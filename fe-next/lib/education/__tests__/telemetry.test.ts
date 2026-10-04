@@ -54,6 +54,8 @@ import {
   trackTeacherHqUpgradeClicked,
   trackTeacherAssignmentReportViewed,
   trackTeacherAssignmentReportUpgradeClicked,
+  trackTeacherInviteStudentsCtaViewed,
+  trackTeacherInviteStudentsCtaClicked,
 } from '../telemetry';
 
 describe('education telemetry', () => {
@@ -429,6 +431,17 @@ describe('education telemetry', () => {
     });
     trackTeacherAssignmentReportUpgradeClicked({ classroomId: 'cls-1' });
     expect(captureMock).toHaveBeenLastCalledWith('teacher_assignment_report_upgrade_clicked', {
+      classroom_id: 'cls-1',
+    });
+  });
+
+  it('empty-roster invite CTA events keep teacher_invite_students_cta_viewed and _clicked', () => {
+    trackTeacherInviteStudentsCtaViewed({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('teacher_invite_students_cta_viewed', {
+      classroom_id: 'cls-1',
+    });
+    trackTeacherInviteStudentsCtaClicked({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('teacher_invite_students_cta_clicked', {
       classroom_id: 'cls-1',
     });
   });

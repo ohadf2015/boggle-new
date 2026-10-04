@@ -8,10 +8,11 @@ import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { LEVEL_ORDER, levelLabelKey } from '@/lib/education/differentiation';
 import { cn } from '@/lib/utils';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { Users, Mail, Calendar, SlidersHorizontal } from 'lucide-react';
+import { Mail, Calendar, SlidersHorizontal } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Avatar from '@/components/Avatar';
 import { resolveDisplayName } from '@/lib/displayName';
+import { InviteStudentsCta } from '@/components/teacher/classroom/InviteStudentsCta';
 
 /** Selected-segment fill per level. Unselected segments are plain white. */
 const LEVEL_SELECTED_BG: Record<VocabularyLevel, string> = {
@@ -147,17 +148,11 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
 
   if (students.length === 0) {
     return (
-      <div className="border-3 border-black rounded-neo p-8 text-center bg-neo-cream shadow-hard-sm">
-        <div className="w-14 h-14 rounded-neo bg-neo-cyan border-2 border-black flex items-center justify-center mx-auto mb-3 shadow-hard-sm">
-          <Users className="w-8 h-8 text-black" />
-        </div>
-        <p className="text-black font-neo-body font-bold mb-1">
-          {t('teacher.classrooms.students.empty')}
-        </p>
-        <p className="text-black/60 text-sm font-bold">
-          {t('teacher.classrooms.students.emptyHint', { code: joinCode })}
-        </p>
-      </div>
+      <InviteStudentsCta
+        classroomId={classroomId}
+        joinCode={joinCode}
+        studentCount={0}
+      />
     );
   }
 

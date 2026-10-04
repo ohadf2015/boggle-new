@@ -485,3 +485,16 @@ export function trackTeacherAssignmentReportViewed(args: TeacherAssignmentReport
 export function trackTeacherAssignmentReportUpgradeClicked(args: { classroomId: string }): void {
   safeCapture('teacher_assignment_report_upgrade_clicked', { classroom_id: args.classroomId });
 }
+
+export interface EduInviteStudentsCtaArgs {
+  classroomId: string;
+}
+
+/** Class-detail empty roster: 0 enrolled students. Distinct from HQ join-panel events. */
+export function trackTeacherInviteStudentsCtaViewed(args: EduInviteStudentsCtaArgs): void {
+  safeCapture('teacher_invite_students_cta_viewed', { classroom_id: args.classroomId });
+}
+
+export function trackTeacherInviteStudentsCtaClicked(args: EduInviteStudentsCtaArgs): void {
+  safeCapture('teacher_invite_students_cta_clicked', { classroom_id: args.classroomId });
+}
