@@ -101,3 +101,26 @@ describe('Teacher Pro checkout strip on classroom compare pages', () => {
     expect(wordwall).toMatch(/calm-mode pressure dials/);
   });
 });
+
+describe('classroom SEO landings that already name Teacher Pro', () => {
+  const CLASSROOM_SEO = [
+    'word-games-for-the-classroom',
+    'bell-ringer-word-games',
+    'substitute-teacher-word-games',
+    'vocabulary-games-for-middle-school',
+  ] as const;
+
+  it('mounts the server checkout strip once and does not open a Classroom checkout', () => {
+    for (const slug of CLASSROOM_SEO) {
+      const page = readFileSync(join(LOCALE, slug, 'page.tsx'), 'utf8');
+      const content = readFileSync(join(LOCALE, slug, 'content.ts'), 'utf8');
+      expect(content, slug).toMatch(/Teacher Pro/);
+      expect(content, slug).toMatch(/\$9/);
+      expect(page, slug).toContain('<TeacherProCompareCheckoutStrip locale={locale} />');
+      expect(page.match(/<TeacherProCompareCheckoutStrip/g)?.length, slug).toBe(1);
+      expect(page, slug).not.toMatch(/^['"]use client['"]/m);
+      expect(page, slug).not.toMatch(/\b39\b/);
+      expect(page, slug).not.toMatch(/plan=classroom/);
+    }
+  });
+});
