@@ -435,6 +435,15 @@ export function trackEduFirstAssignmentCreated(args: EduFirstAssignmentCtaArgs):
   safeCapture('edu_first_assignment_created', { classroom_id: args.classroomId });
 }
 
+/** Class-detail empty state: 0 assignments. Distinct from the HQ panel events. */
+export function trackTeacherFirstAssignmentCtaViewed(args: EduFirstAssignmentCtaArgs): void {
+  safeCapture('teacher_first_assignment_cta_viewed', { classroom_id: args.classroomId });
+}
+
+export function trackTeacherFirstAssignmentCtaClicked(args: EduFirstAssignmentCtaArgs): void {
+  safeCapture('teacher_first_assignment_cta_clicked', { classroom_id: args.classroomId });
+}
+
 export interface EduStartLiveClassArgs {
   classroomId: string;
 }
