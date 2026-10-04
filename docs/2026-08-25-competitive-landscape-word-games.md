@@ -106,3 +106,19 @@ fact. No prose correction is warranted; a positioning rewrite is.
    the same claim before rewriting anything.
 2. Fix the frozen byline date across the four `PageClient.tsx` files.
 3. Re-verify the ⚠ rows against the primary pages when `WebFetch` is available.
+
+---
+
+## Monitoring log
+
+Re-checks of this landscape. One row per cycle; a cycle that finds nothing still gets a row, so
+"no new signal" is distinguishable from "nobody looked".
+
+| Checked | Verdict | What was read | Next check |
+|---|---|---|---|
+| 2026-10-04 | **No change** — nothing found that alters positioning | `wordshake.com` stable (blog-only cadence: 2026-08-24, 2025-12-18; no product changelog, live multiplayer still its newest feature) · `lexiclash.live` live, 10 modes, Season 7 "Frost Lexicon" 27d left, no visible defects · `poki.com/en/g/lexiclash` 404 (unlisted, same as prior runs) · Play Store Wordscapes listing 404 → **review sentiment again unverified** | ~2026-11-04 |
+
+The Wordscapes ad-fatigue opening carried over from earlier runs is still the best speculative
+move, but it is **unverified against a primary page** — the Play Store listing returned
+404/blocked in both this cycle and the 2026-08-25 pass. Treat it as a hypothesis, not evidence,
+until a fetch succeeds.
