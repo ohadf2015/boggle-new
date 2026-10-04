@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
 import CompletionTracker from './CompletionTracker';
 import { StartLiveClassCta } from '../hq/StartLiveClassCta';
+import { CreateFirstAssignmentCta } from './CreateFirstAssignmentCta';
 
 interface AssignmentTrackingPanelProps {
   classroomId: string;
@@ -260,13 +261,11 @@ export default function AssignmentTrackingPanel({
               ? t('teacher.tracking.noAssignments')
               : t('teacher.tracking.noAssignmentsFilter')}
           </p>
-          {activeTab === 'all' && onCreateAssignment && (
-            <Button
-              onClick={onCreateAssignment}
-              className="bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
-            >
-              {t('teacher.tracking.createFirst')}
-            </Button>
+          {activeTab === 'all' && (
+            <CreateFirstAssignmentCta
+              classroomId={classroomId}
+              assignmentCount={assignments.length}
+            />
           )}
         </div>
       ) : (

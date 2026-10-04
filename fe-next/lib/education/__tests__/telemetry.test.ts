@@ -49,6 +49,8 @@ import {
   trackEduFirstAssignmentCtaShown,
   trackEduFirstAssignmentCtaClicked,
   trackEduFirstAssignmentCreated,
+  trackTeacherFirstAssignmentCtaViewed,
+  trackTeacherFirstAssignmentCtaClicked,
   trackEduAssignmentStartLiveClicked,
   trackTeacherHqProgressViewed,
   trackTeacherHqUpgradeClicked,
@@ -381,6 +383,17 @@ describe('education telemetry', () => {
     });
     trackEduFirstAssignmentCreated({ classroomId: 'cls-1' });
     expect(captureMock).toHaveBeenLastCalledWith('edu_first_assignment_created', {
+      classroom_id: 'cls-1',
+    });
+  });
+
+  it('class-detail empty-state CTA events keep teacher_first_assignment_cta_* names', () => {
+    trackTeacherFirstAssignmentCtaViewed({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('teacher_first_assignment_cta_viewed', {
+      classroom_id: 'cls-1',
+    });
+    trackTeacherFirstAssignmentCtaClicked({ classroomId: 'cls-1' });
+    expect(captureMock).toHaveBeenLastCalledWith('teacher_first_assignment_cta_clicked', {
       classroom_id: 'cls-1',
     });
   });
