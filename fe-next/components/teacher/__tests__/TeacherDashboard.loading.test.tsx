@@ -17,7 +17,7 @@
  *    freed height — is now forbidden by shape, not aspect.)
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, fireEvent } from '@testing-library/react';
 
 type Classroom = { id: string; name: string; join_code: string; member_count: number };
 const state = {
@@ -78,6 +78,7 @@ function joinRegion() {
 }
 
 function expectModeChipsKeepTheirShape() {
+  fireEvent.click(screen.getByTestId('play-now-change'));
   const chips = screen.getAllByTestId(/^hq-mode-/);
   expect(chips.length).toBeGreaterThanOrEqual(4);
   for (const chip of chips) {
@@ -112,12 +113,10 @@ describe('<TeacherDashboard> — layout survives every data state', () => {
       expect(screen.queryByTestId('hq-join-code')).toBeNull();
     });
 
-    it('Then the mode chips keep a fixed shape instead of stretching into the freed height', () => {
+    it('Then no step is guessed: the game picker is not mounted until the class read settles', () => {
       render(<TeacherDashboard />);
-      expectModeChipsKeepTheirShape();
-      // The phone's hero column sizes to its content, it does not grow.
-      const main = screen.getByTestId('teacher-dashboard-main');
-      expect(main.className).not.toMatch(/(^|\s)flex-1(\s|$)/);
+      expect(screen.queryByTestId('play-now-launcher')).toBeNull();
+      expect(document.querySelectorAll('[data-hq-primary]')).toHaveLength(0);
     });
 
     it('Then the class chip keeps its slot at the top', () => {
@@ -141,8 +140,10 @@ describe('<TeacherDashboard> — layout survives every data state', () => {
       expect(screen.queryByTestId('hq-join-skeleton')).toBeNull();
     });
 
-    it('Then the mode chips still keep their shape', () => {
+    it('Then the game picker waits behind one quiet link, and its mode chips keep their shape once opened', () => {
       render(<TeacherDashboard />);
+      expect(screen.queryByTestId('play-now-launcher')).toBeNull();
+      fireEvent.click(screen.getByTestId('hq-show-launcher'));
       expectModeChipsKeepTheirShape();
     });
   });
@@ -152,12 +153,19 @@ describe('<TeacherDashboard> — layout survives every data state', () => {
       state.isLoading = false;
     });
 
-    it('Then the join card is live and the mode chips keep their shape', () => {
+    it('Then an empty class gets the live join card as its one step', () => {
       state.classrooms = [{ id: 'c1', name: 'Period 1', join_code: 'AAA111', member_count: 0 }];
       render(<TeacherDashboard />);
       expect(within(joinRegion()).getByTestId('hq-join-code')).toHaveTextContent('AAA111');
       expect(joinRegion()).not.toHaveAttribute('aria-busy', 'true');
+    });
+
+    it('Then a class with students leads with the game picker, whose mode chips keep their shape and whose column does not grow', () => {
+      state.classrooms = [{ id: 'c1', name: 'Period 1', join_code: 'AAA111', member_count: 3 }];
+      render(<TeacherDashboard />);
       expectModeChipsKeepTheirShape();
+      expect(screen.getByTestId('teacher-dashboard-main').className).not.toMatch(/(^|\s)flex-1(\s|$)/);
+      expect(screen.getByTestId('hq-join-code')).toHaveTextContent('AAA111');
     });
 
     it('Then a Latin class name under Hebrew UI isolates its direction and truncates at its END', () => {

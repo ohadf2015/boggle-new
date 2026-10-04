@@ -55,6 +55,8 @@ export interface HqDockProps {
   pro?: ReactNode;
   proOpen: boolean;
   onProOpenChange: (open: boolean) => void;
+  /** The sheet stays reachable (from the pulse) but the top-row chip is not shown. */
+  proChipHidden?: boolean;
   /** Point the open Tools sheet at its last-game section. */
   onLastGame?: () => void;
   /** Drilled into a class tool: the shortcut row steps aside for its section. */
@@ -86,6 +88,7 @@ export function HqDock({
   pro,
   proOpen,
   onProOpenChange,
+  proChipHidden = false,
   onLastGame,
   hideShortcuts = false,
   className,
@@ -206,6 +209,7 @@ export function HqDock({
           // The Pro cards fire `iap_viewed` on mount: only a sheet the teacher
           // actually opened may count as an impression.
           mountWhenOpen
+          hideSummary={proChipHidden}
           open={proOpen}
           onOpenChange={onProOpenChange}
           title={t("academy.hq.proTitle", "Teacher Pro")}
@@ -216,7 +220,7 @@ export function HqDock({
           summary={
             <>
               <Sparkles className="size-4 shrink-0" aria-hidden="true" />
-              <span className="min-w-0 truncate">
+              <span data-hq-upsell="chip" className="min-w-0 truncate">
                 {t("academy.hq.proChip", "Go Pro")}
               </span>
             </>

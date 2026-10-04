@@ -19,6 +19,7 @@ describe('TeacherPlanBadge — quiet when a louder Pro ask is already on screen'
     expect(badge).toHaveAttribute('href', '/en/teacher/upgrade');
     expect(screen.getByText('teacher.plan.free')).toBeInTheDocument();
     expect(screen.queryByText('teacher.plan.upgrade')).toBeNull();
+    expect(badge.className).not.toMatch(/(^|\s)border-neo-lime(\s|$)/);
   });
 
   it('Given not quiet, Then the Upgrade word stays', () => {

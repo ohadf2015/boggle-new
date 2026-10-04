@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import type { MasteryState } from '@/components/teacher/reports/useWordMasteryReport';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -58,15 +58,28 @@ describe('summarizeHqPulse', () => {
 describe('<ClassPulseRow>', () => {
   beforeEach(() => masteryState.mockReset());
 
-  it('Given evidence, Then one row links to the class report with who needs help and on which word', () => {
+  it('Given evidence, Then the pulse leads with accuracy, who needs help and the hardest word, and offers ONE action into the report', () => {
     masteryState.mockReturnValue(READY);
     render(<ClassPulseRow classroomId="c1" studentCount={5} />);
-    const row = screen.getByTestId('hq-class-pulse');
-    expect(row.getAttribute('href')).toBe('/en/teacher/reports?classroomId=c1');
-    expect(row.textContent).toContain('42%');
+    const hero = screen.getByTestId('hq-class-pulse');
+    expect(hero.tagName).not.toBe('A');
+    expect(screen.getByTestId('hq-class-pulse-accuracy').textContent).toContain('42%');
     expect(screen.getByTestId('hq-class-pulse-need-help').textContent).toContain('eg2Rep.hq.needHelp:2');
-    expect(row.textContent).toContain('earth');
     expect(screen.getByTestId('hq-class-pulse-names').textContent).toBe('Priya D, Leo K');
+    expect(screen.getByTestId('hq-class-pulse-hardest').textContent).toContain('earth');
+    const actions = within(hero).getAllByRole('link');
+    expect(actions).toHaveLength(1);
+    expect(actions[0]).toHaveAttribute('data-testid', 'hq-class-pulse-action');
+    expect(actions[0].getAttribute('href')).toBe('/en/teacher/reports?classroomId=c1');
+  });
+
+  it('Given the free preview, Then it keeps accuracy and the hardest word and shows no student names', () => {
+    masteryState.mockReturnValue({ status: 'locked', preview: { totals: totals(4), hardestWords: [hard('earth')], hiddenWords: 3 } });
+    render(<ClassPulseRow classroomId="c1" studentCount={5} />);
+    expect(screen.getByTestId('hq-class-pulse-accuracy').textContent).toContain('42%');
+    expect(screen.getByTestId('hq-class-pulse-hardest').textContent).toContain('earth');
+    expect(screen.queryByTestId('hq-class-pulse-names')).toBeNull();
+    expect(screen.queryByTestId('hq-class-pulse-need-help')).toBeNull();
   });
 
   it('Given everyone at goal, Then it says so instead of a zero', () => {

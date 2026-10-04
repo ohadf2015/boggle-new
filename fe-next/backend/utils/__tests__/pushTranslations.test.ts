@@ -1,7 +1,28 @@
 import { describe, it, expect } from 'vitest';
-import { translatePush, isPushLocale, SUPPORTED_PUSH_LOCALES, countryToLocale } from '../pushTranslations';
+import { translatePush, isPushLocale, SUPPORTED_PUSH_LOCALES, countryToLocale, PUSH_STRINGS } from '../pushTranslations';
 
 describe('pushTranslations', () => {
+  describe('copy quality', () => {
+    it('stores Hebrew in logical order, not visual order', () => {
+      for (const [key, value] of Object.entries(PUSH_STRINGS.he)) {
+        expect(value, key).not.toMatch(/^[!?.:]/);
+        expect(value, key).not.toMatch(/(^|\s)[מבלו]$/);
+      }
+    });
+
+    it('has no em dashes in English push copy', () => {
+      for (const [key, value] of Object.entries(PUSH_STRINGS.en)) {
+        expect(value, key).not.toMatch(/—/);
+      }
+    });
+
+    it('defines every English key in every locale', () => {
+      for (const loc of SUPPORTED_PUSH_LOCALES) {
+        expect(Object.keys(PUSH_STRINGS[loc]).sort(), loc).toEqual(Object.keys(PUSH_STRINGS.en).sort());
+      }
+    });
+  });
+
   describe('isPushLocale', () => {
     it('accepts supported locales', () => {
       for (const loc of SUPPORTED_PUSH_LOCALES) {
@@ -21,7 +42,7 @@ describe('pushTranslations', () => {
   describe('translatePush', () => {
     it('renders English by default', () => {
       const out = translatePush('en', 'friendRequest.title');
-      expect(out).toBe('Friend Request');
+      expect(out).toBe('New friend request');
     });
 
     it('renders Hebrew', () => {
@@ -36,7 +57,7 @@ describe('pushTranslations', () => {
 
     it('interpolates {var} tokens', () => {
       const out = translatePush('en', 'friendRequest.body', { sender: 'Alice' });
-      expect(out).toBe('Alice sent you a friend request!');
+      expect(out).toBe('Alice wants to be friends');
     });
 
     it('interpolates numbers as strings', () => {

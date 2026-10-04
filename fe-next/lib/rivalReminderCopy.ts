@@ -179,7 +179,7 @@ const URGENCY_SUFFIX: Record<PushLocale, Record<UrgencyTier, string>> = {
 const MODE_LABEL: Record<PushLocale, Record<RivalMode, string>> = {
   en: { puzzle: 'puzzle', wordHunt: 'Word Hunt', both: 'daily challenge' },
   he: { puzzle: 'פאזל', wordHunt: 'ציד המילים', both: 'אתגר היומי' },
-  sv: { puzzle: 'pussel', wordHunt: 'Ordjakt', both: 'dagliga utmaning' },
+  sv: { puzzle: 'pussel', wordHunt: 'Ordjakt', both: 'utmaning' },
   ja: { puzzle: 'パズル', wordHunt: 'ワードハント', both: 'デイリー' },
   es: { puzzle: 'puzzle', wordHunt: 'Búsqueda', both: 'reto diario' },
   ru: { puzzle: 'пазл', wordHunt: 'Поиск слов', both: 'ежедневный вызов' },

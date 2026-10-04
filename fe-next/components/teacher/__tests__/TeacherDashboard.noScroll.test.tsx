@@ -14,7 +14,7 @@ import { render, screen } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-const classroomsMock = { value: [{ id: 'c1', name: 'Class 1' }] as Array<{ id: string; name: string }> };
+const classroomsMock = { value: [{ id: 'c1', name: 'Class 1', member_count: 3 }] as Array<{ id: string; name: string; member_count?: number }> };
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
@@ -154,14 +154,15 @@ describe('<TeacherDashboard> — fits the viewport', () => {
     it('puts the hero in the wide column and the secondary row beside it', () => {
       render(<TeacherDashboard />);
       const grid = screen.getByTestId('teacher-dashboard-grid');
-      // 3/5 hero + 2/5 "Get students in": the join code must read from the
-      // back row, so the rail is wider than a third — the hero still wider.
-      expect(grid.className).toMatch(/lg:grid-cols-5/);
+      // Two equal halves: the folded launcher no longer needs 3/5, and the
+      // class pulse beside it is the hero for a class with students.
+      expect(grid.className).toMatch(/lg:grid-cols-2/);
+      expect(grid.className).toContain('lg:items-start');
 
       const main = screen.getByTestId('teacher-dashboard-main');
       const aside = screen.getByTestId('teacher-dashboard-aside');
-      expect(main.className).toContain('lg:col-span-3');
-      expect(aside.className).toContain('lg:col-span-2');
+      expect(main.className).toContain('lg:col-span-1');
+      expect(aside.className).toContain('lg:col-span-1');
       expect(main.contains(screen.getByTestId('play-now-launcher'))).toBe(true);
       // Teacher HQ: the 1/3 rail is the "Get students in" hero; last game /
       // setup / reports live in the Tools sheet opened from the dock (round 2:
@@ -178,9 +179,9 @@ describe('<TeacherDashboard> — fits the viewport', () => {
       // Below lg the deck stacks; on a phone turned sideways that column is
       // ~2x the 390px height. A short landscape screen gets the desktop split.
       const LS = '[@media(orientation:landscape)_and_(max-height:500px)]:';
-      expect(screen.getByTestId('teacher-dashboard-grid').className).toContain(`${LS}grid-cols-5`);
-      expect(screen.getByTestId('teacher-dashboard-main').className).toContain(`${LS}col-span-3`);
-      expect(screen.getByTestId('teacher-dashboard-aside').className).toContain(`${LS}col-span-2`);
+      expect(screen.getByTestId('teacher-dashboard-grid').className).toContain(`${LS}grid-cols-2`);
+      expect(screen.getByTestId('teacher-dashboard-main').className).toContain(`${LS}col-span-1`);
+      expect(screen.getByTestId('teacher-dashboard-aside').className).toContain(`${LS}col-span-1`);
     });
 
     it('Given a 2560x1440 TV, Then the whole shell scales up instead of floating a 1920 island', () => {
@@ -209,7 +210,7 @@ describe('<TeacherDashboard> — fits the viewport', () => {
       expect(document.querySelector('#classroom-name')).toBeNull();
       const art = screen.getByTestId('teacher-empty-classroom-art');
       expect(art.getAttribute('src')).toContain('hero-empty-classroom');
-      classroomsMock.value = [{ id: 'c1', name: 'Class 1' }];
+      classroomsMock.value = [{ id: 'c1', name: 'Class 1', member_count: 3 }];
     });
   });
 
@@ -225,8 +226,8 @@ describe('<TeacherDashboard> — fits the viewport', () => {
       // Source contract: absolute dock needs reserved end space, but w-60 on a
       // 320px phone left ~56px for the class chip and invited sideways scroll.
       const src = readFileSync(path.join(__dirname, '..', 'TeacherDashboard.tsx'), 'utf8');
-      expect(src).toMatch(/hasProChip[\s\S]*?w-36 max-\[360px\]:w-28 sm:w-60/);
-      expect(src).not.toMatch(/hasProChip \? 'w-60 sm:w-72'/);
+      expect(src).toMatch(/chipVisible \? 'w-36 max-\[360px\]:w-28 sm:w-60/);
+      expect(src).not.toMatch(/chipVisible \? 'w-60 sm:w-72'/);
     });
   });
 });
