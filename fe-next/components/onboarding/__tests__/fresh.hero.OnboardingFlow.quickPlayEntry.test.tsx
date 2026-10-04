@@ -98,7 +98,7 @@ describe('OnboardingFlow entry="quickPlay" (homepage hero PLAY)', () => {
     );
     expect(screen.queryByTestId('quick-start-step')).toBeNull();
     expect(pushMock).toHaveBeenCalledTimes(1);
-    expect(pushMock).toHaveBeenCalledWith('/en/singleplayer?autoStart=bots');
+    expect(pushMock).toHaveBeenCalledWith('/en/singleplayer?autoStart=coach');
     expect(markComplete).toHaveBeenCalledTimes(1);
     expect(markComplete).toHaveBeenCalledWith(
       expect.objectContaining({ displayName: 'Zippy Fox', selectedMode: 'home', nameEdited: false })
@@ -122,7 +122,7 @@ describe('OnboardingFlow entry="quickPlay" (homepage hero PLAY)', () => {
     guest.games = 3;
     render(<OnboardingFlow onComplete={vi.fn()} entry="quickPlay" />);
     expect(screen.queryByTestId('returning-step')).toBeNull();
-    expect(pushMock).toHaveBeenCalledWith('/en/singleplayer?autoStart=bots');
+    expect(pushMock).toHaveBeenCalledWith('/en/singleplayer?autoStart=coach');
   });
 
   it('a pending room invite wins: the invite flow runs, no auto-play', () => {

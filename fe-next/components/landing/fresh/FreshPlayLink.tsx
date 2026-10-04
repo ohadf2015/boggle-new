@@ -16,6 +16,8 @@ interface FreshPlayLinkProps {
    * never drift from the page it is on.
    */
   locale?: string;
+  /** Override the no-JS destination. Defaults to multiplayer. */
+  href?: string;
   className?: string;
   children: ReactNode;
 }
@@ -26,7 +28,7 @@ interface FreshPlayLinkProps {
  * never swaps after hydration (the old mount-gated CTA was a CLS source).
  * Modified clicks (new tab/window) keep the native link behaviour.
  */
-export function FreshPlayLink({ onPlay, cta, locale, className, children }: FreshPlayLinkProps) {
+export function FreshPlayLink({ onPlay, cta, locale, href, className, children }: FreshPlayLinkProps) {
   const { language } = useLanguage();
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
@@ -37,7 +39,7 @@ export function FreshPlayLink({ onPlay, cta, locale, className, children }: Fres
   };
 
   return (
-    <Link href={`/${locale ?? language}/multiplayer`} onClick={handleClick} className={className}>
+    <Link href={href ?? `/${locale ?? language}/multiplayer`} onClick={handleClick} className={className}>
       {children}
     </Link>
   );

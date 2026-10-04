@@ -298,28 +298,21 @@ describe('LandingChallengeCards — Word Tower v2 public gate', () => {
   });
 });
 
-describe('LandingChallengeCards — all modes always surfaced', () => {
-  it('never renders the "More Game Modes" expander, even for a brand-new player', () => {
+describe('LandingChallengeCards — two modes up front, the rest parked', () => {
+  it('leads with the live race and parks blast, adventure and word tower', () => {
     mockIsNewPlayer.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(0);
     mockUserStats.mockReturnValue({ totalGamesPlayed: 0 });
     mockUserEmail.mockReturnValue(undefined);
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
-    // Every non-essential mode lives directly in the visible grid.
-    expect(container.querySelector('[data-cube-key="blast"]')).toBeInTheDocument();
-    expect(container.querySelector('[data-cube-key="connections"]')).toBeInTheDocument();
-  });
-
-  it('still shows all modes directly once the player has completed any MP game', () => {
-    mockIsNewPlayer.mockReturnValue(true);
-    mockGamesCompleted.mockReturnValue(1);
-    mockUserStats.mockReturnValue({ totalGamesPlayed: 1 });
-    mockUserEmail.mockReturnValue(undefined);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
-    expect(container.querySelector('[data-cube-key="blast"]')).toBeInTheDocument();
-    expect(container.querySelector('[data-cube-key="connections"]')).toBeInTheDocument();
+    const more = container.querySelector('[data-testid="landing-cubes-more"]');
+    expect(more).not.toBeNull();
+    expect(container.querySelector('[data-cube-key="arena"]')).toBeInTheDocument();
+    for (const key of ['blast', 'adventure', 'wordTowerV2', 'connections']) {
+      const card = container.querySelector(`[data-cube-key="${key}"]`);
+      expect(card).toBeTruthy();
+      expect(more!.contains(card)).toBe(true);
+    }
   });
 });
 

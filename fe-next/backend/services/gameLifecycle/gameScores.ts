@@ -8,6 +8,9 @@
 import type { Server } from 'socket.io';
 import { getGame } from '../../modules/gameStateManager';
 import { isDictionaryWord } from '../../dictionary';
+import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
+import { classicMinWordLength } from '@/shared/utils/classicWordRules';
+import type { Language } from '@/shared/types';
 import {
   isWordCommunityValid,
   isWordValidForScoring,
@@ -99,7 +102,14 @@ export async function calculateAndBroadcastFinalScores(
       if (!seenWords.has(word)) {
         seenWords.add(word);
 
-        if (isDictionaryWord(word, language)) {
+        const shapeWeird = isWordShapeWeird(word, language as Language).weird;
+        const belowClassicMin = game.gameMode === 'classic'
+          && word.length < classicMinWordLength(language);
+        // A listed non-word (aaa) or a classic 2-letter string must not be
+        // re-scored here after the live round already refused it.
+        if (shapeWeird || belowClassicMin) {
+          nonDictionaryWords.push(word);
+        } else if (isDictionaryWord(word, language)) {
           dictionaryValidatedWords.add(word);
         } else if (
           isWordCommunityValid(word, language) ||

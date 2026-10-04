@@ -42,11 +42,11 @@ export const RETIRED_PRACTICE_REDIRECTS = [
     destination: '/:locale/daily/word-wheel',
     permanent: true,
   },
-  // Classic practice was the single-player grid with a tutorial wrapper — the
-  // wrapper is what we removed, so the board itself is the honest destination.
+  // Classic practice was the single-player grid. Land on one coached round,
+  // not a bot match (bare /singleplayer is treated as autoStart=bots).
   {
     source: `/${LOCALE}/practice/classic`,
-    destination: '/:locale/singleplayer',
+    destination: '/:locale/singleplayer?autoStart=coach',
     permanent: true,
   },
   // Anything else under /practice — including `/practice/brain`, which
@@ -60,7 +60,7 @@ export const RETIRED_PRACTICE_REDIRECTS = [
   // The hub itself.
   {
     source: `/${LOCALE}/practice`,
-    destination: '/:locale/singleplayer',
+    destination: '/:locale/singleplayer?autoStart=coach',
     permanent: true,
   },
 ];
