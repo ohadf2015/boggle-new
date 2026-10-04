@@ -123,7 +123,7 @@ export function InviteStudentsCta({
           type="button"
           data-testid="invite-students-copy-link"
           onClick={() => void copyLink()}
-          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy px-2 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cream shadow-hard-sm hover:-translate-y-0.5 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream bg-neo-navy px-2 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cream shadow-hard-sm hover:-translate-y-0.5 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           <Link2 className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
           {t('teacher.classroom.copyLink', 'Copy invite link')}
