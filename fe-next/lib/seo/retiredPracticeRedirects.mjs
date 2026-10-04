@@ -16,8 +16,10 @@
  * specific real game, and dumping someone who wanted the word wheel onto the
  * classic board is a worse landing than the 404 it replaces.
  *
- * Order matters — Next takes the FIRST matching rule, so the specific modes must
- * precede the catch-all.
+ * Order matters — Next takes the FIRST matching rule. Specific modes first, then
+ * the hub, then the catch-all. Use `:rest+` (one or more) — not `:rest*` — so the
+ * catch-all cannot also match the bare hub even if order slips. (`:rest*` is an
+ * optional catch-all and matches `/[locale]/practice` with zero segments.)
  *
  * Plain .mjs, not .ts: next.config.mjs has to import this at config-load time,
  * where Node cannot load TypeScript. One list, shared by the config and its test.
@@ -49,18 +51,20 @@ export const RETIRED_PRACTICE_REDIRECTS = [
     destination: '/:locale/singleplayer?autoStart=coach',
     permanent: true,
   },
-  // Anything else under /practice — including `/practice/brain`, which
-  // SixModeTour still links and which was never a valid practice mode to begin
-  // with, so it 404s today.
-  {
-    source: `/${LOCALE}/practice/:rest*`,
-    destination: '/:locale/singleplayer',
-    permanent: true,
-  },
-  // The hub itself.
+  // The hub itself — must precede the catch-all. Coach, not bare singleplayer
+  // (bots), so old /practice bookmarks land the same place as /practice/classic.
   {
     source: `/${LOCALE}/practice`,
     destination: '/:locale/singleplayer?autoStart=coach',
+    permanent: true,
+  },
+  // Anything else under /practice — including `/practice/brain`, which
+  // SixModeTour still links and which was never a valid practice mode to begin
+  // with, so it 404s today. `:rest+` requires ≥1 segment so it cannot swallow
+  // the hub above.
+  {
+    source: `/${LOCALE}/practice/:rest+`,
+    destination: '/:locale/singleplayer',
     permanent: true,
   },
 ];

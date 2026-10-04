@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useMobilePortrait } from '@/hooks/useMobilePortrait';
@@ -74,7 +73,6 @@ interface ReturningHomeProps {
  */
 export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData, onStartOnboarding }) => {
   const { t, language } = useLanguage();
-  const { playTrack, TRACKS } = useMusic();
   const { isAuthenticated, isAdmin, profile, user, loading: authLoading } = useAuth();
   // Cold-start guard: the auth session resolves (`authLoading` → false) and sets
   // `user` before the separate profile fetch lands, so the top bar would paint the
@@ -142,11 +140,8 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData, onSta
   const [enableHeavyBackground, setEnableHeavyBackground] = useState(false);
   useEffect(() => { setEnableHeavyBackground(getPerfVariant() === 'control'); }, []);
 
-  // Queue ambient music on mount; MusicContext defers it until its own
-  // first-gesture unlock (single code path, no duplicate playback).
-  useEffect(() => {
-    playTrack(TRACKS.BOSSA);
-  }, [playTrack, TRACKS]);
+  // Ambient bed is queued by LandingView (fresh + returning). A second
+  // playTrack here double-starts the same Howl on returning visits.
 
   const dailyChallengeStats = {
     hasPlayed: dailyChallengeStatus.hasPlayed,

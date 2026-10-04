@@ -33,6 +33,7 @@ export async function ensureHowl(): Promise<(typeof import('howler'))['Howl']> {
       patchHowlerRemoveEventListenerRace();
       patchHowlerStaleSoundListeners(mod);
       patchHowlerLoadQueueRecursion(_HowlCtor);
+      patchHowlerPlayReentry(_HowlCtor);
       return _HowlCtor;
     });
   }
@@ -232,6 +233,65 @@ function patchHowlerLoadQueueRecursion(Howl: (typeof import('howler'))['Howl']):
   };
   (iterative as { __lqPatched?: boolean }).__lqPatched = true;
   proto._loadQueue = iterative;
+}
+
+/**
+ * Howler html5 looping is `_ended` → `play(id)`. For a Howl whose decoded
+ * duration is 0 / NaN (truncated file, empty CDN 200, html5 metadata not
+ * ready) that restart is SYNCHRONOUS, so `_ended → play → _ended` recurses
+ * without bound (Sentry 1PP/1RZ). MusicContext's onload duration guard never
+ * runs for SFX (fire-crackle) or for a Howl that plays before onload.
+ *
+ * A second html5 play() on an already-playing looping Howl also spawns a NEW
+ * Audio element — stacked "infinite" beds. Refuse that; return the live id.
+ */
+function patchHowlerPlayReentry(Howl: (typeof import('howler'))['Howl']): void {
+  type PlayHowl = {
+    _loop?: boolean;
+    _state?: string;
+    _sounds?: { _id: number }[];
+    __lexiPlayReentering?: boolean;
+    duration: () => number;
+    loop: (v?: boolean) => boolean | unknown;
+    playing: () => boolean;
+    state?: () => string;
+  };
+  type HowlProto = {
+    play?: (this: PlayHowl, sprite?: unknown) => unknown;
+  };
+  const proto = Howl.prototype as HowlProto;
+  const original = proto.play;
+  if (typeof original !== 'function' || (original as { __lexiPlayPatched?: boolean }).__lexiPlayPatched) {
+    return;
+  }
+
+  const guarded = function (this: PlayHowl, sprite?: unknown) {
+    if (this.__lexiPlayReentering) {
+      return this._sounds?.[0]?._id;
+    }
+
+    const duration = typeof this.duration === 'function' ? this.duration() : 0;
+    const loaded = this._state === 'loaded' || (typeof this.state === 'function' && this.state() === 'loaded');
+    // Only kill looping after we KNOW the file decoded to nothing. An unloaded
+    // Howl reports duration 0 — that's every music bed on first play().
+    if (this._loop && loaded && !(duration > 0)) {
+      this.loop(false);
+      return this._sounds?.[0]?._id;
+    }
+
+    if (this._loop && sprite == null && typeof this.playing === 'function' && this.playing()) {
+      return this._sounds?.[0]?._id;
+    }
+
+    this.__lexiPlayReentering = true;
+    try {
+      return original.call(this, sprite);
+    } finally {
+      this.__lexiPlayReentering = false;
+    }
+  };
+  (guarded as { __lexiPlayPatched?: boolean }).__lexiPlayPatched = true;
+  proto.play = guarded;
 }
 
 /**
