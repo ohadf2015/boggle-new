@@ -116,7 +116,11 @@ vi.mock('../../../utils/profileStorage', () => ({
   getStoredUsername: () => 'Guest',
   setStoredUsername: vi.fn(),
 }));
-vi.mock('../../../utils/guestManager', () => ({ setGuestName: vi.fn() }));
+vi.mock('../../../utils/guestManager', () => ({
+  setGuestName: vi.fn(),
+  saveGuestNameEverywhere: vi.fn(),
+  ensureGuestDisplayName: () => 'Sly Fox',
+}));
 vi.mock('../../../utils/dailyChallenge/guestPlayer', () => ({ updateGuestDailyPlayer: vi.fn() }));
 vi.mock('../../../lib/queryKeys', () => ({ queryKeys: {} }));
 vi.mock('../../../lib/header/notificationScroll', () => ({ notificationListScrollClass: '' }));

@@ -23,8 +23,8 @@ import { ManageCookiesButton } from '@/components/CookieConsent';
 import GetAppMenuRow from '@/components/android-install/GetAppMenuRow';
 import { teacherMenuEntry } from '@/lib/education/teacherRole';
 import AvatarLite from '@/components/AvatarLite';
-import { getStoredCustomAvatar, getStoredUsername } from '../../utils/profileStorage';
-import { saveGuestNameEverywhere } from '../../utils/guestManager';
+import { getStoredCustomAvatar } from '../../utils/profileStorage';
+import { saveGuestNameEverywhere, ensureGuestDisplayName } from '../../utils/guestManager';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { useDailyMissions } from '@/hooks/useDailyMissions';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
@@ -93,7 +93,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const [giftBannerDismissed, setGiftBannerDismissed] = useState(false);
 
     // Guest name editing
-    const [guestName, setGuestNameState] = useState<string>(() => getStoredUsername() || '');
+    const [guestName, setGuestNameState] = useState<string>('');
     const [isEditingGuestName, setIsEditingGuestName] = useState(false);
     const [editGuestNameValue, setEditGuestNameValue] = useState('');
     const guestNameInputRef = useRef<HTMLInputElement>(null);
@@ -101,9 +101,9 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     // Refresh guest name when menu opens
     useEffect(() => {
         if (showMobileMenu && !isAuthenticated) {
-            setGuestNameState(getStoredUsername() || '');
+            setGuestNameState(ensureGuestDisplayName(language) || '');
         }
-    }, [showMobileMenu, isAuthenticated]);
+    }, [showMobileMenu, isAuthenticated, language]);
 
     // Keep the native AdMob banner BEHIND the open side menu. The banner is a
     // native platform view that composites above the WebView, so no z-index can

@@ -34,6 +34,7 @@ vi.mock('@/utils/ThemeContext', () => ({
 // --- Mock guestManager ---
 vi.mock('@/utils/guestManager', () => ({
   getGuestSessionId: vi.fn().mockReturnValue('guest-session-id'),
+  ensureGuestDisplayName: () => 'Sly Fox',
 }));
 
 // --- Mock challenges utils ---
