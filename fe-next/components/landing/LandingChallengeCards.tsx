@@ -308,6 +308,13 @@ export function LandingChallengeCards({
   // preserved from the gated `visibleKeys` computation above.
   const fastModels = visibleModels.filter((m) => !isCalmMode(m.key));
   const calmModels = visibleModels.filter((m) => isCalmMode(m.key));
+  // First screen is the Word Wheel banner plus one live grid race. Everything
+  // else, including Adventure, Word Tower and Blast, stays one tap away.
+  const leadModels = fastModels.filter((m) => m.key === 'arena');
+  const parkedModels = [
+    ...fastModels.filter((m) => m.key !== 'arena'),
+    ...calmModels,
+  ];
   // Daily is the cubes hero — always present (it's the once-a-day hook), not
   // gated on heroCards like the control arm. It renders above the bento grid.
   // Both mobile Home Hub and desktop bento use the richer HomeDailyHero banner
@@ -316,8 +323,9 @@ export function LandingChallengeCards({
 
   return (
     <LandingModeCubes
-      models={fastModels}
-      calmModels={calmModels}
+      models={leadModels}
+      extras={parkedModels}
+      calmModels={[]}
       calmLabel={t('landing.calmSectionTitle')}
       calmHint={t('landing.calmSectionSubtitle')}
       dailyNode={dailyNode}

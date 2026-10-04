@@ -75,7 +75,7 @@ export function FreshDaily() {
       accent="cyan"
       title={t('homeFresh.sections.daily.title')}
       line={t('homeFresh.sections.daily.line')}
-      link={{ href: `/${language}/daily`, label: t('homeFresh.sections.daily.cta') }}
+      link={{ href: `/${language}/daily/word-wheel`, label: t('homeFresh.sections.daily.cta') }}
       art={<StreakArt label={t('homeFresh.sections.daily.streak')} />}
     />
   );

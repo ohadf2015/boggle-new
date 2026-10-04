@@ -23,12 +23,12 @@ import { firstGameRoute } from '../firstGameRoute';
 
 describe('firstGameRoute', () => {
   it('sends a new player into a real auto-started game', () => {
-    expect(firstGameRoute('en')).toBe('/en/singleplayer?autoStart=bots');
+    expect(firstGameRoute('en')).toBe('/en/singleplayer?autoStart=coach');
   });
 
   it('keeps the player in their own language', () => {
-    expect(firstGameRoute('he')).toBe('/he/singleplayer?autoStart=bots');
-    expect(firstGameRoute('ja')).toBe('/ja/singleplayer?autoStart=bots');
+    expect(firstGameRoute('he')).toBe('/he/singleplayer?autoStart=coach');
+    expect(firstGameRoute('ja')).toBe('/ja/singleplayer?autoStart=coach');
   });
 
   it('never routes into practice', () => {

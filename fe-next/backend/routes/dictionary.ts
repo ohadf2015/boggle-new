@@ -11,6 +11,7 @@ import { createEndpointLimiter } from '../utils/apiRateLimiter';
 
 // Import the same dictionary used by multiplayer
 import { isDictionaryWord, dictionary, ensureLanguageLoaded } from '../dictionary';
+import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 import { isWordCommunityValid, isWordValidForScoring } from '../modules/communityWordManager';
 
 const router: Router = express.Router();
@@ -32,7 +33,7 @@ interface DictionaryCheckRequest extends Request {
 
 interface DictionaryCheckResponse {
   isValid: boolean;
-  source: 'dictionary' | 'community' | 'community_positive' | 'too_short' | 'not_loaded' | 'unknown' | 'error';
+  source: 'dictionary' | 'community' | 'community_positive' | 'too_short' | 'invalid_shape' | 'not_loaded' | 'unknown' | 'error';
 }
 
 interface Dictionary {
@@ -86,6 +87,12 @@ router.post('/check', dictionaryRateLimiter, async (req: DictionaryCheckRequest,
     // const isCommunityValidated = isWordCommunityValid(normalizedWord, game.language);
     // const hasPositiveScore = isWordValidForScoring(normalizedWord, game.language);
     // const shouldAutoValidate = isInDictionary || isCommunityValidated || hasPositiveScore;
+
+    // "aaa" is in some lists. Shape-weird strings are not words in any mode.
+    if (isWordShapeWeird(normalizedWord, lang).weird) {
+      res.json({ isValid: false, source: 'invalid_shape' } as DictionaryCheckResponse);
+      return;
+    }
 
     // Check 1: Local dictionary (same as multiplayer)
     const isInDictionary = isDictionaryWord(normalizedWord, lang);

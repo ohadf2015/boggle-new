@@ -24,10 +24,12 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { MODE_META, modeRoute } from '@/lib/landing/modeMeta';
 import { trackLandingCtaClick, trackModeSelected } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
-import { NewModesSpotlight } from '../NewModesSpotlight';
 
-export const FRESH_MODE_KEYS = ['arena', 'wordCraft', 'connections', 'brainGym', 'blast'] as const;
-type FreshModeKey = (typeof FRESH_MODE_KEYS)[number];
+/** First screen: one live grid race. Word Wheel is the daily banner, not a second card. */
+export const FRESH_MODE_KEYS = ['arena'] as const;
+/** Still reachable. Adventure, Word Tower and Blast are parked, not deleted. */
+export const FRESH_PARKED_KEYS = ['adventure', 'wordTowerV2', 'blast', 'wordCraft', 'connections', 'brainGym'] as const;
+type FreshModeKey = (typeof FRESH_MODE_KEYS)[number] | (typeof FRESH_PARKED_KEYS)[number];
 
 /** Literal class strings (Tailwind v4 only sees literals). Neighbours never share a colour. */
 const CARD_TONE = ['bg-neo-pink', 'bg-neo-lime', 'bg-neo-cyan', 'bg-neo-purple'] as const;
@@ -40,7 +42,7 @@ const CARD_TILT = ['-rotate-1', 'rotate-1'] as const;
  * nothing but navy margin is cropped: small-framed stickers get more, blast
  * bleeds its FX to the edge and brainGym is already tall, so they stay at 1.
  */
-const ART_ZOOM: Record<FreshModeKey, number> = {
+const ART_ZOOM: Partial<Record<FreshModeKey, number>> = {
   arena: 1, wordCraft: 1.15, connections: 1.25, brainGym: 1, blast: 1,
 };
 
@@ -83,7 +85,6 @@ export function ModeRow() {
       </div>
 
       <div className="mx-auto mt-10 w-full max-w-6xl px-4 sm:px-6 md:mt-12 lg:px-8">
-        <NewModesSpotlight surface="fresh" />
         {/* Pager sits on the carousel it drives, not up by the heading. */}
         <div className="mt-12 hidden justify-end gap-3 md:flex">
           <PagerButton label={t('homeFresh.modes.prev')} icon={ArrowLeft} onClick={() => page(-1)} />
@@ -107,8 +108,9 @@ export function ModeRow() {
           const meta = MODE_META[key];
           const href = modeRoute(key, language);
           if (!meta?.genIcon || !href) return null;
+          const zoom = ART_ZOOM[key] ?? 1;
           const artScale: CSSProperties | undefined =
-            ART_ZOOM[key] > 1 ? { transform: `scale(${ART_ZOOM[key]})` } : undefined;
+            zoom > 1 ? { transform: `scale(${zoom})` } : undefined;
           return (
             <li key={key} className="flex snap-start">
               <Link
@@ -158,6 +160,32 @@ export function ModeRow() {
           );
         })}
       </ul>
+
+      <details data-testid="fresh-modes-more" className="mx-auto mt-4 w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+        <summary className="cursor-pointer font-neo-display text-base font-bold text-neo-cream">
+          {t('homeFresh.modes.next')}
+        </summary>
+        <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {FRESH_PARKED_KEYS.map((key) => {
+            const meta = MODE_META[key];
+            const href = modeRoute(key, language);
+            if (!meta?.genIcon || !href) return null;
+            return (
+              <li key={key}>
+                <Link
+                  href={href}
+                  data-mode={key}
+                  data-parked-mode={key}
+                  onClick={() => onCardClick(key)}
+                  className="flex items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-cream p-2 font-neo-display text-sm font-bold text-neo-black"
+                >
+                  {t(`homeFresh.modes.items.${key}.title`)}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </details>
     </section>
   );
 }

@@ -39,8 +39,18 @@ describe('wordShapeFilter', () => {
       expect(isWordShapeWeird('xeeeey', 'en')).toEqual({ weird: true, reason: 'repeated_chars' });
     });
 
-    it('accepts 3 in a row', () => {
+    it('accepts 3 in a row when the word is not only that letter', () => {
       expect(isWordShapeWeird('aaab', 'en').weird).toBe(false);
+    });
+
+    it('rejects aaa, which is not a word even if a list contains it', () => {
+      expect(isWordShapeWeird('aaa', 'en')).toEqual({ weird: true, reason: 'repeated_chars' });
+      expect(isWordShapeWeird('AAA', 'en').weird).toBe(true);
+    });
+
+    it('still accepts real doubles and triples mixed with other letters', () => {
+      expect(isWordShapeWeird('see', 'en').weird).toBe(false);
+      expect(isWordShapeWeird('book', 'en').weird).toBe(false);
     });
 
     it('rejects pure spam aaaaaaaa', () => {

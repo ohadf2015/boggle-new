@@ -49,7 +49,8 @@ import type { SinglePlayerGameState, SinglePlayerResultsData } from '../../Singl
 import type { LetterGrid } from '@/shared/types/game';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { FoundWord, TrainingState, DirectionGuidanceState, KeyboardInputState } from '../types';
-import { roundEventsEnabled, startsBehindGate } from './roundGates';
+import { roundEventsEnabled, startsBehindGate, coachClockHeld } from './roundGates';
+import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 import { isFirstSessionPlayer } from '@/lib/retention/firstWin';
 import { useExperiment } from '@/hooks/useExperiment';
 import { resolveQuitConfirmDescription } from '@/lib/experiments/quitConfirmDescription';
@@ -117,7 +118,10 @@ export function useSinglePlayerCore({
   // the default settings and `mode` resolves a render later (autoStart=practice
   // briefly looked like solo-bots and got a Start card it should never have).
   const [started, setStarted] = useState(false);
-  const awaitingStart = startsBehindGate(settings.mode) && !started;
+  const coach = !!settings.coach;
+  const awaitingStart = startsBehindGate(settings.mode, coach) && !started;
+  const validWordCount = foundWords.filter((fw) => fw.isValid === true).length;
+  const clockHeldForCoach = coachClockHeld(coach, validWordCount);
   const handleStart = useCallback(() => setStarted(true), []);
   const held = isPaused || awaitingStart;
   // Read once: the "first game played" flag is written at game END.
@@ -231,7 +235,7 @@ export function useSinglePlayerCore({
   const timer = useGameTimer({
     initialTime: settings.timerSeconds,
     isPaused: isPaused || settings.mode === 'practice',
-    isExternallyPaused: !grid || awaitingStart || isEarthquakePaused || isGiftModalOpen || isRewardAdActive,
+    isExternallyPaused: !grid || awaitingStart || clockHeldForCoach || isEarthquakePaused || isGiftModalOpen || isRewardAdActive,
     autoStart: settings.mode !== 'practice',
     onTimeUp: () => { if (!gameOverCalledRef.current) setIsGameOver(true); },
   });
@@ -280,7 +284,7 @@ export function useSinglePlayerCore({
   });
 
   const { earthquakeState, fireRoundActive, fireRoundRemaining, getScoreMultiplier } = useEarthquakeFireRound({
-    enabled: roundEventsEnabled(settings.mode, isFirstGame), gameDurationSeconds: settings.timerSeconds,
+    enabled: roundEventsEnabled(settings.mode, isFirstGame, coach), gameDurationSeconds: settings.timerSeconds,
     currentTimeSeconds: timer.remainingTime, language: settings.language,
     difficulty: settings.difficulty, mode: 'singleplayer',
     onGridRegenerate: (newGrid) => { setGrid(newGrid); foundWordsSetRef.current.clear(); },
@@ -349,9 +353,17 @@ export function useSinglePlayerCore({
 
     const currentGrid = gridRef.current;
     if (!currentGrid || !isWordOnBoard(normalizedWord, currentGrid, settings.language)) {
-      const notOnBoardMsg = t('playerView.wordNotOnBoard', 'Word not on board');
+      const notOnBoardMsg = t('playerView.wordNotOnBoard', 'Not on board');
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: notOnBoardMsg, timestamp: now });
       playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, notOnBoardMsg); combo.resetCombo();
+      soloJuiceRef.current.onResult({ result: 'invalid', word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: now });
+      return;
+    }
+
+    if (isWordShapeWeird(normalizedWord, settings.language).weird) {
+      const notAWordMsg = t('playerView.invalidWord', 'Not a word');
+      setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: notAWordMsg, timestamp: now });
+      playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, notAWordMsg); combo.resetCombo();
       soloJuiceRef.current.onResult({ result: 'invalid', word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: now });
       return;
     }
@@ -423,7 +435,7 @@ export function useSinglePlayerCore({
       );
       setFoundWords(foundWordsRef.current);
       wordPace.recordWord();
-      const invalidMsg = t('playerView.invalidWord', 'Not a valid word');
+      const invalidMsg = t('playerView.invalidWord', 'Not a word');
       setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: now });
       playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, invalidMsg);
       recordNotInDictionary(normalizedWord, settings.language, 'single_player');
@@ -459,7 +471,7 @@ export function useSinglePlayerCore({
         );
         setFoundWords(foundWordsRef.current);
         wordPace.recordWord();
-        const invalidMsg = t('playerView.invalidWord', 'Not a valid word');
+        const invalidMsg = t('playerView.invalidWord', 'Not a word');
         setCurrentFeedback({ id: `reject-${Date.now()}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: Date.now() });
         playWordRejectedSound(); hapticError();
       });

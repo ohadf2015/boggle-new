@@ -10,6 +10,7 @@
 
 import type { Server, Socket } from 'socket.io';
 import type { LetterGrid, Language, DifficultyLevel, GameMode } from '@/shared/types';
+import { classicMinWordLength } from '@/shared/utils/classicWordRules';
 import type { GameState } from '../modules/gameState/types.js';
 
 import {
@@ -147,7 +148,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // wipes game.minWordLength — keep the host's prior choices as fallbacks.
     const priorTimerSeconds = game.timerSeconds;
     const effectiveDifficulty = difficulty ?? game.difficulty ?? DEFAULT_DIFFICULTY;
-    const effectiveMinWordLength = minWordLength ?? game.minWordLength ?? 2;
+    let effectiveMinWordLength = minWordLength ?? game.minWordLength ?? 2;
 
     if (gamesStarting.has(gameCode)) {
       logger.debug('SOCKET', `Rejected duplicate startGame for ${gameCode} (mutex held)`);
@@ -163,6 +164,12 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     let resolvedMode: GameMode = !gameMode || gameMode === 'random'
       ? selectNextGameMode(game.modeHistory || [], ALL_GAME_MODES)
       : gameMode as GameMode;
+    if (resolvedMode === 'classic') {
+      effectiveMinWordLength = Math.max(
+        effectiveMinWordLength,
+        classicMinWordLength(language || game.language),
+      );
+    }
     const rules = getGameModeRules(resolvedMode);
 
     // Host timer clamped to 30..600s (mode default when none given). Event-driven

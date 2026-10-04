@@ -22,8 +22,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
+import Link from 'next/link';
 import { FreshPlayLink } from './FreshPlayLink';
 import { HeroGrid } from './HeroGrid';
+import { firstGameRoute } from '@/lib/onboarding/firstGameRoute';
 
 // Same chunk the site Header already lazy-loads for its Sign in button.
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -34,7 +36,7 @@ export interface FreshHeroProps {
 }
 
 export function FreshHero({ onPlay }: FreshHeroProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [found, setFound] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
@@ -85,11 +87,19 @@ export function FreshHero({ onPlay }: FreshHeroProps) {
         <FreshPlayLink
           onPlay={onPlay}
           cta="fresh_hero_play"
+          href={firstGameRoute(language)}
           className="inline-flex min-h-14 items-center justify-center gap-2 rounded-neo-lg border-3 border-neo-black bg-neo-lime px-10 py-4 font-neo-display text-xl font-bold uppercase tracking-wide text-neo-black shadow-hard-xl active:translate-x-[3px] active:translate-y-[3px] active:shadow-hard-pressed motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream md:min-w-[18rem] md:text-2xl"
         >
           {t('homeFresh.hero.play')}
           <DirectionalIcon icon={ArrowRight} className="hero-play-arrow h-6 w-6" />
         </FreshPlayLink>
+        <Link
+          href={`/${language}/multiplayer`}
+          onClick={() => trackLandingCtaClick('fresh_hero_play_friend')}
+          className="inline-flex min-h-11 items-center justify-center rounded-neo-lg px-4 font-neo-body text-base font-bold text-neo-cream underline decoration-neo-cream/30 decoration-2 underline-offset-4 hover:text-neo-lime hover:decoration-neo-lime focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream"
+        >
+          {t('homeFresh.hero.playFriend', 'Play a friend')}
+        </Link>
         {!isOnCrazyGamesPlatform && (
           <button
             type="button"

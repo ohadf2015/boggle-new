@@ -75,11 +75,11 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
 
   return (
     <Link
-      href={`/${language}/daily`}
+      href={`/${language}/daily/word-wheel`}
       prefetch={false}
       data-testid="home-daily-hero"
-      onClick={() => trackLandingCtaClick('daily_banner', { mode: 'daily', hasPlayed })}
-      aria-label={`${t('daily.title')} #${puzzleNumber}`}
+      onClick={() => trackLandingCtaClick('daily_banner', { mode: 'word-wheel', hasPlayed })}
+      aria-label={`${t('sitemap.wordWheel', 'Word Wheel')} #${puzzleNumber}`}
       className={cn(
         'group relative block min-h-[138px] overflow-hidden rounded-neo-xl border-neo-thick border-black bg-neo-navy-light shadow-hard-lg',
         // Desktop bento slot is ~768px wide — switch to a row so the content
@@ -125,7 +125,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
               <span className="absolute inline-flex h-full w-full rounded-full bg-neo-navy opacity-60 motion-safe:animate-ping" />
               <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-neo-navy" />
             </span>
-            {t('daily.title')}
+            {t('sitemap.wordWheel', 'Word Wheel')}
           </span>
 
           <h2 className="mt-2.5 font-neo-display text-2xl font-bold uppercase leading-none tracking-tight text-neo-cream md:text-3xl">
