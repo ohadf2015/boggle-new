@@ -36,6 +36,7 @@ import {
   trackEduTeacherToolsOpened,
 } from '@/lib/education/telemetry';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { liveClassroomHref } from '@/lib/education/startLiveClassCta';
 import { GetStudentsInCard } from './hq/GetStudentsInCard';
 import { GetStudentsInSkeleton } from './hq/GetStudentsInSkeleton';
 import { useFirstAssignmentCta } from './hq/useFirstAssignmentCta';
@@ -44,6 +45,7 @@ import { HqDock } from './hq/HqDock';
 import { HqToolsContent, type HqToolsPanel } from './hq/HqToolsContent';
 import { pickHqUpsell } from './hq/pickHqUpsell';
 import { FirstAssignmentInlineCta } from './hq/FirstAssignmentInlineCta';
+import { StartLiveClassCta } from './hq/StartLiveClassCta';
 import { HqClassPulse } from './hq/HqClassPulse';
 import { HqJoinStrip } from './hq/HqJoinStrip';
 import { HqLoadError } from './hq/HqLoadError';
@@ -367,6 +369,13 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                       <FirstAssignmentInlineCta classroomId={selectedClassroom.id} onCta={() => setShowAssignmentCreator(true)} />
                     </div>
                   ) : null}
+                  <StartLiveClassCta
+                    classroomId={selectedClassroom.id}
+                    studentCount={studentCount}
+                    assignmentCount={assignmentCount}
+                    joinCode={selectedClassroom.join_code || ''}
+                    onStart={() => router.push(liveClassroomHref(language, selectedClassroom.id))}
+                  />
                 </div>
                 <HqJoinStrip
                   className={cn('lg:col-span-1 lg:col-start-1', `${LANDSCAPE}:col-span-1 ${LANDSCAPE}:col-start-1`)}
