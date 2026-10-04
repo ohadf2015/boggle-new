@@ -37,10 +37,10 @@ vi.mock('@/components/ads', () => ({ InlineBannerAd: () => <div data-testid="ad"
 vi.mock('@/components/CrazyGamesBanner', () => ({ default: () => <div /> }));
 vi.mock('@/utils/growthTracking', () => ({ trackLandingCtaClick: vi.fn(), trackGrowthEvent: vi.fn() }));
 
-/** Hero PLAY by contract (a link to multiplayer inside the hero), not by label. */
+/** Hero PLAY by contract (coached first round), not by label. */
 function heroPlay(container: HTMLElement): HTMLAnchorElement {
-  const a = container.querySelector<HTMLAnchorElement>('[data-fresh-section="hero"] a[href="/en/multiplayer"]');
-  if (!a) throw new Error('no hero PLAY link to /en/multiplayer');
+  const a = container.querySelector<HTMLAnchorElement>('[data-fresh-section="hero"] a[href="/en/singleplayer?autoStart=coach"]');
+  if (!a) throw new Error('no hero PLAY link to the coached round');
   return a;
 }
 
@@ -76,9 +76,9 @@ describe('FreshPage', () => {
     for (const text of h2s) expect(text).toMatch(/^homeFresh\./);
   });
 
-  it('hero PLAY is a real link to multiplayer without JS', () => {
+  it('hero PLAY is a real link to the coached round without JS', () => {
     const { container } = render(<FreshPage />);
-    expect(heroPlay(container)).toHaveAttribute('href', '/en/multiplayer');
+    expect(heroPlay(container)).toHaveAttribute('href', '/en/singleplayer?autoStart=coach');
   });
 
   it('with onPlay, PLAY clicks open onboarding instead of navigating', () => {
@@ -100,7 +100,7 @@ describe('FreshPage', () => {
   it('links sections to their destinations', () => {
     const { container } = render(<FreshPage />);
     const hrefs = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href'));
-    expect(hrefs).toEqual(expect.arrayContaining(['/en/daily', '/en/multiplayer', '/en/education']));
+    expect(hrefs).toEqual(expect.arrayContaining(['/en/daily/word-wheel', '/en/multiplayer', '/en/education']));
   });
 
   it('hides the classrooms section inside CrazyGames', () => {

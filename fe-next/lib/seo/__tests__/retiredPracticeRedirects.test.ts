@@ -71,13 +71,13 @@ describe('retired practice routes', () => {
   it('sends the practice hub to the real single-player game', () => {
     const rule = match(rules(), '/en/practice');
     expect(rule).toBeDefined();
-    expect(rule?.destination).toBe('/:locale/singleplayer');
+    expect(rule?.destination).toBe('/:locale/singleplayer?autoStart=coach');
     expect(rule?.permanent).toBe(true);
   });
 
   it('sends each mode to the real game it was wrapping', () => {
     const all = rules();
-    expect(match(all, '/en/practice/classic')?.destination).toBe('/:locale/singleplayer');
+    expect(match(all, '/en/practice/classic')?.destination).toBe('/:locale/singleplayer?autoStart=coach');
     expect(match(all, '/en/practice/wordHunt')?.destination).toBe('/:locale/daily/word-hunt');
     expect(match(all, '/en/practice/wheelRush')?.destination).toBe('/:locale/daily/word-wheel');
   });

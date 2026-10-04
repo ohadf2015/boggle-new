@@ -8,6 +8,7 @@ import { recordNotOnBoard, recordNotInDictionary } from '@/utils/invalidWordTrac
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { usePrevalidation } from '@/hooks/usePrevalidation';
 import { evaluateWordAchievements } from '@/lib/achievements/hiddenAchievementBus';
+import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { ComboSystemReturn } from '@/hooks/useComboSystem';
@@ -206,7 +207,7 @@ export function useWordSubmission({
     // Step 2: Check if word exists on board
     const currentGrid = gridRef.current;
     if (!currentGrid || !isWordOnBoard(normalizedWord, currentGrid, language)) {
-      const notOnBoardMsg = t('playerView.wordNotOnBoard', 'Word not on board');
+      const notOnBoardMsg = t('playerView.wordNotOnBoard', 'Not on board');
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
@@ -218,6 +219,22 @@ export function useWordSubmission({
       announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
       combo.resetCombo();
       recordNotOnBoard(normalizedWord, language, 'single_player');
+      return;
+    }
+
+    // On the board, but not a word (aaa and other shape-weird strings). Never score.
+    if (isWordShapeWeird(normalizedWord, language).weird) {
+      const notAWordMsg = t('playerView.invalidWord', 'Not a word');
+      setCurrentFeedback({
+        id: `reject-${now}`,
+        type: 'rejected',
+        word: normalizedWord,
+        message: notAWordMsg,
+        timestamp: now,
+      });
+      hapticError();
+      announceWordResult(normalizedWord, false, undefined, notAWordMsg);
+      combo.resetCombo();
       return;
     }
 
@@ -327,7 +344,7 @@ export function useWordSubmission({
       );
       setFoundWords(foundWordsRef.current);
 
-      const invalidMsg = t('playerView.invalidWord', 'Not a valid word');
+      const invalidMsg = t('playerView.invalidWord', 'Not a word');
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',

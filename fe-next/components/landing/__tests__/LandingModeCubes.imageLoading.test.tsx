@@ -61,10 +61,11 @@ describe('ModeRow — image loading', () => {
 
   it('ModeRow renders exactly the FRESH_MODE_KEYS modes', () => {
     const { container } = render(<ModeRow />);
-    const cards = container.querySelectorAll<HTMLAnchorElement>('[data-fresh-section="modes"] [data-mode]');
+    const lead = container.querySelector('[data-fresh-section="modes"] ul');
+    const cards = lead!.querySelectorAll<HTMLAnchorElement>('[data-mode]');
 
     const renderedModes = Array.from(cards).map(c => c.getAttribute('data-mode'));
-    expect(renderedModes).toEqual(FRESH_MODE_KEYS);
+    expect(renderedModes).toEqual([...FRESH_MODE_KEYS]);
   });
 
   it('each FRESH_MODE_KEY in MODE_META has a genIcon path that exists in public/modes/cubes/', () => {
@@ -92,12 +93,15 @@ describe('ModeRow — image loading', () => {
     expect(missingFiles, `Missing files or case mismatches:\n${missingFiles.join('\n')}`).toHaveLength(0);
   });
 
-  it('adventure and wordTowerV2 are featured in the spotlight with key art and a NEW sticker', () => {
+  it('adventure, word tower and blast are parked off the lead row', () => {
     const { container } = render(<ModeRow />);
-    for (const mode of ['adventure', 'wordTowerV2']) {
-      const card = container.querySelector(`a[data-spotlight-mode="${mode}"]`);
-      expect(card?.querySelector('img')?.getAttribute('src')).toBeTruthy();
-      expect(card?.textContent).toContain('landing.badge.new');
+    const more = container.querySelector('[data-testid="fresh-modes-more"]');
+    for (const mode of ['adventure', 'wordTowerV2', 'blast']) {
+      const card = container.querySelector(`a[data-parked-mode="${mode}"]`);
+      expect(card).toBeTruthy();
+      expect(more?.contains(card!)).toBe(true);
+      const lead = container.querySelector('[data-fresh-section="modes"] ul');
+      expect(lead?.querySelector(`[data-mode="${mode}"]`)).toBeNull();
     }
   });
 

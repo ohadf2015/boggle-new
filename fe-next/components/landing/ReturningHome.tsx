@@ -32,7 +32,6 @@ const LandingBottomCTA = dynamic(() => import('./LandingBottomCTA').then(m => m.
 import { LandingChallengeCards } from './LandingChallengeCards';
 import { HomeHub } from './home/HomeHub';
 import { LandingSeasonHero } from './LandingSeasonHero';
-import { NewModesAnnouncement } from './NewModesAnnouncement';
 // Education entry point — teachers/students get their dashboard card; everyone
 // else (guests included) gets the always-on classroom promo. Hidden on CrazyGames.
 const HomeEducationCardConnected = dynamic(
@@ -185,7 +184,7 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData, onSta
         {mounted && !hideExternalAuth && <HomeEducationCardConnected />}
 
         {/* New modes spotlight — one-time dismissible, Adventure + Word Tower with key art */}
-        {mounted && <NewModesAnnouncement />}
+        {/* Adventure + Word Tower stay in the mode list's More disclosure, not a first-screen spotlight. */}
 
         {/* ===== MOBILE: focused arcade Home Hub (CSS-gated `md:hidden`, never a JS
             branch → no hydration CLS). Reuses the same gated mode list + data hooks

@@ -98,6 +98,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     const handleWordRejected = (data: { word: string; reason?: string }): void => {
       const reasonKeyMap: Record<string, string> = {
         not_in_dictionary: 'playerView.notInDictionary',
+        invalid_shape: 'playerView.invalidWord',
         not_on_board: 'playerView.wordNotOnBoard',
         too_short: 'playerView.wordTooShort',
         duplicate: 'playerView.alreadyFound',
@@ -109,7 +110,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         id: `rejected-${Date.now()}`,
         type: 'rejected',
         word: data.word,
-        message: t(messageKey) || 'Invalid word',
+        message: t(messageKey, 'Not a word'),
         timestamp: Date.now(),
       });
       playWordRejectedSound();
@@ -121,7 +122,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         id: `rejected-${Date.now()}`,
         type: 'rejected',
         word: data.word,
-        message: t('playerView.invalidWord', 'Invalid word'),
+        message: t('playerView.wordNotOnBoard', 'Not on board'),
         timestamp: Date.now(),
       });
       playWordRejectedSound();
@@ -133,7 +134,9 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         id: `rejected-${Date.now()}`,
         type: 'rejected',
         word: data.word,
-        message: t('playerView.wordTooShort', 'Too short'),
+        message: data.minLength
+          ? t('playerView.wordTooShortMin', { min: data.minLength })
+          : t('playerView.wordTooShort', 'Too short'),
         timestamp: Date.now(),
       });
       playWordRejectedSound();

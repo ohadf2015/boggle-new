@@ -44,6 +44,18 @@ export function isWordShapeWeird(word: string, language: Language): ShapeResult 
     }
   }
 
+  // "aaa" is in some word lists and is not a word. A run of the same letter
+  // for the whole string (length >= 3) never scores. Mixed words like "aaab"
+  // and doubles ("book", "see") stay.
+  if (word.length >= 3) {
+    const lower = word.toLowerCase();
+    let allSame = true;
+    for (let i = 1; i < lower.length; i++) {
+      if (lower[i] !== lower[0]) { allSame = false; break; }
+    }
+    if (allSame) return { weird: true, reason: 'repeated_chars' };
+  }
+
   if (VOWEL_CHECK_LANGS.has(language) && word.length >= 3) {
     const lower = word.toLowerCase();
     let hasVowel = false;

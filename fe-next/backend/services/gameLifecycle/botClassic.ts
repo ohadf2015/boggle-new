@@ -13,6 +13,8 @@ import { prepareBotWords, calculateNextDelay, type Bot } from '../../modules/bot
 import { BOT_CONFIG } from '../../modules/botConfig';
 import { addPlayerWord, getGame, trackBotWord } from '../../modules/gameStateManager';
 import { isDictionaryWord } from '../../dictionary';
+import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
+import { classicMinWordLength } from '@/shared/utils/classicWordRules';
 import { isWordCommunityValid, isWordValidForScoring } from '../../modules/communityWordManager';
 import { scoreAcceptedWord } from '../../modules/wordScore';
 import logger from '../../utils/logger';
@@ -30,7 +32,9 @@ import {
  * validation (gameScores): a bot's deliberate "wrong word" is a miss that
  * never scores, instead of scoring live and silently vanishing at results.
  */
-export function isScoringWord(word: string, language: Language): boolean {
+export function isScoringWord(word: string, language: Language, gameMode?: string | null): boolean {
+  if (isWordShapeWeird(word, language).weird) return false;
+  if (gameMode === 'classic' && word.length < classicMinWordLength(language)) return false;
   return !!isDictionaryWord(word, language)
     || isWordCommunityValid(word, language)
     || isWordValidForScoring(word, language);
@@ -38,7 +42,8 @@ export function isScoringWord(word: string, language: Language): boolean {
 
 /** Price a board word exactly like a human's auto-validated word. */
 export function quoteBoardWord(ctx: BotRoundContext, bot: Bot, word: string): BotQuote | null {
-  if (!isScoringWord(word, ctx.language)) return null;
+  const gameMode = getGame(ctx.gameCode)?.gameMode;
+  if (!isScoringWord(word, ctx.language, gameMode)) return null;
   return { wordScore: scoreAcceptedWord({ word, comboLevel: bot.comboLevel }).total };
 }
 

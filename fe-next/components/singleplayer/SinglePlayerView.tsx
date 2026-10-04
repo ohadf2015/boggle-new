@@ -64,7 +64,9 @@ export interface SinglePlayerGameState {
   grid: LetterGrid | null;
   timerSeconds: number;
   bots: BotOpponent[];
-  minWordLength: number; // Minimum word length (2 for EASY, 3 for others)
+  minWordLength: number; // Classic floor: 3 (2 in Japanese)
+  /** First round: find one real word, then the 60s clock. No bots, no start gate. */
+  coach?: boolean;
 }
 
 export interface PlayerWordData {

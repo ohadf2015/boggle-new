@@ -869,6 +869,7 @@ const es = {
       "title": "Encuentra palabras.\nGana a tus amigos.",
       "sub": "Une letras vecinas para formar palabras antes de que se acabe el tiempo. Gratis y sin descargas.",
       "play": "Jugar ahora",
+      "playFriend": "Jugar con un amigo",
       "account": "Ya tengo cuenta",
       "gridLabel": "Tablero de práctica. Toca las letras de {word} en orden.",
       "hint": "Pruébalo: toca {letters}",
