@@ -390,19 +390,21 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
   const [timerUrgencyState, setTimerUrgencyState] = useState<'normal' | 'low' | 'veryLow' | 'critical'>('normal');
   const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Heartbeat sound at ≤10s
+  // Heartbeat sound at ≤10s — only while the round is live. Leaving this
+  // interval running after results is the "SFX infinite loop that sounds
+  // bad" (timerHeartbeat stacking on the victory sting).
   useEffect(() => {
-    if (timerUrgencyState === 'veryLow' || timerUrgencyState === 'critical') {
-      if (!heartbeatIntervalRef.current) {
-        heartbeatIntervalRef.current = setInterval(() => {
-          playTimerHeartbeatSound();
-        }, timerUrgencyState === 'critical' ? 600 : 1000);
-      }
-    } else {
+    if (!isPlaying || (timerUrgencyState !== 'veryLow' && timerUrgencyState !== 'critical')) {
       if (heartbeatIntervalRef.current) {
         clearInterval(heartbeatIntervalRef.current);
         heartbeatIntervalRef.current = null;
       }
+      return;
+    }
+    if (!heartbeatIntervalRef.current) {
+      heartbeatIntervalRef.current = setInterval(() => {
+        playTimerHeartbeatSound();
+      }, timerUrgencyState === 'critical' ? 600 : 1000);
     }
     return () => {
       if (heartbeatIntervalRef.current) {
@@ -410,7 +412,7 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
         heartbeatIntervalRef.current = null;
       }
     };
-  }, [timerUrgencyState, playTimerHeartbeatSound]);
+  }, [isPlaying, timerUrgencyState, playTimerHeartbeatSound]);
 
   // Socket listeners for new round events, special words, and golden letters
   useEffect(() => {

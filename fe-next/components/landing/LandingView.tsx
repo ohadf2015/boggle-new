@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useMusic } from '@/contexts/MusicContext';
 import Header from '@/components/Header';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 import { HomeTreeBoot, HomeTreeSlot, useHomeTree } from './homeTree';
@@ -43,6 +44,16 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   const { language } = useLanguage();
   const router = useRouter();
   const tree = useHomeTree();
+  const { playTrack, TRACKS } = useMusic();
+
+  // Ambient bed lives on the SHELL, not ReturningHome. Fresh visitors never
+  // mount ReturningHome (homeTree keeps it inert), so a playTrack there is
+  // how "music don't work at all" happens for new / logged-out players.
+  // MusicContext queues until the first gesture — one call, no duplicate
+  // listeners. ReturningHome used to own this; do not add a second call there.
+  useEffect(() => {
+    playTrack(TRACKS.BOSSA);
+  }, [playTrack, TRACKS]);
 
   // The finale PLAY ends the page from HomepageContentSection (page.tsx), which
   // is outside this subtree, so it takes the same quick-play action through
