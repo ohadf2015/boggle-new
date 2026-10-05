@@ -6,11 +6,15 @@ import { cn } from '@/lib/utils';
 import type { EducationNavItem, ResolvedEducationNav } from './navItems';
 
 /**
- * Phone bottom tabs and the desktop sidebar — one component, two variants,
- * switched by CSS breakpoint rather than by a JS viewport read. A JS branch
- * would pick a layout from a width that is wrong on the server and right one
- * frame later, which is the dual-source-of-truth flash this codebase keeps
+ * Phone/tablet bottom tabs and the desktop sidebar — one component, two
+ * variants, switched by CSS breakpoint rather than by a JS viewport read. A JS
+ * branch would pick a layout from a width that is wrong on the server and right
+ * one frame later, which is the dual-source-of-truth flash this codebase keeps
  * re-learning (pitfall class 1).
+ *
+ * Handover is at `lg` (1024): below that the teacher keeps bottom tabs (no
+ * permanent sidebar eating width on a 768–1023 tablet). At `lg+` the labeled
+ * 240px sidebar replaces the tab bar. Never both.
  *
  * Neither variant is `position: fixed`. Both are laid out as flex children of
  * the shell, so the scroll region is shorter by exactly the nav's size. A fixed
@@ -58,9 +62,7 @@ function itemClasses(active: boolean, variant: 'tabs' | 'sidebar') {
     'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
     variant === 'tabs'
       ? 'min-h-[52px] flex-1 flex-col gap-1 px-1 py-1.5 text-[11px]'
-      : // Tablet collapses this to an icon rail, so the row centres its icon
-        // until there is desktop width for a label beside it.
-        'min-h-[48px] w-full justify-center px-2 py-2 text-[15px] lg:justify-start lg:px-3',
+      : 'min-h-[48px] w-full justify-start px-3 py-2 text-[15px]',
     active
       // A tinted lime OUTLINE, not the solid slab: GO LIVE owns the one
       // solid lime fill on the deck, and chrome must not compete with it.
@@ -90,12 +92,10 @@ function NavLink({
       className={itemClasses(active, variant)}
     >
       <Icon className="h-5 w-5 shrink-0" aria-hidden />
-      {/* An icon alone is not a label — every tab says what it is. On the tablet
-          icon rail the label stays in the DOM for screen readers and is simply
-          not painted; removing it would leave an unnamed button. */}
+      {/* An icon alone is not a label — every tab/side link says what it is. */}
       <span
         data-testid={variant === 'sidebar' ? `education-side-label-${item.key}` : undefined}
-        className={cn('truncate', variant === 'sidebar' && 'hidden lg:inline')}
+        className="truncate"
       >
         {t(item.labelKey)}
       </span>
@@ -114,10 +114,10 @@ export function EducationNav({ nav, t, variant, className }: EducationNavProps) 
         data-testid="education-sidebar"
         aria-label={t('teacher.nav.sidebarLabel')}
         className={cn(
-          // Tablet and up, and short enough that it never becomes a second
-          // scroller — the shell contract is exactly one. 72px is an icon rail
-          // at tablet; 240px with labels once there is desktop width.
-          'hidden shrink-0 md:flex w-[72px] lg:w-60 flex-col gap-2 overflow-hidden',
+          // Desktop only (`lg` = 1024): below that the bottom tab bar is the
+          // nav — a permanent sidebar (even a 72px rail) eats tablet width.
+          // Short enough that it never becomes a second scroller.
+          'hidden shrink-0 lg:flex w-60 flex-col gap-2 overflow-hidden',
           'border-e-[3px] border-neo-cream bg-neo-navy px-3 py-4',
           className,
         )}
@@ -132,9 +132,8 @@ export function EducationNav({ nav, t, variant, className }: EducationNavProps) 
       data-testid="education-tabbar"
       aria-label={t('teacher.nav.tabsLabel')}
       className={cn(
-        // Hidden the instant the sidebar arrives (md): a tablet carrying both
-        // would spend a row of content on a duplicate nav.
-        'shrink-0 md:hidden flex items-stretch gap-1.5',
+        // Hidden the instant the sidebar arrives (lg): never carry both.
+        'shrink-0 lg:hidden flex items-stretch gap-1.5',
         'border-t-[3px] border-neo-cream bg-neo-navy px-2 pt-2',
         'pb-[max(0.5rem,env(safe-area-inset-bottom))]',
         className,

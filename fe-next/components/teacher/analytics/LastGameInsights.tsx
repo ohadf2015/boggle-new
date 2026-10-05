@@ -261,7 +261,7 @@ export function LastGameInsights({
           <table className="w-full text-sm font-neo-body">
             <thead className="bg-black text-neo-cream">
               <tr>
-                <th scope="col" className="px-3 py-2 text-start font-black">{t('teacher.lastGame.student')}</th>
+                <th scope="col" className="sticky start-0 z-10 bg-black px-3 py-2 text-start font-black">{t('teacher.lastGame.student')}</th>
                 <th scope="col" className="px-3 py-2 text-end font-black">{t('teacher.lastGame.score')}</th>
                 <th scope="col" className="px-3 py-2 text-end font-black">{t('teacher.lastGame.found')}</th>
                 <th scope="col" className="px-3 py-2 text-end font-black">{t('teacher.lastGame.missed')}</th>
@@ -271,7 +271,7 @@ export function LastGameInsights({
             <tbody>
               {game.players.map((p) => (
                 <tr key={p.studentId} data-testid="student-row" className="border-t-2 border-black/10">
-                  <td className="px-3 py-2 text-start font-bold text-black">{p.name}</td>
+                  <td className="sticky start-0 z-10 bg-white px-3 py-2 text-start font-bold text-black">{p.name}</td>
                   <td className="px-3 py-2 text-end tabular-nums text-black">{p.score}</td>
                   <td data-testid="student-found" className="px-3 py-2 text-end tabular-nums text-black">{p.lessonWordsFound.length}</td>
                   <td data-testid="student-missed" className="px-3 py-2 text-end tabular-nums text-black">{p.lessonWordsMissed.length}</td>

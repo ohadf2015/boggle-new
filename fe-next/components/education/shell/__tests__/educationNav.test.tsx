@@ -111,8 +111,8 @@ describe('<EducationNav>', () => {
     const bar = getByTestId('education-tabbar');
     expect(bar.className).not.toMatch(/\bfixed\b/);
     expect(bar.className).toContain('shrink-0');
-    // Phone only — the sidebar replaces it from tablet up.
-    expect(bar.className).toContain('md:hidden');
+    // Phone/tablet only — the sidebar replaces it from lg (1024) up.
+    expect(bar.className).toContain('lg:hidden');
   });
 
   it('separates the bar from the content with a real edge, not a tint', () => {
@@ -161,48 +161,39 @@ describe('<EducationNav>', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
     const side = getByTestId('education-sidebar');
     expect(side.className).toContain('hidden');
-    expect(side.className).toContain('md:flex');
+    expect(side.className).toContain('lg:flex');
     expect(side.className).toContain('shrink-0');
     expect(side.className).not.toMatch(/overflow-y-auto/);
   });
 });
 
 /**
- * Tablet (768-1023px) is its own layout, not "a wide phone".
- *
- * The addendum is explicit: at tablet the sidebar is present but collapsed to
- * icons, and the bottom tab bar is hidden. Getting this backwards — tabs at the
- * bottom of a 1024-wide iPad while a 240px sidebar waits one pixel away — is a
- * spec line a critic reads off the screenshot, so the handover is asserted on
- * the class strings rather than left to a live viewport nobody captures.
- *
- * Both halves must move together: if the sidebar appeared at `md` while the
- * tabs still hid only at `lg`, a tablet would carry BOTH and lose a row of
- * content to a duplicate nav.
+ * Handover at `lg` (1024): product guidance — drawer/tabs below 1024, no
+ * permanent sidebar (even a 72px rail) eating tablet width. Both halves must
+ * move together so a tablet never carries BOTH navs.
  */
-describe('EducationNav — the tablet handover', () => {
+describe('EducationNav — the lg handover', () => {
   const nav = resolveEducationNav('/en/teacher')!;
   const t = (k: string) => k;
 
-  it('brings the sidebar in at tablet, collapsed to an icon rail', () => {
+  it('brings the labeled sidebar in only at desktop (≥1024)', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
     const side = getByTestId('education-sidebar');
-    expect(side.className).toContain('md:flex');
-    // Icon rail at tablet, full 240px column once there is desktop width.
-    expect(side.className).toContain('w-[72px]');
-    expect(side.className).toContain('lg:w-60');
+    expect(side.className).toContain('lg:flex');
+    expect(side.className).toContain('w-60');
+    expect(side.className).not.toMatch(/w-\[72px\]/);
   });
 
   it('hides the bottom tabs the moment the sidebar arrives — never both', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="tabs" />);
-    expect(getByTestId('education-tabbar').className).toContain('md:hidden');
+    expect(getByTestId('education-tabbar').className).toContain('lg:hidden');
   });
 
-  it('keeps the sidebar label in the DOM at tablet but out of the rail', () => {
+  it('keeps every sidebar label painted (no tablet icon-rail hide)', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
     const label = getByTestId('education-side-play').querySelector('[data-testid="education-side-label-play"]');
-    // Present for screen readers at every width; painted only at lg.
     expect(label).not.toBeNull();
-    expect(label!.className).toContain('lg:inline');
+    expect(label!.className).toContain('truncate');
+    expect(label!.className).not.toMatch(/hidden/);
   });
 });

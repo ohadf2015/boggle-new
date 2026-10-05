@@ -138,15 +138,15 @@ describe('Teacher HQ — one decision at a time', () => {
     const { unmount } = render(<TeacherDashboard />);
     const grid = () => screen.getByTestId('teacher-dashboard-grid');
     expect(grid().className).toContain('lg:max-w-2xl');
-    expect(grid().className).not.toContain('lg:grid-cols-2');
+    expect(grid().className).not.toContain('sm:grid-cols-2');
     unmount();
 
     state.assignmentCount = 2;
     render(<TeacherDashboard />);
-    expect(grid().className).toContain('lg:grid-cols-2');
+    expect(grid().className).toContain('sm:grid-cols-2');
     expect(screen.getByTestId('teacher-dashboard-aside')).toContainElement(screen.getByTestId('hq-class-pulse'));
     expect(screen.getByTestId('teacher-dashboard-aside')).not.toContainElement(screen.getByTestId('hq-join-strip'));
-    expect(screen.getByTestId('hq-join-strip').className).toContain('lg:col-start-1');
+    expect(screen.getByTestId('hq-join-strip').className).toContain('sm:col-start-1');
   });
 
   it('Given a Pro teacher, Then HQ carries no Pro ask at all', () => {
