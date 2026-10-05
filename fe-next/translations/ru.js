@@ -6480,6 +6480,9 @@ const ru = {
       "goalMany": "Займи первое место",
       "goalSolo": "Длинные слова приносят гораздо больше очков"
     },
+    "wordGoal": {
+      "progress": "{count} / {goal} слов"
+    },
     "nextGame": {
       "title": "Что дальше?",
       "rematchHarder": "Реванш · сложнее",
