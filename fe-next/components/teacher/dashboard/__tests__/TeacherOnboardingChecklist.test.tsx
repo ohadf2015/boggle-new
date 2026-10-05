@@ -128,38 +128,80 @@ describe('TeacherOnboardingChecklist', () => {
     });
   });
 
-  it('routes the progress-report empty state to the reports screen', () => {
+  it('starts a live class from the empty live-game step', () => {
+    const onStartLive = vi.fn();
     render(
       <TeacherOnboardingChecklist
         classroomCount={1}
         assignmentCount={1}
         rosterCount={2}
-        hasProgressReport={false}
+        hasLiveClass={false}
         joinCode="Q3UQ2J"
         reportsHref="/en/teacher/reports?classroomId=c1"
         onCreateClassroom={vi.fn()}
         onCreateAssignment={vi.fn()}
+        onStartLive={onStartLive}
       />,
     );
 
-    const link = screen.getByTestId('teacher-onboarding-cta-view-report');
-    expect(link).toHaveAttribute('href', '/en/teacher/reports?classroomId=c1');
+    fireEvent.click(screen.getByTestId('teacher-onboarding-cta-start-live'));
+    expect(onStartLive).toHaveBeenCalledTimes(1);
+    expect(trackTeacherOnboardingStep).toHaveBeenCalledWith({
+      step: 'start_live_class',
+      action: 'cta',
+    });
   });
 
-  it('hides once every step is done', () => {
-    const { container } = render(
+  it('shows the Teacher Pro trial CTA once every step is done', () => {
+    render(
       <TeacherOnboardingChecklist
         classroomCount={1}
         assignmentCount={2}
         rosterCount={4}
-        hasProgressReport={true}
+        hasLiveClass={true}
         joinCode="Q3UQ2J"
         reportsHref="/en/teacher/reports"
         onCreateClassroom={vi.fn()}
         onCreateAssignment={vi.fn()}
+        onDismiss={vi.fn()}
       />,
     );
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.getByTestId('teacher-activation-complete')).toBeInTheDocument();
+    expect(screen.getByTestId('teacher-activation-trial-cta')).toBeInTheDocument();
+  });
+
+  it('hides after dismiss', () => {
+    const onDismiss = vi.fn();
+    const { rerender } = render(
+      <TeacherOnboardingChecklist
+        classroomCount={1}
+        assignmentCount={2}
+        rosterCount={4}
+        hasLiveClass={true}
+        joinCode="Q3UQ2J"
+        reportsHref="/en/teacher/reports"
+        onCreateClassroom={vi.fn()}
+        onCreateAssignment={vi.fn()}
+        onDismiss={onDismiss}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('teacher-activation-dismiss'));
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+    rerender(
+      <TeacherOnboardingChecklist
+        classroomCount={1}
+        assignmentCount={2}
+        rosterCount={4}
+        hasLiveClass={true}
+        joinCode="Q3UQ2J"
+        reportsHref="/en/teacher/reports"
+        onCreateClassroom={vi.fn()}
+        onCreateAssignment={vi.fn()}
+        onDismiss={onDismiss}
+        dismissed
+      />,
+    );
+    expect(screen.queryByTestId('teacher-activation-complete')).not.toBeInTheDocument();
   });
 
   describe('hideCreateClassroomCta prop', () => {

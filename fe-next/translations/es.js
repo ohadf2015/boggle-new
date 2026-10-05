@@ -13441,9 +13441,15 @@ const es = {
       "createAssignment": "Crea la primera tarea",
       "createAssignmentCta": "Crear tarea",
       "shareJoin": "Comparte el enlace de acceso",
-      "shareJoinCta": "Copiar enlace",
-      "viewReport": "Mira el primer informe",
-      "viewReportCta": "Abrir informe"
+      "shareJoinCta": "Copiar enlace de unión",
+      "startLive": "Empezar una clase en vivo",
+      "startLiveCta": "Empezar clase en vivo",
+      "viewReport": "Ver el primer informe de progreso",
+      "viewReportCta": "Abrir informe",
+      "dismiss": "Cerrar",
+      "completeTitle": "Tu clase está en vivo",
+      "completeBody": "Prueba Teacher Pro 14 días gratis: más alumnos, deberes e informes.",
+      "trialCta": "Empezar prueba de Teacher Pro"
     },
     "playNow": {
       "recommended": "Recomendado",

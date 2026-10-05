@@ -100,7 +100,6 @@ describe('<HqToolsContent> — summary cards, details on demand', () => {
     expect(screen.getByTestId('last-game-insights')).toBeInTheDocument();
     expect(screen.getByTestId('gate-reports')).toHaveAttribute('data-active', 'true');
     expect(screen.getByTestId('gate-analytics')).toHaveAttribute('data-active', 'true');
-    expect(screen.getByTestId('teacher-onboarding-checklist')).toBeInTheDocument();
   });
 
   it('Given no class yet, Then only the classes card is offered', () => {

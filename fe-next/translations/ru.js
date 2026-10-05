@@ -12615,8 +12615,14 @@ const ru = {
       "createAssignmentCta": "Создать задание",
       "shareJoin": "Поделитесь ссылкой для входа",
       "shareJoinCta": "Скопировать ссылку",
-      "viewReport": "Откройте первый отчёт",
-      "viewReportCta": "Открыть отчёт"
+      "startLive": "Начать живой урок",
+      "startLiveCta": "Начать живой урок",
+      "viewReport": "Первый отчёт о прогрессе",
+      "viewReportCta": "Открыть отчёт",
+      "dismiss": "Скрыть",
+      "completeTitle": "Класс уже играет",
+      "completeBody": "Попробуйте Teacher Pro 14 дней бесплатно — больше учеников, задания и отчёты.",
+      "trialCta": "Начать пробный Teacher Pro"
     },
     "playNow": {
       "recommended": "Рекомендуем",

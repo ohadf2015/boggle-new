@@ -12050,8 +12050,14 @@ const en = {
       "createAssignmentCta": "Create assignment",
       "shareJoin": "Share the join link",
       "shareJoinCta": "Copy join link",
+      "startLive": "Start a live class",
+      "startLiveCta": "Start live class",
       "viewReport": "View first progress report",
-      "viewReportCta": "Open report"
+      "viewReportCta": "Open report",
+      "dismiss": "Dismiss",
+      "completeTitle": "Your class is live",
+      "completeBody": "Try Teacher Pro free for 14 days — extra students, homework insights, class reports.",
+      "trialCta": "Start Teacher Pro trial"
     },
     "playNow": {
       "recommended": "Recommended",

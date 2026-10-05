@@ -349,13 +349,8 @@ describe('TeacherDashboard — Duplicate CTA Consolidation', () => {
 
       render(<TeacherDashboard />);
 
-      // Teacher HQ: the checklist lives in the Class tools sheet and mounts
-      // only once the teacher opens it (a view event for a closed sheet would
-      // be a phantom impression). Open it, then the view event must fire.
-      fireEvent.click(
-        screen.getByTestId('teacher-tools').querySelector('summary') as HTMLElement,
-      );
-
+      // First-run HQ: the checklist is on the dashboard (not buried in tools)
+      // so a newly approved teacher sees it without an extra tap.
       await waitFor(() => {
         expect(screen.queryByTestId('teacher-onboarding-checklist')).toBeInTheDocument();
       });
