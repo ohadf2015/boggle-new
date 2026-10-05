@@ -18,6 +18,11 @@ vi.mock('@/lib/analytics/lazyPosthog', () => ({
   },
 }));
 
+const growthMock = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: (...args: unknown[]) => growthMock(...args),
+}));
+
 import {
   trackEduProUpgradeClicked,
   trackEduProCheckoutSuccessSeen,
@@ -135,5 +140,57 @@ describe('trial CTA funnel events', () => {
       throw new Error('posthog down');
     });
     expect(() => trackTrialCtaTap({ source: 'dashboard_trial_offer' })).not.toThrow();
+  });
+});
+
+describe('Growth Radar mirror (trackGrowthEvent)', () => {
+  beforeEach(() => {
+    captureMock.mockReset();
+    growthMock.mockReset();
+    localStorage.clear();
+  });
+
+  it('Given each client funnel step, When tracked, Then trackGrowthEvent gets the same name and source props', () => {
+    trackTrialCtaView({ source: 'dashboard_trial_offer' });
+    trackTrialCtaTap({ source: 'upgrade_page' });
+    trackEduProUpgradeClicked({ source: 'pricing_page' });
+    trackEduProCheckoutSuccessSeen(1_000);
+
+    expect(growthMock.mock.calls).toEqual([
+      ['trial_cta_view', { source: 'dashboard_trial_offer', product: 'teacher_pro' }],
+      ['trial_cta_tap', { source: 'upgrade_page', product: 'teacher_pro' }],
+      ['edu_pro_upgrade_clicked', { source: 'pricing_page' }],
+      ['edu_pro_checkout_success_seen', {}],
+    ]);
+    // PostHog bare names unchanged
+    expect(captureMock.mock.calls.map((c) => c[0])).toEqual([
+      'trial_cta_view',
+      'trial_cta_tap',
+      'edu_pro_upgrade_clicked',
+      'edu_pro_checkout_success_seen',
+    ]);
+  });
+
+  it('Given a deduped success return, When tracked again, Then the mirror is deduped too', () => {
+    trackEduProCheckoutSuccessSeen(1_000);
+    trackEduProCheckoutSuccessSeen(2_000);
+    expect(growthMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given trackGrowthEvent throws, When a step is tracked, Then the click is never blocked and PostHog still fires', () => {
+    growthMock.mockImplementation(() => {
+      throw new Error('growth down');
+    });
+    expect(() => trackEduProUpgradeClicked({ source: 'dashboard_trial_ended' })).not.toThrow();
+    expect(() => trackTrialCtaTap({ source: 'activation_checklist' })).not.toThrow();
+    expect(captureMock).toHaveBeenCalledWith('edu_pro_upgrade_clicked', { source: 'dashboard_trial_ended' });
+  });
+
+  it('Given PostHog throws, When a step is tracked, Then Growth Radar still gets it', () => {
+    captureMock.mockImplementationOnce(() => {
+      throw new Error('posthog down');
+    });
+    trackTrialCtaView({ source: 'upgrade_page' });
+    expect(growthMock).toHaveBeenCalledWith('trial_cta_view', { source: 'upgrade_page', product: 'teacher_pro' });
   });
 });
