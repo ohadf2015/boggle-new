@@ -1,12 +1,18 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
 import { HeScrabbleCrossLink } from '@/components/seo/HeScrabbleCrossLink';
 import { EnBoggleCrossLink } from '@/components/seo/EnBoggleCrossLink';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
+
+/** Growth Radar rec 6487 — H2 + FAQPage Question must match this query verbatim. */
+export const ANAGRAM_SVENSKA_QUESTION = 'anagram svenska';
+export const ANAGRAM_SVENSKA_ANSWER =
+  'Anagram svenska betyder att blanda om bokstäver till nya ord. LexiClash gratis anagramlösare på svenska tar 2–10 bokstäver och visar varje giltigt tävlingsord, grupperat efter längd, på under 100 millisekunder. Ingen registrering och ingen app. Skriv bokstäverna i adressen, till exempel /sv/anagram/listen. Vill du spela live med svenska ord i stället? Starta ett rum och tävla mot vänner.';
 
 const anagramSeoContent: Record<string, {
   title: string;
@@ -233,7 +239,33 @@ const POPULAR_SEEDS = [
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
   const isEnglish = locale === 'en';
-  const pageUrl = `${BASE_URL}/en/anagram`;
+  const isSwedish = locale === 'sv';
+  const indexable = isEnglish || isSwedish;
+  const enUrl = `${BASE_URL}/en/anagram`;
+  const svUrl = `${BASE_URL}/sv/anagram`;
+  const pageUrl = isSwedish ? svUrl : enUrl;
+
+  if (isSwedish) {
+    return {
+      title: 'Anagram svenska — gratis anagramlösare | LexiClash',
+      description:
+        'Gratis anagramlösare på svenska. Skriv 2–10 bokstäver och se varje giltigt ord direkt. Ingen registrering. Prova /sv/anagram eller spela live mot vänner.',
+      openGraph: {
+        type: 'website',
+        url: svUrl,
+        title: 'Anagram svenska — gratis anagramlösare',
+        description:
+          'Skriv 2–10 bokstäver och se varje giltigt ord direkt. Gratis, ingen app. LexiClash anagramlösare + live ordspel.',
+        siteName: 'LexiClash',
+        locale: 'sv_SE',
+      },
+      alternates: {
+        canonical: svUrl,
+        languages: { 'x-default': enUrl, en: enUrl, sv: svUrl },
+      },
+      robots: { index: true, follow: true },
+    };
+  }
 
   return {
     title: 'Free Anagram Solver — Find Every Word From Any Letters | LexiClash',
@@ -247,41 +279,77 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
         'Enter any letters and find every word you can make. Free, instant, no signup. Built into LexiClash, the multiplayer word game with 30+ modes.',
       siteName: 'LexiClash',
     },
-    // EN-only indexed hub — self-referencing EN hreflang (no noindexed siblings).
-    alternates: enOnlyAlternates('/anagram'),
-    robots: { index: isEnglish, follow: true },
+    // EN + SV indexed; other locales stay noindex and consolidate onto EN.
+    alternates: indexable
+      ? { canonical: enUrl, languages: { 'x-default': enUrl, en: enUrl, sv: svUrl } }
+      : enOnlyAlternates('/anagram'),
+    robots: { index: indexable, follow: true },
   };
 }
 
 export default async function AnagramHubPage({ params }: PageParams) {
   const { locale } = await params;
   const seoData = anagramSeoContent[locale] ?? anagramSeoContent.en;
+  const faqItems =
+    locale === 'sv'
+      ? [
+          { q: ANAGRAM_SVENSKA_QUESTION, a: ANAGRAM_SVENSKA_ANSWER },
+          ...seoData.faq.map((item) => ({ q: item.question, a: item.answer })),
+        ]
+      : seoData.faq.map((item) => ({ q: item.question, a: item.answer }));
 
   return (
     <div className="min-h-screen bg-neo-navy text-neo-white">
       <BreadcrumbJsonLd
         items={[
           { name: 'LexiClash', url: `${BASE_URL}/${locale}` },
-          { name: 'Anagram Solver', url: `${BASE_URL}/en/anagram` },
+          {
+            name: locale === 'sv' ? 'Anagram svenska' : 'Anagram Solver',
+            url: `${BASE_URL}/${locale === 'sv' ? 'sv' : 'en'}/anagram`,
+          },
         ]}
       />
+      <FaqPageJsonLd faqs={faqItems} />
       <div className="max-w-3xl mx-auto px-4 py-8">
         <nav className="mb-6 text-sm text-slate-400">
           <Link href={`/${locale}`} className="hover:text-neo-cyan transition-colors">
             Home
           </Link>
           <span className="mx-2">/</span>
-          <span className="text-neo-white">Anagram Solver</span>
+          <span className="text-neo-white">{locale === 'sv' ? 'Anagram svenska' : 'Anagram Solver'}</span>
         </nav>
 
         <h1 className="text-4xl font-neo-display font-black text-neo-pink tracking-wider mb-4">
-          Anagram Solver
+          {locale === 'sv' ? 'Anagramlösare på svenska' : 'Anagram Solver'}
         </h1>
-        <p className="text-slate-300 text-lg mb-8 leading-relaxed">
-          Enter any letters in the URL and instantly see every valid English word you can make.
-          Free, no signup, no download. Powered by the same dictionary that runs the LexiClash
-          multiplayer word game.
-        </p>
+        {locale === 'sv' ? (
+          <section className="mb-8">
+            <h2 className="text-xl font-neo-display font-bold text-neo-cyan tracking-wider mb-3">
+              {ANAGRAM_SVENSKA_QUESTION}
+            </h2>
+            <p className="text-slate-300 text-lg leading-relaxed">{ANAGRAM_SVENSKA_ANSWER}</p>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href={`/${locale}/anagram/listen`}
+                className="rounded-neo border-2 border-neo-black bg-neo-lime px-4 py-2 text-center font-neo-display font-black uppercase text-neo-navy shadow-hard-sm"
+              >
+                Prova med listen →
+              </Link>
+              <Link
+                href={`/${locale}/multiplayer`}
+                className="rounded-neo border-2 border-neo-black bg-neo-navy px-4 py-2 text-center font-neo-display font-black uppercase text-neo-cyan shadow-hard-sm"
+              >
+                Spela live →
+              </Link>
+            </div>
+          </section>
+        ) : (
+          <p className="text-slate-300 text-lg mb-8 leading-relaxed">
+            Enter any letters in the URL and instantly see every valid English word you can make.
+            Free, no signup, no download. Powered by the same dictionary that runs the LexiClash
+            multiplayer word game.
+          </p>
+        )}
 
         <section className="mb-10">
           <h2 className="text-xl font-neo-display font-bold text-neo-cyan uppercase tracking-wider mb-4">

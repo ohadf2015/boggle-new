@@ -590,13 +590,18 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // The /words hub above stays listed: it is a real navigable page, not a generated list.
   // Reversible — restore this block if a reapply lands and the pages are worth having.
 
-  // Anagram hub page (parent of programmatic /anagram/[letters] routes).
-  // EN-only indexed (app/[locale]/anagram/page.tsx robots: { index: isEnglish }).
+  // Anagram hub: EN + SV indexed (Growth Radar rec 6487 `anagram svenska`).
+  // Other locales stay noindex in page.tsx and must not appear here.
   addForLocaleOnly(routes, '/anagram', {
     lastModified: LAST_DEPLOYED,
     changeFrequency: 'monthly',
     priority: 0.7,
   });
+  addForLocaleOnly(routes, '/anagram', {
+    lastModified: LAST_DEPLOYED,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }, 'sv');
 
   // ─── Anagram solver: programmatic /anagram/[letters] RETIRED from sitemap 2026-06-08 ───
   // The 150 seed pages earned 0 clicks / 0% CTR over 28d and are now noindexed
