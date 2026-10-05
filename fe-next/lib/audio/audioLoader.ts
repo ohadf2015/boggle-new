@@ -187,7 +187,7 @@ function patchHowlerStaleSoundListeners(mod: typeof import('howler')): void {
  */
 function patchHowlerLoadQueueRecursion(Howl: (typeof import('howler'))['Howl']): void {
   type QueueTask = { event: string; action: () => void };
-  type QueueHowl = { _queue: QueueTask[]; __lexiDrainingQueue?: boolean };
+  type QueueHowl = { _queue: QueueTask[]; _playLock?: boolean; __lexiDrainingQueue?: boolean };
   type HowlProto = { _loadQueue?: (this: QueueHowl, event?: string) => unknown };
   const proto = Howl.prototype as HowlProto;
   const original = proto._loadQueue;
@@ -198,6 +198,9 @@ function patchHowlerLoadQueueRecursion(Howl: (typeof import('howler'))['Howl']):
   const iterative = function (this: QueueHowl, event?: string) {
     const self = this;
     if (!Array.isArray(self._queue) || self._queue.length === 0) return self;
+
+    // html5 play().then() only emits 'play', so a volume/fade queued behind the lock never matches and the track stays at volume 0.
+    if (event === 'play' && self._queue[0].event !== 'play' && !self._playLock) event = undefined;
 
     if (self.__lexiDrainingQueue) {
       // Re-entrant call from an action's _emit: keep howler's shift semantics

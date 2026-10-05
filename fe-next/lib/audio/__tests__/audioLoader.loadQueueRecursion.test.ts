@@ -72,4 +72,24 @@ describe('ensureHowl — _loadQueue recursion (issue 149131810)', () => {
     expect(rig._queue.length).toBeGreaterThan(0);
     expect(howl.volume()).not.toBe(0.9);
   });
+  it('drains volume/fade queued behind a play-lock once the play promise settles', async () => {
+    const Howl = await ensureHowl();
+    const howl = new Howl({ src: [SILENT_WAV], html5: true, preload: false });
+    const rig = howl as unknown as RiggedHowl & { _emit: (e: string, id?: number) => void };
+
+    rig._state = 'loaded';
+    rig._sounds = [{ _id: 1, _volume: 0, _node: null, _muted: false }];
+
+    rig._playLock = true;
+    howl.volume(0.6);
+    expect(rig._queue.map((t) => t.event)).toEqual(['volume']);
+
+    // html5 play().then() releases the lock and emits 'play' — the queued head
+    // is 'volume', so stock howler leaves it stuck and the track stays silent.
+    rig._playLock = false;
+    rig._emit('play', 1);
+
+    expect(rig._queue.length).toBe(0);
+    expect(howl.volume()).toBe(0.6);
+  });
 });
