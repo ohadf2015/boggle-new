@@ -40,7 +40,12 @@ export function AccessRequestGate() {
   // Wait for auth to resolve before choosing a branch — rendering the sign-up
   // prompt optimistically would flash it for already-authed users on reload.
   if (loading) {
-    return <div aria-hidden="true" className="h-40 animate-pulse rounded-neo bg-neo-navy/40" />;
+    return (
+      <div
+        aria-hidden="true"
+        className="min-h-[220px] animate-pulse rounded-neo bg-neo-navy/40 sm:min-h-[260px]"
+      />
+    );
   }
 
   // Not signed up / signed in yet. An anonymous arcade session has no email to verify.

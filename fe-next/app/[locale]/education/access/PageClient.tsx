@@ -60,7 +60,11 @@ export function PageClient() {
   // asked for. `hasAccess` is checked separately from `status`: a teacher granted
   // access directly has no access_requests row, so status stays 'none' while
   // hasAccess is true — that pair must show the approved card, not the pitch.
-  const showPitch = !isLoading && status === 'none' && !hasAccess;
+  //
+  // Keep pitch chrome up while auth/access is still loading (`status` stays
+  // `'none'`). Field CLS 0.30 on this route was the short loading column
+  // swapping into the wide hero+gate layout. The gate itself still waits.
+  const showPitch = status === 'none' && !hasAccess;
   const approved = !isLoading && (hasAccess || status === 'approved');
 
   // Steps + escape hatch reveal on scroll. The hero itself is NOT animated:
@@ -76,7 +80,11 @@ export function PageClient() {
   const statusCard = (
     <>
       {isLoading && (
-        <div aria-hidden="true" className="h-44 animate-pulse rounded-neo bg-neo-navy-light" />
+        <div
+          data-testid="access-gate-skeleton"
+          aria-hidden="true"
+          className="min-h-[220px] animate-pulse rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light p-6 sm:min-h-[260px]"
+        />
       )}
 
       {!isLoading && status === 'pending' && (
@@ -108,7 +116,7 @@ export function PageClient() {
         </div>
       )}
 
-      {showPitch && (
+      {!isLoading && showPitch && (
         <div className="rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-lg sm:p-7">
           <AccessRequestGate />
         </div>
@@ -142,10 +150,10 @@ export function PageClient() {
         <LandingHeader showStart={false} />
         <section className="mx-auto flex min-h-[80dvh] max-w-xl flex-col justify-center px-4 pb-10 pt-16">
           <div className="relative rounded-neo-xl border-neo-thick border-black bg-neo-lime p-6 pt-14 text-neo-navy shadow-hard-xl sm:p-8 sm:pt-16">
-            <span className="absolute -top-12 start-1/2 flex size-24 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-neo-thick border-black bg-neo-cyan shadow-hard rtl:translate-x-1/2">
+            <span className="absolute -top-12 start-1/2 flex size-24 shrink-0 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-neo-thick border-black bg-neo-cyan shadow-hard rtl:translate-x-1/2 [contain:layout]">
               <Image src="/mascot/teacher/teacher-hero.webp" alt="" aria-hidden="true" width={96} height={96} priority className="size-full object-contain" />
             </span>
-            <h1 className="text-center font-neo-display text-[clamp(1.75rem,6vw,2.5rem)] font-black leading-tight tracking-[-0.02em] text-balance">
+            <h1 className="text-center font-neo-display text-[clamp(1.75rem,6vw,2.5rem)] font-black leading-tight tracking-[-0.02em] text-balance [min-height:2.5em]">
               {t('education.access.already_approved_title')}
             </h1>
             <Link

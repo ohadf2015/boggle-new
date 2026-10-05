@@ -1,48 +1,25 @@
 'use client';
 
 /**
- * The crawler-facing copy below the lobby — in the HTML, out of the scroll.
+ * Crawler-facing copy below the lobby — in the HTML, never in the layout.
  *
- * This route server-renders a `GamePageSeoContent` block and a for-schools CTA
- * BELOW the client tree. That copy is not decoration: this page is the primary
- * hero CTA of `/education/for-schools`, the Classroom-plan ($39/term) funnel, and the block
- * exists because a crawler previously saw 17 words here under a HowTo that
- * described three unseen steps.
+ * This route server-renders GamePageSeoContent + a for-schools CTA BELOW the
+ * client tree so a HowTo JSON-LD is not describing three unseen steps (crawler
+ * previously saw 17 words here). The block is ~740px tall.
  *
- * It is also 740px tall, and it is what made the lobby page-scroll. Measured
- * live 2026-09-11 at 1440×900: `documentElement.scrollHeight` 1640 against an
- * `innerHeight` of 900, with `body.screen-fit-locked` already applied — the
- * shell was locking itself correctly and this tail was sitting underneath it.
- * (`overflow:hidden` on `<body>` propagates to the viewport rather than
- * clipping the body's own children, so the lock stops the scroll gesture but
- * never stops the height.)
- *
- * So: rendered on the server exactly as before, and removed from the layout the
- * moment the LOBBY is actually up. `isInGame` is that signal and nothing else —
- * `ClassroomGameInner` sets it when it mounts the lobby and clears it on the
- * way out. A crawler, and a logged-out visitor (who is redirected to
- * `/education` before any lobby exists), get the copy untouched.
- *
- * `hidden` rather than a CSS class: the attribute is in the initial server HTML
- * as absent, so the first paint carries the copy, and no stylesheet has to be
- * resolved for the removal to take effect.
+ * Toggling it out of flow after lobby mount (`hidden` or a class swap) is the
+ * classroom-game CLS (p75 0.57 / 230 loads): first paint includes 740px, then
+ * the lobby hides it. Keep the node in the DOM for crawlers, but clip it out
+ * of layout on the FIRST paint — no post-hydrate layout toggle.
  */
 
-import { useContext, type ReactNode } from 'react';
-import NavigationContext from '@/contexts/NavigationContext';
+import type { ReactNode } from 'react';
+
+const CLIP =
+  'pointer-events-none absolute h-0 w-0 overflow-hidden';
 
 export function LobbySeoTail({ children }: { children: ReactNode }) {
-  // Read the context directly rather than through `useNavigation()`, which
-  // THROWS outside a provider. `subpageSeoContent.test.tsx` renders this route's
-  // server tree in isolation to assert the HowTo copy is really in the HTML, and
-  // that render mounts no NavigationProvider — so the throwing hook turned a
-  // crawler-copy assertion into a crash. Same degrade-to-no-op convention the
-  // sibling hooks in NavigationContext already document (`useHideNavigation`,
-  // `useRegisterHeaderAudioControl`): no provider → `false` → the copy renders,
-  // which is exactly the crawler/logged-out case. In the app the layout always
-  // mounts the provider, so lobby behaviour is unchanged.
-  const isInGame = useContext(NavigationContext)?.isInGame ?? false;
-  return <div hidden={isInGame}>{children}</div>;
+  return <div className={CLIP}>{children}</div>;
 }
 
 export default LobbySeoTail;

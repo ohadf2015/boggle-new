@@ -43,6 +43,18 @@ describe('<TeacherGate>', () => {
     expect(screen.getByText('common.loading')).toBeInTheDocument();
   });
 
+  it('uses loadingFallback when the caller reserved chrome', () => {
+    mockUseTeacherAccess.mockReturnValue({ hasAccess: false, status: 'none', isLoading: true });
+    render(
+      <TeacherGate loadingFallback={<div data-testid="reserved-chrome">chrome</div>}>
+        <div>INSIDE</div>
+      </TeacherGate>,
+    );
+    expect(screen.getByTestId('reserved-chrome')).toBeInTheDocument();
+    expect(screen.queryByText('INSIDE')).toBeNull();
+    expect(screen.queryByText('common.loading')).toBeNull();
+  });
+
   it('does not redirect while loading', () => {
     mockUseTeacherAccess.mockReturnValue({ hasAccess: false, status: 'none', isLoading: true });
     render(<TeacherGate><div>INSIDE</div></TeacherGate>);

@@ -21,7 +21,26 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default function Page() {
   // PageClient reads `?from=` via useSearchParams, which needs a boundary here.
   return (
-    <Suspense fallback={<main className="min-h-screen bg-neo-navy" />}>
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-neo-navy text-neo-white">
+          {/* Pitch chrome, not the approved card: most loads are the apply funnel. */}
+          <div className="h-14 border-b-2 border-neo-cream sm:h-16" aria-hidden="true" />
+          <section className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+            <div className="grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+              <div>
+                <div className="h-[3.5rem] w-3/4 animate-pulse rounded bg-neo-navy-light sm:h-[4.5rem]" />
+                <div className="mt-4 h-16 max-w-[62ch] animate-pulse rounded bg-neo-navy-light" />
+                <div className="mt-6 min-h-[220px] animate-pulse rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light sm:min-h-[260px]" />
+              </div>
+              <div className="mx-auto w-full max-w-sm lg:max-w-none">
+                <div className="aspect-[918/880] w-full animate-pulse rounded-neo-xl border-neo-thick border-neo-cream/40 bg-neo-navy-light" />
+              </div>
+            </div>
+          </section>
+        </main>
+      }
+    >
       <PageClient />
     </Suspense>
   );

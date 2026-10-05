@@ -10,8 +10,8 @@ import { EducationHeader } from '@/components/education/EducationHeader';
 import { TV_STAGE_ZOOM_CLASS } from '@/components/education/lobby/tvStageScale';
 import { LaunchStageBackdrop } from '@/components/education/lobby/LaunchStageBackdrop';
 import { QuickLaunchStage } from '@/components/teacher/hq/QuickLaunchStage';
-import { PageLoader } from '@/components/ui/PageLoader';
 import { ClassroomGameLobby } from '@/components/education/ClassroomGameLobby';
+import { ClassroomGameLoadingShell } from './ClassroomGameLoadingShell';
 import { ClassroomGameLobbyExpress } from '@/components/education/ClassroomGameLobbyExpress';
 import { ClassroomGuestDemo } from '@/components/education/ClassroomGuestDemo';
 import { TeacherGate } from '@/components/education/TeacherGate';
@@ -122,14 +122,7 @@ function ClassroomGameInner() {
 
   if (isChecking || authLoading) {
     if (flow === QUICK_LAUNCH_FLOW) return <QuickLaunchStage />;
-    return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
-        <PageLoader
-          size="lg"
-          text={t('common.loading')}
-        />
-      </div>
-    );
+    return <ClassroomGameLoadingShell />;
   }
 
   return (
@@ -177,7 +170,6 @@ function ClassroomGameInner() {
  */
 export default function ClassroomGamePage() {
   const { user, loading } = useAuth();
-  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const preview = previewKind(searchParams?.get('preview'));
 
@@ -188,11 +180,7 @@ export default function ClassroomGamePage() {
 
   if (loading) {
     if (searchParams?.get('flow') === QUICK_LAUNCH_FLOW) return <QuickLaunchStage />;
-    return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
-        <PageLoader size="lg" text={t('common.loading')} />
-      </div>
-    );
+    return <ClassroomGameLoadingShell />;
   }
 
   // `isAuthenticated` also needs the profile, which lands after the user: a signed-in teacher is not a guest.
@@ -201,7 +189,7 @@ export default function ClassroomGamePage() {
   }
 
   return (
-    <TeacherGate>
+    <TeacherGate loadingFallback={<ClassroomGameLoadingShell />}>
       <ClassroomGameInner />
     </TeacherGate>
   );

@@ -66,7 +66,7 @@ describe('classroom-game: signed-in user whose profile has not loaded yet', () =
 
     expect(screen.queryByTestId('student-join')).toBeNull();
     expect(screen.queryByTestId('teacher-launcher')).toBeNull();
-    expect(screen.getByTestId('loader')).toBeTruthy();
+    expect(screen.getByTestId('classroom-game-loading-shell')).toBeTruthy();
 
     authState.profile = { user_role: 'teacher' };
     rerender(<ClassroomGamePage />);
