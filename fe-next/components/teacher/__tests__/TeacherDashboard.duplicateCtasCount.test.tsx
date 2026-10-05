@@ -144,6 +144,15 @@ vi.mock('@/components/teacher/StudentCapMeter', () => ({
   StudentCapMeter: () => <div data-testid="student-cap-meter" />,
 }));
 
+// GetStudentsInCard is not under test here (CTA count on PlayNow / ClassPulse).
+// Leaving the real card mounted made shard-6 flake: its empty-roster effect
+// calls trackEduJoinCodeShown, and a sibling file's incomplete telemetry mock
+// can win in a recycled worker ("No export is defined on the mock") AFTER
+// this suite already counted exactly one play button. Same mock as calmHq.
+vi.mock('@/components/teacher/hq/GetStudentsInCard', () => ({
+  GetStudentsInCard: () => <div data-testid="get-students-in" />,
+}));
+
 // Don't mock ClassPulseSection - let it render so we can test the suppressed
 // play button behavior. Instead, mock only the underlying dependencies.
 vi.mock('@/hooks/useClassPulse', () => ({
@@ -209,7 +218,8 @@ vi.mock('@/hooks/useVocabularyLesson', () => ({
 }));
 
 // ── Telemetry ────────────────────────────────────────────────────────────────
-vi.mock('@/lib/education/telemetry', () => ({
+vi.mock('@/lib/education/telemetry', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/education/telemetry')>()),
   trackEduTeacherDashboardViewed: vi.fn(),
   trackEduTeacherToolsOpened: vi.fn(),
   trackTeacherOnboardingStep: vi.fn(),
