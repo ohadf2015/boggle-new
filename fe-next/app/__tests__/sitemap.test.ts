@@ -216,10 +216,11 @@ describe('sitemap', () => {
     expect(urls.has('https://www.lexiclash.live/en/words')).toBe(true);
   });
 
-  it('lists the anagram hub for EN only', () => {
+  it('lists the anagram hub for EN and SV (zero-click rec 6487)', () => {
     const urls = new Set(sitemap().map((e) => e.url));
     expect(urls.has('https://www.lexiclash.live/en/anagram')).toBe(true);
-    for (const locale of ['he', 'sv', 'ja', 'es']) {
+    expect(urls.has('https://www.lexiclash.live/sv/anagram')).toBe(true);
+    for (const locale of ['he', 'ja', 'es']) {
       expect(urls.has(`https://www.lexiclash.live/${locale}/anagram`)).toBe(false);
     }
   });

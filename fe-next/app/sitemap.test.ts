@@ -264,4 +264,15 @@ describe('sitemap', () => {
       ).toBeDefined();
     }
   });
+
+  it('lists EN and SV anagram hubs (zero-click rec 6487) and not other locales', () => {
+    expect(routes.find((r) => r.url === `${BASE_URL}/en/anagram`)).toBeDefined();
+    expect(routes.find((r) => r.url === `${BASE_URL}/sv/anagram`)).toBeDefined();
+    for (const locale of ['he', 'ja', 'es', 'ru']) {
+      expect(
+        routes.find((r) => r.url === `${BASE_URL}/${locale}/anagram`),
+        `${locale}/anagram must stay out (noindex)`,
+      ).toBeUndefined();
+    }
+  });
 });
