@@ -104,6 +104,51 @@ describe('upgrade page — logged-out visitor', () => {
   });
 });
 
+describe('upgrade page — before auth resolves (server render / first paint)', () => {
+  it('leads with the 14-day trial badge and CTA, like a logged-out visitor, without claiming a plan', () => {
+    auth.loading = true;
+    render(<PageClient />);
+    expect(screen.getByTestId('pricing-trial-cta')).toBeInTheDocument();
+    expect(screen.getByText(/^eg2Pro\.plans\.trialBadge/)).toBeInTheDocument();
+    expect(screen.queryByText('eg2Pro.plans.recommended')).not.toBeInTheDocument();
+    expect(screen.getByTestId('pricing-paid-cta').textContent).toMatch(/^eg2Pro\.plans\.buyNowInstead/);
+    expect(screen.queryByTestId('pricing-free-current')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('pricing-pro-current')).not.toBeInTheDocument();
+  });
+
+  it('does not count a trial view until the viewer is known', async () => {
+    const { trackTrialCtaView } = await import('@/lib/education/proFunnelTelemetry');
+    vi.mocked(trackTrialCtaView).mockClear();
+    auth.loading = true;
+    render(<PageClient />);
+    expect(trackTrialCtaView).not.toHaveBeenCalled();
+  });
+
+  it('drops the trial for a trial-used account once auth and the entitlement resolve', () => {
+    auth.loading = true;
+    const { rerender } = render(<PageClient />);
+    expect(screen.getByTestId('pricing-trial-cta')).toBeInTheDocument();
+    auth.loading = false;
+    auth.user = { id: 't1' };
+    Object.assign(pro, { known: true, trialUsed: true });
+    rerender(<PageClient />);
+    expect(screen.queryByTestId('pricing-trial-cta')).not.toBeInTheDocument();
+    expect(screen.getByText('eg2Pro.plans.recommended')).toBeInTheDocument();
+    expect(screen.getByTestId('pricing-free-current')).toBeInTheDocument();
+  });
+
+  it('shows a Pro teacher their plan, not the trial, once resolved', () => {
+    auth.loading = true;
+    const { rerender } = render(<PageClient />);
+    auth.loading = false;
+    auth.user = { id: 't1' };
+    Object.assign(pro, { known: true, hasPro: true });
+    rerender(<PageClient />);
+    expect(screen.queryByTestId('pricing-trial-cta')).not.toBeInTheDocument();
+    expect(screen.getByTestId('pricing-pro-current')).toBeInTheDocument();
+  });
+});
+
 describe('upgrade page — signed-in teachers', () => {
   it('marks Free as current only once the status read succeeded', () => {
     auth.user = { id: 't1' };
