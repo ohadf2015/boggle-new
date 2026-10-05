@@ -44,7 +44,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+/** Growth Radar rec 5893 — H2 + FAQPage Question must match this query verbatim. */
+export const SCRABLE_ON_LINE_QUESTION = 'scrable on line';
+export const SCRABLE_ON_LINE_ANSWER =
+  'Looking for scrable on line? That query is a common misspelling of Scrabble online. LexiClash is a free browser word game: same letter-grid strategy, played live instead of in turns. Two to twenty players share one board for two to three minutes, and nothing installs. Open a room, send the link, play on any phone or laptop.';
+
 const faqs = [
+  {
+    q: SCRABLE_ON_LINE_QUESTION,
+    a: SCRABLE_ON_LINE_ANSWER,
+  },
   {
     q: 'What is the best free Scrabble alternative online?',
     a: "LexiClash is the best free Scrabble alternative online if you want real-time multiplayer instead of turn-based: 2-20+ players share one letter grid simultaneously, the match wraps in 2-3 minutes, and there's no app install or signup. Scrabble GO still owns official rules and the brand; LexiClash trades that for speed, group size, and zero ads mid-match.",
@@ -169,6 +178,19 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
               Compare 9 word games
             </Link>
           </div>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="mb-3 font-neo-display text-3xl font-black tracking-tight text-neo-cyan">
+            {SCRABLE_ON_LINE_QUESTION}
+          </h2>
+          <p className="max-w-2xl text-lg leading-relaxed text-slate-300">{SCRABLE_ON_LINE_ANSWER}</p>
+          <Link
+            href="/en/multiplayer"
+            className="mt-4 inline-block rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard"
+          >
+            Play free now →
+          </Link>
         </section>
 
         <section className="mb-12">
