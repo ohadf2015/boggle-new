@@ -36,6 +36,7 @@ import {
   trackEduTeacherToolsOpened,
 } from '@/lib/education/telemetry';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { liveClassroomHref } from '@/lib/education/startLiveClassCta';
 import { GetStudentsInCard } from './hq/GetStudentsInCard';
 import { GetStudentsInSkeleton } from './hq/GetStudentsInSkeleton';
 import { useFirstAssignmentCta } from './hq/useFirstAssignmentCta';
@@ -44,10 +45,12 @@ import { HqDock } from './hq/HqDock';
 import { HqToolsContent, type HqToolsPanel } from './hq/HqToolsContent';
 import { pickHqUpsell } from './hq/pickHqUpsell';
 import { FirstAssignmentInlineCta } from './hq/FirstAssignmentInlineCta';
+import { StartLiveClassCta } from './hq/StartLiveClassCta';
 import { HqClassPulse } from './hq/HqClassPulse';
 import { HqJoinStrip } from './hq/HqJoinStrip';
 import { HqLoadError } from './hq/HqLoadError';
 import { pickHqStep } from './hq/hqStep';
+import { TeacherOnboardingChecklistLive } from './dashboard/TeacherOnboardingChecklist';
 import { shouldShowClassProgressStrip } from '@/lib/education/classProgressStrip';
 
 const QUIET_LINK =
@@ -311,6 +314,24 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
           />
         </div>
 
+        {hasTeacherAccess && step !== 'loading' && step !== 'error' ? (
+          <div className={cn('lg:col-span-full', `${LANDSCAPE}:col-span-full`)}>
+            <TeacherOnboardingChecklistLive
+              classroomCount={classrooms.length}
+              classroomId={selectedClassroom?.id ?? null}
+              rosterCount={studentCount}
+              joinCode={selectedClassroom?.join_code}
+              reportsHref={reportsHref}
+              onCreateClassroom={focusCreateClassroom}
+              onCreateAssignment={() => setShowAssignmentCreator(true)}
+              onStartLive={() => setLauncherOpen(true)}
+              hideCreateClassroomCta={step === 'createClass'}
+              hideAssignmentCta={offerFirstAssignment}
+              hideStartLiveCta={step === 'goLive'}
+              hasPro={hasPro}
+            />
+          </div>
+        ) : null}
         {step === 'error' ? (
           <HqLoadError onRetry={() => refreshClassrooms()} className={cn('lg:col-span-full', `${LANDSCAPE}:col-span-full`)} />
         ) : step === 'loading' ? (
@@ -367,6 +388,13 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                       <FirstAssignmentInlineCta classroomId={selectedClassroom.id} onCta={() => setShowAssignmentCreator(true)} />
                     </div>
                   ) : null}
+                  <StartLiveClassCta
+                    classroomId={selectedClassroom.id}
+                    studentCount={studentCount}
+                    assignmentCount={assignmentCount}
+                    joinCode={selectedClassroom.join_code || ''}
+                    onStart={() => router.push(liveClassroomHref(language, selectedClassroom.id))}
+                  />
                 </div>
                 <HqJoinStrip
                   className={cn('lg:col-span-1 lg:col-start-1', `${LANDSCAPE}:col-span-1 ${LANDSCAPE}:col-start-1`)}

@@ -35,7 +35,7 @@ export type ProUpgradeSource =
   | 'dashboard_trial_lifecycle'
   | 'dashboard_trial_ended';
 
-export type TrialCtaSource = 'dashboard_trial_offer' | 'upgrade_page';
+export type TrialCtaSource = 'dashboard_trial_offer' | 'upgrade_page' | 'activation_checklist';
 
 export function trackTrialCtaView(args: { source: TrialCtaSource }): void {
   safeCapture('trial_cta_view', { source: args.source, product: 'teacher_pro' });

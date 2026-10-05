@@ -4,16 +4,16 @@
  * Empty-state CTAs route each incomplete step to its screen:
  *   create classroom     → first-run card on this page
  *   first assignment     → AssignmentCreator
- *   share join link      → copy the student-join payload
- *   first progress report → /teacher/reports
+ *   copy student invite  → copy the student-join payload (persisted)
+ *   start live class     → classroom-game launcher (persisted)
  *
- * Fires PostHog `teacher_onboarding_step` on view and on each CTA.
+ * Completed + not dismissed: Teacher Pro trial CTA.
+ * Dismissed or already Pro: hidden.
  */
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { Check, School, ClipboardList, Link2, FileText } from 'lucide-react';
+import { Check, School, ClipboardList, Link2, MonitorPlay } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { NeoPanel } from '@/components/ui/panel';
@@ -27,6 +27,8 @@ import {
 import { trackTeacherOnboardingStep } from '@/lib/education/telemetry';
 import { getClassroomAssignments } from '@/lib/supabase/education/assignments';
 import { useRecentClassroomGames } from '@/hooks/useRecentClassroomGames';
+import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
+import { TeacherActivationCompleteCard } from './TeacherActivationCompleteCard';
 
 const STEP_COPY: Record<
   TeacherOnboardingStepId,
@@ -47,10 +49,10 @@ const STEP_COPY: Record<
     ctaKey: 'teacher.onboardingChecklist.shareJoinCta',
     testId: 'teacher-onboarding-cta-share-join',
   },
-  view_first_progress_report: {
+  start_live_class: {
     labelKey: 'eduHq.checklist.firstGame',
-    ctaKey: 'eduHq.checklist.firstGameCta',
-    testId: 'teacher-onboarding-cta-view-report',
+    ctaKey: 'teacher.onboardingChecklist.startLiveCta',
+    testId: 'teacher-onboarding-cta-start-live',
   },
 };
 
@@ -58,24 +60,31 @@ const STEP_ICON = {
   create_classroom: School,
   create_first_assignment: ClipboardList,
   share_join_link: Link2,
-  view_first_progress_report: FileText,
+  start_live_class: MonitorPlay,
 } as const;
 
 export interface TeacherOnboardingChecklistProps {
   classroomCount: number;
   assignmentCount: number | null;
   rosterCount: number;
-  hasProgressReport: boolean | null;
+  hasLiveClass?: boolean | null;
+  /** @deprecated alias for hasLiveClass */
+  hasProgressReport?: boolean | null;
   joinCode?: string | null;
   reportsHref: string;
   onCreateClassroom: () => void;
   onCreateAssignment: () => void;
-  /**
-   * When true, hides the create-classroom CTA button because the primary
-   * action is elsewhere (e.g., PlayTabFirstRunCard on the dashboard).
-   * @default false — button is shown when this is the current step
-   */
+  onStartLive?: () => void;
   hideCreateClassroomCta?: boolean;
+  hideAssignmentCta?: boolean;
+  hideStartLiveCta?: boolean;
+  inviteCopied?: boolean;
+  liveStarted?: boolean;
+  dismissed?: boolean;
+  hasPro?: boolean;
+  onDismiss?: () => void;
+  onInviteCopied?: () => void;
+  onLiveStarted?: () => void;
   className?: string;
 }
 
@@ -83,20 +92,34 @@ export function TeacherOnboardingChecklist({
   classroomCount,
   assignmentCount,
   rosterCount,
+  hasLiveClass,
   hasProgressReport,
   joinCode,
-  reportsHref,
+  reportsHref: _reportsHref,
   onCreateClassroom,
   onCreateAssignment,
+  onStartLive,
   hideCreateClassroomCta = false,
+  hideAssignmentCta = false,
+  hideStartLiveCta = false,
+  inviteCopied,
+  liveStarted,
+  dismissed = false,
+  hasPro = false,
+  onDismiss,
+  onInviteCopied,
+  onLiveStarted,
   className,
 }: TeacherOnboardingChecklistProps) {
   const { t, language } = useLanguage();
+  const live = hasLiveClass !== undefined ? hasLiveClass : (hasProgressReport ?? null);
   const result = teacherOnboardingChecklist({
     classroomCount,
     assignmentCount,
     rosterCount,
-    hasProgressReport,
+    hasLiveClass: live,
+    inviteCopied,
+    liveStarted,
   });
 
   const currentStep = result.current;
@@ -105,7 +128,11 @@ export function TeacherOnboardingChecklist({
     trackTeacherOnboardingStep({ step: currentStep, action: 'view' });
   }, [currentStep]);
 
-  if (result.complete) return null;
+  if (dismissed) return null;
+  if (result.complete && hasPro) return null;
+  if (result.complete) {
+    return <TeacherActivationCompleteCard onDismiss={onDismiss} />;
+  }
 
   const code = (joinCode ?? '').trim();
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -114,7 +141,10 @@ export function TeacherOnboardingChecklist({
     if (!code) return;
     navigator.clipboard
       .writeText(classroomInvitePayload(origin, language, code))
-      .then(() => toast.success(t('teacher.classroom.codeCopied')))
+      .then(() => {
+        toast.success(t('teacher.classroom.codeCopied'));
+        onInviteCopied?.();
+      })
       .catch(() => toast.error(t('share.codeCopyError')));
   };
 
@@ -123,6 +153,17 @@ export function TeacherOnboardingChecklist({
     if (id === 'create_classroom') onCreateClassroom();
     if (id === 'create_first_assignment') onCreateAssignment();
     if (id === 'share_join_link') copyJoin();
+    if (id === 'start_live_class') {
+      onLiveStarted?.();
+      onStartLive?.();
+    }
+  };
+
+  const hideCta = (id: TeacherOnboardingStepId) => {
+    if (id === 'create_classroom') return hideCreateClassroomCta;
+    if (id === 'create_first_assignment') return hideAssignmentCta;
+    if (id === 'start_live_class') return hideStartLiveCta || !onStartLive;
+    return false;
   };
 
   return (
@@ -191,16 +232,7 @@ export function TeacherOnboardingChecklist({
                   <Icon className="size-3.5 shrink-0 text-neo-cyan" aria-hidden="true" />
                   {t(copy.labelKey)}
                 </p>
-                {isCurrent && step.id === 'view_first_progress_report' ? (
-                  <Link
-                    href={reportsHref}
-                    data-testid={copy.testId}
-                    onClick={() => trackTeacherOnboardingStep({ step: step.id, action: 'cta' })}
-                    className={ctaClassName()}
-                  >
-                    {t(copy.ctaKey)}
-                  </Link>
-                ) : isCurrent && !(step.id === 'create_classroom' && hideCreateClassroomCta) ? (
+                {isCurrent && !hideCta(step.id) ? (
                   <button
                     type="button"
                     data-testid={copy.testId}
@@ -238,13 +270,18 @@ export interface TeacherOnboardingChecklistLiveProps {
   reportsHref: string;
   onCreateClassroom: () => void;
   onCreateAssignment: () => void;
+  onStartLive?: () => void;
   hideCreateClassroomCta?: boolean;
+  hideAssignmentCta?: boolean;
+  hideStartLiveCta?: boolean;
+  hasPro?: boolean;
   className?: string;
 }
 
 /**
  * Live wrapper. Assignment count and last-game start unknown and stay unknown
  * on error, so a network blip cannot look like "never assigned / never played".
+ * Completions (copy, live start, dismiss) load from the server.
  */
 export function TeacherOnboardingChecklistLive({
   classroomCount,
@@ -254,7 +291,11 @@ export function TeacherOnboardingChecklistLive({
   reportsHref,
   onCreateClassroom,
   onCreateAssignment,
+  onStartLive,
   hideCreateClassroomCta = false,
+  hideAssignmentCta = false,
+  hideStartLiveCta = false,
+  hasPro = false,
   className,
 }: TeacherOnboardingChecklistLiveProps) {
   const [assignmentCount, setAssignmentCount] = useState<number | null>(
@@ -264,6 +305,7 @@ export function TeacherOnboardingChecklistLive({
     classroomId: classroomId ?? '',
     limit: 1,
   });
+  const { progress, markInviteCopied, markLiveStarted, dismiss } = useTeacherActivationProgress();
 
   useEffect(() => {
     if (!classroomId) {
@@ -282,7 +324,7 @@ export function TeacherOnboardingChecklistLive({
     };
   }, [classroomId]);
 
-  const hasProgressReport = !classroomId
+  const hasLiveClass = !classroomId
     ? false
     : gamesError
       ? null
@@ -295,12 +337,22 @@ export function TeacherOnboardingChecklistLive({
       classroomCount={classroomCount}
       assignmentCount={assignmentCount}
       rosterCount={rosterCount}
-      hasProgressReport={hasProgressReport}
+      hasLiveClass={hasLiveClass}
       joinCode={joinCode}
       reportsHref={reportsHref}
       onCreateClassroom={onCreateClassroom}
       onCreateAssignment={onCreateAssignment}
+      onStartLive={onStartLive}
       hideCreateClassroomCta={hideCreateClassroomCta}
+      hideAssignmentCta={hideAssignmentCta}
+      hideStartLiveCta={hideStartLiveCta}
+      inviteCopied={progress.inviteCopied}
+      liveStarted={progress.liveStarted}
+      dismissed={progress.dismissed}
+      hasPro={hasPro}
+      onDismiss={dismiss}
+      onInviteCopied={markInviteCopied}
+      onLiveStarted={markLiveStarted}
       className={className}
     />
   );

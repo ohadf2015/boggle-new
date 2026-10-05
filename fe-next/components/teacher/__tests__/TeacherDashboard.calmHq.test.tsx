@@ -8,6 +8,7 @@ const state = {
   hasPro: false,
 };
 const upgradeClicked = vi.fn();
+const push = vi.fn();
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
@@ -19,7 +20,7 @@ vi.mock('@/hooks/useClassroom', () => ({
   useClassrooms: () => ({ classrooms: state.classrooms, isLoading: false, error: null, refresh: vi.fn(), createClassroom: vi.fn() }),
 }));
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useRouter: () => ({ push, replace: vi.fn() }),
   usePathname: () => '/en/teacher',
   useSearchParams: () => new URLSearchParams(),
 }));
@@ -61,12 +62,14 @@ vi.mock('@/components/teacher/hq/ClassPulseRow', () => ({
 vi.mock('@/components/teacher/hq/useFirstAssignmentCta', () => ({
   useFirstAssignmentCta: () => ({ assignmentCount: state.assignmentCount, submittedCount: 0, hasActiveRoom: false }),
 }));
-vi.mock('@/lib/education/telemetry', () => ({
+vi.mock('@/lib/education/telemetry', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/education/telemetry')>()),
   trackEduTeacherDashboardViewed: vi.fn(),
   trackEduTeacherToolsOpened: vi.fn(),
   trackEduFirstAssignmentCtaShown: vi.fn(),
   trackEduFirstAssignmentCtaClicked: vi.fn(),
   trackEduJoinCodeCopied: vi.fn(),
+  trackEduAssignmentStartLiveClicked: vi.fn(),
   trackTeacherHqProgressViewed: vi.fn(),
   trackTeacherHqUpgradeClicked: (...a: unknown[]) => upgradeClicked(...a),
 }));
@@ -83,6 +86,7 @@ describe('Teacher HQ — one decision at a time', () => {
     state.assignmentCount = 0;
     state.hasPro = false;
     upgradeClicked.mockClear();
+    push.mockClear();
   });
 
   it('Given no class, Then the only primary is create a class and the game picker waits behind a quiet link', () => {
@@ -114,7 +118,7 @@ describe('Teacher HQ — one decision at a time', () => {
     expect(screen.getByTestId('assignment-creator')).toBeInTheDocument();
   });
 
-  it('Given an active class, Then go live leads, the pulse sits beside it, and no second start-game button exists', () => {
+  it('Given an active class, Then go live leads, the pulse sits beside it, and Start live stays on the deck', () => {
     state.classrooms = [room(5)];
     state.assignmentCount = 2;
     state.hasPro = true;
@@ -122,7 +126,8 @@ describe('Teacher HQ — one decision at a time', () => {
     expect(primaries().map((el) => el.getAttribute('data-hq-primary'))).toEqual(['goLive']);
     expect(screen.getByTestId('hq-class-pulse')).toBeInTheDocument();
     expect(screen.getAllByTestId('play-now-go')).toHaveLength(1);
-    expect(screen.queryByTestId('hq-start-live-cta')).toBeNull();
+    expect(screen.getByTestId('hq-start-live-cta')).toBeInTheDocument();
+    expect(screen.getByTestId('teacher-dashboard-aside')).toContainElement(screen.getByTestId('hq-start-live-cta'));
     expect(screen.queryByTestId('hq-first-assignment-inline')).toBeNull();
     expect(screen.queryByTestId('hq-assignments-pill')).toBeNull();
     expect(screen.getByTestId('hq-assignments-open')).toHaveTextContent('2');
@@ -171,6 +176,31 @@ describe('Teacher HQ — one decision at a time', () => {
     state.assignmentCount = assignmentCount;
     render(<TeacherDashboard banner={<div />} usagePrompt={<div />} />);
     expect(upsells().length).toBeLessThanOrEqual(1);
+  });
+
+  it('Given the selected class has students and an assignment, Then Start live opens that class lobby and the join code stays on the CTA', () => {
+    state.classrooms = [
+      { id: 'empty', name: 'Empty', join_code: 'NONE00', member_count: 0 },
+      { id: 'ready', name: 'Ready', join_code: 'LIVE99', member_count: 4 },
+    ];
+    state.assignmentCount = 1;
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('hq-start-live-cta')).toBeNull();
+    fireEvent.click(screen.getByTestId('class-switch-ready'));
+    expect(screen.getByTestId('hq-start-live-join-code')).toHaveTextContent('LIVE99');
+    fireEvent.click(screen.getByTestId('hq-start-live-cta'));
+    expect(push).toHaveBeenCalledWith('/en/education/classroom-game?classroomId=ready');
+  });
+
+  it.each([
+    ['an empty roster', [room(0)], 1],
+    ['zero assignments', [room(3)], 0],
+    ['an unknown assignment count', [room(3)], null],
+  ] as const)('Given %s, Then the HQ Start-live CTA is absent', (_label, classrooms, assignmentCount) => {
+    state.classrooms = [...classrooms];
+    state.assignmentCount = assignmentCount;
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('hq-start-live-cta')).toBeNull();
   });
 
   it('Given a pinned trial banner, Then it is the one ask even when the pulse is on screen', () => {

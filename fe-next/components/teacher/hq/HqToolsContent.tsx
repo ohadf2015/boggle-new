@@ -13,7 +13,6 @@ import { ProGate } from "../ProGate";
 import { StudentCapMeter } from "../StudentCapMeter";
 import { ClassPulseSection } from "../dashboard/ClassPulseSection";
 import { ClassroomWindowProgress } from "../dashboard/ClassroomWindowProgress";
-import { TeacherOnboardingChecklistLive } from "../dashboard/TeacherOnboardingChecklist";
 import { HqToolCard, CountUpNumber, type HqToolCardProps } from "./HqToolCard";
 import { useCalmMotion } from "./useCalmMotion";
 
@@ -47,8 +46,8 @@ type CardSpec = Omit<HqToolCardProps, "index" | "reduced" | "onOpen"> & { id: Ex
 
 /**
  * Class tools as one screen of summary cards; a card opens its section in
- * place. Every section stays mounted (hidden), so the checklist view event
- * and the paywalls' `active` impressions keep firing only for an open sheet.
+ * place. Every section stays mounted (hidden), so paywalls' `active`
+ * impressions keep firing only for an open sheet.
  */
 export function HqToolsContent({
   open,
@@ -56,8 +55,8 @@ export function HqToolsContent({
   selectedClassroom,
   assignmentCount = null,
   reportsHref,
-  hideCreateClassroomCta,
-  onCreateClassroom,
+  hideCreateClassroomCta: _hideCreateClassroomCta,
+  onCreateClassroom: _onCreateClassroom,
   onCreateAssignment,
   onInvite,
   onPlay,
@@ -124,18 +123,6 @@ export function HqToolsContent({
     <>
       <div data-testid="hq-tools-home" hidden={panel !== "home"} className="motion-safe:animate-[hq-card-pop_240ms_cubic-bezier(.2,1.2,.4,1)]">
         <div className="space-y-3">
-          {open ? (
-            <TeacherOnboardingChecklistLive
-              classroomCount={classroomCount}
-              classroomId={id}
-              rosterCount={students}
-              joinCode={selectedClassroom?.join_code}
-              reportsHref={reportsHref}
-              onCreateClassroom={onCreateClassroom}
-              onCreateAssignment={onCreateAssignment}
-              hideCreateClassroomCta={hideCreateClassroomCta}
-            />
-          ) : null}
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 max-sm:[&>*:last-child:nth-child(odd)]:col-span-2">
             {cards.map((card, i) => (
               <HqToolCard key={card.id} {...card} index={i} reduced={reduced} onOpen={() => onPanelChange(card.id)} />

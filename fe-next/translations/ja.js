@@ -13493,9 +13493,15 @@ const ja = {
       "createAssignment": "最初の課題を作成",
       "createAssignmentCta": "課題を作成",
       "shareJoin": "参加リンクを共有",
-      "shareJoinCta": "リンクをコピー",
+      "shareJoinCta": "参加リンクをコピー",
+      "startLive": "ライブ授業を始める",
+      "startLiveCta": "ライブ授業を開始",
       "viewReport": "最初の進捗レポートを見る",
-      "viewReportCta": "レポートを開く"
+      "viewReportCta": "レポートを開く",
+      "dismiss": "閉じる",
+      "completeTitle": "クラスがライブです",
+      "completeBody": "Teacher Pro を14日間無料で。追加の生徒、宿題、レポート。",
+      "trialCta": "Teacher Pro の無料期間を始める"
     },
     "playNow": {
       "recommended": "おすすめ",

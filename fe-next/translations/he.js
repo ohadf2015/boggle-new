@@ -13349,8 +13349,14 @@ const he = {
       "createAssignmentCta": "יצירת מטלה",
       "shareJoin": "שתפו את קישור ההצטרפות",
       "shareJoinCta": "העתיקו קישור הצטרפות",
+      "startLive": "התחילו שיעור חי",
+      "startLiveCta": "התחילו שיעור חי",
       "viewReport": "צפו בדוח ההתקדמות הראשון",
-      "viewReportCta": "פתיחת דוח"
+      "viewReportCta": "פתיחת דוח",
+      "dismiss": "סגירה",
+      "completeTitle": "הכיתה שלכם חיה",
+      "completeBody": "נסו פרו למורים 14 ימים בחינם — עוד תלמידים, מטלות ודוחות.",
+      "trialCta": "התחילו ניסיון פרו למורים"
     },
     "playNow": {
       "recommended": "מומלץ",

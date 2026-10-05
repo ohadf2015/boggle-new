@@ -150,11 +150,16 @@ export default defineConfig({
     // NOTE: Vitest 4 removed maxForks/minForks — these were silently ignored,
     // letting the pool spawn one fork per CPU (48) and blow the box's
     // pids.max=1000 cgroup (EAGAIN spawn / uv_thread_create aborts).
-    maxWorkers: 4,
+    // GitHub-hosted runners are ~7GB / 2 CPU. 4×5120 was a fiction: shard 6
+    // still hit FATAL "Ineffective mark-compacts" at the 5120 cap (job
+    // 111161568575). Cap CI at 2×3072 so two forks fit; keep 4×5120 locally.
+    maxWorkers: process.env.CI ? 2 : 4,
     // Vitest 4 moved per-worker node args from poolOptions.forks.execArgv to a
     // top-level test.execArgv (the old key was silently ignored). Caps each
     // fork's heap so the pool can't OOM under chronic nightly-box load.
-    execArgv: ['--max-old-space-size=5120'],
+    execArgv: process.env.CI
+      ? ['--max-old-space-size=3072']
+      : ['--max-old-space-size=5120'],
     teardownTimeout: 30000,
     hookTimeout: 30000,
     fileParallelism: true,
