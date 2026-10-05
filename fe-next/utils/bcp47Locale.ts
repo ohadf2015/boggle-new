@@ -18,9 +18,9 @@ export function toBcp47Locale(language: string): string {
 
 export function safeToLocaleDateString(date: Date, language: string, options?: Intl.DateTimeFormatOptions): string {
   try {
-    return date.toLocaleDateString(toBcp47Locale(language), options);
+    return date.toLocaleDateString(toBcp47Locale(language), { timeZone: 'UTC', ...options });
   } catch {
-    return date.toLocaleDateString('en-US', options);
+    return date.toLocaleDateString('en-US', { timeZone: 'UTC', ...options });
   }
 }
 
