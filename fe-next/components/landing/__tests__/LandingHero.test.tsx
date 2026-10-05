@@ -81,17 +81,15 @@ describe('LandingHero', () => {
     expect(pro.textContent).toMatch(/\$9/);
   });
 
-  // One primary action per hero: three same-size filled buttons read as three
-  // equal choices and wrap onto two rows at 1440px.
-  it('gives the hero one primary CTA and demotes Play now to a text link', () => {
+  // All three classroom hero CTAs share one touch-target geometry.
+  it('gives the three classroom hero CTAs the same min-height and padding', () => {
     render(<LandingHero {...baseProps} />);
-    const teachers = screen.getByTestId('landing-for-teachers-cta');
-    const play = screen.getByTestId('landing-play-cta');
-    expect(teachers.className).toContain('bg-neo-lime');
-    expect(teachers.className).toContain('py-3');
-    expect(play.className).not.toMatch(/\bbg-neo-/);
-    expect(play.className).not.toContain('shadow-hard');
-    expect(play.className).toContain('underline');
+    for (const id of ['landing-for-teachers-cta', 'landing-teacher-pro-cta', 'landing-play-cta']) {
+      const cls = screen.getByTestId(id).className;
+      expect(cls).toContain('min-h-12');
+      expect(cls).toContain('px-7');
+      expect(cls).toContain('py-3');
+    }
   });
 
   // #ff1493 with white 14px text is 3.64:1 (fails 4.5:1); navy ink is 4.76:1.
