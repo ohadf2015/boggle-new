@@ -55,13 +55,13 @@ export const layoutTranslations: Record<string, any> = {
       },
       "daily": {
         "title": "Daily Word Wheel & Word Puzzle - Free Challenge Like Wordle",
-        "description": "Play the LexiClash Daily Word Wheel Challenge! Same puzzle for everyone worldwide each day. Find words from the daily wheel, share your emoji results like Wordle. Compete globally, track your daily streaks, and chase the world record!",
+        "description": "Play the daily word wheel — same puzzle for everyone worldwide. Share emoji results like Wordle, track streaks, and chase the world record. Free!",
         "ogTitle": "Daily Word Wheel Challenge - Same Puzzle Worldwide",
         "ogDescription": "Daily word wheel puzzle challenge - same board for everyone worldwide. Share your results and compete globally!"
       },
       "multiplayer": {
         "title": "Free Multiplayer Word Game Online With Friends — No Download",
-        "description": "Play the best free multiplayer word game online with friends! Like Words With Friends but everyone plays at once. Host real-time word battle rooms for 2-20+ players, compete live, climb the leaderboard. No download, no signup — perfect for parties, game nights, and online word battles with friends.",
+        "description": "Free multiplayer word game — no download, no signup. Like Words With Friends but everyone plays at once. Host real-time rooms for 2–20+ players. Play now!",
         "ogTitle": "Free Multiplayer Word Game Online — Play With Friends | LexiClash",
         "ogDescription": "Words With Friends alternative — everyone plays at once! Host rooms, invite 2-20+ friends, compete in live word battles. Free, no download!"
       },
@@ -91,7 +91,7 @@ export const layoutTranslations: Record<string, any> = {
       },
       "adventure": {
         "title": "Word Adventure Game - RPG Word Puzzle Free",
-        "description": "Embark on an epic word adventure! Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles, power-ups, and progression. No download needed.",
+        "description": "Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles and power-ups. No download, no signup needed.",
         "ogTitle": "LexiClash Adventure - RPG Word Puzzle Game",
         "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!"
       }
