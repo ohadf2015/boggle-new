@@ -69,14 +69,16 @@ export default function UpgradePricingPageClient() {
     trackGrowthEvent('iap_viewed', { product: 'teacher_pro' });
   }, []);
 
+  // Count a trial view only once the viewer is resolved: while loading the trial is shown to
+  // everyone (server render included), and Pro / trial-used accounts would inflate the count.
   useEffect(() => {
-    if (!showTrial) return;
+    if (!showTrial || viewer === 'loading') return;
     try {
       trackTrialCtaView({ source: 'upgrade_page' });
     } catch {
       /* analytics must never block the till */
     }
-  }, [showTrial]);
+  }, [showTrial, viewer]);
 
   const handleUpgrade = useCallback(async (trial: boolean) => {
     setPending(trial ? 'trial' : 'paid');

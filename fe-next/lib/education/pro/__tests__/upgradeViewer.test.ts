@@ -37,9 +37,14 @@ describe('showTrialOffer — the trial button only where the code grants a trial
     expect(showTrialOffer('free', false)).toBe(false);
   });
 
-  it('never offers it while loading, unknown, or on Pro', () => {
-    expect(showTrialOffer('loading', true)).toBe(false);
+  it('offers it while auth/entitlement is loading, so the server render matches a signed-out visitor', () => {
+    expect(showTrialOffer('loading', false)).toBe(true);
+    expect(showTrialOffer('loading', true)).toBe(true);
+  });
+
+  it('never offers it once resolved as unknown or Pro', () => {
     expect(showTrialOffer('unknown', true)).toBe(false);
     expect(showTrialOffer('pro', true)).toBe(false);
+    expect(showTrialOffer('pro', false)).toBe(false);
   });
 });
