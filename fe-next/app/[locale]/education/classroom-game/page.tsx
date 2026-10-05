@@ -44,8 +44,12 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
       <script id="ld-edu-classroom-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <Suspense
         fallback={
-          <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-dvh">
-            <PageLoader size="lg" />
+          <div className="flex flex-1 flex-col bg-neo-navy min-h-dvh">
+            <div className="h-14 shrink-0 border-b border-neo-cream/10" aria-hidden="true" />
+            <div className="flex flex-1 items-center justify-center">
+              <PageLoader size="lg" />
+            </div>
+            <div className="mx-auto mb-6 h-24 w-full max-w-md animate-pulse rounded-neo bg-neo-navy-light" aria-hidden="true" />
           </div>
         }
       >

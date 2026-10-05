@@ -42,7 +42,21 @@ export function LobbySeoTail({ children }: { children: ReactNode }) {
   // which is exactly the crawler/logged-out case. In the app the layout always
   // mounts the provider, so lobby behaviour is unchanged.
   const isInGame = useContext(NavigationContext)?.isInGame ?? false;
-  return <div hidden={isInGame}>{children}</div>;
+  // `hidden` collapsed ~740px of SEO on lobby mount and drove CLS ~0.57.
+  // Keep the node in the accessibility tree for crawlers, but take it fully
+  // out of layout once the lobby owns the viewport (absolute + inert box).
+  return (
+    <div
+      aria-hidden={isInGame}
+      className={
+        isInGame
+          ? 'pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0'
+          : undefined
+      }
+    >
+      {children}
+    </div>
+  );
 }
 
 export default LobbySeoTail;
