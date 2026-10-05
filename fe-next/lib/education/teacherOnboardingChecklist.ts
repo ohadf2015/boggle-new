@@ -1,21 +1,24 @@
 /**
  * Teacher onboarding checklist — which of the four activation steps is honest.
  *
- * Order is the product: create classroom → first assignment → share join link
- * → first progress report. Dogfooding showed teachers stall on the assignment
+ * Order is the product: create classroom → first assignment → copy invite
+ * → start live class. Dogfooding showed teachers stall on the assignment
  * after creating a class, so assignment is second even with an empty roster
  * (unlike `teacherActivationStep`, which asks to share first).
  *
  * Pure on purpose. A failed assignment or last-game read must arrive as
  * `null`, never as `0` / `false` — otherwise a blip nags a teacher who already
  * did the work (pitfall class 4: a failure wearing a fact's clothes).
+ *
+ * `inviteCopied` / `liveStarted` are server-persisted completions. They never
+ * un-tick a step that live data already proved (roster / a played game).
  */
 
 export const TEACHER_ONBOARDING_STEPS = [
   'create_classroom',
   'create_first_assignment',
   'share_join_link',
-  'view_first_progress_report',
+  'start_live_class',
 ] as const;
 
 export type TeacherOnboardingStepId = (typeof TEACHER_ONBOARDING_STEPS)[number];
@@ -27,8 +30,17 @@ export interface TeacherOnboardingChecklistInput {
   /** `null` = unknown (loading or the read failed). Never coerce a failure to 0. */
   assignmentCount: number | null;
   rosterCount: number;
-  /** `null` = unknown last-game read. `false` = known empty. `true` = at least one game. */
-  hasProgressReport: boolean | null;
+  /**
+   * `null` = unknown last-game read. `false` = known empty. `true` = at least one live game.
+   * Prefer this name; `hasProgressReport` is accepted as an alias for older call sites.
+   */
+  hasLiveClass?: boolean | null;
+  /** @deprecated Use hasLiveClass. Kept so HQ tools wrappers compile during the rename. */
+  hasProgressReport?: boolean | null;
+  /** Server flag: teacher copied the student invite. */
+  inviteCopied?: boolean;
+  /** Server flag: teacher started a live class from the checklist. */
+  liveStarted?: boolean;
 }
 
 export interface TeacherOnboardingStepState {
@@ -57,33 +69,50 @@ function assignmentStatus(
   return assignmentCount >= 1 ? 'done' : 'todo';
 }
 
-function shareStatus(classroomCount: number, rosterCount: number): TeacherOnboardingStepStatus {
-  if (classroomCount < 1) return 'todo';
-  return rosterCount >= 1 ? 'done' : 'todo';
-}
-
-function reportStatus(
+function shareStatus(
   classroomCount: number,
-  hasProgressReport: boolean | null,
+  rosterCount: number,
+  inviteCopied: boolean | undefined,
 ): TeacherOnboardingStepStatus {
   if (classroomCount < 1) return 'todo';
-  if (hasProgressReport === null) return 'unknown';
-  return hasProgressReport ? 'done' : 'todo';
+  if (inviteCopied === true || rosterCount >= 1) return 'done';
+  return 'todo';
+}
+
+function liveStatus(
+  classroomCount: number,
+  hasLiveClass: boolean | null,
+  liveStarted: boolean | undefined,
+): TeacherOnboardingStepStatus {
+  if (classroomCount < 1) return 'todo';
+  if (liveStarted === true || hasLiveClass === true) return 'done';
+  if (hasLiveClass === null) return 'unknown';
+  return 'todo';
+}
+
+function resolveHasLiveClass(input: TeacherOnboardingChecklistInput): boolean | null {
+  if (input.hasLiveClass !== undefined) return input.hasLiveClass;
+  if (input.hasProgressReport !== undefined) return input.hasProgressReport;
+  return false;
 }
 
 export function teacherOnboardingChecklist(
   input: TeacherOnboardingChecklistInput,
 ): TeacherOnboardingChecklist {
+  const hasLiveClass = resolveHasLiveClass(input);
   const steps: TeacherOnboardingStepState[] = [
     { id: 'create_classroom', status: classroomStatus(input.classroomCount) },
     {
       id: 'create_first_assignment',
       status: assignmentStatus(input.classroomCount, input.assignmentCount),
     },
-    { id: 'share_join_link', status: shareStatus(input.classroomCount, input.rosterCount) },
     {
-      id: 'view_first_progress_report',
-      status: reportStatus(input.classroomCount, input.hasProgressReport),
+      id: 'share_join_link',
+      status: shareStatus(input.classroomCount, input.rosterCount, input.inviteCopied),
+    },
+    {
+      id: 'start_live_class',
+      status: liveStatus(input.classroomCount, hasLiveClass, input.liveStarted),
     },
   ];
 

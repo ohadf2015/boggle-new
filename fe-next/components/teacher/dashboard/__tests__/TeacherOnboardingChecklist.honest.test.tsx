@@ -16,7 +16,7 @@ const base = {
   classroomCount: 1,
   assignmentCount: 0,
   rosterCount: 1,
-  hasProgressReport: true,
+  hasLiveClass: true,
   joinCode: 'ABC234',
   reportsHref: '/en/teacher/reports',
   onCreateClassroom: vi.fn(),
@@ -32,12 +32,11 @@ describe('TeacherOnboardingChecklist — every tick names what actually happened
     expect(step).not.toHaveTextContent('teacher.onboardingChecklist.shareJoin');
   });
 
-  it('Given a game was played, Then the step says a live game ran (not "you viewed a report")', () => {
+  it('Given a game was played, Then the step says a live game ran', () => {
     render(<TeacherOnboardingChecklist {...base} />);
-    const step = screen.getByTestId('teacher-onboarding-step-view_first_progress_report');
+    const step = screen.getByTestId('teacher-onboarding-step-start_live_class');
     expect(step).toHaveAttribute('data-status', 'done');
     expect(step).toHaveTextContent('eduHq.checklist.firstGame');
-    expect(step).not.toHaveTextContent('teacher.onboardingChecklist.viewReport');
   });
 
   it('Given progress, Then a progress bar reports done of total', () => {
@@ -47,10 +46,17 @@ describe('TeacherOnboardingChecklist — every tick names what actually happened
     expect(bar).toHaveAttribute('aria-valuemax', '4');
   });
 
-  it('Given the live-game step is current, Then its CTA names the reports it leads to, in eduHq copy', () => {
-    render(<TeacherOnboardingChecklist {...base} assignmentCount={1} hasProgressReport={false} />);
-    const cta = screen.getByTestId('teacher-onboarding-cta-view-report');
-    expect(cta).toHaveAttribute('href', '/en/teacher/reports');
-    expect(cta).toHaveTextContent('eduHq.checklist.firstGameCta');
+  it('Given the live-game step is current, Then its CTA starts a live class', () => {
+    const onStartLive = vi.fn();
+    render(
+      <TeacherOnboardingChecklist
+        {...base}
+        assignmentCount={1}
+        hasLiveClass={false}
+        onStartLive={onStartLive}
+      />,
+    );
+    const cta = screen.getByTestId('teacher-onboarding-cta-start-live');
+    expect(cta).toHaveTextContent('teacher.onboardingChecklist.startLiveCta');
   });
 });

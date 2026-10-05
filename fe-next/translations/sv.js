@@ -13729,9 +13729,15 @@ const sv = {
       "createAssignment": "Skapa första uppgiften",
       "createAssignmentCta": "Skapa uppgift",
       "shareJoin": "Dela inbjudningslänken",
-      "shareJoinCta": "Kopiera länk",
-      "viewReport": "Visa första framstegsrapporten",
-      "viewReportCta": "Öppna rapport"
+      "shareJoinCta": "Kopiera inbjudningslänk",
+      "startLive": "Starta en livelektion",
+      "startLiveCta": "Starta livelektion",
+      "viewReport": "Visa första progressrapporten",
+      "viewReportCta": "Öppna rapport",
+      "dismiss": "Stäng",
+      "completeTitle": "Din klass är live",
+      "completeBody": "Prova Teacher Pro gratis i 14 dagar — fler elever, läxor och rapporter.",
+      "trialCta": "Starta Teacher Pro-provperiod"
     },
     "playNow": {
       "recommended": "Rekommenderas",

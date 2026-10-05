@@ -127,10 +127,8 @@ describe('<TeacherDashboard> — Teacher HQ deck', () => {
     expect(screen.getByTestId('teacher-lessons')).toHaveAttribute('open');
   });
 
-  it('Given the tools sheet closed, Then the onboarding checklist is not mounted (no phantom view event)', () => {
+  it('Given a first-run teacher, Then the activation checklist is on the dashboard', () => {
     render(<TeacherDashboard />);
-    expect(screen.queryByTestId('teacher-onboarding-checklist')).toBeNull();
-    fireEvent.click(screen.getByTestId('shortcut-last-game'));
     expect(screen.getByTestId('teacher-onboarding-checklist')).toBeInTheDocument();
   });
 

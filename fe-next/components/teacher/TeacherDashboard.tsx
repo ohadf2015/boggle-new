@@ -50,6 +50,7 @@ import { HqClassPulse } from './hq/HqClassPulse';
 import { HqJoinStrip } from './hq/HqJoinStrip';
 import { HqLoadError } from './hq/HqLoadError';
 import { pickHqStep } from './hq/hqStep';
+import { TeacherOnboardingChecklistLive } from './dashboard/TeacherOnboardingChecklist';
 import { shouldShowClassProgressStrip } from '@/lib/education/classProgressStrip';
 
 const QUIET_LINK =
@@ -313,6 +314,24 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
           />
         </div>
 
+        {hasTeacherAccess && step !== 'loading' && step !== 'error' ? (
+          <div className={cn('lg:col-span-full', `${LANDSCAPE}:col-span-full`)}>
+            <TeacherOnboardingChecklistLive
+              classroomCount={classrooms.length}
+              classroomId={selectedClassroom?.id ?? null}
+              rosterCount={studentCount}
+              joinCode={selectedClassroom?.join_code}
+              reportsHref={reportsHref}
+              onCreateClassroom={focusCreateClassroom}
+              onCreateAssignment={() => setShowAssignmentCreator(true)}
+              onStartLive={() => setLauncherOpen(true)}
+              hideCreateClassroomCta={step === 'createClass'}
+              hideAssignmentCta={offerFirstAssignment}
+              hideStartLiveCta={step === 'goLive'}
+              hasPro={hasPro}
+            />
+          </div>
+        ) : null}
         {step === 'error' ? (
           <HqLoadError onRetry={() => refreshClassrooms()} className={cn('lg:col-span-full', `${LANDSCAPE}:col-span-full`)} />
         ) : step === 'loading' ? (
