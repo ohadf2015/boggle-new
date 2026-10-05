@@ -23,13 +23,14 @@ import { WordCraftScorePreviewBadge } from '@/components/word-craft/WordCraftSco
 import { GemHuntWinScene } from './GemHuntWinScene';
 import { GemHuntRuleHint } from './GemHuntRuleHint';
 import { cn } from '@/lib/utils';
-import type { AbilityCard, AbilityKind } from '@/lib/word-craft/gems/types';
+import type { AbilityCard, AbilityKind, GemColor, GemRarity } from '@/lib/word-craft/gems/types';
 import { planGemDrama, clampGemDramaForCosy } from '@/lib/word-craft/celebration/gemDrama';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
 import type { SoundEffectKey } from '@/lib/audio/soundEffectsConfig';
+import { haptics } from '@/utils/haptics';
 
 const LETTER_FAMILIES = [
   { id: 'vowels', letters: new Set(['A', 'E', 'I', 'O', 'U']), multiplier: 2 },
@@ -243,6 +244,14 @@ export default function GemHuntPageClient() {
     [hunt, cosyMode],
   );
 
+  const handleTransmute = useCallback(
+    (color: GemColor, rarity: GemRarity) => {
+      playSound('tierPromotion', {});
+      haptics.success();
+      hunt.transmuteGem(color, rarity);
+    },
+    [hunt, playSound],
+  );
   const handleSubmit = useCallback(() => hunt.submitMove(), [hunt]);
   const handleRecallAll = useCallback(() => hunt.recallAll(), [hunt]);
   const handleRestart = useCallback(() => {
@@ -361,7 +370,7 @@ export default function GemHuntPageClient() {
 
         <GemInventory
           inventory={state.inventory}
-          onTransmute={hunt.transmuteGem}
+          onTransmute={handleTransmute}
           labels={{
             title: t('wordcraft.gems.inventory.title'),
             transmuteCta: t('wordcraft.gems.inventory.transmuteCta'),

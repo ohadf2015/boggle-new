@@ -7892,6 +7892,9 @@ const en = {
       "goalMany": "Finish on top",
       "goalSolo": "Longer words score way more"
     },
+    "wordGoal": {
+      "progress": "{count} / {goal} words"
+    },
     "nextGame": {
       "title": "What's next?",
       "rematchHarder": "Rematch · harder",
@@ -16630,7 +16633,9 @@ const en = {
   "wheel": {
     "rush": {
       "loading": "Loading...",
-      "fogActive": "Fog of War active!"
+      "fogActive": "Fog of War active!",
+      "loadFailed": "Couldn't load the round. Please try again.",
+      "loadFailedQuit": "Back to lobby"
     }
   },
   "connections": {

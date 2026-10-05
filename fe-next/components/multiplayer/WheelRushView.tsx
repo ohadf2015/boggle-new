@@ -110,6 +110,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const prefersReduced = useReducedMotion();
 
   const [puzzle, setPuzzle] = useState<WheelPuzzle | null>(null);
+  const [loadTimedOut, setLoadTimedOut] = useState(false);
   // Word-row direction follows the LETTERS on screen, not the gameLanguage prop
   // (which can arrive null at in-game render). Hebrew letters → rtl regardless;
   // an English game on a Hebrew UI keeps Latin letters L→R. See wheelWordDir.
@@ -302,6 +303,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     }) => {
       const me = latestRef.current.username;
       wheelStreakRef.current = 0;
+      setLoadTimedOut(false);
       setPuzzle(data.puzzle);
       setOuterLetters(data.puzzle.outerLetters);
       const sa = data.startedAt ?? Date.now();
@@ -357,10 +359,20 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     socket.emit('requestWheelRushState');
     const onReconnect = () => socket.emit('requestWheelRushState');
     socket.on('connect', onReconnect);
+    // If wheelRushState isn't ready server-side yet (puzzle-gen race / cold
+    // trie), handleRequestWheelRushState silently no-ops — no error, no retry.
+    // Without this, the client sits on the loading spinner forever. One retry,
+    // then show an error state so the player isn't stuck with no feedback.
+    const retryTimer = setTimeout(() => socket.emit('requestWheelRushState'), 4000);
+    const timeoutTimer = setTimeout(() => {
+      if (!latestRef.current.puzzle) setLoadTimedOut(true);
+    }, 9000);
     return () => {
       socket.off('wheelRushInit', onInit);
       socket.off('wheelWordResult', onResult);
       socket.off('connect', onReconnect);
+      clearTimeout(retryTimer);
+      clearTimeout(timeoutTimer);
     };
   }, [socket, flash]);
 
@@ -527,8 +539,21 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const fogEndsAt = (startedAt ?? 0) + WHEEL_RUSH_FOG_MS;
   if (!puzzle) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy text-neo-white">
-        <div className="animate-pulse font-neo-display">{t('wheel.rush.loading')}</div>
+      <div className="flex-1 flex flex-col items-center justify-center gap-4 bg-neo-navy text-neo-white p-4">
+        {loadTimedOut ? (
+          <>
+            <div className="font-neo-display text-center">{t('wheel.rush.loadFailed')}</div>
+            <button
+              type="button"
+              onClick={onQuit}
+              className="px-4 py-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light font-neo-display text-sm"
+            >
+              {t('wheel.rush.loadFailedQuit')}
+            </button>
+          </>
+        ) : (
+          <div className="animate-pulse font-neo-display">{t('wheel.rush.loading')}</div>
+        )}
       </div>
     );
   }

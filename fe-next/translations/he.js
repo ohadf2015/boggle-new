@@ -8420,6 +8420,9 @@ const he = {
       "goalMany": "סיימו במקום הראשון",
       "goalSolo": "מילים ארוכות שוות הרבה יותר"
     },
+    "wordGoal": {
+      "progress": "{count} / {goal} מילים"
+    },
     "nextGame": {
       "title": "מה הלאה?",
       "rematchHarder": "משחק חוזר · קשה יותר",
@@ -18305,7 +18308,9 @@ const he = {
   "wheel": {
     "rush": {
       "loading": "טוען...",
-      "fogActive": "ערפל הקרב פעיל!"
+      "fogActive": "ערפל הקרב פעיל!",
+      "loadFailed": "טעינת הסיבוב נכשלה. נסה שוב.",
+      "loadFailedQuit": "חזרה ללובי"
     }
   },
   "boosts": {

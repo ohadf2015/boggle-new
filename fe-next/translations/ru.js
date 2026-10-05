@@ -15708,7 +15708,9 @@ const ru = {
   "wheel": {
     "rush": {
       "loading": "Загрузка...",
-      "fogActive": "Туман войны активен"
+      "fogActive": "Туман войны активен",
+      "loadFailed": "Не удалось загрузить раунд. Попробуйте ещё раз.",
+      "loadFailedQuit": "Вернуться в лобби"
     }
   },
   "challengeAction": "Вызвать",

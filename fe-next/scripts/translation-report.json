@@ -1,20 +1,20 @@
 {
   "summary": {
-    "totalKeysInCode": 7545,
+    "totalKeysInCode": 8096,
     "keyCountByLanguage": {
-      "en": 14618,
-      "es": 14906,
-      "he": 14828,
-      "ja": 14887,
-      "ru": 14660,
-      "sv": 14884
+      "en": 15599,
+      "es": 15885,
+      "he": 15809,
+      "ja": 15868,
+      "ru": 15641,
+      "sv": 15865
     },
-    "missingFromEnglish": 101,
+    "missingFromEnglish": 104,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 392,
+      "templateLiterals": 413,
       "fallbackUsages": 1,
-      "variableKeys": 118
+      "variableKeys": 126
     }
   },
   "runtimeRisks": {
@@ -44,14 +44,7 @@
         "pattern": "`education.access.${key}`",
         "type": "template_literal",
         "file": "app/[locale]/education/access/PageClient.tsx",
-        "line": 181,
-        "context": "{t(`education.access.${key}`)}"
-      },
-      {
-        "pattern": "`education.access.${key}`",
-        "type": "template_literal",
-        "file": "app/[locale]/education/access/PageClient.tsx",
-        "line": 257,
+        "line": 211,
         "context": "{t(`education.access.${key}`)}"
       },
       {
@@ -142,7 +135,7 @@
         "pattern": "`rank.tier.${navTier}`",
         "type": "template_literal",
         "file": "components/GlobalBottomNav.tsx",
-        "line": 491,
+        "line": 493,
         "context": "aria-label={t(`rank.tier.${navTier}`)}"
       },
       {
@@ -975,13 +968,13 @@
         "pattern": "`blast.combo.${detectedCombos[0].type}`",
         "type": "template_literal",
         "file": "components/blast/legacy/hooks/useBlastWordHandler.ts",
-        "line": 252,
+        "line": 263,
         "context": "effects.setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toU"
       },
       {
         "pattern": "blast.combo.${detectedCombos[0].type}",
         "file": "components/blast/legacy/hooks/useBlastWordHandler.ts",
-        "line": 252,
+        "line": 263,
         "context": "effects.setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toU",
         "type": "template_literal"
       },
@@ -1241,7 +1234,7 @@
         "pattern": "`daily.weeklyChest.tier${tier.charAt(0).toUpperCase() + tier.slice(1)}`",
         "type": "template_literal",
         "file": "components/daily/WeeklyChestCard.tsx",
-        "line": 133,
+        "line": 136,
         "context": "const tierLabel = t("
       },
       {
@@ -1360,21 +1353,28 @@
         "pattern": "`teacher.playNow.failure.${failure.code}`",
         "type": "template_literal",
         "file": "components/education/ClassroomGameLobbyExpress.tsx",
-        "line": 347,
+        "line": 352,
         "context": "{t(`teacher.playNow.failure.${failure.code}`)}"
       },
       {
         "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeBanner.tsx",
-        "line": 326,
+        "line": 345,
         "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`)}"
+      },
+      {
+        "pattern": "`eg2Modes.category.${category}`",
+        "type": "template_literal",
+        "file": "components/education/ClassroomModeCatalogue.tsx",
+        "line": 118,
+        "context": "{t(`eg2Modes.category.${category}`)}"
       },
       {
         "pattern": "`education.landing.mock.${p.nameKey}`",
         "type": "template_literal",
         "file": "components/education/EducationModeMock.tsx",
-        "line": 121,
+        "line": 122,
         "context": "{t(`education.landing.mock.${p.nameKey}`)}"
       },
       {
@@ -1409,71 +1409,43 @@
         "pattern": "`education.landing.moat.${p.key}.tag`",
         "type": "template_literal",
         "file": "components/education/MoatTrifectaSection.tsx",
-        "line": 51,
+        "line": 42,
         "context": "{t(`education.landing.moat.${p.key}.tag`)}"
       },
       {
         "pattern": "`education.landing.moat.${p.key}.title`",
         "type": "template_literal",
         "file": "components/education/MoatTrifectaSection.tsx",
-        "line": 54,
+        "line": 45,
         "context": "{t(`education.landing.moat.${p.key}.title`)}"
       },
       {
         "pattern": "`education.landing.moat.${p.key}.body`",
         "type": "template_literal",
         "file": "components/education/MoatTrifectaSection.tsx",
-        "line": 57,
+        "line": 48,
         "context": "{t(`education.landing.moat.${p.key}.body`)}"
       },
       {
         "pattern": "`education.forSchools.form.role_${r}`",
         "type": "template_literal",
         "file": "components/education/SchoolLeadForm.tsx",
-        "line": 132,
+        "line": 142,
         "context": "{SCHOOL_LEAD_ROLES.map((r) => <SelectItem key={r} value={r}>{t(`education.forSchools.form.role_${r}`"
       },
       {
         "pattern": "`education.forSchools.form.count_${b}`",
         "type": "template_literal",
         "file": "components/education/SchoolLeadForm.tsx",
-        "line": 143,
+        "line": 153,
         "context": "{STUDENT_COUNT_BUCKETS.map((b) => <SelectItem key={b} value={b}>{t(`education.forSchools.form.count_"
       },
       {
         "pattern": "`education.forSchools.form.interest_${key}`",
         "type": "template_literal",
         "file": "components/education/SchoolLeadForm.tsx",
-        "line": 159,
+        "line": 169,
         "context": "<span>{t(`education.forSchools.form.interest_${key}`)}</span>"
-      },
-      {
-        "pattern": "`education.landing.modes.${m.key}.tag`",
-        "type": "template_literal",
-        "file": "components/education/SixModeTour.tsx",
-        "line": 68,
-        "context": "{t(`education.landing.modes.${m.key}.tag`)}"
-      },
-      {
-        "pattern": "`education.landing.modes.${m.key}.title`",
-        "type": "template_literal",
-        "file": "components/education/SixModeTour.tsx",
-        "line": 71,
-        "context": "{t(`education.landing.modes.${m.key}.title`)}"
-      },
-      {
-        "pattern": "`education.landing.modes.${m.key}.body`",
-        "type": "template_literal",
-        "file": "components/education/SixModeTour.tsx",
-        "line": 74,
-        "context": "{t(`education.landing.modes.${m.key}.body`)}"
-      },
-      {
-        "pattern": "`education.landing.modes.${m.key}.teaches`",
-        "type": "template_literal",
-        "file": "components/education/SixModeTour.tsx",
-        "line": 77,
-        "context": "{t('education.landing.modes.teaches')}: {t(`education.landing.modes.${m.key}.teaches`)}"
       },
       {
         "pattern": "`challenges.${challenge.challenge_tier}`",
@@ -1483,17 +1455,73 @@
         "context": "{t(`challenges.${challenge.challenge_tier}`)}"
       },
       {
+        "pattern": "`eg2Help.categories.${meta.category}.title`",
+        "type": "template_literal",
+        "file": "components/education/help/HelpArticleView.tsx",
+        "line": 52,
+        "context": "{t(`eg2Help.categories.${meta.category}.title`)}"
+      },
+      {
+        "pattern": "`eg2Help.categories.${m.category}.title`",
+        "type": "template_literal",
+        "file": "components/education/help/HelpHome.tsx",
+        "line": 37,
+        "context": "category: t(`eg2Help.categories.${m.category}.title`),"
+      },
+      {
+        "pattern": "`eg2Help.categories.${cat}.title`",
+        "type": "template_literal",
+        "file": "components/education/help/HelpHome.tsx",
+        "line": 148,
+        "context": "{t(`eg2Help.categories.${cat}.title`)}"
+      },
+      {
+        "pattern": "`eg2Help.categories.${cat}.blurb`",
+        "type": "template_literal",
+        "file": "components/education/help/HelpHome.tsx",
+        "line": 150,
+        "context": "<p className=\"text-sm text-neo-gray-300\">{t(`eg2Help.categories.${cat}.blurb`)}</p>"
+      },
+      {
+        "pattern": "`eg2Help.next.${next}.title`",
+        "type": "template_literal",
+        "file": "components/education/help/HelpNextStep.tsx",
+        "line": 20,
+        "context": "<h2 className=\"mt-1 font-neo-display text-2xl font-black sm:text-3xl\">{t(`eg2Help.next.${next}.title"
+      },
+      {
+        "pattern": "`eg2Help.next.${next}.body`",
+        "type": "template_literal",
+        "file": "components/education/help/HelpNextStep.tsx",
+        "line": 21,
+        "context": "<p className=\"mt-2 text-base font-semibold sm:text-lg\">{t(`eg2Help.next.${next}.body`)}</p>"
+      },
+      {
+        "pattern": "`eg2Help.next.${next}.cta`",
+        "type": "template_literal",
+        "file": "components/education/help/HelpNextStep.tsx",
+        "line": 28,
+        "context": "{t(`eg2Help.next.${next}.cta`)}"
+      },
+      {
+        "pattern": "`eg2Land.proof.${key}`",
+        "type": "template_literal",
+        "file": "components/education/landing/LandingProofStrip.tsx",
+        "line": 23,
+        "context": "<span className=\"text-sm font-bold leading-snug\">{t(`eg2Land.proof.${key}`)}</span>"
+      },
+      {
         "pattern": "`teacher.classroom.timer.min${m}`",
         "type": "template_literal",
         "file": "components/education/lobby/LobbyRoundSettings.tsx",
-        "line": 116,
+        "line": 119,
         "context": "choices={TIMER_MINUTES.map((m) => ({ value: m, label: t(`teacher.classroom.timer.min${m}`) }))}"
       },
       {
         "pattern": "`teacher.classroom.minWordLength.len${len}`",
         "type": "template_literal",
         "file": "components/education/lobby/LobbyRoundSettings.tsx",
-        "line": 139,
+        "line": 142,
         "context": "label: t(`teacher.classroom.minWordLength.len${len}`),"
       },
       {
@@ -1509,13 +1537,6 @@
         "file": "components/education/lobby/LobbySetupPanel.tsx",
         "line": 173,
         "context": "{t(`teacher.classroom.presets.${key}.desc`)}"
-      },
-      {
-        "pattern": "`teacher.classroom.gameModes.${modeKeySuffix(mode)}`",
-        "type": "template_literal",
-        "file": "components/education/lobby/useClassroomModeSwitch.ts",
-        "line": 101,
-        "context": "toast.success(t('education.modePicker.switched', { mode: t(`teacher.classroom.gameModes.${modeKeySuf"
       },
       {
         "pattern": "`student.practiceFun.headline.${plan.rank}`",
@@ -1556,14 +1577,14 @@
         "pattern": "`vocabQuiz.focus.${question.focus}`",
         "type": "template_literal",
         "file": "components/education/vocabQuiz/VocabQuizHostView.tsx",
-        "line": 183,
+        "line": 189,
         "context": "{t(`vocabQuiz.focus.${question.focus}`)}"
       },
       {
         "pattern": "`vocabQuiz.focus.${question.focus}`",
         "type": "template_literal",
         "file": "components/education/vocabQuiz/VocabQuizView.tsx",
-        "line": 85,
+        "line": 86,
         "context": "() => (question ? t(`vocabQuiz.focus.${question.focus}`) : ''),"
       },
       {
@@ -1668,7 +1689,7 @@
         "pattern": "`homeFresh.close.readMoreLinks.${key}`",
         "type": "template_literal",
         "file": "components/landing/fresh/FreshFaqLinks.tsx",
-        "line": 56,
+        "line": 57,
         "context": "{t(`homeFresh.close.readMoreLinks.${key}`)}"
       },
       {
@@ -2130,21 +2151,21 @@
         "pattern": "`teacher.subscription.matrix.${row.key}`",
         "type": "template_literal",
         "file": "components/teacher/PlanComparisonMatrix.tsx",
-        "line": 101,
+        "line": 109,
         "context": "{t(`teacher.subscription.matrix.${row.key}`)}"
       },
       {
         "pattern": "`teacher.proGate.${feature}.title`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 107,
+        "line": 94,
         "context": "{t(`teacher.proGate.${feature}.title`)}"
       },
       {
         "pattern": "`teacher.proGate.${feature}.body`",
         "type": "template_literal",
         "file": "components/teacher/ProGate.tsx",
-        "line": 110,
+        "line": 97,
         "context": "{t(`teacher.proGate.${feature}.body`)}"
       },
       {
@@ -2186,28 +2207,28 @@
         "pattern": "`education.vocabFocus.focus.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 353,
+        "line": 364,
         "context": "{t(`education.vocabFocus.focus.${option}`)}"
       },
       {
         "pattern": "`education.vocabFocus.instructions.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 359,
+        "line": 370,
         "context": "skill: t(`education.vocabFocus.instructions.${option}`),"
       },
       {
         "pattern": "`education.vocabFocus.unlock.${option}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentCreator.tsx",
-        "line": 361,
+        "line": 372,
         "context": ": t(`education.vocabFocus.unlock.${option}`, { min: MIN_WORDS_PER_FOCUS })}"
       },
       {
         "pattern": "`education.vocabFocus.focus.${practiceFocus}`",
         "type": "template_literal",
         "file": "components/teacher/assignments/AssignmentTrackingPanel.tsx",
-        "line": 87,
+        "line": 93,
         "context": "{t(`education.vocabFocus.focus.${practiceFocus}`)}"
       },
       {
@@ -2225,18 +2246,109 @@
         "context": "{t(`teacher.curriculum.subjects.${list.subject}`)}"
       },
       {
+        "pattern": "`eg2Polish.classes.status.${row.status}`",
+        "type": "template_literal",
+        "file": "components/teacher/hq/ClassRosterStatus.tsx",
+        "line": 104,
+        "context": "? t(`eg2Polish.classes.status.${row.status}`)"
+      },
+      {
+        "pattern": "`eg2Polish.classes.status.${row.status}`",
+        "type": "template_literal",
+        "file": "components/teacher/hq/ClassRosterStatus.tsx",
+        "line": 105,
+        "context": ": t(`eg2Polish.classes.status.${row.status}`, { pct: row.accuracy })}"
+      },
+      {
         "pattern": "`teacher.pulse.state.${pulse.state}`",
         "type": "template_literal",
         "file": "components/teacher/hq/ClassroomCardActivity.tsx",
-        "line": 18,
-        "context": "if (pulse.daysSinceLastGame === null) return t(`teacher.pulse.state.${pulse.state}`);"
+        "line": 20,
+        "context": "return t(`teacher.pulse.state.${pulse.state}`);"
       },
       {
         "pattern": "`teacher.pulse.action.${pulse.nextAction}`",
         "type": "template_literal",
         "file": "components/teacher/hq/ClassroomCardActivity.tsx",
-        "line": 55,
+        "line": 71,
         "context": "{isLoading ? \"…\" : t(`teacher.pulse.action.${pulse.nextAction}`)}"
+      },
+      {
+        "pattern": "`eduLibrary.grade.${g}`",
+        "type": "template_literal",
+        "file": "components/teacher/lesson-creation/ListMetaFields.tsx",
+        "line": 47,
+        "context": "<option key={g} value={g}>{t(`eduLibrary.grade.${g}`)}</option>"
+      },
+      {
+        "pattern": "`eduLibrary.topic.${topic}`",
+        "type": "template_literal",
+        "file": "components/teacher/lesson-creation/ListMetaFields.tsx",
+        "line": 61,
+        "context": "<option key={topic} value={topic}>{t(`eduLibrary.topic.${topic}`)}</option>"
+      },
+      {
+        "pattern": "`eduLibrary.issue.${issue}`",
+        "type": "template_literal",
+        "file": "components/teacher/lesson-creation/WordChips.tsx",
+        "line": 50,
+        "context": "title={issue ? t(`eduLibrary.issue.${issue}`) : undefined}"
+      },
+      {
+        "pattern": "`eduLibrary.grade.${g}`",
+        "type": "template_literal",
+        "file": "components/teacher/lesson-creation/library/DiscoverFilters.tsx",
+        "line": 110,
+        "context": "{GRADE_BANDS.map((g) => <option key={g} value={g}>{t(`eduLibrary.grade.${g}`)}</option>)}"
+      },
+      {
+        "pattern": "`eduLibrary.topic.${tp}`",
+        "type": "template_literal",
+        "file": "components/teacher/lesson-creation/library/DiscoverFilters.tsx",
+        "line": 114,
+        "context": "{LIBRARY_TOPICS.map((tp) => <option key={tp} value={tp}>{t(`eduLibrary.topic.${tp}`)}</option>)}"
+      },
+      {
+        "pattern": "`eduLibrary.report.reason.${r}`",
+        "type": "template_literal",
+        "file": "components/teacher/lesson-creation/library/ReportListDialog.tsx",
+        "line": 62,
+        "context": "{t(`eduLibrary.report.reason.${r}`)}"
+      },
+      {
+        "pattern": "`eg2Pro.school.${key}Title`",
+        "type": "template_literal",
+        "file": "components/teacher/pro/SchoolPlanSection.tsx",
+        "line": 33,
+        "context": "<Icon className=\"h-4 w-4 text-neo-yellow\" aria-hidden /> {t(`eg2Pro.school.${key}Title`)}"
+      },
+      {
+        "pattern": "`eg2Pro.school.${key}Body`",
+        "type": "template_literal",
+        "file": "components/teacher/pro/SchoolPlanSection.tsx",
+        "line": 35,
+        "context": "<p className=\"text-sm font-bold text-neo-white/70\">{t(`eg2Pro.school.${key}Body`)}</p>"
+      },
+      {
+        "pattern": "`eg2Pro.school.roles.${r}`",
+        "type": "template_literal",
+        "file": "components/teacher/pro/SchoolQuoteForm.tsx",
+        "line": 118,
+        "context": "<option key={r} value={r}>{t(`eg2Pro.school.roles.${r}`)}</option>"
+      },
+      {
+        "pattern": "`eg2Pro.faq.${key}Q`",
+        "type": "template_literal",
+        "file": "components/teacher/pro/UpgradeFaq.tsx",
+        "line": 24,
+        "context": "<h3 className=\"text-sm font-black text-neo-white\">{t(`eg2Pro.faq.${key}Q`, params)}</h3>"
+      },
+      {
+        "pattern": "`eg2Pro.faq.${key}A`",
+        "type": "template_literal",
+        "file": "components/teacher/pro/UpgradeFaq.tsx",
+        "line": 31,
+        "context": "<p className=\"px-3 pb-3 text-sm font-bold leading-relaxed text-neo-white/85\">{t(`eg2Pro.faq.${key}A`"
       },
       {
         "pattern": "`teacher.classReport.practice.${drill.practiceKey}`",
@@ -2246,11 +2358,39 @@
         "context": "{t(`teacher.classReport.practice.${drill.practiceKey}`)}"
       },
       {
+        "pattern": "`eduPro.reports.${section}Title`",
+        "type": "template_literal",
+        "file": "components/teacher/reports/FullReportDisclosure.tsx",
+        "line": 77,
+        "context": "title={t(`eduPro.reports.${section}Title`)}"
+      },
+      {
+        "pattern": "`eduPro.reports.${section}Hint`",
+        "type": "template_literal",
+        "file": "components/teacher/reports/FullReportDisclosure.tsx",
+        "line": 78,
+        "context": "hint={t(`eduPro.reports.${section}Hint`)}"
+      },
+      {
+        "pattern": "`eg2Rep.report.state.${states[w.word]}`",
+        "type": "template_literal",
+        "file": "components/teacher/reports/HardestWordsList.tsx",
+        "line": 72,
+        "context": "{t(`eg2Rep.report.state.${states[w.word]}`)}"
+      },
+      {
         "pattern": "`teacher.reports.arc.trend.${word.trend}`",
         "type": "template_literal",
         "file": "components/teacher/reports/StudentArcView.tsx",
-        "line": 202,
+        "line": 197,
         "context": "{t(`teacher.reports.arc.trend.${word.trend}`)}"
+      },
+      {
+        "pattern": "`eg2Rep.report.trend.${student.trend}`",
+        "type": "template_literal",
+        "file": "components/teacher/reports/StudentInsightList.tsx",
+        "line": 72,
+        "context": "<TrendIcon className={cn('size-4 shrink-0', trend.tone)} aria-label={t(`eg2Rep.report.trend.${studen"
       },
       {
         "pattern": "`training.analysis.skills.${skill}`",
@@ -2571,28 +2711,28 @@
         "pattern": "`wordTowerV2.reward.${id}.name`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2HudMenu.tsx",
-        "line": 138,
+        "line": 141,
         "context": "aria-label={t('wordTowerV2.hud.effect', { name: t(`wordTowerV2.reward.${id}.name`), n })}"
       },
       {
         "pattern": "`wordTowerV2.reward.${id}.name`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2HudMenu.tsx",
-        "line": 142,
+        "line": 145,
         "context": "{t(`wordTowerV2.reward.${id}.name`)}"
       },
       {
         "pattern": "`wordTowerV2.ach.${id}.name`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Results.tsx",
-        "line": 232,
+        "line": 256,
         "context": "{t(`wordTowerV2.ach.${id}.name`)}"
       },
       {
         "pattern": "`wordTowerV2.ach.${goal.id}.desc`",
         "type": "template_literal",
         "file": "components/wordTowerV2/V2Results.tsx",
-        "line": 244,
+        "line": 268,
         "context": "<div className=\"mt-0.5 font-neo-display text-sm font-bold\">{t(`wordTowerV2.ach.${goal.id}.desc`)}</d"
       },
       {
@@ -2743,6 +2883,13 @@
         "context": "if (subKey) return t(`leaderboard.gameModes.${subKey}`);"
       },
       {
+        "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[classroomGameMode] ?? 'classic'}`",
+        "type": "template_literal",
+        "file": "player/PlayerView.tsx",
+        "line": 55,
+        "context": "? t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[classroomGameMode] ?? 'classic'}`)"
+      },
+      {
         "pattern": "`wordHunt.shareMessage.${keys[randomIdx]}`",
         "type": "template_literal",
         "file": "utils/dailyChallenge/shareUtils.ts",
@@ -2820,17 +2967,9 @@
         "pattern": "t(CLASSROOM_ROOM_GONE_KEY)",
         "variable": "CLASSROOM_ROOM_GONE_KEY",
         "type": "variable_key",
-        "file": "app/[locale]/multiplayer/useMpPageState.ts",
-        "line": 191,
-        "context": "toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });"
-      },
-      {
-        "pattern": "t(CLASSROOM_ROOM_GONE_KEY)",
-        "variable": "CLASSROOM_ROOM_GONE_KEY",
-        "file": "app/[locale]/multiplayer/useMpPageState.ts",
-        "line": 191,
-        "context": "toast(t(CLASSROOM_ROOM_GONE_KEY), { duration: 6000, icon: '🔔', id: MP_TOAST_IDS.roomGone });",
-        "type": "variable_key"
+        "file": "app/[locale]/multiplayer/PageClient.tsx",
+        "line": 246,
+        "context": "message={t(CLASSROOM_ROOM_GONE_KEY)}"
       },
       {
         "pattern": "t(locale)",
@@ -2855,22 +2994,6 @@
         "file": "app/[locale]/profile/error.tsx",
         "line": 64,
         "context": "🔄 {t(locale, 'errors.tryAgainButton')}"
-      },
-      {
-        "pattern": "t(q)",
-        "variable": "q",
-        "type": "variable_key",
-        "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 358,
-        "context": "<h3 className=\"text-sm font-bold text-neo-cyan mb-1\">{t(q)}</h3>"
-      },
-      {
-        "pattern": "t(a)",
-        "variable": "a",
-        "type": "variable_key",
-        "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 360,
-        "context": "{t(a)}"
       },
       {
         "pattern": "t(key)",
@@ -3133,7 +3256,7 @@
         "variable": "startError",
         "type": "variable_key",
         "file": "components/education/ClassroomGameLobby.tsx",
-        "line": 407,
+        "line": 425,
         "context": "{t(startError)}"
       },
       {
@@ -3143,6 +3266,46 @@
         "file": "components/education/ClassroomGuestDemo.tsx",
         "line": 70,
         "context": "{t(errorKey)}"
+      },
+      {
+        "pattern": "t(k)",
+        "variable": "k",
+        "type": "variable_key",
+        "file": "components/education/ClassroomModeSpotlight.tsx",
+        "line": 85,
+        "context": "{t(k)}"
+      },
+      {
+        "pattern": "t(k)",
+        "variable": "k",
+        "type": "variable_key",
+        "file": "components/education/ClassroomModeSpotlight.tsx",
+        "line": 97,
+        "context": "{t(k)}"
+      },
+      {
+        "pattern": "t(k)",
+        "variable": "k",
+        "type": "variable_key",
+        "file": "components/education/ClassroomModeSpotlight.tsx",
+        "line": 116,
+        "context": "{t(k)}"
+      },
+      {
+        "pattern": "t(k)",
+        "variable": "k",
+        "type": "variable_key",
+        "file": "components/education/ClassroomModeSpotlight.tsx",
+        "line": 139,
+        "context": "{t(k)}"
+      },
+      {
+        "pattern": "t(blockedKey)",
+        "variable": "blockedKey",
+        "type": "variable_key",
+        "file": "components/education/ClassroomModeSpotlight.tsx",
+        "line": 163,
+        "context": "{t(blockedKey)}"
       },
       {
         "pattern": "t(key)",
@@ -3159,6 +3322,14 @@
         "file": "components/education/HomeEducationCard.tsx",
         "line": 177,
         "context": "{t(unitKey)}"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/education/TeacherProCheckoutCta.tsx",
+        "line": 131,
+        "context": "const value = t(key, raw[field], p);"
       },
       {
         "pattern": "t(unitKey)",
@@ -3205,7 +3376,7 @@
         "variable": "pasteNoteKey",
         "type": "variable_key",
         "file": "components/education/join/JoinFlow.tsx",
-        "line": 206,
+        "line": 213,
         "context": "<p className=\"font-neo-body text-sm font-bold text-neo-lime\">{t(pasteNoteKey)}</p>"
       },
       {
@@ -3237,8 +3408,8 @@
         "variable": "messageKey",
         "type": "variable_key",
         "file": "components/game/in-game/hooks/useSocketFeedback.ts",
-        "line": 112,
-        "context": "message: t(messageKey) || 'Invalid word',"
+        "line": 113,
+        "context": "message: t(messageKey, 'Not a word'),"
       },
       {
         "pattern": "t(errorKey)",
@@ -3327,6 +3498,22 @@
         "file": "components/multiplayer/results/MpResultsAlbum.tsx",
         "line": 68,
         "context": "<span className=\"truncate font-neo-body font-bold uppercase text-neo-white/70 text-[calc(10px*var(--"
+      },
+      {
+        "pattern": "t(leaveKey)",
+        "variable": "leaveKey",
+        "type": "variable_key",
+        "file": "components/multiplayer/results/MpResultsFooter.tsx",
+        "line": 132,
+        "context": "{t(leaveKey)}"
+      },
+      {
+        "pattern": "t(modeLabelKey)",
+        "variable": "modeLabelKey",
+        "type": "variable_key",
+        "file": "components/multiplayer/results/MpResultsHeader.tsx",
+        "line": 57,
+        "context": "{playedMode && <span className={cn('text-[calc(11px*var(--mp-u,1))] font-bold uppercase tracking-wid"
       },
       {
         "pattern": "t(labelKey)",
@@ -3493,7 +3680,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/singleplayer/game/hooks/useSinglePlayerCore.ts",
-        "line": 327,
+        "line": 345,
         "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
       },
       {
@@ -3501,7 +3688,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/singleplayer/game/hooks/useSinglePlayerCore.ts",
-        "line": 327,
+        "line": 345,
         "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
       },
       {
@@ -3509,7 +3696,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/singleplayer/game/hooks/useWordSubmission.ts",
-        "line": 192,
+        "line": 193,
         "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
       },
       {
@@ -3517,7 +3704,7 @@
         "variable": "errorKey",
         "type": "variable_key",
         "file": "components/singleplayer/game/hooks/useWordSubmission.ts",
-        "line": 192,
+        "line": 193,
         "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
       },
       {
@@ -3561,6 +3748,22 @@
         "context": "{t(labelKey)}"
       },
       {
+        "pattern": "t(submitHint)",
+        "variable": "submitHint",
+        "type": "variable_key",
+        "file": "components/teacher/assignments/AssignmentCreator.tsx",
+        "line": 408,
+        "context": "{t(submitHint)}"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/teacher/assignments/AssignmentCreatorDueDate.tsx",
+        "line": 55,
+        "context": "{t(key)}"
+      },
+      {
         "pattern": "t(labelKey)",
         "variable": "labelKey",
         "type": "variable_key",
@@ -3583,6 +3786,14 @@
         "file": "components/ugc/UGCFeaturedStrip.tsx",
         "line": 88,
         "context": "{t(titleKey)}"
+      },
+      {
+        "pattern": "t(buyError)",
+        "variable": "buyError",
+        "type": "variable_key",
+        "file": "components/wordTowerV2/rivals/RivalBuilding.tsx",
+        "line": 227,
+        "context": "{t(buyError, { n: ballCost })}"
       },
       {
         "pattern": "t(errorKey)",
@@ -4659,7 +4870,7 @@
       "usages": [
         {
           "file": "components/multiplayer/wordcraft/WordcraftProjectorView.tsx",
-          "line": 122
+          "line": 139
         }
       ]
     },
@@ -4669,6 +4880,15 @@
         {
           "file": "app/[locale]/PageClient.tsx",
           "line": 269
+        }
+      ]
+    },
+    {
+      "key": "eduLibrary.badge.all",
+      "usages": [
+        {
+          "file": "components/teacher/lesson-creation/library/DiscoverFilters.tsx",
+          "line": 97
         }
       ]
     },
@@ -4696,6 +4916,24 @@
         {
           "file": "components/sealedBid/SealedBidTable.tsx",
           "line": 83
+        }
+      ]
+    },
+    {
+      "key": "singlePlayer.coach.findWord",
+      "usages": [
+        {
+          "file": "components/singleplayer/SinglePlayerGame.tsx",
+          "line": 558
+        }
+      ]
+    },
+    {
+      "key": "student.classView.playAssignment",
+      "usages": [
+        {
+          "file": "components/student/StudentAssignmentPlayCta.tsx",
+          "line": 38
         }
       ]
     },
@@ -4778,6 +5016,8 @@
       "seo.quickPlay.description",
       "seo.quickPlay.ogTitle",
       "seo.quickPlay.ogDescription",
+      "wheel.rush.loadFailed",
+      "wheel.rush.loadFailedQuit",
       "vs.feature",
       "vs.gamesPerDay",
       "vs.multiplayer",
@@ -4900,6 +5140,8 @@
       "seo.refund.description",
       "seo.refund.ogTitle",
       "seo.refund.ogDescription",
+      "wheel.rush.loadFailed",
+      "wheel.rush.loadFailedQuit",
       "sealedBid.speedBonus",
       "sealedBid.shareCard.header",
       "sealedBid.shareCard.row",
@@ -5885,6 +6127,8 @@
       "wordForge.perfectCraft"
     ],
     "ru": [
+      "eduLibrary.card.playsFew",
+      "eduLibrary.card.copiesFew",
       "student.quickStart.title",
       "student.quickStart.subtitle",
       "student.quickStart.action",

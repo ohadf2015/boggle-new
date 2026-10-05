@@ -8376,6 +8376,9 @@ const ja = {
       "goalMany": "1位でフィニッシュ",
       "goalSolo": "長い単語ほど高得点"
     },
+    "wordGoal": {
+      "progress": "{count} / {goal} 単語"
+    },
     "nextGame": {
       "title": "次は？",
       "rematchHarder": "再戦 · もっと難しく",
@@ -18117,7 +18120,9 @@ const ja = {
   "wheel": {
     "rush": {
       "loading": "読み込み中...",
-      "fogActive": "戦場の霧 発動中！"
+      "fogActive": "戦場の霧 発動中！",
+      "loadFailed": "ラウンドを読み込めませんでした。もう一度お試しください。",
+      "loadFailedQuit": "ロビーに戻る"
     }
   },
   "boosts": {

@@ -8663,6 +8663,9 @@ const sv = {
       "goalMany": "Sluta överst",
       "goalSolo": "Längre ord ger mycket mer poäng"
     },
+    "wordGoal": {
+      "progress": "{count} / {goal} ord"
+    },
     "nextGame": {
       "title": "Vad händer nu?",
       "rematchHarder": "Returmatch · svårare",
@@ -18403,7 +18406,9 @@ const sv = {
   "wheel": {
     "rush": {
       "loading": "Laddar...",
-      "fogActive": "Krigets dimma är aktiv"
+      "fogActive": "Krigets dimma är aktiv",
+      "loadFailed": "Kunde inte ladda rundan. Försök igen.",
+      "loadFailedQuit": "Tillbaka till lobbyn"
     }
   },
   "boosts": {

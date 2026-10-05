@@ -29,8 +29,11 @@ import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
 import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { evaluateSelectionAchievements } from '@/lib/achievements/hiddenAchievementBus';
+import { useExperiment } from '@/hooks/useExperiment';
 
 const PRACTICE_CONTINUE_THRESHOLD = 100;
+const WORD_GOAL_TARGET = 10;
+const WORD_GOAL_MOMENTUM_THRESHOLD = 5;
 
 interface SinglePlayerGameProps {
   settings: SinglePlayerGameState;
@@ -483,6 +486,14 @@ function SinglePlayerGame({
     <StuckCoachOverlay coach={stuckCoach} grid={core.grid} language={settings.language} />
   );
 
+  // exp-singleplayer-word-goal-v1: timed SP has worst completion of all modes
+  // (73 started / 12 completed). word-goal arm anchors players to a concrete
+  // "X / 10 words" milestone instead of only a countdown timer.
+  const wordGoalBadgeElement =
+    settings.mode !== 'practice' && !hideModeCoach ? (
+      <WordGoalBadge wordsFound={core.foundWords.length} t={commonProps.t} />
+    ) : null;
+
   // One shell for portrait, landscape, desktop and TV.
   //
   // Single player used to branch into three bespoke layouts here —
@@ -511,6 +522,7 @@ function SinglePlayerGame({
       {modeCoachElement}
       {firstRoundCoach}
       {stuckCoachElement}
+      {wordGoalBadgeElement}
       <SinglePlayerShell
         grid={core.grid as LetterGrid}
         language={settings.language}
@@ -548,6 +560,32 @@ function SinglePlayerGame({
   );
 }
 
+
+function WordGoalBadge({
+  wordsFound,
+  t,
+}: {
+  wordsFound: number;
+  t: (key: string, vars?: Record<string, string | number>) => string;
+}): React.ReactElement | null {
+  const { variant, trackExposure } = useExperiment('exp-singleplayer-word-goal-v1');
+  useEffect(() => {
+    if (variant === 'word-goal') trackExposure();
+  }, [variant, trackExposure]);
+
+  if (variant !== 'word-goal') return null;
+
+  const momentum = wordsFound >= WORD_GOAL_MOMENTUM_THRESHOLD;
+  return (
+    <div
+      className={`fixed bottom-4 end-4 z-[80] rounded-neo border-2 border-neo-cream/40 px-3 py-1.5 font-neo-body text-sm font-bold shadow-hard-sm ${
+        momentum ? 'bg-neo-orange text-neo-navy' : 'bg-neo-navy-light text-neo-cream'
+      }`}
+    >
+      {t('singlePlayer.wordGoal.progress', { count: Math.min(wordsFound, WORD_GOAL_TARGET), goal: WORD_GOAL_TARGET })}
+    </div>
+  );
+}
 
 function FirstRoundCoach({ validWords }: { validWords: number }) {
   const { t, language } = useLanguage();

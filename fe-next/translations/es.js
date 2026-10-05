@@ -8359,6 +8359,9 @@ const es = {
       "goalMany": "Termina en primer lugar",
       "goalSolo": "Las palabras largas valen mucho más"
     },
+    "wordGoal": {
+      "progress": "{count} / {goal} palabras"
+    },
     "nextGame": {
       "title": "¿Y ahora qué?",
       "rematchHarder": "Revancha · más difícil",
@@ -18209,7 +18212,9 @@ const es = {
   "wheel": {
     "rush": {
       "loading": "Cargando...",
-      "fogActive": "¡Niebla de guerra activa!"
+      "fogActive": "¡Niebla de guerra activa!",
+      "loadFailed": "No se pudo cargar la ronda. Inténtalo de nuevo.",
+      "loadFailedQuit": "Volver al lobby"
     }
   },
   "boosts": {
