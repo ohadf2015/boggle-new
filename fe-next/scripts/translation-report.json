@@ -1,18 +1,18 @@
 {
   "summary": {
-    "totalKeysInCode": 6960,
+    "totalKeysInCode": 6968,
     "keyCountByLanguage": {
-      "en": 13446,
-      "es": 13751,
-      "he": 13656,
-      "ja": 13716,
-      "ru": 13486,
-      "sv": 13712
+      "en": 13468,
+      "es": 13773,
+      "he": 13678,
+      "ja": 13738,
+      "ru": 13508,
+      "sv": 13734
     },
-    "missingFromEnglish": 101,
+    "missingFromEnglish": 100,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 356,
+      "templateLiterals": 355,
       "fallbackUsages": 1,
       "variableKeys": 133
     }
@@ -2165,7 +2165,7 @@
         "pattern": "`wordcraft.encouragement.${encIdx}`",
         "type": "template_literal",
         "file": "components/word-craft/WordCraftGameScreen.tsx",
-        "line": 627,
+        "line": 629,
         "context": "const encouragement = t(`wordcraft.encouragement.${encIdx}`);"
       },
       {
@@ -2253,25 +2253,11 @@
         "type": "template_literal"
       },
       {
-        "pattern": "`wordcraft.run.card.${c.id}.desc`",
-        "type": "template_literal",
-        "file": "components/word-craft/run/RunHUD.tsx",
-        "line": 44,
-        "context": "title={t(`wordcraft.run.card.${c.id}.desc`)}"
-      },
-      {
         "pattern": "`wordcraft.run.card.${c.id}.name`",
         "type": "template_literal",
         "file": "components/word-craft/run/RunHUD.tsx",
-        "line": 48,
+        "line": 38,
         "context": "{t(`wordcraft.run.card.${c.id}.name`)}"
-      },
-      {
-        "pattern": "`wordcraft.run.card.${c.id}.desc`",
-        "type": "template_literal",
-        "file": "components/word-craft/run/RunHUD.tsx",
-        "line": 51,
-        "context": "{t(`wordcraft.run.card.${c.id}.desc`)}"
       },
       {
         "pattern": "`wordcraft.run.card.${c.id}.name`",
@@ -2293,6 +2279,13 @@
         "line": 55,
         "context": "<span className=\"text-sm\">{t(`wordcraft.run.feedback.${pop.tier}`)}</span>",
         "type": "template_literal"
+      },
+      {
+        "pattern": "`wordcraft.surprise.${lastSurprise.kind}`",
+        "type": "template_literal",
+        "file": "components/word-craft/useWordCraftEventToasts.ts",
+        "line": 47,
+        "context": "detail: t(`wordcraft.surprise.${lastSurprise.kind}`, { count: lastSurprise.count }),"
       },
       {
         "pattern": "`wordTower.crane.${result.quality}`",
@@ -4600,15 +4593,6 @@
         {
           "file": "components/word-craft/WordCraftSetup.tsx",
           "line": 89
-        }
-      ]
-    },
-    {
-      "key": "wordWheel.closeRace",
-      "usages": [
-        {
-          "file": "components/multiplayer/WheelRushHeader.tsx",
-          "line": 160
         }
       ]
     }
