@@ -10,8 +10,8 @@ import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 
 /** Growth Radar rec 6487 — H2 + FAQPage Question must match this query verbatim. */
-export const ANAGRAM_SVENSKA_QUESTION = 'anagram svenska';
-export const ANAGRAM_SVENSKA_ANSWER =
+const ANAGRAM_SVENSKA_QUESTION = 'anagram svenska';
+const ANAGRAM_SVENSKA_ANSWER =
   'Anagram svenska betyder att blanda om bokstäver till nya ord. LexiClash gratis anagramlösare på svenska tar 2–10 bokstäver och visar varje giltigt tävlingsord, grupperat efter längd, på under 100 millisekunder. Ingen registrering och ingen app. Skriv bokstäverna i adressen, till exempel /sv/anagram/listen. Vill du spela live med svenska ord i stället? Starta ett rum och tävla mot vänner.';
 
 const anagramSeoContent: Record<string, {

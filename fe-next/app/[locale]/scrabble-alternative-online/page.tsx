@@ -45,8 +45,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 /** Growth Radar rec 5893 — H2 + FAQPage Question must match this query verbatim. */
-export const SCRABLE_ON_LINE_QUESTION = 'scrable on line';
-export const SCRABLE_ON_LINE_ANSWER =
+const SCRABLE_ON_LINE_QUESTION = 'scrable on line';
+const SCRABLE_ON_LINE_ANSWER =
   'Looking for scrable on line? That query is a common misspelling of Scrabble online. LexiClash is a free browser word game: same letter-grid strategy, played live instead of in turns. Two to twenty players share one board for two to three minutes, and nothing installs. Open a room, send the link, play on any phone or laptop.';
 
 const faqs = [
