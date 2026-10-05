@@ -78,7 +78,7 @@ export function PageClient() {
       {isLoading && (
         <div
           aria-hidden="true"
-          className="min-h-[220px] animate-pulse rounded-neo border-neo-thick border-neo-cream/20 bg-neo-navy-light p-6 sm:min-h-[260px]"
+          className="min-h-[220px] animate-pulse rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light p-6 sm:min-h-[260px]"
         />
       )}
 
