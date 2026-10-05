@@ -13355,8 +13355,8 @@ const he = {
       "viewReportCta": "פתיחת דוח",
       "dismiss": "סגירה",
       "completeTitle": "הכיתה שלכם חיה",
-      "completeBody": "נסו Teacher Pro 14 ימים בחינם — עוד תלמידים, מטלות ודוחות.",
-      "trialCta": "התחילו ניסיון Teacher Pro"
+      "completeBody": "נסו פרו למורים 14 ימים בחינם — עוד תלמידים, מטלות ודוחות.",
+      "trialCta": "התחילו ניסיון פרו למורים"
     },
     "playNow": {
       "recommended": "מומלץ",
