@@ -199,10 +199,12 @@ jobs:
       - name: Upload coverage
         uses: actions/upload-artifact@v4
         if: always()
+        continue-on-error: true
         with:
           name: coverage-shard-${{ matrix.shard }}
           path: fe-next/coverage/
           retention-days: 7
+          if-no-files-found: ignore
 
   # Merge coverage from all shards
   coverage:
@@ -214,12 +216,30 @@ jobs:
 
       - name: Download all coverage artifacts
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           pattern: coverage-shard-*
           merge-multiple: true
           path: coverage/
 
+      # Frontend vitest shards do not pass --coverage, so fe-next/coverage/ is
+      # usually empty. codecov-action@v4 then dies on an SSL handshake (alert 40)
+      # while fetching the uploader — that fails the required-looking coverage
+      # check even with fail_ci_if_error: false. Skip Codecov when there is
+      # nothing to upload so copy-only PRs are not blocked.
+      - name: Detect coverage files
+        id: cov
+        run: |
+          if find coverage -type f \( -name '*coverage*' -o -name '*.lcov' -o -name 'coverage-final.json' -o -name 'clover.xml' \) 2>/dev/null | grep -q .; then
+            echo "has=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has=false" >> "$GITHUB_OUTPUT"
+            echo "No coverage files; skipping Codecov"
+          fi
+
       - name: Upload merged coverage to Codecov
+        if: steps.cov.outputs.has == 'true'
+        continue-on-error: true
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
