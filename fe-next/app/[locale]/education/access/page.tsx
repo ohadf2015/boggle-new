@@ -24,13 +24,18 @@ export default function Page() {
     <Suspense
       fallback={
         <main className="min-h-screen bg-neo-navy text-neo-white">
-          {/* Reserve layout for LandingHeader + hero card to cut CLS (~0.30). */}
-          <div className="h-16" aria-hidden="true" />
-          <section className="mx-auto flex min-h-[80dvh] max-w-xl flex-col justify-center px-4 pb-10 pt-16">
-            <div className="relative min-h-[280px] rounded-neo-xl border-neo-thick border-neo-cream/40 bg-neo-navy-light p-6 pt-14 sm:p-8 sm:pt-16">
-              <div className="mx-auto mb-6 size-24 animate-pulse rounded-full bg-neo-navy" aria-hidden="true" />
-              <div className="mx-auto h-10 w-3/4 animate-pulse rounded bg-neo-navy" aria-hidden="true" />
-              <div className="mt-6 h-14 w-full animate-pulse rounded-neo bg-neo-navy" aria-hidden="true" />
+          {/* Pitch chrome, not the approved card: most loads are the apply funnel. */}
+          <div className="h-14 border-b-2 border-neo-cream sm:h-16" aria-hidden="true" />
+          <section className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+            <div className="grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+              <div>
+                <div className="h-[3.5rem] w-3/4 animate-pulse rounded bg-neo-navy-light sm:h-[4.5rem]" />
+                <div className="mt-4 h-16 max-w-[62ch] animate-pulse rounded bg-neo-navy-light" />
+                <div className="mt-6 min-h-[220px] animate-pulse rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light sm:min-h-[260px]" />
+              </div>
+              <div className="mx-auto w-full max-w-sm lg:max-w-none">
+                <div className="aspect-[918/880] w-full animate-pulse rounded-neo-xl border-neo-thick border-black bg-neo-navy-light" />
+              </div>
             </div>
           </section>
         </main>

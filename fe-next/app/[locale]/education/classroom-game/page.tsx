@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { Suspense } from 'react';
-import { PageLoader } from '@/components/ui/PageLoader';
 import { buildEducationClassroomJsonLd, getEducationSubpageContent } from '@/lib/seo/educationSubpageJsonLd';
+import { ClassroomGameLoadingShell } from './ClassroomGameLoadingShell';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import PageClient from './PageClient';
 import { LobbySeoTail } from './LobbySeoTail';
@@ -42,17 +42,7 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
       <script id="ld-edu-classroom-howto" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howTo) }} />
       <script id="ld-edu-classroom-resource" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(resource) }} />
       <script id="ld-edu-classroom-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <Suspense
-        fallback={
-          <div className="flex flex-1 flex-col bg-neo-navy min-h-dvh">
-            <div className="h-14 shrink-0 border-b border-neo-cream/10" aria-hidden="true" />
-            <div className="flex flex-1 items-center justify-center">
-              <PageLoader size="lg" />
-            </div>
-            <div className="mx-auto mb-6 h-24 w-full max-w-md animate-pulse rounded-neo bg-neo-navy-light" aria-hidden="true" />
-          </div>
-        }
-      >
+      <Suspense fallback={<ClassroomGameLoadingShell />}>
         <PageClient />
       </Suspense>
       {/* Same shell + HowTo-mismatch fix as /education/duels: 17 visible words to a crawler

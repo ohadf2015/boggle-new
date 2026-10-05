@@ -58,7 +58,14 @@ export function __resetTeacherGrantsForTests(): void {
  * page that failed to load. Show the loader here instead, and let the children
  * assume access is already settled.
  */
-export function TeacherGate({ children }: { children: React.ReactNode }) {
+export function TeacherGate({
+  children,
+  loadingFallback,
+}: {
+  children: React.ReactNode;
+  /** When set, used instead of the full-page spinner so the caller can reserve chrome. */
+  loadingFallback?: React.ReactNode;
+}) {
   const { hasAccess, isLoading } = useTeacherAccess();
   const { user } = useAuth();
   const userId = user?.id ?? null;
@@ -112,6 +119,7 @@ export function TeacherGate({ children }: { children: React.ReactNode }) {
   const wasGranted = !!effectiveUserId && grantedTeacherIds.has(effectiveUserId);
 
   if (isLoading && !wasGranted) {
+    if (loadingFallback) return <>{loadingFallback}</>;
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center min-h-screen">
         <PageLoader size="lg" text={t('common.loading')} />

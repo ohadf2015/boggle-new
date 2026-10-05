@@ -60,7 +60,11 @@ export function PageClient() {
   // asked for. `hasAccess` is checked separately from `status`: a teacher granted
   // access directly has no access_requests row, so status stays 'none' while
   // hasAccess is true — that pair must show the approved card, not the pitch.
-  const showPitch = !isLoading && status === 'none' && !hasAccess;
+  //
+  // Keep pitch chrome up while auth/access is still loading (`status` stays
+  // `'none'`). Field CLS 0.30 on this route was the short loading column
+  // swapping into the wide hero+gate layout. The gate itself still waits.
+  const showPitch = status === 'none' && !hasAccess;
   const approved = !isLoading && (hasAccess || status === 'approved');
 
   // Steps + escape hatch reveal on scroll. The hero itself is NOT animated:
@@ -77,6 +81,7 @@ export function PageClient() {
     <>
       {isLoading && (
         <div
+          data-testid="access-gate-skeleton"
           aria-hidden="true"
           className="min-h-[220px] animate-pulse rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light p-6 sm:min-h-[260px]"
         />
@@ -111,7 +116,7 @@ export function PageClient() {
         </div>
       )}
 
-      {showPitch && (
+      {!isLoading && showPitch && (
         <div className="rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-lg sm:p-7">
           <AccessRequestGate />
         </div>
