@@ -3,7 +3,6 @@ import Link from 'next/link';
 import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { PearDeckTeacherFreeHonestyStrip } from '@/components/education/PearDeckTeacherFreeHonestyStrip';
-import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 
 export const revalidate = 86400;
 
@@ -186,8 +185,6 @@ export default async function Page({ params }: PageProps) {
           .
         </p>
       </header>
-
-      <TeacherProCompareCheckoutStrip locale={locale} />
 
       <PearDeckTeacherFreeHonestyStrip locale={locale} />
 
