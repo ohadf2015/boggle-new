@@ -61,7 +61,8 @@ vi.mock('@/components/teacher/hq/ClassPulseRow', () => ({
 vi.mock('@/components/teacher/hq/useFirstAssignmentCta', () => ({
   useFirstAssignmentCta: () => ({ assignmentCount: state.assignmentCount, submittedCount: 0, hasActiveRoom: false }),
 }));
-vi.mock('@/lib/education/telemetry', () => ({
+vi.mock('@/lib/education/telemetry', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/education/telemetry')>()),
   trackEduTeacherDashboardViewed: vi.fn(),
   trackEduTeacherToolsOpened: vi.fn(),
   trackEduFirstAssignmentCtaShown: vi.fn(),
