@@ -2459,3 +2459,17 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - 2 occurrences, 1 user, 2026-09-30; stack resolves to source url `https://imposketch.io/`, a different site sharing this PostHog project (known cross-app noise, see memory posthog-shared-by-12-apps)
   - status: closed, no fix
   - recommended owner: none
+
+## 2026-10-05
+- [PostHog] RLS violation inserting into "votes" table
+  - metric=occurrences_24h, reach=1, severity=1
+  - evidence: https://eu.posthog.com/project/151059/error_tracking/01a10a3c-c45d-7030-b16d-bc6ecdbc7975
+  - status: deferred
+  - why: ran out of time-budget before locating caller/policy (migration 20260530170000_connections_ugc_vote_hardening.sql is the likely RLS owner but not yet read); RLS policy edits are blast-radius-sensitive, needs a real look not a rushed one
+  - recommended owner: self (pick up next lane 01 run)
+- [Sentry] JAVASCRIPT-NEXTJS-25R TypeError reading 'duration' (Howler _loadListener)
+  - count=1849, userCount=1, first seen 2026-09-16, last seen 2026-09-17
+  - evidence: https://lexiclash.sentry.io/issues/147446341/
+  - status: shipped (already fixed, pre-existing)
+  - why: root cause already fixed in commit 1bc3bb3de (2026-10-04) — audioLoader.ts patchHowlerStaleSoundListeners guards _loadListener/_endListener/_errorListener against missing _node. Comment in source explicitly cites this Sentry issue. No code change needed tonight.
+  - recommended owner: self — tried to mark Sentry issue resolved via mcp__sentry__update_issue, got HTTP 403 (no write perms, matches known open item "Sentry MCP write-403" in human queue). Needs a human with Sentry write access to close it manually.
