@@ -16,9 +16,18 @@
  * name for both would count every conversion twice.
  *
  * Never throws — a telemetry failure must never block a checkout click.
+ *
+ * Growth Radar mirror: the client steps are ALSO sent through trackGrowthEvent
+ * (same event names, same source props) so Growth Radar's run_funnel can measure
+ * landing → education_upsell_impression → edu_pro_upgrade_clicked → trial_cta_tap
+ * next to the existing growth:* events. The bare PostHog names above are
+ * unchanged; the mirror lands as `growth:<name>` (not in CANONICAL_DUAL_EMIT), so
+ * PostHog dashboards that count the bare names never double-count. Server steps
+ * (checkout_started, edu_pro_checkout_started, ...) stay server-side only.
  */
 
 import posthog from '@/lib/analytics/lazyPosthog';
+import { trackGrowthEvent, type GrowthEvent } from '@/utils/growthTracking';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
 
@@ -30,6 +39,20 @@ function safeCapture(event: string, props: Record<string, unknown>): void {
   }
 }
 
+/** Same step, same props, into Growth Radar's growth:* stream. Never throws. */
+function mirrorToGrowth(event: GrowthEvent, props: Record<string, unknown>): void {
+  try {
+    trackGrowthEvent(event, { ...props });
+  } catch {
+    /* analytics must never break the money path */
+  }
+}
+
+function captureStep(event: GrowthEvent, props: Record<string, unknown>): void {
+  safeCapture(event, props);
+  mirrorToGrowth(event, props);
+}
+
 export type ProUpgradeSource =
   | 'pricing_page'
   | 'dashboard_trial_lifecycle'
@@ -38,15 +61,15 @@ export type ProUpgradeSource =
 export type TrialCtaSource = 'dashboard_trial_offer' | 'upgrade_page' | 'activation_checklist';
 
 export function trackTrialCtaView(args: { source: TrialCtaSource }): void {
-  safeCapture('trial_cta_view', { source: args.source, product: 'teacher_pro' });
+  captureStep('trial_cta_view', { source: args.source, product: 'teacher_pro' });
 }
 
 export function trackTrialCtaTap(args: { source: TrialCtaSource }): void {
-  safeCapture('trial_cta_tap', { source: args.source, product: 'teacher_pro' });
+  captureStep('trial_cta_tap', { source: args.source, product: 'teacher_pro' });
 }
 
 export function trackEduProUpgradeClicked(args: { source: ProUpgradeSource }): void {
-  safeCapture('edu_pro_upgrade_clicked', { source: args.source });
+  captureStep('edu_pro_upgrade_clicked', { source: args.source });
 }
 
 export const PRO_SUCCESS_SEEN_STORAGE_KEY = 'lexi_edu_pro_success_seen_at';
@@ -68,7 +91,7 @@ export function trackEduProCheckoutSuccessSeen(now: number = Date.now()): boolea
   }
   if (last !== null && Number.isFinite(last) && now - last < SUCCESS_DEDUPE_MS) return false;
 
-  safeCapture('edu_pro_checkout_success_seen', {});
+  captureStep('edu_pro_checkout_success_seen', {});
   try {
     localStorage.setItem(PRO_SUCCESS_SEEN_STORAGE_KEY, String(now));
   } catch {
