@@ -1,6 +1,6 @@
 {
-  "date": "2026-10-01",
-  "note": "Brief's top-ranked items: he/multiplayer LCP 11220ms, sv/singleplayer LCP 6940ms (imposketch.io/r/* items excluded -- different app sharing this PostHog project, confirmed 09-26). Shipped: PageClient.tsx for /multiplayer statically imported 4 classroom-only components (EducationHeader/ClassroomModeBanner/TeacherLiveControls/GamePausedOverlay/StudentWordBank, 1375 combined lines) that only render behind isClassroomMode/gameActive gates -- every non-classroom visitor (the vast majority) parsed all of them regardless. Converted to next/dynamic(ssr:false), matching the existing HostLeftGraceModal lazy pattern already in the same file. No JSON-LD/SEO/hero-preload changes -- those were already tuned (arena-hub-hero.jpg ReactDOM.preload from 09-2x). Backend: re-checked vocabulary_lessons_classroom_id_fkey (28 rows, was 23 on 09-26) and analytics_events hot query (still covered by idx_analytics_events_type_created) -- both re-confirmed no-action, no new advisor findings. sv/singleplayer: PageClient is a 20-line thin wrapper already, no JS-parse fix found -- likely image/network bound, needs PostHog per-route breakdown time budget in a future lane.",
+  "date": "2026-10-06",
+  "note": "Supabase MCP never connected this lane (tool search empty all run) -- brief's backend candidate (auth_db_connections_absolute) unchanged from 10-01, still a dashboard toggle not a code fix, re-deferred. Brief's top-2 'frontend' items were imposketch.io/r/* -- confirmed NOT lexiclash (different app sharing this PostHog project; host breakdown shows imposketch.io at 109 events/24h vs our own www.lexiclash.live at 36 -- see perf-watch.md). With $host filter applied, ZERO own-domain routes cleared the n>50 sample floor in 24h or 7d (best: /en/multiplayer n=48/7d) -- no regression verdict possible anywhere tonight, correctly deferred per sample-gate rule rather than forced. IMPACT CHECK on 10-01's mp-education-chrome-lazy fix: /he/multiplayer p75 LCP 4705ms over 7d (n=12, sub-floor, directional only) vs baseline 11220ms -- large improvement consistent with the shipped fix, logged to impact-ledger as 'improved' with explicit low-n caveat.",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
@@ -9,7 +9,7 @@
       "analytics_events_hot_query": "still covered by idx_analytics_events_type_created(event_type, created_at DESC) matching its WHERE+ORDER BY exactly -- no action needed."
     },
     "deferred": {
-      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue",
+      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (re-flagged 10-01 and 10-06, no change)",
       "realtime_wal_json_parser_cpu": "systemic, tracked by existing 50-supabase-perf.md pg_cron guardrails -- founder-scope publication-membership call, not this lane's fix"
     }
   },
@@ -18,7 +18,7 @@
     "shipped": [
       { "route": "/multiplayer", "fix": "lazy-load 4 classroom-only components via next/dynamic ssr:false", "baseline_lcp_ms": 11220, "route_variant": "/he/multiplayer" }
     ],
-    "note": "Brief items were used directly per brief-first contract -- no fresh PostHog query run tonight. Re-measure he/multiplayer p75 LCP in 3 days per impact-ledger entry 02-perf-2026-10-01-mp-education-chrome-lazy."
+    "note": "No new frontend fix shipped tonight -- all own-domain routes sub-floor (n<50) in both 24h and 7d windows, so no regression could be verified safely. Cross-tenant PostHog contamination confirmed + quantified (see perf-watch.md) -- future briefs must filter $host. Re-measure he/multiplayer p75 LCP again once traffic clears n=50."
   },
   "bundle": {
     "note": "not re-measured tonight (no fresh .next build in time budget) -- carrying 09-26 numbers unchanged. Next lane with a fresh build should confirm the education-chrome split shows as new lazy chunks, not folded into the main /multiplayer route chunk.",

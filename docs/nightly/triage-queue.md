@@ -2473,3 +2473,22 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: shipped (already fixed, pre-existing)
   - why: root cause already fixed in commit 1bc3bb3de (2026-10-04) — audioLoader.ts patchHowlerStaleSoundListeners guards _loadListener/_endListener/_errorListener against missing _node. Comment in source explicitly cites this Sentry issue. No code change needed tonight.
   - recommended owner: self — tried to mark Sentry issue resolved via mcp__sentry__update_issue, got HTTP 403 (no write perms, matches known open item "Sentry MCP write-403" in human queue). Needs a human with Sentry write access to close it manually.
+
+## 2026-10-06
+- [PostHog] RLS violation: `new row violates row-level security policy for table "votes"` (issue 01a10a3c-c45d-7030-b16d-bc6ecdbc7975) — CORRECTION to the earlier same-ID entry above
+  - first/last seen 2026-10-05T04:05Z, count 2, userCount 1
+  - link: https://eu.posthog.com/project/151059/error_tracking/01a10a3c-c45d-7030-b16d-bc6ecdbc7975
+  - status: not-ours, no action — closes the earlier entry above ("ran out of time-budget before locating caller/policy")
+  - why: pulled the event properties this run — `$current_url` is `https://imposketch.io/r/WOLF4`, NOT lexiclash. Different app sharing this PostHog project (memory: PostHog shared by ~12 apps, filter $host). No "votes" table and no `/r/` route exist in this codebase; `connections_ugc_vote_hardening` migration was a red herring.
+  - recommended owner: self (lane 7: add $host filter to the brief's PostHog query so cross-app noise stops scoring/recurring)
+- [PostHog] ChunkLoadError on lexiclash.live /en/education, chunk 94991 (issue 019f3f1a-f3ef-7bb1-b4e9-4275bf7448e1)
+  - first/last seen 2026-10-05T18:09Z, count 1, userCount 1
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f3f1a-f3ef-7bb1-b4e9-4275bf7448e1
+  - status: deferred, no action
+  - why: already fully mitigated — `utils/retryImport.ts`, `components/ChunkErrorRecovery.tsx`, `app/[locale]/error.tsx` and others already self-heal via cache-bust reload on ChunkLoadError (see `lib/deploy/__tests__/chunkLoadRetryPlugin.test.ts`: "residual ChunkLoadError trickle (~1/week)" is documented as expected post-deploy behavior, not a bug). 1 occurrence/1 user over 7d is within that expected trickle.
+  - recommended owner: self (no-op, matches known/accepted baseline)
+- [Sentry] TypeError: Cannot read properties of undefined (reading 'duration') (JAVASCRIPT-NEXTJS-25R) — RE-CONFIRMATION of the "shipped" entry above, no new work needed
+  - link: https://lexiclash.sentry.io/issues/147446341/
+  - status: shipped (already fixed, pre-existing — same as the entry above)
+  - why: this is the identical issue a prior lane-01 run already root-caused and fixed in `1bc3bb3de` — `lib/audio/audioLoader.ts:127` `patchHowlerStaleSoundListeners` guards `_loadListener`/`_endListener`/`_errorListener` against a missing `_node`. Re-verified tonight the guard is still present in `fe-next/lib/audio/audioLoader.ts`. Brief resurfaced it only because the Sentry issue is still open upstream (MCP write-403 blocked the prior resolve attempt too).
+  - recommended owner: human — close https://lexiclash.sentry.io/issues/147446341/ manually in Sentry; no code owner needed.

@@ -289,3 +289,16 @@ review recommended.
 **Context:** `app/[locale]/student/profile/PageClient.tsx` is `'use client'` top-to-bottom (no server component, no SSR). First paint waits on `useAuth()` resolving, then separately fetches achievements, duel stats/history, classroom, classmates, and lesson progress (5+ independent async calls, several sequential rather than parallel) before the real content renders — `PageLoader` is the only thing that can paint early, and if that import chain (framer-motion `m`, date-fns, lucide icons) is slow to hydrate, even the loader is delayed.
 **Not fixed tonight:** converting this to a server-rendered shell with client-side hydration for the interactive parts is an architecture change (auth-gated data, multiple Supabase calls) — too large a blast radius for a single time-boxed lane pass, and the route is noindex/low-reach so not urgent enough to risk a broken auth flow.
 **Recommended next step:** Parallelize the independent fetches with `Promise.all` (achievements, duel stats, classroom, lessons currently look sequential per component read) as a lower-risk first cut before any SSR redesign. A dedicated lane pass should profile with DevTools first to confirm which fetch dominates.
+
+## [BACKEND] Auth DB Connection Strategy (absolute, not percentage) — carried, 2026-10-06
+
+**Severity:** Low (advisor INFO-level, unchanged since 10-01)
+**Source:** brief re-flagged `auth_db_connections_absolute` again tonight. Supabase MCP was still connecting/unavailable all lane (tool search returned zero `mcp__supabase__*` tools), so no fresh advisor/EXPLAIN data was pulled — same item, same status as 10-01.
+**Why still deferred:** this is a Supabase Auth server dashboard toggle (absolute connection count -> percentage-based), not a migration or app code change. Still human/dashboard-queue, not this lane's fix.
+
+## [FRONTEND] PostHog cross-tenant contamination confirmed + quantified — 2026-10-06
+
+**Severity:** info (data-quality finding, not a LexiClash perf bug)
+**Source:** tonight's brief top-2 "frontend" items were both `imposketch.io/r/*` — NOT a LexiClash route. Queried `$host` breakdown for `$web_vitals` last 24h: `imposketch.io` 109 events vs `www.lexiclash.live` 36, plus `growthradar.app`, `stoquant.com`, `titrate.day`, `lf-finance.co.il`, two `vercel.app` preview hosts — at least 9 other apps sharing this PostHog project. Matches memory `PostHog shared by ~12 apps, filter $host` (08-15 cluster) but this is the first night it's quantified: imposketch.io alone outnumbers our own site's web-vitals volume ~3:1 in the raw feed.
+**Action:** any future brief-generation query over `$web_vitals`/`lcp_avg_ms` MUST filter `properties.$host IN ('www.lexiclash.live', ...other real lexiclash hosts)` before ranking — otherwise the "top regression" slot gets handed to a different product every night. Flag for lane 7 / brief generator (phase 0), not a code fix.
+**Tonight's real own-domain check:** with `$host = 'www.lexiclash.live'` applied, ZERO routes cleared the n>50 sample floor in the last 24h or even the last 7 days (highest was `/en/multiplayer` n=48/7d). No regression verdict possible on any route tonight — correctly deferred per the sample-gate rule, not a silent miss.

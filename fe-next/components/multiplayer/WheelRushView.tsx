@@ -129,6 +129,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const celebrationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Consecutive 'all'-tier clears this round — powers the streak badge (variable reward).
   const wheelStreakRef = useRef(0);
+  // Consecutive ACCEPTED words (any tier) this round — drives the ring's combo glow
+  // (WordWheelPixiRing already supports it; daily-challenge wires it, Wheel Rush never did).
+  const [comboLevel, setComboLevel] = useState(0);
   // Ref-bridged so the once-bound socket onResult closure can reach the latest trigger.
   const celebrateRef = useRef<(tier: 'all' | 'almost', word: string) => void>(() => {});
 
@@ -303,6 +306,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     }) => {
       const me = latestRef.current.username;
       wheelStreakRef.current = 0;
+      setComboLevel(0);
       setLoadTimedOut(false);
       setPuzzle(data.puzzle);
       setOuterLetters(data.puzzle.outerLetters);
@@ -335,6 +339,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         const msg = tt(key, { min: MIN_LEN, letter: pz?.centerLetter ?? '' }) || key;
         flash('err', msg);
         rejSfx();
+        setComboLevel(0);
         return;
       }
       if (data.kind === 'locked') {
@@ -345,6 +350,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           ? prev
           : [{ word: data.word, kind: 'locked', score: data.score, lockUntil: data.lockUntil, ts: Date.now() }, ...prev]);
         flash('ok', `+${data.score}`);
+        setComboLevel(c => c + 1);
       }
       const coverage = classifyLetterCoverage(data.word, pz?.allLetters ?? []);
       if (coverage !== 'none') celebrateRef.current(coverage, data.word);
@@ -719,7 +725,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           <WordWheelPixiRing
             selectedIndices={builtLetters.map(bl => bl.wheelIndex)}
             radius={wheelRadius}
-            combo={0}
+            combo={comboLevel}
             // Tiles below lay out on 360/outerLetters.length; the ring defaults
             // to 6. The server supplies outerLetters, so any non-hexagon puzzle
             // would drift the connector lines off the tiles. Keep them in sync.
