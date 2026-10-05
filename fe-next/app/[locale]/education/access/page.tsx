@@ -34,7 +34,7 @@ export default function Page() {
                 <div className="mt-6 min-h-[220px] animate-pulse rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light sm:min-h-[260px]" />
               </div>
               <div className="mx-auto w-full max-w-sm lg:max-w-none">
-                <div className="aspect-[918/880] w-full animate-pulse rounded-neo-xl border-neo-thick border-black bg-neo-navy-light" />
+                <div className="aspect-[918/880] w-full animate-pulse rounded-neo-xl border-neo-thick border-neo-cream/40 bg-neo-navy-light" />
               </div>
             </div>
           </section>

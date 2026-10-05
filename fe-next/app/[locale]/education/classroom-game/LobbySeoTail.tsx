@@ -10,7 +10,7 @@
  * Toggling it out of flow after lobby mount (`hidden` or a class swap) is the
  * classroom-game CLS (p75 0.57 / 230 loads): first paint includes 740px, then
  * the lobby hides it. Keep the node in the DOM for crawlers, but clip it out
- * of layout on the FIRST paint — no isInGame toggle.
+ * of layout on the FIRST paint — no post-hydrate layout toggle.
  */
 
 import type { ReactNode } from 'react';

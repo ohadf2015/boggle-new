@@ -28,7 +28,7 @@ describe('classroom-game CLS reserve', () => {
 
     const src = readFileSync(join(__dirname, '..', 'LobbySeoTail.tsx'), 'utf8');
     expect(src).not.toMatch(/hidden=\{/);
-    expect(src).not.toMatch(/isInGame/);
+    expect(src).not.toMatch(/useContext/);
   });
 
   it('PageClient uses the reserved shell for auth, gate, and inner checks', () => {
