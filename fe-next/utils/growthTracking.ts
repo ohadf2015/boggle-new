@@ -249,6 +249,15 @@ export type GrowthEvent =
   // package_view → education_package_viewed; lead_submitted → school_lead_submitted
   // with { plan }. Do not add a second analytics stack; t_a72fccab owns funnel events.
   | 'education_package_viewed'
+  // Teacher Pro funnel client steps, mirrored from lib/education/proFunnelTelemetry
+  // (same names + { source, product } props as the bare PostHog events) so Growth
+  // Radar can run landing → education_upsell_impression → upgrade → trial tap.
+  // NOT in CANONICAL_DUAL_EMIT: the bare names are already captured by
+  // proFunnelTelemetry, a dual-emit would double-count them in PostHog.
+  | 'trial_cta_view'
+  | 'trial_cta_tap'
+  | 'edu_pro_upgrade_clicked'
+  | 'edu_pro_checkout_success_seen'
   // ESL winner-page depth (t_25b9ddb1). Demo start + CEFR list pick on
   // /education/esl-word-games. Props: { cefr: 'A1'|'A2'|'B1', page }.
   | 'edu_page_play_demo_started'
