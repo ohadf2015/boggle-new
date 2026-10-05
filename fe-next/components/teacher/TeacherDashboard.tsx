@@ -259,22 +259,24 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
       <div
         data-testid="teacher-dashboard-grid"
         className={cn(
-          'relative mx-auto flex min-h-full min-w-0 w-full max-w-[1640px] flex-col gap-3 px-3 py-2 sm:gap-4 sm:px-5 sm:py-3 lg:px-8 lg:py-4',
+          // ~1280 content cap: wide monitors keep desktop density without stretching tables.
+          'relative mx-auto flex min-h-full min-w-0 w-full max-w-[1280px] flex-col gap-3 px-3 py-2 sm:gap-4 sm:px-5 sm:py-3 lg:px-8 lg:py-4',
           deck && !split && 'lg:max-w-2xl',
           split && [
-            'lg:grid lg:min-h-0 lg:grid-cols-2 lg:content-start lg:items-start lg:gap-x-8 lg:gap-y-5',
+            // 640–1023: two-column (launcher | pulse/detail); <640 stays stacked.
+            'sm:grid sm:min-h-0 sm:grid-cols-2 sm:content-start sm:items-start sm:gap-x-6 sm:gap-y-4 lg:gap-x-8 lg:gap-y-5',
             // A phone turned sideways (844x390) is short, not narrow: it gets the desktop split.
             `${LANDSCAPE}:grid ${LANDSCAPE}:min-h-0 ${LANDSCAPE}:grid-cols-2 ${LANDSCAPE}:content-start ${LANDSCAPE}:items-start ${LANDSCAPE}:gap-2 ${LANDSCAPE}:py-1.5`,
           ],
         )}
       >
         {upsell.pinned ? (
-          <div data-testid="teacher-dashboard-pinned-banner" data-hq-upsell="pinned" className={cn('lg:col-span-full', `${LANDSCAPE}:col-span-full`)}>
+          <div data-testid="teacher-dashboard-pinned-banner" data-hq-upsell="pinned" className={cn('sm:col-span-full', `${LANDSCAPE}:col-span-full`)}>
             {banner}
           </div>
         ) : null}
         {/* Top row: which class, and the ONE Tools entry (+ Go Pro chip). The dock is rendered LAST so keyboard order meets the primary action first. */}
-        <div className={cn('flex min-h-9 shrink-0 items-center gap-2 lg:col-span-full lg:min-h-10', `${LANDSCAPE}:col-span-full`)}>
+        <div className={cn('flex min-h-9 shrink-0 items-center gap-2 sm:col-span-full lg:min-h-10', `${LANDSCAPE}:col-span-full`)}>
           {/* `contain: inline-size` — a long class name must truncate here, not widen the shell past a 390px phone. */}
           <div className="min-w-0 flex-1 [contain:inline-size]">
             {classroomsLoading ? (
@@ -315,7 +317,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
         </div>
 
         {hasTeacherAccess && step !== 'loading' && step !== 'error' ? (
-          <div className={cn('lg:col-span-full', `${LANDSCAPE}:col-span-full`)}>
+          <div className={cn('sm:col-span-full', `${LANDSCAPE}:col-span-full`)}>
             <TeacherOnboardingChecklistLive
               classroomCount={classrooms.length}
               classroomId={selectedClassroom?.id ?? null}
@@ -333,7 +335,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
           </div>
         ) : null}
         {step === 'error' ? (
-          <HqLoadError onRetry={() => refreshClassrooms()} className={cn('lg:col-span-full', `${LANDSCAPE}:col-span-full`)} />
+          <HqLoadError onRetry={() => refreshClassrooms()} className={cn('sm:col-span-full', `${LANDSCAPE}:col-span-full`)} />
         ) : step === 'loading' ? (
           <GetStudentsInSkeleton className="mx-auto w-full max-w-2xl" />
         ) : step === 'createClass' || step === 'getStudents' ? (
@@ -360,7 +362,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
             <div
               data-testid="teacher-dashboard-main"
               data-hq-primary="goLive"
-              className={cn('min-w-0 shrink-0 lg:col-span-1', `${LANDSCAPE}:col-span-1`)}
+              className={cn('min-w-0 shrink-0 sm:col-span-1', `${LANDSCAPE}:col-span-1`)}
             >
               {launcher}
             </div>
@@ -368,7 +370,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
               <>
                 <div
                   data-testid="teacher-dashboard-aside"
-                  className={cn('flex min-w-0 flex-col gap-3 lg:col-span-1 lg:row-span-2', `${LANDSCAPE}:col-span-1 ${LANDSCAPE}:row-span-2`)}
+                  className={cn('flex min-w-0 flex-col gap-3 sm:col-span-1 sm:row-span-2', `${LANDSCAPE}:col-span-1 ${LANDSCAPE}:row-span-2`)}
                 >
                   <HqClassPulse
                     classroomId={selectedClassroom.id}
@@ -397,7 +399,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                   />
                 </div>
                 <HqJoinStrip
-                  className={cn('lg:col-span-1 lg:col-start-1', `${LANDSCAPE}:col-span-1 ${LANDSCAPE}:col-start-1`)}
+                  className={cn('sm:col-span-1 sm:col-start-1', `${LANDSCAPE}:col-span-1 ${LANDSCAPE}:col-start-1`)}
                   classroomId={selectedClassroom.id}
                   joinCode={selectedClassroom.join_code || ''}
                   studentCount={studentCount}

@@ -268,7 +268,7 @@ export function AnalyticsDashboard({
             <table className="w-full">
               <thead>
                 <tr className="bg-neo-navy/60 border-b-2 border-black/30">
-                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.student')}</th>
+                  <th className="sticky start-0 z-10 bg-neo-navy px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.student')}</th>
                   <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.level')}</th>
                   <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.mastery')}</th>
                   <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.accuracy')}</th>
@@ -282,7 +282,7 @@ export function AnalyticsDashboard({
                     onClick={() => setSelectedStudentId(student.studentId)}
                     className="border-b border-black/10 hover:bg-neo-white/5 cursor-pointer"
                   >
-                    <td className="px-3 py-2 text-sm font-bold text-neo-white">{student.displayName}</td>
+                    <td className="sticky start-0 z-10 bg-neo-navy px-3 py-2 text-sm font-bold text-neo-white">{student.displayName}</td>
                     <td className="px-3 py-2 text-sm text-neo-white">{student.currentLevel}</td>
                     <td className="px-3 py-2 text-sm text-neo-white">{student.vocabularyMastery}%</td>
                     <td className="px-3 py-2 text-sm text-neo-white">{student.overallAccuracy}%</td>

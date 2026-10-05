@@ -73,6 +73,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
   const columns = useMemo(() => [
     columnHelper.accessor('displayName', {
       header: t('education.analytics.student') as string,
+      meta: { className: 'sticky start-0 z-10 bg-neo-navy' },
       cell: ({ row }) => {
         const student = row.original;
         return (

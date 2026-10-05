@@ -146,9 +146,9 @@ describe('<TeacherDashboard> — fits the viewport', () => {
     it('uses the width instead of a narrow centred column', () => {
       render(<TeacherDashboard />);
       const grid = screen.getByTestId('teacher-dashboard-grid');
-      // max-w-5xl (1024) left a 1440 screen two-thirds empty; 1280 still left
-      // a 1920 projector with wide dead bands and a cramped join-code column.
-      expect(grid.className).toContain('max-w-[1640px]');
+      // Cap ~1280 so wide monitors keep density without stretching tables;
+      // TEACHER_TV_SCALE zooms the whole shell on very large TVs.
+      expect(grid.className).toContain('max-w-[1280px]');
     });
 
     it('puts the hero in the wide column and the secondary row beside it', () => {
@@ -156,13 +156,13 @@ describe('<TeacherDashboard> — fits the viewport', () => {
       const grid = screen.getByTestId('teacher-dashboard-grid');
       // Two equal halves: the folded launcher no longer needs 3/5, and the
       // class pulse beside it is the hero for a class with students.
-      expect(grid.className).toMatch(/lg:grid-cols-2/);
-      expect(grid.className).toContain('lg:items-start');
+      expect(grid.className).toMatch(/sm:grid-cols-2/);
+      expect(grid.className).toContain('sm:items-start');
 
       const main = screen.getByTestId('teacher-dashboard-main');
       const aside = screen.getByTestId('teacher-dashboard-aside');
-      expect(main.className).toContain('lg:col-span-1');
-      expect(aside.className).toContain('lg:col-span-1');
+      expect(main.className).toContain('sm:col-span-1');
+      expect(aside.className).toContain('sm:col-span-1');
       expect(main.contains(screen.getByTestId('play-now-launcher'))).toBe(true);
       // Teacher HQ: the 1/3 rail is the "Get students in" hero; last game /
       // setup / reports live in the Tools sheet opened from the dock (round 2:
@@ -191,14 +191,13 @@ describe('<TeacherDashboard> — fits the viewport', () => {
       );
     });
 
-    it('gives the phone a bottom tab bar and every wider screen a sidebar', () => {
+    it('gives the phone/tablet a bottom tab bar and desktop (≥1024) a sidebar', () => {
       render(<TeacherDashboard />);
-      // The handover is at `md`, not `lg`: a tablet gets the sidebar collapsed
-      // to an icon rail and NO bottom bar. Carrying both would spend a row of
-      // the teacher's content on a duplicate nav.
-      expect(screen.getByTestId('education-tabbar').className).toContain('md:hidden');
-      expect(screen.getByTestId('education-sidebar').className).toContain('md:flex');
-      expect(screen.getByTestId('education-sidebar').className).toContain('lg:w-60');
+      // Handover at `lg` (1024): below that bottom tabs only — no permanent
+      // sidebar (even a 72px rail) eating tablet width. Never both.
+      expect(screen.getByTestId('education-tabbar').className).toContain('lg:hidden');
+      expect(screen.getByTestId('education-sidebar').className).toContain('lg:flex');
+      expect(screen.getByTestId('education-sidebar').className).toContain('w-60');
     });
   });
 
