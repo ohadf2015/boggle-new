@@ -970,3 +970,6 @@ ute
 älven
 ängar
 äppelträd
+fram
+bak
+värld
