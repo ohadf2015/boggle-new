@@ -269,6 +269,22 @@ export type GrowthEvent =
   | 'edu_access_signup_tapped'
   | 'edu_access_verify_resent'
   | 'edu_access_request_submitted'
+  // Teacher classroom ACTIVATION funnel (t_44f87dd2) — mirrored from
+  // lib/education/telemetry.ts with identical props so Growth Radar's
+  // run_funnel can measure class created → code copied → first student →
+  // class game, the steps before every Teacher Pro ask. NOT in
+  // CANONICAL_DUAL_EMIT: the bare names are already captured by telemetry.ts,
+  // a dual-emit would double-count them in PostHog. Privacy: classroom_id and
+  // counts only — never the join code, student names or emails.
+  | 'edu_classroom_created'
+  | 'edu_join_code_shown'
+  | 'edu_join_code_copied'
+  | 'edu_first_student_joined'
+  | 'edu_classroom_join'
+  | 'edu_live_game_started'
+  | 'edu_teacher_onboarding_step'
+  | 'edu_first_assignment_cta_shown'
+  | 'edu_first_assignment_cta_clicked'
   // ESL winner-page depth (t_25b9ddb1). Demo start + CEFR list pick on
   // /education/esl-word-games. Props: { cefr: 'A1'|'A2'|'B1', page }.
   | 'edu_page_play_demo_started'
