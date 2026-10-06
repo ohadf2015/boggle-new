@@ -47,11 +47,13 @@ export default function ChunkErrorRecovery(): null {
           return data?.buildTime;
         },
         getGuard: () => {
-          if (memoryGuard) return true;
+          // Prefer sessionStorage when it works so vitest / clean sessions
+          // that clear the key are not stuck behind a leaked module flag.
+          // memoryGuard only covers the sessionStorage-throws path (bots).
           try {
             return sessionStorage.getItem(CHUNK_RECOVERY_GUARD_KEY) === 'true';
           } catch {
-            return false;
+            return memoryGuard;
           }
         },
         setGuard: () => {
