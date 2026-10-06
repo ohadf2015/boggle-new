@@ -103,21 +103,23 @@ describe('CHUNK_BOOT_GUARD_SCRIPT', () => {
     expect(w.win.location.reload).not.toHaveBeenCalled();
   });
 
-  it('clears the guard on a clean load so later navigations can self-heal', () => {
+  it('keeps the guard after load so post-load chunk failures cannot loop (UR 2026-10-06 P1)', () => {
     const w = makeWindow();
     runGuard(w.win as unknown as Record<string, unknown>);
-    fire(w, 'error', script404);
+    fire(w, 'error', chunkMessage);
+    expect(w.win.location.replace).toHaveBeenCalledTimes(1);
     expect(w.store.lc_chunk_boot_reload).toBe('1');
-    // Simulate the post-reload page: fresh script run, guard present → no reload…
-    const w2 = makeWindow();
-    w2.store.lc_chunk_boot_reload = '1';
-    runGuard(w2.win as unknown as Record<string, unknown>);
-    fire(w2, 'error', script404);
-    expect(w2.win.location.replace).not.toHaveBeenCalled();
-    // …but a clean load clears the flag so the next incident self-heals.
-    fire(w2, 'load', {});
-    expect(w2.store.lc_chunk_boot_reload).toBeUndefined();
-    fire(w2, 'error', chunkMessage);
-    expect(w2.win.location.replace).toHaveBeenCalledTimes(1);
+    // Clean load must NOT clear — that re-armed infinite reload loops when a
+    // chunk failed after load (SEO /words/* Chrome/Linux crawls).
+    fire(w, 'load', {});
+    expect(w.store.lc_chunk_boot_reload).toBe('1');
+    fire(w, 'error', chunkMessage);
+    expect(w.win.location.replace).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the session flag after load (no clear-on-load) and blocks a second navigate', () => {
+    expect(CHUNK_BOOT_GUARD_SCRIPT).not.toMatch(/addEventListener\('load'/);
+    expect(CHUNK_BOOT_GUARD_SCRIPT).toMatch(/var mem=false/);
+    expect(CHUNK_BOOT_GUARD_SCRIPT).toMatch(/if\(mem\)return true/);
   });
 });
