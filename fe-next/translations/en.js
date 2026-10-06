@@ -6083,8 +6083,8 @@ const en = {
     "hidePassword": "Hide password",
     "upgradePrompt": "Sign in to save progress and climb the leaderboard.",
     "firstWin": {
-      "title": "First victory",
-      "subtitle": "Sign up to keep your wins.",
+      "title": "Save your win",
+      "subtitle": "Save your score and keep your streak going.",
       "subtitleUrgency": "Don't lose this win. Sign up to keep it.",
       "subtitleValueProp": "Track your streak and unlock daily challenges.",
       "quickSave": "Takes 10 seconds. Keep this win forever.",
@@ -6099,15 +6099,15 @@ const en = {
     },
     "signInWith": "Sign in with {provider}",
     "multiGames": {
-      "title": "You're on a roll",
-      "subtitle": "Save your progress and track achievements.",
+      "title": "Save your streak",
+      "subtitle": "Save your score, streak, and progress.",
       "subtitleUrgency": "Your stats vanish if you don't save them.",
       "subtitleValueProp": "Climb the leaderboard and play with friends."
     },
     "mpSignup": {
-      "title": "Keep your progress",
+      "title": "Save your score",
       "statsAtRisk": "{words} words across {games} games. Don't lose them.",
-      "statsSubtext": "Sign up in 10 seconds to save everything",
+      "statsSubtext": "Save your score and streak in 10 seconds",
       "benefitLeaderboard": "Leaderboards",
       "benefitProgress": "Track progress",
       "toastStreakWarning": "Your {games}-game streak won't be saved"

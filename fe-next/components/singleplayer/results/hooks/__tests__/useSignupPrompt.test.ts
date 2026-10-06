@@ -15,6 +15,10 @@
  *   - 'after-third-game': show after 3 games regardless of win
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/en/singleplayer',
+}));
 import { renderHook, act } from '@testing-library/react';
 
 const mockFlag = vi.fn<() => string>();
@@ -56,6 +60,7 @@ vi.mock('@/utils/abandonOnPagehide', () => ({
 }));
 
 import { useSignupPrompt } from '../useSignupPrompt';
+import { markPostGameCompleted, POST_GAME_COMPLETED_KEY } from '@/lib/auth/signupPromptCoordination';
 
 const flushTimer = async (ms = 1600): Promise<void> => {
   await act(async () => {
@@ -68,6 +73,7 @@ const flushTimer = async (ms = 1600): Promise<void> => {
 // production: saveGuestStats writes stats, then dispatches the window event.
 const qualifyWithFreshGame = async (stats: unknown): Promise<void> => {
   mockStats.mockReturnValue(stats);
+  markPostGameCompleted();
   await act(async () => {
     window.dispatchEvent(new Event('guestStatsChanged'));
   });
@@ -205,6 +211,7 @@ describe('useSignupPrompt — guestStatsChanged re-evaluation', () => {
     expect(mockTrackSignupFunnel).not.toHaveBeenCalled();
 
     mockStats.mockReturnValue({ games: 1, wins: 1 });
+    markPostGameCompleted();
     await act(async () => {
       window.dispatchEvent(new Event('guestStatsChanged'));
     });
@@ -379,6 +386,7 @@ describe('useSignupPrompt — active-game deferral', () => {
     // Game ends → no active game → next stats-change re-evaluates and shows.
     mockIsGameActive.mockReturnValue(false);
     mockStats.mockReturnValue({ games: 2, wins: 1 });
+    markPostGameCompleted();
     await act(async () => {
       window.dispatchEvent(new Event('guestStatsChanged'));
     });
@@ -464,5 +472,35 @@ describe('useSignupPrompt — friction timing + latch', () => {
     expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', true, {
       surface: 'soft-sheet',
     });
+  });
+});
+
+describe('useSignupPrompt — UR 2026-10-06 P0 results-only gate', () => {
+  it('does NOT show without post-game completed latch even if games>=1', async () => {
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    mockStats.mockReturnValue({ games: 2, wins: 1 });
+    // Do NOT call markPostGameCompleted — only bump statsVersion
+    await act(async () => {
+      window.dispatchEvent(new Event('guestStatsChanged'));
+    });
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(false);
+    expect(mockTrackSignupFunnel).not.toHaveBeenCalled();
+  });
+
+  it('shows on results path after post-game latch + fresh game', async () => {
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await qualifyWithFreshGame({ games: 1, wins: 1 });
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(true);
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith(
+      'prompt_shown',
+      true,
+      expect.objectContaining({ surface: 'soft-sheet' }),
+    );
   });
 });

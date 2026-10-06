@@ -46,3 +46,46 @@ export function shouldSuppressOneTapForSignupFunnel(
   // One Tap on the results screen after consent was the #1046 residual stack.
   return getGames() >= 1;
 }
+
+
+/** Session latch: at least one growth-eligible game completed this SPA session.
+ *  Soft-sheet / mp_sheet must not fire until this is set (UR 2026-10-06 P0). */
+export const POST_GAME_COMPLETED_KEY = 'lexiclash_post_game_completed';
+
+export function markPostGameCompleted(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.setItem(POST_GAME_COMPLETED_KEY, '1');
+  } catch {
+    /* ignore */
+  }
+}
+
+export function hasPostGameCompleted(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return sessionStorage.getItem(POST_GAME_COMPLETED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+/** True when pathname looks like a post-game results surface. */
+export function isResultsPath(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
+  return (
+    /\/results(\/|$|\?)/.test(pathname) ||
+    /\/singleplayer(\/|$|\?)/.test(pathname) ||
+    /\/practice(\/|$|\?)/.test(pathname) ||
+    /\/daily(\/|$|\?)/.test(pathname) ||
+    /\/word-hunt/.test(pathname) ||
+    /\/word-wheel/.test(pathname) ||
+    /\/adventure/.test(pathname) ||
+    /\/blast/.test(pathname) ||
+    /\/connections/.test(pathname) ||
+    /\/word-tower/.test(pathname) ||
+    /\/word-craft/.test(pathname) ||
+    /\/quick-play/.test(pathname) ||
+    /\/multiplayer(\/|$|\?)/.test(pathname)
+  );
+}

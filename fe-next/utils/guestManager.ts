@@ -7,6 +7,7 @@ import logger from '@/utils/logger';
 import { getFromStorage, saveToStorage, removeFromStorage, getJsonFromStorage, saveJsonToStorage } from '@/utils/storageHelpers';
 import { getOrCreateStoredUsername, getStoredUsername, setStoredUsername } from '@/utils/profileStorage';
 import { updateGuestDailyPlayer } from '@/utils/dailyChallenge/guestPlayer';
+import { markPostGameCompleted } from '@/lib/auth/signupPromptCoordination';
 
 const GUEST_SESSION_KEY = 'boggle_guest_session_id';
 const GUEST_STATS_KEY = 'boggle_guest_stats';
@@ -204,6 +205,7 @@ export function updateGuestStatsAfterGame(gameResult: GameResult): GuestStats {
   }
 
   saveGuestStats(stats);
+  markPostGameCompleted();
   return stats;
 }
 
