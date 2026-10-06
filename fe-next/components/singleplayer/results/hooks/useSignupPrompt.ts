@@ -33,7 +33,10 @@ import { isGameActive } from '@/utils/abandonOnPagehide';
 import {
   SIGNUP_PROMPT_SHOWN_KEY,
   emitSignupPromptActive,
+  hasPostGameCompleted,
+  isResultsPath,
 } from '@/lib/auth/signupPromptCoordination';
+import { usePathname } from 'next/navigation';
 
 /** Legacy delay — control arm of signup-prompt-friction-v1. */
 export const SIGNUP_PROMPT_DELAY_CONTROL_MS = 3500;
@@ -67,6 +70,7 @@ export function useSignupPrompt({
   authLoading,
   disabled = false,
 }: UseSignupPromptParams): SignupPromptResult {
+  const pathname = usePathname();
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [isFirstWin, setIsFirstWin] = useState(false);
   // Bump on `guestStatsChanged` window event so the gate re-evaluates when a
@@ -125,6 +129,13 @@ export function useSignupPrompt({
     // This ensures the signup flow only appears post-game, not during gameplay or pre-game lobbies.
     if (games < 1) return;
 
+    // UR 2026-10-06 P0 (t_30c31908): restore #897 no-mid-game interrupt.
+    // #1118 first-game peak + global SignupPromptHost fired median ~3s after
+    // first_game_played, often before game_completed / mid-round. Require an
+    // explicit post-game latch AND a results-like surface.
+    if (!hasPostGameCompleted()) return;
+    if (!isResultsPath(pathname)) return;
+
     // Post-first-game threshold: based on variant and emotional peak strategy.
     // after-third-game: fires at 3+ games (consistent, predictable)
     // after-first-win (default): fires at the FIRST completed game in this
@@ -148,6 +159,7 @@ export function useSignupPrompt({
       // `guestStatsChanged` (i.e. that game's results screen) re-runs this
       // effect and shows the prompt at a natural pause.
       if (isGameActive()) return;
+      if (!hasPostGameCompleted() || !isResultsPath(pathname)) return;
       // Parallel mounts (SignupPromptHost + leftover results callers) both
       // schedule timers before either latches. Re-check here so only the
       // first fire wins — prevents double prompt_shown + stacked UI.
@@ -173,6 +185,7 @@ export function useSignupPrompt({
     delayMs,
     frictionVariant,
     trackFrictionExposure,
+    pathname,
   ]);
 
   const dismissSignupModal = useCallback(() => {

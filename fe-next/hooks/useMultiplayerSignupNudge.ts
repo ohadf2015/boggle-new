@@ -16,6 +16,7 @@ import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import { getGuestStats } from '@/utils/guestManager';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { trackGrowthEvent, trackSignupFunnel } from '@/utils/growthTracking';
+import { hasPostGameCompleted, markPostGameCompleted } from '@/lib/auth/signupPromptCoordination';
 
 // Session-scoped MP game counter (separate from global guest stats)
 const MP_SESSION_GAMES_KEY = 'boggle_mp_session_games';
@@ -117,6 +118,7 @@ export function useMultiplayerSignupNudge({
   }, [mpGames]);
 
   const recordMpGame = useCallback((submode?: string) => {
+    markPostGameCompleted();
     setMpGames((prev) => {
       const newCount = prev + 1;
       setMpSessionGames(newCount);
@@ -154,6 +156,11 @@ export function useMultiplayerSignupNudge({
   useEffect(() => {
     // Never show for: authenticated users, CrazyGames, or when results aren't visible
     if (isAuthenticated || isOnCrazyGamesPlatform || !isResultsVisible) {
+      setActiveNudge(null);
+      return;
+    }
+    // UR 2026-10-06 P0: never fire mp_sheet without a completed game this session.
+    if (!hasPostGameCompleted()) {
       setActiveNudge(null);
       return;
     }
