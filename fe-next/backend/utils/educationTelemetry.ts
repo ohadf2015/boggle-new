@@ -165,6 +165,25 @@ export function buildClassroomGameCompletedEvents(
 }
 
 /**
+ * Server-side Growth Radar twins (t_44f87dd2). Growth Radar ingests this
+ * PostHog project but accepts only `growth:*` names (plus a small bare-game
+ * allowlist), so the bare `edu_classroom_game_started` /
+ * `edu_classroom_game_completed` events below never reach its funnels — and
+ * those two are the terminal steps of the teacher activation funnel (class
+ * created → code copied → first student → CLASS GAME) that gates every
+ * Teacher Pro ask. Events on this allowlist are captured twice: the bare
+ * canonical name (unchanged — existing dashboards keep working) and a
+ * `growth:<name>` twin with the same distinctId and properties, which the
+ * PostHog→Growth Radar import then picks up. The twin is emitted from the
+ * single I/O chokepoint rather than the builders, so a caller can never send
+ * one without the other.
+ */
+const GROWTH_TWIN_EVENTS: ReadonlySet<string> = new Set([
+  'edu_classroom_game_started',
+  'edu_classroom_game_completed',
+]);
+
+/**
  * The ONLY way education server events should reach PostHog. Stamps `$host` on
  * every one (see the module header) and swallows transport failures — a dead
  * analytics endpoint must never take a classroom down with it.
@@ -176,22 +195,27 @@ export function captureEduServerEvents(events: EduServerEvent[]): void {
   if (!client) return;
 
   for (const ev of events) {
-    try {
-      client.capture({
-        distinctId: ev.distinctId,
-        event: ev.event,
-        properties: {
-          ...ev.properties,
-          // Last, so a caller's property bag can never clobber the one thing
-          // that decides whether this event is visible at all.
-          $host: EDU_ANALYTICS_HOST,
-        },
-      });
-    } catch (err) {
-      logger.error(
-        'EDU_TELEMETRY',
-        `Failed to capture ${ev.event}: ${err instanceof Error ? err.message : 'unknown'}`
-      );
+    const names = GROWTH_TWIN_EVENTS.has(ev.event)
+      ? [ev.event, `growth:${ev.event}`]
+      : [ev.event];
+    for (const eventName of names) {
+      try {
+        client.capture({
+          distinctId: ev.distinctId,
+          event: eventName,
+          properties: {
+            ...ev.properties,
+            // Last, so a caller's property bag can never clobber the one thing
+            // that decides whether this event is visible at all.
+            $host: EDU_ANALYTICS_HOST,
+          },
+        });
+      } catch (err) {
+        logger.error(
+          'EDU_TELEMETRY',
+          `Failed to capture ${eventName}: ${err instanceof Error ? err.message : 'unknown'}`
+        );
+      }
     }
   }
 }

@@ -25,6 +25,11 @@ vi.mock('@/lib/analytics/lazyPosthog', () => ({
   },
 }));
 
+const growthMock = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: (...args: unknown[]) => growthMock(...args),
+}));
+
 // Module under test imports posthog-js — load AFTER mock is registered
 import {
   trackEduPracticeComplete,
@@ -64,6 +69,7 @@ describe('education telemetry', () => {
   beforeEach(() => {
     captureMock.mockClear();
     registerMock.mockClear();
+    growthMock.mockClear();
   });
 
   afterEach(() => {
@@ -456,6 +462,72 @@ describe('education telemetry', () => {
     trackTeacherInviteStudentsCtaClicked({ classroomId: 'cls-1' });
     expect(captureMock).toHaveBeenLastCalledWith('teacher_invite_students_cta_clicked', {
       classroom_id: 'cls-1',
+    });
+  });
+
+  describe('Growth Radar activation mirror (t_44f87dd2)', () => {
+    it('Given each allowlisted activation event, When tracked, Then PostHog gets the bare name and Growth Radar the same name + identical props', () => {
+      trackEduClassroomCreated({ classroomId: 'cls-1', createdVia: 'dashboard', language: 'en' });
+      trackEduJoinCodeShown({ classroomId: 'cls-1' });
+      trackEduJoinCodeCopied({ classroomId: 'cls-1' });
+      trackEduFirstStudentJoined({ classroomId: 'cls-1' });
+      trackEduClassroomJoin({ result: 'success', classroomId: 'cls-1', matchedCodeType: 'roster_code', attemptedCode: 'UHMKL4' });
+      trackEduLiveGameStarted({ classroomId: 'cls-1', source: 'hq_express', lessonCount: 2 });
+      trackEduTeacherOnboardingStep({ step: 1, totalSteps: 4, action: 'view' });
+      trackEduFirstAssignmentCtaShown({ classroomId: 'cls-1' });
+      trackEduFirstAssignmentCtaClicked({ classroomId: 'cls-1' });
+
+      const bare = captureMock.mock.calls.map((c) => c[0]);
+      expect(bare).toEqual([
+        'edu_classroom_created',
+        'edu_join_code_shown',
+        'edu_join_code_copied',
+        'edu_first_student_joined',
+        'edu_classroom_join',
+        'edu_live_game_started',
+        'edu_teacher_onboarding_step',
+        'edu_first_assignment_cta_shown',
+        'edu_first_assignment_cta_clicked',
+      ]);
+      // Same 9 events, same order, same props on the growth channel.
+      expect(growthMock.mock.calls.map((c) => c[0])).toEqual(bare);
+      growthMock.mock.calls.forEach((call, i) => {
+        expect(call[1]).toEqual(captureMock.mock.calls[i][1]);
+      });
+    });
+
+    it('Given a NON-allowlisted edu event, When tracked, Then no growth mirror fires (no double-counting)', () => {
+      trackEduTeacherDashboardViewed({ classroomCount: 1, studentCount: 5, hasPro: false });
+      trackEduFirstAssignmentCreated({ classroomId: 'cls-1' });
+      trackTeacherOnboardingStep({ step: 'create_classroom', action: 'view' });
+      expect(growthMock).not.toHaveBeenCalled();
+    });
+
+    it('Given trackGrowthEvent throws, When an activation event is tracked, Then the caller never sees it and PostHog still fired', () => {
+      growthMock.mockImplementation(() => {
+        throw new Error('growth down');
+      });
+      expect(() => trackEduClassroomCreated({ classroomId: 'cls-1', createdVia: 'dashboard' })).not.toThrow();
+      expect(captureMock).toHaveBeenCalledWith('edu_classroom_created', {
+        classroom_id: 'cls-1',
+        created_via: 'dashboard',
+      });
+    });
+
+    it('Given PostHog throws, When an activation event is tracked, Then Growth Radar still gets it', () => {
+      captureMock.mockImplementationOnce(() => {
+        throw new Error('posthog down');
+      });
+      expect(() => trackEduJoinCodeCopied({ classroomId: 'cls-1' })).not.toThrow();
+      expect(growthMock).toHaveBeenCalledWith('edu_join_code_copied', { classroom_id: 'cls-1' });
+    });
+
+    it('Given a join attempt with a typed code, When mirrored, Then the growth props never carry the code itself', () => {
+      trackEduClassroomJoin({ result: 'not_found', attemptedCode: 'ABC123' });
+      expect(growthMock).toHaveBeenCalledTimes(1);
+      const [, props] = growthMock.mock.calls[0];
+      expect(props).toEqual({ result: 'not_found', code_length: 6, code_charset: 'alphanumeric' });
+      expect(JSON.stringify(growthMock.mock.calls)).not.toContain('ABC123');
     });
   });
 });

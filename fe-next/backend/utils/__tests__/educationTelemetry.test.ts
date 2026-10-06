@@ -121,9 +121,13 @@ describe('captureEduServerEvents — $host', () => {
       { distinctId: 'stu-1', event: 'edu_classroom_game_completed', properties: { a: 1 } },
     ]);
 
-    expect(mockCapture).toHaveBeenCalledTimes(1);
-    const arg = mockCapture.mock.calls[0][0];
-    expect(arg.properties.$host).toBe(EDU_ANALYTICS_HOST);
+    // Two calls: the bare canonical event plus its growth:* twin. BOTH must
+    // carry $host or the twin falls into the $host=NULL hole it was built to
+    // climb out of.
+    expect(mockCapture).toHaveBeenCalledTimes(2);
+    for (const call of mockCapture.mock.calls) {
+      expect(call[0].properties.$host).toBe(EDU_ANALYTICS_HOST);
+    }
     expect(EDU_ANALYTICS_HOST).toBeTruthy();
   });
 
@@ -136,7 +140,8 @@ describe('captureEduServerEvents — $host', () => {
     ];
     captureEduServerEvents(evs);
 
-    expect(mockCapture).toHaveBeenCalledTimes(evs.length);
+    // Both built event names are on the twin allowlist → 2 captures per event.
+    expect(mockCapture).toHaveBeenCalledTimes(evs.length * 2);
     for (const call of mockCapture.mock.calls) {
       expect(call[0].properties.$host).toBe(EDU_ANALYTICS_HOST);
     }
@@ -160,6 +165,63 @@ describe('captureEduServerEvents — $host', () => {
   it('Given an empty list, When captured, Then PostHog is not called at all', () => {
     captureEduServerEvents([]);
     expect(mockCapture).not.toHaveBeenCalled();
+  });
+});
+
+describe('captureEduServerEvents — Growth Radar twins (t_44f87dd2)', () => {
+  it('Given a classroom game started, When captured, Then a growth: twin rides with the same distinctId and props', () => {
+    const ev = buildClassroomGameStartedEvent(makeGame(), { isTestAccount: false })!;
+    captureEduServerEvents([ev]);
+
+    expect(mockCapture).toHaveBeenCalledTimes(2);
+    const [bare, twin] = mockCapture.mock.calls.map((c) => c[0]);
+    expect(bare.event).toBe('edu_classroom_game_started');
+    expect(twin.event).toBe('growth:edu_classroom_game_started');
+    expect(twin.distinctId).toBe(bare.distinctId);
+    // Identical props (mod nothing) — Growth Radar must see the same funnel row.
+    expect({ ...twin.properties }).toEqual({ ...bare.properties });
+  });
+
+  it('Given classroom game completions, When captured, Then every per-student event gets a growth: twin', () => {
+    const evs = buildClassroomGameCompletedEvents(makeGame(), [
+      { userId: 'stu-1', score: 30, xpEarned: 12, lessonWordsFoundCount: 2, lessonWordsAskedCount: 4 },
+      { userId: 'stu-2', score: 10, xpEarned: 4, lessonWordsFoundCount: 1, lessonWordsAskedCount: 4 },
+    ]);
+    captureEduServerEvents(evs);
+
+    expect(mockCapture).toHaveBeenCalledTimes(4);
+    const byName = mockCapture.mock.calls.map((c) => [c[0].event, c[0].distinctId]);
+    expect(byName).toEqual([
+      ['edu_classroom_game_completed', 'stu-1'],
+      ['growth:edu_classroom_game_completed', 'stu-1'],
+      ['edu_classroom_game_completed', 'stu-2'],
+      ['growth:edu_classroom_game_completed', 'stu-2'],
+    ]);
+  });
+
+  it('Given a NON-allowlisted event, When captured, Then no twin is emitted (no double-counting)', () => {
+    captureEduServerEvents([
+      buildClassroomJoinRefusedEvent({
+        gameCode: 'ABC123',
+        classroomId: 'class-1',
+        reason: 'GAME_NOT_FOUND',
+        door: 'join',
+        actorId: 'student-9',
+      })!,
+    ]);
+    expect(mockCapture).toHaveBeenCalledTimes(1);
+    expect(mockCapture.mock.calls[0][0].event).toBe('edu_classroom_join_refused');
+  });
+
+  it('Given the bare capture throws, When captured, Then the twin still fires and neither throws', () => {
+    mockCapture.mockImplementationOnce(() => {
+      throw new Error('posthog down');
+    });
+    expect(() =>
+      captureEduServerEvents([{ distinctId: 'x', event: 'edu_classroom_game_started', properties: {} }])
+    ).not.toThrow();
+    expect(mockCapture).toHaveBeenCalledTimes(2);
+    expect(mockCapture.mock.calls[1][0].event).toBe('growth:edu_classroom_game_started');
   });
 });
 

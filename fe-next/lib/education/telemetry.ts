@@ -24,6 +24,7 @@
 
 import posthog from '@/lib/analytics/lazyPosthog';
 import logger from '@/utils/logger';
+import { trackGrowthEvent, type GrowthEvent } from '@/utils/growthTracking';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
 type Register = (props: Record<string, unknown>) => void;
@@ -35,6 +36,53 @@ const safeCapture: Capture = (event, props) => {
     if (process.env.NODE_ENV === 'development') {
       logger.debug('[eduTelemetry] capture failed', { event, err });
     }
+  }
+};
+
+/**
+ * Teacher classroom ACTIVATION funnel (t_44f87dd2) — the steps before every
+ * Teacher Pro ask: class created → join code shown/copied → first student →
+ * live game. These already reach PostHog as bare `edu_*` names, but Growth
+ * Radar's ingest accepts only `growth:*` (plus a small bare-game allowlist),
+ * so run_funnel was blind to exactly where activation stalls. Mirroring the
+ * allowlist below through trackGrowthEvent lands them as `growth:<name>` with
+ * identical props. Deliberately NOT added to CANONICAL_DUAL_EMIT in
+ * growthTracking.ts — the bare PostHog capture right here is the canonical
+ * one, dual-emit would double-count.
+ */
+const ACTIVATION_GROWTH_MIRROR = new Set<GrowthEvent>([
+  'edu_classroom_created',
+  'edu_join_code_shown',
+  'edu_join_code_copied',
+  'edu_first_student_joined',
+  'edu_classroom_join',
+  'edu_live_game_started',
+  'edu_teacher_onboarding_step',
+  'edu_first_assignment_cta_shown',
+  'edu_first_assignment_cta_clicked',
+]);
+
+/** Same event, same props, into Growth Radar's growth:* stream. Never throws. */
+function mirrorToGrowth(event: GrowthEvent, props: Record<string, unknown>): void {
+  try {
+    trackGrowthEvent(event, { ...props });
+  } catch (err) {
+    if (process.env.NODE_ENV === 'development') {
+      logger.debug('[eduTelemetry] growth mirror failed', { event, err });
+    }
+  }
+}
+
+/**
+ * Capture an activation-funnel event: the bare PostHog name (unchanged — every
+ * existing dashboard keeps working) plus the growth:* twin when the event is
+ * on the activation allowlist. A failure in either channel never reaches the
+ * caller and never blocks the other.
+ */
+const captureActivation = (event: GrowthEvent, props: Record<string, unknown>): void => {
+  safeCapture(event, props);
+  if (ACTIVATION_GROWTH_MIRROR.has(event)) {
+    mirrorToGrowth(event, props);
   }
 };
 
@@ -138,7 +186,7 @@ export function trackEduClassroomJoin(args: EduClassroomJoinArgs): void {
     props.code_length = args.attemptedCode.length;
     props.code_charset = charsetOf(args.attemptedCode);
   }
-  safeCapture('edu_classroom_join', props);
+  captureActivation('edu_classroom_join', props);
 }
 
 export interface EduClassroomCreatedArgs {
@@ -160,7 +208,7 @@ export function trackEduClassroomCreated(args: EduClassroomCreatedArgs): void {
     created_via: args.createdVia,
   };
   if (args.language) props.language = args.language;
-  safeCapture('edu_classroom_created', props);
+  captureActivation('edu_classroom_created', props);
 }
 
 export interface EduJoinCodeArgs {
@@ -173,15 +221,15 @@ export interface EduJoinCodeArgs {
  * Copy is also used by the start-live-class CTA so one funnel counts copies.
  */
 export function trackEduJoinCodeShown(args: EduJoinCodeArgs): void {
-  safeCapture('edu_join_code_shown', { classroom_id: args.classroomId });
+  captureActivation('edu_join_code_shown', { classroom_id: args.classroomId });
 }
 
 export function trackEduJoinCodeCopied(args: EduJoinCodeArgs): void {
-  safeCapture('edu_join_code_copied', { classroom_id: args.classroomId });
+  captureActivation('edu_join_code_copied', { classroom_id: args.classroomId });
 }
 
 export function trackEduFirstStudentJoined(args: EduJoinCodeArgs): void {
-  safeCapture('edu_first_student_joined', { classroom_id: args.classroomId });
+  captureActivation('edu_first_student_joined', { classroom_id: args.classroomId });
 }
 
 export interface EduTeacherOnboardingStepArgs {
@@ -191,7 +239,7 @@ export interface EduTeacherOnboardingStepArgs {
 }
 
 export function trackEduTeacherOnboardingStep(args: EduTeacherOnboardingStepArgs): void {
-  safeCapture('edu_teacher_onboarding_step', {
+  captureActivation('edu_teacher_onboarding_step', {
     step: args.step,
     total_steps: args.totalSteps,
     action: args.action,
@@ -402,7 +450,7 @@ export function trackEduLiveGameStarted(args: EduLiveGameStartedArgs): void {
     source: args.source,
   };
   if (args.lessonCount !== undefined) props.lesson_count = args.lessonCount;
-  safeCapture('edu_live_game_started', props);
+  captureActivation('edu_live_game_started', props);
 }
 
 export interface EduReportsViewedArgs {
@@ -423,11 +471,11 @@ export interface EduFirstAssignmentCtaArgs {
 
 /** HQ panel: class has students, 0 assignments, no live room. */
 export function trackEduFirstAssignmentCtaShown(args: EduFirstAssignmentCtaArgs): void {
-  safeCapture('edu_first_assignment_cta_shown', { classroom_id: args.classroomId });
+  captureActivation('edu_first_assignment_cta_shown', { classroom_id: args.classroomId });
 }
 
 export function trackEduFirstAssignmentCtaClicked(args: EduFirstAssignmentCtaArgs): void {
-  safeCapture('edu_first_assignment_cta_clicked', { classroom_id: args.classroomId });
+  captureActivation('edu_first_assignment_cta_clicked', { classroom_id: args.classroomId });
 }
 
 /** First assignment actually created (dialog or starter pack). */
