@@ -12,16 +12,20 @@ export type TeacherProCheckoutResult =
 
 export async function postTeacherProCheckout(
   fetchFn: typeof fetch = fetch,
-  options: { trial?: boolean } = {},
+  options: { trial?: boolean; locale?: string } = {},
 ): Promise<TeacherProCheckoutResult> {
   const trial = options.trial === true;
+  const hasOptions = options.trial !== undefined || options.locale !== undefined;
   const response = await fetchFn(
     '/api/subscription/checkout',
-    trial
+    hasOptions
       ? {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ trial: true }),
+          body: JSON.stringify({
+            trial,
+            ...(options.locale ? { locale: options.locale } : {}),
+          }),
         }
       : { method: 'POST' },
   );

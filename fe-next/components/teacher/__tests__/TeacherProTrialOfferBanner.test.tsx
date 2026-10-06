@@ -49,7 +49,7 @@ describe('TeacherProTrialOfferBanner', () => {
     await waitFor(() => {
       expect(postTeacherProCheckout).toHaveBeenCalledTimes(1);
     });
-    expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: true });
+    expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: true, locale: 'en' });
     expect(trackTrialCtaTap).toHaveBeenCalledWith({ source: 'dashboard_trial_offer' });
     expect(goToPolarCheckout).toHaveBeenCalledWith('https://polar.sh/c/trial');
   });

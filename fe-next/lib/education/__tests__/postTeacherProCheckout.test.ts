@@ -32,6 +32,22 @@ describe('postTeacherProCheckout', () => {
     });
   });
 
+  it('passes the locale through to the checkout body when provided', async () => {
+    const fetchFn = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ url: 'https://polar.sh/checkout/he' }),
+    });
+    await expect(
+      postTeacherProCheckout(fetchFn, { trial: false, locale: 'he' }),
+    ).resolves.toEqual({ ok: true, url: 'https://polar.sh/checkout/he' });
+    expect(fetchFn).toHaveBeenCalledWith('/api/subscription/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trial: false, locale: 'he' }),
+    });
+  });
+
   it('surfaces 401 and 503 instead of inventing a URL', async () => {
     const fetch401 = vi.fn().mockResolvedValue({ ok: false, status: 401, json: async () => ({}) });
     await expect(postTeacherProCheckout(fetch401)).resolves.toEqual({ ok: false, status: 401 });
