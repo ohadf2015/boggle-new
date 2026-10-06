@@ -7,6 +7,7 @@ import {
   teacherTrialStatus,
   isTrialUpgradeNudgeWindow,
   isEligibleForTeacherProUpgradeCta,
+  shouldShowTeacherTrialUpgradeStatus,
   isTrialUpgradeNudgeDismissed,
   persistTrialUpgradeNudgeDismissed,
   trialUpgradeNudgeDismissKey,
@@ -127,6 +128,53 @@ describe('isEligibleForTeacherProUpgradeCta', () => {
     const expired = teacherTrialStatus(new Date(now - DAY).toISOString(), now);
     expect(isEligibleForTeacherProUpgradeCta({ trial: expired, hasPro: false })).toBe(false);
     expect(isEligibleForTeacherProUpgradeCta({ trial: null, hasPro: false })).toBe(false);
+  });
+});
+
+describe('shouldShowTeacherTrialUpgradeStatus', () => {
+  const active = statusInDays(10);
+
+  it('stays up for the whole access trial, including after a 7-day banner would hide', () => {
+    expect(
+      shouldShowTeacherTrialUpgradeStatus({ trial: statusInDays(12), hasPro: false }),
+    ).toBe(true);
+    expect(
+      shouldShowTeacherTrialUpgradeStatus({ trial: statusInDays(2), hasPro: false }),
+    ).toBe(true);
+  });
+
+  it('stays up for a live Polar trial even though hasPro is true', () => {
+    expect(
+      shouldShowTeacherTrialUpgradeStatus({
+        trial: null,
+        hasPro: true,
+        polarTrialing: true,
+      }),
+    ).toBe(true);
+  });
+
+  it('hides when a pinned Polar banner already owns the deck', () => {
+    expect(
+      shouldShowTeacherTrialUpgradeStatus({
+        trial: active,
+        hasPro: false,
+        suppressed: true,
+      }),
+    ).toBe(false);
+  });
+
+  it('hides for paid Pro, loading, expired, or missing trial', () => {
+    expect(shouldShowTeacherTrialUpgradeStatus({ trial: active, hasPro: true })).toBe(false);
+    expect(
+      shouldShowTeacherTrialUpgradeStatus({ trial: active, hasPro: false, proLoading: true }),
+    ).toBe(false);
+    expect(
+      shouldShowTeacherTrialUpgradeStatus({ trial: active, hasPro: false, accessLoading: true }),
+    ).toBe(false);
+    const now = Date.parse('2026-06-26T00:00:00.000Z');
+    const expired = teacherTrialStatus(new Date(now - DAY).toISOString(), now);
+    expect(shouldShowTeacherTrialUpgradeStatus({ trial: expired, hasPro: false })).toBe(false);
+    expect(shouldShowTeacherTrialUpgradeStatus({ trial: null, hasPro: false })).toBe(false);
   });
 });
 

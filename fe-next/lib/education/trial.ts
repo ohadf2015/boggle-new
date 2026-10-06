@@ -111,6 +111,34 @@ export function isEligibleForTeacherProUpgradeCta({
   return !!trial && !trial.isExpired;
 }
 
+/**
+ * Persistent Teacher HQ trial chrome (not the dismissible banner).
+ * Polar trialing wins: that clock is the conversion deadline. Access-trial
+ * teachers who are not Pro keep the strip for the whole 14 days so a dismissed
+ * Polar-trial offer cannot hide the till.
+ */
+export function shouldShowTeacherTrialUpgradeStatus({
+  trial,
+  hasPro,
+  proLoading = false,
+  accessLoading = false,
+  polarTrialing = false,
+  suppressed = false,
+}: {
+  trial: TrialStatus | null | undefined;
+  hasPro: boolean;
+  proLoading?: boolean;
+  accessLoading?: boolean;
+  polarTrialing?: boolean;
+  suppressed?: boolean;
+}): boolean {
+  if (suppressed) return false;
+  if (proLoading || accessLoading) return false;
+  if (polarTrialing) return true;
+  if (hasPro) return false;
+  return !!trial && !trial.isExpired;
+}
+
 export function trialUpgradeNudgeDismissKey(expiresAt: string): string {
   return `${TRIAL_UPGRADE_NUDGE_DISMISS_PREFIX}${expiresAt}`;
 }

@@ -27,6 +27,7 @@ import {
 import { useClassrooms } from '@/hooks/useClassroom';
 import { AssignmentCreator } from './assignments';
 import { TeacherStatusRow } from './dashboard/TeacherStatusRow';
+import { TeacherTrialUpgradeStatus } from './TeacherTrialUpgradeStatus';
 import { ProWelcomeCelebration } from './ProWelcomeCelebration';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
@@ -274,7 +275,9 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
           <div data-testid="teacher-dashboard-pinned-banner" data-hq-upsell="pinned" className={cn('sm:col-span-full', `${LANDSCAPE}:col-span-full`)}>
             {banner}
           </div>
-        ) : null}
+        ) : (
+          <TeacherTrialUpgradeStatus suppressed={!!pinBanner} />
+        )}
         {/* Top row: which class, and the ONE Tools entry (+ Go Pro chip). The dock is rendered LAST so keyboard order meets the primary action first. */}
         <div className={cn('flex min-h-9 shrink-0 items-center gap-2 sm:col-span-full lg:min-h-10', `${LANDSCAPE}:col-span-full`)}>
           {/* `contain: inline-size` — a long class name must truncate here, not widen the shell past a 390px phone. */}
