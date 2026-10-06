@@ -67,7 +67,7 @@ export default async function Page({ params }: PageProps) {
     // Locale-aware @id/url — this node used to name the English org on every build.
     ...educationProviderNode(locale),
     description:
-      'Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Classroom plan $39/term; schools and districts contact us.',
+      'Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Schools & departments from $49 per teacher / year (5+ teachers, invoice/PO).',
     audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
     areaServed: ['US', 'IL', 'SE', 'JP', 'ES'],
     offers: [
@@ -76,8 +76,7 @@ export default async function Page({ params }: PageProps) {
       // understated the free plan and contradicted every other surface.
       { '@type': 'Offer', name: 'Teacher Free', price: 0, priceCurrency: 'USD', category: 'free', description: 'Free tier for individual teachers, with no expiry: 3 classrooms of up to 50 students, custom word lists, live classroom games', availability: 'https://schema.org/InStock' },
       { '@type': 'Offer', name: 'Teacher Pro', price: 9, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 9, priceCurrency: 'USD', unitText: 'month' }, category: 'paid', description: 'Unlimited classrooms plus progress analytics, miss-gap homework and reteach tools', availability: 'https://schema.org/InStock' },
-      { '@type': 'Offer', name: 'Classroom plan', price: 39, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 39, priceCurrency: 'USD', unitText: 'term' }, category: 'paid', description: 'Whole class, all Pro features, class streaks and priority support. Lead capture until school billing trigger.', availability: 'https://schema.org/InStock' },
-      { '@type': 'Offer', name: 'Schools & districts', category: 'paid', description: 'Contact us for school and district rollout. Same lead form, tagged school_lead. No public checkout.', availability: 'https://schema.org/InStock' },
+      { '@type': 'Offer', name: 'Schools & departments', price: 49, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 49, priceCurrency: 'USD', unitText: 'year', referenceQuantity: { '@type': 'QuantitativeValue', value: 1, unitText: 'teacher' } }, category: 'paid', description: 'Teacher Pro for every teacher on the team. From $49 per teacher / year for 5+ teachers, paid by invoice or purchase order. Lead capture via Get a school quote — no public checkout.', availability: 'https://schema.org/InStock' },
     ],
   };
 

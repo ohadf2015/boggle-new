@@ -16,6 +16,8 @@ import {
 } from '@/lib/education/schoolLead';
 import type { TeacherLocale } from '@/lib/education/types';
 import { packageById, type EducationLeadPlan } from '@/lib/education/educationPackages';
+import { clampTeachers, MAX_QUOTE_TEACHERS, studentBucketForTeachers } from '@/lib/education/pro/schoolQuote';
+import { trackSchoolQuoteRequested } from '@/lib/education/proFunnelTelemetry';
 
 const FIELD_CLASS =
   'mt-1 w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white placeholder-neo-white/40 p-3 ' +
@@ -25,28 +27,47 @@ const LABEL_CLASS = 'block text-sm font-semibold text-neo-white font-neo-display
 
 const LEAD_LOCALES: readonly TeacherLocale[] = ['en', 'he', 'sv', 'ja', 'es'];
 
-export function SchoolLeadForm({ plan = 'school', surface }: { plan?: EducationLeadPlan; surface?: string }) {
+export function SchoolLeadForm({
+  plan = 'school',
+  surface,
+  page,
+}: {
+  plan?: EducationLeadPlan;
+  surface?: string;
+  /** Pathname used for school_quote_requested analytics. */
+  page?: string;
+}) {
   const { t, language } = useLanguage();
   // school_leads.locale has a CHECK on these five; ru answers 400 without the fallback.
   const leadLocale: TeacherLocale = LEAD_LOCALES.includes(language as TeacherLocale) ? (language as TeacherLocale) : 'en';
   const shouldReduceMotion = useReducedMotion();
-  const pkg = packageById(plan === 'classroom' ? 'classroom' : 'school');
+  // Always school tier — classroom $39/term was retired 2026-10-06.
+  const resolvedPlan: EducationLeadPlan = 'school';
+  const pkg = packageById('school');
+  void plan; // callers may still pass plan; UI is school-only
 
   useEffect(() => {
-    trackGrowthEvent('school_lead_form_viewed', { locale: language, plan, ...(surface ? { surface } : {}) });
-  }, [language, plan, surface]);
+    trackGrowthEvent('school_lead_form_viewed', {
+      locale: language,
+      plan: resolvedPlan,
+      ...(surface ? { surface } : {}),
+    });
+  }, [language, resolvedPlan, surface]);
+
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [school, setSchool] = useState('');
-  const [role, setRole] = useState<SchoolLeadRole>(plan === 'classroom' ? 'teacher' : 'school_admin');
+  const [role, setRole] = useState<SchoolLeadRole>('school_admin');
+  const [teachers, setTeachers] = useState('5');
   const [studentCount, setStudentCount] = useState<StudentCountBucket>('200_500');
-  const [interests, setInterests] = useState<SchoolLeadInterest[]>([]);
+  const [interests, setInterests] = useState<SchoolLeadInterest[]>(['pricing_info']);
   const [country, setCountry] = useState('');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  const teacherCount = clampTeachers(Number(teachers));
   const nameOk = fullName.trim().length >= 2;
   const emailOk = /\S+@\S+\.\S+/.test(email);
   const schoolOk = school.trim().length >= 2;
@@ -69,6 +90,10 @@ export function SchoolLeadForm({ plan = 'school', surface }: { plan?: EducationL
     setError(null);
     setSubmitting(true);
     try {
+      const teachersLine = `School quote request: ${teacherCount} teacher${teacherCount === 1 ? '' : 's'}.`;
+      const combinedMessage = [teachersLine, message.trim()].filter(Boolean).join('\n').slice(0, 800);
+      // Prefer student bucket derived from teachers when the user entered a head count.
+      const derivedBucket = teachers.trim() === '' ? studentCount : studentBucketForTeachers(teacherCount);
       const res = await fetch('/api/education/school-lead', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -77,10 +102,10 @@ export function SchoolLeadForm({ plan = 'school', surface }: { plan?: EducationL
           full_name: fullName,
           role,
           school_or_district: school,
-          student_count: studentCount,
+          student_count: derivedBucket,
           interests,
           country: country || undefined,
-          message: message || undefined,
+          message: combinedMessage || undefined,
           locale: leadLocale,
           source: pkg.leadSource,
         } satisfies SchoolLeadPayload),
@@ -90,13 +115,22 @@ export function SchoolLeadForm({ plan = 'school', surface }: { plan?: EducationL
         return;
       }
       setSuccess(true);
+      const pagePath =
+        page ||
+        (typeof window !== 'undefined' ? window.location.pathname : '/education/for-schools');
       trackGrowthEvent('school_lead_submitted', {
         role,
-        student_count: studentCount,
+        student_count: derivedBucket,
         locale: language,
-        plan,
+        plan: resolvedPlan,
+        teachers: teacherCount,
         ...(surface ? { surface } : {}),
       });
+      try {
+        trackSchoolQuoteRequested({ page: pagePath, locale: language, teachers: teacherCount });
+      } catch {
+        /* analytics must never block */
+      }
     } catch {
       setError(t('education.forSchools.form.submit_error'));
     } finally {
@@ -144,8 +178,21 @@ export function SchoolLeadForm({ plan = 'school', surface }: { plan?: EducationL
         </Select>
       </m.div>
       <m.div variants={item}>
+        <label htmlFor="sl-teachers" className={LABEL_CLASS}>{t('education.forSchools.form.teachers')}</label>
+        <input
+          id="sl-teachers"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          max={MAX_QUOTE_TEACHERS}
+          value={teachers}
+          onChange={(e) => setTeachers(e.target.value)}
+          className={FIELD_CLASS}
+        />
+      </m.div>
+      <m.div variants={item}>
         <label htmlFor="sl-student_count" className={LABEL_CLASS}>
-          {plan === 'classroom' ? t('education.forSchools.form.class_size') : t('education.forSchools.form.student_count')}
+          {t('education.forSchools.form.student_count')}
         </label>
         <Select value={studentCount} onValueChange={(v) => setStudentCount(v as StudentCountBucket)}>
           <SelectTrigger id="sl-student_count" className={FIELD_CLASS}><SelectValue /></SelectTrigger>

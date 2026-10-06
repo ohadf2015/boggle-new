@@ -117,7 +117,7 @@
   "@id": "https://www.lexiclash.live/ru/education#org",
   "name": "LexiClash Education",
   "url": "https://www.lexiclash.live/ru/education",
-  "description": "Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Classroom plan $39/term.",
+  "description": "Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Schools & departments from $49 per teacher / year.",
   "audience": {
     "@type": "EducationalAudience",
     "educationalRole": "teacher"
@@ -156,17 +156,17 @@
     },
     {
       "@type": "Offer",
-      "name": "Classroom Plan",
-      "price": 39,
+      "name": "Schools & departments",
+      "price": 49,
       "priceCurrency": "USD",
       "priceSpecification": {
         "@type": "UnitPriceSpecification",
-        "price": 39,
+        "price": 49,
         "priceCurrency": "USD",
-        "unitText": "term"
+        "unitText": "year"
       },
       "category": "paid",
-      "description": "Whole class on every Teacher Pro feature: analytics, printable reports, unlimited classrooms",
+      "description": "Teacher Pro for every teacher: from $49 per teacher / year for 5+ teachers, invoice or PO",
       "availability": "https://schema.org/InStock"
     }
   ]

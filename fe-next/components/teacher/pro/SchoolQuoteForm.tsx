@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CheckCircle2, Send } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { trackSchoolQuoteRequested } from '@/lib/education/proFunnelTelemetry';
 import { SCHOOL_LEAD_ROLES, type SchoolLeadRole } from '@/lib/education/schoolLead';
 import { estimateSchoolAnnualUsd } from '@/lib/education/pro/schoolPricing';
 import { buildSchoolQuotePayload, schoolQuoteErrorKey, clampTeachers, MAX_QUOTE_TEACHERS } from '@/lib/education/pro/schoolQuote';
@@ -60,8 +61,18 @@ export function SchoolQuoteForm({ requester }: { requester: string }) {
         role,
         student_count: payload.student_count,
         locale: language,
-        plan: 'teacher-upgrade',
+        plan: 'school',
+        teachers: teacherCount,
       });
+      try {
+        trackSchoolQuoteRequested({
+          page: typeof window !== 'undefined' ? window.location.pathname : `/${language}/teacher/upgrade`,
+          locale: language,
+          teachers: teacherCount,
+        });
+      } catch {
+        /* analytics must never block */
+      }
       setSentTo(payload.email);
     } catch {
       setError(t('eg2Pro.school.errorGeneric'));

@@ -61,7 +61,7 @@ describe('POST /api/education/school-lead', () => {
     expect(row.source).toBe('for-schools-page');
   });
 
-  it('persists classroom-plan source for the $39/term lead (not a checkout)', async () => {
+  it('persists classroom-plan source for a historical lead source (not a checkout)', async () => {
     const res = await POST(mkReq({ ...valid, source: 'classroom-plan' }));
     expect(res.status).toBe(200);
     expect(insertSpy.mock.calls[0][0].source).toBe('classroom-plan');

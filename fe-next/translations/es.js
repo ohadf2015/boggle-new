@@ -16398,46 +16398,45 @@ const es = {
         "interest_pricing_info": "Información de precios",
         "country": "País (opcional)",
         "message": "¿Algo más? (opcional)",
-        "submit": "Cuéntanos sobre tu escuela",
+        "submit": "Pedir cotización escolar",
         "submitting": "Enviando…",
         "submit_error": "Algo salió mal. Inténtalo de nuevo.",
         "rate_limited": "Demasiados envíos. Inténtalo de nuevo en 24 horas.",
         "success_title": "¡Gracias, lo recibimos!",
         "success_body": "Confirmaremos tu acceso de prueba y compartiremos los detalles del plan escolar en 1–2 días hábiles. Mientras tanto, sigue jugando con tu clase. Es gratis.",
         "class_size": "Tamaño de la clase",
+        "teachers": "¿Cuántos docentes necesitan Pro?",
         "privacy_note": "Solo usaremos esto para comunicarnos contigo sobre funciones escolares. Sin spam."
       }
     },
     "packages": {
           "title": "Paquetes educativos",
-          "subtitle": "Teacher Pro es facturación real. El plan de aula es un ancla de precio: cuéntanos de tu clase. Escuelas y distritos: contáctanos. Sin checkout de aula hasta el umbral de demanda.",
+          "subtitle": "Teacher Pro es facturación autoservicio. Escuelas y departamentos: $49 por docente al año (5+ docentes), factura o orden de compra — pide una cotización abajo.",
           "teacherPro": {
                 "name": "Teacher Pro",
                 "interval": "/mes",
-                "blurb": "Todos los informes, deberes de huecos y herramientas de reenseñanza para un docente.",
+                "blurb": "Todos los informes, deberes de palabras falladas y herramientas de reenseñanza para un docente.",
                 "cta": "Mejorar por $9/mes"
           },
-          "classroom": {
-                "name": "Plan de aula",
-                "interval": "/trimestre",
-                "blurb": "Toda la clase, todas las funciones Pro, rachas de clase y soporte prioritario.",
-                "cta": "Pedir aula por $39/trimestre"
-          },
           "school": {
-                "name": "Escuelas y distritos",
-                "price": "Contáctanos",
-                "blurb": "Despliegue, admin y necesidades de distrito. El mismo formulario, marcado como lead escolar.",
-                "cta": "Contáctanos"
+                "name": "Escuelas y departamentos",
+                "price": "Desde $49",
+                "priceFrom": "Desde",
+                "interval": "por docente / año",
+                "priceTerms": "{min}+ docentes · factura u orden de compra",
+                "blurb": "Teacher Pro para cada docente de tu equipo. Factura u OC — sin checkout autoservicio.",
+                "cta": "Pedir cotización escolar"
           },
           "feature": {
                 "reports": "Todos los informes de clase",
-                "homework": "Deberes de huecos",
+                "homework": "Deberes de palabras falladas",
                 "reteach": "Herramientas de reenseñanza",
-                "wholeClass": "Toda la clase, no un solo asiento de docente",
-                "proPlus": "Todas las funciones de Teacher Pro",
+                "wholeClass": "Toda la clase, no solo un asiento",
+                "proPlus": "Todas las funciones de Teacher Pro incluidas",
                 "streaks": "Rachas de clase",
                 "priority": "Soporte prioritario",
-                "district": "Despliegue escolar y de distrito"
+                "district": "Despliegue escolar y de departamento",
+                "invoice": "Factura u orden de compra"
           }
     },
     "teacher": {

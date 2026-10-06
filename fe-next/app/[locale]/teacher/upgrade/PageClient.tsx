@@ -21,7 +21,13 @@ import {
 } from '@/lib/teacher/resumeCheckout';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { polarTrialUx } from '@/lib/education/polarTrial';
-import { trackTrialCtaTap, trackTrialCtaView } from '@/lib/education/proFunnelTelemetry';
+import {
+  trackTrialCtaTap,
+  trackTrialCtaView,
+  trackTeacherProUpgradeClick,
+  trackTeacherProCheckoutStarted,
+  trackTeacherProCheckoutRedirect,
+} from '@/lib/education/proFunnelTelemetry';
 import { upgradeViewer, showTrialOffer } from '@/lib/education/pro/upgradeViewer';
 import { resumeDecision } from '@/lib/education/pro/resumeDecision';
 import { readAskSchoolParams, type UpgradeTab } from '@/lib/education/pro/askSchool';
@@ -90,6 +96,16 @@ export default function UpgradePricingPageClient() {
       }
     }
     try {
+      trackTeacherProUpgradeClick({
+        page: typeof window !== 'undefined' ? window.location.pathname : `/${language}/teacher/upgrade`,
+        locale: language,
+        placement: 'teacher_upgrade',
+      });
+      trackTeacherProCheckoutStarted({ trial, signed_in: Boolean(user) });
+    } catch {
+      /* analytics must never block the till */
+    }
+    try {
       const response = await fetch('/api/subscription/checkout', {
         method: 'POST',
         ...(trial
@@ -119,13 +135,18 @@ export default function UpgradePricingPageClient() {
       }
       clearResumeCheckoutIntent();
       const { url } = await response.json();
+      try {
+        trackTeacherProCheckoutRedirect({ trial });
+      } catch {
+        /* analytics must never block the till */
+      }
       window.location.href = url;
     } catch {
       toast.error(t('teacher.subscription.checkoutError'));
     } finally {
       setPending(null);
     }
-  }, [t, language]);
+  }, [t, language, user]);
 
   // Resume after sign-in only once the entitlement is read: the server turns an ineligible
   // trial into a paid checkout, and a Pro account must not be sent to buy Pro again.

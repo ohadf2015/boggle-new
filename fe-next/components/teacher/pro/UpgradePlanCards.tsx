@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { TEACHER_PRO_TRIAL_DAYS } from '@/lib/education/pro/trialDays';
-import { trackEduProUpgradeClicked } from '@/lib/education/proFunnelTelemetry';
+import { trackEduProUpgradeClicked, trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
 import { SCHOOL_PRICING } from '@/lib/education/pro/schoolPricing';
 import { SchoolPriceTag } from './SchoolPriceTag';
 import type { UpgradeViewer } from '@/lib/education/pro/upgradeViewer';
@@ -101,6 +101,11 @@ export function UpgradePlanCards({
   const buy = () => {
     try {
       trackEduProUpgradeClicked({ source: 'pricing_page' });
+      trackTeacherProUpgradeClick({
+        page: typeof window !== 'undefined' ? window.location.pathname : `/${language}/teacher/upgrade`,
+        locale: language,
+        placement: 'teacher_upgrade',
+      });
     } catch {
       /* analytics never blocks the till */
     }

@@ -6,11 +6,11 @@
  * takes `locale` and does not call that hook, so mounting it cannot crash boot.
  *
  * Price and caps come from freeTierLimits — the same numbers as
- * TeacherProCheckoutCta. Classroom term plan and Schools stay lead-capture
+ * TeacherProCheckoutCta. Schools ($49/teacher/year) stay lead-capture
  * (educationPackages.ts). This strip only links /teacher/upgrade.
  */
-import Link from 'next/link';
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { TeacherProUpgradeLink } from '@/components/education/TeacherProUpgradeLink';
 
 export const TEACHER_PRO_COMPARE_CHECKOUT_PATH = '/teacher/upgrade' as const;
 
@@ -100,13 +100,15 @@ export function TeacherProCompareCheckoutStrip({
       <h2 className="mb-2 font-neo-display text-2xl font-bold text-neo-white">{c.heading}</h2>
       <p className="mb-4 text-sm leading-relaxed text-neo-gray-200 sm:text-base">{c.body}</p>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <Link
+        <TeacherProUpgradeLink
           href={`/${locale}${TEACHER_PRO_COMPARE_CHECKOUT_PATH}`}
-          data-testid="teacher-pro-compare-checkout-link"
+          locale={locale}
+          placement="education_compare_strip"
+          testId="teacher-pro-compare-checkout-link"
           className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg"
         >
           {c.cta}
-        </Link>
+        </TeacherProUpgradeLink>
         <p className="text-xs font-semibold text-neo-white/70">{c.note}</p>
       </div>
     </aside>

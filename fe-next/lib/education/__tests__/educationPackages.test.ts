@@ -1,10 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import {
   EDUCATION_PACKAGES,
-  CLASSROOM_PLAN_PRICE_USD,
+  SCHOOL_PLAN_PRICE_USD,
+  SCHOOL_PLAN_MIN_TEACHERS,
   TEACHER_PRO_PRICE_USD,
   packageById,
 } from '../educationPackages';
+import { SCHOOL_PRICING } from '../pro/schoolPricing';
 
 describe('EDUCATION_PACKAGES', () => {
   it('anchors Teacher Pro at $9/mo with a checkout CTA (existing Polar path)', () => {
@@ -16,26 +18,21 @@ describe('EDUCATION_PACKAGES', () => {
     expect(pro.checkoutPath).toBe('/teacher/upgrade');
   });
 
-  it('anchors Classroom at $39/term with a lead form, never checkout', () => {
-    const classroom = packageById('classroom');
-    expect(classroom.priceUsd).toBe(CLASSROOM_PLAN_PRICE_USD);
-    expect(classroom.priceUsd).toBe(39);
-    expect(classroom.interval).toBe('term');
-    expect(classroom.cta).toBe('lead');
-    expect(classroom.leadPlan).toBe('classroom');
-    expect(classroom.checkoutPath).toBeUndefined();
-  });
-
-  it('offers Schools & districts as contact-us lead tagged school, no price, no checkout', () => {
+  it('anchors Schools & departments at $49/teacher/year with a lead form, never checkout', () => {
     const school = packageById('school');
-    expect(school.priceUsd).toBeNull();
+    expect(school.priceUsd).toBe(SCHOOL_PLAN_PRICE_USD);
+    expect(school.priceUsd).toBe(SCHOOL_PRICING.perTeacherYearUsd);
+    expect(school.priceUsd).toBe(49);
+    expect(school.interval).toBe('year');
     expect(school.cta).toBe('lead');
     expect(school.leadPlan).toBe('school');
     expect(school.checkoutPath).toBeUndefined();
+    expect(SCHOOL_PLAN_MIN_TEACHERS).toBe(5);
   });
 
-  it('is exactly the three public packages — no extra SKU, no billing product', () => {
-    expect(EDUCATION_PACKAGES.map((p) => p.id)).toEqual(['teacher_pro', 'classroom', 'school']);
+  it('is exactly the two public packages — no Classroom $39/term SKU', () => {
+    expect(EDUCATION_PACKAGES.map((p) => p.id)).toEqual(['teacher_pro', 'school']);
     expect(EDUCATION_PACKAGES.some((p) => p.cta === 'checkout' && p.id !== 'teacher_pro')).toBe(false);
+    expect(EDUCATION_PACKAGES.some((p) => (p as { id: string }).id === 'classroom')).toBe(false);
   });
 });

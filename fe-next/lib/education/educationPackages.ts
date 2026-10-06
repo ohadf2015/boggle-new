@@ -1,20 +1,33 @@
 /**
  * Public education packages. Teacher Pro is the only SKU with live billing.
- * Classroom ($39/term) and Schools (contact) are price anchors + lead capture
- * until ≥30 active classrooms or ≥10 qualified school leads.
+ * Schools & departments ($49 per teacher / year, 5+ teachers, invoice/PO via
+ * "Get a school quote") is the single school offer — same numbers as
+ * /teacher/upgrade and lib/education/pro/schoolPricing.ts.
  */
+import { SCHOOL_PRICING } from '@/lib/education/pro/schoolPricing';
+import { TEACHER_PRO_PRICE_USD as PRO_PRICE } from '@/lib/education/freeTierLimits';
 
-export const TEACHER_PRO_PRICE_USD = 9;
-export const CLASSROOM_PLAN_PRICE_USD = 39;
+export const TEACHER_PRO_PRICE_USD = PRO_PRICE;
+export const SCHOOL_PLAN_PRICE_USD = SCHOOL_PRICING.perTeacherYearUsd;
+export const SCHOOL_PLAN_MIN_TEACHERS = SCHOOL_PRICING.minTeachers;
 
-export type EducationPackageId = 'teacher_pro' | 'classroom' | 'school';
-export type EducationLeadPlan = 'classroom' | 'school';
+export type EducationPackageId = 'teacher_pro' | 'school';
+/** Lead form always tags the school tier (classroom $39/term plan retired 2026-10-06). */
+export type EducationLeadPlan = 'school';
 export type EducationPackageCta = 'checkout' | 'lead';
+
+export const SCHOOL_LEAD_SOURCES = [
+  'for-schools-page',
+  'classroom-plan', // historical; new submits use for-schools-page / school-district / teacher-upgrade
+  'school-district',
+  'teacher-upgrade',
+] as const;
+export type SchoolLeadSource = (typeof SCHOOL_LEAD_SOURCES)[number];
 
 export interface EducationPackage {
   id: EducationPackageId;
   priceUsd: number | null;
-  interval: 'month' | 'term' | null;
+  interval: 'month' | 'year' | null;
   cta: EducationPackageCta;
   leadPlan?: EducationLeadPlan;
   checkoutPath?: '/teacher/upgrade';
@@ -31,20 +44,12 @@ export const EDUCATION_PACKAGES: readonly EducationPackage[] = [
     leadSource: 'for-schools-page',
   },
   {
-    id: 'classroom',
-    priceUsd: CLASSROOM_PLAN_PRICE_USD,
-    interval: 'term',
-    cta: 'lead',
-    leadPlan: 'classroom',
-    leadSource: 'classroom-plan',
-  },
-  {
     id: 'school',
-    priceUsd: null,
-    interval: null,
+    priceUsd: SCHOOL_PLAN_PRICE_USD,
+    interval: 'year',
     cta: 'lead',
     leadPlan: 'school',
-    leadSource: 'school-district',
+    leadSource: 'for-schools-page',
   },
 ] as const;
 
@@ -53,11 +58,3 @@ export function packageById(id: EducationPackageId): EducationPackage {
   if (!found) throw new Error(`unknown education package: ${id}`);
   return found;
 }
-
-export const SCHOOL_LEAD_SOURCES = [
-  'for-schools-page',
-  'classroom-plan',
-  'school-district',
-  'teacher-upgrade',
-] as const;
-export type SchoolLeadSource = (typeof SCHOOL_LEAD_SOURCES)[number];

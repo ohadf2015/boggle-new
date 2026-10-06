@@ -15005,36 +15005,34 @@ const en = {
         "interest_pricing_info": "Pricing information",
         "country": "Country (optional)",
         "message": "Anything else? (optional)",
-        "submit": "Tell us about your school",
+        "submit": "Get a school quote",
         "submitting": "Sending…",
         "submit_error": "Couldn't send your form. Try again.",
         "rate_limited": "Too many submissions. Try again in 24 hours.",
         "success_title": "Thanks, we’ve got it",
         "success_body": "We’ll confirm your trial access and share school plan details within 1–2 business days. Keep playing with your class in the meantime. It’s free.",
         "class_size": "Class size",
+        "teachers": "How many teachers need Pro?",
         "privacy_note": "We’ll only use this to talk to you about school features. No spam."
       }
     },
     "packages": {
           "title": "Education packages",
-          "subtitle": "Teacher Pro is live billing. Classroom is a public price anchor. Tell us about your class. Schools and districts: contact us. No classroom checkout until demand hits the trigger.",
+          "subtitle": "Teacher Pro is self-serve billing. Schools & departments: $49 per teacher per year for 5+ teachers, paid by invoice or PO — request a quote below.",
           "teacherPro": {
                 "name": "Teacher Pro",
                 "interval": "/mo",
                 "blurb": "All reports, miss-gap homework, and reteach tools for one teacher.",
                 "cta": "Upgrade for $9/mo"
           },
-          "classroom": {
-                "name": "Classroom plan",
-                "interval": "/term",
-                "blurb": "Whole class, all Pro features, class streaks, and priority support.",
-                "cta": "Request Classroom for $39/term"
-          },
           "school": {
-                "name": "Schools & districts",
-                "price": "Contact us",
-                "blurb": "Rollout, admin, and district needs. Same form, tagged as a school lead.",
-                "cta": "Contact us"
+                "name": "Schools & departments",
+                "price": "From $49",
+                "priceFrom": "From",
+                "interval": "per teacher / year",
+                "priceTerms": "{min}+ teachers · invoice or purchase order",
+                "blurb": "Teacher Pro for every teacher on your team. Invoice or PO — no self-serve checkout.",
+                "cta": "Get a school quote"
           },
           "feature": {
                 "reports": "All class reports",
@@ -15044,7 +15042,8 @@ const en = {
                 "proPlus": "Every Teacher Pro feature included",
                 "streaks": "Class streaks",
                 "priority": "Priority support",
-                "district": "School and district rollout"
+                "district": "School and department rollout",
+                "invoice": "Invoice or purchase order"
           }
     },
     "teacher": {

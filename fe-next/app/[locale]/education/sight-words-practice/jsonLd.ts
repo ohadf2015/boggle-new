@@ -14,7 +14,7 @@ export function sightWordsExtraJsonLd(locale: string): Node[] {
     '@context': 'https://schema.org',
     ...educationProviderNode(locale),
     description:
-      'Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Classroom plan $39/term.',
+      'Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Schools & departments from $49 per teacher / year.',
     audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
     areaServed: ['US', 'IL', 'SE', 'JP', 'ES'],
     offers: [
@@ -23,7 +23,7 @@ export function sightWordsExtraJsonLd(locale: string): Node[] {
       // understated the free plan and contradicted every other surface.
       { '@type': 'Offer', name: 'Teacher Free', price: 0, priceCurrency: 'USD', category: 'free', description: 'Free tier for individual teachers, with no expiry: 3 classrooms of up to 50 students, custom word lists, live classroom games', availability: 'https://schema.org/InStock' },
       { '@type': 'Offer', name: 'Teacher Pro', price: 9, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 9, priceCurrency: 'USD', unitText: 'month' }, category: 'paid', description: 'Unlimited classrooms plus progress analytics and printable reports', availability: 'https://schema.org/InStock' },
-      { '@type': 'Offer', name: 'Classroom Plan', price: 39, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 39, priceCurrency: 'USD', unitText: 'term' }, category: 'paid', description: 'Whole class on every Teacher Pro feature: analytics, printable reports, unlimited classrooms', availability: 'https://schema.org/InStock' },
+      { '@type': 'Offer', name: 'Schools & departments', price: 49, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 49, priceCurrency: 'USD', unitText: 'year' }, category: 'paid', description: 'Teacher Pro for every teacher: from $49 per teacher / year for 5+ teachers, invoice or PO', availability: 'https://schema.org/InStock' },
     ],
   } as Node];
   // Hardcoded English steps, emitted on the EN build only — the same gate the
