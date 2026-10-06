@@ -7,6 +7,7 @@ import { teacherAccessAdminNotify } from '@/lib/email/templates/teacherAccessAdm
 import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
 import { teacherTrialExpiry } from '@/lib/education/trial';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
+import { buildEduAccessRequestCreatedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 import type { TeacherAccessFormPayload } from '@/lib/education/types';
 
 const ROLES = ['teacher', 'tutor', 'admin', 'parent', 'researcher', 'other'] as const;
@@ -95,6 +96,15 @@ export async function POST(req: Request) {
   // The idempotency guard (short-circuit above) protects against most duplicate
   // submits, so insert errors are real and should not be silently tolerated.
   if (ins.error) return bad('insert failed: ' + ins.error.message, 500);
+
+  // Growth Radar server step: record request creation once durably inserted.
+  try {
+    captureProFunnelServerEvent(
+      buildEduAccessRequestCreatedEvent(user.id, { role, locale })
+    );
+  } catch {
+    /* telemetry failure must never break access request */
+  }
 
   // Access is granted INSTANTLY on submit — no manual review step. The insert
   // only records the request; approval promotes the account in the same

@@ -1,11 +1,12 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { Mail, MailCheck, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { resendEmailVerification } from '@/lib/supabase';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { AccessRequestForm } from './AccessRequestForm';
 
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -37,6 +38,27 @@ export function AccessRequestGate() {
   const [authMode, setAuthMode] = useState<'signup' | 'signin' | null>(null);
   const [resend, setResend] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
+  type GateState = 'auth_required' | 'verify_email' | 'form';
+  const gateState: GateState | null = loading
+    ? null
+    : !user || user.is_anonymous || !user.email
+    ? 'auth_required'
+    : !user.email_confirmed_at
+    ? 'verify_email'
+    : 'form';
+
+  const lastEmittedState = useRef<GateState | null>(null);
+  useEffect(() => {
+    if (!gateState) return;
+    if (lastEmittedState.current === gateState) return;
+    lastEmittedState.current = gateState;
+    try {
+      trackGrowthEvent('edu_access_gate_viewed', { state: gateState });
+    } catch {
+      /* telemetry must never break access request */
+    }
+  }, [gateState]);
+
   // Wait for auth to resolve before choosing a branch — rendering the sign-up
   // prompt optimistically would flash it for already-authed users on reload.
   if (loading) {
@@ -56,7 +78,18 @@ export function AccessRequestGate() {
           {t('education.access.auth_required_title')}
         </h2>
         <p className="mt-2 text-neo-white/80">{t('education.access.auth_required_body')}</p>
-        <button type="button" onClick={() => setAuthMode('signup')} className={`mt-5 ${PRIMARY_CTA_CLASS}`}>
+        <button
+          type="button"
+          onClick={() => {
+            try {
+              trackGrowthEvent('edu_access_signup_tapped', { mode: 'signup' });
+            } catch {
+              /* telemetry must never break access request */
+            }
+            setAuthMode('signup');
+          }}
+          className={`mt-5 ${PRIMARY_CTA_CLASS}`}
+        >
           {t('education.access.auth_required_cta')}
           <DirectionalIcon
             icon={ArrowRight}
@@ -65,7 +98,14 @@ export function AccessRequestGate() {
         </button>
         <button
           type="button"
-          onClick={() => setAuthMode('signin')}
+          onClick={() => {
+            try {
+              trackGrowthEvent('edu_access_signup_tapped', { mode: 'signin' });
+            } catch {
+              /* telemetry must never break access request */
+            }
+            setAuthMode('signin');
+          }}
           className="mt-3 flex min-h-11 w-full items-center justify-center rounded-neo border-2 border-neo-cream/60 bg-neo-navy px-4 font-neo-display text-sm font-black text-neo-white shadow-hard-sm transition-[box-shadow] hover:shadow-hard focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           {t('education.access.auth_signin_cta')}
@@ -83,8 +123,21 @@ export function AccessRequestGate() {
     const onResend = async () => {
       if (!user.email || resend === 'sending') return;
       setResend('sending');
-      const { error } = await resendEmailVerification(user.email);
-      setResend(error ? 'error' : 'sent');
+      let ok = false;
+      try {
+        const { error } = await resendEmailVerification(user.email);
+        ok = !error;
+        setResend(error ? 'error' : 'sent');
+      } catch {
+        ok = false;
+        setResend('error');
+      } finally {
+        try {
+          trackGrowthEvent('edu_access_verify_resent', { ok });
+        } catch {
+          /* telemetry must never break access request */
+        }
+      }
     };
     return (
       <div className="text-neo-white">

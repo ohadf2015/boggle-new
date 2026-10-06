@@ -18,6 +18,7 @@ import {
   buildProTrialSucceededEvent,
   buildTrialCheckoutStartedEvent,
   buildTrialActivatedEvent,
+  buildEduAccessRequestCreatedEvent,
   captureProFunnelServerEvent,
 } from '../proFunnelServer';
 
@@ -69,6 +70,14 @@ describe('Pro funnel server events', () => {
       distinctId: 'u-1',
       event: 'edu_pro_checkout_succeeded',
       properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
+    });
+  });
+
+  it('Given an access request created, When built, Then it is edu_access_request_created with properties', () => {
+    expect(buildEduAccessRequestCreatedEvent('u-1', { role: 'teacher', locale: 'en' })).toEqual({
+      distinctId: 'u-1',
+      event: 'edu_access_request_created',
+      properties: { product: 'teacher_pro', role: 'teacher', locale: 'en' },
     });
   });
 
