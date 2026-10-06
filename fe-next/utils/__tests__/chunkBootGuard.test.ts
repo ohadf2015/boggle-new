@@ -122,4 +122,29 @@ describe('CHUNK_BOOT_GUARD_SCRIPT', () => {
     expect(CHUNK_BOOT_GUARD_SCRIPT).toMatch(/var mem=false/);
     expect(CHUNK_BOOT_GUARD_SCRIPT).toMatch(/if\(mem\)return true/);
   });
+  it('stops a storage-less client from looping across the hard navigation (window.name backstop)', () => {
+    // Storage-less clients get a per-page in-memory sessionStorage from the
+    // shim, and `mem` resets on navigation — only window.name survives.
+    const w = makeWindow(true);
+    runGuard(w.win as unknown as Record<string, unknown>);
+    fire(w, 'error', chunkMessage);
+    expect(w.win.location.replace).toHaveBeenCalledTimes(1);
+    const name = (w.win as unknown as { name?: string }).name;
+    expect(name).toContain('__lc_cbr1');
+    // Post-navigation page: fresh realm, storage still blocked, same tab name.
+    const w2 = makeWindow(true);
+    (w2.win as unknown as { name?: string }).name = name;
+    runGuard(w2.win as unknown as Record<string, unknown>);
+    fire(w2, 'error', chunkMessage);
+    expect(w2.win.location.replace).not.toHaveBeenCalled();
+    expect(w2.win.location.reload).not.toHaveBeenCalled();
+  });
+
+  it('preserves an existing window.name when marking', () => {
+    const w = makeWindow();
+    (w.win as unknown as { name?: string }).name = 'oauth-popup';
+    runGuard(w.win as unknown as Record<string, unknown>);
+    fire(w, 'error', script404);
+    expect((w.win as unknown as { name?: string }).name).toBe('oauth-popup__lc_cbr1');
+  });
 });

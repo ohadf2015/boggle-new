@@ -24,9 +24,13 @@
  * one-reload-per-session backstop for the whole tab session. Also keep an
  * in-memory `mem` flag so sessionStorage-unavailable clients (some bots)
  * still stop after one attempt.
+ * Follow-up: `mem` (and the storage shim's in-memory sessionStorage) reset on
+ * every navigation, so a storage-less client could still loop across
+ * reloads. Also stamp a marker into `window.name`, which survives same-tab
+ * navigations, so the one-reload backstop holds across the hard navigation.
  *
  * Static literal, inlined into a <script> tag in the locale layout — no user
  * input, must stay dependency-free (runs before the app bundle loads). Placed
  * AFTER the storage shim so sessionStorage is always safe to touch.
  */
-export const CHUNK_BOOT_GUARD_SCRIPT = `(function(){var KEY='lc_chunk_boot_reload';var PARAM='_lc_chunk';var mem=false;function has(){if(mem)return true;try{return sessionStorage.getItem(KEY)==='1'}catch(e){return false}}function mark(){mem=true;try{sessionStorage.setItem(KEY,'1')}catch(e){}}function navigateOnce(){if(has())return;mark();try{var u=new URL(window.location.href);u.searchParams.set(PARAM,String(Date.now()));window.location.replace(u.toString())}catch(e){window.location.reload()}}window.addEventListener('error',function(e){var t=e&&e.target;if(t&&(t.tagName==='SCRIPT'||t.tagName==='LINK')){var src=t.src||t.href||'';if(src.indexOf('/_next/static/')!==-1)navigateOnce();return}var m=(e&&e.message)||'';if(/loading (css )?chunk|dynamically imported module/i.test(m))navigateOnce()},true)})();`;
+export const CHUNK_BOOT_GUARD_SCRIPT = `(function(){var KEY='lc_chunk_boot_reload';var PARAM='_lc_chunk';var NM='__lc_cbr1';var mem=false;function nameHas(){try{return String(window.name||'').indexOf(NM)!==-1}catch(e){return false}}function has(){if(mem)return true;if(nameHas())return true;try{return sessionStorage.getItem(KEY)==='1'}catch(e){return false}}function mark(){mem=true;try{if(!nameHas())window.name=String(window.name||'')+NM}catch(e){}try{sessionStorage.setItem(KEY,'1')}catch(e){}}function navigateOnce(){if(has())return;mark();try{var u=new URL(window.location.href);u.searchParams.set(PARAM,String(Date.now()));window.location.replace(u.toString())}catch(e){window.location.reload()}}window.addEventListener('error',function(e){var t=e&&e.target;if(t&&(t.tagName==='SCRIPT'||t.tagName==='LINK')){var src=t.src||t.href||'';if(src.indexOf('/_next/static/')!==-1)navigateOnce();return}var m=(e&&e.message)||'';if(/loading (css )?chunk|dynamically imported module/i.test(m))navigateOnce()},true)})();`;
