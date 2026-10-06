@@ -18,7 +18,7 @@ import {
  * missing: surface it, never fake a URL.
  */
 export function useTeacherProCheckout(source: ProUpgradeSource) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [pending, setPending] = useState(false);
 
   const start = useCallback(async () => {
@@ -30,7 +30,7 @@ export function useTeacherProCheckout(source: ProUpgradeSource) {
     }
     setPending(true);
     try {
-      const result = await postTeacherProCheckout();
+      const result = await postTeacherProCheckout(fetch, { trial: false, locale: language });
       if (!result.ok) {
         if (result.status === 401) {
           toast.error(t('teacher.subscription.signInRequired'));
@@ -47,7 +47,7 @@ export function useTeacherProCheckout(source: ProUpgradeSource) {
     } finally {
       setPending(false);
     }
-  }, [pending, source, t]);
+  }, [pending, source, t, language]);
 
   return { pending, start };
 }
