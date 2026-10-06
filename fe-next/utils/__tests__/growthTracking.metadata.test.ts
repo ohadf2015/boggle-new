@@ -60,6 +60,15 @@ function firstNonSessionStartCall(mockFetch: ReturnType<typeof vi.fn>) {
   return call;
 }
 
+function fetchCallForEvent(mockFetch: ReturnType<typeof vi.fn>, eventType: string) {
+  const needle = `"event_type":"${eventType}"`;
+  const call = mockFetch.mock.calls.find(
+    (c) => (c[1]?.body as string | undefined)?.includes(needle)
+  );
+  if (!call) throw new Error(`No fetch call for event_type=${eventType}`);
+  return call;
+}
+
 describe('Analytics Metadata Enrichment', () => {
   describe('1. Platform Detection', () => {
     it('injects platform into metadata for game_completed events', async () => {
@@ -433,7 +442,9 @@ describe('Analytics Metadata Enrichment', () => {
       trackGameEnd('singleplayer', 100, 5, true, 60, { language: 'ja' });
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const body = firstNonSessionStartCall(mockFetch)[1]?.body as string;
+      // Caller extras land on game_completed. first_game_played now emits
+      // first (activation-order fix) and does not take extras.language.
+      const body = fetchCallForEvent(mockFetch, 'game_completed')[1]?.body as string;
       expect(body).toContain('"language":"ja"');
     });
   });
