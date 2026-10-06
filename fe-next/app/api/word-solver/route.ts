@@ -93,12 +93,18 @@ export async function POST(request: NextRequest) {
     return rateLimitResponse(rateLimit);
   }
 
-  let body: WordSolverRequest;
+  let parsed: unknown;
   try {
-    body = await request.json();
+    parsed = await request.json();
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
+  // `null`, a number or an array is valid JSON but not a request object; destructuring
+  // `null` would throw and surface as a 500.
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+  }
+  const body = parsed as Partial<WordSolverRequest>;
 
   const { letters, language: rawLang = 'en' } = body;
   const language = (VALID_LANGUAGES.includes(rawLang as SolverLanguage) ? rawLang : 'en') as SolverLanguage;
