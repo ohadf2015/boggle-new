@@ -13,13 +13,13 @@ export const layoutTranslations: Record<string, any> = {
       "language": "English",
       "leaderboard": {
         "title": "Global Leaderboard - Top Players",
-        "description": "View the top-ranked players on LexiClash global leaderboard. Compete with word game enthusiasts worldwide and track your progress to become the ultimate word master.",
+        "description": "See LexiClash's top word game players. Compete with enthusiasts worldwide, track your progress, and climb to become the ultimate word master.",
         "ogTitle": "Global Leaderboard - Top Word Game Players",
         "ogDescription": "See where you rank among the best word game players. Join LexiClash and compete for the top spot!"
       },
       "profile": {
         "title": "Your Profile & Stats",
-        "description": "View your LexiClash profile, game statistics, achievements, and progress. Track your wins, total score, words found, and time played in this competitive word game.",
+        "description": "View your LexiClash profile, stats, and achievements. Track wins, total score, words found, and time played in this competitive word game.",
         "ogTitle": "Player Profile & Game Stats - LexiClash",
         "ogDescription": "Track your word game achievements, statistics, and climb the leaderboard rankings."
       },
@@ -31,7 +31,7 @@ export const layoutTranslations: Record<string, any> = {
       },
       "terms": {
         "title": "Terms of Service",
-        "description": "Read LexiClash Terms of Service. Learn about user rights, acceptable use, account management, and our game policies for this multiplayer word game platform.",
+        "description": "Read LexiClash Terms of Service. Learn about user rights, acceptable use, account management, and our game policies for this multiplayer platform.",
         "ogTitle": "Terms of Service - LexiClash",
         "ogDescription": "LexiClash Terms of Service - User rights and acceptable use policies."
       },
@@ -49,7 +49,7 @@ export const layoutTranslations: Record<string, any> = {
       },
       "singleplayer": {
         "title": "Play Boggle Online Free - No Download, No Signup Word Game",
-        "description": "Play free boggle online — no download required, no signup needed! LexiClash single player lets you practice word finding, challenge AI bots, and improve your vocabulary. Multiple difficulty levels from easy to hard. The best free boggle alternative you can play instantly in your browser. Like Words With Friends but solo!",
+        "description": "Play boggle free online — no download, no signup. Challenge AI bots, improve your vocabulary, beat your best score. Instant browser play, multiple difficulty levels.",
         "ogTitle": "Play Boggle Free Online - No Download Needed",
         "ogDescription": "Play free boggle online — no download, no signup. Practice word finding solo, challenge AI bots, and beat your high scores instantly."
       },
@@ -66,8 +66,8 @@ export const layoutTranslations: Record<string, any> = {
         "ogDescription": "Words With Friends alternative — everyone plays at once! Host rooms, invite 2-20+ friends, compete in live word battles. Free, no download!"
       },
       "about": {
-        "title": "About Us - Our Story & Mission",
-        "description": "Learn about LexiClash, the real-time multiplayer word game. Discover our mission to make language learning fun and competitive, our technology, education tools, and growing community across 6 languages.",
+        "title": "About LexiClash — Free Word Game Story & Mission",
+        "description": "LexiClash is a free real-time multiplayer word game. Discover our mission, technology, education tools, and growing community spanning 6 languages.",
         "ogTitle": "About LexiClash - Word Game Innovation",
         "ogDescription": "The story behind LexiClash: making language learning fun and competitive through real-time word battles."
       },
@@ -78,14 +78,14 @@ export const layoutTranslations: Record<string, any> = {
         "ogDescription": "Get in touch with the LexiClash team. Send feedback, report issues, or just say hello."
       },
       "faq": {
-        "title": "Frequently Asked Questions",
+        "title": "LexiClash FAQ — Word Game Rules, Scoring & How to Play",
         "description": "Find answers to common questions about LexiClash word game. Learn about gameplay, scoring, account management, multiplayer features, and technical support.",
         "ogTitle": "FAQ - LexiClash Word Game",
         "ogDescription": "Answers to common questions about LexiClash gameplay, scoring, accounts, and more."
       },
       "blog": {
         "title": "Word Game Tips & Strategies - Free Resources",
-        "description": "Tips, strategies, and insights for word game enthusiasts. Learn how to improve your vocabulary, master word-finding techniques, and become a LexiClash champion.",
+        "description": "Tips, strategies, and insights for word game lovers. Improve your vocabulary, master word-finding techniques, and become a LexiClash champion.",
         "ogTitle": "LexiClash Blog - Word Game Tips & Strategies",
         "ogDescription": "Expert tips, strategies, and insights to improve your word game skills."
       },
