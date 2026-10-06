@@ -24,6 +24,11 @@ import {
  * ONE cache-busting hard navigation per session (same policy as retryImport
  * and the boot guard). Mounted once, app-wide, beside VersionChecker.
  */
+// Module-scope backstop: when sessionStorage is unavailable (some crawlers /
+// privacy modes), getGuard previously always returned false → infinite reload.
+// UR 2026-10-06 P1 (t_74b37219).
+let memoryGuard = false;
+
 export default function ChunkErrorRecovery(): null {
   useEffect(() => {
     stripChunkReloadParam();
@@ -42,17 +47,21 @@ export default function ChunkErrorRecovery(): null {
           return data?.buildTime;
         },
         getGuard: () => {
+          // Prefer sessionStorage when it works so vitest / clean sessions
+          // that clear the key are not stuck behind a leaked module flag.
+          // memoryGuard only covers the sessionStorage-throws path (bots).
           try {
             return sessionStorage.getItem(CHUNK_RECOVERY_GUARD_KEY) === 'true';
           } catch {
-            return false;
+            return memoryGuard;
           }
         },
         setGuard: () => {
+          memoryGuard = true;
           try {
             sessionStorage.setItem(CHUNK_RECOVERY_GUARD_KEY, 'true');
           } catch {
-            /* sessionStorage unavailable — one-shot navigation is still the primary guard */
+            /* memoryGuard still blocks further attempts this JS realm */
           }
         },
         clearCachesAndReload,
