@@ -2321,7 +2321,7 @@ const en = {
     },
     "profile": {
       "title": "Your Player Profile, Stats & Game Achievements",
-      "description": "View your LexiClash profile, game statistics, achievements, and progress. Track your wins, total score, words found, and time played in this competitive word game.",
+      "description": "View your LexiClash profile, stats, and achievements. Track wins, total score, words found, and time played in this competitive word game.",
       "ogTitle": "Player Profile & Game Stats - LexiClash",
       "ogDescription": "Track your word game achievements, statistics, and climb the leaderboard rankings."
     },
@@ -2333,7 +2333,7 @@ const en = {
     },
     "terms": {
       "title": "Terms of Service - User Agreement & Policies",
-      "description": "Read LexiClash Terms of Service. Learn about user rights, acceptable use, account management, and our game policies for this multiplayer word game platform.",
+      "description": "Read LexiClash Terms of Service. Learn about user rights, acceptable use, account management, and our game policies for this multiplayer platform.",
       "ogTitle": "Terms of Service - LexiClash",
       "ogDescription": "LexiClash Terms of Service - User rights and acceptable use policies."
     },
@@ -2351,7 +2351,7 @@ const en = {
     },
     "singleplayer": {
       "title": "Play Boggle Online Free - No Download Word Game",
-      "description": "Play free boggle online — no download required! LexiClash single player lets you practice word finding, challenge AI bots, and improve your vocabulary. Multiple difficulty levels from easy to hard. Play boggle free in your browser instantly.",
+      "description": "Play boggle free online — no download, no signup. Challenge AI bots, improve vocabulary, and beat your best score. Multiple difficulty levels.",
       "ogTitle": "Play Boggle Free Online - No Download",
       "ogDescription": "Play free boggle online — no download needed. Practice word finding solo, challenge AI bots, and beat your high scores."
     },
@@ -2362,14 +2362,14 @@ const en = {
       "ogDescription": "Daily Word Wheel + Word Hunt. Same puzzle worldwide, share emoji results, build a streak. Free, no signup."
     },
     "multiplayer": {
-      "title": "Free Multiplayer Word Game — 2-20 Players, 8 Modes, No Signup | LexiClash",
-      "description": "Real-time multiplayer word battles, 2-20 players, no signup. Host a room, share the link, compete live in 8 game modes across 6 languages. Daily leaderboard. Play free now →",
+      "title": "Free Multiplayer Word Game — 8 Modes, No Signup | LexiClash",
+      "description": "Real-time word battles, 2-20 players, no signup. Host a room, share the link, compete live in 8 modes across 6 languages. Daily leaderboard. Play free →",
       "ogTitle": "Real-Time Word Battles, 2-20 Players — Play Free",
       "ogDescription": "Host a room, share the link, race for words with up to 20 friends. 8 modes, 6 languages. Free in your browser."
     },
     "about": {
       "title": "About LexiClash - Our Story, Mission & Team",
-      "description": "Learn about LexiClash, the real-time multiplayer word game. Discover our mission to make language learning fun and competitive, our technology, education tools, and growing community across 6 languages.",
+      "description": "LexiClash is a free real-time multiplayer word game. Discover our mission, technology, education tools, and growing community spanning 6 languages.",
       "ogTitle": "About LexiClash - Word Game Innovation",
       "ogDescription": "The story behind LexiClash: making language learning fun and competitive through real-time word battles."
     },
@@ -2399,7 +2399,7 @@ const en = {
     },
     "blog": {
       "title": "Word Game Tips & Strategies - Free Resources",
-      "description": "Tips, strategies, and insights for word game enthusiasts. Learn how to improve your vocabulary, master word-finding techniques, and become a LexiClash champion.",
+      "description": "Tips, strategies, and insights for word game lovers. Improve your vocabulary, master word-finding techniques, and become a LexiClash champion.",
       "ogTitle": "LexiClash Blog - Word Game Tips & Strategies",
       "ogDescription": "Expert tips, strategies, and insights to improve your word game skills."
     },
