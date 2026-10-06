@@ -1418,6 +1418,18 @@ export const trackGameEnd = (
   // does not double-emit `game_abandoned`.
   markGameInactive();
 
+  // Activation must land BEFORE game_completed on the same tick. Ordered
+  // funnels (PostHog + Growth Radar) with first_game_played → game_completed
+  // dropped ~94% of finishers when game_completed was timestamped first.
+  if (completed) {
+    markFirstGameActivation({
+      won: extras.isWinner === true,
+      score,
+      wordCount,
+      mode,
+    });
+  }
+
   trackGrowthEvent(completed ? 'game_completed' : 'game_abandoned', {
     ...extras,
     mode,
@@ -1442,13 +1454,6 @@ export const trackGameEnd = (
     setPostHogUserPropsOnce({
       first_mode_played: mode,
       first_played_at: new Date().toISOString(),
-    });
-
-    markFirstGameActivation({
-      won: extras.isWinner === true,
-      score,
-      wordCount,
-      mode,
     });
 
     // Daily retention streak: every completed game counts as "played today"
