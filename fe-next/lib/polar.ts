@@ -93,25 +93,21 @@ export class PolarClient {
     productId,
     email,
     redirectUrl,
-    locale,
     allowTrial = false,
   }: {
     userId: string
     productId: string
     email?: string
     redirectUrl?: string
-    /** Locale prefix for the fallback success_url (validated by callers). */
-    locale?: string
     allowTrial?: boolean
   }): Promise<string> {
     const trial = allowTrial === true
-    const successLocale = locale ?? 'en'
     const response = await this.request<{ url: string }>('/v1/checkouts/', {
       method: 'POST',
       body: JSON.stringify({
         products: [productId],
         success_url:
-          redirectUrl || `${process.env.NEXT_PUBLIC_APP_URL}/${successLocale}/teacher?checkout=success`,
+          redirectUrl || `${process.env.NEXT_PUBLIC_APP_URL}/teacher?checkout=success`,
         ...(email ? { customer_email: email } : {}),
         external_customer_id: userId,
         metadata: { user_id: userId, trial },

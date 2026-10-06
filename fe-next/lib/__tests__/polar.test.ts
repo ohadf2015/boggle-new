@@ -136,52 +136,6 @@ describe('PolarClient.createCheckout', () => {
     })
   })
 
-  it('builds the fallback success_url with the /en prefix by default', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc' }),
-    })
-    vi.stubGlobal('fetch', fetchMock)
-    process.env.NEXT_PUBLIC_APP_URL = 'https://www.lexiclash.live'
-
-    const client = new PolarClient('token-123', 'sandbox')
-    await client.createCheckout({ userId: 'user-1', productId: 'prod-1' })
-
-    const body = JSON.parse(fetchMock.mock.calls[0][1].body)
-    expect(body.success_url).toBe('https://www.lexiclash.live/en/teacher?checkout=success')
-    delete process.env.NEXT_PUBLIC_APP_URL
-  })
-
-  it('builds the fallback success_url with the given locale prefix', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc' }),
-    })
-    vi.stubGlobal('fetch', fetchMock)
-    process.env.NEXT_PUBLIC_APP_URL = 'https://www.lexiclash.live'
-
-    const client = new PolarClient('token-123', 'sandbox')
-    await client.createCheckout({ userId: 'user-1', productId: 'prod-1', locale: 'he' })
-
-    const body = JSON.parse(fetchMock.mock.calls[0][1].body)
-    expect(body.success_url).toBe('https://www.lexiclash.live/he/teacher?checkout=success')
-    delete process.env.NEXT_PUBLIC_APP_URL
-  })
-
-  it('lets redirectUrl override the locale-aware success_url', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc' }),
-    })
-    vi.stubGlobal('fetch', fetchMock)
-
-    const client = new PolarClient('token-123', 'sandbox')
-    await client.createCheckout({ userId: 'user-1', productId: 'prod-1', locale: 'he', redirectUrl: 'https://example.com/done' })
-
-    const body = JSON.parse(fetchMock.mock.calls[0][1].body)
-    expect(body.success_url).toBe('https://example.com/done')
-  })
-
   it('throws on Polar API errors', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 401, text: async () => 'unauthorized' }))
     const client = new PolarClient('bad-token', 'production')

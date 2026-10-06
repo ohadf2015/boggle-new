@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { NextRequest } from 'next/server'
 
 const createCheckout = vi.fn()
 vi.mock('@/lib/polar', () => ({
@@ -82,48 +81,7 @@ describe('POST /api/subscription/checkout', () => {
       productId: 'prod-pro-1',
       email: 'teacher@example.com',
       allowTrial: false,
-      locale: 'en',
     })
-  })
-
-  it('uses the locale from the JSON body', async () => {
-    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
-    const res = await POST(new Request('http://localhost/api/subscription/checkout', {
-      method: 'POST',
-      body: JSON.stringify({ trial: false, locale: 'he' }),
-      headers: { 'Content-Type': 'application/json' },
-    }))
-    expect(res.status).toBe(200)
-    expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ locale: 'he' }))
-  })
-
-  it('rejects an unsupported body locale and falls back to the boggle_language cookie', async () => {
-    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
-    // `cookie` is a forbidden header name for plain Request construction
-    // (silently dropped), so seed it via NextRequest.cookies.
-    const request = new NextRequest('http://localhost/api/subscription/checkout', {
-      method: 'POST',
-      body: JSON.stringify({ trial: false, locale: 'xx' }),
-      headers: { 'Content-Type': 'application/json' },
-    })
-    request.cookies.set('boggle_language', 'sv')
-    const res = await POST(request)
-    expect(res.status).toBe(200)
-    expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ locale: 'sv' }))
-  })
-
-  it('defaults to en when neither body nor cookie carries a supported locale', async () => {
-    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
-    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
-    const res = await POST(new Request('http://localhost/api/subscription/checkout', {
-      method: 'POST',
-      body: JSON.stringify({ trial: false, locale: 'xx' }),
-      headers: { 'Content-Type': 'application/json' },
-    }))
-    expect(res.status).toBe(200)
-    expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ locale: 'en' }))
   })
 
   it('an empty JSON body stays on the paid checkout', async () => {

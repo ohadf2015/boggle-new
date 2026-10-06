@@ -38,7 +38,7 @@ export function TeacherProTrialExpiringBanner({
   trialExpires,
   onDismiss,
 }: TeacherProTrialExpiringBannerProps) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [nowMs] = useState(() => Date.now());
   const [isDismissed, setIsDismissed] = useState(false);
   const [pending, setPending] = useState(false);
@@ -62,7 +62,6 @@ export function TeacherProTrialExpiringBanner({
       const response = await fetch('/api/subscription/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trial: false, locale: language }),
       });
       if (!response.ok) {
         if (response.status === 503) {
@@ -83,7 +82,7 @@ export function TeacherProTrialExpiringBanner({
     } finally {
       setPending(false);
     }
-  }, [pending, daysRemaining, t, language]);
+  }, [pending, daysRemaining, t]);
 
   const handleDismiss = useCallback(() => {
     setIsDismissed(true);

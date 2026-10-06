@@ -17,7 +17,7 @@ export function TeacherActivationCompleteCard({
 }: {
   onDismiss?: () => void;
 }) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export function TeacherActivationCompleteCard({
     }
     setPending(true);
     try {
-      const result = await postTeacherProCheckout(fetch, { trial: true, locale: language });
+      const result = await postTeacherProCheckout(fetch, { trial: true });
       if (!result.ok) {
         if (result.status === 401) toast.error(t('teacher.subscription.signInRequired'));
         else if (result.status === 503) toast.error(t('teacher.subscription.checkoutUnavailable'));
@@ -50,7 +50,7 @@ export function TeacherActivationCompleteCard({
     } finally {
       setPending(false);
     }
-  }, [pending, t, language]);
+  }, [pending, t]);
 
   return (
     <NeoPanel

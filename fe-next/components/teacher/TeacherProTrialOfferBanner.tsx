@@ -22,7 +22,7 @@ import {
  * week-long "not now", not a permanent hide.
  */
 export function TeacherProTrialOfferBanner({ onDismiss }: { onDismiss?: () => void }) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export function TeacherProTrialOfferBanner({ onDismiss }: { onDismiss?: () => vo
     }
     setPending(true);
     try {
-      const result = await postTeacherProCheckout(fetch, { trial: true, locale: language });
+      const result = await postTeacherProCheckout(fetch, { trial: true });
       if (!result.ok) {
         if (result.status === 401) {
           toast.error(t('teacher.subscription.signInRequired'));
@@ -59,7 +59,7 @@ export function TeacherProTrialOfferBanner({ onDismiss }: { onDismiss?: () => vo
     } finally {
       setPending(false);
     }
-  }, [pending, t, language]);
+  }, [pending, t]);
 
   return (
     <aside

@@ -108,8 +108,9 @@ export default function UpgradePricingPageClient() {
     try {
       const response = await fetch('/api/subscription/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trial, locale: language }),
+        ...(trial
+          ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ trial: true }) }
+          : {}),
       });
       if (!response.ok) {
         if (response.status === 401) {

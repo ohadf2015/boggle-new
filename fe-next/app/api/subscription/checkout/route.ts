@@ -3,7 +3,6 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { resolveProEntitlement } from '@/lib/education/proGrant';
 import { getPolarClient, getProProductId } from '@/lib/polar';
 import { createAdminClient } from '@/utils/supabase/admin';
-import { locales, defaultLocale } from '@/i18n/config';
 import logger from '@/utils/logger';
 import { buildProCheckoutStartedEvent, buildProTrialStartedEvent, buildTrialCheckoutStartedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 
@@ -38,38 +37,17 @@ async function polarTrialBlocked(userId: string): Promise<boolean> {
 /**
  * `{ trial: true }` starts the 14-day Teacher Pro trial. Empty body, malformed
  * JSON, and any other value stay on the paid checkout — older clients post
- * with no body at all. The same parse also carries the caller's `locale`.
+ * with no body at all.
  */
-async function parseCheckoutBody(
-  request: NextRequest,
-): Promise<{ trial: boolean; locale: string }> {
+async function wantsTrial(request: NextRequest): Promise<boolean> {
   const raw = await request.text();
-  if (!raw.trim()) return { trial: false, locale: '' };
+  if (!raw.trim()) return false;
   try {
-    const parsed = JSON.parse(raw) as { trial?: unknown; locale?: unknown };
-    return {
-      trial: parsed?.trial === true,
-      locale: typeof parsed?.locale === 'string' ? parsed.locale : '',
-    };
+    const parsed = JSON.parse(raw) as { trial?: unknown };
+    return parsed?.trial === true;
   } catch {
-    return { trial: false, locale: '' };
+    return false;
   }
-}
-
-/**
- * The post-checkout success page only exists under /[locale] — a locale-less
- * /teacher?checkout=success 404s. Priority: explicit body locale (validated
- * against the shipped locales) > boggle_language cookie > default 'en'.
- */
-function resolveCheckoutLocale(bodyLocale: string, cookieHeader: string | null): string {
-  if (bodyLocale && (locales as readonly string[]).includes(bodyLocale)) return bodyLocale;
-  const cookieLocale = cookieHeader
-    ?.split(';')
-    .map((c) => c.trim())
-    .find((c) => c.startsWith('boggle_language='))
-    ?.split('=')[1];
-  if (cookieLocale && (locales as readonly string[]).includes(cookieLocale)) return cookieLocale;
-  return defaultLocale;
 }
 
 /**
@@ -102,16 +80,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await parseCheckoutBody(request);
-    const trial = body.trial && !(await polarTrialBlocked(user.id));
-    const locale = resolveCheckoutLocale(body.locale, request.headers.get('cookie'));
+    const requestedTrial = await wantsTrial(request);
+    const trial = requestedTrial && !(await polarTrialBlocked(user.id));
     const client = getPolarClient();
     const checkoutUrl = await client.createCheckout({
       userId: user.id,
       productId: getProProductId(),
       email: user.email ?? undefined,
       allowTrial: trial,
-      locale,
     });
 
     // Analytics only, after the checkout exists; never able to change the answer.
