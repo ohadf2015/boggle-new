@@ -17,7 +17,7 @@ import logger from '@/utils/logger';
  *
  * Weekly Monday 07:00 UTC: email Ohad every school_leads row from the last 7 days.
  * Instant notify is the primary path; this is the unread-pipeline safety net for
- * the $39/term Classroom plan.
+ * the Schools & departments quote form ($49/teacher/year).
  *
  * Security: CRON_SECRET via x-cron-secret or Authorization: Bearer.
  * `?dry=1` returns who would be listed and sends nothing.

@@ -17,7 +17,7 @@
       "name": "What does a school or district plan include?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The Classroom plan ($39/term, through the form on this page) covers a whole class with every Teacher Pro feature -- analytics, reports, homework tools -- plus class streaks and priority support. Admin dashboards, cross-class analytics, curriculum libraries and SSO for school or district rollout are on our roadmap, not shipped yet -- tell us what you need and we will follow up, with pricing on request."
+        "text": "Schools & departments are $49 per teacher per year for 5+ teachers, paid by invoice or purchase order via the form on this page — every teacher gets Teacher Pro (analytics, reports, homework tools). Admin dashboards, cross-class analytics, curriculum libraries and SSO for school or district rollout are on our roadmap, not shipped yet -- tell us what you need and we will follow up."
       }
     },
     {
@@ -41,7 +41,7 @@
       "name": "How do we start our trial or get a school plan?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Sign up as a teacher to start your own 14-day Teacher Pro trial. Rolling out to a whole class or school instead? Fill in the form on this page with your role, school and rough student count, and we'll follow up about the Classroom plan or a school/district quote."
+        "text": "Sign up as a teacher to start your own 14-day Teacher Pro trial. Rolling out to a school or department instead? Fill in the form on this page with your role, school and how many teachers need Pro, and we'll follow up with a school quote ($49 per teacher / year, 5+ teachers, invoice/PO)."
       }
     },
     {
@@ -85,7 +85,7 @@
   "@id": "https://www.lexiclash.live/en/education#org",
   "name": "LexiClash Education",
   "url": "https://www.lexiclash.live/en/education",
-  "description": "Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Classroom plan $39/term; schools and districts contact us.",
+  "description": "Multiplayer vocabulary games for schools — 6 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free tier for teachers: 3 classes of up to 50 students. Teacher Pro $9/month; Schools & departments from $49 per teacher / year (5+ teachers, invoice/PO).",
   "audience": {
     "@type": "EducationalAudience",
     "educationalRole": "teacher"
@@ -124,24 +124,22 @@
     },
     {
       "@type": "Offer",
-      "name": "Classroom plan",
-      "price": 39,
+      "name": "Schools & departments",
+      "price": 49,
       "priceCurrency": "USD",
       "priceSpecification": {
         "@type": "UnitPriceSpecification",
-        "price": 39,
+        "price": 49,
         "priceCurrency": "USD",
-        "unitText": "term"
+        "unitText": "year",
+        "referenceQuantity": {
+          "@type": "QuantitativeValue",
+          "value": 1,
+          "unitText": "teacher"
+        }
       },
       "category": "paid",
-      "description": "Whole class, all Pro features, class streaks and priority support. Lead capture until school billing trigger.",
-      "availability": "https://schema.org/InStock"
-    },
-    {
-      "@type": "Offer",
-      "name": "Schools & districts",
-      "category": "paid",
-      "description": "Contact us for school and district rollout. Same lead form, tagged school_lead. No public checkout.",
+      "description": "Teacher Pro for every teacher on the team. From $49 per teacher / year for 5+ teachers, paid by invoice or purchase order. Lead capture via Get a school quote — no public checkout.",
       "availability": "https://schema.org/InStock"
     }
   ]

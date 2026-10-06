@@ -17,7 +17,7 @@ export type EducationSeoEntry = {
 export const educationSeoContent: Record<string, EducationSeoEntry> = {
   en: {
     title: 'Free Vocabulary Games for the Classroom — No Student Logins',
-    description: 'Free word and vocabulary games for your classroom — no student accounts and no downloads. Bring your own word lists, run whole-class multiplayer in any browser, and teach vocabulary in 6 languages including Hebrew and Japanese. Free for teachers; Teacher Pro $9/month with a 14-day trial; Classroom plan $39/term.',
+    description: 'Free word and vocabulary games for your classroom — no student accounts and no downloads. Bring your own word lists, run whole-class multiplayer in any browser, and teach vocabulary in 6 languages including Hebrew and Japanese. Free for teachers; Teacher Pro $9/month with a 14-day trial; Schools & departments from $49 per teacher / year (5+ teachers, invoice/PO).',
     features: [
       'Classroom word games designed for student engagement and learning outcomes',
       'Vocabulary duels between students for competitive, fun review sessions',

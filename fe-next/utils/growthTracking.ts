@@ -258,6 +258,12 @@ export type GrowthEvent =
   | 'trial_cta_tap'
   | 'edu_pro_upgrade_clicked'
   | 'edu_pro_checkout_success_seen'
+  // School pricing unify (2026-10-06): explicit GTM event names for Teacher Pro
+  // CTAs + school quote. education_upsell_impression stays the impression twin.
+  | 'teacher_pro_upgrade_click'
+  | 'teacher_pro_checkout_started'
+  | 'teacher_pro_checkout_redirect'
+  | 'school_quote_requested'
   // ESL winner-page depth (t_25b9ddb1). Demo start + CEFR list pick on
   // /education/esl-word-games. Props: { cefr: 'A1'|'A2'|'B1', page }.
   | 'edu_page_play_demo_started'

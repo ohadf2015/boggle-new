@@ -6,15 +6,16 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import {
   EDUCATION_PACKAGES,
+  SCHOOL_PLAN_MIN_TEACHERS,
   type EducationLeadPlan,
   type EducationPackage,
   type EducationPackageId,
 } from '@/lib/education/educationPackages';
+import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
 import { SchoolLeadForm } from '@/components/education/SchoolLeadForm';
 
 const I18N: Record<EducationPackageId, string> = {
   teacher_pro: 'teacherPro',
-  classroom: 'classroom',
   school: 'school',
 };
 
@@ -24,15 +25,10 @@ const FEATURES: Record<EducationPackageId, string[]> = {
     'education.packages.feature.homework',
     'education.packages.feature.reteach',
   ],
-  classroom: [
-    'education.packages.feature.wholeClass',
-    'education.packages.feature.proPlus',
-    'education.packages.feature.streaks',
-    'education.packages.feature.priority',
-  ],
   school: [
     'education.packages.feature.district',
     'education.packages.feature.proPlus',
+    'education.packages.feature.invoice',
     'education.packages.feature.priority',
   ],
 };
@@ -66,7 +62,7 @@ export function EducationPackages({
         {t('education.packages.title')}
       </h2>
       <p className="mt-3 max-w-3xl text-neo-gray-200">{t('education.packages.subtitle')}</p>
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
         {EDUCATION_PACKAGES.map((pkg) => (
           <PackageCard
             key={pkg.id}
@@ -89,11 +85,11 @@ function PackageCard({
 }: {
   pkg: EducationPackage;
   locale: string;
-  t: (k: string) => string;
+  t: (k: string, params?: Record<string, string | number>) => string;
   onLead: (plan: EducationLeadPlan) => void;
 }) {
   const ns = I18N[pkg.id];
-  const highlighted = pkg.id === 'classroom';
+  const highlighted = pkg.id === 'school';
   return (
     <article
       className={
@@ -104,8 +100,14 @@ function PackageCard({
     >
       <h3 className="font-neo-display text-xl font-black">{t(`education.packages.${ns}.name`)}</h3>
       <p className="mt-3 font-neo-display text-4xl font-black leading-none">
-        {pkg.priceUsd === null ? (
-          t('education.packages.school.price')
+        {pkg.id === 'school' ? (
+          <>
+            <span className="me-1 text-base font-bold opacity-80">{t('education.packages.school.priceFrom')}</span>
+            ${pkg.priceUsd}
+            <span className="ms-1 text-base font-bold opacity-80">
+              {t('education.packages.school.interval')}
+            </span>
+          </>
         ) : (
           <>
             ${pkg.priceUsd}
@@ -115,6 +117,11 @@ function PackageCard({
           </>
         )}
       </p>
+      {pkg.id === 'school' && (
+        <p className={`mt-1.5 text-xs font-bold ${highlighted ? 'text-neo-navy/70' : 'text-neo-white/70'}`}>
+          {t('education.packages.school.priceTerms', { min: SCHOOL_PLAN_MIN_TEACHERS })}
+        </p>
+      )}
       <p className={`mt-3 text-sm ${highlighted ? 'text-neo-navy/80' : 'text-neo-gray-200'}`}>
         {t(`education.packages.${ns}.blurb`)}
       </p>
@@ -126,6 +133,17 @@ function PackageCard({
       {pkg.cta === 'checkout' && pkg.checkoutPath ? (
         <Link
           href={`/${locale}${pkg.checkoutPath}`}
+          onClick={() => {
+            try {
+              trackTeacherProUpgradeClick({
+                page: typeof window !== 'undefined' ? window.location.pathname : `/${locale}/education/for-schools`,
+                locale,
+                placement: 'education_packages',
+              });
+            } catch {
+              /* analytics must never block */
+            }
+          }}
           className="mt-6 rounded-neo border-4 border-neo-black bg-neo-yellow px-4 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all hover:-translate-y-0.5"
         >
           {t('education.packages.teacherPro.cta')}
@@ -168,7 +186,7 @@ export function ForSchoolsPackages({
         </div>
         <div className="lg:col-span-7">
           <div className="rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-xl">
-            <SchoolLeadForm plan={plan} />
+            <SchoolLeadForm plan={plan} page={`/${locale}/education/for-schools`} />
           </div>
         </div>
       </section>

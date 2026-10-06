@@ -117,3 +117,51 @@ export function trackEduProMissedHomeworkAssigned(args: {
     lesson_count: args.lessonCount,
   });
 }
+
+/** Placement for teacher_pro_upgrade_click — where the CTA lived. */
+export type TeacherProUpgradePlacement =
+  | 'teacher_upgrade'
+  | 'education_packages'
+  | 'education_compare_strip'
+  | 'results_upsell'
+  | 'education_landing'
+  | 'other';
+
+/**
+ * Client click on any Teacher Pro CTA (education pages, results upsell, /teacher/upgrade).
+ * Pairs with education_upsell_impression. Also mirrors to Growth Radar.
+ */
+export function trackTeacherProUpgradeClick(args: {
+  page: string;
+  locale: string;
+  placement: TeacherProUpgradePlacement;
+}): void {
+  const props = { page: args.page, locale: args.locale, placement: args.placement };
+  safeCapture('teacher_pro_upgrade_click', props);
+  mirrorToGrowth('teacher_pro_upgrade_click', props);
+}
+
+/** Fired immediately before POST /api/subscription/checkout. */
+export function trackTeacherProCheckoutStarted(args: { trial: boolean; signed_in: boolean }): void {
+  const props = { trial: args.trial, signed_in: args.signed_in };
+  safeCapture('teacher_pro_checkout_started', props);
+  mirrorToGrowth('teacher_pro_checkout_started', props);
+}
+
+/** Fired when the checkout provider returns a redirect URL. */
+export function trackTeacherProCheckoutRedirect(args?: { trial?: boolean }): void {
+  const props = args?.trial !== undefined ? { trial: args.trial } : {};
+  safeCapture('teacher_pro_checkout_redirect', props);
+  mirrorToGrowth('teacher_pro_checkout_redirect', props);
+}
+
+/** Successful school quote form submit (for-schools or upgrade school tab). */
+export function trackSchoolQuoteRequested(args: {
+  page: string;
+  locale: string;
+  teachers: number;
+}): void {
+  const props = { page: args.page, locale: args.locale, teachers: args.teachers };
+  safeCapture('school_quote_requested', props);
+  mirrorToGrowth('school_quote_requested', props);
+}

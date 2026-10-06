@@ -10,10 +10,9 @@
 //   - Teacher Pro: $9/mo (TEACHER_PRO_PRICE_USD) -- unlimited classes, per-class analytics,
 //     PDF/CSV progress reports (components/teacher/reports/ProgressReportPDF.tsx,
 //     lib/education/assignmentProgressReport.ts). 14-day trial (TEACHER_TRIAL_DAYS).
-//   - Classroom plan: $39/term (CLASSROOM_PLAN_PRICE_USD) -- lead-capture price anchor for
-//     a whole class: every Teacher Pro feature plus class streaks and priority support.
-//   - Schools & districts: contact us, price on request (EDUCATION_PACKAGES 'school',
-//     priceUsd: null). Admin dashboards, cross-class/district analytics, curriculum
+//   - Schools & departments: $49 per teacher / year for 5+ teachers, invoice or PO via
+//     "Get a school quote" (SCHOOL_PLAN_PRICE_USD / SCHOOL_PRICING). Same offer as
+//     /teacher/upgrade. Admin dashboards, cross-class/district analytics, curriculum
 //     libraries and SSO (Clever/ClassLink/Google) are NOT shipped -- they are roadmap asks
 //     surfaced through the same lead form (schoolLead.ts), never advertised as included.
 //   - Google Classroom: a Stream-share add-on exists today (googleClassroomAddon.ts) --
@@ -68,18 +67,18 @@ export interface ForSchoolsContent {
 const EN: ForSchoolsContent = {
   metaTitle: 'Free Vocabulary & ESL Word Games for Schools — LexiClash',
   metaDescription:
-    'Vocabulary games and ESL spelling practice for K-12 classrooms — no student logins, 6 languages (English, Hebrew, Spanish, Swedish, Japanese, Russian), 1v1 word duels and whole-class play for up to 50 students, no ads. Free 14-day Teacher Pro trial. Teacher Pro $9/mo; Classroom plan $39/term.',
+    'Vocabulary games and ESL spelling practice for K-12 classrooms — no student logins, 6 languages (English, Hebrew, Spanish, Swedish, Japanese, Russian), 1v1 word duels and whole-class play for up to 50 students, no ads. Free 14-day Teacher Pro trial. Teacher Pro $9/mo; Schools & departments from $49 per teacher / year (5+ teachers, invoice/PO).',
   ogTitle: 'LexiClash for Schools — Vocabulary & ESL Word Games',
   ogDescription:
-    'Free vocabulary and ESL word games for every classroom — no student logins, 6 languages, 1v1 duels, no ads. Free 14-day trial. Teacher Pro $9/mo; Classroom plan $39/term.',
+    'Free vocabulary and ESL word games for every classroom — no student logins, 6 languages, 1v1 duels, no ads. Free 14-day trial. Teacher Pro $9/mo; Schools & departments from $49 per teacher / year.',
   heroTag: 'For Schools & Districts',
   heroH1: 'Vocabulary games your whole school can',
   heroHighlight: 'actually use',
   heroSubtitle:
-    'Try Teacher Pro free for 14 days -- no student logins, no credit card. No ads anywhere in the classroom, ever. 6 languages including Hebrew RTL, live whole-class play for up to 50 students, and 1v1 word duels. After your trial, the classroom game stays free for individual teachers -- Teacher Pro and the Classroom plan scale up from there.',
-  freeForeverTitle: 'Start free -- Teacher Pro $9/mo, Classroom plan $39/term',
+    'Try Teacher Pro free for 14 days -- no student logins, no credit card. No ads anywhere in the classroom, ever. 6 languages including Hebrew RTL, live whole-class play for up to 50 students, and 1v1 word duels. After your trial, the classroom game stays free for individual teachers -- Teacher Pro and Schools & departments scale up from there.',
+  freeForeverTitle: 'Start free -- Teacher Pro $9/mo, Schools & departments from $49 per teacher / year',
   freeForeverBody:
-    'Every teacher gets a 14-day free trial of Teacher Pro. After the trial, the classroom game -- live whole-class play, 1v1 duels, custom word lists, no ads -- stays free for individual teachers, for up to 3 classes of 50 students each. Teacher Pro ($9/mo) adds per-class analytics, PDF/CSV progress reports and unlimited classes. The Classroom plan ($39/term) covers a whole class with every Teacher Pro feature, plus class streaks and priority support. Rolling out to a whole school or district? Admin dashboards, cross-class analytics, curriculum libraries and SSO are on our roadmap -- tell us what you need below.',
+    'Every teacher gets a 14-day free trial of Teacher Pro. After the trial, the classroom game -- live whole-class play, 1v1 duels, custom word lists, no ads -- stays free for individual teachers, for up to 3 classes of 50 students each. Teacher Pro ($9/mo) adds per-class analytics, PDF/CSV progress reports and unlimited classes. Schools & departments are $49 per teacher per year for 5+ teachers, paid by invoice or purchase order — request a quote below. Admin dashboards, cross-class analytics, curriculum libraries and SSO are on our roadmap -- tell us what you need below.',
   whyTitle: 'Why schools choose LexiClash',
   why: [
     { title: 'No student logins', body: 'Students join a class game with a code -- no accounts to provision, no rostering before you can play, no student data to manage.' },
@@ -106,42 +105,42 @@ const EN: ForSchoolsContent = {
     { title: 'Curriculum content libraries', body: 'Roadmap: curated multilingual word sets mapped to your curriculum, across all six languages.' },
     { title: 'Single sign-on (SSO)', body: 'Roadmap: Clever, ClassLink and Google Sign-In for easy district rollout. Tell us which one your school uses.' },
   ],
-  leadTitle: 'Tell us about your school',
+  leadTitle: 'Get a school quote',
   leadIntro:
-    "Using LexiClash with your class, or rolling it out to a whole school or district? Tell us what you need -- we'll follow up about the Classroom plan ($39/term), a school or district quote, or early access to the roadmap features above.",
+    "Using LexiClash with your class, or rolling it out to a whole school or department? Tell us what you need -- we'll follow up with a school quote ($49 per teacher / year for 5+ teachers, invoice or PO), or early access to the roadmap features above.",
   faqTitle: 'Schools & districts -- frequently asked',
   faqs: [
     { q: 'Is LexiClash free for teachers?', a: 'Yes. Every teacher gets a 14-day free trial of Teacher Pro: whole-class play, 1v1 duels, all six languages, no ads, no student logins, no credit card. After the trial, the classroom game stays free for individual teachers -- up to 3 classes of 50 students each. Teacher Pro is $9/month and adds per-class analytics, PDF/CSV progress reports and unlimited classes.' },
-    { q: 'What does a school or district plan include?', a: 'The Classroom plan ($39/term, through the form on this page) covers a whole class with every Teacher Pro feature -- analytics, reports, homework tools -- plus class streaks and priority support. Admin dashboards, cross-class analytics, curriculum libraries and SSO for school or district rollout are on our roadmap, not shipped yet -- tell us what you need and we will follow up, with pricing on request.' },
+    { q: 'What does a school or district plan include?', a: 'Schools & departments are $49 per teacher per year for 5+ teachers, paid by invoice or purchase order via the form on this page — every teacher gets Teacher Pro (analytics, reports, homework tools). Admin dashboards, cross-class analytics, curriculum libraries and SSO for school or district rollout are on our roadmap, not shipped yet -- tell us what you need and we will follow up.' },
     { q: 'Do students need accounts or logins?', a: 'No. Students join a class game with a code -- nothing to provision, no student data to manage. That makes a school-wide rollout far simpler than tools that require rostering or SSO before play.' },
     { q: 'Which languages are supported?', a: 'English, Hebrew (full right-to-left support), Spanish, Swedish, Japanese and Russian, each with a native dictionary -- built for ESL, bilingual and immersion classrooms.' },
-    { q: 'How do we start our trial or get a school plan?', a: "Sign up as a teacher to start your own 14-day Teacher Pro trial. Rolling out to a whole class or school instead? Fill in the form on this page with your role, school and rough student count, and we'll follow up about the Classroom plan or a school/district quote." },
+    { q: 'How do we start our trial or get a school plan?', a: "Sign up as a teacher to start your own 14-day Teacher Pro trial. Rolling out to a school or department instead? Fill in the form on this page with your role, school and how many teachers need Pro, and we'll follow up with a school quote ($49 per teacher / year, 5+ teachers, invoice/PO)." },
     { q: 'How is this different from Kahoot, Gimkit or Quizlet?', a: 'Those are quiz/flashcard tools that are English-first. LexiClash is a word-building game (not multiple-choice), supports six languages including Hebrew RTL, fits a whole class of up to 50 students for free, and offers true 1v1 duels.' },
     { q: 'Can I use LexiClash for ESL or English language learner (ELL) students?', a: 'Yes — LexiClash was built with language learners in mind. It supports English, Hebrew (RTL), Spanish, Swedish, Japanese and Russian with native dictionaries. Students can compete in their own language or practice the language they are learning, making it a natural fit for ESL, bilingual and immersion classrooms. Word-building gameplay reinforces vocabulary and spelling organically, without passive multiple-choice.' },
     { q: 'Can students use LexiClash as a spelling practice game?', a: 'Yes. LexiClash\'s word-building format — where students find, spell and submit real words against a live opponent or the whole class — makes spelling practice competitive and engaging rather than passive. Teachers use it for spelling warm-ups, end-of-unit vocabulary reviews and in-class tournaments.' },
     { q: 'Does LexiClash work on Chromebooks and school devices?', a: 'Yes. LexiClash runs entirely in the browser — no app to install, no student accounts to provision. It works on Chromebooks, iPads, desktops and phones. Students join with a game code, and teachers can share assignments straight to Google Classroom. District SSO (Clever, ClassLink) is on our roadmap.' },
   ],
   heroCta1: 'Play a class game free',
-  heroCta2: 'Tell us about your school',
+  heroCta2: 'Get a school quote',
   closingTitle: 'Ready to bring LexiClash to your school?',
-  closingCta: 'Tell us about your school',
+  closingCta: 'Get a school quote',
 };
 
 const RU: ForSchoolsContent = {
   metaTitle: 'Бесплатные игры на словарный запас для школ — LexiClash',
   metaDescription:
-    'Игры для изучения лексики и английского языка в школах — без входа ученика, 6 языков (английский, иврит, испанский, шведский, японский, русский), словесные поединки 1 на 1 и командные игры для всего класса (до 50 учеников), без рекламы. Бесплатный пробный период Teacher Pro на 14 дней. Teacher Pro — $9/мес; план для класса — $39/семестр.',
+    'Игры для изучения лексики и английского языка в школах — без входа ученика, 6 языков (английский, иврит, испанский, шведский, японский, русский), словесные поединки 1 на 1 и командные игры для всего класса (до 50 учеников), без рекламы. Бесплатный пробный период Teacher Pro на 14 дней. Teacher Pro — $9/мес; для школ и кафедр от $49 за учителя в год.',
   ogTitle: 'LexiClash для школ — игры на словарный запас',
   ogDescription:
-    'Бесплатные словесные игры для каждого класса — без входа ученика, 6 языков, поединки 1 на 1, без рекламы. Бесплатный пробный период. Teacher Pro — $9/мес; план для класса — $39/семестр.',
+    'Бесплатные словесные игры для каждого класса — без входа ученика, 6 языков, поединки 1 на 1, без рекламы. Бесплатный пробный период. Teacher Pro — $9/мес; для школ и кафедр от $49 за учителя в год.',
   heroTag: 'Для школ и районов',
   heroH1: 'Словесные игры, которые ваша школа действительно может',
   heroHighlight: 'использовать',
   heroSubtitle:
     'Попробуйте Teacher Pro бесплатно 14 дней — без входа для учеников, без кредитной карты. Без рекламы на уроках, никогда. 6 языков, включая иврит с поддержкой RTL, командные игры в реальном времени для всего класса (до 50 учеников) и поединки 1 на 1. После пробного периода командная игра остаётся бесплатной для отдельных учителей — Teacher Pro и план для класса расширяют возможности дальше.',
-  freeForeverTitle: 'Начните бесплатно — Teacher Pro за $9/мес, план для класса за $39/семестр',
+  freeForeverTitle: 'Начните бесплатно — Teacher Pro за $9/мес, для школ и кафедр от $49 за учителя в год',
   freeForeverBody:
-    'Каждый учитель получает бесплатный 14-дневный пробный период Teacher Pro. После пробного периода командная игра — живая игра для всего класса, поединки 1 на 1, собственные списки слов, без рекламы — остаётся бесплатной для отдельных учителей, до 3 классов по 50 учеников в каждом. Teacher Pro (за $9/мес) добавляет аналитику по классу, отчёты о прогрессе в PDF/CSV и неограниченное количество классов. Разворачиваете на весь класс или школу? План для класса (за $39/семестр) охватывает целый класс со всеми функциями Teacher Pro, плюс серии побед класса и приоритетную поддержку. Панель администратора, аналитика между классами, библиотеки учебных материалов и SSO — в нашей дорожной карте. Расскажите нам, что вам нужно, в форме ниже.',
+    'Каждый учитель получает бесплатный 14-дневный пробный период Teacher Pro. После пробного периода командная игра — живая игра для всего класса, поединки 1 на 1, собственные списки слов, без рекламы — остаётся бесплатной для отдельных учителей, до 3 классов по 50 учеников в каждом. Teacher Pro (за $9/мес) добавляет аналитику по классу, отчёты о прогрессе в PDF/CSV и неограниченное количество классов. Разворачиваете на весь класс или школу? План для школ и кафедр ($49 за учителя в год) охватывает целый класс со всеми функциями Teacher Pro, плюс серии побед класса и приоритетную поддержку. Панель администратора, аналитика между классами, библиотеки учебных материалов и SSO — в нашей дорожной карте. Расскажите нам, что вам нужно, в форме ниже.',
   whyTitle: 'Почему школы выбирают LexiClash',
   why: [
     { title: 'Без входа для учеников', body: 'Ученики присоединяются к командной игре по коду — не нужно создавать аккаунты, не нужна регистрация класса перед началом игры, не нужно управлять данными учеников.' },
@@ -170,11 +169,11 @@ const RU: ForSchoolsContent = {
   ],
   leadTitle: 'Расскажите нам о своей школе',
   leadIntro:
-    'Уже используете LexiClash в классе или разворачиваете его на всю школу или район? Расскажите нам, что вам нужно — мы свяжемся с вами по поводу плана для класса ($39/семестр), расчёта стоимости для школы или района, или раннего доступа к функциям из дорожной карты выше.',
+    'Уже используете LexiClash в классе или разворачиваете его на всю школу или район? Расскажите нам, что вам нужно — мы свяжемся с вами по поводу школьного расчёта ($49 за учителя в год), расчёта стоимости для школы или района, или раннего доступа к функциям из дорожной карты выше.',
   faqTitle: 'Часто задаваемые вопросы школ и районов',
   faqs: [
     { q: 'LexiClash бесплатен для учителей?', a: 'Да. Каждый учитель получает бесплатный 14-дневный пробный период Teacher Pro: командные игры, поединки 1 на 1, все шесть языков, без рекламы, без входа для учеников, без кредитной карты. После пробного периода командная игра остаётся бесплатной для отдельных учителей — до 3 классов по 50 учеников в каждом. Teacher Pro стоит $9 в месяц и добавляет аналитику по классу, отчёты о прогрессе в PDF/CSV и неограниченное количество классов.' },
-    { q: 'Что включает школьный или районный план?', a: 'План для класса ($39/семестр, через форму на этой странице) охватывает целый класс со всеми функциями Teacher Pro — аналитикой, отчётами, инструментами для домашних заданий — плюс серии побед класса и приоритетную поддержку. Панель администратора, аналитика между классами, библиотеки учебных материалов и SSO для развёртывания на уровне школы или района — в нашей дорожной карте и пока не реализованы. Расскажите нам, что вам нужно, и мы свяжемся с вами; цена — по запросу.' },
+    { q: 'Что включает школьный или районный план?', a: 'План для школ и кафедр ($49 за учителя в год, через форму на этой странице) охватывает целый класс со всеми функциями Teacher Pro — аналитикой, отчётами, инструментами для домашних заданий — плюс серии побед класса и приоритетную поддержку. Панель администратора, аналитика между классами, библиотеки учебных материалов и SSO для развёртывания на уровне школы или района — в нашей дорожной карте и пока не реализованы. Расскажите нам, что вам нужно, и мы свяжемся с вами; цена — по запросу.' },
     { q: 'Нужны ли учащимся аккаунты или вход?', a: 'Нет. Ученики присоединяются к командной игре по коду — не нужно ничего настраивать, не нужно управлять данными учеников. Это делает развертывание по всей школе намного проще, чем инструменты, которые требуют регистрации или SSO перед игрой.' },
     { q: 'Какие языки поддерживаются?', a: 'Английский, иврит (с полной поддержкой справа налево), испанский, шведский, японский и русский, каждый со встроенным словарем — разработано для ESL, двуязычных и погруженных в языковую среду классов.' },
     { q: 'Как начать пробный период или получить школьный план?', a: 'Зарегистрируйтесь как учитель, чтобы начать собственный 14-дневный пробный период Teacher Pro. Разворачиваете на весь класс или школу? Заполните форму на этой странице, указав свою роль, школу и примерное количество учеников — мы свяжемся с вами по поводу плана для класса или расчёта стоимости для школы или района.' },
@@ -192,18 +191,18 @@ const RU: ForSchoolsContent = {
 const HE: ForSchoolsContent = {
   metaTitle: 'משחקי אוצר מילים ואנגלית לבתי ספר — חינם | LexiClash',
   metaDescription:
-    'משחקי אוצר מילים ותרגול איות לכיתות — בלי חשבונות תלמידים, 6 שפות (אנגלית, עברית, ספרדית, שוודית, יפנית, רוסית), דו-קרבות מילים 1 על 1 ומשחק כיתתי לכל הכיתה (עד 50 תלמידים), בלי פרסומות. ניסיון חינם של Teacher Pro ל-14 יום. Teacher Pro ב-$9 לחודש; תוכנית כיתה ב-$39 לסמסטר.',
+    'משחקי אוצר מילים ותרגול איות לכיתות — בלי חשבונות תלמידים, 6 שפות (אנגלית, עברית, ספרדית, שוודית, יפנית, רוסית), דו-קרבות מילים 1 על 1 ומשחק כיתתי לכל הכיתה (עד 50 תלמידים), בלי פרסומות. ניסיון חינם של Teacher Pro ל-14 יום. Teacher Pro ב-$9 לחודש; בתי ספר ומחלקות החל מ-$49 למורה לשנה.',
   ogTitle: 'LexiClash לבתי ספר — משחקי אוצר מילים ואנגלית',
   ogDescription:
-    'משחקי מילים חינם לכל כיתה — בלי חשבונות תלמידים, 6 שפות, דו-קרבות 1 על 1, בלי פרסומות. ניסיון חינם ל-14 יום. Teacher Pro ב-$9 לחודש; תוכנית כיתה ב-$39 לסמסטר.',
+    'משחקי מילים חינם לכל כיתה — בלי חשבונות תלמידים, 6 שפות, דו-קרבות 1 על 1, בלי פרסומות. ניסיון חינם ל-14 יום. Teacher Pro ב-$9 לחודש; בתי ספר ומחלקות החל מ-$49 למורה לשנה.',
   heroTag: 'לבתי ספר ורשויות חינוך',
   heroH1: 'משחקי אוצר מילים שכל בית הספר שלכם',
   heroHighlight: 'באמת ישתמש בהם',
   heroSubtitle:
     'נסו את Teacher Pro חינם ל-14 יום — בלי חשבונות תלמידים, בלי כרטיס אשראי. בלי פרסומות בכיתה, אף פעם. 6 שפות כולל עברית מימין לשמאל, משחק כיתתי חי לכל הכיתה (עד 50 תלמידים) ודו-קרבות מילים 1 על 1. בתום הניסיון, המשחק הכיתתי נשאר חינם למורים בודדים — Teacher Pro ותוכנית הכיתה מתרחבות משם.',
-  freeForeverTitle: 'מתחילים חינם — Teacher Pro ב-$9 לחודש, תוכנית כיתה ב-$39 לסמסטר',
+  freeForeverTitle: 'מתחילים חינם — Teacher Pro ב-$9 לחודש, בתי ספר ומחלקות החל מ-$49 למורה לשנה',
   freeForeverBody:
-    'כל מורה מקבל ניסיון חינם של 14 יום ל-Teacher Pro. בתום הניסיון, המשחק הכיתתי — משחק חי לכל הכיתה, דו-קרבות 1 על 1, רשימות מילים משלכם, בלי פרסומות — נשאר חינם למורים בודדים, עד 3 כיתות של 50 תלמידים כל אחת. Teacher Pro (ב-$9 לחודש) מוסיף ניתוח נתונים לכל כיתה, דוחות התקדמות ל-PDF/CSV וכיתות ללא הגבלה. מרחיבים לכיתה שלמה או לבית ספר? תוכנית הכיתה (ב-$39 לסמסטר) כוללת כיתה שלמה עם כל יכולות Teacher Pro, בתוספת רצף ניצחונות לכיתה ותמיכה בעדיפות. לוח ניהול, ניתוח נתונים בין כיתות, ספריות תוכן לימודי ו-SSO נמצאים במפת הדרכים שלנו — ספרו לנו מה אתם צריכים למטה.',
+    'כל מורה מקבל ניסיון חינם של 14 יום ל-Teacher Pro. בתום הניסיון, המשחק הכיתתי — משחק חי לכל הכיתה, דו-קרבות 1 על 1, רשימות מילים משלכם, בלי פרסומות — נשאר חינם למורים בודדים, עד 3 כיתות של 50 תלמידים כל אחת. Teacher Pro (ב-$9 לחודש) מוסיף ניתוח נתונים לכל כיתה, דוחות התקדמות ל-PDF/CSV וכיתות ללא הגבלה. מרחיבים לכיתה שלמה או לבית ספר? בתי ספר ומחלקות ($49 למורה לשנה) כוללת כיתה שלמה עם כל יכולות Teacher Pro, בתוספת רצף ניצחונות לכיתה ותמיכה בעדיפות. לוח ניהול, ניתוח נתונים בין כיתות, ספריות תוכן לימודי ו-SSO נמצאים במפת הדרכים שלנו — ספרו לנו מה אתם צריכים למטה.',
   whyTitle: 'למה בתי ספר בוחרים ב-LexiClash',
   why: [
     { title: 'בלי חשבונות תלמידים', body: 'התלמידים מצטרפים למשחק כיתתי עם קוד — אין חשבונות להקים, אין רישום כיתה לפני שמתחילים לשחק, אין נתוני תלמידים לנהל.' },
@@ -232,11 +231,11 @@ const HE: ForSchoolsContent = {
   ],
   leadTitle: 'ספרו לנו על בית הספר שלכם',
   leadIntro:
-    'כבר משתמשים ב-LexiClash בכיתה, או מרחיבים לבית ספר או רשות שלמים? ספרו לנו מה אתם צריכים — נחזור אליכם בנוגע לתוכנית הכיתה (ב-$39 לסמסטר), הצעת מחיר לבית ספר או רשות, או גישה מוקדמת ליכולות שבמפת הדרכים למעלה.',
+    'כבר משתמשים ב-LexiClash בכיתה, או מרחיבים לבית ספר או רשות שלמים? ספרו לנו מה אתם צריכים — נחזור אליכם בנוגע לבתי ספר ומחלקות ($49 למורה לשנה), הצעת מחיר לבית ספר או רשות, או גישה מוקדמת ליכולות שבמפת הדרכים למעלה.',
   faqTitle: 'בתי ספר ורשויות — שאלות נפוצות',
   faqs: [
     { q: 'האם LexiClash חינם למורים?', a: 'כן. כל מורה מקבל ניסיון חינם של 14 יום ל-Teacher Pro: משחק כיתתי, דו-קרבות 1 על 1, כל שש השפות, בלי פרסומות, בלי חשבונות תלמידים, בלי כרטיס אשראי. בתום הניסיון, המשחק הכיתתי נשאר חינם למורים בודדים — עד 3 כיתות של 50 תלמידים כל אחת. Teacher Pro עולה $9 לחודש ומוסיף ניתוח נתונים לכל כיתה, דוחות התקדמות ל-PDF/CSV וכיתות ללא הגבלה.' },
-    { q: 'מה כוללת תוכנית בית ספר או רשות?', a: 'תוכנית הכיתה (ב-$39 לסמסטר, דרך הטופס בעמוד הזה) כוללת כיתה שלמה עם כל יכולות Teacher Pro — ניתוח נתונים, דוחות, כלי שיעורי בית — בתוספת רצף ניצחונות לכיתה ותמיכה בעדיפות. לוח ניהול, ניתוח נתונים בין כיתות, ספריות תוכן לימודי ו-SSO להטמעה ברמת בית ספר או רשות נמצאים במפת הדרכים שלנו ועדיין לא הושקו — ספרו לנו מה אתם צריכים ונחזור אליכם, עם הצעת מחיר לפי בקשה.' },
+    { q: 'מה כוללת תוכנית בית ספר או רשות?', a: 'בתי ספר ומחלקות ($49 למורה לשנה, דרך הטופס בעמוד הזה) כוללת כיתה שלמה עם כל יכולות Teacher Pro — ניתוח נתונים, דוחות, כלי שיעורי בית — בתוספת רצף ניצחונות לכיתה ותמיכה בעדיפות. לוח ניהול, ניתוח נתונים בין כיתות, ספריות תוכן לימודי ו-SSO להטמעה ברמת בית ספר או רשות נמצאים במפת הדרכים שלנו ועדיין לא הושקו — ספרו לנו מה אתם צריכים ונחזור אליכם, עם הצעת מחיר לפי בקשה.' },
     { q: 'האם תלמידים צריכים חשבונות או התחברות?', a: 'לא. התלמידים מצטרפים למשחק כיתתי עם קוד — אין מה להקים, אין נתוני תלמידים לנהל. זה הופך הטמעה בכל בית הספר להרבה יותר פשוטה מכלים שדורשים רישום או SSO לפני שמשחקים.' },
     { q: 'אילו שפות נתמכות?', a: 'אנגלית, עברית (תמיכה מלאה מימין לשמאל), ספרדית, שוודית, יפנית ורוסית, כל אחת עם מילון מובנה — בנוי לכיתות ESL, דו-לשוניות וטבילה לשונית.' },
     { q: 'איך מתחילים את הניסיון או מקבלים תוכנית בית ספר?', a: 'הירשמו כמורה כדי להתחיל ניסיון Teacher Pro של 14 יום משלכם. מרחיבים לכיתה שלמה או לבית ספר? מלאו את הטופס בעמוד הזה עם התפקיד שלכם, בית הספר ומספר תלמידים משוער, ונחזור אליכם בנוגע לתוכנית הכיתה או להצעת מחיר לבית ספר או רשות.' },
@@ -254,18 +253,18 @@ const HE: ForSchoolsContent = {
 const SV: ForSchoolsContent = {
   metaTitle: 'Gratis ordförråds- och ESL-ordspel för skolor — LexiClash',
   metaDescription:
-    'Ordförråds- och ESL-stavningsspel för K-12-klassrum — ingen inloggning för elever, 6 språk (engelska, hebreiska, spanska, svenska, japanska, ryska), 1v1-orddueller och klassomfattande spel för upp till 50 elever, inga annonser. Gratis 14-dagars Teacher Pro-provperiod. Teacher Pro $9/mån; Klassplan $39/termin.',
+    'Ordförråds- och ESL-stavningsspel för K-12-klassrum — ingen inloggning för elever, 6 språk (engelska, hebreiska, spanska, svenska, japanska, ryska), 1v1-orddueller och klassomfattande spel för upp till 50 elever, inga annonser. Gratis 14-dagars Teacher Pro-provperiod. Teacher Pro $9/mån; Skolor och avdelningar från $49 per lärare / år.',
   ogTitle: 'LexiClash för skolor — Ordförråds- och ESL-ordspel',
   ogDescription:
-    'Gratis ord- och ordförrådsspel för varje klassrum — ingen inloggning för elever, 6 språk, 1v1-dueller, inga annonser. Gratis provperiod. Teacher Pro $9/mån; Klassplan $39/termin.',
+    'Gratis ord- och ordförrådsspel för varje klassrum — ingen inloggning för elever, 6 språk, 1v1-dueller, inga annonser. Gratis provperiod. Teacher Pro $9/mån; Skolor och avdelningar från $49 per lärare / år.',
   heroTag: 'För skolor och distrikt',
   heroH1: 'Ordspel som din skola faktiskt kan',
   heroHighlight: 'använda',
   heroSubtitle:
     'Prova Teacher Pro gratis i 14 dagar — ingen inloggning för elever, inget kreditkort. Inga annonser i klassrummet, någonsin. 6 språk inklusive hebreiska RTL, direktsänt klassomfattande spel för upp till 50 elever och 1v1-orddueller. Efter provperioden förblir klassrumsspelet gratis för enskilda lärare — Teacher Pro och Klassplanen skalar därifrån.',
-  freeForeverTitle: 'Börja gratis — Teacher Pro $9/mån, Klassplan $39/termin',
+  freeForeverTitle: 'Börja gratis — Teacher Pro $9/mån, Skolor och avdelningar från $49 per lärare / år',
   freeForeverBody:
-    'Varje lärare får en 14-dagars gratis provperiod av Teacher Pro. Efter provperioden förblir klassrumsspelet — direktsänt klassomfattande spel, 1v1-dueller, egna ordlistor, inga annonser — gratis för enskilda lärare, för upp till 3 klasser med 50 elever vardera. Teacher Pro ($9/mån) lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser. Ska ni rulla ut till en hel klass eller skola? Klassplanen ($39/termin) täcker en hel klass med alla Teacher Pro-funktioner, plus klasstreaks och prioriterad support. Administratörsöversikter, distriktsövergripande statistik, läroplansbibliotek och SSO finns på vår färdplan — berätta vad ni behöver nedan.',
+    'Varje lärare får en 14-dagars gratis provperiod av Teacher Pro. Efter provperioden förblir klassrumsspelet — direktsänt klassomfattande spel, 1v1-dueller, egna ordlistor, inga annonser — gratis för enskilda lärare, för upp till 3 klasser med 50 elever vardera. Teacher Pro ($9/mån) lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser. Ska ni rulla ut till en hel klass eller skola? Skolor och avdelningar ($49 per lärare / år) täcker en hel klass med alla Teacher Pro-funktioner, plus klasstreaks och prioriterad support. Administratörsöversikter, distriktsövergripande statistik, läroplansbibliotek och SSO finns på vår färdplan — berätta vad ni behöver nedan.',
   whyTitle: 'Varför skolor väljer LexiClash',
   why: [
     { title: 'Ingen inloggning för elever', body: 'Eleverna ansluter till ett klassrumsspel med en kod — inga konton att skapa, ingen klasslista innan ni kan spela, inga elevdata att hantera.' },
@@ -294,11 +293,11 @@ const SV: ForSchoolsContent = {
   ],
   leadTitle: 'Berätta om din skola',
   leadIntro:
-    'Använder du LexiClash med din klass, eller rullar ni ut till en hel skola eller ett distrikt? Berätta vad ni behöver — vi hör av oss om Klassplanen ($39/termin), en offert för skola eller distrikt, eller tidig åtkomst till färdplansfunktionerna ovan.',
+    'Använder du LexiClash med din klass, eller rullar ni ut till en hel skola eller ett distrikt? Berätta vad ni behöver — vi hör av oss om Skolor och avdelningar ($49 per lärare / år), en offert för skola eller distrikt, eller tidig åtkomst till färdplansfunktionerna ovan.',
   faqTitle: 'Skolor och distrikt — vanliga frågor',
   faqs: [
     { q: 'Är LexiClash gratis för lärare?', a: 'Ja. Varje lärare får en 14-dagars gratis provperiod av Teacher Pro: klassomfattande spel, 1v1-dueller, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir klassrumsspelet gratis för enskilda lärare — upp till 3 klasser med 50 elever vardera. Teacher Pro kostar $9/månad och lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser.' },
-    { q: 'Vad ingår i en skol- eller distriktsplan?', a: 'Klassplanen ($39/termin, via formuläret på den här sidan) täcker en hel klass med alla Teacher Pro-funktioner — statistik, rapporter, läxverktyg — plus klasstreaks och prioriterad support. Administratörsöversikter, distriktsövergripande statistik, läroplansbibliotek och SSO för skol- eller distriktsutrullning finns på vår färdplan och är inte lanserade än — berätta vad ni behöver så hör vi av oss, med pris på begäran.' },
+    { q: 'Vad ingår i en skol- eller distriktsplan?', a: 'Skolor och avdelningar ($49 per lärare / år, via formuläret på den här sidan) täcker en hel klass med alla Teacher Pro-funktioner — statistik, rapporter, läxverktyg — plus klasstreaks och prioriterad support. Administratörsöversikter, distriktsövergripande statistik, läroplansbibliotek och SSO för skol- eller distriktsutrullning finns på vår färdplan och är inte lanserade än — berätta vad ni behöver så hör vi av oss, med pris på begäran.' },
     { q: 'Behöver eleverna konton eller inloggning?', a: 'Nej. Eleverna ansluter till ett klassrumsspel med en kod — inget att skapa, inga elevdata att hantera. Det gör en skolövergripande lansering mycket enklare än verktyg som kräver klasslistor eller SSO innan man kan spela.' },
     { q: 'Vilka språk stöds?', a: 'Engelska, hebreiska (fullt höger-till-vänster-stöd), spanska, svenska, japanska och ryska, var och en med en inbyggd ordbok — byggd för ESL, tvåspråkiga och immersionsklassrum.' },
     { q: 'Hur börjar vi vår provperiod eller får en skolplan?', a: 'Registrera dig som lärare för att starta din egen 14-dagars Teacher Pro-provperiod. Ska ni istället rulla ut till en hel klass eller skola? Fyll i formuläret på den här sidan med din roll, skola och ungefärligt antal elever, så hör vi av oss om Klassplanen eller en offert för skola/distrikt.' },
@@ -316,18 +315,18 @@ const SV: ForSchoolsContent = {
 const JA: ForSchoolsContent = {
   metaTitle: '学校向け無料語彙・ESL単語ゲーム — LexiClash',
   metaDescription:
-    'K-12クラス向けの語彙とESLスペリング練習 — 学生ログイン不要、6言語（英語、ヘブライ語、スペイン語、スウェーデン語、日本語、ロシア語）、1v1単語決闘とクラス全体（最大50人）プレイ、広告なし。Teacher Pro 14日間無料トライアル。Teacher Pro 月額$9、クラスプランは学期$39から。',
+    'K-12クラス向けの語彙とESLスペリング練習 — 学生ログイン不要、6言語（英語、ヘブライ語、スペイン語、スウェーデン語、日本語、ロシア語）、1v1単語決闘とクラス全体（最大50人）プレイ、広告なし。Teacher Pro 14日間無料トライアル。Teacher Pro 月額$9、学校・学科は教員1人あたり年$49から。',
   ogTitle: '学校向けLexiClash — 語彙とESL単語ゲーム',
   ogDescription:
-    'すべてのクラスルーム向け無料語彙・ESL単語ゲーム — 学生ログイン不要、6言語、1v1決闘、広告なし。14日間無料トライアル。Teacher Pro 月額$9、クラスプランは学期$39から。',
+    'すべてのクラスルーム向け無料語彙・ESL単語ゲーム — 学生ログイン不要、6言語、1v1決闘、広告なし。14日間無料トライアル。Teacher Pro 月額$9、学校・学科は教員1人あたり年$49から。',
   heroTag: '学校・学区向け',
   heroH1: 'あなたの学校が実際に',
   heroHighlight: '使える語彙ゲーム',
   heroSubtitle:
     'Teacher Proを14日間無料でお試しください — 学生ログイン不要、クレジットカード不要。授業内の広告は一切なし。ヘブライ語RTL対応を含む6言語、最大50人のクラス全体でのライブプレイ、1v1単語決闘に対応しています。トライアル後も、クラスルームゲームは個人の教師向けに無料のまま — Teacher Proとクラスプランはそこから拡張できます。',
-  freeForeverTitle: '無料でスタート — Teacher Pro 月額$9、クラスプランは学期$39から',
+  freeForeverTitle: '無料でスタート — Teacher Pro 月額$9、学校・学科は教員1人あたり年$49から',
   freeForeverBody:
-    'すべての教師がTeacher Proの14日間無料トライアルを利用できます。トライアル後も、クラスルームゲーム — ライブのクラス全体プレイ、1v1決闘、独自の単語リスト、広告なし — は個人の教師向けに無料のまま、最大3クラス（各50人）まで利用できます。Teacher Pro（月額$9）はクラスごとの分析、PDF/CSVの進捗レポート、クラス数無制限を追加します。クラス全体や学校全体への導入をお考えですか？クラスプラン（学期$39）はすべてのTeacher Pro機能に加え、クラスの連続記録と優先サポートを含みます。管理者ダッシュボード、クラス間分析、カリキュラムライブラリ、SSOは今後の開発計画にあります — 下のフォームで必要な機能をお知らせください。',
+    'すべての教師がTeacher Proの14日間無料トライアルを利用できます。トライアル後も、クラスルームゲーム — ライブのクラス全体プレイ、1v1決闘、独自の単語リスト、広告なし — は個人の教師向けに無料のまま、最大3クラス（各50人）まで利用できます。Teacher Pro（月額$9）はクラスごとの分析、PDF/CSVの進捗レポート、クラス数無制限を追加します。クラス全体や学校全体への導入をお考えですか？学校・学科プラン（教員1人あたり年$49）はすべてのTeacher Pro機能に加え、クラスの連続記録と優先サポートを含みます。管理者ダッシュボード、クラス間分析、カリキュラムライブラリ、SSOは今後の開発計画にあります — 下のフォームで必要な機能をお知らせください。',
   whyTitle: 'なぜ学校がLexiClashを選ぶのか',
   why: [
     { title: '学生ログイン不要', body: '学生はコードでクラスゲームに参加 — アカウント作成不要、プレイ前の名簿登録不要、学生データの管理も不要です。' },
@@ -356,11 +355,11 @@ const JA: ForSchoolsContent = {
   ],
   leadTitle: 'あなたの学校について教えてください',
   leadIntro:
-    'すでにクラスでLexiClashを使っていますか、それとも学校や学区全体への導入をお考えですか？必要なことを教えてください — クラスプラン（学期$39）、学校・学区向けの見積もり、または上記の開発計画中の機能への早期アクセスについてご連絡します。',
+    'すでにクラスでLexiClashを使っていますか、それとも学校や学区全体への導入をお考えですか？必要なことを教えてください — 学校・学科プラン（教員1人あたり年$49）、学校・学区向けの見積もり、または上記の開発計画中の機能への早期アクセスについてご連絡します。',
   faqTitle: '学校・学区 — よくある質問',
   faqs: [
     { q: 'LexiClashは教師にとって無料ですか？', a: 'はい。すべての教師がTeacher Proの14日間無料トライアルを利用できます：クラス全体プレイ、1v1決闘、6言語すべて、広告なし、学生ログイン不要、クレジットカード不要。トライアル後も、クラスルームゲームは個人の教師向けに無料のまま — 最大3クラス（各50人）まで。Teacher Proは月額$9で、クラスごとの分析、PDF/CSVの進捗レポート、クラス数無制限を追加します。' },
-    { q: '学校または学区プランには何が含まれますか？', a: 'クラスプラン（学期$39、このページのフォームから）は、クラス全体にすべてのTeacher Pro機能 — 分析、レポート、宿題ツール — に加え、クラスの連続記録と優先サポートを提供します。学校・学区への導入向けの管理者ダッシュボード、クラス間分析、カリキュラムライブラリ、SSOは今後の開発計画にあり、まだ提供されていません — 必要なことを教えていただければご連絡します。価格はご相談に応じます。' },
+    { q: '学校または学区プランには何が含まれますか？', a: '学校・学科プラン（教員1人あたり年$49、このページのフォームから）は、クラス全体にすべてのTeacher Pro機能 — 分析、レポート、宿題ツール — に加え、クラスの連続記録と優先サポートを提供します。学校・学区への導入向けの管理者ダッシュボード、クラス間分析、カリキュラムライブラリ、SSOは今後の開発計画にあり、まだ提供されていません — 必要なことを教えていただければご連絡します。価格はご相談に応じます。' },
     { q: '学生にアカウントやログインは必要ですか？', a: 'いいえ。学生はコードでクラスゲームに参加します — 何も用意する必要がなく、学生データを管理する必要もありません。これにより、名簿登録やプレイ前のSSOを必要とするツールよりも、学校全体への展開がはるかに簡単になります。' },
     { q: 'どの言語に対応していますか？', a: '英語、ヘブライ語（完全なRTLサポート）、スペイン語、スウェーデン語、日本語、ロシア語 — それぞれネイティブ辞書を完備し、ESL、バイリンガル、イマージョンのクラスルーム向けです。' },
     { q: 'トライアルを始める、または学校プランを取得するにはどうすればよいですか？', a: '教師として登録すると、ご自身の14日間Teacher Pro無料トライアルを開始できます。クラス全体や学校全体への導入をお考えの場合は、このページのフォームに役割、学校、およびおおよその学生数を入力してください。クラスプランまたは学校・学区向けの見積もりについてご連絡します。' },
@@ -378,18 +377,18 @@ const JA: ForSchoolsContent = {
 const ES: ForSchoolsContent = {
   metaTitle: 'Juegos de vocabulario y ESL gratis para escuelas — LexiClash',
   metaDescription:
-    'Juegos de vocabulario y práctica de ortografía en inglés para aulas K-12 — sin inicios de sesión de estudiantes, 6 idiomas (inglés, hebreo, español, sueco, japonés, ruso), duelos de palabras 1v1 y juego en clase completo para hasta 50 estudiantes, sin anuncios. Prueba gratis de Teacher Pro por 14 días. Teacher Pro $9/mes; plan de clase $39/trimestre.',
+    'Juegos de vocabulario y práctica de ortografía en inglés para aulas K-12 — sin inicios de sesión de estudiantes, 6 idiomas (inglés, hebreo, español, sueco, japonés, ruso), duelos de palabras 1v1 y juego en clase completo para hasta 50 estudiantes, sin anuncios. Prueba gratis de Teacher Pro por 14 días. Teacher Pro $9/mes; escuelas y departamentos desde $49 por docente / año.',
   ogTitle: 'LexiClash para escuelas — Juegos de vocabulario y ESL',
   ogDescription:
-    'Juegos de vocabulario y ESL gratis para cada aula — sin inicios de sesión de estudiantes, 6 idiomas, duelos 1v1, sin anuncios. Prueba gratis por 14 días. Teacher Pro $9/mes; plan de clase $39/trimestre.',
+    'Juegos de vocabulario y ESL gratis para cada aula — sin inicios de sesión de estudiantes, 6 idiomas, duelos 1v1, sin anuncios. Prueba gratis por 14 días. Teacher Pro $9/mes; escuelas y departamentos desde $49 por docente / año.',
   heroTag: 'Para escuelas y distritos',
   heroH1: 'Juegos de vocabulario que toda tu escuela puede',
   heroHighlight: 'usar de verdad',
   heroSubtitle:
     'Prueba Teacher Pro gratis por 14 días — sin inicios de sesión de estudiantes, sin tarjeta de crédito. Sin anuncios en clase, nunca. 6 idiomas incluido hebreo RTL, juego en vivo con toda la clase para hasta 50 estudiantes y duelos de palabras 1v1. Después de la prueba, el juego de aula sigue siendo gratis para maestros individuales — Teacher Pro y el plan de clase escalan desde ahí.',
-  freeForeverTitle: 'Empieza gratis — Teacher Pro $9/mes, plan de clase $39/trimestre',
+  freeForeverTitle: 'Empieza gratis — Teacher Pro $9/mes, escuelas y departamentos desde $49 por docente / año',
   freeForeverBody:
-    'Cada maestro obtiene una prueba gratuita de 14 días de Teacher Pro. Después de la prueba, el juego de aula — juego en vivo con toda la clase, duelos 1v1, tus propias listas de palabras, sin anuncios — sigue siendo gratis para maestros individuales, hasta 3 clases de 50 estudiantes cada una. Teacher Pro ($9/mes) agrega análisis por clase, informes de progreso en PDF/CSV y clases ilimitadas. ¿Vas a implementarlo en toda una clase o escuela? El plan de clase ($39/trimestre) cubre una clase completa con todas las funciones de Teacher Pro, más rachas de clase y soporte prioritario. Los paneles de administración, el análisis entre clases, las bibliotecas de currículo y el SSO están en nuestra hoja de ruta — cuéntanos qué necesitas más abajo.',
+    'Cada maestro obtiene una prueba gratuita de 14 días de Teacher Pro. Después de la prueba, el juego de aula — juego en vivo con toda la clase, duelos 1v1, tus propias listas de palabras, sin anuncios — sigue siendo gratis para maestros individuales, hasta 3 clases de 50 estudiantes cada una. Teacher Pro ($9/mes) agrega análisis por clase, informes de progreso en PDF/CSV y clases ilimitadas. ¿Vas a implementarlo en toda una clase o escuela? El escuelas y departamentos ($49 por docente / año) cubre una clase completa con todas las funciones de Teacher Pro, más rachas de clase y soporte prioritario. Los paneles de administración, el análisis entre clases, las bibliotecas de currículo y el SSO están en nuestra hoja de ruta — cuéntanos qué necesitas más abajo.',
   whyTitle: 'Por qué las escuelas eligen LexiClash',
   why: [
     { title: 'Sin inicios de sesión de estudiantes', body: 'Los estudiantes se unen a un juego de clase con un código — sin cuentas que crear, sin registro de clase antes de jugar, sin datos de estudiantes que gestionar.' },
@@ -418,11 +417,11 @@ const ES: ForSchoolsContent = {
   ],
   leadTitle: 'Cuéntanos sobre tu escuela',
   leadIntro:
-    '¿Ya usas LexiClash con tu clase, o estás implementándolo en toda una escuela o distrito? Cuéntanos qué necesitas — te contactaremos sobre el plan de clase ($39/trimestre), una cotización para tu escuela o distrito, o acceso anticipado a las funciones de la hoja de ruta de arriba.',
+    '¿Ya usas LexiClash con tu clase, o estás implementándolo en toda una escuela o distrito? Cuéntanos qué necesitas — te contactaremos sobre el escuelas y departamentos ($49 por docente / año), una cotización para tu escuela o distrito, o acceso anticipado a las funciones de la hoja de ruta de arriba.',
   faqTitle: 'Escuelas y distritos — preguntas frecuentes',
   faqs: [
     { q: '¿Es LexiClash gratis para maestros?', a: 'Sí. Cada maestro obtiene una prueba gratuita de 14 días de Teacher Pro: juego en clase, duelos 1v1, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego de aula sigue siendo gratis para maestros individuales — hasta 3 clases de 50 estudiantes cada una. Teacher Pro cuesta $9/mes y agrega análisis por clase, informes de progreso en PDF/CSV y clases ilimitadas.' },
-    { q: '¿Qué incluyen los planes escolares o de distrito?', a: 'El plan de clase ($39/trimestre, a través del formulario de esta página) cubre una clase completa con todas las funciones de Teacher Pro — análisis, informes, herramientas de tareas — más rachas de clase y soporte prioritario. Los paneles de administración, el análisis entre clases, las bibliotecas de currículo y el SSO para implementación escolar o de distrito están en nuestra hoja de ruta y aún no están disponibles — cuéntanos qué necesitas y te contactaremos, con precio a solicitud.' },
+    { q: '¿Qué incluyen los planes escolares o de distrito?', a: 'Escuelas y departamentos ($49 por docente / año, a través del formulario de esta página) cubre una clase completa con todas las funciones de Teacher Pro — análisis, informes, herramientas de tareas — más rachas de clase y soporte prioritario. Los paneles de administración, el análisis entre clases, las bibliotecas de currículo y el SSO para implementación escolar o de distrito están en nuestra hoja de ruta y aún no están disponibles — cuéntanos qué necesitas y te contactaremos, con precio a solicitud.' },
     { q: '¿Los estudiantes necesitan cuentas o inicios de sesión?', a: 'No. Los estudiantes se unen a un juego de clase con un código — nada que crear, sin datos de estudiantes que gestionar. Eso hace que una implementación en toda la escuela sea mucho más simple que las herramientas que requieren registro o SSO antes de jugar.' },
     { q: '¿Qué idiomas son compatibles?', a: 'Inglés, hebreo (compatibilidad completa de derecha a izquierda), español, sueco, japonés y ruso, cada uno con un diccionario nativo — diseñado para aulas ESL, bilingües e inmersión de idiomas.' },
     { q: '¿Cómo iniciamos nuestra prueba u obtenemos un plan escolar?', a: 'Regístrate como maestro para iniciar tu propia prueba gratuita de Teacher Pro de 14 días. ¿Vas a implementarlo en toda una clase o escuela? Completa el formulario en esta página con tu rol, escuela y número aproximado de estudiantes, y te contactaremos sobre el plan de clase o una cotización para tu escuela o distrito.' },

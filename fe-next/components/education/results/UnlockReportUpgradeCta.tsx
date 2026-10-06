@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
 import { trackResultsAction, type ResultsSurface } from './trackResultsAction';
 
 /**
@@ -78,6 +79,15 @@ export function UnlockReportUpgradeCta({
           cta: 'teacher_pro',
           source: `results_${surface}`,
         });
+        try {
+          trackTeacherProUpgradeClick({
+            page: typeof window !== 'undefined' ? window.location.pathname : `/${language}/teacher`,
+            locale: language,
+            placement: 'results_upsell',
+          });
+        } catch {
+          /* analytics must never block */
+        }
       }}
       className={cn(
         tone === 'quiet'

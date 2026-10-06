@@ -11,6 +11,10 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
 }));
 
+vi.mock('@/lib/education/proFunnelTelemetry', () => ({
+  trackSchoolQuoteRequested: vi.fn(),
+}));
+
 import { SchoolLeadForm } from '../SchoolLeadForm';
 
 describe('<SchoolLeadForm>', () => {
@@ -40,8 +44,7 @@ describe('<SchoolLeadForm>', () => {
     await user.type(screen.getByLabelText(/education\.forSchools\.form\.full_name/i), 'Dana Levi');
     await user.type(screen.getByLabelText(/education\.forSchools\.form\.email/i), 'dana@lincoln.edu');
     await user.type(screen.getByLabelText(/education\.forSchools\.form\.school_or_district/i), 'Lincoln High');
-    // pick a paying-intent interest
-    await user.click(screen.getByLabelText(/education\.forSchools\.form\.interest_pricing_info/i));
+    // pricing_info is selected by default for school quotes
     await user.click(screen.getByRole('button', { name: /education\.forSchools\.form\.submit/i }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
@@ -51,25 +54,25 @@ describe('<SchoolLeadForm>', () => {
     expect(body.student_count).toBeTruthy();
     expect(body.interests).toContain('pricing_info');
     expect(body.locale).toBe('en');
-    expect(body.source).toBe('school-district');
+    expect(body.source).toBe('for-schools-page');
   });
 
-  it('classroom plan POSTs classroom-plan source and tags school_lead_submitted with plan', async () => {
+  it('school plan POSTs for-schools-page source and tags school_lead_submitted with plan school', async () => {
     const fetchMock = vi.fn(async () => ({ ok: true, json: async () => ({ ok: true }) } as any));
     global.fetch = fetchMock as any;
     const user = userEvent.setup();
-    render(<SchoolLeadForm plan="classroom" />);
+    render(<SchoolLeadForm plan="school" />);
     await user.type(screen.getByLabelText(/education\.forSchools\.form\.full_name/i), 'Dana Levi');
     await user.type(screen.getByLabelText(/education\.forSchools\.form\.email/i), 'dana@lincoln.edu');
     await user.type(screen.getByLabelText(/education\.forSchools\.form\.school_or_district/i), 'Lincoln High');
     await user.click(screen.getByRole('button', { name: /education\.forSchools\.form\.submit/i }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
-    expect(body.source).toBe('classroom-plan');
+    expect(body.source).toBe('for-schools-page');
     await waitFor(() =>
       expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
         'school_lead_submitted',
-        expect.objectContaining({ plan: 'classroom', locale: 'en' }),
+        expect.objectContaining({ plan: 'school', locale: 'en' }),
       ),
     );
   });

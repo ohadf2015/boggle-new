@@ -12,9 +12,13 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
 }));
 
+vi.mock('@/lib/education/proFunnelTelemetry', () => ({
+  trackTeacherProUpgradeClick: vi.fn(),
+}));
+
 vi.mock('next/link', () => ({
-  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
+  default: ({ children, href, onClick }: { children: React.ReactNode; href: string; onClick?: () => void }) => (
+    <a href={href} onClick={onClick}>{children}</a>
   ),
 }));
 
@@ -40,24 +44,11 @@ describe('<EducationPackages>', () => {
     expect(pro).toHaveAttribute('href', '/en/teacher/upgrade');
   });
 
-  it('Classroom CTA is a lead button, never a checkout URL', () => {
+  it('Schools CTA is a lead button tagged school, never a checkout URL', () => {
     render(<EducationPackages locale="en" />);
-    const classroom = screen.getByRole('button', { name: /education\.packages\.classroom\.cta/i });
-    expect(classroom.closest('a')).toBeNull();
-    expect(classroom).not.toHaveAttribute('href');
-  });
-
-  it('Schools CTA is a lead button tagged school', () => {
-    render(<EducationPackages locale="en" />);
-    expect(screen.getByRole('button', { name: /education\.packages\.school\.cta/i })).toBeInTheDocument();
-  });
-
-  it('selecting Classroom sets the lead form plan to classroom', async () => {
-    const user = userEvent.setup();
-    const onPlan = vi.fn();
-    render(<EducationPackages locale="en" onPlanChange={onPlan} />);
-    await user.click(screen.getByRole('button', { name: /education\.packages\.classroom\.cta/i }));
-    expect(onPlan).toHaveBeenCalledWith('classroom');
+    const school = screen.getByRole('button', { name: /education\.packages\.school\.cta/i });
+    expect(school.closest('a')).toBeNull();
+    expect(school).not.toHaveAttribute('href');
   });
 
   it('selecting Schools sets the lead form plan to school', async () => {
@@ -68,10 +59,16 @@ describe('<EducationPackages>', () => {
     expect(onPlan).toHaveBeenCalledWith('school');
   });
 
-  it('shows the $9 and $39 price anchors', () => {
+  it('shows the $9 and $49 price anchors', () => {
     render(<EducationPackages locale="en" />);
     expect(screen.getByText('$9')).toBeInTheDocument();
-    expect(screen.getByText('$39')).toBeInTheDocument();
+    expect(screen.getByText('$49')).toBeInTheDocument();
+  });
+
+  it('does not show a Classroom $39 card', () => {
+    render(<EducationPackages locale="en" />);
+    expect(screen.queryByText('$39')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /classroom/i })).not.toBeInTheDocument();
   });
 
   it('sets dir=rtl when language is Hebrew', () => {

@@ -16712,47 +16712,46 @@ const sv = {
         "interest_pricing_info": "Prisinformation",
         "country": "Land (valfritt)",
         "message": "Något annat? (valfritt)",
-        "submit": "Berätta om din skola",
+        "submit": "Begär skoloffert",
         "submitting": "Skickar…",
         "submit_error": "Något gick fel. Försök igen.",
         "rate_limited": "För många inlämningar. Försök igen om 24 timmar.",
         "success_title": "Tack, vi har tagit emot det",
         "success_body": "Vi bekräftar din provperiod och delar information om skolplanen inom 1–2 arbetsdagar. Fortsätt spela med din klass under tiden. Det är gratis.",
         "class_size": "Klassstorlek",
+        "teachers": "Hur många lärare behöver Pro?",
         "privacy_note": "Vi använder detta endast för att kontakta dig om skolfunktioner. Ingen spam."
       }
     },
     "packages": {
-      "title": "Utbildningspaket",
-      "subtitle": "Teacher Pro är live-betalning. Klassrumsplanen är ett prisankare. Berätta om din klass. Skolor och distrikt: kontakta oss. Ingen kassa för klassrum förrän efterfrågan når tröskeln.",
-      "teacherPro": {
-        "name": "Teacher Pro",
-        "interval": "/mån",
-        "blurb": "Alla rapporter, läxor på missade ord och repetitionsverktyg för en lärare.",
-        "cta": "Uppgradera för $9/mån"
-      },
-      "classroom": {
-        "name": "Klassrumsplan",
-        "interval": "/termin",
-        "blurb": "Hela klassen, alla Pro-funktioner, klasssviter och prioriterad support.",
-        "cta": "Begär klassrum för $39/termin"
-      },
-      "school": {
-        "name": "Skolor och kommuner",
-        "price": "Kontakta oss",
-        "blurb": "Utrullning, admin och kommunbehov. Samma formulär, märkt som skolförfrågan.",
-        "cta": "Kontakta oss"
-      },
-      "feature": {
-        "reports": "Alla klassrapporter",
-        "homework": "Läxor på missade ord",
-        "reteach": "Repetitionsverktyg",
-        "wholeClass": "Hela klassen, inte bara en lärarplats",
-        "proPlus": "Alla Teacher Pro-funktioner ingår",
-        "streaks": "Klasssviter",
-        "priority": "Prioriterad support",
-        "district": "Skol- och distriktsutrullning"
-      }
+          "title": "Utbildningspaket",
+          "subtitle": "Teacher Pro är självbetjäning. Skolor och avdelningar: $49 per lärare och år (5+ lärare), faktura eller inköpsorder — begär en offert nedan.",
+          "teacherPro": {
+                "name": "Teacher Pro",
+                "interval": "/mån",
+                "blurb": "Alla rapporter, miss-gap-läxor och omlärningsverktyg för en lärare.",
+                "cta": "Uppgradera för $9/mån"
+          },
+          "school": {
+                "name": "Skolor och avdelningar",
+                "price": "Från $49",
+                "priceFrom": "Från",
+                "interval": "per lärare / år",
+                "priceTerms": "{min}+ lärare · faktura eller inköpsorder",
+                "blurb": "Teacher Pro för varje lärare i ditt team. Faktura eller IO — ingen självbetjäning.",
+                "cta": "Begär skoloffert"
+          },
+          "feature": {
+                "reports": "Alla klassrapporter",
+                "homework": "Miss-gap-läxor",
+                "reteach": "Omlärningsverktyg",
+                "wholeClass": "Hela klassen, inte bara en plats",
+                "proPlus": "Alla Teacher Pro-funktioner ingår",
+                "streaks": "Klasserier",
+                "priority": "Prioriterad support",
+                "district": "Utbyggnad för skola och avdelning",
+                "invoice": "Faktura eller inköpsorder"
+          }
     }
   },
   "crazygames": {

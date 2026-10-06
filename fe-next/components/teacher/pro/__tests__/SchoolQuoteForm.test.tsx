@@ -49,7 +49,7 @@ describe('SchoolQuoteForm', () => {
     expect(body.message).toContain('Ms Rivera');
     expect(body.message).toContain('7');
     expect(screen.getByTestId('school-quote-success').textContent).toContain('dana@school.org');
-    expect(track).toHaveBeenCalledWith('school_lead_submitted', expect.objectContaining({ plan: 'teacher-upgrade' }));
+    expect(track).toHaveBeenCalledWith('school_lead_submitted', expect.objectContaining({ plan: 'school' }));
   });
 
   it('says so plainly when the 24h limit is hit', async () => {

@@ -150,7 +150,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     teachers: { badge: 'For Teachers', title: 'Word Games for Teachers', desc: 'Sub-day, brain-break, warm-up — zero prep, free for teachers.' },
     spelling: { badge: 'Spelling Bee', title: 'Spelling Bee Practice Online', desc: '4-week training plan, custom word lists, 1v1 duels — Scripps prep.' },
     sightWords: { badge: 'Sight Words', title: 'Sight Words Practice (Dolch & Fry)', desc: 'Flashcards, matching & spelling drills built from your own Dolch/Fry list.' },
-    forSchools: { badge: 'For Schools', title: 'LexiClash for Schools', desc: 'Free for teachers — Classroom plan $39/term, no student logins.' },
+    forSchools: { badge: 'For Schools', title: 'LexiClash for Schools', desc: 'Free for teachers — Schools & departments from $49 per teacher / year, no student logins.' },
   },
   he: {
     heading: 'מדריכים למורים',
@@ -160,7 +160,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     teachers: { badge: 'למורים', title: 'משחקי מילים למורים', desc: 'יום מילוי מקום, הפסקה מרעננת, חימום — אפס הכנה, חינם למורים.' },
     spelling: { badge: 'איות', title: 'תרגול תחרות איות אונליין', desc: 'תוכנית אימון של 4 שבועות, רשימות מילים מותאמות, דואלי 1v1 — הכנה לתחרות.' },
     sightWords: { badge: 'מילים נפוצות', title: 'תרגול Sight Words (Dolch ו-Fry)', desc: 'כרטיסיות, התאמות ואיות — מבוסס על רשימת המילים שלכם.' },
-    forSchools: { badge: 'לבתי ספר', title: 'LexiClash לבתי ספר', desc: 'חינם למורים — תוכנית כיתה ב-$39 לסמסטר, בלי הרשמת תלמידים.' },
+    forSchools: { badge: 'לבתי ספר', title: 'LexiClash לבתי ספר', desc: 'חינם למורים — בתי ספר ומחלקות החל מ-$49 למורה לשנה, בלי הרשמת תלמידים.' },
   },
   sv: {
     heading: 'Lärarguider',
@@ -170,7 +170,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     teachers: { badge: 'För lärare', title: 'Ordspel för lärare', desc: 'Vikariedag, hjärnpaus, uppvärmning — noll förberedelse, gratis för lärare.' },
     spelling: { badge: 'Stavning', title: 'Stavningstävling online', desc: '4-veckors träningsplan, anpassade ordlistor, 1v1-dueller — tävlingsförberedelse.' },
     sightWords: { badge: 'Sight Words', title: 'Träna sight words (Dolch & Fry)', desc: 'Flashcards, matchning och stavning från din egen ordlista.' },
-    forSchools: { badge: 'För skolor', title: 'LexiClash för skolor', desc: 'Gratis för lärare — klassplan $39/termin, ingen elevinloggning.' },
+    forSchools: { badge: 'För skolor', title: 'LexiClash för skolor', desc: 'Gratis för lärare — skolor och avdelningar från $49 per lärare / år, ingen elevinloggning.' },
   },
   ja: {
     heading: '教師向けガイド',
@@ -180,7 +180,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     teachers: { badge: '教師向け', title: '教師のための単語ゲーム', desc: '代行日、頭の休憩、ウォームアップ — 準備ゼロ、教師は無料。' },
     spelling: { badge: 'スペリング', title: 'オンラインスペリング練習', desc: '4週間のトレーニングプラン、カスタム単語リスト、1対1デュエル — 大会対策。' },
     sightWords: { badge: 'サイトワード', title: 'サイトワード練習 (Dolch & Fry)', desc: '自分の単語リストでフラッシュカード・マッチング・スペリング練習。' },
-    forSchools: { badge: '学校向け', title: '学校向けLexiClash', desc: '教師は無料 — クラスプランは学期$39、生徒ログイン不要。' },
+    forSchools: { badge: '学校向け', title: '学校向けLexiClash', desc: '教師は無料 — 学校・学科は教員1人あたり年$49から、生徒ログイン不要。' },
   },
   es: {
     heading: 'Guías para docentes',
@@ -190,7 +190,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     teachers: { badge: 'Para docentes', title: 'Juegos de palabras para docentes', desc: 'Día de sustitución, descanso mental, calentamiento — cero preparación, gratis para docentes.' },
     spelling: { badge: 'Concurso de Ortografía', title: 'Práctica de concurso de ortografía online', desc: 'Plan de entrenamiento de 4 semanas, listas personalizadas, duelos 1v1 — preparación para concursos.' },
     sightWords: { badge: 'Sight Words', title: 'Práctica de sight words (Dolch y Fry)', desc: 'Tarjetas, emparejamientos y deletreo desde tu propia lista.' },
-    forSchools: { badge: 'Para escuelas', title: 'LexiClash para escuelas', desc: 'Gratis para docentes — plan de clase $39/trimestre, sin inicio de sesión de estudiantes.' },
+    forSchools: { badge: 'Para escuelas', title: 'LexiClash para escuelas', desc: 'Gratis para docentes — escuelas y departamentos desde $49 por docente / año, sin inicio de sesión de estudiantes.' },
   },
   ru: {
     heading: 'Гиды для учителей',
@@ -200,7 +200,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     teachers: { badge: 'Для учителей', title: 'Словесные игры для учителей', desc: 'День замены, перемена для мозга, разминка — ноль подготовки, бесплатно для учителей.' },
     spelling: { badge: 'Орфография', title: 'Онлайн-практика орфографии', desc: '4-недельный план тренировок, свои списки слов, дуэли 1 на 1 — подготовка к конкурсу.' },
     sightWords: { badge: 'Sight Words', title: 'Практика sight words (Dolch и Fry)', desc: 'Карточки, совпадения и правописание по вашему списку слов.' },
-    forSchools: { badge: 'Для школ', title: 'LexiClash для школ', desc: 'Бесплатно для учителей — план для класса — $39/семестр, без входа для учеников.' },
+    forSchools: { badge: 'Для школ', title: 'LexiClash для школ', desc: 'Бесплатно для учителей — школы и кафедры от $49 за учителя в год, без входа для учеников.' },
   },
 };
 

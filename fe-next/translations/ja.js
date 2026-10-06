@@ -16476,47 +16476,46 @@ const ja = {
         "interest_pricing_info": "料金情報",
         "country": "国(任意)",
         "message": "その他ご質問やコメントはありますか?(任意)",
-        "submit": "学校情報を送信する",
+        "submit": "学校見積もりを依頼",
         "submitting": "送信中…",
         "submit_error": "エラーが発生しました。もう一度お試しください。",
         "rate_limited": "送信が多すぎます。24時間後にもう一度お試しください。",
         "success_title": "ありがとうございます。確認しました",
         "success_body": "1〜2営業日以内にトライアルアクセスを確認し、学校プランの詳細をご連絡します。それまでもクラスでLexiClashを無料でご利用いただけます。",
         "class_size": "クラス人数",
+        "teachers": "Proが必要な教員は何名ですか？",
         "privacy_note": "この情報は学校向け機能についてのご連絡にのみ使用します。スパムメールはお送りしません。"
       }
     },
     "packages": {
-      "title": "教育パッケージ",
-      "subtitle": "Teacher Pro は本番課金です。クラスプランは価格アンカーです。学校・学区はお問い合わせください。需要の閾値まではクラス向け決済はありません。",
-      "teacherPro": {
-        "name": "Teacher Pro",
-        "interval": "/月",
-        "blurb": "レポート、ミスギャップ宿題、再指導ツールを1人の教師向けに。",
-        "cta": "$9/月でアップグレード"
-      },
-      "classroom": {
-        "name": "クラスプラン",
-        "interval": "/学期",
-        "blurb": "クラス全体、全Pro機能、クラス連続記録、優先サポート。",
-        "cta": "$39/学期でクラスを申し込む"
-      },
-      "school": {
-        "name": "学校・学区",
-        "price": "お問い合わせ",
-        "blurb": "導入・管理・学区向け。同じフォームで学校リードとして記録します。",
-        "cta": "お問い合わせ"
-      },
-      "feature": {
-        "reports": "すべてのクラスレポート",
-        "homework": "ミスギャップ宿題",
-        "reteach": "再指導ツール",
-        "wholeClass": "教師1席ではなくクラス全体",
-        "proPlus": "Teacher Pro の全機能を含む",
-        "streaks": "クラス連続記録",
-        "priority": "優先サポート",
-        "district": "学校・学区への導入"
-      }
+          "title": "教育パッケージ",
+          "subtitle": "Teacher Proはセルフサーブ課金。学校・学科向け：$49/教員/年（5名以上）、請求書または発注書 — 下のフォームで見積もりを依頼。",
+          "teacherPro": {
+                "name": "Teacher Pro",
+                "interval": "/月",
+                "blurb": "1人の教員向けに、すべてのレポート、取りこぼし宿題、再指導ツール。",
+                "cta": "月$9でアップグレード"
+          },
+          "school": {
+                "name": "学校・学科",
+                "price": "$49から",
+                "priceFrom": "年額",
+                "interval": "/教員/年",
+                "priceTerms": "{min}名以上の教員 · 請求書または発注書",
+                "blurb": "チームの全教員にTeacher Pro。請求書または発注書 — セルフサーブ決済なし。",
+                "cta": "学校見積もりを依頼"
+          },
+          "feature": {
+                "reports": "すべてのクラスレポート",
+                "homework": "取りこぼし宿題",
+                "reteach": "再指導ツール",
+                "wholeClass": "クラス全体（1席だけではない）",
+                "proPlus": "Teacher Proの全機能を含む",
+                "streaks": "クラスの連続記録",
+                "priority": "優先サポート",
+                "district": "学校・学科への展開",
+                "invoice": "請求書または発注書"
+          }
     }
   },
   "crazygames": {

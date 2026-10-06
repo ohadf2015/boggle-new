@@ -1,6 +1,6 @@
 /**
  * Public classroom compare pages must link Teacher Pro checkout.
- * The $39/term Classroom plan stays lead-capture and is not linked here.
+ * Schools & departments ($49/teacher/year) stay lead-capture and are not linked here.
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
