@@ -1,18 +1,52 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
 export function TeacherAccessCTA() {
   const { t, language } = useLanguage();
+  const containerRef = useRef<HTMLElement>(null);
+  const firedRef = useRef(false);
 
   useEffect(() => {
-    trackGrowthEvent('education_upsell_impression', { cta: 'teacher_individual' });
+    const el = containerRef.current;
+    if (!el || firedRef.current) return;
+
+    if (typeof IntersectionObserver === 'undefined') {
+      firedRef.current = true;
+      try {
+        trackGrowthEvent('education_upsell_impression', { cta: 'teacher_individual' });
+      } catch {}
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (
+            !firedRef.current &&
+            entry.isIntersecting &&
+            (entry.intersectionRatio === undefined || entry.intersectionRatio >= 0.5)
+          ) {
+            firedRef.current = true;
+            io.disconnect();
+            try {
+              trackGrowthEvent('education_upsell_impression', { cta: 'teacher_individual' });
+            } catch {}
+            break;
+          }
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
   return (
-    <aside className="mx-auto my-12 max-w-3xl rounded-neo border-neo-thick border-neo-navy bg-neo-cream p-6 sm:p-8 shadow-hard-lg">
+    <aside ref={containerRef} className="mx-auto my-12 max-w-3xl rounded-neo border-neo-thick border-neo-navy bg-neo-cream p-6 sm:p-8 shadow-hard-lg">
       <h2
         data-cta-item
         className="text-2xl font-neo-display font-black text-neo-navy"

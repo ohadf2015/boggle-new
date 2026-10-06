@@ -55,6 +55,20 @@ export function buildTrialActivatedEvent(userId: string, subscriptionId: string)
   };
 }
 
+/** Measurable gate step: teacher access request row durably created. */
+export function buildEduAccessRequestCreatedEvent(
+  userId: string,
+  properties: Record<string, unknown> = {}
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'edu_access_request_created',
+    properties: { product: 'teacher_pro', ...properties },
+  };
+}
+
+export const buildAccessRequestCreatedEvent = buildEduAccessRequestCreatedEvent;
+
 /** Never throws: a dead analytics endpoint must never fail a checkout or a webhook. */
 export function captureProFunnelServerEvent(event: EduServerEvent): void {
   try {

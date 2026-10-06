@@ -1,11 +1,14 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
 export function DistrictUpsellStrip({ hideTeacherCta = false }: { hideTeacherCta?: boolean }) {
   const { t, language } = useLanguage();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const firedRef = useRef(false);
+
   // Route interest into STRUCTURED, admin-visible capture instead of raw mailto:
   // individual teachers → the free teacher-access form; districts → the qualified
   // For Schools lead form (role / size / paid-interest fields + rate limit + admin viewer).
@@ -13,14 +16,48 @@ export function DistrictUpsellStrip({ hideTeacherCta = false }: { hideTeacherCta
   const districtHref = `/${language}/education/for-schools`;
 
   useEffect(() => {
-    if (!hideTeacherCta) {
-      trackGrowthEvent('education_upsell_impression', { cta: 'teacher_individual' });
+    const el = containerRef.current;
+    if (!el || firedRef.current) return;
+
+    const fire = () => {
+      if (firedRef.current) return;
+      firedRef.current = true;
+      try {
+        if (!hideTeacherCta) {
+          trackGrowthEvent('education_upsell_impression', { cta: 'teacher_individual' });
+        }
+        trackGrowthEvent('education_upsell_impression', { cta: 'district_upsell' });
+      } catch {}
+    };
+
+    if (typeof IntersectionObserver === 'undefined') {
+      fire();
+      return;
     }
-    trackGrowthEvent('education_upsell_impression', { cta: 'district_upsell' });
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (
+            !firedRef.current &&
+            entry.isIntersecting &&
+            (entry.intersectionRatio === undefined || entry.intersectionRatio >= 0.5)
+          ) {
+            io.disconnect();
+            fire();
+            break;
+          }
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    io.observe(el);
+    return () => io.disconnect();
   }, [hideTeacherCta]);
 
   return (
-    <div className="mx-auto my-8 max-w-3xl flex flex-col gap-4">
+    <div ref={containerRef} className="mx-auto my-8 max-w-3xl flex flex-col gap-4">
       {/* Individual teacher CTA — hidden on the access page itself (self-link) */}
       {!hideTeacherCta && (
         <aside className="rounded-neo border-neo border-neo-lime/60 bg-neo-navy-light px-6 py-5 shadow-hard">

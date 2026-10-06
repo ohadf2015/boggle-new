@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { m, useReducedMotion, type Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { TeacherAccessSubmission, TeacherAccessRole, TeacherLocale } from '@/lib/education/types';
 
 /** Fun emoji per role — turns a boring dropdown into a tap-to-pick card grid. */
@@ -106,6 +107,11 @@ export function AccessRequestForm({
           school_or_org: school || undefined,
         } satisfies TeacherAccessSubmission),
       });
+      try {
+        trackGrowthEvent('edu_access_request_submitted', { ok: res.ok, status: res.status });
+      } catch {
+        /* telemetry must never break access request */
+      }
       if (!res.ok) {
         setError(res.status === 429 ? t('education.access.rate_limited') : t('education.access.submit_error'));
         return;

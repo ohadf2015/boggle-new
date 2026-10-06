@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { POST } from '../route';
+import { EDU_ANALYTICS_HOST } from '@/backend/utils/educationTelemetry';
 
 // Mutable auth/db state the mocked Supabase client reads from, reset per test.
 let mockUser:
@@ -13,8 +14,17 @@ let approveMock = vi.fn(async (_args?: any) => ({ data: [{ id: 'req-1' }], error
 let adminSelectMock = vi.fn(async () => ({ data: [{ id: 'user-1' }], error: null }));
 let adminAvailable = true;
 let sendEmailMock = vi.fn(async (_args: any) => ({ ok: true as boolean, error: undefined as string | undefined }));
+let captureMock = vi.fn();
+let posthogThrows = false;
 // Rows the twin-check select (approved request already exists?) returns.
 let twinRows: any[] = [];
+
+vi.mock('@/lib/posthog', () => ({
+  getPostHogServer: () => {
+    if (posthogThrows) throw new Error('posthog down');
+    return { capture: (...a: unknown[]) => captureMock(...a) };
+  },
+}));
 
 vi.mock('@/utils/supabase/server', () => ({
   createClient: async () => ({
@@ -106,9 +116,27 @@ describe('POST /api/education/access-request', () => {
     adminAvailable = true;
     twinRows = [];
     sendEmailMock = vi.fn(async () => ({ ok: true, error: undefined }));
+    captureMock = vi.fn();
+    posthogThrows = false;
   });
 
-  it('200 for a signed-up, email-verified user', async () => {
+  it('200 for a signed-up, email-verified user and fires edu_access_request_created', async () => {
+    const res = await POST(mkReq(validPayload));
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.ok).toBe(true);
+
+    expect(captureMock).toHaveBeenCalledTimes(1);
+    const ev = captureMock.mock.calls[0][0];
+    expect(ev.distinctId).toBe('user-1');
+    expect(ev.event).toBe('edu_access_request_created');
+    expect(ev.properties.$host).toBe(EDU_ANALYTICS_HOST);
+    expect(ev.properties.role).toBe('teacher');
+    expect(ev.properties.locale).toBe('en');
+  });
+
+  it('still succeeds when posthog capture throws', async () => {
+    posthogThrows = true;
     const res = await POST(mkReq(validPayload));
     expect(res.status).toBe(200);
     const json = await res.json();

@@ -264,6 +264,11 @@ export type GrowthEvent =
   | 'teacher_pro_checkout_started'
   | 'teacher_pro_checkout_redirect'
   | 'school_quote_requested'
+  // Teacher access gate telemetry (Growth Radar funnel)
+  | 'edu_access_gate_viewed'
+  | 'edu_access_signup_tapped'
+  | 'edu_access_verify_resent'
+  | 'edu_access_request_submitted'
   // ESL winner-page depth (t_25b9ddb1). Demo start + CEFR list pick on
   // /education/esl-word-games. Props: { cefr: 'A1'|'A2'|'B1', page }.
   | 'edu_page_play_demo_started'
@@ -754,23 +759,28 @@ const persistToSupabase = (event: GrowthEvent, data: GrowthEventData): void => {
   // Attach the verified bearer token (when signed in) so the server can resolve
   // the real player identity; the body player_id is a hint the server re-verifies.
   void (async () => {
-    const authHeaders = await getAnalyticsAuthHeaders();
-    fetch('/api/analytics/track', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders },
-      body: JSON.stringify({
-        event_type: event,
-        session_id: guestSessionId || data.sessionId || null,
-        player_id: identity?.userId ?? null,
-        utm_source: utmData?.utm_source || utmData?.ref || null,
-        utm_medium: utmData?.utm_medium || null,
-        utm_campaign: utmData?.utm_campaign || null,
-        referrer: utmData?.referrer || null,
-        metadata: enrichedMetadata,
-      }),
-    }).catch(() => {
+    try {
+      const authHeaders = await getAnalyticsAuthHeaders();
+      const p = fetch('/api/analytics/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
+        body: JSON.stringify({
+          event_type: event,
+          session_id: guestSessionId || data.sessionId || null,
+          player_id: identity?.userId ?? null,
+          utm_source: utmData?.utm_source || utmData?.ref || null,
+          utm_medium: utmData?.utm_medium || null,
+          utm_campaign: utmData?.utm_campaign || null,
+          referrer: utmData?.referrer || null,
+          metadata: enrichedMetadata,
+        }),
+      });
+      if (p && typeof p.catch === 'function') {
+        p.catch(() => {});
+      }
+    } catch {
       // Silently fail — analytics should never break the game
-    });
+    }
   })();
 };
 
