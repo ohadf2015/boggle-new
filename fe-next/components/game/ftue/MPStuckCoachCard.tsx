@@ -3,6 +3,7 @@
 import { X } from 'lucide-react';
 
 import { useLanguage } from '@/contexts/LanguageContext';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 import { stageWantsExampleWord, type StuckStage } from '../../../lib/ftue/mpStuckCoach';
 import { DragHintDiagram } from './DragHintDiagram';
@@ -62,7 +63,11 @@ export function MPStuckCoachCard({ stage, onDismiss, exampleWord }: MPStuckCoach
         <p className="font-neo-body text-sm leading-snug">{t(copy.key, copy.fallback)}</p>
         {showExample && (
           <p className="mt-1 font-neo-display text-sm font-black leading-snug">
-            {t('mpCoach.tryWord', 'Try: {word}', { word: exampleWord!.toUpperCase() })}
+            {t('mpCoach.tryWord', 'Try: {word}', {
+              // solve-grid returns Hebrew words sofit-folded (גרמ); the caption
+              // must read as a real word (גרם). No-op for other scripts.
+              word: applyHebrewFinalLetters(exampleWord!).toUpperCase(),
+            })}
           </p>
         )}
       </div>
