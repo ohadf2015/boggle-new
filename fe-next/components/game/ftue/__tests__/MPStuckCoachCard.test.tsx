@@ -5,7 +5,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 let mockDir: 'ltr' | 'rtl' = 'ltr';
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (_key: string, fallback?: string) => fallback ?? _key,
+    t: (_key: string, fallback?: string, vars?: Record<string, string>) =>
+      (fallback ?? _key).replace(/\{(\w+)\}/g, (_m, k: string) => vars?.[k] ?? ''),
     dir: mockDir,
     language: 'en',
   }),
@@ -67,5 +68,17 @@ describe('MPStuckCoachCard', () => {
     expect(diagram).not.toBeNull();
     expect(diagram?.getAttribute('data-dir')).toBe('rtl');
     mockDir = 'ltr';
+  });
+
+  it('shows a Hebrew example word with its final letter in the caption', () => {
+    // solve-grid hands back sofit-folded forms (גרמ); the caption must say גרם.
+    render(<MPStuckCoachCard stage="tap-hint" onDismiss={() => {}} exampleWord="גרמ" />);
+    // Caption only: the drag diagram mirrors board tiles, which never hold sofit.
+    expect(screen.getByText(/^Try:/).textContent).toBe('Try: גרם');
+  });
+
+  it('leaves non-Hebrew example words as upper-case', () => {
+    render(<MPStuckCoachCard stage="tap-hint" onDismiss={() => {}} exampleWord="cat" />);
+    expect(screen.getByText(/^Try:/).textContent).toBe('Try: CAT');
   });
 });
