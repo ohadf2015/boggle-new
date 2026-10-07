@@ -552,6 +552,14 @@ const endEmittedModes = new Set<string>();
 // the same mode still count even when a joiner missed trackGameStart.
 const endEmittedRoundIds = new Set<string>();
 
+// Modes whose current MP end landed WITHOUT a roundId (PlayerView's
+// useGameEndTelemetry, which fires when the view survives to the rising edge).
+// The Results screen then reports the same round WITH a roundId; without this
+// slot the keyed branch skipped the mode guard and double-counted
+// game_completed (and total_games_played) for every player whose PlayerView
+// did fire. The keyed emit consumes the slot, so the next keyed round lands.
+const endEmittedUnkeyedMpModes = new Set<string>();
+
 // Funnel-critical events also emitted under their canonical (unprefixed)
 // name so PostHog dashboards resolve without a `growth:` rewrite.
 //
@@ -1373,6 +1381,7 @@ export const trackGameStart = (
   sessionGameCount += 1;
   // Re-arm this mode's one-end-per-start guard in trackGameEnd.
   endEmittedModes.delete(mode);
+  endEmittedUnkeyedMpModes.delete(mode);
   // gameMode/engineMode defaults first so MP callers' explicit engineMode:'multiplayer'
   // + gameMode:'<resolved>' override them (nightly splits MP rounds by mode). The
   // canonical `mode` goes LAST so extras can never clobber it — matches trackGameEnd's
@@ -1425,8 +1434,15 @@ export const trackGameEnd = (
   if (roundId) {
     if (endEmittedRoundIds.has(roundId)) return;
     endEmittedRoundIds.add(roundId);
+    // Same round already completed via the unkeyed PlayerView path.
+    if (endEmittedUnkeyedMpModes.has(mode)) {
+      endEmittedUnkeyedMpModes.delete(mode);
+      return;
+    }
   } else if (endEmittedModes.has(mode)) {
     return;
+  } else if (extras.isMultiplayer === true) {
+    endEmittedUnkeyedMpModes.add(mode);
   }
   // Always mark the mode slot when we emit, so a later non-roundId caller for
   // the same start still collapses (HostView effect + Results without roundId).
