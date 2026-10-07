@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -107,6 +107,15 @@ function renderComponent() {
 describe('DailyChallengeLanding — Hub Redesign', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Only fake Date so React timers stay real. Freeze away from day-of-month
+    // colliding with the mocked streak (7) — on 2026-10-07 the hub header also
+    // renders a text-xl font-black '7', so getByText('7') was ambiguous.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-01-15T12:00:00.000Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should render "Today\'s Puzzles" header at the top', () => {
