@@ -7,6 +7,8 @@ export interface LocaleContent {
   twitterDescription: string;
   heroTitle: string;
   intro: string;
+  /** H2 for the extractable GEO answer block; body reuses `intro`. */
+  geoQuestion: string;
   ctaStart: string;
   ctaCduel: string;
   ctaMiddleSchool: string;
@@ -32,6 +34,7 @@ const en: LocaleContent = {
   twitterDescription: 'Live multiplayer word games. No login, no download. Free.',
   heroTitle: 'Word games for the classroom — no login, no download, no prep.',
   intro: 'Most classroom games want student accounts, an app install, or both. LexiClash wants a 6-character code. Project it, students type it on any device, and the whole class is playing a live word game in seconds — free, browser-based, nothing to install. Word-formation gameplay (find and spell real words on Boggle-style grids, anagrams, and wheels) makes it perfect for vocabulary review, spelling, and brain breaks. Bring your own word list or use a built-in one for true zero prep.',
+  geoQuestion: 'How do teachers run word games for the classroom with no student login?',
   ctaStart: 'Start a Class Game Free',
   ctaCduel: 'Run a 1v1 Duel',
   ctaMiddleSchool: 'Middle School Games',
@@ -134,6 +137,7 @@ const sv: LocaleContent = {
   twitterDescription: 'Direktsand ordspel. Ingen inloggning, ingen nedladdning. Gratis.',
   heroTitle: 'Ordspel for klassrummet — ingen inloggning, ingen nedladdning, ingen forberedelse.',
   intro: 'De flesta klassrumsspel kraver elevkonton, en appinstallation eller bada. LexiClash behover endast en kod på sex tecken. Projicera den, eleverna skriver in den pa vilken enhet som helst, och hela klassen spelar ett livordspel pa sekunder — gratis, webbaserat, inget att installera. Ordbildningsspelmekanik (soka och stava verkliga ord pa Boggle-inspirerade galler, anagram och hjul) gor det perfekt for vokabularieverkning, stavning och hjarntraning. Ta med din egen ordlista eller anvand en inbyggd for verklig noll forberedelse.',
+  geoQuestion: 'Hur startar larare ordspel i klassrummet utan elevinloggning?',
   ctaStart: 'Starta ett klassrumsspel gratis',
   ctaCduel: 'Kor en 1v1 duel',
   ctaMiddleSchool: 'Spel for mellanstadiet',
@@ -236,6 +240,7 @@ const ja: LocaleContent = {
   twitterDescription: 'ライブマルチプレイヤーワードゲーム。ログイン不要、ダウンロード不要。無料。',
   heroTitle: 'クラスルーム向けワードゲーム — ログイン不要、ダウンロード不要、準備不要。',
   intro: 'ほとんどの教室ゲームには学生アカウント、アプリのインストール、またはその両方が必要です。LexiClashが必要なのは6文字のコードだけです。それを投影し、学生がどのデバイスからでも入力すると、クラス全体が数秒でライブワードゲームをプレイしています — 無料、ブラウザベース、何もインストールする必要がありません。単語形成ゲームプレイ（ボグル風グリッド、アナグラム、ホイール上の実在する単語を見つけて綴る）は、語彙復習、綴り、そして脳トレに最適です。独自の単語リストを持参するか、組み込みのリストを使用して真のゼロ準備を実現できます。',
+  geoQuestion: '生徒アカウントなしで教室向けワードゲームを始めるには？',
   ctaStart: '無料でクラスゲームを開始',
   ctaCduel: '1対1デュエルを実行',
   ctaMiddleSchool: '中学校ゲーム',
@@ -338,6 +343,7 @@ const es: LocaleContent = {
   twitterDescription: 'Juegos de palabras multijugador en vivo. Sin inicio de sesion, sin descargas. Gratis.',
   heroTitle: 'Juegos de palabras para el aula — sin inicio de sesion, sin descargas, sin preparacion.',
   intro: 'La mayoria de los juegos de aula requieren cuentas de estudiantes, una instalacion de aplicacion, o ambos. LexiClash solo necesita un codigo de 6-characteros. Proyectalo, los estudiantes lo escriben en cualquier dispositivo, y toda la clase esta jugando un juego de palabras en vivo en segundos — gratuito, basado en navegador, nada que instalar. La mecanica de juego de formacion de palabras (encontrar y deletrear palabras reales en cuadrículas estilo Boggle, anagramas y ruedas) lo hace perfecto para repaso de vocabulario, ortografia y descansos cerebrales. Trae tu propia lista de palabras o usa una integrada para preparacion realmente cero.',
+  geoQuestion: 'Como se juegan juegos de palabras en el aula sin cuentas de estudiantes?',
   ctaStart: 'Iniciar un juego de clase gratis',
   ctaCduel: 'Ejecutar un duelo 1v1',
   ctaMiddleSchool: 'Juegos de escuela secundaria',
@@ -440,6 +446,7 @@ const he: LocaleContent = {
   twitterDescription: 'משחקי מילים מולטיפלייר בחיים. ללא התחברות, ללא הורדה. חינם.',
   heroTitle: 'משחקי מילים לכיתה — ללא התחברות, ללא הורדה, ללא הכנה.',
   intro: 'רוב משחקי הכיתה דורשים חשבונות תלמידים, התקנת אפליקציה, או שניהם. LexiClash צריך רק קוד בן 6 תווים. הקרן אותו, תלמידים מקלידים אותו בכל מכשיר, וכל הכיתה משחקת משחק מילים חי בשניות — חינם, מבוסס דפדפן, אין צורך להתקין. מכניקת משחק יצירת מילים (מצא ואיית מילים אמיתיות ברשתות בסגנון בוגל, אנגרמות וגלגלים) הופכת אותו למושלם לחזרה על אוצר מילים, איות והפסקות למוח. הביא את רשימת המילים שלך או השתמש באחת מובנית לאפס הכנה אמיתי.',
+  geoQuestion: 'איך מריצים משחקי מילים בכיתה בלי חשבונות לתלמידים?',
   ctaStart: 'התחל משחק כיתה חינם',
   ctaCduel: 'הפעל דו-קרב 1 על 1',
   ctaMiddleSchool: 'משחקי חטיבת ביניים',
@@ -542,6 +549,7 @@ const ru: LocaleContent = {
   twitterDescription: 'Живые многопользовательские словесные игры. Без входа, без загрузки. Бесплатно.',
   heroTitle: 'Словесные игры для класса — без входа, без загрузки, без подготовки.',
   intro: 'Большинство классных игр требуют учетные записи учеников, установку приложения или оба варианта. LexiClash требует только код из 6 символов. Проецируйте его, ученики вводят его на любом устройстве, и весь класс играет в живую словесную игру за считанные секунды — бесплатно, в браузере, ничего не надо устанавливать. Механика словообразования (ищите и пишите реальные слова на сетках в стиле Богла, анаграммы и колеса) идеальны для повторения словарного запаса, орфографии и пауз в мозгу. Принесите свой собственный список слов или используйте встроенный для истинной нулевой подготовки.',
+  geoQuestion: 'Как провести словесные игры в классе без аккаунтов учеников?',
   ctaStart: 'Начать классную игру бесплатно',
   ctaCduel: 'Запустить поединок 1v1',
   ctaMiddleSchool: 'Игры для средней школы',
