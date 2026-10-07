@@ -37,13 +37,19 @@ import { levelUpFromRecordGame, publishLevelUp } from '@/lib/avatar/revealTrigge
 // deferred so results/tutorial JS (framer-motion, ads, confetti) doesn't block first paint.
 // A loader, not nothing: without one the round ended on a blank navy screen
 // until the results chunk arrived (seconds on a slow phone).
-const ResultsLoading = () => <div className="flex min-h-[60vh] items-center justify-center"><PageLoader size="lg" /></div>;
+// mascotSrc: PageLoader's default variant ('happy') fires a HIGH-priority
+// winner.webp fetch (r6 PSI: the script-initiated fetch Lantern modeled at
+// 9-11s simLCP). winner-lcp.webp is preloaded by the layout, so this img is
+// served from cache — zero network in the load window.
+const LCP_SAFE_LOADER = { mascotSrc: '/mascot/winner-lcp.webp', priority: false } as const;
+const ResultsLoading = () => <div className="flex min-h-[60vh] items-center justify-center"><PageLoader size="lg" {...LCP_SAFE_LOADER} /></div>;
+const PracticeResultsLoading = ResultsLoading;
 const SinglePlayerResults = nextDynamic(() => import('./SinglePlayerResults'), { ssr: false, loading: ResultsLoading });
-const PracticeResults = nextDynamic(() => import('./results/PracticeResults'), { ssr: false, loading: ResultsLoading });
+const PracticeResults = nextDynamic(() => import('./results/PracticeResults'), { ssr: false, loading: PracticeResultsLoading });
 const PreGameTutorial = nextDynamic(() => import('./PreGameTutorial'), { ssr: false });
 const SinglePlayerGame = nextDynamic(() => import('./SinglePlayerGame'), {
   ssr: false,
-  loading: () => <div className="flex min-h-[60vh] items-center justify-center" aria-busy="true"><PageLoader size="lg" /></div>,
+  loading: () => <div className="flex min-h-[60vh] items-center justify-center" aria-busy="true"><PageLoader size="lg" {...LCP_SAFE_LOADER} /></div>,
 });
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';

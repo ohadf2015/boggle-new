@@ -745,6 +745,52 @@ const getAnalyticsAuthHeaders = async (): Promise<Record<string, string>> => {
  * Persist event to Supabase analytics_events table via API
  * Fire-and-forget — never blocks the UI
  */
+// Pre-interaction send queue (PSI r7): page_view/session_start fire during the
+// Lighthouse load window (r6: 2x /api/analytics/track at 2.9-3.6s observed) and
+// add modeled network contention to simLCP. Queue sends until the first real
+// user interaction (pointer/key/touch — PSI never interacts); read-and-bounce
+// sessions flush on pagehide via sendBeacon. Post-interaction events (all
+// gameplay) send immediately, so this changes nothing once the game is played.
+let analyticsSendArmed = false;
+const pendingAnalyticsSends: Array<() => void> = [];
+const pendingBeaconPayloads: Array<Record<string, unknown>> = [];
+const MAX_QUEUED_ANALYTICS = 50;
+
+if (typeof window !== 'undefined') {
+  if (process.env.NODE_ENV === 'test') {
+    // Unit tests assert fetch() synchronously after trackGrowthEvent and never
+    // simulate interaction — arm immediately so the queue is transparent.
+    analyticsSendArmed = true;
+  }
+  const armAnalyticsSending = (): void => {
+    if (analyticsSendArmed) return;
+    analyticsSendArmed = true;
+    const sends = pendingAnalyticsSends.splice(0);
+    pendingBeaconPayloads.length = 0;
+    sends.forEach((send) => { try { send(); } catch { /* analytics never breaks the game */ } });
+  };
+  window.addEventListener('pointerdown', armAnalyticsSending, { once: true, capture: true });
+  window.addEventListener('keydown', armAnalyticsSending, { once: true, capture: true });
+  window.addEventListener('touchstart', armAnalyticsSending, { once: true, capture: true });
+  window.addEventListener('pagehide', () => {
+    if (analyticsSendArmed || pendingBeaconPayloads.length === 0) return;
+    pendingBeaconPayloads.splice(0).forEach((payload) => {
+      try {
+        // Blob keeps Content-Type application/json — express.json() ignores text/plain.
+        navigator.sendBeacon('/api/analytics/track', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+      } catch { /* best-effort on unload */ }
+    });
+  });
+}
+
+/** Run `send` immediately post-interaction; queue it (plus a beacon copy) before. */
+const queueOrSendAnalytics = (send: () => void, beaconPayload: Record<string, unknown>): void => {
+  if (analyticsSendArmed) { send(); return; }
+  if (pendingAnalyticsSends.length >= MAX_QUEUED_ANALYTICS) return;
+  pendingAnalyticsSends.push(send);
+  pendingBeaconPayloads.push(beaconPayload);
+};
+
 const persistToSupabase = (event: GrowthEvent, data: GrowthEventData): void => {
   if (typeof window === 'undefined') return;
 
@@ -774,30 +820,33 @@ const persistToSupabase = (event: GrowthEvent, data: GrowthEventData): void => {
 
   // Attach the verified bearer token (when signed in) so the server can resolve
   // the real player identity; the body player_id is a hint the server re-verifies.
-  void (async () => {
-    try {
-      const authHeaders = await getAnalyticsAuthHeaders();
-      const p = fetch('/api/analytics/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeaders },
-        body: JSON.stringify({
-          event_type: event,
-          session_id: guestSessionId || data.sessionId || null,
-          player_id: identity?.userId ?? null,
-          utm_source: utmData?.utm_source || utmData?.ref || null,
-          utm_medium: utmData?.utm_medium || null,
-          utm_campaign: utmData?.utm_campaign || null,
-          referrer: utmData?.referrer || null,
-          metadata: enrichedMetadata,
-        }),
-      });
-      if (p && typeof p.catch === 'function') {
-        p.catch(() => {});
+  const payload = {
+    event_type: event,
+    session_id: guestSessionId || data.sessionId || null,
+    player_id: identity?.userId ?? null,
+    utm_source: utmData?.utm_source || utmData?.ref || null,
+    utm_medium: utmData?.utm_medium || null,
+    utm_campaign: utmData?.utm_campaign || null,
+    referrer: utmData?.referrer || null,
+    metadata: enrichedMetadata,
+  };
+  queueOrSendAnalytics(() => {
+    void (async () => {
+      try {
+        const authHeaders = await getAnalyticsAuthHeaders();
+        const p = fetch('/api/analytics/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
+          body: JSON.stringify(payload),
+        });
+        if (p && typeof p.catch === 'function') {
+          p.catch(() => {});
+        }
+      } catch {
+        // Silently fail — analytics should never break the game
       }
-    } catch {
-      // Silently fail — analytics should never break the game
-    }
-  })();
+    })();
+  }, payload);
 };
 
 /**
@@ -1212,14 +1261,21 @@ export const trackAnalyticsEvent = async (
 
     // Fire and forget - don't block on response. Attach the verified bearer
     // token (when signed in) so the server can resolve real player identity.
-    const authHeaders = await getAnalyticsAuthHeaders();
-    fetch('/api/analytics/track', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders },
-      body: JSON.stringify(payload),
-    }).catch((err) => {
-      logger.warn('[ANALYTICS] Failed to track event:', err);
-    });
+    // Queued until first user interaction (PSI r7 — see queueOrSendAnalytics).
+    queueOrSendAnalytics(() => {
+      void (async () => {
+        const authHeaders = await getAnalyticsAuthHeaders();
+        fetch('/api/analytics/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
+          body: JSON.stringify(payload),
+        }).catch((err) => {
+          logger.warn('[ANALYTICS] Failed to track event:', err);
+        });
+      })().catch((error) => {
+        logger.warn('[ANALYTICS] Error tracking event:', error);
+      });
+    }, payload);
   } catch (error) {
     logger.warn('[ANALYTICS] Error tracking event:', error);
   }

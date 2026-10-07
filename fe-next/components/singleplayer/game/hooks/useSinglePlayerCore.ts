@@ -18,6 +18,7 @@ import { useGiftModalPause } from '@/hooks/useGiftModalPause';
 import { useRewardAdPause } from '@/hooks/useRewardAdPause';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
+import { readCachedThemedWords, cacheThemedWords } from '@/lib/singleplayer/themedWordsCache';
 import { DIFFICULTIES } from '@/utils/consts';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 import { wordErrorToast } from '@/components/NeoToast';
@@ -508,10 +509,19 @@ export function useSinglePlayerCore({
       }
       let wordsToEmbed: string[] = [];
       if (settings.language !== 'ja') {
-        try {
-          const response = await fetch('/api/themed-words', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ language: settings.language, count: wordCount, minLength: 3, maxLength: maxWordLen }) });
-          if (response.ok) { const data = await response.json(); wordsToEmbed = data.words || []; }
-        } catch (error) { console.warn('Failed to fetch themed words:', error); }
+        if (startsBehindGate(settings.mode, coach)) {
+          // Start-gated modes (solo-bots/challenge): NO mount-time fetch — the
+          // POST sat in the PSI load window (r6: themed-words fired ~3s during
+          // load). Build the board from last visit's cached theme words; the
+          // cache refreshes in the background once the round actually starts
+          // (see the effect below). First-ever visits get a plain board.
+          wordsToEmbed = readCachedThemedWords(settings.language, wordCount);
+        } else {
+          try {
+            const response = await fetch('/api/themed-words', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ language: settings.language, count: wordCount, minLength: 3, maxLength: maxWordLen }) });
+            if (response.ok) { const data = await response.json(); wordsToEmbed = data.words || []; cacheThemedWords(settings.language, wordsToEmbed); }
+          } catch (error) { console.warn('Failed to fetch themed words:', error); }
+        }
       }
       setGrid(pickRichestBoardClient(
         () => generateRandomTable(rows, cols, settings.language, wordsToEmbed),
@@ -522,8 +532,36 @@ export function useSinglePlayerCore({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.difficulty, settings.language, settings.bots, settings.mode, initializeBotUsedWords, resetBots, resetSpamDetection]);
 
+  // Refresh the themed-words cache for the NEXT board once this round is
+  // actually running (post Start tap). Gated modes skipped the mount fetch to
+  // keep it out of the PSI load window; this is where they pay for it — user
+  // era, zero load-window cost. Ungated modes already fetched (and cached) at
+  // mount; community boards (settings.grid) never use themed words.
+  useEffect(() => {
+    if (!started || isGameOver) return;
+    if (!startsBehindGate(settings.mode, coach)) return;
+    if (settings.grid || settings.language === 'ja') return;
+    const difficultyConfig = DIFFICULTIES[settings.difficulty];
+    const totalCells = difficultyConfig.rows * difficultyConfig.cols;
+    const wordCount = Math.min(35, Math.max(5, Math.floor(totalCells / 3)));
+    const maxWordLen = Math.min(12, Math.max(difficultyConfig.rows, difficultyConfig.cols));
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const response = await fetch('/api/themed-words', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ language: settings.language, count: wordCount, minLength: 3, maxLength: maxWordLen }), signal: controller.signal });
+        if (response.ok) { const data = await response.json(); cacheThemedWords(settings.language, data.words || []); }
+      } catch { /* cache refresh is best-effort */ }
+    })();
+    return () => controller.abort();
+  }, [started, isGameOver, settings.mode, settings.grid, settings.language, settings.difficulty, coach]);
+
   useEffect(() => {
     if (!grid) return;
+    // Hold the board-solve POST until the Start tap (awaitingStart): bots only
+    // read availableWords once the round runs, and the mount-time fetch sat in
+    // the PSI load window (r6: solve-grid fired ~3s during load). Practice and
+    // coach modes have no start gate, so they fetch at mount as before.
+    if (awaitingStart) return;
     gridVersionRef.current += 1;
     const currentVersion = gridVersionRef.current;
     const controller = new AbortController();
@@ -540,7 +578,7 @@ export function useSinglePlayerCore({
     };
     fetchGridWords();
     return () => { clearTimeout(timeoutId); controller.abort(); };
-  }, [grid, settings.language]);
+  }, [grid, settings.language, awaitingStart]);
 
   useEffect(() => {
     if (!isGameOver || gameOverCalledRef.current || !grid) return;

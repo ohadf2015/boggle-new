@@ -89,7 +89,17 @@ export function useNetworkState(): NetworkState {
         if (typeof navigator !== 'undefined' && !navigator.onLine) return;
         void probeReachability().then(applyProbe);
       };
-      runProbe();
+      // The mount-time probe is pure telemetry — defer it past window load so
+      // it never sits in the Lighthouse load window (r6: /api/ping fired ~3s
+      // during load on /singleplayer). Event-driven probes (online/focus) run
+      // immediately; those are always user-era.
+      let deferredProbeTimer: ReturnType<typeof setTimeout> | undefined;
+      const onLoad = () => { deferredProbeTimer = setTimeout(runProbe, 1500); };
+      if (document.readyState === 'complete') {
+        runProbe();
+      } else {
+        window.addEventListener('load', onLoad, { once: true });
+      }
       window.addEventListener('online', runProbe);
       window.addEventListener('focus', runProbe);
 
@@ -128,6 +138,8 @@ export function useNetworkState(): NetworkState {
           window.removeEventListener('offline', refresh);
           window.removeEventListener('online', runProbe);
           window.removeEventListener('focus', runProbe);
+          window.removeEventListener('load', onLoad);
+          if (deferredProbeTimer) clearTimeout(deferredProbeTimer);
         }
         conn?.removeEventListener?.('change', refresh);
         nativeRemove?.();

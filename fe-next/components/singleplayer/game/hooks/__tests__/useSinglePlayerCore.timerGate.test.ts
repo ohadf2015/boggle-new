@@ -267,9 +267,12 @@ describe('useSinglePlayerCore — timer gated on board load', () => {
   });
 
   it('RED: passes isExternallyPaused=true to useGameTimer while grid is still null', () => {
+    // practice mode still awaits the themed-words fetch at mount (only
+    // start-gated modes build from the sync cache), so the never-resolving
+    // fetch keeps grid null for the life of the test.
     renderHook(() =>
       useSinglePlayerCore({
-        settings: defaultSettings,
+        settings: { ...defaultSettings, mode: 'practice' } as SinglePlayerGameState,
         targetHighScore: null,
         onGameEnd: vi.fn(),
         onQuit: vi.fn(),

@@ -27,6 +27,14 @@ interface PageLoaderProps {
    * real first paint.
    */
   priority?: boolean;
+  /**
+   * Render a plain <img> of this src instead of the Mascot variant lookup.
+   * Use with an ALREADY-CACHED tiny asset (e.g. /mascot/winner-lcp.webp on
+   * /singleplayer): the Mascot path with variant='happy' fires a high-priority
+   * winner.webp fetch while a next/dynamic chunk loads — the r6 PSI Lantern
+   * killer (simLCP 9-11s). A plain img of a cached asset costs zero network.
+   */
+  mascotSrc?: string;
 }
 
 const MASCOT_SIZES = {
@@ -56,6 +64,7 @@ export const PageLoader = memo(function PageLoader({
   nested = false,
   className,
   priority = true,
+  mascotSrc,
 }: PageLoaderProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
@@ -90,14 +99,25 @@ export const PageLoader = memo(function PageLoader({
           animate={{ opacity: [0.7, 1, 0.7], scale: [0.98, 1.02, 0.98] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <Mascot
-            variant={mascotVariant}
-            size={mascotSize}
-            animated={true}
-            priority={priority}
-            clipShape="none"
-            clipBorder="none"
-          />
+          {mascotSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={mascotSrc}
+              alt=""
+              width={112}
+              height={112}
+              className="h-28 w-28 object-contain drop-shadow-lg"
+            />
+          ) : (
+            <Mascot
+              variant={mascotVariant}
+              size={mascotSize}
+              animated={true}
+              priority={priority}
+              clipShape="none"
+              clipBorder="none"
+            />
+          )}
         </AdaptiveMotion.div>
         {text && (
           <AdaptiveMotion.p

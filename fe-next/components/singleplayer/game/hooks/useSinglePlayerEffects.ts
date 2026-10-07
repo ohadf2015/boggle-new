@@ -118,12 +118,22 @@ export function useSinglePlayerEffects({
   // Heartbeat — includes identity so admins can see who is playing live.
   // Guests are tracked anonymously by sessionId; authed users include playerId
   // so the admin live view can deep-link to their profile.
+  // First send is deferred until the round is actually ACTIVE (post Start-tap;
+  // awaitingStart holds the clock) — the mount-time POST sat in the PSI load
+  // window (r6: fired ~3s during load) and nobody is "playing live" while the
+  // Start card is up. The 30s interval then runs regardless (pause included) so
+  // the sessionId stays stable; a gameActive ref gates ONLY the first send.
+  const heartbeatGameActiveRef = useRef(gameActive);
+  heartbeatGameActiveRef.current = gameActive;
   useEffect(() => {
     const sessionId =
       typeof crypto !== 'undefined' && crypto.randomUUID
         ? crypto.randomUUID()
         : Math.random().toString(36).substring(2) + Date.now().toString(36);
+    let firstSent = false;
     const sendHeartbeat = async () => {
+      if (!firstSent && !heartbeatGameActiveRef.current) return;
+      firstSent = true;
       try {
         const username = profile?.display_name || profile?.username || (typeof window !== 'undefined' ? ensureGuestDisplayName(language) || undefined : undefined);
         const avatar = profile
@@ -153,9 +163,17 @@ export function useSinglePlayerEffects({
       }
     };
     sendHeartbeat();
+    // First send is skipped while the Start card is up — poll briefly so the
+    // first post-tap heartbeat lands within ~2s instead of waiting a 30s tick.
+    const firstSendPoll = setInterval(() => {
+      if (firstSent) { clearInterval(firstSendPoll); return; }
+      sendHeartbeat();
+    }, 2000);
     const interval = setInterval(sendHeartbeat, 30000);
     return () => {
+      clearInterval(firstSendPoll);
       clearInterval(interval);
+      if (!firstSent) return; // never announced — nothing to delete
       fetch('/api/single-player/heartbeat', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },

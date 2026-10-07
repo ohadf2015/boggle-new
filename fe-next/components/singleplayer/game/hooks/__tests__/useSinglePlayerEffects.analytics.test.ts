@@ -149,7 +149,9 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
   });
 
   it('heartbeats a generated fun name instead of Guest', async () => {
-    renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'solo-bots' })));
+    // gameActive: true — the first heartbeat is gated on the round actually
+    // running (post Start tap); a pre-start mount intentionally sends nothing.
+    renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'solo-bots', gameActive: true })));
 
     await waitFor(() => {
       const calls = (global.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls;
