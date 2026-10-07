@@ -28,6 +28,7 @@ import type { ClassroomSummary } from '@/shared/types/classroom';
 import { hostLeavesProjectorRecap } from '@/lib/education/roundEndResultsRoute';
 import type { TournamentData } from '@/shared/types/view';
 import { useGameStore } from '@/hooks/gameState/store';
+import { prewarmDictionary } from '@/hooks/useDictionaryCache';
 
 interface StartGameBroadcastExt extends StartGameBroadcast {
   gameSessionId?: number;
@@ -319,6 +320,10 @@ export function useHostGameEvents({
       // Sync language from server broadcast (mirrors player handler)
       if (data.language) {
         useGameStore.getState().setGameLanguage(data.language);
+        // Start the dictionary fetch at game start so a blast board never
+        // mounts into a cold cache on heavy game paths (MP "Generating
+        // grid..." hang, t_67330c55). Fire-and-forget, deduped.
+        void prewarmDictionary(data.language);
       }
 
       // Sync resolved game mode from server (handles random → actual mode) and open

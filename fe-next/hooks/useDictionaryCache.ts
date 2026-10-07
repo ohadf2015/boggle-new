@@ -34,6 +34,24 @@ const STORE_NAME = 'dictionaries';
 const memoryCache = new Map<Language, Set<string>>();
 const loadingPromises = new Map<Language, Promise<Set<string>>>();
 
+// Subscribers notified when a language lands in the memory cache from ANY path
+// (prewarm, another hook instance, retry). Heavy game paths defer the network
+// fetch, so a hook mounted there would otherwise never notice a later prewarm
+// (e.g. the MP join warm) and would sit on `isLoaded: false` forever — that
+// was the MP Blast "Generating grid..." infinite spinner (t_67330c55).
+const warmListeners = new Set<(language: Language) => void>();
+
+function setMemoryCache(language: Language, wordSet: Set<string>): void {
+  memoryCache.set(language, wordSet);
+  warmListeners.forEach((cb) => {
+    try {
+      cb(language);
+    } catch {
+      // A broken listener must not break dictionary loading.
+    }
+  });
+}
+
 interface UseDictionaryCacheReturn {
   /** Check if a word is in the dictionary (instant, no network) */
   checkWord: (word: string) => boolean;
@@ -45,6 +63,9 @@ interface UseDictionaryCacheReturn {
   wordCount: number;
   /** Error if loading failed */
   error: string | null;
+  /** Force a (re)load over the network, bypassing the heavy-game-path deferral.
+   *  Used by loading gates' Retry buttons (e.g. MP Blast board wait). */
+  retry: () => void;
 }
 
 /**
@@ -203,7 +224,7 @@ async function fetchDictionary(language: Language): Promise<Set<string>> {
     // unavailable (SSR, private browsing).
     const downloaded = await loadDownloadedDictionary(language);
     if (downloaded && downloaded.size > 0) {
-      memoryCache.set(language, downloaded);
+      setMemoryCache(language, downloaded);
       return downloaded;
     }
 
@@ -213,14 +234,14 @@ async function fetchDictionary(language: Language): Promise<Set<string>> {
     const cached = await getCachedDictionary(language);
     if (cached && cached.length > 0) {
       const wordSet = await buildWordSet(cached);
-      memoryCache.set(language, wordSet);
+      setMemoryCache(language, wordSet);
       return wordSet;
     }
 
     // Try Web Worker (offloads fetch + parse to background thread)
     const workerResult = await fetchViaWorker(language);
     if (workerResult) {
-      memoryCache.set(language, workerResult);
+      setMemoryCache(language, workerResult);
       return workerResult;
     }
 
@@ -253,7 +274,7 @@ async function fetchDictionary(language: Language): Promise<Set<string>> {
     const wordSet = await buildWordSet(words);
 
     // Cache in memory
-    memoryCache.set(language, wordSet);
+    setMemoryCache(language, wordSet);
 
     // Cache in IndexedDB (async, don't wait)
     cacheDictionary(language, words).catch(() => {
@@ -320,6 +341,7 @@ export function hasWordInMemoryCache(word: string, language: Language): boolean 
 export function __resetDictionaryCacheForTests(seed?: Map<Language, Set<string>>): void {
   memoryCache.clear();
   loadingPromises.clear();
+  warmListeners.clear();
   if (seed) {
     for (const [lang, set] of seed) memoryCache.set(lang, set);
   }
@@ -339,6 +361,39 @@ export function useDictionaryCache(
   const [error, setError] = useState<string | null>(null);
   const dictionaryRef = useRef<Set<string> | null>(memoryCache.get(language) || null);
 
+  const applyWordSet = useCallback((wordSet: Set<string>) => {
+    dictionaryRef.current = wordSet;
+    setIsLoaded(true);
+    setWordCount(wordSet.size);
+  }, []);
+
+  // Network load — reset the ref to null so checkWord returns false until ready.
+  const startNetworkLoad = useCallback(() => {
+    dictionaryRef.current = null;
+    setIsLoading(true);
+    setError(null);
+    setIsLoaded(false);  // ← Critical: reset to false when switching languages or loading for the first time
+
+    fetchDictionary(language)
+      .then(applyWordSet)
+      .catch((err) => {
+        setError(err.message);
+        console.warn('[useDictionaryCache] Failed to load dictionary:', err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [language, applyWordSet]);
+
+  /** Manual retry — bypasses the heavy-game-path network deferral. */
+  const retry = useCallback(() => {
+    if (memoryCache.has(language)) {
+      applyWordSet(memoryCache.get(language)!);
+      return;
+    }
+    startNetworkLoad();
+  }, [language, applyWordSet, startNetworkLoad]);
+
   // Load dictionary on mount or language change
   useEffect(() => {
     // /singleplayer PSI auto-starts phase=playing, so a playing-only gate still
@@ -350,36 +405,43 @@ export function useDictionaryCache(
 
     // If already loaded in memory, use it
     if (memoryCache.has(language)) {
-      dictionaryRef.current = memoryCache.get(language)!;
-      setIsLoaded(true);
-      setWordCount(dictionaryRef.current.size);
+      applyWordSet(memoryCache.get(language)!);
       return;
     }
 
     if (deferNetwork) {
-      return;
+      // Deferred paths must not hang forever (the MP Blast "Generating grid..."
+      // infinite spinner, t_67330c55): a cold tab here never fetched, never
+      // checked IndexedDB, and never noticed the MP-join prewarm. No network:
+      // (1) a warm IndexedDB cache still unblocks the game, and (2) if any
+      // other path (prewarm on room join, a sibling hook, retry) fills the
+      // memory cache while mounted, pick it up immediately.
+      let cancelled = false;
+      getCachedDictionary(language)
+        .then(async (cached) => {
+          if (cancelled || !cached || cached.length === 0) return;
+          if (memoryCache.has(language)) return; // a prewarm beat us to it
+          const wordSet = await buildWordSet(cached);
+          setMemoryCache(language, wordSet);
+          if (!cancelled) applyWordSet(wordSet);
+        })
+        .catch(() => {
+          // IndexedDB unavailable — the warm-listener/retry paths still apply.
+        });
+      const onWarmed = (warmed: Language) => {
+        if (warmed !== language || cancelled) return;
+        const wordSet = memoryCache.get(language);
+        if (wordSet) applyWordSet(wordSet);
+      };
+      warmListeners.add(onWarmed);
+      return () => {
+        cancelled = true;
+        warmListeners.delete(onWarmed);
+      };
     }
 
-    // Start loading — reset the ref to null so checkWord returns false until ready
-    dictionaryRef.current = null;
-    setIsLoading(true);
-    setError(null);
-    setIsLoaded(false);  // ← Critical: reset to false when switching languages or loading for the first time
-
-    fetchDictionary(language)
-      .then((wordSet) => {
-        dictionaryRef.current = wordSet;
-        setIsLoaded(true);
-        setWordCount(wordSet.size);
-      })
-      .catch((err) => {
-        setError(err.message);
-        console.warn('[useDictionaryCache] Failed to load dictionary:', err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [language, enabled]);
+    startNetworkLoad();
+  }, [language, enabled, applyWordSet, startNetworkLoad]);
 
   /**
    * Check if a word is in the dictionary
@@ -406,6 +468,7 @@ export function useDictionaryCache(
     isLoading,
     wordCount,
     error,
+    retry,
   };
 }
 
