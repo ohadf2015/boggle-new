@@ -96,15 +96,17 @@ describe('education telemetry', () => {
   it('teacher onboarding step records funnel position', () => {
     trackEduTeacherOnboardingStep({ step: 2, totalSteps: 4, action: 'next' });
     expect(captureMock).toHaveBeenCalledWith('edu_teacher_onboarding_step', {
+      flow: 'infographic',
       step: 2,
       total_steps: 4,
       action: 'next',
     });
   });
 
-  it('dashboard checklist step uses teacher_onboarding_step', () => {
+  it('dashboard checklist step uses the unified edu_teacher_onboarding_step', () => {
     trackTeacherOnboardingStep({ step: 'create_first_assignment', action: 'view' });
-    expect(captureMock).toHaveBeenCalledWith('teacher_onboarding_step', {
+    expect(captureMock).toHaveBeenCalledWith('edu_teacher_onboarding_step', {
+      flow: 'checklist',
       step: 'create_first_assignment',
       action: 'view',
     });

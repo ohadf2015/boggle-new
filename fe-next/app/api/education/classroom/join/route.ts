@@ -4,6 +4,8 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { z } from 'zod';
 import logger from '@/utils/logger';
 import { canAddStudent } from '@/lib/subscriptions';
+import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
+import { buildStudentJoinedEvent, isQaEmail } from '@/backend/utils/educationRoundTelemetry';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 import { lookupLiveGameForClassroom } from '@/lib/education/liveGameForClassroom';
 
@@ -243,6 +245,14 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    captureEduServerEvents([
+      buildStudentJoinedEvent({
+        studentId: userId,
+        classroomId: classroom.id,
+        isTestAccount: isQaEmail(user?.email),
+      }),
+    ]);
 
     return NextResponse.json(
       {

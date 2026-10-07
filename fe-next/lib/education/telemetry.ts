@@ -240,6 +240,7 @@ export interface EduTeacherOnboardingStepArgs {
 
 export function trackEduTeacherOnboardingStep(args: EduTeacherOnboardingStepArgs): void {
   captureActivation('edu_teacher_onboarding_step', {
+    flow: 'infographic',
     step: args.step,
     total_steps: args.totalSteps,
     action: args.action,
@@ -258,12 +259,13 @@ export interface TeacherOnboardingChecklistStepArgs {
 }
 
 /**
- * `teacher_onboarding_step` — dashboard checklist (classroom → assignment →
- * join link → start live class). Distinct from `edu_teacher_onboarding_step`,
- * which is the first-run infographic modal.
+ * Dashboard checklist (classroom → assignment → join link → start live class).
+ * Same event as the infographic, split by `flow` so one name answers "where do
+ * teachers drop off in onboarding".
  */
 export function trackTeacherOnboardingStep(args: TeacherOnboardingChecklistStepArgs): void {
-  safeCapture('teacher_onboarding_step', {
+  safeCapture('edu_teacher_onboarding_step', {
+    flow: 'checklist',
     step: args.step,
     action: args.action,
   });
