@@ -166,7 +166,12 @@ describe('MP bots: per-round reset + scoring, every auto-rotated mode', () => {
       // ---- round 1 ----
       await playRound(mode, host, gameCode);
       await hostScores(mode, host, gameCode);
-      await vi.advanceTimersByTimeAsync(30_000);
+      // 55s of the 90s round, not 30s: wheel-rush bots deliberately miss turns
+      // (per-turn success 0.65 + 60% skip-on-miss), so a short window made this
+      // assertion a dice roll (~1-2% all-skip flatline over 3-4 turns). At ~8
+      // turns an all-skip chain is ~4e-6 — deterministic enough for CI without
+      // touching the product's bot-pacing knobs.
+      await vi.advanceTimersByTimeAsync(55_000);
       const round1BotScore = getGame(gameCode).playerScores[bot.username] || 0;
       expect(round1BotScore, `[${mode}] bot never scored in round 1`).toBeGreaterThan(0);
       await endRound(host, gameCode);
@@ -182,7 +187,7 @@ describe('MP bots: per-round reset + scoring, every auto-rotated mode', () => {
       // A human scores first so the relative score target (not the grace
       // window) gates the bot — the case a stale score used to freeze.
       await hostScores(mode, host, gameCode);
-      await vi.advanceTimersByTimeAsync(30_000);
+      await vi.advanceTimersByTimeAsync(55_000); // same skip-RNG headroom as round 1
       expect(getGame(gameCode).playerScores[bot.username] || 0, `[${mode}] bot frozen in round 2`).toBeGreaterThan(0);
     });
   }
