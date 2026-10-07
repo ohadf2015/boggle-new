@@ -508,39 +508,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 position: i + 1,
             })),
         },
-        // Event schema for Daily Challenge - improves discoverability for recurring events
-        {
-            '@context': 'https://schema.org',
-            '@type': 'Event',
-            '@id': 'https://www.lexiclash.live/#daily-challenge',
-            name: schemaStrings.dailyEventName,
-            description: schemaStrings.dailyEventDescription,
-            inLanguage: languageCode,
-            startDate: '2024-01-01',
-            endDate: '2099-12-31',
-            eventStatus: 'https://schema.org/EventScheduled',
-            eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
-            location: {
-                '@type': 'VirtualLocation',
-                url: `https://www.lexiclash.live${localePath}/daily`,
-            },
-            organizer: {
-                '@id': 'https://www.lexiclash.live/#organization',
-            },
-            offers: {
-                '@type': 'Offer',
-                price: '0',
-                priceCurrency: 'USD',
-                availability: 'https://schema.org/InStock',
-                url: `https://www.lexiclash.live${localePath}/daily`,
-            },
-            isAccessibleForFree: true,
-            eventSchedule: {
-                '@type': 'Schedule',
-                repeatFrequency: 'P1D',
-                byDay: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-            },
-        },
+        // Daily Challenge Event JSON-LD lives on /daily only
+        // (app/[locale]/daily/layout.tsx + word-wheel page). A sitewide Event
+        // spanning 2024–2099 on every locale page is spammy structured data.
         // FAQPage JSON-LD lives on the homepage only (app/[locale]/(home)/seoContent.ts)
         // to avoid Google "Duplicate field 'FAQPage'" on landing pages with own FAQ.
     ];
