@@ -121,3 +121,26 @@ describe('trackGameEnd — one end per start', () => {
 
     expect(endEvents('classic')).toHaveLength(2);
   });
+
+  it('collapses PlayerView (no roundId) + Results (roundId) for the same MP round', async () => {
+    // PlayerView's useGameEndTelemetry fires without a roundId when the view
+    // survives to the rising edge; Results then reports the same round keyed.
+    vi.resetModules();
+    capture.mockClear();
+    const { trackGameStart, trackGameEnd } = await import('../growthTracking');
+
+    trackGameStart('lightning', { isMultiplayer: true });
+    trackGameEnd('lightning', 10, 2, true, 90, { isMultiplayer: true, role: 'player' });
+    trackGameEnd('lightning', 10, 2, true, 90, { roundId: 'mp:201', isMultiplayer: true });
+    expect(endEvents('lightning')).toHaveLength(1);
+
+    // Round 2 (keyed only, start missed) still lands.
+    trackGameEnd('lightning', 20, 4, true, 90, { roundId: 'mp:202', isMultiplayer: true });
+    expect(endEvents('lightning')).toHaveLength(2);
+
+    // Round 3 with a fresh start, both paths fire again: still one.
+    trackGameStart('lightning', { isMultiplayer: true });
+    trackGameEnd('lightning', 30, 6, true, 90, { isMultiplayer: true, role: 'player' });
+    trackGameEnd('lightning', 30, 6, true, 90, { roundId: 'mp:203', isMultiplayer: true });
+    expect(endEvents('lightning')).toHaveLength(3);
+  });
