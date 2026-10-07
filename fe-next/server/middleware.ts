@@ -18,7 +18,7 @@ import { httpLogger, httpLogSerializers } from './logger';
 // crazyGamesScriptInjector removed — now rendered via CrazyGamesScriptServer React component
 
 const dev: boolean = process.env.NODE_ENV !== 'production';
-const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints', '/api/ugc', '/api/presence'];
+export const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints', '/api/ugc', '/api/presence'];
 
 // Next.js App Router admin POST routes that have NO Express counterpart — they
 // fall through `/api/admin` to the Next catch-all and parse JSON themselves via
@@ -66,10 +66,27 @@ const NEXT_ADMIN_BODY_ROUTES: string[] = [
   '/api/admin/teacher-pro',
 ];
 
+// Same bug class as NEXT_ADMIN_BODY_ROUTES, outside /api/admin: Next.js App
+// Router POST routes that sit under an EXPRESS_API_ROUTES prefix but have NO
+// Express handler, so they fall through to Next and read `request.json()`.
+// Pre-parsing drained the stream and every POST hung on prod (Railway http
+// logs 2026-10-01..07: guest-session and log-session 100% 499 at the client's
+// 5s abort, single-player/vote 408 at 30s or 499). guest-session's own 4s
+// withRouteTimeout never fired because Next buffers the body before the
+// handler runs. Exact paths, not prefixes, so sibling Express routes
+// (/api/analytics/track, /api/single-player/heartbeat) keep their parser.
+export const NEXT_BODY_ROUTES_UNDER_EXPRESS_PREFIX: string[] = [
+  '/api/analytics/guest-session',
+  '/api/analytics/log-session',
+  '/api/single-player/vote',
+];
+
 export function shouldExpressParseJsonBody(path: string): boolean {
   const isExpressRoute = EXPRESS_API_ROUTES.some((route) => path.startsWith(route));
   const isNextAdminRoute = NEXT_ADMIN_BODY_ROUTES.some((route) => path.startsWith(route));
-  return isExpressRoute && !isNextAdminRoute;
+  const normalized = path.length > 1 && path.endsWith('/') ? path.slice(0, -1) : path;
+  const isNextBodyRoute = NEXT_BODY_ROUTES_UNDER_EXPRESS_PREFIX.includes(normalized);
+  return isExpressRoute && !isNextAdminRoute && !isNextBodyRoute;
 }
 
 /**
