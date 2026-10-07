@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { defaultOgImages, defaultOgImageUrl } from '@/lib/seo/defaultOgImage';
 import type { ReactNode } from 'react';
 
 interface LayoutParams {
@@ -44,6 +45,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         title: meta.title,
         description: meta.description,
         openGraph: {
+            images: defaultOgImages(locale),
             title: meta.title,
             description: meta.ogDescription,
             type: 'article',
@@ -51,6 +53,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
             siteName: 'LexiClash',
         },
         twitter: {
+            images: [defaultOgImageUrl(locale)],
             card: 'summary_large_image',
             title: meta.title,
             description: meta.ogDescription,
