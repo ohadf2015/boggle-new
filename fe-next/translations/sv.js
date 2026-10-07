@@ -1,5 +1,112 @@
 // Sv translations
 const sv = {
+  // @eg6Land:start
+  "eg6Land": {
+    "vsGimkit": {
+      "title": "LexiClash vs Gimkit Basic — Pro-exklusiva lägen begränsade till 5 spelare (2026) | LexiClash",
+      "description": "LexiClash vs Gimkit Basic: Pro-exklusiva lägen är begränsade till 5 spelare i Gimkits gratisplan. LexiClash kör gratis ordförrådsspel för hela klassen, upp till 50 elever.",
+      "eyebrow": "Jämförelse · utbildning",
+      "h1": "LexiClash vs Gimkit Basic",
+      "introBefore": "Gimkit Basic erbjuder huvudlägen med obegränsat antal spelare, men",
+      "introBold": "Gimkits Pro-exklusiva lägen är begränsade till 5 spelare",
+      "introAfter": "för Basic-medlemmar. LexiClashs gratis ordförrådsspel för klassrummet täcker hela klassen (upp till 50 elever) utan något läge som krymper till fem platser.",
+      "evidence": "Källor:",
+      "sideHeading": "Sida vid sida",
+      "colFeature": "Funktion",
+      "colLexi": "LexiClash",
+      "colGimkit": "Gimkit Basic",
+      "row1Feature": "Pro-exklusiva / premiumlägen i gratisnivån",
+      "row1Lexi": "✓ Gratis ordförråd för hela klassen (inget läge med fem platser)",
+      "row2Feature": "Huvudlägen i gratisnivån",
+      "row2Lexi": "✓ Upp till 50 elever gratis",
+      "row3Feature": "Ingen elevregistrering",
+      "row3Lexi": "✓ 6-teckens anslutningskod",
+      "row4Feature": "Spelsätt",
+      "row4Lexi": "Ordbildning (Boggle/hjul/anagram)",
+      "row5Feature": "Bäst för",
+      "row5Lexi": "Ordförråd, stavning, ESL",
+      "row6Feature": "Belägg (Basic, Pro-exklusiv)",
+      "row6Lexi": "—",
+      "faqHeading": "Vanliga frågor",
+      "faq1Q": "Är Gimkits Pro-exklusiva lägen begränsade i Basic?",
+      "faq1A": "Ja. Gimkits hjälpartikel om spelargränser säger att Pro-exklusiva lägen är begränsade till 5 spelare i Basic. Huvudlägen i Basic är obegränsade; Pro-exklusiva lägen roterar och ligger kvar på 5 tills man uppgraderar.",
+      "faq2Q": "Hur står sig LexiClash mot gränsen på 5 spelare för Pro-exklusiva lägen?",
+      "faq2A": "LexiClashs gratis ordförrådsspel för klassrummet körs för hela klassen (upp till 50 elever) utan något läge som sjunker till 5 platser.",
+      "faq3Q": "Vad skiljer Gimkit Basic från Gimkit Pro?",
+      "faq3A": "Enligt Gimkits Pro-FAQ kan man i Basic spela huvudlägen med hur många elever som helst. Pro låser upp alla lägen (Pro-exklusiva), uppgifter och mediauppladdning. I Basic är Pro-exklusiva lägen begränsade till 5 spelare.",
+      "faq4Q": "Behöver elever konto på LexiClash?",
+      "faq4A": "Nej. Eleverna ansluter med en 6-teckens kod. Teacher Pro lägger till obegränsat antal klasser och utskrivbara rapporter; gratisnivån räcker redan för en hel klass med upp till 50 elever i ordförrådsspel.",
+      "faq5Q": "Är LexiClash en quizplattform som Gimkit?",
+      "faq5A": "Nej. Gimkit är en plattform för kit och quiz med livelägen (huvudlägen och Pro-exklusiva). LexiClash är ordbildning (Boggle-liknande rutnät, anagram, ordhjul) för ordförråds- och språkövning, med gratis platser för hela klassen.",
+      "footStart": "Starta ett klassrumsspel",
+      "footKahoot": "vs Kahoot",
+      "footWayground": "vs Wayground",
+      "footBlooket": "vs Blooket"
+    },
+    "demo": {
+      "label": "Spelbräde: dra ett ord",
+      "watching": "Titta: LexiClash ritar ett ord",
+      "yourTurn": "Din tur: tryck på bokstäver som ligger intill",
+      "replay": "Titta igen",
+      "found": "Hittat: {word}",
+      "timeLeft": "{count} s kvar",
+      "wordsFound": "{count} ord hittade"
+    },
+    "resources": {
+      "heading": "Utforska utbildningslägen",
+      "subhead": "Välj rätt format för ditt klassrum — snabba 1v1-dueller eller live-multiplayer för hela klassen.",
+      "duelsTitle": "Ordförrådsdueller (1v1)",
+      "duelsDesc": "Para ihop elever för 2-3 minuters ordstrider mot varandra.",
+      "classroomTitle": "Live klassrumsspel",
+      "classroomDesc": "Multiplayer för hela klassen; eleverna ansluter med en klasskod, ingen e-post behövs."
+    },
+    "compare": {
+      "before": "Se hur LexiClash jämförs: ",
+      "anchor": "LexiClash vs Kahoot",
+      "after": " — funktioner, pris och klassrumsanpassning."
+    },
+    "guides": {
+      "heading": "Lärarguider",
+      "subhead": "Fördjupande sidor om specifika användningsfall, med jämförelsetabeller, vanliga frågor och gratis ordlistor.",
+      "vocabBadge": "Guide",
+      "vocabTitle": "Ordförrådsspel för klassrummet",
+      "vocabDesc": "Ingen registrering, 6 språk, gratis för lärare — jämfört med Quizlet/Kahoot/Wordwall.",
+      "eslBadge": "ESL",
+      "eslTitle": "Ordspel för engelska online",
+      "eslDesc": "Nybörjare till avancerad, 6 ordböcker, ingen elevregistrering.",
+      "teachersBadge": "För lärare",
+      "teachersTitle": "Ordspel för lärare",
+      "teachersDesc": "Vikariedag, hjärnpaus, uppvärmning — noll förberedelse, gratis för lärare.",
+      "spellingBadge": "Stavning",
+      "spellingTitle": "Stavningstävling online",
+      "spellingDesc": "4-veckors träningsplan, anpassade ordlistor, 1v1-dueller — tävlingsförberedelse.",
+      "sightBadge": "Sight Words",
+      "sightTitle": "Träna sight words (Dolch & Fry)",
+      "sightDesc": "Flashcards, matchning och stavning från din egen ordlista.",
+      "schoolsBadge": "För skolor",
+      "schoolsTitle": "LexiClash för skolor",
+      "schoolsDesc": "Gratis för lärare — skolor och avdelningar från $49 per lärare / år, ingen elevinloggning.",
+      "listsBadge": "Gratis",
+      "listsTitle": "Ordlistor",
+      "listsDesc": "Ordlistor efter årskurs och ämne, redo att spelas i klassen."
+    },
+    "moments": {
+      "heading": "Välj ditt läge",
+      "subhead": "Ingen funktionslista — de faktiska situationer lärare söker på, var och en med en plan du kan köra idag."
+    },
+    "learner": {
+      "heading": "Spel för engelskinlärare",
+      "subhead": "Åldersband och temaborr för spansk-engelska klassrum — samma lärarledda form som ESL-sidan som redan rankar."
+    },
+    "pro": {
+      "rosterPro": "Obegränsat antal elever i din lista",
+      "liveCap": "Live-spel rymmer upp till {count} spelare samtidigt",
+      "mastery": "Mastery-värmekarta: vilka ord varje elev kan",
+      "missedPractice": "Övningsrundor för missade ord, byggda på riktiga luckor",
+      "reports": "Utskrivbara klassrapporter"
+    }
+  },
+  // @eg6Land:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

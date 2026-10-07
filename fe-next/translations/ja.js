@@ -1,5 +1,112 @@
 // Ja translations
 const ja = {
+  // @eg6Land:start
+  "eg6Land": {
+    "vsGimkit": {
+      "title": "LexiClash vs Gimkit Basic — Proエクスクルーシブモードは5人まで（2026） | LexiClash",
+      "description": "LexiClash vs Gimkit Basic：無料プランのGimkitではProエクスクルーシブモードが5人までに制限されます。LexiClashは最大50人のクラス全員で遊べる無料の語彙ゲームです。",
+      "eyebrow": "比較 · 教育向け",
+      "h1": "LexiClash vs Gimkit Basic",
+      "introBefore": "Gimkit Basicでは人数無制限の主要モードを遊べますが、",
+      "introBold": "Gimkit Proエクスクルーシブモードは5人までに制限されます",
+      "introAfter": "（Basicプランの場合）。LexiClashの無料の教室用語彙ゲームは、クラス全体（最大50人）で遊べ、5席に縮むモードはありません。",
+      "evidence": "根拠：",
+      "sideHeading": "項目別比較",
+      "colFeature": "項目",
+      "colLexi": "LexiClash",
+      "colGimkit": "Gimkit Basic",
+      "row1Feature": "無料プランのProエクスクルーシブ／プレミアムモード",
+      "row1Lexi": "✓ クラス全員で無料の語彙ゲーム（5席モードなし）",
+      "row2Feature": "無料で遊べる主要モード",
+      "row2Lexi": "✓ 最大50人まで無料",
+      "row3Feature": "生徒のサインアップ不要",
+      "row3Lexi": "✓ 6文字の参加コード",
+      "row4Feature": "ゲームの種類",
+      "row4Lexi": "単語作りゲーム（Boggle/ホイール/アナグラム）",
+      "row5Feature": "向いている用途",
+      "row5Lexi": "語彙、スペリング、ESL",
+      "row6Feature": "根拠（Basic・Proエクスクルーシブ）",
+      "row6Lexi": "—",
+      "faqHeading": "よくある質問",
+      "faq1Q": "Gimkit BasicではProエクスクルーシブモードに人数制限がありますか？",
+      "faq1A": "はい。Gimkitのヘルプ記事「プレイヤー人数の上限」では、Basicプランの場合Proエクスクルーシブモードは5人までと説明されています。Basicの主要モードは無制限ですが、Proエクスクルーシブモードは入れ替わり、アップグレードするまで5人のままです。",
+      "faq2Q": "LexiClashはProエクスクルーシブの5人制限にどう対応していますか？",
+      "faq2A": "LexiClashの無料の教室用語彙ゲームは、5席に減るモードなしでクラス全体（最大50人）が遊べます。",
+      "faq3Q": "Gimkit BasicとGimkit Proの違いは何ですか？",
+      "faq3A": "Gimkit ProのFAQによると、Basicでは主要モードを人数無制限で遊べます。Proではすべてのモード（Proエクスクルーシブ）、課題、メディアのアップロードが使えます。Basicでは、Proエクスクルーシブモードは5人までです。",
+      "faq4Q": "LexiClashの生徒にはアカウントが必要ですか？",
+      "faq4A": "いいえ。生徒は6文字のコードで参加します。Teacher Proではクラス数無制限と印刷可能なレポートが加わります。無料プランでも、語彙ゲームで最大50人のクラス全体をカバーできます。",
+      "faq5Q": "LexiClashはGimkitのようなクイズプラットフォームですか？",
+      "faq5A": "いいえ。Gimkitはキットとクイズのライブモードのプラットフォームです（主要モードとProエクスクルーシブ）。LexiClashは語彙や言語練習のための単語作りゲーム（Boggle風のグリッド、アナグラム、単語ホイール）で、クラス全員が無料で参加できます。",
+      "footStart": "教室ゲームを始める",
+      "footKahoot": "vs Kahoot",
+      "footWayground": "vs Wayground",
+      "footBlooket": "vs Blooket"
+    },
+    "demo": {
+      "label": "プレイできるボード：単語をなぞる",
+      "watching": "見てね：LexiClashが単語をなぞります",
+      "yourTurn": "あなたの番：隣り合う文字をタップ",
+      "replay": "もう一度見る",
+      "found": "見つけた：{word}",
+      "timeLeft": "残り{count}秒",
+      "wordsFound": "{count}語見つけました"
+    },
+    "resources": {
+      "heading": "教育モードを探索",
+      "subhead": "クラスに最適なフォーマットを選択 — クイック1対1デュエルまたはクラス全体のライブマルチプレイヤー。",
+      "duelsTitle": "語彙デュエル (1対1)",
+      "duelsDesc": "生徒をペアリングして2〜3分の単語バトルを実施。",
+      "classroomTitle": "ライブクラスルームゲーム",
+      "classroomDesc": "クラス全体のマルチプレイヤー。生徒はクラスコードで参加でき、メールアドレスは不要です。"
+    },
+    "compare": {
+      "before": "LexiClashの比較を見る：",
+      "anchor": "LexiClash対Kahoot",
+      "after": " — 機能、価格、教室への適合性。"
+    },
+    "guides": {
+      "heading": "教師向けガイド",
+      "subhead": "比較表、よくある質問、無料単語リスト付きの、具体的な活用法を深掘りするページ。",
+      "vocabBadge": "ガイド",
+      "vocabTitle": "教室向け語彙ゲーム",
+      "vocabDesc": "登録不要、6言語、教師に無料 — Quizlet/Kahoot/Wordwallと比較。",
+      "eslBadge": "ESL",
+      "eslTitle": "オンライン英語単語ゲーム",
+      "eslDesc": "初級から上級まで、6つの辞書、生徒の登録不要。",
+      "teachersBadge": "教師向け",
+      "teachersTitle": "教師のための単語ゲーム",
+      "teachersDesc": "代行日、頭の休憩、ウォームアップ — 準備ゼロ、教師は無料。",
+      "spellingBadge": "スペリング",
+      "spellingTitle": "オンラインスペリング練習",
+      "spellingDesc": "4週間のトレーニングプラン、カスタム単語リスト、1対1デュエル — 大会対策。",
+      "sightBadge": "サイトワード",
+      "sightTitle": "サイトワード練習 (Dolch & Fry)",
+      "sightDesc": "自分の単語リストでフラッシュカード・マッチング・スペリング練習。",
+      "schoolsBadge": "学校向け",
+      "schoolsTitle": "学校向けLexiClash",
+      "schoolsDesc": "教師は無料 — 学校・学科は教員1人あたり年$49から、生徒ログイン不要。",
+      "listsBadge": "無料",
+      "listsTitle": "単語リスト",
+      "listsDesc": "学年と教科別の単語リスト。そのまま教室でプレイできます。"
+    },
+    "moments": {
+      "heading": "場面から選ぶ",
+      "subhead": "機能一覧ではなく、先生が実際に検索する場面ごとに、今日すぐ使える進行プランを用意しました。"
+    },
+    "learner": {
+      "heading": "英語学習者向けゲーム",
+      "subhead": "年齢層とテーマ別ドリル。すでに検索で届いているESLページと同じ、教師主導の形です。"
+    },
+    "pro": {
+      "rosterPro": "名簿の生徒数は無制限",
+      "liveCap": "ライブゲームは同時に{count}人まで参加できます",
+      "mastery": "習熟ヒートマップ：生徒ごとの習得単語",
+      "missedPractice": "実際の苦手からつくる再練習ラウンド",
+      "reports": "印刷できるクラスレポート"
+    }
+  },
+  // @eg6Land:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
 
 /**
  * Pro framing section — positioned on the landing page to show the value
@@ -136,7 +137,13 @@ export function ProFramingSection() {
             <li className="flex items-start gap-3">
               <span className="text-neo-navy font-bold mt-0.5">✓</span>
               <span className="text-neo-navy font-bold">
-                {t('education.landing.pro.studentLimitPro')}
+                {t('eg6Land.pro.rosterPro')}
+              </span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-neo-navy font-bold mt-0.5">✓</span>
+              <span className="text-neo-navy font-bold">
+                {t('eg6Land.pro.liveCap', undefined, { count: String(MAX_PLAYERS_PER_ROOM) })}
               </span>
             </li>
             {/* customLists and duels deliberately absent — both ship free (see the free card).
@@ -145,6 +152,24 @@ export function ProFramingSection() {
               <span className="text-neo-navy font-bold mt-0.5">✓</span>
               <span className="text-neo-navy font-bold">
                 {t('education.landing.pro.analytics')}
+              </span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-neo-navy font-bold mt-0.5">✓</span>
+              <span className="text-neo-navy font-bold">
+                {t('eg6Land.pro.mastery')}
+              </span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-neo-navy font-bold mt-0.5">✓</span>
+              <span className="text-neo-navy font-bold">
+                {t('eg6Land.pro.missedPractice')}
+              </span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-neo-navy font-bold mt-0.5">✓</span>
+              <span className="text-neo-navy font-bold">
+                {t('eg6Land.pro.reports')}
               </span>
             </li>
           </ul>
