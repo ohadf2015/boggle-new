@@ -5,7 +5,7 @@ import logger from '../../utils/logger';
 import { cacheAside } from '../../cache/redisCache';
 
 const { ensureLanguageLoaded } = require('../../dictionary');
-const { findWordsForBots } = require('../../modules/boggleSolver');
+const { findWordsForBots, resolveSolverLanguage } = require('../../modules/boggleSolver');
 
 interface BotWords {
   easy: string[];
@@ -69,7 +69,8 @@ export const solveGridRouter = router({
       language: z.string().default('en'),
     }))
     .mutation(async ({ input }) => {
-      const { grid, language } = input;
+      const { grid } = input;
+      const language = resolveSolverLanguage(input.language);
 
       // Deterministic — cache by grid+language
       const cacheKey = `solveGrid:${language}:${grid.map((r) => r.join('')).join('|')}`;

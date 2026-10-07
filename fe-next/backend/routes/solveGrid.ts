@@ -7,7 +7,7 @@ import express, { Request, Response, Router, NextFunction } from 'express';
  
 const { ensureLanguageLoaded } = require('../dictionary');
  
-const { findWordsForBots } = require('../modules/boggleSolver');
+const { findWordsForBots, resolveSolverLanguage } = require('../modules/boggleSolver');
 import logger from '../utils/logger';
 
 const router: Router = express.Router();
@@ -134,7 +134,8 @@ async function filterBlacklistedWords(words: BotWords, language: string): Promis
  * Find all valid words on a Boggle grid for bot simulation
  */
 router.post('/', rateLimit, async (req: SolveGridRequest, res: Response): Promise<void> => {
-  const { grid, language = 'en' } = req.body;
+  const { grid, language: rawLanguage = 'en' } = req.body;
+  const language = resolveSolverLanguage(String(rawLanguage));
 
   // Validate grid
   if (!grid || !Array.isArray(grid) || grid.length === 0) {

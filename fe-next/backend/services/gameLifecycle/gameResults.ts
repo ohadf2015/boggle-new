@@ -101,6 +101,36 @@ export function applyBoostsToScores(
 const pendingEngagementTimeouts = new Map<string, ReturnType<typeof setTimeout>[]>();
 
 /**
+ * Schedule a delayed callback tracked per game. The handle removes itself when
+ * it fires (and drops the game key once empty) so fired timeouts — whose
+ * closures hold sockets and per-player results — are not retained across rounds
+ * in rooms that live on via "play again".
+ */
+export function scheduleEngagementTimeout(
+  gameCode: string,
+  fn: () => void | Promise<void>,
+  delayMs: number,
+): void {
+  const handle: ReturnType<typeof setTimeout> = setTimeout(() => {
+    const list = pendingEngagementTimeouts.get(gameCode);
+    if (list) {
+      const i = list.indexOf(handle);
+      if (i !== -1) list.splice(i, 1);
+      if (list.length === 0) pendingEngagementTimeouts.delete(gameCode);
+    }
+    void fn();
+  }, delayMs);
+  const list = pendingEngagementTimeouts.get(gameCode) || [];
+  list.push(handle);
+  pendingEngagementTimeouts.set(gameCode, list);
+}
+
+/** Number of engagement timeouts still pending for a game (test/diagnostics). */
+export function getPendingEngagementTimeoutCount(gameCode: string): number {
+  return pendingEngagementTimeouts.get(gameCode)?.length ?? 0;
+}
+
+/**
  * Clear all pending engagement timeouts for a game.
  * Should be called when a game is deleted/cleaned up to prevent
  * orphaned Supabase queries from dead sockets.
@@ -488,7 +518,7 @@ async function processEngagementEvents(
     // Process engagement (daily challenges, near-misses, mystery rewards)
     // Mystery rewards are delayed by 15 seconds to avoid overwhelming users
     if (playerSocket && playerId) {
-      const timeoutId = setTimeout(async () => {
+      scheduleEngagementTimeout(gameCode, async () => {
         // Skip if socket disconnected while we were waiting
         if (playerSocket.disconnected) {
           logger.debug('ENGAGEMENT', `Skipping engagement for ${playerId} - socket disconnected`);
@@ -512,11 +542,6 @@ async function processEngagementEvents(
           logger.error('ENGAGEMENT', `Delayed engagement failed for ${playerId}: ${(err as Error).message}`);
         }
       }, 15000); // 15 second delay
-
-      // Track timeout for cleanup
-      const gameTimeouts = pendingEngagementTimeouts.get(gameCode) || [];
-      gameTimeouts.push(timeoutId);
-      pendingEngagementTimeouts.set(gameCode, gameTimeouts);
     }
   }
 }
