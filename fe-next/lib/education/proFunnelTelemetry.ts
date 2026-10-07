@@ -72,6 +72,26 @@ export function trackEduProUpgradeClicked(args: { source: ProUpgradeSource }): v
   captureStep('edu_pro_upgrade_clicked', { source: args.source });
 }
 
+/** Persistent HQ trial strip — impression. Not mirrored: name is HQ-only. */
+export function trackTeacherTrialUpgradeCtaViewed(args: {
+  trial_days_remaining: number;
+}): void {
+  safeCapture('teacher_trial_upgrade_cta_viewed', {
+    trial_days_remaining: args.trial_days_remaining,
+    product: 'teacher_pro',
+  });
+}
+
+/** Persistent HQ trial strip — Polar checkout tap. */
+export function trackTeacherTrialUpgradeCtaClicked(args: {
+  trial_days_remaining: number;
+}): void {
+  safeCapture('teacher_trial_upgrade_cta_clicked', {
+    trial_days_remaining: args.trial_days_remaining,
+    product: 'teacher_pro',
+  });
+}
+
 export const PRO_SUCCESS_SEEN_STORAGE_KEY = 'lexi_edu_pro_success_seen_at';
 /** A reload within this window is the same return from checkout, not a new one. */
 const SUCCESS_DEDUPE_MS = 24 * 3_600_000;

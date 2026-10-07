@@ -19,6 +19,7 @@ import {
 import { calculateWordScoreByLength } from '@/shared/utils/scoring';
 import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
 import { getCachedTrie, getTrieNode, type TrieNode } from './boggleSolver';
+import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 
 /** Per-char sofit→regular normalization for Hebrew. Mirrors SP wordWheelGeneration:87. */
 function normalizeWordForLang(word: string, language: Language): string {
@@ -180,6 +181,11 @@ export function validateWheelSubmission(
   if (!isWheelShape(upper, state.puzzle.centerLetter, state.puzzle.allLetters)) {
     return { valid: false, error: 'bad-letters' };
   }
+  // Same shape filter the classic live path (wordHandler) AND final scoring
+  // (gameScores) apply: vowel-less abbreviations like "spl"/"pdn" sit in the
+  // trie, so without this gate they were ACCEPTED live and then silently
+  // zeroed in the results recompute (mpTwoClientGate flake, master red).
+  if (isWordShapeWeird(upper, language).weird) return { valid: false, error: 'not-a-word' };
   if (!isInDictionary(upper, language)) return { valid: false, error: 'not-a-word' };
   return { valid: true };
 }
