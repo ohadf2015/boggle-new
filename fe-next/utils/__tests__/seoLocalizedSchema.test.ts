@@ -1,5 +1,5 @@
 /**
- * Localized JSON-LD schema strings. Drives per-locale HowTo and Event schemas
+ * Localized JSON-LD schema strings. Drives per-locale HowTo schema
  * in the root layout. Missing SV/JA/ES content suppresses rich-result
  * eligibility for those markets (near-zero non-Hebrew/English acquisition).
  */
@@ -9,7 +9,7 @@ import { getLocalizedSchemaStrings } from '../seoLocalizedSchema';
 describe('getLocalizedSchemaStrings', () => {
   const locales = ['he', 'en', 'sv', 'ja', 'es'] as const;
 
-  it.each(locales)('returns HowTo and DailyChallenge strings for %s', (locale) => {
+  it.each(locales)('returns HowTo strings for %s', (locale) => {
     const s = getLocalizedSchemaStrings(locale);
     expect(s.howToName).toBeTruthy();
     expect(s.howToDescription).toBeTruthy();
@@ -18,8 +18,8 @@ describe('getLocalizedSchemaStrings', () => {
       expect(step.name).toBeTruthy();
       expect(step.text).toBeTruthy();
     });
-    expect(s.dailyEventName).toBeTruthy();
-    expect(s.dailyEventDescription).toBeTruthy();
+    expect(s).not.toHaveProperty('dailyEventName');
+    expect(s).not.toHaveProperty('dailyEventDescription');
   });
 
   it('falls back to english for unknown locale', () => {

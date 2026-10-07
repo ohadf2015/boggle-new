@@ -1,5 +1,6 @@
 /**
- * Localized strings for HowTo and Daily Challenge Event JSON-LD schemas.
+ * Localized strings for HowTo JSON-LD in the root locale layout.
+ * Daily Challenge Event markup lives on /daily only — not sitewide.
  * Drives rich-result eligibility for "how to play" queries in each market.
  */
 
@@ -14,8 +15,6 @@ export interface LocalizedSchemaStrings {
   howToName: string;
   howToDescription: string;
   steps: [HowToStepStrings, HowToStepStrings, HowToStepStrings, HowToStepStrings];
-  dailyEventName: string;
-  dailyEventDescription: string;
 }
 
 const STRINGS: Record<SupportedLocale, LocalizedSchemaStrings> = {
@@ -40,9 +39,6 @@ const STRINGS: Record<SupportedLocale, LocalizedSchemaStrings> = {
         text: 'The player with the most points when time runs out wins. Words found by everyone score nothing!',
       },
     ],
-    dailyEventName: 'LexiClash Daily Challenge',
-    dailyEventDescription:
-      'Daily word puzzle — same board for everyone worldwide! Share your results like Wordle',
   },
   he: {
     howToName: 'איך לשחק ב-LexiClash',
@@ -65,9 +61,6 @@ const STRINGS: Record<SupportedLocale, LocalizedSchemaStrings> = {
         text: 'השחקן עם הכי הרבה נקודות בסוף הזמן מנצח. מילים שנמצאו על ידי כולם לא נותנות נקודות!',
       },
     ],
-    dailyEventName: 'אתגר יומי של LexiClash',
-    dailyEventDescription:
-      'פאזל מילים יומי - אותו לוח לכולם ברחבי העולם! שתפו את התוצאות שלכם כמו וורדל',
   },
   sv: {
     howToName: 'Så spelar du LexiClash',
@@ -90,9 +83,6 @@ const STRINGS: Record<SupportedLocale, LocalizedSchemaStrings> = {
         text: 'Spelaren med flest poäng när tiden går ut vinner. Ord som alla hittar ger noll poäng!',
       },
     ],
-    dailyEventName: 'LexiClash Daglig Utmaning',
-    dailyEventDescription:
-      'Dagligt ordpussel — samma bräde för alla i hela världen! Dela dina resultat som Wordle',
   },
   ja: {
     howToName: 'LexiClashの遊び方',
@@ -115,9 +105,6 @@ const STRINGS: Record<SupportedLocale, LocalizedSchemaStrings> = {
         text: '時間切れ時に最も得点の高いプレイヤーが勝ちます。全員が見つけた単語は得点になりません！',
       },
     ],
-    dailyEventName: 'LexiClash デイリーチャレンジ',
-    dailyEventDescription:
-      '毎日の単語パズル — 世界中のみんなが同じ盤面！Wordleのように結果をシェアしよう',
   },
   es: {
     howToName: 'Cómo jugar a LexiClash',
@@ -140,9 +127,6 @@ const STRINGS: Record<SupportedLocale, LocalizedSchemaStrings> = {
         text: '¡El jugador con más puntos cuando se acaba el tiempo gana! Las palabras que todos encuentran no dan puntos.',
       },
     ],
-    dailyEventName: 'Desafío Diario de LexiClash',
-    dailyEventDescription:
-      'Puzzle de palabras diario — ¡el mismo tablero para todos en el mundo! Comparte tus resultados como Wordle',
   },
 };
 

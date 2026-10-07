@@ -62,3 +62,28 @@ describe('root layout metadata', () => {
     expect(rootLayout).toMatch(/\b6 languages\b/);
   });
 });
+
+/**
+ * Google Event rich results reject non-events and 75-year spans. The root
+ * locale layout used to emit a fake "Daily Challenge" Event
+ * (startDate 2024-01-01, endDate 2099-12-31, @id #daily-challenge) on EVERY
+ * page in EVERY locale — the same class of spam as the hardcoded
+ * aggregateRating that was already removed. Per-day Events belong on /daily.
+ *
+ * LocaleLayout is a Next.js server component (headers(), fonts); we cannot
+ * render it in vitest. The graph is built inline, so the source of
+ * app/[locale]/layout.tsx IS the JSON-LD builder.
+ */
+describe('sitewide JSON-LD has no Event node', () => {
+  it('does not emit a schema.org Event from the root locale layout', () => {
+    expect(localeLayout).not.toMatch(/['"]@type['"]\s*:\s*['"]Event['"]/);
+  });
+
+  it('does not ship the 2024–2099 Daily Challenge Event', () => {
+    expect(localeLayout).not.toContain('#daily-challenge');
+    expect(localeLayout).not.toContain("startDate: '2024-01-01'");
+    expect(localeLayout).not.toContain("endDate: '2099-12-31'");
+    expect(localeLayout).not.toContain('dailyEventName');
+    expect(localeLayout).not.toContain('dailyEventDescription');
+  });
+});
