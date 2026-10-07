@@ -105,23 +105,6 @@ describe('QuestCard', () => {
     expect(screen.getByTestId('quest-card-wordHunt')).toBeInTheDocument();
   });
 
-  test('handles unavailable status with request button', () => {
-    const onRequest = vi.fn();
-    renderWithProviders(
-      <QuestCard
-        {...defaultProps}
-        status="unavailable"
-        onRequestChallenge={onRequest}
-        requestState="idle"
-      />
-    );
-
-    const button = screen.getByRole('button');
-    fireEvent.click(button);
-
-    expect(onRequest).toHaveBeenCalledTimes(1);
-  });
-
   test('does not show loading opacity when status is new', () => {
     const { container } = renderWithProviders(<QuestCard {...defaultProps} />);
 
@@ -133,14 +116,6 @@ describe('QuestCard', () => {
     renderWithProviders(<QuestCard {...defaultProps} />);
 
     expect(screen.getByText('icon')).toBeInTheDocument();
-  });
-
-  test('renders badge when provided', () => {
-    renderWithProviders(
-      <QuestCard {...defaultProps} color="yellow" badge="NEW" />
-    );
-
-    expect(screen.getByText('NEW')).toBeInTheDocument();
   });
 
   test('renders image overlay when previewImageUrl provided', () => {

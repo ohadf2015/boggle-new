@@ -123,11 +123,10 @@ describe('DailyChallengeLanding — Hub Redesign', () => {
     expect(screen.getByText(/today['\s]s puzzles/i)).toBeInTheDocument();
   });
 
-  it('should render today\'s date below the header', () => {
+  it('shows the date once, on the date card, not as a raw ISO string', () => {
     const { container } = renderComponent();
-    // Date is rendered client-side only, check for it in the DOM
-    const dateText = container.textContent;
-    expect(dateText).toMatch(/20\d{2}-\d{2}-\d{2}/);
+    expect(container.textContent).not.toMatch(/20\d{2}-\d{2}-\d{2}/);
+    expect(screen.getByTestId('date-card')).toHaveTextContent('JAN15');
   });
 
   it('should render three game cards in order: Word Hunt, Word Wheel, Word Tower', () => {
@@ -187,9 +186,10 @@ describe('DailyChallengeLanding — Hub Redesign', () => {
     expect(questCards.length).toBeGreaterThan(0);
   });
 
-  it('should display persistent streak number in the hub header', () => {
+  it('shows the streak in the same row as the title', () => {
     renderComponent();
-    // The PersistentStreakDisplay should render the streak number from useDailyPlayedStatus
-    expect(screen.getByText('7')).toBeInTheDocument();
+    const header = screen.getByTestId('daily-hub-header');
+    expect(header).toHaveTextContent(/today['\s]s puzzles/i);
+    expect(header).toHaveTextContent('7');
   });
 });

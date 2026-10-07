@@ -69,6 +69,7 @@ vi.mock('framer-motion', () => ({
 }));
 
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
+import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
 
 const props = {
   onSelectWordHunt: vi.fn(),
@@ -90,5 +91,12 @@ describe('DailyChallengeLanding weekly chest wiring', () => {
     mockUseAuth.mockReturnValue({ user: null });
     render(<DailyChallengeLanding {...props} />);
     expect(screen.queryByTestId('weekly-chest-slot')).toBeNull();
+  });
+
+  it('leaves post-game insights to the results screens, not the hub', () => {
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' } });
+    vi.mocked(hasPlayedWordWheelToday).mockReturnValue(true);
+    render(<DailyChallengeLanding {...props} />);
+    expect(screen.queryByTestId('insight-stack-stub')).toBeNull();
   });
 });
