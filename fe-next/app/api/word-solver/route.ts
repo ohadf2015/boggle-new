@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
-import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
+import { normalizeHebrewWord, applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -125,15 +125,20 @@ export async function POST(request: NextRequest) {
     }
 
     const inputCounts = getLetterCounts(normalizedInput);
-    const results: string[] = [];
+    // Set: the Hebrew dictionary stores sofit-folded forms, so restoring the
+    // final letter can collapse two entries into one display word.
+    const found = new Set<string>();
 
     for (const word of dictionary) {
       if (word.length < 2 || word.length > normalizedInput.length) continue;
       const normalized = normalizeWord(word, language);
       if (canFormWord(normalized, inputCounts)) {
-        results.push(word);
+        // he: dictionary words end in the regular form (שלומ); show the real
+        // spelling with a final letter (שלום).
+        found.add(language === 'he' ? applyHebrewFinalLetters(word) : word);
       }
     }
+    const results = Array.from(found);
 
     // Sort by length descending, then alphabetically
     results.sort((a, b) => b.length - a.length || a.localeCompare(b));
