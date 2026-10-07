@@ -106,7 +106,9 @@ function boardCandidates(grid, exclude) {
     .filter((w) => !exclude.has(w) && !isWordShapeWeird(w, 'en').weird);
 }
 
-/** Dictionary words buildable from the wheel (each letter once, must use center). */
+/** Dictionary words buildable from the wheel (each letter once, must use center).
+ *  Shape-filtered for parity with boardCandidates: vowel-less trie junk would be
+ *  rejected by live validation (and zeroed at final scoring) anyway. */
 function wheelCandidates(puzzle, exclude) {
   const trie = getCachedTrie('en');
   const letters = puzzle.allLetters.map((l) => l.toLowerCase());
@@ -117,7 +119,8 @@ function wheelCandidates(puzzle, exclude) {
     if (out.length >= 40 || prefix.length > 6) return;
     const node = getTrieNode(trie, prefix);
     if (!node) return;
-    if (prefix.length >= WHEEL_RUSH_MIN_WORD_LEN && node.isWord && prefix.includes(center) && !exclude.has(prefix)) {
+    if (prefix.length >= WHEEL_RUSH_MIN_WORD_LEN && node.isWord && prefix.includes(center)
+        && !exclude.has(prefix) && !isWordShapeWeird(prefix, 'en').weird) {
       out.push(prefix);
     }
     for (let i = 0; i < letters.length; i++) {
