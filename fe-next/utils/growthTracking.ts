@@ -546,6 +546,12 @@ const MAX_QUEUE_SIZE = 50;
 // holds at most one entry per game mode, a small fixed vocabulary.
 const endEmittedModes = new Set<string>();
 
+// Optional per-round dedupe for multiplayer. HostView/PlayerView and the
+// results screen can both try to complete the same round; pass extras.roundId
+// (gameSessionId) so only one lands. Round-keyed so back-to-back MP rounds of
+// the same mode still count even when a joiner missed trackGameStart.
+const endEmittedRoundIds = new Set<string>();
+
 // Funnel-critical events also emitted under their canonical (unprefixed)
 // name so PostHog dashboards resolve without a `growth:` rewrite.
 //
@@ -1411,7 +1417,19 @@ export const trackGameEnd = (
   // legitimately plays ~4 games in a row, and a mode that never calls
   // `trackGameStart` still gets its first end through — silencing it would trade
   // a double-count for a silent undercount, which is the worse failure.
-  if (endEmittedModes.has(mode)) return;
+  const roundIdRaw = extras.roundId;
+  const roundId =
+    typeof roundIdRaw === "string" || typeof roundIdRaw === "number"
+      ? String(roundIdRaw)
+      : undefined;
+  if (roundId) {
+    if (endEmittedRoundIds.has(roundId)) return;
+    endEmittedRoundIds.add(roundId);
+  } else if (endEmittedModes.has(mode)) {
+    return;
+  }
+  // Always mark the mode slot when we emit, so a later non-roundId caller for
+  // the same start still collapses (HostView effect + Results without roundId).
   endEmittedModes.add(mode);
 
   // Game lifecycle ended (either path) — clear active flag so a later pagehide

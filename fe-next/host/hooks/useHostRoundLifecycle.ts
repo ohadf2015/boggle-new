@@ -150,6 +150,12 @@ export function useHostRoundLifecycle({
       requestedMode: hostSelectedGameMode ?? 'random',
       playerCount: tournament.finalScores?.players?.length ?? 0,
       botCount: botPlayerCount,
+      // Align with Results-path roundId so HostView + MpResultsScreen cannot
+      // double-emit the same round (t_d96d8d58). Prefer the live session id.
+      roundId: gameSessionId
+        ? `mp:${gameSessionId}`
+        : (gameCode ? `mp:${gameCode}:${tournament.tournamentData?.currentRound ?? 0}` : undefined),
+      gameSessionId: gameSessionId || undefined,
     },
   });
 

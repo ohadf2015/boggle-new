@@ -16,6 +16,7 @@ import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import { useMpExit } from '@/hooks/useMpExit';
 import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
 import { getGuestStatsSummary } from '@/utils/guestManager';
+import { trackGameEnd } from '@/utils/growthTracking';
 import { useGameMode, useGameModeConfirmed, useHostSelectedGameMode, useGameActions } from '@/hooks/gameState/store';
 import { playedGameMode } from '@/lib/education/roundEndResultsRoute';
 import { standingsWithoutHost } from '@/lib/education/roundEndPodium';
@@ -52,7 +53,7 @@ export function useMpResultsController(props: MpResultsProps) {
   const {
     finalScores, gameCode, onReturnToRoom, username, socket, achievements, isHost = false,
     roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesRoundNumber, wordHuntSummary, classroomSummary,
-    onResetSeries,
+    onResetSeries, gameSessionId, playerCount,
   } = props;
   const { t, language } = useLanguage();
   const { isAuthenticated, user } = useAuth();
@@ -144,13 +145,51 @@ export function useMpResultsController(props: MpResultsProps) {
   const nudge = useMultiplayerSignupNudge({ isAuthenticated, isResultsVisible: true });
   // Record once BOTH the room and the played mode are known (mount-only fired
   // before the mode hydrated → PostHog got 'multiplayer' for ~65% of games).
+  // Also emit the canonical completion path here: HostView/PlayerView unmount
+  // when showResults flips (same commit as waitingForResults/finalScores), so
+  // useGameEndTelemetry often never sees the rising edge for join-via-link /
+  // non-host clients — PostHog 7d: 58% of mp_session_game players had 0
+  // game_completed (t_d96d8d58). Results is the chokepoint every participant hits.
   const mpGameRecordedRef = useRef(false);
   const { recordMpGame } = nudge;
   useEffect(() => {
     if (mpGameRecordedRef.current || !gameCode || !resolvedGameMode) return;
     mpGameRecordedRef.current = true;
     recordMpGame(resolvedGameMode);
-  }, [gameCode, resolvedGameMode, recordMpGame]);
+
+    const score = currentPlayerData?.score ?? 0;
+    const wordCount =
+      currentPlayerData?.wordsFoundCount ??
+      currentPlayerValidWords?.length ??
+      0;
+    const roundId = gameSessionId
+      ? `mp:${gameSessionId}`
+      : `mp:${gameCode}:${seriesRoundNumber ?? 0}`;
+    trackGameEnd(resolvedGameMode, score, wordCount, true, gameDuration, {
+      gameCode,
+      role: isHost ? 'host' : 'player',
+      isMultiplayer: true,
+      engineMode: 'multiplayer',
+      gameMode: resolvedGameMode,
+      playerCount: finalScores?.length ?? playerCount ?? 0,
+      isWinner: isCurrentUserWinner,
+      roundId,
+      gameSessionId,
+    });
+  }, [
+    gameCode,
+    resolvedGameMode,
+    recordMpGame,
+    currentPlayerData,
+    currentPlayerValidWords,
+    gameDuration,
+    gameSessionId,
+    seriesRoundNumber,
+    isHost,
+    finalScores,
+    playerCount,
+    isCurrentUserWinner,
+  ]);
 
   const guestStats = useMemo(() => getGuestStatsSummary(), []);
   useFirstWinCelebration({ isWinner: isCurrentUserWinner, gamesPlayed: guestStats.gamesPlayed, isMultiplayer: true });

@@ -105,6 +105,8 @@ export interface ResultsPageProps {
   duplicateRuleDisabled?: boolean;
   /** Number of players in the game */
   playerCount?: number;
+  /** Server per-round id — used to dedupe growth:game_completed across HostView/Results */
+  gameSessionId?: number;
   /** Whether the current user is the host */
   isHost?: boolean;
   /**

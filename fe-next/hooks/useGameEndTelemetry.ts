@@ -44,8 +44,13 @@ export function useGameEndTelemetry({
   const firedRef = useRef(false);
 
   useEffect(() => {
+    // Re-arm between rounds so a HostView that stays mounted (classroom
+    // projector) still emits game_completed on round 2+.
+    if (!resultsShown) {
+      firedRef.current = false;
+      return;
+    }
     if (firedRef.current) return;
-    if (!resultsShown) return;
     if (!ready) return;
     if (!mode) return;
 

@@ -73,6 +73,9 @@ export function usePlayerRoundTelemetry({
       gameCode, role: 'player', isMultiplayer: true,
       engineMode: 'multiplayer', gameMode: gameMode ?? 'classic',
       playerCount: humanPlayerCount, botCount: botPlayerCount,
+      // No roundId here: this view usually unmounts before the effect runs
+      // (t_d96d8d58). Results owns the authoritative emit with gameSessionId.
+      // If this path does fire, endEmittedModes collapses a later Results emit.
     },
   });
 }
