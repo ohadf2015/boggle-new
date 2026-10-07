@@ -153,6 +153,40 @@ export function decideBotWheelMove(
   return { action: 'submit', word };
 }
 
+/**
+ * Flatline guard: the score gate's hard-bot floor (75 pts — see
+ * WHEEL_RUSH_BOT_TUNING / botScoreGate) sits below the cheapest 6-letter wheel
+ * word (100 base + 5 first-finder), so while the best human stays cheap a bot
+ * can ONLY bank 3–5-letter words. A slice front-loaded with >=6-letter words —
+ * or with words live validation rejects (vowel-less shapes) — burns every turn
+ * of the round and the bot ends at 0 (mpBotRounds wheel-rush CI flake; in real
+ * rooms the bot just looks dead next to a low-scoring human).
+ * Keep only words live validation accepts, then pull the first
+ * GUARANTEED_AFFORDABLE sub-6-letter words to the front in their original
+ * (banded/shuffled) order so every bot has a playable move from turn one.
+ * Long/pangram words keep their relative order in the rest of the slice, so
+ * difficulty banding still shapes what the bot plays once it is on the board.
+ */
+const GUARANTEED_AFFORDABLE = 5;
+const AFFORDABLE_MAX_LEN = 5;
+
+export function buildPlayableSlice(
+  state: WheelRushModeState,
+  ordered: string[],
+  cap: number,
+  language: Language,
+): string[] {
+  const playable = ordered.filter((w) => validateWheelSubmission(state, w, language).valid);
+  const head: string[] = [];
+  const tail: string[] = [];
+  const headCap = Math.min(GUARANTEED_AFFORDABLE, cap);
+  for (const w of playable) {
+    if (head.length < headCap && w.length <= AFFORDABLE_MAX_LEN) head.push(w);
+    else tail.push(w);
+  }
+  return [...head, ...tail].slice(0, cap);
+}
+
 function wheelRules(state: WheelRushModeState): BotPlayRules {
   return {
     tuning: WHEEL_RUSH_BOT_TUNING,
@@ -224,7 +258,7 @@ export async function startBotsForWheelRush(
     const ordered = rankByWord
       ? orderWordPoolByFrequencyBand(allCandidates, rankByWord, playerWords.length, bot.difficulty)
       : shuffle(allCandidates);
-    const words = ordered.slice(0, perBotCap);
+    const words = buildPlayableSlice(state, ordered, perBotCap, language);
     const successRate = WHEEL_RUSH_BOT_SUCCESS_RATE[bot.difficulty] ?? WHEEL_RUSH_BOT_SUCCESS_RATE.medium;
     let idx = 0;
     activateBot(bot);
@@ -235,7 +269,10 @@ export async function startBotsForWheelRush(
       pick: () => {
         if (idx >= words.length) return undefined;
         const intended = words[idx++];
-        const move = decideBotWheelMove(intended, words.slice(idx), successRate);
+        // Downgrades must skip words the bot already banked — replaying a found
+        // word is rejected by playBotWord, which silently wastes the turn.
+        const remaining = words.slice(idx).filter((w) => !bot.wordsFound.includes(w));
+        const move = decideBotWheelMove(intended, remaining, successRate);
         return move.action === 'submit' ? move.word : null;
       },
     });

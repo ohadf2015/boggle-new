@@ -63,6 +63,7 @@ import {
   startBotsForWheelRush,
   decideBotWheelMove,
   botThinkDelay,
+  buildPlayableSlice,
 } from '../botWheelRush';
 import { initWheelRushState } from '../../../modules/wheelRushManager';
 import {
@@ -304,6 +305,47 @@ describe('startBotsForWheelRush', () => {
     vi.advanceTimersByTime(30_000);
     expect(mocks.updatePlayerScore).not.toHaveBeenCalled();
     expect(mocks.broadcastToRoom).not.toHaveBeenCalled();
+  });
+});
+
+describe('buildPlayableSlice — flatline guard (mpBotRounds wheel-rush flake)', () => {
+  const puzzle = {
+    centerLetter: 'C',
+    outerLetters: ['A', 'N', 'E', 'S', 'T', 'R'],
+    allLetters: ['C', 'A', 'N', 'E', 'S', 'T', 'R'],
+  };
+
+  beforeEach(() => {
+    // CANERS = 6-letter (unbankable under the hard-bot 75pt floor while the
+    // best human is cheap); CRSTN = vowel-less shape live validation rejects.
+    const trie = buildTrie(['cat', 'cane', 'cent', 'caners', 'crstn']);
+    mocks.getCachedTrie.mockReturnValue(trie);
+    mocks.getTrieNode.mockImplementation((t: Record<string, unknown>, prefix: string) => {
+      let n: Record<string, unknown> | null = t;
+      for (const ch of prefix) {
+        if (!n || !n[ch]) return null;
+        n = n[ch] as Record<string, unknown>;
+      }
+      return n;
+    });
+  });
+
+  it('front-loads affordable (<=5 letter) words and drops never-validating ones', () => {
+    const state = initWheelRushState(puzzle, ['BotBob']);
+    const slice = buildPlayableSlice(state, ['CANERS', 'CRSTN', 'CENT', 'CANE', 'CAT'], 14, 'en');
+    expect(slice).toEqual(['CENT', 'CANE', 'CAT', 'CANERS']);
+  });
+
+  it('respects the per-bot cap', () => {
+    const state = initWheelRushState(puzzle, ['BotBob']);
+    const slice = buildPlayableSlice(state, ['CANERS', 'CENT', 'CANE', 'CAT'], 2, 'en');
+    expect(slice).toEqual(['CENT', 'CANE']);
+  });
+
+  it('keeps dear words in order when the pool has no affordable words', () => {
+    const state = initWheelRushState(puzzle, ['BotBob']);
+    const slice = buildPlayableSlice(state, ['CANERS', 'CANERS'], 14, 'en');
+    expect(slice).toEqual(['CANERS', 'CANERS']);
   });
 });
 
