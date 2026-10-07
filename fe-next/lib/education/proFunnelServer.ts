@@ -55,6 +55,38 @@ export function buildTrialActivatedEvent(userId: string, subscriptionId: string)
   };
 }
 
+/** Conversion funnel step 1 — Polar opened the 14-day Teacher Pro trial. */
+export function buildTrialStartEvent(userId: string, subscriptionId: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'trial_start',
+    properties: { ...BASE, subscription_id: subscriptionId },
+  };
+}
+
+/** Conversion funnel step 3 — Polar paid checkout finished (same webhook as `paid`). */
+export function buildCheckoutCompleteEvent(userId: string): EduServerEvent {
+  return { distinctId: userId, event: 'checkout_complete', properties: { ...BASE } };
+}
+
+/** Conversion funnel step 4 — Polar `subscription.active` and not trialing. */
+export function buildPaidEvent(userId: string, subscriptionId: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'paid',
+    properties: { ...BASE, subscription_id: subscriptionId },
+  };
+}
+
+/** Day-10 Polar trial expiry email actually sent. */
+export function buildPolarTrialDay10SentEvent(userId: string, daysLeft: number): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'teacher_polar_trial_day10_sent',
+    properties: { ...BASE, days_left: daysLeft },
+  };
+}
+
 /** Measurable gate step: teacher access request row durably created. */
 export function buildEduAccessRequestCreatedEvent(
   userId: string,

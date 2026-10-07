@@ -42,11 +42,19 @@ describe('trackEduProUpgradeClicked', () => {
   it('Given a dashboard trial CTA, When tracked, Then the source distinguishes lifecycle from expired', () => {
     trackEduProUpgradeClicked({ source: 'dashboard_trial_lifecycle' });
     trackEduProUpgradeClicked({ source: 'dashboard_trial_ended' });
-    expect(captureMock).toHaveBeenNthCalledWith(1, 'edu_pro_upgrade_clicked', {
+    expect(captureMock).toHaveBeenCalledWith('edu_pro_upgrade_clicked', {
       source: 'dashboard_trial_lifecycle',
     });
-    expect(captureMock).toHaveBeenNthCalledWith(2, 'edu_pro_upgrade_clicked', {
+    expect(captureMock).toHaveBeenCalledWith('edu_pro_upgrade_clicked', {
       source: 'dashboard_trial_ended',
+    });
+  });
+
+  it('Given a paid upgrade click, When tracked, Then checkout_open is also fired for the conversion funnel', () => {
+    trackEduProUpgradeClicked({ source: 'dashboard_trial_lifecycle' });
+    expect(captureMock).toHaveBeenCalledWith('checkout_open', {
+      source: 'dashboard_trial_lifecycle',
+      product: 'teacher_pro',
     });
   });
 
@@ -167,6 +175,7 @@ describe('Growth Radar mirror (trackGrowthEvent)', () => {
       'trial_cta_view',
       'trial_cta_tap',
       'edu_pro_upgrade_clicked',
+      'checkout_open',
       'edu_pro_checkout_success_seen',
     ]);
   });
