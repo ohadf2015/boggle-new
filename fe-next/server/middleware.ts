@@ -72,6 +72,36 @@ export function shouldExpressParseJsonBody(path: string): boolean {
   return isExpressRoute && !isNextAdminRoute;
 }
 
+/**
+ * JSON body parser for Express-handled API routes (see shouldExpressParseJsonBody).
+ *
+ * Express 5 leaves `req.body` undefined when a request carries no JSON body
+ * (no content-type, text/plain, form posts, empty POSTs). Route handlers
+ * destructure `req.body` directly (`const { grid } = req.body`), so such a
+ * request threw a TypeError → 500 INTERNAL_ERROR + Sentry on prod
+ * (POST /api/solve-grid and /api/dictionary/check without a JSON content-type,
+ * QA 2026-10-07). Default to `{}` (the Express 4 behaviour) so handlers run
+ * their own validation and answer 400. Parse errors (malformed JSON → 400,
+ * too large → 413) still go to the error handler unchanged.
+ */
+export function expressJsonBody(): RequestHandler {
+  const parseJson = express.json({ limit: '1mb', strict: true });
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (!shouldExpressParseJsonBody(req.path)) {
+      next();
+      return;
+    }
+    parseJson(req, res, (err?: unknown) => {
+      if (err) {
+        next(err);
+        return;
+      }
+      if (req.body === undefined) req.body = {};
+      next();
+    });
+  };
+}
+
 // Pre-compiled regexes — avoids recompilation on every HTTP request
 const STATIC_ASSET_RE = /\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp|avif|mp3|mp4|ogg|wav|gif|webm)$/;
 const NON_HTML_ASSET_RE = /\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp|avif)$/;
@@ -510,13 +540,7 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
 
   // JSON body parsing - only for Express-handled API routes
   // Next.js App Router API routes handle their own body parsing
-  app.use((req: Request, res: Response, next: NextFunction): void => {
-    if (shouldExpressParseJsonBody(req.path)) {
-      express.json({ limit: '1mb', strict: true })(req, res, next);
-      return;
-    }
-    next();
-  });
+  app.use(expressJsonBody());
 
   // Request timeout
   app.use(requestTimeout());
