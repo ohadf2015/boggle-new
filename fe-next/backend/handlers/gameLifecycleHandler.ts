@@ -419,7 +419,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
     if (!gameCode) {
-      logger.warn(
+      logger.info(
         'SOCKET',
         `requestGameState from socket ${socket.id}, which is not seated in any game — ` +
           `answering PLAYER_NOT_IN_GAME. The client must re-emit \`join\` to rebuild the mapping.`

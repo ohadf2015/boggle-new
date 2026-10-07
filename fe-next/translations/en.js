@@ -7464,7 +7464,13 @@ const en = {
       "3": "Knowledge is your sharpest blade",
       "4": "Rhythm wins rounds",
       "5": "Sound is the new strategy",
-      "6": "Rule the dictionary"
+      "6": "Rule the dictionary",
+      "7": "Cool letters, hot streaks",
+      "8": "The board comes alive after dark",
+      "9": "Burn bright, score brighter",
+      "10": "Grow your lead, word by word",
+      "11": "Decode the stars",
+      "12": "The final ascent"
     }
   },
   "seasonBadges": {

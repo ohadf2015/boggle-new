@@ -7931,7 +7931,13 @@ const es = {
       "3": "El saber es tu hoja más afilada",
       "4": "El ritmo gana la ronda",
       "5": "El sonido es la nueva estrategia",
-      "6": "Reina el diccionario"
+      "6": "Reina el diccionario",
+      "7": "Letras frías, rachas calientes",
+      "8": "El tablero cobra vida de noche",
+      "9": "Arde fuerte, puntúa más",
+      "10": "Aumenta tu ventaja, palabra a palabra",
+      "11": "Descifra las estrellas",
+      "12": "El ascenso final"
     }
   },
   "seasonBadges": {

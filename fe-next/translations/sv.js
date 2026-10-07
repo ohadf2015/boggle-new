@@ -8235,7 +8235,13 @@ const sv = {
       "3": "Kunskap är ditt vassaste vapen",
       "4": "Rytm vinner ronder",
       "5": "Ljud är den nya strategin",
-      "6": "Härska över ordboken"
+      "6": "Härska över ordboken",
+      "7": "Coola bokstäver, heta sviter",
+      "8": "Brädet vaknar efter mörkrets inbrott",
+      "9": "Lys starkt, poängsätt starkare",
+      "10": "Öka ditt försprång, ord för ord",
+      "11": "Avkoda stjärnorna",
+      "12": "Den sista klättringen"
     }
   },
   "seasonBadges": {
