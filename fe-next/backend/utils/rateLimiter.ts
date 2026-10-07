@@ -288,6 +288,12 @@ export class RateLimiterCore {
     }
 
     for (const [ip, data] of this.ipData) {
+      // Drop keys whose keyData was just swept: HTTP traffic never calls
+      // unregisterKey, so without this every IP's key Set stays non-empty and
+      // the entry below is never freed.
+      for (const key of data.keys) {
+        if (!this.keyData.has(key)) data.keys.delete(key);
+      }
       if (now - data.lastActivity > staleThreshold && data.keys.size === 0) {
         this.ipData.delete(ip);
       }

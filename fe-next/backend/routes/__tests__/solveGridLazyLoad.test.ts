@@ -23,7 +23,7 @@ const findWordsForBots = vi.fn(() => ({ easy: ['gato'], medium: [], hard: [] }))
 const logError = vi.fn();
 
 vi.mock('../../dictionary', () => ({ load, ensureLanguageLoaded }));
-vi.mock('../../modules/boggleSolver', () => ({ findWordsForBots }));
+vi.mock('../../modules/boggleSolver', () => ({ findWordsForBots, resolveSolverLanguage: (l: string) => l }));
 vi.mock('../../utils/logger', () => ({
   default: { warn: vi.fn(), error: logError, info: vi.fn(), debug: vi.fn() },
 }));

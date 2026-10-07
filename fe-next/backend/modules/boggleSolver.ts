@@ -75,6 +75,16 @@ const WORD_SET_BY_LANGUAGE: Record<string, () => Set<string> | undefined> = {
   ru: () => dictionary.russianWords,
 };
 
+/**
+ * Collapse any caller-supplied language to a supported one (unknown -> 'en').
+ * Solver caches are keyed by this so an unauthenticated `language` string can't
+ * mint a new ~36 MB trie per distinct value. Own-property check: `constructor`
+ * / `__proto__` must not resolve through Object.prototype.
+ */
+export function resolveSolverLanguage(language: string): LanguageCode {
+  return (Object.prototype.hasOwnProperty.call(WORD_SET_BY_LANGUAGE, language) ? language : 'en') as LanguageCode;
+}
+
 // Direction vectors for 8-way adjacent movement
 const DIRECTIONS: [number, number][] = [
   [-1, -1], [-1, 0], [-1, 1],  // up-left, up, up-right
@@ -92,7 +102,8 @@ const TRIE_CACHE_TTL = 30 * 60 * 1000; // 30 minutes - dictionaries rarely chang
 /**
  * Get or build a cached trie for a language
  */
-export function getCachedTrie(language: LanguageCode | string): TrieNode | null {
+export function getCachedTrie(rawLanguage: LanguageCode | string): TrieNode | null {
+  const language = resolveSolverLanguage(rawLanguage);
   const cached = trieCache.get(language);
   const now = Date.now();
 
@@ -103,7 +114,7 @@ export function getCachedTrie(language: LanguageCode | string): TrieNode | null 
   // Get the dictionary set for this language.
   // Getters, not captured references: loadLanguage() REASSIGNS these Sets, so a
   // reference grabbed at module load would stay empty forever.
-  const wordSet: Set<string> | undefined = (WORD_SET_BY_LANGUAGE[language] ?? WORD_SET_BY_LANGUAGE.en)();
+  const wordSet: Set<string> | undefined = WORD_SET_BY_LANGUAGE[language]();
 
   if (!wordSet || wordSet.size === 0) {
     logger.warn('SOLVER', `No dictionary available for language: ${language}`);
@@ -325,9 +336,10 @@ export function findAllWords(
  */
 export function findWordsForBots(
   grid: LetterGrid,
-  language: LanguageCode | string,
+  rawLanguage: LanguageCode | string,
   options: FindWordsOptions = {}
 ): CategorizedWords {
+  const language = resolveSolverLanguage(rawLanguage);
   const minLength = options.minLength || 3;
   const maxLength = options.maxLength || 10;
 
