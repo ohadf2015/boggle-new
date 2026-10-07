@@ -1,0 +1,537 @@
+{
+  "language": "ja",
+  "source": "ja-expansion",
+  "migration": "20261007200000_curriculum_v2_ja_expansion.sql",
+  "lists": [
+    {
+      "code": "LC-JA-G7-SCIENCE",
+      "name": "中学1年 — 理科：生き物と 大地",
+      "description": "植物・からだ・物の性質・大地のうごきなど、中学1年の理科で出てくることば。",
+      "language": "ja",
+      "grade": "grade_7",
+      "subject": "science",
+      "words": [
+        {
+          "word": "しょくぶつ",
+          "level": "support",
+          "definition": "根・くき・葉をもち、日光を使って養分をつくる生き物",
+          "example": "にわの しょくぶつに 水を あげた。"
+        },
+        {
+          "word": "こうごうせい",
+          "level": "core",
+          "definition": "日光のエネルギーを使い、水と二酸化炭素から養分をつくるはたらき",
+          "example": "はっぱの 中で こうごうせいが おこなわれる。"
+        },
+        {
+          "word": "きんにく",
+          "level": "support",
+          "definition": "ちぢんだり ゆるんだりして、体を動かす やわらかい ぶぶん",
+          "example": "おもい にもつを はこぶと きんにくが つかれる。"
+        },
+        {
+          "word": "めんえき",
+          "level": "challenge",
+          "definition": "病気のもとになる 細菌や ウイルスを、体が やっつける ちから",
+          "example": "よく ねて めんえきを たかめる。"
+        },
+        {
+          "word": "じしゃく",
+          "level": "core",
+          "definition": "鉄を ひきつける ちからを もつ もの",
+          "example": "じしゃくに くぎが くっついた。"
+        },
+        {
+          "word": "でんき",
+          "level": "support",
+          "definition": "電子の 流れで、光や 熱や 動きを つくる エネルギー",
+          "example": "ふゆは でんきを たくさん つかう。"
+        },
+        {
+          "word": "とうけつ",
+          "level": "core",
+          "definition": "液体が 冷やされて、かたまりに なること",
+          "example": "よるの あいだに 池が とうけつした。"
+        },
+        {
+          "word": "ふっとう",
+          "level": "core",
+          "definition": "液体が 熱せられて、中から 気体が さかんに わき出ること",
+          "example": "お湯が ふっとうして 湯気が 出た。"
+        },
+        {
+          "word": "えきたい",
+          "level": "support",
+          "definition": "形が きまらず、入れものに そって ながれる 水や 油などの もの",
+          "example": "えきたいを ビーカーに そそいだ。"
+        },
+        {
+          "word": "だんそう",
+          "level": "core",
+          "definition": "土や 岩が 層に なって かさなった もの",
+          "example": "がけに しろい だんそうが 見えた。"
+        },
+        {
+          "word": "かざん",
+          "level": "challenge",
+          "definition": "地下の マグマが 地上に ふき出して できた 山",
+          "example": "かざんの ふもとに 温泉が わいて いた。"
+        },
+        {
+          "word": "じしん",
+          "level": "support",
+          "definition": "地下の 岩が ずれて、大地が ゆれること",
+          "example": "つよい じしんで 本だなが たおれた。"
+        },
+        {
+          "word": "こきゅう",
+          "level": "core",
+          "definition": "空気を すったり はいたりして、体に 酸素を 取り入れること",
+          "example": "うんどうの あとは こきゅうが はやく なる。"
+        },
+        {
+          "word": "ちきゅう",
+          "level": "core",
+          "definition": "太陽の まわりを まわって いる、わたしたちが すむ 星",
+          "example": "ちきゅうは 太陽の まわりを まわって いる。"
+        },
+        {
+          "word": "ばくはつ",
+          "level": "challenge",
+          "definition": "いきおいよく 中の ものが 外へ とびだすこと",
+          "example": "かざんが ばくはつして けむりが 上がった。"
+        },
+        {
+          "word": "たいき",
+          "level": "core",
+          "definition": "ちきゅうを つつむ、空気の そう",
+          "example": "たいきの そうが ちきゅうを まもって いる。"
+        }
+      ]
+    },
+    {
+      "code": "LC-JA-G8-HISTORY",
+      "name": "中学2年 — 歴史：近代の 日本",
+      "description": "明治から 戦前までの 日本の 歴史で 使う、社会や 政治の ことば。",
+      "language": "ja",
+      "grade": "grade_8",
+      "subject": "history",
+      "words": [
+        {
+          "word": "かいこう",
+          "level": "support",
+          "definition": "長く とじて いた 国を ひらき、外国と まじわること",
+          "example": "ペリーが 来て、日本は かいこうに むかった。"
+        },
+        {
+          "word": "いしん",
+          "level": "core",
+          "definition": "世の中や 政治の しくみを、大きく かえること",
+          "example": "めいじの いしんで 国の しくみが かわった。"
+        },
+        {
+          "word": "ぶんめい",
+          "level": "core",
+          "definition": "学問や 技術が すすみ、社会が 発展した すがた",
+          "example": "ぶんめいが すすむと くらしも かわる。"
+        },
+        {
+          "word": "こくみん",
+          "level": "support",
+          "definition": "国の 主人として、政治や 国に かかわる 人びと",
+          "example": "こくみんの けんりが 憲法で まもられる。"
+        },
+        {
+          "word": "ぎかい",
+          "level": "core",
+          "definition": "国の 政治を 話し合い、法律などを 決める 会議",
+          "example": "ぎかいで 新しい ほうりつを 決めた。"
+        },
+        {
+          "word": "きしゃ",
+          "level": "core",
+          "definition": "蒸気の 力で レールの 上を はしった、むかしの 列車",
+          "example": "めいじの ころ きしゃが はしり はじめた。"
+        },
+        {
+          "word": "こうぎょう",
+          "level": "core",
+          "definition": "原料を 機械で たくさん つくる 仕事や 産業",
+          "example": "こうぎょうが さかんに なって まちが にぎわった。"
+        },
+        {
+          "word": "のうみん",
+          "level": "support",
+          "definition": "田畑で 作物を つくって くらす 人",
+          "example": "のうみんは 米を おさめて いた。"
+        },
+        {
+          "word": "さむらい",
+          "level": "core",
+          "definition": "むかし、主君に つかえて たたかい、政治も 担った 武士",
+          "example": "さむらいの 時代は ながく つづいた。"
+        },
+        {
+          "word": "しょうにん",
+          "level": "support",
+          "definition": "ものを 売ったり 買ったりして、くらしを たてる 人",
+          "example": "しょうにんが いちで ぬのを うって いた。"
+        },
+        {
+          "word": "せんそう",
+          "level": "support",
+          "definition": "国どうしが ぶきを つかって あらそう こと",
+          "example": "にっしんせんそうで 日本は かった。"
+        },
+        {
+          "word": "りっけん",
+          "level": "challenge",
+          "definition": "憲法に もとづいて 国の 政治を おこなう しくみ",
+          "example": "めいじに りっけんせいじが はじまった。"
+        },
+        {
+          "word": "ばくふ",
+          "level": "challenge",
+          "definition": "むかし、将軍が 国の 政治を おこなった 政府",
+          "example": "ばくふが たおれ、あたらしい 国が 生まれた。"
+        },
+        {
+          "word": "こくさい",
+          "level": "challenge",
+          "definition": "国と 国の あいだの つながりや かかわり",
+          "example": "日本は こくさいの なかまに なった。"
+        },
+        {
+          "word": "ぶんか",
+          "level": "support",
+          "definition": "その 時代の 人びとの くらしや 考え方",
+          "example": "ぶんかの ちがいを たのしむ。"
+        },
+        {
+          "word": "ぼうせき",
+          "level": "core",
+          "definition": "綿から 糸や 布を つくる 工場の 仕事",
+          "example": "ぼうせきこうじょうで はたらく 人が ふえた。"
+        }
+      ]
+    },
+    {
+      "code": "LC-JA-G10-SOCIETY",
+      "name": "高校1年 — 現代の 社会ことば",
+      "description": "経済・社会・倫理のことばで、高校の授業に出てくるものを、わかりやすい説明で。",
+      "language": "ja",
+      "grade": "grade_10",
+      "subject": "general",
+      "words": [
+        {
+          "word": "けいざい",
+          "level": "core",
+          "definition": "お金や ものを つくり、売り買いする しくみ",
+          "example": "けいざいが よく なると、みんなの くらしも ゆたかに なる。"
+        },
+        {
+          "word": "ぼうえき",
+          "level": "core",
+          "definition": "国と 国が、ものを 売ったり 買ったり すること",
+          "example": "日本は ぼうえきで たくさんの ものを うって いる。"
+        },
+        {
+          "word": "じんけん",
+          "level": "support",
+          "definition": "人が 生まれながらに もつ、大切に まもられる 権利",
+          "example": "じんけんは だれにも うばわれては いけない。"
+        },
+        {
+          "word": "ぎじゅつ",
+          "level": "core",
+          "definition": "ものを つくったり、問題を とく ための 知識と やり方",
+          "example": "あたらしい ぎじゅつで 水を きれいに する。"
+        },
+        {
+          "word": "こうれいか",
+          "level": "challenge",
+          "definition": "人口の なかで お年よりの 割合が ふえて いくこと",
+          "example": "こうれいかが すすみ、まちの 人が へって いく。"
+        },
+        {
+          "word": "きょうそう",
+          "level": "support",
+          "definition": "おたがいに 勝とうとして、きそいあうこと",
+          "example": "クラスの きょうそうで みんなが がんばった。"
+        },
+        {
+          "word": "ちいき",
+          "level": "support",
+          "definition": "まちや 村など、ある 範囲の 地域",
+          "example": "この ちいきには 大きな こうえんが ある。"
+        },
+        {
+          "word": "せいさん",
+          "level": "core",
+          "definition": "ものを つくり出すこと",
+          "example": "この 工場では 毎日 たくさんの 車を せいさんする。"
+        },
+        {
+          "word": "しょうひ",
+          "level": "core",
+          "definition": "お金や ものを 使って、なくして いくこと",
+          "example": "わたしたちは 水を しょうひして いる。"
+        },
+        {
+          "word": "こうがい",
+          "level": "core",
+          "definition": "人や 自然に わるい えいきょうを あたえること",
+          "example": "ごみを すてると しぜんに こうがいを およぼす。"
+        },
+        {
+          "word": "じぞく",
+          "level": "challenge",
+          "definition": "ずっと つづけて いくこと",
+          "example": "まちは しぜんを じぞくできる よう まもって いる。"
+        },
+        {
+          "word": "ほけん",
+          "level": "core",
+          "definition": "けがや 病気に そなえて、お金を 出し合う しくみ",
+          "example": "ほけんに 入ると、病気の ときも 安心だ。"
+        },
+        {
+          "word": "ぶんせき",
+          "level": "challenge",
+          "definition": "物事を こまかく わけて、くわしく しらべること",
+          "example": "データを ぶんせきして 傾向を さがす。"
+        },
+        {
+          "word": "てつがく",
+          "level": "challenge",
+          "definition": "物事の 本当の 意味を、深く 考える 学問",
+          "example": "てつがくの 本を よんで 考えを ふかめた。"
+        },
+        {
+          "word": "きじゅん",
+          "level": "core",
+          "definition": "物事を くらべる ときの もとに する 決まり",
+          "example": "きじゅんを きめて テストの ひょうかを する。"
+        },
+        {
+          "word": "ゆにゅう",
+          "level": "core",
+          "definition": "外国から ものを 買い入れること",
+          "example": "日本は 食べものを たくさん ゆにゅうして いる。"
+        }
+      ]
+    },
+    {
+      "code": "LC-JA-G11-LAW",
+      "name": "高校2年 — くらしと 法律",
+      "description": "法律・裁判・消費のことば。市民として 知っておきたい 社会の 決まりを 身近な 例で。",
+      "language": "ja",
+      "grade": "grade_11",
+      "subject": "general",
+      "words": [
+        {
+          "word": "ふくし",
+          "level": "support",
+          "definition": "お年よりや 障がいの ある 人が 安心して くらせるよう 支える しくみ",
+          "example": "まちの ふくしの 窓口で そうだんした。"
+        },
+        {
+          "word": "さいばん",
+          "level": "core",
+          "definition": "裁判所が あらそいを 法に そって 決める 手続き",
+          "example": "ふたりの さいばんが 来月 はじまる。"
+        },
+        {
+          "word": "せきにん",
+          "level": "core",
+          "definition": "自分の 行いの 結果を 引き受けること",
+          "example": "じぶんの せきにんは じぶんで とる。"
+        },
+        {
+          "word": "みんぽう",
+          "level": "challenge",
+          "definition": "市民どうしの あらそいや 契約についての 法律",
+          "example": "みんぽうでは 約束ごとが まもられる。"
+        },
+        {
+          "word": "けいやく",
+          "level": "core",
+          "definition": "ふたり以上が 約束を 文書で かわし、まもること",
+          "example": "あたらしい けいやくに サインした。"
+        },
+        {
+          "word": "ぼうりょく",
+          "level": "support",
+          "definition": "力で 人を きずつける こと",
+          "example": "ぼうりょくは どんな りゆうでも いけない。"
+        },
+        {
+          "word": "びょうどう",
+          "level": "support",
+          "definition": "だれに対しても 差別せず、同じように あつかうこと",
+          "example": "クラスでは びょうどうに はなしを きく。"
+        },
+        {
+          "word": "そしょう",
+          "level": "challenge",
+          "definition": "あらそいを 裁判で 解決するよう 求めること",
+          "example": "お店の 人が そしょうを おこした。"
+        },
+        {
+          "word": "しょうひしゃ",
+          "level": "core",
+          "definition": "商品や サービスを 買って 使う 人",
+          "example": "しょうひしゃは かしこく えらぶ ひつようが ある。"
+        },
+        {
+          "word": "とうひょうけん",
+          "level": "core",
+          "definition": "選挙で 投票する 権利",
+          "example": "十八さいに なると とうひょうけんが もてる。"
+        },
+        {
+          "word": "しほう",
+          "level": "challenge",
+          "definition": "国の 権力の ひとつで、裁判を おこなう はたらき",
+          "example": "しほうは 法を もとに 判決を だす。"
+        },
+        {
+          "word": "ゆうざい",
+          "level": "challenge",
+          "definition": "罪を おかしたと 裁判で 認められること",
+          "example": "さいばんで ゆうざいに なる ことは たいへんだ。"
+        },
+        {
+          "word": "むざい",
+          "level": "core",
+          "definition": "罪が ないと 認められること",
+          "example": "さいばんの けっかは むざいに なった。"
+        },
+        {
+          "word": "べんごし",
+          "level": "core",
+          "definition": "人の 権利を まもるため、法律の 立場から 助ける 人",
+          "example": "べんごしと いっしょに じじょうを せつめいした。"
+        },
+        {
+          "word": "ぎろん",
+          "level": "core",
+          "definition": "おたがいに 意見を のべて、考えを 深めること",
+          "example": "クラスで ぎろんを して 答えを さがした。"
+        },
+        {
+          "word": "きょうよう",
+          "level": "support",
+          "definition": "社会で 生きていくために 身につけて おく 知識や 態度",
+          "example": "お金の きょうようは だいじな 学びだ。"
+        }
+      ]
+    },
+    {
+      "code": "LC-JA-G12-THOUGHT",
+      "name": "高校3年 — 人と 文化と 考え",
+      "description": "哲学・心理・社会のことば。考えを深めるための言葉を、やさしい説明で。",
+      "language": "ja",
+      "grade": "grade_12",
+      "subject": "general",
+      "words": [
+        {
+          "word": "じんかく",
+          "level": "support",
+          "definition": "その人らしさを つくる、考え方や 性格の まとまり",
+          "example": "本を よむと じんかくが ゆたかに なる。"
+        },
+        {
+          "word": "こころ",
+          "level": "support",
+          "definition": "物事を 感じたり 考えたり する はたらき",
+          "example": "こころの はたらきを しらべる 学問が ある。"
+        },
+        {
+          "word": "きおく",
+          "level": "core",
+          "definition": "覚えた ことを 頭に とどめて おく はたらき",
+          "example": "テストの まえに きおくを たしかめる。"
+        },
+        {
+          "word": "ろんり",
+          "level": "core",
+          "definition": "すじみちを たてて 考える しかた",
+          "example": "ろんりを たどって 答えを みつけた。"
+        },
+        {
+          "word": "しゅうきょう",
+          "level": "core",
+          "definition": "神や 仏などを 信じて、たっとぶ 教え",
+          "example": "まちには いくつも しゅうきょうの たてものが ある。"
+        },
+        {
+          "word": "はんだん",
+          "level": "core",
+          "definition": "物事を くらべて、よいか わるいかを 決める こと",
+          "example": "じぶんで はんだんして えらぶ。"
+        },
+        {
+          "word": "しんり",
+          "level": "challenge",
+          "definition": "まちがいの ない、本当の ことわり",
+          "example": "しんりを もとめて 本を よむ。"
+        },
+        {
+          "word": "げんじつ",
+          "level": "core",
+          "definition": "いま 目の前に ある、本当の 出来事や 状態",
+          "example": "ゆめと げんじつの ちがいに なやむ。"
+        },
+        {
+          "word": "そうぞう",
+          "level": "support",
+          "definition": "まだ ない ものを 頭の 中で 思いうかべること",
+          "example": "そうぞうを ひろげて 新しい はなしを つくる。"
+        },
+        {
+          "word": "ぎもん",
+          "level": "support",
+          "definition": "わからない ことを たずねること",
+          "example": "じゅぎょうで ぎもんを ひとつ だした。"
+        },
+        {
+          "word": "しこう",
+          "level": "core",
+          "definition": "物事を 考える はたらき",
+          "example": "ふかく しこうして けつろんを だす。"
+        },
+        {
+          "word": "かんけい",
+          "level": "support",
+          "definition": "人や 物どうしの つながり、関わり合い",
+          "example": "ともだちと よい かんけいを たもつ。"
+        },
+        {
+          "word": "こころざし",
+          "level": "challenge",
+          "definition": "めざして 努力する 目標",
+          "example": "ゆめに むかって こころざしを もつ。"
+        },
+        {
+          "word": "たいけん",
+          "level": "core",
+          "definition": "実際に 自分で 経験すること",
+          "example": "りょうりの たいけんを して みた。"
+        },
+        {
+          "word": "じゅんすい",
+          "level": "challenge",
+          "definition": "まじりけが ないこと、ひたむきな こと",
+          "example": "じゅんすいな 気持ちで 話を きく。"
+        },
+        {
+          "word": "きげん",
+          "level": "core",
+          "definition": "物事が はじまった、もとの 時",
+          "example": "この まつりの きげんを しらべる。"
+        }
+      ]
+    }
+  ]
+}

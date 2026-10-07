@@ -1,0 +1,431 @@
+{
+  "language": "sv",
+  "source": "sv-expansion",
+  "migration": "20261007200100_curriculum_v2_sv_expansion.sql",
+  "lists": [
+    {
+      "code": "LC-SV-G7-BODY",
+      "name": "Åk 7 — Kroppen och hälsan",
+      "description": "Organ, vävnader och hälsa: ord från biologin i årskurs 7, med en enkel förklaring och en mening för varje ord.",
+      "language": "sv",
+      "grade": "grade_7",
+      "subject": "science",
+      "words": [
+        {
+          "word": "hjärta",
+          "level": "support",
+          "definition": "Muskel som pumpar blodet runt i kroppen",
+          "example": "Mitt hjärta slår snabbare när jag springer."
+        },
+        {
+          "word": "blodkärl",
+          "level": "challenge",
+          "definition": "Rör där blodet rör sig i kroppen, till exempel artärer och vener",
+          "example": "Ett blodkärl i benen vidgas när vi tränar."
+        },
+        {
+          "word": "lungor",
+          "level": "support",
+          "definition": "Två organ i bröstkorgen som tar upp syre från luften",
+          "example": "Lungor fylls med luft när vi andas in."
+        },
+        {
+          "word": "muskel",
+          "level": "core",
+          "definition": "Vävnad som drar ihop sig och gör att kroppen rör sig",
+          "example": "En muskel i armen blir stark av träning."
+        },
+        {
+          "word": "skelett",
+          "level": "core",
+          "definition": "Kroppens stomme av ben som ger form och skyddar organ",
+          "example": "Skelett hjälper oss att stå upprätt."
+        },
+        {
+          "word": "näringsämne",
+          "level": "challenge",
+          "definition": "Ämne i maten som kroppen behöver, till exempel protein eller fett",
+          "example": "Ägg är fulla av ett viktigt näringsämne."
+        },
+        {
+          "word": "vitamin",
+          "level": "core",
+          "definition": "Ämne som kroppen behöver i små mängder för att må bra",
+          "example": "Apelsiner har mycket C-vitamin."
+        },
+        {
+          "word": "cell",
+          "level": "support",
+          "definition": "Den minsta byggstenen i levande saker",
+          "example": "Varje cell i kroppen har en kärna."
+        },
+        {
+          "word": "hormon",
+          "level": "challenge",
+          "definition": "Ämne som styr kroppens funktioner och skickas runt i blodet",
+          "example": "Insulin är ett hormon som styr blodsockret."
+        },
+        {
+          "word": "immunförsvar",
+          "level": "challenge",
+          "definition": "Kroppens skydd mot sjukdomar och bakterier",
+          "example": "Sömn stärker vårt immunförsvar."
+        },
+        {
+          "word": "bakterie",
+          "level": "core",
+          "definition": "Mycket liten levande organism, ibland skadlig och ibland nyttig",
+          "example": "Yoghurt innehåller en nyttig bakterie."
+        },
+        {
+          "word": "arv",
+          "level": "core",
+          "definition": "Egenskaper som vi får från våra föräldrar",
+          "example": "Ögonfärgen är ett arv från mina föräldrar."
+        },
+        {
+          "word": "sinne",
+          "level": "support",
+          "definition": "En av kroppens förmågor att uppfatta ljus, ljud, lukt, smak och beröring",
+          "example": "Ett sinne hjälper oss att uppfatta världen."
+        },
+        {
+          "word": "puls",
+          "level": "core",
+          "definition": "Hur många gånger hjärtat slår per minut",
+          "example": "Min puls blir lugnare när jag vilar."
+        },
+        {
+          "word": "sjukdom",
+          "level": "support",
+          "definition": "Något som gör att kroppen mår dåligt",
+          "example": "Influensa är en vanlig sjukdom på vintern."
+        },
+        {
+          "word": "vävnad",
+          "level": "core",
+          "definition": "Grupp av lika celler som arbetar tillsammans",
+          "example": "Huden är en vävnad som skyddar kroppen."
+        }
+      ]
+    },
+    {
+      "code": "LC-SV-G10-SOCIETY",
+      "name": "Åk 10 — Samhälle och ekonomi",
+      "description": "Demokrati, ekonomi och medier: begrepp från samhällskunskapen, med en kort förklaring och en mening för varje ord.",
+      "language": "sv",
+      "grade": "grade_10",
+      "subject": "general",
+      "words": [
+        {
+          "word": "demokrati",
+          "level": "support",
+          "definition": "Ett styrelseskick där folket väljer sina företrädare i fria val",
+          "example": "Sverige är en demokrati där alla vuxna får rösta."
+        },
+        {
+          "word": "inflation",
+          "level": "core",
+          "definition": "När priserna stiger hela tiden och pengarna blir mindre värda",
+          "example": "Vid hög inflation kostar bullen mer varje år."
+        },
+        {
+          "word": "arbetslöshet",
+          "level": "challenge",
+          "definition": "Läget när människor som vill arbeta inte har något jobb",
+          "example": "Arbetslöshet ökade snabbt under krisen."
+        },
+        {
+          "word": "skatt",
+          "level": "support",
+          "definition": "Pengar som medborgarna betalar till staten för gemensam service",
+          "example": "Skatt används till skolor, vägar och sjukvård."
+        },
+        {
+          "word": "ränta",
+          "level": "core",
+          "definition": "Avgiften för att låna pengar, eller ersättningen för att spara dem",
+          "example": "Hög ränta gör det dyrt att låna pengar."
+        },
+        {
+          "word": "konsument",
+          "level": "core",
+          "definition": "Den som köper och använder varor och tjänster",
+          "example": "Som konsument har man rätt att reklamera en trasig produkt."
+        },
+        {
+          "word": "reklam",
+          "level": "core",
+          "definition": "Information som ska få människor att köpa en produkt eller tjänst",
+          "example": "Reklam på tv är dyr för företagen."
+        },
+        {
+          "word": "marknad",
+          "level": "support",
+          "definition": "Platsen eller systemet där köpare och säljare möts",
+          "example": "På torget finns en marknad med färska grönsaker."
+        },
+        {
+          "word": "export",
+          "level": "challenge",
+          "definition": "Försäljning av varor eller tjänster till andra länder",
+          "example": "Svensk export av bilar är stor."
+        },
+        {
+          "word": "valuta",
+          "level": "core",
+          "definition": "Pengar i ett visst land, till exempel kronor, euro eller dollar",
+          "example": "Valuta för resan växlade vi på banken."
+        },
+        {
+          "word": "medier",
+          "level": "support",
+          "definition": "Kanaler som sprider nyheter och underhållning, till exempel tidningar och radio",
+          "example": "Medier granskar makten och berättar nyheter."
+        },
+        {
+          "word": "källkritik",
+          "level": "challenge",
+          "definition": "Att fundera över hur tillförlitlig en informationskälla är",
+          "example": "Med källkritik kan vi se om en nyhet är sann."
+        },
+        {
+          "word": "minoritet",
+          "level": "core",
+          "definition": "En grupp människor som är färre än majoriteten i ett samhälle",
+          "example": "Samerna är en minoritet i Sverige med eget språk."
+        },
+        {
+          "word": "rättighet",
+          "level": "support",
+          "definition": "Något som en människa har rätt att göra eller få",
+          "example": "Yttrandefrihet är en viktig rättighet i en demokrati."
+        },
+        {
+          "word": "röstning",
+          "level": "core",
+          "definition": "Att lämna sin röst i ett val genom att markera ett parti eller en kandidat",
+          "example": "En röstning i höstens val var mycket välbesökt."
+        },
+        {
+          "word": "budget",
+          "level": "core",
+          "definition": "Plan för hur staten eller ett hushåll ska använda sina pengar",
+          "example": "Regeringen presenterade sin budget i september."
+        }
+      ]
+    },
+    {
+      "code": "LC-SV-G11-ECOLOGY",
+      "name": "Åk 11 — Naturvetenskap och hållbarhet",
+      "description": "Ekosystem, klimat och resurser: begrepp från biologi, fysik och geografi för gymnasiets högre årskurser.",
+      "language": "sv",
+      "grade": "grade_11",
+      "subject": "science",
+      "words": [
+        {
+          "word": "ekosystem",
+          "level": "core",
+          "definition": "Alla levande organismer i ett område och deras samspel med miljön",
+          "example": "Ett ekosystem i havet kan påverkas av utsläpp."
+        },
+        {
+          "word": "mångfald",
+          "level": "challenge",
+          "definition": "Variationen av arter, gener och livsmiljöer på jorden",
+          "example": "Mångfald i skogen gör den mer motståndskraftig."
+        },
+        {
+          "word": "klimat",
+          "level": "support",
+          "definition": "Det genomsnittliga vädret i ett område under lång tid",
+          "example": "Vårt klimat i Sverige har blivit varmare."
+        },
+        {
+          "word": "uppvärmning",
+          "level": "challenge",
+          "definition": "Att jordens medeltemperatur stiger på grund av ökade växthusgaser",
+          "example": "Uppvärmning gör att isarna smälter."
+        },
+        {
+          "word": "utsläpp",
+          "level": "support",
+          "definition": "Ämnen som skickas ut i luft, vatten eller mark från mänsklig verksamhet",
+          "example": "Bilarnas utsläpp av koldioxid minskar."
+        },
+        {
+          "word": "koldioxid",
+          "level": "core",
+          "definition": "Gas som bildas när kol och annat bränsle förbränns",
+          "example": "Växter tar upp koldioxid från luften."
+        },
+        {
+          "word": "förnybar",
+          "level": "support",
+          "definition": "Energi från källor som förnyas hela tiden, till exempel sol och vind",
+          "example": "Vindkraft är en förnybar energikälla."
+        },
+        {
+          "word": "hållbar",
+          "level": "support",
+          "definition": "Något som kan fortsätta utan att förstöra för kommande generationer",
+          "example": "En hållbar skog ger virke i framtiden."
+        },
+        {
+          "word": "energi",
+          "level": "core",
+          "definition": "Förmåga att göra arbete, till exempel värme, rörelse eller ljus",
+          "example": "Solceller omvandlar solljus till energi."
+        },
+        {
+          "word": "art",
+          "level": "core",
+          "definition": "En grupp organismer som kan få fertila avkommor med varandra",
+          "example": "Vargen är en art som lever i flera länder."
+        },
+        {
+          "word": "rovdjur",
+          "level": "support",
+          "definition": "Djur som jagar och äter andra djur",
+          "example": "Lodjuret är ett rovdjur i de svenska skogarna."
+        },
+        {
+          "word": "näringskedja",
+          "level": "challenge",
+          "definition": "Serie av organismer där varje steg äter det föregående",
+          "example": "I varje näringskedja finns växter längst ner."
+        },
+        {
+          "word": "återvinning",
+          "level": "core",
+          "definition": "Att göra nytt av avfall i stället för att slänga det",
+          "example": "Återvinning av papper sparar träd."
+        },
+        {
+          "word": "avfall",
+          "level": "core",
+          "definition": "Sådant som slängs eftersom det inte längre används",
+          "example": "Avfall sorteras i olika kärl."
+        },
+        {
+          "word": "växtätare",
+          "level": "core",
+          "definition": "Djur som äter främst växter",
+          "example": "Hjorten är en växtätare i skogen."
+        },
+        {
+          "word": "kretslopp",
+          "level": "core",
+          "definition": "Ett system där material används om och om igen",
+          "example": "Vattnet ingår i ett naturligt kretslopp."
+        }
+      ]
+    },
+    {
+      "code": "LC-SV-G12-PHILOSOPHY",
+      "name": "Åk 12 — Filosofi och kultur",
+      "description": "Etik, logik och kunskap: begrepp som används i filosofi, samhällskunskap och uppsatsskrivande.",
+      "language": "sv",
+      "grade": "grade_12",
+      "subject": "general",
+      "words": [
+        {
+          "word": "etik",
+          "level": "core",
+          "definition": "Läran om vad som är rätt och fel att göra",
+          "example": "I etik diskuterar vi vad som är rättvist."
+        },
+        {
+          "word": "logik",
+          "level": "challenge",
+          "definition": "Läran om hur man drar korrekta slutsatser från påståenden",
+          "example": "I logik lär man sig att hitta felslut."
+        },
+        {
+          "word": "kunskap",
+          "level": "support",
+          "definition": "Det man vet och förstår efter lärande och erfarenhet",
+          "example": "Kunskap växer när man läser mycket."
+        },
+        {
+          "word": "fördom",
+          "level": "core",
+          "definition": "En förutfattad mening om något innan man har prövat det",
+          "example": "En fördom kan göra att vi dömer andra för tidigt."
+        },
+        {
+          "word": "sanning",
+          "level": "support",
+          "definition": "Det som stämmer överens med verkligheten",
+          "example": "Sanning är viktigt i en debatt."
+        },
+        {
+          "word": "tolkning",
+          "level": "core",
+          "definition": "Förklaring av vad något betyder",
+          "example": "Varje läsare gör sin egen tolkning av dikten."
+        },
+        {
+          "word": "perspektiv",
+          "level": "core",
+          "definition": "Sätt att se på något utifrån den egna platsen eller erfarenheten",
+          "example": "Ett annat perspektiv kan ändra hela bilden."
+        },
+        {
+          "word": "argument",
+          "level": "core",
+          "definition": "Skäl som används för att visa att något är sant eller bra",
+          "example": "Ett starkt argument bygger på fakta."
+        },
+        {
+          "word": "kritik",
+          "level": "core",
+          "definition": "Granskning som pekar ut både styrkor och svagheter",
+          "example": "Kritik av boken var både positiv och negativ."
+        },
+        {
+          "word": "moral",
+          "level": "support",
+          "definition": "Uppfattning om vad som är gott och rätt att göra",
+          "example": "Sagans moral är att vara snäll mot andra."
+        },
+        {
+          "word": "ideal",
+          "level": "challenge",
+          "definition": "Bild av något fulländat som man strävar efter",
+          "example": "Hon har ett ideal om ett rättvist samhälle."
+        },
+        {
+          "word": "samvete",
+          "level": "core",
+          "definition": "Den inre känslan av vad som är rätt och fel",
+          "example": "Mitt samvete säger att jag ska be om ursäkt."
+        },
+        {
+          "word": "frihet",
+          "level": "support",
+          "definition": "Rätten att själv bestämma över sitt liv och sina val",
+          "example": "Frihet innebär att kunna säga sin mening."
+        },
+        {
+          "word": "rationell",
+          "level": "challenge",
+          "definition": "Grundad på förnuft och logik snarare än på känslor",
+          "example": "Hon var rationell och tog ett lugnt beslut."
+        },
+        {
+          "word": "dialog",
+          "level": "core",
+          "definition": "Samtal där två eller flera parter utbyter tankar och frågor",
+          "example": "En dialog mellan två vänner kan ge nya insikter."
+        },
+        {
+          "word": "reflektion",
+          "level": "core",
+          "definition": "Att tänka igenom och värdera sina egna tankar och handlingar",
+          "example": "Dagbok är ett bra verktyg för reflektion."
+        }
+      ]
+    }
+  ]
+}
