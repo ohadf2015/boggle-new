@@ -6,13 +6,9 @@ const bandOf = (grade: string) => Math.ceil(Number(grade.replace('grade_', '')) 
 const listsIn = (lang: string) =>
   CURRICULUM_SEEDS.flatMap((name) => loadCurriculumSeed(name).lists).filter((l) => l.language === lang);
 
-describe.each([
-  ['ja', 2],
-  ['sv', 2],
-  ['ru', 1],
-])('%s grade-band coverage', (lang, min) => {
-  it(`has at least ${min} list in every grade band 1-2 .. 11-12`, () => {
+describe.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('%s grade-band coverage', (lang) => {
+  it('has at least 2 lists in every grade band 1-2 .. 11-12', () => {
     const counts = BANDS.map((b) => listsIn(lang).filter((l) => bandOf(l.grade) === b).length);
-    expect(counts.map((c, i) => (c >= min ? null : `band ${BANDS[i]}`)).filter(Boolean)).toEqual([]);
+    expect(counts.map((c, i) => (c >= 2 ? null : `band ${BANDS[i]}`)).filter(Boolean)).toEqual([]);
   });
 });

@@ -1,0 +1,111 @@
+{
+  "language": "es",
+  "source": "es-upper",
+  "migration": "20261008100200_curriculum_v2_es_upper.sql",
+  "lists": [
+    {
+      "code": "LC-ES-G7-CUERPO",
+      "name": "Séptimo — El cuerpo humano",
+      "description": "Palabras de biología para estudiantes de 7.º y 8.º grado: órganos, sistemas y procesos del cuerpo. Cada palabra tiene una explicación sencilla y una oración de ejemplo.",
+      "language": "es",
+      "grade": "grade_7",
+      "subject": "science",
+      "words": [
+        { "word": "cuerpo", "level": "support", "definition": "Conjunto de todas las partes de un ser vivo", "example": "El ejercicio es bueno para el cuerpo y para la mente." },
+        { "word": "sangre", "level": "support", "definition": "Líquido rojo que lleva oxígeno por todo el organismo", "example": "La sangre viaja por las venas y las arterias." },
+        { "word": "hueso", "level": "support", "definition": "Parte dura del esqueleto que sostiene el cuerpo", "example": "Me caí de la bici y me rompí un hueso del brazo." },
+        { "word": "piel", "level": "support", "definition": "Capa externa que cubre y protege el cuerpo", "example": "La piel nos protege de muchos gérmenes." },
+        { "word": "músculo", "level": "core", "definition": "Tejido que permite mover las partes del cuerpo", "example": "Después de entrenar, el músculo de la pierna quedó cansado." },
+        { "word": "corazón", "level": "core", "definition": "Órgano que bombea la sangre a todo el cuerpo", "example": "Mi corazón late más rápido cuando corro." },
+        { "word": "pulmón", "level": "core", "definition": "Órgano que nos permite respirar y tomar oxígeno", "example": "Cada pulmón se llena de aire al respirar." },
+        { "word": "cerebro", "level": "core", "definition": "Órgano principal que controla los pensamientos y el movimiento", "example": "El cerebro recibe información de los ojos y de los oídos." },
+        { "word": "célula", "level": "core", "definition": "Unidad pequeña de la que están hechos todos los seres vivos", "example": "Una célula tiene un núcleo en el centro." },
+        { "word": "nervio", "level": "core", "definition": "Hilo de tejido que envía mensajes entre el cerebro y el cuerpo", "example": "Un golpe en el codo activa un nervio muy sensible." },
+        { "word": "esqueleto", "level": "core", "definition": "Conjunto de huesos que da forma y sostiene el cuerpo", "example": "El esqueleto de un adulto tiene más de doscientos huesos." },
+        { "word": "órgano", "level": "core", "definition": "Parte del cuerpo que cumple una función especial", "example": "El hígado es un órgano muy grande." },
+        { "word": "sistema", "level": "core", "definition": "Conjunto de partes que trabajan juntas", "example": "El sistema digestivo convierte la comida en energía." },
+        { "word": "digestión", "level": "challenge", "definition": "Proceso por el que el cuerpo convierte la comida en nutrientes", "example": "La digestión empieza en la boca." },
+        { "word": "circulación", "level": "challenge", "definition": "Movimiento de la sangre por los vasos del cuerpo", "example": "Hacer ejercicio mejora la circulación." },
+        { "word": "metabolismo", "level": "challenge", "definition": "Conjunto de reacciones que usa el cuerpo para obtener energía", "example": "Cada persona tiene un metabolismo diferente." }
+      ]
+    },
+    {
+      "code": "LC-ES-G9-DEMOCRACIA",
+      "name": "Noveno — Cómo funciona un gobierno",
+      "description": "Palabras de cívica e historia sobre votos, leyes y la forma en que se gobiernan los países. Cada palabra tiene un significado claro y una oración sobre una situación real.",
+      "language": "es",
+      "grade": "grade_9",
+      "subject": "history",
+      "words": [
+        { "word": "voto", "level": "support", "definition": "Decisión que se expresa al elegir a una persona o una opción", "example": "Cada voto cuenta en una elección." },
+        { "word": "ley", "level": "support", "definition": "Regla que todas las personas de un país deben cumplir", "example": "Según la ley, es ilegal conducir sin licencia." },
+        { "word": "nación", "level": "support", "definition": "Grupo grande de personas que comparten historia, lengua y territorio", "example": "La nación celebró su día de independencia con desfiles." },
+        { "word": "ciudadano", "level": "support", "definition": "Persona que pertenece a un país y tiene sus derechos", "example": "Cada ciudadano tiene derecho a un juicio justo." },
+        { "word": "democracia", "level": "core", "definition": "Sistema en el que el pueblo elige a sus gobernantes", "example": "En una democracia, la gente decide quién gobierna." },
+        { "word": "república", "level": "core", "definition": "País gobernado por representantes elegidos y sin rey", "example": "El país se convirtió en república tras la caída del rey." },
+        { "word": "constitución", "level": "core", "definition": "Conjunto de reglas básicas que organizan un Estado", "example": "La constitución protege la libertad de expresión." },
+        { "word": "enmienda", "level": "core", "definition": "Cambio que se añade a una constitución o a una ley", "example": "La enmienda dio a las mujeres el derecho al voto." },
+        { "word": "tratado", "level": "core", "definition": "Acuerdo formal firmado por dos o más países", "example": "Los dos países firmaron un tratado de paz." },
+        { "word": "colonia", "level": "core", "definition": "Territorio gobernado por un país extranjero", "example": "La colonia quería gobernarse a sí misma." },
+        { "word": "revolución", "level": "core", "definition": "Cambio repentino y profundo en el gobierno, a menudo por la fuerza", "example": "La revolución cambió las leyes del país para siempre." },
+        { "word": "censo", "level": "core", "definition": "Conteo oficial de todas las personas que viven en un país", "example": "El censo cuenta cuántas personas viven en cada ciudad." },
+        { "word": "parlamento", "level": "core", "definition": "Grupo de personas que elaboran y aprueban las leyes", "example": "El parlamento debatió la nueva ley durante semanas." },
+        { "word": "soberanía", "level": "challenge", "definition": "Poder de un país para gobernarse a sí mismo", "example": "El país luchó para proteger su soberanía." },
+        { "word": "ratificar", "level": "challenge", "definition": "Aprobar oficialmente un acuerdo o una constitución", "example": "Los estados votaron para ratificar la nueva constitución." },
+        { "word": "veto", "level": "challenge", "definition": "Poder de un líder para impedir que una ley se apruebe", "example": "El presidente decidió poner su veto a la propuesta." }
+      ]
+    },
+    {
+      "code": "LC-ES-G11-ARGUMENTO",
+      "name": "Undécimo — Palabras para personas e ideas",
+      "description": "Palabras precisas para describir el carácter, los argumentos y la forma de pensar. Cada palabra tiene una definición clara y una oración que muestra cómo se usa.",
+      "language": "es",
+      "grade": "grade_11",
+      "subject": "general",
+      "words": [
+        { "word": "honesto", "level": "support", "definition": "Que dice la verdad y no oculta nada", "example": "El niño honesto devolvió la cartera." },
+        { "word": "breve", "level": "support", "definition": "Corto en longitud o en tiempo", "example": "El entrenador dio una breve charla antes del partido." },
+        { "word": "cuidadoso", "level": "support", "definition": "Que pone atención para no cometer errores", "example": "El conductor fue cuidadoso en cada curva." },
+        { "word": "tranquilo", "level": "support", "definition": "Relajado y sin nervios, incluso bajo presión", "example": "El piloto se mantuvo tranquilo durante la tormenta." },
+        { "word": "franco", "level": "core", "definition": "Abierto y directo, aunque la verdad incomode", "example": "Fue franco conmigo sobre mi ensayo." },
+        { "word": "elocuente", "level": "core", "definition": "Que habla o escribe con claridad y fuerza", "example": "El orador elocuente conquistó a toda la sala." },
+        { "word": "pragmático", "level": "core", "definition": "Que resuelve los problemas de forma práctica y realista", "example": "El equipo eligió un plan pragmático en lugar de uno ideal." },
+        { "word": "perseverante", "level": "core", "definition": "Que no se rinde y sigue intentándolo aunque sea difícil", "example": "El perseverante estudiante practicó cada día." },
+        { "word": "escéptico", "level": "core", "definition": "Que duda de algo hasta tener pruebas", "example": "El juez estaba escéptico ante la historia del testigo." },
+        { "word": "meticuloso", "level": "core", "definition": "Que cuida cada pequeño detalle con mucha atención", "example": "El ingeniero fue meticuloso con cada medición." },
+        { "word": "persuasivo", "level": "core", "definition": "Capaz de convencer a otros de creer o hacer algo", "example": "Su argumento persuasivo cambió la opinión de todos." },
+        { "word": "reticente", "level": "core", "definition": "Poco dispuesto a hacer algo y con dudas al respecto", "example": "Era reticente a admitir que había perdido." },
+        { "word": "conciso", "level": "core", "definition": "Que expresa mucho con pocas palabras", "example": "Un buen resumen es claro y conciso." },
+        { "word": "benévolo", "level": "challenge", "definition": "Amable y con deseos de ayudar a los demás", "example": "El anciano benévolo compartía su comida con quien lo pidiera." },
+        { "word": "ubicuo", "level": "challenge", "definition": "Que está presente en todas partes a la vez", "example": "Hoy el móvil es ubicuo en la vida diaria." },
+        { "word": "lúcido", "level": "challenge", "definition": "Claro y fácil de entender", "example": "El profesor lúcido explicó el teorema." }
+      ]
+    },
+    {
+      "code": "LC-ES-G12-ECONOMIA",
+      "name": "Duodécimo — Dinero y economía",
+      "description": "Palabras de economía que aparecen en la vida real, desde ahorrar unas monedas hasta los precios de todo un país. Cada palabra tiene un significado claro y una oración que muestra su uso.",
+      "language": "es",
+      "grade": "grade_12",
+      "subject": "general",
+      "words": [
+        { "word": "dinero", "level": "support", "definition": "Monedas y billetes que se usan para comprar cosas", "example": "Ahorré dinero para comprar una bici nueva." },
+        { "word": "precio", "level": "support", "definition": "Cantidad de dinero que se paga por algo", "example": "El precio del pan subió este año." },
+        { "word": "trabajo", "level": "support", "definition": "Actividad regular que una persona realiza para ganar dinero", "example": "Mi tía consiguió un trabajo en el hospital." },
+        { "word": "ahorro", "level": "support", "definition": "Dinero que se guarda para usarlo más adelante", "example": "Nuestro ahorro pagará el viaje del próximo verano." },
+        { "word": "presupuesto", "level": "core", "definition": "Plan de cuánto dinero gastar y cuánto guardar", "example": "Hicimos un presupuesto para las compras de cada mes." },
+        { "word": "beneficio", "level": "core", "definition": "Dinero que gana un negocio después de pagar sus gastos", "example": "La tienda tuvo buen beneficio este año." },
+        { "word": "deuda", "level": "core", "definition": "Dinero que una persona debe a otra", "example": "Por fin pagó su deuda con el banco." },
+        { "word": "salario", "level": "core", "definition": "Dinero que se paga a un trabajador por su labor", "example": "El nuevo salario ayuda a pagar el alquiler." },
+        { "word": "mercado", "level": "core", "definition": "Lugar o sistema donde se compran y venden productos", "example": "Los agricultores vendieron verduras frescas en el mercado." },
+        { "word": "oferta", "level": "core", "definition": "Cantidad de un producto disponible para comprar", "example": "Cuando la oferta de maíz baja, los precios suben." },
+        { "word": "demanda", "level": "core", "definition": "Cantidad de personas que quieren comprar un producto", "example": "La gran demanda del juego agotó las existencias." },
+        { "word": "invertir", "level": "core", "definition": "Poner dinero en algo para ganar más en el futuro", "example": "Decidió invertir en una empresa pequeña." },
+        { "word": "interés", "level": "core", "definition": "Dinero extra que se paga por pedir prestado o se gana al ahorrar", "example": "El banco pagó interés por mis ahorros." },
+        { "word": "inflación", "level": "challenge", "definition": "Aumento general y continuo de los precios", "example": "La inflación hace que tu dinero compre menos." },
+        { "word": "arancel", "level": "challenge", "definition": "Impuesto sobre productos que llegan de otro país", "example": "El gobierno puso un arancel al acero importado." },
+        { "word": "déficit", "level": "challenge", "definition": "Situación en la que se gasta más de lo que entra", "example": "El país tuvo un déficit tras la costosa guerra." }
+      ]
+    }
+  ]
+}
