@@ -102,3 +102,22 @@ describe('trackGameEnd — one end per start', () => {
     expect(endEvents('blast')).toHaveLength(1);
   });
 });
+
+  it('dedupes the same MP round across HostView + Results via extras.roundId', async () => {
+    const { trackGameEnd } = await import('../growthTracking');
+
+    trackGameEnd('classic', 10, 2, true, 90, { roundId: 'mp:42', isMultiplayer: true });
+    trackGameEnd('classic', 10, 2, true, 90, { roundId: 'mp:42', isMultiplayer: true });
+
+    expect(endEvents('classic')).toHaveLength(1);
+  });
+
+  it('allows back-to-back MP rounds of the same mode with distinct roundIds (no start)', async () => {
+    // Joiners can miss trackGameStart; roundId must still let round 2 land.
+    const { trackGameEnd } = await import('../growthTracking');
+
+    trackGameEnd('classic', 10, 2, true, 90, { roundId: 'mp:101', isMultiplayer: true });
+    trackGameEnd('classic', 20, 4, true, 90, { roundId: 'mp:102', isMultiplayer: true });
+
+    expect(endEvents('classic')).toHaveLength(2);
+  });

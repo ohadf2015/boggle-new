@@ -124,9 +124,10 @@ export function useMultiplayerSignupNudge({
       setMpSessionGames(newCount);
       const mode = submode || 'multiplayer';
       // Dedicated nudge event — NOT `game_completed`. The real MP completion is
-      // emitted by PlayerView (useGameEndTelemetry) with score/wordCount/MP
-      // flags. Emitting `game_completed` here (no score, no isMultiplayer)
-      // forged a phantom solo 0/0 row in the admin game log per MP game.
+      // emitted via trackGameEnd from useMpResultsController (and HostView/
+      // PlayerView when they stay mounted) with score/wordCount/MP flags.
+      // Emitting `game_completed` here (no score, no isMultiplayer) forged a
+      // phantom solo 0/0 row in the admin game log per MP game.
       trackGrowthEvent('mp_session_game', {
         mode,
         gameMode: mode,

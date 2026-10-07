@@ -100,3 +100,20 @@ describe('useGameEndTelemetry — ready gate mirrors the start hook', () => {
     expect(trackGameEnd).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('useGameEndTelemetry — multi-round re-arm', () => {
+  it('re-arms after resultsShown clears so a later round can emit', () => {
+    const { rerender } = renderHook(
+      ({ shown }: { shown: boolean }) => useGameEndTelemetry({
+        mode: 'classic', resultsShown: shown, score: 10, wordCount: 1,
+      }),
+      { initialProps: { shown: true } },
+    );
+    expect(trackGameEnd).toHaveBeenCalledTimes(1);
+
+    rerender({ shown: false });
+    rerender({ shown: true });
+
+    expect(trackGameEnd).toHaveBeenCalledTimes(2);
+  });
+});
