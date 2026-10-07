@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
-import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildPaidEvent, buildCheckoutCompleteEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
+import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildPaidEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
@@ -170,7 +170,6 @@ function trackProConversion(payload: WebhookPayload, userId?: string) {
     if (mapStatus(payload?.data?.status) === 'trialing') return
     const subId = String(payload?.data?.id ?? '')
     captureProFunnelServerEvent(buildProCheckoutSucceededEvent(userId, subId))
-    captureProFunnelServerEvent(buildCheckoutCompleteEvent(userId))
     captureProFunnelServerEvent(buildPaidEvent(userId, subId))
   } catch (err) {
     console.error('[Polar] conversion telemetry threw:', err)

@@ -166,6 +166,7 @@ export function trackTeacherProUpgradeClick(args: {
   const props = { page: args.page, locale: args.locale, placement: args.placement };
   safeCapture('teacher_pro_upgrade_click', props);
   mirrorToGrowth('teacher_pro_upgrade_click', props);
+  safeCapture('checkout_open', { source: args.placement, product: 'teacher_pro', page: args.page });
 }
 
 /** Fired immediately before POST /api/subscription/checkout. */
@@ -173,6 +174,9 @@ export function trackTeacherProCheckoutStarted(args: { trial: boolean; signed_in
   const props = { trial: args.trial, signed_in: args.signed_in };
   safeCapture('teacher_pro_checkout_started', props);
   mirrorToGrowth('teacher_pro_checkout_started', props);
+  if (!args.trial) {
+    safeCapture('checkout_open', { source: 'checkout_start', product: 'teacher_pro', trial: false });
+  }
 }
 
 /** Fired when the checkout provider returns a redirect URL. */

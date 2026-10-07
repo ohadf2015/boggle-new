@@ -22,6 +22,7 @@ import {
   buildTrialStartEvent,
   buildCheckoutCompleteEvent,
   buildPaidEvent,
+  buildPolarTrialDay10SentEvent,
   captureProFunnelServerEvent,
 } from '../proFunnelServer';
 
@@ -97,6 +98,14 @@ describe('Pro funnel server events', () => {
       distinctId: 'u-1',
       event: 'paid',
       properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
+    });
+  });
+
+  it('Given a Polar day-10 nudge actually sent, When built, Then it is teacher_polar_trial_day10_sent', () => {
+    expect(buildPolarTrialDay10SentEvent('u-1', 4)).toEqual({
+      distinctId: 'u-1',
+      event: 'teacher_polar_trial_day10_sent',
+      properties: { product: 'teacher_pro', provider: 'polar', days_left: 4 },
     });
   });
 

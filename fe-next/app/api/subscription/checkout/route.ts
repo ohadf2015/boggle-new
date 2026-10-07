@@ -5,7 +5,7 @@ import { getPolarClient, getProProductId } from '@/lib/polar';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { locales, defaultLocale } from '@/i18n/config';
 import logger from '@/utils/logger';
-import { buildProCheckoutStartedEvent, buildProTrialStartedEvent, buildTrialCheckoutStartedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
+import { buildProCheckoutStartedEvent, buildProTrialStartedEvent, buildTrialCheckoutStartedEvent, buildCheckoutCompleteEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 
 /**
  * A second free trial, or a trial on top of Pro, is a paid checkout instead.
@@ -121,6 +121,7 @@ export async function POST(request: NextRequest) {
         captureProFunnelServerEvent(buildTrialCheckoutStartedEvent(user.id));
       } else {
         captureProFunnelServerEvent(buildProCheckoutStartedEvent(user.id));
+        captureProFunnelServerEvent(buildCheckoutCompleteEvent(user.id));
       }
     } catch {
       /* the teacher's checkout url matters more than the funnel */

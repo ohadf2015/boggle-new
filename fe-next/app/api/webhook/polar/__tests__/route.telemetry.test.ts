@@ -55,18 +55,16 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     const res = await POST(polarEvent('subscription.active', sub()))
     expect(res.status).toBe(200)
     expect(upsertSubscription).toHaveBeenCalledTimes(1)
-    expect(capture).toHaveBeenCalledTimes(3)
+    expect(capture).toHaveBeenCalledTimes(2)
     const arg = capture.mock.calls[0][0]
     expect(arg).toMatchObject({ distinctId: 'u1', event: 'edu_pro_checkout_succeeded' })
     expect(arg.properties.subscription_id).toBe('sub_1')
     expect(arg.properties.$host).toBe(EDU_ANALYTICS_HOST)
     expect(capture.mock.calls.map((c) => c[0].event)).toEqual([
       'edu_pro_checkout_succeeded',
-      'checkout_complete',
       'paid',
     ])
     expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
-    expect(capture.mock.calls[2][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
   it.each(['subscription.created', 'subscription.uncanceled', 'subscription.resumed', 'subscription.updated'])(

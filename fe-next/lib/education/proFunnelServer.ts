@@ -64,7 +64,7 @@ export function buildTrialStartEvent(userId: string, subscriptionId: string): Ed
   };
 }
 
-/** Conversion funnel step 3 — Polar paid checkout finished (same webhook as `paid`). */
+/** Conversion funnel step 3 — Polar paid checkout session created (user entered Polar). */
 export function buildCheckoutCompleteEvent(userId: string): EduServerEvent {
   return { distinctId: userId, event: 'checkout_complete', properties: { ...BASE } };
 }
