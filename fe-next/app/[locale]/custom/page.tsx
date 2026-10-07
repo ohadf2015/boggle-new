@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { defaultOgImages } from '@/lib/seo/defaultOgImage';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import PageClient from './PageClient';
 
@@ -23,6 +24,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     title: `${title} - LexiClash`,
     description,
     openGraph: {
+      images: defaultOgImages(locale),
       title: `${title} - LexiClash`,
       description,
       type: 'website',

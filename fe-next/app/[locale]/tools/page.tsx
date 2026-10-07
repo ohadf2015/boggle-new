@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { defaultOgImages } from '@/lib/seo/defaultOgImage';
 import ToolsHubPageClient from './PageClient';
 import { getContent, type Locale } from './word-solver/content';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
@@ -44,6 +45,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     title: `${content.toolsHub.title} | LexiClash`,
     description: content.toolsHub.description,
     openGraph: {
+      images: defaultOgImages(locale),
       type: 'website',
       locale: validLocale,
       url: pageUrl,

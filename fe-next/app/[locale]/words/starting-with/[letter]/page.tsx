@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { defaultOgImages } from '@/lib/seo/defaultOgImage';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { InlineBannerAd } from '@/components/ads';
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   return {
     title,
     description,
-    openGraph: { type: 'website', url, title, description, siteName: 'LexiClash' },
+    openGraph: { images: defaultOgImages(locale), type: 'website', url, title, description, siteName: 'LexiClash' },
     // Body content is English-only across all locale prefixes — index:locale==='en'.
     // Self-referencing EN hreflang cluster + canonical → /en (non-EN are noindexed,
     // have no localized equivalent, so we never declare them as alternates).

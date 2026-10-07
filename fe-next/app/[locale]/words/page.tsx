@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { defaultOgImages } from '@/lib/seo/defaultOgImage';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import { InlineBannerAd } from '@/components/ads';
@@ -29,6 +30,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     title,
     description,
     openGraph: {
+      images: defaultOgImages(locale),
       type: 'website',
       url: `${BASE_URL}/${locale}/words`,
       title,

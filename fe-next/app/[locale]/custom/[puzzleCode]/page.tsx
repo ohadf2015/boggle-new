@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { defaultOgImages, defaultOgImageUrl } from '@/lib/seo/defaultOgImage';
 import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
@@ -43,11 +44,13 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     title: `${title} - LexiClash`,
     description,
     openGraph: {
+      images: defaultOgImages(locale),
       title: `${title} - LexiClash`,
       description,
       type: 'website',
     },
     twitter: {
+      images: [defaultOgImageUrl(locale)],
       card: 'summary',
       title: `${title} - LexiClash`,
       description,
