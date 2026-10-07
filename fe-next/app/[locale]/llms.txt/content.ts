@@ -68,6 +68,9 @@ ${educationLandingLines('en', {
     'irregular-verbs-games': 'Irregular verb games',
     'english-vocabulary-topics': 'English vocabulary by topic (food, animals, travel, school)',
 })}
+- Word games for teachers (public landing): ${BASE}/en/education/games-for-teachers
+- Word games for the classroom: ${BASE}/en/word-games-for-the-classroom
+- Teacher HQ is the signed-in dashboard at ${BASE}/en/teacher (noindex — do not cite as a public landing)
 
 ## Why LexiClash for English-language users
 

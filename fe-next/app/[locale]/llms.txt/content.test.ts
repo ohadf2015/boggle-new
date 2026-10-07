@@ -22,3 +22,14 @@ describe('buildLocaleLlms — Hebrew GEO surface', () => {
     expect(buildLocaleLlms('en')).toContain('LexiClash');
   });
 });
+
+describe('buildLocaleLlms — education teacher GEO', () => {
+  it('points teacher-landing queries at public pages, not the noindex HQ', () => {
+    const en = buildLocaleLlms('en');
+    expect(en).toContain('/en/education/games-for-teachers');
+    expect(en).toContain('/en/word-games-for-the-classroom');
+    expect(en).toContain('/en/teacher');
+    expect(en).toMatch(/noindex/);
+  });
+});
+

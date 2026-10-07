@@ -1,19 +1,18 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { GeoFaqList } from '@/components/seo/GeoFaqList';
 import { getClassroomContent } from './content';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
+import { CLASSROOM_WORD_GAMES_BASE, CLASSROOM_WORD_GAMES_PATH, buildClassroomWordGamesJsonLd } from './jsonld';
 
 export const revalidate = 86400;
 
 interface PageProps {
   params: Promise<{ locale: string }>;
 }
-
-const BASE_URL = 'https://www.lexiclash.live';
-const PAGE_PATH = '/word-games-for-the-classroom';
 
 const OG_LOCALE: Record<string, string> = {
   en: 'en_US',
@@ -27,7 +26,7 @@ const OG_LOCALE: Record<string, string> = {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const isEnglish = locale === 'en';
-  const pageUrl = `${BASE_URL}/en${PAGE_PATH}`;
+  const pageUrl = `${CLASSROOM_WORD_GAMES_BASE}/en${CLASSROOM_WORD_GAMES_PATH}`;
   const c = getClassroomContent(locale);
 
   return {
@@ -40,13 +39,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: OG_LOCALE[locale] ?? 'en_US',
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/images/education-hero-en.webp`, width: 1200, height: 675, alt: c.ogTitle }],
+      images: [{ url: `${CLASSROOM_WORD_GAMES_BASE}/images/education-hero-en.webp`, width: 1200, height: 675, alt: c.ogTitle }],
     },
     twitter: {
       card: 'summary_large_image',
       title: c.twitterTitle,
       description: c.twitterDescription,
-      images: [`${BASE_URL}/images/education-hero-en.webp`],
+      images: [`${CLASSROOM_WORD_GAMES_BASE}/images/education-hero-en.webp`],
     },
     alternates: {
       canonical: pageUrl,
@@ -62,23 +61,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   const c = getClassroomContent(locale);
-
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    '@id': `${BASE_URL}/en${PAGE_PATH}#faq`,
-    mainEntity: c.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
-  };
-
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/${locale}` },
-      { '@type': 'ListItem', position: 2, name: 'Education', item: `${BASE_URL}/${locale}/education` },
-      { '@type': 'ListItem', position: 3, name: c.metaTitle, item: `${BASE_URL}/${locale}${PAGE_PATH}` },
-    ],
-  };
+  const { webPage, faqPage, breadcrumb } = buildClassroomWordGamesJsonLd(locale, c);
 
   const moreHrefs = [
     `/${locale}/substitute-teacher-word-games`,
@@ -88,8 +71,9 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
-      <Script id="ld-classwordgames-faq" type="application/ld+json">{JSON.stringify(faqJsonLd)}</Script>
-      <Script id="ld-classwordgames-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</Script>
+      <JsonLd data={webPage} />
+      <JsonLd data={faqPage} />
+      <JsonLd data={breadcrumb} />
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <TopBackLink className="mb-4" />
@@ -98,9 +82,17 @@ export default async function Page({ params }: PageProps) {
           {c.heroTitle}
         </h1>
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          {c.intro}
-        </p>
+        <section
+          data-answer
+          className="mb-12 rounded-neo border-4 border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-lg sm:p-8"
+        >
+          <h2 className="font-neo-display text-xl font-black leading-tight sm:text-2xl">
+            {c.geoQuestion}
+          </h2>
+          <p className="mt-4 max-w-[70ch] text-base leading-relaxed text-neo-white/85 sm:text-lg">
+            {c.intro}
+          </p>
+        </section>
 
         <TeacherProCompareCheckoutStrip locale={locale} />
 
@@ -141,20 +133,7 @@ export default async function Page({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">{c.faqTitle}</h2>
-          <div className="space-y-4">
-            {c.faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+        <GeoFaqList title={c.faqTitle} items={c.faqs} />
 
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{c.moreTitle}</h2>
