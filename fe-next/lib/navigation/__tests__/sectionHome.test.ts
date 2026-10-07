@@ -141,10 +141,10 @@ describe('sectionHome', () => {
         expect(sectionHome({ pathname: '/en/daily/archive' })).toBe('/en');
       });
 
-      it('never falls back to the page that errored: the bare /education landing goes to the app home', () => {
-        expect(sectionHome({ pathname: '/en/education' })).toBe('/en');
-        expect(sectionHome({ pathname: '/he/education' })).toBe('/he');
-        expect(sectionHome({ pathname: '/ru/education' })).toBe('/ru');
+      it('never falls back to the page that errored: the bare /education landing goes to a sibling edu page', () => {
+        expect(sectionHome({ pathname: '/en/education' })).toBe('/en/education/for-schools');
+        expect(sectionHome({ pathname: '/he/education' })).toBe('/he/education/for-schools');
+        expect(sectionHome({ pathname: '/ru/education' })).toBe('/ru/education/for-schools');
       });
 
       it('preserves locale for non-education routes', () => {

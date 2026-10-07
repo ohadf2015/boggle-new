@@ -12,6 +12,7 @@
 
 import { locales as LOCALES } from '@/lib/i18n';
 import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
+import { EDUCATION_SEO_TOP_LEVEL_SEGMENTS } from '@/lib/navigation/educationSeoSegments';
 
 export interface SectionHomeParams {
   /** The pathname to analyze, e.g. '/en/teacher/classroom/abc' */
@@ -86,7 +87,7 @@ export function isEducationPath(pathname: string): boolean {
   if (!LOCALES.includes(locale)) return false;
   const topLevelSegment = segs[1];
   if (!topLevelSegment) return false;
-  return EDUCATION_TOP_LEVEL_SEGMENTS.has(topLevelSegment);
+  return EDUCATION_TOP_LEVEL_SEGMENTS.has(topLevelSegment) || EDUCATION_SEO_TOP_LEVEL_SEGMENTS.has(topLevelSegment);
 }
 
 /**
@@ -125,10 +126,10 @@ export function sectionHome({ pathname, locale: explicitLocale, search }: Sectio
 
   const inEducation = isEducationPath(pathname);
   if (!inEducation) return `/${locale}`;
-  // The bare landing IS the education fallback target — an error boundary
-  // there must not loop the user back onto the page that errored.
+  // The bare landing must not fall back to itself; a sibling edu page keeps the
+  // user inside education.
   const segs = pathOnly.split('/').filter(Boolean);
-  if (segs.length === 2 && segs[1] === 'education') return `/${locale}`;
+  if (segs.length === 2 && segs[1] === 'education') return `/${locale}/education/for-schools`;
   return `/${locale}/education`;
 }
 

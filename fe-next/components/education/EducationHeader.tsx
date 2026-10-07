@@ -29,7 +29,7 @@ import { SearchIconButton } from './SearchIconButton';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { TeacherProNavLink } from '@/components/teacher/TeacherProNavLink';
-import { educationBackHref } from '@/lib/navigation/educationBackHref';
+import { educationBackHref, educationHomeFor } from '@/lib/navigation/educationBackHref';
 
 interface EducationHeaderProps {
   /** Additional class names */
@@ -121,11 +121,13 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   const isOnTeacherSection = pathname?.includes('/teacher');
   const isOnStudentSection = pathname?.includes('/student');
 
+  const eduRole = isTeacher ? 'teacher' : profile?.user_role === 'student' ? 'student' : null;
+  const exitHref = educationHomeFor(language, eduRole);
+
   const handleBackClick = useCallback(() => {
     if (onBack) return onBack();
-    const role = isTeacher ? 'teacher' : profile?.user_role === 'student' ? 'student' : null;
-    router.push(backHref || educationBackHref({ pathname, locale: language, role }));
-  }, [backHref, language, router, pathname, isTeacher, profile?.user_role, onBack]);
+    router.push(backHref || educationBackHref({ pathname, locale: language, role: eduRole }));
+  }, [backHref, language, router, pathname, eduRole, onBack]);
 
   const handleSignOut = useCallback(async () => {
     setShowMobileMenu(false);
@@ -273,6 +275,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
             {/* Education Menu Dropdown */}
             <EducationMenuDropdown
               isTeacher={isTeacher}
+              exitHref={exitHref}
               isOnTeacherSection={isOnTeacherSection}
               isOnStudentSection={isOnStudentSection}
               onSignOut={handleSignOut}
@@ -481,7 +484,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
 
                     {/* Exit Education */}
                     <Link
-                      href={`/${language}`}
+                      href={exitHref}
                       onClick={() => setShowMobileMenu(false)}
                       className={cn(
                         'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-neo-cream/40 transition-all w-full',

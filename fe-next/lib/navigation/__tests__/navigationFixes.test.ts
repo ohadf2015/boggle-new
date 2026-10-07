@@ -167,10 +167,9 @@ describe('Navigation Fixes — All 4 Causes', () => {
       // an error fallback must never bounce them to the consumer home.
       expect(isEducationPath('/en/education/for-schools')).toBe(true);
       expect(sectionHome({ pathname: '/en/education/for-schools' })).toBe('/en/education');
-      // The bare landing IS the education fallback target, so an error there
-      // falls back to the app home — falling back to itself would loop.
+      // The bare landing must not fall back to itself; it goes to a sibling edu page.
       expect(isEducationPath('/en/education')).toBe(true);
-      expect(sectionHome({ pathname: '/en/education' })).toBe('/en');
+      expect(sectionHome({ pathname: '/en/education' })).toBe('/en/education/for-schools');
     });
   });
 

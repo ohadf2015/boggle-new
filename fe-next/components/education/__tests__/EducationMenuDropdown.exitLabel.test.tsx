@@ -16,7 +16,7 @@ describe('EducationMenuDropdown — the link to the consumer app says it leaves 
     );
     fireEvent.click(screen.getByLabelText('common.menu'));
     const exit = screen.getByText('education.header.exitEducation').closest('a');
-    expect(exit).toHaveAttribute('href', '/en');
+    expect(exit).toHaveAttribute('href', '/en/education');
     expect(screen.queryByText('common.backToHome')).not.toBeInTheDocument();
   });
 });
