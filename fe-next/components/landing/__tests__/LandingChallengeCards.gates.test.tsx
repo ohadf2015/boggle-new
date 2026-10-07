@@ -59,12 +59,6 @@ vi.mock('@/contexts/AuthContext', () => ({
 
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({ useIsPracticeVeteran: () => false }));
 
-vi.mock('@/components/daily/DailyChallengeBanner', () => {
-  const DailyChallengeBanner = () => <div data-testid="daily-banner" />;
-  DailyChallengeBanner.displayName = 'DailyChallengeBanner';
-  return { __esModule: true, default: DailyChallengeBanner };
-});
-
 const baseProps = {
   language: 'en',
   activePlayers: 10,

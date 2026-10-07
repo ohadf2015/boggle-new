@@ -21,11 +21,6 @@ vi.mock('@/components/landing/home/HomeDailyHero', () => ({
   HomeDailyHero: () => <div data-testid="home-daily-hero" />,
 }));
 
-vi.mock('@/components/daily/DailyChallengeBanner', () => ({
-  __esModule: true,
-  default: () => <div data-testid="daily-banner">daily</div>,
-}));
-
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({ useIsPracticeVeteran: () => false }));
 vi.mock('@/components/CrazyGamesSDK', () => ({ useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }) }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { email: undefined }, canSeeInWorkModes: false }) }));

@@ -1,28 +1,4 @@
-/**
- * Daily-challenge mode registry (pure).
- *
- * Single source of truth for which game modes are eligible for the daily flow
- * and which are still gated to admins while they're being readied for everyone.
- *
- * Today the live daily hub (`DailyChallengeLanding`) still renders the two
- * shipped modes (Word Hunt, Word Wheel) with their bespoke hero/quest cards.
- * This registry is the FOUNDATION for folding more modes in: a new mode is added
- * here with `adminOnly: true`, surfaces only to admins via {@link adminOnlyDailyModes},
- * and graduates to public by flipping the flag — no hub rewrite.
- *
- * Word Tower was the first mode driven by this: its daily run gives every player the
- * same letters for the day (see `lib/wordTower/dailySeed.ts`) and keeps a per-day best
- * + streak. Cross-day tower carryover ("continue building each day") is now LIVE — the
- * physical tower (floors/height/records) persists across UTC days while the wheel +
- * per-session mechanics refresh to each day's shared seed (see the HYBRID branch in
- * `restoreWordTowerState`, keyed on the save blob's `gameCode`).
- *
- * Connections (Word Bridge) is the second graduate: the daily route hosts BOTH
- * flavors, alternating by UTC day — the classic 5-riddle chain and the pyramid
- * (see lib/connections/dailyVariant.ts). It stays a registry-driven generic card
- * like its beta days, but now public, with the hub feeding it a played-today
- * status so a cleared day reads like every other quest.
- */
+/** Daily-challenge mode registry: which modes the daily hub offers and where each one lives. */
 
 export type DailyModeId = 'word-hunt' | 'word-wheel' | 'word-tower' | 'connections';
 
@@ -90,26 +66,6 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
 /** Modes a given viewer may see — admins see all; everyone else sees public ones. */
 export function visibleDailyModes(isAdmin: boolean): DailyModeDef[] {
   return DAILY_MODES.filter((mode) => isAdmin || !mode.adminOnly);
-}
-
-/** The future-gated modes (admin-only) — what the hub surfaces in its admin section. */
-export function adminOnlyDailyModes(): DailyModeDef[] {
-  return DAILY_MODES.filter((mode) => mode.adminOnly);
-}
-
-/** Modes the hub renders from the REGISTRY as generic quest cards.
- *
- *  Word Hunt, Word Wheel and Word Tower are excluded because the hub draws them
- *  with the shared `QuestCard` box (same chrome, same quest chain, same SPA nav)
- *  — Word Tower graduated out of the generic card once it went public, because a
- *  first-class daily quest should not look different from its siblings.
- *  Everything still gated (Connections) is drawn generically. Splitting it here —
- *  instead of gating the section on `adminOnly` inside the hub — is what lets a
- *  mode graduate to public by flipping one boolean. */
-const HERO_CARD_MODES: readonly DailyModeId[] = ['word-hunt', 'word-wheel', 'word-tower'];
-
-export function questCardModes(isAdmin: boolean): DailyModeDef[] {
-  return visibleDailyModes(isAdmin).filter((mode) => !HERO_CARD_MODES.includes(mode.id));
 }
 
 /** Absolute locale-prefixed href for a mode, query preserved. */
