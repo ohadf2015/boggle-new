@@ -2225,9 +2225,9 @@ const en = {
     },
     "leaderboard": {
       "title": "Word Game Leaderboard — Live Global Rankings | LexiClash",
-      "description": "Live word game leaderboard with daily, weekly, and all-time rankings. Filter by language, country, or mode. Free to play, updated in real time.",
+      "description": "Live word game leaderboard: this month's top players and the all-time leaders. Play free daily puzzles and live multiplayer word battles.",
       "ogTitle": "Word Game Leaderboard — Live Global Rankings",
-      "ogDescription": "Live word game leaderboard — daily, weekly, and all-time ranks across 8 modes. Filter by language or country. Free, no signup."
+      "ogDescription": "Who's on top right now? This month's season leaders and the all-time best. Free daily puzzles and live multiplayer word battles."
     },
     "profile": {
       "title": "Your Player Profile, Stats & Game Achievements",

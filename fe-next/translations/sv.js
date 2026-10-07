@@ -2913,10 +2913,10 @@ const sv = {
       "description": "Ordspel på svenska online i realtid med upp till 4 spelare. Bygg combos, klättra i den globala rankningen och spela gratis — ingen nedladdning ingen registrering i webbläsaren."
     },
     "leaderboard": {
-      "title": "Live Topplista — Bästa Ordspelarna (Dagligt, Veckovis & Genom Tiderna) | LexiClash",
-      "description": "Live topplista — bästa ordspelarna i 8 spellägen: dagligt, veckovis och genom tiderna. Filtrera på språk, land och läge. Uppdateras i realtid.",
-      "ogTitle": "Live Topplista — Dagligt, Veckovis & Genom Tiderna",
-      "ogDescription": "Live topplista över världens bästa ordspelare. Uppdateras i realtid. Gå med och tävla!"
+      "title": "Topplista för ordspel — bästa spelarna live | LexiClash",
+      "description": "Ordspelets topplista live: månadens säsongsledare och bästa spelarna genom tiderna. Spela gratis – dagliga pussel och ordstrider i realtid mot andra.",
+      "ogTitle": "Topplista för ordspel — bästa spelarna live",
+      "ogDescription": "Vem leder just nu? Säsongens topp och bästa spelarna genom tiderna. Gratis dagliga pussel och ordstrider i realtid."
     },
     "profile": {
       "title": "Din Spelarprofil, Statistik & Spelframsteg",

@@ -2632,10 +2632,10 @@ const es = {
       "description": "Juego de palabras en español en línea en tiempo real con hasta 4 jugadores. Construye combos, sube en la clasificación global y juega gratis — sin descargas ni registros en el navegador."
     },
     "leaderboard": {
-      "title": "Ranking en Vivo de Juegos de Palabras — Top Diario, Semanal e Histórico | LexiClash",
-      "description": "Mira quién gana ahora mismo. Ranking en vivo de los mejores jugadores en 8 modos: diario, semanal e histórico. Filtra por idioma, país y modo. Actualizado en tiempo real.",
-      "ogTitle": "Ranking en Vivo — Top Diario, Semanal e Histórico",
-      "ogDescription": "Ranking en vivo de los mejores jugadores de palabras del mundo. Actualizado en tiempo real. ¡Únete y compite!"
+      "title": "Ranking del juego de palabras — Top en vivo | LexiClash",
+      "description": "Ranking en vivo del juego de palabras: los mejores de la temporada del mes y de todos los tiempos. Juega gratis a retos diarios y duelos multijugador en tiempo real.",
+      "ogTitle": "Ranking del juego de palabras — Top en vivo",
+      "ogDescription": "¿Quién manda ahora? Los mejores de la temporada y de todos los tiempos. Retos diarios y duelos de palabras en vivo, gratis."
     },
     "profile": {
       "title": "Tu Perfil de Jugador, Estadisticas & Logros del Juego",
