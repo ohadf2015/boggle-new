@@ -441,6 +441,7 @@ export function useDictionaryCache(
     }
 
     startNetworkLoad();
+    return undefined;
   }, [language, enabled, applyWordSet, startNetworkLoad]);
 
   /**
