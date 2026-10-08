@@ -49,4 +49,13 @@ describe('CrosswordKeyboard — Hebrew', () => {
     fireEvent.click(screen.getByText('א'));
     expect(onLetter).toHaveBeenCalledWith('א');
   });
+  it('offers a Cyrillic keyboard for Russian (never the Latin fallback), with ё folded into е', () => {
+    render(
+      <CrosswordKeyboard locale="ru" onLetter={() => {}} onBackspace={() => {}} backspaceLabel="b" />,
+    );
+    const shown = keys();
+    for (const letter of 'абвгдежзийклмнопрстуфхцчшщъыьэюя') expect(shown).toContain(letter);
+    expect(shown).not.toContain('q');
+    expect(shown).not.toContain('ё');
+  });
 });

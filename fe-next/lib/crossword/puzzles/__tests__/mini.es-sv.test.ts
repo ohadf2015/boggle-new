@@ -3,6 +3,8 @@ import { getPool } from '../index';
 import { isRealCrossword } from '../../templates';
 import esBank from '../../data/clueBank.es.json';
 import svBank from '../../data/clueBank.sv.json';
+import { getGameModeRules } from '@/backend/modes/rules';
+import type { PuzzleLocale } from '../../types';
 
 const BANKS = { es: esBank, sv: svBank } as Record<string, Record<string, { clue: string }>>;
 
@@ -38,5 +40,22 @@ describe.each(['es', 'sv'] as const)('%s mini pool', (locale) => {
       expect(p.rtl).toBe(false);
       expect(isRealCrossword(grid, false)).toBe(true);
     }
+  });
+});
+
+describe('crossword locale gate', () => {
+  it('every locale enabled for the crossword mode has its own non-empty puzzle pool', () => {
+    const languages = getGameModeRules('crossword').languages ?? [];
+    expect(languages.length).toBeGreaterThan(0);
+    for (const lang of languages) {
+      const pool = getPool(lang as PuzzleLocale);
+      expect(pool.length, lang).toBeGreaterThan(0);
+      expect(pool.every((p) => p.locale === lang), lang).toBe(true);
+    }
+  });
+
+  it('a locale with no puzzles of its own (ru) is not enabled for the mode', () => {
+    expect(getPool('ru').every((p) => p.locale !== 'ru')).toBe(true);
+    expect(getGameModeRules('crossword').languages).not.toContain('ru');
   });
 });

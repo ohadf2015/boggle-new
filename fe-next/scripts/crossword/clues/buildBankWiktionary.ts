@@ -18,6 +18,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { wiktionaryClue } from './wiktionary';
 import { evaluateSvClue, evaluateEsClue } from '../../../lib/crossword/clues/evaluateSvClue';
+import { endsDangling } from '../../../lib/crossword/clues/danglingEnd';
+import { evaluateRuClue } from '../../../lib/crossword/clues/evaluateRuClue';
 
 type Bank = Record<string, { clue: string; score: number }>;
 
@@ -39,8 +41,9 @@ const bankKey = (w: string, lang: string) => (lang === 'he' ? normHe(w) : w.toLo
 
 function qualityOk(lang: string, answer: string, clue: string): boolean {
   if (lang === 'sv') return evaluateSvClue(answer, clue).score >= MIN_SCORE;
-  if (lang === 'es') return evaluateEsClue(answer, clue).score >= MIN_SCORE;
-  return true; // en/he/ru: no language auditor — definitionToClue gates already applied
+  if (lang === 'es') return !endsDangling(clue, 'es') && evaluateEsClue(answer, clue).score >= MIN_SCORE;
+  if (lang === 'ru') return evaluateRuClue(answer, clue).score >= MIN_SCORE;
+  return true; // en/he: no language auditor — definitionToClue gates already applied
 }
 
 async function main() {

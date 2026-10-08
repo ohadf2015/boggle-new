@@ -16,6 +16,8 @@ const LAYOUTS: Partial<Record<PuzzleLocale, string[]>> = {
   es: ['qwertyuiop', 'asdfghjklñ', 'zxcvbnm'],
   // Swedish keyboard = QWERTY + å/ä/ö (distinct Swedish letters, appended to the home/top rows).
   sv: ['qwertyuiopå', 'asdfghjklöä', 'zxcvbnm'],
+  // ЙЦУКЕН without ё: normalizeRussianWord folds ё→е, so grids never hold ё.
+  ru: ['йцукенгшщзхъ', 'фывапролджэ', 'ячсмитьбю'],
 };
 
 export interface CrosswordKeyboardProps {
