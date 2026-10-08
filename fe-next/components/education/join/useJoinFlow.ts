@@ -13,6 +13,7 @@ import { sanitizeJoinCode, joinCodeOverflows, JOIN_CODE_LENGTH } from './JoinCod
 
 const CODE_TOO_LONG = 'eg2Fix.join.codeTooLong';
 import { setStoredUsername } from '@/utils/profileStorage';
+import { joinSuccessHref } from '@/lib/navigation/eduExitTargets';
 
 export type JoinStep = 'code' | 'name';
 
@@ -338,11 +339,7 @@ export function useJoinFlow(
             const targetGameCode =
               result.gameCode ||
               (target?.verdict === 'game' ? target.gameCode || trimmedCode : null);
-            router.push(
-              targetGameCode
-                ? `/${language}/multiplayer?room=${targetGameCode}&classroom=true`
-                : `/${language}/student`
-            );
+            router.push(joinSuccessHref(language, targetGameCode));
             return;
           }
 

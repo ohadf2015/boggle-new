@@ -17,6 +17,7 @@
 // Single source of truth for locales — importing avoids the drift that left
 // 'ru' out here while other copies had it (Russian back nav dropped the prefix).
 import { locales as LOCALES } from '@/lib/i18n';
+import { EDUCATION_SEO_TOP_LEVEL_SEGMENTS } from '@/lib/navigation/educationSeoSegments';
 
 /** Routes (locale-stripped) whose URL-drop-one parent has no page → explicit parent.
  *
@@ -56,6 +57,9 @@ export function parentRoute(pathname: string): string {
     if (o.test.test(stripped)) return locale ? `/${locale}${o.parent}` : o.parent;
   }
 
+  if (rest.length === 1 && EDUCATION_SEO_TOP_LEVEL_SEGMENTS.has(rest[0])) {
+    return (locale ? `/${locale}` : '') + '/education';
+  }
   if (rest.length === 1) return home; // top-level section → home
 
   const parentRest = rest.slice(0, -1);

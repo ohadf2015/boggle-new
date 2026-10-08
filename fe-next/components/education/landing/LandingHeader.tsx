@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { educationHomeFor } from '@/lib/navigation/educationBackHref';
 
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
@@ -18,7 +19,7 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
     <header className="sticky top-0 z-40 border-b-2 border-neo-cream bg-neo-navy">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 sm:h-16 sm:gap-3 sm:px-6 lg:px-8">
         <Link
-          href={`/${language}`}
+          href={educationHomeFor(language, null)}
           data-testid="landing-header-home"
           aria-label={t('eg2Land.header.home')}
           className="flex min-w-0 shrink items-center gap-1.5 rounded-sm focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"

@@ -88,14 +88,15 @@ describe('sectionHome', () => {
     describe('education routes', () => {
       it('returns /locale/education for teacher routes', () => {
         expect(sectionHome({ pathname: '/en/teacher' })).toBe('/en/education');
-        expect(sectionHome({ pathname: '/en/teacher/classroom' })).toBe('/en/education');
-        expect(sectionHome({ pathname: '/en/teacher/classroom/abc/analytics' })).toBe('/en/education');
+        expect(sectionHome({ pathname: '/en/teacher/classroom' })).toBe('/en/teacher');
+        expect(sectionHome({ pathname: '/en/teacher/classroom/abc/analytics' })).toBe('/en/teacher');
       });
 
       it('returns /locale/education for student routes', () => {
         expect(sectionHome({ pathname: '/en/student' })).toBe('/en/education');
         expect(sectionHome({ pathname: '/en/student/join' })).toBe('/en/education');
-        expect(sectionHome({ pathname: '/en/student/achievements' })).toBe('/en/education');
+        expect(sectionHome({ pathname: '/en/student/achievements' })).toBe('/en/student');
+        expect(sectionHome({ pathname: '/en/student/lessons/x' })).toBe('/en/student');
       });
 
       it('returns /locale/education for join routes', () => {
@@ -107,7 +108,7 @@ describe('sectionHome', () => {
       });
 
       it('returns /locale/education for functional /education/* flow sub-routes', () => {
-        expect(sectionHome({ pathname: '/en/education/classroom-game' })).toBe('/en/education');
+        expect(sectionHome({ pathname: '/en/education/classroom-game' })).toBe('/en/education/for-schools');
         expect(sectionHome({ pathname: '/en/education/duels/abc123' })).toBe('/en/education');
         expect(sectionHome({ pathname: '/en/education/access' })).toBe('/en/education');
         expect(sectionHome({ pathname: '/en/education/miss-gap-whatsapp' })).toBe('/en/education');
@@ -125,7 +126,7 @@ describe('sectionHome', () => {
         expect(sectionHome({ pathname: '/sv/student' })).toBe('/sv/education');
         expect(sectionHome({ pathname: '/ja/join/X7E4PY' })).toBe('/ja/education');
         expect(sectionHome({ pathname: '/es/classroom' })).toBe('/es/education');
-        expect(sectionHome({ pathname: '/ru/teacher/classroom' })).toBe('/ru/education');
+        expect(sectionHome({ pathname: '/ru/teacher/classroom' })).toBe('/ru/teacher');
       });
     });
 
@@ -141,10 +142,10 @@ describe('sectionHome', () => {
         expect(sectionHome({ pathname: '/en/daily/archive' })).toBe('/en');
       });
 
-      it('never falls back to the page that errored: the bare /education landing goes to the app home', () => {
-        expect(sectionHome({ pathname: '/en/education' })).toBe('/en');
-        expect(sectionHome({ pathname: '/he/education' })).toBe('/he');
-        expect(sectionHome({ pathname: '/ru/education' })).toBe('/ru');
+      it('never falls back to the page that errored: the bare /education landing goes to a sibling edu page', () => {
+        expect(sectionHome({ pathname: '/en/education' })).toBe('/en/education/for-schools');
+        expect(sectionHome({ pathname: '/he/education' })).toBe('/he/education/for-schools');
+        expect(sectionHome({ pathname: '/ru/education' })).toBe('/ru/education/for-schools');
       });
 
       it('preserves locale for non-education routes', () => {

@@ -49,9 +49,10 @@ interface ChallengeInfo {
 
 interface QuickPlayHubProps {
   challengeId?: string | null;
+  backHref?: string;
 }
 
-export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
+export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { announce } = useAnnouncer();
@@ -71,7 +72,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   const [loadError, setLoadError] = useState(false);
   /** Resolved mode the lightning bolt is locked onto during loading. */
   const [strikeMode, setStrikeMode] = useState<QuickMode | null>(null);
-  const goBack = useBackOneLevel();
+  const goBack = useBackOneLevel(backHref);
   const submitting = useRef(false);
   const loadingRef = useRef(false);
   const wheelHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -407,6 +408,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
         dayStreak={dayStreak}
         onNextRound={handleNextRound}
         onChallenge={handleChallenge}
+        onExit={goBack}
       />
     );
   }

@@ -8,6 +8,7 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { QuickPlayHub } from '@/components/quick-play/QuickPlayHub';
+import { quickPlayBackHref } from '@/lib/navigation/eduExitTargets';
 
 function LoadingFallback() {
   return <div className="min-h-screen bg-neo-navy" />;
@@ -17,7 +18,8 @@ function QuickPlayGate() {
   const { language } = useLanguageSafe();
   const searchParams = useSearchParams();
 
-  return <QuickPlayHub challengeId={searchParams.get('challenge')} />;
+  const backHref = quickPlayBackHref(language, searchParams.get('academy') === '1');
+  return <QuickPlayHub challengeId={searchParams.get('challenge')} backHref={backHref} />;
 }
 
 export default function QuickPlayPageClient() {

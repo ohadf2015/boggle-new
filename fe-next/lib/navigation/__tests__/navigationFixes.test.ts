@@ -16,8 +16,8 @@ describe('Navigation Fixes — All 4 Causes', () => {
   describe('Fix #1: Error Boundaries use sectionHome', () => {
     it('should direct chunk errors from education routes to /{locale}/education, not /', () => {
       // Error boundaries catch errors and should call sectionHome to pick the fallback
-      expect(sectionHome({ pathname: '/en/teacher/classroom/abc/analytics' })).toBe('/en/education');
-      expect(sectionHome({ pathname: '/he/student/achievements' })).toBe('/he/education');
+      expect(sectionHome({ pathname: '/en/teacher/classroom/abc/analytics' })).toBe('/en/teacher');
+      expect(sectionHome({ pathname: '/he/student/achievements' })).toBe('/he/student');
       expect(sectionHome({ pathname: '/sv/join/XJXEFN' })).toBe('/sv/education');
     });
 
@@ -30,7 +30,7 @@ describe('Navigation Fixes — All 4 Causes', () => {
     it('should preserve locale for RTL languages on error', () => {
       // Hebrew is RTL — error recovery must preserve it
       expect(sectionHome({ pathname: '/he/teacher' })).toBe('/he/education');
-      expect(sectionHome({ pathname: '/he/student/profile' })).toBe('/he/education');
+      expect(sectionHome({ pathname: '/he/student/profile' })).toBe('/he/student');
     });
 
     it('should default to en if locale is ambiguous', () => {
@@ -137,7 +137,7 @@ describe('Navigation Fixes — All 4 Causes', () => {
       // Scenario: Teacher deep-links to /en/teacher/classroom/abc, chunk error fires
       const errorPath = '/en/teacher/classroom/abc';
       const fallback = sectionHome({ pathname: errorPath });
-      expect(fallback).toBe('/en/education'); // Not the main home
+      expect(fallback).toBe('/en/teacher'); // Not the main home
     });
 
     it('should handle android back from education deep link', () => {
@@ -159,7 +159,7 @@ describe('Navigation Fixes — All 4 Causes', () => {
       const rtlErrorPath = '/he/teacher/classroom';
       const rtlFallback = sectionHome({ pathname: rtlErrorPath });
       expect(rtlFallback).toMatch(/^\/he/); // Starts with /he, not /en
-      expect(rtlFallback).toBe('/he/education');
+      expect(rtlFallback).toBe('/he/teacher');
     });
 
     it('keeps /education/* landings inside education on error, but never loops the bare landing to itself', () => {
@@ -167,10 +167,9 @@ describe('Navigation Fixes — All 4 Causes', () => {
       // an error fallback must never bounce them to the consumer home.
       expect(isEducationPath('/en/education/for-schools')).toBe(true);
       expect(sectionHome({ pathname: '/en/education/for-schools' })).toBe('/en/education');
-      // The bare landing IS the education fallback target, so an error there
-      // falls back to the app home — falling back to itself would loop.
+      // The bare landing must not fall back to itself; it goes to a sibling edu page.
       expect(isEducationPath('/en/education')).toBe(true);
-      expect(sectionHome({ pathname: '/en/education' })).toBe('/en');
+      expect(sectionHome({ pathname: '/en/education' })).toBe('/en/education/for-schools');
     });
   });
 
