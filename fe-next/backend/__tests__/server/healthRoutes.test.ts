@@ -94,6 +94,28 @@ describe('Health Routes', () => {
       expect(typeof res.body.uptime).toBe('number');
       expect(res.body.timestamp).toBeDefined();
     });
+
+    it('includes running commit sha from RAILWAY_GIT_COMMIT_SHA', async () => {
+      const prev = process.env.RAILWAY_GIT_COMMIT_SHA;
+      process.env.RAILWAY_GIT_COMMIT_SHA = 'abc123def456';
+      try {
+        const res = await request(app).get('/health');
+        expect(res.status).toBe(200);
+        expect(res.body.commit).toBe('abc123def456');
+      } finally {
+        if (prev === undefined) delete process.env.RAILWAY_GIT_COMMIT_SHA;
+        else process.env.RAILWAY_GIT_COMMIT_SHA = prev;
+      }
+    });
+  });
+
+  describe('GET /api/health', () => {
+    it('is registered on the Express app (supertest /api/* is intercepted in this suite)', () => {
+      const router = (app as any).router || (app as any)._router;
+      const stack = router?.stack || [];
+      const paths = stack.map((layer: { route?: { path?: string } }) => layer.route?.path);
+      expect(paths).toContain('/api/health');
+    });
   });
 
   describe('GET /health/ready', () => {
