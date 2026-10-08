@@ -4,6 +4,8 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { z } from 'zod';
 import logger from '@/utils/logger';
 import { canCreateClass } from '@/lib/subscriptions';
+import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
+import { buildClassroomCreatedEvent, isQaEmail } from '@/backend/utils/educationRoundTelemetry';
 import { EDUCATION_LANGUAGES } from '@/lib/supabase/education/types';
 
 const createClassroomSchema = z.object({
@@ -81,6 +83,15 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    captureEduServerEvents([
+      buildClassroomCreatedEvent({
+        teacherId: user.id,
+        classroomId: classroom.id,
+        language,
+        isTestAccount: isQaEmail(user.email),
+      }),
+    ]);
 
     return NextResponse.json(
       {

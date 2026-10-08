@@ -14,6 +14,24 @@ import type {
 } from './analyticsTypes';
 
 /**
+ * The avatar slot takes a string: an image URL or an emoji. `avatar_config` is
+ * usually an object, which used to leak into the slot and break the teacher's
+ * table, so anything that is not a non-empty string is dropped.
+ */
+export function avatarForProgress(profile: {
+  avatar_config?: unknown;
+  avatar_emoji?: unknown;
+}): string | null {
+  if (typeof profile.avatar_config === 'string' && profile.avatar_config.trim()) {
+    return profile.avatar_config;
+  }
+  if (typeof profile.avatar_emoji === 'string' && profile.avatar_emoji.trim()) {
+    return profile.avatar_emoji;
+  }
+  return null;
+}
+
+/**
  * Get progress summary for all students in a classroom
  */
 export async function getStudentsProgressSummary(
@@ -125,7 +143,7 @@ export async function getStudentsProgressSummary(
         // Placeholder display names ('Player_<hex>') are truthy, so the `|| 'Unknown'`
         // guard never fired and the teacher's progress table listed hex ids.
         displayName: resolveDisplayName([profile.display_name], 'Unknown'),
-        avatarUrl: profile.avatar_config || profile.avatar_emoji || null, totalXp, currentLevel, vocabularyMastery,
+        avatarUrl: avatarForProgress(profile), totalXp, currentLevel, vocabularyMastery,
         overallAccuracy, wordsAttempted, wordsMastered, lastPracticeDate,
         isStruggling, currentStreak,
       });

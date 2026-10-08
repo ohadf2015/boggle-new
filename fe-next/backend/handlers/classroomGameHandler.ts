@@ -33,6 +33,7 @@ import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
 import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
 import logger from '../utils/logger.js';
+import { buildLiveRoundStartedEvent } from '../utils/educationRoundTelemetry';
 import {
   buildClassroomGameStartedEvent,
   buildClassroomJoinRefusedEvent,
@@ -525,7 +526,8 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       });
 
       const startedEvent = buildClassroomGameStartedEvent(game, { isTestAccount: false });
-      if (startedEvent) captureEduServerEvents([startedEvent]);
+      const liveRoundStarted = buildLiveRoundStartedEvent(game, { isTestAccount: false });
+      captureEduServerEvents([startedEvent, liveRoundStarted].filter((e) => e !== null));
 
       logger.info('CLASSROOM_GAME', `Teacher ${authUserId} started game ${payload.gameCode}`);
     } catch (error) {

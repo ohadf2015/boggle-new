@@ -35,6 +35,7 @@ import {
 } from '../utils/educationTelemetry';
 
 import type { PlayerScore } from './classroomRoundParticipants.js';
+import { recordClassroomRound } from './classroomRoundRecord';
 
 export { playerScoresFromGameResults, roundHasStudents } from './classroomRoundParticipants.js';
 
@@ -570,6 +571,16 @@ export async function persistClassroomGameScores(
   // browser-side `edu_practice_complete` cannot see this path at all — it lives
   // in PracticeSessionProvider, which this server never runs.
   captureEduServerEvents(buildClassroomGameCompletedEvents(game, outcomes));
+
+  if (sessionsWritten > 0) {
+    await recordClassroomRound(game, {
+      playerIds: participants.map((p) => p.userId),
+      durationSeconds: game.startedAt
+        ? Math.max(0, Math.round((Date.now() - new Date(game.startedAt).getTime()) / 1000))
+        : null,
+      startedAt: game.startedAt ? new Date(game.startedAt) : null,
+    });
+  }
 
   // The teacher's whole report hangs off these rows, so their count is the one
   // fact worth stating out loud. A round that wrote nothing releases the lock
