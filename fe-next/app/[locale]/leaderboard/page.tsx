@@ -18,9 +18,9 @@ const seoContent: Record<string, {
   faq: { question: string; answer: string }[];
 }> = {
   en: {
-    title: 'Word Game Leaderboard — Live Daily, Weekly & All-Time Rankings',
+    title: 'Word Game Leaderboard — Monthly Season & All-Time Rankings',
     description:
-      'Live word game leaderboard with daily, weekly, and all-time rankings. Filter by language, country, or mode. Real-time multiplayer across Classic, Blast, Word Hunt, and Daily Challenge. No signup — browser play.',
+      'Live word game leaderboard with the current monthly season, all-time rankings, and past seasons. Real-time multiplayer across Classic, Blast, Word Hunt, and Daily Challenge. No signup — browser play.',
     features: [
       'Real-time multiplayer in Classic, Blast, Word Hunt, and Daily Challenge modes',
       'Play against opponents in six languages: English, Hebrew, Spanish, Swedish, Japanese, Russian',
@@ -32,12 +32,12 @@ const seoContent: Record<string, {
       {
         question: 'What are the best competitive word games with global leaderboards?',
         answer:
-          'LexiClash is one of the best free competitive word games with global leaderboards — daily, weekly, and all-time rankings across Classic, Blast, Word Hunt, and Daily Challenge modes. Other notable picks: Words With Friends (turn-based), Wordle (single-puzzle), and Boggle With Friends. LexiClash is browser-based, real-time multiplayer, no signup, no download.',
+          'LexiClash is one of the best free competitive word games with global leaderboards — a monthly season ranking and an all-time ranking across Classic, Blast, Word Hunt, and Daily Challenge modes. Other notable picks: Words With Friends (turn-based), Wordle (single-puzzle), and Boggle With Friends. LexiClash is browser-based, real-time multiplayer, no signup, no download.',
       },
       {
         question: 'What are the best word games of 2026?',
         answer:
-          'The best word games in 2026 combine real-time multiplayer, daily challenges, and global leaderboards. LexiClash leads the free browser category — 8 game modes, 6 languages, no download, instant play. Wordle remains the daily-puzzle benchmark. Words With Friends owns turn-based async play. For competitive ranked play with global leaderboards, LexiClash is the strongest pick because of its unified daily/weekly/all-time scoring across every mode.',
+          'The best word games in 2026 combine real-time multiplayer, daily challenges, and global leaderboards. LexiClash leads the free browser category — 8 game modes, 6 languages, no download, instant play. Wordle remains the daily-puzzle benchmark. Words With Friends owns turn-based async play. For competitive ranked play with global leaderboards, LexiClash is the strongest pick because of its unified season and all-time scoring across every mode.',
       },
       {
         question: 'What are the best free browser word games in 2025 and 2026?',
@@ -47,12 +47,12 @@ const seoContent: Record<string, {
       {
         question: 'How is the leaderboard score calculated?',
         answer:
-          'Leaderboard rankings are based on your total score across games. Points come from word length, combo multipliers, and bonus tiles. Daily leaderboards reset at midnight UTC.',
+          'Leaderboard rankings are based on your total score across games. Points come from word length, combo multipliers, and bonus tiles. The current season ranking covers the month; the all-time ranking never resets.',
       },
       {
-        question: 'Can I see leaderboards for specific game modes?',
+        question: 'Can I see past seasons and all-time rankings?',
         answer:
-          'Yes — use the mode filter at the top of the leaderboard to switch between Classic, Blast, Word Hunt, and Daily Challenge rankings.',
+          'Yes — use the tabs at the top of the leaderboard to switch between the current season, all-time, and past seasons. Rankings are based on your total score across games, with no per-mode filters.',
       },
       {
         question: 'How often does the leaderboard update?',

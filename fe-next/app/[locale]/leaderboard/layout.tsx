@@ -136,7 +136,7 @@ export default async function LeaderboardLayout({ children, params }: Leaderboar
     '@type': 'ItemList',
     '@id': `https://www.lexiclash.live${localePath}/leaderboard#itemlist`,
     name: 'LexiClash Global Leaderboard',
-    description: 'Top-ranked players in LexiClash multiplayer word game. Rankings based on total score, wins, and achievements.',
+    description: 'Top-ranked players in LexiClash multiplayer word game. Rankings based on total score, with the current season, all-time, and past seasons.',
     itemListOrder: 'https://schema.org/ItemListOrderDescending',
     numberOfItems: 100,
     itemListElement: [
