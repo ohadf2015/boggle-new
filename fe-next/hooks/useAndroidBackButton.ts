@@ -22,7 +22,7 @@ import { isNative } from '../utils/platform';
 import { parentRoute } from '../lib/navigation/parentRoute';
 import { isNavigationGuardActive } from '../lib/navigation/navigationGuardRegistry';
 import { isEducationPath } from '../lib/navigation/sectionHome';
-import { educationHomeFor } from '../lib/navigation/educationBackHref';
+import { classroomGameAndroidBackHref } from '../lib/navigation/eduExitTargets';
 import { isTeacherProfile } from '../lib/education/teacherRole';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -38,7 +38,6 @@ const ROOT_PATH_PATTERNS: RegExp[] = [
 
 const EXIT_DOUBLE_TAP_WINDOW_MS = 2000;
 const LOCALE_ROOT_RE = /^\/(?:[a-z]{2})?$/;
-const CLASSROOM_GAME_RE = /^\/([a-z]{2})\/education\/classroom-game\/?$/;
 
 function isRootPath(pathname: string | null): boolean {
   if (!pathname) return true;
@@ -110,9 +109,9 @@ export function useAndroidBackButton(): void {
           return;
         }
         // The /education landing replaces a teacher straight back here, so neither history nor the URL parent is "up".
-        const classroomGame = CLASSROOM_GAME_RE.exec(pathRef.current || '');
-        if (classroomGame && isTeacherRef.current) {
-          router.push(educationHomeFor(classroomGame[1], 'teacher'));
+        const classroomGameBack = classroomGameAndroidBackHref(pathRef.current, isTeacherRef.current);
+        if (classroomGameBack) {
+          router.push(classroomGameBack);
           return;
         }
         if (data.canGoBack || window.history.length > 1) {

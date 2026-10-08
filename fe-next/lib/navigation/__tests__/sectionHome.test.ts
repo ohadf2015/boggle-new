@@ -107,7 +107,7 @@ describe('sectionHome', () => {
       });
 
       it('returns /locale/education for functional /education/* flow sub-routes', () => {
-        expect(sectionHome({ pathname: '/en/education/classroom-game' })).toBe('/en/education');
+        expect(sectionHome({ pathname: '/en/education/classroom-game' })).toBe('/en/education/for-schools');
         expect(sectionHome({ pathname: '/en/education/duels/abc123' })).toBe('/en/education');
         expect(sectionHome({ pathname: '/en/education/access' })).toBe('/en/education');
         expect(sectionHome({ pathname: '/en/education/miss-gap-whatsapp' })).toBe('/en/education');

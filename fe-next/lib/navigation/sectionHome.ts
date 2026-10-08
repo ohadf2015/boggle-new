@@ -130,6 +130,8 @@ export function sectionHome({ pathname, locale: explicitLocale, search }: Sectio
   // user inside education.
   const segs = pathOnly.split('/').filter(Boolean);
   if (segs.length === 2 && segs[1] === 'education') return `/${locale}/education/for-schools`;
+  // The landing bounces an approved teacher straight back here, so an error on this page can't return to it.
+  if (segs.length === 3 && segs[1] === 'education' && segs[2] === 'classroom-game') return `/${locale}/education/for-schools`;
   return `/${locale}/education`;
 }
 
