@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 8003,
+    "totalKeysInCode": 7999,
     "keyCountByLanguage": {
-      "en": 15459,
-      "es": 15765,
-      "he": 15691,
-      "ja": 15750,
-      "ru": 15488,
-      "sv": 15747
+      "en": 15468,
+      "es": 15774,
+      "he": 15700,
+      "ja": 15759,
+      "ru": 15497,
+      "sv": 15756
     },
     "missingFromEnglish": 103,
     "problematicFlatKeys": 0,
@@ -1192,7 +1192,7 @@
         "pattern": "`crossword.difficulty.${puzzle.difficulty}`",
         "type": "template_literal",
         "file": "components/crossword/CrosswordView.tsx",
-        "line": 246,
+        "line": 212,
         "context": "difficultyLabel={t(`crossword.difficulty.${puzzle.difficulty}`)}"
       },
       {
@@ -2851,7 +2851,7 @@
         "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[classroomGameMode] ?? 'classic'}`",
         "type": "template_literal",
         "file": "player/PlayerView.tsx",
-        "line": 55,
+        "line": 56,
         "context": "? t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[classroomGameMode] ?? 'classic'}`)"
       },
       {
@@ -3789,7 +3789,7 @@
         "variable": "nameKey",
         "type": "variable_key",
         "file": "host/components/pre-game/BattleModeCard.tsx",
-        "line": 111,
+        "line": 116,
         "context": "{t(nameKey)}"
       },
       {

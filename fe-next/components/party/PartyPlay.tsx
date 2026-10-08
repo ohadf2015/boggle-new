@@ -7,6 +7,7 @@ import { isWordOnBoard } from '@/utils/utils';
 import type { Language } from '@/shared/types/game';
 import { currentPlayer, type PartyState } from '@/lib/party';
 import { PartyBoard } from './PartyBoard';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
 const MIN_LEN = 3;
 
@@ -76,6 +77,7 @@ export function PartyPlay({ t, state, onSubmitWord, onTimesUp }: PartyPlayProps)
 
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-4 p-4">
+      <ModeCoach mode="party" />
       <header className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span

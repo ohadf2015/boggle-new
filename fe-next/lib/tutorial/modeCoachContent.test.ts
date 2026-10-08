@@ -12,6 +12,7 @@ const EXPECTED_MODES: CoachModeKey[] = [
   'wordCraft',
   'crossword',
   'adventure',
+  'party',
 ];
 
 const ACCENTS = ['lime', 'cyan', 'pink', 'purple'];
