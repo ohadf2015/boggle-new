@@ -11,7 +11,7 @@ import { useEffect, type MutableRefObject } from 'react';
 import { useSocket } from '@/utils/SocketContext';
 import logger from '@/utils/logger';
 
-import { stashStartGameMessageId, wasStartGameHandled, markStartGameHandled } from '@/shared/utils/gameEventUtils';
+import { stashStartGameMessageId, wasStartGameHandled, markStartGameHandled, replayStartGame } from '@/shared/utils/gameEventUtils';
 import { useGameActions, useGameStore } from '@/hooks/gameState';
 
 import type { PlayerViewProps } from '../types';
@@ -70,6 +70,11 @@ export function usePendingGameStart({
 
     const isReconnect = !!(pendingGameStart as any).reconnect;
     logger.log('[PLAYER] Processing pending game start:', isReconnect ? '(reconnect)' : '(new game)');
+
+    if (isReconnect && replayStartGame('PLAYER', pendingGameStart)) {
+      onGameStartConsumed();
+      return;
+    }
 
     // On reconnect, only restore grid/timer — do NOT reset words, replay animations, or re-ACK.
     // This prevents the "game restarted" visual glitch on brief network blips.

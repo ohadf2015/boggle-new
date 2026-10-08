@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
  * `useHostPhase` / `useHostRoundLifecycle`. Source-contract tests read the
  * concatenation — assertions unchanged, only where the code lives moved.
  */
-export const HOST_VIEW_FILES = ['HostView.tsx', 'hooks/useHostPhase.ts', 'hooks/useHostRoundLifecycle.ts'] as const;
+export const HOST_VIEW_FILES = ['HostView.tsx', 'hooks/useHostPhase.ts', 'hooks/useHostRoundLifecycle.ts', 'hooks/useHostPendingGameStart.ts'] as const;
 
 export function readHostViewSource(): string {
   return HOST_VIEW_FILES.map((f) => readFileSync(resolve(__dirname, '..', f), 'utf8')).join('\n');
