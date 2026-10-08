@@ -2510,7 +2510,7 @@ const es = {
       "bad_chain": "Empieza con la letra brillante",
       "not_buildable": "Usa las letras de la bandeja",
       "duplicate": "Ya usaste esa palabra",
-      "not_in_dictionary": "No está en el diccionario"
+      "not_in_dictionary": "No está en el diccionario", "rejected": "Palabra no aceptada", "no_player": "No estás en esta partida", "self_target": "No puedes bombardear tu propia torre"
     },
     "celebration": {
       "highRise": "¡Edificio alto!",
@@ -3387,7 +3387,7 @@ const es = {
       "blast": "¡BLAST!",
       "wordHunt": "¡CAZA DE PALABRAS!",
       "wheelRush": "¡RUEDA RÁPIDA!",
-      "classic": "¡CLÁSICO!"
+      "classic": "¡CLÁSICO!", "crossword": "¡CRUCIGRAMA!", "wordTower": "¡TORRE DE PALABRAS!"
     }
   },
   "help": {
@@ -16713,6 +16713,12 @@ const es = {
       "step1": "Desliza letras para formar palabras",
       "step2": "Toca para soltarlo al centro",
       "scoreTip": "Cada palabra sube el piso"
+    },
+    "party": {
+      "title": "Pasa el móvil",
+      "step1": "Arrastra letras para formar palabras",
+      "step2": "Pasa el móvil al acabar el tiempo",
+      "scoreTip": "Solo puntúan palabras que nadie encontró"
     },
     "connections": {
       "title": "Halla los vínculos",

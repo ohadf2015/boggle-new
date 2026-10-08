@@ -68,15 +68,7 @@ export function initVersusMatch(
   nowMs: number,
 ): VersusMatchState {
   const rec: Record<string, VersusPlayer> = {};
-  for (const p of players) {
-    rec[p.id] = {
-      playerId: p.id,
-      username: p.username,
-      game: initWordTowerState({ gameCode, playerId: p.id, language }),
-      versus: { shieldUntilMs: 0, damageLog: [] },
-      bombCooldownUntilMs: 0,
-    };
-  }
+  for (const p of players) rec[p.id] = newVersusPlayer(gameCode, language, p.id, p.username);
   return {
     gameCode,
     language,
@@ -84,6 +76,26 @@ export function initVersusMatch(
     order: players.map((p) => p.id),
     startedAtMs: nowMs,
     endsAtMs: nowMs + WORD_TOWER_VERSUS_MATCH_S * 1000,
+  };
+}
+
+function newVersusPlayer(gameCode: string, language: Language, id: string, username: string): VersusPlayer {
+  return {
+    playerId: id,
+    username,
+    game: initWordTowerState({ gameCode, playerId: id, language }),
+    versus: { shieldUntilMs: 0, damageLog: [] },
+    bombCooldownUntilMs: 0,
+  };
+}
+
+/** Seat a player who joins mid-match (no-op when already seated). */
+export function addVersusPlayer(state: VersusMatchState, player: { id: string; username: string }): VersusMatchState {
+  if (state.players[player.id]) return state;
+  return {
+    ...state,
+    players: { ...state.players, [player.id]: newVersusPlayer(state.gameCode, state.language, player.id, player.username) },
+    order: [...state.order, player.id],
   };
 }
 

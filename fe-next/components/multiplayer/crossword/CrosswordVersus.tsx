@@ -15,6 +15,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import type { CrosswordPuzzle } from '@/lib/crossword/types';
 import { useCrosswordGame } from '@/hooks/useCrosswordGame';
+import { useCrosswordHardwareKeys } from '@/hooks/useCrosswordHardwareKeys';
 import { crosswordStats, solvedSlotIds } from '@/lib/crossword/stats';
 import { crosswordScore } from '@/lib/solo/soloReward';
 import { CrosswordGrid } from '@/components/crossword/CrosswordGrid';
@@ -51,10 +52,11 @@ function StandingsRail({ standings, me, t }: { standings: CrosswordStanding[]; m
 
 /** Inner — only mounts once the puzzle exists so useCrosswordGame seeds correctly. */
 function CrosswordRace({
-  puzzle, username, standings, raceOver,
+  puzzle, raceKey, username, standings, raceOver,
   submitProgress, onQuit,
 }: {
   puzzle: CrosswordPuzzle;
+  raceKey: string;
   username: string;
   standings: CrosswordStanding[];
   raceOver: boolean;
@@ -62,11 +64,12 @@ function CrosswordRace({
   onQuit?: () => void;
 }) {
   const { t, dir } = useLanguage();
-  const game = useCrosswordGame(puzzle, {});
+  const game = useCrosswordGame(puzzle, { progressKey: raceKey, telemetry: false });
   const stats = crosswordStats(game.state);
   const solved = game.state.status === 'solved';
   const mySolvedSlotIds = useMemo(() => solvedSlotIds(game.state), [game.state]);
   const hintsUsed = game.state.revealed.length;
+  useCrosswordHardwareKeys(game, puzzle.rtl, !solved);
 
   // Report progress on each newly-solved word + on final solve (word-granularity,
   // no keystroke spam). elapsedMs is read at emit time, not a dep, so the per-second
@@ -166,8 +169,11 @@ export function CrosswordVersus({ socket, username, onQuit }: CrosswordVersusPro
     );
   }
 
+  const raceKey = `mp:${mp.startedAt ?? 0}:${mp.puzzle.id}`;
   return (
     <CrosswordRace
+      key={raceKey}
+      raceKey={raceKey}
       puzzle={mp.puzzle}
       username={username}
       standings={mp.standings}

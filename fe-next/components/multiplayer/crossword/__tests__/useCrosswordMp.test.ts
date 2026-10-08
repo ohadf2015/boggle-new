@@ -42,6 +42,14 @@ describe('useCrosswordMp', () => {
     expect(result.current.ready).toBe(true);
   });
 
+  it('exposes the round start stamp (keys the race save, stable across reconnects)', () => {
+    const { socket, fire } = mockSocket();
+    const { result } = renderHook(() => useCrosswordMp(socket));
+    expect(result.current.startedAt).toBeNull();
+    fire('crosswordMpInit', INIT);
+    expect(result.current.startedAt).toBe(1000);
+  });
+
   it('updates standings on broadcast', () => {
     const { socket, fire } = mockSocket();
     const { result } = renderHook(() => useCrosswordMp(socket));
@@ -67,6 +75,14 @@ describe('useCrosswordMp', () => {
     fire('crosswordMpInit', INIT);
     act(() => result.current.submitProgress({ percent: 60, solved: false, elapsedMs: 15000, score: 0 }));
     expect(emit).toHaveBeenCalledWith('submitCrosswordProgress', { percent: 60, solved: false, elapsedMs: 15000, score: 0 });
+  });
+
+  it('re-requests once a reconnect has re-seated the socket (joined)', () => {
+    const { socket, fire, emit } = mockSocket();
+    renderHook(() => useCrosswordMp(socket));
+    emit.mockClear();
+    fire('joined', { success: true, reconnected: true });
+    expect(emit).toHaveBeenCalledWith('requestCrosswordMpState', {});
   });
 
   it('re-requests on reconnect', () => {

@@ -20,8 +20,15 @@ describe('BattleModeCard — MP mode list (Ohad 2026-09-27)', () => {
     expect(screen.getByTestId('lobby-how-to-play')).toBeInTheDocument();
   });
 
-  it('crossword is gone from the MP picker (admin too)', () => {
+  it('hides the in-work modes from ordinary hosts (admin flag alone too)', () => {
     render(<BattleModeCard {...baseProps} isAdmin />);
     expect(screen.queryByTestId('game-mode-crossword')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('game-mode-word-tower')).not.toBeInTheDocument();
+  });
+
+  it('offers crossword (never the retired MP word-tower) to hosts who can see in-work modes', () => {
+    render(<BattleModeCard {...baseProps} showInWorkModes />);
+    expect(screen.getByTestId('game-mode-crossword')).toBeInTheDocument();
+    expect(screen.queryByTestId('game-mode-word-tower')).not.toBeInTheDocument();
   });
 });

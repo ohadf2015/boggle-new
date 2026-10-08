@@ -11,8 +11,10 @@ interface BattleModeCardProps {
   selectedGameMode: GameModeOption;
   setSelectedGameMode: (mode: GameModeOption) => void;
   t: (path: string, params?: Record<string, string | number>) => string;
-  /** Legacy host flag — no MP mode is gated on it since the crossword removal (2026-09-27). */
+  /** Legacy host flag — gates nothing; in-work modes follow `showInWorkModes`. */
   isAdmin?: boolean;
+  /** Admin or beta tester: also offer the in-work modes (the server enforces the same gate). */
+  showInWorkModes?: boolean;
   /** Board language — no MP mode is gated on it since 2026-09-27. */
   language?: string | null;
   /** @deprecated Blast is offered to all players now. */
@@ -30,8 +32,10 @@ const MODES: Array<{ mode: GameModeOption; nameKey: string }> = [
   { mode: 'word-hunt', nameKey: 'gameModes.wordHunt.name' },
   { mode: 'wheel-rush', nameKey: 'gameModes.wheelRush.name' },
   { mode: 'blast', nameKey: 'gameModes.blast.name' },
-  // Ohad 2026-09-27: crossword is out of the MP picker — it was an admin-only
-  // preview crowding the phone grid. It stays available in SOLO.
+];
+
+const IN_WORK_MODES: Array<{ mode: GameModeOption; nameKey: string }> = [
+  { mode: 'crossword', nameKey: 'gameModes.crossword.name' },
 ];
 
 /**
@@ -59,12 +63,13 @@ export function BattleModeCard({
   setSelectedGameMode,
   t,
   onHowToPlay,
+  showInWorkModes = false,
   fill = false,
   className,
 }: BattleModeCardProps): React.ReactElement {
   const handleSelect = useCallback((mode: GameModeOption) => setSelectedGameMode(mode), [setSelectedGameMode]);
 
-  // Every MODES entry is offered to every host now — no per-mode gating.
+  const modes = showInWorkModes ? [...MODES, ...IN_WORK_MODES] : MODES;
 
   return (
     <section className={cn('flex flex-col gap-2 min-w-0', fill && 'flex-1', className)}>
@@ -78,7 +83,7 @@ export function BattleModeCard({
        * can never shrink below the tiles' min-h.
        */}
       <div className={cn('grid grid-cols-3 gap-2 desktop-tall:gap-[calc(10px*var(--mp-u,1))]', fill && 'flex-1 auto-rows-fr')}>
-        {MODES.map(({ mode, nameKey }) => {
+        {modes.map(({ mode, nameKey }) => {
           const isActive = selectedGameMode === mode;
           const family = FAMILY[getModePresentation(mode).color];
           return (

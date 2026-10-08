@@ -247,14 +247,37 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     return wheelCanvas;
   }
 
-  // Word Tower versus — per-player towers, no shared grid
-  if (gameMode === 'word-tower') {
-    return <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} />;
-  }
+  const roundDialogs = (
+    <>
+      <PlayerRoundDialogs
+        t={t}
+        tournamentData={tournamentData}
+        tournamentStandings={tournamentStandings}
+        showTournamentStandings={showTournamentStandings}
+        setShowTournamentStandings={setShowTournamentStandings}
+        showExitConfirm={showExitConfirm}
+        setShowExitConfirm={setShowExitConfirm}
+        onConfirmExit={onConfirmExit}
+      />
 
-  // Crossword race — all players solve the same puzzle, no letter grid
-  if (gameMode === 'crossword') {
-    return <CrosswordVersus socket={socket} username={username} onQuit={onExitRoom} />;
+      {isReconnecting && gameActive && (
+        <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />
+      )}
+      {showAbortModal && (
+        <MPGameAbortedModal wordCount={foundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onExitRoom} />
+      )}
+    </>
+  );
+
+  // Gridless versus modes — per-player towers / crossword race.
+  if (gameMode === 'word-tower' || gameMode === 'crossword') {
+    const Versus = gameMode === 'word-tower' ? WordTowerVersus : CrosswordVersus;
+    return (
+      <>
+        <Versus socket={socket} username={username} onQuit={onExitRoom} />
+        {roundDialogs}
+      </>
+    );
   }
 
   // Wordcraft — lesson-dealt solo race vs the Baron, no shared grid
@@ -402,24 +425,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
       <PendingWordChips pendingWords={pendingWords} dismissPending={dismissPending} />
 
-      <PlayerRoundDialogs
-        t={t}
-        tournamentData={tournamentData}
-        tournamentStandings={tournamentStandings}
-        showTournamentStandings={showTournamentStandings}
-        setShowTournamentStandings={setShowTournamentStandings}
-        showExitConfirm={showExitConfirm}
-        setShowExitConfirm={setShowExitConfirm}
-        onConfirmExit={onConfirmExit}
-      />
-
-      {isReconnecting && gameActive && (
-        <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />
-      )}
-      {showAbortModal && (
-        <MPGameAbortedModal wordCount={foundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onExitRoom} />
-      )}
-
+      {roundDialogs}
     </div>
   );
 });

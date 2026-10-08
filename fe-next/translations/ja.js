@@ -2511,7 +2511,7 @@ const ja = {
       "bad_chain": "光る文字で始めてください",
       "not_buildable": "トレイの文字を使ってください",
       "duplicate": "その単語は使用済みです",
-      "not_in_dictionary": "辞書にありません"
+      "not_in_dictionary": "辞書にありません", "rejected": "その単語は使えません", "no_player": "このマッチに参加していません", "self_target": "自分のタワーは爆破できません"
     },
     "celebration": {
       "highRise": "ハイライズ！",
@@ -3406,7 +3406,7 @@ const ja = {
       "blast": "ブラスト！",
       "wordHunt": "ワードハント！",
       "wheelRush": "ホイールラッシュ！",
-      "classic": "クラシック！"
+      "classic": "クラシック！", "crossword": "クロスワード！", "wordTower": "ワードタワー！"
     }
   },
   "help": {
@@ -19093,6 +19093,12 @@ const ja = {
       "step1": "文字をなぞって単語を作る",
       "step2": "タップしてど真ん中に落とす",
       "scoreTip": "単語ひとつで階が1段上がる！"
+    },
+    "party": {
+      "title": "スマホを回そう",
+      "step1": "文字をなぞって単語を作る",
+      "step2": "時間切れで次の人に渡す",
+      "scoreTip": "誰も見つけていない単語だけが得点に"
     },
     "connections": {
       "title": "つながりを見つける",

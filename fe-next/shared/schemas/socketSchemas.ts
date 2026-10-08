@@ -192,7 +192,7 @@ export const StartGameSchema = z.object({
     emoji: z.string(),
     isHoliday: z.boolean().optional(),
   }).nullable().optional(),
-  gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'word-tower', 'wordcraft', 'random']).optional(),
+  gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'word-tower', 'crossword', 'wordcraft', 'random']).optional(),
   tvMode: z.boolean().optional(),
   /**
    * Optional boost token bundled with startGame so the server can register

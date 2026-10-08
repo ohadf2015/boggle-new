@@ -347,6 +347,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       <>
         <Versus socket={socket} username={username} onQuit={handleStopGameClick} />
         {connectionOverlays}
+        {stopConfirm}
       </>
     );
   }

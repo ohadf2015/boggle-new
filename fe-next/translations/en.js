@@ -2164,7 +2164,7 @@ const en = {
     "sabotage": { "chip": "Wrecking ball", "tokens": "{n}", "pickTarget": "Pick a rival", "noTargets": "No rivals to target yet", "confirm": "Send wrecking ball to {name}?", "send": "Send", "cancel": "Cancel", "sentTo": "💥 Hit {name}, −1m", "incoming": "🚨 Sabotage incoming from {name}!", "recovered": "Tower stands. Climb on.", "earned": "🎯 Wrecking Ball earned!", "earnedHint": "New zone or achievement", "watchAd": "📺 Watch Ad +1", "adEarned": "🎯 Token via Ad!", "smashTitle": "Release the ball!", "smashCta": "SMASH!", "smashReleasing": "Releasing…", "floorsDestroyed": "−{n} FLOORS!", "newHeight": "New height:", "newHeightValue": "{m}m", "strikeCta": "STRIKE!", "strikeHint": "Tap when the meter hits the green zone", "verdict": { "perfect": "PERFECT HIT!", "solid": "SOLID HIT", "weak": "GLANCING BLOW" }, "done": "DONE" },
     "reward": { "tier": { "common": "Coins", "uncommon": "Nice haul!", "rare": "Rare find!", "epic": "JACKPOT!" } },
     "wreck": { "reportTitle": "Tower raided!", "reportBody": "{name} knocked off {floors} floors while you were away. Here's a scramble to fight back.", "defaultName": "A rival" },
-    "error": { "too_short": "Too short: 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
+    "error": { "too_short": "Too short: 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary", "rejected": "Word not accepted", "no_player": "You're not in this match", "self_target": "You can't bomb your own tower" },
     "celebration": { "highRise": "High Rise!", "tall": "Towering!", "skyscraper": "SKYSCRAPER!" },
     "leaderboard": { "title": "Top Towers", "error": "Couldn't load leaderboard", "empty": "No towers yet. Be the first.", "floors": "{count} floors" },
     "share": { "title": "Word Tower", "button": "Share", "text": "I reached {m} m in Word Tower. Beat my tower!" },
@@ -3007,7 +3007,7 @@ const en = {
       "blast": "BLAST!",
       "wordHunt": "WORD HUNT!",
       "wheelRush": "WHEEL RUSH!",
-      "classic": "CLASSIC!"
+      "classic": "CLASSIC!", "crossword": "CROSSWORD!", "wordTower": "WORD TOWER!"
     }
   },
   "help": {
@@ -15544,6 +15544,12 @@ const en = {
       "step1": "Swipe letters to spell a word",
       "step2": "Tap to drop it dead center",
       "scoreTip": "Every word adds a floor. Go high"
+    },
+    "party": {
+      "title": "Pass the Phone",
+      "step1": "Drag letters to spell words",
+      "step2": "Pass the phone when time's up",
+      "scoreTip": "Only words no one else found score"
     },
     "connections": {
       "title": "Find the Links",

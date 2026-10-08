@@ -14,6 +14,7 @@ import type { Bot } from '../../modules/botBehavior';
 import { getGame } from '../../modules/gameStateManager';
 import * as botManager from '../../modules/botManager';
 import logger from '../../utils/logger';
+import { getGameModeRules } from '../../modes/rules';
 import { markBotScoringStart } from './botScoreGate';
 import type { BotRoundContext } from './botEngine';
 import { startBoardWordBots } from './botClassic';
@@ -69,7 +70,7 @@ export function startBotsForGame(
   restoreBotsForGame(gameCode);
   const bots: Bot[] = botManager.getGameBots(gameCode);
   const game = getGame(gameCode);
-  if (bots.length === 0 || !game) return;
+  if (bots.length === 0 || !game || getGameModeRules(game.gameMode).humanOnly) return;
 
   markBotScoringStart(gameCode);
   const ctx: BotRoundContext = { io, gameCode, language, gameEndTime: Date.now() + timerSeconds * 1000 };

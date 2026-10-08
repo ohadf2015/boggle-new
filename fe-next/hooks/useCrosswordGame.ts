@@ -53,10 +53,19 @@ function now(): number {
 
 export function useCrosswordGame(
   puzzle: CrosswordPuzzle,
-  opts: { onSolved?: () => void; onWordSolved?: () => void } = {},
+  opts: {
+    onSolved?: () => void;
+    onWordSolved?: () => void;
+    /** Save slot (defaults to the puzzle id); a race uses its own so solo progress never leaks in. */
+    progressKey?: string;
+    /** Solo crossword analytics (start/end); off for a multiplayer race. */
+    telemetry?: boolean;
+  } = {},
 ): UseCrosswordGame {
+  const progressKey = opts.progressKey ?? puzzle.id;
+  const telemetry = opts.telemetry ?? true;
   const [state, setState] = useState<GameState>(() => {
-    const saved = loadProgress(puzzle.id);
+    const saved = loadProgress(progressKey);
     return initGame(puzzle, saved?.entries ?? {}, saved?.revealedCells ?? []);
   });
 
@@ -72,7 +81,7 @@ export function useCrosswordGame(
   onWordSolvedRef.current = opts.onWordSolved;
 
   const startRef = useRef<number>(now());
-  const baseElapsedRef = useRef<number>(loadProgress(puzzle.id)?.elapsedMs ?? 0);
+  const baseElapsedRef = useRef<number>(loadProgress(progressKey)?.elapsedMs ?? 0);
   const [elapsedMs, setElapsedMs] = useState<number>(baseElapsedRef.current);
   const solvedFiredRef = useRef(false);
 
@@ -95,19 +104,19 @@ export function useCrosswordGame(
   // localStorage ~4×/sec). Time is captured from the ref here and on unmount.
   useEffect(() => {
     saveProgress({
-      ...emptyProgress(puzzle.id, Date.now()),
+      ...emptyProgress(progressKey, Date.now()),
       entries: state.entries,
       revealedCells: state.revealed,
       status: state.status,
       elapsedMs: elapsedRef.current,
     });
-  }, [state.entries, state.revealed, state.status, puzzle.id]);
+  }, [state.entries, state.revealed, state.status, progressKey]);
 
   // Flush latest elapsed time on unmount.
   useEffect(() => {
     return () => {
       saveProgress({
-        ...emptyProgress(puzzle.id, Date.now()),
+        ...emptyProgress(progressKey, Date.now()),
         entries: stateRef.current.entries,
         revealedCells: stateRef.current.revealed,
         status: stateRef.current.status,
@@ -115,7 +124,7 @@ export function useCrosswordGame(
       });
     };
      
-  }, [puzzle.id]);
+  }, [progressKey]);
 
   // Fire onWordSolved each time a new word becomes fully correct (excluding the
   // final solve, which fires onSolved). Refs avoid spurious re-runs when the
@@ -137,8 +146,8 @@ export function useCrosswordGame(
     if (startFiredRef.current) return;
     if (state.status === 'solved') return;
     startFiredRef.current = true;
-    emitCrosswordGameStart(puzzle);
-  }, [state.status, puzzle]);
+    if (telemetry) emitCrosswordGameStart(puzzle);
+  }, [state.status, puzzle, telemetry]);
 
   // Fire onSolved once.
   useEffect(() => {
@@ -146,10 +155,10 @@ export function useCrosswordGame(
       solvedFiredRef.current = true;
       // Record completion to analytics_events so solved puzzles appear in the
       // admin game log (read from elapsedRef so the duration is current).
-      emitCrosswordGameEnd(puzzle, elapsedRef.current);
+      if (telemetry) emitCrosswordGameEnd(puzzle, elapsedRef.current);
       onSolvedRef.current?.();
     }
-  }, [state.status, puzzle]);
+  }, [state.status, puzzle, telemetry]);
 
   const focusCell = useCallback((row: number, col: number) => {
     setState((s) => focusCellFn(s, row, col));
@@ -194,13 +203,13 @@ export function useCrosswordGame(
   }, []);
 
   const reset = useCallback(() => {
-    clearProgress(puzzle.id);
+    clearProgress(progressKey);
     baseElapsedRef.current = 0;
     startRef.current = now();
     setElapsedMs(0);
     solvedFiredRef.current = false;
     setState(initGame(puzzle));
-  }, [puzzle]);
+  }, [puzzle, progressKey]);
 
   const activeSlot = useMemo(() => currentSlot(state), [state]);
 

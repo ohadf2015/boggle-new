@@ -1783,6 +1783,12 @@ const sv = {
       "step2": "Tryck för att släppa mitt i prick",
       "scoreTip": "Varje ord = en våning upp"
     },
+  "party": {
+    "title": "Skicka telefonen",
+    "step1": "Dra över bokstäver till ord",
+    "step2": "Skicka telefonen när tiden är slut",
+    "scoreTip": "Bara ord ingen annan hittat ger poäng"
+  },
     "connections": {
       "title": "Hitta länken",
       "step1": "Gruppera fyra relaterade ord",
@@ -2791,7 +2797,7 @@ const sv = {
       "bad_chain": "Börja på den lysande bokstaven",
       "not_buildable": "Använd brickornas bokstäver",
       "duplicate": "Ordet är redan använt",
-      "not_in_dictionary": "Inte i ordlistan"
+      "not_in_dictionary": "Inte i ordlistan", "rejected": "Ordet godkändes inte", "no_player": "Du är inte med i den här matchen", "self_target": "Du kan inte bomba ditt eget torn"
     },
     "celebration": {
       "highRise": "Höghus!",
@@ -3686,7 +3692,7 @@ const sv = {
       "blast": "BLAST!",
       "wordHunt": "ORDJAKT!",
       "wheelRush": "HJULRUSH!",
-      "classic": "KLASSISKT!"
+      "classic": "KLASSISKT!", "crossword": "KORSORD!", "wordTower": "ORDTORNET!"
     }
   },
   "help": {

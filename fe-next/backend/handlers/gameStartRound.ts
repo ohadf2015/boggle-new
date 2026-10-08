@@ -43,8 +43,9 @@ export async function checkInWorkModeAccess(socket: Socket, game: GameState, mod
     const { data: profile } = await supabase.from('profiles').select('is_admin, is_beta_tester').eq('id', hostAuthId).single();
     allowed = canAccessInWorkMode(profile);
   }
-  if (allowed && rules.languages && !rules.languages.includes(boardLang)) allowed = false;
-  return allowed ? null : `${rules.betaName} is in beta`;
+  if (!allowed) return `${rules.betaName} is in beta`;
+  if (rules.languages && !rules.languages.includes(boardLang)) return `${rules.betaName} is not available in this language yet`;
+  return null;
 }
 
 /**
