@@ -13483,7 +13483,8 @@ const sv = {
       "listening": "Lyssnar efter klassrumsspel...",
       "connecting": "Ansluter till klassrummet...",
       "idleHint": "När din lärare startar ett spel visas det här",
-      "joinFailed": "Du kom inte in. Spelet kan ha tagit slut. Fråga din lärare efter koden."
+      "joinEnded": "Spelet är slut. Fråga din lärare efter nästa.",
+      "joinRetry": "Vi kom inte in dig än. Tryck på Gå med för att försöka igen. Om det fortsätter, be läraren starta spelet igen."
     },
     "playWithClass": {
       "title": "Spela med klassen",

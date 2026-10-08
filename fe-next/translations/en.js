@@ -11804,7 +11804,8 @@ const en = {
       "listening": "Listening for classroom games...",
       "connecting": "Connecting to classroom...",
       "idleHint": "When your teacher starts a game, you'll see it here",
-      "joinFailed": "Couldn't get you in. The game may have ended. Ask your teacher for the code."
+      "joinEnded": "This game is over. Ask your teacher for the next one.",
+      "joinRetry": "Couldn't get you in yet. Tap Join to try again. If it keeps failing, ask your teacher to start the game again."
     },
     "playWithClass": {
       "title": "Play with class",

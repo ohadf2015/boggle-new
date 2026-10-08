@@ -13260,7 +13260,8 @@ const es = {
       "listening": "Esperando juegos de clase...",
       "connecting": "Conectando al aula...",
       "idleHint": "Cuando tu profesor inicie un juego, aparecerá aquí",
-      "joinFailed": "No pudimos meterte: puede que la partida ya haya terminado. Pídele el código a tu profe."
+      "joinEnded": "La partida ya terminó. Pídele a tu profe la siguiente.",
+      "joinRetry": "Todavía no pudimos meterte. Toca Unirme para intentarlo de nuevo. Si sigue fallando, pídele a tu profe que vuelva a iniciar la partida."
     },
     "playWithClass": {
       "title": "Jugar con la clase",
