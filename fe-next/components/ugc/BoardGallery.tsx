@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import Link from 'next/link';
 import { Layout, Search, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -15,7 +15,7 @@ interface GalleryResponse {
   boards: BoardCardBoard[];
   total: number;
   page: number;
-  hasMore: boolean;
+  hasMore?: boolean;
 }
 
 const SORT_TABS: { key: SortOption; label: string; icon: string }[] = [
@@ -33,6 +33,14 @@ const DIFFICULTY_CHIPS: { key: DifficultyFilter; label: string; color: string }[
 
 const LIMIT = 12;
 
+/** UI sort keys → backend `/api/ugc/boards/gallery` sort values. */
+const SORT_PARAM: Record<SortOption, string> = {
+  featured: 'featured',
+  popular: 'popular',
+  newest: 'newest',
+  topRated: 'top_rated',
+};
+
 interface BoardGalleryProps {
   onPlay?: (boardCode: string) => void;
 }
@@ -47,13 +55,16 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  // Once the visitor picks a sort tab themselves we never auto-switch it.
+  const userPickedSort = useRef(false);
 
   const fetchBoards = useCallback(
     async (currentSort: SortOption, currentDifficulty: DifficultyFilter | null, currentPage: number, append = false) => {
       setLoading(true);
+      let switchedToPopular = false;
       try {
         const params = new URLSearchParams({
-          sort: currentSort,
+          sort: SORT_PARAM[currentSort],
           page: String(currentPage),
           limit: String(LIMIT),
         });
@@ -62,12 +73,29 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
         const res = await fetch(`/api/ugc/boards/gallery?${params.toString()}`, { method: 'GET' });
         if (!res.ok) return;
         const data: GalleryResponse = await res.json();
+        const total = data.total ?? 0;
+
+        // Nothing has been featured yet: show the community's boards
+        // (popular) instead of a "No boards yet" empty state.
+        if (
+          currentSort === 'featured' &&
+          !currentDifficulty &&
+          !append &&
+          total === 0 &&
+          !userPickedSort.current
+        ) {
+          switchedToPopular = true;
+          setSort('popular');
+          return;
+        }
 
         setBoards(prev => append ? [...prev, ...(data.boards ?? [])] : (data.boards ?? []));
-        setTotal(data.total);
-        setHasMore(data.hasMore);
+        setTotal(total);
+        // Backend returns { boards, total, page, limit } (no hasMore).
+        setHasMore(data.hasMore ?? currentPage * LIMIT < total);
       } finally {
-        setLoading(false);
+        // Keep the spinner up while the popular fallback fetch runs.
+        if (!switchedToPopular) setLoading(false);
       }
     },
     []
@@ -89,6 +117,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
   }, []);
 
   const handleSortChange = useCallback((key: SortOption) => {
+    userPickedSort.current = true;
     setSort(key);
   }, []);
 

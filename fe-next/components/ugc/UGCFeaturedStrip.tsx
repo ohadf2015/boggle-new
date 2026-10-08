@@ -27,6 +27,8 @@ interface UGCFeaturedStripProps {
   minToShow?: number;
   /** Additional CSS classes */
   className?: string;
+  /** Called once the fetch settles with the number of boards received. */
+  onLoaded?: (count: number) => void;
 }
 
 /**
@@ -44,6 +46,7 @@ const UGCFeaturedStrip = memo<UGCFeaturedStripProps>(({
   showViewAll = true,
   minToShow = 1,
   className,
+  onLoaded,
 }) => {
   const { t, language, dir } = useLanguage();
   const router = useRouter();
@@ -70,6 +73,10 @@ const UGCFeaturedStrip = memo<UGCFeaturedStripProps>(({
   }, [sort, limit]);
 
   useEffect(() => { fetchBoards(); }, [fetchBoards]);
+
+  useEffect(() => {
+    if (loaded) onLoaded?.(boards.length);
+  }, [loaded, boards.length, onLoaded]);
 
   const handlePlay = useCallback((boardCode: string) => {
     router.push(`/${language}/community/${boardCode}`);
