@@ -12,3 +12,7 @@ export function nextChestPhase(phase: ChestPhase, reducedMotion: boolean): Chest
 export function oddsLabel(rarity: ChestRarity): string {
   return `${Math.round(CHEST_ODDS[rarity] * 100)}%`;
 }
+
+export function chestArtSrc(rarity: ChestRarity, revealed: boolean): string {
+  return `/images/classroom-chests/classroom-chest-${rarity}-${revealed ? 'open' : 'closed'}.webp`;
+}

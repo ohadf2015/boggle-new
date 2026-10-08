@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { CHEST_ODDS, CHEST_RARITIES } from '@/shared/constants/classroomEconomy';
-import { nextChestPhase, oddsLabel } from '../chestPhase';
+import { chestArtSrc, nextChestPhase, oddsLabel } from '../chestPhase';
 
 describe('nextChestPhase', () => {
   it('Given a sealed chest, When opened with motion on, Then it shakes first', () => {
@@ -28,5 +28,15 @@ describe('oddsLabel', () => {
   it('Given the published odds, Then they add up to 100 percent', () => {
     const total = CHEST_RARITIES.reduce((sum, r) => sum + Math.round(CHEST_ODDS[r] * 100), 0);
     expect(total).toBe(100);
+  });
+});
+
+describe('chestArtSrc', () => {
+  it('Given a rarity, When sealed, Then the closed art for that rarity is returned', () => {
+    expect(chestArtSrc('epic', false)).toBe('/images/classroom-chests/classroom-chest-epic-closed.webp');
+  });
+
+  it('Given a rarity, When revealed, Then the open art for that rarity is returned', () => {
+    expect(chestArtSrc('common', true)).toBe('/images/classroom-chests/classroom-chest-common-open.webp');
   });
 });

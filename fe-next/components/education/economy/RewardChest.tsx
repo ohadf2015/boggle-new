@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { hapticGameWin } from '@/utils/haptics';
 import { COSMETICS } from '@/lib/cosmetics';
 import { CHEST_RARITIES, type ChestRarity, type ClassroomChestReveal } from '@/shared/constants/classroomEconomy';
-import { nextChestPhase, oddsLabel, type ChestPhase } from './chestPhase';
+import { chestArtSrc, nextChestPhase, oddsLabel, type ChestPhase } from './chestPhase';
 
 const CONFETTI = Array.from({ length: 12 }, (_, i) => i);
 
@@ -53,7 +53,7 @@ export default function RewardChest({ reveal, onClose }: RewardChestProps) {
             type="button"
             onClick={phase === 'sealed' ? open : undefined}
             aria-label={t('economy.chest.open')}
-            className="h-32 w-32 rounded-xl border-4 border-black bg-neo-lime text-4xl shadow-[6px_6px_0_0_#000]"
+            className="flex h-32 w-32 items-center justify-center"
             animate={
               phase === 'shaking'
                 ? { rotate: [0, -8, 8, -8, 8, 0] }
@@ -67,7 +67,7 @@ export default function RewardChest({ reveal, onClose }: RewardChestProps) {
               if (phase === 'bursting') advance('revealed');
             }}
           >
-            {t('economy.chest.open')}
+            <img src={chestArtSrc(rarity, false)} alt="" className="h-full w-full object-contain" />
           </m.button>
         )}
 
@@ -76,9 +76,10 @@ export default function RewardChest({ reveal, onClose }: RewardChestProps) {
             initial={reduced ? false : { scale: 0.4 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 260, damping: 14 }}
-            className="flex h-32 w-32 flex-col items-center justify-center rounded-xl border-4 border-black bg-neo-cream text-neo-navy shadow-[6px_6px_0_0_#000]"
+            className="flex flex-col items-center gap-1"
             data-testid="chest-reveal"
           >
+            <img src={chestArtSrc(rarity, true)} alt="" className="h-32 w-32 object-contain" />
             <span className="text-xs font-bold uppercase">{t(`economy.chest.rarity.${rarity}`)}</span>
             <span className="text-lg font-bold">{t('economy.chest.xp', { xp: reveal.xp })}</span>
             {itemName && <span className="text-xs">{t(itemName)}</span>}
