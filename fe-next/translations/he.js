@@ -10782,6 +10782,7 @@ const he = {
       "wikipediaWords": "מילות ויקיפדיה",
       "wordBank": "בנק מילים",
       "webVitals": "ביצועי אתר",
+      "education": "סקירת חינוך",
       "guests": "אורחים",
       "exitToSite": "יציאה לאתר",
       "email": "אימייל",

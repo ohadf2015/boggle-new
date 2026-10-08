@@ -11050,6 +11050,7 @@ const ja = {
       "wikipediaWords": "Wikipedia単語",
       "wordBank": "単語バンク",
       "webVitals": "Webパフォーマンス",
+      "education": "教育の概要",
       "guests": "ゲスト",
       "exitToSite": "サイトに戻る",
       "email": "メール",

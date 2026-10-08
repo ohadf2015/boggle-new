@@ -17604,6 +17604,7 @@ const en = {
       "invalidWords": "Invalid Words",
       "milogWords": "Milog Words",
       "webVitals": "Web Vitals",
+      "education": "Education overview",
       "guests": "Guests",
       "exitToSite": "Exit to site",
       "wikipediaWords": "Wikipedia Words",

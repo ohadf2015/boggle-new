@@ -11136,6 +11136,7 @@ const sv = {
       "wikipediaWords": "Wikipedia-ord",
       "wordBank": "Ordbank",
       "webVitals": "Webbprestanda",
+      "education": "Utbildningsöversikt",
       "guests": "Gäster",
       "exitToSite": "Lämna adminläget",
       "email": "E-post",

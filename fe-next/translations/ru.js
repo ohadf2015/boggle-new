@@ -8743,6 +8743,7 @@ const ru = {
       "invalidWords": "Невалидные слова",
       "milogWords": "Слова Milog",
       "webVitals": "Web Vitals",
+      "education": "Обзор образования",
       "guests": "Гости",
       "exitToSite": "Выход на сайт",
       "wikipediaWords": "Слова Wikipedia",

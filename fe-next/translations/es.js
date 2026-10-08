@@ -10857,6 +10857,7 @@ const es = {
       "wikipediaWords": "Palabras Wikipedia",
       "wordBank": "Banco de Palabras",
       "webVitals": "Rendimiento Web",
+      "education": "Resumen educativo",
       "guests": "Invitados",
       "exitToSite": "Salir del panel",
       "email": "Correo",
