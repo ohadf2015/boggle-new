@@ -65,7 +65,7 @@ describe('Education Landing — eg2 conversion pass', () => {
   it('has a header with a home link and a free start, so the page is not a dead end', () => {
     mockUseAuth.mockReturnValue(anon);
     render(<EducationPageClient />);
-    expect(screen.getByTestId('landing-header-home')).toHaveAttribute('href', '/en');
+    expect(screen.getByTestId('landing-header-home')).toHaveAttribute('href', '/en/education');
     expect(screen.getByTestId('landing-header-start')).toHaveAttribute('href', '/en/education/access');
   });
 

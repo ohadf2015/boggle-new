@@ -31,9 +31,9 @@ describe('LandingHeader', () => {
     track.mockClear();
   });
 
-  it('has a logo that goes home, so the teacher page is not a dead end', () => {
+  it('has a logo that goes to the education home, so no edu page leaks to the marketing home', () => {
     render(<LandingHeader />);
-    expect(screen.getByTestId('landing-header-home')).toHaveAttribute('href', '/he');
+    expect(screen.getByTestId('landing-header-home')).toHaveAttribute('href', '/he/education');
   });
 
   it('puts the free start one tap away, straight to the access page', () => {
