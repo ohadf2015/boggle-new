@@ -9,6 +9,9 @@ import {
   type PowerUpId,
 } from '@/shared/constants/classroomEconomy';
 
+const SNAPSHOT_RETRY_MS = 2000;
+const MAX_SNAPSHOT_ASKS = 5;
+
 interface HintPayload {
   letter: string;
   length: number;
@@ -39,6 +42,16 @@ export function useClassroomEconomy(gameCode: string | null) {
   useEffect(() => {
     requestState();
   }, [requestState]);
+
+  const [asks, setAsks] = useState(0);
+  useEffect(() => {
+    if (snapshot || asks >= MAX_SNAPSHOT_ASKS) return;
+    const timer = setTimeout(() => {
+      setAsks((n) => n + 1);
+      requestState();
+    }, SNAPSHOT_RETRY_MS);
+    return () => clearTimeout(timer);
+  }, [snapshot, asks, requestState]);
 
   const buy = useCallback(
     (powerUpId: PowerUpId) => {

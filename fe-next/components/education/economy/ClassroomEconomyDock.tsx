@@ -29,7 +29,7 @@ export default function ClassroomEconomyDock({ gameCode }: ClassroomEconomyDockP
 
   return (
     <>
-      <div className="fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-2 bg-neo-navy/95 px-3 py-2">
+      <div className="relative z-40 flex shrink-0 items-center justify-between gap-2 bg-neo-navy px-3 py-2">
         {econ.snapshot ? <EconomyHud snapshot={econ.snapshot} /> : <span className="text-xs text-white/70">{t('economy.hud.loading')}</span>}
         <div className="flex gap-2">
           {econ.snapshot?.config.powerUps && (

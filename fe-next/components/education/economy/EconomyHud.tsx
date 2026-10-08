@@ -22,7 +22,7 @@ export default function EconomyHud({ snapshot }: EconomyHudProps) {
 
   return (
     <div className="flex items-center gap-3 text-sm font-bold text-white" aria-live="polite">
-      <span className="relative inline-flex items-center gap-1" data-testid="hud-cash">
+      <span className="relative inline-flex items-center gap-1 text-2xl" data-testid="hud-cash">
         <span>{t('economy.hud.cash', { cash: snapshot.cash })}</span>
         {delta?.kind === 'correct' && delta.delta > 0 && (
           <m.span
