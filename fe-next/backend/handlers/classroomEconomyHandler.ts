@@ -7,7 +7,8 @@
 import type { Server, Socket } from 'socket.io';
 import { getAuthUserId } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
-import { getGameState, getRedisClient } from '../redisClient.js';
+import { getRedisClient } from '../redisClient.js';
+import { getGameAsync } from '../modules/gameStateManager.js';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { CLASSROOM_ECONOMY_EVENTS } from '@/shared/constants/classroomEconomy';
 import {
@@ -37,7 +38,7 @@ export function roundIdOf(game: { gameSessionId?: unknown } | null | undefined, 
 }
 
 async function roundOf(gameCode: string): Promise<string | null> {
-  const game = await getGameState(gameCode);
+  const game = await getGameAsync(gameCode);
   return game ? roundIdOf(game as { gameSessionId?: unknown }, gameCode) : null;
 }
 
@@ -120,8 +121,8 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
     const gameCode = typeof data?.gameCode === 'string' ? data.gameCode : null;
     const roundId = typeof data?.roundId === 'string' ? data.roundId : null;
     if (!userId || !gameCode || !roundId || !checkRateLimit(socket.id)) return;
-    const game = await getGameState(gameCode);
-    if (!game || !roundIsOver((game as { cachedResultsPayload?: unknown }).cachedResultsPayload, roundId)) {
+    const game = await getGameAsync(gameCode);
+    if (!game || game.gameState !== 'finished' || roundId !== roundIdOf(game, gameCode) || !roundIsOver(game.cachedResultsPayload, roundId)) {
       socket.emit(E.reward, null);
       return;
     }
@@ -156,7 +157,7 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
     if (!roundId || !(await isPlayer(gameCode, userId))) return;
     const res = await spendHintFor({ gameCode, roundId, userId, now: Date.now() });
     if (!res.ok) { socket.emit(E.error, { reason: res.reason }); return; }
-    const game = await getGameState(gameCode);
+    const game = await getGameAsync(gameCode);
     const words = ((game as { lessonVocabulary?: string[] } | null)?.lessonVocabulary ?? []).filter((w) => w.length > 0);
     if (words.length === 0) { socket.emit(E.error, { reason: 'no_lesson_words' }); return; }
     const pick = words[Math.floor(Math.random() * words.length)];

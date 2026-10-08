@@ -4,6 +4,7 @@ const grant = vi.fn();
 const classroomGame = { value: null as unknown };
 const lockerRows = new Map<string, unknown[]>();
 const gameState = { value: { gameSessionId: 'sess-7' } as unknown };
+const memGame = { value: { gameSessionId: 'sess-7' } as unknown };
 const applyCorrect = vi.fn();
 const buyPowerUpFor = vi.fn();
 const handlers: Record<string, (data: unknown) => Promise<void>> = {};
@@ -35,6 +36,9 @@ vi.mock('../../redisClient', () => ({
   getGameState: async () => gameState.value,
   getRedisClient: () => null,
 }));
+vi.mock('../../modules/gameStateManager', () => ({
+  getGameAsync: async () => memGame.value,
+}));
 vi.mock('../classroomSocketAuth.js', () => ({ getAuthUserId: () => 'u1' }));
 vi.mock('../../utils/rateLimiter.js', () => ({ checkRateLimit: () => true }));
 
@@ -62,6 +66,7 @@ beforeEach(() => {
   applyCorrect.mockReset();
   classroomGame.value = null;
   gameState.value = { gameSessionId: 'sess-7' };
+  memGame.value = { gameSessionId: 'sess-7' };
 });
 
 describe('classroomEconomy:requestLocker', () => {
@@ -88,7 +93,7 @@ describe('classroomEconomy:requestReward', () => {
   }
 
   it('Given the round has ended, Then the student gets their reveal back on their own socket', async () => {
-    gameState.value = { gameSessionId: 7, cachedResultsPayload: { gameSessionId: 7 } };
+    memGame.value = { gameSessionId: 7, gameState: 'finished', cachedResultsPayload: { gameSessionId: 7 } };
     classroomGame.value = { players: [{ userId: 'u1' }], teacherId: 't' };
     grant.mockResolvedValue(reveal);
     const { emitted } = handlerSocket();
@@ -97,8 +102,27 @@ describe('classroomEconomy:requestReward', () => {
     expect(emitted).toEqual([{ event: 'classroomEconomy:reward', data: reveal }]);
   });
 
+  it('Given the in-memory round is finished but Redis has no session id, Then the chest is rolled for that round', async () => {
+    gameState.value = { cachedResultsPayload: null };
+    memGame.value = { gameSessionId: 7, gameState: 'finished', cachedResultsPayload: { gameSessionId: 7 } };
+    classroomGame.value = { players: [{ userId: 'u1' }], teacherId: 't' };
+    grant.mockResolvedValue(reveal);
+    handlerSocket();
+    await handlers['classroomEconomy:requestReward']({ gameCode: 'ABC', roundId: '7' });
+    expect(grant).toHaveBeenCalledWith(expect.objectContaining({ roundId: '7' }));
+  });
+
+  it('Given the client names a different round than the server is on, Then no chest is rolled', async () => {
+    memGame.value = { gameSessionId: 8, gameState: 'finished', cachedResultsPayload: { gameSessionId: 8 } };
+    classroomGame.value = { players: [{ userId: 'u1' }], teacherId: 't' };
+    const { emitted } = handlerSocket();
+    await handlers['classroomEconomy:requestReward']({ gameCode: 'ABC', roundId: '7' });
+    expect(grant).not.toHaveBeenCalled();
+    expect(emitted).toEqual([{ event: 'classroomEconomy:reward', data: null }]);
+  });
+
   it('Given the round is still running, Then no chest is rolled', async () => {
-    gameState.value = { gameSessionId: 7, cachedResultsPayload: null };
+    memGame.value = { gameSessionId: 7, gameState: 'playing', cachedResultsPayload: null };
     classroomGame.value = { players: [{ userId: 'u1' }], teacherId: 't' };
     const { emitted } = handlerSocket();
     await handlers['classroomEconomy:requestReward']({ gameCode: 'ABC', roundId: '7' });
@@ -107,7 +131,7 @@ describe('classroomEconomy:requestReward', () => {
   });
 
   it('Given a socket that is not a seated player, Then no chest is rolled', async () => {
-    gameState.value = { gameSessionId: 7, cachedResultsPayload: { gameSessionId: 7 } };
+    memGame.value = { gameSessionId: 7, gameState: 'finished', cachedResultsPayload: { gameSessionId: 7 } };
     classroomGame.value = { players: [{ userId: 'someone-else' }], teacherId: 't' };
     const { emitted } = handlerSocket();
     await handlers['classroomEconomy:requestReward']({ gameCode: 'ABC', roundId: '7' });
