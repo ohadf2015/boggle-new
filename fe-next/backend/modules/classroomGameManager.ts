@@ -90,7 +90,8 @@ export interface ClassroomGameSettings {
     largeText?: boolean;
     audioCues?: boolean;
     participationPoints?: boolean;
-  };
+  };  /** In-round economy switches (classroomEconomyStore). Absent = power-ups on, wrong-answer cost off. */
+  economy?: { wrongAnswerCost?: boolean; powerUps?: boolean };
 }
 
 export interface ClassroomGame {
