@@ -10918,6 +10918,23 @@ const es = {
         "openTop": "Abrir el primer docente"
       },
       "rescue": {
+        "nudge": {
+          "there": "profe",
+          "withCode": "Hola {name}, tu clase de LexiClash está lista. Los alumnos entran con el código {code} en {link}",
+          "noClass": "Hola {name}, tu cuenta de profesor en LexiClash está aprobada. Crea tu primera clase en {link} y luego comparte el código de acceso con tus alumnos.",
+          "subject": "Tu primer juego de LexiClash"
+        },
+        "cooldown": "Ya enviaste un recordatorio en los últimos 7 días.",
+        "logFailed": "No se pudo registrar. Inténtalo de nuevo.",
+        "copyFailed": "No se pudo copiar. Selecciona el texto del correo.",
+        "copiedUnlogged": "Copiado. El registro aún no está activo.",
+        "copied": "Copiado.",
+        "marked": "Marcado como contactado.",
+        "unavailable": "El registro aún no está activo.",
+        "nudged": "Recordatorio {date}",
+        "copy": "Copiar recordatorio",
+        "email": "Correo",
+        "mark": "Marcar como hecho",
         "title": "Lista de rescate",
         "empty": "Nadie está atascado en este paso.",
         "rowAction": {
@@ -10927,6 +10944,7 @@ const es = {
         "more": "más en Todos los docentes abajo"
       },
       "healthTitle": "Estado de los docentes",
+      "quiet": "Métricas tranquilas",
       "posthogHidden": "La conversión de la landing y del upsell está oculta: no hay clave de PostHog en el servidor.",
       "title": "Resumen educativo",
       "subtitle": "Se excluyen las cuentas de prueba. Las variaciones comparan con el periodo anterior.",

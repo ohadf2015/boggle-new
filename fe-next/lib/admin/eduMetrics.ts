@@ -56,6 +56,22 @@ export function periodDelta(current: number, prior: number): PeriodDelta {
 }
 
 /** Counts per day for the last `days` days, oldest first, ending on the day of `nowMs`. */
+/** Per day, how many distinct keys (e.g. classrooms) had at least one event. */
+export function dailyDistinct(
+  events: Array<{ key: string; ts: string | null | undefined }>,
+  nowMs: number,
+  days: number,
+): number[] {
+  const perDay = Array.from({ length: days }, () => new Set<string>());
+  for (const { key, ts } of events) {
+    const ms = toMs(ts);
+    if (ms === null || ms > nowMs) continue;
+    const ageDays = Math.floor((nowMs - ms) / DAY_MS);
+    if (ageDays < days) perDay[days - 1 - ageDays].add(key);
+  }
+  return perDay.map((set) => set.size);
+}
+
 export function dailySeries(
   timestamps: Array<string | null | undefined>,
   nowMs: number,

@@ -36,8 +36,10 @@ export interface RawRound {
 export interface EduRawRows {
   profiles: RawProfile[];
   requests: RawRequest[];
-  classrooms: Array<{ id: string; teacher_id: string | null; name: string | null }>;
+  classrooms: Array<{ id: string; teacher_id: string | null; name: string | null; join_code: string | null }>;
   memberships: Array<{ classroom_id: string; student_id: string }>;
+  /** null when admin_edu_outreach is not migrated in this database. */
+  outreach: Array<{ teacher_id: string; channel: string; created_at: string }> | null;
   /** null when classroom_rounds is not migrated in this database. */
   rounds: RawRound[] | null;
   subscriptions: Array<{ user_id: string; status: string; created_at: string }>;
@@ -69,14 +71,19 @@ export function prepareEduDashboardInput(
   );
   const requested = new Set(requests.map(personKey)).size;
 
-  const latestApproval = new Map<string, { user_id: string | null; reviewed_at: string | null; trial_expires_at: string | null }>();
+  const latestApproval = new Map<string, NonNullable<EduDashboardInput['approvals'][number]>>();
   for (const r of requests) {
     if (r.status !== 'approved') continue;
     const key = personKey(r);
     const prev = latestApproval.get(key);
     const reviewed = toMs(r.reviewed_at);
     if (!prev || reviewed > toMs(prev.reviewed_at)) {
-      latestApproval.set(key, { user_id: r.user_id, reviewed_at: r.reviewed_at, trial_expires_at: r.trial_expires_at });
+      latestApproval.set(key, {
+        user_id: r.user_id,
+        reviewed_at: r.reviewed_at,
+        trial_expires_at: r.trial_expires_at,
+        email: r.email,
+      });
     }
   }
   const approvals = [...latestApproval.values()];
@@ -84,6 +91,7 @@ export function prepareEduDashboardInput(
   const classrooms = raw.classrooms.filter((c) => !(c.teacher_id && testIds.has(c.teacher_id)));
   const classroomIds = new Set(classrooms.map((c) => c.id));
   const memberships = raw.memberships.filter((m) => classroomIds.has(m.classroom_id));
+  const outreach = raw.outreach ? raw.outreach.filter((o) => !testIds.has(o.teacher_id)) : null;
 
   const rounds = raw.rounds === null ? null : raw.rounds.filter((r) => !testIds.has(r.teacher_id));
 
@@ -103,6 +111,7 @@ export function prepareEduDashboardInput(
     requested,
     classrooms,
     memberships,
+    outreach,
     rounds,
     subscriptions,
   };

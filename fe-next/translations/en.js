@@ -17538,6 +17538,23 @@ const en = {
         "openTop": "Open top teacher"
       },
       "rescue": {
+        "nudge": {
+          "there": "there",
+          "withCode": "Hi {name}, your LexiClash class is ready. Students join with code {code} at {link}",
+          "noClass": "Hi {name}, your LexiClash teacher account is approved. Create your first class at {link}, then share the join code with your students.",
+          "subject": "Your first LexiClash game"
+        },
+        "cooldown": "Already nudged in the last 7 days.",
+        "logFailed": "Could not log this. Try again.",
+        "copyFailed": "Could not copy. Select the text from the email instead.",
+        "copiedUnlogged": "Copied. Logging is not set up yet.",
+        "copied": "Copied.",
+        "marked": "Marked as contacted.",
+        "unavailable": "Logging is not set up yet.",
+        "nudged": "Nudged {date}",
+        "copy": "Copy nudge",
+        "email": "Email",
+        "mark": "Mark done",
         "title": "Rescue list",
         "empty": "No one is stuck at this step.",
         "rowAction": {
@@ -17547,6 +17564,7 @@ const en = {
         "more": "more in All teachers below"
       },
       "healthTitle": "Teacher health",
+      "quiet": "Quiet metrics",
       "posthogHidden": "Landing and upsell conversion are hidden: no server PostHog key is configured.",
       "title": "Education overview",
       "subtitle": "Test accounts excluded. Deltas compare with the prior period.",

@@ -5,37 +5,63 @@ import type { PeriodDelta } from '@/lib/admin/eduMetrics';
 import { formatDelta, useEntered, type EduDashboardView } from './eduDashboardShared';
 import { useCountUp } from './useCountUp';
 
+interface Tile {
+  key: keyof EduDashboardView['kpis'];
+  label: string;
+  delta: PeriodDelta | null;
+  spark: number[] | null;
+  unmeasured: boolean;
+}
+
 export function EduKpiGrid({ data }: { data: EduDashboardView }) {
   const { t } = useLanguage();
   const k = data.kpis;
-  const tiles: Array<{ key: string; label: string; delta: PeriodDelta | null; spark: number[] | null }> = [
-    { key: 'activeTeachers', label: t('admin.eduDashboard.kpi.activeTeachers', 'Active teachers'), delta: k.activeTeachers, spark: data.sparklines.activeTeachers },
-    { key: 'newTeachers', label: t('admin.eduDashboard.kpi.newTeachers', 'New teachers'), delta: k.newTeachers, spark: null },
-    { key: 'classesWithLiveGame', label: t('admin.eduDashboard.kpi.classesWithLiveGame', 'Classes with a live game'), delta: k.classesWithLiveGame, spark: null },
-    { key: 'liveRounds', label: t('admin.eduDashboard.kpi.liveRounds', 'Live rounds played'), delta: k.liveRounds, spark: data.sparklines.liveRounds },
-    { key: 'trialsStarted', label: t('admin.eduDashboard.kpi.trialsStarted', 'Pro trials started'), delta: k.trialsStarted, spark: null },
-    { key: 'trialsPaid', label: t('admin.eduDashboard.kpi.trialsPaid', 'Trials converted to paid'), delta: k.trialsPaid, spark: null },
+  const s = data.sparklines;
+  const roundsTile = (key: keyof EduDashboardView['kpis']) =>
+    (key === 'classesWithLiveGame' || key === 'liveRounds') && !data.roundsAvailable;
+  const tile = (key: keyof EduDashboardView['kpis'], label: string): Tile => ({
+    key,
+    label,
+    delta: k[key],
+    spark: s[key],
+    unmeasured: roundsTile(key),
+  });
+  const tiles: Tile[] = [
+    tile('activeTeachers', t('admin.eduDashboard.kpi.activeTeachers', 'Active teachers')),
+    tile('newTeachers', t('admin.eduDashboard.kpi.newTeachers', 'New teachers')),
+    tile('trialsStarted', t('admin.eduDashboard.kpi.trialsStarted', 'Pro trials started')),
+    tile('trialsPaid', t('admin.eduDashboard.kpi.trialsPaid', 'Trials converted to paid')),
+    tile('classesWithLiveGame', t('admin.eduDashboard.kpi.classesWithLiveGame', 'Classes with a live game')),
+    tile('liveRounds', t('admin.eduDashboard.kpi.liveRounds', 'Live rounds played')),
   ];
+  const isQuiet = (x: Tile) => x.unmeasured || !x.delta || (x.delta.current === 0 && x.delta.prior === 0);
+  const active = tiles.filter((x) => !isQuiet(x));
+  const quiet = tiles.filter(isQuiet);
   const noData = t('admin.eduDashboard.noData', 'No data yet');
 
+  const renderTile = (x: Tile) => (
+    <KpiTile
+      key={x.key}
+      testId={`kpi-${x.key}`}
+      label={x.label}
+      value={x.unmeasured || !x.delta ? null : x.delta.current}
+      delta={formatDelta(x.delta)}
+      noData={noData}
+      spark={x.unmeasured ? null : x.spark}
+    />
+  );
+
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-      {tiles.map((tile) => {
-        const roundsTile = tile.key === 'classesWithLiveGame' || tile.key === 'liveRounds';
-        const missing = roundsTile && !data.roundsAvailable;
-        const delta = formatDelta(tile.delta);
-        return (
-          <KpiTile
-            key={tile.key}
-            testId={`kpi-${tile.key}`}
-            label={tile.label}
-            value={missing || !tile.delta ? null : tile.delta.current}
-            delta={delta}
-            noData={noData}
-            spark={missing ? null : tile.spark}
-          />
-        );
-      })}
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">{active.map(renderTile)}</div>
+      {quiet.length > 0 && (
+        <details data-testid="quiet-metrics" className="rounded border border-white/10 p-3">
+          <summary className="cursor-pointer text-xs font-semibold text-white/60">
+            {t('admin.eduDashboard.quiet', 'Quiet metrics')} ({quiet.length})
+          </summary>
+          <div className="mt-3 grid grid-cols-2 gap-3 xl:grid-cols-4">{quiet.map(renderTile)}</div>
+        </details>
+      )}
     </div>
   );
 }
@@ -62,10 +88,10 @@ function KpiTile({
       {value === null ? (
         <p className="mt-1 text-sm text-white/50">{noData}</p>
       ) : (
-        <>
+        <div className="flex items-end justify-between gap-2">
           <p className="mt-1 text-2xl font-bold tabular-nums">{shown}</p>
           <p className="text-xs tabular-nums text-white/60">{delta ?? '—'}</p>
-        </>
+        </div>
       )}
       {spark && <Sparkline values={spark} />}
     </div>

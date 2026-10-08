@@ -11111,6 +11111,23 @@ const ja = {
         "openTop": "最上位の教師を開く"
       },
       "rescue": {
+        "nudge": {
+          "there": "先生",
+          "withCode": "{name}先生、LexiClashのクラスの準備ができました。生徒はコード {code} を {link} で入力して参加できます",
+          "noClass": "{name}先生、LexiClashの教師アカウントが承認されました。{link} で最初のクラスを作成し、生徒に参加コードを共有してください。",
+          "subject": "LexiClashの最初のゲーム"
+        },
+        "cooldown": "過去7日以内にすでに連絡済みです。",
+        "logFailed": "記録できませんでした。もう一度お試しください。",
+        "copyFailed": "コピーできませんでした。メールの文面を選択してください。",
+        "copiedUnlogged": "コピーしました。記録機能はまだ設定されていません。",
+        "copied": "コピーしました。",
+        "marked": "連絡済みとして記録しました。",
+        "unavailable": "記録機能はまだ設定されていません。",
+        "nudged": "{date} に連絡済み",
+        "copy": "連絡文をコピー",
+        "email": "メール",
+        "mark": "連絡済みにする",
         "title": "救済リスト",
         "empty": "この段階で止まっている人はいません。",
         "rowAction": {
@@ -11120,6 +11137,7 @@ const ja = {
         "more": "件はすべての教師の下に表示"
       },
       "healthTitle": "教師の状態",
+      "quiet": "静かな指標",
       "posthogHidden": "ランディングとアップセルのコンバージョンは非表示です。サーバーの PostHog キーが未設定です。",
       "title": "教育の概要",
       "subtitle": "テストアカウントは除外しています。変化率は前期間との比較です。",

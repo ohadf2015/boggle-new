@@ -27,7 +27,7 @@ export async function fetchEduRawRows(supabase: SupabaseClient, sinceIso: string
       .range(from, to),
   );
   const classrooms = await fetchAllRows((from, to) =>
-    supabase.from('classrooms').select('id, teacher_id, name').order('id').range(from, to),
+    supabase.from('classrooms').select('id, teacher_id, name, join_code').order('id').range(from, to),
   );
   const memberships = await fetchAllRows((from, to) =>
     supabase
@@ -43,6 +43,19 @@ export async function fetchEduRawRows(supabase: SupabaseClient, sinceIso: string
       .eq('status', 'active')
       .order('id')
       .range(from, to),
+  );
+
+  let outreachError: PostgrestLikeError | null = null;
+  const outreach = await fetchAllRows<{ teacher_id: string; channel: string; created_at: string }>((from, to) =>
+    supabase
+      .from('admin_edu_outreach')
+      .select('id, teacher_id, channel, created_at')
+      .order('id')
+      .range(from, to)
+      .then((res) => {
+        outreachError = res.error ?? null;
+        return res;
+      }),
   );
 
   let roundsError: PostgrestLikeError | null = null;
@@ -62,6 +75,12 @@ export async function fetchEduRawRows(supabase: SupabaseClient, sinceIso: string
   const failure = [profiles, requests, classrooms, memberships, subscriptions].find((r) => r.error);
   if (failure?.error) return { ok: false, error: failure.error };
 
+  let outreachRows: Array<{ teacher_id: string; channel: string; created_at: string }> | null = outreach.data;
+  if (outreach.error) {
+    if (!migrationPendingHint(outreachError)) return { ok: false, error: outreach.error };
+    outreachRows = null;
+  }
+
   let roundsRows: RawRound[] | null = rounds.data;
   if (rounds.error) {
     if (!migrationPendingHint(roundsError)) return { ok: false, error: rounds.error };
@@ -75,6 +94,7 @@ export async function fetchEduRawRows(supabase: SupabaseClient, sinceIso: string
       requests: requests.data,
       classrooms: classrooms.data,
       memberships: memberships.data,
+      outreach: outreachRows,
       rounds: roundsRows,
       subscriptions: subscriptions.data,
     },

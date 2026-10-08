@@ -11203,6 +11203,23 @@ const sv = {
         "openTop": "Öppna främsta läraren"
       },
       "rescue": {
+        "nudge": {
+          "there": "lärare",
+          "withCode": "Hej {name}, din LexiClash-klass är klar. Eleverna ansluter med koden {code} på {link}",
+          "noClass": "Hej {name}, ditt lärarkonto på LexiClash är godkänt. Skapa din första klass på {link} och dela sedan anslutningskoden med dina elever.",
+          "subject": "Ditt första LexiClash-spel"
+        },
+        "cooldown": "Redan påmind de senaste 7 dagarna.",
+        "logFailed": "Kunde inte logga detta. Försök igen.",
+        "copyFailed": "Kunde inte kopiera. Markera texten i mejlet i stället.",
+        "copiedUnlogged": "Kopierat. Loggningen är inte inställd än.",
+        "copied": "Kopierat.",
+        "marked": "Markerad som kontaktad.",
+        "unavailable": "Loggningen är inte inställd än.",
+        "nudged": "Påmind {date}",
+        "copy": "Kopiera påminnelse",
+        "email": "Mejl",
+        "mark": "Markera som klar",
         "title": "Räddningslista",
         "empty": "Ingen fastnar på det här steget.",
         "rowAction": {
@@ -11212,6 +11229,7 @@ const sv = {
         "more": "fler under Alla lärare nedan"
       },
       "healthTitle": "Lärarnas hälsa",
+      "quiet": "Tysta mätvärden",
       "posthogHidden": "Konvertering från landningssida och uppsälj är dold: ingen PostHog-serverkey är konfigurerad.",
       "title": "Utbildningsöversikt",
       "subtitle": "Testkonton exkluderas. Förändringar jämförs med föregående period.",

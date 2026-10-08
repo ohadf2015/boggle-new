@@ -9,6 +9,7 @@
 
 import {
   countInRange,
+  dailyDistinct,
   dailySeries,
   funnelConversion,
   periodDelta,
@@ -28,11 +29,18 @@ export interface EduDashboardInput {
   windowDays: WindowDays;
   teachers: Array<{ id: string; name: string | null; last_seen_at: string | null }>;
   /** Non-test access requests that were approved. */
-  approvals: Array<{ user_id: string | null; reviewed_at: string | null; trial_expires_at: string | null }>;
+  approvals: Array<{
+    user_id: string | null;
+    reviewed_at: string | null;
+    trial_expires_at: string | null;
+    email?: string | null;
+  }>;
   /** Number of non-test access requests, any status — the top of the funnel. */
   requested: number;
-  classrooms: Array<{ id: string; teacher_id: string | null; name: string | null }>;
+  classrooms: Array<{ id: string; teacher_id: string | null; name: string | null; join_code?: string | null }>;
   memberships: Array<{ classroom_id: string; student_id: string }>;
+  /** Owner outreach log. Null when admin_edu_outreach is not migrated in this database. */
+  outreach: Array<{ teacher_id: string; channel: string; created_at: string }> | null;
   rounds: Array<{
     classroom_id: string | null;
     teacher_id: string;
@@ -66,6 +74,14 @@ export interface TeacherRow {
   stage: TeacherStage | null;
 }
 
+export interface RescueRow extends TeacherRow {
+  email: string | null;
+  joinCode: string | null;
+  lastOutreachAt: string | null;
+}
+
+export type SparkKey = keyof KpiSet;
+
 export interface EduVerdict {
   /** Funnel step where the biggest drop lands, e.g. 'student'. */
   stepKey: string;
@@ -78,7 +94,7 @@ export interface EduVerdict {
   /** False when the leak is the application step: there is no approved cohort to rescue. */
   cohortAvailable: boolean;
   /** Teachers stuck at `fromKey`, most recently active first, capped for display. */
-  rescue: TeacherRow[];
+  rescue: RescueRow[];
   rescueTotal: number;
 }
 
@@ -100,9 +116,10 @@ export interface ModeRow {
 export interface EduDashboard {
   windowDays: WindowDays;
   roundsAvailable: boolean;
+  outreachAvailable: boolean;
   kpis: KpiSet;
   /** One value per day over the window, oldest first, keyed by KPI. Null where unmeasured. */
-  sparklines: Record<'activeTeachers' | 'liveRounds', number[] | null>;
+  sparklines: Record<SparkKey, number[] | null>;
   teachers: TeacherRow[];
   classes: ClassRow[];
   dyingClasses: ClassRow[];
@@ -167,6 +184,18 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
     }
     return ids.size;
   };
+
+  const emailOf = new Map<string, string | null>();
+  for (const a of input.approvals) if (a.user_id) emailOf.set(a.user_id, a.email ?? null);
+  const joinCodeOf = new Map<string, string>();
+  for (const c of input.classrooms) {
+    if (c.teacher_id && c.join_code && !joinCodeOf.has(c.teacher_id)) joinCodeOf.set(c.teacher_id, c.join_code);
+  }
+  const lastOutreachOf = new Map<string, string>();
+  for (const o of input.outreach ?? []) {
+    const prev = lastOutreachOf.get(o.teacher_id);
+    if (!prev || (toMs(o.created_at) ?? 0) > (toMs(prev) ?? 0)) lastOutreachOf.set(o.teacher_id, o.created_at);
+  }
 
   const kpis: KpiSet = {
     activeTeachers: periodDelta(countWin(teacherTs, false), countWin(teacherTs, true)),
@@ -275,15 +304,32 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
     { key: 'classroom', count: stageCount('classroom') },
     { key: 'student', count: stageCount('student') },
   ]);
-  const verdict = buildVerdict(funnel, approvedIds, stageOf, teacherRow, input.teachers);
+  const rescueExtras = (id: string) => ({
+    email: emailOf.get(id) ?? null,
+    joinCode: joinCodeOf.get(id) ?? null,
+    lastOutreachAt: lastOutreachOf.get(id) ?? null,
+  });
+  const verdict = buildVerdict(funnel, approvedIds, stageOf, teacherRow, input.teachers, rescueExtras);
 
   return {
     windowDays,
     roundsAvailable: rounds !== null,
     kpis,
+    outreachAvailable: input.outreach !== null,
     sparklines: {
       activeTeachers: dailySeries(teacherTs, nowMs, windowDays),
+      newTeachers: dailySeries(input.approvals.map((a) => a.reviewed_at), nowMs, windowDays),
+      classesWithLiveGame:
+        rounds === null
+          ? null
+          : dailyDistinct(
+              rounds.map((r) => ({ key: r.classroom_id ?? '', ts: r.completed_at })).filter((e) => e.key !== ''),
+              nowMs,
+              windowDays,
+            ),
       liveRounds: rounds === null ? null : dailySeries(rounds.map((r) => r.completed_at), nowMs, windowDays),
+      trialsStarted: dailySeries(trialStarts, nowMs, windowDays),
+      trialsPaid: dailySeries(paidTs, nowMs, windowDays),
     },
     teachers,
     classes,
@@ -302,6 +348,7 @@ function buildVerdict(
   stageOf: Map<string, TeacherStage>,
   teacherRow: (id: string, name: string | null, lastActiveAt: string | null) => TeacherRow,
   profiles: EduDashboardInput['teachers'],
+  rescueExtras: (id: string) => Pick<RescueRow, 'email' | 'joinCode' | 'lastOutreachAt'>,
 ): EduVerdict | null {
   const drop = funnel.findIndex((s) => s.isBiggestDrop);
   if (drop < 1 || funnel[0].count === 0) return null;
@@ -315,7 +362,10 @@ function buildVerdict(
   const cohort = cohortAvailable
     ? approvedIds
         .filter((id) => stageOf.get(id) === cohortStage)
-        .map((id) => teacherRow(id, nameOf.get(id)?.name ?? null, nameOf.get(id)?.last ?? null))
+        .map((id): RescueRow => ({
+          ...teacherRow(id, nameOf.get(id)?.name ?? null, nameOf.get(id)?.last ?? null),
+          ...rescueExtras(id),
+        }))
         .sort(
           (a, b) =>
             (toMs(b.lastActiveAt) ?? -Infinity) - (toMs(a.lastActiveAt) ?? -Infinity) ||

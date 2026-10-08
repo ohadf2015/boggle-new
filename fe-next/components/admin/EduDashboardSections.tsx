@@ -15,7 +15,6 @@ export function EduDashboardSections({ data }: { data: EduDashboardView }) {
   return (
     <div className="space-y-4">
       <EduVerdictHero verdict={data.verdict ?? null} />
-      <EduKpiGrid data={data} />
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="space-y-4">
           <EduFunnelCard steps={data.funnel} />
@@ -23,6 +22,7 @@ export function EduDashboardSections({ data }: { data: EduDashboardView }) {
         </div>
         <EduRescueList verdict={data.verdict ?? null} />
       </div>
+      <EduKpiGrid data={data} />
       <EduTeacherTable rows={data.teachers} />
       <div className="grid gap-4 lg:grid-cols-2">
         <DyingClassesCard rows={data.dyingClasses} />

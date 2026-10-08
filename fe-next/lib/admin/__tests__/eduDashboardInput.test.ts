@@ -76,7 +76,7 @@ describe('prepareEduDashboardInput', () => {
       30,
     );
     expect(input.approvals).toEqual([
-      { user_id: 't1', reviewed_at: daysAgo(1), trial_expires_at: daysAgo(-9) },
+      { user_id: 't1', reviewed_at: daysAgo(1), trial_expires_at: daysAgo(-9), email: 'a@school.org' },
     ]);
   });
 
