@@ -1,7 +1,8 @@
 -- Independent 30-day expectations for /api/admin/edu-dashboard?window=30.
 -- Written from the metric definitions, not from the TypeScript: test accounts and
 -- machine requests are excluded here, counts are distinct people, windows are
--- (start, end]. Run read-only; compare with verify.ts --expected.
+-- (start, end]. Run read-only via execute_sql immediately before verify.ts, and save
+-- the one-row JSON result as the expected file (never commit a copy: it goes stale).
 with w as (
   select now() as end_at, now() - interval '30 days' as start_at, now() - interval '60 days' as prior_start
 ),
@@ -56,5 +57,9 @@ select
      where a.user_id is not null and exists (
        select 1 from classes c join public.classroom_memberships m on m.classroom_id = c.id
        where c.teacher_id = a.user_id)) as funnel_student,
+  (select count(*) from public.classroom_rounds r, w where r.completed_at > w.start_at and r.completed_at <= w.end_at
+     and not exists (select 1 from public.profiles p where p.id = r.teacher_id and p.is_test_account)) as live_rounds_cur,
+  (select count(*) from public.classroom_rounds r, w where r.completed_at > w.prior_start and r.completed_at <= w.start_at
+     and not exists (select 1 from public.profiles p where p.id = r.teacher_id and p.is_test_account)) as live_rounds_prior,
   (select count(*) from classes) as classes_total,
   (select count(distinct m.student_id) from public.classroom_memberships m join classes c on c.id = m.classroom_id) as students_distinct;

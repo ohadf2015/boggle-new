@@ -3,8 +3,9 @@
  * fetch (fetchEduRawRows) and the same prepare/build code, then compares each 30-day
  * KPI and funnel step with the numbers from expected.sql.
  *
- * Usage (service-role env exported in the shell, never committed):
- *   npx tsx scripts/edu-dashboard/verify.ts scripts/edu-dashboard/expected-30d.json
+ * Usage: run expected.sql live (execute_sql) and save its one-row JSON to a scratch
+ * file, then immediately run with the service-role env loaded (values never printed):
+ *   node --env-file=.env.local --import tsx scripts/edu-dashboard/verify.ts <expected.json>
  * Exit 0 = every number matches. Exit 1 = mismatch, printed per field.
  */
 import { readFileSync } from 'node:fs';
@@ -17,6 +18,7 @@ async function main() {
   const expectedPath = process.argv[2];
   if (!expectedPath) throw new Error('usage: verify.ts <expected.json>');
   const expected = JSON.parse(readFileSync(expectedPath, 'utf8')) as Record<string, number>;
+  if (Object.keys(expected).length === 0) throw new Error('expected file is empty');
 
   const supabase = getSupabaseAdmin();
   if (!supabase) throw new Error('Supabase service env not set');
@@ -40,6 +42,8 @@ async function main() {
     trials_started_prior: dash.kpis.trialsStarted.prior,
     trials_paid_cur: dash.kpis.trialsPaid.current,
     trials_paid_prior: dash.kpis.trialsPaid.prior,
+    live_rounds_cur: dash.kpis.liveRounds?.current ?? -1,
+    live_rounds_prior: dash.kpis.liveRounds?.prior ?? -1,
     funnel_requested: funnel.requested,
     funnel_approved: funnel.approved,
     funnel_classroom: funnel.classroom,
