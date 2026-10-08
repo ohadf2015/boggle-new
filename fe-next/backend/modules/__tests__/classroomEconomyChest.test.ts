@@ -5,10 +5,14 @@ function fakeDeps(claim: 'claimed' | 'taken' | 'unavailable', insertError: unkno
   const inserted: Record<string, unknown>[] = [];
   const xp: Array<[string, number]> = [];
   const parts: Array<[string, string]> = [];
+  const removed: Array<Record<string, unknown>> = [];
   const store = new Map<string, ChestReveal>();
   const deps: ChestDeps = {
     claim: vi.fn(async () => claim),
     release: vi.fn(async () => {}),
+    removeRow: vi.fn(async (row: Record<string, unknown>) => {
+      removed.push(row);
+    }),
     grantPart: vi.fn(async (userId: string, partKey: string) => {
       if (grantError) throw grantError;
       parts.push([userId, partKey]);
@@ -25,7 +29,7 @@ function fakeDeps(claim: 'claimed' | 'taken' | 'unavailable', insertError: unkno
     }),
     recall: vi.fn(async (key: string) => store.get(key) ?? null),
   };
-  return { deps, inserted, xp, store, parts };
+  return { deps, inserted, xp, store, parts, removed };
 }
 
 const input = { gameCode: 'ABC', roundId: 'sess-1', userId: 'u1', summary: { roundCash: 12, rank: 2, size: 5 } };
@@ -40,18 +44,20 @@ describe('grantRoundChest', () => {
     expect(xp).toEqual([['u1', chest!.xp]]);
   });
 
-  it('Given a first claim, When granted, Then the chest part is owned before the row is written', async () => {
+  it('Given a first claim, When granted, Then the row is written before the chest part is owned', async () => {
     const { deps, parts, inserted } = fakeDeps('claimed');
     const chest = await grantRoundChest(input, deps);
     expect(parts).toEqual([['u1', chest!.itemId]]);
     expect(inserted).toHaveLength(1);
-    expect(deps.grantPart).toHaveBeenCalledBefore(deps.insert as never);
+    expect(deps.insert).toHaveBeenCalledBefore(deps.grantPart as never);
   });
 
-  it('Given the part write fails, When granted, Then nothing is written or awarded and the claim is released', async () => {
-    const { deps, inserted, xp } = fakeDeps('claimed', null, new Error('profile write down'));
+  it('Given the part write fails, When granted, Then the row is removed, no XP is awarded and the claim is released', async () => {
+    const { deps, inserted, xp, removed, parts } = fakeDeps('claimed', null, new Error('profile write down'));
     expect(await grantRoundChest(input, deps)).toBeNull();
-    expect(inserted).toHaveLength(0);
+    expect(parts).toHaveLength(0);
+    expect(inserted).toHaveLength(1);
+    expect(removed).toEqual([{ gameCode: 'ABC', roundId: 'sess-1', userId: 'u1' }]);
     expect(xp).toHaveLength(0);
     expect(deps.release).toHaveBeenCalledTimes(1);
   });
@@ -79,8 +85,9 @@ describe('grantRoundChest', () => {
   });
 
   it('Given the row insert fails, When granted, Then no XP is awarded and the claim is released for a retry', async () => {
-    const { deps, xp } = fakeDeps('claimed', new Error('db down'));
+    const { deps, xp, parts } = fakeDeps('claimed', new Error('db down'));
     expect(await grantRoundChest(input, deps)).toBeNull();
+    expect(parts).toHaveLength(0);
     expect(xp).toHaveLength(0);
     expect(deps.release).toHaveBeenCalledWith('classroom-chest:ABC:sess-1:u1');
   });

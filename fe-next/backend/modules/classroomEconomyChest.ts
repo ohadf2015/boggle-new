@@ -4,8 +4,8 @@
  * that was already granted, never a second roll. Contents are cosmetic plus
  * XP only; nothing here touches coins.
  *
- * Fails closed: no claim, no part, no row, no XP. The part is owned before the
- * row is written and is idempotent, so a retry after a failed row write is safe.
+ * Fails closed: no claim, no row, no part, no XP. The row is written first so an
+ * unmigrated table grants nothing at all; a failed part write removes the row.
  */
 
 import { claimOnce, type ClaimResult } from '@/lib/server/claimOnce';
@@ -29,6 +29,7 @@ export interface ChestDeps {
   insert: (row: Record<string, unknown>) => Promise<{ error: unknown }>;
   /** Idempotent: owning a part twice is a no-op. Throws on failure. */
   grantPart: (userId: string, partKey: string) => Promise<void>;
+  removeRow: (row: { gameCode: string; roundId: string; userId: string }) => Promise<void>;
   grantXp: (userId: string, amount: number) => Promise<void>;
   remember: (key: string, reveal: ChestReveal) => Promise<void>;
   recall: (key: string) => Promise<ChestReveal | null>;
@@ -51,13 +52,6 @@ export async function grantRoundChest(input: RoundChestInput, deps: ChestDeps = 
   }
 
   const chest = rollChest(`${input.gameCode}:${input.roundId}:${input.userId}`);
-  try {
-    await deps.grantPart(input.userId, chest.itemId);
-  } catch (err) {
-    logger.error('CLASSROOM_ECONOMY', `Chest part failed for ${input.userId} in ${input.gameCode}: ${(err as Error).message}`);
-    await deps.release(key);
-    return null;
-  }
   const { error } = await deps.insert({
     game_code: input.gameCode,
     round_id: input.roundId,
@@ -68,6 +62,16 @@ export async function grantRoundChest(input: RoundChestInput, deps: ChestDeps = 
   });
   if (error) {
     logger.error('CLASSROOM_ECONOMY', `Chest row failed for ${input.userId} in ${input.gameCode}: ${String(error)}`);
+    await deps.release(key);
+    return null;
+  }
+  try {
+    await deps.grantPart(input.userId, chest.itemId);
+  } catch (err) {
+    logger.error('CLASSROOM_ECONOMY', `Chest part failed for ${input.userId} in ${input.gameCode}: ${(err as Error).message}`);
+    await deps.removeRow({ gameCode: input.gameCode, roundId: input.roundId, userId: input.userId }).catch((cleanup) =>
+      logger.error('CLASSROOM_ECONOMY', `Chest row cleanup failed for ${input.userId}: ${String(cleanup)}`)
+    );
     await deps.release(key);
     return null;
   }
@@ -107,6 +111,17 @@ function defaultChestDeps(): ChestDeps {
       if (!supabase) return { error: new Error('supabase not configured') };
       const { error } = await supabase.from('classroom_chest_rewards').insert(row);
       return { error };
+    },
+    removeRow: async ({ gameCode, roundId, userId }) => {
+      const supabase = getSupabase();
+      if (!supabase) return;
+      const { error } = await supabase
+        .from('classroom_chest_rewards')
+        .delete()
+        .eq('game_code', gameCode)
+        .eq('round_id', roundId)
+        .eq('user_id', userId);
+      if (error) throw new Error(error.message);
     },
     grantPart: async (userId, partKey) => {
       const supabase = getSupabase();
