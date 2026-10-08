@@ -139,6 +139,9 @@ const es = {
         "title": "Potenciadores",
         "cash": "Dinero: {cash}",
         "cost": "Coste: {cost}",
+        "owned": "Tuyo",
+        "roundOnly": "Solo durante una ronda",
+        "buy": "Comprar",
         "doubleCash": {
           "name": "Doble dinero",
           "desc": "2x de dinero durante 30 segundos. Solo para ti."
@@ -172,6 +175,7 @@ const es = {
       },
       "error": {
         "power_ups_off": "Los potenciadores están desactivados en esta clase",
+        "between_rounds": "El doble funciona durante una ronda",
         "insufficient_cash": "Aún no tienes dinero suficiente",
         "already_active": "Ya está activo",
         "already_held": "Ya tienes uno",

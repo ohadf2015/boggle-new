@@ -139,6 +139,9 @@ const sv = {
         "title": "Power-ups",
         "cash": "Pengar: {cash}",
         "cost": "Pris: {cost}",
+        "owned": "Ägs",
+        "roundOnly": "Bara under en runda",
+        "buy": "Köp",
         "doubleCash": {
           "name": "Dubbla pengar",
           "desc": "2x pengar i 30 sekunder. Bara för dig."
@@ -172,6 +175,7 @@ const sv = {
       },
       "error": {
         "power_ups_off": "Power-ups är avstängda i den här klassen",
+        "between_rounds": "Dubbla poäng fungerar under en runda",
         "insufficient_cash": "Inte tillräckligt med pengar ännu",
         "already_active": "Redan aktiv",
         "already_held": "Du har redan en",
