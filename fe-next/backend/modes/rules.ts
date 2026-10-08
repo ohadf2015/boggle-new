@@ -54,7 +54,7 @@ export const GAME_MODE_RULES: Record<GameMode, GameModeRules> = {
   'word-tower': { ...BOARD, betaName: 'Word Tower', fixedTimerSec: WORD_TOWER_VERSUS_MATCH_S, humanOnly: true },
   // 5 rounds x (30s bid + 5s reveal) = 175s + buffer.
   // Generous race cap (a 5x5 can take minutes).
-  crossword: { ...BOARD, betaName: 'Crossword', fixedTimerSec: 420, humanOnly: true, languages: ['en', 'he'] },
+  crossword: { ...BOARD, betaName: 'Crossword', fixedTimerSec: 420, humanOnly: true, languages: ['en', 'he', 'sv'] },
   // Per-student lesson-dealt race: 5min clock, no classic bots, shared list
   // words bank at full value for everyone who crafts them.
   wordcraft: { ...BOARD, defaultTimerSec: 300, humanOnly: true, duplicatesAllowed: true, rarityScoring: false },

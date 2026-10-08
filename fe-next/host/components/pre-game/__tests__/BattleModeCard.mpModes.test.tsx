@@ -36,7 +36,7 @@ describe('BattleModeCard — MP mode list (Ohad 2026-09-27)', () => {
     const { unmount } = render(<BattleModeCard {...baseProps} showInWorkModes language="he" />);
     expect(screen.getByTestId('game-mode-crossword')).toBeInTheDocument();
     unmount();
-    render(<BattleModeCard {...baseProps} showInWorkModes language="sv" />);
+    render(<BattleModeCard {...baseProps} showInWorkModes language="ja" />);
     expect(screen.queryByTestId('game-mode-crossword')).not.toBeInTheDocument();
   });
 
@@ -48,7 +48,7 @@ describe('BattleModeCard — MP mode list (Ohad 2026-09-27)', () => {
 
   it('leaves non-picker selections (e.g. classroom wordcraft) alone', () => {
     const setSelectedGameMode = vi.fn();
-    render(<BattleModeCard {...baseProps} setSelectedGameMode={setSelectedGameMode} selectedGameMode={'wordcraft' as never} language="sv" />);
+    render(<BattleModeCard {...baseProps} setSelectedGameMode={setSelectedGameMode} selectedGameMode={'wordcraft' as never} language="ja" />);
     expect(setSelectedGameMode).not.toHaveBeenCalled();
   });
 });
