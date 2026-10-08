@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
 import { WifiOff, RefreshCw } from 'lucide-react';
-import { OFFLINE_MODES } from '@/lib/offline/offlineCapableModes';
+import { LAUNCHER_MODES } from '@/lib/offline/offlineCapableModes';
 
 interface OfflineFallbackProps {
   /** Callback when retry button is clicked */
@@ -92,7 +92,7 @@ export function OfflineFallback({ onRetry, isRetrying = false }: OfflineFallback
           {t('native.offline.playablePrompt')}
         </p>
         <div className="flex flex-col gap-3">
-          {OFFLINE_MODES.map(({ labelKey, entry }) => (
+          {LAUNCHER_MODES.map(({ labelKey, entry }) => (
             <Link
               key={labelKey}
               href={entry(language)}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { OfflineFallback } from '../OfflineFallback';
-import { OFFLINE_MODES } from '@/lib/offline/offlineCapableModes';
+import { LAUNCHER_MODES } from '@/lib/offline/offlineCapableModes';
 
 const { mockLang } = vi.hoisted(() => ({ mockLang: { current: 'en', dir: 'ltr' as 'ltr' | 'rtl' } }));
 
@@ -116,12 +116,14 @@ describe('OfflineFallback', () => {
       expect(screen.getByText('No internet? You can still play:')).toBeInTheDocument();
     });
 
-    it('offers a link for EVERY offline-capable mode (derived from OFFLINE_MODES)', () => {
+    it('offers a link for every launcher mode and none for unreleased ones', () => {
       mockLang.current = 'en';
       mockLang.dir = 'ltr';
       const { container } = render(<OfflineFallback onRetry={() => {}} />);
 
-      for (const mode of OFFLINE_MODES) {
+      expect(container.querySelector('a[href="/en/crossword"]')).toBeNull();
+      expect(container.querySelector('a[href="/en/blast/v2"]')).toBeNull();
+      for (const mode of LAUNCHER_MODES) {
         const href = mode.entry('en');
         expect(
           container.querySelector(`a[href="${href}"]`),
