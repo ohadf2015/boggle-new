@@ -56,6 +56,11 @@ describe('CrosswordVersus', () => {
     mp = { puzzle: PUZZLE, standings, raceOver: false, ready: true, startedAt: 1234 };
   });
 
+  it('shows the round clock counting down the server time', () => {
+    render(<CrosswordVersus socket={null} username="me" remainingTime={415} />);
+    expect(screen.getByTestId('crossword-timer')).toHaveTextContent('6:55');
+  });
+
   it('shows a waiting state before the puzzle arrives', () => {
     mp = { puzzle: null, standings: [], raceOver: false, ready: false };
     render(<CrosswordVersus socket={null} username="me" />);

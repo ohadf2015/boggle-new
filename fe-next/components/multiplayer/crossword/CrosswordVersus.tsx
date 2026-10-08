@@ -28,6 +28,7 @@ interface CrosswordVersusProps {
   socket: Socket | null;
   username: string;
   onQuit?: () => void;
+  remainingTime?: number | null;
 }
 
 function StandingsRail({ standings, me, t }: { standings: CrosswordStanding[]; me: string; t: (k: string, fallbackOrParams?: string | Record<string, string | number>) => string }) {
@@ -53,7 +54,7 @@ function StandingsRail({ standings, me, t }: { standings: CrosswordStanding[]; m
 /** Inner — only mounts once the puzzle exists so useCrosswordGame seeds correctly. */
 function CrosswordRace({
   puzzle, raceKey, username, standings, raceOver,
-  submitProgress, onQuit,
+  submitProgress, onQuit, remainingTime,
 }: {
   puzzle: CrosswordPuzzle;
   raceKey: string;
@@ -62,6 +63,7 @@ function CrosswordRace({
   raceOver: boolean;
   submitProgress: (u: { percent: number; solved: boolean; elapsedMs: number; score: number }) => void;
   onQuit?: () => void;
+  remainingTime?: number | null;
 }) {
   const { t, dir } = useLanguage();
   const game = useCrosswordGame(puzzle, { progressKey: raceKey, telemetry: false });
@@ -86,10 +88,15 @@ function CrosswordRace({
 
   return (
     <div className="fixed inset-0 flex h-[100dvh] flex-col bg-neo-navy p-3" dir={dir}>
-      {/* Header: exit + progress + timer */}
-      <div className="flex items-center gap-3">
+      {/* Header: exit + progress + timer; pe-14 clears the floating mute button. */}
+      <div className="flex items-center gap-3 pe-14">
         {onQuit && <ExitRoomButton onClick={onQuit} label={t('common.backToHome')} />}
         <span className="font-neo-display text-sm font-bold text-neo-cyan">{t('crossword.mp.title')}</span>
+        {remainingTime != null && remainingTime >= 0 && (
+          <span data-testid="crossword-timer" className={`ms-auto font-neo-display text-sm font-bold tabular-nums ${remainingTime <= 30 ? 'text-neo-pink' : 'text-neo-white'}`}>
+            {Math.floor(remainingTime / 60)}:{String(Math.floor(remainingTime % 60)).padStart(2, '0')}
+          </span>
+        )}
         <span className="ms-auto font-neo-body text-xs tabular-nums text-neo-cream/70">
           {stats.wordsSolved}{t('crossword.mp.statSeparator', '/')}{stats.wordsTotal} {t('crossword.mp.statPercent', '{{percent}}%', { percent: stats.percent })}
         </span>
@@ -156,7 +163,7 @@ function CrosswordRace({
   );
 }
 
-export function CrosswordVersus({ socket, username, onQuit }: CrosswordVersusProps) {
+export function CrosswordVersus({ socket, username, onQuit, remainingTime }: CrosswordVersusProps) {
   const { t, dir } = useLanguage();
   const versusSocket = socket as unknown as CrosswordMpSocketLike | null;
   const mp = useCrosswordMp(versusSocket);
@@ -180,6 +187,7 @@ export function CrosswordVersus({ socket, username, onQuit }: CrosswordVersusPro
       raceOver={mp.raceOver}
       submitProgress={mp.submitProgress}
       onQuit={onQuit}
+      remainingTime={remainingTime}
     />
   );
 }

@@ -342,10 +342,9 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
 
   // Gridless versus modes — per-player towers / crossword race.
   if (gameMode === 'word-tower' || gameMode === 'crossword') {
-    const Versus = gameMode === 'word-tower' ? WordTowerVersus : CrosswordVersus;
     return (
       <>
-        <Versus socket={socket} username={username} onQuit={handleStopGameClick} />
+        {gameMode === 'word-tower' ? <WordTowerVersus socket={socket} username={username} onQuit={handleStopGameClick} /> : <CrosswordVersus socket={socket} username={username} onQuit={handleStopGameClick} remainingTime={remainingTime} />}
         {connectionOverlays}
         {stopConfirm}
       </>
