@@ -39,6 +39,7 @@ import { useBlastCascade } from './hooks/useBlastCascade';
 import { useBlastWordHandler } from './hooks/useBlastWordHandler';
 import { useBlastGameEnd, type DeadEndFinaleTile } from './hooks/useBlastGameEnd';
 import { BlastContinueModal } from './BlastContinueModal';
+import { BlastLoadingGate } from './BlastLoadingGate';
 import { resolveBlastRecover, BLAST_MAX_LIVES } from './utils/blastLives';
 import type { BlastPregameBuff } from './BlastPregameBuffModal';
 import { useBlastBuffEffects } from './hooks/useBlastBuffEffects';
@@ -101,6 +102,9 @@ interface BlastGameProps {
   livesRemaining?: number;
   /** Called when a free revive consumes a life. Parent owns the run-level count. */
   onConsumeLife?: () => void;
+  /** MP only: loading-gate Retry when the server board never arrived — parent
+   *  re-requests game state over the socket (`requestGameState` resync path). */
+  onGridRetry?: () => void;
   /** True when rendered as the center slot of the MP desktop shell. Collapses
    *  BlastStage's own desktop side-rails (rivals/word-area) so the board fills
    *  the slot and stops duplicating the shell's rails. */
@@ -141,6 +145,7 @@ export function BlastGame({
   activeModifier,
   livesRemaining = BLAST_MAX_LIVES,
   onConsumeLife,
+  onGridRetry,
   isDesktopCanvas = false,
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
@@ -233,7 +238,7 @@ export function BlastGame({
   }, [engine.isCascading, engine.applyServerBoard]);
 
   // Dictionary cache for cascade word detection + validation gate
-  const { checkWord, isLoaded: isDictionaryReady } = useDictionaryCache(config.language);
+  const { checkWord, isLoaded: isDictionaryReady, retry: retryDictionary } = useDictionaryCache(config.language);
 
   // Enable sound gate on mount, disable on unmount
   useEffect(() => {
@@ -667,17 +672,21 @@ export function BlastGame({
     recorder: highlightRecorderRef.current,
   });
 
-  // Loading state — wait for both grid generation AND dictionary cache
+  // Loading state — wait for both grid generation AND dictionary cache.
+  // The gate owns the recovery ladder (status + Retry at 8s, stuck telemetry at
+  // 15s, Back to lobby at 30s) and the growth:blast_board_wait/_stuck events.
   if (!engine.grid || !isDictionaryReady) {
     return (
-      <div className="flex-1 flex items-center justify-center" data-testid="blast-loading">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-neo-lime border-t-transparent rounded-full animate-spin" />
-          <span className="text-neo-white text-sm font-bold">
-            {t('blast.generating')}
-          </span>
-        </div>
-      </div>
+      <BlastLoadingGate
+        gridReady={!!engine.grid}
+        dictionaryReady={isDictionaryReady}
+        mode={isMultiplayer ? 'mp' : 'solo'}
+        language={config.language}
+        t={t}
+        onDictionaryRetry={retryDictionary}
+        onGridRetry={onGridRetry}
+        onBackToLobby={onQuit}
+      />
     );
   }
 

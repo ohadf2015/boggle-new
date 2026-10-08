@@ -35,6 +35,10 @@ export interface MpBlastCanvasProps {
 function MpBlastCanvasImpl({ grid, username, socket, totalTime, onQuit, onWordWithComboType, onBoardCleared }: MpBlastCanvasProps) {
   const bridge = useBlastMultiplayerBridge({ letterGrid: grid, gridSize: grid?.[0]?.length ?? 4 });
   const onDeadEnd = useCallback(() => socket?.emit('blastDeadEnd'), [socket]);
+  // Loading-gate Retry when the server board never arrived: reuse the existing
+  // state-resync path (same emit the timer-stall watchdog uses in
+  // usePlayerPhase) — the server re-emits startGame with the current board.
+  const onGridRetry = useCallback(() => socket?.emit('requestGameState'), [socket]);
   return (
     <BlastGame
       config={bridge.config}
@@ -52,6 +56,7 @@ function MpBlastCanvasImpl({ grid, username, socket, totalTime, onQuit, onWordWi
       serverGrid={bridge.serverGrid}
       serverPointsOnly
       isDesktopCanvas
+      onGridRetry={onGridRetry}
     />
   );
 }

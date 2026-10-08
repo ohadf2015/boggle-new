@@ -31,6 +31,7 @@ import type { GameTimerReturn } from '@/hooks/useGameTimer';
 import { setMmdChanges } from '@/lib/results/rankedResultStore';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import { createTvRevealGate } from '@/components/education/results/classroomResultsDelivery';
+import { prewarmDictionary } from '@/hooks/useDictionaryCache';
 
 interface StartGameBroadcastExt extends StartGameBroadcast {
   gameSessionId?: number;
@@ -333,6 +334,14 @@ export function usePlayerGameEvents({
 
       wasInActiveGameRef.current = true;
       comboShieldsUsedRef.current = 0;
+
+      // The room language is first known here — start the dictionary fetch NOW
+      // (fire-and-forget, shared loading-promise dedupe) so a blast board does
+      // not mount into a cold cache on heavy game paths, where the hook itself
+      // defers the network (the MP "Generating grid..." hang, t_67330c55).
+      if (data.language) {
+        void prewarmDictionary(data.language);
+      }
 
       // Detect retry of same session: server re-fires startGame to clients that
       // didn't ack. We must NOT clobber in-flight game state (life, attempts) on
