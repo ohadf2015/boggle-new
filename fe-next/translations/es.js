@@ -19202,6 +19202,7 @@ const es = {
       "editAvatar": "Editar avatar",
       "codeLabel": "¿Tienes un código de sala?",
       "codeAria": "Código de sala, carácter {{n}} de {{total}}",
+      "codeHint": "6 caracteres del anfitrión · ¿Sin código? Pulsa Inicio rápido",
       "openArenas": "Arenas abiertas",
       "playingNow": "{{count}} jugando",
       "moreArenas": "+{{count}} más",

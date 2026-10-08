@@ -19190,6 +19190,7 @@ const ja = {
       "editAvatar": "アバターを編集",
       "codeLabel": "ルームコードある？",
       "codeAria": "ルームコード {{total}}文字中{{n}}文字目",
+      "codeHint": "ホストから届く6文字のコード・コードがなければクイックスタート",
       "openArenas": "参加できるアリーナ",
       "playingNow": "{{count}}人がプレイ中",
       "moreArenas": "ほか{{count}}件",

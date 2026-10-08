@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
+import { useEffect, useId, useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
 import { KeyRound, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
@@ -33,6 +33,7 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
   const [chars, setChars] = useState<string[]>(EMPTY);
   const [shake, setShake] = useState(0);
   const refs = useRef<Array<HTMLInputElement | null>>([]);
+  const hintId = useId();
   const wasBusy = useRef(false);
   /** Only a join THIS row submitted can fail here — quick play or a sheet's join must not clear it. */
   const submitted = useRef(false);
@@ -60,6 +61,7 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
   useEffect(() => {
     if (shake === 0) return;
     if (document.activeElement?.closest?.('[role="dialog"]')) return;
+    if (window.matchMedia?.('(pointer: coarse)').matches) return;
     refs.current[0]?.focus();
   }, [shake]);
 
@@ -150,6 +152,7 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
             spellCheck={false}
             maxLength={2}
             aria-label={t('mpUi.entry.codeAria', { n: i + 1, total: CODE_LENGTH })}
+            aria-describedby={hintId}
             className={cn(
               'h-12 lg:h-14 tv:h-20 w-full min-w-0 rounded-neo border-3 border-neo-black text-center font-neo-display! text-2xl! tv:text-4xl! font-bold uppercase outline-hidden transition-transform duration-100',
               'focus:-translate-y-0.5 focus:border-neo-lime focus:shadow-hard-sm disabled:opacity-60',
@@ -159,6 +162,7 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
           />
         ))}
       </div>
+      <p id={hintId} className="mt-2 text-xs tv:text-base font-bold text-neo-white/70">{t('mpUi.entry.codeHint')}</p>
     </div>
   );
 }
