@@ -162,14 +162,14 @@ describe('useHint', () => {
 });
 
 describe('applyRoundBoundary', () => {
-  it('Given a new round, Then streak, shield and double-cash reset but cash carries', () => {
+  it('Given a new round, Then streak and double-cash reset but cash and a held shield carry', () => {
     let s = applyRoundBoundary({ ...emptyEconomyState(), roundId: 'r1', cash: 40, streak: 5 }, 'r1');
     s = buyPowerUp(s, 'streakShield', NOW).state;
     s = buyPowerUp(s, 'doubleCash', NOW).state;
     const next = applyRoundBoundary(s, 'r2');
     expect(next.roundId).toBe('r2');
     expect(next.streak).toBe(0);
-    expect(next.shieldHeld).toBe(false);
+    expect(next.shieldHeld).toBe(true);
     expect(next.doubleCashUntil).toBeNull();
     expect(next.cash).toBe(s.cash);
     expect(next.cashEarned).toBe(s.cashEarned);

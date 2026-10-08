@@ -3,7 +3,8 @@
  * The store and socket layers call these and own all I/O, so every number a
  * student sees comes from one place the server computes.
  *
- * Cash carries across rounds. Streak, shield and double-cash do not.
+ * Cash and a held shield carry across rounds (the between-round shop sells
+ * them for the next round). Streak and double-cash do not.
  */
 
 import { COSMETICS } from '@/lib/cosmetics';
@@ -60,7 +61,7 @@ export function streakMultiplier(streak: number): 1 | 2 | 3 {
 
 export function applyRoundBoundary(state: EconomyState, roundId: string): EconomyState {
   if (state.roundId === roundId) return state;
-  return { ...state, roundId, roundCash: 0, streak: 0, shieldHeld: false, doubleCashUntil: null };
+  return { ...state, roundId, roundCash: 0, streak: 0, doubleCashUntil: null };
 }
 
 export function recordCorrectWord(

@@ -119,4 +119,14 @@ describe('round chest over a live socket', () => {
     expect(reveal?.roundId).toBe('7');
     expect(mocks.insert).toHaveBeenCalledTimes(1);
   });
+
+  it('Given the round is over, Then a double-cash power-up is refused until the next round', async () => {
+    mocks.game = { gameState: 'finished', gameSessionId: 7, cachedResultsPayload: null };
+    mocks.classroomGame = { teacherId: 't', players: [{ userId: 'student-1' }] };
+    const error = await new Promise<unknown>((resolve) => {
+      client.once('classroomEconomy:error', resolve);
+      client.emit('classroomEconomy:buyPowerUp', { gameCode: 'ABC123', powerUpId: 'doubleCash' });
+    });
+    expect(error).toEqual({ reason: 'between_rounds' });
+  });
 });

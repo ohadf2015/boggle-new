@@ -144,6 +144,8 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
     if (!userId || !gameCode || typeof data?.powerUpId !== 'string' || !checkRateLimit(socket.id)) return;
     const roundId = await roundOf(gameCode);
     if (!roundId || !(await isPlayer(gameCode, userId))) return;
+    const live = (await getGameAsync(gameCode))?.gameState !== 'finished';
+    if (!live && data.powerUpId === 'doubleCash') { socket.emit(E.error, { reason: 'between_rounds' }); return; }
     const res = await buyPowerUpFor({ gameCode, roundId, userId, powerUpId: data.powerUpId, now: Date.now() });
     if (res.ok) socket.emit(E.state, res.snapshot);
     else socket.emit(E.error, { reason: res.reason });
