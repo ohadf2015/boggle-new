@@ -13534,6 +13534,22 @@ const ru = {
         "untitled": "Урок без названия",
         "anonymousStudent": "Ученик {{id}}"
       },
+      "classGrid": {
+        "title": "Прогресс класса",
+        "empty": "В этом классе пока нет учеников или заданий",
+        "statusCompleted": "Выполнено",
+        "statusMissing": "Не сдано",
+        "copySummary": "Скопировать недельную сводку",
+        "copied": "Скопировано",
+        "copyFailed": "Не удалось скопировать. Выделите сводку и скопируйте её сами.",
+        "proNudge": "Pro: еженедельные отчёты на почту",
+        "summaryDue": "Заданий к сдаче",
+        "summaryCompleted": "Выполнено",
+        "summaryTopWords": "Лучшие слова",
+        "summaryAttention": "Нужно внимание",
+        "summaryNone": "нет",
+        "summaryMissing": "{{name}} (не сдано: {{count}})"
+      },
       "assignmentCompletion": {
         "title": "Сдача заданий",
         "submitted": "{{submitted}} / {{roster}} сдано",

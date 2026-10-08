@@ -14204,6 +14204,22 @@ const es = {
         "untitled": "Lección sin título",
         "anonymousStudent": "Alumno {{id}}"
       },
+      "classGrid": {
+        "title": "Progreso de la clase",
+        "empty": "Todavía no hay alumnos ni tareas en esta clase",
+        "statusCompleted": "Completada",
+        "statusMissing": "Falta",
+        "copySummary": "Copiar resumen semanal",
+        "copied": "Copiado",
+        "copyFailed": "No se pudo copiar. Selecciona el resumen y cópialo tú.",
+        "proNudge": "Pro: informes semanales por correo",
+        "summaryDue": "Tareas para entregar",
+        "summaryCompleted": "Completadas",
+        "summaryTopWords": "Palabras destacadas",
+        "summaryAttention": "Necesitan atención",
+        "summaryNone": "ninguna",
+        "summaryMissing": "{{name}} ({{count}} sin entregar)"
+      },
       "assignmentCompletion": {
         "title": "Entrega de tareas",
         "submitted": "{{submitted}} / {{roster}} entregadas",
