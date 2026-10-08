@@ -79,9 +79,11 @@ describe.each(LOCALES)('education route matrix, locale=%s', (locale) => {
   });
 
   describe('error / 404 boundary, exact', () => {
-    it.each(EDU_PAGES)('/%s → education landing', (path) => {
-      const bounced = path === 'education' || path === 'education/classroom-game';
-      const want = bounced ? at('education/for-schools') : at('education');
+    it.each(EDU_PAGES)('/%s → its role hub, or the education landing', (path) => {
+      let want = at('education');
+      if (path === 'education' || path === 'education/classroom-game') want = at('education/for-schools');
+      else if (path.startsWith('teacher/')) want = at('teacher');
+      else if (path.startsWith('student/') && path !== 'student/join') want = at('student');
       expect(sectionHome({ pathname: at(path) })).toBe(want);
     });
 
