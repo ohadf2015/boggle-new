@@ -9,7 +9,6 @@ import { TeacherProNavLink } from '@/components/teacher/TeacherProNavLink';
 
 interface EducationMenuDropdownProps {
   isTeacher: boolean;
-  /** Where "Exit Education" lands for this viewer's role. */
   exitHref?: string;
   isOnTeacherSection: boolean;
   isOnStudentSection: boolean;
@@ -162,7 +161,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
 
                 <div className="p-2">
                   <Link
-                    href={exitHref ?? `/${language}/education`}
+                    href={exitHref ?? `/${language}`}
                     onClick={() => setIsOpen(false)}
                     className={cn(
                       'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors w-full',

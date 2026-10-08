@@ -42,11 +42,8 @@ const ROLES = {
 } as const;
 
 type Role = keyof typeof ROLES;
-const EXPECTED_EXIT: Record<Role, string> = {
-  teacher: 'teacher',
-  student: 'student',
-  guest: 'education',
-};
+// "Exit Education" is the deliberate way out, so it always leaves for the app home.
+const exitHref = (lang: string) => `/${lang}`;
 
 describe.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('EducationHeader exit links, language=%s', (lang) => {
   beforeEach(() => {
@@ -60,7 +57,7 @@ describe.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('EducationHeader exit links,
     fireEvent.click(screen.getByLabelText('common.openMenu'));
 
     const exit = screen.getByText('education.header.exitEducation').closest('a');
-    expect(exit).toHaveAttribute('href', `/${lang}/${EXPECTED_EXIT[role]}`);
+    expect(exit).toHaveAttribute('href', exitHref(lang));
   });
 
   it('logo always links to the education landing, never the marketing home', () => {
@@ -68,7 +65,6 @@ describe.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('EducationHeader exit links,
     const { container } = render(<EducationHeader />);
     const logo = container.querySelector(`a[href="/${lang}/education"]`);
     expect(logo).not.toBeNull();
-    expect(container.querySelector(`a[href="/${lang}"]`)).toBeNull();
   });
 
   it.each(['teacher', 'student'] as Role[])('desktop menu "Exit Education" for %s', (role) => {
@@ -77,7 +73,7 @@ describe.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('EducationHeader exit links,
     fireEvent.click(screen.getByLabelText('common.menu'));
 
     const menu = screen.getByText('education.header.exitEducation').closest('a');
-    expect(menu).toHaveAttribute('href', `/${lang}/${EXPECTED_EXIT[role]}`);
+    expect(menu).toHaveAttribute('href', exitHref(lang));
   });
 
   it('desktop menu has no exit item for a guest', () => {

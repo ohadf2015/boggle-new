@@ -29,7 +29,7 @@ import { SearchIconButton } from './SearchIconButton';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { TeacherProNavLink } from '@/components/teacher/TeacherProNavLink';
-import { educationBackHref, educationHomeFor } from '@/lib/navigation/educationBackHref';
+import { educationBackHref } from '@/lib/navigation/educationBackHref';
 
 interface EducationHeaderProps {
   /** Additional class names */
@@ -122,7 +122,8 @@ export const EducationHeader = memo<EducationHeaderProps>(({
   const isOnStudentSection = pathname?.includes('/student');
 
   const eduRole = isTeacher ? 'teacher' : profile?.user_role === 'student' ? 'student' : null;
-  const exitHref = educationHomeFor(language, eduRole);
+  // Back, error and 404 paths stay in education; this is the one deliberate way out.
+  const exitHref = `/${language}`;
 
   const handleBackClick = useCallback(() => {
     if (onBack) return onBack();

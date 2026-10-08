@@ -100,11 +100,11 @@ describe('EducationHeader mobile menu — exit-education placement & styling', (
     expect(exitLink.className).toMatch(/bg-transparent/);
   });
 
-  it('exit-education link keeps a guest inside the education landing', () => {
+  it('exit-education link takes a guest out to the app home', () => {
     authState = { isAuthenticated: false, profile: null };
     openMobileMenu();
 
     const exitLink = screen.getByText('education.header.exitEducation').closest('a');
-    expect(exitLink).toHaveAttribute('href', '/en/education');
+    expect(exitLink).toHaveAttribute('href', '/en');
   });
 });
