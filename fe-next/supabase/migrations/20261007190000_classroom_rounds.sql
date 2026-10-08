@@ -5,7 +5,7 @@
 
 CREATE TABLE IF NOT EXISTS public.classroom_rounds (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  classroom_id uuid NOT NULL REFERENCES public.classrooms(id) ON DELETE CASCADE,
+  classroom_id uuid REFERENCES public.classrooms(id) ON DELETE SET NULL,
   teacher_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   game_code text NOT NULL,
   game_mode text NOT NULL,
