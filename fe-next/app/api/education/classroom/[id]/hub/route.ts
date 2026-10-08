@@ -16,8 +16,10 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
 
   const { id } = await context.params;
   try {
+    const admin = createAdminClient();
+    if (!admin) throw new Error('SUPABASE_SERVICE_ROLE_KEY unset');
     const state = await loadClassHubState(
-      createSupabaseClassHubStore(createAdminClient()),
+      createSupabaseClassHubStore(admin),
       id,
       user.id,
       new Date().toISOString().slice(0, 10)
