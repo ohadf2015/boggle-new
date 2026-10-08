@@ -11,9 +11,25 @@ const BANKS = { es: esBank, sv: svBank } as Record<string, Record<string, { clue
 describe.each(['es', 'sv'] as const)('%s mini pool', (locale) => {
   const pool = getPool(locale);
 
+  const enabled = (getGameModeRules('crossword').languages ?? []).includes(locale);
+
   it('has at least 5 generated puzzles of its own locale', () => {
     expect(pool.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it.skipIf(!enabled)('has at least 10 generated puzzles of its own locale', () => {
+    expect(pool.length).toBeGreaterThanOrEqual(10);
     expect(pool.every((p) => p.locale === locale && p.source === 'generated')).toBe(true);
+  });
+
+  it.skipIf(!enabled)('no two puzzles share 3+ answers', () => {
+    const sets = pool.map((p) => new Set(p.slots.map((s) => s.answer)));
+    for (let i = 0; i < sets.length; i++) {
+      for (let j = i + 1; j < sets.length; j++) {
+        const shared = [...sets[i]].filter((a) => sets[j].has(a)).length;
+        expect(shared, `${pool[i].id} vs ${pool[j].id}`).toBeLessThan(3);
+      }
+    }
   });
 
   it('has unique ids', () => {

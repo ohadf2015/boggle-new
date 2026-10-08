@@ -12,7 +12,10 @@
  * additive, so already-built puzzles are unaffected.
  *
  * Usage:
- *   npx tsx scripts/crossword/clues/buildBankWiktionary.ts --lang=es [--limit=N] [--max-len=7] [--min-score=0.5] [--dry]
+ *   npx tsx scripts/crossword/clues/buildBankWiktionary.ts --lang=es [--limit=N] [--max-len=7] [--min-score=0.5] [--dry] [--source=nouns]
+ *
+ * --source=nouns also draws 3..4 letter candidates from backend/<lang>_nouns.txt (the big board-seeding list), kept
+ * only if the (accent-folded) word is in the shipped dictionary and (es) appears >=2x in the repo's Spanish copy; they still need a clean Wiktionary clue + the auditor.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -20,6 +23,10 @@ import { wiktionaryClue } from './wiktionary';
 import { evaluateSvClue, evaluateEsClue } from '../../../lib/crossword/clues/evaluateSvClue';
 import { endsDangling } from '../../../lib/crossword/clues/danglingEnd';
 import { evaluateRuClue } from '../../../lib/crossword/clues/evaluateRuClue';
+import { createSafeReadFile, loadRussianDictionary, loadSpanishDictionary, loadSwedishDictionary } from '../../../backend/dictionaryLoaders';
+import { rejectNounClueEs } from '../../../lib/crossword/clues/nounClueFilter';
+import { loadEsCommonness } from './commonness';
+import { foldEsAccents } from '../../../lib/crossword/answer';
 
 type Bank = Record<string, { clue: string; score: number }>;
 
@@ -29,6 +36,9 @@ const LANG = arg('lang');
 const LIMIT = parseInt(arg('limit', String(Number.MAX_SAFE_INTEGER))!, 10);
 const MAX_LEN = parseInt(arg('max-len', '7')!, 10);
 const MIN_SCORE = parseFloat(arg('min-score', '0.5')!);
+const SOURCE = arg('source');
+const NOUN_MAX_LEN = 4; // build-mini only lands 3-4 letter answers
+const MIN_COMMON = 2; // nouns-only words must appear this often in the repo's Spanish copy
 const DRY = process.argv.includes('--dry');
 const NEW_WORD_SCORE = 50; // neutral difficulty tier (no corpus frequency for these). ponytail: refine if tiering matters
 
@@ -53,14 +63,30 @@ async function main() {
   const before = Object.keys(bank).length;
 
   const listPath = join(__dirname, `../../../backend/common_hunt_words_${LANG}.txt`);
-  const candidates = [
+  let candidates = [
     ...new Set(
       readFileSync(listPath, 'utf8')
         .split('\n')
         .map((w) => w.trim())
         .filter((w) => w.length >= 3 && w.length <= MAX_LEN),
     ),
-  ].filter((w) => !(bankKey(w, LANG) in bank));
+  ];
+  const nounSet = new Set<string>();
+  if (SOURCE === 'nouns') {
+    const dictLoaders = { es: loadSpanishDictionary, sv: loadSwedishDictionary, ru: loadRussianDictionary } as Record<string, typeof loadSpanishDictionary>;
+    const load = dictLoaders[LANG];
+    if (!load) throw new Error(`--source=nouns needs a dictionary loader for ${LANG}`);
+    const dict = await load(createSafeReadFile());
+    const isCommon = loadEsCommonness();
+    const fold = LANG === 'es' ? foldEsAccents : (w: string) => w;
+    const nouns = readFileSync(join(__dirname, `../../../backend/${LANG}_nouns.txt`), 'utf8')
+      .split('\n')
+      .map((w) => w.trim().toLowerCase())
+      .filter((w) => w.length >= 3 && w.length <= NOUN_MAX_LEN && /^\p{L}+$/u.test(w) && dict.has(fold(w)) && (LANG !== 'es' || isCommon(w, MIN_COMMON)));
+    nouns.forEach((w) => nounSet.add(w));
+    candidates.push(...nounSet);
+  }
+  candidates = [...new Set(candidates)].filter((w) => !(bankKey(w, LANG) in bank));
 
   console.log(`${DRY ? '[DRY] ' : ''}${LANG}: bank ${before} words, ${candidates.length} new candidates (len 3..${MAX_LEN})`);
 
@@ -71,6 +97,7 @@ async function main() {
     let clue: string | null = null;
     try { clue = await wiktionaryClue(word, LANG); } catch { clue = null; }
     if (!clue) { miss++; await sleep(120); continue; }
+    if (LANG === 'es' && nounSet.has(word) && rejectNounClueEs(clue)) { rejected++; await sleep(120); continue; }
     if (!qualityOk(LANG, word, clue)) { rejected++; await sleep(120); continue; }
     const key = bankKey(word, LANG);
     if (key in bank) { await sleep(120); continue; }
