@@ -146,6 +146,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete, entry }) =>
     });
   }, []);
 
+  useEffect(() => () => emitSkipped('unknown'), [emitSkipped]);
+
   // Track each step completion through a wrapper so the count stays
   // truthful regardless of which call site advances the flow. Avoid
   // passing `undefined` as 2nd arg — keeps test assertions like

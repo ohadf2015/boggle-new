@@ -910,18 +910,8 @@ export const trackGameCompletion = (
   gameMode?: string
 ): void => {
   const mode = gameMode || 'unknown';
-  if (isFirstGame) {
-    trackGrowthEvent('first_game_played', { score, wordCount, mode, gameMode: mode });
-    trackGA4Event('funnel_first_game', { mode });
-  }
-
-  if (isWinner) {
-    trackGrowthEvent(isFirstGame ? 'first_game_won' : 'streak_continued', {
-      score,
-      wordCount,
-      mode,
-      gameMode: mode,
-    });
+  if (isWinner && !isFirstGame) {
+    trackGrowthEvent('streak_continued', { score, wordCount, mode, gameMode: mode });
   }
 };
 
