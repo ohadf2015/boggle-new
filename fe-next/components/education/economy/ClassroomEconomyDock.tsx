@@ -59,7 +59,7 @@ export default function ClassroomEconomyDock({ gameCode }: ClassroomEconomyDockP
       )}
 
       {sheet && (
-        <div className="fixed inset-x-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-2xl border-t-4 border-black bg-neo-navy p-4 pb-6">
+        <div className="fixed inset-x-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-2xl border-t-4 border-neo-cream bg-neo-navy p-4 pb-6">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-bold text-white">{sheet === 'shop' ? t('economy.shop.title') : t('economy.board.title')}</span>
             <button type="button" onClick={() => setSheet(null)} className="min-h-11 px-3 text-sm font-bold text-white">

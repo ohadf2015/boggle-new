@@ -39,7 +39,7 @@ export default function PowerUpShop({ snapshot, onBuy }: PowerUpShopProps) {
                 type="button"
                 disabled={!affordable}
                 onClick={() => onBuy(id)}
-                className="flex min-h-14 w-full flex-col items-start rounded-lg border-2 border-black bg-neo-cream px-3 py-2 text-left text-neo-navy shadow-[4px_4px_0_0_#000] disabled:opacity-50"
+                className="flex min-h-14 w-full flex-col items-start rounded-lg border-2 border-black bg-neo-cream px-3 py-2 text-start text-neo-navy shadow-[4px_4px_0_0_#000] disabled:opacity-50"
               >
                 <span className="font-bold">{t(`economy.shop.${id}.name`)}</span>
                 <span className="text-xs">{t(`economy.shop.${id}.desc`)}</span>
