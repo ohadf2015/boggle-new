@@ -35,6 +35,7 @@ function buildSupabaseMock(tables: TableState) {
       in: vi.fn(() => builder),
       gte: vi.fn(() => builder),
       order: vi.fn(() => builder),
+      range: vi.fn(() => builder),
       then: (resolve: (v: unknown) => void) => resolve(result),
     };
     return builder;
