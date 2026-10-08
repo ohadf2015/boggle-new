@@ -46,7 +46,6 @@ const GAME_ROUTES = new Set([
   'crossword',
   'word-tower',
   'word-craft',
-  'sealed-bid',
 ]);
 
 // NO_FOOTER_ROUTES: admin panels + internal dev/test screens. No footer at all,

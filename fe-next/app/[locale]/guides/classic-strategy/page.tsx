@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { defaultOgImages, defaultOgImageUrl } from '@/lib/seo/defaultOgImage';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import ClassicStrategyPageClient from './PageClient';
 import { contentByLocale } from './content';
@@ -38,6 +39,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     openGraph: {
+      images: defaultOgImages(locale),
       type: 'article',
       title,
       description,
@@ -45,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: 'LexiClash',
       publishedTime: DATE_PUBLISHED,
     },
-    twitter: { card: 'summary_large_image', title, description },
+    twitter: { images: [defaultOgImageUrl(locale)], card: 'summary_large_image', title, description },
     alternates: {
       canonical: `${SITE_URL}/${locale}/guides/${SLUG}`,
       languages: {

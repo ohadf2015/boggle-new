@@ -27,7 +27,7 @@ import {
   pickDailyModifier,
 } from '@/lib/solo/soloDaily';
 import { crosswordScore } from '@/lib/solo/soloReward';
-import { isTypingTarget } from '@/lib/dom/isTypingTarget';
+import { useCrosswordHardwareKeys } from '@/hooks/useCrosswordHardwareKeys';
 
 function formatTime(ms: number): string {
   const total = Math.floor(ms / 1000);
@@ -164,41 +164,7 @@ export function CrosswordView({
     );
   }, [solved, elapsedMs, hintsUsed, stats.wordsTotal, today, puzzle.locale]);
 
-  // Hardware keyboard support.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      // Ignore typing inside the ClueScramble input (or any other input/textarea)
-      // so the global handler doesn't race with the mini-game.
-      if (isTypingTarget(e)) {
-        return;
-      }
-      const key = e.key;
-      if (key === 'Backspace') {
-        e.preventDefault();
-        backspace();
-      } else if (key === 'ArrowRight') {
-        e.preventDefault();
-        moveInSlot(puzzle.rtl ? -1 : 1);
-      } else if (key === 'ArrowLeft') {
-        e.preventDefault();
-        moveInSlot(puzzle.rtl ? 1 : -1);
-      } else if (key === 'ArrowDown' || key === 'ArrowUp') {
-        e.preventDefault();
-        // Faces the down word and moves in one step (reading state.dir here read a
-        // stale closure, so this used to need two presses).
-        moveVertical(key === 'ArrowDown' ? 1 : -1);
-      } else if (key === ' ' || key === 'Tab') {
-        e.preventDefault();
-        if (key === 'Tab') nextSlot(e.shiftKey ? -1 : 1);
-        else toggleDir();
-      } else if (key.length === 1 && /\p{L}/u.test(key)) {
-        inputLetter(key);
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [backspace, moveInSlot, moveVertical, inputLetter, toggleDir, nextSlot, puzzle.rtl]);
+  useCrosswordHardwareKeys({ backspace, moveInSlot, moveVertical, inputLetter, toggleDir, nextSlot }, puzzle.rtl);
 
   // GSAP entrance for the solved card.
   useEffect(() => {

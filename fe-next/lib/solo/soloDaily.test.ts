@@ -12,6 +12,7 @@ import {
   pickDailyModifier,
   awardSoloDaily,
   isSoloDailyClaimed,
+  type SoloMode,
 } from './soloDaily';
 
 function makeLocalStorageMock() {
@@ -49,7 +50,7 @@ describe('soloDaily', () => {
       expect(soloSeed('crossword', '2026-06-16')).toBe(soloSeed('crossword', '2026-06-16'));
     });
     it('differs across modes', () => {
-      expect(soloSeed('crossword', '2026-06-16')).not.toBe(soloSeed('sealed-bid', '2026-06-16'));
+      expect(soloSeed('crossword', '2026-06-16')).not.toBe(soloSeed('word-alchemy', '2026-06-16'));
     });
     it('differs across dates', () => {
       expect(soloSeed('crossword', '2026-06-16')).not.toBe(soloSeed('crossword', '2026-06-17'));
@@ -85,14 +86,14 @@ describe('soloDaily', () => {
       expect(m.descKey).toMatch(/^solo\.modifier\./);
     });
     it('is deterministic per day', () => {
-      expect(pickDailyModifier('sealed-bid', '2026-06-16').id).toBe(
-        pickDailyModifier('sealed-bid', '2026-06-16').id,
+      expect(pickDailyModifier('crossword', '2026-06-16').id).toBe(
+        pickDailyModifier('crossword', '2026-06-16').id,
       );
     });
     it('rotates across days for a mode', () => {
       const ids = new Set<string>();
       for (let day = 1; day <= 20; day++) {
-        ids.add(pickDailyModifier('sealed-bid', `2026-06-${String(day).padStart(2, '0')}`).id);
+        ids.add(pickDailyModifier('crossword', `2026-06-${String(day).padStart(2, '0')}`).id);
       }
       expect(ids.size).toBeGreaterThan(1);
     });
@@ -119,29 +120,29 @@ describe('soloDaily', () => {
     });
 
     it('awards coins on first completion of the day', () => {
-      const res = awardSoloDaily('sealed-bid', '2026-06-16', 'en', 80, true);
+      const res = awardSoloDaily('crossword', '2026-06-16', 'en', 80, true);
       expect(res).not.toBeNull();
       expect(res!.awarded).toBeGreaterThan(0);
     });
 
     it('does NOT re-award on a replay the same day (practice)', () => {
-      const first = awardSoloDaily('sealed-bid', '2026-06-16', 'en', 80, true);
-      const second = awardSoloDaily('sealed-bid', '2026-06-16', 'en', 200, true);
+      const first = awardSoloDaily('crossword', '2026-06-16', 'en', 80, true);
+      const second = awardSoloDaily('crossword', '2026-06-16', 'en', 200, true);
       expect(first).not.toBeNull();
       expect(second).toBeNull();
     });
 
     it('awards again on a NEW day', () => {
-      const day1 = awardSoloDaily('sealed-bid', '2026-06-16', 'en', 80, true);
-      const day2 = awardSoloDaily('sealed-bid', '2026-06-17', 'en', 80, true);
+      const day1 = awardSoloDaily('crossword', '2026-06-16', 'en', 80, true);
+      const day2 = awardSoloDaily('crossword', '2026-06-17', 'en', 80, true);
       expect(day1).not.toBeNull();
       expect(day2).not.toBeNull();
     });
 
     it('keys are per-mode and per-language (independent claims)', () => {
-      awardSoloDaily('sealed-bid', '2026-06-16', 'en', 80, true);
-      const otherMode = awardSoloDaily('crossword', '2026-06-16', 'en', 80, true);
-      const otherLang = awardSoloDaily('sealed-bid', '2026-06-16', 'he', 80, true);
+      awardSoloDaily('crossword', '2026-06-16', 'en', 80, true);
+      const otherMode = awardSoloDaily('word-alchemy' as SoloMode, '2026-06-16', 'en', 80, true);
+      const otherLang = awardSoloDaily('crossword', '2026-06-16', 'he', 80, true);
       expect(otherMode).not.toBeNull();
       expect(otherLang).not.toBeNull();
     });
@@ -153,7 +154,7 @@ describe('soloDaily', () => {
     });
 
     it('returns null (no award) for a zero-reward result', () => {
-      const res = awardSoloDaily('sealed-bid', '2026-06-16', 'en', 0, false);
+      const res = awardSoloDaily('crossword', '2026-06-16', 'en', 0, false);
       expect(res).toBeNull();
     });
   });

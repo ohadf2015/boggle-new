@@ -10,7 +10,6 @@ const MODE_ICONS: Record<GameMode, string> = {
   'word-hunt': '🎯',
   'wheel-rush': '🎡',
   'word-tower': '🏗️',
-  'sealed-bid': '🔨',
   'crossword': '📰',
   'wordcraft': '🧩',
 };
@@ -22,7 +21,6 @@ const MODE_TRANSLATION_KEYS: Record<GameMode, { name: string; description: strin
   'word-hunt': { name: 'gameModes.wordHunt.name', description: 'gameModes.wordHunt.description' },
   'wheel-rush': { name: 'gameModes.wheelRush.name', description: 'gameModes.wheelRush.description' },
   'word-tower': { name: 'wordTower.cardTitle', description: 'wordTower.cardDesc' },
-  'sealed-bid': { name: 'gameModes.sealedBid.name', description: 'gameModes.sealedBid.description' },
   'crossword': { name: 'gameModes.crossword.name', description: 'gameModes.crossword.description' },
   'wordcraft': { name: 'wordcraft.title', description: 'wordcraft.modeDesc' },
 };
@@ -36,7 +34,6 @@ const MODE_COLORS: Record<GameMode, { from: string; via: string }> = {
   'word-hunt': { from: 'from-neo-pink/30', via: 'via-neo-pink/5' },
   'wheel-rush': { from: 'from-neo-purple/30', via: 'via-neo-purple/5' },
   'word-tower': { from: 'from-neo-purple/30', via: 'via-neo-purple/5' },
-  'sealed-bid': { from: 'from-neo-pink/30', via: 'via-neo-pink/5' },
   'crossword': { from: 'from-neo-cyan/30', via: 'via-neo-cyan/5' },
   'wordcraft': { from: 'from-neo-purple/30', via: 'via-neo-purple/5' },
 };

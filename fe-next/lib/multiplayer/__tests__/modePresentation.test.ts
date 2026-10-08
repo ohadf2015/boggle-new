@@ -36,10 +36,9 @@ describe('getModePresentation', () => {
     expect(getModePresentation('wheel-rush').hookKey).toBe('results.modeTease.hook.wheelRush');
   });
 
-  it('covers the non-rotation modes too (word-tower, sealed-bid)', () => {
+  it('covers the non-rotation modes too (word-tower)', () => {
     expect(getModePresentation('word-tower').labelKey).toBe('results.modeTease.label.wordTower');
     expect(getModePresentation('word-tower').hookKey).toBe('results.modeTease.hook.wordTower');
-    expect(getModePresentation('sealed-bid').labelKey).toBe('results.modeTease.label.sealedBid');
   });
 
   it('falls back gracefully for unknown / "random" / null without a raw key', () => {

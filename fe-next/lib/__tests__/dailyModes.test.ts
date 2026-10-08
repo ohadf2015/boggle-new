@@ -2,8 +2,6 @@ import { describe, it, expect } from 'vitest';
 import {
   DAILY_MODES,
   visibleDailyModes,
-  adminOnlyDailyModes,
-  questCardModes,
   dailyModeHref,
   type DailyModeDef,
 } from '@/lib/dailyModes';
@@ -27,23 +25,6 @@ describe('dailyModes registry', () => {
     const publicIds = visibleDailyModes(false).map((m) => m.id);
     expect(publicIds).toEqual(DAILY_MODES.map((m) => m.id));
     expect(visibleDailyModes(true).map((m) => m.id)).toEqual(publicIds);
-  });
-
-  it('adminOnlyDailyModes is empty now that Connections graduated', () => {
-    expect(adminOnlyDailyModes()).toEqual([]);
-  });
-
-  // Word Tower graduated OUT of the generic quest cards in 42bc4968a (2026-08-18,
-  // "render Word Tower with the shared daily QuestCard"): once it went public it is
-  // drawn with the same QuestCard chrome as Word Hunt and Word Wheel, so all three
-  // are excluded here. Connections is the second public mode but STAYS generic —
-  // the DailyModeQuestCard already gives it full-bleed mascot art and a played
-  // badge, and its hard-nav `<a>` guarantees the daily host re-reads the date.
-  it('exposes the registry-driven quest cards (everything but the bespoke hero cards)', () => {
-    const publicIds = questCardModes(false).map((m) => m.id);
-    expect(publicIds).toEqual(['connections']);
-    const adminIds = questCardModes(true).map((m) => m.id);
-    expect(adminIds).toEqual(['connections']);
   });
 
   it('registers Connections as a PUBLIC daily card pointing at the variant-aware daily route', () => {

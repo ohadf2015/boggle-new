@@ -59,12 +59,6 @@ vi.mock('@/contexts/AuthContext', () => ({
 
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({ useIsPracticeVeteran: () => false }));
 
-vi.mock('@/components/daily/DailyChallengeBanner', () => {
-  const DailyChallengeBanner = () => <div data-testid="daily-banner" />;
-  DailyChallengeBanner.displayName = 'DailyChallengeBanner';
-  return { __esModule: true, default: DailyChallengeBanner };
-});
-
 const baseProps = {
   language: 'en',
   activePlayers: 10,
@@ -149,7 +143,6 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
       // (gateWordCraftMode), not hub cards — so none appear in this admin roster.
       // Party, Word Alchemy, Word Forge and Word Vault modes were removed.
       // Word Tower v1 is retired and replaced by Word Tower v2 (now public).
-      'sealedBid',          // Sealed Bid
       'wordfall',           // Wordfall (Blast V2)
     ];
     for (const key of expected) {
@@ -167,31 +160,12 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     const { container } = render(<LandingChallengeCards {...baseProps} />);
     const adminOnly = [
       // 'wordTower' is NOT here any more — the mode shipped publicly 2026-08-14.
-      'sealedBid',
       'wordfall',
     ];
     for (const key of adminOnly) {
       const card = container.querySelector(`[data-cube-key="${key}"]`);
       expect(card, `leaked admin card to non-admin: ${key}`).toBeNull();
     }
-  });
-});
-
-describe('LandingChallengeCards — Sealed Bid admin dev-preview gate', () => {
-  it('does NOT render the Sealed Bid card for a non-admin', () => {
-    mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-cube-key="sealedBid"]')).toBeNull();
-  });
-
-  it('renders the Sealed Bid card for an admin with the /sealed-bid href', () => {
-    mockIsAdmin.mockReturnValue(true);
-    mockGamesCompleted.mockReturnValue(10);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    const card = container.querySelector('[data-cube-key="sealedBid"]');
-    expect(card).toBeInTheDocument();
-    expect(card?.getAttribute('href')).toBe('/en/sealed-bid');
   });
 });
 

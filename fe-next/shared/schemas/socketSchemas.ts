@@ -192,7 +192,7 @@ export const StartGameSchema = z.object({
     emoji: z.string(),
     isHoliday: z.boolean().optional(),
   }).nullable().optional(),
-  gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'word-tower', 'wordcraft', 'random']).optional(),
+  gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'word-tower', 'crossword', 'wordcraft', 'random']).optional(),
   tvMode: z.boolean().optional(),
   /**
    * Optional boost token bundled with startGame so the server can register
@@ -253,14 +253,6 @@ export const ScrambleTowerSchema = z.object({}).strict();
 /** Word Tower (versus) — drop a bomb on a rival's tower. */
 export const SendTowerBombSchema = z.object({
   targetPlayerId: z.string().min(1).max(64),
-});
-
-/**
- * submitSealedBid event payload — a player's secret bid for the current Sealed
- * Bid round. An empty word (after trim) is treated as a pass.
- */
-export const SubmitSealedBidSchema = z.object({
-  word: z.string().max(50).transform(s => s.trim()),
 });
 
 /**
@@ -460,7 +452,6 @@ export const ClientEventSchemas = {
   closeRoom: CloseRoomSchema,
   submitWord: SubmitWordSchema,
   submitWheelWord: SubmitWheelWordSchema,
-  submitSealedBid: SubmitSealedBidSchema,
   submitCrosswordProgress: SubmitCrosswordProgressSchema,
   submitWordVote: SubmitWordVoteSchema,
   submitPeerValidationVote: SubmitPeerValidationVoteSchema,
@@ -574,7 +565,6 @@ export type SubmitWheelWordData = z.infer<typeof SubmitWheelWordSchema>;
 export type SubmitTowerWordData = z.infer<typeof SubmitTowerWordSchema>;
 export type ScrambleTowerData = z.infer<typeof ScrambleTowerSchema>;
 export type SendTowerBombData = z.infer<typeof SendTowerBombSchema>;
-export type SubmitSealedBidData = z.infer<typeof SubmitSealedBidSchema>;
 export type SubmitCrosswordProgressData = z.infer<typeof SubmitCrosswordProgressSchema>;
 export type ChatMessageData = z.infer<typeof ChatMessageSchema>;
 export type AddBotData = z.infer<typeof AddBotSchema>;

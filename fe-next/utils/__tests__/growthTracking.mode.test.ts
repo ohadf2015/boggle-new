@@ -86,48 +86,13 @@ describe('trackGameEnd — mode property contract', () => {
   });
 });
 
-describe('trackGameCompletion — first_game_played mode propagation', () => {
+describe('trackGameCompletion — first-game events belong to markFirstGameActivation', () => {
   beforeEach(() => captureMock.mockClear());
 
-  it('emits first_game_played with gameMode when isFirstGame=true', () => {
-    trackGameCompletion(false, 80, 4, true, 'multiplayer');
-    const payload = findCapture('first_game_played');
-    expect(payload).toBeDefined();
-    expect(payload!.gameMode).toBe('multiplayer');
-    expect(payload!.mode).toBe('multiplayer');
-  });
-
-  it('emits first_game_played with mode=unknown when caller forgets gameMode', () => {
-    trackGameCompletion(false, 80, 4, true);
-    const payload = findCapture('first_game_played');
-    expect(payload).toBeDefined();
-    expect(payload!.gameMode).toBe('unknown');
-    expect(payload!.mode).toBe('unknown');
-  });
-
-  it('does not emit first_game_played when isFirstGame=false', () => {
-    trackGameCompletion(false, 80, 4, false, 'singleplayer');
-    expect(findCapture('first_game_played')).toBeUndefined();
-  });
-});
-
-describe('trackGameCompletion — first_game_won mode propagation', () => {
-  beforeEach(() => captureMock.mockClear());
-
-  it('passes gameMode through to first_game_won when isFirstGame=true', () => {
+  it('never emits first_game_played or first_game_won (once-per-device owner is trackGameEnd)', () => {
     trackGameCompletion(true, 250, 10, true, 'multiplayer');
-    const payload = findCapture('first_game_won');
-    expect(payload).toBeDefined();
-    expect(payload!.gameMode).toBe('multiplayer');
-    expect(payload!.mode).toBe('multiplayer');
-  });
-
-  it('still emits with mode=unknown when caller forgets to pass gameMode', () => {
-    trackGameCompletion(true, 100, 5, true);
-    const payload = findCapture('first_game_won');
-    expect(payload).toBeDefined();
-    expect(payload!.gameMode).toBe('unknown');
-    expect(payload!.mode).toBe('unknown');
+    expect(findCapture('first_game_played')).toBeUndefined();
+    expect(findCapture('first_game_won')).toBeUndefined();
   });
 
   it('emits streak_continued (not first_game_won) when isFirstGame=false', () => {

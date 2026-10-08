@@ -50,11 +50,6 @@ function executeKick(
   const game = getGame(gameCode);
   if (!game) return;
 
-  // Initialize kickedPlayers set if missing
-  if (!game.kickedPlayers) {
-    game.kickedPlayers = new Set<string>();
-  }
-
   const targetSocketId = getSocketIdByUsername(gameCode, targetUsername);
 
   // Notify target before removing
@@ -74,8 +69,11 @@ function executeKick(
   cleanupPlayerData(game, targetUsername);
   removeUserFromGame(gameCode, targetUsername);
 
-  // Block re-join
-  game.kickedPlayers!.add(targetUsername);
+  // An AFK kick is housekeeping, not a ban: a backgrounded phone must be able to rejoin.
+  if (reason === 'host') {
+    if (!game.kickedPlayers) game.kickedPlayers = new Set<string>();
+    game.kickedPlayers.add(targetUsername);
+  }
 
   // Broadcast to room
   broadcastToRoom(io, getGameRoom(gameCode), 'playerKicked', {
@@ -131,7 +129,6 @@ function checkAutoKickInactive(io: Server, forEachGame: (cb: (gameCode: string, 
   forEachGame((gameCode: string, game: any) => {
     // Only auto-kick in lobby (waiting state), not during active games
     if (game.gameState !== 'waiting') return;
-    // A class lobby is a queue for the teacher's START; a kick here also blocks the rejoin.
     if (game.isClassroom) return;
 
     const usernames = Object.keys(game.users || {});

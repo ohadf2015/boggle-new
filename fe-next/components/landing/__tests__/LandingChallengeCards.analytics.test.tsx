@@ -32,12 +32,6 @@ vi.mock('@/components/landing/home/HomeDailyHero', () => {
 vi.mock('@/utils/contextualGuidanceStorage', () => ({ shouldShowGuidance: () => false }));
 vi.mock('@/utils/onboardingStorage', () => ({ hasCompletedOnboarding: () => true }));
 vi.mock('@/utils/multiplayerProgressStorage', () => ({ isNewPlayer: () => false, getGamesCompleted: () => 0 }));
-vi.mock('@/components/daily/DailyChallengeBanner', () => {
-  const DailyChallengeBanner = () => <div data-testid="daily-banner" />;
-  DailyChallengeBanner.displayName = 'DailyChallengeBanner';
-  return { __esModule: true, default: DailyChallengeBanner };
-});
-
 vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }),
 }));

@@ -58,11 +58,6 @@ export function seededRandom(seed: number): () => number {
 
 /** Per-mode daily mutators — the "modifier" pillar. Labels resolved via t(). */
 const MODIFIERS: Record<SoloMode, SoloModifier[]> = {
-  'sealed-bid': [
-    { id: 'no-clash-penalty', labelKey: 'solo.modifier.sealedBid.noClashPenalty.label', descKey: 'solo.modifier.sealedBid.noClashPenalty.desc' },
-    { id: 'vowel-tax', labelKey: 'solo.modifier.sealedBid.vowelTax.label', descKey: 'solo.modifier.sealedBid.vowelTax.desc' },
-    { id: 'high-stakes', labelKey: 'solo.modifier.sealedBid.highStakes.label', descKey: 'solo.modifier.sealedBid.highStakes.desc' },
-  ],
   crossword: [
     { id: 'themed-grid', labelKey: 'solo.modifier.crossword.themedGrid.label', descKey: 'solo.modifier.crossword.themedGrid.desc' },
     { id: 'no-check', labelKey: 'solo.modifier.crossword.noCheck.label', descKey: 'solo.modifier.crossword.noCheck.desc' },
@@ -120,7 +115,7 @@ export function awardSoloDaily(
 
 /**
  * Mark today's daily as claimed for a mode that awards coins through its own
- * flow (e.g. Sealed Bid cashes chips out via `addCoins` directly rather than
+ * flow (one that cashes out via `addCoins` directly rather than
  * `awardSoloDaily`). Call after awarding so the once-per-day guard holds.
  */
 export function markSoloDailyClaimed(mode: SoloMode, dateISO: string, language: string): void {

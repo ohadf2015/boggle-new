@@ -40,7 +40,7 @@ vi.mock('../../utils/rateLimiter', () => ({
   default: { checkRateLimit: mocks.checkRateLimit },
 }));
 vi.mock('../../utils/logger', () => ({
-  default: { info: vi.fn(), warn: mocks.warn, error: vi.fn(), debug: vi.fn() },
+  default: { info: mocks.warn, warn: mocks.warn, error: vi.fn(), debug: vi.fn() },
 }));
 
 import { registerTeacherControlsHandlers } from '../teacherControlsHandler';

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { defaultOgImages, defaultOgImageUrl } from '@/lib/seo/defaultOgImage';
 import GlossaryPageClient from './PageClient';
 import { contentByLocale } from './content';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
@@ -34,8 +35,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title, description,
-    openGraph: { type: 'website', title, description, url: `${SITE_URL}/${locale}/glossary`, siteName: 'LexiClash' },
-    twitter: { card: 'summary_large_image', title, description },
+    openGraph: { images: defaultOgImages(locale), type: 'website', title, description, url: `${SITE_URL}/${locale}/glossary`, siteName: 'LexiClash' },
+    twitter: { images: [defaultOgImageUrl(locale)], card: 'summary_large_image', title, description },
     alternates: {
       canonical: `${SITE_URL}/${locale}/glossary`,
       languages: {

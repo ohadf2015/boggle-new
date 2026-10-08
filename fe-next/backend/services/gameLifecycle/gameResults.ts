@@ -315,7 +315,7 @@ export async function recordGameResultsToSupabase(
     // Process engagement events for each player
     await processEngagementEvents(io, scoresArray, game, gameCode);
 
-    // Quest crediting (weekly + daily). Beta modes (crossword, sealed-bid,
+    // Quest crediting (weekly + daily). Beta modes (crossword,
     // word-tower, blast, wheel-rush) route through this SAME seam but
     // must NOT grant quest progress — the quest pool never steers players there,
     // so a high score in a beta mode silently completing a skill quest is a bug.

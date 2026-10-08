@@ -33,6 +33,7 @@ const {
   mockSentryBreadcrumb,
   mockEmitError,
   mockLoggerWarn,
+  mockLoggerInfo,
 } = vi.hoisted(() => ({
   mockCheckRateLimit: vi.fn().mockReturnValue(true),
   mockGetGameBySocketId: vi.fn(),
@@ -46,6 +47,7 @@ const {
   mockSentryBreadcrumb: vi.fn(),
   mockEmitError: vi.fn(),
   mockLoggerWarn: vi.fn(),
+  mockLoggerInfo: vi.fn(),
 }));
 
 vi.mock('../../../backend/utils/rateLimiter', () => ({
@@ -107,7 +109,7 @@ vi.mock('../../../backend/utils/metrics', () => ({
 }));
 vi.mock('../../../backend/utils/logger', () => ({
   __esModule: true,
-  default: { info: vi.fn(), error: vi.fn(), warn: mockLoggerWarn, debug: vi.fn(), log: vi.fn() },
+  default: { info: mockLoggerInfo, error: vi.fn(), warn: mockLoggerWarn, debug: vi.fn(), log: vi.fn() },
 }));
 vi.mock('@sentry/nextjs', () => ({
   captureMessage: mockSentryCapture,
@@ -183,7 +185,7 @@ describe('requestGameState — a socket the server never seated', () => {
     registerGameLifecycleHandlers(fakeIo, socket as never);
     socket.handlers['requestGameState']();
 
-    expect(mockLoggerWarn).toHaveBeenCalledWith(
+    expect(mockLoggerInfo).toHaveBeenCalledWith(
       'SOCKET',
       expect.stringContaining('sock-ghost')
     );

@@ -23,10 +23,8 @@ import { DailyHubHeader } from './landing/DailyHubHeader';
 import { QuestCard } from './landing/QuestCard';
 import { CompactModeRow } from './landing/CompactModeRow';
 import { LeaderboardTeaser } from './landing/LeaderboardTeaser';
-import { PersistentStreakDisplay } from './streak/PersistentStreakDisplay';
 import WeeklyChestCard from './WeeklyChestCard';
 import WeeklyChestModal from './WeeklyChestModal';
-import DailyInsightStack from './DailyInsightStack';
 
 interface DailyChallengeLandingProps {
   onSelectWordHunt: () => void;
@@ -57,10 +55,6 @@ function DailyShareDecorations({ t }: { t: (key: string) => string }) {
   );
 }
 
-/**
- * DailyChallengeLanding - Arcade Quest Enhanced layout
- * Vertical quest path with XP header, streak counter, and leaderboard teaser.
- */
 export function DailyChallengeLanding({
   onSelectWordHunt,
   onSelectWordWheel,
@@ -68,10 +62,6 @@ export function DailyChallengeLanding({
 }: DailyChallengeLandingProps) {
   const { t } = useLanguage();
   const { user, canSeeInWorkModes } = useAuth();
-  // All four modes are public now, so every one of them is drawn by the shared
-  // QuestCard/CompactModeRow pair — a first-class daily quest should not look
-  // different from its siblings. `canSeeInWorkModes` still gates VISIBILITY via
-  // visibleDailyModes below, for whatever lands next. See lib/dailyModes.ts.
   const pathname = usePathname();
   const router = useRouter();
 
@@ -83,8 +73,6 @@ export function DailyChallengeLanding({
 
   // Word Wheel status from localStorage (no server endpoint for it yet)
   const [wordWheelStatus, setWordWheelStatus] = useState<'new' | 'played'>('new');
-  // Defer Date.now()-derived value to client to avoid hydration mismatch (React #418)
-  const [todayIso, setTodayIso] = useState<string>('');
   const [claimedChest, setClaimedChest] = useState<PendingChest | null>(null);
   // Word Tower "played today" — client-only localStorage read (SSR-safe), kept
   // fresh when the player returns from the game (visibility/back nav).
@@ -92,12 +80,6 @@ export function DailyChallengeLanding({
   // Connections (Word Bridge) played today — same marker both daily flavors
   // write on their terminal screens (5-riddle chain AND pyramid).
   const [connectionsPlayed, setConnectionsPlayed] = useState(false);
-
-  useEffect(() => {
-    // Deferred to the client so the Date.now()-derived value cannot cause a
-    // hydration mismatch (React #418).
-    setTodayIso(new Date().toISOString().split('T')[0]);
-  }, []);
 
   useEffect(() => {
     const check = () => {
@@ -209,14 +191,6 @@ export function DailyChallengeLanding({
   // Determine which mode should be the primary (hero) card
   const primaryModeId = pickPrimaryMode(playState);
 
-  // Helper to get mode properties for rendering.
-  //
-  // Each mode owns a colour, an icon, a tagline AND its artwork. Art used to be
-  // derived inline with a chain of ternaries that had no Connections branch, so
-  // Connections rendered the WORD HUNT mascot; the secondary rows had no art at
-  // all and were told apart only by a 24px icon tint. Keeping all four on one
-  // record is what makes "is every card recognizable?" answerable by reading
-  // one list instead of auditing four call sites.
   type ModeInfo = {
     id: DailyModeId;
     title: string;
@@ -291,13 +265,8 @@ export function DailyChallengeLanding({
       transition={{ type: 'spring', stiffness: 280, damping: 26 }}
       className="flex-1 flex flex-col items-center px-3 py-2 sm:px-4 sm:py-2 pb-bottom-stack sm:pb-2 max-w-3xl mx-auto w-full relative gap-3"
     >
-      {/* Hub Header: Today's Puzzles + date */}
-      <DailyHubHeader todayIso={todayIso} />
+      <DailyHubHeader />
 
-      {/* Persistent Streak Display: shows current streak across all devices */}
-      <PersistentStreakDisplay />
-
-      {/* Missions Header: XP bar + countdown */}
       <DailyMissionsHeader completedCount={completedCount} total={totalQuests} />
 
       {/* Score Gauntlet Banner: shown when arriving via a challenge share link.
@@ -326,8 +295,6 @@ export function DailyChallengeLanding({
           timeMode={primaryMode.timeMode}
           timeModeLabel={t(primaryMode.timeMode === 'timed' ? 'daily.timedQuest' : 'daily.relaxedQuest')}
           previewImageUrl={primaryMode.artUrl}
-          previewImageAlt={primaryMode.title}
-          currentLanguage={currentLanguage}
           buttonText={t('daily.startQuest')}
           delay={0.15}
         />
@@ -351,22 +318,7 @@ export function DailyChallengeLanding({
           ))}
       </div>
 
-      {/* Today's board. Removed in the 2026-09-19 redesign on the grounds that a
-          three-name board reads as a dead product; restored because the hub is
-          where players look for it. It sums the two modes that expose a
-          per-player daily board and SAYS so, rather than implying it ranks all
-          four — Word Tower and Connections keep their own boards. */}
       <LeaderboardTeaser currentLanguage={currentLanguage} />
-
-      {/* Insights: surface "you improved" / "personal best" inline once any mode complete */}
-      {user && todayIso && (wordHuntStatus === 'won' || wordWheelPlayed) && (
-        <div className="w-full">
-          <DailyInsightStack
-            mode={wordHuntStatus === 'won' ? 'word_hunt' : 'word_wheel'}
-            date={todayIso}
-          />
-        </div>
-      )}
 
       {/* Weekly Chest: 7-day progress + tier reward (authed only — guest has no server cycle) */}
       {user && (
@@ -388,12 +340,6 @@ export function DailyChallengeLanding({
           onClose={() => setClaimedChest(null)}
         />
       )}
-
-      {/* The global bottom banner is the app-wide AnchoredNativeBanner, pinned to
-          the viewport bottom on this hub via the admob-routes allowlist — NOT an
-          in-flow slot (which scrolled with the content). This container's
-          `pb-bottom-stack` reserves the fixed-bottom stack (nav + banner) so the
-          quest cards and weekly chest stay clear of it. */}
     </m.div>
   );
 }

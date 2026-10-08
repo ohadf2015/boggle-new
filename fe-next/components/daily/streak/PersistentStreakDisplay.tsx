@@ -1,19 +1,5 @@
 'use client';
 
-/**
- * PersistentStreakDisplay — Drop-in streak number component for the daily hub header
- *
- * Self-contained display of the current streak. Reads useDailyPlayedStatus internally.
- * No props required. Renders the single source of truth across devices.
- *
- * For the hub builder: import and place in the header:
- *   import { PersistentStreakDisplay } from '@/components/daily/streak/PersistentStreakDisplay';
- *   <PersistentStreakDisplay />
- *
- * Displays as: [flame icon] [number] or skeleton while loading.
- * Also renders a toast if a streak freeze was just applied.
- */
-
 import { useEffect, useState } from 'react';
 import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
 import { useLanguage } from '@/contexts/LanguageContext';

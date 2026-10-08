@@ -5,7 +5,7 @@
  * rail, and progress emission on word-solve.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, dir: 'ltr' }),
@@ -16,14 +16,20 @@ let mp: Record<string, unknown>;
 vi.mock('../useCrosswordMp', () => ({ useCrosswordMp: () => ({ ...mp, submitProgress }) }));
 
 // Solo engine — fixed playing state with 1/4 words solved.
+const inputLetter = vi.fn();
+const backspace = vi.fn();
+const useCrosswordGameArgs: unknown[][] = [];
 vi.mock('@/hooks/useCrosswordGame', () => ({
-  useCrosswordGame: () => ({
-    state: { status: 'playing', revealed: [], entries: {}, active: { row: 0, col: 0 }, dir: 'across' },
-    activeSlot: null, elapsedMs: 10000,
-    focusCell: vi.fn(), toggleDir: vi.fn(), inputLetter: vi.fn(), backspace: vi.fn(),
-    moveInSlot: vi.fn(), revealCell: vi.fn(), revealWord: vi.fn(), checkAll: vi.fn(),
-    nextSlot: vi.fn(), focusSlot: vi.fn(), reset: vi.fn(),
-  }),
+  useCrosswordGame: (...args: unknown[]) => {
+    useCrosswordGameArgs.push(args);
+    return {
+      state: { status: 'playing', revealed: [], entries: {}, active: { row: 0, col: 0 }, dir: 'across' },
+      activeSlot: null, elapsedMs: 10000,
+      focusCell: vi.fn(), toggleDir: vi.fn(), inputLetter, backspace,
+      moveInSlot: vi.fn(), moveVertical: vi.fn(), revealCell: vi.fn(), revealWord: vi.fn(), checkAll: vi.fn(),
+      nextSlot: vi.fn(), focusSlot: vi.fn(), reset: vi.fn(),
+    };
+  },
 }));
 vi.mock('@/lib/crossword/stats', () => ({ crosswordStats: () => ({ percent: 25, wordsSolved: 1, wordsTotal: 4, totalCells: 20, filledCells: 5, correctCells: 5 }), solvedSlotIds: () => [] }));
 vi.mock('@/lib/solo/soloReward', () => ({ crosswordScore: () => 30 }));
@@ -42,7 +48,13 @@ const standings = [
 ];
 
 describe('CrosswordVersus', () => {
-  beforeEach(() => { submitProgress.mockClear(); mp = { puzzle: PUZZLE, standings, raceOver: false, ready: true }; });
+  beforeEach(() => {
+    submitProgress.mockClear();
+    inputLetter.mockClear();
+    backspace.mockClear();
+    useCrosswordGameArgs.length = 0;
+    mp = { puzzle: PUZZLE, standings, raceOver: false, ready: true, startedAt: 1234 };
+  });
 
   it('shows a waiting state before the puzzle arrives', () => {
     mp = { puzzle: null, standings: [], raceOver: false, ready: false };
@@ -62,6 +74,23 @@ describe('CrosswordVersus', () => {
     expect(submitProgress).toHaveBeenCalledWith(
       expect.objectContaining({ percent: 25, solved: false, elapsedMs: 10000 }),
     );
+  });
+
+  it('keeps race progress apart from the solo save of the same puzzle', () => {
+    render(<CrosswordVersus socket={null} username="me" />);
+    const opts = useCrosswordGameArgs[0][1] as { progressKey?: string; telemetry?: boolean };
+    expect(opts.progressKey).toBeTruthy();
+    expect(opts.progressKey).not.toBe(PUZZLE.id);
+    expect(opts.progressKey).toContain('1234');
+    expect(opts.telemetry).toBe(false);
+  });
+
+  it('accepts a hardware keyboard (desktop has no on-screen keys)', () => {
+    render(<CrosswordVersus socket={null} username="me" />);
+    fireEvent.keyDown(window, { key: 'a' });
+    fireEvent.keyDown(window, { key: 'Backspace' });
+    expect(inputLetter).toHaveBeenCalledWith('a');
+    expect(backspace).toHaveBeenCalledTimes(1);
   });
 
   it('shows the win banner when the race is over', () => {

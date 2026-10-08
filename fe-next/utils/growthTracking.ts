@@ -71,6 +71,12 @@ export type GrowthEvent =
   //   candidate for "11 of 20 daily players placed one word and left".
   | 'wordtower_scramble_used'
   | 'wordtower_wall_reached'
+  // Blast board load gate (t_67330c55): the MP "Generating grid..." spinner had
+  // no telemetry, so 20 rage-click sessions/14d were invisible. wait fires once
+  // per mount when the spinner clears, stuck once if still waiting at 15s.
+  // Props { wait_ms, waited_for: 'grid'|'dictionary'|'both', mode, language }.
+  | 'blast_board_wait'
+  | 'blast_board_stuck'
   | 'results_viewed'
   | 'replay_countdown_shown'
   | 'results_autoplay_cancelled'
@@ -910,18 +916,8 @@ export const trackGameCompletion = (
   gameMode?: string
 ): void => {
   const mode = gameMode || 'unknown';
-  if (isFirstGame) {
-    trackGrowthEvent('first_game_played', { score, wordCount, mode, gameMode: mode });
-    trackGA4Event('funnel_first_game', { mode });
-  }
-
-  if (isWinner) {
-    trackGrowthEvent(isFirstGame ? 'first_game_won' : 'streak_continued', {
-      score,
-      wordCount,
-      mode,
-      gameMode: mode,
-    });
+  if (isWinner && !isFirstGame) {
+    trackGrowthEvent('streak_continued', { score, wordCount, mode, gameMode: mode });
   }
 };
 

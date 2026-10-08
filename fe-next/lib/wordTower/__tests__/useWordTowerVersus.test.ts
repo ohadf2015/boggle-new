@@ -31,6 +31,14 @@ describe('useWordTowerVersus', () => {
     expect(after).toBe(before + 1);
   });
 
+  it('re-pulls its tower once a reconnect has re-seated the socket (joined)', () => {
+    const m = mockSocket();
+    renderHook(() => useWordTowerVersus({ socket: m.socket, selfId: 'me' }));
+    const before = m.emits.filter((e) => e.event === 'requestTowerState').length;
+    m.trigger('joined', { success: true, reconnected: true });
+    expect(m.emits.filter((e) => e.event === 'requestTowerState').length).toBe(before + 1);
+  });
+
   it('applies towerStateSync (own tower + standings)', () => {
     const m = mockSocket();
     const { result } = renderHook(() => useWordTowerVersus({ socket: m.socket, selfId: 'me' }));

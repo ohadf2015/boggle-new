@@ -11,6 +11,7 @@ import {
   getRejoinIntent,
   clearRejoinIntent,
   planReconnectRejoin,
+  planNotSeatedRejoin,
   type RejoinIntent,
 } from '../socketRejoin';
 
@@ -62,5 +63,23 @@ describe('planReconnectRejoin — what to re-emit on a socket connect', () => {
 
   it('does NOT rejoin on a reconnect when the player has left (no intent)', () => {
     expect(planReconnectRejoin({ isReconnect: true, intent: null })).toBeNull();
+  });
+});
+
+describe('planNotSeatedRejoin — server says this socket is not seated', () => {
+  it('re-emits the remembered join when the server answers PLAYER_NOT_IN_GAME', () => {
+    expect(planNotSeatedRejoin({ errorCode: 'PLAYER_NOT_IN_GAME', intent: sampleIntent, lastAttemptAt: 0, now: 10_000 })).toEqual(sampleIntent);
+  });
+
+  it('ignores other error codes', () => {
+    expect(planNotSeatedRejoin({ errorCode: 'GAME_NOT_FOUND', intent: sampleIntent, lastAttemptAt: 0, now: 10_000 })).toBeNull();
+  });
+
+  it('does nothing without an intent (player left)', () => {
+    expect(planNotSeatedRejoin({ errorCode: 'PLAYER_NOT_IN_GAME', intent: null, lastAttemptAt: 0, now: 10_000 })).toBeNull();
+  });
+
+  it('throttles repeat attempts within 5s so a failing join cannot loop', () => {
+    expect(planNotSeatedRejoin({ errorCode: 'PLAYER_NOT_IN_GAME', intent: sampleIntent, lastAttemptAt: 8_000, now: 10_000 })).toBeNull();
   });
 });

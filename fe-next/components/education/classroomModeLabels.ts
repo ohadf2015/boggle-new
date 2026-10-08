@@ -16,7 +16,6 @@ export const MODE_TRANSLATION_KEY: Record<string, string> = {
   'word-hunt': 'wordHunt',
   'wheel-rush': 'wheelRush',
   'word-tower': 'wordTower',
-  'sealed-bid': 'sealedBid',
   crossword: 'crossword',
   wordcraft: 'wordcraft',
   'vocab-quiz': 'vocabQuiz',

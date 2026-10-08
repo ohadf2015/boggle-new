@@ -2,7 +2,7 @@
 
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Grid3x3, UserPlus, X, Clock, Building2, Grid2x2, Gavel, Brain } from 'lucide-react';
+import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Grid3x3, UserPlus, X, Clock, Building2, Grid2x2, Brain } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -74,7 +74,6 @@ export const MODE_ICON: Record<string, typeof LayoutGrid> = {
   blast: Zap,
   'wheel-rush': RotateCw,
   'word-tower': Building2,
-  'sealed-bid': Gavel,
   crossword: Grid3x3,
   wordcraft: Grid2x2,
   'vocab-quiz': Brain,

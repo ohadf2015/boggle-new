@@ -98,7 +98,7 @@ export function useHostLobby({
   // Disable Start while any player (host or guest) is mid rewarded-ad — starting
   // would tear a watcher out of their ad and void the reward they're earning.
   const { anyAdActive } = useLobbyAdGate({ socket });
-  const { isAdmin } = useAuth();
+  const { isAdmin, canSeeInWorkModes } = useAuth();
 
   const [hasInitialized, setHasInitialized] = useState(false);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
@@ -313,6 +313,7 @@ export function useHostLobby({
   return {
     socket,
     isAdmin,
+    canSeeInWorkModes,
     anyAdActive,
     selectedGameMode,
     setSelectedGameMode,

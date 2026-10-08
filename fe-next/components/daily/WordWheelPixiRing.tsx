@@ -20,9 +20,8 @@ interface WordWheelPixiRingProps {
   /** Whether a drag gesture is currently active */
   isDraggingRef?: React.RefObject<boolean>;
   /** Number of outer wheel slots the caller lays tiles on (default 6, the daily
-   * wheel's hexagon). Sealed Bid's 7-letter wheel must pass 7 — otherwise this
-   * ring's connection-line/drag-trail math (which used to hardcode 60° = 360/6)
-   * draws at the wrong angle and visually detaches from the actual tiles. */
+   * wheel's hexagon). Wheels with a different slot count must pass it — otherwise
+   * the connection-line/drag-trail angle (360/outerCount) detaches from the tiles. */
   outerCount?: number;
   /** When true, disable ambient orbital motion and center pulse for users who
    * prefer reduced motion. Functional feedback (connection lines) still draws. */

@@ -118,7 +118,7 @@ export function useDailyPlayedStatus(): DailyPlayedStatus & { refresh: () => Pro
         setStatus(data);
       }
     } catch (error) {
-      console.error('[useDailyPlayedStatus] fetch error:', error);
+      console.warn('[useDailyPlayedStatus] fetch error:', error);
       settleFromLocal();
     } finally {
       isFetching.current = false;

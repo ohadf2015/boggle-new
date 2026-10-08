@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { defaultOgImages } from '@/lib/seo/defaultOgImage';
 import Link from 'next/link';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
@@ -251,6 +252,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       description:
         'Gratis anagramlösare på svenska. Skriv 2–10 bokstäver och se varje giltigt ord direkt. Ingen registrering. Prova /sv/anagram eller spela live mot vänner.',
       openGraph: {
+        images: defaultOgImages(locale),
         type: 'website',
         url: svUrl,
         title: 'Anagram svenska — gratis anagramlösare',
@@ -272,6 +274,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     description:
       'Free online anagram solver. Enter any letters and instantly see every valid English word you can make. Perfect for Scrabble, Boggle, Words With Friends, and crossword help.',
     openGraph: {
+      images: defaultOgImages(locale),
       type: 'website',
       url: pageUrl,
       title: 'Free Anagram Solver — Find Every Word From Any Letters',

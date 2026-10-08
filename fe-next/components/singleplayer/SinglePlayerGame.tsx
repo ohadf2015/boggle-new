@@ -31,6 +31,8 @@ import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { evaluateSelectionAchievements } from '@/lib/achievements/hiddenAchievementBus';
 import { useExperiment } from '@/hooks/useExperiment';
 
+const FIRST_ROUND_IDLE_MS = 4000;
+
 const PRACTICE_CONTINUE_THRESHOLD = 100;
 const WORD_GOAL_TARGET = 10;
 const WORD_GOAL_MOMENTUM_THRESHOLD = 5;
@@ -253,6 +255,7 @@ function SinglePlayerGame({
     isClassic: true,
     totalGamesPlayed: gamesPlayed,
     isDesktop: core.isDesktop,
+    idleThresholdMs: settings.coach ? FIRST_ROUND_IDLE_MS : undefined,
   });
 
   // Scoring is the signal that the player understands the game; it silences

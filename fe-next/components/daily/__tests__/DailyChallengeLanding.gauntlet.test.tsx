@@ -68,10 +68,6 @@ vi.mock('../landing/QuestCard', () => ({
   ),
 }));
 
-vi.mock('../landing/StreakCounter', () => ({
-  StreakCounter: () => <div data-testid="streak-counter" />,
-}));
-
 vi.mock('../TabbedDailyLeaderboard', () => ({
   __esModule: true,
   default: () => <div data-testid="tabbed-daily-leaderboard" />,

@@ -111,7 +111,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   wordCount,
   classroomTemplateSettings = null,
 }) => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, canSeeInWorkModes } = useAuth();
   // Display the server-owned auto-start countdown on the TV screen too, with a
   // Cancel so a spectating host can still abort (the start itself fires from
   // HostView's hook regardless of which lobby surface is mounted).
@@ -278,6 +278,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
               setSelectedGameMode={setSelectedGameMode}
               t={t}
               isAdmin={isAdmin}
+              showInWorkModes={canSeeInWorkModes}
               language={roomLanguage}
             />
           </div>

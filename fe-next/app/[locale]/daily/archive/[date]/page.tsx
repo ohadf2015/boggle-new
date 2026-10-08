@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { defaultOgImages } from '@/lib/seo/defaultOgImage';
 import Link from 'next/link';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
@@ -70,6 +71,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     title,
     description,
     openGraph: {
+      images: defaultOgImages(locale),
       type: 'website',
       url: `${BASE_URL}${localePath}/daily/archive/${date}`,
       title,

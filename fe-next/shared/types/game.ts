@@ -21,7 +21,7 @@ export type GameState = 'waiting' | 'in-progress' | 'finished' | 'validating';
  * - Standalone modes (daily / adventure / endless / drill / single player)
  *   which have their own local types in their respective modules.
  */
-export type GameMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'word-tower' | 'sealed-bid' | 'crossword' | 'wordcraft';
+export type GameMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'word-tower' | 'crossword' | 'wordcraft';
 export type GameModeSelection = GameMode | 'random';
 
 export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
@@ -271,8 +271,6 @@ export interface Game {
     discoveryWordCount?: number;
     [key: string]: unknown;
   } | null;
-  /** Sealed Bid auction state (present during sealed-bid games) */
-  sealedBidState?: SealedBidModeState | null;
   /** Crossword race state (present during crossword MP games) */
   crosswordMpState?: CrosswordMpModeState | null;
 }
@@ -374,32 +372,6 @@ export interface WheelRushModeState {
   repeatCredited?: Record<string, string[]>;
 }
 
-
-/** A locked bid for the current Sealed Bid round (cross-player resolution at reveal). */
-export interface SealedBidEntry {
-  /** Normalized bid word, or null for a pass. */
-  word: string | null;
-  /** Server-validated: dict + formable + min length. */
-  valid: boolean;
-  locked: boolean;
-}
-
-/** Sealed Bid (auction) multiplayer mode state tracked per game. */
-export interface SealedBidModeState {
-  players: string[];
-  /** Shared racks for the match (same for all players). */
-  racks: string[];
-  /** Current round index (0-based). */
-  index: number;
-  phase: 'bidding' | 'revealed' | 'done';
-  /** Per-player locked bid for the CURRENT round (reset each round). */
-  bids: Record<string, SealedBidEntry>;
-  /** Cumulative score per player. */
-  scores: Record<string, number>;
-  startedAt: number;
-  /** Absolute epoch ms by which bids for the current round must be in. */
-  roundDeadline: number;
-}
 
 /** One player's live progress in a Crossword race. */
 export interface CrosswordMpPlayerProgress {

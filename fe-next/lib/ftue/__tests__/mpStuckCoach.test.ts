@@ -66,6 +66,11 @@ describe('nextStuckStage — stage detection', () => {
     );
   });
 
+  it('honours a shorter idle threshold for the first coached round', () => {
+    expect(nextStuckStage(base({ idleMs: 4000, elapsedMs: 4000, idleThresholdMs: 4000 }))).toBe('idle-nudge');
+    expect(nextStuckStage(base({ idleMs: 3999, elapsedMs: 4000, idleThresholdMs: 4000 }))).toBe('none');
+  });
+
   it('does NOT fire idle-nudge before IDLE_MS (thoughtful early pause)', () => {
     expect(nextStuckStage(base({ idleMs: IDLE_MS - 1, elapsedMs: IDLE_MS }))).toBe(
       'none'

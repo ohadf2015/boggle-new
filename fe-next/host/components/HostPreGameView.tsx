@@ -219,6 +219,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
         setSelectedGameMode={lobby.setSelectedGameMode}
         t={t}
         isAdmin={lobby.isAdmin}
+        showInWorkModes={lobby.canSeeInWorkModes}
         language={roomLanguage}
         onHowToPlay={() => setSheet('howto')}
       />

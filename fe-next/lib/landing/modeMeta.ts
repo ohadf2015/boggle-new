@@ -12,7 +12,7 @@
  */
 import {
   Swords, BookOpen, Map, Bomb, Link2, Brain, Layers, Building2,
-  Gavel, Grid3x3,
+  Grid3x3,
   CloudRain, Zap,
   type LucideIcon,
 } from 'lucide-react';
@@ -41,7 +41,7 @@ export interface ModeMetaEntry {
   readonly variant: ModeCubeVariant;
   /**
    * Homepage grouping. `'calm'` modes are the untimed, no-pressure puzzles
-   * (crossword, word craft, sealed bid, connections) — the landing splits them
+   * (crossword, word craft, connections) — the landing splits them
    * into a quieter "take your time" section, away from the energetic
    * competitive bento. Absent ⇒ treated as `'fast'` (the default energetic set).
    */
@@ -120,12 +120,6 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   crossword: {
     titleKey: 'crossword.name', descKey: 'crossword.tagline', path: '/crossword',
     Icon: Grid3x3, variant: 'cyan', badge: 'NEW', category: 'calm', genIcon: '/modes/cubes/crossword.png',
-  },
-  // Admin-only dev previews — also carry generated cube icons so the "+ More"
-  // grid is full-bleed art across the board. Colours spread to avoid clusters.
-  sealedBid: {
-    titleKey: 'landing.sealedBidMode', descKey: 'landing.sealedBidModeDesc', path: '/sealed-bid',
-    Icon: Gavel, variant: 'cyan', badge: 'ADMIN', category: 'calm', genIcon: '/modes/cubes/sealedbid.png',
   },
   // Word Tower v2 — the physics rebuild (matter-js rigid bodies, emergent
   // collapse). Now public (GA) and replaces v1 on the hub.

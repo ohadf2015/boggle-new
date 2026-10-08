@@ -33,7 +33,6 @@ const WordTowerVersus = dynamic(
   () => import('@/components/wordTower/WordTowerVersus').then(m => ({ default: m.WordTowerVersus })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
 );
-import { SealedBidVersus } from '@/components/multiplayer/sealedBid/SealedBidVersus';
 import { CrosswordVersus } from '@/components/multiplayer/crossword/CrosswordVersus';
 import { WordcraftProjectorView } from '@/components/multiplayer/wordcraft/WordcraftProjectorView';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
@@ -341,13 +340,14 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     );
   }
 
-  // Gridless versus modes — per-player towers / secret bids / crossword race.
-  if (gameMode === 'word-tower' || gameMode === 'sealed-bid' || gameMode === 'crossword') {
-    const Versus = gameMode === 'word-tower' ? WordTowerVersus : gameMode === 'sealed-bid' ? SealedBidVersus : CrosswordVersus;
+  // Gridless versus modes — per-player towers / crossword race.
+  if (gameMode === 'word-tower' || gameMode === 'crossword') {
+    const Versus = gameMode === 'word-tower' ? WordTowerVersus : CrosswordVersus;
     return (
       <>
         <Versus socket={socket} username={username} onQuit={handleStopGameClick} />
         {connectionOverlays}
+        {stopConfirm}
       </>
     );
   }

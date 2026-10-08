@@ -14,6 +14,8 @@ vi.mock('../../utils/socketHelpers', () => ({
   broadcastToRoom: vi.fn(),
   volatileBroadcastToRoom: vi.fn(),
   getGameRoom: vi.fn((code: string) => `room:${code}`),
+  getSocketById: vi.fn(() => null),
+  safeEmit: vi.fn(),
 }));
 vi.mock('../../utils/rateLimiter', () => ({ checkRateLimit: vi.fn(() => true) }));
 vi.mock('../../utils/socketValidation', () => ({ validatePayload: vi.fn() }));
@@ -22,6 +24,7 @@ vi.mock('../../modules/gameStateManager', () => ({
   getGame: vi.fn(),
   getGameBySocketId: vi.fn(() => 'GAME1'),
   getUsernameBySocketId: vi.fn(() => 'p1'),
+  getSocketIdByUsername: vi.fn(() => null),
   updatePlayerScore: vi.fn(),
 }));
 vi.mock('@/lib/wordTower/versusMatch', () => ({
@@ -42,7 +45,7 @@ import { submitVersusWord, sendVersusBomb } from '@/lib/wordTower/versusMatch';
 const mkSocket = () => ({ id: 's1', emit: vi.fn() } as unknown as Socket);
 const mkIo = () => ({} as Server);
 
-const matchState = { players: { p1: { game: {} }, p2: { game: {} } }, endsAtMs: 1 };
+const matchState = { players: { p1: { game: { heightM: 5.4 } }, p2: { game: { heightM: 2 } } }, endsAtMs: 1 };
 const gameBase = {
   gameState: 'in-progress',
   gameMode: 'word-tower',
@@ -59,7 +62,7 @@ describe('wordTowerHandler', () => {
     const sock = mkSocket();
     handleSubmitTowerWord(mkIo(), sock, { word: 'CAT' });
     expect(sock.emit).toHaveBeenCalledWith('towerWordResult', expect.objectContaining({ accepted: true }));
-    expect(updatePlayerScore).toHaveBeenCalledWith('GAME1', 'p1', 5, true);
+    expect(updatePlayerScore).toHaveBeenCalledWith('GAME1', 'p1', 5);
     expect(volatileBroadcastToRoom).toHaveBeenCalledWith(expect.anything(), 'room:GAME1', 'towerStandings', expect.anything());
   });
 
@@ -86,6 +89,7 @@ describe('wordTowerHandler', () => {
     handleSendTowerBomb(mkIo(), sock, { targetPlayerId: 'p2' });
     expect(sock.emit).toHaveBeenCalledWith('towerBombResult', { sent: true, targetId: 'p2', removed: 3, damage: 4 });
     expect(broadcastToRoom).toHaveBeenCalledWith(expect.anything(), 'room:GAME1', 'towerBombHit', expect.objectContaining({ fromId: 'p1', targetId: 'p2', removed: 3 }));
+    expect(updatePlayerScore).toHaveBeenCalledWith('GAME1', 'p2', 2);
   });
 
   it('emits bomb failure reason when blocked', () => {

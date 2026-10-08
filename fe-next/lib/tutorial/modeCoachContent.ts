@@ -138,17 +138,6 @@ export const MODE_COACH: Record<CoachModeKey, CoachContent> = {
       { demo: 'icon', emoji: '➡️', captionKey: 'modeCoach.crossword.step2' },
     ],
   },
-  sealedBid: {
-    mode: 'sealedBid',
-    tier: 'simple',
-    accent: 'pink',
-    titleKey: 'modeCoach.sealedBid.title',
-    steps: [
-      { demo: 'icon', emoji: '🤫', captionKey: 'modeCoach.sealedBid.step1' },
-      { demo: 'icon', emoji: '💎', captionKey: 'modeCoach.sealedBid.step2' },
-      { demo: 'icon', emoji: '⚡', captionKey: 'modeCoach.sealedBid.step3' },
-    ],
-  },
   adventure: {
     mode: 'adventure',
     tier: 'simple',
@@ -158,6 +147,17 @@ export const MODE_COACH: Record<CoachModeKey, CoachContent> = {
       { demo: 'icon', emoji: '🗺️', captionKey: 'modeCoach.adventure.step1' },
       { demo: 'icon', emoji: '⚔️', captionKey: 'modeCoach.adventure.step2' },
     ],
+  },
+  party: {
+    mode: 'party',
+    tier: 'simple',
+    accent: 'pink',
+    titleKey: 'modeCoach.party.title',
+    steps: [
+      { demo: 'drag', captionKey: 'modeCoach.party.step1' },
+      { demo: 'icon', emoji: '📱', captionKey: 'modeCoach.party.step2' },
+    ],
+    scoreTipKey: 'modeCoach.party.scoreTip',
   },
 };
 

@@ -174,15 +174,6 @@ vi.mock('../ModeCard', () => {
   return { default: MockModeCard };
 });
 
-// Mock components that are lazy loaded
-vi.mock('@/components/daily/DailyChallengeBanner', () => {
-  const MockDailyChallengeBanner = () => {
-    return <div data-testid="daily-challenge-banner">Daily Challenge</div>;
-  };
-  return { default: MockDailyChallengeBanner };
-});
-
-
 describe('LandingView - Daily Challenge Banner Spacing', () => {
   beforeEach(() => {
     (useAuth as vi.Mock).mockReturnValue({
