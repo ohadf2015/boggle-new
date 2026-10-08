@@ -28,6 +28,9 @@ import {
   trackEduProCheckoutSuccessSeen,
   trackTrialCtaView,
   trackTrialCtaTap,
+  trackTeacherProUpgradeClick,
+  trackTeacherProCheckoutStarted,
+  trackTeacherTrialUpgradeCtaClicked,
   PRO_SUCCESS_SEEN_STORAGE_KEY,
 } from '../proFunnelTelemetry';
 
@@ -42,11 +45,55 @@ describe('trackEduProUpgradeClicked', () => {
   it('Given a dashboard trial CTA, When tracked, Then the source distinguishes lifecycle from expired', () => {
     trackEduProUpgradeClicked({ source: 'dashboard_trial_lifecycle' });
     trackEduProUpgradeClicked({ source: 'dashboard_trial_ended' });
-    expect(captureMock).toHaveBeenNthCalledWith(1, 'edu_pro_upgrade_clicked', {
+    expect(captureMock).toHaveBeenCalledWith('edu_pro_upgrade_clicked', {
       source: 'dashboard_trial_lifecycle',
     });
-    expect(captureMock).toHaveBeenNthCalledWith(2, 'edu_pro_upgrade_clicked', {
+    expect(captureMock).toHaveBeenCalledWith('edu_pro_upgrade_clicked', {
       source: 'dashboard_trial_ended',
+    });
+  });
+
+  it('Given a paid upgrade click, When tracked, Then checkout_open is also fired for the conversion funnel', () => {
+    trackEduProUpgradeClicked({ source: 'dashboard_trial_lifecycle' });
+    expect(captureMock).toHaveBeenCalledWith('checkout_open', {
+      source: 'dashboard_trial_lifecycle',
+      product: 'teacher_pro',
+    });
+  });
+});
+
+describe('other Teacher Pro checkout touchpoints', () => {
+  beforeEach(() => captureMock.mockReset());
+
+  it('Given any education CTA click, When tracked, Then checkout_open fires', () => {
+    trackTeacherProUpgradeClick({ page: '/education', locale: 'en', placement: 'education_packages' });
+    expect(captureMock).toHaveBeenCalledWith('checkout_open', {
+      source: 'education_packages',
+      product: 'teacher_pro',
+      page: '/education',
+    });
+  });
+
+  it('Given a paid checkout start, When tracked, Then checkout_open fires', () => {
+    trackTeacherProCheckoutStarted({ trial: false, signed_in: true });
+    expect(captureMock).toHaveBeenCalledWith('checkout_open', {
+      source: 'checkout_start',
+      product: 'teacher_pro',
+      trial: false,
+    });
+  });
+
+  it('Given a trial checkout start, When tracked, Then checkout_open does not fire', () => {
+    trackTeacherProCheckoutStarted({ trial: true, signed_in: true });
+    expect(captureMock.mock.calls.map((c) => c[0])).not.toContain('checkout_open');
+  });
+
+  it('Given the HQ trial-strip upgrade tap, When tracked, Then checkout_open fires', () => {
+    trackTeacherTrialUpgradeCtaClicked({ trial_days_remaining: 4 });
+    expect(captureMock).toHaveBeenCalledWith('checkout_open', {
+      source: 'dashboard_trial_strip',
+      trial_days_remaining: 4,
+      product: 'teacher_pro',
     });
   });
 
@@ -167,6 +214,7 @@ describe('Growth Radar mirror (trackGrowthEvent)', () => {
       'trial_cta_view',
       'trial_cta_tap',
       'edu_pro_upgrade_clicked',
+      'checkout_open',
       'edu_pro_checkout_success_seen',
     ]);
   });

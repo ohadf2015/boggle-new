@@ -55,11 +55,16 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     const res = await POST(polarEvent('subscription.active', sub()))
     expect(res.status).toBe(200)
     expect(upsertSubscription).toHaveBeenCalledTimes(1)
-    expect(capture).toHaveBeenCalledTimes(1)
+    expect(capture).toHaveBeenCalledTimes(2)
     const arg = capture.mock.calls[0][0]
     expect(arg).toMatchObject({ distinctId: 'u1', event: 'edu_pro_checkout_succeeded' })
     expect(arg.properties.subscription_id).toBe('sub_1')
     expect(arg.properties.$host).toBe(EDU_ANALYTICS_HOST)
+    expect(capture.mock.calls.map((c) => c[0].event)).toEqual([
+      'edu_pro_checkout_succeeded',
+      'paid',
+    ])
+    expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
   it.each(['subscription.created', 'subscription.uncanceled', 'subscription.resumed', 'subscription.updated'])(
@@ -74,7 +79,7 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     const res = await POST(polarEvent('subscription.created', sub({ status: 'trialing' })))
     expect(res.status).toBe(200)
     const events = capture.mock.calls.map((c) => c[0].event)
-    expect(events).toEqual(['edu_pro_trial_succeeded', 'trial_activated'])
+    expect(events).toEqual(['edu_pro_trial_succeeded', 'trial_activated', 'trial_start'])
     expect(capture.mock.calls[0][0].properties.subscription_id).toBe('sub_1')
     expect(capture.mock.calls[0][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
     expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
@@ -83,7 +88,7 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
   it('Given subscription.active while still trialing, When handled, Then it is a trial not a paid conversion', async () => {
     await POST(polarEvent('subscription.active', sub({ status: 'trialing' })))
     const events = capture.mock.calls.map((c) => c[0].event)
-    expect(events).toEqual(['edu_pro_trial_succeeded', 'trial_activated'])
+    expect(events).toEqual(['edu_pro_trial_succeeded', 'trial_activated', 'trial_start'])
   })
 
   it('Given a non-Pro product, When active, Then nothing fires', async () => {

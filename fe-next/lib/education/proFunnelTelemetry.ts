@@ -70,6 +70,8 @@ export function trackTrialCtaTap(args: { source: TrialCtaSource }): void {
 
 export function trackEduProUpgradeClicked(args: { source: ProUpgradeSource }): void {
   captureStep('edu_pro_upgrade_clicked', { source: args.source });
+  // Canonical conversion-funnel name (trial_start → checkout_open → checkout_complete → paid).
+  safeCapture('checkout_open', { source: args.source, product: 'teacher_pro' });
 }
 
 /** Persistent HQ trial strip — impression. Not mirrored: name is HQ-only. */
@@ -87,6 +89,11 @@ export function trackTeacherTrialUpgradeCtaClicked(args: {
   trial_days_remaining: number;
 }): void {
   safeCapture('teacher_trial_upgrade_cta_clicked', {
+    trial_days_remaining: args.trial_days_remaining,
+    product: 'teacher_pro',
+  });
+  safeCapture('checkout_open', {
+    source: 'dashboard_trial_strip',
     trial_days_remaining: args.trial_days_remaining,
     product: 'teacher_pro',
   });
@@ -159,6 +166,7 @@ export function trackTeacherProUpgradeClick(args: {
   const props = { page: args.page, locale: args.locale, placement: args.placement };
   safeCapture('teacher_pro_upgrade_click', props);
   mirrorToGrowth('teacher_pro_upgrade_click', props);
+  safeCapture('checkout_open', { source: args.placement, product: 'teacher_pro', page: args.page });
 }
 
 /** Fired immediately before POST /api/subscription/checkout. */
@@ -166,6 +174,9 @@ export function trackTeacherProCheckoutStarted(args: { trial: boolean; signed_in
   const props = { trial: args.trial, signed_in: args.signed_in };
   safeCapture('teacher_pro_checkout_started', props);
   mirrorToGrowth('teacher_pro_checkout_started', props);
+  if (!args.trial) {
+    safeCapture('checkout_open', { source: 'checkout_start', product: 'teacher_pro', trial: false });
+  }
 }
 
 /** Fired when the checkout provider returns a redirect URL. */

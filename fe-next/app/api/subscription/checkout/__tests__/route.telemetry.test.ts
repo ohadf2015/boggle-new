@@ -52,11 +52,14 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
 
     const res = await POST(req())
     expect(res.status).toBe(200)
-    expect(capture).toHaveBeenCalledTimes(1)
+    expect(capture).toHaveBeenCalledTimes(2)
+    const events = capture.mock.calls.map((c) => c[0].event)
+    expect(events).toEqual(['edu_pro_checkout_started', 'checkout_complete'])
     const arg = capture.mock.calls[0][0]
     expect(arg.distinctId).toBe('u1')
     expect(arg.event).toBe('edu_pro_checkout_started')
     expect(arg.properties.$host).toBe(EDU_ANALYTICS_HOST)
+    expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
   it('Given Polar fails, When the route answers 500, Then nothing is counted as started', async () => {
