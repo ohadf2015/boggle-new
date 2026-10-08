@@ -57,13 +57,40 @@ export function normalizeClue(clue: string): string {
  * Returns null if the result is empty, untrimmable to length, or circular (gives the
  * answer away). Language-agnostic: tokenization uses \p{L} via isCircularClue.
  */
-export function definitionToClue(def: string, answer: string): string | null {
-  if (!def) return null;
+function firstSentence(def: string): string {
   let s = cleanDefinition(def).replace(/…+$/, '').trim();
   // first sentence (Latin "." / ";" and CJK "。" "；"), then drop a trailing "— extra" gloss
   s = s.split(/(?<=[.;])\s|。|；/)[0].trim();
   s = s.split(/\s[—–]\s/)[0].trim();
-  s = s.replace(/[.;,\s]+$/, '').trim(); // drop the sentence-end punctuation the split kept
+  return s.replace(/[.;,\s]+$/, '').trim(); // drop the sentence-end punctuation the split kept
+}
+
+const MODIFIER_START = new RegExp(
+  [
+    'котор\\p{L}*', 'а также', 'также', 'обычно', 'как правило', 'в том числе', 'чаще всего', 'преимущественно', 'особенно',
+    '\\p{L}+(?:щ|вш|нн|ем|им)(?:ий|ый|ая|ее|ое|ие|ые|их|ых|ым|им|ими|ую|ого|ей|ой)',
+    '\\p{L}+т(?:ый|ая|ое|ые|ых|ым|ую|ого|ой)',
+    'que', 'con', 'cuy[oa]s?', 'el cual', 'la cual', 'generalmente', 'especialmente', 'normalmente', 'sobre todo', 'en especial', 'y también', 'también',
+    '\\p{L}+(?:ad|id)[oa]s?', '\\p{L}+(?:ando|iendo)',
+  ].map((p) => `^(?:${p})(?!\\p{L})`).join('|'),
+  'u',
+);
+
+/** False when the clue is a hard word-boundary cut that stops mid-clause (reads as truncated). */
+export function clueEndsAtClause(def: string, clue: string): boolean {
+  const s = normalizeClue(firstSentence(def)).toLowerCase();
+  const c = clue.toLowerCase();
+  if (!s.startsWith(c)) return false;
+  const rest = s.slice(c.length);
+  if (rest === '') return true;
+  // a comma cut is safe only when it drops a modifier clause; cutting a list leaves half a meaning
+  const next = rest.replace(/^\s*,\s*/, '');
+  return rest !== next && c.split(/\s+/).length >= 3 && MODIFIER_START.test(next);
+}
+
+export function definitionToClue(def: string, answer: string): string | null {
+  if (!def) return null;
+  let s = firstSentence(def);
   if (s.length > CLUE_MAX) {
     // prefer cutting at a clause (comma) boundary so we don't dangle mid-phrase
     const parts = s.split(',');

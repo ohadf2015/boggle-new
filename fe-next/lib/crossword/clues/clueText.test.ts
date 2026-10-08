@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { cleanDefinition, isCircularClue, clueLengthOk, normalizeClue, definitionToClue } from './clueText';
+import { cleanDefinition, isCircularClue, clueLengthOk, normalizeClue, definitionToClue, clueEndsAtClause } from './clueText';
 
 describe('cleanDefinition', () => {
   it('strips the Datamuse POS prefix and parentheticals', () => {
@@ -84,5 +84,35 @@ describe('definitionToClue', () => {
   });
   it('returns null for empty input', () => {
     expect(definitionToClue('', 'x')).toBeNull();
+  });
+});
+
+describe('clueEndsAtClause', () => {
+  const check = (def: string) => clueEndsAtClause(def, definitionToClue(def, 'zzz')!);
+
+  it('accepts a whole first sentence', () => {
+    expect(check('Pez marino comestible. Otro sentido')).toBe(true);
+  });
+
+  it('accepts a cut at a comma clause boundary', () => {
+    expect(check('самец домашней кошки, а также некоторых других из семейства кошачьих и прочих')).toBe(true);
+  });
+
+  it('accepts a comma cut before a participle or relative clause', () => {
+    expect(check('Узор со множеством небольших сквозных участков, образующих рисунок на ткани или металле и прочем')).toBe(true);
+    expect(check('Edificio grande de varias plantas, destinado a viviendas u oficinas de muchas personas y empresas')).toBe(true);
+    expect(check('Embarcación pequeña sin cubierta, que se mueve a remo o con un motor fuera de borda y velas')).toBe(true);
+  });
+
+  it('rejects a comma cut that leaves fewer than three words', () => {
+    expect(check('Отдельная территория, засаженная деревьями, кустами, цветами и прочими растениями для отдыха')).toBe(false);
+  });
+
+  it('rejects a comma cut that drops part of a list', () => {
+    expect(check('глубокая убеждённость в существовании, истинности или неизбежности чего-либо, не требующая доказательств')).toBe(false);
+  });
+
+  it('rejects a hard word-boundary cut that stops mid-clause', () => {
+    expect(check('Архитектурное сооружение предназначенное для жилья и имеющее стены крышу окна и двери')).toBe(false);
   });
 });

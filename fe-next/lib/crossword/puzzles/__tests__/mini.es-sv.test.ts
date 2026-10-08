@@ -15,7 +15,7 @@ describe.each(['es', 'sv', 'ja'] as const)('%s mini pool', (locale) => {
   const enabled = (getGameModeRules('crossword').languages ?? []).includes(locale);
 
   it('has at least 5 generated puzzles of its own locale', () => {
-    expect(pool.length).toBeGreaterThanOrEqual(5);
+    expect(pool.filter((p) => p.locale === locale).length).toBeGreaterThanOrEqual(5);
   });
 
   it.skipIf(!enabled)('has at least 10 generated puzzles of its own locale', () => {

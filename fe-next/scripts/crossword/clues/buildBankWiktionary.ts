@@ -19,16 +19,23 @@
  *
  * --source=nouns also draws 3..4 letter candidates from backend/<lang>_nouns.txt (the big board-seeding list), kept
  * only if the (accent-folded) word is in the shipped dictionary and (es) appears >=2x in the repo's Spanish copy; they still need a clean Wiktionary clue + the auditor.
+ *
+ * --freq-top=N (es|ru) replaces that repo-copy proxy with our own Wikipedia frequency list (freq/<lang>.json, see
+ * corpusFrequency.ts): 3..4 letter in-dictionary words ranked in the top N. es draws from es_nouns + common_hunt_words_es,
+ * ru from russian_words + common_hunt_words_ru (ru must be a noun lemma). Keys are stored folded (es accents, ru ё).
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { wiktionaryClue, wiktionaryClueJa } from './wiktionary';
+import { fetchWiktExtract, wiktionaryClue, wiktionaryClueJa } from './wiktionary';
+import { loadDeny, loadFreqRank, selectFreqCandidates, type FreqLang } from './frequency';
+import { cleanMeaning } from '../../../lib/dictionary/wiktionaryMeaning';
+import { clueEndsAtClause, definitionToClue } from '../../../lib/crossword/clues/clueText';
 import { selectJaCandidates } from './jaCandidates';
 import { evaluateSvClue, evaluateEsClue } from '../../../lib/crossword/clues/evaluateSvClue';
 import { endsDangling } from '../../../lib/crossword/clues/danglingEnd';
 import { evaluateRuClue } from '../../../lib/crossword/clues/evaluateRuClue';
 import { createSafeReadFile, loadJapaneseDictionary, loadRussianDictionary, loadSpanishDictionary, loadSwedishDictionary } from '../../../backend/dictionaryLoaders';
-import { rejectNounClueEs } from '../../../lib/crossword/clues/nounClueFilter';
+import { esFirstSenseFlagged, esSenses, rejectNounClueEs, rejectNounClueRu, ruNounSenses } from '../../../lib/crossword/clues/nounClueFilter';
 import { loadEsCommonness } from './commonness';
 import { foldEsAccents, foldJaKana } from '../../../lib/crossword/answer';
 
@@ -41,6 +48,7 @@ const LIMIT = parseInt(arg('limit', String(Number.MAX_SAFE_INTEGER))!, 10);
 const MAX_LEN = parseInt(arg('max-len', '7')!, 10);
 const MIN_SCORE = parseFloat(arg('min-score', '0.5')!);
 const SOURCE = arg('source');
+const FREQ_TOP = arg('freq-top') ? parseInt(arg('freq-top')!, 10) : null;
 const NOUN_MAX_LEN = 4; // build-mini only lands 3-4 letter answers
 const MIN_COMMON = 2; // nouns-only words must appear this often in the repo's Spanish copy
 const DRY = process.argv.includes('--dry');
@@ -70,6 +78,11 @@ async function main() {
   if (SOURCE === 'words') {
     if (LANG !== 'ja') throw new Error('--source=words is ja only');
     await buildJa(bank, bankPath, before);
+    return;
+  }
+  if (FREQ_TOP != null) {
+    if (LANG !== 'es' && LANG !== 'ru') throw new Error('--freq-top is es|ru only');
+    await buildFromFreq(LANG, FREQ_TOP, bank, bankPath, before);
     return;
   }
 
@@ -146,6 +159,67 @@ async function buildJa(bank: Bank, bankPath: string, before: number) {
 
   if (!DRY) writeFileSync(bankPath, `${JSON.stringify(bank, null, 2)}\n`);
   console.log(`DONE ${DRY ? '(dry)' : ''} ja: processed ${processed}, +${added} added (${((100 * added) / Math.max(processed, 1)).toFixed(1)}%), ${miss} no-def, ${rejected} rejected by filter. bank ${before} -> ${before + (DRY ? 0 : added)}`);
+}
+
+const readList = (f: string) => readFileSync(join(__dirname, `../../../backend/${f}`), 'utf8').split('\n');
+
+/** First usable clue for a frequency candidate (trying its first two senses), or why there is none. */
+function freqClue(lang: FreqLang, word: string, key: string, extract: string): { clue: string } | { reject: string } {
+  if (lang === 'es' && esFirstSenseFlagged(extract)) return { reject: 'archaic/regional/vulgar usage note' };
+  const senses = lang === 'es' ? esSenses(extract) : ruNounSenses(extract);
+  if (!senses.length) return { reject: lang === 'es' ? 'no clean definition' : 'not a noun lemma' };
+  let last: { reject: string } = { reject: 'no sense' };
+  for (const sense of senses) {
+    if (lang === 'ru' && rejectNounClueRu(sense)) { last = { reject: `filter: ${sense}` }; continue; }
+    const def = lang === 'es' ? cleanMeaning(sense) : cleanMeaning(sense.replace(/^(?:[а-яё-]{1,12}\.,?\s+){1,4}/i, '')); // drop ru domain labels ("зоол. ")
+    const res = clueFromDef(lang, word, key, def);
+    if ('clue' in res) return res;
+    last = res;
+  }
+  return last;
+}
+
+function clueFromDef(lang: FreqLang, word: string, key: string, def: string | null): { clue: string } | { reject: string } {
+  const clue = def && definitionToClue(def, word);
+  if (!def || !clue) return { reject: 'no clean definition' };
+  if (!clueEndsAtClause(def, clue)) return { reject: `truncated: ${clue}` };
+  if ((lang === 'es' ? rejectNounClueEs : rejectNounClueRu)(clue)) return { reject: `filter: ${clue}` };
+  if (!qualityOk(lang, key, clue)) return { reject: `auditor: ${clue}` };
+  return { clue };
+}
+
+async function buildFromFreq(lang: FreqLang, n: number, bank: Bank, bankPath: string, before: number) {
+  const inTop = loadFreqRank(lang);
+  const dict = await (lang === 'es' ? loadSpanishDictionary : loadRussianDictionary)(createSafeReadFile());
+  const words = lang === 'es'
+    ? [...readList('es_nouns.txt'), ...readList('common_hunt_words_es.txt')]
+    : [...readList('common_hunt_words_ru.txt'), ...readList('russian_words.txt')];
+  const candidates = selectFreqCandidates(words, { lang, inTop, n, dict, bankKeys: new Set(Object.keys(bank)), deny: loadDeny(lang) });
+  console.log(`${DRY ? '[DRY] ' : ''}${lang}: bank ${before} words, ${candidates.length} candidates in top ${n} (3-4 letters, in dict)`);
+
+  let added = 0, miss = 0, rejected = 0, processed = 0;
+  for (const { word, key } of candidates) {
+    if (processed >= LIMIT) break;
+    processed++;
+    let extract: string | null = null;
+    for (let attempt = 1; attempt <= 4; attempt++) {
+      try { extract = await fetchWiktExtract(word, lang); break; } catch (e) {
+        console.warn(`  ! ${word}: ${(e as Error).message} (attempt ${attempt})`);
+        await sleep(15000 * attempt); // Wiktionary 429s bursts; back off rather than lose the word
+      }
+    }
+    await sleep(400);
+    if (!extract) { miss++; continue; }
+    const res = freqClue(lang, word, key, extract);
+    if ('reject' in res) { rejected++; if (DRY) console.log(`  - ${key}: ${res.reject}`); continue; }
+    if (key in bank) continue;
+    added++;
+    if (DRY) console.log(`  + ${key}: ${res.clue}`);
+    else bank[key] = { clue: res.clue, score: NEW_WORD_SCORE };
+  }
+
+  if (!DRY) writeFileSync(bankPath, `${JSON.stringify(bank, null, 2)}\n`);
+  console.log(`DONE ${DRY ? '(dry)' : ''} ${lang} freq-top=${n}: processed ${processed}, +${added} added, ${miss} no-page, ${rejected} rejected. bank ${before} -> ${before + (DRY ? 0 : added)}`);
 }
 
 main().then(() => process.exit(0)).catch((e) => { console.error(e); process.exit(1); });

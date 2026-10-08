@@ -14,15 +14,52 @@ const RULES: RegExp[] = [
   // markup / formatting junk and colloquial openers
   /={2,}|\s[,.;:]|^(no me|me)\b/i,
   // regional / archaic
-  /\b(cuba|méxico|mexic\w*|ecuador|aragón|chile|chilen\w*|argentin\w*|perú|peruan\w*|colombia\w*|venezuela\w*|bolivia\w*|uruguay\w*|paraguay\w*|guatemala|honduras|nicaragua|costa rica|panamá|puerto rico|rioja|navarra|andaluc\w*|extremadura|galicia|canarias|américa|amerindi\w*|castilla)\b/i,
+  /(?<!\p{L})(cuba|méxico|mexic\p{L}*|ecuador|aragón|chile|chilen\p{L}*|argentin\p{L}*|perú|peruan\p{L}*|colombia\p{L}*|venezuela\p{L}*|bolivia\p{L}*|uruguay\p{L}*|paraguay\p{L}*|guatemala|honduras|nicaragua|costa rica|panamá|puerto rico|rioja|navarra|andaluc\p{L}*|extremadura|galicia|canarias|américa|amerindi\p{L}*|castilla)(?!\p{L})/iu,
   /\b(antiguo|antigua|antiguos|antiguas|antiguamente|desusad\w*|arcaic\w*|obsolet\w*)\b/i,
   // taxonomy-style obscurity
   /^(especie|arbusto|garrapatero|planta|árbol|hierba|pez|ave|insecto|molusco|mamífero|género|familia)\b.*\b(de|del|familia|especies)\b.*/i,
   /\b(especie de|planta de la familia|arbusto|garrapatero)\b/i,
+  // later senses lean on an earlier one ("Golpe dado con una pieza tal", "Por extensión, …")
+  /^por extensión\b|(?<!\p{L})(tal|tales|este|esta|estos|estas|dicho|dicha|dichos|dichas)(?!\p{L})|\balgun[oa]s otr[oa]s\b/iu,
+  /^que ocupa el \p{L}+ lugar\b/iu,
 ];
 
 export function rejectNounClueEs(clue: string): boolean {
   return RULES.some((r) => r.test(clue));
+}
+
+const ES_POS_HEADER = /^=+ (Sustantivo|Verbo|Adjetivo|Adverbio|Pronombre|Interjección|Numeral|Forma)/i;
+const ES_FLAGGED_USAGE = /^Uso:.*(anticuad|desusad|obsolet|poco usad|coloquial|vulgar|malsonante|despectiv|peyorativ|jerga|jergal|germanía|rural|infantil|eufemism|lunfardo|festivo|poétic|literari)/i;
+
+type EsSense = { gloss: string; flagged: boolean };
+
+/** Numbered senses of the first part-of-speech section: gloss line + whether its notes mark it archaic/vulgar/regional. */
+function parseEsSenses(extract: string | null | undefined): EsSense[] {
+  const lines = (extract ?? '').split('\n').map((l) => l.trim());
+  const es = lines.indexOf('== Español ==');
+  const pos = es < 0 ? -1 : lines.findIndex((l, i) => i > es && ES_POS_HEADER.test(l));
+  if (pos < 0) return [];
+  const out: EsSense[] = [];
+  for (let i = pos + 1; i < lines.length && !lines[i].startsWith('='); i++) {
+    if (!/^\d+(\s|$)/.test(lines[i])) continue;
+    const gloss = lines[i + 1] ?? '';
+    let flagged = false;
+    for (let j = i + 2; j < lines.length && !/^\d+(\s|$)/.test(lines[j]) && !lines[j].startsWith('='); j++) {
+      if (ES_FLAGGED_USAGE.test(lines[j]) || /^Ámbito:/i.test(lines[j])) flagged = true;
+    }
+    if (gloss && !gloss.startsWith('=')) out.push({ gloss, flagged });
+  }
+  return out;
+}
+
+/** True when the word's main sense (first sense of the first part of speech) carries an archaic/vulgar/regional note. */
+export function esFirstSenseFlagged(extract: string | null | undefined): boolean {
+  return parseEsSenses(extract)[0]?.flagged ?? false;
+}
+
+/** Glosses of the first few unflagged senses (a circular or overlong first sense can fall back to the next). */
+export function esSenses(extract: string | null | undefined, max = 2): string[] {
+  return parseEsSenses(extract).filter((x) => !x.flagged).slice(0, max).map((x) => x.gloss);
 }
 
 /** Mechanical rejects for Japanese Wiktionary clues (family/classroom audience). */
@@ -41,4 +78,53 @@ const JA_RULES: RegExp[] = [
 
 export function rejectNounClueJa(clue: string): boolean {
   return JA_RULES.some((r) => r.test(clue));
+}
+
+/** Mechanical rejects for Russian Wiktionary senses and clues (family/classroom audience). */
+const RU_RULES: RegExp[] = [
+  /\d/,
+  /^форма(?!\p{L})|(?<!\p{L})падеж|(?<!\p{L})(местоимени|союз|предлог|частиц|междомет|числительн)/iu,
+  /^(употребляется|используется|служит|указывает|выражает|обозначает|при обращении|то же,? что)(?!\p{L})/iu,
+  /(?<!\p{L})имя(?!\p{L})|(?<!\p{L})фамили/iu,
+  // later senses lean on the previous one ("Здание этого учреждения") or go vague-figurative
+  /(?<!\p{L})(эт(от|а|о|ого|ой|их|им|ом|у)|так(ой|ая|ое|ие|ого|их|им|ую)|данн\p{L}*|указанн\p{L}*)(?!\p{L})/iu,
+  /^(то|нечто|что-либо|что-то|кто-либо|кто-то)(?!\p{L})/iu,
+  // "В живописи: …" / "В восточных единоборствах": a field label, not a meaning
+  /^(в|во|у) [^,]*(:|$)/iu,
+  /\s[,.;:]/,
+  // register labels kept on the raw sense line (archaic, dialect, slang, vulgar, colloquial, bookish)
+  /^(?:[а-яё-]{1,12}\.,?\s+)*(устар|истор|арх|диал|рег|обл|обсц|вульг|бран|груб|жарг|сленг|разг|прост|сниж|презр|пренебр|неодобр|фам|эвф|ирон|шутл|крим|мол|церк|поэт|книжн|высок|спец|техн|мед|физиол)\./iu,
+  /половой|половы|сношени|совокуп|генитал|эротич|секс|проститу|блуд|разврат|наркоти|опиум|конопл|алкогол|спиртн|пьян|водк|самогон|убий|убит|труп|смерт|казн|испражн|кал(?!\p{L})|моч[аие](?!\p{L})|ругат|оскорб|презрит/iu,
+  /сибир|урал|кавказ|украин|белорус|казах|дальн\p{L}* восток|дон(?:ск|у|е)(?!\p{L})|кубан|якут|татар|в некоторых местностях|регион/iu,
+  /^(род|вид|семейство|отряд|подвид|сорт|порода)(?!\p{L})|(?<!\p{L})(семейства|отряда|рода)(?!\p{L})/iu,
+];
+
+export function rejectNounClueRu(clue: string): boolean {
+  const text = clue.replace(/\([^)]*\)/g, ' '); // parentheticals are dropped from the clue anyway
+  // Latin binomials (even in parentheses) mark taxonomy-level senses
+  return /[A-Za-z]/.test(clue) || RU_RULES.some((r) => r.test(text));
+}
+
+/** First few raw sense lines (labels kept, stress marks dropped) of a ru Wiktionary page whose part of speech is a noun, else []. */
+export function ruNounSenses(extract: string | null | undefined, max = 2): string[] {
+  if (!extract) return [];
+  const lines = extract.split('\n').map((l) => l.trim());
+  const start = lines.indexOf('= Русский =');
+  if (start < 0) return [];
+  const end = lines.findIndex((l, i) => i > start && /^= [^=].*=$/.test(l));
+  const body = lines.slice(start + 1, end < 0 ? undefined : end);
+  const morph = body.findIndex((l) => /^=+ Морфологические и синтаксические свойства =+$/.test(l));
+  if (morph < 0) return [];
+  const until = (from: number) => { const rest = body.slice(from); const e = rest.findIndex((l) => l.startsWith('=')); return e < 0 ? rest : rest.slice(0, e); };
+  // headword lines are lowercase ("ве́-ра"); the first capitalized line names the part of speech
+  const pos = until(morph + 1).find((l) => /^[А-ЯЁ]/.test(l));
+  if (!pos?.startsWith('Существительное')) return [];
+  const sense = body.findIndex((l, i) => i > morph && /^=+ Значение =+$/.test(l));
+  if (sense < 0) return [];
+  return until(sense + 1)
+    // a sense with no usage example is a stub entry; frequent homographs (гор = of гора) land on these
+    .filter((l) => l && !/^Общее прототипическое значение/i.test(l) && !/Отсутствует пример употребления/i.test(l))
+    .slice(0, max)
+    .map((l) => l.split('◆')[0].replace(/\u0301/g, '').trim())
+    .filter(Boolean);
 }

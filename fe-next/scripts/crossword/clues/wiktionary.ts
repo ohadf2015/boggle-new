@@ -50,3 +50,19 @@ export async function wiktionaryClueJa(word: string): Promise<{ clue: string | n
   const { def, forms } = await fetchJaEntry(word);
   return { clue: jaClueFromDefinition(def, word, forms), hadDef: !!def };
 }
+
+const UA = 'LexiClash/1.0 (word game; +https://lexiclash.app)';
+
+/** Cached raw extract of the word's OWN page (no redirects: a form redirecting to its lemma is not a lemma). */
+export async function fetchWiktExtract(word: string, lang: string): Promise<string | null> {
+  if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true });
+  const p = join(CACHE_DIR, `${lang}-extract-${encodeURIComponent(word)}.json`);
+  if (existsSync(p)) return JSON.parse(readFileSync(p, 'utf8')) as string | null;
+  const url = `https://${lang}.wiktionary.org/w/api.php?action=query&prop=extracts&explaintext=1&format=json&formatversion=2&titles=${encodeURIComponent(word)}`;
+  const res = await fetch(url, { headers: { 'User-Agent': UA, 'Api-User-Agent': UA } });
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${word}`); // not cached, so a rate-limit miss is retried next run
+  const data = (await res.json()) as { query?: { pages?: { extract?: string }[] } };
+  const extract = data.query?.pages?.[0]?.extract ?? null;
+  writeFileSync(p, JSON.stringify(extract));
+  return extract;
+}

@@ -2490,5 +2490,393 @@
   "zafiro": {
     "clue": "Gema de color azul",
     "score": 50
+  },
+  "acta": {
+    "clue": "Documento formal que testifica por escrito lo ocurrido",
+    "score": 50
+  },
+  "acto": {
+    "clue": "Reunión solemne",
+    "score": 50
+  },
+  "alto": {
+    "clue": "Levantado, elevado sobre la tierra",
+    "score": 50
+  },
+  "aula": {
+    "clue": "Sala de una institución educativa",
+    "score": 50
+  },
+  "bajo": {
+    "clue": "De poca altura",
+    "score": 50
+  },
+  "bala": {
+    "clue": "Proyectil sólido, normalmente de metal o piedra",
+    "score": 50
+  },
+  "base": {
+    "clue": "Parte inferior de un cuerpo que le sirve de soporte",
+    "score": 50
+  },
+  "beta": {
+    "clue": "Segunda letra del alfabeto griego",
+    "score": 50
+  },
+  "bola": {
+    "clue": "Cuerpo cualquiera de forma esférica",
+    "score": 50
+  },
+  "bono": {
+    "clue": "Documento convertible en un valor, bien o servicio",
+    "score": 50
+  },
+  "buey": {
+    "clue": "Vacuno macho castrado y domado",
+    "score": 50
+  },
+  "byte": {
+    "clue": "Unidad de información compuesta de ocho bits",
+    "score": 50
+  },
+  "caos": {
+    "clue": "Estado general de confusión y desorden",
+    "score": 50
+  },
+  "caro": {
+    "clue": "Que tiene un alto valor o costo",
+    "score": 50
+  },
+  "cepa": {
+    "clue": "Parte más gruesa del tronco, o tallo",
+    "score": 50
+  },
+  "cien": {
+    "clue": "Diez veces diez",
+    "score": 50
+  },
+  "cita": {
+    "clue": "Referencia a alguna parte de un texto o libro",
+    "score": 50
+  },
+  "club": {
+    "clue": "Asociación fundada en torno a un interés común",
+    "score": 50
+  },
+  "coda": {
+    "clue": "Pasaje que lleva a un movimiento o pieza a su fin",
+    "score": 50
+  },
+  "coro": {
+    "clue": "Composición musical escrita para varias voces",
+    "score": 50
+  },
+  "cruz": {
+    "clue": "Figura formada por dos líneas o barras perpendiculares",
+    "score": 50
+  },
+  "cupo": {
+    "clue": "Espacio disponible",
+    "score": 50
+  },
+  "cuña": {
+    "clue": "Pequeña pieza de madera o metal, con un borde más delgado",
+    "score": 50
+  },
+  "dama": {
+    "clue": "Título en respeto de una mujer",
+    "score": 50
+  },
+  "data": {
+    "clue": "Fecha, hora o tiempo en que tiene lugar un evento o acción",
+    "score": 50
+  },
+  "dato": {
+    "clue": "Unidad de información",
+    "score": 50
+  },
+  "daño": {
+    "clue": "Condición que afecta la integridad, salud o bienestar",
+    "score": 50
+  },
+  "eje": {
+    "clue": "Pieza cilíndrica que atraviesa un cuerpo giratorio",
+    "score": 50
+  },
+  "fama": {
+    "clue": "Opinión pública que la gente tiene de una persona",
+    "score": 50
+  },
+  "feto": {
+    "clue": "Organismo vertebrado vivíparo, en su desarrollo intrauterino",
+    "score": 50
+  },
+  "fijo": {
+    "clue": "Que está bien atado, apretado o asegurado",
+    "score": 50
+  },
+  "foco": {
+    "clue": "Punto desde el cual parten los rayos caloríficos o luminosos",
+    "score": 50
+  },
+  "frac": {
+    "clue": "Vestidura de hombre",
+    "score": 50
+  },
+  "gama": {
+    "clue": "Escala musical",
+    "score": 50
+  },
+  "giro": {
+    "clue": "Vuelta, parcial o completa, sobre uno mismo",
+    "score": 50
+  },
+  "goce": {
+    "clue": "Acción o efecto de gozar",
+    "score": 50
+  },
+  "golf": {
+    "clue": "Deporte de origen escocés",
+    "score": 50
+  },
+  "gozo": {
+    "clue": "Alegría inmensa",
+    "score": 50
+  },
+  "gris": {
+    "clue": "De color entre blanco y negro",
+    "score": 50
+  },
+  "hijo": {
+    "clue": "Individuo respecto a cualquiera de sus progenitores",
+    "score": 50
+  },
+  "hora": {
+    "clue": "Tiempo señalado por el reloj",
+    "score": 50
+  },
+  "hoz": {
+    "clue": "Herramienta para segar trigo y otros cereales",
+    "score": 50
+  },
+  "ida": {
+    "clue": "Acción o efecto de ir",
+    "score": 50
+  },
+  "idea": {
+    "clue": "Conocimiento elemental que nos hacemos de algo",
+    "score": 50
+  },
+  "inca": {
+    "clue": "Monarca o jefe supremo, considerado hijo del Sol",
+    "score": 50
+  },
+  "lado": {
+    "clue": "Borde, orilla o extremo de algo",
+    "score": 50
+  },
+  "leve": {
+    "clue": "De escasa importancia",
+    "score": 50
+  },
+  "liga": {
+    "clue": "Tira, banda o cinta de tela, generalmente elástica",
+    "score": 50
+  },
+  "liso": {
+    "clue": "Que no tiene relieve o irregularidades en su superficie",
+    "score": 50
+  },
+  "loco": {
+    "clue": "Que no está en su sano juicio",
+    "score": 50
+  },
+  "lona": {
+    "clue": "Tela de tejido pesado hecha de algodón o cáñamo",
+    "score": 50
+  },
+  "masa": {
+    "clue": "Harina con agua y, generalmente, levadura",
+    "score": 50
+  },
+  "meta": {
+    "clue": "Lugar o línea final indicados para una carrera",
+    "score": 50
+  },
+  "mil": {
+    "clue": "Diez veces cien",
+    "score": 50
+  },
+  "misa": {
+    "clue": "Oficio religioso cristiano",
+    "score": 50
+  },
+  "moda": {
+    "clue": "Estilo popular en el vestir",
+    "score": 50
+  },
+  "modo": {
+    "clue": "Sistema para realizar una acción",
+    "score": 50
+  },
+  "nena": {
+    "clue": "Voz con que se llama cariñosamente a una mujer joven",
+    "score": 50
+  },
+  "nodo": {
+    "clue": "Punto en el que dos segmentos de una curva se intersectan",
+    "score": 50
+  },
+  "nota": {
+    "clue": "Comentario o reflexión sobre un documento",
+    "score": 50
+  },
+  "nulo": {
+    "clue": "Inexistente, que no ocurre",
+    "score": 50
+  },
+  "obra": {
+    "clue": "Resultado de un trabajo",
+    "score": 50
+  },
+  "olor": {
+    "clue": "Conjunto de sensaciones captadas por el sentido del olfato",
+    "score": 50
+  },
+  "oral": {
+    "clue": "De viva voz",
+    "score": 50
+  },
+  "paga": {
+    "clue": "El sueldo de un periodo predeterminado",
+    "score": 50
+  },
+  "pago": {
+    "clue": "Dinero que se da o recibe para cumplir una transacción",
+    "score": 50
+  },
+  "peña": {
+    "clue": "Piedra grande sin labrar según la produce la naturaleza",
+    "score": 50
+  },
+  "piso": {
+    "clue": "Suelo de una habitación, calle o lugar transitable",
+    "score": 50
+  },
+  "pro": {
+    "clue": "Ventaja o beneficio que se puede obtener de alguna situación",
+    "score": 50
+  },
+  "psi": {
+    "clue": "Letra del alfabeto griego",
+    "score": 50
+  },
+  "puro": {
+    "clue": "Que no ha sido contaminado",
+    "score": 50
+  },
+  "raro": {
+    "clue": "Que no abunda",
+    "score": 50
+  },
+  "raso": {
+    "clue": "Plano, llano",
+    "score": 50
+  },
+  "rato": {
+    "clue": "Período muy breve de tiempo",
+    "score": 50
+  },
+  "raya": {
+    "clue": "Marca o señal larga y estrecha",
+    "score": 50
+  },
+  "raza": {
+    "clue": "Grupo que se distingue por una ascendencia común",
+    "score": 50
+  },
+  "res": {
+    "clue": "Cabeza de ganado o de caza mayor",
+    "score": 50
+  },
+  "roto": {
+    "clue": "Destrozado parcial o totalmente",
+    "score": 50
+  },
+  "saco": {
+    "clue": "Receptáculo de tela, cuero o papel",
+    "score": 50
+  },
+  "sala": {
+    "clue": "Aposento de grandes dimensiones",
+    "score": 50
+  },
+  "seco": {
+    "clue": "Que no tiene agua, que no tiene humedad",
+    "score": 50
+  },
+  "set": {
+    "clue": "Subdivisión del partido o match",
+    "score": 50
+  },
+  "son": {
+    "clue": "Tipo de canción popular",
+    "score": 50
+  },
+  "sor": {
+    "clue": "Hermana de una comunidad religiosa",
+    "score": 50
+  },
+  "sumo": {
+    "clue": "Más extremado o elevado en su género",
+    "score": 50
+  },
+  "tasa": {
+    "clue": "Magnitud medida en relación a otra",
+    "score": 50
+  },
+  "teja": {
+    "clue": "Pieza con la que se forman cubiertas en los edificios",
+    "score": 50
+  },
+  "tema": {
+    "clue": "Asunto del que trata un discurso o escrito",
+    "score": 50
+  },
+  "tipo": {
+    "clue": "Elemento real o ideal que representa una clase o categoría",
+    "score": 50
+  },
+  "tomo": {
+    "clue": "Subdivisión de un libro, manuscrito u obra impresa",
+    "score": 50
+  },
+  "tour": {
+    "clue": "Viaje de un artista, o por extensión de un turista",
+    "score": 50
+  },
+  "urbe": {
+    "clue": "Ciudad de gran población",
+    "score": 50
+  },
+  "vale": {
+    "clue": "Documento de pago o sustitución de algo",
+    "score": 50
+  },
+  "vano": {
+    "clue": "Que no tiene realidad ni solidez",
+    "score": 50
+  },
+  "vida": {
+    "clue": "Tiempo entre el nacimiento y la muerte de un ser orgánico",
+    "score": 50
+  },
+  "vivo": {
+    "clue": "Que continúa vigente en la memoria o físicamente",
+    "score": 50
+  },
+  "zeta": {
+    "clue": "Denominación para ζ, la sexta letra del alfabeto griego",
+    "score": 50
   }
 }
