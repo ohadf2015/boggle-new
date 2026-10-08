@@ -52,6 +52,9 @@ export interface KpiSet {
   trialsPaid: PeriodDelta;
 }
 
+/** Furthest funnel stage an approved teacher reached. Null for teachers never approved. */
+export type TeacherStage = 'approved' | 'classroom' | 'student';
+
 export interface TeacherRow {
   id: string;
   name: string | null;
@@ -60,6 +63,23 @@ export interface TeacherRow {
   students: number;
   roundsLast7d: number | null;
   health: TeacherHealth;
+  stage: TeacherStage | null;
+}
+
+export interface EduVerdict {
+  /** Funnel step where the biggest drop lands, e.g. 'student'. */
+  stepKey: string;
+  fromKey: string;
+  fromCount: number;
+  toCount: number;
+  lost: number;
+  /** Share of `fromCount` that reached `stepKey`. */
+  pct: number | null;
+  /** False when the leak is the application step: there is no approved cohort to rescue. */
+  cohortAvailable: boolean;
+  /** Teachers stuck at `fromKey`, most recently active first, capped for display. */
+  rescue: TeacherRow[];
+  rescueTotal: number;
 }
 
 export interface ClassRow {
@@ -88,7 +108,10 @@ export interface EduDashboard {
   dyingClasses: ClassRow[];
   modeMix: ModeRow[];
   funnel: FunnelStep[];
+  verdict: EduVerdict | null;
 }
+
+const RESCUE_LIMIT = 8;
 
 function toMs(ts: string | null): number | null {
   if (!ts) return null;
@@ -168,21 +191,37 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
             (toMs(r.completed_at) ?? 0) > nowMs - 7 * DAY_MS,
         ).length;
 
+  const approvedIds = [...new Set(input.approvals.map((a) => a.user_id).filter((id): id is string => !!id))];
+  const stageOf = new Map<string, TeacherStage>();
+  for (const id of approvedIds) {
+    const classIds = classesByTeacher.get(id) ?? [];
+    stageOf.set(
+      id,
+      distinctStudents(classIds, input.memberships) > 0
+        ? 'student'
+        : classIds.length > 0
+          ? 'classroom'
+          : 'approved',
+    );
+  }
+
+  const teacherRow = (id: string, name: string | null, lastActiveAt: string | null): TeacherRow => {
+    const classIds = classesByTeacher.get(id) ?? [];
+    const roundsLast7d = roundsSevenDays(id);
+    return {
+      id,
+      name,
+      lastActiveAt,
+      classes: classIds.length,
+      students: distinctStudents(classIds, input.memberships),
+      roundsLast7d,
+      health: teacherHealth({ lastActiveMs: toMs(lastActiveAt), roundsLast7d, nowMs }),
+      stage: stageOf.get(id) ?? null,
+    };
+  };
+
   const teachers: TeacherRow[] = input.teachers
-    .map((t) => {
-      const classIds = classesByTeacher.get(t.id) ?? [];
-      const roundsLast7d = roundsSevenDays(t.id);
-      const lastActiveMs = toMs(lastActiveOf.get(t.id) ?? null);
-      return {
-        id: t.id,
-        name: t.name,
-        lastActiveAt: t.last_seen_at,
-        classes: classIds.length,
-        students: distinctStudents(classIds, input.memberships),
-        roundsLast7d,
-        health: teacherHealth({ lastActiveMs, roundsLast7d, nowMs }),
-      };
-    })
+    .map((t) => teacherRow(t.id, t.name, t.last_seen_at))
     .sort((a, b) => (toMs(b.lastActiveAt) ?? 0) - (toMs(a.lastActiveAt) ?? 0));
 
   const classes: ClassRow[] = input.classrooms.map((c) => {
@@ -225,19 +264,18 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
   }
   const modeMix = [...modeTotals.values()].sort((a, b) => b.rounds - a.rounds || a.mode.localeCompare(b.mode));
 
-  const approvedTeacherIds = new Set(
-    input.approvals.map((a) => a.user_id).filter((id): id is string => !!id),
-  );
-  const withClass = [...approvedTeacherIds].filter((id) => (classesByTeacher.get(id)?.length ?? 0) > 0);
-  const withStudents = withClass.filter(
-    (id) => distinctStudents(classesByTeacher.get(id) ?? [], input.memberships) > 0,
-  );
+  const stageCount = (min: TeacherStage) =>
+    approvedIds.filter((id) => {
+      const stage = stageOf.get(id);
+      return stage !== undefined && STAGE_ORDER.indexOf(stage) >= STAGE_ORDER.indexOf(min);
+    }).length;
   const funnel = funnelConversion([
     { key: 'requested', count: input.requested },
-    { key: 'approved', count: approvedTeacherIds.size },
-    { key: 'classroom', count: withClass.length },
-    { key: 'student', count: withStudents.length },
+    { key: 'approved', count: approvedIds.length },
+    { key: 'classroom', count: stageCount('classroom') },
+    { key: 'student', count: stageCount('student') },
   ]);
+  const verdict = buildVerdict(funnel, approvedIds, stageOf, teacherRow, input.teachers);
 
   return {
     windowDays,
@@ -252,5 +290,48 @@ export function buildEduDashboard(input: EduDashboardInput): EduDashboard {
     dyingClasses,
     modeMix,
     funnel,
+    verdict,
+  };
+}
+
+const STAGE_ORDER: TeacherStage[] = ['approved', 'classroom', 'student'];
+
+function buildVerdict(
+  funnel: FunnelStep[],
+  approvedIds: string[],
+  stageOf: Map<string, TeacherStage>,
+  teacherRow: (id: string, name: string | null, lastActiveAt: string | null) => TeacherRow,
+  profiles: EduDashboardInput['teachers'],
+): EduVerdict | null {
+  const drop = funnel.findIndex((s) => s.isBiggestDrop);
+  if (drop < 1 || funnel[0].count === 0) return null;
+
+  const from = funnel[drop - 1];
+  const to = funnel[drop];
+  const cohortStage = from.key as TeacherStage;
+  const cohortAvailable = STAGE_ORDER.includes(cohortStage);
+
+  const nameOf = new Map(profiles.map((p) => [p.id, { name: p.name, last: p.last_seen_at }]));
+  const cohort = cohortAvailable
+    ? approvedIds
+        .filter((id) => stageOf.get(id) === cohortStage)
+        .map((id) => teacherRow(id, nameOf.get(id)?.name ?? null, nameOf.get(id)?.last ?? null))
+        .sort(
+          (a, b) =>
+            (toMs(b.lastActiveAt) ?? -Infinity) - (toMs(a.lastActiveAt) ?? -Infinity) ||
+            b.classes - a.classes,
+        )
+    : [];
+
+  return {
+    stepKey: to.key,
+    fromKey: from.key,
+    fromCount: from.count,
+    toCount: to.count,
+    lost: from.count - to.count,
+    pct: to.pctOfPrev,
+    cohortAvailable,
+    rescue: cohort.slice(0, RESCUE_LIMIT),
+    rescueTotal: cohort.length,
   };
 }
