@@ -11011,7 +11011,55 @@ const ja = {
         "revoked": "付与を取り消しました"
       }
     },
+    "eduDashboard": {
+      "posthogHidden": "ランディングとアップセルのコンバージョンは非表示です。サーバーの PostHog キーが未設定です。",
+      "title": "教育の概要",
+      "subtitle": "テストアカウントは除外しています。変化率は前期間との比較です。",
+      "window": "期間",
+      "loadFailed": "教育の概要を読み込めませんでした。",
+      "loading": "読み込み中…",
+      "noData": "データがありません",
+      "kpi": {
+        "activeTeachers": "アクティブな教師",
+        "newTeachers": "新規の教師",
+        "classesWithLiveGame": "ライブゲームのあるクラス",
+        "liveRounds": "ライブラウンド数",
+        "trialsStarted": "Proトライアル開始数",
+        "trialsPaid": "有料に転換したトライアル"
+      },
+      "funnel": {
+        "title": "教師ファネル",
+        "requested": "申請",
+        "approved": "承認",
+        "classroom": "クラスを作成",
+        "student": "最初の生徒が参加"
+      },
+      "health": {
+        "thriving": "好調",
+        "at_risk": "要注意",
+        "dormant": "休眠"
+      },
+      "modeMix": {
+        "title": "クラスのモード構成"
+      },
+      "teachers": {
+        "name": "教師",
+        "lastActive": "最終アクティブ",
+        "classes": "クラス",
+        "students": "生徒",
+        "rounds7d": "7日間のラウンド",
+        "health": "状態"
+      },
+      "dying": {
+        "title": "休眠しかけのクラス",
+        "empty": "現在ありません。"
+      },
+      "classes": {
+        "title": "クラス"
+      }
+    },
     "teacherFunnel": {
+      "excludedMachineRows": "{count} 件の自動生成行（テストアカウント）は上のすべての数値から除外されています。",
       "title": "教師ファネル",
       "subtitle": "承認された教師がその後どう動いたか。",
       "blockedAlert": "承認済みの教師{count}名がログインできません。権限が付与されていません。",
@@ -11109,6 +11157,7 @@ const ja = {
       "wikipediaWords": "Wikipedia単語",
       "wordBank": "単語バンク",
       "webVitals": "Webパフォーマンス",
+      "education": "教育の概要",
       "guests": "ゲスト",
       "exitToSite": "サイトに戻る",
       "email": "メール",

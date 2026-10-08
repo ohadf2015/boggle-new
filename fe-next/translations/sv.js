@@ -11103,7 +11103,55 @@ const sv = {
         "revoked": "Tilldelning återkallad"
       }
     },
+    "eduDashboard": {
+      "posthogHidden": "Konvertering från landningssida och uppsälj är dold: ingen PostHog-serverkey är konfigurerad.",
+      "title": "Utbildningsöversikt",
+      "subtitle": "Testkonton exkluderas. Förändringar jämförs med föregående period.",
+      "window": "Period",
+      "loadFailed": "Kunde inte ladda utbildningsöversikten.",
+      "loading": "Laddar…",
+      "noData": "Inga data ännu",
+      "kpi": {
+        "activeTeachers": "Aktiva lärare",
+        "newTeachers": "Nya lärare",
+        "classesWithLiveGame": "Klasser med ett live-spel",
+        "liveRounds": "Spelade live-omgångar",
+        "trialsStarted": "Pro-provperioder startade",
+        "trialsPaid": "Provperioder som blev betalda"
+      },
+      "funnel": {
+        "title": "Lärartratt",
+        "requested": "Ansökt",
+        "approved": "Godkänd",
+        "classroom": "Skapade en klass",
+        "student": "Första eleven gick med"
+      },
+      "health": {
+        "thriving": "Blomstrar",
+        "at_risk": "Riskerar",
+        "dormant": "Vilande"
+      },
+      "modeMix": {
+        "title": "Lägesfördelning i klassrum"
+      },
+      "teachers": {
+        "name": "Lärare",
+        "lastActive": "Senast aktiv",
+        "classes": "Klasser",
+        "students": "Elever",
+        "rounds7d": "Omgångar 7 d",
+        "health": "Hälsa"
+      },
+      "dying": {
+        "title": "Döende klasser",
+        "empty": "Inga just nu."
+      },
+      "classes": {
+        "title": "Klasser"
+      }
+    },
     "teacherFunnel": {
+      "excludedMachineRows": "{count} maskinskrivna rader (testkonton) exkluderade från alla siffror ovan.",
       "title": "Lärartratt",
       "subtitle": "Vad godkända lärare faktiskt gjorde sedan.",
       "blockedAlert": "{count} godkända lärare kan inte logga in — rollen tilldelades aldrig.",
@@ -11201,6 +11249,7 @@ const sv = {
       "wikipediaWords": "Wikipedia-ord",
       "wordBank": "Ordbank",
       "webVitals": "Webbprestanda",
+      "education": "Utbildningsöversikt",
       "guests": "Gäster",
       "exitToSite": "Lämna adminläget",
       "email": "E-post",

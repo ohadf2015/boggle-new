@@ -8566,7 +8566,55 @@ const ru = {
         "revoked": "Выдача отозвана"
       }
     },
+    "eduDashboard": {
+      "posthogHidden": "Конверсия лендинга и апсейла скрыта: серверный ключ PostHog не настроен.",
+      "title": "Обзор образования",
+      "subtitle": "Тестовые аккаунты исключены. Изменения сравниваются с предыдущим периодом.",
+      "window": "Период",
+      "loadFailed": "Не удалось загрузить обзор образования.",
+      "loading": "Загрузка…",
+      "noData": "Пока нет данных",
+      "kpi": {
+        "activeTeachers": "Активные учителя",
+        "newTeachers": "Новые учителя",
+        "classesWithLiveGame": "Классы с живой игрой",
+        "liveRounds": "Сыгранные живые раунды",
+        "trialsStarted": "Начатые пробные Pro",
+        "trialsPaid": "Пробные, ставшие платными"
+      },
+      "funnel": {
+        "title": "Воронка учителей",
+        "requested": "Заявка",
+        "approved": "Одобрен",
+        "classroom": "Создал класс",
+        "student": "Первый ученик присоединился"
+      },
+      "health": {
+        "thriving": "Процветает",
+        "at_risk": "Под угрозой",
+        "dormant": "Неактивен"
+      },
+      "modeMix": {
+        "title": "Режимы в классе"
+      },
+      "teachers": {
+        "name": "Учитель",
+        "lastActive": "Последняя активность",
+        "classes": "Классы",
+        "students": "Ученики",
+        "rounds7d": "Раунды за 7 дн.",
+        "health": "Состояние"
+      },
+      "dying": {
+        "title": "Угасающие классы",
+        "empty": "Сейчас нет."
+      },
+      "classes": {
+        "title": "Классы"
+      }
+    },
     "teacherFunnel": {
+      "excludedMachineRows": "{count} строк, созданных машиной (тестовые аккаунты), исключены из всех чисел выше.",
       "title": "Воронка учителей",
       "subtitle": "Что одобренные учителя сделали дальше.",
       "blockedAlert": "{count} одобренных учителей не могут войти — роль так и не была выдана.",
@@ -8818,6 +8866,7 @@ const ru = {
       "invalidWords": "Невалидные слова",
       "milogWords": "Слова Milog",
       "webVitals": "Web Vitals",
+      "education": "Обзор образования",
       "guests": "Гости",
       "exitToSite": "Выход на сайт",
       "wikipediaWords": "Слова Wikipedia",

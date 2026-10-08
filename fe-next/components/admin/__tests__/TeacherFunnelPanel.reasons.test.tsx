@@ -27,8 +27,11 @@ vi.mock('@/utils/authFetch', () => ({
 // child — that is a mock bug, not a component bug, and it hid this whole file's first run.
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (k: string, fb?: string | Record<string, string | number>) =>
-      typeof fb === 'string' ? fb : k,
+    t: (k: string, fb?: string | Record<string, string | number>, params?: Record<string, string | number>) => {
+      const base = typeof fb === 'string' ? fb : k;
+      const p = typeof fb === 'object' ? fb : params;
+      return p ? base.replace(/\{(\w+)\}/g, (_m, n: string) => String(p[n] ?? `{${n}}`)) : base;
+    },
     language: 'en',
   }),
 }));
@@ -90,8 +93,7 @@ const payload = (over: Partial<TeacherFunnelResult> = {}): TeacherFunnelResult =
     returnedNoClassroom: 2, returnedNoClassroomTrialActive: 2, excludedMachineRows: 16,
   },
   activity: {
-    classrooms: 2, lessons: 3, studentsJoined: 1, assignments: 0,
-    lessonProgress: 2, achievements: 0, duels: null,
+    classrooms: 2, studentsJoined: 1, assignments: null,
   },
   ...over,
 });
@@ -159,16 +161,6 @@ describe('<TeacherFunnelPanel>', () => {
     render(<TeacherFunnelPanel />);
 
     await screen.findByText(/16 machine-written rows/);
-  });
-
-  it('prints module activity, and a dash where the count failed', async () => {
-    respondWith(payload());
-    render(<TeacherFunnelPanel />);
-
-    await screen.findByText('What is happening inside the module');
-    expect(screen.getByText('Badges unlocked').previousSibling).toHaveTextContent('0');
-    // duels came back null — "could not count" must not render as zero.
-    expect(screen.getByText('Duels played').previousSibling).toHaveTextContent('—');
   });
 
   it('opens the activity drawer when an approved granted row is clicked', async () => {

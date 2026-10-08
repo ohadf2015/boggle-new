@@ -20,17 +20,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { buildTeacherFunnel } from '@/lib/education/teacherFunnel';
-
-/** [label key, table] — the tables that hold evidence of teaching actually happening. */
-const ACTIVITY_TABLES = [
-  ['classrooms', 'classrooms'],
-  ['lessons', 'vocabulary_lessons'],
-  ['studentsJoined', 'classroom_memberships'],
-  ['assignments', 'lesson_assignments'],
-  ['lessonProgress', 'student_lesson_progress'],
-  ['achievements', 'student_achievements'],
-  ['duels', 'student_duels'],
-] as const;
+import { fetchAllRows } from '@/lib/admin/fetchAllRows';
 
 export async function GET(request: NextRequest) {
   const authResult = await verifyAdminAuth(request);
@@ -41,32 +31,34 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
   }
 
-  const [requestsRes, classroomsRes, membershipsRes, assignmentsRes] = await Promise.all([
-    supabase
-      .from('teacher_access_requests')
-      .select(
-        // school_or_org + admin_note are here only so the panel can open the shared
-        // TeacherAccessDrawer straight from a funnel row, without a second round-trip.
-        'id, user_id, email, full_name, locale, country, role, school_or_org, admin_note, status, created_at, reviewed_at, trial_expires_at, use_case',
-      )
-      .order('created_at', { ascending: false }),
-    supabase.from('classrooms').select('id, teacher_id, name, join_code, language, created_at'),
-    supabase.from('classroom_memberships').select('classroom_id, student_id'),
-    // `lesson_assignments` is what the app actually writes (see
-    // lib/supabase/education/assignments.ts createAssignment); `teacher_assignments`
-    // has zero rows and no writer. It has no teacher_id column, so it's mapped
-    // through classroom ownership below rather than changing buildTeacherFunnel's
-    // input contract.
-    supabase.from('lesson_assignments').select('classroom_id'),
+  const [requestsRes, classroomsRes] = await Promise.all([
+    // school_or_org + admin_note are here only so the panel can open the shared
+    // TeacherAccessDrawer straight from a funnel row, without a second round-trip.
+    fetchAllRows((from, to) =>
+      supabase
+        .from('teacher_access_requests')
+        .select(
+          'id, user_id, email, full_name, locale, country, role, school_or_org, admin_note, status, created_at, reviewed_at, trial_expires_at, use_case',
+        )
+        .order('created_at', { ascending: false })
+        .order('id')
+        .range(from, to),
+    ),
+    fetchAllRows((from, to) =>
+      supabase
+        .from('classrooms')
+        .select('id, teacher_id, name, join_code, language, created_at')
+        .order('id')
+        .range(from, to),
+    ),
   ]);
 
-  const firstError =
-    requestsRes.error || classroomsRes.error || membershipsRes.error || assignmentsRes.error;
+  const firstError = requestsRes.error || classroomsRes.error;
   if (firstError) {
-    return NextResponse.json({ error: firstError.message }, { status: 500 });
+    return NextResponse.json({ error: firstError }, { status: 500 });
   }
 
-  const requests = requestsRes.data ?? [];
+  const requests = requestsRes.data;
   // Classroom owners are included alongside applicants: a classroom can be opened by
   // someone who never filled in the access form (the 2026-01-24 one predates the form),
   // and such a row would otherwise render with a blank owner. display_name/username are
@@ -92,36 +84,68 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: profilesRes.error.message }, { status: 500 });
   }
 
-  // What is actually HAPPENING inside the module, as opposed to who was let into it. The
-  // funnel answers "did they activate"; this answers "is anyone teaching". On 2026-08-21
-  // every one of these is 0–3, and that IS the finding — an empty module reads as a broken
-  // panel unless the emptiness is printed as a number. head:true so it costs a count, not
-  // the rows. A table that errors reports null rather than 0: "we could not count" and
-  // "there are none" are different answers and must not look alike.
-  const activityCounts = await Promise.all(
-    ACTIVITY_TABLES.map(async ([key, table]) => {
-      const { count, error } = await supabase.from(table).select('*', { count: 'exact', head: true });
-      return [key, error ? null : (count ?? 0)] as const;
-    }),
-  );
+  const profiles = profilesRes.data ?? [];
+  const classrooms = classroomsRes.data;
+  // Test-owned classrooms are removed inside buildTeacherFunnel; reading memberships and
+  // assignments only for the survivors keeps every activity count on the same population.
+  const testTeacherIds = new Set(profiles.filter((p) => p.is_test_account).map((p) => p.id));
+  const realClassroomIds = classrooms
+    .filter((c) => !(c.teacher_id && testTeacherIds.has(c.teacher_id)))
+    .map((c) => c.id);
 
-  // lesson_assignments has classroom_id, not teacher_id — map through the
-  // classroom's owner so buildTeacherFunnel keeps its { teacher_id } shape.
-  const teacherIdByClassroomId = new Map(
-    (classroomsRes.data ?? []).map((c) => [c.id, c.teacher_id]),
-  );
-  const assignments = (assignmentsRes.data ?? []).map((a) => ({
+  const [membershipsRes, assignmentsRes] = realClassroomIds.length
+    ? await Promise.all([
+        // `lesson_assignments` is what the app writes (lib/supabase/education/assignments.ts
+        // createAssignment); `teacher_assignments` has no writer. It has no teacher_id, so it
+        // is mapped through classroom ownership below.
+        fetchAllRows((from, to) =>
+          supabase
+            .from('classroom_memberships')
+            .select('classroom_id, student_id')
+            .in('classroom_id', realClassroomIds)
+            .order('classroom_id')
+            .order('student_id')
+            .range(from, to),
+        ),
+        fetchAllRows((from, to) =>
+          supabase
+            .from('lesson_assignments')
+            .select('classroom_id')
+            .in('classroom_id', realClassroomIds)
+            .order('classroom_id')
+            .range(from, to),
+        ),
+      ])
+    : [{ data: [], error: null }, { data: [], error: null }];
+
+  const memberError = membershipsRes.error || assignmentsRes.error;
+  if (memberError) {
+    return NextResponse.json({ error: memberError }, { status: 500 });
+  }
+
+  // lesson_assignments has classroom_id, not teacher_id — map through the classroom's owner
+  // so buildTeacherFunnel keeps its { teacher_id } shape.
+  const teacherIdByClassroomId = new Map(classrooms.map((c) => [c.id, c.teacher_id]));
+  const assignments = assignmentsRes.data.map((a) => ({
     teacher_id: teacherIdByClassroomId.get(a.classroom_id) ?? null,
   }));
 
   const funnel = buildTeacherFunnel({
     requests,
-    profiles: profilesRes.data ?? [],
-    classrooms: classroomsRes.data ?? [],
+    profiles,
+    classrooms,
     memberships: membershipsRes.data ?? [],
     assignments,
     nowMs: Date.now(),
   });
 
-  return NextResponse.json({ ...funnel, activity: Object.fromEntries(activityCounts) });
+  // Every activity number is counted over the same non-test population as the funnel above,
+  // so a QA rig can no longer inflate a tile while being excluded from the rows.
+  const activity = {
+    classrooms: funnel.classrooms?.length ?? 0,
+    studentsJoined: new Set((membershipsRes.data ?? []).map((m) => m.student_id)).size,
+    assignments: assignments.length,
+  };
+
+  return NextResponse.json({ ...funnel, activity });
 }

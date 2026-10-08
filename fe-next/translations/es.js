@@ -10818,7 +10818,55 @@ const es = {
         "revoked": "Concesión revocada"
       }
     },
+    "eduDashboard": {
+      "posthogHidden": "La conversión de la landing y del upsell está oculta: no hay clave de PostHog en el servidor.",
+      "title": "Resumen educativo",
+      "subtitle": "Se excluyen las cuentas de prueba. Las variaciones comparan con el periodo anterior.",
+      "window": "Periodo",
+      "loadFailed": "No se pudo cargar el resumen educativo.",
+      "loading": "Cargando…",
+      "noData": "Sin datos todavía",
+      "kpi": {
+        "activeTeachers": "Profesores activos",
+        "newTeachers": "Profesores nuevos",
+        "classesWithLiveGame": "Clases con partida en vivo",
+        "liveRounds": "Rondas en vivo jugadas",
+        "trialsStarted": "Pruebas Pro iniciadas",
+        "trialsPaid": "Pruebas convertidas en pago"
+      },
+      "funnel": {
+        "title": "Embudo de profesores",
+        "requested": "Solicitud",
+        "approved": "Aprobado",
+        "classroom": "Creó una clase",
+        "student": "Primer alumno se unió"
+      },
+      "health": {
+        "thriving": "Prosperando",
+        "at_risk": "En riesgo",
+        "dormant": "Inactivo"
+      },
+      "modeMix": {
+        "title": "Modos en clase"
+      },
+      "teachers": {
+        "name": "Profesor",
+        "lastActive": "Última actividad",
+        "classes": "Clases",
+        "students": "Alumnos",
+        "rounds7d": "Rondas 7d",
+        "health": "Estado"
+      },
+      "dying": {
+        "title": "Clases en declive",
+        "empty": "Ninguna por ahora."
+      },
+      "classes": {
+        "title": "Clases"
+      }
+    },
     "teacherFunnel": {
+      "excludedMachineRows": "{count} filas generadas por máquina (cuentas de prueba) excluidas de todas las cifras de arriba.",
       "title": "Embudo de docentes",
       "subtitle": "Qué hicieron realmente los docentes aprobados.",
       "blockedAlert": "{count} docentes aprobados no pueden entrar: nunca se les asignó el rol.",
@@ -10916,6 +10964,7 @@ const es = {
       "wikipediaWords": "Palabras Wikipedia",
       "wordBank": "Banco de Palabras",
       "webVitals": "Rendimiento Web",
+      "education": "Resumen educativo",
       "guests": "Invitados",
       "exitToSite": "Salir del panel",
       "email": "Correo",

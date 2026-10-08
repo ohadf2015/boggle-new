@@ -17438,7 +17438,55 @@ const en = {
         "revoked": "Grant revoked"
       }
     },
+    "eduDashboard": {
+      "posthogHidden": "Landing and upsell conversion are hidden: no server PostHog key is configured.",
+      "title": "Education overview",
+      "subtitle": "Test accounts excluded. Deltas compare with the prior period.",
+      "window": "Window",
+      "loadFailed": "Could not load the education overview.",
+      "loading": "Loading…",
+      "noData": "No data yet",
+      "kpi": {
+        "activeTeachers": "Active teachers",
+        "newTeachers": "New teachers",
+        "classesWithLiveGame": "Classes with a live game",
+        "liveRounds": "Live rounds played",
+        "trialsStarted": "Pro trials started",
+        "trialsPaid": "Trials converted to paid"
+      },
+      "funnel": {
+        "title": "Teacher funnel",
+        "requested": "Requested",
+        "approved": "Approved",
+        "classroom": "Created a class",
+        "student": "First student joined"
+      },
+      "health": {
+        "thriving": "Thriving",
+        "at_risk": "At risk",
+        "dormant": "Dormant"
+      },
+      "modeMix": {
+        "title": "Classroom mode mix"
+      },
+      "teachers": {
+        "name": "Teacher",
+        "lastActive": "Last active",
+        "classes": "Classes",
+        "students": "Students",
+        "rounds7d": "Rounds 7d",
+        "health": "Health"
+      },
+      "dying": {
+        "title": "Dying classes",
+        "empty": "None right now."
+      },
+      "classes": {
+        "title": "Classes"
+      }
+    },
     "teacherFunnel": {
+      "excludedMachineRows": "{count} machine-written rows (test accounts) excluded from every number above.",
       "title": "Teacher funnel",
       "subtitle": "What approved teachers actually did next.",
       "blockedAlert": "{count} approved teachers can't sign in — their account role was never granted.",
@@ -17689,6 +17737,7 @@ const en = {
       "invalidWords": "Invalid Words",
       "milogWords": "Milog Words",
       "webVitals": "Web Vitals",
+      "education": "Education overview",
       "guests": "Guests",
       "exitToSite": "Exit to site",
       "wikipediaWords": "Wikipedia Words",
