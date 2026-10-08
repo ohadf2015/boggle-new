@@ -44,11 +44,6 @@ vi.mock('@/components/education/TeacherOnboarding', () => ({
   TeacherOnboarding: () => <div>TeacherOnboarding</div>,
 }));
 
-vi.mock('@/components/education/TeacherWelcomeBanner', () => ({
-  TeacherWelcomeBanner: ({ hasAccess }: { hasAccess: boolean }) => (
-    hasAccess ? <div>education.teacher.welcome_banner_title</div> : null
-  ),
-}));
 
 vi.mock('@/components/teacher/ClassroomManager', () => ({
   default: () => <div>ClassroomManager</div>,

@@ -9,7 +9,6 @@ vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => ({ classrooms: [{ 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), usePathname: () => '/en/teacher', useSearchParams: () => new URLSearchParams() }));
 vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => <div /> }));
 vi.mock('@/components/education/TeacherOnboarding', () => ({ TeacherOnboarding: () => null }));
-vi.mock('@/components/education/TeacherWelcomeBanner', () => ({ TeacherWelcomeBanner: () => null }));
 vi.mock('@/components/teacher/ClassroomManager', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/LessonBuilder', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: () => <div />, AssignmentCreator: () => <div /> }));

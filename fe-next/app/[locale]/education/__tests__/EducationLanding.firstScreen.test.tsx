@@ -49,10 +49,6 @@ vi.mock('@/components/education/EducationHero', () => ({
   EducationHero: () => <div data-testid="education-hero" />,
 }));
 
-vi.mock('@/components/education/MoatTrifectaSection', () => ({
-  MoatTrifectaSection: () => <div data-testid="moat-section" />,
-}));
-
 vi.mock('@/components/education/ProFramingSection', () => ({
   ProFramingSection: () => <div data-testid="pro-framing" />,
 }));
@@ -87,10 +83,6 @@ vi.mock('@/components/education/EducationFAQ', () => ({
 
 vi.mock('@/components/education/DistrictUpsellStrip', () => ({
   DistrictUpsellStrip: () => <div data-testid="district-upsell" />,
-}));
-
-vi.mock('@/components/education/TeacherWelcomeBanner', () => ({
-  TeacherWelcomeBanner: () => <div data-testid="teacher-welcome" />,
 }));
 
 vi.mock('@/components/education/TeacherProCheckoutCta', () => ({

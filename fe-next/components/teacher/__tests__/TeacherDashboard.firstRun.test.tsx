@@ -73,10 +73,6 @@ vi.mock('@/components/education/TeacherOnboarding', () => ({
   TeacherOnboarding: () => <div data-testid="teacher-onboarding" />,
 }));
 
-vi.mock('@/components/education/TeacherWelcomeBanner', () => ({
-  TeacherWelcomeBanner: () => <div data-testid="teacher-welcome-banner" />,
-}));
-
 vi.mock('@/components/teacher/ClassroomManager', () => ({
   default: () => <div data-testid="classroom-manager" />,
 }));
@@ -150,7 +146,6 @@ vi.mock('@/hooks/useClassroom', () => ({
 vi.mock('@/components/teacher/dashboard/PlayNowLauncher', () => ({
   PlayNowLauncher: () => <div data-testid="play-now-launcher" />,
 }));
-
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 describe('TeacherDashboard — Play Tab First-Run State', () => {
@@ -353,7 +348,6 @@ describe('TeacherDashboard — Play Tab First-Run State', () => {
       // THEN — first-run card is absent
       expect(screen.queryByTestId('play-tab-first-run-card')).not.toBeInTheDocument();
     });
-
 
   });
 });

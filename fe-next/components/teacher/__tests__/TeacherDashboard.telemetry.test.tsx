@@ -17,7 +17,6 @@ vi.mock('@/components/education/TeacherOnboarding', () => ({ TeacherOnboarding: 
 vi.mock('@/hooks/useOnboardingState', () => ({
   useTeacherOnboardingState: () => ({ isCompleted: true, isSkipped: false, shouldShowOnboarding: false }),
 }));
-vi.mock('@/components/education/TeacherWelcomeBanner', () => ({ TeacherWelcomeBanner: () => null }));
 vi.mock('@/components/teacher/ClassroomManager', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/LessonBuilder', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: () => <div />, AssignmentCreator: () => <div /> }));
