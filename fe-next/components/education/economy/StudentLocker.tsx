@@ -26,7 +26,7 @@ export default function StudentLocker() {
         <span>{items.length}</span>
       </button>
       {open && (
-        <div className="absolute end-0 top-full z-50 mt-2 w-56 rounded-2xl border-4 border-black bg-neo-navy p-3 text-white shadow-[6px_6px_0_0_#000]">
+        <div className="absolute end-0 top-full z-50 mt-2 w-56 rounded-2xl border-4 border-neo-cream/40 bg-neo-navy p-3 text-white shadow-[6px_6px_0_0_#000]">
           <h3 className="mb-2 text-base font-bold">{t('economy.locker.title')}</h3>
           <ul className="grid grid-cols-2 gap-2">
             {items.map((item) => {

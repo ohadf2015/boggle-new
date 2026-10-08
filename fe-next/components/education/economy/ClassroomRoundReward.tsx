@@ -27,7 +27,7 @@ export default function ClassroomRoundReward({ gameCode }: ClassroomRoundRewardP
       )}
 
       {locker.items.length > 0 && (
-        <div className="w-full max-w-sm rounded-2xl border-4 border-black bg-neo-navy p-3 text-white shadow-[6px_6px_0_0_#000]">
+        <div className="w-full max-w-sm rounded-2xl border-4 border-neo-cream/40 bg-neo-navy p-3 text-white shadow-[6px_6px_0_0_#000]">
           <h3 className="mb-2 text-lg font-bold">{t('economy.locker.title')}</h3>
           <ul className="grid grid-cols-2 gap-2">
             {locker.items.map((item) => {
