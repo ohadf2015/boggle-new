@@ -73,3 +73,30 @@ describe('shouldExpressParseJsonBody — teacher-pro grant Next.js route', () =>
     expect(shouldExpressParseJsonBody('/api/admin/teacher-pro/abc-123/revoke')).toBe(false);
   });
 });
+
+/**
+ * Regression (prod QA 2026-10-07): Next.js POST routes under a non-admin
+ * EXPRESS_API_ROUTES prefix with no Express handler. Express pre-parsing
+ * drained the body and every POST hung: guest-session / log-session 499'd at
+ * the client's 5s abort on 100% of requests, single-player/vote 408'd at 30s.
+ */
+describe('shouldExpressParseJsonBody: Next.js body routes under Express prefixes', () => {
+  it.each([
+    '/api/analytics/guest-session',
+    '/api/analytics/log-session',
+    '/api/single-player/vote',
+    '/api/analytics/guest-session/',
+  ])('does NOT pre-parse %s', (path) => {
+    expect(shouldExpressParseJsonBody(path)).toBe(false);
+  });
+
+  it.each([
+    '/api/analytics/track',
+    '/api/single-player/heartbeat',
+    '/api/single-player/sync-score',
+    '/api/solve-grid',
+    '/api/dictionary/check',
+  ])('still pre-parses the Express route %s', (path) => {
+    expect(shouldExpressParseJsonBody(path)).toBe(true);
+  });
+});
