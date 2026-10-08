@@ -14,7 +14,18 @@ const sv = {
         "odds": {
           "label": "Chanser i kistan"
         },
-        "continue": "Fortsätt"
+        "continue": "Fortsätt",
+        "tapToOpen": "Tryck för att öppna"
+      },
+      "reward": {
+        "title": "Rundans belöning",
+        "ready": "Skattkistan är redo",
+        "collected": "Kistan är hämtad",
+        "round": "Den här rundan: {cash} pengar",
+        "rank": "#{rank} av {size} i den här rundan"
+      },
+      "locker": {
+        "added": "Tillagd i ditt skåp"
       },
       "shop": {
         "title": "Power-ups",

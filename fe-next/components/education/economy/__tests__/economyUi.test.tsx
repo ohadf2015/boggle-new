@@ -38,7 +38,7 @@ describe('RewardChest', () => {
   it('Given reduced motion, When the chest mounts, Then the reveal shows without a shake', () => {
     render(
       <RewardChest
-        reveal={{ gameCode: 'ABC', roundId: 'r1', rarity: 'rare', xp: 25, itemId: 'tile-default' }}
+        reveal={{ gameCode: 'ABC', roundId: 'r1', rarity: 'rare', xp: 25, itemId: 'tile-default', roundCash: 0, rank: null, size: 0 }}
         onClose={() => {}}
       />
     );
@@ -50,7 +50,7 @@ describe('RewardChest', () => {
   it('Given the overlay, Then the backdrop is hardcoded dark, not theme-responsive', () => {
     const { container } = render(
       <RewardChest
-        reveal={{ gameCode: 'ABC', roundId: 'r1', rarity: 'common', xp: 10, itemId: 'tile-default' }}
+        reveal={{ gameCode: 'ABC', roundId: 'r1', rarity: 'common', xp: 10, itemId: 'tile-default', roundCash: 0, rank: null, size: 0 }}
         onClose={() => {}}
       />
     );
@@ -63,7 +63,7 @@ describe('RewardChest', () => {
     const onClose = vi.fn();
     render(
       <RewardChest
-        reveal={{ gameCode: 'ABC', roundId: 'r1', rarity: 'epic', xp: 60, itemId: 'tile-default' }}
+        reveal={{ gameCode: 'ABC', roundId: 'r1', rarity: 'epic', xp: 60, itemId: 'tile-default', roundCash: 0, rank: null, size: 0 }}
         onClose={onClose}
       />
     );
@@ -74,12 +74,12 @@ describe('RewardChest', () => {
   it('Given the odds list, Then each percentage comes from the shared odds constant', () => {
     render(
       <RewardChest
-        reveal={{ gameCode: 'ABC', roundId: 'r1', rarity: 'common', xp: 10, itemId: 'tile-default' }}
+        reveal={{ gameCode: 'ABC', roundId: 'r1', rarity: 'common', xp: 10, itemId: 'tile-default', roundCash: 0, rank: null, size: 0 }}
         onClose={() => {}}
       />
     );
-    expect(screen.getByText(`${Math.round(CHEST_ODDS.common * 100)}%`)).toBeTruthy();
-    expect(screen.getByText(`${Math.round(CHEST_ODDS.epic * 100)}%`)).toBeTruthy();
+    expect(screen.getByText(new RegExp(`\\s${Math.round(CHEST_ODDS.common * 100)}%$`))).toBeTruthy();
+    expect(screen.getByText(new RegExp(`\\s${Math.round(CHEST_ODDS.epic * 100)}%$`))).toBeTruthy();
   });
 });
 

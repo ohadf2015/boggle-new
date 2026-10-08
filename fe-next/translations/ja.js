@@ -14,7 +14,18 @@ const ja = {
         "odds": {
           "label": "宝箱の確率"
         },
-        "continue": "つづける"
+        "continue": "つづける",
+        "tapToOpen": "タップして開く"
+      },
+      "reward": {
+        "title": "ラウンド報酬",
+        "ready": "宝箱が準備できました",
+        "collected": "宝箱を獲得",
+        "round": "このラウンド: {cash} 所持金",
+        "rank": "このラウンド {size}人中 {rank}位"
+      },
+      "locker": {
+        "added": "ロッカーに追加されました"
       },
       "shop": {
         "title": "パワーアップ",

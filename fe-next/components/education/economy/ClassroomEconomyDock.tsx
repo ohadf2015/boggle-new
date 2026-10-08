@@ -6,7 +6,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomEconomy } from './useClassroomEconomy';
 import EconomyHud from './EconomyHud';
 import PowerUpShop from './PowerUpShop';
-import RewardChest from './RewardChest';
 import ClassroomBoardMoment from './ClassroomBoardMoment';
 
 interface ClassroomEconomyDockProps {
@@ -90,7 +89,6 @@ export default function ClassroomEconomyDock({ gameCode }: ClassroomEconomyDockP
         </m.div>
       )}
 
-      {econ.chest && <RewardChest reveal={econ.chest} onClose={econ.clearChest} />}
     </>
   );
 }

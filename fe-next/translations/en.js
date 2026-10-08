@@ -14,7 +14,18 @@ const en = {
         "odds": {
           "label": "Chest odds"
         },
-        "continue": "Continue"
+        "continue": "Continue",
+        "tapToOpen": "Tap to open"
+      },
+      "reward": {
+        "title": "Round reward",
+        "ready": "Treasure chest ready",
+        "collected": "Chest collected",
+        "round": "This round: {cash} cash",
+        "rank": "#{rank} of {size} this round"
+      },
+      "locker": {
+        "added": "Added to your locker"
       },
       "shop": {
         "title": "Power-ups",

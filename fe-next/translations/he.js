@@ -14,7 +14,18 @@ const he = {
         "odds": {
           "label": "סיכויי הארגז"
         },
-        "continue": "המשך"
+        "continue": "המשך",
+        "tapToOpen": "הקש לפתיחה"
+      },
+      "reward": {
+        "title": "פרס הסבב",
+        "ready": "ארגז האוצר מוכן",
+        "collected": "ארגז נאסף",
+        "round": "הסבב הזה: {cash} כסף",
+        "rank": "#{rank} מתוך {size} בסבב הזה"
+      },
+      "locker": {
+        "added": "נוסף לאוסף שלך"
       },
       "shop": {
         "title": "שדרוגים",

@@ -14,7 +14,18 @@ const es = {
         "odds": {
           "label": "Probabilidades del cofre"
         },
-        "continue": "Continuar"
+        "continue": "Continuar",
+        "tapToOpen": "Toca para abrir"
+      },
+      "reward": {
+        "title": "Recompensa de la ronda",
+        "ready": "Cofre listo",
+        "collected": "Cofre recogido",
+        "round": "Esta ronda: {cash} dinero",
+        "rank": "#{rank} de {size} en esta ronda"
+      },
+      "locker": {
+        "added": "Añadido a tu cofre"
       },
       "shop": {
         "title": "Potenciadores",
