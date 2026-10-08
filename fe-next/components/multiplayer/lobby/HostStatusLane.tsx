@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Bot, Zap } from 'lucide-react';
 import { SoloPlayPrompt } from '@/host/components/pre-game/SoloPlayPrompt';
 import { cn } from '@/lib/utils';
@@ -23,6 +23,9 @@ export interface HostStatusLaneProps {
   className?: string;
 }
 
+// Tallest lane variant (the solo prompt): once shown, the slot stays this tall so the roster under it never jumps.
+const SLOT = 'flex flex-col justify-center min-h-[calc(52px*var(--mp-u,1))]';
+
 const LANE = 'flex items-center gap-2 min-h-[calc(44px*var(--mp-u,1))] rounded-neo border-2 px-3 py-1.5 font-neo-display font-bold text-[length:calc(14px*var(--mp-u,1))]';
 
 /**
@@ -33,6 +36,7 @@ const LANE = 'flex items-center gap-2 min-h-[calc(44px*var(--mp-u,1))] rounded-n
 export function HostStatusLane({
   t, autoStartSecondsLeft, onCancelAutoStart, botCountdown, onCancelBotCountdown, showSoloPrompt, onPlayVsBots, adHold, className,
 }: HostStatusLaneProps) {
+  const [reserved, setReserved] = useState(false);
   const cancel = (onPress: () => void, tone: string) => (
     <button
       type="button"
@@ -72,6 +76,11 @@ export function HostStatusLane({
     );
   }
 
-  if (!lane) return null;
-  return <div data-testid="host-status-lane" className={cn(styles.laneIn, className)}>{lane}</div>;
+  if (lane && !reserved) setReserved(true);
+  if (!lane && !reserved) return null;
+  return (
+    <div data-testid="host-status-lane" aria-hidden={lane ? undefined : true} className={cn(SLOT, styles.laneIn, className)}>
+      {lane}
+    </div>
+  );
 }
