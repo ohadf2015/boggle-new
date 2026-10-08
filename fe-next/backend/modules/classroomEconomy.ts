@@ -7,8 +7,6 @@
  * them for the next round). Streak and double-cash do not.
  */
 
-import { COSMETICS } from '@/lib/cosmetics';
-
 import {
   CHEST_ODDS,
   CHEST_XP,
@@ -17,6 +15,7 @@ import {
   type ChestRarity,
   type PowerUpId,
 } from '@/shared/constants/classroomEconomy';
+import { chestPartPool } from './classroomEconomyPool';
 
 export { CHEST_ODDS, CHEST_XP, POWER_UPS, WRONG_ANSWER_COST };
 export type { PowerUpId };
@@ -137,16 +136,11 @@ function hash01(seed: string): number {
   return ((h >>> 0) % 1_000_000) / 1_000_000;
 }
 
-function poolFor(rarity: ChestRarity): string[] {
-  const ids = COSMETICS.filter((c) => c.rarity === rarity).map((c) => c.id);
-  return ids.length > 0 ? ids : COSMETICS.filter((c) => c.rarity === 'common').map((c) => c.id);
-}
-
 /** Deterministic in its seed, so a replayed claim cannot re-roll a better chest. */
 export function rollChest(seed: string): ChestRoll {
   const u = hash01(`rarity:${seed}`);
   const rarity: ChestRarity = u < CHEST_ODDS.epic ? 'epic' : u < CHEST_ODDS.epic + CHEST_ODDS.rare ? 'rare' : 'common';
-  const pool = poolFor(rarity);
+  const pool = chestPartPool(rarity);
   const pick = Math.floor(hash01(`item:${seed}`) * pool.length) % pool.length;
   return { rarity, xp: CHEST_XP[rarity], itemId: pool[pick] };
 }

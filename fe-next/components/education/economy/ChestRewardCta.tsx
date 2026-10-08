@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useChestLocker } from './useChestLocker';
 import { useRoundReward } from './useRoundReward';
+import { useStudentAvatar } from './useStudentAvatar';
 import RewardChest from './RewardChest';
 import { chestArtSrc } from './chestPhase';
 
@@ -17,6 +18,7 @@ export default function ChestRewardCta({ gameCode, roundId }: ChestRewardCtaProp
   const { t } = useLanguage();
   const reveal = useRoundReward(gameCode, roundId);
   const locker = useChestLocker();
+  const wearing = useStudentAvatar();
   const [opening, setOpening] = useState(false);
   const [collected, setCollected] = useState(false);
 
@@ -37,6 +39,7 @@ export default function ChestRewardCta({ gameCode, roundId }: ChestRewardCtaProp
       {opening && (
         <RewardChest
           reveal={reveal}
+          wearing={wearing}
           onClose={() => {
             setOpening(false);
             setCollected(true);

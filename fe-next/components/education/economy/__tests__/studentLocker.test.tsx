@@ -6,8 +6,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 const locker = { items: [] as Array<Record<string, unknown>> };
 vi.mock('../useChestLocker', () => ({ useChestLocker: () => ({ items: locker.items, refresh: vi.fn() }) }));
+vi.mock('../useStudentAvatar', () => ({ useStudentAvatar: () => DEFAULT_AVATAR_CONFIG }));
 
 import StudentLocker from '../StudentLocker';
+import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 
 afterEach(() => {
   cleanup();
@@ -30,5 +32,12 @@ describe('StudentLocker', () => {
     fireEvent.click(screen.getByTestId('student-locker'));
     expect(screen.getByText('economy.locker.title')).toBeTruthy();
     expect(screen.getByText('economy.chest.rarity.epic')).toBeTruthy();
+  });
+
+  it('Given a named part chest item, When opened, Then the part name is listed', () => {
+    locker.items = [{ gameCode: 'ABC', roundId: '5', rarity: 'rare', xp: 25, itemId: 'accessory:cowboyHat', createdAt: 'z' }];
+    render(<StudentLocker />);
+    fireEvent.click(screen.getByTestId('student-locker'));
+    expect(screen.getByText('revealUnlock.parts.cowboyHat')).toBeTruthy();
   });
 });

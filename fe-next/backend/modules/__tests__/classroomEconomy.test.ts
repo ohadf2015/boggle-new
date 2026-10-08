@@ -14,6 +14,7 @@ import {
   useHint,
   wordCash,
 } from '../classroomEconomy';
+import { chestPartPool } from '../classroomEconomyPool';
 
 const NOW = 1_000_000;
 
@@ -199,9 +200,9 @@ describe('chest odds and roll', () => {
     expect(counts.epic).toBeGreaterThan(0);
   });
 
-  it('Given a roll, Then the item is a cosmetic and XP matches the rarity', () => {
+  it('Given a roll, Then the item is a named avatar part from its rarity pool and XP matches the rarity', () => {
     const chest = rollChest('ABC:r1:u9');
-    expect(chest.itemId).toMatch(/^[a-z0-9-]+$/);
+    expect(chestPartPool(chest.rarity)).toContain(chest.itemId);
     expect(chest.xp).toBeGreaterThan(0);
   });
 });

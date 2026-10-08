@@ -4,8 +4,8 @@
  * that was already granted, never a second roll. Contents are cosmetic plus
  * XP only; nothing here touches coins.
  *
- * Fails closed: no claim, no row, no XP. A failed row write releases the claim
- * so a retry can still grant once the table is reachable.
+ * Fails closed: no claim, no part, no row, no XP. The part is owned before the
+ * row is written and is idempotent, so a retry after a failed row write is safe.
  */
 
 import { claimOnce, type ClaimResult } from '@/lib/server/claimOnce';
@@ -27,6 +27,8 @@ export interface ChestDeps {
   claim: (key: string) => Promise<ClaimResult>;
   release: (key: string) => Promise<void>;
   insert: (row: Record<string, unknown>) => Promise<{ error: unknown }>;
+  /** Idempotent: owning a part twice is a no-op. Throws on failure. */
+  grantPart: (userId: string, partKey: string) => Promise<void>;
   grantXp: (userId: string, amount: number) => Promise<void>;
   remember: (key: string, reveal: ChestReveal) => Promise<void>;
   recall: (key: string) => Promise<ChestReveal | null>;
@@ -49,6 +51,13 @@ export async function grantRoundChest(input: RoundChestInput, deps: ChestDeps = 
   }
 
   const chest = rollChest(`${input.gameCode}:${input.roundId}:${input.userId}`);
+  try {
+    await deps.grantPart(input.userId, chest.itemId);
+  } catch (err) {
+    logger.error('CLASSROOM_ECONOMY', `Chest part failed for ${input.userId} in ${input.gameCode}: ${(err as Error).message}`);
+    await deps.release(key);
+    return null;
+  }
   const { error } = await deps.insert({
     game_code: input.gameCode,
     round_id: input.roundId,
@@ -98,6 +107,16 @@ function defaultChestDeps(): ChestDeps {
       if (!supabase) return { error: new Error('supabase not configured') };
       const { error } = await supabase.from('classroom_chest_rewards').insert(row);
       return { error };
+    },
+    grantPart: async (userId, partKey) => {
+      const supabase = getSupabase();
+      if (!supabase) throw new Error('supabase not configured');
+      const { data, error } = await supabase.from('profiles').select('premium_avatar_parts').eq('id', userId).single();
+      if (error) throw new Error(error.message);
+      const owned = (data?.premium_avatar_parts as string[] | null) ?? [];
+      if (owned.includes(partKey)) return;
+      const { error: updateError } = await supabase.from('profiles').update({ premium_avatar_parts: [...owned, partKey] }).eq('id', userId);
+      if (updateError) throw new Error(updateError.message);
     },
     grantXp: async (userId, amount) => {
       const supabase = getSupabase();

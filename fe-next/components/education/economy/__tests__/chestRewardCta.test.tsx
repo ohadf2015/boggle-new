@@ -13,6 +13,7 @@ vi.mock('framer-motion', async () => {
 });
 const refreshLocker = vi.fn();
 vi.mock('../useChestLocker', () => ({ useChestLocker: () => ({ items: [], refresh: refreshLocker }) }));
+vi.mock('../useStudentAvatar', () => ({ useStudentAvatar: () => ({}) }));
 
 import ChestRewardCta from '../ChestRewardCta';
 
@@ -28,7 +29,7 @@ describe('ChestRewardCta', () => {
   });
 
   it('Given a reward, When the student taps it, Then the chest opens and closing collects it', () => {
-    reward.value = { gameCode: 'ABC', roundId: '7', rarity: 'rare', xp: 25, itemId: 'tile-neon', roundCash: 9, rank: 1, size: 3 };
+    reward.value = { gameCode: 'ABC', roundId: '7', rarity: 'rare', xp: 25, itemId: 'eyes:starEye', roundCash: 9, rank: 1, size: 3 };
     render(<ChestRewardCta gameCode="ABC" roundId="7" />);
     fireEvent.click(screen.getByText('economy.reward.ready'));
     expect(screen.getByRole('dialog')).toBeTruthy();
