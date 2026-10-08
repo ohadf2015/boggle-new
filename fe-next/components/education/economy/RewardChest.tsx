@@ -48,7 +48,7 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
       role="dialog"
       aria-modal="true"
       aria-label={t('economy.chest.title')}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 overflow-hidden bg-neo-navy px-5 py-6 text-white"
+      className="fixed inset-0 z-[100] flex flex-col items-center gap-4 overflow-y-auto bg-neo-navy px-5 py-6 text-white"
     >
       <h2 className="text-center text-3xl font-bold tracking-wide">{t('economy.chest.title')}</h2>
 
@@ -92,8 +92,8 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
           >
             {unlock ? (
               <>
-                <div className="h-[min(60vw,240px)] w-[min(60vw,240px)]">
-                  <AvatarRenderer config={applyUnlockToConfig(wearing, unlock)} size={240} />
+                <div className="h-[min(52vw,200px)] w-[min(52vw,200px)]">
+                  <AvatarRenderer config={applyUnlockToConfig(wearing, unlock)} size={200} />
                 </div>
                 <span className="text-3xl font-bold leading-tight">{t(revealPartNameKey(unlock))}</span>
                 <span className="text-base text-white/90">{t(REVEAL_CATEGORY_KEY[unlock.category])}</span>
@@ -103,13 +103,13 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
               </>
             ) : (
               <>
-                <img src={chestArtSrc(reveal.rarity, true)} alt="" className="h-[min(60vw,260px)] w-auto object-contain drop-shadow-[6px_6px_0_#000]" />
+                <img src={chestArtSrc(reveal.rarity, true)} alt="" className="h-[min(52vw,200px)] w-auto object-contain drop-shadow-[6px_6px_0_#000]" />
                 {legacyName && <span className="text-3xl font-bold leading-tight">{t(legacyName)}</span>}
+                <span className={cn('rounded-full border-2 bg-black/40 px-4 py-1 text-base font-bold uppercase tracking-wider', tone.text, tone.ring)}>
+                  {t(`economy.chest.rarity.${reveal.rarity}`)}
+                </span>
               </>
             )}
-            <span className={cn('rounded-full border-2 bg-black/40 px-4 py-1 text-base font-bold uppercase tracking-wider', tone.text, tone.ring)}>
-              {t(`economy.chest.rarity.${reveal.rarity}`)}
-            </span>
             <span className="text-2xl font-bold text-neo-lime">{t('economy.chest.xp', { xp: reveal.xp })}</span>
             <span className="text-lg text-white/90">{t('economy.reward.round', { cash: reveal.roundCash })}</span>
             {reveal.rank !== null && (

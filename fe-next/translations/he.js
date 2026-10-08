@@ -158,6 +158,7 @@ const he = {
       "hud": {
         "cash": "כסף: {cash}",
         "multiplier": "x{multiplier}",
+        "streak": "{streak} ברצף",
         "doubleCash": "פי 2 ל-{seconds} שנ׳",
         "loading": "טוען כסף…"
       },

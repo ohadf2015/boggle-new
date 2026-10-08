@@ -158,6 +158,7 @@ const ru = {
       "hud": {
         "cash": "Деньги: {cash}",
         "multiplier": "x{multiplier}",
+        "streak": "{streak} подряд",
         "doubleCash": "2x {seconds} с",
         "loading": "Загрузка денег…"
       },

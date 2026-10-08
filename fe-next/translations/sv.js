@@ -158,6 +158,7 @@ const sv = {
       "hud": {
         "cash": "Pengar: {cash}",
         "multiplier": "x{multiplier}",
+        "streak": "{streak} i rad",
         "doubleCash": "2x {seconds} s",
         "loading": "Laddar pengar…"
       },

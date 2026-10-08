@@ -158,6 +158,7 @@ const ja = {
       "hud": {
         "cash": "所持金: {cash}",
         "multiplier": "x{multiplier}",
+        "streak": "{streak}連続",
         "doubleCash": "2倍 残り{seconds}秒",
         "loading": "所持金を読み込み中…"
       },

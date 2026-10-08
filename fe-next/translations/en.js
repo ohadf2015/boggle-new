@@ -158,6 +158,7 @@ const en = {
       "hud": {
         "cash": "Cash: {cash}",
         "multiplier": "x{multiplier}",
+        "streak": "{streak} in a row",
         "doubleCash": "2x {seconds}s",
         "loading": "Loading cash…"
       },

@@ -44,7 +44,13 @@ vi.mock('../../redisClient.js', () => ({ getRedisClient: () => null }));
 vi.mock('@/lib/server/claimOnce', () => ({ claimOnce: vi.fn(async () => 'claimed') }));
 vi.mock('../../modules/supabase/client.js', () => ({
   getSupabase: () => ({
-    from: () => ({ insert: mocks.insert }),
+    from: (table: string) =>
+      table === 'profiles'
+        ? {
+            select: () => ({ eq: () => ({ single: async () => ({ data: { premium_avatar_parts: [] }, error: null }) }) }),
+            update: () => ({ eq: async () => ({ error: null }) }),
+          }
+        : { insert: mocks.insert },
     rpc: mocks.rpc,
   }),
 }));
