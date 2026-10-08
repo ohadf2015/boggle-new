@@ -25,6 +25,7 @@ const es = {
         "rank": "#{rank} de {size} en esta ronda"
       },
       "locker": {
+        "title": "Tu cofre",
         "added": "Añadido a tu cofre"
       },
       "shop": {

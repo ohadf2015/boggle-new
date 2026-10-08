@@ -25,6 +25,7 @@ const sv = {
         "rank": "#{rank} av {size} i den här rundan"
       },
       "locker": {
+        "title": "Ditt skåp",
         "added": "Tillagd i ditt skåp"
       },
       "shop": {

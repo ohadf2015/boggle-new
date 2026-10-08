@@ -82,7 +82,7 @@ export default function RewardChest({ reveal, onClose }: RewardChestProps) {
             className="relative flex flex-col items-center gap-2 text-center"
             data-testid="chest-reveal"
           >
-            <img src={chestArtSrc(reveal.rarity, true)} alt="" className="h-[min(48vw,200px)] w-auto object-contain drop-shadow-[6px_6px_0_#000]" />
+            <img src={chestArtSrc(reveal.rarity, true)} alt="" className="h-[min(60vw,260px)] w-auto object-contain drop-shadow-[6px_6px_0_#000]" />
             <span className={cn('rounded-full border-2 bg-black/40 px-4 py-1 text-base font-bold uppercase tracking-wider', tone.text, tone.ring)}>
               {t(`economy.chest.rarity.${reveal.rarity}`)}
             </span>

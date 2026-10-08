@@ -25,6 +25,7 @@ const ja = {
         "rank": "このラウンド {size}人中 {rank}位"
       },
       "locker": {
+        "title": "ロッカー",
         "added": "ロッカーに追加されました"
       },
       "shop": {

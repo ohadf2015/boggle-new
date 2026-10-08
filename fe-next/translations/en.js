@@ -25,6 +25,7 @@ const en = {
         "rank": "#{rank} of {size} this round"
       },
       "locker": {
+        "title": "Your locker",
         "added": "Added to your locker"
       },
       "shop": {

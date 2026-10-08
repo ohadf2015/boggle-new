@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const grant = vi.fn();
 const classroomGame = { value: null as unknown };
+const lockerRows = new Map<string, unknown[]>();
 const gameState = { value: { gameSessionId: 'sess-7' } as unknown };
 const applyCorrect = vi.fn();
 const buyPowerUpFor = vi.fn();
@@ -21,6 +22,9 @@ vi.mock('../../modules/classroomEconomyService', () => ({
   toSnapshot: vi.fn(),
   spendHintFor: vi.fn(),
   roundSummaryFor: async () => ({ roundCash: 12, rank: 2, size: 3 }),
+}));
+vi.mock('../../modules/classroomEconomyLocker', () => ({
+  readLocker: async (userId: string) => lockerRows.get(userId) ?? [],
 }));
 vi.mock('../../modules/classroomEconomyStore', () => ({
   loadConfig: vi.fn(),
@@ -58,6 +62,19 @@ beforeEach(() => {
   applyCorrect.mockReset();
   classroomGame.value = null;
   gameState.value = { gameSessionId: 'sess-7' };
+});
+
+describe('classroomEconomy:requestLocker', () => {
+  it('Given a student with chests, Then the locker goes back only to that socket', async () => {
+    lockerRows.set('u1', [{ gameCode: 'ABC', roundId: '3', rarity: 'rare', xp: 25, itemId: 'tile-neon', createdAt: 'x' }]);
+    const socket = { id: 's1', emit: (event: string, data: unknown) => emitted.push({ event, data }), on: (ev: string, fn: (d: unknown) => Promise<void>) => { handlers[ev] = fn; } };
+    const emitted: Array<{ event: string; data: unknown }> = [];
+    socket.emit = (event: string, data: unknown) => emitted.push({ event, data });
+    registerClassroomEconomyHandlers({} as never, socket as never);
+    await handlers['classroomEconomy:requestLocker']({});
+    expect(emitted).toEqual([{ event: 'classroomEconomy:locker', data: [expect.objectContaining({ rarity: 'rare' })] }]);
+    lockerRows.clear();
+  });
 });
 
 describe('classroomEconomy:requestReward', () => {

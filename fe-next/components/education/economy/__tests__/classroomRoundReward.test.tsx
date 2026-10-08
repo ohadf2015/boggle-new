@@ -15,11 +15,16 @@ vi.mock('framer-motion', async () => {
   return { ...actual, useReducedMotion: () => true };
 });
 
+const locker = { items: [] as Array<Record<string, unknown>> };
+const refreshLocker = vi.fn();
+vi.mock('../useChestLocker', () => ({ useChestLocker: () => ({ items: locker.items, refresh: refreshLocker }) }));
+
 import ClassroomRoundReward from '../ClassroomRoundReward';
 
 afterEach(() => {
   cleanup();
   reward.value = null;
+  locker.items = [];
 });
 
 describe('ClassroomRoundReward', () => {
@@ -36,5 +41,12 @@ describe('ClassroomRoundReward', () => {
     fireEvent.click(screen.getByText('economy.chest.continue'));
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.getByText('economy.reward.collected')).toBeTruthy();
+  });
+
+  it('Given collected chests, Then the locker lists each item with its rarity', () => {
+    locker.items = [{ gameCode: 'ABC', roundId: '3', rarity: 'epic', xp: 60, itemId: 'tile-neon', createdAt: 'x' }];
+    render(<ClassroomRoundReward gameCode="ABC" roundId="7" />);
+    expect(screen.getByText('economy.locker.title')).toBeTruthy();
+    expect(screen.getByText('cosmetics.items.tileNeon')).toBeTruthy();
   });
 });

@@ -25,6 +25,7 @@ const he = {
         "rank": "#{rank} מתוך {size} בסבב הזה"
       },
       "locker": {
+        "title": "האוסף שלך",
         "added": "נוסף לאוסף שלך"
       },
       "shop": {

@@ -21,6 +21,7 @@ import {
 } from '../modules/classroomEconomyService.js';
 import { loadConfig, saveEconomyConfig, readEconomy } from '../modules/classroomEconomyStore.js';
 import { grantRoundChest } from '../modules/classroomEconomyChest.js';
+import { readLocker } from '../modules/classroomEconomyLocker.js';
 import logger from '../utils/logger.js';
 
 const E = CLASSROOM_ECONOMY_EVENTS;
@@ -128,6 +129,12 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
     const summary = await roundSummaryFor(gameCode, roundId, userId);
     const reveal = await grantRoundChest({ gameCode, roundId, userId, summary });
     socket.emit(E.reward, reveal);
+  });
+
+  socket.on(E.requestLocker, async () => {
+    const userId = getAuthUserId(socket);
+    if (!userId || !checkRateLimit(socket.id)) return;
+    socket.emit(E.locker, await readLocker(userId));
   });
 
   socket.on(E.buyPowerUp, async (data: { gameCode?: unknown; powerUpId?: unknown }) => {
