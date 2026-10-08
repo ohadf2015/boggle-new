@@ -1832,20 +1832,6 @@ const ja = {
     },
     "modifier": {
       "todaysTwist": "今日のひねり",
-      "sealedBid": {
-        "noClashPenalty": {
-          "label": "休戦の日",
-          "desc": "ゆるめの市場。気軽に入札しよう。"
-        },
-        "vowelTax": {
-          "label": "母音税",
-          "desc": "今日は母音が争奪戦。"
-        },
-        "highStakes": {
-          "label": "ハイステークス",
-          "desc": "今日は大胆でユニークな入札がカギ。"
-        }
-      },
       "wordAlchemy": {
         "doubleCatalyst": {
           "label": "ダブル触媒",
@@ -1874,70 +1860,6 @@ const ja = {
           "desc": "時間との勝負。すばやく解こう。"
         }
       }
-    }
-  },
-  "sealedBidMp": {
-    "waiting": "オークションを準備中…",
-    "round": "ラウンド {{n}}/{{total}}",
-    "scores": "スコア",
-    "youWin": "オークション勝利！",
-    "wins": "がオークションに勝利！",
-    "bidPrompt": "ラックから単語を作ろう。誰も選ばない一語を狙え！",
-    "results": "入札結果を公開",
-    "outcome": {
-      "unique": "ユニーク ×2",
-      "clash": "衝突 ÷2",
-      "none": "入札なし"
-    },
-    "locked": "入札を確定。対戦相手を待っています…",
-    "lockProgress": "{{locked}}/{{total}} 人が確定",
-    "clear": "クリア",
-    "pass": "パス",
-    "lock": "入札を確定",
-    "autoResolve": "{{secs}}秒後に自動で決着",
-    "eloRating": "レーティング"
-  },
-  "sealedBidLegacy": {
-    "badge": "シールドビッド",
-    "title": "シールドビッド",
-    "instructions": "誰も選ばない単語を選ぼう。ユニークな入札は得点2倍。",
-    "roundLabel": "ラウンド {n} / {total}",
-    "totalScore": "スコア: {score}",
-    "timerLabel": "単語を入力…",
-    "sealPhase": "入札を封印",
-    "tapHint": "文字をタップして単語を作ろう",
-    "backspace": "最後の文字を削除",
-    "clear": "単語をクリア",
-    "revealPhase": "公開",
-    "showdown": "ショーダウン！",
-    "lockIn": "確定",
-    "skip": "スキップ",
-    "youPicked": "あなたの選択",
-    "botPicked": "ボットの選択",
-    "resultUnique": "ユニーク！得点2倍",
-    "resultShared": "かぶった：半分の得点",
-    "resultNone": "未入札：0点",
-    "pointsEarned": "+{pts}点",
-    "nextRound": "次のラウンド →",
-    "finalScore": "最終スコア",
-    "playAgain": "もう一度",
-    "adminOnly": "シールドビッドは管理者限定プレビューです。",
-    "shareCard": {
-      "title": "あなたのブラフ記録",
-      "cta": "結果をシェア",
-      "copied": "コピーしました"
-    },
-    "session": {
-      "title": "ブラフカウンター",
-      "outsmarted": "ラウンド上回った",
-      "uniqueLabel": "ユニーク",
-      "clashLabel": "クラッシュ",
-      "passLabel": "パス",
-      "shareCta": "スコアをシェア"
-    },
-    "err": {
-      "notInRack": "ラックの文字だけを使ってください",
-      "notWord": "辞書にありません"
     }
   },
   "wordAlchemy": {
@@ -5228,7 +5150,6 @@ const ja = {
         "wordHunt": "ワードハント",
         "wheelRush": "ホイールラッシュ",
         "wordTower": "ワードタワー",
-        "sealedBid": "封印入札",
         "random": "サプライズモード"
       },
       "hook": {
@@ -5237,7 +5158,6 @@ const ja = {
         "wordHunt": "隠れた単語を狩ろう",
         "wheelRush": "ホイールでライバルと対戦",
         "wordTower": "タワーを積もう",
-        "sealedBid": "全員を出し抜け",
         "random": "お楽しみに"
       }
     },
@@ -8213,8 +8133,6 @@ const ja = {
     "partyModeDesc": "大画面で Caption / Pixel / Shadow Clash",
     "wordAlchemyMode": "ワードアルケミー",
     "wordAlchemyModeDesc": "1つの単語を次の単語へ変えよう",
-    "sealedBidMode": "シールドビッド",
-    "sealedBidModeDesc": "誰も選ばない単語を選べ。ユニークな入札は得点2倍",
     "wordfallMode": "ワードフォール",
     "wordfallModeDesc": "降ってくるタイルが埋まる前に素早く綴ろう",
     "dailyChallenge": "デイリーチャレンジ",
@@ -16681,7 +16599,6 @@ const ja = {
       "playWordfall": "Wordfall",
       "playParty": "パーティー",
       "playWordTower": "ワードタワー",
-      "playSealedBid": "シールドビッド"
     }
   },
   "passAndPlay": {
@@ -17115,10 +17032,6 @@ const ja = {
         "tip2": "周りの文字は順不同でタップ",
         "tip3": "複数形を試して単語を伸ばす"
       }
-    },
-    "sealedBid": {
-      "name": "封印入札",
-      "description": "他の誰も選ばない単語を入札。ユニークな入札は得点2倍！"
     },
     "crossword": {
       "name": "クロスワード",
@@ -19177,8 +19090,8 @@ const ja = {
     },
     "wordTower": {
       "title": "塔を積み上げる",
-      "step1": "タップでブロックを落とす",
-      "step2": "ど真ん中に着地させて積み上げよう",
+      "step1": "文字をなぞって単語を作る",
+      "step2": "タップしてど真ん中に落とす",
       "scoreTip": "単語ひとつで階が1段上がる！"
     },
     "connections": {
@@ -19202,90 +19115,11 @@ const ja = {
       "step1": "ヒントをタップして答えを入力",
       "step2": "タテヨコ両方を解く"
     },
-    "sealedBid": {
-      "title": "秘密入札",
-      "step1": "最高の単語をひそかに入札",
-      "step2": "他とかぶらないと2倍ゲット！",
-      "step3": "早めにロック。ボーナスは時間で減る"
-    },
     "adventure": {
       "title": "アドベンチャー",
       "step1": "目標をクリアして進む",
       "step2": "大きな単語でボスを倒す"
     }
-  },
-  "sealedBid": {
-    "luckyStreak": "ラッキーストリーク！",
-    "hotStreak": "{n}連勝！",
-    "allIn": "全て投入",
-    "clear": "クリア",
-    "currentStake": "現在の賭け金",
-    "balance": "残高",
-    "stake": "賭け金",
-    "uniquePays": "ユニークなら{mult}倍",
-    "potentialPayout": "獲得見込み {amount}",
-    "lockBid": "入札をロック",
-    "needWord": "先に単語を作ろう",
-    "needStake": "ロックするには賭け金を設定してね",
-    "pass": "パス",
-    "unique": "ユニーク",
-    "clash": "衝突",
-    "busted": "バースト",
-    "cashOut": "キャッシュアウト",
-    "chips": "チップ",
-    "showdown": "ショーダウン",
-    "round": "ラウンド",
-    "vsRivals": "{a}・{b}と対戦中",
-    "gameOver": "ゲーム終了",
-    "playAgain": "もう一度",
-    "notAWord": "単語ではありません",
-    "tapHint": "文字をタップして単語を作ろう",
-    "continue": "続ける",
-    "shareCard": {
-      "title": "あなたのブラフ記録",
-      "cta": "結果をシェア",
-      "copied": "コピーしました",
-      "header": "🎯 シールドビッド — {score}pt",
-      "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
-      "url": "lexiclash.live/ja/sealed-bid",
-      "roundLabel": "R{n}",
-      "vs": "vs"
-    },
-    "session": {
-      "title": "ブラフカウンター",
-      "outsmarted": "ラウンド上回った",
-      "uniqueLabel": "ユニーク",
-      "clashLabel": "クラッシュ",
-      "passLabel": "パス",
-      "shareCta": "スコアをシェア",
-      "shareHeader": "🧠 {unique}/{total}ラウンドでボットに勝利、{score}pt",
-      "cashOut": "キャッシュアウト",
-      "chips": "チップ",
-      "coins": "コイン"
-    },
-    "youWin": "勝利！",
-    "youLose": "衝突",
-    "draw": "パス",
-    "noWord": "—",
-    "botRival": "ライバル{n}",
-    "outcome": {
-      "unique": "ユニーク入札",
-      "clash": "衝突",
-      "none": "入札なし"
-    },
-    "outcomeEmoji": {
-      "unique": "✅",
-      "clash": "🤝",
-      "none": "⬜"
-    },
-    "error": {
-      "tooShort": "単語は3文字以上必要です",
-      "needStake": "賭け金を設定してロック"
-    },
-    "revealing": "公開中…",
-    "roundLabel": "ラウンド {n}/{total}",
-    "chipStack": "チップ: {chips}",
-    "speedBonus": "スピード ×{n}"
   },
   "supporter": {
     "card": {
@@ -19406,10 +19240,6 @@ const ja = {
         "wordTower": {
           "name": "ワードタワー",
           "rule": "単語を積んで一番高いタワーを建てよう。"
-        },
-        "sealedBid": {
-          "name": "シールドビッド",
-          "rule": "こっそり入札。ポイントは賢く使おう。"
         },
         "crossword": {
           "name": "クロスワードレース",

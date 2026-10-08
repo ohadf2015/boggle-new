@@ -1,20 +1,20 @@
 {
   "summary": {
-    "totalKeysInCode": 8096,
+    "totalKeysInCode": 8003,
     "keyCountByLanguage": {
-      "en": 15599,
-      "es": 15885,
-      "he": 15809,
-      "ja": 15868,
-      "ru": 15641,
-      "sv": 15865
+      "en": 15459,
+      "es": 15765,
+      "he": 15691,
+      "ja": 15750,
+      "ru": 15488,
+      "sv": 15747
     },
-    "missingFromEnglish": 104,
+    "missingFromEnglish": 103,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 413,
+      "templateLiterals": 408,
       "fallbackUsages": 1,
-      "variableKeys": 126
+      "variableKeys": 125
     }
   },
   "runtimeRisks": {
@@ -44,7 +44,7 @@
         "pattern": "`education.access.${key}`",
         "type": "template_literal",
         "file": "app/[locale]/education/access/PageClient.tsx",
-        "line": 211,
+        "line": 219,
         "context": "{t(`education.access.${key}`)}"
       },
       {
@@ -95,13 +95,6 @@
         "file": "app/[locale]/player/[id]/PageClient.tsx",
         "line": 329,
         "context": "{t(`achievements.${key}.name`, key.replace(/_/g, ' '))}"
-      },
-      {
-        "pattern": "`sealedBid.outcome.${settlement.outcome}`",
-        "type": "template_literal",
-        "file": "app/[locale]/sealed-bid/page.tsx",
-        "line": 290,
-        "context": "? t(`sealedBid.outcome.${settlement.outcome}`)"
       },
       {
         "pattern": "`achievements.${achievement.key}.name`",
@@ -457,7 +450,7 @@
         "pattern": "`adventure.worlds.${worldCfg.name}`",
         "type": "template_literal",
         "file": "components/adventure/play/AdventureLevel.tsx",
-        "line": 368,
+        "line": 369,
         "context": "worldName={worldCfg ? t(`adventure.worlds.${worldCfg.name}`) : ''}"
       },
       {
@@ -1210,20 +1203,6 @@
         "context": "{t(`curator.admin.inbox.kind.${p.kind}`)}"
       },
       {
-        "pattern": "`daily.badges.${justEarnedBadge.label}`",
-        "type": "template_literal",
-        "file": "components/daily/DailyRewardPreview.tsx",
-        "line": 45,
-        "context": "badge: t(`daily.badges.${justEarnedBadge.label}`),"
-      },
-      {
-        "pattern": "`daily.badges.${nextMilestone.label}`",
-        "type": "template_literal",
-        "file": "components/daily/DailyRewardPreview.tsx",
-        "line": 96,
-        "context": "badge: t(`daily.badges.${nextMilestone.label}`),"
-      },
-      {
         "pattern": "`daily.createChallengeFeature.benefits.${benefit.key}`",
         "type": "template_literal",
         "file": "components/daily/UnauthenticatedCreateChallengeSection.tsx",
@@ -1304,7 +1283,7 @@
         "pattern": "`education.access.role_${value}`",
         "type": "template_literal",
         "file": "components/education/AccessRequestForm.tsx",
-        "line": 249,
+        "line": 255,
         "context": "<span className=\"text-sm\">{t(`education.access.role_${value}`)}</span>"
       },
       {
@@ -1360,7 +1339,7 @@
         "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`",
         "type": "template_literal",
         "file": "components/education/ClassroomModeBanner.tsx",
-        "line": 345,
+        "line": 344,
         "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode] ?? 'classic'}`)}"
       },
       {
@@ -1381,28 +1360,28 @@
         "pattern": "`education.packages.${ns}.name`",
         "type": "template_literal",
         "file": "components/education/EducationPackages.tsx",
-        "line": 105,
+        "line": 101,
         "context": "<h3 className=\"font-neo-display text-xl font-black\">{t(`education.packages.${ns}.name`)}</h3>"
       },
       {
         "pattern": "`education.packages.${ns}.interval`",
         "type": "template_literal",
         "file": "components/education/EducationPackages.tsx",
-        "line": 113,
+        "line": 115,
         "context": "{t(`education.packages.${ns}.interval`)}"
       },
       {
         "pattern": "`education.packages.${ns}.blurb`",
         "type": "template_literal",
         "file": "components/education/EducationPackages.tsx",
-        "line": 119,
+        "line": 126,
         "context": "{t(`education.packages.${ns}.blurb`)}"
       },
       {
         "pattern": "`education.packages.${ns}.cta`",
         "type": "template_literal",
         "file": "components/education/EducationPackages.tsx",
-        "line": 143,
+        "line": 161,
         "context": "{t(`education.packages.${ns}.cta`)}"
       },
       {
@@ -1430,21 +1409,21 @@
         "pattern": "`education.forSchools.form.role_${r}`",
         "type": "template_literal",
         "file": "components/education/SchoolLeadForm.tsx",
-        "line": 142,
+        "line": 176,
         "context": "{SCHOOL_LEAD_ROLES.map((r) => <SelectItem key={r} value={r}>{t(`education.forSchools.form.role_${r}`"
       },
       {
         "pattern": "`education.forSchools.form.count_${b}`",
         "type": "template_literal",
         "file": "components/education/SchoolLeadForm.tsx",
-        "line": 153,
+        "line": 200,
         "context": "{STUDENT_COUNT_BUCKETS.map((b) => <SelectItem key={b} value={b}>{t(`education.forSchools.form.count_"
       },
       {
         "pattern": "`education.forSchools.form.interest_${key}`",
         "type": "template_literal",
         "file": "components/education/SchoolLeadForm.tsx",
-        "line": 169,
+        "line": 216,
         "context": "<span>{t(`education.forSchools.form.interest_${key}`)}</span>"
       },
       {
@@ -1791,13 +1770,6 @@
         "type": "template_literal"
       },
       {
-        "pattern": "`sealedBidMp.outcome.${r.outcome}`",
-        "type": "template_literal",
-        "file": "components/multiplayer/sealedBid/SealedBidVersus.tsx",
-        "line": 237,
-        "context": "{r.word ?? '—'} · {t(`sealedBidMp.outcome.${r.outcome}`)} ·{' '}"
-      },
-      {
         "pattern": "`offline.queue.status.${status}`",
         "type": "template_literal",
         "file": "components/offline/PendingSyncBadge.tsx",
@@ -2085,13 +2057,6 @@
         "type": "template_literal"
       },
       {
-        "pattern": "`sealedBid.outcomeEmoji.${r.outcome}`",
-        "type": "template_literal",
-        "file": "components/sealedBid/SealedBidSessionSummary.tsx",
-        "line": 130,
-        "context": "{t(`sealedBid.outcomeEmoji.${r.outcome}`)}"
-      },
-      {
         "pattern": "`rank.tier.${tier}`",
         "type": "template_literal",
         "file": "components/seasons/RankTierChip.tsx",
@@ -2333,7 +2298,7 @@
         "pattern": "`eg2Pro.school.roles.${r}`",
         "type": "template_literal",
         "file": "components/teacher/pro/SchoolQuoteForm.tsx",
-        "line": 118,
+        "line": 129,
         "context": "<option key={r} value={r}>{t(`eg2Pro.school.roles.${r}`)}</option>"
       },
       {
@@ -2459,14 +2424,14 @@
         "pattern": "`wordcraft.gems.dice.families.${sessionDice.id}`",
         "type": "template_literal",
         "file": "components/word-craft/gems/GemHuntPageClient.tsx",
-        "line": 315,
+        "line": 324,
         "context": "? t('wordcraft.gems.dice.active', { family: t(`wordcraft.gems.dice.families.${sessionDice.id}`), mul"
       },
       {
         "pattern": "`wordcraft.gems.dice.families.${fam.id}`",
         "type": "template_literal",
         "file": "components/word-craft/gems/GemHuntPageClient.tsx",
-        "line": 435,
+        "line": 444,
         "context": "{t(`wordcraft.gems.dice.families.${fam.id}`)}"
       },
       {
@@ -3312,7 +3277,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/education/EducationPackages.tsx",
-        "line": 123,
+        "line": 130,
         "context": "<li key={key}>{t(key)}</li>"
       },
       {
@@ -3644,14 +3609,6 @@
         "context": "return t(key, params);"
       },
       {
-        "pattern": "t(hintKey)",
-        "variable": "hintKey",
-        "type": "variable_key",
-        "file": "components/sealedBid/SealedBidTable.tsx",
-        "line": 147,
-        "context": "{t(hintKey)}"
-      },
-      {
         "pattern": "t(labelKey)",
         "variable": "labelKey",
         "type": "variable_key",
@@ -3832,7 +3789,7 @@
         "variable": "nameKey",
         "type": "variable_key",
         "file": "host/components/pre-game/BattleModeCard.tsx",
-        "line": 112,
+        "line": 111,
         "context": "{t(nameKey)}"
       },
       {
@@ -4911,20 +4868,11 @@
       ]
     },
     {
-      "key": "sealedBid.yourWord",
-      "usages": [
-        {
-          "file": "components/sealedBid/SealedBidTable.tsx",
-          "line": 83
-        }
-      ]
-    },
-    {
       "key": "singlePlayer.coach.findWord",
       "usages": [
         {
           "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 558
+          "line": 599
         }
       ]
     },
@@ -4985,28 +4933,6 @@
   ],
   "missingByLanguage": {
     "es": [
-      "sealedBidLegacy.chipStack",
-      "sealedBidLegacy.gameOver",
-      "sealedBidLegacy.busted",
-      "sealedBidLegacy.session.cashOut",
-      "sealedBidLegacy.session.chips",
-      "sealedBidLegacy.session.coins",
-      "sealedBidLegacy.allIn",
-      "sealedBidLegacy.currentStake",
-      "sealedBidLegacy.balance",
-      "sealedBidLegacy.stake",
-      "sealedBidLegacy.uniquePays",
-      "sealedBidLegacy.potentialPayout",
-      "sealedBidLegacy.lockBid",
-      "sealedBidLegacy.pass",
-      "sealedBidLegacy.unique",
-      "sealedBidLegacy.clash",
-      "sealedBidLegacy.notAWord",
-      "sealedBidLegacy.cashOut",
-      "sealedBidLegacy.chips",
-      "sealedBidLegacy.round",
-      "sealedBidLegacy.youWin",
-      "sealedBidLegacy.continue",
       "wordAlchemy.streakNewPB",
       "seo.refund.title",
       "seo.refund.description",
@@ -5016,8 +4942,6 @@
       "seo.quickPlay.description",
       "seo.quickPlay.ogTitle",
       "seo.quickPlay.ogDescription",
-      "wheel.rush.loadFailed",
-      "wheel.rush.loadFailedQuit",
       "vs.feature",
       "vs.gamesPerDay",
       "vs.multiplayer",
@@ -5046,28 +4970,6 @@
       "vs.bestFor"
     ],
     "he": [
-      "sealedBidLegacy.chipStack",
-      "sealedBidLegacy.gameOver",
-      "sealedBidLegacy.busted",
-      "sealedBidLegacy.session.cashOut",
-      "sealedBidLegacy.session.chips",
-      "sealedBidLegacy.session.coins",
-      "sealedBidLegacy.allIn",
-      "sealedBidLegacy.currentStake",
-      "sealedBidLegacy.balance",
-      "sealedBidLegacy.stake",
-      "sealedBidLegacy.uniquePays",
-      "sealedBidLegacy.potentialPayout",
-      "sealedBidLegacy.lockBid",
-      "sealedBidLegacy.pass",
-      "sealedBidLegacy.unique",
-      "sealedBidLegacy.clash",
-      "sealedBidLegacy.notAWord",
-      "sealedBidLegacy.cashOut",
-      "sealedBidLegacy.chips",
-      "sealedBidLegacy.round",
-      "sealedBidLegacy.youWin",
-      "sealedBidLegacy.continue",
       "seo.refund.title",
       "seo.refund.description",
       "seo.refund.ogTitle",
@@ -5078,28 +4980,6 @@
       "seo.quickPlay.ogDescription"
     ],
     "ja": [
-      "sealedBidLegacy.chipStack",
-      "sealedBidLegacy.gameOver",
-      "sealedBidLegacy.busted",
-      "sealedBidLegacy.session.cashOut",
-      "sealedBidLegacy.session.chips",
-      "sealedBidLegacy.session.coins",
-      "sealedBidLegacy.allIn",
-      "sealedBidLegacy.currentStake",
-      "sealedBidLegacy.balance",
-      "sealedBidLegacy.stake",
-      "sealedBidLegacy.uniquePays",
-      "sealedBidLegacy.potentialPayout",
-      "sealedBidLegacy.lockBid",
-      "sealedBidLegacy.pass",
-      "sealedBidLegacy.unique",
-      "sealedBidLegacy.clash",
-      "sealedBidLegacy.notAWord",
-      "sealedBidLegacy.cashOut",
-      "sealedBidLegacy.chips",
-      "sealedBidLegacy.round",
-      "sealedBidLegacy.youWin",
-      "sealedBidLegacy.continue",
       "seo.refund.title",
       "seo.refund.description",
       "seo.refund.ogTitle",
@@ -5139,40 +5019,9 @@
       "seo.refund.title",
       "seo.refund.description",
       "seo.refund.ogTitle",
-      "seo.refund.ogDescription",
-      "wheel.rush.loadFailed",
-      "wheel.rush.loadFailedQuit",
-      "sealedBid.speedBonus",
-      "sealedBid.shareCard.header",
-      "sealedBid.shareCard.row",
-      "sealedBid.shareCard.url",
-      "sealedBid.shareCard.roundLabel",
-      "sealedBid.shareCard.vs",
-      "sealedBid.session.shareHeader"
+      "seo.refund.ogDescription"
     ],
     "sv": [
-      "sealedBidLegacy.chipStack",
-      "sealedBidLegacy.gameOver",
-      "sealedBidLegacy.busted",
-      "sealedBidLegacy.session.cashOut",
-      "sealedBidLegacy.session.chips",
-      "sealedBidLegacy.session.coins",
-      "sealedBidLegacy.allIn",
-      "sealedBidLegacy.currentStake",
-      "sealedBidLegacy.balance",
-      "sealedBidLegacy.stake",
-      "sealedBidLegacy.uniquePays",
-      "sealedBidLegacy.potentialPayout",
-      "sealedBidLegacy.lockBid",
-      "sealedBidLegacy.pass",
-      "sealedBidLegacy.unique",
-      "sealedBidLegacy.clash",
-      "sealedBidLegacy.notAWord",
-      "sealedBidLegacy.cashOut",
-      "sealedBidLegacy.chips",
-      "sealedBidLegacy.round",
-      "sealedBidLegacy.youWin",
-      "sealedBidLegacy.continue",
       "seo.refund.title",
       "seo.refund.description",
       "seo.refund.ogTitle",
@@ -5551,11 +5400,7 @@
       "reengagement.bonusRewards",
       "reengagement.coins",
       "reengagement.streakFreeze",
-      "reengagement.premiumDays",
-      "sealedBid.title",
-      "sealedBid.badge",
-      "sealedBid.lockIn",
-      "sealedBid.yourWord"
+      "reengagement.premiumDays"
     ],
     "he": [
       "leadChange.tookTheLeadVerb",
@@ -6158,28 +6003,6 @@
       "daily.flow.doneTitle",
       "daily.flow.doneSubtitle",
       "daily.flow.doneCta",
-      "sealedBid.badge",
-      "sealedBid.title",
-      "sealedBid.instructions",
-      "sealedBid.totalScore",
-      "sealedBid.timerLabel",
-      "sealedBid.sealPhase",
-      "sealedBid.backspace",
-      "sealedBid.revealPhase",
-      "sealedBid.lockIn",
-      "sealedBid.skip",
-      "sealedBid.youPicked",
-      "sealedBid.botPicked",
-      "sealedBid.resultUnique",
-      "sealedBid.resultShared",
-      "sealedBid.resultNone",
-      "sealedBid.pointsEarned",
-      "sealedBid.nextRound",
-      "sealedBid.finalScore",
-      "sealedBid.adminOnly",
-      "sealedBid.err.notInRack",
-      "sealedBid.err.notWord",
-      "sealedBid.yourWord",
       "classLimitReached",
       "tutorial.defaultClassroomName"
     ],

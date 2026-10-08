@@ -26,7 +26,6 @@ const WordTowerVersus = dynamic(
 // Lightweight gridless versus views (no pixi/gsap) — static-imported so they
 // never race jsdom teardown via a deferred dynamic import. WordTower stays
 // dynamic above because it pulls the pixi scene.
-import { SealedBidVersus } from '@/components/multiplayer/sealedBid/SealedBidVersus';
 import { CrosswordVersus } from '@/components/multiplayer/crossword/CrosswordVersus';
 import { WordcraftLiveView } from '@/components/multiplayer/wordcraft/WordcraftLiveView';
 import type { LetterGrid, Language, TournamentStanding } from '@/shared/types/game';
@@ -251,11 +250,6 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Word Tower versus — per-player towers, no shared grid
   if (gameMode === 'word-tower') {
     return <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} />;
-  }
-
-  // Sealed Bid — secret auction bids, no letter grid
-  if (gameMode === 'sealed-bid') {
-    return <SealedBidVersus socket={socket} username={username} onQuit={onExitRoom} />;
   }
 
   // Crossword race — all players solve the same puzzle, no letter grid

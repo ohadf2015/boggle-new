@@ -17,8 +17,8 @@ const t = (key: string, params?: Record<string, string | number>) => {
 
 const modifier: SoloModifier = {
   id: 'no-clash-penalty',
-  labelKey: 'solo.modifier.sealedBid.noClashPenalty.label',
-  descKey: 'solo.modifier.sealedBid.noClashPenalty.desc',
+  labelKey: 'solo.modifier.crossword.noCheck.label',
+  descKey: 'solo.modifier.crossword.noCheck.desc',
 };
 
 describe('SoloRewardCard', () => {

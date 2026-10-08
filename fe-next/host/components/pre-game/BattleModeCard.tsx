@@ -11,7 +11,7 @@ interface BattleModeCardProps {
   selectedGameMode: GameModeOption;
   setSelectedGameMode: (mode: GameModeOption) => void;
   t: (path: string, params?: Record<string, string | number>) => string;
-  /** Legacy host flag — no MP mode is gated on it since the sealed-bid/crossword removal (2026-09-27). */
+  /** Legacy host flag — no MP mode is gated on it since the crossword removal (2026-09-27). */
   isAdmin?: boolean;
   /** Board language — no MP mode is gated on it since 2026-09-27. */
   language?: string | null;
@@ -30,9 +30,8 @@ const MODES: Array<{ mode: GameModeOption; nameKey: string }> = [
   { mode: 'word-hunt', nameKey: 'gameModes.wordHunt.name' },
   { mode: 'wheel-rush', nameKey: 'gameModes.wheelRush.name' },
   { mode: 'blast', nameKey: 'gameModes.blast.name' },
-  // Ohad 2026-09-27: sealed-bid and crossword are out of the MP picker — they
-  // were admin-only previews crowding the phone grid. They stay available in
-  // SOLO (GameModeSelector / ModesScreen).
+  // Ohad 2026-09-27: crossword is out of the MP picker — it was an admin-only
+  // preview crowding the phone grid. It stays available in SOLO.
 ];
 
 /**

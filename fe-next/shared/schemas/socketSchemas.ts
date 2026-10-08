@@ -256,14 +256,6 @@ export const SendTowerBombSchema = z.object({
 });
 
 /**
- * submitSealedBid event payload — a player's secret bid for the current Sealed
- * Bid round. An empty word (after trim) is treated as a pass.
- */
-export const SubmitSealedBidSchema = z.object({
-  word: z.string().max(50).transform(s => s.trim()),
-});
-
-/**
  * submitCrosswordProgress event payload — a player's live progress in a Crossword
  * race. The server clamps/validates; clients report on each word solved.
  */
@@ -460,7 +452,6 @@ export const ClientEventSchemas = {
   closeRoom: CloseRoomSchema,
   submitWord: SubmitWordSchema,
   submitWheelWord: SubmitWheelWordSchema,
-  submitSealedBid: SubmitSealedBidSchema,
   submitCrosswordProgress: SubmitCrosswordProgressSchema,
   submitWordVote: SubmitWordVoteSchema,
   submitPeerValidationVote: SubmitPeerValidationVoteSchema,
@@ -574,7 +565,6 @@ export type SubmitWheelWordData = z.infer<typeof SubmitWheelWordSchema>;
 export type SubmitTowerWordData = z.infer<typeof SubmitTowerWordSchema>;
 export type ScrambleTowerData = z.infer<typeof ScrambleTowerSchema>;
 export type SendTowerBombData = z.infer<typeof SendTowerBombSchema>;
-export type SubmitSealedBidData = z.infer<typeof SubmitSealedBidSchema>;
 export type SubmitCrosswordProgressData = z.infer<typeof SubmitCrosswordProgressSchema>;
 export type ChatMessageData = z.infer<typeof ChatMessageSchema>;
 export type AddBotData = z.infer<typeof AddBotSchema>;

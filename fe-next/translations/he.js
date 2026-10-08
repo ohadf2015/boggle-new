@@ -1832,20 +1832,6 @@ const he = {
     },
     "modifier": {
       "todaysTwist": "טוויסט היום",
-      "sealedBid": {
-        "noClashPenalty": {
-          "label": "יום שלום",
-          "desc": "שוק ידידותי יותר. הציעו בחופשיות."
-        },
-        "vowelTax": {
-          "label": "מס תנועות",
-          "desc": "התנועות הן הסחורה החמה היום."
-        },
-        "highStakes": {
-          "label": "הימורים גבוהים",
-          "desc": "היום מנצחות הצעות נועזות וייחודיות."
-        }
-      },
       "wordAlchemy": {
         "doubleCatalyst": {
           "label": "קטליזטור כפול",
@@ -1874,70 +1860,6 @@ const he = {
           "desc": "השעון רץ. פתרו מהר."
         }
       }
-    }
-  },
-  "sealedBidMp": {
-    "waiting": "מכינים את המכרז…",
-    "round": "סבב {{n}}/{{total}}",
-    "scores": "ניקוד",
-    "youWin": "זכיתם במכרז!",
-    "wins": "זכה במכרז!",
-    "bidPrompt": "בנו מילה מהאותיות, ובחרו כזו שאף יריב לא יבחר!",
-    "results": "ההצעות נחשפו",
-    "outcome": {
-      "unique": "ייחודי ×2",
-      "clash": "התנגשות ÷2",
-      "none": "אין הצעה"
-    },
-    "locked": "ההצעה ננעלה. ממתינים ליריבים…",
-    "lockProgress": "{{locked}}/{{total}} ננעלו",
-    "clear": "ניקוי",
-    "pass": "ויתור",
-    "lock": "נעילת הצעה",
-    "autoResolve": "יוכרע אוטומטית בעוד {{secs}} שנ׳",
-    "eloRating": "דירוג"
-  },
-  "sealedBidLegacy": {
-    "badge": "הצעה חתומה",
-    "title": "הצעה חתומה",
-    "instructions": "בחרו מילה שאף אחד לא יבחר. הצעה ייחודית מכפילה את הניקוד!",
-    "roundLabel": "סבב {n} מתוך {total}",
-    "totalScore": "ניקוד: {score}",
-    "timerLabel": "הקלידו מילה…",
-    "sealPhase": "חתמו על הצעתכם",
-    "tapHint": "הקישו על אותיות כדי לבנות מילה",
-    "backspace": "מחיקת האות האחרונה",
-    "clear": "ניקוי המילה",
-    "revealPhase": "חשיפה",
-    "showdown": "גילוי פנים!",
-    "lockIn": "נעילה",
-    "skip": "ויתור",
-    "youPicked": "בחרתם",
-    "botPicked": "הבוט בחר",
-    "resultUnique": "ייחודי! ניקוד כפול",
-    "resultShared": "התנגשות: חצי ניקוד",
-    "resultNone": "ללא הצעה: 0 ניקוד",
-    "pointsEarned": "+{pts} נקודות",
-    "nextRound": "סבב הבא →",
-    "finalScore": "ניקוד סופי",
-    "playAgain": "שחקו שוב",
-    "adminOnly": "הצעה חתומה היא תצוגה מקדימה למנהלים בלבד.",
-    "shareCard": {
-      "title": "הסיפור שלכם",
-      "cta": "שתפו תוצאה",
-      "copied": "הועתק!"
-    },
-    "session": {
-      "title": "מונה הבלוף",
-      "outsmarted": "סיבובים שבהם ניצחתי",
-      "uniqueLabel": "ייחודי",
-      "clashLabel": "התנגשות",
-      "passLabel": "פאס",
-      "shareCta": "שתפו תוצאה"
-    },
-    "err": {
-      "notInRack": "השתמשו רק באותיות מהמאגר",
-      "notWord": "לא נמצא במילון"
     }
   },
   "wordAlchemy": {
@@ -5268,7 +5190,6 @@ const he = {
         "wordHunt": "ציד מילים",
         "wheelRush": "גלגל מהיר",
         "wordTower": "מגדל מילים",
-        "sealedBid": "הצעה סמויה",
         "random": "מצב הפתעה"
       },
       "hook": {
@@ -5277,7 +5198,6 @@ const he = {
         "wordHunt": "צודו את המילה הנסתרת",
         "wheelRush": "התחרו ביריבים על הגלגל",
         "wordTower": "בנו את המגדל",
-        "sealedBid": "הציעו יותר מכולם",
         "random": "הפתעה מחכה"
       }
     },
@@ -8257,8 +8177,6 @@ const he = {
     "partyModeDesc": "Caption / Pixel / Shadow Clash על מסך גדול",
     "wordAlchemyMode": "אלכימיית מילים",
     "wordAlchemyModeDesc": "הפכו מילה אחת למילה הבאה",
-    "sealedBidMode": "הצעה חתומה",
-    "sealedBidModeDesc": "בחרו מילה שאף אחד לא יבחר. הצעה ייחודית מכפילה ניקוד",
     "wordfallMode": "מפל מילים",
     "wordfallModeDesc": "אייתו מהר לפני שהאריחים הנופלים ימלאו את הלוח",
     "dailyChallenge": "אתגר יומי",
@@ -16532,7 +16450,6 @@ const he = {
       "playWordfall": "Wordfall",
       "playParty": "מסיבה",
       "playWordTower": "מגדל מילים",
-      "playSealedBid": "הצעה חתומה"
     }
   },
   "passAndPlay": {
@@ -16992,8 +16909,8 @@ const he = {
     },
     "wordTower": {
       "title": "בנו מגדל",
-      "step1": "הקישו כדי להפיל בלוק",
-      "step2": "נחתו במרכז כדי לבנות גבוה",
+      "step1": "החליקו על אותיות ויצרו מילה",
+      "step2": "הקישו כדי להפיל בדיוק במרכז",
       "scoreTip": "כל מילה = עוד קומה!"
     },
     "connections": {
@@ -17016,12 +16933,6 @@ const he = {
       "title": "מלאו את התשבץ",
       "step1": "הקישו על רמז והקלידו תשובה",
       "step2": "פתרו מאוזן ומאונך"
-    },
-    "sealedBid": {
-      "title": "הצעה סודית",
-      "step1": "בחרו את המילה הכי חזקה שלכם",
-      "step2": "מילה שאף אחד לא בחר = כפול!",
-      "step3": "נעלו מהר, הבונוס דועך עם הזמן"
     },
     "adventure": {
       "title": "כבשו את השלבים",
@@ -17097,10 +17008,6 @@ const he = {
         "tip2": "הקישו על אותיות החוץ בכל סדר",
         "tip3": "נסו צורת רבים כדי להאריך מילה"
       }
-    },
-    "sealedBid": {
-      "name": "הצעה סמויה",
-      "description": "הציעו מילה שאף אחד אחר לא יבחר. הצעה ייחודית מכפילה את הניקוד!"
     },
     "crossword": {
       "name": "תשבץ",
@@ -19144,79 +19051,6 @@ const he = {
     "charitableDonation": "זווית של תרומה לצדקה",
     "bestFor": "הכי מתאים ל"
   },
-  "sealedBid": {
-    "luckyStreak": "רצף מזל!",
-    "hotStreak": "{n} ברצף!",
-    "allIn": "הכל פנימה",
-    "clear": "נקו",
-    "currentStake": "ההימור הנוכחי",
-    "balance": "יתרה",
-    "stake": "הימור",
-    "uniquePays": "ייחודי משלם {mult}x",
-    "potentialPayout": "זכייה אפשרית {amount}",
-    "lockBid": "נעלו הימור",
-    "needWord": "קודם בנו מילה",
-    "needStake": "קבעו הימור כדי לנעול",
-    "pass": "דלגו",
-    "unique": "ייחודי",
-    "clash": "התנגשות",
-    "busted": "התפוצץ",
-    "cashOut": "משיכה",
-    "chips": "אסימונים",
-    "showdown": "ההכרעה",
-    "round": "סיבוב",
-    "vsRivals": "מול {a} ו{b}",
-    "gameOver": "המשחק נגמר",
-    "playAgain": "שחקו שוב",
-    "notAWord": "לא מילה",
-    "tapHint": "הקישו על אותיות כדי לבנות מילה",
-    "continue": "המשך",
-    "shareCard": {
-      "title": "סיפור הבלוף שלך",
-      "cta": "שתפו תוצאה",
-      "copied": "הועתק!",
-      "header": "🎯 הימור סגור: {score} נקודות",
-      "row": "{round} {emoji} {playerWord} נגד {botWord}{points}",
-      "url": "lexiclash.live/he/sealed-bid",
-      "roundLabel": "ס{n}",
-      "vs": "נגד"
-    },
-    "session": {
-      "title": "מונה הבלוף",
-      "outsmarted": "סיבובים שבהם ניצחתי",
-      "uniqueLabel": "ייחודי",
-      "clashLabel": "התנגשות",
-      "passLabel": "פאס",
-      "shareCta": "שתפו תוצאה",
-      "shareHeader": "🧠 התחכמתי לבוט ב-{unique} מתוך {total} סיבובים: {score} נקודות",
-      "cashOut": "משיכה",
-      "chips": "אסימונים",
-      "coins": "מטבעות"
-    },
-    "youWin": "ניצחתם!",
-    "youLose": "התנגשות",
-    "draw": "פספסת",
-    "noWord": "—",
-    "botRival": "יריב {n}",
-    "outcome": {
-      "unique": "הימור ייחודי",
-      "clash": "התנגשות",
-      "none": "ללא הימור"
-    },
-    "outcomeEmoji": {
-      "unique": "✅",
-      "clash": "🤝",
-      "none": "⬜"
-    },
-    "error": {
-      "tooShort": "המילה חייבת להכיל לפחות 3 אותיות",
-      "needStake": "קבעו הימור כדי לנעול"
-    },
-    "revealing": "חושף…",
-    "roundLabel": "סבב {n} מתוך {total}",
-    "chipStack": "אסימונים: {chips}",
-    "speedBonus": "מהירות ×{n}"
-  },
   "supporter": {
     "card": {
       "title": "נהנים מ-LexiClash?",
@@ -19336,10 +19170,6 @@ const he = {
         "wordTower": {
           "name": "מגדל מילים",
           "rule": "ערמו מילים ובנו את המגדל הגבוה ביותר."
-        },
-        "sealedBid": {
-          "name": "הצעה חתומה",
-          "rule": "הציעו בסוד. בזבזו את הנקודות בחוכמה."
         },
         "crossword": {
           "name": "מרוץ תשבץ",

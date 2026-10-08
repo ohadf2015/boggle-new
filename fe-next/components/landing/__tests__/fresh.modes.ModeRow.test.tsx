@@ -54,7 +54,7 @@ describe('ModeRow (fresh section 4)', () => {
   it('never links a fresh visitor to a beta-gated route', () => {
     const { container } = render(<ModeRow />);
     for (const a of cards(container)) {
-      expect(a.getAttribute('href')).not.toMatch(/crossword|quick-play|sealed-bid|blast\/v2/);
+      expect(a.getAttribute('href')).not.toMatch(/crossword|quick-play|blast\/v2/);
     }
     // Adventure is now public (GA) and should appear for guests
     expect(FRESH_MODE_KEYS).not.toContain('adventure');

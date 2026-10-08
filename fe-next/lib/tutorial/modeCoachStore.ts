@@ -27,7 +27,6 @@ export type CoachModeKey =
   | 'connections'
   | 'wordCraft'
   | 'crossword'
-  | 'sealedBid'
   | 'adventure';
 
 export function coachStorageKey(mode: CoachModeKey): string {

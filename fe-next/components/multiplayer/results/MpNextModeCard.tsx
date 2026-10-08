@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Building2, Gavel, Grid2x2, Grid3x3, RotateCw, Search, Shuffle, Target, Zap, type LucideIcon } from 'lucide-react';
+import { Building2, Grid2x2, Grid3x3, RotateCw, Search, Shuffle, Target, Zap, type LucideIcon } from 'lucide-react';
 import { MpSheet } from '../shell/MpSheet';
 import { getModePresentation, type ModeColorFamily } from '@/lib/multiplayer/modePresentation';
 import type { GameModeOption } from '@/components/GameModeSelector';
@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 
 type TFn = (key: string, params?: Record<string, string | number>) => string;
 
-const ICONS: Record<string, LucideIcon> = { Search, Zap, Target, RotateCw, Building2, Gavel, Grid3x3, Grid2x2, Shuffle };
+const ICONS: Record<string, LucideIcon> = { Search, Zap, Target, RotateCw, Building2, Grid3x3, Grid2x2, Shuffle };
 
 /** Whole class strings per colour family (Tailwind must see them in source). */
 export const MODE_TONE: Record<ModeColorFamily, { card: string; icon: string; text: string }> = {

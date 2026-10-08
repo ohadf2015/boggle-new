@@ -37,7 +37,6 @@ const VALID_GAME_MODES: readonly ClassroomGameMode[] = [
   'blast',
   'wheel-rush',
   'vocab-quiz',
-  'sealed-bid',
 ];
 
 export function isCompletePlayAgainIntent(value: unknown): value is PlayAgainIntent {

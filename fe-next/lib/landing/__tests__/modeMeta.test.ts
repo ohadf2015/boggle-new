@@ -103,7 +103,7 @@ describe('MODE_META — parity with control renderCard', () => {
   // (lives in the table); the fast/calm PARTITION is a pure helper both the
   // desktop + mobile renderers call so the split can never drift between them.
   describe('mode category — calm / no-timer grouping', () => {
-    const CALM = ['crossword', 'wordCraft', 'sealedBid', 'connections', 'blast'] as const;
+    const CALM = ['crossword', 'wordCraft', 'connections', 'blast'] as const;
     const FAST = ['arena', 'practice', 'adventure', 'brainGym'] as const;
 
     it.each(CALM)('%s is tagged category=calm', (key) => {
@@ -119,16 +119,5 @@ describe('MODE_META — parity with control renderCard', () => {
       it('false for a fast mode', () => expect(isCalmMode('arena')).toBe(false));
       it('false for an unknown key (no throw)', () => expect(isCalmMode('nope')).toBe(false));
     });
-  });
-
-  describe('admin modes carry the ADMIN badge', () => {
-    // wordTower left this list when it was published — modeMeta.ts now gives it
-    // badge 'NEW' on purpose, so asserting ADMIN here was testing a stale fact.
-    it.each(['sealedBid'])(
-      '%s badge=ADMIN',
-      (key) => {
-        expect(MODE_META[key].badge).toBe('ADMIN');
-      },
-    );
   });
 });

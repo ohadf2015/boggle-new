@@ -1832,20 +1832,6 @@ const es = {
     },
     "modifier": {
       "todaysTwist": "Giro de hoy",
-      "sealedBid": {
-        "noClashPenalty": {
-          "label": "Día de tregua",
-          "desc": "Un mercado más amistoso: puja sin miedo."
-        },
-        "vowelTax": {
-          "label": "Impuesto de vocales",
-          "desc": "Las vocales son la mercancía del día."
-        },
-        "highStakes": {
-          "label": "Apuestas altas",
-          "desc": "Las pujas audaces y únicas definen el día."
-        }
-      },
       "wordAlchemy": {
         "doubleCatalyst": {
           "label": "Catalizador doble",
@@ -1874,70 +1860,6 @@ const es = {
           "desc": "El reloj corre: resuelve rápido."
         }
       }
-    }
-  },
-  "sealedBidMp": {
-    "waiting": "Preparando la subasta…",
-    "round": "Ronda {{n}}/{{total}}",
-    "scores": "Puntuaciones",
-    "youWin": "¡Ganaste la subasta!",
-    "wins": "¡gana la subasta!",
-    "bidPrompt": "Forma una palabra con las letras: ¡elige una que nadie más elija!",
-    "results": "Pujas reveladas",
-    "outcome": {
-      "unique": "Única ×2",
-      "clash": "Choque ÷2",
-      "none": "Sin puja"
-    },
-    "locked": "Puja fijada. Esperando a los rivales…",
-    "lockProgress": "{{locked}}/{{total}} fijadas",
-    "clear": "Limpiar",
-    "pass": "Pasar",
-    "lock": "Fijar puja",
-    "autoResolve": "Se resuelve en {{secs}}s",
-    "eloRating": "Puntuación"
-  },
-  "sealedBidLegacy": {
-    "badge": "Puja secreta",
-    "title": "Puja secreta",
-    "instructions": "Elige una palabra que nadie más elegirá. Las pujas únicas dan el doble de puntos.",
-    "roundLabel": "Ronda {n} de {total}",
-    "totalScore": "Puntuación: {score}",
-    "timerLabel": "Escribe tu palabra…",
-    "sealPhase": "Sella tu puja",
-    "tapHint": "Toca las letras para formar tu palabra",
-    "backspace": "Borrar última letra",
-    "clear": "Borrar palabra",
-    "revealPhase": "Revelación",
-    "showdown": "¡SHOWDOWN!",
-    "lockIn": "Confirmar",
-    "skip": "Pasar",
-    "youPicked": "Elegiste",
-    "botPicked": "El bot eligió",
-    "resultUnique": "¡Única! El doble de puntos",
-    "resultShared": "Choque: la mitad de puntos",
-    "resultNone": "Sin puja: 0 puntos",
-    "pointsEarned": "+{pts} pts",
-    "nextRound": "Siguiente ronda →",
-    "finalScore": "Puntuación final",
-    "playAgain": "Jugar de nuevo",
-    "adminOnly": "Puja secreta es una vista previa solo para administradores.",
-    "shareCard": {
-      "title": "Tu historia de engaños",
-      "cta": "Compartir resultado",
-      "copied": "¡Copiado!"
-    },
-    "session": {
-      "title": "Contador de bluffs",
-      "outsmarted": "rondas superadas",
-      "uniqueLabel": "Único",
-      "clashLabel": "Choque",
-      "passLabel": "Paso",
-      "shareCta": "Compartir puntuación"
-    },
-    "err": {
-      "notInRack": "Usa solo las letras del atril",
-      "notWord": "No está en el diccionario"
     }
   },
   "wordAlchemy": {
@@ -4994,7 +4916,6 @@ const es = {
         "wordHunt": "Caza de Palabras",
         "wheelRush": "Rueda Rápida",
         "wordTower": "Torre de Palabras",
-        "sealedBid": "Puja Sellada",
         "random": "Modo Sorpresa"
       },
       "hook": {
@@ -5003,7 +4924,6 @@ const es = {
         "wordHunt": "Caza la palabra oculta",
         "wheelRush": "Compite contra rivales en la rueda",
         "wordTower": "Apila la torre",
-        "sealedBid": "Puja más alto que todos",
         "random": "A ver qué sale"
       }
     },
@@ -8196,8 +8116,6 @@ const es = {
     "partyModeDesc": "Caption / Pixel / Shadow Clash en pantalla grande",
     "wordAlchemyMode": "Alquimia de Palabras",
     "wordAlchemyModeDesc": "Transforma una palabra en la siguiente",
-    "sealedBidMode": "Puja secreta",
-    "sealedBidModeDesc": "Elige la palabra que nadie más elegirá: las pujas únicas dan el doble",
     "wordfallMode": "Cascada de palabras",
     "wordfallModeDesc": "Forma palabras rápido mientras caen las fichas",
     "dailyChallenge": "Desafío diario",
@@ -16624,7 +16542,6 @@ const es = {
       "playWordfall": "Wordfall",
       "playParty": "Fiesta",
       "playWordTower": "Torre de palabras",
-      "playSealedBid": "Puja cerrada"
     }
   },
   "passAndPlay": {
@@ -16793,8 +16710,8 @@ const es = {
     },
     "wordTower": {
       "title": "Torre de palabras",
-      "step1": "Toca, suelta el bloque",
-      "step2": "Centra bien para apilar",
+      "step1": "Desliza letras para formar palabras",
+      "step2": "Toca para soltarlo al centro",
       "scoreTip": "Cada palabra sube el piso"
     },
     "connections": {
@@ -16817,12 +16734,6 @@ const es = {
       "title": "Resuelve la cuadrícula",
       "step1": "Pista → escribe la respuesta",
       "step2": "Horizontal y vertical"
-    },
-    "sealedBid": {
-      "title": "Puja secreta",
-      "step1": "Elige tu palabra más fuerte",
-      "step2": "Palabras únicas valen el doble",
-      "step3": "Bloquea rápido: el bono baja con el tiempo"
     },
     "adventure": {
       "title": "Supera los niveles",
@@ -16898,10 +16809,6 @@ const es = {
         "tip2": "Toca las letras exteriores en cualquier orden",
         "tip3": "Prueba plurales para alargar la palabra"
       }
-    },
-    "sealedBid": {
-      "name": "Puja Sellada",
-      "description": "¡Apuesta una palabra que nadie más elija: las pujas únicas valen doble!"
     },
     "crossword": {
       "name": "Crucigrama",
@@ -19226,85 +19133,6 @@ const es = {
     "notDownloaded": "No descargado",
     "errorGeneric": "No se pudo descargar. Inténtalo de nuevo."
   },
-  "sealedBid": {
-    "luckyStreak": "¡RACHA DE SUERTE!",
-    "hotStreak": "¡{n} seguidas!",
-    "title": "Puja sellada",
-    "badge": "Puja sellada",
-    "roundLabel": "Ronda {n} de {total}",
-    "chipStack": "Fichas: {chips}",
-    "speedBonus": "Velocidad ×{n}",
-    "lockIn": "Cerrar puja",
-    "youWin": "¡Ganaste!",
-    "youLose": "Choque",
-    "draw": "Paso",
-    "tapHint": "Toca letras para formar una palabra",
-    "yourWord": "Tu palabra",
-    "needWord": "Forma una palabra de 3+ letras",
-    "needStake": "Apuesta fichas primero",
-    "botRival": "Rival {n}",
-    "allIn": "Todo adentro",
-    "clear": "Limpiar",
-    "currentStake": "Apuesta actual",
-    "balance": "Saldo",
-    "stake": "Apuesta",
-    "uniquePays": "Único paga {mult}x",
-    "potentialPayout": "Pago potencial {amount}",
-    "lockBid": "Bloquear oferta",
-    "needWord": "Forma una palabra primero",
-    "needStake": "Fija una apuesta para bloquear tu oferta",
-    "pass": "Pasar",
-    "unique": "Único",
-    "clash": "Choque",
-    "busted": "Quebrado",
-    "cashOut": "Retirar",
-    "chips": "Fichas",
-    "showdown": "Enfrentamiento",
-    "round": "Ronda",
-    "vsRivals": "vs {a} y {b}",
-    "gameOver": "Fin del juego",
-    "playAgain": "Jugar de nuevo",
-    "notAWord": "No es una palabra",
-    "continue": "Continuar",
-    "shareCard": {
-      "title": "Tu historia de engaños",
-      "cta": "Compartir resultado",
-      "copied": "Copiado",
-      "header": "🎯 Puja sellada · {score} pts",
-      "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
-      "url": "lexiclash.live/es/sealed-bid",
-      "roundLabel": "R{n}",
-      "vs": "vs"
-    },
-    "session": {
-      "title": "Contador de bluffs",
-      "outsmarted": "rondas superadas",
-      "uniqueLabel": "Único",
-      "clashLabel": "Choque",
-      "passLabel": "Paso",
-      "shareCta": "Compartir puntuación",
-      "shareHeader": "🧠 Superé al bot en {unique}/{total} rondas · {score} pts",
-      "cashOut": "Cobrar",
-      "chips": "fichas",
-      "coins": "monedas"
-    },
-    "noWord": "—",
-    "outcome": {
-      "unique": "Puja única",
-      "clash": "Choque",
-      "none": "Sin puja"
-    },
-    "outcomeEmoji": {
-      "unique": "✅",
-      "clash": "🤝",
-      "none": "⬜"
-    },
-    "error": {
-      "tooShort": "La palabra debe tener al menos 3 letras",
-      "needStake": "Apuesta fichas para bloquear"
-    },
-    "revealing": "Revelando…"
-  },
   "supporter": {
     "card": {
       "title": "¿Disfrutando de LexiClash?",
@@ -19424,10 +19252,6 @@ const es = {
         "wordTower": {
           "name": "Torre de palabras",
           "rule": "Apila palabras y construye la torre más alta."
-        },
-        "sealedBid": {
-          "name": "Puja secreta",
-          "rule": "Puja en secreto. Gasta tus puntos con cabeza."
         },
         "crossword": {
           "name": "Carrera de crucigrama",

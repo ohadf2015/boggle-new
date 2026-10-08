@@ -4,7 +4,7 @@
  * on the countdown live in `mpUi.round.mode.<slug>` so every live mode
  * (crossword included) has copy in all six locales.
  */
-import { Brain, Building2, Gavel, Grid2x2, Grid3x3, RotateCw, Search, Shuffle, Sparkles, Swords, Target, Zap, type LucideIcon } from 'lucide-react';
+import { Brain, Building2, Grid2x2, Grid3x3, RotateCw, Search, Shuffle, Sparkles, Swords, Target, Zap, type LucideIcon } from 'lucide-react';
 import { getModePresentation, type ModeColorFamily } from '@/lib/multiplayer/modePresentation';
 
 export interface RoundModeMeta {
@@ -21,7 +21,6 @@ const SLUG: Record<string, string> = {
   'word-hunt': 'wordHunt',
   'wheel-rush': 'wheelRush',
   'word-tower': 'wordTower',
-  'sealed-bid': 'sealedBid',
   crossword: 'crossword',
 };
 
@@ -58,7 +57,7 @@ export function classroomRoundModeMeta(mode: string | null | undefined, vocabQui
 }
 
 /** The registry's icon names → lucide components (look up; unknown → `Shuffle`). */
-export const MODE_ICONS: Record<string, LucideIcon> = { Search, Zap, Target, RotateCw, Building2, Gavel, Grid3x3, Grid2x2, Shuffle, Brain, Sparkles, Swords };
+export const MODE_ICONS: Record<string, LucideIcon> = { Search, Zap, Target, RotateCw, Building2, Grid3x3, Grid2x2, Shuffle, Brain, Sparkles, Swords };
 export const FALLBACK_MODE_ICON: LucideIcon = Shuffle;
 
 /** Text + fill classes per colour family (dark-only surfaces). */

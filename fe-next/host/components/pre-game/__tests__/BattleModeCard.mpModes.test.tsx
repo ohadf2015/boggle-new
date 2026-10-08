@@ -20,9 +20,8 @@ describe('BattleModeCard — MP mode list (Ohad 2026-09-27)', () => {
     expect(screen.getByTestId('lobby-how-to-play')).toBeInTheDocument();
   });
 
-  it('sealed-bid and crossword are gone from the MP picker (admin too)', () => {
+  it('crossword is gone from the MP picker (admin too)', () => {
     render(<BattleModeCard {...baseProps} isAdmin />);
-    expect(screen.queryByTestId('game-mode-sealed-bid')).not.toBeInTheDocument();
     expect(screen.queryByTestId('game-mode-crossword')).not.toBeInTheDocument();
   });
 });

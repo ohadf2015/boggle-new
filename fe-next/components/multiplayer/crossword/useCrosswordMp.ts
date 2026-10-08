@@ -39,7 +39,7 @@ export interface CrosswordMpState {
 /**
  * Receives the shared CrosswordPuzzle + live standings from the server and emits
  * this client's progress. The race view mounts on startGame, so the hook polls
- * requestCrosswordMpState on mount (and reconnect). Mirrors useSealedBidGame.
+ * requestCrosswordMpState on mount (and reconnect).
  */
 export function useCrosswordMp(
   socket: CrosswordMpSocketLike | null,

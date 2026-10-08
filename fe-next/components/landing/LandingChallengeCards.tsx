@@ -57,7 +57,6 @@ type LandingCardKey =
   | 'connections'
   | 'brainGym'
   | 'wordCraft'
-  | 'sealedBid'
   | 'crossword'
   | 'wordfall'
   | 'wordTowerV2'
@@ -74,7 +73,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'blast', 'practice', 
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
   'connections', 'brainGym', 'wordCraft', 'wordTowerV2',
-  'sealedBid', 'crossword', 'wordfall',
+  'crossword', 'wordfall',
   'adventure',
   'quickPlay', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
 ]);
@@ -158,7 +157,6 @@ export function LandingChallengeCards({
     if (!next.includes('wordCraft')) next.push('wordCraft');
     // Standalone-route preview modes — admins + beta testers get one hub entry
     // each so previews stay reachable without flipping dashboard flags.
-    if (canSeeInWorkModes && !next.includes('sealedBid')) next.push('sealedBid');
     if (canSeeInWorkModes && !next.includes('crossword')) next.push('crossword');
     // Wordfall (Blast V2) — admin/beta dev preview, routes to /blast/v2.
     if (canSeeInWorkModes && !next.includes('wordfall')) next.push('wordfall');
@@ -207,7 +205,7 @@ export function LandingChallengeCards({
 
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'sealedBid', 'crossword', 'wordfall', 'quickPlay', 'wordTowerV2']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'crossword', 'wordfall', 'quickPlay', 'wordTowerV2']);
 
   // Every mode is surfaced directly on the hub — no "More Game Modes" collapse.
   // New and returning players alike see the full roster (the old newcomer
@@ -302,7 +300,7 @@ export function LandingChallengeCards({
     .map((k) => buildCubeModel(k, k === 'arena' ? 'anchor' : 'normal'))
     .filter(isModel);
   // Split the energetic competitive bento (arena anchor, blast, practice, …)
-  // from the calm no-timer room (crossword, word craft, sealed bid, connections)
+  // from the calm no-timer room (crossword, word craft, connections)
   // via the SHARED partition — the mobile Home Hub reuses this exact component,
   // so both surfaces group identically with no drift. Order within each group is
   // preserved from the gated `visibleKeys` computation above.

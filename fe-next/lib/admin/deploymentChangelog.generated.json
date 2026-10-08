@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-09-27T08:41:40.026Z",
+  "generatedAt": "2026-10-07T23:37:45.866Z",
   "commits": [
     {
-      "sha": "804851e21fe9e796bf43c28c532dfd0d5e9ac6a3",
-      "shortSha": "804851e",
-      "subject": "fix(mp-bots): hermetic mpBotRounds — mock Redis word cache that deadlocks under fake timers",
+      "sha": "613578925389b41cbbd112ac0f3523ee5db5abd3",
+      "shortSha": "6135789",
+      "subject": "wip: coaches",
       "author": "Ohad Fisher",
-      "date": "2026-09-27T03:31:44+03:00"
+      "date": "2026-10-08T02:04:25+03:00"
     },
     {
-      "sha": "10d32cbd43133a5ba32875ecd8bfe4a7746145c4",
-      "shortSha": "10d32cb",
-      "subject": "Merge remote-tracking branch 'origin/master' into feature/mp-gauntlet",
+      "sha": "8635aa3413613470d99874b15458658365c542fa",
+      "shortSha": "8635aa3",
+      "subject": "wip: mp fixes + sealed bid removal",
       "author": "Ohad Fisher",
-      "date": "2026-09-27T03:05:52+03:00"
+      "date": "2026-10-08T01:52:31+03:00"
     },
     {
-      "sha": "c0d40c52695b90f0c470733f70257df635d3679a",
-      "shortSha": "c0d40c5",
-      "subject": "fix(word-tower): despawn wrecking ball that leaves the playfield",
+      "sha": "baae8b7397fd9c75e30b3d44a3f48c7a8a67e03a",
+      "shortSha": "baae8b7",
+      "subject": "refactor(daily): declutter hub header and drop dead QuestCard branches",
       "author": "Ohad Fisher",
-      "date": "2026-09-27T02:27:52+03:00"
+      "date": "2026-10-08T00:20:59+03:00"
     },
     {
-      "sha": "4886fd886b55cc69f33fc4581469e9424febbeaa",
-      "shortSha": "4886fd8",
-      "subject": "fix(mp-lobby): phone INVITE demoted to outlined secondary — START stays the one solid CTA",
+      "sha": "f6b1d5ff205ba280d6036a14d3b6c32caac066c3",
+      "shortSha": "f6b1d5f",
+      "subject": "refactor(daily): delete 13 unused daily components/hooks",
       "author": "Ohad Fisher",
-      "date": "2026-09-27T02:21:28+03:00"
+      "date": "2026-10-07T23:36:53+03:00"
     },
     {
-      "sha": "e69ba9210d7e78e8f1bbcd21c99638444ae7b178",
-      "shortSha": "e69ba92",
-      "subject": "test(mp-bots): stop mpBotRounds racing a live Supabase call under load",
+      "sha": "a3994b2769e68a15d7bfc9693a08ca4aa0c7b937",
+      "shortSha": "a3994b2",
+      "subject": "fix(sentry): season taglines 7-12, quiet expected-state log noise",
       "author": "Ohad Fisher",
-      "date": "2026-09-26T22:45:37+03:00"
+      "date": "2026-10-07T23:34:54+03:00"
     },
     {
-      "sha": "f852a0d846670e7136ab72e042aa78faf0af9e4a",
-      "shortSha": "f852a0d",
-      "subject": "merge: origin/master (d880e18da) into feature/mp-gauntlet",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T22:38:55+03:00"
+      "sha": "5a0b94be2d9052170991db59b108cd005b9057bf",
+      "shortSha": "5a0b94b",
+      "subject": "fix(coach): Hebrew 'Try:' example word missing final letter (גרמ → גרם) (#1270)",
+      "author": "ohadf2015",
+      "date": "2026-10-07T23:30:45+03:00"
     },
     {
-      "sha": "7e255c6a0dcb54e0a9a7c52e5ac8e373509a9919",
-      "shortSha": "7e255c6",
-      "subject": "fix(mp-lobby): seat names wrap at natural seams, TV ready chip readable, TV badge says what it means",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T22:36:53+03:00"
+      "sha": "a97fec7e52ccc81e34f304be02daa76b5ea60345",
+      "shortSha": "a97fec7",
+      "subject": "fix(seo): 50 sitemap pages shipped no og:image (page openGraph replaced root images) (#1271)",
+      "author": "ohadf2015",
+      "date": "2026-10-07T23:30:40+03:00"
     },
     {
-      "sha": "10e7b15a8c3456e5577ccc5f2483bbd08a76f316",
-      "shortSha": "10e7b15",
-      "subject": "fix(mp-lobby): one dominant CTA — START BATTLE!/READY UP! solid lime, SHARE/INVITE + chosen mode tile demoted",
+      "sha": "ac90e7d635884cbd32fcc934b4cb0bf8fce9537d",
+      "shortSha": "ac90e7d",
+      "subject": "Merge fix/mpbotrounds-wheel-rush-flake (approved via company-brain)",
       "author": "Ohad Fisher",
-      "date": "2026-09-26T22:36:53+03:00"
+      "date": "2026-10-07T13:06:47+03:00"
     },
     {
-      "sha": "44a8d6adeb3b0e4bd7a5e108613f583ca605aa91",
-      "shortSha": "44a8d6a",
-      "subject": "fix(mp-round): drop duplicate GO toast at round start — the countdown is the GO",
+      "sha": "f71f6115dfd5fb4d01c237d33bd90019024ef9e0",
+      "shortSha": "f71f611",
+      "subject": "fix(mp): wheel-rush hard-bot round-1 flatline (mpBotRounds CI flake)",
       "author": "Ohad Fisher",
-      "date": "2026-09-26T22:30:50+03:00"
+      "date": "2026-10-07T09:22:23Z"
     },
     {
-      "sha": "1c6316ce4739b205ebfc2c4d403386545c72debd",
-      "shortSha": "1c6316c",
-      "subject": "merge(mp): RESULTS piece (feature/mpg-results)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T22:27:35+03:00"
+      "sha": "05bc1cb2fcaddd43467d063753c7177bdb8a6f7f",
+      "shortSha": "05bc1cb",
+      "subject": "fix(server): POST without a JSON body → handler 400, not 500 TypeError (#1269)",
+      "author": "ohadf2015",
+      "date": "2026-10-07T12:15:28+03:00"
     },
     {
-      "sha": "6ef4f1eca5eb89e999575eb0951fa285db42de00",
-      "shortSha": "6ef4f1e",
-      "subject": "merge(mp): ROUND piece (feature/mpg-round)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T22:27:20+03:00"
+      "sha": "e76181d31b3e04b3e7897fb98579d460f6085f86",
+      "shortSha": "e76181d",
+      "subject": "feat(education): crawler-visible FAQPage on classroom word-games landing (#1265)",
+      "author": "ohadf2015",
+      "date": "2026-10-07T11:30:51+03:00"
     },
     {
-      "sha": "35c53ad3f3b5d6ce3871f27c0188a07022a33e39",
-      "shortSha": "35c53ad",
-      "subject": "merge(mp): LOBBY piece (feature/mpg-lobby)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T22:27:07+03:00"
+      "sha": "8b0e33ce240bba08e29165a7fd82f5c2c02c8b26",
+      "shortSha": "8b0e33c",
+      "subject": "fix(seo): og:image pointed at missing /lexiclash.jpg on 12 routes (#1266)",
+      "author": "ohadf2015",
+      "date": "2026-10-07T11:30:47+03:00"
     },
     {
-      "sha": "9adf861359e3fff52232b4de7cac527882fb46da",
-      "shortSha": "9adf861",
-      "subject": "merge(mp): ENTRY piece (feature/mpg-entry)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T22:26:29+03:00"
+      "sha": "08fc522298c2be070982951abe333ade04ddecba",
+      "shortSha": "08fc522",
+      "subject": "fix(server): malformed JSON body → 400, not 500 + Sentry (#1267)",
+      "author": "ohadf2015",
+      "date": "2026-10-07T11:30:41+03:00"
     },
     {
-      "sha": "28a8449f016ced054c08b3140c987d8e5c528be3",
-      "shortSha": "28a8449",
-      "subject": "wip(mp-entry): quality chip splits its round slot by breakpoint — phone docks in the canvas bottom-start corner (lg:hidden), lg/TV docks on the left rail's PLAYERS row end (out-of-flow self-end child of the rail aside; -mt-1 at desktop clears the roster card) because Word Hunt's height-bound board fills the canvas corner at lg; label truncates on a narrow rail; contract = ROUND testids mp-round-canvas + mp-rail-roster",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T20:54:46+03:00"
+      "sha": "221390acac2263c620bde5afe639fca00eef1d25",
+      "shortSha": "221390a",
+      "subject": "fix(word-solver): Hebrew results misspelled without final letters (שלומ → שלום) (#1268)",
+      "author": "ohadf2015",
+      "date": "2026-10-07T11:30:37+03:00"
     },
     {
-      "sha": "038c66abca479e4b2f0511824b6b3d5a27621b83",
-      "shortSha": "038c66a",
-      "subject": "wip(mp-entry): TV quality chip 28px tall (leading-none, py-0.5) so it clears the board's hard shadow",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T20:48:08+03:00"
+      "sha": "9c828c6391dbf60b2e29f47e4e8e04fa7f19d3cf",
+      "shortSha": "9c828c6",
+      "subject": "feat(edu): persistent HQ trial countdown + Polar upgrade CTA (#1259)",
+      "author": "ohadf2015",
+      "date": "2026-10-07T11:24:31+03:00"
     },
     {
-      "sha": "11352ba843f36aafbd25f1e49b44541ddc28dee7",
-      "shortSha": "11352ba",
-      "subject": "wip(mp-entry): Weak-connection chip docks into the round canvas's bottom-start corner mid-round (mirror of the phone 'N found' pill; logical start = RTL-correct) instead of PageClient's fixed top-14 end-2 slot that sat on the phone roster strip and the desktop/TV words-count badge; tracks canvas mount/unmount, falls back in lobby/results; TV-scale sizing",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T20:39:03+03:00"
+      "sha": "e6d773217491f8821bdfe9c7b3d0058e82a33d58",
+      "shortSha": "e6d7732",
+      "subject": "fix(memory): stop three unbounded server-side retention paths (#1263)",
+      "author": "ohadf2015",
+      "date": "2026-10-07T10:32:32+03:00"
     },
     {
-      "sha": "4f4a733de1a82ad35f19830bb384fb75c812a85a",
-      "shortSha": "4f4a733",
-      "subject": "wip(mp-results): brand halftone spotlight behind the podium (static, under the stage via isolate)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T20:23:19+03:00"
+      "sha": "f1f33070dd88a52e3c22ce1a961464cc02b9e8be",
+      "shortSha": "f1f3307",
+      "subject": "fix(seo): drop sitewide 2024-2099 Daily Challenge Event JSON-LD (#1264)",
+      "author": "ohadf2015",
+      "date": "2026-10-07T10:02:42+03:00"
     },
     {
-      "sha": "b49329a432723e1de25e1084fae1de3e3a290067",
-      "shortSha": "b49329a",
-      "subject": "wip(mp-results): awards never stamp the same word twice; MOST WORDS is a bare count (no '1 words'); every '+N' is an LTR island so Hebrew never reads '12+'",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T20:13:28+03:00"
+      "sha": "6bd7671fb11ad5c88e62769e0c3d977ba54dc6d9",
+      "shortSha": "6bd7671",
+      "subject": "fix(analytics): collapse PlayerView + Results game_completed for the same MP round (#1261)",
+      "author": "ohadf2015",
+      "date": "2026-10-07T08:47:44+03:00"
     },
     {
-      "sha": "4b676abdd74cec075af0fba2701efb170ff2d016",
-      "shortSha": "4b676ab",
-      "subject": "wip(mp-results): the results album - every standings row carries its player's best word; desktop/TV tell the round as ROUND AWARDS and the series final ROUND BY ROUND (cells sum to the board's totals); 'Series #3 of 4' reads '#3 of 4 overall'",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T20:02:27+03:00"
+      "sha": "51b9dc83ede8ab68e455f8287acf801a73bb031d",
+      "shortSha": "51b9dc8",
+      "subject": "fix(analytics): emit game_completed for every MP participant on round end (#1260)",
+      "author": "ohadf2015",
+      "date": "2026-10-07T08:13:20+03:00"
     },
     {
-      "sha": "481cd9f46ea207f2d0138fc7a4d0c33900f57458",
-      "shortSha": "481cd9f",
-      "subject": "wip(mp-lobby): host rail invite card absorbs the free height (no dead band between settings and chat)",
-      "author": "Ohad Fisher",
-      "date": "2026-09-26T19:25:52+03:00"
+      "sha": "68833c79ebd397b30538e42a2a82f175a90a0402",
+      "shortSha": "68833c7",
+      "subject": "fix(analytics): emit first_game_played before game_completed (#1258)",
+      "author": "ohadf2015",
+      "date": "2026-10-06T20:01:59+03:00"
     }
   ]
 }

@@ -1779,8 +1779,8 @@ const sv = {
     },
   "wordTower": {
       "title": "Bygg tornet",
-      "step1": "Tryck för att släppa blocket",
-      "step2": "Centrera blocket för att stapla högt",
+      "step1": "Svep över bokstäver till ett ord",
+      "step2": "Tryck för att släppa mitt i prick",
       "scoreTip": "Varje ord = en våning upp"
     },
     "connections": {
@@ -1803,12 +1803,6 @@ const sv = {
       "title": "Fyll rutnätet",
       "step1": "Tryck ledtråd, skriv svar",
       "step2": "Vågrätt och lodrätt"
-    },
-    "sealedBid": {
-      "title": "Hemligt bud",
-      "step1": "Välj ditt starkaste ord",
-      "step2": "Unikt bud = dubbelt poäng",
-      "step3": "Lås snabbt: bonusen minskar med tiden"
     },
     "adventure": {
       "title": "Äventyret",
@@ -2118,20 +2112,6 @@ const sv = {
     },
     "modifier": {
       "todaysTwist": "Dagens twist",
-      "sealedBid": {
-        "noClashPenalty": {
-          "label": "Fredsdag",
-          "desc": "En vänligare marknad. Bjud fritt."
-        },
-        "vowelTax": {
-          "label": "Vokalskat",
-          "desc": "Vokaler är dagens heta handelsvara."
-        },
-        "highStakes": {
-          "label": "Höga insatser",
-          "desc": "Dagens bud ska vara djärva och unika."
-        }
-      },
       "wordAlchemy": {
         "doubleCatalyst": {
           "label": "Dubbel katalysator",
@@ -2160,70 +2140,6 @@ const sv = {
           "desc": "Klockan tickar. Lös snabbt."
         }
       }
-    }
-  },
-  "sealedBidMp": {
-    "waiting": "Förbereder auktionen…",
-    "round": "Runda {{n}}/{{total}}",
-    "scores": "Poäng",
-    "youWin": "Du vann auktionen!",
-    "wins": "vann auktionen!",
-    "bidPrompt": "Bygg ett ord av brickorna. Välj ett som ingen annan väljer!",
-    "results": "Buden avslöjade",
-    "outcome": {
-      "unique": "Unikt ×2",
-      "clash": "Krock ÷2",
-      "none": "Inget bud"
-    },
-    "locked": "Budet är låst. Väntar på motståndarna…",
-    "lockProgress": "{{locked}}/{{total}} låsta",
-    "clear": "Rensa",
-    "pass": "Passa",
-    "lock": "Lås budet",
-    "autoResolve": "Löses automatiskt om {{secs}}s",
-    "eloRating": "Rankning"
-  },
-  "sealedBidLegacy": {
-    "badge": "Förseglat bud",
-    "title": "Förseglat bud",
-    "instructions": "Välj ett ord ingen annan väljer. Unika bud ger dubbla poäng!",
-    "roundLabel": "Runda {n} av {total}",
-    "totalScore": "Poäng: {score}",
-    "timerLabel": "Skriv ditt ord…",
-    "sealPhase": "Försegla ditt bud",
-    "tapHint": "Tryck på bokstäver för att bygga ditt ord",
-    "backspace": "Ta bort sista bokstaven",
-    "clear": "Rensa ordet",
-    "revealPhase": "Avslöjning",
-    "showdown": "SHOWDOWN!",
-    "lockIn": "Lås in",
-    "skip": "Hoppa över",
-    "youPicked": "Du valde",
-    "botPicked": "Boten valde",
-    "resultUnique": "Unikt! Dubbla poäng",
-    "resultShared": "Krock: halva poäng",
-    "resultNone": "Inget bud: 0 poäng",
-    "pointsEarned": "+{pts} poäng",
-    "nextRound": "Nästa runda →",
-    "finalScore": "Slutpoäng",
-    "playAgain": "Spela igen",
-    "adminOnly": "Förseglat bud är en admin-förhandsvisning.",
-    "shareCard": {
-      "title": "Din bluffhistoria",
-      "cta": "Dela resultat",
-      "copied": "Kopierat!"
-    },
-    "session": {
-      "title": "Bluffräknare",
-      "outsmarted": "rundor överlistade",
-      "uniqueLabel": "Unik",
-      "clashLabel": "Krock",
-      "passLabel": "Pass",
-      "shareCta": "Dela poäng"
-    },
-    "err": {
-      "notInRack": "Använd bara bokstäverna på brickorna",
-      "notWord": "Inte i ordlistan"
     }
   },
   "wordAlchemy": {
@@ -5511,7 +5427,6 @@ const sv = {
         "wordHunt": "Ordjakt",
         "wheelRush": "Hjulrush",
         "wordTower": "Ordtorn",
-        "sealedBid": "Hemligt bud",
         "random": "Överraskningsläge"
       },
       "hook": {
@@ -5520,7 +5435,6 @@ const sv = {
         "wordHunt": "Jaga det dolda ordet",
         "wheelRush": "Tävla mot rivaler på hjulet",
         "wordTower": "Bygg tornet",
-        "sealedBid": "Övertrumfa rummet",
         "random": "Det blir en överraskning"
       }
     },
@@ -8500,8 +8414,6 @@ const sv = {
     "partyModeDesc": "Caption / Pixel / Shadow Clash på stor skärm",
     "wordAlchemyMode": "Ordalkemi",
     "wordAlchemyModeDesc": "Förvandla ett ord till nästa",
-    "sealedBidMode": "Förseglat bud",
-    "sealedBidModeDesc": "Välj ett ord ingen annan väljer. Unikt bud ger dubbla poäng",
     "wordfallMode": "Ordfall",
     "wordfallModeDesc": "Stava snabbt medan brickorna regnar ner",
     "dailyChallenge": "Daglig utmaning",
@@ -16917,7 +16829,6 @@ const sv = {
       "playWordfall": "Wordfall",
       "playParty": "Party",
       "playWordTower": "Ordtornet",
-      "playSealedBid": "Slutet bud"
     }
   },
   "passAndPlay": {
@@ -17402,10 +17313,6 @@ const sv = {
         "tip2": "Tryck på yttre bokstäver i valfri ordning",
         "tip3": "Prova pluralformer för att förlänga"
       }
-    },
-    "sealedBid": {
-      "name": "Hemligt bud",
-      "description": "Bjud på ett ord ingen annan väljer. Unika bud ger dubbla poäng!"
     },
     "crossword": {
       "name": "Korsord",
@@ -19214,79 +19121,6 @@ const sv = {
     "notDownloaded": "Ej nedladdad",
     "errorGeneric": "Nedladdningen misslyckades. Försök igen."
   },
-  "sealedBid": {
-    "luckyStreak": "TURSVIT!",
-    "hotStreak": "{n} i rad!",
-    "allIn": "Allt in",
-    "clear": "Rensa",
-    "currentStake": "Nuvarande insats",
-    "balance": "Saldo",
-    "stake": "Insats",
-    "uniquePays": "Unik ger {mult}x",
-    "potentialPayout": "Potentiell utbetalning {amount}",
-    "lockBid": "Lås bud",
-    "needWord": "Bygg ett ord först",
-    "needStake": "Sätt en insats för att låsa budet",
-    "pass": "Passera",
-    "unique": "Unik",
-    "clash": "Krock",
-    "busted": "Spräckt",
-    "cashOut": "Ta ut",
-    "chips": "Marker",
-    "showdown": "Avgöring",
-    "round": "Omgång",
-    "vsRivals": "mot {a} och {b}",
-    "gameOver": "Spelet är slut",
-    "playAgain": "Spela igen",
-    "notAWord": "Inget ord",
-    "tapHint": "Tryck på bokstäver för att bilda ditt ord",
-    "continue": "Fortsätt",
-    "shareCard": {
-      "title": "Din bluffhistoria",
-      "cta": "Dela resultat",
-      "copied": "Kopierat",
-      "header": "🎯 Förseglat bud — {score} poäng",
-      "row": "{round} {emoji} {playerWord} mot {botWord}{points}",
-      "url": "lexiclash.live/sv/sealed-bid",
-      "roundLabel": "R{n}",
-      "vs": "mot"
-    },
-    "session": {
-      "title": "Bluffräknare",
-      "outsmarted": "överlistade rundor",
-      "uniqueLabel": "Unik",
-      "clashLabel": "Krock",
-      "passLabel": "Pass",
-      "shareCta": "Dela poäng",
-      "shareHeader": "🧠 Överlistade botten {unique}/{total} rundor · {score} poäng",
-      "cashOut": "Ta ut",
-      "chips": "marker",
-      "coins": "mynt"
-    },
-    "youWin": "Du vinner!",
-    "youLose": "Krock",
-    "draw": "Pass",
-    "noWord": "—",
-    "botRival": "Rival {n}",
-    "outcome": {
-      "unique": "Unikt bud",
-      "clash": "Krock",
-      "none": "Inget bud"
-    },
-    "outcomeEmoji": {
-      "unique": "✅",
-      "clash": "🤝",
-      "none": "⬜"
-    },
-    "error": {
-      "tooShort": "Ordet måste vara minst 3 bokstäver",
-      "needStake": "Sätt en insats för att låsa"
-    },
-    "revealing": "Avslöjar…",
-    "roundLabel": "Runda {n} av {total}",
-    "chipStack": "Marker: {chips}",
-    "speedBonus": "Hastighet ×{n}"
-  },
   "supporter": {
     "card": {
       "title": "Gillar du LexiClash?",
@@ -19406,10 +19240,6 @@ const sv = {
         "wordTower": {
           "name": "Ordtornet",
           "rule": "Stapla ord och bygg det högsta tornet."
-        },
-        "sealedBid": {
-          "name": "Hemligt bud",
-          "rule": "Buda i hemlighet. Spendera dina poäng klokt."
         },
         "crossword": {
           "name": "Korsordsrace",
