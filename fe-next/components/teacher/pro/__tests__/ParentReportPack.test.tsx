@@ -80,7 +80,12 @@ describe('ParentReportPack — every parent link for a class in one click', () =
     });
     render(<ParentReportPack />);
     fireEvent.click(await screen.findByRole('button', { name: /eg2Pro\.pack\.make/ }));
-    fireEvent.click(await screen.findByRole('button', { name: /eg2Pro\.pack\.copyAll/ }));
+    // Wait for a row first: copyAll/csv render in the same `links.length > 0` commit as
+    // the rows, so once a row exists the buttons are guaranteed present. A bare
+    // findByRole('button', copyAll) races the post-fetch state update and flakes on
+    // loaded CI shard runners (master run 37747826305).
+    await screen.findAllByTestId('parent-pack-row', undefined, { timeout: 5000 });
+    fireEvent.click(screen.getByRole('button', { name: /eg2Pro\.pack\.copyAll/ }));
     await waitFor(() => expect(writeText).toHaveBeenCalled());
     expect(writeText.mock.calls[0][0]).toMatch(/^Maya: http.*\/en\/report\/a$/);
     fireEvent.click(screen.getByRole('button', { name: /eg2Pro\.pack\.csv/ }));
