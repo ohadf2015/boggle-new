@@ -23,7 +23,7 @@ afterEach(() => {
 });
 
 describe('FeatureErrorBoundary — Home button is education-aware (sectionHome)', () => {
-  it('routes to /{locale}/education for an education pathname, not bare /{locale}', () => {
+  it('routes a teacher pathname to /{locale}/teacher, not bare /{locale}', () => {
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: { href: '', pathname: '/es/teacher/classroom/x', reload: vi.fn(), replace: vi.fn() },
@@ -34,7 +34,7 @@ describe('FeatureErrorBoundary — Home button is education-aware (sectionHome)'
       </FeatureErrorBoundary>,
     );
     fireEvent.click(screen.getByRole('button', { name: /back to home/i }));
-    expect(window.location.href).toBe('/es/education');
+    expect(window.location.href).toBe('/es/teacher');
   });
 
   it('routes to bare /{locale} for a non-education pathname', () => {

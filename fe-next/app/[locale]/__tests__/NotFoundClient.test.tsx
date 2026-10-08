@@ -33,18 +33,18 @@ beforeEach(() => {
 });
 
 describe('NotFoundClient — primary CTA is education-aware (sectionHome)', () => {
-  it('routes a missing /teacher/* path back to /{locale}/education, not bare /{locale}', () => {
+  it('routes a missing /teacher/* path back to /{locale}/teacher, not bare /{locale}', () => {
     mockPathname = '/en/teacher/classroom/999/lesson/123';
     render(<NotFoundClient />);
     const cta = screen.getByRole('link', { name: /notFound.button/i }) as HTMLAnchorElement;
-    expect(cta.getAttribute('href')).toBe('/en/education');
+    expect(cta.getAttribute('href')).toBe('/en/teacher');
   });
 
-  it('routes a missing /student/* path back to /{locale}/education', () => {
+  it('routes a missing /student/* path back to /{locale}/student', () => {
     mockPathname = '/en/student/lessons/gone';
     render(<NotFoundClient />);
     const cta = screen.getByRole('link', { name: /notFound.button/i }) as HTMLAnchorElement;
-    expect(cta.getAttribute('href')).toBe('/en/education');
+    expect(cta.getAttribute('href')).toBe('/en/student');
   });
 
   it('routes a missing functional /education/* flow sub-route back to /{locale}/education', () => {

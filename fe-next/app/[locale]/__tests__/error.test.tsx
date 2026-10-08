@@ -100,7 +100,7 @@ describe('app/[locale]/error.tsx — resilient fallback (black-screen fix)', () 
 });
 
 describe('app/[locale]/error.tsx — Home button is education-aware (sectionHome)', () => {
-  it('routes to /{locale}/education for an education pathname, not bare /{locale}', () => {
+  it('routes a teacher pathname to /{locale}/teacher, not bare /{locale}', () => {
     mockLocale = 'es';
     Object.defineProperty(window, 'location', {
       configurable: true,
@@ -109,7 +109,7 @@ describe('app/[locale]/error.tsx — Home button is education-aware (sectionHome
     render(<Error error={makeError('Error', 'boom')} reset={vi.fn()} />);
     const buttons = screen.getAllByRole('button');
     fireEvent.click(buttons[1]); // second button is the "go home" action
-    expect(window.location.href).toBe('/es/education');
+    expect(window.location.href).toBe('/es/teacher');
   });
 
   it('routes to bare /{locale} for a non-education pathname', () => {
@@ -151,7 +151,7 @@ describe('app/global-error.tsx — Home button is education-aware (sectionHome)'
     vi.doMock('@/utils/crashlytics', () => ({ recordNativeError: vi.fn() }));
   });
 
-  it('routes to /{locale}/education for an education pathname, not bare /{locale}', async () => {
+  it('routes a student pathname to /{locale}/student, not bare /{locale}', async () => {
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: { href: '', pathname: '/he/student/lessons/5', reload: vi.fn(), replace: vi.fn() },
@@ -160,7 +160,7 @@ describe('app/global-error.tsx — Home button is education-aware (sectionHome)'
     render(<GlobalError error={makeError('Error', 'boom')} reset={vi.fn()} />);
     const buttons = screen.getAllByRole('button');
     fireEvent.click(buttons[1]); // second button is the "go home" action
-    expect(window.location.href).toBe('/he/education');
+    expect(window.location.href).toBe('/he/student');
   });
 
   it('routes to bare /{locale} for a non-education pathname', async () => {
