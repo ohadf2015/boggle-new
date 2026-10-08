@@ -37,7 +37,7 @@ export function MatchmakingOverlay({
   const tier = getRankTier(elo);
   const minutes = Math.floor(waitTime / 60);
   const seconds = waitTime % 60;
-  const timeStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+  const timeStr = `${minutes}:${String(seconds).padStart(2, '0')}`;
 
   return (
     <div

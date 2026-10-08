@@ -344,7 +344,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   if (gameMode === 'word-tower' || gameMode === 'crossword') {
     return (
       <>
-        {gameMode === 'word-tower' ? <WordTowerVersus socket={socket} username={username} onQuit={handleStopGameClick} /> : <CrosswordVersus socket={socket} username={username} onQuit={handleStopGameClick} remainingTime={remainingTime} />}
+        {gameMode === 'word-tower' ? <WordTowerVersus socket={socket} username={username} onQuit={handleStopGameClick} remainingTime={remainingTime} /> : <CrosswordVersus socket={socket} username={username} onQuit={handleStopGameClick} remainingTime={remainingTime} />}
         {connectionOverlays}
         {stopConfirm}
       </>

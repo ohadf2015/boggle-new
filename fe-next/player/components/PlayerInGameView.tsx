@@ -273,7 +273,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   if (gameMode === 'word-tower' || gameMode === 'crossword') {
     return (
       <>
-        {gameMode === 'word-tower' ? <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} /> : <CrosswordVersus socket={socket} username={username} onQuit={onExitRoom} remainingTime={remainingTime} />}
+        {gameMode === 'word-tower' ? <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} remainingTime={remainingTime} /> : <CrosswordVersus socket={socket} username={username} onQuit={onExitRoom} remainingTime={remainingTime} />}
         {roundDialogs}
       </>
     );

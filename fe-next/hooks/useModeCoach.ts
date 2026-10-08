@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import posthog from '@/lib/analytics/lazyPosthog';
 import {
+  setCoachOnScreen,
   COACH_VERSION,
   hasSeenCoach,
   markCoachSeen,
@@ -72,6 +73,12 @@ export function useModeCoach(
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- onShown is a fire-once callback; re-arming on its identity would re-run the timer.
   }, [mode, content, settleMs]);
+
+  useEffect(() => {
+    if (!visible) return;
+    setCoachOnScreen(true);
+    return () => setCoachOnScreen(false);
+  }, [visible]);
 
   const close = useCallback(
     (reason: CoachDismissReason) => {

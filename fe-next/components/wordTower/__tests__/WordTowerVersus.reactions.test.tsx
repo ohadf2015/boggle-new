@@ -72,3 +72,10 @@ describe('WordTowerVersus — quick reactions', () => {
     expect(screen.getByText('Rival')).toBeInTheDocument();
   });
 });
+
+describe('WordTowerVersus — round clock', () => {
+  it('shows the server round time as m:ss (no client clock skew, no English unit)', () => {
+    render(<WordTowerVersus socket={makeSocket()} username="Me" remainingTime={95} />);
+    expect(screen.getByText('1:35')).toBeInTheDocument();
+  });
+});

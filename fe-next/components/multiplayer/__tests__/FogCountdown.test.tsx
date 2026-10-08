@@ -15,7 +15,7 @@ describe('FogCountdown (MP perf — ref-driven, no re-render)', () => {
 
   it('renders the initial remaining seconds', () => {
     render(<FogCountdown endsAt={10_000} />);
-    expect(screen.getByTestId('fog-countdown').textContent).toBe('10s');
+    expect(screen.getByTestId('fog-countdown').textContent).toBe('0:10');
   });
 
   it('updates the displayed seconds as time advances without a React re-render', () => {
@@ -23,7 +23,7 @@ describe('FogCountdown (MP perf — ref-driven, no re-render)', () => {
     act(() => {
       vi.advanceTimersByTime(3_000);
     });
-    expect(screen.getByTestId('fog-countdown').textContent).toBe('7s');
+    expect(screen.getByTestId('fog-countdown').textContent).toBe('0:07');
   });
 
   it('clamps at 0s once the fog window has elapsed', () => {
@@ -31,6 +31,6 @@ describe('FogCountdown (MP perf — ref-driven, no re-render)', () => {
     act(() => {
       vi.advanceTimersByTime(5_000);
     });
-    expect(screen.getByTestId('fog-countdown').textContent).toBe('0s');
+    expect(screen.getByTestId('fog-countdown').textContent).toBe('0:00');
   });
 });

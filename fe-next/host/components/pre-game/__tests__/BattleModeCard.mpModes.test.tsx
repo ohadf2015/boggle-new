@@ -31,4 +31,24 @@ describe('BattleModeCard — MP mode list (Ohad 2026-09-27)', () => {
     expect(screen.getByTestId('game-mode-crossword')).toBeInTheDocument();
     expect(screen.queryByTestId('game-mode-word-tower')).not.toBeInTheDocument();
   });
+
+  it('offers crossword only in rooms whose language has puzzles', () => {
+    const { unmount } = render(<BattleModeCard {...baseProps} showInWorkModes language="he" />);
+    expect(screen.getByTestId('game-mode-crossword')).toBeInTheDocument();
+    unmount();
+    render(<BattleModeCard {...baseProps} showInWorkModes language="sv" />);
+    expect(screen.queryByTestId('game-mode-crossword')).not.toBeInTheDocument();
+  });
+
+  it('falls back to random when the room switches to a language without crossword', () => {
+    const setSelectedGameMode = vi.fn();
+    render(<BattleModeCard {...baseProps} setSelectedGameMode={setSelectedGameMode} selectedGameMode="crossword" showInWorkModes language="ja" />);
+    expect(setSelectedGameMode).toHaveBeenCalledWith('random');
+  });
+
+  it('leaves non-picker selections (e.g. classroom wordcraft) alone', () => {
+    const setSelectedGameMode = vi.fn();
+    render(<BattleModeCard {...baseProps} setSelectedGameMode={setSelectedGameMode} selectedGameMode={'wordcraft' as never} language="sv" />);
+    expect(setSelectedGameMode).not.toHaveBeenCalled();
+  });
 });

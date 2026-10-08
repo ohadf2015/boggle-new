@@ -91,7 +91,10 @@ export const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
   // React re-render or subtree reconcile. Childless leaf — safe to mutate.
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
-    const format = () => `${Math.max(0, Math.ceil((endsAt - Date.now()) / 1000))}s`;
+    const format = () => {
+      const sec = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
+      return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+    };
     if (ref.current) ref.current.textContent = format();
     const id = setInterval(() => {
       if (ref.current) ref.current.textContent = format();
