@@ -11089,6 +11089,32 @@ const ja = {
       }
     },
     "eduDashboard": {
+      "verdict": {
+        "none": "この期間のデータはまだ十分ではありません。",
+        "eyebrow": "最大の離脱",
+        "label": {
+          "approved": "アクセス申請が承認されなかった",
+          "classroom": "承認済みの教師がクラスを作成していない",
+          "student": "クラスは作成されたが、まだ生徒が参加していない"
+        },
+        "action": {
+          "approved": "教師アクセスで保留中の申請を処理してください。",
+          "classroom": "最初のクラスを作成するよう促してください。",
+          "student": "参加コードをこれらの教師に送ってください（直近で活動した順）。"
+        },
+        "convert": "この段階に到達",
+        "openTop": "最上位の教師を開く"
+      },
+      "rescue": {
+        "title": "救済リスト",
+        "empty": "この段階で止まっている人はいません。",
+        "rowAction": {
+          "approved": "クラス作成を促す",
+          "classroom": "参加コードを送る"
+        },
+        "more": "件はすべての教師の下に表示"
+      },
+      "healthTitle": "教師の状態",
       "posthogHidden": "ランディングとアップセルのコンバージョンは非表示です。サーバーの PostHog キーが未設定です。",
       "title": "教育の概要",
       "subtitle": "テストアカウントは除外しています。変化率は前期間との比較です。",
@@ -11120,6 +11146,12 @@ const ja = {
         "title": "クラスのモード構成"
       },
       "teachers": {
+        "all": "すべての教師",
+        "showDormant": "休眠を表示",
+        "filterLabel": "活動状況で絞り込み",
+        "filter": {
+          "all": "休眠以外"
+        },
         "name": "教師",
         "lastActive": "最終アクティブ",
         "classes": "クラス",

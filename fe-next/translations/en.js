@@ -17516,6 +17516,32 @@ const en = {
       }
     },
     "eduDashboard": {
+      "verdict": {
+        "none": "Not enough data in this window yet.",
+        "eyebrow": "Biggest leak",
+        "label": {
+          "approved": "access requests were never approved",
+          "classroom": "approved teachers never made a class",
+          "student": "teachers made a class but no student has joined yet"
+        },
+        "action": {
+          "approved": "Work through the pending requests in Teacher access.",
+          "classroom": "Nudge them to create their first class.",
+          "student": "Send the join code to these teachers, most recently active first."
+        },
+        "convert": "reach this step",
+        "openTop": "Open top teacher"
+      },
+      "rescue": {
+        "title": "Rescue list",
+        "empty": "No one is stuck at this step.",
+        "rowAction": {
+          "approved": "Nudge to create a class",
+          "classroom": "Send the join code"
+        },
+        "more": "more in All teachers below"
+      },
+      "healthTitle": "Teacher health",
       "posthogHidden": "Landing and upsell conversion are hidden: no server PostHog key is configured.",
       "title": "Education overview",
       "subtitle": "Test accounts excluded. Deltas compare with the prior period.",
@@ -17547,6 +17573,12 @@ const en = {
         "title": "Classroom mode mix"
       },
       "teachers": {
+        "all": "All teachers",
+        "showDormant": "Show dormant",
+        "filterLabel": "Filter by health",
+        "filter": {
+          "all": "Not dormant"
+        },
         "name": "Teacher",
         "lastActive": "Last active",
         "classes": "Classes",

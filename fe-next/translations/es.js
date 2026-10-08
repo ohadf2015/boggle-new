@@ -10896,6 +10896,32 @@ const es = {
       }
     },
     "eduDashboard": {
+      "verdict": {
+        "none": "Aún no hay datos suficientes en este periodo.",
+        "eyebrow": "Mayor fuga",
+        "label": {
+          "approved": "las solicitudes de acceso nunca fueron aprobadas",
+          "classroom": "docentes aprobados nunca crearon una clase",
+          "student": "docentes crearon una clase pero aún no se ha unido ningún alumno"
+        },
+        "action": {
+          "approved": "Revisa las solicitudes pendientes en Acceso docente.",
+          "classroom": "Anímalos a crear su primera clase.",
+          "student": "Envía el código de acceso a estos docentes, primero los más recientes."
+        },
+        "convert": "llegan a este paso",
+        "openTop": "Abrir el primer docente"
+      },
+      "rescue": {
+        "title": "Lista de rescate",
+        "empty": "Nadie está atascado en este paso.",
+        "rowAction": {
+          "approved": "Animar a crear una clase",
+          "classroom": "Enviar el código de acceso"
+        },
+        "more": "más en Todos los docentes abajo"
+      },
+      "healthTitle": "Estado de los docentes",
       "posthogHidden": "La conversión de la landing y del upsell está oculta: no hay clave de PostHog en el servidor.",
       "title": "Resumen educativo",
       "subtitle": "Se excluyen las cuentas de prueba. Las variaciones comparan con el periodo anterior.",
@@ -10927,6 +10953,12 @@ const es = {
         "title": "Modos en clase"
       },
       "teachers": {
+        "all": "Todos los docentes",
+        "showDormant": "Mostrar inactivos",
+        "filterLabel": "Filtrar por estado",
+        "filter": {
+          "all": "No inactivos"
+        },
         "name": "Profesor",
         "lastActive": "Última actividad",
         "classes": "Clases",

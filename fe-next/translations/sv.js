@@ -11181,6 +11181,32 @@ const sv = {
       }
     },
     "eduDashboard": {
+      "verdict": {
+        "none": "Inte tillräckligt med data i det här fönstret än.",
+        "eyebrow": "Största läckan",
+        "label": {
+          "approved": "ansökningar om åtkomst blev aldrig godkända",
+          "classroom": "godkända lärare skapade aldrig en klass",
+          "student": "lärare skapade en klass men ingen elev har gått med ännu"
+        },
+        "action": {
+          "approved": "Gå igenom de väntande ansökningarna under Läraråtkomst.",
+          "classroom": "Påminn dem att skapa sin första klass.",
+          "student": "Skicka anslutningskoden till dessa lärare, senast aktiva först."
+        },
+        "convert": "når det här steget",
+        "openTop": "Öppna främsta läraren"
+      },
+      "rescue": {
+        "title": "Räddningslista",
+        "empty": "Ingen fastnar på det här steget.",
+        "rowAction": {
+          "approved": "Påminn om att skapa en klass",
+          "classroom": "Skicka anslutningskoden"
+        },
+        "more": "fler under Alla lärare nedan"
+      },
+      "healthTitle": "Lärarnas hälsa",
       "posthogHidden": "Konvertering från landningssida och uppsälj är dold: ingen PostHog-serverkey är konfigurerad.",
       "title": "Utbildningsöversikt",
       "subtitle": "Testkonton exkluderas. Förändringar jämförs med föregående period.",
@@ -11212,6 +11238,12 @@ const sv = {
         "title": "Lägesfördelning i klassrum"
       },
       "teachers": {
+        "all": "Alla lärare",
+        "showDormant": "Visa vilande",
+        "filterLabel": "Filtrera på hälsa",
+        "filter": {
+          "all": "Inte vilande"
+        },
         "name": "Lärare",
         "lastActive": "Senast aktiv",
         "classes": "Klasser",
