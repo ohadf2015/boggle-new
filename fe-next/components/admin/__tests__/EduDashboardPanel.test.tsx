@@ -116,7 +116,7 @@ describe('EduDashboardPanel', () => {
     render(<EduDashboardPanel />);
 
     await waitFor(() => expect(screen.getByText('Ada Teacher')).toBeInTheDocument());
-    expect(screen.getByText('Thriving')).toBeInTheDocument();
+    expect(screen.getAllByText('Thriving').length).toBeGreaterThan(0);
     expect(screen.getByText('Quiet Period 3')).toBeInTheDocument();
   });
 });
