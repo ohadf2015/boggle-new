@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
+import { polarTrialDaysLeft, isPolarTrialDay10Expiring } from '@/lib/education/polarTrial';
 import posthog from '@/lib/analytics/lazyPosthog';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
@@ -25,7 +25,7 @@ interface TeacherProTrialExpiringBannerProps {
 /**
  * Trial-expiring conversion surface for Teacher HQ.
  *
- * Shown when Teacher Pro trial has <= 3 days remaining.
+ * Shown when Teacher Pro trial has <= 4 days remaining (day 10 of 14).
  * Highlights days left and features lost without Pro.
  * Primary CTA goes DIRECTLY to paid checkout (POST /api/subscription/checkout
  * without the trial flag), landing in Polar checkout in one click.
@@ -45,7 +45,7 @@ export function TeacherProTrialExpiringBanner({
   const shownRef = useRef(false);
 
   const daysRemaining = polarTrialDaysLeft(trialExpires, nowMs);
-  const isExpiring = daysRemaining !== null && daysRemaining <= 3;
+  const isExpiring = isPolarTrialDay10Expiring(daysRemaining);
 
   useEffect(() => {
     if (!isExpiring || isDismissed) return;

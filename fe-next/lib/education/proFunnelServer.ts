@@ -64,6 +64,15 @@ export function buildTrialStartEvent(userId: string, subscriptionId: string): Ed
   };
 }
 
+/** Canonical HQ funnel name — same moment as `trial_start`. */
+export function buildTrialStartedEvent(userId: string, subscriptionId: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'trial_started',
+    properties: { ...BASE, subscription_id: subscriptionId },
+  };
+}
+
 /** Conversion funnel step 3 — Polar paid checkout session created (user entered Polar). */
 export function buildCheckoutCompleteEvent(userId: string): EduServerEvent {
   return { distinctId: userId, event: 'checkout_complete', properties: { ...BASE } };
@@ -74,6 +83,15 @@ export function buildPaidEvent(userId: string, subscriptionId: string): EduServe
   return {
     distinctId: userId,
     event: 'paid',
+    properties: { ...BASE, subscription_id: subscriptionId },
+  };
+}
+
+/** Trial → paid. Only when Polar's row was a trial (metadata/trial_end). */
+export function buildTeacherTrialConvertedEvent(userId: string, subscriptionId: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'teacher_trial_converted',
     properties: { ...BASE, subscription_id: subscriptionId },
   };
 }

@@ -233,6 +233,24 @@ describe('TeacherPage upgrade CTA', () => {
     });
   });
 
+  it('a Polar trial on day 10 (4 days left) shows the expiring banner, not the lifecycle welcome', () => {
+    const trialExpires = new Date(Date.now() + 4 * 86400000).toISOString();
+    proState = {
+      ...proState,
+      hasPro: true,
+      source: 'polar',
+      status: 'trialing',
+      trialUsed: true,
+      trialExpires,
+      periodEnd: trialExpires,
+    };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    render(<TeacherPage />);
+    expect(screen.getByTestId('teacher-pro-trial-expiring')).toBeInTheDocument();
+    expect(screen.getByTestId('teacher-pro-trial-expiring')).toHaveAttribute('data-days', '4');
+    expect(screen.queryByTestId('teacher-pro-trial-lifecycle')).toBeNull();
+  });
+
   it('an expired Polar trial is one reactivation CTA, not a second free trial or a stacked ask', () => {
     accessState = { trial: mkTrial({ isExpired: true, daysLeft: 0, hoursLeft: 0, msLeft: 0 }) };
     proState = { ...proState, hasPro: false, source: 'polar', status: 'canceled', trialUsed: true };
