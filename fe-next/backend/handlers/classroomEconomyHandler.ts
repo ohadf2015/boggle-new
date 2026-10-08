@@ -16,7 +16,7 @@ import {
   buildBoard,
   buyPowerUpFor,
   toSnapshot,
-  useHintFor,
+  spendHintFor,
 } from '../modules/classroomEconomyService.js';
 import { loadConfig, saveEconomyConfig, readEconomy } from '../modules/classroomEconomyStore.js';
 import { grantEndOfGameChest } from '../modules/classroomEconomyChest.js';
@@ -46,6 +46,15 @@ async function isClassroomGame(gameCode: string): Promise<boolean> {
 async function isPlayer(gameCode: string, userId: string): Promise<boolean> {
   const game = await getClassroomGame(gameCode);
   return !!game?.players?.some((p) => p.userId === userId);
+}
+
+/** Word path hook: a socket without a verified identity simply gets no economy. */
+export function economyUserIdOf(socket: Socket): string | null {
+  try {
+    return getAuthUserId(socket);
+  } catch {
+    return null;
+  }
 }
 
 /** Called by the word path after an accepted word. Self-only emit. */
@@ -135,7 +144,7 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
     if (!userId || !gameCode || !checkRateLimit(socket.id)) return;
     const roundId = await roundOf(gameCode);
     if (!roundId || !(await isPlayer(gameCode, userId))) return;
-    const res = await useHintFor({ gameCode, roundId, userId, now: Date.now() });
+    const res = await spendHintFor({ gameCode, roundId, userId, now: Date.now() });
     if (!res.ok) { socket.emit(E.error, { reason: res.reason }); return; }
     const game = await getGameState(gameCode);
     const words = ((game as { lessonVocabulary?: string[] } | null)?.lessonVocabulary ?? []).filter((w) => w.length > 0);

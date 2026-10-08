@@ -32,8 +32,7 @@ import { makePositionsMap } from '../modules/wordValidator.js';
 import { isLessonWord } from '../utils/lessonVocabulary.js';
 import { computeRushBonus } from '../modules/rushTiles/rushTilesLogic.js';
 import { scoreAcceptedWord, blastTileBonusFor } from '../modules/wordScore.js';
-import { economyOnWordAccepted, roundIdOf } from './classroomEconomyHandler.js';
-import { getAuthUserId } from './classroomSocketAuth.js';
+import { economyOnWordAccepted, economyUserIdOf, roundIdOf } from './classroomEconomyHandler.js';
 import type { BlastTileType } from '@/shared/types/blast';
 import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
@@ -92,7 +91,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // socket that path does not currently hold.
   const lessonBonus = lessonWordBonus(fromLesson);
 
-  const economyUserId = getAuthUserId(socket);
+  const economyUserId = economyUserIdOf(socket);
   if (economyUserId) {
     void economyOnWordAccepted(socket, {
       gameCode,

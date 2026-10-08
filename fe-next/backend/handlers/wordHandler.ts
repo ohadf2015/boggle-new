@@ -44,8 +44,7 @@ import { calculateWordScore } from '../modules/scoringEngine.js';
 import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 import { classicMinWordLength } from '@/shared/utils/classicWordRules';
 import type { Language } from '@/shared/types';
-import { economyOnWordRejected, roundIdOf } from './classroomEconomyHandler.js';
-import { getAuthUserId } from './classroomSocketAuth.js';
+import { economyOnWordRejected, economyUserIdOf, roundIdOf } from './classroomEconomyHandler.js';
 
 // Rate limit weights
 const SUBMIT_WORD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SUBMITWORD || '3');
@@ -429,7 +428,7 @@ function registerWordHandlers(io: Server, socket: Socket): void {
           reason: 'not_in_dictionary'
         });
         breakBlastComboOnMiss();
-        const economyUserId = getAuthUserId(socket);
+        const economyUserId = economyUserIdOf(socket);
         if (economyUserId) {
           void economyOnWordRejected(socket, { gameCode, roundId: roundIdOf(game, gameCode), userId: economyUserId });
         }
