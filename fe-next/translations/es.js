@@ -13135,6 +13135,16 @@ const es = {
     }
   },
   "student": {
+    "classStrip": {
+      "title": "Racha de la clase",
+      "streakDays": "Racha de {count} días",
+      "playedToday": "Jugaron hoy",
+      "notPlayedToday": "Jueguen hoy para mantener la racha",
+      "noStreakYet": "Empieza la racha de la clase hoy",
+      "askRematch": "Pedir revancha",
+      "askedToday": "Pedido enviado. Tu profe lo verá",
+      "askFailed": "No se pudo enviar. Inténtalo de nuevo"
+    },
     "practiceFun": {
       "headline": {
         "perfect": "¡PERFECTO!",

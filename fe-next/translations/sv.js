@@ -13418,6 +13418,16 @@ const sv = {
     }
   },
   "student": {
+    "classStrip": {
+      "title": "Klassens svit",
+      "streakDays": "{count}-dagars klassvit",
+      "playedToday": "Spelade idag",
+      "notPlayedToday": "Spela idag för att hålla sviten vid liv",
+      "noStreakYet": "Starta klassens svit idag",
+      "askRematch": "Be om revansch",
+      "askedToday": "Begäran skickad. Läraren ser den",
+      "askFailed": "Kunde inte skicka. Försök igen"
+    },
     "practiceFun": {
       "headline": {
         "perfect": "FELFRITT!",

@@ -2311,6 +2311,16 @@ const ru = {
     }
   },
   "student": {
+    "classStrip": {
+      "title": "Серия класса",
+      "streakDays": "Серия класса: {count} дн.",
+      "playedToday": "Сыграли сегодня",
+      "notPlayedToday": "Сыграйте сегодня, чтобы сохранить серию",
+      "noStreakYet": "Начните серию класса сегодня",
+      "askRematch": "Попросить реванш",
+      "askedToday": "Запрос отправлен. Учитель его увидит",
+      "askFailed": "Не получилось отправить. Попробуйте ещё раз"
+    },
     "practiceFun": {
       "headline": {
         "perfect": "БЕЗУПРЕЧНО!",

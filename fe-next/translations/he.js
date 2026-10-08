@@ -13042,6 +13042,16 @@ const he = {
     }
   },
   "student": {
+    "classStrip": {
+      "title": "רצף הכיתה",
+      "streakDays": "רצף כיתתי של {count} ימים",
+      "playedToday": "שיחקתם היום",
+      "notPlayedToday": "שחקו היום כדי לשמור על הרצף",
+      "noStreakYet": "התחילו רצף כיתתי היום",
+      "askRematch": "בקשו משחק חוזר",
+      "askedToday": "הבקשה נשלחה. המורה יראה אותה",
+      "askFailed": "לא הצלחנו לשלוח. נסו שוב"
+    },
     "practiceFun": {
       "headline": {
         "perfect": "מושלם!",

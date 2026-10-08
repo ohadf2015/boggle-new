@@ -11731,6 +11731,16 @@ const en = {
     }
   },
   "student": {
+    "classStrip": {
+      "title": "Class streak",
+      "streakDays": "{count}-day class streak",
+      "playedToday": "Played today",
+      "notPlayedToday": "Play today to keep it alive",
+      "noStreakYet": "Start the class streak today",
+      "askRematch": "Ask for a rematch",
+      "askedToday": "Asked. Your teacher will see it",
+      "askFailed": "Couldn't send. Try again"
+    },
     "practiceFun": {
       "headline": {
         "perfect": "FLAWLESS!",

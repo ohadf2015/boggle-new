@@ -13182,6 +13182,16 @@ const ja = {
     }
   },
   "student": {
+    "classStrip": {
+      "title": "クラスの連続記録",
+      "streakDays": "{count}日連続",
+      "playedToday": "今日プレイしました",
+      "notPlayedToday": "今日プレイして記録をつなごう",
+      "noStreakYet": "今日からクラスの連続記録を始めよう",
+      "askRematch": "リマッチをお願い",
+      "askedToday": "送信しました。先生に届きます",
+      "askFailed": "送信できませんでした。もう一度"
+    },
     "practiceFun": {
       "headline": {
         "perfect": "パーフェクト！",

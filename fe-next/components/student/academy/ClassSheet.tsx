@@ -11,6 +11,7 @@ import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ClassroomLeaderboard from '@/components/education/ClassroomLeaderboard';
 import { StudentAssignmentPlayCta } from '@/components/student/StudentAssignmentPlayCta';
+import { ClassStrip } from './ClassStrip';
 import type { NextOpenAssignment } from '@/components/student/nextOpenAssignment';
 
 interface Props {
@@ -52,6 +53,7 @@ export function ClassSheet({ classroomId, userId, className, onClose, reducedMot
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
           <StudentAssignmentPlayCta next={nextOpenAssignment} />
+          <ClassStrip classroomId={classroomId} reducedMotion={reducedMotion} />
           <ClassroomLeaderboard classroomId={classroomId} currentUserId={userId} />
         </div>
       </m.div>
