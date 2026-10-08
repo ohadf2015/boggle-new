@@ -66,3 +66,14 @@ describe('modeCoachStore', () => {
     expect(() => markCoachSeen('classic', 1, throwing)).not.toThrow();
   });
 });
+
+describe('coach on-screen flag', () => {
+  it('reports whether any mode coach card is showing', async () => {
+    const { setCoachOnScreen, isCoachOnScreen } = await import('./modeCoachStore');
+    expect(isCoachOnScreen()).toBe(false);
+    setCoachOnScreen(true);
+    expect(isCoachOnScreen()).toBe(true);
+    setCoachOnScreen(false);
+    expect(isCoachOnScreen()).toBe(false);
+  });
+});

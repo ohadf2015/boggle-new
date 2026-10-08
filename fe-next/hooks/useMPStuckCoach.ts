@@ -12,6 +12,7 @@ import {
   shouldShowGuidance,
   markGuidanceShown,
 } from '../utils/contextualGuidanceStorage';
+import { isCoachOnScreen } from '@/lib/tutorial/modeCoachStore';
 
 /** How long a hint stays up before auto-hiding (counts as "ignored"). */
 export const AUTO_HIDE_MS = 10000;
@@ -130,6 +131,10 @@ export function useMPStuckCoach(args: UseMPStuckCoachArgs): MPStuckCoach {
     const id = setInterval(() => {
       if (decidedRef.current) return;
       const now = Date.now();
+      if (isCoachOnScreen()) {
+        lastActivityRef.current = now;
+        return;
+      }
       const next = nextStuckStage({
         elapsedMs: now - startMsRef.current,
         idleMs: now - lastActivityRef.current,

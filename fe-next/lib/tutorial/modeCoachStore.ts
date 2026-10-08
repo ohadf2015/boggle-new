@@ -59,3 +59,8 @@ export function markCoachSeen(mode: CoachModeKey, version: number, storage: Coac
     /* private mode / quota — ignore, coach simply re-shows next time */
   }
 }
+
+// Lets other first-game hints stay quiet while a coach card is up.
+let coachOnScreen = false;
+export const setCoachOnScreen = (on: boolean): void => { coachOnScreen = on; };
+export const isCoachOnScreen = (): boolean => coachOnScreen;

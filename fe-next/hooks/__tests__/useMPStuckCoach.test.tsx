@@ -21,6 +21,7 @@ vi.mock('../../utils/contextualGuidanceStorage', () => ({
 }));
 
 import { useMPStuckCoach, AUTO_HIDE_MS } from '../useMPStuckCoach';
+import { setCoachOnScreen } from '../../lib/tutorial/modeCoachStore';
 
 function args(overrides = {}) {
   return {
@@ -159,5 +160,18 @@ describe('useMPStuckCoach', () => {
     const first = result.current;
     rerender();
     expect(result.current).toBe(first);
+  });
+
+  it('stays quiet while a mode coach card is on screen, and counts idle only from its dismissal', () => {
+    setCoachOnScreen(true);
+    const { result } = renderHook(() => useMPStuckCoach(args()));
+    act(() => { vi.advanceTimersByTime(20_000); });
+    expect(result.current.visible).toBe(false);
+
+    act(() => { setCoachOnScreen(false); vi.advanceTimersByTime(5_000); });
+    expect(result.current.visible).toBe(false);
+
+    act(() => { vi.advanceTimersByTime(10_000); });
+    expect(result.current.stage).toBe('idle-nudge');
   });
 });

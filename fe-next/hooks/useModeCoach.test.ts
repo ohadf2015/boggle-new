@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useModeCoach } from './useModeCoach';
-import { coachStorageKey } from '@/lib/tutorial/modeCoachStore';
+import { coachStorageKey, isCoachOnScreen } from '@/lib/tutorial/modeCoachStore';
 
 // Non-blocking FTUE: shows once per mode on a device's first visit, after a settle delay.
 describe('useModeCoach', () => {
@@ -63,5 +63,20 @@ describe('useModeCoach', () => {
     });
     act(() => result.current.dismiss());
     expect(result.current.visible).toBe(false);
+  });
+
+  it('flags the card as on screen while visible, and clears it on dismiss and unmount', () => {
+    const { result, unmount } = renderHook(() => useModeCoach('classic', { settleMs: 10 }));
+    act(() => { vi.advanceTimersByTime(10); });
+    expect(isCoachOnScreen()).toBe(true);
+    act(() => { result.current.dismiss(); });
+    expect(isCoachOnScreen()).toBe(false);
+    window.localStorage.clear();
+    const second = renderHook(() => useModeCoach('blast', { settleMs: 10 }));
+    act(() => { vi.advanceTimersByTime(10); });
+    expect(isCoachOnScreen()).toBe(true);
+    second.unmount();
+    expect(isCoachOnScreen()).toBe(false);
+    unmount();
   });
 });
