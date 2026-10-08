@@ -7,7 +7,17 @@ import type { CurriculumSubject, GradeLevel, Language, VocabularyLevel } from '@
 export const CURRICULUM_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 export type CurriculumLocale = (typeof CURRICULUM_LOCALES)[number];
 /** Extra seed files that add lists to a locale through their own migration. */
-export const CURRICULUM_SUPPLEMENTS = ['en-grade3'] as const;
+export const CURRICULUM_SUPPLEMENTS = [
+  'en-grade3',
+  'ja-expansion',
+  'sv-expansion',
+  'ru-starter',
+  'en-upper',
+  'he-upper',
+  'es-upper',
+  'ru-upper-a',
+  'ru-upper-b',
+] as const;
 export type CurriculumSeedName = CurriculumLocale | (typeof CURRICULUM_SUPPLEMENTS)[number];
 export const CURRICULUM_SEEDS: readonly CurriculumSeedName[] = [...CURRICULUM_LOCALES, ...CURRICULUM_SUPPLEMENTS];
 
@@ -32,7 +42,7 @@ export interface CurriculumSeedList {
 }
 
 export interface CurriculumSeedFile {
-  language: CurriculumLocale;
+  language: Language;
   /** Data file name when it differs from the language, e.g. a supplement. */
   source?: string;
   migration: string;

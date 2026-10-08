@@ -1,0 +1,111 @@
+{
+  "language": "en",
+  "source": "en-upper",
+  "migration": "20261008100000_curriculum_v2_en_upper.sql",
+  "lists": [
+    {
+      "code": "LC-EN-G1-SCHOOL",
+      "name": "Grade 1 — Things at School",
+      "description": "Everyday words from the classroom and the schoolyard. Each word has a simple meaning and a sentence to read aloud.",
+      "language": "en",
+      "grade": "grade_1",
+      "subject": "english",
+      "words": [
+        { "word": "pencil", "level": "support", "definition": "A tool with graphite inside that you use to write or draw", "example": "I sharpened my pencil before the spelling test." },
+        { "word": "desk", "level": "support", "definition": "A table where a student sits and works", "example": "My name is written on the top of my desk." },
+        { "word": "eraser", "level": "support", "definition": "A small rubber piece that rubs out pencil marks", "example": "Use the eraser if you make a mistake." },
+        { "word": "friend", "level": "support", "definition": "A person you like and enjoy spending time with", "example": "My best friend sits next to me at lunch." },
+        { "word": "crayon", "level": "core", "definition": "A stick of colored wax used for drawing", "example": "She drew a rainbow with a red crayon." },
+        { "word": "ruler", "level": "core", "definition": "A straight tool used to measure length or draw straight lines", "example": "Measure the line with a ruler, not with your fingers." },
+        { "word": "paper", "level": "core", "definition": "Thin sheets used for writing, drawing, or printing", "example": "Please put your name at the top of the paper." },
+        { "word": "lunch", "level": "core", "definition": "The meal eaten in the middle of the school day", "example": "I packed a cheese sandwich for lunch today." },
+        { "word": "teacher", "level": "core", "definition": "A person who helps students learn at school", "example": "Our teacher reads a story every morning." },
+        { "word": "library", "level": "core", "definition": "A room full of books that you can borrow", "example": "We visit the library every Friday to choose a book." },
+        { "word": "chair", "level": "core", "definition": "A seat with a back, meant for one person", "example": "Please push your chair under the table when you leave." },
+        { "word": "backpack", "level": "core", "definition": "A bag you wear on your back to carry school things", "example": "My backpack felt heavy with all my books." },
+        { "word": "glue", "level": "core", "definition": "A sticky liquid that holds paper or other things together", "example": "Use a little glue to stick the picture on the card." },
+        { "word": "recess", "level": "challenge", "definition": "A break from class when children play outside", "example": "At recess we played tag on the big field." },
+        { "word": "homework", "level": "challenge", "definition": "Work that students finish at home after school", "example": "I finished my homework before dinner." },
+        { "word": "marker", "level": "challenge", "definition": "A pen with thick, colored ink", "example": "The teacher wrote the date on the board with a black marker." }
+      ]
+    },
+    {
+      "code": "LC-EN-G9-CIVICS",
+      "name": "Grade 9 — How Governments Work",
+      "description": "Words from civics and history about voting, laws and how countries are run. Each word has a plain meaning and a sentence about a real situation.",
+      "language": "en",
+      "grade": "grade_9",
+      "subject": "history",
+      "words": [
+        { "word": "vote", "level": "support", "definition": "To choose a leader or make a decision by casting a ballot", "example": "Every citizen over eighteen can vote in the election." },
+        { "word": "law", "level": "support", "definition": "A rule that everyone in a country must follow", "example": "It is against the law to drive through a red light." },
+        { "word": "nation", "level": "support", "definition": "A large group of people who share a country, history, and language", "example": "The nation celebrated its independence with parades." },
+        { "word": "citizen", "level": "support", "definition": "A person who belongs to a country and has its rights", "example": "Every citizen has the right to a fair trial." },
+        { "word": "democracy", "level": "core", "definition": "A system where people choose their leaders through voting", "example": "In a democracy, the people decide who runs the government." },
+        { "word": "republic", "level": "core", "definition": "A country led by elected leaders instead of a king", "example": "The country became a republic after the king gave up power." },
+        { "word": "constitution", "level": "core", "definition": "The basic set of rules that defines how a country is governed", "example": "The constitution protects freedom of speech." },
+        { "word": "amendment", "level": "core", "definition": "A change added to a constitution or a law", "example": "The amendment gave women the right to vote." },
+        { "word": "treaty", "level": "core", "definition": "A formal agreement signed by two or more countries", "example": "The two countries signed a peace treaty in 1919." },
+        { "word": "colony", "level": "core", "definition": "A place ruled by people from another country", "example": "The colony wanted to govern itself after many years." },
+        { "word": "revolution", "level": "core", "definition": "A sudden, large change in government, often by force", "example": "The revolution changed the country's laws forever." },
+        { "word": "census", "level": "core", "definition": "An official count of all the people living in a country", "example": "The census counts how many people live in each city." },
+        { "word": "legislature", "level": "core", "definition": "The group of people in a country who make the laws", "example": "The legislature debated the new tax law for weeks." },
+        { "word": "sovereignty", "level": "challenge", "definition": "The power of a country to govern itself", "example": "The country fought hard to protect its sovereignty." },
+        { "word": "ratify", "level": "challenge", "definition": "To officially approve an agreement or a constitution", "example": "The states voted to ratify the new constitution." },
+        { "word": "veto", "level": "challenge", "definition": "A leader's power to stop a law from passing", "example": "The president decided to veto the bill." }
+      ]
+    },
+    {
+      "code": "LC-EN-G11-WORDS",
+      "name": "Grade 11 — Words for People and Ideas",
+      "description": "Precise words for describing character, arguments and thinking. Each word comes with a clear definition and a sentence that shows how it is used.",
+      "language": "en",
+      "grade": "grade_11",
+      "subject": "english",
+      "words": [
+        { "word": "honest", "level": "support", "definition": "Telling the truth and not hiding anything", "example": "An honest answer is better than a clever lie." },
+        { "word": "brief", "level": "support", "definition": "Short in length or time", "example": "The coach gave a brief talk before the game." },
+        { "word": "careful", "level": "support", "definition": "Paying close attention to avoid mistakes or harm", "example": "She was careful not to spill the paint." },
+        { "word": "calm", "level": "support", "definition": "Relaxed and not upset, even under pressure", "example": "The pilot stayed calm during the storm." },
+        { "word": "candid", "level": "core", "definition": "Open and direct, even when the truth is uncomfortable", "example": "He gave me a candid review of my essay." },
+        { "word": "eloquent", "level": "core", "definition": "Speaking or writing in a clear, graceful, and powerful way", "example": "The eloquent speaker won the whole room over." },
+        { "word": "pragmatic", "level": "core", "definition": "Dealing with problems in a practical, realistic way", "example": "The team chose a pragmatic plan instead of an ideal one." },
+        { "word": "resilient", "level": "core", "definition": "Able to recover quickly from difficulty", "example": "Young children are often more resilient than adults expect." },
+        { "word": "skeptical", "level": "core", "definition": "Doubting a claim until there is good proof", "example": "The judge was skeptical of the witness's story." },
+        { "word": "meticulous", "level": "core", "definition": "Showing great attention to every small detail", "example": "The engineer was meticulous about every measurement." },
+        { "word": "persuasive", "level": "core", "definition": "Able to convince others to believe or do something", "example": "Her persuasive argument changed everyone's mind." },
+        { "word": "reluctant", "level": "core", "definition": "Unwilling to do something and hesitant about it", "example": "He was reluctant to admit that he had lost." },
+        { "word": "concise", "level": "core", "definition": "Expressing a lot in only a few words", "example": "A good summary is short and concise." },
+        { "word": "benevolent", "level": "challenge", "definition": "Kind and wanting to help other people", "example": "The benevolent old man shared his food with anyone who asked." },
+        { "word": "ubiquitous", "level": "challenge", "definition": "Found everywhere at the same time", "example": "Smartphones have become ubiquitous in modern life." },
+        { "word": "lucid", "level": "challenge", "definition": "Clear and easy to understand", "example": "The teacher gave a lucid explanation of the theorem." }
+      ]
+    },
+    {
+      "code": "LC-EN-G12-ECONOMY",
+      "name": "Grade 12 — Money and the Economy",
+      "description": "The money words you meet in real life and in economics class, from saving a few coins to national prices. Each word has a clear meaning and a sentence to show it in use.",
+      "language": "en",
+      "grade": "grade_12",
+      "subject": "general",
+      "words": [
+        { "word": "money", "level": "support", "definition": "Coins and notes that people use to buy things", "example": "I saved my money to buy a new bike." },
+        { "word": "price", "level": "support", "definition": "The amount of money someone pays for something", "example": "The price of bread went up this year." },
+        { "word": "job", "level": "support", "definition": "Regular work that a person does to earn money", "example": "My aunt got a new job at the hospital." },
+        { "word": "savings", "level": "support", "definition": "Money kept aside for later use", "example": "Our savings will pay for the trip next summer." },
+        { "word": "budget", "level": "core", "definition": "A plan for how much money to spend and how much to save", "example": "We made a budget for groceries each month." },
+        { "word": "profit", "level": "core", "definition": "Money a business keeps after paying its costs", "example": "The shop made a profit this year." },
+        { "word": "debt", "level": "core", "definition": "Money that a person owes to someone else", "example": "He finally paid off his debt to the bank." },
+        { "word": "wage", "level": "core", "definition": "Money paid to a worker for their work", "example": "The new wage helps families pay the rent." },
+        { "word": "market", "level": "core", "definition": "A place or system where goods are bought and sold", "example": "The farmers sold fresh vegetables at the market." },
+        { "word": "supply", "level": "core", "definition": "The amount of a product that is available to buy", "example": "When the supply of corn is low, prices rise." },
+        { "word": "demand", "level": "core", "definition": "How many people want to buy a product", "example": "High demand for the game sold out the stock." },
+        { "word": "invest", "level": "core", "definition": "To put money into something to earn more money later", "example": "She decided to invest in a small company." },
+        { "word": "interest", "level": "core", "definition": "Extra money paid for borrowing or for keeping money in a bank", "example": "The bank paid interest on my savings account." },
+        { "word": "inflation", "level": "challenge", "definition": "A general rise in prices over time", "example": "Inflation means your money buys less than it did before." },
+        { "word": "tariff", "level": "challenge", "definition": "A tax on goods brought into a country from abroad", "example": "The government added a tariff on imported steel." },
+        { "word": "deficit", "level": "challenge", "definition": "A situation where spending is larger than the money coming in", "example": "The country ran a deficit after the expensive war." }
+      ]
+    }
+  ]
+}
