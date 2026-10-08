@@ -4,6 +4,7 @@
  */
 
 import logger from './logger';
+import { gameCleanupEmitter } from '../events/gameCleanup';
 
 // ==========================================
 // Type Definitions
@@ -508,6 +509,10 @@ class GameStartCoordinator {
     return this.activeSequences.has(gameCode);
   }
 
+  getActiveSequenceCount(): number {
+    return this.activeSequences.size;
+  }
+
   /**
    * Clear all active sequences (for graceful shutdown or tests).
    * Cancels all timeouts to prevent orphaned callbacks.
@@ -521,6 +526,15 @@ class GameStartCoordinator {
 
 // Export singleton instance
 const gameStartCoordinator = new GameStartCoordinator();
+
+// deleteGame emits gameDeleted without going through start/reset handlers, so
+// leftover sequences (and their timeout closures) used to survive every
+// host-timeout / empty-room teardown. Subscribe here so EVERY deleteGame path
+// drops the map entry.
+gameCleanupEmitter.onGameDeleted(({ gameCode }) => {
+  gameStartCoordinator.cleanupSequence(gameCode);
+});
+
 export default gameStartCoordinator;
 export { GameStartCoordinator };
 export type { GameStartSequence, AcknowledgmentResult, DisconnectResult, TimeoutStats, SequenceStats };

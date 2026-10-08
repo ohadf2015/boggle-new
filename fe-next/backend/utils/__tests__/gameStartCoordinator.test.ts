@@ -516,4 +516,20 @@ describe('GameStartCoordinator', () => {
       expect(onTimeout).not.toHaveBeenCalled();
     });
   });
+
+  // ==========================================
+  // Retention: timer-start does not drop the sequence
+  // ==========================================
+
+  describe('sequence retention after timer start', () => {
+    it('keeps the sequence in the map after allReady — cleanupSequence is required', () => {
+      const messageId = coordinator.initializeSequence('GAME1', ['alice'], 60);
+      const result = coordinator.recordAcknowledgment('GAME1', 'alice', messageId);
+      expect(result.allReady).toBe(true);
+      expect(coordinator.hasActiveSequence('GAME1')).toBe(true);
+      expect(coordinator.getActiveSequenceCount()).toBe(1);
+      coordinator.cleanupSequence('GAME1');
+      expect(coordinator.getActiveSequenceCount()).toBe(0);
+    });
+  });
 });
