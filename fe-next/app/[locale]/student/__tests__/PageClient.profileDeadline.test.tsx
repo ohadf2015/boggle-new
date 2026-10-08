@@ -28,8 +28,6 @@ vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: stri
 vi.mock('@/hooks/useStudentClassroom', () => ({ useStudentClassroom: () => ({ classroomId: null }) }));
 vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => null }));
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div data-testid="loader" /> }));
-vi.mock('@/components/student/StudentHubPlayZone', () => ({ StudentHubPlayZone: () => null }));
-vi.mock('@/components/student/StudentHubProgressZone', () => ({ StudentHubProgressZone: () => null }));
 // The hub itself is the Academy Map now; the guard only cares that it renders.
 vi.mock('@/components/student/academy/AcademyHub', () => ({ AcademyHub: () => <div data-testid="hub" /> }));
 vi.mock('@/components/student/ClassroomGameBanner', () => ({ ClassroomGameBanner: () => null }));
