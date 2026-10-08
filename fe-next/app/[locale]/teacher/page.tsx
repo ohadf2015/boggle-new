@@ -16,8 +16,9 @@ export default async function TeacherPage({ params }: { params: Promise<{ locale
   const { locale } = await params;
   return (
     <>
-      <PublicTeacherPayCta locale={locale} />
       <TeacherPageClient />
+      {/* After the HQ, never above it: it unmounts once a teacher profile resolves, and above the gate's loader that collapse shifted the whole page (CLS). */}
+      <PublicTeacherPayCta locale={locale} />
     </>
   );
 }
