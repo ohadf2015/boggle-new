@@ -107,6 +107,83 @@ const he = {
     }
   },
   // @eg6Land:end
+  // @economy:start
+  "economy": {
+      "chest": {
+        "title": "ארגז אוצר",
+        "open": "פתח",
+        "xp": "+{xp} XP",
+        "rarity": {
+          "common": "נפוץ",
+          "rare": "נדיר",
+          "epic": "אפי"
+        },
+        "odds": {
+          "label": "סיכויי הארגז"
+        },
+        "continue": "המשך",
+        "tapToOpen": "הקש לפתיחה"
+      },
+      "reward": {
+        "title": "פרס הסבב",
+        "ready": "ארגז האוצר מוכן",
+        "collected": "ארגז נאסף",
+        "round": "הסבב הזה: {cash} כסף",
+        "rank": "#{rank} מתוך {size} בסבב הזה"
+      },
+      "locker": {
+        "title": "האוסף שלך",
+        "added": "נוסף לאוסף שלך"
+      },
+      "shop": {
+        "title": "שדרוגים",
+        "cash": "כסף: {cash}",
+        "cost": "מחיר: {cost}",
+        "doubleCash": {
+          "name": "כסף כפול",
+          "desc": "פי 2 כסף במשך 30 שניות. רק לך."
+        },
+        "streakShield": {
+          "name": "מגן רצף",
+          "desc": "התשובה השגויה הבאה לא תשבור את הרצף שלך."
+        },
+        "hintReveal": {
+          "name": "רמז",
+          "desc": "מציג את האות הראשונה של מילת שיעור."
+        }
+      },
+      "hud": {
+        "cash": "כסף: {cash}",
+        "multiplier": "x{multiplier}",
+        "doubleCash": "פי 2 ל-{seconds} שנ׳",
+        "loading": "טוען כסף…"
+      },
+      "board": {
+        "title": "לוח הכיתה",
+        "empty": "הניקוד יופיע אחרי המילה הראשונה.",
+        "you": "אתה במקום {rank} עם {cash} כסף"
+      },
+      "hint": {
+        "text": "רמז: מתחילה ב-“{letter}”, {length} אותיות",
+        "use": "השתמש ברמז ({count})"
+      },
+      "sheet": {
+        "close": "סגור"
+      },
+      "error": {
+        "power_ups_off": "השדרוגים כבויים בכיתה הזו",
+        "insufficient_cash": "אין מספיק כסף עדיין",
+        "already_active": "כבר פעיל",
+        "already_held": "כבר יש לך אחד",
+        "unknown_power_up": "שדרוג לא מוכר",
+        "unavailable": "המערכת לא זמינה כרגע",
+        "no_hint": "אין רמז לשימוש",
+        "not_teacher": "רק המורה יכול לשנות את זה",
+        "no_lesson_words": "אין מילות שיעור לרמז",
+        "error": "משהו השתבש"
+      }
+    },
+  // @economy:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

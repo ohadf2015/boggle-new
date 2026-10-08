@@ -23,6 +23,8 @@ export type { PowerUpId };
 export interface EconomyState {
   cash: number;
   cashEarned: number;
+  /** Cash earned in the round named by roundId. Resets at the round boundary. */
+  roundCash: number;
   streak: number;
   roundId: string | null;
   doubleCashUntil: number | null;
@@ -36,6 +38,7 @@ export function emptyEconomyState(): EconomyState {
   return {
     cash: 0,
     cashEarned: 0,
+    roundCash: 0,
     streak: 0,
     roundId: null,
     doubleCashUntil: null,
@@ -57,7 +60,7 @@ export function streakMultiplier(streak: number): 1 | 2 | 3 {
 
 export function applyRoundBoundary(state: EconomyState, roundId: string): EconomyState {
   if (state.roundId === roundId) return state;
-  return { ...state, roundId, streak: 0, shieldHeld: false, doubleCashUntil: null };
+  return { ...state, roundId, roundCash: 0, streak: 0, shieldHeld: false, doubleCashUntil: null };
 }
 
 export function recordCorrectWord(
@@ -69,7 +72,7 @@ export function recordCorrectWord(
   const doubled = state.doubleCashUntil !== null && input.now < state.doubleCashUntil ? 2 : 1;
   const delta = wordCash(input) * multiplier * doubled;
   return {
-    state: { ...state, streak, cash: state.cash + delta, cashEarned: state.cashEarned + delta },
+    state: { ...state, streak, cash: state.cash + delta, cashEarned: state.cashEarned + delta, roundCash: state.roundCash + delta },
     delta,
     multiplier,
     streak,
@@ -145,4 +148,19 @@ export function rollChest(seed: string): ChestRoll {
   const pool = poolFor(rarity);
   const pick = Math.floor(hash01(`item:${seed}`) * pool.length) % pool.length;
   return { rarity, xp: CHEST_XP[rarity], itemId: pool[pick] };
+}
+
+/** One student's cash and placing in one round. Rank is null when they earned nothing in it. */
+export function roundStanding(
+  all: Record<string, EconomyState>,
+  roundId: string,
+  userId: string
+): { roundCash: number; rank: number | null; size: number } {
+  const earners = Object.entries(all)
+    .filter(([, s]) => s.roundId === roundId && s.roundCash > 0)
+    .sort((a, b) => b[1].roundCash - a[1].roundCash);
+  const index = earners.findIndex(([uid]) => uid === userId);
+  const own = all[userId];
+  const roundCash = own && own.roundId === roundId ? own.roundCash : 0;
+  return { roundCash, rank: index === -1 ? null : index + 1, size: earners.length };
 }

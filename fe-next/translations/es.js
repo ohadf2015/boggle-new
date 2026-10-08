@@ -107,6 +107,83 @@ const es = {
     }
   },
   // @eg6Land:end
+  // @economy:start
+  "economy": {
+      "chest": {
+        "title": "Cofre del tesoro",
+        "open": "Abrir",
+        "xp": "+{xp} XP",
+        "rarity": {
+          "common": "Común",
+          "rare": "Raro",
+          "epic": "Épico"
+        },
+        "odds": {
+          "label": "Probabilidades del cofre"
+        },
+        "continue": "Continuar",
+        "tapToOpen": "Toca para abrir"
+      },
+      "reward": {
+        "title": "Recompensa de la ronda",
+        "ready": "Cofre listo",
+        "collected": "Cofre recogido",
+        "round": "Esta ronda: {cash} dinero",
+        "rank": "#{rank} de {size} en esta ronda"
+      },
+      "locker": {
+        "title": "Tu cofre",
+        "added": "Añadido a tu cofre"
+      },
+      "shop": {
+        "title": "Potenciadores",
+        "cash": "Dinero: {cash}",
+        "cost": "Coste: {cost}",
+        "doubleCash": {
+          "name": "Doble dinero",
+          "desc": "2x de dinero durante 30 segundos. Solo para ti."
+        },
+        "streakShield": {
+          "name": "Escudo de racha",
+          "desc": "Tu próxima respuesta incorrecta no rompe la racha."
+        },
+        "hintReveal": {
+          "name": "Pista",
+          "desc": "Muestra la primera letra de una palabra de la lección."
+        }
+      },
+      "hud": {
+        "cash": "Dinero: {cash}",
+        "multiplier": "x{multiplier}",
+        "doubleCash": "2x {seconds} s",
+        "loading": "Cargando dinero…"
+      },
+      "board": {
+        "title": "Tabla de la clase",
+        "empty": "Las puntuaciones aparecen tras la primera palabra.",
+        "you": "Eres #{rank} con {cash} de dinero"
+      },
+      "hint": {
+        "text": "Pista: empieza por «{letter}», {length} letras",
+        "use": "Usar pista ({count})"
+      },
+      "sheet": {
+        "close": "Cerrar"
+      },
+      "error": {
+        "power_ups_off": "Los potenciadores están desactivados en esta clase",
+        "insufficient_cash": "Aún no tienes dinero suficiente",
+        "already_active": "Ya está activo",
+        "already_held": "Ya tienes uno",
+        "unknown_power_up": "Potenciador desconocido",
+        "unavailable": "La economía no está disponible ahora",
+        "no_hint": "No hay pista que usar",
+        "not_teacher": "Solo el profesor puede cambiar esto",
+        "no_lesson_words": "No hay palabras de lección para una pista",
+        "error": "Algo salió mal"
+      }
+    },
+  // @economy:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

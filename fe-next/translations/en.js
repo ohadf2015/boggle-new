@@ -107,6 +107,83 @@ const en = {
     }
   },
   // @eg6Land:end
+  // @economy:start
+  "economy": {
+      "chest": {
+        "title": "Treasure chest",
+        "open": "Open",
+        "xp": "+{xp} XP",
+        "rarity": {
+          "common": "Common",
+          "rare": "Rare",
+          "epic": "Epic"
+        },
+        "odds": {
+          "label": "Chest odds"
+        },
+        "continue": "Continue",
+        "tapToOpen": "Tap to open"
+      },
+      "reward": {
+        "title": "Round reward",
+        "ready": "Treasure chest ready",
+        "collected": "Chest collected",
+        "round": "This round: {cash} cash",
+        "rank": "#{rank} of {size} this round"
+      },
+      "locker": {
+        "title": "Your locker",
+        "added": "Added to your locker"
+      },
+      "shop": {
+        "title": "Power-ups",
+        "cash": "Cash: {cash}",
+        "cost": "Cost: {cost}",
+        "doubleCash": {
+          "name": "Double cash",
+          "desc": "2x cash for 30 seconds. Only you."
+        },
+        "streakShield": {
+          "name": "Streak shield",
+          "desc": "Your next wrong answer keeps your streak."
+        },
+        "hintReveal": {
+          "name": "Hint",
+          "desc": "Shows the first letter of a lesson word."
+        }
+      },
+      "hud": {
+        "cash": "Cash: {cash}",
+        "multiplier": "x{multiplier}",
+        "doubleCash": "2x {seconds}s",
+        "loading": "Loading cash…"
+      },
+      "board": {
+        "title": "Class board",
+        "empty": "Scores appear after the first word.",
+        "you": "You are #{rank} with {cash} cash"
+      },
+      "hint": {
+        "text": "Hint: starts with “{letter}”, {length} letters",
+        "use": "Use hint ({count})"
+      },
+      "sheet": {
+        "close": "Close"
+      },
+      "error": {
+        "power_ups_off": "Power-ups are off for this class",
+        "insufficient_cash": "Not enough cash yet",
+        "already_active": "Already active",
+        "already_held": "You already hold one",
+        "unknown_power_up": "Unknown power-up",
+        "unavailable": "Economy is unavailable right now",
+        "no_hint": "No hint to use",
+        "not_teacher": "Only the teacher can change this",
+        "no_lesson_words": "No lesson words for a hint",
+        "error": "Something went wrong"
+      }
+    },
+  // @economy:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

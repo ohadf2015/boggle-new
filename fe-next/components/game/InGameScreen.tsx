@@ -39,6 +39,7 @@ import {
 
 // Extracted sub-components
 import { PortraitLayout } from './in-game/components';
+import ClassroomEconomyDock from '@/components/education/economy/ClassroomEconomyDock';
 import { isClassroomStudentPlay as resolveClassroomStudentPlay } from '@/lib/education/classroomPlaySurface';
 import type { RoundEventState } from './in-game/components/RoundEventOverlay';
 import type { SpecialWordEvent } from './in-game/components/SpecialWordToast';
@@ -707,6 +708,7 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
   // Portrait/Desktop Layout
   return (
     <>
+      {isClassroomStudentPlay && gameCode && <ClassroomEconomyDock gameCode={gameCode} />}
       <PortraitLayout
         {...sharedLayoutProps}
         gameCode={gameCode}

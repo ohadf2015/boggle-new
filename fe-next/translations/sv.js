@@ -107,6 +107,83 @@ const sv = {
     }
   },
   // @eg6Land:end
+  // @economy:start
+  "economy": {
+      "chest": {
+        "title": "Skattkista",
+        "open": "Öppna",
+        "xp": "+{xp} XP",
+        "rarity": {
+          "common": "Vanlig",
+          "rare": "Sällsynt",
+          "epic": "Episk"
+        },
+        "odds": {
+          "label": "Chanser i kistan"
+        },
+        "continue": "Fortsätt",
+        "tapToOpen": "Tryck för att öppna"
+      },
+      "reward": {
+        "title": "Rundans belöning",
+        "ready": "Skattkistan är redo",
+        "collected": "Kistan är hämtad",
+        "round": "Den här rundan: {cash} pengar",
+        "rank": "#{rank} av {size} i den här rundan"
+      },
+      "locker": {
+        "title": "Ditt skåp",
+        "added": "Tillagd i ditt skåp"
+      },
+      "shop": {
+        "title": "Power-ups",
+        "cash": "Pengar: {cash}",
+        "cost": "Pris: {cost}",
+        "doubleCash": {
+          "name": "Dubbla pengar",
+          "desc": "2x pengar i 30 sekunder. Bara för dig."
+        },
+        "streakShield": {
+          "name": "Seriesköld",
+          "desc": "Ditt nästa felsvar bryter inte din serie."
+        },
+        "hintReveal": {
+          "name": "Ledtråd",
+          "desc": "Visar första bokstaven i ett lektionsord."
+        }
+      },
+      "hud": {
+        "cash": "Pengar: {cash}",
+        "multiplier": "x{multiplier}",
+        "doubleCash": "2x {seconds} s",
+        "loading": "Laddar pengar…"
+      },
+      "board": {
+        "title": "Klassens ställning",
+        "empty": "Poängen visas efter första ordet.",
+        "you": "Du är #{rank} med {cash} i pengar"
+      },
+      "hint": {
+        "text": "Ledtråd: börjar med ”{letter}”, {length} bokstäver",
+        "use": "Använd ledtråd ({count})"
+      },
+      "sheet": {
+        "close": "Stäng"
+      },
+      "error": {
+        "power_ups_off": "Power-ups är avstängda i den här klassen",
+        "insufficient_cash": "Inte tillräckligt med pengar ännu",
+        "already_active": "Redan aktiv",
+        "already_held": "Du har redan en",
+        "unknown_power_up": "Okänd power-up",
+        "unavailable": "Ekonomin är otillgänglig just nu",
+        "no_hint": "Ingen ledtråd att använda",
+        "not_teacher": "Bara läraren kan ändra detta",
+        "no_lesson_words": "Inga lektionsord till en ledtråd",
+        "error": "Något gick fel"
+      }
+    },
+  // @economy:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

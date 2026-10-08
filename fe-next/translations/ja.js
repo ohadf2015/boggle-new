@@ -107,6 +107,83 @@ const ja = {
     }
   },
   // @eg6Land:end
+  // @economy:start
+  "economy": {
+      "chest": {
+        "title": "宝箱",
+        "open": "開く",
+        "xp": "+{xp} XP",
+        "rarity": {
+          "common": "コモン",
+          "rare": "レア",
+          "epic": "エピック"
+        },
+        "odds": {
+          "label": "宝箱の確率"
+        },
+        "continue": "つづける",
+        "tapToOpen": "タップして開く"
+      },
+      "reward": {
+        "title": "ラウンド報酬",
+        "ready": "宝箱が準備できました",
+        "collected": "宝箱を獲得",
+        "round": "このラウンド: {cash} 所持金",
+        "rank": "このラウンド {size}人中 {rank}位"
+      },
+      "locker": {
+        "title": "ロッカー",
+        "added": "ロッカーに追加されました"
+      },
+      "shop": {
+        "title": "パワーアップ",
+        "cash": "所持金: {cash}",
+        "cost": "価格: {cost}",
+        "doubleCash": {
+          "name": "ダブルキャッシュ",
+          "desc": "30秒間、獲得金額が2倍。自分だけ。"
+        },
+        "streakShield": {
+          "name": "連続シールド",
+          "desc": "次の不正解でも連続記録が途切れない。"
+        },
+        "hintReveal": {
+          "name": "ヒント",
+          "desc": "レッスンの単語の最初の文字を表示。"
+        }
+      },
+      "hud": {
+        "cash": "所持金: {cash}",
+        "multiplier": "x{multiplier}",
+        "doubleCash": "2倍 残り{seconds}秒",
+        "loading": "所持金を読み込み中…"
+      },
+      "board": {
+        "title": "クラスランキング",
+        "empty": "最初の単語の後にスコアが表示されます。",
+        "you": "あなたは{cash}で{rank}位"
+      },
+      "hint": {
+        "text": "ヒント: 「{letter}」で始まる、{length}文字",
+        "use": "ヒントを使う（{count}）"
+      },
+      "sheet": {
+        "close": "閉じる"
+      },
+      "error": {
+        "power_ups_off": "このクラスではパワーアップは無効です",
+        "insufficient_cash": "まだ所持金が足りません",
+        "already_active": "すでに有効です",
+        "already_held": "すでに持っています",
+        "unknown_power_up": "不明なパワーアップ",
+        "unavailable": "今は利用できません",
+        "no_hint": "使えるヒントがありません",
+        "not_teacher": "先生だけが変更できます",
+        "no_lesson_words": "ヒント用のレッスン単語がありません",
+        "error": "問題が発生しました"
+      }
+    },
+  // @economy:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

@@ -9,6 +9,7 @@ import {
   recordCorrectWord,
   recordWrongWord,
   rollChest,
+  roundStanding,
   streakMultiplier,
   useHint,
   wordCash,
@@ -202,5 +203,30 @@ describe('chest odds and roll', () => {
     const chest = rollChest('ABC:r1:u9');
     expect(chest.itemId).toMatch(/^[a-z0-9-]+$/);
     expect(chest.xp).toBeGreaterThan(0);
+  });
+});
+
+describe('round cash', () => {
+  it('Given cash earned in round r1, When round r2 starts, Then roundCash resets and cashEarned carries', () => {
+    const r1 = applyRoundBoundary(emptyEconomyState(), 'r1');
+    const afterWord = recordCorrectWord(r1, { wordLength: 5, fromLesson: false, now: NOW }).state;
+    const r2 = applyRoundBoundary(afterWord, 'r2');
+    expect(afterWord.roundCash).toBe(afterWord.cashEarned);
+    expect(r2.roundCash).toBe(0);
+    expect(r2.cashEarned).toBe(afterWord.cashEarned);
+  });
+});
+
+describe('roundStanding', () => {
+  const withRound = (roundId: string, roundCash: number) => ({ ...emptyEconomyState(), roundId, roundCash, cashEarned: roundCash });
+
+  it('Given three students earned in r1, When asked for the second, Then rank 2 of 3 with that round cash', () => {
+    const all = { a: withRound('r1', 9), b: withRound('r1', 14), c: withRound('r1', 4) };
+    expect(roundStanding(all, 'r1', 'a')).toEqual({ roundCash: 9, rank: 2, size: 3 });
+  });
+
+  it('Given a student who did not earn in this round, Then rank is null and their round cash is zero', () => {
+    const all = { a: withRound('r1', 9), b: withRound('r0', 30) };
+    expect(roundStanding(all, 'r1', 'b')).toEqual({ roundCash: 0, rank: null, size: 1 });
   });
 });

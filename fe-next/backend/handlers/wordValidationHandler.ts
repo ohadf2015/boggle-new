@@ -32,6 +32,7 @@ import { makePositionsMap } from '../modules/wordValidator.js';
 import { isLessonWord } from '../utils/lessonVocabulary.js';
 import { computeRushBonus } from '../modules/rushTiles/rushTilesLogic.js';
 import { scoreAcceptedWord, blastTileBonusFor } from '../modules/wordScore.js';
+import { economyOnWordAccepted, economyUserIdOf, roundIdOf } from './classroomEconomyHandler.js';
 import type { BlastTileType } from '@/shared/types/blast';
 import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
@@ -89,6 +90,17 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // validated lesson word is the rare case, and covering it means emitting to a
   // socket that path does not currently hold.
   const lessonBonus = lessonWordBonus(fromLesson);
+
+  const economyUserId = economyUserIdOf(socket);
+  if (economyUserId) {
+    void economyOnWordAccepted(socket, {
+      gameCode,
+      roundId: roundIdOf(game, gameCode),
+      userId: economyUserId,
+      word: normalizedWord,
+      fromLesson,
+    });
+  }
 
   // Blast: the special tiles on this word's path. Non-null marks a Blast word
   // (which also earns the letter-value bonus); tiles stay [] if the lookup fails.

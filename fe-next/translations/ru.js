@@ -107,6 +107,83 @@ const ru = {
     }
   },
   // @eg6Land:end
+  // @economy:start
+  "economy": {
+      "chest": {
+        "title": "Сундук с наградой",
+        "open": "Открыть",
+        "xp": "+{xp} XP",
+        "rarity": {
+          "common": "Обычный",
+          "rare": "Редкий",
+          "epic": "Эпический"
+        },
+        "odds": {
+          "label": "Шансы сундука"
+        },
+        "continue": "Продолжить",
+        "tapToOpen": "Нажми, чтобы открыть"
+      },
+      "reward": {
+        "title": "Награда за раунд",
+        "ready": "Сундук готов",
+        "collected": "Сундук получен",
+        "round": "Этот раунд: {cash} денег",
+        "rank": "#{rank} из {size} в этом раунде"
+      },
+      "locker": {
+        "title": "Твоя ячейка",
+        "added": "Добавлено в твою ячейку"
+      },
+      "shop": {
+        "title": "Усиления",
+        "cash": "Деньги: {cash}",
+        "cost": "Цена: {cost}",
+        "doubleCash": {
+          "name": "Двойные деньги",
+          "desc": "2x деньги 30 секунд. Только для вас."
+        },
+        "streakShield": {
+          "name": "Щит серии",
+          "desc": "Следующий неверный ответ не сбросит серию."
+        },
+        "hintReveal": {
+          "name": "Подсказка",
+          "desc": "Показывает первую букву слова из урока."
+        }
+      },
+      "hud": {
+        "cash": "Деньги: {cash}",
+        "multiplier": "x{multiplier}",
+        "doubleCash": "2x {seconds} с",
+        "loading": "Загрузка денег…"
+      },
+      "board": {
+        "title": "Таблица класса",
+        "empty": "Очки появятся после первого слова.",
+        "you": "Вы #{rank} с {cash} деньгами"
+      },
+      "hint": {
+        "text": "Подсказка: начинается на «{letter}», букв: {length}",
+        "use": "Использовать подсказку ({count})"
+      },
+      "sheet": {
+        "close": "Закрыть"
+      },
+      "error": {
+        "power_ups_off": "Усиления выключены для этого класса",
+        "insufficient_cash": "Пока недостаточно денег",
+        "already_active": "Уже активно",
+        "already_held": "Уже есть одно",
+        "unknown_power_up": "Неизвестное усиление",
+        "unavailable": "Экономика сейчас недоступна",
+        "no_hint": "Нет подсказки для использования",
+        "not_teacher": "Это может изменить только учитель",
+        "no_lesson_words": "Нет слов урока для подсказки",
+        "error": "Что-то пошло не так"
+      }
+    },
+  // @economy:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

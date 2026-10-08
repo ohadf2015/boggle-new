@@ -27,6 +27,7 @@ const DailyChallengeInvite = dynamic(() => import('@/components/growth/DailyChal
 const PostGameEngagement = dynamic(() => import('@/components/growth/PostGameEngagement'), { ssr: false });
 const PostGameWordReview = dynamic(() => import('@/components/education/PostGameWordReview'), { ssr: false });
 const ClassroomResultsCard = dynamic(() => import('@/components/education/ClassroomResultsCard').then((m) => m.ClassroomResultsCard), { ssr: false });
+const ClassroomRoundReward = dynamic(() => import('@/components/education/economy/ClassroomRoundReward'), { ssr: false });
 const TeamBattleStandings = dynamic(() => import('@/components/education/TeamBattleStandings').then((m) => m.TeamBattleStandings), { ssr: false });
 
 interface Props {
@@ -146,6 +147,9 @@ function DetailsBody({ c }: { c: MpResultsController }) {
         onRematch={isHost ? handleRematch : undefined}
         onPractice={classroomSummary.lessonIds[0] ? () => openLessonPractice(classroomSummary.lessonIds[0]) : undefined}
       />
+      {!isHost && gameCode && (
+        <ClassroomRoundReward gameCode={gameCode} roundId={props.gameSessionId != null ? String(props.gameSessionId) : null} />
+      )}
     </>
   ) : lessonGameData && !isGuest ? (
     <PostGameWordReview

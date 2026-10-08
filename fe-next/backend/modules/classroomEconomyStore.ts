@@ -96,3 +96,15 @@ export async function mutateEconomy<R>(
 export async function loadConfig(gameCode: string): Promise<EconomyConfig> {
   return resolveConfig(await getClassroomGame(gameCode));
 }
+
+export async function saveEconomyConfig(gameCode: string, config: EconomyConfig): Promise<boolean> {
+  const redis = getRedisClient();
+  if (!redis) return false;
+  return withClassroomGameLock(gameCode, async () => {
+    const game = await getClassroomGame(gameCode);
+    if (!game) return false;
+    const next = { ...game, settings: { ...game.settings, economy: { ...config } } };
+    await redis.setex(`classroom_game:${gameCode}`, CLASSROOM_GAME_TTL, JSON.stringify(next));
+    return true;
+  });
+}
