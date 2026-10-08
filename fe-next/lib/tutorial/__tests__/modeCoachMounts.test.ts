@@ -40,8 +40,13 @@ describe('mode coach mounts', () => {
     expect(src('components/party/PartyPlay.tsx')).toMatch(/<ModeCoach mode="party"/);
   });
 
-  it('every party coach key is translated in all 6 locales', () => {
-    const c = MODE_COACH.party;
+  it('every brain drill shows the brain coach', () => {
+    expect(src('components/brain/DrillPageShell.tsx')).toMatch(/<ModeCoach mode="brain"/);
+  });
+
+  it.each(['party', 'brain'] as const)('every %s coach key is translated in all 6 locales', (mode) => {
+    const c = MODE_COACH[mode];
+    expect(c, mode).toBeDefined();
     const keys = [c.titleKey, ...c.steps.map((s) => s.captionKey), c.scoreTipKey].filter(Boolean) as string[];
     for (const [lang, bundle] of Object.entries({ en, he, sv, ja, es, ru })) {
       for (const key of keys) {

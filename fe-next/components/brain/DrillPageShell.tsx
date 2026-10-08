@@ -22,6 +22,7 @@ import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { DRILL_DOMAINS, type DrillType } from '@/shared/types/cognitive';
 import { BRAIN_CHECK_PROTOCOL, type BrainCheckAnalysis, type BrainCheckDrill } from '@/shared/utils/brainCheck';
 import type { LetterGrid, Language } from '@/types';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
 /** Loose shape of every drill's onComplete payload. */
 type DrillRunResult = { score: number; timeSpent: number; level: number } & Record<string, number>;
@@ -224,6 +225,7 @@ export default function DrillPageShell({ drillType, Drill, isCheck = false }: Pr
 
   return (
     <div dir={dir} className={cn('flex-1 flex flex-col min-h-0', isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream')}>
+      <ModeCoach mode="brain" />
       <header className={cn(
         'flex items-center justify-between gap-2 px-4 py-3 border-b-4 border-neo-black',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'

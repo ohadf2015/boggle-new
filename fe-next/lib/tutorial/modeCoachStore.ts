@@ -28,7 +28,8 @@ export type CoachModeKey =
   | 'wordCraft'
   | 'crossword'
   | 'adventure'
-  | 'party';
+  | 'party'
+  | 'brain';
 
 export function coachStorageKey(mode: CoachModeKey): string {
   return `lc_coach_${mode}`;

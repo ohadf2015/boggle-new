@@ -26,10 +26,6 @@ vi.mock('framer-motion', () => {
   };
 });
 
-// Contract since commit 87653de ("remove blocking tutorial flow"): the coach
-// is disabled — ModeCoach renders nothing in every state. It still marks the
-// mode as seen and fires onShown once so a future re-enable won't re-pop for
-// existing players and cross-device DB backfill keeps working.
 describe('ModeCoach', () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -39,14 +35,14 @@ describe('ModeCoach', () => {
     vi.useRealTimers();
   });
 
-  it('renders nothing on a first visit — even after the settle delay', () => {
+  it('shows the coach on a first visit after the settle delay', () => {
     render(<ModeCoach mode="classic" />);
     expect(screen.queryByText('modeCoach.classic.title')).toBeNull();
     act(() => {
       vi.advanceTimersByTime(700);
     });
-    expect(screen.queryByText('modeCoach.classic.title')).toBeNull();
-    expect(screen.queryByText('modeCoach.classic.step1')).toBeNull();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText('modeCoach.classic.step1')).toBeInTheDocument();
   });
 
   it('renders nothing when already seen (show-once)', () => {
@@ -55,7 +51,7 @@ describe('ModeCoach', () => {
     act(() => {
       vi.advanceTimersByTime(700);
     });
-    expect(screen.queryByText('modeCoach.classic.title')).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 
   it('marks the mode as seen and fires onShown once on first visit', () => {
@@ -66,17 +62,30 @@ describe('ModeCoach', () => {
     });
     expect(window.localStorage.getItem(coachStorageKey('wordHunt'))).toBe('1');
     expect(onShown).toHaveBeenCalledTimes(1);
-    expect(screen.queryByText('modeCoach.wordHunt.title')).toBeNull();
   });
 
-  it('board taps after the grace period change nothing (still hidden)', () => {
+  it('a board tap after the grace period dismisses it', () => {
     render(<ModeCoach mode="classic" graceMs={300} />);
     act(() => {
-      vi.advanceTimersByTime(700 + 300);
+      vi.advanceTimersByTime(700);
+    });
+    act(() => {
+      vi.advanceTimersByTime(300);
     });
     act(() => {
       document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
     });
-    expect(screen.queryByText('modeCoach.classic.title')).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('a tap during the grace period does not dismiss it', () => {
+    render(<ModeCoach mode="classic" graceMs={300} />);
+    act(() => {
+      vi.advanceTimersByTime(700);
+    });
+    act(() => {
+      document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    });
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 });

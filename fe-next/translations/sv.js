@@ -1789,6 +1789,12 @@ const sv = {
     "step2": "Skicka telefonen när tiden är slut",
     "scoreTip": "Bara ord ingen annan hittat ger poäng"
   },
+  "brain": {
+    "title": "Hjärngym",
+    "step1": "Varje övning tränar en färdighet",
+    "step2": "Läs uppdraget och kör",
+    "scoreTip": "Snabbt och rätt ger mest poäng"
+  },
     "connections": {
       "title": "Hitta länken",
       "step1": "Gruppera fyra relaterade ord",
@@ -5433,7 +5439,7 @@ const sv = {
         "wordHunt": "Ordjakt",
         "wheelRush": "Hjulrush",
         "wordTower": "Ordtorn",
-        "random": "Överraskningsläge"
+        "random": "Överraskningsläge", "crossword": "Korsord"
       },
       "hook": {
         "classic": "Hitta varje ord",
@@ -5441,7 +5447,7 @@ const sv = {
         "wordHunt": "Jaga det dolda ordet",
         "wheelRush": "Tävla mot rivaler på hjulet",
         "wordTower": "Bygg tornet",
-        "random": "Det blir en överraskning"
+        "random": "Det blir en överraskning", "crossword": "Tävla om att fylla rutnätet"
       }
     },
     "results": "Stridsrapport",

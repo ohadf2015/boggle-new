@@ -5150,7 +5150,7 @@ const ja = {
         "wordHunt": "ワードハント",
         "wheelRush": "ホイールラッシュ",
         "wordTower": "ワードタワー",
-        "random": "サプライズモード"
+        "random": "サプライズモード", "crossword": "クロスワード"
       },
       "hook": {
         "classic": "全部の単語を探そう",
@@ -5158,7 +5158,7 @@ const ja = {
         "wordHunt": "隠れた単語を狩ろう",
         "wheelRush": "ホイールでライバルと対戦",
         "wordTower": "タワーを積もう",
-        "random": "お楽しみに"
+        "random": "お楽しみに", "crossword": "マスを先に埋めよう"
       }
     },
     "results": "バトルレポート",
@@ -19103,6 +19103,12 @@ const ja = {
       "step1": "文字をなぞって単語を作る",
       "step2": "時間切れで次の人に渡す",
       "scoreTip": "誰も見つけていない単語だけが得点に"
+    },
+    "brain": {
+      "title": "脳トレジム",
+      "step1": "各ドリルでひとつの力を鍛える",
+      "step2": "ミッションを読んでスタート",
+      "scoreTip": "速く正確なほど高得点"
     },
     "connections": {
       "title": "つながりを見つける",

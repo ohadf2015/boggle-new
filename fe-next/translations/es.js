@@ -4916,7 +4916,7 @@ const es = {
         "wordHunt": "Caza de Palabras",
         "wheelRush": "Rueda Rápida",
         "wordTower": "Torre de Palabras",
-        "random": "Modo Sorpresa"
+        "random": "Modo Sorpresa", "crossword": "Crucigrama"
       },
       "hook": {
         "classic": "Encuentra cada palabra",
@@ -4924,7 +4924,7 @@ const es = {
         "wordHunt": "Caza la palabra oculta",
         "wheelRush": "Compite contra rivales en la rueda",
         "wordTower": "Apila la torre",
-        "random": "A ver qué sale"
+        "random": "A ver qué sale", "crossword": "Corre a llenar la cuadrícula"
       }
     },
     "backToLobby": "Volver al lobby",
@@ -16723,6 +16723,12 @@ const es = {
       "step1": "Arrastra letras para formar palabras",
       "step2": "Pasa el móvil al acabar el tiempo",
       "scoreTip": "Solo puntúan palabras que nadie encontró"
+    },
+    "brain": {
+      "title": "Gimnasio mental",
+      "step1": "Cada ejercicio entrena una habilidad",
+      "step2": "Lee la misión y empieza",
+      "scoreTip": "Rápido y preciso puntúa más"
     },
     "connections": {
       "title": "Halla los vínculos",

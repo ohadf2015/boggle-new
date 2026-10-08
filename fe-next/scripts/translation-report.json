@@ -2,12 +2,12 @@
   "summary": {
     "totalKeysInCode": 7999,
     "keyCountByLanguage": {
-      "en": 15468,
-      "es": 15774,
-      "he": 15700,
-      "ja": 15759,
-      "ru": 15497,
-      "sv": 15756
+      "en": 15474,
+      "es": 15780,
+      "he": 15706,
+      "ja": 15765,
+      "ru": 15503,
+      "sv": 15762
     },
     "missingFromEnglish": 103,
     "problematicFlatKeys": 0,
@@ -1094,7 +1094,7 @@
         "pattern": "`brain.drills.${drillType}.name`",
         "type": "template_literal",
         "file": "components/brain/DrillPageShell.tsx",
-        "line": 245,
+        "line": 247,
         "context": "{t(`brain.drills.${drillType}.name`)}"
       },
       {

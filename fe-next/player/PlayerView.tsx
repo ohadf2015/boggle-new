@@ -13,7 +13,7 @@ import PlayerWaitingView from './components/PlayerWaitingView';
 import PlayerInGameView from './components/PlayerInGameView';
 import FirstTimeAchievement from '../components/game/FirstTimeAchievement';
 import ModeRevealOverlay from '@/components/game/ModeRevealOverlay';
-import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import { MpModeCoach } from '@/components/tutorial/MpModeCoach';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Loader2 } from 'lucide-react';
 import { sendCountdownComplete, consumeStashedMessageId } from '@/shared/utils/gameEventUtils';
@@ -34,7 +34,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
     dispatchReveal, setShowStartAnimation, pendingMessageIdRef, isGameLoading, resolvedGameLanguage, playersReady,
     showQR, setShowQR, showExitConfirm, setShowExitConfirm, handleExitRoom, confirmExitRoom, handleNameChange,
     handleAvatarChange, readyUsernames, isReady, toggleReady, readyInFlight, leaderboard, foundWords, gameMode,
-    coachMode, isNewPlayerRef, pendingAchievement, clearAchievement, shufflingGrid, minWordLength, comboLevel,
+    isNewPlayerRef, pendingAchievement, clearAchievement, shufflingGrid, minWordLength, comboLevel,
     comboLevelRef, lastWordTime, mappedFoundWords, totalBoardWords, tournamentData, tournamentStandings,
     showTournamentStandings, setShowTournamentStandings, handleWordSubmit, handleResetCombo, hints, earthquakeState,
     fireRoundActive, fireRoundRemaining, boardTheme, totalGameTimeRef,
@@ -146,7 +146,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
           onIntroDismiss={() => dispatchReveal({ type: 'endReveal' })}
         />
       )}
-      {coachMode && <ModeCoach mode={coachMode} />}
+      <MpModeCoach />
       {showStartAnimation && (
         <MpCountdown>
         <GoRipplesAnimation
