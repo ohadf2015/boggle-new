@@ -43,6 +43,7 @@ import { StabilityBrace } from './rescue/StabilityBrace';
 import { type RescueReject, useBrace } from './rescue/useBrace';
 import { WreckScene } from './WreckScene';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { useV2Exit } from './useV2Exit';
 import { NextQuestCta } from '@/components/daily/results/NextQuestCta';
 import { resolveWt2Screen } from '@/lib/wordTowerV2/exitTracking';
@@ -651,6 +652,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
       ) : null}
 
 
+      {phase !== 'over' && !smashing && !district && !raiding ? <ModeCoach mode="wordTower" /> : null}
       {phase !== 'over' && !smashing && !district ? (
         <V2Hud
           t={t}
