@@ -8,6 +8,11 @@ import { EduDashboardSections, type EduDashboardView } from './EduDashboardSecti
 
 const WINDOWS: WindowDays[] = [7, 30, 90];
 
+function isDashboardView(json: unknown): json is EduDashboardView {
+  const v = json as Partial<EduDashboardView> | null;
+  return !!v && typeof v.kpis === 'object' && v.kpis !== null && !!v.sparklines;
+}
+
 export function EduDashboardPanel() {
   const { t } = useLanguage();
   const [windowDays, setWindowDays] = useState<WindowDays>(7);
@@ -20,10 +25,12 @@ export function EduDashboardPanel() {
     fetchWithAuth(`/api/admin/edu-dashboard?window=${windowDays}`)
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return (await res.json()) as EduDashboardView;
+        return (await res.json()) as unknown;
       })
       .then((json) => {
-        if (!cancelled) setData(json);
+        if (cancelled) return;
+        if (isDashboardView(json)) setData(json);
+        else setFailed(true);
       })
       .catch(() => {
         if (!cancelled) setFailed(true);

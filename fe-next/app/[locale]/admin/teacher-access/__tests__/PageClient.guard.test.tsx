@@ -31,9 +31,6 @@ vi.mock('@/components/admin/TeacherAccessQueue', () => ({
 }));
 // Same reason as the queue: the funnel panel fetches on mount, and an unmocked
 // fetch here rejects, blanks the whole render, and reads as a guard regression.
-vi.mock('@/components/admin/EduDashboardPanel', () => ({
-  EduDashboardPanel: () => <div data-testid="edu-dashboard" />,
-}));
 vi.mock('@/components/admin/TeacherFunnelPanel', () => ({
   TeacherFunnelPanel: () => <div data-testid="funnel" />,
 }));
