@@ -85,3 +85,16 @@ export interface ClassroomLockerEntry {
   itemId: string;
   createdAt: string;
 }
+
+/** Shown before the server's first snapshot. Cash is 0, never a placeholder. */
+export const ZERO_ECONOMY_SNAPSHOT: ClassroomEconomySnapshot = {
+  cash: 0,
+  cashEarned: 0,
+  streak: 0,
+  multiplier: 1,
+  doubleCashMsLeft: 0,
+  shieldHeld: false,
+  hintsHeld: 0,
+  config: { wrongAnswerCost: false, powerUps: true },
+  lastDelta: null,
+};

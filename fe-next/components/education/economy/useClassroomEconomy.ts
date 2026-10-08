@@ -10,7 +10,6 @@ import {
 } from '@/shared/constants/classroomEconomy';
 
 const SNAPSHOT_RETRY_MS = 2000;
-const MAX_SNAPSHOT_ASKS = 5;
 
 interface HintPayload {
   letter: string;
@@ -43,15 +42,15 @@ export function useClassroomEconomy(gameCode: string | null) {
     requestState();
   }, [requestState]);
 
-  const [asks, setAsks] = useState(0);
+  const [tick, setTick] = useState(0);
   useEffect(() => {
-    if (snapshot || asks >= MAX_SNAPSHOT_ASKS) return;
+    if (snapshot) return;
     const timer = setTimeout(() => {
-      setAsks((n) => n + 1);
+      setTick((n) => n + 1);
       requestState();
     }, SNAPSHOT_RETRY_MS);
     return () => clearTimeout(timer);
-  }, [snapshot, asks, requestState]);
+  }, [snapshot, tick, requestState]);
 
   const buy = useCallback(
     (powerUpId: PowerUpId) => {

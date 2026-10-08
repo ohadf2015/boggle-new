@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomEconomy } from './useClassroomEconomy';
+import { ZERO_ECONOMY_SNAPSHOT } from '@/shared/constants/classroomEconomy';
 import EconomyHud from './EconomyHud';
 import PowerUpShop from './PowerUpShop';
 import ClassroomBoardMoment from './ClassroomBoardMoment';
@@ -30,7 +31,7 @@ export default function ClassroomEconomyDock({ gameCode }: ClassroomEconomyDockP
   return (
     <>
       <div className="relative z-40 flex shrink-0 items-center justify-between gap-2 bg-neo-navy px-3 py-2">
-        {econ.snapshot ? <EconomyHud snapshot={econ.snapshot} /> : <span className="text-xs text-white/70">{t('economy.hud.loading')}</span>}
+        <EconomyHud snapshot={econ.snapshot ?? ZERO_ECONOMY_SNAPSHOT} />
         <div className="flex gap-2">
           {econ.snapshot?.config.powerUps && (
             <button
