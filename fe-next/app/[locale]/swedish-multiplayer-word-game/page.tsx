@@ -10,11 +10,11 @@ interface PageProps {
 
 const BASE_URL = 'https://www.lexiclash.live';
 
-/** Differentiator before brand; ≤60 chars. SERP neighbors (Wordfeud) sell friends + Swedish dict — we sell gratis browser Alfapet, no app. */
-const SV_TITLE = 'Alfapet online gratis — inget konto | LexiClash';
+/** Differentiator before brand; ≤60 chars. "scrabble svenska" (1.3k impr/28d pos5.3) was missing — added alongside Alfapet. */
+const SV_TITLE = 'Scrabble & Alfapet Online Gratis på Svenska | LexiClash';
 /** Answer in the first 120 chars so Google does not fall back to FAQ body (live snippet was game-mode FAQ). */
 const SV_DESCRIPTION =
-  'Spela Alfapet & anagram på svenska gratis — inget konto, ingen app. Realtid mot vänner, 10 000+ svenska ord. Starta ett rum nu.';
+  'Spela Scrabble & Alfapet online gratis på svenska — inget konto, ingen app. Realtid mot vänner, 10 000+ svenska ord. Starta nu!';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
