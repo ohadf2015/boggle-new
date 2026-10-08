@@ -1,5 +1,50 @@
 // Ja translations
 const ja = {
+  // @economy:start
+  "economy": {
+      "chest": {
+        "title": "宝箱",
+        "open": "開く",
+        "xp": "+{xp} XP",
+        "rarity": {
+          "common": "コモン",
+          "rare": "レア",
+          "epic": "エピック"
+        },
+        "odds": {
+          "label": "宝箱の確率"
+        },
+        "continue": "つづける"
+      },
+      "shop": {
+        "title": "パワーアップ",
+        "cash": "所持金: {cash}",
+        "cost": "価格: {cost}",
+        "doubleCash": {
+          "name": "ダブルキャッシュ",
+          "desc": "30秒間、獲得金額が2倍。自分だけ。"
+        },
+        "streakShield": {
+          "name": "連続シールド",
+          "desc": "次の不正解でも連続記録が途切れない。"
+        },
+        "hintReveal": {
+          "name": "ヒント",
+          "desc": "レッスンの単語の最初の文字を表示。"
+        }
+      },
+      "hud": {
+        "cash": "所持金: {cash}",
+        "multiplier": "x{multiplier}",
+        "doubleCash": "2倍 残り{seconds}秒"
+      },
+      "board": {
+        "title": "クラスランキング",
+        "empty": "最初の単語の後にスコアが表示されます。",
+        "you": "あなたは{cash}で{rank}位"
+      }
+    },
+  // @economy:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

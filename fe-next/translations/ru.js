@@ -1,5 +1,50 @@
 // RU translations
 const ru = {
+  // @economy:start
+  "economy": {
+      "chest": {
+        "title": "Сундук с наградой",
+        "open": "Открыть",
+        "xp": "+{xp} XP",
+        "rarity": {
+          "common": "Обычный",
+          "rare": "Редкий",
+          "epic": "Эпический"
+        },
+        "odds": {
+          "label": "Шансы сундука"
+        },
+        "continue": "Продолжить"
+      },
+      "shop": {
+        "title": "Усиления",
+        "cash": "Деньги: {cash}",
+        "cost": "Цена: {cost}",
+        "doubleCash": {
+          "name": "Двойные деньги",
+          "desc": "2x деньги 30 секунд. Только для вас."
+        },
+        "streakShield": {
+          "name": "Щит серии",
+          "desc": "Следующий неверный ответ не сбросит серию."
+        },
+        "hintReveal": {
+          "name": "Подсказка",
+          "desc": "Показывает первую букву слова из урока."
+        }
+      },
+      "hud": {
+        "cash": "Деньги: {cash}",
+        "multiplier": "x{multiplier}",
+        "doubleCash": "2x {seconds} с"
+      },
+      "board": {
+        "title": "Таблица класса",
+        "empty": "Очки появятся после первого слова.",
+        "you": "Вы #{rank} с {cash} деньгами"
+      }
+    },
+  // @economy:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

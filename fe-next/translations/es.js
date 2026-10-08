@@ -1,5 +1,50 @@
 // Es translations
 const es = {
+  // @economy:start
+  "economy": {
+      "chest": {
+        "title": "Cofre del tesoro",
+        "open": "Abrir",
+        "xp": "+{xp} XP",
+        "rarity": {
+          "common": "Común",
+          "rare": "Raro",
+          "epic": "Épico"
+        },
+        "odds": {
+          "label": "Probabilidades del cofre"
+        },
+        "continue": "Continuar"
+      },
+      "shop": {
+        "title": "Potenciadores",
+        "cash": "Dinero: {cash}",
+        "cost": "Coste: {cost}",
+        "doubleCash": {
+          "name": "Doble dinero",
+          "desc": "2x de dinero durante 30 segundos. Solo para ti."
+        },
+        "streakShield": {
+          "name": "Escudo de racha",
+          "desc": "Tu próxima respuesta incorrecta no rompe la racha."
+        },
+        "hintReveal": {
+          "name": "Pista",
+          "desc": "Muestra la primera letra de una palabra de la lección."
+        }
+      },
+      "hud": {
+        "cash": "Dinero: {cash}",
+        "multiplier": "x{multiplier}",
+        "doubleCash": "2x {seconds} s"
+      },
+      "board": {
+        "title": "Tabla de la clase",
+        "empty": "Las puntuaciones aparecen tras la primera palabra.",
+        "you": "Eres #{rank} con {cash} de dinero"
+      }
+    },
+  // @economy:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

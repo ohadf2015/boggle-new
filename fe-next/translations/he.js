@@ -1,5 +1,50 @@
 // HE translations
 const he = {
+  // @economy:start
+  "economy": {
+      "chest": {
+        "title": "ארגז אוצר",
+        "open": "פתח",
+        "xp": "+{xp} XP",
+        "rarity": {
+          "common": "נפוץ",
+          "rare": "נדיר",
+          "epic": "אפי"
+        },
+        "odds": {
+          "label": "סיכויי הארגז"
+        },
+        "continue": "המשך"
+      },
+      "shop": {
+        "title": "שדרוגים",
+        "cash": "כסף: {cash}",
+        "cost": "מחיר: {cost}",
+        "doubleCash": {
+          "name": "כסף כפול",
+          "desc": "פי 2 כסף במשך 30 שניות. רק לך."
+        },
+        "streakShield": {
+          "name": "מגן רצף",
+          "desc": "התשובה השגויה הבאה לא תשבור את הרצף שלך."
+        },
+        "hintReveal": {
+          "name": "רמז",
+          "desc": "מציג את האות הראשונה של מילת שיעור."
+        }
+      },
+      "hud": {
+        "cash": "כסף: {cash}",
+        "multiplier": "x{multiplier}",
+        "doubleCash": "פי 2 ל-{seconds} שנ׳"
+      },
+      "board": {
+        "title": "לוח הכיתה",
+        "empty": "הניקוד יופיע אחרי המילה הראשונה.",
+        "you": "אתה במקום {rank} עם {cash} כסף"
+      }
+    },
+  // @economy:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

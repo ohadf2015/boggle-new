@@ -1,5 +1,50 @@
 // Sv translations
 const sv = {
+  // @economy:start
+  "economy": {
+      "chest": {
+        "title": "Skattkista",
+        "open": "Öppna",
+        "xp": "+{xp} XP",
+        "rarity": {
+          "common": "Vanlig",
+          "rare": "Sällsynt",
+          "epic": "Episk"
+        },
+        "odds": {
+          "label": "Chanser i kistan"
+        },
+        "continue": "Fortsätt"
+      },
+      "shop": {
+        "title": "Power-ups",
+        "cash": "Pengar: {cash}",
+        "cost": "Pris: {cost}",
+        "doubleCash": {
+          "name": "Dubbla pengar",
+          "desc": "2x pengar i 30 sekunder. Bara för dig."
+        },
+        "streakShield": {
+          "name": "Seriesköld",
+          "desc": "Ditt nästa felsvar bryter inte din serie."
+        },
+        "hintReveal": {
+          "name": "Ledtråd",
+          "desc": "Visar första bokstaven i ett lektionsord."
+        }
+      },
+      "hud": {
+        "cash": "Pengar: {cash}",
+        "multiplier": "x{multiplier}",
+        "doubleCash": "2x {seconds} s"
+      },
+      "board": {
+        "title": "Klassens ställning",
+        "empty": "Poängen visas efter första ordet.",
+        "you": "Du är #{rank} med {cash} i pengar"
+      }
+    },
+  // @economy:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

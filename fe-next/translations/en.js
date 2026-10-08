@@ -1,5 +1,50 @@
 // EN translations
 const en = {
+  // @economy:start
+  "economy": {
+      "chest": {
+        "title": "Treasure chest",
+        "open": "Open",
+        "xp": "+{xp} XP",
+        "rarity": {
+          "common": "Common",
+          "rare": "Rare",
+          "epic": "Epic"
+        },
+        "odds": {
+          "label": "Chest odds"
+        },
+        "continue": "Continue"
+      },
+      "shop": {
+        "title": "Power-ups",
+        "cash": "Cash: {cash}",
+        "cost": "Cost: {cost}",
+        "doubleCash": {
+          "name": "Double cash",
+          "desc": "2x cash for 30 seconds. Only you."
+        },
+        "streakShield": {
+          "name": "Streak shield",
+          "desc": "Your next wrong answer keeps your streak."
+        },
+        "hintReveal": {
+          "name": "Hint",
+          "desc": "Shows the first letter of a lesson word."
+        }
+      },
+      "hud": {
+        "cash": "Cash: {cash}",
+        "multiplier": "x{multiplier}",
+        "doubleCash": "2x {seconds}s"
+      },
+      "board": {
+        "title": "Class board",
+        "empty": "Scores appear after the first word.",
+        "you": "You are #{rank} with {cash} cash"
+      }
+    },
+  // @economy:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

@@ -40,6 +40,7 @@ import { registerBoostHandlers } from './boostHandler.js';
 import { registerTeacherControlsHandlers } from './teacherControlsHandler.js';
 import { registerVocabQuizHandlers } from './vocabQuizHandler.js';
 import { registerWordcraftClassroomHandlers } from './wordcraftClassroomHandler.js';
+import { registerClassroomEconomyHandlers } from './classroomEconomyHandler.js';
 import { getGame } from '../modules/gameStateManager.js';
 
 /**
@@ -89,6 +90,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   // has no running board timer.
   registerVocabQuizHandlers(io, socket);
   registerWordcraftClassroomHandlers(io, socket);
+  registerClassroomEconomyHandlers(io, socket);
 }
 
 export {
