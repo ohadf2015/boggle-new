@@ -62,6 +62,10 @@ describe.each(LOCALES)('education route matrix, locale=%s', (locale) => {
       expect(educationHomeFor(locale, 'student')).toBe(at('student'));
       expect(educationHomeFor(locale, null)).toBe(at('education'));
     });
+
+    it('landing header logo goes to the education landing, not the marketing home', () => {
+      expect(educationHomeFor(locale, null)).toBe(at('education'));
+    });
   });
 
   describe('back from each education page, exact per role', () => {
