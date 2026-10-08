@@ -7,14 +7,13 @@
  * (FOUNDATION 2026-09-26); code moved verbatim.
  */
 
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo, useCallback } from 'react';
 import { useSocket } from '@/utils/SocketContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
 import type { PlayerResult } from '@/types';
 import { useGameMode, useHostSelectedGameMode } from '@/hooks/gameState/store';
-import { stashStartGameMessageId, wasStartGameHandled, markStartGameHandled } from '@/shared/utils/gameEventUtils';
 
 // Custom hooks
 import { useHostViewState, useHostSocketEvents, useHostGameActions } from './index';
@@ -23,6 +22,7 @@ import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
 import { useGameEndTelemetry } from '@/hooks/useGameEndTelemetry';
 import type { GameStartData } from '../hostViewTypes';
+import { useHostPendingGameStart } from './useHostPendingGameStart';
 
 type HostState = ReturnType<typeof useHostViewState>;
 type HostActions = ReturnType<typeof useHostGameActions>;
@@ -49,51 +49,8 @@ export function useHostRoundLifecycle({
   pendingGameStart, onGameStartConsumed, state, actions, fadeToTrack, TRACKS, username, gameCode,
   currentGameMode, gameModeConfirmed, hostSelectedGameMode, t, socket, gameSessionId,
 }: HostRoundLifecycleInput): void {
-  // Handle pending game start (when host returns from results page)
-  // The startGame event was captured at page level while HostView was unmounted
-  // We need to initialize the game state with that data
-  useEffect(() => {
-    if (!pendingGameStart) return;
-
-    // Skip if useHostGameEvents.handleStartGame already drove the start for
-    // this messageId — both handlers run for a normal start, and double
-    // setShowStartAnimation(true) makes GoRipples unmount/remount and play
-    // the countdown twice.
-    if (wasStartGameHandled('HOST', pendingGameStart.messageId)) {
-      onGameStartConsumed?.();
-      return;
-    }
-
-    // Initialize game state from pending data
-    if (pendingGameStart.letterGrid) {
-      state.setTableData(pendingGameStart.letterGrid);
-    }
-    if (pendingGameStart.timerSeconds !== undefined) {
-      state.setRemainingTime(pendingGameStart.timerSeconds);
-    }
-
-    // Stash so the GoRipplesAnimation can emit `countdownComplete` once it
-    // finishes — server gates the round timer on that signal.
-    if (pendingGameStart.messageId) {
-      stashStartGameMessageId('HOST', pendingGameStart.messageId);
-      markStartGameHandled('HOST', pendingGameStart.messageId);
-    }
-
-    // Reset states for new game and trigger animation
-    state.setWaitingForResults(false);
-    state.setShowStartAnimation(true);
-    state.setPlayerWordCounts({});
-    state.setPlayerScores({});
-    state.setHostFoundWords([]);
-    state.setHostAchievements([]);
-    state.setFinalScores(null);
-
-    // Trigger music change for game start
-    fadeToTrack(TRACKS.IN_GAME, 800, 800);
-
-    // Mark pending game start as consumed
-    onGameStartConsumed?.();
-  }, [pendingGameStart, onGameStartConsumed, state, fadeToTrack, TRACKS.IN_GAME]);
+  const onRoundMusic = useCallback(() => fadeToTrack(TRACKS.IN_GAME, 800, 800), [fadeToTrack, TRACKS.IN_GAME]);
+  useHostPendingGameStart({ pendingGameStart, onGameStartConsumed, state, onRoundMusic });
 
   // Destructure for cleaner JSX
   const { runtime, players, tournament, combo } = state;

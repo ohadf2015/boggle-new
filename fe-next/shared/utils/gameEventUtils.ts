@@ -151,6 +151,24 @@ export function wasStartGameHandled(role: 'HOST' | 'PLAYER', messageId: string |
   return handledStartGameIds[role] === messageId;
 }
 
+// A startGame caught at page level before the view's listener mounted (reload) must run through that same listener.
+type StartGameHandler = (data: never) => void;
+const liveStartGameHandlers: Partial<Record<'HOST' | 'PLAYER', StartGameHandler>> = {};
+
+export function registerStartGameHandler(role: 'HOST' | 'PLAYER', handler: StartGameHandler): () => void {
+  liveStartGameHandlers[role] = handler;
+  return () => {
+    if (liveStartGameHandlers[role] === handler) delete liveStartGameHandlers[role];
+  };
+}
+
+export function replayStartGame(role: 'HOST' | 'PLAYER', data: unknown): boolean {
+  const handler = liveStartGameHandlers[role];
+  if (!handler) return false;
+  handler(data as never);
+  return true;
+}
+
 /**
  * Trigger game over celebration with confetti
  */

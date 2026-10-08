@@ -15,6 +15,7 @@ import {
   sendCountdownComplete,
   stashStartGameMessageId,
   markStartGameHandled,
+  registerStartGameHandler,
   wasStartGameHandled,
   createHostLeftRoomClosingHandler,
 } from '@/shared/utils/gameEventUtils';
@@ -936,6 +937,7 @@ export function usePlayerGameEvents({
 
     // Register listeners
     socket.on('startGame', handleStartGame);
+    const unregisterStartGame = registerStartGameHandler('PLAYER', handleStartGame);
     socket.on('endGame', handleEndGame);
     socket.on('timeUpdate', handleTimeUpdate);
     socket.on('validatedScores', handleValidatedScores);
@@ -979,6 +981,7 @@ export function usePlayerGameEvents({
         fireRoundIntervalRef.current = null;
       }
       socket.off('startGame', handleStartGame);
+      unregisterStartGame();
       socket.off('endGame', handleEndGame);
       socket.off('timeUpdate', handleTimeUpdate);
       socket.off('validatedScores', handleValidatedScores);
