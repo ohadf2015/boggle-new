@@ -103,4 +103,17 @@ describe('CrosswordVersus', () => {
     render(<CrosswordVersus socket={null} username="me" />);
     expect(screen.getByText('crossword.mp.youWin')).toBeInTheDocument();
   });
+
+  it('keeps the on-screen keyboard touch-only for en, with no IME input', () => {
+    render(<CrosswordVersus socket={null} username="me" />);
+    expect(screen.getByTestId('kbd').parentElement?.className).toContain('lg:hidden');
+    expect(screen.queryByLabelText('crossword.kanaInput')).toBeNull();
+  });
+
+  it('ja: shows the kana keyboard on desktop too and mounts the IME input', () => {
+    mp = { ...mp, puzzle: { ...PUZZLE, id: 'ja-gen-001', locale: 'ja' } };
+    render(<CrosswordVersus socket={null} username="me" />);
+    expect(screen.getByTestId('kbd').parentElement?.className).not.toContain('lg:hidden');
+    expect(screen.getByLabelText('crossword.kanaInput')).toBeInTheDocument();
+  });
 });

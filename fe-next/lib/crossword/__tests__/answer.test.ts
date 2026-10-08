@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeCell, checkCell, isSolved, displayLetter } from '../answer';
+import { normalizeCell, checkCell, isSolved, displayLetter, foldJaKana } from '../answer';
 import { buildGrid } from '../grid';
 import type { CrosswordPuzzle, GridLayout } from '../types';
 
@@ -110,5 +110,28 @@ describe('normalizeCell — Spanish accent folding', () => {
   });
   it('does NOT fold accents for other locales (en/he unaffected)', () => {
     expect(normalizeCell('á', 'en')).toBe('á');
+  });
+});
+
+describe('Japanese kana folding', () => {
+  it('foldJaKana writes small kana full-size and katakana as hiragana, keeping ー', () => {
+    expect(foldJaKana('しゃしん')).toBe('しやしん');
+    expect(foldJaKana('きっぷ')).toBe('きつぷ');
+    expect(foldJaKana('ぁぃぅぇぉゃゅょっゎゕゖ')).toBe('あいうえおやゆよつわかけ');
+    expect(foldJaKana('ネコ')).toBe('ねこ');
+    expect(foldJaKana('ショー')).toBe('しよー');
+  });
+
+  it('normalizeCell folds a typed small kana / katakana to the stored full-size hiragana', () => {
+    expect(normalizeCell('ゃ', 'ja')).toBe('や');
+    expect(normalizeCell('カ', 'ja')).toBe('か');
+    expect(normalizeCell('ー', 'ja')).toBe('ー');
+    expect(checkCell('ョ', 'よ', 'ja')).toBe(true);
+  });
+
+  it('normalizeCell rejects anything that is not kana (romaji keydowns, kanji, full-width space)', () => {
+    expect(normalizeCell('a', 'ja')).toBe('');
+    expect(normalizeCell('猫', 'ja')).toBe('');
+    expect(normalizeCell('　', 'ja')).toBe('');
   });
 });

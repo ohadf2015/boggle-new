@@ -1,19 +1,19 @@
 /**
- * Generate 4×4 LTR mini crosswords for es / sv / ru from the locale's clue bank only. The fill pool is
+ * Generate 4×4 LTR mini crosswords for es / sv / ru / ja from the locale's clue bank only. The fill pool is
  * the 3-4 letter clue-bank words that are also in the shipped dictionary, so every landed word
  * already has a clue. Deterministic (fixed seeds). Output: lib/crossword/data/puzzles.<locale>.json.
  *
- * Usage: npx tsx scripts/crossword/build-mini.ts <es|sv|ru>
+ * Usage: npx tsx scripts/crossword/build-mini.ts <es|sv|ru|ja>
  */
-import { createSafeReadFile, loadRussianDictionary, loadSpanishDictionary, loadSwedishDictionary } from '../../backend/dictionaryLoaders';
-import { foldEsAccents } from '../../lib/crossword/answer';
+import { createSafeReadFile, loadJapaneseDictionary, loadRussianDictionary, loadSpanishDictionary, loadSwedishDictionary } from '../../backend/dictionaryLoaders';
+import { foldEsAccents, foldJaKana } from '../../lib/crossword/answer';
 import { buildGrid } from '../../lib/crossword/grid';
 import { buildDictIndex, fillGrid, type FillTemplate } from '../../lib/crossword/generate.core';
 import { isRealCrossword, MINI_TEMPLATES_4 } from '../../lib/crossword/templates';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const LOCALES = ['es', 'sv', 'ru'] as const;
+const LOCALES = ['es', 'sv', 'ru', 'ja'] as const;
 type Locale = (typeof LOCALES)[number];
 const MAX_PUZZLES = 20;
 const SEEDS = Number(process.argv[3] ?? 600);
@@ -24,7 +24,14 @@ const FOLD: Record<Locale, (w: string) => string> = {
   es: foldEsAccents,
   sv: (w) => w,
   ru: (w) => w.replace(/ё/g, 'е'),
+  ja: foldJaKana, // ja bank keys are already folded; idempotent
 };
+
+// ja bank keys are kana-folded (しゃしん → しやしん), so membership is checked on the folded dictionary.
+async function jaFoldedDict(safeRead: ReturnType<typeof createSafeReadFile>): Promise<Set<string>> {
+  const { words } = await loadJapaneseDictionary(safeRead);
+  return new Set([...words].map(foldJaKana));
+}
 
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
@@ -49,6 +56,7 @@ async function main() {
   const dict =
     locale === 'es' ? await loadSpanishDictionary(safeRead)
     : locale === 'ru' ? await loadRussianDictionary(safeRead)
+    : locale === 'ja' ? await jaFoldedDict(safeRead)
     : await loadSwedishDictionary(safeRead);
 
   // folded grid answer -> bank key carrying its clue (prefers an exact key over a folded twin)

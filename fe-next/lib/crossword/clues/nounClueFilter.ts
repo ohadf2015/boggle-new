@@ -24,3 +24,21 @@ const RULES: RegExp[] = [
 export function rejectNounClueEs(clue: string): boolean {
   return RULES.some((r) => r.test(clue));
 }
+
+/** Mechanical rejects for Japanese Wiktionary clues (family/classroom audience). */
+const JA_RULES: RegExp[] = [
+  /[0-9０-９]/,
+  /[A-Za-zＡ-Ｚａ-ｚ]/,
+  /[=＝[\]{}<>|*#「」『』【】…?？:：]/,
+  /^[\u30A0-\u30FF・]+$/, // katakana-only = a respelling, not a meaning
+  // spelling stubs / inflected forms / pointers rather than meanings
+  /表記|異表記|旧字体|を参照|参照|の略|略称|略語|未然形|連用形|終止形|連体形|仮定形|命令形|已然形|活用|音便|の転|誤記|接頭辞|接尾辞|助詞|助動詞/,
+  // archaic / dialect / literary register
+  /古語|古文|古典|古称|古く|古風|上代|中古|方言|文語|雅語|廃語|旧称|歴史的仮名遣い|沖縄|琉球/,
+  // vulgar / sexual / drugs / violence
+  /性交|性行為|性器|陰茎|陰部|陰嚢|膣|女陰|男根|精液|射精|売春|娼|遊女|淫|卑猥|猥褻|わいせつ|俗語|卑語|隠語|罵|侮蔑|蔑称|差別|同性愛|強姦|乳房|ポルノ|麻薬|大麻|覚醒剤|糞|大便|小便|尿|屁|死体|殺|自殺|酔/,
+];
+
+export function rejectNounClueJa(clue: string): boolean {
+  return JA_RULES.some((r) => r.test(clue));
+}

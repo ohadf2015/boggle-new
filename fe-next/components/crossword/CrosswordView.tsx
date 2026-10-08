@@ -12,7 +12,7 @@ import { isNewspaperScale, type CrosswordFormat } from '@/lib/crossword/format';
 import type { CrosswordPuzzle, Difficulty, Slot } from '@/lib/crossword/types';
 import { ClueScramble } from './ClueScramble';
 import { CrosswordGrid } from './CrosswordGrid';
-import { CrosswordKeyboard } from './CrosswordKeyboard';
+import { CrosswordInputDock } from './CrosswordInputDock';
 import { CrosswordMasthead } from './CrosswordMasthead';
 import { ClueBar } from './ClueBar';
 import { CrosswordClueList } from './CrosswordClueList';
@@ -331,17 +331,16 @@ export function CrosswordView({
             />
           </div>
 
-          {/* On-screen keyboard — touch only; pinned to the bottom on mobile so
-              the page never scrolls. Desktop uses the physical keyboard. */}
-          <div className="shrink-0 pt-1 lg:hidden">
-            <CrosswordKeyboard
-              locale={puzzle.locale}
-              onLetter={inputLetter}
-              onBackspace={backspace}
-              disabled={solved}
-              backspaceLabel={t('crossword.backspace')}
-            />
-          </div>
+          {/* Pinned to the bottom on mobile so the page never scrolls. */}
+          <CrosswordInputDock
+            className="shrink-0 pt-1"
+            locale={puzzle.locale}
+            onLetter={inputLetter}
+            onBackspace={backspace}
+            disabled={solved}
+            activeKey={`${state.active.row},${state.active.col},${state.dir}`}
+            t={t}
+          />
         </div>
 
         {/* Desktop: the Across/Down clue rail, the strongest "this is a real crossword" signal. */}

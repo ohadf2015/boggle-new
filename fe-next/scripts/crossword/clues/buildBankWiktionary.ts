@@ -14,19 +14,23 @@
  * Usage:
  *   npx tsx scripts/crossword/clues/buildBankWiktionary.ts --lang=es [--limit=N] [--max-len=7] [--min-score=0.5] [--dry] [--source=nouns]
  *
+ * --source=words (ja only) draws candidates from backend/japanese_words.txt instead: 3..4 hiragana that the shipped
+ * Japanese dictionary also accepts. Bank keys are kana-folded (small kana full-size) to match the grid.
+ *
  * --source=nouns also draws 3..4 letter candidates from backend/<lang>_nouns.txt (the big board-seeding list), kept
  * only if the (accent-folded) word is in the shipped dictionary and (es) appears >=2x in the repo's Spanish copy; they still need a clean Wiktionary clue + the auditor.
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { wiktionaryClue } from './wiktionary';
+import { wiktionaryClue, wiktionaryClueJa } from './wiktionary';
+import { selectJaCandidates } from './jaCandidates';
 import { evaluateSvClue, evaluateEsClue } from '../../../lib/crossword/clues/evaluateSvClue';
 import { endsDangling } from '../../../lib/crossword/clues/danglingEnd';
 import { evaluateRuClue } from '../../../lib/crossword/clues/evaluateRuClue';
-import { createSafeReadFile, loadRussianDictionary, loadSpanishDictionary, loadSwedishDictionary } from '../../../backend/dictionaryLoaders';
+import { createSafeReadFile, loadJapaneseDictionary, loadRussianDictionary, loadSpanishDictionary, loadSwedishDictionary } from '../../../backend/dictionaryLoaders';
 import { rejectNounClueEs } from '../../../lib/crossword/clues/nounClueFilter';
 import { loadEsCommonness } from './commonness';
-import { foldEsAccents } from '../../../lib/crossword/answer';
+import { foldEsAccents, foldJaKana } from '../../../lib/crossword/answer';
 
 type Bank = Record<string, { clue: string; score: number }>;
 
@@ -47,7 +51,8 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 // Hebrew bank keys fold final letters (see build-he.ts); other langs key by lowercase.
 const normHe = (w: string) =>
   w.replace(/ם/g, 'מ').replace(/ן/g, 'נ').replace(/ץ/g, 'צ').replace(/ף/g, 'פ').replace(/ך/g, 'כ');
-const bankKey = (w: string, lang: string) => (lang === 'he' ? normHe(w) : w.toLowerCase());
+const bankKey = (w: string, lang: string) =>
+  lang === 'he' ? normHe(w) : lang === 'ja' ? foldJaKana(w) : w.toLowerCase();
 
 function qualityOk(lang: string, answer: string, clue: string): boolean {
   if (lang === 'sv') return evaluateSvClue(answer, clue).score >= MIN_SCORE;
@@ -57,10 +62,16 @@ function qualityOk(lang: string, answer: string, clue: string): boolean {
 }
 
 async function main() {
-  if (!LANG) throw new Error('pass --lang=<en|he|sv|es|ru>');
+  if (!LANG) throw new Error('pass --lang=<en|he|sv|es|ru|ja>');
   const bankPath = join(__dirname, `../../../lib/crossword/data/clueBank.${LANG}.json`);
-  const bank = JSON.parse(readFileSync(bankPath, 'utf8')) as Bank;
+  const bank = (existsSync(bankPath) ? JSON.parse(readFileSync(bankPath, 'utf8')) : {}) as Bank;
   const before = Object.keys(bank).length;
+
+  if (SOURCE === 'words') {
+    if (LANG !== 'ja') throw new Error('--source=words is ja only');
+    await buildJa(bank, bankPath, before);
+    return;
+  }
 
   const listPath = join(__dirname, `../../../backend/common_hunt_words_${LANG}.txt`);
   let candidates = [
@@ -109,6 +120,32 @@ async function main() {
 
   if (!DRY) writeFileSync(bankPath, `${JSON.stringify(bank, null, 2)}\n`); // match the bank's pretty-printed format
   console.log(`DONE ${DRY ? '(dry)' : ''} ${LANG}: +${added} added, ${miss} no-def, ${rejected} low-quality. bank ${before} -> ${before + (DRY ? 0 : added)}`);
+}
+
+async function buildJa(bank: Bank, bankPath: string, before: number) {
+  const { words: dict } = await loadJapaneseDictionary(createSafeReadFile());
+  const lines = readFileSync(join(__dirname, '../../../backend/japanese_words.txt'), 'utf8').split('\n');
+  const candidates = selectJaCandidates(lines, dict).filter((w) => !(bankKey(w, 'ja') in bank));
+  console.log(`${DRY ? '[DRY] ' : ''}ja: bank ${before} words, ${candidates.length} new candidates (3-4 hiragana, in dict)`);
+
+  let added = 0, miss = 0, rejected = 0, processed = 0;
+  for (const word of candidates) {
+    if (processed >= LIMIT) break;
+    processed++;
+    let res: { clue: string | null; hadDef: boolean } = { clue: null, hadDef: false };
+    try { res = await wiktionaryClueJa(word); } catch { /* network miss counts as no-def */ }
+    await sleep(120);
+    if (!res.hadDef) { miss++; continue; }
+    if (!res.clue) { rejected++; continue; }
+    const key = bankKey(word, 'ja');
+    if (key in bank) continue;
+    added++;
+    if (DRY) console.log(`  + ${word}: ${res.clue}`);
+    else bank[key] = { clue: res.clue, score: NEW_WORD_SCORE };
+  }
+
+  if (!DRY) writeFileSync(bankPath, `${JSON.stringify(bank, null, 2)}\n`);
+  console.log(`DONE ${DRY ? '(dry)' : ''} ja: processed ${processed}, +${added} added (${((100 * added) / Math.max(processed, 1)).toFixed(1)}%), ${miss} no-def, ${rejected} rejected by filter. bank ${before} -> ${before + (DRY ? 0 : added)}`);
 }
 
 main().then(() => process.exit(0)).catch((e) => { console.error(e); process.exit(1); });

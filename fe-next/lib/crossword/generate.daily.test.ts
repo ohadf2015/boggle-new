@@ -63,6 +63,26 @@ describe('generateDailyPuzzle', () => {
   });
 });
 
+describe('Japanese', () => {
+  const kanaOnly = (p: Awaited<ReturnType<typeof generateDailyPuzzle>>) =>
+    p!.cells.filter((c) => !c.block).every((c) => /^[\u3041-\u3096ー]$/.test(c.solution));
+
+  it('GIVEN ja THEN the daily is a 4×4 kana grid from the ja clue bank, not an English one', async () => {
+    const p = await generateDailyPuzzle('2026-06-20', 'ja');
+    expect(p).not.toBeNull();
+    expect(p!.locale).toBe('ja');
+    expect(p!.size).toBe(4);
+    expect(kanaOnly(p)).toBe(true);
+    expect(p!.slots.every((s) => s.clue.length > 0)).toBe(true);
+  });
+
+  it('GIVEN ja freeplay THEN also kana', async () => {
+    const p = await generateFreeplayPuzzle(7, 'ja');
+    expect(p).not.toBeNull();
+    expect(kanaOnly(p)).toBe(true);
+  });
+});
+
 describe('generateFreeplayPuzzle', () => {
   it('GIVEN a seed THEN returns a valid puzzle', async () => {
     const p = await generateFreeplayPuzzle(123, 'en');

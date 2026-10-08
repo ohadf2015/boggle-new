@@ -36,13 +36,18 @@ describe('BattleModeCard — MP mode list (Ohad 2026-09-27)', () => {
     const { unmount } = render(<BattleModeCard {...baseProps} showInWorkModes language="he" />);
     expect(screen.getByTestId('game-mode-crossword')).toBeInTheDocument();
     unmount();
-    render(<BattleModeCard {...baseProps} showInWorkModes language="ja" />);
+    render(<BattleModeCard {...baseProps} showInWorkModes language="ru" />);
     expect(screen.queryByTestId('game-mode-crossword')).not.toBeInTheDocument();
+  });
+
+  it('offers crossword in Japanese rooms', () => {
+    render(<BattleModeCard {...baseProps} showInWorkModes language="ja" />);
+    expect(screen.getByTestId('game-mode-crossword')).toBeInTheDocument();
   });
 
   it('falls back to random when the room switches to a language without crossword', () => {
     const setSelectedGameMode = vi.fn();
-    render(<BattleModeCard {...baseProps} setSelectedGameMode={setSelectedGameMode} selectedGameMode="crossword" showInWorkModes language="ja" />);
+    render(<BattleModeCard {...baseProps} setSelectedGameMode={setSelectedGameMode} selectedGameMode="crossword" showInWorkModes language="ru" />);
     expect(setSelectedGameMode).toHaveBeenCalledWith('random');
   });
 

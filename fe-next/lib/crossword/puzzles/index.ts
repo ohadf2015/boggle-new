@@ -21,12 +21,13 @@ try {
   // puzzles.he.json doesn't exist or failed to load — proceed with HE_SEED only.
 }
 
-// Generated ES/SV/RU banks: 4×4 minis filled from each clue bank (scripts/crossword/build-mini.ts).
-function loadGenerated(locale: 'es' | 'sv' | 'ru'): SeedPuzzle[] {
+// Generated ES/SV/RU/JA banks: 4×4 minis filled from each clue bank (scripts/crossword/build-mini.ts).
+function loadGenerated(locale: 'es' | 'sv' | 'ru' | 'ja'): SeedPuzzle[] {
   try {
     return (
       locale === 'es' ? require('../data/puzzles.es.json')
       : locale === 'ru' ? require('../data/puzzles.ru.json')
+      : locale === 'ja' ? require('../data/puzzles.ja.json')
       : require('../data/puzzles.sv.json')
     ) as SeedPuzzle[];
   } catch {
@@ -36,6 +37,7 @@ function loadGenerated(locale: 'es' | 'sv' | 'ru'): SeedPuzzle[] {
 const GENERATED_ES = loadGenerated('es');
 const GENERATED_SV = loadGenerated('sv');
 const GENERATED_RU = loadGenerated('ru');
+const GENERATED_JA = loadGenerated('ja');
 
 /** Turn a seed (grid + clue-by-answer) into a fully-built puzzle. */
 export function buildSeedPuzzle(seed: SeedPuzzle, source: CrosswordPuzzle['source'] = 'authored'): CrosswordPuzzle {
@@ -65,6 +67,7 @@ const POOLS: Partial<Record<PuzzleLocale, CrosswordPuzzle[]>> = {
   ...(GENERATED_ES.length ? { es: GENERATED_ES.map((s) => buildSeedPuzzle(s, 'generated')) } : {}),
   ...(GENERATED_SV.length ? { sv: GENERATED_SV.map((s) => buildSeedPuzzle(s, 'generated')) } : {}),
   ...(GENERATED_RU.length ? { ru: GENERATED_RU.map((s) => buildSeedPuzzle(s, 'generated')) } : {}),
+  ...(GENERATED_JA.length ? { ja: GENERATED_JA.map((s) => buildSeedPuzzle(s, 'generated')) } : {}),
 };
 
 function resolveLocale(locale: PuzzleLocale): PuzzleLocale {

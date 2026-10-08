@@ -18,9 +18,24 @@ export function foldEsAccents(s: string): string {
   return s.toLowerCase().replace(/[áéíóúü]/g, (c) => ES_ACCENT_FOLD[c] ?? c);
 }
 
-/** Normalize a single typed cell letter for comparison (locale-aware; folds HE sofit + ES accents). */
+// Japanese crosswords write small kana full-size (しゃしん → しやしん) and ー stays as is.
+const JA_SMALL_FOLD: Record<string, string> = {
+  ぁ: 'あ', ぃ: 'い', ぅ: 'う', ぇ: 'え', ぉ: 'お', っ: 'つ', ゃ: 'や', ゅ: 'ゆ', ょ: 'よ', ゎ: 'わ', ゕ: 'か', ゖ: 'け',
+};
+export function foldJaKana(s: string): string {
+  return s
+    .replace(/[\u30A1-\u30F6]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60))
+    .replace(/[ぁぃぅぇぉっゃゅょゎゕゖ]/g, (c) => JA_SMALL_FOLD[c] ?? c);
+}
+const JA_CELL_RE = /^[\u3041-\u3096ー]+$/;
+
+/** Normalize a single typed cell letter for comparison (locale-aware; folds HE sofit, ES accents, JA kana). */
 export function normalizeCell(input: string, locale: PuzzleLocale): string {
   const base = normalizeWord((input ?? '').trim(), locale as Language);
+  if (locale === 'ja') {
+    const kana = foldJaKana(base);
+    return JA_CELL_RE.test(kana) ? kana : '';
+  }
   return locale === 'es' ? foldEsAccents(base) : base;
 }
 

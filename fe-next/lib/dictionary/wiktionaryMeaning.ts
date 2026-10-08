@@ -114,7 +114,7 @@ export function parseHebrewExtract(extract: string | null | undefined): string |
 }
 
 function isHeadword(line: string, word: string): boolean {
-  const first = line.trim().split(/[\s(¦|]/)[0].toLowerCase();
+  const first = line.trim().split(/[\s(¦|【]/)[0].toLowerCase();
   return first === word.toLowerCase();
 }
 
@@ -164,6 +164,19 @@ export function parseEditionExtract(
   return null;
 }
 
+/** ja hiragana pages head the sense with "ねこ【猫】" — return the bracketed kanji spellings. */
+export function jaHeadwordForms(extract: string | null | undefined, word: string): string[] {
+  if (!extract) return [];
+  const line = extract.split('\n').find((l) => l.trim().startsWith(`${word}【`));
+  const inner = line?.match(/【([^】]*)】/)?.[1];
+  if (!inner) return [];
+  return inner
+    .replace(/[（(][^）)]*[）)]/g, '')
+    .split(/[・、,，\s]+/)
+    .map((f) => f.trim())
+    .filter(Boolean);
+}
+
 /** Strip leading domain/usage labels: ru "зоол." / ja "（ねこ）" reading groups. */
 function stripLeadingLabels(line: string | null | undefined): string | null {
   if (!line) return null;
@@ -190,6 +203,15 @@ async function getJson(url: string): Promise<unknown | null> {
 function extractOf(data: unknown): string | undefined {
   const pages = (data as { query?: { pages?: Record<string, { extract?: string }> } } | null)?.query?.pages;
   return pages ? Object.values(pages)[0]?.extract : undefined;
+}
+
+/** ja definition plus the kanji spellings from its headword line (build-time clue gating). */
+export async function fetchJaWiktionaryEntry(word: string): Promise<{ def: string | null; forms: string[] }> {
+  const w = (word ?? '').trim();
+  if (!w) return { def: null, forms: [] };
+  const url = `https://ja.wiktionary.org/w/api.php?action=query&prop=extracts&explaintext=1&redirects=1&format=json&titles=${encodeURIComponent(w)}`;
+  const extract = extractOf(await getJson(url));
+  return { def: parseEditionExtract(extract, 'ja', w), forms: jaHeadwordForms(extract, w) };
 }
 
 export async function fetchWiktionaryMeaning(word: string, language: string): Promise<string | null> {

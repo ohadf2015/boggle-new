@@ -4,7 +4,11 @@ const FUNCTION_WORDS: Record<string, Set<string>> = {
 };
 
 /** True when a length-cut clue stops on an article/preposition/conjunction (reads as truncated). */
+// Japanese has no spaces to tokenize; a cut clue ends on a comma or a conjunction.
+const JA_DANGLING = /([、，,・]|および|及び|または|又は|並びに|ならびに|あるいは|もしくは)$/;
+
 export function endsDangling(clue: string, lang: string): boolean {
+  if (lang === 'ja') return JA_DANGLING.test(clue.trim());
   const last = (clue.toLowerCase().match(/\p{L}+/gu) ?? []).pop();
   return !!last && !!FUNCTION_WORDS[lang]?.has(last);
 }

@@ -4,8 +4,9 @@
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { fetchWiktionaryMeaning } from '../../../lib/dictionary/wiktionaryMeaning';
+import { fetchJaWiktionaryEntry, fetchWiktionaryMeaning } from '../../../lib/dictionary/wiktionaryMeaning';
 import { definitionToClue } from '../../../lib/crossword/clues/clueText';
+import { jaClueFromDefinition } from '../../../lib/crossword/clues/jaClue';
 
 const CACHE_DIR = join(__dirname, '.cache', 'wiktionary'); // under the already-gitignored .cache/
 
@@ -30,4 +31,22 @@ export async function fetchWiktDef(word: string, lang: string): Promise<string |
 export async function wiktionaryClue(word: string, lang: string): Promise<string | null> {
   const def = await fetchWiktDef(word, lang);
   return def ? definitionToClue(def, word) : null;
+}
+
+type JaEntry = { def: string | null; forms: string[] };
+
+/** Cached ja entry: the definition plus the headword's kanji spellings (needed for the circular gate). */
+async function fetchJaEntry(word: string): Promise<JaEntry> {
+  if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true });
+  const p = join(CACHE_DIR, `ja-entry-${encodeURIComponent(word)}.json`);
+  if (existsSync(p)) return JSON.parse(readFileSync(p, 'utf8')) as JaEntry;
+  const entry = await fetchJaWiktionaryEntry(word);
+  writeFileSync(p, JSON.stringify(entry));
+  return entry;
+}
+
+/** ja: whole first sentence, family-safe, non-circular (kana or kanji), or null. `hadDef` separates misses from rejects. */
+export async function wiktionaryClueJa(word: string): Promise<{ clue: string | null; hadDef: boolean }> {
+  const { def, forms } = await fetchJaEntry(word);
+  return { clue: jaClueFromDefinition(def, word, forms), hadDef: !!def };
 }

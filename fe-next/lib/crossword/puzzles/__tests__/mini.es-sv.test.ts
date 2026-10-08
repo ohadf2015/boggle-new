@@ -3,12 +3,13 @@ import { getPool } from '../index';
 import { isRealCrossword } from '../../templates';
 import esBank from '../../data/clueBank.es.json';
 import svBank from '../../data/clueBank.sv.json';
+import jaBank from '../../data/clueBank.ja.json';
 import { getGameModeRules } from '@/backend/modes/rules';
 import type { PuzzleLocale } from '../../types';
 
-const BANKS = { es: esBank, sv: svBank } as Record<string, Record<string, { clue: string }>>;
+const BANKS = { es: esBank, sv: svBank, ja: jaBank } as Record<string, Record<string, { clue: string }>>;
 
-describe.each(['es', 'sv'] as const)('%s mini pool', (locale) => {
+describe.each(['es', 'sv', 'ja'] as const)('%s mini pool', (locale) => {
   const pool = getPool(locale);
 
   const enabled = (getGameModeRules('crossword').languages ?? []).includes(locale);
@@ -55,6 +56,14 @@ describe.each(['es', 'sv'] as const)('%s mini pool', (locale) => {
       );
       expect(p.rtl).toBe(false);
       expect(isRealCrossword(grid, false)).toBe(true);
+    }
+  });
+});
+
+describe('ja mini pool', () => {
+  it('stores grid letters as full-size hiragana (small kana folded, ー allowed)', () => {
+    for (const p of getPool('ja')) {
+      for (const c of p.cells) if (!c.block) expect(c.solution, p.id).toMatch(/^[あいうえおか-ぢつ-もやゆよ-ろわをんー]$/);
     }
   });
 });

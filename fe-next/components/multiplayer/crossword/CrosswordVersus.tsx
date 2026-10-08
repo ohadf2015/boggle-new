@@ -19,7 +19,7 @@ import { useCrosswordHardwareKeys } from '@/hooks/useCrosswordHardwareKeys';
 import { crosswordStats, solvedSlotIds } from '@/lib/crossword/stats';
 import { crosswordScore } from '@/lib/solo/soloReward';
 import { CrosswordGrid } from '@/components/crossword/CrosswordGrid';
-import { CrosswordKeyboard } from '@/components/crossword/CrosswordKeyboard';
+import { CrosswordInputDock } from '@/components/crossword/CrosswordInputDock';
 import { ClueBar } from '@/components/crossword/ClueBar';
 import { CrosswordClueList } from '@/components/crossword/CrosswordClueList';
 import { useCrosswordMp, type CrosswordMpSocketLike, type CrosswordStanding } from './useCrosswordMp';
@@ -124,9 +124,15 @@ function CrosswordRace({
               <Eye className="h-4 w-4" aria-hidden="true" /> {t('crossword.revealWord')}
             </button>
           </div>
-          <div className="shrink-0 lg:hidden">
-            <CrosswordKeyboard locale={puzzle.locale} onLetter={game.inputLetter} onBackspace={game.backspace} disabled={solved} backspaceLabel={t('crossword.backspace')} />
-          </div>
+          <CrosswordInputDock
+            className="shrink-0"
+            locale={puzzle.locale}
+            onLetter={game.inputLetter}
+            onBackspace={game.backspace}
+            disabled={solved}
+            activeKey={`${game.state.active.row},${game.state.active.col},${game.state.dir}`}
+            t={t}
+          />
           {/* Full clue list: desktop only. On mobile it was another band competing with the
               board for a fixed viewport (and the clue bar's prev/next already cycles every
               clue). Unlike the solo view, this side's rail holds STANDINGS, not clues — so the

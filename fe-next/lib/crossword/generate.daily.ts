@@ -28,16 +28,14 @@ export function dailyDifficulty(dateISO: string): Difficulty {
 
 /**
  * Locale → clue-bank to fill from. he → Hebrew, es → Spanish (accent-folded keys), sv → Swedish,
- * everything else → en. es fills only because its keys are accent-folded (Spanish crosswords omit
+ * ja → Japanese (kana-folded keys), everything else → en. es fills only because its keys are accent-folded (Spanish crosswords omit
  * grid diacritics; see answer.foldEsAccents). sv keeps å/ä/ö (distinct Swedish letters) and fills
  * with a dense-enough 3-letter pool. All three use the 4×4 mini (their banks are too thin for a
  * doubly-checked 5×5). See the spec.
  */
-type GenLocale = 'en' | 'he' | 'es' | 'sv';
+type GenLocale = 'en' | 'he' | 'es' | 'sv' | 'ja';
 function genLocaleFor(locale: PuzzleLocale): GenLocale {
-  if (locale === 'he') return 'he';
-  if (locale === 'es') return 'es';
-  if (locale === 'sv') return 'sv';
+  if (locale === 'he' || locale === 'es' || locale === 'sv' || locale === 'ja') return locale;
   return 'en';
 }
 
@@ -53,7 +51,9 @@ async function loadClues(gen: GenLocale): Promise<ClueMap> {
       ? import('./data/clueBank.es.json')
       : gen === 'sv'
         ? import('./data/clueBank.sv.json')
-        : import('./data/clueBank.en.json'));
+        : gen === 'ja'
+          ? import('./data/clueBank.ja.json')
+          : import('./data/clueBank.en.json'));
   const clues = ((mod as { default?: unknown }).default ?? mod) as unknown as ClueMap;
   clueCache.set(gen, clues);
   return clues;

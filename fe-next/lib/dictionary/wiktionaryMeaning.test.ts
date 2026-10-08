@@ -4,7 +4,46 @@ import {
   parseHebrewExtract,
   parseEditionExtract,
   fetchWiktionaryMeaning,
+  jaHeadwordForms,
 } from './wiktionaryMeaning';
+
+// Hiragana-titled ja pages (captured live 2026-10-08): the headword line is "ねこ【猫】", not bare "ねこ".
+const JA_HIRA_NEKO = `
+== 日本語 ==
+
+
+=== 異表記・別形 ===
+ネコ
+
+
+=== 名詞：猫 ===
+ねこ【猫】
+
+哺乳類食肉目ネコ科ネコ属に分類される動物の通称。愛玩動物として飼われることが多い。
+`;
+const JA_HIRA_MIZU = `
+== 日本語 ==
+
+
+=== 名詞 ===
+みず【水】 (歴史的仮名遣い みづ)
+
+水素と酸素の化合物。
+`;
+const JA_HIRA_INU = `
+== 日本語 ==
+
+
+=== 語源1 ===
+古典日本語 いぬ < 日本祖語 *enu
+
+
+==== 名詞 ====
+
+いぬ【犬・狗】
+
+哺乳類食肉目イヌ科イヌ属の動物。
+`;
 
 // Real plaintext-extract shapes captured live from each edition's action API (2026-06-30).
 const HE_WINDOW = '\n== חַלּוֹן ==\n\nפתח מתוכנן כלשהו בקירות של מבנה ובחומות שמאפשר לאור ולאוויר לחדור דרכו.';
@@ -136,6 +175,11 @@ describe('parseEditionExtract', () => {
   it('ja: finds 日本語 → 名詞 (not 漢字), strips the leading reading group', () => {
     expect(parseEditionExtract(JA_NEKO, 'ja', '猫')).toBe('ネコ科を構成する小型の哺乳類で、犬とともに古くからの愛玩動物。');
   });
+  it('ja: skips a hiragana page\'s "ねこ【猫】" headword line and returns the definition', () => {
+    expect(parseEditionExtract(JA_HIRA_NEKO, 'ja', 'ねこ')).toBe('哺乳類食肉目ネコ科ネコ属に分類される動物の通称。愛玩動物として飼われることが多い。');
+    expect(parseEditionExtract(JA_HIRA_MIZU, 'ja', 'みず')).toBe('水素と酸素の化合物。');
+    expect(parseEditionExtract(JA_HIRA_INU, 'ja', 'いぬ')).toBe('哺乳類食肉目イヌ科イヌ属の動物。');
+  });
   it('ru: reads the «Значение» section and cuts at the ◆ example marker', () => {
     expect(parseEditionExtract(RU_DOM, 'ru', 'дом')).toBe('архитектурное сооружение, предназначенное для жилья');
   });
@@ -144,6 +188,21 @@ describe('parseEditionExtract', () => {
   });
   it('returns null for empty input', () => {
     expect(parseEditionExtract('', 'en', 'x')).toBeNull();
+  });
+});
+
+describe('jaHeadwordForms', () => {
+  it('returns the kanji spellings bracketed on the headword line', () => {
+    expect(jaHeadwordForms(JA_HIRA_NEKO, 'ねこ')).toEqual(['猫']);
+    expect(jaHeadwordForms(JA_HIRA_INU, 'いぬ')).toEqual(['犬', '狗']);
+    expect(jaHeadwordForms(JA_HIRA_MIZU, 'みず')).toEqual(['水']);
+  });
+  it('drops parenthesised notes inside the brackets', () => {
+    expect(jaHeadwordForms('はな【花、華 （稀用:英、芭、葩）】', 'はな')).toEqual(['花', '華']);
+  });
+  it('is empty when there is no bracketed form', () => {
+    expect(jaHeadwordForms('やま\n\n山。', 'やま')).toEqual([]);
+    expect(jaHeadwordForms(null, 'やま')).toEqual([]);
   });
 });
 

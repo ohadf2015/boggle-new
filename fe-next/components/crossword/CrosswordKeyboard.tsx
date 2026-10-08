@@ -1,7 +1,8 @@
 'use client';
 
-import { Delete } from 'lucide-react';
 import type { PuzzleLocale } from '@/lib/crossword/types';
+import { BackspaceKey, LetterKey } from './CrosswordKeyButton';
+import { CrosswordKanaKeyboard } from './CrosswordKanaKeyboard';
 
 const LAYOUTS: Partial<Record<PuzzleLocale, string[]>> = {
   en: ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'],
@@ -26,6 +27,9 @@ export interface CrosswordKeyboardProps {
   onBackspace: () => void;
   disabled?: boolean;
   backspaceLabel: string;
+  /** ja only: labels for the base ↔ dakuten page toggle. */
+  voicedLabel?: string;
+  basicLabel?: string;
 }
 
 export function CrosswordKeyboard({
@@ -34,7 +38,21 @@ export function CrosswordKeyboard({
   onBackspace,
   disabled,
   backspaceLabel,
+  voicedLabel = '゛゜',
+  basicLabel = 'あ',
 }: CrosswordKeyboardProps) {
+  if (locale === 'ja') {
+    return (
+      <CrosswordKanaKeyboard
+        onLetter={onLetter}
+        onBackspace={onBackspace}
+        disabled={disabled}
+        backspaceLabel={backspaceLabel}
+        voicedLabel={voicedLabel}
+        basicLabel={basicLabel}
+      />
+    );
+  }
   const rows = LAYOUTS[locale] ?? LAYOUTS.en!;
   const dir = locale === 'he' ? 'rtl' : 'ltr';
 
@@ -43,26 +61,10 @@ export function CrosswordKeyboard({
       {rows.map((row, i) => (
         <div key={i} className="flex justify-center gap-1">
           {i === rows.length - 1 && (
-            <button
-              type="button"
-              aria-label={backspaceLabel}
-              disabled={disabled}
-              onClick={onBackspace}
-              className="flex items-center justify-center px-3 h-11 min-w-[2.75rem] bg-neo-navy-light text-neo-white border-neo border-black rounded-neo shadow-hard active:translate-y-[1px] active:shadow-hard-pressed disabled:opacity-40"
-            >
-              <Delete size={18} />
-            </button>
+            <BackspaceKey label={backspaceLabel} onPress={onBackspace} disabled={disabled} />
           )}
           {[...row].map((ch) => (
-            <button
-              key={ch}
-              type="button"
-              disabled={disabled}
-              onClick={() => onLetter(ch)}
-              className="flex-1 max-w-[2.4rem] h-11 bg-neo-white text-neo-navy font-neo-display font-bold uppercase border-neo border-black rounded-neo shadow-hard active:translate-y-[1px] active:shadow-hard-pressed disabled:opacity-40"
-            >
-              {ch}
-            </button>
+            <LetterKey key={ch} ch={ch} onPress={onLetter} disabled={disabled} />
           ))}
         </div>
       ))}
