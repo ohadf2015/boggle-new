@@ -5,6 +5,7 @@
  * triggers score calculation, and handles post-game workflows.
  */
 
+import { buildFallbackResultsPayload } from './fallbackResultsPayload';
 import type { Server } from 'socket.io';
 
 import { getGame, transitionGameState } from '../../modules/gameStateManager';
@@ -97,30 +98,7 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
     const err = error as Error;
     logger.error('GAME', `CRITICAL: Score calculation failed for ${gameCode}: ${err.message}`, { stack: err.stack });
 
-    // Build fallback results from raw playerScores so clients can still see the results page
-    const fallbackScores = Object.entries(game.users || {}).map(([username]) => ({
-      username,
-      totalScore: game.playerScores?.[username] || 0,
-      // Field MUST be `wordDetails` to match PlayerResult: both the client
-      // broadcast (gameScores.ts) and the Supabase mapper (gameResults.ts:187/194)
-      // read `wordDetails`. A `words` key here silently persists 0 words / 0 longest.
-      wordDetails: (game.playerWords?.[username] || []).map((word: string) => ({
-        word,
-        score: 0,
-        isValid: true,
-        isDuplicate: false,
-      })),
-      achievements: [],
-      titles: [],
-    }));
-
-    const fallbackPayload = {
-      scores: fallbackScores,
-      letterGrid: game.letterGrid,
-      duplicateRuleDisabled: false,
-      playerCount: Object.keys(game.users || {}).length,
-      gameMode: game.gameMode,
-    };
+    const fallbackPayload = buildFallbackResultsPayload(game as never);
 
     // Cache and broadcast fallback so reconnecting clients also get it
     game.cachedResultsPayload = fallbackPayload;
@@ -130,7 +108,7 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
     // Persist fallback results to Supabase so XP, coins, and stats are not lost
     if (isSupabaseConfigured()) {
       try {
-        await recordGameResultsToSupabase(io, gameCode, fallbackScores as any, game);
+        await recordGameResultsToSupabase(io, gameCode, fallbackPayload.scores as any, game);
       } catch (persistError: unknown) {
         const pErr = persistError as Error;
         logger.error('GAME', `CRITICAL: Fallback persistence also failed for ${gameCode}: ${pErr.message}`, { stack: pErr.stack });
