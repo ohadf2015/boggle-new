@@ -58,8 +58,6 @@ vi.mock('@/hooks/useLessonDraft', () => ({
   }),
 }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
-vi.mock('../LessonBuilderCreateDialog', () => ({ default: () => null }));
-vi.mock('../LessonBuilderEditDialog', () => ({ default: () => null }));
 vi.mock('../LessonBuilderDraftPrompt', () => ({ default: () => null }));
 vi.mock('../lesson-creation', () => ({ BulkImportEnhanced: () => null }));
 vi.mock('../StarterPacksSection', () => ({ StarterPacksSection: () => null }));

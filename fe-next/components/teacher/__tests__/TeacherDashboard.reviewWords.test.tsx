@@ -43,7 +43,6 @@ vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ grant: null, l
 // Stub every heavy child; the deep link is the whole subject here.
 vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () => null }));
 vi.mock('@/components/education/TeacherOnboarding', () => ({ TeacherOnboarding: () => null }));
-vi.mock('@/components/education/TeacherWelcomeBanner', () => ({ TeacherWelcomeBanner: () => null }));
 vi.mock('../ClassroomManager', () => ({ __esModule: true, default: () => null }));
 vi.mock('../PlayTabFirstRunCard', () => ({ __esModule: true, default: () => null }));
 vi.mock('../StudentsPresentStrip', () => ({ __esModule: true, default: () => null }));

@@ -27,7 +27,6 @@ describe('education surfaces stay calm', () => {
     for (const rel of [
       'components/education/ComparisonStrip.tsx',
       'components/education/SixModeTour.tsx',
-      'components/education/MoatTrifectaSection.tsx',
       'components/education/TeacherAccessCTA.tsx',
     ]) {
       const src = read(rel);

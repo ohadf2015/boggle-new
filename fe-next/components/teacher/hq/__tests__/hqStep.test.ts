@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickHqStep, type HqStepInput } from '../hqStep';
+import { pickHqStep, showLauncher, type HqStepInput } from '../hqStep';
 
 const base: HqStepInput = {
   classroomsLoading: false,
@@ -51,5 +51,19 @@ describe('pickHqStep — Teacher HQ asks for one thing at a time', () => {
 
   it('Given an active class, Then go live leads without the first-homework offer', () => {
     expect(pickHqStep(base)).toEqual({ step: 'goLive', offerFirstAssignment: false });
+  });
+});
+
+describe('showLauncher — the game picker is one tap from a fresh class', () => {
+  it('Given a class was just created, Then the picker is already open', () => {
+    expect(showLauncher({ armed: false, justCreatedClass: true })).toBe(true);
+  });
+
+  it('Given the teacher asked for the picker, Then it stays open', () => {
+    expect(showLauncher({ armed: true, justCreatedClass: false })).toBe(true);
+  });
+
+  it('Given neither, Then the picker stays folded behind its link', () => {
+    expect(showLauncher({ armed: false, justCreatedClass: false })).toBe(false);
   });
 });
