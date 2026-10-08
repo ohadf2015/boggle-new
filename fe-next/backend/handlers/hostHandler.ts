@@ -14,6 +14,7 @@ import {
 } from '../modules/gameStateManager.js';
 
 import { checkRateLimit } from '../utils/rateLimiter.js';
+import { getGameRoom } from '../utils/socketHelpers.js';
 import logger from '../utils/logger.js';
 
 const ALLOWED_LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
@@ -78,7 +79,7 @@ function registerHostHandlers(io: Server, socket: Socket): void {
     game.language = newLang;
 
     const changedBy = game.hostUsername || 'host';
-    io.to(data.gameCode).emit('roomLanguageChanged', {
+    io.to(getGameRoom(data.gameCode)).emit('roomLanguageChanged', {
       language: newLang,
       changedBy,
     });
