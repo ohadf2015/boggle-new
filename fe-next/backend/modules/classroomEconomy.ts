@@ -8,6 +8,18 @@
 
 import { COSMETICS } from '@/lib/cosmetics';
 
+import {
+  CHEST_ODDS,
+  CHEST_XP,
+  POWER_UPS,
+  WRONG_ANSWER_COST,
+  type ChestRarity,
+  type PowerUpId,
+} from '@/shared/constants/classroomEconomy';
+
+export { CHEST_ODDS, CHEST_XP, POWER_UPS, WRONG_ANSWER_COST };
+export type { PowerUpId };
+
 export interface EconomyState {
   cash: number;
   cashEarned: number;
@@ -17,16 +29,6 @@ export interface EconomyState {
   shieldHeld: boolean;
   hintsHeld: number;
 }
-
-export type PowerUpId = 'doubleCash' | 'streakShield' | 'hintReveal';
-
-export const POWER_UPS: Record<PowerUpId, { cost: number; durationMs?: number }> = {
-  doubleCash: { cost: 15, durationMs: 30_000 },
-  streakShield: { cost: 20 },
-  hintReveal: { cost: 10 },
-};
-
-export const WRONG_ANSWER_COST = 2;
 
 const BASE_CAP = 6;
 
@@ -116,21 +118,8 @@ export function isPowerUpId(id: string): id is PowerUpId {
   return Object.prototype.hasOwnProperty.call(POWER_UPS, id);
 }
 
-/** Published odds. The student UI reads this same object, never a copy. */
-export const CHEST_ODDS: Record<'common' | 'rare' | 'epic', number> = {
-  common: 0.7,
-  rare: 0.25,
-  epic: 0.05,
-};
-
-export const CHEST_XP: Record<'common' | 'rare' | 'epic', number> = {
-  common: 10,
-  rare: 25,
-  epic: 60,
-};
-
 export interface ChestRoll {
-  rarity: 'common' | 'rare' | 'epic';
+  rarity: ChestRarity;
   xp: number;
   itemId: string;
 }
@@ -144,7 +133,7 @@ function hash01(seed: string): number {
   return ((h >>> 0) % 1_000_000) / 1_000_000;
 }
 
-function poolFor(rarity: 'common' | 'rare' | 'epic'): string[] {
+function poolFor(rarity: ChestRarity): string[] {
   const ids = COSMETICS.filter((c) => c.rarity === rarity).map((c) => c.id);
   return ids.length > 0 ? ids : COSMETICS.filter((c) => c.rarity === 'common').map((c) => c.id);
 }
@@ -152,7 +141,7 @@ function poolFor(rarity: 'common' | 'rare' | 'epic'): string[] {
 /** Deterministic in its seed, so a replayed claim cannot re-roll a better chest. */
 export function rollChest(seed: string): ChestRoll {
   const u = hash01(`rarity:${seed}`);
-  const rarity: ChestRoll['rarity'] = u < CHEST_ODDS.epic ? 'epic' : u < CHEST_ODDS.epic + CHEST_ODDS.rare ? 'rare' : 'common';
+  const rarity: ChestRarity = u < CHEST_ODDS.epic ? 'epic' : u < CHEST_ODDS.epic + CHEST_ODDS.rare ? 'rare' : 'common';
   const pool = poolFor(rarity);
   const pick = Math.floor(hash01(`item:${seed}`) * pool.length) % pool.length;
   return { rarity, xp: CHEST_XP[rarity], itemId: pool[pick] };
