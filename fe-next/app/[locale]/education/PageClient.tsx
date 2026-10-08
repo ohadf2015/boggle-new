@@ -17,7 +17,7 @@ import { LandingFinalCta } from '@/components/education/landing/LandingFinalCta'
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 
 /**
- * Teacher landing. Order: promise → proof → how it runs → modes → price → school quote → FAQ → close.
+ * Teacher landing. Order: playable board → how a class runs → modes → price → proof → school quote → FAQ → close.
  * Approved teachers go to the live lobby; everyone else sees the page, including signed-in
  * accounts without teacher access (every profile starts as `student`, so redirecting them
  * bounced players and fresh teacher signups to the student hub).
@@ -56,7 +56,6 @@ export function PageClient({ geo, faq }: { geo?: GeoAnswer; faq?: ReactNode }) {
         </p>
       )}
       <EducationHero setupPending={setupPending} />
-      <LandingProofStrip />
       <LandingHowItWorks geo={geo} />
       <div id="modes">
         <SixModeTour />
@@ -65,6 +64,7 @@ export function PageClient({ geo, faq }: { geo?: GeoAnswer; faq?: ReactNode }) {
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         <TeacherProCheckoutCta locale={language} />
       </div>
+      <LandingProofStrip />
       <LandingSchoolLead />
       {faq}
       <LandingFinalCta setupPending={setupPending} />

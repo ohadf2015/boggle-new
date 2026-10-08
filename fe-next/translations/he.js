@@ -1,5 +1,112 @@
 // HE translations
 const he = {
+  // @eg6Land:start
+  "eg6Land": {
+    "vsGimkit": {
+      "title": "LexiClash מול Gimkit Basic — מצבי Pro בלעדיים מוגבלים ל-5 שחקנים (2026) | LexiClash",
+      "description": "LexiClash מול Gimkit Basic: מצבי Pro בלעדיים מוגבלים ל-5 שחקנים בתוכנית החינמית של Gimkit. LexiClash מריצה משחקי אוצר מילים חינמיים לכיתה שלמה, עד 50 תלמידים.",
+      "eyebrow": "השוואה · חלופה לחינוך",
+      "h1": "LexiClash מול Gimkit Basic",
+      "introBefore": "Gimkit Basic מציעה מצבים מובחרים עם מספר שחקנים בלתי מוגבל, אבל",
+      "introBold": "מצבי Gimkit Pro Exclusive מוגבלים ל-5 שחקנים",
+      "introAfter": "למשתמשי Basic. אוצר המילים החינמי של LexiClash לכיתה מריץ כיתה שלמה (עד 50 תלמידים), בלי מצב שמצטמצם לחמישה מקומות.",
+      "evidence": "ראיות:",
+      "sideHeading": "השוואה צד לצד",
+      "colFeature": "תכונה",
+      "colLexi": "LexiClash",
+      "colGimkit": "Gimkit Basic",
+      "row1Feature": "מצבי Pro בלעדיים / פרימיום בתוכנית החינמית",
+      "row1Lexi": "✓ אוצר מילים חינמי לכיתה שלמה (בלי מצב של 5 מקומות)",
+      "row2Feature": "משחק מרכזי חינמי",
+      "row2Lexi": "✓ עד 50 תלמידים בחינם",
+      "row3Feature": "בלי הרשמה לתלמידים",
+      "row3Lexi": "✓ קוד הצטרפות בן 6 תווים",
+      "row4Feature": "סוג המשחק",
+      "row4Lexi": "יצירת מילים (Boggle/גלגל/אנגרמות)",
+      "row5Feature": "מתאים ל",
+      "row5Lexi": "אוצר מילים, איות, ESL",
+      "row6Feature": "ראיה (Basic, Pro Exclusive)",
+      "row6Lexi": "—",
+      "faqHeading": "שאלות נפוצות",
+      "faq1Q": "האם מצבי Pro Exclusive של Gimkit מוגבלים ב-Basic?",
+      "faq1A": "כן. מאמר העזרה של Gimkit על מגבלת השחקנים קובע שמצבי Pro Exclusive מוגבלים ל-5 שחקנים ב-Basic. מצבים מובחרים ב-Basic ללא הגבלה; מצבי Pro Exclusive מתחלפים ונשארים מוגבלים ל-5 עד שדרוג.",
+      "faq2Q": "איך LexiClash מתמודדת עם מגבלת 5 השחקנים של Pro Exclusive?",
+      "faq2A": "אוצר המילים החינמי של LexiClash לכיתה מריץ כיתה שלמה (עד 50 תלמידים), בלי מצב שיורד ל-5 מקומות.",
+      "faq3Q": "מה ההבדל בין Gimkit Basic ל-Gimkit Pro?",
+      "faq3A": "לפי שאלות הנפוצות של Gimkit Pro, ב-Basic אפשר לשחק במצבים מובחרים עם כמה תלמידים שרוצים. Pro פותח את כל המצבים (Pro Exclusives), משימות והעלאת מדיה. ב-Basic מצבי Pro Exclusive נשארים מוגבלים ל-5 שחקנים.",
+      "faq4Q": "האם תלמידים צריכים חשבון ב-LexiClash?",
+      "faq4A": "לא. תלמידים מצטרפים עם קוד בן 6 תווים. פרו למורים מוסיף כיתות בלתי מוגבלות ודוחות להדפסה; התוכנית החינמית כבר מכסה כיתה שלמה של עד 50 תלמידים במשחקי אוצר מילים.",
+      "faq5Q": "האם LexiClash היא פלטפורמת חידונים כמו Gimkit?",
+      "faq5A": "לא. Gimkit היא פלטפורמת קיטים וחידונים עם מצבים חיים (מובחרים ו-Pro Exclusive). LexiClash היא יצירת מילים (רשתות בסגנון Boggle, אנגרמות, גלגלי מילים) לתרגול אוצר מילים ושפה, עם מקומות חינמיים לכיתה שלמה.",
+      "footStart": "התחילו משחק כיתתי",
+      "footKahoot": "מול Kahoot",
+      "footWayground": "מול Wayground",
+      "footBlooket": "מול Blooket"
+    },
+    "demo": {
+      "label": "לוח משחק: מסמנים מילה",
+      "watching": "צפו: LexiClash מסמנת מילה",
+      "yourTurn": "תורכם: לוחצים על אותיות שנוגעות זו בזו",
+      "replay": "צפו שוב",
+      "found": "נמצא: {word}",
+      "timeLeft": "נשארו {count} שניות",
+      "wordsFound": "נמצאו {count} מילים"
+    },
+    "resources": {
+      "heading": "גלו מצבי לימוד",
+      "subhead": "בחרו את הפורמט המתאים לכיתה — דואלי 1v1 מהירים או רב-משתתפים חי לכל הכיתה.",
+      "duelsTitle": "דואלי אוצר מילים (1v1)",
+      "duelsDesc": "התאימו תלמידים לקרבות מילים של 2-3 דקות פנים מול פנים.",
+      "classroomTitle": "משחק כיתתי חי",
+      "classroomDesc": "רב-משתתפים לכל הכיתה; התלמידים מצטרפים עם קוד כיתה, בלי אימייל."
+    },
+    "compare": {
+      "before": "ראו איך LexiClash משתווה: ",
+      "anchor": "LexiClash מול Kahoot",
+      "after": " — תכונות, מחיר והתאמה לכיתה."
+    },
+    "guides": {
+      "heading": "מדריכים למורים",
+      "subhead": "דפי נחיתה מעמיקים למקרי שימוש ספציפיים, עם טבלאות השוואה, שאלות נפוצות ורשימות מילים חינמיות.",
+      "vocabBadge": "מדריך",
+      "vocabTitle": "משחקי אוצר מילים לכיתה",
+      "vocabDesc": "בלי הרשמה, 6 שפות, חינם למורים — מול Quizlet/Kahoot/Wordwall.",
+      "eslBadge": "אנגלית",
+      "eslTitle": "משחקי מילים באנגלית כשפה זרה",
+      "eslDesc": "ממתחילים ועד מתקדמים, 6 מילונים, בלי הרשמת תלמידים.",
+      "teachersBadge": "למורים",
+      "teachersTitle": "משחקי מילים למורים",
+      "teachersDesc": "יום מילוי מקום, הפסקה מרעננת, חימום — אפס הכנה, חינם למורים.",
+      "spellingBadge": "איות",
+      "spellingTitle": "תרגול תחרות איות אונליין",
+      "spellingDesc": "תוכנית אימון של 4 שבועות, רשימות מילים מותאמות, דואלי 1v1 — הכנה לתחרות.",
+      "sightBadge": "מילים נפוצות",
+      "sightTitle": "תרגול Sight Words (Dolch ו-Fry)",
+      "sightDesc": "כרטיסיות, התאמות ואיות — מבוסס על רשימת המילים שלכם.",
+      "schoolsBadge": "לבתי ספר",
+      "schoolsTitle": "LexiClash לבתי ספר",
+      "schoolsDesc": "חינם למורים — בתי ספר ומחלקות החל מ-$49 למורה לשנה, בלי הרשמת תלמידים.",
+      "listsBadge": "חינם",
+      "listsTitle": "רשימות מילים",
+      "listsDesc": "רשימות מילים לפי כיתה ונושא, מוכנות למשחק בכיתה."
+    },
+    "moments": {
+      "heading": "בחרו את הרגע",
+      "subhead": "לא רשימת תכונות — המצבים האמיתיים שמורים מחפשים, כל אחד עם תוכנית שאפשר להפעיל היום."
+    },
+    "learner": {
+      "heading": "משחקים ללומדי אנגלית",
+      "subhead": "לפי גיל ולפי נושא, באותו מבנה של דף ה-ESL שכבר מביא תנועה."
+    },
+    "pro": {
+      "rosterPro": "תלמידים ללא הגבלה ברשימה שלכם",
+      "liveCap": "במשחק חי משתתפים עד {count} שחקנים במקביל",
+      "mastery": "מפת שליטה: אילו מילים כל תלמיד יודע",
+      "missedPractice": "סבבי תרגול למילים שהוחמצו, על בסיס פערים אמיתיים",
+      "reports": "דוחות כיתה להדפסה"
+    }
+  },
+  // @eg6Land:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

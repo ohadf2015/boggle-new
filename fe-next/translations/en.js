@@ -1,5 +1,112 @@
 // EN translations
 const en = {
+  // @eg6Land:start
+  "eg6Land": {
+    "vsGimkit": {
+      "title": "LexiClash vs Gimkit Basic — Pro-Exclusive Modes Capped at 5 Players (2026) | LexiClash",
+      "description": "LexiClash vs Gimkit Basic: Pro-Exclusive modes are limited to 5 players on the free Gimkit Basic plan. LexiClash runs free vocabulary games for a whole class of up to 50 students.",
+      "eyebrow": "Compare · education alternative",
+      "h1": "LexiClash vs Gimkit Basic",
+      "introBefore": "Gimkit Basic offers featured modes with unlimited players, but",
+      "introBold": "Gimkit Pro Exclusive modes are limited to 5 players",
+      "introAfter": "for Basic members. LexiClash free classroom vocabulary runs a whole class (up to 50 students) with no mode that shrinks to five seats.",
+      "evidence": "Evidence:",
+      "sideHeading": "Side-by-side",
+      "colFeature": "Feature",
+      "colLexi": "LexiClash",
+      "colGimkit": "Gimkit Basic",
+      "row1Feature": "Pro-Exclusive / premium modes on the free tier",
+      "row1Lexi": "✓ Whole-class free vocab (no 5-seat mode)",
+      "row2Feature": "Featured / core free play",
+      "row2Lexi": "✓ Up to 50 students free",
+      "row3Feature": "No student signup",
+      "row3Lexi": "✓ 6-character join code",
+      "row4Feature": "Game type",
+      "row4Lexi": "Word-formation (Boggle/Wheel/Anagram)",
+      "row5Feature": "Best for",
+      "row5Lexi": "Vocabulary, spelling, ESL",
+      "row6Feature": "Evidence (Basic Pro Exclusive)",
+      "row6Lexi": "—",
+      "faqHeading": "FAQ",
+      "faq1Q": "Are Gimkit Pro-Exclusive modes limited on Gimkit Basic?",
+      "faq1A": "Yes. Gimkit's help article on player maximums says Pro Exclusive modes are limited to 5 players on Basic. Featured modes on Basic are unlimited; Pro Exclusive modes rotate and stay capped at 5 until you upgrade.",
+      "faq2Q": "How does LexiClash compare on the 5-player Pro-Exclusive cap?",
+      "faq2A": "LexiClash free classroom vocabulary runs a whole class (up to 50 students) with no mode that drops to 5 seats.",
+      "faq3Q": "What is the difference between Gimkit Basic and Gimkit Pro?",
+      "faq3A": "Per Gimkit's Pro FAQ, Basic lets you play featured modes with as many students as you want. Pro unlocks all modes (Pro Exclusives), Assignments, and media uploads. On Basic, Pro Exclusive modes stay limited to 5 players.",
+      "faq4Q": "Do students need accounts on LexiClash?",
+      "faq4A": "No. Students join with a 6-character code. Teacher Pro adds unlimited classes and printable reports; the free tier already covers a whole class of up to 50 for vocabulary word games.",
+      "faq5Q": "Is LexiClash a quiz platform like Gimkit?",
+      "faq5A": "No. Gimkit is a kit and quiz platform with live modes (featured and Pro Exclusive). LexiClash is word-formation (Boggle-style grids, anagrams, word wheels) for vocabulary and language practice, with free whole-class seats.",
+      "footStart": "Start a classroom game",
+      "footKahoot": "vs Kahoot",
+      "footWayground": "vs Wayground",
+      "footBlooket": "vs Blooket"
+    },
+    "demo": {
+      "label": "Playable board: trace a word",
+      "watching": "Watch: LexiClash traces a word",
+      "yourTurn": "Your turn: tap letters that touch",
+      "replay": "Watch again",
+      "found": "Found: {word}",
+      "timeLeft": "{count}s left",
+      "wordsFound": "{count} words found"
+    },
+    "resources": {
+      "heading": "Explore Education Modes",
+      "subhead": "Pick the right format for your classroom — quick 1v1 duels or live whole-class multiplayer.",
+      "duelsTitle": "Vocabulary Duels (1v1)",
+      "duelsDesc": "Pair students for 2-3 minute head-to-head word battles.",
+      "classroomTitle": "Live Classroom Game",
+      "classroomDesc": "Whole-class multiplayer; students join with a class code, no email needed."
+    },
+    "compare": {
+      "before": "See how LexiClash compares: ",
+      "anchor": "LexiClash vs Kahoot",
+      "after": " — features, price, and classroom fit."
+    },
+    "guides": {
+      "heading": "Teacher Guides",
+      "subhead": "Deep-dive landing pages on specific use cases, with comparison tables, FAQs, and free word lists.",
+      "vocabBadge": "Guide",
+      "vocabTitle": "Vocabulary Games for the Classroom",
+      "vocabDesc": "No signup, 6 languages, free for teachers — vs Quizlet/Kahoot/Wordwall.",
+      "eslBadge": "ESL",
+      "eslTitle": "ESL Word Games Online",
+      "eslDesc": "Beginner to advanced, 6 dictionaries, no student signup.",
+      "teachersBadge": "For Teachers",
+      "teachersTitle": "Word Games for Teachers",
+      "teachersDesc": "Sub-day, brain-break, warm-up — zero prep, free for teachers.",
+      "spellingBadge": "Spelling Bee",
+      "spellingTitle": "Spelling Bee Practice Online",
+      "spellingDesc": "4-week training plan, custom word lists, 1v1 duels — Scripps prep.",
+      "sightBadge": "Sight Words",
+      "sightTitle": "Sight Words Practice (Dolch & Fry)",
+      "sightDesc": "Flashcards, matching & spelling drills built from your own Dolch/Fry list.",
+      "schoolsBadge": "For Schools",
+      "schoolsTitle": "LexiClash for Schools",
+      "schoolsDesc": "Free for teachers — Schools & departments from $49 per teacher / year, no student logins.",
+      "listsBadge": "Free",
+      "listsTitle": "Word lists",
+      "listsDesc": "Curriculum word lists by grade and subject, ready to play in class."
+    },
+    "moments": {
+      "heading": "Pick your moment",
+      "subhead": "Not a feature list — the specific situations teachers actually search for, each with a plan you can run today."
+    },
+    "learner": {
+      "heading": "English-learner games",
+      "subhead": "Age bands and topic drills for Spanish-English classrooms — the same teacher-led shape as the ESL page that already ranks."
+    },
+    "pro": {
+      "rosterPro": "Unlimited students on your roster",
+      "liveCap": "Live games seat up to {count} players at once",
+      "mastery": "Mastery heatmap: which words each student knows",
+      "missedPractice": "Missed-practice rounds built from real gaps",
+      "reports": "Printable class reports"
+    }
+  },
+  // @eg6Land:end
   // @eg2Land:start
   "eg2Land": {
     "header": {

@@ -6,15 +6,21 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
+vi.mock('next/dynamic', () => ({
+  default: () => () => <div data-testid="education-landing-demo-slot" />,
+}));
+
 const mockTrackLandingCtaClick = vi.fn();
 vi.mock('@/utils/growthTracking', () => ({
   trackLandingCtaClick: (...args: unknown[]) => mockTrackLandingCtaClick(...args),
 }));
 
+const demoColumn = () => screen.getByTestId('education-landing-demo-slot').closest('[data-hero-item]');
+
 describe('EducationHero', () => {
   beforeEach(() => mockTrackLandingCtaClick.mockClear());
 
-  it('keeps the headline off the 6xl scale and the two play actions in one row on large screens', () => {
+  it('keeps the headline off the 6xl scale and the two actions in one row on large screens', () => {
     render(<EducationHero />);
     const h1 = screen.getByRole('heading', { level: 1 });
     expect(h1.className).not.toMatch(/text-6xl/);
@@ -25,18 +31,7 @@ describe('EducationHero', () => {
     expect(grid?.className).not.toMatch(/items-center/);
   });
 
-  it('puts join-with-a-code in the hero, after the teacher path and before the mock', () => {
-    render(<EducationHero />);
-    const join = screen.getByTestId('education-hero-join-cta');
-    expect(join).toHaveAttribute('href', '/en/student/join');
-    expect(join.className).not.toMatch(/bg-neo-lime/);
-    const free = screen.getByTestId('education-hero-free-cta');
-    const mock = screen.getByTestId('mock-join-code').closest('[data-hero-item]');
-    expect(free.compareDocumentPosition(join) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(join.compareDocumentPosition(mock!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
-
-  it('renders a primary free-access path and a secondary Teacher Pro checkout CTA', () => {
+  it('renders one primary free-access CTA and one secondary Teacher Pro checkout CTA', () => {
     render(<EducationHero />);
     const free = screen.getByTestId('education-hero-free-cta');
     expect(free).toHaveAttribute('href', '/en/education/access');
@@ -44,12 +39,7 @@ describe('EducationHero', () => {
     const pro = screen.getByTestId('education-hero-pro-cta');
     expect(pro).toHaveAttribute('href', '/en/teacher/upgrade');
     expect(pro.textContent).toMatch(/\$9/);
-  });
-
-  it('no longer renders the secondary "see it in action" anchor', () => {
-    render(<EducationHero />);
-    const anchors = Array.from(document.querySelectorAll('a'));
-    expect(anchors.some((a) => (a.getAttribute('href') ?? '') === '#modes')).toBe(false);
+    expect(screen.queryByTestId('education-hero-join-cta')).toBeNull();
   });
 
   it('tracks Pro and free hero CTA clicks separately', () => {
@@ -60,51 +50,40 @@ describe('EducationHero', () => {
     expect(mockTrackLandingCtaClick).toHaveBeenCalledWith('education_hero');
   });
 
-  it('embeds the education-mode mock so visitors see it in action', () => {
+  it('renders the playable board slot in place of the CSS mock', () => {
     render(<EducationHero />);
-    expect(screen.getByTestId('mock-join-code')).toBeInTheDocument();
+    expect(screen.queryByTestId('mock-join-code')).toBeNull();
+    expect(demoColumn()).not.toBeNull();
   });
 
-  it('renders a secondary schools link pointing to the for-schools page', () => {
+  it('ensures h1 and primary CTA precede the playable board in source order (mobile-first)', () => {
     render(<EducationHero />);
-    const link = screen.getByRole('link', { name: /education\.landing\.hero\.cta_schools/ });
-    expect(link).toHaveAttribute('href', '/en/education/for-schools');
+    const h1 = screen.getByRole('heading', { level: 1 });
+    const primaryCTA = screen.getByTestId('education-hero-free-cta');
+    const board = demoColumn()!;
+    expect(h1.compareDocumentPosition(primaryCTA) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(h1.compareDocumentPosition(board) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(primaryCTA.compareDocumentPosition(board) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it('tracks hero_for_schools when the schools link is clicked', () => {
+  it('does not apply unprefixed order-* classes to the board column (prevents mobile reflow)', () => {
     render(<EducationHero />);
-    fireEvent.click(screen.getByRole('link', { name: /education\.landing\.hero\.cta_schools/ }));
-    expect(mockTrackLandingCtaClick).toHaveBeenCalledWith('hero_for_schools');
+    const className = demoColumn()?.className ?? '';
+    expect(className).not.toMatch(/\border-first\b/);
+    expect(className).not.toMatch(/\border-last\b/);
+    expect(className).not.toMatch(/\border-\d+\b/);
   });
 
-  it('renders free CTA as the one still lime action and Pro as a quiet outline', () => {
+  it('renders free CTA as the one lime action and Pro as a quiet outline', () => {
     render(<EducationHero />);
     const free = screen.getByTestId('education-hero-free-cta');
-    const join = screen.getByTestId('education-hero-join-cta');
     const pro = screen.getByTestId('education-hero-pro-cta');
-
     expect(free.className).toMatch(/bg-neo-lime/);
     expect(free.className).toMatch(/text-lg/);
     expect(free.className).not.toMatch(/animate-pulse/);
-
-    expect(join.className).not.toMatch(/\bbg-neo-cyan\b/);
     expect(pro.className).toMatch(/border-neo-cyan/);
     expect(pro.className).not.toMatch(/bg-neo-lime/);
     expect(pro.className).not.toMatch(/animate-pulse/);
-  });
-
-  it('ensures h1 and primary CTA precede the product mock in source order (mobile-first)', () => {
-    const { container } = render(<EducationHero />);
-    const h1 = screen.getByRole('heading', { level: 1 });
-    const primaryCTA = screen.getByTestId('education-hero-free-cta');
-    const mockElement = screen.getByTestId('mock-join-code').closest('[data-hero-item]');
-
-    // H1 should come before CTA (semantic order)
-    expect(h1.compareDocumentPosition(primaryCTA) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-
-    // Both should come before mock in DOM order (prevents mobile reflow pushing CTA off-screen)
-    expect(h1.compareDocumentPosition(mockElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(primaryCTA.compareDocumentPosition(mockElement) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('renders the animated scholar mascot so the hero has real motion, not a still', () => {
@@ -123,17 +102,6 @@ describe('EducationHero', () => {
     expect(mascot?.closest('[aria-hidden="true"]')).toBeTruthy();
   });
 
-  it('does not apply unprefixed order-* classes to the mock (prevents mobile reflow)', () => {
-    const { container } = render(<EducationHero />);
-    const mockElement = screen.getByTestId('mock-join-code').closest('[data-hero-item]');
-    const className = mockElement?.className ?? '';
-
-    // Unprefixed `order-first` at every breakpoint would hoist mock above copy on mobile
-    expect(className).not.toMatch(/\border-first\b/);
-    expect(className).not.toMatch(/\border-last\b/);
-    expect(className).not.toMatch(/\border-\d+\b/);
-  });
-
   it('never sends the free CTA through the /teacher gate, so no ?from= bounce notice', () => {
     render(<EducationHero />);
     const href = screen.getByTestId('education-hero-free-cta').getAttribute('href') ?? '';
@@ -148,7 +116,7 @@ describe('EducationHero', () => {
     expect(free).toHaveTextContent('eg2Land.hero.ctaFinishSetup');
   });
 
-  it('hangs the mascot off the outer edge of the mock, clear of the leaderboard rank badges', () => {
+  it('hangs the mascot off the outer edge of the board, clear of its controls', () => {
     render(<EducationHero />);
     const mascot = Array.from(document.querySelectorAll('img')).find((img) =>
       (img.getAttribute('src') ?? '').includes('scholar'),

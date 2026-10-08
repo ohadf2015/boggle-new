@@ -1,5 +1,112 @@
 // Es translations
 const es = {
+  // @eg6Land:start
+  "eg6Land": {
+    "vsGimkit": {
+      "title": "LexiClash vs Gimkit Basic — Modos Pro exclusivos limitados a 5 jugadores (2026) | LexiClash",
+      "description": "LexiClash vs Gimkit Basic: los modos Pro exclusivos se limitan a 5 jugadores en el plan gratuito de Gimkit. LexiClash ofrece juegos de vocabulario gratis para toda la clase, hasta 50 estudiantes.",
+      "eyebrow": "Comparativa · alternativa educativa",
+      "h1": "LexiClash vs Gimkit Basic",
+      "introBefore": "Gimkit Basic ofrece modos destacados con jugadores ilimitados, pero",
+      "introBold": "los modos Pro exclusivos de Gimkit se limitan a 5 jugadores",
+      "introAfter": "para los miembros Basic. El vocabulario gratuito de LexiClash para el aula sirve a toda la clase (hasta 50 estudiantes) y no tiene ningún modo que se reduzca a cinco plazas.",
+      "evidence": "Fuentes:",
+      "sideHeading": "Lado a lado",
+      "colFeature": "Función",
+      "colLexi": "LexiClash",
+      "colGimkit": "Gimkit Basic",
+      "row1Feature": "Modos Pro exclusivos / premium en el plan gratis",
+      "row1Lexi": "✓ Vocabulario gratis para toda la clase (sin modo de 5 plazas)",
+      "row2Feature": "Juego principal gratuito",
+      "row2Lexi": "✓ Hasta 50 estudiantes gratis",
+      "row3Feature": "Sin registro de estudiantes",
+      "row3Lexi": "✓ Código de unión de 6 caracteres",
+      "row4Feature": "Tipo de juego",
+      "row4Lexi": "Formación de palabras (Boggle/ruleta/anagramas)",
+      "row5Feature": "Ideal para",
+      "row5Lexi": "Vocabulario, ortografía, ESL",
+      "row6Feature": "Evidencia (Basic, Pro exclusivo)",
+      "row6Lexi": "—",
+      "faqHeading": "Preguntas frecuentes",
+      "faq1Q": "¿Los modos Pro exclusivos de Gimkit están limitados en Basic?",
+      "faq1A": "Sí. El artículo de ayuda de Gimkit sobre el máximo de jugadores indica que los modos Pro exclusivos están limitados a 5 jugadores en Basic. Los modos destacados de Basic no tienen límite; los Pro exclusivos rotan y se mantienen en 5 hasta que actualizas.",
+      "faq2Q": "¿Cómo responde LexiClash al límite de 5 jugadores de los modos Pro exclusivos?",
+      "faq2A": "El vocabulario gratuito de LexiClash para el aula funciona para toda la clase (hasta 50 estudiantes) sin ningún modo que baje a 5 plazas.",
+      "faq3Q": "¿Cuál es la diferencia entre Gimkit Basic y Gimkit Pro?",
+      "faq3A": "Según las preguntas frecuentes de Gimkit Pro, Basic permite jugar los modos destacados con tantos estudiantes como quieras. Pro desbloquea todos los modos (Pro exclusivos), las asignaciones y la subida de contenido multimedia. En Basic, los modos Pro exclusivos siguen limitados a 5 jugadores.",
+      "faq4Q": "¿Los estudiantes necesitan cuenta en LexiClash?",
+      "faq4A": "No. Los estudiantes entran con un código de 6 caracteres. Teacher Pro añade clases ilimitadas e informes imprimibles; el plan gratuito ya cubre una clase entera de hasta 50 estudiantes en los juegos de vocabulario.",
+      "faq5Q": "¿LexiClash es una plataforma de preguntas como Gimkit?",
+      "faq5A": "No. Gimkit es una plataforma de kits y preguntas con modos en vivo (destacados y Pro exclusivos). LexiClash es formación de palabras (cuadrículas tipo Boggle, anagramas, ruletas de palabras) para practicar vocabulario e idiomas, con plazas gratuitas para toda la clase.",
+      "footStart": "Empieza un juego de aula",
+      "footKahoot": "vs Kahoot",
+      "footWayground": "vs Wayground",
+      "footBlooket": "vs Blooket"
+    },
+    "demo": {
+      "label": "Tablero jugable: traza una palabra",
+      "watching": "Mira: LexiClash traza una palabra",
+      "yourTurn": "Tu turno: toca letras que se tocan",
+      "replay": "Ver otra vez",
+      "found": "Encontrada: {word}",
+      "timeLeft": "Quedan {count} s",
+      "wordsFound": "{count} palabras encontradas"
+    },
+    "resources": {
+      "heading": "Explora los modos educativos",
+      "subhead": "Elige el formato adecuado para tu aula — duelos 1v1 rápidos o multijugador en vivo para toda la clase.",
+      "duelsTitle": "Duelos de vocabulario (1v1)",
+      "duelsDesc": "Empareja estudiantes para batallas de palabras cara a cara de 2-3 minutos.",
+      "classroomTitle": "Juego de aula en vivo",
+      "classroomDesc": "Multijugador para toda la clase; el alumnado entra con un código de clase, sin correo electrónico."
+    },
+    "compare": {
+      "before": "Compara LexiClash: ",
+      "anchor": "LexiClash vs Kahoot",
+      "after": " — funciones, precio y uso en el aula."
+    },
+    "guides": {
+      "heading": "Guías para docentes",
+      "subhead": "Páginas detalladas sobre casos de uso específicos, con tablas comparativas, preguntas frecuentes y listas de palabras gratuitas.",
+      "vocabBadge": "Guía",
+      "vocabTitle": "Juegos de vocabulario para el aula",
+      "vocabDesc": "Sin registro, 6 idiomas, gratis para docentes — frente a Quizlet/Kahoot/Wordwall.",
+      "eslBadge": "ESL",
+      "eslTitle": "Juegos de palabras en inglés online",
+      "eslDesc": "De principiante a avanzado, 6 diccionarios, sin registro de estudiantes.",
+      "teachersBadge": "Para docentes",
+      "teachersTitle": "Juegos de palabras para docentes",
+      "teachersDesc": "Día de sustitución, descanso mental, calentamiento — cero preparación, gratis para docentes.",
+      "spellingBadge": "Concurso de Ortografía",
+      "spellingTitle": "Práctica de concurso de ortografía online",
+      "spellingDesc": "Plan de entrenamiento de 4 semanas, listas personalizadas, duelos 1v1 — preparación para concursos.",
+      "sightBadge": "Sight Words",
+      "sightTitle": "Práctica de sight words (Dolch y Fry)",
+      "sightDesc": "Tarjetas, emparejamientos y deletreo desde tu propia lista.",
+      "schoolsBadge": "Para escuelas",
+      "schoolsTitle": "LexiClash para escuelas",
+      "schoolsDesc": "Gratis para docentes — escuelas y departamentos desde $49 por docente / año, sin inicio de sesión de estudiantes.",
+      "listsBadge": "Gratis",
+      "listsTitle": "Listas de palabras",
+      "listsDesc": "Listas de palabras por curso y materia, listas para jugar en clase."
+    },
+    "moments": {
+      "heading": "Elige tu momento",
+      "subhead": "No es una lista de funciones: son las situaciones que el profesorado busca de verdad, cada una con un plan para hoy."
+    },
+    "learner": {
+      "heading": "Juegos para aprender inglés",
+      "subhead": "Por etapa y por tema, con la misma estructura de aula que la página de ESL que ya posiciona."
+    },
+    "pro": {
+      "rosterPro": "Alumnado ilimitado en tu lista",
+      "liveCap": "Los juegos en vivo admiten hasta {count} jugadores a la vez",
+      "mastery": "Mapa de dominio: qué palabras domina cada alumno",
+      "missedPractice": "Rondas de repaso creadas a partir de fallos reales",
+      "reports": "Informes de clase imprimibles"
+    }
+  },
+  // @eg6Land:end
   // @eg2Land:start
   "eg2Land": {
     "header": {
