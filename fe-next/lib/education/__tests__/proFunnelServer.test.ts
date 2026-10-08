@@ -20,8 +20,10 @@ import {
   buildTrialActivatedEvent,
   buildEduAccessRequestCreatedEvent,
   buildTrialStartEvent,
+  buildTrialStartedEvent,
   buildCheckoutCompleteEvent,
   buildPaidEvent,
+  buildTeacherTrialConvertedEvent,
   buildPolarTrialDay10SentEvent,
   captureProFunnelServerEvent,
 } from '../proFunnelServer';
@@ -85,6 +87,14 @@ describe('Pro funnel server events', () => {
     });
   });
 
+  it('Given a Polar trial actually opened, When the HQ funnel name is built, Then it is trial_started', () => {
+    expect(buildTrialStartedEvent('u-1', 'sub-9')).toEqual({
+      distinctId: 'u-1',
+      event: 'trial_started',
+      properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
+    });
+  });
+
   it('Given a paid Polar checkout session, When built, Then it is checkout_complete', () => {
     expect(buildCheckoutCompleteEvent('u-1')).toEqual({
       distinctId: 'u-1',
@@ -97,6 +107,14 @@ describe('Pro funnel server events', () => {
     expect(buildPaidEvent('u-1', 'sub-9')).toEqual({
       distinctId: 'u-1',
       event: 'paid',
+      properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
+    });
+  });
+
+  it('Given a Polar trial converts to paid, When built, Then it is teacher_trial_converted', () => {
+    expect(buildTeacherTrialConvertedEvent('u-1', 'sub-9')).toEqual({
+      distinctId: 'u-1',
+      event: 'teacher_trial_converted',
       properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
     });
   });

@@ -74,3 +74,39 @@ export function polarTrialDaysLeft(iso: string | null | undefined, nowMs: number
 export function polarTrialChipUpgrade(daysLeft: number | null): boolean {
   return daysLeft !== null && daysLeft <= 3;
 }
+
+/**
+ * HQ day-10 expiring banner. Day 10 of a 14-day Polar trial = 4 days left.
+ * Inclusive catch-up: 4 down through 0 (ends today). Distinct from the
+ * chip (`polarTrialChipUpgrade`, last 3 days) and from the email nudge
+ * (skips 0).
+ */
+export const POLAR_TRIAL_HQ_DAY10_DAYS_LEFT = 4;
+
+export function isPolarTrialDay10Expiring(daysLeft: number | null): boolean {
+  return daysLeft !== null && daysLeft <= POLAR_TRIAL_HQ_DAY10_DAYS_LEFT;
+}
+
+export type PolarCheckoutWelcomeKind = 'paid' | 'trial' | 'none';
+
+/**
+ * Return-from-Polar HQ overlay. A live trial is still `hasPro`, so treating
+ * `?checkout=success` as paid would greet a trialing teacher with "your
+ * subscription is active".
+ */
+export function polarCheckoutWelcomeKind({
+  checkoutSuccess,
+  hasPro,
+  source,
+  status,
+}: {
+  checkoutSuccess: boolean;
+  hasPro: boolean;
+  source?: string | null;
+  status: string;
+}): PolarCheckoutWelcomeKind {
+  if (!checkoutSuccess || !hasPro) return 'none';
+  if ((source || 'polar') === 'admin_grant') return 'none';
+  if (status === 'trialing') return 'trial';
+  return 'paid';
+}
