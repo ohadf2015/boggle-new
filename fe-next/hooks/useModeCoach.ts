@@ -56,18 +56,21 @@ export function useModeCoach(
   const stepRef = useRef(0);
   stepRef.current = stepIndex;
 
-  // Coach removed per user request — "more confusing than helping".
-  // Players jump straight into gameplay with no FTUE steps.
   useEffect(() => {
     const storage = browserStorage();
     if (!content || !storage) return;
     if (hasSeenCoach(mode, COACH_VERSION, storage)) return;
-
-    // Mark as seen immediately so reload never re-pops, but never show.
-    markCoachSeen(mode, COACH_VERSION, storage);
-    dismissedRef.current = true;
-    // onShown fires so cross-device DB backfill still works.
-    onShown?.();
+    const id = window.setTimeout(() => {
+      // Persist at show-time so a reload mid-coach never re-pops it.
+      markCoachSeen(mode, COACH_VERSION, storage);
+      dismissedRef.current = false;
+      setStepIndex(0);
+      setVisible(true);
+      posthog.capture('mode_coach_shown', { mode });
+      onShown?.();
+    }, settleMs);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- onShown is a fire-once callback; re-arming on its identity would re-run the timer.
   }, [mode, content, settleMs]);
 
   const close = useCallback(

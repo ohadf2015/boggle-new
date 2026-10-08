@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
-import { offlineCapableRoutes } from '../offlineCapableModes';
+import { LAUNCHER_MODES } from '../offlineCapableModes';
 import { locales } from '@/i18n/config';
 
 const htmlPath = path.resolve(__dirname, '../../../capacitor-assets/error.html');
@@ -20,11 +20,20 @@ describe('capacitor-assets/error.html', () => {
     expect(html).toContain('https://www.lexiclash.live');
   });
 
-  it('embeds a Play offline section with every offlineCapableRoutes() href', () => {
+  it('embeds a Play offline section with every launcher mode href', () => {
     expect(html).toMatch(/play offline/i);
-    for (const route of offlineCapableRoutes()) {
-      expect(html, `missing precache href ${route}`).toContain(route);
+    for (const loc of locales) {
+      for (const mode of LAUNCHER_MODES) {
+        expect(html, `missing launcher href ${mode.entry(loc)}`).toContain(`"${mode.entry(loc)}"`);
+      }
     }
+  });
+
+  it('does not reveal unreleased modes (crossword, wordfall)', () => {
+    expect(html).not.toContain('"/en/crossword"');
+    expect(html).not.toContain('"/en/blast/v2"');
+    expect(html).not.toContain('playCrossword');
+    expect(html).not.toContain('playWordfall');
   });
 
   it('covers all five primary locales (and ru) in the inline strings map', () => {

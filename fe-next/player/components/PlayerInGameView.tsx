@@ -271,10 +271,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   // Gridless versus modes — per-player towers / crossword race.
   if (gameMode === 'word-tower' || gameMode === 'crossword') {
-    const Versus = gameMode === 'word-tower' ? WordTowerVersus : CrosswordVersus;
     return (
       <>
-        <Versus socket={socket} username={username} onQuit={onExitRoom} />
+        {gameMode === 'word-tower' ? <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} /> : <CrosswordVersus socket={socket} username={username} onQuit={onExitRoom} remainingTime={remainingTime} />}
         {roundDialogs}
       </>
     );

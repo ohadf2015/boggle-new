@@ -7,9 +7,6 @@ vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: { capture: (...args: unknown[]) => capture(...args) },
 }));
 
-// Contract since commit 87653de: the coach is disabled and never shows, so it
-// must be analytics-silent — no mode_coach_shown and no mode_coach_dismissed,
-// no matter how the user (or a stray caller) pokes dismiss/advance.
 describe('useModeCoach analytics', () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -27,10 +24,11 @@ describe('useModeCoach analytics', () => {
     });
     return view;
   }
+  const events = (name: string) => capture.mock.calls.filter((c) => c[0] === name);
 
-  it('emits no mode_coach_shown on a first visit (coach never appears)', () => {
+  it('emits mode_coach_shown once on a first visit', () => {
     mount();
-    expect(capture.mock.calls.filter((c) => c[0] === 'mode_coach_shown')).toHaveLength(0);
+    expect(events('mode_coach_shown')).toEqual([['mode_coach_shown', { mode: 'classic' }]]);
   });
 
   it('emits nothing on a repeat visit (already seen)', () => {
@@ -42,19 +40,19 @@ describe('useModeCoach analytics', () => {
     expect(capture).not.toHaveBeenCalled();
   });
 
-  it('emits no mode_coach_dismissed on dismiss', () => {
+  it('emits exactly one mode_coach_dismissed however many closes race', () => {
     const { result } = mount();
     act(() => result.current.dismiss('skip'));
     act(() => result.current.dismiss('escape'));
     act(() => result.current.dismiss());
-    expect(capture.mock.calls.filter((c) => c[0] === 'mode_coach_dismissed')).toHaveLength(0);
+    expect(events('mode_coach_dismissed')).toEqual([['mode_coach_dismissed', { mode: 'classic', reason: 'skip', step: 0 }]]);
   });
 
-  it('emits nothing when advancing past the last step', () => {
+  it('reports completed when advancing past the last step', () => {
     const { result } = mount(); // classic = 2 steps
     act(() => result.current.advance());
     act(() => result.current.advance());
     act(() => result.current.advance());
-    expect(capture).not.toHaveBeenCalled();
+    expect(events('mode_coach_dismissed')).toEqual([['mode_coach_dismissed', { mode: 'classic', reason: 'completed', step: 1 }]]);
   });
 });

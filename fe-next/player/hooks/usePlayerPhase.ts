@@ -29,7 +29,6 @@ import type { TournamentStanding } from '@/types';
 import type { ViewTournamentData as TournamentData } from '@/shared/types/view';
 
 import { useFirstTimeAchievement } from '@/components/game/FirstTimeAchievement';
-import type { CoachModeKey } from '@/lib/tutorial/modeCoachStore';
 
 import usePlayerSocketEvents from './usePlayerSocketEvents';
 import { usePublishGameActive } from './usePublishGameActive';
@@ -108,20 +107,6 @@ export function usePlayerPhase({
   // games don't tag start with the stale requested mode (matches game_completed).
   const gameModeConfirmed = useGameModeConfirmed();
 
-  // Map GameMode string to CoachModeKey for ModeCoach mount
-  function getCoachMode(gm: string | undefined): CoachModeKey | undefined {
-    if (!gm) return undefined;
-    const modeMap: Record<string, CoachModeKey> = {
-      'classic': 'classic',
-      'blast': 'blast',
-      'word-hunt': 'wordHunt',
-      'wheel-rush': 'wheelRush',
-      'word-tower': 'wordTower',
-      'crossword': 'crossword',
-    };
-    return modeMap[gm];
-  }
-  const coachMode = getCoachMode(gameMode);
 
   // Captures the messageId from the most recent startGame so we can emit
   // `countdownComplete` once the GoRipplesAnimation finishes. Server gates
@@ -451,7 +436,7 @@ export function usePlayerPhase({
     dispatchReveal, setShowStartAnimation, pendingMessageIdRef, isGameLoading, resolvedGameLanguage, playersReady,
     showQR, setShowQR, showExitConfirm, setShowExitConfirm, handleExitRoom, confirmExitRoom, handleNameChange,
     handleAvatarChange, readyUsernames, isReady, toggleReady, readyInFlight, leaderboard, foundWords, gameMode,
-    coachMode, isNewPlayerRef, pendingAchievement, clearAchievement, shufflingGrid, minWordLength, comboLevel,
+    isNewPlayerRef, pendingAchievement, clearAchievement, shufflingGrid, minWordLength, comboLevel,
     comboLevelRef, lastWordTime, mappedFoundWords, totalBoardWords, tournamentData, tournamentStandings,
     showTournamentStandings, setShowTournamentStandings, handleWordSubmit, handleResetCombo, hints, earthquakeState,
     fireRoundActive, fireRoundRemaining, boardTheme, totalGameTimeRef,

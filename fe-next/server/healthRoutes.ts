@@ -18,6 +18,7 @@ import { getConnectionMetrics } from '../backend/modules/supabase/client';
 import * as dictionary from '../backend/dictionary';
 
 import type { ExtendedSocketServer } from './redisAdapter';
+import { deployHealthPayload, DEPLOY_HEALTH_HEADERS } from '../lib/buildIdentity';
 
 /**
  * Game info returned from getAllGames
@@ -108,9 +109,23 @@ export function configureHealthRoutes(app: Application, io: Server): void {
     });
   });
 
-  // Basic health check (backward compatibility)
+  // Basic health check (backward compatibility) — includes commit so
+  // existing /health probes can confirm the running sha without /api/*.
   app.get('/health', (_req: Request, res: Response): void => {
-    res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
+    res.json({
+      status: 'ok',
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+      commit: deployHealthPayload().commit,
+    });
+  });
+
+  // Deploy confirmation — JSON + running git sha. Public URL is /api/health
+  // (the Next catch-all previously served app HTML for this path). Must be
+  // registered on Express so it never falls through to Next.
+  app.get('/api/health', (_req: Request, res: Response): void => {
+    res.set(DEPLOY_HEALTH_HEADERS);
+    res.json(deployHealthPayload());
   });
 
   // Detailed health check for scaling/load balancer with capacity metrics.

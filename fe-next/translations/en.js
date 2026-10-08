@@ -4689,7 +4689,7 @@ const en = {
         "wordHunt": "Word Hunt",
         "wheelRush": "Wheel Rush",
         "wordTower": "Word Tower",
-        "random": "Surprise Mode"
+        "random": "Surprise Mode", "crossword": "Crossword"
       },
       "hook": {
         "classic": "Spot every word",
@@ -4697,7 +4697,7 @@ const en = {
         "wordHunt": "Hunt the hidden word",
         "wheelRush": "Race rivals on the wheel",
         "wordTower": "Stack the tower",
-        "random": "Surprise me"
+        "random": "Surprise me", "crossword": "Race to fill the grid"
       }
     },
     "results": "Battle Report",
@@ -15554,6 +15554,12 @@ const en = {
       "step1": "Drag letters to spell words",
       "step2": "Pass the phone when time's up",
       "scoreTip": "Only words no one else found score"
+    },
+    "brain": {
+      "title": "Brain Gym",
+      "step1": "Each drill trains one skill",
+      "step2": "Read the mission, then go",
+      "scoreTip": "Fast and accurate scores best"
     },
     "connections": {
       "title": "Find the Links",

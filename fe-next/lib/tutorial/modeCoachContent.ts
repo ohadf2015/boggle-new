@@ -159,6 +159,17 @@ export const MODE_COACH: Record<CoachModeKey, CoachContent> = {
     ],
     scoreTipKey: 'modeCoach.party.scoreTip',
   },
+  brain: {
+    mode: 'brain',
+    tier: 'simple',
+    accent: 'purple',
+    titleKey: 'modeCoach.brain.title',
+    steps: [
+      { demo: 'icon', emoji: '🧠', captionKey: 'modeCoach.brain.step1' },
+      { demo: 'icon', emoji: '⚡', captionKey: 'modeCoach.brain.step2' },
+    ],
+    scoreTipKey: 'modeCoach.brain.scoreTip',
+  },
 };
 
 export const ALL_COACH_MODES = Object.keys(MODE_COACH) as CoachModeKey[];

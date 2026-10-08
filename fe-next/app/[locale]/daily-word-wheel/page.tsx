@@ -39,8 +39,8 @@ const META_FALLBACK: Record<Locale, { title: string; description: string; ogTitl
     ogDescription: 'סובבו את הגלגל ומצאו את כל המילים. פאזל חדש כל יום!',
   },
   sv: {
-    title: 'Ordhjul Online Gratis — Dagligt Pussel | LexiClash',
-    description: 'Spela ordhjulet gratis online — hitta alla gömda ord, strek och global topplista. Nya bokstäver varje dag. Ingen registrering. →',
+    title: 'Ordhjulet Online Gratis — Dagligt Ordpussel | LexiClash',
+    description: 'Spela dagens ordhjul gratis online — bilda ord av bokstäverna i hjulet och hitta alla gömda ord. Nytt pussel varje dag, ingen registrering.',
     ogTitle: 'Dagligt Ordhjul — Gratis Pussel',
     ogDescription: 'Snurra ordhjulet och hitta alla ord. Nytt pussel varje dag!',
   },

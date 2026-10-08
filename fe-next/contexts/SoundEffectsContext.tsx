@@ -265,6 +265,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       // Lazily create/cache variation Howls using the same ref map
       const varKey = `_var_${chosenSrc}`;
       if (!soundsRef.current[varKey]) {
+        if (!soundsLoadedRef.current) return;
         soundsRef.current[varKey] = createLazyHowl(chosenSrc, { volume: 0.6 });
       }
       howl = soundsRef.current[varKey];
@@ -317,6 +318,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     const cacheKey = `_combo_${src}`;
     let howl = soundsRef.current[cacheKey];
     if (!howl) {
+      await ensureHowl();
       howl = createLazyHowl(src, { volume: 0.7 });
       soundsRef.current[cacheKey] = howl;
     }
@@ -364,6 +366,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     const cacheKey = `_wlen_${src}`;
     let howl = soundsRef.current[cacheKey];
     if (!howl) {
+      await ensureHowl();
       howl = createLazyHowl(src, { volume: 0.65 });
       soundsRef.current[cacheKey] = howl;
     }

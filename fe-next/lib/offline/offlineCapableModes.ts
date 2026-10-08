@@ -53,6 +53,8 @@ export interface OfflineMode {
   labelKey: string;
   /** Full href to open the mode in a given locale. */
   entry: (locale: string) => string;
+  /** false = still offline-capable by URL, but not offered in the offline launchers (unreleased). */
+  inLauncher?: false;
 }
 
 const localePath =
@@ -73,17 +75,20 @@ export const OFFLINE_MODES: readonly OfflineMode[] = [
     entry: (locale) => `/${locale}/singleplayer?practice=1`,
   },
   { segment: 'word-craft', labelKey: 'native.offline.playWordCraft', entry: localePath('word-craft') },
-  { segment: 'crossword', labelKey: 'native.offline.playCrossword', entry: localePath('crossword') },
+  { segment: 'crossword', labelKey: 'native.offline.playCrossword', entry: localePath('crossword'), inLauncher: false },
   {
     // Wordfall (Blast V2) shares the `blast` segment for the offline-capable
     // route gate, but precaches/links its own /blast/v2 shell.
     segment: 'blast',
     labelKey: 'native.offline.playWordfall',
     entry: (locale) => `/${locale}/blast/v2`,
+    inLauncher: false,
   },
   { segment: 'party', labelKey: 'native.offline.playParty', entry: localePath('party') },
   { segment: 'word-tower', labelKey: 'native.offline.playWordTower', entry: localePath('word-tower') },
 ] as const;
+
+export const LAUNCHER_MODES: readonly OfflineMode[] = OFFLINE_MODES.filter((m) => m.inLauncher !== false);
 
 /** Segment list — preserved for backward compatibility with existing callers. */
 export const OFFLINE_CAPABLE_MODES = OFFLINE_MODES.map((m) => m.segment);

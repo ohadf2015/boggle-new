@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   OFFLINE_CAPABLE_MODES,
   OFFLINE_MODES,
+  LAUNCHER_MODES,
   isOfflineCapable,
   offlineCapableRoutes,
 } from '../offlineCapableModes';
@@ -45,6 +46,16 @@ describe('offlineCapableModes', () => {
       expect(OFFLINE_CAPABLE_MODES).not.toContain('challenge');
       expect(OFFLINE_CAPABLE_MODES).not.toContain('quick-play');
       expect(OFFLINE_CAPABLE_MODES).not.toContain('anagram');
+    });
+  });
+
+  describe('LAUNCHER_MODES', () => {
+    it('keeps unreleased modes playable offline but out of the launcher', () => {
+      const labels = LAUNCHER_MODES.map((m) => m.labelKey);
+      expect(labels).not.toContain('native.offline.playCrossword');
+      expect(labels).not.toContain('native.offline.playWordfall');
+      expect(labels).toContain('native.offline.playBlast');
+      expect(OFFLINE_CAPABLE_MODES).toContain('crossword');
     });
   });
 
