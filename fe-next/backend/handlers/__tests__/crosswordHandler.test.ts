@@ -18,16 +18,14 @@ vi.mock('../../modules/gameStateManager', () => ({
   getGame: vi.fn(),
   getGameBySocketId: vi.fn(() => 'GAME1'),
   getUsernameBySocketId: vi.fn(() => 'p1'),
-  transitionGameState: vi.fn(() => ({ success: true })),
 }));
-vi.mock('../../utils/timerManager', () => ({ clearGameTimer: vi.fn() }));
-vi.mock('../../modules/supabaseServer', () => ({ isSupabaseConfigured: vi.fn(() => false) }));
-vi.mock('../../services/gameLifecycle/gameResults', () => ({ recordGameResultsToSupabase: vi.fn() }));
+vi.mock('../../services/gameLifecycle/gameEnd', () => ({ endGame: vi.fn(() => Promise.resolve()) }));
 
 import { handleSubmitCrosswordProgress, handleRequestCrosswordMpState } from '../crosswordHandler';
 import { initCrosswordMpState } from '../../modules/crosswordMpManager';
 import { broadcastToRoom } from '../../utils/socketHelpers';
 import { getGame, getUsernameBySocketId } from '../../modules/gameStateManager';
+import { endGame } from '../../services/gameLifecycle/gameEnd';
 
 const PUZZLE = { id: 'en-mini-001', locale: 'en', size: 5, cells: [], slots: [] };
 const mkSocket = (id = 's1') => ({ id, emit: vi.fn() } as unknown as Socket);
@@ -36,6 +34,7 @@ const mkIo = () => ({} as Server);
 const mkGame = (overrides: Record<string, unknown> = {}) => ({
   gameCode: 'GAME1',
   gameMode: 'crossword',
+  gameState: 'in-progress',
   language: 'en',
   users: { p1: { username: 'p1', socketId: 's1' }, p2: { username: 'p2', socketId: 's2' } },
   playerScores: {},
@@ -67,7 +66,7 @@ describe('crosswordHandler', () => {
     expect(game.playerScores.p1).toBe(55);
   });
 
-  it('broadcasts raceOver + finalizes when all players solve', () => {
+  it('broadcasts raceOver + ends the round through endGame when all players solve', () => {
     const game = mkGame();
     (getGame as unknown as Mock).mockReturnValue(game);
     handleSubmitCrosswordProgress(mkIo(), mkSocket('s1'), { percent: 100, solved: true, elapsedMs: 20000, score: 60 });
@@ -76,6 +75,7 @@ describe('crosswordHandler', () => {
     const over = (broadcastToRoom as unknown as Mock).mock.calls.find((c) => c[2] === 'crosswordRaceOver');
     expect(over).toBeTruthy();
     expect(over![3].standings[0].username).toBe('p1'); // faster solve ranks first
+    expect(endGame).toHaveBeenCalledWith(expect.anything(), 'GAME1');
   });
 
   it('does NOT finalize while a player is unsolved', () => {
@@ -84,6 +84,15 @@ describe('crosswordHandler', () => {
     handleSubmitCrosswordProgress(mkIo(), mkSocket(), { percent: 100, solved: true, elapsedMs: 20000, score: 60 });
     const over = (broadcastToRoom as unknown as Mock).mock.calls.find((c) => c[2] === 'crosswordRaceOver');
     expect(over).toBeFalsy();
+    expect(endGame).not.toHaveBeenCalled();
+  });
+
+  it('ignores progress once the round is over', () => {
+    const game = mkGame({ gameState: 'finished' });
+    (getGame as unknown as Mock).mockReturnValue(game);
+    handleSubmitCrosswordProgress(mkIo(), mkSocket(), { percent: 100, solved: true, elapsedMs: 1, score: 99 });
+    expect(game.playerScores).toEqual({});
+    expect(broadcastToRoom).not.toHaveBeenCalled();
   });
 
   it('emits a snapshot on requestCrosswordMpState', () => {

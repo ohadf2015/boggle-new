@@ -12,7 +12,7 @@ import { COIN_EARNING_OTHER } from '@/utils/coinManager';
 describe('soloReward', () => {
   describe('computeSoloReward', () => {
     it('gives zero coins and zero base when score is 0 and not won', () => {
-      const r = computeSoloReward({ mode: 'sealed-bid', score: 0, won: false, seed: 1 });
+      const r = computeSoloReward({ mode: 'crossword', score: 0, won: false, seed: 1 });
       expect(r.breakdown.base).toBe(0);
       expect(r.breakdown.scoreBonus).toBe(0);
       expect(r.breakdown.winBonus).toBe(0);
@@ -21,7 +21,7 @@ describe('soloReward', () => {
     });
 
     it('applies single-player base when score > 0', () => {
-      const r = computeSoloReward({ mode: 'sealed-bid', score: 40, won: false, seed: 7 });
+      const r = computeSoloReward({ mode: 'crossword', score: 40, won: false, seed: 7 });
       expect(r.breakdown.base).toBe(COIN_EARNING_OTHER.SINGLEPLAYER_BASE);
     });
 
@@ -50,15 +50,15 @@ describe('soloReward', () => {
     });
 
     it('variable bonus is deterministic for a given seed (no reload exploit)', () => {
-      const a = computeSoloReward({ mode: 'sealed-bid', score: 30, won: true, seed: 12345 });
-      const b = computeSoloReward({ mode: 'sealed-bid', score: 30, won: true, seed: 12345 });
+      const a = computeSoloReward({ mode: 'crossword', score: 30, won: true, seed: 12345 });
+      const b = computeSoloReward({ mode: 'crossword', score: 30, won: true, seed: 12345 });
       expect(a.bonus).toBe(b.bonus);
     });
 
     it('variable bonus differs across seeds (real variance)', () => {
       const bonuses = new Set<number>();
       for (let s = 0; s < 40; s++) {
-        bonuses.add(computeSoloReward({ mode: 'sealed-bid', score: 30, won: true, seed: s }).bonus);
+        bonuses.add(computeSoloReward({ mode: 'crossword', score: 30, won: true, seed: s }).bonus);
       }
       expect(bonuses.size).toBeGreaterThan(1);
     });

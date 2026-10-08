@@ -93,12 +93,6 @@ vi.mock('@/utils/supabase/client', () => ({
 }));
 
 // Mock lazy-loaded / dynamic components
-vi.mock('@/components/daily/DailyChallengeBanner', () => {
-  const MockDailyChallengeBanner = () => {
-    return <div data-testid="daily-challenge-banner">Daily Challenge</div>;
-  };
-  return { default: MockDailyChallengeBanner };
-});
 vi.mock('@/components/auth/AuthModal', () => {
   const MockAuthModal = () => {
     return null;

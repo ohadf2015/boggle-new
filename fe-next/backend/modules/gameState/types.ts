@@ -3,7 +3,7 @@
  * Centralized type definitions for game state management
  */
 
-import type { LetterGrid, Language, GameMode, BlastModeState as SharedBlastModeState, WordHuntModeState as SharedWordHuntModeState, WheelRushModeState as SharedWheelRushModeState, SealedBidModeState as SharedSealedBidModeState, CrosswordMpModeState as SharedCrosswordMpModeState } from '@/shared/types/game';
+import type { LetterGrid, Language, GameMode, BlastModeState as SharedBlastModeState, WordHuntModeState as SharedWordHuntModeState, WheelRushModeState as SharedWheelRushModeState, CrosswordMpModeState as SharedCrosswordMpModeState } from '@/shared/types/game';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { VersusMatchState } from '@/lib/wordTower/versusMatch';
 import type { WordcraftLiveSession } from '../wordcraftClassroomManager';
@@ -65,7 +65,6 @@ export interface PlayerAchievement {
 export type BlastModeState = SharedBlastModeState;
 export type WordHuntState = SharedWordHuntModeState;
 export type WheelRushState = SharedWheelRushModeState;
-export type SealedBidState = SharedSealedBidModeState;
 export type CrosswordMpState = SharedCrosswordMpModeState;
 
 // Game state interface
@@ -150,7 +149,6 @@ export interface GameState {
   blastModeState?: BlastModeState | null;
   wordHuntState?: WordHuntState | null;
   wheelRushState?: WheelRushState | null;
-  sealedBidState?: SealedBidState | null;
   crosswordMpState?: CrosswordMpState | null;
   wordTowerVersusState?: VersusMatchState | null;
   /** Live classroom Wordcraft race (per-student boards), rebuilt every round. */

@@ -34,12 +34,14 @@ export interface CrosswordMpState {
   standings: CrosswordStanding[];
   raceOver: boolean;
   ready: boolean;
+  /** Server round start — identifies this race (same value on every resend). */
+  startedAt: number | null;
 }
 
 /**
  * Receives the shared CrosswordPuzzle + live standings from the server and emits
  * this client's progress. The race view mounts on startGame, so the hook polls
- * requestCrosswordMpState on mount (and reconnect). Mirrors useSealedBidGame.
+ * requestCrosswordMpState on mount (and reconnect).
  */
 export function useCrosswordMp(
   socket: CrosswordMpSocketLike | null,
@@ -47,6 +49,7 @@ export function useCrosswordMp(
   const [puzzle, setPuzzle] = useState<CrosswordPuzzle | null>(null);
   const [standings, setStandings] = useState<CrosswordStanding[]>([]);
   const [raceOver, setRaceOver] = useState(false);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
 
   useEffect(() => {
     if (!socket) return;
@@ -55,6 +58,7 @@ export function useCrosswordMp(
       const d = raw as InitPayload;
       setPuzzle(d.puzzle);
       setStandings(d.standings ?? []);
+      setStartedAt(d.startedAt ?? null);
     };
     const onStandings = (raw: unknown) => setStandings((raw as StandingsPayload).standings ?? []);
     const onOver = (raw: unknown) => {
@@ -67,6 +71,7 @@ export function useCrosswordMp(
     socket.on('crosswordStandings', onStandings);
     socket.on('crosswordRaceOver', onOver);
     socket.on('connect', request);
+    socket.on('joined', request);
     request();
 
     return () => {
@@ -74,6 +79,7 @@ export function useCrosswordMp(
       socket.off('crosswordStandings', onStandings);
       socket.off('crosswordRaceOver', onOver);
       socket.off('connect', request);
+      socket.off('joined', request);
     };
   }, [socket]);
 
@@ -81,5 +87,5 @@ export function useCrosswordMp(
     socket?.emit('submitCrosswordProgress', u);
   }, [socket]);
 
-  return { puzzle, standings, raceOver, ready: puzzle !== null, submitProgress };
+  return { puzzle, standings, raceOver, ready: puzzle !== null, startedAt, submitProgress };
 }

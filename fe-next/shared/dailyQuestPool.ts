@@ -14,7 +14,7 @@
  * DB columns word_hunt/adventure/community_completed remain SLOT containers
  * (0/1/2) — their names are legacy; they no longer imply a mode.
  *
- * Beta SOCKET modes (adventure, blast, wheel-rush, word-tower versus, sealed-bid,
+ * Beta SOCKET modes (adventure, blast, wheel-rush, word-tower versus,
  * crossword) are NEVER referenced here — quests only steer to public routes.
  * The DAILY Word Tower is public and reports through its own seam with the mode
  * label 'word-tower-daily' (distinct from the beta socket mode 'word-tower').
@@ -48,7 +48,7 @@ export type QuestPublicMode = (typeof QUEST_PUBLIC_MODES)[number];
 /**
  * Beta / not-yet-public game modes. Their socket games route through the SAME
  * recording seam as classic multiplayer (recordGameResultsToSupabase), so a
- * high score in crossword/sealed-bid/etc would otherwise silently credit the
+ * high score in crossword/etc would otherwise silently credit the
  * daily/weekly skill quests — even though the quest pool never steers players
  * there. `isQuestEligibleMode` gates that seam so beta play grants no quest
  * progress. Keep this list in sync with the header-comment enumeration above.
@@ -62,7 +62,6 @@ export const QUEST_BETA_MODES = [
   'blast',
   'wheel-rush',
   'word-tower',
-  'sealed-bid',
   'crossword',
 ] as const;
 

@@ -36,6 +36,8 @@ export interface StuckSignals {
   isDesktop: boolean;
   /** the coach already showed (this game or in a prior session). */
   alreadyShown: boolean;
+  /** overrides IDLE_MS (a brand-new player's first round abandons at ~10s). */
+  idleThresholdMs?: number;
 }
 
 // Tunable thresholds. Exported so tests and the arbiter share one source of truth.
@@ -77,7 +79,7 @@ export function nextStuckStage(s: StuckSignals): StuckStage {
   }
   // Frozen — no action of any kind for a while → gentle "drag to spell" nudge.
   if (
-    s.idleMs >= IDLE_MS &&
+    s.idleMs >= (s.idleThresholdMs ?? IDLE_MS) &&
     s.taps === 0 &&
     s.dragsStarted === 0 &&
     s.submits === 0

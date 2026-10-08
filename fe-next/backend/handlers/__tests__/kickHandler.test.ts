@@ -69,7 +69,7 @@ vi.mock('../../utils/playerCleanup.js', () => ({
   cleanupPlayerData: vi.fn(),
 }));
 
-import { registerKickHandler } from '../kickHandler';
+import { registerKickHandler, checkAutoKickInactive } from '../kickHandler';
 
 // Helper to create mock socket
 function createMockSocket(id = 'host-socket-1'): Socket {
@@ -231,6 +231,22 @@ describe('kickHandler', () => {
 
       expect(mockRemoveUserFromGame).toHaveBeenCalledWith('TEST123', 'Player2');
       expect(game.kickedPlayers.has('Player2')).toBe(true);
+    });
+  });
+  describe('auto-kick inactive', () => {
+    it('removes an AFK lobby player without banning their rejoin', () => {
+      const game = createGame({
+        users: {
+          HostPlayer: { username: 'HostPlayer', isHost: true, disconnected: false },
+          Player2: { username: 'Player2', isHost: false, disconnected: false, lastActivity: Date.now() - 10 * 60_000 },
+        },
+      });
+      mockGetGame.mockReturnValue(game);
+
+      checkAutoKickInactive(io, (cb) => cb('TEST123', game));
+
+      expect(mockRemoveUserFromGame).toHaveBeenCalledWith('TEST123', 'Player2');
+      expect(game.kickedPlayers.has('Player2')).toBe(false);
     });
   });
 });

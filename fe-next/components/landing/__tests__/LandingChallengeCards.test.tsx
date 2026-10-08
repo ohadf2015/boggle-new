@@ -21,12 +21,6 @@ vi.mock('@/utils/contextualGuidanceStorage', () => ({
 vi.mock('@/utils/onboardingStorage', () => ({
   hasCompletedOnboarding: () => true,
 }));
-vi.mock('@/components/daily/DailyChallengeBanner', () => {
-  const DailyChallengeBanner = () => <div data-testid="daily-banner" />;
-  DailyChallengeBanner.displayName = 'DailyChallengeBanner';
-  return { __esModule: true, default: DailyChallengeBanner };
-});
-
 const mockIsVeteran = vi.fn(() => false);
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({
   useIsPracticeVeteran: () => mockIsVeteran(),

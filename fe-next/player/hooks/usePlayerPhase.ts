@@ -117,7 +117,6 @@ export function usePlayerPhase({
       'word-hunt': 'wordHunt',
       'wheel-rush': 'wheelRush',
       'word-tower': 'wordTower',
-      'sealed-bid': 'sealedBid',
       'crossword': 'crossword',
     };
     return modeMap[gm];

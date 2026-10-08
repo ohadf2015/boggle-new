@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { defaultOgImages } from '@/lib/seo/defaultOgImage';
 import Link from 'next/link';
 import { InlineBannerAd } from '@/components/ads';
 import {
@@ -71,7 +72,7 @@ export async function nLetterWordsMetadata(locale: string, n: WordLength): Promi
   return {
     title,
     description,
-    openGraph: { type: 'website', url, title, description, siteName: 'LexiClash' },
+    openGraph: { images: defaultOgImages(locale), type: 'website', url, title, description, siteName: 'LexiClash' },
     // English word list, index:locale==='en'. Self-referencing EN hreflang.
     alternates: enOnlyAlternates(`/words/${n}-letter-words`),
     // NOINDEX 2026-08-09: auto-generated word lists are the canonical "low value

@@ -150,6 +150,7 @@ import {
   trackOnboardingStep,
   trackOnboardingQuickPlay,
   trackInviteConsumed,
+  trackOnboardingSkipped,
 } from '@/utils/growthTracking';
 
 describe('OnboardingFlow analytics', () => {
@@ -172,6 +173,20 @@ describe('OnboardingFlow analytics', () => {
   it('fires onboarding_started once on mount', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
     expect(trackOnboardingStart).toHaveBeenCalledTimes(1);
+  });
+
+  it('closes the funnel as skipped when the flow unmounts without finishing (invite redirect)', () => {
+    const { unmount } = render(<OnboardingFlow onComplete={vi.fn()} />);
+    unmount();
+    expect(trackOnboardingSkipped).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not double-report a finished flow on unmount', () => {
+    const { unmount } = render(<OnboardingFlow onComplete={vi.fn()} />);
+    advanceToQuickStart();
+    play();
+    unmount();
+    expect(trackOnboardingSkipped).not.toHaveBeenCalled();
   });
 
   it('fires step=calmMode when an admin picks a vibe', () => {

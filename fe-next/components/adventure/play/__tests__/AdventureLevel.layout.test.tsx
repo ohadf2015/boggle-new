@@ -6,6 +6,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
+vi.mock('@/components/tutorial/ModeCoach', () => ({ ModeCoach: () => null }));
+
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
     playBossEntranceSound: vi.fn(),

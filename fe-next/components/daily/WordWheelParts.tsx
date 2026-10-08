@@ -63,9 +63,7 @@ export interface WheelLetterProps {
   tileSkin?: string | null;
   /**
    * Smaller outer tiles for wheels squeezed into a panel rather than owning the
-   * screen (Sealed Bid's felt). Seven tiles need an orbit of ~1.15× the tile
-   * width just to not touch, so the full-size tiles could not fit the height
-   * the felt grants. Same sizes the `short:` viewport variants already use.
+   * screen. Same sizes the `short:` viewport variants already use.
    */
   compact?: boolean;
 }

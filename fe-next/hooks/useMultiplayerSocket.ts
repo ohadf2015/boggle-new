@@ -14,6 +14,7 @@ import {
 } from '@/utils/SocketContext';
 import { saveSession, clearSessionPreservingUsername, getSession } from '@/utils/session';
 import { buildRejoinPayload } from '@/lib/multiplayer/reloadRejoin';
+import { getRejoinIntent, planNotSeatedRejoin } from '@/utils/socketRejoin';
 import { setGuestName } from '@/utils/guestManager';
 import { resolveHostLeftMessage } from '@/lib/multiplayer/resolveHostLeftMessage';
 import logger from '@/utils/logger';
@@ -150,6 +151,7 @@ export function useMultiplayerSocket(
   const hostKeepAliveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
   const reconnectFallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const notSeatedRejoinAtRef = useRef(0);
   const kickedReloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -416,6 +418,19 @@ export function useMultiplayerSocket(
 
       if (hasNoMeaningfulContent) {
         logger.debug('[SOCKET.IO] Received empty error object (internal Socket.IO event)');
+        return;
+      }
+
+      const rejoin = planNotSeatedRejoin({
+        errorCode,
+        intent: getRejoinIntent(),
+        lastAttemptAt: notSeatedRejoinAtRef.current,
+        now: Date.now(),
+      });
+      if (rejoin) {
+        notSeatedRejoinAtRef.current = Date.now();
+        logger.log('[SOCKET.IO] Server lost our seat - re-joining', rejoin.gameCode);
+        socketInstance.emit('join', rejoin);
         return;
       }
 

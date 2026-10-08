@@ -20,7 +20,6 @@ const ROUND_SLUG: Record<string, string> = {
   blast: 'blast',
   'wheel-rush': 'wheelRush',
   'word-tower': 'wordTower',
-  'sealed-bid': 'sealedBid',
   crossword: 'crossword',
 };
 

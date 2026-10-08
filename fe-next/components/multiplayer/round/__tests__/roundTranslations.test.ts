@@ -30,7 +30,7 @@ describe('mpUi.round translations', () => {
   });
 
   it('every live mode resolves a name + rule key that exists in en', () => {
-    for (const m of ['classic', 'blast', 'word-hunt', 'wheel-rush', 'word-tower', 'sealed-bid', 'crossword', 'random', null]) {
+    for (const m of ['classic', 'blast', 'word-hunt', 'wheel-rush', 'word-tower', 'crossword', 'random', null]) {
       const meta = roundModeMeta(m);
       expect(EN[meta.nameKey.replace('mpUi.round.', '')], meta.nameKey).toEqual(expect.any(String));
       expect(EN[meta.ruleKey.replace('mpUi.round.', '')], meta.ruleKey).toEqual(expect.any(String));

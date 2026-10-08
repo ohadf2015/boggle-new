@@ -105,6 +105,8 @@ export function useWordTowerVersus(opts: { socket: VersusSocket | null; selfId: 
     socket.on('towerTrayUpdate', onTray);
     socket.on('towerBombHit', onBombHit);
     socket.on('towerMatchReady', onMatchReady);
+    // A reconnect's `join` re-seats the new socket; only then can the server answer.
+    socket.on('joined', onMatchReady);
     socket.emit('requestTowerState');
 
     return () => {
@@ -114,6 +116,7 @@ export function useWordTowerVersus(opts: { socket: VersusSocket | null; selfId: 
       socket.off('towerTrayUpdate', onTray);
       socket.off('towerBombHit', onBombHit);
       socket.off('towerMatchReady', onMatchReady);
+      socket.off('joined', onMatchReady);
     };
   }, [socket, selfId]);
 

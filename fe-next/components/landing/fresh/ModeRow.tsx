@@ -3,8 +3,8 @@
 /**
  * Section 4 of the fresh homepage: a swipeable scroll-snap row of game modes.
  *
- * - Only modes a logged-out visitor can open. crossword / quick-play /
- *   sealed-bid remain beta-gated in LandingChallengeCards (and route-guards).
+ * - Only modes a logged-out visitor can open. crossword / quick-play
+ *   remain beta-gated in LandingChallengeCards (and route-guards).
  * - The new modes (Adventure, Word Tower) lead the section as the
  *   NewModesSpotlight pair (key art + loot chest), so the row skips them.
  * - Order is newcomer-first: blast ranks lowest for first-day players

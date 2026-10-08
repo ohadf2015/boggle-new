@@ -9,9 +9,10 @@ import {
   getGame,
   getGameBySocketId,
   getUsernameBySocketId,
+  getSocketIdByUsername,
   updatePlayerScore,
 } from '../modules/gameStateManager.js';
-import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
+import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload } from '../utils/socketValidation.js';
 import {
@@ -29,6 +30,7 @@ import {
   scrambleVersus,
   sendVersusBomb,
   versusStandings,
+  type VersusMatchState,
 } from '@/lib/wordTower/versusMatch';
 import { clientTowerView } from '@/lib/wordTower/wordTowerManager';
 
@@ -38,6 +40,12 @@ function broadcastTowerStandings(io: Server, gameCode: string): void {
   volatileBroadcastToRoom(io, getGameRoom(gameCode), 'towerStandings', {
     standings: versusStandings(game.wordTowerVersusState),
   });
+}
+
+/** The live score IS the tower height, so a bomb lowers it too. */
+function syncHeightScore(gameCode: string, match: VersusMatchState, playerId: string): void {
+  const player = match.players[playerId];
+  if (player) updatePlayerScore(gameCode, playerId, Math.round(player.game.heightM));
 }
 
 /** Resolve the socket to its in-progress word-tower match + identity. */
@@ -72,7 +80,7 @@ export function handleSubmitTowerWord(io: Server, socket: Socket, data: SubmitTo
 
   // Mirror height into the generic score so end-game/leaderboard reflect it.
   if (outcome.result) {
-    updatePlayerScore(gameCode, username, Math.round(outcome.result.meters), true);
+    syncHeightScore(gameCode, game.wordTowerVersusState, username);
 
     // Record the word into playerWords so end-game recorder captures it for weekly-quest + XP.
     if (!game.playerWords) game.playerWords = {};
@@ -112,6 +120,13 @@ export function handleSendTowerBomb(io: Server, socket: Socket, data: SendTowerB
     return;
   }
 
+  const match = game.wordTowerVersusState;
+  if (outcome.targetId) {
+    syncHeightScore(gameCode, match, outcome.targetId);
+    const targetSocket = getSocketById(io, getSocketIdByUsername(gameCode, outcome.targetId) ?? '');
+    if (targetSocket) safeEmit(targetSocket, 'towerTrayUpdate', { state: clientTowerView(match.players[outcome.targetId].game) });
+  }
+  socket.emit('towerTrayUpdate', { state: clientTowerView(match.players[username].game) });
   socket.emit('towerBombResult', { sent: true, targetId: outcome.targetId, removed: outcome.removed, damage: outcome.damage });
   broadcastToRoom(io, getGameRoom(gameCode), 'towerBombHit', {
     fromId: username,

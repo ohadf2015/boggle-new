@@ -105,7 +105,7 @@ describe('WordWheelPixiRing — connector line brightness', () => {
   });
 });
 
-// ── Phase C: outer-count-aware angle (Sealed Bid's 7-letter wheel) ─────────────
+// ── Phase C: outer-count-aware angle ──
 describe('WordWheelPixiRing — outerCount angle', () => {
   it('defaults to 60° spacing (6-letter wheel) when outerCount is omitted', async () => {
     render(<WordWheelPixiRing selectedIndices={[0, 1]} radius={100} combo={0} />);

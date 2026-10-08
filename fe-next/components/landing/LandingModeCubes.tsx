@@ -354,7 +354,7 @@ export interface LandingModeCubesProps {
   /** the DailyChallengeBanner element — special-cased hero, never a cube */
   dailyNode?: React.ReactNode;
   extras?: ModeCubeModel[];
-  /** the calm / no-timer set (crossword, word craft, sealed bid, connections).
+  /** the calm / no-timer set (crossword, word craft, connections).
       Rendered in a distinct, quieter "take your time" room below the energetic
       bento. Empty/absent ⇒ the section is not rendered at all (no empty room). */
   calmModels?: ModeCubeModel[];
@@ -449,13 +449,13 @@ export function LandingModeCubes({
 
       {/* ===== CALM / NO-TIMER ROOM =====
           A quieter, deliberately separate "world" for the untimed puzzles
-          (crossword, word craft, sealed bid, connections). Stays inside the
+          (crossword, word craft, connections). Stays inside the
           neo-brutalist system — hard border, navy, Fredoka — but dials the energy
           down: a defined cool-tinted panel (vs the bento's bare-navy grid), a
           TimerOff-icon header that names the promise, roomier centred tiles, and
           glow/sheen-free cubes (tone="calm"). Sized to read intentional from 2
           tiles (public: word craft + connections) up to 4 (admin adds
-          crossword + sealed bid) — no anchor hero, all peers. */}
+          crossword) — no anchor hero, all peers. */}
       {hasCalm && (
         <section
           data-testid="landing-cubes-calm"

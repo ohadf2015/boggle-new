@@ -64,3 +64,17 @@ export function planReconnectRejoin(opts: {
   if (!opts.isReconnect) return null;
   return opts.intent;
 }
+
+const NOT_SEATED_REJOIN_THROTTLE_MS = 5000;
+
+/** The server lost this socket's seat without a disconnect (e.g. a recovery emit raced the rejoin): re-seat it. */
+export function planNotSeatedRejoin(opts: {
+  errorCode: unknown;
+  intent: RejoinIntent | null;
+  lastAttemptAt: number;
+  now: number;
+}): RejoinIntent | null {
+  if (opts.errorCode !== 'PLAYER_NOT_IN_GAME' || !opts.intent) return null;
+  if (opts.now - opts.lastAttemptAt < NOT_SEATED_REJOIN_THROTTLE_MS) return null;
+  return opts.intent;
+}

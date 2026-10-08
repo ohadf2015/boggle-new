@@ -50,6 +50,7 @@ import { isCombatKind } from '@/lib/adventure/play/levels';
 import { cn } from '@/lib/utils';
 
 import type { DeedEvent } from './deed/DeedStamp';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 const DraftOverlay = dynamic(() => import('./DraftOverlay'), { ssr: false });
 const DeedStamp = dynamic(() => import('./deed/DeedStamp'), { ssr: false });
 
@@ -434,6 +435,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
       {run.phase === 'ready' && lvl && <LevelIntro world={world} level={shownLevel} floor={floor} lvl={{ ...lvl, seconds: secs }} onBegin={begin} onExit={onExit} />}
 
       {run.phase === 'playing' && <DeedStamp event={deed} />}
+      {run.phase === 'playing' && <ModeCoach mode="adventure" />}
       {/* Ordinary fights: the rival's swing as a watched shot, not a line of HUD text. */}
       {run.phase === 'playing' && lvl && !isCombatKind(lvl.kind) && run.combat && (
         <RivalAttack combat={run.combat} feed={run.combatFx ?? []} />

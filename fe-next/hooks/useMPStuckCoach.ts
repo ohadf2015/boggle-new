@@ -29,6 +29,7 @@ export interface UseMPStuckCoachArgs {
   totalGamesPlayed: number;
   /** Mouse/desktop session — suppresses the touch-only tap hint. */
   isDesktop: boolean;
+  idleThresholdMs?: number;
 }
 
 export interface MPStuckCoach {
@@ -50,7 +51,7 @@ export interface MPStuckCoach {
  * One coordinator — not three racing hooks — is what keeps this from being annoying.
  */
 export function useMPStuckCoach(args: UseMPStuckCoachArgs): MPStuckCoach {
-  const { active, isClassic, totalGamesPlayed, isDesktop } = args;
+  const { active, isClassic, totalGamesPlayed, isDesktop, idleThresholdMs } = args;
 
   const [stage, setStage] = useState<StuckStage>('none');
   const visible = stage !== 'none';
@@ -140,11 +141,12 @@ export function useMPStuckCoach(args: UseMPStuckCoachArgs): MPStuckCoach {
         isDesktop,
         // Suppress across sessions once shown anywhere.
         alreadyShown: !shouldShowGuidance('stuckCoachShown'),
+        idleThresholdMs,
       });
       if (next !== 'none') show(next);
     }, TICK_MS);
     return () => clearInterval(id);
-  }, [active, isClassic, totalGamesPlayed, isDesktop, show]);
+  }, [active, isClassic, totalGamesPlayed, isDesktop, idleThresholdMs, show]);
 
   useEffect(() => clearAutoHide, [clearAutoHide]);
 

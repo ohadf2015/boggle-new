@@ -16,10 +16,6 @@ vi.mock('@/components/landing/home/HomeDailyHero', () => ({
 
 vi.mock('@/utils/contextualGuidanceStorage', () => ({ shouldShowGuidance: () => false }));
 vi.mock('@/utils/onboardingStorage', () => ({ hasCompletedOnboarding: () => true }));
-vi.mock('@/components/daily/DailyChallengeBanner', () => ({
-  __esModule: true,
-  default: () => <div data-testid="daily-banner" />,
-}));
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({ useIsPracticeVeteran: () => false }));
 vi.mock('@/components/CrazyGamesSDK', () => ({ useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }) }));
 vi.mock('@/hooks/useUserStats', () => ({ useUserStats: () => ({ userStats: { totalGamesPlayed: 5 }, isLoading: false }) }));

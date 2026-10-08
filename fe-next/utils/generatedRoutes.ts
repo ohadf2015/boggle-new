@@ -180,7 +180,6 @@ export const PUBLIC_ROUTES: string[] = [
   "/referrals",
   "/rules",
   "/scrabble-alternative-online",
-  "/sealed-bid",
   "/settings",
   "/singleplayer",
   "/sitemap",

@@ -26,7 +26,7 @@
  * The modes the CLIENT's next-round selector offers (`ALL_MODES` in
  * `components/results/StickyReadyBar.tsx`). Not the set `random` can deal:
  * the server rolls `selectNextGameMode(history, ALL_GAME_MODES)`, a SUPERSET
- * that also carries word-tower / sealed-bid / crossword. That mismatch is
+ * that also carries word-tower / crossword. That mismatch is
  * exactly why a per-mode allowlist was never a safe way to protect the recap,
  * and why the decision below keys on `classroomSummary` instead. This list is
  * a convenience for tests, never a gate.

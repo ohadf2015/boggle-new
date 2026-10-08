@@ -70,7 +70,7 @@ function resolveTeacherGame(socket: Socket, action: TeacherAction): { gameCode: 
   }
 
   if (!game.isClassroom) {
-    logger.warn('TEACHER', `${action} ignored: ${gameCode} is not a classroom room`, { socketId: socket.id, gameCode });
+    logger.info('TEACHER', `${action} ignored: ${gameCode} is not a classroom room`, { socketId: socket.id, gameCode });
     return null;
   }
 

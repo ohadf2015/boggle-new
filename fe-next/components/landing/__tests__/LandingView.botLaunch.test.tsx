@@ -86,12 +86,6 @@ vi.mock('@/components/ProfileCustomizationModal', () => ({
   default: () => null,
 }));
 
-// Mock DailyChallengeBanner
-vi.mock('@/components/daily/DailyChallengeBanner', () => ({
-  __esModule: true,
-  default: () => <div data-testid="daily-challenge-banner">Daily Challenge</div>,
-}));
-
 // Mock ThemeContext
 vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({

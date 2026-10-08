@@ -1806,11 +1806,6 @@ const en = {
     },
     "modifier": {
       "todaysTwist": "Today's Twist",
-      "sealedBid": {
-        "noClashPenalty": { "label": "Truce Day", "desc": "A friendlier market. Bid freely." },
-        "vowelTax": { "label": "Vowel Tax", "desc": "Vowels are the hot commodity today." },
-        "highStakes": { "label": "High Stakes", "desc": "Bold, unique bids define the day." }
-      },
       "wordAlchemy": {
         "doubleCatalyst": { "label": "Double Catalyst", "desc": "Catalysts are extra lively today." },
         "heatDecay": { "label": "Cooling Lab", "desc": "A cooler lab. Pace your reactions." },
@@ -1822,91 +1817,6 @@ const en = {
         "timeAttack": { "label": "Time Attack", "desc": "The clock is ticking. Solve fast." }
       }
     }
-  },
-  "sealedBidMp": {
-    "waiting": "Setting up the auction…",
-    "round": "Round {{n}}/{{total}}",
-    "scores": "Scores",
-    "youWin": "You win the auction!",
-    "wins": "wins the auction!",
-    "bidPrompt": "Build a word from the rack. Pick one no rival will.",
-    "results": "Bids revealed",
-    "outcome": { "unique": "Unique ×2", "clash": "Clash ÷2", "none": "No bid" },
-    "locked": "Bid locked. Waiting for rivals…",
-    "lockProgress": "{{locked}}/{{total}} locked",
-    "clear": "Clear",
-    "pass": "Pass",
-    "lock": "Lock bid",
-    "autoResolve": "Auto-resolves in {{secs}}s",
-    "eloRating": "Rating"
-  },
-  "sealedBidLegacy": {
-    "badge": "Sealed Bid",
-    "title": "Sealed Bid",
-    "instructions": "Pick a word nobody else will. Unique bids score double.",
-    "roundLabel": "Round {n} of {total}",
-    "totalScore": "Score: {score}",
-    "chipStack": "Chips: {chips}",
-    "timerLabel": "Type your word…",
-    "sealPhase": "Seal your bid",
-    "tapHint": "Tap letters to build your word",
-    "backspace": "Delete last letter",
-    "clear": "Clear word",
-    "revealPhase": "Reveal",
-    "showdown": "SHOWDOWN!",
-    "lockIn": "Lock in",
-    "skip": "Pass",
-    "youPicked": "You picked",
-    "botPicked": "Bot picked",
-    "resultUnique": "Unique! Double points",
-    "resultShared": "Clash: half points",
-    "resultNone": "No bid: 0 points",
-    "pointsEarned": "+{pts} pts",
-    "nextRound": "Next round →",
-    "finalScore": "Final score",
-    "gameOver": "Game over",
-    "busted": "Busted!",
-    "playAgain": "Play again",
-    "adminOnly": "Sealed Bid is an admin-only preview.",
-    "shareCard": {
-      "title": "Your bluffing story",
-      "cta": "Share result",
-      "copied": "Copied"
-    },
-    "session": {
-      "title": "Bluff Counter",
-      "outsmarted": "rounds outsmarted",
-      "uniqueLabel": "Unique",
-      "clashLabel": "Clash",
-      "passLabel": "Pass",
-      "shareCta": "Share score",
-      "cashOut": "Cash out",
-      "chips": "chips",
-      "coins": "coins"
-    },
-    "err": {
-      "notInRack": "Use only the rack letters",
-      "notWord": "Not in the dictionary"
-    },
-    "allIn": "All in",
-    "currentStake": "Current stake",
-    "balance": "Balance",
-    "stake": "Stake",
-    "uniquePays": "Unique pays {mult}x",
-    "potentialPayout": "Potential payout {amount}",
-    "lockBid": "Lock bid",
-    "pass": "Pass",
-    "unique": "Unique",
-    "clash": "Clash",
-    "notAWord": "Not a word",
-    "busted": "Busted",
-    "cashOut": "Cash out",
-    "chips": "Chips",
-    "round": "Round",
-    "chipStack": "Chips: {chips}",
-    "gameOver": "Game over",
-    "youWin": "You win!",
-    "continue": "Continue"
   },
   "wordAlchemy": {
     "badge": "Word Alchemy",
@@ -2254,7 +2164,7 @@ const en = {
     "sabotage": { "chip": "Wrecking ball", "tokens": "{n}", "pickTarget": "Pick a rival", "noTargets": "No rivals to target yet", "confirm": "Send wrecking ball to {name}?", "send": "Send", "cancel": "Cancel", "sentTo": "💥 Hit {name}, −1m", "incoming": "🚨 Sabotage incoming from {name}!", "recovered": "Tower stands. Climb on.", "earned": "🎯 Wrecking Ball earned!", "earnedHint": "New zone or achievement", "watchAd": "📺 Watch Ad +1", "adEarned": "🎯 Token via Ad!", "smashTitle": "Release the ball!", "smashCta": "SMASH!", "smashReleasing": "Releasing…", "floorsDestroyed": "−{n} FLOORS!", "newHeight": "New height:", "newHeightValue": "{m}m", "strikeCta": "STRIKE!", "strikeHint": "Tap when the meter hits the green zone", "verdict": { "perfect": "PERFECT HIT!", "solid": "SOLID HIT", "weak": "GLANCING BLOW" }, "done": "DONE" },
     "reward": { "tier": { "common": "Coins", "uncommon": "Nice haul!", "rare": "Rare find!", "epic": "JACKPOT!" } },
     "wreck": { "reportTitle": "Tower raided!", "reportBody": "{name} knocked off {floors} floors while you were away. Here's a scramble to fight back.", "defaultName": "A rival" },
-    "error": { "too_short": "Too short: 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
+    "error": { "too_short": "Too short: 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary", "rejected": "Word not accepted", "no_player": "You're not in this match", "self_target": "You can't bomb your own tower" },
     "celebration": { "highRise": "High Rise!", "tall": "Towering!", "skyscraper": "SKYSCRAPER!" },
     "leaderboard": { "title": "Top Towers", "error": "Couldn't load leaderboard", "empty": "No towers yet. Be the first.", "floors": "{count} floors" },
     "share": { "title": "Word Tower", "button": "Share", "text": "I reached {m} m in Word Tower. Beat my tower!" },
@@ -3097,7 +3007,7 @@ const en = {
       "blast": "BLAST!",
       "wordHunt": "WORD HUNT!",
       "wheelRush": "WHEEL RUSH!",
-      "classic": "CLASSIC!"
+      "classic": "CLASSIC!", "crossword": "CROSSWORD!", "wordTower": "WORD TOWER!"
     }
   },
   "help": {
@@ -4779,7 +4689,6 @@ const en = {
         "wordHunt": "Word Hunt",
         "wheelRush": "Wheel Rush",
         "wordTower": "Word Tower",
-        "sealedBid": "Sealed Bid",
         "random": "Surprise Mode"
       },
       "hook": {
@@ -4788,7 +4697,6 @@ const en = {
         "wordHunt": "Hunt the hidden word",
         "wheelRush": "Race rivals on the wheel",
         "wordTower": "Stack the tower",
-        "sealedBid": "Outbid the room",
         "random": "Surprise me"
       }
     },
@@ -7464,7 +7372,13 @@ const en = {
       "3": "Knowledge is your sharpest blade",
       "4": "Rhythm wins rounds",
       "5": "Sound is the new strategy",
-      "6": "Rule the dictionary"
+      "6": "Rule the dictionary",
+      "7": "Cool letters, hot streaks",
+      "8": "The board comes alive after dark",
+      "9": "Burn bright, score brighter",
+      "10": "Grow your lead, word by word",
+      "11": "Decode the stars",
+      "12": "The final ascent"
     }
   },
   "seasonBadges": {
@@ -7723,8 +7637,6 @@ const en = {
     "partyModeDesc": "Big-screen Caption / Pixel / Shadow Clash",
     "wordAlchemyMode": "Word Alchemy",
     "wordAlchemyModeDesc": "Transform one word into the next",
-    "sealedBidMode": "Sealed Bid",
-    "sealedBidModeDesc": "Pick a word nobody else will. Unique bids score double.",
     "wordfallMode": "Wordfall",
     "wordfallModeDesc": "Spell fast as the tiles rain down",
     "dailyChallenge": "Daily Challenge",
@@ -15228,7 +15140,6 @@ const en = {
       "playWordfall": "Wordfall",
       "playParty": "Party",
       "playWordTower": "Word Tower",
-      "playSealedBid": "Sealed Bid"
     }
   },
   "passAndPlay": {
@@ -15634,9 +15545,15 @@ const en = {
     },
     "wordTower": {
       "title": "Build the Tower",
-      "step1": "Tap to drop each block",
-      "step2": "Land it centered to stack higher",
+      "step1": "Swipe letters to spell a word",
+      "step2": "Tap to drop it dead center",
       "scoreTip": "Every word adds a floor. Go high"
+    },
+    "party": {
+      "title": "Pass the Phone",
+      "step1": "Drag letters to spell words",
+      "step2": "Pass the phone when time's up",
+      "scoreTip": "Only words no one else found score"
     },
     "connections": {
       "title": "Find the Links",
@@ -15658,12 +15575,6 @@ const en = {
       "title": "Fill the Grid",
       "step1": "Tap a clue, then type the answer",
       "step2": "Solve across and down"
-    },
-    "sealedBid": {
-      "title": "Bid in Secret",
-      "step1": "Pick your strongest word",
-      "step2": "Words nobody else picks score double",
-      "step3": "Lock fast: the bonus shrinks over time"
     },
     "adventure": {
       "title": "Beat the Levels",
@@ -15739,10 +15650,6 @@ const en = {
         "tip2": "Tap outer letters in any order",
         "tip3": "Try plural forms to extend a word"
       }
-    },
-    "sealedBid": {
-      "name": "Sealed Bid",
-      "description": "Bid a word nobody else picks. Unique bids score double!"
     },
     "crossword": {
       "name": "Crossword",
@@ -18256,79 +18163,6 @@ const en = {
     "charitableDonation": "Charitable donation angle",
     "bestFor": "Best for"
   },
-  "sealedBid": {
-    "luckyStreak": "LUCKY STREAK!",
-    "hotStreak": "{n} in a row!",
-    "allIn": "All in",
-    "clear": "Clear",
-    "currentStake": "Current stake",
-    "balance": "Balance",
-    "stake": "Stake",
-    "uniquePays": "Unique pays {mult}x",
-    "potentialPayout": "Potential payout {amount}",
-    "lockBid": "Lock bid",
-    "needWord": "Build a word first",
-    "needStake": "Set a stake to lock your bid",
-    "pass": "Pass",
-    "unique": "Unique",
-    "clash": "Clash",
-    "busted": "Busted",
-    "cashOut": "Cash out",
-    "chips": "Chips",
-    "showdown": "Showdown",
-    "round": "Round",
-    "vsRivals": "vs {a} & {b}",
-    "roundLabel": "Round {n} of {total}",
-    "chipStack": "Chips: {chips}",
-    "speedBonus": "Speed ×{n}",
-    "gameOver": "Game over",
-    "playAgain": "Play again",
-    "notAWord": "Not a word",
-    "tapHint": "Tap letters to build your word",
-    "continue": "Continue",
-    "revealing": "Revealing…",
-    "youWin": "You win!",
-    "youLose": "Clash",
-    "draw": "Pass",
-    "noWord": "—",
-    "botRival": "Rival {n}",
-    "outcome": {
-      "unique": "Unique bid",
-      "clash": "Clash",
-      "none": "No bid"
-    },
-    "outcomeEmoji": {
-      "unique": "✅",
-      "clash": "🤝",
-      "none": "⬜"
-    },
-    "error": {
-      "tooShort": "Word must be at least 3 letters",
-      "needStake": "Set a stake to lock your bid"
-    },
-    "shareCard": {
-      "title": "Your bluffing story",
-      "cta": "Share result",
-      "copied": "Copied!",
-      "header": "🎯 Sealed Bid — {score}pts",
-      "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
-      "url": "lexiclash.live/{locale}/sealed-bid",
-      "roundLabel": "R{n}",
-      "vs": "vs"
-    },
-    "session": {
-      "title": "Bluff Counter",
-      "outsmarted": "rounds outsmarted",
-      "uniqueLabel": "Unique",
-      "clashLabel": "Clash",
-      "passLabel": "Pass",
-      "shareCta": "Share score",
-      "shareHeader": "🧠 Outsmarted the bot {unique}/{total} rounds · {score} pts",
-      "cashOut": "Cash out",
-      "chips": "chips",
-      "coins": "coins"
-    }
-  },
   "supporter": {
     "card": {
       "title": "Enjoying LexiClash?",
@@ -18467,10 +18301,6 @@ const en = {
         "wordTower": {
           "name": "Word Tower",
           "rule": "Stack words to build the tallest tower."
-        },
-        "sealedBid": {
-          "name": "Sealed Bid",
-          "rule": "Bid in secret. Spend your points wisely."
         },
         "crossword": {
           "name": "Crossword Race",

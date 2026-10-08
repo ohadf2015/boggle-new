@@ -9,6 +9,7 @@
 import type { GameMode, Language } from '@/shared/types';
 import { BLAST_MP_DEFAULT_TIMER, DEFAULT_TIMER } from '@/shared/constants/gameConstants';
 import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
+import { WORD_TOWER_VERSUS_MATCH_S } from '@/shared/constants/wordTowerConstants';
 
 export interface GameModeRules {
   /** Round length when the host supplied none. */
@@ -50,11 +51,10 @@ export const GAME_MODE_RULES: Record<GameMode, GameModeRules> = {
   'word-hunt': { ...BOARD, duplicatesAllowed: true },
   // Lock-free parallel discovery: first-finder bonus + repeat factor encode rarity.
   'wheel-rush': { ...BOARD, defaultTimerSec: WHEEL_RUSH_DURATION_SEC, duplicatesAllowed: true, rarityScoring: false },
-  'word-tower': { ...BOARD, betaName: 'Word Tower' },
+  'word-tower': { ...BOARD, betaName: 'Word Tower', fixedTimerSec: WORD_TOWER_VERSUS_MATCH_S, humanOnly: true },
   // 5 rounds x (30s bid + 5s reveal) = 175s + buffer.
-  'sealed-bid': { ...BOARD, betaName: 'Sealed Bid', fixedTimerSec: 210, languages: ['en', 'he'], humanOnly: true },
   // Generous race cap (a 5x5 can take minutes).
-  crossword: { ...BOARD, betaName: 'Crossword', fixedTimerSec: 420, humanOnly: true },
+  crossword: { ...BOARD, betaName: 'Crossword', fixedTimerSec: 420, humanOnly: true, languages: ['en', 'he'] },
   // Per-student lesson-dealt race: 5min clock, no classic bots, shared list
   // words bank at full value for everyone who crafts them.
   wordcraft: { ...BOARD, defaultTimerSec: 300, humanOnly: true, duplicatesAllowed: true, rarityScoring: false },

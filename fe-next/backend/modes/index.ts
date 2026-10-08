@@ -10,7 +10,6 @@ import { blastMode } from './blast';
 import { wordHuntMode } from './wordHunt';
 import { wheelRushMode } from './wheelRush';
 import { wordTowerMode } from './wordTower';
-import { sealedBidMode } from './sealedBid';
 import { crosswordMode } from './crossword';
 import { wordcraftMode } from './wordcraft';
 
@@ -20,7 +19,6 @@ const MODES: Partial<Record<GameMode, GameModeModule>> = {
   'word-hunt': wordHuntMode,
   'wheel-rush': wheelRushMode,
   'word-tower': wordTowerMode,
-  'sealed-bid': sealedBidMode,
   crossword: crosswordMode,
   wordcraft: wordcraftMode,
 };
