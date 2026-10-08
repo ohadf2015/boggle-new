@@ -492,7 +492,7 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
   // Structured HTTP logging (skip health checks)
   app.use(pinoHttp({
     logger: httpLogger,
-    autoLogging: { ignore: (req) => req.url === '/health' || req.url === '/health/live' },
+    autoLogging: { ignore: (req) => req.url === '/health' || req.url === '/health/live' || req.url === '/api/health' },
     serializers: httpLogSerializers,
   }));
 
