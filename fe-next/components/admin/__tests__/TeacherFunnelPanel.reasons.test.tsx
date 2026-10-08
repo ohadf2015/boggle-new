@@ -90,8 +90,7 @@ const payload = (over: Partial<TeacherFunnelResult> = {}): TeacherFunnelResult =
     returnedNoClassroom: 2, returnedNoClassroomTrialActive: 2, excludedMachineRows: 16,
   },
   activity: {
-    classrooms: 2, lessons: 3, studentsJoined: 1, assignments: 0,
-    lessonProgress: 2, achievements: 0, duels: null,
+    classrooms: 2, studentsJoined: 1, assignments: null,
   },
   ...over,
 });
@@ -166,9 +165,9 @@ describe('<TeacherFunnelPanel>', () => {
     render(<TeacherFunnelPanel />);
 
     await screen.findByText('What is happening inside the module');
-    expect(screen.getByText('Badges unlocked').previousSibling).toHaveTextContent('0');
-    // duels came back null — "could not count" must not render as zero.
-    expect(screen.getByText('Duels played').previousSibling).toHaveTextContent('—');
+    expect(screen.getByText('Classrooms').previousSibling).toHaveTextContent('2');
+    // assignments came back null — "could not count" must not render as zero.
+    expect(screen.getByText('Assignments').previousSibling).toHaveTextContent('—');
   });
 
   it('opens the activity drawer when an approved granted row is clicked', async () => {

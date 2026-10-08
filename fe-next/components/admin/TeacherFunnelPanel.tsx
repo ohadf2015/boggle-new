@@ -64,24 +64,12 @@ function toAccessRequest(r: TeacherFunnelRow): TeacherAccessRequest {
 }
 
 /** Mirrors ACTIVITY_TABLES in app/api/admin/teacher-funnel/route.ts. */
-const ACTIVITY_KEYS = [
-  'classrooms',
-  'lessons',
-  'studentsJoined',
-  'assignments',
-  'lessonProgress',
-  'achievements',
-  'duels',
-] as const;
+const ACTIVITY_KEYS = ['classrooms', 'studentsJoined', 'assignments'] as const;
 
 const ACTIVITY_FALLBACK: Record<(typeof ACTIVITY_KEYS)[number], string> = {
   classrooms: 'Classrooms',
-  lessons: 'Word lists',
-  studentsJoined: 'Students joined',
+  studentsJoined: 'Distinct students joined',
   assignments: 'Assignments',
-  lessonProgress: 'Students practising',
-  achievements: 'Badges unlocked',
-  duels: 'Duels played',
 };
 
 function Stat({
