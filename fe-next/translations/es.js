@@ -13430,6 +13430,14 @@ const es = {
     }
   },
   "student": {
+    "firstDay": {
+      "title": "Objetivos del primer día",
+      "join": "Únete a tu clase",
+      "stars": "Gana {count} estrellas",
+      "flame": "Enciende tu llama",
+      "chestHint": "Gana cofres en los juegos de clase",
+      "classStreakHint": "El juego de clase de hoy inicia la racha de la clase"
+    },
     "classStrip": {
       "title": "Racha de la clase",
       "streakDays": "Racha de {count} días",

@@ -11927,6 +11927,14 @@ const en = {
     }
   },
   "student": {
+    "firstDay": {
+      "title": "First-day goals",
+      "join": "Join your class",
+      "stars": "Earn {count} stars",
+      "flame": "Light your flame",
+      "chestHint": "Win chests in class games",
+      "classStreakHint": "Today's class game starts your class streak"
+    },
     "classStrip": {
       "title": "Class streak",
       "streakDays": "{count}-day class streak",

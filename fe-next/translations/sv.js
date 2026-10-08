@@ -13719,6 +13719,14 @@ const sv = {
     }
   },
   "student": {
+    "firstDay": {
+      "title": "Mål för första dagen",
+      "join": "Gå med i din klass",
+      "stars": "Tjäna {count} stjärnor",
+      "flame": "Tänd din låga",
+      "chestHint": "Vinn kistor i klassspelen",
+      "classStreakHint": "Dagens klassspel startar klassens streak"
+    },
     "classStrip": {
       "title": "Klassens svit",
       "streakDays": "{count}-dagars klassvit",

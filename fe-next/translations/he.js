@@ -13337,6 +13337,14 @@ const he = {
     }
   },
   "student": {
+    "firstDay": {
+      "title": "יעדי היום הראשון",
+      "join": "הצטרפו לכיתה",
+      "stars": "הרוויחו {count} כוכבים",
+      "flame": "הדליקו את הלהבה",
+      "chestHint": "זכו בארגזים במשחקי הכיתה",
+      "classStreakHint": "משחק הכיתה של היום מתחיל את הרצף הכיתתי"
+    },
     "classStrip": {
       "title": "רצף הכיתה",
       "streakDays": "רצף כיתתי של {count} ימים",

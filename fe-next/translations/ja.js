@@ -13477,6 +13477,14 @@ const ja = {
     }
   },
   "student": {
+    "firstDay": {
+      "title": "初日の目標",
+      "join": "クラスに参加",
+      "stars": "スターを{count}個獲得",
+      "flame": "炎を灯す",
+      "chestHint": "クラスゲームでチェストを獲得",
+      "classStreakHint": "今日のクラスゲームでクラスの連続記録が始まります"
+    },
     "classStrip": {
       "title": "クラスの連続記録",
       "streakDays": "{count}日連続",

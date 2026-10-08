@@ -44,6 +44,8 @@ import { AcademyDock } from './AcademyDock';
 import { DailyChest } from './DailyChest';
 import StudentLocker from '@/components/education/economy/StudentLocker';
 import { ClassSheet } from './ClassSheet';
+import { FirstDayCard } from './FirstDayCard';
+import { buildFirstDayGoals } from './firstDayGoals';
 import { nextOpenAssignment } from '@/components/student/nextOpenAssignment';
 import { InkPanel } from './chrome';
 import { useNodeLabel } from './AcademyNodeButton';
@@ -189,6 +191,10 @@ export function AcademyHub(props: AcademyHubProps) {
   });
   const target = [...islands, ...(boss ? [boss] : [])].find((n) => n.key === action.nodeKey);
   const spotlightTag = useCtaOverline(action.kind);
+  const firstDayGoals = useMemo(
+    () => buildFirstDayGoals({ hasClass: !!classroomId, stars: data.stars, streak: data.streak }),
+    [classroomId, data.stars, data.streak],
+  );
   const targetLabel = useNodeLabel(target ?? { key: 'none', kind: 'lesson', type: 'lesson', state: 'open', stars: 0, mastery: 0 });
 
   // Pessimistic until every source answers: a student with a class must never
@@ -296,6 +302,11 @@ export function AcademyHub(props: AcademyHubProps) {
         <div style={zoom} className={rail ? 'flex items-start justify-between gap-3' : undefined}>
           <div ref={topRef} className={cn('pointer-events-auto', rail && 'min-w-0 max-w-md flex-1')}>
             {hud}
+            {ready && (
+              <div className="mx-auto mt-1.5 w-full max-w-xl">
+                <FirstDayCard goals={firstDayGoals} hasClass={!!classroomId} />
+              </div>
+            )}
           </div>
           {/* Phone: the chest is a small badge on the START side, away from the totals (end).
               Phone on its side: at the far end of the top row, clear of the map's middle. */}
