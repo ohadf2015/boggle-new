@@ -27,9 +27,11 @@ interface WordTowerVersusProps {
   /** Authoritative per-player key (server keys match state by this username). */
   username: string;
   onQuit?: () => void;
+  /** Server round clock (seconds) — preferred over endsAtMs, which needs the client clock to agree with the server's. */
+  remainingTime?: number | null;
 }
 
-export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusProps) {
+export function WordTowerVersus({ socket, username, onQuit, remainingTime }: WordTowerVersusProps) {
   const { t, dir, language } = useLanguage();
   const selfId = username;
 
@@ -50,7 +52,9 @@ export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusPro
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
-  const secondsLeft = tower.state.endsAtMs > 0 ? Math.max(0, Math.round((tower.state.endsAtMs - now) / 1000)) : null;
+  const secondsLeft = remainingTime != null
+    ? Math.max(0, Math.floor(remainingTime))
+    : tower.state.endsAtMs > 0 ? Math.max(0, Math.round((tower.state.endsAtMs - now) / 1000)) : null;
 
   const canSubmit = tower.word.length >= 3;
   const banked = bankedBombs(you?.bombCharge ?? 0);
@@ -108,7 +112,7 @@ export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusPro
           )}
           <div className="rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 shadow-hard backdrop-blur-sm">
             <div className="font-neo-display text-2xl font-bold text-neo-white tabular-nums">{Math.round(you.heightM)}<span className="text-sm text-neo-cyan"> m</span></div>
-            {secondsLeft !== null && <div className="font-neo-body text-xs font-bold text-neo-orange tabular-nums">{secondsLeft}s</div>}
+            {secondsLeft !== null && <div className="font-neo-body text-xs font-bold text-neo-orange tabular-nums">{Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}</div>}
           </div>
           <QuickReactions onReaction={sendReaction} layout="bar" />
         </div>

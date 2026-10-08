@@ -55,6 +55,14 @@ export function startGameTimer(
     timerElapsedOffsetMs: 0,
   });
 
+  // The versus match is created at setup, before every player's 3-2-1.
+  if (game.wordTowerVersusState) {
+    const now = Date.now();
+    updateGame(gameCode, {
+      wordTowerVersusState: { ...game.wordTowerVersusState, startedAtMs: now, endsAtMs: now + timerSeconds * 1000 },
+    });
+  }
+
   launchGameInterval(io, gameCode, timerSeconds * 1000, 0);
 
   // Start bots if any are in the game
