@@ -11206,6 +11206,7 @@ const sv = {
         },
         "more": "fler under Alla lärare nedan"
       },
+      "healthTitle": "Lärarnas hälsa",
       "posthogHidden": "Konvertering från landningssida och uppsälj är dold: ingen PostHog-serverkey är konfigurerad.",
       "title": "Utbildningsöversikt",
       "subtitle": "Testkonton exkluderas. Förändringar jämförs med föregående period.",

@@ -2,6 +2,7 @@
 
 import { DyingClassesCard, ClassTableCard, ModeMixCard } from './edu-dashboard/EduClassCards';
 import { EduFunnelCard } from './edu-dashboard/EduFunnelCard';
+import { EduHealthBar } from './edu-dashboard/EduHealthBar';
 import { EduKpiGrid } from './edu-dashboard/EduKpiGrid';
 import { EduRescueList } from './edu-dashboard/EduRescueList';
 import { EduTeacherTable } from './edu-dashboard/EduTeacherTable';
@@ -16,7 +17,10 @@ export function EduDashboardSections({ data }: { data: EduDashboardView }) {
       <EduVerdictHero verdict={data.verdict ?? null} />
       <EduKpiGrid data={data} />
       <div className="grid gap-4 lg:grid-cols-2">
-        <EduFunnelCard steps={data.funnel} />
+        <div className="space-y-4">
+          <EduFunnelCard steps={data.funnel} />
+          <EduHealthBar rows={data.teachers} />
+        </div>
         <EduRescueList verdict={data.verdict ?? null} />
       </div>
       <EduTeacherTable rows={data.teachers} />

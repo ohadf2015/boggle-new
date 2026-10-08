@@ -131,6 +131,13 @@ describe('EduDashboardPanel verdict and rescue list', () => {
     expect(link.getAttribute('href')).toBe('/en/admin/education/teacher/s0');
   });
 
+  it('summarises teacher health as counts beside the funnel', async () => {
+    await load(payload());
+    expect(screen.getByTestId('health-thriving').textContent).toContain('1');
+    expect(screen.getByTestId('health-at_risk').textContent).toContain('10');
+    expect(screen.getByTestId('health-dormant').textContent).toContain('1');
+  });
+
   it('says so instead of inventing a verdict when there is none', async () => {
     await load(payload({ verdict: null }));
     expect(screen.getByText('Not enough data in this window yet.')).toBeInTheDocument();

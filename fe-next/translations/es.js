@@ -10921,6 +10921,7 @@ const es = {
         },
         "more": "más en Todos los docentes abajo"
       },
+      "healthTitle": "Estado de los docentes",
       "posthogHidden": "La conversión de la landing y del upsell está oculta: no hay clave de PostHog en el servidor.",
       "title": "Resumen educativo",
       "subtitle": "Se excluyen las cuentas de prueba. Las variaciones comparan con el periodo anterior.",

@@ -17541,6 +17541,7 @@ const en = {
         },
         "more": "more in All teachers below"
       },
+      "healthTitle": "Teacher health",
       "posthogHidden": "Landing and upsell conversion are hidden: no server PostHog key is configured.",
       "title": "Education overview",
       "subtitle": "Test accounts excluded. Deltas compare with the prior period.",
