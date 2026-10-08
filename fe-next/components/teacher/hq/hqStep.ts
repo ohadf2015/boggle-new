@@ -33,3 +33,7 @@ export function pickHqStep(input: HqStepInput): HqStepResult {
     offerFirstAssignment: input.assignmentCount === 0 && !input.hasActiveRoom,
   };
 }
+
+export function showLauncher(input: { armed: boolean; justCreatedClass: boolean }): boolean {
+  return input.armed || input.justCreatedClass;
+}

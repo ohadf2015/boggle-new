@@ -82,6 +82,8 @@ export interface TeacherOnboardingChecklistProps {
   liveStarted?: boolean;
   dismissed?: boolean;
   hasPro?: boolean;
+  /** Progress line only: the step list yields to the join code on a live-ready class. */
+  compact?: boolean;
   onDismiss?: () => void;
   onInviteCopied?: () => void;
   onLiveStarted?: () => void;
@@ -106,6 +108,7 @@ export function TeacherOnboardingChecklist({
   liveStarted,
   dismissed = false,
   hasPro = false,
+  compact = false,
   onDismiss,
   onInviteCopied,
   onLiveStarted,
@@ -198,6 +201,7 @@ export function TeacherOnboardingChecklist({
           style={{ width: `${(result.doneCount / TEACHER_ONBOARDING_STEPS.length) * 100}%` }}
         />
       </div>
+      {!compact && (
       <ol className="mt-3 grid gap-1.5 sm:grid-cols-2">
         {result.steps.map((step, index) => {
           const copy = STEP_COPY[step.id];
@@ -248,6 +252,7 @@ export function TeacherOnboardingChecklist({
           );
         })}
       </ol>
+      )}
     </NeoPanel>
   );
 }
@@ -275,6 +280,7 @@ export interface TeacherOnboardingChecklistLiveProps {
   hideAssignmentCta?: boolean;
   hideStartLiveCta?: boolean;
   hasPro?: boolean;
+  compact?: boolean;
   className?: string;
 }
 
@@ -296,6 +302,7 @@ export function TeacherOnboardingChecklistLive({
   hideAssignmentCta = false,
   hideStartLiveCta = false,
   hasPro = false,
+  compact = false,
   className,
 }: TeacherOnboardingChecklistLiveProps) {
   const [assignmentCount, setAssignmentCount] = useState<number | null>(
@@ -350,6 +357,7 @@ export function TeacherOnboardingChecklistLive({
       liveStarted={progress.liveStarted}
       dismissed={progress.dismissed}
       hasPro={hasPro}
+      compact={compact}
       onDismiss={dismiss}
       onInviteCopied={markInviteCopied}
       onLiveStarted={markLiveStarted}

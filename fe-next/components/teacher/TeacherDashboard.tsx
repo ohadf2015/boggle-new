@@ -50,7 +50,7 @@ import { StartLiveClassCta } from './hq/StartLiveClassCta';
 import { HqClassPulse } from './hq/HqClassPulse';
 import { HqJoinStrip } from './hq/HqJoinStrip';
 import { HqLoadError } from './hq/HqLoadError';
-import { pickHqStep } from './hq/hqStep';
+import { pickHqStep, showLauncher } from './hq/hqStep';
 import { TeacherOnboardingChecklistLive } from './dashboard/TeacherOnboardingChecklist';
 import { shouldShowClassProgressStrip } from '@/lib/education/classProgressStrip';
 
@@ -233,8 +233,9 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
   const split = deck && !offerFirstAssignment;
   const launcher = <PlayNowLauncher onLaunch={handleQuickLaunch} />;
   const LANDSCAPE = '[@media(orientation:landscape)_and_(max-height:500px)]';
+  const launcherShown = showLauncher({ armed: launcherOpen, justCreatedClass: !!newlyCreatedJoinCode });
   const showLauncherLink = (label: string) =>
-    launcherOpen ? null : (
+    launcherShown ? null : (
       <button type="button" data-testid="hq-show-launcher" onClick={() => setLauncherOpen(true)} className={QUIET_LINK}>
         {label}
       </button>
@@ -334,6 +335,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
               hideAssignmentCta={offerFirstAssignment}
               hideStartLiveCta={step === 'goLive'}
               hasPro={hasPro}
+              compact={step === 'goLive'}
             />
           </div>
         ) : null}
@@ -342,7 +344,13 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
         ) : step === 'loading' ? (
           <GetStudentsInSkeleton className="mx-auto w-full max-w-2xl" />
         ) : step === 'createClass' || step === 'getStudents' ? (
-          <div className="mx-auto flex w-full max-w-2xl flex-col gap-3">
+          <div
+            className={cn(
+              'mx-auto flex w-full max-w-2xl flex-col gap-3',
+              // A just-made class puts its code and GO LIVE side by side on a laptop, so GO LIVE stays above the fold.
+              launcherShown && 'lg:max-w-4xl lg:grid lg:grid-cols-2 lg:items-start lg:gap-4',
+            )}
+          >
             {step === 'createClass' ? (
               <div data-hq-primary="createClass" className="flex flex-col">
                 <PlayTabFirstRunCard onJoinCodeCreated={setNewlyCreatedJoinCode} initialJoinCode={newlyCreatedJoinCode} />
@@ -355,10 +363,12 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                 />
               </div>
             ) : null}
-            <div className="flex justify-center">
-              {showLauncherLink(t(step === 'createClass' ? 'hqCalm.playWithoutClass' : 'hqCalm.startAnyway'))}
-            </div>
-            {launcherOpen ? launcher : null}
+            {!launcherShown ? (
+              <div className="flex justify-center">
+                {showLauncherLink(t(step === 'createClass' ? 'hqCalm.playWithoutClass' : 'hqCalm.startAnyway'))}
+              </div>
+            ) : null}
+            {launcherShown ? launcher : null}
           </div>
         ) : (
           <>
