@@ -37,6 +37,8 @@ export const CLASSROOM_ECONOMY_EVENTS = {
   useHint: 'classroomEconomy:useHint',
   setConfig: 'classroomEconomy:setConfig',
   state: 'classroomEconomy:state',
+  board: 'classroomEconomy:board',
+  configSaved: 'classroomEconomy:configSaved',
   hint: 'classroomEconomy:hint',
   chest: 'classroomEconomy:chest',
   error: 'classroomEconomy:error',

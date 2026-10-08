@@ -36,12 +36,32 @@ const he = {
       "hud": {
         "cash": "כסף: {cash}",
         "multiplier": "x{multiplier}",
-        "doubleCash": "פי 2 ל-{seconds} שנ׳"
+        "doubleCash": "פי 2 ל-{seconds} שנ׳",
+        "loading": "טוען כסף…"
       },
       "board": {
         "title": "לוח הכיתה",
         "empty": "הניקוד יופיע אחרי המילה הראשונה.",
         "you": "אתה במקום {rank} עם {cash} כסף"
+      },
+      "hint": {
+        "text": "רמז: מתחילה ב-“{letter}”, {length} אותיות",
+        "use": "השתמש ברמז ({count})"
+      },
+      "sheet": {
+        "close": "סגור"
+      },
+      "error": {
+        "power_ups_off": "השדרוגים כבויים בכיתה הזו",
+        "insufficient_cash": "אין מספיק כסף עדיין",
+        "already_active": "כבר פעיל",
+        "already_held": "כבר יש לך אחד",
+        "unknown_power_up": "שדרוג לא מוכר",
+        "unavailable": "המערכת לא זמינה כרגע",
+        "no_hint": "אין רמז לשימוש",
+        "not_teacher": "רק המורה יכול לשנות את זה",
+        "no_lesson_words": "אין מילות שיעור לרמז",
+        "error": "משהו השתבש"
       }
     },
   // @economy:end

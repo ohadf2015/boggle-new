@@ -6,7 +6,7 @@ import type { ClassroomEconomyBoard } from '@/shared/constants/classroomEconomy'
 
 interface ClassroomBoardMomentProps {
   board: ClassroomEconomyBoard;
-  currentUserId: string;
+  currentUserId?: string;
 }
 
 /** Between rounds: top three from the server board, plus where this student landed. */

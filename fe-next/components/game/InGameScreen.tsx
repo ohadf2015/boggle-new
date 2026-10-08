@@ -39,6 +39,7 @@ import {
 
 // Extracted sub-components
 import { PortraitLayout } from './in-game/components';
+import ClassroomEconomyDock from '@/components/education/economy/ClassroomEconomyDock';
 import { isClassroomStudentPlay as resolveClassroomStudentPlay } from '@/lib/education/classroomPlaySurface';
 import type { RoundEventState } from './in-game/components/RoundEventOverlay';
 import type { SpecialWordEvent } from './in-game/components/SpecialWordToast';
@@ -723,6 +724,7 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
       >
         {children}
       </PortraitLayout>
+      {isClassroomStudentPlay && gameCode && <ClassroomEconomyDock gameCode={gameCode} />}
       {/* Stuck-player coach: fixed bottom-center, above the grid. Mobile + desktop. */}
       {stuckCoach.visible && (
         <div className="pointer-events-none fixed inset-x-0 bottom-4 z-[60] flex justify-center px-3">

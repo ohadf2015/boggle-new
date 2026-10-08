@@ -36,12 +36,32 @@ const en = {
       "hud": {
         "cash": "Cash: {cash}",
         "multiplier": "x{multiplier}",
-        "doubleCash": "2x {seconds}s"
+        "doubleCash": "2x {seconds}s",
+        "loading": "Loading cash…"
       },
       "board": {
         "title": "Class board",
         "empty": "Scores appear after the first word.",
         "you": "You are #{rank} with {cash} cash"
+      },
+      "hint": {
+        "text": "Hint: starts with “{letter}”, {length} letters",
+        "use": "Use hint ({count})"
+      },
+      "sheet": {
+        "close": "Close"
+      },
+      "error": {
+        "power_ups_off": "Power-ups are off for this class",
+        "insufficient_cash": "Not enough cash yet",
+        "already_active": "Already active",
+        "already_held": "You already hold one",
+        "unknown_power_up": "Unknown power-up",
+        "unavailable": "Economy is unavailable right now",
+        "no_hint": "No hint to use",
+        "not_teacher": "Only the teacher can change this",
+        "no_lesson_words": "No lesson words for a hint",
+        "error": "Something went wrong"
       }
     },
   // @economy:end

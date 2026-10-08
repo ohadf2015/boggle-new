@@ -36,12 +36,32 @@ const sv = {
       "hud": {
         "cash": "Pengar: {cash}",
         "multiplier": "x{multiplier}",
-        "doubleCash": "2x {seconds} s"
+        "doubleCash": "2x {seconds} s",
+        "loading": "Laddar pengar…"
       },
       "board": {
         "title": "Klassens ställning",
         "empty": "Poängen visas efter första ordet.",
         "you": "Du är #{rank} med {cash} i pengar"
+      },
+      "hint": {
+        "text": "Ledtråd: börjar med ”{letter}”, {length} bokstäver",
+        "use": "Använd ledtråd ({count})"
+      },
+      "sheet": {
+        "close": "Stäng"
+      },
+      "error": {
+        "power_ups_off": "Power-ups är avstängda i den här klassen",
+        "insufficient_cash": "Inte tillräckligt med pengar ännu",
+        "already_active": "Redan aktiv",
+        "already_held": "Du har redan en",
+        "unknown_power_up": "Okänd power-up",
+        "unavailable": "Ekonomin är otillgänglig just nu",
+        "no_hint": "Ingen ledtråd att använda",
+        "not_teacher": "Bara läraren kan ändra detta",
+        "no_lesson_words": "Inga lektionsord till en ledtråd",
+        "error": "Något gick fel"
       }
     },
   // @economy:end

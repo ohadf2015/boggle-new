@@ -36,12 +36,32 @@ const es = {
       "hud": {
         "cash": "Dinero: {cash}",
         "multiplier": "x{multiplier}",
-        "doubleCash": "2x {seconds} s"
+        "doubleCash": "2x {seconds} s",
+        "loading": "Cargando dinero…"
       },
       "board": {
         "title": "Tabla de la clase",
         "empty": "Las puntuaciones aparecen tras la primera palabra.",
         "you": "Eres #{rank} con {cash} de dinero"
+      },
+      "hint": {
+        "text": "Pista: empieza por «{letter}», {length} letras",
+        "use": "Usar pista ({count})"
+      },
+      "sheet": {
+        "close": "Cerrar"
+      },
+      "error": {
+        "power_ups_off": "Los potenciadores están desactivados en esta clase",
+        "insufficient_cash": "Aún no tienes dinero suficiente",
+        "already_active": "Ya está activo",
+        "already_held": "Ya tienes uno",
+        "unknown_power_up": "Potenciador desconocido",
+        "unavailable": "La economía no está disponible ahora",
+        "no_hint": "No hay pista que usar",
+        "not_teacher": "Solo el profesor puede cambiar esto",
+        "no_lesson_words": "No hay palabras de lección para una pista",
+        "error": "Algo salió mal"
       }
     },
   // @economy:end

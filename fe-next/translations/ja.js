@@ -36,12 +36,32 @@ const ja = {
       "hud": {
         "cash": "所持金: {cash}",
         "multiplier": "x{multiplier}",
-        "doubleCash": "2倍 残り{seconds}秒"
+        "doubleCash": "2倍 残り{seconds}秒",
+        "loading": "所持金を読み込み中…"
       },
       "board": {
         "title": "クラスランキング",
         "empty": "最初の単語の後にスコアが表示されます。",
         "you": "あなたは{cash}で{rank}位"
+      },
+      "hint": {
+        "text": "ヒント: 「{letter}」で始まる、{length}文字",
+        "use": "ヒントを使う（{count}）"
+      },
+      "sheet": {
+        "close": "閉じる"
+      },
+      "error": {
+        "power_ups_off": "このクラスではパワーアップは無効です",
+        "insufficient_cash": "まだ所持金が足りません",
+        "already_active": "すでに有効です",
+        "already_held": "すでに持っています",
+        "unknown_power_up": "不明なパワーアップ",
+        "unavailable": "今は利用できません",
+        "no_hint": "使えるヒントがありません",
+        "not_teacher": "先生だけが変更できます",
+        "no_lesson_words": "ヒント用のレッスン単語がありません",
+        "error": "問題が発生しました"
       }
     },
   // @economy:end
