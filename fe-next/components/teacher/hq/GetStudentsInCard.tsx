@@ -166,21 +166,21 @@ export function GetStudentsInCard({
         {/* `@container`: the code is sized by THIS box's width (~4.2em for six
             mono glyphs + tracking, so 20cqi always fits), capped per
             breakpoint. A viewport size overflowed the ~280px column at 1024. */}
-        <div className="@container flex shrink-0 flex-col items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream px-2 py-1 shadow-hard-sm lg:py-3">
+        <div className="@container flex shrink-0 flex-col items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream px-2 py-1 shadow-hard-sm lg:py-3 lg:[@media(max-height:800px)]:py-1.5">
           <span className="font-neo-display text-[0.65rem] font-black uppercase tracking-widest text-black/60 lg:text-sm [@media(orientation:landscape)_and_(max-height:500px)]:sr-only">
             {t("academy.hq.classCode", "Class code")}
           </span>
           <span
             data-testid="hq-join-code"
             dir="ltr"
-            className="select-all whitespace-nowrap font-mono text-[min(20cqi,3rem)] font-black leading-none tracking-[0.1em] text-neo-black sm:text-[min(20cqi,3.75rem)] lg:text-[min(22cqi,5rem)] 2xl:text-[min(22cqi,6rem)] [@media(orientation:landscape)_and_(max-height:500px)]:text-[min(20cqi,2.25rem)] max-sm:[@media(max-height:700px)]:text-[min(20cqi,2.5rem)]"
+            className="select-all whitespace-nowrap font-mono text-[min(20cqi,3rem)] font-black leading-none tracking-[0.1em] text-neo-black sm:text-[min(20cqi,3.75rem)] lg:text-[min(22cqi,5rem)] lg:[@media(max-height:800px)]:text-[min(22cqi,3.5rem)] 2xl:text-[min(22cqi,6rem)] [@media(orientation:landscape)_and_(max-height:500px)]:text-[min(20cqi,2.25rem)] max-sm:[@media(max-height:700px)]:text-[min(20cqi,2.5rem)]"
           >
             {classroom.join_code}
           </span>
           {shortUrl ? (
             <span
               dir="ltr"
-              className="mt-1 hidden max-w-full truncate font-mono text-sm font-bold text-black/60 lg:block"
+              className="mt-1 hidden max-w-full truncate font-mono text-sm font-bold text-black/60 lg:block lg:[@media(max-height:800px)]:hidden"
             >
               {shortUrl}
             </span>
@@ -245,19 +245,19 @@ export function GetStudentsInCard({
           data-testid="hq-roster-row"
           className={cn(
             "flex shrink-0 rounded-neo border-2 border-neo-cream/60 bg-neo-navy/70 px-2 py-1.5",
-            "lg:min-h-0 lg:flex-1 lg:flex-col lg:gap-3 lg:overflow-hidden lg:p-3",
+            "lg:min-h-0 lg:flex-1 lg:flex-col lg:gap-3 lg:overflow-hidden lg:p-3 lg:[@media(max-height:800px)]:flex-row lg:[@media(max-height:800px)]:items-center lg:[@media(max-height:800px)]:gap-3 lg:[@media(max-height:800px)]:p-2",
             waiting ? "items-center" : "items-center justify-between gap-2 lg:items-stretch lg:justify-start",
           )}
         >
           {waiting ? (
             <div
               data-testid={empty ? "hq-first-student-panel" : "hq-roster-waiting"}
-              className="flex w-full min-w-0 items-center gap-3 lg:h-full lg:flex-col lg:justify-center lg:gap-4"
+              className="flex w-full min-w-0 items-center gap-3 lg:h-full lg:flex-col lg:justify-center lg:gap-4 lg:[@media(max-height:800px)]:flex-row lg:[@media(max-height:800px)]:justify-start lg:[@media(max-height:800px)]:gap-3"
             >
               {empty && joinUrl ? (
                 <span
                   data-testid="hq-first-student-qr"
-                  className="hidden size-20 shrink-0 rounded-neo border-2 border-neo-black bg-neo-white p-1 shadow-hard-sm lg:block"
+                  className="hidden size-20 shrink-0 rounded-neo border-2 border-neo-black bg-neo-white p-1 shadow-hard-sm lg:block lg:[@media(max-height:800px)]:size-16"
                 >
                   <QRCodeSVG
                     value={joinUrl}
@@ -275,7 +275,7 @@ export function GetStudentsInCard({
               {empty ? (
                 <p
                   data-testid="hq-first-student-title"
-                  className="hidden font-neo-display text-sm font-black uppercase tracking-tight text-neo-lime lg:block lg:text-center lg:text-base"
+                  className="hidden font-neo-display text-sm font-black uppercase tracking-tight text-neo-lime lg:block lg:text-center lg:text-base lg:[@media(max-height:800px)]:hidden"
                 >
                   {t("academy.hq.firstStudentTitle", "Get your first student in")}
                 </p>
@@ -289,7 +289,7 @@ export function GetStudentsInCard({
                 empty={t("academy.hq.nobodyYet", "No one yet — share the code")}
               />
               {/* Claims no count, so it is honest while the read is open too. */}
-              <p className="hidden max-w-sm text-center font-neo-body text-sm font-bold text-neo-white/60 lg:block">
+              <p className="hidden max-w-sm text-center font-neo-body text-sm font-bold text-neo-white/60 lg:block lg:[@media(max-height:800px)]:hidden">
                 {t("teacher.activation.shareBody")}
               </p>
             </div>

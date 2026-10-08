@@ -262,7 +262,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
         data-testid="teacher-dashboard-grid"
         className={cn(
           // ~1280 content cap: wide monitors keep desktop density without stretching tables.
-          'relative mx-auto flex min-h-full min-w-0 w-full max-w-[1280px] flex-col gap-3 px-3 py-2 sm:gap-4 sm:px-5 sm:py-3 lg:px-8 lg:py-4',
+          'relative mx-auto flex min-h-full min-w-0 w-full max-w-[1280px] flex-col gap-3 px-3 py-2 sm:gap-4 sm:px-5 sm:py-3 lg:px-8 lg:py-4 lg:[@media(max-height:800px)]:py-2',
           deck && !split && 'lg:max-w-2xl',
           split && [
             // 640–1023: two-column (launcher | pulse/detail); <640 stays stacked.
@@ -335,7 +335,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
               hideAssignmentCta={offerFirstAssignment}
               hideStartLiveCta={step === 'goLive'}
               hasPro={hasPro}
-              compact={step === 'goLive'}
+              compact
             />
           </div>
         ) : null}
