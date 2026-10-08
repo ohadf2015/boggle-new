@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { cn } from '../../../lib/utils';
 import { getModeDescription, type GameModeOption } from '@/components/GameModeSelector';
 import { HowToArt, ModeArt } from '@/components/multiplayer/lobby/ModeArt';
 import { getModePresentation, type ModeColorFamily } from '@/lib/multiplayer/modePresentation';
 import styles from '@/components/multiplayer/lobby/lobby.module.css';
+import { getGameModeRules } from '@/backend/modes/rules';
+import type { GameMode, Language } from '@/shared/types';
 
 interface BattleModeCardProps {
   selectedGameMode: GameModeOption;
@@ -15,7 +17,7 @@ interface BattleModeCardProps {
   isAdmin?: boolean;
   /** Admin or beta tester: also offer the in-work modes (the server enforces the same gate). */
   showInWorkModes?: boolean;
-  /** Board language — no MP mode is gated on it since 2026-09-27. */
+  /** Board language — gates beta modes with curated content (crossword: en/he). */
   language?: string | null;
   /** @deprecated Blast is offered to all players now. */
   hasBlastAccess?: boolean;
@@ -64,12 +66,21 @@ export function BattleModeCard({
   t,
   onHowToPlay,
   showInWorkModes = false,
+  language,
   fill = false,
   className,
 }: BattleModeCardProps): React.ReactElement {
   const handleSelect = useCallback((mode: GameModeOption) => setSelectedGameMode(mode), [setSelectedGameMode]);
 
-  const modes = showInWorkModes ? [...MODES, ...IN_WORK_MODES] : MODES;
+  const inWork = showInWorkModes
+    ? IN_WORK_MODES.filter(({ mode }) => getGameModeRules(mode as GameMode).languages?.includes((language || 'en') as Language) ?? true)
+    : [];
+  const modes = [...MODES, ...inWork];
+  const selectionHidden = IN_WORK_MODES.some((m) => m.mode === selectedGameMode) && !inWork.some((m) => m.mode === selectedGameMode);
+
+  useEffect(() => {
+    if (selectionHidden) setSelectedGameMode('random');
+  }, [selectionHidden, setSelectedGameMode]);
 
   return (
     <section className={cn('flex flex-col gap-2 min-w-0', fill && 'flex-1', className)}>
