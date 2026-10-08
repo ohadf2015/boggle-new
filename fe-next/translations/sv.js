@@ -19476,6 +19476,7 @@ const sv = {
       "editAvatar": "Redigera avatar",
       "codeLabel": "Har du en rumskod?",
       "codeAria": "Rumskod, tecken {{n}} av {{total}}",
+      "codeHint": "6 tecken från värden · Ingen kod? Tryck på Snabbstart",
       "openArenas": "Öppna arenor",
       "playingNow": "{{count}} spelar",
       "moreArenas": "+{{count}} till",

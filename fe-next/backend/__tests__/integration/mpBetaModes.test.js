@@ -239,7 +239,7 @@ describe('MP beta modes (real socket flow)', () => {
       expect(getGame(gameCode).crosswordMpState.players).toEqual([JOINER]);
     });
 
-    it.each(['sv', 'es', 'ja'])('refuses to start in %s (no puzzles) instead of dealing an English grid', async (lang) => {
+    it.each(['ja', 'es'])('refuses to start in %s (no or too few puzzles) instead of dealing an English grid', async (lang) => {
       const { host, gameCode } = await lobby(env);
       await host.receiveEvent('startGame', { timerSeconds: 120, language: lang, gameMode: 'crossword' });
       expect(getGame(gameCode).gameState).toBe('waiting');
@@ -254,6 +254,14 @@ describe('MP beta modes (real socket flow)', () => {
       const init = lastEvent(joiner, 'crosswordMpInit');
       expect(init?.puzzle?.locale, eventDump(joiner)).toBe('he');
       expect(init.puzzle.rtl).toBe(true);
+    });
+
+    it.each(['sv'])('starts in %s with a puzzle of that locale', async (lang) => {
+      const { host, others: [joiner] } = await lobby(env);
+      await host.receiveEvent('startGame', { timerSeconds: 120, language: lang, gameMode: 'crossword' });
+      const init = lastEvent(joiner, 'crosswordMpInit');
+      expect(init?.puzzle?.locale, eventDump(joiner)).toBe(lang);
+      expect(init.puzzle.rtl).toBe(false);
     });
   });
 

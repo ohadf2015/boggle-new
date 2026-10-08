@@ -87,6 +87,11 @@ export const LANDING_EXTRA_KEYS = [
   // New-modes spotlight loot peek (components/landing/LootPeek.tsx) names real loot.
   'adventurePlay.relic',
   'wordTowerV2.chest.tier',
+  // /multiplayer hydrates on this subset (heavy game path); its SSR'd entry screen must resolve here.
+  'mpUi.entry',
+  'mpUi.shell',
+  'multiplayerFlow.roomList',
+  'mp.quality.reconnecting',
   'legal.copyright',
   'legal.privacyPolicy',
   'legal.refundPolicy',

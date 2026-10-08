@@ -124,4 +124,25 @@ describe('CodeEntry', () => {
     expect(document.activeElement).toBe(inside);
     dialog.remove();
   });
+
+  it('tells a visitor where the code comes from and what to do without one', () => {
+    render(<CodeEntry onSubmit={vi.fn()} />);
+    const hint = screen.getByText('mpUi.entry.codeHint');
+    for (const box of boxes()) expect(box.getAttribute('aria-describedby')).toBe(hint.id);
+  });
+
+  it('a failed join on a touch screen clears the boxes without popping the keyboard back up', () => {
+    const matchMedia = vi.spyOn(window, 'matchMedia').mockImplementation(
+      (q: string) => ({ matches: q.includes('coarse'), media: q, addEventListener: vi.fn(), removeEventListener: vi.fn() }) as unknown as MediaQueryList,
+    );
+    const onSubmit = vi.fn();
+    const { rerender } = render(<CodeEntry onSubmit={onSubmit} />);
+    paste(boxes()[0], 'XWUCT4');
+    (document.activeElement as HTMLElement | null)?.blur();
+    rerender(<CodeEntry onSubmit={onSubmit} busy />);
+    rerender(<CodeEntry onSubmit={onSubmit} busy={false} />);
+    expect(boxes().map((b) => b.value).join('')).toBe('');
+    expect(boxes()).not.toContain(document.activeElement);
+    matchMedia.mockRestore();
+  });
 });

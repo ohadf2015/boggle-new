@@ -17,6 +17,7 @@ export interface GameStartData {
   language: Language;
   minWordLength?: number;
   messageId?: string;
+  reconnect?: boolean;
 }
 
 

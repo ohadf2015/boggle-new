@@ -202,7 +202,7 @@ describe('hostHandler', () => {
       handlers['changeRoomLanguage']({ gameCode: 'GAME1', language: 'he' });
 
       expect(game.language).toBe('he');
-      expect(to).toHaveBeenCalledWith('GAME1');
+      expect(to).toHaveBeenCalledWith('game:GAME1');
       expect(emit).toHaveBeenCalledWith('roomLanguageChanged', {
         language: 'he',
         changedBy: 'Host',

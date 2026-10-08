@@ -326,10 +326,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // Auto-submit after 1s idle (or instantly on drag-release; see handlePointerUp).
   // Any change to builtLetters also cancels a pending post-error auto-reset
   // (so a new tap during the 2.5s reset window doesn't get wiped mid-typing).
+  const prevBuiltLengthRef = useRef(0);
   useEffect(() => {
     if (idleSubmitTimerRef.current) { clearTimeout(idleSubmitTimerRef.current); idleSubmitTimerRef.current = null; }
     if (autoResetTimerRef.current) { clearTimeout(autoResetTimerRef.current); autoResetTimerRef.current = null; }
-    if (builtLetters.length >= 3 && !gameOverRef.current) {
+    // A removal is an edit in progress: auto-submitting it made players race the timer with backspace.
+    const grew = builtLetters.length > prevBuiltLengthRef.current;
+    prevBuiltLengthRef.current = builtLetters.length;
+    if (grew && builtLetters.length >= 3 && !gameOverRef.current) {
       idleSubmitTimerRef.current = setTimeout(() => {
         idleSubmitTimerRef.current = null;
         handleSubmitRef.current();

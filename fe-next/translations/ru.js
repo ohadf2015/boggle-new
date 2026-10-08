@@ -19172,6 +19172,7 @@ const ru = {
       "editAvatar": "Изменить аватар",
       "codeLabel": "Есть код комнаты?",
       "codeAria": "Код комнаты, символ {{n}} из {{total}}",
+      "codeHint": "6 символов от хоста · Нет кода? Жмите «Быстрый старт»",
       "openArenas": "Открытые арены",
       "playingNow": "Играют: {{count}}",
       "moreArenas": "Ещё {{count}}",

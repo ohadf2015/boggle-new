@@ -14,7 +14,7 @@ const CTA = join(ROOT, 'components', 'education', 'TeacherProCheckoutCta.tsx');
 const GATE = join(ROOT, 'components', 'education', 'TeacherGate.tsx');
 
 describe('public /teacher Teacher Pro CTA', () => {
-  it('server page mounts PublicTeacherPayCta next to the HQ client, not inside TeacherGate', () => {
+  it('server page mounts PublicTeacherPayCta after the HQ client (its unmount must not shift the gate), not inside TeacherGate', () => {
     const src = readFileSync(PAGE, 'utf8');
     expect(src).not.toMatch(/^['"]use client['"]/m);
     expect(src).toMatch(/<PublicTeacherPayCta\b/);
@@ -23,8 +23,8 @@ describe('public /teacher Teacher Pro CTA', () => {
     expect(src).not.toMatch(/TeacherGate/);
     const ctaIdx = src.indexOf('<PublicTeacherPayCta');
     const hqIdx = src.indexOf('<TeacherPageClient');
-    expect(ctaIdx).toBeGreaterThan(-1);
-    expect(hqIdx).toBeGreaterThan(ctaIdx);
+    expect(hqIdx).toBeGreaterThan(-1);
+    expect(ctaIdx).toBeGreaterThan(hqIdx);
   });
 
   it('wrapper SSRs TeacherProCheckoutCta and hides only after a teacher profile resolves', () => {

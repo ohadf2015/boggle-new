@@ -19406,6 +19406,7 @@ const he = {
       "editAvatar": "עריכת אווטאר",
       "codeLabel": "יש לך קוד חדר?",
       "codeAria": "קוד חדר, תו {{n}} מתוך {{total}}",
+      "codeHint": "6 תווים מהמארח · אין קוד? לחצו על התחלה מהירה",
       "openArenas": "זירות פתוחות",
       "playingNow": "משחקים עכשיו: {{count}}",
       "moreArenas": "עוד {{count}}",

@@ -18527,6 +18527,7 @@ const en = {
       "editAvatar": "Edit avatar",
       "codeLabel": "Got a room code?",
       "codeAria": "Room code, character {{n}} of {{total}}",
+      "codeHint": "6 characters from your host · No code? Hit Quick Start",
       "openArenas": "Open arenas",
       "playingNow": "{{count}} playing",
       "moreArenas": "+{{count}} more",

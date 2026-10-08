@@ -12,6 +12,7 @@ import {
   stashStartGameMessageId,
   wasStartGameHandled,
   markStartGameHandled,
+  registerStartGameHandler,
   createRoomClosedDueToInactivityHandler,
   triggerGameOverCelebration,
   showGameCompleteToast,
@@ -659,6 +660,7 @@ export function useHostGameEvents({
 
     // Register listeners
     socket.on('startGame', handleStartGame);
+    const unregisterStartGame = registerStartGameHandler('HOST', handleStartGame);
     socket.on('timeUpdate', handleTimeUpdate);
     socket.on('endGame', handleEndGame);
     socket.on('validationComplete', handleValidationComplete);
@@ -694,6 +696,7 @@ export function useHostGameEvents({
         fireRoundIntervalRef.current = null;
       }
       socket.off('startGame', handleStartGame);
+      unregisterStartGame();
       socket.off('timeUpdate', handleTimeUpdate);
       socket.off('endGame', handleEndGame);
       socket.off('validationComplete', handleValidationComplete);
