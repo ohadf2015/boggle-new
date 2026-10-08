@@ -127,7 +127,14 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
   // Eagerly load howler module on mount (deferred from parse-time to runtime)
   const howlReadyRef = useRef(false);
   useEffect(() => {
-    ensureHowl().then(() => { howlReadyRef.current = true; }).catch(() => {});
+    ensureHowl().then(() => {
+      howlReadyRef.current = true;
+      const pending = pendingUnlockTrackRef.current;
+      if (pending && audioUnlockedRef.current) {
+        pendingUnlockTrackRef.current = null;
+        fadeToTrackRef.current?.(pending.trackKey, pending.fadeOutMs, pending.fadeInMs);
+      }
+    }).catch(() => {});
   }, []);
 
   const audioUnlockedRef = useRef(false);
@@ -310,6 +317,11 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
 
     if (!audioUnlockedRef.current) {
       logger.log('[Music] Audio not unlocked, queueing track:', trackKey);
+      pendingUnlockTrackRef.current = { trackKey, fadeOutMs, fadeInMs };
+      return;
+    }
+
+    if (!howlReadyRef.current) {
       pendingUnlockTrackRef.current = { trackKey, fadeOutMs, fadeInMs };
       return;
     }
@@ -552,6 +564,7 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
   }, [isMuted, volume]);
 
   const preloadMusicTrack = useCallback(async (trackKey: TrackKey) => {
+    await ensureHowl();
     const howl = getOrCreateHowl(trackKey);
     if (howl.state() === 'unloaded') {
       try { await preloadAudioOnDemand(howl); } catch (err) { logger.log('[Music] Failed to preload track:', trackKey, err); }
