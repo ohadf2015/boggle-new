@@ -5,6 +5,7 @@ import { fetchWithAuth } from '@/utils/authFetch';
 import { AlertTriangle } from 'lucide-react';
 import { TeacherAccessDrawer } from './TeacherAccessDrawer';
 import { TeacherActivityDrawer } from './TeacherActivityDrawer';
+import { Block, ClassroomsPanel } from './TeacherFunnelClassrooms';
 import type { TeacherAccessRequest } from '@/lib/education/types';
 import type {
   ClassroomRow,
@@ -63,15 +64,6 @@ function toAccessRequest(r: TeacherFunnelRow): TeacherAccessRequest {
   };
 }
 
-/** Mirrors ACTIVITY_TABLES in app/api/admin/teacher-funnel/route.ts. */
-const ACTIVITY_KEYS = ['classrooms', 'studentsJoined', 'assignments'] as const;
-
-const ACTIVITY_FALLBACK: Record<(typeof ACTIVITY_KEYS)[number], string> = {
-  classrooms: 'Classrooms',
-  studentsJoined: 'Distinct students joined',
-  assignments: 'Assignments',
-};
-
 function Stat({
   label,
   value,
@@ -99,25 +91,6 @@ function Stat({
       </div>
       <div className="mt-1 font-neo-body text-[11px] font-bold uppercase opacity-70">{label}</div>
     </div>
-  );
-}
-
-/** Consistent section chrome, so the panel reads as sections rather than a stack of blocks. */
-function Block({
-  title,
-  hint,
-  children,
-}: {
-  title: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="mt-4 rounded-neo border-neo border-black bg-neo-navy-light p-3">
-      <h3 className="font-neo-display text-base font-black text-neo-white">{title}</h3>
-      {hint && <p className="mt-1 font-neo-body text-xs text-neo-white/50">{hint}</p>}
-      {children}
-    </section>
   );
 }
 
@@ -215,90 +188,6 @@ function ReasonsPanel({
  * classrooms exist. Listed classroom-first rather than teacher-first so an owner who never
  * filled in the access form still shows up; the funnel table below cannot show those at all.
  */
-function ClassroomsPanel({
-  classrooms,
-  t,
-}: {
-  classrooms: ClassroomRow[];
-  t: (k: string, v?: Record<string, string> | string) => string;
-}) {
-  return (
-    <Block
-      title={`${t('admin.teacherFunnel.classrooms.title', 'Classrooms that exist')} (${classrooms.length})`}
-      hint={t(
-        'admin.teacherFunnel.classrooms.subtitle',
-        'Every classroom in the database, newest first — its name and who opened it.',
-      )}
-    >
-      {classrooms.length === 0 ? (
-        <p className="mt-3 font-neo-body text-sm text-neo-white/50">
-          {t('admin.teacherFunnel.classrooms.empty', 'No classroom has ever been opened.')}
-        </p>
-      ) : (
-        // Wide table on a narrow phone: scroll the table, never the page.
-        <div className="mt-3 overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse font-neo-body text-sm">
-            <thead>
-              <tr className="text-left text-[11px] font-bold uppercase text-neo-white/50">
-                <th className="py-1 pe-3">{t('admin.teacherFunnel.classrooms.name', 'Classroom')}</th>
-                <th className="py-1 pe-3">{t('admin.teacherFunnel.classrooms.teacher', 'Opened by')}</th>
-                <th className="py-1 pe-3 text-right">
-                  {t('admin.teacherFunnel.classrooms.students', 'Students')}
-                </th>
-                <th className="py-1 pe-3">{t('admin.teacherFunnel.classrooms.created', 'Created')}</th>
-              </tr>
-            </thead>
-            <tbody className="text-neo-white">
-              {classrooms.map((c) => (
-                <tr key={c.id} className="border-t border-neo-white/10 align-top">
-                  <td className="py-2 pe-3">
-                    <span className="font-bold">
-                      {c.name ?? (
-                        <span className="italic text-neo-white/40">
-                          {t('admin.teacherFunnel.classrooms.unnamed', '(unnamed)')}
-                        </span>
-                      )}
-                    </span>
-                    <span className="ms-2 text-[11px] text-neo-white/40">
-                      {[c.language, c.joinCode].filter(Boolean).join(' · ')}
-                    </span>
-                  </td>
-                  <td className="py-2 pe-3">
-                    {/* Never blank: name → email → raw id, in that order of usefulness. */}
-                    <span>{c.teacherName ?? c.teacherEmail ?? c.teacherId ?? '—'}</span>
-                    {c.teacherName && c.teacherEmail && (
-                      <span className="ms-2 text-[11px] text-neo-white/40">{c.teacherEmail}</span>
-                    )}
-                    {!c.teacherIsApplicant && (
-                      <span
-                        className="ms-2 rounded-neo bg-neo-navy px-1.5 py-0.5 text-[10px] font-bold uppercase text-neo-white/60"
-                        title={t(
-                          'admin.teacherFunnel.classrooms.notApplicantHint',
-                          'This owner never filled in the teacher access form, so they do not appear in the funnel table below.',
-                        )}
-                      >
-                        {t('admin.teacherFunnel.classrooms.notApplicant', 'no access request')}
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-2 pe-3 text-right tabular-nums">
-                    <span className={c.students === 0 ? 'text-neo-orange' : 'text-neo-lime'}>
-                      {c.students}
-                    </span>
-                  </td>
-                  <td className="py-2 pe-3 whitespace-nowrap text-neo-white/70">
-                    {c.createdAt ? c.createdAt.slice(0, 10) : '—'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </Block>
-  );
-}
-
 /** Granted teachers get the activity drill-down; everyone else still needs the access queue. */
 function isActivityRow(r: TeacherFunnelRow): boolean {
   return r.status === 'approved' && r.roleGranted && !!r.userId;
@@ -349,7 +238,6 @@ export function TeacherFunnelPanel() {
   // `reasons.filter` on undefined white-screens the whole admin page — default them.
   const { summary, rows } = data;
   const reasons = data.reasons ?? [];
-  const activity = data.activity ?? {};
   const classrooms = data.classrooms ?? [];
 
   return (
@@ -418,7 +306,8 @@ export function TeacherFunnelPanel() {
         <p className="mt-2 font-neo-body text-xs text-neo-white/40">
           {t(
             'admin.teacherFunnel.excludedMachineRows',
-            `${summary.excludedMachineRows} machine-written rows (test accounts) excluded from every number above.`,
+            '{count} machine-written rows (test accounts) excluded from every number above.',
+            { count: summary.excludedMachineRows },
           )}
         </p>
       )}
@@ -432,26 +321,6 @@ export function TeacherFunnelPanel() {
       {/* Demoted below the named data on purpose. These are all-time whole-product counts —
           context, not the answer to "who is teaching". Kept because an empty module and a
           missing panel look identical until you print the zeros. */}
-      <Block
-        title={t('admin.teacherFunnel.activity.title', 'What is happening inside the module')}
-        hint={t(
-          'admin.teacherFunnel.activity.hint',
-          'Whole-product totals, all time. A dash means the count failed, which is not the same as zero.',
-        )}
-      >
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
-          {ACTIVITY_KEYS.map((k) => (
-            <div key={k} className="rounded-neo border border-black bg-neo-cream px-2 py-1.5 text-black">
-              <div className="font-neo-display text-xl font-black leading-none tabular-nums">
-                {activity[k] === null || activity[k] === undefined ? '—' : activity[k]}
-              </div>
-              <div className="mt-1 font-neo-body text-[10px] font-bold uppercase opacity-70">
-                {t(`admin.teacherFunnel.activity.${k}`, ACTIVITY_FALLBACK[k])}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Block>
 
       {/* Wide table on a narrow phone: scroll the table, never the page. */}
       <div className="mt-4 overflow-x-auto rounded-neo border-neo border-black bg-neo-navy-light">

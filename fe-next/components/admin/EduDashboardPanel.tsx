@@ -77,6 +77,9 @@ export function EduDashboardPanel() {
         <p className="text-sm text-white/60">{t('admin.eduDashboard.loading', 'Loading…')}</p>
       )}
       {data && <EduDashboardSections data={data} />}
+      <p className="text-xs text-white/50">
+        {t('admin.eduDashboard.posthogHidden', 'Landing and upsell conversion are hidden: no server PostHog key is configured.')}
+      </p>
     </section>
   );
 }

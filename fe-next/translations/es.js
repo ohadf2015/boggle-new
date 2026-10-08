@@ -10712,6 +10712,7 @@ const es = {
       }
     },
     "eduDashboard": {
+      "posthogHidden": "La conversión de la landing y del upsell está oculta: no hay clave de PostHog en el servidor.",
       "title": "Resumen educativo",
       "subtitle": "Se excluyen las cuentas de prueba. Las variaciones comparan con el periodo anterior.",
       "window": "Periodo",
@@ -10758,6 +10759,7 @@ const es = {
       }
     },
     "teacherFunnel": {
+      "excludedMachineRows": "{count} filas generadas por máquina (cuentas de prueba) excluidas de todas las cifras de arriba.",
       "title": "Embudo de docentes",
       "subtitle": "Qué hicieron realmente los docentes aprobados.",
       "blockedAlert": "{count} docentes aprobados no pueden entrar: nunca se les asignó el rol.",

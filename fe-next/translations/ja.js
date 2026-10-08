@@ -10905,6 +10905,7 @@ const ja = {
       }
     },
     "eduDashboard": {
+      "posthogHidden": "ランディングとアップセルのコンバージョンは非表示です。サーバーの PostHog キーが未設定です。",
       "title": "教育の概要",
       "subtitle": "テストアカウントは除外しています。変化率は前期間との比較です。",
       "window": "期間",
@@ -10951,6 +10952,7 @@ const ja = {
       }
     },
     "teacherFunnel": {
+      "excludedMachineRows": "{count} 件の自動生成行（テストアカウント）は上のすべての数値から除外されています。",
       "title": "教師ファネル",
       "subtitle": "承認された教師がその後どう動いたか。",
       "blockedAlert": "承認済みの教師{count}名がログインできません。権限が付与されていません。",

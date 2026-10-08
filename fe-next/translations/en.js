@@ -17306,6 +17306,7 @@ const en = {
       }
     },
     "eduDashboard": {
+      "posthogHidden": "Landing and upsell conversion are hidden: no server PostHog key is configured.",
       "title": "Education overview",
       "subtitle": "Test accounts excluded. Deltas compare with the prior period.",
       "window": "Window",
@@ -17352,6 +17353,7 @@ const en = {
       }
     },
     "teacherFunnel": {
+      "excludedMachineRows": "{count} machine-written rows (test accounts) excluded from every number above.",
       "title": "Teacher funnel",
       "subtitle": "What approved teachers actually did next.",
       "blockedAlert": "{count} approved teachers can't sign in — their account role was never granted.",

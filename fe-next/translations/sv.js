@@ -10991,6 +10991,7 @@ const sv = {
       }
     },
     "eduDashboard": {
+      "posthogHidden": "Konvertering från landningssida och uppsälj är dold: ingen PostHog-serverkey är konfigurerad.",
       "title": "Utbildningsöversikt",
       "subtitle": "Testkonton exkluderas. Förändringar jämförs med föregående period.",
       "window": "Period",
@@ -11037,6 +11038,7 @@ const sv = {
       }
     },
     "teacherFunnel": {
+      "excludedMachineRows": "{count} maskinskrivna rader (testkonton) exkluderade från alla siffror ovan.",
       "title": "Lärartratt",
       "subtitle": "Vad godkända lärare faktiskt gjorde sedan.",
       "blockedAlert": "{count} godkända lärare kan inte logga in — rollen tilldelades aldrig.",
