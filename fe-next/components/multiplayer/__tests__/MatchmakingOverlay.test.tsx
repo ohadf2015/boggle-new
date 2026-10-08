@@ -12,6 +12,7 @@ const mockT = (key: string, params?: Record<string, unknown>) => {
     'matchmaking.matchFound': 'Match found!',
     'matchmaking.timeout': 'No match found',
     'matchmaking.createRoom': 'Create a room instead',
+    'matchmaking.estimatedWait': '~{{time}}',
   };
   let result = map[key] || key;
   if (params) {
@@ -39,6 +40,23 @@ describe('MatchmakingOverlay', () => {
     );
     expect(screen.getByText('Finding opponent...')).toBeTruthy();
     expect(screen.getByText('Cancel search')).toBeTruthy();
+  });
+
+  it('shows the wait as a language-neutral m:ss clock', () => {
+    render(
+      <MatchmakingOverlay
+        status="searching"
+        elo={1200}
+        eloRange={100}
+        queueSize={5}
+        waitTime={75}
+        opponent={null}
+        onCancel={vi.fn()}
+        onCreateRoom={vi.fn()}
+        t={mockT}
+      />
+    );
+    expect(screen.getByText('~1:15')).toBeTruthy();
   });
 
   it('calls onCancel when cancel button clicked', () => {
