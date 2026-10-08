@@ -10636,6 +10636,52 @@ const he = {
         "revoked": "ההענקה בוטלה"
       }
     },
+    "eduDashboard": {
+      "title": "סקירת חינוך",
+      "subtitle": "חשבונות בדיקה לא נכללים. השינויים מושווים לתקופה הקודמת.",
+      "window": "טווח",
+      "loadFailed": "לא ניתן לטעון את סקירת החינוך.",
+      "loading": "טוען…",
+      "noData": "אין נתונים עדיין",
+      "kpi": {
+        "activeTeachers": "מורים פעילים",
+        "newTeachers": "מורים חדשים",
+        "classesWithLiveGame": "כיתות עם משחק חי",
+        "liveRounds": "סיבובי משחק חי",
+        "trialsStarted": "ניסיונות Pro שהתחילו",
+        "trialsPaid": "ניסיונות שהפכו לתשלום"
+      },
+      "funnel": {
+        "title": "משפך מורים",
+        "requested": "בקשה",
+        "approved": "אושר",
+        "classroom": "יצר כיתה",
+        "student": "תלמיד ראשון הצטרף"
+      },
+      "health": {
+        "thriving": "משגשג",
+        "at_risk": "בסיכון",
+        "dormant": "רדום"
+      },
+      "modeMix": {
+        "title": "מצבי משחק בכיתה"
+      },
+      "teachers": {
+        "name": "מורה",
+        "lastActive": "פעיל לאחרונה",
+        "classes": "כיתות",
+        "students": "תלמידים",
+        "rounds7d": "סיבובים 7 ימים",
+        "health": "בריאות"
+      },
+      "dying": {
+        "title": "כיתות גוססות",
+        "empty": "אין כרגע."
+      },
+      "classes": {
+        "title": "כיתות"
+      }
+    },
     "teacherFunnel": {
       "title": "משפך המורים",
       "subtitle": "מה מורים שאושרו באמת עשו אחר כך.",

@@ -10711,6 +10711,52 @@ const es = {
         "revoked": "Concesión revocada"
       }
     },
+    "eduDashboard": {
+      "title": "Resumen educativo",
+      "subtitle": "Se excluyen las cuentas de prueba. Las variaciones comparan con el periodo anterior.",
+      "window": "Periodo",
+      "loadFailed": "No se pudo cargar el resumen educativo.",
+      "loading": "Cargando…",
+      "noData": "Sin datos todavía",
+      "kpi": {
+        "activeTeachers": "Profesores activos",
+        "newTeachers": "Profesores nuevos",
+        "classesWithLiveGame": "Clases con partida en vivo",
+        "liveRounds": "Rondas en vivo jugadas",
+        "trialsStarted": "Pruebas Pro iniciadas",
+        "trialsPaid": "Pruebas convertidas en pago"
+      },
+      "funnel": {
+        "title": "Embudo de profesores",
+        "requested": "Solicitud",
+        "approved": "Aprobado",
+        "classroom": "Creó una clase",
+        "student": "Primer alumno se unió"
+      },
+      "health": {
+        "thriving": "Prosperando",
+        "at_risk": "En riesgo",
+        "dormant": "Inactivo"
+      },
+      "modeMix": {
+        "title": "Modos en clase"
+      },
+      "teachers": {
+        "name": "Profesor",
+        "lastActive": "Última actividad",
+        "classes": "Clases",
+        "students": "Alumnos",
+        "rounds7d": "Rondas 7d",
+        "health": "Estado"
+      },
+      "dying": {
+        "title": "Clases en declive",
+        "empty": "Ninguna por ahora."
+      },
+      "classes": {
+        "title": "Clases"
+      }
+    },
     "teacherFunnel": {
       "title": "Embudo de docentes",
       "subtitle": "Qué hicieron realmente los docentes aprobados.",
