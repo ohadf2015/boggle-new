@@ -1,18 +1,36 @@
-/**
- * Only GAME_ENDED is a real "it's over". Everything else the server says
- * ("Game not found" covers a room lost to a restart too) is retryable: the
- * student's Join button is right there, so the message names that action.
- */
+/** Retry reasons get a Join-again message; terminal ones say who to ask. */
+export const CLASSROOM_JOIN_REFUSAL_KEYS = {
+  ended: 'student.activeGame.joinEnded',
+  notMember: 'student.activeGame.joinNotMember',
+  signIn: 'student.activeGame.joinSignIn',
+  busy: 'student.activeGame.joinBusy',
+  full: 'student.activeGame.joinFull',
+  removed: 'student.activeGame.joinRemoved',
+  retry: 'student.activeGame.joinRetry',
+} as const;
+
+export type ClassroomJoinRefusalReason = keyof typeof CLASSROOM_JOIN_REFUSAL_KEYS;
+
 export interface ClassroomJoinRefusal {
-  refusal: 'ended' | 'unknown';
-  messageKey: 'student.activeGame.joinEnded' | 'student.activeGame.joinRetry';
+  refusal: ClassroomJoinRefusalReason;
+  messageKey: (typeof CLASSROOM_JOIN_REFUSAL_KEYS)[ClassroomJoinRefusalReason];
 }
+
+const REASON_BY_CODE: Record<string, ClassroomJoinRefusalReason> = {
+  GAME_ENDED: 'ended',
+  NOT_A_MEMBER: 'notMember',
+  AUTH_REQUIRED: 'signIn',
+  USER_ID_MISMATCH: 'signIn',
+  LOOKUP_UNAVAILABLE: 'busy',
+  JOIN_THREW: 'busy',
+  GAME_FULL: 'full',
+  PLAYER_KICKED: 'removed',
+  PLAYER_BLOCKED: 'removed',
+};
 
 export function classifyClassroomJoinRefusal(
   payload: { code?: string } | null | undefined
 ): ClassroomJoinRefusal {
-  if (payload?.code === 'GAME_ENDED') {
-    return { refusal: 'ended', messageKey: 'student.activeGame.joinEnded' };
-  }
-  return { refusal: 'unknown', messageKey: 'student.activeGame.joinRetry' };
+  const refusal = (payload?.code && REASON_BY_CODE[payload.code]) || 'retry';
+  return { refusal, messageKey: CLASSROOM_JOIN_REFUSAL_KEYS[refusal] };
 }

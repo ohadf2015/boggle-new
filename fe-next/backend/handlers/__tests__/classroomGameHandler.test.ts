@@ -425,6 +425,7 @@ describe('ClassroomGameHandler', () => {
       // membership-message guarantee is what this test is for.
       expect(mockSocket.emit).toHaveBeenCalledWith('classroomGameError', expect.objectContaining({
         error: expect.stringMatching(/not a member|not authorized|classroom/i),
+        code: 'NOT_A_MEMBER',
       }));
     });
 

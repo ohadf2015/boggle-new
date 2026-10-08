@@ -13261,7 +13261,12 @@ const es = {
       "connecting": "Conectando al aula...",
       "idleHint": "Cuando tu profesor inicie un juego, aparecerá aquí",
       "joinEnded": "La partida ya terminó. Pídele a tu profe la siguiente.",
-      "joinRetry": "Todavía no pudimos meterte. Toca Unirme para intentarlo de nuevo. Si sigue fallando, pídele a tu profe que vuelva a iniciar la partida."
+      "joinRetry": "Todavía no pudimos meterte. Toca Unirme para intentarlo de nuevo. Si sigue fallando, pídele a tu profe que vuelva a iniciar la partida.",
+      "joinNotMember": "Esta partida es solo para tu clase. Pídele a tu profe que te agregue.",
+      "joinSignIn": "Vuelve a iniciar sesión para unirte a la partida.",
+      "joinBusy": "El servidor está ocupado ahora mismo. Espera un momento y toca Unirme otra vez.",
+      "joinFull": "La partida está llena ahora. Pídele a tu profe que abra un lugar.",
+      "joinRemoved": "No puedes unirte a esta partida. Pídele a tu profe que te deje volver."
     },
     "playWithClass": {
       "title": "Jugar con la clase",

@@ -11805,7 +11805,12 @@ const en = {
       "connecting": "Connecting to classroom...",
       "idleHint": "When your teacher starts a game, you'll see it here",
       "joinEnded": "This game is over. Ask your teacher for the next one.",
-      "joinRetry": "Couldn't get you in yet. Tap Join to try again. If it keeps failing, ask your teacher to start the game again."
+      "joinRetry": "Couldn't get you in yet. Tap Join to try again. If it keeps failing, ask your teacher to start the game again.",
+      "joinNotMember": "This game is only for your class. Ask your teacher to add you.",
+      "joinSignIn": "Sign in again to join this game.",
+      "joinBusy": "Our server is busy right now. Wait a moment, then tap Join again.",
+      "joinFull": "This game is full right now. Ask your teacher to open a seat.",
+      "joinRemoved": "You can't join this game. Ask your teacher to let you back in."
     },
     "playWithClass": {
       "title": "Play with class",
