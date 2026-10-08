@@ -55,3 +55,27 @@ describe('grantEndOfGameChest', () => {
     expect(deps.claim).toHaveBeenCalledWith('classroom-chest:ABC:sess-1:u1');
   });
 });
+
+describe('guest rejoin', () => {
+  it('Given a guest who rejoins on a new socket, When the end-of-game grant runs again, Then no second chest or XP', async () => {
+    const claimed = new Set<string>();
+    const claim = vi.fn(async (key: string) => {
+      if (claimed.has(key)) return 'taken' as const;
+      claimed.add(key);
+      return 'claimed' as const;
+    });
+    const { deps, inserted, xp } = fakeDeps('claimed');
+    deps.claim = claim;
+    const guest = { gameCode: 'ABC', roundId: 'sess-1', userId: 'guest-anon-1' };
+
+    expect(await grantEndOfGameChest(guest, deps)).not.toBeNull();
+    expect(await grantEndOfGameChest(guest, deps)).toBeNull();
+    expect(claim).toHaveBeenCalledTimes(2);
+    expect(claim.mock.calls.map((c) => c[0])).toEqual([
+      'classroom-chest:ABC:sess-1:guest-anon-1',
+      'classroom-chest:ABC:sess-1:guest-anon-1',
+    ]);
+    expect(inserted).toHaveLength(1);
+    expect(xp).toHaveLength(1);
+  });
+});

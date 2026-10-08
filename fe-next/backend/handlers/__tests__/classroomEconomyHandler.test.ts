@@ -3,6 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const grant = vi.fn();
 const classroomGame = { value: null as unknown };
 const applyCorrect = vi.fn();
+const buyPowerUpFor = vi.fn();
+const handlers: Record<string, (data: unknown) => Promise<void>> = {};
 
 vi.mock('../../modules/classroomEconomyChest', () => ({
   grantEndOfGameChest: (input: unknown) => grant(input),
@@ -14,7 +16,7 @@ vi.mock('../../modules/classroomEconomyService', () => ({
   applyCorrectWord: (input: unknown) => applyCorrect(input),
   applyWrongWord: vi.fn(),
   buildBoard: vi.fn(),
-  buyPowerUpFor: vi.fn(),
+  buyPowerUpFor: (input: unknown) => buyPowerUpFor(input),
   toSnapshot: vi.fn(),
   spendHintFor: vi.fn(),
 }));
@@ -30,7 +32,12 @@ vi.mock('../../redisClient', () => ({
 vi.mock('../classroomSocketAuth.js', () => ({ getAuthUserId: () => 'u1' }));
 vi.mock('../../utils/rateLimiter.js', () => ({ checkRateLimit: () => true }));
 
-import { economyGrantChests, economyOnWordAccepted, roundIdOf } from '../classroomEconomyHandler';
+import {
+  economyGrantChests,
+  economyOnWordAccepted,
+  registerClassroomEconomyHandlers,
+  roundIdOf,
+} from '../classroomEconomyHandler';
 
 function fakeIo() {
   const emits: Array<{ room: string; event: string; data: unknown }> = [];
@@ -45,6 +52,7 @@ function fakeIo() {
 }
 
 beforeEach(() => {
+  buyPowerUpFor.mockReset();
   grant.mockReset();
   applyCorrect.mockReset();
   classroomGame.value = null;
@@ -91,6 +99,26 @@ describe('economyOnWordAccepted', () => {
     await economyOnWordAccepted(socket as never, { gameCode: 'ABC', roundId: 'r', userId: 'u1', word: 'cats', fromLesson: true });
     expect(applyCorrect).toHaveBeenCalledWith(expect.objectContaining({ userId: 'u1', wordLength: 4, fromLesson: true }));
     expect(socket.emit).toHaveBeenCalledWith('classroomEconomy:state', { cash: 2 });
+  });
+});
+
+describe('classroomEconomy:buyPowerUp targeting', () => {
+  it('Given a payload naming another student, Then the power-up is bought for the buyer only', async () => {
+    classroomGame.value = { gameCode: 'ABC', players: [{ userId: 'u1' }, { userId: 'u2' }] };
+    buyPowerUpFor.mockResolvedValue({ ok: true, snapshot: { cash: 0 } });
+    const socket = {
+      id: 's1',
+      emit: vi.fn(),
+      on: (event: string, fn: (data: unknown) => Promise<void>) => { handlers[event] = fn; },
+    };
+    registerClassroomEconomyHandlers({} as never, socket as never);
+    await handlers['classroomEconomy:buyPowerUp']({
+      gameCode: 'ABC', powerUpId: 'doubleCash', targetUserId: 'u2', userId: 'u2',
+    });
+    expect(buyPowerUpFor).toHaveBeenCalledTimes(1);
+    const input = buyPowerUpFor.mock.calls[0][0] as Record<string, unknown>;
+    expect(input.userId).toBe('u1');
+    expect(input).not.toHaveProperty('targetUserId');
   });
 });
 

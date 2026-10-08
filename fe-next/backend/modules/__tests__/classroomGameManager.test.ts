@@ -294,6 +294,21 @@ describe('ClassroomGameManager', () => {
     });
   });
 
+  describe('guest rejoin', () => {
+    it('Given a guest who reconnects on a new socket, Then the same seat keeps its userId and joinedAt', async () => {
+      const gameCode = 'ABC123';
+      const seat = { userId: 'guest-anon-1', username: 'Guest', socketId: 'socket-old', joinedAt: '2026-10-01T10:00:00.000Z' };
+      (mockRedis.get as Mock).mockResolvedValue(JSON.stringify({ gameCode, classroomId: 'classroom-1', players: [seat] }));
+      (mockRedis.setex as Mock).mockResolvedValue('OK');
+
+      await addPlayerToClassroomGame(gameCode, { userId: 'guest-anon-1', username: 'Guest', socketId: 'socket-new' });
+
+      const saved = JSON.parse((mockRedis.setex as Mock).mock.calls[0][2]);
+      expect(saved.players).toHaveLength(1);
+      expect(saved.players[0]).toMatchObject({ userId: 'guest-anon-1', socketId: 'socket-new', joinedAt: seat.joinedAt });
+    });
+  });
+
   describe('getClassroomGameByCode', () => {
     it('should return classroom metadata for a game code', async () => {
       // GIVEN
