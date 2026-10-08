@@ -39,6 +39,9 @@ import {
 import { withBootTimeout } from './bootTimeout';
 import { sendOpsAlert } from '../backend/modules/notificationService';
 import { startMemoryWatchdog } from '../backend/modules/memoryWatchdog';
+import { formatMemwatchCounts } from '../backend/modules/memoryWatchdogCounts';
+import { registerActiveGamesProvider } from '../backend/modules/scoreManager';
+import { getAllGameCodes } from '../backend/modules/gameStateManager';
 
 // Route modules
 import adminRoutes from '../backend/routes/admin';
@@ -270,7 +273,11 @@ async function start(): Promise<void> {
   // Warn to Telegram before an OOM-kill (2026-07-19: silent SIGKILL at the
   // ~2560MB cgroup limit after a slow leak → 53min outage). Early warning buys
   // time to act while there's still headroom.
-  startMemoryWatchdog();
+  // Dual trigger: RSS vs cgroup AND heapUsed vs V8 heapLimit — the 2026-10-07
+  // crash died at heapLimit 1584MB before the 80% RSS line. Do NOT raise
+  // max-old-space (that recreates the 2026-07-29 kernel SIGKILL).
+  registerActiveGamesProvider(() => new Set(getAllGameCodes()));
+  startMemoryWatchdog({ getCounts: formatMemwatchCounts });
 }
 
 // Start the server

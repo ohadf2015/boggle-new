@@ -12,6 +12,7 @@
  */
 
 import type { VocabQuizSession } from '../services/vocabQuizEngine.js';
+import { gameCleanupEmitter } from '../events/gameCleanup';
 
 interface QuizEntry {
   session: VocabQuizSession;
@@ -121,3 +122,17 @@ export function clearAllQuizSessions(): void {
   // windows behind would let one test's finished quiz answer for the next.
   finishedAt.clear();
 }
+
+/**
+ * Room is gone (host timeout, empty sweep, closeRoom). Drop the 250ms tick
+ * AND the finish-grace window — there is no board engine left to guard.
+ */
+function dropQuizForDeletedRoom(gameCode: string): void {
+  clearQuizTimer(gameCode);
+  quizzes.delete(gameCode);
+  finishedAt.delete(gameCode);
+}
+
+gameCleanupEmitter.onGameDeleted(({ gameCode }) => {
+  dropQuizForDeletedRoom(gameCode);
+});

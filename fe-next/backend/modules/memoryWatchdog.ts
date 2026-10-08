@@ -30,6 +30,12 @@ export interface MemWatchState {
   lastAlertAt: number;
 }
 
+/** Independent RSS (cgroup) and V8-heap band machines. */
+export interface DualMemWatchState {
+  rss: MemWatchState;
+  heap: MemWatchState;
+}
+
 export interface MemAlertDecision {
   alert: boolean;
   level: 'warn' | 'critical' | 'recovered' | null;
@@ -88,6 +94,30 @@ export function evaluateMemoryAlert(
   }
 
   return { alert: false, level: null, next: prev };
+}
+
+/**
+ * Run the same band model against RSS/cgroup AND heapUsed/heapLimit.
+ *
+ * Why both: --max-old-space-size=1536 on a 2384MB cgroup (the 2026-07-29
+ * SIGKILL fix) means V8 fatals at rss≈1.7GB, BEFORE the 80%-of-cgroup RSS
+ * line (~1907MB). The 2026-10-07 crash was exactly that: heapTotal pinned at
+ * 91–92% of 1584MB, then "Ineffective mark-compacts near heap limit", with
+ * zero "memory high" alerts. Do NOT raise max-old-space to "fix" this — that
+ * recreates the silent kernel kill.
+ */
+export function evaluateDualMemoryAlert(
+  prev: DualMemWatchState,
+  rssBytes: number,
+  rssLimitBytes: number,
+  heapUsedBytes: number,
+  heapLimitBytes: number,
+  now: number,
+): { rss: MemAlertDecision; heap: MemAlertDecision } {
+  return {
+    rss: evaluateMemoryAlert(prev.rss, rssBytes, rssLimitBytes, now),
+    heap: evaluateMemoryAlert(prev.heap, heapUsedBytes, heapLimitBytes, now),
+  };
 }
 
 /**
@@ -159,7 +189,28 @@ function formatAlert(level: 'warn' | 'critical' | 'recovered', rssBytes: number,
       : level === 'critical'
         ? 'memory CRITICAL — OOM imminent'
         : 'memory high — approaching OOM';
-  return `${icon} lexiclash boggle-new: ${head}\nRSS ${rssMb}MB / ${limitMb}MB (${pct}%) · uptime ${upMin}m`;
+  return `${icon} lexiclash boggle-new: ${head}
+RSS ${rssMb}MB / ${limitMb}MB (${pct}%) · uptime ${upMin}m`;
+}
+
+function formatHeapAlert(
+  level: 'warn' | 'critical' | 'recovered',
+  heapUsedBytes: number,
+  heapLimitBytes: number,
+): string {
+  const usedMb = Math.round(heapUsedBytes / 1024 / 1024);
+  const limitMb = Math.round(heapLimitBytes / 1024 / 1024);
+  const pct = heapLimitBytes > 0 ? Math.round((heapUsedBytes / heapLimitBytes) * 100) : 0;
+  const upMin = Math.round(process.uptime() / 60);
+  const icon = level === 'critical' ? '🔴' : level === 'recovered' ? '🟢' : '🟠';
+  const head =
+    level === 'recovered'
+      ? 'V8 heap recovered'
+      : level === 'critical'
+        ? 'V8 heap CRITICAL — heap OOM imminent'
+        : 'V8 heap high — approaching heapLimit';
+  return `${icon} lexiclash boggle-new: ${head}
+heapUsed ${usedMb}MB / ${limitMb}MB (${pct}%) · uptime ${upMin}m`;
 }
 
 let timer: NodeJS.Timeout | undefined;
@@ -169,13 +220,22 @@ let timer: NodeJS.Timeout | undefined;
  * a prior timer is cleared first. Returns a stop function.
  */
 export function startMemoryWatchdog(
-  opts: { intervalMs?: number; limitBytes?: number; send?: (m: string) => void | Promise<void> } = {},
+  opts: {
+    intervalMs?: number;
+    limitBytes?: number;
+    send?: (m: string) => void | Promise<void>;
+    getCounts?: () => string;
+  } = {},
 ): () => void {
   if (timer) clearInterval(timer);
   const intervalMs = opts.intervalMs ?? 30_000;
   const limitBytes = opts.limitBytes ?? getContainerMemoryLimitBytes();
   const send = opts.send ?? sendOpsAlert;
-  let state: MemWatchState = { band: 'ok', lastAlertAt: 0 };
+  const getCounts = opts.getCounts;
+  let state: DualMemWatchState = {
+    rss: { band: 'ok', lastAlertAt: 0 },
+    heap: { band: 'ok', lastAlertAt: 0 },
+  };
   let samples = 0;
 
   logger.info('MEMWATCH', `Memory watchdog started: limit ${Math.round(limitBytes / 1024 / 1024)}MB, every ${intervalMs}ms`);
@@ -189,10 +249,14 @@ export function startMemoryWatchdog(
 
   timer = setInterval(() => {
     const mu = process.memoryUsage();
-    const decision = evaluateMemoryAlert(state, mu.rss, limitBytes, Date.now());
-    state = decision.next;
-    if (decision.alert && decision.level) {
-      void send(formatAlert(decision.level, mu.rss, limitBytes));
+    const hs = v8.getHeapStatistics();
+    const dual = evaluateDualMemoryAlert(state, mu.rss, limitBytes, mu.heapUsed, hs.heap_size_limit, Date.now());
+    state = { rss: dual.rss.next, heap: dual.heap.next };
+    if (dual.rss.alert && dual.rss.level) {
+      void send(formatAlert(dual.rss.level, mu.rss, limitBytes));
+    }
+    if (dual.heap.alert && dual.heap.level) {
+      void send(formatHeapAlert(dual.heap.level, mu.heapUsed, hs.heap_size_limit));
     }
 
     // Leak forensics: full memory breakdown every ~5 min (10 × 30s samples).
@@ -201,8 +265,8 @@ export function startMemoryWatchdog(
     // the two classes need completely different fixes.
     samples += 1;
     if (samples % 10 === 0) {
-      const hs = v8.getHeapStatistics();
       const mb = (n: number) => Math.round(n / 1024 / 1024);
+      const heapPct = hs.heap_size_limit > 0 ? Math.round((mu.heapUsed / hs.heap_size_limit) * 100) : 0;
       // Per-space breakdown: large_object_space growth = big strings/arrays
       // (dictionaries, grids); old_space growth = retained object graphs.
       const spaces = v8
@@ -211,12 +275,20 @@ export function startMemoryWatchdog(
         .join(' ');
       // Handle count catches interval/timer leaks (each leaked setInterval is a handle).
       const handles = (process as any)._getActiveHandles?.()?.length ?? -1;
+      let counts = '';
+      if (getCounts) {
+        try {
+          counts = ` ${getCounts()}`;
+        } catch {
+          counts = '';
+        }
+      }
       logger.info(
         'MEMWATCH',
         `diag rss=${mb(mu.rss)}MB heapUsed=${mb(mu.heapUsed)}/${mb(mu.heapTotal)}MB ` +
           `external=${mb(mu.external)}MB arrayBuffers=${mb(mu.arrayBuffers ?? 0)}MB ` +
-          `heapLimit=${mb(hs.heap_size_limit)}MB handles=${handles} ` +
-          `spaces[${spaces}] uptime=${Math.round(process.uptime() / 60)}m`,
+          `heapLimit=${mb(hs.heap_size_limit)}MB heapPct=${heapPct} handles=${handles} ` +
+          `spaces[${spaces}]${counts} uptime=${Math.round(process.uptime() / 60)}m`,
       );
     }
   }, intervalMs);

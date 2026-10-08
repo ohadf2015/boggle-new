@@ -11,9 +11,11 @@ vi.mock('../modules/notificationService', () => ({ sendOpsAlert: vi.fn() }));
 
 import {
   evaluateMemoryAlert,
+  evaluateDualMemoryAlert,
   getContainerMemoryLimitBytes,
   evaluateHeapCapVsContainer,
   type MemWatchState,
+  type DualMemWatchState,
 } from '../modules/memoryWatchdog';
 
 const MB = 1024 * 1024;
@@ -123,5 +125,42 @@ describe('evaluateHeapCapVsContainer', () => {
   it('treats an unknown (0) container limit as safe — never false-alarm at boot', () => {
     const r = evaluateHeapCapVsContainer(2048 * MB, 0);
     expect(r.safe).toBe(true);
+  });
+});
+
+describe('evaluateDualMemoryAlert', () => {
+  const dualOk = (): DualMemWatchState => ({
+    rss: { band: 'ok', lastAlertAt: 0 },
+    heap: { band: 'ok', lastAlertAt: 0 },
+  });
+
+  it('alerts on V8 heap 85% even when RSS is well under the cgroup 80% line', () => {
+    // Prod 2026-10-07: heapLimit 1584MB killed the process at rss≈1.7GB, before
+    // the 1907MB (80% of 2384MB) RSS watchdog could fire.
+    const d = evaluateDualMemoryAlert(
+      dualOk(),
+      0.5 * 2384 * MB, // RSS 50% of cgroup
+      2384 * MB,
+      0.85 * 1584 * MB, // heap 85% of V8 cap
+      1584 * MB,
+      1000,
+    );
+    expect(d.rss.alert).toBe(false);
+    expect(d.heap.alert).toBe(true);
+    expect(d.heap.level).toBe('warn');
+  });
+
+  it('still alerts on RSS 80% when the heap is quiet', () => {
+    const d = evaluateDualMemoryAlert(
+      dualOk(),
+      0.85 * 2384 * MB,
+      2384 * MB,
+      0.4 * 1584 * MB,
+      1584 * MB,
+      1000,
+    );
+    expect(d.rss.alert).toBe(true);
+    expect(d.rss.level).toBe('warn');
+    expect(d.heap.alert).toBe(false);
   });
 });

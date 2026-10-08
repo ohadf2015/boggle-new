@@ -29,6 +29,7 @@ import {
   clearAllQuizSessions,
   QUIZ_FINISH_GRACE_MS,
 } from '../vocabQuizStore';
+import { gameCleanupEmitter } from '../../events/gameCleanup';
 import type { VocabQuizSession } from '../../services/vocabQuizEngine';
 
 const session = (gameCode: string) => ({ gameCode, questions: [] } as unknown as VocabQuizSession);
@@ -92,5 +93,15 @@ describe('vocabQuizStore — the finish grace window', () => {
     clearAllQuizSessions();
 
     expect(hasQuizSession('AAA111')).toBe(false);
+  });
+});
+
+describe('vocabQuizStore — gameDeleted (host-timeout / room teardown)', () => {
+  it('drops the live session AND the finish grace — the room is gone', () => {
+    setQuizSession('HOSTTO', session('HOSTTO'));
+    gameCleanupEmitter.emitGameDeleted('HOSTTO');
+
+    expect(getQuizSession('HOSTTO')).toBeUndefined();
+    expect(hasQuizSession('HOSTTO')).toBe(false);
   });
 });

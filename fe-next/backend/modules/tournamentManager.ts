@@ -489,6 +489,10 @@ export async function restoreTournamentsFromRedis(): Promise<void> {
   }
 }
 
+export function getTournamentCount(): number {
+  return Object.keys(tournaments).length;
+}
+
 // Export tournaments object for direct access
 export { tournaments };
 
