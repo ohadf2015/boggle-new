@@ -30,11 +30,13 @@ describe('useClassroomEconomy snapshot retry', () => {
     expect(emit).toHaveBeenLastCalledWith('classroomEconomy:requestState', { gameCode: 'ABC' });
   });
 
-  it('Given the retries are exhausted, Then it stops asking', () => {
+  it('Given no snapshot after a minute, Then it keeps asking until one arrives', () => {
     renderHook(() => useClassroomEconomy('ABC'));
-    act(() => {
-      vi.advanceTimersByTime(60_000);
-    });
-    expect(emit.mock.calls.length).toBeLessThanOrEqual(6);
+    for (let i = 0; i < 30; i++) {
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+    }
+    expect(emit.mock.calls.length).toBeGreaterThan(20);
   });
 });

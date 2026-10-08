@@ -14,6 +14,7 @@ import {
   useHint,
   wordCash,
 } from '../classroomEconomy';
+import { chestPartPool } from '../classroomEconomyPool';
 
 const NOW = 1_000_000;
 
@@ -162,14 +163,14 @@ describe('useHint', () => {
 });
 
 describe('applyRoundBoundary', () => {
-  it('Given a new round, Then streak, shield and double-cash reset but cash carries', () => {
+  it('Given a new round, Then streak and double-cash reset but cash and a held shield carry', () => {
     let s = applyRoundBoundary({ ...emptyEconomyState(), roundId: 'r1', cash: 40, streak: 5 }, 'r1');
     s = buyPowerUp(s, 'streakShield', NOW).state;
     s = buyPowerUp(s, 'doubleCash', NOW).state;
     const next = applyRoundBoundary(s, 'r2');
     expect(next.roundId).toBe('r2');
     expect(next.streak).toBe(0);
-    expect(next.shieldHeld).toBe(false);
+    expect(next.shieldHeld).toBe(true);
     expect(next.doubleCashUntil).toBeNull();
     expect(next.cash).toBe(s.cash);
     expect(next.cashEarned).toBe(s.cashEarned);
@@ -199,9 +200,9 @@ describe('chest odds and roll', () => {
     expect(counts.epic).toBeGreaterThan(0);
   });
 
-  it('Given a roll, Then the item is a cosmetic and XP matches the rarity', () => {
+  it('Given a roll, Then the item is a named avatar part from its rarity pool and XP matches the rarity', () => {
     const chest = rollChest('ABC:r1:u9');
-    expect(chest.itemId).toMatch(/^[a-z0-9-]+$/);
+    expect(chestPartPool(chest.rarity)).toContain(chest.itemId);
     expect(chest.xp).toBeGreaterThan(0);
   });
 });

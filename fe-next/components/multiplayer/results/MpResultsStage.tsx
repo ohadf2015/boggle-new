@@ -29,6 +29,8 @@ import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
 import { MpNextModeCard } from './MpNextModeCard';
 import { MpFinalFooter, MpIntermissionFooter } from './MpResultsFooter';
 import MpResultsDetails from './MpResultsDetails';
+import ChestRewardCta from '@/components/education/economy/ChestRewardCta';
+import RoundShop from '@/components/education/economy/RoundShop';
 import { MpRoundAwards, MpSeriesGrid } from './MpResultsAlbum';
 import { roundAwards, seriesGrid } from './mpResultsStory';
 import type { MpResultsController } from './useMpResultsController';
@@ -260,6 +262,10 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           t={t}
         />
         </div>
+        {classroomStudent && props.gameCode && (
+          <ChestRewardCta gameCode={props.gameCode} roundId={props.gameSessionId != null ? String(props.gameSessionId) : null} />
+        )}
+        {classroomStudent && props.gameCode && <RoundShop gameCode={props.gameCode} />}
         {classroomStudent ? (
           <StudentMissedWords
             words={missedWords}

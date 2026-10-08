@@ -139,6 +139,9 @@ const he = {
         "title": "שדרוגים",
         "cash": "כסף: {cash}",
         "cost": "מחיר: {cost}",
+        "owned": "בבעלותך",
+        "roundOnly": "רק במהלך סיבוב",
+        "buy": "קנה",
         "doubleCash": {
           "name": "כסף כפול",
           "desc": "פי 2 כסף במשך 30 שניות. רק לך."
@@ -155,6 +158,7 @@ const he = {
       "hud": {
         "cash": "כסף: {cash}",
         "multiplier": "x{multiplier}",
+        "streak": "{streak} ברצף",
         "doubleCash": "פי 2 ל-{seconds} שנ׳",
         "loading": "טוען כסף…"
       },
@@ -172,6 +176,7 @@ const he = {
       },
       "error": {
         "power_ups_off": "השדרוגים כבויים בכיתה הזו",
+        "between_rounds": "כפל מזומן פועל במהלך סיבוב",
         "insufficient_cash": "אין מספיק כסף עדיין",
         "already_active": "כבר פעיל",
         "already_held": "כבר יש לך אחד",

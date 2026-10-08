@@ -139,6 +139,9 @@ const en = {
         "title": "Power-ups",
         "cash": "Cash: {cash}",
         "cost": "Cost: {cost}",
+        "owned": "Owned",
+        "roundOnly": "Only during a round",
+        "buy": "Buy",
         "doubleCash": {
           "name": "Double cash",
           "desc": "2x cash for 30 seconds. Only you."
@@ -155,6 +158,7 @@ const en = {
       "hud": {
         "cash": "Cash: {cash}",
         "multiplier": "x{multiplier}",
+        "streak": "{streak} in a row",
         "doubleCash": "2x {seconds}s",
         "loading": "Loading cash…"
       },
@@ -172,6 +176,7 @@ const en = {
       },
       "error": {
         "power_ups_off": "Power-ups are off for this class",
+        "between_rounds": "Double cash works during a round",
         "insufficient_cash": "Not enough cash yet",
         "already_active": "Already active",
         "already_held": "You already hold one",

@@ -139,6 +139,9 @@ const ru = {
         "title": "Усиления",
         "cash": "Деньги: {cash}",
         "cost": "Цена: {cost}",
+        "owned": "Есть",
+        "roundOnly": "Только во время раунда",
+        "buy": "Купить",
         "doubleCash": {
           "name": "Двойные деньги",
           "desc": "2x деньги 30 секунд. Только для вас."
@@ -155,6 +158,7 @@ const ru = {
       "hud": {
         "cash": "Деньги: {cash}",
         "multiplier": "x{multiplier}",
+        "streak": "{streak} подряд",
         "doubleCash": "2x {seconds} с",
         "loading": "Загрузка денег…"
       },
@@ -172,6 +176,7 @@ const ru = {
       },
       "error": {
         "power_ups_off": "Усиления выключены для этого класса",
+        "between_rounds": "Удвоение работает только во время раунда",
         "insufficient_cash": "Пока недостаточно денег",
         "already_active": "Уже активно",
         "already_held": "Уже есть одно",

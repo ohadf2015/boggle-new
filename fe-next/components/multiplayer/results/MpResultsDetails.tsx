@@ -148,7 +148,7 @@ function DetailsBody({ c }: { c: MpResultsController }) {
         onPractice={classroomSummary.lessonIds[0] ? () => openLessonPractice(classroomSummary.lessonIds[0]) : undefined}
       />
       {!isHost && gameCode && (
-        <ClassroomRoundReward gameCode={gameCode} roundId={props.gameSessionId != null ? String(props.gameSessionId) : null} />
+        <ClassroomRoundReward gameCode={gameCode} />
       )}
     </>
   ) : lessonGameData && !isGuest ? (

@@ -3,10 +3,9 @@
  * The store and socket layers call these and own all I/O, so every number a
  * student sees comes from one place the server computes.
  *
- * Cash carries across rounds. Streak, shield and double-cash do not.
+ * Cash and a held shield carry across rounds (the between-round shop sells
+ * them for the next round). Streak and double-cash do not.
  */
-
-import { COSMETICS } from '@/lib/cosmetics';
 
 import {
   CHEST_ODDS,
@@ -16,6 +15,7 @@ import {
   type ChestRarity,
   type PowerUpId,
 } from '@/shared/constants/classroomEconomy';
+import { chestPartPool } from './classroomEconomyPool';
 
 export { CHEST_ODDS, CHEST_XP, POWER_UPS, WRONG_ANSWER_COST };
 export type { PowerUpId };
@@ -60,7 +60,7 @@ export function streakMultiplier(streak: number): 1 | 2 | 3 {
 
 export function applyRoundBoundary(state: EconomyState, roundId: string): EconomyState {
   if (state.roundId === roundId) return state;
-  return { ...state, roundId, roundCash: 0, streak: 0, shieldHeld: false, doubleCashUntil: null };
+  return { ...state, roundId, roundCash: 0, streak: 0, doubleCashUntil: null };
 }
 
 export function recordCorrectWord(
@@ -136,16 +136,11 @@ function hash01(seed: string): number {
   return ((h >>> 0) % 1_000_000) / 1_000_000;
 }
 
-function poolFor(rarity: ChestRarity): string[] {
-  const ids = COSMETICS.filter((c) => c.rarity === rarity).map((c) => c.id);
-  return ids.length > 0 ? ids : COSMETICS.filter((c) => c.rarity === 'common').map((c) => c.id);
-}
-
 /** Deterministic in its seed, so a replayed claim cannot re-roll a better chest. */
 export function rollChest(seed: string): ChestRoll {
   const u = hash01(`rarity:${seed}`);
   const rarity: ChestRarity = u < CHEST_ODDS.epic ? 'epic' : u < CHEST_ODDS.epic + CHEST_ODDS.rare ? 'rare' : 'common';
-  const pool = poolFor(rarity);
+  const pool = chestPartPool(rarity);
   const pick = Math.floor(hash01(`item:${seed}`) * pool.length) % pool.length;
   return { rarity, xp: CHEST_XP[rarity], itemId: pool[pick] };
 }

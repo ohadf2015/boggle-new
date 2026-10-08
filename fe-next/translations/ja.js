@@ -139,6 +139,9 @@ const ja = {
         "title": "パワーアップ",
         "cash": "所持金: {cash}",
         "cost": "価格: {cost}",
+        "owned": "所持中",
+        "roundOnly": "ラウンド中のみ",
+        "buy": "購入",
         "doubleCash": {
           "name": "ダブルキャッシュ",
           "desc": "30秒間、獲得金額が2倍。自分だけ。"
@@ -155,6 +158,7 @@ const ja = {
       "hud": {
         "cash": "所持金: {cash}",
         "multiplier": "x{multiplier}",
+        "streak": "{streak}連続",
         "doubleCash": "2倍 残り{seconds}秒",
         "loading": "所持金を読み込み中…"
       },
@@ -172,6 +176,7 @@ const ja = {
       },
       "error": {
         "power_ups_off": "このクラスではパワーアップは無効です",
+        "between_rounds": "2倍はラウンド中のみ有効",
         "insufficient_cash": "まだ所持金が足りません",
         "already_active": "すでに有効です",
         "already_held": "すでに持っています",

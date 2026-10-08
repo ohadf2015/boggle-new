@@ -112,8 +112,13 @@ describe('EconomyHud', () => {
     expect(screen.getByText('economy.hud.multiplier:2')).toBeTruthy();
   });
 
-  it('Given a streak below 3, Then no flame shows', () => {
-    render(<EconomyHud snapshot={snap({ streak: 2 })} />);
+  it('Given the first correct word, Then the streak chip shows the count from one', () => {
+    render(<EconomyHud snapshot={snap({ streak: 1, multiplier: 1, cash: 1 })} />);
+    expect(screen.getByTestId('hud-streak').textContent).toContain('economy.hud.streak:1');
+  });
+
+  it('Given no streak yet, Then no chip shows', () => {
+    render(<EconomyHud snapshot={snap({ streak: 0 })} />);
     expect(screen.queryByTestId('hud-streak')).toBeNull();
   });
 

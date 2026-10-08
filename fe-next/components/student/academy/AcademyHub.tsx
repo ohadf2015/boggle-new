@@ -42,6 +42,7 @@ import { AcademyMascot } from './AcademyMascot';
 import { AcademySidePanel } from './AcademySidePanel';
 import { AcademyDock } from './AcademyDock';
 import { DailyChest } from './DailyChest';
+import StudentLocker from '@/components/education/economy/StudentLocker';
 import { ClassSheet } from './ClassSheet';
 import { nextOpenAssignment } from '@/components/student/nextOpenAssignment';
 import { InkPanel } from './chrome';
@@ -218,12 +219,15 @@ export function AcademyHub(props: AcademyHubProps) {
 
   const pageTitle = classroomName ?? (ready ? t('academy.student.title', 'Word Academy') : null);
   const chest = (
-    <DailyChest
-      userId={userId}
-      reducedMotion={reducedMotion}
-      size={wide ? 'md' : 'sm'}
-      onGranted={(xp) => xp != null && setGrantedXp(xp)}
-    />
+    <div className="flex items-center gap-2">
+      <DailyChest
+        userId={userId}
+        reducedMotion={reducedMotion}
+        size={wide ? 'md' : 'sm'}
+        onGranted={(xp) => xp != null && setGrantedXp(xp)}
+      />
+      <StudentLocker />
+    </div>
   );
 
   const goSolo = () => router.push(`/${language}/quick-play?academy=1`);
