@@ -218,4 +218,62 @@ describe('BoardGallery', () => {
       );
     });
   });
+  it('sends top_rated (backend value) when the Top Rated tab is picked', async () => {
+    render(<BoardGallery />);
+    await waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByText('ugc.gallery.sort.topRated'));
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('sort=top_rated'),
+        expect.anything()
+      );
+    });
+    expect(mockFetch).not.toHaveBeenCalledWith(
+      expect.stringContaining('sort=topRated'),
+      expect.anything()
+    );
+  });
+
+  it('falls back to popular boards when nothing is featured yet', async () => {
+    mockFetch.mockImplementation((url: string) =>
+      url.includes('sort=featured') ? buildFetchResponse([], 0) : buildFetchResponse(mockBoards)
+    );
+    render(<BoardGallery />);
+    await waitFor(() => {
+      expect(screen.getByTestId('board-card-AAA1')).toBeInTheDocument();
+    });
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('sort=popular'), expect.anything());
+    expect(screen.queryByText('ugc.gallery.empty')).not.toBeInTheDocument();
+  });
+
+  it('does not auto-switch after the visitor explicitly picks Featured', async () => {
+    render(<BoardGallery />);
+    await waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(1));
+
+    mockFetch.mockImplementation((url: string) =>
+      url.includes('sort=featured') ? buildFetchResponse([], 0) : buildFetchResponse(mockBoards)
+    );
+    fireEvent.click(screen.getByText('ugc.gallery.sort.newest'));
+    await waitFor(() => expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('sort=newest'), expect.anything()));
+    fireEvent.click(screen.getByText('ugc.gallery.sort.featured'));
+
+    await waitFor(() => {
+      expect(screen.getByText('ugc.gallery.empty')).toBeInTheDocument();
+    });
+  });
+
+  it('derives load more from total when the backend omits hasMore', async () => {
+    mockFetch.mockReturnValue(
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ boards: mockBoards, total: 30, page: 1, limit: 12 }),
+      } as Response)
+    );
+    render(<BoardGallery />);
+    await waitFor(() => {
+      expect(screen.getByText('ugc.gallery.loadMore')).toBeInTheDocument();
+    });
+  });
 });

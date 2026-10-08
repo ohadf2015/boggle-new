@@ -61,7 +61,8 @@ function useCommunityStats() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/ugc/boards/gallery?sort=featured&page=1&limit=1');
+        // `popular` covers every public board; `featured` is only the curated subset.
+        const res = await fetch('/api/ugc/boards/gallery?sort=popular&page=1&limit=1');
         if (!res.ok) return;
         const data = await res.json();
         if (data.total != null) {
@@ -157,6 +158,10 @@ export default function CommunityPageClient() {
   const goBack = useBackOneLevel();
   const [activeTab, setActiveTab] = useState<Tab>('boards');
   const stats = useCommunityStats();
+  // Hide the featured frame until (and unless) there is something featured,
+  // instead of rendering an empty bordered box with only a heading.
+  const [hasFeatured, setHasFeatured] = useState(false);
+  const handleFeaturedLoaded = useCallback((count: number) => setHasFeatured(count > 0), []);
 
   const handleNavigatePlay = useCallback(
     (boardCode: string) => {
@@ -258,8 +263,10 @@ export default function CommunityPageClient() {
           className={cn(
             'mb-8 p-4 rounded-neo',
             'border-2 border-neo-yellow/20',
-            'bg-linear-to-br from-neo-yellow/4 via-transparent to-neo-pink/4'
+            'bg-linear-to-br from-neo-yellow/4 via-transparent to-neo-pink/4',
+            !hasFeatured && 'hidden'
           )}
+          data-testid="community-featured-spotlight"
         >
           <div className="flex items-center gap-2 mb-3">
             <div className="w-1 h-5 rounded-full bg-neo-yellow" />
@@ -274,6 +281,7 @@ export default function CommunityPageClient() {
             showCreateCTA={false}
             showViewAll={false}
             minToShow={1}
+            onLoaded={handleFeaturedLoaded}
           />
         </AdaptiveMotion.div>
 
