@@ -363,3 +363,54 @@ describe('test accounts', () => {
     expect(out.summary.excludedMachineRows).toBe(1);
   });
 });
+
+describe('returnedNoClassroom baseline', () => {
+  it('does not count a return when reviewed_at is missing', () => {
+    // Without a review date there is no baseline to say the visit came after approval.
+    const out = buildTeacherFunnel(
+      input({
+        requests: [req({ reviewed_at: null })],
+        profiles: [{ id: 'u1', user_role: 'teacher', last_seen_at: '2026-08-09T00:00:00Z' }],
+      }),
+    );
+
+    expect(out.summary.returnedNoClassroom).toBe(0);
+  });
+});
+
+describe('students per teacher', () => {
+  it('counts a student once even when they joined two of the teacher’s classes', () => {
+    const out = buildTeacherFunnel(
+      input({
+        classrooms: [
+          { id: 'c1', teacher_id: 'u1' },
+          { id: 'c2', teacher_id: 'u1' },
+        ],
+        memberships: [
+          { classroom_id: 'c1', student_id: 's1' },
+          { classroom_id: 'c2', student_id: 's1' },
+        ],
+      }),
+    );
+
+    expect(out.rows[0].students).toBe(1);
+  });
+});
+
+describe('test accounts', () => {
+  it('drops a classroom owned by a test account from every count', () => {
+    const out = buildTeacherFunnel(
+      input({
+        profiles: [
+          { id: 'u1', user_role: 'teacher' },
+          { id: 'qa', user_role: 'teacher', is_test_account: true },
+        ],
+        classrooms: [{ id: 'cq', teacher_id: 'qa' }],
+        memberships: [{ classroom_id: 'cq', student_id: 's9' }],
+      }),
+    );
+
+    expect(out.classrooms).toEqual([]);
+    expect(out.rows[0].students).toBe(0);
+  });
+});

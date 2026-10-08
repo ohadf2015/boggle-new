@@ -245,6 +245,17 @@ function buildReasons(rows: TeacherFunnelRow[]): UseCaseReason[] {
   return [...byText.values()].sort((a, b) => b.count - a.count || a.text.localeCompare(b.text));
 }
 
+function distinctStudents(
+  classroomIds: string[],
+  studentsByClassroom: Map<string, Set<string>>,
+): number {
+  const seen = new Set<string>();
+  for (const id of classroomIds) {
+    for (const studentId of studentsByClassroom.get(id) ?? []) seen.add(studentId);
+  }
+  return seen.size;
+}
+
 export function buildTeacherFunnel(input: TeacherFunnelInput): TeacherFunnelResult {
   const { profiles, memberships, assignments, nowMs } = input;
 
@@ -287,10 +298,7 @@ export function buildTeacherFunnel(input: TeacherFunnelInput): TeacherFunnelResu
   const rows: TeacherFunnelRow[] = requests.map((r) => {
     const roleGranted = !!r.user_id && roleById.get(r.user_id) === 'teacher';
     const ownedClassrooms = r.user_id ? classroomsByTeacher.get(r.user_id) ?? [] : [];
-    const students = ownedClassrooms.reduce(
-      (n, id) => n + (studentsByClassroom.get(id)?.size ?? 0),
-      0,
-    );
+    const students = distinctStudents(ownedClassrooms, studentsByClassroom);
     const assignmentCount = r.user_id ? assignmentsByTeacher.get(r.user_id) ?? 0 : 0;
 
     let stage: TeacherStage;
@@ -328,15 +336,15 @@ export function buildTeacherFunnel(input: TeacherFunnelInput): TeacherFunnelResu
   });
 
   const approvedRows = rows.filter((r) => r.status === 'approved');
-  // "Came back" = seen in the app after we approved them. Falls back to the request date
-  // when reviewed_at is missing (older rows), which is the conservative direction: it can
-  // only under-count returns, never invent one.
+  // "Came back" = seen in the app after we approved them. No review date means no
+  // baseline, so the row cannot count as a return.
   const returned = approvedRows.filter(
     (r) =>
       r.roleGranted &&
       r.classrooms === 0 &&
       !!r.lastSeenAt &&
-      Date.parse(r.lastSeenAt) > Date.parse(r.reviewedAt ?? r.createdAt),
+      !!r.reviewedAt &&
+      Date.parse(r.lastSeenAt) > Date.parse(r.reviewedAt),
   );
 
   // Identity for a classroom owner, best effort. The applicant row is preferred because it

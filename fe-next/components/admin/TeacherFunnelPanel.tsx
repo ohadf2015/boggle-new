@@ -430,7 +430,7 @@ export function TeacherFunnelPanel() {
         <p className="mt-2 font-neo-body text-xs text-neo-white/40">
           {t(
             'admin.teacherFunnel.excludedMachineRows',
-            `${summary.excludedMachineRows} machine-written rows (integration tests) excluded from every number above.`,
+            `${summary.excludedMachineRows} machine-written rows (test accounts) excluded from every number above.`,
           )}
         </p>
       )}
