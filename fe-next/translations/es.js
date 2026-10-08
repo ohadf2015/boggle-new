@@ -13246,6 +13246,16 @@ const es = {
     }
   },
   "student": {
+    "classStrip": {
+      "title": "Racha de la clase",
+      "streakDays": "Racha de {count} días",
+      "playedToday": "Jugaron hoy",
+      "notPlayedToday": "Jueguen hoy para mantener la racha",
+      "noStreakYet": "Empieza la racha de la clase hoy",
+      "askRematch": "Pedir revancha",
+      "askedToday": "Pedido enviado. Tu profe lo verá",
+      "askFailed": "No se pudo enviar. Inténtalo de nuevo"
+    },
     "practiceFun": {
       "headline": {
         "perfect": "¡PERFECTO!",
@@ -13361,7 +13371,13 @@ const es = {
       "listening": "Esperando juegos de clase...",
       "connecting": "Conectando al aula...",
       "idleHint": "Cuando tu profesor inicie un juego, aparecerá aquí",
-      "joinFailed": "No pudimos meterte: puede que la partida ya haya terminado. Pídele el código a tu profe."
+      "joinEnded": "La partida ya terminó. Pídele a tu profe la siguiente.",
+      "joinRetry": "Todavía no pudimos meterte. Toca Unirme para intentarlo de nuevo. Si sigue fallando, pídele a tu profe que vuelva a iniciar la partida.",
+      "joinNotMember": "Esta partida es solo para tu clase. Pídele a tu profe que te agregue.",
+      "joinSignIn": "Vuelve a iniciar sesión para unirte a la partida.",
+      "joinBusy": "El servidor está ocupado ahora mismo. Espera un momento y toca Unirme otra vez.",
+      "joinFull": "La partida está llena ahora. Pídele a tu profe que abra un lugar.",
+      "joinRemoved": "No puedes unirte a esta partida. Pídele a tu profe que te deje volver."
     },
     "playWithClass": {
       "title": "Jugar con la clase",

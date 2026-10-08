@@ -125,7 +125,7 @@ function refuseClassroomJoin(
   payload: Record<string, unknown>,
   classroomId: string | null
 ): void {
-  socket.emit('classroomGameError', { ...payload, gameCode });
+  socket.emit('classroomGameError', { ...payload, code: reason, gameCode });
   const event = buildClassroomJoinRefusedEvent({
     gameCode,
     classroomId,

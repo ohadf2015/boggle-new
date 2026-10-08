@@ -11842,6 +11842,16 @@ const en = {
     }
   },
   "student": {
+    "classStrip": {
+      "title": "Class streak",
+      "streakDays": "{count}-day class streak",
+      "playedToday": "Played today",
+      "notPlayedToday": "Play today to keep it alive",
+      "noStreakYet": "Start the class streak today",
+      "askRematch": "Ask for a rematch",
+      "askedToday": "Asked. Your teacher will see it",
+      "askFailed": "Couldn't send. Try again"
+    },
     "practiceFun": {
       "headline": {
         "perfect": "FLAWLESS!",
@@ -11905,7 +11915,13 @@ const en = {
       "listening": "Listening for classroom games...",
       "connecting": "Connecting to classroom...",
       "idleHint": "When your teacher starts a game, you'll see it here",
-      "joinFailed": "Couldn't get you in. The game may have ended. Ask your teacher for the code."
+      "joinEnded": "This game is over. Ask your teacher for the next one.",
+      "joinRetry": "Couldn't get you in yet. Tap Join to try again. If it keeps failing, ask your teacher to start the game again.",
+      "joinNotMember": "This game is only for your class. Ask your teacher to add you.",
+      "joinSignIn": "Sign in again to join this game.",
+      "joinBusy": "Our server is busy right now. Wait a moment, then tap Join again.",
+      "joinFull": "This game is full right now. Ask your teacher to open a seat.",
+      "joinRemoved": "You can't join this game. Ask your teacher to let you back in."
     },
     "playWithClass": {
       "title": "Play with class",

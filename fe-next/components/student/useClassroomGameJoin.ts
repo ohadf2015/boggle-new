@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ActiveGame } from '@/hooks/useActiveClassroomGame';
+import { classifyClassroomJoinRefusal } from './classroomJoinRefusal';
 
 /** Long enough for a slow phone on school wifi, short enough to not be a hang. */
 export const JOIN_TIMEOUT_MS = 12_000;
@@ -62,17 +63,17 @@ export function useClassroomGameJoin({ activeGame, socket, userId, username }: A
       router.push(`/${language}/multiplayer?room=${gameCode}&classroom=true`);
     };
 
-    const onError = (data: { gameCode?: string }) => {
+    const onError = (data: { gameCode?: string; code?: string }) => {
       if (data?.gameCode !== gameCode) return;
       settle();
       setIsJoining(false);
-      setJoinError(t('student.activeGame.joinFailed'));
+      setJoinError(t(classifyClassroomJoinRefusal(data).messageKey));
     };
 
     const timer = setTimeout(() => {
       settle();
       setIsJoining(false);
-      setJoinError(t('student.activeGame.joinFailed'));
+      setJoinError(t(classifyClassroomJoinRefusal(null).messageKey));
     }, JOIN_TIMEOUT_MS);
 
     socket.on('joinedClassroomGame', onJoined);

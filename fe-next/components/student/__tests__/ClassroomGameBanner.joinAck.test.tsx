@@ -150,7 +150,17 @@ describe('ClassroomGameBanner — JOIN waits for the server', () => {
 
     // THEN they are told, and are NOT dumped on the generic multiplayer hub
     expect(mockPush).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert')).toHaveTextContent('student.activeGame.joinFailed');
+    expect(screen.getByRole('alert')).toHaveTextContent('student.activeGame.joinRetry');
+  });
+
+  it('says the game is over, not to retry, when the server reports GAME_ENDED', () => {
+    renderBanner();
+    fireEvent.click(screen.getByText('student.activeGame.joinNow'));
+
+    socket.server('classroomGameError', { error: 'Game not found', code: 'GAME_ENDED', gameCode: 'R438D5' });
+
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toHaveTextContent('student.activeGame.joinEnded');
   });
 
   it('lets the student try again after a failure', () => {
@@ -177,7 +187,7 @@ describe('ClassroomGameBanner — JOIN waits for the server', () => {
 
     // THEN the spinner does not run forever with no explanation
     expect(mockPush).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert')).toHaveTextContent('student.activeGame.joinFailed');
+    expect(screen.getByRole('alert')).toHaveTextContent('student.activeGame.joinRetry');
   });
 
   it('leaves no listeners behind after a join resolves', () => {

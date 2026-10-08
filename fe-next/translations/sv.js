@@ -13535,6 +13535,16 @@ const sv = {
     }
   },
   "student": {
+    "classStrip": {
+      "title": "Klassens svit",
+      "streakDays": "{count}-dagars klassvit",
+      "playedToday": "Spelade idag",
+      "notPlayedToday": "Spela idag för att hålla sviten vid liv",
+      "noStreakYet": "Starta klassens svit idag",
+      "askRematch": "Be om revansch",
+      "askedToday": "Begäran skickad. Läraren ser den",
+      "askFailed": "Kunde inte skicka. Försök igen"
+    },
     "practiceFun": {
       "headline": {
         "perfect": "FELFRITT!",
@@ -13590,7 +13600,13 @@ const sv = {
       "listening": "Lyssnar efter klassrumsspel...",
       "connecting": "Ansluter till klassrummet...",
       "idleHint": "När din lärare startar ett spel visas det här",
-      "joinFailed": "Du kom inte in. Spelet kan ha tagit slut. Fråga din lärare efter koden."
+      "joinEnded": "Spelet är slut. Fråga din lärare efter nästa.",
+      "joinRetry": "Vi kom inte in dig än. Tryck på Gå med för att försöka igen. Om det fortsätter, be läraren starta spelet igen.",
+      "joinNotMember": "Den här leken är bara för din klass. Be läraren lägga till dig.",
+      "joinSignIn": "Logga in igen för att gå med i spelet.",
+      "joinBusy": "Servern är upptagen just nu. Vänta en stund och tryck på Gå med igen.",
+      "joinFull": "Spelet är fullt just nu. Be läraren öppna en plats.",
+      "joinRemoved": "Du kan inte gå med i spelet. Be läraren släppa in dig igen."
     },
     "playWithClass": {
       "title": "Spela med klassen",
