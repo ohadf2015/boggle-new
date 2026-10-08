@@ -9,6 +9,7 @@ import {
   isPowerUpId,
   recordCorrectWord,
   recordWrongWord,
+  roundStanding,
   streakMultiplier,
   useHint,
   type EconomyState,
@@ -126,4 +127,14 @@ export async function buildBoard(gameCode: string, userId: string): Promise<Clas
     top: ranked.slice(0, 3),
     you: index === -1 ? null : { rank: index + 1, cashEarned: ranked[index].cashEarned },
   };
+}
+
+/** This student's cash and placing in one round, read from the live economy. */
+export async function roundSummaryFor(
+  gameCode: string,
+  roundId: string,
+  userId: string
+): Promise<{ roundCash: number; rank: number | null; size: number }> {
+  const all = (await readAllEconomy(gameCode)) ?? {};
+  return roundStanding(all, roundId, userId);
 }

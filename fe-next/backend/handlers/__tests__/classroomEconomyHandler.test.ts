@@ -2,12 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const grant = vi.fn();
 const classroomGame = { value: null as unknown };
+const gameState = { value: { gameSessionId: 'sess-7' } as unknown };
 const applyCorrect = vi.fn();
 const buyPowerUpFor = vi.fn();
 const handlers: Record<string, (data: unknown) => Promise<void>> = {};
 
 vi.mock('../../modules/classroomEconomyChest', () => ({
-  grantEndOfGameChest: (input: unknown) => grant(input),
+  grantRoundChest: (input: unknown) => grant(input),
 }));
 vi.mock('../../modules/classroomGameManager', () => ({
   getClassroomGame: async () => classroomGame.value,
@@ -19,6 +20,7 @@ vi.mock('../../modules/classroomEconomyService', () => ({
   buyPowerUpFor: (input: unknown) => buyPowerUpFor(input),
   toSnapshot: vi.fn(),
   spendHintFor: vi.fn(),
+  roundSummaryFor: async () => ({ roundCash: 12, rank: 2, size: 3 }),
 }));
 vi.mock('../../modules/classroomEconomyStore', () => ({
   loadConfig: vi.fn(),
@@ -26,14 +28,13 @@ vi.mock('../../modules/classroomEconomyStore', () => ({
   saveEconomyConfig: vi.fn(),
 }));
 vi.mock('../../redisClient', () => ({
-  getGameState: async () => ({ gameSessionId: 'sess-7' }),
+  getGameState: async () => gameState.value,
   getRedisClient: () => null,
 }));
 vi.mock('../classroomSocketAuth.js', () => ({ getAuthUserId: () => 'u1' }));
 vi.mock('../../utils/rateLimiter.js', () => ({ checkRateLimit: () => true }));
 
 import {
-  economyGrantChests,
   economyOnWordAccepted,
   registerClassroomEconomyHandlers,
   roundIdOf,
@@ -56,31 +57,45 @@ beforeEach(() => {
   grant.mockReset();
   applyCorrect.mockReset();
   classroomGame.value = null;
+  gameState.value = { gameSessionId: 'sess-7' };
 });
 
-describe('economyGrantChests', () => {
-  it('Given two students, Then each chest goes only to that student user room', async () => {
-    grant.mockImplementation(async ({ userId }: { userId: string }) => ({
-      gameCode: 'ABC', roundId: 'sess-7', userId, rarity: 'common', xp: 10, itemId: 'tile-default',
-    }));
-    const { io, emits } = fakeIo();
-    await economyGrantChests(io, { gameCode: 'ABC', userIds: ['u1', 'u2'] });
-    expect(emits.map((e) => e.room)).toEqual(['user:u1', 'user:u2']);
-    expect(emits.every((e) => e.event === 'classroomEconomy:chest')).toBe(true);
+describe('classroomEconomy:requestReward', () => {
+  const reveal = { gameCode: 'ABC', roundId: '7', userId: 'u1', rarity: 'common', xp: 10, itemId: 'tile-default', roundCash: 12, rank: 2, size: 3 };
+
+  function handlerSocket() {
+    const emitted: Array<{ event: string; data: unknown }> = [];
+    const socket = { id: 's1', emit: (event: string, data: unknown) => emitted.push({ event, data }), on: (ev: string, fn: (d: unknown) => Promise<void>) => { handlers[ev] = fn; } };
+    registerClassroomEconomyHandlers({} as never, socket as never);
+    return { socket, emitted };
+  }
+
+  it('Given the round has ended, Then the student gets their reveal back on their own socket', async () => {
+    gameState.value = { gameSessionId: 7, cachedResultsPayload: { gameSessionId: 7 } };
+    classroomGame.value = { players: [{ userId: 'u1' }], teacherId: 't' };
+    grant.mockResolvedValue(reveal);
+    const { emitted } = handlerSocket();
+    await handlers['classroomEconomy:requestReward']({ gameCode: 'ABC', roundId: '7' });
+    expect(grant).toHaveBeenCalledWith(expect.objectContaining({ gameCode: 'ABC', roundId: '7', userId: 'u1', summary: { roundCash: 12, rank: 2, size: 3 } }));
+    expect(emitted).toEqual([{ event: 'classroomEconomy:reward', data: reveal }]);
   });
 
-  it('Given a claim was refused, Then no reveal is emitted for that student', async () => {
-    grant.mockResolvedValue(null);
-    const { io, emits } = fakeIo();
-    await economyGrantChests(io, { gameCode: 'ABC', userIds: ['u1'] });
-    expect(emits).toHaveLength(0);
+  it('Given the round is still running, Then no chest is rolled', async () => {
+    gameState.value = { gameSessionId: 7, cachedResultsPayload: null };
+    classroomGame.value = { players: [{ userId: 'u1' }], teacherId: 't' };
+    const { emitted } = handlerSocket();
+    await handlers['classroomEconomy:requestReward']({ gameCode: 'ABC', roundId: '7' });
+    expect(grant).not.toHaveBeenCalled();
+    expect(emitted).toEqual([{ event: 'classroomEconomy:reward', data: null }]);
   });
 
-  it('Given a live session, Then the chest is keyed by that session id', async () => {
-    grant.mockResolvedValue(null);
-    const { io } = fakeIo();
-    await economyGrantChests(io, { gameCode: 'ABC', userIds: ['u1'] });
-    expect(grant).toHaveBeenCalledWith({ gameCode: 'ABC', roundId: 'sess-7', userId: 'u1' });
+  it('Given a socket that is not a seated player, Then no chest is rolled', async () => {
+    gameState.value = { gameSessionId: 7, cachedResultsPayload: { gameSessionId: 7 } };
+    classroomGame.value = { players: [{ userId: 'someone-else' }], teacherId: 't' };
+    const { emitted } = handlerSocket();
+    await handlers['classroomEconomy:requestReward']({ gameCode: 'ABC', roundId: '7' });
+    expect(grant).not.toHaveBeenCalled();
+    expect(emitted).toEqual([]);
   });
 });
 

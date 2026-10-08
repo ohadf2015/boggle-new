@@ -33,6 +33,7 @@ export const CHEST_XP: Record<ChestRarity, number> = {
 
 export const CLASSROOM_ECONOMY_EVENTS = {
   requestState: 'classroomEconomy:requestState',
+  requestReward: 'classroomEconomy:requestReward',
   buyPowerUp: 'classroomEconomy:buyPowerUp',
   useHint: 'classroomEconomy:useHint',
   setConfig: 'classroomEconomy:setConfig',
@@ -40,7 +41,7 @@ export const CLASSROOM_ECONOMY_EVENTS = {
   board: 'classroomEconomy:board',
   configSaved: 'classroomEconomy:configSaved',
   hint: 'classroomEconomy:hint',
-  chest: 'classroomEconomy:chest',
+  reward: 'classroomEconomy:reward',
   error: 'classroomEconomy:error',
 } as const;
 
@@ -68,4 +69,8 @@ export interface ClassroomChestReveal {
   rarity: ChestRarity;
   xp: number;
   itemId: string;
+  /** Cash the student earned in this round, and where that put them among the round's earners. */
+  roundCash: number;
+  rank: number | null;
+  size: number;
 }

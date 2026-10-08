@@ -58,7 +58,6 @@ import {
   getGameRoom,
 } from '../utils/socketHelpers.js';
 import { persistClassroomGameScores } from './classroomGamePersistence.js';
-import { economyGrantChests } from './classroomEconomyHandler.js';
 import { seatedAuthUserIds } from './classroomSeatedRoster.js';
 import { getAuthUserId } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
@@ -174,11 +173,6 @@ export function registerClassroomGameEndHandlers(io: Server, socket: Socket): vo
 
         // Persist scores to Supabase (S2.5) — F-24: capture per-player rewards
         const rewards = await persistClassroomGameScores(game, verifiedScores);
-
-        const chestUserIds = [...new Set((verifiedScores ?? []).map((s) => s.userId))].filter(
-          (id) => id !== game.teacherId
-        );
-        await economyGrantChests(io, { gameCode: payload.gameCode, userIds: chestUserIds });
 
         io.to(`classroom:${game.classroomId}`).emit('classroomGameEnded', {
           gameCode: payload.gameCode, sessionEnded: true, // the SESSION, not a round

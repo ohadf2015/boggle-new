@@ -9,17 +9,18 @@ import { getAuthUserId } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { getGameState, getRedisClient } from '../redisClient.js';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
-import { CLASSROOM_ECONOMY_EVENTS, type ClassroomChestReveal } from '@/shared/constants/classroomEconomy';
+import { CLASSROOM_ECONOMY_EVENTS } from '@/shared/constants/classroomEconomy';
 import {
   applyCorrectWord,
   applyWrongWord,
   buildBoard,
   buyPowerUpFor,
+  roundSummaryFor,
   toSnapshot,
   spendHintFor,
 } from '../modules/classroomEconomyService.js';
 import { loadConfig, saveEconomyConfig, readEconomy } from '../modules/classroomEconomyStore.js';
-import { grantEndOfGameChest } from '../modules/classroomEconomyChest.js';
+import { grantRoundChest } from '../modules/classroomEconomyChest.js';
 import logger from '../utils/logger.js';
 
 const E = CLASSROOM_ECONOMY_EVENTS;
@@ -89,28 +90,14 @@ export async function economyOnWordRejected(socket: Socket, input: GameRef & { u
   }
 }
 
-/** End of game: one chest per student, each claimed once and sent to that student only. */
-export async function economyGrantChests(
-  io: Server,
-  input: { gameCode: string; userIds: string[] }
-): Promise<void> {
-  const roundId = (await roundOf(input.gameCode)) ?? input.gameCode;
-  for (const userId of input.userIds) {
-    try {
-      const grant = await grantEndOfGameChest({ gameCode: input.gameCode, roundId, userId });
-      if (!grant) continue;
-      const reveal: ClassroomChestReveal = {
-        gameCode: grant.gameCode,
-        roundId: grant.roundId,
-        rarity: grant.rarity,
-        xp: grant.xp,
-        itemId: grant.itemId,
-      };
-      io.to(`user:${userId}`).emit(E.chest, reveal);
-    } catch (err) {
-      logger.error('CLASSROOM_ECONOMY', `Chest grant failed for ${userId}: ${(err as Error).message}`);
-    }
-  }
+/**
+ * The round's chest, asked for by the student's own results screen. Refused
+ * until the server has finished that round (its results payload exists for
+ * exactly that round id), so a chest can never be rolled mid-round.
+ */
+export function roundIsOver(cachedResultsPayload: unknown, roundId: string): boolean {
+  const id = (cachedResultsPayload as { gameSessionId?: unknown } | null | undefined)?.gameSessionId;
+  return id !== undefined && id !== null && String(id) === roundId;
 }
 
 export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): void {
@@ -125,6 +112,22 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
     if (!state) { socket.emit(E.error, { reason: 'unavailable' }); return; }
     socket.emit(E.state, toSnapshot(state, config, null, Date.now()));
     socket.emit(E.board, await buildBoard(gameCode, userId));
+  });
+
+  socket.on(E.requestReward, async (data: { gameCode?: unknown; roundId?: unknown }) => {
+    const userId = getAuthUserId(socket);
+    const gameCode = typeof data?.gameCode === 'string' ? data.gameCode : null;
+    const roundId = typeof data?.roundId === 'string' ? data.roundId : null;
+    if (!userId || !gameCode || !roundId || !checkRateLimit(socket.id)) return;
+    const game = await getGameState(gameCode);
+    if (!game || !roundIsOver((game as { cachedResultsPayload?: unknown }).cachedResultsPayload, roundId)) {
+      socket.emit(E.reward, null);
+      return;
+    }
+    if (!(await isPlayer(gameCode, userId))) return;
+    const summary = await roundSummaryFor(gameCode, roundId, userId);
+    const reveal = await grantRoundChest({ gameCode, roundId, userId, summary });
+    socket.emit(E.reward, reveal);
   });
 
   socket.on(E.buyPowerUp, async (data: { gameCode?: unknown; powerUpId?: unknown }) => {
