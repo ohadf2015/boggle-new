@@ -132,6 +132,9 @@ export function sectionHome({ pathname, locale: explicitLocale, search }: Sectio
   if (segs.length === 2 && segs[1] === 'education') return `/${locale}/education/for-schools`;
   // The landing bounces an approved teacher straight back here, so an error on this page can't return to it.
   if (segs.length === 3 && segs[1] === 'education' && segs[2] === 'classroom-game') return `/${locale}/education/for-schools`;
+  // A deep teacher/student page recovers to that role's hub, which is where its own back button goes.
+  if (segs.length >= 3 && segs[1] === 'teacher') return `/${locale}/teacher`;
+  if (segs.length >= 3 && segs[1] === 'student' && segs[2] !== 'join') return `/${locale}/student`;
   return `/${locale}/education`;
 }
 

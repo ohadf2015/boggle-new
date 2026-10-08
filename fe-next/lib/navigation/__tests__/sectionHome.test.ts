@@ -88,14 +88,15 @@ describe('sectionHome', () => {
     describe('education routes', () => {
       it('returns /locale/education for teacher routes', () => {
         expect(sectionHome({ pathname: '/en/teacher' })).toBe('/en/education');
-        expect(sectionHome({ pathname: '/en/teacher/classroom' })).toBe('/en/education');
-        expect(sectionHome({ pathname: '/en/teacher/classroom/abc/analytics' })).toBe('/en/education');
+        expect(sectionHome({ pathname: '/en/teacher/classroom' })).toBe('/en/teacher');
+        expect(sectionHome({ pathname: '/en/teacher/classroom/abc/analytics' })).toBe('/en/teacher');
       });
 
       it('returns /locale/education for student routes', () => {
         expect(sectionHome({ pathname: '/en/student' })).toBe('/en/education');
         expect(sectionHome({ pathname: '/en/student/join' })).toBe('/en/education');
-        expect(sectionHome({ pathname: '/en/student/achievements' })).toBe('/en/education');
+        expect(sectionHome({ pathname: '/en/student/achievements' })).toBe('/en/student');
+        expect(sectionHome({ pathname: '/en/student/lessons/x' })).toBe('/en/student');
       });
 
       it('returns /locale/education for join routes', () => {
@@ -125,7 +126,7 @@ describe('sectionHome', () => {
         expect(sectionHome({ pathname: '/sv/student' })).toBe('/sv/education');
         expect(sectionHome({ pathname: '/ja/join/X7E4PY' })).toBe('/ja/education');
         expect(sectionHome({ pathname: '/es/classroom' })).toBe('/es/education');
-        expect(sectionHome({ pathname: '/ru/teacher/classroom' })).toBe('/ru/education');
+        expect(sectionHome({ pathname: '/ru/teacher/classroom' })).toBe('/ru/teacher');
       });
     });
 

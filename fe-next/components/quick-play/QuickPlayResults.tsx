@@ -71,6 +71,8 @@ interface QuickPlayResultsProps {
   /** A mode means "start that one now"; undefined means back to the wheel. */
   onNextRound: (mode?: QuickMode) => void;
   onChallenge: () => void;
+  /** Leave the hub from the results screen; omitted = no exit button. */
+  onExit?: () => void;
 }
 
 /**
@@ -103,6 +105,7 @@ export function QuickPlayResults({
   dayStreak = 0,
   onNextRound,
   onChallenge,
+  onExit,
 }: QuickPlayResultsProps) {
   const { t, language } = useLanguage();
   const { user, profile } = useAuth();
@@ -480,6 +483,16 @@ export function QuickPlayResults({
         {t('quickPlay.solo.challengeFriend')}
       </button>
       <p className="text-center text-[10px] text-neo-white/45">{t('quickPlay.solo.challengeHint')}</p>
+      {onExit && (
+        <button
+          type="button"
+          data-testid="quick-results-exit"
+          onClick={onExit}
+          className="flex h-[44px] items-center justify-center rounded-2xl font-neo-display text-sm font-semibold text-neo-white/80"
+        >
+          {t('common.back')}
+        </button>
+      )}
       </div>
 
       {/* Bottom spacer: reserves space for the push-notification prompt that anchors

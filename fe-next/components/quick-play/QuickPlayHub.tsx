@@ -408,6 +408,7 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
         dayStreak={dayStreak}
         onNextRound={handleNextRound}
         onChallenge={handleChallenge}
+        onExit={goBack}
       />
     );
   }
