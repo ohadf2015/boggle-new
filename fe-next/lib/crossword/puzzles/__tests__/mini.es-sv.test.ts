@@ -4,12 +4,14 @@ import { isRealCrossword } from '../../templates';
 import esBank from '../../data/clueBank.es.json';
 import svBank from '../../data/clueBank.sv.json';
 import jaBank from '../../data/clueBank.ja.json';
+import ruBase from '../../data/clueBank.ru.json';
+import ruCurated from '../../data/clueBank.ru.curated.json';
 import { getGameModeRules } from '@/backend/modes/rules';
 import type { PuzzleLocale } from '../../types';
 
-const BANKS = { es: esBank, sv: svBank, ja: jaBank } as Record<string, Record<string, { clue: string }>>;
+const BANKS = { es: esBank, sv: svBank, ja: jaBank, ru: { ...ruBase, ...ruCurated } } as Record<string, Record<string, { clue: string }>>;
 
-describe.each(['es', 'sv', 'ja'] as const)('%s mini pool', (locale) => {
+describe.each(['es', 'sv', 'ja', 'ru'] as const)('%s mini pool', (locale) => {
   const pool = getPool(locale);
 
   const enabled = (getGameModeRules('crossword').languages ?? []).includes(locale);
@@ -79,8 +81,8 @@ describe('crossword locale gate', () => {
     }
   });
 
-  it('a locale with no puzzles of its own (ru) is not enabled for the mode', () => {
-    expect(getPool('ru').every((p) => p.locale !== 'ru')).toBe(true);
-    expect(getGameModeRules('crossword').languages).not.toContain('ru');
+  it('a locale without puzzles of its own is not enabled for the mode', () => {
+    expect(getPool('fr' as PuzzleLocale).every((p) => p.locale !== 'fr')).toBe(true);
+    expect(getGameModeRules('crossword').languages).not.toContain('fr');
   });
 });

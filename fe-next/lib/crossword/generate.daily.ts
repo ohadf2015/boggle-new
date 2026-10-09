@@ -31,10 +31,12 @@ export function dailyDifficulty(dateISO: string): Difficulty {
  * ja → Japanese (kana-folded keys), everything else → en. es fills only because its keys are accent-folded (Spanish crosswords omit
  * grid diacritics; see answer.foldEsAccents). sv keeps å/ä/ö (distinct Swedish letters) and fills
  * with a dense-enough 3-letter pool. All three use the 4×4 mini (their banks are too thin for a
- * doubly-checked 5×5). See the spec.
+ * doubly-checked 5×5). ru has no generator (an English bank would fill English grids), so it is
+ * served from its pool only. See the spec.
  */
 type GenLocale = 'en' | 'he' | 'es' | 'sv' | 'ja';
-function genLocaleFor(locale: PuzzleLocale): GenLocale {
+function genLocaleFor(locale: PuzzleLocale): GenLocale | null {
+  if (locale === 'ru') return null;
   if (locale === 'he' || locale === 'es' || locale === 'sv' || locale === 'ja') return locale;
   return 'en';
 }
@@ -86,8 +88,10 @@ export async function generateDailyPuzzle(
   // has always been — renaming it would silently orphan every in-flight solve on deploy. Only
   // the new format gets a new namespace, which also keeps the two sizes' progress separate.
   const id = format === 'full' ? `${locale}-daily-full-${dateISO}` : `${locale}-daily-${dateISO}`;
+  const gen = genLocaleFor(locale);
+  if (!gen) return format === 'full' ? null : getStaticDaily(dateISO, locale);
   try {
-    clues = await loadClues(genLocaleFor(locale));
+    clues = await loadClues(gen);
   } catch {
     // The full board has no mini-shaped fallback, and quietly serving a 5×5 to someone who asked
     // for the newspaper grid would look like the feature simply doesn't work. Fail loudly instead.
@@ -118,8 +122,10 @@ export async function generateFreeplayPuzzle(
 ): Promise<CrosswordPuzzle | null> {
   let clues: ClueMap;
   const id = format === 'full' ? `${locale}-free-full-${seed}` : `${locale}-free-${seed}`;
+  const gen = genLocaleFor(locale);
+  if (!gen) return format === 'full' ? null : pickFromPool(seed, locale);
   try {
-    clues = await loadClues(genLocaleFor(locale));
+    clues = await loadClues(gen);
   } catch {
     return format === 'full' ? null : pickFromPool(seed, locale);
   }

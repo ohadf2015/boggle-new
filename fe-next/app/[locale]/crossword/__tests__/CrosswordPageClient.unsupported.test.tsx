@@ -10,7 +10,7 @@ vi.mock('@/lib/crossword/generate.daily', () => ({
   generateFreeplayPuzzle: (...a: unknown[]) => generateFreeplay(...a),
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (k: string) => k, language: 'ru', dir: 'ltr' }),
+  useLanguage: () => ({ t: (k: string) => k, language: 'fr', dir: 'ltr' }),
 }));
 vi.mock('next/dynamic', () => ({ default: () => () => null }));
 vi.mock('@/components/tutorial/ModeCoach', () => ({ ModeCoach: () => null }));
@@ -23,8 +23,8 @@ import { CrosswordPageClient } from '../CrosswordPageClient';
 describe('CrosswordPageClient — locale without its own puzzles', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('shows the unavailable state and never generates a puzzle for ru', () => {
-    render(<CrosswordPageClient locale="ru" />);
+  it('shows the unavailable state and never generates a puzzle for fr', () => {
+    render(<CrosswordPageClient locale="fr" />);
     expect(screen.getByText('crossword.unavailable.title')).toBeInTheDocument();
     expect(screen.queryByTestId('loader')).toBeNull();
     expect(generateDaily).not.toHaveBeenCalled();

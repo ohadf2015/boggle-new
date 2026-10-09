@@ -17,8 +17,9 @@ import { buildGrid } from '../../lib/crossword/grid';
 import { buildDictIndex, fillGrid, type FillTemplate } from '../../lib/crossword/generate.core';
 import { isRealCrossword, MINI_TEMPLATES_4 } from '../../lib/crossword/templates';
 import { enumerateFills, selectDistinct, symmetricPatterns, toCandidates, type Template } from './mpPool';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { loadBank } from './loadBank';
 
 const LOCALES = ['es', 'sv', 'ru', 'ja'] as const;
 interface Puzzle { id: string; locale: Locale; difficulty: 'easy'; rtl: false; grid: (string | null)[][]; clues: Record<string, string> }
@@ -93,10 +94,7 @@ async function main() {
   if (!LOCALES.includes(locale)) throw new Error(`usage: build-mini.ts <${LOCALES.join('|')}>`);
 
   const dataDir = join(__dirname, '../../lib/crossword/data');
-  const bank = JSON.parse(readFileSync(join(dataDir, `clueBank.${locale}.json`), 'utf8')) as Record<
-    string,
-    { clue: string; score: number }
-  >;
+  const bank = loadBank(dataDir, locale);
   const safeRead = createSafeReadFile();
   const dict =
     locale === 'es' ? await loadSpanishDictionary(safeRead)

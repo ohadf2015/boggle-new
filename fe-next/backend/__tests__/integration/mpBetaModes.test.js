@@ -239,7 +239,7 @@ describe('MP beta modes (real socket flow)', () => {
       expect(getGame(gameCode).crosswordMpState.players).toEqual([JOINER]);
     });
 
-    it.each(['ru'])('refuses to start in %s (no or too few puzzles) instead of dealing an English grid', async (lang) => {
+    it.each(['fr'])('refuses to start in %s (no puzzles of its own) instead of dealing an English grid', async (lang) => {
       const { host, gameCode } = await lobby(env);
       await host.receiveEvent('startGame', { timerSeconds: 120, language: lang, gameMode: 'crossword' });
       expect(getGame(gameCode).gameState).toBe('waiting');
@@ -256,7 +256,7 @@ describe('MP beta modes (real socket flow)', () => {
       expect(init.puzzle.rtl).toBe(true);
     });
 
-    it.each(['sv', 'ja', 'es'])('starts in %s with a puzzle of that locale', async (lang) => {
+    it.each(['sv', 'ja', 'es', 'ru'])('starts in %s with a puzzle of that locale', async (lang) => {
       const { host, others: [joiner] } = await lobby(env);
       await host.receiveEvent('startGame', { timerSeconds: 120, language: lang, gameMode: 'crossword' });
       const init = lastEvent(joiner, 'crosswordMpInit');

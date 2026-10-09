@@ -327,9 +327,9 @@ describe('LandingChallengeCards — Japanese locale gates', () => {
 });
 
 describe('LandingChallengeCards — crossword only for locales with their own puzzles', () => {
-  it('omits the crossword card for ru even for beta testers', () => {
+  it('omits the crossword card for fr even for beta testers', () => {
     mockIsAdmin.mockReturnValue(true);
-    const { container } = render(<LandingChallengeCards {...baseProps} language="ru" />);
+    const { container } = render(<LandingChallengeCards {...baseProps} language="fr" />);
     expect(container.querySelector('[data-cube-key="crossword"]')).toBeNull();
   });
 
