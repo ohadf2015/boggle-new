@@ -1,145 +1,19 @@
 {
-  "generatedAt": "2026-10-07T16:14:36.343Z",
+  "generatedAt": "2026-10-09T06:43:46.166Z",
   "commits": [
     {
-      "sha": "ac90e7d635884cbd32fcc934b4cb0bf8fce9537d",
-      "shortSha": "ac90e7d",
-      "subject": "Merge fix/mpbotrounds-wheel-rush-flake (approved via company-brain)",
+      "sha": "21bd0c4158d5bf6c492e1e8e30a336422998e34f",
+      "shortSha": "21bd0c4",
+      "subject": "Education: complete Teacher Pro trial->paid lifecycle telemetry + Day-10 expiring touchpoint",
       "author": "Ohad Fisher",
-      "date": "2026-10-07T13:06:47+03:00"
+      "date": "2026-10-09T06:16:11+00:00"
     },
     {
-      "sha": "f71f6115dfd5fb4d01c237d33bd90019024ef9e0",
-      "shortSha": "f71f611",
-      "subject": "fix(mp): wheel-rush hard-bot round-1 flatline (mpBotRounds CI flake)",
-      "author": "Ohad Fisher",
-      "date": "2026-10-07T09:22:23+00:00"
-    },
-    {
-      "sha": "05bc1cb2fcaddd43467d063753c7177bdb8a6f7f",
-      "shortSha": "05bc1cb",
-      "subject": "fix(server): POST without a JSON body → handler 400, not 500 TypeError (#1269)",
+      "sha": "c2b5f0ae40fe7299a332ce1e79b6253a184bda70",
+      "shortSha": "c2b5f0a",
+      "subject": "SEO: daily meta tag improvements (2026-10-09) (#1286)",
       "author": "ohadf2015",
-      "date": "2026-10-07T12:15:28+03:00"
-    },
-    {
-      "sha": "e76181d31b3e04b3e7897fb98579d460f6085f86",
-      "shortSha": "e76181d",
-      "subject": "feat(education): crawler-visible FAQPage on classroom word-games landing (#1265)",
-      "author": "ohadf2015",
-      "date": "2026-10-07T11:30:51+03:00"
-    },
-    {
-      "sha": "8b0e33ce240bba08e29165a7fd82f5c2c02c8b26",
-      "shortSha": "8b0e33c",
-      "subject": "fix(seo): og:image pointed at missing /lexiclash.jpg on 12 routes (#1266)",
-      "author": "ohadf2015",
-      "date": "2026-10-07T11:30:47+03:00"
-    },
-    {
-      "sha": "08fc522298c2be070982951abe333ade04ddecba",
-      "shortSha": "08fc522",
-      "subject": "fix(server): malformed JSON body → 400, not 500 + Sentry (#1267)",
-      "author": "ohadf2015",
-      "date": "2026-10-07T11:30:41+03:00"
-    },
-    {
-      "sha": "221390acac2263c620bde5afe639fca00eef1d25",
-      "shortSha": "221390a",
-      "subject": "fix(word-solver): Hebrew results misspelled without final letters (שלומ → שלום) (#1268)",
-      "author": "ohadf2015",
-      "date": "2026-10-07T11:30:37+03:00"
-    },
-    {
-      "sha": "9c828c6391dbf60b2e29f47e4e8e04fa7f19d3cf",
-      "shortSha": "9c828c6",
-      "subject": "feat(edu): persistent HQ trial countdown + Polar upgrade CTA (#1259)",
-      "author": "ohadf2015",
-      "date": "2026-10-07T11:24:31+03:00"
-    },
-    {
-      "sha": "e6d773217491f8821bdfe9c7b3d0058e82a33d58",
-      "shortSha": "e6d7732",
-      "subject": "fix(memory): stop three unbounded server-side retention paths (#1263)",
-      "author": "ohadf2015",
-      "date": "2026-10-07T10:32:32+03:00"
-    },
-    {
-      "sha": "f1f33070dd88a52e3c22ce1a961464cc02b9e8be",
-      "shortSha": "f1f3307",
-      "subject": "fix(seo): drop sitewide 2024-2099 Daily Challenge Event JSON-LD (#1264)",
-      "author": "ohadf2015",
-      "date": "2026-10-07T10:02:42+03:00"
-    },
-    {
-      "sha": "6bd7671fb11ad5c88e62769e0c3d977ba54dc6d9",
-      "shortSha": "6bd7671",
-      "subject": "fix(analytics): collapse PlayerView + Results game_completed for the same MP round (#1261)",
-      "author": "ohadf2015",
-      "date": "2026-10-07T08:47:44+03:00"
-    },
-    {
-      "sha": "51b9dc83ede8ab68e455f8287acf801a73bb031d",
-      "shortSha": "51b9dc8",
-      "subject": "fix(analytics): emit game_completed for every MP participant on round end (#1260)",
-      "author": "ohadf2015",
-      "date": "2026-10-07T08:13:20+03:00"
-    },
-    {
-      "sha": "68833c79ebd397b30538e42a2a82f175a90a0402",
-      "shortSha": "68833c7",
-      "subject": "fix(analytics): emit first_game_played before game_completed (#1258)",
-      "author": "ohadf2015",
-      "date": "2026-10-06T20:01:59+03:00"
-    },
-    {
-      "sha": "e4184edd9f55cb406bf6c88e9339d78fe31be14e",
-      "shortSha": "e4184ed",
-      "subject": "feat(edu): mirror teacher activation funnel to Growth Radar (#1257)",
-      "author": "ohadf2015",
-      "date": "2026-10-06T15:39:47+03:00"
-    },
-    {
-      "sha": "cae299fa8d6f9e672aacce15dd741a8d67d69206",
-      "shortSha": "cae299f",
-      "subject": "perf(mascot): shrink winner.webp 148KB -> 44KB (192x192x51f -> 160x160x17f) (#1256)",
-      "author": "ohadf2015",
-      "date": "2026-10-06T13:19:06+03:00"
-    },
-    {
-      "sha": "41e9256c2570290120f3ad17ea8ed64f4f0a939c",
-      "shortSha": "41e9256",
-      "subject": "fix(word-solver): 400 instead of 500 for null/non-object JSON body (#1255)",
-      "author": "ohadf2015",
-      "date": "2026-10-06T11:59:03+03:00"
-    },
-    {
-      "sha": "421753fb3f92d2c9098d8b44a9d2ef879702b828",
-      "shortSha": "421753f",
-      "subject": "fix(edu): locale-aware Polar checkout success_url (#1253)",
-      "author": "ohadf2015",
-      "date": "2026-10-06T11:31:07+03:00"
-    },
-    {
-      "sha": "8ea2b42f632f2371a34d7b5f85ceb754242862db",
-      "shortSha": "8ea2b42",
-      "subject": "agy: Instrument the LexiClash teacher-access gate with Growth Radar telemet (#1254)",
-      "author": "ohadf2015",
-      "date": "2026-10-06T11:31:02+03:00"
-    },
-    {
-      "sha": "424620891b5016ea382d4c56d03d983b7ce38a1d",
-      "shortSha": "4246208",
-      "subject": "feat(seo): trim 6 over-length meta descriptions + multiplayer title (2026-10-06) (#1250)",
-      "author": "ohadf2015",
-      "date": "2026-10-06T10:33:03+03:00"
-    },
-    {
-      "sha": "fc5331f02bd1dfed810510188a221e46cd75380b",
-      "shortSha": "fc5331f",
-      "subject": "feat(edu): unify school pricing at $49/teacher/year + GTM events (#1251)",
-      "author": "ohadf2015",
-      "date": "2026-10-06T09:52:43+03:00"
+      "date": "2026-10-09T09:01:40+03:00"
     }
   ]
 }
