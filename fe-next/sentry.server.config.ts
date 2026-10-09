@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
+import { sentryRelease } from "./lib/sentry/release";
 
 const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
 
@@ -14,11 +15,8 @@ Sentry.init({
   // Performance monitoring sample rate
   tracesSampleRate: 0.1,
 
-  // Release tracking
-  release:
-    process.env.SENTRY_RELEASE ||
-    process.env.NEXT_PUBLIC_SENTRY_RELEASE ||
-    undefined,
+  // Release tracking (Railway SHA at runtime; Vercel/explicit env as fallback)
+  release: sentryRelease(),
 
   // Ignore expected/handled errors
   ignoreErrors: [

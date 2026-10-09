@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
+import { sentryRelease } from "./lib/sentry/release";
 
 const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
 
@@ -12,11 +13,7 @@ Sentry.init({
 
   tracesSampleRate: isProduction ? 0.1 : 1.0,
 
-  release:
-    process.env.SENTRY_RELEASE ||
-    process.env.NEXT_PUBLIC_SENTRY_RELEASE ||
-    process.env.VERCEL_GIT_COMMIT_SHA ||
-    undefined,
+  release: sentryRelease(),
 
   beforeSend(event) {
     const error = event.exception?.values?.[0];
