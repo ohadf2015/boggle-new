@@ -84,6 +84,6 @@ describe('Teacher HQ first visit — walkthrough never blocks GO LIVE', () => {
 
   it('does not hold the Pro welcome hostage to a walkthrough the teacher never opened', () => {
     expect(src).not.toMatch(/onboardingClear\s*&&\s*\(\s*<ProWelcomeCelebration/);
-    expect(src).toMatch(/!walkthroughOpen\s*&&\s*\(\s*<ProWelcomeCelebration/);
+    expect(src).toMatch(/!walkthroughOpen\s*&&\s*\(\s*<TeacherHqWelcome/);
   });
 });

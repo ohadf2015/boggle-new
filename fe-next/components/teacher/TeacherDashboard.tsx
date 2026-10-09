@@ -28,8 +28,9 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import { AssignmentCreator } from './assignments';
 import { TeacherStatusRow } from './dashboard/TeacherStatusRow';
 import { TeacherTrialUpgradeStatus } from './TeacherTrialUpgradeStatus';
-import { ProWelcomeCelebration } from './ProWelcomeCelebration';
+import { TeacherHqWelcome } from './TeacherHqWelcome';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { polarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import {
@@ -85,7 +86,6 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
   const [proOpen, setProOpen] = useState(false);
   const [projectorOpen, setProjectorOpen] = useState(false);
   const [newlyCreatedJoinCode, setNewlyCreatedJoinCode] = useState<string | null>(null);
-  // Only ONE fixed overlay at a time: the Pro welcome stands down while the teacher has the walkthrough open.
   const [walkthroughOpen, setWalkthroughOpen] = useState(false);
   const {
     classrooms,
@@ -99,12 +99,19 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
     loading: proLoading,
     hasPro,
     source: proSource,
+    status: proStatus,
+    trialExpires,
+    periodEnd,
     refresh: refreshPro,
   } = useTeacherPro();
-  // Back from Polar checkout: the webhook can land seconds after the redirect —
-  // keep re-reading rather than greet a teacher who just paid with "Upgrade".
   const searchParams = useSearchParams();
   const checkoutSuccess = searchParams?.get('checkout') === 'success';
+  const welcomeKind = polarCheckoutWelcomeKind({
+    checkoutSuccess,
+    hasPro,
+    source: proSource,
+    status: proStatus ?? 'active',
+  });
   // "Start game" on a Classes card lands here with its class preselected.
   const requestedClassroomId = searchParams?.get('classroomId') ?? null;
   // One-shot: drop ?assign=1 once read so a refresh doesn't reopen the creator.
@@ -251,9 +258,10 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
       contentClassName="relative [@media(min-height:501px)]:[html.has-cookie-consent_&]:pb-0!"
     >
       {!proLoading && !walkthroughOpen && (
-        <ProWelcomeCelebration
+        <TeacherHqWelcome
+          welcomeKind={welcomeKind}
           grant={proGrant}
-          paid={checkoutSuccess && hasPro && proSource === 'polar'}
+          trialExpires={trialExpires ?? periodEnd}
         />
       )}
 

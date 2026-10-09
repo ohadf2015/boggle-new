@@ -87,4 +87,19 @@ describe('<TeacherDashboard> after Polar checkout', () => {
     expect(screen.getByTestId('teacher-plan-badge')).toHaveAttribute('data-plan', 'pro');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
+
+  it('shows days remaining + upgrade CTA after a Polar trial checkout, not the paid celebration', () => {
+    const trialExpires = new Date(Date.now() + 14 * 86400000).toISOString();
+    proState = {
+      ...PAID,
+      status: 'trialing',
+      trialExpires,
+      periodEnd: trialExpires,
+      refresh: vi.fn(),
+    };
+    render(<TeacherDashboard />);
+    expect(screen.getByTestId('teacher-trial-welcome')).toBeInTheDocument();
+    expect(screen.getByTestId('teacher-trial-welcome-upgrade')).toBeInTheDocument();
+    expect(screen.queryByText('teacher.proWelcome.paidBody')).not.toBeInTheDocument();
+  });
 });
