@@ -90,7 +90,7 @@ export function TeacherProTrialExpiringBanner({
     onDismiss?.();
   }, [onDismiss]);
 
-  if (!isExpiring || isDismissed) {
+  if (daysRemaining === null || !isExpiring || isDismissed) {
     return null;
   }
 

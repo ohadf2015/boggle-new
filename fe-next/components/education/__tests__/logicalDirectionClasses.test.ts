@@ -53,6 +53,10 @@ const ALLOWLIST: Record<string, { tokens: string[]; why: string }> = {
     tokens: ['text-right'],
     why: 'applied only inside isRTL && "rtl text-right"',
   },
+  'teacher/TeacherTrialWelcome.tsx': {
+    tokens: ['text-right'],
+    why: 'applied only inside isRTL && "rtl text-right"',
+  },
 };
 
 /**
