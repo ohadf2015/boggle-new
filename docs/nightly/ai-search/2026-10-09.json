@@ -1,0 +1,288 @@
+{
+  "date": "2026-10-09",
+  "site": "https://lexiclash.live/",
+  "source": "bing-wmt-ai-performance",
+  "totals": {
+    "total_citations": 9000,
+    "avg_cited_pages": 12
+  },
+  "grounding_queries": [
+    {
+      "query": "boggle wordshake",
+      "intent": "Learn and Solve",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 522,
+      "citation_share": 28.7
+    },
+    {
+      "query": "daily word wheel",
+      "intent": "Informational",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 477,
+      "citation_share": 36.95
+    },
+    {
+      "query": "wordplay boggle shake",
+      "intent": "Learn and Solve",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 385,
+      "citation_share": 30.48
+    },
+    {
+      "query": "word wheel daily record",
+      "intent": "Informational",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 340,
+      "citation_share": 31.25
+    },
+    {
+      "query": "play scrabble not on pogo",
+      "intent": "Learn and Solve",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 339,
+      "citation_share": 21.87
+    },
+    {
+      "query": "jugar al scrabble online sin registrarse",
+      "intent": "Media",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 260,
+      "citation_share": 28.57
+    },
+    {
+      "query": "word shake boggle",
+      "intent": "Media",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 234,
+      "citation_share": 10.8
+    },
+    {
+      "query": "play words with friends online free",
+      "intent": "Media",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 200,
+      "citation_share": 22.81
+    },
+    {
+      "query": "play words with friends online",
+      "intent": "Media",
+      "topic": "Multiplayer & Co-op Games",
+      "citations": 171,
+      "citation_share": 4.09
+    },
+    {
+      "query": "word with friends online free",
+      "intent": "Informational",
+      "topic": "Gaming",
+      "citations": 162,
+      "citation_share": 27.09
+    },
+    {
+      "query": "free word wheel games",
+      "intent": "Media",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 154,
+      "citation_share": 14.82
+    },
+    {
+      "query": "words with friends multiplayer free online",
+      "intent": "Media",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 150,
+      "citation_share": 19.46
+    },
+    {
+      "query": "scrabble på svenska",
+      "intent": "Informational",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 111,
+      "citation_share": 12
+    },
+    {
+      "query": "games word",
+      "intent": "Media",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 104,
+      "citation_share": 13.89
+    },
+    {
+      "query": "facebook gameroom word with friends free online games no downloads required",
+      "intent": "Media",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 93,
+      "citation_share": 22.3
+    },
+    {
+      "query": "word blast",
+      "intent": "Media",
+      "topic": "Gaming",
+      "citations": 84,
+      "citation_share": 30.77
+    },
+    {
+      "query": "platforms with widest variety of free word games",
+      "intent": "Informational",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 78,
+      "citation_share": 19.07
+    },
+    {
+      "query": "platforms widest variety free word games",
+      "intent": "Informational",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 76,
+      "citation_share": 23.82
+    },
+    {
+      "query": "free spelling word games",
+      "intent": "Media",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 69,
+      "citation_share": 16.95
+    },
+    {
+      "query": "best free browser word games multiplayer leaderboards progress tracking",
+      "intent": "Media",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 69,
+      "citation_share": 56.1
+    },
+    {
+      "query": "irregular verbs games",
+      "intent": "Media",
+      "topic": "Grammar & Language Structure",
+      "citations": 68,
+      "citation_share": 21.79
+    },
+    {
+      "query": "sight word games online",
+      "intent": "Media",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 68,
+      "citation_share": 19.54
+    },
+    {
+      "query": "site word games",
+      "intent": "Media",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 66,
+      "citation_share": 16.92
+    },
+    {
+      "query": "irregular verbs game",
+      "intent": "Media",
+      "topic": "Grammar & Language Structure",
+      "citations": 60,
+      "citation_share": 20.13
+    },
+    {
+      "query": "sight word matching game",
+      "intent": "Media",
+      "topic": "Puzzle & Strategy Games",
+      "citations": 50,
+      "citation_share": 20.41
+    }
+  ],
+  "cited_pages": [
+    {
+      "url": "https://www.lexiclash.live/en/best-online-word-games",
+      "citations": 1400
+    },
+    {
+      "url": "https://www.lexiclash.live/en/boggle-word-shake-free",
+      "citations": 1200
+    },
+    {
+      "url": "https://www.lexiclash.live/en/daily-word-wheel",
+      "citations": 1100
+    },
+    {
+      "url": "https://www.lexiclash.live/en/online-word-games-with-friends",
+      "citations": 810
+    },
+    {
+      "url": "https://www.lexiclash.live/en",
+      "citations": 542
+    },
+    {
+      "url": "https://www.lexiclash.live/es/juego-de-palabras-multijugador",
+      "citations": 416
+    },
+    {
+      "url": "https://www.lexiclash.live/en/scrabble-alternative-online",
+      "citations": 366
+    },
+    {
+      "url": "https://www.lexiclash.live/en/education/sight-words-practice",
+      "citations": 353
+    },
+    {
+      "url": "https://www.lexiclash.live/en/leaderboard",
+      "citations": 276
+    },
+    {
+      "url": "https://www.lexiclash.live/en/online-word-games-with-friends?_lc_chunk=1789344024329",
+      "citations": 172
+    },
+    {
+      "url": "https://www.lexiclash.live/en/competitive-word-games",
+      "citations": 170
+    },
+    {
+      "url": "https://www.lexiclash.live/en/blog/most-popular-word-games-2026",
+      "citations": 150
+    },
+    {
+      "url": "https://www.lexiclash.live/en/education/irregular-verbs-games",
+      "citations": 140
+    },
+    {
+      "url": "https://www.lexiclash.live/sv/swedish-multiplayer-word-game",
+      "citations": 119
+    },
+    {
+      "url": "https://www.lexiclash.live/es/education/irregular-verbs-games",
+      "citations": 113
+    },
+    {
+      "url": "https://www.lexiclash.live/ru",
+      "citations": 105
+    },
+    {
+      "url": "https://www.lexiclash.live/en/word-blast-game",
+      "citations": 80
+    },
+    {
+      "url": "https://www.lexiclash.live/en/multiplayer",
+      "citations": 59
+    },
+    {
+      "url": "https://www.lexiclash.live/es",
+      "citations": 58
+    },
+    {
+      "url": "https://www.lexiclash.live/en/anagram/smart",
+      "citations": 54
+    },
+    {
+      "url": "https://www.lexiclash.live/en/anagram",
+      "citations": 51
+    },
+    {
+      "url": "https://www.lexiclash.live/ja/education/esl-word-games",
+      "citations": 50
+    },
+    {
+      "url": "https://www.lexiclash.live/en/blog/multiplayer-strategy-guide",
+      "citations": 43
+    },
+    {
+      "url": "https://www.lexiclash.live/en/daily",
+      "citations": 43
+    },
+    {
+      "url": "https://www.lexiclash.live/es/daily-word-wheel",
+      "citations": 43
+    }
+  ]
+}
