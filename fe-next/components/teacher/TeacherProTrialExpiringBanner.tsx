@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
+import { polarTrialDaysLeft, polarTrialExpiring } from '@/lib/education/polarTrial';
 import posthog from '@/lib/analytics/lazyPosthog';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
@@ -25,7 +25,7 @@ interface TeacherProTrialExpiringBannerProps {
 /**
  * Trial-expiring conversion surface for Teacher HQ.
  *
- * Shown when Teacher Pro trial has <= 3 days remaining.
+ * Shown from Day-10 of the 14-day trial — `trial_days_remaining <= 4`.
  * Highlights days left and features lost without Pro.
  * Primary CTA goes DIRECTLY to paid checkout (POST /api/subscription/checkout
  * without the trial flag), landing in Polar checkout in one click.
@@ -45,7 +45,7 @@ export function TeacherProTrialExpiringBanner({
   const shownRef = useRef(false);
 
   const daysRemaining = polarTrialDaysLeft(trialExpires, nowMs);
-  const isExpiring = daysRemaining !== null && daysRemaining <= 3;
+  const isExpiring = polarTrialExpiring(daysRemaining);
 
   useEffect(() => {
     if (!isExpiring || isDismissed) return;
@@ -90,7 +90,9 @@ export function TeacherProTrialExpiringBanner({
     onDismiss?.();
   }, [onDismiss]);
 
-  if (!isExpiring || isDismissed) {
+  // daysRemaining === null is already covered by polarTrialExpiring; the
+  // explicit guard restores the narrowing the inline check used to provide.
+  if (!isExpiring || isDismissed || daysRemaining === null) {
     return null;
   }
 

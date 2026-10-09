@@ -78,6 +78,33 @@ export function buildPaidEvent(userId: string, subscriptionId: string): EduServe
   };
 }
 
+/**
+ * Teacher-facing trial-funnel start — Polar opened the 14-day trial
+ * (webhook status `trialing`, teacher row upserted). Pairs with
+ * `teacher_trial_converted`; dashboards count the pair distinct on
+ * `subscription_id` because Polar redelivers webhook events.
+ */
+export function buildTeacherTrialStartedEvent(userId: string, subscriptionId: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'teacher_trial_started',
+    properties: { ...BASE, subscription_id: subscriptionId, trial_days_remaining: 14 },
+  };
+}
+
+/**
+ * Teacher-facing trial-funnel conversion — `subscription.activation` for the
+ * Pro product while NOT trialing: the trial's first paid charge (or a
+ * straight paid checkout) landed.
+ */
+export function buildTeacherTrialConvertedEvent(userId: string, subscriptionId: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'teacher_trial_converted',
+    properties: { ...BASE, subscription_id: subscriptionId },
+  };
+}
+
 /** Day-10 Polar trial expiry email actually sent. */
 export function buildPolarTrialDay10SentEvent(userId: string, daysLeft: number): EduServerEvent {
   return {

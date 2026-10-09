@@ -74,3 +74,15 @@ export function polarTrialDaysLeft(iso: string | null | undefined, nowMs: number
 export function polarTrialChipUpgrade(daysLeft: number | null): boolean {
   return daysLeft !== null && daysLeft <= 3;
 }
+
+/**
+ * Day-10 of the 14-day Polar trial: the HQ 'trial expiring' banner takes over
+ * from the calm lifecycle banner. One constant so the page and the banner
+ * cannot drift apart on when the urgent treatment starts.
+ */
+export const POLAR_TRIAL_EXPIRING_DAYS = 4;
+
+/** HQ 'trial expiring' banner window — Day-10 onward (<= 4 days remaining). */
+export function polarTrialExpiring(daysLeft: number | null): boolean {
+  return daysLeft !== null && daysLeft <= POLAR_TRIAL_EXPIRING_DAYS;
+}

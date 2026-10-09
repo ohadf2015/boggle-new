@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { polarTrialDaysLeft, polarTrialExpires, polarTrialUx, polarTrialChipUpgrade } from '../polarTrial';
+import { polarTrialDaysLeft, polarTrialExpires, polarTrialUx, polarTrialChipUpgrade, polarTrialExpiring, POLAR_TRIAL_EXPIRING_DAYS } from '../polarTrial';
 
 const END = '2026-10-08T00:00:00.000Z';
 
@@ -65,5 +65,17 @@ describe('polarTrialChipUpgrade', () => {
     expect(polarTrialChipUpgrade(0)).toBe(true);
     expect(polarTrialChipUpgrade(4)).toBe(false);
     expect(polarTrialChipUpgrade(null)).toBe(false);
+  });
+});
+
+describe('polarTrialExpiring', () => {
+  it('opens the HQ expiring banner at Day-10 (4 days left) through the end', () => {
+    expect(POLAR_TRIAL_EXPIRING_DAYS).toBe(4);
+    expect(polarTrialExpiring(4)).toBe(true);
+    expect(polarTrialExpiring(3)).toBe(true);
+    expect(polarTrialExpiring(0)).toBe(true);
+    expect(polarTrialExpiring(5)).toBe(false);
+    expect(polarTrialExpiring(14)).toBe(false);
+    expect(polarTrialExpiring(null)).toBe(false);
   });
 });

@@ -19,7 +19,7 @@ import { useTeacherTrialOffer } from '@/hooks/useTeacherTrialOffer';
 import { useTeacherUsagePrompt } from '@/hooks/useTeacherUsagePrompt';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { pickTeacherBanner } from '@/lib/education/teacherBannerPriority';
-import { polarTrialUx, polarTrialDaysLeft } from '@/lib/education/polarTrial';
+import { polarTrialUx, polarTrialDaysLeft, polarTrialExpiring } from '@/lib/education/polarTrial';
 import { isTrialUpgradeNudgeWindow } from '@/lib/education/trial';
 import { useTrialUpgradeNudge } from '@/lib/education/useTrialUpgradeNudge';
 import {
@@ -132,7 +132,9 @@ function TeacherDashboardInner() {
   // Capture once — react-hooks/purity treats Date.now() during render as impure.
   const [nowMs] = useState(() => Date.now());
   const trialDaysLeft = polarTrialDaysLeft(trialExpires ?? periodEnd, nowMs);
-  const isTrialExpiring = trialDaysLeft !== null && trialDaysLeft <= 3;
+  // Day-10 (<= 4 days left): the pink 'trial expiring' banner replaces the
+  // calm lifecycle banner and keeps the HQ upgrade strip suppressed.
+  const isTrialExpiring = polarTrialExpiring(trialDaysLeft);
 
   return (
     <TeacherDashboard
