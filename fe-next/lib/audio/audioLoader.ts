@@ -49,16 +49,18 @@ export async function ensureHowl(): Promise<(typeof import('howler'))['Howl']> {
  */
 function patchHowlerRemoveEventListenerRace(): void {
   if (typeof window === 'undefined') return;
-  const origRemove = HTMLAudioElement.prototype.removeEventListener;
-  HTMLAudioElement.prototype.removeEventListener = function (
+  const proto = HTMLAudioElement.prototype;
+  const parent = Object.getPrototypeOf(proto) as HTMLMediaElement;
+  // Resolve the inherited method per call: Sentry loads after howler and wraps add/remove on EventTarget; a captured native remove never matches its wrapped listeners, so Howler's self-removing canplaythrough/ended handlers fire forever.
+  proto.removeEventListener = function (
     this: HTMLAudioElement,
     type: string,
     listener: EventListenerOrEventListenerObject | null,
     options?: boolean | EventListenerOptions
   ) {
     if (listener == null || typeof listener === 'number') return;
-    return origRemove.call(this, type, listener, options);
-  } as typeof origRemove;
+    return parent.removeEventListener.call(this, type, listener, options);
+  } as typeof proto.removeEventListener;
 }
 
 /**
