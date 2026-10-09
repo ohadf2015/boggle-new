@@ -74,6 +74,9 @@ vi.mock('@/components/teacher/reports/StudentArcView', () => ({
 vi.mock('@/components/teacher/reports/AssignmentProgressReport', () => ({
   AssignmentProgressReport: () => <div data-testid="assignment-report" />,
 }));
+vi.mock('@/components/teacher/reports/ClassAssignmentGrid', () => ({
+  ClassAssignmentGrid: () => <div data-testid="class-assignment-grid" />,
+}));
 vi.mock('@/components/teacher/reports/AssignmentCompletionReport', () => ({
   AssignmentCompletionReport: () => <div data-testid="assignment-completion-report" />,
 }));
@@ -104,6 +107,14 @@ describe('<TeacherReportsPage> class view — summary first, detail on demand', 
     const heading = screen.getByRole('heading', { level: 1 });
     expect(heading).toHaveTextContent('Band 2');
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
+
+  it('shows the class assignment grid on the open page, outside the folded sections', () => {
+    render(<TeacherReportsPage />);
+    const grid = screen.getByTestId('class-assignment-grid');
+    expect(grid.closest('details')).toBeNull();
+    const mastery = screen.getByTestId('word-mastery-report');
+    expect(mastery.compareDocumentPosition(grid) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('leads with the word mastery report, above the arc', () => {

@@ -48,6 +48,8 @@ import {
   isTestAccountEmail,
   trackEduLiveGameStarted,
   trackEduReportsViewed,
+  trackProgressReportViewed,
+  trackWeeklySummaryCopied,
   trackEduJoinCodeShown,
   trackEduJoinCodeCopied,
   trackEduFirstStudentJoined,
@@ -350,6 +352,18 @@ describe('education telemetry', () => {
       source: 'create_room',
       lesson_count: 2,
     });
+  });
+
+  it('class progress events carry class_id and stay on PostHog', () => {
+    trackProgressReportViewed('cls-1');
+    expect(captureMock).toHaveBeenCalledWith('progress_report_viewed', { class_id: 'cls-1' });
+    trackWeeklySummaryCopied('cls-1');
+    expect(captureMock).toHaveBeenLastCalledWith('weekly_summary_copied', { class_id: 'cls-1' });
+    expect(growthMock).not.toHaveBeenCalled();
+    captureMock.mockClear();
+    trackProgressReportViewed('');
+    trackWeeklySummaryCopied('');
+    expect(captureMock).not.toHaveBeenCalled();
   });
 
   it('reports viewed fires with optional classroom scope', () => {

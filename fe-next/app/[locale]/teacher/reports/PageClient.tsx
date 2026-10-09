@@ -21,6 +21,7 @@ import { ClassArcPanel } from '@/components/teacher/reports/ClassArcPanel';
 import { StudentArcView } from '@/components/teacher/reports/StudentArcView';
 import { AssignmentCompletionReport } from '@/components/teacher/reports/AssignmentCompletionReport';
 import { AssignmentProgressReport } from '@/components/teacher/reports/AssignmentProgressReport';
+import { ClassAssignmentGrid } from '@/components/teacher/reports/ClassAssignmentGrid';
 import { GoogleClassroomGradePassback } from '@/components/teacher/reports/GoogleClassroomGradePassback';
 import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
 import { EducationShell } from '@/components/education/shell/EducationShell';
@@ -281,6 +282,10 @@ function TeacherReportsInner() {
           classroomName={selectedClassroom?.name ?? ''}
           onStudentClick={handleStudentClick}
         />
+        <ClassAssignmentGrid
+          classroomId={selectedClassroomId}
+          classroomName={selectedClassroom?.name ?? ''}
+        />
         <div className="space-y-3">
           <SectionDisclosure section="assignments">
             <AssignmentCompletionReport classroomId={selectedClassroomId} />
@@ -351,9 +356,10 @@ function TeacherReportsInner() {
   );
 }
 
-// Last-lesson digest and assignment progress are free (CSV export is Pro).
-// Full class/student analytics reports stay behind ProGate, mounted inside Inner
-// so a free teacher still gets the picker + digest + assignment table + Teacher Pro CTA.
+// Last-lesson digest, assignment progress, and the class assignment grid are
+// free (CSV export is Pro). Full class/student analytics reports stay behind
+// ProGate, mounted inside Inner so a free teacher still gets the picker +
+// digest + assignment grid + Teacher Pro nudge.
 export default function TeacherReportsPage() {
   return (
     <ReportsShell>

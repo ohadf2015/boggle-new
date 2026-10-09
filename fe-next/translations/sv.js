@@ -14915,6 +14915,22 @@ const sv = {
         "untitled": "Namnlös lektion",
         "anonymousStudent": "Elev {{id}}"
       },
+      "classGrid": {
+        "title": "Klassens framsteg",
+        "empty": "Inga elever eller uppgifter i den här klassen ännu",
+        "statusCompleted": "Klar",
+        "statusMissing": "Saknas",
+        "copySummary": "Kopiera veckosammanfattning",
+        "copied": "Kopierad",
+        "copyFailed": "Det gick inte att kopiera. Markera sammanfattningen och kopiera den själv.",
+        "proNudge": "Pro: schemalagda veckorapporter via e-post",
+        "summaryDue": "Uppgifter att lämna in",
+        "summaryCompleted": "Klara",
+        "summaryTopWords": "Vanligaste orden",
+        "summaryAttention": "Behöver uppmärksamhet",
+        "summaryNone": "inga",
+        "summaryMissing": "{{name}} ({{count}} saknas)"
+      },
       "assignmentCompletion": {
         "title": "Inlämning av uppgifter",
         "submitted": "{{submitted}} / {{roster}} inlämnade",

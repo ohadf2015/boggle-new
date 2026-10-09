@@ -12957,6 +12957,22 @@ const en = {
         "untitled": "Untitled lesson",
         "anonymousStudent": "Student {{id}}"
       },
+      "classGrid": {
+        "title": "Class progress",
+        "empty": "No students or assignments in this class yet",
+        "statusCompleted": "Completed",
+        "statusMissing": "Missing",
+        "copySummary": "Copy weekly summary",
+        "copied": "Copied",
+        "copyFailed": "Couldn't copy. Select the summary and copy it yourself.",
+        "proNudge": "Pro: scheduled weekly email reports",
+        "summaryDue": "Assignments due",
+        "summaryCompleted": "Completed",
+        "summaryTopWords": "Top words",
+        "summaryAttention": "Needs attention",
+        "summaryNone": "none",
+        "summaryMissing": "{{name}} ({{count}} missing)"
+      },
       "assignmentCompletion": {
         "title": "Assignment completion",
         "submitted": "{{submitted}} / {{roster}} submitted",

@@ -467,6 +467,18 @@ export function trackEduReportsViewed(args: EduReportsViewedArgs = {}): void {
   safeCapture('edu_reports_viewed', props);
 }
 
+/** Class assignment grid opened. Property is `class_id`. */
+export function trackProgressReportViewed(classId: string): void {
+  if (!classId) return;
+  safeCapture('progress_report_viewed', { class_id: classId });
+}
+
+/** Teacher copied the weekly summary text. Same property as the view event. */
+export function trackWeeklySummaryCopied(classId: string): void {
+  if (!classId) return;
+  safeCapture('weekly_summary_copied', { class_id: classId });
+}
+
 export interface EduFirstAssignmentCtaArgs {
   classroomId: string;
 }

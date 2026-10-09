@@ -64,6 +64,12 @@ vi.mock('@/components/teacher/reports/AssignmentProgressReport', () => ({
   ),
 }));
 
+vi.mock('@/components/teacher/reports/ClassAssignmentGrid', () => ({
+  ClassAssignmentGrid: ({ classroomId }: { classroomId: string }) => (
+    <div data-testid="class-assignment-grid" data-classroom-id={classroomId} />
+  ),
+}));
+
 vi.mock('@/components/teacher/reports/AssignmentCompletionReport', () => ({
   AssignmentCompletionReport: ({ classroomId }: { classroomId: string }) => (
     <div data-testid="assignment-completion-report" data-classroom-id={classroomId} />
@@ -253,6 +259,7 @@ describe('ReportsPageClient', () => {
 
       expect(screen.getByTestId('progress-digest-dashboard')).toBeInTheDocument();
       expect(screen.getByTestId('assignment-progress-report')).toBeInTheDocument();
+      expect(screen.getByTestId('class-assignment-grid')).toBeInTheDocument();
       expect(screen.getByTestId('pro-gate-preview')).toBeInTheDocument();
       expect(screen.queryByTestId('class-progress-report')).not.toBeInTheDocument();
     });

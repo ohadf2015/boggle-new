@@ -79,6 +79,9 @@ vi.mock('@/components/teacher/reports/StudentArcView', () => ({
 vi.mock('@/components/teacher/reports/AssignmentProgressReport', () => ({
   AssignmentProgressReport: () => <div data-testid="assignment-report" />,
 }));
+vi.mock('@/components/teacher/reports/ClassAssignmentGrid', () => ({
+  ClassAssignmentGrid: () => <div data-testid="class-assignment-grid" />,
+}));
 vi.mock('@/components/teacher/reports/AssignmentCompletionReport', () => ({
   AssignmentCompletionReport: () => <div data-testid="assignment-completion-report" />,
 }));

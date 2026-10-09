@@ -14673,6 +14673,22 @@ const ja = {
         "untitled": "無題のレッスン",
         "anonymousStudent": "生徒 {{id}}"
       },
+      "classGrid": {
+        "title": "クラスの進捗",
+        "empty": "このクラスにはまだ生徒も課題もありません",
+        "statusCompleted": "完了",
+        "statusMissing": "未提出",
+        "copySummary": "週次まとめをコピー",
+        "copied": "コピーしました",
+        "copyFailed": "コピーできませんでした。まとめを選択してコピーしてください。",
+        "proNudge": "Pro: 毎週のメールレポート",
+        "summaryDue": "提出課題",
+        "summaryCompleted": "完了",
+        "summaryTopWords": "注目の単語",
+        "summaryAttention": "フォローが必要",
+        "summaryNone": "なし",
+        "summaryMissing": "{{name}}（{{count}} 未提出）"
+      },
       "assignmentCompletion": {
         "title": "課題の提出状況",
         "submitted": "{{submitted}} / {{roster}} 提出",

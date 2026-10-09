@@ -14528,6 +14528,22 @@ const he = {
         "untitled": "שיעור ללא שם",
         "anonymousStudent": "תלמיד {{id}}"
       },
+      "classGrid": {
+        "title": "התקדמות הכיתה",
+        "empty": "אין עדיין תלמידים או משימות בכיתה הזו",
+        "statusCompleted": "הושלם",
+        "statusMissing": "חסר",
+        "copySummary": "העתקת סיכום שבועי",
+        "copied": "הועתק",
+        "copyFailed": "לא הצלחנו להעתיק. סמנו את הסיכום והעתיקו ידנית.",
+        "proNudge": "פרו: דוחות שבועיים באימייל",
+        "summaryDue": "משימות להגשה",
+        "summaryCompleted": "הושלמו",
+        "summaryTopWords": "מילים מובילות",
+        "summaryAttention": "צריך תשומת לב",
+        "summaryNone": "אין",
+        "summaryMissing": "{{name}} ({{count}} חסר)"
+      },
       "assignmentCompletion": {
         "title": "השלמת משימות",
         "submitted": "{{submitted}} / {{roster}} הוגשו",
