@@ -40,8 +40,8 @@ describe('BattleModeCard — MP mode list (Ohad 2026-09-27)', () => {
     expect(screen.queryByTestId('game-mode-crossword')).not.toBeInTheDocument();
   });
 
-  it('offers crossword in Japanese rooms', () => {
-    render(<BattleModeCard {...baseProps} showInWorkModes language="ja" />);
+  it.each(['ja', 'es'])('offers crossword in %s rooms', (language) => {
+    render(<BattleModeCard {...baseProps} showInWorkModes language={language} />);
     expect(screen.getByTestId('game-mode-crossword')).toBeInTheDocument();
   });
 

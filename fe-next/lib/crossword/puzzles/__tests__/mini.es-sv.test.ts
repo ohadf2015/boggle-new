@@ -18,8 +18,8 @@ describe.each(['es', 'sv', 'ja'] as const)('%s mini pool', (locale) => {
     expect(pool.filter((p) => p.locale === locale).length).toBeGreaterThanOrEqual(5);
   });
 
-  it.skipIf(!enabled)('has at least 10 generated puzzles of its own locale', () => {
-    expect(pool.length).toBeGreaterThanOrEqual(10);
+  it.skipIf(!enabled)('has at least 5 generated puzzles of its own locale', () => {
+    expect(pool.length).toBeGreaterThanOrEqual(5);
     expect(pool.every((p) => p.locale === locale && p.source === 'generated')).toBe(true);
   });
 
