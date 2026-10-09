@@ -7,6 +7,7 @@ const MP_COACH: Record<string, CoachModeKey> = {
   'wheel-rush': 'wheelRush',
   'word-tower': 'wordTower',
   crossword: 'crossword',
+  wordcraft: 'wordCraft',
 };
 
 export const mpCoachMode = (gameMode: string | undefined): CoachModeKey | undefined =>

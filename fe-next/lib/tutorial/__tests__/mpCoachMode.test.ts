@@ -18,7 +18,7 @@ describe('multiplayer mode coach', () => {
 
   it('has no coach for unknown or missing modes', () => {
     expect(mpCoachMode(undefined)).toBeUndefined();
-    expect(mpCoachMode('wordcraft')).toBeUndefined();
+    expect(mpCoachMode('not-a-mode')).toBeUndefined();
   });
 
   it('a host who plays gets the same coach as a joining player', () => {
