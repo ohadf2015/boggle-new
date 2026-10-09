@@ -49,6 +49,12 @@ describe('loadBank', () => {
     expect(Object.keys(loadBank(dir, 'es'))).toEqual(['casa']);
   });
 
+  it('loads the shipped es curated file on top of the base', () => {
+    const bank = loadBank(REAL_DATA, 'es');
+    expect(bank.ocho.clue).toBe('Número que sigue al siete');
+    expect(Object.keys(bank).length).toBeGreaterThan(720);
+  });
+
   it('loads the shipped ru curated file on top of the reviewed base', () => {
     const bank = loadBank(REAL_DATA, 'ru');
     expect(bank.дом.clue.length).toBeGreaterThan(0);

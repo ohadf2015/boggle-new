@@ -31,10 +31,11 @@ const EXHAUSTIVE = process.argv.includes('--exhaustive');
 const MP_MAX_GRIDS = 5000;
 const MP_TEMPLATES: Template[] = [...symmetricPatterns(4, 4), ...symmetricPatterns(5, 5), ...symmetricPatterns(6, 6)];
 // Answers reviewed by hand and rejected (bad or obscure clue). Any grid using one is dropped.
-// es: 'ire' (archaic, not a Spanish noun), 'ana' (obscure literary term) and 'ese' (clued as
-// "allá", but the far demonstrative is 'aquel') rejected.
+// es: 'ire' (archaic), 'ana' (obscure), 'ese' (clued as "allá" but far demonstrative is 'aquel'),
+// 'mas' (archaic for 'pero'), 'rie'/'den'/'vas'/'das'/'aca'/'ahi'/'des'/'usa'/'oye' (fragments or verb forms
+// with no crossword-worthy clue) rejected.
 const MP_DENYLIST: Record<Locale, ReadonlySet<string>> = {
-  es: new Set(['ire', 'ana']),
+  es: new Set(['ire', 'ana', 'ese', 'mas', 'rie', 'den', 'vas', 'das', 'aca', 'ahi', 'des', 'usa', 'oye']),
   sv: new Set(),
   ru: new Set(),
   ja: new Set(),

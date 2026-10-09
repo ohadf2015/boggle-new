@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { getPool } from '../index';
 import { isRealCrossword } from '../../templates';
 import esBank from '../../data/clueBank.es.json';
+import esCurated from '../../data/clueBank.es.curated.json';
 import svBank from '../../data/clueBank.sv.json';
 import jaBank from '../../data/clueBank.ja.json';
 import ruBase from '../../data/clueBank.ru.json';
@@ -9,19 +10,22 @@ import ruCurated from '../../data/clueBank.ru.curated.json';
 import { getGameModeRules } from '@/backend/modes/rules';
 import type { PuzzleLocale } from '../../types';
 
-const BANKS = { es: esBank, sv: svBank, ja: jaBank, ru: { ...ruBase, ...ruCurated } } as Record<string, Record<string, { clue: string }>>;
+const BANKS = { es: { ...esBank, ...esCurated }, sv: svBank, ja: jaBank, ru: { ...ruBase, ...ruCurated } } as Record<string, Record<string, { clue: string }>>;
+
+const MIN_PUZZLES = { es: 10, ru: 10, sv: 5, ja: 5 } as const;
 
 describe.each(['es', 'sv', 'ja', 'ru'] as const)('%s mini pool', (locale) => {
   const pool = getPool(locale);
+  const min = MIN_PUZZLES[locale];
 
   const enabled = (getGameModeRules('crossword').languages ?? []).includes(locale);
 
-  it('has at least 5 generated puzzles of its own locale', () => {
-    expect(pool.filter((p) => p.locale === locale).length).toBeGreaterThanOrEqual(5);
+  it(`has at least ${min} generated puzzles of its own locale`, () => {
+    expect(pool.filter((p) => p.locale === locale).length).toBeGreaterThanOrEqual(min);
   });
 
-  it.skipIf(!enabled)('has at least 5 generated puzzles of its own locale', () => {
-    expect(pool.length).toBeGreaterThanOrEqual(5);
+  it.skipIf(!enabled)(`has at least ${min} generated puzzles of its own locale`, () => {
+    expect(pool.length).toBeGreaterThanOrEqual(min);
     expect(pool.every((p) => p.locale === locale && p.source === 'generated')).toBe(true);
   });
 
