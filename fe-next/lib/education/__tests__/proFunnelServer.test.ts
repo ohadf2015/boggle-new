@@ -20,7 +20,7 @@ import {
   buildTrialActivatedEvent,
   buildEduAccessRequestCreatedEvent,
   buildTrialStartEvent,
-  buildTrialStartedEvent,
+  buildTeacherTrialStartedEvent,
   buildCheckoutCompleteEvent,
   buildPaidEvent,
   buildTeacherTrialConvertedEvent,
@@ -87,10 +87,10 @@ describe('Pro funnel server events', () => {
     });
   });
 
-  it('Given a Polar trial actually opened, When the HQ funnel name is built, Then it is trial_started', () => {
-    expect(buildTrialStartedEvent('u-1', 'sub-9')).toEqual({
+  it('Given a Polar trial actually opened, When the HQ funnel name is built, Then it is teacher_trial_started', () => {
+    expect(buildTeacherTrialStartedEvent('u-1', 'sub-9')).toEqual({
       distinctId: 'u-1',
-      event: 'trial_started',
+      event: 'teacher_trial_started',
       properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
     });
   });

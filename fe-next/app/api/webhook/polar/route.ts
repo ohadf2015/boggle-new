@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
-import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTrialStartedEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
+import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
@@ -180,8 +180,10 @@ function trackProConversion(payload: WebhookPayload, userId?: string) {
 }
 
 /**
- * `edu_pro_trial_succeeded` + `trial_activated` — Polar opened the 14-day trial
- * and upserted the teacher row. Distinct from paid conversion. Never throws.
+ * `edu_pro_trial_succeeded` + `trial_activated` + `teacher_trial_started` —
+ * Polar granted the 14-day trial and upserted the teacher row. Distinct from
+ * paid conversion. Polar's activation webhook is `subscription.active`
+ * (status=trialing). Never throws.
  */
 function trackProTrial(payload: WebhookPayload, userId?: string) {
   try {
@@ -191,7 +193,7 @@ function trackProTrial(payload: WebhookPayload, userId?: string) {
     captureProFunnelServerEvent(buildProTrialSucceededEvent(userId, subId))
     captureProFunnelServerEvent(buildTrialActivatedEvent(userId, subId))
     captureProFunnelServerEvent(buildTrialStartEvent(userId, subId))
-    captureProFunnelServerEvent(buildTrialStartedEvent(userId, subId))
+    captureProFunnelServerEvent(buildTeacherTrialStartedEvent(userId, subId))
   } catch (err) {
     console.error('[Polar] trial telemetry threw:', err)
   }

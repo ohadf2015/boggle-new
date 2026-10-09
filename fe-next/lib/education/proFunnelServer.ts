@@ -64,11 +64,11 @@ export function buildTrialStartEvent(userId: string, subscriptionId: string): Ed
   };
 }
 
-/** Canonical HQ funnel name — same moment as `trial_start`. */
-export function buildTrialStartedEvent(userId: string, subscriptionId: string): EduServerEvent {
+/** Canonical HQ funnel name — Polar granted the 14-day Teacher Pro trial. */
+export function buildTeacherTrialStartedEvent(userId: string, subscriptionId: string): EduServerEvent {
   return {
     distinctId: userId,
-    event: 'trial_started',
+    event: 'teacher_trial_started',
     properties: { ...BASE, subscription_id: subscriptionId },
   };
 }
