@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 /**
  * Crossword — a fully client-side daily puzzle. The board, clue navigation and
  * check/reveal run with no server, and the daily puzzle is picked client-side
- * from the bundled pool (lib/crossword/puzzles). EN + HE content today; other
- * locales fall back to EN puzzles. See docs/2026-06-06-crossword-mode-spec.md.
+ * from the bundled pool (lib/crossword/puzzles). Locales without their own
+ * pool (ru) get an unavailable state, never English puzzles (lib/crossword/locales). See docs/2026-06-06-crossword-mode-spec.md.
  *
  * Public + offline-capable: the route renders a static client shell for everyone
  * so the service worker can precache it and a rider can play it offline.

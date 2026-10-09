@@ -1907,6 +1907,11 @@ const en = {
     "sampleWord": "CAT"
   },
   "crossword": {
+    "unavailable": {
+      "title": "Crossword isn't in your language yet",
+      "body": "We don't have crossword puzzles in this language yet. Try another mode.",
+      "home": "Back to home"
+    },
     "mp": {
       "title": "Crossword Race",
       "waiting": "Setting up the race…",

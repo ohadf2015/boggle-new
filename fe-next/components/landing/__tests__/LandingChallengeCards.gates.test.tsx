@@ -325,3 +325,17 @@ describe('LandingChallengeCards — Japanese locale gates', () => {
     expect(wordCraftCards.length).toBe(1);
   });
 });
+
+describe('LandingChallengeCards — crossword only for locales with their own puzzles', () => {
+  it('omits the crossword card for ru even for beta testers', () => {
+    mockIsAdmin.mockReturnValue(true);
+    const { container } = render(<LandingChallengeCards {...baseProps} language="ru" />);
+    expect(container.querySelector('[data-cube-key="crossword"]')).toBeNull();
+  });
+
+  it('keeps the crossword card for es beta testers', () => {
+    mockIsAdmin.mockReturnValue(true);
+    const { container } = render(<LandingChallengeCards {...baseProps} language="es" />);
+    expect(container.querySelector('[data-cube-key="crossword"]')).toBeInTheDocument();
+  });
+});

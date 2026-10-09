@@ -1,5 +1,6 @@
 'use client';
 
+import { hasCrosswordPuzzles } from '@/lib/crossword/locales';
 import { useState, useEffect } from 'react';
 import { HomeDailyHero } from './home/HomeDailyHero';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -157,7 +158,7 @@ export function LandingChallengeCards({
     if (!next.includes('wordCraft')) next.push('wordCraft');
     // Standalone-route preview modes — admins + beta testers get one hub entry
     // each so previews stay reachable without flipping dashboard flags.
-    if (canSeeInWorkModes && !next.includes('crossword')) next.push('crossword');
+    if (canSeeInWorkModes && hasCrosswordPuzzles(language) && !next.includes('crossword')) next.push('crossword');
     // Wordfall (Blast V2) — admin/beta dev preview, routes to /blast/v2.
     if (canSeeInWorkModes && !next.includes('wordfall')) next.push('wordfall');
     // Word Tower v2 — now public (GA), routes to /word-tower.
@@ -172,7 +173,8 @@ export function LandingChallengeCards({
     // inconsistent without this append.
     if (!next.includes('adventure')) next.push('adventure');
     // Hide only beta-only modes (quickPlay) from non-beta users.
-    const gated = canSeeInWorkModes ? next : next.filter((m) => m !== 'quickPlay');
+    const gated = (canSeeInWorkModes ? next : next.filter((m) => m !== 'quickPlay'))
+      .filter((m) => m !== 'crossword' || hasCrosswordPuzzles(language));
     return gated;
   })();
   // Bump Blast up the hub: it sits directly after the multiplayer ('arena')

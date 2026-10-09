@@ -1926,6 +1926,11 @@ const es = {
     "sampleWord": "SOL"
   },
   "crossword": {
+    "unavailable": {
+      "title": "El crucigrama aún no está en tu idioma",
+      "body": "Todavía no tenemos crucigramas en este idioma. Prueba otro modo.",
+      "home": "Volver al inicio"
+    },
     "mp": {
       "title": "Carrera de Crucigrama",
       "waiting": "Preparando la carrera…",

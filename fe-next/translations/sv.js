@@ -2012,6 +2012,11 @@ const sv = {
     }
   },
   "crossword": {
+    "unavailable": {
+      "title": "Korsord finns inte på ditt språk än",
+      "body": "Vi har inga korsord på det här språket än. Prova ett annat läge.",
+      "home": "Tillbaka till startsidan"
+    },
     "mp": {
       "title": "Korsordskapplöpning",
       "waiting": "Förbereder loppet…",

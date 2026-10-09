@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { generateDailyPuzzle, generateFreeplayPuzzle } from '@/lib/crossword/generate.daily';
 import { loadStreak, persistSolve, type StreakState, emptyStreak } from '@/lib/crossword/streak';
@@ -12,6 +13,7 @@ import {
   supportsFull,
   type CrosswordFormat,
 } from '@/lib/crossword/format';
+import { hasCrosswordPuzzles } from '@/lib/crossword/locales';
 import type { CrosswordPuzzle, Difficulty, PuzzleLocale } from '@/lib/crossword/types';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { CrosswordLoader } from '@/components/crossword/CrosswordLoader';
@@ -95,6 +97,7 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
   useEffect(() => setFormat(loadFormat(locale)), [locale]);
   const [genError, setGenError] = useState<boolean>(false);
   const seqRef = useRef(0); // guards against out-of-order async results
+  const supported = hasCrosswordPuzzles(locale);
 
   const dailyEditionLabel = useMemo(() => {
     try {
@@ -112,6 +115,7 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
 
   // Initial load: today's daily (from cache if present, else generated + cached).
   useEffect(() => {
+    if (!supported) return;
     let cancelled = false;
     const seq = ++seqRef.current;
     setGenerating(true);
@@ -136,7 +140,7 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
     return () => {
       cancelled = true;
     };
-  }, [today, locale, format, dailyEditionLabel]);
+  }, [today, locale, format, dailyEditionLabel, supported]);
 
   const handleNewPuzzle = useCallback(
     (difficulty?: Difficulty) => {
@@ -177,6 +181,23 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
   const handleDailySolved = useCallback(() => {
     setStreak(persistSolve(today));
   }, [today]);
+
+  if (!supported) {
+    return (
+      <main className="min-h-dvh bg-neo-navy texture-halftone flex items-center justify-center p-6">
+        <div className="bg-neo-navy-light border-neo border-black rounded-neo shadow-hard px-8 py-7 text-center max-w-xs w-full">
+          <p className="font-neo-display font-bold text-neo-white text-lg mb-1">{t('crossword.unavailable.title')}</p>
+          <p className="font-neo-body text-sm text-neo-white/70 mb-4">{t('crossword.unavailable.body')}</p>
+          <Link
+            href={`/${locale}`}
+            className="inline-block font-neo-display font-bold bg-neo-cyan text-neo-navy border-neo border-black rounded-neo shadow-hard px-5 py-2.5 active:translate-y-[1px] active:shadow-hard-pressed"
+          >
+            {t('crossword.unavailable.home')}
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   if (genError) {
     return (
