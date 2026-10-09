@@ -62,6 +62,12 @@ ARG NEXT_PUBLIC_ADSENSE_ENABLED
 ARG NEXT_PUBLIC_CHECKOUT_ENABLED
 ARG NEXT_PUBLIC_POSTHOG_KEY
 ARG NEXT_PUBLIC_POSTHOG_HOST
+# Railway injects this at build; next.config.mjs copies it into
+# NEXT_PUBLIC_SENTRY_RELEASE so the client SDK tags releases.
+ARG RAILWAY_GIT_COMMIT_SHA
+ARG NEXT_PUBLIC_SENTRY_RELEASE
+ENV RAILWAY_GIT_COMMIT_SHA=$RAILWAY_GIT_COMMIT_SHA
+ENV NEXT_PUBLIC_SENTRY_RELEASE=$NEXT_PUBLIC_SENTRY_RELEASE
 # Build-only secrets for PostHog source map upload (see next.config.mjs). Both are
 # read only at build time and this stage is discarded, so neither is baked into the
 # runner image. POSTHOG_API_KEY is a personal API key with error-tracking write

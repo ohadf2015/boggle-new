@@ -34,6 +34,17 @@ const isPreviewEnvironment = process.env.NEXT_PUBLIC_IS_PREVIEW === 'true' ||
 // Set NEXT_PUBLIC_CRAZYGAMES_ENABLED=false to force-disable.
 const isCrazyGamesForceDisabled = process.env.NEXT_PUBLIC_CRAZYGAMES_ENABLED === 'false';
 
+// Bake a release id into NEXT_PUBLIC_SENTRY_RELEASE so the client SDK (which
+// only inlines NEXT_PUBLIC_*) tags errors with the Railway/Vercel git SHA.
+// Server/edge Sentry.init reads RAILWAY_GIT_COMMIT_SHA at runtime separately.
+if (!process.env.NEXT_PUBLIC_SENTRY_RELEASE) {
+  const sha =
+    process.env.RAILWAY_GIT_COMMIT_SHA ||
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    process.env.GITHUB_SHA;
+  if (sha) process.env.NEXT_PUBLIC_SENTRY_RELEASE = sha;
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Build output dir. Default '.next'. The nightly improvement loop overrides it

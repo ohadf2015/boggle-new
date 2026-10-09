@@ -20,7 +20,10 @@ Sentry.init({
   // in next.config.mjs strips the tracing code from the bundle entirely.
   tracesSampleRate: 0,
 
-  release: process.env.NEXT_PUBLIC_SENTRY_RELEASE || process.env.VERCEL_GIT_COMMIT_SHA || undefined,
+  // NEXT_PUBLIC_SENTRY_RELEASE is populated at build (next.config copies
+  // RAILWAY_GIT_COMMIT_SHA / VERCEL_GIT_COMMIT_SHA). Non-public env is not
+  // inlined into the client bundle.
+  release: process.env.NEXT_PUBLIC_SENTRY_RELEASE || undefined,
 
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 0,
