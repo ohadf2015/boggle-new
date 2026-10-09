@@ -131,3 +131,19 @@ describe('symmetricPatterns', () => {
     expect(corners).toContain(['0,0', '3,3'].join(' '));
   });
 });
+
+describe('enumerateFills on a large word pool', () => {
+  it('finds a 5x5 fill hidden among hundreds of decoys (crossings prune early)', () => {
+    let s = 7;
+    const rnd = () => ((s = (s * 1103515245 + 12345) % 2147483648) / 2147483648);
+    const ABC = 'абвгдежзиклмнопрстуф';
+    const pick = () => ABC[Math.floor(rnd() * ABC.length)];
+    const t: Template = { size: 5, blocks: [[0, 0], [4, 4]] };
+    const solution = Array.from({ length: 5 }, (_, r) =>
+      Array.from({ length: 5 }, (_, c) => ((r === 0 && c === 0) || (r === 4 && c === 4) ? null : pick())),
+    );
+    const decoys = Array.from({ length: 600 }, (_, i) => Array.from({ length: i % 2 ? 5 : 4 }, pick).join(''));
+    const fills = enumerateFills(t, [...decoys, ...answersOf(solution)], 1);
+    expect(fills.length).toBe(1);
+  });
+});

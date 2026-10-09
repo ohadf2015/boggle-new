@@ -61,14 +61,29 @@ export function enumerateFills(t: Template, words: readonly string[], maxGrids: 
 
   const assemble = (): Grid => letters.map((row) => row.map((ch) => (ch === '' ? null : ch)));
 
-  const place = (idx: number): void => {
+  const filled = new Set<number>();
+  // Most-constrained slot next, so crossings prune before same-direction slots multiply out.
+  const nextSlot = (): number => {
+    let best = -1;
+    let bestKnown = -1;
+    for (let i = 0; i < slots.length; i++) {
+      if (filled.has(i)) continue;
+      const known = slots[i].cells.filter(([r, c]) => letters[r][c] !== '').length;
+      if (known > bestKnown) { best = i; bestKnown = known; }
+    }
+    return best;
+  };
+
+  const place = (depth: number): void => {
     if (out.length >= maxGrids || nodes++ > NODE_BUDGET) return;
-    if (idx === slots.length) {
+    if (depth === slots.length) {
       const grid = assemble();
       if (isRealCrossword(grid, false)) out.push(grid);
       return;
     }
+    const idx = nextSlot();
     const { cells } = slots[idx];
+    filled.add(idx);
     for (const w of byLen.get(cells.length) ?? []) {
       if (used.has(w)) continue;
       let fits = true;
@@ -84,11 +99,12 @@ export function enumerateFills(t: Template, words: readonly string[], maxGrids: 
         if (letters[r][c] === '') { letters[r][c] = w[k]; written.push([r, c]); }
       }
       used.add(w);
-      place(idx + 1);
+      place(depth + 1);
       used.delete(w);
       for (const [r, c] of written) letters[r][c] = '';
-      if (out.length >= maxGrids) return;
+      if (out.length >= maxGrids) break;
     }
+    filled.delete(idx);
   };
 
   place(0);
