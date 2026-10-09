@@ -105,26 +105,65 @@ export function rejectNounClueRu(clue: string): boolean {
   return /[A-Za-z]/.test(clue) || RU_RULES.some((r) => r.test(text));
 }
 
-/** First few raw sense lines (labels kept, stress marks dropped) of a ru Wiktionary page whose part of speech is a noun, else []. */
-export function ruNounSenses(extract: string | null | undefined, max = 2): string[] {
-  if (!extract) return [];
+type RuBlock = { pos: string; lines: string[] };
+
+/** Part-of-speech line and the sense lines of a ru Wiktionary page's morphology/meaning blocks, or null. */
+function ruSenseBlock(extract: string | null | undefined): RuBlock | null {
+  if (!extract) return null;
   const lines = extract.split('\n').map((l) => l.trim());
   const start = lines.indexOf('= Русский =');
-  if (start < 0) return [];
+  if (start < 0) return null;
   const end = lines.findIndex((l, i) => i > start && /^= [^=].*=$/.test(l));
   const body = lines.slice(start + 1, end < 0 ? undefined : end);
   const morph = body.findIndex((l) => /^=+ Морфологические и синтаксические свойства =+$/.test(l));
-  if (morph < 0) return [];
+  if (morph < 0) return null;
   const until = (from: number) => { const rest = body.slice(from); const e = rest.findIndex((l) => l.startsWith('=')); return e < 0 ? rest : rest.slice(0, e); };
   // headword lines are lowercase ("ве́-ра"); the first capitalized line names the part of speech
   const pos = until(morph + 1).find((l) => /^[А-ЯЁ]/.test(l));
-  if (!pos?.startsWith('Существительное')) return [];
+  if (!pos) return null;
   const sense = body.findIndex((l, i) => i > morph && /^=+ Значение =+$/.test(l));
-  if (sense < 0) return [];
-  return until(sense + 1)
+  if (sense < 0) return null;
+  const senseLines = until(sense + 1)
     // a sense with no usage example is a stub entry; frequent homographs (гор = of гора) land on these
-    .filter((l) => l && !/^Общее прототипическое значение/i.test(l) && !/Отсутствует пример употребления/i.test(l))
-    .slice(0, max)
-    .map((l) => l.split('◆')[0].replace(/\u0301/g, '').trim())
-    .filter(Boolean);
+    .filter((l) => l && !/^Общее прототипическое значение/i.test(l) && !/Отсутствует пример употребления/i.test(l));
+  return { pos, lines: senseLines };
+}
+
+const takeSenses = (lines: string[], max: number) => lines.slice(0, max).map((l) => l.split('◆')[0].replace(/́/g, '').trim()).filter(Boolean);
+
+/** First few raw sense lines (labels kept, stress marks dropped) of a ru Wiktionary page whose part of speech is a noun, else []. */
+export function ruNounSenses(extract: string | null | undefined, max = 2): string[] {
+  const b = ruSenseBlock(extract);
+  return b?.pos.startsWith('Существительное') ? takeSenses(b.lines, max) : [];
+}
+
+const RU_LEMMA_POS = /^(Прилагательное|Глагол|Наречие|Местоимение|Числительное|Междометие)(?!\p{L})/u;
+const RU_NOT_LEMMA_POS = /степен|форм|причаст|деепричаст/iu;
+
+/** Senses of a non-noun lemma. Inflected pages (ого-adjectives, -ает verbs) fail on the ending of the word itself. */
+export function ruLemmaSenses(extract: string | null | undefined, word: string, max = 2): string[] {
+  const b = ruSenseBlock(extract);
+  if (!b || !RU_LEMMA_POS.test(b.pos) || RU_NOT_LEMMA_POS.test(b.pos.split(/Сравнительн|Превосходн|Соответствующ/u)[0])) return [];
+  const w = word.toLowerCase().replace(/ё/g, 'е');
+  if (b.pos.startsWith('Глагол') && !/(ть|ти|чь)(ся|сь)?$/.test(w)) return [];
+  if (b.pos.startsWith('Прилагательное') && !/(ый|ий|ой)$/.test(w)) return [];
+  return takeSenses(b.lines, max);
+}
+
+/** Clue source senses for a ru candidate: noun senses for a noun lemma, else the other accepted lemma senses. */
+export function ruClueSenses(extract: string | null | undefined, word: string, max = 2): string[] {
+  const noun = ruNounSenses(extract, max);
+  return noun.length ? noun : ruLemmaSenses(extract, word, max);
+}
+
+/** Non-noun clue rejects: context-only openers (anaphora, grammar labels, topic "О …") and truncated abbreviation tails. */
+const RU_LEMMA_CLUE_RULES: RegExp[] = [
+  /^(также|тоже|обычно|наречие|вопросительн|указательн|образует|относительн|местоименн|употребл|частиц|неопределённ|притяжательн|определительн|личн|возвратн|сравнительн|превосходн)(?!\p{L})/iu,
+  /^об?(?:о)?\s/iu,
+  /\s(доп|мест|сравн|разг|нар|гл|ед|мн|знач|прил|сущ)\.?$/iu,
+  /\?$/,
+];
+
+export function rejectLemmaClueRu(clue: string): boolean {
+  return RU_LEMMA_CLUE_RULES.some((r) => r.test(clue.trim()));
 }

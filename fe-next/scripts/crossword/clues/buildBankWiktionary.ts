@@ -26,7 +26,7 @@
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { fetchWiktExtract, wiktionaryClue, wiktionaryClueJa } from './wiktionary';
+import { extractCachePath, fetchWiktExtract, wiktionaryClue, wiktionaryClueJa } from './wiktionary';
 import { loadDeny, loadFreqRank, selectFreqCandidates, type FreqLang } from './frequency';
 import { cleanMeaning } from '../../../lib/dictionary/wiktionaryMeaning';
 import { clueEndsAtClause, definitionToClue } from '../../../lib/crossword/clues/clueText';
@@ -35,7 +35,7 @@ import { evaluateSvClue, evaluateEsClue } from '../../../lib/crossword/clues/eva
 import { endsDangling } from '../../../lib/crossword/clues/danglingEnd';
 import { evaluateRuClue } from '../../../lib/crossword/clues/evaluateRuClue';
 import { createSafeReadFile, loadJapaneseDictionary, loadRussianDictionary, loadSpanishDictionary, loadSwedishDictionary } from '../../../backend/dictionaryLoaders';
-import { esFirstSenseFlagged, esSenses, rejectNounClueEs, rejectNounClueRu, ruNounSenses } from '../../../lib/crossword/clues/nounClueFilter';
+import { esFirstSenseFlagged, esSenses, rejectLemmaClueRu, rejectNounClueEs, rejectNounClueRu, ruClueSenses, ruNounSenses } from '../../../lib/crossword/clues/nounClueFilter';
 import { loadEsCommonness } from './commonness';
 import { foldEsAccents, foldJaKana } from '../../../lib/crossword/answer';
 
@@ -166,13 +166,14 @@ const readList = (f: string) => readFileSync(join(__dirname, `../../../backend/$
 /** First usable clue for a frequency candidate (trying its first two senses), or why there is none. */
 function freqClue(lang: FreqLang, word: string, key: string, extract: string): { clue: string } | { reject: string } {
   if (lang === 'es' && esFirstSenseFlagged(extract)) return { reject: 'archaic/regional/vulgar usage note' };
-  const senses = lang === 'es' ? esSenses(extract) : ruNounSenses(extract);
-  if (!senses.length) return { reject: lang === 'es' ? 'no clean definition' : 'not a noun lemma' };
+  const senses = lang === 'es' ? esSenses(extract) : ruClueSenses(extract, word);
+  if (!senses.length) return { reject: lang === 'es' ? 'no clean definition' : 'no accepted lemma sense' };
   let last: { reject: string } = { reject: 'no sense' };
   for (const sense of senses) {
     if (lang === 'ru' && rejectNounClueRu(sense)) { last = { reject: `filter: ${sense}` }; continue; }
     const def = lang === 'es' ? cleanMeaning(sense) : cleanMeaning(sense.replace(/^(?:[а-яё-]{1,12}\.,?\s+){1,4}/i, '')); // drop ru domain labels ("зоол. ")
     const res = clueFromDef(lang, word, key, def);
+    if ('clue' in res && lang === 'ru' && !ruNounSenses(extract).length && rejectLemmaClueRu(res.clue)) { last = { reject: `lemma filter: ${res.clue}` }; continue; }
     if ('clue' in res) return res;
     last = res;
   }
@@ -203,13 +204,14 @@ async function buildFromFreq(lang: FreqLang, n: number, bank: Bank, bankPath: st
     if (processed >= LIMIT) break;
     processed++;
     let extract: string | null = null;
+    const cached = existsSync(extractCachePath(word, lang));
     for (let attempt = 1; attempt <= 4; attempt++) {
       try { extract = await fetchWiktExtract(word, lang); break; } catch (e) {
         console.warn(`  ! ${word}: ${(e as Error).message} (attempt ${attempt})`);
         await sleep(15000 * attempt); // Wiktionary 429s bursts; back off rather than lose the word
       }
     }
-    await sleep(400);
+    if (!cached) await sleep(400);
     if (!extract) { miss++; continue; }
     const res = freqClue(lang, word, key, extract);
     if ('reject' in res) { rejected++; if (DRY) console.log(`  - ${key}: ${res.reject}`); continue; }

@@ -53,10 +53,13 @@ export async function wiktionaryClueJa(word: string): Promise<{ clue: string | n
 
 const UA = 'LexiClash/1.0 (word game; +https://lexiclash.app)';
 
+export const extractCachePath = (word: string, lang: string): string =>
+  join(CACHE_DIR, `${lang}-extract-${encodeURIComponent(word)}.json`);
+
 /** Cached raw extract of the word's OWN page (no redirects: a form redirecting to its lemma is not a lemma). */
 export async function fetchWiktExtract(word: string, lang: string): Promise<string | null> {
   if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true });
-  const p = join(CACHE_DIR, `${lang}-extract-${encodeURIComponent(word)}.json`);
+  const p = extractCachePath(word, lang);
   if (existsSync(p)) return JSON.parse(readFileSync(p, 'utf8')) as string | null;
   const url = `https://${lang}.wiktionary.org/w/api.php?action=query&prop=extracts&explaintext=1&format=json&formatversion=2&titles=${encodeURIComponent(word)}`;
   const res = await fetch(url, { headers: { 'User-Agent': UA, 'Api-User-Agent': UA } });

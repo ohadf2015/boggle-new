@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { esFirstSenseFlagged, esSenses, rejectNounClueEs, rejectNounClueRu, ruNounSenses } from '../nounClueFilter';
+import { esFirstSenseFlagged, esSenses, rejectNounClueEs, rejectNounClueRu, rejectLemmaClueRu, ruClueSenses, ruLemmaSenses, ruNounSenses } from '../nounClueFilter';
 
 describe('rejectNounClueEs', () => {
   it.each([
@@ -170,5 +170,70 @@ describe('esSenses', () => {
 
   it('is empty without a Spanish section', () => {
     expect(esSenses('== Catalán ==\n==== Sustantivo ====\n1\nx')).toEqual([]);
+  });
+});
+
+const ruPage = (lines: string[]) => ['= Русский =', '', '=== Морфологические и синтаксические свойства ===', ...lines].join('\n');
+const ADJ_ALYJ = ruPage(['а́·лый', 'Прилагательное, качественное, тип склонения по классификации А. Зализняка — 1a\'. Сравнительная степень — але́е, але́й.', '==== Значение ====', 'ярко-красный ◆ Алые розы.    ◆ Алый мак.    ◆ Алая кровь.   ']);
+const VERB_BEGAT = ruPage(['бе́-гать (дореформ. бѣ́гать)', 'Глагол, несовершенный вид,  непереходный,    тип спряжения по классификации А. Зализняка — 1a.      Соответствующего глагола совершенного вида нет.', 'Непроизводное.', '==== Значение ====', 'быстро перемещаться, отталкиваясь ногами от земли и в некоторые моменты не касаясь земли вовсе (о движении, совершаемом неоднократно или не в определённом направлении, в отличие от сходного по смыслу гл. бежать) ◆ Отсутствует пример употребления (см. рекомендации).   ', 'спорт. заниматься беговыми видами спорта ◆ Он бегает на средние дистанции.    ◆ Надо бы бегать начать.   ']);
+const ADV_BEGLO = ruPage(['бе́г-ло', 'Наречие; неизменяемое. ', 'Корень: -бег-; суффиксы: -л-о.   ', '==== Значение ====', 'свободно, без затруднений ◆ Лет восьми нас стали учить грамоте; я через несколько месяцев бегло читал псалтырь.', 'не останавливаясь на подробностях; в общих чертах ◆ Но мы, бегло взглянув на них.']);
+const PRON_EGO = ruPage(['е·го́', 'Местоимение, притяжательное, третьего лица.', 'Производное: ??.', '==== Значение ====', 'принадлежащий или относящийся к тому, что выражено третьим лицом мужского или среднего ро́да ◆ Отсутствует пример употребления (см. рекомендации).   ']);
+const DEEPR_BOLTAYA = ruPage(['бол-та́·я', 'Невозвратное деепричастие, несовершенного вида, настоящего времени; неизменяемое. ', '', '==== Значение ====', 'дееприч.  от болтать ◆ Не знаю, как уж там устроились Спиваков с Ковалевским.']);
+
+describe('ruLemmaSenses', () => {
+  it('returns senses for an accepted adjective, verb or adverb lemma', () => {
+    expect(ruLemmaSenses(ADJ_ALYJ, 'алый')[0]).toBe('ярко-красный');
+    expect(ruLemmaSenses(VERB_BEGAT, 'бегать')[0]).toBe('спорт. заниматься беговыми видами спорта');
+    expect(ruLemmaSenses(ADV_BEGLO, 'бегло')).toEqual(['свободно, без затруднений', 'не останавливаясь на подробностях; в общих чертах']);
+  });
+
+  it('keeps pronouns only when a usable sense is left', () => {
+    expect(ruLemmaSenses(PRON_EGO, 'его')).toEqual([]);
+  });
+
+  it('rejects participle-like forms (деепричастие) by part of speech', () => {
+    expect(ruLemmaSenses(DEEPR_BOLTAYA, 'болтая')).toEqual([]);
+  });
+
+  it('rejects an inflected adjective whose page is the form itself (ending is not the masculine lemma)', () => {
+    expect(ruLemmaSenses(ADJ_ALYJ, 'алого')).toEqual([]);
+  });
+
+  it('rejects a verb that is not an infinitive', () => {
+    expect(ruLemmaSenses(VERB_BEGAT, 'бегает')).toEqual([]);
+  });
+
+  it('does not change the noun path: nouns are not lemma-sensed', () => {
+    expect(ruLemmaSenses(ruPage(['а·га́р', 'Существительное, неодушевлённое, мужской род.', '==== Значение ====', 'ботан. вид водорослей ◆ Пример.']), 'агар')).toEqual([]);
+  });
+});
+
+describe('ruClueSenses', () => {
+  it('uses the noun senses for nouns and the lemma senses otherwise', () => {
+    expect(ruClueSenses(ruPage(['а·га́р', 'Существительное, неодушевлённое, мужской род.', '==== Значение ====', 'ботан. вид водорослей ◆ Пример.']), 'агар')).toEqual(['ботан. вид водорослей']);
+    expect(ruClueSenses(ADV_BEGLO, 'бегло')[0]).toBe('свободно, без затруднений');
+  });
+});
+
+describe('rejectLemmaClueRu', () => {
+  it.each([
+    ['anaphoric opener', 'Также без дополнения приступить к какому-либо действию'],
+    ['part-of-speech label opener', 'Наречие другим способом'],
+    ['grammar-only gloss', 'Образует сравнительную степень'],
+    ['topic opener', 'О способе передвижения'],
+    ['topic opener with truncated tail', 'О ком-чём и без доп'],
+    ['truncated abbreviation tail', 'Когда, где и без доп'],
+    ['pronoun label tail', 'Указательное мест'],
+    ['question gloss', 'Вопросительное наречие в какое время?'],
+  ])('rejects %s', (_, clue) => {
+    expect(rejectLemmaClueRu(clue)).toBe(true);
+  });
+
+  it.each([
+    ['plain gloss', 'Свободно, без затруднений'],
+    ['gloss with a preposition', 'В некоторых, отдельных случаях'],
+    ['gloss with a number', 'Целое число между пятью и семью'],
+  ])('keeps %s', (_, clue) => {
+    expect(rejectLemmaClueRu(clue)).toBe(false);
   });
 });
