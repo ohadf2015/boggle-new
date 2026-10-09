@@ -13,6 +13,7 @@ const LANG = process.argv[2] as FreqLang;
 const ARTICLES = parseInt(arg('articles', '4000'), 10);
 const TOP = parseInt(arg('top', '40000'), 10);
 const CONCURRENCY = parseInt(arg('concurrency', '1'), 10);
+const BATCH = 20; // random pages per request (generator=random returns BATCH distinct articles with extracts)
 const DELAY_MS = 500; // Wikimedia 429s at ~4 req/s from one IP; serial + delay stays well under
 const MAX_CONSECUTIVE_ERRORS = 8;
 const UA = 'LexiClashCrosswordFreq/1.0 (word game; +https://lexiclash.app)';
@@ -23,25 +24,28 @@ const cached = () => readdirSync(CACHE_DIR).filter((f) => f.endsWith('.txt'));
 
 type Page = { pageid: number; extract?: string };
 
-async function fetchRandom(): Promise<Page | null> {
-  const url = `https://${LANG}.wikipedia.org/w/api.php?action=query&generator=random&grnnamespace=0&grnlimit=1&prop=extracts&explaintext=1&format=json&formatversion=2&maxlag=5`;
+async function fetchRandom(): Promise<Page[]> {
+  const url = `https://${LANG}.wikipedia.org/w/api.php?action=query&generator=random&grnnamespace=0&grnlimit=${BATCH}&prop=extracts&explaintext=1&format=json&formatversion=2&maxlag=5`;
   const res = await fetch(url, { headers: { 'User-Agent': UA, 'Api-User-Agent': UA } });
   if (!res.ok) throw Object.assign(new Error(`HTTP ${res.status} ${res.statusText} from ${url}`), { retryAfter: Number(res.headers.get('retry-after')) || 0 });
   const data = (await res.json()) as { error?: { code: string; info: string }; query?: { pages?: Page[] } };
   if (data.error) throw new Error(`API error ${data.error.code}: ${data.error.info}`);
-  return data.query?.pages?.[0] ?? null;
+  return data.query?.pages ?? [];
 }
 
 async function worker(state: { have: number; errors: number; lastError: string }) {
   while (state.have < ARTICLES) {
     try {
-      const page = await fetchRandom();
+      const pages = await fetchRandom();
       state.errors = 0;
-      const p = page && join(CACHE_DIR, `${page.pageid}.txt`);
-      if (page?.extract && p && !existsSync(p)) {
-        writeFileSync(p, page.extract);
-        state.have++;
-        if (state.have % 250 === 0) console.log(`${LANG}: ${state.have}/${ARTICLES} articles`);
+      for (const page of pages) {
+        const p = join(CACHE_DIR, `${page.pageid}.txt`);
+        if (state.have >= ARTICLES) break;
+        if (page.extract && !existsSync(p)) {
+          writeFileSync(p, page.extract);
+          state.have++;
+          if (state.have % 250 === 0) console.log(`${LANG}: ${state.have}/${ARTICLES} articles`);
+        }
       }
     } catch (e) {
       state.lastError = (e as Error).message;

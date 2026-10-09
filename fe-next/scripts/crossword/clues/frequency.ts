@@ -55,17 +55,18 @@ type SelectOpts = {
   dict: Set<string>;
   bankKeys: Set<string>;
   deny?: Set<string>;
+  maxLen?: number;
 };
 
-/** Mini-sized (3-4), in-dictionary, top-N words not yet banked; `word` keeps its spelling for the Wiktionary lookup. */
-export function selectFreqCandidates(words: Iterable<string>, { lang, inTop, n, dict, bankKeys, deny = new Set() }: SelectOpts): { word: string; key: string }[] {
+/** Mini-sized (3..maxLen, default 4), in-dictionary, top-N words not yet banked; `word` keeps its spelling for the Wiktionary lookup. */
+export function selectFreqCandidates(words: Iterable<string>, { lang, inTop, n, dict, bankKeys, deny = new Set(), maxLen = 4 }: SelectOpts): { word: string; key: string }[] {
   const banked = new Set([...bankKeys, ...deny].map((k) => freqKey(k, lang)));
   const seen = new Set<string>();
   const out: { word: string; key: string }[] = [];
   for (const raw of words) {
     const word = raw.trim().normalize('NFC').toLowerCase();
     const key = freqKey(word, lang);
-    if (key.length < 3 || key.length > 4 || !SCRIPT[lang].test(key)) continue;
+    if (key.length < 3 || key.length > maxLen || !SCRIPT[lang].test(key)) continue;
     if (seen.has(key) || banked.has(key) || !dict.has(key) || !inTop(key, n)) continue;
     seen.add(key);
     out.push({ word, key });

@@ -79,6 +79,14 @@ describe('selectFreqCandidates', () => {
     expect(out).toEqual([{ word: 'oso', key: 'oso' }]);
   });
 
+  it('admits 5-6 letter words when maxLen is 6 (ru mini pools are 4x4..6x6)', () => {
+    const ruTop = rankOf([['город', 3], ['дом', 2], ['елка', 1]] as [string, number][], 'ru');
+    const dict = new Set(['город', 'дом', 'елка']);
+    expect(selectFreqCandidates(['город', 'дом', 'елка'], { lang: 'ru', inTop: ruTop, n: 3, dict, bankKeys: new Set(), maxLen: 6 }))
+      .toEqual([{ word: 'город', key: 'город' }, { word: 'дом', key: 'дом' }, { word: 'елка', key: 'елка' }]);
+    expect(selectFreqCandidates(['город'], { lang: 'ru', inTop: ruTop, n: 3, dict, bankKeys: new Set() })).toEqual([]);
+  });
+
   it('respects N and folds ru ё for the key', () => {
     const ruTop = rankOf([['ёж', 1], ['елка', 2], ['дом', 3]] as [string, number][], 'ru');
     const out = selectFreqCandidates(['ёлка', 'дом'], { lang: 'ru', inTop: ruTop, n: 2, dict: new Set(['елка', 'дом']), bankKeys: new Set() });

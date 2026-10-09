@@ -32,7 +32,12 @@ const MP_TEMPLATES: Template[] = [...symmetricPatterns(4, 4), ...symmetricPatter
 // Answers reviewed by hand and rejected (bad or obscure clue). Any grid using one is dropped.
 // es: 'ire' (archaic, not a Spanish noun), 'ana' (obscure literary term) and 'ese' (clued as
 // "allá", but the far demonstrative is 'aquel') rejected.
-const MP_DENYLIST: ReadonlySet<string> = new Set<string>(['ire', 'ana']);
+const MP_DENYLIST: Record<Locale, ReadonlySet<string>> = {
+  es: new Set(['ire', 'ana']),
+  sv: new Set(),
+  ru: new Set(),
+  ja: new Set(),
+};
 
 // Grid letters are stored the way the answer checker normalizes typed input (es accents, ru ё).
 const FOLD: Record<Locale, (w: string) => string> = {
@@ -70,7 +75,7 @@ function exhaustivePuzzles(
     return found;
   });
   const bankOf = (answer: string) => bank[bankKeyOf.get(answer) ?? ''];
-  const cands = toCandidates(grids, (a) => bankOf(a)?.clue, MP_DENYLIST, (a) => bankOf(a)?.score ?? 0);
+  const cands = toCandidates(grids, (a) => bankOf(a)?.clue, MP_DENYLIST[locale], (a) => bankOf(a)?.score ?? 0);
   const picked = selectDistinct(cands, MAX_SHARED_ANSWERS, 1);
   console.log(`candidates ${cands.length} | distinct subset ${picked.length}`);
   return picked.map((c, i) => ({

@@ -194,8 +194,9 @@ async function buildFromFreq(lang: FreqLang, n: number, bank: Bank, bankPath: st
   const words = lang === 'es'
     ? [...readList('es_nouns.txt'), ...readList('common_hunt_words_es.txt')]
     : [...readList('common_hunt_words_ru.txt'), ...readList('russian_words.txt')];
-  const candidates = selectFreqCandidates(words, { lang, inTop, n, dict, bankKeys: new Set(Object.keys(bank)), deny: loadDeny(lang) });
-  console.log(`${DRY ? '[DRY] ' : ''}${lang}: bank ${before} words, ${candidates.length} candidates in top ${n} (3-4 letters, in dict)`);
+  const maxLen = lang === 'ru' ? 6 : 4;
+  const candidates = selectFreqCandidates(words, { lang, inTop, n, dict, bankKeys: new Set(Object.keys(bank)), deny: loadDeny(lang), maxLen });
+  console.log(`${DRY ? '[DRY] ' : ''}${lang}: bank ${before} words, ${candidates.length} candidates in top ${n} (3-${maxLen} letters, in dict)`);
 
   let added = 0, miss = 0, rejected = 0, processed = 0;
   for (const { word, key } of candidates) {
