@@ -1,23 +1,38 @@
 /**
- * Generate 4×4 LTR mini crosswords for es / sv / ru / ja from the locale's clue bank only. The fill pool is
- * the 3-4 letter clue-bank words that are also in the shipped dictionary, so every landed word
- * already has a clue. Deterministic (fixed seeds). Output: lib/crossword/data/puzzles.<locale>.json.
+ * Generate mini crosswords for es / sv / ru / ja from the locale's clue bank only. The fill pool is
+ * the clue-bank words that are also in the shipped dictionary, so every landed word already has a
+ * clue. Deterministic. Output: lib/crossword/data/puzzles.<locale>.json.
  *
- * Usage: npx tsx scripts/crossword/build-mini.ts <es|sv|ru|ja>
+ * Usage: npx tsx scripts/crossword/build-mini.ts <es|sv|ru|ja>            (4x4 sample, sv/ja)
+ *        npx tsx scripts/crossword/build-mini.ts <es|sv|ru|ja> --exhaustive (MP pool, es)
+ *
+ * --exhaustive enumerates EVERY fill of each symmetric 4x4/5x5/6x6 pattern (the runtime filler
+ * returns one fill per seed, so it never sees the full candidate set) and keeps the largest subset
+ * whose puzzles pairwise share at most MAX_SHARED_ANSWERS answers. es must be built this way: the
+ * plain 4x4 path yields 3 puzzles, below the 5 the mini.es-sv test requires.
  */
 import { createSafeReadFile, loadJapaneseDictionary, loadRussianDictionary, loadSpanishDictionary, loadSwedishDictionary } from '../../backend/dictionaryLoaders';
 import { foldEsAccents, foldJaKana } from '../../lib/crossword/answer';
 import { buildGrid } from '../../lib/crossword/grid';
 import { buildDictIndex, fillGrid, type FillTemplate } from '../../lib/crossword/generate.core';
 import { isRealCrossword, MINI_TEMPLATES_4 } from '../../lib/crossword/templates';
+import { enumerateFills, selectDistinct, symmetricPatterns, toCandidates, type Template } from './mpPool';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const LOCALES = ['es', 'sv', 'ru', 'ja'] as const;
+interface Puzzle { id: string; locale: Locale; difficulty: 'easy'; rtl: false; grid: (string | null)[][]; clues: Record<string, string> }
 type Locale = (typeof LOCALES)[number];
 const MAX_PUZZLES = 20;
-const SEEDS = Number(process.argv[3] ?? 600);
+const SEEDS = 600;
 const MAX_SHARED_ANSWERS = 2; // two puzzles may share at most this many answers
+const EXHAUSTIVE = process.argv.includes('--exhaustive');
+const MP_MAX_GRIDS = 5000;
+const MP_TEMPLATES: Template[] = [...symmetricPatterns(4, 4), ...symmetricPatterns(5, 5), ...symmetricPatterns(6, 6)];
+// Answers reviewed by hand and rejected (bad or obscure clue). Any grid using one is dropped.
+// es: 'ire' (archaic, not a Spanish noun), 'ana' (obscure literary term) and 'ese' (clued as
+// "allá", but the far demonstrative is 'aquel') rejected.
+const MP_DENYLIST: ReadonlySet<string> = new Set<string>(['ire', 'ana']);
 
 // Grid letters are stored the way the answer checker normalizes typed input (es accents, ru ё).
 const FOLD: Record<Locale, (w: string) => string> = {
@@ -43,6 +58,31 @@ function mulberry32(seed: number): () => number {
   };
 }
 
+function exhaustivePuzzles(
+  locale: Locale,
+  bank: Record<string, { clue: string; score: number }>,
+  bankKeyOf: Map<string, string>,
+): Puzzle[] {
+  const pool = [...bankKeyOf.keys()];
+  const grids = MP_TEMPLATES.flatMap((t) => {
+    const found = enumerateFills(t, pool, MP_MAX_GRIDS);
+    console.log(`${t.size}x${t.size} ${t.blocks.length} blocks: ${found.length} fills`);
+    return found;
+  });
+  const bankOf = (answer: string) => bank[bankKeyOf.get(answer) ?? ''];
+  const cands = toCandidates(grids, (a) => bankOf(a)?.clue, MP_DENYLIST, (a) => bankOf(a)?.score ?? 0);
+  const picked = selectDistinct(cands, MAX_SHARED_ANSWERS, 1);
+  console.log(`candidates ${cands.length} | distinct subset ${picked.length}`);
+  return picked.map((c, i) => ({
+    id: `${locale}-gen-${String(i + 1).padStart(3, '0')}`,
+    locale,
+    difficulty: 'easy' as const,
+    rtl: false as const,
+    grid: c.grid,
+    clues: c.clues,
+  }));
+}
+
 async function main() {
   const locale = process.argv[2] as Locale;
   if (!LOCALES.includes(locale)) throw new Error(`usage: build-mini.ts <${LOCALES.join('|')}>`);
@@ -60,17 +100,24 @@ async function main() {
     : await loadSwedishDictionary(safeRead);
 
   // folded grid answer -> bank key carrying its clue (prefers an exact key over a folded twin)
+  const maxLen = EXHAUSTIVE ? 6 : 4;
   const bankKeyOf = new Map<string, string>();
   for (const w of Object.keys(bank)) {
     const f = FOLD[locale](w);
-    if (f.length < 3 || f.length > 4 || !bank[w].clue || !dict.has(f)) continue;
+    if (f.length < 3 || f.length > maxLen || !bank[w].clue || !dict.has(f)) continue;
     if (!bankKeyOf.has(f) || w === f) bankKeyOf.set(f, w);
+  }
+  if (EXHAUSTIVE) {
+    const outPath = join(dataDir, `puzzles.${locale}.json`);
+    writeFileSync(outPath, JSON.stringify(exhaustivePuzzles(locale, bank, bankKeyOf)));
+    console.log(`wrote exhaustive ${locale} pool -> ${outPath}`);
+    return;
   }
   const pool = [...bankKeyOf.keys()];
   console.log(`${locale} bank ${Object.keys(bank).length} | 3-4 letter in dict: ${pool.length} (dict ${dict.size})`);
   const idx = buildDictIndex(pool);
 
-  const puzzles: { id: string; locale: Locale; difficulty: 'easy'; rtl: false; grid: (string | null)[][]; clues: Record<string, string> }[] = [];
+  const puzzles: Puzzle[] = [];
   const sigs = new Set<string>();
   const answerSets: Set<string>[] = [];
   let fillOk = 0, realOk = 0;
