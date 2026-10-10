@@ -105,13 +105,13 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
           ? 'w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 short:w-16 short:h-16 short:sm:w-16 short:sm:h-16 short:md:w-16 short:md:h-16 text-3xl sm:text-4xl md:text-5xl short:text-2xl short:sm:text-2xl short:md:text-2xl z-10'
           : compact
             ? 'w-11 h-11 sm:w-12 sm:h-12 text-base sm:text-lg'
-            : 'w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] md:w-[68px] md:h-[68px] short:w-12 short:h-12 short:sm:w-12 short:sm:h-12 short:md:w-12 short:md:h-12 text-lg sm:text-xl md:text-2xl short:text-base short:sm:text-base short:md:text-base',
+            : 'w-14 h-14 sm:w-16 sm:h-16 md:w-[72px] md:h-[72px] short:w-12 short:h-12 short:sm:w-12 short:sm:h-12 short:md:w-12 short:md:h-12 text-lg sm:text-xl md:text-2xl short:text-base short:sm:text-base short:md:text-base',
         isCenter
           ? isUsed
             ? 'bg-neo-lime/40 text-neo-black/40 shadow-hard-lg'
             : 'bg-neo-lime text-neo-black shadow-[3px_3px_0px_black,0_0_20px_rgba(191,255,0,0.5)]'
           : isUsed
-            ? 'bg-neo-navy-light text-neo-white border-neo-cream/20 shadow-none'
+            ? 'bg-neo-lime text-neo-black shadow-[2px_2px_0px_black,0_0_14px_rgba(191,255,0,0.55)]'
             : 'bg-neo-white text-neo-navy shadow-[2px_2px_0px_black,0_0_8px_rgba(191,255,0,0.15)] hover:shadow-[2px_2px_0px_black,0_0_14px_rgba(191,255,0,0.35)] hover:bg-neo-cream active:bg-neo-lime/30',
         'cursor-pointer',
       )}
@@ -140,7 +140,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
         : {
             x: offsetX,
             y: offsetY,
-            scale: isUsed ? 0.9 : 1,
+            scale: isUsed ? 1.08 : 1,
           }}
       transition={isCenter && !isUsed && !reducedMotion
         // Multi-keyframe scale pulse must be tween; x/y stay springs (2-value).

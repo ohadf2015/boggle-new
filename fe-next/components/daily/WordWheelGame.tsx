@@ -24,12 +24,11 @@ import { trackGameEnd, trackGameStart, trackGrowthEvent } from '@/utils/growthTr
 import { useExperiment } from '@/hooks/useExperiment';
 import { useMPFTUEIdle } from '@/hooks/useMPFTUEIdle';
 import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
-import dynamic from 'next/dynamic';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import Avatar from '@/components/Avatar';
 
-const WordWheelPixiRing = dynamic(() => import('./WordWheelPixiRing'), { ssr: false });
+import WordWheelTrail from './WordWheelTrail';
 
 // Haptic feedback for mobile — distinct patterns per interaction type
 const haptic = (pattern: number | number[]) => {
@@ -1206,15 +1205,13 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               'radial-gradient(circle at center, var(--neo-navy-elevated) 0%, var(--neo-navy) 60%, transparent 80%)',
           }}
         />
-        {/* PixiJS wheel decorations: orbital rings + connection lines */}
-        <WordWheelPixiRing
+        <WordWheelTrail
           selectedIndices={builtLetters.map(bl => bl.wheelIndex)}
           radius={wheelRadius}
-          combo={combo}
+          outerCount={outerLetters.length}
           pointerPosRef={pointerPosRef}
           isDraggingRef={draggingRef}
-          outerCount={outerLetters.length}
-          reducedMotion={prefersReducedMotion}
+          invalid={wordBuilderShake}
         />
         {/* Outer glow ring — breathing loop disabled under reduced-motion */}
         <m.div
