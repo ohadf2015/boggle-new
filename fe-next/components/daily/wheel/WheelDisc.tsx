@@ -1,6 +1,6 @@
 'use client';
 
-import React, { type MutableRefObject, type ReactNode, type RefObject } from 'react';
+import React, { useState, type MutableRefObject, type ReactNode, type RefObject } from 'react';
 import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import WheelDiscLetter from './WheelDiscLetter';
@@ -42,6 +42,8 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
   onPointerDown, onPointerMove, onPointerUp, onPress, onHoldStart, onHoldEnd, holdActiveIndex,
   tileSkin, fx, release = null, checking = false, t, reducedMotion, children,
 }) => {
+  const [haltedSpin, setHaltedSpin] = useState<number | null>(null);
+  const spinning = fx?.kind === 'good' && !reducedMotion && fx.id !== haltedSpin;
   const used = new Set(builtIndices);
   const ready = builtIndices.length >= 3;
   const kick = fx && !reducedMotion
@@ -57,7 +59,10 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
       data-release={release ? 'true' : 'false'}
       // Each cap is wrapped in min(100cqb, …): the box is shrink-0 in the flex-1 cluster, so these caps alone keep it inside (see wordWheelOrbitClamp.contract).
       className="ww-orbit relative aspect-square [container-type:size] w-[21rem] h-[21rem] sm:w-[24rem] sm:h-[24rem] lg:w-[31rem] lg:h-[31rem] max-w-[min(100cqb,100cqi,max(176px,calc(100cqb-176px)))] max-h-[min(100cqb,100cqi,max(176px,calc(100cqb-176px)))] short:max-w-[min(100cqb,100cqi,max(132px,min(calc(100cqb-124px),46svh)))] short:max-h-[min(100cqb,100cqi,max(132px,min(calc(100cqb-124px),46svh)))] shrink-0 touch-none select-none"
-      onPointerDown={onPointerDown}
+      onPointerDown={(e) => {
+        if (spinning && fx) setHaltedSpin(fx.id);
+        onPointerDown(e);
+      }}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
@@ -106,7 +111,7 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
       </m.div>
       <div
         data-testid="wheel-spin"
-        data-spin={fx?.kind === 'good' && !reducedMotion ? 'true' : 'false'}
+        data-spin={spinning ? 'true' : 'false'}
         data-spin-phase={fx ? fx.id % 2 : 0}
         className="ww-spin absolute inset-0"
         style={{ zIndex: 2 }}

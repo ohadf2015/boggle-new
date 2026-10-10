@@ -198,20 +198,9 @@ const WordWheelChallenge: React.FC = () => {
     return () => setIsInGame(false);
   }, [phase, setIsInGame]);
 
-  // The site prewarmer skips /daily; a dictionary still loading when the first word lands stalls its release.
+  // The site prewarmer skips /daily. Start on the ready screen so the dictionary is built before the first word, not during it.
   useEffect(() => {
-    if (phase === 'playing') {
-      void prewarmDictionary(language as Language);
-      return;
-    }
-    if (phase !== 'ready') return;
-    const warm = () => void prewarmDictionary(language as Language);
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(warm, { timeout: 800 });
-      return () => window.cancelIdleCallback(id);
-    }
-    const timer = setTimeout(warm, 300);
-    return () => clearTimeout(timer);
+    if (phase === 'ready' || phase === 'playing') void prewarmDictionary(language as Language);
   }, [phase, language]);
 
   const containerRef = useRef<HTMLDivElement>(null);

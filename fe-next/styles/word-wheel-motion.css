@@ -3,11 +3,11 @@
    running on the compositor while a word is being checked. */
 
 .ww-spin[data-spin='true'] {
-  animation: ww-spin-0 760ms cubic-bezier(0.18, 0.8, 0.22, 1) both;
+  animation: ww-spin-0 620ms cubic-bezier(0.18, 0.8, 0.22, 1) both;
 }
 
 .ww-spin[data-spin='true'] [data-wheel-letter] {
-  animation: ww-upright-0 760ms cubic-bezier(0.18, 0.8, 0.22, 1) both;
+  animation: ww-upright-0 620ms cubic-bezier(0.18, 0.8, 0.22, 1) both;
 }
 
 /* Back-to-back words alternate between twin keyframes so each one restarts the spin. */

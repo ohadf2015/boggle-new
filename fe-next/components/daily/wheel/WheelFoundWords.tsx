@@ -37,9 +37,9 @@ const WheelFoundWords: React.FC<WheelFoundWordsProps> = ({ words, fresh, score, 
                   'font-neo-display font-black text-xs lg:text-sm uppercase leading-none',
                   isFresh ? 'bg-neo-lime text-neo-black shadow-[1px_2px_0_#000]' : 'bg-neo-cream text-neo-navy shadow-[1px_1px_0_#000]',
                 )}
-                initial={isFresh && !reducedMotion ? { y: -14, scale: 0.4, rotate: i % 2 ? 10 : -10 } : false}
+                initial={isFresh && !reducedMotion ? { y: -14, scale: 0, rotate: i % 2 ? 10 : -10 } : false}
                 animate={{ y: 0, scale: 1, rotate: 0 }}
-                transition={{ ...DROP, delay: isFresh ? 0.28 + i * 0.045 : 0 }}
+                transition={{ ...DROP, delay: isFresh ? 0.18 + i * 0.045 : 0 }}
               >
                 {ch}
               </m.span>

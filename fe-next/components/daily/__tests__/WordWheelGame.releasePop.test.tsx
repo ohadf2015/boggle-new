@@ -125,6 +125,15 @@ describe('WordWheelGame release reaction', () => {
     expect(screen.getByTestId('wheel-spin').dataset.spin).toBe('true');
   });
 
+  it('given a spin in flight, when the next swipe starts, then the letters snap home under the finger', async () => {
+    mountGame(Promise.resolve(true));
+    ['C', 'A', 'B'].forEach(tap);
+    await act(async () => { fireEvent.click(screen.getByTestId('inline-submit-chip')); });
+    expect(screen.getByTestId('wheel-spin').dataset.spin).toBe('true');
+    fireEvent.pointerDown(screen.getByTestId('wheel-orbit'), { clientX: 0, clientY: 0 });
+    expect(screen.getByTestId('wheel-spin').dataset.spin).toBe('false');
+  });
+
   it('given a rejected word, then the ring does not spin and the release gives way to the red reaction', async () => {
     const verdict = deferred();
     mountGame(verdict.promise);

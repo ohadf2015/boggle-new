@@ -76,7 +76,7 @@ import WordWheelChallenge from '../WordWheelChallenge';
 describe('WordWheelChallenge — dictionary warm-up', () => {
   beforeEach(() => prewarmSpy.mockClear());
 
-  it('given the ready screen, when it settles, then the dictionary warms before the first word', async () => {
+  it('given the ready screen, then the dictionary starts warming before the first word', async () => {
     render(<WordWheelChallenge />);
     await waitFor(() => screen.getByText('Play'));
     await waitFor(() => expect(prewarmSpy).toHaveBeenCalledWith('en'), { timeout: 4000 });
