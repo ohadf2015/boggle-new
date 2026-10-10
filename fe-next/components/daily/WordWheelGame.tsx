@@ -16,6 +16,7 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { WheelLetter, WordTile } from './WordWheelParts';
+import WordWheelRankLadder from './WordWheelRankLadder';
 import { useHoldToSubmit } from '@/hooks/useHoldToSubmit';
 import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
@@ -849,7 +850,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
       {/* ── Timer & Score Bar ── */}
       <div className="w-full space-y-1.5">
-        <div className="flex items-center w-full gap-2 justify-between">
+        <div className="flex items-center w-full gap-2 justify-between pe-12 sm:pe-0">
           {/* Start cluster: exit affordance + countdown. Laid out in-flow with
               flexbox (NOT absolute left/right) so it flips correctly under RTL —
               in Hebrew the whole cluster sits at the visual right (the start of
@@ -1057,39 +1058,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         </AnimatePresence>
       </m.div>
 
-      {/* Points-to-pass next-rival hint — fixed-height reserved slot.
-          h-* (not min-h-*) + whitespace-nowrap + truncate keeps the pill
-          locked to one line. pointsToPass derives from score → mutates every
-          submit; long HE/JA strings or long player names would otherwise
-          wrap the pill and grow the slot, recentering the wheel cluster. */}
       {showRivalLayer && (
-      <div
-        data-testid="next-rival-slot"
-        className="w-full mt-1.5 h-[30px] sm:h-[32px] flex items-center justify-center px-2"
-      >
-        <AnimatePresence>
-          {nextRival && (
-            <m.div
-              className="max-w-full px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-white font-semibold flex items-center gap-1.5 whitespace-nowrap"
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-            >
-              <ChevronUp className="w-3 h-3 text-neo-lime shrink-0" />
-              <Avatar
-                pixelSize={20}
-                userId={nextRival.playerId ?? nextRival.name}
-                customAvatar={nextRival.customAvatar ?? undefined}
-                avatarImage={nextRival.avatarImage ?? undefined}
-                className="shrink-0 rounded-full"
-              />
-              <span className="truncate">
-                {t('wordWheel.pointsToPass', { count: pointsToPass, name: nextRival.name })}
-              </span>
-            </m.div>
-          )}
-        </AnimatePresence>
-      </div>
+        <WordWheelRankLadder t={t} score={score} rivals={rivals} />
       )}
 
       {/* Pass notification toast stack — queued so back-to-back passes all
@@ -1129,20 +1099,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           chip near the word-builder still serves as the primary CTA when the
           found-words list grows past viewport. */}
       <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1 short:gap-0.5 short:py-0" data-testid="wheel-cluster">
-      {/* Tap-to-remove + double-tap-to-submit hint — fixed-height reserved
-          slot (h-*, not min-h-*) so even font/locale ascender variance can't
-          grow the slot when builtLetters mounts/unmounts the hint text. */}
-      <div
-        data-testid="tap-hint-slot"
-        className="h-[14px] sm:h-[16px] flex items-center justify-center"
-      >
-        {builtLetters.length > 0 && (
-          <p className="text-neo-white/45 text-[10px] sm:text-xs text-center">
-            {t('wordWheel.tapToRemove')} &middot; {t('wordWheel.doubleTapToSubmit')}
-          </p>
-        )}
-      </div>
-
       {/* ── The Wheel ── */}
       <div
         ref={wheelContainerRef}

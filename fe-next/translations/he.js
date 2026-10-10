@@ -9385,6 +9385,11 @@ const he = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "top": "אתה בראש!",
+      "showBoard": "הלוח של היום",
+      "hideBoard": "הסתר לוח"
+    },
     "youFoundEverything": "מצאת כל מילה שגם הם מצאו. מגניב.",
     "title": "גלגל מילים",
     "loading": "טוען את גלגל המילים...",

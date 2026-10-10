@@ -126,9 +126,9 @@ describe('WordWheelGame layout reserves space (no shift)', () => {
     expect(screen.getByTestId('next-rival-slot')).toBeInTheDocument();
   });
 
-  it('renders a reserved slot for the tap-to-remove hint at all times', () => {
+  it('no longer renders a tap-hint line under the word builder', () => {
     mountGame();
-    expect(screen.getByTestId('tap-hint-slot')).toBeInTheDocument();
+    expect(screen.queryByTestId('tap-hint-slot')).toBeNull();
   });
 
   it('renders a reserved slot for the combo chip in the top bar', () => {

@@ -8850,6 +8850,11 @@ const en = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "top": "You're on top",
+      "showBoard": "Today's board",
+      "hideBoard": "Hide board"
+    },
     "youFoundEverything": "You found every word they did. Nice.",
     "title": "Word Wheel",
     "loading": "Loading Word Wheel...",

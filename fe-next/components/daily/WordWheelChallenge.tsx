@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import dynamic from 'next/dynamic';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { AnimatePresence, m } from 'framer-motion';
-import { Star, Type, Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -12,6 +11,7 @@ import { buildQuitDialogConfig } from './survival/quitDialogConfig';
 import logger from '@/utils/logger';
 import WordWheelGame, { type WordWheelGameResult } from './WordWheelGame';
 import WordWheelResults from './WordWheelResults';
+import ReadyLeaderboardPeek from './ReadyLeaderboardPeek';
 const TabbedDailyLeaderboard = dynamic(() => import('./TabbedDailyLeaderboard'), {
   ssr: false,
 });
@@ -626,22 +626,13 @@ const WordWheelChallenge: React.FC = () => {
               </span>
             </div>
 
-            {/* Instruction rules — compact wrapping chips instead of stacked
-                full-width cards, so they take far less vertical space. */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 max-w-md w-full">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-neo-black bg-neo-navy-light shadow-hard-xs text-neo-white text-xs">
-                <Star className="h-3.5 w-3.5 shrink-0 text-neo-lime" strokeWidth={2.5} aria-hidden />
-                {t('wordWheel.centerLetterRule')}
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-neo-black bg-neo-navy-light shadow-hard-xs text-neo-white text-xs">
-                <Type className="h-3.5 w-3.5 shrink-0 text-neo-cyan" strokeWidth={2.5} aria-hidden />
-                {t('wordWheel.minLetters', { min: '3' })}
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-neo-black bg-neo-navy-light shadow-hard-xs text-neo-white text-xs">
-                <Timer className="h-3.5 w-3.5 shrink-0 text-neo-pink" strokeWidth={2.5} aria-hidden />
-                {t('wordWheel.timeLimit')}
-              </span>
-            </div>
+            <p className="text-neo-white/80 text-xs sm:text-sm text-center font-semibold">
+              {t('wordWheel.centerLetterRule')}
+              <span aria-hidden className="mx-1.5 text-neo-white/40">·</span>
+              {t('wordWheel.minLetters', { min: '3' })}
+              <span aria-hidden className="mx-1.5 text-neo-white/40">·</span>
+              {t('wordWheel.timeLimit')}
+            </p>
 
             {/* Preview wheel — outer letters censored before play to keep the
                 pre-game scout from cheating (you only see the center letter,
@@ -693,19 +684,21 @@ const WordWheelChallenge: React.FC = () => {
               {t('daily.play')}
             </m.button>
 
-            {/* Tabbed leaderboard — parity with Word Hunt ready screen */}
+            {/* Board sits behind one tap so the pre-game screen stays on the PLAY action. */}
             <div className="w-full max-w-md lg:max-w-lg xl:max-w-2xl mt-2">
-              <TabbedDailyLeaderboard
-                puzzleDate={catchupDate || getDailyChallengeDate()}
-                language={language as Language}
-                currentPlayerId={isAuthenticated && profile ? profile.id : null}
-                currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-                scope="word-wheel"
-                defaultTab="today"
-                t={t}
-                maxVisible={5}
-                compact
-              />
+              <ReadyLeaderboardPeek t={t}>
+                <TabbedDailyLeaderboard
+                  puzzleDate={catchupDate || getDailyChallengeDate()}
+                  language={language as Language}
+                  currentPlayerId={isAuthenticated && profile ? profile.id : null}
+                  currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+                  scope="word-wheel"
+                  defaultTab="today"
+                  t={t}
+                  maxVisible={5}
+                  compact
+                />
+              </ReadyLeaderboardPeek>
             </div>
           </m.div>
         )}

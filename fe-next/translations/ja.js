@@ -9456,6 +9456,11 @@ const ja = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "top": "トップです!",
+      "showBoard": "今日のランキング",
+      "hideBoard": "ランキングを閉じる"
+    },
     "youFoundEverything": "相手が見つけた言葉をすべて見つけました。お見事。",
     "title": "ワードホイール",
     "loading": "ワードホイールを読み込み中...",

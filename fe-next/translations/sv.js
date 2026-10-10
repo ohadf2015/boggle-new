@@ -9698,6 +9698,11 @@ const sv = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "top": "Du leder!",
+      "showBoard": "Dagens ranking",
+      "hideBoard": "Dölj ranking"
+    },
     "youFoundEverything": "Du hittade varje ord de hittade. Snyggt.",
     "title": "Ordhjul",
     "loading": "Laddar Ordhjul...",

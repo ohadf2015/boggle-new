@@ -9417,6 +9417,11 @@ const es = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "top": "¡Vas primero!",
+      "showBoard": "Tabla de hoy",
+      "hideBoard": "Ocultar tabla"
+    },
     "youFoundEverything": "Encontraste todas las palabras que ellos encontraron. Bien hecho.",
     "title": "Rueda de palabras",
     "loading": "Cargando Rueda de Palabras...",
