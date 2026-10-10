@@ -2,8 +2,8 @@
 
 import { useSyncExternalStore } from 'react';
 
-// Why: the global signup nudge fires ~3s after any result and sheets over the
-// quick-play results hero. This flag lets that screen hold it back.
+// Why: the global signup nudge fires seconds after any result; held until the
+// quick-play celebration has played so it never sheets over the reveal.
 let onScreen = false;
 const listeners = new Set<() => void>();
 
@@ -15,6 +15,15 @@ export function setQuickResultsOnScreen(next: boolean): void {
 
 export function isQuickResultsOnScreen(): boolean {
   return onScreen;
+}
+
+export function holdQuickResultsCalm(ms: number): () => void {
+  setQuickResultsOnScreen(true);
+  const timer = setTimeout(() => setQuickResultsOnScreen(false), ms);
+  return () => {
+    clearTimeout(timer);
+    setQuickResultsOnScreen(false);
+  };
 }
 
 function subscribe(listener: () => void): () => void {

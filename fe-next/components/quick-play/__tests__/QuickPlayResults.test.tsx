@@ -256,9 +256,8 @@ describe('QuickPlayResults — mascot, standings and words', () => {
     expect(screen.queryByTestId('quick-mascot')).toBeNull();
   });
 
-  it('plays exactly one mascot, the champion clip, when the round crosses a rank', () => {
-    // 40 points before the round, 100 after → Rookie(0) → still Rookie... use a
-    // crossing: 260 before, 300 after → Bronze.
+  it("celebrates a rank-up with the player's own avatar, never a mascot clip", () => {
+    // 260 points before the round, 300 after: Rookie -> Bronze.
     const rankUp: QuickSubmitOutcome = { ...outcome, scorePct: 40, history: [40], totalPoints: 300 };
     render(
       <QuickPlayResults
@@ -269,9 +268,9 @@ describe('QuickPlayResults — mascot, standings and words', () => {
         onChallenge={vi.fn()}
       />
     );
-    const mascots = screen.getAllByTestId('quick-mascot');
-    expect(mascots).toHaveLength(1);
-    expect(mascots[0].getAttribute('data-mascot-kind')).toBe('champion');
+    expect(screen.getByTestId('quick-rank-up')).toBeTruthy();
+    expect(screen.getByTestId('quick-hero-avatar')).toBeTruthy();
+    expect(screen.queryByTestId('quick-mascot')).toBeNull();
   });
 
   it('shows the round standings with the rivals it actually raced', () => {

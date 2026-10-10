@@ -5,31 +5,33 @@
  * Core stat is % of perfect (the board's ceiling), NOT placement: quick play
  * frames you vs the board, never vs a lobby of opponents (that's MP's turf).
  *
- * Hierarchy: hero % + score dominates; the race standings and the words you
- * collected sit beside it; rank is the long game underneath; the only filled
- * CTA is the next round — and it lets you pick the mode you go into.
+ * Above the fold is one calm moment: your avatar on turning light rays, three
+ * stat cards that land and count in turn, coins flying into the wallet, and
+ * one pinned next-round button. Standings, rank and words sit below.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { haptics } from '@/utils/haptics/HapticsManager';
 import useReducedMotion from '@/hooks/useReducedMotion';
-import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
-import { setQuickResultsOnScreen } from '@/lib/quickPlay/resultsCalm';
-import { CoinFlight, QuickResultsRays, QuickResultsSparkles } from './QuickResultsFx';
+import { getOrCreateStoredCustomAvatar } from '@/utils/profileStorage';
+import { holdQuickResultsCalm } from '@/lib/quickPlay/resultsCalm';
+import { getGuestProgress, percentileFromBoard } from '@/lib/quickPlay/guestProgress';
 import Avatar from '@/components/Avatar';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
-import { QuickPlayRankCard } from './QuickPlayRankCard';
+import { BurstLines, CoinFlight, CoinIcon, ConfettiPuff, QuickResultsRays, SparkleLoop } from './QuickResultsFx';
 import { QuickResultsStats } from './QuickResultsStats';
-import { QuickResultsNextActions } from './QuickResultsNextActions';
+import { QuickResultsWallet } from './QuickResultsWallet';
+import { QuickResultsCtaBar, QuickResultsModeSwitch } from './QuickResultsNextActions';
+import { QuickPlayRankCard } from './QuickPlayRankCard';
 import { QuickRivalsPassed } from './QuickRivalsPassed';
 import { QuickWordsCollected, type CollectedWord } from './QuickWordsCollected';
 import { QuickLeaderboardCard } from './QuickLeaderboardCard';
 import { celebrationTier } from './celebrationTier';
 import { quickRank } from './quickRank';
 import { NODE_COLORS } from './modeColors';
-import { percentileFromBoard } from '@/lib/quickPlay/guestProgress';
 import type { QuickGhostRival } from '@/lib/quickPlay/ghostRivals';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { QuickMode, QuickRoundResult, QuickSubmitOutcome } from './types';
@@ -76,24 +78,20 @@ interface QuickPlayResultsProps {
   onExit?: () => void;
 }
 
-/**
- * The mascot clip is heavy (mp4 + halo/sparkle layers) and only plays on a good
- * round, so it loads on demand. Inline, never a full-screen overlay: daily
- * results deliberately dropped the overlay fanfare as "too distracting" (see
- * DailyWordHuntResults.mascot.test) and the same objection applies here.
- */
 /** The idle/reaction mascot (GIF set) — used for the scoreless round. */
 const InteractiveMascot = dynamic(() => import('@/components/ui/InteractiveMascot'), { ssr: false });
 
-const MascotCelebrationVideo = dynamic(
-  () => import('@/components/mascot/MascotCelebrationVideo').then((m) => m.MascotCelebrationVideo),
-  { ssr: false }
-);
-
 /** Below this many leaderboard rows a percentile is noise, not information. */
 const MIN_BOARD_FOR_PERCENTILE = 5;
-const GAUGE_R = 54;
-const GAUGE_C = 2 * Math.PI * GAUGE_R;
+/** The signup sheet waits until the reveal has played out. */
+const CALM_HOLD_MS = 4500;
+
+type Point = { x: number; y: number };
+const centerOf = (el: Element | null): Point | null => {
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+};
 
 export function QuickPlayResults({
   result,
@@ -113,7 +111,17 @@ export function QuickPlayResults({
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
   const celebrated = useRef(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const coinChipRef = useRef<HTMLSpanElement>(null);
+  const walletIconRef = useRef<HTMLSpanElement>(null);
+  const [flight, setFlight] = useState<{ from: Point | null; to: Point | null }>({ from: null, to: null });
   const prefersReducedMotion = useReducedMotion();
+  const animate = !prefersReducedMotion;
+
+  const [guestAvatar] = useState<CustomAvatarConfig | null>(() => (user ? null : getOrCreateStoredCustomAvatar()));
+  const [walletTo] = useState(() =>
+    isGuest ? getGuestProgress().coinsPending : (profile?.total_coins ?? 0) + outcome.coins
+  );
+  const walletFrom = Math.max(0, walletTo - outcome.coins);
 
   // This screen replaces the game board with no navigation, so keyboard
   // focus needs to move here explicitly instead of being stranded on a
@@ -121,6 +129,12 @@ export function QuickPlayResults({
   useEffect(() => {
     headingRef.current?.focus();
   }, []);
+
+  useLayoutEffect(() => {
+    setFlight({ from: centerOf(coinChipRef.current), to: centerOf(walletIconRef.current) });
+  }, []);
+
+  useEffect(() => holdQuickResultsCalm(CALM_HOLD_MS), []);
 
   // history[0] is this round (inserted before fetch); compare vs the rest
   const priorAvg = useMemo(() => {
@@ -134,19 +148,13 @@ export function QuickPlayResults({
     [outcome.history, result.scorePct]
   );
   const beatRival = rival !== null && rival.myValue > rival.theirValue;
-  // Near-miss tension: a strong-but-not-record round nudges "one more round"
-  // harder than a flat score readout. Suppressed once the bigger badges
-  // (best/rank-up) already cover the moment.
+  // Near-miss tension, suppressed once the bigger badges cover the moment.
   const isNearMiss = result.scorePct >= 85 && result.scorePct < 100 && !isPersonalBest;
-  // Quick Rank: this round's pct just became permanent points
   const rankNow = quickRank(outcome.totalPoints);
   const rankBefore = quickRank(Math.max(0, outcome.totalPoints - result.scorePct));
   const rankedUp = rankNow.key !== rankBefore.key && outcome.totalPoints > 0;
-  // A guest's percentile RPC always answered 0 ("better than 0% of today's
-  // scores" after every round). The public board answers the same question —
-  // but only once there are enough rows for the answer to mean anything: on a
-  // three-row board a mediocre round reads "better than 100%", which is worse
-  // than saying nothing. Capped at 99 for the same reason.
+  // A percentile on a three-row board reads "better than 100%" for a mediocre
+  // round, so it waits for enough rows and caps at 99.
   const boardPercentile =
     board.length >= MIN_BOARD_FOR_PERCENTILE ? Math.min(99, percentileFromBoard(result.scorePct, board)) : null;
   const percentileToday = outcome.percentileToday > 0 ? outcome.percentileToday : boardPercentile ?? 0;
@@ -158,14 +166,7 @@ export function QuickPlayResults({
     beatRival,
     percentileToday: outcome.percentileToday,
   });
-  // Sparse starbursts, not a confetti blizzard: a rank-up or a top tier gets
-  // the full handful, a plain good round gets two.
-  const sparkCount = rankedUp ? 6 : celebrateTier >= 2 ? 4 : celebrateTier >= 1 ? 2 : 0;
-
-  useEffect(() => {
-    setQuickResultsOnScreen(true);
-    return () => setQuickResultsOnScreen(false);
-  }, []);
+  const confettiCount = result.wordsFound === 0 ? 0 : rankedUp || celebrateTier >= 2 ? 16 : 10;
 
   useEffect(() => {
     if (celebrated.current) return;
@@ -186,280 +187,218 @@ export function QuickPlayResults({
     };
   }, []);
 
-  const dash = (result.scorePct / 100) * GAUGE_C;
   const modeColor = NODE_COLORS[result.mode];
-  // Static appear: an opacity tween on a full-width layer flashes on mobile.
-  // Motion lives in the rays, the counters and the coins instead.
-  const fxEnabled = !prefersReducedMotion;
-
   const myName = profile?.username || t('common.you', 'You');
-
-  // Mascot: at most one clip, only on a moment that earned it. Priority runs
-  // biggest-first — a rank-up outranks a personal best outranks clearing the
-  // whole field. A flat round gets nothing; a mascot for every round is
-  // wallpaper, and a sad mascot after a bad round is a reason to stop playing.
-  const passedAllRivals = rivals.length > 0 && rivals.every((r) => result.scorePct > r.scorePct);
-  const mascotKind = rankedUp
-    ? ('champion' as const)
-    : isPersonalBest
-      ? ('bingo' as const)
-      : passedAllRivals
-        ? ('knight' as const)
-        : dayStreak > 2
-          ? ('streak' as const)
-          : null;
+  const badge = 'animate-neo-pop rounded-xl border-[3px] border-black px-3 py-1 font-neo-display text-xs font-bold tracking-wide text-black shadow-hard';
 
   return (
-    <div
-      className="flex h-full flex-col gap-2.5 overflow-y-auto overscroll-contain bg-neo-navy px-4 py-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
-      data-testid="quick-play-results"
-    >
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-2.5">
-      <div className="flex items-center justify-center gap-2">
-        <span
-          data-testid="quick-mode-chip"
-          className={`rounded-xl border-neo-thick border-black px-3 py-1 font-neo-display text-xs font-bold tracking-widest text-black shadow-hard ${modeColor.bg}`}
-        >
-          {t(`quickPlay.solo.mode.${result.mode}`)}
-        </span>
-        <h1 ref={headingRef} tabIndex={-1} className="font-neo-display text-lg font-bold tracking-wide text-neo-cream outline-none">
-          {t('quickPlay.solo.roundComplete')}
-        </h1>
-        {dayStreak > 1 && (
-          <span
-            className="rounded-xl border-neo-thick border-black bg-neo-orange px-2 py-1 font-neo-display text-xs font-bold text-black shadow-hard"
-            data-testid="quick-day-streak"
-          >
-            {t('quickPlay.solo.dayStreak', '{days}-day streak', { days: String(dayStreak) })}
-          </span>
-        )}
-      </div>
-
-      {mascotKind && (
-        <div className="flex justify-center" data-testid="quick-mascot" data-mascot-kind={mascotKind}>
-          <MascotCelebrationVideo
-            kind={mascotKind}
-            overlay={false}
-            size="clamp(140px, 30vmin, 220px)"
-            autoDismissMs={3600}
-            title={null}
-          />
-        </div>
-      )}
-
-      {/* Badges — celebration layer. Restyle/reposition only, keep conditions. */}
-
-      {isPersonalBest && (
-        <div className="animate-neo-pop -rotate-1 rounded-xl border-neo-thick border-black bg-neo-yellow px-3 py-1.5 text-center font-neo-display text-sm font-bold tracking-wide text-black shadow-hard" data-testid="quick-new-best">
-          ★ {t('quickPlay.solo.newBest')}
-        </div>
-      )}
-      {rankedUp && (
-        <div className="animate-neo-pop rounded-xl border-neo-thick border-black bg-neo-pink px-3 py-1.5 text-center font-neo-display text-sm font-bold tracking-wide text-black shadow-hard" data-testid="quick-rank-up">
-          {t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}
-        </div>
-      )}
-      {isNearMiss && (
-        <div className="animate-neo-pop rounded-xl border-neo-thick border-black bg-neo-orange px-3 py-1.5 text-center font-neo-display text-sm font-bold tracking-wide text-black shadow-hard" data-testid="quick-near-miss">
-          {t('quickPlay.solo.nearMiss', { pct: String(100 - result.scorePct) })}
-        </div>
-      )}
-
-      {/* Two columns on a wide screen — the single narrow stack left two thirds
-          of a desktop viewport empty below the fold. */}
-      <div className="grid gap-2.5 lg:grid-cols-2 lg:items-start">
-      <div className="flex flex-col gap-2.5">
-      {/* Hero: % of perfect — DOMINANT element. */}
-      <div
-        className="relative overflow-hidden rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-4 shadow-hard-lg"
-        data-testid="quick-hero-card"
-      >
-        <QuickResultsRays color={modeColor.hex} enabled={fxEnabled} />
-        <QuickResultsSparkles count={sparkCount} enabled={fxEnabled} />
-        <div className="relative z-10 flex flex-col items-center gap-4">
-          <div data-testid="quick-hero-avatar">
-            <Avatar
-              userId={user?.id ?? myName}
-              customAvatar={profile?.avatar_config ?? undefined}
-              size="xl"
-            />
-          </div>
-          {/* Percentage gauge and display */}
-          <div className="relative h-28 w-28">
-            <svg width="112" height="112" viewBox="0 0 128 128" className="-rotate-90">
-              <circle cx="64" cy="64" r={GAUGE_R} fill="none" stroke="var(--neo-abyss)" strokeWidth="14" />
-              <circle
-                cx="64" cy="64" r={GAUGE_R} fill="none" stroke={modeColor.hex} strokeWidth="14"
-                strokeDasharray={`${dash} ${GAUGE_C - dash}`}
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <b className={`font-neo-display text-5xl ${modeColor.text}`} data-testid="quick-hero-percentage">
-                {result.scorePct}%
-              </b>
-              <small className="text-[10px] tracking-widest text-neo-white/60">{t('quickPlay.solo.ofPerfect')}</small>
-            </div>
-          </div>
-
-          {/* Words line: the score itself lives in the stat card below. */}
-          <div className="text-center">
-            <div className="text-xs text-neo-white/60">
-              {t('quickPlay.solo.wordsFound', {
-                found: String(result.wordsFound),
-                total: String(result.totalWords),
-              })}
-            </div>
-          </div>
-
-          {/* Percentile comparison — pulled up from rank card */}
-          {showPercentile && (
-            <div className="w-full border-t border-neo-white/20 pt-3">
-              <p className="text-center text-xs text-neo-cream font-bold">
-                {t('quickPlay.solo.betterThan', { pct: String(percentileToday) })}
-              </p>
-            </div>
+    <div className="relative flex h-full flex-col overflow-hidden bg-neo-navy" data-testid="quick-play-results">
+      <div className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain" data-testid="quick-results-scroll">
+        <header className="relative z-20 mx-auto flex w-full max-w-5xl items-center justify-between gap-2 px-4 pt-3">
+          {onExit ? (
+            <button
+              type="button"
+              data-testid="quick-results-exit"
+              onClick={onExit}
+              aria-label={t('common.back')}
+              className="flex h-11 w-11 items-center justify-center rounded-full text-neo-white/70 active:scale-95"
+            >
+              <X className="h-6 w-6" strokeWidth={2.75} aria-hidden="true" />
+            </button>
+          ) : (
+            <span className="w-11" aria-hidden="true" />
           )}
+          <div className="flex min-w-0 items-center gap-1.5">
+            <span
+              data-testid="quick-mode-chip"
+              className={`rounded-xl border-[3px] border-black px-3 py-1 font-neo-display text-xs font-bold tracking-widest text-black shadow-hard ${modeColor.bg}`}
+            >
+              {t(`quickPlay.solo.mode.${result.mode}`)}
+            </span>
+            {dayStreak > 1 && (
+              <span
+                className="rounded-xl border-[3px] border-black bg-neo-orange px-2 py-1 font-neo-display text-xs font-bold text-black shadow-hard"
+                data-testid="quick-day-streak"
+              >
+                {t('quickPlay.solo.dayStreak', '{days}-day streak', { days: String(dayStreak) })}
+              </span>
+            )}
+          </div>
+          <QuickResultsWallet from={walletFrom} to={walletTo} animate={animate} held={isGuest} iconRef={walletIconRef} />
+        </header>
 
-          {/* Target word indicator (word-hunt only) */}
-          {result.mode === 'word-hunt' && result.targetWord && (
-            <div className={`text-sm font-bold ${result.targetWordFound ? 'text-neo-lime' : 'text-neo-white/75'}`}>
-              {t(
-                result.targetWordFound ? 'quickPlay.solo.targetWordFound' : 'quickPlay.solo.targetWordMissed',
-                { word: result.targetWord.toUpperCase() }
+        <section
+          className="relative mx-auto flex w-full max-w-xl flex-col items-center gap-3 px-4 pb-5 lg:gap-4"
+          data-testid="quick-hero-card"
+        >
+          <div className="relative flex h-[190px] w-full items-center justify-center lg:h-[250px]">
+            <QuickResultsRays color={modeColor.hex} spinning={animate} />
+            <ConfettiPuff count={confettiCount} enabled={animate} />
+            <BurstLines enabled={animate && result.wordsFound > 0} />
+            <SparkleLoop enabled={animate && result.wordsFound > 0} />
+            <div
+              className={`relative z-10 lg:scale-[1.3] ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}
+              data-testid="quick-hero-avatar"
+            >
+              <div className={animate ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
+                <Avatar
+                  userId={user?.id ?? 'guest'}
+                  customAvatar={profile?.avatar_config ?? guestAvatar ?? undefined}
+                  pixelSize={128}
+                />
+              </div>
+              <span
+                aria-hidden="true"
+                className={`absolute -bottom-3 left-1/2 -z-10 h-3 w-24 -translate-x-1/2 rounded-[50%] bg-black/45 ${
+                  animate ? 'animate-[qp-shadow-bob_2.8s_ease-in-out_0.9s_infinite]' : ''
+                }`}
+              />
+            </div>
+          </div>
+
+          <div className="relative z-10 flex flex-col items-center gap-1 text-center">
+            <h1
+              ref={headingRef}
+              tabIndex={-1}
+              className="font-neo-display text-[32px] font-bold leading-tight text-neo-yellow outline-none [text-shadow:0_3px_0_#000] lg:text-5xl"
+            >
+              {t('quickPlay.solo.roundComplete')}
+            </h1>
+            <p className="text-sm font-semibold text-neo-white/70">
+              {t('quickPlay.solo.wordsFound', { found: String(result.wordsFound), total: String(result.totalWords) })}
+            </p>
+          </div>
+
+          {(isPersonalBest || rankedUp || isNearMiss) && (
+            <div className="relative z-10 flex flex-wrap items-center justify-center gap-2">
+              {isPersonalBest && (
+                <span className={`${badge} -rotate-2 bg-neo-yellow`} data-testid="quick-new-best">
+                  ★ {t('quickPlay.solo.newBest')}
+                </span>
+              )}
+              {rankedUp && (
+                <span className={`${badge} rotate-1 bg-neo-pink`} data-testid="quick-rank-up">
+                  {t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}
+                </span>
+              )}
+              {isNearMiss && (
+                <span className={`${badge} bg-neo-orange`} data-testid="quick-near-miss">
+                  {t('quickPlay.solo.nearMiss', { pct: String(100 - result.scorePct) })}
+                </span>
               )}
             </div>
           )}
 
-          {/* Improvement vs average */}
-          {/* "▲ 0% vs your average" is noise — only show a real move. */}
-          {improvementPct !== null && improvementPct !== 0 && (
-            <span
-              className={`w-max rounded-lg border-2 px-2 py-0.5 text-xs font-bold ${
-                improvementPct >= 0
-                  ? 'border-neo-lime bg-neo-lime/15 text-neo-lime'
-                  : 'border-neo-white/30 bg-neo-white/5 text-neo-white/70'
-              }`}
-            >
-              {improvementPct >= 0 ? '▲' : '▼'} {t('quickPlay.solo.vsAverage', { pct: String(Math.abs(improvementPct)) })}
-            </span>
+          <QuickResultsStats
+            score={result.score}
+            scorePct={result.scorePct}
+            wordsFound={result.wordsFound}
+            animate={animate}
+            modeBand={modeColor.bg}
+            modeInk={modeColor.text}
+          />
+
+          {showPercentile && (
+            <p className="text-center text-xs font-bold text-neo-cream">
+              {t('quickPlay.solo.betterThan', { pct: String(percentileToday) })}
+            </p>
           )}
-        </div>
-      </div>
+          {result.mode === 'word-hunt' && result.targetWord && (
+            <p className={`text-sm font-bold ${result.targetWordFound ? 'text-neo-lime' : 'text-neo-white/75'}`}>
+              {t(result.targetWordFound ? 'quickPlay.solo.targetWordFound' : 'quickPlay.solo.targetWordMissed', {
+                word: result.targetWord.toUpperCase(),
+              })}
+            </p>
+          )}
 
-      <QuickResultsStats score={result.score} wordsFound={result.wordsFound} />
-
-      {/* Rewards — small chips, not full-width slabs. Signed out, the same
-          numbers are shown as held rather than as a row of zeros. Animated
-          counters make the reveal feel like a payoff. */}
-      <div className="relative flex flex-col items-center gap-1">
-        <CoinFlight count={outcome.coins > 0 ? 6 : 0} enabled={fxEnabled} />
-        <div className="flex items-center justify-center gap-3">
-          <div
-            className={`inline-flex items-center gap-1 rounded-full border-2 px-3 py-1.5 font-neo-display text-sm font-bold ${
-              isGuest ? 'border-neo-yellow/50 bg-neo-yellow/5 text-neo-yellow/80' : 'border-neo-yellow bg-neo-yellow/10 text-neo-yellow'
-            }`}
-            data-testid="quick-coins-reward"
-          >
-            ◉ +<AnimatedCounter value={outcome.coins} size="sm" variant="gold" delay={800} />
+          <div className="flex flex-wrap items-center justify-center gap-2.5">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border-[3px] border-black bg-neo-navy-elevated px-3 py-1 font-neo-display text-sm font-bold text-neo-yellow shadow-hard"
+              data-testid="quick-coins-reward"
+            >
+              <span ref={coinChipRef} className="block h-5 w-5">
+                <CoinIcon className="h-full w-full" />
+              </span>
+              +{outcome.coins}
+            </span>
+            <span
+              className="inline-flex items-center gap-1 rounded-full border-[3px] border-black bg-neo-navy-elevated px-3 py-1 font-neo-display text-sm font-bold text-neo-purple shadow-hard"
+              data-testid="quick-xp-reward"
+            >
+              ★ +{outcome.xp}
+            </span>
+            {improvementPct !== null && improvementPct !== 0 && (
+              <span
+                className={`rounded-full border-2 px-2.5 py-1 text-xs font-bold ${
+                  improvementPct > 0 ? 'border-neo-lime text-neo-lime' : 'border-neo-white/30 text-neo-white/70'
+                }`}
+              >
+                {improvementPct > 0 ? '▲' : '▼'} {t('quickPlay.solo.vsAverage', { pct: String(Math.abs(improvementPct)) })}
+              </span>
+            )}
           </div>
-          <div
-            className={`inline-flex items-center gap-1 rounded-full border-2 px-3 py-1.5 font-neo-display text-sm font-bold ${
-              isGuest ? 'border-neo-purple/50 bg-neo-purple/5 text-neo-purple/80' : 'border-neo-purple bg-neo-purple/10 text-neo-purple'
-            }`}
-            data-testid="quick-xp-reward"
-          >
-            ★ +<AnimatedCounter value={outcome.xp} size="sm" variant="default" delay={1100} />
-          </div>
-        </div>
-        {isGuest && (
-          <p className="text-center text-[11px] text-neo-white/55" data-testid="quick-rewards-pending">
-            {/* Says only what's true: nothing grants the accumulated
-                coinsPending on sign-in yet, so don't promise a balance. */}
-            {t('quickPlay.solo.rewardsPending', 'Sign in to start banking coins and XP')}
-          </p>
-        )}
-      </div>
+          {isGuest && (
+            <p className="text-center text-[11px] text-neo-white/55" data-testid="quick-rewards-pending">
+              {t('quickPlay.solo.rewardsPending', 'Sign in to start banking coins and XP')}
+            </p>
+          )}
+        </section>
 
-
-      <QuickResultsNextActions
-        currentMode={result.mode}
-        onNextRound={onNextRound}
-        onChallenge={onChallenge}
-        onExit={onExit}
-      />
-
-      {/* Rank progress card — split out for modularity */}
-      <div>
-        <QuickPlayRankCard
-          totalPoints={outcome.totalPoints}
-          percentileToday={percentileToday}
-          scorePct={result.scorePct}
-        />
-      </div>
-      </div>
-
-      <div className="flex flex-col gap-2.5">
-      {/* The field you just raced. */}
-      <QuickRivalsPassed
-        rivals={rivals}
-        myScorePct={result.scorePct}
-        myName={myName}
-        myUserId={user?.id}
-        myAvatar={profile?.avatar_config ?? null}
-      />
-
-      {/* Rival compare: the challenge / weekly rivalry, a different axis from
-          the round's own field above. */}
-      {rival && rival.avatarUserId && (
-        <RivalCompareCard
-          rivalName={rival.name}
-          rivalEmoji={rival.emoji}
-          rivalScore={rival.theirValue}
-          myScore={rival.myValue}
-          rivalAvatar={{
-            userId: rival.avatarUserId,
-            customAvatar: rival.avatarConfig ?? undefined,
-          }}
-          myAvatar={user?.id ? {
-            userId: user.id,
-            customAvatar: profile?.avatar_config ?? undefined,
-          } : undefined}
-          t={t}
-        />
-      )}
-
-      {collected.length > 0 ? (
-        <QuickWordsCollected words={collected} collectionTotal={collectionTotal} />
-      ) : (
-        /* A scoreless round used to leave this whole column empty — the screen
-           that has to sell one more round showing nothing at all. */
-        <div
-          className="flex items-center gap-3 rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 shadow-hard"
-          data-testid="quick-no-words"
+        <section
+          className="mx-auto grid w-full max-w-5xl gap-3 px-4 pb-4 lg:grid-cols-2 lg:items-start"
+          data-testid="quick-results-details"
         >
-          <InteractiveMascot variant="encouraging" sizeClassName="w-16 h-16 shrink-0" animated={false} />
-          <p className="font-neo-display text-sm text-neo-cream">
-            {t('quickPlay.solo.noWords', 'No words this time — the next board is 60 seconds away.')}
-          </p>
-        </div>
-      )}
+          <div className="flex flex-col gap-3">
+            <QuickResultsModeSwitch currentMode={result.mode} onNextRound={onNextRound} />
+            <QuickPlayRankCard totalPoints={outcome.totalPoints} percentileToday={percentileToday} scorePct={result.scorePct} />
+            <QuickRivalsPassed
+              rivals={rivals}
+              myScorePct={result.scorePct}
+              myName={myName}
+              myUserId={user?.id}
+              myAvatar={profile?.avatar_config ?? guestAvatar}
+            />
+            {rival && rival.avatarUserId && (
+              <RivalCompareCard
+                rivalName={rival.name}
+                rivalEmoji={rival.emoji}
+                rivalScore={rival.theirValue}
+                myScore={rival.myValue}
+                rivalAvatar={{ userId: rival.avatarUserId, customAvatar: rival.avatarConfig ?? undefined }}
+                myAvatar={user?.id ? { userId: user.id, customAvatar: profile?.avatar_config ?? undefined } : undefined}
+                t={t}
+              />
+            )}
+          </div>
+          <div className="flex flex-col gap-3">
+            {collected.length > 0 ? (
+              <QuickWordsCollected words={collected} collectionTotal={collectionTotal} />
+            ) : (
+              <div
+                className="flex items-center gap-3 rounded-2xl border-[3px] border-black bg-neo-navy-elevated p-3 shadow-hard"
+                data-testid="quick-no-words"
+              >
+                <InteractiveMascot variant="encouraging" sizeClassName="w-16 h-16 shrink-0" animated={false} />
+                <p className="font-neo-display text-sm text-neo-cream">
+                  {t('quickPlay.solo.noWords', 'No words this time — the next board is 60 seconds away.')}
+                </p>
+              </div>
+            )}
+            <QuickLeaderboardCard entries={board} />
+          </div>
+        </section>
 
-      {/* Leaderboard card component (extracted for line-count management) */}
-      <QuickLeaderboardCard entries={board} />
-      </div>
+        {/* Reserves room for the push-notification prompt anchored at
+            bottom-[calc(5rem+var(--admob-banner-height,0px))]. */}
+        <div
+          className="h-[calc(5rem+var(--admob-banner-height,0px)+1.5rem)]"
+          data-testid="quick-results-bottom-spacer"
+          aria-hidden="true"
+        />
       </div>
 
-      </div>
-
-      {/* Bottom spacer: reserves space for the push-notification prompt that anchors
-          at fixed bottom-[calc(5rem+var(--admob-banner-height,0px))], preventing it
-          from covering the primary CTA. The prompt is max-w-md with internal padding,
-          so we reserve an additional 1.5rem buffer. */}
-      <div
-        className="h-[calc(5rem+var(--admob-banner-height,0px)+1.5rem)]"
-        data-testid="quick-results-bottom-spacer"
-        aria-hidden="true"
-      />
+      <QuickResultsCtaBar onNextRound={onNextRound} onChallenge={onChallenge} shine={animate} />
+      <CoinFlight count={outcome.coins > 0 ? 8 : 0} from={flight.from} to={flight.to} enabled={animate} />
     </div>
   );
 }

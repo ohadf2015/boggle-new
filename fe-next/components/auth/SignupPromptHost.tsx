@@ -45,8 +45,7 @@ export function SignupPromptHost() {
     isAuthenticated,
     hasUser: !!user,
     authLoading,
-    // Quick-play results carry their own inline sign-in line; a sheet over the
-    // celebration hid the reward reveal (3s after every round).
+    // Held while the quick-play celebration plays, then asks: celebrate first.
     disabled: isMultiplayerRoute(pathname) || quickResultsOnScreen,
   });
 
