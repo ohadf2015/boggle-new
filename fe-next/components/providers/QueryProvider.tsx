@@ -21,7 +21,7 @@ export function QueryProvider({ children }: { children: ReactNode }) {
     defaultOptions: {
       queries: {
         staleTime: 60_000,
-        gcTime: 5 * 60_000,
+        gcTime: typeof window === 'undefined' ? Infinity : 5 * 60_000,
         retry: 1,
         refetchOnWindowFocus: false,
       },
