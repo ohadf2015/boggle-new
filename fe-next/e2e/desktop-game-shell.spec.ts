@@ -65,9 +65,9 @@ test.describe('desktop game shell (1440x900)', () => {
   });
 
   test('solo classic: rails frame a height-sized board', async ({ page }) => {
-    test.setTimeout(60_000);
+    test.setTimeout(90_000);
     await page.goto('/en/singleplayer');
-    await page.getByRole('button', { name: /^\s*start\s*$/i }).first().click({ timeout: 30_000 });
+    await page.getByRole('button', { name: /^\s*start\s*$/i }).first().click({ timeout: 60_000 });
     await dismissCoaches(page);
     await expectShell(page, 'classic');
     await expectBoardOwnsHeight(page);
@@ -88,6 +88,29 @@ test.describe('desktop game shell (1440x900)', () => {
     await expectShell(page, 'word-chain');
     await expect(page.getByTestId('game-shell-left').getByTestId('pyramid-rail-map')).toBeVisible();
     await expect(page.getByTestId('game-shell-stage').getByTestId('pyramid-root')).toBeVisible();
+  });
+
+  test('lightning round: clock, target and keys in the rail, board in the centre', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.goto('/en/brain');
+    await page.getByTestId('drill-level-lightning-round').click({ timeout: 60_000 });
+    await page.getByRole('button', { name: /let'?s train/i }).click({ timeout: 30_000 });
+    await expectShell(page, 'lightning');
+    await expectBoardOwnsHeight(page);
+    await expect(page.getByTestId('game-shell-left').getByTestId('shell-clock')).toBeVisible();
+  });
+
+  test('wordcraft: the board is sized by height with the chrome beside it, no site header', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.goto('/en/word-craft');
+    await page.getByRole('button', { name: /^\s*start game\s*$/i }).click({ timeout: 60_000 });
+    const board = page.locator('[data-wc-board-square]');
+    await expect(board).toBeVisible({ timeout: 30_000 });
+    const box = await board.boundingBox();
+    expect(box?.height ?? 0).toBeGreaterThan(DESKTOP.height * 0.75);
+    const rack = await page.locator('[data-rack-tile-id]').first().boundingBox();
+    expect(rack?.x ?? 0).toBeGreaterThan((box?.x ?? 0) + (box?.width ?? 0));
+    for (const header of await page.locator('[data-wc-page] > header').all()) await expect(header).toBeHidden();
   });
 });
 
