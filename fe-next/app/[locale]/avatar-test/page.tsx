@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import AvatarTestPageClient from './PageClient';
 import { parseAvatarLabParams } from './fixtures';
+import { notFoundInProduction } from '@/lib/devOnlyRoute';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -11,6 +12,7 @@ type PageProps = {
 };
 
 export default async function AvatarTestPage({ searchParams }: PageProps) {
+  notFoundInProduction();
   const { level, view } = parseAvatarLabParams(await searchParams);
   return (
     <>
