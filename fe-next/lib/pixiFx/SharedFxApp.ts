@@ -15,7 +15,13 @@ import type { Application, Graphics } from 'pixi.js';
 import type { ParticlePool } from '../gameEngine/ParticleSystem';
 import type { ParticleConfig } from '../gameEngine/types';
 import { PRESETS, type PresetName } from './presets';
-import { dropHeldFxCalls, flushHeldFxCalls, holdFxCall, waitForFxGate } from './SharedFxGate';
+import {
+  dropHeldFxCalls,
+  flushHeldFxCalls,
+  holdFxCall,
+  openFxGate,
+  waitForFxGate,
+} from './SharedFxGate';
 
 // Runtime pixi.Graphics constructor, resolved during mount(). The spawn helpers
 // that use it all early-return unless `app` is set (i.e. post-mount), so it is
@@ -112,6 +118,13 @@ let fireworkParticles: FireworkParticle[] = [];
 let live = false;
 let generation = 0;
 let resizeHandler: (() => void) | null = null;
+// The GPU context lives while SharedFxMount holds it OR any fxLayer does. Only the
+// root mount enables spawn*: it carries the native / low-end / calm-mode gating.
+let rootHeld = false;
+let layerHolds = 0;
+// Per-frame callbacks from fxLayers; one returning false is dropped.
+type FxWork = (deltaMS: number) => boolean;
+const extraWork = new Set<FxWork>();
 
 function isSSR(): boolean {
   return typeof window === 'undefined';
@@ -123,7 +136,8 @@ function hasActiveFxWork(): boolean {
   return (
     coinStreams.length > 0 ||
     fireworkParticles.length > 0 ||
-    getActiveEmitterCount() > 0
+    getActiveEmitterCount() > 0 ||
+    extraWork.size > 0
   );
 }
 
@@ -138,14 +152,18 @@ async function mount(
   device: Partial<DeviceConfig> = {},
 ): Promise<void> {
   if (isSSR()) return;
+  rootHeld = true;
+  deviceConfig = { ...DEFAULT_DEVICE, ...device };
+  return ensureMounted(parent);
+}
+
+async function ensureMounted(parent: HTMLElement): Promise<void> {
   if (app) return;
   if (mountPromise) return mountPromise;
 
   const myGeneration = ++generation;
 
   mountPromise = (async () => {
-    deviceConfig = { ...DEFAULT_DEVICE, ...device };
-
     // First-load gate (./SharedFxGate): while held, pixi waits for the visitor's
     // first interaction or first spawn instead of loading with the page.
     await waitForFxGate();
@@ -201,6 +219,7 @@ async function mount(
       pool?.update(t.deltaMS / 1000);
       updateCoinStreams(t.deltaMS);
       updateFireworks(t.deltaMS);
+      for (const work of [...extraWork]) if (!work(t.deltaMS)) extraWork.delete(work);
       // Idle-stop: once every queue has drained, halt the rAF loop. A free-running
       // ticker on this global singleton burned ~1.2–2.0s main-thread per 6s on an
       // idle homepage (high input_delay → "taps feel stuck"). Restarted by spawn*.
@@ -225,6 +244,12 @@ async function mount(
 }
 
 function unmount(): void {
+  rootHeld = false;
+  if (layerHolds > 0) return;
+  teardown();
+}
+
+function teardown(): void {
   // Invalidate any in-flight mount so its init() discards instead of assigning,
   // and clear mountPromise so the next mount() starts fresh rather than awaiting
   // the discarded attempt (StrictMode mount→unmount→mount before init settles).
@@ -240,6 +265,7 @@ function unmount(): void {
   if (tickerFn) app.ticker.remove(tickerFn);
   clearCoinStreams();
   clearFireworks();
+  extraWork.clear();
   pool?.destroy();
   app.canvas.remove();
   app.destroy();
@@ -247,6 +273,33 @@ function unmount(): void {
   pool = null;
   tickerFn = null;
   deviceConfig = DEFAULT_DEVICE;
+}
+
+/** Hold the GPU context for an fxLayer, mounting it if nothing else has. */
+async function acquire(): Promise<Application | null> {
+  if (isSSR()) return null;
+  layerHolds++;
+  openFxGate();
+  try {
+    await ensureMounted(document.body);
+  } catch {
+    // GPU init failed: the layer gets null and releases.
+  }
+  return app;
+}
+
+function release(): void {
+  if (layerHolds === 0) return;
+  layerHolds--;
+  if (layerHolds === 0 && !rootHeld) teardown();
+}
+
+function addWork(work: FxWork): () => void {
+  extraWork.add(work);
+  wakeTicker();
+  return () => {
+    extraWork.delete(work);
+  };
 }
 
 function computeControlPoint(source: Point, target: Point): Point {
@@ -265,6 +318,7 @@ function holdIfMounting(replay: () => void): void {
 
 function spawnCoinStream(req: CoinStreamRequest): void {
   if (isSSR()) return;
+  if (!rootHeld) return;
   if (!app) return holdIfMounting(() => spawnCoinStream(req));
   if (deviceConfig.prefersReducedMotion) return;
 
@@ -358,6 +412,7 @@ function getActiveCoinStreamCount(): number {
 
 function spawnFirework(req: FireworkRequest): void {
   if (isSSR()) return;
+  if (!rootHeld) return;
   if (!app) return holdIfMounting(() => spawnFirework(req));
   if (deviceConfig.prefersReducedMotion) return;
 
@@ -475,6 +530,7 @@ function spawnBurst(
   overrides: SpawnOverrides = {},
 ): void {
   if (isSSR()) return;
+  if (!rootHeld) return;
   if (!pool) return holdIfMounting(() => spawnBurst(preset, x, y, overrides));
   if (deviceConfig.prefersReducedMotion) return;
 
@@ -525,6 +581,9 @@ export const SharedFxApp = {
   getActiveEmitterCount,
   getActiveCoinStreamCount,
   getActiveFireworkCount,
+  acquire,
+  release,
+  addWork,
 };
 
 export type { DeviceConfig, SpawnOverrides, CoinStreamRequest, FireworkRequest };

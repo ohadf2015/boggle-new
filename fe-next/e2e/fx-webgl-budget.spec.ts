@@ -1,11 +1,8 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-
-// Counts WebGL contexts a page holds. "raw" = every webgl getContext call
-// (Pixi probes support with a throwaway canvas, so raw overcounts). "live" =
-// distinct canvases still connected to the DOM whose context is not lost.
-// Sampled every 200ms because effects mount late (SharedFxGate, GPU init).
+import { installWebglProbe, resetWebglPeak, webglSnapshot, type ProbeSnapshot } from './helpers/webgl-probe';
+import { solveCrosswordByReveal } from './helpers/crossword-solve';
 
 const ROUTES = (process.env.FX_PROBE_ROUTES ?? '/en,/en/blast,/en/daily-word-wheel,/en/daily,/en/crossword,/en/word-tower,/en/word-craft,/en/adventure')
   .split(',')
@@ -14,65 +11,12 @@ const ROUTES = (process.env.FX_PROBE_ROUTES ?? '/en,/en/blast,/en/daily-word-whe
 const SETTLE_MS = Number(process.env.FX_PROBE_SETTLE_MS ?? 4000);
 const OUT = process.env.FX_PROBE_OUT ?? 'test-results/fx-webgl-probe.json';
 
-interface ProbeSnapshot {
-  rawWebgl: number;
-  everCanvases: number;
-  liveNow: number;
-  peakLive: number;
-}
-
-async function installProbe(page: Page): Promise<void> {
-  await page.addInitScript(() => {
-    const WEBGL = /^(webgl|webgl2|experimental-webgl)$/;
-    const state = { rawWebgl: 0, ever: new Set<HTMLCanvasElement>(), peakLive: 0 };
-    const isLive = (c: HTMLCanvasElement) => {
-      if (!c.isConnected) return false;
-      const gl = (c as unknown as { __fxCtx?: WebGLRenderingContext }).__fxCtx;
-      return !!gl && !gl.isContextLost();
-    };
-    const liveNow = () => {
-      let n = 0;
-      for (const c of state.ever) if (isLive(c)) n++;
-      return n;
-    };
-    const origGet = HTMLCanvasElement.prototype.getContext;
-    HTMLCanvasElement.prototype.getContext = function (
-      this: HTMLCanvasElement,
-      type: string,
-      ...rest: unknown[]
-    ) {
-      const ctx = (origGet as (...a: unknown[]) => RenderingContext | null).call(this, type, ...rest);
-      if (WEBGL.test(type) && ctx) {
-        state.rawWebgl++;
-        state.ever.add(this);
-        (this as unknown as { __fxCtx?: unknown }).__fxCtx = ctx;
-      }
-      return ctx;
-    } as typeof origGet;
-    setInterval(() => {
-      state.peakLive = Math.max(state.peakLive, liveNow());
-    }, 200);
-    (window as unknown as { __fxProbe: unknown }).__fxProbe = {
-      snapshot: (): ProbeSnapshot => ({
-        rawWebgl: state.rawWebgl,
-        everCanvases: state.ever.size,
-        liveNow: liveNow(),
-        peakLive: Math.max(state.peakLive, liveNow()),
-      }),
-    };
-  });
-}
-
 test.describe('FX WebGL context budget', () => {
   test('records WebGL contexts per route', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'chromium', 'desktop probe only');
     test.setTimeout(900_000);
-    await installProbe(page);
-
-    const snap = () =>
-      page.evaluate<ProbeSnapshot>(
-        () => (window as unknown as { __fxProbe: { snapshot: () => ProbeSnapshot } }).__fxProbe.snapshot(),
-      );
+    await installWebglProbe(page);
+    const snap = () => webglSnapshot(page);
     const results: Record<string, { status: number | null; cold: ProbeSnapshot; afterInteraction: ProbeSnapshot }> = {};
     for (const route of ROUTES) {
       const resp = await page.goto(route, { waitUntil: 'load', timeout: 240_000 });
@@ -83,6 +27,17 @@ test.describe('FX WebGL context budget', () => {
       await page.waitForTimeout(SETTLE_MS);
       results[route] = { status: resp?.status() ?? null, cold, afterInteraction: await snap() };
     }
+
+    // Co-mount scenario: the solve confetti used to open its own context next to SharedFxApp.
+    await page.goto('/en/crossword', { waitUntil: 'load', timeout: 240_000 });
+    await page.getByRole('gridcell').first().waitFor({ timeout: 240_000 });
+    await page.getByRole('gridcell').first().click();
+    await page.waitForTimeout(SETTLE_MS);
+    const cold = await snap();
+    await resetWebglPeak(page);
+    await solveCrosswordByReveal(page);
+    await page.waitForTimeout(1500);
+    results['crossword-solve'] = { status: null, cold, afterInteraction: await snap() };
 
     mkdirSync(dirname(OUT), { recursive: true });
     writeFileSync(OUT, JSON.stringify(results, null, 2));
