@@ -1,25 +1,8 @@
-import { test, expect, type Browser, type Page } from '@playwright/test';
+import { test, expect, type Browser } from '@playwright/test';
 import { MultiplayerPage } from './pages/MultiplayerPage';
 import { open, randomUsername } from './helpers/test-utils';
 import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures';
-
-function recordSocketEvents(page: Page): Array<{ event: string; data: unknown }> {
-  const events: Array<{ event: string; data: unknown }> = [];
-  page.on('websocket', (ws) => {
-    ws.on('framereceived', ({ payload }) => {
-      const text = typeof payload === 'string' ? payload : payload.toString('utf8');
-      const match = /^42(?:\/[^,]*,)?(\[.*\])$/s.exec(text);
-      if (!match) return;
-      try {
-        const [event, data] = JSON.parse(match[1]) as [string, unknown];
-        events.push({ event, data });
-      } catch {
-        // binary or partial frame
-      }
-    });
-  });
-  return events;
-}
+import { recordSocketEvents, unlockedAchievementKeys } from './helpers/socket-events';
 
 async function createOnboardedContext(browser: Browser) {
   const context = await browser.newContext();
@@ -33,11 +16,6 @@ async function createOnboardedContext(browser: Browser) {
   return { context, page, events, mp };
 }
 
-function unlockedKeys(events: Array<{ event: string; data: unknown }>): string[] {
-  return events
-    .filter((e) => e.event === 'liveAchievementUnlocked')
-    .flatMap((e) => ((e.data as { achievements?: Array<{ key: string }> })?.achievements ?? []).map((a) => a.key));
-}
 
 test.describe('Multiplayer live achievements', () => {
   test.slow();
@@ -61,8 +39,8 @@ test.describe('Multiplayer live achievements', () => {
     const word = await host.mp.submitRealWord(baseURL!, 'en');
     await expect(host.mp.wordLadderRow(word)).toBeVisible({ timeout: 10_000 });
 
-    await expect.poll(() => unlockedKeys(host.events), { timeout: 10_000 }).toContain('FIRST_BLOOD');
-    expect(unlockedKeys(player.events)).not.toContain('FIRST_BLOOD');
+    await expect.poll(() => unlockedAchievementKeys(host.events), { timeout: 10_000 }).toContain('FIRST_BLOOD');
+    expect(unlockedAchievementKeys(player.events)).not.toContain('FIRST_BLOOD');
 
     await host.context.close();
     await player.context.close();

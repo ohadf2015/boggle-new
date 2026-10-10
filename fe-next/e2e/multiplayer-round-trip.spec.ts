@@ -2,6 +2,7 @@ import { test, expect, type Browser } from '@playwright/test';
 import { MultiplayerPage } from './pages/MultiplayerPage';
 import { open, randomUsername, type Locale } from './helpers/test-utils';
 import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures';
+import { recordSocketEvents, topLeaderboardScore } from './helpers/socket-events';
 
 /**
  * Covers the product's only critical path end to end: create room -> second
@@ -15,12 +16,13 @@ import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures'
 async function createOnboardedContext(browser: Browser, locale: Locale = 'en') {
   const context = await browser.newContext();
   const page = await context.newPage();
+  const events = recordSocketEvents(page);
   await open(page, '/multiplayer', locale);
   await applyStorageFixture(page, ONBOARDED_USER);
   await open(page, '/multiplayer', locale);
   const mp = new MultiplayerPage(page);
   await mp.waitForEntryReady();
-  return { context, page, mp };
+  return { context, page, events, mp };
 }
 
 const ROUND_TRIP_LOCALES: { locale: Locale; language: string }[] = [
@@ -57,10 +59,11 @@ test.describe('Multiplayer round trip', () => {
       // Submit a real, board-verified word by dragging across the host's grid.
       const word = await host.mp.submitRealWord(baseURL!, language);
 
-      // Scoring round-trips through the server: the word lands in the live
-      // found-words ladder for BOTH players, not just the submitter.
+      // Scoring round-trips through the server: the submitter's word list has it,
+      // and the leaderboard BOTH players receive carries the new score.
       await expect(host.mp.wordLadderRow(word)).toBeVisible({ timeout: 10_000 });
-      await expect(player.mp.wordLadderRow(word)).toBeVisible({ timeout: 10_000 });
+      await expect.poll(() => topLeaderboardScore(host.events), { timeout: 10_000 }).toBeGreaterThan(0);
+      await expect.poll(() => topLeaderboardScore(player.events), { timeout: 10_000 }).toBeGreaterThan(0);
 
       // Round ends and both players leave the grid for the results screen.
       await expect(host.mp.gameGrid).toBeHidden({ timeout: 120_000 });

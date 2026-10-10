@@ -1,5 +1,5 @@
 import { type Page, type Locator, expect } from '@playwright/test';
-import { submitRealWord } from '../helpers/grid-solver';
+import { readGrid, toGridArray, solveGrid, findWordPath, dragSubmitWord } from '../helpers/grid-solver';
 
 /**
  * Page Object for the multiplayer flow.
@@ -63,7 +63,7 @@ export class MultiplayerPage {
       'input[placeholder*="name"], input[placeholder*="username"], input[name="hostUsername"]'
     );
     this.languageSelector = page.locator('[data-testid="language-selector"], select[name="language"]');
-    this.confirmCreateButton = page.getByRole('button', { name: /create|צור|start|יאללה/i }).last();
+    this.confirmCreateButton = page.getByRole('dialog').getByRole('button', { name: /create|צור|start|יאללה/i }).last();
 
     // Join Room Modal
     this.joinRoomModal = page.locator('[data-testid="join-room-modal"]');
@@ -77,7 +77,7 @@ export class MultiplayerPage {
     this.nameSaveButton = page.locator('[data-testid="name-save-button"]');
     this.editAvatarButton = page.locator('[data-testid="edit-avatar-button"]');
     this.desktopChatArea = page.locator('[data-testid="desktop-chat-area"]');
-    this.startGameButton = page.getByRole('button', { name: /start.*(game|battle)|התחל.*משחק|יאללה לקרב/i });
+    this.startGameButton = page.getByRole('button', { name: /start.*(game|battle)|התחל.*משחק|התחילו קרב|יאללה לקרב/i });
     this.inviteLink = page.locator('[class*="invite"], [data-testid*="invite"]');
     this.playerRoster = page.locator('[class*="roster"], [class*="player-list"]');
 
@@ -129,11 +129,11 @@ export class MultiplayerPage {
 
   /** The entry screen is usable once React has hydrated Create and the socket has enabled it */
   async waitForEntryReady() {
-    await expect
-      .poll(() => this.createRoomButton.evaluate((el) => Object.keys(el).some((k) => k.startsWith('__reactProps'))), {
-        timeout: 60_000,
-      })
-      .toBe(true);
+    const hydrated = () =>
+      this.createRoomButton
+        .evaluate((el) => Object.keys(el).some((k) => k.startsWith('__reactProps')))
+        .catch(() => false);
+    await expect.poll(hydrated, { timeout: 60_000 }).toBe(true);
     await expect(this.createRoomButton).toBeEnabled({ timeout: 60_000 });
   }
 
@@ -213,8 +213,26 @@ export class MultiplayerPage {
     return this.page.locator(`[data-testid="ladder-row-${word}" i]`);
   }
 
-  /** Read the current board, ask the solver for a real word, and submit it via a drag gesture */
-  async submitRealWord(baseURL: string, language = 'en'): Promise<string> {
-    return submitRealWord(this.page, baseURL, language);
+  /**
+   * Read the board, ask the solver for real words, and drag one in until the server accepts it.
+   * Board events (meteor showers, earthquakes) can swap tiles mid-drag, so a few words are tried.
+   */
+  async submitRealWord(baseURL: string, language = 'en', attempts = 4): Promise<string> {
+    const tried = new Set<string>();
+    for (let i = 0; i < attempts; i++) {
+      const cells = await readGrid(this.page);
+      const solved = await solveGrid(baseURL, toGridArray(cells), language);
+      const word = [...solved.easy, ...solved.medium, ...solved.hard].find((w) => !tried.has(w) && findWordPath(cells, w));
+      if (!word) break;
+      tried.add(word);
+      await dragSubmitWord(this.page, findWordPath(cells, word)!);
+      try {
+        await expect(this.wordLadderRow(word)).toBeVisible({ timeout: 4_000 });
+        return word;
+      } catch {
+        // rejected or the board changed under the drag; try the next word
+      }
+    }
+    throw new Error(`No solver word was accepted after trying: ${[...tried].join(', ')}`);
   }
 }
