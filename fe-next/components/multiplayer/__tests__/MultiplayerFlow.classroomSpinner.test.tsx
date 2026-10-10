@@ -55,12 +55,6 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-vi.mock('@/components/NativeLanguageBanner', () => ({
-  NativeLanguageBanner: () => null,
-}));
-vi.mock('@/components/FirstGameLanguageNotice', () => ({
-  FirstGameLanguageNotice: () => null,
-}));
 
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ isAdmin: false, profile: null }),

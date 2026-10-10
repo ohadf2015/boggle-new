@@ -9,7 +9,6 @@ import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import CurriculumPageClient from '../PageClient';
 
-// Mock the CurriculumWordListBrowser component
 // The page now mounts the shared education header — a compact bar with a way
 // back, which these screens used to lack entirely. It pulls MusicContext in,
 // which this suite has no provider for and no interest in.

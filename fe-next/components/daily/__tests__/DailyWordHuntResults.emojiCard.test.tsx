@@ -220,12 +220,6 @@ vi.mock('../WinCinematic', () => ({
   WinCinematic: () => null,
 }));
 
-vi.mock('@/components/results/WordHuntPromoPopup', () => {
-  const React = require('react');
-  return React.forwardRef(function MockWordHuntPromoPopup(props: Record<string, unknown>, ref: React.Ref<HTMLDivElement>) {
-    return React.createElement('div', { ...props, ref, 'data-testid': 'word-hunt-promo-popup' });
-  });
-});
 
 vi.mock('@/hooks/useInterstitialAd', () => ({
   useInterstitialAd: () => ({

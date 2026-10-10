@@ -77,14 +77,6 @@ vi.mock('@/hooks/useNavigationGuard', () => ({
   useNavigationGuard: () => {},
 }));
 
-vi.mock('@/hooks/useContextualGuidance', () => ({
-  useContextualGuidance: () => ({
-    showSwipeTip: false,
-    dismissSwipeTip: vi.fn(),
-    triggerSwipeTipGuidance: vi.fn(),
-  }),
-  useSwipeTipGuidanceTrigger: () => {},
-}));
 
 vi.mock('@/hooks/useKeyboardWordInput', () => ({
   useKeyboardWordInput: () => ({

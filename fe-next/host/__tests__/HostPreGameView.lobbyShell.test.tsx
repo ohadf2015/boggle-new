@@ -62,7 +62,6 @@ vi.mock('../components/pre-game/PresetSelector', () => ({
     challenge: { timer: 5, difficulty: 'HARD', nameKey: 'hostView.presetPro' },
   },
 }));
-vi.mock('../components/pre-game/MobileBottomNav', () => ({ MobileBottomNav: () => null }));
 vi.mock('../components/pre-game/MobileShareSection', () => ({ MobileShareSection: () => null }));
 vi.mock('../components/pre-game/LobbyAudioButton', () => ({ LobbyAudioButton: () => null }));
 vi.mock('../components/pre-game/desktop', () => ({

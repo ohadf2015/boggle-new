@@ -28,11 +28,6 @@ vi.mock('@/hooks/useAdventureAchievements', () => ({
 vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: vi.fn(),
 }));
-vi.mock('@/components/adventure/AdventureGuestGate', () => ({
-  AdventureGuestGate: ({ surface }: any) => (
-    <div data-testid={`guest-gate-${surface}`} />
-  ),
-}));
 
 import AchievementsPage from '../page';
 

@@ -32,10 +32,6 @@ const ALLOWLIST: Record<string, { tokens: string[]; why: string }> = {
     tokens: ['left-0', 'right-0'],
     why: 'dropdown alignment mirrors inside one isRTL ternary (RTL hangs left-0, LTR right-0)',
   },
-  'education/student-preview/PreviewWaitingScreen.tsx': {
-    tokens: ['border-r-neo-cyan'],
-    why: 'same animate-spin loader arc',
-  },
   'education/MultiLessonSelector.tsx': {
     tokens: ['left-2', 'right-2'],
     why: 'isRTL ? left-2 : right-2 ternary',

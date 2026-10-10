@@ -18,10 +18,6 @@ vi.mock('@/hooks/useReducedMotion', () => ({
 
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 
-vi.mock('../WinStreakDisplay', () => ({
-  __esModule: true,
-  default: () => <div data-testid="win-streak" />,
-}));
 
 const makeReward = (breakdown: CoinReward['breakdown']): CoinReward => ({
   awarded: 100,

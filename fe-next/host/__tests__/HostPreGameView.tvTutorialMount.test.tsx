@@ -117,9 +117,6 @@ vi.mock('../components/pre-game/StartButton', () => ({
   StartButton: () => null,
 }));
 
-vi.mock('../components/pre-game/MobileBottomNav', () => ({
-  MobileBottomNav: () => null,
-}));
 
 vi.mock('../components/pre-game/MobileShareSection', () => ({
   MobileShareSection: () => null,

@@ -15,10 +15,8 @@ const OWNED_DIRS = ['components/multiplayer/results'];
 const OWNED_FILES = [
   'components/multiplayer/HostWordSelector.tsx',
   'components/multiplayer/NearRankTeaser.tsx',
-  'components/multiplayer/NextModeTease.tsx',
   'components/multiplayer/GlobalRankBadge.tsx',
   'components/multiplayer/EloRankBadge.tsx',
-  'components/multiplayer/WinStreakBadge.tsx',
 ];
 
 function ownedSources(): string[] {

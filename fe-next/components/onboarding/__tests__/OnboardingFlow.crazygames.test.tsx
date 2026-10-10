@@ -67,10 +67,6 @@ vi.mock('../LanguageSelect', () => ({
   __esModule: true,
   default: () => <div data-testid="language-select" />,
 }));
-vi.mock('../TutorialGame', () => ({
-  __esModule: true,
-  default: () => <div data-testid="tutorial-game" />,
-}));
 vi.mock('../QuickProfileSetup', () => ({
   __esModule: true,
   default: () => <div data-testid="quick-profile-setup" />,

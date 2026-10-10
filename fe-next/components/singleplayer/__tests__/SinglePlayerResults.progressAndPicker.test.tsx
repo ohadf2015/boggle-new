@@ -105,12 +105,6 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ submitLeaderboardScore: vi.fn() }),
 }));
 
-vi.mock('@/hooks/useWordHuntPromo', () => ({
-  useWordHuntPromo: () => ({
-    canShow: false,
-    recordImpression: vi.fn(),
-  }),
-}));
 
 vi.mock('@/hooks/usePostHogFlag', () => ({
   usePostHogFlag: () => 'control',
