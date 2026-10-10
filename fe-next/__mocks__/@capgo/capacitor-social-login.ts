@@ -1,7 +1,7 @@
 /**
  * Mock for @capgo/capacitor-social-login
  *
- * Used in Jest tests to mock the native social login plugin
+ * Used in tests to mock the native social login plugin
  */
 
 export const SocialLogin = {

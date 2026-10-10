@@ -236,10 +236,10 @@ jobs:
           name: codecov-umbrella
           fail_ci_if_error: false
 
-  # Runs in parallel with tests; ci-success gates on both.
+  # Runs in parallel with lint, type-check and tests; ci-success gates on all four.
   build:
     runs-on: ubuntu-latest
-    needs: [lint, type-check]
+    needs: install
     steps:
       - uses: actions/checkout@v4
 

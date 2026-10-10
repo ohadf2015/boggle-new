@@ -434,7 +434,7 @@ function createTestEnvironment() {
 }
 
 // ==========================================
-// Custom Jest Matchers
+// Custom Matchers
 // ==========================================
 
 /**
