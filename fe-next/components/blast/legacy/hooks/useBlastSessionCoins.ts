@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { emitCoinEarned } from '@/utils/coinEarnedFx';
 
 type Cell = { row: number; col: number };
@@ -23,27 +23,41 @@ function wordCentre(path: Cell[], gridSize: number): { x: number; y: number } | 
 
 /**
  * Single-player run coins. Visual only: the run total is banked once at wave end
- * through CoinContext.addCoins — nothing here grants coins.
+ * through CoinContext.addCoins — nothing here grants coins. The wallet shows a
+ * word's estimate while its coins fly (the score lands after the clear animation).
  */
 export function useBlastSessionCoins({ isMultiplayer, gridSize }: { isMultiplayer: boolean; gridSize: number }) {
   const [sessionCoins, setSessionCoins] = useState(0);
+  const [inFlight, setInFlight] = useState(0);
+  const launched = useRef<{ path: Cell[]; estimate: number } | null>(null);
 
   const launchCoins = useCallback(
-    (path: Cell[]) => {
-      if (isMultiplayer || path.length === 0) return;
+    (path: Cell[], estimate: number) => {
+      if (isMultiplayer || path.length === 0 || !(estimate > 0)) return;
       const coins = Math.min(MAX_FLYING_COINS, Math.max(MIN_FLYING_COINS, path.length + 1));
-      emitCoinEarned(path.length, wordCentre(path, gridSize), { inline: true, coins });
+      launched.current = { path, estimate };
+      setInFlight(estimate);
+      emitCoinEarned(estimate, wordCentre(path, gridSize), { inline: true, coins });
     },
     [isMultiplayer, gridSize],
   );
 
   const creditCoins = useCallback(
     (delta: number) => {
-      if (isMultiplayer || !(delta > 0)) return;
+      if (isMultiplayer) return;
+      const word = launched.current;
+      launched.current = null;
+      setInFlight(0);
+      if (!(delta > 0)) return;
       setSessionCoins((c) => c + delta);
+      const extra = delta - (word?.estimate ?? 0);
+      if (word && extra > 0) {
+        const coins = Math.min(MAX_FLYING_COINS, MIN_FLYING_COINS + Math.floor(extra / 5));
+        emitCoinEarned(extra, wordCentre(word.path, gridSize), { inline: true, coins });
+      }
     },
-    [isMultiplayer],
+    [isMultiplayer, gridSize],
   );
 
-  return { sessionCoins, launchCoins, creditCoins };
+  return { sessionCoins, walletCoins: sessionCoins + inFlight, launchCoins, creditCoins };
 }

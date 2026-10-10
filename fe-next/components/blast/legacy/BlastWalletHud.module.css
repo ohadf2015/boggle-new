@@ -53,6 +53,10 @@
   animation: gain 1100ms cubic-bezier(0.2, 0.8, 0.3, 1);
 }
 
+.gain::after {
+  content: attr(data-amount);
+}
+
 .dip {
   display: inline-flex;
   align-items: center;

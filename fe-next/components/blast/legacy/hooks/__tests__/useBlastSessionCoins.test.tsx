@@ -25,7 +25,7 @@ describe('useBlastSessionCoins', () => {
   it('launches coins from the word on the board the moment it is accepted, inline into the wallet', () => {
     addBoard();
     const { result } = renderHook(() => useBlastSessionCoins({ isMultiplayer: false, gridSize: 3 }));
-    act(() => result.current.launchCoins([{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }]));
+    act(() => result.current.launchCoins([{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }], 1));
     expect(events).toHaveLength(1);
     const detail = events[0].detail;
     expect(detail.inline).toBe(true);
@@ -41,10 +41,39 @@ describe('useBlastSessionCoins', () => {
     expect(events).toHaveLength(0);
   });
 
+  it('shows the word coins in the wallet as they take off, then settles on the scored amount', () => {
+    addBoard();
+    const { result } = renderHook(() => useBlastSessionCoins({ isMultiplayer: false, gridSize: 3 }));
+    act(() => result.current.launchCoins([{ row: 0, col: 0 }], 2));
+    expect(result.current.walletCoins).toBe(2);
+    expect(result.current.sessionCoins).toBe(0);
+    act(() => result.current.creditCoins(3));
+    expect(result.current.walletCoins).toBe(3);
+    expect(result.current.sessionCoins).toBe(3);
+  });
+
+  it('a score bigger than the estimate sends a second wave of coins for the extra', () => {
+    addBoard();
+    const { result } = renderHook(() => useBlastSessionCoins({ isMultiplayer: false, gridSize: 3 }));
+    act(() => result.current.launchCoins([{ row: 1, col: 1 }], 2));
+    act(() => result.current.creditCoins(20));
+    expect(events).toHaveLength(2);
+    expect(events[1].detail).toMatchObject({ amount: 18, inline: true, source: { x: 150, y: 350 } });
+    expect(result.current.walletCoins).toBe(20);
+  });
+
+  it('a score at or under the estimate sends no second wave', () => {
+    addBoard();
+    const { result } = renderHook(() => useBlastSessionCoins({ isMultiplayer: false, gridSize: 3 }));
+    act(() => result.current.launchCoins([{ row: 1, col: 1 }], 2));
+    act(() => result.current.creditCoins(2));
+    expect(events).toHaveLength(1);
+  });
+
   it('does nothing in multiplayer', () => {
     addBoard();
     const { result } = renderHook(() => useBlastSessionCoins({ isMultiplayer: true, gridSize: 3 }));
-    act(() => result.current.launchCoins([{ row: 0, col: 0 }]));
+    act(() => result.current.launchCoins([{ row: 0, col: 0 }], 1));
     act(() => result.current.creditCoins(3));
     expect(events).toHaveLength(0);
     expect(result.current.sessionCoins).toBe(0);

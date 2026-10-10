@@ -49,7 +49,22 @@ describe('BlastWalletHud', () => {
     expect(screen.queryByTestId('coin-counter-gain')).toBeNull();
     act(() => { vi.advanceTimersByTime(1200); });
     expect(shown()).toBe('14');
-    expect(screen.getByTestId('coin-counter-gain')).toHaveTextContent('+4');
+    expect(screen.getByTestId('coin-counter-gain')).toHaveAttribute('data-amount', '+4');
+    expect(screen.getByTestId('coin-counter')).toHaveTextContent(/^14$/);
+  });
+
+  it('a top-up while coins are still flying does not push the roll back', () => {
+    const { rerender } = render(<BlastWalletHud coins={10} />);
+    markCoinsInFlight(600);
+    rerender(<BlastWalletHud coins={12} />);
+    act(() => { vi.advanceTimersByTime(300); });
+    markCoinsInFlight(900);
+    rerender(<BlastWalletHud coins={30} />);
+    act(() => { vi.advanceTimersByTime(450); });
+    expect(Number(shown())).toBeGreaterThan(10);
+    act(() => { vi.advanceTimersByTime(1500); });
+    expect(shown()).toBe('30');
+    expect(screen.getByTestId('coin-counter-gain')).toHaveAttribute('data-amount', '+20');
   });
 
   it('rolls straight away when no coins are in flight', () => {
@@ -67,7 +82,7 @@ describe('BlastWalletHud', () => {
     const mid = Number(shown());
     expect(mid).toBeLessThan(500);
     expect(mid).toBeGreaterThan(380);
-    expect(screen.getByTestId('coin-counter-spent')).toHaveTextContent('-120');
+    expect(screen.getByTestId('coin-counter-spent')).toHaveAttribute('data-amount', '-120');
     act(() => { vi.advanceTimersByTime(800); });
     expect(shown()).toBe('380');
   });

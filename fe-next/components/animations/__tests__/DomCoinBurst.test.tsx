@@ -40,4 +40,27 @@ describe('DomCoinBurst', () => {
     act(() => { vi.advanceTimersByTime(t.totalMs - t.lastLandMs); });
     expect(onDone).toHaveBeenCalledTimes(1);
   });
+
+  it('coins burst out at once and each is swallowed by the wallet on arrival', () => {
+    const calls: Keyframe[][] = [];
+    const proto = HTMLElement.prototype as unknown as { animate?: unknown };
+    const original = proto.animate;
+    proto.animate = function (frames: Keyframe[]) {
+      calls.push(frames);
+      return { cancel: () => {} };
+    };
+    try {
+      render(<DomCoinBurst source={{ x: 0, y: 400 }} target={{ x: 300, y: 30 }} count={2} onDone={() => {}} />);
+    } finally {
+      proto.animate = original;
+    }
+    const coinFrames = calls.filter((f) => f.length > 2);
+    expect(coinFrames.length).toBeGreaterThan(0);
+    for (const frames of coinFrames) {
+      const last = frames[frames.length - 1];
+      expect(last.opacity).toBe(0);
+      expect(String(last.transform)).toContain('translate(285px, 15px)');
+      expect(Number(frames[0].opacity)).toBeGreaterThan(0);
+    }
+  });
 });

@@ -365,7 +365,8 @@ describe('useBlastWordHandler', () => {
       act(() => {
         void result.current.handleWordAccepted({ word: 'cat', score: 5 });
       });
-      expect(onCoinsLaunch).toHaveBeenCalledWith(path);
+      expect(onCoinsLaunch).toHaveBeenCalledWith(path, expect.any(Number));
+      expect(onCoinsLaunch.mock.calls[0][1]).toBeGreaterThanOrEqual(1);
     });
 
     it('credits coins only, from the scored word', async () => {

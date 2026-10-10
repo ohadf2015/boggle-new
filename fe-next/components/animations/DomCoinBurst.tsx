@@ -19,7 +19,7 @@ const TRAVEL_MS = 430;
 const STAGGER_MS = 40;
 const IMPACT_MS = 280;
 const MAX_COINS = 12;
-const COIN_PX = 26;
+const COIN_PX = 30;
 const TRAILS = [
   { lag: 34, alpha: 0.5, scale: 0.82 },
   { lag: 68, alpha: 0.22, scale: 0.64 },
@@ -35,11 +35,11 @@ export function coinFlightTiming(count: number) {
 const translate = (p: Point, scale: number, rot: number) =>
   `translate(${p.x - COIN_PX / 2}px, ${p.y - COIN_PX / 2}px) rotate(${rot}deg) scale(${scale})`;
 
-/** Pop out of the source in a fan, then get sucked along an arc into the target. */
+/** Burst out of the source together, hover, then get sucked one by one along an arc into the target. */
 function flightKeyframes(source: Point, target: Point, i: number, n: number, alpha: number, sizeMul: number): Keyframe[] {
   const spread = n === 1 ? 0 : i / (n - 1) - 0.5;
-  const angle = -Math.PI / 2 + spread * Math.PI * 0.95;
-  const radius = 44 + (i % 3) * 14;
+  const angle = -Math.PI / 2 + spread * Math.PI * 1.1;
+  const radius = 52 + (i % 3) * 16;
   const fan = { x: source.x + Math.cos(angle) * radius, y: source.y + Math.sin(angle) * radius };
   const side = i % 2 === 0 ? 1 : -1;
   const control = {
@@ -47,29 +47,35 @@ function flightKeyframes(source: Point, target: Point, i: number, n: number, alp
     y: Math.min(fan.y, target.y) - 50 - (i % 3) * 22,
   };
   const spin = side * (200 + (i % 3) * 90);
-  const fanAt = FAN_MS / (FAN_MS + TRAVEL_MS);
+  const total = flightDuration(i);
+  const fanAt = FAN_MS / total;
+  const departAt = (FAN_MS + i * STAGGER_MS) / total;
+  const hover = { x: fan.x, y: fan.y - 6 - (i % 2) * 4 };
   const frames: Keyframe[] = [
-    { offset: 0, transform: translate(source, 0.3 * sizeMul, 0), opacity: 0 },
-    { offset: 0.05, transform: translate(source, 0.7 * sizeMul, spin * 0.05), opacity: alpha },
-    { offset: fanAt, transform: translate(fan, 1.3 * sizeMul, spin * 0.3), opacity: alpha, easing: 'linear' },
+    { offset: 0, transform: translate(source, 0.55 * sizeMul, 0), opacity: alpha, easing: 'cubic-bezier(0.2, 0.9, 0.3, 1.25)' },
+    { offset: fanAt, transform: translate(fan, 1.3 * sizeMul, spin * 0.2), opacity: alpha, easing: 'ease-in-out' },
   ];
+  if (departAt > fanAt) frames.push({ offset: departAt, transform: translate(hover, 1.25 * sizeMul, spin * 0.3), opacity: alpha });
   const steps = 6;
   for (let k = 1; k <= steps; k++) {
     const u = Math.pow(k / steps, 1.45);
     const a = 1 - u;
     const p = {
-      x: a * a * fan.x + 2 * a * u * control.x + u * u * target.x,
-      y: a * a * fan.y + 2 * a * u * control.y + u * u * target.y,
+      x: a * a * hover.x + 2 * a * u * control.x + u * u * target.x,
+      y: a * a * hover.y + 2 * a * u * control.y + u * u * target.y,
     };
-    const scale = (1.3 - 0.75 * (k / steps)) * sizeMul;
+    const last = k === steps;
+    const scale = (last ? 0.35 : 1.25 - 0.55 * (k / steps)) * sizeMul;
     frames.push({
-      offset: fanAt + (1 - fanAt) * (k / steps),
+      offset: departAt + (1 - departAt) * (k / steps),
       transform: translate(p, scale, spin * (0.3 + 0.7 * (k / steps))),
-      opacity: alpha,
+      opacity: last ? 0 : alpha,
     });
   }
   return frames;
 }
+
+const flightDuration = (i: number) => FAN_MS + i * STAGGER_MS + TRAVEL_MS;
 
 /**
  * Coins burst out of where they were earned, streak along an arc with comet
@@ -100,9 +106,9 @@ export function DomCoinBurst({ source, target, count, onDone, onLand }: DomCoinB
         const t = trail >= 0 ? TRAILS[trail] : { lag: 0, alpha: 1, scale: 1 };
         animations.push(
           el.animate(flightKeyframes(from, to, i, n, t.alpha, t.scale), {
-            duration: FAN_MS + TRAVEL_MS,
-            delay: i * STAGGER_MS + t.lag,
-            easing: 'cubic-bezier(0.3, 0, 0.6, 1)',
+            duration: flightDuration(i),
+            delay: t.lag,
+            easing: 'linear',
             fill: 'none',
           }),
         );

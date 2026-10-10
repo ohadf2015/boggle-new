@@ -289,7 +289,7 @@ export function BlastGame({
   useEffect(() => {
     if (baseCoinsRef.current === 0) baseCoinsRef.current = contextCoins;
   }, [contextCoins]);
-  const { sessionCoins, launchCoins, creditCoins } = useBlastSessionCoins({ isMultiplayer, gridSize: config.gridSize });
+  const { sessionCoins, walletCoins, launchCoins, creditCoins } = useBlastSessionCoins({ isMultiplayer, gridSize: config.gridSize });
 
   const onWordWithComboTypeRef = useRef(onWordWithComboType);
   useEffect(() => { onWordWithComboTypeRef.current = onWordWithComboType; }, [onWordWithComboType]);
@@ -759,7 +759,7 @@ export function BlastGame({
         buffConsumed={initialBuff === 'shield' ? shieldConsumed : false}
         objectiveProgress={objectives.objectiveProgress}
         ddaBoostActive={!isMultiplayer && engine.ddaBoostActive}
-        coins={!isMultiplayer ? baseCoinsRef.current + sessionCoins : 0}
+        coins={!isMultiplayer ? baseCoinsRef.current + walletCoins : 0}
         hintSlot={!isMultiplayer ? (
           <BlastHintButton
             waveNumber={waveNumber}

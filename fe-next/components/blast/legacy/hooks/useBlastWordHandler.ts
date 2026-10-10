@@ -42,8 +42,8 @@ interface WordHandlerEffects {
   setNearMissCells: Dispatch<SetStateAction<Array<{ row: number; col: number }>>>;
   /** Coins the scored word earned this run. */
   onCurrencyEarned?: (data: { coinDelta: number }) => void;
-  /** The word was accepted: coins take off from its tiles now, credited once scored. */
-  onCoinsLaunch?: (path: Array<{ row: number; col: number }>) => void;
+  /** The word was accepted: coins take off from its tiles now (an estimate), settled once scored. */
+  onCoinsLaunch?: (path: Array<{ row: number; col: number }>, estimate: number) => void;
 }
 
 interface UseBlastWordHandlerParams {
@@ -107,7 +107,7 @@ export function useBlastWordHandler({
     try {
     const path = lastPathRef.current;
     lastPathRef.current = [];
-    effects.onCoinsLaunch?.(path);
+    effects.onCoinsLaunch?.(path, Math.max(1, Math.round(((data.score + blastLetterBonus(data.word)) * scoreMultiplier) / 10)));
 
     effects.setLastWordLength(path.length);
     effects.setWordSubmitCount(c => c + 1);
