@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { m } from 'framer-motion';
 import Link from 'next/link';
-import { Share2, Heart, ChevronRight, Flame } from 'lucide-react';
+import { Share2, ChevronRight, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -19,8 +19,6 @@ import {
   pyramidAdvance,
   pyramidGiveUp,
   pyramidRevive,
-  pyramidAttemptsLeft,
-  PYRAMID_ATTEMPTS_PER_STAGE,
   type PyramidState,
 } from '@/lib/connections/pyramid/gameLogic';
 import { dailyPyramid } from '@/lib/connections/pyramid/daily';
@@ -31,6 +29,10 @@ import { gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
 import { stripEmoji } from '@/lib/share/stripEmoji';
 import type { GameState } from '@/lib/connections/types';
 import PyramidProgress from './PyramidProgress';
+import PyramidHeader from './PyramidHeader';
+import { PyramidLeftRail, PyramidRightRail } from './PyramidShellRails';
+import { GameShell, SHELL_MEDIA } from '@/components/game/shell';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import FinaleCard from './FinaleCard';
 import PuzzleCard from '../PuzzleCard';
 import ConnectionsMascot from '../ConnectionsMascot';
@@ -94,6 +96,7 @@ function PyramidRun({
   const prefersReducedMotion = useReducedMotion();
   const { haptic, customHaptic } = useHapticFeedback();
   const sfx = useSoundEffects();
+  const inShell = useMediaQuery(SHELL_MEDIA);
 
   const [pyramidState, dispatch] = useReducer(reducer, pyramid, initPyramidState);
   const [input, setInput] = useState('');
@@ -416,49 +419,14 @@ function PyramidRun({
 
   // Playing state
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-4" data-testid="pyramid-root">
-      <header className="flex flex-col gap-2">
-        <div className="flex items-center justify-center gap-2">
-          <ConnectionsMascot status={pyramidState.status} className="h-12 w-12" />
-          <h1 className="text-center font-neo-display text-lg font-black text-neo-white">
-            {t('connections.pyramid.title')}
-          </h1>
-        </div>
-        <p className="text-center font-neo-body text-xs text-neo-white/60">
-          {baseStage ? t('connections.pyramid.explainer') : t('connections.pyramid.finalePrompt')}
-        </p>
-        {/* Attempts were spent invisibly — the player only learned a budget
-            existed when the run ended. Show it, per stage. */}
-        <div
-          data-testid="pyramid-attempts"
-          data-remaining={pyramidAttemptsLeft(pyramidState)}
-          className="flex items-center justify-center gap-1.5"
-          aria-label={t('connections.daily.triesLeft', { count: pyramidAttemptsLeft(pyramidState) })}
-        >
-          {pyramidAttemptsLeft(pyramidState) === 1 && (
-            <span className="font-neo-body text-[0.7rem] font-bold uppercase tracking-wider text-neo-red">
-              {t('connections.daily.lastTry')}
-            </span>
-          )}
-          {Array.from({ length: PYRAMID_ATTEMPTS_PER_STAGE }, (_, i) => (
-            <Heart
-              key={i}
-              aria-hidden="true"
-              className={`h-4 w-4 transition-colors duration-200 ${
-                i < pyramidAttemptsLeft(pyramidState) ? 'fill-neo-red text-neo-red' : 'text-neo-white/25'
-              }`}
-              strokeWidth={2.5}
-            />
-          ))}
-        </div>
-        <PyramidProgress
-          stage={pyramidState.stage}
-          solvedBridges={pyramidState.solvedBridges}
-          gaveUpBase={pyramidState.gaveUpBase}
-          metaAnswer={pyramid.metaAnswer}
-          won={pyramidState.status === 'won'}
-        />
-      </header>
+    <GameShell
+      mode="word-chain"
+      accent="purple"
+      left={inShell ? <PyramidLeftRail t={t} state={pyramidState} metaAnswer={pyramid.metaAnswer} /> : null}
+      right={<PyramidRightRail t={t} state={pyramidState} />}
+    >
+    <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-4 shell:my-auto shell:max-w-[40rem] shell:px-0" data-testid="pyramid-root">
+      {!inShell && <PyramidHeader state={pyramidState} metaAnswer={pyramid.metaAnswer} />}
 
       {pyramidState.stage < 3 ? (
         <>
@@ -492,5 +460,6 @@ function PyramidRun({
         />
       )}
     </div>
+    </GameShell>
   );
 }

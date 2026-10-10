@@ -3901,6 +3901,41 @@ html.has-cookie-consent {
   }
 }
 
+/* WordCraft desktop: the board owns a height-sized square, the chrome stacks
+   in a side column beside it (same source-order grid as landscape phones). */
+@media (min-width: 1024px) and (min-height: 600px) {
+  [data-wc-main] {
+    display: grid;
+    grid-template-columns: min(calc(100svh - 2.5rem), calc(100vw - 40rem)) minmax(30rem, 34rem);
+    grid-auto-rows: min-content;
+    align-content: center;
+    justify-content: center;
+    column-gap: clamp(1rem, 2vw, 2.5rem);
+    row-gap: 0.625rem;
+    max-width: none;
+    padding: 1.25rem clamp(1rem, 2vw, 2.5rem);
+  }
+  [data-wc-main] > * {
+    grid-column: 2;
+  }
+  [data-wc-main] > [data-wc-board-zone] {
+    grid-column: 1;
+    grid-row: 1 / span 20;
+    align-self: center;
+    width: min(calc(100svh - 2.5rem), calc(100vw - 40rem));
+    height: min(calc(100svh - 2.5rem), calc(100vw - 40rem));
+    flex: none;
+  }
+  [data-wc-board-square] {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  [data-wc-page] > header,
+  [data-wc-page] > .h-header {
+    display: none !important;
+  }
+}
+
 /* Utility for any page that needs to clear the bottom-fixed stack
    (nav + banner). Reactive: updates automatically as either layer resizes. */
 .pb-bottom-stack {

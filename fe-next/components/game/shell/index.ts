@@ -1,4 +1,5 @@
-export { GameShell, SHELL_ACCENTS, SHELL_MEDIA, type ShellAccent } from './GameShell';
+export { GameShell, SHELL_ACCENTS, type ShellAccent } from './GameShell';
+export { SHELL_MEDIA } from './media';
 export { ShellPanel, type ShellT } from './ShellPanel';
 export { ShellWordFeed, type ShellWord } from './ShellWordFeed';
 export { ShellStandings, type ShellStandingRow } from './ShellStandings';

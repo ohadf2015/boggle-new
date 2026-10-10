@@ -12,6 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { ZOOM_FEEL, boardFilter, computeAutoZoomScale } from '@/lib/word-craft/zoomFeel';
+import { SHELL_MEDIA } from '@/components/game/shell/media';
 
 /**
  * Pinch-zoom + 1-finger pan wrapper for the WordCraft board.
@@ -281,6 +282,8 @@ export function WordCraftZoomShell({
       return;
     }
     if (userControlledRef.current) return;
+    // A desktop board is already big enough to read; following play would hide most of it.
+    if (window.matchMedia?.(SHELL_MEDIA).matches) return;
 
     const cells = focusCells ?? [];
     let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;

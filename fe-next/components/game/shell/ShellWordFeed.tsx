@@ -20,12 +20,14 @@ interface ShellWordFeedProps {
   t: ShellT;
   accent?: ShellAccent;
   title?: string;
+  /** Modes without a board to drag swap the empty-state copy for their own. */
+  empty?: { title: string; body: string };
 }
 
 const MAX_ROWS = 60;
 
 /** Found words, newest on top: the fresh word slams into a hero slot and the rest shift down. */
-function ShellWordFeedImpl({ words, t, accent, title }: ShellWordFeedProps) {
+function ShellWordFeedImpl({ words, t, accent, title, empty }: ShellWordFeedProps) {
   const newestFirst = useMemo(() => words.slice(-MAX_ROWS).reverse(), [words]);
   const scored = words.some((w) => typeof w.score === 'number');
   const points = useMemo(() => words.reduce((sum, w) => sum + (w.score ?? 0), 0), [words]);
@@ -66,10 +68,10 @@ function ShellWordFeedImpl({ words, t, accent, title }: ShellWordFeedProps) {
             <span dir="ltr" className="tabular-nums">+?</span>
           </div>
           <p dir="auto" className="font-neo-display text-base font-bold uppercase tracking-wide text-neo-cream text-balance tv:text-2xl">
-            {t('gameShell.wordsEmptyTitle')}
+            {empty?.title ?? t('gameShell.wordsEmptyTitle')}
           </p>
           <p dir="auto" className="max-w-[17rem] text-sm font-semibold leading-snug text-neo-cream/60 text-balance tv:text-lg">
-            {t('gameShell.wordsEmptyBody')}
+            {empty?.body ?? t('gameShell.wordsEmptyBody')}
           </p>
         </div>
       ) : (
