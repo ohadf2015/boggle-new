@@ -151,7 +151,21 @@
   animation: keyGlow 1.6s ease-in-out infinite;
 }
 
+@keyframes clockTick {
+  0% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+.clockTick {
+  display: inline-block;
+  animation: clockTick 1s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.clockUrgent {
+  border-color: #ff1493;
+  box-shadow: 4px 4px 0 #ff1493;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .clockTick,
   .feedSlam,
   .feedFlash,
   .rowShift,

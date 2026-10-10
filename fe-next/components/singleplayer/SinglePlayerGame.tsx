@@ -433,7 +433,7 @@ function SinglePlayerGame({
   // covered the exit button and the race, and over the start card it said
   // "Let's go!" before anything had gone.
   const encouragementBanner = encouragement.currentTrigger && !core.awaitingStart ? (
-    <div className="absolute bottom-[calc(max(0.75rem,env(safe-area-inset-bottom))+4.5rem)] left-0 right-0 z-50 flex justify-center pointer-events-none">
+    <div className="absolute bottom-[calc(max(0.75rem,env(safe-area-inset-bottom))+4.5rem)] left-0 right-0 z-50 flex justify-center pointer-events-none shell:bottom-44 shell:right-auto shell:left-[clamp(0.875rem,1.4vw,1.75rem)] shell:w-64 shell:justify-start">
       <div className="pointer-events-auto">
         <FirstTimeEncouragement
           trigger={encouragement.currentTrigger}

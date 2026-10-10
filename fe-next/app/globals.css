@@ -65,6 +65,12 @@ html.lexi-native [data-selectable] {
 @custom-variant tv (@media (min-width: 1800px) and (min-height: 1000px));
 /* The desktop game shell (components/game/shell/gameShell.module.css). */
 @custom-variant shell (@media (min-width: 1024px) and (min-height: 600px));
+/* Inside the shell the keys card in the rail already teaches typing. */
+@media (min-width: 1024px) and (min-height: 600px) {
+  body:has([data-game-shell]) [data-keyboard-speed-tip] {
+    display: none;
+  }
+}
 
 @utility text-balance {
   text-wrap: balance;

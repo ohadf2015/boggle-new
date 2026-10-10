@@ -13,6 +13,9 @@ export const SHELL_ACCENTS = {
 } as const;
 export type ShellAccent = keyof typeof SHELL_ACCENTS;
 
+/** Same query as the `shell` custom variant and gameShell.module.css. */
+export const SHELL_MEDIA = '(min-width: 1024px) and (min-height: 600px)';
+
 export interface GameShellProps {
   /** Mode slug, exposed as `data-game-shell` for tests and the capture rig. */
   mode: string;
