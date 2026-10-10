@@ -13195,6 +13195,7 @@ const en = {
       "trialEndedTitle": "Trial expired. Upgrade to keep your classrooms",
       "trialEndedBody": "Keep unlimited classes and printable reports for $9/month. This is not another free trial.",
       "trialEndedCta": "Keep Pro: $9/mo",
+      "trialReactivateCta": "Reactivate",
       "trialLifecycleTitle": "{count} days left in your Teacher Pro trial",
       "trialLifecycleTitleToday": "Your Teacher Pro trial ends today",
       "trialLifecycleTitleOne": "1 day left in your Teacher Pro trial",

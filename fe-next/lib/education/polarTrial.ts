@@ -110,3 +110,27 @@ export function polarCheckoutWelcomeKind({
   if (status === 'trialing') return 'trial';
   return 'paid';
 }
+
+export interface PolarTrialLapseRow {
+  status: string;
+  trial?: boolean;
+  trial_end?: string | null;
+  current_period_end?: string | null;
+}
+
+/**
+ * Polar Teacher Pro trial ended without converting to paid.
+ * A later paid cancel keeps current_period_end past trial_end — not a lapse.
+ */
+export function isPolarTrialLapse(row: PolarTrialLapseRow | null | undefined): boolean {
+  if (!row) return false;
+  const status = String(row.status ?? '');
+  const usedTrial = row.trial === true || Boolean(row.trial_end) || status === 'trialing';
+  if (!usedTrial) return false;
+  if (status === 'active' || status === 'past_due') return false;
+  if (status === 'trialing') return true;
+  if (row.trial_end && row.current_period_end && row.current_period_end !== row.trial_end) {
+    return false;
+  }
+  return status === 'canceled' || status === 'unpaid' || status === 'incomplete_expired' || status === 'paused';
+}

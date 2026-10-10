@@ -14036,6 +14036,7 @@ const ja = {
       "trialEndedTitle": "トライアル終了。クラスを維持するにはアップグレードしてください",
       "trialEndedBody": "月額9ドルで無制限クラスと印刷レポートを維持できます。無料トライアルの再付与ではありません。",
       "trialEndedCta": "Proを続ける（月額9ドル）",
+      "trialReactivateCta": "再有効化",
       "trialLifecycleTitle": "Teacher Proトライアル残り{count}日",
       "trialLifecycleTitleToday": "Teacher Proトライアルは本日期限です",
       "trialLifecycleTitleOne": "Teacher Proトライアル残り1日",

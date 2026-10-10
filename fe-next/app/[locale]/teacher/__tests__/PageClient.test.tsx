@@ -79,6 +79,10 @@ let trialOfferState = { dismissed: true, dismiss: vi.fn() };
 vi.mock('@/hooks/useTeacherTrialOffer', () => ({
   useTeacherTrialOffer: () => trialOfferState,
 }));
+let trialEndedState = { dismissed: false, dismiss: vi.fn() };
+vi.mock('@/hooks/useTeacherTrialEnded', () => ({
+  useTeacherTrialEnded: () => trialEndedState,
+}));
 // The usage-triggered card waits on the same inputs as the milestone ask.
 // Default: no limit hit, so the card stays down unless a test opts in.
 let usageState = {
@@ -113,6 +117,7 @@ describe('TeacherPage upgrade CTA', () => {
     recentState = { hasRecentConfig: true };
     milestoneState = { hasMilestone: true, loading: false, dismissed: false, dismiss: vi.fn() };
     trialOfferState = { dismissed: true, dismiss: vi.fn() };
+    trialEndedState = { dismissed: false, dismiss: vi.fn() };
     usageState = { reason: null, count: 0, loading: false, dismissed: false, dismiss: vi.fn() };
   });
 
@@ -258,8 +263,8 @@ describe('TeacherPage upgrade CTA', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
     expect(screen.getByTestId('teacher-pro-trial-ended')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'teacher.subscription.trialEndedCta' })).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'teacher.subscription.trialEndedCta' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'teacher.subscription.trialReactivateCta' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'teacher.subscription.trialReactivateCta' })).toBeNull();
     expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
     expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
     expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();
@@ -268,6 +273,15 @@ describe('TeacherPage upgrade CTA', () => {
       source: 'dashboard_trial_ended',
       event_type: 'impression',
     });
+  });
+
+  it('hides the expired Polar trial banner after persisted dismiss', () => {
+    accessState = { trial: mkTrial({ isExpired: true, daysLeft: 0, hoursLeft: 0, msLeft: 0 }) };
+    proState = { ...proState, hasPro: false, source: 'polar', status: 'canceled', trialUsed: true };
+    trialEndedState = { dismissed: true, dismiss: vi.fn() };
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    render(<TeacherPage />);
+    expect(screen.queryByTestId('teacher-pro-trial-ended')).toBeNull();
   });
 
   it('hides the usage prompt card for a Pro teacher and after dismiss', () => {
@@ -312,6 +326,7 @@ describe('TeacherPage 7-day trial upgrade nudge', () => {
     recentState = { hasRecentConfig: true };
     milestoneState = { hasMilestone: true, loading: false, dismissed: false, dismiss: vi.fn() };
     trialOfferState = { dismissed: true, dismiss: vi.fn() };
+    trialEndedState = { dismissed: false, dismiss: vi.fn() };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
   });
 
@@ -364,6 +379,7 @@ describe('TeacherPage Polar 14-day trial offer', () => {
     recentState = { hasRecentConfig: true };
     milestoneState = { hasMilestone: false, loading: false, dismissed: false, dismiss: vi.fn() };
     trialOfferState = { dismissed: false, dismiss: vi.fn() };
+    trialEndedState = { dismissed: false, dismiss: vi.fn() };
     usageState = { reason: null, count: 0, loading: false, dismissed: false, dismiss: vi.fn() };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
   });

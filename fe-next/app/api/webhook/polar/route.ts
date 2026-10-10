@@ -13,7 +13,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
-import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
+import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
+import { isPolarTrialLapse } from '@/lib/education/polarTrial'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
@@ -131,9 +132,11 @@ export async function POST(request: NextRequest) {
         break
       case 'subscription.canceled':
         await handleSubscriptionCanceled(payload, userId)
+        trackTrialExpired(payload, userId)
         break
       case 'subscription.revoked':
         await handleSubscriptionRevoked(payload, userId)
+        trackTrialExpired(payload, userId)
         break
       case 'order.created':
       case 'order.paid':
@@ -196,6 +199,30 @@ function trackProTrial(payload: WebhookPayload, userId?: string) {
     captureProFunnelServerEvent(buildTeacherTrialStartedEvent(userId, subId))
   } catch (err) {
     console.error('[Polar] trial telemetry threw:', err)
+  }
+}
+
+/**
+ * `trial_expired` — Polar Teacher Pro trial lapsed without converting.
+ * Canceled/revoked only. A later paid cancel is not a lapse
+ * (`isPolarTrialLapse`). Never throws.
+ */
+function trackTrialExpired(payload: WebhookPayload, userId?: string) {
+  try {
+    if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
+    const data = payload?.data ?? {}
+    const marker = trialMarker(data)
+    const periodEnd = typeof data?.current_period_end === 'string' ? data.current_period_end : null
+    if (!isPolarTrialLapse({
+      status: String(data?.status ?? ''),
+      trial: marker.trial,
+      trial_end: marker.trial_end,
+      current_period_end: periodEnd,
+    })) return
+    const subId = String(data?.id ?? '')
+    captureProFunnelServerEvent(buildTrialExpiredEvent(userId, subId))
+  } catch (err) {
+    console.error('[Polar] trial_expired telemetry threw:', err)
   }
 }
 
