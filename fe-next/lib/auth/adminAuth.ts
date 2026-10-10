@@ -62,12 +62,9 @@ export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthRe
  */
 async function verifyBearerToken(token: string): Promise<AdminAuthResult> {
   try {
-    // Create Supabase client with service role key for token verification
-    const supabaseLib = await import('@supabase/supabase-js');
-    const supabase = supabaseLib.createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const { createAdminClient } = await import('@/utils/supabase/admin');
+    const supabase = createAdminClient();
+    if (!supabase) throw new Error('Supabase service role not configured');
 
     // Verify JWT and get user
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);

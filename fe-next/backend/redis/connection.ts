@@ -16,6 +16,14 @@ import logger from '../utils/logger';
 // State Management
 let _redisClient: RedisClient | null = null;
 let _rateLimitClient: RedisClient | null = null; // Dedicated connection for rate limiting
+
+// Next route code is bundled into its own module registry, so it gets a second
+// copy of this file whose _redisClient is never set. The handle on globalThis
+// lets that copy reuse the connection instead of opening its own.
+const SHARED_HANDLE = Symbol.for('lexiclash.redis.shared');
+function publishSharedClient(client: RedisClient | null): void {
+  (globalThis as Record<symbol, unknown>)[SHARED_HANDLE] = client;
+}
 let _isRedisAvailable = false;
 let _errorReported = false; // Prevent repeated error events to Sentry
 let lastHealthCheck = Date.now();
@@ -273,6 +281,7 @@ export async function initRedis(): Promise<boolean> {
     await _redisClient.ping();
     _isRedisAvailable = true;
     logger.info('REDIS', 'Redis connection test successful');
+    publishSharedClient(_redisClient);
 
     // Create dedicated rate-limit client to prevent rate-limit queries
     // from blocking game state operations on the main connection.
@@ -333,6 +342,7 @@ export async function closeRedis(): Promise<void> {
     _redisClient = null;
     _isRedisAvailable = false;
   }
+  publishSharedClient(null);
 }
 
 export function createPubSubClients(): { pubClient: RedisClient; subClient: RedisClient } | null {
@@ -395,6 +405,11 @@ export function isRedisAvailable(): boolean {
 
 export function getRedisClient(): RedisClient | null {
   return _redisClient;
+}
+
+/** The connected client, from this module copy or the one the server booted. */
+export function getSharedRedisClient(): RedisClient | null {
+  return _redisClient ?? ((globalThis as Record<symbol, unknown>)[SHARED_HANDLE] as RedisClient | null | undefined) ?? null;
 }
 
 /**

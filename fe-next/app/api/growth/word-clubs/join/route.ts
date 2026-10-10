@@ -5,8 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { createAdminClient, getAnonClient } from '@/utils/supabase/admin';
 
 function getSupabaseAdmin() {
   return createAdminClient()!;
@@ -16,10 +15,8 @@ async function getUserFromRequest(req: NextRequest) {
   const authHeader = req.headers.get('Authorization');
   if (!authHeader) return null;
   const token = authHeader.replace('Bearer ', '');
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = getAnonClient();
+  if (!supabase) return null;
   const { data: { user } } = await supabase.auth.getUser(token);
   return user;
 }

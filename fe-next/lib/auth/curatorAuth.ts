@@ -71,11 +71,9 @@ export async function verifyCuratorAuth(
 ): Promise<CuratorAuthResult> {
   const authHeader = request.headers.get('authorization');
   if (authHeader && authHeader.startsWith('Bearer ')) {
-    const supabaseLib = await import('@supabase/supabase-js');
-    const supabase = supabaseLib.createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    ) as unknown as MinimalClient;
+    const { createAdminClient } = await import('@/utils/supabase/admin');
+    const supabase = createAdminClient() as unknown as MinimalClient | null;
+    if (!supabase) return unauthorized('Authentication failed', 500);
     return resolveCurator(supabase, authHeader.substring(7), opts);
   }
 

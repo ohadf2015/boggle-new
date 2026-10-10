@@ -1,5 +1,5 @@
 import Redis from 'ioredis';
-import { getRedisClient } from '../redis/connection';
+import { getSharedRedisClient } from '../redis/connection';
 
 let cacheClient: Redis | null = null;
 
@@ -20,7 +20,7 @@ export function failFast<T>(op: Promise<T>): Promise<T> {
 }
 
 export function getCacheClient(): Redis {
-  const shared = getRedisClient();
+  const shared = getSharedRedisClient();
   if (shared) return shared;
   if (cacheClient) return cacheClient;
   const url =

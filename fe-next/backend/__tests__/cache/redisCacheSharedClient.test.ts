@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const shared = vi.hoisted(() => ({ client: null as unknown as object | null }));
-vi.mock('../../redis/connection', () => ({ getRedisClient: () => shared.client }));
+vi.mock('../../redis/connection', () => ({ getSharedRedisClient: () => shared.client }));
 
 import { getCacheClient, failFast } from '../../cache/redisCache';
 
