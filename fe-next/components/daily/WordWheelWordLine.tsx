@@ -19,6 +19,8 @@ interface WordWheelWordLineProps {
   onRemove: (index: number) => void;
   onSubmit: () => void;
   isValidating: boolean;
+  /** A released word still waiting on the server; the wheel is already clear for the next swipe. */
+  pendingWord?: string | null;
   shake: boolean;
   feedback: { message: string; type: 'success' | 'error' } | null;
   acceptedWord: string | null;
@@ -33,14 +35,16 @@ interface WordWheelWordLineProps {
 const POP = { type: 'spring', stiffness: 640, damping: 17 } as const;
 
 export default function WordWheelWordLine({
-  t, letters, allLetters, dir, onRemove, onSubmit, isValidating, shake, feedback,
+  t, letters, allLetters, dir, onRemove, onSubmit, isValidating, pendingWord = null, shake, feedback,
   acceptedWord, acceptedPoints, acceptedId, reducedMotion = false, hint = false, className,
 }: WordWheelWordLineProps) {
   const word = letters.map(l => l.letter).join('');
   const [lastBuilt, setLastBuilt] = useState('');
   if (word && word !== lastBuilt) setLastBuilt(word);
-  const checking = isValidating && letters.length > 0;
-  const preview = word.length >= 3 ? scoreWord(word) : 0;
+  const riding = letters.length === 0 && !!pendingWord;
+  const shown = riding ? [...pendingWord].map(letter => ({ letter, wheelIndex: -2 })) : letters;
+  const checking = riding || (isValidating && letters.length > 0);
+  const preview = word.length >= 3 && !checking ? scoreWord(word) : 0;
   const isError = feedback?.type === 'error';
   const accepted = feedback?.type === 'success' && acceptedWord ? acceptedWord : null;
   const fullWheel = accepted ? classifyLetterCoverage(accepted, allLetters) === 'all' : false;
@@ -125,7 +129,7 @@ export default function WordWheelWordLine({
       )}
 
       <div dir={dir} className="flex items-center justify-center gap-0.5 max-w-full">
-        {letters.length === 0 ? (
+        {shown.length === 0 ? (
           <span className="flex items-center gap-2 text-neo-white/45 font-semibold text-sm sm:text-base">
             <m.span
               data-testid="word-caret"
@@ -138,15 +142,15 @@ export default function WordWheelWordLine({
           </span>
         ) : (
           <>
-            {letters.map((bl, i) => (
+            {shown.map((bl, i) => (
               <m.button
                 key={`${bl.wheelIndex}-${i}`}
                 type="button"
                 translate="no"
-                data-testid="built-letter-tile"
+                data-testid={riding ? 'pending-letter-tile' : 'built-letter-tile'}
                 data-center={bl.wheelIndex === -1 ? 'true' : 'false'}
                 aria-label={`${bl.letter}. ${t('wordWheel.tapToRemove')}`}
-                onClick={() => onRemove(i)}
+                onClick={() => { if (!riding) onRemove(i); }}
                 className={cn(
                   'notranslate relative font-neo-display font-black uppercase leading-none text-[40px] sm:text-5xl tall:text-[52px] short:text-3xl px-[1px] touch-manipulation cursor-pointer',
                   'before:absolute before:-inset-y-2 before:inset-x-0 before:content-[""]',

@@ -37,7 +37,7 @@ import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge
 import type { Language } from '@/types';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fastValidateWord } from '@/hooks/fastValidateWord';
-import { prewarmDictionary } from '@/hooks/useDictionaryCache';
+import { prewarmDictionary, hasWordInMemoryCache } from '@/hooks/useDictionaryCache';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
@@ -333,6 +333,10 @@ const WordWheelChallenge: React.FC = () => {
 
   const handleValidateWord = useCallback(
     (word: string) => fastValidateWord(word, language as Language),
+    [language]
+  );
+  const handleQuickVerdict = useCallback(
+    (word: string) => hasWordInMemoryCache(word, language as Language),
     [language]
   );
 
@@ -652,6 +656,7 @@ const WordWheelChallenge: React.FC = () => {
               duration={WORD_WHEEL_DURATION}
               onComplete={handleComplete}
               onValidateWord={handleValidateWord}
+              onQuickVerdict={handleQuickVerdict}
               onEffect={handleEffect}
               language={language}
               practice={isPractice}

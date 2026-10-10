@@ -6,7 +6,7 @@ import { Delete, RotateCcw, TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { selectWheelRadius } from '@/lib/wordWheel/wheelGeometry';
-import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
+import type { WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
 import { wheelWordDir } from '@/lib/wheelRush/wordDirection';
@@ -29,6 +29,7 @@ import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import WordWheelRankLadder from './WordWheelRankLadder';
 import WordWheelWordLine from './WordWheelWordLine';
+import { useWordWheelSubmit, type LetterClear } from './useWordWheelSubmit';
 import WordWheelFoundWords from './WordWheelFoundWords';
 import WordWheelHud from './WordWheelHud';
 import WordWheelLiveRanks from './WordWheelLiveRanks';
@@ -48,6 +49,8 @@ interface WordWheelGameProps {
   duration: number;
   onComplete: (result: WordWheelGameResult) => void;
   onValidateWord: (word: string) => Promise<boolean>;
+  /** Synchronous dictionary answer (true/false when loaded, null when cold) so a release scores in-frame. */
+  onQuickVerdict?: (word: string) => boolean | null;
   onEffect: (effect: WordWheelEffect) => void;
   language: string;
   paused?: boolean;
@@ -107,7 +110,7 @@ interface RivalScore {
 }
 
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
-  puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false, practice = false,
+  puzzle, duration, onComplete, onValidateWord, onQuickVerdict, onEffect, language, paused = false, practice = false,
   hideModeCoach = false,
   hideCompetitive = false, rivals: rivalsOverride, onWordFound, isDesktop = false,
   puzzleDate, currentPlayerId = null, currentGuestFingerprint = null, onExit,
@@ -133,7 +136,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(duration);
   const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const [isValidating, setIsValidating] = useState(false);
   const [outerLetters, setOuterLetters] = useState(puzzle.outerLetters);
   const [lastWordScore, setLastWordScore] = useState<number | null>(null);
   // Monotonic id for the flying "+score" element's key. Using Date.now() here
@@ -178,7 +180,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // Drag-mode users already lifted, so a wrong word should clear immediately
   // instead of waiting through the read-toast window.
   const lastSubmitWasDragRef = useRef(false);
-  const submittingRef = useRef(false);
 
   // ── Live leaderboard rivals (snapshot on mount + refresh every 30s) ──
   const [fetchedRivals, setFetchedRivals] = useState<RivalScore[]>([]);
@@ -431,7 +432,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // same moment, so the player sees *why* it failed and the wheel clears for a
   // fresh attempt without needing the manual reset button. New input within
   // the window cancels the auto-reset (see builtLetters effect above).
-  const showFeedback = useCallback((message: string, type: 'success' | 'error') => {
+  const showFeedback = useCallback((message: string, type: 'success' | 'error', clear: LetterClear = 'later') => {
     setFeedback({ message, type });
     const toastDuration = type === 'error' ? 1500 : 1500;
     setTimeout(() => setFeedback(null), toastDuration);
@@ -446,12 +447,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       if (autoResetTimerRef.current) clearTimeout(autoResetTimerRef.current);
       // Drag-mode submits clear instantly so the next stroke isn't blocked;
       // tap/idle submits wait 1.5s so the player can see what was wrong.
-      const wasDrag = lastSubmitWasDragRef.current;
-      lastSubmitWasDragRef.current = false;
-      if (wasDrag) {
+      if (clear === 'now') {
         builtLettersRef.current = [];
         setBuiltLetters([]);
-      } else {
+      } else if (clear === 'later') {
         autoResetTimerRef.current = setTimeout(() => {
           autoResetTimerRef.current = null;
           builtLettersRef.current = [];
@@ -582,129 +581,90 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     playButtonClickSound();
   }, [playButtonClickSound]);
 
-  // ── Submit word ──
-  const handleSubmit = useCallback(async () => {
-    // Refs, not render state: a drag release can land before React re-renders the last letter in.
-    const word = builtLettersRef.current.map(bl => bl.letter).join('').toUpperCase();
-    if (submittingRef.current || word.length === 0 || gameOverRef.current) return;
-
-    // Container-relative center for effects
+  // ── Accept a word (score, list, effects) ──
+  const acceptWord = useCallback((word: string) => {
     const cx = gameContainerRef.current
       ? gameContainerRef.current.getBoundingClientRect().width / 2
       : 200;
-
-    // Client-side checks
-    if (word.length < 3) {
-      showFeedback(t('wordWheel.tooShort', { min: '3' }), 'error');
-      onEffect({ type: 'error', x: cx, y: 80 });
-      playWordRejectedSound();
-      return;
-    }
-
-    if (!word.includes(puzzle.centerLetter.toUpperCase())) {
-      showFeedback(t('wordWheel.missingCenter', { letter: puzzle.centerLetter }), 'error');
-      onEffect({ type: 'error', x: cx, y: 80 });
-      playWordRejectedSound();
-      return;
-    }
-
-    if (!isValidWordWheelWord(word, puzzle.centerLetter, puzzle.allLetters)) {
-      showFeedback(t('wordWheel.invalidLetters'), 'error');
-      onEffect({ type: 'error', x: cx, y: 80 });
-      playWordRejectedSound();
-      return;
-    }
-
-    if (wordsFoundRef.current.includes(word)) {
-      // Daily is single-player: once you've found a word it's yours, so
-      // re-typing it is blocked outright (no points). This differs from
-      // multiplayer Wheel Rush, where the same word can be re-submitted because
-      // a different player found it first — but that path is server-authoritative
-      // (WheelRushView), not this client-side check.
-      showFeedback(t('wordWheel.alreadyFound'), 'error');
-      onEffect({ type: 'error', x: cx, y: 80 });
-      playWordRejectedSound();
+    const points = scoreWord(word);
+    const nextWordsFound = [...wordsFoundRef.current, word];
+    wordsFoundRef.current = nextWordsFound;
+    setWordsFound(nextWordsFound);
+    // Surface progress to the practice shell (goal tracking) — fires for
+    // every accepted word, competitive or practice.
+    onWordFound?.(word, nextWordsFound);
+    setScore(prev => prev + points);
+    setLastWordScore(points);
+    setScoreFlyId(id => id + 1);
+    setTimeout(() => setLastWordScore(null), 1200);
+    showFeedback(`+${points}`, 'success');
+    if (builtLettersRef.current.map(bl => bl.letter).join('').toUpperCase() === word) {
       builtLettersRef.current = [];
       setBuiltLetters([]);
-      return;
     }
+    setLastFoundWord(word);
+    setTimeout(() => setLastFoundWord(null), 2000);
 
-    submittingRef.current = true;
-    setIsValidating(true);
-    try {
-      const isValid = await onValidateWord(word);
-      if (isValid) {
-        const points = scoreWord(word);
-        const nextWordsFound = [...wordsFoundRef.current, word];
-        wordsFoundRef.current = nextWordsFound;
-        setWordsFound(nextWordsFound);
-        // Surface progress to the practice shell (goal tracking) — fires for
-        // every accepted word, competitive or practice.
-        onWordFound?.(word, nextWordsFound);
-        setScore(prev => prev + points);
-        setLastWordScore(points);
-        setScoreFlyId(id => id + 1);
-        setTimeout(() => setLastWordScore(null), 1200);
-        showFeedback(`+${points}`, 'success');
-        builtLettersRef.current = [];
-        setBuiltLetters([]);
-        setLastFoundWord(word);
-        setTimeout(() => setLastFoundWord(null), 2000);
+    // Combo tracker — resets after 5s of inactivity
+    const hadActiveCombo = comboTimerRef.current !== null;
+    if (comboTimerRef.current) { clearTimeout(comboTimerRef.current); comboTimerRef.current = null; }
+    const newCombo = hadActiveCombo ? combo + 1 : 1;
+    setCombo(newCombo);
+    comboTimerRef.current = setTimeout(() => { setCombo(0); comboTimerRef.current = null; }, 5000);
 
-        // Combo tracker — resets after 5s of inactivity
-        const hadActiveCombo = comboTimerRef.current !== null;
-        if (comboTimerRef.current) { clearTimeout(comboTimerRef.current); comboTimerRef.current = null; }
-        const newCombo = hadActiveCombo ? combo + 1 : 1;
-        setCombo(newCombo);
-        comboTimerRef.current = setTimeout(() => { setCombo(0); comboTimerRef.current = null; }, 5000);
+    // Wheel-coverage feat: 'all' = used every distinct wheel letter (a true
+    // wheel pangram — the old `length >= 9` check was dead code since a
+    // 7-letter wheel caps words at 7 chars); 'almost' = all-but-one.
+    const wheelLetters = puzzle.allLetters ?? [puzzle.centerLetter, ...puzzle.outerLetters];
+    const coverage = classifyLetterCoverage(word, wheelLetters);
+    const isAllLetters = coverage === 'all';
 
-        // Wheel-coverage feat: 'all' = used every distinct wheel letter (a true
-        // wheel pangram — the old `length >= 9` check was dead code since a
-        // 7-letter wheel caps words at 7 chars); 'almost' = all-but-one.
-        const wheelLetters = puzzle.allLetters ?? [puzzle.centerLetter, ...puzzle.outerLetters];
-        const coverage = classifyLetterCoverage(word, wheelLetters);
-        const isAllLetters = coverage === 'all';
-
-        // Sound + haptic feedback
-        if (isAllLetters) {
-          playLegendaryWordSound();
-          haptic([50, 30, 50, 30, 80]);
-        } else {
-          playWordAcceptedSound();
-          if (word.length >= 5) {
-            playWordLengthSound(word.length);
-          }
-          haptic(newCombo >= 2 ? [15, 30, 15, 30, 15] : 20);
-        }
-        if (newCombo >= 2) {
-          playComboSound(newCombo);
-        }
-
-        // Trigger celebration effects — 'all' unlocks the 4-wave Pixi pangram
-        // spectacular; everything else gets the standard word burst.
-        if (isAllLetters) {
-          onEffect({ type: 'pangram', x: cx, y: 200 });
-        } else {
-          onEffect({ type: 'wordValid', x: cx, y: 200, points });
-        }
-        // Combo milestone effect
-        if (newCombo >= 2) {
-          onEffect({ type: 'combo', x: cx, y: 160, combo: newCombo });
-        }
-
-        // Headline banner for full / near-full wheel coverage.
-        if (coverage !== 'none') {
-          triggerFeatBanner(coverage, word);
-        }
-      } else {
-        showFeedback(t('wordWheel.notInDictionary'), 'error');
-        onEffect({ type: 'error', x: cx, y: 80 });
+    // Sound + haptic feedback
+    if (isAllLetters) {
+      playLegendaryWordSound();
+      haptic([50, 30, 50, 30, 80]);
+    } else {
+      playWordAcceptedSound();
+      if (word.length >= 5) {
+        playWordLengthSound(word.length);
       }
-    } finally {
-      submittingRef.current = false;
-      setIsValidating(false);
+      haptic(newCombo >= 2 ? [15, 30, 15, 30, 15] : 20);
     }
-  }, [puzzle, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, triggerFeatBanner, onWordFound]);
+    if (newCombo >= 2) {
+      playComboSound(newCombo);
+    }
+
+    // Trigger celebration effects — 'all' unlocks the 4-wave Pixi pangram
+    // spectacular; everything else gets the standard word burst.
+    if (isAllLetters) {
+      onEffect({ type: 'pangram', x: cx, y: 200 });
+    } else {
+      onEffect({ type: 'wordValid', x: cx, y: 200, points });
+    }
+    // Combo milestone effect
+    if (newCombo >= 2) {
+      onEffect({ type: 'combo', x: cx, y: 160, combo: newCombo });
+    }
+
+    // Headline banner for full / near-full wheel coverage.
+    if (coverage !== 'none') {
+      triggerFeatBanner(coverage, word);
+    }
+  }, [puzzle, showFeedback, onEffect, combo, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, triggerFeatBanner, onWordFound]);
+
+  const rejectWord = useCallback((message: string, clear: LetterClear) => {
+    const cx = gameContainerRef.current
+      ? gameContainerRef.current.getBoundingClientRect().width / 2
+      : 200;
+    showFeedback(message, 'error', clear);
+    onEffect({ type: 'error', x: cx, y: 80 });
+    playWordRejectedSound();
+  }, [showFeedback, onEffect, playWordRejectedSound]);
+
+  const { handleSubmit, pendingWord, isValidating } = useWordWheelSubmit({
+    puzzle, t, builtLettersRef, setBuiltLetters, wordsFoundRef, gameOverRef, lastSubmitWasDragRef,
+    onValidateWord, onQuickVerdict, accept: acceptWord, reject: rejectWord,
+  });
 
   // Keep submit ref fresh so double-tap handler (created earlier) can reach the latest closure.
   useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);
@@ -843,6 +803,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         onRemove={handleRemoveLetter}
         onSubmit={handleSubmit}
         isValidating={isValidating}
+        pendingWord={pendingWord}
         shake={wordBuilderShake}
         feedback={feedback}
         acceptedWord={lastFoundWord}
