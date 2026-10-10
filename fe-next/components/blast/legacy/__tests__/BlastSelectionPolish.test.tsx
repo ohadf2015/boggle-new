@@ -7,12 +7,10 @@
  *  - Selection is an OVERLAY: a selected special tile keeps its own identity
  *    (type class + indicator icon) — we never overwrite the face with an accent
  *    fill (that would erase which tile is a bomb/gold/gem).
- *  - The drag trail uses a dark underlay for value contrast, not a thin hairline.
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BlastTile } from '../BlastTile';
-import { BlastDragTrail } from '../BlastDragTrail';
 import type { BlastTileType } from '@/shared/types/blast';
 
 jest.mock('@/hooks/usePrefersReducedMotion', () => ({
@@ -57,34 +55,5 @@ describe('Selection polish — value-contrast overlay', () => {
     render(<BlastTile {...baseProps} type="standard" />);
     const style = (screen.getByRole('button').getAttribute('style') ?? '').toLowerCase();
     expect(style).not.toContain('translatey');
-  });
-});
-
-describe('Drag trail — chunky, value-contrasting', () => {
-  const cells = [
-    { row: 0, col: 0 },
-    { row: 0, col: 1 },
-    { row: 0, col: 2 },
-  ];
-
-  it('renders a dark navy underlay stroke so the trail reads on a busy board', () => {
-    const { container } = render(
-      <BlastDragTrail selectedCells={cells} gridSize={6} containerWidth={360} padding={8} />,
-    );
-    const strokes = Array.from(container.querySelectorAll('polyline')).map(
-      (p) => (p.getAttribute('stroke') ?? '').toLowerCase(),
-    );
-    expect(strokes.some((s) => s.includes(NAVY))).toBe(true);
-  });
-
-  it('keeps a bright accent core on top of the dark underlay', () => {
-    const { container } = render(
-      <BlastDragTrail selectedCells={cells} gridSize={6} containerWidth={360} padding={8} />,
-    );
-    const strokes = Array.from(container.querySelectorAll('polyline')).map(
-      (p) => (p.getAttribute('stroke') ?? '').toUpperCase(),
-    );
-    // default accent is lime #BFFF00
-    expect(strokes.some((s) => s.includes('BFFF00'))).toBe(true);
   });
 });

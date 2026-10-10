@@ -6,7 +6,9 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { beforeEach } from 'vitest';
 import GridComponent from '../GridComponent';
+import { playSubmitMotion } from '../board/boardMotion';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Mock framer-motion to avoid animation issues in tests
@@ -27,6 +29,10 @@ vi.mock('framer-motion', () => {
     useAnimation: () => ({ start: vi.fn(), stop: vi.fn(), set: vi.fn() }),
   };
 });
+
+vi.mock('../board/boardMotion', () => ({
+  playSubmitMotion: vi.fn(),
+}));
 
 // Mock accessibility context
 vi.mock('@/contexts/AccessibilityContext', () => ({
@@ -250,6 +256,46 @@ describe('GridComponent', () => {
       expect(container.querySelector('[data-tile-skin="world-3"]')).not.toBeNull();
       expect(container.querySelector('[data-tile-skin="neon"]')).toBeNull();
       localStorage.removeItem('lexiclash_cosmetics_equipped');
+    });
+  });
+
+  describe('submit motion', () => {
+    const path = [
+      { row: 0, col: 0, letter: 'A' },
+      { row: 1, col: 1, letter: 'E' },
+    ];
+    const feedback = { id: 'fb-1', type: 'accepted' as const, word: 'AE', timestamp: 1 };
+
+    beforeEach(() => {
+      vi.mocked(playSubmitMotion).mockClear();
+    });
+
+    it('given a submitted word, settles the tiles of its path in order', () => {
+      const { rerender } = render(
+        <GridComponent grid={mockGrid} selectedCells={path} />,
+        { wrapper: TestWrapper }
+      );
+      rerender(
+        <GridComponent grid={mockGrid} selectedCells={[]} submitFeedback={feedback} />
+      );
+      expect(playSubmitMotion).toHaveBeenCalledTimes(1);
+      const [tiles, kind] = vi.mocked(playSubmitMotion).mock.calls[0];
+      expect(kind).toBe('accepted');
+      expect(tiles.map((el) => `${el.dataset.row}-${el.dataset.col}`)).toEqual(['0-0', '1-1']);
+    });
+
+    it('given the same feedback id twice, animates only once', () => {
+      const { rerender } = render(
+        <GridComponent grid={mockGrid} selectedCells={path} />,
+        { wrapper: TestWrapper }
+      );
+      rerender(
+        <GridComponent grid={mockGrid} selectedCells={[]} submitFeedback={feedback} />
+      );
+      rerender(
+        <GridComponent grid={mockGrid} selectedCells={[]} submitFeedback={feedback} />
+      );
+      expect(playSubmitMotion).toHaveBeenCalledTimes(1);
     });
   });
 });

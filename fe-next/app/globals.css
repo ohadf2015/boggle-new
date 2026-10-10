@@ -5563,66 +5563,6 @@ html[data-cosy='true'] .animate-neo-press {
    FUN/FEEL POLISH PASS (LexiClash core game)
    ==================================== */
 
-/* ── 1. Grid tile submit burst / ripple ── */
-@keyframes grid-tile-burst {
-  0% {
-    transform: translate(-50%, -50%) scale(0.6);
-    opacity: 0.9;
-  }
-  40% {
-    opacity: 0.7;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(2.2);
-    opacity: 0;
-  }
-}
-
-@keyframes grid-tile-burst-rejected {
-  0% {
-    transform: translate(-50%, -50%) scale(0.5);
-    opacity: 0.9;
-  }
-  30% {
-    transform: translate(-50%, -50%) scale(1.1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.05);
-    opacity: 0.6;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1.8);
-    opacity: 0;
-  }
-}
-
-.grid-submit-burst {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 6px;
-  pointer-events: none;
-  z-index: 20;
-  animation: grid-tile-burst 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.grid-submit-burst--accepted {
-  background: radial-gradient(circle, rgba(191, 255, 0, 0.55) 0%, rgba(255, 225, 53, 0.25) 45%, transparent 70%);
-  box-shadow: 0 0 0 2px rgba(191, 255, 0, 0.45), 0 0 18px rgba(191, 255, 0, 0.4);
-}
-
-.grid-submit-burst--rejected {
-  background: radial-gradient(circle, rgba(255, 80, 80, 0.55) 0%, rgba(255, 50, 50, 0.22) 45%, transparent 70%);
-  box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.4), 0 0 18px rgba(255, 80, 80, 0.35);
-  animation-name: grid-tile-burst-rejected;
-}
-
-.grid-submit-burst--duplicate {
-  background: radial-gradient(circle, rgba(255, 105, 180, 0.5) 0%, rgba(255, 20, 147, 0.2) 45%, transparent 70%);
-  box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.35), 0 0 18px rgba(255, 105, 180, 0.3);
-}
-
 /* ── 2. Snappier touch tile press ── */
 @keyframes grid-tile-touch-pop {
   0% {
@@ -5691,14 +5631,10 @@ html[data-cosy='true'] .animate-neo-press {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .grid-submit-burst,
   .grid-cell-touch-pop:active,
   .streak-flame,
   .streak-ember {
     animation: none !important;
-  }
-  .grid-submit-burst {
-    opacity: 0;
   }
 }
 

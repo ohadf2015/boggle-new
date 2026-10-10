@@ -18,7 +18,8 @@ import { GRID_PADDING, GRID_GAP_CLASS } from './grid/gridLayoutConstants';
 import EarthquakeEffects from './grid/EarthquakeEffects';
 import { getSelectionEscalation, resolveGridEffects, type GridEffectsProfile } from './grid/selectionEscalation';
 import DragReleaseHint from './grid/DragReleaseHint';
-import GridConnectorOverlay from './grid/GridConnectorOverlay';
+import FingerTrail from './board/FingerTrail';
+import { playSubmitMotion } from './board/boardMotion';
 import BoardHandCoach from './tutorial/BoardHandCoach';
 import { useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
@@ -26,7 +27,6 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useEarthquakeAnimation } from '../hooks/useEarthquakeAnimation';
 import GridCell, { type HighlightedCell } from './grid/GridCell';
-import GridSubmitBurst, { type SubmitBurstType } from './grid/GridSubmitBurst';
 import type { WordFeedback } from './game/WordFormingArea';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 
@@ -469,31 +469,29 @@ const GridComponent = memo<GridComponentProps>(({
   // Now fires 16 t() calls per round (when boardSeed changes).
   const cellAriaLabels = useGridAriaLabels(grid, boardSeed);
 
-  // Track the last selected cell so a submit burst can paint at the word's
-  // final tile even after selection clears before async feedback lands.
-  const lastSelectedCellRef = useRef<{ row: number; col: number } | null>(null);
+  // Keep the path of the word being built so the submit motion can reach its tiles
+  // after selection has already cleared, while async feedback is still in flight.
+  const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
   useEffect(() => {
     if (selectedCells.length > 0) {
-      const last = selectedCells[selectedCells.length - 1];
-      if (last) lastSelectedCellRef.current = { row: last.row, col: last.col };
+      lastPathRef.current = selectedCells.map((c) => ({ row: c.row, col: c.col }));
     }
   }, [selectedCells]);
 
-  const [submitBurst, setSubmitBurst] = useState<{ key: number; row: number; col: number; type: SubmitBurstType } | null>(null);
   const prevFeedbackIdRef = useRef<string | undefined>(undefined);
   useEffect(() => {
     if (!submitFeedback) return;
     if (submitFeedback.id === prevFeedbackIdRef.current) return;
     prevFeedbackIdRef.current = submitFeedback.id;
-    const last = lastSelectedCellRef.current;
-    if (!last) return;
-    setSubmitBurst({
-      key: submitFeedback.timestamp,
-      row: last.row,
-      col: last.col,
-      type: submitFeedback.type,
-    });
-  }, [submitFeedback]);
+    const root = gridRef.current;
+    if (!root || ghostCells) return;
+    const tiles: HTMLElement[] = [];
+    for (const { row, col } of lastPathRef.current) {
+      const el = root.querySelector<HTMLElement>(`[data-row="${row}"][data-col="${col}"]`);
+      if (el) tiles.push(el);
+    }
+    playSubmitMotion(tiles, submitFeedback.type);
+  }, [submitFeedback, ghostCells]);
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -684,16 +682,6 @@ const GridComponent = memo<GridComponentProps>(({
             })
           )}
 
-          {/* Localized submit burst overlay — paints on the last tile of a submitted word. */}
-          {submitBurst && (
-            <GridSubmitBurst
-              key={submitBurst.key}
-              row={submitBurst.row}
-              col={submitBurst.col}
-              type={submitBurst.type}
-              onDone={() => setSubmitBurst(null)}
-            />
-          )}
         </div>
 
         {/* Tier transition flash overlay */}
@@ -720,7 +708,7 @@ const GridComponent = memo<GridComponentProps>(({
           dust={earthquakeDust}
         />
 
-        <GridConnectorOverlay selectedCells={selectedCells} gridEl={gridNode} comboLevel={visualEffectiveCombo} />
+        <FingerTrail selectedCells={selectedCells} gridEl={gridNode} comboLevel={visualEffectiveCombo} />
 
         {/* First-play teaching, in place. Shares gridRef with the connector
             overlay so the hand lands on the same real tile centres. */}
