@@ -1,6 +1,6 @@
 import { test, expect, type Browser } from '@playwright/test';
 import { MultiplayerPage } from './pages/MultiplayerPage';
-import { goto, randomUsername, waitForHydration, type Locale } from './helpers/test-utils';
+import { open, randomUsername, type Locale } from './helpers/test-utils';
 import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures';
 
 /**
@@ -15,11 +15,12 @@ import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures'
 async function createOnboardedContext(browser: Browser, locale: Locale = 'en') {
   const context = await browser.newContext();
   const page = await context.newPage();
-  await goto(page, '/multiplayer', locale);
+  await open(page, '/multiplayer', locale);
   await applyStorageFixture(page, ONBOARDED_USER);
-  await goto(page, '/multiplayer', locale);
-  await waitForHydration(page);
-  return { context, page, mp: new MultiplayerPage(page) };
+  await open(page, '/multiplayer', locale);
+  const mp = new MultiplayerPage(page);
+  await mp.waitForEntryReady();
+  return { context, page, mp };
 }
 
 const ROUND_TRIP_LOCALES: { locale: Locale; language: string }[] = [
@@ -45,13 +46,8 @@ test.describe('Multiplayer round trip', () => {
 
       // Second player joins via the invite code/link.
       const player = await createOnboardedContext(browser, locale);
-      await goto(player.page, `/join/${gameCode}`, locale);
-      await waitForHydration(player.page);
-      const playerName = randomUsername('Player');
-      if (await player.mp.joinNameInput.isVisible().catch(() => false)) {
-        await player.mp.joinRoom(playerName);
-      }
-      await expect(player.page.getByText(gameCode).first()).toBeVisible({ timeout: 15_000 });
+      await player.mp.joinByInvite(locale, gameCode, randomUsername('Player'));
+      await host.mp.waitForPlayerCount(2);
 
       // Host starts the round; the board generates for both players.
       await host.mp.startGameButton.click();

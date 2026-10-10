@@ -10,6 +10,11 @@ export async function goto(page: Page, path: string, locale: Locale = 'en') {
   await page.goto(url);
 }
 
+/** Like goto, but returns at DOMContentLoaded instead of waiting on slow third-party loads */
+export async function open(page: Page, path: string, locale: Locale = 'en') {
+  await page.goto(`/${locale}${path.startsWith('/') ? path : `/${path}`}`, { waitUntil: 'domcontentloaded' });
+}
+
 /** Wait for page to be fully loaded (hydrated) */
 export async function waitForHydration(page: Page) {
   // Wait for Next.js hydration — __NEXT_DATA__ or body not having loading class

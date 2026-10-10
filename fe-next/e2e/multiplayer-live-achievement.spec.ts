@@ -1,6 +1,6 @@
 import { test, expect, type Browser, type Page } from '@playwright/test';
 import { MultiplayerPage } from './pages/MultiplayerPage';
-import { goto, randomUsername, waitForHydration } from './helpers/test-utils';
+import { open, randomUsername } from './helpers/test-utils';
 import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures';
 
 function recordSocketEvents(page: Page): Array<{ event: string; data: unknown }> {
@@ -25,11 +25,12 @@ async function createOnboardedContext(browser: Browser) {
   const context = await browser.newContext();
   const page = await context.newPage();
   const events = recordSocketEvents(page);
-  await goto(page, '/multiplayer', 'en');
+  await open(page, '/multiplayer', 'en');
   await applyStorageFixture(page, ONBOARDED_USER);
-  await goto(page, '/multiplayer', 'en');
-  await waitForHydration(page);
-  return { context, page, events, mp: new MultiplayerPage(page) };
+  await open(page, '/multiplayer', 'en');
+  const mp = new MultiplayerPage(page);
+  await mp.waitForEntryReady();
+  return { context, page, events, mp };
 }
 
 function unlockedKeys(events: Array<{ event: string; data: unknown }>): string[] {
@@ -50,12 +51,8 @@ test.describe('Multiplayer live achievements', () => {
     await host.mp.selectClassicMode();
 
     const player = await createOnboardedContext(browser);
-    await goto(player.page, `/join/${gameCode}`, 'en');
-    await waitForHydration(player.page);
-    if (await player.mp.joinNameInput.isVisible().catch(() => false)) {
-      await player.mp.joinRoom(randomUsername('Player'));
-    }
-    await expect(player.page.getByText(gameCode).first()).toBeVisible({ timeout: 15_000 });
+    await player.mp.joinByInvite('en', gameCode, randomUsername('Player'));
+    await host.mp.waitForPlayerCount(2);
 
     await host.mp.startGameButton.click();
     await host.mp.waitForGameStart();
