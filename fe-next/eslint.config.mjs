@@ -10,7 +10,6 @@ const PIXI_PATH = {
   name: "pixi.js",
   message: "Pixi is confined to the modules that already import it (see lib/pixiFx). Add new Pixi code there.",
 };
-// Modules that already import pixi.js. A new importer outside these fails lint.
 const PIXI_ALLOWED = [
   "lib/pixiFx/**",
   "lib/word-craft/pixi/**",
@@ -72,9 +71,7 @@ const eslintConfig = defineConfig([
       "no-duplicate-imports": "error",
     },
   },
-  // `motion` ships the full framer engine into whichever chunk imports it; app
-  // code uses `m` under LazyMotionRoot. Pixi is confined to the modules that
-  // already import it, so a new importer must reuse one of them.
+  // `motion` pulls the full framer engine into its chunk; Pixi must stay behind a route leaf.
   {
     files: ["**/*.{ts,tsx}"],
     ignores: [...PIXI_ALLOWED, ...TEST_FILES],

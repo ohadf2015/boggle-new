@@ -2,19 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, readdirSync, statSync } from 'fs';
 import { dirname, join, relative, resolve } from 'path';
 
-/**
- * GUARD: no `[locale]` route ships Pixi in its first-load JS.
- * Walks the STATIC import graph (what webpack puts in a route's entry chunks)
- * from every page/layout segment file; `import()` / `next/dynamic` boundaries
- * are not followed, so a Pixi module is only reachable behind one of those.
- */
-
+// Static imports land in a route's first-load chunks; Pixi may only sit behind import() / next/dynamic.
 const ROOT = join(__dirname, '..');
-const LOCALE_APP = join(ROOT, 'app', '[locale]');
+const APP = join(ROOT, 'app');
 const SEGMENT_FILE = /^(page|layout|template|loading|error|not-found|default)\.(tsx|ts|jsx|js)$/;
 const PIXI = /^(pixi\.js|@pixi\/)/;
 // Admin-only preview (`notFound()` for everyone else).
-const ALLOWED_ROUTES = ['blast/v2'];
+const ALLOWED_ROUTES = ['[locale]/blast/v2'];
 
 const EXTS = ['', '.ts', '.tsx', '.js', '.jsx', '.mjs', '/index.ts', '/index.tsx', '/index.js'];
 const IMPORT_RE = /(?:^|[\n;])\s*(import|export)\s+(type\s+)?([^'";]*?\sfrom\s+)?['"]([^'"\n]+)['"]/g;
@@ -22,7 +16,7 @@ const IMPORT_RE = /(?:^|[\n;])\s*(import|export)\s+(type\s+)?([^'";]*?\sfrom\s+)
 function segmentFiles(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir)) {
     const full = join(dir, name);
-    if (statSync(full).isDirectory()) segmentFiles(full, out);
+    if (statSync(full).isDirectory()) { if (name !== 'api' && name !== '__tests__') segmentFiles(full, out); }
     else if (SEGMENT_FILE.test(name)) out.push(full);
   }
   return out;
@@ -82,10 +76,10 @@ function pixiChain(entry: string): string[] | null {
 }
 
 describe('pixi route-leaf guard', () => {
-  it('no [locale] route statically reaches pixi.js', () => {
+  it('no route or layout statically reaches pixi.js', () => {
     const offenders: string[] = [];
-    for (const entry of segmentFiles(LOCALE_APP)) {
-      const route = relative(LOCALE_APP, dirname(entry)).split('/').filter((s) => !/^\(.*\)$/.test(s)).join('/');
+    for (const entry of segmentFiles(APP)) {
+      const route = relative(APP, dirname(entry)).split('/').filter((s) => !/^\(.*\)$/.test(s)).join('/');
       if (ALLOWED_ROUTES.some((r) => route === r || route.startsWith(`${r}/`))) continue;
       const chain = pixiChain(entry);
       if (chain) offenders.push(chain.join(' -> '));
