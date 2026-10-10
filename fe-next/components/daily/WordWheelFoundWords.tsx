@@ -14,7 +14,7 @@ interface WordWheelFoundWordsProps {
   reducedMotion?: boolean;
 }
 
-function AllWords({ words, lastFound, columns, reducedMotion = false }: { words: string[]; lastFound: string | null; columns: string; reducedMotion?: boolean }) {
+function AllWords({ words, lastFound, columns, reducedMotion = false, large = false }: { words: string[]; lastFound: string | null; columns: string; reducedMotion?: boolean; large?: boolean }) {
   const sorted = [...words].sort((a, b) => a.localeCompare(b));
   return (
     <ul data-testid="found-words-all" className={cn('grid gap-x-5 gap-y-1', columns)}>
@@ -23,7 +23,8 @@ function AllWords({ words, lastFound, columns, reducedMotion = false }: { words:
           key={w}
           data-testid="found-word"
           className={cn(
-            'flex items-baseline justify-between gap-2 border-b border-neo-white/10 py-1 font-bold text-sm',
+            'flex items-baseline justify-between gap-2 border-b border-neo-white/10 font-bold',
+            large ? 'py-1.5 font-neo-display text-lg' : 'py-1 text-sm',
             w === lastFound ? 'text-neo-lime' : 'text-neo-white',
           )}
           initial={w === lastFound && !reducedMotion ? { scale: 1.35, x: -12 } : false}
@@ -67,7 +68,7 @@ export default function WordWheelFoundWords({
           {words.length === 0 ? (
             <p className="text-neo-white/55 text-sm font-semibold">{t('wordWheel.strip.empty')}</p>
           ) : (
-            <AllWords words={words} lastFound={lastFound} columns="grid-cols-2" reducedMotion={reducedMotion} />
+            <AllWords words={words} lastFound={lastFound} columns="grid-cols-2" reducedMotion={reducedMotion} large />
           )}
         </div>
         {longest && (
