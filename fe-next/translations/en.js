@@ -8872,6 +8872,13 @@ const en = {
     "invalidLetters": "Can only use wheel letters",
     "allLettersUsed": "ALL LETTERS!",
     "almostAllLetters": "ALMOST ALL!",
+    "praise": {
+      "nice": "Nice!",
+      "great": "Great!",
+      "brilliant": "Brilliant!",
+      "amazing": "Amazing!",
+      "legendary": "Legendary!"
+    },
     "streakBadge": "{count} in a row!",
     "onFireBadge": "{count} on fire!",
     "closeRace": "Close race",

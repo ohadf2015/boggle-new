@@ -9439,6 +9439,13 @@ const es = {
     "invalidLetters": "Solo puedes usar las letras de la rueda",
     "allLettersUsed": "¡TODAS LAS LETRAS!",
     "almostAllLetters": "¡CASI TODAS!",
+    "praise": {
+      "nice": "¡Bien!",
+      "great": "¡Genial!",
+      "brilliant": "¡Brillante!",
+      "amazing": "¡Increíble!",
+      "legendary": "¡Legendario!"
+    },
     "streakBadge": "¡{count} seguidas!",
     "onFireBadge": "¡{count} seguidas, en racha!",
     "closeRace": "Carrera reñida",

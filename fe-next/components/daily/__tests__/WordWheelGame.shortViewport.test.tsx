@@ -99,12 +99,11 @@ describe('WordWheelGame short-viewport wheel sizing', () => {
     expect(orbit.className).toMatch(/short:max-w-\[[^\]]*svh/);
   });
 
-  it('still keeps the unconstrained (tall-viewport) fixed sizing untouched', () => {
+  it('gives the wheel a fixed base size per breakpoint on tall viewports', () => {
     const orbit = renderGame();
-    // Base fixed sizes remain so tall phones/tablets are unchanged.
-    expect(orbit.className).toMatch(/\bh-64\b/);
-    expect(orbit.className).toMatch(/sm:h-80/);
-    expect(orbit.className).toMatch(/md:h-96/);
+    expect(orbit.className).toMatch(/\bh-\[21rem\]/);
+    expect(orbit.className).toMatch(/sm:h-\[24rem\]/);
+    expect(orbit.className).toMatch(/lg:h-\[31rem\]/);
   });
 
   it('locks the wheel to a square aspect ratio so it never ovals/stretches on desktop', () => {
@@ -112,11 +111,8 @@ describe('WordWheelGame short-viewport wheel sizing', () => {
     // 1:1 guarantee. The orbit ring + pixi decorations follow the box, so a
     // non-square box was the desktop "stretched / ring detached from letters" bug.
     expect(orbit.className).toMatch(/\baspect-square\b/);
-    // It is NOT over-enlarged past the orbit's natural fill (md:w-96). The orbit
-    // radius is min(w,h)-capped, so a bigger box only floats the ring away from
-    // the centred letters — keep it contained.
-    expect(orbit.className).not.toMatch(/lg:w-\[/);
-    expect(orbit.className).not.toMatch(/xl:w-\[/);
+    // Letters are sized in container units of this box, so a bigger box scales the whole flower together.
+    expect(orbit.className).toMatch(/\[container-type:size\]/);
   });
 });
 

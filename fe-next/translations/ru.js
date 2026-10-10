@@ -15448,6 +15448,13 @@ const ru = {
     "invalidLetters": "Можно использовать только буквы колеса",
     "allLettersUsed": "ВСЕ БУКВЫ!",
     "almostAllLetters": "ПОЧТИ ВСЕ!",
+    "praise": {
+      "nice": "Неплохо!",
+      "great": "Отлично!",
+      "brilliant": "Блестяще!",
+      "amazing": "Потрясающе!",
+      "legendary": "Легендарно!"
+    },
     "streakBadge": "{count} подряд!",
     "onFireBadge": "{count} подряд, в ударе!",
     "closeRace": "Плотная гонка",

@@ -9720,6 +9720,13 @@ const sv = {
     "invalidLetters": "Kan bara använda hjulets bokstäver",
     "allLettersUsed": "ALLA BOKSTÄVER!",
     "almostAllLetters": "NÄSTAN ALLA!",
+    "praise": {
+      "nice": "Snyggt!",
+      "great": "Grymt!",
+      "brilliant": "Lysande!",
+      "amazing": "Otroligt!",
+      "legendary": "Legendariskt!"
+    },
     "streakBadge": "{count} i rad!",
     "onFireBadge": "{count} i rad – glödhett!",
     "closeRace": "Jämn kamp",
