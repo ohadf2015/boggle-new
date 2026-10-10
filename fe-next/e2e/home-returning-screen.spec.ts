@@ -88,3 +88,34 @@ test('fresh visitors still get the explainer with its SEO copy', async ({ page }
   expect(scrollHeight).toBeGreaterThan(innerHeight * 2);
   await expect(page.locator('h2').first()).toBeAttached();
 });
+
+test('fresh hero: a traced word cheers on release, then PLAY NOW opens on the launch curtain', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await seedDecidedVisitor(page, false);
+  await page.goto('/en', { waitUntil: 'domcontentloaded' });
+  const grid = page.locator('[data-hero-grid]');
+  await expect(grid).toBeVisible({ timeout: 60_000 });
+
+  const centre = async (cell: string) => {
+    const box = await page.locator(`button[data-cell="${cell}"]`).boundingBox();
+    if (!box) throw new Error(`no tile ${cell}`);
+    return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  };
+  const path = [await centre('0-0'), await centre('0-1'), await centre('1-1')];
+  await page.waitForFunction(
+    () => Object.keys(document.querySelector('[data-hero-grid]') ?? {}).some((k) => k.startsWith('__react')),
+    undefined,
+    { timeout: 60_000 },
+  );
+  await page.mouse.move(path[0].x, path[0].y);
+  await page.mouse.down();
+  for (const p of path.slice(1)) await page.mouse.move(p.x, p.y, { steps: 4 });
+  await expect(grid).toHaveAttribute('data-state', 'play');
+  await page.mouse.up();
+  await expect(grid).toHaveAttribute('data-state', 'found');
+  await expect(page.locator('[data-hero-spark]').first()).toBeAttached();
+
+  await page.getByRole('link', { name: /^play now$/i }).first().click();
+  await expect(page.getByTestId('home-quickplay-cover')).toBeVisible({ timeout: 10_000 });
+});

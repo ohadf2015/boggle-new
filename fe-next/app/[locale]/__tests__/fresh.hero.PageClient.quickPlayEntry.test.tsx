@@ -59,6 +59,20 @@ describe('HomePageClient: hero PLAY enters quick play', () => {
     expect(screen.getByTestId('onboarding-flow')).toHaveAttribute('data-entry', 'quickPlay');
   });
 
+  it('PLAY raises the launch curtain at once, while the quick-play chunk is still loading', () => {
+    render(<HomePageClient />);
+    fireEvent.click(screen.getByTestId('play-cta'));
+    const cover = screen.getByTestId('home-quickplay-cover');
+    expect(cover.querySelectorAll('[data-launch-tile]').length).toBeGreaterThan(0);
+  });
+
+  it('a ?next= bounce auto-opens the FULL flow without the curtain over its steps', () => {
+    setSearch('?next=/en/practice');
+    render(<HomePageClient />);
+    expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-quickplay-cover')).toBeNull();
+  });
+
   it('a ?next= bounce auto-opens the FULL flow (no quick-play entry)', () => {
     setSearch('?next=/en/practice');
     render(<HomePageClient />);

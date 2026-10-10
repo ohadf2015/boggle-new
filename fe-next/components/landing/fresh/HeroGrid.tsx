@@ -18,6 +18,7 @@ import { Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getDemoConfig, type DemoConfig } from '@/components/onboarding/demoConfigs';
 import { cn } from '@/lib/utils';
+import { HeroSparks } from './HeroSparks';
 
 type Cell = { row: number; col: number };
 type Mode = 'demo' | 'play' | 'found' | 'miss';
@@ -85,6 +86,7 @@ const CSS = `
 .hg[data-mode=found] .hg-tile[data-order="1"] *{animation-delay:.07s}
 .hg[data-mode=found] .hg-tile[data-order="2"] *{animation-delay:.14s}
 .hg[data-mode=miss] .hg-board{animation:hg-shake .45s cubic-bezier(.36,.07,.19,.97)}
+.hg[data-mode=found] .hg-board{animation:hg-bump .5s cubic-bezier(.34,1.56,.64,1)}
 }
 @media (prefers-reduced-motion: reduce){
 .hg[data-mode=demo] .hg-tile[data-order] .hg-lit{opacity:1}
@@ -99,6 +101,7 @@ const CSS = `
 @keyframes hg-chip{0%,31%{opacity:0;transform:translate(-50%,6px) scale(.8)}35%{opacity:1;transform:translate(-50%,0) scale(1.1)}39%,72%{opacity:1;transform:translate(-50%,0) scale(1)}80%,100%{opacity:0;transform:translate(-50%,0) scale(1)}}
 @keyframes hg-chip-in{0%{opacity:0;transform:translate(-50%,8px) scale(.6)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
 @keyframes hg-cheer{0%{transform:scale(1)}45%{transform:scale(1.16) rotate(5deg)}100%{transform:scale(1.04)}}
+@keyframes hg-bump{0%{transform:scale(1)}35%{transform:scale(1.045) rotate(-1deg)}100%{transform:scale(1)}}
 @keyframes hg-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
 `;
 
@@ -116,16 +119,21 @@ export function HeroGrid({ onFound }: HeroGridProps) {
   const lastPointer = useRef<string | null>(null);
   const missTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const selRef = useRef<Cell[]>([]);
+  const judgeRef = useRef<(next: Cell[]) => void>(() => {});
+
   useEffect(() => {
     const stop = () => {
+      if (!dragging.current) return;
       dragging.current = false;
+      if (selRef.current.length >= demo.word.length) judgeRef.current(selRef.current);
     };
     window.addEventListener('pointerup', stop);
     return () => {
       window.removeEventListener('pointerup', stop);
       if (missTimer.current) clearTimeout(missTimer.current);
     };
-  }, []);
+  }, [demo.word.length]);
 
   const judge = useCallback(
     (next: Cell[]) => {
@@ -139,12 +147,16 @@ export function HeroGrid({ onFound }: HeroGridProps) {
       dragging.current = false;
       setMode('miss');
       missTimer.current = setTimeout(() => {
+        selRef.current = [];
         setSel([]);
         setMode('play');
       }, 700);
     },
     [demo, onFound]
   );
+  useEffect(() => {
+    judgeRef.current = judge;
+  }, [judge]);
 
   const add = useCallback(
     (cell: Cell) => {
@@ -157,9 +169,10 @@ export function HeroGrid({ onFound }: HeroGridProps) {
       else if (base.some((c) => same(c, cell))) return;
       else if (last && !adjacent(last, cell)) next = [cell];
       else next = [...base, cell];
+      selRef.current = next;
       setSel(next);
       setMode('play');
-      if (next.length === demo.word.length) judge(next);
+      if (!dragging.current && next.length === demo.word.length) judge(next);
     },
     [mode, sel, demo.word.length, judge]
   );
@@ -239,6 +252,7 @@ export function HeroGrid({ onFound }: HeroGridProps) {
               );
             })
           )}
+          {mode === 'found' && <HeroSparks />}
           <svg
             aria-hidden="true"
             viewBox="0 0 100 100"
