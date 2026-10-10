@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Crown } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import {
@@ -42,7 +42,7 @@ function RosterRailImpl({ players }: { players: RosterPlayer[] }) {
   return (
     <ul className="flex flex-col gap-2" data-component="roster-rail" aria-label="Players">
       {rows.map((p) => (
-        <motion.li
+        <m.li
           key={p.userId}
           layout={!reduce}
           transition={rowTransition}
@@ -81,7 +81,7 @@ function RosterRailImpl({ players }: { players: RosterPlayer[] }) {
             </div>
             <span className="flex-1 min-w-0 truncate text-sm font-medium">{p.username}</span>
             <div className="flex flex-col items-end shrink-0">
-              <motion.span
+              <m.span
                 // Remounting on score change replays the pop; `initial={false}`
                 // keeps it silent on first paint and on non-scoring re-renders.
                 key={p.score}
@@ -91,7 +91,7 @@ function RosterRailImpl({ players }: { players: RosterPlayer[] }) {
                 className="font-bold tabular-nums text-sm"
               >
                 {p.score}
-              </motion.span>
+              </m.span>
               {p.wordCount != null && p.wordCount > 0 && (
                 <span className="text-[10px] opacity-70 tabular-nums">{p.wordCount}w</span>
               )}
@@ -104,7 +104,7 @@ function RosterRailImpl({ players }: { players: RosterPlayer[] }) {
               aria-hidden="true"
             />
           </div>
-        </motion.li>
+        </m.li>
       ))}
     </ul>
   );

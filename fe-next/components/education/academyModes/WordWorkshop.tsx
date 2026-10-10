@@ -15,7 +15,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { Coins, Hammer, RotateCcw, Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -296,7 +296,7 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
         <div className="pointer-events-none fixed inset-x-0 top-[18%] z-[60] flex justify-center px-4">
           <AnimatePresence>
             {callout && (
-              <motion.div
+              <m.div
                 key={callout.id}
                 data-testid="workshop-callout"
                 role="status"
@@ -319,7 +319,7 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
                 <span className="ms-1 rounded-full border-2 border-black bg-black px-2 py-0.5 text-sm font-black text-neo-yellow lg:text-xl">
                   {t('academy.modes.workshop.stars', '★ {count}', { count: callout.total })}
                 </span>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>

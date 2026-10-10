@@ -22,7 +22,7 @@
  * Prices come from `intentView`, which re-derives them the way `combat.ts`
  * actually resolves an attack (volleys multiply, curses bite for the rule).
  */
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Swords, Snowflake, Skull, Flame, Shuffle, Droplet, Hourglass, Heart, Grid2x2, ShieldCheck, type LucideIcon } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { AttackEffect, CombatState } from '@/lib/adventure/play/combat';
@@ -158,7 +158,7 @@ export default function IntentDial({ combat, compact = false }: Props) {
           <circle cx="28" cy="28" r={R + 3} fill="#000" />
           <circle cx="28" cy="28" r={R} fill="none" stroke="#1f2a52" strokeWidth="6" />
           {tele && !reduce ? (
-            <motion.circle
+            <m.circle
               key={tele.startedAt}
               cx="28" cy="28" r={R} fill="none" stroke={color} strokeWidth="6" strokeLinecap="butt"
               strokeDasharray={C}

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ITEM } from '../estate/estateArt';
 
 /**
@@ -53,7 +53,7 @@ export function CoinFountain({ count, spread, reducedMotion }: Props) {
       {Array.from({ length: count }, (_, i) => {
         const a = arc(i, count, spread);
         return (
-          <motion.img
+          <m.img
             key={i}
             src={ITEM.coin}
             alt=""

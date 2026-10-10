@@ -2,7 +2,7 @@
 
 /** Full-screen navy stage shared by the cleared / run-over / run-complete screens. */
 import type { ReactNode } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export function ResultShell({ children, tone = 'navy' }: { children: ReactNode; tone?: 'navy' | 'dusk' }) {
@@ -22,14 +22,14 @@ export function ResultShell({ children, tone = 'navy' }: { children: ReactNode; 
 export function Stamp({ children, className }: { children: ReactNode; className?: string }) {
   const reduce = useReducedMotion();
   return (
-    <motion.h2
+    <m.h2
       initial={reduce ? false : { scale: 2.2, rotate: -12, opacity: 0 }}
       animate={{ scale: 1, rotate: -3, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 380, damping: 16 }}
       className={cn('mx-auto inline-block rounded-2xl border-[4px] border-black px-4 py-1.5 text-center font-neo-display text-[2rem] font-bold uppercase leading-none text-black shadow-[6px_6px_0_#000] sm:text-5xl', className)}
     >
       {children}
-    </motion.h2>
+    </m.h2>
   );
 }
 

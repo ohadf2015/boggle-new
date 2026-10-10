@@ -8,7 +8,7 @@
  *  next    — full colour, lifted, pulsing, tappable (44px+ target)
  */
 import { memo } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { MapNode } from '@/lib/adventure/play/runMap';
@@ -84,7 +84,7 @@ function MapNodeButton({ node, x, y, status, world, step, resumable, tier = 'sm'
           {t('adventurePlay.map.youAreHere')}
         </span>
       )}
-      <motion.button
+      <m.button
         type="button"
         disabled={!tappable}
         onClick={() => tappable && onSelect(node.id)}
@@ -133,7 +133,7 @@ function MapNodeButton({ node, x, y, status, world, step, resumable, tier = 'sm'
             {t('adventurePlay.map.kind.elite')}
           </span>
         )}
-      </motion.button>
+      </m.button>
       {(status === 'next' || status === 'current') && node.kind !== 'elite' && (
         <span className={cn('rounded-md border-2 border-black bg-black/75 px-1.5 py-0.5 font-bold uppercase tracking-wide text-neo-cream', LABEL[tier])}>
           {label}

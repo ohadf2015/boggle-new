@@ -9,7 +9,7 @@
  * a plain `fight` node pays no coins and the XP daily cap can zero the XP, so
  * "nothing moved" is the common case, not an edge.
  */
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Zap, Flame, Medal, Coins, PiggyBank, type LucideIcon } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { ecosystemGains, type Gain, type GainKind } from './ecosystemGains';
@@ -60,7 +60,7 @@ function GainChip({ gain, index, delay }: { gain: Gain; index: number; delay: nu
   // A streak is a STATE (day 6), the rest are deltas (+40). Only deltas get the plus.
   const text = gain.kind === 'streak' ? `${shown}` : `+${shown}`;
   return (
-    <motion.li
+    <m.li
       initial={reduce ? false : { opacity: 0, y: 14, scale: 0.8 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: 'spring', stiffness: 440, damping: 18, delay: delay + index * 0.14 }}
@@ -79,7 +79,7 @@ function GainChip({ gain, index, delay }: { gain: Gain; index: number; delay: nu
         {text}
       </span>
       <span className="text-[10px] font-black uppercase leading-none tracking-wider opacity-70">{t(s.label)}</span>
-    </motion.li>
+    </m.li>
   );
 }
 
@@ -90,7 +90,7 @@ export default function EcosystemStrip({ result, delay = 0, className }: Props) 
   if (!gains.length) return null;
 
   return (
-    <motion.section
+    <m.section
       data-testid="eco-strip"
       initial={reduce ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -104,6 +104,6 @@ export default function EcosystemStrip({ result, delay = 0, className }: Props) 
       <ul className="flex gap-1.5">
         {gains.map((g, i) => <GainChip key={g.kind} gain={g} index={i} delay={delay} />)}
       </ul>
-    </motion.section>
+    </m.section>
   );
 }

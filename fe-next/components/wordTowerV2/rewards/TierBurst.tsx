@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { ChestTier } from '@/lib/wordTowerV2/estate';
 import { tierFx } from '@/lib/wordTowerV2/rewards';
 import { CoinFountain } from './CoinFountain';
@@ -76,7 +76,7 @@ export function TierBurst({ tier, rattling, popped, reducedMotion }: Props) {
       {popped ? <GodRays rays={fx.rays} hex={hex} strength={fx.flood} /> : null}
 
       {/* Light seeping out of the seam, then the flood when it blows. */}
-      <motion.div
+      <m.div
         className="absolute inset-0"
         style={{ background: `radial-gradient(circle at 50% 42%, ${hex} 0%, transparent 60%)` }}
         initial={{ opacity: 0 }}
@@ -92,7 +92,7 @@ export function TierBurst({ tier, rattling, popped, reducedMotion }: Props) {
 
       {/* The shockwave: one hard ring, as wide as the tier is loud. */}
       {popped ? (
-        <motion.div
+        <m.div
           className="absolute left-1/2 top-[42%] rounded-full border-[6px]"
           style={{ borderColor: hex, width: '14vmin', height: '14vmin', marginLeft: '-7vmin', marginTop: '-7vmin' }}
           initial={{ scale: 0.2, opacity: 0.95 }}
@@ -109,7 +109,7 @@ export function TierBurst({ tier, rattling, popped, reducedMotion }: Props) {
         ? Array.from({ length: fx.sparks }, (_, i) => {
             const s = spark(i, fx.sparks, fx.spread);
             return (
-              <motion.img
+              <m.img
                 key={i}
                 src={STAR_ART}
                 alt=""

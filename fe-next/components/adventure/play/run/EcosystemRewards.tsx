@@ -21,7 +21,7 @@
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { ChevronsUp } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -123,7 +123,7 @@ export default function EcosystemRewards({ result, delay = 0, celebrate = false,
       <EcosystemStrip result={result} delay={delay} />
 
       {levelUp && (
-        <motion.div
+        <m.div
           data-testid="eco-rank-ribbon"
           initial={reduce ? false : { opacity: 0, scaleX: 0.7 }}
           animate={{ opacity: 1, scaleX: 1 }}
@@ -135,7 +135,7 @@ export default function EcosystemRewards({ result, delay = 0, celebrate = false,
             {t('adventurePlay.eco.rank', { level: levelUp.newLevel })}
             {title && <span className="opacity-80"> · {t(`landing.home.titles.${title}`)}</span>}
           </span>
-        </motion.div>
+        </m.div>
       )}
 
       {levelUp && showLevelUp && (

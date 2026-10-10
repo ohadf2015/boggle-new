@@ -15,7 +15,7 @@
  */
 
 import { useEffect, useState, type ReactNode } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -73,7 +73,7 @@ function XpCounter({ xp, reduce }: { xp: number; reduce: boolean }) {
   }, [xp, reduce, playXpGainSound]);
 
   return (
-    <motion.span
+    <m.span
       data-testid="academy-xp"
       initial={reduce ? false : { scale: 0.5, rotate: -8 }}
       animate={{ scale: 1, rotate: -2 }}
@@ -85,7 +85,7 @@ function XpCounter({ xp, reduce }: { xp: number; reduce: boolean }) {
       <span aria-hidden dir="ltr" className="text-4xl tabular-nums leading-none sm:text-5xl lg:text-7xl">
         {t('academy.modes.xpEarned', '+{xp} XP', { xp: shown })}
       </span>
-    </motion.span>
+    </m.span>
   );
 }
 
@@ -145,7 +145,7 @@ export function AcademyReward({
           open ? 'flex-none' : 'flex-1',
         )}
       >
-        <motion.h2
+        <m.h2
           initial={reduce ? false : { y: -20, scale: 0.8 }}
           animate={{ y: 0, scale: 1 }}
           transition={{ type: 'spring', stiffness: 380, damping: 16 }}
@@ -153,7 +153,7 @@ export function AcademyReward({
           style={{ textShadow: '3px 3px 0 #000, 0 0 24px rgba(0,0,0,0.6)' }}
         >
           {headline}
-        </motion.h2>
+        </m.h2>
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <GodRays rays={open ? fx.rays : Math.max(4, fx.rays / 2)} hex={fx.hex} strength={open ? 0.8 : 0.35} reducedMotion={reduce} />
         </div>
@@ -173,7 +173,7 @@ export function AcademyReward({
               }}
             >
               {open && !reduce && (
-                <motion.span
+                <m.span
                   aria-hidden
                   className="absolute left-1/2 top-1/2 rounded-full border-[6px]"
                   style={{ borderColor: fx.hex, width: '30%', height: '30%', marginLeft: '-15%', marginTop: '-15%' }}
@@ -182,7 +182,7 @@ export function AcademyReward({
                   transition={{ duration: 0.6, ease: 'easeOut' }}
                 />
               )}
-              <motion.img
+              <m.img
                 src={ACADEMY_ART.chest}
                 alt=""
                 draggable={false}
@@ -196,7 +196,7 @@ export function AcademyReward({
                   {Array.from({ length: fx.sparks }, (_, i) => {
                     const s = spark(i, fx.sparks, fx.spread);
                     return (
-                      <motion.img
+                      <m.img
                         key={i}
                         src={ACADEMY_ART.star}
                         alt=""
@@ -251,7 +251,7 @@ export function AcademyReward({
         {note}
         <ul data-open={open ? 'true' : 'false'} className="grid w-full grid-cols-3 gap-2 lg:gap-4">
           {stats.map((s, i) => (
-            <motion.li
+            <m.li
               key={s.label}
               data-testid="academy-stat"
               initial={reduce ? false : { y: 24, scale: 0.8 }}
@@ -288,7 +288,7 @@ export function AcademyReward({
                 {s.suffix && <span className="ms-0.5 align-baseline text-[0.42em] text-neo-cream">{s.suffix}</span>}
               </span>
               <span className="mt-1 line-clamp-1 font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-cream sm:text-xs lg:text-lg">{s.label}</span>
-            </motion.li>
+            </m.li>
           ))}
         </ul>
         <div className="mt-1 flex w-full gap-2 lg:mt-2 lg:gap-4">{actions}</div>

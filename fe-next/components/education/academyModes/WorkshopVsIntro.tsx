@@ -8,7 +8,7 @@
  */
 
 import { useId, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Coins, Swords } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -115,26 +115,26 @@ export function WorkshopVsIntro({
         </svg>
         </div>
 
-        <motion.div
+        <m.div
           className="absolute start-[5cqw] top-[5cqh]"
           initial={still ? false : { x: -120, rotate: -10 }}
           animate={{ x: 0, rotate: 0 }}
           transition={spring(0.05)}
         >
           <PlayerMedallion player={player} fallbackName={t('academy.modes.workshop.you', 'You')} />
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           className="absolute bottom-[3cqh] end-[3cqw]"
           initial={still ? false : { x: 140 }}
           animate={{ x: 0 }}
           transition={spring(0.2)}
         >
           <WorkshopRival mood="idle" taunt={null} size="arena" />
-        </motion.div>
+        </m.div>
 
         {/* The Baron's taunt, pointing at him across the pink half. */}
-        <motion.p
+        <m.p
           data-testid="workshop-rival-taunt"
           className="absolute bottom-[8cqh] start-[4cqw] max-w-[42cqw] rounded-2xl border-[3px] border-black bg-neo-cream px-[2.4cqmin] py-[1.6cqmin] font-neo-display text-[clamp(0.75rem,4.4cqmin,2.25rem)] font-black leading-tight text-black"
           style={{ boxShadow: '4px 4px 0 #000' }}
@@ -144,10 +144,10 @@ export function WorkshopVsIntro({
         >
           {t(INTRO_TAUNT.key, INTRO_TAUNT.en)}
           <span aria-hidden className="absolute -end-3 bottom-3 h-5 w-5 rotate-45 border-e-[3px] border-t-[3px] border-black bg-neo-cream" />
-        </motion.p>
+        </m.p>
 
         {/* VS badge on the seam */}
-        <motion.div
+        <m.div
           aria-hidden
           className="absolute left-1/2 top-1/2 grid -translate-x-1/2 -translate-y-1/2 place-items-center"
           initial={still ? false : { scale: 1.8, rotate: -30, opacity: 0 }}
@@ -167,11 +167,11 @@ export function WorkshopVsIntro({
           >
             {t('academy.modes.workshop.vs', 'VS')}
           </span>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Stakes + the one hero button. */}
-      <motion.div
+      <m.div
         initial={still ? false : { y: 30 }}
         animate={{ y: 0 }}
         transition={spring(0.15)}
@@ -207,7 +207,7 @@ export function WorkshopVsIntro({
         {startFailed && (
           <p className="mb-2 font-neo-body text-sm text-neo-pink lg:text-[clamp(1rem,1.4vw,1.25rem)]">{t('academy.modes.startFailed', "Couldn't start. Check your connection and try again.")}</p>
         )}
-        <motion.button
+        <m.button
           type="button"
           data-testid={loading ? 'workshop-play-pending' : 'workshop-play'}
           disabled={starting || loading}
@@ -237,8 +237,8 @@ export function WorkshopVsIntro({
           <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-white/60" />
           <Swords className="relative h-[1.1em] w-[1.1em] shrink-0" aria-hidden />
           <span className="relative">{loading ? t('common.loading', 'Loading…') : t('academy.modes.workshop.battle', 'Battle!')}</span>
-        </motion.button>
-      </motion.div>
+        </m.button>
+      </m.div>
     </div>
   );
 }

@@ -9,7 +9,7 @@
  * breaks, intent dial, and the fight's one rule.
  */
 import Image from 'next/image';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Crown, Swords } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { getBossConfig } from '@/lib/adventure/bossConfig';
@@ -103,18 +103,18 @@ function StaticEnemyStage({ world, isBoss, combat, juice, taunt, t, reduce }: St
           <div aria-hidden className={cn('absolute inset-x-2 top-3 bottom-4 rounded-full blur-2xl opacity-70 transition-colors',
             enraged ? 'bg-neo-pink' : tele ? '' : 'bg-[#3b5bdb]')} style={tele ? { background: color } : undefined} />
           <div aria-hidden className="absolute bottom-1 inset-x-5 h-5 rounded-[50%] bg-black/60 blur-[2px]" />
-          <motion.div className="absolute inset-x-0 bottom-2 top-0 origin-bottom" animate={body} transition={bodyT}>
+          <m.div className="absolute inset-x-0 bottom-2 top-0 origin-bottom" animate={body} transition={bodyT}>
             <Image src={enemyArt(world, isBoss, art)} alt={name} fill sizes="160px" priority
               className={cn('object-contain object-bottom drop-shadow-[4px_4px_0_#000]',
                 juice.flash === 'hurt' && 'brightness-200 saturate-0',
                 combat.defeated && 'grayscale')} />
-          </motion.div>
+          </m.div>
 
           {/* Charge orb in the enemy's hand: the telegraph made physical — the same shot that then flies. */}
           <div data-enemy-anchor className="absolute top-[34%] end-0 w-16 h-16 -translate-y-1/2 pointer-events-none">
             <AnimatePresence>
               {tele && !released && (
-                <motion.div key={tele.startedAt} className="absolute inset-0"
+                <m.div key={tele.startedAt} className="absolute inset-0"
                   initial={{ scale: reduce ? 1 : 0.2 + chargeFrom * 0.8, opacity: 1 }}
                   animate={{ scale: 1 }}
                   exit={{ scale: 0.4, opacity: 0, transition: { duration: 0.15 } }}
@@ -122,7 +122,7 @@ function StaticEnemyStage({ world, isBoss, combat, juice, taunt, t, reduce }: St
                   <div className="absolute inset-0 rounded-full animate-pulse" style={{ background: `radial-gradient(circle, #fff 0%, ${color} 45%, transparent 70%)`, boxShadow: `0 0 24px 10px ${color}` }} />
                   {/* eslint-disable-next-line @next/next/no-img-element -- fx sprite */}
                   <img src={missileArt(tele.attack.effect)} alt="" className={cn('absolute inset-1 w-14 h-14 object-contain drop-shadow-[2px_2px_0_#000]', !reduce && 'animate-spin [animation-duration:1.4s]')} />
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </div>
@@ -130,24 +130,24 @@ function StaticEnemyStage({ world, isBoss, combat, juice, taunt, t, reduce }: St
           {/* Enemy-side stamps: Interrupted! / Enraged! / Deflected! */}
           <AnimatePresence>
             {onEnemy && (
-              <motion.div key={status.id} role="status"
+              <m.div key={status.id} role="status"
                 initial={reduce ? { opacity: 0 } : { scale: 1.8, rotate: -16, opacity: 0 }}
                 animate={{ scale: 1, rotate: -8, opacity: 1 }} exit={{ opacity: 0, y: -12 }}
                 transition={{ type: 'spring', stiffness: 520, damping: 18 }}
                 className={cn('absolute inset-x-0 top-[40%] z-10 mx-auto w-fit max-w-full text-center rounded-lg border-[3px] border-black px-2 py-0.5 font-neo-display font-black text-lg leading-tight uppercase shadow-[3px_3px_0_#000]',
                   STATUS_STYLE[status.kind] ?? 'bg-neo-pink text-black')}>
                 {status.kind === 'phase' && combat.phase < 2 ? t('adventurePlay.combat.phaseTwo') : t(`adventurePlay.combat.status.${status.kind}`)}
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
 
           {/* Taunt: a speech bubble off the enemy's head. */}
           <AnimatePresence>
             {taunt && !combat.defeated && (
-              <motion.p key={taunt} initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+              <m.p key={taunt} initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
                 className="absolute top-0 start-0 z-20 max-w-[12rem] rounded-xl rounded-es-none border-[3px] border-black bg-neo-cream px-2 py-1 text-[11px] font-bold leading-snug text-black line-clamp-3 shadow-[3px_3px_0_#000]">
                 {t(taunt, { requirement: t('adventurePlay.longerWords') })}
-              </motion.p>
+              </m.p>
             )}
           </AnimatePresence>
         </div>

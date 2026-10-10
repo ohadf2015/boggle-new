@@ -11,7 +11,7 @@
  * pointer-events:none: nothing here takes layout or blocks the board.
  */
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import type { CombatState } from '@/lib/adventure/play/combat';
 import type { CombatFxEntry } from '../useAdventureRun';
@@ -31,7 +31,7 @@ export default function RivalAttack({ combat, feed }: { combat: CombatState; fee
         <div className="pointer-events-none fixed inset-0 z-57" aria-hidden>
           <AnimatePresence>
             {juice.hurtPulse > 0 && (
-              <motion.div key={`hurt-${juice.hurtPulse}`} className="absolute inset-0"
+              <m.div key={`hurt-${juice.hurtPulse}`} className="absolute inset-0"
                 style={{ boxShadow: 'inset 0 0 70px 14px rgba(255,20,60,0.9)' }}
                 initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: reduce ? 0.2 : 0.7, ease: 'easeOut' }} />
             )}

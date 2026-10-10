@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Crown, Swords } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { getBossConfig } from '@/lib/adventure/bossConfig';
@@ -97,7 +97,7 @@ export default function CombatOverlay({ world, isBoss, combat, hurtPulse, phaseP
       {/* Damage vignette */}
       <AnimatePresence>
         {hurtPulse > 0 && (
-          <motion.div key={`hurt-${hurtPulse}`} className="absolute inset-0"
+          <m.div key={`hurt-${hurtPulse}`} className="absolute inset-0"
             style={{ boxShadow: 'inset 0 0 70px 14px rgba(255,20,60,0.9)' }}
             initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 0.7, ease: 'easeOut' }} />
         )}
@@ -105,7 +105,7 @@ export default function CombatOverlay({ world, isBoss, combat, hurtPulse, phaseP
 
       <AnimatePresence>
         {moment?.kind === 'intro' && (
-          <motion.button type="button" key="intro" onClick={dismiss} aria-label={t('adventurePlay.combat.skip')}
+          <m.button type="button" key="intro" onClick={dismiss} aria-label={t('adventurePlay.combat.skip')}
             className="absolute inset-0 pointer-events-auto grid place-items-center bg-[#0f1b3d]"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.35 } }}>
             {isBoss ? <BossVideo world={world} reduce={reduce} /> : (
@@ -114,38 +114,38 @@ export default function CombatOverlay({ world, isBoss, combat, hurtPulse, phaseP
             )}
             <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(15,27,61,0.1)_0%,rgba(15,27,61,0.92)_70%)]" />
             <div className="relative flex flex-col items-center gap-3 px-6 text-center">
-              <motion.div initial={reduce ? false : { scale: 0.2, rotate: -200 }} animate={{ scale: 1, rotate: 0 }}
+              <m.div initial={reduce ? false : { scale: 0.2, rotate: -200 }} animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 160, damping: 14 }}
                 className="relative w-56 h-56 rounded-full border-[5px] border-black bg-neo-yellow shadow-[6px_6px_0_#000] grid place-items-center overflow-hidden">
                 <div className="absolute inset-3 rounded-full border-[3px] border-dashed border-black/60" />
                 <div className="relative w-40 h-40">
                   <Image src={enemyArt(world, isBoss, 'idle')} alt={name} fill sizes="160px" className="object-contain drop-shadow-[3px_3px_0_#000]" priority />
                 </div>
-              </motion.div>
-              <motion.div initial={reduce ? false : { y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}
+              </m.div>
+              <m.div initial={reduce ? false : { y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.25 }}
                 className={cn('-mt-8 rounded-xl border-[4px] border-black px-4 py-1.5 font-neo-display font-black text-3xl uppercase tracking-wide text-black shadow-[5px_5px_0_#000] -rotate-3',
                   isBoss ? 'bg-neo-pink' : 'bg-neo-cyan')}>
                 <span className="inline-flex items-center gap-2">
                   {isBoss ? <Crown className="w-7 h-7" /> : <Swords className="w-7 h-7" />}
                   {isBoss ? t('adventurePlay.combat.bossBattle') : t('adventurePlay.combat.eliteFight')}
                 </span>
-              </motion.div>
+              </m.div>
               <div className="font-neo-display text-2xl font-bold text-neo-cream drop-shadow-[2px_2px_0_#000]">{name}</div>
-              <motion.p initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+              <m.p initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
                 className="max-w-xs rounded-lg border-[3px] border-black bg-neo-purple px-3 py-2 text-sm font-bold text-neo-cream shadow-[3px_3px_0_#000]">
                 {t(ruleKey(world, isBoss))}
-              </motion.p>
+              </m.p>
               <div className="text-xs font-bold uppercase tracking-widest text-neo-cream/70">{t('adventurePlay.combat.tapToFight')}</div>
             </div>
-          </motion.button>
+          </m.button>
         )}
 
         {moment?.kind === 'phase' && (
-          <motion.div key={`phase-${moment.id}`} className="absolute inset-0 grid place-items-center overflow-hidden px-4"
+          <m.div key={`phase-${moment.id}`} className="absolute inset-0 grid place-items-center overflow-hidden px-4"
             initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <motion.div className="absolute inset-0 bg-white" initial={{ opacity: reduce ? 0.3 : 0.9 }} animate={{ opacity: 0 }} transition={{ duration: 0.45 }} />
-            <motion.div className="absolute inset-0 bg-neo-pink mix-blend-multiply" initial={{ opacity: 0.5 }} animate={{ opacity: 0 }} transition={{ duration: 1.2 }} />
-            <motion.div initial={reduce ? false : { scale: 1.3, rotate: 4, opacity: 0 }} animate={{ scale: 1, rotate: -3, opacity: 1 }}
+            <m.div className="absolute inset-0 bg-white" initial={{ opacity: reduce ? 0.3 : 0.9 }} animate={{ opacity: 0 }} transition={{ duration: 0.45 }} />
+            <m.div className="absolute inset-0 bg-neo-pink mix-blend-multiply" initial={{ opacity: 0.5 }} animate={{ opacity: 0 }} transition={{ duration: 1.2 }} />
+            <m.div initial={reduce ? false : { scale: 1.3, rotate: 4, opacity: 0 }} animate={{ scale: 1, rotate: -3, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 400, damping: 16 }}
               className="relative flex w-full max-w-[22rem] flex-col items-center gap-2 text-center">
               {isBoss && (
@@ -160,8 +160,8 @@ export default function CombatOverlay({ world, isBoss, combat, hurtPulse, phaseP
               <div className="max-w-full rounded-lg border-[3px] border-black bg-neo-cream px-3 py-1 text-center text-sm font-bold text-black shadow-[3px_3px_0_#000] break-words">
                 {t(combat.phase === 2 ? 'adventurePlay.combat.phaseTaunt2' : 'adventurePlay.combat.phaseTaunt1')}
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
 
         {moment?.kind === 'victory' && combat.kill && (

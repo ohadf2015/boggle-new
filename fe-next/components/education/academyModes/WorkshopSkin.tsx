@@ -18,7 +18,7 @@
  */
 
 import { useEffect, type RefObject } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { RIVAL_ART } from '@/lib/education/academyReactions';
 import { buildableCells } from '@/lib/education/workshopBoardHints';
 
@@ -237,7 +237,7 @@ export function GoldSparks({ points, burstId }: { points: { x: number; y: number
         Array.from({ length: 6 }, (_, i) => {
           const a = (i / 6) * Math.PI * 2 + pi;
           return (
-            <motion.span
+            <m.span
               key={`${burstId}-${pi}-${i}`}
               className="absolute h-2.5 w-2.5 rounded-full bg-neo-yellow"
               style={{ left: p.x - 5, top: p.y - 5, boxShadow: '0 0 10px 3px rgba(255,214,0,0.9)' }}

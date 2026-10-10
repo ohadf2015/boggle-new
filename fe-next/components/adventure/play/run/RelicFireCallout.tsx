@@ -22,7 +22,7 @@
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { RelicId } from '@/lib/adventure/play/relics';
 import { relicArt } from './art';
@@ -119,7 +119,7 @@ export default function RelicFireCallout({ fired, fireKey, host, chipAt, onDone 
           panel. This is the attribution — without it the panel is just another
           number floating near the top of the screen. */}
       {trails.map((line, i) => (
-        <motion.span
+        <m.span
           key={`${line.id}-${fireKey}`}
           className="absolute w-[11px] -translate-x-1/2 rounded-full border-[3px] border-black bg-neo-lime shadow-[0_0_10px_3px_rgba(198,244,50,0.55)]"
           style={{ left: line.left, top: line.top, height: line.height, transformOrigin: spot?.flipped ? 'bottom' : 'top' }}
@@ -129,7 +129,7 @@ export default function RelicFireCallout({ fired, fireKey, host, chipAt, onDone 
         />
       ))}
 
-      <motion.div
+      <m.div
         ref={boxRef}
         data-testid="relic-fire-callout"
         className={cn(
@@ -170,7 +170,7 @@ export default function RelicFireCallout({ fired, fireKey, host, chipAt, onDone 
             </span>
           </span>
         )}
-      </motion.div>
+      </m.div>
     </div>
   );
 

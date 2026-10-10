@@ -14,7 +14,7 @@
 
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
 import { cn } from '@/lib/utils';
 import { ChestIcon } from './ChestIcon';
@@ -45,7 +45,7 @@ export function TreasureChestPicker({ onPick, disabled, pickedIndex = null, t }:
         {[0, 1, 2].map((index) => {
           const picked = pickedIndex === index;
           return (
-            <motion.button
+            <m.button
               key={index}
               type="button"
               onClick={() => onPick(index)}
@@ -66,7 +66,7 @@ export function TreasureChestPicker({ onPick, disabled, pickedIndex = null, t }:
               )}
             >
               <ChestIcon size={64} />
-            </motion.button>
+            </m.button>
           );
         })}
       </div>

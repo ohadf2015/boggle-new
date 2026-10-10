@@ -18,7 +18,7 @@
  * server's leaderboard points, so this one is titled and unit-labelled as a RUN
  * score and never borrows the word "pts" from that strip.
  */
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Crown, Footprints, Gem, HeartPulse, PackageOpen, Skull, Sparkles, Swords, Type, HelpCircle, type LucideIcon } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { runLedger, type LedgerInput, type LedgerKey, type LedgerLine } from './ledger';
@@ -74,7 +74,7 @@ function Row({ line, index, delay }: { line: LedgerLine; index: number; delay: n
   const dim = line.points === 0;
 
   return (
-    <motion.li
+    <m.li
       data-testid={`ledger-${line.key}`}
       initial={reduce ? false : { x: -14, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
@@ -98,7 +98,7 @@ function Row({ line, index, delay }: { line: LedgerLine; index: number; delay: n
       <span className={cn('w-8 shrink-0 text-end font-neo-display text-[15px] font-bold leading-none tabular-nums', s.ink)}>
         <bdi>{shown}</bdi>
       </span>
-    </motion.li>
+    </m.li>
   );
 }
 
@@ -129,7 +129,7 @@ export default function RunLedger({ delay = 0, pips, className, ...input }: Prop
           </ul>
         )}
       </div>
-      <motion.div
+      <m.div
         data-testid="ledger-total"
         initial={reduce ? false : { scale: 0.86, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -138,7 +138,7 @@ export default function RunLedger({ delay = 0, pips, className, ...input }: Prop
       >
         <span className="font-neo-display text-sm font-bold uppercase leading-tight">{t('adventurePlay.ledger.total')}</span>
         <span className="font-neo-display text-[1.75rem] font-bold leading-none tabular-nums">{shownTotal}</span>
-      </motion.div>
+      </m.div>
     </section>
   );
 }

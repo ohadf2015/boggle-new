@@ -7,7 +7,7 @@
  * bubble; the mood lives on `data-mood` so it is testable without pixels.
  */
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
 import { RIVAL_ART, type RivalMood, type Taunt } from '@/lib/education/academyReactions';
@@ -57,7 +57,7 @@ export function WorkshopRival({
     >
       <div className="relative flex shrink-0 flex-col items-center">
         <div className={cn('relative', art)}>
-          <motion.img
+          <m.img
             key={mood}
             src={RIVAL_ART[mood]}
             alt=""
@@ -68,7 +68,7 @@ export function WorkshopRival({
             transition={{ duration: 0.5, ease: 'easeOut' }}
           />
           {mood === 'idle' && !reduce && (
-            <motion.span
+            <m.span
               aria-hidden
               className="absolute inset-x-[20%] bottom-0 h-3 rounded-full bg-black/40"
               animate={{ scaleX: [1, 0.85, 1] }}
@@ -91,7 +91,7 @@ export function WorkshopRival({
       </div>
       <AnimatePresence mode="popLayout">
         {taunt && (
-          <motion.p
+          <m.p
             key={taunt.key}
             data-testid="workshop-rival-taunt"
             role="status"
@@ -105,7 +105,7 @@ export function WorkshopRival({
             )}
           >
             {t(taunt.key, taunt.en)}
-          </motion.p>
+          </m.p>
         )}
       </AnimatePresence>
     </div>

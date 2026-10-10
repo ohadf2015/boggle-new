@@ -12,7 +12,7 @@
  * dragging words across the board still works.
  */
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { PROJECTILE_MS, type CombatEvent, type CombatState } from '@/lib/adventure/play/combat';
 import { projectileArt } from './combatView';
@@ -94,7 +94,7 @@ export default function BoardHazards({ world, combat, dispatchCombat, playing }:
         if (!r) return null;
         const frozen = tile.kind === 'freeze';
         return (
-          <motion.button
+          <m.button
             key={`${tile.key}-${tile.until}`}
             type="button"
             disabled={!playing}
@@ -117,19 +117,19 @@ export default function BoardHazards({ world, combat, dispatchCombat, playing }:
             <span className="absolute bottom-0.5 inset-x-0 text-center text-[9px] font-black uppercase text-white drop-shadow-[1px_1px_0_#000]">
               {t('adventurePlay.combat.tap')}
             </span>
-          </motion.button>
+          </m.button>
         );
       })}
 
       {/* Scramble blind: every letter hidden until it passes */}
       <AnimatePresence>
         {blind && (
-          <motion.div key={`blind-${combat.blindUntil}`} className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <m.div key={`blind-${combat.blindUntil}`} className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             {Object.entries(rects).map(([key, r]) => (
               <div key={key} className="absolute rounded-lg border-[3px] border-black bg-[#1a1036] grid place-items-center font-neo-display font-black text-2xl text-neo-yellow"
                 style={{ left: r.x, top: r.y, width: r.w, height: r.h }}>?</div>
             ))}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -152,7 +152,7 @@ export default function BoardHazards({ world, combat, dispatchCombat, playing }:
             {/* Landing marker */}
             <div className="absolute rounded-lg border-[3px] border-dashed border-neo-pink animate-pulse"
               style={{ left: target.x, top: target.y, width: target.w, height: target.h }} />
-            <motion.button
+            <m.button
               type="button"
               aria-label={t('adventurePlay.combat.deflect')}
               onPointerDown={(e) => { e.stopPropagation(); deflect(p.id, cx, cy); }}
@@ -165,7 +165,7 @@ export default function BoardHazards({ world, combat, dispatchCombat, playing }:
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- fx sprite */}
               <img src={shot} alt="" className="w-12 h-12 object-contain rotate-45 drop-shadow-[2px_2px_0_#000]" />
-            </motion.button>
+            </m.button>
           </div>
         );
       })}
@@ -173,7 +173,7 @@ export default function BoardHazards({ world, combat, dispatchCombat, playing }:
       {/* Deflect bursts */}
       <AnimatePresence>
         {bursts.map((b) => (
-          <motion.img key={b.id} src="/images/adventure/fx/slash.webp" alt="" aria-hidden
+          <m.img key={b.id} src="/images/adventure/fx/slash.webp" alt="" aria-hidden
             className="absolute w-20 h-20 -ml-10 -mt-10 object-contain"
             style={{ left: b.x, top: b.y }}
             initial={{ scale: 0.4, opacity: 1, rotate: -20 }} animate={{ scale: 1.4, opacity: 0, rotate: 10 }} transition={{ duration: 0.4 }} />

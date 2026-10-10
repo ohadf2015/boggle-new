@@ -10,7 +10,7 @@
  * the screen names the choice instead of printing an empty panel.
  */
 import { useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { BedDouble, BookOpen, Dumbbell } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -96,7 +96,7 @@ export default function RestScreen({ heal, taken, run, before, world, busy, onCh
           return (
             <AnimatePresence key={c.index}>
               {!gone && (
-                <motion.button
+                <m.button
                   type="button"
                   data-testid={`rest-choice-${c.index}`}
                   data-dead={dead || undefined}
@@ -129,7 +129,7 @@ export default function RestScreen({ heal, taken, run, before, world, busy, onCh
                       <span className="mt-0.5 block text-xs font-bold leading-tight">{t('adventurePlay.node.restFull')}</span>
                     )}
                   </span>
-                </motion.button>
+                </m.button>
               )}
             </AnimatePresence>
           );
@@ -137,7 +137,7 @@ export default function RestScreen({ heal, taken, run, before, world, busy, onCh
 
         <AnimatePresence>
           {resolved && (
-            <motion.div data-testid="rest-outcome"
+            <m.div data-testid="rest-outcome"
               initial={reduce ? false : { y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 24, delay: reduce ? 0 : 0.15 }}
               className="rounded-2xl border-[3px] border-black bg-black/80 p-3 text-center">
@@ -146,7 +146,7 @@ export default function RestScreen({ heal, taken, run, before, world, busy, onCh
                 ? <p className="mt-1 font-neo-display text-lg font-bold">{t(choices[taken as number]?.key ?? '', choices[taken as number]?.params)}</p>
                 : <div className="mt-1.5"><DeltaChips lines={lines} testId="rest-delta" /></div>}
               <p className="sr-only">{lines.map(lineText).join(', ')}</p>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

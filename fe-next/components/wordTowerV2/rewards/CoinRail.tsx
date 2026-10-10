@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, type RefObject } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -55,7 +55,7 @@ export function CoinRail({ t, coins, counterRef, wide, reducedMotion }: Props) {
         wide ? 'end-[23.5rem] top-3 xl:end-[27.5rem]' : 'end-3 top-[6.75rem]'
       }`}
     >
-      <motion.div
+      <m.div
         ref={counterRef}
         key={`coins-${bump}`}
         animate={reducedMotion ? undefined : { scale: [1, 1.18, 1], rotate: [0, -2, 0] }}
@@ -68,7 +68,7 @@ export function CoinRail({ t, coins, counterRef, wide, reducedMotion }: Props) {
         <span className="font-neo-display text-2xl font-black tabular-nums lg:text-4xl" aria-hidden>
           {shown.toLocaleString()}
         </span>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

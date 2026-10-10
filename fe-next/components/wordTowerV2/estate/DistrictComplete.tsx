@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { districtReward } from '@/lib/wordTowerV2/estate';
 import { ITEM, backdropFor } from './estateArt';
 
@@ -27,7 +27,7 @@ export function DistrictComplete({ t, district, doneName, nextName, reducedMotio
   const reward = districtReward(district);
   return (
     <div className="absolute inset-0 z-[80] flex items-center justify-center bg-neo-navy/85 p-4" role="dialog" aria-modal="true">
-      <motion.div
+      <m.div
         className="w-full max-w-md overflow-hidden rounded-neo border-neo-thick border-black bg-neo-cream text-center text-neo-navy shadow-hard-lg"
         initial={reducedMotion ? false : { scale: 0.8, y: 20, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
@@ -37,7 +37,7 @@ export function DistrictComplete({ t, district, doneName, nextName, reducedMotio
           <div className="absolute inset-0 bg-cover bg-bottom" style={{ backgroundImage: `url(${backdropFor(district + 1)})` }} aria-hidden />
           {!reducedMotion
             ? CONFETTI.map((c, i) => (
-                <motion.span
+                <m.span
                   key={i}
                   className={`absolute left-1/2 top-0 h-3 w-2 border-2 border-black ${c.hue}`}
                   initial={{ y: -12, x: c.x, rotate: 0, opacity: 1 }}
@@ -67,7 +67,7 @@ export function DistrictComplete({ t, district, doneName, nextName, reducedMotio
             {t('wordTowerV2.estate.completeCta', { name: nextName })}
           </button>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

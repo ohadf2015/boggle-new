@@ -5,7 +5,7 @@
  * Fixed-position overlay, measured once on mount. Reduced motion: no coins.
  */
 import { useEffect, useLayoutEffect, useState, type RefObject } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { COIN_ART } from './art';
 
 interface Props {
@@ -53,7 +53,7 @@ export default function CoinBurst({ fromRef, toRef, count, onLand, onDone }: Pro
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 z-70">
       {flights.map((f, i) => (
-        <motion.img
+        <m.img
           key={i}
           src={COIN_ART}
           alt=""

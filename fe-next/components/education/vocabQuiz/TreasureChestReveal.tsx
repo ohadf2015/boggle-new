@@ -13,7 +13,7 @@
 
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import type { TreasureChestOutcome, TreasureChestState, TranslateFn } from '@/shared/types/vocabQuiz';
 import { cn } from '@/lib/utils';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
@@ -71,7 +71,7 @@ export function TreasureChestReveal({ state, t, onDismiss }: TreasureChestReveal
       className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy px-4"
     >
       <BoundedConfettiBurst trigger={celebrate && !reduceMotion} size="lg">
-        <motion.div
+        <m.div
           initial={reduceMotion ? false : { scale: 0.5, rotate: -8 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 420, damping: 16 }}
@@ -93,7 +93,7 @@ export function TreasureChestReveal({ state, t, onDismiss }: TreasureChestReveal
           {onDismiss && (
             <p className="font-neo-body text-sm text-neo-white/70">{t('vocabQuiz.treasure.tapToContinue')}</p>
           )}
-        </motion.div>
+        </m.div>
       </BoundedConfettiBurst>
     </div>
   );

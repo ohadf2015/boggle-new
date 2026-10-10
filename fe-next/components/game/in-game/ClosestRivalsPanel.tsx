@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -83,7 +83,7 @@ function ClosestRivalsPanelImpl({
             !row.isMe && adjacentToMe && Math.abs(row.deltaToMe) <= pulseThreshold;
 
           return (
-            <motion.li
+            <m.li
               key={row.id}
               layout={!reduce}
               animate={
@@ -168,7 +168,7 @@ function ClosestRivalsPanelImpl({
                   </span>
                 )}
               </div>
-            </motion.li>
+            </m.li>
           );
         })}
       </ul>

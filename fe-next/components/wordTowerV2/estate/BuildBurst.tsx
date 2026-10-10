@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { ITEM } from './estateArt';
 
 interface Props {
@@ -35,7 +35,7 @@ export function BuildBurst({ show, kind, cost, label, reducedMotion, onDone }: P
         <div className="pointer-events-none absolute inset-0 z-20 flex items-end justify-center">
           {!reducedMotion ? (
             <>
-              <motion.img
+              <m.img
                 src={ITEM.dust}
                 alt=""
                 aria-hidden
@@ -45,7 +45,7 @@ export function BuildBurst({ show, kind, cost, label, reducedMotion, onDone }: P
                 transition={{ duration: 0.7, ease: 'easeOut' }}
               />
               {STARS.map((s, i) => (
-                <motion.img
+                <m.img
                   key={i}
                   src={ITEM.star}
                   alt=""
@@ -57,7 +57,7 @@ export function BuildBurst({ show, kind, cost, label, reducedMotion, onDone }: P
                 />
               ))}
               {Array.from({ length: coins }, (_, i) => (
-                <motion.img
+                <m.img
                   key={`c${i}`}
                   src={ITEM.coin}
                   alt=""
@@ -70,7 +70,7 @@ export function BuildBurst({ show, kind, cost, label, reducedMotion, onDone }: P
               ))}
             </>
           ) : null}
-          <motion.div
+          <m.div
             className={`absolute bottom-[45%] rounded-neo border-neo-thick border-black px-2.5 py-1 font-neo-display text-sm font-black text-neo-navy shadow-hard ${kind === 'build' ? 'bg-neo-lime' : 'bg-neo-cyan'}`}
             initial={{ opacity: 0, scale: 0.6, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: -14 }}
@@ -78,7 +78,7 @@ export function BuildBurst({ show, kind, cost, label, reducedMotion, onDone }: P
             transition={{ duration: 0.35, ease: 'easeOut' }}
           >
             {label}
-          </motion.div>
+          </m.div>
         </div>
       ) : null}
     </AnimatePresence>

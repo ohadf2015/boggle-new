@@ -14,7 +14,7 @@
  * room for another flask before you buy one.
  */
 import { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Heart, Timer, Sparkles, Lightbulb, type LucideIcon } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { PotionId } from '@/lib/adventure/play/relics';
@@ -86,7 +86,7 @@ export default function PotionButton({ id, count, disabled, onDrink }: Props) {
   }
 
   return (
-    <motion.button
+    <m.button
       key={gulp}
       type="button"
       data-potion={id}
@@ -112,6 +112,6 @@ export default function PotionButton({ id, count, disabled, onDrink }: Props) {
         style={{ backgroundColor: look.accent }}>
         {count}
       </span>
-    </motion.button>
+    </m.button>
   );
 }

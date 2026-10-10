@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import type { Milestone } from './useRunRewards';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -39,7 +39,7 @@ export function MilestoneBurst({ t, milestone, onDone, wide, reducedMotion }: Pr
     >
       <AnimatePresence>
         {milestone ? (
-          <motion.div
+          <m.div
             key={milestone.key}
             initial={reducedMotion ? { opacity: 1 } : { scale: 0.4, opacity: 0, rotate: -6 }}
             animate={reducedMotion ? { opacity: 1 } : { scale: 1, opacity: 1, rotate: -2 }}
@@ -57,7 +57,7 @@ export function MilestoneBurst({ t, milestone, onDone, wide, reducedMotion }: Pr
             {reducedMotion
               ? null
               : STARS.map((dx, i) => (
-                  <motion.img
+                  <m.img
                     key={dx}
                     src={STAR_ART}
                     alt=""
@@ -68,7 +68,7 @@ export function MilestoneBurst({ t, milestone, onDone, wide, reducedMotion }: Pr
                     transition={{ duration: 0.9, ease: 'easeOut' }}
                   />
                 ))}
-          </motion.div>
+          </m.div>
         ) : null}
       </AnimatePresence>
     </div>
