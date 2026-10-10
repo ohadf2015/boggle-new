@@ -7,6 +7,7 @@ import type { Metadata } from 'next';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
 import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
+import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 
 function buildFaqJsonLd(locale: string): string {
   const data = contentByLocale[locale] ?? contentByLocale.en;
@@ -246,6 +247,7 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
       <FAQPageClient />
       <GuidesCalloutLink locale={locale} />
       <EducationCalloutLink locale={locale} />
+      <EsScrabbleCrossLink locale={locale} anchorVariant="query" />
       <GamePageSeoContent
         title={content.title}
         description={content.description}
