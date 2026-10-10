@@ -1056,15 +1056,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           data-testid="word-wheel-desktop-grid"
           className="grid w-full h-full max-h-full max-w-[1500px] mx-auto gap-6 p-6 overflow-hidden grid-cols-[minmax(260px,320px)_minmax(0,1fr)_minmax(260px,340px)] grid-rows-[minmax(0,1fr)]"
         >
-          <div className="h-full min-h-0 flex flex-col gap-4">
-            {!hideCompetitive && (
-              <div className="flex-1 min-h-0 overflow-hidden zone-panel-pink rounded-neo">
-                <WordWheelLiveRanks t={t} score={score} rivals={[...rivals].reverse()} />
+          <div className="h-full min-h-0 overflow-hidden rounded-neo zone-panel-pink">
+            {hideCompetitive ? (
+              <div className="p-4">
+                <WordWheelRankLadder t={t} score={score} thresholds={thresholds} rivals={rivals} variant="list" />
               </div>
+            ) : (
+              <WordWheelLiveRanks t={t} score={score} rivals={[...rivals].reverse()} />
             )}
-            <div className="shrink-0 zone-panel-lime rounded-neo p-4">
-              <WordWheelRankLadder t={t} score={score} thresholds={thresholds} rivals={rivals} variant="list" />
-            </div>
           </div>
 
           <div className="flex flex-col items-center h-full min-w-0 min-h-0 gap-3 relative z-10 zone-panel-cyan rounded-neo px-8 py-5">

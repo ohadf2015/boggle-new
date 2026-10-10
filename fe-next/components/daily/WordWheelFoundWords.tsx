@@ -48,7 +48,7 @@ export default function WordWheelFoundWords({
     const longest = words.reduce((best, w) => (w.length > best.length ? w : best), '');
     return (
       <div data-testid="found-words-slot" className="flex flex-col min-h-0 h-full">
-        <div className="flex items-center justify-between px-4 py-3 border-b-3 border-neo-black bg-neo-black/30 shrink-0">
+        <div className="flex items-center justify-between ps-4 pe-16 py-3 border-b-3 border-neo-black bg-neo-black/30 shrink-0">
           <span className="font-black text-neo-white text-sm uppercase tracking-wide">
             {t('wordWheel.strip.label', { count: words.length })}
           </span>

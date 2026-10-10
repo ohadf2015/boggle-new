@@ -36,6 +36,9 @@ test.describe('Daily Word Wheel — phone', () => {
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
     await toggle.click();
     await expect(page.getByRole('button', { name: /hide board/i })).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.getByRole('tab')).toHaveCount(3, { timeout: 15000 });
+    await page.getByTestId('leaderboard-more-tabs').click();
+    await expect(page.getByRole('menuitem')).toHaveCount(3);
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(0);
@@ -58,6 +61,15 @@ test.describe('Daily Word Wheel — phone', () => {
     await expect(page.getByTestId('rank-list')).toBeVisible();
   });
 
+  test('a word that breaks the rules is shown back in red', async ({ page }) => {
+    await startPractice(page);
+    const outer = page.locator('[data-testid="wheel-orbit"] [data-wheel-letter]:not([data-wheel-index="-1"])');
+    for (const i of [0, 1, 2]) await outer.nth(i).click({ force: true });
+    await page.getByTestId('inline-submit-chip').click({ force: true });
+    await expect(page.getByTestId('word-feedback')).toHaveAttribute('data-kind', 'error', { timeout: 10000 });
+    await expect(page.getByTestId('word-builder')).toHaveAttribute('data-state', 'rejected');
+  });
+
   test('ending the run lands on the rank hero with share', async ({ page }) => {
     await startPractice(page);
     await page.getByRole('button', { name: /^end run$/i }).click({ force: true });
@@ -70,12 +82,15 @@ test.describe('Daily Word Wheel — phone', () => {
 test.describe('Daily Word Wheel — desktop', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test('play uses the width: rivals and ranks left, wheel centre, words right', async ({ page }) => {
+  test('play uses the width: rivals left, wheel and ladder centre, words right', async ({ page }) => {
     await startPractice(page);
     await expect(page.getByTestId('word-wheel-desktop-grid')).toBeVisible();
-    await expect(page.getByTestId('rank-list')).toBeVisible();
+    await expect(page.getByText(/live ranks/i)).toBeVisible();
+    await expect(page.getByTestId('rank-ladder')).toHaveCount(1);
     await expect(page.getByTestId('rank-bubble')).toBeVisible();
     await expect(page.getByTestId('found-words-slot')).toBeVisible();
+    await page.getByRole('button', { name: /see all ranks/i }).click();
+    await expect(page.getByTestId('rank-list')).toBeVisible();
   });
 });
 
