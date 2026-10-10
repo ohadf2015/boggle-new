@@ -8,7 +8,6 @@
   --ok: #bfff00;
   --bad: #ff3366;
   --dupe: #ffe135;
-  --bed: #20234a;
   --pad: clamp(5px, 2.4%, 12px);
   --gap: clamp(4px, 1.8%, 10px);
   position: relative;
@@ -30,6 +29,7 @@
 
 .board[data-ghost] {
   --pad: 0.4rem;
+  z-index: 12;
 }
 
 .grid {
@@ -37,19 +37,13 @@
   inset: 0;
   display: grid;
   padding: var(--pad);
-  border-radius: clamp(12px, 4.5%, 22px);
-  background:
-    radial-gradient(120% 80% at 50% 0%, rgb(255 255 255 / 0.08), transparent 62%),
-    var(--bed);
-  border: 3px solid var(--ink);
-  box-shadow: 0 6px 0 var(--ink);
+  border-radius: clamp(10px, 4%, 18px);
   outline: none;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   container-type: size;
-  transition: box-shadow 140ms ease;
 }
 
 .board:not([data-ghost]) .grid,
@@ -57,19 +51,13 @@
   gap: var(--gap);
 }
 
-.board[data-active]:not([data-ghost]) .grid {
-  box-shadow: 0 6px 0 var(--ink), 0 0 0 3px color-mix(in srgb, var(--accent) 70%, transparent);
-}
-
 .grid:focus-visible {
-  box-shadow: 0 6px 0 var(--ink), 0 0 0 3px #00ffff;
+  box-shadow: 0 0 0 3px #00ffff;
 }
 
 .board[data-ghost] .grid {
-  background: transparent;
-  border-width: 0;
-  box-shadow: none;
   border-radius: 0;
+  z-index: 11;
 }
 
 .board[data-shaking] .grid {
@@ -337,6 +325,10 @@
 .board[data-ghost] .trail [data-tail='core'],
 .board[data-ghost] .trail [data-trail-echo] {
   stroke: #bfff00;
+}
+
+.board[data-ghost] .trail {
+  opacity: 0.88;
 }
 
 .trail [data-finger] {

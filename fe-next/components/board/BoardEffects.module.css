@@ -138,32 +138,29 @@
 
 .layer :global([data-fly]) {
   position: absolute;
-  width: var(--fly-size);
-  height: var(--fly-size);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #0b0b1e;
-  border-radius: 22%;
-  background: linear-gradient(180deg, var(--accent-hi, #ff6ec4) 0%, var(--accent, #ff1493) 55%, var(--accent-deep, #b3005e) 100%);
-  box-shadow: 0 4px 0 #0b0b1e;
+  width: var(--fly-size);
+  height: var(--fly-size);
   color: #fff;
-  font-size: calc(var(--fly-size) * 0.52);
+  font-size: calc(var(--fly-size) * 0.62);
   font-weight: 700;
-  -webkit-text-stroke: 0.08em #0b0b1e;
+  line-height: 1;
+  -webkit-text-stroke: 0.1em #0b0b1e;
   paint-order: stroke fill;
+  text-shadow: 0 0.08em 0 var(--accent, #ff1493), 0 0.14em 0 #0b0b1e;
   transform: translate(-50%, -50%);
   will-change: transform;
 }
 
 .layer :global([data-fly][data-verdict='ok']) {
-  background: linear-gradient(180deg, #efffb8 0%, #bfff00 100%);
-  color: #0b0b1e;
-  -webkit-text-stroke: 0;
+  color: #bfff00;
 }
 
 .layer :global([data-fly][data-verdict='bad']) {
-  background: linear-gradient(180deg, #ffc2d1 0%, #ff3366 100%);
+  color: #ffc2d1;
+  text-shadow: 0 0.08em 0 #ff3366, 0 0.14em 0 #0b0b1e;
 }
 
 .layer :global([data-chip]) {

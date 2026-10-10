@@ -2216,46 +2216,6 @@ html.reduce-motion *::after {
   box-shadow: none !important;
 }
 
-/* ==================== Enhanced Touch Interaction Styles ==================== */
-/* Improved touch targets and feedback for onboarding and general gameplay */
-
-/* Larger effective touch area via padding trick - apply to all devices */
-.game-board-frame [role="gridcell"] {
-  /* Use position relative for pseudo-element touch area expansion */
-  position: relative;
-  /* Prevent text selection during swipe */
-  user-select: none;
-  -webkit-user-select: none;
-  /* Ensure touch events are captured */
-  touch-action: none;
-}
-
-/* Expand touch target beyond visible bounds */
-.game-board-frame [role="gridcell"]::before {
-  content: '';
-  position: absolute;
-  /* Expand by 15% beyond cell bounds on all sides */
-  inset: -15%;
-  z-index: -1;
-  /* Invisible but captures touch events */
-  background: transparent;
-}
-
-/* Visual feedback during active touch/swipe on adjacent cells */
-.game-board-frame [role="gridcell"].ring-neo-lime\/70 {
-  /* Adjacent hint cells - pulse subtly to show they're valid targets */
-  animation: adjacentPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes adjacentPulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.85;
-  }
-}
-
 /* RTL support: Ensure swipe gestures work correctly in both directions */
 /* The grid itself uses dir="ltr" but we ensure touch feedback is consistent */
 [dir="rtl"] .game-board-frame {

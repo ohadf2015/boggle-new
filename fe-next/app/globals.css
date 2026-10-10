@@ -933,15 +933,13 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
 @utility game-board-frame {
   /* Game Board Frame (Neo-Brutalist design with hard shadows) */
   position: relative;
-  background: var(--neo-cream);
-  /* Neo-Brutalist: thick black border */
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgb(255 255 255 / 0.08), transparent 62%),
+    #20234a;
   border: 4px solid rgb(var(--neo-black));
-  /* Neo-Brutalist: hard shadow (NO blur) */
   box-shadow: 6px 6px 0px rgb(var(--neo-black));
   border-radius: var(--radius-lg);
-  /* No rotation - keep grid perfectly straight */
-  /* Padding for breathing room around the grid */
-  padding: 12px;
+  padding: 6px;
   /* Simplified sizing using vmin to prevent layout shift on orientation change */
   /* Max height leaves room for timer, stats, and word forming area above grid */
   /* CRITICAL: Use single CSS variable for BOTH width AND height to guarantee square grid */

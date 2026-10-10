@@ -256,7 +256,7 @@ function celebrate(container: HTMLElement, s: FxState, score: number | undefined
     ], { duration: 560 + (i % 3) * 90, easing: 'cubic-bezier(0.1, 0.7, 0.3, 1)', fill: 'forwards' });
   }
 
-  if (score && score > 0) {
+  if (score && score > 0 && container.querySelector('[data-board-preview]')) {
     const chip = spawn(container, layer, 'data-chip', `+${score}`);
     chip.style.left = `${x}px`;
     chip.style.top = `${y}px`;

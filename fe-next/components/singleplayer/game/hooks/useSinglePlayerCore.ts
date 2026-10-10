@@ -1,5 +1,6 @@
 'use client';
 
+import { useSelectionStore } from '@/hooks/useSelectionStore';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { selectRandomRevealWord, getRevealableWordCount } from '@/utils/wordPathFinder';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -137,8 +138,6 @@ export function useSinglePlayerCore({
   // Capacitor WebView (black screen on exit). See useNavigationGuard `leaving`.
   const [quitting, setQuitting] = useState(false);
   const [showHintPrompt, setShowHintPrompt] = useState(false);
-  const [formedWord, setFormedWord] = useState('');
-  const [letterCount, setLetterCount] = useState(0);
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
   const feedbackClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isEarthquakePaused, setIsEarthquakePaused] = useState(false);
@@ -575,7 +574,9 @@ export function useSinglePlayerCore({
     trainingAnalysisTrackPath(cells); trainingTrackPath(cells);
   }, [directionGuidance, firstPlayTutorial, trainingAnalysisTrackPath, trainingTrackPath]);
 
-  const handleWordChange = useCallback((word: string, count: number) => { setFormedWord(word); setLetterCount(count); }, []);
+  const handleWordChange = useCallback((word: string, count: number) => {
+    useSelectionStore.getState().setSelection(word, count);
+  }, []);
   const handleFinishPractice = useCallback(() => setIsGameOver(true), []);
   const handleQuitRequest = useCallback(() => {
     if (settings.mode === 'practice') { setIsGameOver(true); return; }
@@ -639,7 +640,7 @@ export function useSinglePlayerCore({
     isLandscape: false, isDesktop, isTv,
     grid, foundWords, score, isPaused, isGameOver, isValidatingWords,
     timer, combo, comboCoinReward, handleCoinAnimationComplete,
-    formedWord, letterCount, currentFeedback,
+    currentFeedback,
     keyboardInput: keyboardInputState,
     tutorialPath: firstPlayTutorial.tutorialPath, tutorialWord: firstPlayTutorial.tutorialWord,
     revealState, revealableWordCount, handleReveal,
