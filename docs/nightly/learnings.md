@@ -2,184 +2,175 @@
 
 Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All lane prompts inject this file as preamble.
 
-> **Window: 2026-09-27..10-05. 9 scheduled nights. LANES ACTUALLY RAN ON 2 OF THEM (10-01, 10-05).**
-> Lane 7 last ran 09-16, so this rewrite spans 19 nights.
+> **Window: 2026-10-05..10-10. 6 scheduled nights. LANES RAN ON 5 OF 6** (10-07 died on the spend cap).
+> Last rewrite was 10-05 and its window had **7 of 9 nights produce nothing**. That is fixed.
 >
-> **HEADLINE 1 — LAST WEEK'S #1 IS FIXED. THE GATE NO LONGER DROPS LANE CODE.**
-> Last week: *"the isolated gate drops all lane code on 4 of 6 completed nights."* This week **both** nights
-> that produced code **SHIPPED it**. 10-01 → `50e281c39 chore(nightly): autonomous improvement loop 2026-10-01`,
-> **28 authored files across all 8 lanes**, every lane kept something. The new log path that did it:
-> `isolated-gate(no-lint): PASS — authored set is test+build clean`
-> `baseline-poisoned gate: failing file(s) are non-authored (pre-existing/concurrent lint error on clean HEAD)
->  AND the authored set passes test+build with lint skipped — shipping the nightly's authored work, which
->  introduced no new failure`
-> That is the correct discrimination: separate *baseline* lint rot from *authored* breakage instead of
-> refusing the whole set. **CLOSE the "lane code gets dropped" watch. Do not re-report it.**
-> **Keep running `npx tsc --noEmit` anyway** — the gate ships on test+build, and a type error still fails build.
+> | Night | Lane phase | authored | Gate | Outcome |
+> |---|---|---|---|---|
+> | 10-05 | **08:52→11:00** (7h34m preflight hang) | ~17 | — | 6 lanes, lane 3 rc=75 usage-limit |
+> | 10-06 | 01:06→02:02 (**56 min, 8 lanes**) | 23 | PASS @43m | **SHIPPED** |
+> | 10-07 | — | 0 | — | `MONTHLY SPEND CAP (rc=76)` → circuit breaker @ 09:27 |
+> | 10-08 | 01:36→05:10 (**3h34m**, 8 lanes) | 15 | PASS @70m | **SHIPPED** `c547ba1df` |
+> | 10-09 | 01:06→03:36 (2h30m, 8 lanes) | 23 | **FAIL ×7 over 3h07m** | docs-only salvage — **ALL 23 files DROPPED** |
+> | 10-10 | 01:07→ (in flight) | 19+ | — | 6 lanes done at write time |
 >
-> **HEADLINE 2 — THE NEW #1 IS THAT THE LOOP DOES NOT START. 7 of 9 nights produced ZERO output, from TWO
-> silent killers, neither of which is a lane problem.**
+> **HEADLINE 1 — THE 10-02..10-04 PREFLIGHT ABORT IS GONE.** Every night now logs
+> `preflight: working tree dirty — will run on top of WIP and ship it` → `dirty tree — skipping ff-pull
+> (git-ship rebases onto origin at push time)` → `HEAD carries unpushed non-docs commits — enabling isolated
+> ship`. That is last week's **#2** fixed exactly as proposed: route the diverged case into isolated-ship
+> instead of aborting. **Skipping ff-pull also removed the 7h34m `git pull` hang (#3) as a side effect** —
+> 10-06/08/09/10 all started lanes within 7 minutes of 01:00. **CLOSE #2 and #3.**
 >
-> | Night | What happened | Output |
-> |---|---|---|
-> | 09-27..09-30 | lane 1 died in **11s**, `rc=76` spend cap → circuit breaker | **0 files, 0 docs** ×4 (20-line report stubs) |
-> | 10-01 | ran clean, 8 lanes, 01:14→02:33, gate PASS | **28 files, SHIPPED `50e281c39`** |
-> | 10-02..10-04 | `preflight: ABORT — diverged & local-only commits touch non-docs paths` | **0** ×3 |
-> | 10-05 | **7h34m hang in preflight `git pull`**, lanes 08:52→11:00+ | 6 lanes, 2–11 files each |
+> **HEADLINE 2 — THE NEW #1 IS THAT ONE BAD FILE DROPS ALL EIGHT LANES.** 10-09 lost **23 authored files**
+> to a **single two-line type error** in one lane's file:
+> `components/word-craft/gems/GemHuntPageClient.tsx(379,13): error TS2353: ... 'oneMoreCrown' does not exist
+>  in type '{ title; transmuteCta; transmuteAria; crownGoal }'`
+> then, after a repair attempt, the exact mirror:
+> `(374,11): error TS2741: Property 'oneMoreCrown' is missing in type ... but required in type ...`
+> A lane added one copy key to an **inline-inferred** object literal and updated one of the two sites. The
+> gate's repair loop then **ping-ponged between the two halves of the same mismatch for 3h07m across 7
+> attempts** (03:36 → 06:43) before giving up and dropping everything. `scripts/nightly/run.sh` has no
+> per-file bisect: `drop-and-re-gate` only re-runs with **lint skipped**, never with the offending file
+> removed. One lane's typo cost the other seven lanes their entire night.
 >
-> **Killer A — `MONTHLY SPEND CAP hit (rc=76)`, 4 consecutive nights (09-27..09-30).** The log is explicit and
-> correct: `lane 1 — MONTHLY SPEND CAP hit (rc=76) — not a code failure; tripping the circuit breaker now` →
-> `circuit-breaker: every further lane would fail identically; stopping early`. The breaker is right; the
-> problem is it then produced **nothing at all** — not even the mandatory-minimum artifacts, because lanes never
-> got a turn. Four nights read as "quiet" instead of "the budget ran out on the 27th."
->
-> **Killer B — `preflight: ABORT — diverged & local-only commits touch non-docs paths`, 3 consecutive nights
-> (10-02..10-04).** *Verbatim* the incident already catalogued in `.claude/rules/60-recurring-pitfalls.md`
-> Class 4 as **"off-master preflight hard-abort (silent for days)"** — it recurred, again silent for days. The
-> founder's `wip(mp-*)` commits (09-26) sat local and non-docs, so ff-pull failed (`fatal: Not possible to
-> fast-forward, aborting`) and the loop quit at ~01:05.
->
-> **HEADLINE 3 — `preflight: fetching + ff-pulling master...` HUNG FOR 7h34m ON 10-05** (01:16:51 → 08:51:17,
-> then `Created autostash` / `Applied autostash` / `preflight: OK`). The git call has **no timeout wrapper**.
-> Consequence: tonight's lanes ran **09:00–11:00 in broad daylight**, racing the founder's live sessions for
-> `.next/lock` and the git index (see `bg-task-exit-masking-and-concurrent-sessions-2026-06-27`). Lane 3
-> (02-perf) burned 31 min and exited 75; lane 1 was 8× slower than on 10-01.
+> **HEADLINE 3 — the salvage is now RECOVERABLE, and that is genuinely new.**
+> `docs-only salvage: dropped lane code is RECOVERABLE — backup at ~/logs/lexi-nightly/salvaged-code-20261009-010003;
+>  restore with: scripts/nightly/restore-salvaged-code.sh 20261009-010003`. **The 10-09 code still exists.**
+> Restoring it is a 2-minute win for whoever reads this — fix `oneMoreCrown` in both sites, re-gate, ship.
 
 ## FOUNDER DIRECTIVE — highest priority
 - **2026-06-23 (standing):** (1) SPEED without bugs, (2) MODE READINESS to release quality,
   (3) EDUCATION growth into real `/[locale]/education` pages, (4) AUTONOMY (ship reversible, defer only
   irreversible). HARD LINE: never touch coin amounts, ad-reward values, the coin economy, or payment logic.
 - **ADMIN-BETA TARGET LIST.** NOT admin-gated, never pick as STEP-0 targets: `blast`/`blast/v2`, `crossword`
-  (noindex-only), `shiritori` (**DELETED 09-08**), `word-tower` (public; the hide-it PR #1032 was **REVERTED**
-  by #1049), `party`/`word-alchemy`/`word-forge`/`word-vault` (DELETED 07-06).
-  **Surviving admin-gated set: `sealed-bid`, `word-craft` (`?mode=gems`, `?mode=cards`), `brain-drill`,
-  `wheel-rush`.** Check the gate BEFORE offering a polish idea. `wheel-rush` has **no standalone route** — it
-  is a 0.15-weight MP-rotation pick only, so its report URL 404s by design.
-- **The lane scheduler skipping lanes is BY DESIGN.** `run.sh:421`. 8 of 12 lanes per night, every night in this
-  window. `NIGHTLY_SCHEDULER=0` restores all 12. **Not a defect.**
-- **2026-06-27 (blog cadence):** new blog every 2 days — word-game + education/"AI to learn a language" angles,
-  link a live MODE. **Lane 08 launched 1/9** (10-01); cause of the miss is the 7-of-9 no-run, not the lane.
+  (noindex-only), `shiritori` (**DELETED 09-08**), `word-tower` (public), `party`/`word-alchemy`/`word-forge`/
+  `word-vault` (DELETED 07-06). **Surviving admin-gated set: `sealed-bid`, `word-craft` (`?mode=gems`,
+  `?mode=cards`), `brain-drill`, `wheel-rush`.** `wheel-rush` has **no standalone route** (0.15-weight
+  MP-rotation pick only) — its report URL 404s by design. Check the gate BEFORE offering a polish idea.
+- **The lane scheduler skipping lanes is BY DESIGN.** `run.sh:421`. 8 of 12 every night this window.
+  `NIGHTLY_SCHEDULER=0` restores all 12. **Not a defect.**
+- **2026-06-27 (blog cadence):** new blog every 2 days — word-game + education/"AI to learn a language"
+  angles, link a live MODE. Lane 08 got 2 of 6 slots (10-06, 10-08).
 - **Improve admin-beta modes nightly — NO new modes** (2026-06-16). Lane 05 STEP 0 improves ONE existing
   admin-gated mode/night, EXISTING files only, keeps the admin gate.
-- **No hard file-count cap**, but the time-guard enforces **`file-cap=8` per lane** and BLOCKS new edits past the
+- **No hard file-count cap**, but the guard enforces **`file-cap=8` per lane** and blocks new edits past the
   finalize cutoff. Write all locale translations FIRST — **`ru` is a live 6th locale** despite CLAUDE.md's 5.
 
 ## Telegram-button feedback (last 7 days)
-- **ZERO callbacks. `docs/nightly/feedback/*.ndjson` still stops at 2026-07-26 — now 71 days.** Tenth
+- **ZERO callbacks. `docs/nightly/feedback/*.ndjson` still stops at 2026-07-26 — now 76 days.** Eleventh
   consecutive window at 0. `night:good` 0 · `night:meh` 0 · `polish:try` 0 · `idea:build` 0 · `reddit:*` 0 ·
   `mode:*` 0. **The Telegram card CTA is dead as a steering channel. Stop adding buttons.** Any lane prompt
-  that says "wait for a `polish:try` vote" is unreachable — self-select instead.
-- Not the same as `feedback/summary-*.md` — that is the **player** sentiment digest, a live signal (10-05).
+  that waits on a `polish:try` vote is unreachable — self-select instead.
+- Cards still SEND fine (10-06 sent mode-readiness + game-mode-idea + 2 polish-idea cards; 10-08 sent a
+  landing URL card). The outbound leg works; only the inbound callback is dead.
+- Not the same as `feedback/summary-*.md` — that is the **player** sentiment digest, a live signal.
 
 ## What works (validated this week)
-- **The baseline-poisoned-gate discrimination SHIPS lane code.** Separating pre-existing/concurrent lint rot from
-  authored breakage, then shipping on test+build-clean, turned last week's 4-of-6 drop rate into 2-of-2 ships.
-  **Biggest loop improvement in a month.** (validated ×2, headline)
-- **Every lane yields when it gets a turn.** 10-01: 3·11·3·2·3·1·3·2 = 28 files, **zero empty lanes** — a first.
-  Lane 09 (monetization) still kept exactly 1.
-- **The spend-cap circuit breaker is correct engineering.** Names the cause (`not a code failure`), refuses to
-  burn 7 more lanes on an identical failure, exits in 11 s instead of 8 h. Only defect: ships no artifact. (×4)
-- **Per-lane self-revert contains blast radius.** 10-05 lane 3 exit 75 reverted only its own files; lanes 4–6
-  ran clean after. (validated ×3, carried)
-- **Founder WIP is never lost**, and `isolated ship` keeps it local. `pre-lane WIP: N dirty files (snapshot …;
-  protect list …)` fired on every night reaching the lane phase, incl. 09-30's **160 dirty files**; `preflight:
-  HEAD carries unpushed non-docs commits — enabling isolated ship` fired on 4 nights and the founder's
-  `wip(mp-*)` commits were never pushed. (validated ×9)
-- **The Mandatory-Minimum-Artifact floor works *within* a lane** — but cannot save a night that never reaches the
-  lane phase (7 of 9). See "What to avoid #1".
-- **Doctrine:** Pixi `.destroyed`/`.geometry` null-guards in rAF · BOOLEAN not bare Capacitor proxy · try/catch
-  on async generation · `initial={false}` on above-fold Framer entrances · `DirectionalIcon` NAMED import (default
-  = `undefined`, silent no-op) + logical `start-`/`end-` for RTL · local JWT verify on read-only GET · root-cause
-  dead counters at the shared funnel · Supabase Management API raw-SQL fallback.
+- **Dirty-tree isolated-ship replaced the preflight abort — 5/5 nights reached the lane phase.** Removes
+  both last week's #2 and #3 in one change. Biggest loop improvement of the window. (validated ×5)
+- **Recoverable salvage backup + `restore-salvaged-code.sh`.** 10-09's 23 dropped files are on disk, not
+  gone. A dropped night is now a deferred night. (validated ×1, high value)
+- **The spend-cap circuit breaker is still correct engineering** — names the cause (`not a code failure`),
+  refuses 7 identical failures, exits in ~12 s. Only defect unchanged: ships no artifact. (×1 this window)
+- **Per-lane self-revert contains blast radius.** 10-05 lane 3 (rc=75 usage limit) and 10-07 lane 1 (rc=76)
+  each reverted only their own files; later lanes ran clean. (validated ×5, carried)
+- **Founder WIP is never lost.** `pre-lane WIP: N dirty files (snapshot …; protect list …)` fired every
+  night; `isolated ship` left local HEAD advanced and restored the founder base at end-of-run. (×9)
+- **The Mandatory-Minimum-Artifact floor holds inside a lane.** 10-10 lane 6 wrote its
+  `lane-12-telemetry-coverage-2026-10-10.md` artifact before its real work.
+- **A 56-minute 8-lane phase is achievable** (10-06: 01:06→02:02, 23 files). 10-08 took 3h34m for 15. The
+  spread is lane prompt scope, not infra.
+- **Doctrine:** Pixi `.destroyed`/`.geometry` null-guards in rAF · BOOLEAN not bare Capacitor proxy ·
+  try/catch on async generation · `initial={false}` on above-fold Framer entrances · `DirectionalIcon`
+  NAMED import (default = `undefined`, silent no-op) + logical `start-`/`end-` for RTL · local JWT verify on
+  read-only GET · root-cause dead counters at the shared funnel · Supabase Management API raw-SQL fallback.
 
 ## What to avoid (failed this week)
-- **#1 — A NIGHT THAT DIES BEFORE THE LANE PHASE SHIPS NOTHING, NOT EVEN AN ARTIFACT. 7 of 9 nights.**
-  Both killers abort in `preflight`/`lane 1`, so the per-lane artifact floor never engages and the report stays
-  a 20-line stub. **Fix: on any pre-lane abort (`rc=76` spend cap, preflight ABORT), write
-  `docs/nightly/artifacts/run-aborted-<date>.md` with the reason + the exact unblock command, commit it docs-only,
-  and send ONE Telegram alert.** A loop that fails loudly on night 1 costs one night; this one cost seven.
-  (open, **#1**, S-effort, ~7 nights/9 recovered)
-- **#2 — `preflight: ABORT — diverged & local-only commits touch non-docs paths` is a KNOWN, RECURRING,
-  SILENT killer (10-02, 10-03, 10-04).** Already in `.claude/rules/60-recurring-pitfalls.md` Class 4 as
-  *"off-master preflight hard-abort (silent for days)"* — and it did it again, for days. The trigger is normal
-  founder behaviour: unpushed non-docs WIP on master. **It must ALERT, and it should not abort at all** — the
-  `isolated ship` path already exists for exactly this case and ran fine on 09-27..09-30. Route the diverged
-  case into isolated-ship instead of exiting. (open, **#2**, S/M-effort)
-- **#3 — `preflight: fetching + ff-pulling master...` has NO TIMEOUT and hung 7h34m on 10-05.** Pure Class 4.
-  Downstream cost: lanes ran 09:00–11:00 against the founder's live sessions (lock/index contention), and lane
-  3 exited 75. **Wrap it in `timeout 300` and alert on rc 124.** (open, new, S-effort)
-- **#4 — The monthly spend cap was hit on 09-27 and nothing adapted for 4 nights.** No degraded mode, no
-  "docs-only night", no notice. **The breaker should fall back to a zero-token docs night** (regenerate the
-  intel brief + feedback digest, which both work without model calls) rather than exit. (open, new, M-effort)
-- **#5 — Stranded `refs/nightly-pending/` is STILL three refs: 2026-08-03, 2026-08-06, 2026-08-28.** ~63 nights
-  of failed retries for 08-03, warned on all 9. Blocker unchanged: a conflict in the same append-only artifacts
-  every time — `docs/nightly/impact-ledger.ndjson`, `mode-readiness.md`, `perf-baseline.json`. **Give those three
-  a `merge=union` driver in `.gitattributes`.** (open, carried, M-effort — oldest unfixed item here)
-- **#6 — `summary composer failed/timed out — deterministic inline brief` on 4 of 4 no-run nights.** Composing
-  a summary of nothing hides the real headline. Skip it when `authored == 0 && abort_reason != ""` and surface
-  `abort_reason` instead. (open, new, S-effort)
-- **agent-browser cannot dismiss the cookie-consent overlay** — dialog renders outside the snapshot a11y tree.
-  Blocks lane 11 visual QA and lane 02 CLS capture. **#1046 shrank the bar — re-test before assuming it still
-  blocks.** (open, **longest-running**)
-- **`run-intel: collector <x> failed/timed out → stale fallback` on EVERY night** — `supabase` on all 9, plus
-  `impact`/`restore`/`search` on 10-05. The brief still emits 40 ranked signals, so it reads healthy while 4 of
-  9 sources are stale. **Print per-source age in days; >3d = no-signal, not stale-signal.** (open, new)
-- **Impact checks vs a zero denominator read as "neutral" and teach nothing** — assert the DENOMINATOR is
-  plausible first; report `no-exposure`. **Never diagnose a live run from its own half-written report.**
+- **#1 — ONE FILE'S TYPE ERROR DROPS ALL 8 LANES. The gate is all-or-nothing on the authored set.**
+  10-09: 23 files lost to `oneMoreCrown` TS2353/TS2741 in `GemHuntPageClient.tsx`. **Fix: parse the file
+  paths out of the `tsc`/test failure, drop ONLY those authored files, re-gate once.** On 10-09 that ships
+  21–22 of 23 instead of 0. `scripts/nightly/run.sh` ~L1000 already has the `drop-and-re-gate` hook — it
+  just drops *lint*, not *files*. (open, **#1**, M-effort, ~1 night/6 recovered + kills the retry storm)
+- **#2 — ADDING A COPY KEY TO AN INLINE-INFERRED OBJECT LITERAL IS A TWO-SITE EDIT, AND LANES KEEP DOING
+  ONE.** Both 10-09 errors are the same mismatch seen from each end: add the key to the literal → TS2353
+  at the consumer; add it to the consumer → TS2741 at the literal. **Rule for every lane: when you add a
+  copy/props key, `rg` the key's sibling (`crownGoal` here) and edit EVERY site in the same edit, then
+  `cd fe-next && npx tsc --noEmit` before finalizing.** `npx eslint` does NOT type-check. (open, **#2**,
+  prompt-only fix)
+- **#3 — THE GATE REPAIR LOOP HAS NO PROGRESS CHECK AND BURNED 3h07m ON 7 ATTEMPTS.** It flipped between
+  TS2353 and TS2741 — the error *moved* but never shrank. **Abort the loop when attempt N's error set is
+  the same size as N-1's, or after 2 attempts, whichever is first.** 3 hours of compute bought nothing.
+  (open, **#3**, S-effort)
+- **#4 — The spend cap still ships zero artifacts (10-07).** `circuit-breaker: … stopping early` →
+  `summary composer failed/timed out — deterministic inline brief` → nothing on disk. **Write
+  `docs/nightly/artifacts/run-aborted-<date>.md` with the reason + unblock command and commit it docs-only.**
+  Carried from last week unfixed; cost is now 1 night/6 instead of 4/9. (open, carried, S-effort)
+- **#5 — Stranded `refs/nightly-pending/` is STILL the same three refs: 2026-08-03, 2026-08-06, 2026-08-28.**
+  ~68 nights for 08-03, warned on all 6 nights this window. Blocker unchanged: conflicts in the same
+  append-only artifacts — `docs/nightly/impact-ledger.ndjson`, `mode-readiness.md`, `perf-baseline.json`.
+  **Give those three a `merge=union` driver in `.gitattributes`.** (open, carried, M-effort — oldest item)
+- **#6 — `supabase` MCP fails its boot probe on 5 of 6 nights** (`fail:transport(no response — npx
+  boot/connect failed)`, 3 attempts, then `WARN — MCP 'supabase' not connected`). On 10-08 `sentry` failed
+  too. Known cause class: **`npx` cold-boot under load hangs subagents** (see MEMORY 09-07 cluster).
+  **Pin the MCP server to a local install instead of `npx`.** (open, new, S/M-effort)
+- **`run-intel: collector supabase failed/timed out → stale fallback` on 6 of 6 nights**; 10-08 also lost
+  `restore`, `impact`, `flagged-puzzles`, `sentry` — 5 of ~9 sources stale while the brief still printed
+  ranked signals and read healthy. **Print per-source age in days; >3d = no-signal, not stale-signal.**
+- **agent-browser cannot dismiss the cookie-consent overlay** — dialog renders outside the snapshot a11y
+  tree. Blocks lane 11 visual QA and lane 02 CLS capture. #1046 shrank the bar — re-test. (open, longest-running)
 - **`reddit-fetch search` returns garbage**; the RSS *feed* path works. Fall through to WebSearch. (lane 04)
 - **Subagents fabricate non-English word lists** — spot-check 5 real words per locale before shipping any
   he/ja/sv/es/ru content. (lane 10)
-- **A bare `count` in a supabase-js select is a PostgREST AGGREGATE (42803), not a column.** Verify live names in
-  `information_schema.columns`; import socket payload types from `@/shared/types/socket`, never redeclare.
-  **And `npx eslint <changed files>` does NOT type-check** — touched `.ts`/`.tsx` → `cd fe-next && npx tsc
-  --noEmit` before declaring done, time permitting.
+- **A bare `count` in a supabase-js select is a PostgREST AGGREGATE (42803), not a column.** Verify live
+  names in `information_schema.columns`; import socket payload types from `@/shared/types/socket`, never
+  redeclare.
 
 ## Open watches (carry forward)
-- **Pre-lane aborts ship zero artifacts** — 7/9 nights. Status: **#1, new.**
-- **Diverged-master preflight ABORT** — 3 nights, and a repeat of a catalogued Class-4 incident. Status: **#2.**
-- **No timeout on preflight `git pull`** — 7h34m hang 10-05. Status: open, new, S-effort.
-- **Monthly spend cap with no degraded mode** — 4 nights lost. Status: open, new.
-- **Stranded `refs/nightly-pending/2026-08-03, -08-06, -08-28`** — ~63 nights. Union merge driver.
+- **All-or-nothing gate: 1 bad file drops 8 lanes** — 10-09, 23 files. Status: **#1, new.**
+- **Copy keys added to inline-inferred literals break `tsc` at the other site** — Status: **#2, new.**
+- **Gate repair loop has no progress check (3h07m / 7 attempts)** — Status: **#3, new.**
+- **Spend cap ships no artifact** — 10-07. Status: open, carried from 10-05.
+- **Stranded `refs/nightly-pending/2026-08-03, -08-06, -08-28`** — ~68 nights. Union merge driver.
+- **`supabase` MCP npx boot probe fails 5/6 nights** — Status: open, new.
+- **4–5 of 9 intel collectors serve stale data while reporting ready** — Status: open, carried.
 - **agent-browser cookie-consent dismissal** — re-test after #1046.
-- **4 of 9 intel collectors serve stale data while reporting "ready"** — Status: open, new.
-- **Lane code dropped by the gate** — Status: **CLOSED 10-01.** The `baseline-poisoned gate` path discriminates
-  baseline rot from authored breakage and shipped 2/2. Do not reopen.
-- **Gate `rc=134` SIGABRT (6/6 last week)** — **not observed on 10-01 or 10-05**, but only 2 gate runs in the
-  window. Status: downgraded to watch — weak evidence, not a fix.
-- **Gate retry loop costing 3–5 h/night** — 10-01 gate ran 02:33→04:54 (**2h21m**, one PASS, no retry storm).
-  Status: improving; still the longest single phase.
-- **Per-lane 7.9 h stall / rc 75** — guard holds (`idle-kill @ 900–1500s, finalize @ +24m, backstop @ +30m,
-  file-cap=8` on all 14 lane launches); 10-05 lane 3 exit 75 capped at 31 min. Status: **CLOSED** at lane level
-  — the stall moved UP into preflight (see #3).
-- **Lane rc is still a useless health signal** — `kept N authored file(s)` is the only honest one. Emit
-  `files_shipped=` per lane AFTER the gate. Status: open, carried.
+- **Diverged-master preflight ABORT** — **CLOSED 10-06.** Dirty-tree isolated-ship path. Do not reopen.
+- **No timeout on preflight `git pull`** — **CLOSED 10-06.** ff-pull is skipped on a dirty tree.
+- **Lane code dropped by the gate** — **REOPENED 10-09** after being closed on 10-01. Cause is different
+  this time: not baseline lint rot (that discrimination still works and shipped 10-06/10-08) but a real
+  authored type error with no per-file bisect. Tracked as #1.
+- **Gate `rc=134` SIGABRT** — not observed on any of the 4 gate runs this window. Status: watch.
+- **Gate is the longest phase** — 43m (10-06, PASS), 70m (10-08, PASS), 3h07m (10-09, FAIL×7). Status: #3.
+- **Per-lane stall / rc 75-76** — guard holds on all 5 nights (`idle-kill @ 900–1500s, finalize @ +24m,
+  backstop @ +30m, file-cap=8`). Status: CLOSED at lane level.
+- **Lane rc is still a useless health signal** — `kept N authored file(s)` is the only honest one, and it
+  over-reports after a salvage drop (10-09 "kept 23", shipped 0). **Emit `files_shipped=` per lane AFTER
+  the gate.** Status: open, carried.
 - **Unwired-but-typed experiments** — `exp-practice-wheel-cta-v1`, `exp-game-abandon-confirm-v1`,
   `exp-mp-round-feedback-top-v1` + 7 more, 0 non-test call sites. Search `rg "n\('exp-" fe-next`, NOT
-  `useExperiment`. Status: open, lane 03. **Brain Drill has no traffic** (`drill_completed` 0/19d+) —
-  discoverability, not features. **Telemetry classifier false-positives** — probe `growth:<event>` volume
-  before marking DEAD; open 9 weeks. **MP CLS 0.92+** (socket `connecting→lobby` DOM swap) — fix = a
-  `RoomListView` skeleton; human queue.
-- **GSC/human queue** — GSC creds drifted to `lf-finance.co.il`; IndexNow Bing parity; AdSense re-submit after ≥5
-  informational pages clear 400w; Sentry MCP write-403 (blocked a 10-05 triage close-out); Supabase never-expire
-  PAT. Status: human.
-- **Zero-slot lanes** — 06 seo, 10 dict, 12 telemetry got 0 of 9. Status: open, resolves with #1–#3.
+  `useExperiment`. **Brain Drill has no traffic** (`drill_completed` 0) — discoverability, not features.
+  **MP CLS 0.92+** (socket `connecting→lobby` DOM swap) — fix = a `RoomListView` skeleton; human queue.
+- **GSC/human queue** — GSC creds drifted to `lf-finance.co.il`; IndexNow Bing parity; AdSense re-submit
+  after ≥5 informational pages clear 400w; Sentry MCP write-403; Supabase never-expire PAT.
+- **Zero-slot lanes this window** — 07-self-learn got 1 of 6 (tonight), 10-dictionary 0 of 6,
+  12-telemetry-coverage 1 of 6, 04-competitor 2 of 6. Status: scheduler rotation, by design.
 
 ## Specialized Skills (maintained by lane 7)
 
 | Lane | Recommended skills | Evidence |
 |---|---|---|
-| 01 triage | `security`, `supabase-db-manager` | 2/2 nights that ran; kept 3 then 2 — most reliable lane |
-| 02 perf | `superpowers:systematic-debugging`, `agent-browser:agent-browser` | 1/2 (10-05 exit 75 after 31m); kept 3 on 10-01 |
-| 03 engagement | `frontend-design` | 2/2, kept 3 then 2 — consistent |
-| 04 competitor | `humanizer`, `game-designer` | 1/9 launched (scheduler-skipped 6×); kept 3 — stable when it runs |
-| 05 landing | `frontend-design`, `impeccable`, `animate-ai` | 2/2, kept 2 each; design quality non-negotiable |
-| 06 seo | `seo-daily` | 0/9 — scheduler-starved 4 nights running; mandatory when it runs |
-| 07 self-learn | none — prompt-only | 1/9 (10-05); its 09-10 time-guard proposal shipped and holds |
-| 08 adsense | `humanizer`, `higgsfield-generate` | 1/9, kept 2; blog cadence missed — cause is the no-run, not the lane |
-| 09 monetization | `frontend-design` | 1/1 launched, kept exactly **1 file** — 7th straight night at 1; prompt is too narrow |
-| 10 dict | `dictionary-improvement`, `crossword-clue-craft` | 0/9 — scheduler-skipped every night |
-| 11 mode-qa | `senior-qa`, `ccgs-design-review`, `agent-browser:agent-browser` | 2/2, kept **11 files both nights** — highest yield in the loop |
-| 12 telemetry | none — prompt-only | 0/9 — scheduler-skipped; idempotence guard still unbuilt |
+| 01 triage | `security`, `supabase-db-manager` | 5/5 nights, kept 2·2·2·1·5 — most reliable lane |
+| 02 perf | `superpowers:systematic-debugging`, `agent-browser:agent-browser` | 4/5 (10-05 rc=75 usage limit); kept 4·3·1·3 |
+| 03 engagement | `frontend-design` | 5/5, kept 1·3·4·3 — consistent |
+| 04 competitor | `humanizer`, `game-designer` | 2/6 slots; stable when it runs |
+| 05 landing | `frontend-design`, `impeccable`, `animate-ai` | 5/5 — but **authored 10-09's gate-killing `oneMoreCrown`**; design quality non-negotiable, add `tsc --noEmit` to its finalize |
+| 06 seo | `seo-daily` | 3/6 slots; mandatory when it runs |
+| 07 self-learn | none — prompt-only | 2/6 (10-06, 10-10); its time-guard proposal shipped and holds |
+| 08 adsense | `humanizer`, `higgsfield-generate` | 2/6, kept 3 then 2 |
+| 09 monetization | `frontend-design` | kept 1–2 files/night — prompt still too narrow |
+| 10 dict | `dictionary-improvement`, `crossword-clue-craft` | 0/6 — scheduler-skipped every night |
+| 11 mode-qa | `senior-qa`, `ccgs-design-review`, `agent-browser:agent-browser` | 5/5, kept 11·2·2·3·2 — highest single-night yield in the loop |
+| 12 telemetry | none — prompt-only | 1/6 (10-10); idempotence guard still unbuilt |
 
 ## Reddit reply etiquette (lane 4 sub-output)
 - **Never auto-post.** Drafts only. User reviews + posts manually.

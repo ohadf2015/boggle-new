@@ -2492,3 +2492,37 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: shipped (already fixed, pre-existing — same as the entry above)
   - why: this is the identical issue a prior lane-01 run already root-caused and fixed in `1bc3bb3de` — `lib/audio/audioLoader.ts:127` `patchHowlerStaleSoundListeners` guards `_loadListener`/`_endListener`/`_errorListener` against a missing `_node`. Re-verified tonight the guard is still present in `fe-next/lib/audio/audioLoader.ts`. Brief resurfaced it only because the Sentry issue is still open upstream (MCP write-403 blocked the prior resolve attempt too).
   - recommended owner: human — close https://lexiclash.sentry.io/issues/147446341/ manually in Sentry; no code owner needed.
+
+## 2026-10-10
+- [Sentry] GUEST_TRACKER duplicate key race (guest_sessions_session_id_key)
+  - first seen 15h ago, last seen 6h ago, 2 events, 0 users
+  - https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-2C7
+  - status: shipped (fix applied, see fe-next/backend/modules/guestTracker.ts)
+  - why: TOCTOU — concurrent create requests for the same sessionId both miss the SELECT, second INSERT hits the unique constraint and the route 500s. Fixed by re-fetching the winner's row on a 23505 conflict instead of returning null.
+  - recommended owner: review-by-eod
+- [Sentry] FRIEND_MESSAGES "Exception getting threads"/"pending challenges" — The request was denied
+  - first/last seen ~4h ago, 1 event each, 0 users
+  - https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-29V, https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-29T
+  - status: deferred
+  - why: culprit is the multiplayer page for an ES guest/anon visitor — looks like an unauthenticated user hitting a friends-messages fetch that needs a session; root cause needs a repro (auth state at fetch time) before a guard is safe to ship. Low reach (1 event, 0 users) tonight.
+  - recommended owner: self (next triage pass — attach auth-state logging if it recurs)
+- [Sentry] "Error fetching players: {}" on /he/admin/players
+  - first/last seen ~8h ago, 1 event, 1 user
+  - https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-23V
+  - status: deferred
+  - why: admin-only page, empty error object gives no stack signal; low priority vs the other two.
+  - recommended owner: self
+- [PostHog] RLS violation inserting into "votes" (reach=2)
+  - evidence: posthog error_tracking issue 01a10a3c-c45d-7030-b16d-bc6ecdbc7975
+  - status: deferred — could not locate a `votes` table or `.from('votes')` callsite anywhere in fe-next or the repo root (grepped code + migrations); likely a third-party/library-internal table name or stale issue. Needs a direct Supabase/PostHog lookup to find the real caller before any RLS policy change.
+  - recommended owner: self (next pass: `mcp__supabase__execute_sql` to check if a `votes` table even exists in this project)
+- [Restore] Stale dropped-work restores (20260904-020001, 20260912-000001, 20260910-010000, 20260817-010001, 20261009-010003)
+  - status: deferred — Sentry sweep + the one real fix above consumed the lane's time budget; brief says restores come AFTER the sweep, not before.
+  - recommended owner: self (tomorrow's lane 01, or lane 7 if it recurs again)
+
+### [Lane 03 2026-10-10] `/es/multiplayer` rage clicks — flag hygiene + fix, no new experiment
+- Brief's top item: rage clicks on `/es/multiplayer` (score 0.764). This surface already carries 3 live typed experiments targeting it (`exp-mp-quickplay-eager-disable-v1`, `exp-mp-quickplay-wait-v1`, plus the reverted `exp-mp-lobby-connect-feedback-v1` lesson: disabling a CTA mid-wait made rage clicks WORSE 6→22, not better). Adding a 4th experiment on the same low-volume surface (4 clicks/week) risks confounding the two already running — skipped Goal 2 this run rather than force one.
+- Root-caused the `$el_text` null gap flagged 2026-10-04/05: `MpPrimaryCta.tsx` renders ONLY a `Loader2` icon while `loading` (no text node) — PostHog `$rageclick` autocapture reads `el.textContent`, so every rage-click event on this button during the loading state resolves `$el_text: null`. Fixed: kept the label in a `sr-only` span alongside the spinner (no visible/behavior change, button disabled state untouched). Should make the NEXT rage-click sample on this button resolve an element name — re-check with `SELECT properties.$el_text FROM events WHERE event='$rageclick' AND properties.$current_url LIKE '%multiplayer%'` in ~3 days.
+- `exp-mp-quickplay-eager-disable-v1` (live since 2026-07-29, 100% rollout) and `exp-mp-quickplay-wait-v1` (live since 2026-06-16) have been running 10+ and 17+ weeks respectively on a surface doing single-digit-to-low-20s rage clicks/week — unlikely to ever accumulate n≥1000/arm on that metric. Recommend a human pull the PostHog experiment-results UI directly for both rather than waiting on volume; flagging for review per the 14-day-inconclusive rule.
+- Stale/dead flags found, no action taken (neither blocks anything): `exp-mp-room-join-loading-v1` (PostHog id 219697, `active:false`) has ZERO matching `defineExperiment` entry in `lib/experiments.ts` and zero code call sites — orphaned flag from removed code, already inactive. `exp-practice-wheel-cta-v1` (id 209540, `active:false`) is defined in `lib/experiments.ts` but has 0 non-test call sites — still unwired (confirms prior-run note), left as-is since WheelRush isn't in scope tonight.
+- recommended owner: lane-03 next run — pull the two eager-disable/quickplay-wait experiment results directly instead of relying on rage-click volume to decide.
