@@ -9386,9 +9386,38 @@ const he = {
   },
   "wordWheel": {
     "climb": {
-      "top": "אתה בראש!",
       "showBoard": "הלוח של היום",
       "hideBoard": "הסתר לוח"
+    },
+    "rank": {
+      "title": "דרגות",
+      "open": "כל הדרגות",
+      "toNext": "{rank} בעוד {count}",
+      "top": "דרגה עליונה. אגדה!",
+      "reached": "הדרגה של היום",
+      "warmUp": "מתחמם",
+      "spinning": "מסתובב",
+      "onARoll": "בתנופה",
+      "sharp": "חד",
+      "hotStreak": "לוהט",
+      "wordsmith": "אמן מילים",
+      "whirlwind": "סופה",
+      "wizard": "קוסם",
+      "legend": "אגדה"
+    },
+    "praise": {
+      "nice": "יפה!",
+      "great": "אחלה!",
+      "superb": "מעולה!",
+      "brilliant": "מבריק!",
+      "fullWheel": "גלגל שלם!"
+    },
+    "strip": {
+      "empty": "המילים שלך ינחתו כאן",
+      "label": "נמצאו {count}",
+      "all": "כל המילים",
+      "close": "סגירה",
+      "longest": "הכי ארוכה"
     },
     "youFoundEverything": "מצאת כל מילה שגם הם מצאו. מגניב.",
     "title": "גלגל מילים",
@@ -9398,7 +9427,6 @@ const he = {
     "description": "כל מילה חייבת להשתמש באות המרכזית ולהיות באורך של 3 אותיות לפחות",
     "centerLetterRule": "חובה להשתמש באות המרכזית",
     "minLetters": "מינימום {min} אותיות",
-    "wordsFound": "נמצאו {count} מילים",
     "scoreLabel": "ניקוד",
     "timeLeft": "זמן שנותר",
     "closeRace": "מרוץ צמוד!",
@@ -9428,10 +9456,6 @@ const he = {
     "removeLetter": "מחיקת אות",
     "foundWords": "מילים שנמצאו",
     "possibleWords": "אפשרי",
-    "excellent": "מצוין!",
-    "great": "נהדר!",
-    "good": "כל הכבוד!",
-    "tryAgain": "המשיכו להתאמן!",
     "longest": "הארוכה ביותר",
     "viewSubmittedWords": "צפו במילים שהוגשו",
     "viewWordsYouMissed": "צפו במילים שפספסתם",
@@ -9439,7 +9463,6 @@ const he = {
     "youMissedTitle": "מילים שפספסת",
     "noWordsSubmitted": "עדיין לא הוגשו מילים",
     "results": {
-      "title": "תוצאות גלגל מילים",
       "wordsFound": "מילים שנמצאו",
       "score": "ניקוד",
       "time": "זמן",

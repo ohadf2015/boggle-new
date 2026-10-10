@@ -15427,9 +15427,38 @@ const ru = {
   },
   "wordWheel": {
     "climb": {
-      "top": "Ты в лидерах!",
       "showBoard": "Таблица на сегодня",
       "hideBoard": "Скрыть таблицу"
+    },
+    "rank": {
+      "title": "Ранги",
+      "open": "Все ранги",
+      "toNext": "{count} до «{rank}»",
+      "top": "Высший ранг. Легенда!",
+      "reached": "Ранг дня",
+      "warmUp": "Разминка",
+      "spinning": "Раскрутка",
+      "onARoll": "В ударе",
+      "sharp": "Острый ум",
+      "hotStreak": "Жара",
+      "wordsmith": "Словодел",
+      "whirlwind": "Вихрь",
+      "wizard": "Маг",
+      "legend": "Легенда"
+    },
+    "praise": {
+      "nice": "Неплохо!",
+      "great": "Отлично!",
+      "superb": "Супер!",
+      "brilliant": "Блестяще!",
+      "fullWheel": "Всё колесо!"
+    },
+    "strip": {
+      "empty": "Здесь появятся твои слова",
+      "label": "Найдено: {count}",
+      "all": "Все слова",
+      "close": "Закрыть",
+      "longest": "Самое длинное"
     },
     "youFoundEverything": "Ты нашёл всё, что они нашли. Красиво.",
     "title": "Колесо Слов",
@@ -15439,7 +15468,6 @@ const ru = {
     "description": "В каждом слове должна быть центральная буква, минимум 3 буквы",
     "centerLetterRule": "Нужна центральная буква",
     "minLetters": "Мин {min} букв",
-    "wordsFound": "Найдено слов: {count}",
     "scoreLabel": "Очки",
     "timeLeft": "Осталось времени",
     "closeRace": "Гонка почти равна!",
@@ -15469,10 +15497,6 @@ const ru = {
     "removeLetter": "Удалить букву",
     "foundWords": "Найденные слова",
     "possibleWords": "Возможные",
-    "excellent": "Отлично!",
-    "great": "Хорошо!",
-    "good": "Хороший результат!",
-    "tryAgain": "Потренируйся ещё!",
     "longest": "Самое длинное",
     "viewSubmittedWords": "Посмотреть отправленные слова",
     "viewWordsYouMissed": "Посмотреть пропущенные слова",
@@ -15480,7 +15504,6 @@ const ru = {
     "youMissedTitle": "Слова, которые ты пропустил",
     "noWordsSubmitted": "Пока нет отправленных слов",
     "results": {
-      "title": "Результаты Колеса Слов",
       "wordsFound": "Найденные слова",
       "score": "Очки",
       "time": "Время",

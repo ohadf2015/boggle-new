@@ -21,4 +21,19 @@ describe('ReadyLeaderboardPeek', () => {
     expect(screen.getByTestId('board-body')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'wordWheel.climb.hideBoard' }).getAttribute('aria-expanded')).toBe('true');
   });
+
+  it('opens on its own once a wide layout resolves after mount', () => {
+    const { rerender } = render(
+      <ReadyLeaderboardPeek t={t}>
+        <div data-testid="board-body">board</div>
+      </ReadyLeaderboardPeek>,
+    );
+    expect(screen.queryByTestId('board-body')).toBeNull();
+    rerender(
+      <ReadyLeaderboardPeek t={t} defaultOpen>
+        <div data-testid="board-body">board</div>
+      </ReadyLeaderboardPeek>,
+    );
+    expect(screen.getByTestId('board-body')).toBeInTheDocument();
+  });
 });

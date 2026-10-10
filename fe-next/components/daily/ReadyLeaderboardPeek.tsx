@@ -1,13 +1,17 @@
-import React, { useId, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 interface ReadyLeaderboardPeekProps {
   t: (key: string) => string;
   children: React.ReactNode;
+  defaultOpen?: boolean;
 }
 
-export default function ReadyLeaderboardPeek({ t, children }: ReadyLeaderboardPeekProps) {
-  const [open, setOpen] = useState(false);
+export default function ReadyLeaderboardPeek({ t, children, defaultOpen = false }: ReadyLeaderboardPeekProps) {
+  const [open, setOpen] = useState(defaultOpen);
+  useEffect(() => {
+    if (defaultOpen) setOpen(true);
+  }, [defaultOpen]);
   const panelId = useId();
 
   return (

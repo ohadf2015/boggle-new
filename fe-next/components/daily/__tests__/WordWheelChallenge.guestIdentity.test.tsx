@@ -127,7 +127,8 @@ beforeEach(() => {
 describe('WordWheelChallenge — guest identity', () => {
   it('hands the ready-screen leaderboard the DAILY guest fingerprint, not the multiplayer session id', async () => {
     render(<WordWheelChallenge />);
-    fireEvent.click(await screen.findByRole('button', { name: /showBoard|Today's board/ }));
+    const boardToggle = await screen.findByRole('button', { name: /showBoard|hideBoard/ });
+    if (boardToggle.getAttribute('aria-expanded') === 'false') fireEvent.click(boardToggle);
     const lb = await waitFor(() => screen.getByTestId('tabbed-daily-leaderboard'));
     await waitFor(() => expect(lb.getAttribute('data-fp')).toBe('daily-fp'));
     expect(capturedProps.some(p => p.currentGuestFingerprint === 'session-fp')).toBe(false);

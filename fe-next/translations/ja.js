@@ -9457,9 +9457,38 @@ const ja = {
   },
   "wordWheel": {
     "climb": {
-      "top": "トップです!",
       "showBoard": "今日のランキング",
       "hideBoard": "ランキングを閉じる"
+    },
+    "rank": {
+      "title": "ランク",
+      "open": "ランク一覧",
+      "toNext": "{rank}まであと{count}",
+      "top": "最高ランク。伝説!",
+      "reached": "今日のランク",
+      "warmUp": "ウォームアップ",
+      "spinning": "回転中",
+      "onARoll": "絶好調",
+      "sharp": "冴えてる",
+      "hotStreak": "アツい",
+      "wordsmith": "言葉職人",
+      "whirlwind": "旋風",
+      "wizard": "魔術師",
+      "legend": "伝説"
+    },
+    "praise": {
+      "nice": "いいね!",
+      "great": "すごい!",
+      "superb": "見事!",
+      "brilliant": "天才的!",
+      "fullWheel": "全文字クリア!"
+    },
+    "strip": {
+      "empty": "見つけた単語はここに",
+      "label": "{count}語",
+      "all": "すべての単語",
+      "close": "閉じる",
+      "longest": "最長"
     },
     "youFoundEverything": "相手が見つけた言葉をすべて見つけました。お見事。",
     "title": "ワードホイール",
@@ -9469,7 +9498,6 @@ const ja = {
     "description": "単語は3文字以上で、中央の文字を必ず使います",
     "centerLetterRule": "中央の文字は必須",
     "minLetters": "最低{min}文字",
-    "wordsFound": "{count}語見つかりました",
     "scoreLabel": "スコア",
     "timeLeft": "残り時間",
     "closeRace": "接戦中!",
@@ -9499,10 +9527,6 @@ const ja = {
     "removeLetter": "1文字削除",
     "foundWords": "見つかった単語",
     "possibleWords": "出せる単語",
-    "excellent": "素晴らしい！",
-    "great": "よくできました！",
-    "good": "よく頑張りました！",
-    "tryAgain": "練習あるのみ！",
     "longest": "最長",
     "viewSubmittedWords": "提出した単語を見る",
     "viewWordsYouMissed": "見逃した単語を見る",
@@ -9510,7 +9534,6 @@ const ja = {
     "youMissedTitle": "見逃した単語",
     "noWordsSubmitted": "まだ単語が提出されていません",
     "results": {
-      "title": "ワードホイール結果",
       "wordsFound": "見つかった単語",
       "score": "スコア",
       "time": "時間",
