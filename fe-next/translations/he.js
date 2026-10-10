@@ -14331,7 +14331,15 @@ const he = {
       "starterColors": "צבעים וצורות",
       "starterColorsDesc": "צבעים וצורות בסיסיות לתלמידים צעירים",
       "starterFood": "אוכל",
-      "starterFoodDesc": "מילות אוכל יומיומיות לשיעורי בית ראשונים"
+      "starterFoodDesc": "מילות אוכל יומיומיות לשיעורי בית ראשונים",
+      "wordCountGoal": "יעד מספר מילים",
+      "wordCountGoalHint": "התלמידים מוצאים כמה מילים ייחודיות עד תאריך היעד.",
+      "wordCountLabel": "כמה מילים?",
+      "wordListGoal": "רשימת מילים",
+      "wordListGoalHint": "הדביקו מילים, שורה לכל מילה או מופרדות בפסיק.",
+      "wordListPlaceholder": "חתול, כלב, דג",
+      "wordGoalMissing": "הוסיפו יעד מילים או רשימה ותאריך יעד",
+      "findNWords": "מצאו {{count}} מילים"
     },
     "completion": {
       "overallProgress": "התקדמות כללית",

@@ -13663,7 +13663,15 @@ const ru = {
       "starterColors": "Цвета и формы",
       "starterColorsDesc": "Цвета и простые формы для начинающих",
       "starterFood": "Еда",
-      "starterFoodDesc": "Повседневные слова про еду для первого задания"
+      "starterFoodDesc": "Повседневные слова про еду для первого задания",
+      "wordCountGoal": "Цель по словам",
+      "wordCountGoalHint": "Ученики находят столько уникальных слов к сроку.",
+      "wordCountLabel": "Сколько слов?",
+      "wordListGoal": "Список слов",
+      "wordListGoalHint": "Вставьте слова, по одному в строке или через запятую.",
+      "wordListPlaceholder": "кот, пёс, рыба",
+      "wordGoalMissing": "Добавьте цель или список и срок",
+      "findNWords": "Найди {{count}} слов"
     },
     "completion": {
       "overallProgress": "Общий прогресс",

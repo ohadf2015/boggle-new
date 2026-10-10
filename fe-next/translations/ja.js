@@ -14476,7 +14476,15 @@ const ja = {
       "starterColors": "色と形",
       "starterColorsDesc": "初級向けの色と基本の形",
       "starterFood": "食べ物",
-      "starterFoodDesc": "最初の宿題向けの日常の食べ物"
+      "starterFoodDesc": "最初の宿題向けの日常の食べ物",
+      "wordCountGoal": "単語数ゴール",
+      "wordCountGoalHint": "期限までにこの数の異なる単語を見つけます。",
+      "wordCountLabel": "何語？",
+      "wordListGoal": "単語リスト",
+      "wordListGoalHint": "単語を1行ずつ、またはカンマ区切りで貼り付けます。",
+      "wordListPlaceholder": "ねこ, いぬ, さかな",
+      "wordGoalMissing": "単語ゴールかリストと期限を入れてください",
+      "findNWords": "{{count}}語見つけよう"
     },
     "completion": {
       "overallProgress": "全体的な進捗",

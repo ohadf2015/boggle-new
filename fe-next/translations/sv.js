@@ -14718,7 +14718,15 @@ const sv = {
       "starterColors": "Färger och former",
       "starterColorsDesc": "Färger och grundformer för nybörjare",
       "starterFood": "Mat",
-      "starterFoodDesc": "Vardagliga matord för första läxan"
+      "starterFoodDesc": "Vardagliga matord för första läxan",
+      "wordCountGoal": "Ordantal",
+      "wordCountGoalHint": "Eleverna hittar så här många unika ord till förfallodagen.",
+      "wordCountLabel": "Hur många ord?",
+      "wordListGoal": "Ordlista",
+      "wordListGoalHint": "Klistra in ord, ett per rad eller kommaseparerade.",
+      "wordListPlaceholder": "katt, hund, fisk",
+      "wordGoalMissing": "Lägg till ett ordmål eller en lista och ett datum",
+      "findNWords": "Hitta {{count}} ord"
     },
     "completion": {
       "overallProgress": "Övergripande framsteg",
