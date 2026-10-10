@@ -17,6 +17,7 @@ interface WordWheelResultsHeroProps {
   showStreak: boolean;
   formatWord: (word: string) => string;
   onShareClick?: (method: 'native' | 'copy') => void;
+  highlights?: React.ReactNode;
 }
 
 function prefersReducedMotion(): boolean {
@@ -26,7 +27,7 @@ function prefersReducedMotion(): boolean {
 const FILL = { delay: 0.25, duration: 1.2, ease: [0.16, 1, 0.3, 1] } as const;
 
 export default function WordWheelResultsHero({
-  t, score, wordsFound, puzzleNumber, streakDays, showStreak, formatWord, onShareClick,
+  t, score, wordsFound, puzzleNumber, streakDays, showStreak, formatWord, onShareClick, highlights,
 }: WordWheelResultsHeroProps) {
   const [reduced] = useState(prefersReducedMotion);
   const thresholds = rankThresholds();
@@ -149,6 +150,12 @@ export default function WordWheelResultsHero({
           </div>
         )}
       </div>
+
+      {highlights && (
+        <div data-testid="results-highlights" className="flex flex-wrap items-center justify-center gap-2 px-3 py-3 border-t-3 border-neo-black">
+          {highlights}
+        </div>
+      )}
 
       {wordsFound.length > 0 && (
         <div data-testid="word-wheel-share" className="grid grid-cols-[1fr_auto] gap-2 p-3 border-t-3 border-neo-black bg-neo-black/20">

@@ -9700,7 +9700,8 @@ const sv = {
   "wordWheel": {
     "climb": {
       "showBoard": "Dagens ranking",
-      "hideBoard": "Dölj ranking"
+      "hideBoard": "Dölj ranking",
+      "moreBoards": "Fler"
     },
     "rank": {
       "title": "Nivåer",

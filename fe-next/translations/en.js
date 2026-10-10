@@ -8852,7 +8852,8 @@ const en = {
   "wordWheel": {
     "climb": {
       "showBoard": "Today's board",
-      "hideBoard": "Hide board"
+      "hideBoard": "Hide board",
+      "moreBoards": "More"
     },
     "rank": {
       "title": "Ranks",

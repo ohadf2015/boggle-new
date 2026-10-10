@@ -849,6 +849,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         acceptedPoints={lastWordScore}
         acceptedId={scoreFlyId}
         reducedMotion={prefersReducedMotion}
+        hint={wordsFound.length === 0}
         className="shrink-0"
       />
       {/* ── The Wheel ── */}

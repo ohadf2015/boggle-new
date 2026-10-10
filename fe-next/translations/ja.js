@@ -9458,7 +9458,8 @@ const ja = {
   "wordWheel": {
     "climb": {
       "showBoard": "今日のランキング",
-      "hideBoard": "ランキングを閉じる"
+      "hideBoard": "ランキングを閉じる",
+      "moreBoards": "その他"
     },
     "rank": {
       "title": "ランク",

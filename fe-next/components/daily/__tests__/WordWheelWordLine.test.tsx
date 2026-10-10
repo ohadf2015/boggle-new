@@ -22,10 +22,32 @@ const base = {
 };
 
 describe('WordWheelWordLine', () => {
-  it('shows the placeholder with a caret when nothing is built', () => {
-    render(<WordWheelWordLine {...base} letters={[]} />);
+  it('shows the how-to hint with a caret before the first word', () => {
+    render(<WordWheelWordLine {...base} hint letters={[]} />);
     expect(screen.getByText('wordWheel.tapLetters')).toBeInTheDocument();
     expect(screen.getByTestId('word-caret')).toBeInTheDocument();
+  });
+
+  it('drops the hint once the player is under way, leaving only the caret', () => {
+    render(<WordWheelWordLine {...base} letters={[]} />);
+    expect(screen.queryByText('wordWheel.tapLetters')).toBeNull();
+    expect(screen.getByTestId('word-caret')).toBeInTheDocument();
+  });
+
+  it('marks the word as checking the moment it is submitted', () => {
+    const letters = ['C', 'A', 'T'].map((letter, i) => ({ letter, wheelIndex: i - 1 }));
+    render(<WordWheelWordLine {...base} isValidating letters={letters} />);
+    expect(screen.getByTestId('word-builder').getAttribute('data-state')).toBe('checking');
+    expect(screen.getByTestId('submit-pending')).toBeInTheDocument();
+  });
+
+  it('keeps a rejected word on screen in red after the line clears', () => {
+    const letters = ['N', 'W', 'G'].map((letter, i) => ({ letter, wheelIndex: i - 1 }));
+    const { rerender } = render(<WordWheelWordLine {...base} letters={letters} />);
+    rerender(
+      <WordWheelWordLine {...base} letters={[]} feedback={{ message: 'Not a valid word', type: 'error' }} shake />,
+    );
+    expect(screen.getByTestId('rejected-word').textContent).toBe('NWG');
   });
 
   it('hides the placeholder text while an accepted word flies off', () => {

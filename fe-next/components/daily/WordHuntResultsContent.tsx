@@ -289,6 +289,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       {(result.wordsDiscovered?.length ?? 0) > 0 && hintVariant !== 'hide-hint' && <p className="text-xs text-neo-white text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
       <div onClick={() => trackGrowthEvent('wordhunt_leaderboard_tap', { language, solved: result.solved })}>
         <TabbedDailyLeaderboard
+          compactTabs
           key={leaderboardKey}
           puzzleDate={puzzleDate}
           language={language}

@@ -15428,7 +15428,8 @@ const ru = {
   "wordWheel": {
     "climb": {
       "showBoard": "Таблица на сегодня",
-      "hideBoard": "Скрыть таблицу"
+      "hideBoard": "Скрыть таблицу",
+      "moreBoards": "Ещё"
     },
     "rank": {
       "title": "Ранги",

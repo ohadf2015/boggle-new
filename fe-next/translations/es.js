@@ -9419,7 +9419,8 @@ const es = {
   "wordWheel": {
     "climb": {
       "showBoard": "Tabla de hoy",
-      "hideBoard": "Ocultar tabla"
+      "hideBoard": "Ocultar tabla",
+      "moreBoards": "Más"
     },
     "rank": {
       "title": "Rangos",

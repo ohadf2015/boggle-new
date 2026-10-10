@@ -9387,7 +9387,8 @@ const he = {
   "wordWheel": {
     "climb": {
       "showBoard": "הלוח של היום",
-      "hideBoard": "הסתר לוח"
+      "hideBoard": "הסתר לוח",
+      "moreBoards": "עוד"
     },
     "rank": {
       "title": "דרגות",

@@ -165,6 +165,45 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           streakDays={streakDays}
           showStreak={!isPractice}
           formatWord={(w) => (gameLang === 'he' ? applyHebrewFinalLetters(w) : w)}
+          highlights={isExceptional || rareFind ? (
+            <>
+              {isExceptional && (
+                <m.span
+                  data-testid="word-wheel-perfect-banner"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-xs uppercase tracking-wider shadow-[2px_2px_0_#000]"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 1.0, type: 'spring', stiffness: 380, damping: 16 }}
+                >
+                  <Sparkles className="w-3.5 h-3.5" strokeWidth={2.5} aria-hidden />
+                  {t('wordWheel.results.perfectBanner', 'Word Wizard!')}
+                </m.span>
+              )}
+              {rareFind && (
+                <m.span
+                  data-testid="word-wheel-rare-find"
+                  data-exclusive={rareFind.isExclusive ? 'true' : 'false'}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-neo-black text-xs font-black shadow-[2px_2px_0_#000]',
+                    rareFind.isExclusive ? 'bg-neo-yellow text-neo-black' : 'bg-neo-purple text-neo-white',
+                  )}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 1.1, type: 'spring', stiffness: 360, damping: 16 }}
+                >
+                  <Gem className="w-3.5 h-3.5 shrink-0" strokeWidth={2.5} aria-hidden />
+                  <span className="uppercase tracking-wide">
+                    {rareFind.isExclusive
+                      ? t('wordWheel.results.onlyYouFound', 'Only you found this — so far!')
+                      : t('wordWheel.results.rareFind', { count: rareFind.playerCount })}
+                  </span>
+                  <span dir="auto" className="font-neo-display tracking-widest">
+                    {gameLang === 'he' ? applyHebrewFinalLetters(rareFind.word) : rareFind.word}
+                  </span>
+                </m.span>
+              )}
+            </>
+          ) : undefined}
           onShareClick={(method) => trackGrowthEvent('cross_promo_click', {
             target: 'share',
             source: 'word_wheel_results',
@@ -173,51 +212,6 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             language,
           })}
         />
-
-        {isExceptional && (
-          <m.div
-            data-testid="word-wheel-perfect-banner"
-            className="z-10 flex items-center gap-2 px-4 py-1.5 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black shadow-[3px_3px_0px_black,0_0_24px_rgba(191,255,0,0.55)]"
-            initial={{ scale: 0, y: -6 }}
-            animate={{ scale: 1, y: 0 }}
-            transition={{ delay: 1.0, duration: 0.55, type: 'spring', stiffness: 380, damping: 16 }}
-          >
-            <Sparkles className="w-4 h-4" strokeWidth={2.5} aria-hidden />
-            <span className="font-neo-display font-black text-sm tracking-wider uppercase">
-              {t('wordWheel.results.perfectBanner', 'Word Wizard!')}
-            </span>
-            <Sparkles className="w-4 h-4" strokeWidth={2.5} aria-hidden />
-          </m.div>
-        )}
-
-        {/* Rarest-find celebration — "only you found X (so far)" or a rare-but-
-            shared find. Honesty gates live in selectRareFindCelebration. */}
-        {rareFind && (
-          <m.div
-            data-testid="word-wheel-rare-find"
-            data-exclusive={rareFind.isExclusive ? 'true' : 'false'}
-            className={cn(
-              'z-10 flex flex-col items-center gap-0.5 px-4 py-2.5 rounded-neo border-3 border-neo-black shadow-hard-lg',
-              rareFind.isExclusive
-                ? 'bg-neo-yellow text-neo-black shadow-[3px_3px_0px_black,0_0_24px_rgba(255,225,53,0.5)]'
-                : 'bg-neo-purple text-neo-white',
-            )}
-            initial={{ scale: 0, y: -6 }}
-            animate={{ scale: 1, y: 0 }}
-            transition={{ delay: 1.1, duration: 0.5, type: 'spring', stiffness: 360, damping: 16 }}
-          >
-            <span className="flex items-center gap-1.5 font-neo-display font-black text-xs sm:text-sm tracking-wide uppercase">
-              <Gem className="w-4 h-4" strokeWidth={2.5} aria-hidden />
-              {rareFind.isExclusive
-                ? t('wordWheel.results.onlyYouFound', 'Only you found this — so far!')
-                : t('wordWheel.results.rareFind', { count: rareFind.playerCount })}
-              <Gem className="w-4 h-4" strokeWidth={2.5} aria-hidden />
-            </span>
-            <span dir="auto" className="font-neo-body font-black text-lg tracking-widest">
-              {gameLang === 'he' ? applyHebrewFinalLetters(rareFind.word) : rareFind.word}
-            </span>
-          </m.div>
-        )}
 
         {/* Guest signup conversion — Word Wheel bypasses the generic guest-stats
             signup gate, so this restores a value-led signup surface for the mode.
@@ -289,13 +283,6 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
       </div>
 
       <div className="w-full flex flex-col items-center gap-3">
-        {/* Hint: tap a player row to see diff */}
-        {!isPractice && result.wordsFound.length > 0 && (
-          <p className="text-xs text-neo-white text-center font-medium -mb-1">
-            {t('wordWheel.results.tapPlayerHint', 'Tap a player to see what you missed')}
-          </p>
-        )}
-
         {/* Leaderboard — hidden in practice (no score persisted, would only confuse). */}
         {!isPractice && (
           <m.div
@@ -316,6 +303,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
               />
             )}
             <TabbedDailyLeaderboard
+              compactTabs
               key={`${leaderboardKey}-${renameCount}`}
               puzzleDate={puzzleDate}
               language={gameLang}
@@ -330,6 +318,11 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
               onCurrentUserRankChange={setCurrentRank}
               onParticipantCountChange={setTotalPlayers}
             />
+            {result.wordsFound.length > 0 && (
+              <p className="mt-2 text-xs text-neo-white/70 text-center font-medium">
+                {t('wordWheel.results.tapPlayerHint', 'Tap a player to see what you missed')}
+              </p>
+            )}
           </m.div>
         )}
 

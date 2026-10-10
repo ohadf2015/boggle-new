@@ -336,10 +336,19 @@ const WordWheelChallenge: React.FC = () => {
     [language]
   );
 
-  // Core start — shared by direct play and post-ad-reward callback.
+  // Fullscreen game paths skip the global prewarm, and without it every word waits on a server round-trip.
+  useEffect(() => {
+    if (phase !== 'ready') return;
+    const warm = () => void prewarmDictionary(language as Language);
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(warm, { timeout: 1500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(warm, 300);
+    return () => window.clearTimeout(id);
+  }, [phase, language]);
+
   const startPlaying = useCallback(() => {
-    // Fullscreen game paths skip the global prewarm (PSI window); PLAY is past it,
-    // and without the dictionary every word waits on a server round-trip.
     void prewarmDictionary(language as Language);
     setGameActive(true);
     setPhase('playing');
@@ -603,6 +612,7 @@ const WordWheelChallenge: React.FC = () => {
             >
               <ReadyLeaderboardPeek t={t} defaultOpen={isDesktop || isTv}>
                 <TabbedDailyLeaderboard
+                  compactTabs
                   puzzleDate={catchupDate || getDailyChallengeDate()}
                   language={language as Language}
                   currentPlayerId={isAuthenticated && profile ? profile.id : null}

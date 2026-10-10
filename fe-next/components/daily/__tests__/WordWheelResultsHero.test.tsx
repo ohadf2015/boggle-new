@@ -18,6 +18,18 @@ const base = {
 };
 
 describe('WordWheelResultsHero', () => {
+  it('carries the run highlights inside the card instead of stacking them below', () => {
+    render(<WordWheelResultsHero {...base} highlights={<span data-testid="hl">Only you</span>} />);
+    const hero = screen.getByTestId('word-wheel-results-hero');
+    expect(hero.contains(screen.getByTestId('hl'))).toBe(true);
+    expect(screen.getByTestId('results-highlights')).toBeInTheDocument();
+  });
+
+  it('renders no highlight row when there is nothing to call out', () => {
+    render(<WordWheelResultsHero {...base} />);
+    expect(screen.queryByTestId('results-highlights')).toBeNull();
+  });
+
   it('leads with the rank the score reached on the same ladder as the play screen', () => {
     render(<WordWheelResultsHero {...base} />);
     expect(screen.getByTestId('results-rank-name').textContent).toBe('wordWheel.rank.onARoll');

@@ -18,6 +18,7 @@ import type { ChaseParticipant } from './chaseTarget';
 import { DailySeasonRibbon } from './DailySeasonRibbon';
 import { participantKey, computeRankMovements, collectCountries, type RankMovement } from './leaderboardLive';
 import ConnectionsDailyTab from './ConnectionsDailyTab';
+import LeaderboardTabSwitch from './LeaderboardTabSwitch';
 
 /**
  * The leaderboard routes answer with `Cache-Control: public, max-age=20`. That is
@@ -132,6 +133,8 @@ interface TabbedDailyLeaderboardProps {
   onParticipantCountChange?: (count: number) => void;
   onCurrentUserRankChange?: (rank: number | null) => void;
   compact?: boolean;
+  /** Today + Friends up front, the other boards behind one More tap; drops the countries strip. */
+  compactTabs?: boolean;
   maxVisible?: number;
   t: T;
   defaultTab?: LeaderboardTab;
@@ -237,6 +240,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   onParticipantCountChange,
   onCurrentUserRankChange,
   compact = false,
+  compactTabs = false,
   maxVisible = 10,
   t,
   defaultTab = 'today',
@@ -1156,7 +1160,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       </div>
 
       {/* Countries on today's board */}
-      {activeTab === 'today' && !isLoading && !error && countries.length > 0 && (
+      {!compactTabs && activeTab === 'today' && !isLoading && !error && countries.length > 0 && (
         <div
           className="flex items-center gap-1.5 mb-3 px-2.5 py-1.5 rounded-neo border border-neo-white/15 bg-neo-navy/60 text-xs sm:text-sm"
           data-testid="countries-strip"
@@ -1192,7 +1196,9 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
       {/* Tabs - always visible, outside loading area */}
       <div className="mb-4">
-        <LeaderboardTabs activeTab={activeTab} onTabChange={setActiveTab} t={t} />
+        {compactTabs
+          ? <LeaderboardTabSwitch activeTab={activeTab} onTabChange={setActiveTab} t={t} />
+          : <LeaderboardTabs activeTab={activeTab} onTabChange={setActiveTab} t={t} />}
       </div>
 
       {/* Season identity + picker */}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -25,6 +25,8 @@ interface WordWheelWordLineProps {
   acceptedPoints?: number | null;
   acceptedId: number;
   reducedMotion?: boolean;
+  /** How-to line beside the caret; only before the player's first word. */
+  hint?: boolean;
   className?: string;
 }
 
@@ -32,18 +34,23 @@ const POP = { type: 'spring', stiffness: 640, damping: 17 } as const;
 
 export default function WordWheelWordLine({
   t, letters, allLetters, dir, onRemove, onSubmit, isValidating, shake, feedback,
-  acceptedWord, acceptedPoints, acceptedId, reducedMotion = false, className,
+  acceptedWord, acceptedPoints, acceptedId, reducedMotion = false, hint = false, className,
 }: WordWheelWordLineProps) {
   const word = letters.map(l => l.letter).join('');
+  const [lastBuilt, setLastBuilt] = useState('');
+  if (word && word !== lastBuilt) setLastBuilt(word);
+  const checking = isValidating && letters.length > 0;
   const preview = word.length >= 3 ? scoreWord(word) : 0;
   const isError = feedback?.type === 'error';
   const accepted = feedback?.type === 'success' && acceptedWord ? acceptedWord : null;
   const fullWheel = accepted ? classifyLetterCoverage(accepted, allLetters) === 'all' : false;
+  const rejected = isError && letters.length === 0 && lastBuilt ? lastBuilt : null;
 
   return (
     <m.div
       data-testid="word-builder"
-      className={cn('relative z-20 w-full mt-2 short:mt-1 h-[60px] sm:h-[76px] short:h-[46px] flex items-center justify-center', className)}
+      data-state={checking ? 'checking' : isError ? 'rejected' : accepted ? 'accepted' : 'idle'}
+      className={cn('relative z-20 w-full mt-2 short:mt-1 h-[60px] sm:h-[76px] tall:h-[88px] short:h-[46px] flex items-center justify-center', className)}
       animate={shake ? { x: [-10, 10, -7, 7, -3, 0] } : { x: 0 }}
       transition={shake ? { duration: 0.38 } : { duration: 0 }}
     >
@@ -93,12 +100,27 @@ export default function WordWheelWordLine({
           data-testid="accepted-word-fly"
           aria-hidden
           dir={dir}
-          className="absolute inset-0 flex items-center justify-center font-neo-display font-black text-[40px] sm:text-5xl tracking-[0.06em] text-neo-lime pointer-events-none [text-shadow:0_0_18px_rgba(191,255,0,0.7)]"
+          className="absolute inset-0 flex items-center justify-center font-neo-display font-black text-[40px] sm:text-5xl tall:text-[52px] tracking-[0.06em] text-neo-lime pointer-events-none [text-shadow:0_0_18px_rgba(191,255,0,0.7)]"
           initial={{ y: 0, scale: 1, opacity: 1 }}
           animate={{ y: -110, scale: 0.42, opacity: 0 }}
           transition={{ duration: 0.7, ease: [0.3, 0, 0.2, 1] }}
         >
           {accepted}
+        </m.span>
+      )}
+
+      {rejected && (
+        <m.span
+          key={`rejected-${acceptedId}-${feedback?.message}`}
+          data-testid="rejected-word"
+          aria-hidden
+          dir={dir}
+          className="absolute inset-0 flex items-center justify-center font-neo-display font-black uppercase text-[40px] sm:text-5xl tall:text-[52px] tracking-[0.06em] text-neo-red pointer-events-none [text-shadow:0_0_14px_rgba(255,59,48,0.55)]"
+          initial={{ x: 0, y: 0, opacity: 1, rotate: 0 }}
+          animate={reducedMotion ? { opacity: 0 } : { x: [0, -12, 10, -6, 0], y: [0, 0, 0, 4, 34], rotate: [0, -2, 2, 0, 6], opacity: [1, 1, 1, 0.9, 0] }}
+          transition={{ duration: reducedMotion ? 0.3 : 0.75, times: [0, 0.15, 0.3, 0.5, 1], ease: 'easeOut' }}
+        >
+          {rejected}
         </m.span>
       )}
 
@@ -112,7 +134,7 @@ export default function WordWheelWordLine({
               animate={reducedMotion ? undefined : { opacity: [1, 0, 1] }}
               transition={{ duration: 1.05, repeat: Infinity, ease: 'linear' }}
             />
-            {!accepted && t('wordWheel.tapLetters')}
+            {hint && !accepted && !rejected && t('wordWheel.tapLetters')}
           </span>
         ) : (
           <>
@@ -126,13 +148,15 @@ export default function WordWheelWordLine({
                 aria-label={`${bl.letter}. ${t('wordWheel.tapToRemove')}`}
                 onClick={() => onRemove(i)}
                 className={cn(
-                  'notranslate relative font-neo-display font-black uppercase leading-none text-[40px] sm:text-5xl short:text-3xl px-[1px] touch-manipulation cursor-pointer',
+                  'notranslate relative font-neo-display font-black uppercase leading-none text-[40px] sm:text-5xl tall:text-[52px] short:text-3xl px-[1px] touch-manipulation cursor-pointer',
                   'before:absolute before:-inset-y-2 before:inset-x-0 before:content-[""]',
-                  isError ? 'text-neo-red' : bl.wheelIndex === -1 ? 'text-neo-lime' : 'text-neo-white',
+                  isError ? 'text-neo-red' : checking ? 'text-neo-cyan' : bl.wheelIndex === -1 ? 'text-neo-lime' : 'text-neo-white',
                 )}
                 initial={reducedMotion ? false : { y: 14, scale: 0.5 }}
-                animate={{ y: 0, scale: 1 }}
-                transition={POP}
+                animate={checking && !reducedMotion ? { y: [0, -10, 0], scale: [1, 1.12, 1] } : { y: 0, scale: 1 }}
+                transition={checking && !reducedMotion
+                  ? { duration: 0.42, delay: i * 0.05, repeat: Infinity, ease: 'easeInOut' }
+                  : POP}
               >
                 {bl.letter}
               </m.button>
@@ -169,7 +193,17 @@ export default function WordWheelWordLine({
                   : 'bg-neo-navy-light text-neo-white/70 shadow-[2px_2px_0_#000]',
               )}
             >
-              <Check className="w-5 h-5" strokeWidth={3} aria-hidden />
+              {checking ? (
+                <m.span
+                  data-testid="submit-pending"
+                  aria-hidden
+                  className="w-5 h-5 rounded-full border-[3px] border-neo-black/25 border-t-neo-black"
+                  animate={reducedMotion ? undefined : { rotate: 360 }}
+                  transition={{ duration: 0.5, repeat: Infinity, ease: 'linear' }}
+                />
+              ) : (
+                <Check className="w-5 h-5" strokeWidth={3} aria-hidden />
+              )}
             </button>
           </>
         )}

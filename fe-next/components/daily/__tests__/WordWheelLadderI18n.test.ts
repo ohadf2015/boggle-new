@@ -10,7 +10,7 @@ import { WHEEL_RANKS } from '@/lib/wordWheel/rankLadder';
 const bundles = { en: en.en, es: es.es, he: he.he, ja: ja.ja, ru: ru.ru, sv: sv.sv } as Record<string, any>;
 
 const required = {
-  climb: ['showBoard', 'hideBoard'],
+  climb: ['showBoard', 'hideBoard', 'moreBoards'],
   rank: ['title', 'open', 'toNext', 'top', 'reached', ...WHEEL_RANKS],
   praise: ['nice', 'great', 'superb', 'brilliant', 'fullWheel'],
   strip: ['empty', 'label', 'all', 'close', 'longest'],
@@ -20,6 +20,8 @@ const sharedKeys = [
   'practice.endRun', 'common.quit', 'common.you', 'wordWheel.timeLeft', 'wordWheel.pointsToPass',
   'wordWheel.tapLetters', 'wordWheel.tapToRemove', 'wordWheel.submit',
   'wordHunt.desktop.liveRanks', 'wordHunt.desktop.beFirst',
+  'wordHunt.leaderboard.today', 'wordHunt.leaderboard.season', 'wordHunt.leaderboard.allTime',
+  'wordHunt.leaderboard.connections', 'leaderboard.friends',
 ];
 
 const lookup = (bundle: any, path: string) => path.split('.').reduce((o, p) => o?.[p], bundle);
