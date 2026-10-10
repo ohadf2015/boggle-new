@@ -542,6 +542,9 @@ function SinglePlayerGame({
         earthquakeState={core.earthquakeState}
         currentFeedback={core.currentFeedback}
         highlightedPath={core.revealState.highlightedPath ?? []}
+        isTypingMode={core.keyboardInput?.isTypingMode}
+        typedWord={core.keyboardInput?.typedWord}
+        keyboardHighlight={core.keyboardInput?.highlightedCells}
         lastWordFoundTime={core.lastWordFoundTimeRef.current ?? 0}
         isDesktop={core.isDesktop || core.isTv}
         awaitingStart={core.awaitingStart}

@@ -20299,6 +20299,42 @@ const ja = {
     }
   },
   // @eg2Help:end
+  // @gameShell:start
+  "gameShell": {
+    "words": "見つけた単語",
+    "wordsEmptyTitle": "見つけた単語がここに並びます",
+    "wordsEmptyBody": "文字をなぞるか、そのまま入力。新しい単語ほど上に積み上がります。",
+    "pts": "点",
+    "best": "最長",
+    "rivals": "ライバル",
+    "leading": "あなたがトップ！",
+    "behind": "{name}まであと{points}点",
+    "raceOpen": "最初の一語でトップに立とう",
+    "round": "このラウンド",
+    "score": "スコア",
+    "found": "発見数",
+    "time": "残り時間",
+    "combo": "コンボ",
+    "moves": "手数",
+    "cleared": "クリア率",
+    "wave": "ウェーブ",
+    "life": "ライフ",
+    "tries": "残りチャンス",
+    "clues": "判明した文字",
+    "missions": "ミッション",
+    "streak": "連続",
+    "multiplier": "倍率",
+    "topWord": "最高の単語",
+    "you": "あなた",
+    "keys": {
+      "title": "キーボードでも遊べる",
+      "type": "単語を入力",
+      "letters": "A–Z",
+      "submit": "決定",
+      "clear": "やり直し"
+    }
+  },
+  // @gameShell:end
   // @hqCalm:start
   "hqCalm": {
     "playWithoutClass": "クラスなしでゲームをする",

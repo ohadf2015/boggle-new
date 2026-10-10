@@ -19995,6 +19995,42 @@ const ru = {
     }
   },
   // @eg2Help:end
+  // @gameShell:start
+  "gameShell": {
+    "words": "Твои слова",
+    "wordsEmptyTitle": "Здесь появятся твои слова",
+    "wordsEmptyBody": "Проведи по буквам или просто печатай. Новые слова встают наверх.",
+    "pts": "очк.",
+    "best": "Самое длинное",
+    "rivals": "Соперники",
+    "leading": "Ты лидируешь",
+    "behind": "{points} до {name}",
+    "raceOpen": "Первое слово выводит в лидеры",
+    "round": "Этот раунд",
+    "score": "Очки",
+    "found": "Найдено",
+    "time": "Осталось",
+    "combo": "Комбо",
+    "moves": "Ходы",
+    "cleared": "Очищено",
+    "wave": "Волна",
+    "life": "Жизнь",
+    "tries": "Попытки",
+    "clues": "Открытые буквы",
+    "missions": "Задания",
+    "streak": "Серия",
+    "multiplier": "Множитель",
+    "topWord": "Лучшее слово",
+    "you": "Вы",
+    "keys": {
+      "title": "Играй с клавиатуры",
+      "type": "Печатай слово",
+      "letters": "А–Я",
+      "submit": "Отправить",
+      "clear": "Сначала"
+    }
+  },
+  // @gameShell:end
   // @hqCalm:start
   "hqCalm": {
     "playWithoutClass": "Или сыграть без класса",

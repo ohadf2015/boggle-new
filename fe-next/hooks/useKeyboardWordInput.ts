@@ -84,7 +84,7 @@ function findLetterPositions(grid: LetterGrid, letter: string, language: string)
  * Find a valid path on the grid for the given word using DFS
  * Returns highlighted cells forming the path, or empty array if no valid path exists
  */
-function findWordPath(
+export function findWordPath(
   grid: LetterGrid,
   word: string,
   language: string

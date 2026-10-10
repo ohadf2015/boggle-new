@@ -20299,6 +20299,42 @@ const sv = {
     }
   },
   // @eg2Help:end
+  // @gameShell:start
+  "gameShell": {
+    "words": "Dina ord",
+    "wordsEmptyTitle": "Här hamnar dina ord",
+    "wordsEmptyBody": "Dra över bokstäverna eller skriv bara. Varje ord läggs här, nyaste överst.",
+    "pts": "p",
+    "best": "Längsta",
+    "rivals": "Rivaler",
+    "leading": "Du leder",
+    "behind": "{points} bakom {name}",
+    "raceOpen": "Första ordet tar ledningen",
+    "round": "Den här rundan",
+    "score": "Poäng",
+    "found": "Hittade",
+    "time": "Tid kvar",
+    "combo": "Kombo",
+    "moves": "Drag",
+    "cleared": "Rensat",
+    "wave": "Våg",
+    "life": "Liv",
+    "tries": "Försök kvar",
+    "clues": "Avslöjade bokstäver",
+    "missions": "Uppdrag",
+    "streak": "Svit",
+    "multiplier": "Multiplikator",
+    "topWord": "Bästa ordet",
+    "you": "Du",
+    "keys": {
+      "title": "Spela med tangentbordet",
+      "type": "Skriv ordet",
+      "letters": "A–Ö",
+      "submit": "Skicka",
+      "clear": "Börja om"
+    }
+  },
+  // @gameShell:end
   // @hqCalm:start
   "hqCalm": {
     "playWithoutClass": "Eller spela utan klass",

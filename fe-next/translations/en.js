@@ -19350,6 +19350,42 @@ const en = {
     }
   },
   // @eg2Help:end
+  // @gameShell:start
+  "gameShell": {
+    "words": "Your words",
+    "wordsEmptyTitle": "Your words land here",
+    "wordsEmptyBody": "Drag across the letters or just type. Every word stacks up here, newest on top.",
+    "pts": "pts",
+    "best": "Longest",
+    "rivals": "Rivals",
+    "leading": "You're in the lead",
+    "behind": "{points} behind {name}",
+    "raceOpen": "First word takes the lead",
+    "round": "This round",
+    "score": "Score",
+    "found": "Found",
+    "time": "Time left",
+    "combo": "Combo",
+    "moves": "Moves",
+    "cleared": "Board cleared",
+    "wave": "Wave",
+    "life": "Life",
+    "tries": "Tries left",
+    "clues": "Letters revealed",
+    "missions": "Missions",
+    "streak": "Streak",
+    "multiplier": "Multiplier",
+    "topWord": "Top word",
+    "you": "You",
+    "keys": {
+      "title": "Play with your keyboard",
+      "type": "Type the word",
+      "letters": "A–Z",
+      "submit": "Send it",
+      "clear": "Start over"
+    }
+  },
+  // @gameShell:end
   // @hqCalm:start
   "hqCalm": {
     "playWithoutClass": "Or play a game without a class",

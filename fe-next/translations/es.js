@@ -20311,6 +20311,42 @@ const es = {
     }
   },
   // @eg2Help:end
+  // @gameShell:start
+  "gameShell": {
+    "words": "Tus palabras",
+    "wordsEmptyTitle": "Aquí caen tus palabras",
+    "wordsEmptyBody": "Arrastra por las letras o simplemente escribe. Cada palabra se apila aquí, la más nueva arriba.",
+    "pts": "pts",
+    "best": "La más larga",
+    "rivals": "Rivales",
+    "leading": "¡Vas primero!",
+    "behind": "A {points} de {name}",
+    "raceOpen": "La primera palabra se lleva el liderato",
+    "round": "Esta ronda",
+    "score": "Puntos",
+    "found": "Encontradas",
+    "time": "Tiempo",
+    "combo": "Combo",
+    "moves": "Jugadas",
+    "cleared": "Tablero limpio",
+    "wave": "Oleada",
+    "life": "Vida",
+    "tries": "Intentos",
+    "clues": "Letras reveladas",
+    "missions": "Misiones",
+    "streak": "Racha",
+    "multiplier": "Multiplicador",
+    "topWord": "Mejor palabra",
+    "you": "Tú",
+    "keys": {
+      "title": "Juega con el teclado",
+      "type": "Escribe la palabra",
+      "letters": "A–Ñ",
+      "submit": "Enviar",
+      "clear": "Borrar todo"
+    }
+  },
+  // @gameShell:end
   // @hqCalm:start
   "hqCalm": {
     "playWithoutClass": "O juega sin crear una clase",

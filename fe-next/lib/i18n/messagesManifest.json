@@ -1,15 +1,15 @@
 {
-  "en": "/i18n/en.24b01bba.js",
+  "en": "/i18n/en.abdd219f.js",
   "enLanding": "/i18n/en.landing.8a433610.js",
-  "he": "/i18n/he.5f2f2f59.js",
-  "heLanding": "/i18n/he.landing.2c01ddaa.js",
-  "sv": "/i18n/sv.dbd9a30a.js",
+  "he": "/i18n/he.066bc413.js",
+  "heLanding": "/i18n/he.landing.9fd6bed3.js",
+  "sv": "/i18n/sv.e9411a31.js",
   "svLanding": "/i18n/sv.landing.4f680cc7.js",
-  "ja": "/i18n/ja.210ff7d8.js",
+  "ja": "/i18n/ja.284b7df4.js",
   "jaLanding": "/i18n/ja.landing.414cfe99.js",
-  "es": "/i18n/es.eb163a17.js",
+  "es": "/i18n/es.a20dc8f5.js",
   "esLanding": "/i18n/es.landing.baae7533.js",
-  "ru": "/i18n/ru.dc13ee6e.js",
+  "ru": "/i18n/ru.e8a256b4.js",
   "ruLanding": "/i18n/ru.landing.9af9b55f.js",
-  "__sources": "1ee819965919c7bf"
+  "__sources": "065fc1a160284205"
 }

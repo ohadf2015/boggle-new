@@ -3357,7 +3357,7 @@ const he = {
     "word": "מילה",
     "words": "מילים",
     "wordsFound": "מילים",
-    "you": "את/ה",
+    "you": "אתם",
     "quickRematch": "עוד סיבוב",
     "attempts": "ניסיונות",
     "share": "שיתוף",
@@ -5575,7 +5575,7 @@ const he = {
     "hostWillStartWhenReady": "המארח יתחיל את הסיבוב הבא כשכולם יהיו מוכנים",
     "performanceHistory": "היסטוריית ביצועים",
     "goToLobby": "לחדר המתנה",
-    "you": "את/ה",
+    "you": "אתם",
     "betterLuckNextTime": "בפעם הבאה מרסקים אותם!",
     "loserFeedback": {
       "almostPodium": "כמעט על הפודיום!",
@@ -5651,7 +5651,7 @@ const he = {
     },
     "sessionStats": {
       "title": "הבולטים מהסשן",
-      "you": "את/ה",
+      "you": "אתם",
       "versus": "נגד",
       "improved": "זינוק של {percent}% מהסיבוב הראשון!",
       "consistent": "טופ 3 ב-{count} סיבובים ברצף!",
@@ -9147,7 +9147,7 @@ const he = {
     },
     "rival": {
       "header": "אתגר תחרותי",
-      "you": "את/ה",
+      "you": "אתם",
       "youWin": "הבסתם את {name}! 🏆",
       "youLose": "{name} ניצח/ה את הסיבוב הזה",
       "tie": "זה תיקו! 🤝"
@@ -13051,7 +13051,7 @@ const he = {
     "best": "שיא",
     "movesLeft": "מהלכים",
     "time": "זמן",
-    "you": "את/ה",
+    "you": "אתם",
     "live": "חי",
     "luckyBoost": "בונוס מזל",
     "luckyBoostDesc": "מוסיפים יותר אריחים מיוחדים אחרי ריצה קשה",
@@ -16930,7 +16930,7 @@ const he = {
     "wordsAccepted": "מילים שאושרו",
     "wordsRejected": "מילים שנדחו",
     "xpEarned": "נקודות ניסיון",
-    "you": "את/ה",
+    "you": "אתם",
     "youLose": "הפסדת! 😢",
     "youWin": "ניצחת! 🏆",
     "opponentDisconnected": "{{opponentName}} התנתק",
@@ -17475,7 +17475,7 @@ const he = {
     "position": "מיקום",
     "score": "ניקוד",
     "rewards": "פרסים",
-    "you": "את/ה",
+    "you": "אתם",
     "noParticipants": "אין משתתפים עדיין"
   },
   "league": {
@@ -17510,7 +17510,7 @@ const he = {
     "title": "היריבים שלך בליגה",
     "ahead": "{{pts}} נקודות מעליך",
     "behind": "{{pts}} נקודות מתחתיך",
-    "you": "את/ה",
+    "you": "אתם",
     "noRivals": "טפסו בליגה כדי למצוא יריבים"
   },
   "socialGift": {
@@ -17866,7 +17866,7 @@ const he = {
   },
   "ghostRival": {
     "title": "היריב שלך השבוע",
-    "you": "את/ה",
+    "you": "אתם",
     "ahead": "{{pts}} נקודות מוביל/ה",
     "behind": "{{pts}} נקודות מאחור",
     "cta": "שחקו כדי לסגור את הפער",
@@ -19566,7 +19566,7 @@ const he = {
       "details": "פרטים",
       "detailsTitle": "פרטי הקרב",
       "skipHint": "הקישו לדילוג",
-      "you": "את/ה",
+      "you": "אתם",
       "pts": "נק׳",
       "winner": "ניצחון!",
       "placeOf": "מתוך {total}",
@@ -20229,6 +20229,42 @@ const he = {
     }
   },
   // @eg2Help:end
+  // @gameShell:start
+  "gameShell": {
+    "words": "המילים שלך",
+    "wordsEmptyTitle": "כאן ייערמו המילים שלך",
+    "wordsEmptyBody": "גררו על האותיות או פשוט הקלידו. כל מילה נוחתת כאן, החדשה למעלה.",
+    "pts": "נק׳",
+    "best": "הכי ארוכה",
+    "rivals": "יריבים",
+    "leading": "אתם בהובלה",
+    "behind": "{points} נק׳ אחרי {name}",
+    "raceOpen": "המילה הראשונה לוקחת את ההובלה",
+    "round": "הסיבוב הזה",
+    "score": "ניקוד",
+    "found": "נמצאו",
+    "time": "זמן",
+    "combo": "קומבו",
+    "moves": "מהלכים",
+    "cleared": "הלוח נוקה",
+    "wave": "גל",
+    "life": "חיים",
+    "tries": "ניסיונות",
+    "clues": "אותיות שנחשפו",
+    "missions": "משימות",
+    "streak": "רצף",
+    "multiplier": "מכפיל",
+    "topWord": "המילה הכי שווה",
+    "you": "אתם",
+    "keys": {
+      "title": "משחקים מהמקלדת",
+      "type": "מקלידים את המילה",
+      "letters": "א–ת",
+      "submit": "שולחים",
+      "clear": "מתחילים מחדש"
+    }
+  },
+  // @gameShell:end
   // @hqCalm:start
   "hqCalm": {
     "playWithoutClass": "או לשחק משחק בלי כיתה",

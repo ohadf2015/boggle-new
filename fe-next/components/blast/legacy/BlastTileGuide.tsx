@@ -1,16 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { BLAST_TILE_TYPE_LIST } from '@/shared/types/blast';
-import { BLAST_RETIRED_SPECIAL_TYPES } from './utils/blastWaveConfig';
-import { TILE_VISUALS } from './blastTileVisuals';
-
-// Retired types are zeroed in every wave distribution, so listing them taught
-// players tiles they can never meet — and locked/key/chocolate/cake had no
-// strings at all, which is where the "Translation missing" Sentry issues came from.
-const GUIDE_TILE_TYPES = BLAST_TILE_TYPE_LIST.filter(
-  (type) => !BLAST_RETIRED_SPECIAL_TYPES.has(type),
-);
+import { BlastTileLegendList } from './BlastTileLegend';
 
 interface BlastTileGuideProps {
   isOpen: boolean;
@@ -52,34 +43,7 @@ export function BlastTileGuide({ isOpen, onClose, t }: BlastTileGuideProps) {
 
             {/* Scrollable grid */}
             <div className="overflow-y-auto overscroll-contain p-3 flex-1">
-              <div className="grid grid-cols-1 gap-2">
-                {GUIDE_TILE_TYPES.map((type) => {
-                  const visual = TILE_VISUALS[type];
-                  const Icon = visual.indicator;
-                  return (
-                    <div
-                      key={type}
-                      className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-neo px-3 py-2"
-                    >
-                      <span
-                        className={`shrink-0 w-10 h-10 flex items-center justify-center rounded-neo border-2 border-black/40 ${visual.text ?? ''}`}
-                        style={visual.style}
-                        aria-hidden="true"
-                      >
-                        {Icon ? <Icon className="w-5 h-5" strokeWidth={2.5} /> : null}
-                      </span>
-                      <div className="min-w-0">
-                        <span className="block font-neo-display font-bold text-neo-white text-sm capitalize">
-                          {t(`blast.tileGuide.${type}.name`)}
-                        </span>
-                        <span className="block font-neo-body text-white text-xs">
-                          {t(`blast.tileGuide.${type}.desc`)}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <BlastTileLegendList t={t} />
             </div>
           </div>
         </div>

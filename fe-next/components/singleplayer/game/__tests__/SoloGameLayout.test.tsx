@@ -5,12 +5,14 @@ import React from 'react';
 // The board, word strip and overlays are covered by their own suites; here they
 // are stand-ins so the test reads the layout's own decisions.
 vi.mock('@/components/GridComponent', () => ({
-  default: (p: { interactive: boolean }) => (
-    <div data-testid="grid" data-interactive={String(p.interactive)} />
+  default: (p: { interactive: boolean; highlightedPath?: Array<{ row: number; col: number }> }) => (
+    <div data-testid="grid" data-interactive={String(p.interactive)} data-highlight={JSON.stringify(p.highlightedPath ?? [])} />
   ),
 }));
 vi.mock('@/components/game/in-game/components/WordFormingAreaConnected', () => ({
-  WordFormingAreaConnected: () => <div data-testid="word-forming" />,
+  WordFormingAreaConnected: (p: { isTypingMode: boolean; typedWord: string }) => (
+    <div data-testid="word-forming" data-typing={String(p.isTypingMode)} data-typed={p.typedWord} />
+  ),
 }));
 vi.mock('@/components/game/in-game/components/GameOverlays', () => ({
   GameOverlays: () => null,
@@ -154,5 +156,40 @@ describe('SoloGameLayout', () => {
     const slot = document.querySelector('[data-solo-slot="missions"]');
     expect(slot).not.toBeNull();
     expect(slot?.className).toContain('min-h-[2.25rem]');
+  });
+
+  describe('desktop game shell', () => {
+    const w = (word: string, ts: number, score = word.length) =>
+      ({ word, score, timestamp: ts, timeSinceStart: ts, isValid: true });
+
+    it('wraps the board in the shared shell: race on the left, found words on the right', () => {
+      render(<SoloGameLayout {...props({ score: 12, bots: [{ name: 'BrainBot', score: 8 }], foundWords: [w('cat', 1), w('tree', 2, 9)] })} />);
+      expect(screen.getByTestId('game-shell').getAttribute('data-game-shell')).toBe('classic');
+      const left = screen.getByTestId('game-shell-left');
+      expect(within(left).getByTestId('shell-standing-you').getAttribute('data-me')).toBe('true');
+      expect(within(left).getByTestId('shell-standing-bot-0')).toBeInTheDocument();
+      const right = screen.getByTestId('game-shell-right');
+      const rows = within(right).getAllByTestId(/^shell-word-row-/);
+      expect(rows[0].getAttribute('data-word')).toBe('tree');
+      expect(within(rows[0]).getByText('+9')).toBeInTheDocument();
+      expect(screen.getByTestId('game-shell-stage').contains(screen.getByTestId('solo-slot-board'))).toBe(true);
+    });
+
+    it('teaches keyboard play beside the board', () => {
+      render(<SoloGameLayout {...props()} />);
+      expect(within(screen.getByTestId('game-shell-left')).getByTestId('shell-keys')).toBeInTheDocument();
+    });
+
+    it('shows the typed word on the board strip and lights its path while typing', () => {
+      render(
+        <SoloGameLayout
+          {...props({ isTypingMode: true, typedWord: 'AB', keyboardHighlight: [{ row: 0, col: 0 }, { row: 0, col: 1 }] })}
+        />,
+      );
+      const strip = screen.getByTestId('word-forming');
+      expect(strip.getAttribute('data-typing')).toBe('true');
+      expect(strip.getAttribute('data-typed')).toBe('AB');
+      expect(JSON.parse(screen.getByTestId('grid').getAttribute('data-highlight') ?? '[]')).toHaveLength(2);
+    });
   });
 });

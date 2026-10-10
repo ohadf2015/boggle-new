@@ -21,8 +21,8 @@
  *    top, so the board is `min(slot width, slot height - strip)` — square, and
  *    it takes whatever is left.
  *  - short landscape (phones on their side): two lanes, HUD left, board right.
- *  - wide (>=900px, >=5/4): three lanes — stage | board | word feed — under
- *    one full-width bar, the Adventure TV layout.
+ *  - desktop (>=1024x600): the shared GameShell — race + round stats left,
+ *    found words right, the board column sized from the viewport height.
  *  All media queries, never a JS breakpoint: CSS is right at first paint.
  */
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
@@ -43,6 +43,9 @@ import type { FoundWord } from './types';
 import { SoloComboMeter } from './components/SoloComboMeter';
 import { MissionChips } from './components/MissionChips';
 import { SoloStartCard } from './components/SoloStartCard';
+import { SoloLeftRail, SoloRightRail } from './components/SoloShellRails';
+import { GameShell } from '@/components/game/shell';
+import { formatClock } from '@/components/game/shell/formatClock';
 
 export interface SoloGameLayoutProps {
   grid: LetterGrid;
@@ -62,6 +65,10 @@ export interface SoloGameLayoutProps {
   earthquakeState: EarthquakeState;
   currentFeedback: WordFeedback | null;
   highlightedPath: Array<{ row: number; col: number }>;
+  /** Keyboard play: the typed word and the board path it matches. */
+  isTypingMode?: boolean;
+  typedWord?: string;
+  keyboardHighlight?: Array<{ row: number; col: number }>;
   isDesktop: boolean;
   /** Round is dealt but the clock waits for the player's tap. */
   awaitingStart: boolean;
@@ -113,38 +120,9 @@ const SOLO_SHELL_CSS = `
   .${SHELL} > [data-solo-slot="words"] { grid-area: words; min-height: 0; overflow: hidden; }
   .${SHELL} > [data-solo-slot="words"] > ul { flex-wrap: wrap; overflow: hidden; align-content: flex-start; }
 }
-@media (min-width: 900px) and (min-aspect-ratio: 5/4) {
-  .${SHELL} {
-    max-width: 1600px;
-    display: grid;
-    column-gap: clamp(1rem, 2vw, 2.5rem);
-    row-gap: 0.75rem;
-    padding-inline: clamp(1rem, 2.4vw, 3rem);
-    grid-template-columns: minmax(14rem, 0.9fr) minmax(0, 2fr) minmax(14rem, 0.9fr);
-    grid-template-rows: auto auto minmax(0, 1fr);
-    grid-template-areas: "bar bar bar" "race board words" "missions board words";
-  }
-  .${SHELL} > [data-solo-slot] { margin-top: 0; }
-  .${SHELL} > [data-solo-slot="bar"] { grid-area: bar; }
-  .${SHELL} > [data-solo-slot="race"] { grid-area: race; align-self: start; }
-  .${SHELL} > [data-solo-slot="missions"] { grid-area: missions; align-self: start; }
-  .${SHELL} > [data-solo-slot="missions"] [data-testid="mission-chips"] { flex-direction: column; }
-  .${SHELL} > [data-solo-slot="board"] { grid-area: board; --solo-board-max: clamp(26rem, 42vw, 46rem); }
-  .${SHELL} > [data-solo-slot="words"] { grid-area: words; min-height: 0; align-self: stretch; overflow: hidden; display: flex; flex-direction: column; }
-  .${SHELL} > [data-solo-slot="words"] > ul { flex-direction: column; flex-wrap: nowrap; overflow-y: auto; overflow-x: hidden; height: auto; flex: 1 1 auto; }
-  .${SHELL} > [data-solo-slot="words"] > ul > li { justify-content: space-between; }
-}
-/* TV / big monitor: the side lanes are read from the couch — scale them up. */
-@media (min-width: 1700px) and (min-height: 900px) and (min-aspect-ratio: 5/4) {
-  .${SHELL} > [data-solo-slot="bar"],
-  .${SHELL} > [data-solo-slot="race"],
-  .${SHELL} > [data-solo-slot="missions"] { zoom: 1.35; }
+@media (min-width: 1024px) and (min-height: 600px) {
+  .${SHELL} [data-solo-slot="board"] { --solo-board-max: 100cqh; }
 }`;
-
-function formatClock(seconds: number): string {
-  const s = Math.max(0, Math.ceil(seconds));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-}
 
 const HUD_BUTTON =
   'grid h-11 w-11 shrink-0 place-items-center rounded-xl border-[3px] border-neo-black bg-neo-cream text-neo-black shadow-[3px_3px_0_#000] active:translate-y-0.5 active:shadow-none';
@@ -153,7 +131,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
   const {
     grid, language, score, remainingTime, totalSeconds, isPaused, isGameOver, bots,
     foundWords, comboLevel, fireRoundActive, fireRoundRemaining, earthquakeState, currentFeedback,
-    highlightedPath, isDesktop, awaitingStart, onStart, onWordSubmit, onWordChange, onPathSubmit,
+    highlightedPath, isTypingMode = false, typedWord = '', keyboardHighlight, isDesktop, awaitingStart, onStart, onWordSubmit, onWordChange, onPathSubmit,
     onExit, onPauseToggle, gameStatsRef, t, soloStreak = 0, soloMultiplier = 1, soloPraiseKey = null,
     soloMissions, soloChrome, children,
   } = props;
@@ -214,10 +192,19 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
       />
 
       <style>{SOLO_SHELL_CSS}</style>
+      <GameShell
+        mode="classic"
+        accent="cyan"
+        className="relative z-10"
+        left={
+          <SoloLeftRail t={t} score={score} bots={bots} validWords={validWords} streak={soloStreak} multiplier={soloMultiplier} />
+        }
+        right={<SoloRightRail t={t} validWords={validWords} />}
+      >
       <div
         className={cn(
           SHELL,
-          'relative z-10 mx-auto flex h-full w-full max-w-lg md:max-w-xl flex-col px-3 sm:px-4',
+          'relative z-10 mx-auto flex h-full w-full max-w-lg md:max-w-xl flex-col px-3 sm:px-4 shell:max-w-none shell:px-0 shell:py-0',
           'pt-[max(0.625rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]',
           '[--solo-board-max:560px] [--solo-word-h:3.25rem]',
         )}
@@ -259,7 +246,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
           data-testid="solo-race"
           data-solo-slot="race"
           data-leader={leader}
-          className="mt-2 flex items-center gap-2.5 rounded-xl border-[3px] border-neo-black bg-black/55 px-3 py-1.5 font-neo-display font-bold leading-none shadow-[3px_3px_0_#000]"
+          className="mt-2 shell:hidden flex items-center gap-2.5 rounded-xl border-[3px] border-neo-black bg-black/55 px-3 py-1.5 font-neo-display font-bold leading-none shadow-[3px_3px_0_#000]"
         >
           <span className="flex shrink-0 items-baseline gap-1.5">
             <span className="text-[11px] uppercase tracking-wider text-neo-lime">{t('common.you')}</span>
@@ -295,7 +282,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
         >
           {/* The traced word sits right on the board, where the eye already is. */}
           <div className="relative flex h-[var(--solo-word-h)] w-full shrink-0 items-center justify-center">
-            <WordFormingAreaConnected isTypingMode={false} typedWord="" feedback={currentFeedback} />
+            <WordFormingAreaConnected isTypingMode={isTypingMode} typedWord={typedWord} feedback={currentFeedback} />
             <div className="pointer-events-none absolute inset-x-0 -bottom-1 flex justify-center">
               <SoloComboMeter streak={soloStreak} multiplier={soloMultiplier} praiseKey={soloPraiseKey} />
             </div>
@@ -312,7 +299,8 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
               hideWordPreview
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
-              highlightedPath={highlightedPath}
+              highlightedPath={isTypingMode && keyboardHighlight?.length ? keyboardHighlight : highlightedPath}
+              isTypingMode={isTypingMode}
               language={language}
               effectsProfile="lean"
               submitFeedback={currentFeedback}
@@ -321,7 +309,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
         </div>
 
         {/* Found words — newest first. A strip on phones, a feed column when wide. */}
-        <div data-testid="solo-slot-words" data-solo-slot="words" className="mt-2 shrink-0">
+        <div data-testid="solo-slot-words" data-solo-slot="words" className="mt-2 shrink-0 shell:hidden">
           <div className="mb-1 flex items-center justify-between px-0.5 text-[11px] font-bold uppercase tracking-wider text-neo-cream/70">
             <span>{t('singlePlayer.wordsFound')}</span>
             <span dir="ltr" className="tabular-nums text-neo-cyan">{validWords.length}</span>
@@ -347,6 +335,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
 
         {children}
       </div>
+      </GameShell>
 
       {awaitingStart && !isGameOver && (
         <SoloStartCard

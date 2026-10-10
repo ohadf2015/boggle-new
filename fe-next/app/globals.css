@@ -63,6 +63,8 @@ html.lexi-native [data-selectable] {
 @custom-variant phone-short (@media (max-width: 639px) and (max-height: 600px));
 /* TV / party screen (MP shell): every size token scales by 1.5 via --mp-u. */
 @custom-variant tv (@media (min-width: 1800px) and (min-height: 1000px));
+/* The desktop game shell (components/game/shell/gameShell.module.css). */
+@custom-variant shell (@media (min-width: 1024px) and (min-height: 600px));
 
 @utility text-balance {
   text-wrap: balance;
