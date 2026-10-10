@@ -9142,6 +9142,14 @@ const en = {
       "clueUnlocked": "{name} unlocked (-{cost} coins)",
       "longWordBonus": "🔥 +{bonus} long word bonus!",
       "scoreBreakdownTooltip": "Tap for details",
+      "stage": {
+        "prompt": "Swipe letters to make a word",
+        "praiseShort": "Nice!",
+        "praiseMid": "Sweet!",
+        "praiseLong": "Monster word!",
+        "boardLabel": "Letter board",
+        "longWord": "Long word +{bonus}"
+      },
       "score": {
         "tier": {
           "bronze": "Bronze",

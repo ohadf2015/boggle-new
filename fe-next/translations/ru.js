@@ -2061,6 +2061,14 @@ const ru = {
       "clueUnlocked": "Открыто: {name} (-{cost} монет)",
       "longWordBonus": "🔥 +{bonus} за длинное слово!",
       "scoreBreakdownTooltip": "Нажми для деталей",
+      "stage": {
+        "prompt": "Проведи по буквам и собери слово",
+        "praiseShort": "Неплохо!",
+        "praiseMid": "Отлично!",
+        "praiseLong": "Вот это слово!",
+        "boardLabel": "Поле с буквами",
+        "longWord": "Длинное слово +{bonus}"
+      },
       "score": {
         "tier": {
           "bronze": "Бронза",

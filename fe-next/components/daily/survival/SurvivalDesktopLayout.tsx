@@ -5,23 +5,19 @@ import { Keyboard } from 'lucide-react';
 import { SurvivalHeader } from './SurvivalHeader';
 import { SurvivalClueBoxes } from './SurvivalClueBoxes';
 import { SurvivalLifeBar } from './SurvivalLifeBar';
-import { SurvivalGridSection } from './SurvivalGridSection';
 import { SurvivalLiveRanks } from './SurvivalLiveRanks';
 import { SurvivalLootPanel } from './SurvivalLootPanel';
-import type { LetterGrid, Language } from '@/types';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { cn } from '@/lib/utils';
+import type { Language } from '@/types';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { HintLevel } from '@/utils/aiHintGenerator';
 import type { WordDiscovery, TargetAttempt, AccumulatedClue } from './types';
 
 export interface SurvivalDesktopLayoutProps {
   isTv: boolean;
-  // Grid
-  grid: LetterGrid;
+  playfield: React.ReactNode;
   isGameOver: boolean;
-  eliminatedLetters: Set<string>;
-  onWordSubmit: (word: string) => void;
-  onWordChange: (word: string, count: number) => void;
-  highlightedPath: Array<{ row: number; col: number }>;
   // Life
   lifePoints: number;
   isLifeGaining: boolean;
@@ -66,12 +62,8 @@ export interface SurvivalDesktopLayoutProps {
  */
 function SurvivalDesktopLayoutImpl({
   isTv,
-  grid,
+  playfield,
   isGameOver,
-  eliminatedLetters,
-  onWordSubmit,
-  onWordChange,
-  highlightedPath,
   lifePoints,
   isLifeGaining,
   lifeGainAmount,
@@ -102,6 +94,7 @@ function SurvivalDesktopLayoutImpl({
   t,
 }: SurvivalDesktopLayoutProps): React.ReactElement {
   const sidebarWidth = isTv ? '320px' : '280px';
+  const short = useMediaQuery('(max-height: 799px)');
 
   return (
     <div className="relative flex h-full w-full bg-neo-navy">
@@ -139,7 +132,7 @@ function SurvivalDesktopLayoutImpl({
           />
 
           {/* Clue Boxes — fixed min-height prevents layout shift during feedback */}
-          <div className="w-full min-h-[120px] flex items-center justify-center">
+          <div className={cn('w-full flex items-center justify-center', !short && 'min-h-[120px]')}>
             <SurvivalClueBoxes
               ref={clueContainerRef}
               currentHint={currentHint}
@@ -153,6 +146,7 @@ function SurvivalDesktopLayoutImpl({
               isClueGaining={isClueGaining}
               skipAnimations={skipAnimations}
               gameDir={gameDir}
+              compact={short}
               t={t}
             />
           </div>
@@ -167,23 +161,14 @@ function SurvivalDesktopLayoutImpl({
             onLifeGainComplete={onLifeGainComplete}
           />
 
-          {/* Game Grid with HUD corner accents */}
-          <div className="relative">
-            {/* HUD Corner Accents */}
-            <div className="absolute -top-1.5 -left-1.5 w-6 h-6 border-t-[3px] border-l-[3px] border-neo-cyan rounded-tl pointer-events-none opacity-40" />
-            <div className="absolute -top-1.5 -right-1.5 w-6 h-6 border-t-[3px] border-r-[3px] border-neo-cyan rounded-tr pointer-events-none opacity-40" />
-            <div className="absolute -bottom-1.5 -left-1.5 w-6 h-6 border-b-[3px] border-l-[3px] border-neo-cyan rounded-bl pointer-events-none opacity-40" />
-            <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 border-b-[3px] border-r-[3px] border-neo-cyan rounded-br pointer-events-none opacity-40" />
-
-            <SurvivalGridSection
-              grid={grid}
-              isGameOver={isGameOver}
-              eliminatedLetters={eliminatedLetters}
-              onWordSubmit={onWordSubmit}
-              onWordChange={onWordChange}
-              highlightedPath={highlightedPath}
-              t={t}
-            />
+          <div
+            data-testid="desktop-playfield"
+            data-short={short ? 'true' : 'false'}
+            className="relative flex min-h-0 w-full flex-1 justify-center [container-type:size]"
+          >
+            <div className={cn('relative', short ? 'w-[min(100cqw,calc(100cqh-72px))]' : 'w-[min(100cqw,calc(100cqh-96px))]')}>
+              {playfield}
+            </div>
           </div>
 
           {/* Desktop Keyboard Tip */}
@@ -207,12 +192,6 @@ function SurvivalDesktopLayoutImpl({
   );
 }
 
-// Memoized: parent re-renders ~1× per second from life-drain timer.
-// Without memo, every tick cascades through this 3-column layout and into
-// GridComponent, defeating the cell-tree memo work. Stable-ref props are
-// expected from the parent (callbacks via useCallback, derived data via useMemo).
-// Both named + default exports resolve to the memoized version so consumers
-// importing either path get the same memo guarantee.
 export const SurvivalDesktopLayout = memo(SurvivalDesktopLayoutImpl);
 SurvivalDesktopLayout.displayName = 'SurvivalDesktopLayout';
 export default SurvivalDesktopLayout;

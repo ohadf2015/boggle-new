@@ -9994,6 +9994,14 @@ const sv = {
       "clueUnlocked": "{name} upplåst! (-{cost} mynt)",
       "longWordBonus": "🔥 +{bonus} bonus för långt ord!",
       "scoreBreakdownTooltip": "Tryck för detaljer",
+      "stage": {
+        "prompt": "Dra över bokstäverna och bilda ett ord",
+        "praiseShort": "Snyggt!",
+        "praiseMid": "Grymt!",
+        "praiseLong": "Vilket monsterord!",
+        "boardLabel": "Bokstavsbräde",
+        "longWord": "Långt ord +{bonus}"
+      },
       "score": {
         "tier": {
           "bronze": "Brons",

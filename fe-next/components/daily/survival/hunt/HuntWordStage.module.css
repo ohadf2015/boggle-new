@@ -1,0 +1,261 @@
+.stage {
+  --ink: #0b0b1a;
+  --fill: #fffef0;
+  --text: #1a1a2e;
+  --edge: var(--ink);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 78px;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.stage[data-size='desktop'] { height: 96px; }
+
+@media (max-height: 799px) {
+  .stage[data-size='desktop'] { height: 72px; }
+}
+
+.prompt {
+  position: absolute;
+  padding: 8px 18px;
+  border: 2px dashed rgba(255, 254, 240, 0.28);
+  border-radius: 16px;
+  color: rgba(255, 254, 240, 0.62);
+  font-family: var(--font-fredoka), var(--font-heebo-hebrew), 'Fredoka', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: calc(100% - 64px);
+  min-height: 58px;
+  padding: 4px 18px;
+  border: 3px solid var(--edge);
+  border-radius: 18px;
+  background: var(--fill);
+  box-shadow: 5px 5px 0 var(--ink);
+  transform: rotate(-1.5deg);
+  transition: background-color 120ms, border-color 120ms;
+}
+
+.stage[data-size='desktop'] .pill { min-height: 68px; padding: 4px 24px; }
+
+.pill[data-empty='true'] { display: none; }
+
+.word {
+  display: flex;
+  gap: 0.02em;
+  color: var(--text);
+  font-family: var(--font-fredoka), var(--font-heebo-hebrew), 'Fredoka', sans-serif;
+  font-weight: 800;
+  font-size: clamp(22px, calc(64px - var(--n) * 4px), 42px);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.stage[data-size='desktop'] .word { font-size: clamp(30px, calc(76px - var(--n) * 4px), 52px); }
+
+.letter {
+  display: inline-block;
+  animation: letterIn 220ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.count {
+  position: absolute;
+  top: -14px;
+  inset-inline-end: -16px;
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--neo-pink);
+  color: #fffef0;
+  font-family: var(--font-fredoka), 'Fredoka', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  transform: rotate(10deg);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.long {
+  position: absolute;
+  top: -18px;
+  inset-inline-start: -12px;
+  padding: 2px 10px;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  background: var(--neo-yellow);
+  color: var(--ink);
+  font-family: var(--font-fredoka), var(--font-heebo-hebrew), 'Fredoka', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  --rot: -5deg;
+  transform: rotate(var(--rot));
+  box-shadow: 2px 2px 0 var(--ink);
+  animation: stickerSlap 260ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.stage[data-phase='pending'] .pill {
+  --edge: var(--neo-pink);
+  animation: bob 480ms ease-in-out infinite alternate;
+}
+
+.stage[data-verdict='good'] .pill { --fill: var(--neo-lime); animation: pillPunch 360ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.stage[data-verdict='good'] .letter { animation: letterHop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both; animation-delay: calc(var(--i) * 40ms); }
+
+.stage[data-verdict='bad'] .pill { --fill: var(--neo-red); --text: #fffef0; animation: pillShake 340ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+.stage[data-verdict='bad'] .word { position: relative; }
+.stage[data-verdict='bad'] .word::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: -4px;
+  top: 50%;
+  height: 4px;
+  width: calc(100% + 8px);
+  border-radius: 4px;
+  background: var(--ink);
+  transform-origin: left center;
+  animation: strike 200ms 60ms ease-out both;
+}
+
+.stage[data-verdict='dupe'] .pill { --fill: var(--neo-yellow); animation: pillShake 300ms ease-in-out both; }
+
+.praise {
+  position: absolute;
+  top: -18px;
+  inset-inline-start: -14px;
+  padding: 2px 10px;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  background: var(--neo-pink);
+  color: #fffef0;
+  font-family: var(--font-fredoka), var(--font-heebo-hebrew), 'Fredoka', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+  --rot: -7deg;
+  transform: rotate(var(--rot));
+  box-shadow: 2px 2px 0 var(--ink);
+  animation: stickerSlap 280ms 40ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.points {
+  position: absolute;
+  top: -24px;
+  inset-inline-end: -34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: var(--neo-yellow);
+  color: var(--ink);
+  font-family: var(--font-fredoka), 'Fredoka', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 4px 4px 0 var(--ink);
+  transform: rotate(6deg);
+  animation: pointsSlam 380ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.heart { width: 18px; height: 18px; fill: var(--neo-red); stroke: var(--ink); stroke-width: 2.5; }
+
+.coins {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-inline-start: 6px;
+  padding-inline-start: 8px;
+  border-inline-start: 3px solid var(--ink);
+  font-size: 18px;
+}
+
+.coin { width: 16px; height: 16px; fill: var(--neo-orange); stroke: var(--ink); stroke-width: 2.5; }
+
+.reason {
+  position: absolute;
+  top: -20px;
+  inset-inline-end: -14px;
+  padding: 3px 10px;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  background: #16213e;
+  color: #fffef0;
+  font-family: var(--font-fredoka), var(--font-heebo-hebrew), 'Fredoka', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  --rot: 3deg;
+  transform: rotate(var(--rot));
+  box-shadow: 2px 2px 0 var(--ink);
+  animation: stickerSlap 260ms 40ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.stage[data-calm='true'] *,
+.stage[data-calm='true'] .pill {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage *, .stage .pill { animation: none !important; transition: none !important; }
+}
+
+@keyframes letterIn {
+  0% { transform: translateY(10px) scale(0.4); }
+  60% { transform: translateY(-4px) scale(1.2); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes letterHop {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-12px) rotate(-6deg); }
+  100% { transform: translateY(0); }
+}
+@keyframes bob {
+  from { transform: rotate(-1.5deg) translateY(0); }
+  to { transform: rotate(-1.5deg) translateY(-3px); }
+}
+@keyframes pillPunch {
+  0% { transform: rotate(-1.5deg) scale(1); }
+  40% { transform: rotate(1deg) scale(1.12); }
+  100% { transform: rotate(-1.5deg) scale(1); }
+}
+@keyframes pillShake {
+  0%, 100% { transform: rotate(-1.5deg) translateX(0); }
+  20% { transform: rotate(-3deg) translateX(-10px); }
+  45% { transform: rotate(0deg) translateX(8px); }
+  70% { transform: rotate(-2deg) translateX(-5px); }
+}
+@keyframes strike {
+  from { transform: translateY(-50%) scaleX(0); }
+  to { transform: translateY(-50%) scaleX(1); }
+}
+@keyframes stickerSlap {
+  0% { transform: scale(1.6) rotate(calc(var(--rot) * 3)); }
+  70% { transform: scale(0.92) rotate(calc(var(--rot) * 0.5)); }
+  100% { transform: scale(1) rotate(var(--rot)); }
+}
+@keyframes pointsSlam {
+  0% { transform: scale(2) rotate(-14deg); }
+  55% { transform: scale(0.88) rotate(9deg); }
+  100% { transform: scale(1) rotate(6deg); }
+}

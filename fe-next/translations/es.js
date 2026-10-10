@@ -9627,6 +9627,14 @@ const es = {
       "clueUnlocked": "¡{name} desbloqueada! (-{cost} monedas)",
       "longWordBonus": "🔥 +{bonus} bonus por palabra larga",
       "scoreBreakdownTooltip": "Toca para detalles",
+      "stage": {
+        "prompt": "Desliza por las letras y forma una palabra",
+        "praiseShort": "¡Bien!",
+        "praiseMid": "¡Genial!",
+        "praiseLong": "¡Qué palabra!",
+        "boardLabel": "Tablero de letras",
+        "longWord": "Palabra larga +{bonus}"
+      },
       "score": {
         "tier": {
           "bronze": "Bronce",

@@ -9677,6 +9677,14 @@ const he = {
       "clueUnlocked": "{name} נפתח! (-{cost} מטבעות)",
       "longWordBonus": "🔥 +{bonus} בונוס מילה ארוכה!",
       "scoreBreakdownTooltip": "לחצו לפרטים",
+      "stage": {
+        "prompt": "החליקו על האותיות ויצרו מילה",
+        "praiseShort": "יפה!",
+        "praiseMid": "אחלה!",
+        "praiseLong": "מילה ענקית!",
+        "boardLabel": "לוח אותיות",
+        "longWord": "מילה ארוכה +{bonus}"
+      },
       "score": {
         "tier": {
           "bronze": "ארד",

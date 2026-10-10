@@ -89,6 +89,7 @@ vi.mock('@/hooks/useContextualGuidance', () => ({
 vi.mock('@/hooks/useKeyboardWordInput', () => ({
   useKeyboardWordInput: () => ({
     highlightedCells: [],
+    typedWord: '',
   }),
 }));
 

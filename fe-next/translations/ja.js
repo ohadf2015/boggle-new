@@ -9752,6 +9752,14 @@ const ja = {
       "clueUnlocked": "{name}解放！（-{cost}コイン）",
       "longWordBonus": "🔥 +{bonus} 長い単語ボーナス！",
       "scoreBreakdownTooltip": "詳細はタップ",
+      "stage": {
+        "prompt": "文字をなぞって単語を作ろう",
+        "praiseShort": "いいね！",
+        "praiseMid": "うまい！",
+        "praiseLong": "超ロング！",
+        "boardLabel": "文字ボード",
+        "longWord": "ロング +{bonus}"
+      },
       "score": {
         "tier": {
           "bronze": "ブロンズ",

@@ -4,8 +4,7 @@ import { useCallback, useRef, useEffect } from 'react';
 import type { LetterGrid, Language } from '@/types';
 import { getLetterFeedback, isTargetWordFound, type LetterFeedback } from '@/utils/wordHuntFeedback';
 import { calculateLifeReward, calculateTokenReward } from '@/utils/aiHintGenerator';
-import type { FeedbackType } from '../WordFeedbackToast';
-import type { WordDiscovery, TargetAttempt } from './types';
+import type { FeedbackType, WordDiscovery, TargetAttempt } from './types';
 import type { SurvivalAction } from './survivalGameReducer';
 import {
   MAX_ATTEMPTS,
