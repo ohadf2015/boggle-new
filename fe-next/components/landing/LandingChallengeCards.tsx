@@ -43,7 +43,7 @@ interface LandingChallengeCardsProps {
   cardOrder?: LandingGameMode[];
   /** `'hub'` renders for the mobile Home Hub: a richer daily hero + a visible
       "Game Modes" header with a live-online pill. Defaults to the desktop bento. */
-  layout?: 'bento' | 'hub';
+  layout?: 'bento' | 'hub' | 'screen';
 }
 
 /**
@@ -320,6 +320,23 @@ export function LandingChallengeCards({
   // Both mobile Home Hub and desktop bento use the richer HomeDailyHero banner
   // (it widens to fill the slot at md+). Same `useDailyChallengeStats` feed.
   const dailyNode = <HomeDailyHero preloadedStats={dailyChallengeStats} />;
+
+  // One-screen home: the live arena + four modes in the grid, the rest one tap away.
+  const SCREEN_GRID_MODES = 4;
+  if (layout === 'screen') {
+    return (
+      <LandingModeCubes
+        models={[...leadModels, ...parkedModels.slice(0, SCREEN_GRID_MODES)]}
+        extras={parkedModels.slice(SCREEN_GRID_MODES)}
+        calmModels={[]}
+        dailyNode={dailyNode}
+        sectionLabel={t('landing.home.gameModes')}
+        t={t}
+        layout="screen"
+        liveCount={activePlayers}
+      />
+    );
+  }
 
   return (
     <LandingModeCubes

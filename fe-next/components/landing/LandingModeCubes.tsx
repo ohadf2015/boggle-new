@@ -112,6 +112,8 @@ interface CubeProps {
       ~350ms after click so players get confirmed visual feedback even when
       navigation starts immediately (CSS :active disappears on mouseup). */
   pressHighlight?: boolean;
+  /** one-screen home: shorter tiles so the arena + four modes fit beside the daily hero */
+  screen?: boolean;
 }
 
 function StartHerePill({ label, compact }: { label: string; compact?: boolean }) {
@@ -135,7 +137,7 @@ const WIDE_ORPHAN: Record<'sm' | 'md', string> = {
   md: 'col-span-2 aspect-[5/2] md:col-span-1 md:aspect-square',
 };
 
-function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast', wideOrphan = false, pressHighlight = false }: CubeProps) {
+function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast', wideOrphan = false, pressHighlight = false, screen = false }: CubeProps) {
   const { dir } = useLanguage();
   const Arrow = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const v = VARIANT[model.variant];
@@ -210,10 +212,14 @@ function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast', w
         // exp-homepage-click-feedback-v1: brightness drop persists 350ms post-click
         // so players see confirmed feedback even when navigation starts immediately.
         pressHighlight && pressed && 'brightness-[0.72]',
-        anchor
+        anchor && screen
+          ? 'col-span-2 h-24 sm:h-28 md:row-span-2 md:h-auto'
+          : anchor
           ? bigAnchor
             ? 'col-span-2 md:row-span-2 aspect-[16/9] sm:aspect-[2/1] md:aspect-square'
             : 'col-span-2 aspect-[16/9] sm:aspect-[5/2]' // wide banner: too few siblings for a 2×2
+          : screen
+          ? 'h-[6.25rem] md:h-auto md:aspect-square'
           : wideOrphan
           ? WIDE_ORPHAN[wideOrphan] // lone trailing cube → full-width banner, not a half-width orphan
           : 'aspect-square',
@@ -329,7 +335,7 @@ function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast', w
       ) : (
         <div className={cn('relative z-[1] flex h-full flex-col p-2.5', hasArt ? 'justify-end' : 'items-center justify-center gap-2 text-center')}>
           {!hasArt && (
-            <span className={cn('flex h-11 w-11 items-center justify-center rounded-neo border-2 border-black shadow-hard-sm', v.chip, v.chipInk)}>
+            <span className={cn('flex items-center justify-center rounded-neo border-2 border-black shadow-hard-sm', screen ? 'h-9 w-9' : 'h-11 w-11', v.chip, v.chipInk)}>
               <model.Icon className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
             </span>
           )}
@@ -370,7 +376,7 @@ export interface LandingModeCubesProps {
   /** `'hub'` (mobile Home Hub) shows a VISIBLE section header + live-online pill
       above the grid; `'bento'` (default, desktop landing) keeps the header as an
       invisible aria-label only. */
-  layout?: 'bento' | 'hub';
+  layout?: 'bento' | 'hub' | 'screen';
   /** live player count — drives the hub header's "{n} online" pill */
   liveCount?: number;
 }
@@ -394,6 +400,7 @@ export function LandingModeCubes({
   useEffect(() => { trackClickFbExposure(); }, [trackClickFbExposure]);
   const pressHighlight = clickFbVariant === 'click-feedback';
 
+  const screen = layout === 'screen';
   const anchor = models.find((m) => m.role === 'anchor') ?? models[0];
   const rest = models.filter((m) => m !== anchor);
   const hasExtras = extras.length > 0;
@@ -406,15 +413,20 @@ export function LandingModeCubes({
   return (
     // `.cube-deck` sets the shared `perspective` so every child `.cube-tilt`
     // (cubes + daily banner) tilts with real 3D depth on hover.
-    <div className="cube-deck mx-auto w-full max-w-5xl space-y-5 md:space-y-6 xl:max-w-6xl">
+    <div
+      className={cn(
+        'cube-deck mx-auto w-full max-w-5xl xl:max-w-6xl',
+        screen ? 'space-y-3 md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:items-center md:gap-x-8 md:space-y-0' : 'space-y-5 md:space-y-6',
+      )}
+    >
       {dailyNode && (
         // Centred + width-capped so the daily reads as a tidy banner (content + mascot
         // sit close) instead of a full-width strip with a dead navy gap in the middle.
-        <div className="cube-tilt mx-auto w-full max-w-3xl rounded-neo">{dailyNode}</div>
+        <div className={cn('cube-tilt mx-auto w-full max-w-3xl rounded-neo', screen && 'md:row-span-2 md:max-w-none')}>{dailyNode}</div>
       )}
 
       <section aria-label={sectionLabel}>
-        {layout === 'hub' && (
+        {layout !== 'bento' && (
           <div className="mb-3 flex items-center justify-between gap-2 px-0.5">
             <h3 className="whitespace-nowrap font-neo-display text-lg font-black uppercase tracking-wide text-neo-cream">
               {sectionLabel}
@@ -431,7 +443,7 @@ export function LandingModeCubes({
           </div>
         )}
         <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-          {anchor && <Cube model={anchor} index={0} anchor bigAnchor={bigAnchor} pressHighlight={pressHighlight} />}
+          {anchor && <Cube model={anchor} index={0} anchor bigAnchor={bigAnchor} pressHighlight={pressHighlight} screen={screen} />}
           {rest.map((m, i) => (
             // Odd rest ⇒ the last cube would sit alone at 50% on the 2-col mobile
             // grid; span it full-width (reverts to a square once the bento goes
@@ -442,6 +454,7 @@ export function LandingModeCubes({
               index={i + 1}
               wideOrphan={rest.length % 2 === 1 && i === rest.length - 1 ? 'md' : false}
               pressHighlight={pressHighlight}
+              screen={screen}
             />
           ))}
         </div>
@@ -526,9 +539,15 @@ export function LandingModeCubes({
               <ChevronDown className="h-5 w-5 text-neo-white" strokeWidth={2.5} />
             </span>
           </summary>
-          <div className="grid auto-rows-fr grid-cols-2 gap-3 px-4 pb-4 pt-2 sm:gap-4 md:grid-cols-4">
+          <div
+            className={cn(
+              'auto-rows-fr grid-cols-2 gap-3 px-4 pb-4 pt-2 sm:gap-4 md:grid-cols-4',
+              // Collapsed = not laid out at all: a closed <details> still reserves its body height.
+              screen ? 'hidden group-open:grid' : 'grid',
+            )}
+          >
             {extras.map((m, i) => (
-              <Cube key={m.key} model={m} index={i} pressHighlight={pressHighlight} />
+              <Cube key={m.key} model={m} index={i} pressHighlight={pressHighlight} screen={screen} />
             ))}
           </div>
         </details>

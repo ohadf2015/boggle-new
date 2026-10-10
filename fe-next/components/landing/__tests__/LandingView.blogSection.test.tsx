@@ -112,14 +112,8 @@ vi.mock('next/image', () => ({
   default: ({ alt, ...rest }: { alt: string }) => <img alt={alt} {...rest} />,
 }));
 vi.mock('@/components/Header', () => ({ default: () => <header /> }));
-vi.mock('../LandingHero', () => ({ LandingHero: () => <div /> }));
 vi.mock('../LandingChallengeCards', () => ({ LandingChallengeCards: () => <div /> }));
-vi.mock('../LandingLeaderboardPreview', () => ({ LandingLeaderboardPreview: () => <div /> }));
-vi.mock('../LandingSocialProofBar', () => ({ LandingSocialProofBar: () => <div /> }));
-vi.mock('../LandingAvatarTeaser', () => ({ LandingAvatarTeaser: () => <div /> }));
 vi.mock('../LandingSEOSection', () => ({ LandingSEOSection: () => <div /> }));
-vi.mock('../LandingBottomCTA', () => ({ LandingBottomCTA: () => <div /> }));
-vi.mock('../LandingYourRank', () => ({ LandingYourRank: () => <div /> }));
 vi.mock('@/components/ads', () => ({ AdPlaceholder: () => <div />, InlineBannerAd: () => <div /> }));
 vi.mock('@/components/events/EventBanner', () => ({ default: () => <div /> }));
 vi.mock('@/components/auth/AuthModal', () => ({ default: () => <div /> }));

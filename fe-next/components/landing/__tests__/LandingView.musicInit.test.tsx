@@ -74,9 +74,7 @@ vi.mock('next/link', () => ({
   default: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
 }));
 vi.mock('@/components/Header', () => ({ default: () => <header /> }));
-vi.mock('../LandingHero', () => ({ LandingHero: () => <div /> }));
 vi.mock('../LandingChallengeCards', () => ({ LandingChallengeCards: () => <div /> }));
-vi.mock('../LandingLeaderboardPreview', () => ({ LandingLeaderboardPreview: () => <div /> }));
 vi.mock('../LandingSEOSection', () => ({ LandingSEOSection: () => <div />, ScrollIndicator: () => <div /> }));
 vi.mock('@/components/ads', () => ({ AdPlaceholder: () => <div />, InlineBannerAd: () => <div /> }));
 
