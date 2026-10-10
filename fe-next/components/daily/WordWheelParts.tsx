@@ -169,11 +169,9 @@ export interface WordTileProps {
   index: number;
   onRemove: (index: number) => void;
   isCenter: boolean;
-  /** Vanish without the fly-out when something else animates the word away. */
-  instantExit?: boolean;
 }
 
-export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isCenter, instantExit = false }) => {
+export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isCenter }) => {
   const { t } = useLanguage();
   return (
   <m.button
@@ -191,7 +189,7 @@ export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isC
     onClick={() => onRemove(index)}
     initial={{ scale: 0, y: 20 }}
     animate={{ scale: 1, y: 0 }}
-    exit={instantExit ? { opacity: 0, transition: { duration: 0 } } : { scale: 0, y: -35, opacity: 0 }}
+    exit={{ scale: 0, y: -35, opacity: 0 }}
     transition={{
       scale: { type: 'spring', stiffness: 600, damping: 20 },
       y: { type: 'spring', stiffness: 600, damping: 20 },

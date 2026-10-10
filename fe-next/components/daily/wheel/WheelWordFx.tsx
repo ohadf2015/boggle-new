@@ -13,7 +13,34 @@ interface DiscFxProps {
   reducedMotion: boolean;
 }
 
-/** Shockwave, letter bursts, praise stamp and the rising score, all on the disc. */
+const SPARK_COLORS = ['bg-neo-lime', 'bg-neo-cyan', 'bg-neo-pink', 'bg-neo-yellow', 'bg-neo-white'];
+
+const Sparks: React.FC<{ count: number; reach: number }> = ({ count, reach }) => (
+  <>
+    {Array.from({ length: count }, (_, k) => {
+      const a = ((k * 360) / count + (k % 2 ? 9 : -9)) * (Math.PI / 180);
+      const d = reach * (k % 3 === 0 ? 1 : k % 3 === 1 ? 0.82 : 0.66);
+      return (
+        <m.span
+          key={k}
+          data-testid="wheel-spark"
+          className={cn('absolute w-[3.2%] h-[3.2%] -ml-[1.6%] -mt-[1.6%] border-[0.4cqw] border-neo-black', SPARK_COLORS[k % SPARK_COLORS.length], k % 2 ? 'rounded-full' : 'rounded-[0.6cqw]')}
+          initial={{ left: '50%', top: '50%', scale: 0.4, rotate: 0, opacity: 1 }}
+          animate={{
+            left: ['50%', `${50 + Math.sin(a) * d}%`, `${50 + Math.sin(a) * d * 1.08}%`],
+            top: ['50%', `${50 - Math.cos(a) * d}%`, `${50 - Math.cos(a) * d * 1.08 + 6}%`],
+            scale: [0.4, 1.25, 0.5],
+            rotate: [0, 140, 260],
+            opacity: [1, 1, 0],
+          }}
+          transition={{ duration: 0.95, times: [0, 0.4, 1], ease: 'easeOut', delay: 0.02 }}
+        />
+      );
+    })}
+  </>
+);
+
+/** Shockwave, letter bursts, sparks, the praise or coverage stamp and the rising score, all on the disc. */
 export const DiscFx: React.FC<DiscFxProps> = ({ fx, outerCount, t, reducedMotion }) => {
   if (!fx) return null;
   const good = fx.kind === 'good';
@@ -26,7 +53,6 @@ export const DiscFx: React.FC<DiscFxProps> = ({ fx, outerCount, t, reducedMotion
             initial={{ scale: good ? 0.5 : 1, opacity: 1 }}
             animate={{ scale: good ? 1.22 : 1.06, opacity: 0 }}
             transition={{ duration: good ? 0.6 : 0.5, ease: 'easeOut' }}
-            style={{ boxShadow: good ? '0 0 24px rgba(191,255,0,0.7)' : '0 0 24px rgba(255,51,102,0.7)' }}
           />
           {good && (
             <m.div
@@ -56,6 +82,36 @@ export const DiscFx: React.FC<DiscFxProps> = ({ fx, outerCount, t, reducedMotion
           />
         );
       })}
+      {good && !reducedMotion && <Sparks count={fx.coverage === 'none' ? 12 : 20} reach={fx.coverage === 'none' ? 40 : 52} />}
+      {good && fx.coverage !== 'none' && (
+        <div className="absolute inset-x-0 top-[6%] flex justify-center" style={{ zIndex: 7 }}>
+          <m.div
+            data-testid="wheel-celebration"
+            data-tier={fx.coverage}
+            className={cn(
+              'flex flex-col items-center px-[4cqw] py-[1.6cqw] rounded-[2.4cqw] border-[0.9cqw] border-neo-black shadow-[5px_6px_0_#000] whitespace-nowrap',
+              fx.coverage === 'all' ? 'bg-neo-pink text-neo-white' : 'bg-neo-yellow text-neo-black',
+            )}
+            initial={{ scale: 2.2, opacity: 0, rotate: -12 }}
+            animate={reducedMotion
+              ? { scale: 1, opacity: [1, 1, 0], rotate: -5 }
+              : {
+                  scale: [2.2, 0.86, 1.07, 1, 1, 0.9],
+                  opacity: [0, 1, 1, 1, 1, 0],
+                  rotate: [-12, -3, -6, -5, -5, -5],
+                  y: [0, 0, 0, 0, 0, -14],
+                }}
+            transition={{ duration: 1.25, times: [0, 0.1, 0.16, 0.22, 0.82, 1], ease: 'easeOut' }}
+          >
+            <span className="font-neo-display font-black uppercase leading-none text-[8.5cqw]">
+              {t(fx.coverage === 'all' ? 'wordWheel.allLettersUsed' : 'wordWheel.almostAllLetters')}
+            </span>
+            <span className="font-neo-display font-black uppercase leading-none text-[4.4cqw] tracking-[0.2em] opacity-80 mt-[0.6cqw]">
+              {fx.letters.join('')}
+            </span>
+          </m.div>
+        </div>
+      )}
       {good && fx.praise && (
         <div className="absolute inset-x-0 top-[1%] flex justify-center">
           <m.span
@@ -64,7 +120,7 @@ export const DiscFx: React.FC<DiscFxProps> = ({ fx, outerCount, t, reducedMotion
             style={{
               WebkitTextStroke: '0.9cqw #0b1530',
               paintOrder: 'stroke fill',
-              textShadow: '0.9cqw 1cqw 0 #0b1530, 0 0 18px rgba(191,255,0,0.55)',
+              textShadow: '0.9cqw 1cqw 0 #0b1530',
             }}
             initial={{ scale: 2.4, opacity: 0, rotate: -14 }}
             animate={reducedMotion
@@ -125,7 +181,7 @@ export const LaunchFx: React.FC<LaunchFxProps> = ({ fx, reducedMotion }) => {
                 ? isHub ? 'bg-neo-lime text-neo-black' : 'bg-neo-white text-neo-navy'
                 : 'bg-neo-red text-neo-white',
             )}
-            style={{ left: r.x, top: r.y, width: r.w, height: r.h, boxShadow: good ? '3px 3px 0 #000, 0 0 16px rgba(191,255,0,0.6)' : '3px 3px 0 #000' }}
+            style={{ left: r.x, top: r.y, width: r.w, height: r.h, boxShadow: good ? '3px 3px 0 #000, 0 0 0 3px rgba(191,255,0,0.45)' : '3px 3px 0 #000' }}
             initial={{ x: 0, y: 0, scale: 1, opacity: 1, rotate: 0 }}
             animate={reducedMotion
               ? { opacity: [1, 0] }

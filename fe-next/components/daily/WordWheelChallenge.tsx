@@ -36,6 +36,7 @@ import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge
 import type { Language } from '@/types';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fastValidateWord } from '@/hooks/fastValidateWord';
+import { prewarmDictionary } from '@/hooks/useDictionaryCache';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
@@ -196,6 +197,11 @@ const WordWheelChallenge: React.FC = () => {
     setIsInGame(phase === 'playing');
     return () => setIsInGame(false);
   }, [phase, setIsInGame]);
+
+  // /daily is a heavy path, so the site prewarmer skips it; without this every word waits on /api/validate-word.
+  useEffect(() => {
+    if (phase === 'playing') void prewarmDictionary(language as Language);
+  }, [phase, language]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const sizeObserverRef = useRef<ResizeObserver | null>(null);

@@ -10,8 +10,6 @@ import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
 import { wheelWordDir } from '@/lib/wheelRush/wordDirection';
 import type { Language } from '@/types';
-import { WheelRushCelebration, type WheelCelebration } from '@/components/multiplayer/WheelRushCelebration';
-import { fireConfetti } from '@/utils/confettiUtils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { WordTile } from './WordWheelParts';
@@ -122,6 +120,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const [isValidating, setIsValidating] = useState(false);
   const outerLetters = puzzle.outerLetters;
   const { fx, fire: fireFx } = useWheelWordFx();
+  // Bumped when a word launches off the tray, so its tiles vanish instead of playing their exit under the launch copies.
+  const [trayGen, setTrayGen] = useState(0);
   const scoreRef = useRef<HTMLSpanElement>(null);
   const [combo, setCombo] = useState(0);
   const comboTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -130,8 +130,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // "You used the whole wheel" banner — fires when an accepted word covers all
   // (or all-but-one) distinct wheel letters. Single keyed state so a second
   // pangram replaces (re-animates) rather than stacks.
-  const [celebration, setCelebration] = useState<WheelCelebration | null>(null);
-  const celebrationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // exp-wordwheel-drag-hint-v1: the drag arm surfaces the "swipe to spell"
   // coachmark after a short idle (the wheel rage-click root cause). Reuses the
@@ -339,25 +337,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     if (autoResetTimerRef.current) { clearTimeout(autoResetTimerRef.current); autoResetTimerRef.current = null; }
   }, []);
 
-  // Show the wheel-coverage banner and auto-clear it. 'all' rides the dormant
-  // Pixi `pangram` mega-burst (fired via onEffect in handleSubmit); 'almost' has
-  // no canvas show, so it gets a light DOM confetti pop instead. fireConfetti
-  // self-gates on reduced-motion / cosy-calm / low-end devices.
-  const triggerFeatBanner = useCallback((tier: 'all' | 'almost', word: string) => {
-    setCelebration({ tier, word, key: Date.now() });
-    if (tier === 'almost') {
-      fireConfetti({ particleCount: 36, spread: 80, startVelocity: 50, origin: { y: 0.5 } });
-    }
-    if (celebrationTimerRef.current) clearTimeout(celebrationTimerRef.current);
-    celebrationTimerRef.current = setTimeout(() => {
-      celebrationTimerRef.current = null;
-      setCelebration(null);
-    }, 1900);
-  }, []);
-  useEffect(() => () => {
-    if (celebrationTimerRef.current) { clearTimeout(celebrationTimerRef.current); celebrationTimerRef.current = null; }
-  }, []);
-
   const builtWord = useMemo(
     () => builtLetters.map(bl => bl.letter).join(''),
     [builtLetters],
@@ -448,6 +427,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           points: 0,
           launch: lastSubmitWasDragRef.current ? tileLaunch() : null,
         });
+        if (lastSubmitWasDragRef.current) setTrayGen(g => g + 1);
       }
       setWordBuilderShake(true);
       haptic([30, 50, 30]);
@@ -651,6 +631,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         // every accepted word, competitive or practice.
         onWordFound?.(word, nextWordsFound);
         setScore(prev => prev + points);
+        const wheelLetters = puzzle.allLetters ?? [puzzle.centerLetter, ...puzzle.outerLetters];
+        const coverage = classifyLetterCoverage(word, wheelLetters);
         const spelled = builtLettersRef.current;
         fireFx({
           kind: 'good',
@@ -658,7 +640,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           letters: spelled.map(bl => bl.letter),
           points,
           launch: tileLaunch(),
+          coverage,
         });
+        setTrayGen(g => g + 1);
         setBuiltLetters([]);
         setLastFoundWord(word);
         setTimeout(() => setLastFoundWord(null), 2000);
@@ -673,8 +657,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         // Wheel-coverage feat: 'all' = used every distinct wheel letter (a true
         // wheel pangram — the old `length >= 9` check was dead code since a
         // 7-letter wheel caps words at 7 chars); 'almost' = all-but-one.
-        const wheelLetters = puzzle.allLetters ?? [puzzle.centerLetter, ...puzzle.outerLetters];
-        const coverage = classifyLetterCoverage(word, wheelLetters);
         const isAllLetters = coverage === 'all';
 
         // Sound + haptic feedback
@@ -704,10 +686,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           onEffect({ type: 'combo', x: cx, y: 160, combo: newCombo });
         }
 
-        // Headline banner for full / near-full wheel coverage.
-        if (coverage !== 'none') {
-          triggerFeatBanner(coverage, word);
-        }
       } else {
         showFeedback(t('wordWheel.notInDictionary'), 'error');
         onEffect({ type: 'error', x: cx, y: 80 });
@@ -715,7 +693,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     } finally {
       setIsValidating(false);
     }
-  }, [builtWord, isValidating, puzzle, wordsFound, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, triggerFeatBanner, onWordFound, fireFx, tileLaunch]);
+  }, [builtWord, isValidating, puzzle, wordsFound, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, onWordFound, fireFx, tileLaunch]);
 
   // Keep submit ref fresh so double-tap handler (created earlier) can reach the latest closure.
   useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);
@@ -743,8 +721,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // Wheel cluster JSX (header/timer + wheel + word-builder + action-bar)
   const wheelCluster = (
     <>
-      {/* Full / near-full wheel-coverage banner (pointer-events disabled). */}
-      <WheelRushCelebration celebration={celebration} t={t} prefersReduced={prefersReducedMotion} />
 
       {/* Practice-mode coach — auto-hides on first found word. */}
       {practice && !hideModeCoach && (
@@ -918,7 +894,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         animate={
           wordBuilderShake
             ? { x: [-4, 4, -3, 3, -1, 0] }
-            : { scale: 1 + builtLetters.length * 0.008 }
+            : { scale: isValidating ? 1.12 : 1 + builtLetters.length * 0.008 }
         }
         transition={wordBuilderShake
           ? { duration: 0.35 }
@@ -934,11 +910,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             builtLetters.length === 0
               ? 'border-transparent'
               : builtWord.length >= 3
-                ? 'border-neo-black bg-neo-lime/20 shadow-[4px_4px_0_#000,0_0_22px_rgba(191,255,0,0.4)]'
+                ? 'border-neo-black bg-neo-lime/20 shadow-[4px_4px_0_#000,0_0_0_5px_rgba(191,255,0,0.25)]'
                 : 'border-neo-black bg-neo-navy-light shadow-[4px_4px_0_#000]',
           )}
         >
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence key={trayGen} mode="popLayout">
             {builtLetters.length === 0 ? (fx ? null : (
               <m.span
                 key="placeholder"
@@ -957,7 +933,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
                   index={i}
                   onRemove={handleRemoveLetter}
                   isCenter={bl.wheelIndex === -1}
-                  instantExit
                 />
               ))
             )}
@@ -1032,6 +1007,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         holdActiveIndex={holdActiveIndex}
         tileSkin={equippedTileSkin}
         fx={fx}
+        checking={isValidating}
         t={t}
         reducedMotion={prefersReducedMotion}
       >

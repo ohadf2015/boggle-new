@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { praiseTier, type Praise } from '@/lib/wordWheel/discGeometry';
+import type { LetterCoverage } from '@/lib/wheelRush/letterCoverage';
 
 export interface FxRect { x: number; y: number; w: number; h: number }
 
@@ -11,13 +12,15 @@ export interface WheelWordFxEvent {
   letters: string[];
   points: number;
   praise: Praise | null;
+  /** Whole-wheel words get the coverage banner instead of a praise stamp. */
+  coverage: LetterCoverage;
   /** Built-word tiles (relative to the game container) and the score they fly to. */
   launch: { from: FxRect[]; to: { x: number; y: number } } | null;
 }
 
 export const FX_MS = { good: 1300, bad: 850 } as const;
 
-type FireInput = Omit<WheelWordFxEvent, 'id' | 'praise'>;
+type FireInput = Omit<WheelWordFxEvent, 'id' | 'praise' | 'coverage'> & { coverage?: LetterCoverage };
 
 /** The last word's reaction, kept apart from the built word so the wheel can clear at once. */
 export function useWheelWordFx() {
@@ -31,8 +34,9 @@ export function useWheelWordFx() {
 
   const fire = useCallback((input: FireInput) => {
     const id = ++seqRef.current;
-    const praise = input.kind === 'good' ? praiseTier(input.letters.length) : null;
-    setFx({ ...input, id, praise });
+    const coverage = input.kind === 'good' ? input.coverage ?? 'none' : 'none';
+    const praise = input.kind === 'good' && coverage === 'none' ? praiseTier(input.letters.length) : null;
+    setFx({ ...input, id, praise, coverage });
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
       timerRef.current = null;

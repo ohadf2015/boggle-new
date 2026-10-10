@@ -45,9 +45,9 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
         'border-[3px] border-neo-black font-neo-display font-black uppercase leading-none select-none touch-manipulation cursor-pointer',
         isHub ? 'text-[13cqw]' : 'text-[10cqw]',
         isUsed
-          ? 'bg-neo-lime text-neo-black shadow-[inset_0_-4px_0_rgba(0,0,0,0.18),4px_5px_0_#000,0_0_22px_rgba(191,255,0,0.7)]'
+          ? 'bg-neo-lime text-neo-black shadow-[inset_0_-4px_0_rgba(0,0,0,0.18),4px_5px_0_#000,0_0_0_5px_rgba(191,255,0,0.3)]'
           : isHub
-            ? 'bg-[#0b1530] text-neo-lime shadow-[inset_0_0_0_0.9cqw_#bfff00,4px_5px_0_#000,0_0_24px_rgba(191,255,0,0.4)]'
+            ? 'bg-[#0b1530] text-neo-lime shadow-[inset_0_0_0_0.9cqw_#bfff00,4px_5px_0_#000,0_0_0_6px_rgba(191,255,0,0.16)]'
             : 'bg-neo-cream text-neo-black shadow-[inset_0_-4px_0_rgba(0,0,0,0.14),3px_4px_0_#000] hover:bg-neo-white',
       )}
       style={{
@@ -56,7 +56,6 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
         left: `${at.x - size / 2}%`,
         top: `${at.y - size / 2}%`,
         zIndex: isHub ? 3 : 2,
-        ...(isHub && !isUsed ? { textShadow: '0 0 10px rgba(191,255,0,0.75)' } : null),
       }}
       initial={false}
       animate={{ scale: isUsed ? 1.12 : 1 }}

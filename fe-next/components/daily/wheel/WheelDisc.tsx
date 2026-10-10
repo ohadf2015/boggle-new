@@ -26,6 +26,8 @@ interface WheelDiscProps {
   holdActiveIndex: number | null;
   tileSkin?: string | null;
   fx: WheelWordFxEvent | null;
+  /** The word is out for a verdict. */
+  checking?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
   reducedMotion: boolean;
   children?: ReactNode;
@@ -35,7 +37,7 @@ interface WheelDiscProps {
 const WheelDisc: React.FC<WheelDiscProps> = ({
   orbitRef, centerLetter, outerLetters, builtIndices, pointerPosRef, draggingRef,
   onPointerDown, onPointerMove, onPointerUp, onPress, onHoldStart, onHoldEnd, holdActiveIndex,
-  tileSkin, fx, t, reducedMotion, children,
+  tileSkin, fx, checking = false, t, reducedMotion, children,
 }) => {
   const used = new Set(builtIndices);
   const ready = builtIndices.length >= 3;
@@ -80,7 +82,7 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
         style={{
           background: 'radial-gradient(circle at 50% 34%, #2c3366 0%, #1d2346 46%, #121733 100%)',
           boxShadow: ready
-            ? 'inset 0 4px 0 rgba(255,255,255,0.08), inset 0 -10px 0 rgba(0,0,0,0.35), 7px 8px 0 #000, 0 0 46px rgba(191,255,0,0.32)'
+            ? 'inset 0 4px 0 rgba(255,255,255,0.08), inset 0 -10px 0 rgba(0,0,0,0.35), 7px 8px 0 #000, 0 0 0 6px rgba(191,255,0,0.22)'
             : 'inset 0 4px 0 rgba(255,255,255,0.08), inset 0 -10px 0 rgba(0,0,0,0.35), 7px 8px 0 #000',
         }}
         initial={{ scale: 1, x: 0 }}
@@ -105,6 +107,7 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
         pointerPosRef={pointerPosRef}
         draggingRef={draggingRef}
         fx={fx}
+        checking={checking}
         reducedMotion={reducedMotion}
       />
       <WheelDiscLetter

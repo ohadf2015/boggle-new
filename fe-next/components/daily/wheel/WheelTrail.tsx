@@ -16,6 +16,7 @@ interface WheelTrailProps {
   pointerPosRef: MutableRefObject<{ x: number; y: number } | null>;
   draggingRef: MutableRefObject<boolean>;
   fx: WheelWordFxEvent | null;
+  checking?: boolean;
   reducedMotion: boolean;
 }
 
@@ -23,7 +24,7 @@ const toPoints = (pts: DiscPoint[]) => pts.map((p) => `${p.x},${p.y}`).join(' ')
 
 /** Ink-edged lime line through the chosen letters, with a live tail to the finger. */
 const WheelTrail: React.FC<WheelTrailProps> = ({
-  indices, outerCount, discRef, pointerPosRef, draggingRef, fx, reducedMotion,
+  indices, outerCount, discRef, pointerPosRef, draggingRef, fx, checking = false, reducedMotion,
 }) => {
   const tailInkRef = useRef<SVGLineElement>(null);
   const tailRef = useRef<SVGLineElement>(null);
@@ -85,7 +86,6 @@ const WheelTrail: React.FC<WheelTrailProps> = ({
             initial={{ strokeWidth: 3 }}
             animate={{ strokeWidth: fx.kind === 'bad' ? 3 : [3, 4.2, 0.6] }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            style={{ filter: `drop-shadow(0 0 1.6px ${fx.kind === 'bad' ? RED : LIME})` }}
           />
         </m.g>
       )}
@@ -93,15 +93,15 @@ const WheelTrail: React.FC<WheelTrailProps> = ({
         <g data-testid="wheel-trail-live">
           {pts.length > 1 && (
             <>
+              <polyline points={toPoints(pts)} fill="none" stroke={LIME} strokeOpacity={0.22} strokeWidth={8.5} strokeLinecap="round" strokeLinejoin="round" />
               <polyline points={toPoints(pts)} fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
               <polyline
                 points={toPoints(pts)}
                 fill="none"
-                stroke={LIME}
-                strokeWidth={2.8}
+                stroke={checking ? '#ffffff' : LIME}
+                strokeWidth={checking ? 3.4 : 2.8}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                style={{ filter: 'drop-shadow(0 0 1.4px rgba(191,255,0,0.9))' }}
               />
             </>
           )}
