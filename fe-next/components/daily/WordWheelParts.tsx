@@ -201,6 +201,7 @@ export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isC
     {letter}
     <span
       aria-hidden
+      data-remove-badge
       className="pointer-events-none absolute -top-1.5 -inset-e-1.5 w-4 h-4 rounded-full border-2 border-neo-black bg-neo-red text-neo-white text-[9px] leading-none flex items-center justify-center font-black shadow-hard-xs"
     >
       ×

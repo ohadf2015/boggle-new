@@ -20,11 +20,19 @@ export interface WheelWordFxEvent {
 
 export const FX_MS = { good: 1300, bad: 850 } as const;
 
+/** The spelled word, held up the moment the finger lifts, before its verdict is in. */
+export interface WheelReleaseEvent {
+  id: number;
+  indices: number[];
+  letters: string[];
+}
+
 type FireInput = Omit<WheelWordFxEvent, 'id' | 'praise' | 'coverage'> & { coverage?: LetterCoverage };
 
 /** The last word's reaction, kept apart from the built word so the wheel can clear at once. */
 export function useWheelWordFx() {
   const [fx, setFx] = useState<WheelWordFxEvent | null>(null);
+  const [release, setRelease] = useState<WheelReleaseEvent | null>(null);
   const seqRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -36,6 +44,7 @@ export function useWheelWordFx() {
     const id = ++seqRef.current;
     const coverage = input.kind === 'good' ? input.coverage ?? 'none' : 'none';
     const praise = input.kind === 'good' && coverage === 'none' ? praiseTier(input.letters.length) : null;
+    setRelease(null);
     setFx({ ...input, id, praise, coverage });
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
@@ -44,7 +53,12 @@ export function useWheelWordFx() {
     }, FX_MS[input.kind]);
   }, []);
 
-  return { fx, fire };
+  const hold = useCallback((input: Omit<WheelReleaseEvent, 'id'>) => {
+    setRelease({ ...input, id: ++seqRef.current });
+  }, []);
+  const drop = useCallback(() => setRelease(null), []);
+
+  return { fx, fire, release, hold, drop };
 }
 
 /** Rects of `els` relative to `container`, for overlays that must start where the tiles are. */

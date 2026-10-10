@@ -5,8 +5,10 @@ import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import WheelDiscLetter from './WheelDiscLetter';
 import WheelTrail from './WheelTrail';
-import { DiscFx } from './WheelWordFx';
-import type { WheelWordFxEvent } from './useWheelWordFx';
+import { DiscFx, LetterBursts } from './WheelWordFx';
+import type { WheelReleaseEvent, WheelWordFxEvent } from './useWheelWordFx';
+import { DISC, letterPoint } from '@/lib/wordWheel/discGeometry';
+import '@/styles/word-wheel-motion.css';
 
 type Press = (letter: string, index: number, el: HTMLButtonElement) => void;
 
@@ -26,6 +28,7 @@ interface WheelDiscProps {
   holdActiveIndex: number | null;
   tileSkin?: string | null;
   fx: WheelWordFxEvent | null;
+  release?: WheelReleaseEvent | null;
   /** The word is out for a verdict. */
   checking?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -37,7 +40,7 @@ interface WheelDiscProps {
 const WheelDisc: React.FC<WheelDiscProps> = ({
   orbitRef, centerLetter, outerLetters, builtIndices, pointerPosRef, draggingRef,
   onPointerDown, onPointerMove, onPointerUp, onPress, onHoldStart, onHoldEnd, holdActiveIndex,
-  tileSkin, fx, checking = false, t, reducedMotion, children,
+  tileSkin, fx, release = null, checking = false, t, reducedMotion, children,
 }) => {
   const used = new Set(builtIndices);
   const ready = builtIndices.length >= 3;
@@ -51,8 +54,9 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
     <div
       ref={orbitRef}
       data-testid="wheel-orbit"
+      data-release={release ? 'true' : 'false'}
       // Each cap is wrapped in min(100cqb, …): the box is shrink-0 in the flex-1 cluster, so these caps alone keep it inside (see wordWheelOrbitClamp.contract).
-      className="relative aspect-square [container-type:size] w-[21rem] h-[21rem] sm:w-[24rem] sm:h-[24rem] lg:w-[31rem] lg:h-[31rem] max-w-[min(100cqb,100cqi,max(176px,calc(100cqb-176px)))] max-h-[min(100cqb,100cqi,max(176px,calc(100cqb-176px)))] short:max-w-[min(100cqb,100cqi,max(132px,min(calc(100cqb-124px),46svh)))] short:max-h-[min(100cqb,100cqi,max(132px,min(calc(100cqb-124px),46svh)))] shrink-0 touch-none select-none"
+      className="ww-orbit relative aspect-square [container-type:size] w-[21rem] h-[21rem] sm:w-[24rem] sm:h-[24rem] lg:w-[31rem] lg:h-[31rem] max-w-[min(100cqb,100cqi,max(176px,calc(100cqb-176px)))] max-h-[min(100cqb,100cqi,max(176px,calc(100cqb-176px)))] short:max-w-[min(100cqb,100cqi,max(132px,min(calc(100cqb-124px),46svh)))] short:max-h-[min(100cqb,100cqi,max(132px,min(calc(100cqb-124px),46svh)))] shrink-0 touch-none select-none"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
@@ -100,43 +104,67 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
           </svg>
         </div>
       </m.div>
-      <WheelTrail
-        indices={builtIndices}
-        outerCount={outerLetters.length}
-        discRef={orbitRef}
-        pointerPosRef={pointerPosRef}
-        draggingRef={draggingRef}
-        fx={fx}
-        checking={checking}
-        reducedMotion={reducedMotion}
-      />
-      <WheelDiscLetter
-        letter={centerLetter}
-        index={-1}
-        isUsed={used.has(-1)}
-        onPress={onPress}
-        onHoldStart={onHoldStart}
-        onHoldEnd={onHoldEnd}
-        showHoldRing={holdActiveIndex === -1}
-        tileSkin={tileSkin}
-        reducedMotion={reducedMotion}
-      />
-      {outerLetters.map((letter, i) => (
-        <WheelDiscLetter
-          key={`${letter}-${i}`}
-          letter={letter}
-          index={i}
+      <div
+        data-testid="wheel-spin"
+        data-spin={fx?.kind === 'good' && !reducedMotion ? 'true' : 'false'}
+        data-spin-phase={fx ? fx.id % 2 : 0}
+        className="ww-spin absolute inset-0"
+        style={{ zIndex: 2 }}
+      >
+        <WheelTrail
+          indices={builtIndices}
           outerCount={outerLetters.length}
-          isUsed={used.has(i)}
+          discRef={orbitRef}
+          pointerPosRef={pointerPosRef}
+          draggingRef={draggingRef}
+          fx={fx}
+          checking={checking}
+          reducedMotion={reducedMotion}
+        />
+        <WheelDiscLetter
+          letter={centerLetter}
+          index={-1}
+          isUsed={used.has(-1)}
           onPress={onPress}
           onHoldStart={onHoldStart}
           onHoldEnd={onHoldEnd}
-          showHoldRing={holdActiveIndex === i}
+          showHoldRing={holdActiveIndex === -1}
           tileSkin={tileSkin}
           reducedMotion={reducedMotion}
         />
-      ))}
-      <DiscFx fx={fx} outerCount={outerLetters.length} t={t} reducedMotion={reducedMotion} />
+        {outerLetters.map((letter, i) => (
+          <WheelDiscLetter
+            key={`${letter}-${i}`}
+            letter={letter}
+            index={i}
+            outerCount={outerLetters.length}
+            isUsed={used.has(i)}
+            onPress={onPress}
+            onHoldStart={onHoldStart}
+            onHoldEnd={onHoldEnd}
+            showHoldRing={holdActiveIndex === i}
+            tileSkin={tileSkin}
+            reducedMotion={reducedMotion}
+          />
+        ))}
+        <LetterBursts fx={fx} outerCount={outerLetters.length} />
+        {release && (
+          <div key={release.id} data-testid="wheel-release" data-word={release.letters.join('').toUpperCase()} aria-hidden className="absolute inset-0 pointer-events-none" style={{ zIndex: 4 }}>
+            {release.indices.map((idx) => {
+              const p = letterPoint(idx, outerLetters.length);
+              const size = idx === -1 ? DISC.center : DISC.outer;
+              return (
+                <span
+                  key={idx}
+                  className="ww-release-ring absolute rounded-full border-[1.3cqw] border-neo-lime"
+                  style={{ width: `${size}%`, height: `${size}%`, left: `${p.x - size / 2}%`, top: `${p.y - size / 2}%` }}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <DiscFx fx={fx} t={t} reducedMotion={reducedMotion} />
       {children}
     </div>
   );

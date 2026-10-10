@@ -74,10 +74,12 @@ vi.mock('../TabbedDailyLeaderboard', () => ({ __esModule: true, default: () => <
 import WordWheelChallenge from '../WordWheelChallenge';
 
 describe('WordWheelChallenge — dictionary warm-up', () => {
-  it('given the ready screen, when nothing is played yet, then the dictionary is not fetched', async () => {
+  beforeEach(() => prewarmSpy.mockClear());
+
+  it('given the ready screen, when it settles, then the dictionary warms before the first word', async () => {
     render(<WordWheelChallenge />);
     await waitFor(() => screen.getByText('Play'));
-    expect(prewarmSpy).not.toHaveBeenCalled();
+    await waitFor(() => expect(prewarmSpy).toHaveBeenCalledWith('en'), { timeout: 4000 });
   });
 
   it('given the player starts, then the wheel language dictionary is warmed so words verify without a round trip', async () => {

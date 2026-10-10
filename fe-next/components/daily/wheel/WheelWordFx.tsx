@@ -8,7 +8,6 @@ import type { WheelWordFxEvent } from './useWheelWordFx';
 
 interface DiscFxProps {
   fx: WheelWordFxEvent | null;
-  outerCount: number;
   t: (key: string, params?: Record<string, string | number>) => string;
   reducedMotion: boolean;
 }
@@ -40,8 +39,36 @@ const Sparks: React.FC<{ count: number; reach: number }> = ({ count, reach }) =>
   </>
 );
 
-/** Shockwave, letter bursts, sparks, the praise or coverage stamp and the rising score, all on the disc. */
-export const DiscFx: React.FC<DiscFxProps> = ({ fx, outerCount, t, reducedMotion }) => {
+/** Each spelled letter bursts where it sits; rendered inside the ring so it travels with a spin. */
+export const LetterBursts: React.FC<{ fx: WheelWordFxEvent | null; outerCount: number }> = ({ fx, outerCount }) => {
+  if (!fx) return null;
+  const good = fx.kind === 'good';
+  return (
+    <div key={fx.id} aria-hidden className="absolute inset-0 pointer-events-none" style={{ zIndex: 4 }}>
+      {fx.indices.map((idx, order) => {
+        const p = letterPoint(idx, outerCount);
+        const size = idx === -1 ? DISC.center : DISC.outer;
+        return (
+          <m.span
+            key={`${fx.id}-${idx}`}
+            data-testid="wheel-letter-burst"
+            className={cn(
+              'absolute rounded-full border-[0.8cqw]',
+              good ? 'bg-neo-lime/70 border-neo-white' : 'bg-neo-red/60 border-neo-red',
+            )}
+            style={{ width: `${size}%`, height: `${size}%`, left: `${p.x - size / 2}%`, top: `${p.y - size / 2}%` }}
+            initial={{ scale: 1, opacity: 0.95 }}
+            animate={{ scale: good ? 2 : 1.45, opacity: 0 }}
+            transition={{ duration: good ? 0.5 : 0.4, delay: order * 0.035, ease: 'easeOut' }}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+/** Shockwave, sparks, the praise or coverage stamp and the rising score, all on the disc. */
+export const DiscFx: React.FC<DiscFxProps> = ({ fx, t, reducedMotion }) => {
   if (!fx) return null;
   const good = fx.kind === 'good';
   return (
@@ -64,24 +91,6 @@ export const DiscFx: React.FC<DiscFxProps> = ({ fx, outerCount, t, reducedMotion
           )}
         </>
       )}
-      {fx.indices.map((idx, order) => {
-        const p = letterPoint(idx, outerCount);
-        const size = idx === -1 ? DISC.center : DISC.outer;
-        return (
-          <m.span
-            key={`${fx.id}-${idx}`}
-            data-testid="wheel-letter-burst"
-            className={cn(
-              'absolute rounded-full border-[0.8cqw]',
-              good ? 'bg-neo-lime/70 border-neo-white' : 'bg-neo-red/60 border-neo-red',
-            )}
-            style={{ width: `${size}%`, height: `${size}%`, left: `${p.x - size / 2}%`, top: `${p.y - size / 2}%` }}
-            initial={{ scale: 1, opacity: 0.95 }}
-            animate={{ scale: good ? 2 : 1.45, opacity: 0 }}
-            transition={{ duration: good ? 0.5 : 0.4, delay: order * 0.035, ease: 'easeOut' }}
-          />
-        );
-      })}
       {good && !reducedMotion && <Sparks count={fx.coverage === 'none' ? 12 : 20} reach={fx.coverage === 'none' ? 40 : 52} />}
       {good && fx.coverage !== 'none' && (
         <div className="absolute inset-x-0 top-[6%] flex justify-center" style={{ zIndex: 7 }}>
@@ -92,11 +101,11 @@ export const DiscFx: React.FC<DiscFxProps> = ({ fx, outerCount, t, reducedMotion
               'flex flex-col items-center px-[4cqw] py-[1.6cqw] rounded-[2.4cqw] border-[0.9cqw] border-neo-black shadow-[5px_6px_0_#000] whitespace-nowrap',
               fx.coverage === 'all' ? 'bg-neo-pink text-neo-white' : 'bg-neo-yellow text-neo-black',
             )}
-            initial={{ scale: 2.2, opacity: 0, rotate: -12 }}
+            initial={{ scale: 1.45, opacity: 0, rotate: -12 }}
             animate={reducedMotion
               ? { scale: 1, opacity: [1, 1, 0], rotate: -5 }
               : {
-                  scale: [2.2, 0.86, 1.07, 1, 1, 0.9],
+                  scale: [1.45, 0.88, 1.06, 1, 1, 0.9],
                   opacity: [0, 1, 1, 1, 1, 0],
                   rotate: [-12, -3, -6, -5, -5, -5],
                   y: [0, 0, 0, 0, 0, -14],
@@ -122,11 +131,11 @@ export const DiscFx: React.FC<DiscFxProps> = ({ fx, outerCount, t, reducedMotion
               paintOrder: 'stroke fill',
               textShadow: '0.9cqw 1cqw 0 #0b1530',
             }}
-            initial={{ scale: 2.4, opacity: 0, rotate: -14 }}
+            initial={{ scale: 1.5, opacity: 0, rotate: -14 }}
             animate={reducedMotion
               ? { scale: 1, opacity: [1, 1, 0], rotate: -6 }
               : {
-                  scale: [2.4, 0.88, 1.08, 1, 1, 0.92],
+                  scale: [1.5, 0.88, 1.08, 1, 1, 0.92],
                   opacity: [0, 1, 1, 1, 1, 0],
                   rotate: [-14, -4, -7, -6, -6, -6],
                   y: [0, 0, 0, 0, 0, -16],

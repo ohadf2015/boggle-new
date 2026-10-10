@@ -198,9 +198,20 @@ const WordWheelChallenge: React.FC = () => {
     return () => setIsInGame(false);
   }, [phase, setIsInGame]);
 
-  // /daily is a heavy path, so the site prewarmer skips it; without this every word waits on /api/validate-word.
+  // The site prewarmer skips /daily; a dictionary still loading when the first word lands stalls its release.
   useEffect(() => {
-    if (phase === 'playing') void prewarmDictionary(language as Language);
+    if (phase === 'playing') {
+      void prewarmDictionary(language as Language);
+      return;
+    }
+    if (phase !== 'ready') return;
+    const warm = () => void prewarmDictionary(language as Language);
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(warm, { timeout: 800 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(warm, 300);
+    return () => clearTimeout(timer);
   }, [phase, language]);
 
   const containerRef = useRef<HTMLDivElement>(null);
