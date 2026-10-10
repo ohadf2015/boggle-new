@@ -32,6 +32,7 @@
 - [ ] Is the reset behind a mode `if`? Every mode that reuses the object must hit a reset — prefer ONE shared `resetXForNewRound()` called unconditionally over per-mode branches.
 - [ ] New mode added? Grep every `resetScoresForNewRound` / `resetBotsForNewRound` sibling and confirm the new mode routes through all of them.
 - [ ] Case/format mismatch on lookups: `findAllWords` returns lowercase — compare `word.toLowerCase()`, never `.toUpperCase()` against a lowercase set.
+- [ ] **Per-request state outliving the request (SSR):** client providers/hooks also run during SSR. Any timer they create (TanStack `gcTime`, `setInterval`, debounce) captures that request's AsyncLocalStorage store, and Error stacks chain those stores together → linear heap leak at 0 games (2026-10-10, `QueryProvider` gcTime 5min, ~85KB/render). Guard with `typeof window === 'undefined'`. See `ssr-heap-leak-tanstack-gctime-timers-2026-10-10`.
 
 ---
 
