@@ -13,6 +13,15 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import { readAssignmentMode, sessionCompletesAssignment } from './wordcraftAssignment';
+import { uniqueWordCount } from './wordGoalAssignment';
+import { captureAssignmentCompletedServer } from './assignmentEvents';
+
+export interface SatisfiedAssignmentLookup {
+  lessonId: string;
+  sessionMode: string | null | undefined;
+  wordsAttempted?: Record<string, { attempts?: number; correct?: number }> | null;
+  extraWords?: readonly string[];
+}
 
 /**
  * The assignment (newest first) that a finished session of this lesson
@@ -21,28 +30,56 @@ import { readAssignmentMode, sessionCompletesAssignment } from './wordcraftAssig
  */
 export async function findSatisfiedAssignment(
   client: SupabaseClient,
-  args: { lessonId: string; sessionMode: string | null | undefined },
+  args: SatisfiedAssignmentLookup,
 ): Promise<string | null> {
   const { data: assignments, error } = await client
     .from('lesson_assignments')
-    .select('id, practice_focus')
+    .select('id, practice_focus, word_count_target, classroom_id')
     .eq('lesson_id', args.lessonId)
     .order('created_at', { ascending: false });
   if (error) {
     logger.error('findSatisfiedAssignment: assignment lookup failed', error);
     return null;
   }
-  const match = (assignments ?? []).find((a: { id: string; practice_focus: string | null }) => {
+  const found = uniqueWordCount(args.wordsAttempted, args.extraWords);
+  const match = (assignments ?? []).find((a: {
+    id: string;
+    practice_focus: string | null;
+    word_count_target?: number | null;
+  }) => {
+    const target = a.word_count_target;
+    if (typeof target === 'number' && target > 0) {
+      return found >= target;
+    }
     const mode = readAssignmentMode(a);
     return mode !== null && sessionCompletesAssignment(mode, { mode: args.sessionMode });
   });
   return match?.id ?? null;
 }
 
+export async function classroomIdForAssignment(
+  client: SupabaseClient,
+  assignmentId: string,
+): Promise<string | null> {
+  const { data, error } = await client
+    .from('lesson_assignments')
+    .select('classroom_id')
+    .eq('id', assignmentId)
+    .maybeSingle();
+  if (error) return null;
+  return (data as { classroom_id?: string } | null)?.classroom_id ?? null;
+}
+
 /** Stamp the student's progress row with the assignment; true on success. */
 export async function stampAssignmentCompletion(
   client: SupabaseClient,
-  args: { studentId: string; lessonId: string; assignmentId: string; now?: string },
+  args: {
+    studentId: string;
+    lessonId: string;
+    assignmentId: string;
+    now?: string;
+    classroomId?: string | null;
+  },
 ): Promise<boolean> {
   const { error } = await client.from('student_lesson_progress').upsert(
     {
@@ -57,5 +94,10 @@ export async function stampAssignmentCompletion(
     logger.error('stampAssignmentCompletion: progress upsert failed', error);
     return false;
   }
+  captureAssignmentCompletedServer({
+    classroom_id: args.classroomId ?? null,
+    assignment_id: args.assignmentId,
+    student_id: args.studentId,
+  });
   return true;
 }

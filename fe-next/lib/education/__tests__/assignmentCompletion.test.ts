@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { findSatisfiedAssignment, stampAssignmentCompletion } from '../assignmentCompletion';
 
-function fakeClient(assignments: Array<{ id: string; practice_focus: string | null }>, upsertError: unknown = null) {
+function fakeClient(assignments: Array<{ id: string; practice_focus: string | null; word_count_target?: number | null }>, upsertError: unknown = null) {
   const upsert = vi.fn().mockResolvedValue({ error: upsertError });
   const order = vi.fn().mockResolvedValue({ data: assignments, error: null });
   const eq = vi.fn(() => ({ order }));
@@ -36,6 +36,24 @@ describe('findSatisfiedAssignment', () => {
   it('Given a student-picks assignment, When any session finishes, Then it counts', async () => {
     const { client } = fakeClient([{ id: 'A2', practice_focus: 'any' }]);
     expect(await findSatisfiedAssignment(client, { lessonId: 'L', sessionMode: null })).toBe('A2');
+  });
+
+  it('Given a word-count goal, When the student has found enough unique words, Then that assignment is found', async () => {
+    const { client } = fakeClient([{ id: 'A4', practice_focus: null, word_count_target: 3 }]);
+    expect(await findSatisfiedAssignment(client, {
+      lessonId: 'L',
+      sessionMode: 'solo_board',
+      extraWords: ['cat', 'dog', 'fish'],
+    })).toBe('A4');
+  });
+
+  it('Given a word-count goal, When the student is still short, Then it does not count', async () => {
+    const { client } = fakeClient([{ id: 'A4', practice_focus: null, word_count_target: 5 }]);
+    expect(await findSatisfiedAssignment(client, {
+      lessonId: 'L',
+      sessionMode: 'solo_board',
+      extraWords: ['cat'],
+    })).toBeNull();
   });
 
   it('Given the lesson is not assigned to any of my classrooms, Then null', async () => {

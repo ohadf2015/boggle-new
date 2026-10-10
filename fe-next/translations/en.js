@@ -12760,7 +12760,15 @@ const en = {
       "starterColors": "Colors & shapes",
       "starterColorsDesc": "Colors and basic shapes for early learners",
       "starterFood": "Food",
-      "starterFoodDesc": "Everyday food words for a first homework"
+      "starterFoodDesc": "Everyday food words for a first homework",
+      "wordCountGoal": "Word-count goal",
+      "wordCountGoalHint": "Students find this many unique words by the due date.",
+      "wordCountLabel": "How many words?",
+      "wordListGoal": "Word list",
+      "wordListGoalHint": "Paste words, one per line or comma-separated.",
+      "wordListPlaceholder": "cat, dog, fish",
+      "wordGoalMissing": "Add a word goal or a word list and a due date",
+      "findNWords": "Find {{count}} words"
     },
     "completion": {
       "overallProgress": "Overall progress",

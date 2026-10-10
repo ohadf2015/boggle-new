@@ -14731,7 +14731,15 @@ const es = {
       "starterColors": "Colores y formas",
       "starterColorsDesc": "Colores y formas básicas para principiantes",
       "starterFood": "Comida",
-      "starterFoodDesc": "Palabras de comida cotidiana para la primera tarea"
+      "starterFoodDesc": "Palabras de comida cotidiana para la primera tarea",
+      "wordCountGoal": "Meta de palabras",
+      "wordCountGoalHint": "El alumnado encuentra esta cantidad de palabras únicas para la fecha.",
+      "wordCountLabel": "¿Cuántas palabras?",
+      "wordListGoal": "Lista de palabras",
+      "wordListGoalHint": "Pega palabras, una por línea o separadas por comas.",
+      "wordListPlaceholder": "gato, perro, pez",
+      "wordGoalMissing": "Añade una meta o una lista y una fecha",
+      "findNWords": "Encuentra {{count}} palabras"
     },
     "completion": {
       "overallProgress": "Progreso general",

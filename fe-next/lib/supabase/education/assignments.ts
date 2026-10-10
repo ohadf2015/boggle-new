@@ -101,6 +101,7 @@ export async function createAssignment(data: {
   due_date?: string | null;
   title?: string | null;
   instructions?: string | null;
+  word_count_target?: number | null;
   /**
    * Vocabulary skill to drill: definition | synonym | antonym | context |
    * multiple_meaning | roots_affixes. `any`/unset = student picks.
@@ -122,6 +123,7 @@ export async function createAssignment(data: {
         classroom_id: data.classroom_id,
         lesson_id: data.lesson_id,
         due_date: data.due_date || null,
+        ...(typeof data.word_count_target === 'number' ? { word_count_target: data.word_count_target } : {}),
         ...focus,
       })
       .select()

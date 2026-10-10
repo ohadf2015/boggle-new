@@ -405,7 +405,12 @@ export async function PATCH(request: NextRequest) {
       const [{ data: progressData }, foundAssignment] = await Promise.all([
         supabase.from('student_lesson_progress').select('current_streak')
           .eq('student_id', existing.student_id).eq('lesson_id', existing.lesson_id).single(),
-        findSatisfiedAssignment(supabase, { lessonId: existing.lesson_id, sessionMode: existing.mode })
+        findSatisfiedAssignment(supabase, {
+          lessonId: existing.lesson_id,
+          sessionMode: existing.mode,
+          extraWords: Array.isArray(merged.words_found) ? merged.words_found : [],
+          wordsAttempted: (merged.words_attempted as Record<string, { attempts?: number }> | null) ?? null,
+        })
           .catch((err) => { logger.error('Assignment lookup failed:', err); return null; }),
       ]);
       satisfiedAssignmentId = foundAssignment;
