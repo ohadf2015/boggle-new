@@ -15,6 +15,7 @@ import { WheelRushCelebration, type WheelCelebration } from '@/components/multip
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
+import WordWheelReleasePop, { type WheelReleasePopState } from './WordWheelReleasePop';
 import { WheelLetter, WordTile } from './WordWheelParts';
 import { useHoldToSubmit } from '@/hooks/useHoldToSubmit';
 import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
@@ -130,6 +131,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const [isValidating, setIsValidating] = useState(false);
   const [outerLetters, setOuterLetters] = useState(puzzle.outerLetters);
   const [lastWordScore, setLastWordScore] = useState<number | null>(null);
+  const [releasePop, setReleasePop] = useState<WheelReleasePopState | null>(null);
   // Monotonic id for the flying "+score" element's key. Using Date.now() here
   // recomputed the key on every render, remounting the element (and restarting
   // its 1.2s fly animation) whenever anything else re-rendered mid-flight.
@@ -643,6 +645,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         setLastWordScore(points);
         setScoreFlyId(id => id + 1);
         setTimeout(() => setLastWordScore(null), 1200);
+        const popId = Date.now();
+        setReleasePop({ id: popId, word });
+        setTimeout(() => setReleasePop(cur => (cur?.id === popId ? null : cur)), 950);
         showFeedback(`+${points}`, 'success');
         setBuiltLetters([]);
         setLastFoundWord(word);
@@ -1213,16 +1218,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           isDraggingRef={draggingRef}
           invalid={wordBuilderShake}
         />
-        {/* Outer glow ring — breathing loop disabled under reduced-motion */}
-        <m.div
-          className="absolute inset-0 rounded-full border-2 border-neo-lime/20"
-          style={{ boxShadow: '0 0 24px rgba(191,255,0,0.12), inset 0 0 24px rgba(191,255,0,0.06)' }}
-          animate={prefersReducedMotion ? { opacity: 0.85 } : { opacity: [0.6, 1, 0.6] }}
-          transition={prefersReducedMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        {/* Inner decorative ring */}
-        <div className="absolute inset-4 sm:inset-5 rounded-full border border-neo-cyan/10" />
-        <div className="absolute inset-8 sm:inset-10 rounded-full border border-neo-cream/5" />
+        <WordWheelReleasePop pop={releasePop} />
 
         {/* Center letter */}
         <WheelLetter

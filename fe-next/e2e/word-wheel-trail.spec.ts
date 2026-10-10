@@ -1,6 +1,6 @@
 import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
 import zlib from 'node:zlib';
-import { goto, waitForHydration } from './helpers/test-utils';
+import { goto } from './helpers/test-utils';
 
 async function loadDict(request: APIRequestContext): Promise<Set<string>> {
   const res = await request.get('/dicts/en.dict.gz');
@@ -40,8 +40,9 @@ test.describe('Word Wheel trail', () => {
   test('a drag draws a live lime trail through the chosen letters and fills them', async ({ page, request }) => {
     const dict = await loadDict(request);
     await goto(page, '/daily/word-wheel?practice=1', 'en');
-    await waitForHydration(page);
-    await page.getByRole('button', { name: /^play$/i }).first().click();
+    const play = page.getByRole('button', { name: /^play$/i }).first();
+    await expect(play).toBeVisible();
+    await play.click();
     await expect(page.getByTestId('word-wheel-stage')).toBeVisible();
     await expect(page.locator('[data-wheel-letter]').nth(5)).toBeVisible();
 
@@ -69,5 +70,7 @@ test.describe('Word Wheel trail', () => {
 
     await page.mouse.up();
     await expect(page.locator('[data-trail-line]')).toHaveCount(0, { timeout: 5000 });
+    await expect(page.getByTestId('wheel-release-pop')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('wheel-release-pop')).toHaveText((word as string).toUpperCase());
   });
 });
