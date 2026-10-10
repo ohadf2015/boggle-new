@@ -21,8 +21,8 @@ export interface BoardHandCoachProps {
   rows: number;
   cols: number;
   /**
-   * A path the game already knows is a real word (single player supplies one via
-   * useFirstPlayTutorial). Optional — the coach falls back to a fixed gesture.
+   * A path the game already knows is a real word (single player supplies its
+   * lesson hint). Optional — the coach falls back to a fixed gesture.
    */
   path?: CoachCell[] | null;
   enabled?: boolean;

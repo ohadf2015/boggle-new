@@ -19399,6 +19399,17 @@ const ja = {
     "cta": "プレイ開始",
     "ctaWait": "{{seconds}}秒"
   },
+  "lesson": {
+    "try": "試してみて:",
+    "skip": "スキップ",
+    "findAny": "どんな単語でもOK",
+    "findLength": "{count}文字以上の単語を見つけよう",
+    "nice": "いいね！",
+    "great": "すごい！",
+    "wow": "わお！",
+    "amazing": "最高！",
+    "complete": "レッスン完了！",
+  },
   "modeCoach": {
     "skip": "スキップ",
     "next": "次へ",

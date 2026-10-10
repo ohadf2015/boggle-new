@@ -122,7 +122,7 @@ const settings = {
 } as unknown as SinglePlayerGameState;
 
 describe('SinglePlayerGame hideModeCoach', () => {
-  it('mounts ModeCoach in challenge mode by default', () => {
+  it('does not mount the generic ModeCoach for classic; the first-round lesson replaces it', () => {
     render(
       <SinglePlayerGame
         settings={settings}
@@ -131,7 +131,7 @@ describe('SinglePlayerGame hideModeCoach', () => {
         onQuit={vi.fn()}
       />
     );
-    expect(screen.getByTestId('mode-coach')).toHaveAttribute('data-mode', 'classic');
+    expect(screen.queryByTestId('mode-coach')).toBeNull();
   });
 
   it('does not mount ModeCoach when hideModeCoach is true (quick play)', () => {

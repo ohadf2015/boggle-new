@@ -17218,6 +17218,17 @@ const he = {
     "cta": "מתחילים לשחק",
     "ctaWait": "{{seconds}} שנ׳"
   },
+  "lesson": {
+    "try": "נסו:",
+    "skip": "דילוג",
+    "findAny": "מצאו כל מילה",
+    "findLength": "מצאו מילה של {count}+ אותיות",
+    "nice": "יפה!",
+    "great": "מצוין!",
+    "wow": "וואו!",
+    "amazing": "מדהים!",
+    "complete": "השיעור הסתיים!",
+  },
   "modeCoach": {
     "skip": "דלגו",
     "next": "הבא",

@@ -86,6 +86,8 @@ interface GridComponentProps {
    * yields the moment the player touches a tile.
    */
   showHandCoach?: boolean;
+  /** Overrides the traced path, e.g. the lesson hint word. */
+  handCoachPath?: Array<{ row: number; col: number }> | null;
   /** Force a tile skin (e.g. an adventure world's skin) over the player's equipped one. */
   tileSkinOverride?: string;
 }
@@ -130,6 +132,7 @@ const GridComponent = memo<GridComponentProps>(({
   effectsProfile = 'full',
   submitFeedback,
   showHandCoach = false,
+  handCoachPath,
   tileSkinOverride,
 }) => {
   const { t } = useLanguage();
@@ -729,7 +732,7 @@ const GridComponent = memo<GridComponentProps>(({
             gridEl={gridNode}
             rows={grid.length}
             cols={grid[0]?.length ?? 0}
-            path={highlightedPath.length >= 2 ? highlightedPath : null}
+            path={handCoachPath ?? (highlightedPath.length >= 2 ? highlightedPath : null)}
           />
         )}
 

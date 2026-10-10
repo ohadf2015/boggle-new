@@ -27,7 +27,7 @@ import { recordNotInDictionary } from '@/utils/invalidWordTracker';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
-import { useFirstPlayTutorial } from '@/hooks/useFirstPlayTutorial';
+import { pickLessonHint } from '@/lib/tutorial/lesson/lessonEngine';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useTrainingAnalysis } from '@/hooks/useTrainingAnalysis';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
@@ -195,10 +195,10 @@ export function useSinglePlayerCore({
     timerIntervalMs: isLowEnd ? 500 : 250,
   });
   const directionGuidance = useDirectionPatternGuidance();
-  const firstPlayTutorial = useFirstPlayTutorial({
-    grid, availableWords, language: settings.language,
-    isGameActive: !!grid && !held && !isGameOver,
-  });
+  const lessonHint = useMemo(
+    () => pickLessonHint(availableWords, grid, settings.language),
+    [availableWords, grid, settings.language],
+  );
 
   const trainingGridSize = useMemo(() => ({ rows: 4, cols: 4 }), []);
   const handleTrainingAnalysisComplete = useCallback(() => { }, []);
@@ -571,9 +571,9 @@ export function useSinglePlayerCore({
   }, [isGameOver, grid, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo, settings.mode, trainingAnalysisFinishTraining, effects.gameStartTimeRef]);
 
   const handlePathSubmit = useCallback((cells: Array<{ row: number; col: number }>) => {
-    directionGuidance.trackWordPath(cells); firstPlayTutorial.trackUserPath(cells);
+    directionGuidance.trackWordPath(cells);
     trainingAnalysisTrackPath(cells); trainingTrackPath(cells);
-  }, [directionGuidance, firstPlayTutorial, trainingAnalysisTrackPath, trainingTrackPath]);
+  }, [directionGuidance, trainingAnalysisTrackPath, trainingTrackPath]);
 
   const handleWordChange = useCallback((word: string, count: number) => { setFormedWord(word); setLetterCount(count); }, []);
   const handleFinishPractice = useCallback(() => setIsGameOver(true), []);
@@ -641,7 +641,7 @@ export function useSinglePlayerCore({
     timer, combo, comboCoinReward, handleCoinAnimationComplete,
     formedWord, letterCount, currentFeedback,
     keyboardInput: keyboardInputState,
-    tutorialPath: firstPlayTutorial.tutorialPath, tutorialWord: firstPlayTutorial.tutorialWord,
+    lessonHint,
     revealState, revealableWordCount, handleReveal,
     fireRoundActive, fireRoundRemaining, earthquakeState,
     showHintPrompt, setShowHintPrompt,

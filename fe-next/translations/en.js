@@ -15751,6 +15751,17 @@ const en = {
     "cta": "Let's play",
     "ctaWait": "{{seconds}}s"
   },
+  "lesson": {
+    "try": "Try:",
+    "skip": "Skip",
+    "findAny": "Find any word",
+    "findLength": "Find a {count}+ letter word",
+    "nice": "Nice!",
+    "great": "Great!",
+    "wow": "Wow!",
+    "amazing": "Amazing!",
+    "complete": "Lesson complete!",
+  },
   "modeCoach": {
     "skip": "Skip",
     "next": "Next",

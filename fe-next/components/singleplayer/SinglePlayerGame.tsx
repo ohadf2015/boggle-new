@@ -23,7 +23,8 @@ import type { LetterGrid } from '@/shared/types/game';
 import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
 import PracticeContinuePrompt from './PracticeContinuePrompt';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
-import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import { LessonBar } from '@/components/tutorial/lesson/LessonBar';
+import { useLesson } from '@/components/tutorial/lesson/useLesson';
 import { useMPStuckCoach } from '@/hooks/useMPStuckCoach';
 import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
 import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
@@ -258,6 +259,14 @@ function SinglePlayerGame({
     idleThresholdMs: settings.coach ? FIRST_ROUND_IDLE_MS : undefined,
   });
 
+  // The classic first round teaches itself by doing: a hinted word on the real
+  // board, then steps that unlock as the player finds more words.
+  const lesson = useLesson({
+    enabled: settings.mode !== 'practice' && !hideModeCoach && !core.awaitingStart && !core.isGameOver && !core.isPaused,
+    hint: core.lessonHint,
+    words: core.foundWords,
+  });
+
   // Scoring is the signal that the player understands the game; it silences
   // every later stage. Derived from the found-word list so no grid-interaction
   // plumbing is needed.
@@ -334,8 +343,6 @@ function SinglePlayerGame({
       letterCount: core.letterCount,
       currentFeedback: core.currentFeedback,
       keyboardInput: core.keyboardInput,
-      tutorialPath: core.tutorialPath,
-      tutorialWord: core.tutorialWord,
       // "You can trace in ANY direction" is taught on the board itself now
       // (BoardHandCoach) rather than by a modal that froze the clock and
       // disabled its own continue button for ten seconds. Still suppressed in
@@ -386,8 +393,6 @@ function SinglePlayerGame({
     core.letterCount,
     core.currentFeedback,
     core.keyboardInput,
-    core.tutorialPath,
-    core.tutorialWord,
     core.revealState.highlightedPath,
     core.lastWordFoundTimeRef,
     core.fireRoundActive,
@@ -472,10 +477,15 @@ function SinglePlayerGame({
       <PracticeCoachTip mode="classic" wordsFound={core.foundWords.length} />
     ) : null;
 
-  const modeCoachElement =
-    settings.mode !== 'practice' && !hideModeCoach && !core.awaitingStart && !settings.coach ? (
-      <ModeCoach mode="classic" />
-    ) : null;
+  const lessonElement = lesson.active && lesson.hint ? (
+    <LessonBar
+      steps={lesson.steps}
+      completedCount={lesson.completedCount}
+      hintWord={lesson.hint.word}
+      hintPath={lesson.hint.path}
+      onSkip={lesson.skip}
+    />
+  ) : null;
 
   const validCoachWords = core.foundWords.filter((fw) => fw.isValid === true).length;
   const firstRoundCoach = settings.coach ? (
@@ -485,7 +495,7 @@ function SinglePlayerGame({
   // Rendered from ONE place for all three layouts — portrait, landscape and
   // desktop reaching the same overlay separately is how one of them silently
   // loses it (Class 3).
-  const stuckCoachElement = (
+  const stuckCoachElement = lesson.active ? null : (
     <StuckCoachOverlay coach={stuckCoach} grid={core.grid} language={settings.language} />
   );
 
@@ -522,7 +532,6 @@ function SinglePlayerGame({
       {encouragementBanner}
       {scorePopupElement}
       {practicePromptElement}
-      {modeCoachElement}
       {firstRoundCoach}
       {stuckCoachElement}
       {wordGoalBadgeElement}
@@ -557,7 +566,8 @@ function SinglePlayerGame({
         soloMultiplier={core.soloCombo?.multiplier ?? 1}
         soloPraiseKey={core.soloCombo?.praiseKey ?? null}
         soloMissions={core.soloMissions}
-        soloChrome={practiceCoachElement}
+        soloChrome={lessonElement ?? practiceCoachElement}
+        handCoachPath={lesson.active && lesson.hint ? lesson.hint.path : null}
       />
     </div>
   );

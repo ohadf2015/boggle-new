@@ -79,6 +79,8 @@ export interface SoloGameLayoutProps {
   soloMissions?: readonly SoloMission[];
   /** Coins badge / practice training bar — mode-specific extras. */
   soloChrome?: ReactNode;
+  /** Set while a lesson hint is live: the hand traces this real word on the board. */
+  handCoachPath?: Array<{ row: number; col: number }> | null;
   children?: ReactNode;
 }
 
@@ -155,7 +157,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
     foundWords, comboLevel, fireRoundActive, fireRoundRemaining, earthquakeState, currentFeedback,
     highlightedPath, isDesktop, awaitingStart, onStart, onWordSubmit, onWordChange, onPathSubmit,
     onExit, onPauseToggle, gameStatsRef, t, soloStreak = 0, soloMultiplier = 1, soloPraiseKey = null,
-    soloMissions, soloChrome, children,
+    soloMissions, soloChrome, handCoachPath, children,
   } = props;
 
   const hapticsEnabled = useHapticsEnabled();
@@ -316,6 +318,8 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
               language={language}
               effectsProfile="lean"
               submitFeedback={currentFeedback}
+              showHandCoach={!!handCoachPath}
+              handCoachPath={handCoachPath}
             />
           </div>
         </div>

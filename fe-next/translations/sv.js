@@ -1937,6 +1937,17 @@ const sv = {
     "cta": "Nu kör vi",
     "ctaWait": "{{seconds}} s"
   },
+  "lesson": {
+    "try": "Prova:",
+    "skip": "Hoppa över",
+    "findAny": "Hitta vilket ord som helst",
+    "findLength": "Hitta ett ord med {count}+ bokstäver",
+    "nice": "Bra!",
+    "great": "Snyggt!",
+    "wow": "Wow!",
+    "amazing": "Fantastiskt!",
+    "complete": "Lektionen klar!",
+  },
   "modeCoach": {
     "skip": "Hoppa över",
     "next": "Nästa",
