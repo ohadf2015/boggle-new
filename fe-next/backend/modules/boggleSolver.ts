@@ -3,8 +3,8 @@
  * Finds all valid words on a Boggle grid using DFS traversal and dictionary lookup
  *
  * Performance optimizations:
- * - Trie-based prefix pruning for exponentially faster search
- * - Per-language trie caching to avoid rebuilding
+ * - Prefix pruning (binary search over a sorted word array) for exponentially faster search
+ * - Per-language index caching to avoid re-sorting
  * - Grid-based result caching to avoid re-solving same boards
  */
 
@@ -16,10 +16,8 @@ const { normalizeHebrewLetter, normalizeSpanishLetter } = require('./wordValidat
 import logger from '../utils/logger';
 
 // Interfaces
-export interface TrieNode {
-  [key: string]: TrieNode | boolean | undefined;
-  isWord?: boolean;
-}
+/** Sorted word list; shares the dictionary Set's strings, so it costs one pointer per word. */
+export type WordIndex = readonly string[];
 
 export interface GridPosition {
   row: number;
@@ -36,11 +34,11 @@ export interface FindWordsOptions {
   minLength?: number;
   maxLength?: number;
   maxWords?: number;
-  trie?: TrieNode | null;
+  trie?: WordIndex | null;
 }
 
 export interface TrieCacheEntry {
-  trie: TrieNode;
+  trie: WordIndex;
   timestamp: number;
 }
 
@@ -93,8 +91,8 @@ const DIRECTIONS: [number, number][] = [
 ];
 
 // ============================================================================
-// TRIE CACHING FOR CPU OPTIMIZATION
-// Building a trie from ~275k words is expensive (~100ms), so we cache per language
+// WORD INDEX CACHING
+// Sorting a dictionary costs 30-130ms, so we cache per language
 // ============================================================================
 const trieCache = new Map<string, TrieCacheEntry>(); // language -> { trie, timestamp }
 const TRIE_CACHE_TTL = 30 * 60 * 1000; // 30 minutes - dictionaries rarely change
@@ -102,7 +100,7 @@ const TRIE_CACHE_TTL = 30 * 60 * 1000; // 30 minutes - dictionaries rarely chang
 /**
  * Get or build a cached trie for a language
  */
-export function getCachedTrie(rawLanguage: LanguageCode | string): TrieNode | null {
+export function getCachedTrie(rawLanguage: LanguageCode | string): WordIndex | null {
   const language = resolveSolverLanguage(rawLanguage);
   const cached = trieCache.get(language);
   const now = Date.now();
@@ -179,36 +177,27 @@ function cleanupGridCache(): void {
   }
 }
 
-/**
- * Build a trie from a Set of words for efficient prefix lookup
- */
-export function buildTrie(wordSet: Set<string>): TrieNode {
-  const root: TrieNode = {};
-
-  for (const word of wordSet) {
-    let node: TrieNode = root;
-    for (const char of word) {
-      if (!node[char]) {
-        node[char] = {} as TrieNode;
-      }
-      node = node[char] as TrieNode;
-    }
-    node.isWord = true;
-  }
-
-  return root;
+// ponytail: sorted array (~8 B/word) not an object trie (26-125 MB/language; OOM'd prod with all six loaded).
+export function buildTrie(wordSet: Set<string>): WordIndex {
+  return Array.from(wordSet).sort();
 }
 
-/**
- * Check if a prefix exists in the trie
- */
-export function getTrieNode(trie: TrieNode, prefix: string): TrieNode | null {
-  let node: TrieNode = trie;
-  for (const char of prefix) {
-    if (!node[char]) return null;
-    node = node[char] as TrieNode;
+function lowerBound(index: WordIndex, s: string): number {
+  let lo = 0;
+  let hi = index.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (index[mid] < s) lo = mid + 1;
+    else hi = mid;
   }
-  return node;
+  return lo;
+}
+
+/** null when no word starts with prefix; otherwise whether prefix is itself a word. */
+export function getTrieNode(index: WordIndex, prefix: string): { isWord: boolean } | null {
+  const word = index[lowerBound(index, prefix)];
+  if (word === undefined || !word.startsWith(prefix)) return null;
+  return { isWord: word === prefix };
 }
 
 /**
@@ -243,11 +232,13 @@ export function findAllWords(
       return letter;
     })
   );
+  // Empty / multi-letter cells (cleared blast tiles) are not walkable — the old per-char trie never matched them.
+  const walkable = normalizedGrid.map(row => row.map(cell => Array.from(cell).length === 1));
 
   /**
    * DFS to find words starting from a cell
    */
-  function dfs(row: number, col: number, currentWord: string, visited: Set<string>, trieNode: TrieNode | null): void {
+  function dfs(row: number, col: number, currentWord: string, visited: Set<string>, trieNode: { isWord: boolean } | null): void {
     // Stop if we've found enough words
     if (foundWords.size >= maxWords) return;
 
@@ -279,14 +270,14 @@ export function findAllWords(
 
       // Check if already visited in this path
       const key = `${newRow},${newCol}`;
-      if (visited.has(key)) continue;
+      if (visited.has(key) || (trie && !walkable[newRow][newCol])) continue;
 
       const nextChar = normalizedGrid[newRow][newCol];
       const nextWord = currentWord + nextChar;
 
       // If using trie, check if prefix exists (prune early)
       if (trieNode) {
-        const nextNode = trieNode[nextChar] as TrieNode | undefined;
+        const nextNode = getTrieNode(trie!, nextWord);
         if (!nextNode) continue; // No words with this prefix
 
         visited.add(key);
@@ -310,7 +301,7 @@ export function findAllWords(
       const visited = new Set([`${row},${col}`]);
 
       if (trie) {
-        const startNode = trie[startChar] as TrieNode | undefined;
+        const startNode = walkable[row][col] ? getTrieNode(trie, startChar) : null;
         if (startNode) {
           dfs(row, col, startChar, visited, startNode);
         }
@@ -521,9 +512,8 @@ export function clearSolverCaches(): void {
  * Evict solver caches whose TTL has expired.
  *
  * getCachedTrie() only re-checks TRIE_CACHE_TTL when that language is asked
- * for again, so a locale played once holds its trie (~36 MB for English —
- * 607k plain-object nodes) until the process dies. Call this on a timer so
- * idle locales actually give their memory back; they rebuild in ~100 ms.
+ * for again, so a locale played once holds its index until the process dies.
+ * Call this on a timer so idle locales give their memory back.
  */
 export function pruneSolverCaches(): { tries: number; grids: number } {
   const now = Date.now();

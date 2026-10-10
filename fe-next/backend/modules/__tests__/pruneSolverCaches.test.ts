@@ -12,6 +12,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   buildTrie,
+  getTrieNode,
   getCachedTrie,
   clearSolverCaches,
   pruneSolverCaches,
@@ -41,13 +42,12 @@ afterEach(() => {
 });
 
 describe('buildTrie', () => {
-  it('marks terminal nodes as words and shares prefixes', () => {
-    const trie = buildTrie(new Set(['cat', 'car']));
-    const child = (node: unknown, key: string): Record<string, unknown> =>
-      (node as Record<string, Record<string, unknown>>)[key];
+  it('marks whole words and keeps shared prefixes searchable', () => {
+    const index = buildTrie(new Set(['cat', 'car']));
 
-    expect(child(child(child(trie, 'c'), 'a'), 't').isWord).toBe(true);
-    expect(child(child(child(trie, 'c'), 'a'), 'r').isWord).toBe(true);
+    expect(getTrieNode(index, 'cat')?.isWord).toBe(true);
+    expect(getTrieNode(index, 'car')?.isWord).toBe(true);
+    expect(getTrieNode(index, 'ca')?.isWord).toBe(false);
   });
 });
 
