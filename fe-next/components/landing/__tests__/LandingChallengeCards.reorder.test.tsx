@@ -60,8 +60,6 @@ const baseProps = {
 
 describe('LandingChallengeCards reordering', () => {
   it('non-veteran: no practice cube; every other mode visible when 5+ games', () => {
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByTestId('home-daily-hero')).toBeInTheDocument();
     const { container } = render(<LandingChallengeCards {...baseProps} />);
     expect(container.querySelector('[data-cube-key="arena"]')).toBeInTheDocument();
     expect(container.querySelector('[data-cube-key="practice"]')).toBeNull();

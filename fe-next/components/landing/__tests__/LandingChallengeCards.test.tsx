@@ -66,11 +66,6 @@ describe('LandingChallengeCards', () => {
     expect(screen.getByText('landing.brainTraining')).toBeInTheDocument();
   });
 
-  it('renders daily challenge cube', () => {
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByTestId('home-daily-hero')).toBeInTheDocument();
-  });
-
   describe('practice is off the hub for every cohort', () => {
     afterEach(() => mockIsVeteran.mockReturnValue(false));
 
@@ -158,18 +153,18 @@ describe('LandingChallengeCards', () => {
 
     it('brand-new player sees the live race up front and the rest under More', () => {
       const { container } = render(<LandingChallengeCards {...baseProps} />);
-      const more = container.querySelector('[data-testid="landing-cubes-more"]');
+      const more = container.querySelector('[data-testid="home-more-sheet"]');
       expect(more).not.toBeNull();
       expect(more!.contains(container.querySelector('[data-cube-key="arena"]'))).toBe(false);
     });
 
-    it('connections + brainGym stay in the document, parked under More', () => {
+    it('connections + brainGym stay in the document, brain training on the home and connections under More', () => {
       const { container } = render(<LandingChallengeCards {...baseProps} />);
-      const more = container.querySelector('[data-testid="landing-cubes-more"]');
+      const more = container.querySelector('[data-testid="home-more-sheet"]');
       expect(container.textContent).toContain('landing.wordChainMode');
       expect(container.textContent).toContain('landing.brainTraining');
       expect(more!.contains(container.querySelector('[data-cube-key="connections"]'))).toBe(true);
-      expect(more!.contains(container.querySelector('[data-cube-key="brainGym"]'))).toBe(true);
+      expect(more!.contains(container.querySelector('[data-cube-key="brainGym"]'))).toBe(false);
     });
   });
 });

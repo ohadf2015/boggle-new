@@ -88,6 +88,15 @@ describe('HomeDailyHero — CTA hydration gate', () => {
     expect(screen.queryByText('VIEW RESULTS')).not.toBeInTheDocument();
   });
 
+  it('keeps the pending CTA a lit lime action bar, not a dark empty slot', () => {
+    mockStats = baseStats({ loading: true });
+    render(<HomeDailyHero preloadedStats={{ hasPlayed: false, hasSolved: null, currentStreak: 0, loading: true }} />);
+
+    const pending = screen.getByTestId('daily-cta-skeleton');
+    expect(pending.className).toContain('bg-neo-lime');
+    expect(pending.querySelector('svg')).not.toBeNull();
+  });
+
   it('renders VIEW RESULTS once a completed daily resolves', () => {
     mockStats = baseStats({ loading: false, hasPlayed: true, hasSolved: true });
     render(<HomeDailyHero preloadedStats={{ hasPlayed: true, hasSolved: true, currentStreak: 3, loading: false }} />);

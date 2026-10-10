@@ -61,7 +61,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
         'transition-[transform,box-shadow] duration-100 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
         tint.ring,
-        anchor ? 'h-[5.75rem] md:h-full md:min-h-[11rem]' : 'aspect-square',
+        anchor ? 'min-h-[5.75rem] flex-1 md:min-h-0' : 'aspect-square',
         model.highlighted && 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
         locked && 'cursor-not-allowed',
       )}
@@ -73,7 +73,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
           fill
           placeholder="blur"
           blurDataURL={CUBE_BLUR_DATA_URL}
-          sizes={anchor ? '(max-width: 768px) 100vw, 640px' : '(max-width: 768px) 25vw, 180px'}
+          sizes={anchor ? '(max-width: 768px) 100vw, 400px' : '(max-width: 768px) 25vw, 200px'}
           onError={() => setImgFailed(true)}
           className={cn('object-cover', styles.art)}
         />
@@ -104,8 +104,8 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
       {model.resume && !locked && <ModeResumeChip resume={model.resume} anchor={anchor} />}
 
       {anchor ? (
-        <span className="absolute inset-0 z-[2] flex flex-col justify-end p-3 md:p-5">
-          <span className="font-neo-display text-2xl font-black uppercase leading-none tracking-tight text-neo-white drop-shadow-[0_2px_0_rgba(0,0,0,0.7)] md:text-4xl">
+        <span className="absolute inset-0 z-[2] flex flex-col justify-end p-3 md:p-4">
+          <span className="font-neo-display text-2xl font-black uppercase leading-none tracking-tight text-neo-white drop-shadow-[0_2px_0_rgba(0,0,0,0.7)] md:text-2xl">
             {model.title}
           </span>
           {model.livePill && (
@@ -117,7 +117,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
               {model.livePill}
             </span>
           )}
-          <span className="absolute bottom-3 end-3 flex h-9 w-9 items-center justify-center rounded-full border-2 border-black bg-neo-lime text-neo-navy shadow-hard-sm transition-transform group-hover:translate-x-0.5 md:bottom-5 md:end-5 md:h-12 md:w-12">
+          <span className="absolute bottom-3 end-3 flex h-9 w-9 items-center justify-center rounded-full border-2 border-black bg-neo-lime text-neo-navy shadow-hard-sm transition-transform group-hover:translate-x-0.5 md:bottom-3 md:end-3 md:h-10 md:w-10">
             <Arrow className="h-5 w-5 md:h-6 md:w-6" strokeWidth={3} aria-hidden="true" />
           </span>
         </span>
@@ -140,19 +140,19 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
   );
 }
 
-function MoreSheet({ extras, onClose }: { extras: ModeCubeModel[]; onClose: () => void }) {
+function MoreSheet({ extras, open, onClose }: { extras: ModeCubeModel[]; open: boolean; onClose: () => void }) {
   const { t } = useLanguage();
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const d = ref.current;
-    if (!d) return;
-    if (typeof d.showModal === 'function') d.showModal();
-    else d.setAttribute('open', '');
-    return () => {
-      if (d.open && typeof d.close === 'function') d.close();
-    };
-  }, []);
+    if (!d || d.open === open) return;
+    if (open) {
+      if (typeof d.showModal === 'function') d.showModal();
+      else d.setAttribute('open', '');
+    } else if (typeof d.close === 'function') d.close();
+    else d.removeAttribute('open');
+  }, [open]);
 
   return (
     <dialog
@@ -163,6 +163,7 @@ function MoreSheet({ extras, onClose }: { extras: ModeCubeModel[]; onClose: () =
         e.preventDefault();
         onClose();
       }}
+      onClose={onClose}
       onClick={(e) => e.target === e.currentTarget && onClose()}
       className="mb-0 mt-auto w-full max-w-none rounded-t-neo-xl border-[3px] border-b-0 border-black bg-neo-navy p-0 text-neo-cream shadow-hard-lg backdrop:bg-black/70 md:m-auto md:max-w-2xl md:rounded-neo-xl md:border-b-[3px]"
     >
@@ -205,7 +206,7 @@ export function HomeModeGrid({ models, extras, liveCount }: HomeModeGridProps) {
   const tiles = models.filter((m) => m !== anchor);
 
   return (
-    <section aria-labelledby="home-modes-title" className="flex min-h-0 flex-col gap-2.5 md:h-full md:gap-4">
+    <section aria-labelledby="home-modes-title" className="flex min-h-0 flex-1 flex-col gap-2.5 md:flex-none md:gap-3">
       <div className="flex items-center justify-between gap-2 px-0.5">
         <h2 id="home-modes-title" className="font-neo-display text-base font-black uppercase tracking-wide text-neo-cream md:text-xl">
           {t('landing.home.gameModes')}
@@ -221,36 +222,41 @@ export function HomeModeGrid({ models, extras, liveCount }: HomeModeGridProps) {
         )}
       </div>
 
-      {anchor && (
-        <div className="md:min-h-0 md:flex-1">
-          <ModeTile model={anchor} index={0} anchor />
-        </div>
-      )}
+      <div className="flex min-h-0 flex-1 flex-col gap-2.5 md:grid md:flex-none md:grid-cols-[minmax(0,2fr)_repeat(5,minmax(0,1fr))] md:gap-4">
+        {anchor && (
+          <div className="flex min-h-[5.75rem] flex-1 flex-col md:min-h-0">
+            <ModeTile model={anchor} index={0} anchor />
+          </div>
+        )}
 
-      <div className="grid grid-cols-4 gap-2 md:gap-4">
-        {tiles.map((m, i) => (
-          <ModeTile key={m.key} model={m} index={i + 1} />
-        ))}
+        <div className="grid grid-cols-4 gap-2 md:contents">
+          {tiles.map((m, i) => (
+            <ModeTile key={m.key} model={m} index={i + 1} />
+          ))}
+        </div>
+
+        {extras.length > 0 && (
+          <button
+            type="button"
+            data-testid="landing-cubes-more"
+            aria-haspopup="dialog"
+            onClick={() => setMoreOpen(true)}
+            className={cn(
+              'flex h-11 w-full items-center gap-2.5 rounded-neo border-[3px] border-black bg-neo-navy-light px-2.5 text-start font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow] duration-100 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
+              'md:aspect-square md:h-auto md:flex-col md:justify-center md:gap-2 md:px-2 md:text-center',
+            )}
+          >
+            <span className="flex h-7 w-7 items-center justify-center rounded-neo border-2 border-black bg-neo-lime text-neo-navy md:h-12 md:w-12">
+              <Sparkles className="h-4 w-4 md:h-6 md:w-6" strokeWidth={2.5} aria-hidden="true" />
+            </span>
+            <span className="flex-1 truncate md:flex-none md:whitespace-normal md:text-sm md:leading-tight">{t('landing.moreGameModes')}</span>
+            <span className="rounded-full border-2 border-black bg-neo-lime px-2 py-0.5 text-xs leading-none text-neo-navy">+{extras.length}</span>
+            <ChevronDown className="h-5 w-5 md:hidden" strokeWidth={2.5} aria-hidden="true" />
+          </button>
+        )}
       </div>
 
-      {extras.length > 0 && (
-        <button
-          type="button"
-          data-testid="landing-cubes-more"
-          aria-haspopup="dialog"
-          onClick={() => setMoreOpen(true)}
-          className="flex h-11 w-full items-center gap-2.5 rounded-neo border-[3px] border-black bg-neo-navy-light px-2.5 text-start font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow] duration-100 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none md:h-14 md:px-4 md:text-base"
-        >
-          <span className="flex h-7 w-7 items-center justify-center rounded-neo border-2 border-black bg-neo-lime text-neo-navy md:h-9 md:w-9">
-            <Sparkles className="h-4 w-4 md:h-5 md:w-5" strokeWidth={2.5} aria-hidden="true" />
-          </span>
-          <span className="flex-1 truncate">{t('landing.moreGameModes')}</span>
-          <span className="rounded-full border-2 border-black bg-neo-lime px-2 py-0.5 text-xs leading-none text-neo-navy">+{extras.length}</span>
-          <ChevronDown className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
-        </button>
-      )}
-
-      {moreOpen && <MoreSheet extras={extras} onClose={() => setMoreOpen(false)} />}
+      {extras.length > 0 && <MoreSheet extras={extras} open={moreOpen} onClose={() => setMoreOpen(false)} />}
     </section>
   );
 }

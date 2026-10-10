@@ -2,7 +2,6 @@
 
 import { hasCrosswordPuzzles } from '@/lib/crossword/locales';
 import { useState, useEffect } from 'react';
-import { HomeDailyHero } from './home/HomeDailyHero';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
@@ -15,37 +14,17 @@ import { requiresNetworkToPlay } from '@/lib/offline/landingOfflineAwareness';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 import { placeBlastAfterArena } from '@/lib/landing/blastPlacement';
 import { orderModesForNewcomer } from '@/lib/landing/newcomerModeOrder';
-import { LandingModeCubes } from './LandingModeCubes';
 import { HomeModeGrid } from './home/HomeModeGrid';
 import { useAdventureResume } from './useAdventureResume';
 import { MODE_META, modeRoute, isCalmMode, type ModeCubeModel } from '@/lib/landing/modeMeta';
 
-interface DailyChallengePreloadedStats {
-  hasPlayed: boolean;
-  hasSolved: boolean | null;
-  currentStreak: number;
-  puzzleNumber: number;
-  loading: boolean;
-}
-
 interface LandingChallengeCardsProps {
   language: string;
-  /** @deprecated Blast is now public — kept for caller compat, ignored */
-  isAdmin?: boolean;
-  /** @deprecated Blast is now public — kept for caller compat, ignored */
-  hasBlastAccess?: boolean;
   activePlayers: number;
-  openRooms: number;
-  totalPlayers: number;
   playerAllTimeBest: { score: number } | null;
   t: (key: string) => string;
-  dailyChallengeStats: DailyChallengePreloadedStats;
   /** Pre-computed card order from server — static per ISR/deploy */
   cardOrder?: LandingGameMode[];
-  /** `'hub'` renders for the mobile Home Hub: a richer daily hero + a visible
-      "Game Modes" header with a live-online pill. Defaults to the desktop bento.
-      `'screen'` is the one-screen returning home: modes only, the daily is the home's own. */
-  layout?: 'bento' | 'hub' | 'screen';
 }
 
 /**
@@ -86,13 +65,9 @@ const FEATURED_MODES = new Set<LandingCardKey>([
 export function LandingChallengeCards({
   language,
   activePlayers,
-  openRooms,
-  totalPlayers,
   playerAllTimeBest,
   t,
-  dailyChallengeStats,
   cardOrder: cardOrderProp,
-  layout = 'bento',
 }: LandingChallengeCardsProps) {
   // Offline-aware home: when the device is offline, live-multiplayer cards are
   // shown locked so a player on a flight doesn't tap into a dead lobby. Every
@@ -253,7 +228,7 @@ export function LandingChallengeCards({
       if (key === 'adventure' || key === 'wordTowerV2') {
         trackGrowthEvent('featured_mode_card_clicked', {
           mode: key,
-          surface: layout === 'hub' ? 'hub' : 'desktop',
+          surface: 'home',
         });
       }
     };
@@ -317,36 +292,12 @@ export function LandingChallengeCards({
     ...fastModels.filter((m) => m.key !== 'arena'),
     ...calmModels,
   ];
-  if (layout === 'screen') {
-    const SCREEN_TILES = 4;
-    return (
-      <HomeModeGrid
-        models={[...leadModels, ...parkedModels.slice(0, SCREEN_TILES)]}
-        extras={parkedModels.slice(SCREEN_TILES)}
-        liveCount={activePlayers}
-      />
-    );
-  }
-
-  // Daily is the cubes hero — always present (it's the once-a-day hook), not
-  // gated on heroCards like the control arm. It renders above the bento grid.
-  // Both mobile Home Hub and desktop bento use the richer HomeDailyHero banner
-  // (it widens to fill the slot at md+). Same `useDailyChallengeStats` feed.
-  const dailyNode = <HomeDailyHero preloadedStats={dailyChallengeStats} />;
-
+  const SCREEN_TILES = 4;
   return (
-    <LandingModeCubes
-      models={leadModels}
-      extras={parkedModels}
-      calmModels={[]}
-      calmLabel={t('landing.calmSectionTitle')}
-      calmHint={t('landing.calmSectionSubtitle')}
-      dailyNode={dailyNode}
-      sectionLabel={layout === 'hub' ? t('landing.home.gameModes') : t('landing.sectionSoloTitle')}
-      t={t}
-      layout={layout}
+    <HomeModeGrid
+      models={[...leadModels, ...parkedModels.slice(0, SCREEN_TILES)]}
+      extras={parkedModels.slice(SCREEN_TILES)}
       liveCount={activePlayers}
     />
   );
-
 }

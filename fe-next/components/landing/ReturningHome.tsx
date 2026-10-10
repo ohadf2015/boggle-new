@@ -37,7 +37,7 @@ interface ReturningHomeProps {
  */
 export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => {
   const { t, language } = useLanguage();
-  const { isAdmin, profile, user, loading: authLoading } = useAuth();
+  const { profile, user, loading: authLoading } = useAuth();
   // Keep the profile-derived top bar in its skeleton until the profile lands,
   // so the guest "Player" default never snaps to the real name.
   const dashboardProfileLoading = isDashboardProfileLoading(authLoading, user, profile);
@@ -100,7 +100,7 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
         </div>
       )}
 
-      <section className="relative z-20 mx-auto flex w-full max-w-6xl flex-col gap-3 overflow-x-clip px-3 pb-3 pt-2 sm:px-4 md:min-h-[calc(100dvh-8rem)] md:justify-center md:gap-6 md:px-8 md:py-6">
+      <section className="relative z-20 mx-auto flex min-h-[calc(100dvh-var(--header-height-mobile)-var(--bottom-stack-height,0px))] w-full max-w-6xl flex-col gap-3 overflow-x-clip px-3 pb-3 pt-2 sm:px-4 md:min-h-[calc(100dvh-var(--header-height-desktop))] md:justify-center md:gap-5 md:px-8 md:py-5">
         <HomeTopBar
           profile={profile}
           language={language}
@@ -108,22 +108,14 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
           profileLoading={dashboardProfileLoading}
         />
 
-        <div className="grid gap-4 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-8">
-          <HomeDailyHero preloadedStats={dailyChallengeStats} />
-          <LandingChallengeCards
-            layout="screen"
-            language={language}
-            isAdmin={isAdmin}
-            hasBlastAccess={true}
-            activePlayers={liveRoomStats.activePlayers}
-            openRooms={liveRoomStats.openRooms}
-            totalPlayers={liveRoomStats.totalPlayers}
-            playerAllTimeBest={playerAllTimeBest}
-            t={t}
-            dailyChallengeStats={dailyChallengeStats}
-            cardOrder={initialData?.cardOrder}
-          />
-        </div>
+        <HomeDailyHero preloadedStats={dailyChallengeStats} />
+        <LandingChallengeCards
+          language={language}
+          activePlayers={liveRoomStats.activePlayers}
+          playerAllTimeBest={playerAllTimeBest}
+          t={t}
+          cardOrder={initialData?.cardOrder}
+        />
       </section>
     </LaunchProvider>
   );

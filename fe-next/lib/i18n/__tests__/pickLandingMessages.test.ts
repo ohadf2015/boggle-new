@@ -44,3 +44,9 @@ describe('pickLandingMessages', () => {
     expect((picked as { adventure?: unknown }).adventure).toBeUndefined();
   });
 });
+
+describe('landing bundle covers the returning home', () => {
+  it("ships the daily hero's Word Wheel label, so the home never shows the English fallback", () => {
+    expect(LANDING_EXTRA_KEYS).toContain('sitemap.wordWheel');
+  });
+});

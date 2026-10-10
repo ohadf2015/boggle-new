@@ -28,9 +28,8 @@ for (const vp of VIEWPORTS) {
     test('fits one screen with the top bar, daily hero and modes visible', async ({ page }) => {
       test.setTimeout(120_000);
       await goto(page, '/');
-      await page.waitForLoadState('load');
       await expect(page.locator('html')).toHaveAttribute('data-home', 'returning');
-      await expect(page.getByTestId('home-daily-hero').first()).toBeVisible({ timeout: 60_000 });
+      await expect(page.getByTestId('daily-cta')).toBeVisible({ timeout: 60_000 });
       await dismissCookieSheet(page);
 
       const size = await page.evaluate(() => ({
@@ -46,13 +45,33 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByTestId('mode-cube-anchor').first()).toBeVisible();
       await expect(page.getByTestId('landing-cubes-more')).toBeVisible();
     });
+
+    test('the rest of the modes open in a sheet one tap away', async ({ page }) => {
+      test.setTimeout(120_000);
+      await goto(page, '/');
+      await expect(page.getByTestId('daily-cta')).toBeVisible({ timeout: 60_000 });
+      await dismissCookieSheet(page);
+      await page.getByTestId('landing-cubes-more').click();
+      const sheet = page.getByTestId('home-more-sheet');
+      await expect(sheet).toBeVisible();
+      await expect(sheet.locator('[data-cube-key]').first()).toBeVisible();
+    });
+
+    test("tapping today's daily launches into the Word Wheel", async ({ page }) => {
+      test.setTimeout(120_000);
+      await goto(page, '/');
+      await expect(page.getByTestId('daily-cta')).toBeVisible({ timeout: 60_000 });
+      await dismissCookieSheet(page);
+      await page.getByTestId('home-daily-hero').click();
+      await expect(page.getByTestId('home-launch')).toBeVisible();
+      await expect(page).toHaveURL(/\/en\/daily\/word-wheel/, { timeout: 60_000 });
+    });
   });
 }
 
 test('fresh visitors still get the explainer with its SEO copy', async ({ page }) => {
   test.setTimeout(120_000);
   await goto(page, '/');
-  await page.waitForLoadState('load');
   await expect(page.locator('html')).toHaveAttribute('data-home', 'fresh');
   await expect(page.getByRole('link', { name: /^play now$/i }).first()).toBeVisible({ timeout: 60_000 });
 

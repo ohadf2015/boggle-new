@@ -6,7 +6,7 @@
 import { render, screen } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { Map, BookOpen } from 'lucide-react';
-import { LandingModeCubes } from '../LandingModeCubes';
+import { HomeModeGrid } from '../home/HomeModeGrid';
 import type { ModeCubeModel } from '@/lib/landing/modeMeta';
 import type { AdventureResume } from '@/lib/landing/adventureResume';
 
@@ -24,7 +24,7 @@ const adventure = (over: Partial<ModeCubeModel> = {}) =>
 const renderCubes = (models: ModeCubeModel[]) =>
   render(
     <LanguageProvider>
-      <LandingModeCubes t={(k: string) => k} dailyNode={<div />} models={models} extras={[]} sectionLabel="Game modes" />
+      <HomeModeGrid models={models} extras={[]} liveCount={0} />
     </LanguageProvider>,
   );
 

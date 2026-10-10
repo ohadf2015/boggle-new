@@ -45,7 +45,7 @@ vi.mock('@/utils/dailyChallenge/storage', () => ({ getLastSevenDaysCompletion: (
 vi.mock('@/utils/growthTracking', () => ({ trackLandingCtaClick: vi.fn() }));
 
 import { HomeDailyHero } from '../home/HomeDailyHero';
-import { LandingModeCubes } from '../LandingModeCubes';
+import { HomeModeGrid } from '../home/HomeModeGrid';
 
 describe('returning-tree images never preload for fresh visitors', () => {
   beforeEach(() => {
@@ -63,9 +63,7 @@ describe('returning-tree images never preload for fresh visitors', () => {
   it('shouldNotPrioritiseTheAnchorModeCube', () => {
     // GIVEN the returning tree's mode cubes with an art-backed anchor
     render(
-      <LandingModeCubes
-        t={(k: string) => k}
-        dailyNode={<div />}
+      <HomeModeGrid
         models={[
           {
             key: 'arena',
@@ -89,7 +87,7 @@ describe('returning-tree images never preload for fresh visitors', () => {
           },
         ]}
         extras={[]}
-        sectionLabel="Game modes"
+        liveCount={0}
       />,
     );
     // THEN the anchor art renders but is not a priority preload

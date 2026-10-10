@@ -20,7 +20,7 @@ export function DailyWheel({ className }: { className?: string }) {
   return (
     <div data-testid="daily-wheel" aria-hidden="true" className={cn('relative aspect-square [container-type:inline-size]', className)}>
       <span className={cn('absolute inset-[11%] rounded-full', styles.rim)} />
-      <span className="absolute inset-[24%] rounded-full border-[3px] border-black bg-neo-yellow/90 shadow-hard">
+      <span className="absolute inset-[24%] overflow-hidden rounded-full border-[3px] border-black bg-neo-yellow/90 shadow-hard">
         <span className={cn('absolute inset-0 block', styles.core)}>
           <Image
             src={DAILY_ART}

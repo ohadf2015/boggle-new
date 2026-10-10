@@ -111,3 +111,57 @@
     transform: translateX(480%) skewX(-18deg);
   }
 }
+
+/* Hero layout: wheel beside the copy, the bar underneath on phones; on desktop
+   a wide banner with the wheel spanning both rows and the bar under the copy. */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 49%) minmax(0, 1fr);
+  grid-template-areas:
+    'wheel text'
+    'cta cta';
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+.heroWheel {
+  grid-area: wheel;
+  width: 100%;
+  max-width: 250px;
+}
+
+.heroText {
+  grid-area: text;
+}
+
+.heroCta {
+  grid-area: cta;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'wheel text'
+      'wheel cta';
+    column-gap: 3rem;
+    row-gap: 1.75rem;
+    padding: 2rem 3rem;
+  }
+
+  .heroWheel {
+    width: clamp(13rem, calc(100dvh - 31rem), 24rem);
+    max-width: none;
+  }
+
+  .heroText {
+    align-self: end;
+  }
+
+  .heroCta {
+    align-self: start;
+    max-width: 34rem;
+  }
+}

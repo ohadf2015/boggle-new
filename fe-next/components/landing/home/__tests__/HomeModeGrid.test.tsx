@@ -53,16 +53,21 @@ describe('HomeModeGrid', () => {
   it('lays out the live arena first and the next four modes as tiles', () => {
     render(<HomeModeGrid models={models} extras={extras} liveCount={42} />);
     expect(screen.getByTestId('mode-cube-anchor')).toHaveAttribute('data-cube-key', 'arena');
-    const tiles = screen.getAllByTestId('mode-cube').map((el) => el.getAttribute('data-cube-key'));
+    const sheet = screen.getByTestId('home-more-sheet');
+    const tiles = screen
+      .getAllByTestId('mode-cube')
+      .filter((el) => !sheet.contains(el))
+      .map((el) => el.getAttribute('data-cube-key'));
     expect(tiles).toEqual(['adventure', 'wordTowerV2', 'brainGym', 'blast']);
     expect(screen.getByTestId('home-live-count')).toHaveTextContent('42');
   });
 
   it('keeps the other modes one tap away in a sheet', () => {
     render(<HomeModeGrid models={models} extras={extras} liveCount={0} />);
-    expect(screen.queryByTestId('home-more-sheet')).toBeNull();
-    fireEvent.click(screen.getByTestId('landing-cubes-more'));
     const sheet = screen.getByTestId('home-more-sheet');
+    expect(sheet).not.toHaveAttribute('open');
+    fireEvent.click(screen.getByTestId('landing-cubes-more'));
+    expect(sheet).toHaveAttribute('open');
     const keys = within(sheet)
       .getAllByRole('link')
       .map((el) => el.getAttribute('data-cube-key'));
