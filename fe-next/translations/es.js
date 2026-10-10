@@ -13985,6 +13985,7 @@ const es = {
       "trialEndedTitle": "Prueba caducada: mejora para conservar tus clases",
       "trialEndedBody": "Conserva clases ilimitadas e informes imprimibles por 9 $/mes. No es otra prueba gratis.",
       "trialEndedCta": "Seguir con Pro: 9 $/mes",
+      "trialReactivateCta": "Reactivar",
       "trialLifecycleTitle": "Quedan {count} días de tu prueba de Teacher Pro",
       "trialLifecycleTitleToday": "Tu prueba de Teacher Pro termina hoy",
       "trialLifecycleTitleOne": "Queda 1 día de tu prueba de Teacher Pro",

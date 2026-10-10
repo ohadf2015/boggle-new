@@ -13891,6 +13891,7 @@ const he = {
       "trialEndedTitle": "תקופת הניסיון הסתיימה. שדרגו כדי לשמור על הכיתות",
       "trialEndedBody": "שמרו על כיתות ללא הגבלה ודוחות להדפסה ב-9$ לחודש. זו לא תקופת ניסיון נוספת.",
       "trialEndedCta": "להמשיך ב-Pro: 9$ לחודש",
+      "trialReactivateCta": "הפעלה מחדש",
       "trialLifecycleTitle": "נותרו {count} ימים בניסיון פרו למורים",
       "trialLifecycleTitleToday": "ניסיון פרו למורים מסתיים היום",
       "trialLifecycleTitleOne": "נותר יום אחד בניסיון פרו למורים",

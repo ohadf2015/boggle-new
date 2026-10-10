@@ -15,6 +15,7 @@ import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherProMilestone } from '@/hooks/useTeacherProMilestone';
 import { useTeacherTrialExpiring } from '@/hooks/useTeacherTrialExpiring';
+import { useTeacherTrialEnded } from '@/hooks/useTeacherTrialEnded';
 import { useTeacherTrialOffer } from '@/hooks/useTeacherTrialOffer';
 import { useTeacherUsagePrompt } from '@/hooks/useTeacherUsagePrompt';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
@@ -52,6 +53,7 @@ function TeacherDashboardInner() {
   } = useTeacherProMilestone();
   const { dismissed: trialOfferDismissed, dismiss: dismissTrialOffer } = useTeacherTrialOffer();
   const { dismissed: trialExpiringDismissed, dismiss: dismissTrialExpiring } = useTeacherTrialExpiring();
+  const { dismissed: trialEndedDismissed, dismiss: dismissTrialEnded } = useTeacherTrialEnded();
   const {
     reason: usageReason,
     count: usageCount,
@@ -85,7 +87,7 @@ function TeacherDashboardInner() {
     // Expired Polar Pro trial replaces the access banner and the milestone
     // ask. A live Polar trial is hasPro + the lifecycle banner (days left
     // and a Keep-Pro CTA that POSTs /api/subscription/checkout). The header chip stays.
-    polarTrialExpired: polarTrial.showReactivation,
+    polarTrialExpired: polarTrial.showReactivation && !trialEndedDismissed,
     polarTrialing: polarTrial.showLifecycleBanner,
     polarOfferTrial: polarTrial.offerTrial,
     offerTrialDismissed: trialOfferDismissed,
@@ -153,7 +155,7 @@ function TeacherDashboardInner() {
         ) : banner === 'pro' ? (
           <TeacherProAskBanner onDismiss={dismiss} />
         ) : banner === 'reactivate' ? (
-          <TeacherProTrialEndedBanner />
+          <TeacherProTrialEndedBanner onDismiss={dismissTrialEnded} />
         ) : banner === 'trialing' ? (
           isTrialExpiring ? (
             !trialExpiringDismissed ? (
