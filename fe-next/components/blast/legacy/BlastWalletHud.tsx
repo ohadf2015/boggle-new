@@ -42,6 +42,10 @@ export function reelStops(from: number, to: number, formatted: string): ReelStop
   return stops;
 }
 
+const DIGITS = '0\n1\n2\n3\n4\n5\n6\n7\n8\n9';
+/** Lives in an attribute (drawn by ::before) so the chip's text stays just the balance. */
+const REEL_STRIP = `\u00a0\n${DIGITS}\n${DIGITS}`;
+
 type Landing = { key: number; from: number; to: number; delayMs: number; landAt: number };
 
 /**
@@ -113,6 +117,7 @@ export default function BlastWalletHud({ coins }: { coins: number }) {
               <span
                 key={`${k}-${i}`}
                 className={styles.reel}
+                data-strip={REEL_STRIP}
                 style={{ '--start': s.start, '--end': s.end, '--delay': delay.animationDelay } as CSSProperties}
               />
             ) : (

@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 
-const { spendMock } = vi.hoisted(() => ({ spendMock: vi.fn(async () => true) }));
+const { spendMock, wallet } = vi.hoisted(() => ({ spendMock: vi.fn(async () => true), wallet: { coins: 5000 } }));
 
 vi.mock('@/contexts/CoinContext', () => ({
-  useCoinContext: () => ({ coins: 5000, spendCoins: spendMock }),
+  useCoinContext: () => ({ coins: wallet.coins, spendCoins: spendMock }),
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
@@ -20,6 +20,7 @@ describe('BlastUpgradePanel', () => {
     useBlastUpgradeStore.getState().reset();
     spendMock.mockClear();
     spendMock.mockResolvedValue(true);
+    wallet.coins = 5000;
   });
   afterEach(cleanup);
 
@@ -56,5 +57,26 @@ describe('BlastUpgradePanel', () => {
     fireEvent.click(screen.getByTestId('buy-extraMoves'));
     expect(screen.getByTestId('buy-comboSurge')).not.toHaveAttribute('data-confirming', 'true');
     expect(spendMock).not.toHaveBeenCalled();
+  });
+
+  it('a player who cannot afford an upgrade is never charged and gains no level', () => {
+    wallet.coins = 10;
+    render(<BlastUpgradePanel onClose={() => {}} t={t} />);
+    const buy = screen.getByTestId('buy-extraMoves');
+    expect(buy).toBeDisabled();
+    fireEvent.click(buy);
+    fireEvent.click(buy);
+    expect(spendMock).not.toHaveBeenCalled();
+    expect(useBlastUpgradeStore.getState().levelOf('extraMoves')).toBe(0);
+  });
+
+  it('a refused wallet spend leaves the upgrade unbought', async () => {
+    spendMock.mockResolvedValue(false);
+    render(<BlastUpgradePanel onClose={() => {}} t={t} />);
+    fireEvent.click(screen.getByTestId('buy-extraMoves'));
+    fireEvent.click(screen.getByTestId('buy-extraMoves'));
+    await waitFor(() => expect(spendMock).toHaveBeenCalledOnce());
+    await waitFor(() => expect(screen.getByTestId('buy-extraMoves')).not.toBeDisabled());
+    expect(useBlastUpgradeStore.getState().levelOf('extraMoves')).toBe(0);
   });
 });

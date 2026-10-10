@@ -39,6 +39,10 @@ describe('BlastWalletHud', () => {
     expect(screen.queryByLabelText(/gem/i)).toBeNull();
     expect(screen.getAllByTestId('coin-counter')).toHaveLength(1);
     expect(chip()).toHaveTextContent(/^1,234$/);
+    const strips = [...chip().querySelectorAll('[data-strip]')].map((el) => el.getAttribute('data-strip')!.split('\n'));
+    expect(strips).toHaveLength(4);
+    expect(strips[0]).toHaveLength(21);
+    expect(strips[0].slice(1, 11).join('')).toBe('0123456789');
   });
 
   it('schedules the roll, bump and +N tag for the moment the flying coins land', () => {
