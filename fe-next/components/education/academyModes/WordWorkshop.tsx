@@ -19,7 +19,6 @@ import { AnimatePresence, m } from 'framer-motion';
 import { Coins, Hammer, RotateCcw, Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
-import { WordCraftGameView } from '@/components/word-craft/WordCraftGameScreen';
 import { onWordCraftGameEnd, onWordCraftMove } from '@/components/word-craft/wordCraftTelemetry';
 import { canonLessonWord } from '@/lib/wordTower/lessonSeed';
 import { lessonTargetsFor, wordCraftLocaleFor } from '@/lib/word-craft/lessonBag';
@@ -78,6 +77,22 @@ type Phase = { name: 'intro' } | { name: 'playing'; seed: number; guide: boolean
 
 const newSeed = () => Math.floor(Math.random() * 1_000_000);
 
+// The game view carries Pixi; keep it out of the route's first-load JS.
+type GameView = typeof import('@/components/word-craft/WordCraftGameScreen').WordCraftGameView;
+
+function useGameView() {
+  const [view, setView] = useState<{ View: GameView | null; failed: boolean }>({ View: null, failed: false });
+  useEffect(() => {
+    let live = true;
+    import('@/components/word-craft/WordCraftGameScreen').then(
+      (mod) => live && setView({ View: mod.WordCraftGameView, failed: false }),
+      () => live && setView({ View: null, failed: true }),
+    );
+    return () => { live = false; };
+  }, []);
+  return view;
+}
+
 const RIVAL_REST_MS = 2600;
 const CALLOUT_MS = 2200;
 
@@ -86,6 +101,7 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
   const sfx = useSoundEffects();
   const reduce = useAcademyReducedMotion();
   usePreloadImages(Object.values(RIVAL_ART));
+  const { View: WordCraftGameView, failed: gameViewFailed } = useGameView();
   const [phase, setPhase] = useState<Phase>({ name: 'intro' });
   const [starting, setStarting] = useState(false);
   const [startFailed, setStartFailed] = useState(false);
@@ -258,27 +274,32 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
   const playerChip = player ? <AcademyPlayerChip player={player} className="max-w-[45%]" /> : null;
 
   if (phase.name === 'playing') {
+    if (gameViewFailed) throw new Error('Word Workshop: game view chunk failed to load');
     return (
       <div ref={gameRef} className="fixed inset-0 z-50 overflow-hidden bg-neo-navy [--wk-col:760px]" data-testid="workshop-game" data-academy-workshop="">
         <WorkshopBoardSkin reduce={reduce} />
         <AcademyScene theme="workshop" dim={0.62}>
-          <WordCraftGameView
-            seed={phase.seed}
-            duel={null}
-            hotseat={false}
-            difficulty="easy"
-            modifierOverride="none"
-            lesson={{
-              locale: deal.locale,
-              targets: deal.targets,
-              dims: WORKSHOP_DIMS,
-              bare: true,
-              initialTiles: deal.opener,
-              guide: phase.guide,
-              achievements: false,
-              onExit: () => setPhase({ name: 'intro' }),
-            }}
-          />
+          {WordCraftGameView ? (
+            <WordCraftGameView
+              seed={phase.seed}
+              duel={null}
+              hotseat={false}
+              difficulty="easy"
+              modifierOverride="none"
+              lesson={{
+                locale: deal.locale,
+                targets: deal.targets,
+                dims: WORKSHOP_DIMS,
+                bare: true,
+                initialTiles: deal.opener,
+                guide: phase.guide,
+                achievements: false,
+                onExit: () => setPhase({ name: 'intro' }),
+              }}
+            />
+          ) : (
+            <div data-testid="workshop-game-loading" aria-busy="true" className="h-full w-full" />
+          )}
         </AcademyScene>
         {/* The Baron: speech bubble under his scoreboard face below 2xl (a phone on its side: the free strip under the action bar), a full portrait hugging the board in the 2xl gutter.
             The bubble hides while the LESSON WORD banner shows, so the two never collide. */}
