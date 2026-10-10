@@ -45,9 +45,14 @@ const WheelFoundWords: React.FC<WheelFoundWordsProps> = ({ words, fresh, score, 
               </m.span>
             ))}
           </span>
-          <span className="ms-1 lg:ms-2 font-neo-display font-black text-[11px] lg:text-sm text-neo-lime leading-none">
+          <m.span
+            className="ms-1 lg:ms-2 font-neo-display font-black text-[11px] lg:text-sm text-neo-lime leading-none"
+            initial={isFresh && !reducedMotion ? { scale: 0 } : false}
+            animate={{ scale: 1 }}
+            transition={{ ...DROP, delay: isFresh ? 0.18 + word.length * 0.045 : 0 }}
+          >
             +{score(word)}
-          </span>
+          </m.span>
         </div>
       );
     })}
