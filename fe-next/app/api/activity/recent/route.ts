@@ -7,14 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
-
-// Lazy-init to avoid crash on missing env vars
-function getSupabaseConfig() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return { url, key };
-}
+import { getSupabaseAdmin } from '@/lib/admin/server';
 
 export interface ActivityEvent {
   type: 'multiplayer_win' | 'daily_solved' | 'word_hunt_solved' | 'blast_highscore' | 'long_word' | 'streak';
@@ -54,15 +47,12 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const config = getSupabaseConfig();
-  if (!config) {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
     return NextResponse.json({ events: [] });
   }
 
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(config.url, config.key);
-
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
     // Run ALL 5 queries in parallel instead of sequentially

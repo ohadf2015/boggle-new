@@ -1,23 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { updateEmailPreferences, generateUnsubscribeToken } from '@/lib/email';
 import { verifyJwtLocal } from '@/lib/auth/verifyJwt';
-
-/**
- * Get Supabase admin client for database operations
- */
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: { persistSession: false },
-  });
-}
+import { getSupabaseAdmin } from '@/lib/admin/server';
 
 /**
  * GET /api/email/preferences

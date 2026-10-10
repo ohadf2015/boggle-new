@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import logger from '@/utils/logger';
 import { captureApiError } from '@/utils/sentry';
 import { checkApiRateLimit, rateLimitResponse, addRateLimitHeaders } from '@/lib/apiRateLimit';
 import { withTimeout, EMAIL_COLORS } from '@/lib/email';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 
 /**
  * HTML entity encoding to prevent XSS in email HTML content
@@ -40,22 +40,6 @@ const CONTACT_RATE_LIMIT = {
   windowMs: 60 * 60 * 1000, // 1 hour
   blockDurationMs: 24 * 60 * 60 * 1000, // 24 hour block for abuse
 };
-
-/**
- * Get Supabase admin client for database operations
- */
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: { persistSession: false },
-  });
-}
 
 /**
  * Send email notification via Resend

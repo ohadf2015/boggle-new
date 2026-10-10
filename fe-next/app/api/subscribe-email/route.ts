@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import logger from '@/utils/logger';
-import { createClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
 import { getPostHogServer } from '@/lib/posthog';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 
 // Timeout for external email service calls (prevents indefinite hangs)
 const EMAIL_SERVICE_TIMEOUT_MS = 15_000; // 15 seconds
@@ -47,22 +47,6 @@ async function fetchWithTimeout(
  *
  * Emails are always stored in the database regardless of email provider.
  */
-
-/**
- * Get Supabase admin client for database operations
- */
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: { persistSession: false },
-  });
-}
 
 /**
  * Check if email subscription is enabled

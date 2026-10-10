@@ -7,19 +7,11 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { validateBlastResult, type PersonalBests } from '../utils';
 import { captureApiError } from '@/utils/sentry';
 import { processBlastCompletion } from './processCompletion';
-
-// Lazy-init to avoid crash on missing env vars
-function getSupabaseConfig() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return { url, key };
-}
 
 /**
  * POST /api/blast/result
@@ -61,11 +53,10 @@ export async function POST(request: NextRequest) {
     }
 
     const data = validation.data;
-    const config = getSupabaseConfig();
-    if (!config) {
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
     }
-    const supabase = createServiceClient(config.url, config.key);
 
     // Persistence (shared with the offline-sync replay path).
     const result = await processBlastCompletion(data, userId, { supabase, source: 'route' });
@@ -94,11 +85,10 @@ export async function GET(request: Request) {
     }
 
     const userId = user.id;
-    const config = getSupabaseConfig();
-    if (!config) {
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
     }
-    const supabase = createServiceClient(config.url, config.key);
 
     // Parse optional difficulty filter from query
     const { searchParams } = new URL(request.url);

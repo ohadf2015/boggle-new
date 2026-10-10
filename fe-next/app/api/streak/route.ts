@@ -10,16 +10,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import { captureApiError } from '@/utils/sentry';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
-
-function getSupabaseConfig() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return { url, key };
-}
 
 /**
  * GET /api/streak — Fetch current streak data from server
@@ -39,12 +32,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const config = getSupabaseConfig();
-    if (!config) {
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
-    const supabase = createServiceClient(config.url, config.key);
     const { data: engagement } = await supabase
       .from('player_engagement')
       .select('current_streak, longest_streak, last_login_date, streak_freezes_available, streak_protected_until')
@@ -111,15 +103,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const config = getSupabaseConfig();
-    if (!config) {
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
     const body = await request.json();
     const { action, localData } = body;
 
-    const supabase = createServiceClient(config.url, config.key);
     const today = new Date().toISOString().split('T')[0];
 
     if (action === 'recordWin') {
