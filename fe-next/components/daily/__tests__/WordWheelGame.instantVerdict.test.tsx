@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, act } from '@testing-library/react';
+import { render, fireEvent, act, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/utils/growthTracking', () => ({
@@ -60,6 +60,7 @@ const puzzle: WordWheelPuzzle = {
 } as unknown as WordWheelPuzzle;
 
 beforeEach(() => {
+  global.requestAnimationFrame = ((cb: FrameRequestCallback) => setTimeout(() => cb(0), 16) as unknown as number) as typeof requestAnimationFrame;
   global.fetch = vi.fn().mockResolvedValue({ ok: false }) as unknown as typeof fetch;
 });
 
@@ -110,6 +111,16 @@ describe('WordWheelGame — the verdict lands at release', () => {
     expect(bubble()).toContain('5');
     expect(q('built-letter-tile')).toHaveLength(0);
     expect(builder().dataset.state).toBe('accepted');
+  });
+
+  it('paints the score before the particle burst runs, so the reward is never a frame late', async () => {
+    const onEffect = vi.fn();
+    mountGame({ onQuickVerdict: () => true, onEffect });
+    await drag(['C', 'A', 'B']);
+
+    expect(q('found-word')).toHaveLength(1);
+    expect(onEffect).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'wordValid' }));
+    await waitFor(() => expect(onEffect).toHaveBeenCalledWith(expect.objectContaining({ type: 'wordValid' })));
   });
 
   it('a word the loaded dictionary lacks is rejected at release, not after the server', async () => {

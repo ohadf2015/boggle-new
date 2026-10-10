@@ -37,6 +37,12 @@ import { rankThresholds } from '@/lib/wordWheel/rankLadder';
 
 const WordWheelPixiRing = dynamic(() => import('./WordWheelPixiRing'), { ssr: false });
 
+// Score, list and cleared trail paint first; particles, audio and haptics follow the frame.
+const afterPaint = (fn: () => void) => {
+  if (typeof requestAnimationFrame === 'undefined') return fn();
+  requestAnimationFrame(() => setTimeout(fn, 0));
+};
+
 // Haptic feedback for mobile — distinct patterns per interaction type
 const haptic = (pattern: number | number[]) => {
   try { navigator.vibrate?.(pattern); } catch { /* unsupported */ }
@@ -619,32 +625,35 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     const coverage = classifyLetterCoverage(word, wheelLetters);
     const isAllLetters = coverage === 'all';
 
-    // Sound + haptic feedback
-    if (isAllLetters) {
-      playLegendaryWordSound();
-      haptic([50, 30, 50, 30, 80]);
-    } else {
-      playWordAcceptedSound();
-      if (word.length >= 5) {
-        playWordLengthSound(word.length);
+    afterPaint(() => {
+      // Sound + haptic feedback
+      if (isAllLetters) {
+        playLegendaryWordSound();
+        haptic([50, 30, 50, 30, 80]);
+      } else {
+        playWordAcceptedSound();
+        if (word.length >= 5) {
+          playWordLengthSound(word.length);
+        }
+        haptic(newCombo >= 2 ? [15, 30, 15, 30, 15] : 20);
       }
-      haptic(newCombo >= 2 ? [15, 30, 15, 30, 15] : 20);
-    }
-    if (newCombo >= 2) {
-      playComboSound(newCombo);
-    }
+      if (newCombo >= 2) {
+        playComboSound(newCombo);
+      }
 
-    // Trigger celebration effects — 'all' unlocks the 4-wave Pixi pangram
-    // spectacular; everything else gets the standard word burst.
-    if (isAllLetters) {
-      onEffect({ type: 'pangram', x: cx, y: 200 });
-    } else {
-      onEffect({ type: 'wordValid', x: cx, y: 200, points });
-    }
-    // Combo milestone effect
-    if (newCombo >= 2) {
-      onEffect({ type: 'combo', x: cx, y: 160, combo: newCombo });
-    }
+      // Trigger celebration effects — 'all' unlocks the 4-wave Pixi pangram
+      // spectacular; everything else gets the standard word burst.
+      if (isAllLetters) {
+        onEffect({ type: 'pangram', x: cx, y: 200 });
+      } else {
+        onEffect({ type: 'wordValid', x: cx, y: 200, points });
+      }
+      // Combo milestone effect
+      if (newCombo >= 2) {
+        onEffect({ type: 'combo', x: cx, y: 160, combo: newCombo });
+      }
+
+    });
 
     // Headline banner for full / near-full wheel coverage.
     if (coverage !== 'none') {
@@ -657,8 +666,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       ? gameContainerRef.current.getBoundingClientRect().width / 2
       : 200;
     showFeedback(message, 'error', clear);
-    onEffect({ type: 'error', x: cx, y: 80 });
-    playWordRejectedSound();
+    afterPaint(() => {
+      onEffect({ type: 'error', x: cx, y: 80 });
+      playWordRejectedSound();
+    });
   }, [showFeedback, onEffect, playWordRejectedSound]);
 
   const { handleSubmit, pendingWord, isValidating } = useWordWheelSubmit({
