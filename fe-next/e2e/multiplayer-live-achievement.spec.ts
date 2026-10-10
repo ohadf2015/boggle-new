@@ -3,7 +3,6 @@ import { MultiplayerPage } from './pages/MultiplayerPage';
 import { goto, randomUsername, waitForHydration } from './helpers/test-utils';
 import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures';
 
-/** Collects every Socket.IO event name + payload the page receives over websocket. */
 function recordSocketEvents(page: Page): Array<{ event: string; data: unknown }> {
   const events: Array<{ event: string; data: unknown }> = [];
   page.on('websocket', (ws) => {
@@ -33,17 +32,22 @@ async function createOnboardedContext(browser: Browser) {
   return { context, page, events, mp: new MultiplayerPage(page) };
 }
 
+function unlockedKeys(events: Array<{ event: string; data: unknown }>): string[] {
+  return events
+    .filter((e) => e.event === 'liveAchievementUnlocked')
+    .flatMap((e) => ((e.data as { achievements?: Array<{ key: string }> })?.achievements ?? []).map((a) => a.key));
+}
+
 test.describe('Multiplayer live achievements', () => {
   test.slow();
 
-  test('first valid word in a room unlocks FIRST_BLOOD for the submitter only', async ({ browser, baseURL }) => {
+  test('first valid word in a classic room unlocks FIRST_BLOOD for the submitter only', async ({ browser, baseURL }) => {
     test.setTimeout(150_000);
 
     const host = await createOnboardedContext(browser);
     await host.mp.createRoom(randomUsername('Host'));
-    await expect(host.mp.waitingStatus).toBeVisible({ timeout: 10_000 });
-    const gameCode = host.page.url().split('/').pop() || '';
-    expect(gameCode).toBeTruthy();
+    const gameCode = await host.mp.waitForHostLobby();
+    await host.mp.selectClassicMode();
 
     const player = await createOnboardedContext(browser);
     await goto(player.page, `/join/${gameCode}`, 'en');
@@ -51,7 +55,7 @@ test.describe('Multiplayer live achievements', () => {
     if (await player.mp.joinNameInput.isVisible().catch(() => false)) {
       await player.mp.joinRoom(randomUsername('Player'));
     }
-    await expect(player.mp.waitingStatus).toBeVisible({ timeout: 10_000 });
+    await expect(player.page.getByText(gameCode).first()).toBeVisible({ timeout: 15_000 });
 
     await host.mp.startGameButton.click();
     await host.mp.waitForGameStart();
@@ -59,11 +63,6 @@ test.describe('Multiplayer live achievements', () => {
 
     const word = await host.mp.submitRealWord(baseURL!, 'en');
     await expect(host.mp.wordLadderRow(word)).toBeVisible({ timeout: 10_000 });
-
-    const unlockedKeys = (events: typeof host.events) =>
-      events
-        .filter((e) => e.event === 'liveAchievementUnlocked')
-        .flatMap((e) => ((e.data as { achievements?: Array<{ key: string }> })?.achievements ?? []).map((a) => a.key));
 
     await expect.poll(() => unlockedKeys(host.events), { timeout: 10_000 }).toContain('FIRST_BLOOD');
     expect(unlockedKeys(player.events)).not.toContain('FIRST_BLOOD');

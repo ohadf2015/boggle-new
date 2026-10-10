@@ -22,12 +22,6 @@ async function createOnboardedContext(browser: Browser, locale: Locale = 'en') {
   return { context, page, mp: new MultiplayerPage(page) };
 }
 
-/** Extract the game code from the current URL (expects /{locale}/multiplayer/{code}) */
-function extractGameCode(url: string): string {
-  const parts = url.split('/');
-  return parts[parts.length - 1] || '';
-}
-
 const ROUND_TRIP_LOCALES: { locale: Locale; language: string }[] = [
   { locale: 'en', language: 'en' },
   { locale: 'he', language: 'he' },
@@ -46,10 +40,8 @@ test.describe('Multiplayer round trip', () => {
       const host = await createOnboardedContext(browser, locale);
       const hostName = randomUsername('Host');
       await host.mp.createRoom(hostName);
-      await expect(host.mp.waitingStatus).toBeVisible({ timeout: 10_000 });
-
-      const gameCode = extractGameCode(host.page.url());
-      expect(gameCode).toBeTruthy();
+      const gameCode = await host.mp.waitForHostLobby();
+      await host.mp.selectClassicMode();
 
       // Second player joins via the invite code/link.
       const player = await createOnboardedContext(browser, locale);
@@ -59,7 +51,7 @@ test.describe('Multiplayer round trip', () => {
       if (await player.mp.joinNameInput.isVisible().catch(() => false)) {
         await player.mp.joinRoom(playerName);
       }
-      await expect(player.mp.waitingStatus).toBeVisible({ timeout: 10_000 });
+      await expect(player.page.getByText(gameCode).first()).toBeVisible({ timeout: 15_000 });
 
       // Host starts the round; the board generates for both players.
       await host.mp.startGameButton.click();

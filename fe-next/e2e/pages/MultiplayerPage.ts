@@ -53,7 +53,7 @@ export class MultiplayerPage {
 
     // Room List
     this.roomListView = page.locator('[data-testid="room-list-view"]');
-    this.createRoomButton = page.getByRole('button', { name: /create.*room|צור.*חדר/i });
+    this.createRoomButton = page.getByRole('button', { name: /create.*room|צר.*חדר/i });
     this.refreshButton = page.getByRole('button', { name: /refresh|רענן/i });
 
     // Create Room Modal
@@ -124,6 +124,18 @@ export class MultiplayerPage {
       }
     }
     await this.confirmCreateButton.click();
+  }
+
+  /** Wait for the host lobby and return its room code */
+  async waitForHostLobby(): Promise<string> {
+    const codeButton = this.page.locator('button[aria-label]').filter({ hasText: /^[A-Z0-9]{4,8}$/ }).first();
+    await expect(codeButton).toBeVisible({ timeout: 15_000 });
+    return ((await codeButton.textContent()) ?? '').trim();
+  }
+
+  /** Pin the round to classic so the board is a letter grid, not a random mode */
+  async selectClassicMode() {
+    await this.page.getByRole('button', { name: /^(classic|קלאסי)$/i }).first().click();
   }
 
   /** Click on a room in the room list to join */
