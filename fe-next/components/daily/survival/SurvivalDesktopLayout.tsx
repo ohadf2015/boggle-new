@@ -166,7 +166,7 @@ function SurvivalDesktopLayoutImpl({
             data-short={short ? 'true' : 'false'}
             className="relative flex min-h-0 w-full flex-1 justify-center [container-type:size]"
           >
-            <div className={cn('relative', short ? 'w-[min(100cqw,calc(100cqh-72px))]' : 'w-[min(100cqw,calc(100cqh-96px))]')}>
+            <div className={cn('relative', short ? 'w-[min(100cqw,calc(100cqh-86px))]' : 'w-[min(100cqw,calc(100cqh-110px))]')}>
               {playfield}
             </div>
           </div>

@@ -4,7 +4,6 @@ import React, { useRef, useEffect, useState, useCallback, memo } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { LifeGainAnimation } from '../LifeGainAnimation';
 
 export interface SurvivalLifeBarProps {
   lifePoints: number;
@@ -14,6 +13,8 @@ export interface SurvivalLifeBarProps {
   skipAnimations: boolean;
   onLifeGainComplete: () => void;
 }
+
+const LIFE_GAIN_SETTLE_MS = 700;
 
 /** Color tier for the life bar */
 function getLifeTier(pct: number) {
@@ -68,6 +69,12 @@ export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
     return undefined;
   }, [lifePoints, isGameOver, pct, spawnDrips]);
 
+  useEffect(() => {
+    if (lifeGainAmount == null) return undefined;
+    const id = setTimeout(onLifeGainComplete, LIFE_GAIN_SETTLE_MS);
+    return () => clearTimeout(id);
+  }, [lifeGainAmount, onLifeGainComplete]);
+
   // Segment markers for visual rhythm (every 25%)
   const segments = [25, 50, 75];
 
@@ -82,12 +89,6 @@ export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
       aria-valuemin={0}
       aria-valuemax={100}
     >
-      {/* Life gain animation */}
-      <LifeGainAnimation
-        amount={lifeGainAmount}
-        onComplete={onLifeGainComplete}
-      />
-
       {/* Heart icon — neo-brutalist circle with pulse */}
       <AdaptiveMotion.div
         key={`heart-${isLifeGaining ? 'beating' : 'idle'}`}

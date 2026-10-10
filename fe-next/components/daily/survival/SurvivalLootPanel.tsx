@@ -42,7 +42,7 @@ export const SurvivalLootPanel: React.FC<SurvivalLootPanelProps> = ({
   return (
     <div className="h-full flex flex-col overflow-hidden">
       {/* Loot Header */}
-      <div className="flex items-center justify-between px-4 py-2 border-b-3 border-neo-black shrink-0 bg-neo-black/30">
+      <div data-testid="loot-panel-header" className="flex items-center justify-between ps-4 pe-12 py-2 border-b-3 border-neo-black shrink-0 bg-neo-black/30">
         <div className="flex items-center gap-2">
           <Package className="w-4 h-4 text-neo-lime" />
           <span className="font-bold text-neo-white text-sm uppercase tracking-wide">

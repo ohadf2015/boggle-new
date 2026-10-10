@@ -199,7 +199,8 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
     <div className="fixed inset-0 bg-black/80 text-white flex items-center justify-center z-[120] p-4">
       <div
         className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black max-w-md w-full p-6 shadow-neo-brutalist relative flex flex-col max-h-[92vh] overflow-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
-        {...swipeHandlers}
+        onTouchStart={swipeHandlers.onTouchStart}
+        onTouchEnd={swipeHandlers.onTouchEnd}
       >
         {/* Close button */}
         <button

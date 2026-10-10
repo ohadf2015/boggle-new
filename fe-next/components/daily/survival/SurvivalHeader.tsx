@@ -52,7 +52,7 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
       ? [{ username: selfUsername, score: liveScore }, ...rivals]
       : null;
   return (
-    <div className="sticky top-0 z-20 flex items-center justify-between mb-1 px-2 py-1 max-w-3xl mx-auto w-full bg-neo-navy/90 backdrop-blur-sm rounded-b-neo overflow-visible">
+    <div data-testid="survival-header" className="sticky top-0 z-20 flex items-center justify-between mb-1 ps-2 pe-12 py-1 max-w-3xl mx-auto w-full bg-neo-navy/90 backdrop-blur-sm rounded-b-neo overflow-visible">
       <div className="flex items-center gap-1.5">
         <button
           type="button"

@@ -1,3 +1,4 @@
+import zlib from 'node:zlib';
 import { test, expect, type Page } from '@playwright/test';
 import { goto, clearDailyState, type Locale } from './helpers/test-utils';
 import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures';
@@ -54,6 +55,62 @@ async function dragThrough(page: Page, cells: Array<[number, number]>) {
   for (const p of points.slice(1)) await page.mouse.move(p.x, p.y, { steps: 6 });
 }
 
+type Cell = { row: number; col: number; letter: string };
+
+async function readBoard(page: Page): Promise<Cell[]> {
+  return page.locator(CELLS).evaluateAll((els) =>
+    els.map((el) => ({
+      row: Number((el as HTMLElement).dataset.row),
+      col: Number((el as HTMLElement).dataset.col),
+      letter: ((el as HTMLElement).dataset.letter || '').toLowerCase(),
+    })),
+  );
+}
+
+async function loadWords(page: Page): Promise<string[]> {
+  const res = await page.request.get('/dicts/en.dict.gz');
+  expect(res.ok()).toBe(true);
+  const text = zlib.gunzipSync(await res.body()).toString('utf8');
+  return [...new Set(text.split('\n').map((w) => w.trim().toLowerCase()).filter((w) => w.length >= 3 && w.length <= 8))].sort();
+}
+
+function hasPrefix(sorted: string[], p: string) {
+  let lo = 0;
+  let hi = sorted.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (sorted[mid] < p) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo < sorted.length && sorted[lo].startsWith(p);
+}
+
+/** A 3-letter dictionary word (never the hidden target) and a dead-end non-word, both traceable on the board. */
+function planPaths(cells: Cell[], words: string[]) {
+  const at = new Map(cells.map((c) => [`${c.row},${c.col}`, c]));
+  const set = new Set(words);
+  let word: Cell[] | null = null;
+  let junk: Cell[] | null = null;
+  const dfs = (path: Cell[], s: string) => {
+    if (word && junk) return;
+    if (!word && s.length === 3 && set.has(s)) word = [...path];
+    if (!junk && path.length >= 3 && !hasPrefix(words, s)) junk = [...path];
+    if (path.length >= 6 || !hasPrefix(words, s)) return;
+    const last = path[path.length - 1];
+    for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+      const n = at.get(`${last.row + dr},${last.col + dc}`);
+      if (n && !path.includes(n)) dfs([...path, n], s + n.letter);
+    }
+  };
+  for (const c of cells) dfs([c], c.letter);
+  return { word: word as Cell[] | null, junk: junk as Cell[] | null };
+}
+
+async function swipe(page: Page, path: Cell[]) {
+  await dragThrough(page, path.map((c) => [c.row, c.col] as [number, number]));
+  await page.mouse.up();
+}
+
 test.describe('Word Hunt board', () => {
   test('renders the board as a grid of letter tiles with an idle prompt', async ({ page }) => {
     await startGame(page);
@@ -85,6 +142,36 @@ test.describe('Word Hunt board', () => {
     await expect(page.getByRole('grid')).toHaveAttribute('data-verdict', /good|bad|dupe/);
     await expect(page.getByTestId('hunt-trail')).toHaveCount(0, { timeout: 5_000 });
     await expect(page.getByTestId('hunt-stage')).toHaveAttribute('data-phase', 'idle');
+  });
+
+  test('a dictionary word pays its reward once on the stage, joins the found list, and a repeat is already found', async ({ page }) => {
+    await startGame(page);
+    const { word } = planPaths(await readBoard(page), await loadWords(page));
+    test.skip(!word, 'no 3-letter dictionary word on today\'s board');
+    const spelled = word!.map((c) => c.letter).join('');
+
+    await swipe(page, word!);
+    const stage = page.getByTestId('hunt-stage');
+    await expect(stage).toHaveAttribute('data-verdict', 'good', { timeout: 5_000 });
+    await expect(page.getByTestId('hunt-stage-points')).toHaveText(/^\+\d+/);
+    await expect(page.getByTestId('hunt-board-bubble')).toHaveCount(0);
+    await expect(page.getByText(new RegExp(`^${spelled}$`, 'i')).filter({ visible: true }).first()).toBeVisible();
+    await expect(stage).toHaveAttribute('data-phase', 'idle', { timeout: 5_000 });
+
+    await swipe(page, word!);
+    await expect(stage).toHaveAttribute('data-verdict', 'dupe', { timeout: 5_000 });
+  });
+
+  test('a non-word is rejected with the reason and the life penalty', async ({ page }) => {
+    await startGame(page);
+    const { junk } = planPaths(await readBoard(page), await loadWords(page));
+    test.skip(!junk, 'no dead-end path on the board');
+
+    await swipe(page, junk!);
+    const stage = page.getByTestId('hunt-stage');
+    await expect(stage).toHaveAttribute('data-verdict', 'bad', { timeout: 5_000 });
+    await expect(page.getByRole('grid')).toHaveAttribute('data-verdict', 'bad');
+    await expect(stage).toContainText(/-\s?\d/);
   });
 
   test('typing a word on the keyboard spells it on the stage and Enter submits it', async ({ page }) => {

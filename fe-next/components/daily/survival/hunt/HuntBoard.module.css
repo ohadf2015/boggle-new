@@ -130,8 +130,8 @@
   animation: tilePop 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.tray[data-tier='2'] .tile[data-state='sel'] .face { background: linear-gradient(180deg, #ffe6d6 0%, #ffc49f 100%); box-shadow: 0 5px 0 #c94a16, 0 0 0 3px var(--ink), 0 0 22px var(--rib-glow); }
-.tray[data-tier='3'] .tile[data-state='sel'] .face { background: linear-gradient(180deg, #fff8c9 0%, #ffe86b 100%); box-shadow: 0 5px 0 #b38f00, 0 0 0 3px var(--ink), 0 0 26px var(--rib-glow); }
+.tray[data-tier='2'] .tile[data-state] .face { background: linear-gradient(180deg, #ffe6d6 0%, #ffc49f 100%); box-shadow: 0 5px 0 #c94a16, 0 0 0 3px var(--ink), 0 0 22px var(--rib-glow); }
+.tray[data-tier='3'] .tile[data-state] .face { background: linear-gradient(180deg, #fff8c9 0%, #ffe86b 100%); box-shadow: 0 5px 0 #b38f00, 0 0 0 3px var(--ink), 0 0 26px var(--rib-glow); }
 
 .tile[data-tip='true'],
 .glyph[data-tip='true'] { transform: translateY(-6px) rotate(var(--tilt)) scale(1.08); z-index: 3; }
@@ -141,10 +141,16 @@
 .glyph[data-state='held'] { z-index: 2; transform: translateY(-4px) rotate(var(--tilt)); }
 .tile[data-state='held'] .face {
   background: linear-gradient(180deg, #ffe3f1 0%, #ffc2e0 100%);
-  box-shadow: 0 5px 0 #b30066, 0 0 0 3px var(--ink);
+  box-shadow: 0 5px 0 #b30066, 0 0 0 3px var(--ink), 0 0 22px var(--rib-glow);
 }
 
-.tray[data-phase='pending'] .tile[data-state='held'] .face { animation: heldPulse 520ms ease-in-out infinite alternate; }
+.tray[data-phase='pending'] .tile[data-state='held'] .face { animation: heldPulse 520ms 360ms ease-in-out infinite alternate; }
+.tray[data-phase='pending'] .tile[data-state='held'],
+.tray[data-phase='pending'] .glyph[data-state='held'] {
+  animation: releaseRipple 340ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(var(--i) * 32ms);
+}
+.tray[data-phase='pending'] { animation: trayDip 260ms ease-out both; }
 
 .tray[data-verdict='good'] .tile[data-state='held'] .face {
   background: linear-gradient(180deg, #f2ffc2 0%, #bfff00 100%);
@@ -177,8 +183,6 @@
   pointer-events: none;
   z-index: 4;
 }
-
-.layerTop { z-index: 6; }
 
 .trail {
   position: absolute;
@@ -221,26 +225,6 @@
 .tray[data-phase='verdict'] .trail { animation: trailOut 700ms ease-in both; }
 .tray[data-phase='pending'] .stitch { animation-duration: 220ms; }
 
-.bubble {
-  position: absolute;
-  z-index: 6;
-  padding: 2px 10px;
-  border: 3px solid var(--ink);
-  border-radius: 999px;
-  background: var(--rib);
-  color: var(--ink);
-  font-family: var(--font-fredoka), 'Fredoka', sans-serif;
-  font-weight: 800;
-  font-size: clamp(16px, 4.6vw, 24px);
-  line-height: 1.15;
-  white-space: nowrap;
-  box-shadow: 3px 3px 0 var(--ink);
-  transform: translate(-50%, -50%);
-  animation: bubbleRise 720ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
-}
-
-.tray[data-verdict='bad'] .bubble { color: #fffef0; }
-
 .submitHint {
   margin-top: 10px;
   padding: 4px 12px;
@@ -277,7 +261,7 @@
 }
 @keyframes tileHop {
   0% { transform: translateY(-4px) rotate(var(--tilt)) scale(1); }
-  35% { transform: translateY(-18px) rotate(calc(var(--tilt) * -2)) scale(1.14); }
+  35% { transform: translateY(-11px) rotate(calc(var(--tilt) * -2)) scale(1.12); }
   70% { transform: translateY(-2px) rotate(var(--tilt)) scale(0.98); }
   100% { transform: translateY(-4px) rotate(var(--tilt)) scale(1); }
 }
@@ -306,10 +290,13 @@
   0%, 55% { opacity: 1; }
   100% { opacity: 0; }
 }
-@keyframes bubbleRise {
-  0% { transform: translate(-50%, -50%) scale(0.3) rotate(-12deg); opacity: 0; }
-  25% { transform: translate(-50%, -110%) scale(1.25) rotate(6deg); opacity: 1; }
-  45% { transform: translate(-50%, -125%) scale(1) rotate(-3deg); }
-  80% { transform: translate(-50%, -165%) scale(1) rotate(0deg); opacity: 1; }
-  100% { transform: translate(-50%, -190%) scale(0.95); opacity: 0; }
+@keyframes releaseRipple {
+  0% { transform: translateY(-4px) rotate(var(--tilt)) scale(1); }
+  45% { transform: translateY(-13px) rotate(calc(var(--tilt) * -1.5)) scale(1.1); }
+  100% { transform: translateY(-4px) rotate(var(--tilt)) scale(1); }
+}
+@keyframes trayDip {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(3px); }
+  100% { transform: translateY(0); }
 }

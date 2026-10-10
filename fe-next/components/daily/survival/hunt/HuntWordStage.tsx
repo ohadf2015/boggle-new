@@ -23,7 +23,8 @@ export interface HuntWordStageProps {
 export function HuntWordStage({ phase, word, verdict, points, coins = null, message, calm, size = 'phone', t }: HuntWordStageProps) {
   const letters = phase === 'idle' ? [] : Array.from(word);
   const showVerdict = phase === 'verdict' && verdict;
-  const bonus = phase === 'live' ? getLifeBonusForWord(letters.length) : 0;
+  const building = phase === 'live' || phase === 'pending';
+  const bonus = building ? getLifeBonusForWord(letters.length) : 0;
 
   return (
     <div
@@ -44,31 +45,35 @@ export function HuntWordStage({ phase, word, verdict, points, coins = null, mess
             </span>
           ))}
         </span>
-        {phase === 'live' && letters.length > 0 && <span className={styles.count}>{letters.length}</span>}
+        {building && letters.length > 0 && (
+          <span data-testid="hunt-stage-count" className={styles.count}>{letters.length}</span>
+        )}
         {bonus > 0 && (
           <span key={bonus} className={styles.long}>
             {t('wordHunt.survival.stage.longWord', { bonus })}
           </span>
         )}
-        {showVerdict && verdict === 'good' && (
-          <>
-            <span className={styles.praise}>{t(praiseKeyFor(letters.length))}</span>
-            {points != null && (
-              <span data-testid="hunt-stage-points" className={styles.points}>
-                +{points}
-                <Heart className={styles.heart} aria-hidden="true" />
-                {coins != null && (
-                  <span data-testid="hunt-stage-coins" className={styles.coins}>
-                    +{coins}
-                    <Coins className={styles.coin} aria-hidden="true" />
-                  </span>
-                )}
-              </span>
-            )}
-          </>
-        )}
-        {showVerdict && verdict !== 'good' && message && <span className={styles.reason}>{message}</span>}
+        {showVerdict && verdict === 'good' && <span className={styles.praise}>{t(praiseKeyFor(letters.length))}</span>}
       </div>
+      {showVerdict && verdict !== 'good' && message && (
+        <span className={styles.reward}>
+          <span className={styles.reason}>{message}</span>
+        </span>
+      )}
+      {showVerdict && verdict === 'good' && points != null && (
+        <span data-testid="hunt-stage-reward" className={styles.reward}>
+          <span data-testid="hunt-stage-points" className={styles.points}>
+            +{points}
+            <Heart className={styles.heart} aria-hidden="true" />
+          </span>
+          {coins != null && (
+            <span data-testid="hunt-stage-coins" className={styles.coins}>
+              +{coins}
+              <Coins className={styles.coin} aria-hidden="true" />
+            </span>
+          )}
+        </span>
+      )}
     </div>
   );
 }

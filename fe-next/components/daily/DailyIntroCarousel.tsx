@@ -103,7 +103,8 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
       {/* Carousel Content */}
       <div
         className="relative overflow-hidden rounded-neo-lg border-3 border-neo-black bg-white dark:bg-neo-navy shadow-hard-lg h-[200px] sm:h-[220px]"
-        {...swipeHandlers}
+        onTouchStart={swipeHandlers.onTouchStart}
+        onTouchEnd={swipeHandlers.onTouchEnd}
       >
         <AnimatePresence mode="wait">
           <m.div

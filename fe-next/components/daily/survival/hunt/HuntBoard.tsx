@@ -22,7 +22,6 @@ export interface HuntBoardProps {
   phase: HuntPhase;
   verdict: HuntVerdict | null;
   heldPath: HuntCell[];
-  bubble?: string | null;
   calm: boolean;
   size?: 'phone' | 'desktop';
   t: TFn;
@@ -68,7 +67,6 @@ export function HuntBoard({
   phase,
   verdict,
   heldPath,
-  bubble,
   calm,
   size = 'phone',
   t,
@@ -234,18 +232,6 @@ export function HuntBoard({
               );
             }),
           )}
-        </div>
-        <div className={`${styles.layer} ${styles.layerTop}`} aria-hidden="true">
-        {holding && verdict && bubble && tipPos && (
-          <span
-            key={`${verdict}-${bubble}-${tipPos.x}-${tipPos.y}`}
-            className={styles.bubble}
-            data-testid="hunt-board-bubble"
-            style={{ left: `${(tipPos.x / (cols * CELL_UNIT)) * 100}%`, top: `${(tipPos.y / (rows * CELL_UNIT)) * 100}%` }}
-          >
-            {bubble}
-          </span>
-        )}
         </div>
       </div>
       {interactive && shouldShowDoubleClickSubmitHint({ canHover, isClickSelecting: isSelecting, selectedCount: selectedCells.length }) && (

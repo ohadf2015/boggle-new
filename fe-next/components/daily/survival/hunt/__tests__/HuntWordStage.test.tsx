@@ -48,6 +48,20 @@ describe('HuntWordStage', () => {
     expect(screen.getByTestId('hunt-live-word').textContent).toBe('SFRK');
   });
 
+  it('keeps the long-word sticker and letter count up while the check is pending', () => {
+    stage({ phase: 'pending', word: 'PLANET' });
+    expect(screen.getByText('wordHunt.survival.stage.longWord:{"bonus":5}')).toBeTruthy();
+    expect(screen.getByTestId('hunt-stage-count').textContent).toBe('6');
+  });
+
+  it('pays the reward on its own strip below the word so it never covers a letter', () => {
+    stage({ phase: 'verdict', verdict: 'good', word: 'PLANE', points: 14 });
+    const reward = screen.getByTestId('hunt-stage-reward');
+    const pill = screen.getByTestId('hunt-live-word').parentElement as HTMLElement;
+    expect(pill.contains(reward)).toBe(false);
+    expect(reward.contains(screen.getByTestId('hunt-stage-points'))).toBe(true);
+  });
+
   it('keeps the released word up while the check is pending', () => {
     stage({ phase: 'pending', word: 'PLANE' });
     expect(screen.getByTestId('hunt-stage').dataset.phase).toBe('pending');

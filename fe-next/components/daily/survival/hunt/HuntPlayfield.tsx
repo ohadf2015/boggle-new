@@ -2,8 +2,7 @@
 
 import React from 'react';
 import type { LetterGrid } from '@/types';
-import type { FeedbackType, WordDiscovery } from '../types';
-import { INVALID_WORD_PENALTY, NOT_IN_DICTIONARY_PENALTY } from '../constants';
+import type { WordDiscovery } from '../types';
 import { HuntBoard } from './HuntBoard';
 import { HuntWordStage } from './HuntWordStage';
 import type { HuntCell, HuntStageState } from './huntStage';
@@ -20,7 +19,6 @@ export interface HuntPlayfieldProps {
   onLive: (word: string) => void;
   onRelease: (word: string, path: HuntCell[]) => void;
   typedWord: string;
-  feedbackType: FeedbackType | null;
   feedbackMessage: string;
   discoveredWords: WordDiscovery[];
   calm: boolean;
@@ -33,12 +31,6 @@ function rewardFor(word: string, discoveredWords: WordDiscovery[]): WordDiscover
   return [...discoveredWords].reverse().find((d) => d.word.toUpperCase() === upper) ?? null;
 }
 
-function penaltyFor(type: FeedbackType | null): number | null {
-  if (type === 'not-on-board') return INVALID_WORD_PENALTY;
-  if (type === 'not-in-dictionary') return NOT_IN_DICTIONARY_PENALTY;
-  return null;
-}
-
 export function HuntPlayfield({
   grid,
   isGameOver,
@@ -49,7 +41,6 @@ export function HuntPlayfield({
   onLive,
   onRelease,
   typedWord,
-  feedbackType,
   feedbackMessage,
   discoveredWords,
   calm,
@@ -62,8 +53,6 @@ export function HuntPlayfield({
   const reward = stage.verdict === 'good' ? rewardFor(stage.word, discoveredWords) : null;
   const points = reward ? reward.lifeGained : null;
   const coins = reward && reward.tokensGained > 0 ? reward.tokensGained : null;
-  const penalty = stage.verdict === 'bad' ? penaltyFor(feedbackType) : null;
-  const bubble = points != null ? `+${points}` : penalty != null ? `−${penalty}` : null;
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -89,7 +78,6 @@ export function HuntPlayfield({
         phase={stage.phase}
         verdict={stage.verdict}
         heldPath={stage.path}
-        bubble={bubble}
         calm={calm}
         size={size}
         t={t as (key: string, fallback?: string) => string}

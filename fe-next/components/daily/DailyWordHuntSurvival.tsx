@@ -304,7 +304,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     onLive: onStageLive,
     onRelease: onStageRelease,
     typedWord: keyboardInput.typedWord,
-    feedbackType: state.feedbackType,
     feedbackMessage: state.feedbackMessage,
     discoveredWords: state.discoveredWords,
     calm: skipAnimations,
@@ -470,7 +469,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       <div className="relative flex-1 min-h-[320px] [container-type:size]">
         <span id={fx.rewardId} className="absolute left-1/2 top-8 pointer-events-none" />
         {celebration}
-        <div className="mx-auto w-[min(100cqw,calc(100cqh-78px))]">
+        <div className="mx-auto w-[min(100cqw,calc(100cqh-92px))]">
           <HuntPlayfield {...playfieldProps} size="phone" />
         </div>
       </div>

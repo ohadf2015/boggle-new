@@ -20,7 +20,6 @@ function field(stage: HuntStageState, extra: Partial<React.ComponentProps<typeof
       onLive={() => {}}
       onRelease={() => {}}
       typedWord=""
-      feedbackType={null}
       feedbackMessage=""
       discoveredWords={[]}
       calm={false}
@@ -31,19 +30,19 @@ function field(stage: HuntStageState, extra: Partial<React.ComponentProps<typeof
 }
 
 describe('HuntPlayfield', () => {
-  it('pays the life won by the released word on the stage and the board', () => {
+  it('pays the life won by the released word once, on the stage only', () => {
     field(
       { phase: 'verdict', verdict: 'good', word: 'CAT', path, releaseSeq: 0 },
-      { feedbackType: 'valid-word', discoveredWords: [{ word: 'CAT', lifeGained: 12, tokensGained: 0, timestamp: 1 }] },
+      { discoveredWords: [{ word: 'CAT', lifeGained: 12, tokensGained: 0, timestamp: 1 }] },
     );
     expect(screen.getByTestId('hunt-stage-points').textContent).toContain('+12');
-    expect(screen.getByTestId('hunt-board-bubble').textContent).toBe('+12');
+    expect(screen.queryByTestId('hunt-board-bubble')).toBeNull();
   });
 
   it('pays the coins won by the released word next to the life', () => {
     field(
       { phase: 'verdict', verdict: 'good', word: 'CAT', path, releaseSeq: 0 },
-      { feedbackType: 'valid-word', discoveredWords: [{ word: 'CAT', lifeGained: 12, tokensGained: 4, timestamp: 1 }] },
+      { discoveredWords: [{ word: 'CAT', lifeGained: 12, tokensGained: 4, timestamp: 1 }] },
     );
     expect(screen.getByTestId('hunt-stage-coins').textContent).toContain('+4');
   });
@@ -51,7 +50,7 @@ describe('HuntPlayfield', () => {
   it('leaves the coin chip out when the word paid no coins', () => {
     field(
       { phase: 'verdict', verdict: 'good', word: 'CAT', path, releaseSeq: 0 },
-      { feedbackType: 'valid-word', discoveredWords: [{ word: 'CAT', lifeGained: 12, tokensGained: 0, timestamp: 1 }] },
+      { discoveredWords: [{ word: 'CAT', lifeGained: 12, tokensGained: 0, timestamp: 1 }] },
     );
     expect(screen.queryByTestId('hunt-stage-coins')).toBeNull();
   });
@@ -59,9 +58,9 @@ describe('HuntPlayfield', () => {
   it('shows the life penalty for a non-word', () => {
     field(
       { phase: 'verdict', verdict: 'bad', word: 'CTA', path, releaseSeq: 0 },
-      { feedbackType: 'not-in-dictionary', feedbackMessage: 'Not a word -4' },
+      { feedbackMessage: 'Not a word -4' },
     );
-    expect(screen.getByTestId('hunt-board-bubble').textContent).toBe('−4');
+    expect(screen.queryByTestId('hunt-board-bubble')).toBeNull();
     expect(screen.getByText('Not a word -4')).toBeTruthy();
   });
 
