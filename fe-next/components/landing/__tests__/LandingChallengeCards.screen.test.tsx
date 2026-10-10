@@ -30,21 +30,16 @@ const props = {
 };
 
 describe('LandingChallengeCards layout="screen"', () => {
-  it('shows the live arena plus four modes in the grid and parks the rest under More', () => {
-    const { container } = render(<LandingChallengeCards {...props} layout="screen" />);
-    const more = container.querySelector('[data-testid="landing-cubes-more"]');
-    expect(more).not.toBeNull();
+  it('shows the live arena plus four modes and parks the rest behind More', () => {
+    const { container, getByTestId } = render(<LandingChallengeCards {...props} layout="screen" />);
     const cubes = Array.from(container.querySelectorAll('[data-cube-key]'));
-    const inGrid = cubes.filter((el) => !more!.contains(el));
-    const parked = cubes.filter((el) => more!.contains(el));
-    expect(inGrid).toHaveLength(5);
-    expect(inGrid[0].getAttribute('data-cube-key')).toBe('arena');
-    expect(parked.length).toBe(cubes.length - 5);
-    expect(parked.length).toBeGreaterThan(0);
+    expect(cubes).toHaveLength(5);
+    expect(cubes[0].getAttribute('data-cube-key')).toBe('arena');
+    expect(getByTestId('landing-cubes-more')).toHaveTextContent(/\+\d+/);
   });
 
-  it('keeps the calm room out of the screen layout (it is parked under More)', () => {
+  it('leaves the daily to the home itself', () => {
     const { container } = render(<LandingChallengeCards {...props} layout="screen" />);
-    expect(container.querySelector('[data-testid="landing-cubes-calm"]')).toBeNull();
+    expect(container.querySelector('[data-testid="home-daily-hero"]')).toBeNull();
   });
 });

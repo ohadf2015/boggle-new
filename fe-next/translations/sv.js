@@ -8520,6 +8520,9 @@ const sv = {
     "alternativesTitle": "Bästa Boggle-alternativen 2026"
   },
   "landing": {
+    "launch": {
+      "go": "KÖR!"
+    },
     "home": {
       "greeting": "Hej, {name}",
       "levelTitle": "Nivå {level} · {title}",
@@ -8539,6 +8542,7 @@ const sv = {
       "online": "online",
       "gameModes": "Spellägen",
       "todaysPuzzle": "Dagens pussel",
+      "wheelWord": "ORDHJUL",
       "puzzleNo": "Pussel #{n}",
       "resetsIn": "återställs om {time}",
       "dayStreak": "{n} dagar i rad",

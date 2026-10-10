@@ -1,0 +1,22 @@
+/* Mode tiles idle: each mascot breathes on its own beat. */
+
+.art {
+  transform: translateY(0) scale(var(--art-scale, 1));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .art {
+    animation: idle 2.6s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * -0.55s);
+  }
+}
+
+@keyframes idle {
+  0%,
+  100% {
+    transform: translateY(0) scale(var(--art-scale, 1));
+  }
+  50% {
+    transform: translateY(-4%) scale(calc(var(--art-scale, 1) * 1.04));
+  }
+}

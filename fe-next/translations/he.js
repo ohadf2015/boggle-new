@@ -8271,6 +8271,9 @@ const he = {
     "alternativesTitle": "החלופות הטובות ביותר לבוגל 2026"
   },
   "landing": {
+    "launch": {
+      "go": "יאללה!"
+    },
     "home": {
       "greeting": "היי, {name}",
       "levelTitle": "רמה {level} · {title}",
@@ -8290,6 +8293,7 @@ const he = {
       "online": "מחוברים",
       "gameModes": "מצבי משחק",
       "todaysPuzzle": "החידה היומית",
+      "wheelWord": "חידות",
       "puzzleNo": "חידה #{n}",
       "resetsIn": "מתאפס בעוד {time}",
       "dayStreak": "רצף {n} ימים",

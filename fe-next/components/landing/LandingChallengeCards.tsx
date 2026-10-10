@@ -16,6 +16,7 @@ import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 import { placeBlastAfterArena } from '@/lib/landing/blastPlacement';
 import { orderModesForNewcomer } from '@/lib/landing/newcomerModeOrder';
 import { LandingModeCubes } from './LandingModeCubes';
+import { HomeModeGrid } from './home/HomeModeGrid';
 import { useAdventureResume } from './useAdventureResume';
 import { MODE_META, modeRoute, isCalmMode, type ModeCubeModel } from '@/lib/landing/modeMeta';
 
@@ -42,7 +43,8 @@ interface LandingChallengeCardsProps {
   /** Pre-computed card order from server — static per ISR/deploy */
   cardOrder?: LandingGameMode[];
   /** `'hub'` renders for the mobile Home Hub: a richer daily hero + a visible
-      "Game Modes" header with a live-online pill. Defaults to the desktop bento. */
+      "Game Modes" header with a live-online pill. Defaults to the desktop bento.
+      `'screen'` is the one-screen returning home: modes only, the daily is the home's own. */
   layout?: 'bento' | 'hub' | 'screen';
 }
 
@@ -315,28 +317,22 @@ export function LandingChallengeCards({
     ...fastModels.filter((m) => m.key !== 'arena'),
     ...calmModels,
   ];
+  if (layout === 'screen') {
+    const SCREEN_TILES = 4;
+    return (
+      <HomeModeGrid
+        models={[...leadModels, ...parkedModels.slice(0, SCREEN_TILES)]}
+        extras={parkedModels.slice(SCREEN_TILES)}
+        liveCount={activePlayers}
+      />
+    );
+  }
+
   // Daily is the cubes hero — always present (it's the once-a-day hook), not
   // gated on heroCards like the control arm. It renders above the bento grid.
   // Both mobile Home Hub and desktop bento use the richer HomeDailyHero banner
   // (it widens to fill the slot at md+). Same `useDailyChallengeStats` feed.
   const dailyNode = <HomeDailyHero preloadedStats={dailyChallengeStats} />;
-
-  // One-screen home: the live arena + four modes in the grid, the rest one tap away.
-  const SCREEN_GRID_MODES = 4;
-  if (layout === 'screen') {
-    return (
-      <LandingModeCubes
-        models={[...leadModels, ...parkedModels.slice(0, SCREEN_GRID_MODES)]}
-        extras={parkedModels.slice(SCREEN_GRID_MODES)}
-        calmModels={[]}
-        dailyNode={dailyNode}
-        sectionLabel={t('landing.home.gameModes')}
-        t={t}
-        layout="screen"
-        liveCount={activePlayers}
-      />
-    );
-  }
 
   return (
     <LandingModeCubes

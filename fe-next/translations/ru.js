@@ -16327,6 +16327,9 @@ const ru = {
     }
   },
   "landing": {
+    "launch": {
+      "go": "ВПЕРЁД!"
+    },
     "home": {
       "greeting": "Привет, {name}",
       "levelTitle": "Уровень {level} · {title}",
@@ -16346,6 +16349,7 @@ const ru = {
       "online": "онлайн",
       "gameModes": "Режимы игры",
       "todaysPuzzle": "Сегодняшний пазл",
+      "wheelWord": "ЗАГАДКА",
       "puzzleNo": "Пазл #{n}",
       "resetsIn": "сбросится через {time}",
       "dayStreak": "серия {n} дней",

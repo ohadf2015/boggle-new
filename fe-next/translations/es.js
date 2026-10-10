@@ -8210,6 +8210,9 @@ const es = {
     "alternativesTitle": "Mejores alternativas a Boggle 2026"
   },
   "landing": {
+    "launch": {
+      "go": "¡VAMOS!"
+    },
     "home": {
       "greeting": "Hola, {name}",
       "levelTitle": "Nivel {level} · {title}",
@@ -8229,6 +8232,7 @@ const es = {
       "online": "en línea",
       "gameModes": "Modos de juego",
       "todaysPuzzle": "Reto de hoy",
+      "wheelWord": "PALABRA",
       "puzzleNo": "Puzle #{n}",
       "resetsIn": "se reinicia en {time}",
       "dayStreak": "racha de {n} días",

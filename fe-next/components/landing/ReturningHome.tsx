@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useMobilePortrait } from '@/hooks/useMobilePortrait';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
@@ -18,6 +16,8 @@ import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 import { isDashboardProfileLoading } from '@/lib/landing/dashboardReadiness';
 import { LandingChallengeCards } from './LandingChallengeCards';
 import { HomeTopBar } from './home/HomeTopBar';
+import { HomeDailyHero } from './home/HomeDailyHero';
+import { LaunchProvider } from './home/HomeLaunch';
 
 const EventBanner = dynamic(() => import('@/components/events/EventBanner'), { ssr: false });
 const PlayfulBackground = dynamic(
@@ -32,9 +32,8 @@ interface ReturningHomeProps {
 
 /**
  * The returning-user homepage: one screen, no page scroll. Top bar (profile,
- * streak, coins), today's daily as the lead action, the live arena and four
- * more modes, and one link to the classroom side. Mounted live only for
- * returning visitors (LandingView/homeTree keep it inert for fresh visitors).
+ * streak, coins), today's daily as the primary action, the live arena and four
+ * modes, the rest one tap away. Every door opens through the launch curtain.
  */
 export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => {
   const { t, language } = useLanguage();
@@ -43,11 +42,6 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
   // so the guest "Player" default never snaps to the real name.
   const dashboardProfileLoading = isDashboardProfileLoading(authLoading, user, profile);
   const isMobilePortrait = useMobilePortrait();
-
-  // Hydration gate: client-only state (CrazyGames, personalization) must not
-  // change the server HTML on the first client render.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
 
   const liveRoomStats = useLiveRoomStats();
   const { allTimeBest: playerAllTimeBest } = usePlayerStats();
@@ -62,10 +56,6 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
   const handleDismissEvent = useCallback(() => {
     if (visibleEvent) setDismissedEventIds((prev) => new Set([...prev, visibleEvent.id]));
   }, [visibleEvent]);
-
-  const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
-  // Treat "still resolving" as embedded so the classroom link never flashes on CrazyGames.
-  const hideExternalAuth = cgLoading || isOnCrazyGamesPlatform;
 
   // Mark returning players (cleared localStorage) as onboarded
   useEffect(() => {
@@ -96,7 +86,7 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
   };
 
   return (
-    <>
+    <LaunchProvider>
       {enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
 
       {visibleEvent && (
@@ -110,7 +100,7 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
         </div>
       )}
 
-      <section className="relative z-20 mx-auto flex w-full max-w-7xl flex-col gap-3 overflow-x-clip px-3 py-2 sm:px-4 md:min-h-[calc(100dvh-8rem)] md:justify-center md:gap-5 md:px-8 md:py-6">
+      <section className="relative z-20 mx-auto flex w-full max-w-6xl flex-col gap-3 overflow-x-clip px-3 pb-3 pt-2 sm:px-4 md:min-h-[calc(100dvh-8rem)] md:justify-center md:gap-6 md:px-8 md:py-6">
         <HomeTopBar
           profile={profile}
           language={language}
@@ -118,31 +108,23 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
           profileLoading={dashboardProfileLoading}
         />
 
-        <LandingChallengeCards
-          layout="screen"
-          language={language}
-          isAdmin={isAdmin}
-          hasBlastAccess={true}
-          activePlayers={liveRoomStats.activePlayers}
-          openRooms={liveRoomStats.openRooms}
-          totalPlayers={liveRoomStats.totalPlayers}
-          playerAllTimeBest={playerAllTimeBest}
-          t={t}
-          dailyChallengeStats={dailyChallengeStats}
-          cardOrder={initialData?.cardOrder}
-        />
-
-        {mounted && !hideExternalAuth && (
-          <Link
-            href={`/${language}/education`}
-            prefetch={false}
-            data-testid="landing-for-teachers-cta"
-            className="self-center font-neo-display text-sm font-black uppercase tracking-wide text-neo-cyan underline-offset-4 hover:underline md:hidden"
-          >
-            {t('landing.forTeachers')}
-          </Link>
-        )}
+        <div className="grid gap-4 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-8">
+          <HomeDailyHero preloadedStats={dailyChallengeStats} />
+          <LandingChallengeCards
+            layout="screen"
+            language={language}
+            isAdmin={isAdmin}
+            hasBlastAccess={true}
+            activePlayers={liveRoomStats.activePlayers}
+            openRooms={liveRoomStats.openRooms}
+            totalPlayers={liveRoomStats.totalPlayers}
+            playerAllTimeBest={playerAllTimeBest}
+            t={t}
+            dailyChallengeStats={dailyChallengeStats}
+            cardOrder={initialData?.cardOrder}
+          />
+        </div>
       </section>
-    </>
+    </LaunchProvider>
   );
 };

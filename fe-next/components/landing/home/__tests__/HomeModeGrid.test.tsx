@@ -1,0 +1,98 @@
+import React from 'react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, act, within } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { Swords } from 'lucide-react';
+import type { ModeCubeModel } from '@/lib/landing/modeMeta';
+import { HomeModeGrid } from '../HomeModeGrid';
+import { LaunchProvider, LAUNCH_HOLD_MS } from '../HomeLaunch';
+
+const push = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push, prefetch: vi.fn() }),
+}));
+vi.mock('next/image', () => ({
+  // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+  default: ({ fill: _f, placeholder: _p, blurDataURL: _b, ...props }: any) => <img {...props} />,
+}));
+vi.mock('next/link', () => ({
+  default: ({ children, href, prefetch: _p, ...props }: any) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}));
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
+}));
+
+function model(key: string, over: Partial<ModeCubeModel> = {}): ModeCubeModel {
+  return {
+    key,
+    title: key.toUpperCase(),
+    href: `/en/${key}`,
+    variant: 'pink',
+    Icon: Swords,
+    genIcon: `/modes/cubes/${key}.png`,
+    role: key === 'arena' ? 'anchor' : 'normal',
+    onClick: vi.fn(),
+    ...over,
+  };
+}
+
+const models = ['arena', 'adventure', 'wordTowerV2', 'brainGym', 'blast'].map((k) => model(k));
+const extras = [model('practice'), model('crossword')];
+
+describe('HomeModeGrid', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    push.mockReset();
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('lays out the live arena first and the next four modes as tiles', () => {
+    render(<HomeModeGrid models={models} extras={extras} liveCount={42} />);
+    expect(screen.getByTestId('mode-cube-anchor')).toHaveAttribute('data-cube-key', 'arena');
+    const tiles = screen.getAllByTestId('mode-cube').map((el) => el.getAttribute('data-cube-key'));
+    expect(tiles).toEqual(['adventure', 'wordTowerV2', 'brainGym', 'blast']);
+    expect(screen.getByTestId('home-live-count')).toHaveTextContent('42');
+  });
+
+  it('keeps the other modes one tap away in a sheet', () => {
+    render(<HomeModeGrid models={models} extras={extras} liveCount={0} />);
+    expect(screen.queryByTestId('home-more-sheet')).toBeNull();
+    fireEvent.click(screen.getByTestId('landing-cubes-more'));
+    const sheet = screen.getByTestId('home-more-sheet');
+    const keys = within(sheet)
+      .getAllByRole('link')
+      .map((el) => el.getAttribute('data-cube-key'));
+    expect(keys).toEqual(['practice', 'crossword']);
+  });
+
+  it('tracks the tap and launches into the mode', () => {
+    render(
+      <LaunchProvider>
+        <HomeModeGrid models={models} extras={extras} liveCount={0} />
+      </LaunchProvider>,
+    );
+    fireEvent.click(screen.getByTestId('mode-cube-anchor'));
+    expect(models[0].onClick).toHaveBeenCalled();
+    expect(screen.getByTestId('home-launch')).toHaveTextContent('ARENA');
+    act(() => {
+      vi.advanceTimersByTime(LAUNCH_HOLD_MS);
+    });
+    expect(push).toHaveBeenCalledWith('/en/arena');
+  });
+
+  it('never launches a locked mode', () => {
+    const locked = [model('arena', { locked: true, lockedMessage: 'offline' }), ...models.slice(1)];
+    render(
+      <LaunchProvider>
+        <HomeModeGrid models={locked} extras={[]} liveCount={0} />
+      </LaunchProvider>,
+    );
+    fireEvent.click(screen.getByTestId('mode-cube-anchor'));
+    expect(screen.queryByTestId('home-launch')).toBeNull();
+    expect(screen.getByText('offline')).toBeInTheDocument();
+  });
+});

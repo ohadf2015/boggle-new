@@ -7731,6 +7731,9 @@ const en = {
     "alternativesTitle": "Best Boggle Alternatives 2026"
   },
   "landing": {
+    "launch": {
+      "go": "GO!"
+    },
     "home": {
       "greeting": "Hey, {name}",
       "levelTitle": "Level {level} · {title}",
@@ -7750,6 +7753,7 @@ const en = {
       "online": "online",
       "gameModes": "Game modes",
       "todaysPuzzle": "Today's puzzle",
+      "wheelWord": "PUZZLE",
       "puzzleNo": "Puzzle #{n}",
       "resetsIn": "resets in {time}",
       "dayStreak": "{n}-day streak",

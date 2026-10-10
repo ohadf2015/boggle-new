@@ -8227,6 +8227,9 @@ const ja = {
     "alternativesTitle": "2026年おすすめボグル代替ゲーム"
   },
   "landing": {
+    "launch": {
+      "go": "いくぞ！"
+    },
     "home": {
       "greeting": "こんにちは、{name}さん",
       "levelTitle": "レベル{level}・{title}",
@@ -8246,6 +8249,7 @@ const ja = {
       "online": "オンライン",
       "gameModes": "ゲームモード",
       "todaysPuzzle": "今日のパズル",
+      "wheelWord": "ことばあそび",
       "puzzleNo": "パズル #{n}",
       "resetsIn": "{time}でリセット",
       "dayStreak": "{n}日連続",
