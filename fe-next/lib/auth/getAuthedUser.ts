@@ -13,16 +13,48 @@
  *   const user = await getAuthedUser(request);
  *   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
  */
+import { combineChunks, stringFromBase64URL } from '@supabase/ssr';
 import { verifyJwtLocal, bearerToken, type LocalUser } from './verifyJwt';
 
+const READ_METHODS = new Set(['GET', 'HEAD']);
+
+function readCookies(header: string): Map<string, string> {
+  const jar = new Map<string, string>();
+  for (const part of header.split(';')) {
+    const eq = part.indexOf('=');
+    if (eq < 0) continue;
+    const raw = part.slice(eq + 1).trim();
+    let value = raw;
+    try { value = decodeURIComponent(raw); } catch { /* keep raw */ }
+    jar.set(part.slice(0, eq).trim(), value);
+  }
+  return jar;
+}
+
+/** The access token from the @supabase/ssr session cookie (chunked, base64url). */
+async function cookieAccessToken(req: Request): Promise<string | null> {
+  const header = req.headers.get('cookie');
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!header || !url) return null;
+  try {
+    const key = `sb-${new URL(url).hostname.split('.')[0]}-auth-token`;
+    const jar = readCookies(header);
+    const raw = await combineChunks(key, (name) => jar.get(name));
+    if (!raw) return null;
+    const json = raw.startsWith('base64-') ? stringFromBase64URL(raw.slice(7)) : raw;
+    const token = (JSON.parse(json) as { access_token?: unknown })?.access_token;
+    return typeof token === 'string' ? token : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getAuthedUser(req: Request): Promise<LocalUser | null> {
-  // Fast path: local JWT verify when secret + bearer token present.
   if (process.env.SUPABASE_JWT_SECRET) {
-    const token = bearerToken(req);
+    const token = bearerToken(req) ?? (READ_METHODS.has(req.method) ? await cookieAccessToken(req) : null);
     if (token) {
       const local = await verifyJwtLocal(token);
       if (local) return local;
-      // Fall through to remote on local-verify failure (token might be cookie-derived).
     }
   }
 
