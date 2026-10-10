@@ -17775,14 +17775,6 @@ const ja = {
       "legendary": "レジェンダリー"
     }
   },
-  "encouragement": {
-    "gameStart": "さあ行こう。君ならできる！ 🎯",
-    "firstWord": "ナイス！どんどん見つけよう",
-    "longWord": "すごい！長い単語は高得点だよ",
-    "combo": "コンボ！絶好調",
-    "halfway": "半分達成、続けて！",
-    "almostDone": "ラストスパート！もっと見つけよう"
-  },
   "toast": {
     "found": "見つけた！",
     "nah": "ダメ。",
@@ -19399,16 +19391,28 @@ const ja = {
     "cta": "プレイ開始",
     "ctaWait": "{{seconds}}秒"
   },
-  "lesson": {
-    "try": "試してみて:",
-    "skip": "スキップ",
-    "findAny": "どんな単語でもOK",
-    "findLength": "{count}文字以上の単語を見つけよう",
-    "nice": "いいね！",
-    "great": "すごい！",
-    "wow": "わお！",
-    "amazing": "最高！",
-    "complete": "レッスン完了！",
+  "firstLesson": {
+    "skipLabel": "レッスンをスキップ",
+    "progressLabel": "レッスンの進み具合",
+    "trace": "この言葉をなぞろう",
+    "findAny": "次は好きな言葉を探そう",
+    "findLength": "{{count}}文字以上をねらおう",
+    "inARow": "{{count}}連続",
+    "praise": {
+      "nice": "いいね！",
+      "great": "すごい！",
+      "awesome": "最高！",
+      "amazing": "天才！"
+    },
+    "oops": "おしい！",
+    "tryWord": "{{word}}をなぞってみて",
+    "found": "{{word}}を見つけた！",
+    "complete": "レッスンクリア！",
+    "completeSub": "コツはつかめたね。残りの時間は自由にどうぞ。",
+    "statWords": "言葉",
+    "statPoints": "ポイント",
+    "statStreak": "連続",
+    "keepPlaying": "このまま続ける"
   },
   "modeCoach": {
     "skip": "スキップ",

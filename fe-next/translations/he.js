@@ -17218,16 +17218,28 @@ const he = {
     "cta": "מתחילים לשחק",
     "ctaWait": "{{seconds}} שנ׳"
   },
-  "lesson": {
-    "try": "נסו:",
-    "skip": "דילוג",
-    "findAny": "מצאו כל מילה",
-    "findLength": "מצאו מילה של {count}+ אותיות",
-    "nice": "יפה!",
-    "great": "מצוין!",
-    "wow": "וואו!",
-    "amazing": "מדהים!",
-    "complete": "השיעור הסתיים!",
+  "firstLesson": {
+    "skipLabel": "דילוג על השיעור",
+    "progressLabel": "התקדמות בשיעור",
+    "trace": "גררו על המילה הזו",
+    "findAny": "עכשיו מצאו מילה משלכם",
+    "findLength": "נסו מילה של {{count}}+ אותיות",
+    "inARow": "{{count}} ברצף",
+    "praise": {
+      "nice": "יפה!",
+      "great": "מעולה!",
+      "awesome": "אש!",
+      "amazing": "מטורף!"
+    },
+    "oops": "כמעט",
+    "tryWord": "נסו {{word}}",
+    "found": "מצאתם {{word}}",
+    "complete": "סיימתם את השיעור!",
+    "completeSub": "תפסתם את זה. שאר הסיבוב שלכם.",
+    "statWords": "מילים",
+    "statPoints": "נקודות",
+    "statStreak": "רצף",
+    "keepPlaying": "ממשיכים לשחק"
   },
   "modeCoach": {
     "skip": "דלגו",
@@ -17773,14 +17785,6 @@ const he = {
       "epic": "אפי",
       "legendary": "אגדי"
     }
-  },
-  "encouragement": {
-    "gameStart": "יאללה, אתם יכולים! 🎯",
-    "firstWord": "יפה! המשיכו למצוא מילים",
-    "longWord": "וואו! מילים ארוכות שוות יותר",
-    "combo": "קומבו! אתם על גל",
-    "halfway": "באמצע הדרך, המשיכו!",
-    "almostDone": "הישורת האחרונה! מצאו עוד מילים"
   },
   "toast": {
     "found": "נמצא!",

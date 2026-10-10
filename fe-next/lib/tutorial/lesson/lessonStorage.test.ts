@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readLessonOutcome, writeLessonOutcome, LESSON_STORAGE_KEY } from './lessonStorage';
+import { readLessonOutcome, writeLessonOutcome, lessonStorageKey } from './lessonStorage';
 
 function memoryStorage(): Storage {
   const data = new Map<string, string>();
@@ -17,20 +17,21 @@ function memoryStorage(): Storage {
 
 describe('lessonStorage', () => {
   it('returns null for a player who has never finished or skipped the lesson', () => {
-    expect(readLessonOutcome(memoryStorage())).toBeNull();
+    expect(readLessonOutcome('classic', memoryStorage())).toBeNull();
   });
 
-  it('remembers a finished lesson', () => {
+  it('remembers a finished lesson per mode', () => {
     const s = memoryStorage();
-    writeLessonOutcome('done', s);
-    expect(readLessonOutcome(s)).toBe('done');
-    expect(s.getItem(LESSON_STORAGE_KEY)).toBe('done');
+    writeLessonOutcome('classic', 'done', s);
+    expect(readLessonOutcome('classic', s)).toBe('done');
+    expect(s.getItem(lessonStorageKey('classic'))).toBe('done');
+    expect(readLessonOutcome('blast', s)).toBeNull();
   });
 
   it('remembers a skipped lesson', () => {
     const s = memoryStorage();
-    writeLessonOutcome('skipped', s);
-    expect(readLessonOutcome(s)).toBe('skipped');
+    writeLessonOutcome('classic', 'skipped', s);
+    expect(readLessonOutcome('classic', s)).toBe('skipped');
   });
 
   it('treats an unreadable storage as never-seen and never throws', () => {
@@ -42,7 +43,7 @@ describe('lessonStorage', () => {
         throw new Error('blocked');
       },
     } as unknown as Storage;
-    expect(readLessonOutcome(broken)).toBeNull();
-    expect(() => writeLessonOutcome('done', broken)).not.toThrow();
+    expect(readLessonOutcome('classic', broken)).toBeNull();
+    expect(() => writeLessonOutcome('classic', 'done', broken)).not.toThrow();
   });
 });

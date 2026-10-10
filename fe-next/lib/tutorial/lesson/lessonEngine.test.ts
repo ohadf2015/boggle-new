@@ -1,65 +1,85 @@
 import { describe, it, expect } from 'vitest';
 import {
-  CLASSIC_FIRST_ROUND_STEPS,
-  applyLessonWord,
+  CLASSIC_LESSON,
   replayLesson,
+  stepAccepts,
+  liveSlots,
+  nextTraceIndex,
 } from './lessonEngine';
 
-const HINT = 'cat';
+const steps = CLASSIC_LESSON.steps;
+const valid = (word: string) => ({ word, isValid: true as const });
 
-describe('applyLessonWord', () => {
-  it('ignores invalid words', () => {
-    const r = applyLessonWord(CLASSIC_FIRST_ROUND_STEPS, 0, { word: HINT, isValid: false, hintWord: HINT });
-    expect(r.completedCount).toBe(0);
-    expect(r.completedStep).toBeNull();
+describe('CLASSIC_LESSON', () => {
+  it('opens with a trace step and climbs in word length', () => {
+    expect(steps[0].kind).toBe('trace');
+    const lengths = steps.map((s) => s.minLength);
+    expect([...lengths].sort((a, b) => a - b)).toEqual(lengths);
+    expect(steps.length).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('stepAccepts', () => {
+  it('never accepts an invalid or unvalidated word', () => {
+    expect(stepAccepts(steps[0], { word: 'cat', isValid: false })).toBe(false);
+    expect(stepAccepts(steps[0], { word: 'cat', isValid: null })).toBe(false);
   });
 
-  it('completes the trace step only with the hinted word', () => {
-    const miss = applyLessonWord(CLASSIC_FIRST_ROUND_STEPS, 0, { word: 'dog', isValid: true, hintWord: HINT });
-    expect(miss.completedCount).toBe(0);
-    const hit = applyLessonWord(CLASSIC_FIRST_ROUND_STEPS, 0, { word: 'CAT', isValid: true, hintWord: HINT });
-    expect(hit.completedCount).toBe(1);
-    expect(hit.completedStep?.id).toBe('trace-hint');
+  it('accepts any real word for the trace step, so a player who finds their own word still advances', () => {
+    expect(stepAccepts(steps[0], valid('dog'))).toBe(true);
   });
 
-  it('advances at most one step per word', () => {
-    const r = applyLessonWord(CLASSIC_FIRST_ROUND_STEPS, 1, { word: 'elephant', isValid: true, hintWord: HINT });
-    expect(r.completedCount).toBe(2);
-    expect(r.completedStep?.id).toBe('any-word');
-  });
-
-  it('requires the minimum length of the current step', () => {
-    const short = applyLessonWord(CLASSIC_FIRST_ROUND_STEPS, 2, { word: 'tea', isValid: true, hintWord: HINT });
-    expect(short.completedCount).toBe(2);
-    const long = applyLessonWord(CLASSIC_FIRST_ROUND_STEPS, 2, { word: 'tree', isValid: true, hintWord: HINT });
-    expect(long.completedCount).toBe(3);
-  });
-
-  it('does nothing once every step is done', () => {
-    const r = applyLessonWord(CLASSIC_FIRST_ROUND_STEPS, CLASSIC_FIRST_ROUND_STEPS.length, {
-      word: 'elephant', isValid: true, hintWord: HINT,
-    });
-    expect(r.completedCount).toBe(CLASSIC_FIRST_ROUND_STEPS.length);
-    expect(r.completedStep).toBeNull();
+  it('holds a find step to its minimum length', () => {
+    const four = steps.find((s) => s.minLength === 4)!;
+    expect(stepAccepts(four, valid('cat'))).toBe(false);
+    expect(stepAccepts(four, valid('cats'))).toBe(true);
   });
 });
 
 describe('replayLesson', () => {
-  it('replays words in order and reports the last completed step', () => {
-    const words = [
-      { word: 'dog', isValid: true },
-      { word: 'cat', isValid: true },
-      { word: 'tree', isValid: true },
-      { word: 'elephant', isValid: true },
-    ];
-    const r = replayLesson(CLASSIC_FIRST_ROUND_STEPS, words, HINT);
-    expect(r.completedCount).toBe(3);
-    expect(r.lastCompleted?.id).toBe('long-word');
+  it('advances at most one step per word, in order', () => {
+    const r = replayLesson(steps, [valid('planets')]);
+    expect(r.completedCount).toBe(1);
   });
 
-  it('reports nothing when no words have been played', () => {
-    const r = replayLesson(CLASSIC_FIRST_ROUND_STEPS, [], HINT);
-    expect(r.completedCount).toBe(0);
-    expect(r.lastCompleted).toBeNull();
+  it('skips words that do not fit the current step without losing progress', () => {
+    const four = steps.findIndex((s) => s.minLength === 4);
+    const words = [...steps.slice(0, four).map(() => valid('cat')), valid('dog'), valid('cats')];
+    const r = replayLesson(steps, words);
+    expect(r.completedCount).toBe(four + 1);
+    expect(r.lastWord).toBe('cats');
+  });
+
+  it('caps at the number of steps', () => {
+    const r = replayLesson(steps, Array.from({ length: 10 }, () => valid('elephants')));
+    expect(r.completedCount).toBe(steps.length);
+  });
+});
+
+describe('liveSlots', () => {
+  it('shows the target ghosted, then marks each traced letter as a match or a miss', () => {
+    expect(liveSlots(steps[0], 'CAT', '').map((s) => s.state)).toEqual(['ghost', 'ghost', 'ghost']);
+    const partial = liveSlots(steps[0], 'CAT', 'ca');
+    expect(partial.map((s) => s.state)).toEqual(['match', 'match', 'ghost']);
+    expect(partial[0].char).toBe('C');
+    expect(liveSlots(steps[0], 'CAT', 'co').map((s) => s.state)).toEqual(['match', 'miss', 'ghost']);
+  });
+
+  it('gives a find step one empty slot per required letter and grows past it', () => {
+    const four = steps.find((s) => s.minLength === 4)!;
+    expect(liveSlots(four, null, '').map((s) => s.state)).toEqual(['empty', 'empty', 'empty', 'empty']);
+    expect(liveSlots(four, null, 'ab').map((s) => s.state)).toEqual(['filled', 'filled', 'empty', 'empty']);
+    const long = liveSlots(four, null, 'plane');
+    expect(long).toHaveLength(5);
+    expect(long.every((s) => s.state === 'ready')).toBe(true);
+  });
+});
+
+describe('nextTraceIndex', () => {
+  it('points at the next letter while the player stays on the target', () => {
+    expect(nextTraceIndex('CAT', '')).toBe(0);
+    expect(nextTraceIndex('CAT', 'c')).toBe(1);
+    expect(nextTraceIndex('CAT', 'cat')).toBe(-1);
+    expect(nextTraceIndex('CAT', 'cu')).toBe(-1);
   });
 });

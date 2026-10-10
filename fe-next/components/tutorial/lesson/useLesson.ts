@@ -1,61 +1,121 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  CLASSIC_FIRST_ROUND_STEPS,
   replayLesson,
-  type LessonHint,
+  type LessonDefinition,
   type LessonStep,
   type LessonWord,
 } from '@/lib/tutorial/lesson/lessonEngine';
 import { readLessonOutcome, writeLessonOutcome, type LessonOutcome } from '@/lib/tutorial/lesson/lessonStorage';
 
-const FINISH_HOLD_MS = 2200;
+export const SUCCESS_MS = 1700;
+export const OOPS_MS = 1300;
+export const COMPLETE_MS = 3600;
+
+export interface LessonFeedback {
+  id: string;
+  type: string;
+  message?: string;
+}
 
 export interface UseLessonArgs {
-  /** Mode gate: false keeps the lesson off (practice, quick play, paused, game over). */
+  definition: LessonDefinition;
+  /** Mode gate: false keeps the lesson off (practice, quick play, game over). */
   enabled: boolean;
-  hint: LessonHint | null;
   words: readonly LessonWord[];
-  steps?: readonly LessonStep[];
+  feedback: LessonFeedback | null;
 }
+
+export type LessonEvent =
+  | { key: string; kind: 'success'; word: string; streak: number; stepIndex: number }
+  | { key: string; kind: 'oops'; message: string; streak: 0 };
 
 export interface UseLessonResult {
   active: boolean;
   steps: readonly LessonStep[];
   completedCount: number;
-  hint: LessonHint | null;
+  /** The step being taught, or null once all are done. */
+  step: LessonStep | null;
+  event: LessonEvent | null;
+  /** The finale card is on screen. */
+  complete: boolean;
+  bestStreak: number;
   skip: () => void;
+  closeComplete: () => void;
 }
 
-/** Progress is replayed from played words, so it cannot drift from what the game counted. */
-export function useLesson({ enabled, hint, words, steps = CLASSIC_FIRST_ROUND_STEPS }: UseLessonArgs): UseLessonResult {
-  const [outcome, setOutcome] = useState<LessonOutcome | null>(() => readLessonOutcome());
+export function useLesson({ definition, enabled, words, feedback }: UseLessonArgs): UseLessonResult {
+  const { id, steps } = definition;
+  const [outcome, setOutcome] = useState<LessonOutcome | null>(() => readLessonOutcome(id));
+  const [complete, setComplete] = useState(false);
+  const [event, setEvent] = useState<LessonEvent | null>(null);
+  const streakRef = useRef(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const seenCountRef = useRef(0);
+  const seenFeedbackRef = useRef<string | null>(null);
 
-  const completedCount = useMemo(
-    () => replayLesson(steps, words, hint?.word ?? null).completedCount,
-    [steps, words, hint],
-  );
-  const finished = completedCount >= steps.length;
+  const { completedCount, lastWord } = useMemo(() => replayLesson(steps, words), [steps, words]);
+  const running = enabled && !outcome;
 
   useEffect(() => {
-    if (!finished || outcome) return;
-    writeLessonOutcome('done');
-    const id = window.setTimeout(() => setOutcome('done'), FINISH_HOLD_MS);
-    return () => window.clearTimeout(id);
-  }, [finished, outcome]);
+    if (completedCount <= seenCountRef.current) return;
+    seenCountRef.current = completedCount;
+    if (!running) return;
+    streakRef.current += 1;
+    setBestStreak((b) => Math.max(b, streakRef.current));
+    setEvent({
+      key: `s${completedCount}`,
+      kind: 'success',
+      word: lastWord ?? '',
+      streak: streakRef.current,
+      stepIndex: completedCount - 1,
+    });
+    if (completedCount >= steps.length) {
+      writeLessonOutcome(id, 'done');
+      setComplete(true);
+      setOutcome('done');
+    }
+  }, [completedCount, lastWord, running, steps.length, id]);
+
+  useEffect(() => {
+    if (!feedback || feedback.id === seenFeedbackRef.current) return;
+    seenFeedbackRef.current = feedback.id;
+    if (!running || feedback.type !== 'rejected') return;
+    streakRef.current = 0;
+    setEvent({ key: feedback.id, kind: 'oops', message: feedback.message ?? '', streak: 0 });
+  }, [feedback, running]);
+
+  useEffect(() => {
+    if (!event) return;
+    const ms = event.kind === 'success' ? SUCCESS_MS : OOPS_MS;
+    const t = window.setTimeout(() => setEvent(null), ms);
+    return () => window.clearTimeout(t);
+  }, [event]);
+
+  useEffect(() => {
+    if (!complete) return;
+    const t = window.setTimeout(() => setComplete(false), COMPLETE_MS);
+    return () => window.clearTimeout(t);
+  }, [complete]);
 
   const skip = useCallback(() => {
-    writeLessonOutcome('skipped');
+    writeLessonOutcome(id, 'skipped');
     setOutcome('skipped');
-  }, []);
+    setEvent(null);
+  }, [id]);
+  const closeComplete = useCallback(() => setComplete(false), []);
 
   return {
-    active: enabled && !outcome && !!hint,
+    active: running || complete,
     steps,
     completedCount,
-    hint,
+    step: steps[completedCount] ?? null,
+    event: running || complete ? event : null,
+    complete,
+    bestStreak,
     skip,
+    closeComplete,
   };
 }
 

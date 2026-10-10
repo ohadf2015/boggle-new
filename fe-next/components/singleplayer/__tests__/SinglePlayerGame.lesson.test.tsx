@@ -1,25 +1,7 @@
-/**
- * A first-timer now lands in /singleplayer?autoStart=bots straight out of FTUE
- * (see lib/onboarding/firstGameRoute.ts). ModeCoach is deliberately disabled
- * ("more confusing than helping"), so before this there was NO on-screen help
- * here at all — nothing taught the drag gesture and nothing rescued someone who
- * froze.
- *
- * The stuck coach is the one that may speak: silent if you have scored, silent
- * for anyone past their first game, at most one hint per game, auto-hidden after
- * 10s. It only appears on demonstrated confusion — 12s frozen, or fruitless
- * submits — which is the "help me only if I am stuck" contract.
- */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
-
-vi.mock('@/components/tutorial/ModeCoach', () => ({
-  ModeCoach: ({ mode }: { mode: string }) => (
-    <div data-testid="mode-coach" data-mode={mode} />
-  ),
-}));
 
 vi.mock('@/components/practice/PracticeCoachTip', () => ({
   __esModule: true,
@@ -27,7 +9,12 @@ vi.mock('@/components/practice/PracticeCoachTip', () => ({
 }));
 
 vi.mock('../game', () => ({
-  SinglePlayerShell: () => <div data-testid="layout-portrait" />,
+  SinglePlayerShell: ({ soloChrome, soloMissions }: { soloChrome?: React.ReactNode; soloMissions?: unknown }) => (
+    <div data-testid="layout-portrait">
+      {soloChrome}
+      <span data-testid="missions">{soloMissions ? 'on' : 'off'}</span>
+    </div>
+  ),
   useSinglePlayerCore: () => ({
     grid: [['A', 'B'], ['C', 'D']],
     foundWords: [],
@@ -44,8 +31,8 @@ vi.mock('../game', () => ({
     letterCount: 0,
     currentFeedback: null,
     keyboardInput: null,
-    tutorialPath: null,
-    tutorialWord: null,
+    availableWords: null,
+    soloMissions: [{ id: 'm1' }],
     revealState: { highlightedPath: null },
     lastWordFoundTimeRef: { current: 0 },
     fireRoundActive: false,
@@ -86,17 +73,6 @@ vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => null }));
 vi.mock('@/components/achievements', () => ({
   useAchievementQueue: () => ({ queueAchievement: vi.fn() }),
 }));
-vi.mock('@/components/game/FirstTimeEncouragement', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-vi.mock('@/hooks/useFirstTimeEncouragement', () => ({
-  useFirstTimeEncouragement: () => ({
-    currentTrigger: null,
-    triggerEncouragement: vi.fn(),
-    dismiss: vi.fn(),
-  }),
-}));
 vi.mock('@/hooks/useIdleDetection', () => ({
   useIdleDetection: () => ({ reportActivity: vi.fn() }),
 }));
@@ -116,7 +92,9 @@ vi.mock('@/lib/achievements/hiddenAchievementBus', () => ({
   evaluateSelectionAchievements: vi.fn(),
 }));
 
+import SinglePlayerGame from '../SinglePlayerGame';
 import type { SinglePlayerGameState } from '../SinglePlayerView';
+import { lessonStorageKey } from '@/lib/tutorial/lesson/lessonStorage';
 
 const settings = {
   mode: 'challenge',
@@ -128,86 +106,42 @@ const settings = {
   minWordLength: 3,
 } as unknown as SinglePlayerGameState;
 
-import SinglePlayerGame from '../SinglePlayerGame';
-
-let mockCoach: {
-  stage: string;
-  visible: boolean;
-  markTap: ReturnType<typeof vi.fn>;
-  markDragStart: ReturnType<typeof vi.fn>;
-  markSubmit: ReturnType<typeof vi.fn>;
-  markAccepted: ReturnType<typeof vi.fn>;
-  dismiss: ReturnType<typeof vi.fn>;
-};
-const coachArgsSpy = vi.fn();
-
-vi.mock('@/hooks/useMPStuckCoach', () => ({
-  useMPStuckCoach: (args: unknown) => {
-    coachArgsSpy(args);
-    return mockCoach;
-  },
-}));
-vi.mock('@/hooks/useCoachExampleWord', () => ({
-  useCoachExampleWord: () => 'CAT',
-}));
-
-const baseSettings = {
-  mode: 'solo-bots' as const,
-  difficulty: 'EASY',
-  timerSeconds: 90,
-  bots: [],
-  language: 'en',
-  grid: null,
-  minWordLength: 2,
-};
-
-function renderGame() {
-  return render(
+const renderGame = (props: { hideModeCoach?: boolean; mode?: string } = {}) =>
+  render(
     <SinglePlayerGame
-      settings={baseSettings as never}
+      settings={{ ...settings, mode: props.mode ?? 'challenge' } as SinglePlayerGameState}
       targetHighScore={null}
       onGameEnd={vi.fn()}
       onQuit={vi.fn()}
+      hideModeCoach={props.hideModeCoach}
     />
   );
-}
 
-beforeEach(() => {
-  coachArgsSpy.mockClear();
-  mockCoach = {
-    stage: 'none',
-    visible: false,
-    markTap: vi.fn(),
-    markDragStart: vi.fn(),
-    markSubmit: vi.fn(),
-    markAccepted: vi.fn(),
-    dismiss: vi.fn(),
-  };
-});
+describe('SinglePlayerGame first-round lesson', () => {
+  beforeEach(() => window.localStorage.clear());
 
-describe('SinglePlayerGame — stuck coach', () => {
-  it('stays completely silent while the player is coping', () => {
+  it('teaches a new player with the lesson in place of the mission chips', () => {
     renderGame();
-    expect(screen.queryByTestId('mp-stuck-coach-card')).not.toBeInTheDocument();
+    expect(screen.getByTestId('lesson-hud')).toBeInTheDocument();
+    expect(screen.getByTestId('lesson-target')).toBeInTheDocument();
+    expect(screen.getByTestId('missions')).toHaveTextContent('off');
   });
 
-  it('shows the coach once the arbiter says the player is stuck', () => {
-    mockCoach = { ...mockCoach, stage: 'idle-nudge', visible: true };
-    renderGame();
-    expect(screen.getByTestId('mp-stuck-coach-card')).toBeInTheDocument();
+  it('stays out of Quick Play rounds', () => {
+    renderGame({ hideModeCoach: true });
+    expect(screen.queryByTestId('lesson-hud')).toBeNull();
+    expect(screen.getByTestId('missions')).toHaveTextContent('on');
   });
 
-  it('passes the desktop flag through so the touch-only tap hint is suppressed', () => {
-    renderGame();
-    expect(coachArgsSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ isClassic: true, isDesktop: false })
-    );
+  it('stays out of practice', () => {
+    renderGame({ mode: 'practice' });
+    expect(screen.queryByTestId('lesson-hud')).toBeNull();
   });
 
-  it('reports the player has scored, so the coach gets out of the way', () => {
+  it('does not return once the player finished or skipped it', () => {
+    window.localStorage.setItem(lessonStorageKey('classic'), 'skipped');
     renderGame();
-    // markAccepted is what silences every later stage (accepted > 0 => 'none').
-    expect(typeof mockCoach.markAccepted).toBe('function');
-    expect(coachArgsSpy).toHaveBeenCalled();
+    expect(screen.queryByTestId('lesson-hud')).toBeNull();
+    expect(screen.getByTestId('missions')).toHaveTextContent('on');
   });
 });

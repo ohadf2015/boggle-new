@@ -15751,16 +15751,28 @@ const en = {
     "cta": "Let's play",
     "ctaWait": "{{seconds}}s"
   },
-  "lesson": {
-    "try": "Try:",
-    "skip": "Skip",
-    "findAny": "Find any word",
-    "findLength": "Find a {count}+ letter word",
-    "nice": "Nice!",
-    "great": "Great!",
-    "wow": "Wow!",
-    "amazing": "Amazing!",
+  "firstLesson": {
+    "skipLabel": "Skip lesson",
+    "progressLabel": "Lesson progress",
+    "trace": "Trace this word",
+    "findAny": "Now find any word",
+    "findLength": "Go for {{count}}+ letters",
+    "inARow": "{{count}} in a row",
+    "praise": {
+      "nice": "Nice!",
+      "great": "Great!",
+      "awesome": "Awesome!",
+      "amazing": "Amazing!"
+    },
+    "oops": "Not quite",
+    "tryWord": "Try {{word}}",
+    "found": "You found {{word}}",
     "complete": "Lesson complete!",
+    "completeSub": "You've got it. The rest of the round is all yours.",
+    "statWords": "Words",
+    "statPoints": "Points",
+    "statStreak": "Streak",
+    "keepPlaying": "Keep playing"
   },
   "modeCoach": {
     "skip": "Skip",
@@ -16301,14 +16313,6 @@ const en = {
       "epic": "Epic",
       "legendary": "Legendary"
     }
-  },
-  "encouragement": {
-    "gameStart": "Let's go, you've got this!",
-    "firstWord": "Nice one. Keep finding words!",
-    "longWord": "Nice long word. Those score big!",
-    "combo": "Combo! You're on fire",
-    "halfway": "Halfway there, keep going!",
-    "almostDone": "Final stretch. Find more words!"
   },
   "toast": {
     "found": "FOUND!",

@@ -1,6 +1,6 @@
-export const LESSON_STORAGE_KEY = 'lexiclash.lesson.classic.v1';
-
 export type LessonOutcome = 'done' | 'skipped';
+
+export const lessonStorageKey = (lessonId: string) => `lexiclash.lesson.${lessonId}.v1`;
 
 function localStorageOrNull(): Storage | null {
   try {
@@ -10,19 +10,26 @@ function localStorageOrNull(): Storage | null {
   }
 }
 
-export function readLessonOutcome(storage: Storage | null = localStorageOrNull()): LessonOutcome | null {
+export function readLessonOutcome(
+  lessonId: string,
+  storage: Storage | null = localStorageOrNull(),
+): LessonOutcome | null {
   try {
-    const v = storage?.getItem(LESSON_STORAGE_KEY);
+    const v = storage?.getItem(lessonStorageKey(lessonId));
     return v === 'done' || v === 'skipped' ? v : null;
   } catch {
     return null;
   }
 }
 
-export function writeLessonOutcome(outcome: LessonOutcome, storage: Storage | null = localStorageOrNull()): void {
+export function writeLessonOutcome(
+  lessonId: string,
+  outcome: LessonOutcome,
+  storage: Storage | null = localStorageOrNull(),
+): void {
   try {
-    storage?.setItem(LESSON_STORAGE_KEY, outcome);
+    storage?.setItem(lessonStorageKey(lessonId), outcome);
   } catch {
-    /* private mode or blocked storage: the lesson simply shows again next game */
+    /* blocked storage: the lesson shows again next game */
   }
 }
