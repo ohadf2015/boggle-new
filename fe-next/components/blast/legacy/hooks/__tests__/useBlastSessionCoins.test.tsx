@@ -70,6 +70,20 @@ describe('useBlastSessionCoins', () => {
     expect(events).toHaveLength(1);
   });
 
+  it('a score under the estimate never rolls the wallet back down; later words catch it up', () => {
+    addBoard();
+    const { result } = renderHook(() => useBlastSessionCoins({ isMultiplayer: false, gridSize: 3 }));
+    act(() => result.current.launchCoins([{ row: 1, col: 1 }], 5));
+    act(() => result.current.creditCoins(3));
+    expect(result.current.sessionCoins).toBe(3);
+    expect(result.current.walletCoins).toBe(5);
+    act(() => result.current.launchCoins([{ row: 0, col: 0 }], 4));
+    expect(result.current.walletCoins).toBe(7);
+    act(() => result.current.creditCoins(4));
+    expect(result.current.sessionCoins).toBe(7);
+    expect(result.current.walletCoins).toBe(7);
+  });
+
   it('does nothing in multiplayer', () => {
     addBoard();
     const { result } = renderHook(() => useBlastSessionCoins({ isMultiplayer: true, gridSize: 3 }));
