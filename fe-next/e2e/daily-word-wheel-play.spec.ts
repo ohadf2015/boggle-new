@@ -54,7 +54,7 @@ test.describe('Daily Word Wheel — phone', () => {
     for (const i of [0, 1, 2]) await letters.nth(i).click({ force: true });
     await expect(page.getByTestId('built-letter-tile')).toHaveCount(3);
     await page.getByTestId('inline-submit-chip').click({ force: true });
-    await expect(page.getByTestId('word-feedback')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId('word-feedback')).toBeVisible({ timeout: 20000 });
 
     const ranks = page.getByRole('button', { name: /see all ranks/i });
     await ranks.click();

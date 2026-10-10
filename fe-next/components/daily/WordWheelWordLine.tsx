@@ -130,7 +130,7 @@ export default function WordWheelWordLine({
             <m.span
               data-testid="word-caret"
               aria-hidden
-              className="inline-block w-[3px] h-7 rounded-full bg-neo-lime"
+              className={cn('inline-block w-[3px] h-7 rounded-full bg-neo-lime', rejected && 'invisible')}
               animate={reducedMotion ? undefined : { opacity: [1, 0, 1] }}
               transition={{ duration: 1.05, repeat: Infinity, ease: 'linear' }}
             />
