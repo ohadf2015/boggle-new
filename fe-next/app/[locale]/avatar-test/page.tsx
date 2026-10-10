@@ -12,7 +12,7 @@ type PageProps = {
 };
 
 export default async function AvatarTestPage({ searchParams }: PageProps) {
-  notFoundInProduction();
+  await notFoundInProduction();
   const { level, view } = parseAvatarLabParams(await searchParams);
   return (
     <>

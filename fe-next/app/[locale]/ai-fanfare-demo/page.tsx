@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'AI Fanfare Demo',
 };
 
-export default function AiFanfareDemoPage() {
-  notFoundInProduction();
+export default async function AiFanfareDemoPage() {
+  await notFoundInProduction();
   return <AiFanfareDemoClient />;
 }

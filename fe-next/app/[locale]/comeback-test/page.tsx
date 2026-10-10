@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function ComebackTestPage() {
-  notFoundInProduction();
+export default async function ComebackTestPage() {
+  await notFoundInProduction();
   return <ComebackTestPageClient />;
 }
