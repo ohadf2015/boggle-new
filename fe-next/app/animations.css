@@ -3223,3 +3223,24 @@ html.reduce-motion *::after {
 .animate-fade-in-up {
   animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+/* Quick-play results celebration (components/quick-play/QuickResultsFx.tsx) */
+@keyframes qp-ray-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes qp-spark {
+  0%, 30%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+  12% { transform: scale(1) rotate(45deg); opacity: 1; }
+}
+@keyframes qp-coin-fly {
+  0% { transform: translate(var(--fx, 0px), -170px) scale(0.7); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate(0, 8px) scale(0.4); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[qp-ray-spin_28s_linear_infinite\],
+  .animate-\[qp-spark_3\.2s_ease-in-out_infinite\],
+  .animate-\[qp-coin-fly_1\.1s_cubic-bezier\(0\.3\,0\,0\.2\,1\)_both\] {
+    animation: none;
+  }
+}

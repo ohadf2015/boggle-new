@@ -13,10 +13,11 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { fireConfetti } from '@/utils/confettiUtils';
 import { haptics } from '@/utils/haptics/HapticsManager';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
+import { setQuickResultsOnScreen } from '@/lib/quickPlay/resultsCalm';
+import { CoinFlight, QuickResultsRays, QuickResultsSparkles } from './QuickResultsFx';
 import Avatar from '@/components/Avatar';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
 import { QuickPlayRankCard } from './QuickPlayRankCard';
@@ -151,25 +152,26 @@ export function QuickPlayResults({
   const percentileToday = outcome.percentileToday > 0 ? outcome.percentileToday : boardPercentile ?? 0;
   const showPercentile = outcome.percentileToday > 0 || boardPercentile !== null;
 
+  const celebrateTier = celebrationTier({
+    scorePct: result.scorePct,
+    isPersonalBest,
+    beatRival,
+    percentileToday: outcome.percentileToday,
+  });
+  // Sparse starbursts, not a confetti blizzard: a rank-up or a top tier gets
+  // the full handful, a plain good round gets two.
+  const sparkCount = rankedUp ? 6 : celebrateTier >= 2 ? 4 : celebrateTier >= 1 ? 2 : 0;
+
+  useEffect(() => {
+    setQuickResultsOnScreen(true);
+    return () => setQuickResultsOnScreen(false);
+  }, []);
+
   useEffect(() => {
     if (celebrated.current) return;
     celebrated.current = true;
-    const tier = celebrationTier({
-      scorePct: result.scorePct,
-      isPersonalBest,
-      beatRival,
-      percentileToday: outcome.percentileToday,
-    });
-    if (tier >= 2 || rankedUp) haptics.success();
-    if (rankedUp) fireConfetti({ particleCount: 180, spread: 100 });
-    if (tier === 1) fireConfetti({ particleCount: 40, spread: 55 });
-    else if (tier === 2) fireConfetti({ particleCount: 90, spread: 70 });
-    else if (tier === 3) fireConfetti({ particleCount: 140, spread: 90 });
-    else if (tier === 4) {
-      fireConfetti({ particleCount: 220, spread: 120 });
-      setTimeout(() => fireConfetti({ particleCount: 120, spread: 70 }), 450);
-    }
-  }, [result.scorePct, isPersonalBest, beatRival, outcome.percentileToday, rankedUp]);
+    if (celebrateTier >= 2 || rankedUp) haptics.success();
+  }, [celebrateTier, rankedUp]);
 
   useEffect(() => {
     let cancelled = false;
@@ -194,6 +196,7 @@ export function QuickPlayResults({
   };
   const heroAnimation = prefersReducedMotion ? '' : 'animate-[fadeInUp_0.3s_ease-out_var(--delay,0s)_both]';
   const rewardsAnimation = prefersReducedMotion ? '' : 'animate-[fadeInUp_0.3s_ease-out_var(--delay,0.25s)_both]';
+  const fxEnabled = !prefersReducedMotion;
   const rankAnimation = prefersReducedMotion ? '' : 'animate-[fadeInUp_0.3s_ease-out_var(--delay,0.5s)_both]';
 
   const myName = profile?.username || t('common.you', 'You');
@@ -276,11 +279,20 @@ export function QuickPlayResults({
       <div className="flex flex-col gap-2.5">
       {/* Hero: % of perfect — DOMINANT element. */}
       <div
-        className={`rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-4 shadow-hard-lg ${heroAnimation}`}
+        className={`relative overflow-hidden rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-4 shadow-hard-lg ${heroAnimation}`}
         style={{ '--delay': staggerDelay.hero } as React.CSSProperties}
         data-testid="quick-hero-card"
       >
-        <div className="flex flex-col items-center gap-4">
+        <QuickResultsRays color={modeColor.hex} enabled={fxEnabled} />
+        <QuickResultsSparkles count={sparkCount} enabled={fxEnabled} />
+        <div className="relative z-10 flex flex-col items-center gap-4">
+          <div data-testid="quick-hero-avatar">
+            <Avatar
+              userId={user?.id ?? myName}
+              customAvatar={profile?.avatar_config ?? undefined}
+              size="xl"
+            />
+          </div>
           {/* Percentage gauge and display */}
           <div className="relative h-28 w-28">
             <svg width="112" height="112" viewBox="0 0 128 128" className="-rotate-90">
@@ -351,9 +363,10 @@ export function QuickPlayResults({
           numbers are shown as held rather than as a row of zeros. Animated
           counters make the reveal feel like a payoff. */}
       <div
-        className={`flex flex-col items-center gap-1 ${rewardsAnimation}`}
+        className={`relative flex flex-col items-center gap-1 ${rewardsAnimation}`}
         style={{ '--delay': staggerDelay.rewards } as React.CSSProperties}
       >
+        <CoinFlight count={8} enabled={fxEnabled} />
         <div className="flex items-center justify-center gap-3">
           <div
             className={`inline-flex items-center gap-1 rounded-full border-2 px-3 py-1.5 font-neo-display text-sm font-bold ${
@@ -369,7 +382,7 @@ export function QuickPlayResults({
             }`}
             data-testid="quick-xp-reward"
           >
-            ★ +<AnimatedCounter value={outcome.xp} size="sm" variant="default" delay={400} />
+            ★ +<AnimatedCounter value={outcome.xp} size="sm" variant="default" delay={700} />
           </div>
         </div>
         {isGuest && (

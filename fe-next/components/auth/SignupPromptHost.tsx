@@ -25,6 +25,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSignupPrompt } from '@/components/singleplayer/results/hooks/useSignupPrompt';
 import { GsiClientPreloader } from '@/components/auth/GsiClientPreloader';
+import { useQuickResultsOnScreen } from '@/lib/quickPlay/resultsCalm';
 
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), {
   ssr: false,
@@ -38,12 +39,15 @@ function isMultiplayerRoute(pathname: string | null): boolean {
 export function SignupPromptHost() {
   const pathname = usePathname();
   const { isAuthenticated, user, loading: authLoading } = useAuth();
+  const quickResultsOnScreen = useQuickResultsOnScreen();
 
   const { showSignupModal, dismissSignupModal, isFirstWin, frictionVariant } = useSignupPrompt({
     isAuthenticated,
     hasUser: !!user,
     authLoading,
-    disabled: isMultiplayerRoute(pathname),
+    // Quick-play results carry their own inline sign-in line; a sheet over the
+    // celebration hid the reward reveal (3s after every round).
+    disabled: isMultiplayerRoute(pathname) || quickResultsOnScreen,
   });
 
   return (
