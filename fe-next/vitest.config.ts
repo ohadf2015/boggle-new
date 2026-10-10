@@ -73,7 +73,6 @@ export default defineConfig({
       ['components/__tests__/ExitConfirmation.allGameModes.test.tsx', 'node'],
       ['components/blast/__tests__/BlastGame.confetti.test.tsx', 'node'],
       ['components/singleplayer/__tests__/SinglePlayerResults.landscape-layout.test.tsx', 'node'],
-      ['components/auth/__tests__/WordHuntLoginModal.test.tsx', 'node'],
       ['components/custom-puzzle/__tests__/CustomPuzzleCreator.test.tsx', 'node'],
       ['components/student/__tests__/LessonPractice.hebrewNormalization.test.tsx', 'node'],
       ['components/admin/wikipedia-words/__tests__/adminDashboard.integration.test.tsx', 'node'],
