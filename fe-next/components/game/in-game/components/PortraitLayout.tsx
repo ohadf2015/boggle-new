@@ -31,6 +31,7 @@ import { GameHeader } from './GameHeader';
 import { GameLeaderboard } from './GameLeaderboard';
 import { isBoardInteractive } from '../boardInteractive';
 import { GameWordList } from './GameWordList';
+import { DesktopWordsRail } from './DesktopWordsRail';
 import { MobileChatFab } from './MobileChatFab';
 import { ScoreDisplay } from './ScoreDisplay';
 import FloatingScoreAnimation from '../../FloatingScoreAnimation';
@@ -464,11 +465,11 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             center column stays optically centered (countdown overlay is
             fixed inset-0 → viewport center must equal game-area center). */}
         {!gameplayFocusMode && !mpChrome && (
-          <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 min-h-0 shrink-0 overflow-y-auto">
-            {isPlaying && (
-              <GameWordList foundWords={foundWords} minWordLength={minWordLength} t={t} />
-            )}
-          </div>
+          isPlaying ? (
+            <DesktopWordsRail foundWords={foundWords} minWordLength={minWordLength} t={t} />
+          ) : (
+            <div aria-hidden className="hidden lg:block lg:w-64 xl:w-72 2xl:w-80 shrink-0" />
+          )
         )}
 
         {/* Center Column: Timer, Score, Grid — container-queryable so board auto-fits */}
