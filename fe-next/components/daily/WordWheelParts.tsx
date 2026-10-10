@@ -97,7 +97,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
         'wheel-letter-skinnable notranslate absolute inset-0 m-auto flex items-center justify-center font-neo-display font-black uppercase select-none touch-manipulation',
         // Invisible hit-area expander (≥48px WCAG AAA). Fixes rageclicks on Hebrew RTL wheel.
         'before:absolute before:-inset-2 before:content-[""]',
-        'rounded-full transition-colors duration-150',
+        'border-3 border-neo-black rounded-full transition-colors duration-150',
         // short: (≤600px height) shrinks letters so a height-capped wheel doesn't
         // collide center↔orbit. Landscape phones are short AND ≥sm/md wide, so the
         // short:sm/short:md compounds force the shrink to win over width breakpoints.
@@ -105,14 +105,14 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
           ? 'w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 short:w-16 short:h-16 short:sm:w-16 short:sm:h-16 short:md:w-16 short:md:h-16 text-3xl sm:text-4xl md:text-5xl short:text-2xl short:sm:text-2xl short:md:text-2xl z-10'
           : compact
             ? 'w-11 h-11 sm:w-12 sm:h-12 text-base sm:text-lg'
-            : 'w-14 h-14 sm:w-16 sm:h-16 md:w-[72px] md:h-[72px] short:w-12 short:h-12 short:sm:w-12 short:sm:h-12 short:md:w-12 short:md:h-12 text-lg sm:text-xl md:text-2xl short:text-base short:sm:text-base short:md:text-base',
+            : 'w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] md:w-[68px] md:h-[68px] short:w-12 short:h-12 short:sm:w-12 short:sm:h-12 short:md:w-12 short:md:h-12 text-lg sm:text-xl md:text-2xl short:text-base short:sm:text-base short:md:text-base',
         isCenter
           ? isUsed
-            ? 'border-3 border-neo-black bg-neo-lime/40 text-neo-black/40 shadow-hard-lg'
-            : 'border-3 border-neo-black bg-neo-lime text-neo-black shadow-[3px_3px_0px_black,0_0_20px_rgba(191,255,0,0.5)]'
+            ? 'bg-neo-lime/40 text-neo-black/40 shadow-hard-lg'
+            : 'bg-neo-lime text-neo-black shadow-[3px_3px_0px_black,0_0_20px_rgba(191,255,0,0.5)]'
           : isUsed
-            ? 'border-3 border-neo-black bg-neo-lime text-neo-black shadow-[0_0_18px_rgba(191,255,0,0.7)]'
-            : 'bg-transparent text-neo-white [text-shadow:0_2px_0_rgba(0,0,0,0.55)] hover:bg-neo-cream/15 active:bg-neo-lime/25',
+            ? 'bg-neo-navy-light text-neo-white border-neo-cream/20 shadow-none'
+            : 'bg-neo-white text-neo-navy shadow-[2px_2px_0px_black,0_0_8px_rgba(191,255,0,0.15)] hover:shadow-[2px_2px_0px_black,0_0_14px_rgba(191,255,0,0.35)] hover:bg-neo-cream active:bg-neo-lime/30',
         'cursor-pointer',
       )}
       onClick={() => {
@@ -129,7 +129,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
       // but didn't commit" → users re-tap. PostHog 2026-04-27 rage-clicks on
       // /he/daily/word-wheel were exclusively Mobile (he, ר, ש).
       whileTap={{ scale: 0.94 }}
-      whileHover={!isCenter && !isUsed ? { scale: 1.1 } : undefined}
+      whileHover={!isCenter && !isUsed ? { scale: 1.1, boxShadow: '2px 2px 0px black, 0 0 18px rgba(191,255,0,0.5)' } : undefined}
       animate={isCenter && !isUsed && !reducedMotion
         ? {
             x: offsetX,
@@ -140,7 +140,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
         : {
             x: offsetX,
             y: offsetY,
-            scale: isUsed ? 1.08 : 1,
+            scale: isUsed ? 0.9 : 1,
           }}
       transition={isCenter && !isUsed && !reducedMotion
         // Multi-keyframe scale pulse must be tween; x/y stay springs (2-value).
