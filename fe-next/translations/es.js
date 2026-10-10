@@ -3560,7 +3560,8 @@ const es = {
     },
     "gestureTutorial": "Desliza sobre las letras para formar palabras",
     "grid": {
-      "cellLabel": "Fila {{row}}, columna {{col}}: letra {{letter}}"
+      "cellLabel": "Fila {{row}}, columna {{col}}: letra {{letter}}",
+      "label": "Tablero de letras"
     }
   },
   "roundEvent": {

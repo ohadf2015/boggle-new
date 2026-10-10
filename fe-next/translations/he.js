@@ -3560,7 +3560,8 @@ const he = {
     },
     "gestureTutorial": "החליקו על האותיות כדי ליצור מילים",
     "grid": {
-      "cellLabel": "שורה {{row}}, עמודה {{col}}: אות {{letter}}"
+      "cellLabel": "שורה {{row}}, עמודה {{col}}: אות {{letter}}",
+      "label": "לוח האותיות"
     }
   },
   "leadChange": {

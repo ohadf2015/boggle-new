@@ -3852,7 +3852,8 @@ const sv = {
       "toggle": "Visa/dölj spellåda"
     },
     "grid": {
-      "cellLabel": "Rad {{row}}, kolumn {{col}}: bokstav {{letter}}"
+      "cellLabel": "Rad {{row}}, kolumn {{col}}: bokstav {{letter}}",
+      "label": "Bokstavsrutnät"
     }
   },
   "leadChange": {

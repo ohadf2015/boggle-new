@@ -3560,7 +3560,8 @@ const ja = {
     },
     "gestureTutorial": "スワイプで文字をつなげて単語を作ろう",
     "grid": {
-      "cellLabel": "{{row}}行{{col}}列：文字{{letter}}"
+      "cellLabel": "{{row}}行{{col}}列：文字{{letter}}",
+      "label": "文字盤"
     }
   },
   "leadChange": {

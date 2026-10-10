@@ -3176,7 +3176,8 @@ const en = {
       "toggle": "Toggle game drawer"
     },
     "grid": {
-      "cellLabel": "Row {{row}}, Column {{col}}: Letter {{letter}}"
+      "cellLabel": "Row {{row}}, Column {{col}}: Letter {{letter}}",
+      "label": "Letter grid"
     }
   },
   "leadChange": {

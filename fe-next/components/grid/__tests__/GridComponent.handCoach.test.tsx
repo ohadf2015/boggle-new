@@ -47,21 +47,6 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useEarthquakeAnimation', () => ({
-  useEarthquakeAnimation: () => ({
-    earthquakePhase: 'idle',
-    earthquakeParticles: [],
-    earthquakeDust: [],
-    getShakeOffset: () => ({ x: 0, y: 0, rotate: 0, scale: 1, delay: 0 }),
-    getPhaseAnimation: {
-      rumble: { animate: {}, transition: {} },
-      quake: { animate: {}, transition: {} },
-      settle: { animate: {}, transition: {} },
-    },
-    useEnhancedMode: false,
-  }),
-}));
-
 const mockGrid: LetterGrid = [
   ['T', 'E', 'S', 'T'],
   ['W', 'O', 'R', 'D'],
