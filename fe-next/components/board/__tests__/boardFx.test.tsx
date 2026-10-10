@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import LetterBoard from '../LetterBoard';
 import { clearFx, feedbackFx, releaseFx } from '../boardFx';
 import { createBoardPainter } from '../boardPainter';
@@ -36,7 +36,10 @@ let restore: () => void;
 beforeEach(() => {
   restore = stubBoardLayout();
 });
-afterEach(() => restore());
+afterEach(() => {
+  restore();
+  vi.useRealTimers();
+});
 
 describe('board release effects', () => {
   it('given a released word, then each letter leaves its tile as a flying chip in path order', () => {
@@ -46,6 +49,24 @@ describe('board release effects', () => {
     expect(flies.map((f) => f.textContent)).toEqual(['C', 'A', 'T']);
     expect(['0-0', '0-1', '0-2'].map((k) => glyph(board, k).getAttribute('data-fx'))).toEqual(['sent', 'sent', 'sent']);
     expect(glyph(board, '1-1').hasAttribute('data-fx')).toBe(false);
+  });
+
+  it('given no verdict ever arrives, then the letters return to their tiles once the flight lands', () => {
+    vi.useFakeTimers();
+    const { board, send } = mount();
+    send();
+    expect(glyph(board, '0-0').getAttribute('data-fx')).toBe('sent');
+    vi.advanceTimersByTime(1000);
+    expect(board.querySelector('[data-fx]')).toBeNull();
+  });
+
+  it('given the verdict landed first, then the late cleanup leaves its celebration alone', () => {
+    vi.useFakeTimers();
+    const { board, send } = mount();
+    send();
+    feedbackFx(board, 'ok', 10, 'cat');
+    vi.advanceTimersByTime(700);
+    expect(glyph(board, '0-0').getAttribute('data-fx')).toBe('ok');
   });
 
   it('given the word was accepted, then the board carries the verdict so the trail echo and chips turn to it', () => {

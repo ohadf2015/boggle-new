@@ -160,6 +160,14 @@ export function releaseFx(container: HTMLElement, path: CellRef[], geo: BoardGeo
   if (ghost || !geo) return;
 
   markTiles(container, s.keys, 'sent');
+  const sentKeys = s.keys;
+  later(container, FLY_MS + path.length * FLY_STAGGER_MS + 150, () => {
+    tilesFor(container, sentKeys).forEach((els) =>
+      els.forEach((el) => {
+        if (el.getAttribute('data-fx') === 'sent') el.removeAttribute('data-fx');
+      }),
+    );
+  });
   const layer = container.querySelector<HTMLElement>('[data-board-fx]');
   const grid = container.querySelector<HTMLElement>('[role="grid"]');
   if (!layer || !grid) return;
