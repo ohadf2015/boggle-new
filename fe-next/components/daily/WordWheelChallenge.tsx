@@ -44,7 +44,6 @@ import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { isNative } from '@/utils/platform';
 import PracticeBadge from '@/components/practice/PracticeBadge';
-import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 
 // Lazy-load PixiJS effects canvas (no SSR)
 const WordWheelEffectsCanvas = dynamic(
@@ -118,7 +117,6 @@ const WordWheelChallenge: React.FC = () => {
   const { setGameActive } = useSoundEffects();
   const { profile, isAuthenticated } = useAuth();
   const setIsInGame = useHideNavigation();
-  const { isDesktop, isTv } = useDesktopLayout();
 
   // Catch-up: `?date=YYYY-MM-DD` launches a past daily within the 3-day window.
   const searchParams = useSearchParams();
@@ -721,7 +719,7 @@ const WordWheelChallenge: React.FC = () => {
             key="playing"
             // No pb-bottom-stack: body.screen-fit-locked already reserves
             // --bottom-stack-height for this screen, and padding is additive.
-            className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 lg:items-stretch lg:pt-0 relative z-20 overflow-y-auto overscroll-contain"
+            className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 shell:items-stretch shell:pt-0 shell:overflow-hidden relative z-20 overflow-y-auto overscroll-contain"
             // Paint the board INSTANTLY on mount. With AnimatePresence mode="wait"
             // the playing layer only mounts after the ready layer finishes exiting;
             // a fade-in-from-opacity-0 here then leaves the bg-neo-navy parent fully
@@ -742,7 +740,6 @@ const WordWheelChallenge: React.FC = () => {
               onEffect={handleEffect}
               language={language}
               practice={isPractice}
-              isDesktop={isDesktop || isTv}
               puzzleDate={catchupDate || getDailyChallengeDate()}
               currentPlayerId={isAuthenticated && profile ? profile.id : null}
               currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}

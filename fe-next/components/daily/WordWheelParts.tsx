@@ -66,11 +66,13 @@ export interface WheelLetterProps {
    * screen. Same sizes the `short:` viewport variants already use.
    */
   compact?: boolean;
+  /** Grow with the desktop game shell's stage (the solo wheel; MP sizes its own canvas). */
+  scaleInShell?: boolean;
 }
 
 export const WheelLetter: React.FC<WheelLetterProps> = ({
   letter, isCenter, angle = 0, radius = 0, onPress, isUsed, index, reducedMotion = false,
-  showHoldRing = false, onHoldStart, onHoldEnd, tileSkin, compact = false,
+  showHoldRing = false, onHoldStart, onHoldEnd, tileSkin, compact = false, scaleInShell = false,
 }) => {
   const btnRef = useRef<HTMLButtonElement>(null);
   const { t } = useLanguage();
@@ -106,6 +108,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
           : compact
             ? 'w-11 h-11 sm:w-12 sm:h-12 text-base sm:text-lg'
             : 'w-[52px] h-[52px] sm:w-[60px] sm:h-[60px] md:w-[68px] md:h-[68px] short:w-12 short:h-12 short:sm:w-12 short:sm:h-12 short:md:w-12 short:md:h-12 text-lg sm:text-xl md:text-2xl short:text-base short:sm:text-base short:md:text-base',
+        scaleInShell && (isCenter ? 'shell:!w-36 shell:!h-36 shell:!text-6xl' : !compact && 'shell:!w-24 shell:!h-24 shell:!text-4xl'),
         isCenter
           ? isUsed
             ? 'bg-neo-lime/40 text-neo-black/40 shadow-hard-lg'

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Clock, Delete, RotateCcw, Flame, TrendingUp, ChevronUp, Check, Trophy, ArrowLeft } from 'lucide-react';
+import { Clock, Delete, RotateCcw, Flame, TrendingUp, ChevronUp, Check, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { selectWheelRadius } from '@/lib/wordWheel/wheelGeometry';
@@ -28,6 +28,8 @@ import dynamic from 'next/dynamic';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import Avatar from '@/components/Avatar';
+import { GameShell } from '@/components/game/shell';
+import { WheelLeftRail, WheelRightRail } from './WheelShellRails';
 
 const WordWheelPixiRing = dynamic(() => import('./WordWheelPixiRing'), { ssr: false });
 
@@ -69,8 +71,6 @@ interface WordWheelGameProps {
   rivals?: RivalScore[];
   /** Fired with each accepted word + the running found list (practice goal tracking). */
   onWordFound?: (word: string, wordsFound: string[]) => void;
-  /** Desktop layout (1024w + 700h) — 3-column grid with ranks/wheel/words. */
-  isDesktop?: boolean;
   /**
    * The puzzle date being played (YYYY-MM-DD). Drives which day's leaderboard
    * the live rival pill reads from — on a catch-up replay this must be the
@@ -104,7 +104,7 @@ interface RivalScore {
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
   puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false, practice = false,
   hideModeCoach = false,
-  hideCompetitive = false, rivals: rivalsOverride, onWordFound, isDesktop = false,
+  hideCompetitive = false, rivals: rivalsOverride, onWordFound,
   puzzleDate, currentPlayerId = null, currentGuestFingerprint = null, onExit,
 }) => {
   const { t } = useLanguage();
@@ -719,18 +719,21 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     const el = wheelContainerRef.current;
     if (!el) return;
     const shortVp = typeof window !== 'undefined' ? window.matchMedia('(max-height: 600px)') : null;
+    const wideVp = typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px) and (min-height: 600px)') : null;
     const update = () => {
       const rect = el.getBoundingClientRect();
       // Shared selector — same orbit math the multiplayer wheel uses.
-      setWheelRadius(selectWheelRadius({ width: rect.width, height: rect.height, isShort: !!shortVp?.matches }));
+      setWheelRadius(selectWheelRadius({ width: rect.width, height: rect.height, isShort: !!shortVp?.matches, isWide: !!wideVp?.matches }));
     };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
     shortVp?.addEventListener?.('change', update);
+    wideVp?.addEventListener?.('change', update);
     return () => {
       ro.disconnect();
       shortVp?.removeEventListener?.('change', update);
+      wideVp?.removeEventListener?.('change', update);
     };
   }, []);
 
@@ -749,87 +752,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
   const equippedBoardTheme = useEquippedCosmetic('boardTheme');
   const equippedTileSkin = useEquippedCosmetic('tileSkin');
-
-  // Desktop ranks panel from rivals
-  const ranksPanel = !hideCompetitive ? (
-    <div className="h-full flex flex-col overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b-3 border-neo-black shrink-0 bg-neo-black/30">
-        <div className="flex items-center gap-2">
-          <Trophy className="w-4 h-4 text-neo-yellow" />
-          <span className="font-bold text-neo-white text-sm uppercase tracking-wide">
-            {t('wordHunt.desktop.liveRanks')}
-          </span>
-        </div>
-      </div>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-1 scrollbar-thin scrollbar-thumb-neo-cream/20 scrollbar-track-transparent">
-        {rivals.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-6 text-neo-white/70 text-center gap-1">
-            <Trophy className="w-7 h-7 opacity-40" />
-            <span className="text-xs">{t('wordHunt.desktop.beFirst')}</span>
-          </div>
-        )}
-        <AnimatePresence mode="popLayout">
-          {[...rivals].reverse().map((rival, idx) => (
-            <m.div
-              key={`rival-${rival.playerId}-${idx}`}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-              className={cn(
-                'flex items-center gap-2 px-2 py-1.5 rounded-neo transition-colors',
-                'bg-neo-black/20 hover:bg-neo-black/30'
-              )}
-            >
-              <span className="w-6 text-center font-black text-sm tabular-nums shrink-0 text-neo-white">
-                {idx + 1}
-              </span>
-              <div className="shrink-0">
-                <Avatar
-                  customAvatar={rival.customAvatar ?? undefined}
-                  avatarImage={rival.avatarImage ?? undefined}
-                  userId={rival.playerId ?? rival.name}
-                  size="sm"
-                />
-              </div>
-              <span className="truncate text-xs font-semibold text-neo-white min-w-0">
-                {rival.name}
-              </span>
-              <span className="font-black text-neo-cyan text-xs shrink-0 ms-auto">
-                {rival.score}
-              </span>
-            </m.div>
-          ))}
-          <m.div
-            key="you-row"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-            className="flex items-center gap-2 px-2 py-1.5 rounded-neo bg-neo-cyan/10 ring-2 ring-neo-cyan/60"
-          >
-            <span className="w-6 text-center font-black text-sm tabular-nums shrink-0 text-neo-cyan">
-              {nextRival ? rivals.findIndex(r => r.score >= score) + 1 : 1}
-            </span>
-            <div className="shrink-0">
-              <Avatar
-                customAvatar={undefined}
-                avatarImage={undefined}
-                userId="me"
-                size="sm"
-              />
-            </div>
-            <span className="truncate text-xs font-semibold text-neo-white min-w-0">
-              {t('common.you')}
-            </span>
-            <span className="font-black text-neo-lime text-xs shrink-0 ms-auto">
-              {score}
-            </span>
-          </m.div>
-        </AnimatePresence>
-      </div>
-    </div>
-  ) : null;
 
   // Wheel cluster JSX (header/timer + wheel + word-builder + action-bar)
   const wheelCluster = (
@@ -1176,7 +1098,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         // chips (measured 60px overlap) and the board is crushed into the top
         // of the screen. min(100cqb, …) is inert on normal viewports, where
         // 100cqb is already the largest term.
-        className="relative aspect-square w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[min(100cqb,max(176px,calc(100cqb-116px)))] max-h-[min(100cqb,max(176px,calc(100cqb-116px)))] short:max-w-[min(100cqb,max(132px,min(calc(100cqb-72px),46svh)))] short:max-h-[min(100cqb,max(132px,min(calc(100cqb-72px),46svh)))] shrink-0 flex items-center justify-center touch-none"
+        className="relative aspect-square w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[min(100cqb,max(176px,calc(100cqb-116px)))] max-h-[min(100cqb,max(176px,calc(100cqb-116px)))] short:max-w-[min(100cqb,max(132px,min(calc(100cqb-72px),46svh)))] short:max-h-[min(100cqb,max(132px,min(calc(100cqb-72px),46svh)))] shell:!w-[min(100cqi,calc(100cqb-140px),640px)] shell:!h-[min(100cqi,calc(100cqb-140px),640px)] shell:!max-w-none shell:!max-h-none shrink-0 flex items-center justify-center touch-none"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -1232,6 +1154,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           letter={puzzle.centerLetter}
           isCenter
           tileSkin={equippedTileSkin}
+          scaleInShell
           onPress={(letter, _, el) => handleLetterPress(letter, -1, el)}
           isUsed={usedIndices.has(-1)}
           index={-1}
@@ -1247,6 +1170,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             letter={letter}
             isCenter={false}
             tileSkin={equippedTileSkin}
+            scaleInShell
             angle={i * (360 / outerLetters.length)}
             radius={wheelRadius}
             onPress={(l, _, el) => handleLetterPress(l, i, el)}
@@ -1362,48 +1286,17 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     </div>
   );
 
-  // Desktop / Mobile branch
-  if (isDesktop) {
-    return (
-      <div
-        ref={gameContainerRef}
-        className="relative flex h-full w-full bg-neo-navy"
-        translate="no"
-      >
-        {/* 3-Column Grid */}
-        <div
-          data-testid="word-wheel-desktop-grid"
-          className="flex w-full h-full max-h-full gap-6 p-5 overflow-hidden"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '280px 1fr 280px',
-            gridTemplateRows: '1fr',
-          }}
-        >
-          {/* Left Sidebar — Live Ranks (pink accent) */}
-          <div className="h-full overflow-hidden zone-panel-pink rounded-neo">
-            {ranksPanel}
-          </div>
+  const railWords = wordsFound.map((w) => ({ word: displayWord(w), score: scoreWord(w) }));
+  const railRivals = hideCompetitive && !rivalsOverride ? null : rivals;
 
-          {/* Center — Game Area (cyan accent) */}
-          <div className="flex flex-col items-center justify-center h-full min-w-0 min-h-0 gap-2 relative z-10 zone-panel-cyan rounded-neo px-4 py-3">
-            {wheelCluster}
-          </div>
-
-          {/* Right Sidebar — Found Words (lime accent) */}
-          <div className="h-full overflow-hidden zone-panel-lime rounded-neo flex flex-col">
-            <h3 className="text-xs font-bold uppercase mb-1.5 shrink-0 px-4 py-3 border-b-3 border-neo-black bg-neo-black/30">
-              {t('wordWheel.foundWords')} ({wordsFound.length})
-            </h3>
-            {foundWordsList}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Mobile / tablet layout (single column)
+  // One tree for every screen: on desktop the GameShell frames it with rails.
   return (
+    <GameShell
+      mode="wheel"
+      accent="lime"
+      left={<WheelLeftRail t={t} score={score} wordCount={wordsFound.length} combo={combo} rivals={railRivals} />}
+      right={<WheelRightRail t={t} words={railWords} />}
+    >
     <div
       ref={gameContainerRef}
       className={cn(
@@ -1415,7 +1308,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         // Submit sat on top of the found-words chips. The action bar is no
         // longer sticky (it moved inside the wheel cluster), so the original
         // "defence in depth" reason no longer applies either.
-        'relative flex flex-col items-center w-full flex-1 max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto px-3 sm:px-4 rounded-neo',
+        'relative flex flex-col items-center w-full flex-1 max-w-lg lg:max-w-xl xl:max-w-2xl shell:max-w-none shell:h-full shell:min-h-0 mx-auto px-3 sm:px-4 rounded-neo',
         equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`,
       )}
       translate="no"
@@ -1428,7 +1321,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           inside the cap; only the chip animations move, never the slot. ── */}
       <div
         data-testid="found-words-slot"
-        className="w-full mt-2 medium-short:mt-1 h-[112px] sm:h-[136px] medium-short:h-[88px] short:h-16 flex flex-col"
+        className="w-full mt-2 medium-short:mt-1 h-[112px] sm:h-[136px] medium-short:h-[88px] short:h-16 flex flex-col shell:hidden"
       >
         <h3
           className={cn(
@@ -1442,6 +1335,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         {foundWordsList}
       </div>
     </div>
+    </GameShell>
   );
 };
 

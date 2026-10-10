@@ -1,14 +1,9 @@
 /**
- * Desktop 3-column layout (parity with Word Hunt's SurvivalDesktopLayout).
- *
- * On desktop (isDesktop=true) Word Wheel renders a 3-column grid — left live
- * ranks / center wheel / right found-words — instead of the mobile single
- * column that floated narrow in a wide void. The wheel + its refs/handlers are
- * the SAME JSX in both layouts (drag interaction preserved), so we assert the
- * grid wraps the unchanged wheel-orbit, and that mobile is untouched.
+ * Word Wheel sits in the shared desktop GameShell: one tree for every screen,
+ * CSS decides the frame. Rivals + round stats left, found words right.
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/utils/growthTracking', () => ({
@@ -85,27 +80,25 @@ beforeEach(() => {
   global.fetch = vi.fn().mockResolvedValue({ ok: false }) as unknown as typeof fetch;
 });
 
-describe('WordWheelGame desktop 3-column layout', () => {
-  it('renders the 3-column desktop grid wrapping the same wheel when isDesktop', () => {
-    renderGame({ isDesktop: true });
-    const grid = screen.getByTestId('word-wheel-desktop-grid');
-    expect(grid).toBeInTheDocument();
-    // The wheel (with its drag handlers/refs) lives INSIDE the grid — same JSX,
-    // just relocated to the center column.
-    expect(grid.querySelector('[data-testid="wheel-orbit"]')).toBeInTheDocument();
-  });
-
-  it('keeps the mobile single-column layout (no grid) when not desktop', () => {
+describe('WordWheelGame in the desktop game shell', () => {
+  it('wraps the wheel in the shared shell — no separate desktop tree', () => {
     renderGame();
     expect(screen.queryByTestId('word-wheel-desktop-grid')).not.toBeInTheDocument();
-    // wheel still renders in the mobile column
-    expect(screen.getByTestId('wheel-orbit')).toBeInTheDocument();
+    const shell = screen.getByTestId('game-shell');
+    expect(shell.getAttribute('data-game-shell')).toBe('wheel');
+    expect(screen.getByTestId('game-shell-stage').querySelector('[data-testid="wheel-orbit"]')).toBeInTheDocument();
   });
 
-  it('shows the live-ranks header even with no rivals (panel is never a blank void)', () => {
-    renderGame({ isDesktop: true });
-    // t() echoes the key; the panel always renders the Live Ranks header + empty state.
-    expect(screen.getByText('wordHunt.desktop.liveRanks')).toBeInTheDocument();
-    expect(screen.getByText('wordHunt.desktop.beFirst')).toBeInTheDocument();
+  it('puts the found-words feed in the end rail and keyboard help in the start rail', () => {
+    renderGame();
+    expect(within(screen.getByTestId('game-shell-right')).getByTestId('shell-words')).toBeInTheDocument();
+    expect(within(screen.getByTestId('game-shell-left')).getByTestId('shell-keys')).toBeInTheDocument();
+  });
+
+  it('races the passed-in rivals in the start rail with the player marked', () => {
+    renderGame({ rivals: [{ name: 'Ada', score: 30, playerId: 'a' }] });
+    const left = screen.getByTestId('game-shell-left');
+    expect(within(left).getByTestId('shell-standing-me').getAttribute('data-me')).toBe('true');
+    expect(within(left).getByText('Ada')).toBeInTheDocument();
   });
 });

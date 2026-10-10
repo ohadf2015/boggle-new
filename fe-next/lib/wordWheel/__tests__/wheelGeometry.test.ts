@@ -104,3 +104,11 @@ describe('selectWheelRadius — single source of truth for daily + multiplayer w
     expect(selectWheelRadius({ width: 0, height: 0 })).toBe(76);
   });
 });
+
+describe('selectWheelRadius — desktop game shell', () => {
+  it('given a wide stage, then the orbit grows past the phone cap and still fits the rim', () => {
+    const r = selectWheelRadius({ width: 600, height: 600, isWide: true });
+    expect(r).toBeGreaterThan(200);
+    expect(r * 2).toBeLessThan(600);
+  });
+});
