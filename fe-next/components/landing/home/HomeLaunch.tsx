@@ -77,7 +77,7 @@ export function LaunchCurtain({ tone, title, art, origin, testId = 'home-launch'
         />
         <div className="relative flex flex-col items-center gap-5 px-4 text-center">
           {art && (
-            // eslint-disable-next-line @next/next/no-img-element -- already decoded by the card that launched it
+            // eslint-disable-next-line @next/next/no-img-element -- the card's own resolved src, already in cache
             <img
               src={art}
               alt=""
@@ -173,7 +173,9 @@ export function LaunchProvider({ children }: { children: ReactNode }) {
         e.clientX || e.clientY
           ? { x: e.clientX, y: e.clientY }
           : { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-      setActive({ ...target, origin });
+      const cardImg = e.currentTarget.querySelector('img');
+      const art = target.art ? cardImg?.currentSrc || cardImg?.src || target.art : undefined;
+      setActive({ ...target, art, origin });
       timer.current = setTimeout(() => {
         timer.current = null;
         router.push(target.href);

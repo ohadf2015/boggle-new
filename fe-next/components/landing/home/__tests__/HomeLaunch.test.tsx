@@ -72,6 +72,33 @@ describe('home launch', () => {
     expect(push).toHaveBeenCalledWith('/en/daily/word-wheel');
   });
 
+  it('shows the art the tapped card already loaded, not a cold fetch of the raw file', () => {
+    function ArtLink({ href = '/en/daily/word-wheel' }: { href?: string }) {
+      const launch = useHomeLaunch();
+      return (
+        <a
+          href={href}
+          data-testid="art-link"
+          onClick={(e) => launch?.start(e, { href, tone: 'yellow', art: '/modes/cubes/daily.png' })}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img alt="" data-testid="card-art" src="/_next/image?url=%2Fmodes%2Fcubes%2Fdaily.png&w=384&q=75" />
+        </a>
+      );
+    }
+    render(
+      <LaunchProvider>
+        <ArtLink />
+      </LaunchProvider>,
+    );
+    const cardArt = screen.getByTestId('card-art');
+    Object.defineProperty(cardArt, 'currentSrc', { value: 'http://localhost/_next/image?url=%2Fmodes%2Fcubes%2Fdaily.png&w=384&q=75' });
+    fireEvent.click(screen.getByTestId('art-link'));
+
+    const curtainArt = screen.getByTestId('home-launch').querySelector('img');
+    expect(curtainArt?.getAttribute('src')).toBe('http://localhost/_next/image?url=%2Fmodes%2Fcubes%2Fdaily.png&w=384&q=75');
+  });
+
   it('leaves modified clicks (new tab) to the browser', () => {
     render(
       <LaunchProvider>
