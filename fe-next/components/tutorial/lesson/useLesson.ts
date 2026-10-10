@@ -12,6 +12,8 @@ import { readLessonOutcome, writeLessonOutcome, type LessonOutcome } from '@/lib
 export const SUCCESS_MS = 1700;
 export const OOPS_MS = 1300;
 export const COMPLETE_MS = 3600;
+/** The last word's win lands on the board before the finale covers it. */
+export const FINALE_DELAY_MS = 450;
 
 export interface LessonFeedback {
   id: string;
@@ -40,6 +42,8 @@ export interface UseLessonResult {
   event: LessonEvent | null;
   /** The finale card is on screen. */
   complete: boolean;
+  /** From the last step until the finale closes: the round's clock should wait. */
+  holdClock: boolean;
   bestStreak: number;
   skip: () => void;
   closeComplete: () => void;
@@ -48,7 +52,7 @@ export interface UseLessonResult {
 export function useLesson({ definition, enabled, words, feedback }: UseLessonArgs): UseLessonResult {
   const { id, steps } = definition;
   const [outcome, setOutcome] = useState<LessonOutcome | null>(() => readLessonOutcome(id));
-  const [complete, setComplete] = useState(false);
+  const [finale, setFinale] = useState<'off' | 'pending' | 'on'>('off');
   const [event, setEvent] = useState<LessonEvent | null>(null);
   const streakRef = useRef(0);
   const [bestStreak, setBestStreak] = useState(0);
@@ -73,7 +77,7 @@ export function useLesson({ definition, enabled, words, feedback }: UseLessonArg
     });
     if (completedCount >= steps.length) {
       writeLessonOutcome(id, 'done');
-      setComplete(true);
+      setFinale('pending');
       setOutcome('done');
     }
   }, [completedCount, lastWord, running, steps.length, id]);
@@ -94,25 +98,30 @@ export function useLesson({ definition, enabled, words, feedback }: UseLessonArg
   }, [event]);
 
   useEffect(() => {
-    if (!complete) return;
-    const t = window.setTimeout(() => setComplete(false), COMPLETE_MS);
+    if (finale === 'off') return;
+    const t = window.setTimeout(
+      () => setFinale(finale === 'pending' ? 'on' : 'off'),
+      finale === 'pending' ? FINALE_DELAY_MS : COMPLETE_MS,
+    );
     return () => window.clearTimeout(t);
-  }, [complete]);
+  }, [finale]);
 
   const skip = useCallback(() => {
     writeLessonOutcome(id, 'skipped');
     setOutcome('skipped');
     setEvent(null);
   }, [id]);
-  const closeComplete = useCallback(() => setComplete(false), []);
+  const closeComplete = useCallback(() => setFinale('off'), []);
+  const finishing = finale !== 'off';
 
   return {
-    active: running || complete,
+    active: running || finishing,
     steps,
     completedCount,
     step: steps[completedCount] ?? null,
-    event: running || complete ? event : null,
-    complete,
+    event: running || finishing ? event : null,
+    complete: finale === 'on',
+    holdClock: finishing,
     bestStreak,
     skip,
     closeComplete,

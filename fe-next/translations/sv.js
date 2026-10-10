@@ -1939,6 +1939,7 @@ const sv = {
   },
   "firstLesson": {
     "skipLabel": "Hoppa över lektionen",
+    "skip": "Hoppa över",
     "progressLabel": "Lektionens framsteg",
     "trace": "Dra över ordet",
     "findAny": "Hitta nu ett eget ord",

@@ -89,7 +89,7 @@ export function useSoloLesson({
 
   return {
     active: true,
-    holdClock: lesson.complete,
+    holdClock: lesson.holdClock,
     hud: (
       <LessonHud
         steps={lesson.steps}

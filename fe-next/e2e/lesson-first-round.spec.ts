@@ -1,35 +1,33 @@
 import { test, expect, type Page } from '@playwright/test';
 
-/**
- * Classic first round: a hinted word on the real board, drawn by the hand,
- * then steps that unlock as the player plays. Runs on the prod build.
- */
-
-async function freshSolo(page: Page) {
+async function freshFirstRound(page: Page, locale = 'en') {
   await page.addInitScript(() => {
     try {
-      window.localStorage.clear();
+      if (!window.sessionStorage.getItem('e2e-cleared')) {
+        window.localStorage.clear();
+        window.sessionStorage.setItem('e2e-cleared', '1');
+      }
     } catch {
       /* storage blocked */
     }
   });
-  await page.goto('/en/singleplayer');
+  await page.goto(`/${locale}/singleplayer?autoStart=coach`);
   await expect(page.locator('[data-testid=solo-slot-board]').first()).toBeVisible({ timeout: 30000 });
   const start = page.getByRole('button', { name: /^start$/i }).first();
   if (await start.isVisible({ timeout: 1500 }).catch(() => false)) await start.click();
 }
 
-async function hintCells(page: Page): Promise<Array<[number, number]>> {
-  const bar = page.getByTestId('lesson-bar');
-  await expect(bar).toBeVisible({ timeout: 15000 });
-  await expect.poll(async () => (await bar.getAttribute('data-lesson-path')) ?? '[]').not.toBe('[]');
-  return JSON.parse((await bar.getAttribute('data-lesson-path')) ?? '[]');
+async function targetPath(page: Page): Promise<Array<[number, number]>> {
+  const target = page.getByTestId('lesson-target');
+  await expect(target).toBeVisible({ timeout: 20000 });
+  await expect.poll(async () => (await target.getAttribute('data-path')) ?? '[]', { timeout: 15000 }).not.toBe('[]');
+  return JSON.parse((await target.getAttribute('data-path')) ?? '[]');
 }
 
 async function dragCells(page: Page, cells: Array<[number, number]>) {
   const points: Array<{ x: number; y: number }> = [];
   for (const [r, c] of cells) {
-    const box = await page.locator(`[data-row="${r}"][data-col="${c}"]`).first().boundingBox();
+    const box = await page.locator(`[data-testid=solo-slot-board] [data-row="${r}"][data-col="${c}"]`).first().boundingBox();
     if (!box) throw new Error(`cell ${r},${c} not on screen`);
     points.push({ x: box.x + box.width / 2, y: box.y + box.height / 2 });
   }
@@ -39,29 +37,40 @@ async function dragCells(page: Page, cells: Array<[number, number]>) {
   await page.mouse.up();
 }
 
-test.describe('Classic first-round lesson', () => {
-  test('shows the hinted word and completes the first step when it is traced', async ({ page }) => {
-    await freshSolo(page);
-    const cells = await hintCells(page);
+test.describe('First-round lesson', () => {
+  test.describe.configure({ timeout: 90_000 });
+
+  test('a new player traces the shown word and the first step lands with praise', async ({ page }) => {
+    await freshFirstRound(page);
+    const hud = page.getByTestId('lesson-hud');
+    await expect(hud).toHaveAttribute('data-completed', '0');
+    await expect(page.getByTestId('lesson-hand')).toBeAttached();
+
+    const cells = await targetPath(page);
     expect(cells.length).toBeGreaterThanOrEqual(3);
-
-    const bar = page.getByTestId('lesson-bar');
-    await expect(page.getByTestId('lesson-caption')).toContainText('Try:');
-
     await dragCells(page, cells);
-    await expect(bar).toHaveAttribute('data-completed', '1');
-    await expect(page.getByTestId('lesson-praise')).toBeVisible();
+
+    await expect(hud).toHaveAttribute('data-completed', '1', { timeout: 10000 });
+    await expect(page.getByTestId('lesson-sheet')).toHaveAttribute('data-kind', 'success');
+    await expect(page.getByTestId('lesson-target')).toHaveAttribute('data-step', 'find-any');
   });
 
-  test('can be skipped and does not come back on reload', async ({ page }) => {
-    await freshSolo(page);
-    await hintCells(page);
+  test('can be skipped and stays gone after a reload', async ({ page }) => {
+    await freshFirstRound(page);
+    await targetPath(page);
 
-    await page.getByRole('button', { name: 'Skip' }).click();
-    await expect(page.getByTestId('lesson-bar')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Skip lesson' }).click();
+    await expect(page.getByTestId('lesson-hud')).toHaveCount(0);
 
     await page.reload();
     await expect(page.locator('[data-testid=solo-slot-board]').first()).toBeVisible({ timeout: 30000 });
-    await expect(page.getByTestId('lesson-bar')).toHaveCount(0);
+    await expect(page.getByTestId('lesson-hud')).toHaveCount(0);
+  });
+
+  test('runs right-to-left in Hebrew', async ({ page }) => {
+    await freshFirstRound(page, 'he');
+    const hud = page.getByTestId('lesson-hud');
+    await expect(hud).toBeVisible({ timeout: 20000 });
+    await expect(hud).toHaveAttribute('dir', 'rtl');
   });
 });

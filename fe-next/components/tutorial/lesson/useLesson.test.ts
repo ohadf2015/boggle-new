@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useLesson, SUCCESS_MS, COMPLETE_MS, type UseLessonArgs } from './useLesson';
+import { useLesson, SUCCESS_MS, COMPLETE_MS, FINALE_DELAY_MS, type UseLessonArgs } from './useLesson';
 import { CLASSIC_LESSON, type LessonWord } from '@/lib/tutorial/lesson/lessonEngine';
 import { lessonStorageKey } from '@/lib/tutorial/lesson/lessonStorage';
 
@@ -54,7 +54,7 @@ describe('useLesson', () => {
     expect(result.current.bestStreak).toBe(2);
   });
 
-  it('persists "done" the moment the last step lands, then shows the finale until it times out', () => {
+  it('persists "done" the moment the last step lands, lets that win land, then shows the finale until it times out', () => {
     const { result, rerender } = setup();
     rerender({
       definition: CLASSIC_LESSON,
@@ -63,8 +63,12 @@ describe('useLesson', () => {
       feedback: null,
     });
     expect(window.localStorage.getItem(KEY)).toBe('done');
-    expect(result.current.complete).toBe(true);
+    expect(result.current.complete).toBe(false);
     expect(result.current.active).toBe(true);
+    expect(result.current.event).toMatchObject({ kind: 'success', stepIndex: 3 });
+    act(() => void vi.advanceTimersByTime(FINALE_DELAY_MS + 10));
+    expect(result.current.complete).toBe(true);
+    expect(result.current.holdClock).toBe(true);
     act(() => void vi.advanceTimersByTime(COMPLETE_MS + 10));
     expect(result.current.complete).toBe(false);
     expect(result.current.active).toBe(false);

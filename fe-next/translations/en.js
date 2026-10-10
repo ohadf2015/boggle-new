@@ -15753,6 +15753,7 @@ const en = {
   },
   "firstLesson": {
     "skipLabel": "Skip lesson",
+    "skip": "Skip",
     "progressLabel": "Lesson progress",
     "trace": "Trace this word",
     "findAny": "Now find any word",

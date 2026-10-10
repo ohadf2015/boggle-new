@@ -17220,6 +17220,7 @@ const he = {
   },
   "firstLesson": {
     "skipLabel": "דילוג על השיעור",
+    "skip": "דילוג",
     "progressLabel": "התקדמות בשיעור",
     "trace": "גררו על המילה הזו",
     "findAny": "עכשיו מצאו מילה משלכם",

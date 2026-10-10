@@ -19393,6 +19393,7 @@ const ja = {
   },
   "firstLesson": {
     "skipLabel": "レッスンをスキップ",
+    "skip": "スキップ",
     "progressLabel": "レッスンの進み具合",
     "trace": "この言葉をなぞろう",
     "findAny": "次は好きな言葉を探そう",

@@ -34,7 +34,7 @@ export function LessonComplete({ words, points, bestStreak, onClose, friendHref 
       aria-labelledby="lesson-complete-title"
       dir={dir}
       onClick={onClose}
-      className="fixed inset-0 z-[95] flex items-center justify-center bg-neo-navy/85 px-4"
+      className="fixed inset-0 z-[155] flex items-center justify-center bg-neo-navy/85 px-4"
     >
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-0">
         {CONFETTI.map((i) => (
@@ -62,7 +62,7 @@ export function LessonComplete({ words, points, bestStreak, onClose, friendHref 
           <div className={cn(s.sunburst, 'absolute inset-0 rounded-full')} />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/mascot/celebration.webp"
+            src="/mascot/bridge-cheer-nobg.webp"
             alt=""
             width={150}
             height={150}
@@ -80,7 +80,7 @@ export function LessonComplete({ words, points, bestStreak, onClose, friendHref 
             <div
               key={st.key}
               className={cn(s.statIn, 'rounded-xl border-[3px] border-neo-black shadow-[3px_3px_0_#000]', st.tone)}
-              style={{ ['--delay' as string]: `${260 + i * 120}ms` }}
+              style={{ ['--delay' as string]: `${120 + i * 80}ms` }}
             >
               <p className="border-b-[3px] border-neo-black px-1 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-wider text-neo-black">
                 {st.label}

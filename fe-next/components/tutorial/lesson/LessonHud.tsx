@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Flame } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { LessonStep } from '@/lib/tutorial/lesson/lessonEngine';
@@ -38,14 +38,6 @@ export function LessonHud({ steps, completedCount, step, target, targetPath, for
       className="flex w-full flex-col gap-2"
     >
       <div className="flex items-center gap-2.5">
-        <button
-          type="button"
-          onClick={onSkip}
-          aria-label={t('firstLesson.skipLabel')}
-          className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-neo-cream/70 transition-colors hover:bg-white/10 hover:text-neo-cream"
-        >
-          <X className="h-5 w-5" strokeWidth={3} aria-hidden />
-        </button>
 
         <div className="relative flex-1">
           {streak >= 2 && (
@@ -105,6 +97,14 @@ export function LessonHud({ steps, completedCount, step, target, targetPath, for
         >
           {Math.min(completedCount + (step ? 1 : 0), total)}/{total}
         </span>
+        <button
+          type="button"
+          onClick={onSkip}
+          aria-label={t('firstLesson.skipLabel')}
+          className="shrink-0 rounded-md px-1.5 py-1 font-neo-display text-xs font-black uppercase tracking-wider text-neo-cream/60 transition-colors hover:bg-white/10 hover:text-neo-cream"
+        >
+          {t('firstLesson.skip')}
+        </button>
       </div>
 
       {step && <LessonTarget step={step} target={target} path={targetPath} formedWord={formedWord} oops={event?.kind === 'oops' ? event.key : null} />}

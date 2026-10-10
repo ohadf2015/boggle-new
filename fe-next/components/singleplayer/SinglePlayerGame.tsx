@@ -55,8 +55,7 @@ function SinglePlayerGame({
   hideModeCoach = false,
   quitStaysOnPage = false,
 }: SinglePlayerGameProps): React.ReactElement {
-  // The lesson finale freezes the clock; the lesson reads the core, so the hold
-  // comes back through state.
+  // The lesson reads the core, so its clock hold comes back through state.
   const [lessonHold, setLessonHold] = useState(false);
   const core = useSinglePlayerCore({
     settings,
@@ -284,10 +283,6 @@ function SinglePlayerGame({
       letterCount: core.letterCount,
       currentFeedback: core.currentFeedback,
       keyboardInput: core.keyboardInput,
-      // "You can trace in ANY direction" is taught on the board itself now
-      // (BoardHandCoach) rather than by a modal that froze the clock and
-      // disabled its own continue button for ten seconds. Still suppressed in
-      // Quick Play, same as ModeCoach.
       showHandCoach: !hideModeCoach,
       highlightedPath: core.revealState.highlightedPath,
       lastWordFoundTimeRef: core.lastWordFoundTimeRef,
@@ -414,12 +409,6 @@ function SinglePlayerGame({
 
   // One shell for portrait, landscape, desktop and TV.
   //
-  // Single player used to branch into three bespoke layouts here —
-  // LandscapeGameLayout (424 lines) and DesktopGameLayout (394) alongside the
-  // already-deleted PortraitGameLayout (593). Multiplayer never needed that
-  // split: PortraitLayout is responsive and takes `isDesktop`, so the branch
-  // itself was the duplication. All that differs now is that one flag.
-  //
   // `fixed inset-0`, not `h-[100dvh]`: the shell is `flex-1 min-h-0` over a
   // `container-type: size` board slot, so it needs a definite height (see
   // gameShellSizing.contract.test.ts) — but a 100dvh box that STARTS below the
@@ -470,6 +459,7 @@ function SinglePlayerGame({
         soloPraiseKey={core.soloCombo?.praiseKey ?? null}
         soloMissions={lesson.active ? undefined : core.soloMissions}
         soloChrome={lesson.hud ?? practiceCoachElement}
+        soloLessonActive={lesson.active}
       />
     </div>
   );

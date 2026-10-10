@@ -17021,6 +17021,7 @@ const es = {
   },
   "firstLesson": {
     "skipLabel": "Saltar lección",
+    "skip": "Saltar",
     "progressLabel": "Progreso de la lección",
     "trace": "Traza esta palabra",
     "findAny": "Ahora busca otra palabra",
