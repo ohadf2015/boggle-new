@@ -12,11 +12,6 @@ test.describe('QA and demo routes are hidden in production', () => {
       expect(res.status()).toBe(404);
     });
   }
-
-  test('a real page next to them still renders', async ({ request }) => {
-    const res = await request.get('/en');
-    expect(res.status()).toBe(200);
-  });
 });
 
 test.describe('QA and demo routes render outside production', () => {

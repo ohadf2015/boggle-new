@@ -1,9 +1,8 @@
 import { notFound } from 'next/navigation';
 import { connection } from 'next/server';
+import { qaRoutesEnabled, type QaRouteEnv } from './qaRoutes';
 
-type RouteEnv = { NODE_ENV?: string; ENABLE_QA_ROUTES?: string };
-
-export async function notFoundInProduction(env: RouteEnv = process.env): Promise<void> {
+export async function notFoundInProduction(env: QaRouteEnv = process.env): Promise<void> {
   await connection();
-  if (env.NODE_ENV === 'production' && env.ENABLE_QA_ROUTES !== '1') notFound();
+  if (!qaRoutesEnabled(env)) notFound();
 }
