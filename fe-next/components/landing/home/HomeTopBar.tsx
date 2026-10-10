@@ -159,8 +159,15 @@ export function HomeTopBar({
 
       {/* streak + coins */}
       <div className="flex shrink-0 items-center gap-2">
-        <span className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-black bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm">
-          <Flame className="h-[15px] w-[15px] text-neo-orange" strokeWidth={2.2} aria-hidden="true" />
+        <span
+          data-testid="home-streak-chip"
+          className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-black bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm"
+        >
+          <Flame
+            className="h-[15px] w-[15px] text-neo-orange motion-safe:animate-streak-flicker"
+            strokeWidth={2.2}
+            aria-hidden="true"
+          />
           {showStreakSkeleton ? (
             <NeoSkeleton variant="text" width={14} height={14} />
           ) : (

@@ -42,6 +42,7 @@ for (const vp of VIEWPORTS) {
       expect(size.scrollHeight).toBeLessThanOrEqual(size.innerHeight);
       expect(size.scrollWidth).toBeLessThanOrEqual(size.innerWidth);
 
+      await expect(page.getByTestId('home-streak-chip')).toBeVisible();
       await expect(page.getByTestId('mode-cube-anchor').first()).toBeVisible();
       await expect(page.getByTestId('landing-cubes-more')).toBeVisible();
     });
