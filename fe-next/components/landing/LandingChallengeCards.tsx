@@ -186,9 +186,7 @@ export function LandingChallengeCards({
   const MP_MODES = new Set<LandingCardKey>(['arena']);
   const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'crossword', 'wordfall', 'quickPlay', 'wordTowerV2']);
 
-  // Every mode is surfaced directly on the hub — no "More Game Modes" collapse.
-  // New and returning players alike see the full roster (the old newcomer
-  // choice-paralysis gate hid half the modes; players asked to see them all).
+  // New and returning players get the same roster; no cohort hides modes.
   const mpCards = cardOrder.filter((m) => MP_MODES.has(m));
   // Non-veterans see practice promoted to a dedicated featured row above the SP grid
   // so it stops looking like just another card. Locked siblings (blast/adventure/etc.)
@@ -278,15 +276,10 @@ export function LandingChallengeCards({
   const visibleModels = visibleKeys
     .map((k) => buildCubeModel(k, k === 'arena' ? 'anchor' : 'normal'))
     .filter(isModel);
-  // Split the energetic competitive bento (arena anchor, blast, practice, …)
-  // from the calm no-timer room (crossword, word craft, connections)
-  // via the SHARED partition — the mobile Home Hub reuses this exact component,
-  // so both surfaces group identically with no drift. Order within each group is
-  // preserved from the gated `visibleKeys` computation above.
+  // Fast modes before the calm no-timer ones (crossword, word craft, connections).
   const fastModels = visibleModels.filter((m) => !isCalmMode(m.key));
   const calmModels = visibleModels.filter((m) => isCalmMode(m.key));
-  // First screen is the Word Wheel banner plus one live grid race. Everything
-  // else, including Adventure, Word Tower and Blast, stays one tap away.
+  // The live race anchors the home with the next four modes; the rest sit in the More sheet.
   const leadModels = fastModels.filter((m) => m.key === 'arena');
   const parkedModels = [
     ...fastModels.filter((m) => m.key !== 'arena'),
