@@ -20,8 +20,8 @@ vi.mock('@/lib/quickPlay/guestProgress', async (orig) => ({
   getGuestProgress: () => ({ coinsPending: 300 }),
 }));
 vi.mock('@/components/Avatar', () => ({
-  default: ({ customAvatar, userId }: { customAvatar?: { face?: string }; userId?: string }) => (
-    <span data-testid="avatar" data-face={customAvatar?.face ?? ''} data-seed={userId ?? ''} />
+  default: ({ customAvatar, userId, mood }: { customAvatar?: { face?: string }; userId?: string; mood?: string }) => (
+    <span data-testid="avatar" data-face={customAvatar?.face ?? ''} data-seed={userId ?? ''} data-mood={mood ?? 'idle'} />
   ),
 }));
 
@@ -72,6 +72,37 @@ describe('QuickPlayResults freshen', () => {
     renderResults();
     const hero = screen.getByTestId('quick-hero-avatar');
     expect(hero.querySelector('[data-testid="avatar"]')).toHaveAttribute('data-face', 'guest-face');
+  });
+
+  it('the avatar reacts as the round lands: a grin, then star eyes with a hop as the last stat and coins arrive', () => {
+    vi.useFakeTimers();
+    renderResults();
+    const avatar = () => screen.getByTestId('quick-hero-avatar').querySelector('[data-testid="avatar"]');
+    expect(avatar()).toHaveAttribute('data-mood', 'idle');
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
+    expect(avatar()).toHaveAttribute('data-mood', 'correct');
+    expect(screen.queryByTestId('quick-hero-hop')).toBeNull();
+    act(() => {
+      vi.advanceTimersByTime(1200);
+    });
+    expect(avatar()).toHaveAttribute('data-mood', 'win');
+    expect(screen.getByTestId('quick-hero-hop')).toBeTruthy();
+    act(() => {
+      vi.advanceTimersByTime(8000);
+    });
+    expect(avatar()).toHaveAttribute('data-mood', 'win');
+  });
+
+  it('a wordless round keeps the avatar calm: no cheer, no hop', () => {
+    vi.useFakeTimers();
+    renderResults({ wordsFound: 0, score: 0, scorePct: 0 }, { coins: 0 });
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(screen.getByTestId('quick-hero-avatar').querySelector('[data-testid="avatar"]')).toHaveAttribute('data-mood', 'idle');
+    expect(screen.queryByTestId('quick-hero-hop')).toBeNull();
   });
 
   it("puts a signed-in player's profile avatar front and center", () => {

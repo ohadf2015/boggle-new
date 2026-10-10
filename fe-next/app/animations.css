@@ -3228,6 +3228,9 @@ html.reduce-motion *::after {
 @keyframes qp-ray-spin {
   to { transform: rotate(360deg); }
 }
+@keyframes qp-ray-spin-rev {
+  to { transform: rotate(-360deg); }
+}
 @keyframes qp-avatar-pop {
   0% { transform: translateY(18px) scale(0.55); }
   45% { transform: translateY(-14px) scale(1.08); }
@@ -3237,6 +3240,12 @@ html.reduce-motion *::after {
 @keyframes qp-avatar-bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
+}
+@keyframes qp-avatar-hop {
+  0% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-22px) scale(1.06) rotate(-4deg); }
+  62% { transform: translateY(2px) scale(0.98, 1.02); }
+  100% { transform: translateY(0) scale(1); }
 }
 @keyframes qp-shadow-bob {
   0%, 100% { transform: scaleX(1); }

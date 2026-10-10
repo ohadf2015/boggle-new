@@ -12,12 +12,27 @@ const MAX_COINS = 8;
 const CONFETTI_COLORS = ['#bfff00', '#ff4d9a', '#22d3ee', '#ffe135', '#c084fc'];
 const BURST_ANGLES = [0, 36, 72, 108, 144, 180, 216, 252, 288, 324];
 const SPARK_SLOTS = [
-  { left: '22%', top: '18%', delay: '1.0s', color: 'text-neo-yellow', size: 'h-4 w-4' },
-  { left: '74%', top: '26%', delay: '1.9s', color: 'text-neo-lime', size: 'h-3 w-3' },
-  { left: '30%', top: '72%', delay: '2.8s', color: 'text-neo-pink', size: 'h-3 w-3' },
+  { left: '20%', top: '16%', delay: '1.0s', color: 'text-neo-yellow', size: 'h-6 w-6' },
+  { left: '76%', top: '24%', delay: '1.7s', color: 'text-neo-lime', size: 'h-5 w-5' },
+  { left: '28%', top: '70%', delay: '2.4s', color: 'text-neo-pink', size: 'h-4 w-4' },
+  { left: '70%', top: '66%', delay: '3.1s', color: 'text-neo-cyan', size: 'h-5 w-5' },
 ];
 
 const vars = (v: Record<string, string>) => v as React.CSSProperties;
+
+/** [start, width] in degrees — uneven on purpose so no two moments of the turn look alike. */
+const MAIN_RAYS: Array<[number, number]> = [
+  [0, 9], [24, 5], [41, 12], [70, 6], [92, 10], [121, 4], [138, 11], [166, 7],
+  [190, 13], [222, 5], [240, 9], [268, 6], [289, 12], [318, 4], [334, 8],
+];
+const FINE_RAYS: Array<[number, number]> = [
+  [12, 3], [57, 2], [104, 4], [152, 2], [203, 3], [251, 2], [302, 4], [347, 2],
+];
+
+function conicRays(rays: Array<[number, number]>, ink: string): string {
+  const stops = rays.map(([at, w]) => `transparent ${at}deg, ${ink} ${at}deg ${at + w}deg, transparent ${at + w}deg`);
+  return `conic-gradient(from 0deg, ${stops.join(', ')}, transparent 360deg)`;
+}
 
 export function QuickResultsRays({ color, spinning }: { color: string; spinning: boolean }) {
   return (
@@ -28,8 +43,14 @@ export function QuickResultsRays({ color, spinning }: { color: string; spinning:
       className="pointer-events-none absolute left-1/2 top-1/2 h-[1200px] w-[1200px] -translate-x-1/2 -translate-y-1/2 [mask-image:radial-gradient(closest-side,black_6%,transparent_72%)]"
     >
       <div
-        className={`h-full w-full ${spinning ? 'animate-[qp-ray-spin_26s_linear_infinite]' : ''}`}
-        style={{ background: `repeating-conic-gradient(from 0deg, ${color}3d 0deg 6deg, transparent 6deg 20deg)` }}
+        data-ray-layer
+        className={`absolute inset-0 ${spinning ? 'animate-[qp-ray-spin_34s_linear_infinite]' : ''}`}
+        style={{ background: conicRays(MAIN_RAYS, `${color}40`) }}
+      />
+      <div
+        data-ray-layer
+        className={`absolute inset-0 ${spinning ? 'animate-[qp-ray-spin-rev_51s_linear_infinite]' : ''}`}
+        style={{ background: conicRays(FINE_RAYS, '#ffffff1f') }}
       />
       <div
         className="absolute inset-0"
@@ -39,15 +60,15 @@ export function QuickResultsRays({ color, spinning }: { color: string; spinning:
   );
 }
 
-export function BurstLines({ enabled }: { enabled: boolean }) {
+export function BurstLines({ enabled, delayMs = 380 }: { enabled: boolean; delayMs?: number }) {
   if (!enabled) return null;
   return (
     <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 h-0 w-0">
       {BURST_ANGLES.map((a) => (
         <span
           key={a}
-          className="absolute -left-[3px] -top-[10px] h-5 w-1.5 rounded-full bg-neo-yellow animate-[qp-burst_0.7s_cubic-bezier(0.2,0.7,0.3,1)_0.38s_both]"
-          style={vars({ '--a': `${a}deg` })}
+          className="absolute -left-[3px] -top-[10px] h-5 w-1.5 rounded-full bg-neo-yellow animate-[qp-burst_0.7s_cubic-bezier(0.2,0.7,0.3,1)_both]"
+          style={{ ...vars({ '--a': `${a}deg` }), animationDelay: `${delayMs}ms` }}
         />
       ))}
     </div>

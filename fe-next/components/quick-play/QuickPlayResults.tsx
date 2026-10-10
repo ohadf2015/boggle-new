@@ -18,6 +18,7 @@ import { haptics } from '@/utils/haptics/HapticsManager';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { getOrCreateStoredCustomAvatar } from '@/utils/profileStorage';
 import { holdQuickResultsCalm } from '@/lib/quickPlay/resultsCalm';
+import { useHeroCheer } from '@/lib/quickPlay/useHeroCheer';
 import { getGuestProgress, percentileFromBoard } from '@/lib/quickPlay/guestProgress';
 import Avatar from '@/components/Avatar';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
@@ -171,6 +172,8 @@ export function QuickPlayResults({
     beatRival,
     percentileToday: outcome.percentileToday,
   });
+  const heroMood = useHeroCheer(result.wordsFound > 0, animate);
+  const hopping = animate && heroMood === 'win';
   const confettiCount = result.wordsFound === 0 ? 0 : rankedUp || celebrateTier >= 2 ? 16 : 10;
 
   useEffect(() => {
@@ -240,17 +243,24 @@ export function QuickPlayResults({
             <QuickResultsRays color={modeColor.hex} spinning={animate} />
             <ConfettiPuff count={confettiCount} enabled={animate} />
             <BurstLines enabled={animate && result.wordsFound > 0} />
+            {hopping && <BurstLines enabled delayMs={0} />}
             <SparkleLoop enabled={animate && result.wordsFound > 0} />
             <div
               className={`relative z-10 lg:scale-[1.3] ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}
               data-testid="quick-hero-avatar"
             >
               <div className={animate ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
-                <Avatar
-                  userId={user?.id ?? 'guest'}
-                  customAvatar={profile?.avatar_config ?? guestAvatar ?? undefined}
-                  pixelSize={128}
-                />
+                <div
+                  data-testid={hopping ? 'quick-hero-hop' : undefined}
+                  className={hopping ? 'animate-[qp-avatar-hop_0.62s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}
+                >
+                  <Avatar
+                    userId={user?.id ?? 'guest'}
+                    customAvatar={profile?.avatar_config ?? guestAvatar ?? undefined}
+                    pixelSize={128}
+                    mood={heroMood}
+                  />
+                </div>
               </div>
               <span
                 aria-hidden="true"

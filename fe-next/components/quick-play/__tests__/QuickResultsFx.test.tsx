@@ -11,6 +11,17 @@ describe('QuickResultsRays', () => {
     expect(rays).toHaveAttribute('data-spinning', 'true');
   });
 
+  it('never looks the same twice: uneven rays on two layers turning at different speeds', () => {
+    render(<QuickResultsRays color="#ffe135" spinning />);
+    const layers = screen.getByTestId('quick-results-rays').querySelectorAll<HTMLElement>('[data-ray-layer]');
+    expect(layers).toHaveLength(2);
+    for (const layer of layers) expect(layer.style.background).not.toMatch(/repeating-conic/);
+    const [a, b] = [...layers].map((l) => l.className.match(/qp-ray-spin(?:-rev)?_(\d+)s/));
+    expect(a?.[0]).toContain('qp-ray-spin_');
+    expect(b?.[0]).toContain('qp-ray-spin-rev_');
+    expect(a?.[1]).not.toBe(b?.[1]);
+  });
+
   it('stays as a still backdrop when motion is off', () => {
     render(<QuickResultsRays color="#ffe135" spinning={false} />);
     expect(screen.getByTestId('quick-results-rays')).toHaveAttribute('data-spinning', 'false');
