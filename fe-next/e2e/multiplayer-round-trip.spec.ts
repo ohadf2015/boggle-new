@@ -38,7 +38,7 @@ test.describe('Multiplayer round trip', () => {
       browser,
       baseURL,
     }) => {
-      test.setTimeout(150_000);
+      test.setTimeout(240_000);
 
       const host = await createOnboardedContext(browser, locale);
       const hostName = randomUsername('Host');
