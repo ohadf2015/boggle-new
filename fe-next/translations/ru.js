@@ -9927,6 +9927,8 @@ const ru = {
       "dayStreak": "{days} дней подряд",
       "rewardsPending": "Войди, чтобы копить монеты и XP",
       "pickNextMode": "Следующий раунд",
+      "statScore": "Очки",
+      "statWords": "Слова",
       "noWords": "В этот раз без слов. Следующая доска через 60 секунд.",
       "rankProgress": "{points} / {next} до ранга {rank}",
       "rankMax": "Максимальный ранг",

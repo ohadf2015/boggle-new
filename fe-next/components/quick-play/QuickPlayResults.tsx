@@ -21,18 +21,18 @@ import { CoinFlight, QuickResultsRays, QuickResultsSparkles } from './QuickResul
 import Avatar from '@/components/Avatar';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
 import { QuickPlayRankCard } from './QuickPlayRankCard';
+import { QuickResultsStats } from './QuickResultsStats';
+import { QuickResultsNextActions } from './QuickResultsNextActions';
 import { QuickRivalsPassed } from './QuickRivalsPassed';
 import { QuickWordsCollected, type CollectedWord } from './QuickWordsCollected';
 import { QuickLeaderboardCard } from './QuickLeaderboardCard';
-import { ModeGlyph } from './ModeGlyph';
 import { celebrationTier } from './celebrationTier';
 import { quickRank } from './quickRank';
 import { NODE_COLORS } from './modeColors';
 import { percentileFromBoard } from '@/lib/quickPlay/guestProgress';
-import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { QuickGhostRival } from '@/lib/quickPlay/ghostRivals';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { QUICK_MODES, type QuickMode, type QuickRoundResult, type QuickSubmitOutcome } from './types';
+import type { QuickMode, QuickRoundResult, QuickSubmitOutcome } from './types';
 
 export interface QuickRival {
   name: string;
@@ -108,7 +108,7 @@ export function QuickPlayResults({
   onChallenge,
   onExit,
 }: QuickPlayResultsProps) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const { user, profile } = useAuth();
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
   const celebrated = useRef(false);
@@ -188,16 +188,9 @@ export function QuickPlayResults({
 
   const dash = (result.scorePct / 100) * GAUGE_C;
   const modeColor = NODE_COLORS[result.mode];
-  // Stagger delays: hero 0s, rewards 0.25s, rank 0.5s
-  const staggerDelay = {
-    hero: prefersReducedMotion ? '0s' : '0s',
-    rewards: prefersReducedMotion ? '0s' : '0.25s',
-    rank: prefersReducedMotion ? '0s' : '0.5s',
-  };
-  const heroAnimation = prefersReducedMotion ? '' : 'animate-[fadeInUp_0.3s_ease-out_var(--delay,0s)_both]';
-  const rewardsAnimation = prefersReducedMotion ? '' : 'animate-[fadeInUp_0.3s_ease-out_var(--delay,0.25s)_both]';
+  // Static appear: an opacity tween on a full-width layer flashes on mobile.
+  // Motion lives in the rays, the counters and the coins instead.
   const fxEnabled = !prefersReducedMotion;
-  const rankAnimation = prefersReducedMotion ? '' : 'animate-[fadeInUp_0.3s_ease-out_var(--delay,0.5s)_both]';
 
   const myName = profile?.username || t('common.you', 'You');
 
@@ -220,7 +213,6 @@ export function QuickPlayResults({
     <div
       className="flex h-full flex-col gap-2.5 overflow-y-auto overscroll-contain bg-neo-navy px-4 py-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
       data-testid="quick-play-results"
-      data-reveal={prefersReducedMotion ? 'instant' : 'staggered'}
     >
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-2.5">
       <div className="flex items-center justify-center gap-2">
@@ -279,8 +271,7 @@ export function QuickPlayResults({
       <div className="flex flex-col gap-2.5">
       {/* Hero: % of perfect — DOMINANT element. */}
       <div
-        className={`relative overflow-hidden rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-4 shadow-hard-lg ${heroAnimation}`}
-        style={{ '--delay': staggerDelay.hero } as React.CSSProperties}
+        className="relative overflow-hidden rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-4 shadow-hard-lg"
         data-testid="quick-hero-card"
       >
         <QuickResultsRays color={modeColor.hex} enabled={fxEnabled} />
@@ -310,12 +301,8 @@ export function QuickPlayResults({
             </div>
           </div>
 
-          {/* Score secondary line */}
+          {/* Words line: the score itself lives in the stat card below. */}
           <div className="text-center">
-            <div className="font-neo-display text-2xl text-neo-cream">
-              <em className={`not-italic ${modeColor.text}`}>{safeToLocaleString(result.score, language)}</em>{' '}
-              {t('quickPlay.solo.points')}
-            </div>
             <div className="text-xs text-neo-white/60">
               {t('quickPlay.solo.wordsFound', {
                 found: String(result.wordsFound),
@@ -359,14 +346,13 @@ export function QuickPlayResults({
         </div>
       </div>
 
+      <QuickResultsStats score={result.score} wordsFound={result.wordsFound} />
+
       {/* Rewards — small chips, not full-width slabs. Signed out, the same
           numbers are shown as held rather than as a row of zeros. Animated
           counters make the reveal feel like a payoff. */}
-      <div
-        className={`relative flex flex-col items-center gap-1 ${rewardsAnimation}`}
-        style={{ '--delay': staggerDelay.rewards } as React.CSSProperties}
-      >
-        <CoinFlight count={8} enabled={fxEnabled} />
+      <div className="relative flex flex-col items-center gap-1">
+        <CoinFlight count={outcome.coins > 0 ? 6 : 0} enabled={fxEnabled} />
         <div className="flex items-center justify-center gap-3">
           <div
             className={`inline-flex items-center gap-1 rounded-full border-2 px-3 py-1.5 font-neo-display text-sm font-bold ${
@@ -374,7 +360,7 @@ export function QuickPlayResults({
             }`}
             data-testid="quick-coins-reward"
           >
-            ◉ +<AnimatedCounter value={outcome.coins} size="sm" variant="gold" delay={400} />
+            ◉ +<AnimatedCounter value={outcome.coins} size="sm" variant="gold" delay={800} />
           </div>
           <div
             className={`inline-flex items-center gap-1 rounded-full border-2 px-3 py-1.5 font-neo-display text-sm font-bold ${
@@ -382,7 +368,7 @@ export function QuickPlayResults({
             }`}
             data-testid="quick-xp-reward"
           >
-            ★ +<AnimatedCounter value={outcome.xp} size="sm" variant="default" delay={700} />
+            ★ +<AnimatedCounter value={outcome.xp} size="sm" variant="default" delay={1100} />
           </div>
         </div>
         {isGuest && (
@@ -394,8 +380,16 @@ export function QuickPlayResults({
         )}
       </div>
 
+
+      <QuickResultsNextActions
+        currentMode={result.mode}
+        onNextRound={onNextRound}
+        onChallenge={onChallenge}
+        onExit={onExit}
+      />
+
       {/* Rank progress card — split out for modularity */}
-      <div className={rankAnimation} style={{ '--delay': staggerDelay.rank } as React.CSSProperties}>
+      <div>
         <QuickPlayRankCard
           totalPoints={outcome.totalPoints}
           percentileToday={percentileToday}
@@ -455,57 +449,6 @@ export function QuickPlayResults({
       </div>
       </div>
 
-      {/* Next round: the mode is part of the decision, so it lives on the
-          button row instead of behind a trip back to the wheel. */}
-      <div className="flex flex-col gap-1.5" data-testid="quick-next-mode-picker">
-        <span className="text-center font-neo-display text-[10px] uppercase tracking-[0.18em] text-neo-white/45">
-          {t('quickPlay.solo.pickNextMode', 'Next round')}
-        </span>
-        <div className="grid grid-cols-4 gap-1.5">
-          {QUICK_MODES.map((mode) => (
-            <button
-              key={mode}
-              type="button"
-              data-testid={`quick-next-mode-${mode}`}
-              onClick={() => onNextRound(mode)}
-              className={`flex h-[56px] flex-col items-center justify-center gap-0.5 rounded-xl border-neo-thick border-black font-neo-display text-[11px] font-bold tracking-wide text-black shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${NODE_COLORS[mode].bg} ${
-                mode === result.mode ? 'ring-2 ring-neo-cream ring-offset-2 ring-offset-neo-navy' : ''
-              }`}
-            >
-              <ModeGlyph mode={mode} size={18} />
-              {t(`quickPlay.solo.mode.${mode}`)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <button
-        type="button"
-        data-testid="quick-results-next"
-        onClick={() => onNextRound()}
-        className="h-[52px] rounded-2xl border-4 border-black bg-neo-lime font-neo-display text-lg font-bold tracking-[2px] text-black shadow-hard-lg active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed"
-      >
-        {t('quickPlay.solo.nextRound')}
-      </button>
-      <button
-        type="button"
-        data-testid="quick-results-challenge"
-        onClick={onChallenge}
-        className="flex h-[44px] items-center justify-center rounded-2xl font-neo-display text-sm font-semibold text-neo-cosy"
-      >
-        {t('quickPlay.solo.challengeFriend')}
-      </button>
-      <p className="text-center text-[10px] text-neo-white/45">{t('quickPlay.solo.challengeHint')}</p>
-      {onExit && (
-        <button
-          type="button"
-          data-testid="quick-results-exit"
-          onClick={onExit}
-          className="flex h-[44px] items-center justify-center rounded-2xl font-neo-display text-sm font-semibold text-neo-white/80"
-        >
-          {t('common.back')}
-        </button>
-      )}
       </div>
 
       {/* Bottom spacer: reserves space for the push-notification prompt that anchors

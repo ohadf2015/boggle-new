@@ -11698,6 +11698,8 @@ const he = {
       "dayStreak": "{days} ימים ברציפות",
       "rewardsPending": "התחברו כדי להתחיל לצבור מטבעות ו-XP",
       "pickNextMode": "הסיבוב הבא",
+      "statScore": "ניקוד",
+      "statWords": "מילים",
       "noWords": "בלי מילים הפעם. הלוח הבא במרחק 60 שניות.",
       "rankProgress": "{points} / {next} עד {rank}",
       "rankMax": "הדרגה הגבוהה ביותר",

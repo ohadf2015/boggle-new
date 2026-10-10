@@ -73,6 +73,26 @@ describe('QuickPlayResults freshen', () => {
     expect(screen.getByTestId('quick-coin-flight')).toBeInTheDocument();
   });
 
+  it('flies no coins on a round that earned none', () => {
+    render(
+      <QuickPlayResults
+        result={result}
+        outcome={{ ...outcome, coins: 0 }}
+        rival={null}
+        onNextRound={() => undefined}
+        onChallenge={() => undefined}
+      />
+    );
+    expect(screen.queryByTestId('quick-coin-flight')).toBeNull();
+  });
+
+  it('keeps the next-round CTA above the rank and rivals cards', () => {
+    renderResults();
+    const cta = screen.getByTestId('quick-results-next');
+    const rank = screen.getByTestId('quick-rank-bar');
+    expect(cta.compareDocumentPosition(rank) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('marks the results screen on while mounted so the signup nudge holds back', () => {
     const { unmount } = renderResults();
     expect(isQuickResultsOnScreen()).toBe(true);

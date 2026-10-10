@@ -17,10 +17,10 @@ describe('QuickResultsRays', () => {
 });
 
 describe('QuickResultsSparkles', () => {
-  it('caps the sparkle burst at six so the celebration stays sparse', () => {
+  it('caps the sparkle burst at four so the celebration stays sparse', () => {
     render(<QuickResultsSparkles count={40} enabled />);
     const burst = screen.getByTestId('quick-results-sparkles');
-    expect(burst.querySelectorAll('[data-spark]')).toHaveLength(6);
+    expect(burst.querySelectorAll('[data-spark]')).toHaveLength(4);
   });
 
   it('renders nothing with a zero count or motion disabled', () => {
@@ -33,10 +33,10 @@ describe('QuickResultsSparkles', () => {
 });
 
 describe('CoinFlight', () => {
-  it('flies at most eight coins and hides them from assistive tech', () => {
+  it('flies at most six coins and hides them from assistive tech', () => {
     render(<CoinFlight count={20} enabled />);
     const flight = screen.getByTestId('quick-coin-flight');
     expect(flight).toHaveAttribute('aria-hidden', 'true');
-    expect(flight.querySelectorAll('[data-coin]')).toHaveLength(8);
+    expect(flight.querySelectorAll('[data-coin]')).toHaveLength(6);
   });
 });

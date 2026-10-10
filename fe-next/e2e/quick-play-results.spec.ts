@@ -1,18 +1,33 @@
-import { test, expect } from '@playwright/test';
-import { goto, waitForHydration } from './helpers/test-utils';
+import { test, expect, type Page } from '@playwright/test';
+import { goto } from './helpers/test-utils';
 
 /**
  * Quick Play wheel round ends on the results screen. Guest run, no words
- * played: the 60 s timer runs out and the results hero mounts. Checks the
- * player avatar, the rays and sparkles layers, the single primary CTA, and
- * that the signup sheet does not cover the reveal.
+ * played: the 60 s timer runs out and the results screen mounts. Checks the
+ * avatar hero, the stat cards, the single primary action, and that the signup
+ * sheet is held back over the reveal.
+ *
+ * networkidle never settles on /quick-play (live sockets), so we wait for
+ * React to attach to the mode card instead.
  */
+async function waitForReactAttached(page: Page, testId: string) {
+  await page.waitForFunction(
+    (id) => {
+      const el = document.querySelector(`[data-testid="${id}"]`);
+      return !!el && Object.keys(el).some((k) => k.startsWith('__reactFiber'));
+    },
+    testId,
+    { timeout: 60_000 }
+  );
+}
+
 test.describe('/quick-play results', () => {
-  test('shows the avatar hero and holds the signup sheet back', async ({ page }) => {
+  test('shows the avatar hero, stat cards and one primary action, and holds the signup sheet back', async ({ page }) => {
     test.setTimeout(150_000);
 
     await goto(page, '/quick-play');
-    await waitForHydration(page);
+    await page.getByTestId('mode-card-wheel-rush').waitFor({ state: 'visible', timeout: 60_000 });
+    await waitForReactAttached(page, 'mode-card-wheel-rush');
     await page.getByTestId('mode-card-wheel-rush').click({ timeout: 20_000 });
 
     const results = page.getByTestId('quick-play-results');
@@ -21,7 +36,9 @@ test.describe('/quick-play results', () => {
     await expect(page.getByText('Round complete')).toBeVisible();
     await expect(page.getByTestId('quick-hero-avatar')).toBeVisible();
     await expect(page.getByTestId('quick-results-rays')).toHaveCount(1);
-    await expect(page.getByTestId('quick-coin-flight')).toHaveCount(1);
+    await expect(page.getByTestId('quick-stats')).toBeVisible();
+    await expect(page.getByTestId('quick-stat-score')).toBeVisible();
+    await expect(page.getByTestId('quick-stat-words')).toBeVisible();
 
     const next = page.getByTestId('quick-results-next');
     await expect(next).toBeVisible();

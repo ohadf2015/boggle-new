@@ -121,13 +121,11 @@ describe('QuickPlayResults redesign', () => {
     expect(hero).toHaveTextContent('quickPlay.solo.betterThan');
   });
 
-  it('hero displays score and points label', () => {
+  it('score lives in the stat card under the hero', () => {
     render(
       <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
     );
-    const hero = screen.getByTestId('quick-hero-card');
-    expect(hero).toHaveTextContent('quickPlay.solo.points');
-    expect(hero).toHaveTextContent('340');
+    expect(screen.getByTestId('quick-stat-score')).toHaveAttribute('data-value', '340');
   });
 
   // Was "does not display the wordsFound line" — the hero deliberately carried
@@ -194,26 +192,16 @@ describe('QuickPlayResults redesign', () => {
     }
   });
 
-  it('renders with staggered reveal by default', () => {
+  it('appears statically: the hero never starts at opacity 0', () => {
     render(
       <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
     );
-    const container = screen.getByTestId('quick-play-results');
-    expect(container).toHaveAttribute('data-reveal', 'staggered');
+    expect(screen.getByTestId('quick-hero-card').className).not.toMatch(/fadeInUp/);
   });
 
   // Note: testing reduced motion requires a separate test suite that mocks
   // useReducedMotion to return true, due to vitest mock setup constraints.
   // See: QuickPlayResults.reducedMotion.test.tsx
-
-  it('staggered reveal blocks have animate classes in normal mode', () => {
-    render(
-      <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
-    );
-    const heroCard = screen.getByTestId('quick-hero-card');
-    // Should have an animate class for stagger
-    expect(heroCard.className).toMatch(/animate-\[/);
-  });
 
   it('preserves all existing testids', () => {
     render(

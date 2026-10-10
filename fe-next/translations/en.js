@@ -10345,6 +10345,8 @@ const en = {
       "dayStreak": "{days}-day streak",
       "rewardsPending": "Sign in to start banking coins and XP",
       "pickNextMode": "Next round",
+      "statScore": "Score",
+      "statWords": "Words",
       "noWords": "No words this time. The next board is 60 seconds away.",
       "rankProgress": "{points} / {next} to {rank}",
       "rankMax": "Top rank reached",

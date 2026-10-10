@@ -12081,6 +12081,8 @@ const sv = {
       "dayStreak": "{days} dagar i rad",
       "rewardsPending": "Logga in för att börja samla mynt och XP",
       "pickNextMode": "Nästa runda",
+      "statScore": "Poäng",
+      "statWords": "Ord",
       "noWords": "Inga ord den här gången – nästa bräde är 60 sekunder bort.",
       "rankProgress": "{points} / {next} till {rank}",
       "rankMax": "Högsta rangen nådd",
