@@ -49,6 +49,13 @@ test.describe('/quick-play results', () => {
     await expect(next).toBeVisible();
     await expect(next).toBeEnabled();
 
+    const stats = await page.getByTestId('quick-stats').boundingBox();
+    const bar = await page.getByTestId('quick-results-cta-bar').boundingBox();
+    const details = await page.getByTestId('quick-results-details').boundingBox();
+    expect(stats && bar && details).toBeTruthy();
+    expect(stats!.y + stats!.height).toBeLessThan(bar!.y);
+    expect(details!.y).toBeGreaterThan(bar!.y - 48);
+
     await page.waitForTimeout(4_000);
     expect(await page.getByText('Save your streak').count()).toBe(0);
   });

@@ -187,6 +187,23 @@ describe('QuickPlayResults freshen', () => {
     expect(details).toContainElement(screen.getByTestId('quick-rank-bar'));
   });
 
+  it('gives the hero the whole first screen and leaves the details below the fold', () => {
+    renderResults();
+    const stage = screen.getByTestId('quick-results-stage');
+    expect(stage.className).toContain('min-h-[calc(100dvh-var(--bottom-nav-height');
+    expect(stage).toContainElement(screen.getByTestId('quick-hero-card'));
+    expect(stage).toContainElement(screen.getByTestId('quick-wallet'));
+    expect(stage).not.toContainElement(screen.getByTestId('quick-results-details'));
+  });
+
+  it('keeps the plus sign in front of the earned amounts in Hebrew', () => {
+    renderResults();
+    for (const id of ['quick-coins-reward', 'quick-xp-reward']) {
+      const amount = screen.getByTestId(id).querySelector('[dir="ltr"]');
+      expect(amount?.textContent).toMatch(/^\+\d+$/);
+    }
+  });
+
   it('holds the signup nudge through the celebration, then lets it through', () => {
     vi.useFakeTimers();
     const { unmount } = renderResults();

@@ -202,162 +202,164 @@ export function QuickPlayResults({
   return (
     <div className="relative flex max-h-[100dvh] min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy" data-testid="quick-play-results">
       <div className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain" data-testid="quick-results-scroll">
-        <header className="relative z-20 mx-auto flex w-full max-w-5xl items-center justify-between gap-2 px-4 pt-3">
-          {onExit ? (
-            <button
-              type="button"
-              data-testid="quick-results-exit"
-              onClick={onExit}
-              aria-label={t('common.back')}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-neo-white/70 active:scale-95"
-            >
-              <X className="h-6 w-6" strokeWidth={2.75} aria-hidden="true" />
-            </button>
-          ) : (
-            <span className="w-11" aria-hidden="true" />
-          )}
-          <div className="flex min-w-0 items-center gap-1.5">
-            <span
-              data-testid="quick-mode-chip"
-              className={`rounded-xl border-[3px] border-black px-3 py-1 font-neo-display text-xs font-bold tracking-widest text-black shadow-hard ${modeColor.bg}`}
-            >
-              {t(`quickPlay.solo.mode.${result.mode}`)}
-            </span>
-            {dayStreak > 1 && (
-              <span
-                className="rounded-xl border-[3px] border-black bg-neo-orange px-2 py-1 font-neo-display text-xs font-bold text-black shadow-hard"
-                data-testid="quick-day-streak"
+        <div className="flex min-h-[calc(100dvh-var(--bottom-nav-height,0px)-6.75rem)] flex-col" data-testid="quick-results-stage">
+          <header className="relative z-20 mx-auto flex w-full max-w-5xl items-center justify-between gap-2 px-4 pt-3">
+            {onExit ? (
+              <button
+                type="button"
+                data-testid="quick-results-exit"
+                onClick={onExit}
+                aria-label={t('common.back')}
+                className="flex h-11 w-11 items-center justify-center rounded-full text-neo-white/70 active:scale-95"
               >
-                {t('quickPlay.solo.dayStreak', '{days}-day streak', { days: String(dayStreak) })}
-              </span>
+                <X className="h-6 w-6" strokeWidth={2.75} aria-hidden="true" />
+              </button>
+            ) : (
+              <span className="w-11" aria-hidden="true" />
             )}
-          </div>
-          <QuickResultsWallet from={walletFrom} to={walletTo} animate={animate} held={isGuest} iconRef={walletIconRef} />
-        </header>
-
-        <section
-          className="relative mx-auto flex w-full max-w-xl flex-col items-center gap-3 px-4 pb-5 lg:gap-4"
-          data-testid="quick-hero-card"
-        >
-          <div className="relative flex h-[190px] w-full items-center justify-center lg:h-[250px]">
-            <QuickResultsRays color={modeColor.hex} spinning={animate} />
-            <ConfettiPuff count={confettiCount} enabled={animate} />
-            <BurstLines enabled={animate && result.wordsFound > 0} />
-            {hopping && <BurstLines enabled delayMs={0} />}
-            <SparkleLoop enabled={animate && result.wordsFound > 0} />
-            <div
-              className={`relative z-10 lg:scale-[1.3] ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}
-              data-testid="quick-hero-avatar"
-            >
-              <div className={animate ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
-                <div
-                  data-testid={hopping ? 'quick-hero-hop' : undefined}
-                  className={hopping ? 'animate-[qp-avatar-hop_0.62s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}
+            <div className="flex min-w-0 items-center gap-1.5">
+              <span
+                data-testid="quick-mode-chip"
+                className={`rounded-xl border-[3px] border-black px-3 py-1 font-neo-display text-xs font-bold tracking-widest text-black shadow-hard ${modeColor.bg}`}
+              >
+                {t(`quickPlay.solo.mode.${result.mode}`)}
+              </span>
+              {dayStreak > 1 && (
+                <span
+                  className="rounded-xl border-[3px] border-black bg-neo-orange px-2 py-1 font-neo-display text-xs font-bold text-black shadow-hard"
+                  data-testid="quick-day-streak"
                 >
-                  <Avatar
-                    userId={user?.id ?? 'guest'}
-                    customAvatar={profile?.avatar_config ?? guestAvatar ?? undefined}
-                    pixelSize={128}
-                    mood={heroMood}
-                  />
-                </div>
-              </div>
-              <span
-                aria-hidden="true"
-                className={`absolute -bottom-3 left-1/2 -z-10 h-3 w-24 -translate-x-1/2 rounded-[50%] bg-black/45 ${
-                  animate ? 'animate-[qp-shadow-bob_2.8s_ease-in-out_0.9s_infinite]' : ''
-                }`}
-              />
-            </div>
-          </div>
-
-          <div className="relative z-10 flex flex-col items-center gap-1 text-center">
-            <h1
-              ref={headingRef}
-              tabIndex={-1}
-              className="font-neo-display text-[32px] font-bold leading-tight text-neo-yellow outline-none [text-shadow:0_3px_0_#000] lg:text-5xl"
-            >
-              {t('quickPlay.solo.roundComplete')}
-            </h1>
-            <p className="text-sm font-semibold text-neo-white/70">
-              {t('quickPlay.solo.wordsFound', { found: String(result.wordsFound), total: String(result.totalWords) })}
-            </p>
-          </div>
-
-          {(isPersonalBest || rankedUp || isNearMiss) && (
-            <div className="relative z-10 flex flex-wrap items-center justify-center gap-2">
-              {isPersonalBest && (
-                <span className={`${badge} -rotate-2 bg-neo-yellow`} data-testid="quick-new-best">
-                  ★ {t('quickPlay.solo.newBest')}
-                </span>
-              )}
-              {rankedUp && (
-                <span className={`${badge} rotate-1 bg-neo-pink`} data-testid="quick-rank-up">
-                  {t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}
-                </span>
-              )}
-              {isNearMiss && (
-                <span className={`${badge} bg-neo-orange`} data-testid="quick-near-miss">
-                  {t('quickPlay.solo.nearMiss', { pct: String(100 - result.scorePct) })}
+                  {t('quickPlay.solo.dayStreak', '{days}-day streak', { days: String(dayStreak) })}
                 </span>
               )}
             </div>
-          )}
+            <QuickResultsWallet from={walletFrom} to={walletTo} animate={animate} held={isGuest} iconRef={walletIconRef} />
+          </header>
 
-          <QuickResultsStats
-            score={result.score}
-            scorePct={result.scorePct}
-            wordsFound={result.wordsFound}
-            animate={animate}
-            modeBand={modeColor.bg}
-            modeInk={modeColor.text}
-          />
-
-          {showPercentile && (
-            <p className="text-center text-xs font-bold text-neo-cream">
-              {t('quickPlay.solo.betterThan', { pct: String(percentileToday) })}
-            </p>
-          )}
-          {result.mode === 'word-hunt' && result.targetWord && (
-            <p className={`text-sm font-bold ${result.targetWordFound ? 'text-neo-lime' : 'text-neo-white/75'}`}>
-              {t(result.targetWordFound ? 'quickPlay.solo.targetWordFound' : 'quickPlay.solo.targetWordMissed', {
-                word: result.targetWord.toUpperCase(),
-              })}
-            </p>
-          )}
-
-          <div className="flex flex-wrap items-center justify-center gap-2.5">
-            <span
-              className="inline-flex items-center gap-1.5 rounded-full border-[3px] border-black bg-neo-navy-elevated px-3 py-1 font-neo-display text-sm font-bold text-neo-yellow shadow-hard"
-              data-testid="quick-coins-reward"
-            >
-              <span ref={coinChipRef} className="block h-5 w-5">
-                <CoinIcon className="h-full w-full" />
-              </span>
-              +{outcome.coins}
-            </span>
-            <span
-              className="inline-flex items-center gap-1 rounded-full border-[3px] border-black bg-neo-navy-elevated px-3 py-1 font-neo-display text-sm font-bold text-neo-purple shadow-hard"
-              data-testid="quick-xp-reward"
-            >
-              ★ +{outcome.xp}
-            </span>
-            {improvementPct !== null && improvementPct !== 0 && (
-              <span
-                className={`rounded-full border-2 px-2.5 py-1 text-xs font-bold ${
-                  improvementPct > 0 ? 'border-neo-lime text-neo-lime' : 'border-neo-white/30 text-neo-white/70'
-                }`}
+          <section
+            className="relative mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-3 px-4 pb-6 lg:gap-5"
+            data-testid="quick-hero-card"
+          >
+            <div className="relative flex h-[min(34dvh,290px)] w-full items-center justify-center lg:h-[300px]">
+              <QuickResultsRays color={modeColor.hex} spinning={animate} />
+              <ConfettiPuff count={confettiCount} enabled={animate} />
+              <BurstLines enabled={animate && result.wordsFound > 0} />
+              {hopping && <BurstLines enabled delayMs={0} />}
+              <SparkleLoop enabled={animate && result.wordsFound > 0} />
+              <div
+                className={`relative z-10 lg:scale-[1.25] ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}
+                data-testid="quick-hero-avatar"
               >
-                {improvementPct > 0 ? '▲' : '▼'} {t('quickPlay.solo.vsAverage', { pct: String(Math.abs(improvementPct)) })}
-              </span>
+                <div className={animate ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
+                  <div
+                    data-testid={hopping ? 'quick-hero-hop' : undefined}
+                    className={hopping ? 'animate-[qp-avatar-hop_0.62s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}
+                  >
+                    <Avatar
+                      userId={user?.id ?? 'guest'}
+                      customAvatar={profile?.avatar_config ?? guestAvatar ?? undefined}
+                      pixelSize={160}
+                      mood={heroMood}
+                    />
+                  </div>
+                </div>
+                <span
+                  aria-hidden="true"
+                  className={`absolute -bottom-3 left-1/2 -z-10 h-3.5 w-28 -translate-x-1/2 rounded-[50%] bg-black/45 ${
+                    animate ? 'animate-[qp-shadow-bob_2.8s_ease-in-out_0.9s_infinite]' : ''
+                  }`}
+                />
+              </div>
+            </div>
+
+            <div className="relative z-10 flex flex-col items-center gap-1 text-center">
+              <h1
+                ref={headingRef}
+                tabIndex={-1}
+                className="font-neo-display text-[32px] font-bold leading-tight text-neo-yellow outline-none [text-shadow:0_3px_0_#000] lg:text-5xl"
+              >
+                {t('quickPlay.solo.roundComplete')}
+              </h1>
+              <p className="text-sm font-semibold text-neo-white/70">
+                {t('quickPlay.solo.wordsFound', { found: String(result.wordsFound), total: String(result.totalWords) })}
+              </p>
+            </div>
+
+            {(isPersonalBest || rankedUp || isNearMiss) && (
+              <div className="relative z-10 flex flex-wrap items-center justify-center gap-2">
+                {isPersonalBest && (
+                  <span className={`${badge} -rotate-2 bg-neo-yellow`} data-testid="quick-new-best">
+                    ★ {t('quickPlay.solo.newBest')}
+                  </span>
+                )}
+                {rankedUp && (
+                  <span className={`${badge} rotate-1 bg-neo-pink`} data-testid="quick-rank-up">
+                    {t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}
+                  </span>
+                )}
+                {isNearMiss && (
+                  <span className={`${badge} bg-neo-orange`} data-testid="quick-near-miss">
+                    {t('quickPlay.solo.nearMiss', { pct: String(100 - result.scorePct) })}
+                  </span>
+                )}
+              </div>
             )}
-          </div>
-          {isGuest && (
-            <p className="text-center text-[11px] text-neo-white/55" data-testid="quick-rewards-pending">
-              {t('quickPlay.solo.rewardsPending', 'Sign in to start banking coins and XP')}
-            </p>
-          )}
-        </section>
+
+            <QuickResultsStats
+              score={result.score}
+              scorePct={result.scorePct}
+              wordsFound={result.wordsFound}
+              animate={animate}
+              modeBand={modeColor.bg}
+              modeInk={modeColor.text}
+            />
+
+            {showPercentile && (
+              <p className="text-center text-xs font-bold text-neo-cream">
+                {t('quickPlay.solo.betterThan', { pct: String(percentileToday) })}
+              </p>
+            )}
+            {result.mode === 'word-hunt' && result.targetWord && (
+              <p className={`text-sm font-bold ${result.targetWordFound ? 'text-neo-lime' : 'text-neo-white/75'}`}>
+                {t(result.targetWordFound ? 'quickPlay.solo.targetWordFound' : 'quickPlay.solo.targetWordMissed', {
+                  word: result.targetWord.toUpperCase(),
+                })}
+              </p>
+            )}
+
+            <div className="flex flex-wrap items-center justify-center gap-2.5">
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full border-[3px] border-black bg-neo-navy-elevated px-3 py-1 font-neo-display text-sm font-bold text-neo-yellow shadow-hard"
+                data-testid="quick-coins-reward"
+              >
+                <span ref={coinChipRef} className="block h-5 w-5">
+                  <CoinIcon className="h-full w-full" />
+                </span>
+                <span dir="ltr">+{outcome.coins}</span>
+              </span>
+              <span
+                className="inline-flex items-center gap-1 rounded-full border-[3px] border-black bg-neo-navy-elevated px-3 py-1 font-neo-display text-sm font-bold text-neo-purple shadow-hard"
+                data-testid="quick-xp-reward"
+              >
+                ★ <span dir="ltr">+{outcome.xp}</span>
+              </span>
+              {improvementPct !== null && improvementPct !== 0 && (
+                <span
+                  className={`rounded-full border-2 px-2.5 py-1 text-xs font-bold ${
+                    improvementPct > 0 ? 'border-neo-lime text-neo-lime' : 'border-neo-white/30 text-neo-white/70'
+                  }`}
+                >
+                  {improvementPct > 0 ? '▲' : '▼'} {t('quickPlay.solo.vsAverage', { pct: String(Math.abs(improvementPct)) })}
+                </span>
+              )}
+            </div>
+            {isGuest && (
+              <p className="text-center text-[11px] text-neo-white/55" data-testid="quick-rewards-pending">
+                {t('quickPlay.solo.rewardsPending', 'Sign in to start banking coins and XP')}
+              </p>
+            )}
+          </section>
+        </div>
 
         <section
           className="mx-auto grid w-full max-w-5xl gap-3 px-4 pb-4 lg:grid-cols-2 lg:items-start"
