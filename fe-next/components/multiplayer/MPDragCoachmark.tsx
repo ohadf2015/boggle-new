@@ -197,7 +197,7 @@ export const MPDragCoachmark: React.FC<Props> = ({
       />
 
       {/* Bottom label pill + dismiss */}
-      <div className="absolute bottom-2 inset-x-0 flex flex-col items-center gap-2 pointer-events-auto">
+      <div className="absolute bottom-2 inset-x-0 flex flex-col items-center gap-2">
         <div
           className={cn(
             'px-4 py-2 rounded-neo border-neo-thick font-neo-display font-bold text-sm sm:text-base shadow-hard',
@@ -210,7 +210,7 @@ export const MPDragCoachmark: React.FC<Props> = ({
         <button
           type="button"
           onClick={onDismiss}
-          className="px-3 py-1 rounded-neo border-2 border-neo-cream/40 bg-neo-navy/80 text-neo-white text-xs font-neo-display font-bold hover:bg-neo-navy"
+          className="pointer-events-auto px-3 py-1 rounded-neo border-2 border-neo-cream/40 bg-neo-navy/80 text-neo-white text-xs font-neo-display font-bold hover:bg-neo-navy"
         >
           {t('wheelRush.ftue.dismiss')}
         </button>

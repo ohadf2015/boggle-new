@@ -28,7 +28,7 @@ import { trackGameEnd, trackGameStart, trackGrowthEvent } from '@/utils/growthTr
 import { useExperiment } from '@/hooks/useExperiment';
 import { useMPFTUEIdle } from '@/hooks/useMPFTUEIdle';
 import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
-import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
+import WheelCoachSlot from './wheel/WheelCoachSlot';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import Avatar from '@/components/Avatar';
 
@@ -725,12 +725,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const wheelCluster = (
     <>
 
-      {/* Practice-mode coach — auto-hides on first found word. */}
-      {practice && !hideModeCoach && (
-        <div className="w-full pb-2">
-          <PracticeCoachTip mode="wheelRush" wordsFound={wordsFound.length} />
-        </div>
-      )}
+      {practice && !hideModeCoach && <WheelCoachSlot wordsFound={wordsFound.length} />}
 
       {/* Mode coach for non-practice mode. Suppressed by hideModeCoach (Quick Play). */}
       {!practice && !hideModeCoach && <ModeCoach mode="wheelRush" />}

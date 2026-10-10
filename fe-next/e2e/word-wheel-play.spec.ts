@@ -74,7 +74,20 @@ async function drag(page: Page, pts: Letter[], onEach?: (n: number) => Promise<v
 }
 
 test.describe('Word Wheel play', () => {
+  test('the letters hold still while the practice tip rotates, so a swipe lands where the finger aims', async ({ page }) => {
+    test.setTimeout(90_000);
+    await openWheel(page);
+    const before = await readWheel(page);
+    await page.waitForTimeout(8_000);
+    const after = await readWheel(page);
+    for (const [i, p] of before.entries()) {
+      expect(Math.abs(after[i].x - p.x), `${p.l} moved sideways`).toBeLessThan(2);
+      expect(Math.abs(after[i].y - p.y), `${p.l} moved vertically`).toBeLessThan(2);
+    }
+  });
+
   test('a drag spells live, an accepted word reacts on the wheel and lands in the found list', async ({ page }) => {
+    test.setTimeout(90_000);
     const dict = await loadDict(page);
     await openWheel(page);
     const wheel = await readWheel(page);
