@@ -15,7 +15,6 @@ const WordHuntEffectsCanvas = dynamic(
 import { useLanguage } from '@/contexts/LanguageContext';
 import { wordHuntSolveTier, type WordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
 import { cn } from '@/lib/utils';
-import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
@@ -44,7 +43,8 @@ import {
   SurvivalGridSection,
   AutoClueNotification,
 } from './survival';
-import { SurvivalDesktopLayout } from './survival/SurvivalDesktopLayout';
+import { HuntLeftRail, HuntRightRail } from './survival/HuntShellRails';
+import { GameShell } from '@/components/game/shell';
 import { SurvivalExtraLifeModal } from './survival/SurvivalExtraLifeModal';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
@@ -110,7 +110,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   quitStaysOnPage = false,
 }) => {
   const { t } = useLanguage();
-  const { isDesktop, isTv } = useDesktopLayout();
   const setIsInGame = useHideNavigation();
 
   // Performance optimization for low-end devices + player opt-out.
@@ -436,10 +435,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     }
   };
 
-  // Stable callbacks for SurvivalDesktopLayout — inline arrows broke the memo()
-  // wrap on the layout, so every life-drain tick re-rendered the whole 3-column
-  // tree (and through it, the grid). The setters are individually useCallback'd
-  // in useSurvivalGameLogic; destructure to give exhaustive-deps a clean signal.
   const { setLifeGainAmount, setShowQuitConfirm } = actions;
   const handleLifeGainComplete = useCallback(() => {
     setLifeGainAmount(null);
@@ -462,105 +457,31 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     />
   ) : null;
 
-  // Desktop/TV layout (3-column with sidebars)
-  if ((isDesktop || isTv) && puzzleDate) {
-    return (
-      <div ref={containerRef} className="relative w-full h-full">
-        {pixiOverlay}
-        <ScreenFlashOverlay trigger={flashTrigger} colorClass={flashColor} />
-        {practice && !hideModeCoach && (
-          <div className="absolute top-2 inset-x-0 z-30 px-3 pointer-events-auto">
-            <PracticeCoachTip mode="wordHunt" wordsFound={state.discoveredWords.length} />
-          </div>
-        )}
-        {!practice && !hideModeCoach && <ModeCoach mode="wordHunt" />}
-        {/* react-rewards anchor — must exist in DOM for reward confetti to target */}
-        <span id={rewardId} className="fixed top-1/2 left-1/2 pointer-events-none" />
-        <SurvivalDesktopLayout
-          isTv={isTv}
-          grid={grid}
-          isGameOver={state.isGameOver}
-          eliminatedLetters={state.eliminatedLetters}
-          onWordSubmit={actions.handleWordSubmit}
-          onWordChange={actions.handleWordChange}
-          highlightedPath={keyboardInput.highlightedCells}
-          lifePoints={state.lifePoints}
-          isLifeGaining={state.isLifeGaining}
-          lifeGainAmount={state.lifeGainAmount}
-          skipAnimations={skipAnimations}
-          onLifeGainComplete={handleLifeGainComplete}
-          liveScore={state.liveScore}
-          lastScoreIncrement={state.lastScoreIncrement}
-          isScoreAnimating={state.isScoreAnimating}
-          currentHint={state.currentHint}
-          targetWord={targetWord}
-          attempts={state.attempts}
-          accumulatedClues={state.accumulatedClues}
-          revealedLetters={state.revealedLetters}
-          knownLetters={state.knownLetters}
-          latestAttemptFeedback={state.latestAttemptFeedback}
-          showFeedbackOverlay={state.showFeedbackOverlay}
-          isClueGaining={state.isClueGaining}
-          clueContainerRef={actions.clueContainerRef}
-          gameDir={actions.gameDir}
-          discoveredWords={state.discoveredWords}
-          hintStage={state.hintStage}
-          puzzleDate={puzzleDate}
-          language={language}
-          currentPlayerId={currentPlayerId ?? null}
-          currentGuestFingerprint={currentGuestFingerprint ?? null}
-          onQuitClick={handleQuitClick}
-          practice={practice}
-          t={t}
-        />
-
-        {/* Word Feedback — inline WordFormingArea */}
-        <div className="fixed bottom-[calc(1rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-40">
-          <WordFormingArea word={state.formedWord} letterCount={state.letterCount} feedback={state.wordFeedback} compact />
-        </div>
-
-        {/* Auto-Clue Notifications */}
-        <AnimatePresence>
-          {state.activeNotifications.map((notification) => (
-            <AutoClueNotification
-              key={notification.id}
-              clueType={notification.clueType}
-              onDismiss={() => actions.dismissNotification(notification.id)}
-              direction={actions.gameDir}
-              t={t}
-              language={language}
-            />
-          ))}
-        </AnimatePresence>
-
-        {/* Quit Confirmation Dialog */}
-        <ConfirmationDialog
-          open={state.showQuitConfirm}
-          onOpenChange={(open) => actions.setShowQuitConfirm(open)}
-          title={quitDialog.title}
-          description={quitDialog.description}
-          confirmText={quitDialog.confirmText}
-          cancelText={quitDialog.cancelText}
-          onConfirm={handleQuitConfirm}
-          variant="danger"
-          analyticsId="daily_survival_quit_confirm"
-          analyticsExtras={{ orientation: 'landscape' }}
-        />
-
-        {extraLifeModal}
-      </div>
-    );
-  }
-
-  // Portrait/responsive layout
+  // One tree for every screen; on desktop the GameShell frames it with rails.
   // pt-3 ensures game header doesn't overlap with the sticky app header on mobile
   return (
+    <GameShell
+      mode="hunt"
+      accent="yellow"
+      left={
+        <HuntLeftRail
+          t={t}
+          liveScore={state.liveScore}
+          lifePoints={state.lifePoints}
+          hintStage={state.hintStage}
+          attempts={state.attempts}
+          rivals={rivals}
+          daily={puzzleDate ? { puzzleDate, language, currentPlayerId: currentPlayerId ?? null, currentGuestFingerprint: currentGuestFingerprint ?? null } : undefined}
+        />
+      }
+      right={<HuntRightRail t={t} words={state.discoveredWords} />}
+    >
     <m.div
       ref={containerRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="relative flex-1 flex flex-col p-2 sm:p-4 overflow-x-clip overflow-y-auto pb-safe pt-3 sm:pt-2"
+      className="relative flex-1 flex flex-col p-2 sm:p-4 overflow-x-clip overflow-y-auto pb-safe pt-3 sm:pt-2 shell:p-0 shell:h-full shell:overflow-hidden"
       style={{
         paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
       } as React.CSSProperties}
@@ -703,7 +624,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       </div>
 
       {/* Game Grid — flex-1 lets it fill remaining space; min-h-0 allows flex shrinking */}
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 shell:[container-type:size] shell:[&_.game-board-frame]:!w-[min(100cqw,100cqh)] shell:[&_.game-board-frame]:!h-[min(100cqw,100cqh)] shell:[&_.game-board-frame]:!max-w-none shell:[&_.game-board-frame]:!max-h-none">
         <SurvivalGridSection
           grid={grid}
           isGameOver={state.isGameOver}
@@ -717,7 +638,11 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {/* Mobile: discovered words list with obfuscate toggle. Reserved slot so the
           first word found doesn't shrink the flex-1 grid above it mid-round. */}
-      <div className="shrink-0 min-h-[64px]" data-testid="wordhunt-discovered-words-slot">
+      <div className="hidden shell:flex shrink-0 h-14 items-center justify-center" data-testid="wordhunt-forming-desktop">
+        <WordFormingArea word={state.formedWord} letterCount={state.letterCount} feedback={state.wordFeedback} compact />
+      </div>
+
+      <div className="shrink-0 min-h-[64px] shell:hidden" data-testid="wordhunt-discovered-words-slot">
         {state.discoveredWords.length > 0 && (
           <DiscoveredWordsList
             words={state.discoveredWords}
@@ -756,6 +681,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {extraLifeModal}
     </m.div>
+    </GameShell>
   );
 };
 

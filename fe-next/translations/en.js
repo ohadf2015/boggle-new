@@ -9114,7 +9114,6 @@ const en = {
         "decline": "End run"
       },
       "findWordsToReveal": "Spell words on the grid to reveal these letters",
-      "keyboardTip": "Swipe on grid or type with keyboard",
       "shop": "Clue Shop",
       "revealLetter": "Reveal Letter",
       "revealLetterDesc": "Reveal a random letter in the target word",
@@ -9165,9 +9164,6 @@ const en = {
     "desktop": {
       "liveRanks": "Live Ranks",
       "lootCollected": "Loot Collected",
-      "powerUps": "Power-ups",
-      "hintsUnlocked": "Hints Unlocked",
-      "triesRemaining": "Tries Remaining",
       "noWordsYet": "Find words to collect loot.",
       "beFirst": "Be the first to rank."
     },
@@ -19371,7 +19367,7 @@ const en = {
     "wave": "Wave",
     "life": "Life",
     "tries": "Tries left",
-    "clues": "Letters revealed",
+    "clues": "Hints",
     "missions": "Missions",
     "streak": "Streak",
     "multiplier": "Multiplier",

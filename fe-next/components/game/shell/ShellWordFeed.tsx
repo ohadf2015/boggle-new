@@ -10,6 +10,8 @@ export interface ShellWord {
   word: string;
   /** Omitted by modes that score by tiles cleared rather than per word. */
   score?: number;
+  /** A mode's own reward label (e.g. "+12 ♥") shown where the score would be. */
+  detail?: string;
 }
 
 interface ShellWordFeedProps {
@@ -83,9 +85,9 @@ function ShellWordFeedImpl({ words, t, accent, title }: ShellWordFeedProps) {
               <span dir="auto" className="min-w-0 truncate font-neo-display text-2xl font-black uppercase tracking-wide tv:text-4xl">
                 {fresh.word}
               </span>
-              {typeof fresh.score === 'number' && (
+              {(typeof fresh.score === 'number' || fresh.detail) && (
                 <span dir="ltr" className={cn(styles.ptsRise, 'shrink-0 rounded-md border-2 border-black bg-neo-cream px-2 font-neo-display text-lg font-black tabular-nums text-black')}>
-                  +{fresh.score}
+                  {fresh.detail ?? `+${fresh.score}`}
                 </span>
               )}
             </div>
@@ -102,9 +104,9 @@ function ShellWordFeedImpl({ words, t, accent, title }: ShellWordFeedProps) {
                 <span dir="auto" className="min-w-0 truncate font-neo-display text-base font-bold uppercase tracking-wide text-neo-cream/90 tv:text-2xl">
                   {w.word}
                 </span>
-                {typeof w.score === 'number' && (
+                {(typeof w.score === 'number' || w.detail) && (
                   <span dir="ltr" className="shrink-0 font-neo-display text-sm font-black tabular-nums text-[var(--panel-accent,var(--shell-accent))] tv:text-xl">
-                    +{w.score}
+                    {w.detail ?? `+${w.score}`}
                   </span>
                 )}
               </li>

@@ -75,14 +75,8 @@ export type { AutoClueNotificationProps } from './AutoClueNotification';
 export { useLiveScoreTracker } from './useLiveScoreTracker';
 export type { LiveScoreState, LiveScoreActions, UseLiveScoreTrackerProps } from './useLiveScoreTracker';
 
-export { SurvivalDesktopLayout } from './SurvivalDesktopLayout';
-export type { SurvivalDesktopLayoutProps } from './SurvivalDesktopLayout';
-
 export { SurvivalLiveRanks } from './SurvivalLiveRanks';
 export type { SurvivalLiveRanksProps } from './SurvivalLiveRanks';
-
-export { SurvivalLootPanel } from './SurvivalLootPanel';
-export type { SurvivalLootPanelProps } from './SurvivalLootPanel';
 
 export { SurvivalMobileInfoBar } from './SurvivalMobileInfoBar';
 export type { SurvivalMobileInfoBarProps } from './SurvivalMobileInfoBar';

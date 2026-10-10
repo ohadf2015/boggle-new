@@ -9966,7 +9966,6 @@ const sv = {
         "decline": "Avsluta rundan"
       },
       "findWordsToReveal": "Stava ord på rutorna för att avslöja dessa bokstäver",
-      "keyboardTip": "Svep på rutnätet eller skriv med tangentbordet",
       "shop": "Ledtrådsbutik",
       "revealLetter": "Avslöja bokstav",
       "revealLetterDesc": "Avslöja en slumpmässig bokstav i målordet",
@@ -10020,9 +10019,6 @@ const sv = {
     "desktop": {
       "liveRanks": "Live-ranking",
       "lootCollected": "Insamlat byte",
-      "powerUps": "Power-ups",
-      "hintsUnlocked": "Upplåsta ledtrådar",
-      "triesRemaining": "Försök kvar",
       "noWordsYet": "Hitta ord för att samla byte!",
       "beFirst": "Bli först på topplistan!"
     },
@@ -20320,7 +20316,7 @@ const sv = {
     "wave": "Våg",
     "life": "Liv",
     "tries": "Försök kvar",
-    "clues": "Avslöjade bokstäver",
+    "clues": "Ledtrådar",
     "missions": "Uppdrag",
     "streak": "Svit",
     "multiplier": "Multiplikator",

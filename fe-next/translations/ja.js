@@ -9724,7 +9724,6 @@ const ja = {
         "decline": "ランを終了"
       },
       "findWordsToReveal": "グリッドで単語を作って、この文字を表示しよう",
-      "keyboardTip": "グリッドをスワイプするかキーボードで入力",
       "shop": "ヒントショップ",
       "revealLetter": "文字を表示",
       "revealLetterDesc": "目標単語のランダムな文字を表示",
@@ -9778,9 +9777,6 @@ const ja = {
     "desktop": {
       "liveRanks": "ライブランキング",
       "lootCollected": "獲得した戦利品",
-      "powerUps": "パワーアップ",
-      "hintsUnlocked": "解放されたヒント",
-      "triesRemaining": "残りの試行回数",
       "noWordsYet": "単語を見つけて戦利品を集めよう！",
       "beFirst": "最初のランカーになろう!"
     },
@@ -20320,7 +20316,7 @@ const ja = {
     "wave": "ウェーブ",
     "life": "ライフ",
     "tries": "残りチャンス",
-    "clues": "判明した文字",
+    "clues": "ヒント",
     "missions": "ミッション",
     "streak": "連続",
     "multiplier": "倍率",

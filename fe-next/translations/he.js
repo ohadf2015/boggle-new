@@ -9649,7 +9649,6 @@ const he = {
         "decline": "סיימו ריצה"
       },
       "findWordsToReveal": "הרכיבו מילים על הלוח כדי לחשוף את האותיות האלה",
-      "keyboardTip": "החליקו על הלוח או הקלידו במקלדת",
       "shop": "חנות רמזים",
       "revealLetter": "חשפו אות",
       "revealLetterDesc": "חשפו אות אקראית במילת היעד",
@@ -9703,9 +9702,6 @@ const he = {
     "desktop": {
       "liveRanks": "דירוג חי",
       "lootCollected": "שלל שנאסף",
-      "powerUps": "כוחות מיוחדים",
-      "hintsUnlocked": "רמזים שנפתחו",
-      "triesRemaining": "ניסיונות נותרים",
       "noWordsYet": "מצאו מילים כדי לאסוף שלל",
       "beFirst": "היו הראשונים בדירוג"
     },
@@ -20250,7 +20246,7 @@ const he = {
     "wave": "גל",
     "life": "חיים",
     "tries": "ניסיונות",
-    "clues": "אותיות שנחשפו",
+    "clues": "רמזים",
     "missions": "משימות",
     "streak": "רצף",
     "multiplier": "מכפיל",

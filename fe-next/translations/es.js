@@ -9599,7 +9599,6 @@ const es = {
         "decline": "Terminar partida"
       },
       "findWordsToReveal": "Deletrea palabras en la cuadrícula para revelar estas letras",
-      "keyboardTip": "Desliza en la cuadrícula o escribe con el teclado",
       "shop": "Tienda de Pistas",
       "revealLetter": "Revelar Letra",
       "revealLetterDesc": "Revelar una letra aleatoria de la palabra objetivo",
@@ -9653,9 +9652,6 @@ const es = {
     "desktop": {
       "liveRanks": "Clasificación en Vivo",
       "lootCollected": "Botín Recolectado",
-      "powerUps": "Mejoras",
-      "hintsUnlocked": "Pistas Desbloqueadas",
-      "triesRemaining": "Intentos Restantes",
       "noWordsYet": "Encuentra palabras para recolectar botín",
       "beFirst": "Sé el primero en el ranking"
     },
@@ -20332,7 +20328,7 @@ const es = {
     "wave": "Oleada",
     "life": "Vida",
     "tries": "Intentos",
-    "clues": "Letras reveladas",
+    "clues": "Pistas",
     "missions": "Misiones",
     "streak": "Racha",
     "multiplier": "Multiplicador",
