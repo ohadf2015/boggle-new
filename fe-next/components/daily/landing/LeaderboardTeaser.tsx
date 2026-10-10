@@ -10,6 +10,7 @@ import type { MergedLeaderboardEntry } from '@/lib/daily/mergeDailyLeaderboard';
 import type { Language } from '@/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
+import { getWithAuth } from '@/utils/authFetch';
 
 interface LeaderboardTeaserProps {
   currentLanguage: Language;
@@ -62,7 +63,7 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
         // was invisible from an English hub. `fp` lets the server find a guest
         // viewer's own row (a signed-in viewer is found by their session).
         const fp = await getGuestFingerprint().catch(() => '');
-        const res = await fetch(
+        const res = await getWithAuth(
           `/api/daily/leaderboard?date=${today}&lang=all&limit=3${fp ? `&fp=${encodeURIComponent(fp)}` : ''}`,
           { cache: 'no-store' },
         );

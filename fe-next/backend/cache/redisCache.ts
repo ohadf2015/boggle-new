@@ -1,10 +1,27 @@
 import Redis from 'ioredis';
+import { getRedisClient } from '../redis/connection';
 
 let cacheClient: Redis | null = null;
 
 let loggedConnError = false;
 
+const FAIL_FAST_MS = 1000;
+
+/**
+ * Bounds one cache command so a stalled Redis falls through to the DB within
+ * ~1s. The shared connection's own timeouts are longer (3s command timeout).
+ */
+export function failFast<T>(op: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error('cache command timed out')), FAIL_FAST_MS);
+  });
+  return Promise.race([op, timeout]).finally(() => clearTimeout(timer));
+}
+
 export function getCacheClient(): Redis {
+  const shared = getRedisClient();
+  if (shared) return shared;
   if (cacheClient) return cacheClient;
   const url =
     process.env.REDIS_URL ||
@@ -42,7 +59,7 @@ export async function cacheAside<T>(
 ): Promise<T> {
   const redis = getCacheClient();
   try {
-    const cached = await redis.get(key);
+    const cached = await failFast(redis.get(key));
     if (cached) return JSON.parse(cached) as T;
   } catch {
     /* cache miss or error — fall through to fetcher */
@@ -50,7 +67,7 @@ export async function cacheAside<T>(
 
   const result = await fetcher();
   try {
-    await redis.setex(key, ttlSeconds, JSON.stringify(result));
+    await failFast(redis.setex(key, ttlSeconds, JSON.stringify(result)));
   } catch {
     /* cache write failure is non-fatal */
   }
@@ -65,7 +82,7 @@ export async function cacheAside<T>(
 export async function invalidateKeys(...keys: string[]): Promise<void> {
   if (keys.length === 0) return;
   try {
-    await getCacheClient().del(...keys);
+    await failFast(getCacheClient().del(...keys));
   } catch {
     /* non-fatal — entry expires via TTL */
   }
@@ -73,12 +90,15 @@ export async function invalidateKeys(...keys: string[]): Promise<void> {
 
 export async function invalidateCache(pattern: string): Promise<void> {
   const redis = getCacheClient();
-  const stream = redis.scanStream({ match: pattern, count: 100 });
-  const keysToDelete: string[] = [];
-  for await (const chunk of stream) {
-    keysToDelete.push(...(chunk as string[]));
-  }
-  if (keysToDelete.length > 0) await redis.del(...keysToDelete);
+  const scanAndDelete = async () => {
+    const stream = redis.scanStream({ match: pattern, count: 100 });
+    const keysToDelete: string[] = [];
+    for await (const chunk of stream) {
+      keysToDelete.push(...(chunk as string[]));
+    }
+    if (keysToDelete.length > 0) await redis.del(...keysToDelete);
+  };
+  await failFast(scanAndDelete());
 }
 
 export async function closeCacheClient(): Promise<void> {

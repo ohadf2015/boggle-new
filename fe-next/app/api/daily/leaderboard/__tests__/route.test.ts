@@ -2,8 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
 const getUser = vi.fn();
-vi.mock('@/utils/supabase/server', () => ({
-  createRequestClient: vi.fn(async () => ({ supabase: { auth: { getUser } }, token: null })),
+vi.mock('@/lib/auth/getAuthedUser', () => ({
+  getAuthedUser: async () => {
+    const { data } = await getUser();
+    return data.user ? { id: data.user.id } : null;
+  },
 }));
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 

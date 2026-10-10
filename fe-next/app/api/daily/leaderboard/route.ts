@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
-import { createRequestClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureApiError } from '@/utils/sentry';
 import { mergeDailyLeaderboard, type MergeInput } from '@/lib/daily/mergeDailyLeaderboard';
 
@@ -96,9 +96,8 @@ export async function GET(request: NextRequest) {
 /** The caller's group key (see `identityOf`): the session user, else the guest fingerprint. */
 async function callerIdentity(request: NextRequest, fp: string | null): Promise<string | null> {
   try {
-    const { supabase, token } = await createRequestClient(request);
-    const { data } = await supabase.auth.getUser(token ?? undefined);
-    if (data?.user?.id) return `u:${data.user.id}`;
+    const user = await getAuthedUser(request);
+    if (user?.id) return `u:${user.id}`;
   } catch { /* anonymous */ }
   return fp ? `g:${fp}` : null;
 }
