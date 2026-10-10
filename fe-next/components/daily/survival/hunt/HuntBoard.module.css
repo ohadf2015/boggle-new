@@ -261,7 +261,7 @@
 }
 @keyframes tileHop {
   0% { transform: translateY(-4px) rotate(var(--tilt)) scale(1); }
-  35% { transform: translateY(-11px) rotate(calc(var(--tilt) * -2)) scale(1.12); }
+  35% { transform: translateY(-6px) rotate(calc(var(--tilt) * -2)) scale(1.1); }
   70% { transform: translateY(-2px) rotate(var(--tilt)) scale(0.98); }
   100% { transform: translateY(-4px) rotate(var(--tilt)) scale(1); }
 }
