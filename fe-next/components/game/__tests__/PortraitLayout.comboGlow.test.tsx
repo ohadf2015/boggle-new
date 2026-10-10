@@ -132,9 +132,6 @@ vi.mock('@/components/game/WordHuntLifeBar', () => ({
 vi.mock('@/components/game/WordHuntPlayerLives', () => ({
   WordHuntPlayerLives: () => null,
 }));
-vi.mock('@/components/singleplayer/game/components/DynamicEnergyBackground', () => ({
-  DynamicEnergyBackground: () => null,
-}));
 vi.mock('@/components/game/ComboMilestoneAnnouncement', () => ({
   ComboMilestoneAnnouncement: () => null,
 }));

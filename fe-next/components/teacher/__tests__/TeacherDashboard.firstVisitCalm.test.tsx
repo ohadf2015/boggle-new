@@ -51,7 +51,6 @@ vi.mock('@/components/teacher/ProGate', () => ({
   ProGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 vi.mock('@/components/teacher/ProWelcomeCelebration', () => ({ ProWelcomeCelebration: () => null }));
-vi.mock('@/components/teacher/StudentsPresentStrip', () => ({ default: () => <div data-testid="students-present" /> }));
 vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => ({ grant: null, loading: false, hasPro: false, source: null, periodEnd: null, refresh: vi.fn(), grantExpired: false }),
 }));

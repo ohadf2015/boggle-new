@@ -21,7 +21,6 @@ vi.mock('@/components/teacher/ClassroomManager', () => ({ default: () => <div />
 vi.mock('@/components/teacher/LessonBuilder', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: () => <div />, AssignmentCreator: () => <div /> }));
 vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({ AnalyticsDashboard: () => <div /> }));
-vi.mock('@/components/teacher/StudentsPresentStrip', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/analytics/LastGameInsights', () => ({ LastGameInsights: () => <div /> }));
 vi.mock('@/components/teacher/dashboard/PlayNowLauncher', () => ({ PlayNowLauncher: () => <div /> }));
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));

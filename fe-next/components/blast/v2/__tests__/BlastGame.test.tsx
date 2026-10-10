@@ -8,9 +8,6 @@ vi.mock('../BlastAtmosphereOverlay', () => ({
 vi.mock('../BlastFxOverlay', () => ({
   BlastFxOverlay: () => null,
 }));
-vi.mock('@/lib/blast/v2/fx', () => ({
-  useBlastFx: () => new Proxy({}, { get: () => () => {} }),
-}));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, fallback: string) => fallback,

@@ -135,7 +135,6 @@ vi.mock('../components/pre-game/desktop', () => ({
 // theme/auth contexts; the tutorial test doesn't wrap in providers, so stub it to
 // keep this suite focused on TV tutorial state. (Reward behavior is covered by the
 // component's own tests.)
-vi.mock('@/components/lobby/LobbyRewardCluster', () => ({ LobbyRewardCluster: () => null }));
 
 // Mock localStorage
 const mockLocalStorage = (() => {

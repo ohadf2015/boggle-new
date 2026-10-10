@@ -71,9 +71,6 @@ vi.mock('@/components/teacher/TeacherPlanBadge', () => ({
 vi.mock('@/components/teacher/ProWelcomeCelebration', () => ({
   ProWelcomeCelebration: () => null,
 }));
-vi.mock('@/components/teacher/StudentsPresentStrip', () => ({
-  default: () => <div data-testid="students-present" />,
-}));
 vi.mock('@/components/teacher/PlayTabFirstRunCard', () => ({
   default: () => <div data-testid="first-run-card" />,
 }));

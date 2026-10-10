@@ -9,7 +9,6 @@ import { SocketContext } from '../../utils/SocketContext';
 import { MusicProvider } from '../../contexts/MusicContext';
 
 // Mock next/navigation
-vi.mock('@/components/lobby/LobbyRewardCluster', () => ({ LobbyRewardCluster: () => null }));
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(() => ({

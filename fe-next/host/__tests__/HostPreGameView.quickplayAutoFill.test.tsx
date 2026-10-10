@@ -88,7 +88,6 @@ vi.mock('../components/pre-game/desktop', () => ({
   EnhancedPlayerList: () => null,
 }));
 vi.mock('@/components/lobby/LobbyReactions', () => ({ LobbyReactions: () => null }));
-vi.mock('@/components/lobby/LobbyRewardCluster', () => ({ LobbyRewardCluster: () => null }));
 
 const mockT = (key: string) => key;
 

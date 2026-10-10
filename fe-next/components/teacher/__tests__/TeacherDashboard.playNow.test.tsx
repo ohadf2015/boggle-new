@@ -40,7 +40,6 @@ vi.mock('@/components/teacher/analytics/LastGameInsights', () => ({ LastGameInsi
 vi.mock('@/components/teacher/ProGate', () => ({ ProGate: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
 vi.mock('@/components/teacher/TeacherPlanBadge', () => ({ TeacherPlanBadge: () => <div /> }));
 vi.mock('@/components/teacher/ProWelcomeCelebration', () => ({ ProWelcomeCelebration: () => null }));
-vi.mock('@/components/teacher/StudentsPresentStrip', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/PlayTabFirstRunCard', () => ({ default: () => <div data-testid="first-run-card" /> }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ grant: null, loading: false, hasPro: false }) }));
 vi.mock('@/hooks/useVocabularyLesson', () => ({

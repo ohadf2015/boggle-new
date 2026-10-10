@@ -32,7 +32,6 @@ vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () =
 vi.mock('@/components/education/TeacherOnboarding', () => ({ TeacherOnboarding: () => null }));
 vi.mock('../ClassroomManager', () => ({ __esModule: true, default: () => null }));
 vi.mock('../PlayTabFirstRunCard', () => ({ __esModule: true, default: () => null }));
-vi.mock('../StudentsPresentStrip', () => ({ __esModule: true, default: () => null }));
 vi.mock('../assignments', () => ({
   AssignmentTrackingPanel: () => null,
   AssignmentCreator: ({ isOpen, classroomId }: { isOpen: boolean; classroomId: string }) =>

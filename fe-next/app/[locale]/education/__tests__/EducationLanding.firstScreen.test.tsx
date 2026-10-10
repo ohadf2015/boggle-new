@@ -77,9 +77,6 @@ vi.mock('@/components/education/TeacherSetupSteps', () => ({
   ),
 }));
 
-vi.mock('@/components/education/EducationFAQ', () => ({
-  EducationFAQ: () => <div data-testid="education-faq" />,
-}));
 
 vi.mock('@/components/education/DistrictUpsellStrip', () => ({
   DistrictUpsellStrip: () => <div data-testid="district-upsell" />,
