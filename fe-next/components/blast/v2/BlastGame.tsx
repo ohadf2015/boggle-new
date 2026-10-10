@@ -19,7 +19,6 @@ import { mechanicsForLevel } from '@/lib/blast/v2/mechanic-flags';
 import { trackBlastLevelStarted, trackBlastLevelCompleted, trackBlastLevelAbandoned } from '@/lib/blast/v2/telemetry';
 import { BlastBoard } from './BlastBoard';
 import { BlastHud } from './BlastHud';
-import { useBlastCoinEarn } from './useBlastCoinEarn';
 import { BlastSurpriseBanner } from './BlastSurpriseBanner';
 import { BlastLevelIntroCard } from './BlastLevelIntroCard';
 import { BlastResultFlow } from './BlastResultFlow';
@@ -107,7 +106,6 @@ export function BlastGame({
   // instantly inline (no async round-trip / reject-flicker). The async verify
   // below stays as the fallback for community words + a cold cache.
   const { state, handlers } = useBlastV2(level, { dictionaryCheck: checkDictionarySync });
-  useBlastCoinEarn(state.coins);
   // Hide the global bottom nav while the board is mounted — without this the
   // HUD + board + bottom nav exceed 100dvh on phones and force a page scroll.
   const setIsInGame = useHideNavigation();

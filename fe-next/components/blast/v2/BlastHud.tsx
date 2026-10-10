@@ -76,7 +76,6 @@ function CoinDisplay({ coins, modeColor }: { coins: number; modeColor: string })
   return (
     <m.div
       data-testid="coin-counter"
-      data-coin-counter="true"
       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-neo-display font-black text-lg tabular-nums"
       style={{
         scale,
