@@ -303,7 +303,6 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
               />
             )}
             <TabbedDailyLeaderboard
-              compactTabs
               key={`${leaderboardKey}-${renameCount}`}
               puzzleDate={puzzleDate}
               language={gameLang}

@@ -51,7 +51,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 const mockT = (key: string) => key;
 
-describe('TabbedDailyLeaderboard — compact tabs', () => {
+describe('TabbedDailyLeaderboard — tab switch', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
     (global.fetch as jest.Mock).mockImplementation(() =>
@@ -66,7 +66,7 @@ describe('TabbedDailyLeaderboard — compact tabs', () => {
 
   it('puts Today and Friends up front and tucks the other boards behind More', async () => {
     const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
-    render(<TabbedDailyLeaderboard puzzleDate="2026-09-14" language="en" t={mockT} compactTabs />);
+    render(<TabbedDailyLeaderboard puzzleDate="2026-09-14" language="en" t={mockT} />);
 
     expect(await screen.findByTestId('leaderboard-more-tabs')).toBeInTheDocument();
     expect(screen.getAllByRole('tab')).toHaveLength(3);
@@ -75,12 +75,5 @@ describe('TabbedDailyLeaderboard — compact tabs', () => {
     fireEvent.click(screen.getByTestId('leaderboard-more-tabs'));
     fireEvent.click(await screen.findByTestId('connections-tab-button'));
     expect(await screen.findByTestId('connections-daily-tab-empty')).toBeInTheDocument();
-  });
-
-  it('keeps all five tab buttons by default', async () => {
-    const { default: TabbedDailyLeaderboard } = await import('../TabbedDailyLeaderboard');
-    render(<TabbedDailyLeaderboard puzzleDate="2026-09-14" language="en" t={mockT} />);
-    expect(await screen.findByTestId('connections-tab-button')).toBeInTheDocument();
-    expect(screen.queryByTestId('leaderboard-more-tabs')).toBeNull();
   });
 });

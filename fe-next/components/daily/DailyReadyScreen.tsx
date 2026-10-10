@@ -365,7 +365,6 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               className="overflow-hidden"
             >
               <TabbedDailyLeaderboard
-                compactTabs
                 puzzleDate={puzzleDate}
                 language={language}
                 currentPlayerId={currentPlayerId}
@@ -408,7 +407,6 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           </div>
           <div className="p-3">
             <TabbedDailyLeaderboard
-              compactTabs
               puzzleDate={puzzleDate}
               language={language}
               currentPlayerId={currentPlayerId}

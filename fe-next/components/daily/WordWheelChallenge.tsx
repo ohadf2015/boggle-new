@@ -336,16 +336,12 @@ const WordWheelChallenge: React.FC = () => {
     [language]
   );
 
-  // Fullscreen game paths skip the global prewarm, and without it every word waits on a server round-trip.
+  // Fullscreen game paths skip the global prewarm (PSI window), so warm on the first touch instead.
   useEffect(() => {
     if (phase !== 'ready') return;
     const warm = () => void prewarmDictionary(language as Language);
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(warm, { timeout: 1500 });
-      return () => window.cancelIdleCallback(id);
-    }
-    const id = window.setTimeout(warm, 300);
-    return () => window.clearTimeout(id);
+    window.addEventListener('pointerdown', warm, { once: true, passive: true });
+    return () => window.removeEventListener('pointerdown', warm);
   }, [phase, language]);
 
   const startPlaying = useCallback(() => {
@@ -612,7 +608,6 @@ const WordWheelChallenge: React.FC = () => {
             >
               <ReadyLeaderboardPeek t={t} defaultOpen={isDesktop || isTv}>
                 <TabbedDailyLeaderboard
-                  compactTabs
                   puzzleDate={catchupDate || getDailyChallengeDate()}
                   language={language as Language}
                   currentPlayerId={isAuthenticated && profile ? profile.id : null}

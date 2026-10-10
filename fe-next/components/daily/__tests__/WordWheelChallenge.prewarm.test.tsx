@@ -115,13 +115,18 @@ vi.mock('../TabbedDailyLeaderboard', () => ({
 }));
 
 describe('WordWheelChallenge - dictionary warm-up', () => {
-  it('warms the dictionary while the ready card is up, so the first word lands without a round-trip', async () => {
+  beforeEach(() => prewarmDictionary.mockClear());
+
+  it('waits for the first touch on the ready card, keeping the download out of the page-load window', async () => {
     render(<WordWheelChallenge />);
     await screen.findByText('daily.play');
+    await new Promise((r) => setTimeout(r, 400));
+    expect(prewarmDictionary).not.toHaveBeenCalled();
+    fireEvent.pointerDown(document.body);
     await waitFor(() => expect(prewarmDictionary).toHaveBeenCalledWith('en'));
   });
 
-  it('still warms it on PLAY when the idle warm-up has not run', async () => {
+  it('warms it on PLAY', async () => {
     render(<WordWheelChallenge />);
     fireEvent.click(await screen.findByText('daily.play'));
     await waitFor(() => expect(prewarmDictionary).toHaveBeenCalledWith('en'));
