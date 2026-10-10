@@ -224,3 +224,12 @@ describe('GridComponent hints', () => {
     expect(board.getAttribute('data-hint-phase')).toBe('fadeout');
   });
 });
+
+describe('GridComponent tile skins', () => {
+  it('given an equipped tile skin, then every tile carries the skin hook the cosmetics paint', () => {
+    const { container } = render(<GridComponent grid={GRID} tileSkinOverride="tile-neon" />, { wrapper: Wrapper });
+    expect(container.querySelector('[data-tile-skin="neon"]')).not.toBeNull();
+    const tiles = [...container.querySelectorAll('[data-tile]')];
+    expect(tiles.every((el) => el.classList.contains('letter-tile-gradient'))).toBe(true);
+  });
+});

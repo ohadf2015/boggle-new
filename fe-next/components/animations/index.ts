@@ -11,7 +11,6 @@ export { CoinCounterAnimated } from './CoinCounterAnimated';
 
 // Gameplay Animations
 export { WordPathTrail } from './WordPathTrail';
-export { ScorePopupFly } from './ScorePopupFly';
 export { SelectionSparkle, LetterSelectFeedback } from './SelectionSparkle';
 
 // Combo Animations

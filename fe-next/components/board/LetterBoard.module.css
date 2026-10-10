@@ -205,15 +205,25 @@
 
 /* ---------- verdict on the tiles that just left ---------- */
 
-.board .tile[data-fx='sent'],
-.board .glyph[data-fx='sent'] {
+.board .tile[data-fx='sent'] {
   animation: tile-release 200ms ease-out both;
 }
 
-.board .tile[data-fx='ok'],
-.board .glyph[data-fx='ok'] {
+/* The letter has left as a flying chip; its tile keeps a faint imprint until the verdict. */
+.board .glyph[data-fx='sent'] {
+  opacity: 0.22;
+  transform: scale(0.82);
+  transition: opacity 90ms linear, transform 90ms ease-out;
+}
+
+.board .tile[data-fx='ok'] {
   animation: tile-ok 520ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
   animation-delay: calc(var(--fx-i, 0) * 45ms);
+}
+
+.board .glyph[data-fx='ok'] {
+  animation: glyph-refill 380ms cubic-bezier(0.2, 1.7, 0.4, 1) both;
+  animation-delay: calc(var(--fx-i, 0) * 40ms + 140ms);
 }
 
 .board .tile[data-fx='ok'] {
@@ -222,10 +232,13 @@
 }
 
 .board .tile[data-fx='bad'],
-.board .glyph[data-fx='bad'],
-.board .tile[data-fx='dupe'],
-.board .glyph[data-fx='dupe'] {
+.board .tile[data-fx='dupe'] {
   animation: tile-shake 340ms ease-in-out both;
+}
+
+.board .glyph[data-fx='bad'],
+.board .glyph[data-fx='dupe'] {
+  animation: tile-shake 340ms ease-in-out both, glyph-back 220ms ease-out 60ms both;
 }
 
 .board .tile[data-fx='bad'] {
@@ -261,7 +274,7 @@
   font-size: var(--cell-font-size);
   font-weight: 700;
   line-height: 1;
-  color: #1a1a2e;
+  color: var(--tile-ink, #1a1a2e);
   transform-origin: 50% 55%;
   transition: transform 160ms cubic-bezier(0.3, 1.5, 0.5, 1);
 }
@@ -317,8 +330,21 @@
 }
 
 .trail [data-trail-echo] {
-  stroke: var(--accent);
+  stroke: #fff;
   opacity: 0;
+}
+
+.board[data-verdict='ok'] .trail [data-trail-echo] {
+  stroke: var(--ok);
+}
+
+.board[data-verdict='bad'] .trail [data-trail-echo] {
+  stroke: var(--bad);
+}
+
+/* Blast paints its own tiles below: a highlighter band, so the letters read through it. */
+.board[data-ghost] {
+  mix-blend-mode: multiply;
 }
 
 .board[data-ghost] .trail [data-trail='core'],
@@ -327,8 +353,10 @@
   stroke: #bfff00;
 }
 
-.board[data-ghost] .trail {
-  opacity: 0.88;
+.board[data-ghost] .trail [data-trail='ink'],
+.board[data-ghost] .trail [data-tail='ink'],
+.board[data-ghost] .trail [data-trail='shine'] {
+  display: none;
 }
 
 .trail [data-finger] {
@@ -375,6 +403,17 @@
   35% { transform: translateY(-14%) scale(1.14); }
   70% { transform: translateY(3%) scale(0.96); }
   100% { transform: none; }
+}
+
+@keyframes glyph-refill {
+  0% { opacity: 0; transform: translateY(30%) scale(0.4); }
+  60% { opacity: 1; transform: translateY(-12%) scale(1.18); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes glyph-back {
+  0% { opacity: 0.22; }
+  100% { opacity: 1; }
 }
 
 @keyframes tile-shake {

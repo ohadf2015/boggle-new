@@ -51,13 +51,13 @@ export function createBoardPainter(container: HTMLElement): BoardPainter {
       svg.setAttribute('viewBox', `0 0 ${w.toFixed(1)} ${h.toFixed(1)}`);
       const ghost = container.hasAttribute('data-ghost');
       const widths: Record<string, number> = ghost
-        ? { ink: 0.3, core: 0.2, shine: 0.05 }
+        ? { ink: 0.3, core: 0.62, shine: 0.05 }
         : { ink: 0.44, core: 0.32, shine: 0.08 };
       svg.querySelectorAll<SVGElement>('[data-trail], [data-tail]').forEach((line) => {
         const kind = line.getAttribute('data-trail') ?? line.getAttribute('data-tail') ?? 'core';
         line.setAttribute('stroke-width', (geo!.cell * (widths[kind] ?? 0.3)).toFixed(1));
       });
-      q<SVGCircleElement>('[data-finger]')?.setAttribute('r', (geo.cell * (ghost ? 0.14 : 0.2)).toFixed(1));
+      q<SVGCircleElement>('[data-finger]')?.setAttribute('r', (geo.cell * (ghost ? 0.18 : 0.2)).toFixed(1));
     }
     return geo;
   }

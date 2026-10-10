@@ -72,6 +72,7 @@ test.describe('shared letter board', () => {
     await page.mouse.up();
     await expect(page.locator(`${TILE}[data-sel]`)).toHaveCount(0);
     await expect(page.locator(`${TILE}[data-fx="ok"]`).first()).toBeAttached({ timeout: 5_000 });
+    await expect(page.locator('[data-board]')).toHaveAttribute('data-verdict', 'ok');
   });
 
   test('a path that is not a word gets a gentle shake, not a celebration', async ({ page, baseURL }) => {
@@ -112,5 +113,20 @@ test.describe('shared letter board', () => {
     await expect(board).toHaveAttribute('data-mode', 'drag');
     await expect(page.locator('[data-board][data-ghost] [data-trail="core"]')).toHaveAttribute('points', /\d/);
     await page.mouse.up();
+  });
+
+  test('pass-and-play party turns use the same board', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.goto('/en/party', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('button', { name: /start party/i }).click({ timeout: 30_000 });
+    await page.getByRole('button', { name: /i'm ready/i }).click({ timeout: 10_000 });
+    const board = page.locator('[data-board]');
+    await expect(board.locator(TILE).first()).toBeVisible({ timeout: 10_000 });
+    const cells = await readGrid(page);
+    const row = cells.filter((c) => c.row === 0).slice(0, 3);
+    await dragThrough(page, row);
+    await expect(board).toHaveAttribute('data-len', '3');
+    await page.mouse.up();
+    await expect(board).toHaveAttribute('data-verdict', /ok|bad|dupe/, { timeout: 5_000 });
   });
 });

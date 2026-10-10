@@ -74,6 +74,10 @@ function markAttrs(key: string, marks: BoardMarks | undefined) {
   };
 }
 
+function isMarked(key: string, marks: BoardMarks | undefined): boolean {
+  return !!marks && Object.values(marks).some((set) => set?.has(key));
+}
+
 /**
  * The letter board every grid mode plays on. React renders the tiles once per
  * board; the live selection, trail, preview and release effects are painted
@@ -209,7 +213,7 @@ export default function LetterBoard({
                 data-eliminated={eliminated ? '' : undefined}
                 {...markAttrs(key, marks)}
                 aria-label={cellLabel?.(r, c, letter)}
-                className={styles.tile}
+                className={cn(styles.tile, !ghost && !order && !eliminated && !isMarked(key, marks) && 'letter-tile-gradient')}
                 style={{ ['--enter-i' as string]: r * cols + c }}
               >
                 {order && <span className={styles.badge}>{order}</span>}

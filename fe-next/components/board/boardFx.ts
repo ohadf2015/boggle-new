@@ -16,8 +16,8 @@ const states = new WeakMap<HTMLElement, FxState>();
 
 const SHARD_COLORS = ['#bfff00', '#00ffff', '#ffe135', '#ff6bb8', '#ffffff'];
 
-export const FLY_MS = 320;
-export const FLY_STAGGER_MS = 28;
+export const FLY_MS = 420;
+export const FLY_STAGGER_MS = 30;
 const VERDICT_WINDOW_MS = 4000;
 const PREVIEW_HOLD_MS = 700;
 const LEAVE_MS = 240;
@@ -106,6 +106,7 @@ export function clearFx(container: HTMLElement): void {
   });
   s.nodes.forEach((n) => n.remove());
   unmarkTiles(container, s.keys);
+  container.removeAttribute('data-verdict');
   states.set(container, empty());
 }
 
@@ -114,12 +115,13 @@ function gridOrigin(grid: HTMLElement) {
   return { left: r.left + grid.clientLeft, top: r.top + grid.clientTop, width: grid.clientWidth || r.width };
 }
 
-function flyTargets(container: HTMLElement): { letters: DOMRect[]; box: DOMRect | null } {
+function flyTargets(container: HTMLElement): { letters: DOMRect[]; box: DOMRect | null; rtl: boolean } {
   const own = [...container.querySelectorAll<HTMLElement>('[data-board-preview] [data-pl]')].map((n) => n.getBoundingClientRect());
-  if (own.length) return { letters: own, box: null };
+  if (own.length) return { letters: own, box: null, rtl: false };
   const ext = container.ownerDocument.querySelector<HTMLElement>('[data-board-fly-target]');
   const box = ext?.getBoundingClientRect();
-  return { letters: [], box: box && box.width > 0 ? box : null };
+  const rtl = ext?.closest('[dir]')?.getAttribute('dir') === 'rtl';
+  return { letters: [], box: box && box.width > 0 ? box : null, rtl };
 }
 
 function echoTrail(container: HTMLElement) {
@@ -131,9 +133,9 @@ function echoTrail(container: HTMLElement) {
   echo.setAttribute('points', pts);
   echo.setAttribute('stroke-width', String(w));
   animate(container, echo, [
-    { opacity: 0.85, strokeWidth: `${w}px` },
-    { opacity: 0, strokeWidth: `${w * 0.15}px` },
-  ], { duration: 380, easing: 'cubic-bezier(0.3, 0, 0.6, 1)', fill: 'forwards' });
+    { opacity: 0.9, strokeWidth: `${w * 1.15}px` },
+    { opacity: 0, strokeWidth: `${w * 0.1}px` },
+  ], { duration: 260, easing: 'cubic-bezier(0.3, 0, 0.6, 1)', fill: 'forwards' });
 }
 
 /**
@@ -162,7 +164,7 @@ export function releaseFx(container: HTMLElement, path: CellRef[], geo: BoardGeo
   const grid = container.querySelector<HTMLElement>('[role="grid"]');
   if (!layer || !grid) return;
   const origin = gridOrigin(grid);
-  const { letters, box } = flyTargets(container);
+  const { letters, box, rtl } = flyTargets(container);
   const n = path.length;
 
   path.forEach((c, i) => {
@@ -174,7 +176,7 @@ export function releaseFx(container: HTMLElement, path: CellRef[], geo: BoardGeo
     fly.style.left = `${x}px`;
     fly.style.top = `${y}px`;
     fly.style.setProperty('--fly-size', `${t.size}px`);
-    const spread = (i - (n - 1) / 2) * Math.min(t.size * 0.5, 30);
+    const spread = (rtl ? -1 : 1) * (i - (n - 1) / 2) * Math.min(t.size * 0.5, 30);
     let tx: number;
     let ty: number;
     const own = letters[i];
@@ -194,7 +196,7 @@ export function releaseFx(container: HTMLElement, path: CellRef[], geo: BoardGeo
     const tilt = i % 2 ? 10 : -10;
     const anim = animate(container, fly, [
       { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1 },
-      { transform: `translate(calc(-50% + ${dx * 0.12}px), calc(-50% + ${lift}px)) scale(1.18) rotate(${tilt}deg)`, opacity: 1, offset: 0.3 },
+      { transform: `translate(calc(-50% + ${dx * 0.1}px), calc(-50% + ${lift}px)) scale(1.22) rotate(${tilt}deg)`, opacity: 1, offset: 0.2 },
       { transform: `translate(calc(-50% + ${dx * 0.7}px), calc(-50% + ${dy * 0.7 + lift * 0.4}px)) scale(0.8) rotate(${tilt / 2}deg)`, opacity: 1, offset: 0.75 },
       { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.45) rotate(0deg)`, opacity: 0 },
     ], { duration: FLY_MS, delay: i * FLY_STAGGER_MS, easing: 'cubic-bezier(0.45, 0, 0.25, 1)', fill: 'both' });
@@ -281,7 +283,9 @@ export function feedbackFx(container: HTMLElement, kind: FeedbackKind, score?: n
     preview.dataset.state = kind;
     later(container, PREVIEW_HOLD_MS, () => hidePreview(container));
   }
-  if (ghost || !fresh) return;
+  if (!fresh) return;
+  container.setAttribute('data-verdict', kind);
+  if (ghost) return;
   markTiles(container, s.keys, kind);
   const keys = s.keys;
   later(container, TILE_FX_MS, () => unmarkTiles(container, keys));

@@ -3,7 +3,6 @@
 import React, { useMemo, useEffect, useRef, useCallback, useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { shouldShowScorePopup } from '@/lib/singleplayer/scorePopup';
 import { useAchievementQueue } from '@/components/achievements';
 import FirstTimeEncouragement from '@/components/game/FirstTimeEncouragement';
 import { useFirstTimeEncouragement } from '@/hooks/useFirstTimeEncouragement';
@@ -20,7 +19,6 @@ import {
 
 import type { SinglePlayerGameState, SinglePlayerResultsData } from './SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
-import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
 import PracticeContinuePrompt from './PracticeContinuePrompt';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
@@ -118,19 +116,6 @@ function SinglePlayerGame({
   const { queueAchievement } = useAchievementQueue();
   const prevAchievementCountRef = useRef(0);
 
-  // Score popup — shows "+30" when score increases
-  const [scorePopup, setScorePopup] = React.useState<{ id: number; value: number; x: number; y: number; word?: string; bonus?: string } | null>(null);
-  const prevScoreRef = useRef(0);
-  // Deliberately NOT the `prevWordCountRef` above: that one is owned by the
-  // encouragement effect, which is declared earlier and so has already advanced
-  // it to the current count by the time this effect runs — sharing it would make
-  // the popup check never match. Separate ref, separate owner.
-  const prevPopupWordCountRef = useRef(0);
-
-  // Refs for anchoring the floating score popup to real HUD elements (portrait/mobile)
-  const scoreBadgeRef = useRef<HTMLDivElement>(null);
-  const wordAreaRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const achievements = core.liveAchievements;
     // Only trigger for NEW achievements (not on initial render)
@@ -143,39 +128,6 @@ function SinglePlayerGame({
     }
     prevAchievementCountRef.current = achievements.length;
   }, [core.liveAchievements, queueAchievement]);
-
-  // Score popup effect — detect score delta and show flying number
-  // Long words (6+) get a bonus label for extra celebration
-  useEffect(() => {
-    const delta = core.score - prevScoreRef.current;
-    if (
-      shouldShowScorePopup({
-        delta,
-        prevWordCount: prevPopupWordCountRef.current,
-        wordCount: core.foundWords.length,
-      })
-    ) {
-      const lastWord = core.foundWords[core.foundWords.length - 1];
-      const wordLen = lastWord?.word?.length ?? 0;
-      const bonus = wordLen >= 8 ? 'LEGENDARY!' : wordLen >= 7 ? 'INCREDIBLE!' : wordLen >= 6 ? 'AMAZING!' : undefined;
-
-      // Anchor popup origin to the word-forming area when available (portrait/mobile)
-      const originRect = wordAreaRef.current?.getBoundingClientRect();
-      const originX = originRect ? originRect.left + originRect.width / 2 : (typeof window !== 'undefined' ? window.innerWidth / 2 : 200);
-      const originY = originRect ? originRect.top + originRect.height / 2 : (typeof window !== 'undefined' ? window.innerHeight / 2 : 300);
-
-      setScorePopup({
-        id: Date.now(),
-        value: delta,
-        x: originX,
-        y: originY,
-        word: lastWord?.word,
-        bonus,
-      });
-    }
-    prevScoreRef.current = core.score;
-    prevPopupWordCountRef.current = core.foundWords.length;
-  }, [core.score, core.foundWords]);
 
   // Practice-mode all-words celebration — fires once when player clears the board.
   // Declared first so the score-threshold prompt can suppress itself when this fires.
@@ -439,17 +391,6 @@ function SinglePlayerGame({
     </div>
   ) : null;
 
-  const scorePopupElement = (
-    <ScorePopupFly
-      popup={scorePopup}
-      flyToTarget
-      targetRef={scoreBadgeRef}
-      showWord
-      size={scorePopup?.bonus ? 'lg' : 'md'}
-      onComplete={() => setScorePopup(null)}
-    />
-  );
-
   const practicePromptElement = settings.mode === 'practice' ? (
     <PracticeContinuePrompt
       open={continuePromptOpen}
@@ -516,7 +457,6 @@ function SinglePlayerGame({
   return (
     <div className="fixed inset-0 z-[70] flex flex-col overflow-hidden bg-neo-navy" translate="no">
       {encouragementBanner}
-      {scorePopupElement}
       {practicePromptElement}
       {modeCoachElement}
       {firstRoundCoach}

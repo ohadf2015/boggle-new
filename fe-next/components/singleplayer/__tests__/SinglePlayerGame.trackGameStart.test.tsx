@@ -83,7 +83,6 @@ vi.mock('@/hooks/useFirstTimeEncouragement', () => ({
   useFirstTimeEncouragement: () => ({ currentTrigger: null, triggerEncouragement: vi.fn(), dismiss: vi.fn() }),
 }));
 vi.mock('@/hooks/useIdleDetection', () => ({ useIdleDetection: () => ({ reportActivity: vi.fn() }) }));
-vi.mock('@/components/animations/ScorePopupFly', () => ({ ScorePopupFly: () => null }));
 
 import SinglePlayerGame from '../SinglePlayerGame';
 import type { SinglePlayerGameState } from '../SinglePlayerView';

@@ -101,7 +101,6 @@ vi.mock('@/utils/posthogEngagement', () => ({
   createFirstMinuteSurvivalTimer: () => ({ start: vi.fn(), cancel: vi.fn() }),
   detectPlatform: () => 'web',
 }));
-vi.mock('@/components/animations/ScorePopupFly', () => ({ ScorePopupFly: () => null }));
 vi.mock('../PracticeContinuePrompt', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn() }));
 vi.mock('@/lib/achievements/hiddenAchievementBus', () => ({
