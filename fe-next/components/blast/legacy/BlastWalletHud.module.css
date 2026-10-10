@@ -10,6 +10,54 @@
   box-shadow: 3px 3px 0 0 #0b1530;
 }
 
+.still {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.coin {
+  display: inline-flex;
+}
+
+.reels {
+  display: inline-flex;
+  direction: ltr;
+  unicode-bidi: isolate;
+  --cell: 1.3em;
+  line-height: var(--cell);
+  text-shadow: 1px 1px 0 #0b1530;
+}
+
+.reel {
+  position: relative;
+  display: inline-block;
+  width: 1ch;
+  height: var(--cell);
+  overflow: hidden;
+}
+
+.reel::before {
+  content: '\00a0\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9\A 0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  width: 100%;
+  text-align: center;
+  white-space: pre;
+  line-height: var(--cell);
+  transform: translateY(calc(var(--end) * var(--cell) * -1));
+  animation: reel 640ms var(--delay, 0ms) cubic-bezier(0.2, 0.85, 0.3, 1.12) backwards;
+}
+
+.sep::before {
+  content: attr(data-char);
+}
+
+@keyframes reel {
+  from { transform: translateY(calc(var(--start) * var(--cell) * -1)); }
+}
+
 .bump {
   display: inline-flex;
   align-items: center;
@@ -103,7 +151,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bump, .dip, .spin, .ring, .gain { animation: none; }
+  .bump, .dip, .spin, .ring, .gain, .reel::before { animation: none; }
   .ring { display: none; }
   .gain { opacity: 1; }
 }

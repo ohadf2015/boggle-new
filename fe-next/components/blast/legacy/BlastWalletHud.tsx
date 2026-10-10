@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
@@ -8,119 +8,137 @@ import { CoinArt } from '@/components/ui/CoinArt';
 import { msUntilCoinsLand } from '@/utils/coinEarnedFx';
 import styles from './BlastWalletHud.module.css';
 
-const ROLL_MS = 460;
+export type ReelStop = { kind: 'digit'; start: number; end: number } | { kind: 'sep'; char: string };
 
 /**
- * Rolls the shown balance up once the flying coins reach the chip (down at once on
- * a spend). A new target mid-wait or mid-roll retargets the same roll.
+ * Reel positions per character of the new balance. A reel strip is
+ * [blank, 0-9, 0-9]: earns roll forward through it, spends roll back.
  */
-function useLandingCountUp(target: number, reduced: boolean) {
-  const [shown, setShown] = useState(target);
-  const [landing, setLanding] = useState<{ key: number; gain: number } | null>(null);
-  const shownRef = useRef(target);
-  const targetRef = useRef(target);
-  const originRef = useRef(target);
-  const roll = useRef<{ from: number; start: number } | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const raf = useRef(0);
-
-  useEffect(() => {
-    targetRef.current = target;
-    if (reduced) {
-      if (timer.current) clearTimeout(timer.current);
-      cancelAnimationFrame(raf.current);
-      timer.current = null;
-      roll.current = null;
-      shownRef.current = target;
-      originRef.current = target;
-      setShown(target);
-      return;
+export function reelStops(from: number, to: number, formatted: string): ReelStop[] {
+  const up = to > from;
+  const stops: ReelStop[] = [];
+  let place = 0;
+  for (let i = formatted.length - 1; i >= 0; i--) {
+    const char = formatted[i];
+    if (!/\d/.test(char)) {
+      stops.unshift({ kind: 'sep', char });
+      continue;
     }
-    const tick = (now: number) => {
-      const r = roll.current;
-      if (!r) return;
-      const to = targetRef.current;
-      const t = Math.min(1, (now - r.start) / ROLL_MS);
-      const v = Math.round(r.from + (to - r.from) * (1 - Math.pow(1 - t, 3)));
-      shownRef.current = v;
-      setShown(v);
-      if (t < 1) raf.current = requestAnimationFrame(tick);
-      else {
-        roll.current = null;
-        originRef.current = to;
+    const nd = Number(char);
+    const od = place === 0 || from >= 10 ** place ? Math.floor(from / 10 ** place) % 10 : null;
+    place += 1;
+    let start = 1 + nd;
+    let end = 1 + nd;
+    if (od !== nd) {
+      if (up) {
+        start = od === null ? 0 : 1 + od;
+        if (end < start) end += 10;
+      } else {
+        start = od === null ? 0 : 11 + od;
       }
-    };
-    const begin = () => {
-      timer.current = null;
-      const from = shownRef.current;
-      if (from === targetRef.current) return;
-      setLanding((l) => ({ key: (l?.key ?? 0) + 1, gain: targetRef.current - originRef.current }));
-      roll.current = { from, start: performance.now() };
-      raf.current = requestAnimationFrame(tick);
-    };
-    if (roll.current) {
-      roll.current = { from: shownRef.current, start: performance.now() };
-      setLanding((l) => (l ? { ...l, gain: target - originRef.current } : l));
-      return;
     }
-    if (timer.current || shownRef.current === target) return;
-    timer.current = setTimeout(begin, target > shownRef.current ? msUntilCoinsLand() : 0);
-  }, [target, reduced]);
-
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-      cancelAnimationFrame(raf.current);
-    },
-    [],
-  );
-
-  return { shown, landing };
+    stops.unshift({ kind: 'digit', start, end });
+  }
+  return stops;
 }
 
-/** The in-run coin wallet: the one counter Blast coins fly into. */
+type Landing = { key: number; from: number; to: number; delayMs: number; landAt: number };
+
+/**
+ * Plans each balance change as one landing, committed with the change itself: the
+ * roll, bump and tag are CSS animations delayed until the flying coins arrive, so
+ * they play on time even while the main thread is busy clearing the board.
+ */
+function useWalletLanding(target: number, reduced: boolean): Landing | null {
+  const [landing, setLanding] = useState<Landing | null>(null);
+  const prev = useRef(target);
+  const last = useRef<Landing | null>(null);
+
+  useLayoutEffect(() => {
+    const before = prev.current;
+    prev.current = target;
+    if (target === before) return;
+    if (reduced) {
+      last.current = null;
+      setLanding(null);
+      return;
+    }
+    const now = performance.now();
+    const pending = last.current && now < last.current.landAt ? last.current : null;
+    const from = pending ? pending.from : before;
+    const delayMs = target > from ? msUntilCoinsLand() : 0;
+    const next = { key: (last.current?.key ?? 0) + 1, from, to: target, delayMs, landAt: now + delayMs };
+    last.current = next;
+    setLanding(next);
+  }, [target, reduced]);
+
+  return landing;
+}
+
+/** The coin wallet: the one counter coins fly into and out of. */
 export default function BlastWalletHud({ coins }: { coins: number }) {
   const { t, language } = useLanguage();
   const reduced = useReducedMotion();
-  const { shown, landing } = useLandingCountUp(coins, reduced);
-  const k = landing?.key ?? 0;
+  const landing = useWalletLanding(coins, reduced);
+  const live = landing && landing.to === coins ? landing : null;
+  const formatted = safeToLocaleString(coins, language);
+  const gain = live ? live.to - live.from : 0;
+  const k = live?.key ?? 0;
+  const delay = { animationDelay: `${live?.delayMs ?? 0}ms` };
+  const stops = reelStops(live ? live.from : coins, coins, formatted);
 
   return (
     <div
       data-testid="coin-counter"
       data-coin-counter="true"
+      data-landing={live && gain !== 0 ? `${live.from}>${live.to}` : undefined}
       role="status"
       aria-label={t('blast.wallet.coins', { count: coins })}
       className={styles.chip}
     >
-      <span key={`b${k}`} className={k ? (landing && landing.gain < 0 ? styles.dip : styles.bump) : 'inline-flex items-center gap-1.5'}>
-        <span className={k ? styles.spin : 'inline-flex'}>
+      <span key={`b${k}`} className={gain > 0 ? styles.bump : gain < 0 ? styles.dip : styles.still} style={delay}>
+        <span className={gain > 0 ? styles.spin : styles.coin} style={delay}>
           <CoinArt size={22} />
         </span>
+        <span data-testid="coin-counter-value" className="sr-only">
+          {formatted}
+        </span>
         <span
-          data-testid="coin-counter-value"
-          className="font-neo-display text-lg font-black tabular-nums leading-none text-[#FFC53D]"
-          style={{ textShadow: '1px 1px 0 #0b1530' }}
+          className={`${styles.reels} font-neo-display text-lg font-black tabular-nums text-[#FFC53D]`}
+          dir="ltr"
+          aria-hidden="true"
         >
-          {safeToLocaleString(shown, language)}
+          {stops.map((s, i) =>
+            s.kind === 'digit' ? (
+              <span
+                key={`${k}-${i}`}
+                className={styles.reel}
+                style={{ '--start': s.start, '--end': s.end, '--delay': delay.animationDelay } as CSSProperties}
+              />
+            ) : (
+              <span key={`${k}-${i}`} className={styles.sep} data-char={s.char} />
+            ),
+          )}
         </span>
       </span>
-      {k > 0 && landing && landing.gain > 0 && <span key={`r${k}`} className={styles.ring} aria-hidden="true" />}
-      {landing && landing.gain > 0 && (
+      {gain > 0 && <span key={`r${k}`} className={styles.ring} style={delay} aria-hidden="true" />}
+      {gain > 0 && (
         <span
           key={`g${k}`}
           data-testid="coin-counter-gain"
-          data-amount={`+${safeToLocaleString(landing.gain, language)}`}
+          data-amount={`+${safeToLocaleString(gain, language)}`}
           className={styles.gain}
+          style={delay}
           aria-hidden="true"
         />
       )}
-      {landing && landing.gain < 0 && (
+      {gain < 0 && (
         <span
           key={`s${k}`}
           data-testid="coin-counter-spent"
-          data-amount={`-${safeToLocaleString(-landing.gain, language)}`}
+          data-amount={`-${safeToLocaleString(-gain, language)}`}
           className={`${styles.gain} ${styles.spent}`}
+          style={delay}
           aria-hidden="true"
         />
       )}

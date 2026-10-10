@@ -1,12 +1,19 @@
 import { test, expect, type Page } from '@playwright/test';
 
+test.describe.configure({ timeout: 90_000 });
+
 const EARN = 'lexiclash:coin-earned';
 const SPEND = 'lexiclash:coin-spent';
 
 async function openBlast(page: Page, locale = 'en') {
   await page.goto(`/${locale}/blast`);
-  await page.getByTestId('play-button').click({ timeout: 20_000 });
-  await expect(page.getByTestId('coin-counter')).toBeVisible({ timeout: 20_000 });
+  const wallet = page.getByTestId('coin-counter');
+  // A click that lands before hydration does nothing; press again until play starts.
+  await expect(async () => {
+    const play = page.getByTestId('play-button');
+    if (await play.isVisible()) await play.click({ timeout: 5_000 });
+    await expect(wallet).toBeVisible({ timeout: 5_000 });
+  }).toPass({ timeout: 45_000 });
 }
 
 async function fire(page: Page, evt: string, detail: Record<string, unknown>) {
