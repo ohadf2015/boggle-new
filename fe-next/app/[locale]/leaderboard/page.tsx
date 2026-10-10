@@ -3,6 +3,7 @@ import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { buildLeaderboardFaqJsonLd, encodeJsonLd } from '@/lib/seo/leaderboardJsonLd';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import LeaderboardPageClient from './PageClientNoSsr';
+import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 
 export const revalidate = 300;
 
@@ -165,6 +166,7 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ lo
         faq={content.faq}
         collapsible
       />
+      <EsScrabbleCrossLink locale={locale} anchorVariant="query" />
       <script type="application/ld+json">{encodeJsonLd(breadcrumbJsonLd)}</script>
       {faqJsonLd && (
         <script type="application/ld+json">{encodeJsonLd(faqJsonLd)}</script>

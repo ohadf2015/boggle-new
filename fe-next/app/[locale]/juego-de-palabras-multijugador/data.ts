@@ -149,4 +149,65 @@ export const FAQS = [
     q: '¿Cuál es la mejor alternativa a Scrabble online en español?',
     a: 'LexiClash es la alternativa a Scrabble online en español más completa de 2026: gratis, sin descargas, multijugador en tiempo real, 8 modos de juego y diccionario español de 10,000+ palabras. A diferencia de las apps oficiales, no hay anuncios entre rondas, no hay bots disfrazados de jugadores reales y nunca se paga por ganar.',
   },
+  {
+    q: '¿Cómo se validan las palabras en español?',
+    a: 'Cada palabra se comprueba contra el diccionario español de LexiClash (más de 10.000 entradas, con variantes de España y Latinoamérica). Acentos se normalizan; la ñ se conserva. No hay árbitro ni “desafío”: si la palabra está en el diccionario, cuenta al instante para todos los jugadores de la sala.',
+  },
+  {
+    q: '¿Qué juegos son parecidos a Scrabble online en español?',
+    a: 'Apalabrados y Words With Friends son por turnos (esperas horas). El Scrabble oficial es app + registro. Wordle es un puzzle diario en solitario. LexiClash es la partida multijugador en tiempo real: misma cuadrícula, 2–50 jugadores, 2–3 minutos, en el navegador.',
+  },
+];
+
+/** Classic-mode length scoring (also documented on /es/rules). */
+export const LENGTH_SCORES: { letters: string; points: number }[] = [
+  { letters: '3', points: 1 },
+  { letters: '4', points: 1 },
+  { letters: '5', points: 2 },
+  { letters: '6', points: 3 },
+  { letters: '7', points: 5 },
+  { letters: '8+', points: 11 },
+];
+
+/**
+ * Worked 4×4 Spanish round. Every word is in backend/es_nouns.txt and is
+ * a legal adjacent path (including diagonals), same rules as Classic.
+ *
+ *   C A S A
+ *   O R T E
+ *   N I L A
+ *   D E S A
+ */
+export const EXAMPLE_GRID: string[][] = [
+  ['C', 'A', 'S', 'A'],
+  ['O', 'R', 'T', 'E'],
+  ['N', 'I', 'L', 'A'],
+  ['D', 'E', 'S', 'A'],
+];
+
+export const EXAMPLE_WORDS: { word: string; letters: number; points: number; path: string }[] = [
+  { word: 'CASA', letters: 4, points: 1, path: 'fila 1' },
+  { word: 'CARO', letters: 4, points: 1, path: 'C–A–R–O' },
+  { word: 'ARTE', letters: 4, points: 1, path: 'A–R–T–E' },
+  { word: 'CARTA', letters: 5, points: 2, path: 'C–A–R–T–A' },
+  { word: 'CARTAS', letters: 6, points: 3, path: 'C–A–R–T–A–S' },
+  { word: 'TELA', letters: 4, points: 1, path: 'T–E–L–A' },
+  { word: 'RATA', letters: 4, points: 1, path: 'R–A–T–A' },
+  { word: 'ASA', letters: 3, points: 1, path: 'A–S–A' },
+];
+
+export const EXAMPLE_TOTAL_POINTS = EXAMPLE_WORDS.reduce((n, w) => n + w.points, 0);
+
+export const TIPS: { title: string; body: string }[] = [
+  { title: 'Empieza por el centro', body: 'Las letras del medio tocan a más vecinas. Una R o una A central abre CASA, CARO y ARTE en la misma ronda.' },
+  { title: 'Las de 3 letras pagan el combo', body: 'ASA, ORA, TES: 1 punto cada una, pero encadenadas en 5 segundos suben el multiplicador. No las desprecies.' },
+  { title: 'Una letra extra cambia el tramo', body: 'CARTA vale 2; añade la S adyacente y CARTAS vale 3. Revisa siempre si la palabra sigue un paso más.' },
+  { title: 'No esperes turno', body: 'En Scrabble online clásico tu rival piensa 2 minutos. Aquí los 8 jugadores buscan a la vez: el reloj es de 180 segundos para todos.' },
+];
+
+export const SIMILAR_GAMES: { name: string; vs: string }[] = [
+  { name: 'Scrabble (app oficial)', vs: 'Por turnos, registro, tablero 15×15. LexiClash: misma sala, todos a la vez, 2–3 min.' },
+  { name: 'Apalabrados', vs: 'Asíncrono con amigos. LexiClash no te deja esperando el próximo movimiento.' },
+  { name: 'Wordle / Wordle en español', vs: 'Un puzzle al día, solo. LexiClash tiene desafío diario y además salas de 2–50.' },
+  { name: 'Boggle', vs: 'Misma idea de cuadrícula; LexiClash añade puntuación en vivo, 8 modos y 6 idiomas.' },
 ];
