@@ -14,6 +14,7 @@ import {
   evaluateDualMemoryAlert,
   getContainerMemoryLimitBytes,
   evaluateHeapCapVsContainer,
+  heapPressureBytes,
   type MemWatchState,
   type DualMemWatchState,
 } from '../modules/memoryWatchdog';
@@ -162,5 +163,28 @@ describe('evaluateDualMemoryAlert', () => {
     expect(d.rss.alert).toBe(true);
     expect(d.rss.level).toBe('warn');
     expect(d.heap.alert).toBe(false);
+  });
+
+  it('alerts on heapTotal 85% even when heapUsed is only 71% (the 2026-10-09 fatal)', () => {
+    // Prod 2026-10-09: heapUsed 1119/1584 ≈ 71% (below WARN 80%) while
+    // heapTotal 1343/1584 ≈ 85% — V8 then fataled. Old watchdog keyed only
+    // on heapUsed and stayed silent.
+    const d = evaluateDualMemoryAlert(
+      dualOk(),
+      0.5 * 2384 * MB,
+      2384 * MB,
+      0.71 * 1584 * MB,
+      1584 * MB,
+      1000,
+      0.85 * 1584 * MB,
+    );
+    expect(d.rss.alert).toBe(false);
+    expect(d.heap.alert).toBe(true);
+    expect(d.heap.level).toBe('warn');
+  });
+
+  it('heapPressureBytes is max(used, total)', () => {
+    expect(heapPressureBytes(100, 200)).toBe(200);
+    expect(heapPressureBytes(200, 100)).toBe(200);
   });
 });

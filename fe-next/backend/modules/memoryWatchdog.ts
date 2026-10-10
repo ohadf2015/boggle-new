@@ -97,14 +97,24 @@ export function evaluateMemoryAlert(
 }
 
 /**
- * Run the same band model against RSS/cgroup AND heapUsed/heapLimit.
+ * V8 fatals on heapTotal approaching heap_size_limit (mark-compact cannot
+ * reclaim), not on heapUsed. The 2026-10-09 crash died at heapTotal 85% of
+ * 1584MB while heapUsed/heapLimit (the old numerator) was only 71% — below
+ * the 80% warn band, so the heap watchdog never fired. Always take the
+ * worse of used vs committed.
+ */
+export function heapPressureBytes(heapUsedBytes: number, heapTotalBytes: number): number {
+  return Math.max(heapUsedBytes, heapTotalBytes);
+}
+
+/**
+ * Run the same band model against RSS/cgroup AND heap pressure/heapLimit.
  *
  * Why both: --max-old-space-size=1536 on a 2384MB cgroup (the 2026-07-29
  * SIGKILL fix) means V8 fatals at rss≈1.7GB, BEFORE the 80%-of-cgroup RSS
- * line (~1907MB). The 2026-10-07 crash was exactly that: heapTotal pinned at
- * 91–92% of 1584MB, then "Ineffective mark-compacts near heap limit", with
- * zero "memory high" alerts. Do NOT raise max-old-space to "fix" this — that
- * recreates the silent kernel kill.
+ * line (~1907MB). Heap pressure is max(heapUsed, heapTotal) — V8 dies on
+ * committed heap, not live bytes. Do NOT raise max-old-space to "fix" this —
+ * that recreates the silent kernel kill.
  */
 export function evaluateDualMemoryAlert(
   prev: DualMemWatchState,
@@ -113,10 +123,11 @@ export function evaluateDualMemoryAlert(
   heapUsedBytes: number,
   heapLimitBytes: number,
   now: number,
+  heapTotalBytes: number = 0,
 ): { rss: MemAlertDecision; heap: MemAlertDecision } {
   return {
     rss: evaluateMemoryAlert(prev.rss, rssBytes, rssLimitBytes, now),
-    heap: evaluateMemoryAlert(prev.heap, heapUsedBytes, heapLimitBytes, now),
+    heap: evaluateMemoryAlert(prev.heap, heapPressureBytes(heapUsedBytes, heapTotalBytes), heapLimitBytes, now),
   };
 }
 
@@ -197,10 +208,13 @@ function formatHeapAlert(
   level: 'warn' | 'critical' | 'recovered',
   heapUsedBytes: number,
   heapLimitBytes: number,
+  heapTotalBytes: number = 0,
 ): string {
   const usedMb = Math.round(heapUsedBytes / 1024 / 1024);
+  const totalMb = Math.round((heapTotalBytes || heapUsedBytes) / 1024 / 1024);
   const limitMb = Math.round(heapLimitBytes / 1024 / 1024);
-  const pct = heapLimitBytes > 0 ? Math.round((heapUsedBytes / heapLimitBytes) * 100) : 0;
+  const usedPct = heapLimitBytes > 0 ? Math.round((heapUsedBytes / heapLimitBytes) * 100) : 0;
+  const totalPct = heapLimitBytes > 0 ? Math.round(((heapTotalBytes || heapUsedBytes) / heapLimitBytes) * 100) : 0;
   const upMin = Math.round(process.uptime() / 60);
   const icon = level === 'critical' ? '🔴' : level === 'recovered' ? '🟢' : '🟠';
   const head =
@@ -210,7 +224,16 @@ function formatHeapAlert(
         ? 'V8 heap CRITICAL — heap OOM imminent'
         : 'V8 heap high — approaching heapLimit';
   return `${icon} lexiclash boggle-new: ${head}
-heapUsed ${usedMb}MB / ${limitMb}MB (${pct}%) · uptime ${upMin}m`;
+heapUsed ${usedMb}MB heapTotal ${totalMb}MB / ${limitMb}MB (used ${usedPct}% total ${totalPct}%) · uptime ${upMin}m`;
+}
+
+function logMemAlert(level: 'warn' | 'critical' | 'recovered', msg: string): void {
+  // Railway log scan for "V8 heap" / "memory high" must see the same text as Telegram.
+  // sendOpsAlert is Telegram-only and silent on success — 24h watch t_2f3c5b2a
+  // recorded zero "V8 heap" lines despite heapPct 90%.
+  if (level === 'critical') logger.error('MEMWATCH', msg);
+  else if (level === 'recovered') logger.info('MEMWATCH', msg);
+  else logger.warn('MEMWATCH', msg);
 }
 
 let timer: NodeJS.Timeout | undefined;
@@ -250,13 +273,25 @@ export function startMemoryWatchdog(
   timer = setInterval(() => {
     const mu = process.memoryUsage();
     const hs = v8.getHeapStatistics();
-    const dual = evaluateDualMemoryAlert(state, mu.rss, limitBytes, mu.heapUsed, hs.heap_size_limit, Date.now());
+    const dual = evaluateDualMemoryAlert(
+      state,
+      mu.rss,
+      limitBytes,
+      mu.heapUsed,
+      hs.heap_size_limit,
+      Date.now(),
+      mu.heapTotal,
+    );
     state = { rss: dual.rss.next, heap: dual.heap.next };
     if (dual.rss.alert && dual.rss.level) {
-      void send(formatAlert(dual.rss.level, mu.rss, limitBytes));
+      const msg = formatAlert(dual.rss.level, mu.rss, limitBytes);
+      logMemAlert(dual.rss.level, msg);
+      void send(msg);
     }
     if (dual.heap.alert && dual.heap.level) {
-      void send(formatHeapAlert(dual.heap.level, mu.heapUsed, hs.heap_size_limit));
+      const msg = formatHeapAlert(dual.heap.level, mu.heapUsed, hs.heap_size_limit, mu.heapTotal);
+      logMemAlert(dual.heap.level, msg);
+      void send(msg);
     }
 
     // Leak forensics: full memory breakdown every ~5 min (10 × 30s samples).
@@ -267,6 +302,7 @@ export function startMemoryWatchdog(
     if (samples % 10 === 0) {
       const mb = (n: number) => Math.round(n / 1024 / 1024);
       const heapPct = hs.heap_size_limit > 0 ? Math.round((mu.heapUsed / hs.heap_size_limit) * 100) : 0;
+      const heapTotalPct = hs.heap_size_limit > 0 ? Math.round((mu.heapTotal / hs.heap_size_limit) * 100) : 0;
       // Per-space breakdown: large_object_space growth = big strings/arrays
       // (dictionaries, grids); old_space growth = retained object graphs.
       const spaces = v8
@@ -287,7 +323,7 @@ export function startMemoryWatchdog(
         'MEMWATCH',
         `diag rss=${mb(mu.rss)}MB heapUsed=${mb(mu.heapUsed)}/${mb(mu.heapTotal)}MB ` +
           `external=${mb(mu.external)}MB arrayBuffers=${mb(mu.arrayBuffers ?? 0)}MB ` +
-          `heapLimit=${mb(hs.heap_size_limit)}MB heapPct=${heapPct} handles=${handles} ` +
+          `heapLimit=${mb(hs.heap_size_limit)}MB heapPct=${heapPct} heapTotalPct=${heapTotalPct} handles=${handles} ` +
           `spaces[${spaces}]${counts} uptime=${Math.round(process.uptime() / 60)}m`,
       );
     }
