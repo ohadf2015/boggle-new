@@ -152,6 +152,7 @@ export default function PracticeModeStage({
           onComplete={(results) =>
             onFinish('solo_board', {
               vocabularyWordsFound: results.vocabularyWordsFound,
+              wordsFound: results.wordsFound,
               newWordsFound: [],
             })
           }
@@ -170,6 +171,7 @@ export default function PracticeModeStage({
           onComplete={(results) =>
             onFinish('solo_board', {
               vocabularyWordsFound: results.vocabularyWordsFound,
+              wordsFound: results.wordsFound,
               newWordsFound: [],
             })
           }

@@ -80,6 +80,12 @@ describe('isWordGoalComplete', () => {
       }),
     ).toBe(true);
   });
+
+  it('completes a word-list goal from vocabulary_words_found / extraWords when words_attempted was never sent', () => {
+    const goal = { kind: 'word_list' as const, words: ['cat', 'dog', 'fish'], dueDate: '2026-10-17' };
+    expect(isWordGoalComplete(goal, { extraWords: ['CAT', 'dog'] })).toBe(false);
+    expect(isWordGoalComplete(goal, { extraWords: ['CAT', 'dog', 'FISH'] })).toBe(true);
+  });
 });
 
 describe('uniqueWordCount', () => {

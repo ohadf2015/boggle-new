@@ -161,7 +161,7 @@ describe('PATCH /api/education/practice — Word Craft completion', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFind.mockResolvedValue('A1');
+    mockFind.mockResolvedValue({ id: 'A1', classroomId: 'c1' });
     mockStamp.mockResolvedValue(true);
     mockClient();
   });
@@ -173,9 +173,14 @@ describe('PATCH /api/education/practice — Word Craft completion', () => {
     }));
     expect(res.status).toBe(200);
     expect(mockCalculatePracticeXp).toHaveBeenCalledWith(expect.objectContaining({ type: 'solo_board' }));
-    expect(mockFind).toHaveBeenCalledWith(expect.anything(), { lessonId: LESSON, sessionMode: 'wordcraft' });
+    expect(mockFind).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
+      lessonId: LESSON,
+      sessionMode: 'wordcraft',
+      extraWords: [],
+      wordsAttempted: null,
+    }));
     expect(mockStamp).toHaveBeenCalledWith(expect.anything(), {
-      studentId: USER, lessonId: LESSON, assignmentId: 'A1',
+      studentId: USER, lessonId: LESSON, assignmentId: 'A1', classroomId: 'c1',
     });
   });
 

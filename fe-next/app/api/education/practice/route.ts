@@ -371,7 +371,7 @@ export async function PATCH(request: NextRequest) {
     // the same UPDATE instead of costing a second write to the same row.
     let serverCalculatedXp = 0;
     let streakDays = 0;
-    let satisfiedAssignmentId: string | null = null;
+    let satisfiedAssignment: { id: string; classroomId: string | null } | null = null;
 
     if (completed) {
       const merged = { ...existing, ...updateObj } as typeof existing & Record<string, unknown>;
@@ -410,10 +410,11 @@ export async function PATCH(request: NextRequest) {
           sessionMode: existing.mode,
           extraWords: Array.isArray(merged.words_found) ? merged.words_found : [],
           wordsAttempted: (merged.words_attempted as Record<string, { attempts?: number }> | null) ?? null,
+          vocabularyWordsFound: Array.isArray(merged.vocabulary_words_found) ? merged.vocabulary_words_found : [],
         })
           .catch((err) => { logger.error('Assignment lookup failed:', err); return null; }),
       ]);
-      satisfiedAssignmentId = foundAssignment;
+      satisfiedAssignment = foundAssignment;
 
       streakDays = progressData?.current_streak ?? 0;
       serverCalculatedXp = calculatePracticeXp({ ...xpSession, streakDays }).totalXp;
@@ -460,8 +461,8 @@ export async function PATCH(request: NextRequest) {
         )
       : Promise.resolve(null);
 
-    const stampAssignment = satisfiedAssignmentId ? stampAssignmentCompletion(supabase, { studentId: existing.student_id,
-      lessonId: existing.lesson_id, assignmentId: satisfiedAssignmentId }).catch((err) => { logger.error('Assignment stamp failed:', err); return false; })
+    const stampAssignment = satisfiedAssignment ? stampAssignmentCompletion(supabase, { studentId: existing.student_id,
+      lessonId: existing.lesson_id, assignmentId: satisfiedAssignment.id, classroomId: satisfiedAssignment.classroomId }).catch((err) => { logger.error('Assignment stamp failed:', err); return false; })
       : Promise.resolve(null);
 
     const [{ data: session, error }, xpResult, profileXpResult] = await Promise.all([

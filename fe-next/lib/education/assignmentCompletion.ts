@@ -13,7 +13,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import { readAssignmentMode, sessionCompletesAssignment } from './wordcraftAssignment';
-import { uniqueWordCount } from './wordGoalAssignment';
+import { uniqueWordCount, wordListPracticed } from './wordGoalAssignment';
 import { captureAssignmentCompletedServer } from './assignmentEvents';
 
 export interface SatisfiedAssignmentLookup {
@@ -21,6 +21,15 @@ export interface SatisfiedAssignmentLookup {
   sessionMode: string | null | undefined;
   wordsAttempted?: Record<string, { attempts?: number; correct?: number }> | null;
   extraWords?: readonly string[];
+  /** Lesson/list words the student actually found (PATCH vocabulary_words_found). */
+  vocabularyWordsFound?: readonly string[];
+  /** Pasted word-list homework. When set, completion is coverage of this list — not any-session. */
+  goalWords?: readonly string[];
+}
+
+export interface SatisfiedAssignment {
+  id: string;
+  classroomId: string | null;
 }
 
 /**
@@ -31,7 +40,7 @@ export interface SatisfiedAssignmentLookup {
 export async function findSatisfiedAssignment(
   client: SupabaseClient,
   args: SatisfiedAssignmentLookup,
-): Promise<string | null> {
+): Promise<SatisfiedAssignment | null> {
   const { data: assignments, error } = await client
     .from('lesson_assignments')
     .select('id, practice_focus, word_count_target, classroom_id')
@@ -41,20 +50,29 @@ export async function findSatisfiedAssignment(
     logger.error('findSatisfiedAssignment: assignment lookup failed', error);
     return null;
   }
-  const found = uniqueWordCount(args.wordsAttempted, args.extraWords);
+  const extra = [
+    ...(args.extraWords ?? []),
+    ...(args.vocabularyWordsFound ?? []),
+  ];
+  const found = uniqueWordCount(args.wordsAttempted, extra);
   const match = (assignments ?? []).find((a: {
     id: string;
     practice_focus: string | null;
     word_count_target?: number | null;
+    classroom_id?: string | null;
   }) => {
     const target = a.word_count_target;
     if (typeof target === 'number' && target > 0) {
       return found >= target;
     }
+    if (args.goalWords && args.goalWords.length > 0) {
+      return wordListPracticed(args.goalWords, args.wordsAttempted, extra) >= args.goalWords.length;
+    }
     const mode = readAssignmentMode(a);
     return mode !== null && sessionCompletesAssignment(mode, { mode: args.sessionMode });
   });
-  return match?.id ?? null;
+  if (!match) return null;
+  return { id: match.id, classroomId: match.classroom_id ?? null };
 }
 
 export async function classroomIdForAssignment(

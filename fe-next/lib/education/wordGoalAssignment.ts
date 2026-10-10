@@ -70,11 +70,16 @@ export function uniqueWordCount(
 export function wordListPracticed(
   required: readonly string[],
   wordsAttempted: Record<string, { attempts?: number; correct?: number }> | null | undefined,
+  extraWords: readonly string[] = [],
 ): number {
   if (!required.length) return 0;
   const found = new Set(
     Object.keys(wordsAttempted ?? {}).map((w) => w.trim().toLocaleLowerCase()),
   );
+  for (const word of extraWords) {
+    const key = word.trim().toLocaleLowerCase();
+    if (key) found.add(key);
+  }
   let n = 0;
   for (const word of required) {
     if (found.has(word.trim().toLocaleLowerCase())) n += 1;
@@ -92,7 +97,7 @@ export function isWordGoalComplete(
   if (goal.kind === 'word_count') {
     return uniqueWordCount(progress.wordsAttempted, progress.extraWords) >= goal.target;
   }
-  return wordListPracticed(goal.words, progress.wordsAttempted) >= goal.words.length;
+  return wordListPracticed(goal.words, progress.wordsAttempted, progress.extraWords) >= goal.words.length;
 }
 
 export function validateWordGoal(input: {
