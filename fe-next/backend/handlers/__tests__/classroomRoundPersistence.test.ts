@@ -197,7 +197,7 @@ describe('persistClassroomGameScores — round education events', () => {
           select: () => ({
             eq: () => ({
               in: () => Promise.resolve({
-                data: [{ student_id: 'user-ana', joined_at: new Date(Date.now() - 2 * DAY).toISOString() }],
+                data: [{ student_id: 'user-ana', joined_at: new Date(Date.now() - 2.5 * DAY).toISOString() }],
                 error: null,
               }),
             }),

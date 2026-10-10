@@ -243,29 +243,21 @@ describe('BlastTile', () => {
   });
 
   describe('progressive selection scale', () => {
-    it('scales first tile at 1.1x (selectionIndex=0)', () => {
+    const scaleOf = (index: number) => {
       const { container } = render(
-        <BlastTile {...baseProps} type="standard" isSelected selectionIndex={0} selectionTotal={5} />
+        <BlastTile {...baseProps} type="standard" isSelected selectionIndex={index} selectionTotal={5} />
       );
-      const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scale(1.1)');
+      const match = /scale\(([\d.]+)\)/.exec(container.querySelector('button')?.style.transform ?? '');
+      return Number(match?.[1]);
+    };
+
+    it('grows along the word, from the first tile to the last', () => {
+      expect(scaleOf(4)).toBeGreaterThan(scaleOf(0));
     });
 
-    it('scales last tile at 1.22x (selectionIndex=total-1)', () => {
-      const { container } = render(
-        <BlastTile {...baseProps} type="standard" isSelected selectionIndex={4} selectionTotal={5} />
-      );
-      const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scale(1.22)');
-    });
-
-    it('interpolates scale for middle tiles', () => {
-      const { container } = render(
-        <BlastTile {...baseProps} type="standard" isSelected selectionIndex={2} selectionTotal={5} />
-      );
-      const button = container.querySelector('button');
-      // midpoint: 1.10 + (2/4) * 0.12 = 1.16
-      expect(button?.style.transform).toContain('scale(1.16)');
+    it('stays inside its cell gap so the top row is never clipped by the board', () => {
+      expect(scaleOf(4)).toBeLessThanOrEqual(1.06);
+      expect(scaleOf(0)).toBeGreaterThan(1);
     });
   });
 

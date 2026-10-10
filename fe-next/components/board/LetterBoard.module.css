@@ -366,7 +366,7 @@
 }
 
 .board[data-ghost] .trail [data-finger] {
-  fill: #bfff00;
+  display: none;
 }
 
 .trail [data-finger][data-off] {
