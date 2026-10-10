@@ -84,7 +84,7 @@ const InteractiveMascot = dynamic(() => import('@/components/ui/InteractiveMasco
 /** Below this many leaderboard rows a percentile is noise, not information. */
 const MIN_BOARD_FOR_PERCENTILE = 5;
 /** The signup sheet waits until the reveal has played out. */
-const CALM_HOLD_MS = 4500;
+const CALM_HOLD_MS = 6000;
 
 type Point = { x: number; y: number };
 const centerOf = (el: Element | null): Point | null => {
@@ -135,6 +135,11 @@ export function QuickPlayResults({
   }, []);
 
   useEffect(() => holdQuickResultsCalm(CALM_HOLD_MS), []);
+
+  useEffect(() => {
+    document.body.classList.add('quick-results-open');
+    return () => document.body.classList.remove('quick-results-open');
+  }, []);
 
   // history[0] is this round (inserted before fetch); compare vs the rest
   const priorAvg = useMemo(() => {
@@ -192,7 +197,7 @@ export function QuickPlayResults({
   const badge = 'animate-neo-pop rounded-xl border-[3px] border-black px-3 py-1 font-neo-display text-xs font-bold tracking-wide text-black shadow-hard';
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden bg-neo-navy" data-testid="quick-play-results">
+    <div className="relative flex max-h-[100dvh] min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy" data-testid="quick-play-results">
       <div className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain" data-testid="quick-results-scroll">
         <header className="relative z-20 mx-auto flex w-full max-w-5xl items-center justify-between gap-2 px-4 pt-3">
           {onExit ? (
@@ -349,7 +354,6 @@ export function QuickPlayResults({
           data-testid="quick-results-details"
         >
           <div className="flex flex-col gap-3">
-            <QuickResultsModeSwitch currentMode={result.mode} onNextRound={onNextRound} />
             <QuickPlayRankCard totalPoints={outcome.totalPoints} percentileToday={percentileToday} scorePct={result.scorePct} />
             <QuickRivalsPassed
               rivals={rivals}
@@ -369,6 +373,7 @@ export function QuickPlayResults({
                 t={t}
               />
             )}
+            <QuickResultsModeSwitch currentMode={result.mode} onNextRound={onNextRound} />
           </div>
           <div className="flex flex-col gap-3">
             {collected.length > 0 ? (

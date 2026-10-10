@@ -125,6 +125,30 @@ describe('QuickPlayResults freshen', () => {
     expect(bar.querySelectorAll('button.bg-neo-lime')).toHaveLength(1);
   });
 
+  it('caps the screen at the viewport so the pinned action stays on screen on desktop', () => {
+    renderResults();
+    expect(screen.getByTestId('quick-play-results').className).toContain('max-h-[100dvh]');
+  });
+
+  it('hides the floating feedback launcher while the results are up, so it never sits on the pinned buttons', () => {
+    const { unmount } = renderResults();
+    expect(document.body.classList.contains('quick-results-open')).toBe(true);
+    unmount();
+    expect(document.body.classList.contains('quick-results-open')).toBe(false);
+  });
+
+  it('keeps the primary action clear of the app tab bar', () => {
+    renderResults();
+    expect(screen.getByTestId('quick-results-cta-bar').className).toContain('var(--bottom-nav-height');
+  });
+
+  it('lists the mode switch after the rank card, so the pinned button stays the one obvious next step', () => {
+    renderResults();
+    const rank = screen.getByTestId('quick-rank-bar');
+    const picker = screen.getByTestId('quick-next-mode-picker');
+    expect(rank.compareDocumentPosition(picker) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('moves the mode switcher and standings into the details below the hero', () => {
     renderResults();
     const details = screen.getByTestId('quick-results-details');
@@ -136,7 +160,9 @@ describe('QuickPlayResults freshen', () => {
     vi.useFakeTimers();
     const { unmount } = renderResults();
     expect(isQuickResultsOnScreen()).toBe(true);
-    act(() => vi.advanceTimersByTime(5000));
+    act(() => vi.advanceTimersByTime(5500));
+    expect(isQuickResultsOnScreen()).toBe(true);
+    act(() => vi.advanceTimersByTime(1000));
     expect(isQuickResultsOnScreen()).toBe(false);
     unmount();
   });

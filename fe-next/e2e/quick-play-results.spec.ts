@@ -1,5 +1,4 @@
 import { test, expect, type Page } from '@playwright/test';
-import { goto } from './helpers/test-utils';
 
 /**
  * Quick Play wheel round ends on the results screen. Guest run, no words
@@ -7,8 +6,8 @@ import { goto } from './helpers/test-utils';
  * avatar hero, the stat cards, the single primary action, and that the signup
  * sheet is held back over the reveal.
  *
- * networkidle never settles on /quick-play (live sockets), so we wait for
- * React to attach to the mode card instead.
+ * networkidle and load never settle on /quick-play (live sockets), so we wait
+ * for React to attach to the mode card instead.
  */
 async function waitForReactAttached(page: Page, testId: string) {
   await page.waitForFunction(
@@ -25,7 +24,13 @@ test.describe('/quick-play results', () => {
   test('shows the avatar hero, stat cards and one primary action, and holds the signup sheet back', async ({ page }) => {
     test.setTimeout(150_000);
 
-    await goto(page, '/quick-play');
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem('cookie-consent', 'accepted');
+        sessionStorage.setItem('android_app_install_promo_shown', '1');
+      } catch {}
+    });
+    await page.goto('/en/quick-play', { waitUntil: 'domcontentloaded' });
     await page.getByTestId('mode-card-wheel-rush').waitFor({ state: 'visible', timeout: 60_000 });
     await waitForReactAttached(page, 'mode-card-wheel-rush');
     await page.getByTestId('mode-card-wheel-rush').click({ timeout: 20_000 });
@@ -45,6 +50,6 @@ test.describe('/quick-play results', () => {
     await expect(next).toBeEnabled();
 
     await page.waitForTimeout(4_000);
-    await expect(page.getByText('Save your streak')).toHaveCount(0);
+    expect(await page.getByText('Save your streak').count()).toBe(0);
   });
 });

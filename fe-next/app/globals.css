@@ -4005,7 +4005,8 @@ html.has-cookie-consent {
    crossword it sat on top of the bottom-left keyboard key, eating real taps. Every
    full-screen game locks the body, so hide it there for all modes at once. It stays
    available everywhere else in the app. */
-body.screen-fit-locked #fdw-root {
+body.screen-fit-locked #fdw-root,
+body.quick-results-open #fdw-root {
   display: none;
 }
 

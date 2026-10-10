@@ -19,7 +19,7 @@ export function QuickResultsCtaBar({
   const { t } = useLanguage();
   return (
     <div
-      className="relative z-20 shrink-0 bg-neo-navy px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5"
+      className="relative z-20 mb-[var(--bottom-nav-height,0px)] shrink-0 bg-neo-navy px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5"
       data-testid="quick-results-cta-bar"
     >
       <div className="mx-auto flex w-full max-w-md items-stretch gap-2.5">
