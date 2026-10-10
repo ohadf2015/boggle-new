@@ -7,7 +7,6 @@ import { useCoinContext } from '@/contexts/CoinContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCelebrationIntensity } from '@/contexts/AccessibilityContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
-import { isNative } from '@/utils/platform';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { COIN_EARNED_EVENT, COIN_SPENT_EVENT, selectCoinFxMode, type CoinEarnedDetail } from '@/utils/coinEarnedFx';
 import { planCoinReward, type CoinRewardTier } from '@/lib/audio/coinSoundPlan';
@@ -145,11 +144,7 @@ export const GlobalCoinEarnFx: React.FC<GlobalCoinEarnFxProps> = ({ rand = Math.
       const target = isSpend ? spendPoint : counter;
 
       // --- Flying coins: WebGL stream / DOM fallback / none (reduced). ---
-      const mode = selectCoinFxMode({
-        reduced,
-        fxActive: SharedFxApp.isInitialized(),
-        native: isNative(),
-      });
+      const mode = selectCoinFxMode({ reduced, fxActive: SharedFxApp.isInitialized() });
       if (mode === 'webgl') {
         SharedFxApp.spawnCoinStream({ source, target, count: plan.coinCount });
       } else if (mode === 'dom') {

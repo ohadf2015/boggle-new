@@ -39,20 +39,12 @@ export function emitCoinSpent(amount: number, source?: { x: number; y: number })
 export type CoinFxMode = 'none' | 'webgl' | 'dom';
 
 /**
- * Pick the coin-burst treatment:
- * - reduced motion → 'none' (sound still plays elsewhere)
- * - WebGL FX layer active → 'webgl' (the rich PixiJS stream)
- * - native (where the fullscreen WebGL canvas is disabled to avoid the
- *   Android WebView compositor hole) → 'dom' (lightweight DOM fallback)
- * - otherwise (e.g. low-end web with no FX) → 'none', so we never add cost
+ * Pick the coin-burst treatment. Coins must always visibly fly to the wallet:
+ * WebGL stream when the FX layer is up, otherwise the lightweight DOM burst.
+ * Reduced motion is the only opt-out (sound and the counter still play).
  */
-export function selectCoinFxMode(opts: {
-  reduced: boolean;
-  fxActive: boolean;
-  native: boolean;
-}): CoinFxMode {
+export function selectCoinFxMode(opts: { reduced: boolean; fxActive: boolean }): CoinFxMode {
   if (opts.reduced) return 'none';
   if (opts.fxActive) return 'webgl';
-  if (opts.native) return 'dom';
-  return 'none';
+  return 'dom';
 }

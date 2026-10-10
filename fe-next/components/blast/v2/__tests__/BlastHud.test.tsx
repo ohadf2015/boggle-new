@@ -16,6 +16,13 @@ describe('BlastHud', () => {
     expect(screen.getByTestId('coin-counter')).toHaveTextContent('100');
   });
 
+  it('marks the coin counter as the fly-to-wallet target', () => {
+    render(
+      <BlastHud levelNumber={1} coins={100} chestProgress={0.5} onShuffle={vi.fn()} onHint={vi.fn()} />
+    );
+    expect(screen.getByTestId('coin-counter')).toHaveAttribute('data-coin-counter', 'true');
+  });
+
   it('never renders the shuffle button — Blast V2 is shuffle-free at every level', () => {
     for (const n of [1, 5, 9, 25, 100]) {
       const { unmount } = render(

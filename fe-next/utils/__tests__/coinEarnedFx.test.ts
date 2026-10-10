@@ -64,15 +64,12 @@ describe('emitCoinSpent', () => {
 
 describe('selectCoinFxMode', () => {
   it('reduced motion -> none (sound only)', () => {
-    expect(selectCoinFxMode({ reduced: true, fxActive: true, native: true })).toBe('none');
+    expect(selectCoinFxMode({ reduced: true, fxActive: true })).toBe('none');
   });
   it('webgl FX active -> webgl', () => {
-    expect(selectCoinFxMode({ reduced: false, fxActive: true, native: false })).toBe('webgl');
+    expect(selectCoinFxMode({ reduced: false, fxActive: true })).toBe('webgl');
   });
-  it('native with no WebGL FX -> dom fallback', () => {
-    expect(selectCoinFxMode({ reduced: false, fxActive: false, native: true })).toBe('dom');
-  });
-  it('non-native web with no FX (low-end) -> none, no added cost', () => {
-    expect(selectCoinFxMode({ reduced: false, fxActive: false, native: false })).toBe('none');
+  it('no WebGL FX -> dom burst, so coins still fly on web', () => {
+    expect(selectCoinFxMode({ reduced: false, fxActive: false })).toBe('dom');
   });
 });

@@ -182,6 +182,14 @@ describe('GlobalCoinEarnFx', () => {
     expect(screen.getByTestId('coin-reward-hud')).toBeInTheDocument();
   });
 
+  it('renders DOM coin burst on web when WebGL inactive, so coins still fly', () => {
+    isInitializedMock.mockReturnValue(false);
+    isNativeMock.mockReturnValue(false);
+    render(<GlobalCoinEarnFx rand={noSurprise} />);
+    fire({ amount: 50 });
+    expect(screen.getByTestId('dom-coin-burst')).toBeInTheDocument();
+  });
+
   it('renders DOM coin burst on native when WebGL inactive', () => {
     isInitializedMock.mockReturnValue(false);
     isNativeMock.mockReturnValue(true);
