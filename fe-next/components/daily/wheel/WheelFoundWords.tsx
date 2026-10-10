@@ -27,14 +27,14 @@ const WheelFoundWords: React.FC<WheelFoundWordsProps> = ({ words, fresh, score, 
           data-fresh={isFresh ? 'true' : 'false'}
           className="relative flex items-center h-fit"
         >
-          <span dir={dir} className="flex gap-[2px]">
+          <span dir={dir} className="flex gap-[2px] lg:gap-[3px]">
             {Array.from(word).map((ch, i) => (
               <m.span
                 key={i}
                 data-testid="found-word-tile"
                 className={cn(
-                  'w-[18px] h-[21px] sm:w-5 sm:h-6 flex items-center justify-center rounded-[4px] border-2 border-neo-black',
-                  'font-neo-display font-black text-[11px] sm:text-xs uppercase leading-none',
+                  'w-5 h-6 lg:w-7 lg:h-8 flex items-center justify-center rounded-[4px] border-2 border-neo-black',
+                  'font-neo-display font-black text-xs lg:text-sm uppercase leading-none',
                   isFresh ? 'bg-neo-lime text-neo-black shadow-[1px_2px_0_#000]' : 'bg-neo-cream text-neo-navy shadow-[1px_1px_0_#000]',
                 )}
                 initial={isFresh && !reducedMotion ? { y: -14, scale: 0.4, rotate: i % 2 ? 10 : -10 } : false}
@@ -45,7 +45,7 @@ const WheelFoundWords: React.FC<WheelFoundWordsProps> = ({ words, fresh, score, 
               </m.span>
             ))}
           </span>
-          <span className="ms-1 font-neo-display font-black text-[10px] sm:text-xs text-neo-lime leading-none">
+          <span className="ms-1 lg:ms-2 font-neo-display font-black text-[11px] lg:text-sm text-neo-lime leading-none">
             +{score(word)}
           </span>
         </div>
