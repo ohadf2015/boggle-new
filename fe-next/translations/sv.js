@@ -13670,11 +13670,17 @@ const sv = {
       "reelLabel": "Höjdpunkter",
       "bestWord": "Bästa ord"
     },
+    "wallet": {
+      "coins": "{count} mynt"
+    },
     "store": {
       "title": "Uppgraderingsbutik",
       "close": "Klart",
       "buy": "Köp",
       "max": "MAXAD",
+      "pay": "Betala",
+      "short": "Behöver",
+      "confirm": "Betala {cost} mynt",
       "extraMoves": {
         "name": "Extra drag",
         "desc": "Börja med +1 drag per nivå"

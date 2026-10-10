@@ -1,6 +1,6 @@
 // SharedFxMount wires the SharedFxApp Pixi singleton once at app root. Without
-// it, every spawnCoinStream / spawnFirework / spawnBurst call no-ops (app=null)
-// — the silent prod regression where coin/level-up/firework FX never rendered.
+// it, every spawnFirework / spawnBurst call no-ops (app=null)
+// — the silent prod regression where level-up/firework FX never rendered.
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, cleanup, act } from '@testing-library/react';

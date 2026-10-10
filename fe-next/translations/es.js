@@ -13381,11 +13381,17 @@ const es = {
       "reelLabel": "Repetición",
       "bestWord": "Mejor palabra"
     },
+    "wallet": {
+      "coins": "{count} monedas"
+    },
     "store": {
       "title": "Tienda de Mejoras",
       "close": "Listo",
       "buy": "Comprar",
       "max": "MÁXIMO",
+      "pay": "Pagar",
+      "short": "Te faltan",
+      "confirm": "Pagar {cost} monedas",
       "extraMoves": {
         "name": "Movimientos Extra",
         "desc": "Comienza con +1 movimiento por nivel"

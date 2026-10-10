@@ -1,95 +1,90 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Coins, Gem } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
-import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { CoinArt } from '@/components/ui/CoinArt';
+import { msUntilCoinsLand } from '@/utils/coinEarnedFx';
+import styles from './BlastWalletHud.module.css';
 
-interface BlastWalletHudProps {
-  coins: number;
-  gems: number;
-  /** Hide the gem chip when the mode never awards gems (keeps the HUD tight). */
-  showGems?: boolean;
-}
+const ROLL_MS = 460;
 
-/** Ease a displayed integer toward `target` — the slot-machine count-up roll. */
-function useCountUp(target: number, ms = 480): number {
-  const [display, setDisplay] = useState(target);
-  const fromRef = useRef(target);
-  const rafRef = useRef<number | null>(null);
+/** Rolls the shown balance up once the flying coins reach the chip, and down at once on a spend. */
+function useLandingCountUp(target: number, reduced: boolean) {
+  const [shown, setShown] = useState(target);
+  const [landing, setLanding] = useState<{ key: number; gain: number } | null>(null);
+  const shownRef = useRef(target);
 
   useEffect(() => {
-    const from = fromRef.current;
+    const from = shownRef.current;
     if (from === target) return;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / ms);
-      const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
-      setDisplay(Math.round(from + (target - from) * eased));
-      if (t < 1) {
-        rafRef.current = requestAnimationFrame(tick);
-      } else {
-        fromRef.current = target;
-      }
+    if (reduced) {
+      shownRef.current = target;
+      setShown(target);
+      return;
+    }
+    let raf = 0;
+    const roll = () => {
+      setLanding((l) => ({ key: (l?.key ?? 0) + 1, gain: target - from }));
+      const start = performance.now();
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - start) / ROLL_MS);
+        const v = Math.round(from + (target - from) * (1 - Math.pow(1 - t, 3)));
+        shownRef.current = v;
+        setShown(v);
+        if (t < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
     };
-    rafRef.current = requestAnimationFrame(tick);
+    const lead = setTimeout(roll, target > from ? msUntilCoinsLand() : 0);
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      fromRef.current = target;
+      clearTimeout(lead);
+      cancelAnimationFrame(raf);
     };
-  }, [target, ms]);
+  }, [target, reduced]);
 
-  return display;
+  return { shown, landing };
 }
 
-interface ChipProps {
-  value: number;
-  icon: typeof Coins;
-  accent: string;
-  label: string;
-}
-
-function WalletChip({ value, icon: Icon, accent, label }: ChipProps) {
-  const { language } = useLanguage();
-  const shown = useCountUp(value);
-  const prevRef = useRef(value);
-  const [creditKey, setCreditKey] = useState(0);
-
-  useEffect(() => {
-    if (value > prevRef.current) setCreditKey(k => k + 1);
-    prevRef.current = value;
-  }, [value]);
+/** The in-run coin wallet: the one counter Blast coins fly into. */
+export default function BlastWalletHud({ coins }: { coins: number }) {
+  const { t, language } = useLanguage();
+  const reduced = useReducedMotion();
+  const { shown, landing } = useLandingCountUp(coins, reduced);
+  const k = landing?.key ?? 0;
 
   return (
-    <AdaptiveMotion.div
-      key={creditKey}
-      className="relative flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-navy-light px-2.5 py-1 shadow-hard"
-      aria-label={`${label}: ${value}`}
-      // A quick pop + colored flash whenever the balance is credited.
-      initial={creditKey === 0 ? false : { scale: 1 }}
-      animate={creditKey === 0 ? {} : { scale: [1, 1.16, 1] }}
-      transition={{ duration: 0.34, ease: [0.34, 1.6, 0.5, 1] }}
-      style={{ boxShadow: undefined }}
+    <div
+      data-testid="coin-counter"
+      data-coin-counter="true"
+      role="status"
+      aria-label={t('blast.wallet.coins', { count: coins })}
+      className={styles.chip}
     >
-      <Icon className="h-4 w-4" style={{ color: accent, filter: `drop-shadow(0 0 3px ${accent}aa)` }} strokeWidth={2.75} aria-hidden="true" />
-      <span className="font-neo-display text-base font-black tabular-nums leading-none" style={{ color: accent }}>
-        {safeToLocaleString(shown, language)}
+      <span key={`b${k}`} className={k ? (landing && landing.gain < 0 ? styles.dip : styles.bump) : 'inline-flex items-center gap-1.5'}>
+        <span className={k ? styles.spin : 'inline-flex'}>
+          <CoinArt size={22} />
+        </span>
+        <span
+          data-testid="coin-counter-value"
+          className="font-neo-display text-lg font-black tabular-nums leading-none text-[#FFC53D]"
+          style={{ textShadow: '1px 1px 0 #0b1530' }}
+        >
+          {safeToLocaleString(shown, language)}
+        </span>
       </span>
-    </AdaptiveMotion.div>
-  );
-}
-
-/**
- * BlastWalletHud — the in-run coin + gem balance chips. Each rolls its number up
- * slot-machine style on credit and gives a quick pop so earning FEELS like a
- * payout, not a silent counter. Purely a display of the passed balances.
- */
-export default function BlastWalletHud({ coins, gems, showGems = true }: BlastWalletHudProps) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <WalletChip value={coins} icon={Coins} accent="#FFC53D" label="Coins" />
-      {showGems && <WalletChip value={gems} icon={Gem} accent="#C084FC" label="Gems" />}
+      {k > 0 && landing && landing.gain > 0 && <span key={`r${k}`} className={styles.ring} aria-hidden="true" />}
+      {landing && landing.gain > 0 && (
+        <span key={`g${k}`} data-testid="coin-counter-gain" className={styles.gain} aria-hidden="true">
+          +{safeToLocaleString(landing.gain, language)}
+        </span>
+      )}
+      {landing && landing.gain < 0 && (
+        <span key={`s${k}`} data-testid="coin-counter-spent" className={`${styles.gain} ${styles.spent}`} aria-hidden="true">
+          -{safeToLocaleString(-landing.gain, language)}
+        </span>
+      )}
     </div>
   );
 }

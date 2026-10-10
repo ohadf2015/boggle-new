@@ -14,12 +14,22 @@ export const COIN_SPENT_EVENT = 'lexiclash:coin-spent';
 export interface CoinEarnedDetail {
   amount: number;
   source?: { x: number; y: number };
+  /** The on-screen counter already shows this amount and rolls it as the coins land. */
+  inline?: boolean;
+  /** How many coins fly (defaults to the reward plan's count for the amount). */
+  coins?: number;
 }
 
-export function emitCoinEarned(amount: number, source?: { x: number; y: number }): void {
+export function emitCoinEarned(
+  amount: number,
+  source?: { x: number; y: number },
+  opts?: { inline?: boolean; coins?: number },
+): void {
   if (!(amount > 0)) return;
   if (typeof window === 'undefined') return;
   const detail: CoinEarnedDetail = source ? { amount, source } : { amount };
+  if (opts?.inline) detail.inline = true;
+  if (opts?.coins) detail.coins = opts.coins;
   window.dispatchEvent(new CustomEvent<CoinEarnedDetail>(COIN_EARNED_EVENT, { detail }));
 }
 
@@ -36,15 +46,31 @@ export function emitCoinSpent(amount: number, source?: { x: number; y: number })
   window.dispatchEvent(new CustomEvent<CoinEarnedDetail>(COIN_SPENT_EVENT, { detail }));
 }
 
-export type CoinFxMode = 'none' | 'webgl' | 'dom';
+export type CoinFxMode = 'none' | 'dom';
 
-/**
- * Pick the coin-burst treatment. Coins must always visibly fly to the wallet:
- * WebGL stream when the FX layer is up, otherwise the lightweight DOM burst.
- * Reduced motion is the only opt-out (sound and the counter still play).
- */
-export function selectCoinFxMode(opts: { reduced: boolean; fxActive: boolean }): CoinFxMode {
-  if (opts.reduced) return 'none';
-  if (opts.fxActive) return 'webgl';
-  return 'dom';
+/** Coins always visibly fly to the wallet; reduced motion is the only opt-out (sound and counter still play). */
+export function selectCoinFxMode(opts: { reduced: boolean }): CoinFxMode {
+  return opts.reduced ? 'none' : 'dom';
+}
+
+/** The wallet counter coins fly into: the first one actually on screen (headers hide theirs during play). */
+export function findCoinCounter(): HTMLElement | null {
+  if (typeof document === 'undefined') return null;
+  const all = document.querySelectorAll<HTMLElement>('[data-coin-counter="true"]');
+  for (const el of all) {
+    const r = el.getBoundingClientRect();
+    if (r.width > 0 && r.height > 0) return el;
+  }
+  return null;
+}
+
+let coinsLandAt = 0;
+
+/** Called when coins take off toward the wallet, so counters can hold their roll until they land. */
+export function markCoinsInFlight(msUntilLand: number): void {
+  coinsLandAt = Math.max(coinsLandAt, performance.now() + msUntilLand);
+}
+
+export function msUntilCoinsLand(): number {
+  return Math.max(0, Math.round(coinsLandAt - performance.now()));
 }

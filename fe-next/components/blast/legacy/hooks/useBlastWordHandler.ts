@@ -17,7 +17,6 @@ import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { hasGemLetter } from '@/lib/blast/gemLetters';
 import { blastLetterBonus } from '@/lib/blast/blastLetterBonus';
 import { rollTreasure, type TreasureTier } from '@/lib/blast/blastTreasureRoll';
-import { rollGemDrop } from '@/lib/blast/blastGemDrop';
 import type { BlastTileType, BlastGameConfig } from '../types';
 import type { ScoreFlyEvent } from '../BlastScoreFly';
 import type { ClearedTileEvent } from '../BlastEffectsCanvas';
@@ -41,8 +40,10 @@ interface WordHandlerEffects {
   setComboParticle: Dispatch<SetStateAction<number>>;
   setExplosionShake: Dispatch<SetStateAction<number>>;
   setNearMissCells: Dispatch<SetStateAction<Array<{ row: number; col: number }>>>;
-  /** Fire when gems/coins are earned from word submission. Optional for backward compatibility. */
-  onCurrencyEarned?: (data: { coinDelta: number; gemDelta: number; avgRow: number; avgCol: number }) => void;
+  /** Coins the scored word earned this run. */
+  onCurrencyEarned?: (data: { coinDelta: number }) => void;
+  /** The word was accepted: coins take off from its tiles now, credited once scored. */
+  onCoinsLaunch?: (path: Array<{ row: number; col: number }>) => void;
 }
 
 interface UseBlastWordHandlerParams {
@@ -106,6 +107,7 @@ export function useBlastWordHandler({
     try {
     const path = lastPathRef.current;
     lastPathRef.current = [];
+    effects.onCoinsLaunch?.(path);
 
     effects.setLastWordLength(path.length);
     effects.setWordSubmitCount(c => c + 1);
@@ -227,14 +229,7 @@ export function useBlastWordHandler({
 
     // Currency earn (SP only, wired via callback)
     try {
-      const coinDelta = Math.max(1, Math.round(result.score / 10));
-      const gemDelta = rollGemDrop({
-        wordLength: path.length,
-        hasGemLetter: hasGemLetter(data.word, config.language),
-        treasureTier,
-        comboLevel: detectedCombos.length,
-      });
-      effects.onCurrencyEarned?.({ coinDelta, gemDelta, avgRow, avgCol });
+      effects.onCurrencyEarned?.({ coinDelta: Math.max(1, Math.round(result.score / 10)) });
     } catch {
       // Currency is decorative — never block gameplay on earn failure
     }

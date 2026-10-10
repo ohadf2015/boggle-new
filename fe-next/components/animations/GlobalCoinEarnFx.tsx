@@ -6,11 +6,10 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCelebrationIntensity } from '@/contexts/AccessibilityContext';
-import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { COIN_EARNED_EVENT, COIN_SPENT_EVENT, selectCoinFxMode, type CoinEarnedDetail } from '@/utils/coinEarnedFx';
+import { COIN_EARNED_EVENT, COIN_SPENT_EVENT, findCoinCounter, markCoinsInFlight, selectCoinFxMode, type CoinEarnedDetail } from '@/utils/coinEarnedFx';
 import { planCoinReward, type CoinRewardTier } from '@/lib/audio/coinSoundPlan';
-import { DomCoinBurst } from './DomCoinBurst';
+import { DomCoinBurst, coinFlightTiming } from './DomCoinBurst';
 import { CoinRewardHud } from './CoinRewardHud';
 
 // Re-export for back-compat with existing importers.
@@ -20,7 +19,7 @@ type Point = { x: number; y: number };
 
 function getTargetPosition(): Point {
   if (typeof document === 'undefined') return { x: 0, y: 0 };
-  const target = document.querySelector<HTMLElement>('[data-coin-counter="true"]');
+  const target = findCoinCounter();
   if (!target) {
     return { x: window.innerWidth - 40, y: 40 };
   }
@@ -75,9 +74,10 @@ interface GlobalCoinEarnFxProps {
  *  1. plan the moment once (planCoinReward) so sound + visual + counter agree
  *  2. play an ascending coin-chime arpeggio (casino "ding-ding-ding"), + a
  *     cascade layer on a jackpot — ALWAYS (even reduced motion / menus)
- *  3. fling coins toward the counter (WebGL stream / DOM fallback / none)
+ *  3. fling coins toward the counter (DOM flight; none under reduced motion)
  *  4. pop the CoinRewardHud counter — ALWAYS, even under reduced motion, since
- *     it's the a11y-friendly replacement for the retired "+X gold" toast.
+ *     it's the a11y-friendly replacement for the retired "+X gold" toast —
+ *     except for inline earns, where the on-screen counter rolls the amount itself.
  *
  * Mount once inside CoinProvider + SoundEffectsProvider.
  */
@@ -115,17 +115,19 @@ export const GlobalCoinEarnFx: React.FC<GlobalCoinEarnFxProps> = ({ rand = Math.
       const isSpend = direction === 'spend';
       const plan = planCoinReward(amount, randRef.current);
 
-      // --- Sound: earn climbs (ascending arpeggio + cascade on jackpot);
-      //     spend drains (the same notes reversed, descending, softer, never a
-      //     cascade). requiresGameActive:false is baked into the sound fns. ---
+      const mode = selectCoinFxMode({ reduced });
+      const coinCount = detail?.coins ?? plan.coinCount;
+      // The first chime is the launch; the rest ring as the coins land in the counter.
+      const landLead = mode === 'dom' ? coinFlightTiming(coinCount).firstLandMs : 0;
+      if (mode === 'dom' && !isSpend) markCoinsInFlight(landLead);
+
       if (plan.cascade && !isSpend) {
         playCoinCascadeSound({ volume: 0.6 });
       }
-      // Reverse the pitch order for spend (descending), but keep the timing
-      // schedule ascending by position so it still plays as a quick run.
+      // Spend reverses the pitch order (descending) but keeps the ascending timing schedule.
       const order = isSpend ? plan.chimes.slice().reverse() : plan.chimes;
       order.forEach((chime, i) => {
-        const delayMs = plan.chimes[i].delayMs;
+        const delayMs = i === 0 ? 0 : plan.chimes[i].delayMs + landLead;
         const vol = isSpend ? chime.volume * 0.7 : chime.volume;
         const fire = () => playCoinCollectSound({ rate: chime.rate, volume: vol });
         if (delayMs <= 0) {
@@ -136,21 +138,18 @@ export const GlobalCoinEarnFx: React.FC<GlobalCoinEarnFxProps> = ({ rand = Math.
         }
       });
 
-      // The counter is where coins live. Earn flies into it; spend flies out of
-      // it toward where the money was spent.
+      // Earn flies into the counter; spend flies out of it toward where the money went.
       const counter = getTargetPosition();
       const spendPoint = getSourcePosition(detail);
       const source = isSpend ? counter : spendPoint;
       const target = isSpend ? spendPoint : counter;
 
-      // --- Flying coins: WebGL stream / DOM fallback / none (reduced). ---
-      const mode = selectCoinFxMode({ reduced, fxActive: SharedFxApp.isInitialized() });
-      if (mode === 'webgl') {
-        SharedFxApp.spawnCoinStream({ source, target, count: plan.coinCount });
-      } else if (mode === 'dom') {
+      if (mode === 'dom') {
         const id = (idRef.current += 1);
-        setBursts((b) => [...b, { id, source, target, count: plan.coinCount }]);
+        setBursts((b) => [...b, { id, source, target, count: coinCount }]);
       }
+
+      if (detail?.inline && !isSpend) return;
 
       // --- Counter HUD: ALWAYS (the retired-toast replacement). delta is the
       //     amount; total is the post-transaction balance from context. ---

@@ -3,6 +3,9 @@ import {
   emitCoinEarned,
   emitCoinSpent,
   selectCoinFxMode,
+  findCoinCounter,
+  markCoinsInFlight,
+  msUntilCoinsLand,
   COIN_EARNED_EVENT,
   COIN_SPENT_EVENT,
 } from '../coinEarnedFx';
@@ -62,14 +65,71 @@ describe('emitCoinSpent', () => {
   });
 });
 
+describe('emitCoinEarned inline', () => {
+  it('marks an inline earn so the target counter rolls itself (no floating HUD)', () => {
+    const handler = vi.fn();
+    window.addEventListener(COIN_EARNED_EVENT, handler);
+    emitCoinEarned(4, { x: 1, y: 2 }, { inline: true });
+    window.removeEventListener(COIN_EARNED_EVENT, handler);
+    expect((handler.mock.calls[0][0] as CustomEvent).detail).toEqual({ amount: 4, source: { x: 1, y: 2 }, inline: true });
+  });
+});
+
 describe('selectCoinFxMode', () => {
   it('reduced motion -> none (sound only)', () => {
-    expect(selectCoinFxMode({ reduced: true, fxActive: true })).toBe('none');
+    expect(selectCoinFxMode({ reduced: true })).toBe('none');
   });
-  it('webgl FX active -> webgl', () => {
-    expect(selectCoinFxMode({ reduced: false, fxActive: true })).toBe('webgl');
+  it('otherwise -> dom flight, on web and native alike', () => {
+    expect(selectCoinFxMode({ reduced: false })).toBe('dom');
   });
-  it('no WebGL FX -> dom burst, so coins still fly on web', () => {
-    expect(selectCoinFxMode({ reduced: false, fxActive: false })).toBe('dom');
+});
+
+describe('findCoinCounter', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  function counter(rect: { left: number; top: number; width: number; height: number }) {
+    const el = document.createElement('div');
+    el.setAttribute('data-coin-counter', 'true');
+    el.getBoundingClientRect = () => ({ ...rect, right: rect.left + rect.width, bottom: rect.top + rect.height, x: rect.left, y: rect.top, toJSON: () => ({}) }) as DOMRect;
+    document.body.appendChild(el);
+    return el;
+  }
+
+  it('skips a hidden counter and returns the one on screen', () => {
+    counter({ left: 0, top: 0, width: 0, height: 0 });
+    const visible = counter({ left: 300, top: 20, width: 60, height: 30 });
+    expect(findCoinCounter()).toBe(visible);
+  });
+
+  it('returns null when no counter is on screen', () => {
+    counter({ left: 0, top: 0, width: 0, height: 0 });
+    expect(findCoinCounter()).toBeNull();
+  });
+});
+
+describe('coin flight clock', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('tells a counter how long until coins in flight land, and 0 once they have', () => {
+    vi.useFakeTimers({ toFake: ['performance', 'Date'] });
+    expect(msUntilCoinsLand()).toBe(0);
+    markCoinsInFlight(600);
+    expect(msUntilCoinsLand()).toBe(600);
+    vi.advanceTimersByTime(450);
+    expect(msUntilCoinsLand()).toBe(150);
+    vi.advanceTimersByTime(200);
+    expect(msUntilCoinsLand()).toBe(0);
+  });
+});
+
+describe('emitCoinEarned coins override', () => {
+  it('carries an explicit flying-coin count', () => {
+    const handler = vi.fn();
+    window.addEventListener(COIN_EARNED_EVENT, handler);
+    emitCoinEarned(3, { x: 1, y: 2 }, { inline: true, coins: 7 });
+    window.removeEventListener(COIN_EARNED_EVENT, handler);
+    expect((handler.mock.calls[0][0] as CustomEvent).detail.coins).toBe(7);
   });
 });
