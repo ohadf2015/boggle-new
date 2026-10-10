@@ -309,7 +309,7 @@ describe('useParentalConsent', () => {
 
     it('should not check consent for unauthenticated users', async () => {
       // Re-mock with null user
-      jest.doMock('@/contexts/AuthContext', () => ({
+      vi.doMock('@/contexts/AuthContext', () => ({
         useAuth: () => ({
           user: null,
           isAuthenticated: false,

@@ -11,6 +11,7 @@ import { useSafeArea } from '@/hooks/useSafeArea';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import { isNative } from '@/utils/platform';
+import type { MockedFunction } from 'vitest';
 
 // Mock dependencies
 vi.mock('@/hooks/useSafeArea');
@@ -52,12 +53,12 @@ vi.mock('@/utils/logger', () => ({
   },
 }));
 
-const mockUseSafeArea = useSafeArea as jest.MockedFunction<typeof useSafeArea>;
-const mockUseAppLifecycle = useAppLifecycle as jest.MockedFunction<typeof useAppLifecycle>;
-const mockGetSharedSocketIfExists = getSharedSocketIfExists as jest.MockedFunction<
+const mockUseSafeArea = useSafeArea as MockedFunction<typeof useSafeArea>;
+const mockUseAppLifecycle = useAppLifecycle as MockedFunction<typeof useAppLifecycle>;
+const mockGetSharedSocketIfExists = getSharedSocketIfExists as MockedFunction<
   typeof getSharedSocketIfExists
 >;
-const mockIsNative = isNative as jest.MockedFunction<typeof isNative>;
+const mockIsNative = isNative as MockedFunction<typeof isNative>;
 
 describe('NativeAppProvider', () => {
   beforeEach(() => {

@@ -14,7 +14,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BlastTile } from '../BlastTile';
 
-jest.mock('@/hooks/usePrefersReducedMotion', () => ({
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 
@@ -23,7 +23,7 @@ const baseProps = {
   phase: 'idle' as const,
   isSelected: false,
   isCleared: false,
-  onClick: jest.fn(),
+  onClick: vi.fn(),
 };
 
 describe('BlastTile frost identity (no padlock)', () => {

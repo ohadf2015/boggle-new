@@ -81,7 +81,7 @@ describe('CinematicFallback', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    jest.clearAllTimers();
+    vi.clearAllTimers();
   });
 
   describe('rendering', () => {

@@ -20,7 +20,7 @@ import {
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
 import { queueOpponentWord } from '../utils/opponentWordFeedBatcher.js';
 import { queuePlayerFoundWord } from '../utils/playerFoundWordBatcher.js';
-import { checkAndAwardAchievements } from '../modules/achievementManager.js';
+import { checkAndAwardAchievements, type GameWithAchievements } from '../modules/achievementManager.js';
 import { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } from '../modules/supabaseServer.js';
 import { addWordToBlacklist } from '../modules/botManager.js';
 import { inc, incPerGame } from '../utils/metrics.js';
@@ -438,7 +438,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   });
 
   // Check achievements
-  const achievements: Achievement[] = checkAndAwardAchievements(game, username, normalizedWord);
+  const achievements: Achievement[] = checkAndAwardAchievements(game as unknown as GameWithAchievements, username, normalizedWord);
   if (achievements.length > 0) {
     logger.info('ACHIEVEMENT', `Emitting liveAchievementUnlocked to ${username}: ${achievements.map(a => a.key).join(', ')} (gameState: ${game.gameState})`);
     socket.emit('liveAchievementUnlocked', { achievements });

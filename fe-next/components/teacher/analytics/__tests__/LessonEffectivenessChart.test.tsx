@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 // Import the inner component directly to avoid next/dynamic issues in tests
 import { LessonEffectivenessChart } from '../LessonEffectivenessChartInner';
 import * as useLessonEffectivenessModule from '@/hooks/useLessonEffectiveness';
+import type { MockedFunction } from 'vitest';
 
 // Mock LanguageContext
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -15,7 +16,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 // Mock useLessonEffectiveness hook
 vi.mock('@/hooks/useLessonEffectiveness');
 
-const mockUseLessonEffectiveness = useLessonEffectivenessModule.useLessonEffectiveness as jest.MockedFunction<
+const mockUseLessonEffectiveness = useLessonEffectivenessModule.useLessonEffectiveness as MockedFunction<
   typeof useLessonEffectivenessModule.useLessonEffectiveness
 >;
 

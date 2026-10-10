@@ -3,6 +3,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CompletionTracker from './CompletionTracker';
 import { getAssignmentCompletions } from '@/lib/supabase/education/assignments';
+import type { MockedFunction } from 'vitest';
 
 // Mock supabase functions
 vi.mock('@/lib/supabase/education/assignments');
@@ -13,7 +14,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   })),
 }));
 
-const mockGetAssignmentCompletions = getAssignmentCompletions as jest.MockedFunction<typeof getAssignmentCompletions>;
+const mockGetAssignmentCompletions = getAssignmentCompletions as MockedFunction<typeof getAssignmentCompletions>;
 
 describe('CompletionTracker', () => {
   beforeEach(() => {

@@ -9,6 +9,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { NetworkStatusHandler } from '../NetworkStatusHandler';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { isNative } from '@/utils/platform';
+import type { MockedFunction } from 'vitest';
 
 const { mockPathname } = vi.hoisted(() => ({
   mockPathname: { current: '/en' },
@@ -30,8 +31,8 @@ vi.mock('../OfflineFallback', () => ({
   ),
 }));
 
-const mockUseOnlineStatus = useOnlineStatus as jest.MockedFunction<typeof useOnlineStatus>;
-const mockIsNative = isNative as jest.MockedFunction<typeof isNative>;
+const mockUseOnlineStatus = useOnlineStatus as MockedFunction<typeof useOnlineStatus>;
+const mockIsNative = isNative as MockedFunction<typeof isNative>;
 
 describe('NetworkStatusHandler', () => {
   beforeEach(() => {

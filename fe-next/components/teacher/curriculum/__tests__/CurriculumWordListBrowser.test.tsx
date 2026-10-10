@@ -14,6 +14,7 @@ import {
   importCurriculumToLesson,
   CurriculumWordList,
 } from '@/lib/supabase/education';
+import type { MockedFunction } from 'vitest';
 
 // Mock the education data functions
 vi.mock('@/lib/supabase/education', () => ({
@@ -141,10 +142,10 @@ const mockCurriculumLists: CurriculumWordList[] = [
   },
 ];
 
-const mockedGetCurriculumWordLists = getCurriculumWordLists as jest.MockedFunction<
+const mockedGetCurriculumWordLists = getCurriculumWordLists as MockedFunction<
   typeof getCurriculumWordLists
 >;
-const mockedImportCurriculumToLesson = importCurriculumToLesson as jest.MockedFunction<
+const mockedImportCurriculumToLesson = importCurriculumToLesson as MockedFunction<
   typeof importCurriculumToLesson
 >;
 

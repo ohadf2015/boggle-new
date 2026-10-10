@@ -8,7 +8,7 @@ import { BlastTile } from '../BlastTile';
 import { BlastHUD } from '../BlastHUD';
 
 // Mock reduced motion
-jest.mock('@/hooks/usePrefersReducedMotion', () => ({
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 
@@ -18,7 +18,7 @@ const baseTileProps = {
   phase: 'idle' as const,
   isSelected: false,
   isCleared: false,
-  onClick: jest.fn(),
+  onClick: vi.fn(),
 };
 
 describe('Blast Mobile Responsive', () => {
@@ -87,7 +87,7 @@ describe('Blast Mobile Responsive', () => {
       waveNumber: 1,
       tilesCleared: 5,
       totalTiles: 36,
-      onQuit: jest.fn(),
+      onQuit: vi.fn(),
       t: (key: string) => key,
     };
 

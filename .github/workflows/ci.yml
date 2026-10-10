@@ -157,9 +157,7 @@ jobs:
       - name: Run backend tests (shard 1 only)
         if: matrix.shard == 1
         working-directory: fe-next
-        # Backend uses Vitest, not Jest — the `backend/jest.config.js` this
-        # step used to reference doesn't exist in the repo. Match the
-        # `npm run test:backend` script.
+        # Matches `npm run test:backend`.
         run: npx vitest run --config backend/vitest.config.ts
         env:
           CI: true

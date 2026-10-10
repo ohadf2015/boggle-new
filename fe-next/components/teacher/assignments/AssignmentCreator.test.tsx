@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AssignmentCreator from './AssignmentCreator';
 import { useAssignments } from '@/hooks/useAssignments';
+import type { Mock } from 'vitest';
 
 // Mock hooks
 vi.mock('@/hooks/useAssignments');
@@ -61,7 +62,7 @@ const mockOnClose = vi.fn();
 describe('AssignmentCreator', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useAssignments as jest.Mock).mockReturnValue({
+    (useAssignments as Mock).mockReturnValue({
       createAssignment: mockCreateAssignment,
     });
   });
@@ -204,7 +205,7 @@ describe('AssignmentCreator — free-tier assignment cap', () => {
 
   beforeEach(() => {
     proState = { hasPro: false, loading: false };
-    (useAssignments as jest.Mock).mockReturnValue({
+    (useAssignments as Mock).mockReturnValue({
       createAssignment: mockCreateAssignment,
       assignments: threeAssignments,
     });
@@ -246,7 +247,7 @@ describe('AssignmentCreator — free-tier assignment cap', () => {
   });
 
   it('keeps the form for a free teacher below the cap', () => {
-    (useAssignments as jest.Mock).mockReturnValue({
+    (useAssignments as Mock).mockReturnValue({
       createAssignment: mockCreateAssignment,
       assignments: threeAssignments.slice(0, 2),
     });

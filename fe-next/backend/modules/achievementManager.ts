@@ -104,7 +104,7 @@ interface WordDetailWithTimestamp extends WordDetail {
 }
 
 // Extended game type for achievement checking
-interface GameWithAchievements extends Game {
+export interface GameWithAchievements extends Game {
   firstWordFound?: boolean;
   gameDuration?: number;
   playerCombos?: Record<string, number>;

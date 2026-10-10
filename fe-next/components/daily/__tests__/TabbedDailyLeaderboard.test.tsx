@@ -97,6 +97,7 @@ vi.mock('@/hooks/useFriends', () => ({
 
 // Import the component types for mock data
 import type { DailyParticipant, AllTimeParticipant } from '../TabbedDailyLeaderboard';
+import type { Mock } from 'vitest';
 
 // Helper to create mock participant data
 const createMockParticipant = (overrides: Partial<DailyParticipant> = {}): DailyParticipant => ({
@@ -145,7 +146,7 @@ describe('TabbedDailyLeaderboard', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
     vi.clearAllMocks();
-    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+    (global.fetch as Mock).mockImplementation((url: string) => {
       if (url.includes('/word-hunt/leaderboard')) {
         return Promise.resolve({
           ok: true,
@@ -243,7 +244,7 @@ describe('TabbedDailyLeaderboard', () => {
           rank_position: i + 1,
         })
       );
-      (global.fetch as jest.Mock).mockImplementation((url: string) => {
+      (global.fetch as Mock).mockImplementation((url: string) => {
         if (url.includes('/word-hunt/leaderboard')) {
           return Promise.resolve({
             ok: true,
@@ -290,7 +291,7 @@ describe('TabbedDailyLeaderboard', () => {
           rank_position: i + 1,
         })
       );
-      (global.fetch as jest.Mock).mockImplementation((url: string) => {
+      (global.fetch as Mock).mockImplementation((url: string) => {
         if (url.includes('/word-hunt/leaderboard')) {
           return Promise.resolve({
             ok: true,
@@ -336,7 +337,7 @@ describe('TabbedDailyLeaderboard', () => {
         attempts_used: 4,
         efficiency_score: 77,
       });
-      (global.fetch as jest.Mock).mockImplementation((url: string) => {
+      (global.fetch as Mock).mockImplementation((url: string) => {
         if (url.includes('/word-hunt/leaderboard')) {
           return Promise.resolve({
             ok: true,
@@ -380,7 +381,7 @@ describe('TabbedDailyLeaderboard', () => {
     // breaks Hebrew/Swedish/Japanese/Spanish UX. Audit 2026-05-02 / memory
     // feedback-hardcoded-leaderboard-error.md.
     it('renders translation key when fetch fails', async () => {
-      (global.fetch as jest.Mock).mockImplementation(() =>
+      (global.fetch as Mock).mockImplementation(() =>
         Promise.resolve({ ok: false, status: 500, text: () => Promise.resolve('boom') })
       );
 
@@ -404,7 +405,7 @@ describe('TabbedDailyLeaderboard', () => {
 
   describe('header subtitle suppresses misleading counts on error', () => {
     it('does NOT show "0 players" subtitle when the fetch fails', async () => {
-      (global.fetch as jest.Mock).mockImplementation(() =>
+      (global.fetch as Mock).mockImplementation(() =>
         Promise.resolve({ ok: false, status: 500, text: () => Promise.resolve('boom') })
       );
 

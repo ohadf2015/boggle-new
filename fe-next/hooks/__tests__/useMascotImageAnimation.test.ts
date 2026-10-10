@@ -236,13 +236,13 @@ describe('useMascotImageAnimation', () => {
     );
 
     // There should be pending timers
-    const pendingTimersBefore = jest.getTimerCount();
+    const pendingTimersBefore = vi.getTimerCount();
     expect(pendingTimersBefore).toBeGreaterThan(0);
 
     unmount();
 
     // All timers should be cleaned up
-    const pendingTimersAfter = jest.getTimerCount();
+    const pendingTimersAfter = vi.getTimerCount();
     expect(pendingTimersAfter).toBe(0);
   });
 });

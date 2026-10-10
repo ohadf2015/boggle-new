@@ -17,6 +17,7 @@ import userEvent from '@testing-library/user-event';
 import { ChallengePanel } from '../ChallengePanel';
 import type { DailyChallengeRow, WeeklyQuestRow } from '@/lib/supabase/education/types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { Mock } from 'vitest';
 
 // ============================================================
 // Mocks
@@ -71,7 +72,7 @@ function makeFetchResponse(body: object, ok = true) {
 }
 
 function setupFetch(daily: DailyChallengeRow[], weekly: WeeklyQuestRow[]) {
-  (global.fetch as jest.Mock)
+  (global.fetch as Mock)
     .mockResolvedValueOnce(makeFetchResponse({ challenges: daily }))
     .mockResolvedValueOnce(makeFetchResponse({ quests: weekly }));
 }
@@ -133,7 +134,7 @@ describe('ChallengePanel', () => {
 
   describe('loading state', () => {
     it('renders PageLoader while fetching data', () => {
-      (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
+      (global.fetch as Mock).mockReturnValue(new Promise(() => {}));
 
       render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
@@ -141,7 +142,7 @@ describe('ChallengePanel', () => {
     });
 
     it('does not render challenge-panel while loading', () => {
-      (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
+      (global.fetch as Mock).mockReturnValue(new Promise(() => {}));
 
       render(<ChallengePanel playerId="player-1" />, { wrapper: createWrapper() });
 
@@ -219,7 +220,7 @@ describe('ChallengePanel', () => {
       const challenge = makeChallenge({ id: 'ch-claim-1', completed: true });
       setupFetch([challenge], []);
       // Re-fetch after claim
-      (global.fetch as jest.Mock)
+      (global.fetch as Mock)
         .mockResolvedValueOnce(makeFetchResponse({ data: { xpReward: 50 } }))
         .mockResolvedValueOnce(makeFetchResponse({ challenges: [{ ...challenge, claimed: true }] }))
         .mockResolvedValueOnce(makeFetchResponse({ quests: [] }));
@@ -244,7 +245,7 @@ describe('ChallengePanel', () => {
     it('re-fetches challenges after claiming a challenge reward', async () => {
       const challenge = makeChallenge({ id: 'ch-refetch-1', completed: true });
       setupFetch([challenge], []);
-      (global.fetch as jest.Mock)
+      (global.fetch as Mock)
         .mockResolvedValueOnce(makeFetchResponse({ data: { xpReward: 50 } }))
         .mockResolvedValueOnce(makeFetchResponse({ challenges: [{ ...challenge, claimed: true }] }))
         .mockResolvedValueOnce(makeFetchResponse({ quests: [] }));
@@ -266,7 +267,7 @@ describe('ChallengePanel', () => {
     it('POSTs to weekly API with questId when claiming a quest', async () => {
       const quest = makeQuest({ id: 'wq-claim-1', completed: true });
       setupFetch([], [quest]);
-      (global.fetch as jest.Mock)
+      (global.fetch as Mock)
         .mockResolvedValueOnce(makeFetchResponse({ data: { xpReward: 300 } }))
         .mockResolvedValueOnce(makeFetchResponse({ challenges: [] }))
         .mockResolvedValueOnce(makeFetchResponse({ quests: [{ ...quest, claimed: true }] }));
@@ -293,7 +294,7 @@ describe('ChallengePanel', () => {
     it('re-fetches when playerId prop changes', async () => {
       setupFetch([], []);
       // second render
-      (global.fetch as jest.Mock)
+      (global.fetch as Mock)
         .mockResolvedValueOnce(makeFetchResponse({ challenges: [] }))
         .mockResolvedValueOnce(makeFetchResponse({ quests: [] }));
 

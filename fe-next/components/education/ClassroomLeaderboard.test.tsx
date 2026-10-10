@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import ClassroomLeaderboard from './ClassroomLeaderboard';
 import * as useClassroomLeaderboardHook from '@/hooks/useClassroomLeaderboard';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import type { MockedFunction } from 'vitest';
 
 // Mock LanguageContext with translations
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -72,7 +73,7 @@ vi.mock('@/lib/supabase/education/leaderboard', () => ({
   },
 }));
 
-const mockUseClassroomLeaderboard = useClassroomLeaderboardHook.useClassroomLeaderboard as jest.MockedFunction<
+const mockUseClassroomLeaderboard = useClassroomLeaderboardHook.useClassroomLeaderboard as MockedFunction<
   typeof useClassroomLeaderboardHook.useClassroomLeaderboard
 >;
 

@@ -3,12 +3,12 @@
 import { PhysicsDebris } from '../PhysicsDebris';
 import { Container } from 'pixi.js';
 
-jest.mock('pixi.js', () => {
+vi.mock('pixi.js', () => {
   const mockGraphics = {
-    clear: jest.fn().mockReturnThis(),
-    rect: jest.fn().mockReturnThis(),
-    fill: jest.fn().mockReturnThis(),
-    destroy: jest.fn(),
+    clear: vi.fn().mockReturnThis(),
+    rect: vi.fn().mockReturnThis(),
+    fill: vi.fn().mockReturnThis(),
+    destroy: vi.fn(),
     alpha: 1,
     x: 0,
     y: 0,
@@ -16,28 +16,28 @@ jest.mock('pixi.js', () => {
     visible: true,
   };
   const mockContainer = {
-    addChild: jest.fn(),
-    removeChild: jest.fn(),
-    destroy: jest.fn(),
+    addChild: vi.fn(),
+    removeChild: vi.fn(),
+    destroy: vi.fn(),
   };
   return {
-    Container: jest.fn(() => mockContainer),
-    Graphics: jest.fn(() => mockGraphics),
+    Container: vi.fn(function () { return mockContainer; }),
+    Graphics: vi.fn(function () { return mockGraphics; }),
   };
 });
 
 // Mock PhysicsWorld
 const mockPhysics = {
-  createRect: jest.fn().mockReturnValue(1),
-  removeBody: jest.fn(),
-  getBodyState: jest.fn().mockReturnValue({
+  createRect: vi.fn().mockReturnValue(1),
+  removeBody: vi.fn(),
+  getBodyState: vi.fn().mockReturnValue({
     id: 1,
     position: { x: 100, y: 200 },
     angle: 0.5,
     velocity: { x: 2, y: 3 },
     label: 'debris',
   }),
-  createWall: jest.fn(),
+  createWall: vi.fn(),
 };
 
 describe('PhysicsDebris', () => {
@@ -45,7 +45,7 @@ describe('PhysicsDebris', () => {
   let debris: PhysicsDebris;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     parent = new Container();
     debris = new PhysicsDebris(parent, mockPhysics as never, { floorY: 600 });
   });

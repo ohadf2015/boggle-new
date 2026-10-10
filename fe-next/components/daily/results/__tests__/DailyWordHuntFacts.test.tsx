@@ -37,7 +37,8 @@ vi.mock('@/utils/dailyWordHuntFactsCalculator', () => ({
 }));
 
 import { getWordHuntFacts } from '@/utils/dailyWordHuntFactsCalculator';
-const mockGetWordHuntFacts = getWordHuntFacts as jest.MockedFunction<typeof getWordHuntFacts>;
+import type { MockedFunction } from 'vitest';
+const mockGetWordHuntFacts = getWordHuntFacts as MockedFunction<typeof getWordHuntFacts>;
 
 // ---------------------------------------------------------------------------
 // Helpers

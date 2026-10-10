@@ -15,7 +15,7 @@ import { BlastTile } from '../BlastTile';
 import { BlastDragTrail } from '../BlastDragTrail';
 import type { BlastTileType } from '@/shared/types/blast';
 
-jest.mock('@/hooks/usePrefersReducedMotion', () => ({
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 
@@ -24,7 +24,7 @@ const baseProps = {
   phase: 'idle' as const,
   isSelected: false,
   isCleared: false,
-  onClick: jest.fn(),
+  onClick: vi.fn(),
 };
 
 const NAVY = '0b1530'; // brand near-black, the high-value-contrast ink

@@ -8,6 +8,7 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import '@testing-library/jest-dom';
 import AssignmentCreator from './AssignmentCreator';
 import { useAssignments } from '@/hooks/useAssignments';
+import type { Mock } from 'vitest';
 
 vi.mock('@/hooks/useAssignments');
 vi.mock('@/hooks/useVocabularyLesson', () => ({
@@ -51,7 +52,7 @@ const renderIt = () =>
 describe('AssignmentCreator — practice focus', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useAssignments as jest.Mock).mockReturnValue({ createAssignment: mockCreateAssignment });
+    (useAssignments as Mock).mockReturnValue({ createAssignment: mockCreateAssignment });
     mockCreateAssignment.mockResolvedValue({ success: true });
   });
 

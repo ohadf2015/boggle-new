@@ -8,6 +8,7 @@ import { PactFriendSelector } from '../PactFriendSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWordPact } from '@/hooks/useWordPact';
+import type { Mock } from 'vitest';
 
 // Mock Supabase chain
 const mockSingle = vi.fn();
@@ -44,9 +45,9 @@ describe('PactFriendSelector', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useLanguage as jest.Mock).mockReturnValue({ t: mockT });
-    (useAuth as jest.Mock).mockReturnValue({ user: { id: 'user-1' } });
-    (useWordPact as jest.Mock).mockReturnValue({ createPact: mockCreatePact });
+    (useLanguage as Mock).mockReturnValue({ t: mockT });
+    (useAuth as Mock).mockReturnValue({ user: { id: 'user-1' } });
+    (useWordPact as Mock).mockReturnValue({ createPact: mockCreatePact });
   });
 
   it('renders the modal with title', async () => {

@@ -8,6 +8,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import type { Mock } from 'vitest';
 
 // Mock framer-motion to simplify testing
 vi.mock('framer-motion', () => ({
@@ -63,7 +64,7 @@ describe('TabbedDailyLeaderboard — Connections tab', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
     vi.clearAllMocks();
-    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+    (global.fetch as Mock).mockImplementation((url: string) => {
       if (url.includes('/api/connections/daily/')) {
         return Promise.resolve({
           ok: true,
@@ -111,7 +112,7 @@ describe('TabbedDailyLeaderboard — Connections tab', () => {
     expect(screen.getByText('500')).toBeInTheDocument();
 
     // …and it came from the connections daily endpoint for this puzzle date.
-    const calls = (global.fetch as jest.Mock).mock.calls.map((c) => String(c[0]));
+    const calls = (global.fetch as Mock).mock.calls.map((c) => String(c[0]));
     expect(calls.some((u) => u.includes('/api/connections/daily/2026-09-14/leaderboard'))).toBe(true);
   });
 });

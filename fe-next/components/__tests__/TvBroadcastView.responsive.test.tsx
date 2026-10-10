@@ -7,6 +7,7 @@ import { useTvFullscreen } from '@/host/hooks/useTvFullscreen';
 import { useTvPlayerCombos } from '@/host/hooks/useTvPlayerCombos';
 import { useTvNotifications } from '@/host/hooks/useTvNotifications';
 import { useTvSounds } from '@/host/hooks/useTvSounds';
+import type { Mock } from 'vitest';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -127,7 +128,7 @@ beforeEach(() => {
 
 
 
-  (useTvFullscreen as jest.Mock).mockReturnValue({
+  (useTvFullscreen as Mock).mockReturnValue({
     isFullscreen: false,
     toggleFullscreen: vi.fn(),
     enterFullscreen: vi.fn(),
@@ -135,16 +136,16 @@ beforeEach(() => {
     isSupported: true,
   });
 
-  (useTvPlayerCombos as jest.Mock).mockReturnValue({
+  (useTvPlayerCombos as Mock).mockReturnValue({
     playerCombos: {},
   });
 
-  (useTvNotifications as jest.Mock).mockReturnValue({
+  (useTvNotifications as Mock).mockReturnValue({
     notifications: [],
     dismissNotification: vi.fn(),
   });
 
-  (useTvSounds as jest.Mock).mockReturnValue({
+  (useTvSounds as Mock).mockReturnValue({
     playSound: vi.fn(),
   });
 });
@@ -191,7 +192,7 @@ describe('TvBroadcastView - Responsive Layout', () => {
 describe('TvBroadcastView - Fullscreen Behavior', () => {
   it('should keep join bar visible even in fullscreen mode', () => {
 
-    (useTvFullscreen as jest.Mock).mockReturnValue({
+    (useTvFullscreen as Mock).mockReturnValue({
       isFullscreen: true,
       toggleFullscreen: vi.fn(),
       enterFullscreen: vi.fn(),
@@ -206,7 +207,7 @@ describe('TvBroadcastView - Fullscreen Behavior', () => {
 
   it('should keep timer visible in fullscreen mode', () => {
 
-    (useTvFullscreen as jest.Mock).mockReturnValue({
+    (useTvFullscreen as Mock).mockReturnValue({
       isFullscreen: true,
       toggleFullscreen: vi.fn(),
       enterFullscreen: vi.fn(),
@@ -221,7 +222,7 @@ describe('TvBroadcastView - Fullscreen Behavior', () => {
 
   it('should show game header with timer in non-fullscreen mode', () => {
 
-    (useTvFullscreen as jest.Mock).mockReturnValue({
+    (useTvFullscreen as Mock).mockReturnValue({
       isFullscreen: false,
       toggleFullscreen: vi.fn(),
       enterFullscreen: vi.fn(),
@@ -238,7 +239,7 @@ describe('TvBroadcastView - Fullscreen Behavior', () => {
   it('should toggle fullscreen when button is clicked', () => {
     const toggleFullscreen = vi.fn();
 
-    (useTvFullscreen as jest.Mock).mockReturnValue({
+    (useTvFullscreen as Mock).mockReturnValue({
       isFullscreen: false,
       toggleFullscreen,
       enterFullscreen: vi.fn(),

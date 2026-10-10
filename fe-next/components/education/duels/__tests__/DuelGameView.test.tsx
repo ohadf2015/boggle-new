@@ -8,6 +8,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { DuelGameView } from '../DuelGameView';
 import { getDuelById } from '@/lib/supabase/education/duels';
 import { useDuelSocket, type DuelCompletedData, type ScoreSubmittedData } from '@/hooks/useDuelSocket';
+import type { Mock, MockedFunction } from 'vitest';
 
 // ============================================
 // MOCKS
@@ -51,8 +52,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-const mockGetDuelById = getDuelById as jest.MockedFunction<typeof getDuelById>;
-const mockUseDuelSocket = useDuelSocket as jest.MockedFunction<typeof useDuelSocket>;
+const mockGetDuelById = getDuelById as MockedFunction<typeof getDuelById>;
+const mockUseDuelSocket = useDuelSocket as MockedFunction<typeof useDuelSocket>;
 
 // ============================================
 // TEST DATA
@@ -99,10 +100,10 @@ const mockDuelRow = {
 // ============================================
 
 describe('DuelGameView', () => {
-  let mockSubmitScore: jest.Mock;
-  let mockOnDuelCompleted: jest.Mock & { callback?: Function };
-  let mockOnScoreSubmitted: jest.Mock & { callback?: Function };
-  let mockOnError: jest.Mock & { callback?: Function };
+  let mockSubmitScore: Mock;
+  let mockOnDuelCompleted: Mock & { callback?: Function };
+  let mockOnScoreSubmitted: Mock & { callback?: Function };
+  let mockOnError: Mock & { callback?: Function };
 
   beforeEach(() => {
     // Reset mocks

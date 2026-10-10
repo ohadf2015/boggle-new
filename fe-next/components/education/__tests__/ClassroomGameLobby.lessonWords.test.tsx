@@ -17,6 +17,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
 import * as supabaseTeacher from '@/lib/supabase/education';
 import { io } from 'socket.io-client';
+import type { Mock } from 'vitest';
 
 // `t` interpolates in production, and the word count is a `{count}` param — a
 // key-only mock would make the count assertion below vacuous.
@@ -43,7 +44,7 @@ vi.mock('socket.io-client');
 vi.mock('@/lib/supabase/education');
 
 const mockSocket = { emit: vi.fn(), on: vi.fn(), disconnect: vi.fn() };
-(io as jest.Mock).mockReturnValue(mockSocket);
+(io as Mock).mockReturnValue(mockSocket);
 
 /** The real shape of the audited lesson: one word longer than the board rule allows. */
 const ecologyLesson = {
@@ -77,8 +78,8 @@ async function openLessonAndStart() {
 describe('ClassroomGameLobby — the lesson the teacher actually assigned', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (supabaseTeacher.getLessons as jest.Mock).mockResolvedValue({ data: [ecologyLesson] });
-    (supabaseTeacher.getClassrooms as jest.Mock).mockResolvedValue({ data: mockClassrooms });
+    (supabaseTeacher.getLessons as Mock).mockResolvedValue({ data: [ecologyLesson] });
+    (supabaseTeacher.getClassrooms as Mock).mockResolvedValue({ data: mockClassrooms });
   });
 
   it('sends every word in the lesson, including one no board can hold', async () => {
@@ -115,7 +116,7 @@ describe('ClassroomGameLobby — the lesson the teacher actually assigned', () =
   });
 
   it('defaults to the vocab quiz once a lesson whose words carry meanings is attached', async () => {
-    (supabaseTeacher.getLessons as jest.Mock).mockResolvedValue({
+    (supabaseTeacher.getLessons as Mock).mockResolvedValue({
       data: [
         {
           ...ecologyLesson,

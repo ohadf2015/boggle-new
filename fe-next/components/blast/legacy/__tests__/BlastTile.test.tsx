@@ -8,7 +8,7 @@ import { BlastTile } from '../BlastTile';
 import type { BlastTileType } from '@/shared/types/blast';
 
 // Mock reduced motion to always return false for consistent tests
-jest.mock('@/hooks/usePrefersReducedMotion', () => ({
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 
@@ -17,7 +17,7 @@ const baseProps = {
   phase: 'idle' as const,
   isSelected: false,
   isCleared: false,
-  onClick: jest.fn(),
+  onClick: vi.fn(),
 };
 
 describe('BlastTile', () => {

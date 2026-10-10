@@ -5,9 +5,10 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { BlastWaveIntro } from '../BlastWaveIntro';
 
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: (props: React.PropsWithChildren<{ className?: string; style?: React.CSSProperties }>) => <div {...props} />,
+    span: (props: React.PropsWithChildren<{ className?: string; style?: React.CSSProperties }>) => <span {...props} />,
   },
   AdaptiveAnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
@@ -36,8 +37,8 @@ const prog = (type: string, target: number, extras: Record<string, unknown> = {}
   ({ objective: { type, target, ...extras }, current: 0, isComplete: false }) as unknown as import('../types').BlastObjectiveProgress;
 
 describe('BlastWaveIntro', () => {
-  beforeEach(() => jest.useFakeTimers());
-  afterEach(() => { jest.runOnlyPendingTimers(); jest.useRealTimers(); });
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => { vi.runOnlyPendingTimers(); vi.useRealTimers(); });
 
   it('renders archetype mascot for scoreRush', () => {
     render(<BlastWaveIntro waveNumber={4} archetype="scoreRush" t={mockT} />);
@@ -66,7 +67,7 @@ describe('BlastWaveIntro', () => {
   it('auto-dismisses after 2600ms (no goals)', () => {
     const { container } = render(<BlastWaveIntro waveNumber={1} archetype="normal" t={mockT} />);
     expect(container.textContent).toContain('STANDARD WAVE');
-    act(() => { jest.advanceTimersByTime(2700); });
+    act(() => { vi.advanceTimersByTime(2700); });
     expect(container.textContent).toBe('');
   });
 
@@ -80,16 +81,16 @@ describe('BlastWaveIntro', () => {
       />,
     );
     // Still on screen after 2.7s (no-goal duration)
-    act(() => { jest.advanceTimersByTime(2700); });
+    act(() => { vi.advanceTimersByTime(2700); });
     expect(container.textContent).toContain('STANDARD WAVE');
     // But gone after 4.3s (with-goal duration)
-    act(() => { jest.advanceTimersByTime(1600); });
+    act(() => { vi.advanceTimersByTime(1600); });
     expect(container.textContent).toBe('');
   });
 
   it('re-triggers on waveNumber change', () => {
     const { container, rerender } = render(<BlastWaveIntro waveNumber={1} archetype="normal" t={mockT} />);
-    act(() => { jest.advanceTimersByTime(2700); });
+    act(() => { vi.advanceTimersByTime(2700); });
     expect(container.textContent).toBe('');
     rerender(<BlastWaveIntro waveNumber={2} archetype="treasureHunt" t={mockT} />);
     expect(container.textContent).toContain('TREASURE HUNT');
@@ -105,7 +106,7 @@ describe('BlastWaveIntro', () => {
     expect(container.textContent).toContain('STANDARD WAVE');
 
     // Advance 600ms (now > 500ms guard threshold)
-    act(() => { jest.advanceTimersByTime(600); });
+    act(() => { vi.advanceTimersByTime(600); });
 
     // Tap now should dismiss
     act(() => { overlay.click(); });
@@ -117,7 +118,7 @@ describe('BlastWaveIntro', () => {
     // Hint should not be visible initially
     expect(queryByText('Tap to start')).toBeNull();
     // Advance to 1s (hint delay)
-    act(() => { jest.advanceTimersByTime(1000); });
+    act(() => { vi.advanceTimersByTime(1000); });
     // Now hint should be visible
     expect(getByText('Tap to start')).toBeInTheDocument();
   });

@@ -3,6 +3,7 @@ import Header from '../Header';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUnclaimedGifts } from '@/hooks/useUnclaimedGifts';
+import type { MockedFunction } from 'vitest';
 
 // Mock framer-motion to avoid animation issues
 vi.mock('framer-motion', () => ({
@@ -89,9 +90,9 @@ vi.mock('next/navigation', () => ({
     usePathname: () => '/',
 }));
 
-const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-const mockUseUnclaimedGifts = useUnclaimedGifts as jest.MockedFunction<typeof useUnclaimedGifts>;
+const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
+const mockUseUnclaimedGifts = useUnclaimedGifts as MockedFunction<typeof useUnclaimedGifts>;
 
 describe('Header Visual Consistency - Desktop Mode', () => {
     beforeEach(() => {

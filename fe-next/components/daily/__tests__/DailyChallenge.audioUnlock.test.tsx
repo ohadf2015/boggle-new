@@ -233,9 +233,10 @@ global.fetch = vi.fn(() =>
     ok: true,
     json: () => Promise.resolve({ hasPlayed: false }),
   })
-) as jest.Mock;
+) as Mock;
 
 import DailyChallenge from '../DailyChallenge';
+import type { Mock } from 'vitest';
 
 describe('DailyChallenge - Audio Unlock on Game Start', () => {
   beforeEach(() => {

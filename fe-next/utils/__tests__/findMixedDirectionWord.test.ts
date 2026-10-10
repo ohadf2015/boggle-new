@@ -18,9 +18,10 @@ vi.mock('../directionPatternDetector', () => ({
 
 import { findWordPath } from '../wordPathFinder';
 import { hasDirectionChange } from '../directionPatternDetector';
+import type { Mock } from 'vitest';
 
-const mockFindWordPath = findWordPath as jest.Mock;
-const mockHasDirectionChange = hasDirectionChange as jest.Mock;
+const mockFindWordPath = findWordPath as Mock;
+const mockHasDirectionChange = hasDirectionChange as Mock;
 
 describe('findMixedDirectionWord', () => {
   beforeEach(() => {

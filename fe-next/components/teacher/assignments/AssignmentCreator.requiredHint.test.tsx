@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AssignmentCreator from './AssignmentCreator';
 import { useAssignments } from '@/hooks/useAssignments';
+import type { Mock } from 'vitest';
 
 // Mock hooks
 vi.mock('@/hooks/useAssignments');
@@ -62,7 +63,7 @@ const renderCreator = () =>
 describe('AssignmentCreator — the disabled submit explains itself', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useAssignments as jest.Mock).mockReturnValue({ createAssignment: vi.fn() });
+    (useAssignments as Mock).mockReturnValue({ createAssignment: vi.fn() });
   });
 
   it('marks the due date as required, for eyes and screen readers', () => {

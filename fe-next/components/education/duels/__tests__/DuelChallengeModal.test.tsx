@@ -3,6 +3,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DuelChallengeModal from '../DuelChallengeModal';
 import { useDuelSocket, type OpponentInfo } from '@/hooks/useDuelSocket';
+import type { Mock } from 'vitest';
 
 // Mock dependencies
 vi.mock('@/hooks/useDuelSocket');
@@ -86,7 +87,7 @@ describe('DuelChallengeModal', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useDuelSocket as jest.Mock).mockReturnValue({
+    (useDuelSocket as Mock).mockReturnValue({
       socket: {},
       isConnected: true,
       createChallenge: mockCreateChallenge,

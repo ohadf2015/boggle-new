@@ -5,6 +5,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import BulkImportEnhanced, { parseBulkImportLine } from './BulkImportEnhanced';
 import { useWordIntegration } from '@/hooks/useWordIntegration';
+import type { Mock } from 'vitest';
 
 vi.mock('@/hooks/useWordIntegration');
 
@@ -65,7 +66,7 @@ describe('BulkImportEnhanced with extra columns', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useWordIntegration as jest.Mock).mockReturnValue({
+    (useWordIntegration as Mock).mockReturnValue({
       checkWordIntegration: vi.fn((word: string) => ({ word: word.trim().toLowerCase(), canIntegrate: true })),
     });
   });

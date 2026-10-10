@@ -5,17 +5,17 @@
  */
 
 export const SocialLogin = {
-  initialize: jest.fn().mockResolvedValue(undefined),
-  login: jest.fn().mockResolvedValue({
+  initialize: vi.fn().mockResolvedValue(undefined),
+  login: vi.fn().mockResolvedValue({
     result: {
       idToken: 'mock-id-token-123',
       accessToken: 'mock-access-token-456'
     }
   }),
-  logout: jest.fn().mockResolvedValue(undefined),
-  isLoggedIn: jest.fn().mockResolvedValue({ isLoggedIn: false }),
-  getAuthorizationCode: jest.fn().mockResolvedValue({ jwt: 'mock-jwt' }),
-  refresh: jest.fn().mockResolvedValue({
+  logout: vi.fn().mockResolvedValue(undefined),
+  isLoggedIn: vi.fn().mockResolvedValue({ isLoggedIn: false }),
+  getAuthorizationCode: vi.fn().mockResolvedValue({ jwt: 'mock-jwt' }),
+  refresh: vi.fn().mockResolvedValue({
     accessToken: 'new-access-token',
     refreshToken: 'new-refresh-token'
   })

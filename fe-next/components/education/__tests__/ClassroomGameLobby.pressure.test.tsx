@@ -13,6 +13,7 @@ import { ClassroomGameLobby } from '../ClassroomGameLobby';
 import * as supabaseTeacher from '@/lib/supabase/education';
 import { io } from 'socket.io-client';
 import { DEFAULT_CLASSROOM_PRESSURE } from '@/shared/utils/classroomPressure';
+import type { Mock } from 'vitest';
 
 const { mockToastError } = vi.hoisted(() => ({ mockToastError: vi.fn() }));
 vi.mock('react-hot-toast', () => ({
@@ -63,7 +64,7 @@ const mockSocket = {
   off: vi.fn(),
   disconnect: vi.fn(),
 };
-(io as jest.Mock).mockReturnValue(mockSocket);
+(io as Mock).mockReturnValue(mockSocket);
 
 function emitCall(event: string) {
   return mockSocket.emit.mock.calls.find((c) => c[0] === event);
@@ -95,8 +96,8 @@ describe('ClassroomGameLobby — pressure dials wiring', () => {
     vi.clearAllMocks();
     listeners.clear();
     mockHasPro = true;
-    (supabaseTeacher.getLessons as jest.Mock).mockResolvedValue({ data: mockLessons });
-    (supabaseTeacher.getClassrooms as jest.Mock).mockResolvedValue({ data: mockClassrooms });
+    (supabaseTeacher.getLessons as Mock).mockResolvedValue({ data: mockLessons });
+    (supabaseTeacher.getClassrooms as Mock).mockResolvedValue({ data: mockClassrooms });
   });
 
   it('renders the dials inside the setup sheet', async () => {

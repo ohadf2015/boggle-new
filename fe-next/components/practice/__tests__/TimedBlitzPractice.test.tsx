@@ -94,7 +94,7 @@ describe('TimedBlitzPractice', () => {
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
     vi.useRealTimers();
   });
 

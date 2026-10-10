@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { VocabularyHeatmap } from '../VocabularyHeatmap';
 import { useVocabularyMastery } from '@/hooks/useVocabularyMastery';
 import { useLanguage } from '@/contexts/LanguageContext';
+import type { Mock } from 'vitest';
 
 // Mock hooks
 vi.mock('@/hooks/useVocabularyMastery');
@@ -26,7 +27,7 @@ const mockT = (key: string) => {
 describe('VocabularyHeatmap', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useLanguage as jest.Mock).mockReturnValue({
+    (useLanguage as Mock).mockReturnValue({
       t: mockT,
       language: 'en',
       setLanguage: vi.fn(),
@@ -35,7 +36,7 @@ describe('VocabularyHeatmap', () => {
 
   it('should render loading state', () => {
     // GIVEN: Hook returns loading
-    (useVocabularyMastery as jest.Mock).mockReturnValue({
+    (useVocabularyMastery as Mock).mockReturnValue({
       heatmapData: null,
       isLoading: true,
       error: null,
@@ -109,7 +110,7 @@ describe('VocabularyHeatmap', () => {
       ],
     };
 
-    (useVocabularyMastery as jest.Mock).mockReturnValue({
+    (useVocabularyMastery as Mock).mockReturnValue({
       heatmapData: mockData,
       isLoading: false,
       error: null,
@@ -132,7 +133,7 @@ describe('VocabularyHeatmap', () => {
 
   it('should render empty state when no data', () => {
     // GIVEN: Hook returns empty data
-    (useVocabularyMastery as jest.Mock).mockReturnValue({
+    (useVocabularyMastery as Mock).mockReturnValue({
       heatmapData: {
         students: [],
         words: [],
@@ -192,7 +193,7 @@ describe('VocabularyHeatmap', () => {
       ],
     };
 
-    (useVocabularyMastery as jest.Mock).mockReturnValue({
+    (useVocabularyMastery as Mock).mockReturnValue({
       heatmapData: mockData,
       isLoading: false,
       error: null,
@@ -235,7 +236,7 @@ describe('VocabularyHeatmap', () => {
       ],
     };
 
-    (useVocabularyMastery as jest.Mock).mockReturnValue({
+    (useVocabularyMastery as Mock).mockReturnValue({
       heatmapData: mockData,
       isLoading: false,
       error: null,
@@ -274,7 +275,7 @@ describe('VocabularyHeatmap', () => {
       ],
     };
 
-    (useVocabularyMastery as jest.Mock).mockReturnValue({
+    (useVocabularyMastery as Mock).mockReturnValue({
       heatmapData: mockData,
       isLoading: false,
       error: null,
@@ -312,7 +313,7 @@ describe('VocabularyHeatmap', () => {
       ],
     };
 
-    (useVocabularyMastery as jest.Mock).mockReturnValue({
+    (useVocabularyMastery as Mock).mockReturnValue({
       heatmapData: mockData,
       isLoading: false,
       error: null,
@@ -332,7 +333,7 @@ describe('VocabularyHeatmap', () => {
 
   it('should show error state', () => {
     // GIVEN: Hook returns error
-    (useVocabularyMastery as jest.Mock).mockReturnValue({
+    (useVocabularyMastery as Mock).mockReturnValue({
       heatmapData: null,
       isLoading: false,
       error: new Error('Failed to load data'),

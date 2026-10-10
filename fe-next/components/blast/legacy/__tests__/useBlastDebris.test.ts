@@ -292,11 +292,19 @@ describe('useBlastDebris — static walls', () => {
     const gridSize = 8;
     const boardPx = cellSize * gridSize;
 
+    // Seeded: about 1 in 300 random launches clears a side wall and rests on its off-screen top.
+    let seed = 42;
+    const random = vi.spyOn(Math, 'random').mockImplementation(() => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 2 ** 32;
+    });
+
     const { result, unmount } = renderHook(() =>
       useBlastDebris(cellSize, gridSize, camera, physics),
     );
 
     result.current.spawnDebris([{ row: 4, col: 4, type: 'bomb' }]);
+    random.mockRestore();
 
     // Run physics long enough for fragments to settle on the floor.
     for (let i = 0; i < 600; i++) physics.update(16.67);

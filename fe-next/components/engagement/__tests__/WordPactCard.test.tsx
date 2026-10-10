@@ -7,6 +7,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { WordPactCard } from '../WordPactCard';
 import { useWordPact } from '@/hooks/useWordPact';
 import { useLanguage } from '@/contexts/LanguageContext';
+import type { Mock } from 'vitest';
 
 vi.mock('@/hooks/useWordPact');
 vi.mock('@/contexts/LanguageContext');
@@ -55,17 +56,17 @@ const basePactReturn = {
 describe('WordPactCard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useLanguage as jest.Mock).mockReturnValue({ t: mockT });
+    (useLanguage as Mock).mockReturnValue({ t: mockT });
   });
 
   it('returns null when loading', () => {
-    (useWordPact as jest.Mock).mockReturnValue({ ...basePactReturn, loading: true });
+    (useWordPact as Mock).mockReturnValue({ ...basePactReturn, loading: true });
     const { container } = render(<WordPactCard />);
     expect(container.firstChild).toBeNull();
   });
 
   it('shows CTA when no active pact', () => {
-    (useWordPact as jest.Mock).mockReturnValue(basePactReturn);
+    (useWordPact as Mock).mockReturnValue(basePactReturn);
     render(<WordPactCard />);
 
     expect(screen.getByText('Word Pact')).toBeInTheDocument();
@@ -73,7 +74,7 @@ describe('WordPactCard', () => {
   });
 
   it('opens friend selector when CTA clicked', () => {
-    (useWordPact as jest.Mock).mockReturnValue(basePactReturn);
+    (useWordPact as Mock).mockReturnValue(basePactReturn);
     render(<WordPactCard />);
 
     fireEvent.click(screen.getByTestId('form-pact-btn'));
@@ -81,7 +82,7 @@ describe('WordPactCard', () => {
   });
 
   it('shows active pact with partner name', () => {
-    (useWordPact as jest.Mock).mockReturnValue({
+    (useWordPact as Mock).mockReturnValue({
       ...basePactReturn,
       pact: { id: 'p1', player1_id: 'a', player2_id: 'b', active: true },
       partnerName: 'Alice',
@@ -98,7 +99,7 @@ describe('WordPactCard', () => {
   });
 
   it('shows both-played message and 1.5x multiplier', () => {
-    (useWordPact as jest.Mock).mockReturnValue({
+    (useWordPact as Mock).mockReturnValue({
       ...basePactReturn,
       pact: { id: 'p1', active: true },
       partnerName: 'Bob',
@@ -114,7 +115,7 @@ describe('WordPactCard', () => {
   });
 
   it('shows streak when > 0', () => {
-    (useWordPact as jest.Mock).mockReturnValue({
+    (useWordPact as Mock).mockReturnValue({
       ...basePactReturn,
       pact: { id: 'p1', active: true },
       partnerName: 'Carol',
@@ -126,7 +127,7 @@ describe('WordPactCard', () => {
   });
 
   it('does not show streak when 0', () => {
-    (useWordPact as jest.Mock).mockReturnValue({
+    (useWordPact as Mock).mockReturnValue({
       ...basePactReturn,
       pact: { id: 'p1', active: true },
       partnerName: 'Dave',
@@ -139,7 +140,7 @@ describe('WordPactCard', () => {
 
   it('calls dissolvePact when dissolve button clicked', () => {
     const mockDissolve = vi.fn();
-    (useWordPact as jest.Mock).mockReturnValue({
+    (useWordPact as Mock).mockReturnValue({
       ...basePactReturn,
       pact: { id: 'p1', active: true },
       partnerName: 'Eve',
@@ -152,7 +153,7 @@ describe('WordPactCard', () => {
   });
 
   it('shows neither-played message', () => {
-    (useWordPact as jest.Mock).mockReturnValue({
+    (useWordPact as Mock).mockReturnValue({
       ...basePactReturn,
       pact: { id: 'p1', active: true },
       partnerName: 'Frank',
@@ -163,7 +164,7 @@ describe('WordPactCard', () => {
   });
 
   it('shows partner-played message', () => {
-    (useWordPact as jest.Mock).mockReturnValue({
+    (useWordPact as Mock).mockReturnValue({
       ...basePactReturn,
       pact: { id: 'p1', active: true },
       partnerName: 'Grace',

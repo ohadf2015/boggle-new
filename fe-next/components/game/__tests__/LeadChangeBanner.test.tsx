@@ -3,7 +3,7 @@ import { render, screen, act } from '@testing-library/react';
 import { LeadChangeBanner } from '../LeadChangeBanner';
 import type { LeadChangeEvent } from '@/hooks/useLeadChangeDetection';
 
-// Mock framer-motion — factory must be self-contained (jest.mock is hoisted)
+// Mock framer-motion — factory must be self-contained (vi.mock is hoisted)
 vi.mock('framer-motion', () => {
   const React = require('react');
   const MotionDiv = React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {

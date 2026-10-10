@@ -9,6 +9,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import BulkImportEnhanced from './BulkImportEnhanced';
 import type { Language } from '@/lib/supabase/education/types';
 import { useWordIntegration } from '@/hooks/useWordIntegration';
+import type { Mock } from 'vitest';
 
 // Mock useWordIntegration hook
 vi.mock('@/hooks/useWordIntegration');
@@ -59,7 +60,7 @@ describe('BulkImportEnhanced', () => {
       reason: undefined,
     }));
 
-    (useWordIntegration as jest.Mock).mockReturnValue({
+    (useWordIntegration as Mock).mockReturnValue({
       checkWordIntegration: mockCheckWordIntegration,
     });
   });

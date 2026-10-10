@@ -19,6 +19,7 @@ import {
   __resetForTesting,
 } from '../nativePGS';
 import * as platform from '../platform';
+import type { Mock } from 'vitest';
 
 // Mock platform utils
 vi.mock('../platform', () => ({
@@ -56,7 +57,7 @@ vi.mock('@capacitor/core', () => ({
 }));
 
 describe('Native Play Games Services bridge', () => {
-  const mockIsAndroid = platform.isAndroid as jest.Mock;
+  const mockIsAndroid = platform.isAndroid as Mock;
 
   beforeEach(() => {
     vi.clearAllMocks();

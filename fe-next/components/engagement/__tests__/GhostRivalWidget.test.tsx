@@ -8,6 +8,7 @@ import { render, screen } from '@testing-library/react';
 import { GhostRivalWidget } from '../GhostRivalWidget';
 import { useGhostRival } from '@/hooks/useGhostRival';
 import { useLanguage } from '@/contexts/LanguageContext';
+import type { Mock } from 'vitest';
 
 // Mock dependencies
 vi.mock('@/hooks/useGhostRival');
@@ -32,12 +33,12 @@ const mockT = (key: string, params?: Record<string, string>) => {
 describe('GhostRivalWidget', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useLanguage as jest.Mock).mockReturnValue({ t: mockT });
+    (useLanguage as Mock).mockReturnValue({ t: mockT });
   });
 
   it('should not render when loading', () => {
     // GIVEN
-    (useGhostRival as jest.Mock).mockReturnValue({
+    (useGhostRival as Mock).mockReturnValue({
       rival: null,
       player: { score: 0 },
       gap: 0,
@@ -57,7 +58,7 @@ describe('GhostRivalWidget', () => {
 
   it('should not render when no rival matched', () => {
     // GIVEN
-    (useGhostRival as jest.Mock).mockReturnValue({
+    (useGhostRival as Mock).mockReturnValue({
       rival: null,
       player: { score: 0 },
       gap: 0,
@@ -77,7 +78,7 @@ describe('GhostRivalWidget', () => {
 
   it('should render rival widget with scores when rival exists', () => {
     // GIVEN
-    (useGhostRival as jest.Mock).mockReturnValue({
+    (useGhostRival as Mock).mockReturnValue({
       rival: { id: 'r1', username: 'GhostPlayer', avatar: '', score: 150 },
       player: { score: 200 },
       gap: 50,
@@ -100,7 +101,7 @@ describe('GhostRivalWidget', () => {
 
   it('should show ahead indicator when player is leading', () => {
     // GIVEN
-    (useGhostRival as jest.Mock).mockReturnValue({
+    (useGhostRival as Mock).mockReturnValue({
       rival: { id: 'r1', username: 'Rival', avatar: '', score: 100 },
       player: { score: 200 },
       gap: 100,
@@ -121,7 +122,7 @@ describe('GhostRivalWidget', () => {
 
   it('should show behind indicator and CTA when rival is leading', () => {
     // GIVEN
-    (useGhostRival as jest.Mock).mockReturnValue({
+    (useGhostRival as Mock).mockReturnValue({
       rival: { id: 'r1', username: 'Rival', avatar: '', score: 300 },
       player: { score: 100 },
       gap: 200,
@@ -143,7 +144,7 @@ describe('GhostRivalWidget', () => {
 
   it('should not show CTA when player is ahead', () => {
     // GIVEN
-    (useGhostRival as jest.Mock).mockReturnValue({
+    (useGhostRival as Mock).mockReturnValue({
       rival: { id: 'r1', username: 'Rival', avatar: '', score: 50 },
       player: { score: 200 },
       gap: 150,
@@ -163,7 +164,7 @@ describe('GhostRivalWidget', () => {
 
   it('should have accessible region role and label', () => {
     // GIVEN
-    (useGhostRival as jest.Mock).mockReturnValue({
+    (useGhostRival as Mock).mockReturnValue({
       rival: { id: 'r1', username: 'Rival', avatar: '', score: 50 },
       player: { score: 100 },
       gap: 50,

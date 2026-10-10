@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AssignmentTrackingPanel from './AssignmentTrackingPanel';
 import { useAssignments } from '@/hooks/useAssignments';
+import type { Mock } from 'vitest';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
@@ -78,7 +79,7 @@ const mockAssignments = [
 describe('AssignmentTrackingPanel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useAssignments as jest.Mock).mockReturnValue({
+    (useAssignments as Mock).mockReturnValue({
       assignments: mockAssignments,
       isLoading: false,
       error: null,
@@ -127,7 +128,7 @@ describe('AssignmentTrackingPanel', () => {
   });
 
   it('handles empty state', () => {
-    (useAssignments as jest.Mock).mockReturnValue({
+    (useAssignments as Mock).mockReturnValue({
       assignments: [],
       isLoading: false,
       error: null,
@@ -151,7 +152,7 @@ describe('AssignmentTrackingPanel', () => {
   });
 
   it('shows loading state with skeletons', () => {
-    (useAssignments as jest.Mock).mockReturnValue({
+    (useAssignments as Mock).mockReturnValue({
       assignments: [],
       isLoading: true,
       error: null,

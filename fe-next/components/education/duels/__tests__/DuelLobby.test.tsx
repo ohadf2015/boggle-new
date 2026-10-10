@@ -4,6 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DuelLobby from '../DuelLobby';
 import { useDuelSocket, type OpponentInfo, type ChallengeReceivedData } from '@/hooks/useDuelSocket';
 import { getPendingDuelsForStudent } from '@/lib/supabase/education/duels';
+import type { Mock } from 'vitest';
 
 // Mock dependencies
 vi.mock('@/hooks/useDuelSocket');
@@ -59,7 +60,7 @@ describe('DuelLobby', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useDuelSocket as jest.Mock).mockReturnValue({
+    (useDuelSocket as Mock).mockReturnValue({
       socket: {},
       isConnected: true,
       joinLobby: mockJoinLobby,

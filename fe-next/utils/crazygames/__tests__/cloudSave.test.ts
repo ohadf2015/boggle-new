@@ -1,9 +1,10 @@
 import { saveToCloud, loadFromCloud, clearCloudSave, type SaveData } from '../cloudSave';
+import type { Mock } from 'vitest';
 
 describe('cloudSave', () => {
-  let mockSetItem: jest.Mock;
-  let mockGetItem: jest.Mock;
-  let mockRemoveItem: jest.Mock;
+  let mockSetItem: Mock;
+  let mockGetItem: Mock;
+  let mockRemoveItem: Mock;
 
   const mockSaveDataValue: SaveData = {
     version: 2,

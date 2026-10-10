@@ -1,12 +1,12 @@
+import type { Mock } from 'vitest';
 /**
  * Invalid Word Tracker Tests
  *
  * Tests for the client-side invalid word tracking utility.
  */
 
-// Use jest.isolateModules to ensure fresh module state for each test
 describe('invalidWordTracker', () => {
-  let mockFetch: jest.Mock;
+  let mockFetch: Mock;
   let recordInvalidWord: typeof import('../invalidWordTracker').recordInvalidWord;
   let recordNotOnBoard: typeof import('../invalidWordTracker').recordNotOnBoard;
   let recordNotInDictionary: typeof import('../invalidWordTracker').recordNotInDictionary;

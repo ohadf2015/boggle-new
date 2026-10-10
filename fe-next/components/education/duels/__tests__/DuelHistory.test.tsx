@@ -12,6 +12,7 @@ import {
   type DuelHistoryEntry,
   type DuelStatsResult,
 } from '@/lib/supabase/education/duels';
+import type { MockedFunction } from 'vitest';
 
 // ============================================
 // MOCKS
@@ -49,8 +50,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-const mockGetDuelHistory = getDuelHistory as jest.MockedFunction<typeof getDuelHistory>;
-const mockGetDuelStats = getDuelStats as jest.MockedFunction<typeof getDuelStats>;
+const mockGetDuelHistory = getDuelHistory as MockedFunction<typeof getDuelHistory>;
+const mockGetDuelStats = getDuelStats as MockedFunction<typeof getDuelStats>;
 
 // ============================================
 // TEST DATA

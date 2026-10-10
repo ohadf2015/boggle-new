@@ -120,6 +120,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { Mock } from 'vitest';
 
 const mockPlayTrack = vi.fn();
 
@@ -136,19 +137,19 @@ describe('LandingView', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as Mock).mockReturnValue({
       isAuthenticated: false,
       isAdmin: false,
       loading: false,
     });
 
-    (useLanguage as jest.Mock).mockReturnValue({
+    (useLanguage as Mock).mockReturnValue({
       t: (key: string) => key,
       language: 'en',
       dir: 'ltr',
     });
 
-    (useMusic as jest.Mock).mockReturnValue({
+    (useMusic as Mock).mockReturnValue({
       playTrack: mockPlayTrack,
       unlockAudio: vi.fn(),
       stopMusic: vi.fn(),
@@ -185,8 +186,8 @@ describe('LandingView', () => {
     // SSR renders the real cards (no window → no session → always ready). A returning
     // user has a Supabase token in localStorage and auth is still resolving on the
     // client. The client must NOT replace the painted cards with a skeleton.
-    (hasSupabaseSession as jest.Mock).mockReturnValue(true);
-    (useAuth as jest.Mock).mockReturnValue({
+    (hasSupabaseSession as Mock).mockReturnValue(true);
+    (useAuth as Mock).mockReturnValue({
       isAuthenticated: false,
       isAdmin: false,
       profile: null,

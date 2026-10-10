@@ -28,7 +28,8 @@ vi.mock('@/hooks/useMediaQuery', () => ({
 }));
 
 import { useIsDesktop } from '@/hooks/useMediaQuery';
-const mockUseIsDesktop = useIsDesktop as jest.MockedFunction<typeof useIsDesktop>;
+import type { MockedFunction } from 'vitest';
+const mockUseIsDesktop = useIsDesktop as MockedFunction<typeof useIsDesktop>;
 
 describe('Collapsible', () => {
   beforeEach(() => {

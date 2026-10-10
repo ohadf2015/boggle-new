@@ -1,12 +1,12 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
 
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k }) }))
 
 // Track Audio constructions so we can assert per-sound volumes were applied.
 // Names start with `mock` so Jest's hoisting check allows them to be referenced
 // from inside mock factories.
-const mockAudioInstances: Array<{ src: string; volume: number; play: jest.Mock | ((...args: unknown[]) => unknown) }> = []
+const mockAudioInstances: Array<{ src: string; volume: number; play: Mock | ((...args: unknown[]) => unknown) }> = []
 class MockAudio {
   src: string
   volume = 0

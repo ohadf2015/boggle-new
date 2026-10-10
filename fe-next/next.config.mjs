@@ -700,7 +700,7 @@ const nextConfig = {
     // before webpack surfaces ChunkLoadError. Cuts the residual transient-flake
     // exceptions (~1/week) that pollute PostHog even when recovery reload later
     // succeeds. See lib/deploy/chunkLoadRetryPlugin.mjs. Turbopack builds ignore
-    // webpack plugins entirely, so build:turbopack is unaffected (and unhardened).
+    // webpack plugins entirely, so a Turbopack build is unhardened.
     if (!isServer) {
       config.plugins = config.plugins || [];
       config.plugins.push(new ChunkLoadRetryPlugin());

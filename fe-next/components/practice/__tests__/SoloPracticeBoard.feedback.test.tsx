@@ -1,9 +1,10 @@
+import type { Mock } from 'vitest';
 import { render, act, waitFor } from '@testing-library/react';
 import SoloPracticeBoard from '../SoloPracticeBoard';
 import type { VocabularyWord } from '@/lib/supabase/education';
 
 // Use vi.fn() to capture GridComponent props without module-level reassignment
-const mockGridComponent = jest.fn<React.JSX.Element, [Record<string, unknown>]>(() => <div data-testid="grid-component" />);
+const mockGridComponent = vi.fn<React.JSX.Element, [Record<string, unknown>]>(() => <div data-testid="grid-component" />);
 
 vi.mock('@/components/GridComponent', () => {
   const Wrapped = (props: Record<string, unknown>) => mockGridComponent(props);
@@ -109,7 +110,7 @@ describe('SoloPracticeBoard - Word Feedback & Validation', () => {
 
   it('should validate submitted words against dictionary API', async () => {
     // GIVEN: SoloPracticeBoard is rendered and fetch is mocked
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ isValid: true }),
     });
@@ -148,7 +149,7 @@ describe('SoloPracticeBoard - Word Feedback & Validation', () => {
 
   it('should show accepted feedback when dictionary validates word', async () => {
     // GIVEN: Dictionary API returns valid
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ isValid: true }),
     });
@@ -170,7 +171,7 @@ describe('SoloPracticeBoard - Word Feedback & Validation', () => {
 
   it('should show rejected feedback when dictionary rejects word', async () => {
     // GIVEN: Dictionary API returns invalid
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
+    (global.fetch as Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ isValid: false }),
     });

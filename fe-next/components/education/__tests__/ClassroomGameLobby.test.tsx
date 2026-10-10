@@ -10,6 +10,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
 import * as supabaseTeacher from '@/lib/supabase/education';
 import { io } from 'socket.io-client';
+import type { Mock } from 'vitest';
 
 // Mock dependencies
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -42,7 +43,7 @@ const mockSocket = {
   disconnect: vi.fn(),
 };
 
-(io as jest.Mock).mockReturnValue(mockSocket);
+(io as Mock).mockReturnValue(mockSocket);
 
 const mockLessons = [
   {
@@ -71,20 +72,20 @@ const mockClassrooms = [
 describe('ClassroomGameLobby (Single Step)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (supabaseTeacher.getLessons as jest.Mock).mockResolvedValue({
+    (supabaseTeacher.getLessons as Mock).mockResolvedValue({
       data: mockLessons,
     });
-    (supabaseTeacher.getClassrooms as jest.Mock).mockResolvedValue({
+    (supabaseTeacher.getClassrooms as Mock).mockResolvedValue({
       data: mockClassrooms,
     });
   });
 
   describe('Initial Loading', () => {
     it('should show loading spinner while fetching data', () => {
-      (supabaseTeacher.getLessons as jest.Mock).mockReturnValue(
+      (supabaseTeacher.getLessons as Mock).mockReturnValue(
         new Promise(() => {}) // Never resolves
       );
-      (supabaseTeacher.getClassrooms as jest.Mock).mockReturnValue(
+      (supabaseTeacher.getClassrooms as Mock).mockReturnValue(
         new Promise(() => {}) // Never resolves
       );
 
@@ -332,7 +333,7 @@ describe('ClassroomGameLobby (Single Step)', () => {
 
   describe('Error Handling', () => {
     it('should show error if no classrooms available', async () => {
-      (supabaseTeacher.getClassrooms as jest.Mock).mockResolvedValue({
+      (supabaseTeacher.getClassrooms as Mock).mockResolvedValue({
         data: [],
       });
 
@@ -346,7 +347,7 @@ describe('ClassroomGameLobby (Single Step)', () => {
     });
 
     it('should show "Create Classroom" button when no classrooms', async () => {
-      (supabaseTeacher.getClassrooms as jest.Mock).mockResolvedValue({
+      (supabaseTeacher.getClassrooms as Mock).mockResolvedValue({
         data: [],
       });
 
@@ -360,7 +361,7 @@ describe('ClassroomGameLobby (Single Step)', () => {
     });
 
     it('should navigate to teacher dashboard when "Create Classroom" clicked', async () => {
-      (supabaseTeacher.getClassrooms as jest.Mock).mockResolvedValue({
+      (supabaseTeacher.getClassrooms as Mock).mockResolvedValue({
         data: [],
       });
 
@@ -374,7 +375,7 @@ describe('ClassroomGameLobby (Single Step)', () => {
     });
 
     it('should show "Create Lesson" button when no lessons available', async () => {
-      (supabaseTeacher.getLessons as jest.Mock).mockResolvedValue({
+      (supabaseTeacher.getLessons as Mock).mockResolvedValue({
         data: [],
       });
 
@@ -388,7 +389,7 @@ describe('ClassroomGameLobby (Single Step)', () => {
     });
 
     it('should navigate to teacher dashboard when "Create Lesson" clicked', async () => {
-      (supabaseTeacher.getLessons as jest.Mock).mockResolvedValue({
+      (supabaseTeacher.getLessons as Mock).mockResolvedValue({
         data: [],
       });
 

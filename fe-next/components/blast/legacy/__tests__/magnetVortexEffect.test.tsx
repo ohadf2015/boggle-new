@@ -12,7 +12,7 @@ import {
 } from '@/lib/gameEngine/presets/particles';
 
 // Mock reduced motion
-jest.mock('@/hooks/usePrefersReducedMotion', () => ({
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: () => false,
 }));
 
@@ -22,7 +22,7 @@ const baseProps = {
   phase: 'idle' as const,
   isSelected: false,
   isCleared: false,
-  onClick: jest.fn(),
+  onClick: vi.fn(),
 };
 
 describe('Magnet/Vortex Effect', () => {

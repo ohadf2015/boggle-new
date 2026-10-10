@@ -17,7 +17,7 @@ import {
 } from '../types';
 
 // Mock tile generation to avoid randomness
-jest.mock('../utils/blastTileGeneration', () => ({
+vi.mock('../utils/blastTileGeneration', () => ({
   rollSpecialFromDistribution: () => 'bomb' as const,
 }));
 
