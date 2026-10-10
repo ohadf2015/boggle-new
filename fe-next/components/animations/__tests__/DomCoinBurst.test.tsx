@@ -1,5 +1,5 @@
 import { render, screen, act, cleanup } from '@testing-library/react';
-import { DomCoinBurst, coinFlightTiming } from '../DomCoinBurst';
+import { DomCoinBurst, coinFlightTiming, coinSizeFor } from '../DomCoinBurst';
 
 describe('DomCoinBurst', () => {
   afterEach(() => {
@@ -62,5 +62,11 @@ describe('DomCoinBurst', () => {
       expect(String(last.transform)).toContain('translate(285px, 15px)');
       expect(Number(frames[0].opacity)).toBeGreaterThan(0);
     }
+  });
+
+  it('coins grow with the screen so they still read next to big desktop tiles', () => {
+    expect(coinSizeFor(390)).toBe(30);
+    expect(coinSizeFor(1440)).toBe(44);
+    expect(coinSizeFor(4000)).toBe(44);
   });
 });
