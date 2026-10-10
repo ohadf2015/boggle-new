@@ -438,7 +438,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   });
 
   // Check achievements
-  const achievements: Achievement[] = checkAndAwardAchievements(gameCode, username, normalizedWord);
+  const achievements: Achievement[] = checkAndAwardAchievements(game, username, normalizedWord);
   if (achievements.length > 0) {
     logger.info('ACHIEVEMENT', `Emitting liveAchievementUnlocked to ${username}: ${achievements.map(a => a.key).join(', ')} (gameState: ${game.gameState})`);
     socket.emit('liveAchievementUnlocked', { achievements });

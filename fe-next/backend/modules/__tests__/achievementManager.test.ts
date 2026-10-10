@@ -7,6 +7,7 @@ import {
   checkLifetimeAchievements,
   LIFETIME_ACHIEVEMENT_THRESHOLDS,
   checkLiveAchievements,
+  checkAndAwardAchievements,
   awardFinalAchievements,
   ACHIEVEMENT_ICONS,
   type UserStats,
@@ -553,5 +554,23 @@ describe('awardFinalAchievements — FLAWLESS_VICTORY', () => {
     awardFinalAchievements(game, ['alice', 'bob']);
 
     expect(game.playerAchievements.alice || []).not.toContain('FLAWLESS_VICTORY');
+  });
+});
+
+describe('checkAndAwardAchievements — game passed in', () => {
+  it('Given a live game with the player registered, When a valid word is submitted, Then First Blood is awarded', () => {
+    const game = buildGame({
+      playerAchievements: { ana: [] },
+      playerWordDetails: { ana: [{ word: 'cat', validated: true, timeSinceStart: 5 } as WordDetail] },
+      users: { ana: { isBot: false } as Game['users'][string] },
+    });
+
+    const awarded = checkAndAwardAchievements(game, 'ana', 'cat');
+
+    expect(awarded.map((a) => a.key)).toContain('FIRST_BLOOD');
+  });
+
+  it('Given no game, When a word is submitted, Then nothing is awarded', () => {
+    expect(checkAndAwardAchievements(null, 'ana', 'cat')).toEqual([]);
   });
 });
