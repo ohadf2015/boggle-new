@@ -100,6 +100,12 @@ describe('selectWheelRadius — single source of truth for daily + multiplayer w
     );
   });
 
+  it('the large desktop wheel orbits wide enough to fill its panel, still inside the rim', () => {
+    expect(selectWheelRadius({ width: 480, height: 480, isLarge: true })).toBe(190);
+    expect(selectWheelRadius({ width: 900, height: 900, isLarge: true })).toBe(210);
+    expect(selectWheelRadius({ width: 260, height: 260, isLarge: true })).toBe(110);
+  });
+
   it('guards against a zero/unmeasured box (pre-layout render)', () => {
     expect(selectWheelRadius({ width: 0, height: 0 })).toBe(76);
   });

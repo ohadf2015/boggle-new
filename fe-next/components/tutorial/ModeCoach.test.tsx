@@ -88,4 +88,24 @@ describe('ModeCoach', () => {
     });
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
+
+  it('docks at the bottom when asked, leaving the game header readable', () => {
+    render(<ModeCoach mode="wheelRush" placement="bottom" />);
+    act(() => {
+      vi.advanceTimersByTime(700);
+    });
+    const dock = screen.getByRole('dialog').parentElement as HTMLElement;
+    expect(dock.dataset.placement).toBe('bottom');
+    expect(dock.className).toContain('bottom-0');
+    expect(dock.className).not.toContain('top-0');
+  });
+
+  it('stays docked at the top by default', () => {
+    render(<ModeCoach mode="classic" />);
+    act(() => {
+      vi.advanceTimersByTime(700);
+    });
+    expect((screen.getByRole('dialog').parentElement as HTMLElement).dataset.placement).toBe('top');
+  });
 });
+

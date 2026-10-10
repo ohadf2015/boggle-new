@@ -685,7 +685,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     const update = () => {
       const rect = el.getBoundingClientRect();
       // Shared selector — same orbit math the multiplayer wheel uses.
-      setWheelRadius(selectWheelRadius({ width: rect.width, height: rect.height, isShort: !!shortVp?.matches }));
+      setWheelRadius(selectWheelRadius({ width: rect.width, height: rect.height, isShort: !!shortVp?.matches, isLarge: isDesktop }));
     };
     update();
     const ro = new ResizeObserver(update);
@@ -695,7 +695,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       ro.disconnect();
       shortVp?.removeEventListener?.('change', update);
     };
-  }, []);
+  }, [isDesktop]);
 
   // ── Keyboard input ──
   useWordWheelKeyboard({
@@ -754,7 +754,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         </div>
       )}
 
-      {!practice && !hideModeCoach && <ModeCoach mode="wheelRush" />}
+      {!practice && !hideModeCoach && <ModeCoach mode="wheelRush" placement="bottom" />}
 
       {isDesktop ? (
         <div className="w-full flex flex-col gap-4 shrink-0">
@@ -817,6 +817,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       <div
         ref={wheelContainerRef}
         data-testid="wheel-orbit"
+        data-size={isDesktop ? 'large' : 'default'}
         // Height-cap (max-*) only binds when smaller than the fixed size, so tall
         // screens are unchanged while short/landscape ones shrink the wheel to fit
         // the cluster instead of overlapping the pills above / buttons below.
@@ -846,7 +847,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         // chips (measured 60px overlap) and the board is crushed into the top
         // of the screen. min(100cqb, …) is inert on normal viewports, where
         // 100cqb is already the largest term.
-        className="relative aspect-square w-[min(86vw,336px)] h-[min(86vw,336px)] sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[min(100cqb,max(176px,calc(100cqb-184px)))] max-h-[min(100cqb,max(176px,calc(100cqb-184px)))] short:max-w-[min(100cqb,max(132px,min(calc(100cqb-122px),46svh)))] short:max-h-[min(100cqb,max(132px,min(calc(100cqb-122px),46svh)))] shrink-0 flex items-center justify-center touch-none"
+        className={cn(
+          isDesktop ? 'w-[560px] h-[560px]' : 'w-[min(86vw,336px)] h-[min(86vw,336px)] sm:w-80 sm:h-80 md:w-96 md:h-96',
+          'relative aspect-square max-w-[min(100cqb,max(176px,calc(100cqb-184px)))] max-h-[min(100cqb,max(176px,calc(100cqb-184px)))] short:max-w-[min(100cqb,max(132px,min(calc(100cqb-122px),46svh)))] short:max-h-[min(100cqb,max(132px,min(calc(100cqb-122px),46svh)))] shrink-0 flex items-center justify-center touch-none',
+        )}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -901,6 +905,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         <WheelLetter
           letter={puzzle.centerLetter}
           isCenter
+          large={isDesktop}
           tileSkin={equippedTileSkin}
           onPress={(letter, _, el) => handleLetterPress(letter, -1, el)}
           isUsed={usedIndices.has(-1)}
@@ -916,6 +921,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             key={`${letter}-${i}`}
             letter={letter}
             isCenter={false}
+            large={isDesktop}
             tileSkin={equippedTileSkin}
             angle={i * (360 / outerLetters.length)}
             radius={wheelRadius}
@@ -1031,7 +1037,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             {wheelCluster}
           </div>
 
-          <div className="h-full min-h-0 overflow-hidden zone-panel-lime rounded-neo">
+          <div className="mt-12 min-h-0 overflow-hidden zone-panel-lime rounded-neo">
             {foundWords}
           </div>
         </div>

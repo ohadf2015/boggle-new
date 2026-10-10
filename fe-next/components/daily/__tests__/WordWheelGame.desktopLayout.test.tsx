@@ -119,4 +119,17 @@ describe('WordWheelGame desktop 3-column layout', () => {
     expect(screen.queryByText('wordHunt.desktop.liveRanks')).toBeNull();
     expect(screen.getAllByTestId('rank-ladder')).toHaveLength(2);
   });
+
+  it('scales the wheel up on desktop: large letters, not the phone-sized ones', () => {
+    renderGame({ isDesktop: true });
+    const letters = document.querySelectorAll('[data-testid="wheel-orbit"] button.wheel-letter-skinnable');
+    expect(letters.length).toBe(7);
+    letters.forEach((el) => expect(el.getAttribute('data-size')).toBe('large'));
+    expect(screen.getByTestId('wheel-orbit').getAttribute('data-size')).toBe('large');
+  });
+
+  it('keeps phone-sized letters off desktop', () => {
+    renderGame();
+    expect(screen.getByTestId('wheel-orbit').getAttribute('data-size')).toBe('default');
+  });
 });
