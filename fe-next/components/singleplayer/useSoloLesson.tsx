@@ -8,7 +8,7 @@ import { LessonSheet } from '@/components/tutorial/lesson/LessonSheet';
 import { LessonComplete } from '@/components/tutorial/lesson/LessonComplete';
 import { CLASSIC_LESSON, nextTraceIndex, type LessonWord } from '@/lib/tutorial/lesson/lessonEngine';
 import { findStarterOnGrid } from '@/lib/tutorial/lesson/starterWords';
-import { pickStepHint } from '@/lib/tutorial/lesson/stepHint';
+import { pickStepHint, pickTraceHint } from '@/lib/tutorial/lesson/stepHint';
 import { findWordPath } from '@/utils/wordPathFinder';
 import type { CategorizedWords } from '@/utils/findMixedDirectionWord';
 import type { Language, LetterGrid } from '@/types';
@@ -70,7 +70,7 @@ export function useSoloLesson({
     if (!lesson.active || !step) return null;
     if (step.kind === 'trace') {
       if (starter && !found.has(starter.word.toLowerCase())) return starter;
-      return pickStepHint(availableWords, grid, language, 3, found);
+      return pickTraceHint(availableWords, grid, language, found);
     }
     return idle ? pickStepHint(availableWords, grid, language, step.minLength, found) : null;
   }, [lesson.active, step, starter, found, availableWords, grid, language, idle]);

@@ -24,3 +24,13 @@ export function pickStepHint(
   }
   return null;
 }
+
+/** The first word to trace: three letters when the board has one, else two (Japanese boards deal kanji pairs). */
+export function pickTraceHint(
+  available: CategorizedWords | null,
+  grid: LetterGrid | null,
+  language: Language,
+  found: ReadonlySet<string>,
+): LessonHint | null {
+  return pickStepHint(available, grid, language, 3, found) ?? pickStepHint(available, grid, language, 2, found);
+}
