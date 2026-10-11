@@ -3,7 +3,6 @@
 // Only for effects that already draw as a top-most viewport overlay.
 
 import type { Application, Container } from 'pixi.js';
-import { SharedFxApp } from './SharedFxApp';
 
 export interface FxLayer {
   /** Called every frame. Return false when finished: the layer then detaches itself. */
@@ -24,6 +23,8 @@ export function attachFxLayer(build: (ctx: FxLayerContext) => FxLayer): () => vo
   let finish: ((deferRelease?: boolean) => void) | null = null;
 
   void (async () => {
+    const { SharedFxApp } = await import('./SharedFxApp');
+    if (done) return;
     const app = await SharedFxApp.acquire();
     const pixi = app && !done ? await import('pixi.js') : null;
     if (!app || !pixi || done || SharedFxApp.getApplication() !== app) {

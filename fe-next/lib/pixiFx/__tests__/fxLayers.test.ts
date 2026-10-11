@@ -270,3 +270,13 @@ describe('attachFxLayer', () => {
     expect(SharedFxApp.isInitialized()).toBe(true);
   });
 });
+
+describe('fxLayers — first-load weight guard', () => {
+  it('loads SharedFxApp and pixi.js lazily, so importing a layer site adds neither to its route', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { resolve } = await import('node:path');
+    const src = readFileSync(resolve(process.cwd(), 'lib/pixiFx/fxLayers.ts'), 'utf8');
+    expect(src).not.toMatch(/^import\s+(?!type\b)[^;]*from\s+['"](\.\/SharedFxApp|pixi\.js)['"]/m);
+    expect(src).toMatch(/import\(['"]\.\/SharedFxApp['"]\)/);
+  });
+});
