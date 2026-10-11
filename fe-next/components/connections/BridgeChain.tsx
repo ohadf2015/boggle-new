@@ -17,7 +17,7 @@ const CARD_SPRING = { type: 'spring' as const, stiffness: 320, damping: 26 };
 /**
  * The entrance animates SCALE and POSITION but never starts from `opacity: 0`.
  *
- * `m` only animates once LazyMotion's `domMax` feature bundle has loaded; until
+ * `m` only animates once LazyMotion's animation features have loaded; until
  * then every element sits frozen on its `initial` values. An entrance that
  * starts transparent therefore renders the puzzle — the whole point of the
  * screen — as a blank area whenever that chunk is slow, blocked or failed, and

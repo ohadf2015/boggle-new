@@ -2,6 +2,7 @@
 
 import React, { useEffect, useId, useRef } from 'react';
 import { m, type PanInfo } from 'framer-motion';
+import { useMotionMaxReady } from '@/components/motion/useMotionMaxReady';
 import { ChevronLeft, ChevronRight, type LucideIcon } from 'lucide-react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { cn } from '@/lib/utils';
@@ -44,6 +45,7 @@ export function ProfileShowcaseLayout({
   panelHandlers,
   beforePanel,
 }: ProfileShowcaseLayoutProps): React.ReactElement {
+  const dragReady = useMotionMaxReady();
   const reduced = useReducedMotion();
   const baseId = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const index = Math.max(0, tabs.findIndex(tab => tab.id === activeTab));
@@ -133,7 +135,7 @@ export function ProfileShowcaseLayout({
 
           <m.div
             className="h-full px-5 md:px-0 pt-3 pb-24 md:pb-6"
-            drag="x"
+            drag={dragReady ? 'x' : false}
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.15}
             dragSnapToOrigin

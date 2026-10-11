@@ -9,6 +9,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { m, useMotionValue, PanInfo } from 'framer-motion';
+import { useMotionMaxReady } from '@/components/motion/useMotionMaxReady';
 import { ChevronUp, ChevronDown, BookOpen, Gem } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -36,6 +37,7 @@ export function MobileGameDrawer({
   peekHeight = 44,
   expandedHeight = 260,
 }: MobileGameDrawerProps) {
+  const dragReady = useMotionMaxReady();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const y = useMotionValue(0);
@@ -68,7 +70,7 @@ export function MobileGameDrawer({
         aria-expanded={isOpen}
         aria-label={t('game.drawer.toggle')}
         className="w-full bg-neo-navy/95 border-t-2 border-neo-black/60 cursor-grab active:cursor-grabbing touch-none select-none"
-        drag="y"
+        drag={dragReady ? 'y' : false}
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={0.2}
         onDragEnd={handleDragEnd}

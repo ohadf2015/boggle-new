@@ -1,9 +1,20 @@
 'use client';
 
-import { LazyMotion, domMax } from 'framer-motion';
-import type { ReactNode } from 'react';
+import { LazyMotion, domAnimation, type FeatureBundle } from 'framer-motion';
+import { useEffect, useState, type ReactNode } from 'react';
+import { MotionMaxReadyContext } from '@/components/motion/useMotionMaxReady';
 
-// domMax, not domAnimation: drag and layout/layoutId are used across the tree.
 export function LazyMotionRoot({ children }: { children: ReactNode }) {
-  return <LazyMotion features={domMax}>{children}</LazyMotion>;
+  const [max, setMax] = useState<FeatureBundle | null>(null);
+  useEffect(() => {
+    let live = true;
+    import('./motionMaxFeatures').then((mod) => { if (live) setMax(mod.default); });
+    return () => { live = false; };
+  }, []);
+  return (
+    <LazyMotion features={domAnimation}>
+      {max && <LazyMotion features={max}>{null}</LazyMotion>}
+      <MotionMaxReadyContext.Provider value={max !== null}>{children}</MotionMaxReadyContext.Provider>
+    </LazyMotion>
+  );
 }
