@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@/utils/growthTracking', () => ({
   trackGameStart: vi.fn(),
@@ -80,6 +80,18 @@ beforeEach(() => {
   global.fetch = vi.fn().mockResolvedValue({ ok: false }) as unknown as typeof fetch;
 });
 
+function onDesktop(matches = true) {
+  window.matchMedia = ((q: string) => ({
+    matches, media: q, onchange: null,
+    addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {}, dispatchEvent: () => false,
+  })) as unknown as typeof window.matchMedia;
+}
+
+const realMatchMedia = window.matchMedia;
+afterEach(() => {
+  window.matchMedia = realMatchMedia;
+});
+
 describe('WordWheelGame in the desktop game shell', () => {
   it('wraps the wheel in the shared shell — no separate desktop tree', () => {
     renderGame();
@@ -90,6 +102,7 @@ describe('WordWheelGame in the desktop game shell', () => {
   });
 
   it('keeps keyboard help and the live ranks in the start rail', () => {
+    onDesktop();
     renderGame();
     const left = screen.getByTestId('game-shell-left');
     expect(within(left).getByTestId('shell-keys')).toBeInTheDocument();
@@ -97,26 +110,29 @@ describe('WordWheelGame in the desktop game shell', () => {
   });
 
   it('moves the found words into the end rail on desktop, leaving one copy', () => {
-    const mm = window.matchMedia;
-    window.matchMedia = ((q: string) => ({
-      matches: true, media: q, onchange: null,
-      addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {}, dispatchEvent: () => false,
-    })) as unknown as typeof window.matchMedia;
-    try {
-      renderGame();
-      expect(screen.getAllByTestId('found-words-slot')).toHaveLength(1);
-      expect(within(screen.getByTestId('game-shell-right')).getByTestId('found-words-slot')).toBeInTheDocument();
-    } finally {
-      window.matchMedia = mm;
-    }
+    onDesktop();
+    renderGame();
+    expect(screen.getAllByTestId('found-words-slot')).toHaveLength(1);
+    expect(within(screen.getByTestId('game-shell-right')).getByTestId('found-words-slot')).toBeInTheDocument();
+  });
+
+  it('leaves both rails empty on a phone, so the phone tree has one ladder and one word strip', () => {
+    onDesktop(false);
+    renderGame({ hideCompetitive: true });
+    expect(screen.getByTestId('game-shell-left')).toBeEmptyDOMElement();
+    expect(screen.getByTestId('game-shell-right')).toBeEmptyDOMElement();
+    expect(screen.getAllByTestId('rank-ladder')).toHaveLength(1);
+    expect(screen.getAllByTestId('found-words-slot')).toHaveLength(1);
   });
 
   it('shows the rank ladder once, not again as a side list, when live ranks fill the left column', () => {
+    onDesktop();
     renderGame();
     expect(screen.getAllByTestId('rank-ladder')).toHaveLength(1);
   });
 
   it('falls back to the rank list on the left when there is no live board', () => {
+    onDesktop();
     renderGame({ hideCompetitive: true });
     expect(screen.queryByText('wordHunt.desktop.liveRanks')).toBeNull();
     expect(screen.getAllByTestId('rank-ladder')).toHaveLength(2);

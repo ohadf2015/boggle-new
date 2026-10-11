@@ -1049,7 +1049,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     <GameShell
       mode="wheel"
       accent="lime"
-      left={
+      left={inShell ? (
         <>
           <div className="min-h-0 flex-1 overflow-hidden rounded-neo zone-panel-pink">
             {hideCompetitive ? (
@@ -1062,7 +1062,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           </div>
           <ShellKeysCard t={t} />
         </>
-      }
+      ) : null}
       right={inShell ? <div className="h-full min-h-0 overflow-hidden rounded-neo zone-panel-lime">{foundWords}</div> : null}
     >
       <div

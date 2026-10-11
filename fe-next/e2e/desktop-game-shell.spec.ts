@@ -117,6 +117,20 @@ test.describe('desktop game shell (1440x900)', () => {
     await expect(page.getByTestId('game-shell-right').locator('[data-testid^="shell-word-row-"]').first()).toBeVisible({ timeout: 10_000 });
   });
 
+  test('quick wheel: the wheel takes the centre, ranks left, one found-words list right', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.goto('/en/quick-play');
+    await page.getByTestId('mode-card-wheel-rush').click();
+    await dismissCoaches(page);
+    await expectShell(page, 'wheel');
+    const orbit = await page.getByTestId('wheel-orbit').boundingBox();
+    expect(orbit?.height ?? 0).toBeGreaterThan(DESKTOP.height * 0.4);
+    await expect(page.getByTestId('found-words-slot')).toHaveCount(1);
+    await expect(page.getByTestId('game-shell-right').getByTestId('found-words-slot')).toBeVisible();
+    await expect(page.getByTestId('game-shell-left').getByTestId('rank-ladder')).toBeVisible();
+    await expect(page.getByTestId('game-shell-left').getByTestId('shell-keys')).toBeVisible();
+  });
+
   test('wordcraft: the board is sized by height with the chrome beside it, no site header', async ({ page }) => {
     test.setTimeout(90_000);
     await page.goto('/en/word-craft');
@@ -146,5 +160,17 @@ test.describe('phone keeps its own layout (390x844)', () => {
     await expect(page.locator('.game-board-frame').first()).toBeVisible({ timeout: 30_000 });
     await expect(page.getByTestId('game-shell-left')).toBeHidden();
     await expect(page.getByTestId('timer-container')).toBeVisible();
+  });
+
+  test('quick wheel: rails stay empty, one ladder and one word strip on the phone', async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.goto('/en/quick-play');
+    await page.getByTestId('mode-card-wheel-rush').click();
+    await dismissCoaches(page);
+    await expect(page.getByTestId('wheel-orbit')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByTestId('game-shell-left')).toBeHidden();
+    await expect(page.getByTestId('game-shell-left').locator('*')).toHaveCount(0);
+    await expect(page.getByTestId('rank-ladder')).toHaveCount(1);
+    await expect(page.getByTestId('found-words-slot')).toHaveCount(1);
   });
 });

@@ -201,6 +201,13 @@ describe('SoloGameLayout', () => {
     expect(shell()).toHaveAttribute('data-lesson', 'on');
   });
 
+  it('lifts the desktop board clear of the lesson sheet while a lesson runs', () => {
+    render(<SoloGameLayout {...props({ soloLessonActive: true })} />);
+    const css = [...document.querySelectorAll('style')].map((s) => s.textContent ?? '').join('\n');
+    const desktop = css.slice(css.indexOf('@media (min-width: 1024px) and (min-height: 600px)'));
+    expect(desktop).toMatch(/\[data-lesson="on"\][^{]*\{[^}]*padding-bottom/);
+  });
+
   it('keeps the desktop typing tips out of the way while a lesson runs', () => {
     const { rerender } = render(<SoloGameLayout {...props()} />);
     expect(screen.getByTestId('overlays')).toHaveAttribute('data-playing', 'true');

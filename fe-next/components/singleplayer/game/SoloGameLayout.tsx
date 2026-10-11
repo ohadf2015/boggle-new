@@ -124,6 +124,7 @@ const SOLO_SHELL_CSS = `
 }
 @media (min-width: 1024px) and (min-height: 600px) {
   .${SHELL} [data-solo-slot="board"] { --solo-board-max: 100cqh; }
+  .${SHELL}[data-lesson="on"] { padding-bottom: 6.5rem; }
 }`;
 
 const HUD_BUTTON =

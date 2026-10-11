@@ -84,11 +84,12 @@ test.describe('Daily Word Wheel — desktop', () => {
 
   test('play uses the width: rivals left, wheel and ladder centre, words right', async ({ page }) => {
     await startPractice(page);
-    await expect(page.getByTestId('word-wheel-desktop-grid')).toBeVisible();
-    await expect(page.getByText(/live ranks/i)).toBeVisible();
+    await expect(page.locator('[data-game-shell="wheel"]')).toBeVisible();
+    await expect(page.getByTestId('game-shell-left').getByText(/live ranks/i)).toBeVisible();
     await expect(page.getByTestId('rank-ladder')).toHaveCount(1);
     await expect(page.getByTestId('rank-bubble')).toBeVisible();
-    await expect(page.getByTestId('found-words-slot')).toBeVisible();
+    await expect(page.getByTestId('found-words-slot')).toHaveCount(1);
+    await expect(page.getByTestId('game-shell-right').getByTestId('found-words-slot')).toBeVisible();
     await page.getByRole('button', { name: /see all ranks/i }).click();
     await expect(page.getByTestId('rank-list')).toBeVisible();
   });
