@@ -66,7 +66,11 @@ export function BlastWaveIntro({ waveNumber, archetype, t, featured, objectives 
       if (Date.now() - mountTimeRef.current >= TAP_GUARD_MS) setVisible(false);
     };
     window.addEventListener('pointerdown', dismiss, true);
-    return () => window.removeEventListener('pointerdown', dismiss, true);
+    window.addEventListener('keydown', dismiss, true);
+    return () => {
+      window.removeEventListener('pointerdown', dismiss, true);
+      window.removeEventListener('keydown', dismiss, true);
+    };
   }, [visible]);
 
   if (!visible) return null;

@@ -17,6 +17,8 @@ import { computeCellFilter, createPortalAdjacency } from './hooks/blastCellFilte
 import { scanOffensiveSpecial, OFFENSIVE_RANK } from './utils/blastTileEffects';
 import { getTileTooltip } from './utils/blastTileTooltips';
 
+const TILE_TOOLTIP_HOLD_MS = 550;
+
 const ZONE_PREVIEW_TILES: Partial<Record<BlastTileType, 'bomb' | 'lightning' | 'prism' | 'magnet'>> = {
   bomb: 'bomb',
   lightning: 'lightning',
@@ -219,19 +221,25 @@ export const BlastBoard = memo(function BlastBoard({
     return map;
   }, [sequencerState]);
 
-  // Single-tile tooltip: when exactly 1 special tile is selected, show its info.
-  // Suppressed in multiplayer — the explanations are distracting clutter during a
-  // timed, competitive round.
+  // A finger held on one special tile asks what it does; a drag that moves on does not.
+  const singleKey = selectedCells.length === 1 ? `${selectedCells[0].row}-${selectedCells[0].col}` : null;
+  const [heldKey, setHeldKey] = useState<string | null>(null);
+  useEffect(() => {
+    setHeldKey(null);
+    if (!singleKey || isMultiplayer) return undefined;
+    const id = window.setTimeout(() => setHeldKey(singleKey), TILE_TOOLTIP_HOLD_MS);
+    return () => window.clearTimeout(id);
+  }, [singleKey, isMultiplayer]);
+
   const singleTileTooltip = useMemo(() => {
-    if (isMultiplayer) return null;
-    if (selectedCells.length !== 1) return null;
+    if (!heldKey || heldKey !== singleKey) return null;
     const c = selectedCells[0];
     const tile = tileStates[c.row]?.[c.col];
     if (!tile || tile.type === 'standard') return null;
     const tooltip = getTileTooltip(tile.type, t);
     if (!tooltip) return null;
     return { ...tooltip, row: c.row, col: c.col };
-  }, [isMultiplayer, selectedCells, tileStates, t]);
+  }, [heldKey, singleKey, selectedCells, tileStates, t]);
 
   // Only render overlay once we have tile states
   const hasTileStates = tileStates.length > 0 && tileStates[0]?.length > 0;
@@ -332,6 +340,7 @@ export const BlastBoard = memo(function BlastBoard({
       {/* Layer 3: Single-tile info tooltip (mobile-friendly) */}
       {singleTileTooltip && (
         <div
+          data-testid="blast-tile-tooltip"
           className="absolute left-1/2 -translate-x-1/2 z-30 px-3 py-1.5 rounded-neo bg-neo-navy/95 border border-neo-lime/40 shadow-hard-sm pointer-events-none animate-neo-pop"
           style={{
             top: `${(singleTileTooltip.row / gridSize) * 100}%`,

@@ -107,6 +107,13 @@ describe('BlastWaveIntro', () => {
     expect(container.textContent).toBe('');
   });
 
+  it('leaves when a desktop player starts typing after the guard period', () => {
+    const { container } = render(<BlastWaveIntro waveNumber={1} archetype="normal" t={mockT} />);
+    act(() => { jest.advanceTimersByTime(600); });
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'c' })); });
+    expect(container.textContent).toBe('');
+  });
+
   it('tap-to-start hint appears after 1s', () => {
     const { getByText, queryByText } = render(<BlastWaveIntro waveNumber={1} archetype="normal" t={mockT} />);
     // Hint should not be visible initially

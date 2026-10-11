@@ -72,10 +72,13 @@ async function openBlast(page: Page) {
 
 async function shippedWords(baseURL: string): Promise<Set<string>> {
   const res = await fetch(`${baseURL}/dicts/en.dict.gz`);
+  expect(res.ok, 'the shipped dictionary is served').toBeTruthy();
   const buf = Buffer.from(await res.arrayBuffer());
   let text: string;
   try { text = zlib.gunzipSync(buf).toString('utf8'); } catch { text = buf.toString('utf8'); }
-  return new Set(text.split('\n').map((w) => w.trim().toLowerCase()).filter(Boolean));
+  const words = new Set(text.split('\n').map((w) => w.trim().toLowerCase()).filter(Boolean));
+  expect(words.size, 'a real word list, not an error page').toBeGreaterThan(10_000);
+  return words;
 }
 
 test.describe('shared letter board', () => {
