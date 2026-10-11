@@ -3,11 +3,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { LaunchProvider, LaunchCurtain, useHomeLaunch, LAUNCH_HOLD_MS } from '../HomeLaunch';
+import { LaunchHost } from '../LaunchHost';
+import { dropLaunch } from '../launchStore';
 
 const push = vi.fn();
 const prefetch = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push, prefetch }),
+  usePathname: () => '/en',
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -50,15 +53,19 @@ describe('home launch', () => {
     mockReducedMotion(false);
   });
   afterEach(() => {
+    act(() => dropLaunch());
     vi.useRealTimers();
     vi.unstubAllGlobals();
   });
 
   it('covers the home with the launch curtain on tap and navigates after the hold', () => {
     render(
-      <LaunchProvider>
-        <LaunchLink />
-      </LaunchProvider>,
+      <>
+        <LaunchProvider>
+          <LaunchLink />
+        </LaunchProvider>
+        <LaunchHost />
+      </>,
     );
     fireEvent.click(screen.getByTestId('launch-link'), { clientX: 40, clientY: 60 });
 
@@ -87,9 +94,12 @@ describe('home launch', () => {
       );
     }
     render(
-      <LaunchProvider>
-        <ArtLink />
-      </LaunchProvider>,
+      <>
+        <LaunchProvider>
+          <ArtLink />
+        </LaunchProvider>
+        <LaunchHost />
+      </>,
     );
     const cardArt = screen.getByTestId('card-art');
     Object.defineProperty(cardArt, 'currentSrc', { value: 'http://localhost/_next/image?url=%2Fmodes%2Fcubes%2Fdaily.png&w=384&q=75' });
@@ -99,11 +109,33 @@ describe('home launch', () => {
     expect(curtainArt?.getAttribute('src')).toBe('http://localhost/_next/image?url=%2Fmodes%2Fcubes%2Fdaily.png&w=384&q=75');
   });
 
+  it('keeps the curtain up when the home unmounts for the next route', () => {
+    function Shell({ home }: { home: boolean }) {
+      return (
+        <>
+          {home && (
+            <LaunchProvider>
+              <LaunchLink />
+            </LaunchProvider>
+          )}
+          <LaunchHost />
+        </>
+      );
+    }
+    const { rerender } = render(<Shell home />);
+    fireEvent.click(screen.getByTestId('launch-link'));
+    rerender(<Shell home={false} />);
+    expect(screen.getAllByTestId('home-launch')).toHaveLength(1);
+  });
+
   it('leaves modified clicks (new tab) to the browser', () => {
     render(
-      <LaunchProvider>
-        <LaunchLink />
-      </LaunchProvider>,
+      <>
+        <LaunchProvider>
+          <LaunchLink />
+        </LaunchProvider>
+        <LaunchHost />
+      </>,
     );
     const evt = new MouseEvent('click', { bubbles: true, cancelable: true, metaKey: true });
     screen.getByTestId('launch-link').dispatchEvent(evt);
@@ -115,9 +147,12 @@ describe('home launch', () => {
   it('navigates at once for players who asked for reduced motion', () => {
     mockReducedMotion(true);
     render(
-      <LaunchProvider>
-        <LaunchLink />
-      </LaunchProvider>,
+      <>
+        <LaunchProvider>
+          <LaunchLink />
+        </LaunchProvider>
+        <LaunchHost />
+      </>,
     );
     fireEvent.click(screen.getByTestId('launch-link'));
     act(() => {

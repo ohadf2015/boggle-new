@@ -6,10 +6,13 @@ import { Swords } from 'lucide-react';
 import type { ModeCubeModel } from '@/lib/landing/modeMeta';
 import { HomeModeGrid } from '../HomeModeGrid';
 import { LaunchProvider, LAUNCH_HOLD_MS } from '../HomeLaunch';
+import { LaunchHost } from '../LaunchHost';
+import { dropLaunch } from '../launchStore';
 
 const push = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push, prefetch: vi.fn() }),
+  usePathname: () => '/en',
 }));
 vi.mock('next/image', () => ({
   // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
@@ -48,7 +51,10 @@ describe('HomeModeGrid', () => {
     vi.useFakeTimers();
     push.mockReset();
   });
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => {
+    act(() => dropLaunch());
+    vi.useRealTimers();
+  });
 
   it('lays out the live arena first and the next four modes as tiles', () => {
     render(<HomeModeGrid models={models} extras={extras} liveCount={42} />);
@@ -76,9 +82,12 @@ describe('HomeModeGrid', () => {
 
   it('tracks the tap and launches into the mode', () => {
     render(
-      <LaunchProvider>
-        <HomeModeGrid models={models} extras={extras} liveCount={0} />
-      </LaunchProvider>,
+      <>
+        <LaunchProvider>
+          <HomeModeGrid models={models} extras={extras} liveCount={0} />
+        </LaunchProvider>
+        <LaunchHost />
+      </>,
     );
     fireEvent.click(screen.getByTestId('mode-cube-anchor'));
     expect(models[0].onClick).toHaveBeenCalled();
@@ -92,9 +101,12 @@ describe('HomeModeGrid', () => {
   it('never launches a locked mode', () => {
     const locked = [model('arena', { locked: true, lockedMessage: 'offline' }), ...models.slice(1)];
     render(
-      <LaunchProvider>
-        <HomeModeGrid models={locked} extras={[]} liveCount={0} />
-      </LaunchProvider>,
+      <>
+        <LaunchProvider>
+          <HomeModeGrid models={locked} extras={[]} liveCount={0} />
+        </LaunchProvider>
+        <LaunchHost />
+      </>,
     );
     fireEvent.click(screen.getByTestId('mode-cube-anchor'));
     expect(screen.queryByTestId('home-launch')).toBeNull();

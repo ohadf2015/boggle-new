@@ -4,10 +4,13 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { HomeDailyHero } from '../HomeDailyHero';
 import { LaunchProvider, LAUNCH_HOLD_MS } from '../HomeLaunch';
+import { LaunchHost } from '../LaunchHost';
+import { dropLaunch } from '../launchStore';
 
 const push = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push, prefetch: vi.fn() }),
+  usePathname: () => '/en',
 }));
 vi.mock('next/image', () => ({
   // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
@@ -52,7 +55,10 @@ describe('HomeDailyHero', () => {
     push.mockReset();
     wheelWord = 'PUZZLE';
   });
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => {
+    act(() => dropLaunch());
+    vi.useRealTimers();
+  });
 
   it('rings the mascot with one wheel tile per letter of the localized word', () => {
     wheelWord = 'חידות';
@@ -63,9 +69,12 @@ describe('HomeDailyHero', () => {
 
   it('launches into the daily Word Wheel in the daily colour', () => {
     render(
-      <LaunchProvider>
-        <HomeDailyHero />
-      </LaunchProvider>,
+      <>
+        <LaunchProvider>
+          <HomeDailyHero />
+        </LaunchProvider>
+        <LaunchHost />
+      </>,
     );
     fireEvent.click(screen.getByTestId('home-daily-hero'));
     expect(screen.getByTestId('home-launch')).toBeInTheDocument();

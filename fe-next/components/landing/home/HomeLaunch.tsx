@@ -7,7 +7,6 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
   type CSSProperties,
   type MouseEvent,
   type ReactNode,
@@ -16,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import styles from './HomeLaunch.module.css';
+import { raiseLaunch } from './launchStore';
 
 export type LaunchTone = 'yellow' | 'lime' | 'pink' | 'cyan' | 'purple' | 'orange' | 'blue';
 
@@ -124,6 +124,7 @@ interface LaunchApi {
 }
 
 const LaunchContext = createContext<LaunchApi | null>(null);
+const LAUNCH_ID = 'home-card';
 
 /** null outside a LaunchProvider: callers keep their plain link navigation. */
 export function useHomeLaunch(): LaunchApi | null {
@@ -138,30 +139,13 @@ function prefersReducedMotion(): boolean {
   }
 }
 
-interface ActiveLaunch extends LaunchTarget {
-  origin: { x: number; y: number } | null;
-}
-
 export function LaunchProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [active, setActive] = useState<ActiveLaunch | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
   }, []);
-
-  // Back-forward cache restores the page with the curtain still up; a dead navigation must not strand it.
-  useEffect(() => {
-    if (!active) return;
-    const clear = (e: PageTransitionEvent) => e.persisted && setActive(null);
-    window.addEventListener('pageshow', clear);
-    const safety = setTimeout(() => setActive(null), 15000);
-    return () => {
-      clearTimeout(safety);
-      window.removeEventListener('pageshow', clear);
-    };
-  }, [active]);
 
   const start = useCallback(
     (e: MouseEvent<HTMLElement>, target: LaunchTarget) => {
@@ -175,7 +159,7 @@ export function LaunchProvider({ children }: { children: ReactNode }) {
           : { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
       const cardImg = e.currentTarget.querySelector('img');
       const art = target.art ? cardImg?.currentSrc || cardImg?.src || target.art : undefined;
-      setActive({ ...target, art, origin });
+      raiseLaunch({ id: LAUNCH_ID, tone: target.tone, title: target.title, art, origin });
       timer.current = setTimeout(() => {
         timer.current = null;
         router.push(target.href);
@@ -191,7 +175,6 @@ export function LaunchProvider({ children }: { children: ReactNode }) {
   return (
     <LaunchContext.Provider value={api}>
       {children}
-      {active && <LaunchCurtain tone={active.tone} title={active.title} art={active.art} origin={active.origin} />}
     </LaunchContext.Provider>
   );
 }

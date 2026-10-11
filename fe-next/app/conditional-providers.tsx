@@ -23,6 +23,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 const CommandPalette = lazy(() => import('@/components/CommandPalette'));
+const LaunchHost = lazy(() => import('@/components/landing/home/LaunchHost').then((m) => ({ default: m.LaunchHost })));
 // Named chunk so `/` does not parse socket/howler/game providers. Rendered
 // only when needsGameProviders is true; ssr stays on so game routes still SSR.
 const GameSpecificProviders = nextDynamic(
@@ -116,6 +117,7 @@ export function ConditionalProviders({ children, lang }: ConditionalProvidersPro
           )}
           <Suspense fallback={null}>
             <CommandPalette />
+            <LaunchHost />
           </Suspense>
         </EssentialProviders>
       </NuqsAdapter>
