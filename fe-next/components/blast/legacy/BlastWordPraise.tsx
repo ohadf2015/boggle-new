@@ -82,6 +82,11 @@ export default function BlastWordPraise({ wordLength, submitCount, t }: BlastWor
 
   return (
     <div className="absolute inset-x-0 top-[14%] pointer-events-none z-50 flex items-start justify-center">
+      <span
+        data-coin-avoid="true"
+        aria-hidden="true"
+        className="invisible absolute left-1/2 -top-3 h-[4.75rem] w-[min(80%,340px)] -translate-x-1/2"
+      />
       <AdaptiveAnimatePresence mode="wait">
         {visible && tier && (
           <AdaptiveMotion.div

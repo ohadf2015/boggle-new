@@ -79,4 +79,11 @@ describe('BlastWordPraise', () => {
     // Text should not change since submitCount didn't increment
     expect(container.querySelector('.text-neo-lime')).toBeNull();
   });
+
+  it('always marks the stamp footprint so flying coins route around it, even before it shows', () => {
+    const { container } = render(<BlastWordPraise wordLength={0} submitCount={0} t={mockT} />);
+    const zone = container.querySelector('[data-coin-avoid="true"]');
+    expect(zone).not.toBeNull();
+    expect(zone).toHaveAttribute('aria-hidden', 'true');
+  });
 });

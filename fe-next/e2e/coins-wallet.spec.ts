@@ -47,6 +47,31 @@ for (const [name, size] of [
       expect(box!.x + box!.width).toBeLessThanOrEqual(size.width);
       expect(box!.y).toBeGreaterThanOrEqual(0);
       expect(box!.y + box!.height).toBeLessThanOrEqual(size.height);
+      expect(box!.height).toBeGreaterThanOrEqual(name === 'desktop' ? 44 : 34);
+    });
+
+    test('a big word throws a +N stamp and its coins fly around the praise banner', async ({ page }) => {
+      await openBlast(page);
+      const board = await page.locator('[data-blast-board="true"]').boundingBox();
+      const source = { x: board!.x + board!.width * 0.3, y: board!.y + board!.height * 0.12 };
+      await page.evaluate(() => {
+        const w = window as unknown as { __bigBurst?: { coins: number; stamp: string; avoid: string | null } };
+        new MutationObserver(() => {
+          const b = document.querySelector('[data-testid="dom-coin-burst"]');
+          if (!b || w.__bigBurst) return;
+          w.__bigBurst = {
+            coins: b.querySelectorAll('[data-testid="flying-coin"]').length,
+            stamp: b.querySelector('[data-testid="coin-jackpot"]')?.textContent ?? '',
+            avoid: b.getAttribute('data-avoid'),
+          };
+        }).observe(document.body, { childList: true, subtree: true });
+      });
+      await fireUntilBurst(page, EARN, { amount: 8, inline: true, coins: 12, big: true, source });
+      const seen = await page.evaluate(() => (window as unknown as { __bigBurst?: { coins: number; stamp: string; avoid: string | null } }).__bigBurst);
+      expect(seen?.coins).toBe(12);
+      expect(seen?.stamp).toContain('+8');
+      const avoid = seen?.avoid ?? null;
+      expect(avoid).toMatch(/^-?\d+,-?\d+,-?\d+,-?\d+/);
     });
 
     test('a reward flies coins into the wallet and pops the reward counter', async ({ page }) => {

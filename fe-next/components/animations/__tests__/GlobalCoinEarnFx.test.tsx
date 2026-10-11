@@ -209,6 +209,27 @@ describe('GlobalCoinEarnFx', () => {
     expect(screen.queryByTestId('coin-hud-jackpot')).toBeNull();
   });
 
+  it('a big earn throws the +N jackpot stamp at the word and routes coins around marked areas', () => {
+    addCounter();
+    const zone = document.createElement('div');
+    zone.setAttribute('data-coin-avoid', 'true');
+    zone.getBoundingClientRect = () => ({ left: 60, top: 220, right: 330, bottom: 290, width: 270, height: 70, x: 60, y: 220, toJSON: () => ({}) }) as DOMRect;
+    document.body.appendChild(zone);
+    render(<GlobalCoinEarnFx rand={noSurprise} />);
+    act(() => {
+      window.dispatchEvent(new CustomEvent(COIN_EARNED_EVENT, { detail: { amount: 8, inline: true, coins: 12, big: true, source: { x: 110, y: 300 } } }));
+    });
+    expect(screen.getByTestId('coin-jackpot')).toHaveTextContent('+8');
+    expect(burst()).toHaveAttribute('data-avoid', '60,220,330,290');
+    expect(screen.getAllByTestId('flying-coin')).toHaveLength(12);
+  });
+
+  it('a small earn has no jackpot stamp', () => {
+    render(<GlobalCoinEarnFx rand={noSurprise} />);
+    fire({ amount: 3, source: { x: 10, y: 10 } });
+    expect(screen.queryByTestId('coin-jackpot')).toBeNull();
+  });
+
   it('falls back to viewport-top-right when no counter present', () => {
     render(<GlobalCoinEarnFx rand={noSurprise} />);
     fire({ amount: 25 });

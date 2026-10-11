@@ -3,12 +3,22 @@
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  padding-block: 0.25rem;
-  padding-inline: 0.375rem 0.625rem;
-  border: 2px solid #0b1530;
-  border-radius: 0.6rem;
-  background: #1b2a55;
-  box-shadow: 3px 3px 0 0 #0b1530;
+  min-height: 2.25rem;
+  padding-block: 0.125rem;
+  padding-inline: 0.25rem 0.75rem;
+  border: 3px solid #0b1530;
+  border-radius: 999px;
+  background: #ffc53d;
+  color: #0b1530;
+  box-shadow:
+    3px 3px 0 0 #0b1530,
+    inset 0 3px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -3px 0 rgba(150, 90, 0, 0.25);
+}
+
+.chip svg {
+  width: 26px;
+  height: 26px;
 }
 
 .still {
@@ -27,7 +37,7 @@
   unicode-bidi: isolate;
   --cell: 1.3em;
   line-height: var(--cell);
-  text-shadow: 1px 1px 0 #0b1530;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 .reel {
@@ -74,9 +84,9 @@
 .ring {
   position: absolute;
   inset: -4px;
-  border-radius: 0.75rem;
-  border: 3px solid #ffc53d;
-  box-shadow: 0 0 18px #ffc53d;
+  border-radius: 999px;
+  border: 3px solid #fff6d5;
+  box-shadow: 0 0 22px 4px #ffc53d;
   pointer-events: none;
   opacity: 0;
   animation: ring 620ms ease-out;
@@ -88,12 +98,12 @@
   inset-inline-end: -2px;
   margin-top: 4px;
   padding: 0 0.375rem;
-  border: 2px solid #0b1530;
+  border: 2px solid #ffc53d;
   border-radius: 0.4rem;
-  background: #ffc53d;
-  color: #0b1530;
+  background: #0b1530;
+  color: #ffc53d;
   font-weight: 900;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   line-height: 1.25rem;
   white-space: nowrap;
   box-shadow: 2px 2px 0 0 #0b1530;
@@ -114,6 +124,7 @@
 }
 
 .spent {
+  border-color: #0b1530;
   background: #ff5c8a;
   color: #fff;
 }
@@ -159,15 +170,23 @@
 
 @media (min-width: 1024px) {
   .chip {
-    padding-block: 0.375rem;
-    padding-inline: 0.5rem 0.875rem;
-    box-shadow: 4px 4px 0 0 #0b1530;
+    min-height: 3rem;
+    padding-block: 0.25rem;
+    padding-inline: 0.375rem 1.125rem;
+    box-shadow:
+      5px 5px 0 0 #0b1530,
+      inset 0 4px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -4px 0 rgba(150, 90, 0, 0.25);
   }
   .chip svg {
-    width: 30px;
-    height: 30px;
+    width: 38px;
+    height: 38px;
   }
   .chip .reels {
-    font-size: 1.5rem;
+    font-size: 1.875rem;
+  }
+  .gain {
+    font-size: 1.05rem;
+    line-height: 1.5rem;
   }
 }

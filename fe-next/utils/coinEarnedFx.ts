@@ -18,18 +18,21 @@ export interface CoinEarnedDetail {
   inline?: boolean;
   /** How many coins fly (defaults to the reward plan's count for the amount). */
   coins?: number;
+  /** A big word: the flight throws a bigger payoff at the source. */
+  big?: boolean;
 }
 
 export function emitCoinEarned(
   amount: number,
   source?: { x: number; y: number },
-  opts?: { inline?: boolean; coins?: number },
+  opts?: { inline?: boolean; coins?: number; big?: boolean },
 ): void {
   if (!(amount > 0)) return;
   if (typeof window === 'undefined') return;
   const detail: CoinEarnedDetail = source ? { amount, source } : { amount };
   if (opts?.inline) detail.inline = true;
   if (opts?.coins) detail.coins = opts.coins;
+  if (opts?.big) detail.big = true;
   window.dispatchEvent(new CustomEvent<CoinEarnedDetail>(COIN_EARNED_EVENT, { detail }));
 }
 
@@ -62,6 +65,15 @@ export function findCoinCounter(): HTMLElement | null {
     if (r.width > 0 && r.height > 0) return el;
   }
   return null;
+}
+
+/** On-screen areas flying coins must not cover (marked `data-coin-avoid="true"`, e.g. the praise stamp). */
+export function findCoinAvoidRects(): Array<{ left: number; top: number; right: number; bottom: number }> {
+  if (typeof document === 'undefined') return [];
+  return [...document.querySelectorAll<HTMLElement>('[data-coin-avoid="true"]')]
+    .map((el) => el.getBoundingClientRect())
+    .filter((r) => r.width > 0 && r.height > 0)
+    .map((r) => ({ left: r.left, top: r.top, right: r.right, bottom: r.bottom }));
 }
 
 let coinsLandAt = 0;

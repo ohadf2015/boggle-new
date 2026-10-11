@@ -7,10 +7,12 @@ import { useCoinContext } from '@/contexts/CoinContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCelebrationIntensity } from '@/contexts/AccessibilityContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { COIN_EARNED_EVENT, COIN_SPENT_EVENT, findCoinCounter, markCoinsInFlight, selectCoinFxMode, type CoinEarnedDetail } from '@/utils/coinEarnedFx';
+import { COIN_EARNED_EVENT, COIN_SPENT_EVENT, findCoinAvoidRects, findCoinCounter, markCoinsInFlight, selectCoinFxMode, type CoinEarnedDetail } from '@/utils/coinEarnedFx';
 import { planCoinReward, type CoinRewardTier } from '@/lib/audio/coinSoundPlan';
 import { DomCoinBurst, coinFlightTiming } from './DomCoinBurst';
 import { CoinRewardHud } from './CoinRewardHud';
+import type { Rect } from './coinFlightPath';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 
 // Re-export for back-compat with existing importers.
 export { COIN_EARNED_EVENT };
@@ -53,6 +55,9 @@ interface ActiveBurst {
   source: Point;
   target: Point;
   count: number;
+  avoid: Rect[];
+  big: boolean;
+  amountLabel: string;
 }
 
 interface ActiveMoment {
@@ -98,6 +103,8 @@ export const GlobalCoinEarnFx: React.FC<GlobalCoinEarnFxProps> = ({ rand = Math.
   coinsRef.current = coins;
   const randRef = useRef(rand);
   randRef.current = rand;
+  const languageRef = useRef(language);
+  languageRef.current = language;
 
   const removeBurst = useCallback((id: number) => {
     setBursts((b) => b.filter((x) => x.id !== id));
@@ -146,7 +153,9 @@ export const GlobalCoinEarnFx: React.FC<GlobalCoinEarnFxProps> = ({ rand = Math.
 
       if (mode === 'dom') {
         const id = (idRef.current += 1);
-        setBursts((b) => [...b, { id, source, target, count: coinCount }]);
+        const big = !isSpend && detail?.big === true;
+        const amountLabel = `+${safeToLocaleString(amount, languageRef.current)}`;
+        setBursts((b) => [...b, { id, source, target, count: coinCount, avoid: isSpend ? [] : findCoinAvoidRects(), big, amountLabel }]);
       }
 
       if (detail?.inline && !isSpend) return;
@@ -197,6 +206,9 @@ export const GlobalCoinEarnFx: React.FC<GlobalCoinEarnFxProps> = ({ rand = Math.
           source={b.source}
           target={b.target}
           count={b.count}
+          avoid={b.avoid}
+          big={b.big}
+          amountLabel={b.amountLabel}
           onDone={() => removeBurst(b.id)}
         />
       ))}
