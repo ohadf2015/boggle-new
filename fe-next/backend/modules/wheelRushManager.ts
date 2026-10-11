@@ -18,7 +18,7 @@ import {
 } from '@/shared/constants/wheelRushConstants';
 import { calculateWordScoreByLength } from '@/shared/utils/scoring';
 import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
-import { getCachedTrie, getTrieNode, type TrieNode } from './boggleSolver';
+import { getCachedTrie, getTrieNode } from './boggleSolver';
 import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 
 /** Per-char sofit→regular normalization for Hebrew. Mirrors SP wordWheelGeneration:87. */
@@ -146,7 +146,7 @@ function bumpBestWord(
   if (word.length > stats.bestWord.length) stats.bestWord = word;
 }
 
-/** True if word is in the language trie (node.isWord). */
+/** True if word is in the language word index. */
 function isInDictionary(word: string, language: Language): boolean {
   const trie = getCachedTrie(language);
   if (!trie) return false;

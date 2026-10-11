@@ -263,73 +263,6 @@ describe('SharedFxApp', () => {
     });
   });
 
-  describe('spawnCoinStream', () => {
-    it('is no-op when not mounted (SSR / pre-mount)', () => {
-      expect(SharedFxApp.getActiveCoinStreamCount()).toBe(0);
-      expect(() =>
-        SharedFxApp.spawnCoinStream({
-          source: { x: 100, y: 400 },
-          target: { x: 300, y: 40 },
-          count: 6,
-        })
-      ).not.toThrow();
-      expect(SharedFxApp.getActiveCoinStreamCount()).toBe(0);
-    });
-
-    it('spawns stream projectiles after mount', async () => {
-      await SharedFxApp.mount(parent, { maxParticles: 20, prefersReducedMotion: false });
-      SharedFxApp.spawnCoinStream({
-        source: { x: 100, y: 400 },
-        target: { x: 300, y: 40 },
-        count: 5,
-      });
-      expect(SharedFxApp.getActiveCoinStreamCount()).toBe(5);
-    });
-
-    it('is no-op when prefersReducedMotion is true', async () => {
-      await SharedFxApp.mount(parent, { maxParticles: 20, prefersReducedMotion: true });
-      SharedFxApp.spawnCoinStream({
-        source: { x: 0, y: 0 },
-        target: { x: 100, y: 100 },
-        count: 10,
-      });
-      expect(SharedFxApp.getActiveCoinStreamCount()).toBe(0);
-    });
-
-    it('caps count at device maxParticles ceiling', async () => {
-      await SharedFxApp.mount(parent, { maxParticles: 4, prefersReducedMotion: false });
-      SharedFxApp.spawnCoinStream({
-        source: { x: 0, y: 0 },
-        target: { x: 100, y: 100 },
-        count: 20,
-      });
-      expect(SharedFxApp.getActiveCoinStreamCount()).toBeLessThanOrEqual(4);
-    });
-
-    it('clears all active streams on unmount', async () => {
-      await SharedFxApp.mount(parent, { maxParticles: 20, prefersReducedMotion: false });
-      SharedFxApp.spawnCoinStream({
-        source: { x: 0, y: 0 },
-        target: { x: 100, y: 100 },
-        count: 6,
-      });
-      expect(SharedFxApp.getActiveCoinStreamCount()).toBeGreaterThan(0);
-      SharedFxApp.unmount();
-      expect(SharedFxApp.getActiveCoinStreamCount()).toBe(0);
-    });
-
-    it('accepts {source,target,count} shape', async () => {
-      await SharedFxApp.mount(parent);
-      expect(() =>
-        SharedFxApp.spawnCoinStream({
-          source: { x: 10, y: 20 },
-          target: { x: 30, y: 40 },
-          count: 3,
-        })
-      ).not.toThrow();
-    });
-  });
-
   describe('spawnFirework', () => {
     it('is no-op when not mounted', () => {
       expect(SharedFxApp.getActiveFireworkCount()).toBe(0);
@@ -460,7 +393,7 @@ describe('SharedFxApp', () => {
         ticker: { listeners: Array<(t: { deltaMS: number }) => void> };
       };
       const tickerFn = app.ticker.listeners[0];
-      SharedFxApp.spawnCoinStream({ source: { x: 0, y: 0 }, target: { x: 10, y: 10 }, count: 3 });
+      SharedFxApp.spawnFirework({ x: 10, y: 10, color: 0xffffff, size: 20 });
       SharedFxApp.unmount();
       // A late frame must not touch destroyed graphics.
       expect(() => tickerFn?.({ deltaMS: 16 })).not.toThrow();

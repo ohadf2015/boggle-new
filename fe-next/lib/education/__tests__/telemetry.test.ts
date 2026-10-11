@@ -59,6 +59,8 @@ import {
   trackTeacherFirstAssignmentCtaViewed,
   trackTeacherFirstAssignmentCtaClicked,
   trackEduAssignmentStartLiveClicked,
+  trackEduAssignmentReminderShown,
+  trackEduAssignmentOverdue,
   trackTeacherHqProgressViewed,
   trackTeacherHqUpgradeClicked,
   trackTeacherAssignmentReportViewed,
@@ -119,6 +121,32 @@ describe('education telemetry', () => {
     expect(captureMock).toHaveBeenCalledWith('edu_error', {
       surface: 'record_xp',
       code: 'rpc_error',
+    });
+  });
+
+  it('assignment reminder shown carries the assignment and hours until due', () => {
+    trackEduAssignmentReminderShown({ assignmentId: 'asg-1', classroomId: 'cls-1', hoursUntilDue: 4 });
+    expect(captureMock).toHaveBeenCalledWith('assignment_reminder_shown', {
+      assignment_id: 'asg-1',
+      hours_until_due: 4,
+      classroom_id: 'cls-1',
+    });
+  });
+
+  it('assignment reminder shown omits classroom_id when unknown', () => {
+    trackEduAssignmentReminderShown({ assignmentId: 'asg-2', hoursUntilDue: 1 });
+    expect(captureMock).toHaveBeenCalledWith('assignment_reminder_shown', {
+      assignment_id: 'asg-2',
+      hours_until_due: 1,
+    });
+  });
+
+  it('assignment overdue carries the assignment and days overdue', () => {
+    trackEduAssignmentOverdue({ assignmentId: 'asg-1', classroomId: 'cls-1', daysOverdue: 2 });
+    expect(captureMock).toHaveBeenCalledWith('assignment_overdue', {
+      assignment_id: 'asg-1',
+      days_overdue: 2,
+      classroom_id: 'cls-1',
     });
   });
 

@@ -47,6 +47,12 @@ import { ClassSheet } from './ClassSheet';
 import { FirstDayCard } from './FirstDayCard';
 import { buildFirstDayGoals } from './firstDayGoals';
 import { nextOpenAssignment } from '@/components/student/nextOpenAssignment';
+import { AssignmentDueCard } from './AssignmentDueCard';
+import {
+  classifyAssignmentDue,
+  isOverdueNudgeDue,
+  markOverdueNudged,
+} from '@/lib/education/assignmentDueReminder';
 import { InkPanel } from './chrome';
 import { useNodeLabel } from './AcademyNodeButton';
 import { cn } from '@/lib/utils';
@@ -183,6 +189,25 @@ export function AcademyHub(props: AcademyHubProps) {
     () => nextOpenAssignment(data.lessons, language, classroomId),
     [data.lessons, language, classroomId],
   );
+  // Due-soon card: the next open assignment lands within 24h. Overdue nudge:
+  // only when its once-per-day throttle allows it; marking happens in the
+  // effect below, after the card has actually mounted.
+  const dueCard = useMemo(() => {
+    const dueDate = nextAssignment?.dueDate;
+    if (!nextAssignment || !dueDate) return null;
+    const kind = classifyAssignmentDue(dueDate);
+    if (!kind) return null;
+    if (kind === 'overdue') {
+      const storage = typeof window !== 'undefined' ? window.localStorage : null;
+      if (!isOverdueNudgeDue(storage, nextAssignment.assignmentId)) return null;
+    }
+    return { kind, dueDate };
+  }, [nextAssignment]);
+  useEffect(() => {
+    if (!dueCard || dueCard.kind !== 'overdue' || !nextAssignment) return;
+    const storage = typeof window !== 'undefined' ? window.localStorage : null;
+    markOverdueNudged(storage, nextAssignment.assignmentId);
+  }, [dueCard, nextAssignment]);
   const mascotMood = academyMascotMood({
     kind: action.kind,
     streakAtRisk: data.streakAtRisk,
@@ -305,6 +330,18 @@ export function AcademyHub(props: AcademyHubProps) {
             {ready && (
               <div className="mx-auto mt-1.5 w-full max-w-xl">
                 <FirstDayCard goals={firstDayGoals} hasClass={!!classroomId} />
+                {dueCard && nextAssignment && (
+                  <div className="mt-1.5">
+                    <AssignmentDueCard
+                      assignmentId={nextAssignment.assignmentId}
+                      classroomId={classroomId}
+                      title={nextAssignment.title}
+                      href={nextAssignment.href}
+                      dueDate={dueCard.dueDate}
+                      kind={dueCard.kind}
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>

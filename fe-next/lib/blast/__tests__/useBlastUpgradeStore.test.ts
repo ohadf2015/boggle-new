@@ -1,61 +1,44 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
-
-vi.mock('@/utils/coinManager', () => ({
-  getCoins: vi.fn(() => 100000),
-  spendCoins: vi.fn(() => true),
-}));
-
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useBlastUpgradeStore } from '../useBlastUpgradeStore';
-import { useBlastGems } from '../useBlastGems';
-import { getUpgrade } from '../blastUpgradeCatalog';
-import * as coinManager from '@/utils/coinManager';
+import { getUpgrade, upgradeCost } from '../blastUpgradeCatalog';
+
+const paid = () => vi.fn(async () => true);
 
 describe('useBlastUpgradeStore', () => {
-  beforeEach(() => {
-    useBlastUpgradeStore.getState().reset();
-    useBlastGems.getState().reset();
-    vi.clearAllMocks();
-    (coinManager.getCoins as Mock).mockReturnValue(100000);
-    (coinManager.spendCoins as Mock).mockReturnValue(true);
-  });
+  beforeEach(() => useBlastUpgradeStore.getState().reset());
 
-  it('buys a coin-priced upgrade when affordable and bumps its level', () => {
-    expect(useBlastUpgradeStore.getState().buy('extraMoves')).toBe(true);
+  it('buys an upgrade through the coin wallet spend and bumps its level', async () => {
+    const spend = paid();
+    expect(await useBlastUpgradeStore.getState().buy('extraMoves', spend)).toBe(true);
     expect(useBlastUpgradeStore.getState().levelOf('extraMoves')).toBe(1);
-    expect(coinManager.spendCoins).toHaveBeenCalledOnce();
+    expect(spend).toHaveBeenCalledWith(upgradeCost(getUpgrade('extraMoves')!, 0), 'blast_upgrade', { id: 'extraMoves', level: 1 });
   });
 
-  it('refuses a coin upgrade when the balance is too low (no level change)', () => {
-    (coinManager.getCoins as Mock).mockReturnValue(0);
-    expect(useBlastUpgradeStore.getState().buy('extraMoves')).toBe(false);
+  it('every upgrade, including the ones gems used to buy, is paid in coins', async () => {
+    for (const id of ['comboSurge', 'safetyNet'] as const) {
+      const spend = paid();
+      expect(await useBlastUpgradeStore.getState().buy(id, spend)).toBe(true);
+      expect(spend).toHaveBeenCalledOnce();
+    }
+  });
+
+  it('a refused spend leaves the level untouched', async () => {
+    const spend = vi.fn(async () => false);
+    expect(await useBlastUpgradeStore.getState().buy('extraMoves', spend)).toBe(false);
     expect(useBlastUpgradeStore.getState().levelOf('extraMoves')).toBe(0);
-    expect(coinManager.spendCoins).not.toHaveBeenCalled();
   });
 
-  it('buys a gem-priced upgrade from the gem wallet', () => {
-    useBlastGems.getState().addGems(100);
-    expect(useBlastUpgradeStore.getState().buy('comboSurge')).toBe(true);
-    expect(useBlastUpgradeStore.getState().levelOf('comboSurge')).toBe(1);
-    expect(useBlastGems.getState().gems).toBeLessThan(100);
-    // Gem purchases must NOT touch the coin balance.
-    expect(coinManager.spendCoins).not.toHaveBeenCalled();
-  });
-
-  it('refuses a gem upgrade when gems are short', () => {
-    expect(useBlastUpgradeStore.getState().buy('comboSurge')).toBe(false);
-    expect(useBlastUpgradeStore.getState().levelOf('comboSurge')).toBe(0);
-  });
-
-  it('stops selling at maxLevel', () => {
-    useBlastGems.getState().addGems(1_000_000);
+  it('stops selling at maxLevel without charging', async () => {
     const def = getUpgrade('safetyNet')!;
-    for (let i = 0; i < def.maxLevel; i++) useBlastUpgradeStore.getState().buy('safetyNet');
+    for (let i = 0; i < def.maxLevel; i++) await useBlastUpgradeStore.getState().buy('safetyNet', paid());
     expect(useBlastUpgradeStore.getState().levelOf('safetyNet')).toBe(def.maxLevel);
-    expect(useBlastUpgradeStore.getState().buy('safetyNet')).toBe(false);
+    const spend = paid();
+    expect(await useBlastUpgradeStore.getState().buy('safetyNet', spend)).toBe(false);
+    expect(spend).not.toHaveBeenCalled();
   });
 
-  it('effects() reflects owned levels', () => {
-    useBlastUpgradeStore.getState().buy('extraMoves');
+  it('effects() reflects owned levels', async () => {
+    await useBlastUpgradeStore.getState().buy('extraMoves', paid());
     expect(useBlastUpgradeStore.getState().effects().startingMovesBonus).toBeGreaterThan(0);
   });
 });

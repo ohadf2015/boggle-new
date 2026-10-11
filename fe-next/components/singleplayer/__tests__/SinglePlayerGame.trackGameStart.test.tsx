@@ -78,10 +78,6 @@ vi.mock('../game', () => ({
 
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => null }));
 vi.mock('@/components/achievements', () => ({ useAchievementQueue: () => ({ queueAchievement: vi.fn() }) }));
-vi.mock('@/components/game/FirstTimeEncouragement', () => ({ __esModule: true, default: () => null }));
-vi.mock('@/hooks/useFirstTimeEncouragement', () => ({
-  useFirstTimeEncouragement: () => ({ currentTrigger: null, triggerEncouragement: vi.fn(), dismiss: vi.fn() }),
-}));
 vi.mock('@/hooks/useIdleDetection', () => ({ useIdleDetection: () => ({ reportActivity: vi.fn() }) }));
 
 import SinglePlayerGame from '../SinglePlayerGame';

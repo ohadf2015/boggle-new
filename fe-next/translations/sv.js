@@ -1937,6 +1937,30 @@ const sv = {
     "cta": "Nu kör vi",
     "ctaWait": "{{seconds}} s"
   },
+  "firstLesson": {
+    "skipLabel": "Hoppa över lektionen",
+    "skip": "Hoppa över",
+    "progressLabel": "Lektionens framsteg",
+    "trace": "Dra över ordet",
+    "findAny": "Hitta nu ett eget ord",
+    "findLength": "Sikta på {{count}}+ bokstäver",
+    "inARow": "{{count}} i rad",
+    "praise": {
+      "nice": "Snyggt!",
+      "great": "Grymt!",
+      "awesome": "Toppen!",
+      "amazing": "Galet bra!"
+    },
+    "oops": "Inte riktigt",
+    "tryWord": "Testa {{word}}",
+    "found": "Du hittade {{word}}",
+    "complete": "Lektionen klar!",
+    "completeSub": "Du har fattat grejen. Resten av rundan är din.",
+    "statWords": "Ord",
+    "statPoints": "Poäng",
+    "statStreak": "I rad",
+    "keepPlaying": "Spela vidare"
+  },
   "modeCoach": {
     "skip": "Hoppa över",
     "next": "Nästa",
@@ -9699,6 +9723,41 @@ const sv = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "showBoard": "Dagens ranking",
+      "hideBoard": "Dölj ranking",
+      "moreBoards": "Fler"
+    },
+    "rank": {
+      "title": "Nivåer",
+      "open": "Alla nivåer",
+      "toNext": "{count} kvar till {rank}",
+      "top": "Högsta nivån. Legend!",
+      "reached": "Dagens nivå",
+      "warmUp": "Uppvärmning",
+      "spinning": "Snurrar",
+      "onARoll": "På gång",
+      "sharp": "Vass",
+      "hotStreak": "Het",
+      "wordsmith": "Ordsmed",
+      "whirlwind": "Virvelvind",
+      "wizard": "Trollkarl",
+      "legend": "Legend"
+    },
+    "praise": {
+      "nice": "Snyggt!",
+      "great": "Grymt!",
+      "superb": "Toppen!",
+      "brilliant": "Briljant!",
+      "fullWheel": "Hela hjulet!"
+    },
+    "strip": {
+      "empty": "Dina ord landar här",
+      "label": "Hittade {count}",
+      "all": "Alla ord",
+      "close": "Stäng",
+      "longest": "Längsta"
+    },
     "youFoundEverything": "Du hittade varje ord de hittade. Snyggt.",
     "title": "Ordhjul",
     "loading": "Laddar Ordhjul...",
@@ -9707,7 +9766,6 @@ const sv = {
     "description": "Varje ord måste använda mittenbokstaven och vara minst 3 bokstäver långt",
     "centerLetterRule": "Måste använda mittenbokstaven",
     "minLetters": "Min {min} bokstäver",
-    "wordsFound": "{count} ord hittade",
     "scoreLabel": "Poäng",
     "timeLeft": "Tid kvar",
     "closeRace": "Jämnt lopp!",
@@ -9737,10 +9795,6 @@ const sv = {
     "removeLetter": "Ta bort bokstav",
     "foundWords": "Hittade ord",
     "possibleWords": "Möjliga",
-    "excellent": "Utmärkt!",
-    "great": "Bra jobbat!",
-    "good": "Bra försök!",
-    "tryAgain": "Fortsätt öva!",
     "longest": "Längsta",
     "viewSubmittedWords": "Visa inskickade ord",
     "viewWordsYouMissed": "Visa ord du missade",
@@ -9748,7 +9802,6 @@ const sv = {
     "youMissedTitle": "Ord du missade",
     "noWordsSubmitted": "Inga ord inskickade ännu",
     "results": {
-      "title": "Ordhjulsresultat",
       "wordsFound": "Hittade ord",
       "score": "Poäng",
       "time": "Tid",
@@ -13671,11 +13724,17 @@ const sv = {
       "reelLabel": "Höjdpunkter",
       "bestWord": "Bästa ord"
     },
+    "wallet": {
+      "coins": "{count} mynt"
+    },
     "store": {
       "title": "Uppgraderingsbutik",
       "close": "Klart",
       "buy": "Köp",
       "max": "MAXAD",
+      "pay": "Betala",
+      "short": "Behöver",
+      "confirm": "Betala {cost} mynt",
       "extraMoves": {
         "name": "Extra drag",
         "desc": "Börja med +1 drag per nivå"
@@ -13778,6 +13837,17 @@ const sv = {
     "hub": {
       "playZone": "Spela",
       "learnZone": "Lär dig"
+    },
+    "assignments": {
+      "dueInHours": "Förfaller om {hours}t",
+      "dueInMinutes": "Förfaller om {minutes}m",
+      "overdueBy": "{days}d försenad",
+      "doIt": "Gör det"
+    },
+    "classView": {
+      "playAssignment": "Spela {title}",
+      "playAssignmentDueSoon": "Snart · Spela {title}",
+      "playAssignmentOverdue": "Försenad · Spela {title}"
     },
     "welcome": {
       "title": "Välkommen till ditt klassrum!",
@@ -14279,6 +14349,7 @@ const sv = {
       "trialEndedTitle": "Provperioden är slut. Uppgradera för att behålla klasserna",
       "trialEndedBody": "Behåll obegränsade klasser och utskrivbara rapporter för 9 $/månad. Det här är inte en ny gratis provperiod.",
       "trialEndedCta": "Behåll Pro – 9 $/mån",
+      "trialReactivateCta": "Återaktivera",
       "trialLifecycleTitle": "{count} dagar kvar av din Teacher Pro-provperiod",
       "trialLifecycleTitleToday": "Din Teacher Pro-provperiod slutar idag",
       "trialLifecycleTitleOne": "1 dag kvar av din Teacher Pro-provperiod",
@@ -14719,7 +14790,15 @@ const sv = {
       "starterColors": "Färger och former",
       "starterColorsDesc": "Färger och grundformer för nybörjare",
       "starterFood": "Mat",
-      "starterFoodDesc": "Vardagliga matord för första läxan"
+      "starterFoodDesc": "Vardagliga matord för första läxan",
+      "wordCountGoal": "Ordantal",
+      "wordCountGoalHint": "Eleverna hittar så här många unika ord till förfallodagen.",
+      "wordCountLabel": "Hur många ord?",
+      "wordListGoal": "Ordlista",
+      "wordListGoalHint": "Klistra in ord, ett per rad eller kommaseparerade.",
+      "wordListPlaceholder": "katt, hund, fisk",
+      "wordGoalMissing": "Lägg till ett ordmål eller en lista och ett datum",
+      "findNWords": "Hitta {{count}} ord"
     },
     "completion": {
       "overallProgress": "Övergripande framsteg",
@@ -14910,6 +14989,7 @@ const sv = {
         "empty": "Inga uppgifter i den här klassen ännu",
         "statusCompleted": "Klar",
         "statusMissing": "Saknas",
+        "statusOverdue": "Försenad",
         "exportCsv": "Exportera CSV",
         "exportCsvPro": "Exportera CSV med Teacher Pro {{price}}",
         "fileName": "{{name}} – framsteg i uppgifter",
@@ -18068,14 +18148,6 @@ const sv = {
       "epic": "Episk",
       "legendary": "Legendarisk"
     }
-  },
-  "encouragement": {
-    "gameStart": "Kör! 🎯",
-    "firstWord": "Snyggt! Fortsätt hitta ord!",
-    "longWord": "Fantastiskt! Långa ord ger mer!",
-    "combo": "Kombo! Nu rullar det!",
-    "halfway": "Halvvägs, fortsätt!",
-    "almostDone": "Slutspurten! Hitta fler ord!"
   },
   "toast": {
     "found": "HITTAD!",

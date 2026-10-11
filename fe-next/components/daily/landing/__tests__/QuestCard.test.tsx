@@ -67,6 +67,13 @@ describe('QuestCard', () => {
     expect(screen.getByText('Timed Quest')).toBeInTheDocument();
   });
 
+  test('says the time mode in the tagline line, not as a separate chip', () => {
+    renderWithProviders(<QuestCard {...defaultProps} />);
+    const label = screen.getByText('Timed Quest');
+    expect(label.closest('[class*="rounded-full"]')).toBeNull();
+    expect(label.closest('p')?.textContent).toContain('Find words before time runs out!');
+  });
+
   test('renders button text', () => {
     renderWithProviders(<QuestCard {...defaultProps} />);
 

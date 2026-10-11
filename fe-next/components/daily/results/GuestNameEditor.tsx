@@ -57,14 +57,16 @@ export function GuestNameEditor({ name, guestFingerprint, onRenamed, t }: GuestN
 
   if (!editing) {
     return (
-      <div className="flex items-center justify-center gap-2 text-sm text-neo-white">
-        <span className="text-neo-white/70">{t('wordHunt.results.guestNameLabel', 'On the leaderboard as')}</span>
-        <span className="font-bold truncate max-w-[12rem]">{name}</span>
+      <div className="w-full flex items-center gap-2 mb-2 px-3 py-2 rounded-neo border-2 border-neo-white/10 bg-neo-black/25 text-sm text-neo-white">
+        <span className="min-w-0 flex-1 truncate">
+          <span className="text-neo-white/70">{t('wordHunt.results.guestNameLabel', 'On the leaderboard as')}</span>{' '}
+          <span className="font-bold">{name}</span>
+        </span>
         <button
           type="button"
           onClick={startEditing}
           disabled={!guestFingerprint}
-          className="px-2 py-0.5 rounded-neo border-2 border-neo-cyan text-neo-cyan text-xs font-bold shadow-hard-sm disabled:opacity-50"
+          className="shrink-0 px-2 py-0.5 rounded-neo border-2 border-neo-cyan text-neo-cyan text-xs font-bold shadow-hard-sm disabled:opacity-50"
         >
           {t('playerView.editName', 'Change name')}
         </button>

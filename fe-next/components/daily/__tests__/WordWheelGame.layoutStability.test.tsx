@@ -98,10 +98,8 @@ describe('WordWheelGame — layout stability of found-words slot', () => {
     const slot = container.querySelector('[data-testid="found-words-slot"]');
     expect(slot).toBeTruthy();
     const cls = slot!.className;
-    // Reserved cap so wheel cluster doesn't shrink when first word lands.
-    // Tailwind class is concatenated; substring check tolerates ordering.
-    expect(cls).toMatch(/h-\[112px\]/);
-    expect(cls).toMatch(/sm:h-\[136px\]/);
+    expect(cls).toMatch(/\bh-11\b/);
+    expect(cls).toMatch(/\bshrink-0\b/);
   });
 
   it('keeps the slot height stable after a word is found', async () => {
