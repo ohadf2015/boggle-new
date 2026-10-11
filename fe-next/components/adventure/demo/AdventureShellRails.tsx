@@ -9,7 +9,6 @@ interface AdventureLeftRailProps {
   totalSecs: number;
   score: number;
   words: readonly string[];
-  /** Star thresholds; the bar fills toward the top star. */
   stars: readonly number[];
 }
 
