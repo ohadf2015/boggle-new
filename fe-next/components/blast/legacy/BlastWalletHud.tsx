@@ -1,95 +1,152 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Coins, Gem } from 'lucide-react';
+import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
-import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { CoinArt } from '@/components/ui/CoinArt';
+import { msUntilCoinsLand } from '@/utils/coinEarnedFx';
+import styles from './BlastWalletHud.module.css';
 
-interface BlastWalletHudProps {
-  coins: number;
-  gems: number;
-  /** Hide the gem chip when the mode never awards gems (keeps the HUD tight). */
-  showGems?: boolean;
-}
-
-/** Ease a displayed integer toward `target` — the slot-machine count-up roll. */
-function useCountUp(target: number, ms = 480): number {
-  const [display, setDisplay] = useState(target);
-  const fromRef = useRef(target);
-  const rafRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    const from = fromRef.current;
-    if (from === target) return;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / ms);
-      const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
-      setDisplay(Math.round(from + (target - from) * eased));
-      if (t < 1) {
-        rafRef.current = requestAnimationFrame(tick);
-      } else {
-        fromRef.current = target;
-      }
-    };
-    rafRef.current = requestAnimationFrame(tick);
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      fromRef.current = target;
-    };
-  }, [target, ms]);
-
-  return display;
-}
-
-interface ChipProps {
-  value: number;
-  icon: typeof Coins;
-  accent: string;
-  label: string;
-}
-
-function WalletChip({ value, icon: Icon, accent, label }: ChipProps) {
-  const { language } = useLanguage();
-  const shown = useCountUp(value);
-  const prevRef = useRef(value);
-  const [creditKey, setCreditKey] = useState(0);
-
-  useEffect(() => {
-    if (value > prevRef.current) setCreditKey(k => k + 1);
-    prevRef.current = value;
-  }, [value]);
-
-  return (
-    <AdaptiveMotion.div
-      key={creditKey}
-      className="relative flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-navy-light px-2.5 py-1 shadow-hard"
-      aria-label={`${label}: ${value}`}
-      // A quick pop + colored flash whenever the balance is credited.
-      initial={creditKey === 0 ? false : { scale: 1 }}
-      animate={creditKey === 0 ? {} : { scale: [1, 1.16, 1] }}
-      transition={{ duration: 0.34, ease: [0.34, 1.6, 0.5, 1] }}
-      style={{ boxShadow: undefined }}
-    >
-      <Icon className="h-4 w-4" style={{ color: accent, filter: `drop-shadow(0 0 3px ${accent}aa)` }} strokeWidth={2.75} aria-hidden="true" />
-      <span className="font-neo-display text-base font-black tabular-nums leading-none" style={{ color: accent }}>
-        {safeToLocaleString(shown, language)}
-      </span>
-    </AdaptiveMotion.div>
-  );
-}
+export type ReelStop = { kind: 'digit'; start: number; end: number } | { kind: 'sep'; char: string };
 
 /**
- * BlastWalletHud — the in-run coin + gem balance chips. Each rolls its number up
- * slot-machine style on credit and gives a quick pop so earning FEELS like a
- * payout, not a silent counter. Purely a display of the passed balances.
+ * Reel positions per character of the new balance. A reel strip is
+ * [blank, 0-9, 0-9]: earns roll forward through it, spends roll back.
  */
-export default function BlastWalletHud({ coins, gems, showGems = true }: BlastWalletHudProps) {
+export function reelStops(from: number, to: number, formatted: string): ReelStop[] {
+  const up = to > from;
+  const stops: ReelStop[] = [];
+  let place = 0;
+  for (let i = formatted.length - 1; i >= 0; i--) {
+    const char = formatted[i];
+    if (!/\d/.test(char)) {
+      stops.unshift({ kind: 'sep', char });
+      continue;
+    }
+    const nd = Number(char);
+    const od = place === 0 || from >= 10 ** place ? Math.floor(from / 10 ** place) % 10 : null;
+    place += 1;
+    let start = 1 + nd;
+    let end = 1 + nd;
+    if (od !== nd) {
+      if (up) {
+        start = od === null ? 0 : 1 + od;
+        if (end < start) end += 10;
+      } else {
+        start = od === null ? 0 : 11 + od;
+      }
+    }
+    stops.unshift({ kind: 'digit', start, end });
+  }
+  return stops;
+}
+
+const DIGITS = '0\n1\n2\n3\n4\n5\n6\n7\n8\n9';
+/** Lives in an attribute (drawn by ::before) so the chip's text stays just the balance. */
+const REEL_STRIP = `\u00a0\n${DIGITS}\n${DIGITS}`;
+
+type Landing = { key: number; from: number; to: number; delayMs: number; landAt: number };
+
+/**
+ * Plans each balance change as one landing, committed with the change itself: the
+ * roll, bump and tag are CSS animations delayed until the flying coins arrive, so
+ * they play on time even while the main thread is busy clearing the board.
+ */
+function useWalletLanding(target: number, reduced: boolean): Landing | null {
+  const [landing, setLanding] = useState<Landing | null>(null);
+  const prev = useRef(target);
+  const last = useRef<Landing | null>(null);
+
+  useLayoutEffect(() => {
+    const before = prev.current;
+    prev.current = target;
+    if (target === before) return;
+    if (reduced) {
+      last.current = null;
+      setLanding(null);
+      return;
+    }
+    const now = performance.now();
+    const pending = last.current && now < last.current.landAt ? last.current : null;
+    const from = pending ? pending.from : before;
+    const delayMs = target > from ? msUntilCoinsLand() : 0;
+    const next = { key: (last.current?.key ?? 0) + 1, from, to: target, delayMs, landAt: now + delayMs };
+    last.current = next;
+    setLanding(next);
+  }, [target, reduced]);
+
+  return landing;
+}
+
+/** The coin wallet: the one counter coins fly into and out of. */
+export default function BlastWalletHud({ coins }: { coins: number }) {
+  const { t, language } = useLanguage();
+  const reduced = useReducedMotion();
+  const landing = useWalletLanding(coins, reduced);
+  const live = landing && landing.to === coins ? landing : null;
+  const formatted = safeToLocaleString(coins, language);
+  const gain = live ? live.to - live.from : 0;
+  const k = live?.key ?? 0;
+  const delay = { animationDelay: `${live?.delayMs ?? 0}ms` };
+  const stops = reelStops(live ? live.from : coins, coins, formatted);
+
   return (
-    <div className="flex items-center gap-1.5">
-      <WalletChip value={coins} icon={Coins} accent="#FFC53D" label="Coins" />
-      {showGems && <WalletChip value={gems} icon={Gem} accent="#C084FC" label="Gems" />}
+    <div
+      data-testid="coin-counter"
+      data-coin-counter="true"
+      data-landing={live && gain !== 0 ? `${live.from}>${live.to}` : undefined}
+      role="status"
+      aria-label={t('blast.wallet.coins', { count: coins })}
+      className={styles.chip}
+    >
+      <span key={`b${k}`} className={gain > 0 ? styles.bump : gain < 0 ? styles.dip : styles.still} style={delay}>
+        <span className={gain > 0 ? styles.spin : styles.coin} style={delay}>
+          <CoinArt size={22} />
+        </span>
+        <span data-testid="coin-counter-value" className="sr-only">
+          {formatted}
+        </span>
+        <span
+          className={`${styles.reels} font-neo-display text-lg font-black tabular-nums text-[#FFC53D]`}
+          dir="ltr"
+          aria-hidden="true"
+        >
+          {stops.map((s, i) =>
+            s.kind === 'digit' ? (
+              <span
+                key={`${k}-${i}`}
+                className={styles.reel}
+                data-strip={REEL_STRIP}
+                style={{ '--start': s.start, '--end': s.end, '--delay': delay.animationDelay } as CSSProperties}
+              />
+            ) : (
+              <span key={`${k}-${i}`} className={styles.sep} data-char={s.char} />
+            ),
+          )}
+        </span>
+      </span>
+      {gain > 0 && <span key={`r${k}`} className={styles.ring} style={delay} aria-hidden="true" />}
+      {gain > 0 && (
+        <span
+          key={`g${k}`}
+          data-testid="coin-counter-gain"
+          data-amount={`+${safeToLocaleString(gain, language)}`}
+          className={styles.gain}
+          style={delay}
+          aria-hidden="true"
+        />
+      )}
+      {gain < 0 && (
+        <span
+          key={`s${k}`}
+          data-testid="coin-counter-spent"
+          data-amount={`-${safeToLocaleString(-gain, language)}`}
+          className={`${styles.gain} ${styles.spent}`}
+          style={delay}
+          aria-hidden="true"
+        />
+      )}
     </div>
   );
 }

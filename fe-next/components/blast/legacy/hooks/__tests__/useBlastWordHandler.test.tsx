@@ -352,4 +352,33 @@ describe('useBlastWordHandler', () => {
       expect(jackpotFlashCalls.length).toBe(0);
     });
   });
+
+  describe('coins', () => {
+    it('launches the coin flight from the word the moment it is accepted, before the clear animation ends', async () => {
+      const onCoinsLaunch = vi.fn();
+      const { params, sequencer, lastPathRef } = setup();
+      const path = lastPathRef.current;
+      sequencer.animateWordClear.mockImplementation(() => new Promise<void>(() => {}));
+      const { result } = renderHook(() =>
+        useBlastWordHandler({ ...params, effects: { ...params.effects, onCoinsLaunch } }),
+      );
+      act(() => {
+        void result.current.handleWordAccepted({ word: 'cat', score: 5 });
+      });
+      expect(onCoinsLaunch).toHaveBeenCalledWith(path, expect.any(Number));
+      expect(onCoinsLaunch.mock.calls[0][1]).toBeGreaterThanOrEqual(1);
+    });
+
+    it('credits coins only, from the scored word', async () => {
+      const onCurrencyEarned = vi.fn();
+      const { params } = setup();
+      const { result } = renderHook(() =>
+        useBlastWordHandler({ ...params, effects: { ...params.effects, onCurrencyEarned } }),
+      );
+      await act(async () => {
+        await result.current.handleWordAccepted({ word: 'cat', score: 5 });
+      });
+      expect(onCurrencyEarned).toHaveBeenCalledWith({ coinDelta: 1 });
+    });
+  });
 });

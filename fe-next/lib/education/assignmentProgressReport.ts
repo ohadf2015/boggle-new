@@ -17,7 +17,7 @@
 
 import { gradePercentFromProgress, type ProgressRowLike } from './googleClassroomGrades';
 
-export type AssignmentProgressStatus = 'completed' | 'missing';
+export type AssignmentProgressStatus = 'completed' | 'missing' | 'overdue';
 
 export interface AssignmentProgressStudent {
   studentId: string;
@@ -27,6 +27,7 @@ export interface AssignmentProgressStudent {
 export interface AssignmentProgressAssignment {
   id: string;
   title: string;
+  dueDate?: string | null;
 }
 
 export interface AssignmentProgressCompletion {
@@ -93,14 +94,16 @@ export interface AssignmentProgressCsvLabels {
   completedAt: string;
   completed: string;
   missing: string;
+  overdue: string;
 }
 
 export function buildAssignmentProgressRows(args: {
   students: AssignmentProgressStudent[];
   assignments: AssignmentProgressAssignment[];
   completions: AssignmentProgressCompletion[];
+  now?: number;
 }): AssignmentProgressRow[] {
-  const { students, assignments, completions } = args;
+  const { students, assignments, completions, now = Date.now() } = args;
   if (students.length === 0 || assignments.length === 0) return [];
 
   const byPair = new Map<string, AssignmentProgressCompletion>();
@@ -113,12 +116,17 @@ export function buildAssignmentProgressRows(args: {
     for (const assignment of assignments) {
       const hit = byPair.get(`${student.studentId}\0${assignment.id}`);
       const completed = Boolean(hit);
+      let status: AssignmentProgressStatus = completed ? 'completed' : 'missing';
+      if (!completed && assignment.dueDate) {
+        const due = Date.parse(assignment.dueDate);
+        if (Number.isFinite(due) && due < now) status = 'overdue';
+      }
       rows.push({
         studentId: student.studentId,
         studentName: student.name,
         assignmentId: assignment.id,
         assignmentTitle: assignment.title,
-        status: completed ? 'completed' : 'missing',
+        status,
         score: completed && hit?.score != null ? hit.score : null,
         accuracy: completed && hit?.accuracy != null ? hit.accuracy : null,
         completedAt: completed ? hit?.completedAt ?? null : null,
@@ -162,7 +170,13 @@ export function assignmentProgressToCsv(
     [
       csvEscape(row.studentName),
       csvEscape(row.assignmentTitle),
-      csvEscape(row.status === 'completed' ? labels.completed : labels.missing),
+      csvEscape(
+        row.status === 'completed'
+          ? labels.completed
+          : row.status === 'overdue'
+            ? labels.overdue
+            : labels.missing,
+      ),
       row.score == null ? '' : String(row.score),
       row.accuracy == null ? '' : String(row.accuracy),
       row.completedAt == null ? '' : csvEscape(row.completedAt),

@@ -39,6 +39,13 @@ import {
   trackEduFirstAssignmentCreated,
 } from '@/lib/education/telemetry';
 import type { Language } from '@/lib/supabase/education/types';
+import { AssignmentGoalModes } from './AssignmentGoalModes';
+import { createWordGoalAssignment } from '@/lib/education/createWordGoalAssignment';
+import {
+  validateWordGoal,
+  WORD_COUNT_DEFAULT,
+  type WordGoalKind,
+} from '@/lib/education/wordGoalAssignment';
 
 interface AssignmentCreatorProps {
   classroomId: string;
@@ -54,7 +61,7 @@ interface AssignmentCreatorProps {
  * bot. `lesson_assignments` has no mode column, so it is saved as
  * practice_focus 'wordcraft'; 'practice' saves a focus or 'any' (→ NULL).
  */
-type AssignmentType = 'wordcraft' | 'practice' | 'duel';
+type AssignmentType = 'wordcraft' | 'practice' | 'duel' | WordGoalKind;
 
 export default function AssignmentCreator({
   classroomId,
@@ -94,6 +101,9 @@ export default function AssignmentCreator({
   const [instructions, setInstructions] = useState<string>('');
   const [focus, setFocus] = useState<PracticeFocusSetting>('any');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [wordCount, setWordCount] = useState(WORD_COUNT_DEFAULT);
+  const [wordListRaw, setWordListRaw] = useState('');
+  const isWordGoal = selectedType === 'word_count' || selectedType === 'word_list';
 
   const selectedLesson = lessons.find(l => l.id === selectedLessonId);
   // How many questions each skill can really build off this lesson. The teacher
@@ -128,6 +138,8 @@ export default function AssignmentCreator({
       setDueDate('');
       setInstructions('');
       setFocus('any');
+      setWordCount(WORD_COUNT_DEFAULT);
+      setWordListRaw('');
     }
   }, [isOpen, initialLessonId]);
 
@@ -140,10 +152,51 @@ export default function AssignmentCreator({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLessonId, focus]);
 
-  const submitHint = assignmentSubmitHintKey(Boolean(selectedLessonId), Boolean(dueDate));
+  const submitHint = isWordGoal
+    ? assignmentSubmitHintKey(true, Boolean(dueDate))
+    : assignmentSubmitHintKey(Boolean(selectedLessonId), Boolean(dueDate));
 
   const handleSubmit = async () => {
-    if (!selectedLessonId || !dueDate || !user) {
+    if (!user) {
+      toast.error(t('teacher.assignment.missingFields'));
+      return;
+    }
+
+    if (isWordGoal) {
+      const validated = validateWordGoal({
+        kind: selectedType as WordGoalKind,
+        dueDate,
+        target: wordCount,
+        wordListRaw,
+      });
+      if (!validated.ok) {
+        toast.error(t('teacher.assignment.wordGoalMissing'));
+        return;
+      }
+      setIsSubmitting(true);
+      const result = await createWordGoalAssignment({
+        goal: validated.goal,
+        classroomId,
+        teacherId: user.id,
+        language: classroomLanguage,
+        createLesson,
+        findNWordsLabel: (n) => t('teacher.assignment.findNWords', { count: n }),
+      });
+      setIsSubmitting(false);
+      if (result.success && result.assigned) {
+        toast.success(t('teacher.assignment.created'));
+        if (assignmentCount === 0) {
+          trackEduFirstAssignmentCreated({ classroomId });
+        }
+        onComplete();
+        onClose();
+      } else {
+        toast.error(result.error || t('teacher.assignment.error'));
+      }
+      return;
+    }
+
+    if (!selectedLessonId || !dueDate) {
       toast.error(t('teacher.assignment.missingFields'));
       return;
     }
@@ -231,6 +284,7 @@ export default function AssignmentCreator({
           />
         ) : (
         <div className="space-y-4">
+            {!isWordGoal && (
             <AssignmentStep step="list" n={1} label={t('teacher.assignment.lessonLabel')}>
               <select
                 value={selectedLessonId}
@@ -246,6 +300,7 @@ export default function AssignmentCreator({
                 ))}
               </select>
             </AssignmentStep>
+            )}
 
             <AssignmentStep step="who" n={2} label={t('eg2Rep.assign.who')}>
               <p
@@ -310,6 +365,15 @@ export default function AssignmentCreator({
                   <span className="font-bold">{t('teacher.assignment.duelChallenge')}</span>
                 </button>
               </div>
+              <AssignmentGoalModes
+                selectedType={selectedType}
+                onSelect={(kind) => setSelectedType(kind)}
+                wordCount={wordCount}
+                onWordCount={setWordCount}
+                wordListRaw={wordListRaw}
+                onWordListRaw={setWordListRaw}
+                t={t}
+              />
             </AssignmentStep>
 
             {/* Vocabulary focus (practice only, once a lesson is chosen) */}
@@ -412,7 +476,7 @@ export default function AssignmentCreator({
               <Button
                 onClick={handleSubmit}
                 aria-describedby={submitHint ? 'assignment-submit-hint' : undefined}
-                disabled={isSubmitting || !selectedLessonId || !dueDate}
+                disabled={isSubmitting || (!isWordGoal && !selectedLessonId) || !dueDate}
                 className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed disabled:opacity-50"
               >
                 {isSubmitting ? t('teacher.assignment.creating') : t('teacher.assignment.create')}

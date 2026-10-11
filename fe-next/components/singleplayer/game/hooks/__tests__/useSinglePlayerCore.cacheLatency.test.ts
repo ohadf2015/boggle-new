@@ -119,10 +119,6 @@ vi.mock('@/hooks/useDirectionPatternGuidance', () => ({
   useDirectionPatternGuidance: () => ({ guidance: null })
 }));
 
-vi.mock('@/hooks/useFirstPlayTutorial', () => ({
-  useFirstPlayTutorial: () => ({ showTutorial: false })
-}));
-
 vi.mock('@/hooks/useCrazyGamesLifecycle', () => ({
   useCrazyGamesLifecycle: () => ({})
 }));

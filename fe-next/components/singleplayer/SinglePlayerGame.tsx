@@ -1,12 +1,9 @@
 'use client';
 
 import React, { useMemo, useEffect, useRef, useCallback, useState } from 'react';
-import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { shouldShowScorePopup } from '@/lib/singleplayer/scorePopup';
 import { useAchievementQueue } from '@/components/achievements';
-import FirstTimeEncouragement from '@/components/game/FirstTimeEncouragement';
-import { useFirstTimeEncouragement } from '@/hooks/useFirstTimeEncouragement';
 import { useIdleDetection } from '@/hooks/useIdleDetection';
 import { trackDeadTime, trackGrowthEvent } from '@/utils/growthTracking';
 import { createFirstMinuteSurvivalTimer, detectPlatform } from '@/utils/posthogEngagement';
@@ -23,15 +20,10 @@ import type { LetterGrid } from '@/shared/types/game';
 import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
 import PracticeContinuePrompt from './PracticeContinuePrompt';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
-import { ModeCoach } from '@/components/tutorial/ModeCoach';
-import { useMPStuckCoach } from '@/hooks/useMPStuckCoach';
-import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
-import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
+import { useSoloLesson } from './useSoloLesson';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { evaluateSelectionAchievements } from '@/lib/achievements/hiddenAchievementBus';
 import { useExperiment } from '@/hooks/useExperiment';
-
-const FIRST_ROUND_IDLE_MS = 4000;
 
 const PRACTICE_CONTINUE_THRESHOLD = 100;
 const WORD_GOAL_TARGET = 10;
@@ -63,12 +55,15 @@ function SinglePlayerGame({
   hideModeCoach = false,
   quitStaysOnPage = false,
 }: SinglePlayerGameProps): React.ReactElement {
+  // The lesson reads the core, so its clock hold comes back through state.
+  const [lessonHold, setLessonHold] = useState(false);
   const core = useSinglePlayerCore({
     settings,
     targetHighScore,
     onGameEnd,
     onQuit,
     quitStaysOnPage,
+    clockHold: lessonHold,
   });
 
   // No game_started here: useSinglePlayerEffects (inside useSinglePlayerCore above)
@@ -85,18 +80,7 @@ function SinglePlayerGame({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // First-time player encouragement system
-  const encouragement = useFirstTimeEncouragement();
-  const hasTriggeredStartRef = useRef(false);
   const prevWordCountRef = useRef(0);
-
-  // Trigger 'game-start' once when grid loads
-  useEffect(() => {
-    if (core.grid && !hasTriggeredStartRef.current) {
-      hasTriggeredStartRef.current = true;
-      encouragement.triggerEncouragement('game-start');
-    }
-  }, [core.grid, encouragement]);
 
   // First-15-seconds instrumentation: proves the timer gate in
   // useSinglePlayerCore held the clock while the board was loading (see
@@ -104,15 +88,13 @@ function SinglePlayerGame({
   // timerSeconds now).
   useBoardReadyTelemetry(core.grid, core.timer.remainingTime, settings.mode, settings.timerSeconds);
 
-  // Trigger 'first-word' when first word is found
   useEffect(() => {
     const wordCount = core.foundWords.length;
     if (wordCount === 1 && prevWordCountRef.current === 0) {
-      encouragement.triggerEncouragement('first-word');
       trackGrowthEvent('first_word_found', { mode: settings.mode });
     }
     prevWordCountRef.current = wordCount;
-  }, [core.foundWords.length, encouragement, settings.mode]);
+  }, [core.foundWords.length, settings.mode]);
 
   // Show toast notifications for achievements (same as multiplayer)
   const { queueAchievement } = useAchievementQueue();
@@ -121,10 +103,8 @@ function SinglePlayerGame({
   // Score popup — shows "+30" when score increases
   const [scorePopup, setScorePopup] = React.useState<{ id: number; value: number; x: number; y: number; word?: string; bonus?: string } | null>(null);
   const prevScoreRef = useRef(0);
-  // Deliberately NOT the `prevWordCountRef` above: that one is owned by the
-  // encouragement effect, which is declared earlier and so has already advanced
-  // it to the current count by the time this effect runs — sharing it would make
-  // the popup check never match. Separate ref, separate owner.
+  // Not the `prevWordCountRef` above: that effect runs first and has already
+  // advanced it, so sharing it would make the popup check never match.
   const prevPopupWordCountRef = useRef(0);
 
   // Refs for anchoring the floating score popup to real HUD elements (portrait/mobile)
@@ -234,59 +214,28 @@ function SinglePlayerGame({
     sessionKey,
   });
 
-  // Lifetime games on this device — the arbiter never tutorialises a veteran.
-  // Read once (lazy initialiser) so it is stable for the whole round and safe
-  // during SSR.
-  const [gamesPlayed] = useState(() =>
-    typeof window === 'undefined' ? 0 : readGamesCompletedCount()
-  );
-
-  // On-screen help for a first-timer, and ONLY for a first-timer who is visibly
-  // stuck. FTUE now lands new players here (lib/onboarding/firstGameRoute.ts)
-  // and ModeCoach is deliberately disabled ("more confusing than helping"), so
-  // without this there is nothing on screen teaching the drag gesture at all.
-  //
-  // The arbiter stays silent once the player scores, silent past their first
-  // game, shows at most one hint per game and auto-hides it after 10s — help
-  // arrives only after 12s frozen or a run of fruitless submits, never as an
-  // opening interruption.
-  const stuckCoach = useMPStuckCoach({
-    active: !!core.grid && !core.isPaused && !core.isGameOver,
-    isClassic: true,
-    totalGamesPlayed: gamesPlayed,
-    isDesktop: core.isDesktop,
-    idleThresholdMs: settings.coach ? FIRST_ROUND_IDLE_MS : undefined,
-  });
-
-  // Scoring is the signal that the player understands the game; it silences
-  // every later stage. Derived from the found-word list so no grid-interaction
-  // plumbing is needed.
-  const acceptedCount = core.foundWords.filter((w) => w.isValid !== false).length;
-  useEffect(() => {
-    if (acceptedCount > 0) stuckCoach.markAccepted();
-  }, [acceptedCount, stuckCoach]);
-
   const coreWordChange = core.handleWordChange;
   const wrappedWordChange = useCallback(
     (word: string, count: number) => {
       reportActivity();
-      // A path forming IS the drag signal — it distinguishes "building words but
-      // never submitting" from "frozen", which are different hints.
-      if (count > 0) stuckCoach.markDragStart();
       coreWordChange(word, count);
     },
-    [reportActivity, coreWordChange, stuckCoach]
+    [reportActivity, coreWordChange]
   );
+  const wrappedWordSubmit = core.handleWordSubmit;
 
-  // Submissions feed the "submitting but nothing is valid" stage.
-  const coreWordSubmit = core.handleWordSubmit;
-  const wrappedWordSubmit = useCallback(
-    (word: string) => {
-      stuckCoach.markSubmit();
-      coreWordSubmit(word);
-    },
-    [stuckCoach, coreWordSubmit]
-  );
+  const lesson = useSoloLesson({
+    enabled: settings.mode !== 'practice' && !hideModeCoach && !core.awaitingStart && !core.isGameOver,
+    grid: core.grid as LetterGrid | null,
+    language: settings.language,
+    availableWords: core.availableWords,
+    foundWords: core.foundWords,
+    formedWord: core.formedWord,
+    feedback: core.currentFeedback,
+    score: core.score,
+    friendHref: `/${settings.language}/multiplayer`,
+  });
+  useEffect(() => setLessonHold(lesson.holdClock), [lesson.holdClock]);
 
   // Wrap path submit to detect the "select every tile in one drag" hidden
   // achievement. Cosmetic + fire-and-forget; always delegates to the real handler.
@@ -334,12 +283,6 @@ function SinglePlayerGame({
       letterCount: core.letterCount,
       currentFeedback: core.currentFeedback,
       keyboardInput: core.keyboardInput,
-      tutorialPath: core.tutorialPath,
-      tutorialWord: core.tutorialWord,
-      // "You can trace in ANY direction" is taught on the board itself now
-      // (BoardHandCoach) rather than by a modal that froze the clock and
-      // disabled its own continue button for ten seconds. Still suppressed in
-      // Quick Play, same as ModeCoach.
       showHandCoach: !hideModeCoach,
       highlightedPath: core.revealState.highlightedPath,
       lastWordFoundTimeRef: core.lastWordFoundTimeRef,
@@ -386,8 +329,6 @@ function SinglePlayerGame({
     core.letterCount,
     core.currentFeedback,
     core.keyboardInput,
-    core.tutorialPath,
-    core.tutorialWord,
     core.revealState.highlightedPath,
     core.lastWordFoundTimeRef,
     core.fireRoundActive,
@@ -429,20 +370,6 @@ function SinglePlayerGame({
     );
   }
 
-  // Above the word feed, and only once the round is running — at the top it
-  // covered the exit button and the race, and over the start card it said
-  // "Let's go!" before anything had gone.
-  const encouragementBanner = encouragement.currentTrigger && !core.awaitingStart ? (
-    <div className="absolute bottom-[calc(max(0.75rem,env(safe-area-inset-bottom))+4.5rem)] left-0 right-0 z-50 flex justify-center pointer-events-none">
-      <div className="pointer-events-auto">
-        <FirstTimeEncouragement
-          trigger={encouragement.currentTrigger}
-          onDismiss={encouragement.dismiss}
-        />
-      </div>
-    </div>
-  ) : null;
-
   const scorePopupElement = (
     <ScorePopupFly
       popup={scorePopup}
@@ -472,38 +399,15 @@ function SinglePlayerGame({
       <PracticeCoachTip mode="classic" wordsFound={core.foundWords.length} />
     ) : null;
 
-  const modeCoachElement =
-    settings.mode !== 'practice' && !hideModeCoach && !core.awaitingStart && !settings.coach ? (
-      <ModeCoach mode="classic" />
-    ) : null;
-
-  const validCoachWords = core.foundWords.filter((fw) => fw.isValid === true).length;
-  const firstRoundCoach = settings.coach ? (
-    <FirstRoundCoach validWords={validCoachWords} />
-  ) : null;
-
-  // Rendered from ONE place for all three layouts — portrait, landscape and
-  // desktop reaching the same overlay separately is how one of them silently
-  // loses it (Class 3).
-  const stuckCoachElement = (
-    <StuckCoachOverlay coach={stuckCoach} grid={core.grid} language={settings.language} />
-  );
-
   // exp-singleplayer-word-goal-v1: timed SP has worst completion of all modes
   // (73 started / 12 completed). word-goal arm anchors players to a concrete
   // "X / 10 words" milestone instead of only a countdown timer.
   const wordGoalBadgeElement =
-    settings.mode !== 'practice' && !hideModeCoach ? (
+    settings.mode !== 'practice' && !hideModeCoach && !lesson.active ? (
       <WordGoalBadge wordsFound={core.foundWords.length} t={commonProps.t} />
     ) : null;
 
   // One shell for portrait, landscape, desktop and TV.
-  //
-  // Single player used to branch into three bespoke layouts here —
-  // LandscapeGameLayout (424 lines) and DesktopGameLayout (394) alongside the
-  // already-deleted PortraitGameLayout (593). Multiplayer never needed that
-  // split: PortraitLayout is responsive and takes `isDesktop`, so the branch
-  // itself was the duplication. All that differs now is that one flag.
   //
   // `fixed inset-0`, not `h-[100dvh]`: the shell is `flex-1 min-h-0` over a
   // `container-type: size` board slot, so it needs a definite height (see
@@ -519,12 +423,9 @@ function SinglePlayerGame({
   // every surface. Modals stay above (AuthModal z-100, WinnerOnboarding z-110).
   return (
     <div className="fixed inset-0 z-[70] flex flex-col overflow-hidden bg-neo-navy" translate="no">
-      {encouragementBanner}
       {scorePopupElement}
       {practicePromptElement}
-      {modeCoachElement}
-      {firstRoundCoach}
-      {stuckCoachElement}
+      {lesson.overlay}
       {wordGoalBadgeElement}
       <SinglePlayerShell
         grid={core.grid as LetterGrid}
@@ -556,8 +457,9 @@ function SinglePlayerGame({
         soloStreak={core.soloCombo?.streak ?? 0}
         soloMultiplier={core.soloCombo?.multiplier ?? 1}
         soloPraiseKey={core.soloCombo?.praiseKey ?? null}
-        soloMissions={core.soloMissions}
-        soloChrome={practiceCoachElement}
+        soloMissions={lesson.active ? undefined : core.soloMissions}
+        soloChrome={lesson.hud ?? practiceCoachElement}
+        soloLessonActive={lesson.active}
       />
     </div>
   );
@@ -586,22 +488,6 @@ function WordGoalBadge({
       }`}
     >
       {t('singlePlayer.wordGoal.progress', { count: Math.min(wordsFound, WORD_GOAL_TARGET), goal: WORD_GOAL_TARGET })}
-    </div>
-  );
-}
-
-function FirstRoundCoach({ validWords }: { validWords: number }) {
-  const { t, language } = useLanguage();
-  return (
-    <div data-testid="first-round-coach" className="flex flex-col items-center gap-1 bg-neo-navy px-3 py-2 text-center">
-      {validWords < 1 && (
-        <p className="font-neo-body text-sm font-semibold text-neo-cream">
-          {t('singlePlayer.coach.findWord', 'Find a short word. The clock starts when you do.')}
-        </p>
-      )}
-      <Link href={`/${language}/multiplayer`} className="font-neo-body text-sm font-bold text-neo-lime underline underline-offset-2">
-        {t('homeFresh.hero.playFriend', 'Play a friend')}
-      </Link>
     </div>
   );
 }

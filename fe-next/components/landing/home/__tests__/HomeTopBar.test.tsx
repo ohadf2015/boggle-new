@@ -136,6 +136,14 @@ describe('HomeTopBar', () => {
     expect(screen.getByTestId('avatar-lite-stub')).toHaveAttribute('data-user-id', 'real-id');
   });
 
+  it('the coins pill is the wallet coins fly into, drawn with the shared gold coin', () => {
+    const profile = { id: 'u1', username: 'm', total_xp: 0, total_coins: 2840 } as unknown as ProfileData;
+    render(<HomeTopBar profile={profile} language="en" t={t} />);
+    const pill = screen.getByText('2,840').closest('[data-coin-counter="true"]');
+    expect(pill).not.toBeNull();
+    expect(pill!.querySelector('svg circle[fill="#FFC53D"]')).not.toBeNull();
+  });
+
   it('shows loading skeletons (not values) for name/coins while the profile is loading', () => {
     const profile = {
       id: 'u1', username: 'm', display_name: 'Maya', current_level: 7, total_xp: 0, total_coins: 2840,

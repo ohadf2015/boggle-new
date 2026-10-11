@@ -186,8 +186,6 @@ interface BlastHUDProps {
   isDesktopCanvas?: boolean;
   /** In-run coins balance (SP only) */
   coins?: number;
-  /** In-run gems balance (SP only) */
-  gems?: number;
   t: (key: string, fallback?: string) => string | undefined;
 }
 
@@ -219,7 +217,6 @@ export function BlastHUD({
   totalTime,
   isDesktopCanvas = false,
   coins = 0,
-  gems = 0,
   t,
 }: BlastHUDProps) {
   const showTimer =
@@ -323,7 +320,7 @@ export function BlastHUD({
         </div>
 
         <div className="flex items-center gap-1.5">
-          {!isMultiplayer && coins > 0 && <BlastWalletHud coins={coins} gems={gems} showGems={true} />}
+          {!isMultiplayer && <BlastWalletHud coins={coins} />}
           {hintSlot}
           {onShowHelp && (
             <button

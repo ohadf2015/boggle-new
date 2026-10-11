@@ -174,7 +174,11 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
 // internal `cacheController` (~7.7MB per render, verified via heap-snapshot diff
 // 2026-07-20 → OOM). Forcing fetches to no-store bypasses the Data Cache tee.
 // Cascades to all [locale] routes. Landing data is still amortized by the
-// in-process TTL cache (lib/cache/ttlCache). REMOVE once #90433 is fixed upstream.
+// in-process TTL cache (lib/cache/ttlCache).
+// 16.3.x includes the tee FinalizationRegistry fix (#88577) plus the 16.2
+// self-host leaks (#94890 LRU unique-URL, #94919 RSC abort, #95094 middleware
+// timeouts). KEEP force-no-store in this bump so the 24h heap watch has one
+// variable (the version). Drop it in a follow-up once idle slope is <0.03 GB/h.
 // COSTS: this also appears to be what keeps every `[locale]` route classified
 // ƒ (Dynamic). Measured 2026-08-25 — 453 of 456 routes built dynamic and
 // production served `cache-control: private, no-cache, no-store, max-age=0,
