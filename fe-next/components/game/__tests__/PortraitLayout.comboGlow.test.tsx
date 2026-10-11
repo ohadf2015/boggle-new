@@ -90,12 +90,6 @@ vi.mock('@/components/game/ComboDisplay', () => {
 vi.mock('@/components/game/ComboDisplayConnected', () => ({
   ComboDisplayConnected: () => <div>ComboDisplayConnected</div>,
 }));
-vi.mock('@/components/game/CompactLeaderboard', () => {
-  const MockLeaderboard = () => {
-    return <div>CompactLeaderboard</div>;
-  };
-  return { default: MockLeaderboard };
-});
 vi.mock('@/components/game/FloatingScoreAnimation', () => {
   const MockFloating = () => {
     return null;

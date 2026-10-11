@@ -10,6 +10,11 @@ const PAGES = [
   '/en/daily',
   '/en/blast',
   '/en/word-of-the-day',
+  '/en/quick-play',
+  '/en/multiplayer',
+  '/en/daily-word-wheel',
+  '/en/student/lessons',
+  '/en/singleplayer',
 ];
 
 const MISSING_CODE = /ChunkLoadError|Loading chunk|Cannot find module|dynamically imported module|is not defined|is not a function|Element type is invalid/i;

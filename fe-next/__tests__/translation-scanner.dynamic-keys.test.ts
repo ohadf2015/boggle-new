@@ -115,10 +115,10 @@ describe('translation scanner — dynamic t() key resolution', () => {
     expect(missingKeys).not.toContain('multiplayer.opponentFoundLongWord');
   });
 
-  it('end-to-end on the real repo: OpponentWordFeed keys are extracted (original gap regression)', () => {
+  it('end-to-end on the real repo: ternary-selected WeeklyChestModal keys are extracted', () => {
     const calls = scanner.extractAllTFunctionCalls();
     const keys = keysOf(calls);
-    expect(keys).toContain('multiplayer.opponentFoundWord');
-    expect(keys).toContain('multiplayer.opponentFoundLongWord');
+    expect(keys).toContain('daily.weeklyChest.freezesGranted');
+    expect(keys).toContain('daily.weeklyChest.freezesGrantedPlural');
   }, 60000);
 });
