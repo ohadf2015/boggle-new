@@ -1,21 +1,18 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { getPostHogServer } from '@/lib/posthog';
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { mergeUnlocksSeen } from './mergeUnlocksSeen';
 
-let supabaseInstance: ReturnType<typeof createClient> | null = null;
+let supabaseInstance: SupabaseClient | null = null;
 
-function getSupabase() {
-  if (!supabaseInstance) {
-    supabaseInstance = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-  }
-  return supabaseInstance;
+function getSupabase(): SupabaseClient {
+  const client = supabaseInstance ?? createAdminClient();
+  if (!client) throw new Error('Supabase service role not configured');
+  return client;
 }
 
 // For testing
-export function setSupabaseInstance(instance: ReturnType<typeof createClient>) {
+export function setSupabaseInstance(instance: SupabaseClient) {
   supabaseInstance = instance;
 }
 

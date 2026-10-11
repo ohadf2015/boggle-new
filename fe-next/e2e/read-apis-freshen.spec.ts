@@ -49,8 +49,8 @@ test.describe('service-role read APIs (shared admin client)', () => {
     expect(Array.isArray(body.data)).toBe(true);
   });
 
-  test('streak and blast result stay 401 for a guest', async ({ request }) => {
-    for (const path of ['/api/streak', '/api/blast/result']) {
+  test('streak, blast result and word collection stay 401 for a guest', async ({ request }) => {
+    for (const path of ['/api/streak', '/api/blast/result', '/api/quick-play/word-collection']) {
       const res = await request.get(path);
       expect([401, 429]).toContain(res.status());
     }
@@ -88,6 +88,21 @@ test.describe('forged sessions are rejected', () => {
   test('a forged session cookie does not unlock a signed-in GET', async ({ request }) => {
     const res = await request.get('/api/streak', { headers: { cookie: await forgedSessionCookie(request) } });
     expect([401, 429]).toContain(res.status());
+  });
+
+  test('a forged session cookie does not unlock the word collection', async ({ request }) => {
+    const res = await request.get('/api/quick-play/word-collection', {
+      headers: { cookie: await forgedSessionCookie(request) },
+    });
+    expect([401, 429]).toContain(res.status());
+  });
+
+  test('a forged bearer token cannot bulk-approve invalid words', async ({ request }) => {
+    const res = await request.post('/api/admin/invalid-words/bulk-approve', {
+      headers: { authorization: `Bearer ${await forgedToken()}` },
+      data: { wordIds: ['00000000-0000-4000-8000-000000000000'] },
+    });
+    expect([401, 403, 429]).toContain(res.status());
   });
 
   test('a forged session cookie still gets the public daily board', async ({ request }) => {
