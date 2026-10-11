@@ -415,6 +415,21 @@ describe('useWordSubmission', () => {
       mockGetCached.mockReturnValue(undefined);
     });
 
+    it('does not ask the server about a word the client dictionary already knows', () => {
+      mockDictionaryCacheState.isLoaded = true;
+      mockCheckWord.mockImplementation((word: string) => word === 'hello');
+      const { result } = renderHook(() => useWordSubmission(createDefaultOptions()));
+
+      act(() => {
+        result.current.prefetchValidation('HELLO');
+        result.current.prefetchValidation('hellx');
+      });
+
+      expect(mockPrefetch).toHaveBeenCalledTimes(1);
+      expect(mockPrefetch).toHaveBeenCalledWith('hellx');
+      mockDictionaryCacheState.isLoaded = false;
+    });
+
     it('should expose prefetchValidation function', () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);

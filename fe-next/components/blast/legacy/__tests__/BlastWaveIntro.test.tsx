@@ -95,20 +95,15 @@ describe('BlastWaveIntro', () => {
     expect(container.textContent).toContain('TREASURE HUNT');
   });
 
-  it('tap-to-dismiss works after guard period (500ms)', () => {
+  it('lets a drag through to the board and leaves on the first touch after the guard period (500ms)', () => {
     const { container, getByTestId } = render(<BlastWaveIntro waveNumber={1} archetype="normal" t={mockT} />);
-    const overlay = getByTestId('blast-wave-intro-overlay');
+    expect(getByTestId('blast-wave-intro-overlay')).toHaveClass('pointer-events-none');
+
+    act(() => { document.body.dispatchEvent(new Event('pointerdown', { bubbles: true })); });
     expect(container.textContent).toContain('STANDARD WAVE');
 
-    // Tap at 0ms (within guard window) — should not dismiss
-    act(() => { overlay.click(); });
-    expect(container.textContent).toContain('STANDARD WAVE');
-
-    // Advance 600ms (now > 500ms guard threshold)
     act(() => { jest.advanceTimersByTime(600); });
-
-    // Tap now should dismiss
-    act(() => { overlay.click(); });
+    act(() => { document.body.dispatchEvent(new Event('pointerdown', { bubbles: true })); });
     expect(container.textContent).toBe('');
   });
 

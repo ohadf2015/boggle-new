@@ -366,6 +366,7 @@ export function BlastGame({
     onWordAccepted: handleWordAccepted,
   });
 
+  const { prefetchValidation } = wordSubmission;
   const shownFeedback = withBlastCredit(wordSubmission.currentFeedback, credit, serverPointsOnly);
 
   // Handlers
@@ -390,6 +391,7 @@ export function BlastGame({
   const handleWordChange = useCallback((word: string, _count: number) => {
     reportIdleActivity();
     setFormedWord(word);
+    if (word.length >= minWordLength) prefetchValidation(word);
     if (word.length > prevWordLenRef.current) {
       sounds.playTileSelect();
     } else if (word.length === 0 && prevWordLenRef.current >= 2) {
@@ -398,7 +400,7 @@ export function BlastGame({
     }
     prevWordLenRef.current = word.length;
     if (word.length > 0) sounds.playPathTone(word.length);
-  }, [sounds, reportIdleActivity]);
+  }, [sounds, reportIdleActivity, minWordLength, prefetchValidation]);
 
   // Play rejection sound + consume a move when word is rejected
   const prevFeedbackIdRef = useRef<string | null>(null);

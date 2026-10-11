@@ -254,6 +254,8 @@
 .overlay :global([data-lift][data-verdict='bad']) {
   background: #ff3366;
   color: #fff;
+  -webkit-text-stroke: 0.07em #0b0b1e;
+  paint-order: stroke fill;
   animation: lift-shake 380ms ease-in-out;
 }
 
@@ -266,6 +268,10 @@
   background: linear-gradient(180deg, #efffb8 0%, #bfff00 60%, #8fcc00 100%);
   color: #0b0b1e;
   -webkit-text-stroke: 0;
+}
+
+.overlay :global([data-fly][data-ghost-fly][data-verdict='bad']) {
+  background: linear-gradient(180deg, #ffc2d1 0%, #ff3366 100%);
 }
 
 .overlay :global([data-score-float]) {

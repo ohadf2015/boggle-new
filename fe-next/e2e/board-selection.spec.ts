@@ -1,3 +1,4 @@
+import zlib from 'node:zlib';
 import { test, expect, type Page } from '@playwright/test';
 import { readGrid, solveGrid, toGridArray, findWordPath, type GridCellInfo } from './helpers/grid-solver';
 
@@ -7,6 +8,7 @@ async function openSolo(page: Page) {
   await page.addInitScript(() => {
     try {
       localStorage.setItem('cookie-consent', 'accepted');
+      localStorage.setItem('lexiclash.lesson.classic.v1', 'skipped');
     } catch {
       /* storage blocked */
     }
@@ -53,6 +55,29 @@ async function realWordPath(page: Page, baseURL: string) {
   return { cells, all, path };
 }
 
+async function openBlast(page: Page) {
+  await page.goto('/en/blast', { waitUntil: 'domcontentloaded' });
+  await page.getByTestId('play-button').click({ timeout: 30_000 });
+  const board = page.locator('[data-board][data-ghost]');
+  await expect(board).toBeAttached({ timeout: 45_000 });
+  const dismiss = page.getByRole('button', { name: /^(skip|got it|next|ok|let'?s go)$/i });
+  for (let i = 0; i < 8; i++) {
+    const b = dismiss.first();
+    if (await b.isVisible().catch(() => false)) await b.click().catch(() => {});
+    else if (i > 3) break;
+    await page.waitForTimeout(400);
+  }
+  return board;
+}
+
+async function shippedWords(baseURL: string): Promise<Set<string>> {
+  const res = await fetch(`${baseURL}/dicts/en.dict.gz`);
+  const buf = Buffer.from(await res.arrayBuffer());
+  let text: string;
+  try { text = zlib.gunzipSync(buf).toString('utf8'); } catch { text = buf.toString('utf8'); }
+  return new Set(text.split('\n').map((w) => w.trim().toLowerCase()).filter(Boolean));
+}
+
 test.describe('shared letter board', () => {
   test('a drag lights the tiles in order, draws the trail and previews the word live', async ({ page, baseURL }) => {
     test.setTimeout(90_000);
@@ -96,17 +121,7 @@ test.describe('shared letter board', () => {
 
   test('Blast keeps its own tiles, draws the trail over them and lifts the released word', async ({ page }) => {
     test.setTimeout(90_000);
-    await page.goto('/en/blast', { waitUntil: 'domcontentloaded' });
-    await page.getByTestId('play-button').click({ timeout: 30_000 });
-    const board = page.locator('[data-board][data-ghost]');
-    await expect(board).toBeAttached({ timeout: 20_000 });
-    const dismiss = page.getByRole('button', { name: /^(skip|got it|next|ok|let'?s go)$/i });
-    for (let i = 0; i < 8; i++) {
-      const b = dismiss.first();
-      if (await b.isVisible().catch(() => false)) await b.click().catch(() => {});
-      else if (i > 3) break;
-      await page.waitForTimeout(400);
-    }
+    const board = await openBlast(page);
     const cells = await readGrid(page);
     const row = cells.filter((c) => c.row === cells[0].row).slice(0, 3);
     await dragThrough(page, row);
@@ -127,6 +142,34 @@ test.describe('shared letter board', () => {
     await dragThrough(page, [again[0], again[1]]);
     await expect(board).toHaveAttribute('data-mode', 'drag');
     await page.mouse.up();
+  });
+
+  test('Blast turns a non-word red and drops its letters the moment it is released', async ({ page, baseURL }) => {
+    test.setTimeout(90_000);
+    const words = await shippedWords(baseURL!);
+    const board = await openBlast(page);
+    await expect(page.getByTestId('blast-wave-intro-overlay')).toHaveCount(0, { timeout: 10_000 }).catch(() => {});
+    const cells = (await readGrid(page)).filter((c) => c.letter);
+    const rows = [...new Set(cells.map((c) => c.row))];
+    let junk: GridCellInfo[] | null = null;
+    for (const r of rows) {
+      const run = cells.filter((c) => c.row === r).sort((a, b) => a.col - b.col);
+      for (let i = 0; i + 4 <= run.length && !junk; i++) {
+        const cand = run.slice(i, i + 4);
+        const contiguous = cand.every((c, j) => j === 0 || c.col === cand[j - 1].col + 1);
+        if (contiguous && !words.has(cand.map((c) => c.letter).join('').toLowerCase())) junk = cand;
+      }
+      if (junk) break;
+    }
+    expect(junk, 'a 4-tile row run that is not a word').toBeTruthy();
+
+    await dragThrough(page, junk!);
+    await page.waitForTimeout(400);
+    await page.mouse.up();
+    const lift = page.locator('[data-board-overlay] [data-lift]');
+    await expect(lift).toHaveAttribute('data-verdict', 'bad', { timeout: 5_000 });
+    await expect(lift).toHaveCSS('background-color', 'rgb(255, 51, 102)');
+    await expect(board).toHaveAttribute('data-verdict', 'bad');
   });
 
   test('pass-and-play party turns use the same board', async ({ page }) => {
