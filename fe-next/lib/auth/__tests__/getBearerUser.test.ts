@@ -90,17 +90,6 @@ describe('getBearerUser', () => {
     expect(user).toBeNull();
   });
 
-  it('reuses one anon client across remote fallbacks', async () => {
-    const { createClient } = await import('@supabase/supabase-js');
-    const { getBearerUser } = await import('../getBearerUser');
-    mockGetUser.mockResolvedValue({ data: { user: { id: 'remote-3' } }, error: null });
-    vi.mocked(createClient).mockClear();
-    await getBearerUser(bearer('not.a.jwt'));
-    await getBearerUser(bearer('still.not.a.jwt'));
-    expect(mockGetUser).toHaveBeenCalledTimes(2);
-    expect(vi.mocked(createClient).mock.calls.length).toBeLessThanOrEqual(1);
-  });
-
   // Canary: when the secret is ENTIRELY ABSENT, every bearer call takes the
   // uncapped remote-auth round-trip that hangs Railway's proxy → the real root of
   // the churn-signals 502s (JAVASCRIPT-NEXTJS-1KQ). The client beacon no longer

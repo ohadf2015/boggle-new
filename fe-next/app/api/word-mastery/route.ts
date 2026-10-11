@@ -14,7 +14,7 @@ const CACHE_LIMIT = 200;
 const SESSION_BACKFILL_LIMIT = 50;
 
 export async function GET(request: Request) {
-  const user = await getAuthedUser(request);
+  const user = await getAuthedUser(request, { writes: true });
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

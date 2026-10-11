@@ -35,7 +35,7 @@ function generateReferralCode(userId: string): string {
 
 export async function GET(req: NextRequest) {
   try {
-    const user = await getAuthedUser(req);
+    const user = await getAuthedUser(req, { writes: true });
     if (!user) return bad('Unauthorized', 401);
 
     const supabase = admin();

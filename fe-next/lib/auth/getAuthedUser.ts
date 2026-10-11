@@ -49,9 +49,11 @@ async function cookieAccessToken(req: Request): Promise<string | null> {
   }
 }
 
-export async function getAuthedUser(req: Request): Promise<LocalUser | null> {
+/** `writes`: the handler writes even on GET, so a cookie session keeps the remote (revocation-aware) check. */
+export async function getAuthedUser(req: Request, opts: { writes?: boolean } = {}): Promise<LocalUser | null> {
   if (process.env.SUPABASE_JWT_SECRET) {
-    const token = bearerToken(req) ?? (READ_METHODS.has(req.method) ? await cookieAccessToken(req) : null);
+    const cookieLocal = READ_METHODS.has(req.method) && !opts.writes;
+    const token = bearerToken(req) ?? (cookieLocal ? await cookieAccessToken(req) : null);
     if (token) {
       const local = await verifyJwtLocal(token);
       if (local) return local;

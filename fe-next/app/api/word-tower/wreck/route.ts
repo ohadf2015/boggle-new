@@ -35,7 +35,7 @@ const PostSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthedUser(request);
+    const user = await getAuthedUser(request, { writes: true });
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const supabase = getSupabaseAdmin();

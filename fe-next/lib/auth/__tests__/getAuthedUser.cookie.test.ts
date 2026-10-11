@@ -68,6 +68,13 @@ describe('getAuthedUser with a cookie session', () => {
     expect(mockGetUser).toHaveBeenCalledTimes(1);
   });
 
+  it('keeps remote verification for a GET that writes, even with a valid session cookie', async () => {
+    const token = await makeToken({ sub: 'u-cookie' });
+    const user = await getAuthedUser(req('GET', sessionCookie(token)), { writes: true });
+    expect(user?.id).toBe('remote-1');
+    expect(mockGetUser).toHaveBeenCalledTimes(1);
+  });
+
   it('falls back to remote for a token signed with another secret', async () => {
     const token = await makeToken({ sub: 'forged' }, { secret: 'another-secret-that-is-32-chars-long!!' });
     const user = await getAuthedUser(req('GET', sessionCookie(token)));
