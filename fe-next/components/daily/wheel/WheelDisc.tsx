@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, type MutableRefObject, type ReactNode, type RefObject } from 'react';
+import React, { useEffect, useState, type MutableRefObject, type ReactNode, type RefObject } from 'react';
 import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import WheelDiscLetter from './WheelDiscLetter';
@@ -32,6 +32,8 @@ interface WheelDiscProps {
   /** The word is out for a verdict. */
   checking?: boolean;
   reducedMotion: boolean;
+  /** The letter a finger is resting on before it joins the word (null once lifted or used). */
+  onPressedChange?: (letter: string | null) => void;
   children?: ReactNode;
 }
 
@@ -39,11 +41,23 @@ interface WheelDiscProps {
 const WheelDisc: React.FC<WheelDiscProps> = ({
   orbitRef, centerLetter, outerLetters, builtIndices, pointerPosRef, draggingRef,
   onPointerDown, onPointerMove, onPointerUp, onPress, onHoldStart, onHoldEnd, holdActiveIndex,
-  tileSkin, fx, release = null, checking = false, reducedMotion, children,
+  tileSkin, fx, release = null, checking = false, reducedMotion, onPressedChange, children,
 }) => {
   const [haltedSpin, setHaltedSpin] = useState<number | null>(null);
+  const [pressed, setPressed] = useState<number | null>(null);
   const spinning = fx?.kind === 'good' && !reducedMotion && fx.id !== haltedSpin;
   const used = new Set(builtIndices);
+  const livePress = pressed !== null && !used.has(pressed) ? pressed : null;
+  const pressedLetter = livePress === null ? null : livePress === -1 ? centerLetter : outerLetters[livePress] ?? null;
+  useEffect(() => { onPressedChange?.(pressedLetter); }, [pressedLetter, onPressedChange]);
+  const holdStart: Press = (letter, index, el) => {
+    if (!used.has(index)) setPressed(index);
+    onHoldStart(letter, index, el);
+  };
+  const lift = () => {
+    setPressed(null);
+    onPointerUp();
+  };
   const ready = builtIndices.length >= 3;
   const kick = fx && !reducedMotion
     ? fx.kind === 'good'
@@ -63,9 +77,9 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
         onPointerDown(e);
       }}
       onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerUp}
-      onPointerLeave={onPointerUp}
+      onPointerUp={lift}
+      onPointerCancel={lift}
+      onPointerLeave={lift}
     >
       <div
         data-testid="wheel-backdrop"
@@ -129,8 +143,9 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
           letter={centerLetter}
           index={-1}
           isUsed={used.has(-1)}
+          isPressed={livePress === -1}
           onPress={onPress}
-          onHoldStart={onHoldStart}
+          onHoldStart={holdStart}
           onHoldEnd={onHoldEnd}
           showHoldRing={holdActiveIndex === -1}
           tileSkin={tileSkin}
@@ -143,8 +158,9 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
             index={i}
             outerCount={outerLetters.length}
             isUsed={used.has(i)}
+            isPressed={livePress === i}
             onPress={onPress}
-            onHoldStart={onHoldStart}
+            onHoldStart={holdStart}
             onHoldEnd={onHoldEnd}
             showHoldRing={holdActiveIndex === i}
             tileSkin={tileSkin}

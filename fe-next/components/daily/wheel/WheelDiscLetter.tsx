@@ -13,6 +13,8 @@ export interface WheelDiscLetterProps {
   /** Outer letters on the ring, to place this one. */
   outerCount?: number;
   isUsed: boolean;
+  /** A finger is down on it but it has not joined the word yet. */
+  isPressed?: boolean;
   onPress: (letter: string, index: number, el: HTMLButtonElement) => void;
   onHoldStart?: (letter: string, index: number, el: HTMLButtonElement) => void;
   onHoldEnd?: () => void;
@@ -25,7 +27,7 @@ const POP = { type: 'spring' as const, stiffness: 520, damping: 17 };
 
 /** One letter on the disc: a cream keycap on the ring, or the inked hub with its lime ring. */
 const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
-  letter, index, outerCount = 6, isUsed, onPress, onHoldStart, onHoldEnd, showHoldRing = false,
+  letter, index, outerCount = 6, isUsed, isPressed = false, onPress, onHoldStart, onHoldEnd, showHoldRing = false,
   tileSkin, reducedMotion = false,
 }) => {
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -34,6 +36,7 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
   const size = isHub ? DISC.center : DISC.outer;
   const skin = !isHub && !isUsed && tileSkin ? tileSkin.replace('tile-', '') : null;
   const at = letterPoint(index, outerCount);
+  const lit = isUsed || isPressed;
 
   return (
     <m.button
@@ -44,7 +47,7 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
         'wheel-letter-skinnable notranslate absolute pointer-events-auto flex items-center justify-center rounded-full',
         'border-[3px] border-neo-black font-neo-display font-black uppercase leading-none select-none touch-manipulation cursor-pointer',
         isHub ? 'text-[13cqw]' : 'text-[10cqw]',
-        isUsed
+        lit
           ? 'bg-neo-lime text-neo-black shadow-[inset_0_-4px_0_rgba(0,0,0,0.18),4px_5px_0_#000,0_0_0_5px_rgba(191,255,0,0.3)]'
           : isHub
             ? 'bg-[#0b1530] text-neo-lime shadow-[inset_0_0_0_0.9cqw_#bfff00,4px_5px_0_#000,0_0_0_6px_rgba(191,255,0,0.16)]'
@@ -58,10 +61,10 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
         zIndex: isHub ? 3 : 2,
       }}
       initial={false}
-      animate={{ scale: isUsed ? 1.12 : 1 }}
+      animate={{ scale: lit ? 1.12 : 1 }}
       transition={POP}
-      whileTap={{ scale: 0.92 }}
-      whileHover={!isUsed && !reducedMotion ? { scale: 1.06 } : undefined}
+      whileTap={isUsed ? { scale: 0.92 } : undefined}
+      whileHover={!lit && !reducedMotion ? { scale: 1.06 } : undefined}
       onClick={() => { if (btnRef.current) onPress(letter, index, btnRef.current); }}
       onPointerDown={() => { if (onHoldStart && btnRef.current) onHoldStart(letter, index, btnRef.current); }}
       onPointerUp={() => onHoldEnd?.()}
@@ -72,9 +75,10 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
       data-wheel-letter={letter}
       data-wheel-index={index}
       data-wheel-used={isUsed ? 'true' : 'false'}
+      data-wheel-pressed={isPressed && !isUsed ? 'true' : 'false'}
       {...(skin && { 'data-tile-skin': skin })}
     >
-      {isHub && !isUsed && !reducedMotion && (
+      {isHub && !lit && !reducedMotion && (
         <m.span
           aria-hidden
           className="absolute -inset-[14%] rounded-full border-[0.7cqw] border-neo-lime/70 pointer-events-none"
@@ -82,7 +86,7 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
         />
       )}
-      {isUsed && !reducedMotion && (
+      {lit && !reducedMotion && (
         <m.span
           aria-hidden
           className="absolute -inset-[3px] rounded-full border-[0.8cqw] border-neo-lime pointer-events-none"

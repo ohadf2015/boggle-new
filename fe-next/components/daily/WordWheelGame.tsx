@@ -302,6 +302,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // refs are encapsulated inside the hook.
   const draggingRef = useRef(false);
   const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
+  const [pendingLetter, setPendingLetter] = useState<string | null>(null);
 
   // ── Double-tap-to-submit support ──
   const lastTapRef = useRef<{ idx: number; time: number } | null>(null);
@@ -350,8 +351,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // Pixi `pangram` mega-burst (fired via onEffect in handleSubmit); 'almost' has
   // no canvas show, so it gets a light DOM confetti pop instead. fireConfetti
   // self-gates on reduced-motion / cosy-calm / low-end devices.
-  const triggerFeatBanner = useCallback((tier: 'all' | 'almost', word: string) => {
-    setCelebration({ tier, word, key: Date.now() });
+  const triggerFeatBanner = useCallback((tier: 'all' | 'almost', word: string, points: number) => {
+    setCelebration({ tier, word, key: Date.now(), points });
     if (tier === 'almost') {
       fireConfetti({ particleCount: 36, spread: 80, startVelocity: 50, origin: { y: 0.5 } });
     }
@@ -704,7 +705,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
         // Headline banner for full / near-full wheel coverage.
         if (coverage !== 'none') {
-          triggerFeatBanner(coverage, word);
+          triggerFeatBanner(coverage, word, points);
         }
       } else {
         showFeedback(t('wordWheel.notInDictionary'), 'error');
@@ -769,7 +770,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // Wheel cluster JSX (word line + wheel + action-bar; phone adds the HUD, ladder and words above)
   const wheelCluster = (
     <>
-      <WheelRushCelebration celebration={celebration} t={t} prefersReduced={prefersReducedMotion} />
 
       {practice && !hideModeCoach && <WheelCoachSlot wordsFound={wordsFound.length} />}
 
@@ -829,6 +829,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         acceptedId={scoreFlyId}
         reducedMotion={prefersReducedMotion}
         hint={wordsFound.length === 0}
+        pending={pendingLetter}
+        celebrating={celebration !== null}
+        banner={<WheelRushCelebration celebration={celebration} t={t} prefersReduced={prefersReducedMotion} delay={0.2} className="inset-0 items-center" />}
         className="shrink-0"
       />
       <WheelDisc
@@ -850,6 +853,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         release={release}
         checking={isValidating}
         reducedMotion={prefersReducedMotion}
+        onPressedChange={setPendingLetter}
       >
         {/* exp-wordwheel-drag-hint-v1: idle "swipe to spell" coachmark (cyan = SP). */}
         {dragHintFtue.visible && (

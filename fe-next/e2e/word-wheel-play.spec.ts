@@ -102,6 +102,24 @@ test.describe('Word Wheel play', () => {
     }
   });
 
+  test('a finger landing on a letter lights it and previews it before it moves, and lifting keeps it as a tap', async ({ page }) => {
+    await openWheel(page);
+    const btn = page.locator('[data-wheel-index="0"]');
+    const glyph = (await btn.getAttribute('data-wheel-letter')) || '';
+    const box = (await btn.boundingBox())!;
+
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await expect(btn).toHaveAttribute('data-wheel-pressed', 'true');
+    await expect(page.getByTestId('word-pending-letter')).toHaveText(glyph, { ignoreCase: true });
+    await expect(page.locator('[data-wheel-used="true"]')).toHaveCount(0);
+
+    await page.mouse.up();
+    await expect(btn).toHaveAttribute('data-wheel-used', 'true');
+    await expect(page.getByTestId('word-pending-letter')).toHaveCount(0);
+    await expect(page.getByTestId('built-letter-tile')).toHaveCount(1);
+  });
+
   test('a drag spells live, an accepted word reacts on the wheel and lands in the found list', async ({ page }) => {
     test.setTimeout(90_000);
     const dict = await loadDict(page);

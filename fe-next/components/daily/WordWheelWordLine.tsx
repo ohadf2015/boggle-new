@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, type ReactNode } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -27,14 +27,36 @@ interface WordWheelWordLineProps {
   reducedMotion?: boolean;
   /** How-to line beside the caret; only before the player's first word. */
   hint?: boolean;
+  /** Letter under a finger that has not joined the word yet. */
+  pending?: string | null;
+  /** A coverage banner is carrying the praise for this word. */
+  celebrating?: boolean;
+  /** Coverage banner, laid over the line once the scored word has flown off it. */
+  banner?: ReactNode;
   className?: string;
 }
 
 const POP = { type: 'spring', stiffness: 640, damping: 17 } as const;
 
+function PendingLetter({ letter, reducedMotion }: { letter: string; reducedMotion: boolean }) {
+  return (
+    <m.span
+      data-testid="word-pending-letter"
+      aria-hidden
+      className="notranslate font-neo-display font-black uppercase leading-none text-[40px] sm:text-5xl tall:text-[52px] short:text-3xl px-[1px] text-neo-lime [text-shadow:0_0_16px_rgba(191,255,0,0.6)]"
+      initial={reducedMotion ? false : { y: 12, scale: 0.4 }}
+      animate={{ y: 0, scale: 1 }}
+      transition={POP}
+    >
+      {letter}
+    </m.span>
+  );
+}
+
 export default function WordWheelWordLine({
   t, letters, allLetters, dir, onRemove, onSubmit, isValidating, shake, feedback,
-  acceptedWord, acceptedPoints, acceptedId, reducedMotion = false, hint = false, className,
+  acceptedWord, acceptedPoints, acceptedId, reducedMotion = false, hint = false, pending = null,
+  celebrating = false, banner, className,
 }: WordWheelWordLineProps) {
   const word = letters.map(l => l.letter).join('');
   const [lastBuilt, setLastBuilt] = useState('');
@@ -55,7 +77,7 @@ export default function WordWheelWordLine({
       transition={shake ? { duration: 0.38 } : { duration: 0 }}
     >
       <AnimatePresence>
-        {feedback && (
+        {feedback && !(celebrating && !isError) && (
           <m.div
             key={`${feedback.type}-${feedback.message}-${acceptedId}`}
             data-testid="word-feedback"
@@ -124,8 +146,12 @@ export default function WordWheelWordLine({
         </m.span>
       )}
 
+      {letters.length === 0 && !pending && banner}
+
       <div dir={dir} className="flex items-center justify-center gap-0.5 max-w-full">
-        {letters.length === 0 ? (
+        {letters.length === 0 && pending ? (
+          <PendingLetter key={`pending-${pending}`} letter={pending} reducedMotion={reducedMotion} />
+        ) : letters.length === 0 ? (
           <span className="flex items-center gap-2 text-neo-white/45 font-semibold text-sm sm:text-base">
             <m.span
               data-testid="word-caret"
@@ -161,6 +187,7 @@ export default function WordWheelWordLine({
                 {bl.letter}
               </m.button>
             ))}
+            {pending && <PendingLetter key={`pending-${pending}`} letter={pending} reducedMotion={reducedMotion} />}
             <m.span
               aria-hidden
               className={cn('inline-block w-[3px] h-9 sm:h-11 ms-1 rounded-full', isError ? 'bg-neo-red' : 'bg-neo-lime')}

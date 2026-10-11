@@ -12,12 +12,18 @@ export interface WheelCelebration {
   key: number;
   /** Consecutive 'all' clears this round (2+ triggers the streak badge). */
   streak?: number;
+  /** Points the word scored, shown on the banner when it replaces the praise pill. */
+  points?: number;
 }
 
 interface Props {
   celebration: WheelCelebration | null;
   t: (path: string, params?: Record<string, string | number>) => string;
   prefersReduced: boolean;
+  /** Seconds to hold the entrance so the scored word can fly clear first. */
+  delay?: number;
+  /** Replaces the default placement (a third of the way down the parent). */
+  className?: string;
 }
 
 /**
@@ -26,8 +32,8 @@ interface Props {
  * timer that clears `celebration` back to null. Pointer-events disabled so it
  * never blocks the wheel underneath.
  */
-export const WheelRushCelebration: React.FC<Props> = ({ celebration, t, prefersReduced }) => (
-  <div className="pointer-events-none absolute inset-x-0 top-1/3 z-50 flex justify-center">
+export const WheelRushCelebration: React.FC<Props> = ({ celebration, t, prefersReduced, delay = 0, className }) => (
+  <div className={cn('pointer-events-none absolute z-50 flex justify-center', className ?? 'inset-x-0 top-1/3')}>
     <AnimatePresence mode="wait">
       {celebration && (
         <m.div
@@ -43,7 +49,7 @@ export const WheelRushCelebration: React.FC<Props> = ({ celebration, t, prefersR
           initial={prefersReduced ? { opacity: 0 } : { opacity: 0, scale: 0.6, y: 12 }}
           animate={prefersReduced ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
           exit={prefersReduced ? { opacity: 0 } : { opacity: 0, scale: 0.8, y: -12 }}
-          transition={prefersReduced ? { duration: 0.15 } : { type: 'spring', stiffness: 380, damping: 18 }}
+          transition={prefersReduced ? { duration: 0.15 } : { type: 'spring', stiffness: 380, damping: 18, delay }}
         >
           <span className="flex items-center gap-1.5 font-neo-display font-black text-lg sm:text-xl tracking-wide">
             <Sparkles className="w-5 h-5" />
@@ -52,8 +58,15 @@ export const WheelRushCelebration: React.FC<Props> = ({ celebration, t, prefersR
               : t('wordWheel.almostAllLetters')}
             <Sparkles className="w-5 h-5" />
           </span>
-          <span dir="auto" className="font-neo-body font-bold text-sm uppercase tracking-widest opacity-80">
-            {celebration.word}
+          <span className="flex items-center gap-2">
+            <span dir="auto" className="font-neo-body font-bold text-sm uppercase tracking-widest opacity-80">
+              {celebration.word}
+            </span>
+            {celebration.points !== undefined && (
+              <span className="px-2 py-0.5 rounded-full border-2 border-neo-black bg-neo-black text-neo-lime font-neo-display font-black text-sm tabular-nums">
+                +{celebration.points}
+              </span>
+            )}
           </span>
           {celebration.tier === 'all' && (celebration.streak ?? 0) >= 4 ? (
             <span className="flex items-center gap-1 font-neo-display font-black text-xs uppercase tracking-wide bg-neo-orange text-neo-black px-2 py-0.5 rounded-neo">
