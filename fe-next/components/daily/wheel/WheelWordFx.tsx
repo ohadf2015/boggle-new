@@ -68,17 +68,19 @@ export const LetterBursts: React.FC<{ fx: WheelWordFxEvent | null; outerCount: n
 
 /** Shockwave and sparks on the disc; the verdict text belongs to the word line. */
 export const DiscFx: React.FC<DiscFxProps> = ({ fx, reducedMotion }) => {
-  if (!fx || reducedMotion) return null;
+  if (!fx) return null;
   const good = fx.kind === 'good';
   return (
     <div key={fx.id} data-testid="wheel-disc-fx" data-kind={fx.kind} aria-hidden className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-      <m.div
-        className={cn('absolute inset-[4%] rounded-full border-[1.6cqw]', good ? 'border-neo-lime' : 'border-neo-red')}
-        initial={{ scale: good ? 0.5 : 1, opacity: 1 }}
-        animate={{ scale: good ? 1.22 : 1.06, opacity: 0 }}
-        transition={{ duration: good ? 0.6 : 0.5, ease: 'easeOut' }}
-      />
-      {good && (
+      {!reducedMotion && (
+        <m.div
+          className={cn('absolute inset-[4%] rounded-full border-[1.6cqw]', good ? 'border-neo-lime' : 'border-neo-red')}
+          initial={{ scale: good ? 0.5 : 1, opacity: 1 }}
+          animate={{ scale: good ? 1.22 : 1.06, opacity: 0 }}
+          transition={{ duration: good ? 0.6 : 0.5, ease: 'easeOut' }}
+        />
+      )}
+      {good && !reducedMotion && (
         <m.div
           className="absolute inset-[4%] rounded-full border-[0.9cqw] border-neo-cyan"
           initial={{ scale: 0.4, opacity: 0.9 }}
@@ -86,7 +88,7 @@ export const DiscFx: React.FC<DiscFxProps> = ({ fx, reducedMotion }) => {
           transition={{ duration: 0.75, delay: 0.09, ease: 'easeOut' }}
         />
       )}
-      {good && <Sparks count={fx.coverage === 'none' ? 12 : 20} reach={fx.coverage === 'none' ? 40 : 52} />}
+      {good && !reducedMotion && <Sparks count={fx.coverage === 'none' ? 12 : 20} reach={fx.coverage === 'none' ? 40 : 52} />}
     </div>
   );
 };
