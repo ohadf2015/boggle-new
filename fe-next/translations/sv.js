@@ -1937,6 +1937,30 @@ const sv = {
     "cta": "Nu kör vi",
     "ctaWait": "{{seconds}} s"
   },
+  "firstLesson": {
+    "skipLabel": "Hoppa över lektionen",
+    "skip": "Hoppa över",
+    "progressLabel": "Lektionens framsteg",
+    "trace": "Dra över ordet",
+    "findAny": "Hitta nu ett eget ord",
+    "findLength": "Sikta på {{count}}+ bokstäver",
+    "inARow": "{{count}} i rad",
+    "praise": {
+      "nice": "Snyggt!",
+      "great": "Grymt!",
+      "awesome": "Toppen!",
+      "amazing": "Galet bra!"
+    },
+    "oops": "Inte riktigt",
+    "tryWord": "Testa {{word}}",
+    "found": "Du hittade {{word}}",
+    "complete": "Lektionen klar!",
+    "completeSub": "Du har fattat grejen. Resten av rundan är din.",
+    "statWords": "Ord",
+    "statPoints": "Poäng",
+    "statStreak": "I rad",
+    "keepPlaying": "Spela vidare"
+  },
   "modeCoach": {
     "skip": "Hoppa över",
     "next": "Nästa",
@@ -18076,14 +18100,6 @@ const sv = {
       "epic": "Episk",
       "legendary": "Legendarisk"
     }
-  },
-  "encouragement": {
-    "gameStart": "Kör! 🎯",
-    "firstWord": "Snyggt! Fortsätt hitta ord!",
-    "longWord": "Fantastiskt! Långa ord ger mer!",
-    "combo": "Kombo! Nu rullar det!",
-    "halfway": "Halvvägs, fortsätt!",
-    "almostDone": "Slutspurten! Hitta fler ord!"
   },
   "toast": {
     "found": "HITTAD!",

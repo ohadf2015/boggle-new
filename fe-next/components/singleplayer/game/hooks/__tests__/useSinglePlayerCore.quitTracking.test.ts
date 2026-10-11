@@ -37,7 +37,6 @@ vi.mock('@/hooks/useGiftModalPause', () => ({ useGiftModalPause: () => ({ isPaus
 vi.mock('@/hooks/useRewardAdPause', () => ({ useRewardAdPause: () => ({ isPausedByAd: false }) }));
 vi.mock('@/components/GameAnnouncer', () => ({ useAnnouncer: () => ({ announce: vi.fn() }) }));
 vi.mock('@/hooks/useDirectionPatternGuidance', () => ({ useDirectionPatternGuidance: () => ({ directionGuidance: null }) }));
-vi.mock('@/hooks/useFirstPlayTutorial', () => ({ useFirstPlayTutorial: () => ({ firstPlayTutorial: null, advanceTutorial: vi.fn() }) }));
 vi.mock('@/hooks/useCrazyGamesLifecycle', () => ({ useCrazyGamesLifecycle: vi.fn() }));
 vi.mock('@/hooks/useTrainingAnalysis', () => ({ useTrainingAnalysis: () => ({ trainingAnalysisTrackPath: vi.fn() }) }));
 vi.mock('@/hooks/useTrainingProgress', () => ({ useTrainingProgress: () => ({ trainingCompletedSkills: new Set(), trainingJustUnlocked: null, trainingUpdateProgress: vi.fn(), trainingTrackPath: vi.fn() }) }));

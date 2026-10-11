@@ -17028,6 +17028,30 @@ const es = {
     "cta": "A jugar",
     "ctaWait": "{{seconds}} s"
   },
+  "firstLesson": {
+    "skipLabel": "Saltar lección",
+    "skip": "Saltar",
+    "progressLabel": "Progreso de la lección",
+    "trace": "Traza esta palabra",
+    "findAny": "Ahora busca otra palabra",
+    "findLength": "A por {{count}}+ letras",
+    "inARow": "{{count}} seguidas",
+    "praise": {
+      "nice": "¡Bien!",
+      "great": "¡Genial!",
+      "awesome": "¡Brutal!",
+      "amazing": "¡Increíble!"
+    },
+    "oops": "Casi",
+    "tryWord": "Prueba {{word}}",
+    "found": "Encontraste {{word}}",
+    "complete": "¡Lección completada!",
+    "completeSub": "Ya lo tienes. El resto de la ronda es tuyo.",
+    "statWords": "Palabras",
+    "statPoints": "Puntos",
+    "statStreak": "Racha",
+    "keepPlaying": "Seguir jugando"
+  },
   "modeCoach": {
     "skip": "Saltar",
     "next": "Siguiente",
@@ -17882,14 +17906,6 @@ const es = {
     "lifeDrop": "Desliza palabras en el tablero para curarte. Cada palabra restaura vida.",
     "firstClue": "¡Esa palabra reveló una pista! Revisa las casillas de arriba.",
     "wrongGuess": "¡Error = -15 vida! Acumula pistas primero."
-  },
-  "encouragement": {
-    "gameStart": "¡Vamos! ¡Tú puedes! 🎯",
-    "firstWord": "¡Bien hecho! Sigue encontrando palabras.",
-    "longWord": "¡Qué palabra! Las palabras largas dan más puntos.",
-    "combo": "¡Combo! Estás en racha.",
-    "halfway": "¡A mitad de camino, sigue así!",
-    "almostDone": "¡Recta final! Encuentra más palabras."
   },
   "toast": {
     "found": "¡ENCONTRADA!",

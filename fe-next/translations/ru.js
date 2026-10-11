@@ -10952,6 +10952,30 @@ const ru = {
     "cta": "Играть",
     "ctaWait": "{{seconds}} с"
   },
+  "firstLesson": {
+    "skipLabel": "Пропустить урок",
+    "skip": "Пропустить",
+    "progressLabel": "Прогресс урока",
+    "trace": "Проведи по слову",
+    "findAny": "Теперь найди своё слово",
+    "findLength": "Слово из {{count}}+ букв",
+    "inARow": "{{count}} подряд",
+    "praise": {
+      "nice": "Неплохо!",
+      "great": "Здорово!",
+      "awesome": "Круто!",
+      "amazing": "Невероятно!"
+    },
+    "oops": "Почти",
+    "tryWord": "Попробуй {{word}}",
+    "found": "Ты нашёл {{word}}",
+    "complete": "Урок пройден!",
+    "completeSub": "Ты всё понял. Остаток раунда — твой.",
+    "statWords": "Слова",
+    "statPoints": "Очки",
+    "statStreak": "Серия",
+    "keepPlaying": "Играть дальше"
+  },
   "modeCoach": {
     "skip": "Пропустить",
     "next": "Далее",
@@ -14679,14 +14703,6 @@ const ru = {
     "zap": "Молния",
     "love": "Любовь",
     "label": "Быстрые реакции"
-  },
-  "encouragement": {
-    "gameStart": "Поехали, у тебя всё получится! 🎯",
-    "firstWord": "Хорошее слово! Так держать",
-    "longWord": "Ого! Длинные слова дают много очков!",
-    "combo": "Комбо! Ты в огне!",
-    "halfway": "Половина пути, не сбавляй!",
-    "almostDone": "Финишная прямая! Найди ещё слов!"
   },
   "cosy": {
     "wellDone": "Хорошо сделано",
