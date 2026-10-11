@@ -29,6 +29,7 @@ export interface SurvivalHeaderProps {
   /** Label for my own row in the standing. */
   selfUsername?: string;
   dir?: 'ltr' | 'rtl';
+  center?: React.ReactNode;
   t: (key: string) => string;
 }
 
@@ -45,6 +46,7 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
   rivals,
   selfUsername = 'You',
   dir = 'ltr',
+  center,
   t,
 }) => {
   const standing =
@@ -66,6 +68,12 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
         <SurvivalAudioEffectsControls t={t} />
       </div>
 
+      {center && (
+        <div data-testid="survival-header-center" className="min-w-0 flex-1 px-4">
+          {center}
+        </div>
+      )}
+
       {standing && (
         <div data-testid="survival-rank-indicator">
           <MobileRankIndicator
@@ -78,12 +86,14 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
       )}
 
       {!practice && (
-        <AccumulatedScoreDisplay
-          currentScore={liveScore}
-          lastIncrement={lastScoreIncrement}
-          isAnimating={isScoreAnimating}
-          t={t}
-        />
+        <div className={center ? 'flex w-44 shrink-0 justify-end' : 'contents'}>
+          <AccumulatedScoreDisplay
+            currentScore={liveScore}
+            lastIncrement={lastScoreIncrement}
+            isAnimating={isScoreAnimating}
+            t={t}
+          />
+        </div>
       )}
     </div>
   );

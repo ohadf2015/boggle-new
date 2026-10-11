@@ -245,6 +245,8 @@ interface EffectsWorkerProps {
 }
 
 const WORD_VALID_COOLDOWN_MS = 80;
+// The board and word stage carry the verdict colour; a strong full-screen wash muddies the header and clues mid-release.
+const VERDICT_FLASH_MAX = 0.12;
 
 function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
   const { particles, shake, flash, timeDilation, width, height } = useGameEngine();
@@ -273,22 +275,22 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
 
           if (pts <= 1) {
             particles.burst(WORD_SMALL_POP, effect.x, effect.y);
-            flash.flash({ color: 0xbfff00, duration: 0.1, intensity: 0.15 });
+            flash.flash({ color: 0xbfff00, duration: 0.1, intensity: 0.08 });
           } else if (pts <= 5) {
             particles.burst(WORD_MEDIUM_BURST, effect.x, effect.y);
-            flash.flash({ color: 0xbfff00, duration: 0.15, intensity: 0.25 });
+            flash.flash({ color: 0xbfff00, duration: 0.15, intensity: 0.1 });
             shake.light();
           } else if (pts <= 12) {
             particles.burst(WORD_BIG_EXPLOSION, effect.x, effect.y);
             particles.burst(GOLD_STARS, effect.x, effect.y - 30, 15);
-            flash.flash({ color: 0xffcc00, duration: 0.2, intensity: 0.3 });
+            flash.flash({ color: 0xffcc00, duration: 0.15, intensity: VERDICT_FLASH_MAX });
             shake.medium();
             timeDilation.slowDown(0.3, 0.15);
           } else {
             particles.burst(WORD_MASSIVE_BURST, effect.x, effect.y);
             particles.burst(GOLD_STARS, effect.x, effect.y - 40, 25);
             particles.burst(CONFETTI_BURST, effect.x, effect.y + 20);
-            flash.flash({ color: 0xffcc00, duration: 0.25, intensity: 0.4 });
+            flash.flash({ color: 0xffcc00, duration: 0.15, intensity: VERDICT_FLASH_MAX });
             shake.heavy();
             timeDilation.slowDown(0.2, 0.2);
             setTimeout(() => {
@@ -325,7 +327,7 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
         // ── Invalid input ──
         case 'invalid':
           particles.burst(ERROR_SPARKS, effect.x, effect.y);
-          flash.danger();
+          flash.flash({ color: 0xff2200, duration: 0.12, intensity: VERDICT_FLASH_MAX });
           shake.shake({ intensity: 4, duration: 0.12, decay: 'exponential', frequency: 40 });
           break;
 

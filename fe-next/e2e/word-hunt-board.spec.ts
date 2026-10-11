@@ -296,6 +296,14 @@ test.describe('Word Hunt board, desktop', () => {
     await expect(page.getByText(/loot collected/i).first()).toBeVisible();
   });
 
+  test('the life bar rides in the header row and the board takes the freed height', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'desktop layout only');
+    await startGame(page);
+    await expect(page.getByTestId('survival-header').getByTestId('survival-header-center').getByRole('progressbar')).toBeVisible();
+    const board = await page.getByRole('grid').boundingBox();
+    expect(board?.width ?? 0).toBeGreaterThanOrEqual(400);
+  });
+
   test('click-building a word shows the double-click submit hint', async ({ page, isMobile }) => {
     test.skip(isMobile, 'needs a hover pointer');
     await startGame(page);

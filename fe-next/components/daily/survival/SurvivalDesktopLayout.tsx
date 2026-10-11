@@ -128,6 +128,16 @@ function SurvivalDesktopLayoutImpl({
             isScoreAnimating={isScoreAnimating}
             onQuitClick={onQuitClick}
             practice={practice}
+            center={
+              <SurvivalLifeBar
+                lifePoints={lifePoints}
+                isGameOver={isGameOver}
+                isLifeGaining={isLifeGaining}
+                lifeGainAmount={lifeGainAmount}
+                skipAnimations={skipAnimations}
+                onLifeGainComplete={onLifeGainComplete}
+              />
+            }
             t={t}
           />
 
@@ -150,16 +160,6 @@ function SurvivalDesktopLayoutImpl({
               t={t}
             />
           </div>
-
-          {/* Life Bar */}
-          <SurvivalLifeBar
-            lifePoints={lifePoints}
-            isGameOver={isGameOver}
-            isLifeGaining={isLifeGaining}
-            lifeGainAmount={lifeGainAmount}
-            skipAnimations={skipAnimations}
-            onLifeGainComplete={onLifeGainComplete}
-          />
 
           <div
             data-testid="desktop-playfield"
