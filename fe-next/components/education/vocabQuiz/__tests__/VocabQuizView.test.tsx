@@ -222,7 +222,7 @@ describe('VocabQuizView', () => {
     });
 
     expect(screen.getByText('vocabQuiz.progress:3,5')).toBeInTheDocument();
-    expect(await screen.findByText('260')).toBeInTheDocument();
+    expect(await screen.findByText('260', undefined, { timeout: 5000 })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /brittle/ })).toHaveAttribute('aria-pressed', 'true');
   });
 

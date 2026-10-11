@@ -11,7 +11,6 @@ import type { Language } from '@/lib/supabase/education/types';
 
 // Mock translations
 vi.mock('@/contexts/LanguageContext', () => ({
-  ...vi.importActual('@/contexts/LanguageContext'),
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
