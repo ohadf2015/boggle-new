@@ -79,4 +79,19 @@ describe('BlastWordPraise', () => {
     // Text should not change since submitCount didn't increment
     expect(container.querySelector('.text-neo-lime')).toBeNull();
   });
+
+  it('given a delay, then the stamp waits for the lifted word to clear before it lands', () => {
+    vi.useFakeTimers();
+    try {
+      const { rerender } = render(<BlastWordPraise wordLength={0} submitCount={0} t={mockT} delayMs={500} />);
+      act(() => {
+        rerender(<BlastWordPraise wordLength={5} submitCount={1} t={mockT} delayMs={500} />);
+      });
+      expect(screen.queryByText('Great!')).toBeNull();
+      act(() => { vi.advanceTimersByTime(500); });
+      expect(screen.getByText('Great!')).toBeDefined();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

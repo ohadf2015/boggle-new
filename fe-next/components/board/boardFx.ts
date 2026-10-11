@@ -1,5 +1,5 @@
 import { keyOf, type BoardGeometry, type CellRef } from './selectionPath';
-import { animate, burst, flyFrames, later, norm, peekFx, reduced, resetFx, spawn, stateOf, type FxState } from './fxCore';
+import { animate, burst, flyFrames, later, norm, peekFx, pointsFrames, reduced, resetFx, spawn, stateOf, type FxState } from './fxCore';
 import { disposeOverlay, liftRelease, liftVerdict } from './boardLift';
 
 export type FeedbackKind = 'ok' | 'bad' | 'dupe';
@@ -200,12 +200,7 @@ function celebrate(container: HTMLElement, s: FxState, score: number | undefined
     const chip = spawn(container, layer, 'data-chip', `+${score}`);
     chip.style.left = `${x}px`;
     chip.style.top = `${y}px`;
-    animate(container, chip, [
-      { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 0 },
-      { transform: 'translate(-50%, calc(-50% - 22px)) scale(1.25)', opacity: 1, offset: 0.2 },
-      { transform: 'translate(-50%, calc(-50% - 54px)) scale(1)', opacity: 1, offset: 0.75 },
-      { transform: 'translate(-50%, calc(-50% - 70px)) scale(0.9)', opacity: 0 },
-    ], { duration: 1100, easing: 'cubic-bezier(0.2, 0.8, 0.3, 1)', fill: 'forwards' });
+    animate(container, chip, pointsFrames(70), { duration: 1100, easing: 'cubic-bezier(0.2, 0.8, 0.3, 1)', fill: 'forwards' });
   }
 }
 

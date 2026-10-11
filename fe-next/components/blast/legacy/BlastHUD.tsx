@@ -9,6 +9,8 @@ import { computeTimerUrgency } from '@/lib/cosy/timerUrgency';
 import { useSuppressTimerUrgency } from '@/contexts/AccessibilityContext';
 import { BlastComboStreakBadge } from './BlastComboStreakBadge';
 import BlastWalletHud from './BlastWalletHud';
+import { BlastHudMuteButton } from '../v2/BlastHudMuteButton';
+import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { BLAST_MAX_LIVES } from './utils/blastLives';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
 
@@ -219,6 +221,7 @@ export function BlastHUD({
   coins = 0,
   t,
 }: BlastHUDProps) {
+  useRegisterHeaderAudioControl();
   const showTimer =
     !isDesktopCanvas &&
     isMultiplayer && remainingTime !== null && remainingTime !== undefined && (totalTime ?? 0) > 0;
@@ -322,6 +325,7 @@ export function BlastHUD({
         <div className="flex items-center gap-1.5">
           {!isMultiplayer && <BlastWalletHud coins={coins} />}
           {hintSlot}
+          <BlastHudMuteButton className="h-7 w-7" />
           {onShowHelp && (
             <button
               onClick={onShowHelp}

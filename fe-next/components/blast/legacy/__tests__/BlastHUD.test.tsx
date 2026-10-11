@@ -251,3 +251,17 @@ describe('BlastHUD — coin wallet', () => {
     expect(screen.queryByTestId('coin-counter')).toBeNull();
   });
 });
+
+describe('BlastHUD — its own mute control', () => {
+  it('given a Blast round, then the HUD carries the mute toggle and the floating one stands down instead of landing on the progress row', async () => {
+    const { default: NavigationContext } = await import('@/contexts/NavigationContext');
+    const register = vi.fn(() => () => {});
+    render(
+      <NavigationContext.Provider value={{ registerHeaderAudioControl: register } as never}>
+        <BlastHUD {...baseProps} />
+      </NavigationContext.Provider>,
+    );
+    expect(screen.getByTestId('blast-mute-btn')).toBeTruthy();
+    expect(register).toHaveBeenCalled();
+  });
+});

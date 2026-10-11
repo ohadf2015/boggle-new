@@ -98,3 +98,13 @@ export function flyFrames(dx: number, dy: number, lift: number, tilt: number, en
     { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(${endScale}) rotate(0deg)`, opacity: 0 },
   ];
 }
+
+/** Points chip: pops in at full strength (a fade-in reads muddy over navy), rises, then fades out. */
+export function pointsFrames(rise: number, tilt = 0): Keyframe[] {
+  return [
+    { transform: `translate(-50%, -50%) scale(0.3) rotate(${-tilt}deg)`, opacity: 1 },
+    { transform: `translate(-50%, calc(-50% - ${Math.round(rise * 0.4)}px)) scale(1.3) rotate(${tilt / 2}deg)`, opacity: 1, offset: 0.2 },
+    { transform: `translate(-50%, calc(-50% - ${Math.round(rise * 0.78)}px)) scale(1) rotate(0deg)`, opacity: 1, offset: 0.78 },
+    { transform: `translate(-50%, calc(-50% - ${rise}px)) scale(0.9)`, opacity: 0 },
+  ];
+}

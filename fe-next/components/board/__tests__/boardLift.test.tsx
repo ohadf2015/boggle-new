@@ -107,6 +107,45 @@ describe('word lift on a board that another mode paints (Blast)', () => {
   });
 });
 
+describe('points chip', () => {
+  const firstFrames = (attr: string, run: () => void) => {
+    const seen: Keyframe[][] = [];
+    const proto = HTMLElement.prototype as unknown as { animate?: unknown };
+    const had = proto.animate;
+    proto.animate = function (this: HTMLElement, kf: Keyframe[]) {
+      if (this.hasAttribute(attr)) seen.push(kf);
+      return { cancel() {}, pause() {}, finished: Promise.resolve() } as unknown as Animation;
+    };
+    try {
+      run();
+    } finally {
+      proto.animate = had;
+    }
+    return seen;
+  };
+
+  it('given a lifted word is accepted, then its points pop in solid instead of fading up through the navy', () => {
+    const { board, geo } = mountGhost();
+    const seen = firstFrames('data-score-float', () => {
+      releaseFx(board, CAT, geo);
+      feedbackFx(board, 'ok', 61, 'cat');
+    });
+    expect(seen).toHaveLength(1);
+    expect(seen[0][0].opacity ?? 1).toBe(1);
+  });
+
+  it('given a word is accepted on a board with its own preview, then its points pop in solid too', () => {
+    const { container } = render(<LetterBoard grid={GRID} interactive />);
+    const board = container.querySelector<HTMLElement>('[data-board]')!;
+    const seen = firstFrames('data-chip', () => {
+      releaseFx(board, CAT, createBoardPainter(board).measure());
+      feedbackFx(board, 'ok', 40, 'cat');
+    });
+    expect(seen.length).toBeGreaterThanOrEqual(1);
+    expect(seen[0][0].opacity ?? 1).toBe(1);
+  });
+});
+
 describe('fly target', () => {
   it('given a hidden word bar before the visible one, then the letters fly to the visible one', () => {
     const rect = (x: number, y: number, w: number, h: number) =>

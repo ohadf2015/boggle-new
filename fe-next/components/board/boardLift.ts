@@ -1,11 +1,11 @@
 import { keyOf, type BoardGeometry, type CellRef } from './selectionPath';
-import { animate, burst, flyFrames, later, spawn, type FxState } from './fxCore';
+import { animate, burst, flyFrames, later, pointsFrames, spawn, type FxState } from './fxCore';
 import fx from './BoardEffects.module.css';
 
 export const LIFT_FLY_MS = 300;
 export const LIFT_STAGGER_MS = 28;
 const LIFT_TIMEOUT_MS = 1800;
-const OK_HOLD_MS = 520;
+export const LIFT_OK_HOLD_MS = 520;
 const BAD_HOLD_MS = 420;
 const LEAVE_MS = 260;
 
@@ -110,12 +110,7 @@ function scoreFloat(container: HTMLElement, layer: HTMLElement, label: HTMLEleme
   const chip = spawn(container, layer, 'data-score-float', `+${score}`);
   chip.style.left = `${r.left + r.width / 2}px`;
   chip.style.top = `${r.top}px`;
-  animate(container, chip, [
-    { transform: 'translate(-50%, -50%) scale(0.3) rotate(-8deg)', opacity: 0 },
-    { transform: 'translate(-50%, calc(-50% - 30px)) scale(1.3) rotate(3deg)', opacity: 1, offset: 0.22 },
-    { transform: 'translate(-50%, calc(-50% - 62px)) scale(1) rotate(0deg)', opacity: 1, offset: 0.78 },
-    { transform: 'translate(-50%, calc(-50% - 80px)) scale(0.9)', opacity: 0 },
-  ], { duration: 1150, easing: 'cubic-bezier(0.2, 0.8, 0.3, 1)', fill: 'forwards' });
+  animate(container, chip, pointsFrames(80, 8), { duration: 1150, easing: 'cubic-bezier(0.2, 0.8, 0.3, 1)', fill: 'forwards' });
 }
 
 function flyToScore(container: HTMLElement, label: HTMLElement) {
@@ -154,6 +149,6 @@ export function liftVerdict(container: HTMLElement, s: FxState, kind: 'ok' | 'ba
     if (tr) burst(container, layer, tr.left + tr.width / 2, tr.top + tr.height / 2, tr.width || 60, 12);
     if (score && score > 0) scoreFloat(container, layer, label, score);
   }
-  later(container, OK_HOLD_MS, () => flyToScore(container, label));
+  later(container, LIFT_OK_HOLD_MS, () => flyToScore(container, label));
 }
 

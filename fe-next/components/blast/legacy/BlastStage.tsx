@@ -26,6 +26,7 @@ import { BlastBoard } from './BlastBoard';
 import BlastChainText from './BlastChainText';
 import BlastWaveClearText from './BlastWaveClearText';
 import BlastWordPraise from './BlastWordPraise';
+import { LIFT_OK_HOLD_MS } from '@/components/board/boardLift';
 import { BlastWordRewardPreview } from './BlastWordRewardPreview';
 import { BlastEffectsLayer } from './BlastEffectsLayer';
 import { BlastScoreMilestone } from './BlastScoreMilestone';
@@ -483,7 +484,7 @@ export const BlastStage = memo(function BlastStage({
         </AdaptiveAnimatePresence>
         {/* Chain escalation text — scoped within board area */}
         <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} t={t} />
-        <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} />
+        <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} delayMs={LIFT_OK_HOLD_MS} />
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} t={t} />
       </div>
 
