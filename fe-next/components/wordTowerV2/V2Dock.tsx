@@ -55,8 +55,8 @@ export function V2Dock(p: Props) {
       ref={p.dockRef}
       className={
         p.wide
-          ? 'absolute bottom-0 end-0 top-0 z-30 flex w-[22rem] flex-col justify-center border-s-4 border-neo-cream/30 bg-neo-navy px-6 xl:w-[26rem]'
-          : 'pointer-events-none absolute inset-x-0 bottom-0 z-30 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-7'
+          ? 'absolute bottom-0 end-0 top-0 z-30 flex w-[22rem] flex-col justify-center border-s-4 border-neo-cream/30 bg-neo-navy px-6 pb-24 xl:w-[26rem]'
+          : 'pointer-events-none absolute inset-x-0 bottom-0 z-30 px-4 pb-[max(2.25rem,calc(env(safe-area-inset-bottom)+1.25rem))] pt-7'
       }
     >
       {p.rejected ? (
