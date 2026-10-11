@@ -168,13 +168,11 @@ export function DailyChallengeLanding({
   const showsWordTower = visibleModes.some((mode) => mode.id === 'word-tower');
   const showsConnections = visibleModes.some((mode) => mode.id === 'connections');
   const wordTowerHref = `/${currentLanguage}/word-tower/daily`;
-  const totalQuests = 2 + (showsWordTower ? 1 : 0) + (showsConnections ? 1 : 0);
-
-  // Completion count for progress bar
+  // Word Tower is an optional bonus: it never counts toward clearing the day.
+  const totalQuests = 2 + (showsConnections ? 1 : 0);
   const completedCount =
     (wordHuntStatus === 'won' ? 1 : 0) +
     (wordWheelStatus === 'played' ? 1 : 0) +
-    (showsWordTower && wordTowerPlayed ? 1 : 0) +
     (showsConnections && connectionsPlayed ? 1 : 0);
 
   const wordHuntPlayed = wordHuntStatus === 'won' || wordHuntStatus === 'lost';
@@ -203,6 +201,7 @@ export function DailyChallengeLanding({
     onPlay: () => void;
     visible: boolean;
     timeMode: 'timed' | 'relaxed';
+    badge?: string;
   };
 
   const modesInfo: ModeInfo[] = [
@@ -231,18 +230,6 @@ export function DailyChallengeLanding({
       timeMode: 'timed',
     },
     {
-      id: 'word-tower',
-      title: t('wordTower.daily.questTitle'),
-      tagline: t('wordTower.daily.questDesc'),
-      icon: <Building2 className="w-8 h-8" />,
-      color: 'cyan',
-      artUrl: '/daily/word-tower-mascot.jpg',
-      played: wordTowerPlayed,
-      onPlay: () => router.push(wordTowerHref),
-      visible: showsWordTower,
-      timeMode: 'relaxed',
-    },
-    {
       id: 'connections',
       title: t('connections.daily.questTitle'),
       tagline: t('connections.daily.questDesc'),
@@ -253,6 +240,19 @@ export function DailyChallengeLanding({
       onPlay: () => router.push(`/${currentLanguage}/connections/daily`),
       visible: showsConnections,
       timeMode: 'relaxed',
+    },
+    {
+      id: 'word-tower',
+      title: t('wordTower.daily.questTitle'),
+      tagline: t('wordTower.daily.questDesc'),
+      icon: <Building2 className="w-8 h-8" />,
+      color: 'cyan',
+      artUrl: '/daily/word-tower-mascot.jpg',
+      played: wordTowerPlayed,
+      onPlay: () => router.push(wordTowerHref),
+      visible: showsWordTower,
+      timeMode: 'relaxed',
+      badge: t('daily.bonusQuest'),
     },
   ];
 
@@ -313,6 +313,7 @@ export function DailyChallengeLanding({
               artUrl={mode.artUrl}
               onPlay={mode.onPlay}
               played={mode.played}
+              badge={mode.badge}
               delay={0.25 + i * 0.05}
             />
           ))}

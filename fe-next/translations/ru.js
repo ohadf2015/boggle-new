@@ -10061,6 +10061,7 @@ const ru = {
     "nextQuestsIn": "Новые квесты через",
     "timedQuest": "Квест на время",
     "relaxedQuest": "Спокойный квест",
+    "bonusQuest": "Бонус",
     "untimedQuest": "Квест без таймера",
     "startQuest": "НАЧАТЬ КВЕСТ",
     "aPlayer": "Игрок",

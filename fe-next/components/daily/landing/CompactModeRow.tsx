@@ -14,6 +14,8 @@ export interface CompactModeRowProps {
   delay?: number;
   /** Mode artwork (the same mascot the hero card uses). Omitted → no art slot. */
   artUrl?: string;
+  /** Small tag after the title, e.g. the optional bonus quest. */
+  badge?: string;
 }
 
 /* Every class is spelled out in full: Tailwind only emits a class when the
@@ -65,6 +67,7 @@ export function CompactModeRow({
   played = false,
   delay = 0,
   artUrl,
+  badge,
 }: CompactModeRowProps) {
   const config = COLOR_CONFIGS[color] ?? COLOR_CONFIGS.cyan;
 
@@ -134,6 +137,11 @@ export function CompactModeRow({
         {/* Title */}
         <h3 className="relative text-base font-neo-display font-black text-neo-white flex-1 text-start">
           {title}
+          {badge && (
+            <span className="ms-2 inline-block rounded-neo border-2 border-black bg-neo-cream px-1.5 py-0.5 align-middle text-[10px] font-black uppercase tracking-wide text-neo-navy">
+              {badge}
+            </span>
+          )}
         </h3>
 
         {/* Status Badge / Play Button */}

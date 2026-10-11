@@ -8422,6 +8422,7 @@ const en = {
     "nextQuestsIn": "Next quests in",
     "timedQuest": "Timed quest",
     "relaxedQuest": "Relaxed quest",
+    "bonusQuest": "Bonus",
     "untimedQuest": "Untimed quest",
     "startQuest": "START QUEST",
     "aPlayer": "A player",

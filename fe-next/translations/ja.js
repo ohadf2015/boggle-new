@@ -9034,6 +9034,7 @@ const ja = {
     "nextQuestsIn": "次のクエストまで",
     "timedQuest": "タイムクエスト",
     "relaxedQuest": "のんびりクエスト",
+    "bonusQuest": "ボーナス",
     "untimedQuest": "フリークエスト",
     "startQuest": "クエスト開始",
     "aPlayer": "プレイヤー",

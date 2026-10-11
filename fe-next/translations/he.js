@@ -9148,6 +9148,7 @@ const he = {
     "nextQuestsIn": "משימות חדשות בעוד",
     "timedQuest": "משימה בזמן",
     "relaxedQuest": "משימה רגועה",
+    "bonusQuest": "בונוס",
     "untimedQuest": "משימה חופשית",
     "startQuest": "התחילו משימה",
     "aPlayer": "שחקן",

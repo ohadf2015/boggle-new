@@ -123,18 +123,29 @@ function renderHub() {
   );
 }
 
-describe('DailyChallengeLanding — Progress bar counts all modes /4', () => {
+describe('DailyChallengeLanding — progress counts the required quests; Word Tower is a last, optional bonus', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     window.localStorage.clear();
     mockFetch.mockImplementation(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [] }) }));
   });
 
-  it('shows progress bar with aria-valuemax of 4 (four quests)', async () => {
+  it('shows progress over the three required quests', async () => {
     renderHub();
     const bar = await screen.findByTestId('xp-progress-bar');
-    // All four modes (hunt, wheel, tower, connections) count toward /4
-    expect(bar).toHaveAttribute('aria-valuemax', '4');
+    expect(bar).toHaveAttribute('aria-valuemax', '3');
+  });
+
+  it('lists Word Tower last among the quests, tagged as a bonus', async () => {
+    renderHub();
+    const secondary = await screen.findByTestId('secondary-modes');
+    const rows = Array.from(secondary.querySelectorAll('[data-testid^="compact-row-"]'));
+    expect(rows.map((r) => r.getAttribute('data-testid'))).toEqual([
+      'compact-row-yellow',
+      'compact-row-purple',
+      'compact-row-cyan',
+    ]);
+    expect(rows[2]).toHaveTextContent(/bonus/i);
   });
 
   it('renders primary hero card and secondary modes', async () => {
@@ -161,9 +172,8 @@ describe('DailyChallengeLanding — Progress bar counts all modes /4', () => {
   it('includes Connections in the total quest denominator', async () => {
     renderHub();
 
-    // The critical assertion: Connections counts toward the /4 denominator
     const bar = await screen.findByTestId('xp-progress-bar');
-    expect(bar).toHaveAttribute('aria-valuemax', '4');
+    expect(bar).toHaveAttribute('aria-valuemax', '3');
 
     // Verify all 4 modes are present:
     // Primary: quest-card-word-hunt
@@ -181,7 +191,7 @@ describe('DailyChallengeLanding — Progress bar counts all modes /4', () => {
 
     // Component should still work and show the progress bar
     const bar = await screen.findByTestId('xp-progress-bar');
-    expect(bar).toHaveAttribute('aria-valuemax', '4');
+    expect(bar).toHaveAttribute('aria-valuemax', '3');
 
     // The compact row for Connections should NOT show as played
     // (the done badge should NOT appear)

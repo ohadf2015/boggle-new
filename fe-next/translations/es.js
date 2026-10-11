@@ -9177,6 +9177,7 @@ const es = {
     "nextQuestsIn": "Próximas misiones en",
     "timedQuest": "Misión con tiempo",
     "relaxedQuest": "Misión relajada",
+    "bonusQuest": "Extra",
     "untimedQuest": "Misión libre",
     "startQuest": "INICIAR MISIÓN",
     "aPlayer": "Un jugador",

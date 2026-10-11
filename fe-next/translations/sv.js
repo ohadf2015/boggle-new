@@ -9333,6 +9333,7 @@ const sv = {
     "nextQuestsIn": "Nästa uppdrag om",
     "timedQuest": "Tidsbegränsat",
     "relaxedQuest": "Lugnt uppdrag",
+    "bonusQuest": "Bonus",
     "untimedQuest": "Utan timer",
     "startQuest": "STARTA QUEST",
     "aPlayer": "En spelare",

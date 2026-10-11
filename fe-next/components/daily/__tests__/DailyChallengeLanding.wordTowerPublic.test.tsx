@@ -146,12 +146,11 @@ describe('DailyChallengeLanding — Word Tower is a first-class daily quest', ()
     expect(mockPush).toHaveBeenCalledWith('/en/word-tower/daily');
   });
 
-  it('counts all four public quests in the progress bar', async () => {
+  it('leaves the optional Word Tower out of the progress bar', async () => {
     renderHub();
     await waitFor(() => {
       const bar = screen.getByTestId('xp-progress-bar');
-      // Word Hunt + Word Wheel + Word Tower + Connections (graduated from beta).
-      expect(bar).toHaveAttribute('aria-valuemax', '4');
+      expect(bar).toHaveAttribute('aria-valuemax', '3');
     });
   });
 
