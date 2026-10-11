@@ -8850,6 +8850,41 @@ const en = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "showBoard": "Today's board",
+      "hideBoard": "Hide board",
+      "moreBoards": "More"
+    },
+    "rank": {
+      "title": "Ranks",
+      "open": "See all ranks",
+      "toNext": "{count} to {rank}",
+      "top": "Top rank. Legend!",
+      "reached": "Today's rank",
+      "warmUp": "Warm-up",
+      "spinning": "Spinning",
+      "onARoll": "On a roll",
+      "sharp": "Sharp",
+      "hotStreak": "Hot streak",
+      "wordsmith": "Wordsmith",
+      "whirlwind": "Whirlwind",
+      "wizard": "Wizard",
+      "legend": "Legend"
+    },
+    "praise": {
+      "nice": "Nice!",
+      "great": "Great!",
+      "superb": "Superb!",
+      "brilliant": "Brilliant!",
+      "fullWheel": "Full wheel!"
+    },
+    "strip": {
+      "empty": "Your words land here",
+      "label": "Found {count}",
+      "all": "All words",
+      "close": "Close",
+      "longest": "Longest"
+    },
     "youFoundEverything": "You found every word they did. Nice.",
     "title": "Word Wheel",
     "loading": "Loading Word Wheel...",
@@ -8858,7 +8893,6 @@ const en = {
     "description": "Every word must use the center letter and be at least 3 letters long",
     "centerLetterRule": "Must use center letter",
     "minLetters": "Min {min} letters",
-    "wordsFound": "{count} words found",
     "scoreLabel": "Score",
     "timeLeft": "Time left",
     "closeRace": "Close race!",
@@ -8888,10 +8922,6 @@ const en = {
     "removeLetter": "Remove letter",
     "foundWords": "Found words",
     "possibleWords": "Possible",
-    "excellent": "Excellent!",
-    "great": "Great!",
-    "good": "Good effort!",
-    "tryAgain": "Keep practicing!",
     "longest": "Longest",
     "viewSubmittedWords": "View submitted words",
     "viewWordsYouMissed": "View words you missed",
@@ -8899,7 +8929,6 @@ const en = {
     "youMissedTitle": "Words you missed",
     "noWordsSubmitted": "No words submitted yet",
     "results": {
-      "title": "Word Wheel Results",
       "wordsFound": "Words found",
       "score": "Score",
       "time": "Time",

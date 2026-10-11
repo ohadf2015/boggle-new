@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import WordWheelChallenge from '../WordWheelChallenge';
 
 // --- next/dynamic: actually resolve the loader ---
@@ -127,6 +127,8 @@ beforeEach(() => {
 describe('WordWheelChallenge - ready phase leaderboard', () => {
   it('GIVEN unplayed state THEN renders TabbedDailyLeaderboard with scope="word-wheel"', async () => {
     render(<WordWheelChallenge />);
+    const boardToggle = await screen.findByRole('button', { name: /showBoard|hideBoard/ });
+    if (boardToggle.getAttribute('aria-expanded') === 'false') fireEvent.click(boardToggle);
 
     const lb = await waitFor(() =>
       screen.getByTestId('tabbed-daily-leaderboard')

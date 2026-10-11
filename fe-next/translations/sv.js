@@ -9722,6 +9722,41 @@ const sv = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "showBoard": "Dagens ranking",
+      "hideBoard": "Dölj ranking",
+      "moreBoards": "Fler"
+    },
+    "rank": {
+      "title": "Nivåer",
+      "open": "Alla nivåer",
+      "toNext": "{count} kvar till {rank}",
+      "top": "Högsta nivån. Legend!",
+      "reached": "Dagens nivå",
+      "warmUp": "Uppvärmning",
+      "spinning": "Snurrar",
+      "onARoll": "På gång",
+      "sharp": "Vass",
+      "hotStreak": "Het",
+      "wordsmith": "Ordsmed",
+      "whirlwind": "Virvelvind",
+      "wizard": "Trollkarl",
+      "legend": "Legend"
+    },
+    "praise": {
+      "nice": "Snyggt!",
+      "great": "Grymt!",
+      "superb": "Toppen!",
+      "brilliant": "Briljant!",
+      "fullWheel": "Hela hjulet!"
+    },
+    "strip": {
+      "empty": "Dina ord landar här",
+      "label": "Hittade {count}",
+      "all": "Alla ord",
+      "close": "Stäng",
+      "longest": "Längsta"
+    },
     "youFoundEverything": "Du hittade varje ord de hittade. Snyggt.",
     "title": "Ordhjul",
     "loading": "Laddar Ordhjul...",
@@ -9730,7 +9765,6 @@ const sv = {
     "description": "Varje ord måste använda mittenbokstaven och vara minst 3 bokstäver långt",
     "centerLetterRule": "Måste använda mittenbokstaven",
     "minLetters": "Min {min} bokstäver",
-    "wordsFound": "{count} ord hittade",
     "scoreLabel": "Poäng",
     "timeLeft": "Tid kvar",
     "closeRace": "Jämnt lopp!",
@@ -9760,10 +9794,6 @@ const sv = {
     "removeLetter": "Ta bort bokstav",
     "foundWords": "Hittade ord",
     "possibleWords": "Möjliga",
-    "excellent": "Utmärkt!",
-    "great": "Bra jobbat!",
-    "good": "Bra försök!",
-    "tryAgain": "Fortsätt öva!",
     "longest": "Längsta",
     "viewSubmittedWords": "Visa inskickade ord",
     "viewWordsYouMissed": "Visa ord du missade",
@@ -9771,7 +9801,6 @@ const sv = {
     "youMissedTitle": "Ord du missade",
     "noWordsSubmitted": "Inga ord inskickade ännu",
     "results": {
-      "title": "Ordhjulsresultat",
       "wordsFound": "Hittade ord",
       "score": "Poäng",
       "time": "Tid",

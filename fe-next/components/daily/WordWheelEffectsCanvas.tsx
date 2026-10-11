@@ -208,17 +208,16 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
         case 'wordValid': {
           const pts = effect.points;
 
-          if (pts <= 1) {
-            // 3-letter: small satisfying pop
+          // Thresholds follow scoreWord: 3 letters = 12, 4 = 30, 5-6 = 60-96, 7+ = 144+.
+          if (pts <= 12) {
             particles.burst(WORD_SMALL_POP, effect.x, effect.y);
-            flash.flash({ color: 0xbfff00, duration: 0.1, intensity: 0.15 });
-          } else if (pts <= 5) {
-            // 4-5 letter: medium burst + light shake
+            flash.flash({ color: 0xbfff00, duration: 0.1, intensity: 0.1 });
+          } else if (pts <= 30) {
             particles.burst(WORD_MEDIUM_BURST, effect.x, effect.y);
-            flash.flash({ color: 0xbfff00, duration: 0.15, intensity: 0.25 });
+            flash.flash({ color: 0xbfff00, duration: 0.12, intensity: 0.14 });
             shake.light();
-          } else if (pts <= 12) {
-            // 6-7 letter: big explosion + gold stars + medium shake
+          } else if (pts <= 96) {
+            // 5-6 letters: big explosion + gold stars + medium shake
             particles.burst(WORD_BIG_EXPLOSION, effect.x, effect.y);
             particles.burst(GOLD_STARS, effect.x, effect.y - 30, 15);
             flash.flash({ color: 0xffcc00, duration: 0.2, intensity: 0.3 });
@@ -226,7 +225,7 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
             // Brief hit-stop for big words
             timeDilation.slowDown(0.3, 0.15);
           } else {
-            // 8+ letter: massive explosion + confetti + hit-stop
+            // 7+ letters: massive explosion + confetti + hit-stop
             particles.burst(WORD_BIG_EXPLOSION, effect.x, effect.y);
             particles.burst(GOLD_STARS, effect.x, effect.y - 40, 25);
             particles.burst(CONFETTI_BURST, effect.x, effect.y + 20);
@@ -248,7 +247,7 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
           if (c >= 2 && c < 5) {
             // x2-x4: combo flash ring
             particles.burst(COMBO_FLASH, effect.x, effect.y);
-            flash.combo();
+            flash.flash({ color: 0x00ffff, duration: 0.15, intensity: 0.15 });
           } else if (c >= 5 && c < 10) {
             // x5-x9: electric rings + bigger shake
             particles.burst(COMBO_FLASH, effect.x, effect.y);
@@ -307,7 +306,7 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
         case 'error':
           particles.burst(ERROR_SPARKS, effect.x, effect.y);
           shake.shake({ intensity: 4, duration: 0.12, decay: 'exponential', frequency: 40 });
-          flash.danger();
+          flash.flash({ color: 0xff2200, duration: 0.15, intensity: 0.12 });
           break;
 
         // ── Time warning: start urgency mode ──

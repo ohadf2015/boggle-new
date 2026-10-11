@@ -9417,6 +9417,41 @@ const es = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "showBoard": "Tabla de hoy",
+      "hideBoard": "Ocultar tabla",
+      "moreBoards": "Más"
+    },
+    "rank": {
+      "title": "Rangos",
+      "open": "Ver todos los rangos",
+      "toNext": "{count} para {rank}",
+      "top": "Rango máximo. ¡Leyenda!",
+      "reached": "Tu rango de hoy",
+      "warmUp": "Calentando",
+      "spinning": "Girando",
+      "onARoll": "En racha",
+      "sharp": "Afilado",
+      "hotStreak": "Encendido",
+      "wordsmith": "Artesano",
+      "whirlwind": "Torbellino",
+      "wizard": "Mago",
+      "legend": "Leyenda"
+    },
+    "praise": {
+      "nice": "¡Bien!",
+      "great": "¡Genial!",
+      "superb": "¡Soberbio!",
+      "brilliant": "¡Brillante!",
+      "fullWheel": "¡Rueda completa!"
+    },
+    "strip": {
+      "empty": "Tus palabras aparecen aquí",
+      "label": "{count} halladas",
+      "all": "Todas las palabras",
+      "close": "Cerrar",
+      "longest": "La más larga"
+    },
     "youFoundEverything": "Encontraste todas las palabras que ellos encontraron. Bien hecho.",
     "title": "Rueda de palabras",
     "loading": "Cargando Rueda de Palabras...",
@@ -9425,7 +9460,6 @@ const es = {
     "description": "Cada palabra debe usar la letra central y tener al menos 3 letras",
     "centerLetterRule": "Debe usar la letra central",
     "minLetters": "Mín {min} letras",
-    "wordsFound": "{count} palabras encontradas",
     "scoreLabel": "Puntuación",
     "timeLeft": "Tiempo restante",
     "closeRace": "¡Carrera reñida!",
@@ -9455,10 +9489,6 @@ const es = {
     "removeLetter": "Quitar letra",
     "foundWords": "Palabras encontradas",
     "possibleWords": "Posibles",
-    "excellent": "¡Excelente!",
-    "great": "¡Genial!",
-    "good": "¡Buen esfuerzo!",
-    "tryAgain": "¡Sigue practicando!",
     "longest": "Más larga",
     "viewSubmittedWords": "Ver palabras enviadas",
     "viewWordsYouMissed": "Ver palabras que se te escaparon",
@@ -9466,7 +9496,6 @@ const es = {
     "youMissedTitle": "Palabras que se te escaparon",
     "noWordsSubmitted": "Aún no se han enviado palabras",
     "results": {
-      "title": "Resultados de la rueda de palabras",
       "wordsFound": "Palabras encontradas",
       "score": "Puntuación",
       "time": "Tiempo",
