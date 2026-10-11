@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useCallback, memo, useMemo, useRef } from 'react';
 import { useSafeInterval } from '@/hooks/useSafeTimeout';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Trophy, ChevronDown, ChevronUp, Crown, Calendar, Users, Target, CircleDot, Globe, Sparkles, Link2 } from 'lucide-react';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Trophy, ChevronDown, ChevronUp, Target, CircleDot, Globe } from 'lucide-react';
 import { useFriends } from '@/hooks/useFriends';
 import type { Language } from '@/types';
 import { LANGUAGE_CONFIG } from '@/lib/languageConfig';
@@ -18,6 +17,7 @@ import type { ChaseParticipant } from './chaseTarget';
 import { DailySeasonRibbon } from './DailySeasonRibbon';
 import { participantKey, computeRankMovements, collectCountries, type RankMovement } from './leaderboardLive';
 import ConnectionsDailyTab from './ConnectionsDailyTab';
+import LeaderboardTabSwitch from './LeaderboardTabSwitch';
 
 /**
  * The leaderboard routes answer with `Cache-Control: public, max-age=20`. That is
@@ -182,48 +182,6 @@ function fallbackSeasons(): { seasons: DailySeasonSummary[]; currentSeasonId: nu
     }],
   };
 }
-
-// ==========================================
-// Tabs Component (Always Visible)
-// ==========================================
-
-const LeaderboardTabs = memo<{
-  activeTab: LeaderboardTab;
-  onTabChange: (tab: LeaderboardTab) => void;
-  t: T;
-}>(({ activeTab, onTabChange, t }) => (
-  <div className="flex justify-center">
-    <ToggleGroup
-      type="single"
-      value={activeTab}
-      onValueChange={(value) => value && onTabChange(value as LeaderboardTab)}
-      className="bg-neo-navy-light p-1 rounded-neo border-2 border-neo-black flex-wrap justify-center"
-    >
-      <ToggleGroupItem value="today" size="sm" className="text-xs px-2 sm:px-3">
-        <Calendar className="w-3.5 h-3.5 me-1 sm:me-1.5" />
-        {t('wordHunt.leaderboard.today')}
-      </ToggleGroupItem>
-      <ToggleGroupItem value="season" size="sm" className="text-xs px-2 sm:px-3">
-        <Sparkles className="w-3.5 h-3.5 me-1 sm:me-1.5" />
-        {t('wordHunt.leaderboard.season')}
-      </ToggleGroupItem>
-      <ToggleGroupItem value="alltime" size="sm" className="text-xs px-2 sm:px-3">
-        <Crown className="w-3.5 h-3.5 me-1 sm:me-1.5" />
-        {t('wordHunt.leaderboard.allTime')}
-      </ToggleGroupItem>
-      <ToggleGroupItem value="friends" size="sm" className="text-xs px-2 sm:px-3">
-        <Users className="w-3.5 h-3.5 me-1 sm:me-1.5" />
-        {t('leaderboard.friends')}
-      </ToggleGroupItem>
-      <ToggleGroupItem value="connections" size="sm" className="text-xs px-2 sm:px-3" data-testid="connections-tab-button">
-        <Link2 className="w-3.5 h-3.5 me-1 sm:me-1.5" />
-        {t('wordHunt.leaderboard.connections', 'Connections')}
-      </ToggleGroupItem>
-    </ToggleGroup>
-  </div>
-));
-
-LeaderboardTabs.displayName = 'LeaderboardTabs';
 
 // ==========================================
 // Main Component
@@ -1119,6 +1077,21 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                       </span>
                     </>
                   )}
+                  {countries.length > 0 && (
+                    <>
+                      <span className="mx-1.5">•</span>
+                      <span data-testid="countries-strip" className="inline-flex items-center gap-1">
+                        <span aria-hidden className="leading-none">
+                          {countries.slice(0, 3).map((code) => (
+                            <span key={code} title={code}>{getCountryFlag(code)}</span>
+                          ))}
+                        </span>
+                        {countries.length === 1
+                          ? t('wordHunt.leaderboard.countrySingular')
+                          : t('wordHunt.leaderboard.countries').replace('{count}', String(countries.length))}
+                      </span>
+                    </>
+                  )}
                 </>
               ) : totalCount > 0 ? (
                 <>{totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}</>
@@ -1155,25 +1128,6 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
         )}
       </div>
 
-      {/* Countries on today's board */}
-      {activeTab === 'today' && !isLoading && !error && countries.length > 0 && (
-        <div
-          className="flex items-center gap-1.5 mb-3 px-2.5 py-1.5 rounded-neo border border-neo-white/15 bg-neo-navy/60 text-xs sm:text-sm"
-          data-testid="countries-strip"
-        >
-          <span className="flex items-center gap-0.5 leading-none" aria-hidden>
-            {countries.slice(0, 8).map((code) => (
-              <span key={code} title={code}>{getCountryFlag(code)}</span>
-            ))}
-          </span>
-          <span className="text-neo-white/70 font-bold">
-            {countries.length === 1
-              ? t('wordHunt.leaderboard.countrySingular')
-              : t('wordHunt.leaderboard.countries').replace('{count}', String(countries.length))}
-          </span>
-        </div>
-      )}
-
       {/* Who to beat — the single closable gap, above the standings so the board
           reads as a target rather than a record. Today's tab only: the other
           tabs rank on cumulative totals, where "one good word passes them" is
@@ -1192,7 +1146,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
       {/* Tabs - always visible, outside loading area */}
       <div className="mb-4">
-        <LeaderboardTabs activeTab={activeTab} onTabChange={setActiveTab} t={t} />
+        <LeaderboardTabSwitch activeTab={activeTab} onTabChange={setActiveTab} t={t} />
       </div>
 
       {/* Season identity + picker */}

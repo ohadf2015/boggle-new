@@ -9,7 +9,7 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import WordWheelChallenge from '../WordWheelChallenge';
 
 vi.mock('next/dynamic', () => ({
@@ -127,6 +127,8 @@ beforeEach(() => {
 describe('WordWheelChallenge — guest identity', () => {
   it('hands the ready-screen leaderboard the DAILY guest fingerprint, not the multiplayer session id', async () => {
     render(<WordWheelChallenge />);
+    const boardToggle = await screen.findByRole('button', { name: /showBoard|hideBoard/ });
+    if (boardToggle.getAttribute('aria-expanded') === 'false') fireEvent.click(boardToggle);
     const lb = await waitFor(() => screen.getByTestId('tabbed-daily-leaderboard'));
     await waitFor(() => expect(lb.getAttribute('data-fp')).toBe('daily-fp'));
     expect(capturedProps.some(p => p.currentGuestFingerprint === 'session-fp')).toBe(false);

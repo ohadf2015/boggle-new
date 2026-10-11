@@ -79,6 +79,8 @@ export interface SoloGameLayoutProps {
   soloMissions?: readonly SoloMission[];
   /** Coins badge / practice training bar — mode-specific extras. */
   soloChrome?: ReactNode;
+  /** A first-run lesson owns the chrome slot; wide screens lift it over the board. */
+  soloLessonActive?: boolean;
   children?: ReactNode;
 }
 
@@ -133,6 +135,8 @@ const SOLO_SHELL_CSS = `
   .${SHELL} > [data-solo-slot="words"] { grid-area: words; min-height: 0; align-self: stretch; overflow: hidden; display: flex; flex-direction: column; }
   .${SHELL} > [data-solo-slot="words"] > ul { flex-direction: column; flex-wrap: nowrap; overflow-y: auto; overflow-x: hidden; height: auto; flex: 1 1 auto; }
   .${SHELL} > [data-solo-slot="words"] > ul > li { justify-content: space-between; }
+  .${SHELL}[data-lesson="on"] { grid-template-areas: "bar bar bar" "race missions words" ". board words"; padding-bottom: 6.5rem; }
+  .${SHELL}[data-lesson="on"] > [data-solo-slot="missions"] { justify-self: center; width: min(100%, 40rem); margin-top: 2.5rem; }
 }
 /* TV / big monitor: the side lanes are read from the couch — scale them up. */
 @media (min-width: 1700px) and (min-height: 900px) and (min-aspect-ratio: 5/4) {
@@ -155,7 +159,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
     foundWords, comboLevel, fireRoundActive, fireRoundRemaining, earthquakeState, currentFeedback,
     highlightedPath, isDesktop, awaitingStart, onStart, onWordSubmit, onWordChange, onPathSubmit,
     onExit, onPauseToggle, gameStatsRef, t, soloStreak = 0, soloMultiplier = 1, soloPraiseKey = null,
-    soloMissions, soloChrome, children,
+    soloMissions, soloChrome, soloLessonActive = false, children,
   } = props;
 
   const hapticsEnabled = useHapticsEnabled();
@@ -205,7 +209,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
-        isPlaying={playing}
+        isPlaying={playing && !soloLessonActive}
         isDesktop={isDesktop}
         isTypingMode={false}
         isHelpOpen={false}
@@ -215,6 +219,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
 
       <style>{SOLO_SHELL_CSS}</style>
       <div
+        data-lesson={soloLessonActive ? 'on' : undefined}
         className={cn(
           SHELL,
           'relative z-10 mx-auto flex h-full w-full max-w-lg md:max-w-xl flex-col px-3 sm:px-4',
