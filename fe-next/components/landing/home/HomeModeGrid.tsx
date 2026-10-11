@@ -29,7 +29,7 @@ interface ModeTileProps {
 }
 
 function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
-  const { dir } = useLanguage();
+  const { t, dir } = useLanguage();
   const Arrow = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const launch = useHomeLaunch();
   const tint = TINT[model.variant];
@@ -98,7 +98,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
             tint.chip,
           )}
         >
-          {model.badge}
+          {t(`landing.badge.${model.badge.toLowerCase()}`, model.badge)}
         </span>
       )}
       {model.resume && !locked && <ModeResumeChip resume={model.resume} anchor={anchor} />}
@@ -250,7 +250,7 @@ export function HomeModeGrid({ models, extras, liveCount }: HomeModeGridProps) {
               <Sparkles className="h-4 w-4 md:h-6 md:w-6" strokeWidth={2.5} aria-hidden="true" />
             </span>
             <span className="flex-1 truncate md:flex-none md:whitespace-normal md:text-sm md:leading-tight">{t('landing.moreGameModes')}</span>
-            <span className="rounded-full border-2 border-black bg-neo-lime px-2 py-0.5 text-xs leading-none text-neo-navy">+{extras.length}</span>
+            <span dir="ltr" className="rounded-full border-2 border-black bg-neo-lime px-2 py-0.5 text-xs leading-none text-neo-navy">+{extras.length}</span>
             <ChevronDown className="h-5 w-5 md:hidden" strokeWidth={2.5} aria-hidden="true" />
           </button>
         )}

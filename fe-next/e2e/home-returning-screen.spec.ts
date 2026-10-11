@@ -51,6 +51,7 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByTestId('home-streak-chip')).toBeVisible();
       await expect(page.getByTestId('mode-cube-anchor').first()).toBeInViewport();
       await expect(page.getByTestId('landing-cubes-more')).toBeInViewport();
+      await expect(page.locator('[data-install-pill]')).toBeHidden();
     });
 
     test('the rest of the modes open in a sheet one tap away', async ({ page }) => {

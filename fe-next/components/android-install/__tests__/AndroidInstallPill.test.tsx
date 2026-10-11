@@ -118,6 +118,19 @@ describe('AndroidInstallPill', () => {
     expect(screen.queryByText('androidAppPromo.pillLabel')).not.toBeInTheDocument();
   });
 
+  it('stays off the returning home, where it sat on the modes row, and logs no impression', () => {
+    document.documentElement.setAttribute('data-home', 'returning');
+    try {
+      useAndroidInstallStore.setState({ pillVisible: true });
+      render(<AndroidInstallPill />);
+      settle();
+      expect(screen.queryByText('androidAppPromo.pillLabel')).not.toBeInTheDocument();
+      expect(captureMock).not.toHaveBeenCalled();
+    } finally {
+      document.documentElement.removeAttribute('data-home');
+    }
+  });
+
   it('shows the pill and tracks the impression once when active + eligible', () => {
     useAndroidInstallStore.setState({ pillVisible: true });
     render(<AndroidInstallPill />);

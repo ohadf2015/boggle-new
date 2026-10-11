@@ -26,7 +26,7 @@ vi.mock('next/link', () => ({
   ),
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
+  useLanguage: () => ({ t: (k: string, fallback?: string) => (k.startsWith('landing.badge.admin') ? fallback : k), language: 'en', dir: 'ltr' }),
 }));
 
 function model(key: string, over: Partial<ModeCubeModel> = {}): ModeCubeModel {
@@ -111,5 +111,19 @@ describe('HomeModeGrid', () => {
     fireEvent.click(screen.getByTestId('mode-cube-anchor'));
     expect(screen.queryByTestId('home-launch')).toBeNull();
     expect(screen.getByText('offline')).toBeInTheDocument();
+  });
+
+  it('speaks the badge in the page language instead of a raw English tag', () => {
+    const tagged = [model('arena'), model('adventure', { badge: 'NEW' }), model('blast', { badge: 'BETA' }), model('rain', { badge: 'ADMIN' })];
+    render(<HomeModeGrid models={tagged} extras={[]} liveCount={0} />);
+    expect(screen.getByText('landing.badge.new')).toBeInTheDocument();
+    expect(screen.getByText('landing.badge.beta')).toBeInTheDocument();
+    expect(screen.getByText('ADMIN')).toBeInTheDocument();
+    expect(screen.queryByText('NEW')).not.toBeInTheDocument();
+  });
+
+  it('keeps the extra-modes count reading "+2" in right-to-left pages', () => {
+    render(<HomeModeGrid models={models} extras={extras} liveCount={0} />);
+    expect(screen.getByText('+2')).toHaveAttribute('dir', 'ltr');
   });
 });

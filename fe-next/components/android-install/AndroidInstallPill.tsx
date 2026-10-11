@@ -108,7 +108,14 @@ export default function AndroidInstallPill() {
   // the map's Continue button, the one primary action there (blind judge 2026-09-26).
   const onAdventure = /^\/(?:[a-z]{2}\/)?adventure(?:\/|$)/.test(pathname ?? '');
 
-  const shown = pillVisible && eligible && !sessionHidden && routeAllowed && !inGame && !onAdventure;
+  // The returning home is one screen; the pill sat on its modes row there.
+  const onReturningHome =
+    /^\/(?:[a-z]{2}\/?)?$/.test(pathname ?? '') &&
+    typeof document !== 'undefined' &&
+    document.documentElement.getAttribute('data-home') === 'returning';
+
+  const shown =
+    pillVisible && eligible && !sessionHidden && routeAllowed && !inGame && !onAdventure && !onReturningHome;
 
   // Track the impression once per appearance.
   useEffect(() => {
@@ -134,7 +141,7 @@ export default function AndroidInstallPill() {
   };
 
   return (
-    <div className="fixed end-0 bottom-[calc(var(--bottom-stack-height)+0.75rem)] z-[55] flex items-stretch md:bottom-auto md:top-1/2 md:-translate-y-1/2">
+    <div data-install-pill className="fixed end-0 bottom-[calc(var(--bottom-stack-height)+0.75rem)] z-[55] flex items-stretch md:bottom-auto md:top-1/2 md:-translate-y-1/2">
       <button
         type="button"
         onClick={handleOpen}
