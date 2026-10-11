@@ -29,6 +29,8 @@ const TARGETS: Record<string, Target[]> = {
   'english-games-middle-school': [{ grade: 6 }, { grade: 7 }, { grade: 8 }, { topic: 'academic' }],
   'english-games-adults': [{ topic: 'academic' }, { grade: 10 }, { grade: 11 }, { grade: 12 }],
   'irregular-verbs-games': [{ topic: 'verbs' }, { grade: 3 }, { grade: 7 }],
+  'boggle-for-the-classroom': [{ topic: 'school' }, { topic: 'animals' }, { grade: 3 }, { grade: 5 }],
+  'boggle-for-kids': [{ grade: 1 }, { grade: 2 }, { topic: 'animals' }, { topic: 'food' }],
   'english-vocabulary-topics': [
     { topic: 'animals' },
     { topic: 'food' },
