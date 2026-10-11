@@ -39,6 +39,13 @@ export function createAdminClient(): SupabaseClient | null {
   return _adminClient.client;
 }
 
+/** createAdminClient for jobs that cannot run without it (crons, verifiers). */
+export function requireAdminClient(): SupabaseClient {
+  const client = createAdminClient();
+  if (!client) throw new Error('Supabase service role is not configured');
+  return client;
+}
+
 let _anonClient: { url: string; key: string; client: SupabaseClient } | null = null;
 
 /**

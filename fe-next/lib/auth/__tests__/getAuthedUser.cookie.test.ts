@@ -31,18 +31,15 @@ vi.mock('@/utils/supabase/server', () => ({
 import { getAuthedUser } from '../getAuthedUser';
 
 describe('getAuthedUser with a cookie session', () => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
   beforeEach(() => {
-    process.env.SUPABASE_JWT_SECRET = TEST_SECRET;
-    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://proj.supabase.co';
+    vi.stubEnv('SUPABASE_JWT_SECRET', TEST_SECRET);
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://proj.supabase.co');
     mockGetUser.mockReset();
     mockGetUser.mockResolvedValue({ data: { user: { id: 'remote-1' } }, error: null });
   });
 
   afterEach(() => {
-    delete process.env.SUPABASE_JWT_SECRET;
-    process.env.NEXT_PUBLIC_SUPABASE_URL = url;
+    vi.unstubAllEnvs();
   });
 
   it('verifies a GET locally from the session cookie without calling Supabase Auth', async () => {

@@ -49,6 +49,12 @@ vi.mock('@supabase/supabase-js', () => ({
 describe('MilogWordVerifier', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-service-key');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   describe('parseVerificationResult', () => {

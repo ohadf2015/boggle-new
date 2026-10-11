@@ -3,7 +3,7 @@
  * Uses en.wiktionary.org, checks body.es — mirrors wiktionaryEnVerifier test pattern.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const { mockGet } = vi.hoisted(() => ({ mockGet: vi.fn() }));
 vi.mock('ky', () => ({
@@ -43,8 +43,14 @@ function makeJsonResponse(body: unknown) {
 describe('WiktionaryEsVerifier', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-service-key');
     mockRedisGet.mockResolvedValue(null);
     mockRedisSetex.mockResolvedValue('OK');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   describe('parseWiktionaryEsResponse', () => {

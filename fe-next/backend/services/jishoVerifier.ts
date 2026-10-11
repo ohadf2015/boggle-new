@@ -15,6 +15,7 @@
 import ky, { HTTPError } from 'ky';
 import { getRedisClient } from '../redisClient';
 import logger from '../utils/logger';
+import { requireAdminClient } from '@/utils/supabase/admin';
 
 const USER_AGENT = 'LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)';
 const RATE_LIMIT_MS = 300;
@@ -112,17 +113,12 @@ export async function verifyWordOnJisho(word: string): Promise<JishoVerification
 
 export interface ProcessQueueResult { processed: number; verified: number; notFound: number; rejectedType: number; errors: number }
 
-async function getServiceClient() {
-  const { createClient } = await import('@supabase/supabase-js');
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
-}
-
 export async function processJishoVerificationQueue(
   options: { batchSize?: number; minSubmissions?: number; maxAttempts?: number } = {}
 ): Promise<ProcessQueueResult> {
   const { batchSize = 50, minSubmissions = 2, maxAttempts = 3 } = options;
   const result: ProcessQueueResult = { processed: 0, verified: 0, notFound: 0, rejectedType: 0, errors: 0 };
-  const supabase = await getServiceClient();
+  const supabase = requireAdminClient();
 
   const { data: queue, error: queueError } = await supabase.rpc('get_verification_queue', {
     p_language: 'ja', p_batch_size: batchSize, p_min_submissions: minSubmissions, p_max_attempts: maxAttempts,

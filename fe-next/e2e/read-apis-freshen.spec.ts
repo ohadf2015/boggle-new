@@ -125,6 +125,55 @@ test.describe('forged sessions are rejected', () => {
   });
 });
 
+test.describe('signed-out writes are refused before touching the database', () => {
+  test('coin and avatar spends need a session', async ({ request }) => {
+    const purchase = await request.post('/api/avatar/purchase-part', { data: { category: 'hat', partId: 'crown' } });
+    expect([401, 429]).toContain(purchase.status());
+    const claimStatus = await request.get('/api/avatar/claim-daily-part');
+    expect([401, 429]).toContain(claimStatus.status());
+    const claim = await request.post('/api/avatar/claim-daily-part', { data: {} });
+    expect([401, 429]).toContain(claim.status());
+  });
+
+  test('ranked, score sync and clubs need a session', async ({ request }) => {
+    for (const path of ['/api/ranked/match', '/api/scores/sync', '/api/growth/word-clubs', '/api/feedback/notify']) {
+      const res = await request.post(path, { data: {} });
+      expect([401, 429], path).toContain(res.status());
+    }
+    const clubs = await request.get('/api/growth/word-clubs');
+    expect([401, 429]).toContain(clubs.status());
+  });
+
+  test('GETs that write keep the remote session check', async ({ request }) => {
+    const cookie = await forgedSessionCookie(request);
+    for (const path of ['/api/engagement/calendar', '/api/word-mastery', '/api/word-tower/wreck']) {
+      const guest = await request.get(path);
+      expect([401, 429], path).toContain(guest.status());
+      const forged = await request.get(path, { headers: { cookie } });
+      expect([401, 429], path).toContain(forged.status());
+    }
+  });
+
+  test('email preferences need a session or a signed token', async ({ request }) => {
+    const res = await request.get('/api/email/preferences');
+    expect([401, 429]).toContain(res.status());
+  });
+
+  test('public forms validate input before writing', async ({ request }) => {
+    const cases: Array<[string, Record<string, unknown>]> = [
+      ['/api/contact', {}],
+      ['/api/subscribe-email', { email: 'not-an-email' }],
+      ['/api/feedback', { message: 'short' }],
+      ['/api/appeal-word', {}],
+      ['/api/invalid-word/record', {}],
+    ];
+    for (const [path, data] of cases) {
+      const res = await request.post(path, { data });
+      expect([400, 429], path).toContain(res.status());
+    }
+  });
+});
+
 test('daily hub loads the leaderboard teaser from the API', async ({ page }) => {
   const leaderboard = page.waitForResponse(
     (res) => res.url().includes('/api/daily/leaderboard') && res.request().method() === 'GET',

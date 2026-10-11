@@ -6,6 +6,7 @@
 import type { Language } from '@/shared/types/game';
 import { storeWikipediaWordCandidates } from './wikipediaWordFetcher';
 import logger from '../utils/logger';
+import { requireAdminClient } from '@/utils/supabase/admin';
 
 /**
  * Get word candidates for admin review from UNIFIED WORD BANK
@@ -22,11 +23,7 @@ export async function getWordCandidatesForAdmin(
   status: string;
 }>> {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = requireAdminClient();
 
     let query = supabase
       .from('daily_challenge_word_bank')
@@ -72,11 +69,7 @@ export async function adminUpdateWordStatus(
   status: 'valid' | 'invalid' | 'pending' | 'approved' | 'rejected'
 ): Promise<boolean> {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = requireAdminClient();
 
     const statusMap: Record<string, string> = {
       'valid': 'approved',
@@ -111,11 +104,7 @@ export async function adminUpdateWordStatus(
  */
 export async function adminDeleteWordCandidate(candidateId: string): Promise<boolean> {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = requireAdminClient();
 
     const { error } = await supabase
       .from('daily_challenge_word_bank')
@@ -146,11 +135,7 @@ export async function adminAddWordCandidate(
   source: string = 'admin'
 ): Promise<{ success: boolean; id?: string }> {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = requireAdminClient();
 
     const dateStr = date.toISOString().split('T')[0];
 

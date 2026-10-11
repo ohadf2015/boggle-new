@@ -14,6 +14,7 @@
 import ky, { HTTPError } from 'ky';
 import { getRedisClient } from '../redisClient';
 import logger from '../utils/logger';
+import { requireAdminClient } from '@/utils/supabase/admin';
 
 const USER_AGENT = 'LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)';
 const RATE_LIMIT_MS = 200;
@@ -149,19 +150,13 @@ export async function verifyWordOnWiktionary(word: string, lang: string): Promis
 export interface ProcessQueueOptions { batchSize?: number; minSubmissions?: number; maxAttempts?: number }
 export interface ProcessQueueResult { processed: number; verified: number; notFound: number; rejectedType: number; errors: number }
 
-async function getServiceClient() {
-  // imported lazily so the module stays usable in pure-parse unit tests
-  const { createClient } = await import('@supabase/supabase-js');
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
-}
-
 export async function processWiktionaryVerificationQueue(
   lang: string,
   options: ProcessQueueOptions = {}
 ): Promise<ProcessQueueResult> {
   const { batchSize = 50, minSubmissions = 2, maxAttempts = 3 } = options;
   const result: ProcessQueueResult = { processed: 0, verified: 0, notFound: 0, rejectedType: 0, errors: 0 };
-  const supabase = await getServiceClient();
+  const supabase = requireAdminClient();
 
   const { data: queue, error: queueError } = await supabase.rpc('get_verification_queue', {
     p_language: lang, p_batch_size: batchSize, p_min_submissions: minSubmissions, p_max_attempts: maxAttempts,
@@ -201,7 +196,7 @@ export async function getVerifiedWordsForPromotionByLang(
   limit = 100
 ): Promise<Array<{ id: string; word: string; url: string | null }>> {
   try {
-    const supabase = await getServiceClient();
+    const supabase = requireAdminClient();
     const { data, error } = await supabase.rpc('get_verified_words_for_promotion', { p_language: lang, p_limit: limit });
     if (error) { logger.error('WiktionaryVerify', `${lang} promotion fetch failed`, { error: error.message }); return []; }
     return (data || []).map((d: { id: string; word: string; verification_url: string | null }) => ({ id: d.id, word: d.word, url: d.verification_url }));

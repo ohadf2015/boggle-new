@@ -85,8 +85,14 @@ describe('verifyWordOnWiktionary (generic, sv)', () => {
 describe('processWiktionaryVerificationQueue (generic, sv)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-service-key');
     mockRedisGet.mockResolvedValue(null);
     mockRedisSetex.mockResolvedValue('OK');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it('pulls the sv queue and writes results', async () => {

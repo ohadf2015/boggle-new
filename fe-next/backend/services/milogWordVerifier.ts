@@ -7,6 +7,7 @@
 import ky, { HTTPError } from 'ky';
 import { getRedisClient } from '../redisClient';
 import logger from '../utils/logger';
+import { requireAdminClient } from '@/utils/supabase/admin';
 
 // User-Agent for requests (be a good citizen)
 const MILOG_USER_AGENT = 'LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)';
@@ -347,11 +348,7 @@ export async function processMilogVerificationQueue(
   };
 
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = requireAdminClient();
 
     // Fetch words from queue
     const { data: words, error: fetchError } = await supabase.rpc(
@@ -429,11 +426,7 @@ export async function getVerifiedWordsForPromotion(
   limit: number = 100
 ): Promise<Array<{ id: string; word: string; url: string | null }>> {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = requireAdminClient();
 
     const { data, error } = await supabase.rpc('get_milog_verified_words', {
       p_limit: limit,
@@ -475,11 +468,7 @@ export async function invalidateMilogCache(word: string): Promise<void> {
  */
 export async function markWordPromoted(wordId: string): Promise<boolean> {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = requireAdminClient();
 
     const { error } = await supabase.rpc('mark_word_auto_promoted', {
       p_word_id: wordId,

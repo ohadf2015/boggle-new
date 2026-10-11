@@ -8,6 +8,7 @@ import ky, { HTTPError } from 'ky';
 import { getRedisClient } from '../redisClient';
 import type { Language } from '@/shared/types/game';
 import logger from '../utils/logger';
+import { requireAdminClient } from '@/utils/supabase/admin';
 
 // Wikipedia API User-Agent (required by Wikimedia guidelines)
 const WIKIPEDIA_USER_AGENT = 'LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)';
@@ -606,11 +607,7 @@ export async function storeWikipediaWordCandidates(
   }
 
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = requireAdminClient();
 
     // Prepare all insert data for UNIFIED WORD BANK. Only columns that exist
     // on daily_challenge_word_bank (061_daily_challenge_word_bank.sql +
@@ -692,11 +689,7 @@ export async function getValidatedWikipediaWords(
   limit: number = 10
 ): Promise<Array<{ word: string; url?: string; score: number }>> {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = requireAdminClient();
 
     const dateStr = date.toISOString().split('T')[0];
 
