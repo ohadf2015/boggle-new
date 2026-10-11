@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { m, AnimatePresence, PanInfo } from 'framer-motion';
-import { useMotionMaxReady } from '@/components/motion/useMotionMaxReady';
 import {
   Gamepad2, Users, PlayCircle, Swords, Star, Flame,
   ArrowRight, ArrowLeft, Lightbulb,
@@ -72,7 +71,6 @@ interface HowToPlayProps {
 
 const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
   const { t, dir, language } = useLanguage();
-  const dragReady = useMotionMaxReady();
   const [currentStep, setCurrentStep] = useState(0);
   const [interactiveDemoCompleted, setInteractiveDemoCompleted] = useState(false);
 
@@ -478,7 +476,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         <m.div
           data-testid="step-content"
           className="p-5 min-h-[260px] sm:min-h-[320px] max-h-[55vh] overflow-y-auto"
-          drag={dragReady ? 'x' : false}
+          drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.2}
           onDragEnd={handleDragEnd}

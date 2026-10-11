@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { m } from 'framer-motion';
-import { useMotionMaxReady } from '@/components/motion/useMotionMaxReady';
 import { AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -45,7 +44,6 @@ export function FlashcardSwipeStack({
 }: FlashcardSwipeStackProps) {
   const { t, dir } = useLanguage();
   const isRTL = dir === 'rtl';
-  const dragReady = useMotionMaxReady();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showDefinition, setShowDefinition] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
@@ -174,7 +172,7 @@ export function FlashcardSwipeStack({
             <m.div
               key={currentWord.word}
               className="absolute inset-x-0 top-0 h-full cursor-grab active:cursor-grabbing"
-              drag={showDefinition && dragReady ? 'x' : false}
+              drag={showDefinition ? 'x' : false}
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.7}
               onDragEnd={handleDragEnd}
