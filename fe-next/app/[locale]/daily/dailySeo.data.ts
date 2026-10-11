@@ -75,8 +75,8 @@ export const dailySeoContent: Record<string, DailySeoEntry> = {
     ],
   },
   sv: {
-    title: 'Dagligt Ordhjul & Ordjakt — Gratis Ordpussel | LexiClash',
-    description: 'Spela Ordhjul och Ordjakt gratis — nytt pussel varje dag. Samma braede foer alla, ingen nedladdning, ingen registrering. Taevla paa den globala topplistan.',
+    title: 'Dagens ord gratis — 10 försök, utan konto | LexiClash',
+    description: 'Gissa dagens ord på svenska — 10 försök, samma bräde för alla. Gratis, ingen registrering, ingen nedladdning.',
     features: [
       'Nytt pussel varje dag vid midnatt UTC',
       'Samma braede foer alla spelare vaerldsomspaennande',

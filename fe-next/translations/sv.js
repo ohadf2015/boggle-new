@@ -3182,10 +3182,10 @@ const sv = {
       "ogDescription": "Öva ordhittning solo, utmana AI-bottar och slå dina highscores i LexiClash enspelarläge."
     },
     "daily": {
-      "title": "Dagligt Ordhjul & Ordjakt — Gratis Ordpussel | LexiClash",
-      "description": "Ordhjul & Ordjakt gratis — nytt pussel varje dag, samma bräde för alla. Gissa det dolda ordet på 10 försök. Ingen registrering.",
-      "ogTitle": "Dagligt Ordhjul — Snurra och hitta alla ord",
-      "ogDescription": "Dagliga ordhjulspussel gratis. Snurra hjulet, hitta alla ord, dela resultaten. Nytt pussel varje dag!"
+      "title": "Dagens ord gratis — 10 försök, utan konto | LexiClash",
+      "description": "Gissa dagens ord på svenska — 10 försök, samma bräde för alla. Gratis, ingen registrering, ingen nedladdning.",
+      "ogTitle": "Dagens ord gratis — 10 försök, utan konto | LexiClash",
+      "ogDescription": "Gissa dagens ord på svenska — 10 försök, gratis utan konto. Samma bräde för alla!"
     },
     "multiplayer": {
       "title": "Scrabble Online på Svenska — 2-20 Spelare, 8 Spellägen, Gratis | LexiClash",
