@@ -10989,7 +10989,6 @@ const ja = {
       "pickNextMode": "次のラウンド",
       "statScore": "スコア",
       "statWords": "単語",
-      "walletAria": "コイン {coins} 枚",
       "noWords": "今回は単語なし。次のボードは60秒後。",
       "rankProgress": "{points} / {next}（{rank}まで）",
       "rankMax": "最高ランク到達",

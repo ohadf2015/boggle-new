@@ -27,33 +27,46 @@ interface StatCardProps {
 }
 
 function StatCard({ testId, label, value, suffix = '', icon, band, ink, timing, animate, valueTestId }: StatCardProps) {
-  const shown = useCountUp(value, { delay: timing.count, duration: STAT_COUNT_MS, enabled: animate });
+  const shown = useCountUp(value, {
+    delay: timing.count,
+    duration: STAT_COUNT_MS,
+    enabled: animate,
+  });
   return (
-    <div
-      className={`flex min-w-0 flex-col overflow-hidden rounded-2xl border-[3px] border-black bg-neo-navy-elevated shadow-hard ${
-        animate ? 'animate-[qp-card-in_0.42s_cubic-bezier(0.34,1.4,0.64,1)_both]' : ''
-      }`}
-      style={animate ? { animationDelay: `${timing.appear}ms` } : undefined}
-      data-testid={testId}
-      data-delay={timing.count}
-      data-value={value}
-    >
-      <span className={`truncate px-2 py-1 text-center font-neo-display text-[10px] font-bold uppercase tracking-[0.16em] text-black ${band}`}>
-        {label}
-      </span>
-      <span className="flex items-center justify-center gap-1.5 px-2 py-2.5 lg:py-3.5">
-        <span className={ink}>{icon}</span>
-        <b
-          className={`inline-block font-neo-display text-3xl leading-none tabular-nums lg:text-4xl ${ink} ${
-            animate ? 'animate-[qp-value-pop_0.38s_cubic-bezier(0.34,1.56,0.64,1)_both]' : ''
-          }`}
-          style={animate ? { animationDelay: `${timing.count + STAT_COUNT_MS}ms` } : undefined}
-          data-testid={valueTestId}
+    <div className="relative min-w-0">
+      <span
+        aria-hidden="true"
+        data-testid="quick-stat-socket"
+        className="absolute inset-0 rounded-2xl border-[3px] border-dashed border-neo-white/15 bg-black/20"
+      />
+      <div
+        className={`relative flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border-[3px] border-black bg-neo-navy-elevated shadow-hard ${
+          animate ? 'animate-[qp-card-in_0.42s_cubic-bezier(0.34,1.4,0.64,1)_both]' : ''
+        }`}
+        style={animate ? { animationDelay: `${timing.appear}ms` } : undefined}
+        data-testid={testId}
+        data-delay={timing.count}
+        data-value={value}
+      >
+        <span
+          className={`truncate px-2 py-1 text-center font-neo-display text-[10px] font-bold uppercase tracking-[0.16em] text-black ${band}`}
         >
-          {shown}
-          {suffix}
-        </b>
-      </span>
+          {label}
+        </span>
+        <span className="flex items-center justify-center gap-1.5 px-2 py-2.5 lg:py-3.5">
+          <span className={ink}>{icon}</span>
+          <b
+            className={`inline-block font-neo-display text-3xl leading-none tabular-nums lg:text-4xl ${ink} ${
+              animate ? 'animate-[qp-value-pop_0.38s_cubic-bezier(0.34,1.56,0.64,1)_both]' : ''
+            }`}
+            style={animate ? { animationDelay: `${timing.count + STAT_COUNT_MS}ms` } : undefined}
+            data-testid={valueTestId}
+          >
+            {shown}
+            {suffix}
+          </b>
+        </span>
+      </div>
     </div>
   );
 }
@@ -78,7 +91,7 @@ export function QuickResultsStats({
 }: QuickResultsStatsProps) {
   const { t } = useLanguage();
   return (
-    <div className="grid w-full grid-cols-3 gap-2.5 lg:gap-4" data-testid="quick-stats">
+    <div className="grid w-full grid-cols-3 gap-2.5 lg:max-w-2xl lg:gap-5" data-testid="quick-stats">
       <StatCard
         testId="quick-stat-score"
         label={t('quickPlay.solo.statScore', 'Score')}

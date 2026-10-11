@@ -15,6 +15,7 @@ vi.mock('@/components/daily/RivalCompareCard', () => ({
 vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
   default: vi.fn(() => false),
+  useReducedMotion: vi.fn(() => false),
 }));
 
 const result: QuickRoundResult = {

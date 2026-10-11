@@ -10375,7 +10375,6 @@ const en = {
       "pickNextMode": "Next round",
       "statScore": "Score",
       "statWords": "Words",
-      "walletAria": "{coins} coins",
       "noWords": "No words this time. The next board is 60 seconds away.",
       "rankProgress": "{points} / {next} to {rank}",
       "rankMax": "Top rank reached",

@@ -9939,7 +9939,6 @@ const ru = {
       "pickNextMode": "Следующий раунд",
       "statScore": "Очки",
       "statWords": "Слова",
-      "walletAria": "{coins} монет",
       "noWords": "В этот раз без слов. Следующая доска через 60 секунд.",
       "rankProgress": "{points} / {next} до ранга {rank}",
       "rankMax": "Максимальный ранг",

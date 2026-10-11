@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { QuickResultsRays, ConfettiPuff, SparkleLoop, CoinFlight } from '../QuickResultsFx';
+import { QuickResultsRays, ConfettiPuff, SparkleLoop } from '../QuickResultsFx';
 
 describe('QuickResultsRays', () => {
   it('renders a decorative ray layer in the given color', () => {
@@ -59,22 +59,5 @@ describe('SparkleLoop', () => {
     const sparks = screen.getByTestId('quick-results-sparkles').querySelectorAll('[data-spark]');
     expect(sparks.length).toBeGreaterThan(0);
     expect(sparks.length).toBeLessThanOrEqual(4);
-  });
-});
-
-describe('CoinFlight', () => {
-  it('flies coins from the reward to the wallet and hides them from assistive tech', () => {
-    render(<CoinFlight count={20} from={{ x: 100, y: 500 }} to={{ x: 340, y: 24 }} enabled />);
-    const flight = screen.getByTestId('quick-coin-flight');
-    expect(flight).toHaveAttribute('aria-hidden', 'true');
-    const coins = flight.querySelectorAll<HTMLElement>('[data-coin]');
-    expect(coins).toHaveLength(8);
-    expect(coins[0].style.getPropertyValue('--dx')).toBe('240px');
-    expect(coins[0].style.getPropertyValue('--dy')).toBe('-476px');
-  });
-
-  it('waits until both ends are measured', () => {
-    render(<CoinFlight count={5} from={null} to={{ x: 1, y: 1 }} enabled />);
-    expect(screen.queryByTestId('quick-coin-flight')).toBeNull();
   });
 });

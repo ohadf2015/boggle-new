@@ -5,10 +5,7 @@ import type React from 'react';
 // Celebration layers for the quick-play results hero. Big layers only rotate;
 // anything that fades is small (a full-screen opacity tween flashes on mobile).
 
-type Point = { x: number; y: number };
-
 const MAX_CONFETTI = 16;
-const MAX_COINS = 8;
 const CONFETTI_COLORS = ['#bfff00', '#ff4d9a', '#22d3ee', '#ffe135', '#c084fc'];
 const BURST_ANGLES = [0, 36, 72, 108, 144, 180, 216, 252, 288, 324];
 const SPARK_SLOTS = [
@@ -123,59 +120,6 @@ export function SparkleLoop({ enabled }: { enabled: boolean }) {
           <svg viewBox="0 0 24 24" className="h-full w-full fill-current">
             <path d="M12 0 L14.2 9.8 L24 12 L14.2 14.2 L12 24 L9.8 14.2 L0 12 L9.8 9.8 Z" />
           </svg>
-        </span>
-      ))}
-    </div>
-  );
-}
-
-export function CoinIcon({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden="true" className={className}>
-      <circle cx="10" cy="10" r="9" fill="#ffe135" stroke="#000" strokeWidth="2" />
-      <circle cx="10" cy="10" r="5.2" fill="none" stroke="#c99a00" strokeWidth="1.8" />
-      <path d="M6.5 6.2 Q8 4.6 10 4.4" stroke="#fff8c4" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-/** Ms after mount when the first coin leaves the reward chip; the wallet ticks as they land. */
-export const COIN_FLIGHT_START_MS = 1100;
-export const COIN_FLIGHT_LAND_MS = 1950;
-
-export function CoinFlight({
-  count,
-  from,
-  to,
-  enabled,
-}: {
-  count: number;
-  from: Point | null;
-  to: Point | null;
-  enabled: boolean;
-}) {
-  const n = Math.min(MAX_COINS, Math.max(0, Math.floor(count)));
-  if (!enabled || n === 0 || !from || !to) return null;
-  return (
-    <div aria-hidden="true" data-testid="quick-coin-flight" className="pointer-events-none fixed inset-0 z-50">
-      {Array.from({ length: n }, (_, i) => (
-        <span
-          key={i}
-          data-coin
-          className="absolute h-0 w-0 animate-[qp-coin-x_0.78s_cubic-bezier(0.3,0.1,0.5,1)_both]"
-          style={{
-            left: from.x,
-            top: from.y,
-            animationDelay: `${COIN_FLIGHT_START_MS / 1000 + i * 0.07}s`,
-            ...vars({ '--dx': `${Math.round(to.x - from.x)}px`, '--dy': `${Math.round(to.y - from.y)}px` }),
-          }}
-        >
-          <span
-            className="absolute -left-2.5 -top-2.5 block h-5 w-5 animate-[qp-coin-y_0.78s_cubic-bezier(0.55,0,0.85,0.45)_both]"
-            style={vars({ animationDelay: `${COIN_FLIGHT_START_MS / 1000 + i * 0.07}s`, '--jx': `${((i % 3) - 1) * 14}px` })}
-          >
-            <CoinIcon className="h-full w-full" />
-          </span>
         </span>
       ))}
     </div>

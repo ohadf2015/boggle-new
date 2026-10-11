@@ -55,4 +55,15 @@ describe('QuickResultsStats', () => {
     expect(solidAt).not.toBeNull();
     expect(Number(solidAt![1])).toBeLessThanOrEqual(20);
   });
+
+  it('lays a still socket under every card, so the row reads whole while the cards are still landing', () => {
+    render(<QuickResultsStats score={900} scorePct={90} wordsFound={9} animate />);
+    const sockets = screen.getAllByTestId('quick-stat-socket');
+    expect(sockets).toHaveLength(3);
+    cards.forEach((id, i) => {
+      expect(sockets[i]).toHaveAttribute('aria-hidden', 'true');
+      expect(sockets[i].className).not.toMatch(/animate-/);
+      expect(sockets[i].parentElement).toContainElement(screen.getByTestId(id));
+    });
+  });
 });

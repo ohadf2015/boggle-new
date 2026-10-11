@@ -12135,7 +12135,6 @@ const sv = {
       "pickNextMode": "Nästa runda",
       "statScore": "Poäng",
       "statWords": "Ord",
-      "walletAria": "{coins} mynt",
       "noWords": "Inga ord den här gången – nästa bräde är 60 sekunder bort.",
       "rankProgress": "{points} / {next} till {rank}",
       "rankMax": "Högsta rangen nådd",

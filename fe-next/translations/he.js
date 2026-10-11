@@ -11728,7 +11728,6 @@ const he = {
       "pickNextMode": "הסיבוב הבא",
       "statScore": "ניקוד",
       "statWords": "מילים",
-      "walletAria": "{coins} מטבעות",
       "noWords": "בלי מילים הפעם. הלוח הבא במרחק 60 שניות.",
       "rankProgress": "{points} / {next} עד {rank}",
       "rankMax": "הדרגה הגבוהה ביותר",

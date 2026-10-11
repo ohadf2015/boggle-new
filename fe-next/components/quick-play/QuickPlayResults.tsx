@@ -9,7 +9,7 @@
  * stat cards that land and count in turn, coins flying into the wallet, and
  * one pinned next-round button. Standings, rank and words sit below.
  */
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -21,10 +21,12 @@ import { holdQuickResultsCalm } from '@/lib/quickPlay/resultsCalm';
 import { useHeroCheer } from '@/lib/quickPlay/useHeroCheer';
 import { getGuestProgress, percentileFromBoard } from '@/lib/quickPlay/guestProgress';
 import Avatar from '@/components/Avatar';
+import BlastWalletHud from '@/components/blast/legacy/BlastWalletHud';
+import { CoinArt } from '@/components/ui/CoinArt';
+import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
-import { BurstLines, CoinFlight, CoinIcon, ConfettiPuff, QuickResultsRays, SparkleLoop } from './QuickResultsFx';
+import { BurstLines, ConfettiPuff, QuickResultsRays, SparkleLoop } from './QuickResultsFx';
 import { QuickResultsStats } from './QuickResultsStats';
-import { QuickResultsWallet } from './QuickResultsWallet';
 import { QuickResultsCtaBar, QuickResultsModeSwitch } from './QuickResultsNextActions';
 import { QuickPlayRankCard } from './QuickPlayRankCard';
 import { QuickRivalsPassed } from './QuickRivalsPassed';
@@ -87,12 +89,9 @@ const MIN_BOARD_FOR_PERCENTILE = 5;
 /** The signup sheet waits until the reveal has played out. */
 const CALM_HOLD_MS = 6000;
 
-type Point = { x: number; y: number };
-const centerOf = (el: Element | null): Point | null => {
-  if (!el) return null;
-  const r = el.getBoundingClientRect();
-  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-};
+/** Ms after mount when the coins leave the reward chip, once the last stat card has landed. */
+export const COIN_LAUNCH_MS = 1100;
+const FLYING_COINS = 8;
 
 export function QuickPlayResults({
   result,
@@ -113,8 +112,6 @@ export function QuickPlayResults({
   const celebrated = useRef(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const coinChipRef = useRef<HTMLSpanElement>(null);
-  const walletIconRef = useRef<HTMLSpanElement>(null);
-  const [flight, setFlight] = useState<{ from: Point | null; to: Point | null }>({ from: null, to: null });
   const prefersReducedMotion = useReducedMotion();
   const animate = !prefersReducedMotion;
 
@@ -123,6 +120,7 @@ export function QuickPlayResults({
     isGuest ? getGuestProgress().coinsPending : (profile?.total_coins ?? 0) + outcome.coins
   );
   const walletFrom = Math.max(0, walletTo - outcome.coins);
+  const [walletCoins, setWalletCoins] = useState(walletFrom);
 
   // This screen replaces the game board with no navigation, so keyboard
   // focus needs to move here explicitly instead of being stranded on a
@@ -131,9 +129,16 @@ export function QuickPlayResults({
     headingRef.current?.focus();
   }, []);
 
-  useLayoutEffect(() => {
-    setFlight({ from: centerOf(coinChipRef.current), to: centerOf(walletIconRef.current) });
-  }, []);
+  useEffect(() => {
+    if (walletTo <= walletFrom) return;
+    const launch = setTimeout(() => {
+      const chip = coinChipRef.current?.getBoundingClientRect();
+      const source = chip ? { x: chip.left + chip.width / 2, y: chip.top + chip.height / 2 } : undefined;
+      emitCoinEarned(walletTo - walletFrom, source, { inline: true, coins: FLYING_COINS });
+      setWalletCoins(walletTo);
+    }, COIN_LAUNCH_MS);
+    return () => clearTimeout(launch);
+  }, [walletFrom, walletTo]);
 
   useEffect(() => holdQuickResultsCalm(CALM_HOLD_MS), []);
 
@@ -233,11 +238,13 @@ export function QuickPlayResults({
                 </span>
               )}
             </div>
-            <QuickResultsWallet from={walletFrom} to={walletTo} animate={animate} held={isGuest} iconRef={walletIconRef} />
+            <div data-testid="quick-wallet" data-from={walletFrom} data-to={walletTo} className="[&_[data-strip]]:font-bold">
+              <BlastWalletHud coins={walletCoins} />
+            </div>
           </header>
 
           <section
-            className="relative mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-3 px-4 pb-6 lg:gap-5"
+            className="relative mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-3 px-4 pb-6 lg:max-w-3xl lg:gap-5"
             data-testid="quick-hero-card"
           >
             <div className="relative flex h-[min(34dvh,290px)] w-full items-center justify-center lg:h-[300px]">
@@ -247,7 +254,7 @@ export function QuickPlayResults({
               {hopping && <BurstLines enabled delayMs={0} />}
               <SparkleLoop enabled={animate && result.wordsFound > 0} />
               <div
-                className={`relative z-10 lg:scale-[1.25] ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}
+                className={`relative z-10 ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}
                 data-testid="quick-hero-avatar"
               >
                 <div className={animate ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
@@ -255,12 +262,14 @@ export function QuickPlayResults({
                     data-testid={hopping ? 'quick-hero-hop' : undefined}
                     className={hopping ? 'animate-[qp-avatar-hop_0.62s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}
                   >
-                    <Avatar
-                      userId={user?.id ?? 'guest'}
-                      customAvatar={profile?.avatar_config ?? guestAvatar ?? undefined}
-                      pixelSize={160}
-                      mood={heroMood}
-                    />
+                    <div className="-m-5 scale-[0.8] lg:m-0 lg:scale-100">
+                      <Avatar
+                        userId={user?.id ?? 'guest'}
+                        customAvatar={profile?.avatar_config ?? guestAvatar ?? undefined}
+                        pixelSize={200}
+                        mood={heroMood}
+                      />
+                    </div>
                   </div>
                 </div>
                 <span
@@ -332,8 +341,8 @@ export function QuickPlayResults({
                 className="inline-flex items-center gap-1.5 rounded-full border-[3px] border-black bg-neo-navy-elevated px-3 py-1 font-neo-display text-sm font-bold text-neo-yellow shadow-hard"
                 data-testid="quick-coins-reward"
               >
-                <span ref={coinChipRef} className="block h-5 w-5">
-                  <CoinIcon className="h-full w-full" />
+                <span ref={coinChipRef} className="block">
+                  <CoinArt size={20} />
                 </span>
                 <span dir="ltr">+{outcome.coins}</span>
               </span>
@@ -415,7 +424,6 @@ export function QuickPlayResults({
       </div>
 
       <QuickResultsCtaBar onNextRound={onNextRound} onChallenge={onChallenge} shine={animate} />
-      <CoinFlight count={outcome.coins > 0 ? 8 : 0} from={flight.from} to={flight.to} enabled={animate} />
     </div>
   );
 }

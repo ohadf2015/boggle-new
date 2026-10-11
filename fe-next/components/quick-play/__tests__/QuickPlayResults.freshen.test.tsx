@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
-import { QuickPlayResults } from '../QuickPlayResults';
+import { QuickPlayResults, COIN_LAUNCH_MS } from '../QuickPlayResults';
 import { isQuickResultsOnScreen } from '@/lib/quickPlay/resultsCalm';
 import type { QuickRoundResult, QuickSubmitOutcome } from '../types';
 
@@ -13,7 +13,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth }));
 vi.mock('@/utils/haptics/HapticsManager', () => ({ haptics: { success: vi.fn() } }));
 vi.mock('@/components/daily/RivalCompareCard', () => ({ default: () => null }));
-vi.mock('@/hooks/useReducedMotion', () => ({ __esModule: true, default: vi.fn(() => false) }));
+vi.mock('@/hooks/useReducedMotion', () => ({ __esModule: true, default: vi.fn(() => false), useReducedMotion: vi.fn(() => false) }));
+const coinFx = vi.hoisted(() => ({ emit: vi.fn() }));
+vi.mock('@/utils/coinEarnedFx', async (orig) => ({
+  ...(await orig<typeof import('@/utils/coinEarnedFx')>()),
+  emitCoinEarned: coinFx.emit,
+}));
 vi.mock('@/utils/profileStorage', () => ({ getOrCreateStoredCustomAvatar: () => guestAvatar }));
 vi.mock('@/lib/quickPlay/guestProgress', async (orig) => ({
   ...(await orig<typeof import('@/lib/quickPlay/guestProgress')>()),
@@ -60,6 +65,7 @@ function renderResults(over: Partial<QuickRoundResult> = {}, out: Partial<QuickS
 
 describe('QuickPlayResults freshen', () => {
   beforeEach(() => {
+    coinFx.emit.mockReset();
     auth.user = null;
     auth.profile = null;
     vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: true, json: async () => ({ entries: [] }) })));
@@ -126,12 +132,31 @@ describe('QuickPlayResults freshen', () => {
     expect(screen.queryByTestId('quick-confetti')).toBeNull();
   });
 
-  it("flies the earned coins into a guest's held wallet", () => {
+  it("flies the earned coins from the reward chip into the one shared wallet, which rolls once they land", () => {
+    vi.useFakeTimers();
     renderResults();
     const wallet = screen.getByTestId('quick-wallet');
     expect(wallet).toHaveAttribute('data-from', '180');
     expect(wallet).toHaveAttribute('data-to', '300');
-    expect(screen.getByTestId('quick-coin-flight')).toBeInTheDocument();
+    const counter = wallet.querySelector('[data-coin-counter="true"]');
+    expect(counter).not.toBeNull();
+    expect(screen.getByTestId('coin-counter-value')).toHaveTextContent('180');
+    expect(coinFx.emit).not.toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(COIN_LAUNCH_MS);
+    });
+    expect(coinFx.emit).toHaveBeenCalledTimes(1);
+    expect(coinFx.emit).toHaveBeenCalledWith(
+      120,
+      expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) }),
+      expect.objectContaining({ inline: true })
+    );
+    expect(screen.getByTestId('coin-counter-value')).toHaveTextContent('300');
+  });
+
+  it('draws the wallet digits at a weight the display font really has, so synthetic bold never clips them', () => {
+    renderResults();
+    expect(screen.getByTestId('quick-wallet').className).toContain('[&_[data-strip]]:font-bold');
   });
 
   it("adds the earned coins on top of a signed-in player's balance", () => {
@@ -144,8 +169,12 @@ describe('QuickPlayResults freshen', () => {
   });
 
   it('flies no coins on a round that earned none', () => {
+    vi.useFakeTimers();
     renderResults({}, { coins: 0 });
-    expect(screen.queryByTestId('quick-coin-flight')).toBeNull();
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    expect(coinFx.emit).not.toHaveBeenCalled();
   });
 
   it('pins one primary action outside the scrolling details', () => {
