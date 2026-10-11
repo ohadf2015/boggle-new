@@ -133,6 +133,19 @@ function planPaths(cells: Cell[], words: string[]) {
   return { word: word as Cell[] | null, junk: junk as Cell[] | null };
 }
 
+/** Boustrophedon path from the bottom row up, n cells long, always 8-neighbour adjacent. */
+async function serpentine(page: Page, n: number): Promise<Array<[number, number]>> {
+  const cells = await readBoard(page);
+  const rows = Math.max(...cells.map((c) => c.row)) + 1;
+  const cols = Math.max(...cells.map((c) => c.col)) + 1;
+  const out: Array<[number, number]> = [];
+  for (let i = 0; out.length < n && i < rows; i++) {
+    const r = rows - 1 - i;
+    for (let j = 0; out.length < n && j < cols; j++) out.push([r, i % 2 ? cols - 1 - j : j]);
+  }
+  return out;
+}
+
 async function swipe(page: Page, path: Cell[]) {
   await dragThrough(page, path.map((c) => [c.row, c.col] as [number, number]));
   await page.mouse.up();
@@ -202,8 +215,7 @@ test.describe('Word Hunt board', () => {
 
   test('a nine-letter swipe is a soft rejection with the length limit, no penalty', async ({ page }) => {
     await startGame(page);
-    const snake: Array<[number, number]> = [[5, 0], [5, 1], [5, 2], [5, 3], [5, 4], [5, 5], [4, 5], [4, 4], [4, 3]];
-    await dragThrough(page, snake);
+    await dragThrough(page, await serpentine(page, 9));
     await page.mouse.up();
     const long = await expectVerdict(page, /^dupe$/);
     expect(long.text).toMatch(/8/);
@@ -211,7 +223,7 @@ test.describe('Word Hunt board', () => {
 
   test('a five-letter drag shows the long-word life bonus while it is still being spelled', async ({ page }) => {
     await startGame(page);
-    await dragThrough(page, [[4, 0], [4, 1], [4, 2], [4, 3], [4, 4]]);
+    await dragThrough(page, await serpentine(page, 5));
     await expect(page.getByTestId('hunt-stage-count')).toHaveText('5');
     await expect(page.getByTestId('hunt-stage')).toContainText(/\+3/);
     await page.mouse.up();
