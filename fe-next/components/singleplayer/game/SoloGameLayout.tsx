@@ -86,6 +86,8 @@ export interface SoloGameLayoutProps {
   soloMissions?: readonly SoloMission[];
   /** Coins badge / practice training bar — mode-specific extras. */
   soloChrome?: ReactNode;
+  /** A first-run lesson owns the chrome slot; wide screens lift it over the board. */
+  soloLessonActive?: boolean;
   children?: ReactNode;
 }
 
@@ -133,7 +135,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
     foundWords, comboLevel, fireRoundActive, fireRoundRemaining, earthquakeState, currentFeedback,
     highlightedPath, isTypingMode = false, typedWord = '', keyboardHighlight, isDesktop, awaitingStart, onStart, onWordSubmit, onWordChange, onPathSubmit,
     onExit, onPauseToggle, gameStatsRef, t, soloStreak = 0, soloMultiplier = 1, soloPraiseKey = null,
-    soloMissions, soloChrome, children,
+    soloMissions, soloChrome, soloLessonActive = false, children,
   } = props;
 
   const hapticsEnabled = useHapticsEnabled();
@@ -183,7 +185,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
         earthquakeState={earthquakeState}
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
-        isPlaying={playing}
+        isPlaying={playing && !soloLessonActive}
         isDesktop={isDesktop}
         isTypingMode={false}
         isHelpOpen={false}
@@ -202,6 +204,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
         right={<SoloRightRail t={t} validWords={validWords} />}
       >
       <div
+        data-lesson={soloLessonActive ? 'on' : undefined}
         className={cn(
           SHELL,
           'relative z-10 mx-auto flex h-full w-full max-w-lg md:max-w-xl flex-col px-3 sm:px-4 shell:max-w-none shell:px-0 shell:py-0',

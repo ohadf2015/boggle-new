@@ -12,6 +12,7 @@ import type { TeacherAssignment, AssignmentStatus, AssignmentType } from '@/lib/
 import type { AssignmentFocusValue } from '@/lib/education/wordcraftAssignment';
 import logger from '@/utils/logger';
 import { trackEduTeacherActionFailed } from '@/lib/education/telemetry';
+import { trackAssignmentCreated } from '@/lib/education/assignmentEvents';
 
 interface UseAssignmentsState {
   assignments: TeacherAssignment[];
@@ -29,6 +30,7 @@ interface UseAssignmentsActions {
     title?: string | null;
     instructions?: string | null;
     practice_focus?: AssignmentFocusValue | null;
+    word_count_target?: number | null;
   }) => Promise<{ success: boolean; error?: string }>;
   deleteAssignment: (assignmentId: string) => Promise<void>;
   refresh: () => Promise<void>;
@@ -104,6 +106,7 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
       title?: string | null;
       instructions?: string | null;
       practice_focus?: AssignmentFocusValue | null;
+      word_count_target?: number | null;
     }): Promise<{ success: boolean; error?: string }> => {
       // Optimistic update: add temporary assignment
       const tempId = `temp-${Date.now()}`;
@@ -152,6 +155,13 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
         window.dispatchEvent(new CustomEvent(ASSIGNMENTS_CHANGED_EVENT, {
           detail: { classroomId: data.classroom_id, source: instanceId.current },
         }));
+        trackAssignmentCreated({
+          classroom_id: data.classroom_id,
+          assignment_id: newAssignment?.id,
+          kind: typeof data.word_count_target === 'number' ? 'word_count' : 'lesson',
+          due_date: data.due_date ?? null,
+          word_count_target: data.word_count_target ?? null,
+        });
 
         return { success: true };
       } catch (err) {

@@ -8850,6 +8850,41 @@ const en = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "showBoard": "Today's board",
+      "hideBoard": "Hide board",
+      "moreBoards": "More"
+    },
+    "rank": {
+      "title": "Ranks",
+      "open": "See all ranks",
+      "toNext": "{count} to {rank}",
+      "top": "Top rank. Legend!",
+      "reached": "Today's rank",
+      "warmUp": "Warm-up",
+      "spinning": "Spinning",
+      "onARoll": "On a roll",
+      "sharp": "Sharp",
+      "hotStreak": "Hot streak",
+      "wordsmith": "Wordsmith",
+      "whirlwind": "Whirlwind",
+      "wizard": "Wizard",
+      "legend": "Legend"
+    },
+    "praise": {
+      "nice": "Nice!",
+      "great": "Great!",
+      "superb": "Superb!",
+      "brilliant": "Brilliant!",
+      "fullWheel": "Full wheel!"
+    },
+    "strip": {
+      "empty": "Your words land here",
+      "label": "Found {count}",
+      "all": "All words",
+      "close": "Close",
+      "longest": "Longest"
+    },
     "youFoundEverything": "You found every word they did. Nice.",
     "title": "Word Wheel",
     "loading": "Loading Word Wheel...",
@@ -8858,7 +8893,6 @@ const en = {
     "description": "Every word must use the center letter and be at least 3 letters long",
     "centerLetterRule": "Must use center letter",
     "minLetters": "Min {min} letters",
-    "wordsFound": "{count} words found",
     "scoreLabel": "Score",
     "timeLeft": "Time left",
     "closeRace": "Close race!",
@@ -8888,10 +8922,6 @@ const en = {
     "removeLetter": "Remove letter",
     "foundWords": "Found words",
     "possibleWords": "Possible",
-    "excellent": "Excellent!",
-    "great": "Great!",
-    "good": "Good effort!",
-    "tryAgain": "Keep practicing!",
     "longest": "Longest",
     "viewSubmittedWords": "View submitted words",
     "viewWordsYouMissed": "View words you missed",
@@ -8899,7 +8929,6 @@ const en = {
     "youMissedTitle": "Words you missed",
     "noWordsSubmitted": "No words submitted yet",
     "results": {
-      "title": "Word Wheel Results",
       "wordsFound": "Words found",
       "score": "Score",
       "time": "Time",
@@ -11901,11 +11930,17 @@ const en = {
         "body": "Drag straight down (or up) to spell vertical words."
       }
     },
+    "wallet": {
+      "coins": "{count} coins"
+    },
     "store": {
       "title": "Upgrade Store",
       "close": "Done",
       "buy": "Buy",
       "max": "MAXED",
+      "pay": "Pay",
+      "short": "Need",
+      "confirm": "Pay {cost} coins",
       "extraMoves": {
         "name": "Extra Moves",
         "desc": "Start with +1 move per level"
@@ -11981,6 +12016,17 @@ const en = {
     "hub": {
       "playZone": "Play",
       "learnZone": "Learn"
+    },
+    "assignments": {
+      "dueInHours": "Due in {hours}h",
+      "dueInMinutes": "Due in {minutes}m",
+      "overdueBy": "Overdue by {days}d",
+      "doIt": "Do it"
+    },
+    "classView": {
+      "playAssignment": "Play {title}",
+      "playAssignmentDueSoon": "Due soon · Play {title}",
+      "playAssignmentOverdue": "Overdue · Play {title}"
     },
     "welcome": {
       "title": "Welcome to your classroom",
@@ -12756,7 +12802,15 @@ const en = {
       "starterColors": "Colors & shapes",
       "starterColorsDesc": "Colors and basic shapes for early learners",
       "starterFood": "Food",
-      "starterFoodDesc": "Everyday food words for a first homework"
+      "starterFoodDesc": "Everyday food words for a first homework",
+      "wordCountGoal": "Word-count goal",
+      "wordCountGoalHint": "Students find this many unique words by the due date.",
+      "wordCountLabel": "How many words?",
+      "wordListGoal": "Word list",
+      "wordListGoalHint": "Paste words, one per line or comma-separated.",
+      "wordListPlaceholder": "cat, dog, fish",
+      "wordGoalMissing": "Add a word goal or a word list and a due date",
+      "findNWords": "Find {{count}} words"
     },
     "completion": {
       "overallProgress": "Overall progress",
@@ -12947,6 +13001,7 @@ const en = {
         "empty": "No assignments in this classroom yet",
         "statusCompleted": "Completed",
         "statusMissing": "Missing",
+        "statusOverdue": "Overdue",
         "exportCsv": "Export CSV",
         "exportCsvPro": "Export CSV with Teacher Pro {{price}}",
         "fileName": "{{name}} assignment progress",
@@ -13191,6 +13246,7 @@ const en = {
       "trialEndedTitle": "Trial expired. Upgrade to keep your classrooms",
       "trialEndedBody": "Keep unlimited classes and printable reports for $9/month. This is not another free trial.",
       "trialEndedCta": "Keep Pro: $9/mo",
+      "trialReactivateCta": "Reactivate",
       "trialLifecycleTitle": "{count} days left in your Teacher Pro trial",
       "trialLifecycleTitleToday": "Your Teacher Pro trial ends today",
       "trialLifecycleTitleOne": "1 day left in your Teacher Pro trial",
@@ -15747,6 +15803,30 @@ const en = {
     "cta": "Let's play",
     "ctaWait": "{{seconds}}s"
   },
+  "firstLesson": {
+    "skipLabel": "Skip lesson",
+    "skip": "Skip",
+    "progressLabel": "Lesson progress",
+    "trace": "Trace this word",
+    "findAny": "Now find any word",
+    "findLength": "Go for {{count}}+ letters",
+    "inARow": "{{count}} in a row",
+    "praise": {
+      "nice": "Nice!",
+      "great": "Great!",
+      "awesome": "Awesome!",
+      "amazing": "Amazing!"
+    },
+    "oops": "Not quite",
+    "tryWord": "Try {{word}}",
+    "found": "You found {{word}}",
+    "complete": "Lesson complete!",
+    "completeSub": "You've got it. The rest of the round is all yours.",
+    "statWords": "Words",
+    "statPoints": "Points",
+    "statStreak": "Streak",
+    "keepPlaying": "Keep playing"
+  },
   "modeCoach": {
     "skip": "Skip",
     "next": "Next",
@@ -16286,14 +16366,6 @@ const en = {
       "epic": "Epic",
       "legendary": "Legendary"
     }
-  },
-  "encouragement": {
-    "gameStart": "Let's go, you've got this!",
-    "firstWord": "Nice one. Keep finding words!",
-    "longWord": "Nice long word. Those score big!",
-    "combo": "Combo! You're on fire",
-    "halfway": "Halfway there, keep going!",
-    "almostDone": "Final stretch. Find more words!"
   },
   "toast": {
     "found": "FOUND!",

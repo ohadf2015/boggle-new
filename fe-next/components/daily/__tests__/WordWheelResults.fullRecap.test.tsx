@@ -111,23 +111,13 @@ describe('WordWheelResults — full recap disclosure', () => {
   });
 });
 
-/**
- * A blind reviewer comparing this screen against a well-known daily puzzle's
- * result card named the same gap twice: ours had no way to get the result OUT
- * of the app. The other screen's emoji grid is the whole reason its puzzles
- * spread. Word Hunt already had one; Word Wheel had nothing.
- *
- * Reusing the shared card the singleplayer results already ship rather than
- * inventing a second one — its `classic` shape (puzzle number, score, word list)
- * is exactly a wheel run.
- */
 describe('WordWheelResults — the result can leave the app', () => {
-  it('offers a shareable card once the player has found words', () => {
+  it('offers share once the player has found words', () => {
     renderResults();
-    expect(screen.getByTestId('game-emoji-share-card')).toBeInTheDocument();
+    expect(screen.getByTestId('word-wheel-share')).toBeInTheDocument();
   });
 
-  it('does not offer an empty card to a player who found nothing', () => {
+  it('does not offer to share an empty run', () => {
     render(
       <WordWheelResults
         result={{ score: 0, wordsFound: [], timeSeconds: 120 }}
@@ -138,6 +128,6 @@ describe('WordWheelResults — the result can leave the app', () => {
         isAuthenticated
       />,
     );
-    expect(screen.queryByTestId('game-emoji-share-card')).toBeNull();
+    expect(screen.queryByTestId('word-wheel-share')).toBeNull();
   });
 });

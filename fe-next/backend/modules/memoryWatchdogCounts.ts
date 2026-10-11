@@ -10,11 +10,13 @@ import timerManager from '../utils/timerManager';
 import gameStartCoordinator from '../utils/gameStartCoordinator';
 import { activeQuizCodes } from './vocabQuizStore';
 import { getTournamentCount } from './tournamentManager';
+import { formatNextHandleCounts } from './nextHandleStats';
 
 export function formatMemwatchCounts(): string {
   return (
     `counts[games=${getGameCount()} timers=${timerManager.getTimerCount()} ` +
     `seq=${gameStartCoordinator.getActiveSequenceCount()} ` +
-    `quizzes=${activeQuizCodes().length} tournaments=${getTournamentCount()}]`
+    `quizzes=${activeQuizCodes().length} tournaments=${getTournamentCount()}] ` +
+    formatNextHandleCounts()
   );
 }

@@ -42,27 +42,6 @@ interface SpawnOverrides {
   colors?: string[];
 }
 
-interface Point {
-  x: number;
-  y: number;
-}
-
-interface CoinStreamRequest {
-  source: Point;
-  target: Point;
-  count: number;
-  duration?: number;
-}
-
-interface CoinStream {
-  graphic: Graphics;
-  source: Point;
-  control: Point;
-  target: Point;
-  elapsed: number;
-  duration: number;
-}
-
 interface FireworkRequest {
   x: number;
   y: number;
@@ -82,11 +61,6 @@ interface FireworkParticle {
   kind: 'flash' | 'radial' | 'trail';
 }
 
-const STREAM_DEFAULT_DURATION_MS = 900;
-const STREAM_STAGGER_MS = 60;
-const STREAM_RADIUS = 8;
-const STREAM_COLOR = 0xffd700;
-
 const FIREWORK_RADIAL_COUNT = 16;
 const FIREWORK_TRAIL_COUNT = 8;
 const FIREWORK_FLASH_DURATION_MS = 400;
@@ -103,7 +77,6 @@ let pool: ParticlePool | null = null;
 let tickerFn: ((t: { deltaMS: number }) => void) | null = null;
 let deviceConfig: DeviceConfig = DEFAULT_DEVICE;
 let mountPromise: Promise<void> | null = null;
-let coinStreams: CoinStream[] = [];
 let fireworkParticles: FireworkParticle[] = [];
 // `live` gates the ticker so a late frame can't touch graphics mid/post-teardown
 // (JAVASCRIPT-NEXTJS-13Y null-'x' class). `generation` lets a pending init detect
@@ -121,7 +94,6 @@ function isSSR(): boolean {
 // global rAF loop only runs when something is actually on screen.
 function hasActiveFxWork(): boolean {
   return (
-    coinStreams.length > 0 ||
     fireworkParticles.length > 0 ||
     getActiveEmitterCount() > 0
   );
@@ -199,7 +171,6 @@ async function mount(
     tickerFn = (t: { deltaMS: number }) => {
       if (!live) return; // ignore frames once teardown has begun
       pool?.update(t.deltaMS / 1000);
-      updateCoinStreams(t.deltaMS);
       updateFireworks(t.deltaMS);
       // Idle-stop: once every queue has drained, halt the rAF loop. A free-running
       // ticker on this global singleton burned ~1.2–2.0s main-thread per 6s on an
@@ -238,7 +209,6 @@ function unmount(): void {
   }
   if (!app) return;
   if (tickerFn) app.ticker.remove(tickerFn);
-  clearCoinStreams();
   clearFireworks();
   pool?.destroy();
   app.canvas.remove();
@@ -249,111 +219,9 @@ function unmount(): void {
   deviceConfig = DEFAULT_DEVICE;
 }
 
-function computeControlPoint(source: Point, target: Point): Point {
-  const dy = Math.abs(target.y - source.y);
-  const arcHeight = Math.min(dy * 0.5, 100);
-  return {
-    x: (source.x + target.x) / 2,
-    y: Math.min(source.y, target.y) - arcHeight,
-  };
-}
-
 // Mount pending (first-use gate or GPU init): hold the spawn for replay.
 function holdIfMounting(replay: () => void): void {
   if (mountPromise) holdFxCall(replay);
-}
-
-function spawnCoinStream(req: CoinStreamRequest): void {
-  if (isSSR()) return;
-  if (!app) return holdIfMounting(() => spawnCoinStream(req));
-  if (deviceConfig.prefersReducedMotion) return;
-
-  const capped = Math.min(req.count, deviceConfig.maxParticles);
-  if (capped <= 0) return;
-
-  const duration = req.duration ?? STREAM_DEFAULT_DURATION_MS;
-
-  for (let i = 0; i < capped; i++) {
-    // Per-coin scatter at the source, a jittered arc apex, varied size + speed.
-    // The coins still converge on the exact target (the counter), but the path
-    // looks alive and a little different every time — the casino "spray". Purely
-    // cosmetic, so Math.random is fine (no determinism/leaderboard constraint).
-    const coinSource = {
-      x: req.source.x + (Math.random() - 0.5) * 48,
-      y: req.source.y + (Math.random() - 0.5) * 48,
-    };
-    const control = computeControlPoint(coinSource, req.target);
-    control.x += (Math.random() - 0.5) * 80;
-    control.y -= Math.random() * 60;
-
-    const radius = STREAM_RADIUS * (0.75 + Math.random() * 0.6); // ~6–11px
-
-    const graphic = new GraphicsCtor!();
-    graphic.circle(0, 0, radius).fill(STREAM_COLOR);
-    (graphic as unknown as { x: number }).x = coinSource.x;
-    (graphic as unknown as { y: number }).y = coinSource.y;
-    app.stage.addChild(graphic);
-
-    coinStreams.push({
-      graphic,
-      source: coinSource,
-      control,
-      target: req.target,
-      elapsed: -i * STREAM_STAGGER_MS - Math.random() * 40,
-      duration: duration * (0.85 + Math.random() * 0.3),
-    });
-  }
-  wakeTicker();
-}
-
-function updateCoinStreams(deltaMS: number): void {
-  if (!app || coinStreams.length === 0) return;
-
-  const alive: CoinStream[] = [];
-  for (const stream of coinStreams) {
-    stream.elapsed += deltaMS;
-
-    if (stream.elapsed < 0) {
-      alive.push(stream);
-      continue;
-    }
-
-    const t = Math.min(stream.elapsed / stream.duration, 1);
-    const inv = 1 - t;
-    const x =
-      inv * inv * stream.source.x +
-      2 * inv * t * stream.control.x +
-      t * t * stream.target.x;
-    const y =
-      inv * inv * stream.source.y +
-      2 * inv * t * stream.control.y +
-      t * t * stream.target.y;
-
-    const g = stream.graphic as unknown as { x: number; y: number; alpha: number };
-    g.x = x;
-    g.y = y;
-    g.alpha = t < 0.8 ? 1 : Math.max(0, 1 - (t - 0.8) / 0.2);
-
-    if (t >= 1) {
-      app.stage.removeChild(stream.graphic);
-      stream.graphic.destroy();
-    } else {
-      alive.push(stream);
-    }
-  }
-  coinStreams = alive;
-}
-
-function clearCoinStreams(): void {
-  for (const stream of coinStreams) {
-    if (app) app.stage.removeChild(stream.graphic);
-    stream.graphic.destroy();
-  }
-  coinStreams = [];
-}
-
-function getActiveCoinStreamCount(): number {
-  return coinStreams.length;
 }
 
 function spawnFirework(req: FireworkRequest): void {
@@ -517,14 +385,12 @@ export const SharedFxApp = {
   mount,
   unmount,
   spawnBurst,
-  spawnCoinStream,
   spawnFirework,
   isInitialized,
   getApplication,
   getDeviceConfig,
   getActiveEmitterCount,
-  getActiveCoinStreamCount,
   getActiveFireworkCount,
 };
 
-export type { DeviceConfig, SpawnOverrides, CoinStreamRequest, FireworkRequest };
+export type { DeviceConfig, SpawnOverrides, FireworkRequest };

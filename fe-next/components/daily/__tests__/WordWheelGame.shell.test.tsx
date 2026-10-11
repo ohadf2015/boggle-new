@@ -89,16 +89,36 @@ describe('WordWheelGame in the desktop game shell', () => {
     expect(screen.getByTestId('game-shell-stage').querySelector('[data-testid="wheel-orbit"]')).toBeInTheDocument();
   });
 
-  it('puts the found-words feed in the end rail and keyboard help in the start rail', () => {
+  it('keeps keyboard help and the live ranks in the start rail', () => {
     renderGame();
-    expect(within(screen.getByTestId('game-shell-right')).getByTestId('shell-words')).toBeInTheDocument();
-    expect(within(screen.getByTestId('game-shell-left')).getByTestId('shell-keys')).toBeInTheDocument();
+    const left = screen.getByTestId('game-shell-left');
+    expect(within(left).getByTestId('shell-keys')).toBeInTheDocument();
+    expect(within(left).getByText('wordHunt.desktop.liveRanks')).toBeInTheDocument();
   });
 
-  it('races the passed-in rivals in the start rail with the player marked', () => {
-    renderGame({ rivals: [{ name: 'Ada', score: 30, playerId: 'a' }] });
-    const left = screen.getByTestId('game-shell-left');
-    expect(within(left).getByTestId('shell-standing-me').getAttribute('data-me')).toBe('true');
-    expect(within(left).getByText('Ada')).toBeInTheDocument();
+  it('moves the found words into the end rail on desktop, leaving one copy', () => {
+    const mm = window.matchMedia;
+    window.matchMedia = ((q: string) => ({
+      matches: true, media: q, onchange: null,
+      addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {}, dispatchEvent: () => false,
+    })) as unknown as typeof window.matchMedia;
+    try {
+      renderGame();
+      expect(screen.getAllByTestId('found-words-slot')).toHaveLength(1);
+      expect(within(screen.getByTestId('game-shell-right')).getByTestId('found-words-slot')).toBeInTheDocument();
+    } finally {
+      window.matchMedia = mm;
+    }
+  });
+
+  it('shows the rank ladder once, not again as a side list, when live ranks fill the left column', () => {
+    renderGame();
+    expect(screen.getAllByTestId('rank-ladder')).toHaveLength(1);
+  });
+
+  it('falls back to the rank list on the left when there is no live board', () => {
+    renderGame({ hideCompetitive: true });
+    expect(screen.queryByText('wordHunt.desktop.liveRanks')).toBeNull();
+    expect(screen.getAllByTestId('rank-ladder')).toHaveLength(2);
   });
 });

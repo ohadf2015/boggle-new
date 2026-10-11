@@ -77,8 +77,6 @@ export function QuestCard({
     orange: {
       text: 'text-neo-orange',
       bg: 'bg-neo-orange',
-      pill: 'bg-neo-orange/20 border-neo-orange text-neo-orange',
-      iconBg: 'bg-neo-orange',
       gradient: 'from-neo-orange/15',
       accent: 'bg-neo-orange',
       glow: 'bg-neo-orange/30',
@@ -89,8 +87,6 @@ export function QuestCard({
     yellow: {
       text: 'text-neo-yellow',
       bg: 'bg-neo-yellow',
-      pill: 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow',
-      iconBg: 'bg-neo-yellow',
       gradient: 'from-neo-yellow/15',
       accent: 'bg-neo-yellow',
       glow: 'bg-neo-yellow/30',
@@ -99,8 +95,6 @@ export function QuestCard({
     cyan: {
       text: 'text-neo-cyan',
       bg: 'bg-neo-cyan',
-      pill: 'bg-neo-cyan/20 border-neo-cyan text-neo-cyan',
-      iconBg: 'bg-neo-cyan',
       gradient: 'from-neo-cyan/15',
       accent: 'bg-neo-cyan',
       glow: 'bg-neo-cyan/30',
@@ -109,8 +103,6 @@ export function QuestCard({
     purple: {
       text: 'text-neo-purple',
       bg: 'bg-neo-purple',
-      pill: 'bg-neo-purple/20 border-neo-purple text-neo-purple',
-      iconBg: 'bg-neo-purple',
       gradient: 'from-neo-purple/15',
       accent: 'bg-neo-purple',
       glow: 'bg-neo-purple/30',
@@ -216,73 +208,37 @@ export function QuestCard({
           </div>
         )}
 
-        <div className="flex items-start justify-between relative z-10 md:flex-col md:items-center md:gap-2 md:shrink-0">
-          <div className={cn(
-            'flex items-center gap-1.5 px-3 py-1 rounded-full border-2 text-[10px] font-black uppercase tracking-wide',
-            colorConfig.pill
-          )}>
-            {timeMode === 'timed'
-              ? <Timer className="w-3.5 h-3.5" />
-              : <Hourglass className="w-3.5 h-3.5" />
-            }
-            <span>{timeModeLabel}</span>
-          </div>
-
-          <div className="relative">
-            <div className={cn(
-              'w-10 h-10 rounded-full border-2 border-neo-black',
-              'flex items-center justify-center text-neo-black',
-              'shadow-hard-xs group-hover:scale-110 transition-transform',
-              colorConfig.iconBg
+        {/* Content */}
+        <div className="relative z-10 space-y-1.5 md:flex-1 md:min-w-0">
+          <div className="flex items-center gap-2">
+            <span className={cn('[&>svg]:w-6 [&>svg]:h-6 shrink-0', colorConfig.text)} aria-hidden>{icon}</span>
+            <h2 className={cn(
+              'font-neo-display font-black leading-none text-2xl',
+              // Over artwork the hue already lives in the scrim; tinting the title too drops it below AA.
+              previewImageUrl ? 'text-neo-white' : colorConfig.text,
             )}>
-              <span className="[&>svg]:w-5 [&>svg]:h-5">{icon}</span>
-            </div>
-
+              {title}
+            </h2>
             {!isLoadingStatus && isCompleted && (
-              <m.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+              <span
                 className={cn(
-                  'absolute -top-1 -inset-s-1 p-0.5 rounded-full border-2 border-neo-black shadow-hard-xs',
-                  status === 'won' ? 'bg-neo-lime' : 'bg-neo-pink'
+                  'p-0.5 rounded-full border-2 border-neo-black shadow-hard-xs',
+                  status === 'won' ? 'bg-neo-lime' : 'bg-neo-pink',
                 )}
                 data-testid={status === 'won' ? 'won-badge' : 'lost-badge'}
               >
                 {status === 'won'
                   ? <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />
-                  : <X className="w-3 h-3 text-neo-black" strokeWidth={3} />
-                }
-              </m.div>
+                  : <X className="w-3 h-3 text-neo-black" strokeWidth={3} />}
+              </span>
             )}
-
-            {isLoadingStatus && (
-              <div className="absolute -top-1 -inset-s-1 p-0.5 rounded-full bg-neo-navy-elevated border border-slate-600">
-                <Loader2 className="w-3 h-3 animate-spin text-slate-400" />
-              </div>
-            )}
+            {isLoadingStatus && <Loader2 className="w-4 h-4 animate-spin text-slate-400" />}
           </div>
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 space-y-1 md:flex-1 md:min-w-0">
-          <h2 className={cn(
-            'font-neo-display font-black leading-none',
-            /* The scrim now carries the game's hue, so tinting the title too puts
-               orange on orange over busy artwork — below WCAG AA. Identity still
-               reads from the accent strip, the icon and the button. */
-            previewImageUrl ? 'text-neo-white' : colorConfig.text,
-            'text-2xl'
-          )}>
-            {title}
-          </h2>
-          <p className={cn(
-            'text-[13px] line-clamp-2',
-            /* A blind craft review measured this line at roughly 4.5:1 over the
-               tinted card art — the AA threshold exactly, which is a floor, not a
-               target. slate-400 was tuned for a flat dark card, not for artwork
-               with a colour wash over it. */
-            previewImageUrl ? 'text-neo-white/90' : 'text-slate-400',
-          )}>
+          <p className={cn('text-[13px] line-clamp-2', previewImageUrl ? 'text-neo-white/90' : 'text-slate-400')}>
+            <span className={cn('inline-flex items-center gap-1 font-black uppercase tracking-wide text-[11px] me-2 align-middle', colorConfig.text)}>
+              {timeMode === 'timed' ? <Timer className="w-3.5 h-3.5" aria-hidden /> : <Hourglass className="w-3.5 h-3.5" aria-hidden />}
+              <span>{timeModeLabel}</span>
+            </span>
             {tagline}
           </p>
         </div>
