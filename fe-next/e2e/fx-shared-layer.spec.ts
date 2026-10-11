@@ -55,6 +55,9 @@ test.describe('Shared FX canvas', () => {
     await cells.first().waitFor({ timeout: 300_000 });
     await cells.first().click();
     await waitForLive(page, 1);
+    expect((await webglSnapshot(page)).live, 'the one live context is the shared FX canvas').toEqual([
+      expect.stringMatching(/^fixed z9999 /),
+    ]);
     await resetWebglPeak(page);
 
     const before = await confettiPixels(page);

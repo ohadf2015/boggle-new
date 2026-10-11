@@ -10,6 +10,8 @@ export interface ProbeSnapshot {
   everCanvases: number;
   liveNow: number;
   peakLive: number;
+  /** One entry per live canvas: "<position> z<z-index> <w>x<h>", so a count can be traced to its owner. */
+  live: string[];
 }
 
 export async function installWebglProbe(page: Page): Promise<void> {
@@ -25,6 +27,10 @@ export async function installWebglProbe(page: Page): Promise<void> {
       let n = 0;
       for (const c of state.ever) if (isLive(c)) n++;
       return n;
+    };
+    const describe = (c: HTMLCanvasElement) => {
+      const s = getComputedStyle(c);
+      return `${s.position} z${s.zIndex} ${c.clientWidth}x${c.clientHeight}`;
     };
     const origGet = HTMLCanvasElement.prototype.getContext;
     HTMLCanvasElement.prototype.getContext = function (
@@ -49,6 +55,7 @@ export async function installWebglProbe(page: Page): Promise<void> {
         everCanvases: state.ever.size,
         liveNow: liveNow(),
         peakLive: Math.max(state.peakLive, liveNow()),
+        live: [...state.ever].filter(isLive).map(describe),
       }),
       resetPeak: () => {
         state.peakLive = liveNow();
