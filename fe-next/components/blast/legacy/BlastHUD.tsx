@@ -221,7 +221,8 @@ export function BlastHUD({
   coins = 0,
   t,
 }: BlastHUDProps) {
-  useRegisterHeaderAudioControl();
+  const ownMute = !isMultiplayer && !isDesktopCanvas;
+  useRegisterHeaderAudioControl(ownMute);
   const showTimer =
     !isDesktopCanvas &&
     isMultiplayer && remainingTime !== null && remainingTime !== undefined && (totalTime ?? 0) > 0;
@@ -325,7 +326,7 @@ export function BlastHUD({
         <div className="flex items-center gap-1.5">
           {!isMultiplayer && <BlastWalletHud coins={coins} />}
           {hintSlot}
-          <BlastHudMuteButton className="h-7 w-7" />
+          {ownMute && <BlastHudMuteButton className="h-7 w-7" />}
           {onShowHelp && (
             <button
               onClick={onShowHelp}
