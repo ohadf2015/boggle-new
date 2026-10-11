@@ -71,6 +71,7 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
       assignments: assignments.map((a) => ({
         id: a.id,
         title: a.title || a.vocabulary_lessons?.name || untitled,
+        dueDate: a.due_date ?? null,
       })),
       // `student_lesson_progress` has no score/accuracy column — derive the
       // percentage from the real columns (words_attempted / completed_at) via
@@ -99,6 +100,7 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
       completedAt: t('teacher.reports.columns.completedAt'),
       completed: t('teacher.reports.assignmentProgress.statusCompleted'),
       missing: t('teacher.reports.assignmentProgress.statusMissing'),
+      overdue: t('teacher.reports.assignmentProgress.statusOverdue'),
     });
     downloadCsvFile(t('teacher.reports.assignmentProgress.fileName', { name: classroomName }), csv);
   }, [data, t, classroomName]);
@@ -166,7 +168,9 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
                 <td className="px-3 py-2 text-neo-white">
                   {row.status === 'completed'
                     ? t('teacher.reports.assignmentProgress.statusCompleted')
-                    : t('teacher.reports.assignmentProgress.statusMissing')}
+                    : row.status === 'overdue'
+                      ? t('teacher.reports.assignmentProgress.statusOverdue')
+                      : t('teacher.reports.assignmentProgress.statusMissing')}
                 </td>
                 <td className="px-3 py-2 text-end text-neo-white tabular-nums">
                   {row.score == null ? '—' : row.score}
