@@ -82,6 +82,40 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     expect(capture.mock.calls[2][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
+  it('Given subscription.canceled after a Polar trial, When handled, Then it fires trial_expired with $host', async () => {
+    const res = await POST(polarEvent('subscription.canceled', sub({
+      status: 'canceled',
+      metadata: { user_id: 'u1', trial: true },
+      trial_end: '2026-10-01T00:00:00.000Z',
+      current_period_end: '2026-10-01T00:00:00.000Z',
+    })))
+    expect(res.status).toBe(200)
+    expect(capture.mock.calls.map((c) => c[0].event)).toEqual(['trial_expired'])
+    expect(capture.mock.calls[0][0].properties.subscription_id).toBe('sub_1')
+    expect(capture.mock.calls[0][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
+  })
+
+  it('Given subscription.revoked on a still-trialing Pro row, When handled, Then it fires trial_expired', async () => {
+    const res = await POST(polarEvent('subscription.revoked', sub({
+      status: 'trialing',
+      metadata: { user_id: 'u1', trial: true },
+      trial_end: '2026-10-01T00:00:00.000Z',
+      current_period_end: '2026-10-01T00:00:00.000Z',
+    })))
+    expect(res.status).toBe(200)
+    expect(capture.mock.calls.map((c) => c[0].event)).toEqual(['trial_expired'])
+  })
+
+  it('Given a paid cancel (period past trial_end), When canceled, Then it does not fire trial_expired', async () => {
+    await POST(polarEvent('subscription.canceled', sub({
+      status: 'canceled',
+      metadata: { user_id: 'u1', trial: true },
+      trial_end: '2026-10-01T00:00:00.000Z',
+      current_period_end: '2026-11-08T00:00:00.000Z',
+    })))
+    expect(capture).not.toHaveBeenCalled()
+  })
+
   it.each(['subscription.created', 'subscription.uncanceled', 'subscription.resumed', 'subscription.updated'])(
     'Given %s, When handled, Then it is not counted as a conversion',
     async (type) => {

@@ -11,6 +11,7 @@ import posthog from '@/lib/analytics/lazyPosthog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { STUDENT_ASSIGNMENT_CTA_TESTID, type NextOpenAssignment } from './nextOpenAssignment';
+import { assignmentDueState } from '@/lib/education/assignmentDueReminders';
 
 export interface StudentAssignmentPlayCtaProps {
   next: NextOpenAssignment | null;
@@ -19,12 +20,20 @@ export interface StudentAssignmentPlayCtaProps {
 export function StudentAssignmentPlayCta({ next }: StudentAssignmentPlayCtaProps) {
   const { t } = useLanguage();
   if (!next) return null;
+  const urgency = assignmentDueState(next.dueDate);
+  const label =
+    urgency === 'overdue'
+      ? t('student.classView.playAssignmentOverdue', 'Overdue · Play {title}', { title: next.title })
+      : urgency === 'due_soon'
+        ? t('student.classView.playAssignmentDueSoon', 'Due soon · Play {title}', { title: next.title })
+        : t('student.classView.playAssignment', 'Play {title}', { title: next.title });
 
   return (
     <Link
       href={next.href}
       data-testid={STUDENT_ASSIGNMENT_CTA_TESTID}
       data-assignment-id={next.assignmentId}
+      data-due-state={urgency}
       onClick={() => {
         posthog.capture('student_assignment_cta_clicked', {
           assignment_id: next.assignmentId,
@@ -35,7 +44,7 @@ export function StudentAssignmentPlayCta({ next }: StudentAssignmentPlayCtaProps
     >
       <DirectionalIcon icon={Play} mirror className="h-5 w-5 fill-neo-black text-neo-black" />
       <span dir="auto" className="line-clamp-2 text-center">
-        {t('student.classView.playAssignment', 'Play {title}', { title: next.title })}
+        {label}
       </span>
     </Link>
   );

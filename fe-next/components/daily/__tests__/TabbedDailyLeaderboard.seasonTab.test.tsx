@@ -135,10 +135,10 @@ const installFetch = (respond: (url: string) => Record<string, unknown> | null) 
   return calls;
 };
 
-// Radix toggle items react to pointer events, not a bare synthetic `click`.
 const openSeasonTab = async () => {
-  const tab = await screen.findByRole('radio', { name: /Season/ });
-  await userEvent.setup().click(tab);
+  const user = userEvent.setup();
+  await user.click(await screen.findByTestId('leaderboard-more-tabs'));
+  await user.click(await screen.findByRole('menuitem', { name: /Season/ }));
 };
 
 beforeEach(() => {

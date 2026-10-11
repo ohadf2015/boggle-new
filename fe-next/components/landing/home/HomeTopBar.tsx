@@ -10,6 +10,7 @@ import { getXpProgress, getTitleForLevel } from '@/backend/modules/xpManager';
 import { clampPercent } from '@/lib/landing/homeHubFormat';
 import { useAccountStreak } from '@/hooks/useAccountStreak';
 import type { ProfileData } from '@/contexts/auth/authTypes';
+import { CoinArt } from '@/components/ui/CoinArt';
 
 /** localStorage key — a stable per-device seed so a guest's random avatar is the
  *  same across reloads (and matches whatever they later see pre-sign-in). */
@@ -174,8 +175,11 @@ export function HomeTopBar({
             <span className="font-neo-display text-sm font-bold tabular-nums text-neo-cream">{liveStreak}</span>
           )}
         </span>
-        <span className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-black bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm">
-          <CoinGlyph />
+        <span
+          data-coin-counter="true"
+          className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-black bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm"
+        >
+          <CoinArt size={16} />
           {showProfileSkeleton ? (
             <NeoSkeleton variant="text" width={28} height={14} />
           ) : (
@@ -200,16 +204,6 @@ function humanizeTitleKey(key: string): string {
     .split('_')
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
-}
-
-/** Two overlapping lime discs — a tiny stacked-coins glyph, on-brand vs a generic icon. */
-function CoinGlyph() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="9" cy="12" r="7" fill="var(--neo-lime)" stroke="#000" strokeWidth="1.4" />
-      <circle cx="15" cy="12" r="7" fill="#d4ff4d" stroke="#000" strokeWidth="1.4" />
-    </svg>
-  );
 }
 
 export default HomeTopBar;

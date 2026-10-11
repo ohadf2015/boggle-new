@@ -40,6 +40,7 @@ import { withBootTimeout } from './bootTimeout';
 import { sendOpsAlert } from '../backend/modules/notificationService';
 import { startMemoryWatchdog } from '../backend/modules/memoryWatchdog';
 import { formatMemwatchCounts } from '../backend/modules/memoryWatchdogCounts';
+import { noteNextHandle } from '../backend/modules/nextHandleStats';
 import { registerActiveGamesProvider } from '../backend/modules/scoreManager';
 import { getAllGameCodes } from '../backend/modules/gameStateManager';
 
@@ -223,6 +224,10 @@ async function start(): Promise<void> {
       // server/offlineShellCache.ts for the safety invariants.
       applyOfflineShellCacheHeader(req, res, pathname ?? '');
 
+      // Next 16.2 self-host leaks (router LRU / RSC abort / fetch tee) grow
+      // with handle() traffic even when games=0. Count hits vs unique paths
+      // so MEMWATCH can name that class without a heap snapshot.
+      noteNextHandle(pathname ?? '');
       await handle(req, res, parsedUrl);
     } catch (err) {
       // Pass to error handler instead of handling inline

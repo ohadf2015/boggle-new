@@ -54,6 +54,13 @@ describe('EsScrabbleCrossLink', () => {
     expect(link.textContent).toMatch(/Scrabble|alternativa/i);
   });
 
+  it('renders query variant with the exact GSC query as anchor text', () => {
+    const { container } = render(<EsScrabbleCrossLink locale="es" anchorVariant="query" />);
+    const link = container.querySelector('a')!;
+    expect(link.getAttribute('href')).toBe('/es/juego-de-palabras-multijugador');
+    expect(link.textContent).toMatch(/scrabble online español multijugador/i);
+  });
+
   it('all five variants produce five distinct anchor texts', () => {
     const variants = ['words', 'anagram', 'daily', 'leaderboard', 'blog'] as const;
     const texts = variants.map(v =>

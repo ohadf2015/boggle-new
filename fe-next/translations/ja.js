@@ -9431,6 +9431,41 @@ const ja = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "showBoard": "今日のランキング",
+      "hideBoard": "ランキングを閉じる",
+      "moreBoards": "その他"
+    },
+    "rank": {
+      "title": "ランク",
+      "open": "ランク一覧",
+      "toNext": "{rank}まであと{count}",
+      "top": "最高ランク。伝説!",
+      "reached": "今日のランク",
+      "warmUp": "ウォームアップ",
+      "spinning": "回転中",
+      "onARoll": "絶好調",
+      "sharp": "冴えてる",
+      "hotStreak": "アツい",
+      "wordsmith": "言葉職人",
+      "whirlwind": "旋風",
+      "wizard": "魔術師",
+      "legend": "伝説"
+    },
+    "praise": {
+      "nice": "いいね!",
+      "great": "すごい!",
+      "superb": "見事!",
+      "brilliant": "天才的!",
+      "fullWheel": "全文字クリア!"
+    },
+    "strip": {
+      "empty": "見つけた単語はここに",
+      "label": "{count}語",
+      "all": "すべての単語",
+      "close": "閉じる",
+      "longest": "最長"
+    },
     "youFoundEverything": "相手が見つけた言葉をすべて見つけました。お見事。",
     "title": "ワードホイール",
     "loading": "ワードホイールを読み込み中...",
@@ -9439,7 +9474,6 @@ const ja = {
     "description": "単語は3文字以上で、中央の文字を必ず使います",
     "centerLetterRule": "中央の文字は必須",
     "minLetters": "最低{min}文字",
-    "wordsFound": "{count}語見つかりました",
     "scoreLabel": "スコア",
     "timeLeft": "残り時間",
     "closeRace": "接戦中!",
@@ -9469,10 +9503,6 @@ const ja = {
     "removeLetter": "1文字削除",
     "foundWords": "見つかった単語",
     "possibleWords": "出せる単語",
-    "excellent": "素晴らしい！",
-    "great": "よくできました！",
-    "good": "よく頑張りました！",
-    "tryAgain": "練習あるのみ！",
     "longest": "最長",
     "viewSubmittedWords": "提出した単語を見る",
     "viewWordsYouMissed": "見逃した単語を見る",
@@ -9480,7 +9510,6 @@ const ja = {
     "youMissedTitle": "見逃した単語",
     "noWordsSubmitted": "まだ単語が提出されていません",
     "results": {
-      "title": "ワードホイール結果",
       "wordsFound": "見つかった単語",
       "score": "スコア",
       "time": "時間",
@@ -13403,11 +13432,17 @@ const ja = {
       "reelLabel": "ハイライト",
       "bestWord": "ベストワード"
     },
+    "wallet": {
+      "coins": "コイン{count}枚"
+    },
     "store": {
       "title": "アップグレードストア",
       "close": "完了",
       "buy": "購入",
       "max": "最大",
+      "pay": "支払う",
+      "short": "不足",
+      "confirm": "{cost}コインで購入",
       "extraMoves": {
         "name": "追加ムーブ",
         "desc": "レベルあたり+1ムーブで開始"
@@ -13510,6 +13545,17 @@ const ja = {
     "hub": {
       "playZone": "プレイ",
       "learnZone": "学ぶ"
+    },
+    "assignments": {
+      "dueInHours": "残り{hours}時間",
+      "dueInMinutes": "残り{minutes}分",
+      "overdueBy": "{days}日遅れ",
+      "doIt": "やる"
+    },
+    "classView": {
+      "playAssignment": "{title}をプレイ",
+      "playAssignmentDueSoon": "まもなく締切 · {title}をプレイ",
+      "playAssignmentOverdue": "期限切れ · {title}をプレイ"
     },
     "welcome": {
       "title": "クラスへようこそ！",
@@ -14011,6 +14057,7 @@ const ja = {
       "trialEndedTitle": "トライアル終了。クラスを維持するにはアップグレードしてください",
       "trialEndedBody": "月額9ドルで無制限クラスと印刷レポートを維持できます。無料トライアルの再付与ではありません。",
       "trialEndedCta": "Proを続ける（月額9ドル）",
+      "trialReactivateCta": "再有効化",
       "trialLifecycleTitle": "Teacher Proトライアル残り{count}日",
       "trialLifecycleTitleToday": "Teacher Proトライアルは本日期限です",
       "trialLifecycleTitleOne": "Teacher Proトライアル残り1日",
@@ -14451,7 +14498,15 @@ const ja = {
       "starterColors": "色と形",
       "starterColorsDesc": "初級向けの色と基本の形",
       "starterFood": "食べ物",
-      "starterFoodDesc": "最初の宿題向けの日常の食べ物"
+      "starterFoodDesc": "最初の宿題向けの日常の食べ物",
+      "wordCountGoal": "単語数ゴール",
+      "wordCountGoalHint": "期限までにこの数の異なる単語を見つけます。",
+      "wordCountLabel": "何語？",
+      "wordListGoal": "単語リスト",
+      "wordListGoalHint": "単語を1行ずつ、またはカンマ区切りで貼り付けます。",
+      "wordListPlaceholder": "ねこ, いぬ, さかな",
+      "wordGoalMissing": "単語ゴールかリストと期限を入れてください",
+      "findNWords": "{{count}}語見つけよう"
     },
     "completion": {
       "overallProgress": "全体的な進捗",
@@ -14642,6 +14697,7 @@ const ja = {
         "empty": "このクラスにはまだ課題がありません",
         "statusCompleted": "完了",
         "statusMissing": "未提出",
+        "statusOverdue": "期限切れ",
         "exportCsv": "CSVを書き出す",
         "exportCsvPro": "Teacher Pro {{price}} で CSV を書き出す",
         "fileName": "{{name}} – 課題の進捗",
@@ -17750,14 +17806,6 @@ const ja = {
       "legendary": "レジェンダリー"
     }
   },
-  "encouragement": {
-    "gameStart": "さあ行こう。君ならできる！ 🎯",
-    "firstWord": "ナイス！どんどん見つけよう",
-    "longWord": "すごい！長い単語は高得点だよ",
-    "combo": "コンボ！絶好調",
-    "halfway": "半分達成、続けて！",
-    "almostDone": "ラストスパート！もっと見つけよう"
-  },
   "toast": {
     "found": "見つけた！",
     "nah": "ダメ。",
@@ -19373,6 +19421,30 @@ const ja = {
     "donePrompt": "いいね！ななめもアリ 🎉",
     "cta": "プレイ開始",
     "ctaWait": "{{seconds}}秒"
+  },
+  "firstLesson": {
+    "skipLabel": "レッスンをスキップ",
+    "skip": "スキップ",
+    "progressLabel": "レッスンの進み具合",
+    "trace": "この言葉をなぞろう",
+    "findAny": "次は好きな言葉を探そう",
+    "findLength": "{{count}}文字以上をねらおう",
+    "inARow": "{{count}}連続",
+    "praise": {
+      "nice": "いいね！",
+      "great": "すごい！",
+      "awesome": "最高！",
+      "amazing": "天才！"
+    },
+    "oops": "おしい！",
+    "tryWord": "{{word}}をなぞってみて",
+    "found": "{{word}}を見つけた！",
+    "complete": "レッスンクリア！",
+    "completeSub": "コツはつかめたね。残りの時間は自由にどうぞ。",
+    "statWords": "言葉",
+    "statPoints": "ポイント",
+    "statStreak": "連続",
+    "keepPlaying": "このまま続ける"
   },
   "modeCoach": {
     "skip": "スキップ",

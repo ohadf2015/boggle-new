@@ -13,7 +13,7 @@ vi.mock('@/components/game/in-game/components/WordFormingAreaConnected', () => (
   WordFormingAreaConnected: () => <div data-testid="word-forming" />,
 }));
 vi.mock('@/components/game/in-game/components/GameOverlays', () => ({
-  GameOverlays: () => null,
+  GameOverlays: (p: { isPlaying: boolean }) => <div data-testid="overlays" data-playing={String(p.isPlaying)} />,
 }));
 vi.mock('@/components/game/FloatingScoreAnimation', () => ({ default: () => null }));
 vi.mock('@/components/game/ComboMilestoneAnnouncement', () => ({ ComboMilestoneAnnouncement: () => null }));
@@ -154,5 +154,20 @@ describe('SoloGameLayout', () => {
     const slot = document.querySelector('[data-solo-slot="missions"]');
     expect(slot).not.toBeNull();
     expect(slot?.className).toContain('min-h-[2.25rem]');
+  });
+
+  it('flags the shell while a lesson runs, so wide screens can lift it over the board', () => {
+    const { rerender } = render(<SoloGameLayout {...props()} />);
+    const shell = () => document.querySelector('[data-solo-slot="bar"]')?.parentElement;
+    expect(shell()).not.toHaveAttribute('data-lesson');
+    rerender(<SoloGameLayout {...props({ soloLessonActive: true })} />);
+    expect(shell()).toHaveAttribute('data-lesson', 'on');
+  });
+
+  it('keeps the desktop typing tips out of the way while a lesson runs', () => {
+    const { rerender } = render(<SoloGameLayout {...props()} />);
+    expect(screen.getByTestId('overlays')).toHaveAttribute('data-playing', 'true');
+    rerender(<SoloGameLayout {...props({ soloLessonActive: true })} />);
+    expect(screen.getByTestId('overlays')).toHaveAttribute('data-playing', 'false');
   });
 });

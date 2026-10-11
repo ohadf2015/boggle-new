@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import dynamic from 'next/dynamic';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { AnimatePresence, m } from 'framer-motion';
-import { Star, Type, Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -12,6 +11,8 @@ import { buildQuitDialogConfig } from './survival/quitDialogConfig';
 import logger from '@/utils/logger';
 import WordWheelGame, { type WordWheelGameResult } from './WordWheelGame';
 import WordWheelResults from './WordWheelResults';
+import ReadyLeaderboardPeek from './ReadyLeaderboardPeek';
+import WordWheelReadyCard from './WordWheelReadyCard';
 const TabbedDailyLeaderboard = dynamic(() => import('./TabbedDailyLeaderboard'), {
   ssr: false,
 });
@@ -36,6 +37,7 @@ import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge
 import type { Language } from '@/types';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fastValidateWord } from '@/hooks/fastValidateWord';
+import { prewarmDictionary } from '@/hooks/useDictionaryCache';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
@@ -57,30 +59,6 @@ const WordWheelEffectsCanvas = dynamic(
 // ==========================================
 
 type WordWheelPhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played';
-
-// Blurred "censored letter" that fills an outer tile in the ready-screen
-// preview wheel. We deliberately render a DECOY glyph (never the real outer
-// letter) so the pre-game scout can't read the answer by inspecting the
-// markup — only the look of a censored letter survives the blur. Decoys are
-// deterministic per seed (SSR + client match, no hydration mismatch) and the
-// `avoid` letter is skipped so the decoy can never coincide with the real one.
-const DECOY_GLYPHS = ['Q', 'X', 'Z', 'K', 'W', 'V', 'Y', 'J'] as const;
-function CensorTile({ seed, avoid }: { seed: number; avoid?: string }) {
-  let glyph = DECOY_GLYPHS[seed % DECOY_GLYPHS.length];
-  if (avoid && glyph === avoid.toUpperCase()) {
-    glyph = DECOY_GLYPHS[(seed + 1) % DECOY_GLYPHS.length];
-  }
-  return (
-    <span
-      data-testid="censor-blur"
-      className="flex h-full w-full select-none items-center justify-center font-neo-display font-black text-neo-navy"
-      style={{ filter: 'blur(4px)', fontSize: '0.95rem' }}
-      aria-hidden
-    >
-      {glyph}
-    </span>
-  );
-}
 
 const WORD_WHEEL_DURATION = 120; // 2 minutes
 
@@ -358,11 +336,19 @@ const WordWheelChallenge: React.FC = () => {
     [language]
   );
 
-  // Core start — shared by direct play and post-ad-reward callback.
+  // Fullscreen game paths skip the global prewarm (PSI window), so warm on the first touch instead.
+  useEffect(() => {
+    if (phase !== 'ready') return;
+    const warm = () => void prewarmDictionary(language as Language);
+    window.addEventListener('pointerdown', warm, { once: true, passive: true });
+    return () => window.removeEventListener('pointerdown', warm);
+  }, [phase, language]);
+
   const startPlaying = useCallback(() => {
+    void prewarmDictionary(language as Language);
     setGameActive(true);
     setPhase('playing');
-  }, [setGameActive]);
+  }, [setGameActive, language]);
 
   // Rewarded ad for catch-up plays (native only; web degrades to free).
   const {
@@ -608,105 +594,32 @@ const WordWheelChallenge: React.FC = () => {
       )}
 
       <AnimatePresence mode="wait">
-        {/* Ready screen */}
+        {/* Ready screen. Static appear: an opacity tween on this full-screen layer flashes on mobile. */}
         {phase === 'ready' && puzzle && (
-          <m.div
-            key="ready"
-            className="flex-1 flex flex-col items-center gap-4 px-4 pt-4 pb-bottom-stack sm:pb-6 overflow-y-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div className="text-center">
-              <h1 className="font-neo-display font-black text-3xl sm:text-4xl text-neo-white mb-2">
-                {t('wordWheel.title')}
-              </h1>
-              <span className="text-neo-white text-sm">
-                {t('daily.puzzleNumber', { number: puzzleNumber })}
-              </span>
-            </div>
-
-            {/* Instruction rules — compact wrapping chips instead of stacked
-                full-width cards, so they take far less vertical space. */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 max-w-md w-full">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-neo-black bg-neo-navy-light shadow-hard-xs text-neo-white text-xs">
-                <Star className="h-3.5 w-3.5 shrink-0 text-neo-lime" strokeWidth={2.5} aria-hidden />
-                {t('wordWheel.centerLetterRule')}
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-neo-black bg-neo-navy-light shadow-hard-xs text-neo-white text-xs">
-                <Type className="h-3.5 w-3.5 shrink-0 text-neo-cyan" strokeWidth={2.5} aria-hidden />
-                {t('wordWheel.minLetters', { min: '3' })}
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-neo-black bg-neo-navy-light shadow-hard-xs text-neo-white text-xs">
-                <Timer className="h-3.5 w-3.5 shrink-0 text-neo-pink" strokeWidth={2.5} aria-hidden />
-                {t('wordWheel.timeLimit')}
-              </span>
-            </div>
-
-            {/* Preview wheel — outer letters censored before play to keep the
-                pre-game scout from cheating (you only see the center letter,
-                everything else is a deterministic pixel mosaic). */}
-            <div className="relative w-32 h-32 lg:w-40 lg:h-40 flex items-center justify-center my-2">
-              {/* Glow ring */}
-              <m.div
-                className="absolute inset-0 rounded-full border-2 border-neo-lime/20"
-                style={{ boxShadow: '0 0 30px rgba(191,255,0,0.15)' }}
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-              />
-              <m.div
-                className="w-12 h-12 rounded-full border-3 border-neo-black bg-neo-lime flex items-center justify-center font-neo-display font-black text-xl text-neo-black shadow-[3px_3px_0px_black,0_0_20px_rgba(191,255,0,0.5)]"
-                animate={{ scale: [1, 1.08, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                {puzzle.centerLetter}
-              </m.div>
-              {puzzle.outerLetters.map((letter, i) => {
-                const angle = i * 60;
-                const rad = (angle * Math.PI) / 180;
-                const x = Math.sin(rad) * 44;
-                const y = -Math.cos(rad) * 44;
-                return (
-                  <m.div
-                    key={`outer-${i}`}
-                    data-testid="preview-outer-letter"
-                    className="absolute inset-0 m-auto w-8 h-8 rounded-full border-2 border-neo-black bg-neo-white overflow-hidden shadow-[2px_2px_0px_black,0_0_6px_rgba(191,255,0,0.12)]"
-                    initial={{ scale: 0, x, y }}
-                    animate={{ scale: 1, x, y }}
-                    transition={{ delay: i * 0.06, type: 'spring', stiffness: 400 }}
-                    aria-label="hidden letter"
-                  >
-                    <CensorTile seed={i + 1} avoid={letter} />
-                  </m.div>
-                );
-              })}
-            </div>
-
-            <m.button
-              type="button"
-              onClick={handleStart}
-              className="px-8 py-3 rounded-neo border-3 border-neo-black bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black font-neo-display font-black text-lg shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)] active:shadow-hard-pressed active:translate-x-px active:translate-y-px transition-all"
-              whileTap={{ scale: 0.95 }}
-              animate={{ scale: [1, 1.03, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          <m.div key="ready" className="flex-1 flex min-h-0" exit={{ opacity: 0 }}>
+            <WordWheelReadyCard
+              t={t}
+              centerLetter={puzzle.centerLetter}
+              outerLetters={puzzle.outerLetters}
+              puzzleNumber={puzzleNumber}
+              streakDays={isPractice ? 0 : getDailyStreak().currentStreak}
+              onPlay={handleStart}
+              wide={isDesktop || isTv}
             >
-              {t('daily.play')}
-            </m.button>
-
-            {/* Tabbed leaderboard — parity with Word Hunt ready screen */}
-            <div className="w-full max-w-md lg:max-w-lg xl:max-w-2xl mt-2">
-              <TabbedDailyLeaderboard
-                puzzleDate={catchupDate || getDailyChallengeDate()}
-                language={language as Language}
-                currentPlayerId={isAuthenticated && profile ? profile.id : null}
-                currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-                scope="word-wheel"
-                defaultTab="today"
-                t={t}
-                maxVisible={5}
-                compact
-              />
-            </div>
+              <ReadyLeaderboardPeek t={t} defaultOpen={isDesktop || isTv}>
+                <TabbedDailyLeaderboard
+                  puzzleDate={catchupDate || getDailyChallengeDate()}
+                  language={language as Language}
+                  currentPlayerId={isAuthenticated && profile ? profile.id : null}
+                  currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+                  scope="word-wheel"
+                  defaultTab="today"
+                  t={t}
+                  maxVisible={5}
+                  compact
+                />
+              </ReadyLeaderboardPeek>
+            </WordWheelReadyCard>
           </m.div>
         )}
 
@@ -762,8 +675,6 @@ const WordWheelChallenge: React.FC = () => {
           <m.div
             key="results"
             className="flex-1 min-h-0 flex flex-col items-center justify-start overflow-y-auto overscroll-contain pb-bottom-stack"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <WordWheelResults

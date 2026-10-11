@@ -33,6 +33,7 @@
 - [ ] New mode added? Grep every `resetScoresForNewRound` / `resetBotsForNewRound` sibling and confirm the new mode routes through all of them.
 - [ ] Case/format mismatch on lookups: `findAllWords` returns lowercase — compare `word.toLowerCase()`, never `.toUpperCase()` against a lowercase set.
 - [ ] **Per-request state outliving the request (SSR):** client providers/hooks also run during SSR. Any timer they create (TanStack `gcTime`, `setInterval`, debounce) captures that request's AsyncLocalStorage store, and Error stacks chain those stores together → linear heap leak at 0 games (2026-10-10, `QueryProvider` gcTime 5min, ~85KB/render). Guard with `typeof window === 'undefined'`. See `ssr-heap-leak-tanstack-gctime-timers-2026-10-10`.
+- [ ] **"Bounded per language" ≠ affordable:** a module cache keyed by language × 6 languages × several copies (Express `Dictionary`, Next `sharedWordSets`, route-local Sets/arrays, tries) is bounded yet OOM'd prod (2026-10-10: object tries alone 369MB, ru 125MB, vs 1536MB cap; heap bursts tracked MP game starts). Measure post-GC cost of ALL languages loaded before adding a per-language cache; prefer a sorted array sharing the Set's strings over object graphs. See `prod-oom-solver-trie-residency-2026-10-11`.
 
 ---
 
