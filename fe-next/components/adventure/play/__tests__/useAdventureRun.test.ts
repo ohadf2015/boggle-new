@@ -47,6 +47,18 @@ describe('useAdventureRun', () => {
     expect(result.current.score).toBe(wordPoints('cat'));
   });
 
+  it('given the dictionary cannot be checked, when a word is submitted, then it is neither invalid nor scored', async () => {
+    mockFetch();
+    const unchecked = async () => null;
+    const { result } = renderHook(() => useAdventureRun({ world: 1, level: 1, language: 'en', isWord: unchecked }));
+    await waitFor(() => expect(result.current.phase).toBe('ready'));
+    act(() => result.current.begin());
+    let r = '';
+    await act(async () => { r = await result.current.submitWord('cat'); });
+    expect(r).toBe('retry');
+    expect(result.current.words).toEqual([]);
+  });
+
   it('given invalid words, when submitted, then they are rejected without scoring', async () => {
     mockFetch();
     const { result } = renderHook(() => useAdventureRun({ world: 1, level: 1, language: 'en', isWord }));

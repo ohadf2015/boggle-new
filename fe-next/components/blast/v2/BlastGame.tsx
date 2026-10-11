@@ -218,6 +218,10 @@ export function BlastGame({
       const accepted = fOk ? forward : rOk ? reversed : null;
       if (accepted) {
         handlers.onForceBonus(cells, accepted);
+      } else if (fOk === null || rOk === null) {
+        // The dictionary could not answer: never burn a strike on a word we could not check.
+        dictRetryLockRef.current = null;
+        handlers.onRejectUnverified();
       } else {
         // Dictionary confirms it's not a real word — release the deferred
         // shake now (the submit didn't fire it, so the player gets a single

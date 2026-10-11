@@ -83,16 +83,36 @@ describe('useBlastDictionary', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it('returns false (without crashing) when the network call rejects', async () => {
-    fetchMock.mockRejectedValueOnce(new Error('offline'));
+  it('returns null (unknown, not a reject) when the network call rejects', async () => {
+    fetchMock.mockRejectedValue(new Error('offline'));
 
     const { result } = renderHook(() => useBlastDictionary('en'));
-    let ok = true;
+    let ok: boolean | null = true;
     await act(async () => {
       ok = await result.current.verify('hello');
     });
 
-    expect(ok).toBe(false);
+    expect(ok).toBeNull();
+  });
+
+  it('returns null on a rate-limited check and does not cache it, so the next try re-checks the server', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(JSON.stringify({ error: 'Too many requests' }), { status: 429, headers: { 'Retry-After': '60' } }),
+    );
+    const { result } = renderHook(() => useBlastDictionary('en'));
+    let ok: boolean | null = true;
+    await act(async () => {
+      ok = await result.current.verify('hello');
+    });
+    expect(ok).toBeNull();
+
+    fetchMock.mockReset();
+    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ isValid: true, source: 'dictionary' })));
+    await act(async () => {
+      ok = await result.current.verify('hello');
+    });
+    expect(ok).toBe(true);
+    expect(fetchMock).toHaveBeenCalledOnce();
   });
 
   it('caches `hello` and `HELLO` as the same key (normalized cache hit)', async () => {
@@ -133,15 +153,15 @@ describe('useBlastDictionary', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('when offline and the word is not cached, rejects without hitting the network', async () => {
+  it('when offline and the word is not cached, answers unknown without hitting the network', async () => {
     setOnline(false);
     memHit.current = null; // dict not warmed / word unknown
     const { result } = renderHook(() => useBlastDictionary('en'));
-    let ok = true;
+    let ok: boolean | null = true;
     await act(async () => {
       ok = await result.current.verify('zzqqx');
     });
-    expect(ok).toBe(false);
+    expect(ok).toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

@@ -9549,6 +9549,7 @@ const ru = {
     "submittingTooFast": "Стоп! Медленнее.",
     "words": "Слова",
     "invalidWord": "Недопустимое слово",
+    "wordCheckUnavailable": "Не удалось проверить слово. Попробуйте ещё раз",
     "notInDictionary": "Не в словаре",
     "pendingValidation": "Проверяется...",
     "validation": {

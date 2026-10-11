@@ -112,6 +112,7 @@ type Action =
   | { type: 'undo' }
   | { type: 'forceBonus'; cells: CellId[]; word: string }
   | { type: 'rejectConfirmed' }
+  | { type: 'rejectUnverified' }
   | { type: 'markRewardedUndo' };
 
 type UseBlastV2Options = {
@@ -416,6 +417,9 @@ function reducer(state: State, action: Action): State {
   if (action.type === 'forceBonus') {
     return { ...applyForceBonus(state, action.cells, action.word), hintCells: [] };
   }
+  if (action.type === 'rejectUnverified') {
+    return state.dictCheckPending ? { ...state, dictCheckPending: false, lastRejectedCells: [] } : state;
+  }
   if (action.type === 'rejectConfirmed') {
     // The async dictionary check came back negative for a pending `unknown`
     // word. NOW fire the shake (it was deferred at submit time) and clear the
@@ -543,6 +547,7 @@ export function useBlastV2(initialLevel: BlastLevel, options: UseBlastV2Options 
       // The async dictionary check rejected a pending `unknown` word — it's
       // genuinely not a real word. Fires the (deferred) shake.
       onRejectConfirmed: () => dispatch({ type: 'rejectConfirmed' }),
+      onRejectUnverified: () => dispatch({ type: 'rejectUnverified' }),
     }),
     []
   );

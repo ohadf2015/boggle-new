@@ -10,7 +10,7 @@ import type { NodeKind } from '@/lib/adventure/play/runMap';
 import type { RelicId } from '@/lib/adventure/play/relics';
 
 export type RunPhase = 'loading' | 'error' | 'draft' | 'ready' | 'playing' | 'saving' | 'done' | 'map' | 'node';
-export type SubmitResult = 'ok' | 'dup' | 'short' | 'invalid' | 'chain' | 'idle';
+export type SubmitResult = 'ok' | 'dup' | 'short' | 'invalid' | 'chain' | 'idle' | 'retry';
 
 export interface RunResult {
   score: number;

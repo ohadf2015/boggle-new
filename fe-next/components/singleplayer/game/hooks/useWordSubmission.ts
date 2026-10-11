@@ -7,6 +7,7 @@ import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import { recordNotOnBoard, recordNotInDictionary } from '@/utils/invalidWordTracker';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { usePrevalidation } from '@/hooks/usePrevalidation';
+import { resolveWordVerdict } from '@/lib/dictionary/checkWordRemote';
 import { evaluateWordAchievements } from '@/lib/achievements/hiddenAchievementBus';
 import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
@@ -382,47 +383,26 @@ export function useWordSubmission({
       return;
     }
 
-    // Step 5: Check dictionary via backend API (fallback for words not in cache)
-    fetch('/api/dictionary/check', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word: normalizedWord, language }),
-    })
-      .then(res => {
-        if (!res.ok) {
-          return { isValid: false, source: 'error' };
-        }
-        return res.json();
-      })
-      .then(result => {
-        if (result.isValid) {
-          handleValidWord();
-        } else {
-          handleInvalidWord();
-        }
-      })
-      .catch(() => {
-        // On API error, treat as invalid
-        const errorNow = Date.now();
-        combo.resetCombo();
-
-        foundWordsRef.current = foundWordsRef.current.map(fw =>
-          fw.word === normalizedWord && fw.timestamp === now
-            ? { ...fw, isValid: false, score: 0 }
-            : fw
-        );
-        setFoundWords(foundWordsRef.current);
-
-        const invalidMsg = t('playerView.invalidWord', 'Not a valid word');
-        setCurrentFeedback({
-          id: `reject-${errorNow}`,
-          type: 'rejected',
-          word: normalizedWord.toUpperCase(),
-          message: invalidMsg,
-          timestamp: errorNow,
-        });
-        hapticError();
+    const handleUncheckedWord = () => {
+      foundWordsSetRef.current.delete(normalizedWord);
+      foundWordsRef.current = foundWordsRef.current.filter(fw => !(fw.word === normalizedWord && fw.timestamp === now));
+      setFoundWords(foundWordsRef.current);
+      const msg = t('playerView.wordCheckUnavailable', "Couldn't check that word. Try again");
+      setCurrentFeedback({
+        id: `unchecked-${now}`,
+        type: 'duplicate',
+        word: normalizedWord.toUpperCase(),
+        message: msg,
+        timestamp: now,
       });
+      announceWordResult(normalizedWord, false, undefined, msg);
+    };
+
+    void resolveWordVerdict(normalizedWord, language).then(verdict => {
+      if (verdict === 'valid') handleValidWord();
+      else if (verdict === 'invalid') handleInvalidWord();
+      else handleUncheckedWord();
+    });
   }, [
     language,
     minWordLength,

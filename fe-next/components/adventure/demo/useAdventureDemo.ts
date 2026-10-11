@@ -31,7 +31,7 @@ export { type RunPhase, type SubmitResult, type RunResult, type EcosystemGains, 
 
 interface Options {
   language: string;
-  isWord: (word: string) => Promise<boolean>;
+  isWord: (word: string) => Promise<boolean | null>;
 }
 
 const NO_POTIONS: Record<PotionId, number> = { heal: 0, time: 0, cleanse: 0, insight: 0 };
@@ -146,7 +146,9 @@ export function useAdventureDemo({ language, isWord }: Options) {
       if (w.length < lvl.minLength) return 'short';
       if (wordsRef.current.includes(w)) return 'dup';
       if (!isWordOnBoard(w, grid.map((r) => r.map((c) => c.toLowerCase())), language)) return 'invalid';
-      if (!(await isWord(w))) return 'invalid';
+      const known = await isWord(w);
+      if (known === null) return 'retry';
+      if (!known) return 'invalid';
       if (wordsRef.current.includes(w)) return 'dup';
       wordsRef.current = [...wordsRef.current, w];
       timesRef.current = [...timesRef.current, Math.max(0, Date.now() - startedAtRef.current)];

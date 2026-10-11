@@ -4503,6 +4503,7 @@ const en = {
     "submittingTooFast": "Whoa there. Slow your roll.",
     "words": "Words",
     "invalidWord": "Not a word",
+    "wordCheckUnavailable": "Couldn't check that word. Try again",
     "notInDictionary": "Not a word",
     "pendingValidation": "Being checked...",
     "validation": {

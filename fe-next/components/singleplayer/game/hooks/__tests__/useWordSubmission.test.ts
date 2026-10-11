@@ -43,6 +43,8 @@ vi.mock('@/hooks/useDictionaryCache', () => ({
     checkWord: mockCheckWord,
     ...mockDictionaryCacheState,
   }),
+  hasWordInMemoryCache: () => null,
+  prewarmDictionary: () => Promise.resolve(),
 }));
 
 // Mock usePrevalidation for pre-typing validation
@@ -541,7 +543,7 @@ describe('useWordSubmission', () => {
       expect(mockCombo.resetCombo).toHaveBeenCalled();
     });
 
-    it('should reject word when API call fails', async () => {
+    it('should not reject or penalise the word when the API call fails', async () => {
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(true);
       (global.fetch as any).mockRejectedValue(new Error('Network error'));
@@ -556,10 +558,11 @@ describe('useWordSubmission', () => {
       });
 
       await waitFor(() => {
-        expect(result.current.currentFeedback?.type).toBe('rejected');
+        expect(result.current.currentFeedback?.message).toBe('playerView.wordCheckUnavailable');
       });
 
-      expect(mockCombo.resetCombo).toHaveBeenCalled();
+      expect(result.current.currentFeedback?.type).not.toBe('rejected');
+      expect(mockCombo.resetCombo).not.toHaveBeenCalled();
     });
   });
 

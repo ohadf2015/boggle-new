@@ -149,9 +149,10 @@ vi.mock('@/utils/clientWordValidator', () => ({
   isWordOnBoard: vi.fn(() => true),
 }));
 
+const mockHapticError = vi.fn();
 vi.mock('@/utils/haptics', () => ({
   hapticForWordScore: vi.fn(),
-  hapticError: vi.fn(),
+  hapticError: () => mockHapticError(),
 }));
 
 vi.mock('@/utils/invalidWordTracker', () => ({
@@ -215,6 +216,8 @@ vi.mock('@/hooks/useDictionaryCache', () => ({
     checkWord: mockCheckWord,
     ...mockDictionaryCacheState,
   }),
+  hasWordInMemoryCache: () => null,
+  prewarmDictionary: () => Promise.resolve(),
 }));
 
 // Import AFTER mocks
@@ -308,6 +311,30 @@ describe('useSinglePlayerCore — Dictionary Cache Latency', () => {
       '/api/dictionary/check',
       expect.objectContaining({ method: 'POST' })
     );
+  });
+
+  it('given a rate-limited dictionary check, then the word is neither rejected nor penalised', async () => {
+    global.fetch = vi.fn(async () =>
+      new Response(JSON.stringify({ error: 'Too many requests' }), { status: 429, headers: { 'Retry-After': '1' } }),
+    ) as unknown as typeof fetch;
+
+    const { result } = renderHook(() =>
+      useSinglePlayerCore({
+        settings: { ...defaultSettings, grid: mockGrid },
+        targetHighScore: null,
+        onGameEnd: vi.fn(),
+        onQuit: vi.fn(),
+      })
+    );
+
+    act(() => {
+      result.current.handleWordSubmit('test');
+    });
+
+    await waitFor(() => expect(result.current.currentFeedback?.message).toBe('playerView.wordCheckUnavailable'), { timeout: 3000 });
+    expect(result.current.currentFeedback?.type).not.toBe('rejected');
+    expect(result.current.foundWords.some(fw => fw.word === 'test')).toBe(false);
+    expect(mockHapticError).not.toHaveBeenCalled();
   });
 
 });

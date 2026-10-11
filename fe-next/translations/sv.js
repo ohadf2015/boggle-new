@@ -5218,6 +5218,7 @@ const sv = {
     "words": "Ord",
     "alreadyFound": "Redan hittad",
     "invalidWord": "Ogiltigt ord",
+    "wordCheckUnavailable": "Kunde inte kolla ordet. Försök igen",
     "notInDictionary": "Inte i ordlistan",
     "pendingValidation": "Kollas...",
     "letterWords": "bokstavsord",

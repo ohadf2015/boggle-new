@@ -19,6 +19,7 @@ import { MIN_DISCOVERY_WORD_LENGTH, MAX_DISCOVERY_WORD_LENGTH } from '@/shared/c
 import { formatRewardMessage } from '@/utils/formatRewardMessage';
 import { recordNotOnBoard, recordNotInDictionary } from '@/utils/invalidWordTracker';
 import type { useSafeTimeout } from '@/hooks/useSafeTimeout';
+import { resolveWordVerdict, type WordVerdict } from '@/lib/dictionary/checkWordRemote';
 
 type SafeTimeout = ReturnType<typeof useSafeTimeout>;
 
@@ -53,7 +54,7 @@ export interface UseSurvivalWordSubmissionProps {
 export interface SurvivalWordSubmissionActions {
   handleWordSubmit: (word: string) => void;
   handleWordChange: (word: string, count: number) => void;
-  validateWordInDictionary: (word: string) => Promise<boolean>;
+  validateWordInDictionary: (word: string) => Promise<WordVerdict>;
 }
 
 export function useSurvivalWordSubmission({
@@ -79,21 +80,9 @@ export function useSurvivalWordSubmission({
   const handleWordDiscoveryRef = useRef<((word: string) => void) | null>(null);
   const handleDiscoveryFeedbackRef = useRef<((word: string, target: string) => void) | null>(null);
 
-  // Dictionary validation
-  const validateWordInDictionary = useCallback(async (word: string): Promise<boolean> => {
-    if (word.toLowerCase() === targetWord.toLowerCase()) return true;
-
-    try {
-      const response = await fetch('/api/dictionary/check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word: word.toLowerCase(), language }),
-      });
-      const data = await response.json();
-      return data.isValid === true;
-    } catch {
-      return true;
-    }
+  const validateWordInDictionary = useCallback(async (word: string): Promise<WordVerdict> => {
+    if (word.toLowerCase() === targetWord.toLowerCase()) return 'valid';
+    return resolveWordVerdict(word.toLowerCase(), language);
   }, [language, targetWord]);
 
   // Handle word change from grid
@@ -205,8 +194,12 @@ export function useSurvivalWordSubmission({
       return;
     }
 
-    const isValidWord = await validateWordInDictionary(word);
-    if (!isValidWord) {
+    const verdict = await validateWordInDictionary(word);
+    if (verdict === 'unknown') {
+      showToast('duplicate', t('playerView.wordCheckUnavailable', "Couldn't check that word. Try again"));
+      return;
+    }
+    if (verdict === 'invalid') {
       playWordRejectedSound?.();
       dispatch({ type: 'ADJUST_LIFE', payload: { delta: -NOT_IN_DICTIONARY_PENALTY } });
       showToast('not-in-dictionary', t('wordHunt.feedback.notInDictionary') || `Not a word -${NOT_IN_DICTIONARY_PENALTY}`);

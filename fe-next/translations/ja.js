@@ -4898,6 +4898,7 @@ const ja = {
     "words": "単語",
     "alreadyFound": "既に発見済み",
     "invalidWord": "無効な単語",
+    "wordCheckUnavailable": "単語を確認できませんでした。もう一度どうぞ",
     "notInDictionary": "辞書にありません",
     "pendingValidation": "チェック待ち",
     "letterWords": "文字の単語",

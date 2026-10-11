@@ -63,6 +63,27 @@ const apiStore = new RateLimiterCore({
   cleanupIntervalMs: 120000,
 });
 
+const dedicatedStores: RateLimiterCore[] = [];
+
+// The shared store is built with the default limits, so a limiter configured with its own limits needs its own store.
+function storeFor(config: Required<ApiRateLimiterConfig>): RateLimiterCore {
+  if (
+    config.maxRequests === API_DEFAULT_CONFIG.maxRequests &&
+    config.windowMs === API_DEFAULT_CONFIG.windowMs &&
+    config.blockDurationMs === API_DEFAULT_CONFIG.blockDurationMs
+  ) {
+    return apiStore;
+  }
+  const store = new RateLimiterCore({
+    maxRequests: config.maxRequests,
+    windowMs: config.windowMs,
+    blockDurationMs: config.blockDurationMs,
+    cleanupIntervalMs: 120000,
+  });
+  dedicatedStores.push(store);
+  return store;
+}
+
 function sendApiRateLimitResponse(res: Response, config: Required<ApiRateLimiterConfig>, retryAfter: number, message?: string): void {
   res.setHeader('Retry-After', retryAfter);
   res.status(429).json({
@@ -77,6 +98,7 @@ function sendApiRateLimitResponse(res: Response, config: Required<ApiRateLimiter
  */
 export function apiRateLimiter(options: ApiRateLimiterConfig = {}): (req: Request, res: Response, next: NextFunction) => void {
   const config: Required<ApiRateLimiterConfig> = { ...API_DEFAULT_CONFIG, ...options };
+  const store = storeFor(config);
 
   return (req: Request, res: Response, next: NextFunction) => {
     if (config.skip && config.skip(req)) {
@@ -85,7 +107,7 @@ export function apiRateLimiter(options: ApiRateLimiterConfig = {}): (req: Reques
 
     const ip = getIpFromRequest(req);
 
-    if (apiStore.isIpBlocked(ip)) {
+    if (store.isIpBlocked(ip)) {
       return sendApiRateLimitResponse(res, config, 60, 'IP temporarily blocked');
     }
 
@@ -95,7 +117,7 @@ export function apiRateLimiter(options: ApiRateLimiterConfig = {}): (req: Reques
     const endpointConfig = endpointPath ? ENDPOINT_CONFIGS[endpointPath] : null;
     const effectiveMax = endpointConfig?.maxRequests ?? config.maxRequests;
 
-    const result = apiStore.checkLimit(key, ip);
+    const result = store.checkLimit(key, ip);
     const resetTime = Math.ceil((result.resetTime ?? Date.now()) / 1000);
     const remaining = result.remaining ?? 0;
 
@@ -194,6 +216,7 @@ export function blockApiIp(ip: string, durationMs: number = API_DEFAULT_CONFIG.b
  */
 export function shutdownApiRateLimiter(): void {
   apiStore.shutdown();
+  for (const store of dedicatedStores) store.shutdown();
 }
 
 // Export API store for testing

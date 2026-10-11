@@ -26,6 +26,7 @@
 
 import { useCallback, useRef, useEffect } from 'react';
 import type { Language } from '@/shared/types/game';
+import { checkWordOnServer } from '@/lib/dictionary/checkWordRemote';
 
 interface CachedResult {
   isValid: boolean;
@@ -130,36 +131,13 @@ export function usePrevalidation(language: Language): UsePrevalidationReturn {
       // Create new abort controller
       abortControllerRef.current = new AbortController();
 
-      fetch('/api/dictionary/check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word: normalizedWord, language }),
-        signal: abortControllerRef.current.signal,
-      })
-        .then(res => {
-          if (!res.ok) return null;
-          return res.json();
-        })
-        .then(result => {
-          if (result) {
-            // Cache the result
-            cacheRef.current.set(normalizedWord, {
-              isValid: result.isValid === true,
-              timestamp: Date.now(),
-            });
-
-            // Clean up if needed
-            if (cacheRef.current.size > MAX_CACHE_SIZE) {
-              cleanupCache();
-            }
-          }
-        })
-        .catch(err => {
-          // Ignore abort errors
-          if (err.name !== 'AbortError') {
-            console.warn('[usePrevalidation] Prefetch failed:', err);
-          }
-        });
+      void checkWordOnServer(normalizedWord, language, abortControllerRef.current.signal).then(({ verdict }) => {
+        if (verdict === 'unknown') return;
+        cacheRef.current.set(normalizedWord, { isValid: verdict === 'valid', timestamp: Date.now() });
+        if (cacheRef.current.size > MAX_CACHE_SIZE) {
+          cleanupCache();
+        }
+      });
     }, DEBOUNCE_MS);
   }, [language, cleanupCache]);
 

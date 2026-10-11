@@ -4,6 +4,7 @@ import type { Locale } from './types';
 import { LOCALE_CONFIGS } from './locale-config';
 import { prewarmDictionary, hasWordInMemoryCache } from '@/hooks/useDictionaryCache';
 import type { Language } from '@/shared/types/game';
+import { resolveWordVerdict } from '@/lib/dictionary/checkWordRemote';
 
 /**
  * Async dictionary fallback for free-form word play in Blast V2.
@@ -25,9 +26,9 @@ import type { Language } from '@/shared/types/game';
  */
 export function useBlastDictionary(locale: Locale) {
   // Cache hits per (locale, normalized word). `true` = confirmed valid,
-  // `false` = confirmed not in dictionary. Map<string, Promise<boolean>> for
-  // in-flight de-duplication.
-  const cacheRef = useRef<Map<string, boolean | Promise<boolean>>>(new Map());
+  // `false` = confirmed not in dictionary. In-flight promises de-duplicate;
+  // a `null` (server could not answer) is never cached.
+  const cacheRef = useRef<Map<string, boolean | Promise<boolean | null>>>(new Map());
   const config = LOCALE_CONFIGS[locale];
 
   // Warm the shared offline dictionary once per mount. It fetches
@@ -38,7 +39,7 @@ export function useBlastDictionary(locale: Locale) {
   }, [locale]);
 
   const verify = useCallback(
-    async (word: string): Promise<boolean> => {
+    async (word: string): Promise<boolean | null> => {
       if (!word) return false;
       const norm = config.normalize(word);
       if (!norm) return false;
@@ -53,32 +54,19 @@ export function useBlastDictionary(locale: Locale) {
         cacheRef.current.set(norm, true);
         return true;
       }
-      // With no connection the server check can't run. Reject WITHOUT caching a
-      // hard false, so reconnecting re-checks the server for community words.
       if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-        return false;
+        return null;
       }
 
-      const inflight = (async () => {
-        try {
-          const res = await fetch('/api/dictionary/check', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ word: norm, language: locale }),
-          });
-          if (!res.ok) {
-            cacheRef.current.set(norm, false);
-            return false;
-          }
-          const data = (await res.json()) as { isValid?: boolean };
-          const ok = !!data.isValid;
-          cacheRef.current.set(norm, ok);
-          return ok;
-        } catch {
+      const inflight = resolveWordVerdict(norm, locale).then((verdict) => {
+        if (verdict === 'unknown') {
           cacheRef.current.delete(norm);
-          return false;
+          return null;
         }
-      })();
+        const ok = verdict === 'valid';
+        cacheRef.current.set(norm, ok);
+        return ok;
+      });
       cacheRef.current.set(norm, inflight);
       return inflight;
     },

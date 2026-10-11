@@ -19,6 +19,7 @@ import { validateWordLocally, isWordOnBoard, buildPositionsMap } from '@/utils/c
 import { getComboBonus, calculateWordScore } from '@/shared/utils/scoring';
 import { useDictionaryCache, prewarmDictionary } from '@/hooks/useDictionaryCache';
 import { usePrevalidation } from '@/hooks/usePrevalidation';
+import { resolveWordVerdict } from '@/lib/dictionary/checkWordRemote';
 import { trackWordFound, trackInvalidWord } from '@/utils/posthogEngagement';
 import type { Language, LetterGrid } from '@/shared/types/game';
 
@@ -298,6 +299,18 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     }
   }, [t, onWordRejected, onComboReset, mode]);
 
+  const handleUncheckedWord = useCallback((normalizedWord: string, now: number) => {
+    foundWordsSetRef.current.delete(normalizedWord);
+    setFoundWords(prev => prev.filter(fw => !(fw.word === normalizedWord && fw.timestamp === now)));
+    setCurrentFeedback({
+      id: `unchecked-${now}`,
+      type: 'duplicate',
+      word: normalizedWord.toUpperCase(),
+      message: t('playerView.wordCheckUnavailable', "Couldn't check that word. Try again"),
+      timestamp: now,
+    });
+  }, [t]);
+
   /**
    * Submit a word for validation
    */
@@ -446,28 +459,11 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       return;
     }
 
-    // Step 5c: Fallback to dictionary API (network round-trip)
-    fetch('/api/dictionary/check', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word: normalizedWord, language }),
-    })
-      .then(res => {
-        if (!res.ok) {
-          return { isValid: false, source: 'error' };
-        }
-        return res.json();
-      })
-      .then(result => {
-        if (result.isValid) {
-          handleValidWord(normalizedWord, now, currentCombo);
-        } else {
-          handleInvalidWord(normalizedWord, now);
-        }
-      })
-      .catch(() => {
-        handleInvalidWord(normalizedWord, now);
-      });
+    void resolveWordVerdict(normalizedWord, language).then(verdict => {
+      if (verdict === 'valid') handleValidWord(normalizedWord, now, currentCombo);
+      else if (verdict === 'invalid') handleInvalidWord(normalizedWord, now);
+      else handleUncheckedWord(normalizedWord, now);
+    });
   }, [
     grid,
     language,
@@ -483,6 +479,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     getPrevalidationCached,
     handleValidWord,
     handleInvalidWord,
+    handleUncheckedWord,
     mode,
   ]);
 

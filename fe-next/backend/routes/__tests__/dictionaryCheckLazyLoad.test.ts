@@ -106,4 +106,15 @@ describe('POST /api/dictionary/check — lazy language loading (real dictionary)
 
     expect(res.body).toEqual({ isValid: false, source: 'too_short' });
   });
+
+  it('answers a lookup failure with a 503, not a 200 that reads as "not a word"', async () => {
+    const community = await import('../../modules/communityWordManager');
+    vi.mocked(community.isWordCommunityValid).mockImplementationOnce(() => { throw new Error('boom'); });
+    const handler = await getCheckHandler();
+    const res = makeRes();
+    await handler({ body: { word: 'plonterish', language: 'en' } }, res);
+
+    expect(res.statusCode).toBe(503);
+    expect(res.body?.source).toBe('error');
+  }, 30000);
 });

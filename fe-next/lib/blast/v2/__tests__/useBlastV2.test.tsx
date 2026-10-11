@@ -242,6 +242,26 @@ describe('useBlastV2 hook', () => {
     expect(result.current.state.lastRejectedCells).toEqual([]);
   });
 
+  it('onRejectUnverified clears the pending check without a shake or a strike', () => {
+    const { result } = renderHook(() => useBlastV2(mockLevel));
+    act(() => {
+      dragRow0(result);
+    });
+    const before = result.current.state;
+    expect(before.dictCheckPending).toBe(true);
+
+    act(() => {
+      result.current.handlers.onRejectUnverified();
+    });
+
+    const after = result.current.state;
+    expect(after.dictCheckPending).toBe(false);
+    expect(after.lastRejectedCells).toEqual([]);
+    expect(after.invalidShakeKey).toBe(before.invalidShakeKey);
+    expect(after.strikesUsed).toBe(before.strikesUsed);
+    expect(after.wrongAttempts).toBe(before.wrongAttempts);
+  });
+
   it('bonusWordCount counts off-theme found words', () => {
     // dictionaryCheck accepts "CSER" (row 0). It is not a theme word → bonus.
     const { result } = renderHook(() =>

@@ -26,6 +26,7 @@ import { awardComboCoins } from '@/utils/coinManager';
 import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import { recordNotInDictionary } from '@/utils/invalidWordTracker';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
+import { resolveWordVerdict } from '@/lib/dictionary/checkWordRemote';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import { plantStarterWord } from '@/lib/tutorial/lesson/starterWords';
@@ -447,32 +448,20 @@ export function useSinglePlayerCore({
       return;
     }
 
-    // Cache miss or not loaded yet: fetch from server for verification
-    fetch('/api/dictionary/check', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word: normalizedWord, language: settings.language }),
-    })
-      .then(res => res.ok ? res.json() : { isValid: false, source: 'error' })
-      .then(result => {
-        if (result.isValid) {
-          handleValidWord();
-        } else {
-          handleInvalidWord();
-        }
-      })
-      .catch(() => {
-        // Treat network errors as invalid
-        combo.resetCombo();
-        soloJuiceRef.current.onResult({ result: 'invalid', word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: Date.now() });
-        foundWordsRef.current = foundWordsRef.current.map(fw =>
-          fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: false, score: 0 } : fw
-        );
-        setFoundWords(foundWordsRef.current);
-        wordPace.recordWord();
-        const invalidMsg = t('playerView.invalidWord', 'Not a word');
-        setCurrentFeedback({ id: `reject-${Date.now()}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: Date.now() });
-        playWordRejectedSound(); hapticError();
-      });
+    const handleUncheckedWord = () => {
+      foundWordsSetRef.current.delete(normalizedWord);
+      foundWordsRef.current = foundWordsRef.current.filter(fw => !(fw.word === normalizedWord && fw.timestamp === now));
+      setFoundWords(foundWordsRef.current);
+      const msg = t('playerView.wordCheckUnavailable', "Couldn't check that word. Try again");
+      setCurrentFeedback({ id: `unchecked-${now}`, type: 'duplicate', word: normalizedWord.toUpperCase(), message: msg, timestamp: now });
+      announceWordResult(normalizedWord, false, undefined, msg);
+    };
+
+    void resolveWordVerdict(normalizedWord, settings.language).then(verdict => {
+      if (verdict === 'valid') handleValidWord();
+      else if (verdict === 'invalid') handleInvalidWord();
+      else handleUncheckedWord();
+    });
   }, [settings.language, settings.minWordLength, settings.timerSeconds, foundWords, t, playWordAcceptedSound, playWordRejectedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScoreLocal, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission, effects.gameStartTimeRef, effects.lastWordFoundTimeRef, wordPace, isDictionaryCacheLoaded, checkWordInCache]);
 
   const keyboardInput = useKeyboardWordInput({

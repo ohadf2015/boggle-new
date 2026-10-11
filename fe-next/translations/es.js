@@ -4953,6 +4953,7 @@ const es = {
     "words": "Palabras",
     "alreadyFound": "Ya encontrada",
     "invalidWord": "Palabra inválida",
+    "wordCheckUnavailable": "No pudimos comprobar esa palabra. Inténtalo de nuevo",
     "notInDictionary": "No está en el diccionario",
     "loadFailed": "No se pudo cargar",
     "pendingValidation": "En verificación",

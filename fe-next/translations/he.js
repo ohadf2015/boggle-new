@@ -4942,6 +4942,7 @@ const he = {
     "words": "מילים",
     "alreadyFound": "כבר נמצא",
     "invalidWord": "מילה לא חוקית",
+    "wordCheckUnavailable": "לא הצלחנו לבדוק את המילה. נסו שוב",
     "notInDictionary": "לא במילון",
     "pendingValidation": "בבדיקה...",
     "swipeHintWithMin": "החליקו על האותיות כדי למצוא מילים (מינימום {min} אותיות)",

@@ -16,8 +16,7 @@ import { isWordCommunityValid, isWordValidForScoring } from '../modules/communit
 
 const router: Router = express.Router();
 
-// Rate limit: 300 requests per minute per IP
-// Higher limit to accommodate multiple users on same network (family, office, cafe)
+// 300/min per IP: one school or office NAT shares a single IP.
 const dictionaryRateLimiter = createEndpointLimiter({
   maxRequests: 300,
   windowMs: 60000,
@@ -121,7 +120,7 @@ router.post('/check', dictionaryRateLimiter, async (req: DictionaryCheckRequest,
   } catch (error) {
     const err = error as Error;
     logger.error('DICTIONARY', `Check error: ${err.message}`);
-    res.json({ isValid: false, source: 'unknown' } as DictionaryCheckResponse);
+    res.status(503).json({ isValid: false, source: 'error' } as DictionaryCheckResponse);
   }
 });
 

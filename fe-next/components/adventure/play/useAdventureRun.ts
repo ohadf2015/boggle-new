@@ -41,7 +41,7 @@ interface Options {
   world: number;
   level: number;
   language: string;
-  isWord: (word: string) => Promise<boolean>;
+  isWord: (word: string) => Promise<boolean | null>;
   /** Roguelike: the act-map node to play. Omitted = the run's current node (or row 0). */
   nodeId?: string;
   /**
@@ -483,7 +483,9 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
       if (wordsRef.current.includes(w)) return 'dup';
       if (lvl.kind === 'chain' && !chainsFrom(wordsRef.current[wordsRef.current.length - 1] ?? null, w)) return 'chain';
       if (!isWordOnBoard(w, grid.map((r) => r.map((c) => c.toLowerCase())), language)) return 'invalid';
-      if (!(await isWord(w))) return 'invalid';
+      const known = await isWord(w);
+      if (known === null) return 'retry';
+      if (!known) return 'invalid';
       if (wordsRef.current.includes(w)) return 'dup';
       wordsRef.current = [...wordsRef.current, w];
       timesRef.current = [...timesRef.current, Math.max(0, Date.now() - startedAtRef.current)];
