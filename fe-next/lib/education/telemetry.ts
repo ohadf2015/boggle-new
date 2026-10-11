@@ -166,6 +166,8 @@ export interface EduClassroomJoinArgs {
    */
   attemptedCode?: string;
   matchedCodeType?: MatchedCodeType;
+  /** Invite URL vs typed on /join. Never the code itself. */
+  source?: 'invite_link' | 'typed_code';
 }
 
 /**
@@ -187,6 +189,29 @@ export function trackEduClassroomJoin(args: EduClassroomJoinArgs): void {
     props.code_charset = charsetOf(args.attemptedCode);
   }
   captureActivation('edu_classroom_join', props);
+
+  // The teacher-activation funnel above stays `edu_classroom_join`. The student
+  // join funnel is a separate pair of names so a drop-off between "opened the
+  // invite" and "is in the class" can be counted without splitting the
+  // existing dashboard. The code itself is a shared secret and never rides
+  // either event — only its shape, on failures.
+  if (args.result === 'success' || args.result === 'already_member') {
+    const completed: Record<string, unknown> = {
+      already_member: args.result === 'already_member',
+    };
+    if (args.classroomId) completed.classroom_id = args.classroomId;
+    if (args.matchedCodeType) completed.matched_code_type = args.matchedCodeType;
+    if (args.source) completed.source = args.source;
+    safeCapture('student_join_completed', completed);
+    return;
+  }
+  const failed: Record<string, unknown> = { reason: args.result };
+  if (args.attemptedCode) {
+    failed.code_length = args.attemptedCode.length;
+    failed.code_charset = charsetOf(args.attemptedCode);
+  }
+  if (args.source) failed.source = args.source;
+  safeCapture('student_join_failed', failed);
 }
 
 export interface EduClassroomCreatedArgs {

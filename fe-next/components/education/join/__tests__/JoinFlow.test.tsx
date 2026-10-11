@@ -208,6 +208,9 @@ describe('<JoinFlow> — submitting', () => {
     mockJoin.mockResolvedValue({ success: true, classroomId: 'c1' });
     render(<JoinFlow initialCode="P45KRT" />);
     await waitFor(() => expect(mockResolve).toHaveBeenCalled());
+    await act(async () => {
+      await Promise.resolve();
+    });
     fireEvent.change(nameField(), { target: { value: 'Maya' } });
     fireEvent.click(goButton());
     await waitFor(() => {
@@ -216,10 +219,11 @@ describe('<JoinFlow> — submitting', () => {
     });
   });
 
-  it('sends a roster joiner to the student hub', async () => {
+  it('keeps a roster joiner on this screen with the next-assignment Play CTA', async () => {
     mockJoin.mockResolvedValue({ success: true, classroomId: 'c1' });
     await join();
-    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/en/student'));
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(await screen.findByTestId('join-success-panel')).toBeInTheDocument();
   });
 
   it('passes the guest nickname through', async () => {
@@ -236,6 +240,7 @@ describe('<JoinFlow> — submitting', () => {
     // phone they cannot even see which control is refusing. Kahoot's Join is
     // always tappable and answers with a sentence; so is this one.
     render(<JoinFlow initialCode="P45KRT" />);
+    fireEvent.change(nameField(), { target: { value: '' } });
     expect(goButton()).not.toBeDisabled();
 
     fireEvent.click(goButton());
@@ -363,12 +368,10 @@ describe('<JoinFlow> — a student who already has an account', () => {
   it('is never asked to invent a nickname', () => {
     render(<JoinFlow initialCode="P45KRT" />);
     expect(screen.queryByLabelText('education.student.join.nameLabel')).not.toBeInTheDocument();
-    expect(goButton()).not.toBeDisabled();
   });
 
-  it('joins without a guest name', async () => {
+  it('joins without a guest name from the invite link, without a second tap', async () => {
     render(<JoinFlow initialCode="P45KRT" />);
-    fireEvent.click(goButton());
     await waitFor(() => expect(mockJoin).toHaveBeenCalledWith('P45KRT', undefined));
   });
 
@@ -395,6 +398,7 @@ describe('<JoinFlow> — the sign-in return path', () => {
     vi.clearAllMocks();
     sessionStorage.clear();
     mockResolve.mockResolvedValue({ verdict: 'game', label: 'Ms Levy' });
+    mockJoin.mockResolvedValue({ success: false, error: 'skip' });
   });
 
   it('stashes the code so a student who picks an account comes back to it', () => {

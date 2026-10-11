@@ -16748,7 +16748,11 @@ const sv = {
           "readyHeadline": "REDO?",
           "readySub": "Ett tryck så är du inne.",
           "go": "Kör!",
-          "entering": "Vi släpper in dig…"
+          "entering": "Vi släpper in dig…",
+          "joinedHeadline": "Din nästa uppgift",
+          "joinedSub": "Du är inne i klassen. Spela läxan som väntar.",
+          "openAcademy": "Öppna min klass",
+          "findingAssignment": "Letar upp din uppgift…"
         },
         "heroLine": "Fråga din lärare om klasskoden",
         "preparing": "Gör i ordning – ett ögonblick.",

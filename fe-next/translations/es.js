@@ -16441,7 +16441,11 @@ const es = {
           "readyHeadline": "¿LISTO?",
           "readySub": "Un toque y ya estás dentro.",
           "go": "¡Vamos!",
-          "entering": "Te estamos metiendo…"
+          "entering": "Te estamos metiendo…",
+          "joinedHeadline": "Tu siguiente tarea",
+          "joinedSub": "Ya estás en la clase. Juega la tarea que te espera.",
+          "openAcademy": "Abrir mi clase",
+          "findingAssignment": "Buscando tu tarea…"
         },
         "heroLine": "Pide a tu profe el código de la clase",
         "preparing": "Preparando todo, un momento.",

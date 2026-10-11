@@ -93,7 +93,7 @@ describe('<JoinFlow> — the first tap counts', () => {
     fireEvent.click(go);
     expect(mockJoin).toHaveBeenCalledTimes(1);
 
-    settle({ success: true });
+    settle({ success: true, gameCode: 'P45KRT' });
     await waitFor(() => expect(mockPush).toHaveBeenCalled());
   });
 
@@ -188,6 +188,7 @@ describe('<JoinFlow> — a tap with no name while the session is still resolving
     // "getting ready…" forever while the thing actually blocking them is a
     // field they can fill in one second (recurring pitfall class 4).
     render(<JoinFlow initialCode="P45KRT" />);
+    fireEvent.change(nameField(), { target: { value: '' } });
     fireEvent.click(goButton());
 
     expect(alerts()).toContain('education.student.join.flow.nameRequired');
@@ -222,6 +223,7 @@ describe('<JoinFlow> — the session resolves and changes what is being asked', 
     // A refusal about a field that no longer exists is a demand the student
     // cannot possibly satisfy: no input, no way to clear it, GO sitting there.
     const { rerender } = render(<JoinFlow initialCode="P45KRT" />);
+    fireEvent.change(nameField(), { target: { value: '' } });
     fireEvent.click(goButton());
     expect(alerts()).toContain('education.student.join.flow.nameRequired');
 

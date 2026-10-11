@@ -105,32 +105,17 @@ describe('<JoinFlow> — simplified for Blooket parity', () => {
     }, { timeout: 100 });
   });
 
-  it('navigation happens after confetti animation completes (~600-900ms)', async () => {
+  it('keeps a roster joiner on the success panel instead of bouncing to the hub', async () => {
     mockJoin.mockResolvedValue({ success: true, classroomId: 'class-123' });
     mockResolve.mockResolvedValue({ verdict: 'classroom', label: 'Ms Levy' });
 
-    vi.useFakeTimers();
     render(<JoinFlow initialCode="P45KRT" />);
 
     const nameInput = nameField();
     fireEvent.change(nameInput, { target: { value: 'Bob' } });
+    fireEvent.click(goButton()!);
 
-    const goBtn = goButton();
-    fireEvent.click(goBtn!);
-
-    // Should NOT navigate immediately
     expect(mockPush).not.toHaveBeenCalled();
-
-    // Wait for confetti timer (~750ms)
-    act(() => {
-      vi.advanceTimersByTime(750);
-    });
-
-    // Now should navigate
-    await waitFor(() => {
-      expect(mockPush).toHaveBeenCalled();
-    });
-
-    vi.useRealTimers();
+    expect(await screen.findByTestId('join-success-panel')).toBeInTheDocument();
   });
 });

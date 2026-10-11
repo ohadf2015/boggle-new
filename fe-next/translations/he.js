@@ -16335,7 +16335,11 @@ const he = {
           "readyHeadline": "מוכנים?",
           "readySub": "לחיצה אחת ואתם בפנים.",
           "go": "יאללה, נכנסים",
-          "entering": "מכניסים אתכם…"
+          "entering": "מכניסים אתכם…",
+          "joinedHeadline": "המטלה הבאה שלך",
+          "joinedSub": "נכנסת לכיתה. שחקו את המטלה שמחכה.",
+          "openAcademy": "לכיתה שלי",
+          "findingAssignment": "מחפשים את המטלה…"
         },
         "heroLine": "בקשו מהמורה את קוד הכיתה",
         "preparing": "רגע, מתכוננים…",

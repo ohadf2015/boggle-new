@@ -159,12 +159,44 @@ describe('education telemetry', () => {
         attemptedCode: 'UHMKL4',
       });
 
-      expect(captureMock).toHaveBeenLastCalledWith('edu_classroom_join', {
+      expect(captureMock).toHaveBeenCalledWith('edu_classroom_join', {
         result: 'success',
         classroom_id: 'cls-1',
         matched_code_type: 'roster_code',
         code_length: 6,
         code_charset: 'alphanumeric',
+      });
+      expect(captureMock).toHaveBeenLastCalledWith('student_join_completed', {
+        already_member: false,
+        classroom_id: 'cls-1',
+        matched_code_type: 'roster_code',
+      });
+    });
+
+    it('Given an invite-link source, When join completes, Then student_join_completed carries source and never the code', () => {
+      trackEduClassroomJoin({
+        result: 'success',
+        classroomId: 'cls-1',
+        matchedCodeType: 'roster_code',
+        attemptedCode: 'UHMKL4',
+        source: 'invite_link',
+      });
+      expect(captureMock).toHaveBeenLastCalledWith('student_join_completed', {
+        already_member: false,
+        classroom_id: 'cls-1',
+        matched_code_type: 'roster_code',
+        source: 'invite_link',
+      });
+      expect(JSON.stringify(captureMock.mock.calls)).not.toContain('UHMKL4');
+    });
+
+    it('Given a failed join, When tracked, Then student_join_failed records the reason', () => {
+      trackEduClassroomJoin({ result: 'invalid_code', attemptedCode: 'AB1', source: 'typed_code' });
+      expect(captureMock).toHaveBeenLastCalledWith('student_join_failed', {
+        reason: 'invalid_code',
+        code_length: 3,
+        code_charset: 'alphanumeric',
+        source: 'typed_code',
       });
     });
 
@@ -180,7 +212,7 @@ describe('education telemetry', () => {
         attemptedCode: '5L7UCD',
       });
 
-      expect(captureMock).toHaveBeenLastCalledWith(
+      expect(captureMock).toHaveBeenCalledWith(
         'edu_classroom_join',
         expect.objectContaining({ matched_code_type: 'game_code' })
       );
@@ -189,7 +221,8 @@ describe('education telemetry', () => {
     it('Given a not_found, When tracked, Then the code SHAPE is recorded but never the code itself', () => {
       trackEduClassroomJoin({ result: 'not_found', attemptedCode: 'ABC123' });
 
-      const [, props] = captureMock.mock.calls.at(-1)!;
+      const eduCall = captureMock.mock.calls.find((c) => c[0] === 'edu_classroom_join')!;
+      const [, props] = eduCall;
       expect(props).toEqual({
         result: 'not_found',
         code_length: 6,
@@ -201,7 +234,7 @@ describe('education telemetry', () => {
 
     it('Given a letters-only code, When tracked, Then charset is letters', () => {
       trackEduClassroomJoin({ result: 'not_found', attemptedCode: 'CFJHFB' });
-      expect(captureMock).toHaveBeenLastCalledWith(
+      expect(captureMock).toHaveBeenCalledWith(
         'edu_classroom_join',
         expect.objectContaining({ code_charset: 'letters' })
       );
@@ -209,7 +242,7 @@ describe('education telemetry', () => {
 
     it('Given a digits-only code, When tracked, Then charset is digits', () => {
       trackEduClassroomJoin({ result: 'not_found', attemptedCode: '123456' });
-      expect(captureMock).toHaveBeenLastCalledWith(
+      expect(captureMock).toHaveBeenCalledWith(
         'edu_classroom_join',
         expect.objectContaining({ code_charset: 'digits' })
       );
@@ -217,7 +250,7 @@ describe('education telemetry', () => {
 
     it('Given a too-short code, When tracked, Then code_length shows the truncation', () => {
       trackEduClassroomJoin({ result: 'invalid_code', attemptedCode: 'AB1' });
-      expect(captureMock).toHaveBeenLastCalledWith('edu_classroom_join', {
+      expect(captureMock).toHaveBeenCalledWith('edu_classroom_join', {
         result: 'invalid_code',
         code_length: 3,
         code_charset: 'alphanumeric',
@@ -226,7 +259,7 @@ describe('education telemetry', () => {
 
     it('Given no code at all, When tracked, Then shape props are omitted rather than faked', () => {
       trackEduClassroomJoin({ result: 'error' });
-      expect(captureMock).toHaveBeenLastCalledWith('edu_classroom_join', {
+      expect(captureMock).toHaveBeenCalledWith('edu_classroom_join', {
         result: 'error',
       });
     });
@@ -521,7 +554,9 @@ describe('education telemetry', () => {
       trackEduFirstAssignmentCtaShown({ classroomId: 'cls-1' });
       trackEduFirstAssignmentCtaClicked({ classroomId: 'cls-1' });
 
-      const bare = captureMock.mock.calls.map((c) => c[0]);
+      const bare = captureMock.mock.calls
+        .map((c) => c[0])
+        .filter((n) => n !== 'student_join_completed' && n !== 'student_join_failed');
       expect(bare).toEqual([
         'edu_classroom_created',
         'edu_join_code_shown',
@@ -536,7 +571,8 @@ describe('education telemetry', () => {
       // Same 9 events, same order, same props on the growth channel.
       expect(growthMock.mock.calls.map((c) => c[0])).toEqual(bare);
       growthMock.mock.calls.forEach((call, i) => {
-        expect(call[1]).toEqual(captureMock.mock.calls[i][1]);
+        const edu = captureMock.mock.calls.find((c) => c[0] === call[0]);
+        expect(edu?.[1]).toEqual(call[1]);
       });
     });
 
