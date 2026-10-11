@@ -197,7 +197,9 @@ describe('persistClassroomGameScores — round education events', () => {
           select: () => ({
             eq: () => ({
               in: () => Promise.resolve({
-                data: [{ student_id: 'user-ana', joined_at: new Date(Date.now() - 2 * DAY).toISOString() }],
+                // Extra minute so day_n stays 2 even when `now` was snapshotted
+                // before this mock runs (floor((2d - 1ms) / 1d) === 1).
+                data: [{ student_id: 'user-ana', joined_at: new Date(Date.now() - 2 * DAY - 60_000).toISOString() }],
                 error: null,
               }),
             }),

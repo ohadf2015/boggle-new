@@ -13524,6 +13524,17 @@ const es = {
       "playZone": "Jugar",
       "learnZone": "Aprender"
     },
+    "assignments": {
+      "dueInHours": "Vence en {hours}h",
+      "dueInMinutes": "Vence en {minutes}m",
+      "overdueBy": "Atrasada {days}d",
+      "doIt": "Hacerlo"
+    },
+    "classView": {
+      "playAssignment": "Jugar {title}",
+      "playAssignmentDueSoon": "Pronto · Jugar {title}",
+      "playAssignmentOverdue": "Atrasada · Jugar {title}"
+    },
     "welcome": {
       "title": "¡Bienvenido a tu aula!",
       "subtitle": "Elige tu primer desafío",
@@ -14558,6 +14569,7 @@ const es = {
         "empty": "Aún no hay tareas en esta clase",
         "statusCompleted": "Completada",
         "statusMissing": "Falta",
+        "statusOverdue": "Atrasada",
         "exportCsv": "Exportar CSV",
         "exportCsvPro": "Exportar CSV con Teacher Pro {{price}}",
         "fileName": "{{name}} – progreso de tareas",

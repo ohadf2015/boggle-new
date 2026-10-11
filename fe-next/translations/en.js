@@ -12021,6 +12021,17 @@ const en = {
       "playZone": "Play",
       "learnZone": "Learn"
     },
+    "assignments": {
+      "dueInHours": "Due in {hours}h",
+      "dueInMinutes": "Due in {minutes}m",
+      "overdueBy": "Overdue by {days}d",
+      "doIt": "Do it"
+    },
+    "classView": {
+      "playAssignment": "Play {title}",
+      "playAssignmentDueSoon": "Due soon · Play {title}",
+      "playAssignmentOverdue": "Overdue · Play {title}"
+    },
     "welcome": {
       "title": "Welcome to your classroom",
       "subtitle": "Pick your first challenge",
@@ -12994,6 +13005,7 @@ const en = {
         "empty": "No assignments in this classroom yet",
         "statusCompleted": "Completed",
         "statusMissing": "Missing",
+        "statusOverdue": "Overdue",
         "exportCsv": "Export CSV",
         "exportCsvPro": "Export CSV with Teacher Pro {{price}}",
         "fileName": "{{name}} assignment progress",

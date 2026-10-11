@@ -13571,6 +13571,17 @@ const ja = {
       "playZone": "プレイ",
       "learnZone": "学ぶ"
     },
+    "assignments": {
+      "dueInHours": "残り{hours}時間",
+      "dueInMinutes": "残り{minutes}分",
+      "overdueBy": "{days}日遅れ",
+      "doIt": "やる"
+    },
+    "classView": {
+      "playAssignment": "{title}をプレイ",
+      "playAssignmentDueSoon": "まもなく締切 · {title}をプレイ",
+      "playAssignmentOverdue": "期限切れ · {title}をプレイ"
+    },
     "welcome": {
       "title": "クラスへようこそ！",
       "subtitle": "最初のチャレンジを選んでください",
@@ -14711,6 +14722,7 @@ const ja = {
         "empty": "このクラスにはまだ課題がありません",
         "statusCompleted": "完了",
         "statusMissing": "未提出",
+        "statusOverdue": "期限切れ",
         "exportCsv": "CSVを書き出す",
         "exportCsvPro": "Teacher Pro {{price}} で CSV を書き出す",
         "fileName": "{{name}} – 課題の進捗",

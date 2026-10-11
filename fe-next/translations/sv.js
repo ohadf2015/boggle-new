@@ -13837,6 +13837,17 @@ const sv = {
       "playZone": "Spela",
       "learnZone": "Lär dig"
     },
+    "assignments": {
+      "dueInHours": "Förfaller om {hours}t",
+      "dueInMinutes": "Förfaller om {minutes}m",
+      "overdueBy": "{days}d försenad",
+      "doIt": "Gör det"
+    },
+    "classView": {
+      "playAssignment": "Spela {title}",
+      "playAssignmentDueSoon": "Snart · Spela {title}",
+      "playAssignmentOverdue": "Försenad · Spela {title}"
+    },
     "welcome": {
       "title": "Välkommen till ditt klassrum!",
       "subtitle": "Välj din första utmaning",
@@ -14977,6 +14988,7 @@ const sv = {
         "empty": "Inga uppgifter i den här klassen ännu",
         "statusCompleted": "Klar",
         "statusMissing": "Saknas",
+        "statusOverdue": "Försenad",
         "exportCsv": "Exportera CSV",
         "exportCsvPro": "Exportera CSV med Teacher Pro {{price}}",
         "fileName": "{{name}} – framsteg i uppgifter",

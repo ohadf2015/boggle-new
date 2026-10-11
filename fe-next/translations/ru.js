@@ -2554,6 +2554,17 @@ const ru = {
       "playZone": "Играть",
       "learnZone": "Учиться"
     },
+    "assignments": {
+      "dueInHours": "Через {hours} ч",
+      "dueInMinutes": "Через {minutes} мин",
+      "overdueBy": "Просрочено на {days} д",
+      "doIt": "Сделать"
+    },
+    "classView": {
+      "playAssignment": "Играть {title}",
+      "playAssignmentDueSoon": "Скоро · Играть {title}",
+      "playAssignmentOverdue": "Просрочено · Играть {title}"
+    },
     "welcome": {
       "title": "Добро пожаловать в класс!",
       "subtitle": "Выбери первое задание",
@@ -13887,6 +13898,7 @@ const ru = {
         "empty": "В этом классе пока нет заданий",
         "statusCompleted": "Выполнено",
         "statusMissing": "Не сдано",
+        "statusOverdue": "Просрочено",
         "exportCsv": "Экспорт CSV",
         "exportCsvPro": "Экспорт CSV с Teacher Pro {{price}}",
         "fileName": "{{name}} – прогресс по заданиям",

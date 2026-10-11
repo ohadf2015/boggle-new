@@ -13431,6 +13431,17 @@ const he = {
       "playZone": "שחקו",
       "learnZone": "למדו"
     },
+    "assignments": {
+      "dueInHours": "עוד {hours} שע׳",
+      "dueInMinutes": "עוד {minutes} דק׳",
+      "overdueBy": "באיחור {days} ימים",
+      "doIt": "לעשות"
+    },
+    "classView": {
+      "playAssignment": "שחקו {title}",
+      "playAssignmentDueSoon": "עד מחר · שחקו {title}",
+      "playAssignmentOverdue": "באיחור · שחקו {title}"
+    },
     "welcome": {
       "title": "ברוכים הבאים לכיתה שלכם",
       "subtitle": "בחרו את האתגר הראשון שלכם",
@@ -14566,6 +14577,7 @@ const he = {
         "empty": "אין משימות בכיתה הזו עדיין",
         "statusCompleted": "הושלם",
         "statusMissing": "חסר",
+        "statusOverdue": "באיחור",
         "exportCsv": "ייצוא CSV",
         "exportCsvPro": "ייצוא CSV עם פרו למורים {{price}}",
         "fileName": "{{name}} – התקדמות במשימות",
