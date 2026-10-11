@@ -59,7 +59,7 @@ export function LessonHud({ steps, completedCount, step, target, targetPath, for
             aria-valuemin={0}
             aria-valuemax={total}
             aria-valuenow={completedCount}
-            className="relative h-5 overflow-visible rounded-full border-[3px] border-neo-black bg-black/60 shadow-[3px_3px_0_#000]"
+            className="relative h-5 overflow-visible rounded-full lg:h-6 border-[3px] border-neo-black bg-black/60 shadow-[3px_3px_0_#000]"
           >
             <div
               data-testid="lesson-progress-fill"
@@ -93,7 +93,7 @@ export function LessonHud({ steps, completedCount, step, target, targetPath, for
 
         <span
           dir="ltr"
-          className="shrink-0 rounded-md border-2 border-neo-black bg-neo-cream px-1.5 py-0.5 font-neo-display text-xs font-black tabular-nums text-neo-black shadow-[2px_2px_0_#000]"
+          className="shrink-0 rounded-md border-2 border-neo-black bg-neo-cream px-1.5 py-0.5 font-neo-display text-xs font-black tabular-nums text-neo-black shadow-[2px_2px_0_#000] lg:text-base"
         >
           {Math.min(completedCount + (step ? 1 : 0), total)}/{total}
         </span>
@@ -101,7 +101,7 @@ export function LessonHud({ steps, completedCount, step, target, targetPath, for
           type="button"
           onClick={onSkip}
           aria-label={t('firstLesson.skipLabel')}
-          className="shrink-0 rounded-md px-1.5 py-1 font-neo-display text-xs font-black uppercase tracking-wider text-neo-cream/60 transition-colors hover:bg-white/10 hover:text-neo-cream"
+          className="shrink-0 rounded-md px-1.5 py-1 font-neo-display text-xs font-black uppercase lg:text-base tracking-wider text-neo-cream/60 transition-colors hover:bg-white/10 hover:text-neo-cream"
         >
           {t('firstLesson.skip')}
         </button>

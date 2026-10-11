@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { CoinArt } from '@/components/ui/CoinArt';
-
-type Point = { x: number; y: number };
+import { coinFlightPlan, type CoinFlightPlan, type Point, type Rect } from './coinFlightPath';
+import { CoinJackpot, JACKPOT_MS } from './CoinJackpot';
 
 export interface DomCoinBurstProps {
   source: Point;
@@ -12,6 +12,12 @@ export interface DomCoinBurstProps {
   onDone: () => void;
   /** Fires as coin `index` hits the target (counters tick and chimes play on it). */
   onLand?: (index: number) => void;
+  /** Screen areas the coins steer around (the praise stamp). */
+  avoid?: Rect[];
+  /** A big word: wider spray, bigger coins and a "+N" stamp with a gold burst at the word. */
+  big?: boolean;
+  /** The "+N" text for a big earn. */
+  amountLabel?: string;
 }
 
 const FAN_MS = 170;
@@ -36,54 +42,41 @@ export const coinSizeFor = (viewportWidth: number) => (viewportWidth >= 1200 ? 4
 const translate = (p: Point, scale: number, rot: number, px: number) =>
   `translate(${p.x - px / 2}px, ${p.y - px / 2}px) rotate(${rot}deg) scale(${scale})`;
 
-/** Burst out of the source together, hover, then get sucked one by one along an arc into the target. */
-function flightKeyframes(source: Point, target: Point, i: number, n: number, alpha: number, sizeMul: number, px: number): Keyframe[] {
-  const spread = n === 1 ? 0 : i / (n - 1) - 0.5;
-  const angle = -Math.PI / 2 + spread * Math.PI * 1.1;
-  const radius = 52 + (i % 3) * 16;
-  const fan = { x: source.x + Math.cos(angle) * radius, y: source.y + Math.sin(angle) * radius };
+const flightDuration = (i: number) => FAN_MS + i * STAGGER_MS + TRAVEL_MS;
+
+/** Burst out of the source together, hover, then get sucked one by one into the target. */
+function flightKeyframes(source: Point, i: number, plan: CoinFlightPlan, alpha: number, sizeMul: number, px: number): Keyframe[] {
   const side = i % 2 === 0 ? 1 : -1;
-  const control = {
-    x: (fan.x + target.x) / 2 + side * (36 + (i % 4) * 16),
-    y: Math.min(fan.y, target.y) - 50 - (i % 3) * 22,
-  };
   const spin = side * (200 + (i % 3) * 90);
   const total = flightDuration(i);
   const fanAt = FAN_MS / total;
   const departAt = (FAN_MS + i * STAGGER_MS) / total;
-  const hover = { x: fan.x, y: fan.y - 6 - (i % 2) * 4 };
   const frames: Keyframe[] = [
     { offset: 0, transform: translate(source, 0.55 * sizeMul, 0, px), opacity: alpha, easing: 'cubic-bezier(0.2, 0.9, 0.3, 1.25)' },
-    { offset: fanAt, transform: translate(fan, 1.3 * sizeMul, spin * 0.2, px), opacity: alpha, easing: 'ease-in-out' },
+    { offset: fanAt, transform: translate(plan.fan, 1.3 * sizeMul, spin * 0.2, px), opacity: alpha, easing: 'ease-in-out' },
   ];
-  if (departAt > fanAt) frames.push({ offset: departAt, transform: translate(hover, 1.25 * sizeMul, spin * 0.3, px), opacity: alpha });
-  const steps = 6;
-  for (let k = 1; k <= steps; k++) {
-    const u = Math.pow(k / steps, 1.45);
-    const a = 1 - u;
-    const p = {
-      x: a * a * hover.x + 2 * a * u * control.x + u * u * target.x,
-      y: a * a * hover.y + 2 * a * u * control.y + u * u * target.y,
-    };
-    const last = k === steps;
-    const scale = (last ? 0.35 : 1.25 - 0.55 * (k / steps)) * sizeMul;
+  if (departAt > fanAt) frames.push({ offset: departAt, transform: translate(plan.hover, 1.25 * sizeMul, spin * 0.3, px), opacity: alpha });
+  plan.route.forEach((p, k) => {
+    const last = k === plan.route.length - 1;
+    const f = plan.at[k];
     frames.push({
-      offset: departAt + (1 - departAt) * (k / steps),
-      transform: translate(p, scale, spin * (0.3 + 0.7 * (k / steps)), px),
+      offset: departAt + (1 - departAt) * f,
+      transform: translate(p, (last ? 0.35 : 1.25 - 0.55 * f) * sizeMul, spin * (0.3 + 0.7 * f), px),
       opacity: last ? 0 : alpha,
     });
-  }
+  });
   return frames;
 }
 
-const flightDuration = (i: number) => FAN_MS + i * STAGGER_MS + TRAVEL_MS;
+const rectKey = (r: Rect) => `${Math.round(r.left)},${Math.round(r.top)},${Math.round(r.right)},${Math.round(r.bottom)}`;
 
 /**
- * Coins burst out of where they were earned, streak along an arc with comet
- * trails, and slam into the wallet counter with an impact ring. Pure DOM + Web
- * Animations (compositor-only transforms), finite, self-removing.
+ * Coins burst out of where they were earned, streak toward the wallet with comet
+ * trails (around the praise stamp, never over it), and slam into the counter with
+ * an impact ring. Pure DOM + Web Animations (compositor-only transforms), finite,
+ * self-removing.
  */
-export function DomCoinBurst({ source, target, count, onDone, onLand }: DomCoinBurstProps) {
+export function DomCoinBurst({ source, target, count, onDone, onLand, avoid = [], big = false, amountLabel }: DomCoinBurstProps) {
   const n = Math.min(MAX_COINS, Math.max(1, Math.floor(count)));
   const [px] = useState(() => coinSizeFor(typeof window === 'undefined' ? 0 : window.innerWidth));
   const rootRef = useRef<HTMLDivElement>(null);
@@ -91,15 +84,23 @@ export function DomCoinBurst({ source, target, count, onDone, onLand }: DomCoinB
   doneRef.current = onDone;
   const landRef = useRef(onLand);
   landRef.current = onLand;
+  const avoidRef = useRef(avoid);
+  avoidRef.current = avoid;
 
   const { x: sx, y: sy } = source;
   const { x: tx, y: ty } = target;
+  const avoidKey = avoid.map(rectKey).join(';');
 
   useEffect(() => {
     const from = { x: sx, y: sy };
     const to = { x: tx, y: ty };
+    const viewport = { w: window.innerWidth, h: window.innerHeight };
     const root = rootRef.current;
     const timing = coinFlightTiming(n);
+    const sizeMul = big ? 1.15 : 1;
+    const plans = Array.from({ length: n }, (_, i) =>
+      coinFlightPlan({ source: from, target: to, i, n, px: px * sizeMul, avoid: avoidRef.current, viewport, big }),
+    );
     const animations: Animation[] = [];
     if (root && typeof root.animate === 'function') {
       root.querySelectorAll<HTMLElement>('[data-coin-index]').forEach((el) => {
@@ -107,7 +108,7 @@ export function DomCoinBurst({ source, target, count, onDone, onLand }: DomCoinB
         const trail = Number(el.dataset.trail ?? -1);
         const t = trail >= 0 ? TRAILS[trail] : { lag: 0, alpha: 1, scale: 1 };
         animations.push(
-          el.animate(flightKeyframes(from, to, i, n, t.alpha, t.scale, px), {
+          el.animate(flightKeyframes(from, i, plans[i], t.alpha, t.scale * sizeMul, px), {
             duration: flightDuration(i),
             delay: t.lag,
             easing: 'linear',
@@ -130,12 +131,12 @@ export function DomCoinBurst({ source, target, count, onDone, onLand }: DomCoinB
     const timers = Array.from({ length: n }, (_, i) =>
       setTimeout(() => landRef.current?.(i), timing.firstLandMs + i * STAGGER_MS),
     );
-    timers.push(setTimeout(() => doneRef.current(), timing.totalMs));
+    timers.push(setTimeout(() => doneRef.current(), big ? Math.max(timing.totalMs, JACKPOT_MS) : timing.totalMs));
     return () => {
       timers.forEach(clearTimeout);
       animations.forEach((a) => a.cancel());
     };
-  }, [n, sx, sy, tx, ty, px]);
+  }, [n, sx, sy, tx, ty, px, big, avoidKey]);
 
   const coins: React.ReactNode[] = [];
   for (let i = 0; i < n; i++) {
@@ -171,13 +172,16 @@ export function DomCoinBurst({ source, target, count, onDone, onLand }: DomCoinB
       data-testid="dom-coin-burst"
       data-from={`${Math.round(source.x)},${Math.round(source.y)}`}
       data-to={`${Math.round(target.x)},${Math.round(target.y)}`}
+      data-avoid={avoidKey || undefined}
     >
+      {big && <CoinJackpot source={source} avoid={avoid} label={amountLabel ?? ''} part="burst" />}
       {coins}
       <span
         data-impact
         className="absolute rounded-full border-4 border-neo-yellow"
         style={{ left: target.x, top: target.y, width: 44, height: 44, opacity: 0, boxShadow: '0 0 18px rgba(255,197,61,0.9)' }}
       />
+      {big && <CoinJackpot source={source} avoid={avoid} label={amountLabel ?? ''} part="stamp" />}
     </div>
   );
 }

@@ -240,6 +240,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   return (
     <div
       className={containerClasses}
+      data-board-fly-target=""
       aria-live="polite"
       aria-atomic="true"
     >

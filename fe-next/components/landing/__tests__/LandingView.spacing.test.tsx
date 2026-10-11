@@ -152,11 +152,6 @@ vi.mock('@/components/ui/IdleMascot', () => ({
   IdleMascotWithEntrance: () => <div data-testid="idle-mascot">Idle Mascot</div>,
 }));
 
-vi.mock('../LandingShareBanner', () => ({
-  LandingShareBanner: ({ onShareClick }: { onShareClick: () => void }) => (
-    <button data-testid="landing-share-banner" onClick={onShareClick}>Share</button>
-  ),
-}));
 
 vi.mock('../LandingSEOSection', () => ({
   LandingSEOSection: () => <div data-testid="seo-section">SEO Content</div>,

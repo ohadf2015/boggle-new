@@ -60,14 +60,18 @@ export function BlastWaveIntro({ waveNumber, archetype, t, featured, objectives 
     };
   }, [waveNumber, hasGoals]);
 
-  const handleDismiss = () => {
-    const elapsed = Date.now() - mountTimeRef.current;
-    // Guard: only allow tap-dismiss after 500ms from mount
-    if (elapsed < TAP_GUARD_MS) {
-      return;
-    }
-    setVisible(false);
-  };
+  useEffect(() => {
+    if (!visible) return undefined;
+    const dismiss = () => {
+      if (Date.now() - mountTimeRef.current >= TAP_GUARD_MS) setVisible(false);
+    };
+    window.addEventListener('pointerdown', dismiss, true);
+    window.addEventListener('keydown', dismiss, true);
+    return () => {
+      window.removeEventListener('pointerdown', dismiss, true);
+      window.removeEventListener('keydown', dismiss, true);
+    };
+  }, [visible]);
 
   if (!visible) return null;
 
@@ -83,10 +87,7 @@ export function BlastWaveIntro({ waveNumber, archetype, t, featured, objectives 
 
   return (
     <div
-      className="absolute inset-0 pointer-events-auto z-50 flex flex-col items-center justify-center gap-3 cursor-pointer"
-      onClick={handleDismiss}
-      role="button"
-      tabIndex={0}
+      className="absolute inset-0 pointer-events-none z-50 flex flex-col items-center justify-center gap-3"
       data-testid="blast-wave-intro-overlay"
     >
       <AdaptiveAnimatePresence mode="wait">

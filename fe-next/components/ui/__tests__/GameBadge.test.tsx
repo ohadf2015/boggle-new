@@ -46,12 +46,12 @@ vi.mock('@/hooks/useSafeTimeout', () => {
 
 describe('GameBadge', () => {
   beforeEach(() => {
-    jest.clearAllTimers();
+    vi.clearAllTimers();
     vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
     vi.useRealTimers();
   });
 

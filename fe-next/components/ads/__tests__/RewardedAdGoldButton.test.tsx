@@ -34,12 +34,13 @@ vi.mock('@/utils/ThemeContext', () => ({
 
 import { RewardedAdGoldButton } from '../RewardedAdGoldButton';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
+import type { Mock } from 'vitest';
 
 describe('RewardedAdGoldButton', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    (useRewardedAd as jest.Mock).mockReturnValue({
+    (useRewardedAd as Mock).mockReturnValue({
       status: 'idle',
       isAdAvailable: true,
       isPlaceholderCooldown: false,
@@ -63,7 +64,7 @@ describe('RewardedAdGoldButton', () => {
   });
 
   test('is disabled during loading state', () => {
-    (useRewardedAd as jest.Mock).mockReturnValue({
+    (useRewardedAd as Mock).mockReturnValue({
       status: 'loading',
       isAdAvailable: true,
       isPlaceholderCooldown: false,
@@ -83,7 +84,7 @@ describe('RewardedAdGoldButton', () => {
   });
 
   test('is disabled when placeholder cooldown is active', () => {
-    (useRewardedAd as jest.Mock).mockReturnValue({
+    (useRewardedAd as Mock).mockReturnValue({
       status: 'idle',
       isAdAvailable: true,
       isPlaceholderCooldown: true,
@@ -108,7 +109,7 @@ describe('RewardedAdGoldButton', () => {
   });
 
   test('renders nothing when no active ad provider (canShowAd false)', () => {
-    (useRewardedAd as jest.Mock).mockReturnValue({
+    (useRewardedAd as Mock).mockReturnValue({
       status: 'idle',
       isAdAvailable: true,
       isPlaceholderCooldown: false,
@@ -124,7 +125,7 @@ describe('RewardedAdGoldButton', () => {
   });
 
   test('renders the button when an active ad provider exists (canShowAd true)', () => {
-    (useRewardedAd as jest.Mock).mockReturnValue({
+    (useRewardedAd as Mock).mockReturnValue({
       status: 'idle',
       isAdAvailable: true,
       isPlaceholderCooldown: false,
@@ -145,7 +146,7 @@ describe('RewardedAdGoldButton', () => {
   describe('warm preload', () => {
     test('does not pre-load the ad slot on mount (no prepareAd call)', () => {
       const prepareAdMock = vi.fn();
-      (useRewardedAd as jest.Mock).mockReturnValue({
+      (useRewardedAd as Mock).mockReturnValue({
         status: 'idle',
         isAdAvailable: true,
         isPlaceholderCooldown: false,

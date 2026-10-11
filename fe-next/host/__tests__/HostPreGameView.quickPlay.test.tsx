@@ -65,7 +65,6 @@ vi.mock('../components/pre-game/PresetSelector', () => ({
 vi.mock('../components/pre-game/PlayerRoster', () => ({ PlayerRoster: () => null }));
 vi.mock('../components/pre-game/BattleModeCard', () => ({ BattleModeCard: () => null }));
 vi.mock('../components/pre-game/StartButton', () => ({ StartButton: () => null }));
-vi.mock('../components/pre-game/MobileBottomNav', () => ({ MobileBottomNav: () => null }));
 vi.mock('../components/pre-game/MobileShareSection', () => ({ MobileShareSection: () => null }));
 vi.mock('../components/pre-game/LobbyAudioButton', () => ({ LobbyAudioButton: () => null }));
 vi.mock('../components/pre-game/desktop', () => ({
@@ -75,7 +74,6 @@ vi.mock('../components/pre-game/desktop', () => ({
   EnhancedPlayerList: () => null,
 }));
 vi.mock('@/components/lobby/LobbyReactions', () => ({ LobbyReactions: () => null }));
-vi.mock('@/components/lobby/LobbyRewardCluster', () => ({ LobbyRewardCluster: () => null }));
 
 const mockT = (key: string) => key;
 

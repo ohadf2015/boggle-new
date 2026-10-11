@@ -43,4 +43,15 @@ describe('MPDragCoachmark', () => {
     render(<MPDragCoachmark t={t} onDismiss={() => {}} reducedMotion />);
     expect(screen.getByText('Drag to spell!')).toBeTruthy();
   });
+
+  it('lets a drag pass through everything but the dismiss button, so letters under the label stay reachable', () => {
+    render(<MPDragCoachmark t={t} onDismiss={() => {}} reducedMotion />);
+    const btn = screen.getByRole('button', { name: /got it/i });
+    expect(btn.className).toMatch(/\bpointer-events-auto\b/);
+    let el: HTMLElement | null = btn.parentElement;
+    while (el && el.getAttribute('role') !== 'dialog') {
+      expect(el.className).not.toMatch(/\bpointer-events-auto\b/);
+      el = el.parentElement;
+    }
+  });
 });

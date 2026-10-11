@@ -22,7 +22,7 @@ export interface UseSoloLessonArgs {
   grid: LetterGrid | null;
   language: Language;
   availableWords: CategorizedWords | null;
-  foundWords: readonly LessonWord[];
+  foundWords: readonly (LessonWord & { score?: number })[];
   formedWord: string;
   feedback: LessonFeedback | null;
   score: number;
@@ -78,8 +78,9 @@ export function useSoloLesson({
   const burst = useMemo<LessonBurst | null>(() => {
     if (event?.kind !== 'success' || !grid) return null;
     const path = findWordPath(event.word, grid, language);
-    return path ? { key: event.key, cells: path } : null;
-  }, [event, grid, language]);
+    const points = foundWords.find((w) => w.word === event.word)?.score;
+    return path ? { key: event.key, cells: path, points } : null;
+  }, [event, grid, language, foundWords]);
 
   if (!lesson.active) return { active: false, holdClock: false, hud: null, overlay: null };
 
@@ -107,7 +108,11 @@ export function useSoloLesson({
         {!lesson.complete && (
           <LessonBoardLayer boardSelector={BOARD_SELECTOR} handPath={handPath} nextIndex={nextIndex} burst={burst} />
         )}
-        <LessonSheet event={event} retryWord={step?.kind === 'trace' ? hint?.word ?? null : null} />
+        <LessonSheet
+          event={event}
+          retryWord={step?.kind === 'trace' ? hint?.word ?? null : null}
+          points={burst?.points}
+        />
         {lesson.complete && (
           <LessonComplete
             words={found.size}

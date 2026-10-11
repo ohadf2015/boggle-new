@@ -126,7 +126,11 @@ export function useWordSubmission({
   const { checkWord: checkWordInCache, isLoaded: isDictionaryCacheLoaded } = useDictionaryCache(language);
 
   // Pre-validation cache for words being typed
-  const { prefetch: prefetchValidation, getCached: getPrevalidationCached, clearCache: clearPrevalidationCache } = usePrevalidation(language);
+  const { prefetch, getCached: getPrevalidationCached, clearCache: clearPrevalidationCache } = usePrevalidation(language);
+  const prefetchValidation = useCallback((word: string) => {
+    if (isDictionaryCacheLoaded && checkWordInCache(word.toLowerCase().trim())) return;
+    prefetch(word);
+  }, [isDictionaryCacheLoaded, checkWordInCache, prefetch]);
 
   // Refs for latest values (to avoid stale closures)
   const foundWordsRef = useRef<FoundWord[]>([]);

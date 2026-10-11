@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { flushSync } from 'react-dom';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Delete, RotateCcw, TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { selectWheelRadius } from '@/lib/wordWheel/wheelGeometry';
-import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
+import type { WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
 import { wheelWordDir } from '@/lib/wheelRush/wordDirection';
@@ -15,7 +15,9 @@ import { WheelRushCelebration, type WheelCelebration } from '@/components/multip
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
-import { WheelLetter } from './WordWheelParts';
+import WheelDisc from './wheel/WheelDisc';
+import WheelCoachSlot from './wheel/WheelCoachSlot';
+import { useWheelWordFx } from './wheel/useWheelWordFx';
 import { useHoldToSubmit } from '@/hooks/useHoldToSubmit';
 import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
@@ -24,17 +26,23 @@ import { trackGameEnd, trackGameStart, trackGrowthEvent } from '@/utils/growthTr
 import { useExperiment } from '@/hooks/useExperiment';
 import { useMPFTUEIdle } from '@/hooks/useMPFTUEIdle';
 import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
-import dynamic from 'next/dynamic';
-import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
-import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import { liveVerdict } from '@/lib/wordWheel/liveVerdict';
+import { claimPointer } from '@/lib/wordWheel/claimPointer';
 import WordWheelRankLadder from './WordWheelRankLadder';
 import WordWheelWordLine from './WordWheelWordLine';
+import { useWordWheelSubmit, type LetterClear } from './useWordWheelSubmit';
 import WordWheelFoundWords from './WordWheelFoundWords';
 import WordWheelHud from './WordWheelHud';
 import WordWheelLiveRanks from './WordWheelLiveRanks';
+import { GameShell, ShellKeysCard, SHELL_MEDIA } from '@/components/game/shell';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { rankThresholds } from '@/lib/wordWheel/rankLadder';
 
-const WordWheelPixiRing = dynamic(() => import('./WordWheelPixiRing'), { ssr: false });
+// Score, list and cleared trail paint first; particles, audio and haptics follow the frame.
+const afterPaint = (fn: () => void) => {
+  if (typeof requestAnimationFrame === 'undefined') return fn();
+  requestAnimationFrame(() => setTimeout(fn, 0));
+};
 
 // Haptic feedback for mobile — distinct patterns per interaction type
 const haptic = (pattern: number | number[]) => {
@@ -48,13 +56,15 @@ interface WordWheelGameProps {
   duration: number;
   onComplete: (result: WordWheelGameResult) => void;
   onValidateWord: (word: string) => Promise<boolean>;
+  /** Synchronous dictionary answer (true/false when loaded, null when cold) so a release scores in-frame. */
+  onQuickVerdict?: (word: string) => boolean | null;
   onEffect: (effect: WordWheelEffect) => void;
   language: string;
   paused?: boolean;
   /** Practice mode: suppress countdown timer + show manual "end practice" CTA. */
   practice?: boolean;
   /**
-   * Suppress ModeCoach FTUE and PracticeCoachTip without enabling practice
+   * Suppress the practice coach tip without enabling practice
    * gameplay changes (timer off, etc.). Used by Quick Play arcade rounds.
    */
   hideModeCoach?: boolean;
@@ -74,8 +84,6 @@ interface WordWheelGameProps {
   rivals?: RivalScore[];
   /** Fired with each accepted word + the running found list (practice goal tracking). */
   onWordFound?: (word: string, wordsFound: string[]) => void;
-  /** Desktop layout (1024w + 700h) — 3-column grid with ranks/wheel/words. */
-  isDesktop?: boolean;
   /**
    * The puzzle date being played (YYYY-MM-DD). Drives which day's leaderboard
    * the live rival pill reads from — on a catch-up replay this must be the
@@ -107,12 +115,13 @@ interface RivalScore {
 }
 
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
-  puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false, practice = false,
+  puzzle, duration, onComplete, onValidateWord, onQuickVerdict, onEffect, language, paused = false, practice = false,
   hideModeCoach = false,
-  hideCompetitive = false, rivals: rivalsOverride, onWordFound, isDesktop = false,
+  hideCompetitive = false, rivals: rivalsOverride, onWordFound,
   puzzleDate, currentPlayerId = null, currentGuestFingerprint = null, onExit,
 }) => {
   const { t } = useLanguage();
+  const inShell = useMediaQuery(SHELL_MEDIA);
   // `useReducedMotion` returns `true` when the user has set the OS-level
   // reduced-motion preference; we gate the breathing/pulse loops on it
   // (WCAG 2.3.3) but leave functional feedback animations (tap, success) intact.
@@ -133,8 +142,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(duration);
   const [feedback, setFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const [isValidating, setIsValidating] = useState(false);
-  const [outerLetters, setOuterLetters] = useState(puzzle.outerLetters);
+  const outerLetters = puzzle.outerLetters;
+  const { fx, fire: fireFx, release, hold: holdRelease, drop: dropRelease } = useWheelWordFx();
   const [lastWordScore, setLastWordScore] = useState<number | null>(null);
   // Monotonic id for the flying "+score" element's key. Using Date.now() here
   // recomputed the key on every render, remounting the element (and restarting
@@ -178,7 +187,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // Drag-mode users already lifted, so a wrong word should clear immediately
   // instead of waiting through the read-toast window.
   const lastSubmitWasDragRef = useRef(false);
-  const submittingRef = useRef(false);
 
   // ── Live leaderboard rivals (snapshot on mount + refresh every 30s) ──
   const [fetchedRivals, setFetchedRivals] = useState<RivalScore[]>([]);
@@ -303,6 +311,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // refs are encapsulated inside the hook.
   const draggingRef = useRef(false);
   const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
+  const [pendingLetter, setPendingLetter] = useState<string | null>(null);
 
   // ── Double-tap-to-submit support ──
   const lastTapRef = useRef<{ idx: number; time: number } | null>(null);
@@ -351,8 +360,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // Pixi `pangram` mega-burst (fired via onEffect in handleSubmit); 'almost' has
   // no canvas show, so it gets a light DOM confetti pop instead. fireConfetti
   // self-gates on reduced-motion / cosy-calm / low-end devices.
-  const triggerFeatBanner = useCallback((tier: 'all' | 'almost', word: string) => {
-    setCelebration({ tier, word, key: Date.now() });
+  const triggerFeatBanner = useCallback((tier: 'all' | 'almost', word: string, points: number) => {
+    setCelebration({ tier, word, key: Date.now(), points });
     if (tier === 'almost') {
       fireConfetti({ particleCount: 36, spread: 80, startVelocity: 50, origin: { y: 0.5 } });
     }
@@ -431,11 +440,15 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // same moment, so the player sees *why* it failed and the wheel clears for a
   // fresh attempt without needing the manual reset button. New input within
   // the window cancels the auto-reset (see builtLetters effect above).
-  const showFeedback = useCallback((message: string, type: 'success' | 'error') => {
+  const showFeedback = useCallback((message: string, type: 'success' | 'error', clear: LetterClear = 'later', spelledWord?: { letter: string; wheelIndex: number }[]) => {
     setFeedback({ message, type });
     const toastDuration = type === 'error' ? 1500 : 1500;
     setTimeout(() => setFeedback(null), toastDuration);
     if (type === 'error') {
+      const spelled = spelledWord ?? builtLettersRef.current;
+      if (spelled.length > 0) {
+        fireFx({ kind: 'bad', indices: spelled.map(bl => bl.wheelIndex), letters: spelled.map(bl => bl.letter), points: 0 });
+      }
       setWordBuilderShake(true);
       haptic([30, 50, 30]);
       setTimeout(() => setWordBuilderShake(false), 400);
@@ -446,12 +459,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       if (autoResetTimerRef.current) clearTimeout(autoResetTimerRef.current);
       // Drag-mode submits clear instantly so the next stroke isn't blocked;
       // tap/idle submits wait 1.5s so the player can see what was wrong.
-      const wasDrag = lastSubmitWasDragRef.current;
-      lastSubmitWasDragRef.current = false;
-      if (wasDrag) {
+      if (clear === 'now') {
         builtLettersRef.current = [];
         setBuiltLetters([]);
-      } else {
+      } else if (clear === 'later') {
         autoResetTimerRef.current = setTimeout(() => {
           autoResetTimerRef.current = null;
           builtLettersRef.current = [];
@@ -459,7 +470,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         }, 1500);
       }
     }
-  }, []);
+  }, [fireFx]);
 
   // Shared add path — used by tap-add (handleLetterPress) and by the eager-add
   // on hold-to-submit pointerdown. Writes builtLettersRef synchronously (in the
@@ -546,6 +557,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const { handlePointerDown, handlePointerMove, handlePointerUp } = useWheelDragSpell({
     draggingRef,
     pointerPosRef,
+    hubIndex: -1,
     isIndexUsed: (i) => usedIndicesRef.current.has(i),
     addLetter: (i, letter, el) => handleLetterPress(letter, i, el),
     getBuiltLength: () => builtLettersRef.current.length,
@@ -582,160 +594,98 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     playButtonClickSound();
   }, [playButtonClickSound]);
 
-  // ── Submit word ──
-  const handleSubmit = useCallback(async () => {
-    // Refs, not render state: a drag release can land before React re-renders the last letter in.
-    const word = builtLettersRef.current.map(bl => bl.letter).join('').toUpperCase();
-    if (submittingRef.current || word.length === 0 || gameOverRef.current) return;
-
-    // Container-relative center for effects
+  // ── Accept a word (score, list, effects) ──
+  const acceptWord = useCallback((word: string, spelled: { letter: string; wheelIndex: number }[]) => {
     const cx = gameContainerRef.current
       ? gameContainerRef.current.getBoundingClientRect().width / 2
       : 200;
-
-    // Client-side checks
-    if (word.length < 3) {
-      showFeedback(t('wordWheel.tooShort', { min: '3' }), 'error');
-      onEffect({ type: 'error', x: cx, y: 80 });
-      playWordRejectedSound();
-      return;
-    }
-
-    if (!word.includes(puzzle.centerLetter.toUpperCase())) {
-      showFeedback(t('wordWheel.missingCenter', { letter: puzzle.centerLetter }), 'error');
-      onEffect({ type: 'error', x: cx, y: 80 });
-      playWordRejectedSound();
-      return;
-    }
-
-    if (!isValidWordWheelWord(word, puzzle.centerLetter, puzzle.allLetters)) {
-      showFeedback(t('wordWheel.invalidLetters'), 'error');
-      onEffect({ type: 'error', x: cx, y: 80 });
-      playWordRejectedSound();
-      return;
-    }
-
-    if (wordsFoundRef.current.includes(word)) {
-      // Daily is single-player: once you've found a word it's yours, so
-      // re-typing it is blocked outright (no points). This differs from
-      // multiplayer Wheel Rush, where the same word can be re-submitted because
-      // a different player found it first — but that path is server-authoritative
-      // (WheelRushView), not this client-side check.
-      showFeedback(t('wordWheel.alreadyFound'), 'error');
-      onEffect({ type: 'error', x: cx, y: 80 });
-      playWordRejectedSound();
+    const points = scoreWord(word);
+    const nextWordsFound = [...wordsFoundRef.current, word];
+    wordsFoundRef.current = nextWordsFound;
+    setWordsFound(nextWordsFound);
+    // Surface progress to the practice shell (goal tracking) — fires for
+    // every accepted word, competitive or practice.
+    onWordFound?.(word, nextWordsFound);
+    setScore(prev => prev + points);
+    // Wheel-coverage feat: 'all' = used every distinct wheel letter (a true
+    // wheel pangram — the old `length >= 9` check was dead code since a
+    // 7-letter wheel caps words at 7 chars); 'almost' = all-but-one.
+    const wheelLetters = puzzle.allLetters ?? [puzzle.centerLetter, ...puzzle.outerLetters];
+    const coverage = classifyLetterCoverage(word, wheelLetters);
+    const isAllLetters = coverage === 'all';
+    fireFx({ kind: 'good', indices: spelled.map(bl => bl.wheelIndex), letters: spelled.map(bl => bl.letter), points, coverage });
+    setLastWordScore(points);
+    setScoreFlyId(id => id + 1);
+    setTimeout(() => setLastWordScore(null), 1200);
+    showFeedback(`+${points}`, 'success');
+    if (builtLettersRef.current.map(bl => bl.letter).join('').toUpperCase() === word) {
       builtLettersRef.current = [];
       setBuiltLetters([]);
-      return;
     }
+    setLastFoundWord(word);
+    setTimeout(() => setLastFoundWord(null), 2000);
 
-    submittingRef.current = true;
-    setIsValidating(true);
-    try {
-      const isValid = await onValidateWord(word);
-      if (isValid) {
-        const points = scoreWord(word);
-        const nextWordsFound = [...wordsFoundRef.current, word];
-        wordsFoundRef.current = nextWordsFound;
-        setWordsFound(nextWordsFound);
-        // Surface progress to the practice shell (goal tracking) — fires for
-        // every accepted word, competitive or practice.
-        onWordFound?.(word, nextWordsFound);
-        setScore(prev => prev + points);
-        setLastWordScore(points);
-        setScoreFlyId(id => id + 1);
-        setTimeout(() => setLastWordScore(null), 1200);
-        showFeedback(`+${points}`, 'success');
-        builtLettersRef.current = [];
-        setBuiltLetters([]);
-        setLastFoundWord(word);
-        setTimeout(() => setLastFoundWord(null), 2000);
+    // Combo tracker — resets after 5s of inactivity
+    const hadActiveCombo = comboTimerRef.current !== null;
+    if (comboTimerRef.current) { clearTimeout(comboTimerRef.current); comboTimerRef.current = null; }
+    const newCombo = hadActiveCombo ? combo + 1 : 1;
+    setCombo(newCombo);
+    comboTimerRef.current = setTimeout(() => { setCombo(0); comboTimerRef.current = null; }, 5000);
 
-        // Combo tracker — resets after 5s of inactivity
-        const hadActiveCombo = comboTimerRef.current !== null;
-        if (comboTimerRef.current) { clearTimeout(comboTimerRef.current); comboTimerRef.current = null; }
-        const newCombo = hadActiveCombo ? combo + 1 : 1;
-        setCombo(newCombo);
-        comboTimerRef.current = setTimeout(() => { setCombo(0); comboTimerRef.current = null; }, 5000);
-
-        // Wheel-coverage feat: 'all' = used every distinct wheel letter (a true
-        // wheel pangram — the old `length >= 9` check was dead code since a
-        // 7-letter wheel caps words at 7 chars); 'almost' = all-but-one.
-        const wheelLetters = puzzle.allLetters ?? [puzzle.centerLetter, ...puzzle.outerLetters];
-        const coverage = classifyLetterCoverage(word, wheelLetters);
-        const isAllLetters = coverage === 'all';
-
-        // Sound + haptic feedback
-        if (isAllLetters) {
-          playLegendaryWordSound();
-          haptic([50, 30, 50, 30, 80]);
-        } else {
-          playWordAcceptedSound();
-          if (word.length >= 5) {
-            playWordLengthSound(word.length);
-          }
-          haptic(newCombo >= 2 ? [15, 30, 15, 30, 15] : 20);
-        }
-        if (newCombo >= 2) {
-          playComboSound(newCombo);
-        }
-
-        // Trigger celebration effects — 'all' unlocks the 4-wave Pixi pangram
-        // spectacular; everything else gets the standard word burst.
-        if (isAllLetters) {
-          onEffect({ type: 'pangram', x: cx, y: 200 });
-        } else {
-          onEffect({ type: 'wordValid', x: cx, y: 200, points });
-        }
-        // Combo milestone effect
-        if (newCombo >= 2) {
-          onEffect({ type: 'combo', x: cx, y: 160, combo: newCombo });
-        }
-
-        // Headline banner for full / near-full wheel coverage.
-        if (coverage !== 'none') {
-          triggerFeatBanner(coverage, word);
-        }
+    afterPaint(() => {
+      // Sound + haptic feedback
+      if (isAllLetters) {
+        playLegendaryWordSound();
+        haptic([50, 30, 50, 30, 80]);
       } else {
-        showFeedback(t('wordWheel.notInDictionary'), 'error');
-        onEffect({ type: 'error', x: cx, y: 80 });
+        playWordAcceptedSound();
+        if (word.length >= 5) {
+          playWordLengthSound(word.length);
+        }
+        haptic(newCombo >= 2 ? [15, 30, 15, 30, 15] : 20);
       }
-    } finally {
-      submittingRef.current = false;
-      setIsValidating(false);
+      if (newCombo >= 2) {
+        playComboSound(newCombo);
+      }
+
+      // Trigger celebration effects — 'all' unlocks the 4-wave Pixi pangram
+      // spectacular; everything else gets the standard word burst.
+      if (isAllLetters) {
+        onEffect({ type: 'pangram', x: cx, y: 200 });
+      } else {
+        onEffect({ type: 'wordValid', x: cx, y: 200, points });
+      }
+      // Combo milestone effect
+      if (newCombo >= 2) {
+        onEffect({ type: 'combo', x: cx, y: 160, combo: newCombo });
+      }
+    });
+
+    // Headline banner for full / near-full wheel coverage.
+    if (coverage !== 'none') {
+      triggerFeatBanner(coverage, word, points);
     }
-  }, [puzzle, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, triggerFeatBanner, onWordFound]);
+  }, [puzzle, showFeedback, onEffect, combo, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, triggerFeatBanner, onWordFound, fireFx]);
+
+  const rejectWord = useCallback((message: string, clear: LetterClear, spelled: { letter: string; wheelIndex: number }[]) => {
+    const cx = gameContainerRef.current
+      ? gameContainerRef.current.getBoundingClientRect().width / 2
+      : 200;
+    showFeedback(message, 'error', clear, spelled);
+    afterPaint(() => {
+      onEffect({ type: 'error', x: cx, y: 80 });
+      playWordRejectedSound();
+    });
+  }, [showFeedback, onEffect, playWordRejectedSound]);
+
+  const { handleSubmit, pendingWord, isValidating } = useWordWheelSubmit({
+    puzzle, t, builtLettersRef, setBuiltLetters, wordsFoundRef, gameOverRef, lastSubmitWasDragRef,
+    onValidateWord, onQuickVerdict, accept: acceptWord, reject: rejectWord,
+    hold: (r) => flushSync(() => holdRelease(r)), drop: dropRelease,
+  });
 
   // Keep submit ref fresh so double-tap handler (created earlier) can reach the latest closure.
   useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);
-
-  // Responsive wheel radius measured from the wheel div's *smaller* dimension.
-  // The container is height-capped on short/landscape viewports (max-w/max-h
-  // below), so the measured box shrinks there and the orbit pulls inward to stay
-  // inside the rim. Using min(w,h) keeps letters inside even if the box ends up
-  // non-square (e.g. a viewport cap binds height but not width).
-  // On short viewports the `short:` variant shrinks the letters too, so we feed a
-  // smaller maxRadius / minRadius / letterAllowance to match — otherwise the orbit
-  // would floor onto the (still-large) center letter.
-  const [wheelRadius, setWheelRadius] = useState(96);
-  useEffect(() => {
-    const el = wheelContainerRef.current;
-    if (!el) return;
-    const shortVp = typeof window !== 'undefined' ? window.matchMedia('(max-height: 600px)') : null;
-    const update = () => {
-      const rect = el.getBoundingClientRect();
-      // Shared selector — same orbit math the multiplayer wheel uses.
-      setWheelRadius(selectWheelRadius({ width: rect.width, height: rect.height, isShort: !!shortVp?.matches }));
-    };
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    shortVp?.addEventListener?.('change', update);
-    return () => {
-      ro.disconnect();
-      shortVp?.removeEventListener?.('change', update);
-    };
-  }, []);
 
   // ── Keyboard input ──
   useWordWheelKeyboard({
@@ -758,7 +708,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       practice={practice}
       onEndPractice={handleEndPractice}
       onExit={onExit}
-      className={isDesktop ? undefined : 'pe-12 sm:pe-0'}
+      className={inShell ? undefined : 'pe-12 sm:pe-0'}
     />
   );
 
@@ -769,7 +719,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       thresholds={thresholds}
       rivals={rivals}
       showRival={showRivalLayer}
-      variant={isDesktop ? 'wide' : 'bar'}
+      variant={inShell ? 'wide' : 'bar'}
     />
   );
 
@@ -778,7 +728,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       t={t}
       words={wordsFound}
       lastFound={lastFoundWord}
-      variant={isDesktop ? 'panel' : 'strip'}
+      variant={inShell ? 'panel' : 'strip'}
       reducedMotion={prefersReducedMotion}
     />
   );
@@ -786,28 +736,15 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // Wheel cluster JSX (word line + wheel + action-bar; phone adds the HUD, ladder and words above)
   const wheelCluster = (
     <>
-      <WheelRushCelebration celebration={celebration} t={t} prefersReduced={prefersReducedMotion} />
 
-      {practice && !hideModeCoach && (
-        <div className="w-full pb-2">
-          <PracticeCoachTip mode="wheelRush" wordsFound={wordsFound.length} />
-        </div>
-      )}
+      {practice && !hideModeCoach && <WheelCoachSlot wordsFound={wordsFound.length} />}
 
-      {!practice && !hideModeCoach && <ModeCoach mode="wheelRush" />}
 
-      {isDesktop ? (
-        <div className="w-full flex flex-col gap-4 shrink-0">
-          {hud}
-          {ladder}
-        </div>
-      ) : (
-        <div className="w-full flex flex-col gap-3 shrink-0">
-          {hud}
-          {ladder}
-          {foundWords}
-        </div>
-      )}
+      <div className="w-full flex flex-col gap-3 shell:gap-4 shrink-0">
+        {hud}
+        {ladder}
+        {!inShell && <div className="w-full shell:hidden">{foundWords}</div>}
+      </div>
 
       {showRivalLayer && (
       <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 pointer-events-none flex flex-col items-center gap-1.5">
@@ -843,6 +780,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         onRemove={handleRemoveLetter}
         onSubmit={handleSubmit}
         isValidating={isValidating}
+        pendingWord={pendingWord}
         shake={wordBuilderShake}
         feedback={feedback}
         acceptedWord={lastFoundWord}
@@ -850,123 +788,34 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         acceptedId={scoreFlyId}
         reducedMotion={prefersReducedMotion}
         hint={wordsFound.length === 0}
+        live={liveVerdict(builtLetters.map(bl => bl.letter).join(''), puzzle.centerLetter, wordsFound, onQuickVerdict)}
+        pending={pendingLetter}
+        celebrating={celebration !== null}
+        banner={<WheelRushCelebration celebration={celebration} t={t} prefersReduced={prefersReducedMotion} delay={0.2} className="inset-0 items-center" />}
         className="shrink-0"
       />
-      {/* ── The Wheel ── */}
-      <div
-        ref={wheelContainerRef}
-        data-testid="wheel-orbit"
-        // Height-cap (max-*) only binds when smaller than the fixed size, so tall
-        // screens are unchanged while short/landscape ones shrink the wheel to fit
-        // the cluster instead of overlapping the pills above / buttons below.
-        // Reserve ~184px (word line + action bar + gaps); floor 176px.
-        //
-        // short: (≤600px tall, incl. desktop 1136×473) adds a *viewport* cap
-        // (svh) so the wheel can never exceed the viewport even when the flex /
-        // cqb height-chain fails to propagate a bounded height — the prior
-        // cqb-only cap left it stuck at the fixed h-96 (384px) and the orbit
-        // collided with the instruction text above and the action bar below.
-        // Lower reserve (122px, chrome is tightened on short) and floor (132px).
-        // aspect-square is a hard 1:1 guarantee: even if the width/height caps
-        // ever bind to different values, the box can never become an oval (the
-        // orbit ring + pixi decorations follow the box, so a non-square box was
-        // the "stretched / ring detached from the letters" desktop bug). The
-        // orbit radius is min(w,h)-based and caps at ~140px, so the box never
-        // needs to grow past md:w-96 (384px) — bigger only floats the ring away
-        // from the centred letters. Keep it contained & centred on desktop.
-        //
-        // Every cap is wrapped in min(100cqb, …) because this box is shrink-0
-        // inside the flex-1 cluster — these caps are the ONLY thing keeping it
-        // inside its container. A bare `max(176px, …)` floor WINS when the
-        // container is smaller than the floor, which happens for real on
-        // Android: an anchored AdMob banner feeds --bottom-stack-height, the
-        // cluster is squeezed to ~126px, the orbit floors at 176px, and the
-        // cluster overflows by ~64px — Submit lands on top of the found-words
-        // chips (measured 60px overlap) and the board is crushed into the top
-        // of the screen. min(100cqb, …) is inert on normal viewports, where
-        // 100cqb is already the largest term.
-        className="relative aspect-square w-[min(86vw,336px)] h-[min(86vw,336px)] sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[min(100cqb,max(176px,calc(100cqb-184px)))] max-h-[min(100cqb,max(176px,calc(100cqb-184px)))] short:max-w-[min(100cqb,max(132px,min(calc(100cqb-122px),46svh)))] short:max-h-[min(100cqb,max(132px,min(calc(100cqb-122px),46svh)))] shrink-0 flex items-center justify-center touch-none"
-        onPointerDown={handlePointerDown}
+      <WheelDisc
+        orbitRef={wheelContainerRef}
+        large={inShell}
+        centerLetter={puzzle.centerLetter}
+        outerLetters={outerLetters}
+        builtIndices={builtLetters.map(bl => bl.wheelIndex)}
+        pointerPosRef={pointerPosRef}
+        draggingRef={draggingRef}
+        onPointerDown={(e) => { claimPointer(e); handlePointerDown(e); }}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        onPointerLeave={handlePointerUp}
+        onPress={handleLetterPress}
+        onHoldStart={holdPointerDown}
+        onHoldEnd={holdPointerEnd}
+        holdActiveIndex={holdActiveIndex}
+        tileSkin={equippedTileSkin}
+        fx={fx}
+        release={release}
+        checking={isValidating}
+        reducedMotion={prefersReducedMotion}
+        onPressedChange={setPendingLetter}
       >
-        {/* Depth backdrop disc — an always-on radial gradient centred on the
-            wheel. The orbit box carries no fill of its own and the stage's
-            radial gradient peaks above the wheel, so without this the disc
-            behind the letters read as flat solid black. Elevated navy center
-            (#2a2a4e) fading out to transparent lifts the disc above the navy
-            edge while still blending into the stage. zIndex -10 keeps it behind
-            the pixi layer, the rings, and every letter. */}
-        <div
-          data-testid="wheel-backdrop"
-          aria-hidden
-          className="absolute -inset-6 rounded-full pointer-events-none"
-          style={{
-            zIndex: -10,
-            // Two stacked layers so the disc reads as lit depth — not flat black —
-            // even on high-contrast mobile OLED where the navy-elevated→navy delta
-            // alone was imperceptible:
-            //   1. a soft brand glow (lime→cyan) blooming from the center, and
-            //   2. the elevated-navy depth disc fading to transparent at the rim.
-            background:
-              'radial-gradient(circle at 50% 45%, rgba(191,255,0,0.22) 0%, rgba(0,255,255,0.13) 38%, transparent 64%),' +
-              'radial-gradient(circle at center, var(--neo-navy-elevated) 0%, var(--neo-navy) 60%, transparent 80%)',
-          }}
-        />
-        {/* PixiJS wheel decorations: orbital rings + connection lines */}
-        <WordWheelPixiRing
-          selectedIndices={builtLetters.map(bl => bl.wheelIndex)}
-          radius={wheelRadius}
-          combo={combo}
-          pointerPosRef={pointerPosRef}
-          isDraggingRef={draggingRef}
-          outerCount={outerLetters.length}
-          reducedMotion={prefersReducedMotion}
-        />
-        {/* Outer glow ring — breathing loop disabled under reduced-motion */}
-        <m.div
-          className="absolute inset-0 rounded-full border-2 border-neo-lime/20"
-          style={{ boxShadow: '0 0 24px rgba(191,255,0,0.12), inset 0 0 24px rgba(191,255,0,0.06)' }}
-          animate={prefersReducedMotion ? { opacity: 0.85 } : { opacity: [0.6, 1, 0.6] }}
-          transition={prefersReducedMotion ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        {/* Inner decorative ring */}
-        <div className="absolute inset-4 sm:inset-5 rounded-full border border-neo-cyan/10" />
-        <div className="absolute inset-8 sm:inset-10 rounded-full border border-neo-cream/5" />
-
-        {/* Center letter */}
-        <WheelLetter
-          letter={puzzle.centerLetter}
-          isCenter
-          tileSkin={equippedTileSkin}
-          onPress={(letter, _, el) => handleLetterPress(letter, -1, el)}
-          isUsed={usedIndices.has(-1)}
-          index={-1}
-          reducedMotion={prefersReducedMotion}
-          showHoldRing={holdActiveIndex === -1}
-          onHoldStart={(l, _, el) => holdPointerDown(l, -1, el)}
-          onHoldEnd={holdPointerEnd}
-        />
-        {/* Outer letters */}
-        {outerLetters.map((letter, i) => (
-          <WheelLetter
-            key={`${letter}-${i}`}
-            letter={letter}
-            isCenter={false}
-            tileSkin={equippedTileSkin}
-            angle={i * (360 / outerLetters.length)}
-            radius={wheelRadius}
-            onPress={(l, _, el) => handleLetterPress(l, i, el)}
-            isUsed={usedIndices.has(i)}
-            index={i}
-            reducedMotion={prefersReducedMotion}
-            showHoldRing={holdActiveIndex === i}
-            onHoldStart={(l, _, el) => holdPointerDown(l, i, el)}
-            onHoldEnd={holdPointerEnd}
-          />
-        ))}
         {/* exp-wordwheel-drag-hint-v1: idle "swipe to spell" coachmark (cyan = SP). */}
         {dragHintFtue.visible && (
           <MPDragCoachmark
@@ -978,7 +827,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             }}
           />
         )}
-      </div>
+      </WheelDisc>
 
       {/* The center-letter + min-length rule was removed from the live board to
           cut mid-game clutter — it's still presented on the intro/ready screen
@@ -1045,18 +894,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     </>
   );
 
-  if (isDesktop) {
-    return (
-      <div
-        ref={gameContainerRef}
-        className="relative flex h-full w-full bg-neo-navy"
-        translate="no"
-      >
-        <div
-          data-testid="word-wheel-desktop-grid"
-          className="grid w-full h-full max-h-full max-w-[1500px] mx-auto gap-6 p-6 overflow-hidden grid-cols-[minmax(260px,320px)_minmax(0,1fr)_minmax(260px,340px)] grid-rows-[minmax(0,1fr)]"
-        >
-          <div className="h-full min-h-0 overflow-hidden rounded-neo zone-panel-pink">
+  // One tree for every screen: on desktop the GameShell frames it with rails.
+  return (
+    <GameShell
+      mode="wheel"
+      accent="lime"
+      left={inShell ? (
+        <>
+          <div className="min-h-0 flex-1 overflow-hidden rounded-neo zone-panel-pink">
             {hideCompetitive ? (
               <div className="p-4">
                 <WordWheelRankLadder t={t} score={score} thresholds={thresholds} rivals={rivals} variant="list" />
@@ -1065,31 +910,24 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               <WordWheelLiveRanks t={t} score={score} rivals={[...rivals].reverse()} />
             )}
           </div>
-
-          <div className="flex flex-col items-center h-full min-w-0 min-h-0 gap-3 relative z-10 zone-panel-cyan rounded-neo px-8 py-5">
-            {wheelCluster}
-          </div>
-
-          <div className="h-full min-h-0 overflow-hidden zone-panel-lime rounded-neo">
-            {foundWords}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      ref={gameContainerRef}
-      className={cn(
-        // No bottom-stack padding: body.screen-fit-locked already reserves --bottom-stack-height.
-        'relative flex flex-col items-center gap-3 w-full flex-1 min-h-0 max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto px-4 pb-3 rounded-neo',
-        equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`,
-      )}
-      translate="no"
+          <ShellKeysCard t={t} />
+        </>
+      ) : null}
+      right={inShell ? <div className="h-full min-h-0 overflow-hidden rounded-neo zone-panel-lime">{foundWords}</div> : null}
     >
-      {wheelCluster}
-    </div>
+      <div
+        ref={gameContainerRef}
+        className={cn(
+          // No bottom-stack padding: body.screen-fit-locked already reserves --bottom-stack-height.
+          'relative flex flex-col items-center gap-3 w-full flex-1 min-h-0 max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto px-4 pb-3 rounded-neo select-none',
+          'shell:max-w-none shell:h-full shell:px-0 shell:pb-0',
+          equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`,
+        )}
+        translate="no"
+      >
+        {wheelCluster}
+      </div>
+    </GameShell>
   );
 };
 

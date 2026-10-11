@@ -109,9 +109,6 @@ vi.mock('@/hooks/gameState', () => ({
 }));
 
 // Mock the lobby reward cluster (pulls AdMob/ad providers transitively).
-vi.mock('@/components/lobby/LobbyRewardCluster', () => ({
-  LobbyRewardCluster: () => <div data-testid="lobby-reward-cluster" />,
-}));
 
 // Mock animation presets
 vi.mock('@/lib/animation/presets', () => ({

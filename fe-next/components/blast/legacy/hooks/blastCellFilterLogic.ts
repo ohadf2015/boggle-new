@@ -8,7 +8,7 @@
  */
 import type { BlastTileState } from '../types';
 import type { GridPosition } from '@/types';
-import { isAdjacentCell } from '@/components/grid/gridGeometry';
+import { isNeighbour as isAdjacentCell } from '@/components/board/selectionPath';
 // Thaw logic lives in a pure util (single source of truth, shared with the
 // server cascade). Re-exported here so existing client import sites keep working.
 import { THAWABLE_TYPES, computeThawedCells } from '../utils/blastThaw';

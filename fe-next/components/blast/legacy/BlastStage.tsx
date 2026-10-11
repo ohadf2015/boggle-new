@@ -3,6 +3,9 @@
 import { memo, useRef, useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { Shuffle, AlertTriangle, Lightbulb } from 'lucide-react';
+import { GameShell } from '@/components/game/shell';
+import { BlastLeftRail, BlastRightRail } from './BlastShellRails';
+import { useBlastKeyboard } from './hooks/useBlastKeyboard';
 const BlastTileGuide = dynamic(() => import('./BlastTileGuide'), { ssr: false });
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Button } from '@/components/ui/button';
@@ -18,14 +21,12 @@ import { useBlastTileFirstUse } from './hooks/useBlastTileFirstUse';
 import { BlastTileFirstUseCallout } from './BlastTileFirstUseCallout';
 import { BlastHUD } from './BlastHUD';
 import { BlastMPLeaderboard } from './BlastMPLeaderboard';
-import { ClosestRivalsPanel } from '@/components/game/in-game/ClosestRivalsPanel';
-import { selectClosestRivals } from '@/lib/leaderboard/selectClosestRivals';
 import { selectMyBlastScore } from '@/lib/blast/selectMyBlastScore';
-import { blastEntriesToRivals } from '@/lib/leaderboard/rivalNormalizers';
 import { BlastBoard } from './BlastBoard';
 import BlastChainText from './BlastChainText';
 import BlastWaveClearText from './BlastWaveClearText';
 import BlastWordPraise from './BlastWordPraise';
+import { LIFT_OK_HOLD_MS } from '@/components/board/boardLift';
 import { BlastWordRewardPreview } from './BlastWordRewardPreview';
 import { BlastEffectsLayer } from './BlastEffectsLayer';
 import { BlastScoreMilestone } from './BlastScoreMilestone';
@@ -195,14 +196,11 @@ export const BlastStage = memo(function BlastStage({
       : score
     : score;
 
-  // Live "closest rivals" slice for the desktop side rail. Identity is keyed by
-  // username (blast's identity scheme). Returns null in solo blast (no leaderboard).
-  const rivalsView = useMemo(() => {
-    if (!leaderboard || leaderboard.length === 0) return null;
-    return selectClosestRivals(blastEntriesToRivals(leaderboard, username), 3);
-  }, [leaderboard, username]);
-
   const [showTileGuide, setShowTileGuide] = useState(false);
+
+  // The MP desktop canvas owns its own input; everywhere else Blast is playable from the keyboard.
+  const keyboard = useBlastKeyboard({ grid, language, enabled: interactive && !isComplete && !isDesktopCanvas, onPathSubmit });
+  const liveWord = keyboard.isTypingMode ? keyboard.typedWord.toUpperCase() : formedWord;
 
   // Measure board container for PixiJS effects canvas
   const boardContainerRef = useRef<HTMLDivElement>(null);
@@ -261,7 +259,7 @@ export const BlastStage = memo(function BlastStage({
   // useBlastBadgeUnlocks (a separate path).
   const { currentId: microId } = useBlastMicroAchievements(microStateRef.current, { enabled: false });
 
-  return (
+  const stage = (
     <div className="flex-1 flex flex-col h-full overflow-hidden relative pb-safe" data-testid="blast-stage">
       {/* Urgency vignette at low moves */}
       {movesRemaining <= 3 && !isComplete && (
@@ -294,7 +292,7 @@ export const BlastStage = memo(function BlastStage({
           the score · moves · progress cluster reads as one console aligned over
           the board, instead of stretching edge-to-edge across a wide viewport.
           On phones the cap exceeds the screen, so it stays full-width. */}
-      <div className="relative z-40 w-full max-w-[640px] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(680px,80dvh)] 2xl:max-w-[min(820px,86dvh)] mx-auto">
+      <div className={cn('relative z-40 w-full max-w-[640px] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(680px,80dvh)] 2xl:max-w-[min(820px,86dvh)] mx-auto', !isDesktopCanvas && 'shell:max-w-none')}>
       <BlastHUD
         score={displayScore}
         wordsFoundCount={wordsFound.length}
@@ -341,32 +339,14 @@ export const BlastStage = memo(function BlastStage({
         </div>
       )}
 
-      {/* Desktop: horizontal layout (board center + side panels). Mobile: vertical stack.
-          Inside the MP desktop shell (isDesktopCanvas) we stay stacked and let the
-          board fill the slot — the shell already supplies the side rails. */}
-      <div className={cn(
-        'flex-1 flex flex-col min-h-0 relative z-30',
-        !isDesktopCanvas && 'lg:flex-row lg:items-stretch lg:justify-center lg:gap-4 lg:px-4 xl:px-8 lg:max-w-[1400px] lg:mx-auto lg:w-full',
-      )}>
+      <div className="flex-1 flex flex-col min-h-0 relative z-30">
 
-      {/* Left panel — word area on desktop (suppressed in shell; the stacked mobile
-          word area below takes over so the board isn't squeezed by a side column). */}
-      <div className={cn('hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-center shrink-0', isDesktopCanvas && '!hidden')}>
-        <div
-          className={cn(
-            'flex items-center justify-center gap-2 px-3 py-2 w-full transition-opacity',
-            formedWord ? 'opacity-100' : 'opacity-30',
-          )}
-        >
-          <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
-          <BlastWordRewardPreview wordLength={formedWord.length} />
-        </div>
-      </div>
-
-      {/* 3. Board — center column, expands on desktop */}
+      {/* 3. Board — in the desktop shell the column is a size container, so the
+          board is as big as the stage's short side allows. */}
       <div
         className={cn(
           'flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-2 min-h-0',
+          !isDesktopCanvas && 'shell:[container-type:size] shell:px-0',
           explosionShake && explosionShake >= 2 ? 'animate-neo-shake' :
           explosionShake === 1 ? 'animate-neo-wobble' :
           sequencerState?.chainLevel && sequencerState.chainLevel >= 3 ? 'animate-neo-shake' :
@@ -382,13 +362,24 @@ export const BlastStage = memo(function BlastStage({
           transition: 'transform 200ms ease-out',
         }}
       >
+        {/* Desktop word bar, anchored right above the board. */}
+        <div
+          className={cn(
+            'hidden lg:flex items-center justify-center gap-2 pb-3 min-h-[56px] transition-opacity',
+            formedWord ? 'opacity-100' : 'opacity-30',
+            isDesktopCanvas && '!hidden',
+          )}
+        >
+          <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} />
+          <BlastWordRewardPreview wordLength={formedWord.length} />
+        </div>
         {/* Board frame — neo-brutalist with hard shadow + reactive glow */}
         <div
           className={cn(
             'relative w-full max-w-[min(94vw,80dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(680px,80dvh)] 2xl:max-w-[min(820px,86dvh)] p-1.5 rounded-neo border-3 shadow-hard-lg transition-all duration-300',
             // In the shell the board owns the full center column — override the
             // phone-tuned caps so it fills instead of floating tiny.
-            isDesktopCanvas && '!max-w-[min(680px,82dvh)]',
+            isDesktopCanvas ? '!max-w-[min(680px,82dvh)]' : 'shell:!max-w-none shell:w-[min(100cqw,100cqh)]',
             (sequencerState?.chainLevel ?? 0) >= 4
               ? 'border-yellow-400'
               : (sequencerState?.chainLevel ?? 0) >= 2
@@ -434,6 +425,7 @@ export const BlastStage = memo(function BlastStage({
                 cascadeHighlightCells={cascadeHighlightCells}
                 diamondRevealTurns={gameState.diamondRevealTurns}
                 isMultiplayer={isMultiplayer}
+                submitFeedback={currentFeedback}
               />
             </div>
             {/* PixiJS effects layer — overlays DOM board so particles/shockwaves/shatters are visible above tile art. pointer-events-none so taps still reach BlastBoard. */}
@@ -482,79 +474,10 @@ export const BlastStage = memo(function BlastStage({
         </AdaptiveAnimatePresence>
         {/* Chain escalation text — scoped within board area */}
         <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} t={t} />
-        <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} />
+        <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} delayMs={LIFT_OK_HOLD_MS} />
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} t={t} />
       </div>
 
-      {/* Right panel — closest-rivals rail + notices on desktop. Suppressed in the
-          shell: the shell's left rail already shows the rivals/roster, and the
-          stacked mobile out-of-moves / stuck notices below cover those states. */}
-      <div className={cn('hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-start lg:pt-2 lg:gap-3 shrink-0', isDesktopCanvas && '!hidden')}>
-        {rivalsView && <ClosestRivalsPanel view={rivalsView} className="w-full" />}
-        {/* Out of moves (desktop) */}
-        <AdaptiveAnimatePresence>
-          {movesRemaining <= 0 && isDeadEnd && !isComplete && !noWordsRemaining && (
-            <AdaptiveMotion.div
-              initial={{ scale: 0.6, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-              data-testid="blast-out-of-moves-notice-desktop"
-            >
-              <div
-                className={cn(
-                  'flex items-center justify-center gap-2 px-4 py-2.5',
-                  'rounded-neo border-3 border-neo-black shadow-hard',
-                  'bg-linear-to-r from-neo-red via-orange-400 to-neo-red',
-                  'font-neo-display font-black uppercase tracking-wider text-base text-neo-black',
-                )}
-                style={{ boxShadow: '0 0 24px rgba(255,51,102,0.55), 3px 3px 0 #000' }}
-              >
-                <AlertTriangle className="w-5 h-5 shrink-0" strokeWidth={2.75} />
-                <span>{t('blast.outOfMoves')}</span>
-              </div>
-            </AdaptiveMotion.div>
-          )}
-        </AdaptiveAnimatePresence>
-
-        {/* Dead-end + shuffle (desktop) */}
-        <AdaptiveAnimatePresence>
-          {noWordsRemaining && !isComplete && (
-            <AdaptiveMotion.div
-              initial={{ scale: 0.6, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-              data-testid="blast-stuck-notice-desktop"
-            >
-              <div
-                className={cn(
-                  'flex flex-col items-center gap-2 px-4 py-3',
-                  'rounded-neo border-3 border-neo-black shadow-hard',
-                  'bg-linear-to-r from-neo-purple via-neo-pink to-neo-purple',
-                  'font-neo-display font-black uppercase tracking-wider text-sm text-neo-white',
-                )}
-                style={{ textShadow: '0 0 12px rgba(255,20,147,0.65)', boxShadow: '0 0 24px rgba(139,92,246,0.55), 3px 3px 0 #000' }}
-              >
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 shrink-0" strokeWidth={2.75} />
-                  <span>{t('blast.stuck')}</span>
-                </div>
-                <Button
-                  size="sm"
-                  onClick={onShuffle}
-                  className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed bg-neo-lime text-neo-black font-neo-display font-black uppercase text-xs w-full"
-                >
-                  <Shuffle className="h-3.5 w-3.5 me-1" strokeWidth={2.75} />
-                  {t('blast.shuffle')}
-                </Button>
-              </div>
-            </AdaptiveMotion.div>
-          )}
-        </AdaptiveAnimatePresence>
-      </div>
-
-      {/* end desktop flex-row wrapper */}
       </div>
 
       {/* Effects overlay */}
@@ -572,30 +495,28 @@ export const BlastStage = memo(function BlastStage({
       <ComboMilestoneAnnouncement comboLevel={comboLevel} />
       <BlastMicroToast id={microId} t={t} />
 
-      {/* 4. Word forming area — mobile + shell (the shell hides the desktop left
-          word-area, so this stacked one carries the live word there too). */}
+      {/* 4. Word forming area — the traced or typed word, under the board on every screen. */}
       <div className={cn(
         'flex items-center justify-center shrink-0 relative z-40 px-4 py-2',
-        !isDesktopCanvas && 'lg:hidden',
         'max-w-[360px] md:max-w-[480px] mx-auto w-full overflow-visible',
         'min-h-[44px]',
       )}>
         <div
           className={cn(
             'flex items-center justify-center gap-2 px-5 py-2 w-full',
-            formedWord ? 'opacity-100' : 'opacity-40',
+            liveWord ? 'opacity-100' : 'opacity-40',
           )}
           style={{
             borderRadius: '8px',
-            border: formedWord ? '2px solid rgba(0,0,0,0.4)' : '2px solid transparent',
-            background: formedWord ? 'rgba(255,255,255,0.05)' : 'transparent',
+            border: liveWord ? '2px solid rgba(0,0,0,0.4)' : '2px solid transparent',
+            background: liveWord ? 'rgba(255,255,255,0.05)' : 'transparent',
           }}
         >
-          <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
-          <BlastWordRewardPreview wordLength={formedWord.length} />
-          {formedWord && (
+          <WordFormingArea word={liveWord} letterCount={liveWord.length} feedback={currentFeedback} compact />
+          <BlastWordRewardPreview wordLength={liveWord.length} />
+          {liveWord && (
             <span className="text-[10px] font-bold text-white tabular-nums">
-              {formedWord.length}
+              {liveWord.length}
             </span>
           )}
         </div>
@@ -609,7 +530,7 @@ export const BlastStage = memo(function BlastStage({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 10 }}
             transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-            className={cn('px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe', !isDesktopCanvas && 'lg:hidden')}
+            className="px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe"
             data-testid="blast-out-of-moves-notice"
           >
             <div
@@ -636,7 +557,7 @@ export const BlastStage = memo(function BlastStage({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 10 }}
             transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-            className={cn('px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe', !isDesktopCanvas && 'lg:hidden')}
+            className="px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe"
             data-testid="blast-stuck-notice"
           >
             <div
@@ -668,6 +589,21 @@ export const BlastStage = memo(function BlastStage({
       {/* Tile Guide modal */}
       <BlastTileGuide isOpen={showTileGuide} onClose={() => setShowTileGuide(false)} t={t} />
     </div>
+  );
+
+  // The MP round frame supplies its own rails around this stage.
+  if (isDesktopCanvas) return stage;
+  return (
+    <GameShell
+      mode="blast"
+      accent="pink"
+      left={
+        <BlastLeftRail t={t} leaderboard={leaderboard} username={username} />
+      }
+      right={<BlastRightRail t={t} words={wordsFound} />}
+    >
+      {stage}
+    </GameShell>
   );
 });
 BlastStage.displayName = 'BlastStage';

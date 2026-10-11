@@ -1,4 +1,4 @@
-// Mock for @remotion/media (ESM-only module that can't be resolved through Jest's modulePathIgnorePatterns)
+// Mock for @remotion/media (ESM-only module)
 const Audio = 'audio';
 
 module.exports = { Audio };

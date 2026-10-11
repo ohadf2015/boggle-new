@@ -47,7 +47,7 @@ vi.mock('../../utils/timerManager', () => {
   const mockTimerManager = {
     setTimeout: vi.fn((key: string, callback: () => void, _delay: number) => {
       callbacks.set(key, callback);
-      // Use real setTimeout so jest.advanceTimersByTime works
+      // Use real setTimeout so vi.advanceTimersByTime works
       setTimeout(callback, _delay);
       return key;
     }),

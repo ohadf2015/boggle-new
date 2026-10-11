@@ -101,18 +101,3 @@ export async function dragSubmitWord(page: Page, path: GridCellInfo[]): Promise<
   }
   await page.mouse.up();
 }
-
-/** Read the board, ask the solver for a real word, and submit it via a drag gesture. Returns the word. */
-export async function submitRealWord(page: Page, baseURL: string, language = 'en'): Promise<string> {
-  const cells = await readGrid(page);
-  const grid = toGridArray(cells);
-  const solved = await solveGrid(baseURL, grid, language);
-  const word = solved.easy[0] || solved.medium[0] || solved.hard[0];
-  if (!word) throw new Error('solve-grid found no submittable word for this board');
-
-  const path = findWordPath(cells, word);
-  if (!path) throw new Error(`Could not derive a cell path for word "${word}"`);
-
-  await dragSubmitWord(page, path);
-  return word;
-}

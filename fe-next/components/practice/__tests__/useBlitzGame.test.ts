@@ -16,7 +16,7 @@ describe('useBlitzGame', () => {
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
     vi.useRealTimers();
   });
 

@@ -180,7 +180,7 @@
    Cells inside inherit the skin through child selectors.
    ============================================================ */
 
-[data-tile-skin='neon'] .letter-tile-gradient {
+[data-tile-skin='neon'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background: linear-gradient(135deg, #050d1a 0%, #000f1f 100%) !important;
   border-color: #00ffff !important;
   box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.5) !important;
@@ -188,7 +188,7 @@
   text-shadow: 0 0 8px rgba(0, 255, 255, 0.9);
 }
 
-[data-tile-skin='wooden'] .letter-tile-gradient {
+[data-tile-skin='wooden'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background:
     repeating-linear-gradient(
       90deg,
@@ -203,7 +203,7 @@
   color: #ffe8cc !important;
 }
 
-[data-tile-skin='crystal'] .letter-tile-gradient {
+[data-tile-skin='crystal'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
     linear-gradient(135deg, #b8e0ff 0%, #88ccff 50%, #6ab8ff 100%) !important;
@@ -212,13 +212,29 @@
   color: #002855 !important;
 }
 
-[data-tile-skin='fire'] .letter-tile-gradient {
+[data-tile-skin='fire'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background: linear-gradient(135deg, #cc4400 0%, #ff5500 35%, #ff2200 70%, #dd1100 100%) !important;
   border-color: #660000 !important;
   box-shadow: inset 0 0 10px rgba(255, 100, 0, 0.5), inset 0 0 6px rgba(255, 200, 0, 0.2) !important;
   color: #ffe8cc !important;
   text-shadow: 0 0 6px rgba(255, 200, 0, 0.7);
 }
+
+/* Letter colour for skinned board tiles (the shared board draws letters in their own layer). */
+[data-tile-skin='neon'] { --tile-ink: #00ffff; }
+[data-tile-skin='wooden'] { --tile-ink: #ffe8cc; }
+[data-tile-skin='crystal'] { --tile-ink: #002855; }
+[data-tile-skin='fire'] { --tile-ink: #ffe8cc; }
+[data-tile-skin='world-1'] { --tile-ink: #0d1a00; }
+[data-tile-skin='world-2'] { --tile-ink: #002233; }
+[data-tile-skin='world-3'] { --tile-ink: #fffef0; }
+[data-tile-skin='world-4'] { --tile-ink: #2b0a00; }
+[data-tile-skin='world-5'] { --tile-ink: #fff3e6; }
+[data-tile-skin='world-6'] { --tile-ink: #1a0010; }
+[data-tile-skin='world-7'] { --tile-ink: #16213e; }
+[data-tile-skin='world-8'] { --tile-ink: #fffef0; }
+[data-tile-skin='world-9'] { --tile-ink: #0a2f3d; }
+[data-tile-skin='world-10'] { --tile-ink: #3d2600; }
 
 /* ============================================================
    Avatar Frames — applied via .avatar-{frameId} on rounded wrapper
@@ -288,7 +304,7 @@
    Accent fills carry black/navy letters; dark fills carry cream.
    ============================================================ */
 
-[data-tile-skin='world-1'] .letter-tile-gradient {
+[data-tile-skin='world-1'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background:
     linear-gradient(to top, #5a8a00 0 18%, transparent 18%),
     linear-gradient(160deg, #d9ff66 0%, #bfff00 55%, #a6d900 100%) !important;
@@ -297,7 +313,7 @@
   color: #0d1a00 !important;
 }
 
-[data-tile-skin='world-2'] .letter-tile-gradient {
+[data-tile-skin='world-2'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background:
     radial-gradient(ellipse 60% 22% at 30% 22%, rgba(255, 255, 255, 0.7), transparent 70%),
     linear-gradient(180deg, #66ffff 0%, #00d9e6 50%, #0088b3 100%) !important;
@@ -306,7 +322,7 @@
   color: #002233 !important;
 }
 
-[data-tile-skin='world-3'] .letter-tile-gradient {
+[data-tile-skin='world-3'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0 22%, transparent 22% 55%, rgba(255, 255, 255, 0.12) 55% 62%, transparent 62%),
     linear-gradient(135deg, #7b2ff7 0%, #4b0fa8 60%, #2a0866 100%) !important;
@@ -316,14 +332,14 @@
   text-shadow: 0 0 8px rgba(217, 179, 255, 0.9);
 }
 
-[data-tile-skin='world-4'] .letter-tile-gradient {
+[data-tile-skin='world-4'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background: linear-gradient(180deg, #ffd166 0%, #ff8c42 45%, #ff4f7b 100%) !important;
   border-color: #3d0f00 !important;
   box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.4), inset 0 -3px 0 rgba(90, 0, 30, 0.3) !important;
   color: #2b0a00 !important;
 }
 
-[data-tile-skin='world-5'] .letter-tile-gradient {
+[data-tile-skin='world-5'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background:
     repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 7px, rgba(60, 10, 0, 0.28) 7px 9px),
     linear-gradient(180deg, #ff7a45 0%, #d93a1a 60%, #8c1c07 100%) !important;
@@ -333,7 +349,7 @@
   text-shadow: 2px 2px 0 rgba(60, 10, 0, 0.8);
 }
 
-[data-tile-skin='world-6'] .letter-tile-gradient {
+[data-tile-skin='world-6'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background:
     repeating-conic-gradient(rgba(0, 0, 0, 0.1) 0 25%, transparent 0 50%) 0 0 / 12px 12px,
     linear-gradient(135deg, #ff6bb8 0%, #ff2e93 100%) !important;
@@ -342,7 +358,7 @@
   color: #1a0010 !important;
 }
 
-[data-tile-skin='world-7'] .letter-tile-gradient {
+[data-tile-skin='world-7'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background:
     linear-gradient(115deg, transparent 0 30%, rgba(255, 255, 255, 0.85) 38%, transparent 46%),
     linear-gradient(180deg, #f4f9ff 0%, #c7dcf2 50%, #9db8d9 100%) !important;
@@ -351,7 +367,7 @@
   color: #16213e !important;
 }
 
-[data-tile-skin='world-8'] .letter-tile-gradient {
+[data-tile-skin='world-8'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background:
     radial-gradient(1px 1px at 20% 30%, #fff 99%, transparent),
     radial-gradient(1.5px 1.5px at 70% 20%, #ffd6ff 99%, transparent),
@@ -364,7 +380,7 @@
   text-shadow: 0 0 8px rgba(255, 214, 255, 0.95);
 }
 
-[data-tile-skin='world-9'] .letter-tile-gradient {
+[data-tile-skin='world-9'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background:
     linear-gradient(to bottom, #ffffff 0 26%, transparent 26%),
     linear-gradient(180deg, #e8fffb 0%, #5ce6c8 55%, #13806b 100%) !important;
@@ -373,7 +389,7 @@
   color: #0a2f3d !important;
 }
 
-[data-tile-skin='world-10'] .letter-tile-gradient {
+[data-tile-skin='world-10'] .letter-tile-gradient:not([data-sel]):not([data-fx]) {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0 12%, transparent 12%),
     linear-gradient(160deg, #fff1a8 0%, #ffd23f 40%, #d99a00 75%, #a66f00 100%) !important;

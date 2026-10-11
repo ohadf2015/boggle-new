@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { matchAcceptLanguage } from './lib/localeResolution';
+import { isHiddenQaRoute } from './lib/qaRoutes';
 
 const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 const DEFAULT_LOCALE = 'en';
@@ -43,6 +44,12 @@ export async function proxy(request: NextRequest) {
 
   if (PROBE_RE.test(pathname)) {
     return new NextResponse(null, { status: 404 });
+  }
+
+  // A page-level notFound() streams under [locale]/loading.tsx and answers 200.
+  if (isHiddenQaRoute(pathname)) {
+    const locale = pathname.split('/')[1];
+    return NextResponse.rewrite(new URL(`/${locale}/__qa-route-disabled`, request.url));
   }
 
   const pathnameHasLocale = VALID_LOCALES.some(

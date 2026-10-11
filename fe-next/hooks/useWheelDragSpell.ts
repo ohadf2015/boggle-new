@@ -1,4 +1,4 @@
-import { useCallback, useRef, type MutableRefObject } from 'react';
+import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
 
 /**
  * Shared wheel drag-to-spell input — the single source of truth for the
@@ -43,7 +43,48 @@ export interface UseWheelDragSpellOptions {
   onBeforeDragSubmit?: () => void;
   /** Cancel any pending idle auto-submit before a drag-release submit. */
   cancelPendingSubmit?: () => void;
+  /**
+   * A letter that sits between other letters (the wheel hub). A straight swipe
+   * from one outer letter to the opposite one crosses it, so the drag only takes
+   * it after the pointer rests on it, turns inside it, or is released on it.
+   */
+  hubIndex?: number;
 }
+
+/** Shortest pause on the hub that counts as resting there. */
+export const HUB_REST_MIN_MS = 120;
+const HUB_TURN_DEG = 35;
+const GAP_SAMPLES = 9;
+
+interface Pt { x: number; y: number }
+
+interface PendingHub {
+  entry: Pt;
+  heading: Pt;
+  maxGap: number;
+  timer: ReturnType<typeof setTimeout>;
+}
+
+const median = (xs: number[]) => {
+  const sorted = [...xs].sort((a, b) => a - b);
+  return sorted[Math.floor(sorted.length / 2)];
+};
+
+/**
+ * A rest is a pause clearly longer than this drag's own rhythm between pointer
+ * events: ~16 ms for a finger, but a scripted or starved pointer can be far
+ * sparser, and a fixed dwell would then mistake every crossing for a rest.
+ */
+const restThreshold = (gaps: number[]) =>
+  Math.max(HUB_REST_MIN_MS, (gaps.length ? median(gaps) : 40) * 1.6 + 60);
+
+const angleBetween = (a: Pt, b: Pt) => {
+  const la = Math.hypot(a.x, a.y);
+  const lb = Math.hypot(b.x, b.y);
+  if (la === 0 || lb === 0) return 0;
+  const cos = Math.max(-1, Math.min(1, (a.x * b.x + a.y * b.y) / (la * lb)));
+  return (Math.acos(cos) * 180) / Math.PI;
+};
 
 export interface WheelDragSpellHandlers {
   handlePointerDown: (e: React.PointerEvent) => void;
@@ -62,13 +103,54 @@ export function useWheelDragSpell(
   const lastDragIdxRef = useRef<number | null>(null);
   const dragStartIdxRef = useRef<number | null>(null);
   const dragEngagedRef = useRef(false);
+  const lastPtRef = useRef<Pt | null>(null);
+  const pendingHubRef = useRef<PendingHub | null>(null);
+  const lastMoveAtRef = useRef<number | null>(null);
+  const gapsRef = useRef<number[]>([]);
 
-  const tryDragHit = useCallback((clientX: number, clientY: number) => {
+  useEffect(() => () => {
+    if (pendingHubRef.current) clearTimeout(pendingHubRef.current.timer);
+  }, []);
+
+  const resolveHub = useCallback((take: boolean) => {
+    const pending = pendingHubRef.current;
+    if (!pending) return;
+    clearTimeout(pending.timer);
+    pendingHubRef.current = null;
+    const o = optionsRef.current;
+    const hub = o.hubIndex;
+    if (!take || hub === undefined || o.isIndexUsed(hub)) return;
+    const btn = document.querySelector<HTMLButtonElement>(`[data-wheel-index="${hub}"]`);
+    if (!btn) return;
+    lastDragIdxRef.current = hub;
+    o.addLetter(hub, btn.dataset.wheelLetter || '', btn);
+  }, []);
+
+  const armHubTimer = useCallback((pending: PendingHub) => {
+    clearTimeout(pending.timer);
+    pending.timer = setTimeout(() => resolveHub(true), restThreshold(gapsRef.current));
+  }, [resolveHub]);
+
+  const tryDragHit = useCallback((clientX: number, clientY: number, gap: number | null) => {
     const o = optionsRef.current;
     const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
     const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
-    if (!btn) return;
-    const idx = Number(btn.dataset.wheelIndex);
+    const hitIdx = btn ? Number(btn.dataset.wheelIndex) : null;
+    const pending = pendingHubRef.current;
+    if (pending) {
+      if (gap !== null) pending.maxGap = Math.max(pending.maxGap, gap);
+      if (hitIdx === o.hubIndex) {
+        armHubTimer(pending);
+        return;
+      }
+      const exit = { x: clientX - pending.entry.x, y: clientY - pending.entry.y };
+      const rested = pending.maxGap >= restThreshold(gapsRef.current);
+      resolveHub(rested || angleBetween(pending.heading, exit) >= HUB_TURN_DEG);
+    } else if (gap !== null) {
+      gapsRef.current = [...gapsRef.current, gap].slice(-GAP_SAMPLES);
+    }
+    if (!btn || hitIdx === null) return;
+    const idx = hitIdx;
     if (idx === lastDragIdxRef.current) return;
     if (!dragEngagedRef.current) {
       const startIdx = dragStartIdxRef.current;
@@ -84,31 +166,52 @@ export function useWheelDragSpell(
       }
     }
     if (optionsRef.current.isIndexUsed(idx)) return;
+    if (idx === o.hubIndex) {
+      const prev = lastPtRef.current ?? { x: clientX, y: clientY };
+      const fresh: PendingHub = {
+        entry: { x: clientX, y: clientY },
+        heading: { x: clientX - prev.x, y: clientY - prev.y },
+        maxGap: 0,
+        timer: setTimeout(() => {}, 0),
+      };
+      pendingHubRef.current = fresh;
+      armHubTimer(fresh);
+      return;
+    }
     lastDragIdxRef.current = idx;
     o.addLetter(idx, btn.dataset.wheelLetter || '', btn);
-  }, []);
+  }, [resolveHub, armHubTimer]);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     const o = optionsRef.current;
     o.draggingRef.current = true;
     dragEngagedRef.current = false;
     lastDragIdxRef.current = null;
+    resolveHub(false);
+    lastPtRef.current = { x: e.clientX, y: e.clientY };
+    lastMoveAtRef.current = Date.now();
+    gapsRef.current = [];
     const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
     const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
     dragStartIdxRef.current = btn ? Number(btn.dataset.wheelIndex) : null;
-  }, []);
+  }, [resolveHub]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     const o = optionsRef.current;
     o.pointerPosRef.current = { x: e.clientX, y: e.clientY };
     if (!o.draggingRef.current) return;
-    tryDragHit(e.clientX, e.clientY);
+    const now = Date.now();
+    const gap = lastMoveAtRef.current === null ? null : now - lastMoveAtRef.current;
+    lastMoveAtRef.current = now;
+    tryDragHit(e.clientX, e.clientY, gap);
+    lastPtRef.current = { x: e.clientX, y: e.clientY };
   }, [tryDragHit]);
 
   const handlePointerUp = useCallback(() => {
     const o = optionsRef.current;
     o.pointerPosRef.current = null;
     const wasEngaged = dragEngagedRef.current;
+    resolveHub(wasEngaged);
     o.draggingRef.current = false;
     lastDragIdxRef.current = null;
     dragStartIdxRef.current = null;
@@ -118,7 +221,7 @@ export function useWheelDragSpell(
       o.onBeforeDragSubmit?.();
       o.submit();
     }
-  }, []);
+  }, [resolveHub]);
 
   return { handlePointerDown, handlePointerMove, handlePointerUp };
 }

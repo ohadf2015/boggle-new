@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
-const EXCLUDED_DIRS = new Set(['admin', 'auth', 'api', 'avatar-test']);
+const EXCLUDED_DIRS = new Set(['admin', 'auth', 'api', 'avatar-test', 'comeback-test', 'ai-fanfare-demo']);
 
 function scan(baseDir, relativePath, routes) {
   const fullPath = path.join(baseDir, relativePath);

@@ -51,7 +51,6 @@ test-results/
 **/*.spec.ts
 **/__tests__/
 **/__mocks__/
-**/jest.config.*
 
 # CI/CD
 .github/

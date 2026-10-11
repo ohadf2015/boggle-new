@@ -62,6 +62,7 @@ import {
   deleteWithAuth,
 } from '../authFetch';
 import { supabase } from '@/lib/supabase';
+import type { Mock } from 'vitest';
 
 describe('fetchWithAuth', () => {
   beforeEach(() => {
@@ -76,7 +77,7 @@ describe('fetchWithAuth', () => {
         refresh_token: 'refresh-token-123',
       };
 
-      (supabase!.auth.getSession as jest.Mock).mockResolvedValue({
+      (supabase!.auth.getSession as Mock).mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
@@ -86,7 +87,7 @@ describe('fetchWithAuth', () => {
         headers: { 'Content-Type': 'application/json' },
       } as any);
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      (global.fetch as Mock).mockResolvedValue(mockResponse);
 
       const response = await fetchWithAuth('/api/test');
 
@@ -97,7 +98,7 @@ describe('fetchWithAuth', () => {
         })
       );
 
-      const callHeaders = (global.fetch as jest.Mock).mock.calls[0][1].headers;
+      const callHeaders = (global.fetch as Mock).mock.calls[0][1].headers;
       expect(callHeaders.get('Authorization')).toBe('Bearer valid-token-123');
       expect(response.status).toBe(200);
     });
@@ -108,7 +109,7 @@ describe('fetchWithAuth', () => {
         refresh_token: 'refresh-token-123',
       };
 
-      (supabase!.auth.getSession as jest.Mock).mockResolvedValue({
+      (supabase!.auth.getSession as Mock).mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
@@ -117,13 +118,13 @@ describe('fetchWithAuth', () => {
         status: 200,
       } as any);
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      (global.fetch as Mock).mockResolvedValue(mockResponse);
 
       await fetchWithAuth('/api/test', {
         headers: { Authorization: 'Bearer custom-token' },
       });
 
-      const callHeaders = (global.fetch as jest.Mock).mock.calls[0][1].headers;
+      const callHeaders = (global.fetch as Mock).mock.calls[0][1].headers;
       expect(callHeaders.get('Authorization')).toBe('Bearer custom-token');
     });
   });
@@ -140,12 +141,12 @@ describe('fetchWithAuth', () => {
         refresh_token: 'new-refresh-token',
       };
 
-      (supabase!.auth.getSession as jest.Mock).mockResolvedValue({
+      (supabase!.auth.getSession as Mock).mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
 
-      (supabase!.auth.refreshSession as jest.Mock).mockResolvedValue({
+      (supabase!.auth.refreshSession as Mock).mockResolvedValue({
         data: { session: mockRefreshedSession },
         error: null,
       });
@@ -159,7 +160,7 @@ describe('fetchWithAuth', () => {
         status: 200,
       } as any);
 
-      (global.fetch as jest.Mock)
+      (global.fetch as Mock)
         .mockResolvedValueOnce(mockResponse401)
         .mockResolvedValueOnce(mockResponse200);
 
@@ -169,14 +170,14 @@ describe('fetchWithAuth', () => {
       expect(global.fetch).toHaveBeenCalledTimes(2);
 
       // First call with expired token
-      const firstCallHeaders = (global.fetch as jest.Mock).mock.calls[0][1].headers;
+      const firstCallHeaders = (global.fetch as Mock).mock.calls[0][1].headers;
       expect(firstCallHeaders.get('Authorization')).toBe('Bearer expired-token');
 
       // Second call with fresh token
-      const secondCallHeaders = (global.fetch as jest.Mock).mock.calls[1][1].headers;
+      const secondCallHeaders = (global.fetch as Mock).mock.calls[1][1].headers;
       expect(secondCallHeaders.get('Authorization')).toBe('Bearer fresh-token-456');
 
-      expect((supabase!.auth.refreshSession as jest.Mock)).toHaveBeenCalledTimes(1);
+      expect((supabase!.auth.refreshSession as Mock)).toHaveBeenCalledTimes(1);
       expect(response.status).toBe(200);
     });
 
@@ -186,12 +187,12 @@ describe('fetchWithAuth', () => {
         refresh_token: 'refresh-token',
       };
 
-      (supabase!.auth.getSession as jest.Mock).mockResolvedValue({
+      (supabase!.auth.getSession as Mock).mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
 
-      (supabase!.auth.refreshSession as jest.Mock).mockResolvedValue({
+      (supabase!.auth.refreshSession as Mock).mockResolvedValue({
         data: { session: null },
         error: { message: 'Refresh token expired' },
       });
@@ -200,13 +201,13 @@ describe('fetchWithAuth', () => {
         status: 401,
       } as any);
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse401);
+      (global.fetch as Mock).mockResolvedValue(mockResponse401);
 
       const response = await fetchWithAuth('/api/test');
 
       // Should only call fetch once (no retry)
       expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect((supabase!.auth.refreshSession as jest.Mock)).toHaveBeenCalledTimes(1);
+      expect((supabase!.auth.refreshSession as Mock)).toHaveBeenCalledTimes(1);
       expect(response.status).toBe(401);
     });
 
@@ -216,7 +217,7 @@ describe('fetchWithAuth', () => {
         refresh_token: 'refresh-token',
       };
 
-      (supabase!.auth.getSession as jest.Mock).mockResolvedValue({
+      (supabase!.auth.getSession as Mock).mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
@@ -225,7 +226,7 @@ describe('fetchWithAuth', () => {
         status: 401,
       } as any);
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse401);
+      (global.fetch as Mock).mockResolvedValue(mockResponse401);
 
       const response = await fetchWithAuth('/api/test', {
         skipAuthRefresh: true,
@@ -233,14 +234,14 @@ describe('fetchWithAuth', () => {
 
       // Should only call fetch once (no retry)
       expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect((supabase!.auth.refreshSession as jest.Mock)).not.toHaveBeenCalled();
+      expect((supabase!.auth.refreshSession as Mock)).not.toHaveBeenCalled();
       expect(response.status).toBe(401);
     });
   });
 
   describe('edge cases', () => {
     it('should handle missing session gracefully', async () => {
-      (supabase!.auth.getSession as jest.Mock).mockResolvedValue({
+      (supabase!.auth.getSession as Mock).mockResolvedValue({
         data: { session: null },
         error: null,
       });
@@ -249,7 +250,7 @@ describe('fetchWithAuth', () => {
         status: 200,
       } as any);
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      (global.fetch as Mock).mockResolvedValue(mockResponse);
 
       const response = await fetchWithAuth('/api/test');
 
@@ -259,7 +260,7 @@ describe('fetchWithAuth', () => {
     });
 
     it('should handle session error gracefully', async () => {
-      (supabase!.auth.getSession as jest.Mock).mockResolvedValue({
+      (supabase!.auth.getSession as Mock).mockResolvedValue({
         data: { session: null },
         error: { message: 'Session error' },
       });
@@ -268,7 +269,7 @@ describe('fetchWithAuth', () => {
         status: 200,
       } as any);
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      (global.fetch as Mock).mockResolvedValue(mockResponse);
 
       const response = await fetchWithAuth('/api/test');
 
@@ -285,7 +286,7 @@ describe('fetchWithAuth', () => {
         refresh_token: 'refresh-token',
       };
 
-      (supabase!.auth.getSession as jest.Mock).mockResolvedValue({
+      (supabase!.auth.getSession as Mock).mockResolvedValue({
         data: { session: mockSession },
         error: null,
       });
@@ -294,20 +295,20 @@ describe('fetchWithAuth', () => {
         status: 200,
       } as any);
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      (global.fetch as Mock).mockResolvedValue(mockResponse);
     });
 
     it('getWithAuth should make GET request', async () => {
       await getWithAuth('/api/test');
 
-      const callOptions = (global.fetch as jest.Mock).mock.calls[0][1];
+      const callOptions = (global.fetch as Mock).mock.calls[0][1];
       expect(callOptions.method).toBe('GET');
     });
 
     it('postWithAuth should make POST request with JSON body', async () => {
       await postWithAuth('/api/test', { foo: 'bar' });
 
-      const callOptions = (global.fetch as jest.Mock).mock.calls[0][1];
+      const callOptions = (global.fetch as Mock).mock.calls[0][1];
       expect(callOptions.method).toBe('POST');
       expect(callOptions.body).toBe(JSON.stringify({ foo: 'bar' }));
       expect(callOptions.headers.get('Content-Type')).toBe('application/json');
@@ -316,7 +317,7 @@ describe('fetchWithAuth', () => {
     it('putWithAuth should make PUT request with JSON body', async () => {
       await putWithAuth('/api/test', { foo: 'bar' });
 
-      const callOptions = (global.fetch as jest.Mock).mock.calls[0][1];
+      const callOptions = (global.fetch as Mock).mock.calls[0][1];
       expect(callOptions.method).toBe('PUT');
       expect(callOptions.body).toBe(JSON.stringify({ foo: 'bar' }));
       expect(callOptions.headers.get('Content-Type')).toBe('application/json');
@@ -325,7 +326,7 @@ describe('fetchWithAuth', () => {
     it('deleteWithAuth should make DELETE request', async () => {
       await deleteWithAuth('/api/test');
 
-      const callOptions = (global.fetch as jest.Mock).mock.calls[0][1];
+      const callOptions = (global.fetch as Mock).mock.calls[0][1];
       expect(callOptions.method).toBe('DELETE');
     });
   });

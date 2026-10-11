@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest';
 /**
  * Invalid Word Tracker — per-round rejected-word list
  *
@@ -8,7 +9,7 @@
  */
 
 describe('invalidWordTracker — round list', () => {
-  let mockFetch: jest.Mock;
+  let mockFetch: Mock;
   let tracker: typeof import('../invalidWordTracker');
 
   beforeEach(async () => {

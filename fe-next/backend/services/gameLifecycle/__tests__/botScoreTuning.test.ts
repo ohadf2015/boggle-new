@@ -16,7 +16,7 @@ import {
 } from '../botGame';
 
 vi.mock('../../../modules/gameStateManager', () => ({
-  getLeaderboard: vi.fn(),
+  getLeaderboard: vi.fn(() => []),
   getLeaderboardThrottled: vi.fn(),
   addPlayerWord: vi.fn(),
   updatePlayerScore: vi.fn(),

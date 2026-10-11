@@ -7,6 +7,8 @@ type Cell = { row: number; col: number };
 
 const MIN_FLYING_COINS = 4;
 const MAX_FLYING_COINS = 9;
+const BIG_WORD_LETTERS = 5;
+const BIG_WORD_COINS = 12;
 
 /** Viewport centre of a word's tiles, from the board's on-screen rect. */
 function wordCentre(path: Cell[], gridSize: number): { x: number; y: number } | undefined {
@@ -33,10 +35,11 @@ export function useBlastSessionCoins({ isMultiplayer, gridSize }: { isMultiplaye
   const launchCoins = useCallback(
     (path: Cell[], estimate: number) => {
       if (isMultiplayer || path.length === 0 || !(estimate > 0)) return;
-      const count = Math.min(MAX_FLYING_COINS, Math.max(MIN_FLYING_COINS, path.length + 1));
+      const big = path.length >= BIG_WORD_LETTERS;
+      const count = big ? BIG_WORD_COINS : Math.min(MAX_FLYING_COINS, Math.max(MIN_FLYING_COINS, path.length + 1));
       launched.current = { path, estimate };
       setCoins((c) => ({ ...c, wallet: Math.max(c.wallet, c.session + estimate) }));
-      emitCoinEarned(estimate, wordCentre(path, gridSize), { inline: true, coins: count });
+      emitCoinEarned(estimate, wordCentre(path, gridSize), { inline: true, coins: count, ...(big ? { big } : {}) });
     },
     [isMultiplayer, gridSize],
   );

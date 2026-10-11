@@ -364,7 +364,7 @@ describe('useClassroomLeaderboard', () => {
         createEntry({ userId: mockCurrentUserId, displayName: 'Current User', totalXp: 100, rank: 2, isCurrentUser: true }),
       ];
 
-      const mockFetch = jest
+      const mockFetch = vi
         .spyOn(educationLib, 'getLeaderboardWithRankDelta')
         .mockResolvedValueOnce({ data: mockFullList1, error: null })
         .mockResolvedValueOnce({ data: mockFullList2, error: null });
@@ -404,7 +404,7 @@ describe('useClassroomLeaderboard', () => {
   describe('Time Scope', () => {
     it('defaults to weekly scope', async () => {
       // GIVEN: Leaderboard data
-      const mockFetch = jest
+      const mockFetch = vi
         .spyOn(educationLib, 'getLeaderboardWithRankDelta')
         .mockResolvedValue({ data: [], error: null });
 
@@ -427,7 +427,7 @@ describe('useClassroomLeaderboard', () => {
 
     it('supports custom initialTimeScope', async () => {
       // GIVEN: Monthly scope requested
-      const mockFetch = jest
+      const mockFetch = vi
         .spyOn(educationLib, 'getLeaderboardWithRankDelta')
         .mockResolvedValue({ data: [], error: null });
 

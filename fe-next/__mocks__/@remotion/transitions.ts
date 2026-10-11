@@ -1,4 +1,4 @@
-// Jest mock for @remotion/transitions
+// Mock for @remotion/transitions
 import React from 'react';
 
 const TransitionSeriesBase = ({ children, ...props }: any) =>

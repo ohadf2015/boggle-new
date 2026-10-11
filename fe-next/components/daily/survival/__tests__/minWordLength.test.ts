@@ -13,6 +13,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useSurvivalGameLogic } from '../useSurvivalGameLogic';
 import { MIN_ANSWER_LENGTH, MIN_DISCOVERY_WORD_LENGTH, MAX_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
+import type { Mock } from 'vitest';
 
 // Mock contexts and hooks
 vi.mock('@/contexts/AuthContext', () => ({
@@ -63,7 +64,7 @@ global.fetch = vi.fn(() =>
   Promise.resolve({
     json: () => Promise.resolve({ isValid: true }),
   })
-) as jest.Mock;
+) as Mock;
 
 describe('Word Hunt Minimum Word Length', () => {
   // Grid where short words can be formed

@@ -24,13 +24,13 @@ const base = {
 describe('WordWheelWordLine', () => {
   it('shows the how-to hint with a caret before the first word', () => {
     render(<WordWheelWordLine {...base} hint letters={[]} />);
-    expect(screen.getByText('wordWheel.tapLetters')).toBeInTheDocument();
+    expect(screen.getByText('wordWheel.firstHint:{"letter":"C"}')).toBeInTheDocument();
     expect(screen.getByTestId('word-caret')).toBeInTheDocument();
   });
 
   it('drops the hint once the player is under way, leaving only the caret', () => {
     render(<WordWheelWordLine {...base} letters={[]} />);
-    expect(screen.queryByText('wordWheel.tapLetters')).toBeNull();
+    expect(screen.queryByText(/wordWheel\.firstHint/)).toBeNull();
     expect(screen.getByTestId('word-caret')).toBeInTheDocument();
   });
 
@@ -61,7 +61,7 @@ describe('WordWheelWordLine', () => {
         acceptedId={1}
       />,
     );
-    expect(screen.queryByText('wordWheel.tapLetters')).toBeNull();
+    expect(screen.queryByText(/wordWheel\.firstHint/)).toBeNull();
     expect(screen.getByTestId('word-caret')).toBeInTheDocument();
   });
 
@@ -81,9 +81,9 @@ describe('WordWheelWordLine', () => {
     expect(onRemove).toHaveBeenCalledWith(1);
   });
 
-  it('previews the points once the word is long enough to score', () => {
+  it('previews the points once the built letters spell a known word', () => {
     const letters = ['C', 'A', 'T', 'S'].map((letter, i) => ({ letter, wheelIndex: i - 1 }));
-    render(<WordWheelWordLine {...base} letters={letters} />);
+    render(<WordWheelWordLine {...base} letters={letters} live="word" />);
     expect(screen.getByTestId('word-points-preview').textContent).toBe('+30');
   });
 
@@ -135,5 +135,33 @@ describe('WordWheelWordLine', () => {
     const toast = screen.getByTestId('word-feedback');
     expect(toast.textContent).toBe('Not a valid word');
     expect(toast.getAttribute('data-kind')).toBe('error');
+  });
+
+  describe('mid-drag verdict', () => {
+    const cat = ['C', 'A', 'T'].map((letter, i) => ({ letter, wheelIndex: i - 1 }));
+
+    it('Given a built word the dictionary knows, Then it previews its points and inks as a word', () => {
+      render(<WordWheelWordLine {...base} letters={cat} live="word" />);
+      expect(screen.getByTestId('word-points-preview')).toBeInTheDocument();
+      expect(screen.getByTestId('word-builder').getAttribute('data-live')).toBe('word');
+    });
+
+    it('Given a built non-word, Then no points are promised', () => {
+      render(<WordWheelWordLine {...base} letters={cat} live="no" />);
+      expect(screen.queryByTestId('word-points-preview')).toBeNull();
+      expect(screen.getByTestId('word-builder').getAttribute('data-live')).toBe('no');
+    });
+
+    it('Given a word already found, Then no points are promised', () => {
+      render(<WordWheelWordLine {...base} letters={cat} live="found" />);
+      expect(screen.queryByTestId('word-points-preview')).toBeNull();
+    });
+
+    it('Then the submit chip reads as "enter", never as an accepted check', () => {
+      render(<WordWheelWordLine {...base} letters={cat} live="no" />);
+      const chip = screen.getByTestId('inline-submit-chip');
+      expect(chip.querySelector('.lucide-check')).toBeNull();
+      expect(chip.querySelector('.lucide-corner-down-left')).not.toBeNull();
+    });
   });
 });

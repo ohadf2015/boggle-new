@@ -227,8 +227,6 @@ const FROZEN_EXTRA = [
   'components/adventure/boss/cinematics/CinematicFallback.tsx|neo-navy|neo-black',
   'components/adventure/map/MapNodeButton.tsx|neo-navy-light|neo-black',
   'components/adventure/play/intro/ChapterBeat.tsx|neo-pink/30|neo-black',
-  'components/wordTowerV2/StabilityMeter.tsx|neo-navy/90|neo-black',
-  'components/wordTowerV2/StabilityMeter.tsx|neo-cream/15|neo-black',
   'components/wordTowerV2/V2Dock.tsx|neo-navy|neo-cream/30',
   'components/wordTowerV2/V2Results.tsx|neo-navy|neo-black',
   'components/wordTowerV2/V2Results.tsx|neo-navy|neo-black',

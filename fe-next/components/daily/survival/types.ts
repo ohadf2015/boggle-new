@@ -91,3 +91,17 @@ export interface AutoClueNotificationData {
   clueType: 'reveal_letter' | 'reveal_category' | 'example_sentence';
   timestamp: number;
 }
+
+export type FeedbackType =
+  | 'valid-word'
+  | 'invalid-word'
+  | 'not-on-board'
+  | 'not-in-dictionary'
+  | 'too-short'
+  | 'too-long'
+  | 'duplicate'
+  | 'target-attempt'
+  | 'target-found'
+  | 'clue-unlocked'
+  | 'discovery'
+  | 'short-valid';

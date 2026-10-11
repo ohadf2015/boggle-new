@@ -8,8 +8,7 @@
  * 3. AchievementToast uses shadow-hard-yellow class (no inline boxShadow with tier border)
  * 4. AchievementToast achievement name uses neo-lime token class
  * 5. AchievementDock uses border-3 (not border-4)
- * 6. AchievementPopup uses inset-e-4 logical property
- * 7. GuestBrainScorePreview has no backdrop-blur, uses neo tokens
+ * 6. GuestBrainScorePreview has no backdrop-blur, uses neo tokens
  */
 
 import React from 'react';
@@ -52,10 +51,6 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
 }));
 
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
-vi.mock('@/utils/ogShare', () => ({
-  getAchievementShareUrl: vi.fn(),
-  shareWithOgImage: vi.fn(),
-}));
 vi.mock('@/components/GoogleAnalytics', () => ({
   gameEvents: { achievementUnlock: vi.fn(), share: vi.fn() },
 }));
@@ -171,27 +166,6 @@ describe('AchievementDock - neo-brutalist fixes', () => {
     const button = container.querySelector('button');
     expect(button?.className).toContain('border-3');
     expect(button?.className).not.toContain('border-4');
-  });
-});
-
-describe('AchievementPopup - logical property fix', () => {
-  it('uses inset-e-4 instead of ltr:right-4 rtl:left-4', async () => {
-    const { default: AchievementPopup } = await import('../AchievementPopup');
-
-    const { container } = render(
-      <AchievementPopup achievement={{ key: 'test', icon: '🏆' }} />
-    );
-
-    // The outer positioned div should use inset-e-4
-    const fixedDiv = container.querySelector('.inset-e-4');
-    expect(fixedDiv).toBeTruthy();
-
-    // Should NOT have ltr:right-4 or rtl:left-4
-    const allElements = container.querySelectorAll('*');
-    allElements.forEach((el) => {
-      expect(el.className).not.toContain('ltr:right-4');
-      expect(el.className).not.toContain('rtl:left-4');
-    });
   });
 });
 

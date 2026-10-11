@@ -3,12 +3,12 @@
 import { useRef, useState, useEffect, useCallback, useMemo, memo } from 'react';
 import GridComponent from '@/components/GridComponent';
 import { BlastTile } from './BlastTile';
-import { BlastDragTrail } from './BlastDragTrail';
 import type { SelectedCell } from '@/components/grid';
+import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastTileType } from './types';
 import type { SequencerState, TileAnimState } from './hooks/useBlastSequencer';
-import { GRID_PADDING, GRID_PADDING_PX, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
+import { GRID_PADDING, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
 import { DESKTOP_IDLE_AUTOSUBMIT_MS } from '@/components/grid/submitHintVisibility';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
@@ -16,6 +16,8 @@ import { COMBO_ELIGIBLE_TILES } from './utils/blastCombos';
 import { computeCellFilter, createPortalAdjacency } from './hooks/blastCellFilterLogic';
 import { scanOffensiveSpecial, OFFENSIVE_RANK } from './utils/blastTileEffects';
 import { getTileTooltip } from './utils/blastTileTooltips';
+
+const TILE_TOOLTIP_HOLD_MS = 550;
 
 const ZONE_PREVIEW_TILES: Partial<Record<BlastTileType, 'bomb' | 'lightning' | 'prism' | 'magnet'>> = {
   bomb: 'bomb',
@@ -77,6 +79,8 @@ export interface BlastBoardProps {
    * aid.
    */
   isMultiplayer?: boolean;
+  /** Verdict on the last submitted word; the shared board lifts and rewards it. */
+  submitFeedback?: WordFeedback | null;
 }
 
 /**
@@ -100,6 +104,7 @@ export const BlastBoard = memo(function BlastBoard({
   cascadeHighlightCells = [],
   diamondRevealTurns = 0,
   isMultiplayer = false,
+  submitFeedback,
 }: BlastBoardProps) {
   const { t } = useLanguage();
   const equippedBoardTheme = useEquippedCosmetic('boardTheme');
@@ -216,19 +221,25 @@ export const BlastBoard = memo(function BlastBoard({
     return map;
   }, [sequencerState]);
 
-  // Single-tile tooltip: when exactly 1 special tile is selected, show its info.
-  // Suppressed in multiplayer — the explanations are distracting clutter during a
-  // timed, competitive round.
+  // A finger held on one special tile asks what it does; a drag that moves on does not.
+  const singleKey = selectedCells.length === 1 ? `${selectedCells[0].row}-${selectedCells[0].col}` : null;
+  const [heldKey, setHeldKey] = useState<string | null>(null);
+  useEffect(() => {
+    setHeldKey(null);
+    if (!singleKey || isMultiplayer) return undefined;
+    const id = window.setTimeout(() => setHeldKey(singleKey), TILE_TOOLTIP_HOLD_MS);
+    return () => window.clearTimeout(id);
+  }, [singleKey, isMultiplayer]);
+
   const singleTileTooltip = useMemo(() => {
-    if (isMultiplayer) return null;
-    if (selectedCells.length !== 1) return null;
+    if (!heldKey || heldKey !== singleKey) return null;
     const c = selectedCells[0];
     const tile = tileStates[c.row]?.[c.col];
     if (!tile || tile.type === 'standard') return null;
     const tooltip = getTileTooltip(tile.type, t);
     if (!tooltip) return null;
     return { ...tooltip, row: c.row, col: c.col };
-  }, [isMultiplayer, selectedCells, tileStates, t]);
+  }, [heldKey, singleKey, selectedCells, tileStates, t]);
 
   // Only render overlay once we have tile states
   const hasTileStates = tileStates.length > 0 && tileStates[0]?.length > 0;
@@ -256,17 +267,8 @@ export const BlastBoard = memo(function BlastBoard({
         largeText
         language={language}
         ghostCells
+        submitFeedback={submitFeedback}
       />
-
-      {/* Layer 1.5: Drag trail — SVG polyline through selected tile centers */}
-      {selectedCells.length >= 2 && containerWidth > 0 && (
-        <BlastDragTrail
-          selectedCells={selectedCells}
-          gridSize={gridSize}
-          containerWidth={containerWidth}
-          padding={GRID_PADDING_PX}
-        />
-      )}
 
       {/* Layer 2: Blast tile type overlay — indicators, special backgrounds, selection glow */}
       {hasTileStates && containerWidth > 0 && (
@@ -338,6 +340,7 @@ export const BlastBoard = memo(function BlastBoard({
       {/* Layer 3: Single-tile info tooltip (mobile-friendly) */}
       {singleTileTooltip && (
         <div
+          data-testid="blast-tile-tooltip"
           className="absolute left-1/2 -translate-x-1/2 z-30 px-3 py-1.5 rounded-neo bg-neo-navy/95 border border-neo-lime/40 shadow-hard-sm pointer-events-none animate-neo-pop"
           style={{
             top: `${(singleTileTooltip.row / gridSize) * 100}%`,

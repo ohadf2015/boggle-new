@@ -13,8 +13,6 @@ vi.mock('@/components/teacher/ClassroomManager', () => ({ default: () => <div />
 vi.mock('@/components/teacher/LessonBuilder', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: () => <div />, AssignmentCreator: () => <div /> }));
 vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({ AnalyticsDashboard: () => <div data-testid="analytics" /> }));
-vi.mock('@/components/teacher/StudentsPresentStrip', () => ({ default: () => <div /> }));
-vi.mock('@/components/teacher/curriculum/CurriculumWordListBrowser', () => ({ CurriculumWordListBrowser: () => <div /> }));
 vi.mock('@/components/teacher/TeacherPlanBadge', () => ({ TeacherPlanBadge: () => null }));
 vi.mock('@/components/teacher/ProWelcomeCelebration', () => ({ ProWelcomeCelebration: () => null }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: false, loading: false, grant: null }) }));

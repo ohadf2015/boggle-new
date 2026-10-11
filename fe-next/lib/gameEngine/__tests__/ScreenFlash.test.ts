@@ -3,26 +3,26 @@
 import { ScreenFlash } from '../ScreenFlash';
 import { Container, Graphics } from 'pixi.js';
 
-jest.mock('pixi.js', () => {
-  const mockGraphics = {
-    clear: jest.fn().mockReturnThis(),
-    rect: jest.fn().mockReturnThis(),
-    fill: jest.fn().mockReturnThis(),
-    destroy: jest.fn(function (this: { destroyed: boolean }) {
+vi.mock('pixi.js', () => {
+  const makeGraphics = () => ({
+    clear: vi.fn().mockReturnThis(),
+    rect: vi.fn().mockReturnThis(),
+    fill: vi.fn().mockReturnThis(),
+    destroy: vi.fn(function (this: { destroyed: boolean }) {
       this.destroyed = true;
     }),
     destroyed: false,
     alpha: 0,
     visible: false,
-  };
+  });
   const mockContainer = {
-    addChild: jest.fn(),
-    removeChild: jest.fn(),
-    destroy: jest.fn(),
+    addChild: vi.fn(),
+    removeChild: vi.fn(),
+    destroy: vi.fn(),
   };
   return {
-    Container: jest.fn(() => mockContainer),
-    Graphics: jest.fn(() => mockGraphics),
+    Container: vi.fn(function () { return mockContainer; }),
+    Graphics: vi.fn(function () { return makeGraphics(); }),
   };
 });
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import type { Mock } from 'vitest';
 
 // Mock framer-motion to simplify testing
 vi.mock('framer-motion', () => ({
@@ -54,7 +55,7 @@ const mockT = (key: string) => key;
 describe('TabbedDailyLeaderboard — tab switch', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
-    (global.fetch as jest.Mock).mockImplementation(() =>
+    (global.fetch as Mock).mockImplementation(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({

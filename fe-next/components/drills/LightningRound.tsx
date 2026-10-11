@@ -6,6 +6,8 @@ import { Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
+import { GameShell } from '@/components/game/shell';
+import { LightningLeftRail, LightningRightRail } from './LightningShellRails';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
@@ -226,7 +228,8 @@ export default function LightningRound({
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        'bg-neo-navy-light'
+        'bg-neo-navy-light',
+        phase === 'playing' && 'shell:hidden'
       )}>
         <div className="flex items-center gap-3">
           {/* Timer — pulses in the final 5s so the urgency is felt, not just read.
@@ -293,7 +296,7 @@ export default function LightningRound({
       </div>
 
       {/* Game Area */}
-      <div className="flex-1 min-h-0 overflow-x-hidden overflow-y-auto flex flex-col items-center justify-start p-4">
+      <div className={cn('flex-1 min-h-0 overflow-x-hidden overflow-y-auto flex flex-col items-center justify-start p-4', phase === 'playing' && 'shell:p-0 shell:overflow-hidden')}>
         {/* Ready Phase */}
         {phase === 'ready' && (
           <DrillBriefing
@@ -306,8 +309,24 @@ export default function LightningRound({
 
         {/* Playing Phase */}
         {phase === 'playing' && (
-          <div className="w-full max-w-md lg:max-w-lg space-y-4">
-            <div className="flex items-center justify-center gap-2">
+          <GameShell
+            mode="lightning"
+            accent="lime"
+            left={
+              <LightningLeftRail
+                t={t}
+                remaining={timeRemaining}
+                total={levelConfig.timeLimit}
+                score={score}
+                found={wordsFound.length}
+                target={levelConfig.targetWords}
+                streak={combo.comboLevel}
+              />
+            }
+            right={<LightningRightRail t={t} words={wordsFound} />}
+          >
+          <div className="w-full max-w-md lg:max-w-lg space-y-4 shell:flex shell:h-full shell:max-w-none shell:flex-col shell:gap-2 shell:space-y-0">
+            <div className="flex items-center justify-center gap-2 shell:hidden">
               <Zap className="w-5 h-5 text-neo-lime animate-pulse" />
               <span className={cn(
                 'font-bold uppercase',
@@ -318,7 +337,8 @@ export default function LightningRound({
             </div>
 
             {/* Grid + collect-burst overlay (absolute/pointer-events-none → no reflow). */}
-            <div className="relative w-full">
+            <div className="relative w-full shell:flex shell:min-h-0 shell:flex-1 shell:items-center shell:justify-center shell:[container-type:size]">
+              <div className="w-full shell:h-[min(100cqw,100cqh)] shell:w-[min(100cqw,100cqh)] shell:[&_.game-board-frame]:!h-full shell:[&_.game-board-frame]:!max-h-full shell:[&_.game-board-frame]:!w-full shell:[&_.game-board-frame]:!max-w-full">
               <GridComponent
                 grid={grid}
                 interactive={true}
@@ -327,6 +347,7 @@ export default function LightningRound({
                 language={language}
                 className="w-full"
               />
+              </div>
               <DrillRewardBurst
                 trigger={wordsFound.length}
                 magnitude={Math.min((lastWordScore ?? 5) / 18 + combo.comboLevel * 0.04, 1)}
@@ -380,7 +401,7 @@ export default function LightningRound({
             <div
               data-testid="drill-found-words"
               className={cn(
-                'flex flex-wrap gap-2 justify-center content-start p-3 rounded-neo border-2 border-neo-black h-28 overflow-y-auto',
+                'flex flex-wrap gap-2 justify-center content-start p-3 rounded-neo border-2 border-neo-black h-28 overflow-y-auto shell:hidden',
                 'bg-neo-navy-light'
               )}
             >
@@ -406,17 +427,21 @@ export default function LightningRound({
             {/* Keyboard UI - Desktop only */}
             {keyboard.isDesktop && (
               <>
-                <KeyboardDesktopBadge t={t} position="bottom-right" />
+                <div className="shell:hidden">
+                  <KeyboardDesktopBadge t={t} position="bottom-right" />
+                </div>
                 <EnterKeyHint
                   isVisible={keyboard.showEnterHint}
                   t={t}
                   position="bottom-center"
                 />
-                <KeyboardQuickTip
-                  isVisible={keyboard.showQuickTip}
-                  onDismiss={keyboard.dismissQuickTip}
-                  t={t}
-                />
+                <div className="shell:hidden">
+                  <KeyboardQuickTip
+                    isVisible={keyboard.showQuickTip}
+                    onDismiss={keyboard.dismissQuickTip}
+                    t={t}
+                  />
+                </div>
               </>
             )}
 
@@ -426,7 +451,7 @@ export default function LightningRound({
               onClick={finishGame}
               aria-label={t('brain.drills.finishGame')}
               className={cn(
-                'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
+                'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black shell:mt-0 shell:shrink-0',
                 'font-bold text-sm uppercase',
                 'transition-all hover:-translate-y-px',
                 'bg-neo-navy-elevated text-neo-white'
@@ -435,6 +460,7 @@ export default function LightningRound({
               {t('brain.drills.finishGame')}
             </AdaptiveMotion.button>
           </div>
+          </GameShell>
         )}
 
         {/* Complete Phase */}

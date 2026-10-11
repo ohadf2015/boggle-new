@@ -8,6 +8,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { usePlayGamesServices } from './usePlayGamesServices';
 import * as pgs from '@/utils/nativePGS';
+import type { Mock } from 'vitest';
 
 vi.mock('@/utils/nativePGS', () => ({
   initializePlayGames: vi.fn(),
@@ -22,7 +23,7 @@ vi.mock('@/utils/nativePGS', () => ({
 describe('usePlayGamesServices', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (pgs.initializePlayGames as jest.Mock).mockResolvedValue(true);
+    (pgs.initializePlayGames as Mock).mockResolvedValue(true);
   });
 
   it('reports available=false until init resolves, then true on Android', async () => {
@@ -35,7 +36,7 @@ describe('usePlayGamesServices', () => {
   });
 
   it('stays unavailable when init resolves false (web/iOS)', async () => {
-    (pgs.initializePlayGames as jest.Mock).mockResolvedValue(false);
+    (pgs.initializePlayGames as Mock).mockResolvedValue(false);
     const { result } = renderHook(() => usePlayGamesServices());
     await waitFor(() => expect(pgs.initializePlayGames).toHaveBeenCalled());
     expect(result.current.available).toBe(false);

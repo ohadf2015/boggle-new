@@ -56,6 +56,7 @@ vi.mock('@/utils/dailyChallenge', () => ({
 }));
 
 import type { DailyParticipant } from '../TabbedDailyLeaderboard';
+import type { Mock } from 'vitest';
 
 const createMockSolvedParticipant = (id: number): DailyParticipant => ({
   player_id: `user-${id}`,
@@ -106,7 +107,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
 
   it('should display correct solved count when totalSolved is provided by API', async () => {
     // GIVEN: API returns totalPlayers=10, totalSolved=7 (7 out of 10 players solved)
-    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+    (global.fetch as Mock).mockImplementation((url: string) => {
       if (url.includes('/word-hunt/leaderboard')) {
         return Promise.resolve({
           ok: true,
@@ -154,7 +155,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
 
   it('should display guest count when guests have solved', async () => {
     // GIVEN: API returns data with guest solvers
-    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+    (global.fetch as Mock).mockImplementation((url: string) => {
       if (url.includes('/word-hunt/leaderboard')) {
         return Promise.resolve({
           ok: true,
@@ -195,7 +196,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
 
   it('should show singular "guest" when only 1 guest solved', async () => {
     // GIVEN: API returns data with single guest solver
-    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+    (global.fetch as Mock).mockImplementation((url: string) => {
       if (url.includes('/word-hunt/leaderboard')) {
         return Promise.resolve({
           ok: true,
@@ -235,7 +236,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
 
   it('should NOT show guest count when no guests have solved', async () => {
     // GIVEN: API returns data with NO guest solvers
-    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+    (global.fetch as Mock).mockImplementation((url: string) => {
       if (url.includes('/word-hunt/leaderboard')) {
         return Promise.resolve({
           ok: true,
@@ -280,7 +281,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
 
   it('should display solved count in the brand success color (neo-lime)', async () => {
     // GIVEN: API returns data
-    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+    (global.fetch as Mock).mockImplementation((url: string) => {
       if (url.includes('/word-hunt/leaderboard')) {
         return Promise.resolve({
           ok: true,
@@ -330,7 +331,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
       createMockSolvedParticipant(2),
     ];
 
-    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+    (global.fetch as Mock).mockImplementation((url: string) => {
       if (url.includes('/word-hunt/leaderboard')) {
         return Promise.resolve({
           ok: true,
@@ -376,7 +377,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
   it('combined scope: never shows solved > played (splits per-mode when both have solvers)', async () => {
     // GIVEN: Combined scope. Hunt 6 played / 4 solved, Wheel 6 played / 6 solved.
     // Without the split, header sums to "10 solved" while only 6 unique players → impossible.
-    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+    (global.fetch as Mock).mockImplementation((url: string) => {
       if (url.includes('/word-hunt/leaderboard')) {
         return Promise.resolve({
           ok: true,

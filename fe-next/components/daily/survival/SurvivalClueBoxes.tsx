@@ -150,7 +150,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
           box rows in ONE cell during the AnimatePresence crossfade — otherwise
           mode="sync" keeps both mounted in normal flow and they wrap to a second
           row, doubling the height for ~150ms and shifting the grid on every submit. */}
-      <div dir={gameDir} className="grid w-full [&>*]:[grid-area:1/1] [@media(max-height:560px)]:px-0 px-2">
+      <div data-testid="clue-boxes" dir={gameDir} className="grid w-full [&>*]:[grid-area:1/1] [@media(max-height:560px)]:px-0 px-2">
         <AdaptiveAnimatePresence mode="sync">
           {showFeedbackOverlay && latestAttemptFeedback ? (
             <FeedbackOverlay
@@ -374,6 +374,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
         return (
           <AdaptiveMotion.div
             key={`hint-${idx}`}
+            data-testid={`clue-box-${idx}`}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: idx * 0.03, type: "spring", stiffness: 300 }}

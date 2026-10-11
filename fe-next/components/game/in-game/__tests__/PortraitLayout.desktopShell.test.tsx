@@ -41,10 +41,6 @@ vi.mock('../../ComboDisplayConnected', () => ({
   ComboDisplayConnected: () => <div data-testid="combo-display-connected" />,
 }));
 
-vi.mock('../../CompactLeaderboard', () => ({
-  default: () => <div data-testid="compact-leaderboard" />,
-}));
-
 vi.mock('../../FloatingScoreAnimation', () => ({
   default: () => <div data-testid="floating-score" />,
 }));

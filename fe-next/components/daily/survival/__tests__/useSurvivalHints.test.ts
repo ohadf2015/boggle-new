@@ -9,7 +9,7 @@
  * Key behavior: Must exhaust current tier before moving to next tier.
  */
 
-import { vi } from 'vitest';
+import { vi, type Mock } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSurvivalHints } from '../useSurvivalHints';
 import type { Language } from '@/types';
@@ -74,13 +74,13 @@ describe('useSurvivalHints', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     
-    (generateProgressiveHints as jest.Mock).mockResolvedValue({
+    (generateProgressiveHints as Mock).mockResolvedValue({
       hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
       category: 'Test Category',
       exampleSentence: 'Test sentence with _____.',
     });
     
-    (generateFallbackHints as jest.Mock).mockReturnValue({
+    (generateFallbackHints as Mock).mockReturnValue({
       hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
       category: 'Unknown',
       exampleSentence: 'Test sentence.',

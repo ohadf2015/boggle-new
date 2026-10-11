@@ -79,7 +79,11 @@ vi.mock('@/utils/guestManager', () => ({
 }));
 
 const prewarmDictionary = vi.fn().mockResolvedValue(undefined);
-vi.mock('@/hooks/useDictionaryCache', () => ({ prewarmDictionary: (lang: string) => prewarmDictionary(lang) }));
+const hasWordInMemoryCache = vi.fn((word: string) => (word === 'CAB' ? true : false));
+vi.mock('@/hooks/useDictionaryCache', () => ({
+  prewarmDictionary: (lang: string) => prewarmDictionary(lang),
+  hasWordInMemoryCache: (word: string, lang: string) => hasWordInMemoryCache(word, lang),
+}));
 
 vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: () => ({
@@ -91,9 +95,13 @@ vi.mock('@/hooks/useRewardedAd', () => ({
 }));
 
 // --- Child components ---
+const gameProps: { onQuickVerdict?: (w: string) => boolean | null }[] = [];
 vi.mock('../WordWheelGame', () => ({
   __esModule: true,
-  default: () => <div data-testid="word-wheel-game" />,
+  default: (props: { onQuickVerdict?: (w: string) => boolean | null }) => {
+    gameProps.push(props);
+    return <div data-testid="word-wheel-game" />;
+  },
 }));
 vi.mock('../WordWheelResults', () => ({
   __esModule: true,
@@ -130,5 +138,15 @@ describe('WordWheelChallenge - dictionary warm-up', () => {
     render(<WordWheelChallenge />);
     fireEvent.click(await screen.findByText('daily.play'));
     await waitFor(() => expect(prewarmDictionary).toHaveBeenCalledWith('en'));
+  });
+
+  it('hands the game the loaded dictionary so a release is judged in the same frame', async () => {
+    render(<WordWheelChallenge />);
+    fireEvent.click(await screen.findByText('daily.play'));
+    await screen.findByTestId('word-wheel-game');
+    const verdict = gameProps[gameProps.length - 1].onQuickVerdict!;
+    expect(verdict('CAB')).toBe(true);
+    expect(verdict('XYZ')).toBe(false);
+    expect(hasWordInMemoryCache).toHaveBeenCalledWith('CAB', 'en');
   });
 });

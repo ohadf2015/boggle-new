@@ -3357,7 +3357,7 @@ const he = {
     "word": "מילה",
     "words": "מילים",
     "wordsFound": "מילים",
-    "you": "את/ה",
+    "you": "אתם",
     "quickRematch": "עוד סיבוב",
     "attempts": "ניסיונות",
     "share": "שיתוף",
@@ -3560,7 +3560,8 @@ const he = {
     },
     "gestureTutorial": "החליקו על האותיות כדי ליצור מילים",
     "grid": {
-      "cellLabel": "שורה {{row}}, עמודה {{col}}: אות {{letter}}"
+      "cellLabel": "שורה {{row}}, עמודה {{col}}: אות {{letter}}",
+      "label": "לוח האותיות"
     }
   },
   "leadChange": {
@@ -5575,7 +5576,7 @@ const he = {
     "hostWillStartWhenReady": "המארח יתחיל את הסיבוב הבא כשכולם יהיו מוכנים",
     "performanceHistory": "היסטוריית ביצועים",
     "goToLobby": "לחדר המתנה",
-    "you": "את/ה",
+    "you": "אתם",
     "betterLuckNextTime": "בפעם הבאה מרסקים אותם!",
     "loserFeedback": {
       "almostPodium": "כמעט על הפודיום!",
@@ -5651,7 +5652,7 @@ const he = {
     },
     "sessionStats": {
       "title": "הבולטים מהסשן",
-      "you": "את/ה",
+      "you": "אתם",
       "versus": "נגד",
       "improved": "זינוק של {percent}% מהסיבוב הראשון!",
       "consistent": "טופ 3 ב-{count} סיבובים ברצף!",
@@ -8102,7 +8103,6 @@ const he = {
     "noPastSeasons": "אין עדיין עונות קודמות",
     "rankedAt": "מקום #{{position}}",
     "tierLabel": "דרגה",
-    "viewLeaderboard": "טבלת מובילים",
     "tagline": {
       "1": "כתבו את המורשת שלכם, מילה אחר מילה",
       "2": "כתרים לא יורשים, מרוויחים",
@@ -8271,6 +8271,9 @@ const he = {
     "alternativesTitle": "החלופות הטובות ביותר לבוגל 2026"
   },
   "landing": {
+    "launch": {
+      "go": "יאללה!"
+    },
     "home": {
       "greeting": "היי, {name}",
       "levelTitle": "רמה {level} · {title}",
@@ -8290,16 +8293,12 @@ const he = {
       "online": "מחוברים",
       "gameModes": "מצבי משחק",
       "todaysPuzzle": "החידה היומית",
+      "wheelWord": "חידות",
       "puzzleNo": "חידה #{n}",
       "resetsIn": "מתאפס בעוד {time}",
       "dayStreak": "רצף {n} ימים",
-      "gamesToday": "משחקים היום",
       "modes": "מצבים",
       "languages": "שפות",
-      "rank": "דירוג",
-      "maxLevel": "מקס",
-      "xpToNext": "{xp} XP לרמה {level}",
-      "bestScore": "שיא",
       "tier": {
         "common": "ליגת מתחילים",
         "uncommon": "ליגת ארד",
@@ -8318,16 +8317,7 @@ const he = {
       "vaultSubtitle": "אספו מטבעות, פתחו פרסים"
     },
     "playingNow": "משחקים",
-    "welcomeTitle": "מילים. חברים. ניצחון.",
-    "welcomeSubtitle": "חינם. בלי הרשמה. בלי תשלום לניצחון.",
-    "classroomHeroTitle": "משחקי מילים לכיתה שלכם",
-    "classroomHeroSubtitle": "בלי התחברות לתלמידים. משתפים קוד בן 6 תווים. כל הכיתה משחקת בחינם.",
-    "forTeachers": "למורים",
-    "playTodayChallenge": "שחקו באתגר היומי",
     "moreGameModes": "עוד מצבי משחק",
-    "moreGameModesHint": "הקישו לעוד מצבים",
-    "calmSectionTitle": "קחו את הזמן",
-    "calmSectionSubtitle": "חידות רגועות, בקצב שלכם",
     "singlePlayer": "משחק מהיר",
     "singlePlayerDesc": "קפצו פנימה ושחקו מיד",
     "badgeBots": "בוטים",
@@ -8395,23 +8385,11 @@ const he = {
     "shareTextAuth": "בואו לשחק איתי ב-LexiClash! קוד ההפניה שלי: {code}",
     "shareTextGuest": "בואו לשחק איתי LexiClash ונראה מי יותר טוב.",
     "shareNativeTitle": "הצטרפו ל-LexiClash",
-    "playNowFree": "שחקו עכשיו, בחינם",
     "letsPlay": "בואו נשחק!",
     "duration": "{time} דק׳",
     "difficultyEasy": "קל",
     "difficultyMedium": "בינוני",
     "difficultyHard": "קשה",
-    "gameModes": "מצבי משחק",
-    "languages": "שפות",
-    "activePlayers": "שחקנים פעילים",
-    "todaysTopPlayers": "השחקנים המובילים",
-    "viewFullLeaderboard": "צפו בטבלת המובילים המלאה",
-    "readyToCompete": "בא לכם להתחרות?",
-    "startPlaying": "התחילו לשחק",
-    "createAvatar": "צרו את הדמות שלכם",
-    "designYourLook": "עצבו מראה ייחודי",
-    "yourRank": "הדירוג שלכם",
-    "totalScore": "ניקוד כולל",
     "solvedPercent": "רק {percent}% פתרו היום",
     "liveActivity": "פעילות משחק בזמן אמת",
     "tickerLive": "שידור חי",
@@ -8442,8 +8420,6 @@ const he = {
     "todaysTopWords": "המילים המובילות היום",
     "hallOfFame": "היכל התהילה",
     "careerPoints": "נקודות קריירה",
-    "gamesToday": "משחקים היום",
-    "freeToPlay": "חינם לשחק",
     "wordHuntMode": "ציד מילים",
     "wordHuntModeDesc": "מצאו את מילת היעד כמה שיותר מהר. פאזל חדש כל יום",
     "communityBoards": "לוחות הקהילה",
@@ -9147,7 +9123,7 @@ const he = {
     },
     "rival": {
       "header": "אתגר תחרותי",
-      "you": "את/ה",
+      "you": "אתם",
       "youWin": "הבסתם את {name}! 🏆",
       "youLose": "{name} ניצח/ה את הסיבוב הזה",
       "tie": "זה תיקו! 🤝"
@@ -9445,6 +9421,7 @@ const he = {
     "onFireBadge": "{count} על האש!",
     "closeRace": "מרוץ צמוד",
     "inputPlaceholder": "הקלידו מילה...",
+    "firstHint": "מקישים או גוררים — בכל מילה יש {letter}",
     "tapLetters": "הקישו או גררו אותיות כדי לבנות מילה",
     "tapToRemove": "הקישו שוב על אות שהוספתם כדי להסיר",
     "doubleTapToSubmit": "הקישו פעמיים על אות כדי לשלוח",
@@ -9678,7 +9655,6 @@ const he = {
         "decline": "סיימו ריצה"
       },
       "findWordsToReveal": "הרכיבו מילים על הלוח כדי לחשוף את האותיות האלה",
-      "keyboardTip": "החליקו על הלוח או הקלידו במקלדת",
       "shop": "חנות רמזים",
       "revealLetter": "חשפו אות",
       "revealLetterDesc": "חשפו אות אקראית במילת היעד",
@@ -9706,6 +9682,14 @@ const he = {
       "clueUnlocked": "{name} נפתח! (-{cost} מטבעות)",
       "longWordBonus": "🔥 +{bonus} בונוס מילה ארוכה!",
       "scoreBreakdownTooltip": "לחצו לפרטים",
+      "stage": {
+        "prompt": "החליקו על האותיות ויצרו מילה",
+        "praiseShort": "יפה!",
+        "praiseMid": "אחלה!",
+        "praiseLong": "מילה ענקית!",
+        "boardLabel": "לוח אותיות",
+        "longWord": "מילה ארוכה +{bonus}"
+      },
       "score": {
         "tier": {
           "bronze": "ארד",
@@ -9732,14 +9716,11 @@ const he = {
     "desktop": {
       "liveRanks": "דירוג חי",
       "lootCollected": "שלל שנאסף",
-      "powerUps": "כוחות מיוחדים",
-      "hintsUnlocked": "רמזים שנפתחו",
-      "triesRemaining": "ניסיונות נותרים",
       "noWordsYet": "מצאו מילים כדי לאסוף שלל",
       "beFirst": "היו הראשונים בדירוג"
     },
     "mobile": {
-      "words": "מילים",
+      "found": "מצאת",
       "rank": "דירוג"
     },
     "results": {
@@ -11697,7 +11678,6 @@ const he = {
       },
       "roundComplete": "הסיבוב הושלם",
       "ofPerfect": "מהמושלם",
-      "points": "נק׳",
       "wordsFound": "נמצאו {found} מתוך {total} מילים",
       "targetWordFound": "🎯 מצאתם את המילה: {word}",
       "targetWordMissed": "🎯 המילה הייתה: {word}",
@@ -11727,6 +11707,8 @@ const he = {
       "dayStreak": "{days} ימים ברציפות",
       "rewardsPending": "התחברו כדי להתחיל לצבור מטבעות ו-XP",
       "pickNextMode": "הסיבוב הבא",
+      "statScore": "ניקוד",
+      "statWords": "מילים",
       "noWords": "בלי מילים הפעם. הלוח הבא במרחק 60 שניות.",
       "rankProgress": "{points} / {next} עד {rank}",
       "rankMax": "הדרגה הגבוהה ביותר",
@@ -13080,7 +13062,7 @@ const he = {
     "best": "שיא",
     "movesLeft": "מהלכים",
     "time": "זמן",
-    "you": "את/ה",
+    "you": "אתם",
     "live": "חי",
     "luckyBoost": "בונוס מזל",
     "luckyBoostDesc": "מוסיפים יותר אריחים מיוחדים אחרי ריצה קשה",
@@ -16986,7 +16968,7 @@ const he = {
     "wordsAccepted": "מילים שאושרו",
     "wordsRejected": "מילים שנדחו",
     "xpEarned": "נקודות ניסיון",
-    "you": "את/ה",
+    "you": "אתם",
     "youLose": "הפסדת! 😢",
     "youWin": "ניצחת! 🏆",
     "opponentDisconnected": "{{opponentName}} התנתק",
@@ -17555,7 +17537,7 @@ const he = {
     "position": "מיקום",
     "score": "ניקוד",
     "rewards": "פרסים",
-    "you": "את/ה",
+    "you": "אתם",
     "noParticipants": "אין משתתפים עדיין"
   },
   "league": {
@@ -17590,7 +17572,7 @@ const he = {
     "title": "היריבים שלך בליגה",
     "ahead": "{{pts}} נקודות מעליך",
     "behind": "{{pts}} נקודות מתחתיך",
-    "you": "את/ה",
+    "you": "אתם",
     "noRivals": "טפסו בליגה כדי למצוא יריבים"
   },
   "socialGift": {
@@ -17938,7 +17920,7 @@ const he = {
   },
   "ghostRival": {
     "title": "היריב שלך השבוע",
-    "you": "את/ה",
+    "you": "אתם",
     "ahead": "{{pts}} נקודות מוביל/ה",
     "behind": "{{pts}} נקודות מאחור",
     "cta": "שחקו כדי לסגור את הפער",
@@ -18528,6 +18510,10 @@ const he = {
       "finale": "סיום",
       "explainer": "פתרו את שלוש החידות למטה, והתשובות שלהן פותחות את המילה שבראש.",
       "finalePrompt": "איזו מילה קושרת את שלוש המילים?",
+      "railMap": "הפירמידה",
+      "railSolved": "גשרים",
+      "railEmptyTitle": "הגשרים שפיצחת יעלו לכאן",
+      "railEmptyBody": "כל תשובה שפותרים מדליקה קרן אל המילה שבראש.",
       "cluesLabel": "מצאו מילה שקושרת כל גשר:",
       "won": "פירמידה הושלמה!",
       "lost": "הפירמידה נפלה.",
@@ -19638,7 +19624,7 @@ const he = {
       "details": "פרטים",
       "detailsTitle": "פרטי הקרב",
       "skipHint": "הקישו לדילוג",
-      "you": "את/ה",
+      "you": "אתם",
       "pts": "נק׳",
       "winner": "ניצחון!",
       "placeOf": "מתוך {total}",
@@ -20301,6 +20287,40 @@ const he = {
     }
   },
   // @eg2Help:end
+  // @gameShell:start
+  "gameShell": {
+    "words": "המילים שלך",
+    "wordsEmptyTitle": "כאן ייערמו המילים שלך",
+    "wordsEmptyBody": "גררו על האותיות או פשוט הקלידו. כל מילה נוחתת כאן, החדשה למעלה.",
+    "pts": "נק׳",
+    "best": "הכי ארוכה",
+    "rivals": "יריבים",
+    "leading": "אתם בהובלה",
+    "behind": "{points} נק׳ אחרי {name}",
+    "raceOpen": "המילה הראשונה לוקחת את ההובלה",
+    "round": "הסיבוב הזה",
+    "score": "ניקוד",
+    "found": "נמצאו",
+    "time": "זמן",
+    "combo": "קומבו",
+    "life": "חיים",
+    "tries": "ניסיונות",
+    "clues": "רמזים",
+    "streak": "רצף",
+    "multiplier": "מכפיל",
+    "topWord": "המילה הכי שווה",
+    "byLength": "לפי אורך",
+    "target": "יעד",
+    "you": "אתם",
+    "keys": {
+      "title": "משחקים מהמקלדת",
+      "type": "מקלידים את המילה",
+      "letters": "א–ת",
+      "submit": "שולחים",
+      "clear": "מתחילים מחדש"
+    }
+  },
+  // @gameShell:end
   // @hqCalm:start
   "hqCalm": {
     "playWithoutClass": "או לשחק משחק בלי כיתה",

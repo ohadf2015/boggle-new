@@ -18,7 +18,7 @@ import { vi, describe, it, expect, beforeEach, afterEach, type MockInstance } fr
 
 // Pin the best-human baseline; everything else about gameStateManager is unused here.
 vi.mock('../../../modules/gameStateManager', () => ({
-  getLeaderboard: vi.fn(),
+  getLeaderboard: vi.fn(() => []),
   getLeaderboardThrottled: vi.fn(),
   addPlayerWord: vi.fn(),
   updatePlayerScore: vi.fn(),

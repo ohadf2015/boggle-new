@@ -2216,46 +2216,6 @@ html.reduce-motion *::after {
   box-shadow: none !important;
 }
 
-/* ==================== Enhanced Touch Interaction Styles ==================== */
-/* Improved touch targets and feedback for onboarding and general gameplay */
-
-/* Larger effective touch area via padding trick - apply to all devices */
-.game-board-frame [role="gridcell"] {
-  /* Use position relative for pseudo-element touch area expansion */
-  position: relative;
-  /* Prevent text selection during swipe */
-  user-select: none;
-  -webkit-user-select: none;
-  /* Ensure touch events are captured */
-  touch-action: none;
-}
-
-/* Expand touch target beyond visible bounds */
-.game-board-frame [role="gridcell"]::before {
-  content: '';
-  position: absolute;
-  /* Expand by 15% beyond cell bounds on all sides */
-  inset: -15%;
-  z-index: -1;
-  /* Invisible but captures touch events */
-  background: transparent;
-}
-
-/* Visual feedback during active touch/swipe on adjacent cells */
-.game-board-frame [role="gridcell"].ring-neo-lime\/70 {
-  /* Adjacent hint cells - pulse subtly to show they're valid targets */
-  animation: adjacentPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes adjacentPulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.85;
-  }
-}
-
 /* RTL support: Ensure swipe gestures work correctly in both directions */
 /* The grid itself uses dir="ltr" but we ensure touch feedback is consistent */
 [dir="rtl"] .game-board-frame {
@@ -3222,4 +3182,65 @@ html.reduce-motion *::after {
 }
 .animate-fade-in-up {
   animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Quick-play results celebration (components/quick-play/QuickResultsFx.tsx) */
+@keyframes qp-ray-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes qp-ray-spin-rev {
+  to { transform: rotate(-360deg); }
+}
+@keyframes qp-avatar-pop {
+  0% { transform: translateY(18px) scale(0.55); }
+  45% { transform: translateY(-14px) scale(1.08); }
+  70% { transform: translateY(2px) scale(0.97); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes qp-avatar-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes qp-avatar-hop {
+  0% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-22px) scale(1.06) rotate(-4deg); }
+  62% { transform: translateY(2px) scale(0.98, 1.02); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes qp-shadow-bob {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(0.82); }
+}
+@keyframes qp-burst {
+  0% { transform: rotate(var(--a)) translateY(-70px) scaleY(0); }
+  35% { transform: rotate(var(--a)) translateY(-86px) scaleY(1); }
+  100% { transform: rotate(var(--a)) translateY(-112px) scaleY(0); }
+}
+@keyframes qp-confetti {
+  0% { transform: translate(0, 0) scale(0.3); opacity: 0; }
+  12% { opacity: 1; }
+  40% { transform: translate(calc(var(--x) * 0.75), var(--y)) rotate(calc(var(--r) * 0.4)) scale(1); }
+  80% { opacity: 1; }
+  100% { transform: translate(var(--x), calc(var(--y) + 80px)) rotate(var(--r)) scale(0.7); opacity: 0; }
+}
+@keyframes qp-spark {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  10% { transform: scale(1.15) rotate(45deg); opacity: 1; }
+  24% { transform: scale(0) rotate(90deg); opacity: 0; }
+  100% { transform: scale(0); opacity: 0; }
+}
+@keyframes qp-card-in {
+  0% { transform: translateY(18px) scale(0.6); opacity: 0; }
+  15% { opacity: 1; }
+  60% { transform: translateY(-4px) scale(1.06); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes qp-value-pop {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.22); }
+  70% { transform: scale(0.96); }
+}
+@keyframes qp-shine {
+  0% { transform: translateX(-140%) skewX(-20deg); }
+  22%, 100% { transform: translateX(320%) skewX(-20deg); }
 }

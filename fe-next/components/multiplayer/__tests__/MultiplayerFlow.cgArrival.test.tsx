@@ -79,12 +79,6 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguageSafe: () => ({ t: (k: string) => k, language: 'en', setLanguage: () => {}, dir: 'ltr', currentFlag: '🇺🇸' }),
 }));
 
-vi.mock('@/components/NativeLanguageBanner', () => ({
-  NativeLanguageBanner: () => null,
-}));
-vi.mock('@/components/FirstGameLanguageNotice', () => ({
-  FirstGameLanguageNotice: () => null,
-}));
 
 const baseRoom: ActiveRoom = {
   gameCode: 'ROOM01',

@@ -35,7 +35,7 @@ vi.mock('../../modules/gameStateManager', () => ({
   getPlayersReadyCount: vi.fn(),
   removeUserFromGame: vi.fn(),
   updateUsernameMapping: vi.fn(),
-  getLeaderboard: vi.fn(),
+  getLeaderboard: vi.fn(() => []),
 }));
 
 vi.mock('../../utils/socketHelpers', () => ({

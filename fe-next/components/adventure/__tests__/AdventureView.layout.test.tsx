@@ -34,9 +34,6 @@ vi.mock('../WorldMap', () => ({ default: () => <div data-testid="world-map" /> }
 vi.mock('../CollectionPanel', () => ({ default: () => null }));
 vi.mock('../play/AdventureLevel', () => ({ default: () => null }));
 vi.mock('../play/SkinVault', () => ({ default: () => null }));
-vi.mock('../AdventureGuestGate', () => ({
-  AdventureGuestGate: ({ surface }: any) => <div data-testid={`guest-gate-${surface}`} />,
-}));
 
 import AdventureView from '../AdventureView';
 

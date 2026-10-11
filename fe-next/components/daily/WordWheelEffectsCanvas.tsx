@@ -211,16 +211,13 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
           // Thresholds follow scoreWord: 3 letters = 12, 4 = 30, 5-6 = 60-96, 7+ = 144+.
           if (pts <= 12) {
             particles.burst(WORD_SMALL_POP, effect.x, effect.y);
-            flash.flash({ color: 0xbfff00, duration: 0.1, intensity: 0.1 });
           } else if (pts <= 30) {
             particles.burst(WORD_MEDIUM_BURST, effect.x, effect.y);
-            flash.flash({ color: 0xbfff00, duration: 0.12, intensity: 0.14 });
             shake.light();
           } else if (pts <= 96) {
             // 5-6 letters: big explosion + gold stars + medium shake
             particles.burst(WORD_BIG_EXPLOSION, effect.x, effect.y);
             particles.burst(GOLD_STARS, effect.x, effect.y - 30, 15);
-            flash.flash({ color: 0xffcc00, duration: 0.2, intensity: 0.3 });
             shake.medium();
             // Brief hit-stop for big words
             timeDilation.slowDown(0.3, 0.15);
@@ -229,7 +226,6 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
             particles.burst(WORD_BIG_EXPLOSION, effect.x, effect.y);
             particles.burst(GOLD_STARS, effect.x, effect.y - 40, 25);
             particles.burst(CONFETTI_BURST, effect.x, effect.y + 20);
-            flash.flash({ color: 0xffcc00, duration: 0.25, intensity: 0.4 });
             shake.heavy();
             timeDilation.slowDown(0.2, 0.2);
             // Delayed second wave
@@ -247,12 +243,10 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
           if (c >= 2 && c < 5) {
             // x2-x4: combo flash ring
             particles.burst(COMBO_FLASH, effect.x, effect.y);
-            flash.flash({ color: 0x00ffff, duration: 0.15, intensity: 0.15 });
           } else if (c >= 5 && c < 10) {
             // x5-x9: electric rings + bigger shake
             particles.burst(COMBO_FLASH, effect.x, effect.y);
             particles.burst(ELECTRIC_RINGS, effect.x, effect.y);
-            flash.flash({ color: 0x00ffff, duration: 0.2, intensity: 0.4 });
             shake.medium();
             timeDilation.slowDown(0.4, 0.12);
           } else if (c >= 10) {
@@ -261,7 +255,6 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
             particles.burst(ELECTRIC_RINGS, effect.x, effect.y);
             particles.burst(LIGHTNING_SPARK, effect.x, effect.y);
             particles.burst(CONFETTI_BURST, effect.x, effect.y);
-            flash.flash({ color: 0xff44ff, duration: 0.3, intensity: 0.5 });
             shake.heavy();
             timeDilation.slowDown(0.2, 0.25);
           }
@@ -277,7 +270,6 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
           particles.burst(PANGRAM_MEGA_BURST, effect.x, effect.y);
           particles.burst(GOLD_STARS, effect.x, effect.y - 40, 30);
           particles.burst(CONFETTI_BURST, effect.x, effect.y + 20);
-          flash.flash({ color: 0xffcc00, duration: 0.35, intensity: 0.55 });
           shake.heavy();
 
           // Wave 2: flanking explosions
@@ -297,7 +289,6 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
           // Wave 4: final confetti rain
           setTimeout(() => {
             particles.burst(CONFETTI_BURST, effect.x, effect.y - 30);
-            flash.gold();
           }, 600);
           break;
         }
@@ -306,7 +297,6 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
         case 'error':
           particles.burst(ERROR_SPARKS, effect.x, effect.y);
           shake.shake({ intensity: 4, duration: 0.12, decay: 'exponential', frequency: 40 });
-          flash.flash({ color: 0xff2200, duration: 0.15, intensity: 0.12 });
           break;
 
         // ── Time warning: start urgency mode ──

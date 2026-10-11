@@ -36,6 +36,9 @@ export interface SinglePlayerShellProps {
   earthquakeState: EarthquakeState;
   currentFeedback: WordFeedback | null;
   highlightedPath: Array<{ row: number; col: number }>;
+  isTypingMode?: boolean;
+  typedWord?: string;
+  keyboardHighlight?: Array<{ row: number; col: number }>;
   lastWordFoundTime: number;
   isDesktop: boolean;
   awaitingStart: boolean;

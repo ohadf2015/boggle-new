@@ -54,12 +54,14 @@ describe('LandingChallengeCards - hydration safety', () => {
     expect(html).toContain('data-cube-key="blast"');
   });
 
-  it('keeps Adventure, Word Tower and Blast inside More after mount', () => {
+  it('shows the live arena and four modes, and keeps the rest of the roster in the More sheet after mount', () => {
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    const more = container.querySelector('[data-testid="landing-cubes-more"]');
-    expect(more).not.toBeNull();
-    for (const key of ['blast', 'adventure', 'wordTowerV2']) {
-      expect(more!.contains(container.querySelector(`[data-cube-key="${key}"]`))).toBe(true);
-    }
+    const sheet = container.querySelector('[data-testid="home-more-sheet"]');
+    expect(sheet).not.toBeNull();
+    const cubes = Array.from(container.querySelectorAll('[data-cube-key]'));
+    const onHome = cubes.filter((el) => !sheet!.contains(el));
+    expect(onHome.map((el) => el.getAttribute('data-cube-key'))[0]).toBe('arena');
+    expect(onHome).toHaveLength(5);
+    expect(cubes.length).toBeGreaterThan(onHome.length);
   });
 });

@@ -6,7 +6,7 @@ import { tryValidateOffline } from '@/hooks/fastValidateWord';
 import { isWordOnBoard } from '@/utils/utils';
 import type { Language } from '@/shared/types/game';
 import { currentPlayer, type PartyState } from '@/lib/party';
-import { PartyBoard } from './PartyBoard';
+import LetterBoard, { type BoardFeedback, type CellRef } from '@/components/board/LetterBoard';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
 const MIN_LEN = 3;
@@ -24,6 +24,7 @@ export function PartyPlay({ t, state, onSubmitWord, onTimesUp }: PartyPlayProps)
   const { checkWord, isLoaded } = useDictionaryCache(language);
   const [seconds, setSeconds] = useState(state.setup.timerSeconds);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [verdict, setVerdict] = useState<BoardFeedback | null>(null);
   const ended = useRef(false);
   const onTimesUpRef = useRef(onTimesUp);
   onTimesUpRef.current = onTimesUp;
@@ -50,26 +51,32 @@ export function PartyPlay({ t, state, onSubmitWord, onTimesUp }: PartyPlayProps)
   const handleSubmit = useCallback(
     async (raw: string) => {
       const word = raw.trim().toLocaleLowerCase();
+      const judge = (kind: BoardFeedback['kind']) => setVerdict({ id: `${word}-${Date.now()}`, kind, word });
       if (word.length < MIN_LEN) {
         setFeedback(t('passAndPlay.tooShort'));
+        judge('bad');
         return;
       }
       if (state.currentFound.some((w) => w.word === word)) {
         setFeedback(t('passAndPlay.alreadyFound'));
+        judge('dupe');
         return;
       }
       if (!isWordOnBoard(word, state.board, language)) {
         setFeedback(t('passAndPlay.notOnBoard'));
+        judge('bad');
         return;
       }
       const cached = isLoaded && checkWord(word);
       const valid = cached || (await tryValidateOffline(word, language));
       if (!valid) {
         setFeedback(t('passAndPlay.notInDict'));
+        judge('bad');
         onSubmitWord(word, false);
         return;
       }
       setFeedback(null);
+      judge('ok');
       onSubmitWord(word, true);
     },
     [checkWord, isLoaded, language, onSubmitWord, state.board, state.currentFound, t],
@@ -98,7 +105,16 @@ export function PartyPlay({ t, state, onSubmitWord, onTimesUp }: PartyPlayProps)
         </div>
       </header>
 
-      <PartyBoard grid={state.board} onSubmit={(w) => void handleSubmit(w)} />
+      <div className="relative mx-auto mt-14 aspect-square w-full max-w-sm">
+        <LetterBoard
+          grid={state.board}
+          interactive={seconds > 0}
+          language={language}
+          onSubmit={(path: CellRef[]) => void handleSubmit(path.map((c) => c.letter).join(''))}
+          feedback={verdict}
+          gridLabel={t('game.grid.label')}
+        />
+      </div>
 
       <div className="flex justify-between text-sm">
         <span>

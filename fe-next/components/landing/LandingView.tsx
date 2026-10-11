@@ -87,7 +87,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
       </HomeTreeSlot>
 
       <HomeTreeSlot tree={tree} which="returning">
-        <ReturningHome initialData={initialData} onStartOnboarding={onStartOnboarding} />
+        <ReturningHome initialData={initialData} />
       </HomeTreeSlot>
 
       {/* How to Play (homepage gauntlet, round 6): a section at the width and

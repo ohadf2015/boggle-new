@@ -2,6 +2,7 @@
 
 import { TrailRenderer } from '../TrailRenderer';
 import { Container } from 'pixi.js';
+import type { Mock } from 'vitest';
 
 vi.mock('pixi.js', () => {
   class MockGraphics {
@@ -69,7 +70,7 @@ describe('TrailRenderer', () => {
     trail.addPoint(150, 250);
     trail.update(0.016);
 
-    const gfx = (trail as unknown as { graphics: { moveTo: jest.Mock } }).graphics;
+    const gfx = (trail as unknown as { graphics: { moveTo: Mock } }).graphics;
     expect(gfx.moveTo).toHaveBeenCalled();
   });
 
@@ -77,7 +78,7 @@ describe('TrailRenderer', () => {
     trail.addPoint(100, 200);
     trail.update(0.016);
 
-    const gfx = (trail as unknown as { graphics: { clear: jest.Mock; moveTo: jest.Mock } }).graphics;
+    const gfx = (trail as unknown as { graphics: { clear: Mock; moveTo: Mock } }).graphics;
     expect(gfx.clear).toHaveBeenCalled();
     // moveTo may or may not be called for a single-point glow dot
   });
@@ -102,7 +103,7 @@ describe('TrailRenderer', () => {
 
   it('clear() does not crash if Graphics was destroyed by parent (children:true)', () => {
     trail.addPoint(10, 10);
-    const gfx = (trail as unknown as { graphics: { clear: jest.Mock; destroyed: boolean } }).graphics;
+    const gfx = (trail as unknown as { graphics: { clear: Mock; destroyed: boolean } }).graphics;
     // Reproduce the production null-context throw: a destroyed Graphics whose
     // internal context is null throws "Cannot read properties of null (reading 'clear')".
     gfx.clear.mockImplementationOnce(() => {

@@ -35,6 +35,7 @@ vi.mock('../streaks', () => ({
 }));
 
 import { getJsonFromLocalStorage, saveJsonToLocalStorage, getFromLocalStorage } from '@/utils/storageHelpers';
+import type { Mock } from 'vitest';
 // vi.mock hoists above, so these are already mocked vi.fn() instances
 
 describe('getWordHuntStatusToday', () => {
@@ -131,7 +132,7 @@ describe('getWordHuntStatusToday', () => {
     it('should use correct storage key format for English', () => {
       // GIVEN - Mocked storage and mocked date
       getJsonFromLocalStorage.mockReturnValue(null);
-      const mockDate = (getDailyChallengeDate as jest.Mock)();
+      const mockDate = (getDailyChallengeDate as Mock)();
 
       // WHEN - Checking status for English
       getWordHuntStatusToday('en' as Language);
@@ -146,7 +147,7 @@ describe('getWordHuntStatusToday', () => {
     it('should use correct storage key format for Hebrew', () => {
       // GIVEN - Mocked storage and mocked date
       getJsonFromLocalStorage.mockReturnValue(null);
-      const mockDate = (getDailyChallengeDate as jest.Mock)();
+      const mockDate = (getDailyChallengeDate as Mock)();
 
       // WHEN - Checking status for Hebrew
       getWordHuntStatusToday('he' as Language);

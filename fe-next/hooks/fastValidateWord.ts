@@ -25,9 +25,12 @@ export async function tryValidateOffline(word: string, language: Language): Prom
 }
 
 export async function fastValidateWord(word: string, language: Language): Promise<boolean> {
-  if (hasWordInMemoryCache(word, language) === true) return true;
+  const inMemory = hasWordInMemoryCache(word, language);
+  if (inMemory === true) return true;
 
-  if (await tryValidateOffline(word, language)) return true;
+  // Same word list as memory, so only worth booting the offline store when memory is cold or we are offline.
+  const online = typeof navigator === 'undefined' || navigator.onLine !== false;
+  if (!(inMemory === false && online) && await tryValidateOffline(word, language)) return true;
 
   try {
     const res = await fetch('/api/validate-word', {

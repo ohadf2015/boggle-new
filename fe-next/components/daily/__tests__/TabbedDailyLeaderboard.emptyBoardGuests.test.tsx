@@ -57,6 +57,7 @@ vi.mock('@/utils/dailyChallenge', () => ({
 
 
 import TabbedDailyLeaderboard from '../TabbedDailyLeaderboard';
+import type { Mock } from 'vitest';
 
 // "Be the first today!" was shown on a GLOBAL board whenever the ranked list came back empty.
 // Guests ARE recorded (backend/routes/dailyChallenge/wordHuntRoutes.ts:208-212 writes their row
@@ -85,7 +86,7 @@ describe('TabbedDailyLeaderboard - empty ranked board with guest solvers', () =>
   };
 
   const mockLeaderboard = (body: Record<string, unknown>) => {
-    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+    (global.fetch as Mock).mockImplementation((url: string) => {
       // Answer word-hunt only. The default scope merges BOTH modes, so returning the same body
       // for each endpoint would double every count and quietly make the assertion meaningless.
       if (url.includes('/word-hunt/leaderboard')) {

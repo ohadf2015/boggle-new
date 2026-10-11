@@ -10,6 +10,7 @@ import { createHighlightRecorder, type HighlightRecorder } from '@/lib/blast/hig
 import { useBlastSounds } from './hooks/useBlastSounds';
 import { useComboSystem } from '@/hooks/useComboSystem';
 import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordSubmission';
+import { withBlastCredit, type BlastCredit } from './utils/withBlastCredit';
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastEngine } from './hooks/useBlastEngine';
 import { useBlastObjectives } from './hooks/useBlastObjectives';
@@ -303,6 +304,8 @@ export function BlastGame({
     setClearedTilesForEffects,
   });
 
+  const [credit, setCredit] = useState<BlastCredit | null>(null);
+
   // Word-accepted pipeline (extracted to useBlastWordHandler)
   const { handleWordAccepted } = useBlastWordHandler({
     engine, sequencer, sounds, runCascade,
@@ -321,6 +324,7 @@ export function BlastGame({
       setExplosionShake, setNearMissCells,
       onCurrencyEarned: ({ coinDelta }) => creditCoins(coinDelta),
       onCoinsLaunch: launchCoins,
+      onCreditedScore: setCredit,
     },
   });
 
@@ -362,11 +366,8 @@ export function BlastGame({
     onWordAccepted: handleWordAccepted,
   });
 
-  // serverPointsOnly: the pill keeps its accept/reject state, minus the client "+N".
-  const pointlessFeedback = useMemo(
-    () => (serverPointsOnly && wordSubmission.currentFeedback ? { ...wordSubmission.currentFeedback, score: undefined } : null),
-    [serverPointsOnly, wordSubmission.currentFeedback],
-  );
+  const { prefetchValidation } = wordSubmission;
+  const shownFeedback = withBlastCredit(wordSubmission.currentFeedback, credit, serverPointsOnly);
 
   // Handlers
 
@@ -390,6 +391,7 @@ export function BlastGame({
   const handleWordChange = useCallback((word: string, _count: number) => {
     reportIdleActivity();
     setFormedWord(word);
+    if (word.length >= minWordLength) prefetchValidation(word);
     if (word.length > prevWordLenRef.current) {
       sounds.playTileSelect();
     } else if (word.length === 0 && prevWordLenRef.current >= 2) {
@@ -398,7 +400,7 @@ export function BlastGame({
     }
     prevWordLenRef.current = word.length;
     if (word.length > 0) sounds.playPathTone(word.length);
-  }, [sounds, reportIdleActivity]);
+  }, [sounds, reportIdleActivity, minWordLength, prefetchValidation]);
 
   // Play rejection sound + consume a move when word is rejected
   const prevFeedbackIdRef = useRef<string | null>(null);
@@ -728,7 +730,7 @@ export function BlastGame({
         livesRemaining={isMultiplayer ? undefined : livesRemaining}
         comboLevel={combo.comboLevel}
         formedWord={formedWord}
-        currentFeedback={serverPointsOnly ? pointlessFeedback : wordSubmission.currentFeedback}
+        currentFeedback={shownFeedback}
         sequencerState={sequencer.state}
         interactive={!engine.isCascading && !sequencer.state.isAnimating && pendingDiscovery == null && !engine.gameState.isDeadEnd && !engine.gameState.isComplete}
         onWordSubmit={wordSubmission.handleWordSubmit}

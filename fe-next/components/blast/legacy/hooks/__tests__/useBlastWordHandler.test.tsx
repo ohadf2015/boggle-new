@@ -156,6 +156,22 @@ describe('useBlastWordHandler', () => {
     expect(lastPathRef.current).toEqual([]);
   });
 
+  it('given an accepted word, then the credited points (letter bonus in) are reported before the tiles start clearing', async () => {
+    const onCreditedScore = vi.fn();
+    const { params, sequencer } = setup();
+    params.effects = { ...params.effects, onCreditedScore };
+    let reportedBeforeClear = false;
+    sequencer.animateWordClear = vi.fn(async () => {
+      reportedBeforeClear = onCreditedScore.mock.calls.length === 1;
+    });
+    const { result } = renderHook(() => useBlastWordHandler(params));
+    await act(async () => {
+      await result.current.handleWordAccepted({ word: 'cat', score: 5 });
+    });
+    expect(reportedBeforeClear).toBe(true);
+    expect(onCreditedScore).toHaveBeenCalledWith({ word: 'cat', score: 10 });
+  });
+
   it('bursts FX and plays the pop sound the moment tiles start clearing, before scoring', async () => {
     const { params, sequencer, effects, sounds, engine } = setup();
     const seen: { fx: number; pop: number; submitted: number }[] = [];

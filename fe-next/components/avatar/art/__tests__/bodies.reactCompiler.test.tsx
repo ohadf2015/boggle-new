@@ -31,12 +31,10 @@ function compileBodies(): string {
     filename: 'bodies.tsx',
     babelrc: false,
     configFile: false,
-    plugins: [
-      '@babel/plugin-syntax-jsx',
-      ['@babel/plugin-syntax-typescript', { isTSX: true }],
-      ['babel-plugin-react-compiler', {}],
-    ],
+    parserOpts: { plugins: ['jsx', 'typescript'] },
+    plugins: [['babel-plugin-react-compiler', {}]],
   });
+  expect(out!.code).toContain('react/compiler-runtime');
   return out!.code!.replace(/from '\.\//g, "from '../");
 }
 

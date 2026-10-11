@@ -132,7 +132,6 @@ describe('user-facing labels in student/practice turf never truncate', () => {
     'components/student/academy/ClassSheet.tsx',
     'components/student/academy/AcademySidePanel.tsx',
     'components/student/pages/LessonsList.tsx',
-    'components/student/StudentLessonView.tsx',
     'components/practice/PracticeHeader.tsx',
     'components/practice/VocabFocusPractice.tsx',
   ];

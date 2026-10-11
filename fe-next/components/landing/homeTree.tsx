@@ -38,7 +38,9 @@ const TREE_CSS =
   'html[data-home="returning"] [data-home-tree="fresh"]{display:none}' +
   'html[data-home="returning"] [data-home-only="fresh"]{display:none}' +
   '[data-home-only="returning"]{display:none}' +
-  'html[data-home="returning"] [data-home-only="returning"]{display:block}';
+  'html[data-home="returning"] [data-home-only="returning"]{display:block}' +
+  'html[data-home="returning"] [data-home-tail="tail"]{display:none}' +
+  'html[data-home="returning"] footer{display:none}';
 
 /** Stable identity: a new object each render would make React rewrite innerHTML. */
 const INERT_HTML = { __html: '' };

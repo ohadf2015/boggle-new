@@ -10,7 +10,7 @@ import { joinClassroom } from '../education';
 import { supabase } from '@/lib/supabase';
 
 // Mock Supabase
-// Note: jest.mock is hoisted, so we use a factory function
+// Note: vi.mock is hoisted, so we use a factory function
 vi.mock('@/lib/supabase', () => ({
   supabase: {
     from: vi.fn(),

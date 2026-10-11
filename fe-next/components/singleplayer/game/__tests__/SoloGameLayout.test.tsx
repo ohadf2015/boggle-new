@@ -5,18 +5,23 @@ import React from 'react';
 // The board, word strip and overlays are covered by their own suites; here they
 // are stand-ins so the test reads the layout's own decisions.
 vi.mock('@/components/GridComponent', () => ({
-  default: (p: { interactive: boolean }) => (
-    <div data-testid="grid" data-interactive={String(p.interactive)} />
+  default: (p: { interactive: boolean; highlightedPath?: Array<{ row: number; col: number }> }) => (
+    <div data-testid="grid" data-interactive={String(p.interactive)} data-highlight={JSON.stringify(p.highlightedPath ?? [])} />
   ),
 }));
 vi.mock('@/components/game/in-game/components/WordFormingAreaConnected', () => ({
-  WordFormingAreaConnected: () => <div data-testid="word-forming" />,
+  WordFormingAreaConnected: (p: { isTypingMode: boolean; typedWord: string }) => (
+    <div data-testid="word-forming" data-typing={String(p.isTypingMode)} data-typed={p.typedWord} />
+  ),
 }));
 vi.mock('@/components/game/in-game/components/GameOverlays', () => ({
   GameOverlays: (p: { isPlaying: boolean }) => <div data-testid="overlays" data-playing={String(p.isPlaying)} />,
 }));
-vi.mock('@/components/game/FloatingScoreAnimation', () => ({ default: () => null }));
-vi.mock('@/components/game/ComboMilestoneAnnouncement', () => ({ ComboMilestoneAnnouncement: () => null }));
+vi.mock('../components/SoloComboMeter', () => ({
+  SoloComboMeter: () => <div data-testid="combo-meter" />,
+}));
+vi.mock('@/components/game/FloatingScoreAnimation', () => ({ default: () => <div data-testid="score-float" /> }));
+vi.mock('@/components/game/ComboMilestoneAnnouncement', () => ({ ComboMilestoneAnnouncement: () => <div data-testid="combo-milestone" /> }));
 vi.mock('@/contexts/AccessibilityContext', () => ({
   useHapticsEnabled: () => false,
   useShouldReduceMotion: () => true,
@@ -26,6 +31,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 import { SoloGameLayout, type SoloGameLayoutProps } from '../SoloGameLayout';
+import { LESSON_LANE_PAD } from '@/components/tutorial/lesson/lessonLane';
 
 const t = ((key: string, params?: Record<string, unknown>) =>
   params ? `${key}:${JSON.stringify(params)}` : key) as SoloGameLayoutProps['t'];
@@ -156,6 +162,41 @@ describe('SoloGameLayout', () => {
     expect(slot?.className).toContain('min-h-[2.25rem]');
   });
 
+  describe('desktop game shell', () => {
+    const w = (word: string, ts: number, score = word.length) =>
+      ({ word, score, timestamp: ts, timeSinceStart: ts, isValid: true });
+
+    it('wraps the board in the shared shell: race on the left, found words on the right', () => {
+      render(<SoloGameLayout {...props({ score: 12, bots: [{ name: 'BrainBot', score: 8 }], foundWords: [w('cat', 1), w('tree', 2, 9)] })} />);
+      expect(screen.getByTestId('game-shell').getAttribute('data-game-shell')).toBe('classic');
+      const left = screen.getByTestId('game-shell-left');
+      expect(within(left).getByTestId('shell-standing-you').getAttribute('data-me')).toBe('true');
+      expect(within(left).getByTestId('shell-standing-bot-0')).toBeInTheDocument();
+      const right = screen.getByTestId('game-shell-right');
+      const rows = within(right).getAllByTestId(/^shell-word-row-/);
+      expect(rows[0].getAttribute('data-word')).toBe('tree');
+      expect(within(rows[0]).getByText('+9')).toBeInTheDocument();
+      expect(screen.getByTestId('game-shell-stage').contains(screen.getByTestId('solo-slot-board'))).toBe(true);
+    });
+
+    it('teaches keyboard play beside the board', () => {
+      render(<SoloGameLayout {...props()} />);
+      expect(within(screen.getByTestId('game-shell-left')).getByTestId('shell-keys')).toBeInTheDocument();
+    });
+
+    it('shows the typed word on the board strip and lights its path while typing', () => {
+      render(
+        <SoloGameLayout
+          {...props({ isTypingMode: true, typedWord: 'AB', keyboardHighlight: [{ row: 0, col: 0 }, { row: 0, col: 1 }] })}
+        />,
+      );
+      const strip = screen.getByTestId('word-forming');
+      expect(strip.getAttribute('data-typing')).toBe('true');
+      expect(strip.getAttribute('data-typed')).toBe('AB');
+      expect(JSON.parse(screen.getByTestId('grid').getAttribute('data-highlight') ?? '[]')).toHaveLength(2);
+    });
+  });
+
   it('flags the shell while a lesson runs, so wide screens can lift it over the board', () => {
     const { rerender } = render(<SoloGameLayout {...props()} />);
     const shell = () => document.querySelector('[data-solo-slot="bar"]')?.parentElement;
@@ -164,10 +205,40 @@ describe('SoloGameLayout', () => {
     expect(shell()).toHaveAttribute('data-lesson', 'on');
   });
 
+  it('lifts the desktop board clear of the lesson sheet while a lesson runs', () => {
+    render(<SoloGameLayout {...props({ soloLessonActive: true })} />);
+    const css = [...document.querySelectorAll('style')].map((s) => s.textContent ?? '').join('\n');
+    const desktop = css.slice(css.indexOf('@media (min-width: 1024px) and (min-height: 600px)'));
+    expect(desktop).toMatch(/\[data-lesson="on"\][^{]*\{[^}]*padding-bottom/);
+  });
+
   it('keeps the desktop typing tips out of the way while a lesson runs', () => {
     const { rerender } = render(<SoloGameLayout {...props()} />);
     expect(screen.getByTestId('overlays')).toHaveAttribute('data-playing', 'true');
     rerender(<SoloGameLayout {...props({ soloLessonActive: true })} />);
     expect(screen.getByTestId('overlays')).toHaveAttribute('data-playing', 'false');
+  });
+
+  it('reserves the bottom lane for lesson feedback, so a banner never covers the found words', () => {
+    const { rerender } = render(<SoloGameLayout {...props()} />);
+    const shell = () => document.querySelector('[data-solo-slot="bar"]')?.parentElement;
+    expect(shell()?.className).not.toContain(LESSON_LANE_PAD);
+    rerender(<SoloGameLayout {...props({ soloLessonActive: true })} />);
+    expect(shell()?.className).toContain(LESSON_LANE_PAD);
+  });
+
+  it('drops the combo meter during a lesson: the lesson strip already counts the streak', () => {
+    const { rerender } = render(<SoloGameLayout {...props({ soloStreak: 2, soloMultiplier: 2 })} />);
+    expect(screen.getByTestId('combo-meter')).toBeInTheDocument();
+    rerender(<SoloGameLayout {...props({ soloStreak: 2, soloMultiplier: 2, soloLessonActive: true })} />);
+    expect(screen.queryByTestId('combo-meter')).toBeNull();
+    expect(screen.queryByTestId('combo-milestone')).toBeNull();
+  });
+
+  it('lets the lesson banner carry the points: no second score pop over the board', () => {
+    const { rerender } = render(<SoloGameLayout {...props()} />);
+    expect(screen.getByTestId('score-float')).toBeInTheDocument();
+    rerender(<SoloGameLayout {...props({ soloLessonActive: true })} />);
+    expect(screen.queryByTestId('score-float')).toBeNull();
   });
 });

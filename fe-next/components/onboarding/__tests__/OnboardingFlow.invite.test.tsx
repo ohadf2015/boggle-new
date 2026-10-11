@@ -14,9 +14,6 @@ vi.mock('@/contexts/AccessibilityContext', () => ({ useAccessibility: () => ({ u
 vi.mock('@/components/CrazyGamesSDK', () => ({ useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }) }));
 
 // Mock heavy children we don't need to test the routing logic.
-vi.mock('@/components/onboarding/TutorialGame', () => ({
-  default: () => <div data-testid="tutorial-game" />,
-}));
 vi.mock('@/components/onboarding/QuickProfileSetup', () => ({
   default: ({ inviteContext, hasPendingInvite }: any) => (
     <div data-testid="quick-profile-setup" data-invite-mode={!!inviteContext} data-pending={!!hasPendingInvite} />

@@ -1,0 +1,63 @@
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { QuickResultsRays, ConfettiPuff, SparkleLoop } from '../QuickResultsFx';
+
+describe('QuickResultsRays', () => {
+  it('renders a decorative ray layer in the given color', () => {
+    render(<QuickResultsRays color="#ffe135" spinning />);
+    const rays = screen.getByTestId('quick-results-rays');
+    expect(rays).toHaveAttribute('aria-hidden', 'true');
+    expect(rays.innerHTML).toContain('#ffe135');
+    expect(rays).toHaveAttribute('data-spinning', 'true');
+  });
+
+  it('never looks the same twice: uneven rays on two layers turning at different speeds', () => {
+    render(<QuickResultsRays color="#ffe135" spinning />);
+    const layers = screen.getByTestId('quick-results-rays').querySelectorAll<HTMLElement>('[data-ray-layer]');
+    expect(layers).toHaveLength(2);
+    for (const layer of layers) expect(layer.style.background).not.toMatch(/repeating-conic/);
+    const [a, b] = [...layers].map((l) => l.className.match(/qp-ray-spin(?:-rev)?_(\d+)s/));
+    expect(a?.[0]).toContain('qp-ray-spin_');
+    expect(b?.[0]).toContain('qp-ray-spin-rev_');
+    expect(a?.[1]).not.toBe(b?.[1]);
+  });
+
+  it('stays as a still backdrop when motion is off', () => {
+    render(<QuickResultsRays color="#ffe135" spinning={false} />);
+    expect(screen.getByTestId('quick-results-rays')).toHaveAttribute('data-spinning', 'false');
+  });
+});
+
+describe('ConfettiPuff', () => {
+  it('is sparse: never more than sixteen pieces', () => {
+    render(<ConfettiPuff count={200} enabled />);
+    expect(screen.getByTestId('quick-confetti').querySelectorAll('[data-piece]')).toHaveLength(16);
+  });
+
+  it('is short: every piece plays once and is gone within two seconds', () => {
+    render(<ConfettiPuff count={16} enabled />);
+    for (const piece of screen.getByTestId('quick-confetti').querySelectorAll<HTMLElement>('[data-piece]')) {
+      const delay = parseFloat(piece.style.animationDelay);
+      const duration = parseFloat(piece.style.animationDuration);
+      expect(delay + duration).toBeLessThanOrEqual(2);
+      expect(piece.style.animationIterationCount || '1').toBe('1');
+    }
+  });
+
+  it('renders nothing with no pieces or motion off', () => {
+    const { unmount } = render(<ConfettiPuff count={0} enabled />);
+    expect(screen.queryByTestId('quick-confetti')).toBeNull();
+    unmount();
+    render(<ConfettiPuff count={10} enabled={false} />);
+    expect(screen.queryByTestId('quick-confetti')).toBeNull();
+  });
+});
+
+describe('SparkleLoop', () => {
+  it('keeps a few twinkles going, never a shower', () => {
+    render(<SparkleLoop enabled />);
+    const sparks = screen.getByTestId('quick-results-sparkles').querySelectorAll('[data-spark]');
+    expect(sparks.length).toBeGreaterThan(0);
+    expect(sparks.length).toBeLessThanOrEqual(4);
+  });
+});

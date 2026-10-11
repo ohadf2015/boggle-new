@@ -45,7 +45,7 @@ import { registerActiveGamesProvider } from '../backend/modules/scoreManager';
 import { getAllGameCodes } from '../backend/modules/gameStateManager';
 
 // Route modules
-import adminRoutes from '../backend/routes/admin';
+import adminRoutes from '../backend/routes/admin/index';
 import leaderboardRoutes from '../backend/routes/leaderboard';
 import analyticsRoutes from '../backend/routes/analytics';
 import geolocationRoutes from '../backend/routes/geolocation';

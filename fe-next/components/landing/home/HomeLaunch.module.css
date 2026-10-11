@@ -1,0 +1,104 @@
+/*
+ * Launch curtain: the tapped card bursts open into the mode's colour, the
+ * mascot pops, the GO tiles slam down, then the next route takes over.
+ * Transform and clip-path only (no opacity tweens on the full-screen layer).
+ * Reduced motion sees the finished frame.
+ */
+
+.stage {
+  clip-path: circle(150vmax at var(--lx, 50%) var(--ly, 50%));
+}
+
+.sunburst {
+  background: repeating-conic-gradient(from 0deg, rgba(0, 0, 0, 0.09) 0deg 9deg, transparent 9deg 18deg);
+}
+
+.tile {
+  transform: translateY(0) rotate(var(--tilt, 0deg));
+}
+
+.art {
+  transform: scale(1);
+}
+
+.bar {
+  transform: scaleX(0.92);
+  transform-origin: 0 50%;
+}
+
+[dir='rtl'] .bar {
+  transform-origin: 100% 50%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .stage {
+    animation: burst 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .sunburst {
+    animation: spin 7s linear infinite;
+  }
+  .tile {
+    animation: slam 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation-delay: calc(140ms + var(--i, 0) * 55ms);
+  }
+  .art {
+    animation:
+      pop 380ms cubic-bezier(0.34, 1.56, 0.64, 1) 90ms both,
+      bob 1.4s ease-in-out 470ms infinite;
+  }
+  .bar {
+    animation: fill 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) 120ms both;
+  }
+}
+
+@keyframes burst {
+  from {
+    clip-path: circle(0 at var(--lx, 50%) var(--ly, 50%));
+  }
+  to {
+    clip-path: circle(150vmax at var(--lx, 50%) var(--ly, 50%));
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slam {
+  from {
+    transform: translateY(-70vh) rotate(calc(var(--tilt, 0deg) * -6));
+  }
+  to {
+    transform: translateY(0) rotate(var(--tilt, 0deg));
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.2) rotate(-12deg);
+  }
+  to {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.03);
+  }
+}
+
+@keyframes fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(0.92);
+  }
+}

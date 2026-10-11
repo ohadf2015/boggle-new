@@ -7,12 +7,13 @@
 
 import { createEarthquakeSocketHandlers } from '../../shared/utils/earthquakeSocketHandlers';
 import type { MutableRefObject } from 'react';
+import type { Mock } from 'vitest';
 
 describe('createEarthquakeSocketHandlers', () => {
-  let setEarthquakeState: jest.Mock;
-  let setFireRoundActive: jest.Mock;
-  let setFireRoundRemaining: jest.Mock;
-  let setLetterGrid: jest.Mock;
+  let setEarthquakeState: Mock;
+  let setFireRoundActive: Mock;
+  let setFireRoundRemaining: Mock<(seconds: number) => void>;
+  let setLetterGrid: Mock;
   let gameSessionIdRef: MutableRefObject<number>;
   let fireRoundIntervalRef: MutableRefObject<NodeJS.Timeout | null>;
 

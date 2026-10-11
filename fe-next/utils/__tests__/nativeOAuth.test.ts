@@ -16,6 +16,7 @@ import {
 } from '../nativeOAuth';
 import * as platform from '../platform';
 import { supabase } from '@/lib/supabase';
+import type { Mock } from 'vitest';
 
 // Mock platform utils
 vi.mock('../platform', () => ({
@@ -59,10 +60,10 @@ vi.mock('@capgo/capacitor-social-login', () => ({
 const originalEnv = process.env;
 
 describe('Native OAuth Utility', () => {
-  const mockIsNative = platform.isNative as jest.Mock;
-  const mockIsIOS = platform.isIOS as jest.Mock;
-  const mockSignInWithIdToken = (supabase?.auth.signInWithIdToken as jest.Mock);
-  const mockUpdateUser = (supabase?.auth.updateUser as jest.Mock);
+  const mockIsNative = platform.isNative as Mock;
+  const mockIsIOS = platform.isIOS as Mock;
+  const mockSignInWithIdToken = (supabase?.auth.signInWithIdToken as Mock);
+  const mockUpdateUser = (supabase?.auth.updateUser as Mock);
 
   beforeEach(() => {
     vi.clearAllMocks();

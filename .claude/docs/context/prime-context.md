@@ -110,12 +110,12 @@
 ### Testing Patterns
 
 **Backend Tests:**
-- Jest with `backend/jest.config.js`
+- Vitest with `backend/vitest.config.ts` (`npm run test:backend`)
 - Test files in `backend/__tests__/`
 - Supertest for API testing
 
 **Frontend Tests:**
-- Jest with `jest.config.js`
+- Vitest with `vitest.config.ts` (`npm run test:frontend`)
 - React Testing Library
 - Test files in `__tests__/` and `app/**/__tests__/`
 

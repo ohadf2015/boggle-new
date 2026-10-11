@@ -32,7 +32,7 @@ export function PersistentStreakDisplay() {
 
   return (
     <>
-      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-neo-navy-light">
+      <div data-testid="streak-counter" className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-neo-navy-light">
         <span className="text-lg" role="img" aria-label={t('auth.dailyChallenge.streak_flame_icon')}>
           🔥
         </span>

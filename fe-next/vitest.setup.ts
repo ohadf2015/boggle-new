@@ -1,12 +1,11 @@
 /**
  * Vitest Setup for Frontend Tests
  *
- * Ported from jest.setup.js — sets up:
+ * Sets up:
  * - React Testing Library matchers
  * - Global mocks for browser APIs
  * - Socket.IO mocks
  * - Next.js router mocks
- * - Jest compatibility layer (globalThis.jest = vi)
  */
 
 import { vi, beforeAll, afterAll, afterEach, beforeEach } from 'vitest';
@@ -56,10 +55,7 @@ vi.mock('@testing-library/react', async (importOriginal) => {
   };
 });
 
-// ==========================================
-// Jest Compatibility Layer
-// ==========================================
-// Allows existing tests using jest.fn(), jest.mock(), etc. to work without modification.
+// waitFor only advances fake timers when a global `jest` exists.
 if (typeof (globalThis as any).jest === 'undefined') {
   (globalThis as any).jest = vi;
 }

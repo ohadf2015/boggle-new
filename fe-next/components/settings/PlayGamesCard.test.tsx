@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { PlayGamesCard } from './PlayGamesCard';
 import * as hook from '@/hooks/usePlayGamesServices';
 
@@ -27,11 +27,11 @@ const baseHook = {
 describe('PlayGamesCard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (hook.usePlayGamesServices as jest.Mock).mockReturnValue({ ...baseHook });
+    (hook.usePlayGamesServices as Mock).mockReturnValue({ ...baseHook });
   });
 
   it('renders nothing when Play Games is unavailable (web/iOS)', () => {
-    (hook.usePlayGamesServices as jest.Mock).mockReturnValue({ ...baseHook, available: false });
+    (hook.usePlayGamesServices as Mock).mockReturnValue({ ...baseHook, available: false });
     const { container } = render(<PlayGamesCard isDarkMode={false} />);
     expect(container.firstChild).toBeNull();
   });

@@ -2214,6 +2214,10 @@ const sv = {
       "finale": "Final",
       "explainer": "Lös de tre gåtorna längst ner. Deras svar låser upp ordet i toppen.",
       "finalePrompt": "Vilket ord förbinder alla tre?",
+      "railMap": "Pyramiden",
+      "railSolved": "Broar",
+      "railEmptyTitle": "Knäckta broar klättrar hit",
+      "railEmptyBody": "Varje svar du löser tänder en stråle mot ordet i toppen.",
       "cluesLabel": "Hitta ordet som kopplar varje bro:",
       "won": "Pyramiden klar!",
       "lost": "Pyramiden föll.",
@@ -3876,7 +3880,8 @@ const sv = {
       "toggle": "Visa/dölj spellåda"
     },
     "grid": {
-      "cellLabel": "Rad {{row}}, kolumn {{col}}: bokstav {{letter}}"
+      "cellLabel": "Rad {{row}}, kolumn {{col}}: bokstav {{letter}}",
+      "label": "Bokstavsrutnät"
     }
   },
   "leadChange": {
@@ -8375,7 +8380,6 @@ const sv = {
     "noPastSeasons": "Inga tidigare säsonger ännu",
     "rankedAt": "Plats #{{position}}",
     "tierLabel": "Nivå",
-    "viewLeaderboard": "Topplistan",
     "tagline": {
       "1": "Smid din legend, ett ord i taget",
       "2": "Kronor förtjänas, inte ärvs",
@@ -8544,6 +8548,9 @@ const sv = {
     "alternativesTitle": "Bästa Boggle-alternativen 2026"
   },
   "landing": {
+    "launch": {
+      "go": "KÖR!"
+    },
     "home": {
       "greeting": "Hej, {name}",
       "levelTitle": "Nivå {level} · {title}",
@@ -8563,16 +8570,12 @@ const sv = {
       "online": "online",
       "gameModes": "Spellägen",
       "todaysPuzzle": "Dagens pussel",
+      "wheelWord": "ORDHJUL",
       "puzzleNo": "Pussel #{n}",
       "resetsIn": "återställs om {time}",
       "dayStreak": "{n} dagar i rad",
-      "gamesToday": "Spel idag",
       "modes": "Lägen",
       "languages": "Språk",
-      "rank": "Rang",
-      "maxLevel": "MAX",
-      "xpToNext": "{xp} XP till nivå {level}",
-      "bestScore": "Bästa poäng",
       "tier": {
         "common": "Nybörjarliga",
         "uncommon": "Bronsliga",
@@ -8591,16 +8594,7 @@ const sv = {
       "vaultSubtitle": "Samla mynt, lås upp belöningar"
     },
     "playingNow": "spelar",
-    "welcomeTitle": "Ord. Vänner. Seger.",
-    "welcomeSubtitle": "Gratis. Ingen registrering. Inget pay-to-win.",
-    "classroomHeroTitle": "Ordspel för din klass",
-    "classroomHeroSubtitle": "Inga elevkonton. Dela en kod på 6 tecken. Hela klassen spelar gratis.",
-    "forTeachers": "För lärare",
-    "playTodayChallenge": "Spela dagens utmaning",
     "moreGameModes": "Fler spellägen",
-    "moreGameModesHint": "Tryck för att utforska",
-    "calmSectionTitle": "Ta det lugnt",
-    "calmSectionSubtitle": "Avslappnade pussel i din egen takt",
     "singlePlayer": "Snabbspel",
     "singlePlayerDesc": "Hoppa in och spela direkt",
     "badgeBots": "Bottar",
@@ -8668,23 +8662,11 @@ const sv = {
     "shareTextAuth": "Gå med mig i LexiClash! Använd min referenskod: {code}",
     "shareTextGuest": "Spela LexiClash med mig. Vi får se vem som är bäst.",
     "shareNativeTitle": "Gå med i LexiClash",
-    "playNowFree": "Spela nu, gratis",
     "letsPlay": "Nu kör vi!",
     "duration": "{time} min",
     "difficultyEasy": "Lätt",
     "difficultyMedium": "Medel",
     "difficultyHard": "Svårt",
-    "gameModes": "Spellägen",
-    "languages": "Språk",
-    "activePlayers": "Aktiva spelare",
-    "todaysTopPlayers": "Toppspelare",
-    "viewFullLeaderboard": "Visa hela topplistan",
-    "readyToCompete": "Dags att tävla?",
-    "startPlaying": "Börja spela",
-    "createAvatar": "Skapa din avatar",
-    "designYourLook": "Skapa ditt eget utseende",
-    "yourRank": "Din ranking",
-    "totalScore": "Totalpoäng",
     "solvedPercent": "Bara {percent}% löste idag",
     "liveActivity": "Spelaktivitet i realtid",
     "tickerLive": "LIVE",
@@ -8715,8 +8697,6 @@ const sv = {
     "todaysTopWords": "Dagens toppord",
     "hallOfFame": "Ärepallen",
     "careerPoints": "Karriärpoäng",
-    "gamesToday": "Spel idag",
-    "freeToPlay": "Gratis att spela",
     "wordHuntMode": "Ordjakt",
     "wordHuntModeDesc": "Hitta målordet så snabbt du kan. Ett nytt pussel varje dag!",
     "communityBoards": "Communitybrädena",
@@ -9782,6 +9762,7 @@ const sv = {
     "onFireBadge": "{count} i rad – glödhett!",
     "closeRace": "Jämn kamp",
     "inputPlaceholder": "Skriv ett ord...",
+    "firstHint": "Tryck eller dra — varje ord har {letter}",
     "tapLetters": "Tryck eller dra bokstäver för att bygga ett ord",
     "tapToRemove": "Tryck igen på en tillagd bokstav för att ta bort",
     "doubleTapToSubmit": "Dubbeltryck på en bokstav för att skicka",
@@ -10019,7 +10000,6 @@ const sv = {
         "decline": "Avsluta rundan"
       },
       "findWordsToReveal": "Stava ord på rutorna för att avslöja dessa bokstäver",
-      "keyboardTip": "Svep på rutnätet eller skriv med tangentbordet",
       "shop": "Ledtrådsbutik",
       "revealLetter": "Avslöja bokstav",
       "revealLetterDesc": "Avslöja en slumpmässig bokstav i målordet",
@@ -10047,6 +10027,14 @@ const sv = {
       "clueUnlocked": "{name} upplåst! (-{cost} mynt)",
       "longWordBonus": "🔥 +{bonus} bonus för långt ord!",
       "scoreBreakdownTooltip": "Tryck för detaljer",
+      "stage": {
+        "prompt": "Dra över bokstäverna och bilda ett ord",
+        "praiseShort": "Snyggt!",
+        "praiseMid": "Grymt!",
+        "praiseLong": "Vilket monsterord!",
+        "boardLabel": "Bokstavsbräde",
+        "longWord": "Långt ord +{bonus}"
+      },
       "score": {
         "tier": {
           "bronze": "Brons",
@@ -10073,14 +10061,11 @@ const sv = {
     "desktop": {
       "liveRanks": "Live-ranking",
       "lootCollected": "Insamlat byte",
-      "powerUps": "Power-ups",
-      "hintsUnlocked": "Upplåsta ledtrådar",
-      "triesRemaining": "Försök kvar",
       "noWordsYet": "Hitta ord för att samla byte!",
       "beFirst": "Bli först på topplistan!"
     },
     "mobile": {
-      "words": "ord",
+      "found": "Hittade",
       "rank": "Rank"
     },
     "results": {
@@ -12101,7 +12086,6 @@ const sv = {
       "durationUnit": "sekunder",
       "roundComplete": "Rundan klar",
       "ofPerfect": "av perfekt",
-      "points": "poäng",
       "wordsFound": "{found} / {total} ord hittade",
       "targetWordFound": "🎯 Du hittade ordet: {word}",
       "targetWordMissed": "🎯 Ordet var: {word}",
@@ -12134,6 +12118,8 @@ const sv = {
       "dayStreak": "{days} dagar i rad",
       "rewardsPending": "Logga in för att börja samla mynt och XP",
       "pickNextMode": "Nästa runda",
+      "statScore": "Poäng",
+      "statWords": "Ord",
       "noWords": "Inga ord den här gången – nästa bräde är 60 sekunder bort.",
       "rankProgress": "{points} / {next} till {rank}",
       "rankMax": "Högsta rangen nådd",
@@ -20371,6 +20357,40 @@ const sv = {
     }
   },
   // @eg2Help:end
+  // @gameShell:start
+  "gameShell": {
+    "words": "Dina ord",
+    "wordsEmptyTitle": "Här hamnar dina ord",
+    "wordsEmptyBody": "Dra över bokstäverna eller skriv bara. Varje ord läggs här, nyaste överst.",
+    "pts": "p",
+    "best": "Längsta",
+    "rivals": "Rivaler",
+    "leading": "Du leder",
+    "behind": "{points} bakom {name}",
+    "raceOpen": "Första ordet tar ledningen",
+    "round": "Den här rundan",
+    "score": "Poäng",
+    "found": "Hittade",
+    "time": "Tid kvar",
+    "combo": "Kombo",
+    "life": "Liv",
+    "tries": "Försök kvar",
+    "clues": "Ledtrådar",
+    "streak": "Svit",
+    "multiplier": "Multiplikator",
+    "topWord": "Bästa ordet",
+    "byLength": "Efter längd",
+    "target": "Mål",
+    "you": "Du",
+    "keys": {
+      "title": "Spela med tangentbordet",
+      "type": "Skriv ordet",
+      "letters": "A–Ö",
+      "submit": "Skicka",
+      "clear": "Börja om"
+    }
+  },
+  // @gameShell:end
   // @hqCalm:start
   "hqCalm": {
     "playWithoutClass": "Eller spela utan klass",

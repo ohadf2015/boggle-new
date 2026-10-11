@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import type { Language } from '@/types';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { generateProgressiveHints, generateFallbackHints, CLUE_SHOP_ITEMS, type HintLevel, type ClueShopItem } from '@/utils/aiHintGenerator';
-import type { FeedbackType } from '../WordFeedbackToast';
+import type { FeedbackType } from './types';
 
 
 export interface UseSurvivalHintsProps {

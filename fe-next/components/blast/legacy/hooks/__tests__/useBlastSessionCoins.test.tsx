@@ -84,6 +84,17 @@ describe('useBlastSessionCoins', () => {
     expect(result.current.walletCoins).toBe(7);
   });
 
+  it('a 5+ letter word is a big earn: more coins and the big payoff', () => {
+    addBoard();
+    const { result } = renderHook(() => useBlastSessionCoins({ isMultiplayer: false, gridSize: 6 }));
+    const five = [0, 1, 2, 3, 4].map((col) => ({ row: 0, col }));
+    act(() => result.current.launchCoins(five, 7));
+    act(() => result.current.launchCoins(five.slice(0, 3), 2));
+    expect(events[0].detail).toMatchObject({ big: true, coins: 12 });
+    expect(events[1].detail.big).toBeUndefined();
+    expect(events[1].detail.coins).toBeLessThan(12);
+  });
+
   it('does nothing in multiplayer', () => {
     addBoard();
     const { result } = renderHook(() => useBlastSessionCoins({ isMultiplayer: true, gridSize: 3 }));

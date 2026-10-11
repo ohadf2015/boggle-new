@@ -63,6 +63,14 @@ html.lexi-native [data-selectable] {
 @custom-variant phone-short (@media (max-width: 639px) and (max-height: 600px));
 /* TV / party screen (MP shell): every size token scales by 1.5 via --mp-u. */
 @custom-variant tv (@media (min-width: 1800px) and (min-height: 1000px));
+/* The desktop game shell (components/game/shell/gameShell.module.css). */
+@custom-variant shell (@media (min-width: 1024px) and (min-height: 600px));
+/* Inside the shell the keys card in the rail already teaches typing. */
+@media (min-width: 1024px) and (min-height: 600px) {
+  body:has([data-game-shell]) [data-keyboard-speed-tip] {
+    display: none;
+  }
+}
 
 @utility text-balance {
   text-wrap: balance;
@@ -933,15 +941,13 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
 @utility game-board-frame {
   /* Game Board Frame (Neo-Brutalist design with hard shadows) */
   position: relative;
-  background: var(--neo-cream);
-  /* Neo-Brutalist: thick black border */
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgb(255 255 255 / 0.08), transparent 62%),
+    #20234a;
   border: 4px solid rgb(var(--neo-black));
-  /* Neo-Brutalist: hard shadow (NO blur) */
   box-shadow: 6px 6px 0px rgb(var(--neo-black));
   border-radius: var(--radius-lg);
-  /* No rotation - keep grid perfectly straight */
-  /* Padding for breathing room around the grid */
-  padding: 12px;
+  padding: 6px;
   /* Simplified sizing using vmin to prevent layout shift on orientation change */
   /* Max height leaves room for timer, stats, and word forming area above grid */
   /* CRITICAL: Use single CSS variable for BOTH width AND height to guarantee square grid */
@@ -3893,6 +3899,41 @@ html.has-cookie-consent {
   }
 }
 
+/* WordCraft desktop: the board owns a height-sized square, the chrome stacks
+   in a side column beside it (same source-order grid as landscape phones). */
+@media (min-width: 1024px) and (min-height: 600px) {
+  [data-wc-main] {
+    display: grid;
+    grid-template-columns: min(calc(100svh - 2.5rem), calc(100vw - 40rem)) minmax(30rem, 34rem);
+    grid-auto-rows: min-content;
+    align-content: center;
+    justify-content: center;
+    column-gap: clamp(1rem, 2vw, 2.5rem);
+    row-gap: 0.625rem;
+    max-width: none;
+    padding: 1.25rem clamp(1rem, 2vw, 2.5rem);
+  }
+  [data-wc-main] > * {
+    grid-column: 2;
+  }
+  [data-wc-main] > [data-wc-board-zone] {
+    grid-column: 1;
+    grid-row: 1 / span 20;
+    align-self: center;
+    width: min(calc(100svh - 2.5rem), calc(100vw - 40rem));
+    height: min(calc(100svh - 2.5rem), calc(100vw - 40rem));
+    flex: none;
+  }
+  [data-wc-board-square] {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  [data-wc-page] > header,
+  [data-wc-page] > .h-header {
+    display: none !important;
+  }
+}
+
 /* Utility for any page that needs to clear the bottom-fixed stack
    (nav + banner). Reactive: updates automatically as either layer resizes. */
 .pb-bottom-stack {
@@ -4005,7 +4046,8 @@ html.has-cookie-consent {
    crossword it sat on top of the bottom-left keyboard key, eating real taps. Every
    full-screen game locks the body, so hide it there for all modes at once. It stays
    available everywhere else in the app. */
-body.screen-fit-locked #fdw-root {
+body.screen-fit-locked #fdw-root,
+body.quick-results-open #fdw-root {
   display: none;
 }
 
@@ -5220,32 +5262,6 @@ html[data-cosy='true'] .animate-neo-press {
   .mp-coach-trace-rtl { right: auto; }
 }
 
-/* ===== Homepage mode cubes — scroll-driven reveal (landing-modes-cubes-v1) =====
-   Cubes are fully visible by default (no JS/intersection gate → never ships blank
-   on headless renderers or with JS disabled). Where the browser supports
-   scroll-driven timelines AND the user allows motion, each cube rises + fades as
-   it scrolls into view. Browsers without scroll timelines get a one-shot entrance
-   on mount instead. prefers-reduced-motion disables all of it. */
-@keyframes cube-rise {
-  from { opacity: 0; transform: translateY(26px) scale(0.96); }
-  to   { opacity: 1; transform: translateY(0)    scale(1); }
-}
-.cube-reveal { opacity: 1; transform: none; }
-/* Touch screens get still tiles: the scroll-linked rise stepped on Android WebView and read as tiles jumping. */
-@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
-  @supports (animation-timeline: view()) {
-    .cube-reveal {
-      animation: cube-rise linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 20%;
-      animation-delay: 0s !important; /* scroll timeline drives progress, not time */
-    }
-  }
-  @supports not (animation-timeline: view()) {
-    .cube-reveal { animation: cube-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
-  }
-}
-
 /* Idle hero sheen — a slow diagonal light sweep over the anchor cube's art so
    the grid has ambient party energy on TV/party screens where there's no hover.
    Decorative only; hidden entirely when the user prefers reduced motion. */
@@ -5274,54 +5290,6 @@ html[data-cosy='true'] .animate-neo-press {
   background: radial-gradient(120% 90% at 50% 16%, var(--cube-glow, transparent), transparent 62%);
   mix-blend-mode: screen;
   opacity: 0.5;
-}
-
-/* 3D hover lift for the homepage mode cubes + daily banner.
-   CRITICAL: `.cube-reveal` runs the `cube-rise` entrance animation with
-   `fill: both`, which OWNS the `transform` property — a filling animation
-   overrides plain `:hover { transform }`, so any transform-based hover on the
-   same element is silently dead. We therefore drive the lift with the
-   INDIVIDUAL transform properties (`translate`/`scale`/`rotate`), which compose
-   with — rather than get clobbered by — the transform-based entrance animation.
-   `perspective` lives on the parent `.cube-deck` so `rotate: x …` reads as real
-   depth (the individual `rotate` property carries no perspective of its own).
-   All motion-gated: reduced-motion users get a flat, still grid (the coloured
-   hover shadow still applies via Tailwind, so hover is not feedback-less). */
-@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
-  .cube-deck {
-    perspective: 1400px;
-    perspective-origin: center 40%;
-  }
-  .cube-tilt {
-    transition:
-      translate 0.18s ease,
-      scale 0.18s ease,
-      rotate 0.18s ease;
-    transform-origin: center bottom;
-  }
-  .cube-tilt:hover,
-  .cube-tilt:focus-visible,
-  .cube-tilt:focus-within {
-    translate: 0 -5px;
-    scale: 1.03;
-    rotate: x 7deg;
-  }
-  .cube-tilt:active {
-    translate: 0 0;
-    scale: 0.99;
-    rotate: x 0deg;
-  }
-}
-
-/* Floating hero letter-tiles — gentle vertical bob for the energetic (cubes)
-   landing hero. translateY only (rotation lives on a static wrapper so it isn't
-   clobbered). Decorative; holds still under prefers-reduced-motion. */
-@keyframes hero-tile-float {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-7px); }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .hero-tile-float { animation: hero-tile-float 3.2s ease-in-out infinite; }
 }
 
 /* ── Hero style-mascot dances ───────────────────────────────────────────────
@@ -5563,66 +5531,6 @@ html[data-cosy='true'] .animate-neo-press {
    FUN/FEEL POLISH PASS (LexiClash core game)
    ==================================== */
 
-/* ── 1. Grid tile submit burst / ripple ── */
-@keyframes grid-tile-burst {
-  0% {
-    transform: translate(-50%, -50%) scale(0.6);
-    opacity: 0.9;
-  }
-  40% {
-    opacity: 0.7;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(2.2);
-    opacity: 0;
-  }
-}
-
-@keyframes grid-tile-burst-rejected {
-  0% {
-    transform: translate(-50%, -50%) scale(0.5);
-    opacity: 0.9;
-  }
-  30% {
-    transform: translate(-50%, -50%) scale(1.1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.05);
-    opacity: 0.6;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1.8);
-    opacity: 0;
-  }
-}
-
-.grid-submit-burst {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 6px;
-  pointer-events: none;
-  z-index: 20;
-  animation: grid-tile-burst 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-.grid-submit-burst--accepted {
-  background: radial-gradient(circle, rgba(191, 255, 0, 0.55) 0%, rgba(255, 225, 53, 0.25) 45%, transparent 70%);
-  box-shadow: 0 0 0 2px rgba(191, 255, 0, 0.45), 0 0 18px rgba(191, 255, 0, 0.4);
-}
-
-.grid-submit-burst--rejected {
-  background: radial-gradient(circle, rgba(255, 80, 80, 0.55) 0%, rgba(255, 50, 50, 0.22) 45%, transparent 70%);
-  box-shadow: 0 0 0 2px rgba(255, 80, 80, 0.4), 0 0 18px rgba(255, 80, 80, 0.35);
-  animation-name: grid-tile-burst-rejected;
-}
-
-.grid-submit-burst--duplicate {
-  background: radial-gradient(circle, rgba(255, 105, 180, 0.5) 0%, rgba(255, 20, 147, 0.2) 45%, transparent 70%);
-  box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.35), 0 0 18px rgba(255, 105, 180, 0.3);
-}
-
 /* ── 2. Snappier touch tile press ── */
 @keyframes grid-tile-touch-pop {
   0% {
@@ -5691,14 +5599,10 @@ html[data-cosy='true'] .animate-neo-press {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .grid-submit-burst,
   .grid-cell-touch-pop:active,
   .streak-flame,
   .streak-ember {
     animation: none !important;
-  }
-  .grid-submit-burst {
-    opacity: 0;
   }
 }
 

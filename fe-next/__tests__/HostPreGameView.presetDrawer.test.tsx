@@ -40,7 +40,6 @@ vi.mock('framer-motion', () => {
   };
 });
 
-vi.mock('@/components/lobby/LobbyRewardCluster', () => ({ LobbyRewardCluster: () => null }));
 
 vi.mock('../utils/SocketContext', () => ({
   useSocket: () => ({ socket: null }),

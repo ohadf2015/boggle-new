@@ -330,6 +330,10 @@ module.exports = {
           "0%, 100%": { transform: "translateY(0px) rotate(-1deg)" },
           "50%": { transform: "translateY(-5px) rotate(1deg)" },
         },
+        "streak-flicker": {
+          "0%, 100%": { transform: "scale(1) rotate(-3deg)" },
+          "50%": { transform: "scale(1.12) rotate(3deg)" },
+        },
         // Score pop animation
         "score-pop": {
           "0%": { transform: "scale(1)" },
@@ -645,6 +649,7 @@ module.exports = {
         "neo-press-bounce": "neo-press-bounce 0.25s ease-out",
         "float": "float 3s ease-in-out infinite",
         "bob": "bob 2.5s ease-in-out infinite",
+        "streak-flicker": "streak-flicker 1.6s ease-in-out infinite",
         "score-pop": "score-pop 0.3s ease-out",
         "shimmer": "shimmer 2s linear infinite",
         "screen-shake": "screen-shake 0.4s ease-in-out",

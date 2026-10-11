@@ -3560,7 +3560,8 @@ const ja = {
     },
     "gestureTutorial": "スワイプで文字をつなげて単語を作ろう",
     "grid": {
-      "cellLabel": "{{row}}行{{col}}列：文字{{letter}}"
+      "cellLabel": "{{row}}行{{col}}列：文字{{letter}}",
+      "label": "文字盤"
     }
   },
   "leadChange": {
@@ -8058,7 +8059,6 @@ const ja = {
     "noPastSeasons": "過去のシーズンはまだありません",
     "rankedAt": "{{position}}位",
     "tierLabel": "ティア",
-    "viewLeaderboard": "ランキング",
     "tagline": {
       "1": "一語ずつ、伝説を刻め",
       "2": "王冠は受け継ぐものじゃない、勝ち取るものだ",
@@ -8227,6 +8227,9 @@ const ja = {
     "alternativesTitle": "2026年おすすめボグル代替ゲーム"
   },
   "landing": {
+    "launch": {
+      "go": "いくぞ！"
+    },
     "home": {
       "greeting": "こんにちは、{name}さん",
       "levelTitle": "レベル{level}・{title}",
@@ -8246,16 +8249,12 @@ const ja = {
       "online": "オンライン",
       "gameModes": "ゲームモード",
       "todaysPuzzle": "今日のパズル",
+      "wheelWord": "ことばあそび",
       "puzzleNo": "パズル #{n}",
       "resetsIn": "{time}でリセット",
       "dayStreak": "{n}日連続",
-      "gamesToday": "本日のゲーム",
       "modes": "モード",
       "languages": "言語",
-      "rank": "ランク",
-      "maxLevel": "最大",
-      "xpToNext": "次のレベル{level}まで{xp} XP",
-      "bestScore": "ベストスコア",
       "tier": {
         "common": "ルーキーリーグ",
         "uncommon": "ブロンズリーグ",
@@ -8274,16 +8273,7 @@ const ja = {
       "vaultSubtitle": "コインを貯めて報酬を解除"
     },
     "playingNow": "プレイ中",
-    "welcomeTitle": "言葉。仲間。勝利。",
-    "welcomeSubtitle": "無料。登録不要。課金で有利になることもなし。",
-    "classroomHeroTitle": "クラスで遊べるワードゲーム",
-    "classroomHeroSubtitle": "生徒のログイン不要。6文字のコードを共有。クラス全員が無料でプレイ。",
-    "forTeachers": "教員の方へ",
-    "playTodayChallenge": "今日のチャレンジをプレイ",
     "moreGameModes": "他のゲームモード",
-    "moreGameModesHint": "タップして見る",
-    "calmSectionTitle": "じっくりプレイ",
-    "calmSectionSubtitle": "のんびり解けるパズル",
     "singlePlayer": "クイックプレイ",
     "singlePlayerDesc": "すぐにプレイ開始",
     "badgeBots": "ボット",
@@ -8351,23 +8341,11 @@ const ja = {
     "shareTextAuth": "LexiClashで一緒に遊ぼう！私の招待コードを使ってね: {code}",
     "shareTextGuest": "LexiClashで対戦しよう。どっちが強いか勝負だ。",
     "shareNativeTitle": "LexiClashに参加",
-    "playNowFree": "今すぐ無料でプレイ",
     "letsPlay": "さあ、遊ぼう！",
     "duration": "{time}分",
     "difficultyEasy": "かんたん",
     "difficultyMedium": "ふつう",
     "difficultyHard": "むずかしい",
-    "gameModes": "ゲームモード",
-    "languages": "言語",
-    "activePlayers": "アクティブプレイヤー",
-    "todaysTopPlayers": "トッププレイヤー",
-    "viewFullLeaderboard": "全ランキングを見る",
-    "readyToCompete": "腕試ししよう",
-    "startPlaying": "プレイ開始",
-    "createAvatar": "アバターを作成",
-    "designYourLook": "ユニークな外見をデザイン",
-    "yourRank": "あなたのランク",
-    "totalScore": "合計スコア",
     "solvedPercent": "今日クリアできたのは{percent}%だけ",
     "liveActivity": "ライブゲームアクティビティ",
     "tickerLive": "ライブ",
@@ -8398,8 +8376,6 @@ const ja = {
     "todaysTopWords": "今日のトップワード",
     "hallOfFame": "殿堂入り",
     "careerPoints": "キャリアポイント",
-    "gamesToday": "今日のゲーム数",
-    "freeToPlay": "無料プレイ",
     "wordHuntMode": "ワードハント",
     "wordHuntModeDesc": "ターゲットワードをできるだけ早く見つけよう。毎日新しいパズル",
     "communityBoards": "コミュニティボード",
@@ -9516,6 +9492,7 @@ const ja = {
     "onFireBadge": "{count}連続、絶好調！",
     "closeRace": "接戦中",
     "inputPlaceholder": "単語を入力...",
+    "firstHint": "タップかなぞる。どの単語にも {letter}",
     "tapLetters": "文字をタップまたはドラッグして単語を作ろう",
     "tapToRemove": "追加した文字をもう一度タップで削除",
     "doubleTapToSubmit": "文字をダブルタップで送信",
@@ -9753,7 +9730,6 @@ const ja = {
         "decline": "ランを終了"
       },
       "findWordsToReveal": "グリッドで単語を作って、この文字を表示しよう",
-      "keyboardTip": "グリッドをスワイプするかキーボードで入力",
       "shop": "ヒントショップ",
       "revealLetter": "文字を表示",
       "revealLetterDesc": "目標単語のランダムな文字を表示",
@@ -9781,6 +9757,14 @@ const ja = {
       "clueUnlocked": "{name}解放！（-{cost}コイン）",
       "longWordBonus": "🔥 +{bonus} 長い単語ボーナス！",
       "scoreBreakdownTooltip": "詳細はタップ",
+      "stage": {
+        "prompt": "文字をなぞって単語を作ろう",
+        "praiseShort": "いいね！",
+        "praiseMid": "うまい！",
+        "praiseLong": "超ロング！",
+        "boardLabel": "文字ボード",
+        "longWord": "ロング +{bonus}"
+      },
       "score": {
         "tier": {
           "bronze": "ブロンズ",
@@ -9807,14 +9791,11 @@ const ja = {
     "desktop": {
       "liveRanks": "ライブランキング",
       "lootCollected": "獲得した戦利品",
-      "powerUps": "パワーアップ",
-      "hintsUnlocked": "解放されたヒント",
-      "triesRemaining": "残りの試行回数",
       "noWordsYet": "単語を見つけて戦利品を集めよう！",
       "beFirst": "最初のランカーになろう!"
     },
     "mobile": {
-      "words": "単語",
+      "found": "見つけた",
       "rank": "ランク"
     },
     "results": {
@@ -10955,7 +10936,6 @@ const ja = {
       "durationUnit": "秒",
       "roundComplete": "ラウンド終了",
       "ofPerfect": "パーフェクト比",
-      "points": "点",
       "wordsFound": "{found} / {total} 語発見",
       "targetWordFound": "🎯 単語を発見: {word}",
       "targetWordMissed": "🎯 単語は「{word}」でした",
@@ -10988,6 +10968,8 @@ const ja = {
       "dayStreak": "{days}日連続",
       "rewardsPending": "サインインしてコインとXPを貯めよう",
       "pickNextMode": "次のラウンド",
+      "statScore": "スコア",
+      "statWords": "単語",
       "noWords": "今回は単語なし。次のボードは60秒後。",
       "rankProgress": "{points} / {next}（{rank}まで）",
       "rankMax": "最高ランク到達",
@@ -19071,6 +19053,10 @@ const ja = {
       "finale": "フィナーレ",
       "explainer": "下の3つの問題を解くと、頂上の言葉が明らかになる。",
       "finalePrompt": "3つ全てとつながる言葉は？",
+      "railMap": "ピラミッド",
+      "railSolved": "ブリッジ",
+      "railEmptyTitle": "解いたブリッジがここに積まれる",
+      "railEmptyBody": "答えを当てるたび、頂上の言葉へ光の道がつながります。",
       "cluesLabel": "各橋とつながる言葉を見つけよう:",
       "won": "ピラミッド完成！",
       "lost": "ピラミッドが崩れた。",
@@ -20371,6 +20357,40 @@ const ja = {
     }
   },
   // @eg2Help:end
+  // @gameShell:start
+  "gameShell": {
+    "words": "見つけた単語",
+    "wordsEmptyTitle": "見つけた単語がここに並びます",
+    "wordsEmptyBody": "文字をなぞるか、そのまま入力。新しい単語ほど上に積み上がります。",
+    "pts": "点",
+    "best": "最長",
+    "rivals": "ライバル",
+    "leading": "あなたがトップ！",
+    "behind": "{name}まであと{points}点",
+    "raceOpen": "最初の一語でトップに立とう",
+    "round": "このラウンド",
+    "score": "スコア",
+    "found": "発見数",
+    "time": "残り時間",
+    "combo": "コンボ",
+    "life": "ライフ",
+    "tries": "残りチャンス",
+    "clues": "ヒント",
+    "streak": "連続",
+    "multiplier": "倍率",
+    "topWord": "最高の単語",
+    "byLength": "文字数別",
+    "target": "目標",
+    "you": "あなた",
+    "keys": {
+      "title": "キーボードでも遊べる",
+      "type": "単語を入力",
+      "letters": "A–Z",
+      "submit": "決定",
+      "clear": "やり直し"
+    }
+  },
+  // @gameShell:end
   // @hqCalm:start
   "hqCalm": {
     "playWithoutClass": "クラスなしでゲームをする",

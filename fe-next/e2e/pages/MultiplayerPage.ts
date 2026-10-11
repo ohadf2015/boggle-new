@@ -1,5 +1,5 @@
 import { type Page, type Locator, expect } from '@playwright/test';
-import { submitRealWord } from '../helpers/grid-solver';
+import { readGrid, toGridArray, solveGrid, findWordPath, dragSubmitWord } from '../helpers/grid-solver';
 
 /**
  * Page Object for the multiplayer flow.
@@ -53,7 +53,7 @@ export class MultiplayerPage {
 
     // Room List
     this.roomListView = page.locator('[data-testid="room-list-view"]');
-    this.createRoomButton = page.getByRole('button', { name: /create.*room|צור.*חדר/i });
+    this.createRoomButton = page.getByRole('button', { name: /create.*room|צר.*חדר/i });
     this.refreshButton = page.getByRole('button', { name: /refresh|רענן/i });
 
     // Create Room Modal
@@ -63,7 +63,7 @@ export class MultiplayerPage {
       'input[placeholder*="name"], input[placeholder*="username"], input[name="hostUsername"]'
     );
     this.languageSelector = page.locator('[data-testid="language-selector"], select[name="language"]');
-    this.confirmCreateButton = page.getByRole('button', { name: /create|צור|start/i }).last();
+    this.confirmCreateButton = page.getByRole('dialog').getByRole('button', { name: /create|צור|start|יאללה/i }).last();
 
     // Join Room Modal
     this.joinRoomModal = page.locator('[data-testid="join-room-modal"]');
@@ -77,7 +77,7 @@ export class MultiplayerPage {
     this.nameSaveButton = page.locator('[data-testid="name-save-button"]');
     this.editAvatarButton = page.locator('[data-testid="edit-avatar-button"]');
     this.desktopChatArea = page.locator('[data-testid="desktop-chat-area"]');
-    this.startGameButton = page.getByRole('button', { name: /start.*game|התחל.*משחק/i });
+    this.startGameButton = page.getByRole('button', { name: /start.*(game|battle)|התחל.*משחק|התחילו קרב|יאללה לקרב/i });
     this.inviteLink = page.locator('[class*="invite"], [data-testid*="invite"]');
     this.playerRoster = page.locator('[class*="roster"], [class*="player-list"]');
 
@@ -87,7 +87,8 @@ export class MultiplayerPage {
     // looser class/testid probe as a fallback for older/alternate layouts.
     this.gameGrid = page
       .locator('[role="grid"]')
-      .or(page.locator('[class*="grid-container"], [data-testid*="grid"]'));
+      .or(page.locator('[class*="grid-container"], [data-testid*="grid"]'))
+      .first();
     this.wordInput = page.locator('input[type="text"][placeholder*="word"], [class*="word-input"]');
     this.submitWordButton = page.getByRole('button', { name: /submit|שלח/i });
     this.leaderboard = page.locator('[class*="leaderboard"]');
@@ -126,6 +127,54 @@ export class MultiplayerPage {
     await this.confirmCreateButton.click();
   }
 
+  /** The entry screen is usable once React has hydrated Create and the socket has enabled it */
+  async waitForEntryReady() {
+    const hydrated = () =>
+      this.createRoomButton
+        .evaluate((el) => Object.keys(el).some((k) => k.startsWith('__reactProps')))
+        .catch(() => false);
+    await expect.poll(hydrated, { timeout: 60_000 }).toBe(true);
+    await expect(this.createRoomButton).toBeEnabled({ timeout: 60_000 });
+  }
+
+  /** Wait for the host lobby and return its room code */
+  async waitForHostLobby(): Promise<string> {
+    const codeButton = this.page.locator('button[aria-label]').filter({ hasText: /^[A-Z0-9]{4,8}$/ }).first();
+    await expect(codeButton).toBeVisible({ timeout: 15_000 });
+    return ((await codeButton.textContent()) ?? '').trim();
+  }
+
+  /** Join a room through its ?room= invite link, naming the player if asked */
+  async joinByInvite(locale: string, gameCode: string, playerName: string) {
+    await this.page.goto(`/${locale}/multiplayer?room=${gameCode}`, { waitUntil: 'domcontentloaded' });
+    const squad = this.page.getByRole('heading', { name: /\d+\/\d+/ });
+    const sheet = this.page.getByTestId('mp-sheet-panel');
+    const joinBattle = sheet.getByRole('button', { name: /join battle|הצטרפו לקרב/i });
+    await expect(joinBattle.or(squad).first()).toBeVisible({ timeout: 30_000 });
+    if (await joinBattle.isVisible()) {
+      const nameInput = sheet.getByRole('textbox');
+      if ((await nameInput.isVisible()) && !(await nameInput.inputValue())) {
+        await nameInput.fill(playerName);
+      }
+      await joinBattle.click();
+    }
+    await expect(squad.first()).toBeVisible({ timeout: 15_000 });
+    const readyUp = this.page.getByRole('button', { name: /^(ready up|מוכנים!)$/i });
+    if (await readyUp.isVisible()) {
+      await readyUp.click();
+    }
+  }
+
+  /** Wait until the host's lobby counts this many players */
+  async waitForPlayerCount(count: number) {
+    await expect(this.page.getByRole('heading', { name: new RegExp(`\\b${count}/\\d+`) })).toBeVisible({ timeout: 15_000 });
+  }
+
+  /** Pin the round to classic so the board is a letter grid, not a random mode */
+  async selectClassicMode() {
+    await this.page.getByRole('button', { name: /^(classic|קלאסי)$/i }).first().click();
+  }
+
   /** Click on a room in the room list to join */
   async clickRoom(gameCode: string) {
     await this.page.locator(`[data-testid="room-${gameCode}"]`).click();
@@ -161,11 +210,29 @@ export class MultiplayerPage {
 
   /** The live found-words ladder row for a given word (components/multiplayer/desktop/WordsLadder.tsx) */
   wordLadderRow(word: string): Locator {
-    return this.page.locator(`[data-testid="ladder-row-${word}"]`);
+    return this.page.locator(`[data-testid="ladder-row-${word}" i]`);
   }
 
-  /** Read the current board, ask the solver for a real word, and submit it via a drag gesture */
-  async submitRealWord(baseURL: string, language = 'en'): Promise<string> {
-    return submitRealWord(this.page, baseURL, language);
+  /**
+   * Read the board, ask the solver for real words, and drag one in until the server accepts it.
+   * Board events (meteor showers, earthquakes) can swap tiles mid-drag, so a few words are tried.
+   */
+  async submitRealWord(baseURL: string, language = 'en', attempts = 4): Promise<string> {
+    const tried = new Set<string>();
+    for (let i = 0; i < attempts; i++) {
+      const cells = await readGrid(this.page);
+      const solved = await solveGrid(baseURL, toGridArray(cells), language);
+      const word = [...solved.easy, ...solved.medium, ...solved.hard].find((w) => !tried.has(w) && findWordPath(cells, w));
+      if (!word) break;
+      tried.add(word);
+      await dragSubmitWord(this.page, findWordPath(cells, word)!);
+      try {
+        await expect(this.wordLadderRow(word)).toBeVisible({ timeout: 4_000 });
+        return word;
+      } catch {
+        // rejected or the board changed under the drag; try the next word
+      }
+    }
+    throw new Error(`No solver word was accepted after trying: ${[...tried].join(', ')}`);
   }
 }

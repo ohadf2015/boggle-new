@@ -9,6 +9,7 @@ import { render, screen } from '@testing-library/react';
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import type { Mock } from 'vitest';
 
 // Mock Next.js navigation
 vi.mock('next/navigation', () => ({
@@ -118,7 +119,7 @@ global.fetch = vi.fn((url: string) => {
     ok: true,
     json: () => Promise.resolve({ available: true, data: { played: false } }),
   });
-}) as jest.Mock;
+}) as Mock;
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <AuthProvider>

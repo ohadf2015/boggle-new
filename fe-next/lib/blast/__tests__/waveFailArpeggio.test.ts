@@ -31,11 +31,11 @@ describe('waveFailArpeggio', () => {
   });
 
   it('schedules 3 oscillator nodes when AudioContext is available', () => {
-    const startSpy = jest.fn();
-    const stopSpy = jest.fn();
-    const connectSpy = jest.fn();
-    const setValueAtTimeSpy = jest.fn();
-    const exponentialRampSpy = jest.fn();
+    const startSpy = vi.fn();
+    const stopSpy = vi.fn();
+    const connectSpy = vi.fn();
+    const setValueAtTimeSpy = vi.fn();
+    const exponentialRampSpy = vi.fn();
 
     const fakeOscillator = () => ({
       type: 'sine',
@@ -55,9 +55,9 @@ describe('waveFailArpeggio', () => {
     class FakeAudioContext {
       currentTime = 0;
       destination = {};
-      createOscillator = jest.fn(fakeOscillator);
-      createGain = jest.fn(fakeGain);
-      close = jest.fn();
+      createOscillator = vi.fn(fakeOscillator);
+      createGain = vi.fn(fakeGain);
+      close = vi.fn();
     }
 
     (globalThis as unknown as { AudioContext: typeof FakeAudioContext }).AudioContext = FakeAudioContext;

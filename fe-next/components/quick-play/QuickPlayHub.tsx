@@ -17,6 +17,7 @@ import type { CollectedWord } from './QuickWordsCollected';
 import { recordGuestRound, quickCoinsFor, quickXpFor, recentAveragePct } from '@/lib/quickPlay/guestProgress';
 import { getQuickPlayWordProgress } from '@/lib/quickPlay/wordCollection';
 import { updateGuestStatsAfterGame } from '@/utils/guestManager';
+import { useQuickResultsCalmBridge } from '@/lib/quickPlay/resultsCalm';
 import { shareChallenge } from './challengeShare';
 import { quickRank } from './quickRank';
 import { BackButton } from '@/components/ui/BackButton';
@@ -74,6 +75,7 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
   const [strikeMode, setStrikeMode] = useState<QuickMode | null>(null);
   const goBack = useBackOneLevel(backHref);
   const submitting = useRef(false);
+  const holdCalmUntilResults = useQuickResultsCalmBridge(phase === 'results');
   const loadingRef = useRef(false);
   const wheelHeadingRef = useRef<HTMLHeadingElement>(null);
   // Track current phase for handleNextRound to guard against stale adapter onQuit calls.
@@ -202,6 +204,7 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
     async (r: QuickRoundResult) => {
       if (submitting.current) return;
       submitting.current = true;
+      holdCalmUntilResults();
       setResult(r);
       try {
         // Local first: the day streak has no server home, and a signed-out
@@ -321,7 +324,7 @@ export function QuickPlayHub({ challengeId, backHref }: QuickPlayHubProps) {
         setPhase('results');
       }
     },
-    [challenge, language, roundIndex, user?.id]
+    [challenge, holdCalmUntilResults, language, roundIndex, user?.id]
   );
 
   /**

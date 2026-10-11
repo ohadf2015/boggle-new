@@ -12,7 +12,7 @@
  *   - an ordinary word → no banner.
  */
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/utils/growthTracking', () => ({
@@ -80,6 +80,7 @@ const puzzle: WordWheelPuzzle = {
 };
 
 beforeEach(() => {
+  global.requestAnimationFrame = ((cb: FrameRequestCallback) => setTimeout(() => cb(0), 16) as unknown as number) as typeof requestAnimationFrame;
   vi.clearAllMocks();
   global.fetch = vi.fn().mockResolvedValue({ ok: false }) as unknown as typeof fetch;
 });
@@ -121,7 +122,7 @@ describe('WordWheelGame coverage celebration', () => {
 
     const banner = await screen.findByTestId('wheel-celebration');
     expect(banner).toHaveAttribute('data-tier', 'all');
-    expect(legendarySpy).toHaveBeenCalled();
+    await waitFor(() => expect(legendarySpy).toHaveBeenCalled());
     expect(onEffect).toHaveBeenCalledWith(expect.objectContaining({ type: 'pangram' }));
   });
 

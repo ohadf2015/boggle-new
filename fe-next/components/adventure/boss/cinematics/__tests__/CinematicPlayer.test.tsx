@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest';
 /**
  * CinematicPlayer Component Tests
  *
@@ -117,12 +118,12 @@ describe('CinematicPlayer', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    jest.clearAllTimers();
+    vi.clearAllTimers();
     // Clear player event listeners
     Object.keys(playerEventListeners).forEach(key => {
       delete playerEventListeners[key];
     });
-    (usePrefersReducedMotion as jest.Mock).mockReturnValue(false);
+    (usePrefersReducedMotion as Mock).mockReturnValue(false);
   });
 
   // Helper to wait for loading state to complete + simulate first frame
@@ -295,7 +296,7 @@ describe('CinematicPlayer', () => {
 
   describe('reduced motion', () => {
     it('should show loading state when reduced motion is preferred', () => {
-      (usePrefersReducedMotion as jest.Mock).mockReturnValue(true);
+      (usePrefersReducedMotion as Mock).mockReturnValue(true);
 
       render(<CinematicPlayer {...defaultProps} />);
 
@@ -303,7 +304,7 @@ describe('CinematicPlayer', () => {
     });
 
     it('should not render Remotion Player when reduced motion is preferred', () => {
-      (usePrefersReducedMotion as jest.Mock).mockReturnValue(true);
+      (usePrefersReducedMotion as Mock).mockReturnValue(true);
 
       render(<CinematicPlayer {...defaultProps} />);
 
@@ -312,7 +313,7 @@ describe('CinematicPlayer', () => {
 
     it('should auto-complete after delay when reduced motion is preferred', () => {
       const onComplete = vi.fn();
-      (usePrefersReducedMotion as jest.Mock).mockReturnValue(true);
+      (usePrefersReducedMotion as Mock).mockReturnValue(true);
 
       render(<CinematicPlayer {...defaultProps} onComplete={onComplete} />);
 

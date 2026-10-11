@@ -89,10 +89,6 @@ vi.mock('@/components/auth/FirstWinSignupModal', () => ({
   default: () => null,
 }));
 
-vi.mock('@/components/results/WinStreakDisplay', () => ({
-  __esModule: true,
-  default: () => null,
-}));
 
 // Track WordFeedbackModal render count
 let wordFeedbackModalRenderCount = 0;

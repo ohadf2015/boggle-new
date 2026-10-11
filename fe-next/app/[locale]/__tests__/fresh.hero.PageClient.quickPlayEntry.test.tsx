@@ -6,9 +6,21 @@
  * while the game route loads, so a cover stays up.
  */
 import React from 'react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import HomePageClient from '@/app/[locale]/PageClient';
+import { LaunchHost } from '@/components/landing/home/LaunchHost';
+import { dropLaunch } from '@/components/landing/home/launchStore';
+
+// The curtain is drawn by the layout's LaunchHost, so it outlives the homepage.
+function renderHome() {
+  return render(
+    <>
+      <HomePageClient />
+      <LaunchHost />
+    </>,
+  );
+}
 
 vi.mock('@/components/landing', () => ({
   LandingView: ({ onStartOnboarding }: { onStartOnboarding?: () => void }) => (
@@ -52,31 +64,64 @@ describe('HomePageClient: hero PLAY enters quick play', () => {
     completeFlow = null;
     setSearch('');
   });
+  afterEach(() => {
+    act(() => dropLaunch());
+  });
 
   it('PLAY opens OnboardingFlow with entry="quickPlay"', () => {
-    render(<HomePageClient />);
+    renderHome();
     fireEvent.click(screen.getByTestId('play-cta'));
     expect(screen.getByTestId('onboarding-flow')).toHaveAttribute('data-entry', 'quickPlay');
   });
 
+  it('PLAY raises the launch curtain at once, while the quick-play chunk is still loading', () => {
+    renderHome();
+    fireEvent.click(screen.getByTestId('play-cta'));
+    const cover = screen.getByTestId('home-quickplay-cover');
+    expect(cover.querySelectorAll('[data-launch-tile]').length).toBeGreaterThan(0);
+  });
+
+  it('a ?next= bounce auto-opens the FULL flow without the curtain over its steps', () => {
+    setSearch('?next=/en/practice');
+    renderHome();
+    expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-quickplay-cover')).toBeNull();
+  });
+
   it('a ?next= bounce auto-opens the FULL flow (no quick-play entry)', () => {
     setSearch('?next=/en/practice');
-    render(<HomePageClient />);
+    renderHome();
     expect(screen.getByTestId('onboarding-flow')).toHaveAttribute('data-entry', '');
   });
 
   it('after quick play completes, a cover stays up instead of the homepage flashing back', () => {
-    render(<HomePageClient />);
+    renderHome();
     fireEvent.click(screen.getByTestId('play-cta'));
     act(() => completeFlow?.());
     expect(screen.queryByTestId('onboarding-flow')).toBeNull();
     expect(screen.getByTestId('home-quickplay-cover')).toBeInTheDocument();
   });
 
+  it('the cover stays up when the homepage unmounts for the game route', () => {
+    function Shell({ home }: { home: boolean }) {
+      return (
+        <>
+          {home && <HomePageClient />}
+          <LaunchHost />
+        </>
+      );
+    }
+    const { rerender } = render(<Shell home />);
+    fireEvent.click(screen.getByTestId('play-cta'));
+    act(() => completeFlow?.());
+    rerender(<Shell home={false} />);
+    expect(screen.getAllByTestId('home-quickplay-cover')).toHaveLength(1);
+  });
+
   it('the cover survives a slow game-route load, and clears on a bfcache restore', () => {
     vi.useFakeTimers();
     try {
-      render(<HomePageClient />);
+      renderHome();
       fireEvent.click(screen.getByTestId('play-cta'));
       act(() => completeFlow?.());
       act(() => {

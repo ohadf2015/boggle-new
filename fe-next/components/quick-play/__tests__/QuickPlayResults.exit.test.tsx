@@ -12,7 +12,7 @@ vi.mock('@/contexts/AuthContext', () => ({
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 vi.mock('@/utils/haptics/HapticsManager', () => ({ haptics: { success: vi.fn() } }));
 vi.mock('@/components/daily/RivalCompareCard', () => ({ default: () => null }));
-vi.mock('@/hooks/useReducedMotion', () => ({ __esModule: true, default: vi.fn(() => false) }));
+vi.mock('@/hooks/useReducedMotion', () => ({ __esModule: true, default: vi.fn(() => false), useReducedMotion: vi.fn(() => false) }));
 
 const result: QuickRoundResult = {
   mode: 'blast', seed: 's-1', score: 340, perfectScore: 500, scorePct: 68,

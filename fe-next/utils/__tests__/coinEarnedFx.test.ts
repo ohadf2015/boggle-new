@@ -6,6 +6,7 @@ import {
   findCoinCounter,
   markCoinsInFlight,
   msUntilCoinsLand,
+  findCoinAvoidRects,
   COIN_EARNED_EVENT,
   COIN_SPENT_EVENT,
 } from '../coinEarnedFx';
@@ -131,5 +132,35 @@ describe('emitCoinEarned coins override', () => {
     emitCoinEarned(3, { x: 1, y: 2 }, { inline: true, coins: 7 });
     window.removeEventListener(COIN_EARNED_EVENT, handler);
     expect((handler.mock.calls[0][0] as CustomEvent).detail.coins).toBe(7);
+  });
+});
+
+describe('big coin earns', () => {
+  it('carries the big-word flag so the flight can throw a bigger payoff', () => {
+    const handler = vi.fn();
+    window.addEventListener(COIN_EARNED_EVENT, handler);
+    emitCoinEarned(8, { x: 1, y: 2 }, { inline: true, coins: 12, big: true });
+    emitCoinEarned(2, { x: 1, y: 2 }, { inline: true });
+    window.removeEventListener(COIN_EARNED_EVENT, handler);
+    expect((handler.mock.calls[0][0] as CustomEvent).detail.big).toBe(true);
+    expect((handler.mock.calls[1][0] as CustomEvent).detail.big).toBeUndefined();
+  });
+});
+
+describe('findCoinAvoidRects', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('returns the on-screen areas coins must fly around, skipping hidden ones', () => {
+    const add = (rect: { left: number; top: number; width: number; height: number }) => {
+      const el = document.createElement('div');
+      el.setAttribute('data-coin-avoid', 'true');
+      el.getBoundingClientRect = () => ({ ...rect, right: rect.left + rect.width, bottom: rect.top + rect.height, x: rect.left, y: rect.top, toJSON: () => ({}) }) as DOMRect;
+      document.body.appendChild(el);
+    };
+    add({ left: 0, top: 0, width: 0, height: 0 });
+    add({ left: 60, top: 220, width: 270, height: 70 });
+    expect(findCoinAvoidRects()).toEqual([{ left: 60, top: 220, right: 330, bottom: 290 }]);
   });
 });

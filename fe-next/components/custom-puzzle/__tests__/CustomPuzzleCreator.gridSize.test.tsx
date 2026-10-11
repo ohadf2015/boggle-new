@@ -5,6 +5,7 @@ import CustomPuzzleCreator from '../CustomPuzzleCreator';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { Mock } from 'vitest';
 
 
 const createWrapper = () => {
@@ -49,12 +50,12 @@ describe('CustomPuzzleCreator - Grid Size', () => {
     vi.clearAllMocks();
     mockEfficiencyScore = 95; // Reset to default
 
-    (useLanguage as jest.Mock).mockReturnValue({
+    (useLanguage as Mock).mockReturnValue({
       t: mockT,
       language: 'en',
     });
 
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as Mock).mockReturnValue({
       user: { email: 'test@example.com' },
       profile: { display_name: 'Test User' },
     });
@@ -81,7 +82,7 @@ describe('CustomPuzzleCreator - Grid Size', () => {
         });
       }
       return Promise.reject(new Error('Unknown URL'));
-    }) as jest.Mock;
+    }) as Mock;
   });
 
   afterEach(() => {
@@ -132,7 +133,7 @@ describe('CustomPuzzleCreator - Grid Size', () => {
     });
 
     // Verify the body contains 7x7 grid size
-    const fetchCalls = (global.fetch as jest.Mock).mock.calls;
+    const fetchCalls = (global.fetch as Mock).mock.calls;
     const gridGenerationCall = fetchCalls.find(call => call[0] === '/api/grid/generate');
     expect(gridGenerationCall).toBeDefined();
 

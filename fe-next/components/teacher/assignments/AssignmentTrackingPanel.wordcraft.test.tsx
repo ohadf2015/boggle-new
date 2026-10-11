@@ -8,6 +8,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AssignmentTrackingPanel from './AssignmentTrackingPanel';
 import { useAssignments } from '@/hooks/useAssignments';
+import type { Mock } from 'vitest';
 
 vi.mock('@/hooks/useAssignments');
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -28,7 +29,7 @@ const row = (id: string, practice_focus: string | null) => ({
 
 describe('AssignmentTrackingPanel — Word Craft', () => {
   beforeEach(() => {
-    (useAssignments as jest.Mock).mockReturnValue({
+    (useAssignments as Mock).mockReturnValue({
       assignments: [row('1', 'wordcraft'), row('2', null)],
       isLoading: false,
       error: null,

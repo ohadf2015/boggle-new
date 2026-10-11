@@ -29,6 +29,7 @@ export interface SurvivalHeaderProps {
   /** Label for my own row in the standing. */
   selfUsername?: string;
   dir?: 'ltr' | 'rtl';
+  center?: React.ReactNode;
   t: (key: string) => string;
 }
 
@@ -45,6 +46,7 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
   rivals,
   selfUsername = 'You',
   dir = 'ltr',
+  center,
   t,
 }) => {
   const standing =
@@ -52,7 +54,7 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
       ? [{ username: selfUsername, score: liveScore }, ...rivals]
       : null;
   return (
-    <div className="sticky top-0 z-20 flex items-center justify-between mb-1 px-2 py-1 max-w-3xl mx-auto w-full bg-neo-navy/90 backdrop-blur-sm rounded-b-neo overflow-visible">
+    <div data-testid="survival-header" className="sticky top-0 z-20 flex items-center justify-between mb-1 ps-2 pe-12 py-1 max-w-3xl mx-auto w-full bg-neo-navy/90 backdrop-blur-sm rounded-b-neo overflow-visible">
       <div className="flex items-center gap-1.5">
         <button
           type="button"
@@ -66,6 +68,12 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
         <SurvivalAudioEffectsControls t={t} />
       </div>
 
+      {center && (
+        <div data-testid="survival-header-center" className="min-w-0 flex-1 px-4">
+          {center}
+        </div>
+      )}
+
       {standing && (
         <div data-testid="survival-rank-indicator">
           <MobileRankIndicator
@@ -78,12 +86,14 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
       )}
 
       {!practice && (
-        <AccumulatedScoreDisplay
-          currentScore={liveScore}
-          lastIncrement={lastScoreIncrement}
-          isAnimating={isScoreAnimating}
-          t={t}
-        />
+        <div className={center ? 'flex w-44 shrink-0 justify-end' : 'contents'}>
+          <AccumulatedScoreDisplay
+            currentScore={liveScore}
+            lastIncrement={lastScoreIncrement}
+            isAnimating={isScoreAnimating}
+            t={t}
+          />
+        </div>
       )}
     </div>
   );

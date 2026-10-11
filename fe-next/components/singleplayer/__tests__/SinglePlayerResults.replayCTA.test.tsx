@@ -105,9 +105,6 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 vi.mock('@/hooks/useAutoShowWithInteraction', () => ({ useAutoShowWithInteraction: vi.fn() }));
-vi.mock('@/hooks/useWordHuntPromo', () => ({
-  useWordHuntPromo: () => ({ canShow: false, recordImpression: vi.fn() }),
-}));
 vi.mock('@/hooks/useSaveCognitiveScore', () => ({
   useSaveCognitiveScore: () => ({ saveCognitiveScore: vi.fn().mockResolvedValue(null) }),
 }));

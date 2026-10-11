@@ -11,7 +11,6 @@
  * - SurvivalHeader.tsx          - Header with quit and tokens display
  * - SurvivalLifeBar.tsx         - Life bar with animations
  * - SurvivalClueBoxes.tsx       - Hint boxes with feedback overlay
- * - SurvivalGridSection.tsx     - Grid wrapper with protection
  * - SurvivalLandscapeLayout.tsx - Landscape mode layout
  *
  * Note: Shop has been removed - clues now auto-unlock as tokens are earned
@@ -63,8 +62,6 @@ export type { SurvivalClueBoxesProps } from './SurvivalClueBoxes';
 
 // SurvivalClueShop removed - clues now auto-unlock as tokens are earned
 
-export { SurvivalGridSection } from './SurvivalGridSection';
-export type { SurvivalGridSectionProps } from './SurvivalGridSection';
 
 export { AccumulatedScoreDisplay } from './AccumulatedScoreDisplay';
 export type { AccumulatedScoreDisplayProps } from './AccumulatedScoreDisplay';
@@ -75,14 +72,6 @@ export type { AutoClueNotificationProps } from './AutoClueNotification';
 export { useLiveScoreTracker } from './useLiveScoreTracker';
 export type { LiveScoreState, LiveScoreActions, UseLiveScoreTrackerProps } from './useLiveScoreTracker';
 
-export { SurvivalDesktopLayout } from './SurvivalDesktopLayout';
-export type { SurvivalDesktopLayoutProps } from './SurvivalDesktopLayout';
-
 export { SurvivalLiveRanks } from './SurvivalLiveRanks';
 export type { SurvivalLiveRanksProps } from './SurvivalLiveRanks';
 
-export { SurvivalLootPanel } from './SurvivalLootPanel';
-export type { SurvivalLootPanelProps } from './SurvivalLootPanel';
-
-export { SurvivalMobileInfoBar } from './SurvivalMobileInfoBar';
-export type { SurvivalMobileInfoBarProps } from './SurvivalMobileInfoBar';

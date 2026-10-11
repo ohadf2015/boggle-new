@@ -47,7 +47,7 @@ const STAGE_HUNT = `${STAGE_BASE} overflow-hidden`;
  * can scroll the found-words list.
  */
 const STAGE_WHEEL =
-  `${STAGE_BASE} justify-start overflow-y-auto overscroll-contain pt-3 sm:pt-4 pb-bottom-stack`;
+  `${STAGE_BASE} justify-start overflow-y-auto overscroll-contain pt-3 sm:pt-4 pb-bottom-stack shell:overflow-hidden shell:p-0`;
 
 interface QuickModeAdapterProps {
   config: QuickRoundConfig;

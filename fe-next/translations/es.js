@@ -3560,7 +3560,8 @@ const es = {
     },
     "gestureTutorial": "Desliza sobre las letras para formar palabras",
     "grid": {
-      "cellLabel": "Fila {{row}}, columna {{col}}: letra {{letter}}"
+      "cellLabel": "Fila {{row}}, columna {{col}}: letra {{letter}}",
+      "label": "Tablero de letras"
     }
   },
   "roundEvent": {
@@ -8041,7 +8042,6 @@ const es = {
     "noPastSeasons": "Aún no hay temporadas pasadas",
     "rankedAt": "Puesto #{{position}}",
     "tierLabel": "Nivel",
-    "viewLeaderboard": "Clasificación",
     "tagline": {
       "1": "Forja tu leyenda, palabra a palabra",
       "2": "Las coronas se ganan, no se heredan",
@@ -8210,6 +8210,9 @@ const es = {
     "alternativesTitle": "Mejores alternativas a Boggle 2026"
   },
   "landing": {
+    "launch": {
+      "go": "¡VAMOS!"
+    },
     "home": {
       "greeting": "Hola, {name}",
       "levelTitle": "Nivel {level} · {title}",
@@ -8229,16 +8232,12 @@ const es = {
       "online": "en línea",
       "gameModes": "Modos de juego",
       "todaysPuzzle": "Reto de hoy",
+      "wheelWord": "PALABRA",
       "puzzleNo": "Puzle #{n}",
       "resetsIn": "se reinicia en {time}",
       "dayStreak": "racha de {n} días",
-      "gamesToday": "Partidas hoy",
       "modes": "Modos",
       "languages": "Idiomas",
-      "rank": "Rango",
-      "maxLevel": "MÁX",
-      "xpToNext": "{xp} XP para nivel {level}",
-      "bestScore": "Mejor puntuación",
       "tier": {
         "common": "Liga Novato",
         "uncommon": "Liga Bronce",
@@ -8257,16 +8256,7 @@ const es = {
       "vaultSubtitle": "Acumula monedas, desbloquea recompensas"
     },
     "playingNow": "jugando",
-    "welcomeTitle": "Palabras. Amigos. Victoria.",
-    "welcomeSubtitle": "Gratis. Sin registro. Sin pagar para ganar.",
-    "classroomHeroTitle": "Juegos de palabras para tu clase",
-    "classroomHeroSubtitle": "Sin cuentas de alumnos. Comparte un código de 6 caracteres. Toda la clase juega gratis.",
-    "forTeachers": "Para docentes",
-    "playTodayChallenge": "Jugar el desafío de hoy",
     "moreGameModes": "Más modos de juego",
-    "moreGameModesHint": "Toca para explorar",
-    "calmSectionTitle": "Tómate tu tiempo",
-    "calmSectionSubtitle": "Puzzles relajados a tu ritmo",
     "singlePlayer": "Juego rápido",
     "singlePlayerDesc": "Entra y juega al instante",
     "badgeBots": "Bots",
@@ -8334,23 +8324,11 @@ const es = {
     "shareTextAuth": "¡Únete a LexiClash! Usa mi código de referido: {code}",
     "shareTextGuest": "Juguemos LexiClash juntos: a ver quién gana.",
     "shareNativeTitle": "Únete a LexiClash",
-    "playNowFree": "Juega ahora, gratis",
     "letsPlay": "¡A jugar!",
     "duration": "{time} min",
     "difficultyEasy": "Fácil",
     "difficultyMedium": "Medio",
     "difficultyHard": "Difícil",
-    "gameModes": "Modos de juego",
-    "languages": "Idiomas",
-    "activePlayers": "Jugadores activos",
-    "todaysTopPlayers": "Mejores jugadores",
-    "viewFullLeaderboard": "Ver clasificación completa",
-    "readyToCompete": "¿Te animas a competir?",
-    "startPlaying": "Empezar a jugar",
-    "createAvatar": "Crea tu avatar",
-    "designYourLook": "Diseña tu look único",
-    "yourRank": "Tu ranking",
-    "totalScore": "Puntuación total",
     "solvedPercent": "Solo el {percent}% lo resolvió hoy",
     "liveActivity": "Actividad en vivo",
     "tickerLive": "EN VIVO",
@@ -8381,8 +8359,6 @@ const es = {
     "todaysTopWords": "Palabras top de hoy",
     "hallOfFame": "Salón de la Fama",
     "careerPoints": "Puntos de carrera",
-    "gamesToday": "Partidas hoy",
-    "freeToPlay": "Gratis para jugar",
     "wordHuntMode": "Caza de Palabras",
     "wordHuntModeDesc": "Encuentra la palabra objetivo lo más rápido que puedas. Un reto nuevo cada día.",
     "communityBoards": "Tableros de la comunidad",
@@ -9477,6 +9453,7 @@ const es = {
     "onFireBadge": "¡{count} seguidas, en racha!",
     "closeRace": "Carrera reñida",
     "inputPlaceholder": "Escribe una palabra...",
+    "firstHint": "Toca o desliza: todas llevan la {letter}",
     "tapLetters": "Toca o arrastra letras para formar una palabra",
     "tapToRemove": "Toca otra vez una letra añadida para quitarla",
     "doubleTapToSubmit": "Toca dos veces una letra para enviar",
@@ -9628,7 +9605,6 @@ const es = {
         "decline": "Terminar partida"
       },
       "findWordsToReveal": "Deletrea palabras en la cuadrícula para revelar estas letras",
-      "keyboardTip": "Desliza en la cuadrícula o escribe con el teclado",
       "shop": "Tienda de Pistas",
       "revealLetter": "Revelar Letra",
       "revealLetterDesc": "Revelar una letra aleatoria de la palabra objetivo",
@@ -9656,6 +9632,14 @@ const es = {
       "clueUnlocked": "¡{name} desbloqueada! (-{cost} monedas)",
       "longWordBonus": "🔥 +{bonus} bonus por palabra larga",
       "scoreBreakdownTooltip": "Toca para detalles",
+      "stage": {
+        "prompt": "Desliza por las letras y forma una palabra",
+        "praiseShort": "¡Bien!",
+        "praiseMid": "¡Genial!",
+        "praiseLong": "¡Qué palabra!",
+        "boardLabel": "Tablero de letras",
+        "longWord": "Palabra larga +{bonus}"
+      },
       "score": {
         "tier": {
           "bronze": "Bronce",
@@ -9682,14 +9666,11 @@ const es = {
     "desktop": {
       "liveRanks": "Clasificación en Vivo",
       "lootCollected": "Botín Recolectado",
-      "powerUps": "Mejoras",
-      "hintsUnlocked": "Pistas Desbloqueadas",
-      "triesRemaining": "Intentos Restantes",
       "noWordsYet": "Encuentra palabras para recolectar botín",
       "beFirst": "Sé el primero en el ranking"
     },
     "mobile": {
-      "words": "palabras",
+      "found": "Encontradas",
       "rank": "Rango"
     },
     "results": {
@@ -11790,7 +11771,6 @@ const es = {
       },
       "roundComplete": "Ronda completada",
       "ofPerfect": "del perfecto",
-      "points": "pts",
       "wordsFound": "{found} / {total} palabras",
       "targetWordFound": "🎯 Encontraste la palabra: {word}",
       "targetWordMissed": "🎯 La palabra era: {word}",
@@ -11820,6 +11800,8 @@ const es = {
       "dayStreak": "{days} días seguidos",
       "rewardsPending": "Inicia sesión para empezar a acumular monedas y XP",
       "pickNextMode": "Siguiente ronda",
+      "statScore": "Puntos",
+      "statWords": "Palabras",
       "noWords": "Sin palabras esta vez: el próximo tablero está a 60 segundos.",
       "rankProgress": "{points} / {next} para {rank}",
       "rankMax": "Rango máximo alcanzado",
@@ -19114,6 +19096,10 @@ const es = {
       "finale": "Final",
       "explainer": "Resuelve los 3 acertijos de abajo: sus respuestas desbloquean la palabra de arriba.",
       "finalePrompt": "¿Qué palabra conecta las tres?",
+      "railMap": "La pirámide",
+      "railSolved": "Puentes",
+      "railEmptyTitle": "Aquí suben los puentes que resuelvas",
+      "railEmptyBody": "Cada respuesta enciende un rayo hacia la palabra de la cima.",
       "cluesLabel": "Encuentra la palabra que une cada puente:",
       "won": "¡Pirámide completada!",
       "lost": "La pirámide se derrumbó.",
@@ -20383,6 +20369,40 @@ const es = {
     }
   },
   // @eg2Help:end
+  // @gameShell:start
+  "gameShell": {
+    "words": "Tus palabras",
+    "wordsEmptyTitle": "Aquí caen tus palabras",
+    "wordsEmptyBody": "Arrastra por las letras o simplemente escribe. Cada palabra se apila aquí, la más nueva arriba.",
+    "pts": "pts",
+    "best": "La más larga",
+    "rivals": "Rivales",
+    "leading": "¡Vas primero!",
+    "behind": "A {points} de {name}",
+    "raceOpen": "La primera palabra se lleva el liderato",
+    "round": "Esta ronda",
+    "score": "Puntos",
+    "found": "Encontradas",
+    "time": "Tiempo",
+    "combo": "Combo",
+    "life": "Vida",
+    "tries": "Intentos",
+    "clues": "Pistas",
+    "streak": "Racha",
+    "multiplier": "Multiplicador",
+    "topWord": "Mejor palabra",
+    "byLength": "Por longitud",
+    "target": "Objetivo",
+    "you": "Tú",
+    "keys": {
+      "title": "Juega con el teclado",
+      "type": "Escribe la palabra",
+      "letters": "A–Ñ",
+      "submit": "Enviar",
+      "clear": "Borrar todo"
+    }
+  },
+  // @gameShell:end
   // @hqCalm:start
   "hqCalm": {
     "playWithoutClass": "O juega sin crear una clase",

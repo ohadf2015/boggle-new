@@ -6,7 +6,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import type { Language } from '@/types';
 
-// Mock Supabase client - factory function for jest.mock
+// Mock Supabase client - factory function for vi.mock
 const mockAuthGetSession = vi.fn(() => Promise.resolve({
   data: { session: { access_token: 'test-token' } },
   error: null

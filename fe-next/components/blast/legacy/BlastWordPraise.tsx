@@ -11,6 +11,8 @@ interface BlastWordPraiseProps {
   submitCount: number;
   /** Translation function */
   t: (key: string) => string | undefined;
+  /** Wait before stamping, so the word lifted off the board has cleared the same spot. */
+  delayMs?: number;
 }
 
 interface PraiseTier {
@@ -55,7 +57,7 @@ const SPARKS = [
  * a solid tier-colored face, thick ink border, hard shadow, per-tier icon, plus
  * burst rays + sparks for the big tiers so a long word FEELS like an event.
  */
-export default function BlastWordPraise({ wordLength, submitCount, t }: BlastWordPraiseProps) {
+export default function BlastWordPraise({ wordLength, submitCount, t, delayMs = 0 }: BlastWordPraiseProps) {
   const [visible, setVisible] = useState(false);
   const [animKey, setAnimKey] = useState(0);
   const prevSubmitRef = useRef(submitCount);
@@ -70,18 +72,36 @@ export default function BlastWordPraise({ wordLength, submitCount, t }: BlastWor
     const tier = getPraiseTier(wordLength);
     if (!tier) { setVisible(false); return; }
 
-    setVisible(true);
-    setAnimKey(k => k + 1);
     // Savor the rare tiers a little longer.
     const holdMs = tier.sparks ? 1250 : tier.rays ? 1050 : 900;
-    const id = setTimeout(dismiss, holdMs);
-    return () => clearTimeout(id);
-  }, [submitCount, wordLength, dismiss]);
+    let hideId: ReturnType<typeof setTimeout> | undefined;
+    const show = () => {
+      setVisible(true);
+      setAnimKey(k => k + 1);
+      hideId = setTimeout(dismiss, holdMs);
+    };
+    let showId: ReturnType<typeof setTimeout> | undefined;
+    if (delayMs > 0) {
+      setVisible(false);
+      showId = setTimeout(show, delayMs);
+    } else {
+      show();
+    }
+    return () => {
+      if (showId) clearTimeout(showId);
+      if (hideId) clearTimeout(hideId);
+    };
+  }, [submitCount, wordLength, dismiss, delayMs]);
 
   const tier = getPraiseTier(wordLength);
 
   return (
     <div className="absolute inset-x-0 top-[14%] pointer-events-none z-50 flex items-start justify-center">
+      <span
+        data-coin-avoid="true"
+        aria-hidden="true"
+        className="invisible absolute left-1/2 -top-3 h-[4.75rem] w-[min(80%,340px)] -translate-x-1/2"
+      />
       <AdaptiveAnimatePresence mode="wait">
         {visible && tier && (
           <AdaptiveMotion.div

@@ -7,6 +7,7 @@
 import { TileRenderer } from '../TileRenderer';
 import { Container } from 'pixi.js';
 import type { TileRenderConfig, TileData } from '../types';
+import type { Mock } from 'vitest';
 
 vi.mock('pixi-filters', () => ({
   GlowFilter: class {
@@ -113,7 +114,7 @@ describe('TileRenderer destroyed-guard', () => {
     // Simulate app.destroy({ children: true }) nulling the Graphics context:
     // its .clear() now throws like production.
     const sprites = (renderer as unknown as {
-      tiles: Map<string, { bg: { clear: jest.Mock; destroyed: boolean } }>;
+      tiles: Map<string, { bg: { clear: Mock; destroyed: boolean } }>;
     }).tiles;
     const bg = sprites.get('a')!.bg;
     bg.clear.mockImplementation(() => {
@@ -130,7 +131,7 @@ describe('TileRenderer destroyed-guard', () => {
     // .clear() throws even though sprite.bg.destroyed is still false.
     renderer.setTiles([tile('a')]);
     const sprites = (renderer as unknown as {
-      tiles: Map<string, { bg: { clear: jest.Mock; destroyed: boolean } }>;
+      tiles: Map<string, { bg: { clear: Mock; destroyed: boolean } }>;
     }).tiles;
     const bg = sprites.get('a')!.bg;
     bg.destroyed = false; // guard would NOT early-return

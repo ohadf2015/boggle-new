@@ -59,6 +59,10 @@ export interface WheelRadiusInput {
   isDesktop?: boolean;
   /** Short / landscape viewport (`max-height: 600px`) — letters shrink too. */
   isShort?: boolean;
+  /** Daily desktop wheel with large letters (center 128px, outer 84px). */
+  isLarge?: boolean;
+  /** Desktop game shell (>= 1024x600) — the wheel scales with the stage and its letters grow. */
+  isWide?: boolean;
 }
 
 /**
@@ -74,8 +78,10 @@ export interface WheelRadiusInput {
  * screens, so a box that is wider than it is tall must pull its orbit inward to
  * keep outer letters off the action bar below.
  */
-export function selectWheelRadius({ width, height, isDesktop = false, isShort = false }: WheelRadiusInput): number {
+export function selectWheelRadius({ width, height, isDesktop = false, isShort = false, isLarge = false, isWide = false }: WheelRadiusInput): number {
   const size = Math.min(width, height);
+  if (isWide) return computeWheelRadius(size, 260, 96, 128);
+  if (isLarge && !isShort) return computeWheelRadius(size, 210, 110, 100);
   if (isDesktop) {
     // Desktop canvas is a fixed square (no short variant) → wider 140 cap.
     return computeWheelRadius(size, 140);

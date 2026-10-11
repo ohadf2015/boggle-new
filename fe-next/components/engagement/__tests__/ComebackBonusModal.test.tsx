@@ -27,7 +27,8 @@ vi.mock('@/utils/authFetch', () => ({
 }));
 
 import { postWithAuth } from '@/utils/authFetch';
-const mockPostWithAuth = postWithAuth as jest.MockedFunction<typeof postWithAuth>;
+import type { MockedFunction } from 'vitest';
+const mockPostWithAuth = postWithAuth as MockedFunction<typeof postWithAuth>;
 
 const tier = {
   xpMultiplier: 2,

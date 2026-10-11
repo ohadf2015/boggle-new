@@ -33,7 +33,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 describe('WinCinematic', () => {
   afterEach(() => {
-    jest.clearAllTimers();
+    vi.clearAllTimers();
     vi.clearAllMocks();
   });
 
@@ -63,7 +63,7 @@ describe('WinCinematic', () => {
 
   it('calls onComplete on click exactly once', async () => {
     const onComplete = vi.fn();
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(
       <WinCinematic
         puzzleNumber={421}

@@ -6,6 +6,7 @@
 import { awardGameEnd } from './awardPlayGames';
 import * as pgs from '@/utils/nativePGS';
 import { PLAY_GAMES_LEADERBOARDS, PLAY_GAMES_ACHIEVEMENTS } from './playGamesIds';
+import type { Mock } from 'vitest';
 
 vi.mock('@/utils/nativePGS', () => ({
   submitLeaderboardScore: vi.fn().mockResolvedValue({ success: true }),
@@ -59,17 +60,17 @@ describe('awardGameEnd', () => {
       await awardGameEnd({ mode: 'blast', score: 10, wordCount: 3 });
       expect(pgs.unlockAchievement).toHaveBeenCalledWith(PLAY_GAMES_ACHIEVEMENTS.firstWord);
 
-      (pgs.unlockAchievement as jest.Mock).mockClear();
+      (pgs.unlockAchievement as Mock).mockClear();
       await awardGameEnd({ mode: 'blast', score: 20, wordCount: 5 });
       expect(pgs.unlockAchievement).not.toHaveBeenCalledWith(PLAY_GAMES_ACHIEVEMENTS.firstWord);
     });
 
     it('does not mark awarded (so it retries) when the unlock fails', async () => {
-      (pgs.unlockAchievement as jest.Mock).mockResolvedValueOnce({ success: false });
+      (pgs.unlockAchievement as Mock).mockResolvedValueOnce({ success: false });
       await awardGameEnd({ mode: 'blast', score: 10, wordCount: 1 });
       // Next game retries because the prior unlock did not succeed.
       await awardGameEnd({ mode: 'blast', score: 10, wordCount: 1 });
-      const firstWordCalls = (pgs.unlockAchievement as jest.Mock).mock.calls.filter(
+      const firstWordCalls = (pgs.unlockAchievement as Mock).mock.calls.filter(
         (c) => c[0] === PLAY_GAMES_ACHIEVEMENTS.firstWord,
       );
       expect(firstWordCalls.length).toBe(2);

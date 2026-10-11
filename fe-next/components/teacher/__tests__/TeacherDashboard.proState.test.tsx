@@ -22,8 +22,6 @@ vi.mock('@/components/teacher/ClassroomManager', () => ({ default: () => <div />
 vi.mock('@/components/teacher/LessonBuilder', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: () => <div />, AssignmentCreator: () => <div /> }));
 vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({ AnalyticsDashboard: () => <div /> }));
-vi.mock('@/components/teacher/StudentsPresentStrip', () => ({ default: () => <div /> }));
-vi.mock('@/components/teacher/curriculum/CurriculumWordListBrowser', () => ({ CurriculumWordListBrowser: () => <div /> }));
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 
 let proState: Record<string, unknown>;

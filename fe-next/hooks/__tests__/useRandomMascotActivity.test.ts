@@ -6,7 +6,7 @@ import {
   DEFAULT_BASE_VARIANTS,
 } from '../useRandomMascotActivity';
 
-// Use global mock from jest.setup.js
+// Use global mock from vitest.setup.ts
  
 const mockUseDevicePerformance = (global as any).mockUseDevicePerformance;
 
@@ -280,12 +280,12 @@ describe('useRandomMascotActivity', () => {
       })
     );
 
-    const pendingTimersBefore = jest.getTimerCount();
+    const pendingTimersBefore = vi.getTimerCount();
     expect(pendingTimersBefore).toBeGreaterThan(0);
 
     unmount();
 
-    const pendingTimersAfter = jest.getTimerCount();
+    const pendingTimersAfter = vi.getTimerCount();
     expect(pendingTimersAfter).toBe(0);
   });
 

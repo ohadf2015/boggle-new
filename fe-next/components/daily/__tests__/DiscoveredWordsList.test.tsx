@@ -18,7 +18,7 @@ vi.mock('framer-motion', () => ({
 
 const t = (key: string) => {
   const dict: Record<string, string> = {
-    'wordHunt.mobile.words': 'words',
+    'wordHunt.mobile.found': 'Found',
     'common.show': 'Show',
     'common.hide': 'Hide',
   };
@@ -33,9 +33,10 @@ const makeWord = (word: string, timestamp: number): WordDiscovery => ({
 });
 
 describe('DiscoveredWordsList', () => {
-  it('renders word count with label', () => {
-    render(<DiscoveredWordsList words={[makeWord('cat', 1), makeWord('dog', 2)]} t={t} />);
-    expect(screen.getByText(/2\s+words/)).toBeInTheDocument();
+  it('renders a Found label with the count in its own badge, so one word never reads "1 words"', () => {
+    render(<DiscoveredWordsList words={[makeWord('cat', 1)]} t={t} />);
+    expect(screen.getByText('Found')).toBeInTheDocument();
+    expect(screen.getByTestId('found-count')).toHaveTextContent(/^1$/);
   });
 
   it('shows most recent word first', () => {

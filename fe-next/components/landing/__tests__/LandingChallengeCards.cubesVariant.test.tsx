@@ -55,11 +55,6 @@ describe('LandingChallengeCards — cubes layout', () => {
     expect(screen.getByText(/1,234 landing\.playingNow/)).toBeInTheDocument();
   });
 
-  it('renders daily challenge cube (hero node)', () => {
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByTestId('home-daily-hero')).toBeInTheDocument();
-  });
-
   it('preserves analytics on cube click (mode_selected + landing_cta_clicked)', () => {
     const { container } = render(<LandingChallengeCards {...baseProps} />);
     const connectionsLink = container.querySelector('[data-cube-key="connections"]') as HTMLElement;

@@ -2,7 +2,6 @@
 
 import React, { useMemo, useEffect, useRef, useCallback, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { shouldShowScorePopup } from '@/lib/singleplayer/scorePopup';
 import { useAchievementQueue } from '@/components/achievements';
 import { useIdleDetection } from '@/hooks/useIdleDetection';
 import { trackDeadTime, trackGrowthEvent } from '@/utils/growthTracking';
@@ -17,10 +16,10 @@ import {
 
 import type { SinglePlayerGameState, SinglePlayerResultsData } from './SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
-import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
 import PracticeContinuePrompt from './PracticeContinuePrompt';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { useSoloLesson } from './useSoloLesson';
+import { useSelectionStore } from '@/hooks/useSelectionStore';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { evaluateSelectionAchievements } from '@/lib/achievements/hiddenAchievementBus';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -100,17 +99,6 @@ function SinglePlayerGame({
   const { queueAchievement } = useAchievementQueue();
   const prevAchievementCountRef = useRef(0);
 
-  // Score popup — shows "+30" when score increases
-  const [scorePopup, setScorePopup] = React.useState<{ id: number; value: number; x: number; y: number; word?: string; bonus?: string } | null>(null);
-  const prevScoreRef = useRef(0);
-  // Not the `prevWordCountRef` above: that effect runs first and has already
-  // advanced it, so sharing it would make the popup check never match.
-  const prevPopupWordCountRef = useRef(0);
-
-  // Refs for anchoring the floating score popup to real HUD elements (portrait/mobile)
-  const scoreBadgeRef = useRef<HTMLDivElement>(null);
-  const wordAreaRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const achievements = core.liveAchievements;
     // Only trigger for NEW achievements (not on initial render)
@@ -123,39 +111,6 @@ function SinglePlayerGame({
     }
     prevAchievementCountRef.current = achievements.length;
   }, [core.liveAchievements, queueAchievement]);
-
-  // Score popup effect — detect score delta and show flying number
-  // Long words (6+) get a bonus label for extra celebration
-  useEffect(() => {
-    const delta = core.score - prevScoreRef.current;
-    if (
-      shouldShowScorePopup({
-        delta,
-        prevWordCount: prevPopupWordCountRef.current,
-        wordCount: core.foundWords.length,
-      })
-    ) {
-      const lastWord = core.foundWords[core.foundWords.length - 1];
-      const wordLen = lastWord?.word?.length ?? 0;
-      const bonus = wordLen >= 8 ? 'LEGENDARY!' : wordLen >= 7 ? 'INCREDIBLE!' : wordLen >= 6 ? 'AMAZING!' : undefined;
-
-      // Anchor popup origin to the word-forming area when available (portrait/mobile)
-      const originRect = wordAreaRef.current?.getBoundingClientRect();
-      const originX = originRect ? originRect.left + originRect.width / 2 : (typeof window !== 'undefined' ? window.innerWidth / 2 : 200);
-      const originY = originRect ? originRect.top + originRect.height / 2 : (typeof window !== 'undefined' ? window.innerHeight / 2 : 300);
-
-      setScorePopup({
-        id: Date.now(),
-        value: delta,
-        x: originX,
-        y: originY,
-        word: lastWord?.word,
-        bonus,
-      });
-    }
-    prevScoreRef.current = core.score;
-    prevPopupWordCountRef.current = core.foundWords.length;
-  }, [core.score, core.foundWords]);
 
   // Practice-mode all-words celebration — fires once when player clears the board.
   // Declared first so the score-threshold prompt can suppress itself when this fires.
@@ -224,13 +179,15 @@ function SinglePlayerGame({
   );
   const wrappedWordSubmit = core.handleWordSubmit;
 
+  const lessonEnabled = settings.mode !== 'practice' && !hideModeCoach && !core.awaitingStart && !core.isGameOver;
+  const tracedWord = useSelectionStore((s) => (lessonEnabled ? s.formedWord : ''));
   const lesson = useSoloLesson({
-    enabled: settings.mode !== 'practice' && !hideModeCoach && !core.awaitingStart && !core.isGameOver,
+    enabled: lessonEnabled,
     grid: core.grid as LetterGrid | null,
     language: settings.language,
     availableWords: core.availableWords,
     foundWords: core.foundWords,
-    formedWord: core.formedWord,
+    formedWord: tracedWord,
     feedback: core.currentFeedback,
     score: core.score,
     friendHref: `/${settings.language}/multiplayer`,
@@ -279,8 +236,6 @@ function SinglePlayerGame({
       maxCombo: core.combo.maxCombo,
       comboCoinReward: core.comboCoinReward,
       onCoinAnimationComplete: core.handleCoinAnimationComplete,
-      formedWord: core.formedWord,
-      letterCount: core.letterCount,
       currentFeedback: core.currentFeedback,
       keyboardInput: core.keyboardInput,
       showHandCoach: !hideModeCoach,
@@ -325,8 +280,6 @@ function SinglePlayerGame({
     core.combo.maxCombo,
     core.comboCoinReward,
     core.handleCoinAnimationComplete,
-    core.formedWord,
-    core.letterCount,
     core.currentFeedback,
     core.keyboardInput,
     core.revealState.highlightedPath,
@@ -370,16 +323,6 @@ function SinglePlayerGame({
     );
   }
 
-  const scorePopupElement = (
-    <ScorePopupFly
-      popup={scorePopup}
-      flyToTarget
-      targetRef={scoreBadgeRef}
-      showWord
-      size={scorePopup?.bonus ? 'lg' : 'md'}
-      onComplete={() => setScorePopup(null)}
-    />
-  );
 
   const practicePromptElement = settings.mode === 'practice' ? (
     <PracticeContinuePrompt
@@ -423,7 +366,6 @@ function SinglePlayerGame({
   // every surface. Modals stay above (AuthModal z-100, WinnerOnboarding z-110).
   return (
     <div className="fixed inset-0 z-[70] flex flex-col overflow-hidden bg-neo-navy" translate="no">
-      {scorePopupElement}
       {practicePromptElement}
       {lesson.overlay}
       {wordGoalBadgeElement}
@@ -443,6 +385,9 @@ function SinglePlayerGame({
         earthquakeState={core.earthquakeState}
         currentFeedback={core.currentFeedback}
         highlightedPath={core.revealState.highlightedPath ?? []}
+        isTypingMode={core.keyboardInput?.isTypingMode}
+        typedWord={core.keyboardInput?.typedWord}
+        keyboardHighlight={core.keyboardInput?.highlightedCells}
         lastWordFoundTime={core.lastWordFoundTimeRef.current ?? 0}
         isDesktop={core.isDesktop || core.isTv}
         awaitingStart={core.awaitingStart}

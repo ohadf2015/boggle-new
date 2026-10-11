@@ -10,6 +10,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StudentProgressReport } from '../StudentProgressReport';
 import { getStudentReportData, StudentReportData } from '@/lib/supabase/analytics';
+import type { MockedFunction } from 'vitest';
 
 // Mock data fetching
 vi.mock('@/lib/supabase/analytics', () => ({
@@ -127,7 +128,7 @@ const mockStudentData: StudentReportData = {
 };
 
 describe('StudentProgressReport', () => {
-  const mockGetStudentReportData = getStudentReportData as jest.MockedFunction<
+  const mockGetStudentReportData = getStudentReportData as MockedFunction<
     typeof getStudentReportData
   >;
 

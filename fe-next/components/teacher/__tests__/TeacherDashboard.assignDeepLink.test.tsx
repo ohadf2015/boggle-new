@@ -32,7 +32,6 @@ vi.mock('@/components/education/EducationHeader', () => ({ EducationHeader: () =
 vi.mock('@/components/education/TeacherOnboarding', () => ({ TeacherOnboarding: () => null }));
 vi.mock('../ClassroomManager', () => ({ __esModule: true, default: () => null }));
 vi.mock('../PlayTabFirstRunCard', () => ({ __esModule: true, default: () => null }));
-vi.mock('../StudentsPresentStrip', () => ({ __esModule: true, default: () => null }));
 vi.mock('../assignments', () => ({
   AssignmentTrackingPanel: () => null,
   AssignmentCreator: ({ isOpen, classroomId }: { isOpen: boolean; classroomId: string }) =>
@@ -41,7 +40,6 @@ vi.mock('../assignments', () => ({
 vi.mock('../analytics/AnalyticsDashboard', () => ({ AnalyticsDashboard: () => null }));
 vi.mock('../analytics/LastGameInsights', () => ({ LastGameInsights: () => null }));
 vi.mock('../ProGate', () => ({ ProGate: ({ children }: { children: React.ReactNode }) => children }));
-vi.mock('../curriculum/CurriculumWordListBrowser', () => ({ CurriculumWordListBrowser: () => null }));
 vi.mock('../TeacherPlanBadge', () => ({ TeacherPlanBadge: () => null }));
 vi.mock('../ProWelcomeCelebration', () => ({ ProWelcomeCelebration: () => null }));
 vi.mock('../LessonBuilder', () => ({

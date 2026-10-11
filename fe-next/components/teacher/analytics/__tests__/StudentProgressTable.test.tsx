@@ -2,10 +2,11 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { StudentProgressTable } from '../StudentProgressTable';
 import { useStudentProgressMetrics } from '@/hooks/useStudentProgressMetrics';
 import type { StudentProgressSummary } from '@/lib/supabase/analytics';
+import type { MockedFunction } from 'vitest';
 
 // Mock the hook
 vi.mock('@/hooks/useStudentProgressMetrics');
-const mockUseStudentProgressMetrics = useStudentProgressMetrics as jest.MockedFunction<
+const mockUseStudentProgressMetrics = useStudentProgressMetrics as MockedFunction<
   typeof useStudentProgressMetrics
 >;
 

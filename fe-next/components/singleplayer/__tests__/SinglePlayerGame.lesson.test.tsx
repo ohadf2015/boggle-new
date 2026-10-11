@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 
@@ -27,7 +27,6 @@ vi.mock('../game', () => ({
     combo: { comboLevel: 0, comboTimeRemaining: 0, isDangerState: false, maxCombo: 0 },
     comboCoinReward: 0,
     handleCoinAnimationComplete: vi.fn(),
-    formedWord: '',
     letterCount: 0,
     currentFeedback: null,
     keyboardInput: null,
@@ -85,7 +84,6 @@ vi.mock('@/utils/posthogEngagement', () => ({
   createFirstMinuteSurvivalTimer: () => ({ start: vi.fn(), cancel: vi.fn() }),
   detectPlatform: () => 'web',
 }));
-vi.mock('@/components/animations/ScorePopupFly', () => ({ ScorePopupFly: () => null }));
 vi.mock('../PracticeContinuePrompt', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn() }));
 vi.mock('@/lib/achievements/hiddenAchievementBus', () => ({
@@ -95,6 +93,7 @@ vi.mock('@/lib/achievements/hiddenAchievementBus', () => ({
 import SinglePlayerGame from '../SinglePlayerGame';
 import type { SinglePlayerGameState } from '../SinglePlayerView';
 import { lessonStorageKey } from '@/lib/tutorial/lesson/lessonStorage';
+import { resetSelection, useSelectionStore } from '@/hooks/useSelectionStore';
 
 const settings = {
   mode: 'challenge',
@@ -118,7 +117,10 @@ const renderGame = (props: { hideModeCoach?: boolean; mode?: string } = {}) =>
   );
 
 describe('SinglePlayerGame first-round lesson', () => {
-  beforeEach(() => window.localStorage.clear());
+  beforeEach(() => {
+    window.localStorage.clear();
+    resetSelection();
+  });
 
   it('teaches a new player with the lesson in place of the mission chips', () => {
     renderGame();
@@ -143,5 +145,14 @@ describe('SinglePlayerGame first-round lesson', () => {
     renderGame();
     expect(screen.queryByTestId('lesson-hud')).toBeNull();
     expect(screen.getByTestId('missions')).toHaveTextContent('on');
+  });
+
+  it('fills the lesson slots from the letters the player is tracing', () => {
+    renderGame();
+    const filled = () => Array.from(document.querySelectorAll('[data-slot-state]'))
+      .filter((el) => el.getAttribute('data-slot-state') !== 'ghost' && el.getAttribute('data-slot-state') !== 'empty');
+    expect(filled()).toHaveLength(0);
+    act(() => useSelectionStore.getState().setSelection('AB', 2));
+    expect(filled().length).toBeGreaterThan(0);
   });
 });

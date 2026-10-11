@@ -1,5 +1,6 @@
 'use client';
 
+import { useSelectionStore } from '@/hooks/useSelectionStore';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { selectRandomRevealWord, getRevealableWordCount } from '@/utils/wordPathFinder';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -28,6 +29,7 @@ import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import { plantStarterWord } from '@/lib/tutorial/lesson/starterWords';
+import { lessonBoardFor } from '@/lib/tutorial/lesson/lessonBoards';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useTrainingAnalysis } from '@/hooks/useTrainingAnalysis';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
@@ -139,8 +141,6 @@ export function useSinglePlayerCore({
   // Capacitor WebView (black screen on exit). See useNavigationGuard `leaving`.
   const [quitting, setQuitting] = useState(false);
   const [showHintPrompt, setShowHintPrompt] = useState(false);
-  const [formedWord, setFormedWord] = useState('');
-  const [letterCount, setLetterCount] = useState(0);
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
   const feedbackClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isEarthquakePaused, setIsEarthquakePaused] = useState(false);
@@ -504,6 +504,11 @@ export function useSinglePlayerCore({
         setGrid(settings.grid);
         return;
       }
+      const lessonGrid = settings.coach ? lessonBoardFor(settings.language, rows, cols) : null;
+      if (lessonGrid) {
+        setGrid(lessonGrid);
+        return;
+      }
       let wordsToEmbed: string[] = [];
       if (settings.language !== 'ja') {
         try {
@@ -574,7 +579,9 @@ export function useSinglePlayerCore({
     trainingAnalysisTrackPath(cells); trainingTrackPath(cells);
   }, [directionGuidance, trainingAnalysisTrackPath, trainingTrackPath]);
 
-  const handleWordChange = useCallback((word: string, count: number) => { setFormedWord(word); setLetterCount(count); }, []);
+  const handleWordChange = useCallback((word: string, count: number) => {
+    useSelectionStore.getState().setSelection(word, count);
+  }, []);
   const handleFinishPractice = useCallback(() => setIsGameOver(true), []);
   const handleQuitRequest = useCallback(() => {
     if (settings.mode === 'practice') { setIsGameOver(true); return; }
@@ -638,7 +645,7 @@ export function useSinglePlayerCore({
     isLandscape: false, isDesktop, isTv,
     grid, foundWords, score, isPaused, isGameOver, isValidatingWords,
     timer, combo, comboCoinReward, handleCoinAnimationComplete,
-    formedWord, letterCount, currentFeedback,
+    currentFeedback,
     keyboardInput: keyboardInputState,
     availableWords,
     revealState, revealableWordCount, handleReveal,

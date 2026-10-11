@@ -44,6 +44,8 @@ interface WordHandlerEffects {
   onCurrencyEarned?: (data: { coinDelta: number }) => void;
   /** The word was accepted: coins take off from its tiles now (an estimate), settled once scored. */
   onCoinsLaunch?: (path: Array<{ row: number; col: number }>, estimate: number) => void;
+  /** The points this word will credit, known before the clear animation so the board can show them on release. */
+  onCreditedScore?: (data: { word: string; score: number }) => void;
 }
 
 interface UseBlastWordHandlerParams {
@@ -155,16 +157,13 @@ export function useBlastWordHandler({
       sounds.playTileClear(clearedInfo.length);
       sounds.playLongWordBonus(path.length);
     };
-    await sequencer.animateWordClear(clearedInfo, pop);
-    pop();
-
-    // 2. Submit to engine — fold in the deterministic letter-value bonus (organic,
+    // Score — fold in the deterministic letter-value bonus (organic,
     // non-round totals; matches the server's MP total exactly), then apply the
     // pregame-buff score multiplier (combo2x).
     const scoreWithLetters = data.score + blastLetterBonus(data.word);
     const multipliedScore = scoreMultiplier !== 1 ? Math.round(scoreWithLetters * scoreMultiplier) : scoreWithLetters;
 
-    // 2a. Ethical "treasure roll" (SOLO) — an upside-only surprise on top of the
+    // Ethical "treasure roll" (SOLO) — an upside-only surprise on top of the
     // deterministic base so identical words don't always feel identical. Seeded
     // (same word+turn → same roll, can't be re-rolled), floor-guaranteed, capped.
     let treasureBonus = 0;
@@ -181,6 +180,12 @@ export function useBlastWordHandler({
       treasureTier = roll.tier;
     }
 
+    effects.onCreditedScore?.({ word: data.word, score: multipliedScore + treasureBonus });
+
+    await sequencer.animateWordClear(clearedInfo, pop);
+    pop();
+
+    // 2. Submit to engine
     const result = engine.submitWord(path, data.word, multipliedScore + treasureBonus);
 
     // 2a. Capture post-grid snapshot after engine processing

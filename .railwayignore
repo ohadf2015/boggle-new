@@ -35,8 +35,6 @@ __tests__/
 **/*.test.tsx
 **/*.spec.js
 **/*.spec.ts
-fe-next/jest.config.*
-fe-next/jest.setup.*
 
 # Development files
 .git/

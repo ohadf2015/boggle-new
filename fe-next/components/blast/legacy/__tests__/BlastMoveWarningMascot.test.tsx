@@ -5,7 +5,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BlastMoveWarningMascot } from '../BlastMoveWarningMascot';
 
-jest.mock('@/components/motion/AdaptiveMotion', () => ({
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: (props: React.PropsWithChildren<{ className?: string; style?: React.CSSProperties }>) => <div {...props} />,
   },

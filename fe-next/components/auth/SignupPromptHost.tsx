@@ -25,6 +25,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSignupPrompt } from '@/components/singleplayer/results/hooks/useSignupPrompt';
 import { GsiClientPreloader } from '@/components/auth/GsiClientPreloader';
+import { useQuickResultsOnScreen } from '@/lib/quickPlay/resultsCalm';
 
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), {
   ssr: false,
@@ -38,12 +39,14 @@ function isMultiplayerRoute(pathname: string | null): boolean {
 export function SignupPromptHost() {
   const pathname = usePathname();
   const { isAuthenticated, user, loading: authLoading } = useAuth();
+  const quickResultsOnScreen = useQuickResultsOnScreen();
 
   const { showSignupModal, dismissSignupModal, isFirstWin, frictionVariant } = useSignupPrompt({
     isAuthenticated,
     hasUser: !!user,
     authLoading,
-    disabled: isMultiplayerRoute(pathname),
+    // Held while the quick-play celebration plays, then asks: celebrate first.
+    disabled: isMultiplayerRoute(pathname) || quickResultsOnScreen,
   });
 
   return (

@@ -79,4 +79,26 @@ describe('BlastWordPraise', () => {
     // Text should not change since submitCount didn't increment
     expect(container.querySelector('.text-neo-lime')).toBeNull();
   });
+
+  it('always marks the stamp footprint so flying coins route around it, even before it shows', () => {
+    const { container } = render(<BlastWordPraise wordLength={0} submitCount={0} t={mockT} />);
+    const zone = container.querySelector('[data-coin-avoid="true"]');
+    expect(zone).not.toBeNull();
+    expect(zone).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('given a delay, then the stamp waits for the lifted word to clear before it lands', () => {
+    vi.useFakeTimers();
+    try {
+      const { rerender } = render(<BlastWordPraise wordLength={0} submitCount={0} t={mockT} delayMs={500} />);
+      act(() => {
+        rerender(<BlastWordPraise wordLength={5} submitCount={1} t={mockT} delayMs={500} />);
+      });
+      expect(screen.queryByText('Great!')).toBeNull();
+      act(() => { vi.advanceTimersByTime(500); });
+      expect(screen.getByText('Great!')).toBeDefined();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

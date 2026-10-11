@@ -90,12 +90,6 @@ vi.mock('@/components/game/ComboDisplay', () => {
 vi.mock('@/components/game/ComboDisplayConnected', () => ({
   ComboDisplayConnected: () => <div>ComboDisplayConnected</div>,
 }));
-vi.mock('@/components/game/CompactLeaderboard', () => {
-  const MockLeaderboard = () => {
-    return <div>CompactLeaderboard</div>;
-  };
-  return { default: MockLeaderboard };
-});
 vi.mock('@/components/game/FloatingScoreAnimation', () => {
   const MockFloating = () => {
     return null;
@@ -131,9 +125,6 @@ vi.mock('@/components/game/WordHuntLifeBar', () => ({
 }));
 vi.mock('@/components/game/WordHuntPlayerLives', () => ({
   WordHuntPlayerLives: () => null,
-}));
-vi.mock('@/components/singleplayer/game/components/DynamicEnergyBackground', () => ({
-  DynamicEnergyBackground: () => null,
 }));
 vi.mock('@/components/game/ComboMilestoneAnnouncement', () => ({
   ComboMilestoneAnnouncement: () => null,

@@ -4,9 +4,7 @@ import { useCallback, useEffect, useRef, useReducer } from 'react';
 import type { LetterGrid, Language } from '@/types';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import { calculateEfficiencyScore, type ClueShopItem, type HintLevel } from '@/utils/aiHintGenerator';
-import type { FeedbackType } from '../WordFeedbackToast';
-import type { WordFeedback } from '@/components/game/WordFormingArea';
-import type { WordDiscovery, TargetAttempt, SurvivalGameResult, AccumulatedClue, ScoreEvent, AutoClueNotificationData } from './types';
+import type { FeedbackType, WordDiscovery, TargetAttempt, SurvivalGameResult, AccumulatedClue, ScoreEvent, AutoClueNotificationData } from './types';
 import { useLiveScoreTracker } from './useLiveScoreTracker';
 import { clearRejectedWords } from '@/utils/invalidWordTracker';
 import {
@@ -97,9 +95,7 @@ export interface SurvivalGameState {
   feedbackType: FeedbackType | null;
   feedbackMessage: string;
   feedbackWord: string | null;
-
-  // WordFormingArea feedback
-  wordFeedback: WordFeedback | null;
+  feedbackSeq: number;
 }
 
 export interface SurvivalGameActions {
@@ -154,23 +150,7 @@ export function useSurvivalGameLogic({
   // Toast helpers - dispatch-based
   const showToast = useCallback((type: FeedbackType, message: string, word?: string) => {
     dispatch({ type: 'SHOW_TOAST', payload: { type, message, word } });
-
-    // Also dispatch WordFeedback for WordFormingArea
-    const wordFeedbackType = type === 'valid-word' || type === 'target-found'
-      ? 'accepted' as const
-      : type === 'duplicate'
-        ? 'duplicate' as const
-        : 'rejected' as const;
-    const fb: WordFeedback = {
-      id: `${Date.now()}`,
-      type: wordFeedbackType,
-      word: state.formedWord || '',
-      message: wordFeedbackType !== 'accepted' ? message : undefined,
-      score: wordFeedbackType === 'accepted' ? undefined : undefined,
-      timestamp: Date.now(),
-    };
-    dispatch({ type: 'SET_WORD_FEEDBACK', payload: fb });
-  }, [state.formedWord]);
+  }, []);
 
   const closeToast = useCallback(() => {
     dispatch({ type: 'CLOSE_TOAST' });
@@ -532,7 +512,7 @@ export function useSurvivalGameLogic({
     feedbackType: state.feedbackType,
     feedbackMessage: state.feedbackMessage,
     feedbackWord: state.feedbackWord,
-    wordFeedback: state.wordFeedback,
+    feedbackSeq: state.feedbackSeq,
   };
 
   const actions: SurvivalGameActions = {

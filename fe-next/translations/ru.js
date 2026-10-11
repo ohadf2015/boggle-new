@@ -2033,7 +2033,6 @@ const ru = {
         "decline": "Закончить раунд"
       },
       "findWordsToReveal": "Составляй слова на доске, чтобы открыть эти буквы",
-      "keyboardTip": "Проводи по доске или печатай с клавиатуры",
       "shop": "Лавка подсказок",
       "revealLetter": "Открыть букву",
       "revealLetterDesc": "Открыть случайную букву в целевом слове",
@@ -2061,6 +2060,14 @@ const ru = {
       "clueUnlocked": "Открыто: {name} (-{cost} монет)",
       "longWordBonus": "🔥 +{bonus} за длинное слово!",
       "scoreBreakdownTooltip": "Нажми для деталей",
+      "stage": {
+        "prompt": "Проведи по буквам и собери слово",
+        "praiseShort": "Неплохо!",
+        "praiseMid": "Отлично!",
+        "praiseLong": "Вот это слово!",
+        "boardLabel": "Поле с буквами",
+        "longWord": "Длинное слово +{bonus}"
+      },
       "score": {
         "tier": {
           "bronze": "Бронза",
@@ -2084,14 +2091,11 @@ const ru = {
     "desktop": {
       "liveRanks": "Живые рейтинги",
       "lootCollected": "Добыча собрана",
-      "powerUps": "Усилители",
-      "hintsUnlocked": "Подсказки открыты",
-      "triesRemaining": "Попыток в запасе",
       "noWordsYet": "Найди слова и собери добычу",
       "beFirst": "Стань первым в рейтинге"
     },
     "mobile": {
-      "words": "слов",
+      "found": "Найдено",
       "rank": "Рейтинг"
     },
     "results": {
@@ -2386,6 +2390,10 @@ const ru = {
       "finale": "Финал",
       "explainer": "Реши три загадки внизу: их ответы открывают слово наверху.",
       "finalePrompt": "Какое слово соединяет все три?",
+      "railMap": "Пирамида",
+      "railSolved": "Мосты",
+      "railEmptyTitle": "Разгаданные мосты поднимаются сюда",
+      "railEmptyBody": "Каждый ответ зажигает луч к слову на вершине.",
       "cluesLabel": "Найди слово, которое подходит к каждому мосту:",
       "won": "Пирамида завершена!",
       "lost": "Пирамида рухнула.",
@@ -9626,7 +9634,6 @@ const ru = {
     "noPastSeasons": "Прошлых сезонов ещё нет",
     "rankedAt": "Место #{{position}}",
     "tierLabel": "Уровень",
-    "viewLeaderboard": "Таблица лидеров",
     "tagline": {
       "1": "Куй свою легенду, слово за словом",
       "2": "Короны зарабатываются, не наследуются",
@@ -9908,7 +9915,6 @@ const ru = {
       "durationUnit": "секунд",
       "roundComplete": "Раунд завершён",
       "ofPerfect": "от идеала",
-      "points": "очк.",
       "wordsFound": "Найдено {found} из {total} слов",
       "targetWordFound": "🎯 Слово найдено: {word}",
       "targetWordMissed": "🎯 Слово было: {word}",
@@ -9938,6 +9944,8 @@ const ru = {
       "dayStreak": "{days} дней подряд",
       "rewardsPending": "Войди, чтобы копить монеты и XP",
       "pickNextMode": "Следующий раунд",
+      "statScore": "Очки",
+      "statWords": "Слова",
       "noWords": "В этот раз без слов. Следующая доска через 60 секунд.",
       "rankProgress": "{points} / {next} до ранга {rank}",
       "rankMax": "Максимальный ранг",
@@ -11244,7 +11252,8 @@ const ru = {
       "toggle": "Открыть или закрыть панель игры"
     },
     "grid": {
-      "cellLabel": "Строка {{row}}, столбец {{col}}: буква {{letter}}"
+      "cellLabel": "Строка {{row}}, столбец {{col}}: буква {{letter}}",
+      "label": "Поле с буквами"
     }
   },
   "email": {
@@ -15523,6 +15532,7 @@ const ru = {
     "onFireBadge": "{count} подряд, в ударе!",
     "closeRace": "Плотная гонка",
     "inputPlaceholder": "Введи слово…",
+    "firstHint": "Жми или веди — в каждом слове есть {letter}",
     "tapLetters": "Нажимай или тяни буквы, чтобы составить слово",
     "tapToRemove": "Нажми на добавленную букву снова, чтобы удалить",
     "doubleTapToSubmit": "Дважды нажми на букву, чтобы отправить",
@@ -16393,6 +16403,9 @@ const ru = {
     }
   },
   "landing": {
+    "launch": {
+      "go": "ВПЕРЁД!"
+    },
     "home": {
       "greeting": "Привет, {name}",
       "levelTitle": "Уровень {level} · {title}",
@@ -16412,16 +16425,12 @@ const ru = {
       "online": "онлайн",
       "gameModes": "Режимы игры",
       "todaysPuzzle": "Сегодняшний пазл",
+      "wheelWord": "ЗАГАДКА",
       "puzzleNo": "Пазл #{n}",
       "resetsIn": "сбросится через {time}",
       "dayStreak": "серия {n} дней",
-      "gamesToday": "Игр сегодня",
       "modes": "Режимы",
       "languages": "Языки",
-      "rank": "Ранг",
-      "maxLevel": "МАКС",
-      "xpToNext": "{xp} XP до уровня {level}",
-      "bestScore": "Лучший счёт",
       "tier": {
         "common": "Лига новичков",
         "uncommon": "Бронзовая лига",
@@ -16440,16 +16449,7 @@ const ru = {
       "vaultSubtitle": "Копи монеты, открывай награды"
     },
     "playingNow": "играют",
-    "welcomeTitle": "Слова. Друзья. Победы.",
-    "welcomeSubtitle": "Бесплатно. Без регистрации. Без платных преимуществ.",
-    "classroomHeroTitle": "Словесные игры для вашего класса",
-    "classroomHeroSubtitle": "Без входа для учеников. Код из 6 символов. Весь класс играет бесплатно.",
-    "forTeachers": "Для учителей",
-    "playTodayChallenge": "Сыграть в сегодняшний вызов",
     "moreGameModes": "Больше режимов",
-    "moreGameModesHint": "Нажми, чтобы посмотреть",
-    "calmSectionTitle": "Не спеша",
-    "calmSectionSubtitle": "Спокойные головоломки в своём темпе",
     "singlePlayer": "Быстрая игра",
     "singlePlayerDesc": "Заходи и играй сразу",
     "badgeBots": "Боты",
@@ -16517,23 +16517,11 @@ const ru = {
     "shareTextAuth": "Присоединись ко мне в LexiClash! Используй мой код реферала: {code}",
     "shareTextGuest": "Давай сыграем в LexiClash и посмотрим, кто лучше.",
     "shareNativeTitle": "Присоединиться к LexiClash",
-    "playNowFree": "Играть бесплатно",
     "letsPlay": "Играем!",
     "duration": "{time} мин",
     "difficultyEasy": "Лёгкая",
     "difficultyMedium": "Средняя",
     "difficultyHard": "Сложная",
-    "gameModes": "Режимы игры",
-    "languages": "Языки",
-    "activePlayers": "Активные игроки",
-    "todaysTopPlayers": "Лучшие игроки",
-    "viewFullLeaderboard": "Вся таблица лидеров",
-    "readyToCompete": "Хочешь посоревноваться?",
-    "startPlaying": "Начни играть",
-    "createAvatar": "Создай свой аватар",
-    "designYourLook": "Придумай свой образ",
-    "yourRank": "Твой ранг",
-    "totalScore": "Общий счёт",
     "solvedPercent": "Сегодня решили только {percent}%",
     "liveActivity": "Живая активность игры",
     "tickerLive": "ЖИВО",
@@ -16564,8 +16552,6 @@ const ru = {
     "todaysTopWords": "Лучшие слова сегодня",
     "hallOfFame": "Зал славы",
     "careerPoints": "Очки карьеры",
-    "gamesToday": "Игр сегодня",
-    "freeToPlay": "Бесплатная игра",
     "wordHuntMode": "Охота за словом",
     "wordHuntModeDesc": "Найди загаданное слово как можно быстрее. Новая головоломка каждый день.",
     "communityBoards": "Доски сообщества",
@@ -20067,6 +20053,40 @@ const ru = {
     }
   },
   // @eg2Help:end
+  // @gameShell:start
+  "gameShell": {
+    "words": "Твои слова",
+    "wordsEmptyTitle": "Здесь появятся твои слова",
+    "wordsEmptyBody": "Проведи по буквам или просто печатай. Новые слова встают наверх.",
+    "pts": "очк.",
+    "best": "Самое длинное",
+    "rivals": "Соперники",
+    "leading": "Ты лидируешь",
+    "behind": "{points} до {name}",
+    "raceOpen": "Первое слово выводит в лидеры",
+    "round": "Этот раунд",
+    "score": "Очки",
+    "found": "Найдено",
+    "time": "Осталось",
+    "combo": "Комбо",
+    "life": "Жизнь",
+    "tries": "Попытки",
+    "clues": "Подсказки",
+    "streak": "Серия",
+    "multiplier": "Множитель",
+    "topWord": "Лучшее слово",
+    "byLength": "По длине",
+    "target": "Цель",
+    "you": "Вы",
+    "keys": {
+      "title": "Играй с клавиатуры",
+      "type": "Печатай слово",
+      "letters": "А–Я",
+      "submit": "Отправить",
+      "clear": "Сначала"
+    }
+  },
+  // @gameShell:end
   // @hqCalm:start
   "hqCalm": {
     "playWithoutClass": "Или сыграть без класса",

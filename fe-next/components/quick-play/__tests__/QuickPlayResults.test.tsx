@@ -15,6 +15,7 @@ vi.mock('@/components/daily/RivalCompareCard', () => ({
 vi.mock('@/hooks/useReducedMotion', () => ({
   __esModule: true,
   default: vi.fn(() => false),
+  useReducedMotion: vi.fn(() => false),
 }));
 
 const result: QuickRoundResult = {
@@ -121,13 +122,11 @@ describe('QuickPlayResults redesign', () => {
     expect(hero).toHaveTextContent('quickPlay.solo.betterThan');
   });
 
-  it('hero displays score and points label', () => {
+  it('score lives in the stat card under the hero', () => {
     render(
       <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
     );
-    const hero = screen.getByTestId('quick-hero-card');
-    expect(hero).toHaveTextContent('quickPlay.solo.points');
-    expect(hero).toHaveTextContent('340');
+    expect(screen.getByTestId('quick-stat-score')).toHaveAttribute('data-value', '340');
   });
 
   // Was "does not display the wordsFound line" — the hero deliberately carried
@@ -194,26 +193,16 @@ describe('QuickPlayResults redesign', () => {
     }
   });
 
-  it('renders with staggered reveal by default', () => {
+  it('appears statically: the hero never starts at opacity 0', () => {
     render(
       <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
     );
-    const container = screen.getByTestId('quick-play-results');
-    expect(container).toHaveAttribute('data-reveal', 'staggered');
+    expect(screen.getByTestId('quick-hero-card').className).not.toMatch(/fadeInUp/);
   });
 
   // Note: testing reduced motion requires a separate test suite that mocks
   // useReducedMotion to return true, due to vitest mock setup constraints.
   // See: QuickPlayResults.reducedMotion.test.tsx
-
-  it('staggered reveal blocks have animate classes in normal mode', () => {
-    render(
-      <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
-    );
-    const heroCard = screen.getByTestId('quick-hero-card');
-    // Should have an animate class for stagger
-    expect(heroCard.className).toMatch(/animate-\[/);
-  });
 
   it('preserves all existing testids', () => {
     render(
@@ -268,9 +257,8 @@ describe('QuickPlayResults — mascot, standings and words', () => {
     expect(screen.queryByTestId('quick-mascot')).toBeNull();
   });
 
-  it('plays exactly one mascot, the champion clip, when the round crosses a rank', () => {
-    // 40 points before the round, 100 after → Rookie(0) → still Rookie... use a
-    // crossing: 260 before, 300 after → Bronze.
+  it("celebrates a rank-up with the player's own avatar, never a mascot clip", () => {
+    // 260 points before the round, 300 after: Rookie -> Bronze.
     const rankUp: QuickSubmitOutcome = { ...outcome, scorePct: 40, history: [40], totalPoints: 300 };
     render(
       <QuickPlayResults
@@ -281,9 +269,9 @@ describe('QuickPlayResults — mascot, standings and words', () => {
         onChallenge={vi.fn()}
       />
     );
-    const mascots = screen.getAllByTestId('quick-mascot');
-    expect(mascots).toHaveLength(1);
-    expect(mascots[0].getAttribute('data-mascot-kind')).toBe('champion');
+    expect(screen.getByTestId('quick-rank-up')).toBeTruthy();
+    expect(screen.getByTestId('quick-hero-avatar')).toBeTruthy();
+    expect(screen.queryByTestId('quick-mascot')).toBeNull();
   });
 
   it('shows the round standings with the rivals it actually raced', () => {

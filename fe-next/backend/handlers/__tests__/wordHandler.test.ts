@@ -13,7 +13,7 @@ vi.mock('../../../backend/modules/gameStateManager', () => ({
   addPlayerWord: vi.fn(),
   playerHasWord: vi.fn(),
   updatePlayerScore: vi.fn(),
-  getLeaderboard: vi.fn(),
+  getLeaderboard: vi.fn(() => []),
   getLeaderboardThrottled: vi.fn(),
   markUserActivity: vi.fn(),
   recordPeerValidationVote: vi.fn(),

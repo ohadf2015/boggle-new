@@ -1,0 +1,167 @@
+/* Daily wheel: a light runs round the letters in reading order, the dashed rim turns. */
+
+.rim {
+  border: 3px dashed rgba(255, 225, 53, 0.45);
+}
+
+.tile {
+  transform: translate(-50%, -50%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rim {
+    animation: turn 24s linear infinite;
+  }
+  .tile {
+    animation: lit 3.4s ease-out infinite both;
+    animation-delay: calc(var(--i, 0) * 260ms);
+  }
+  .core {
+    animation: breathe 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes lit {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    background-color: #1a1a2e;
+    color: #fffef0;
+  }
+  6% {
+    transform: translate(-50%, -62%) scale(1.28);
+    background-color: #ffe135;
+    color: #1a1a2e;
+  }
+  14%,
+  52% {
+    transform: translate(-50%, -54%) scale(1.08);
+    background-color: #ffe135;
+    color: #1a1a2e;
+  }
+  60%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    background-color: #1a1a2e;
+    color: #fffef0;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06) rotate(-3deg);
+  }
+}
+
+/* Hero CTA: the arrow leans forward and a glint crosses the bar. */
+
+.cta {
+  position: relative;
+  overflow: hidden;
+}
+
+.cta::after {
+  content: '';
+  position: absolute;
+  inset: -20% auto -20% 0;
+  width: 28%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: translateX(-140%) skewX(-18deg);
+  pointer-events: none;
+}
+
+[dir='rtl'] .nudge {
+  --dir: -1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .nudge {
+    animation: nudge 1.1s ease-in-out infinite;
+  }
+  .cta::after {
+    animation: glint 2.8s ease-in-out 0.6s infinite;
+  }
+}
+
+@keyframes nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(calc(5px * var(--dir, 1)));
+  }
+}
+
+@keyframes glint {
+  0% {
+    transform: translateX(-140%) skewX(-18deg);
+  }
+  45%,
+  100% {
+    transform: translateX(480%) skewX(-18deg);
+  }
+}
+
+/* Hero layout: wheel beside the copy, the bar underneath on phones; on desktop
+   a wide banner with the wheel spanning both rows and the bar under the copy. */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 49%) minmax(0, 1fr);
+  grid-template-areas:
+    'wheel text'
+    'cta cta';
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+.heroWheel {
+  grid-area: wheel;
+  width: 100%;
+  max-width: 250px;
+}
+
+.heroText {
+  grid-area: text;
+}
+
+.heroCta {
+  grid-area: cta;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'wheel text'
+      'wheel cta';
+    column-gap: 3rem;
+    row-gap: 1.75rem;
+    padding: 2rem 3rem;
+  }
+
+  .heroWheel {
+    width: clamp(13rem, calc(100dvh - 31rem), 24rem);
+    max-width: none;
+  }
+
+  .heroText {
+    align-self: end;
+  }
+
+  .heroCta {
+    align-self: start;
+    max-width: 34rem;
+  }
+}

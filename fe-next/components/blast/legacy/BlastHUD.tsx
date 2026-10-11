@@ -9,6 +9,8 @@ import { computeTimerUrgency } from '@/lib/cosy/timerUrgency';
 import { useSuppressTimerUrgency } from '@/contexts/AccessibilityContext';
 import { BlastComboStreakBadge } from './BlastComboStreakBadge';
 import BlastWalletHud from './BlastWalletHud';
+import { BlastHudMuteButton } from '../v2/BlastHudMuteButton';
+import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { BLAST_MAX_LIVES } from './utils/blastLives';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
 
@@ -219,6 +221,8 @@ export function BlastHUD({
   coins = 0,
   t,
 }: BlastHUDProps) {
+  const ownMute = !isMultiplayer && !isDesktopCanvas;
+  useRegisterHeaderAudioControl(ownMute);
   const showTimer =
     !isDesktopCanvas &&
     isMultiplayer && remainingTime !== null && remainingTime !== undefined && (totalTime ?? 0) > 0;
@@ -322,6 +326,7 @@ export function BlastHUD({
         <div className="flex items-center gap-1.5">
           {!isMultiplayer && <BlastWalletHud coins={coins} />}
           {hintSlot}
+          {ownMute && <BlastHudMuteButton className="h-7 w-7" />}
           {onShowHelp && (
             <button
               onClick={onShowHelp}
@@ -350,7 +355,7 @@ export function BlastHUD({
           className="flex flex-col justify-center basis-1/3 min-w-0"
           aria-label={`${t('blast.score')}: ${animatedScore}`}
         >
-          <div className="flex items-center gap-1.5 min-w-0">
+          <div data-board-score-target="" className="flex items-center gap-1.5 min-w-0">
             <span className="text-amber-400 text-sm shrink-0">★</span>
             <span
               className={cn(

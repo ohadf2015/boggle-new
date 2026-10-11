@@ -53,6 +53,12 @@ vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: () => ({ showAd: vi.fn(), isAdAvailable: true, isPlaceholderCooldown: false, status: 'idle' }),
 }));
 
+vi.mock('@/hooks/useDictionaryCache', () => ({
+  prewarmDictionary: vi.fn().mockResolvedValue(undefined),
+  hasWordInMemoryCache: () => null,
+}));
+vi.mock('../WordWheelEffectsCanvas', () => ({ __esModule: true, default: () => null }));
+
 vi.mock('../WordWheelGame', () => ({ __esModule: true, default: () => <div data-testid="word-wheel-game" /> }));
 vi.mock('../WordWheelResults', () => ({ __esModule: true, default: () => <div data-testid="word-wheel-results" /> }));
 vi.mock('../TabbedDailyLeaderboard', () => ({ __esModule: true, default: () => <div data-testid="tabbed-daily-leaderboard" /> }));

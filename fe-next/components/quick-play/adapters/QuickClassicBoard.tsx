@@ -20,6 +20,10 @@ import type { HintsState } from '@/components/game/in-game/types';
 import type { SinglePlayerResultsData } from '@/components/singleplayer/SinglePlayerView';
 import { fromSinglePlayer } from './normalizeResult';
 import { buildGhostRows } from '@/lib/quickPlay/ghostRivals';
+import { GameShell, SHELL_MEDIA } from '@/components/game/shell';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { QuickClassicLeftRail, QuickClassicRightRail } from './QuickClassicRails';
+import shellStyles from './quickClassicShell.module.css';
 import type { QuickRoundConfig, QuickRoundResult } from '../types';
 
 interface QuickClassicBoardProps {
@@ -43,6 +47,9 @@ const DISABLED_HINTS: HintsState = {
 
 export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardProps) {
   const { t, dir } = useLanguage();
+
+  // The board's own clock is the only one on a phone; on desktop the rail carries it.
+  const inShell = useMediaQuery(SHELL_MEDIA);
 
   const core = useSinglePlayerCore({
     settings: {
@@ -95,6 +102,11 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
     ]
   );
 
+  const validWords = useMemo(
+    () => (core.foundWords as Array<{ word: string; score: number; isValid: boolean | null }>).filter((w) => w.isValid !== false),
+    [core.foundWords]
+  );
+
   const gameActive = Boolean(core.grid) && !core.isPaused && !core.isGameOver && core.timer.remainingTime > 0;
 
   // Hold until the board resolves — InGameScreen is built around a real grid.
@@ -108,7 +120,25 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
 
   return (
     <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-neo-navy">
+      <GameShell
+        mode="quick-classic"
+        accent="cyan"
+        className={shellStyles.stage}
+        left={
+          <QuickClassicLeftRail
+            t={t}
+            remaining={core.timer.remainingTime}
+            total={config.durationSec}
+            score={core.score}
+            validWords={validWords}
+            leaderboard={leaderboard}
+            selfUsername={selfUsername}
+          />
+        }
+        right={<QuickClassicRightRail t={t} validWords={validWords} />}
+      >
       <InGameScreen
+        inDesktopShell={inShell}
         username={selfUsername}
         gameCode="QUICK"
         isPlaying
@@ -140,6 +170,7 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
         onWordSubmit={core.handleWordSubmit}
         onExitRoom={onQuit}
       />
+      </GameShell>
     </div>
   );
 }

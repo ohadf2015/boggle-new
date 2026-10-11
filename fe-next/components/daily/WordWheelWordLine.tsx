@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, type ReactNode } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { CornerDownLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
@@ -19,6 +19,8 @@ interface WordWheelWordLineProps {
   onRemove: (index: number) => void;
   onSubmit: () => void;
   isValidating: boolean;
+  /** A released word still waiting on the server; the wheel is already clear for the next swipe. */
+  pendingWord?: string | null;
   shake: boolean;
   feedback: { message: string; type: 'success' | 'error' } | null;
   acceptedWord: string | null;
@@ -27,20 +29,47 @@ interface WordWheelWordLineProps {
   reducedMotion?: boolean;
   /** How-to line beside the caret; only before the player's first word. */
   hint?: boolean;
+  /** Letter under a finger that has not joined the word yet. */
+  pending?: string | null;
+  /** A coverage banner is carrying the praise for this word. */
+  celebrating?: boolean;
+  /** Coverage banner, laid over the line once the scored word has flown off it. */
+  banner?: ReactNode;
+  /** What the loaded dictionary says about the word being built: a new word, a non-word, or one already found. */
+  live?: 'word' | 'no' | 'found' | null;
   className?: string;
 }
 
 const POP = { type: 'spring', stiffness: 640, damping: 17 } as const;
 
+function PendingLetter({ letter, reducedMotion }: { letter: string; reducedMotion: boolean }) {
+  return (
+    <m.span
+      data-testid="word-pending-letter"
+      aria-hidden
+      className="notranslate font-neo-display font-black uppercase leading-none text-[40px] sm:text-5xl tall:text-[52px] short:text-3xl px-[1px] text-neo-lime [text-shadow:0_0_16px_rgba(191,255,0,0.6)]"
+      initial={reducedMotion ? false : { y: 12, scale: 0.4 }}
+      animate={{ y: 0, scale: 1 }}
+      transition={POP}
+    >
+      {letter}
+    </m.span>
+  );
+}
+
 export default function WordWheelWordLine({
-  t, letters, allLetters, dir, onRemove, onSubmit, isValidating, shake, feedback,
-  acceptedWord, acceptedPoints, acceptedId, reducedMotion = false, hint = false, className,
+  t, letters, centerLetter, allLetters, dir, onRemove, onSubmit, isValidating, pendingWord = null, shake, feedback,
+  acceptedWord, acceptedPoints, acceptedId, reducedMotion = false, hint = false, pending = null,
+  celebrating = false, banner, live = null, className,
 }: WordWheelWordLineProps) {
   const word = letters.map(l => l.letter).join('');
   const [lastBuilt, setLastBuilt] = useState('');
   if (word && word !== lastBuilt) setLastBuilt(word);
-  const checking = isValidating && letters.length > 0;
-  const preview = word.length >= 3 ? scoreWord(word) : 0;
+  const riding = letters.length === 0 && !!pendingWord;
+  const shown = riding ? [...pendingWord].map(letter => ({ letter, wheelIndex: -2 })) : letters;
+  const checking = riding || (isValidating && letters.length > 0);
+  const isWord = live === 'word' && word.length >= 3 && !checking;
+  const preview = isWord ? scoreWord(word) : 0;
   const isError = feedback?.type === 'error';
   const accepted = feedback?.type === 'success' && acceptedWord ? acceptedWord : null;
   const fullWheel = accepted ? classifyLetterCoverage(accepted, allLetters) === 'all' : false;
@@ -50,12 +79,13 @@ export default function WordWheelWordLine({
     <m.div
       data-testid="word-builder"
       data-state={checking ? 'checking' : isError ? 'rejected' : accepted ? 'accepted' : 'idle'}
+      data-live={live ?? 'unknown'}
       className={cn('relative z-20 w-full mt-2 short:mt-1 h-[60px] sm:h-[76px] tall:h-[88px] short:h-[46px] flex items-center justify-center', className)}
       animate={shake ? { x: [-10, 10, -7, 7, -3, 0] } : { x: 0 }}
       transition={shake ? { duration: 0.38 } : { duration: 0 }}
     >
       <AnimatePresence>
-        {feedback && (
+        {feedback && !(celebrating && !isError) && (
           <m.div
             key={`${feedback.type}-${feedback.message}-${acceptedId}`}
             data-testid="word-feedback"
@@ -124,8 +154,12 @@ export default function WordWheelWordLine({
         </m.span>
       )}
 
+      {shown.length === 0 && !pending && banner}
+
       <div dir={dir} className="flex items-center justify-center gap-0.5 max-w-full">
-        {letters.length === 0 ? (
+        {shown.length === 0 && pending ? (
+          <PendingLetter key={`pending-${pending}`} letter={pending} reducedMotion={reducedMotion} />
+        ) : shown.length === 0 ? (
           <span className="flex items-center gap-2 text-neo-white/45 font-semibold text-sm sm:text-base">
             <m.span
               data-testid="word-caret"
@@ -134,23 +168,23 @@ export default function WordWheelWordLine({
               animate={reducedMotion ? undefined : { opacity: [1, 0, 1] }}
               transition={{ duration: 1.05, repeat: Infinity, ease: 'linear' }}
             />
-            {hint && !accepted && !rejected && t('wordWheel.tapLetters')}
+            {hint && !accepted && !rejected && t('wordWheel.firstHint', { letter: centerLetter })}
           </span>
         ) : (
           <>
-            {letters.map((bl, i) => (
+            {shown.map((bl, i) => (
               <m.button
                 key={`${bl.wheelIndex}-${i}`}
                 type="button"
                 translate="no"
-                data-testid="built-letter-tile"
+                data-testid={riding ? 'pending-letter-tile' : 'built-letter-tile'}
                 data-center={bl.wheelIndex === -1 ? 'true' : 'false'}
                 aria-label={`${bl.letter}. ${t('wordWheel.tapToRemove')}`}
-                onClick={() => onRemove(i)}
+                onClick={() => { if (!riding) onRemove(i); }}
                 className={cn(
                   'notranslate relative font-neo-display font-black uppercase leading-none text-[40px] sm:text-5xl tall:text-[52px] short:text-3xl px-[1px] touch-manipulation cursor-pointer',
                   'before:absolute before:-inset-y-2 before:inset-x-0 before:content-[""]',
-                  isError ? 'text-neo-red' : checking ? 'text-neo-cyan' : bl.wheelIndex === -1 ? 'text-neo-lime' : 'text-neo-white',
+                  isError ? 'text-neo-red' : checking ? 'text-neo-cyan' : isWord ? 'text-neo-lime [text-shadow:0_0_18px_rgba(191,255,0,0.6)]' : live === 'found' ? 'text-neo-white/45' : bl.wheelIndex === -1 ? 'text-neo-lime' : 'text-neo-white',
                 )}
                 initial={reducedMotion ? false : { y: 14, scale: 0.5 }}
                 animate={checking && !reducedMotion ? { y: [0, -10, 0], scale: [1, 1.12, 1] } : { y: 0, scale: 1 }}
@@ -161,6 +195,7 @@ export default function WordWheelWordLine({
                 {bl.letter}
               </m.button>
             ))}
+            {pending && <PendingLetter key={`pending-${pending}`} letter={pending} reducedMotion={reducedMotion} />}
             <m.span
               aria-hidden
               className={cn('inline-block w-[3px] h-9 sm:h-11 ms-1 rounded-full', isError ? 'bg-neo-red' : 'bg-neo-lime')}
@@ -171,7 +206,7 @@ export default function WordWheelWordLine({
               <m.span
                 key={preview}
                 data-testid="word-points-preview"
-                className="ms-2 px-2 py-0.5 rounded-full border-2 border-neo-lime/70 text-neo-lime font-neo-display font-black text-sm tabular-nums"
+                className="ms-2 px-2 py-0.5 rounded-full border-2 border-neo-black bg-neo-lime text-neo-black shadow-hard-sm font-neo-display font-black text-sm tabular-nums"
                 initial={reducedMotion ? false : { scale: 1.6 }}
                 animate={{ scale: 1 }}
                 transition={POP}
@@ -188,7 +223,7 @@ export default function WordWheelWordLine({
               className={cn(
                 'relative ms-2 w-10 h-10 rounded-full border-[3px] border-neo-black grid place-items-center touch-manipulation',
                 'before:absolute before:-inset-2 before:content-[""] active:translate-y-px',
-                word.length >= 3
+                isWord
                   ? 'bg-neo-lime text-neo-black shadow-[2px_2px_0_#000,0_0_14px_rgba(191,255,0,0.55)]'
                   : 'bg-neo-navy-light text-neo-white/70 shadow-[2px_2px_0_#000]',
               )}
@@ -202,7 +237,7 @@ export default function WordWheelWordLine({
                   transition={{ duration: 0.5, repeat: Infinity, ease: 'linear' }}
                 />
               ) : (
-                <Check className="w-5 h-5" strokeWidth={3} aria-hidden />
+                <CornerDownLeft className="w-5 h-5" strokeWidth={3} aria-hidden />
               )}
             </button>
           </>

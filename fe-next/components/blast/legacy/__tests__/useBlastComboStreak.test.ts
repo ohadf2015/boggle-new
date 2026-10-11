@@ -4,7 +4,7 @@
  *
  * Given-When-Then pattern throughout.
  * Timer strategy: vi.useFakeTimers() with advanceTimersByTime().
- * RAF is mocked globally as setTimeout(cb, 0) in jest.setup.js.
+ * RAF is mocked globally as setTimeout(cb, 0) in vitest.setup.ts.
  */
 import { renderHook, act } from '@testing-library/react';
 import { useBlastComboStreak } from '../hooks/useBlastComboStreak';
@@ -26,7 +26,7 @@ function advance(ms: number) {
 describe('useBlastComboStreak — initial state', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
     vi.useRealTimers();
   });
 
@@ -44,7 +44,7 @@ describe('useBlastComboStreak — initial state', () => {
 describe('useBlastComboStreak — first word submitted', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
     vi.useRealTimers();
   });
 
@@ -79,7 +79,7 @@ describe('useBlastComboStreak — first word submitted', () => {
 describe('useBlastComboStreak — streak increments', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
     vi.useRealTimers();
   });
 
@@ -130,7 +130,7 @@ describe('useBlastComboStreak — streak increments', () => {
 describe('useBlastComboStreak — window expiry decays by 1', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
     vi.useRealTimers();
   });
 
@@ -198,7 +198,7 @@ describe('useBlastComboStreak — window expiry decays by 1', () => {
 describe('useBlastComboStreak — max combo level cap', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
     vi.useRealTimers();
   });
 
@@ -234,7 +234,7 @@ describe('useBlastComboStreak — max combo level cap', () => {
 describe('useBlastComboStreak — reset()', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
     vi.useRealTimers();
   });
 
@@ -303,7 +303,7 @@ describe('useBlastComboStreak — reset()', () => {
 describe('useBlastComboStreak — cleanup on unmount', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
     vi.useRealTimers();
   });
 

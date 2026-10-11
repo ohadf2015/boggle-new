@@ -104,7 +104,7 @@ interface WordDetailWithTimestamp extends WordDetail {
 }
 
 // Extended game type for achievement checking
-interface GameWithAchievements extends Game {
+export interface GameWithAchievements extends Game {
   firstWordFound?: boolean;
   gameDuration?: number;
   playerCombos?: Record<string, number>;
@@ -372,14 +372,10 @@ export function checkLiveAchievements(
  * Check and award achievements for a word submission
  */
 export function checkAndAwardAchievements(
-  gameCode: string,
+  game: GameWithAchievements | null,
   username: string,
   word: string
 ): NewAchievement[] {
-  // Import here to avoid circular dependency at module load time
-  const { getGame } = require('./gameStateManager');
-
-  const game = getGame(gameCode) as GameWithAchievements | null;
   if (!game || !game.playerAchievements || !game.playerAchievements[username]) {
     return [];
   }
@@ -394,20 +390,6 @@ export function checkAndAwardAchievements(
   }
 
   return newAchievements;
-}
-
-/**
- * Get achievements for a specific player in a game
- */
-export function getPlayerAchievements(gameCode: string, username: string): string[] {
-  const { getGame } = require('./gameStateManager');
-
-  const game = getGame(gameCode);
-  if (!game || !game.playerAchievements || !game.playerAchievements[username]) {
-    return [];
-  }
-
-  return game.playerAchievements[username];
 }
 
 /**

@@ -1,14 +1,14 @@
 import { type Page, type Locator, expect } from '@playwright/test';
 
 /**
- * Page Object for the Daily Word Hunt flow.
- * Covers landing, game play, and streak tracking. Results-phase assertions
- * live in component tests (see components/daily/__tests__/DailyWordHuntResults.*).
+ * Page Object for the Daily Word Hunt flow: the /daily hub (missions header,
+ * Word Hunt hero card, leaderboard teaser) and the Word Hunt run itself.
+ * Results-phase assertions live in component tests (see components/daily/__tests__/DailyWordHuntResults.*).
  */
 export class DailyWordHuntPage {
   readonly page: Page;
 
-  // Landing
+  // Hub
   readonly wordHuntHero: Locator;
   readonly streakCounter: Locator;
   readonly leaderboardTeaser: Locator;
@@ -17,9 +17,7 @@ export class DailyWordHuntPage {
   readonly countdownTimer: Locator;
   readonly xpProgressBar: Locator;
   readonly questCards: Locator;
-  readonly wonBadge: Locator;
-  readonly lostBadge: Locator;
-  readonly confettiBackground: Locator;
+  readonly doneBadge: Locator;
 
   // Game UI
   readonly gameGrid: Locator;
@@ -28,79 +26,64 @@ export class DailyWordHuntPage {
   readonly scoreDisplay: Locator;
   readonly liveRanks: Locator;
   readonly lootPanel: Locator;
-  readonly mobileInfoToggle: Locator;
-  readonly mobileInfoExpanded: Locator;
+  readonly discoveredWordsSlot: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    // Landing
-    this.wordHuntHero = page.locator('[data-testid="word-hunt-hero"]');
-    this.streakCounter = page.locator('[data-testid="streak-counter"]');
-    this.leaderboardTeaser = page.locator('[data-testid="leaderboard-teaser"]');
-    this.dailyMissionsHeader = page.locator('[data-testid="daily-missions-header"]');
-    this.dateCard = page.locator('[data-testid="date-card"]');
-    this.countdownTimer = page.locator('[data-testid="countdown-timer"]');
-    this.xpProgressBar = page.locator('[data-testid="xp-progress-bar"]');
-    this.questCards = page.locator('[data-testid^="quest-card-"]');
-    this.wonBadge = page.locator('[data-testid="won-badge"]');
-    this.lostBadge = page.locator('[data-testid="lost-badge"]');
-    this.confettiBackground = page.locator('[data-testid="confetti-background"]');
+    this.wordHuntHero = page.getByTestId('quest-card-word-hunt');
+    this.streakCounter = page.getByTestId('streak-counter');
+    this.leaderboardTeaser = page.getByTestId('leaderboard-teaser');
+    this.dailyMissionsHeader = page.getByTestId('daily-missions-header');
+    this.dateCard = page.getByTestId('date-card');
+    this.countdownTimer = page.getByTestId('countdown-timer');
+    this.xpProgressBar = page.getByTestId('xp-progress-bar');
+    this.questCards = page.locator('[data-testid^="quest-card-"]:not([data-testid^="quest-card-accent"]):not([data-testid^="quest-card-image"])');
+    this.doneBadge = page.locator('[data-testid=won-badge], [data-testid=lost-badge], [data-testid$="-done-badge"]');
 
-    // Game UI
-    this.gameGrid = page.locator('[data-testid="desktop-grid"], [class*="grid-container"]');
-    this.lifeBar = page.locator('[data-testid="life-bar"], [class*="life-bar"]');
-    this.clueBoxes = page.locator('[data-testid="clue-boxes"]');
-    this.scoreDisplay = page.locator('[data-testid="score-display"]');
-    this.liveRanks = page.locator('[data-testid="live-ranks"]');
-    this.lootPanel = page.locator('[data-testid="loot-panel"]');
-    this.mobileInfoToggle = page.locator('[data-testid="mobile-info-toggle"]');
-    this.mobileInfoExpanded = page.locator('[data-testid="mobile-info-expanded"]');
-
+    this.gameGrid = page.locator('[role=grid]:has([role=gridcell][data-letter])');
+    this.lifeBar = page.getByTestId('life-bar');
+    this.clueBoxes = page.getByTestId('clue-boxes');
+    this.scoreDisplay = page.getByTestId('score-display');
+    this.liveRanks = page.getByTestId('game-shell-left').getByText(/live ranks/i);
+    this.lootPanel = page.getByTestId('game-shell-right').getByTestId('shell-words');
+    this.discoveredWordsSlot = page.getByTestId('wordhunt-discovered-words-slot');
   }
 
-  /** Navigate to the daily challenge landing */
+  /** The hub is ready once its missions header has rendered (networkidle never settles: the socket stays open). */
+  async waitForHub() {
+    await this.page.waitForLoadState('domcontentloaded');
+    await expect(this.dailyMissionsHeader).toBeVisible({ timeout: 30_000 });
+  }
+
   async visitLanding(locale = 'en') {
-    await this.page.goto(`/${locale}/daily/word-hunt`);
-    await this.page.waitForLoadState('networkidle');
+    await this.page.goto(`/${locale}/daily`);
+    await this.waitForHub();
   }
 
-  /** Click on the Word Hunt quest card to start */
+  /** Hub hero card → Word Hunt intro → Play. */
   async startWordHunt() {
-    // Click the word hunt hero card or quest card
-    const heroCard = this.wordHuntHero;
-    if (await heroCard.isVisible().catch(() => false)) {
-      await heroCard.click();
-    } else {
-      // Fallback: click a quest card
-      await this.questCards.first().click();
-    }
+    await this.wordHuntHero.click();
+    await this.page.waitForURL(/\/daily\/word-hunt/, { timeout: 30_000 });
+    const play = this.page.getByRole('button', { name: /^play$/i }).first();
+    await expect(play).toBeVisible({ timeout: 30_000 });
+    await play.click();
   }
 
-  /** Wait for game to load (grid visible) */
   async waitForGameReady() {
-    await expect(this.gameGrid).toBeVisible({ timeout: 15_000 });
+    await expect(this.gameGrid).toBeVisible({ timeout: 30_000 });
   }
 
-  /** Check if streak counter shows expected value */
   async expectStreak(value: number) {
     await expect(this.streakCounter).toContainText(String(value));
   }
 
-  /** Check that the correct date is shown */
+  /** Dailies reset at midnight UTC, so the date card shows the UTC day. */
   async expectTodaysDate() {
-    const day = String(new Date().getDate());
-    await expect(this.dateCard).toContainText(day);
+    await expect(this.dateCard).toContainText(String(new Date().getUTCDate()));
   }
 
-  /** Verify mobile info panel toggles */
-  async toggleMobileInfo() {
-    await this.mobileInfoToggle.click();
-    await expect(this.mobileInfoExpanded).toBeVisible();
-  }
-
-  /** Get a specific clue box by index */
   getClueBox(index: number) {
-    return this.page.locator(`[data-testid="clue-box-${index}"]`);
+    return this.page.getByTestId(`clue-box-${index}`);
   }
 }

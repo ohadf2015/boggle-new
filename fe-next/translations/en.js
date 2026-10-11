@@ -3176,7 +3176,8 @@ const en = {
       "toggle": "Toggle game drawer"
     },
     "grid": {
-      "cellLabel": "Row {{row}}, Column {{col}}: Letter {{letter}}"
+      "cellLabel": "Row {{row}}, Column {{col}}: Letter {{letter}}",
+      "label": "Letter grid"
     }
   },
   "leadChange": {
@@ -7562,7 +7563,6 @@ const en = {
     "noPastSeasons": "No past seasons yet",
     "rankedAt": "Rank #{{position}}",
     "tierLabel": "Tier",
-    "viewLeaderboard": "Leaderboard",
     "tagline": {
       "1": "Make your mark, one word at a time",
       "2": "Crowns earned, not inherited",
@@ -7731,6 +7731,9 @@ const en = {
     "alternativesTitle": "Best Boggle Alternatives 2026"
   },
   "landing": {
+    "launch": {
+      "go": "GO!"
+    },
     "home": {
       "greeting": "Hey, {name}",
       "levelTitle": "Level {level} · {title}",
@@ -7750,16 +7753,12 @@ const en = {
       "online": "online",
       "gameModes": "Game modes",
       "todaysPuzzle": "Today's puzzle",
+      "wheelWord": "PUZZLE",
       "puzzleNo": "Puzzle #{n}",
       "resetsIn": "resets in {time}",
       "dayStreak": "{n}-day streak",
-      "gamesToday": "Games today",
       "modes": "Modes",
       "languages": "Languages",
-      "rank": "Rank",
-      "maxLevel": "MAX",
-      "xpToNext": "{xp} XP to Lvl {level}",
-      "bestScore": "Best score",
       "tier": {
         "common": "Rookie League",
         "uncommon": "Bronze League",
@@ -7778,14 +7777,7 @@ const en = {
       "vaultSubtitle": "Stash coins, unlock rewards"
     },
     "playingNow": "playing",
-    "welcomeTitle": "Words. Friends. Wins.",
-    "welcomeSubtitle": "Free. No sign-up. No pay-to-win.",
-    "classroomHeroTitle": "Word games for your class",
-    "classroomHeroSubtitle": "No student logins. Share a 6-character code. Whole class plays free.",
-    "forTeachers": "For teachers",
-    "playTodayChallenge": "Play today's challenge",
     "moreGameModes": "More game modes",
-    "moreGameModesHint": "Tap to explore",
     "singlePlayer": "Quick Play",
     "singlePlayerDesc": "Jump in and play instantly",
     "badgeBots": "Bots",
@@ -7803,8 +7795,6 @@ const en = {
     "sectionMultiplayerSubtitle": "Real players, live chaos",
     "sectionSoloTitle": "Solo",
     "sectionSoloSubtitle": "Train. Climb. Beat your best.",
-    "calmSectionTitle": "Take Your Time",
-    "calmSectionSubtitle": "Relaxed puzzles at your own pace",
     "arena": "Multiplayer",
     "arenaDesc": "Play solo or challenge friends",
     "offlineLocked": "Needs internet",
@@ -7855,23 +7845,11 @@ const en = {
     "shareTextAuth": "Join me on LexiClash! Use my referral code: {code}",
     "shareTextGuest": "Come play LexiClash with me. Let's see who's better.",
     "shareNativeTitle": "Join LexiClash",
-    "playNowFree": "Play free now",
     "letsPlay": "Let's play",
     "duration": "{time} min",
     "difficultyEasy": "Easy",
     "difficultyMedium": "Medium",
     "difficultyHard": "Hard",
-    "gameModes": "Game Modes",
-    "languages": "Languages",
-    "activePlayers": "Active Players",
-    "todaysTopPlayers": "Top Players",
-    "viewFullLeaderboard": "View full leaderboard",
-    "readyToCompete": "Think you can win?",
-    "startPlaying": "Start Playing",
-    "createAvatar": "Create your avatar",
-    "designYourLook": "Design your look",
-    "yourRank": "Your rank",
-    "totalScore": "Total score",
     "solvedPercent": "Only {percent}% solved today",
     "liveActivity": "Live game activity",
     "tickerLive": "LIVE",
@@ -7902,8 +7880,6 @@ const en = {
     "todaysTopWords": "Top words today",
     "hallOfFame": "Hall of Fame",
     "careerPoints": "Career points",
-    "gamesToday": "Games today",
-    "freeToPlay": "Free to play",
     "wordHuntMode": "Word Hunt",
     "wordHuntModeDesc": "Find the target word fast. A fresh puzzle every day.",
     "communityBoards": "Community Boards",
@@ -8910,6 +8886,7 @@ const en = {
     "onFireBadge": "{count} on fire!",
     "closeRace": "Close race",
     "inputPlaceholder": "Type a word...",
+    "firstHint": "Tap or swipe — every word uses {letter}",
     "tapLetters": "Tap or drag letters to build a word",
     "tapToRemove": "Tap an added letter again to remove it",
     "doubleTapToSubmit": "Double-tap a letter to submit",
@@ -9143,7 +9120,6 @@ const en = {
         "decline": "End run"
       },
       "findWordsToReveal": "Spell words on the grid to reveal these letters",
-      "keyboardTip": "Swipe on grid or type with keyboard",
       "shop": "Clue Shop",
       "revealLetter": "Reveal Letter",
       "revealLetterDesc": "Reveal a random letter in the target word",
@@ -9171,6 +9147,14 @@ const en = {
       "clueUnlocked": "{name} unlocked (-{cost} coins)",
       "longWordBonus": "🔥 +{bonus} long word bonus!",
       "scoreBreakdownTooltip": "Tap for details",
+      "stage": {
+        "prompt": "Swipe letters to make a word",
+        "praiseShort": "Nice!",
+        "praiseMid": "Sweet!",
+        "praiseLong": "Monster word!",
+        "boardLabel": "Letter board",
+        "longWord": "Long word +{bonus}"
+      },
       "score": {
         "tier": {
           "bronze": "Bronze",
@@ -9194,14 +9178,11 @@ const en = {
     "desktop": {
       "liveRanks": "Live Ranks",
       "lootCollected": "Loot Collected",
-      "powerUps": "Power-ups",
-      "hintsUnlocked": "Hints Unlocked",
-      "triesRemaining": "Tries Remaining",
       "noWordsYet": "Find words to collect loot.",
       "beFirst": "Be the first to rank."
     },
     "mobile": {
-      "words": "words",
+      "found": "Found",
       "rank": "Rank"
     },
     "results": {
@@ -10344,7 +10325,6 @@ const en = {
       },
       "roundComplete": "Round complete",
       "ofPerfect": "of perfect",
-      "points": "pts",
       "wordsFound": "{found} / {total} words found",
       "targetWordFound": "🎯 You found the word: {word}",
       "targetWordMissed": "🎯 The word was: {word}",
@@ -10374,6 +10354,8 @@ const en = {
       "dayStreak": "{days}-day streak",
       "rewardsPending": "Sign in to start banking coins and XP",
       "pickNextMode": "Next round",
+      "statScore": "Score",
+      "statWords": "Words",
       "noWords": "No words this time. The next board is 60 seconds away.",
       "rankProgress": "{points} / {next} to {rank}",
       "rankMax": "Top rank reached",
@@ -16956,6 +16938,10 @@ const en = {
       "finale": "Finale",
       "explainer": "Solve the 3 bottom riddles. Their answers unlock the word at the top.",
       "finalePrompt": "Which word connects all three?",
+      "railMap": "The pyramid",
+      "railSolved": "Bridges",
+      "railEmptyTitle": "Cracked bridges climb here",
+      "railEmptyBody": "Each answer you solve lights a beam toward the word at the top.",
       "cluesLabel": "Find the word that pairs with each bridge:",
       "won": "Pyramid complete!",
       "lost": "Pyramid lost.",
@@ -19422,6 +19408,40 @@ const en = {
     }
   },
   // @eg2Help:end
+  // @gameShell:start
+  "gameShell": {
+    "words": "Your words",
+    "wordsEmptyTitle": "Your words land here",
+    "wordsEmptyBody": "Drag across the letters or just type. Every word stacks up here, newest on top.",
+    "pts": "pts",
+    "best": "Longest",
+    "rivals": "Rivals",
+    "leading": "You're in the lead",
+    "behind": "{points} behind {name}",
+    "raceOpen": "First word takes the lead",
+    "round": "This round",
+    "score": "Score",
+    "found": "Found",
+    "time": "Time left",
+    "combo": "Combo",
+    "life": "Life",
+    "tries": "Tries left",
+    "clues": "Hints",
+    "streak": "Streak",
+    "multiplier": "Multiplier",
+    "topWord": "Top word",
+    "byLength": "By length",
+    "target": "Target",
+    "you": "You",
+    "keys": {
+      "title": "Play with your keyboard",
+      "type": "Type the word",
+      "letters": "A–Z",
+      "submit": "Send it",
+      "clear": "Start over"
+    }
+  },
+  // @gameShell:end
   // @hqCalm:start
   "hqCalm": {
     "playWithoutClass": "Or play a game without a class",

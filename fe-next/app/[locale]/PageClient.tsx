@@ -1,23 +1,26 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useLayoutEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { retryImport } from '@/utils/retryImport';
 import { LoadingDancer } from '@/components/ui/LoadingDancer';
-import { isReturningVisitor, savePendingRoomInvite } from '@/utils/onboardingStorage';
+import { getPendingRoomInvite, isReturningVisitor, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { detectCrazyGamesSync } from '@/components/CrazyGamesSDK';
 import { trackInviteLanded, trackInviteRedirectFired, trackGrowthEvent } from '@/utils/growthTracking';
 import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
 import { isQrScanArrival } from '@/utils/utmCapture';
 import { isCrawler } from '@/lib/seo/isCrawler';
 import { LandingView } from '@/components/landing';
+import { dropLaunch, raiseLaunch } from '@/components/landing/home/launchStore';
 import { useExperiment } from '@/hooks/useExperiment';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
 // Denylist: allow only Latin/accented/Hebrew/Hiragana/Katakana + space/apostrophe/hyphen
 const HOST_NAME_ALLOWED = /[^A-Za-z0-9 '\-À-ɏ֐-׿぀-ヿ]/g;
+
+const QUICK_COVER = 'home-quickplay';
 
 const sanitizeHostName = (raw: string): string => {
   if (!raw) return '';
@@ -197,6 +200,8 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   const [ftueEntry, setFtueEntry] = useState<'quickPlay' | undefined>(undefined);
   // Quick play ends by navigating; a cover stops the homepage flashing back.
   const [leavingForGame, setLeavingForGame] = useState(false);
+  // Quick play skips every onboarding step, so the curtain can cover the flow from the tap on.
+  const [quickCurtain, setQuickCurtain] = useState(false);
   useEffect(() => {
     if (!leavingForGame) return; // never strand it: bfcache restore or a dead nav clears it
     const clear = (e: PageTransitionEvent) => e.persisted && setLeavingForGame(false);
@@ -208,6 +213,17 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     };
   }, [leavingForGame]);
 
+  // The layout draws the cover, so it stays up over the game route's loader after this page unmounts.
+  const quickCover = (showFTUE && quickCurtain) || (leavingForGame && !showFTUE);
+  const quickTitle = t('landing.quickPlay');
+  useLayoutEffect(() => {
+    if (quickCover) {
+      raiseLaunch({ id: QUICK_COVER, tone: 'lime', title: quickTitle, testId: 'home-quickplay-cover', sticky: true });
+    } else {
+      dropLaunch(QUICK_COVER);
+    }
+  }, [quickCover, quickTitle]);
+
   const handleStartOnboarding = useCallback(() => {
     if (!routeAllowsOnboarding) return;
     let isCrazyGames = false;
@@ -217,6 +233,7 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
       isCrazyGames = false;
     }
     setFtueEntry(isCrazyGames ? undefined : 'quickPlay');
+    setQuickCurtain(!isCrazyGames && !getPendingRoomInvite());
     setShowFTUE(true);
   }, [routeAllowsOnboarding]);
   const handleFTUEComplete = useCallback(() => {
@@ -282,17 +299,6 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
       />
       {showFTUE && routeAllowsOnboarding && (
         <OnboardingFlow onComplete={handleFTUEComplete} entry={ftueEntry} />
-      )}
-      {leavingForGame && !showFTUE && (
-        <div
-          data-testid="home-quickplay-cover"
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-neo-navy"
-          role="status"
-          aria-live="polite"
-        >
-          <LoadingDancer styleKey="arcade" className="h-28 w-28 sm:h-32 sm:w-32" />
-          <span className="sr-only">{t('onboarding.loading')}</span>
-        </div>
       )}
     </>
   );

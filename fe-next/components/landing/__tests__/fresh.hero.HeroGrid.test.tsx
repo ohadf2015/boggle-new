@@ -115,6 +115,44 @@ describe('HeroGrid', () => {
     expect(onFound).toHaveBeenCalledTimes(1);
   });
 
+  it('a mouse drag is judged on release, like a real board, so the cheer follows the let-go', () => {
+    const onFound = vi.fn();
+    render(<HeroGrid onFound={onFound} />);
+    fireEvent.pointerDown(tile(0, 0), { pointerType: 'mouse' });
+    fireEvent.pointerEnter(tile(0, 1), { pointerType: 'mouse' });
+    fireEvent.pointerEnter(tile(1, 1), { pointerType: 'mouse' });
+    expect(board()).toHaveAttribute('data-state', 'play');
+    expect(onFound).not.toHaveBeenCalled();
+    fireEvent.pointerUp(window);
+    expect(board()).toHaveAttribute('data-state', 'found');
+    expect(onFound).toHaveBeenCalledTimes(1);
+  });
+
+  it('mouse clicks one tile at a time still build the word across releases', () => {
+    const onFound = vi.fn();
+    render(<HeroGrid onFound={onFound} />);
+    for (const [r, c] of [
+      [0, 0],
+      [0, 1],
+      [1, 1],
+    ]) {
+      fireEvent.pointerDown(tile(r, c), { pointerType: 'mouse' });
+      fireEvent.pointerUp(window);
+      fireEvent.click(tile(r, c));
+    }
+    expect(board()).toHaveAttribute('data-state', 'found');
+    expect(onFound).toHaveBeenCalledTimes(1);
+  });
+
+  it('a found word throws sparks off the board', () => {
+    render(<HeroGrid />);
+    fireEvent.click(tile(0, 0));
+    fireEvent.click(tile(0, 1));
+    expect(document.querySelectorAll('[data-hero-spark]')).toHaveLength(0);
+    fireEvent.click(tile(1, 1));
+    expect(document.querySelectorAll('[data-hero-spark]').length).toBeGreaterThanOrEqual(6);
+  });
+
   it('never blocks page scroll over the board (no touch-action:none)', () => {
     render(<HeroGrid />);
     const html = board().outerHTML;

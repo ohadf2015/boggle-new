@@ -64,6 +64,7 @@ vi.mock('@/utils/clientWordValidator', () => ({
 
 import { WordHuntGame } from '../WordHuntGame';
 import { validateWordLocally, couldBeOnBoard } from '@/utils/clientWordValidator';
+import type { Mock } from 'vitest';
 
 describe('WordHuntGame', () => {
   const defaultGrid = [
@@ -103,8 +104,8 @@ describe('WordHuntGame', () => {
     mockBridgeReturn.isGameOver = false;
     mockBridgeReturn.lifePoints = 75;
     mockBridgeReturn.eliminatedPlayers = [];
-    (validateWordLocally as jest.Mock).mockReturnValue({ isValid: true, shouldSubmitToServer: true });
-    (couldBeOnBoard as jest.Mock).mockReturnValue(true);
+    (validateWordLocally as Mock).mockReturnValue({ isValid: true, shouldSubmitToServer: true });
+    (couldBeOnBoard as Mock).mockReturnValue(true);
     // Mark quick rules as seen so the game renders directly
     localStorage.setItem('lexiclash_wh_rules_seen', '1');
   });
@@ -238,7 +239,7 @@ describe('WordHuntGame', () => {
 
   describe('client-side validation', () => {
     it('should reject duplicate words with duplicate feedback', () => {
-      (validateWordLocally as jest.Mock).mockReturnValue({
+      (validateWordLocally as Mock).mockReturnValue({
         isValid: false,
         errorKey: 'playerView.wordAlreadyFound',
         shouldSubmitToServer: false,
@@ -260,7 +261,7 @@ describe('WordHuntGame', () => {
     });
 
     it('should reject too-short words with rejected feedback', () => {
-      (validateWordLocally as jest.Mock).mockReturnValue({
+      (validateWordLocally as Mock).mockReturnValue({
         isValid: false,
         errorKey: 'playerView.wordTooShortMin',
         shouldSubmitToServer: false,
@@ -282,7 +283,7 @@ describe('WordHuntGame', () => {
     });
 
     it('should reject words not on board', () => {
-      (couldBeOnBoard as jest.Mock).mockReturnValue(false);
+      (couldBeOnBoard as Mock).mockReturnValue(false);
 
       render(<WordHuntGame {...defaultProps} />);
       const layoutOnWordSubmit = capturedLayoutProps.value!.onWordSubmit as (word: string) => void;

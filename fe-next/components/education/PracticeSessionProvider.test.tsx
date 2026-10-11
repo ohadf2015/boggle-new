@@ -120,6 +120,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 // Import after mocks
 import { PracticeSessionProvider, usePracticeSession } from './PracticeSessionProvider';
 import useEducationXp from '@/hooks/useEducationXp';
+import type { Mock } from 'vitest';
 
 // Test consumer component
 function TestConsumer() {
@@ -368,7 +369,7 @@ describe('PracticeSessionProvider', () => {
 
   describe('Initial values from props', () => {
     it('passes initial XP to useEducationXp', () => {
-      const mockUseEducationXp = useEducationXp as jest.Mock;
+      const mockUseEducationXp = useEducationXp as Mock;
 
       render(
         <PracticeSessionProvider

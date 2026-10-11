@@ -15,6 +15,9 @@ import LevelTopBar from '../play/LevelTopBar';
 import FoeTarget from '../play/fx/FoeTarget';
 import { WORLD_CONFIGS } from '@/lib/adventure/worldConfig';
 import type { Language } from '@/types';
+import { GameShell } from '@/components/game/shell';
+import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
+import { AdventureLeftRail, AdventureRightRail } from './AdventureShellRails';
 
 interface AdventureDemoProps {
   onExit: () => void;
@@ -50,6 +53,13 @@ function DemoRun({ language, onPlayAgain, onExit }: DemoRunProps): ReactNode {
   }, [phase, start]);
 
   const lvl = run.lvl;
+  const keyboard = useKeyboardWordInput({
+    grid: run.grid,
+    language,
+    gameLanguage: language,
+    enabled: run.phase === 'playing',
+    onWordSubmit: (word) => void handleWordSubmit(word),
+  });
 
   if (run.phase === 'loading') {
     return (
@@ -81,7 +91,7 @@ function DemoRun({ language, onPlayAgain, onExit }: DemoRunProps): ReactNode {
 
   return (
     <div
-      className="min-h-dvh flex flex-col bg-[#0f1b3d] text-neo-cream"
+      className="min-h-dvh shell:h-dvh shell:overflow-hidden flex flex-col bg-[#0f1b3d] text-neo-cream"
       style={{
         backgroundImage: `url(${worldBackdrop(WORLD)})`,
         backgroundSize: 'cover',
@@ -89,7 +99,7 @@ function DemoRun({ language, onPlayAgain, onExit }: DemoRunProps): ReactNode {
       }}
     >
       {/* Same top bar + foe card as a real level: timer, exit, rival HP vs the star bars. */}
-      <header className="sticky top-0 z-40 px-3 pt-[max(0.625rem,env(safe-area-inset-top))] pb-2.5 space-y-2">
+      <header className="sticky top-0 z-40 px-3 pt-[max(0.625rem,env(safe-area-inset-top))] pb-2.5 space-y-2 shell:static shell:shrink-0 shell:px-[clamp(0.875rem,1.4vw,1.75rem)] shell:pb-0 shell:[&_[data-adv-slot=timer]]:hidden">
         <LevelTopBar
           worldName={t('adventure.worlds.' + WORLD_NAME)}
           levelLabel={t('adventurePlay.guest.demoLabel')}
@@ -104,17 +114,39 @@ function DemoRun({ language, onPlayAgain, onExit }: DemoRunProps): ReactNode {
         )}
       </header>
 
-      {/* Board */}
       {lvl && run.grid.length > 0 && (
-        <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
-          <GridComponent
-            grid={run.grid}
-            language={language}
-            onWordSubmit={handleWordSubmit}
-            tileSkinOverride={worldSkinId(WORLD)}
-            interactive={run.phase === 'playing'}
-          />
-        </div>
+        <GameShell
+          mode="adventure"
+          accent="lime"
+          scene
+          className="min-h-0 [--shell-chrome:12.5rem]"
+          left={
+            <AdventureLeftRail
+              t={t}
+              secsLeft={Math.ceil(run.msLeft / 1000)}
+              totalSecs={lvl.seconds}
+              score={run.score}
+              words={run.words}
+              stars={lvl.stars}
+            />
+          }
+          right={<AdventureRightRail t={t} words={run.words} />}
+        >
+          <div
+            data-testid="adventure-board"
+            className="flex-1 flex flex-col items-center justify-center px-4 py-8 shell:p-0 shell:min-h-0 shell:[container-type:size] shell:[&_.game-board-frame]:!w-[min(100cqw,100cqh)] shell:[&_.game-board-frame]:!h-[min(100cqw,100cqh)] shell:[&_.game-board-frame]:!max-w-none shell:[&_.game-board-frame]:!max-h-none"
+          >
+            <GridComponent
+              grid={run.grid}
+              language={language}
+              onWordSubmit={handleWordSubmit}
+              tileSkinOverride={worldSkinId(WORLD)}
+              interactive={run.phase === 'playing'}
+              highlightedPath={keyboard.highlightedCells}
+              isTypingMode={keyboard.isTypingMode}
+            />
+          </div>
+        </GameShell>
       )}
 
     </div>

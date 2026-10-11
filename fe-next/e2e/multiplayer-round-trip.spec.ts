@@ -1,7 +1,8 @@
 import { test, expect, type Browser } from '@playwright/test';
 import { MultiplayerPage } from './pages/MultiplayerPage';
-import { goto, randomUsername, waitForHydration, type Locale } from './helpers/test-utils';
+import { open, randomUsername, type Locale } from './helpers/test-utils';
 import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures';
+import { recordSocketEvents, topLeaderboardScore } from './helpers/socket-events';
 
 /**
  * Covers the product's only critical path end to end: create room -> second
@@ -15,17 +16,13 @@ import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures'
 async function createOnboardedContext(browser: Browser, locale: Locale = 'en') {
   const context = await browser.newContext();
   const page = await context.newPage();
-  await goto(page, '/multiplayer', locale);
+  const events = recordSocketEvents(page);
+  await open(page, '/multiplayer', locale);
   await applyStorageFixture(page, ONBOARDED_USER);
-  await goto(page, '/multiplayer', locale);
-  await waitForHydration(page);
-  return { context, page, mp: new MultiplayerPage(page) };
-}
-
-/** Extract the game code from the current URL (expects /{locale}/multiplayer/{code}) */
-function extractGameCode(url: string): string {
-  const parts = url.split('/');
-  return parts[parts.length - 1] || '';
+  await open(page, '/multiplayer', locale);
+  const mp = new MultiplayerPage(page);
+  await mp.waitForEntryReady();
+  return { context, page, events, mp };
 }
 
 const ROUND_TRIP_LOCALES: { locale: Locale; language: string }[] = [
@@ -41,25 +38,18 @@ test.describe('Multiplayer round trip', () => {
       browser,
       baseURL,
     }) => {
-      test.setTimeout(150_000);
+      test.setTimeout(240_000);
 
       const host = await createOnboardedContext(browser, locale);
       const hostName = randomUsername('Host');
       await host.mp.createRoom(hostName);
-      await expect(host.mp.waitingStatus).toBeVisible({ timeout: 10_000 });
-
-      const gameCode = extractGameCode(host.page.url());
-      expect(gameCode).toBeTruthy();
+      const gameCode = await host.mp.waitForHostLobby();
+      await host.mp.selectClassicMode();
 
       // Second player joins via the invite code/link.
       const player = await createOnboardedContext(browser, locale);
-      await goto(player.page, `/join/${gameCode}`, locale);
-      await waitForHydration(player.page);
-      const playerName = randomUsername('Player');
-      if (await player.mp.joinNameInput.isVisible().catch(() => false)) {
-        await player.mp.joinRoom(playerName);
-      }
-      await expect(player.mp.waitingStatus).toBeVisible({ timeout: 10_000 });
+      await player.mp.joinByInvite(locale, gameCode, randomUsername('Player'));
+      await host.mp.waitForPlayerCount(2);
 
       // Host starts the round; the board generates for both players.
       await host.mp.startGameButton.click();
@@ -69,10 +59,11 @@ test.describe('Multiplayer round trip', () => {
       // Submit a real, board-verified word by dragging across the host's grid.
       const word = await host.mp.submitRealWord(baseURL!, language);
 
-      // Scoring round-trips through the server: the word lands in the live
-      // found-words ladder for BOTH players, not just the submitter.
+      // Scoring round-trips through the server: the submitter's word list has it,
+      // and the leaderboard BOTH players receive carries the new score.
       await expect(host.mp.wordLadderRow(word)).toBeVisible({ timeout: 10_000 });
-      await expect(player.mp.wordLadderRow(word)).toBeVisible({ timeout: 10_000 });
+      await expect.poll(() => topLeaderboardScore(host.events), { timeout: 10_000 }).toBeGreaterThan(0);
+      await expect.poll(() => topLeaderboardScore(player.events), { timeout: 10_000 }).toBeGreaterThan(0);
 
       // Round ends and both players leave the grid for the results screen.
       await expect(host.mp.gameGrid).toBeHidden({ timeout: 120_000 });

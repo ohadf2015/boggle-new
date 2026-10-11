@@ -272,20 +272,20 @@ describe('LandingChallengeCards — Word Tower v2 public gate', () => {
   });
 });
 
-describe('LandingChallengeCards — two modes up front, the rest parked', () => {
-  it('leads with the live race and parks blast, adventure and word tower', () => {
+describe('LandingChallengeCards — the live race and four modes up front, the rest parked', () => {
+  it('leads with the live race, shows four more modes and parks the rest', () => {
     mockIsNewPlayer.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(0);
     mockUserStats.mockReturnValue({ totalGamesPlayed: 0 });
     mockUserEmail.mockReturnValue(undefined);
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    const more = container.querySelector('[data-testid="landing-cubes-more"]');
+    const more = container.querySelector('[data-testid="home-more-sheet"]');
     expect(more).not.toBeNull();
-    expect(container.querySelector('[data-cube-key="arena"]')).toBeInTheDocument();
+    const onHome = Array.from(container.querySelectorAll('[data-cube-key]')).filter((el) => !more!.contains(el));
+    expect(onHome.map((el) => el.getAttribute('data-cube-key'))[0]).toBe('arena');
+    expect(onHome).toHaveLength(5);
     for (const key of ['blast', 'adventure', 'wordTowerV2', 'connections']) {
-      const card = container.querySelector(`[data-cube-key="${key}"]`);
-      expect(card).toBeTruthy();
-      expect(more!.contains(card)).toBe(true);
+      expect(container.querySelector(`[data-cube-key="${key}"]`)).toBeTruthy();
     }
   });
 });

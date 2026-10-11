@@ -59,7 +59,7 @@ describe('BlastMascotHud', () => {
   });
 
   it('calls onToggle when clicked', () => {
-    const onToggle = jest.fn();
+    const onToggle = vi.fn();
     render(<BlastMascotHud state="awe" enabled={true} onToggle={onToggle} />);
     screen.getByTestId('blast-mascot-hud').click();
     expect(onToggle).toHaveBeenCalledTimes(1);

@@ -26,7 +26,8 @@ import { join } from 'path';
  * verified in a real browser with the banner CSS vars simulated.
  */
 
-const FILE = 'components/daily/WordWheelGame.tsx';
+const FILE = 'components/daily/wheel/WheelDisc.tsx';
+const GAME = 'components/daily/WordWheelGame.tsx';
 const CHALLENGE = 'components/daily/WordWheelChallenge.tsx';
 
 describe('word wheel orbit clamp', () => {
@@ -77,7 +78,7 @@ describe('bottom stack is reserved once', () => {
     'x 154px = 462px lost from an 832px viewport.';
 
   it('WordWheelGame renders wholly inside the locked body, so it never re-reserves', () => {
-    const src = readFileSync(join(process.cwd(), FILE), 'utf8');
+    const src = [GAME, FILE].map((f) => readFileSync(join(process.cwd(), f), 'utf8')).join('\n');
     const offenders = src
       .split('\n')
       .map((line, i) => `${i + 1}: ${line.trim().slice(0, 70)}`)

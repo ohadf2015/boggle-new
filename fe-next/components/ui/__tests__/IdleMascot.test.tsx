@@ -3,10 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { IdleMascot } from '../IdleMascot';
 import { useRandomMascotActivity } from '@/hooks/useRandomMascotActivity';
 import type { ActivityVariant } from '../InteractiveMascot';
+import type { MockedFunction } from 'vitest';
 
 // Mock the hook
 vi.mock('@/hooks/useRandomMascotActivity');
-const mockUseRandomMascotActivity = useRandomMascotActivity as jest.MockedFunction<
+const mockUseRandomMascotActivity = useRandomMascotActivity as MockedFunction<
   typeof useRandomMascotActivity
 >;
 

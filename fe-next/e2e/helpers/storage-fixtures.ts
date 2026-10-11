@@ -21,9 +21,10 @@ export const ONBOARDED_USER = {
 export const DAILY_PLAYER = {
   ...ONBOARDED_USER,
   lexiclash_daily_streak: JSON.stringify({
-    current: 5,
-    longest: 12,
+    currentStreak: 5,
+    longestStreak: 12,
     lastPlayedDate: new Date().toISOString().slice(0, 10),
+    totalDailiesCompleted: 20,
   }),
 };
 
