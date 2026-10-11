@@ -41,6 +41,7 @@ import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { SoloMission } from '@/lib/soloMissions';
 import type { FoundWord } from './types';
 import { SoloComboMeter } from './components/SoloComboMeter';
+import { LESSON_LANE_PAD } from '@/components/tutorial/lesson/lessonLane';
 import { MissionChips } from './components/MissionChips';
 import { SoloStartCard } from './components/SoloStartCard';
 
@@ -95,6 +96,10 @@ const SOLO_SHELL_CSS = `
   max-width: min(var(--board-size), 100%);
   max-height: min(var(--board-size), 100%);
 }
+.${SHELL}[data-lesson="on"] [data-testid="grid-doubleclick-submit-hint"] { display: none; }
+.${SHELL}[data-lesson="on"] [role="gridcell"][aria-selected="true"] { box-shadow: 3px 3px 0 #0a0a1a !important; border-color: #0a0a1a !important; }
+.${SHELL}[data-lesson="on"] [role="gridcell"][aria-selected="true"][style*="rgb(0, 255, 255)"] { background: linear-gradient(135deg, #ffd60a, #ff6b35 55%, #ff1493) !important; animation: none !important; }
+.${SHELL}[data-lesson="on"] [role="gridcell"] > div.pointer-events-none { display: none; }
 @media (orientation: landscape) and (max-height: 540px) {
   .${SHELL} {
     max-width: none;
@@ -135,8 +140,11 @@ const SOLO_SHELL_CSS = `
   .${SHELL} > [data-solo-slot="words"] { grid-area: words; min-height: 0; align-self: stretch; overflow: hidden; display: flex; flex-direction: column; }
   .${SHELL} > [data-solo-slot="words"] > ul { flex-direction: column; flex-wrap: nowrap; overflow-y: auto; overflow-x: hidden; height: auto; flex: 1 1 auto; }
   .${SHELL} > [data-solo-slot="words"] > ul > li { justify-content: space-between; }
-  .${SHELL}[data-lesson="on"] { grid-template-areas: "bar bar bar" "race missions words" ". board words"; padding-bottom: 6.5rem; }
-  .${SHELL}[data-lesson="on"] > [data-solo-slot="missions"] { justify-self: center; width: min(100%, 40rem); margin-top: 2.5rem; }
+  .${SHELL}[data-lesson="on"] { grid-template-areas: "bar bar bar" "race missions words" "race board words"; grid-template-columns: minmax(15rem, 0.8fr) minmax(0, 2.2fr) minmax(15rem, 0.8fr); row-gap: 0.5rem; }
+  .${SHELL}[data-lesson="on"] > [data-solo-slot="missions"] { justify-self: center; width: min(100%, 44rem); }
+  .${SHELL}[data-lesson="on"] > [data-solo-slot="board"] { --solo-board-max: 48rem; --solo-word-h: 3rem; }
+  .${SHELL}[data-lesson="on"] > [data-solo-slot="race"],
+  .${SHELL}[data-lesson="on"] > [data-solo-slot="words"] { zoom: 1.3; }
 }
 /* TV / big monitor: the side lanes are read from the couch — scale them up. */
 @media (min-width: 1700px) and (min-height: 900px) and (min-aspect-ratio: 5/4) {
@@ -201,8 +209,8 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
         <div aria-hidden className={cn('pointer-events-none fixed inset-0 z-30 shadow-[inset_0_0_60px_rgba(255,50,50,0.55)]', !reduceMotion && 'animate-timer-vignette-ambient')} />
       )}
 
-      {playing && <ComboMilestoneAnnouncement comboLevel={comboLevel} />}
-      {playing && (
+      {playing && !soloLessonActive && <ComboMilestoneAnnouncement comboLevel={comboLevel} />}
+      {playing && !soloLessonActive && (
         <FloatingScoreAnimation score={floatingScore} isFireRound={floatingFire} onAnimationComplete={clearFloating} />
       )}
       <GameOverlays
@@ -223,7 +231,8 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
         className={cn(
           SHELL,
           'relative z-10 mx-auto flex h-full w-full max-w-lg md:max-w-xl flex-col px-3 sm:px-4',
-          'pt-[max(0.625rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]',
+          'pt-[max(0.625rem,env(safe-area-inset-top))]',
+          soloLessonActive ? LESSON_LANE_PAD : 'pb-[max(0.75rem,env(safe-area-inset-bottom))]',
           '[--solo-board-max:560px] [--solo-word-h:3.25rem]',
         )}
       >
@@ -302,7 +311,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
           <div className="relative flex h-[var(--solo-word-h)] w-full shrink-0 items-center justify-center">
             <WordFormingAreaConnected isTypingMode={false} typedWord="" feedback={currentFeedback} />
             <div className="pointer-events-none absolute inset-x-0 -bottom-1 flex justify-center">
-              <SoloComboMeter streak={soloStreak} multiplier={soloMultiplier} praiseKey={soloPraiseKey} />
+              {!soloLessonActive && <SoloComboMeter streak={soloStreak} multiplier={soloMultiplier} praiseKey={soloPraiseKey} />}
             </div>
           </div>
           <div className="flex justify-center" style={{ width: 'min(100cqw, calc(100cqh - var(--solo-word-h)), var(--solo-board-max))' }}>

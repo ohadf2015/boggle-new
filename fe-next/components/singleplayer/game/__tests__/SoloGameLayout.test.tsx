@@ -15,8 +15,11 @@ vi.mock('@/components/game/in-game/components/WordFormingAreaConnected', () => (
 vi.mock('@/components/game/in-game/components/GameOverlays', () => ({
   GameOverlays: (p: { isPlaying: boolean }) => <div data-testid="overlays" data-playing={String(p.isPlaying)} />,
 }));
-vi.mock('@/components/game/FloatingScoreAnimation', () => ({ default: () => null }));
-vi.mock('@/components/game/ComboMilestoneAnnouncement', () => ({ ComboMilestoneAnnouncement: () => null }));
+vi.mock('../components/SoloComboMeter', () => ({
+  SoloComboMeter: () => <div data-testid="combo-meter" />,
+}));
+vi.mock('@/components/game/FloatingScoreAnimation', () => ({ default: () => <div data-testid="score-float" /> }));
+vi.mock('@/components/game/ComboMilestoneAnnouncement', () => ({ ComboMilestoneAnnouncement: () => <div data-testid="combo-milestone" /> }));
 vi.mock('@/contexts/AccessibilityContext', () => ({
   useHapticsEnabled: () => false,
   useShouldReduceMotion: () => true,
@@ -26,6 +29,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 import { SoloGameLayout, type SoloGameLayoutProps } from '../SoloGameLayout';
+import { LESSON_LANE_PAD } from '@/components/tutorial/lesson/lessonLane';
 
 const t = ((key: string, params?: Record<string, unknown>) =>
   params ? `${key}:${JSON.stringify(params)}` : key) as SoloGameLayoutProps['t'];
@@ -169,5 +173,28 @@ describe('SoloGameLayout', () => {
     expect(screen.getByTestId('overlays')).toHaveAttribute('data-playing', 'true');
     rerender(<SoloGameLayout {...props({ soloLessonActive: true })} />);
     expect(screen.getByTestId('overlays')).toHaveAttribute('data-playing', 'false');
+  });
+
+  it('reserves the bottom lane for lesson feedback, so a banner never covers the found words', () => {
+    const { rerender } = render(<SoloGameLayout {...props()} />);
+    const shell = () => document.querySelector('[data-solo-slot="bar"]')?.parentElement;
+    expect(shell()?.className).not.toContain(LESSON_LANE_PAD);
+    rerender(<SoloGameLayout {...props({ soloLessonActive: true })} />);
+    expect(shell()?.className).toContain(LESSON_LANE_PAD);
+  });
+
+  it('drops the combo meter during a lesson: the lesson strip already counts the streak', () => {
+    const { rerender } = render(<SoloGameLayout {...props({ soloStreak: 2, soloMultiplier: 2 })} />);
+    expect(screen.getByTestId('combo-meter')).toBeInTheDocument();
+    rerender(<SoloGameLayout {...props({ soloStreak: 2, soloMultiplier: 2, soloLessonActive: true })} />);
+    expect(screen.queryByTestId('combo-meter')).toBeNull();
+    expect(screen.queryByTestId('combo-milestone')).toBeNull();
+  });
+
+  it('lets the lesson banner carry the points: no second score pop over the board', () => {
+    const { rerender } = render(<SoloGameLayout {...props()} />);
+    expect(screen.getByTestId('score-float')).toBeInTheDocument();
+    rerender(<SoloGameLayout {...props({ soloLessonActive: true })} />);
+    expect(screen.queryByTestId('score-float')).toBeNull();
   });
 });

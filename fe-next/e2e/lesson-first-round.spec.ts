@@ -73,4 +73,27 @@ test.describe('First-round lesson', () => {
     await expect(hud).toBeVisible({ timeout: 20000 });
     await expect(hud).toHaveAttribute('dir', 'rtl');
   });
+
+  test('deals the friendly lesson board with CAT straight down the middle', async ({ page }) => {
+    await freshFirstRound(page);
+    const target = page.getByTestId('lesson-target');
+    await expect(target).toHaveAttribute('data-word', 'CAT', { timeout: 20000 });
+    expect(await targetPath(page)).toEqual([[1, 2], [2, 2], [3, 2]]);
+    const topRow = await page
+      .locator('[data-testid=solo-slot-board] [data-row="0"]')
+      .evaluateAll((els) => els.map((e) => e.getAttribute('data-letter')).join(''));
+    expect(topRow).toBe('CLOIS');
+  });
+
+  test('the win banner sits in its own lane: it never covers the found words, and it carries the points', async ({ page }) => {
+    await freshFirstRound(page);
+    await dragCells(page, await targetPath(page));
+    const sheet = page.getByTestId('lesson-sheet');
+    await expect(sheet).toHaveAttribute('data-kind', 'success', { timeout: 10000 });
+    await expect(page.getByTestId('lesson-sheet-points')).toHaveText(/^\+\d+$/);
+    const words = await page.getByTestId('solo-slot-words').boundingBox();
+    const lane = await sheet.boundingBox();
+    expect(words && lane).toBeTruthy();
+    expect(words!.y + words!.height).toBeLessThanOrEqual(lane!.y + 1);
+  });
 });

@@ -22,7 +22,7 @@ export interface UseSoloLessonArgs {
   grid: LetterGrid | null;
   language: Language;
   availableWords: CategorizedWords | null;
-  foundWords: readonly LessonWord[];
+  foundWords: readonly (LessonWord & { score?: number })[];
   formedWord: string;
   feedback: LessonFeedback | null;
   score: number;
@@ -107,7 +107,11 @@ export function useSoloLesson({
         {!lesson.complete && (
           <LessonBoardLayer boardSelector={BOARD_SELECTOR} handPath={handPath} nextIndex={nextIndex} burst={burst} />
         )}
-        <LessonSheet event={event} retryWord={step?.kind === 'trace' ? hint?.word ?? null : null} />
+        <LessonSheet
+          event={event}
+          retryWord={step?.kind === 'trace' ? hint?.word ?? null : null}
+          points={event?.kind === 'success' ? foundWords.find((w) => w.word === event.word)?.score : undefined}
+        />
         {lesson.complete && (
           <LessonComplete
             words={found.size}

@@ -127,29 +127,34 @@
   100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
-/* Feedback sheet */
-.sheetUp {
-  animation: sheetUp 340ms cubic-bezier(0.34, 1.45, 0.64, 1) both;
+/* Feedback banner: static in its lane; a thin shine sweeps across it once. */
+.shine {
+  transform: translateX(-120%) skewX(-18deg);
+  animation: shine 620ms cubic-bezier(0.3, 0.7, 0.4, 1) 40ms both;
 }
-@keyframes sheetUp {
-  0% { transform: translateY(105%); }
-  100% { transform: translateY(0); }
+:global([dir='rtl']) .shine { animation-name: shineRtl; }
+@keyframes shine {
+  to { transform: translateX(110vw) skewX(-18deg); }
+}
+@keyframes shineRtl {
+  from { transform: translateX(120%) skewX(18deg); }
+  to { transform: translateX(-110vw) skewX(18deg); }
 }
 
 .badgePop {
-  animation: badgePop 520ms cubic-bezier(0.34, 1.9, 0.64, 1) 60ms both;
+  animation: badgePop 300ms cubic-bezier(0.34, 1.6, 0.64, 1) both;
 }
 @keyframes badgePop {
-  0% { transform: scale(0) rotate(-120deg); }
-  70% { transform: scale(1.25) rotate(8deg); }
-  100% { transform: scale(1) rotate(0deg); }
+  0% { transform: scale(0.2); }
+  60% { transform: scale(1.14); }
+  100% { transform: scale(1); }
 }
 
 .titleIn {
-  animation: titleIn 460ms cubic-bezier(0.34, 1.6, 0.64, 1) 90ms both;
+  animation: titleIn 280ms cubic-bezier(0.34, 1.6, 0.64, 1) both;
 }
 @keyframes titleIn {
-  0% { transform: translateY(18px) scale(0.7); }
+  0% { transform: translateY(6px) scale(0.82); }
   100% { transform: translateY(0) scale(1); }
 }
 
@@ -199,9 +204,9 @@
 @media (prefers-reduced-motion: reduce) {
   .fill { transition: none; }
   .spark, .ray, .popIn, .streakIn, .shake, .readyGlow, .march, .tileRing, .nextRing, .press,
-  .shock, .particle, .stamp, .sheetUp, .badgePop, .titleIn, .confetti, .sunburst, .cardIn,
+  .shock, .particle, .stamp, .shine, .badgePop, .titleIn, .confetti, .sunburst, .cardIn,
   .mascotBounce, .statIn {
     animation: none;
   }
-  .shock, .particle, .press, .confetti, .spark, .ray { display: none; }
+  .shock, .particle, .press, .confetti, .spark, .ray, .shine { display: none; }
 }

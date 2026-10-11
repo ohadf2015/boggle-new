@@ -69,6 +69,15 @@ function useTileRects(boardSelector: string, watch: unknown): Map<string, Rect> 
 
 const center = (r: Rect) => ({ x: r.x + r.w / 2, y: r.y + r.h / 2 });
 
+function unionOf(rects: Iterable<Rect>): Rect | null {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const r of rects) {
+    x0 = Math.min(x0, r.x); y0 = Math.min(y0, r.y);
+    x1 = Math.max(x1, r.x + r.w); y1 = Math.max(y1, r.y + r.h);
+  }
+  return x0 === Infinity ? null : { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+}
+
 /**
  * Everything the lesson draws on the real board: the guiding hand and glowing
  * path, the next-tile beacon while dragging, and the burst on a found word.
@@ -84,6 +93,7 @@ export function LessonBoardLayer({ boardSelector, handPath, nextIndex, burst }: 
   const nextRect = handPath && nextIndex >= 0 ? rectOf(handPath[nextIndex]) : undefined;
   const showDemo = !!handPath && nextIndex < 0 && points.length >= 2;
   const burstRects = (burst?.cells ?? []).map(rectOf).filter((r): r is Rect => !!r);
+  const boardRect = unionOf(rects.values());
 
   return (
     <div data-testid="lesson-board-layer" aria-hidden className="pointer-events-none fixed inset-0 z-[60]">
@@ -145,10 +155,15 @@ export function LessonBoardLayer({ boardSelector, handPath, nextIndex, burst }: 
         />
       )}
 
-      {burst && burstRects.length > 0 && (
-        <div key={burst.key} data-testid="lesson-burst">
+      {burst && boardRect && burstRects.length > 0 && (
+        <div
+          key={burst.key}
+          data-testid="lesson-burst"
+          className="absolute overflow-hidden rounded-xl"
+          style={{ left: boardRect.x, top: boardRect.y, width: boardRect.w, height: boardRect.h }}
+        >
           {burstRects.map((r, i) => {
-            const c = center(r);
+            const c = { x: center(r).x - boardRect.x, y: center(r).y - boardRect.y };
             const delay = i * 55;
             return (
               <span key={i} className="absolute" style={{ left: c.x, top: c.y }}>
@@ -163,7 +178,7 @@ export function LessonBoardLayer({ boardSelector, handPath, nextIndex, burst }: 
                     style={{
                       background: PARTICLE_COLORS[(i + j) % PARTICLE_COLORS.length],
                       ['--a' as string]: `${a + i * 17}deg`,
-                      ['--d' as string]: `${r.w * 0.9 + (j % 3) * 10}px`,
+                      ['--d' as string]: `${r.w * 0.75 + (j % 3) * 8}px`,
                       ['--delay' as string]: `${delay}ms`,
                     }}
                   />

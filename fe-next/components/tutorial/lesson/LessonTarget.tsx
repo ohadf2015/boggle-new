@@ -41,9 +41,9 @@ export function LessonTarget({ step, target, path, formedWord, oops }: LessonTar
       data-step={step.id}
       data-word={showWord ? target : ''}
       data-path={JSON.stringify(showWord && path ? path.map((c) => [c.row, c.col]) : [])}
-      className="flex min-h-[3.25rem] items-center gap-3 rounded-xl border-[3px] border-neo-black bg-neo-navy-light px-3 py-1.5 shadow-[3px_3px_0_#000]"
+      className="flex min-h-[3.25rem] items-center gap-3 rounded-xl lg:min-h-[4.25rem] lg:px-5 border-[3px] border-neo-black bg-neo-navy-light px-3 py-1.5 shadow-[3px_3px_0_#000]"
     >
-      <p key={step.id} className={cn(s.titleIn, 'min-w-0 flex-1 font-neo-display text-[15px] font-black uppercase leading-tight tracking-wide text-neo-cream')}>
+      <p key={step.id} className={cn(s.titleIn, 'min-w-0 flex-1 font-neo-display text-[15px] font-black uppercase leading-tight tracking-wide text-neo-cream lg:text-xl')}>
         {label}
       </p>
       <div key={oops ?? 'steady'} dir="auto" className={cn('flex shrink-0 gap-1.5', oops && s.shake)} aria-live="polite">
@@ -53,7 +53,7 @@ export function LessonTarget({ step, target, path, formedWord, oops }: LessonTar
             data-slot-state={slot.state}
             className={cn(
               'grid place-items-center rounded-lg border-[3px] font-neo-display font-black uppercase leading-none',
-              slots.length > 5 ? 'h-8 w-6 text-base' : 'h-9 w-8 text-lg',
+              slots.length > 5 ? 'h-8 w-6 text-base lg:h-10 lg:w-8 lg:text-xl' : 'h-9 w-8 text-lg lg:h-12 lg:w-11 lg:text-2xl',
               SLOT[slot.state],
             )}
           >

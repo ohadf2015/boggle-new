@@ -28,6 +28,7 @@ import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import { plantStarterWord } from '@/lib/tutorial/lesson/starterWords';
+import { lessonBoardFor } from '@/lib/tutorial/lesson/lessonBoards';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useTrainingAnalysis } from '@/hooks/useTrainingAnalysis';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
@@ -502,6 +503,11 @@ export function useSinglePlayerCore({
       // If settings already has a grid (e.g. community board), use it directly
       if (settings.grid) {
         setGrid(settings.grid);
+        return;
+      }
+      const lessonGrid = settings.coach ? lessonBoardFor(settings.language, rows, cols) : null;
+      if (lessonGrid) {
+        setGrid(lessonGrid);
         return;
       }
       let wordsToEmbed: string[] = [];
