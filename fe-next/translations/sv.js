@@ -10088,7 +10088,7 @@ const sv = {
       "beFirst": "Bli först på topplistan!"
     },
     "mobile": {
-      "words": "ord",
+      "found": "Hittade",
       "rank": "Rank"
     },
     "results": {

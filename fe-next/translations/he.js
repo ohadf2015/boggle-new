@@ -9747,7 +9747,7 @@ const he = {
       "beFirst": "היו הראשונים בדירוג"
     },
     "mobile": {
-      "words": "מילים",
+      "found": "מצאת",
       "rank": "דירוג"
     },
     "results": {

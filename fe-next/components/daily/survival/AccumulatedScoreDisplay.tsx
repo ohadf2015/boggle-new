@@ -138,6 +138,28 @@ export const AccumulatedScoreDisplay = memo<AccumulatedScoreDisplayProps>(({
           stiffness: 350,
         }}
       >
+        <AdaptiveAnimatePresence>
+          {lastIncrement !== null && lastIncrement !== 0 && (
+            <AdaptiveMotion.div
+              data-testid="score-increment"
+              data-sign={lastIncrement > 0 ? 'up' : 'down'}
+              initial={{ opacity: 0, x: 14, scale: 0.6 }}
+              animate={{ opacity: [0, 1, 1, 0], x: [14, -4, -6, -10], scale: [0.6, 1.15, 1, 0.9] }}
+              exit={{ opacity: 0, scale: 0 }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+              className={cn(
+                'absolute top-1/2 end-full me-2 -translate-y-1/2 pointer-events-none',
+                'px-2 py-0.5 rounded-full border-2 border-neo-black shadow-hard-sm',
+                'text-sm font-black font-neo-display tabular-nums whitespace-nowrap',
+                lastIncrement > 0 ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-white',
+              )}
+            >
+              {lastIncrement > 0 ? '+' : ''}
+              {Math.round(lastIncrement)}
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
+
         <div
           className={cn(
             'w-5 h-5 shrink-0 rounded-full flex items-center justify-center',
@@ -154,33 +176,6 @@ export const AccumulatedScoreDisplay = memo<AccumulatedScoreDisplayProps>(({
           >
             {springProps.val.to((v) => Math.round(v).toLocaleString())}
           </animated.span>
-
-          <AdaptiveAnimatePresence>
-            {lastIncrement !== null && lastIncrement !== 0 && (
-              <AdaptiveMotion.div
-                initial={{ opacity: 0, y: 0, scale: 0.5 }}
-                animate={{
-                  opacity: [0, 1, 1, 0],
-                  y: [0, -18, -24, -30],
-                  scale: [0.5, 1.1, 1, 0.8],
-                }}
-                exit={{ opacity: 0, scale: 0 }}
-                transition={{ duration: 0.55, ease: 'easeOut' }}
-                className={cn(
-                  'absolute -top-5 left-1/2 -translate-x-1/2',
-                  'px-1.5 py-0.5',
-                  'text-[11px] font-black font-neo-display',
-                  'rounded-full',
-                  lastIncrement > 0
-                    ? 'text-neo-lime drop-shadow-[0_0_6px_rgba(191,255,0,0.6)]'
-                    : 'text-neo-pink drop-shadow-[0_0_6px_rgba(255,20,147,0.6)]',
-                )}
-              >
-                {lastIncrement > 0 ? '+' : ''}
-                {Math.round(lastIncrement)}
-              </AdaptiveMotion.div>
-            )}
-          </AdaptiveAnimatePresence>
         </div>
       </AdaptiveMotion.div>
 

@@ -2099,7 +2099,7 @@ const ru = {
       "beFirst": "Стань первым в рейтинге"
     },
     "mobile": {
-      "words": "слов",
+      "found": "Найдено",
       "rank": "Рейтинг"
     },
     "results": {

@@ -9209,7 +9209,7 @@ const en = {
       "beFirst": "Be the first to rank."
     },
     "mobile": {
-      "words": "words",
+      "found": "Found",
       "rank": "Rank"
     },
     "results": {

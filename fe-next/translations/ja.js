@@ -9822,7 +9822,7 @@ const ja = {
       "beFirst": "最初のランカーになろう!"
     },
     "mobile": {
-      "words": "単語",
+      "found": "見つけた",
       "rank": "ランク"
     },
     "results": {

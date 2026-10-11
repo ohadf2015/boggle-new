@@ -9697,7 +9697,7 @@ const es = {
       "beFirst": "Sé el primero en el ranking"
     },
     "mobile": {
-      "words": "palabras",
+      "found": "Encontradas",
       "rank": "Rango"
     },
     "results": {
