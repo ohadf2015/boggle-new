@@ -37,6 +37,7 @@ const { stableT } = vi.hoisted(() => {
     'teacher.reports.assignmentProgress.empty': 'No assignments in this classroom yet',
     'teacher.reports.assignmentProgress.statusCompleted': 'Completed',
     'teacher.reports.assignmentProgress.statusMissing': 'Missing',
+    'teacher.reports.assignmentProgress.statusOverdue': 'Overdue',
     'teacher.reports.assignmentProgress.exportCsv': 'Export CSV',
     'teacher.reports.assignmentProgress.exportCsvPro': 'Export CSV with Teacher Pro {{price}}',
     'teacher.reports.assignmentProgress.fileName': '{{name}} – assignment progress',

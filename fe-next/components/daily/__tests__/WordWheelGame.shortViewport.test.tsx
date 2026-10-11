@@ -102,7 +102,7 @@ describe('WordWheelGame short-viewport wheel sizing', () => {
   it('still keeps the unconstrained (tall-viewport) fixed sizing untouched', () => {
     const orbit = renderGame();
     // Base fixed sizes remain so tall phones/tablets are unchanged.
-    expect(orbit.className).toMatch(/\bh-64\b/);
+    expect(orbit.className).toMatch(/\bh-\[min\(86vw,336px\)\]/);
     expect(orbit.className).toMatch(/sm:h-80/);
     expect(orbit.className).toMatch(/md:h-96/);
   });

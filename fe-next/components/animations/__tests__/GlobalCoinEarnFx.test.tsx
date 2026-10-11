@@ -1,8 +1,8 @@
 /**
  * GlobalCoinEarnFx — the single owner of the coin-reward moment. Listens to
  * `lexiclash:coin-earned`, plans the moment once (planCoinReward), then fires:
- * an ascending coin-chime arpeggio (always), flying coins (WebGL/DOM/none by
- * mode), and the CoinRewardHud counter (ALWAYS, even under reduced motion —
+ * an ascending coin-chime arpeggio (always), flying coins (DOM, none under
+ * reduced motion), and the CoinRewardHud counter (ALWAYS, even under reduced motion —
  * it's the a11y replacement for the retired toast).
  *
  * `rand` is injected so the casino surprise-jackpot roll is deterministic here.
@@ -10,14 +10,11 @@
 import { render, screen, act, waitFor, cleanup } from '@testing-library/react';
 
 const {
-  playCoinCollectMock, playCoinCascadeMock, spawnCoinStreamMock,
-  isInitializedMock, isNativeMock, reducedMock, coinsMock, calmMock,
+  playCoinCollectMock, playCoinCascadeMock,
+  reducedMock, coinsMock, calmMock,
 } = vi.hoisted(() => ({
   playCoinCollectMock: vi.fn(),
   playCoinCascadeMock: vi.fn(),
-  spawnCoinStreamMock: vi.fn(),
-  isInitializedMock: vi.fn(() => true),
-  isNativeMock: vi.fn(() => false),
   reducedMock: vi.fn(() => false),
   coinsMock: vi.fn(() => 5000),
   calmMock: vi.fn(() => 'full'),
@@ -30,21 +27,13 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
   }),
 }));
 
-vi.mock('@/lib/pixiFx/SharedFxApp', () => ({
-  SharedFxApp: {
-    spawnCoinStream: spawnCoinStreamMock,
-    isInitialized: () => isInitializedMock(),
-  },
-}));
-
-vi.mock('@/utils/platform', () => ({ isNative: () => isNativeMock() }));
 vi.mock('@/hooks/useReducedMotion', () => ({ useReducedMotion: () => reducedMock() }));
 vi.mock('@/contexts/CoinContext', () => ({ useCoinContext: () => ({ coins: coinsMock() }) }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'en' }) }));
 vi.mock('@/contexts/AccessibilityContext', () => ({ useCelebrationIntensity: () => calmMock() }));
 
 import GlobalCoinEarnFx, { COIN_EARNED_EVENT } from '../GlobalCoinEarnFx';
-import { COIN_SPENT_EVENT } from '@/utils/coinEarnedFx';
+import { COIN_SPENT_EVENT, msUntilCoinsLand } from '@/utils/coinEarnedFx';
 
 // rand that never triggers the surprise jackpot (first roll high).
 const noSurprise = () => 0.99;
@@ -65,24 +54,23 @@ function fireSpent(detail: { amount: number; source?: { x: number; y: number } }
   });
 }
 
-function addCounter() {
+function addCounter(rect = { left: 300, top: 20, width: 40, height: 40 }) {
   const counter = document.createElement('div');
   counter.setAttribute('data-coin-counter', 'true');
   Object.defineProperty(counter, 'getBoundingClientRect', {
-    value: () => ({ left: 300, top: 20, width: 40, height: 40, right: 340, bottom: 60, x: 300, y: 20, toJSON: () => ({}) }),
+    value: () => ({ ...rect, right: rect.left + rect.width, bottom: rect.top + rect.height, x: rect.left, y: rect.top, toJSON: () => ({}) }),
   });
   document.body.appendChild(counter);
 }
+
+const burst = () => screen.getByTestId('dom-coin-burst');
 
 describe('GlobalCoinEarnFx', () => {
   beforeEach(() => {
     playCoinCollectMock.mockClear();
     playCoinCascadeMock.mockClear();
-    spawnCoinStreamMock.mockClear();
     coinsMock.mockClear();
     calmMock.mockClear();
-    isInitializedMock.mockReturnValue(true);
-    isNativeMock.mockReturnValue(false);
     reducedMock.mockReturnValue(false);
     coinsMock.mockReturnValue(5000);
     calmMock.mockReturnValue('full');
@@ -134,19 +122,45 @@ describe('GlobalCoinEarnFx', () => {
     fire({ amount: 0 });
     fire({ amount: -5 });
     expect(playCoinCollectMock).not.toHaveBeenCalled();
-    expect(spawnCoinStreamMock).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('dom-coin-burst')).toBeNull();
     expect(screen.queryByTestId('coin-reward-hud')).toBeNull();
   });
 
-  it('flies coins via SharedFxApp.spawnCoinStream to the counter when FX active', () => {
+  it('flies coins from the earn source to the counter', () => {
     addCounter();
     render(<GlobalCoinEarnFx rand={noSurprise} />);
     fire({ amount: 25, source: { x: 100, y: 400 } });
-    expect(spawnCoinStreamMock).toHaveBeenCalledTimes(1);
-    const arg = spawnCoinStreamMock.mock.calls[0][0];
-    expect(arg.source).toEqual({ x: 100, y: 400 });
-    expect(arg.target).toEqual({ x: 320, y: 40 });
-    expect(arg.count).toBeGreaterThanOrEqual(4);
+    expect(burst()).toHaveAttribute('data-from', '100,400');
+    expect(burst()).toHaveAttribute('data-to', '320,40');
+    expect(screen.getAllByTestId('flying-coin').length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('flies the requested number of coins and tells counters when they land', () => {
+    render(<GlobalCoinEarnFx rand={noSurprise} />);
+    act(() => {
+      window.dispatchEvent(new CustomEvent(COIN_EARNED_EVENT, { detail: { amount: 3, inline: true, coins: 7 } }));
+    });
+    expect(screen.getAllByTestId('flying-coin')).toHaveLength(7);
+    expect(msUntilCoinsLand()).toBeGreaterThan(300);
+  });
+
+  it('targets the counter that is on screen, not a hidden header copy', () => {
+    addCounter({ left: 0, top: 0, width: 0, height: 0 });
+    addCounter({ left: 200, top: 100, width: 60, height: 20 });
+    render(<GlobalCoinEarnFx rand={noSurprise} />);
+    fire({ amount: 25, source: { x: 100, y: 400 } });
+    expect(burst()).toHaveAttribute('data-to', '230,110');
+  });
+
+  it('inline earn flies coins into the counter without the floating total pill', () => {
+    addCounter();
+    render(<GlobalCoinEarnFx rand={noSurprise} />);
+    act(() => {
+      window.dispatchEvent(new CustomEvent(COIN_EARNED_EVENT, { detail: { amount: 3, source: { x: 50, y: 50 }, inline: true } }));
+    });
+    expect(burst()).toBeInTheDocument();
+    expect(screen.queryByTestId('coin-reward-hud')).toBeNull();
+    expect(playCoinCollectMock).toHaveBeenCalled();
   });
 
   it('renders the CoinRewardHud counter that rolls up to the new total, with +delta', async () => {
@@ -177,14 +191,11 @@ describe('GlobalCoinEarnFx', () => {
     render(<GlobalCoinEarnFx rand={noSurprise} />);
     fire({ amount: 50 });
     expect(playCoinCollectMock).toHaveBeenCalled();
-    expect(spawnCoinStreamMock).not.toHaveBeenCalled();
     expect(screen.queryByTestId('dom-coin-burst')).toBeNull();
     expect(screen.getByTestId('coin-reward-hud')).toBeInTheDocument();
   });
 
-  it('renders DOM coin burst on native when WebGL inactive', () => {
-    isInitializedMock.mockReturnValue(false);
-    isNativeMock.mockReturnValue(true);
+  it('renders the DOM coin flight whenever motion is allowed', () => {
     render(<GlobalCoinEarnFx rand={noSurprise} />);
     fire({ amount: 50 });
     expect(screen.getByTestId('dom-coin-burst')).toBeInTheDocument();
@@ -201,9 +212,7 @@ describe('GlobalCoinEarnFx', () => {
   it('falls back to viewport-top-right when no counter present', () => {
     render(<GlobalCoinEarnFx rand={noSurprise} />);
     fire({ amount: 25 });
-    const arg = spawnCoinStreamMock.mock.calls[0][0];
-    expect(arg.target.x).toBe(window.innerWidth - 40);
-    expect(arg.target.y).toBe(40);
+    expect(burst()).toHaveAttribute('data-to', `${window.innerWidth - 40},40`);
   });
 
   // --- spend (reversed) ---
@@ -223,10 +232,8 @@ describe('GlobalCoinEarnFx', () => {
       addCounter(); // counter centre (320, 40)
       render(<GlobalCoinEarnFx rand={noSurprise} />);
       fireSpent({ amount: 50, source: { x: 100, y: 500 } });
-      expect(spawnCoinStreamMock).toHaveBeenCalledTimes(1);
-      const arg = spawnCoinStreamMock.mock.calls[0][0];
-      expect(arg.source).toEqual({ x: 320, y: 40 });
-      expect(arg.target).toEqual({ x: 100, y: 500 });
+      expect(burst()).toHaveAttribute('data-from', '320,40');
+      expect(burst()).toHaveAttribute('data-to', '100,500');
     });
 
     it('never fires the jackpot flair or cascade, even on a would-be surprise', () => {

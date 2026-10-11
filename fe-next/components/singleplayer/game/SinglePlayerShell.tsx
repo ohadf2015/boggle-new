@@ -52,6 +52,7 @@ export interface SinglePlayerShellProps {
 
   /** Coins badge, practice training bar — solo-only chrome. */
   soloChrome?: React.ReactNode;
+  soloLessonActive?: boolean;
   soloStreak?: number;
   soloMultiplier?: number;
   soloPraiseKey?: string | null;

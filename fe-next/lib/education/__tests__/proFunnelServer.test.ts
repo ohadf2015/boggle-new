@@ -24,6 +24,7 @@ import {
   buildCheckoutCompleteEvent,
   buildPaidEvent,
   buildTeacherTrialConvertedEvent,
+  buildTrialExpiredEvent,
   buildPolarTrialDay10SentEvent,
   captureProFunnelServerEvent,
 } from '../proFunnelServer';
@@ -115,6 +116,14 @@ describe('Pro funnel server events', () => {
     expect(buildTeacherTrialConvertedEvent('u-1', 'sub-9')).toEqual({
       distinctId: 'u-1',
       event: 'teacher_trial_converted',
+      properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
+    });
+  });
+
+  it('Given a Polar trial lapses without converting, When built, Then it is trial_expired', () => {
+    expect(buildTrialExpiredEvent('u-1', 'sub-9')).toEqual({
+      distinctId: 'u-1',
+      event: 'trial_expired',
       properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
     });
   });

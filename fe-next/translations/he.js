@@ -9385,6 +9385,41 @@ const he = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "showBoard": "הלוח של היום",
+      "hideBoard": "הסתר לוח",
+      "moreBoards": "עוד"
+    },
+    "rank": {
+      "title": "דרגות",
+      "open": "כל הדרגות",
+      "toNext": "{rank} בעוד {count}",
+      "top": "דרגה עליונה. אגדה!",
+      "reached": "הדרגה של היום",
+      "warmUp": "מתחמם",
+      "spinning": "מסתובב",
+      "onARoll": "בתנופה",
+      "sharp": "חד",
+      "hotStreak": "לוהט",
+      "wordsmith": "אמן מילים",
+      "whirlwind": "סופה",
+      "wizard": "קוסם",
+      "legend": "אגדה"
+    },
+    "praise": {
+      "nice": "יפה!",
+      "great": "אחלה!",
+      "superb": "מעולה!",
+      "brilliant": "מבריק!",
+      "fullWheel": "גלגל שלם!"
+    },
+    "strip": {
+      "empty": "המילים שלך ינחתו כאן",
+      "label": "נמצאו {count}",
+      "all": "כל המילים",
+      "close": "סגירה",
+      "longest": "הכי ארוכה"
+    },
     "youFoundEverything": "מצאת כל מילה שגם הם מצאו. מגניב.",
     "title": "גלגל מילים",
     "loading": "טוען את גלגל המילים...",
@@ -9393,7 +9428,6 @@ const he = {
     "description": "כל מילה חייבת להשתמש באות המרכזית ולהיות באורך של 3 אותיות לפחות",
     "centerLetterRule": "חובה להשתמש באות המרכזית",
     "minLetters": "מינימום {min} אותיות",
-    "wordsFound": "נמצאו {count} מילים",
     "scoreLabel": "ניקוד",
     "timeLeft": "זמן שנותר",
     "closeRace": "מרוץ צמוד!",
@@ -9423,10 +9457,6 @@ const he = {
     "removeLetter": "מחיקת אות",
     "foundWords": "מילים שנמצאו",
     "possibleWords": "אפשרי",
-    "excellent": "מצוין!",
-    "great": "נהדר!",
-    "good": "כל הכבוד!",
-    "tryAgain": "המשיכו להתאמן!",
     "longest": "הארוכה ביותר",
     "viewSubmittedWords": "צפו במילים שהוגשו",
     "viewWordsYouMissed": "צפו במילים שפספסתם",
@@ -9434,7 +9464,6 @@ const he = {
     "youMissedTitle": "מילים שפספסת",
     "noWordsSubmitted": "עדיין לא הוגשו מילים",
     "results": {
-      "title": "תוצאות גלגל מילים",
       "wordsFound": "מילים שנמצאו",
       "score": "ניקוד",
       "time": "זמן",
@@ -13315,11 +13344,17 @@ const he = {
         "body": "גררו ישר למטה (או למעלה) כדי לאיית מילים אנכיות."
       }
     },
+    "wallet": {
+      "coins": "{count} מטבעות"
+    },
     "store": {
       "title": "חנות שדרוגים",
       "close": "סיום",
       "buy": "קנו",
       "max": "מקסימום",
+      "pay": "לשלם",
+      "short": "חסר",
+      "confirm": "לשלם {cost} מטבעות",
       "extraMoves": {
         "name": "תנועות נוספות",
         "desc": "התחילו כל שלב עם מהלך נוסף"
@@ -13395,6 +13430,17 @@ const he = {
     "hub": {
       "playZone": "שחקו",
       "learnZone": "למדו"
+    },
+    "assignments": {
+      "dueInHours": "עוד {hours} שע׳",
+      "dueInMinutes": "עוד {minutes} דק׳",
+      "overdueBy": "באיחור {days} ימים",
+      "doIt": "לעשות"
+    },
+    "classView": {
+      "playAssignment": "שחקו {title}",
+      "playAssignmentDueSoon": "עד מחר · שחקו {title}",
+      "playAssignmentOverdue": "באיחור · שחקו {title}"
     },
     "welcome": {
       "title": "ברוכים הבאים לכיתה שלכם",
@@ -13891,6 +13937,7 @@ const he = {
       "trialEndedTitle": "תקופת הניסיון הסתיימה. שדרגו כדי לשמור על הכיתות",
       "trialEndedBody": "שמרו על כיתות ללא הגבלה ודוחות להדפסה ב-9$ לחודש. זו לא תקופת ניסיון נוספת.",
       "trialEndedCta": "להמשיך ב-Pro: 9$ לחודש",
+      "trialReactivateCta": "הפעלה מחדש",
       "trialLifecycleTitle": "נותרו {count} ימים בניסיון פרו למורים",
       "trialLifecycleTitleToday": "ניסיון פרו למורים מסתיים היום",
       "trialLifecycleTitleOne": "נותר יום אחד בניסיון פרו למורים",
@@ -14331,7 +14378,15 @@ const he = {
       "starterColors": "צבעים וצורות",
       "starterColorsDesc": "צבעים וצורות בסיסיות לתלמידים צעירים",
       "starterFood": "אוכל",
-      "starterFoodDesc": "מילות אוכל יומיומיות לשיעורי בית ראשונים"
+      "starterFoodDesc": "מילות אוכל יומיומיות לשיעורי בית ראשונים",
+      "wordCountGoal": "יעד מספר מילים",
+      "wordCountGoalHint": "התלמידים מוצאים כמה מילים ייחודיות עד תאריך היעד.",
+      "wordCountLabel": "כמה מילים?",
+      "wordListGoal": "רשימת מילים",
+      "wordListGoalHint": "הדביקו מילים, שורה לכל מילה או מופרדות בפסיק.",
+      "wordListPlaceholder": "חתול, כלב, דג",
+      "wordGoalMissing": "הוסיפו יעד מילים או רשימה ותאריך יעד",
+      "findNWords": "מצאו {{count}} מילים"
     },
     "completion": {
       "overallProgress": "התקדמות כללית",
@@ -14522,6 +14577,7 @@ const he = {
         "empty": "אין משימות בכיתה הזו עדיין",
         "statusCompleted": "הושלם",
         "statusMissing": "חסר",
+        "statusOverdue": "באיחור",
         "exportCsv": "ייצוא CSV",
         "exportCsvPro": "ייצוא CSV עם פרו למורים {{price}}",
         "fileName": "{{name}} – התקדמות במשימות",
@@ -17218,6 +17274,30 @@ const he = {
     "cta": "מתחילים לשחק",
     "ctaWait": "{{seconds}} שנ׳"
   },
+  "firstLesson": {
+    "skipLabel": "דילוג על השיעור",
+    "skip": "דילוג",
+    "progressLabel": "התקדמות בשיעור",
+    "trace": "גררו על המילה הזו",
+    "findAny": "עכשיו מצאו מילה משלכם",
+    "findLength": "נסו מילה של {{count}}+ אותיות",
+    "inARow": "{{count}} ברצף",
+    "praise": {
+      "nice": "יפה!",
+      "great": "מעולה!",
+      "awesome": "אש!",
+      "amazing": "מטורף!"
+    },
+    "oops": "כמעט",
+    "tryWord": "נסו {{word}}",
+    "found": "מצאתם {{word}}",
+    "complete": "סיימתם את השיעור!",
+    "completeSub": "תפסתם את זה. שאר הסיבוב שלכם.",
+    "statWords": "מילים",
+    "statPoints": "נקודות",
+    "statStreak": "רצף",
+    "keepPlaying": "ממשיכים לשחק"
+  },
   "modeCoach": {
     "skip": "דלגו",
     "next": "הבא",
@@ -17762,14 +17842,6 @@ const he = {
       "epic": "אפי",
       "legendary": "אגדי"
     }
-  },
-  "encouragement": {
-    "gameStart": "יאללה, אתם יכולים! 🎯",
-    "firstWord": "יפה! המשיכו למצוא מילים",
-    "longWord": "וואו! מילים ארוכות שוות יותר",
-    "combo": "קומבו! אתם על גל",
-    "halfway": "באמצע הדרך, המשיכו!",
-    "almostDone": "הישורת האחרונה! מצאו עוד מילים"
   },
   "toast": {
     "found": "נמצא!",
