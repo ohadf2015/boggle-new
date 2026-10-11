@@ -14522,6 +14522,7 @@ const he = {
         "empty": "אין משימות בכיתה הזו עדיין",
         "statusCompleted": "הושלם",
         "statusMissing": "חסר",
+        "statusOverdue": "באיחור",
         "exportCsv": "ייצוא CSV",
         "exportCsvPro": "ייצוא CSV עם פרו למורים {{price}}",
         "fileName": "{{name}} – התקדמות במשימות",

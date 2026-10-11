@@ -13854,6 +13854,7 @@ const ru = {
         "empty": "В этом классе пока нет заданий",
         "statusCompleted": "Выполнено",
         "statusMissing": "Не сдано",
+        "statusOverdue": "Просрочено",
         "exportCsv": "Экспорт CSV",
         "exportCsvPro": "Экспорт CSV с Teacher Pro {{price}}",
         "fileName": "{{name}} – прогресс по заданиям",

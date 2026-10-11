@@ -14667,6 +14667,7 @@ const ja = {
         "empty": "このクラスにはまだ課題がありません",
         "statusCompleted": "完了",
         "statusMissing": "未提出",
+        "statusOverdue": "期限切れ",
         "exportCsv": "CSVを書き出す",
         "exportCsvPro": "Teacher Pro {{price}} で CSV を書き出す",
         "fileName": "{{name}} – 課題の進捗",

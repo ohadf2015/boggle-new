@@ -14522,6 +14522,7 @@ const es = {
         "empty": "Aún no hay tareas en esta clase",
         "statusCompleted": "Completada",
         "statusMissing": "Falta",
+        "statusOverdue": "Atrasada",
         "exportCsv": "Exportar CSV",
         "exportCsvPro": "Exportar CSV con Teacher Pro {{price}}",
         "fileName": "{{name}} – progreso de tareas",

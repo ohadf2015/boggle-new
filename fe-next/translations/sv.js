@@ -14909,6 +14909,7 @@ const sv = {
         "empty": "Inga uppgifter i den här klassen ännu",
         "statusCompleted": "Klar",
         "statusMissing": "Saknas",
+        "statusOverdue": "Försenad",
         "exportCsv": "Exportera CSV",
         "exportCsvPro": "Exportera CSV med Teacher Pro {{price}}",
         "fileName": "{{name}} – framsteg i uppgifter",

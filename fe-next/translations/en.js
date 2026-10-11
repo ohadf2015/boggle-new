@@ -12951,6 +12951,7 @@ const en = {
         "empty": "No assignments in this classroom yet",
         "statusCompleted": "Completed",
         "statusMissing": "Missing",
+        "statusOverdue": "Overdue",
         "exportCsv": "Export CSV",
         "exportCsvPro": "Export CSV with Teacher Pro {{price}}",
         "fileName": "{{name}} assignment progress",
