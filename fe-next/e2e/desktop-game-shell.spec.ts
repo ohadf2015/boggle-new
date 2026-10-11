@@ -68,6 +68,7 @@ test.describe('desktop game shell (1440x900)', () => {
     test.setTimeout(90_000);
     await page.goto('/en/singleplayer');
     await page.getByRole('button', { name: /^\s*start\s*$/i }).first().click({ timeout: 60_000 });
+    await page.getByRole('button', { name: /skip lesson/i }).click({ timeout: 5_000 }).catch(() => undefined);
     await dismissCoaches(page);
     await expectShell(page, 'classic');
     await expectBoardOwnsHeight(page);

@@ -119,7 +119,7 @@ describe('WordWheelGame rival self-filter + day scoping', () => {
       { score: 80, display_name: 'RealRival', player_id: 'other' },
     ]);
     renderGame({ puzzleDate: '2026-06-20', currentPlayerId: 'me' });
-    await waitFor(() => expect(screen.getAllByText('RealRival').length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getByText('RealRival')).toBeInTheDocument());
     expect(screen.queryByText('SelfPlayer')).toBeNull();
   });
 
@@ -129,7 +129,7 @@ describe('WordWheelGame rival self-filter + day scoping', () => {
       { score: 80, display_name: 'RealRival', player_id: 'other', guest_fingerprint: 'fp2' },
     ]);
     renderGame({ puzzleDate: '2026-06-20', currentGuestFingerprint: 'fp1' });
-    await waitFor(() => expect(screen.getAllByText('RealRival').length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getByText('RealRival')).toBeInTheDocument());
     expect(screen.queryByText('SelfGuest')).toBeNull();
   });
 });
