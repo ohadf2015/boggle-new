@@ -117,6 +117,8 @@ export function ConditionalProviders({ children, lang }: ConditionalProvidersPro
           )}
           <Suspense fallback={null}>
             <CommandPalette />
+          </Suspense>
+          <Suspense fallback={null}>
             <LaunchHost />
           </Suspense>
         </EssentialProviders>
