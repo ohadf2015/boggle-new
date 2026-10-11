@@ -14,6 +14,7 @@ export interface BoardCell {
 export interface LessonBurst {
   key: string;
   cells: BoardCell[];
+  points?: number;
 }
 
 export interface LessonBoardLayerProps {
@@ -68,6 +69,9 @@ function useTileRects(boardSelector: string, watch: unknown): Map<string, Rect> 
 }
 
 const center = (r: Rect) => ({ x: r.x + r.w / 2, y: r.y + r.h / 2 });
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+const POP_HALF_W = 48;
+const POP_HALF_H = 28;
 
 function unionOf(rects: Iterable<Rect>): Rect | null {
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -186,6 +190,31 @@ export function LessonBoardLayer({ boardSelector, handPath, nextIndex, burst }: 
               </span>
             );
           })}
+          {burst.points != null && burst.points > 0 && (() => {
+            const cs = burstRects.map(center);
+            const x = cs.reduce((a, c) => a + c.x, 0) / cs.length - boardRect.x;
+            const y = cs.reduce((a, c) => a + c.y, 0) / cs.length - boardRect.y;
+            return (
+              <div
+                data-testid="lesson-burst-points"
+                className="absolute -translate-x-1/2 -translate-y-1/2"
+                style={{
+                  left: clamp(x, POP_HALF_W, boardRect.w - POP_HALF_W),
+                  top: clamp(y, POP_HALF_H, boardRect.h - POP_HALF_H),
+                }}
+              >
+                <span
+                  dir="ltr"
+                  className={cn(
+                    s.pointsPop,
+                    'block whitespace-nowrap rounded-xl border-[3px] border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[26px] lg:text-[34px] font-black leading-none text-neo-black shadow-[4px_4px_0_#000]',
+                  )}
+                >
+                  +{burst.points}
+                </span>
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>

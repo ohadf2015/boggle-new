@@ -78,8 +78,9 @@ export function useSoloLesson({
   const burst = useMemo<LessonBurst | null>(() => {
     if (event?.kind !== 'success' || !grid) return null;
     const path = findWordPath(event.word, grid, language);
-    return path ? { key: event.key, cells: path } : null;
-  }, [event, grid, language]);
+    const points = foundWords.find((w) => w.word === event.word)?.score;
+    return path ? { key: event.key, cells: path, points } : null;
+  }, [event, grid, language, foundWords]);
 
   if (!lesson.active) return { active: false, holdClock: false, hud: null, overlay: null };
 
@@ -110,7 +111,7 @@ export function useSoloLesson({
         <LessonSheet
           event={event}
           retryWord={step?.kind === 'trace' ? hint?.word ?? null : null}
-          points={event?.kind === 'success' ? foundWords.find((w) => w.word === event.word)?.score : undefined}
+          points={burst?.points}
         />
         {lesson.complete && (
           <LessonComplete

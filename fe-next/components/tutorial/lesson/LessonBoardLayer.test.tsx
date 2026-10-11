@@ -42,6 +42,36 @@ describe('LessonBoardLayer', () => {
     expect(clip.className).toContain('overflow-hidden');
   });
 
+  it('pops the points over the found word, inside the board', () => {
+    render(
+      <LessonBoardLayer
+        boardSelector="#board"
+        handPath={null}
+        nextIndex={-1}
+        burst={{ key: 'b1', cells: [{ row: 0, col: 1 }, { row: 1, col: 1 }], points: 10 }}
+      />,
+    );
+    const pop = screen.getByTestId('lesson-burst-points');
+    expect(pop).toHaveTextContent('+10');
+    expect(screen.getByTestId('lesson-burst')).toContainElement(pop);
+    expect(pop.style.left).toBe(`${TILE * 1.5}px`);
+    expect(pop.style.top).toBe(`${TILE}px`);
+  });
+
+  it('keeps the points pop clear of the board edge', () => {
+    render(
+      <LessonBoardLayer
+        boardSelector="#board"
+        handPath={null}
+        nextIndex={-1}
+        burst={{ key: 'b2', cells: [{ row: 0, col: 0 }], points: 10 }}
+      />,
+    );
+    const pop = screen.getByTestId('lesson-burst-points');
+    expect(parseFloat(pop.style.left)).toBeGreaterThanOrEqual(48);
+    expect(parseFloat(pop.style.top)).toBeGreaterThanOrEqual(28);
+  });
+
   it('shows the hand on the hinted word until the player starts dragging it', () => {
     const path = [{ row: 0, col: 1 }, { row: 1, col: 1 }, { row: 2, col: 1 }];
     const { rerender } = render(<LessonBoardLayer boardSelector="#board" handPath={path} nextIndex={-1} burst={null} />);
