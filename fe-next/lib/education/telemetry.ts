@@ -483,6 +483,38 @@ export interface EduFirstAssignmentCtaArgs {
   classroomId: string;
 }
 
+export interface EduAssignmentReminderArgs {
+  assignmentId: string;
+  classroomId?: string | null;
+}
+
+/**
+ * Student's open assignment is due within 24h — the Academy hub reminder card
+ * is on screen. Client-side like every other student-visible education event;
+ * `hours_until_due` is rounded up so "3.2h left" reads as 4.
+ */
+export function trackEduAssignmentReminderShown(args: EduAssignmentReminderArgs & { hoursUntilDue: number }): void {
+  const props: Record<string, unknown> = {
+    assignment_id: args.assignmentId,
+    hours_until_due: args.hoursUntilDue,
+  };
+  if (args.classroomId) props.classroom_id = args.classroomId;
+  safeCapture('assignment_reminder_shown', props);
+}
+
+/**
+ * Student was nudged about an assignment past its due date (throttled to one
+ * nudge per assignment per day by assignmentDueReminder.ts).
+ */
+export function trackEduAssignmentOverdue(args: EduAssignmentReminderArgs & { daysOverdue: number }): void {
+  const props: Record<string, unknown> = {
+    assignment_id: args.assignmentId,
+    days_overdue: args.daysOverdue,
+  };
+  if (args.classroomId) props.classroom_id = args.classroomId;
+  safeCapture('assignment_overdue', props);
+}
+
 /** HQ panel: class has students, 0 assignments, no live room. */
 export function trackEduFirstAssignmentCtaShown(args: EduFirstAssignmentCtaArgs): void {
   captureActivation('edu_first_assignment_cta_shown', { classroom_id: args.classroomId });

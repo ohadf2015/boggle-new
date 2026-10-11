@@ -27,6 +27,8 @@ export interface AssignmentProgressStudent {
 export interface AssignmentProgressAssignment {
   id: string;
   title: string;
+  /** Past this instant the assignment reads overdue for unfinished students. */
+  dueDate?: string | null;
 }
 
 export interface AssignmentProgressCompletion {
@@ -79,6 +81,8 @@ export interface AssignmentProgressRow {
   assignmentId: string;
   assignmentTitle: string;
   status: AssignmentProgressStatus;
+  /** Missing AND past the assignment's due date — the teacher's overdue badge. */
+  overdue: boolean;
   score: number | null;
   accuracy: number | null;
   completedAt: string | null;
@@ -99,8 +103,11 @@ export function buildAssignmentProgressRows(args: {
   students: AssignmentProgressStudent[];
   assignments: AssignmentProgressAssignment[];
   completions: AssignmentProgressCompletion[];
+  /** Test clock; defaults to Date.now(). Overdue compares due_date against this. */
+  now?: number;
 }): AssignmentProgressRow[] {
   const { students, assignments, completions } = args;
+  const now = args.now ?? Date.now();
   if (students.length === 0 || assignments.length === 0) return [];
 
   const byPair = new Map<string, AssignmentProgressCompletion>();
@@ -113,12 +120,14 @@ export function buildAssignmentProgressRows(args: {
     for (const assignment of assignments) {
       const hit = byPair.get(`${student.studentId}\0${assignment.id}`);
       const completed = Boolean(hit);
+      const due = assignment.dueDate ? Date.parse(assignment.dueDate) : NaN;
       rows.push({
         studentId: student.studentId,
         studentName: student.name,
         assignmentId: assignment.id,
         assignmentTitle: assignment.title,
         status: completed ? 'completed' : 'missing',
+        overdue: !completed && Number.isFinite(due) && due < now,
         score: completed && hit?.score != null ? hit.score : null,
         accuracy: completed && hit?.accuracy != null ? hit.accuracy : null,
         completedAt: completed ? hit?.completedAt ?? null : null,

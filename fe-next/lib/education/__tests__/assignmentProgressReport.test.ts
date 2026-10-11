@@ -65,6 +65,41 @@ describe('buildAssignmentProgressRows', () => {
     expect(buildAssignmentProgressRows({ students, assignments: [], completions: [] })).toEqual([]);
     expect(buildAssignmentProgressRows({ students: [], assignments, completions: [] })).toEqual([]);
   });
+
+  it('flags a missing row overdue when the assignment due date has passed', () => {
+    const rows = buildAssignmentProgressRows({
+      students: [{ studentId: 's1', name: 'Ada' }],
+      assignments: [{ id: 'a1', title: 'Drill', dueDate: '2026-10-10T00:00:00.000Z' }],
+      completions: [],
+      now: Date.parse('2026-10-11T00:00:00.000Z'),
+    });
+    expect(rows[0]).toMatchObject({ status: 'missing', overdue: true });
+  });
+
+  it('never flags a completed row overdue, even past the due date', () => {
+    const rows = buildAssignmentProgressRows({
+      students: [{ studentId: 's1', name: 'Ada' }],
+      assignments: [{ id: 'a1', title: 'Drill', dueDate: '2026-10-10T00:00:00.000Z' }],
+      completions: [{ assignmentId: 'a1', studentId: 's1', completedAt: '2026-10-12T00:00:00.000Z' }],
+      now: Date.parse('2026-10-11T00:00:00.000Z'),
+    });
+    expect(rows[0]).toMatchObject({ status: 'completed', overdue: false });
+  });
+
+  it('does not flag missing rows when there is no due date or it is still in the future', () => {
+    const now = Date.parse('2026-10-11T00:00:00.000Z');
+    const rows = buildAssignmentProgressRows({
+      students: [{ studentId: 's1', name: 'Ada' }],
+      assignments: [
+        { id: 'a1', title: 'No deadline' },
+        { id: 'a2', title: 'Future', dueDate: '2026-10-12T00:00:00.000Z' },
+        { id: 'a3', title: 'Broken', dueDate: 'garbage' },
+      ],
+      completions: [],
+      now,
+    });
+    expect(rows.map((r) => r.overdue)).toEqual([false, false, false]);
+  });
 });
 
 describe('assignmentProgressToCsv', () => {
