@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { BlastMascotHud } from '../BlastMascotHud';
+import { BlastMascotHud, BLAST_MASCOT_SLOT_CLASS } from '../BlastMascotHud';
 import { MASCOT_GIF_PATHS } from '@/lib/blast/mascotState';
 
 describe('BlastMascotHud', () => {
@@ -83,5 +83,15 @@ describe('BlastMascotHud', () => {
     render(<BlastMascotHud state="awe" />);
     const img = screen.getByTestId('blast-mascot-img');
     expect(img.className).toContain('object-cover');
+  });
+});
+
+describe('BLAST_MASCOT_SLOT_CLASS', () => {
+  it('drops below the HUD on phones so it never covers the coin wallet, top corner from sm up', () => {
+    const cls = BLAST_MASCOT_SLOT_CLASS.split(' ');
+    expect(cls).toContain('top-[9.25rem]');
+    expect(cls).toContain('sm:top-3');
+    expect(cls).toContain('end-3');
+    expect(cls).not.toContain('right-3');
   });
 });

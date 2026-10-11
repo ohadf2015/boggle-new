@@ -25,6 +25,7 @@ const CSV_LABELS = {
   completedAt: 'Completed at',
   completed: 'Completed',
   missing: 'Missing',
+  overdue: 'Overdue',
 };
 
 describe('buildAssignmentProgressRows', () => {
@@ -64,6 +65,17 @@ describe('buildAssignmentProgressRows', () => {
   it('returns an empty list when there are no assignments or no students', () => {
     expect(buildAssignmentProgressRows({ students, assignments: [], completions: [] })).toEqual([]);
     expect(buildAssignmentProgressRows({ students: [], assignments, completions: [] })).toEqual([]);
+  });
+
+  it('marks missing work overdue when the assignment due date has passed', () => {
+    const now = Date.parse('2026-10-11T12:00:00.000Z');
+    const rows = buildAssignmentProgressRows({
+      students: [{ studentId: 's2', name: 'Ben' }],
+      assignments: [{ id: 'a1', title: 'Week 1 nouns', dueDate: '2026-10-10T00:00:00.000Z' }],
+      completions: [],
+      now,
+    });
+    expect(rows[0].status).toBe('overdue');
   });
 });
 

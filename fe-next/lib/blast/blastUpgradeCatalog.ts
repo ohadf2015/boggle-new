@@ -2,9 +2,8 @@
  * Blast Upgrade Catalog — pure data + math for the Blast upgrade store.
  *
  * Mirrors the Word Tower upgrade economy (cost = baseCost × growth^ownedLevel).
- * COINS buy the common upgrades (global balance via CoinContext); GEMS buy the
- * premium ones (blast-local wallet, useBlastGems). Effects are aggregated from the
- * player's owned levels and merged into a run's config at game start.
+ * Every upgrade is priced in coins, the app's one currency. Effects are aggregated
+ * from the player's owned levels and merged into a run's config at game start.
  *
  * This module is pure — no React, no store, no I/O — so the curve and effect math
  * are unit-testable in isolation and shared by the store hook + store UI.
@@ -12,14 +11,11 @@
 
 export type BlastUpgradeId = 'extraMoves' | 'luckySpawn' | 'comboSurge' | 'safetyNet';
 
-export type BlastCurrency = 'coins' | 'gems';
-
 export interface BlastUpgradeDef {
   id: BlastUpgradeId;
   nameKey: string;
   descKey: string;
-  currency: BlastCurrency;
-  /** Cost of the FIRST level. */
+  /** Coin cost of the FIRST level. */
   baseCost: number;
   /** Geometric cost multiplier per already-owned level (>1). */
   costGrowth: number;
@@ -53,7 +49,6 @@ export const BLAST_UPGRADES: readonly BlastUpgradeDef[] = [
     id: 'extraMoves',
     nameKey: 'blast.store.extraMoves.name',
     descKey: 'blast.store.extraMoves.desc',
-    currency: 'coins',
     baseCost: 120,
     costGrowth: 1.8,
     maxLevel: 5,
@@ -63,7 +58,6 @@ export const BLAST_UPGRADES: readonly BlastUpgradeDef[] = [
     id: 'luckySpawn',
     nameKey: 'blast.store.luckySpawn.name',
     descKey: 'blast.store.luckySpawn.desc',
-    currency: 'coins',
     baseCost: 200,
     costGrowth: 1.9,
     maxLevel: 3,
@@ -73,8 +67,7 @@ export const BLAST_UPGRADES: readonly BlastUpgradeDef[] = [
     id: 'comboSurge',
     nameKey: 'blast.store.comboSurge.name',
     descKey: 'blast.store.comboSurge.desc',
-    currency: 'gems',
-    baseCost: 8,
+    baseCost: 300,
     costGrowth: 1.7,
     maxLevel: 3,
     perLevel: 0.25, // +25% combo score per level
@@ -83,8 +76,7 @@ export const BLAST_UPGRADES: readonly BlastUpgradeDef[] = [
     id: 'safetyNet',
     nameKey: 'blast.store.safetyNet.name',
     descKey: 'blast.store.safetyNet.desc',
-    currency: 'gems',
-    baseCost: 12,
+    baseCost: 450,
     costGrowth: 2.0,
     maxLevel: 2,
     perLevel: 1, // +1 free dead-end recovery per level

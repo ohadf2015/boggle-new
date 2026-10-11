@@ -64,7 +64,7 @@ interface CoinContextValue {
 
   // Core operations
   addCoins: (amount: number, reason: string, metadata?: Record<string, string | number>) => Promise<number>;
-  spendCoins: (amount: number, reason: string, metadata?: Record<string, string | number>) => Promise<boolean>;
+  spendCoins: (amount: number, reason: string, metadata?: Record<string, string | number>, fxSource?: { x: number; y: number }) => Promise<boolean>;
   refreshCoins: () => Promise<number>;
 
   // Unified award operations (handle duplicate prevention + sync)
@@ -229,7 +229,8 @@ export function CoinProvider({ children }: { children: ReactNode }) {
   const spendCoins = useCallback(async (
     amount: number,
     reason: string,
-    metadata?: Record<string, string | number>
+    metadata?: Record<string, string | number>,
+    fxSource?: { x: number; y: number },
   ): Promise<boolean> => {
     if (!canAfford(amount)) return false;
 
@@ -238,7 +239,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
 
       if (result.success) {
         await refreshProfile();
-        emitCoinSpent(amount);
+        emitCoinSpent(amount, fxSource);
         return true;
       } else {
         console.error('[CoinContext] Failed to spend coins:', result.error);
@@ -249,7 +250,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
       const success = spendLocalCoins(amount, reason, metadata);
       if (success) {
         setLocalCoins(getCoins());
-        emitCoinSpent(amount);
+        emitCoinSpent(amount, fxSource);
       }
       return success;
     }

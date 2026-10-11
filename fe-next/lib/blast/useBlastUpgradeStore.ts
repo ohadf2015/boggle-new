@@ -1,18 +1,10 @@
 /**
- * Blast Upgrade Store — persistent owned-levels layer for the Blast store
- * (zustand + localStorage). Holds ONLY the owned upgrade levels; balances live
- * elsewhere:
- *   - COINS: the global, server-synced balance via `@/utils/coinManager` (sync).
- *   - GEMS:  the blast-local wallet `useBlastGems`.
- *
- * `buy()` reads the live balance for the upgrade's currency, spends it, and only
- * commits the level if the spend actually went through. Pure economy math lives in
- * `blastUpgradeCatalog` — this store is thin glue (mirrors useTowerUpgradeStore).
+ * Blast Upgrade Store — persistent owned levels (zustand + localStorage). The coin
+ * balance is not held here: `buy()` is handed the wallet's spend (CoinContext, which
+ * charges the server for signed-in players) and commits the level only once paid.
  */
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { getCoins, spendCoins } from '@/utils/coinManager';
-import { useBlastGems } from './useBlastGems';
 import {
   BLAST_UPGRADES,
   getUpgrade,
@@ -24,10 +16,12 @@ import {
 
 export type BlastUpgradeLevels = Partial<Record<BlastUpgradeId, number>>;
 
+export type SpendCoins = (amount: number, reason: string, metadata?: Record<string, string | number>) => Promise<boolean>;
+
 interface BlastUpgradeState {
   levels: BlastUpgradeLevels;
-  /** Buy the next level of `id`. Returns true on success (afforded + not maxed). */
-  buy: (id: BlastUpgradeId) => boolean;
+  /** Buy the next level of `id` with `spend`. Resolves true once paid (and not maxed). */
+  buy: (id: BlastUpgradeId, spend: SpendCoins) => Promise<boolean>;
   /** Aggregate run-effect bundle from owned levels. */
   effects: () => BlastUpgradeEffects;
   /** Owned level of one upgrade (clamped to [0, maxLevel]). */
@@ -40,21 +34,13 @@ export const useBlastUpgradeStore = create<BlastUpgradeState>()(
     (set, get) => ({
       levels: {},
 
-      buy: (id) => {
+      buy: async (id, spend) => {
         const def = getUpgrade(id);
         if (!def) return false;
         const cur = get().levelOf(id);
         if (cur >= def.maxLevel) return false;
-        const cost = upgradeCost(def, cur);
-
-        if (def.currency === 'gems') {
-          if (!useBlastGems.getState().spendGems(cost)) return false;
-        } else {
-          if (getCoins() < cost) return false;
-          if (!spendCoins(cost, 'blast_upgrade', { id, level: cur + 1 })) return false;
-        }
-
-        set((s) => ({ levels: { ...s.levels, [id]: cur + 1 } }));
+        if (!(await spend(upgradeCost(def, cur), 'blast_upgrade', { id, level: cur + 1 }))) return false;
+        set((s) => ({ levels: { ...s.levels, [id]: Math.max(s.levels[id] ?? 0, cur + 1) } }));
         return true;
       },
 

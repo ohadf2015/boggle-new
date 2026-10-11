@@ -103,6 +103,7 @@ describe('TabbedDailyLeaderboard — Connections tab', () => {
       />
     );
 
+    fireEvent.click(await screen.findByTestId('leaderboard-more-tabs'));
     const tabButton = await screen.findByTestId('connections-tab-button');
     fireEvent.click(tabButton);
 
