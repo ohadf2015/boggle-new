@@ -52,11 +52,15 @@ export function liftRelease(container: HTMLElement, s: FxState, path: CellRef[],
   const g = grid.getBoundingClientRect();
   const cell = geo.cell || g.width / 4;
 
+  const size = Math.round(Math.min(64, Math.max(30, cell * 0.62)));
+  const half = size * 0.75;
+  const lx = g.left + g.width / 2;
+  const ly = Math.max(half + 8, g.top - half - 12);
   const label = spawn(container, layer, 'data-lift');
   label.dir = container.getAttribute('data-word-dir') === 'rtl' ? 'rtl' : 'ltr';
-  label.style.left = `${g.left + g.width / 2}px`;
-  label.style.top = `${g.top + cell * 0.12}px`;
-  label.style.setProperty('--lift-size', `${Math.round(Math.min(64, Math.max(30, cell * 0.62)))}px`);
+  label.style.left = `${lx}px`;
+  label.style.top = `${ly}px`;
+  label.style.setProperty('--lift-size', `${size}px`);
   path.forEach((c, i) => {
     const slot = label.ownerDocument.createElement('span');
     slot.setAttribute('data-ll', '');
@@ -65,8 +69,6 @@ export function liftRelease(container: HTMLElement, s: FxState, path: CellRef[],
     label.appendChild(slot);
   });
   const slots = [...label.querySelectorAll<HTMLElement>('[data-ll]')].map((n) => n.getBoundingClientRect());
-  const lx = g.left + g.width / 2;
-  const ly = g.top + cell * 0.12;
   animate(container, label, [
     { transform: 'translate(-50%, -50%) translateY(26px) scale(0.55) rotate(-4deg)' },
     { transform: 'translate(-50%, -50%) translateY(-6px) scale(1.14) rotate(2deg)', offset: 0.55 },

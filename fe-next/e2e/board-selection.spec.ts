@@ -114,8 +114,19 @@ test.describe('shared letter board', () => {
     await expect(page.locator('[data-board][data-ghost] [data-trail="core"]')).toHaveAttribute('points', /\d/);
     const word = row.map((c) => c.letter).join('').toUpperCase();
     await page.mouse.up();
-    await expect(page.locator('[data-board-overlay] [data-lift]')).toHaveText(new RegExp(`^${word}$`, 'i'), { timeout: 2_000 });
+    const lift = page.locator('[data-board-overlay] [data-lift]');
+    await expect(lift).toHaveText(new RegExp(`^${word}$`, 'i'), { timeout: 2_000 });
+    const liftBox = await lift.boundingBox();
+    const gridBox = await page.locator('[data-board][data-ghost] [role="grid"]').boundingBox();
+    expect(liftBox!.y + liftBox!.height / 2).toBeLessThan(gridBox!.y);
     await expect(board).toHaveAttribute('data-verdict', /ok|bad|dupe/, { timeout: 8_000 });
+
+    await expect(lift).toHaveCount(0, { timeout: 8_000 });
+    await expect(page.locator('[data-board][data-ghost] [role="grid"]')).toHaveAttribute('tabindex', '0', { timeout: 15_000 });
+    const again = (await readGrid(page)).filter((c) => c.letter);
+    await dragThrough(page, [again[0], again[1]]);
+    await expect(board).toHaveAttribute('data-mode', 'drag');
+    await page.mouse.up();
   });
 
   test('pass-and-play party turns use the same board', async ({ page }) => {

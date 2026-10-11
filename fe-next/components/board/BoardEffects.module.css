@@ -290,7 +290,7 @@
 }
 
 @keyframes ll-land {
-  0% { transform: scale(0.82); color: rgb(11 11 30 / 0.24); }
+  0% { transform: none; }
   60% { transform: scale(1.35) translateY(-0.08em); }
   100% { transform: none; }
 }

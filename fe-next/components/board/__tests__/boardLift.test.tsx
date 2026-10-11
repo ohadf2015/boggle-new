@@ -47,6 +47,23 @@ describe('word lift on a board that another mode paints (Blast)', () => {
     expect(flies.map((f) => f.textContent)).toEqual(['C', 'A', 'T']);
   });
 
+  it('given room above the board, then the word lifts into it instead of covering the top row', () => {
+    const { board, geo } = mountGhost();
+    const grid = board.querySelector<HTMLElement>('[role="grid"]')!;
+    grid.getBoundingClientRect = () =>
+      ({ x: 0, y: 300, left: 0, top: 300, width: 320, height: 320, right: 320, bottom: 620, toJSON: () => ({}) }) as DOMRect;
+    releaseFx(board, CAT, geo);
+    const top = parseFloat(label()!.style.top);
+    expect(top).toBeLessThan(300 - 20);
+    expect(top).toBeGreaterThan(200);
+  });
+
+  it('given no room above the board, then the word stays on screen', () => {
+    const { board, geo } = mountGhost();
+    releaseFx(board, CAT, geo);
+    expect(parseFloat(label()!.style.top)).toBeGreaterThanOrEqual(20);
+  });
+
   it('given the word is accepted, then the label takes the verdict, the points rise off it and the last tile bursts', () => {
     const { board, geo } = mountGhost();
     releaseFx(board, CAT, geo);
