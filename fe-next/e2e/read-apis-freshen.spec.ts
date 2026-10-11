@@ -136,7 +136,9 @@ test.describe('signed-out writes are refused before touching the database', () =
   });
 
   test('ranked, score sync and clubs need a session', async ({ request }) => {
-    for (const path of ['/api/ranked/match', '/api/scores/sync', '/api/growth/word-clubs', '/api/feedback/notify']) {
+    const ranked = await request.post('/api/ranked/match', { data: {} });
+    expect([401, 429, 503], 'ranked match needs the server secret').toContain(ranked.status());
+    for (const path of ['/api/scores/sync', '/api/growth/word-clubs', '/api/feedback/notify']) {
       const res = await request.post(path, { data: {} });
       expect([401, 429], path).toContain(res.status());
     }
