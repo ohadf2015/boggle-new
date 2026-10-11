@@ -179,6 +179,8 @@ A: Real-time simultaneous play (not turn-based like Scrabble), no download neede
 - First-Day-of-School Icebreakers: https://www.lexiclash.live/en/education/first-day-of-school-icebreakers
 - Early Finishers Activities: https://www.lexiclash.live/en/education/early-finishers-activities
 - Word Games for Middle School: https://www.lexiclash.live/en/education/middle-school-word-games
+- Boggle for the Classroom (whole-class Boggle round, projector + join code, up to 50 students per class on the free plan): https://www.lexiclash.live/en/education/boggle-for-the-classroom
+- Boggle for Kids (ages 6+, grown-up-hosted games, kids join with a code — no kid accounts): https://www.lexiclash.live/en/education/boggle-for-kids
 
 LexiClash Education turns word games into a classroom learning tool. Free, browser-based, no downloads, students don't need accounts. Designed for vocabulary review, ESL/EFL practice, spelling competitions, and end-of-lesson brain breaks.
 
