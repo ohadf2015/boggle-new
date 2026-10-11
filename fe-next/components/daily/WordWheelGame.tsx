@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { flushSync } from 'react-dom';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Delete, RotateCcw, TrendingUp, ChevronUp, Check } from 'lucide-react';
+import { Delete, RotateCcw, TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
@@ -11,15 +11,13 @@ import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
 import { wheelWordDir } from '@/lib/wheelRush/wordDirection';
 import type { Language } from '@/types';
+import { WheelRushCelebration, type WheelCelebration } from '@/components/multiplayer/WheelRushCelebration';
+import { fireConfetti } from '@/utils/confettiUtils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
-import { WordTile } from './WordWheelParts';
 import WheelDisc from './wheel/WheelDisc';
-import WheelRanksPanel, { type RivalScore } from './wheel/WheelRanksPanel';
-import WheelHud from './wheel/WheelHud';
-import WheelFoundWords from './wheel/WheelFoundWords';
-import { LaunchFx } from './wheel/WheelWordFx';
-import { useWheelWordFx, rectsWithin, centreWithin } from './wheel/useWheelWordFx';
+import WheelCoachSlot from './wheel/WheelCoachSlot';
+import { useWheelWordFx } from './wheel/useWheelWordFx';
 import { useHoldToSubmit } from '@/hooks/useHoldToSubmit';
 import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
@@ -28,9 +26,13 @@ import { trackGameEnd, trackGameStart, trackGrowthEvent } from '@/utils/growthTr
 import { useExperiment } from '@/hooks/useExperiment';
 import { useMPFTUEIdle } from '@/hooks/useMPFTUEIdle';
 import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
-import WheelCoachSlot from './wheel/WheelCoachSlot';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
-import Avatar from '@/components/Avatar';
+import WordWheelRankLadder from './WordWheelRankLadder';
+import WordWheelWordLine from './WordWheelWordLine';
+import WordWheelFoundWords from './WordWheelFoundWords';
+import WordWheelHud from './WordWheelHud';
+import WordWheelLiveRanks from './WordWheelLiveRanks';
+import { rankThresholds } from '@/lib/wordWheel/rankLadder';
 
 // Haptic feedback for mobile — distinct patterns per interaction type
 const haptic = (pattern: number | number[]) => {
@@ -93,6 +95,15 @@ interface WordWheelGameProps {
 }
 
 
+interface RivalScore {
+  name: string;
+  score: number;
+  avatarImage: string | null;
+  customAvatar: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
+  playerId: string | null;
+  guestFingerprint: string | null;
+}
+
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
   puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false, practice = false,
   hideModeCoach = false,
@@ -123,9 +134,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const [isValidating, setIsValidating] = useState(false);
   const outerLetters = puzzle.outerLetters;
   const { fx, fire: fireFx, release, hold: holdRelease, drop: dropRelease } = useWheelWordFx();
-  // Bumped when a word launches off the tray, so its tiles vanish instead of playing their exit under the launch copies.
-  const [trayGen, setTrayGen] = useState(0);
-  const scoreRef = useRef<HTMLSpanElement>(null);
+  const [lastWordScore, setLastWordScore] = useState<number | null>(null);
+  // Monotonic id for the flying "+score" element's key. Using Date.now() here
+  // recomputed the key on every render, remounting the element (and restarting
+  // its 1.2s fly animation) whenever anything else re-rendered mid-flight.
+  const [scoreFlyId, setScoreFlyId] = useState(0);
   const [combo, setCombo] = useState(0);
   const comboTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [wordBuilderShake, setWordBuilderShake] = useState(false);
@@ -133,6 +146,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // "You used the whole wheel" banner — fires when an accepted word covers all
   // (or all-but-one) distinct wheel letters. Single keyed state so a second
   // pangram replaces (re-animates) rather than stacks.
+  const [celebration, setCelebration] = useState<WheelCelebration | null>(null);
+  const celebrationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // exp-wordwheel-drag-hint-v1: the drag arm surfaces the "swipe to spell"
   // coachmark after a short idle (the wheel rage-click root cause). Reuses the
@@ -152,7 +167,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
   const gameOverRef = useRef(false);
   const wordsFoundRef = useRef<string[]>([]);
-  const scoreValueRef = useRef(0);
+  const scoreRef = useRef(0);
   const timeWarningFiredRef = useRef(false);
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const wheelContainerRef = useRef<HTMLDivElement>(null);
@@ -162,6 +177,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // Drag-mode users already lifted, so a wrong word should clear immediately
   // instead of waiting through the read-toast window.
   const lastSubmitWasDragRef = useRef(false);
+  const submittingRef = useRef(false);
 
   // ── Live leaderboard rivals (snapshot on mount + refresh every 30s) ──
   const [fetchedRivals, setFetchedRivals] = useState<RivalScore[]>([]);
@@ -239,15 +255,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     };
   }, [language, hideCompetitive, rivalsOverride, puzzleDate, currentPlayerId, currentGuestFingerprint]);
 
-  // Closest rival above me + pass detection
-  const nextRival = useMemo(
-    () => rivals.find(r => r.score > score) || null,
-    [rivals, score],
-  );
-  const pointsToPass = nextRival ? nextRival.score - score : 0;
-
   useEffect(() => { wordsFoundRef.current = wordsFound; }, [wordsFound]);
-  useEffect(() => { scoreValueRef.current = score; }, [score]);
+  useEffect(() => { scoreRef.current = score; }, [score]);
 
   // Funnel parity: emit game_started once on mount to pair with trackGameEnd('word-wheel', ...).
   // Practice hub (hideCompetitive) is outside the daily funnel, so it stays silent.
@@ -323,15 +332,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     const grew = builtLetters.length > prevBuiltLengthRef.current;
     prevBuiltLengthRef.current = builtLetters.length;
     if (grew && builtLetters.length >= 3 && !gameOverRef.current) {
-      const fireIdleSubmit = () => {
-        if (draggingRef.current) {
-          idleSubmitTimerRef.current = setTimeout(fireIdleSubmit, 250);
-          return;
-        }
+      idleSubmitTimerRef.current = setTimeout(() => {
         idleSubmitTimerRef.current = null;
+        // Mid-drag the release submits; firing here split a slow swipe into a half word.
+        if (draggingRef.current) return;
         handleSubmitRef.current();
-      };
-      idleSubmitTimerRef.current = setTimeout(fireIdleSubmit, 1000);
+      }, 1000);
     }
     return () => { if (idleSubmitTimerRef.current) { clearTimeout(idleSubmitTimerRef.current); idleSubmitTimerRef.current = null; } };
   }, [builtLetters]);
@@ -340,15 +346,29 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     if (autoResetTimerRef.current) { clearTimeout(autoResetTimerRef.current); autoResetTimerRef.current = null; }
   }, []);
 
+  // Show the wheel-coverage banner and auto-clear it. 'all' rides the dormant
+  // Pixi `pangram` mega-burst (fired via onEffect in handleSubmit); 'almost' has
+  // no canvas show, so it gets a light DOM confetti pop instead. fireConfetti
+  // self-gates on reduced-motion / cosy-calm / low-end devices.
+  const triggerFeatBanner = useCallback((tier: 'all' | 'almost', word: string) => {
+    setCelebration({ tier, word, key: Date.now() });
+    if (tier === 'almost') {
+      fireConfetti({ particleCount: 36, spread: 80, startVelocity: 50, origin: { y: 0.5 } });
+    }
+    if (celebrationTimerRef.current) clearTimeout(celebrationTimerRef.current);
+    celebrationTimerRef.current = setTimeout(() => {
+      celebrationTimerRef.current = null;
+      setCelebration(null);
+    }, 1900);
+  }, []);
+  useEffect(() => () => {
+    if (celebrationTimerRef.current) { clearTimeout(celebrationTimerRef.current); celebrationTimerRef.current = null; }
+  }, []);
+
   const builtWord = useMemo(
     () => builtLetters.map(bl => bl.letter).join(''),
     [builtLetters],
   );
-
-  // Wheel tiles always carry regular (non-sofit) forms, so the built-word
-  // bar and found-words list show the same glyphs as the tiles.
-  const displayLetters = useMemo(() => builtLetters.map(bl => bl.letter), [builtLetters]);
-  const displayWord = useCallback((word: string) => word, []);
 
   // Timer — suppressed in practice mode (no countdown, no auto-complete).
   // Player ends the run via the manual "End practice" CTA below.
@@ -359,11 +379,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         if (prev <= 1) {
           clearInterval(interval);
           gameOverRef.current = true;
-          onEffect({ type: 'gameComplete', score: scoreValueRef.current });
+          onEffect({ type: 'gameComplete', score: scoreRef.current });
           playEpicVictorySound();
           trackGameEnd(
             'word-wheel',
-            scoreValueRef.current,
+            scoreRef.current,
             wordsFoundRef.current.length,
             true,
             duration,
@@ -371,7 +391,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           );
           onComplete({
             wordsFound: wordsFoundRef.current,
-            score: scoreValueRef.current,
+            score: scoreRef.current,
             timeSeconds: duration,
           });
           return 0;
@@ -400,7 +420,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     gameOverRef.current = true;
     onComplete({
       wordsFound: wordsFoundRef.current,
-      score: scoreValueRef.current,
+      score: scoreRef.current,
       timeSeconds: 0,
     });
   }, [onComplete]);
@@ -410,27 +430,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // same moment, so the player sees *why* it failed and the wheel clears for a
   // fresh attempt without needing the manual reset button. New input within
   // the window cancels the auto-reset (see builtLetters effect above).
-  const tileLaunch = useCallback(() => {
-    const root = gameContainerRef.current;
-    const tiles = root ? Array.from(root.querySelectorAll('[data-testid="built-letter-tile"]')) : [];
-    const to = centreWithin(root, scoreRef.current) ?? { x: root?.clientWidth ?? 0, y: 0 };
-    return { from: rectsWithin(root, tiles), to };
-  }, []);
-
   const showFeedback = useCallback((message: string, type: 'success' | 'error') => {
     setFeedback({ message, type });
-    setTimeout(() => setFeedback(null), 1500);
+    const toastDuration = type === 'error' ? 1500 : 1500;
+    setTimeout(() => setFeedback(null), toastDuration);
     if (type === 'error') {
       const spelled = builtLettersRef.current;
       if (spelled.length > 0) {
-        fireFx({
-          kind: 'bad',
-          indices: spelled.map(bl => bl.wheelIndex),
-          letters: spelled.map(bl => bl.letter),
-          points: 0,
-          launch: lastSubmitWasDragRef.current ? tileLaunch() : null,
-        });
-        if (lastSubmitWasDragRef.current) setTrayGen(g => g + 1);
+        fireFx({ kind: 'bad', indices: spelled.map(bl => bl.wheelIndex), letters: spelled.map(bl => bl.letter), points: 0 });
       }
       setWordBuilderShake(true);
       haptic([30, 50, 30]);
@@ -445,15 +452,17 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       const wasDrag = lastSubmitWasDragRef.current;
       lastSubmitWasDragRef.current = false;
       if (wasDrag) {
+        builtLettersRef.current = [];
         setBuiltLetters([]);
       } else {
         autoResetTimerRef.current = setTimeout(() => {
           autoResetTimerRef.current = null;
+          builtLettersRef.current = [];
           setBuiltLetters([]);
         }, 1500);
       }
     }
-  }, [fireFx, tileLaunch]);
+  }, [fireFx]);
 
   // Shared add path — used by tap-add (handleLetterPress) and by the eager-add
   // on hold-to-submit pointerdown. Writes builtLettersRef synchronously (in the
@@ -564,6 +573,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
   // ── Clear all ──
   const handleClear = useCallback(() => {
+    builtLettersRef.current = [];
     setBuiltLetters([]);
     playButtonClickSound();
   }, [playButtonClickSound]);
@@ -578,9 +588,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
   // ── Submit word ──
   const handleSubmit = useCallback(async () => {
-    if (isValidating || builtWord.length === 0 || gameOverRef.current) return;
-
-    const word = builtWord.toUpperCase();
+    // Refs, not render state: a drag release can land before React re-renders the last letter in.
+    const word = builtLettersRef.current.map(bl => bl.letter).join('').toUpperCase();
+    if (submittingRef.current || word.length === 0 || gameOverRef.current) return;
 
     // Container-relative center for effects
     const cx = gameContainerRef.current
@@ -609,7 +619,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       return;
     }
 
-    if (wordsFound.includes(word)) {
+    if (wordsFoundRef.current.includes(word)) {
       // Daily is single-player: once you've found a word it's yours, so
       // re-typing it is blocked outright (no points). This differs from
       // multiplayer Wheel Rush, where the same word can be re-submitted because
@@ -618,10 +628,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       showFeedback(t('wordWheel.alreadyFound'), 'error');
       onEffect({ type: 'error', x: cx, y: 80 });
       playWordRejectedSound();
+      builtLettersRef.current = [];
       setBuiltLetters([]);
       return;
     }
 
+    submittingRef.current = true;
     const releasing = builtLettersRef.current;
     // Committed before validation starts, so the release reacts even while a cold dictionary blocks the thread.
     flushSync(() => {
@@ -641,16 +653,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         setScore(prev => prev + points);
         const wheelLetters = puzzle.allLetters ?? [puzzle.centerLetter, ...puzzle.outerLetters];
         const coverage = classifyLetterCoverage(word, wheelLetters);
-        const spelled = builtLettersRef.current;
-        fireFx({
-          kind: 'good',
-          indices: spelled.map(bl => bl.wheelIndex),
-          letters: spelled.map(bl => bl.letter),
-          points,
-          launch: tileLaunch(),
-          coverage,
-        });
-        setTrayGen(g => g + 1);
+        fireFx({ kind: 'good', indices: releasing.map(bl => bl.wheelIndex), letters: releasing.map(bl => bl.letter), points, coverage });
+        setLastWordScore(points);
+        setScoreFlyId(id => id + 1);
+        setTimeout(() => setLastWordScore(null), 1200);
+        showFeedback(`+${points}`, 'success');
+        builtLettersRef.current = [];
         setBuiltLetters([]);
         setLastFoundWord(word);
         setTimeout(() => setLastFoundWord(null), 2000);
@@ -694,15 +702,20 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           onEffect({ type: 'combo', x: cx, y: 160, combo: newCombo });
         }
 
+        // Headline banner for full / near-full wheel coverage.
+        if (coverage !== 'none') {
+          triggerFeatBanner(coverage, word);
+        }
       } else {
         showFeedback(t('wordWheel.notInDictionary'), 'error');
         onEffect({ type: 'error', x: cx, y: 80 });
       }
     } finally {
+      submittingRef.current = false;
       setIsValidating(false);
       dropRelease();
     }
-  }, [builtWord, isValidating, puzzle, wordsFound, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, onWordFound, fireFx, tileLaunch, holdRelease, dropRelease]);
+  }, [puzzle, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, triggerFeatBanner, onWordFound, fireFx, holdRelease, dropRelease]);
 
   // Keep submit ref fresh so double-tap handler (created earlier) can reach the latest closure.
   useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);
@@ -716,72 +729,65 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
   const equippedBoardTheme = useEquippedCosmetic('boardTheme');
   const equippedTileSkin = useEquippedCosmetic('tileSkin');
+  const thresholds = useMemo(() => rankThresholds(practice ? 120 : duration), [practice, duration]);
 
-  const ranksPanel = !hideCompetitive ? (
-    <WheelRanksPanel rivals={rivals} score={score} hasNextRival={!!nextRival} t={t} />
-  ) : null;
+  const hud = (
+    <WordWheelHud
+      t={t}
+      timeLeft={timeLeft}
+      duration={duration}
+      combo={combo}
+      showCombo={!hideCompetitive}
+      practice={practice}
+      onEndPractice={handleEndPractice}
+      onExit={onExit}
+      className={isDesktop ? undefined : 'pe-12 sm:pe-0'}
+    />
+  );
 
-  // Wheel cluster JSX (header/timer + wheel + word-builder + action-bar)
+  const ladder = (
+    <WordWheelRankLadder
+      t={t}
+      score={score}
+      thresholds={thresholds}
+      rivals={rivals}
+      showRival={showRivalLayer}
+      variant={isDesktop ? 'wide' : 'bar'}
+    />
+  );
+
+  const foundWords = (
+    <WordWheelFoundWords
+      t={t}
+      words={wordsFound}
+      lastFound={lastFoundWord}
+      variant={isDesktop ? 'panel' : 'strip'}
+      reducedMotion={prefersReducedMotion}
+    />
+  );
+
+  // Wheel cluster JSX (word line + wheel + action-bar; phone adds the HUD, ladder and words above)
   const wheelCluster = (
     <>
+      <WheelRushCelebration celebration={celebration} t={t} prefersReduced={prefersReducedMotion} />
 
       {practice && !hideModeCoach && <WheelCoachSlot wordsFound={wordsFound.length} />}
 
-      {/* Mode coach for non-practice mode. Suppressed by hideModeCoach (Quick Play). */}
       {!practice && !hideModeCoach && <ModeCoach mode="wheelRush" />}
 
-      <WheelHud
-        t={t}
-        onExit={onExit}
-        practice={practice}
-        timeLeft={timeLeft}
-        duration={duration}
-        showCombo={!hideCompetitive}
-        combo={combo}
-        score={score}
-        wordsCount={wordsFound.length}
-        scoreRef={scoreRef}
-        onEndPractice={handleEndPractice}
-      />
-
-      {/* Points-to-pass next-rival hint — fixed-height reserved slot.
-          h-* (not min-h-*) + whitespace-nowrap + truncate keeps the pill
-          locked to one line. pointsToPass derives from score → mutates every
-          submit; long HE/JA strings or long player names would otherwise
-          wrap the pill and grow the slot, recentering the wheel cluster. */}
-      {showRivalLayer && (
-      <div
-        data-testid="next-rival-slot"
-        className="w-full mt-1.5 h-[30px] sm:h-[32px] flex items-center justify-center px-2"
-      >
-        <AnimatePresence>
-          {nextRival && (
-            <m.div
-              className="max-w-full px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-white font-semibold flex items-center gap-1.5 whitespace-nowrap"
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-            >
-              <ChevronUp className="w-3 h-3 text-neo-lime shrink-0" />
-              <Avatar
-                pixelSize={20}
-                userId={nextRival.playerId ?? nextRival.name}
-                customAvatar={nextRival.customAvatar ?? undefined}
-                avatarImage={nextRival.avatarImage ?? undefined}
-                className="shrink-0 rounded-full"
-              />
-              <span className="truncate">
-                {t('wordWheel.pointsToPass', { count: pointsToPass, name: nextRival.name })}
-              </span>
-            </m.div>
-          )}
-        </AnimatePresence>
-      </div>
+      {isDesktop ? (
+        <div className="w-full flex flex-col gap-4 shrink-0">
+          {hud}
+          {ladder}
+        </div>
+      ) : (
+        <div className="w-full flex flex-col gap-3 shrink-0">
+          {hud}
+          {ladder}
+          {foundWords}
+        </div>
       )}
 
-      {/* Pass notification toast stack — queued so back-to-back passes all
-          celebrate. Each toast stacks vertically with a small offset.
-          Suppressed in the practice hub unless the caller supplied rivals. */}
       {showRivalLayer && (
       <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 pointer-events-none flex flex-col items-center gap-1.5">
         <AnimatePresence>
@@ -790,9 +796,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               key={toast.id}
               className="px-3 py-1.5 rounded-neo border-3 border-neo-black bg-linear-to-r from-neo-pink to-neo-purple text-neo-white font-neo-display font-black text-sm shadow-[3px_3px_0px_black,0_0_18px_rgba(255,20,147,0.6)] flex items-center gap-1.5 whitespace-nowrap"
               initial={{ opacity: 0, y: -20, scale: 0.6, rotate: -4 }}
-              // Springs support 2 keyframes max — a [0.6, 1.15, 1] array here
-              // logged "Only two keyframes currently supported with spring..."
-              // in real browsers. The underdamped spring overshoots on its own.
               animate={{ opacity: 1, y: i * 4, scale: 1, rotate: 0 }}
               exit={{ opacity: 0, y: -10, scale: 0.7 }}
               transition={prefersReducedMotion
@@ -808,112 +811,26 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </div>
       )}
 
+      {/* Word line + wheel + actions centre together in the leftover height. */}
       <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1 short:gap-0.5 short:py-0" data-testid="wheel-cluster">
-      {/* Fixed height so tile pop-in/out never re-centres the cluster; mt-2 keeps the × badges off whatever sits above. */}
-      <m.div
-        data-testid="word-builder"
-        className="relative z-20 w-full mt-2 short:mt-1 h-[60px] sm:h-[72px] short:h-[44px] shrink-0 flex items-center justify-center"
-        animate={
-          wordBuilderShake
-            ? { x: [-4, 4, -3, 3, -1, 0] }
-            : { scale: isValidating ? 1.12 : 1 + builtLetters.length * 0.008 }
-        }
-        transition={wordBuilderShake
-          ? { duration: 0.35 }
-          : { type: 'spring', stiffness: 300, damping: 20 }
-        }
-      >
-        <div
-          dir={wordDir}
-          data-testid="word-tray"
-          data-ready={builtWord.length >= 3 ? 'true' : 'false'}
-          data-releasing={release ? 'true' : 'false'}
-          className={cn(
-            'flex items-center justify-center gap-1 sm:gap-1.5 flex-wrap max-w-full rounded-full border-3 px-2.5 py-1.5 sm:px-3 transition-[background-color,border-color,box-shadow] duration-150',
-            builtLetters.length === 0
-              ? 'border-transparent'
-              : builtWord.length >= 3
-                ? 'border-neo-black bg-neo-lime/20 shadow-[4px_4px_0_#000,0_0_0_5px_rgba(191,255,0,0.25)]'
-                : 'border-neo-black bg-neo-navy-light shadow-[4px_4px_0_#000]',
-          )}
-        >
-          <AnimatePresence key={trayGen} mode="popLayout">
-            {builtLetters.length === 0 ? (fx ? null : (
-              <m.span
-                key="placeholder"
-                className="text-neo-white/55 font-medium text-sm sm:text-base"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {t('wordWheel.tapLetters')}
-              </m.span>
-            )) : (
-              builtLetters.map((bl, i) => (
-                <WordTile
-                  key={`${bl.wheelIndex}-${i}`}
-                  letter={displayLetters[i] ?? bl.letter}
-                  index={i}
-                  onRemove={handleRemoveLetter}
-                  isCenter={bl.wheelIndex === -1}
-                />
-              ))
-            )}
-          </AnimatePresence>
-          {/* Inline submit chip — primary tap-friendly affordance.
-              Sits next to the built word so the thumb never has to travel
-              down to the sticky bottom bar. Disabled-styled until min-len
-              reached, but still tappable so users get a "too short" toast. */}
-          <AnimatePresence>
-            {builtLetters.length > 0 && (
-              <m.button
-                key="inline-submit-chip"
-                type="button"
-                data-testid="inline-submit-chip"
-                onClick={handleSubmit}
-                disabled={isValidating}
-                aria-label={t('wordWheel.submit')}
-                className={cn(
-                  'ms-1 sm:ms-2 w-9 h-10 sm:w-11 sm:h-12 md:w-12 md:h-14 rounded-neo border-3 border-neo-black flex items-center justify-center touch-manipulation cursor-pointer',
-                  'before:absolute before:-inset-2 before:content-[""] relative',
-                  'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
-                  builtWord.length >= 3
-                    ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[2px_2px_0px_black,0_0_14px_rgba(191,255,0,0.5)]'
-                    : 'bg-neo-navy-light text-neo-white shadow-hard-xs',
-                )}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                whileTap={builtWord.length >= 3 ? { scale: 0.9 } : { scale: 0.96 }}
-                transition={{ type: 'spring', stiffness: 600, damping: 22 }}
-              >
-                <Check className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={3} />
-              </m.button>
-            )}
-          </AnimatePresence>
-        </div>
-        {/* Inline feedback toast */}
-        <AnimatePresence>
-          {feedback && (
-            <m.div
-              dir="auto"
-              className={cn(
-                'absolute -top-8 left-1/2 -translate-x-1/2 px-3 py-1 rounded-neo border-2 border-neo-black text-sm font-bold whitespace-nowrap z-20',
-                feedback.type === 'success'
-                  ? 'bg-neo-lime text-neo-black'
-                  : 'bg-neo-red text-neo-white',
-              )}
-              initial={{ opacity: 0, y: -10, scale: 0.8 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.8 }}
-            >
-              {feedback.message}
-            </m.div>
-          )}
-        </AnimatePresence>
-      </m.div>
-
-
+      <WordWheelWordLine
+        t={t}
+        letters={builtLetters}
+        centerLetter={puzzle.centerLetter}
+        allLetters={puzzle.allLetters ?? [puzzle.centerLetter, ...puzzle.outerLetters]}
+        dir={wordDir}
+        onRemove={handleRemoveLetter}
+        onSubmit={handleSubmit}
+        isValidating={isValidating}
+        shake={wordBuilderShake}
+        feedback={feedback}
+        acceptedWord={lastFoundWord}
+        acceptedPoints={lastWordScore}
+        acceptedId={scoreFlyId}
+        reducedMotion={prefersReducedMotion}
+        hint={wordsFound.length === 0}
+        className="shrink-0"
+      />
       <WheelDisc
         orbitRef={wheelContainerRef}
         centerLetter={puzzle.centerLetter}
@@ -932,9 +849,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         fx={fx}
         release={release}
         checking={isValidating}
-        t={t}
         reducedMotion={prefersReducedMotion}
       >
+        {/* exp-wordwheel-drag-hint-v1: idle "swipe to spell" coachmark (cyan = SP). */}
         {dragHintFtue.visible && (
           <MPDragCoachmark
             t={t}
@@ -947,9 +864,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         )}
       </WheelDisc>
 
+      {/* The center-letter + min-length rule was removed from the live board to
+          cut mid-game clutter — it's still presented on the intro/ready screen
+          and surfaced on demand via the "too short" / "missing center" toasts. */}
+
+      {/* ── Action Buttons (inline below wheel, glued via flex cluster) ── */}
       <div
         data-testid="word-wheel-action-bar"
-        className="w-full flex items-center justify-center gap-2.5 sm:gap-3 mt-2 short:mt-0"
+        className="w-full flex items-center justify-center gap-3 mt-1 short:mt-0"
       >
         {/* Clear */}
         <m.button
@@ -1003,31 +925,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           <Delete className="w-5 h-5" />
         </m.button>
       </div>
-      <div
-        data-testid="tap-hint-slot"
-        className="h-[14px] sm:h-[16px] flex items-center justify-center"
-      >
-        {builtLetters.length > 0 && (
-          <p className="text-neo-white/45 text-[10px] sm:text-xs text-center">
-            {t('wordWheel.tapToRemove')} &middot; {t('wordWheel.doubleTapToSubmit')}
-          </p>
-        )}
-      </div>
       </div>
     </>
   );
 
-  const foundWordsList = (
-    <WheelFoundWords
-      words={wordsFound.map(displayWord)}
-      fresh={lastFoundWord}
-      score={scoreWord}
-      dir={wordDir}
-      reducedMotion={prefersReducedMotion}
-    />
-  );
-
-  // Desktop / Mobile branch
   if (isDesktop) {
     return (
       <div
@@ -1035,79 +936,43 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         className="relative flex h-full w-full bg-neo-navy"
         translate="no"
       >
-        <LaunchFx fx={fx} reducedMotion={prefersReducedMotion} />
-        {/* 3-Column Grid */}
         <div
           data-testid="word-wheel-desktop-grid"
-          className="flex w-full h-full max-h-full gap-6 p-5 overflow-hidden"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '280px 1fr 280px',
-            gridTemplateRows: '1fr',
-          }}
+          className="grid w-full h-full max-h-full max-w-[1500px] mx-auto gap-6 p-6 overflow-hidden grid-cols-[minmax(260px,320px)_minmax(0,1fr)_minmax(260px,340px)] grid-rows-[minmax(0,1fr)]"
         >
-          {/* Left Sidebar — Live Ranks (pink accent) */}
-          <div className="h-full overflow-hidden zone-panel-pink rounded-neo">
-            {ranksPanel}
+          <div className="h-full min-h-0 overflow-hidden rounded-neo zone-panel-pink">
+            {hideCompetitive ? (
+              <div className="p-4">
+                <WordWheelRankLadder t={t} score={score} thresholds={thresholds} rivals={rivals} variant="list" />
+              </div>
+            ) : (
+              <WordWheelLiveRanks t={t} score={score} rivals={[...rivals].reverse()} />
+            )}
           </div>
 
-          {/* Center — Game Area (cyan accent) */}
-          <div className="flex flex-col items-center justify-center h-full min-w-0 min-h-0 gap-2 relative z-10 zone-panel-cyan rounded-neo px-4 py-3">
+          <div className="flex flex-col items-center h-full min-w-0 min-h-0 gap-3 relative z-10 zone-panel-cyan rounded-neo px-8 py-5">
             {wheelCluster}
           </div>
 
-          {/* Right Sidebar — Found Words (lime accent) */}
-          <div className="h-full overflow-hidden zone-panel-lime rounded-neo flex flex-col">
-            <h3 className="text-xs font-bold uppercase mb-1.5 shrink-0 px-4 py-3 border-b-3 border-neo-black bg-neo-black/30">
-              {t('wordWheel.foundWords')} ({wordsFound.length})
-            </h3>
-            {foundWordsList}
+          <div className="h-full min-h-0 overflow-hidden zone-panel-lime rounded-neo">
+            {foundWords}
           </div>
         </div>
       </div>
     );
   }
 
-  // Mobile / tablet layout (single column)
   return (
     <div
       ref={gameContainerRef}
       className={cn(
-        // No bottom-stack padding here. `body.screen-fit-locked` already reserves
-        // --bottom-stack-height, and padding is additive, not idempotent: this
-        // used to reserve it a third time (body + challenge playing wrapper +
-        // here). On Android with an AdMob banner that is 3 x 154px = 462px lost
-        // from an 832px viewport — the board was crushed into the top third and
-        // Submit sat on top of the found-words chips. The action bar is no
-        // longer sticky (it moved inside the wheel cluster), so the original
-        // "defence in depth" reason no longer applies either.
-        'relative flex flex-col items-center w-full flex-1 max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto px-3 sm:px-4 rounded-neo',
+        // No bottom-stack padding: body.screen-fit-locked already reserves --bottom-stack-height.
+        'relative flex flex-col items-center gap-3 w-full flex-1 min-h-0 max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto px-4 pb-3 rounded-neo',
         equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`,
       )}
       translate="no"
     >
-      <LaunchFx fx={fx} reducedMotion={prefersReducedMotion} />
       {wheelCluster}
-
-      {/* ── Found Words — fixed-height reserved slot. Always rendered so the
-          wheel cluster's `flex-1 justify-center` parent never re-centers when
-          the first word lands or new chips wrap to a new row. Chips scroll
-          inside the cap; only the chip animations move, never the slot. ── */}
-      <div
-        data-testid="found-words-slot"
-        className="w-full mt-2 medium-short:mt-1 h-[112px] sm:h-[136px] medium-short:h-[88px] short:h-16 flex flex-col"
-      >
-        <h3
-          className={cn(
-            'text-xs font-bold uppercase mb-1.5 shrink-0 transition-opacity',
-            wordsFound.length > 0 ? 'text-neo-white opacity-100' : 'opacity-0',
-          )}
-          aria-hidden={wordsFound.length === 0}
-        >
-          {t('wordWheel.foundWords')} ({wordsFound.length})
-        </h3>
-        {foundWordsList}
-      </div>
     </div>
   );
 };

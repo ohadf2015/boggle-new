@@ -208,22 +208,21 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
         case 'wordValid': {
           const pts = effect.points;
 
-          if (pts <= 1) {
-            // 3-letter: small satisfying pop
+          // Thresholds follow scoreWord: 3 letters = 12, 4 = 30, 5-6 = 60-96, 7+ = 144+.
+          if (pts <= 12) {
             particles.burst(WORD_SMALL_POP, effect.x, effect.y);
-          } else if (pts <= 5) {
-            // 4-5 letter: medium burst + light shake
+          } else if (pts <= 30) {
             particles.burst(WORD_MEDIUM_BURST, effect.x, effect.y);
             shake.light();
-          } else if (pts <= 12) {
-            // 6-7 letter: big explosion + gold stars + medium shake
+          } else if (pts <= 96) {
+            // 5-6 letters: big explosion + gold stars + medium shake
             particles.burst(WORD_BIG_EXPLOSION, effect.x, effect.y);
             particles.burst(GOLD_STARS, effect.x, effect.y - 30, 15);
             shake.medium();
             // Brief hit-stop for big words
             timeDilation.slowDown(0.3, 0.15);
           } else {
-            // 8+ letter: massive explosion + confetti + hit-stop
+            // 7+ letters: massive explosion + confetti + hit-stop
             particles.burst(WORD_BIG_EXPLOSION, effect.x, effect.y);
             particles.burst(GOLD_STARS, effect.x, effect.y - 40, 25);
             particles.burst(CONFETTI_BURST, effect.x, effect.y + 20);

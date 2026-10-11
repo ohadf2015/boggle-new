@@ -109,7 +109,7 @@ describe('WordWheelGame release reaction', () => {
 
     const release = screen.getByTestId('wheel-release');
     expect(release.dataset.word).toBe('ACB');
-    expect(screen.getByTestId('word-tray').dataset.releasing).toBe('true');
+    expect(screen.getByTestId('word-builder').dataset.state).toBe('checking');
     expect(screen.queryByTestId('wheel-disc-fx')).toBeNull();
 
     await act(async () => { verdict.resolve(true); });

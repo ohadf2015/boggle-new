@@ -25,7 +25,7 @@ import type { Language, WheelPuzzle, WheelRushModeState } from '@/shared/types/g
 import type { Bot } from '../../modules/botBehavior';
 import { getCachedPlayerWords } from '../../modules/botBehaviorCache';
 import { orderWordPoolByFrequencyBand, MIN_CORPUS_FOR_BANDING } from '../../modules/wordFrequencyBanding';
-import { getCachedTrie, type TrieNode } from '../../modules/boggleSolver';
+import { getCachedTrie, getTrieNode, type WordIndex } from '../../modules/boggleSolver';
 import {
   applyWheelWord,
   scoreWheelWord,
@@ -66,12 +66,12 @@ const WHEEL_RUSH_BOT_TUNING: BotScoreTuning = {
 };
 
 /**
- * DFS trie walk over the wheel letter bag. Each outer letter usable at most
+ * Prefix-pruned DFS over the wheel letter bag. Each outer letter usable at most
  * once, center required. Returns uppercase words meeting minLen.
  */
 export function enumerateWheelWords(
   puzzle: WheelPuzzle,
-  trie: TrieNode,
+  trie: WordIndex,
   minLen: number,
 ): string[] {
   const center = puzzle.centerLetter.toLowerCase();
@@ -84,24 +84,24 @@ export function enumerateWheelWords(
   const results: string[] = [];
   const prefix: string[] = [];
 
-  function walk(node: TrieNode, usedCenter: boolean): void {
-    if (node.isWord === true && usedCenter && prefix.length >= minLen) {
+  function walk(isWord: boolean, usedCenter: boolean): void {
+    if (isWord && usedCenter && prefix.length >= minLen) {
       results.push(prefix.join('').toUpperCase());
     }
-    for (const ch of Object.keys(node)) {
-      if (ch === 'isWord') continue;
+    for (const ch of Object.keys(bag)) {
       if (!bag[ch]) continue;
-      const child = node[ch];
-      if (!child || typeof child !== 'object') continue;
-      bag[ch] -= 1;
       prefix.push(ch);
-      walk(child as TrieNode, usedCenter || ch === center);
+      const node = getTrieNode(trie, prefix.join(''));
+      if (node) {
+        bag[ch] -= 1;
+        walk(node.isWord, usedCenter || ch === center);
+        bag[ch] += 1;
+      }
       prefix.pop();
-      bag[ch] += 1;
     }
   }
 
-  walk(trie, false);
+  walk(false, false);
   return results;
 }
 

@@ -6,6 +6,7 @@ import {
   polarTrialChipUpgrade,
   isPolarTrialDay10Expiring,
   polarCheckoutWelcomeKind,
+  isPolarTrialLapse,
 } from '../polarTrial';
 
 const END = '2026-10-08T00:00:00.000Z';
@@ -107,5 +108,35 @@ describe('polarCheckoutWelcomeKind', () => {
     expect(polarCheckoutWelcomeKind({
       checkoutSuccess: true, hasPro: true, source: 'admin_grant', status: 'active',
     })).toBe('none');
+  });
+});
+
+describe('isPolarTrialLapse', () => {
+  it('is true when Polar cancels a still-trialing Teacher Pro row', () => {
+    expect(isPolarTrialLapse({
+      status: 'trialing', trial: true, trial_end: END, current_period_end: END,
+    })).toBe(true);
+  });
+
+  it('is true when Polar reports canceled and the period end is the trial end', () => {
+    expect(isPolarTrialLapse({
+      status: 'canceled', trial: true, trial_end: END, current_period_end: END,
+    })).toBe(true);
+  });
+
+  it('is false for a paid cancel (period continues past the trial end)', () => {
+    expect(isPolarTrialLapse({
+      status: 'canceled',
+      trial: true,
+      trial_end: END,
+      current_period_end: '2026-11-08T00:00:00.000Z',
+    })).toBe(false);
+  });
+
+  it('is false for an active or never-trialed row', () => {
+    expect(isPolarTrialLapse({
+      status: 'active', trial: true, trial_end: END, current_period_end: END,
+    })).toBe(false);
+    expect(isPolarTrialLapse({ status: 'canceled', trial: false, trial_end: null, current_period_end: END })).toBe(false);
   });
 });

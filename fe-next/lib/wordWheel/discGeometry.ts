@@ -38,14 +38,3 @@ export function toDiscPercent(
     y: ((clientY - rect.top) / rect.height) * 100,
   };
 }
-
-export type Praise = 'nice' | 'great' | 'brilliant' | 'amazing' | 'legendary';
-
-export function praiseTier(length: number): Praise | null {
-  if (length >= 8) return 'legendary';
-  if (length === 7) return 'amazing';
-  if (length === 6) return 'brilliant';
-  if (length === 5) return 'great';
-  if (length === 4) return 'nice';
-  return null;
-}

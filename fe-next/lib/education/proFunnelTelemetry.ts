@@ -196,3 +196,17 @@ export function trackSchoolQuoteRequested(args: {
   safeCapture('school_quote_requested', props);
   mirrorToGrowth('school_quote_requested', props);
 }
+
+/**
+ * HQ expired-trial banner impression. Same `trial_expired` name as the Polar
+ * webhook lapse — distinguished by `surface: hq_banner`. Not mirrored:
+ * Growth Radar already counts iap_viewed on this strip.
+ */
+export function trackTrialExpiredShown(args: { source: 'dashboard_trial_ended' }): void {
+  safeCapture('trial_expired', {
+    source: args.source,
+    product: 'teacher_pro',
+    provider: 'polar',
+    surface: 'hq_banner',
+  });
+}

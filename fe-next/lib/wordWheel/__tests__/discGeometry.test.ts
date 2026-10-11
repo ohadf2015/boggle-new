@@ -3,7 +3,6 @@ import {
   DISC,
   slotPoint,
   letterPoint,
-  praiseTier,
   toDiscPercent,
 } from '../discGeometry';
 
@@ -68,19 +67,5 @@ describe('disc geometry', () => {
     const rect = { left: 100, top: 200, width: 400, height: 400 };
     expect(toDiscPercent(300, 400, rect)).toEqual({ x: 50, y: 50 });
     expect(toDiscPercent(100, 200, rect)).toEqual({ x: 0, y: 0 });
-  });
-});
-
-describe('praiseTier', () => {
-  it('given short words, then there is no stamp', () => {
-    expect(praiseTier(3)).toBeNull();
-  });
-
-  it('given longer words, then the stamp climbs with length', () => {
-    expect(praiseTier(4)).toBe('nice');
-    expect(praiseTier(5)).toBe('great');
-    expect(praiseTier(6)).toBe('brilliant');
-    expect(praiseTier(7)).toBe('amazing');
-    expect(praiseTier(9)).toBe('legendary');
   });
 });

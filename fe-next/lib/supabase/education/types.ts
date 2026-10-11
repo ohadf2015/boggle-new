@@ -276,6 +276,8 @@ export interface TeacherAssignment {
   due_date: string | null;
   title: string | null;
   instructions: string | null;
+  /** When set, students complete by finding this many unique words. */
+  word_count_target?: number | null;
   created_at: string;
   updated_at: string;
   // Joined data (optional)

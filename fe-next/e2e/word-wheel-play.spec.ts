@@ -117,7 +117,7 @@ test.describe('Word Wheel play', () => {
     await expect.poll(fxSeen, { timeout: 8_000 }).toContain('good');
     await expect(page.getByTestId('found-word')).toHaveCount(1);
     await expect(page.getByTestId('found-word').first()).toContainText(word!.toUpperCase());
-    await expect(page.getByTestId('wheel-score')).not.toContainText(/^0/);
+    await expect(page.getByTestId('rank-bubble')).not.toHaveText('0');
   });
 
   test('a drag over a non-word shakes the wheel red and keeps the found list empty', async ({ page }) => {

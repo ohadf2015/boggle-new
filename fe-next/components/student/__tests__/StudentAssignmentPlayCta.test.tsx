@@ -40,4 +40,13 @@ describe('StudentAssignmentPlayCta — next-open-assignment', () => {
     expect(cta).toBeInTheDocument();
     expect(cta).toHaveAttribute('href', '/en/student/lessons/week-3');
   });
+
+  it('Given an overdue assignment, Then the CTA is marked overdue', () => {
+    render(
+      <StudentAssignmentPlayCta
+        next={{ ...open, dueDate: '2020-01-01T00:00:00Z' }}
+      />,
+    );
+    expect(screen.getByTestId('student_assignment_cta')).toHaveAttribute('data-due-state', 'overdue');
+  });
 });

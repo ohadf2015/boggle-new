@@ -2554,6 +2554,17 @@ const ru = {
       "playZone": "Играть",
       "learnZone": "Учиться"
     },
+    "assignments": {
+      "dueInHours": "Через {hours} ч",
+      "dueInMinutes": "Через {minutes} мин",
+      "overdueBy": "Просрочено на {days} д",
+      "doIt": "Сделать"
+    },
+    "classView": {
+      "playAssignment": "Играть {title}",
+      "playAssignmentDueSoon": "Скоро · Играть {title}",
+      "playAssignmentOverdue": "Просрочено · Играть {title}"
+    },
     "welcome": {
       "title": "Добро пожаловать в класс!",
       "subtitle": "Выбери первое задание",
@@ -10952,6 +10963,30 @@ const ru = {
     "cta": "Играть",
     "ctaWait": "{{seconds}} с"
   },
+  "firstLesson": {
+    "skipLabel": "Пропустить урок",
+    "skip": "Пропустить",
+    "progressLabel": "Прогресс урока",
+    "trace": "Проведи по слову",
+    "findAny": "Теперь найди своё слово",
+    "findLength": "Слово из {{count}}+ букв",
+    "inARow": "{{count}} подряд",
+    "praise": {
+      "nice": "Неплохо!",
+      "great": "Здорово!",
+      "awesome": "Круто!",
+      "amazing": "Невероятно!"
+    },
+    "oops": "Почти",
+    "tryWord": "Попробуй {{word}}",
+    "found": "Ты нашёл {{word}}",
+    "complete": "Урок пройден!",
+    "completeSub": "Ты всё понял. Остаток раунда — твой.",
+    "statWords": "Слова",
+    "statPoints": "Очки",
+    "statStreak": "Серия",
+    "keepPlaying": "Играть дальше"
+  },
   "modeCoach": {
     "skip": "Пропустить",
     "next": "Далее",
@@ -13223,6 +13258,7 @@ const ru = {
       "trialEndedTitle": "Пробный период истёк — оформите Pro, чтобы сохранить классы",
       "trialEndedBody": "Безлимитные классы и печатные отчёты за 9 $ в месяц. Это не новый бесплатный период.",
       "trialEndedCta": "Оставить Pro — 9 $/мес",
+      "trialReactivateCta": "Возобновить",
       "trialLifecycleTitle": "До конца пробного Teacher Pro: {count} дн.",
       "trialLifecycleTitleToday": "Пробный Teacher Pro заканчивается сегодня",
       "trialLifecycleTitleOne": "До конца пробного Teacher Pro: 1 день",
@@ -13663,7 +13699,15 @@ const ru = {
       "starterColors": "Цвета и формы",
       "starterColorsDesc": "Цвета и простые формы для начинающих",
       "starterFood": "Еда",
-      "starterFoodDesc": "Повседневные слова про еду для первого задания"
+      "starterFoodDesc": "Повседневные слова про еду для первого задания",
+      "wordCountGoal": "Цель по словам",
+      "wordCountGoalHint": "Ученики находят столько уникальных слов к сроку.",
+      "wordCountLabel": "Сколько слов?",
+      "wordListGoal": "Список слов",
+      "wordListGoalHint": "Вставьте слова, по одному в строке или через запятую.",
+      "wordListPlaceholder": "кот, пёс, рыба",
+      "wordGoalMissing": "Добавьте цель или список и срок",
+      "findNWords": "Найди {{count}} слов"
     },
     "completion": {
       "overallProgress": "Общий прогресс",
@@ -13854,6 +13898,7 @@ const ru = {
         "empty": "В этом классе пока нет заданий",
         "statusCompleted": "Выполнено",
         "statusMissing": "Не сдано",
+        "statusOverdue": "Просрочено",
         "exportCsv": "Экспорт CSV",
         "exportCsvPro": "Экспорт CSV с Teacher Pro {{price}}",
         "fileName": "{{name}} – прогресс по заданиям",
@@ -14671,14 +14716,6 @@ const ru = {
     "love": "Любовь",
     "label": "Быстрые реакции"
   },
-  "encouragement": {
-    "gameStart": "Поехали, у тебя всё получится! 🎯",
-    "firstWord": "Хорошее слово! Так держать",
-    "longWord": "Ого! Длинные слова дают много очков!",
-    "combo": "Комбо! Ты в огне!",
-    "halfway": "Половина пути, не сбавляй!",
-    "almostDone": "Финишная прямая! Найди ещё слов!"
-  },
   "cosy": {
     "wellDone": "Хорошо сделано",
     "affirmLovely": "Милый",
@@ -15426,6 +15463,41 @@ const ru = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "showBoard": "Таблица на сегодня",
+      "hideBoard": "Скрыть таблицу",
+      "moreBoards": "Ещё"
+    },
+    "rank": {
+      "title": "Ранги",
+      "open": "Все ранги",
+      "toNext": "{count} до «{rank}»",
+      "top": "Высший ранг. Легенда!",
+      "reached": "Ранг дня",
+      "warmUp": "Разминка",
+      "spinning": "Раскрутка",
+      "onARoll": "В ударе",
+      "sharp": "Острый ум",
+      "hotStreak": "Жара",
+      "wordsmith": "Словодел",
+      "whirlwind": "Вихрь",
+      "wizard": "Маг",
+      "legend": "Легенда"
+    },
+    "praise": {
+      "nice": "Неплохо!",
+      "great": "Отлично!",
+      "superb": "Супер!",
+      "brilliant": "Блестяще!",
+      "fullWheel": "Всё колесо!"
+    },
+    "strip": {
+      "empty": "Здесь появятся твои слова",
+      "label": "Найдено: {count}",
+      "all": "Все слова",
+      "close": "Закрыть",
+      "longest": "Самое длинное"
+    },
     "youFoundEverything": "Ты нашёл всё, что они нашли. Красиво.",
     "title": "Колесо Слов",
     "loading": "Загрузка Колеса Слов...",
@@ -15434,7 +15506,6 @@ const ru = {
     "description": "В каждом слове должна быть центральная буква, минимум 3 буквы",
     "centerLetterRule": "Нужна центральная буква",
     "minLetters": "Мин {min} букв",
-    "wordsFound": "Найдено слов: {count}",
     "scoreLabel": "Очки",
     "timeLeft": "Осталось времени",
     "closeRace": "Гонка почти равна!",
@@ -15448,13 +15519,6 @@ const ru = {
     "invalidLetters": "Можно использовать только буквы колеса",
     "allLettersUsed": "ВСЕ БУКВЫ!",
     "almostAllLetters": "ПОЧТИ ВСЕ!",
-    "praise": {
-      "nice": "Неплохо!",
-      "great": "Отлично!",
-      "brilliant": "Блестяще!",
-      "amazing": "Потрясающе!",
-      "legendary": "Легендарно!"
-    },
     "streakBadge": "{count} подряд!",
     "onFireBadge": "{count} подряд, в ударе!",
     "closeRace": "Плотная гонка",
@@ -15471,10 +15535,6 @@ const ru = {
     "removeLetter": "Удалить букву",
     "foundWords": "Найденные слова",
     "possibleWords": "Возможные",
-    "excellent": "Отлично!",
-    "great": "Хорошо!",
-    "good": "Хороший результат!",
-    "tryAgain": "Потренируйся ещё!",
     "longest": "Самое длинное",
     "viewSubmittedWords": "Посмотреть отправленные слова",
     "viewWordsYouMissed": "Посмотреть пропущенные слова",
@@ -15482,7 +15542,6 @@ const ru = {
     "youMissedTitle": "Слова, которые ты пропустил",
     "noWordsSubmitted": "Пока нет отправленных слов",
     "results": {
-      "title": "Результаты Колеса Слов",
       "wordsFound": "Найденные слова",
       "score": "Очки",
       "time": "Время",
@@ -18152,11 +18211,17 @@ const ru = {
         "body": "Тяни прямо вниз (или вверх), чтобы составить вертикальные слова."
       }
     },
+    "wallet": {
+      "coins": "Монет: {count}"
+    },
     "store": {
       "title": "Магазин улучшений",
       "close": "Готово",
       "buy": "Купить",
       "max": "МАКС",
+      "pay": "Оплатить",
+      "short": "Не хватает",
+      "confirm": "Оплатить {cost} монет",
       "extraMoves": {
         "name": "Дополнительные ходы",
         "desc": "+1 ход в начале каждого уровня"

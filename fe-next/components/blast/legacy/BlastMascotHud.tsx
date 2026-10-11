@@ -28,6 +28,9 @@ interface BlastMascotHudProps {
   className?: string;
 }
 
+/** Positioned slot for the mascot: below the HUD on phones (the wallet lives in the top corner). */
+export const BLAST_MASCOT_SLOT_CLASS = 'absolute top-[9.25rem] sm:top-3 end-3 z-50';
+
 export function BlastMascotHud({
   state,
   enabled = true,

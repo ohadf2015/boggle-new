@@ -31,7 +31,6 @@ interface WheelDiscProps {
   release?: WheelReleaseEvent | null;
   /** The word is out for a verdict. */
   checking?: boolean;
-  t: (key: string, params?: Record<string, string | number>) => string;
   reducedMotion: boolean;
   children?: ReactNode;
 }
@@ -40,7 +39,7 @@ interface WheelDiscProps {
 const WheelDisc: React.FC<WheelDiscProps> = ({
   orbitRef, centerLetter, outerLetters, builtIndices, pointerPosRef, draggingRef,
   onPointerDown, onPointerMove, onPointerUp, onPress, onHoldStart, onHoldEnd, holdActiveIndex,
-  tileSkin, fx, release = null, checking = false, t, reducedMotion, children,
+  tileSkin, fx, release = null, checking = false, reducedMotion, children,
 }) => {
   const [haltedSpin, setHaltedSpin] = useState<number | null>(null);
   const spinning = fx?.kind === 'good' && !reducedMotion && fx.id !== haltedSpin;
@@ -169,7 +168,7 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
           </div>
         )}
       </div>
-      <DiscFx fx={fx} t={t} reducedMotion={reducedMotion} />
+      <DiscFx fx={fx} reducedMotion={reducedMotion} />
       {children}
     </div>
   );

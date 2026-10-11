@@ -13,11 +13,11 @@ describe('blastUpgradeCatalog', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('every upgrade has an i18n name+desc key, a currency, and sane curve', () => {
+  it('every upgrade has an i18n name+desc key, a coin price, and sane curve', () => {
     for (const u of BLAST_UPGRADES) {
       expect(u.nameKey).toMatch(/^blast\.store\./);
       expect(u.descKey).toMatch(/^blast\.store\./);
-      expect(['coins', 'gems']).toContain(u.currency);
+      expect(u).not.toHaveProperty('currency');
       expect(u.baseCost).toBeGreaterThan(0);
       expect(u.costGrowth).toBeGreaterThan(1);
       expect(u.maxLevel).toBeGreaterThanOrEqual(1);

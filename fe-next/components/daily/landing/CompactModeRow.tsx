@@ -109,7 +109,7 @@ export function CompactModeRow({
             A CSS background rather than <img>: it is purely decorative (the
             title beside it names the mode), it is the convention the hero
             QuestCard already uses for the same mascots, and it keeps the row
-            free of next/image machinery for a 36px thumbnail. */}
+            free of next/image machinery for a 44px thumbnail. */}
         {artUrl && (
           <span
             aria-hidden="true"
@@ -118,20 +118,21 @@ export function CompactModeRow({
             data-art-url={artUrl}
             style={{ backgroundImage: `url(${artUrl})` }}
             className={cn(
-              'relative shrink-0 w-9 h-9 rounded-md bg-cover bg-center',
+              'relative shrink-0 w-11 h-11 rounded-md bg-cover bg-center',
               'border-2 border-neo-black/60',
               played && 'grayscale'
             )}
           />
         )}
 
-        {/* Icon */}
-        <div className={cn('relative shrink-0 w-6 h-6 flex items-center justify-center', config.icon)}>
-          {icon}
-        </div>
+        {!artUrl && (
+          <div className={cn('relative shrink-0 w-6 h-6 flex items-center justify-center', config.icon)}>
+            {icon}
+          </div>
+        )}
 
         {/* Title */}
-        <h3 className="relative text-sm font-neo-display font-black text-neo-white flex-1 text-start">
+        <h3 className="relative text-base font-neo-display font-black text-neo-white flex-1 text-start">
           {title}
         </h3>
 

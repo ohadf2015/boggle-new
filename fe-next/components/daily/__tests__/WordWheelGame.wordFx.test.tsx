@@ -95,45 +95,33 @@ const drag = (letters: string[]) => {
 };
 
 describe('WordWheelGame word reactions', () => {
-  it('given an accepted five-letter word, then the disc stamps it, flies the points and launches the tiles', async () => {
+  it('given an accepted five-letter word, then the disc bursts every spelled letter while the word line says the verdict', async () => {
     mountGame(true);
     ['C', 'A', 'B', 'E', 'D'].forEach(tap);
     await act(async () => { fireEvent.click(screen.getByTestId('inline-submit-chip')); });
 
-    const fx = screen.getByTestId('wheel-disc-fx');
-    expect(fx.dataset.kind).toBe('good');
-    expect(screen.getByTestId('wheel-praise').textContent).toBe('wordWheel.praise.great');
-    expect(screen.getByTestId('wheel-points-fly').textContent).toBe('+5');
-    expect(screen.getAllByTestId('wheel-launch-letter').map(el => el.textContent)).toEqual(['C', 'A', 'B', 'E', 'D']);
+    expect(screen.getByTestId('wheel-disc-fx').dataset.kind).toBe('good');
     expect(screen.getAllByTestId('wheel-letter-burst')).toHaveLength(5);
+    expect(screen.getAllByTestId('wheel-spark')).toHaveLength(12);
+    expect(screen.getByTestId('word-feedback').textContent).toContain('+5');
     expect(screen.queryAllByTestId('built-letter-tile')).toHaveLength(0);
   });
 
-  it('given a three-letter word, then there is no praise stamp but the points still fly', async () => {
-    mountGame(true);
-    ['C', 'A', 'B'].forEach(tap);
-    await act(async () => { fireEvent.click(screen.getByTestId('inline-submit-chip')); });
-    expect(screen.queryByTestId('wheel-praise')).toBeNull();
-    expect(screen.getByTestId('wheel-points-fly')).toBeInTheDocument();
-  });
-
-  it('given a word that uses all but one wheel letter, then the coverage banner owns the moment and no stamp shows', async () => {
+  it('given a word that uses all but one wheel letter, then the disc throws a bigger spark ring', async () => {
     mountGame(true);
     ['C', 'A', 'B', 'E', 'D', 'F'].forEach(tap);
     await act(async () => { fireEvent.click(screen.getByTestId('inline-submit-chip')); });
-    expect(screen.getByTestId('wheel-disc-fx').dataset.kind).toBe('good');
-    expect(screen.queryByTestId('wheel-praise')).toBeNull();
+    expect(screen.getAllByTestId('wheel-spark')).toHaveLength(20);
   });
 
-  it('given a rejected drag, then the wheel flashes red, the trail ghost shakes red and the tiles drop off the tray', async () => {
+  it('given a rejected drag, then the disc kicks red, the trail ghost shakes red and the word line drops the word', async () => {
     mountGame(false);
     const orbit = drag(['C', 'B', 'D']);
     await act(async () => { fireEvent.pointerUp(orbit); });
 
     expect(screen.getByTestId('wheel-disc-fx').dataset.kind).toBe('bad');
     expect(screen.getByTestId('wheel-trail-ghost').dataset.kind).toBe('bad');
-    expect(screen.getByTestId('wheel-launch-fx').dataset.kind).toBe('bad');
-    expect(screen.getAllByTestId('wheel-launch-letter')).toHaveLength(3);
+    expect(screen.getByTestId('rejected-word').textContent).toBe('CBD');
     expect(screen.queryAllByTestId('built-letter-tile')).toHaveLength(0);
   });
 

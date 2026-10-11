@@ -108,4 +108,15 @@ describe('WordWheelGame desktop 3-column layout', () => {
     expect(screen.getByText('wordHunt.desktop.liveRanks')).toBeInTheDocument();
     expect(screen.getByText('wordHunt.desktop.beFirst')).toBeInTheDocument();
   });
+
+  it('shows the rank ladder once, not again as a side list, when live ranks fill the left column', () => {
+    renderGame({ isDesktop: true });
+    expect(screen.getAllByTestId('rank-ladder')).toHaveLength(1);
+  });
+
+  it('falls back to the rank list on the left when there is no live board', () => {
+    renderGame({ isDesktop: true, hideCompetitive: true });
+    expect(screen.queryByText('wordHunt.desktop.liveRanks')).toBeNull();
+    expect(screen.getAllByTestId('rank-ladder')).toHaveLength(2);
+  });
 });
