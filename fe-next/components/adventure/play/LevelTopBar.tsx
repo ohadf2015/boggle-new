@@ -41,6 +41,7 @@ export default function LevelTopBar({ worldName, levelLabel, secs, urgent, onExi
         <div className="font-neo-display font-bold leading-tight">{levelLabel}</div>
       </div>
       <div
+        data-adv-slot="timer"
         className={cn(
           'rounded-xl border-[3px] border-black px-3 py-2 font-neo-display font-bold tabular-nums inline-flex items-center gap-1 shadow-[3px_3px_0_#000]',
           urgent ? 'bg-neo-pink text-black animate-pulse' : 'bg-neo-yellow text-black'

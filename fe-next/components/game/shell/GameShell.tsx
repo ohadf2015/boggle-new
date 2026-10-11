@@ -25,13 +25,15 @@ export interface GameShellProps {
   /** The mode's own play surface — on phones it renders exactly as without the shell. */
   children: ReactNode;
   className?: string;
+  /** Lets a mode's own painted world show through instead of the flat shell floor. */
+  scene?: boolean;
 }
 
 /** Layout is CSS only, so the desktop frame is right at first paint (no JS breakpoint flip). */
-function GameShellImpl({ mode, accent, left, right, children, className }: GameShellProps) {
+function GameShellImpl({ mode, accent, left, right, children, className, scene = false }: GameShellProps) {
   const style = { '--shell-accent': SHELL_ACCENTS[accent] } as CSSProperties;
   return (
-    <div data-testid="game-shell" data-game-shell={mode} className={cn(styles.shell, className)} style={style}>
+    <div data-testid="game-shell" data-game-shell={mode} className={cn(styles.shell, scene && styles.scene, className)} style={style}>
       <aside data-testid="game-shell-left" className={cn(styles.rail, styles.railStart)}>
         {left}
       </aside>

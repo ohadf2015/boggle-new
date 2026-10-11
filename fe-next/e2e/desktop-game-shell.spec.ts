@@ -100,6 +100,23 @@ test.describe('desktop game shell (1440x900)', () => {
     await expect(page.getByTestId('game-shell-left').getByTestId('shell-clock')).toBeVisible();
   });
 
+  test('adventure: the guest fight keeps its foe bar on top, the board owns the centre and typed words land in the feed', async ({ page }) => {
+    test.setTimeout(90_000);
+    const demo = page.waitForResponse((r) => r.url().includes('/api/adventure/demo') && r.ok(), { timeout: 60_000 });
+    await page.goto('/en/adventure');
+    const { hints } = (await (await demo).json()) as { hints?: string[] };
+    await dismissCoaches(page);
+    await expectShell(page, 'adventure');
+    await expectBoardOwnsHeight(page);
+    await expect(page.getByTestId('game-shell-left').getByTestId('shell-clock')).toBeVisible();
+    const word = hints?.[0];
+    test.skip(!word, 'demo board came without hint words');
+    await page.locator('body').click({ position: { x: 5, y: DESKTOP.height - 5 } });
+    await page.keyboard.type(word!, { delay: 40 });
+    await page.keyboard.press('Enter');
+    await expect(page.getByTestId('game-shell-right').locator('[data-testid^="shell-word-row-"]').first()).toBeVisible({ timeout: 10_000 });
+  });
+
   test('wordcraft: the board is sized by height with the chrome beside it, no site header', async ({ page }) => {
     test.setTimeout(90_000);
     await page.goto('/en/word-craft');

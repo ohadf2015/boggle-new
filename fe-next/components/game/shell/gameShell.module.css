@@ -17,7 +17,8 @@
   .shell {
     --shell-gap: clamp(0.875rem, 1.4vw, 1.75rem);
     --shell-rail-min: 16rem;
-    --shell-stage: min(calc(100dvh - 2rem), calc(100vw - 2 * var(--shell-rail-min) - 4 * var(--shell-gap)), 64rem);
+    /* --shell-chrome: height a mode spends on its own bars above the shell, so the stage stays square. */
+    --shell-stage: min(calc(100dvh - 2rem - var(--shell-chrome, 0px)), calc(100vw - 2 * var(--shell-rail-min) - 4 * var(--shell-gap)), 64rem);
     position: relative;
     display: grid;
     grid-template-columns: minmax(var(--shell-rail-min), 26rem) var(--shell-stage) minmax(var(--shell-rail-min), 26rem);
@@ -51,6 +52,9 @@
     min-width: 0;
     min-height: 0;
     overflow: hidden;
+  }
+  .scene {
+    background: radial-gradient(ellipse 46% 62% at 50% 52%, transparent 0%, rgb(10 14 30 / 0.55) 100%);
   }
   .railStart { grid-column: 1; }
   /* Clears the fixed in-game mute button, which sits at the inline-end top corner. */
