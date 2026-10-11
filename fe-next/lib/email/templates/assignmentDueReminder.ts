@@ -1,6 +1,5 @@
 import type { TeacherLocale } from '@/lib/education/types';
-import type { TeacherReminderPlan } from '@/lib/education/assignmentDueReminders';
-import { reportsUrl } from '@/lib/education/assignmentDueReminders';
+import { reportsUrl, type TeacherReminderPlan } from '@/lib/education/assignmentDueReminders';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 
 function escape(s: string): string {

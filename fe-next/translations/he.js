@@ -13396,6 +13396,17 @@ const he = {
       "playZone": "שחקו",
       "learnZone": "למדו"
     },
+    "assignments": {
+      "dueInHours": "עוד {hours} שע׳",
+      "dueInMinutes": "עוד {minutes} דק׳",
+      "overdueBy": "באיחור {days} ימים",
+      "doIt": "לעשות"
+    },
+    "classView": {
+      "playAssignment": "שחקו {title}",
+      "playAssignmentDueSoon": "עד מחר · שחקו {title}",
+      "playAssignmentOverdue": "באיחור · שחקו {title}"
+    },
     "welcome": {
       "title": "ברוכים הבאים לכיתה שלכם",
       "subtitle": "בחרו את האתגר הראשון שלכם",

@@ -166,11 +166,18 @@ export function AssignmentProgressReport({ classroomId, classroomName }: Assignm
                 <td className="px-3 py-2 font-bold text-neo-white">{row.studentName}</td>
                 <td className="px-3 py-2 text-neo-white">{row.assignmentTitle}</td>
                 <td className="px-3 py-2 text-neo-white">
-                  {row.status === 'completed'
-                    ? t('teacher.reports.assignmentProgress.statusCompleted')
-                    : row.status === 'overdue'
-                      ? t('teacher.reports.assignmentProgress.statusOverdue')
-                      : t('teacher.reports.assignmentProgress.statusMissing')}
+                  {row.status === 'completed' ? (
+                    t('teacher.reports.assignmentProgress.statusCompleted')
+                  ) : row.status === 'overdue' ? (
+                    <span
+                      data-testid="assignment-overdue-badge"
+                      className="inline-flex items-center gap-1 rounded border-2 border-neo-red bg-neo-red/15 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide text-neo-red"
+                    >
+                      {t('teacher.reports.assignmentProgress.statusOverdue')}
+                    </span>
+                  ) : (
+                    t('teacher.reports.assignmentProgress.statusMissing')
+                  )}
                 </td>
                 <td className="px-3 py-2 text-end text-neo-white tabular-nums">
                   {row.score == null ? '—' : row.score}

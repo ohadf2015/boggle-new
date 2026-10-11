@@ -13489,6 +13489,17 @@ const es = {
       "playZone": "Jugar",
       "learnZone": "Aprender"
     },
+    "assignments": {
+      "dueInHours": "Vence en {hours}h",
+      "dueInMinutes": "Vence en {minutes}m",
+      "overdueBy": "Atrasada {days}d",
+      "doIt": "Hacerlo"
+    },
+    "classView": {
+      "playAssignment": "Jugar {title}",
+      "playAssignmentDueSoon": "Pronto · Jugar {title}",
+      "playAssignmentOverdue": "Atrasada · Jugar {title}"
+    },
     "welcome": {
       "title": "¡Bienvenido a tu aula!",
       "subtitle": "Elige tu primer desafío",

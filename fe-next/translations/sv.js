@@ -13778,6 +13778,17 @@ const sv = {
       "playZone": "Spela",
       "learnZone": "Lär dig"
     },
+    "assignments": {
+      "dueInHours": "Förfaller om {hours}t",
+      "dueInMinutes": "Förfaller om {minutes}m",
+      "overdueBy": "{days}d försenad",
+      "doIt": "Gör det"
+    },
+    "classView": {
+      "playAssignment": "Spela {title}",
+      "playAssignmentDueSoon": "Snart · Spela {title}",
+      "playAssignmentOverdue": "Försenad · Spela {title}"
+    },
     "welcome": {
       "title": "Välkommen till ditt klassrum!",
       "subtitle": "Välj din första utmaning",

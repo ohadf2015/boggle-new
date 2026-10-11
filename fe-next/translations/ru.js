@@ -2554,6 +2554,17 @@ const ru = {
       "playZone": "Играть",
       "learnZone": "Учиться"
     },
+    "assignments": {
+      "dueInHours": "Через {hours} ч",
+      "dueInMinutes": "Через {minutes} мин",
+      "overdueBy": "Просрочено на {days} д",
+      "doIt": "Сделать"
+    },
+    "classView": {
+      "playAssignment": "Играть {title}",
+      "playAssignmentDueSoon": "Скоро · Играть {title}",
+      "playAssignmentOverdue": "Просрочено · Играть {title}"
+    },
     "welcome": {
       "title": "Добро пожаловать в класс!",
       "subtitle": "Выбери первое задание",

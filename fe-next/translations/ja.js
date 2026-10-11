@@ -13536,6 +13536,17 @@ const ja = {
       "playZone": "プレイ",
       "learnZone": "学ぶ"
     },
+    "assignments": {
+      "dueInHours": "残り{hours}時間",
+      "dueInMinutes": "残り{minutes}分",
+      "overdueBy": "{days}日遅れ",
+      "doIt": "やる"
+    },
+    "classView": {
+      "playAssignment": "{title}をプレイ",
+      "playAssignmentDueSoon": "まもなく締切 · {title}をプレイ",
+      "playAssignmentOverdue": "期限切れ · {title}をプレイ"
+    },
     "welcome": {
       "title": "クラスへようこそ！",
       "subtitle": "最初のチャレンジを選んでください",
