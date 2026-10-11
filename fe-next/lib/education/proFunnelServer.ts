@@ -96,6 +96,15 @@ export function buildTeacherTrialConvertedEvent(userId: string, subscriptionId: 
   };
 }
 
+/** Polar Teacher Pro trial lapsed without converting. */
+export function buildTrialExpiredEvent(userId: string, subscriptionId: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'trial_expired',
+    properties: { ...BASE, subscription_id: subscriptionId },
+  };
+}
+
 /** Day-10 Polar trial expiry email actually sent. */
 export function buildPolarTrialDay10SentEvent(userId: string, daysLeft: number): EduServerEvent {
   return {

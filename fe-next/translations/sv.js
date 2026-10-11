@@ -14278,6 +14278,7 @@ const sv = {
       "trialEndedTitle": "Provperioden är slut. Uppgradera för att behålla klasserna",
       "trialEndedBody": "Behåll obegränsade klasser och utskrivbara rapporter för 9 $/månad. Det här är inte en ny gratis provperiod.",
       "trialEndedCta": "Behåll Pro – 9 $/mån",
+      "trialReactivateCta": "Återaktivera",
       "trialLifecycleTitle": "{count} dagar kvar av din Teacher Pro-provperiod",
       "trialLifecycleTitleToday": "Din Teacher Pro-provperiod slutar idag",
       "trialLifecycleTitleOne": "1 dag kvar av din Teacher Pro-provperiod",

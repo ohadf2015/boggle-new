@@ -13223,6 +13223,7 @@ const ru = {
       "trialEndedTitle": "Пробный период истёк — оформите Pro, чтобы сохранить классы",
       "trialEndedBody": "Безлимитные классы и печатные отчёты за 9 $ в месяц. Это не новый бесплатный период.",
       "trialEndedCta": "Оставить Pro — 9 $/мес",
+      "trialReactivateCta": "Возобновить",
       "trialLifecycleTitle": "До конца пробного Teacher Pro: {count} дн.",
       "trialLifecycleTitleToday": "Пробный Teacher Pro заканчивается сегодня",
       "trialLifecycleTitleOne": "До конца пробного Teacher Pro: 1 день",
