@@ -9445,6 +9445,7 @@ const he = {
     "onFireBadge": "{count} על האש!",
     "closeRace": "מרוץ צמוד",
     "inputPlaceholder": "הקלידו מילה...",
+    "firstHint": "מקישים או גוררים — בכל מילה יש {letter}",
     "tapLetters": "הקישו או גררו אותיות כדי לבנות מילה",
     "tapToRemove": "הקישו שוב על אות שהוספתם כדי להסיר",
     "doubleTapToSubmit": "הקישו פעמיים על אות כדי לשלוח",

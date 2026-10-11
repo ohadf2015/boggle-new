@@ -34,8 +34,6 @@ export interface ModeCoachProps {
   onShown?: () => void;
   /** Grace period before the "touch the board to dismiss" listener arms. */
   graceMs?: number;
-  /** Where the card docks; 'bottom' keeps a dense game header readable. */
-  placement?: 'top' | 'bottom';
 }
 
 /**
@@ -45,7 +43,7 @@ export interface ModeCoachProps {
  * Shows once per mode per device. Visual-first: a looping gesture demo carries
  * the meaning, the caption is ≤6 words.
  */
-export function ModeCoach({ mode, onShown, graceMs = 1500, placement = 'top' }: ModeCoachProps) {
+export function ModeCoach({ mode, onShown, graceMs = 1500 }: ModeCoachProps) {
   const content = getModeCoach(mode);
   const { t, language } = useLanguage();
   const reduced = useReducedMotion() ?? false;
@@ -84,29 +82,21 @@ export function ModeCoach({ mode, onShown, graceMs = 1500, placement = 'top' }: 
   const step = content.steps[stepIndex];
   const accent = content.accent;
   const isRtl = language === 'he';
-  const atBottom = placement === 'bottom';
-  const enterY = atBottom ? 24 : -24;
 
   return (
     <AnimatePresence>
       {visible && step && (
         <div
-          data-placement={placement}
-          className={cn(
-            'pointer-events-none fixed inset-x-0 z-[70] flex justify-center px-3',
-            atBottom
-              ? 'bottom-0 pb-[max(1.25rem,calc(env(safe-area-inset-bottom)+1rem))]'
-              : 'top-0 pt-[max(4.25rem,calc(env(safe-area-inset-top)+3.75rem))]',
-          )}
+          className="pointer-events-none fixed inset-x-0 top-0 z-[70] flex justify-center px-3 pt-[max(4.25rem,calc(env(safe-area-inset-top)+3.75rem))]"
           dir={isRtl ? 'rtl' : 'ltr'}
         >
           <m.div
             ref={cardRef}
             role="dialog"
             aria-label={t(content.titleKey)}
-            initial={reduced ? { opacity: 0 } : { opacity: 0, y: enterY }}
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: -24 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? { opacity: 0 } : { opacity: 0, y: enterY * 0.75 }}
+            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -18 }}
             transition={reduced ? { duration: 0.15 } : { type: 'spring', stiffness: 380, damping: 30 }}
             className={cn(
               'pointer-events-auto w-full max-w-xs rounded-neo border-neo-thick bg-neo-navy-light shadow-hard-lg',

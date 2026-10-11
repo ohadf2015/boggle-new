@@ -9758,6 +9758,7 @@ const sv = {
     "onFireBadge": "{count} i rad – glödhett!",
     "closeRace": "Jämn kamp",
     "inputPlaceholder": "Skriv ett ord...",
+    "firstHint": "Tryck eller dra — varje ord har {letter}",
     "tapLetters": "Tryck eller dra bokstäver för att bygga ett ord",
     "tapToRemove": "Tryck igen på en tillagd bokstav för att ta bort",
     "doubleTapToSubmit": "Dubbeltryck på en bokstav för att skicka",

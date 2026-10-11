@@ -9477,6 +9477,7 @@ const es = {
     "onFireBadge": "¡{count} seguidas, en racha!",
     "closeRace": "Carrera reñida",
     "inputPlaceholder": "Escribe una palabra...",
+    "firstHint": "Toca o desliza: todas llevan la {letter}",
     "tapLetters": "Toca o arrastra letras para formar una palabra",
     "tapToRemove": "Toca otra vez una letra añadida para quitarla",
     "doubleTapToSubmit": "Toca dos veces una letra para enviar",

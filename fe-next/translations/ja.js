@@ -9516,6 +9516,7 @@ const ja = {
     "onFireBadge": "{count}連続、絶好調！",
     "closeRace": "接戦中",
     "inputPlaceholder": "単語を入力...",
+    "firstHint": "タップかなぞる。どの単語にも {letter}",
     "tapLetters": "文字をタップまたはドラッグして単語を作ろう",
     "tapToRemove": "追加した文字をもう一度タップで削除",
     "doubleTapToSubmit": "文字をダブルタップで送信",

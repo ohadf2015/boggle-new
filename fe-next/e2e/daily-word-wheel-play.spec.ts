@@ -62,7 +62,10 @@ async function swipe(page: Page, word: string, tiles: { l: string; x: number; y:
   });
   await page.mouse.move(pts[0].x, pts[0].y);
   await page.mouse.down();
-  for (const p of pts.slice(1)) await page.mouse.move(p.x, p.y, { steps: 6 });
+  for (const p of pts.slice(1)) {
+    await page.mouse.move(p.x, p.y, { steps: 6 });
+    await page.waitForTimeout(160);
+  }
   await page.mouse.up();
 }
 
@@ -128,6 +131,56 @@ test.describe('Daily Word Wheel — phone', () => {
     }
     await expect.poll(() => page.getByTestId('found-word').count(), { timeout: 15000 }).toBeGreaterThan(0);
     await expect(page.getByTestId('rank-bubble')).not.toHaveText('0');
+  });
+
+  test('first daily visit: nothing floats over the wheel and a swipe from a lower letter lands, even over a stray selection', async ({ page }) => {
+    await page.route('**/api/daily-challenge/word-wheel/check-played/**', (r) =>
+      r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ hasPlayed: false }) }),
+    );
+    await page.route('**/api/daily-challenge/word-wheel/submit', (r) =>
+      r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true }) }),
+    );
+    await open(page, '/en/daily/word-wheel');
+    const play = page.getByRole('button', { name: /^play$/i }).first();
+    await expect(play).toBeVisible({ timeout: 30000 });
+    await play.click({ force: true });
+    await expect(page.getByTestId('wheel-orbit')).toBeVisible({ timeout: 20000 });
+    await page.waitForTimeout(2500);
+    await expect(page.locator('[role="dialog"]')).toHaveCount(0);
+
+    const tiles = await wheelTiles(page);
+    const lowFirst = (await wheelWords(page, tiles)).sort((a, b) => {
+      const y = (w: string) => tiles.find((t) => t.l === w[0])?.y ?? 0;
+      return y(b) - y(a);
+    });
+    expect(lowFirst.length).toBeGreaterThan(0);
+
+    await page.evaluate(() => {
+      const range = document.createRange();
+      range.selectNodeContents(document.body);
+      window.getSelection()?.addRange(range);
+    });
+    for (const word of lowFirst.slice(0, 6)) {
+      await swipe(page, word, tiles);
+      await page.waitForTimeout(250);
+      expect(await page.evaluate(() => window.getSelection()?.toString() ?? '')).toBe('');
+      if ((await page.getByTestId('found-word').count()) > 0) break;
+      await page.waitForTimeout(900);
+    }
+    await expect.poll(() => page.getByTestId('found-word').count(), { timeout: 15000 }).toBeGreaterThan(0);
+    await expect(page.getByTestId('rank-bubble')).not.toHaveText('0');
+  });
+
+  test('mid-swipe the line only promises points for a real word', async ({ page }) => {
+    await startPractice(page);
+    const tiles = await wheelTiles(page);
+    const outer = tiles.filter((t) => !t.hub).slice(0, 3);
+    await page.mouse.move(outer[0].x, outer[0].y);
+    await page.mouse.down();
+    for (const p of outer.slice(1)) await page.mouse.move(p.x, p.y, { steps: 6 });
+    await expect(page.getByTestId('built-letter-tile')).toHaveCount(3);
+    await expect(page.getByTestId('word-points-preview')).toHaveCount(0);
+    await page.mouse.up();
   });
 
   test('ending the run lands on the rank hero with share', async ({ page }) => {

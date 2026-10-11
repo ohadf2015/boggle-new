@@ -88,15 +88,23 @@ const q = (id: string) => document.querySelectorAll(`[data-testid="${id}"]`);
 const builder = () => document.querySelector('[data-testid="word-builder"]') as HTMLElement;
 const bubble = () => document.querySelector('[data-testid="rank-bubble"]')?.textContent;
 
+const RING = ['B', 'C', 'D', 'E', 'F', 'G'];
+const spot = (l: string) => {
+  const i = RING.indexOf(l);
+  if (i < 0) return { clientX: 0, clientY: 0 };
+  const rad = (i * Math.PI) / 3;
+  return { clientX: Math.round(Math.sin(rad) * 100), clientY: Math.round(-Math.cos(rad) * 100) };
+};
+
 async function drag(path: string[]) {
   const orbit = document.querySelector('[data-testid="wheel-orbit"]') as HTMLElement;
   let at = path[0];
   document.elementFromPoint = vi.fn(() => letterEl(at)) as unknown as typeof document.elementFromPoint;
   await act(async () => {
-    fireEvent.pointerDown(orbit, { clientX: 1, clientY: 1 });
+    fireEvent.pointerDown(orbit, spot(path[0]));
     for (const l of path.slice(1)) {
       at = l;
-      fireEvent.pointerMove(orbit, { clientX: 2, clientY: 2 });
+      fireEvent.pointerMove(orbit, spot(l));
     }
     fireEvent.pointerUp(orbit);
   });

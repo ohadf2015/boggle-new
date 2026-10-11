@@ -156,6 +156,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
       }
       aria-label={isUsed ? `${letter}. ${t('wordWheel.tapToRemove')}` : letter}
       aria-pressed={isUsed}
+      draggable={false}
       data-wheel-letter={letter}
       data-wheel-index={index}
       data-wheel-used={isUsed ? 'true' : 'false'}

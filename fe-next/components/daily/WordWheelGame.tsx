@@ -26,7 +26,8 @@ import { useMPFTUEIdle } from '@/hooks/useMPFTUEIdle';
 import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
 import dynamic from 'next/dynamic';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
-import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import { liveVerdict } from '@/lib/wordWheel/liveVerdict';
+import { claimPointer } from '@/lib/wordWheel/claimPointer';
 import WordWheelRankLadder from './WordWheelRankLadder';
 import WordWheelWordLine from './WordWheelWordLine';
 import { useWordWheelSubmit, type LetterClear } from './useWordWheelSubmit';
@@ -63,7 +64,7 @@ interface WordWheelGameProps {
   /** Practice mode: suppress countdown timer + show manual "end practice" CTA. */
   practice?: boolean;
   /**
-   * Suppress ModeCoach FTUE and PracticeCoachTip without enabling practice
+   * Suppress the PracticeCoachTip without enabling practice
    * gameplay changes (timer off, etc.). Used by Quick Play arcade rounds.
    */
   hideModeCoach?: boolean;
@@ -551,6 +552,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const { handlePointerDown, handlePointerMove, handlePointerUp } = useWheelDragSpell({
     draggingRef,
     pointerPosRef,
+    hubIndex: -1,
     isIndexUsed: (i) => usedIndicesRef.current.has(i),
     addLetter: (i, letter, el) => handleLetterPress(letter, i, el),
     getBuiltLength: () => builtLettersRef.current.length,
@@ -765,7 +767,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         </div>
       )}
 
-      {!practice && !hideModeCoach && <ModeCoach mode="wheelRush" placement="bottom" />}
 
       {isDesktop ? (
         <div className="w-full flex flex-col gap-4 shrink-0">
@@ -822,6 +823,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         acceptedId={scoreFlyId}
         reducedMotion={prefersReducedMotion}
         hint={wordsFound.length === 0}
+        live={liveVerdict(builtLetters.map(bl => bl.letter).join(''), puzzle.centerLetter, wordsFound, onQuickVerdict)}
         className="shrink-0"
       />
       {/* ── The Wheel ── */}
@@ -862,7 +864,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           isDesktop ? 'w-[560px] h-[560px]' : 'w-[min(86vw,336px)] h-[min(86vw,336px)] sm:w-80 sm:h-80 md:w-96 md:h-96',
           'relative aspect-square max-w-[min(100cqb,max(176px,calc(100cqb-184px)))] max-h-[min(100cqb,max(176px,calc(100cqb-184px)))] short:max-w-[min(100cqb,max(132px,min(calc(100cqb-122px),46svh)))] short:max-h-[min(100cqb,max(132px,min(calc(100cqb-122px),46svh)))] shrink-0 flex items-center justify-center touch-none',
         )}
-        onPointerDown={handlePointerDown}
+        onPointerDown={(e) => { claimPointer(e); handlePointerDown(e); }}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
@@ -1027,7 +1029,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     return (
       <div
         ref={gameContainerRef}
-        className="relative flex h-full w-full bg-neo-navy"
+        className="relative flex h-full w-full bg-neo-navy select-none"
         translate="no"
       >
         <div
@@ -1061,7 +1063,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       ref={gameContainerRef}
       className={cn(
         // No bottom-stack padding: body.screen-fit-locked already reserves --bottom-stack-height.
-        'relative flex flex-col items-center gap-3 w-full flex-1 min-h-0 max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto px-4 pb-3 rounded-neo',
+        'relative flex flex-col items-center gap-3 w-full flex-1 min-h-0 max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto px-4 pb-3 rounded-neo select-none',
         equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`,
       )}
       translate="no"

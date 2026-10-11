@@ -8910,6 +8910,7 @@ const en = {
     "onFireBadge": "{count} on fire!",
     "closeRace": "Close race",
     "inputPlaceholder": "Type a word...",
+    "firstHint": "Tap or swipe — every word uses {letter}",
     "tapLetters": "Tap or drag letters to build a word",
     "tapToRemove": "Tap an added letter again to remove it",
     "doubleTapToSubmit": "Double-tap a letter to submit",

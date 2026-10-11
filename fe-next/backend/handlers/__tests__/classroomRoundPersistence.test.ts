@@ -189,6 +189,7 @@ describe('persistClassroomGameScores — round education events', () => {
 
   it('Given a returning student, When persisted, Then edu_student_returned fires once for that student', async () => {
     const DAY = 86_400_000;
+    const joinedAt = new Date(Date.now() - 2 * DAY - 60_000).toISOString();
     const supa = makeSupabase();
     const base = supa.from;
     supa.from = (table: string) => {
@@ -197,7 +198,7 @@ describe('persistClassroomGameScores — round education events', () => {
           select: () => ({
             eq: () => ({
               in: () => Promise.resolve({
-                data: [{ student_id: 'user-ana', joined_at: new Date(Date.now() - 2 * DAY).toISOString() }],
+                data: [{ student_id: 'user-ana', joined_at: joinedAt }],
                 error: null,
               }),
             }),

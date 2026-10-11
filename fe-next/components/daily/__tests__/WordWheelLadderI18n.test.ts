@@ -18,7 +18,7 @@ const required = {
 
 const sharedKeys = [
   'practice.endRun', 'common.quit', 'common.you', 'wordWheel.timeLeft', 'wordWheel.pointsToPass',
-  'wordWheel.tapLetters', 'wordWheel.tapToRemove', 'wordWheel.submit',
+  'wordWheel.tapLetters', 'wordWheel.firstHint', 'wordWheel.tapToRemove', 'wordWheel.submit',
   'wordHunt.desktop.liveRanks', 'wordHunt.desktop.beFirst',
   'wordHunt.leaderboard.today', 'wordHunt.leaderboard.season', 'wordHunt.leaderboard.allTime',
   'wordHunt.leaderboard.connections', 'leaderboard.friends',
