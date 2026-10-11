@@ -61,6 +61,22 @@ function findWord(dict: Set<string>, wheel: Letter[]): string | null {
   return best;
 }
 
+// The verdict flash lasts under a second and lands after a server round-trip for
+// misses, so polling for it can fall between two polls; record every flash instead.
+async function watchFx(page: Page) {
+  await page.evaluate(() => {
+    const w = window as unknown as { __wheelFx: string[] };
+    w.__wheelFx = [];
+    new MutationObserver(() => {
+      document.querySelectorAll('[data-testid="wheel-disc-fx"]').forEach((el) => {
+        const kind = el.getAttribute('data-kind') || '';
+        if (w.__wheelFx[w.__wheelFx.length - 1] !== kind) w.__wheelFx.push(kind);
+      });
+    }).observe(document.body, { subtree: true, childList: true, attributes: true });
+  });
+  return () => page.evaluate(() => (window as unknown as { __wheelFx: string[] }).__wheelFx);
+}
+
 async function drag(page: Page, pts: Letter[], onEach?: (n: number) => Promise<void>) {
   await page.mouse.move(pts[0].x, pts[0].y);
   await page.mouse.down();
@@ -94,10 +110,11 @@ test.describe('Word Wheel play', () => {
     const word = findWord(dict, wheel);
     expect(word, `no 4+ letter word on ${wheel.map((p) => p.l).join('')}`).not.toBeNull();
 
+    const fxSeen = await watchFx(page);
     await drag(page, pathFor(word!, wheel)!, async (n) => {
       await expect(page.locator('[data-wheel-used="true"]')).toHaveCount(n);
     });
-    await expect(page.locator('[data-testid="wheel-disc-fx"][data-kind="good"]')).toBeVisible({ timeout: 8_000 });
+    await expect.poll(fxSeen, { timeout: 8_000 }).toContain('good');
     await expect(page.getByTestId('found-word')).toHaveCount(1);
     await expect(page.getByTestId('found-word').first()).toContainText(word!.toUpperCase());
     await expect(page.getByTestId('wheel-score')).not.toContainText(/^0/);
@@ -119,8 +136,9 @@ test.describe('Word Wheel play', () => {
     }
     expect(bad).not.toBeNull();
 
+    const fxSeen = await watchFx(page);
     await drag(page, bad!);
-    await expect(page.locator('[data-testid="wheel-disc-fx"][data-kind="bad"]')).toBeVisible({ timeout: 8_000 });
+    await expect.poll(fxSeen, { timeout: 8_000 }).toEqual(['bad']);
     await expect(page.getByTestId('found-word')).toHaveCount(0);
     await expect(page.locator('[data-wheel-used="true"]')).toHaveCount(0);
   });

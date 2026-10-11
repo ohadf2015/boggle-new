@@ -117,6 +117,22 @@ describe('WordWheelGame release reaction', () => {
     expect(screen.getByTestId('wheel-disc-fx').dataset.kind).toBe('good');
   });
 
+  it('given a word still out for a verdict, then its letters pulse in the checking colour, not the accepted lime, one after another', async () => {
+    const verdict = deferred();
+    mountGame(verdict.promise);
+    const orbit = drag(['A', 'C', 'B']);
+    await act(async () => { fireEvent.pointerUp(orbit); });
+
+    const rings = Array.from(screen.getByTestId('wheel-release').querySelectorAll<HTMLElement>('.ww-release-ring'));
+    expect(rings).toHaveLength(3);
+    rings.forEach((r) => {
+      expect(r.className).toContain('border-neo-cyan');
+      expect(r.className).not.toContain('border-neo-lime');
+    });
+    expect(rings.map((r) => r.style.animationDelay)).toEqual(['0ms', '70ms', '140ms']);
+    await act(async () => { verdict.resolve(false); });
+  });
+
   it('given an accepted word, then the letter ring spins once around the hub', async () => {
     mountGame(Promise.resolve(true));
     expect(screen.getByTestId('wheel-spin').dataset.spin).toBe('false');

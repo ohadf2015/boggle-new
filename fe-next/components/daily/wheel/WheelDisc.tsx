@@ -86,12 +86,12 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
         aria-hidden
         className={cn(
           'absolute inset-[1.5%] rounded-full border-[3px] pointer-events-none transition-[border-color,box-shadow] duration-200',
-          fx?.kind === 'bad' ? 'border-neo-red' : ready ? 'border-neo-lime' : 'border-neo-black',
+          fx?.kind === 'bad' ? 'border-neo-red' : release ? 'border-neo-cyan' : ready ? 'border-neo-lime' : 'border-neo-black',
         )}
         style={{
           background: 'radial-gradient(circle at 50% 34%, #2c3366 0%, #1d2346 46%, #121733 100%)',
           boxShadow: ready
-            ? 'inset 0 4px 0 rgba(255,255,255,0.08), inset 0 -10px 0 rgba(0,0,0,0.35), 7px 8px 0 #000, 0 0 0 6px rgba(191,255,0,0.22)'
+            ? `inset 0 4px 0 rgba(255,255,255,0.08), inset 0 -10px 0 rgba(0,0,0,0.35), 7px 8px 0 #000, 0 0 0 6px ${release ? 'rgba(0,255,255,0.3)' : 'rgba(191,255,0,0.22)'}`
             : 'inset 0 4px 0 rgba(255,255,255,0.08), inset 0 -10px 0 rgba(0,0,0,0.35), 7px 8px 0 #000',
         }}
         initial={{ scale: 1, x: 0 }}
@@ -155,14 +155,14 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
         <LetterBursts fx={fx} outerCount={outerLetters.length} />
         {release && (
           <div key={release.id} data-testid="wheel-release" data-word={release.letters.join('').toUpperCase()} aria-hidden className="absolute inset-0 pointer-events-none" style={{ zIndex: 4 }}>
-            {release.indices.map((idx) => {
+            {release.indices.map((idx, order) => {
               const p = letterPoint(idx, outerLetters.length);
               const size = idx === -1 ? DISC.center : DISC.outer;
               return (
                 <span
                   key={idx}
-                  className="ww-release-ring absolute rounded-full border-[1.3cqw] border-neo-lime"
-                  style={{ width: `${size}%`, height: `${size}%`, left: `${p.x - size / 2}%`, top: `${p.y - size / 2}%` }}
+                  className="ww-release-ring absolute rounded-full border-[1.3cqw] border-neo-cyan"
+                  style={{ width: `${size}%`, height: `${size}%`, left: `${p.x - size / 2}%`, top: `${p.y - size / 2}%`, animationDelay: `${order * 70}ms` }}
                 />
               );
             })}
