@@ -45,6 +45,16 @@ describe('CompactModeRow — per-mode identity', () => {
     expect(art).toHaveAttribute('aria-hidden', 'true');
   });
 
+  it('shows the art alone, without a second icon beside it', () => {
+    render(<CompactModeRow {...baseProps} artUrl="/daily/word-wheel-mascot.jpg" />);
+    expect(screen.queryByTestId('icon')).not.toBeInTheDocument();
+  });
+
+  it('falls back to the icon when a mode has no artwork', () => {
+    render(<CompactModeRow {...baseProps} />);
+    expect(screen.getByTestId('icon')).toBeInTheDocument();
+  });
+
   it('omits the art slot entirely when a mode has no artwork', () => {
     render(<CompactModeRow {...baseProps} />);
     expect(screen.queryByTestId('mode-row-art-yellow')).not.toBeInTheDocument();

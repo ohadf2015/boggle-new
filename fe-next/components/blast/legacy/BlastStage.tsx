@@ -17,7 +17,6 @@ import { shouldMountBlastFxCanvas } from './utils/shouldMountBlastFxCanvas';
 import { useBlastTileFirstUse } from './hooks/useBlastTileFirstUse';
 import { BlastTileFirstUseCallout } from './BlastTileFirstUseCallout';
 import { BlastHUD } from './BlastHUD';
-import BlastCurrencyBurst from './BlastCurrencyBurst';
 import { BlastMPLeaderboard } from './BlastMPLeaderboard';
 import { ClosestRivalsPanel } from '@/components/game/in-game/ClosestRivalsPanel';
 import { selectClosestRivals } from '@/lib/leaderboard/selectClosestRivals';
@@ -125,8 +124,6 @@ interface BlastStageProps {
   t: (key: string) => string | undefined;
   // Currency (SP only)
   coins?: number;
-  gems?: number;
-  currencyBurst?: { id: number; kind: 'coin' | 'gem'; amount: number; originX?: number; originY?: number } | null;
 }
 
 /**
@@ -182,8 +179,6 @@ export const BlastStage = memo(function BlastStage({
   t,
   activeModifier,
   coins = 0,
-  gems = 0,
-  currencyBurst = null,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
   // MP Blast has timer props; SP Blast doesn't. Timer-era games hide the wave chip.
@@ -325,7 +320,6 @@ export const BlastStage = memo(function BlastStage({
         // ring and the pill disagreed by a second on screen.
         isDesktopCanvas={isDesktopCanvas}
         coins={coins}
-        gems={gems}
         t={t}
       />
       <BlastObjectiveBanner objectives={objectiveProgress} t={t} />
@@ -421,6 +415,7 @@ export const BlastStage = memo(function BlastStage({
           {/* Inner board surface */}
           <div
             ref={boardContainerRef}
+            data-blast-board="true"
             className="relative w-full overflow-hidden rounded-[6px]"
           >
             {/* DOM board — renders underneath so effects overlay tile art */}
@@ -488,7 +483,6 @@ export const BlastStage = memo(function BlastStage({
         {/* Chain escalation text — scoped within board area */}
         <BlastChainText chainLevel={sequencerState?.chainLevel ?? 0} t={t} />
         <BlastWordPraise wordLength={lastWordLength} submitCount={wordSubmitCount} t={t} />
-        <BlastCurrencyBurst burst={currencyBurst} />
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} t={t} />
       </div>
 

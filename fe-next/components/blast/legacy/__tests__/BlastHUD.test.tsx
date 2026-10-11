@@ -239,3 +239,15 @@ describe('BlastHUD — lives (3-lives model)', () => {
     expect(spent.length).toBe(2);
   });
 });
+
+describe('BlastHUD — coin wallet', () => {
+  it('shows the coin wallet in single-player from the very first move, even at 0 coins', () => {
+    render(<BlastHUD {...baseProps} coins={0} />);
+    expect(screen.getByTestId('coin-counter')).toBeInTheDocument();
+  });
+
+  it('hides the wallet in multiplayer', () => {
+    render(<BlastHUD {...baseProps} coins={40} isMultiplayer />);
+    expect(screen.queryByTestId('coin-counter')).toBeNull();
+  });
+});

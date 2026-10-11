@@ -44,10 +44,14 @@ vi.mock('../../../utils/socketHelpers', () => ({
 vi.mock('../../../utils/timerManager', () => ({
   default: { setTimeout: mocks.timerSetTimeout, clearTimer: vi.fn() },
 }));
-vi.mock('../../../modules/boggleSolver', () => ({
-  getCachedTrie: mocks.getCachedTrie,
-  getTrieNode: mocks.getTrieNode,
-}));
+vi.mock('../../../modules/boggleSolver', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../modules/boggleSolver')>();
+  mocks.getTrieNode.mockImplementation(actual.getTrieNode);
+  return {
+    getCachedTrie: mocks.getCachedTrie,
+    getTrieNode: mocks.getTrieNode,
+  };
+});
 vi.mock('../../../dictionary', () => ({
   ensureLanguageLoaded: mocks.ensureLanguageLoaded,
 }));
@@ -100,18 +104,8 @@ function makeBot(overrides: Partial<Bot> = {}): Bot {
   };
 }
 
-function buildTrie(words: string[]): Record<string, unknown> {
-  // Lowercase-keyed trie matching boggleSolver contract
-  const root: Record<string, unknown> = {};
-  for (const w of words) {
-    let node: Record<string, unknown> = root;
-    for (const c of w.toLowerCase()) {
-      if (!node[c]) node[c] = {};
-      node = node[c] as Record<string, unknown>;
-    }
-    (node as { isWord?: boolean }).isWord = true;
-  }
-  return root;
+function buildTrie(words: string[]): string[] {
+  return [...new Set(words.map((w) => w.toLowerCase()))].sort();
 }
 
 describe('enumerateWheelWords', () => {
@@ -150,15 +144,6 @@ describe('startBotsForWheelRush', () => {
 
     const trie = buildTrie(['cat', 'cane', 'cent']);
     mocks.getCachedTrie.mockReturnValue(trie);
-    // Real getTrieNode walks the object — forward to a minimal impl
-    mocks.getTrieNode.mockImplementation((t: Record<string, unknown>, prefix: string) => {
-      let n: Record<string, unknown> | null = t;
-      for (const ch of prefix) {
-        if (!n || !n[ch]) return null;
-        n = n[ch] as Record<string, unknown>;
-      }
-      return n;
-    });
   });
 
   afterEach(() => {
@@ -320,14 +305,6 @@ describe('buildPlayableSlice — flatline guard (mpBotRounds wheel-rush flake)',
     // best human is cheap); CRSTN = vowel-less shape live validation rejects.
     const trie = buildTrie(['cat', 'cane', 'cent', 'caners', 'crstn']);
     mocks.getCachedTrie.mockReturnValue(trie);
-    mocks.getTrieNode.mockImplementation((t: Record<string, unknown>, prefix: string) => {
-      let n: Record<string, unknown> | null = t;
-      for (const ch of prefix) {
-        if (!n || !n[ch]) return null;
-        n = n[ch] as Record<string, unknown>;
-      }
-      return n;
-    });
   });
 
   it('front-loads affordable (<=5 letter) words and drops never-validating ones', () => {

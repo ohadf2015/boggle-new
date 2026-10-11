@@ -109,9 +109,8 @@ const submitCab = async () => {
   });
 };
 
-// Reads the live score from the top-bar score span.
 const readScore = (container: HTMLElement): number => {
-  const el = container.querySelector('span.text-neo-lime');
+  const el = container.querySelector('[data-testid="rank-bubble"]');
   return Number(el?.textContent ?? 'NaN');
 };
 

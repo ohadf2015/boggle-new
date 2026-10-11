@@ -27,7 +27,7 @@ import { recordNotInDictionary } from '@/utils/invalidWordTracker';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
-import { useFirstPlayTutorial } from '@/hooks/useFirstPlayTutorial';
+import { plantStarterWord } from '@/lib/tutorial/lesson/starterWords';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useTrainingAnalysis } from '@/hooks/useTrainingAnalysis';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
@@ -69,6 +69,8 @@ interface UseSinglePlayerCoreOptions {
    * MUST be popped, or every quit strands an extra same-URL history entry.
    */
   quitStaysOnPage?: boolean;
+  /** Freeze the clock while a full-screen lesson moment is on screen. */
+  clockHold?: boolean;
 }
 
 interface AvailableWords {
@@ -84,7 +86,7 @@ const MIN_TRACKED_WORD_LENGTH = 5;
  * Consolidates all state management, effects, and handlers
  */
 export function useSinglePlayerCore({
-  settings, targetHighScore, onGameEnd, onQuit, quitStaysOnPage = false,
+  settings, targetHighScore, onGameEnd, onQuit, quitStaysOnPage = false, clockHold = false,
 }: UseSinglePlayerCoreOptions) {
   const { t } = useLanguage();
   // Cozy / Calm Mode (single-player only): calmer bot pacing + no urgency cues.
@@ -195,10 +197,6 @@ export function useSinglePlayerCore({
     timerIntervalMs: isLowEnd ? 500 : 250,
   });
   const directionGuidance = useDirectionPatternGuidance();
-  const firstPlayTutorial = useFirstPlayTutorial({
-    grid, availableWords, language: settings.language,
-    isGameActive: !!grid && !held && !isGameOver,
-  });
 
   const trainingGridSize = useMemo(() => ({ rows: 4, cols: 4 }), []);
   const handleTrainingAnalysisComplete = useCallback(() => { }, []);
@@ -235,7 +233,7 @@ export function useSinglePlayerCore({
   const timer = useGameTimer({
     initialTime: settings.timerSeconds,
     isPaused: isPaused || settings.mode === 'practice',
-    isExternallyPaused: !grid || awaitingStart || clockHeldForCoach || isEarthquakePaused || isGiftModalOpen || isRewardAdActive,
+    isExternallyPaused: !grid || awaitingStart || clockHeldForCoach || clockHold || isEarthquakePaused || isGiftModalOpen || isRewardAdActive,
     autoStart: settings.mode !== 'practice',
     onTimeUp: () => { if (!gameOverCalledRef.current) setIsGameOver(true); },
   });
@@ -513,10 +511,11 @@ export function useSinglePlayerCore({
           if (response.ok) { const data = await response.json(); wordsToEmbed = data.words || []; }
         } catch (error) { console.warn('Failed to fetch themed words:', error); }
       }
-      setGrid(pickRichestBoardClient(
+      const dealt = pickRichestBoardClient(
         () => generateRandomTable(rows, cols, settings.language, wordsToEmbed),
         settings.language
-      ));
+      );
+      setGrid(settings.coach ? plantStarterWord(dealt, settings.language)?.grid ?? dealt : dealt);
     };
     initGrid(); initializeBotUsedWords(settings.bots); resetBots(); resetSpamDetection();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -571,9 +570,9 @@ export function useSinglePlayerCore({
   }, [isGameOver, grid, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo, settings.mode, trainingAnalysisFinishTraining, effects.gameStartTimeRef]);
 
   const handlePathSubmit = useCallback((cells: Array<{ row: number; col: number }>) => {
-    directionGuidance.trackWordPath(cells); firstPlayTutorial.trackUserPath(cells);
+    directionGuidance.trackWordPath(cells);
     trainingAnalysisTrackPath(cells); trainingTrackPath(cells);
-  }, [directionGuidance, firstPlayTutorial, trainingAnalysisTrackPath, trainingTrackPath]);
+  }, [directionGuidance, trainingAnalysisTrackPath, trainingTrackPath]);
 
   const handleWordChange = useCallback((word: string, count: number) => { setFormedWord(word); setLetterCount(count); }, []);
   const handleFinishPractice = useCallback(() => setIsGameOver(true), []);
@@ -641,7 +640,7 @@ export function useSinglePlayerCore({
     timer, combo, comboCoinReward, handleCoinAnimationComplete,
     formedWord, letterCount, currentFeedback,
     keyboardInput: keyboardInputState,
-    tutorialPath: firstPlayTutorial.tutorialPath, tutorialWord: firstPlayTutorial.tutorialWord,
+    availableWords,
     revealState, revealableWordCount, handleReveal,
     fireRoundActive, fireRoundRemaining, earthquakeState,
     showHintPrompt, setShowHintPrompt,

@@ -9417,6 +9417,41 @@ const es = {
     }
   },
   "wordWheel": {
+    "climb": {
+      "showBoard": "Tabla de hoy",
+      "hideBoard": "Ocultar tabla",
+      "moreBoards": "Más"
+    },
+    "rank": {
+      "title": "Rangos",
+      "open": "Ver todos los rangos",
+      "toNext": "{count} para {rank}",
+      "top": "Rango máximo. ¡Leyenda!",
+      "reached": "Tu rango de hoy",
+      "warmUp": "Calentando",
+      "spinning": "Girando",
+      "onARoll": "En racha",
+      "sharp": "Afilado",
+      "hotStreak": "Encendido",
+      "wordsmith": "Artesano",
+      "whirlwind": "Torbellino",
+      "wizard": "Mago",
+      "legend": "Leyenda"
+    },
+    "praise": {
+      "nice": "¡Bien!",
+      "great": "¡Genial!",
+      "superb": "¡Soberbio!",
+      "brilliant": "¡Brillante!",
+      "fullWheel": "¡Rueda completa!"
+    },
+    "strip": {
+      "empty": "Tus palabras aparecen aquí",
+      "label": "{count} halladas",
+      "all": "Todas las palabras",
+      "close": "Cerrar",
+      "longest": "La más larga"
+    },
     "youFoundEverything": "Encontraste todas las palabras que ellos encontraron. Bien hecho.",
     "title": "Rueda de palabras",
     "loading": "Cargando Rueda de Palabras...",
@@ -9425,7 +9460,6 @@ const es = {
     "description": "Cada palabra debe usar la letra central y tener al menos 3 letras",
     "centerLetterRule": "Debe usar la letra central",
     "minLetters": "Mín {min} letras",
-    "wordsFound": "{count} palabras encontradas",
     "scoreLabel": "Puntuación",
     "timeLeft": "Tiempo restante",
     "closeRace": "¡Carrera reñida!",
@@ -9455,10 +9489,6 @@ const es = {
     "removeLetter": "Quitar letra",
     "foundWords": "Palabras encontradas",
     "possibleWords": "Posibles",
-    "excellent": "¡Excelente!",
-    "great": "¡Genial!",
-    "good": "¡Buen esfuerzo!",
-    "tryAgain": "¡Sigue practicando!",
     "longest": "Más larga",
     "viewSubmittedWords": "Ver palabras enviadas",
     "viewWordsYouMissed": "Ver palabras que se te escaparon",
@@ -9466,7 +9496,6 @@ const es = {
     "youMissedTitle": "Palabras que se te escaparon",
     "noWordsSubmitted": "Aún no se han enviado palabras",
     "results": {
-      "title": "Resultados de la rueda de palabras",
       "wordsFound": "Palabras encontradas",
       "score": "Puntuación",
       "time": "Tiempo",
@@ -13389,11 +13418,17 @@ const es = {
       "reelLabel": "Repetición",
       "bestWord": "Mejor palabra"
     },
+    "wallet": {
+      "coins": "{count} monedas"
+    },
     "store": {
       "title": "Tienda de Mejoras",
       "close": "Listo",
       "buy": "Comprar",
       "max": "MÁXIMO",
+      "pay": "Pagar",
+      "short": "Te faltan",
+      "confirm": "Pagar {cost} monedas",
       "extraMoves": {
         "name": "Movimientos Extra",
         "desc": "Comienza con +1 movimiento por nivel"
@@ -13496,6 +13531,17 @@ const es = {
     "hub": {
       "playZone": "Jugar",
       "learnZone": "Aprender"
+    },
+    "assignments": {
+      "dueInHours": "Vence en {hours}h",
+      "dueInMinutes": "Vence en {minutes}m",
+      "overdueBy": "Atrasada {days}d",
+      "doIt": "Hacerlo"
+    },
+    "classView": {
+      "playAssignment": "Jugar {title}",
+      "playAssignmentDueSoon": "Pronto · Jugar {title}",
+      "playAssignmentOverdue": "Atrasada · Jugar {title}"
     },
     "welcome": {
       "title": "¡Bienvenido a tu aula!",
@@ -13993,6 +14039,7 @@ const es = {
       "trialEndedTitle": "Prueba caducada: mejora para conservar tus clases",
       "trialEndedBody": "Conserva clases ilimitadas e informes imprimibles por 9 $/mes. No es otra prueba gratis.",
       "trialEndedCta": "Seguir con Pro: 9 $/mes",
+      "trialReactivateCta": "Reactivar",
       "trialLifecycleTitle": "Quedan {count} días de tu prueba de Teacher Pro",
       "trialLifecycleTitleToday": "Tu prueba de Teacher Pro termina hoy",
       "trialLifecycleTitleOne": "Queda 1 día de tu prueba de Teacher Pro",
@@ -14530,6 +14577,7 @@ const es = {
         "empty": "Aún no hay tareas en esta clase",
         "statusCompleted": "Completada",
         "statusMissing": "Falta",
+        "statusOverdue": "Atrasada",
         "exportCsv": "Exportar CSV",
         "exportCsvPro": "Exportar CSV con Teacher Pro {{price}}",
         "fileName": "{{name}} – progreso de tareas",
@@ -14739,7 +14787,15 @@ const es = {
       "starterColors": "Colores y formas",
       "starterColorsDesc": "Colores y formas básicas para principiantes",
       "starterFood": "Comida",
-      "starterFoodDesc": "Palabras de comida cotidiana para la primera tarea"
+      "starterFoodDesc": "Palabras de comida cotidiana para la primera tarea",
+      "wordCountGoal": "Meta de palabras",
+      "wordCountGoalHint": "El alumnado encuentra esta cantidad de palabras únicas para la fecha.",
+      "wordCountLabel": "¿Cuántas palabras?",
+      "wordListGoal": "Lista de palabras",
+      "wordListGoalHint": "Pega palabras, una por línea o separadas por comas.",
+      "wordListPlaceholder": "gato, perro, pez",
+      "wordGoalMissing": "Añade una meta o una lista y una fecha",
+      "findNWords": "Encuentra {{count}} palabras"
     },
     "completion": {
       "overallProgress": "Progreso general",
@@ -17027,6 +17083,30 @@ const es = {
     "cta": "A jugar",
     "ctaWait": "{{seconds}} s"
   },
+  "firstLesson": {
+    "skipLabel": "Saltar lección",
+    "skip": "Saltar",
+    "progressLabel": "Progreso de la lección",
+    "trace": "Traza esta palabra",
+    "findAny": "Ahora busca otra palabra",
+    "findLength": "A por {{count}}+ letras",
+    "inARow": "{{count}} seguidas",
+    "praise": {
+      "nice": "¡Bien!",
+      "great": "¡Genial!",
+      "awesome": "¡Brutal!",
+      "amazing": "¡Increíble!"
+    },
+    "oops": "Casi",
+    "tryWord": "Prueba {{word}}",
+    "found": "Encontraste {{word}}",
+    "complete": "¡Lección completada!",
+    "completeSub": "Ya lo tienes. El resto de la ronda es tuyo.",
+    "statWords": "Palabras",
+    "statPoints": "Puntos",
+    "statStreak": "Racha",
+    "keepPlaying": "Seguir jugando"
+  },
   "modeCoach": {
     "skip": "Saltar",
     "next": "Siguiente",
@@ -17881,14 +17961,6 @@ const es = {
     "lifeDrop": "Desliza palabras en el tablero para curarte. Cada palabra restaura vida.",
     "firstClue": "¡Esa palabra reveló una pista! Revisa las casillas de arriba.",
     "wrongGuess": "¡Error = -15 vida! Acumula pistas primero."
-  },
-  "encouragement": {
-    "gameStart": "¡Vamos! ¡Tú puedes! 🎯",
-    "firstWord": "¡Bien hecho! Sigue encontrando palabras.",
-    "longWord": "¡Qué palabra! Las palabras largas dan más puntos.",
-    "combo": "¡Combo! Estás en racha.",
-    "halfway": "¡A mitad de camino, sigue así!",
-    "almostDone": "¡Recta final! Encuentra más palabras."
   },
   "toast": {
     "found": "¡ENCONTRADA!",
