@@ -13457,11 +13457,17 @@ const ja = {
       "reelLabel": "ハイライト",
       "bestWord": "ベストワード"
     },
+    "wallet": {
+      "coins": "コイン{count}枚"
+    },
     "store": {
       "title": "アップグレードストア",
       "close": "完了",
       "buy": "購入",
       "max": "最大",
+      "pay": "支払う",
+      "short": "不足",
+      "confirm": "{cost}コインで購入",
       "extraMoves": {
         "name": "追加ムーブ",
         "desc": "レベルあたり+1ムーブで開始"

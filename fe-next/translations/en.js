@@ -11934,11 +11934,17 @@ const en = {
         "body": "Drag straight down (or up) to spell vertical words."
       }
     },
+    "wallet": {
+      "coins": "{count} coins"
+    },
     "store": {
       "title": "Upgrade Store",
       "close": "Done",
       "buy": "Buy",
       "max": "MAXED",
+      "pay": "Pay",
+      "short": "Need",
+      "confirm": "Pay {cost} coins",
       "extraMoves": {
         "name": "Extra Moves",
         "desc": "Start with +1 move per level"

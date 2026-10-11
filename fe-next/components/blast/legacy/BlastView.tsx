@@ -14,7 +14,7 @@ import { BlastGame } from './BlastGame';
 import { BlastResultsSummary } from './BlastResultsSummary';
 import { BlastPregameBuffModal, type BlastPregameBuff } from './BlastPregameBuffModal';
 import { BlastRetryWaveModal } from './BlastRetryWaveModal';
-import { BlastMascotHud } from './BlastMascotHud';
+import { BlastMascotHud, BLAST_MASCOT_SLOT_CLASS } from './BlastMascotHud';
 import BlastUpgradePanel from './BlastUpgradePanel';
 import { HighlightPlayer } from './highlight/HighlightPlayer';
 import { useBlastMascot } from '@/lib/blast/useBlastMascot';
@@ -448,7 +448,7 @@ export function BlastView() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.6 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 24 }}
-                className="absolute top-3 right-3 z-50"
+                className={BLAST_MASCOT_SLOT_CLASS}
               >
                 <BlastMascotHud
                   state={mascot.state}
