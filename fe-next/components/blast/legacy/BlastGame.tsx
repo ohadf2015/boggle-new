@@ -11,6 +11,7 @@ import { createHighlightRecorder, type HighlightRecorder } from '@/lib/blast/hig
 import { useBlastSounds } from './hooks/useBlastSounds';
 import { useComboSystem } from '@/hooks/useComboSystem';
 import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordSubmission';
+import { withBlastCredit, type BlastCredit } from './utils/withBlastCredit';
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastEngine } from './hooks/useBlastEngine';
 import { useBlastObjectives } from './hooks/useBlastObjectives';
@@ -342,6 +343,8 @@ export function BlastGame({
     [config.gridSize, isMultiplayer],
   );
 
+  const [credit, setCredit] = useState<BlastCredit | null>(null);
+
   // Word-accepted pipeline (extracted to useBlastWordHandler)
   const { handleWordAccepted } = useBlastWordHandler({
     engine, sequencer, sounds, runCascade,
@@ -359,6 +362,7 @@ export function BlastGame({
       setComboFlash, setComboTypeName, setComboParticle,
       setExplosionShake, setNearMissCells,
       onCurrencyEarned: handleCurrencyEarned,
+      onCreditedScore: setCredit,
     },
   });
 
@@ -400,11 +404,7 @@ export function BlastGame({
     onWordAccepted: handleWordAccepted,
   });
 
-  // serverPointsOnly: the pill keeps its accept/reject state, minus the client "+N".
-  const pointlessFeedback = useMemo(
-    () => (serverPointsOnly && wordSubmission.currentFeedback ? { ...wordSubmission.currentFeedback, score: undefined } : null),
-    [serverPointsOnly, wordSubmission.currentFeedback],
-  );
+  const shownFeedback = withBlastCredit(wordSubmission.currentFeedback, credit, serverPointsOnly);
 
   // Handlers
 
@@ -766,7 +766,7 @@ export function BlastGame({
         livesRemaining={isMultiplayer ? undefined : livesRemaining}
         comboLevel={combo.comboLevel}
         formedWord={formedWord}
-        currentFeedback={serverPointsOnly ? pointlessFeedback : wordSubmission.currentFeedback}
+        currentFeedback={shownFeedback}
         sequencerState={sequencer.state}
         interactive={!engine.isCascading && !sequencer.state.isAnimating && pendingDiscovery == null && !engine.gameState.isDeadEnd && !engine.gameState.isComplete}
         onWordSubmit={wordSubmission.handleWordSubmit}

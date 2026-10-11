@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, useCallback, useMemo, memo } from 'react';
 import GridComponent from '@/components/GridComponent';
 import { BlastTile } from './BlastTile';
 import type { SelectedCell } from '@/components/grid';
+import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastTileType } from './types';
 import type { SequencerState, TileAnimState } from './hooks/useBlastSequencer';
@@ -76,6 +77,8 @@ export interface BlastBoardProps {
    * aid.
    */
   isMultiplayer?: boolean;
+  /** Verdict on the last submitted word; the shared board lifts and rewards it. */
+  submitFeedback?: WordFeedback | null;
 }
 
 /**
@@ -99,6 +102,7 @@ export const BlastBoard = memo(function BlastBoard({
   cascadeHighlightCells = [],
   diamondRevealTurns = 0,
   isMultiplayer = false,
+  submitFeedback,
 }: BlastBoardProps) {
   const { t } = useLanguage();
   const equippedBoardTheme = useEquippedCosmetic('boardTheme');
@@ -255,6 +259,7 @@ export const BlastBoard = memo(function BlastBoard({
         largeText
         language={language}
         ghostCells
+        submitFeedback={submitFeedback}
       />
 
       {/* Layer 2: Blast tile type overlay — indicators, special backgrounds, selection glow */}

@@ -5,7 +5,7 @@ import type { Language, LetterGrid } from '@/types';
 import { cn } from '@/lib/utils';
 import { useBoardSelection, type SubmitMethod } from './useBoardSelection';
 import { useBoardKeyboard } from './useBoardKeyboard';
-import { clearFx, feedbackFx, type FeedbackKind } from './boardFx';
+import { clearFx, disposeFx, feedbackFx, type FeedbackKind } from './boardFx';
 import { keyOf, type CellRef } from './selectionPath';
 import styles from './LetterBoard.module.css';
 import fx from './BoardEffects.module.css';
@@ -141,6 +141,13 @@ export default function LetterBoard({
     if (!interactive && api.current?.getPath().length) api.current.setPath([]);
   }, [interactive, api]);
 
+  useEffect(() => {
+    const el = containerRef.current;
+    return () => {
+      if (el) disposeFx(el);
+    };
+  }, []);
+
   const lastFeedbackId = useRef<string | null>(null);
   useEffect(() => {
     const el = containerRef.current;
@@ -169,6 +176,7 @@ export default function LetterBoard({
       data-mode="idle"
       data-len="0"
       data-heat="0"
+      data-word-dir={language === 'he' ? 'rtl' : 'ltr'}
       className={cn(styles.board, className)}
     >
       {showPreview && !ghost && (

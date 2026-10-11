@@ -355,19 +355,8 @@ export const BlastStage = memo(function BlastStage({
         !isDesktopCanvas && 'lg:flex-row lg:items-stretch lg:justify-center lg:gap-4 lg:px-4 xl:px-8 lg:max-w-[1400px] lg:mx-auto lg:w-full',
       )}>
 
-      {/* Left panel — word area on desktop (suppressed in shell; the stacked mobile
-          word area below takes over so the board isn't squeezed by a side column). */}
-      <div className={cn('hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-center shrink-0', isDesktopCanvas && '!hidden')}>
-        <div
-          className={cn(
-            'flex items-center justify-center gap-2 px-3 py-2 w-full transition-opacity',
-            formedWord ? 'opacity-100' : 'opacity-30',
-          )}
-        >
-          <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
-          <BlastWordRewardPreview wordLength={formedWord.length} />
-        </div>
-      </div>
+      {/* Left spacer — balances the right rail so the board stays centred. */}
+      <div aria-hidden="true" className={cn('hidden lg:block lg:w-56 xl:w-64 shrink-0', isDesktopCanvas && '!hidden')} />
 
       {/* 3. Board — center column, expands on desktop */}
       <div
@@ -388,6 +377,17 @@ export const BlastStage = memo(function BlastStage({
           transition: 'transform 200ms ease-out',
         }}
       >
+        {/* Desktop word bar, anchored right above the board. */}
+        <div
+          className={cn(
+            'hidden lg:flex items-center justify-center gap-2 pb-3 min-h-[56px] transition-opacity',
+            formedWord ? 'opacity-100' : 'opacity-30',
+            isDesktopCanvas && '!hidden',
+          )}
+        >
+          <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} />
+          <BlastWordRewardPreview wordLength={formedWord.length} />
+        </div>
         {/* Board frame — neo-brutalist with hard shadow + reactive glow */}
         <div
           className={cn(
@@ -439,6 +439,7 @@ export const BlastStage = memo(function BlastStage({
                 cascadeHighlightCells={cascadeHighlightCells}
                 diamondRevealTurns={gameState.diamondRevealTurns}
                 isMultiplayer={isMultiplayer}
+                submitFeedback={currentFeedback}
               />
             </div>
             {/* PixiJS effects layer — overlays DOM board so particles/shockwaves/shatters are visible above tile art. pointer-events-none so taps still reach BlastBoard. */}

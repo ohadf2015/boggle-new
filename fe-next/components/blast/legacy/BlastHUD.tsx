@@ -353,7 +353,7 @@ export function BlastHUD({
           className="flex flex-col justify-center basis-1/3 min-w-0"
           aria-label={`${t('blast.score')}: ${animatedScore}`}
         >
-          <div className="flex items-center gap-1.5 min-w-0">
+          <div data-board-score-target="" className="flex items-center gap-1.5 min-w-0">
             <span className="text-amber-400 text-sm shrink-0">★</span>
             <span
               className={cn(

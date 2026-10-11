@@ -94,7 +94,7 @@ test.describe('shared letter board', () => {
     await expect(page.locator(`${TILE}[data-fx="ok"]`)).toHaveCount(0);
   });
 
-  test('Blast keeps its own tiles and still draws the trail over them', async ({ page }) => {
+  test('Blast keeps its own tiles, draws the trail over them and lifts the released word', async ({ page }) => {
     test.setTimeout(90_000);
     await page.goto('/en/blast', { waitUntil: 'domcontentloaded' });
     await page.getByTestId('play-button').click({ timeout: 30_000 });
@@ -112,7 +112,10 @@ test.describe('shared letter board', () => {
     await dragThrough(page, row);
     await expect(board).toHaveAttribute('data-mode', 'drag');
     await expect(page.locator('[data-board][data-ghost] [data-trail="core"]')).toHaveAttribute('points', /\d/);
+    const word = row.map((c) => c.letter).join('').toUpperCase();
     await page.mouse.up();
+    await expect(page.locator('[data-board-overlay] [data-lift]')).toHaveText(new RegExp(`^${word}$`, 'i'), { timeout: 2_000 });
+    await expect(board).toHaveAttribute('data-verdict', /ok|bad|dupe/, { timeout: 8_000 });
   });
 
   test('pass-and-play party turns use the same board', async ({ page }) => {

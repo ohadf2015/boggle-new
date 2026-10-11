@@ -1,20 +1,8 @@
 import { keyOf, type BoardGeometry, type CellRef } from './selectionPath';
+import { animate, burst, flyFrames, later, norm, peekFx, reduced, resetFx, spawn, stateOf, type FxState } from './fxCore';
+import { disposeOverlay, liftRelease, liftVerdict } from './boardLift';
 
 export type FeedbackKind = 'ok' | 'bad' | 'dupe';
-
-interface FxState {
-  keys: string[];
-  word: string;
-  at: number;
-  timers: number[];
-  nodes: Element[];
-  anims: Animation[];
-  flights: Array<{ el: HTMLElement; anim: Animation | null }>;
-}
-
-const states = new WeakMap<HTMLElement, FxState>();
-
-const SHARD_COLORS = ['#bfff00', '#00ffff', '#ffe135', '#ff6bb8', '#ffffff'];
 
 export const FLY_MS = 420;
 export const FLY_STAGGER_MS = 30;
@@ -22,49 +10,6 @@ const VERDICT_WINDOW_MS = 4000;
 const PREVIEW_HOLD_MS = 700;
 const LEAVE_MS = 240;
 const TILE_FX_MS = 900;
-
-const FINALS: Record<string, string> = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
-const norm = (w: string) => [...w.toLowerCase()].map((ch) => FINALS[ch] ?? ch).join('');
-
-function reduced(): boolean {
-  try {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  } catch {
-    return false;
-  }
-}
-
-const empty = (): FxState => ({ keys: [], word: '', at: 0, timers: [], nodes: [], anims: [], flights: [] });
-
-function stateOf(container: HTMLElement): FxState {
-  let s = states.get(container);
-  if (!s) {
-    s = empty();
-    states.set(container, s);
-  }
-  return s;
-}
-
-function later(container: HTMLElement, ms: number, fn: () => void) {
-  stateOf(container).timers.push(window.setTimeout(fn, ms));
-}
-
-function animate(container: HTMLElement, el: Element, frames: Keyframe[], opts: KeyframeAnimationOptions): Animation | null {
-  if (typeof (el as HTMLElement).animate !== 'function') return null;
-  const a = (el as HTMLElement).animate(frames, opts);
-  stateOf(container).anims.push(a);
-  return a;
-}
-
-function spawn(container: HTMLElement, parent: Element, attr: string, text = ''): HTMLElement {
-  const el = parent.ownerDocument.createElement('div');
-  el.setAttribute(attr, '');
-  el.setAttribute('aria-hidden', 'true');
-  if (text) el.textContent = text;
-  parent.appendChild(el);
-  stateOf(container).nodes.push(el);
-  return el;
-}
 
 function tilesFor(container: HTMLElement, keys: string[]): HTMLElement[][] {
   return keys.map((k) => [...container.querySelectorAll<HTMLElement>(`[data-tile][data-key="${k}"], [data-gk="${k}"]`)]);
@@ -98,7 +43,7 @@ function hidePreview(container: HTMLElement) {
 
 /** Cancels every running board effect, so a new word always starts on a clean board. */
 export function clearFx(container: HTMLElement): void {
-  const s = states.get(container);
+  const s = peekFx(container);
   if (!s) return;
   s.timers.forEach((t) => window.clearTimeout(t));
   s.anims.forEach((a) => {
@@ -107,7 +52,13 @@ export function clearFx(container: HTMLElement): void {
   s.nodes.forEach((n) => n.remove());
   unmarkTiles(container, s.keys);
   container.removeAttribute('data-verdict');
-  states.set(container, empty());
+  resetFx(container);
+}
+
+/** Board unmount: stop everything and take the page-level lift layer down. */
+export function disposeFx(container: HTMLElement): void {
+  clearFx(container);
+  disposeOverlay(container);
 }
 
 function gridOrigin(grid: HTMLElement) {
@@ -118,10 +69,11 @@ function gridOrigin(grid: HTMLElement) {
 function flyTargets(container: HTMLElement): { letters: DOMRect[]; box: DOMRect | null; rtl: boolean } {
   const own = [...container.querySelectorAll<HTMLElement>('[data-board-preview] [data-pl]')].map((n) => n.getBoundingClientRect());
   if (own.length) return { letters: own, box: null, rtl: false };
-  const ext = container.ownerDocument.querySelector<HTMLElement>('[data-board-fly-target]');
-  const box = ext?.getBoundingClientRect();
-  const rtl = ext?.closest('[dir]')?.getAttribute('dir') === 'rtl';
-  return { letters: [], box: box && box.width > 0 ? box : null, rtl };
+  const ext = [...container.ownerDocument.querySelectorAll<HTMLElement>('[data-board-fly-target]')]
+    .map((el) => ({ el, box: el.getBoundingClientRect() }))
+    .find((t) => t.box.width > 0);
+  const rtl = ext?.el.closest('[dir]')?.getAttribute('dir') === 'rtl';
+  return { letters: [], box: ext?.box ?? null, rtl };
 }
 
 function echoTrail(container: HTMLElement) {
@@ -157,7 +109,11 @@ export function releaseFx(container: HTMLElement, path: CellRef[], geo: BoardGeo
   later(container, PREVIEW_HOLD_MS + 600, () => {
     if (preview?.dataset.state === 'sent') hidePreview(container);
   });
-  if (ghost || !geo) return;
+  if (!geo) return;
+  if (ghost) {
+    liftRelease(container, s, path, geo);
+    return;
+  }
 
   markTiles(container, s.keys, 'sent');
   const sentKeys = s.keys;
@@ -202,12 +158,7 @@ export function releaseFx(container: HTMLElement, path: CellRef[], geo: BoardGeo
     const dy = ty - y;
     const lift = -Math.max(20, t.size * 0.45);
     const tilt = i % 2 ? 10 : -10;
-    const anim = animate(container, fly, [
-      { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1 },
-      { transform: `translate(calc(-50% + ${dx * 0.1}px), calc(-50% + ${lift}px)) scale(1.22) rotate(${tilt}deg)`, opacity: 1, offset: 0.2 },
-      { transform: `translate(calc(-50% + ${dx * 0.7}px), calc(-50% + ${dy * 0.7 + lift * 0.4}px)) scale(0.8) rotate(${tilt / 2}deg)`, opacity: 1, offset: 0.75 },
-      { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.45) rotate(0deg)`, opacity: 0 },
-    ], { duration: FLY_MS, delay: i * FLY_STAGGER_MS, easing: 'cubic-bezier(0.45, 0, 0.25, 1)', fill: 'both' });
+    const anim = animate(container, fly, flyFrames(dx, dy, lift, tilt), { duration: FLY_MS, delay: i * FLY_STAGGER_MS, easing: 'cubic-bezier(0.45, 0, 0.25, 1)', fill: 'both' });
     s.flights.push({ el: fly, anim });
   });
   later(container, FLY_MS + n * FLY_STAGGER_MS + 60, () => {
@@ -243,28 +194,7 @@ function celebrate(container: HTMLElement, s: FxState, score: number | undefined
   const y = tr.top + tr.height / 2 - origin.top;
   const size = tr.width || 60;
 
-  const ring = spawn(container, layer, 'data-ring');
-  ring.style.left = `${x}px`;
-  ring.style.top = `${y}px`;
-  ring.style.width = `${size}px`;
-  ring.style.height = `${size}px`;
-  animate(container, ring, [
-    { transform: 'translate(-50%, -50%) scale(0.6)', opacity: 1 },
-    { transform: 'translate(-50%, -50%) scale(2.6)', opacity: 0 },
-  ], { duration: 520, easing: 'cubic-bezier(0.1, 0.7, 0.3, 1)', fill: 'forwards' });
-
-  for (let i = 0; i < 10; i++) {
-    const shard = spawn(container, layer, 'data-shard');
-    shard.style.left = `${x}px`;
-    shard.style.top = `${y}px`;
-    shard.style.background = SHARD_COLORS[i % SHARD_COLORS.length];
-    const a = (i / 10) * Math.PI * 2 + 0.3;
-    const r = size * (0.9 + (i % 3) * 0.35);
-    animate(container, shard, [
-      { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1 },
-      { transform: `translate(calc(-50% + ${Math.cos(a) * r}px), calc(-50% + ${Math.sin(a) * r}px)) scale(0.3) rotate(${(i % 2 ? 1 : -1) * 200}deg)`, opacity: 0 },
-    ], { duration: 560 + (i % 3) * 90, easing: 'cubic-bezier(0.1, 0.7, 0.3, 1)', fill: 'forwards' });
-  }
+  burst(container, layer, x, y, size);
 
   if (score && score > 0 && container.querySelector('[data-board-preview]')) {
     const chip = spawn(container, layer, 'data-chip', `+${score}`);
@@ -293,7 +223,11 @@ export function feedbackFx(container: HTMLElement, kind: FeedbackKind, score?: n
   }
   if (!fresh) return;
   container.setAttribute('data-verdict', kind);
-  if (ghost) return;
+  if (ghost) {
+    liftVerdict(container, s, kind, score, motion);
+    if (motion) dropFlights(container, s, kind);
+    return;
+  }
   markTiles(container, s.keys, kind);
   const keys = s.keys;
   later(container, TILE_FX_MS, () => unmarkTiles(container, keys));
