@@ -53,6 +53,8 @@ const LABELS: Record<string, Record<EducationLinkLocale, string>> = {
   'irregular-verbs-games': { en: 'Irregular verb games', he: 'משחקי פעלים חריגים', es: 'Juegos de verbos irregulares', sv: 'Oregelbundna verb-lekar', ja: '不規則動詞ゲーム', ru: 'Игры на неправильные глаголы' },
   lists: { en: 'Free word lists by grade', he: 'רשימות מילים לפי שכבה', es: 'Listas de palabras por grado', sv: 'Ordlistor per årskurs', ja: '学年別の単語リスト', ru: 'Списки слов по классам' },
   'english-vocabulary-topics': { en: 'English vocabulary by topic', he: 'אוצר מילים באנגלית לפי נושאים', es: 'Vocabulario en inglés por temas', sv: 'Engelskt ordförråd efter tema', ja: 'テーマ別英単語', ru: 'Английский словарь по темам' },
+  'boggle-for-the-classroom': { en: 'Boggle for the Classroom', he: 'בוגל לכיתה', es: 'Boggle para el aula', sv: 'Boggle för klassrummet', ja: '教室のためのBoggle', ru: 'Боггл для класса' },
+  'boggle-for-kids': { en: 'Boggle for Kids', he: 'בוגל לילדים', es: 'Boggle para niños', sv: 'Boggle för barn', ja: '子ども向けBoggle', ru: 'Боггл для детей' },
 };
 
 /**
@@ -79,6 +81,8 @@ export const EDUCATION_PAGES: readonly EducationPageLink[] = [
   { slug: 'irregular-verbs-games', accent: 'cyan', label: LABELS['irregular-verbs-games'] },
   { slug: 'english-vocabulary-topics', accent: 'lime', label: LABELS['english-vocabulary-topics'] },
   { slug: 'lists', accent: 'cyan', label: LABELS.lists },
+  { slug: 'boggle-for-the-classroom', accent: 'cyan', label: LABELS['boggle-for-the-classroom'] },
+  { slug: 'boggle-for-kids', accent: 'pink', label: LABELS['boggle-for-kids'] },
 ] as const;
 
 function linkLocale(locale: string): EducationLinkLocale {

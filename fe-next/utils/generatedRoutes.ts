@@ -79,6 +79,8 @@ export const PUBLIC_ROUTES: string[] = [
   "/editorial-policy",
   "/education",
   "/education/access",
+  "/education/boggle-for-kids",
+  "/education/boggle-for-the-classroom",
   "/education/brain-breaks-word-games",
   "/education/chatgpt-reteach",
   "/education/class-gap",

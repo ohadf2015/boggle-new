@@ -21,6 +21,8 @@ import { getEndOfYearContent } from './end-of-year-classroom-activities/content'
 import { getIcebreakersContent } from './first-day-of-school-icebreakers/content';
 import { getEarlyFinishersContent } from './early-finishers-activities/content';
 import { getMiddleSchoolContent } from './middle-school-word-games/content';
+import { getBoggleClassroomContent } from './boggle-for-the-classroom/content';
+import { getBoggleForKidsContent } from './boggle-for-kids/content';
 import { educationPageLabel } from '@/lib/seo/educationPageLinks';
 
 // The hub renders from a static content object keyed by locale — no cookies(),
@@ -186,6 +188,8 @@ const MOMENT_ACCENT: Record<string, string> = {
   'first-day-of-school-icebreakers': 'text-neo-purple-light',
   'early-finishers-activities': 'text-neo-lime',
   'middle-school-word-games': 'text-neo-pink-light',
+  'boggle-for-the-classroom': 'text-neo-cyan',
+  'boggle-for-kids': 'text-neo-pink-light',
 };
 
 function TeacherMomentLinks({ locale }: { locale: string }) {
@@ -196,6 +200,8 @@ function TeacherMomentLinks({ locale }: { locale: string }) {
     { slug: 'first-day-of-school-icebreakers', c: getIcebreakersContent(locale) },
     { slug: 'early-finishers-activities', c: getEarlyFinishersContent(locale) },
     { slug: 'middle-school-word-games', c: getMiddleSchoolContent(locale) },
+    { slug: 'boggle-for-the-classroom', c: getBoggleClassroomContent(locale) },
+    { slug: 'boggle-for-kids', c: getBoggleForKidsContent(locale) },
   ];
 
   return (

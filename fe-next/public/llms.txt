@@ -99,6 +99,8 @@ carries a usable artifact (a timed plan, a word list, or a decision table):
 - First Day of School Icebreakers (first 15 minutes, low-exposure for shy students): https://www.lexiclash.live/en/education/first-day-of-school-icebreakers
 - Early Finishers Activities (self-directed, zero teacher attention): https://www.lexiclash.live/en/education/early-finishers-activities
 - Word Games for Middle School (ages 11-15, tier-2 academic vocabulary): https://www.lexiclash.live/en/education/middle-school-word-games
+- Boggle for the Classroom (whole-class Boggle: project the board, students join with a code, no student accounts): https://www.lexiclash.live/en/education/boggle-for-the-classroom
+- Boggle for Kids (ages 6+, grown-up-hosted word hunts, no kid accounts or emails): https://www.lexiclash.live/en/education/boggle-for-kids
 
 Every page above exists in all six locales at /{en|he|sv|ja|es|ru}/<path>, with copy
 written natively for that country's school system rather than machine-translated.
