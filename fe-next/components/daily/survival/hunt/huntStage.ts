@@ -19,7 +19,7 @@ export type HuntStageEvent =
   | { type: 'expire' };
 
 export const VERDICT_HOLD_MS = 700;
-export const PENDING_TIMEOUT_MS = 1600;
+export const PENDING_TIMEOUT_MS = 8000;
 
 export const initialHuntStage: HuntStageState = {
   phase: 'idle',

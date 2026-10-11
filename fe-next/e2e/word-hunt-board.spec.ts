@@ -1,5 +1,5 @@
 import zlib from 'node:zlib';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type APIRequestContext } from '@playwright/test';
 import { goto, clearDailyState, type Locale } from './helpers/test-utils';
 import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures';
 
@@ -25,9 +25,11 @@ async function dismissOverlays(page: Page) {
 
 const PLAY_LABEL: Partial<Record<Locale, RegExp>> = { en: /^play$/i, he: /שחקו/ };
 
+const COACH_SEEN = { lc_coach_wordHunt: '99' };
+
 async function startGame(page: Page, locale: Locale = 'en') {
   await goto(page, '/daily/word-hunt', locale);
-  await applyStorageFixture(page, ONBOARDED_USER);
+  await applyStorageFixture(page, { ...ONBOARDED_USER, ...COACH_SEEN });
   await clearDailyState(page);
   await page.reload();
   const play = page.getByRole('button', { name: PLAY_LABEL[locale] ?? /^play$/i }).first();
@@ -67,11 +69,36 @@ async function readBoard(page: Page): Promise<Cell[]> {
   );
 }
 
-async function loadWords(page: Page): Promise<string[]> {
-  const res = await page.request.get('/dicts/en.dict.gz');
-  expect(res.ok()).toBe(true);
-  const text = zlib.gunzipSync(await res.body()).toString('utf8');
-  return [...new Set(text.split('\n').map((w) => w.trim().toLowerCase()).filter((w) => w.length >= 3 && w.length <= 8))].sort();
+let dictionary: Promise<string[]> | null = null;
+
+function loadWords(request: APIRequestContext): Promise<string[]> {
+  dictionary ??= (async () => {
+    const res = await request.get('/dicts/en.dict.gz');
+    expect(res.ok()).toBe(true);
+    const text = zlib.gunzipSync(await res.body()).toString('utf8');
+    return [...new Set(text.split('\n').map((w) => w.trim().toLowerCase()).filter((w) => w.length >= 3 && w.length <= 8))].sort();
+  })();
+  return dictionary;
+}
+
+/** The stage and the board both carry the verdict only for its short hold, so read them in one poll. */
+async function expectVerdict(page: Page, pattern: RegExp) {
+  const handle = await page.waitForFunction(
+    () => {
+      const el = document.querySelector('[data-testid="hunt-stage"]');
+      const stage = el?.getAttribute('data-verdict');
+      const board = document.querySelector('[role=grid]')?.getAttribute('data-verdict');
+      if (!stage || !board) return null;
+      const points = document.querySelector('[data-testid="hunt-stage-points"]')?.textContent ?? null;
+      return { stage, board, text: el?.textContent ?? '', points };
+    },
+    undefined,
+    { timeout: 15_000, polling: 50 },
+  );
+  const seen = (await handle.jsonValue()) as { stage: string; board: string; text: string; points: string | null };
+  expect(seen.stage).toMatch(pattern);
+  expect(seen.board).toBe(seen.stage);
+  return seen;
 }
 
 function hasPrefix(sorted: string[], p: string) {
@@ -111,6 +138,8 @@ async function swipe(page: Page, path: Cell[]) {
   await page.mouse.up();
 }
 
+test.describe.configure({ timeout: 90_000 });
+
 test.describe('Word Hunt board', () => {
   test('renders the board as a grid of letter tiles with an idle prompt', async ({ page }) => {
     await startGame(page);
@@ -138,40 +167,75 @@ test.describe('Word Hunt board', () => {
     await dragThrough(page, [[1, 0], [1, 1], [1, 2]]);
     await page.mouse.up();
 
-    await expect(page.getByTestId('hunt-stage')).toHaveAttribute('data-verdict', /good|bad|dupe/, { timeout: 5_000 });
-    await expect(page.getByRole('grid')).toHaveAttribute('data-verdict', /good|bad|dupe/);
+    await expectVerdict(page, /^(good|bad|dupe)$/);
     await expect(page.getByTestId('hunt-trail')).toHaveCount(0, { timeout: 5_000 });
     await expect(page.getByTestId('hunt-stage')).toHaveAttribute('data-phase', 'idle');
   });
 
-  test('a dictionary word pays its reward once on the stage, joins the found list, and a repeat is already found', async ({ page }) => {
+  test('a dictionary word pays its reward once on the stage, joins the found list, and a repeat is already found', async ({ page, request }) => {
     await startGame(page);
-    const { word } = planPaths(await readBoard(page), await loadWords(page));
+    const { word } = planPaths(await readBoard(page), await loadWords(request));
     test.skip(!word, 'no 3-letter dictionary word on today\'s board');
     const spelled = word!.map((c) => c.letter).join('');
 
     await swipe(page, word!);
     const stage = page.getByTestId('hunt-stage');
-    await expect(stage).toHaveAttribute('data-verdict', 'good', { timeout: 5_000 });
-    await expect(page.getByTestId('hunt-stage-points')).toHaveText(/^\+\d+/);
+    const good = await expectVerdict(page, /^good$/);
+    expect(good.points).toMatch(/^\+\d+/);
     await expect(page.getByTestId('hunt-board-bubble')).toHaveCount(0);
     await expect(page.getByText(new RegExp(`^${spelled}$`, 'i')).filter({ visible: true }).first()).toBeVisible();
     await expect(stage).toHaveAttribute('data-phase', 'idle', { timeout: 5_000 });
 
     await swipe(page, word!);
-    await expect(stage).toHaveAttribute('data-verdict', 'dupe', { timeout: 5_000 });
+    await expectVerdict(page, /^dupe$/);
   });
 
-  test('a non-word is rejected with the reason and the life penalty', async ({ page }) => {
+  test('a non-word is rejected with the reason and the life penalty', async ({ page, request }) => {
     await startGame(page);
-    const { junk } = planPaths(await readBoard(page), await loadWords(page));
+    const { junk } = planPaths(await readBoard(page), await loadWords(request));
     test.skip(!junk, 'no dead-end path on the board');
 
     await swipe(page, junk!);
-    const stage = page.getByTestId('hunt-stage');
-    await expect(stage).toHaveAttribute('data-verdict', 'bad', { timeout: 5_000 });
-    await expect(page.getByRole('grid')).toHaveAttribute('data-verdict', 'bad');
-    await expect(stage).toContainText(/-\s?\d/);
+    const bad = await expectVerdict(page, /^bad$/);
+    expect(bad.text).toMatch(/-\s?\d/);
+  });
+
+  test('a nine-letter swipe is a soft rejection with the length limit, no penalty', async ({ page }) => {
+    await startGame(page);
+    const snake: Array<[number, number]> = [[5, 0], [5, 1], [5, 2], [5, 3], [5, 4], [5, 5], [4, 5], [4, 4], [4, 3]];
+    await dragThrough(page, snake);
+    await page.mouse.up();
+    const long = await expectVerdict(page, /^dupe$/);
+    expect(long.text).toMatch(/8/);
+  });
+
+  test('a five-letter drag shows the long-word life bonus while it is still being spelled', async ({ page }) => {
+    await startGame(page);
+    await dragThrough(page, [[4, 0], [4, 1], [4, 2], [4, 3], [4, 4]]);
+    await expect(page.getByTestId('hunt-stage-count')).toHaveText('5');
+    await expect(page.getByTestId('hunt-stage')).toContainText(/\+3/);
+    await page.mouse.up();
+  });
+
+  test('life drains while the clock runs', async ({ page }) => {
+    await startGame(page);
+    const bar = page.locator('[role=progressbar][aria-valuemax="100"]:not([aria-label])').first();
+    const before = Number(await bar.getAttribute('aria-valuenow'));
+    await expect.poll(async () => Number(await bar.getAttribute('aria-valuenow')), { timeout: 15_000 }).toBeLessThan(before);
+  });
+
+  test('the Word Hunt coach greets a first-time player and Skip puts the board in front', async ({ page }) => {
+    await goto(page, '/daily/word-hunt', 'en');
+    await applyStorageFixture(page, ONBOARDED_USER);
+    await clearDailyState(page);
+    await page.reload();
+    await page.getByRole('button', { name: /^play$/i }).first().click();
+    await expect(page.locator(CELLS).first()).toBeVisible({ timeout: 30_000 });
+    const skip = page.getByRole('button', { name: /^skip$/i }).first();
+    await expect(skip).toBeVisible({ timeout: 15_000 });
+    await skip.click();
+    await expect(skip).toBeHidden();
+    await expect(page.getByRole('grid')).toBeVisible();
   });
 
   test('typing a word on the keyboard spells it on the stage and Enter submits it', async ({ page }) => {
@@ -180,7 +244,7 @@ test.describe('Word Hunt board', () => {
     await page.keyboard.type(word.toLowerCase(), { delay: 60 });
     await expect(page.getByTestId('hunt-live-word')).toHaveText(word, { ignoreCase: true });
     await page.keyboard.press('Enter');
-    await expect(page.getByTestId('hunt-stage')).toHaveAttribute('data-verdict', /good|bad|dupe/, { timeout: 5_000 });
+    await expectVerdict(page, /^(good|bad|dupe)$/);
   });
 
   test('Quit asks for confirmation and Cancel keeps the run going', async ({ page }) => {

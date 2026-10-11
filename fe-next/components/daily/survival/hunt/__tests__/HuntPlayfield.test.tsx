@@ -68,4 +68,10 @@ describe('HuntPlayfield', () => {
     field(initialHuntStage, { typedWord: 'CATS' });
     expect(screen.getByTestId('hunt-live-word').textContent).toBe('CATS');
   });
+
+  it('typing a new word takes over a word still waiting on its verdict', () => {
+    field({ phase: 'pending', verdict: null, word: 'CAT', path, releaseSeq: 0 }, { typedWord: 'TA' });
+    expect(screen.getByTestId('hunt-live-word').textContent).toBe('TA');
+    expect(screen.getByTestId('hunt-stage').getAttribute('data-phase')).toBe('live');
+  });
 });

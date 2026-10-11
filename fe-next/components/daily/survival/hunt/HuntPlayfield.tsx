@@ -47,7 +47,9 @@ export function HuntPlayfield({
   size = 'phone',
   t,
 }: HuntPlayfieldProps) {
-  const typing = stage.phase === 'idle' && typedWord.length > 0;
+  const typing =
+    typedWord.length > 0 &&
+    (stage.phase === 'idle' || (stage.phase === 'pending' && typedWord.toUpperCase() !== stage.word.toUpperCase()));
   const phase = typing ? 'live' : stage.phase;
   const word = typing ? typedWord : stage.word;
   const reward = stage.verdict === 'good' ? rewardFor(stage.word, discoveredWords) : null;

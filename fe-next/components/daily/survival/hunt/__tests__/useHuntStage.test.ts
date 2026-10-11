@@ -32,6 +32,16 @@ describe('useHuntStage', () => {
     expect(result.current.stage.phase).toBe('idle');
   });
 
+  it('still lands a verdict that arrives 2.5s late on a slow network', () => {
+    vi.useFakeTimers();
+    const { result, rerender } = setup();
+    act(() => result.current.release('CAT', path));
+    act(() => vi.advanceTimersByTime(2500));
+    expect(result.current.stage.phase).toBe('pending');
+    rerender({ seq: 1, type: 'not-in-dictionary' });
+    expect(result.current.stage).toMatchObject({ phase: 'verdict', verdict: 'bad', word: 'CAT' });
+  });
+
   it('gives up on a verdict that never arrives', () => {
     vi.useFakeTimers();
     const { result } = setup();
