@@ -25,7 +25,7 @@ export function QuickResultsCtaBar({
       <span
         aria-hidden="true"
         data-testid="quick-results-cta-fade"
-        className="pointer-events-none absolute inset-x-0 bottom-full h-12 bg-gradient-to-t from-neo-navy to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-full h-12 bg-linear-to-t from-neo-navy to-transparent"
       />
       <div className="mx-auto flex w-full max-w-md items-stretch gap-2.5">
         <button
