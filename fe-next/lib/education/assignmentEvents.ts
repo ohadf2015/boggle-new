@@ -6,19 +6,14 @@
  * strings. Do not prefix with edu_ here.
  */
 
+/**
+ * Client-safe funnel events. Do not import `@/lib/posthog` (posthog-node)
+ * from this file — teacher dashboard client components import it, and
+ * webpack then fails on `node:` builtins. Server capture lives in
+ * `assignmentEvents.server.ts`.
+ */
 import posthog from '@/lib/analytics/lazyPosthog';
-import { getPostHogServer } from '@/lib/posthog';
 import logger from '@/utils/logger';
-
-function analyticsHost(): string {
-  const raw = process.env.NEXT_PUBLIC_APP_URL;
-  if (!raw) return 'www.lexiclash.live';
-  try {
-    return new URL(raw).hostname || 'www.lexiclash.live';
-  } catch {
-    return 'www.lexiclash.live';
-  }
-}
 
 export const ASSIGNMENT_CREATED = 'assignment_created';
 export const ASSIGNMENT_COMPLETED = 'assignment_completed';
@@ -78,29 +73,5 @@ export function trackAssignmentCompleted(args: AssignmentCompletedProps): void {
     if (process.env.NODE_ENV === 'development') {
       logger.debug('[assignmentEvents] completed capture failed', { err });
     }
-  }
-}
-
-/**
- * Practice PATCH / server path. posthog-node does not set $host; dashboards
- * filter on www.lexiclash.live, so we stamp it here.
- */
-export function captureAssignmentCompletedServer(args: AssignmentCompletedProps): void {
-  try {
-    const client = getPostHogServer();
-    if (!client) return;
-    client.capture({
-      distinctId: args.student_id,
-      event: ASSIGNMENT_COMPLETED,
-      properties: {
-        ...assignmentCompletedProperties(args),
-        $host: analyticsHost(),
-      },
-    });
-  } catch (err) {
-    logger.error(
-      'Failed to capture assignment_completed:',
-      err instanceof Error ? err.message : 'unknown',
-    );
   }
 }

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const captureMock = vi.fn();
@@ -21,8 +23,8 @@ import {
   assignmentCreatedProperties,
   assignmentCompletedProperties,
   trackAssignmentCreated,
-  captureAssignmentCompletedServer,
 } from '../assignmentEvents';
+import { captureAssignmentCompletedServer } from '../assignmentEvents.server';
 
 describe('assignment funnel events', () => {
   beforeEach(() => {
@@ -49,6 +51,12 @@ describe('assignment funnel events', () => {
       }),
     );
     expect(captureMock.mock.calls[0][0]).toBe('assignment_created');
+  });
+
+  it('client module does not import posthog-node (webpack client graph)', () => {
+    const src = readFileSync(path.join(process.cwd(), 'lib/education/assignmentEvents.ts'), 'utf8');
+    expect(src).not.toMatch(/from ['"]@\/lib\/posthog['"]/);
+    expect(src).not.toMatch(/from ['"]posthog-node['"]/);
   });
 
   it('server completion stamps $host so HQ progress queries can see it', () => {

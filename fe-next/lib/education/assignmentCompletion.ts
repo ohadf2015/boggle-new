@@ -14,7 +14,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import { readAssignmentMode, sessionCompletesAssignment } from './wordcraftAssignment';
 import { uniqueWordCount, wordListPracticed } from './wordGoalAssignment';
-import { captureAssignmentCompletedServer } from './assignmentEvents';
+import { captureAssignmentCompletedServer } from './assignmentEvents.server';
 
 export interface SatisfiedAssignmentLookup {
   lessonId: string;
