@@ -56,6 +56,10 @@ test.describe('/quick-play results', () => {
     expect(stats!.y + stats!.height).toBeLessThan(bar!.y);
     expect(details!.y).toBeGreaterThan(bar!.y - 48);
 
+    const fade = await page.getByTestId('quick-results-cta-fade').boundingBox();
+    expect(fade).toBeTruthy();
+    expect(fade!.y + fade!.height).toBeLessThanOrEqual(bar!.y + 1);
+
     await page.waitForTimeout(4_000);
     expect(await page.getByText('Save your streak').count()).toBe(0);
   });

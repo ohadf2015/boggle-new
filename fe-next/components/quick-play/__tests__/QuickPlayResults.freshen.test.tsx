@@ -156,6 +156,14 @@ describe('QuickPlayResults freshen', () => {
     expect(bar.querySelectorAll('button.bg-neo-lime')).toHaveLength(1);
   });
 
+  it('fades the details peeking under the pinned action instead of clipping them', () => {
+    renderResults();
+    const fade = screen.getByTestId('quick-results-cta-fade');
+    expect(screen.getByTestId('quick-results-cta-bar')).toContainElement(fade);
+    expect(fade).toHaveAttribute('aria-hidden', 'true');
+    expect(fade.className).toContain('pointer-events-none');
+  });
+
   it('caps the screen at the viewport so the pinned action stays on screen on desktop', () => {
     renderResults();
     expect(screen.getByTestId('quick-play-results').className).toContain('max-h-[100dvh]');

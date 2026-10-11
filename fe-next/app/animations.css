@@ -3270,9 +3270,15 @@ html.reduce-motion *::after {
   100% { transform: scale(0); opacity: 0; }
 }
 @keyframes qp-card-in {
-  0% { transform: translateY(14px) scale(0.86); opacity: 0; }
-  60% { transform: translateY(-3px) scale(1.04); opacity: 1; }
+  0% { transform: translateY(18px) scale(0.6); opacity: 0; }
+  15% { opacity: 1; }
+  60% { transform: translateY(-4px) scale(1.06); opacity: 1; }
   100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes qp-value-pop {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.22); }
+  70% { transform: scale(0.96); }
 }
 @keyframes qp-coin-x {
   from { transform: translateX(0); }

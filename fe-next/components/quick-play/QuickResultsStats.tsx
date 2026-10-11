@@ -11,7 +11,7 @@ export const STAT_TIMELINE = {
   perfect: { appear: 700, count: 850 },
   words: { appear: 1250, count: 1400 },
 } as const;
-const COUNT_MS = 650;
+export const STAT_COUNT_MS = 650;
 
 interface StatCardProps {
   testId: string;
@@ -27,7 +27,7 @@ interface StatCardProps {
 }
 
 function StatCard({ testId, label, value, suffix = '', icon, band, ink, timing, animate, valueTestId }: StatCardProps) {
-  const shown = useCountUp(value, { delay: timing.count, duration: COUNT_MS, enabled: animate });
+  const shown = useCountUp(value, { delay: timing.count, duration: STAT_COUNT_MS, enabled: animate });
   return (
     <div
       className={`flex min-w-0 flex-col overflow-hidden rounded-2xl border-[3px] border-black bg-neo-navy-elevated shadow-hard ${
@@ -43,7 +43,13 @@ function StatCard({ testId, label, value, suffix = '', icon, band, ink, timing, 
       </span>
       <span className="flex items-center justify-center gap-1.5 px-2 py-2.5 lg:py-3.5">
         <span className={ink}>{icon}</span>
-        <b className={`font-neo-display text-3xl leading-none tabular-nums lg:text-4xl ${ink}`} data-testid={valueTestId}>
+        <b
+          className={`inline-block font-neo-display text-3xl leading-none tabular-nums lg:text-4xl ${ink} ${
+            animate ? 'animate-[qp-value-pop_0.38s_cubic-bezier(0.34,1.56,0.64,1)_both]' : ''
+          }`}
+          style={animate ? { animationDelay: `${timing.count + STAT_COUNT_MS}ms` } : undefined}
+          data-testid={valueTestId}
+        >
           {shown}
           {suffix}
         </b>

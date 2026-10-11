@@ -22,6 +22,11 @@ export function QuickResultsCtaBar({
       className="relative z-20 mb-[var(--bottom-nav-height,0px)] shrink-0 bg-neo-navy px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5"
       data-testid="quick-results-cta-bar"
     >
+      <span
+        aria-hidden="true"
+        data-testid="quick-results-cta-fade"
+        className="pointer-events-none absolute inset-x-0 bottom-full h-12 bg-gradient-to-t from-neo-navy to-transparent"
+      />
       <div className="mx-auto flex w-full max-w-md items-stretch gap-2.5">
         <button
           type="button"
