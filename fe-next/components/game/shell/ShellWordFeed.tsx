@@ -3,6 +3,7 @@
 import { memo, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { ShellPanel, type ShellT } from './ShellPanel';
+import { ShellLengthLadder } from './ShellLengthLadder';
 import type { ShellAccent } from './GameShell';
 import styles from './gameShell.module.css';
 
@@ -25,6 +26,7 @@ interface ShellWordFeedProps {
 }
 
 const MAX_ROWS = 60;
+const GHOST_SLOTS = 9;
 
 /** Found words, newest on top: the fresh word slams into a hero slot and the rest shift down. */
 function ShellWordFeedImpl({ words, t, accent, title, empty }: ShellWordFeedProps) {
@@ -37,6 +39,7 @@ function ShellWordFeedImpl({ words, t, accent, title, empty }: ShellWordFeedProp
   );
   const count = words.length;
   const [fresh, ...older] = newestFirst;
+  const ghosts = Math.max(0, GHOST_SLOTS - count);
 
   return (
     <ShellPanel
@@ -94,7 +97,7 @@ function ShellWordFeedImpl({ words, t, accent, title, empty }: ShellWordFeedProp
               )}
             </div>
           </div>
-          <ul key={count} className={cn(styles.rowShift, 'flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden [scrollbar-width:thin]')} aria-live="polite">
+          <ul key={count} className={cn(styles.rowShift, 'flex min-h-0 flex-1 flex-col gap-1 overflow-x-hidden [scrollbar-width:thin]', ghosts ? 'overflow-y-hidden' : 'overflow-y-auto')} aria-live="polite">
             {older.map((w, i) => (
               <li
                 key={`${w.word}-${count - 1 - i}`}
@@ -113,6 +116,18 @@ function ShellWordFeedImpl({ words, t, accent, title, empty }: ShellWordFeedProp
                 )}
               </li>
             ))}
+            {Array.from({ length: ghosts }, (_, i) => (
+              <li
+                key={`ghost-${i}`}
+                aria-hidden="true"
+                data-testid="shell-word-ghost"
+                className="flex shrink-0 items-center justify-between rounded-md border-2 border-dashed border-neo-cream/15 px-3 py-1.5 tv:py-2.5"
+                style={{ opacity: Math.max(0.25, 1 - i * 0.1) }}
+              >
+                <span className="h-2 rounded-full bg-neo-cream/10" style={{ width: `${34 + ((i * 23) % 40)}%` }} />
+                <span className="font-neo-display text-sm font-black text-neo-cream/15">+?</span>
+              </li>
+            ))}
           </ul>
           {best && best.word.length >= 5 && (
             <p data-testid="shell-words-best" className="flex items-baseline justify-between gap-2 border-t-2 border-black/40 pt-2 text-[11px] font-bold uppercase tracking-wider text-neo-cream/60">
@@ -122,6 +137,7 @@ function ShellWordFeedImpl({ words, t, accent, title, empty }: ShellWordFeedProp
           )}
         </div>
       )}
+      <ShellLengthLadder words={words} t={t} />
     </ShellPanel>
   );
 }

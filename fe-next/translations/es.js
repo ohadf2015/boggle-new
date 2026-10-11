@@ -20333,6 +20333,7 @@ const es = {
     "streak": "Racha",
     "multiplier": "Multiplicador",
     "topWord": "Mejor palabra",
+    "byLength": "Por longitud",
     "target": "Objetivo",
     "you": "Tú",
     "keys": {

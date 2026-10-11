@@ -140,6 +140,11 @@
 .ptsRise {
   animation: ptsRise 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+.ladderFill {
+  transform-origin: center bottom;
+  transform: scaleY(var(--ladder, 0));
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
 .bar {
   transform-origin: left center;
   transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -188,7 +193,8 @@
   .keyPress {
     animation: none !important;
   }
-  .bar {
+  .bar,
+  .ladderFill {
     transition: none;
   }
 }

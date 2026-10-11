@@ -19372,6 +19372,7 @@ const en = {
     "streak": "Streak",
     "multiplier": "Multiplier",
     "topWord": "Top word",
+    "byLength": "By length",
     "target": "Target",
     "you": "You",
     "keys": {

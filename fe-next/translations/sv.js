@@ -20321,6 +20321,7 @@ const sv = {
     "streak": "Svit",
     "multiplier": "Multiplikator",
     "topWord": "Bästa ordet",
+    "byLength": "Efter längd",
     "target": "Mål",
     "you": "Du",
     "keys": {

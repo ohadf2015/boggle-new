@@ -20321,6 +20321,7 @@ const ja = {
     "streak": "連続",
     "multiplier": "倍率",
     "topWord": "最高の単語",
+    "byLength": "文字数別",
     "target": "目標",
     "you": "あなた",
     "keys": {

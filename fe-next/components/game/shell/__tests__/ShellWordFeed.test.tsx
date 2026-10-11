@@ -56,4 +56,47 @@ describe('ShellWordFeed', () => {
     const leaves = Array.from(container.querySelectorAll('span,div,button')).filter((e) => e.children.length === 0);
     expect(leaves.some((e) => /^[A-Za-z]$/.test((e.textContent ?? '').trim()))).toBe(false);
   });
+
+  it('given words of mixed lengths, then the length ladder counts them per bucket with 7+ lumped together', () => {
+    render(
+      <ShellWordFeed
+        words={[{ word: 'cat' }, { word: 'tact' }, { word: 'coat' }, { word: 'carrot' }, { word: 'aircraft' }, { word: 'tractors' }]}
+        t={t}
+      />,
+    );
+    const ladder = screen.getByTestId('shell-words-ladder');
+    const counts = within(ladder)
+      .getAllByTestId(/^shell-ladder-/)
+      .map((b) => [b.getAttribute('data-len'), b.getAttribute('data-count')]);
+    expect(counts).toEqual([
+      ['3', '1'],
+      ['4', '2'],
+      ['5', '0'],
+      ['6', '1'],
+      ['7', '2'],
+    ]);
+  });
+
+  it('given no words yet, then the ladder still stands with every bucket at zero', () => {
+    render(<ShellWordFeed words={[]} t={t} />);
+    const buckets = within(screen.getByTestId('shell-words-ladder')).getAllByTestId(/^shell-ladder-/);
+    expect(buckets.every((b) => b.getAttribute('data-count') === '0')).toBe(true);
+  });
+
+  it('marks the bucket of the freshest word so it can pop', () => {
+    render(<ShellWordFeed words={[{ word: 'carrot' }, { word: 'tea' }]} t={t} />);
+    expect(screen.getByTestId('shell-ladder-3').getAttribute('data-fresh')).toBe('true');
+    expect(screen.getByTestId('shell-ladder-6').getAttribute('data-fresh')).toBe('false');
+  });
+
+  it('given a short list, then ghost slots fill the column below the found words', () => {
+    render(<ShellWordFeed words={[{ word: 'cat' }, { word: 'tea' }]} t={t} />);
+    expect(screen.getAllByTestId('shell-word-ghost').length).toBeGreaterThan(0);
+  });
+
+  it('given a long list, then no ghost slots are drawn', () => {
+    const words = Array.from({ length: 12 }, (_, i) => ({ word: `word${'s'.repeat(i)}` }));
+    render(<ShellWordFeed words={words} t={t} />);
+    expect(screen.queryAllByTestId('shell-word-ghost')).toHaveLength(0);
+  });
 });

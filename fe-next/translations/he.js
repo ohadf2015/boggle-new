@@ -20251,6 +20251,7 @@ const he = {
     "streak": "רצף",
     "multiplier": "מכפיל",
     "topWord": "המילה הכי שווה",
+    "byLength": "לפי אורך",
     "target": "יעד",
     "you": "אתם",
     "keys": {

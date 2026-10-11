@@ -20017,6 +20017,7 @@ const ru = {
     "streak": "Серия",
     "multiplier": "Множитель",
     "topWord": "Лучшее слово",
+    "byLength": "По длине",
     "target": "Цель",
     "you": "Вы",
     "keys": {
