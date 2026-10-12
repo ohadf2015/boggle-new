@@ -16413,7 +16413,11 @@ const ja = {
           "readyHeadline": "じゅんびはいい？",
           "readySub": "タップひとつで参加できます。",
           "go": "スタート！",
-          "entering": "入室しています…"
+          "entering": "入室しています…",
+          "joinedHeadline": "次の課題",
+          "joinedSub": "クラスに入れました。待っている課題をプレイしよう。",
+          "openAcademy": "クラスを開く",
+          "findingAssignment": "課題を探しています…"
         },
         "heroLine": "先生にクラスコードを聞いてね",
         "preparing": "準備しています。少しお待ちください。",

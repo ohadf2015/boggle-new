@@ -9,6 +9,7 @@ import { JoinCodeField, JOIN_CODE_LENGTH, joinCodeOverflows, sanitizeJoinCode } 
 import { useJoinFlow } from './useJoinFlow';
 import { useFitStage } from './fitStage';
 import { pickFunName } from './funName';
+import { JoinSuccessPanel } from './JoinSuccessPanel';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
 import { PopPressButton } from '@/components/motion/PopPressButton';
 
@@ -83,6 +84,17 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
   useEffect(() => {
     if (flow.step === 'name' && flow.showNameField) nameRef.current?.focus();
   }, [flow.step, flow.showNameField]);
+
+  // Invite link + guest: one GO, not type-a-name-from-blank. Wait until the
+  // code lookup has spoken — a seeded name would look like "they started
+  // typing" and block the invalid-code bounce back to the code step.
+  useEffect(() => {
+    if (flow.step !== 'name' || !flow.showNameField || flow.name.trim()) return;
+    if (sanitizeJoinCode(initialCode).length !== JOIN_CODE_LENGTH) return;
+    if (flow.isChecking || !flow.target || flow.target.verdict === 'invalid') return;
+    flow.setName(pickFunName(t('eduStudent.join.funNames'), ''));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flow.step, flow.showNameField, initialCode, flow.isChecking, flow.target]);
 
   // Any refusal about the NAME — empty, or already taken by a classmate — puts
   // the cursor back in the field that fixes it. One place, so the two refusals
@@ -170,7 +182,12 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
           </ol>
         </header>
 
-        {flow.step === 'code' ? (
+        {flow.joined ? (
+          <JoinSuccessPanel
+            classroomId={flow.joined.classroomId}
+            alreadyMember={flow.joined.alreadyMember}
+          />
+        ) : flow.step === 'code' ? (
           <form
             onSubmit={(e) => {
               e.preventDefault();

@@ -17,6 +17,12 @@ import { joinSuccessHref } from '@/lib/navigation/eduExitTargets';
 
 export type JoinStep = 'code' | 'name';
 
+/** A roster join that stayed on this screen instead of leaving for the hub. */
+export interface JoinedClassroom {
+  classroomId: string;
+  alreadyMember: boolean;
+}
+
 /**
  * How long a held tap waits for the session before going anyway.
  *
@@ -73,6 +79,13 @@ export interface JoinFlowState {
   formErrorKey: string | null;
   nameError: boolean;
   suggestedName: string | null;
+  /**
+   * Set after a roster join (no live game). The screen stays here and shows
+   * the class's next assignment — leaving for `/student` was the drop-off.
+   * Null while the student is still on the form, and while a live-game join
+   * is walking them into the room.
+   */
+  joined: JoinedClassroom | null;
   canSubmit: boolean;
   setCode: (next: string) => void;
   setName: (next: string) => void;
@@ -129,6 +142,9 @@ export function useJoinFlow(
   const [queued, setQueued] = useState(false);
   /** The hold outlived its deadline: go without the session. */
   const [holdExpired, setHoldExpired] = useState(false);
+  const [joined, setJoined] = useState<JoinedClassroom | null>(null);
+  /** Synchronous: two taps in one frame must not send two joins. */
+  const inFlight = useRef(false);
 
   const lastLookedUp = useRef('');
   const lookupSeq = useRef(0);
@@ -262,7 +278,7 @@ export function useJoinFlow(
 
   const submit = useCallback(
     (overrideName?: string) => {
-      if (isSubmitting) return;
+      if (isSubmitting || inFlight.current || joined) return;
 
       const trimmedCode = code.trim().toUpperCase();
       // Passed in rather than read from state because setState is async —
@@ -276,7 +292,12 @@ export function useJoinFlow(
       if (trimmedCode.length !== JOIN_CODE_LENGTH) {
         setCodeErrorKey('education.student.join.flow.codeTooShort');
         setStep('code');
-        trackEduClassroomJoin({ result: 'invalid_code', attemptedCode: trimmedCode });
+        trackEduClassroomJoin({
+          result: 'invalid_code',
+          attemptedCode: trimmedCode,
+          source:
+            sanitizeJoinCode(initialCode).length === JOIN_CODE_LENGTH ? 'invite_link' : 'typed_code',
+        });
         return;
       }
       if (showNameField && !trimmedName) {
@@ -296,9 +317,12 @@ export function useJoinFlow(
 
       setFormErrorKey(null);
       setSuggestedName(null);
+      inFlight.current = true;
       setIsSubmitting(true);
 
       void (async () => {
+        const source =
+          sanitizeJoinCode(initialCode).length === JOIN_CODE_LENGTH ? 'invite_link' : 'typed_code';
         try {
           const result = await joinClassroom(
             trimmedCode,
@@ -315,6 +339,7 @@ export function useJoinFlow(
               // The ONLY signal that separates the two six-character systems —
               // they are shape-identical, so the resolution is the discriminator.
               matchedCodeType: result.gameCode ? 'game_code' : 'roster_code',
+              source,
             });
             toast.success(t('education.student.join.success'));
 
@@ -324,6 +349,22 @@ export function useJoinFlow(
             }
 
             // Call the success callback (e.g. to show confetti) before navigating
+            // A student who typed the LIVE GAME code came to PLAY, not to be
+            // enrolled. Walk them straight in; the enrolment already happened.
+            // A roster join (the teacher invite link) stays on this screen:
+            // the next open assignment is the thing they came to do, and
+            // bouncing them to the hub was where that step disappeared.
+            const targetGameCode =
+              result.gameCode ||
+              (target?.verdict === 'game' ? target.gameCode || trimmedCode : null);
+            const staying = !targetGameCode && !!result.classroomId;
+            if (staying && result.classroomId) {
+              setJoined({
+                classroomId: result.classroomId,
+                alreadyMember: !!result.alreadyMember,
+              });
+            }
+
             if (onSuccessBeforeNavigation) {
               try {
                 await Promise.resolve(onSuccessBeforeNavigation());
@@ -334,12 +375,9 @@ export function useJoinFlow(
               }
             }
 
-            // A student who typed the LIVE GAME code came to PLAY, not to be
-            // enrolled. Walk them straight in; the enrolment already happened.
-            const targetGameCode =
-              result.gameCode ||
-              (target?.verdict === 'game' ? target.gameCode || trimmedCode : null);
-            router.push(joinSuccessHref(language, targetGameCode));
+            if (!staying) {
+              router.push(joinSuccessHref(language, targetGameCode));
+            }
             return;
           }
 
@@ -356,6 +394,7 @@ export function useJoinFlow(
           trackEduClassroomJoin({
             result: joinOutcome,
             attemptedCode: trimmedCode,
+            source,
           });
 
           if (result.code === 'NAME_TAKEN') {
@@ -376,9 +415,14 @@ export function useJoinFlow(
             setFormErrorKey('common.error');
           }
         } catch {
-          trackEduClassroomJoin({ result: 'server_error', attemptedCode: trimmedCode });
+          trackEduClassroomJoin({
+            result: 'server_error',
+            attemptedCode: trimmedCode,
+            source,
+          });
           setFormErrorKey('common.error');
         } finally {
+          inFlight.current = false;
           setIsSubmitting(false);
         }
       })();
@@ -390,13 +434,30 @@ export function useJoinFlow(
       showNameField,
       isAuthResolving,
       isSubmitting,
+      joined,
       joinClassroom,
       language,
       router,
       t,
+      target,
       onSuccessBeforeNavigation,
+      initialCode,
     ]
   );
+
+  const autoJoinStarted = useRef(false);
+  // Invite link + signed-in student: join without a second GO tap.
+  useEffect(() => {
+    if (autoJoinStarted.current || joined || isSubmitting || inFlight.current) return;
+    if (isAuthResolving) return;
+    if (!user) return;
+    if (sanitizeJoinCode(initialCode).length !== JOIN_CODE_LENGTH) return;
+    if (code.length !== JOIN_CODE_LENGTH) return;
+    if (showNameField) return;
+    autoJoinStarted.current = true;
+    submit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthResolving, user, initialCode, code, showNameField, joined, isSubmitting]);
 
   // The nickname question can be WITHDRAWN mid-flow. `showNameField` derives
   // from auth, which resolves LATE (recurring pitfall class 1): a student we
@@ -449,6 +510,7 @@ export function useJoinFlow(
     formErrorKey,
     nameError,
     suggestedName,
+    joined,
     // Live unless a join is genuinely in flight. Disabling GO for a missing
     // nickname looked tidy and behaved as a silent no-op: the student taps a
     // grey button, nothing happens, and nothing on screen says why. `submit`

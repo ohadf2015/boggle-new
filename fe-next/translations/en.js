@@ -14901,7 +14901,11 @@ const en = {
           "readyHeadline": "READY?",
           "readySub": "One tap and you're in the room.",
           "go": "Let's go",
-          "entering": "Getting you in…"
+          "entering": "Getting you in…",
+          "joinedHeadline": "Your next assignment",
+          "joinedSub": "You're in the class. Play the homework that's waiting.",
+          "openAcademy": "Open my class",
+          "findingAssignment": "Finding your assignment…"
         },
         "heroLine": "Ask your teacher for the class code",
         "preparing": "Getting things ready. One moment.",

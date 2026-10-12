@@ -52,9 +52,10 @@ describe('useJoinFlow destinations', () => {
     expect(pushMock).toHaveBeenCalledWith(`/en/multiplayer?room=${CODE}&classroom=true`);
   });
 
-  it('a join that resolves to no game lands on the student hub', async () => {
-    await submitWith({ success: true, gameCode: null, classroomId: 'c1' });
-    expect(pushMock).toHaveBeenCalledWith('/en/student');
+  it('a join that resolves to no game stays on the join screen for the Play CTA', async () => {
+  const hook = await submitWith({ success: true, gameCode: null, classroomId: 'c1' });
+  expect(pushMock).not.toHaveBeenCalled();
+  expect(hook.result.current.joined).toEqual({ classroomId: 'c1', alreadyMember: false });
   });
 
   it('a full classroom stays on the join form with an inline error and never navigates', async () => {
