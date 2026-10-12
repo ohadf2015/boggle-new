@@ -14,7 +14,7 @@ import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 import { ComparisonTable } from './components/ComparisonTable';
 import { SerpGapSections } from './components/SerpGapSections';
 import { PageScrollFx } from './components/PageScrollFx';
-import { FAQS } from './data';
+import { FAQS, ES_DICT_FLOOR } from './data';
 
 
 interface PageProps {
@@ -102,7 +102,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
         mode="juego-de-palabras-multijugador"
         locale="es"
         name="LexiClash - Alternativa a Scrabble Online en Español Multijugador"
-        description="Alternativa al estilo Scrabble online en español multijugador gratis. Crea sala, comparte enlace, compite en tiempo real con amigos. 10,000+ palabras, sin registro, sin descargas."
+        description="Alternativa al estilo Scrabble online en español multijugador gratis. Crea sala, comparte enlace, compite en tiempo real con amigos. Diccionario medido, sin registro, sin descargas."
         playMode="MultiPlayer"
         numberOfPlayers={{ minValue: 2, maxValue: 50 }}
       />
@@ -200,7 +200,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
               <Link href={`/${locale}/words`} className="text-neo-cyan underline">
                 diccionario de palabras
               </Link>{' '}
-              incluye más de 10.000 palabras en español, ideal para expandir vocabulario y practicar ortografía. ¿Atascado en una ronda? El{' '}
+              incluye más de {ES_DICT_FLOOR} palabras en español, ideal para expandir vocabulario y practicar ortografía. ¿Atascado en una ronda? El{' '}
               <Link href={`/${locale}/anagram`} className="text-neo-pink underline">
                 resolvedor de anagramas
               </Link>{' '}

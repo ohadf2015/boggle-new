@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { m, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { HERO_TILES, STATS } from '../data';
+import { HERO_TILES, STATS, ES_DICT_FLOOR } from '../data';
 
 interface HeroAnimatedProps {
   locale: string;
@@ -71,7 +71,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
           </div>
 
           <p className="mb-8 max-w-2xl font-neo-body text-base leading-relaxed text-neo-white sm:text-lg">
-            Juega <strong className="text-neo-white">Scrabble online gratis en español</strong>: crea una sala, comparte el enlace y compite en tiempo real. Más de 10.000 palabras, sin descargas, sin registro, sin esperas.
+            Juega <strong className="text-neo-white">Scrabble online gratis en español</strong>: crea una sala, comparte el enlace y compite en tiempo real. Más de {ES_DICT_FLOOR} palabras, sin descargas, sin registro, sin esperas.
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">

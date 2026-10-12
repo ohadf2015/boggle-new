@@ -1,3 +1,8 @@
+import { dictionaryFloor } from '@/lib/seo/dictionaryStats';
+
+/** Measured Spanish validation-Set floor. Never type a dict size by hand. */
+export const ES_DICT_FLOOR = dictionaryFloor('es', 'es');
+
 export type Tile = { ch: string; color: string; rotate: string };
 
 export const HERO_TILES: Tile[] = [
@@ -12,7 +17,7 @@ export const HERO_TILES: Tile[] = [
 ];
 
 export const STATS = [
-  { num: '10K+', label: 'palabras ES', color: 'text-neo-lime' },
+  { num: `${ES_DICT_FLOOR}+`, label: 'palabras ES', color: 'text-neo-lime' },
   { num: '0€', label: 'precio total', color: 'text-neo-pink' },
   { num: '2-50', label: 'jugadores', color: 'text-neo-cyan' },
   { num: '6', label: 'idiomas', color: 'text-neo-purple-light' },
@@ -21,7 +26,7 @@ export const STATS = [
 export const FEATURES = [
   { icon: '⚡', text: 'Batallas en tiempo real con puntos al instante', accent: 'border-neo-pink shadow-hard-pink' },
   { icon: '🔗', text: 'Crea sala e invita por enlace — sin registro', accent: 'border-neo-cyan shadow-hard-cyan' },
-  { icon: '📚', text: 'Más de 10.000 palabras en español', accent: 'border-neo-lime shadow-hard-lime' },
+  { icon: '📚', text: `Más de ${ES_DICT_FLOOR} palabras en español`, accent: 'border-neo-lime shadow-hard-lime' },
   { icon: '🎮', text: 'Modos múltiples: Boggle, Cazador, Explosión', accent: 'border-neo-purple shadow-hard' },
   { icon: '📅', text: 'Desafíos diarios con clasificaciones', accent: 'border-neo-pink shadow-hard-pink' },
   { icon: '👹', text: 'Batallas de jefes con giros únicos', accent: 'border-neo-cyan shadow-hard-cyan' },
@@ -97,7 +102,7 @@ export const COMPARISON: {
     { label: '100 % gratis, sin pagar por ganar', cells: [true, 'Compras', 'Compras'] },
     { label: 'Sin registro ni descarga', cells: [true, false, false] },
     { label: 'Multijugador en tiempo real', cells: ['2-50', 'Por turnos', 'Por turnos'] },
-    { label: 'Diccionario español 10.000+', cells: [true, true, true] },
+    { label: `Diccionario español ${ES_DICT_FLOOR}+`, cells: [true, true, true] },
     { label: 'Modos de juego', cells: ['8 modos', '1', '1'] },
     { label: 'Juega en el navegador', cells: [true, 'Solo app', 'Solo app'] },
     { label: 'Sin anuncios entre rondas', cells: [true, false, false] },
@@ -119,7 +124,7 @@ export const FAQS = [
   },
   {
     q: '¿LexiClash es como Scrabble o Apalabrados pero online?',
-    a: 'Es la misma familia, pero sin la espera. LexiClash combina la profundidad estratégica de Scrabble, la velocidad de Boggle y el formato social de Apalabrados — con la diferencia de que todos juegan a la vez, en tiempo real, con más de 10,000 palabras en español.',
+    a: `Es la misma familia, pero sin la espera. LexiClash combina la profundidad estratégica de Scrabble, la velocidad de Boggle y el formato social de Apalabrados — con la diferencia de que todos juegan a la vez, en tiempo real, con más de ${ES_DICT_FLOOR} palabras en español.`,
   },
   {
     q: '¿Puedo jugar Scrabble online con amigos sin registrarme?',
@@ -127,7 +132,7 @@ export const FAQS = [
   },
   {
     q: '¿Cuántas palabras en español tiene el diccionario?',
-    a: 'Más de 10,000 palabras en español validadas, actualizadas continuamente. Reconoce variantes de España y Latinoamérica.',
+    a: `Más de ${ES_DICT_FLOOR} palabras en español validadas (suelo medido del Set de validación, no un recuento de líneas). Reconoce variantes de España y Latinoamérica.`,
   },
   {
     q: '¿Qué modos de juego multijugador hay?',
@@ -135,7 +140,7 @@ export const FAQS = [
   },
   {
     q: '¿Dónde puedo jugar Scrabble en línea gratis en español?',
-    a: 'En LexiClash. Es una alternativa a Scrabble en línea, gratis y en español, jugable directamente en el navegador sin descargas ni registro. Más de 10,000 palabras en español validadas, salas multijugador en tiempo real (2-50 jugadores) y desafíos diarios con clasificación global. Para jugar Scrabble gratis en línea con amigos, simplemente comparte el enlace de tu sala.',
+    a: `En LexiClash. Es una alternativa a Scrabble en línea, gratis y en español, jugable directamente en el navegador sin descargas ni registro. Más de ${ES_DICT_FLOOR} palabras en español validadas, salas multijugador en tiempo real (2-50 jugadores) y desafíos diarios con clasificación global. Para jugar Scrabble gratis en línea con amigos, simplemente comparte el enlace de tu sala.`,
   },
   {
     q: '¿Cuántos jugadores pueden jugar en la misma sala?',
@@ -147,15 +152,27 @@ export const FAQS = [
   },
   {
     q: '¿Cuál es la mejor alternativa a Scrabble online en español?',
-    a: 'LexiClash es la alternativa a Scrabble online en español más completa de 2026: gratis, sin descargas, multijugador en tiempo real, 8 modos de juego y diccionario español de 10,000+ palabras. A diferencia de las apps oficiales, no hay anuncios entre rondas, no hay bots disfrazados de jugadores reales y nunca se paga por ganar.',
+    a: `LexiClash es la alternativa a Scrabble online en español más completa de 2026: gratis, sin descargas, multijugador en tiempo real, 8 modos de juego y diccionario español de más de ${ES_DICT_FLOOR} palabras. A diferencia de las apps oficiales, no hay anuncios entre rondas, no hay bots disfrazados de jugadores reales y nunca se paga por ganar.`,
   },
   {
     q: '¿Cómo se validan las palabras en español?',
-    a: 'Cada palabra se comprueba contra el diccionario español de LexiClash (más de 10.000 entradas, con variantes de España y Latinoamérica). Acentos se normalizan; la ñ se conserva. No hay árbitro ni “desafío”: si la palabra está en el diccionario, cuenta al instante para todos los jugadores de la sala.',
+    a: `Cada palabra se comprueba contra el diccionario español de LexiClash (más de ${ES_DICT_FLOOR} entradas, con variantes de España y Latinoamérica). Acentos se normalizan; la ñ se conserva. No hay árbitro ni “desafío”: si la palabra está en el diccionario, cuenta al instante para todos los jugadores de la sala.`,
   },
   {
     q: '¿Qué juegos son parecidos a Scrabble online en español?',
     a: 'Apalabrados y Words With Friends son por turnos (esperas horas). El Scrabble oficial es app + registro. Wordle es un puzzle diario en solitario. LexiClash es la partida multijugador en tiempo real: misma cuadrícula, 2–50 jugadores, 2–3 minutos, en el navegador.',
+  },
+  {
+    q: '¿Cuál es el objetivo de una partida multijugador?',
+    a: 'Sumar más puntos que el resto de la sala en la misma ronda. Todos ven la misma cuadrícula a la vez: no hay turnos ni atril. Gana quien encadena más palabras válidas antes de que el reloj llegue a cero.',
+  },
+  {
+    q: '¿Hay niveles de dificultad?',
+    a: 'Contra amigos, no: el tablero es el mismo para todos. Si juegas solo, elige bots (fácil / medio / difícil). A diferencia de Minijuegos o Locura de Letras, el rival no es una IA de Scrabble 15×15 — son buscadores de palabras en la misma rejilla.',
+  },
+  {
+    q: '¿Cuándo termina la partida?',
+    a: 'Cuando se acaba el temporizador de la ronda (unos 180 segundos en Clásico). No hay bolsa de fichas que vaciar ni restar puntos del atril. El marcador se congela y puedes repetir o cambiar de modo.',
   },
 ];
 
@@ -210,4 +227,20 @@ export const SIMILAR_GAMES: { name: string; vs: string }[] = [
   { name: 'Apalabrados', vs: 'Asíncrono con amigos. LexiClash no te deja esperando el próximo movimiento.' },
   { name: 'Wordle / Wordle en español', vs: 'Un puzzle al día, solo. LexiClash tiene desafío diario y además salas de 2–50.' },
   { name: 'Boggle', vs: 'Misma idea de cuadrícula; LexiClash añade puntuación en vivo, 8 modos y 6 idiomas.' },
+];
+
+/** FISE-style Spanish Scrabble tile values vs LexiClash (length only). Public bag. */
+export const SPANISH_TILES: { tile: string; scrabble: string; lexiclash: string }[] = [
+  { tile: 'Ñ', scrabble: '8 pts · 1 ficha', lexiclash: 'Letra normal; no suma extra' },
+  { tile: 'CH', scrabble: '5 pts · 1 ficha', lexiclash: 'No es ficha; C y H van aparte' },
+  { tile: 'LL', scrabble: '8 pts · 1 ficha', lexiclash: 'No es ficha; L y L van aparte' },
+  { tile: 'RR', scrabble: '8 pts · 1 ficha', lexiclash: 'No es ficha; R y R van aparte' },
+  { tile: 'Z', scrabble: '10 pts · 1 ficha', lexiclash: 'Letra normal; paga la longitud' },
+  { tile: 'Q / J / X', scrabble: '5 / 8 / 8 pts', lexiclash: 'Igual que una A: cuenta la palabra' },
+];
+
+export const CONTROLS = [
+  { device: 'Móvil', how: 'Desliza el dedo por letras adyacentes (también en diagonal).' },
+  { device: 'Ordenador', how: 'Clic y arrastra, o escribe la palabra. Ratón o teclado.' },
+  { device: 'Tablet / TV', how: 'Táctil en tablet; en fiesta, el teléfono es el mando.' },
 ];
