@@ -57,9 +57,9 @@ describe('<PlayNowLauncher> — mode cards', () => {
     fireEvent.click(screen.getByTestId('play-now-change'));
     const group = screen.getByRole('radiogroup');
     // Five chips in one row squeezes each to ~150px and the label dies
-    // ("VOC…"). Never more than two per row, at any breakpoint.
+    // ("VOC…"). Two per row below 1536px; three only from 2xl, where tiles are wide enough.
     expect(group.className).toMatch(/(^|\s)grid-cols-2(\s|$)/);
-    expect(group.className).not.toMatch(/grid-cols-[3-9]/);
+    expect(group.className).not.toMatch(/(^|\s)grid-cols-[3-9](\s|$)/);
     for (const id of ['vocab-quiz', 'classic', 'blast', 'word-hunt', 'wordcraft']) {
       const chip = screen.getByTestId(`hq-mode-${id}`);
       const label = chip.getAttribute('aria-label');

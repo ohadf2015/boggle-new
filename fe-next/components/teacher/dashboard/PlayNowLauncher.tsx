@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Rocket, X, ChevronUp } from 'lucide-react';
+import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useLessons } from '@/hooks/useVocabularyLesson';
@@ -245,10 +246,10 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
       aria-labelledby="play-now-heading"
       className="@container relative flex min-h-0 flex-col overflow-hidden rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 shadow-hard"
     >
-      <div className="flex min-h-0 flex-col gap-3 p-3 sm:gap-4 sm:p-5 [@media(orientation:landscape)_and_(max-height:500px)]:gap-1.5! [@media(orientation:landscape)_and_(max-height:500px)]:p-2!">
+      <div className="flex min-h-0 flex-col gap-3 p-3 sm:gap-4 sm:p-5 desktop-medium-short:gap-2! desktop-medium-short:p-3! [@media(orientation:landscape)_and_(max-height:500px)]:gap-1.5! [@media(orientation:landscape)_and_(max-height:500px)]:p-2!">
         <h2
           id="play-now-heading"
-          className="font-neo-display text-xs font-bold uppercase leading-none tracking-widest text-neo-white/60 [@media(orientation:landscape)_and_(max-height:500px)]:sr-only"
+          className="font-neo-display text-xs font-bold uppercase leading-none tracking-widest text-neo-white/60 desktop-medium-short:sr-only [@media(orientation:landscape)_and_(max-height:500px)]:sr-only"
         >
           {t('academy.hq.startTitle', 'Start a game')}
         </h2>
@@ -272,8 +273,8 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
             // min-w-0 + overflow-hidden: flex children default to min-width:auto,
             // so a long locale ("יוצאים לדרך") at text-3xl blew past a 320px
             // phone and forced the shell to scroll sideways (#1173).
-            'relative flex min-h-14 w-full min-w-0 shrink-0 items-center justify-center gap-3 overflow-hidden rounded-neo border-3 border-black px-3 py-1.5 sm:min-h-16 sm:px-6 sm:py-2',
-            'font-neo-display text-3xl font-black uppercase tracking-tight max-[360px]:text-xl sm:min-h-20 sm:text-4xl',
+            'relative flex min-h-14 w-full min-w-0 shrink-0 items-center justify-center gap-3 overflow-hidden rounded-neo border-3 border-black px-3 py-1.5 sm:min-h-16 sm:px-6 sm:py-2 desktop-medium-short:min-h-14!',
+            'font-neo-display text-3xl font-black uppercase tracking-tight max-[360px]:text-xl sm:min-h-20 sm:text-4xl 2xl:min-h-24 2xl:text-6xl',
             // `!`: globals.css pads every landscape-phone <button> 0.75rem, unlayered,
             // which beats any layered utility.
             '[@media(orientation:landscape)_and_(max-height:500px)]:min-h-10 [@media(orientation:landscape)_and_(max-height:500px)]:py-0.5! [@media(orientation:landscape)_and_(max-height:500px)]:text-2xl max-sm:[@media(max-height:700px)]:min-h-12 max-sm:[@media(max-height:700px)]:py-1',
@@ -286,18 +287,25 @@ export function PlayNowLauncher({ onLaunch }: PlayNowLauncherProps) {
               : 'cursor-not-allowed bg-neo-cream text-neo-gray shadow-hard-sm'
           )}
         >
-          <Rocket className="size-8 shrink-0 sm:size-10 [@media(orientation:landscape)_and_(max-height:500px)]:size-6 max-sm:[@media(max-height:700px)]:size-6" strokeWidth={3} aria-hidden="true" />
+          <m.span
+            data-testid="play-now-go-rocket"
+            className="flex shrink-0"
+            animate={reduced || !armed ? undefined : { y: [0, -4, 0], rotate: [0, -8, 0] }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <Rocket className="size-8 sm:size-10 [@media(orientation:landscape)_and_(max-height:500px)]:size-6 max-sm:[@media(max-height:700px)]:size-6" strokeWidth={3} aria-hidden="true" />
+          </m.span>
           <span className="min-w-0 truncate">{t('teacher.playNow.goLive')}</span>
         </button>
 
         {expanded ? (
-          <div id={panelId} data-testid="play-now-picker" className="flex flex-col gap-3 sm:gap-4">
+          <div id={panelId} data-testid="play-now-picker" className="flex flex-col gap-3 sm:gap-4 desktop-medium-short:gap-2!">
             <div
               role="radiogroup"
               aria-label={t('academy.hq.pickGame', 'Pick a game')}
               // Two per row at desktop: four-in-a-row squeezes a chip to ~150px
               // and the mode's NAME truncates — the verb must get the pixels.
-              className="grid shrink-0 grid-cols-2 gap-2 pt-1 sm:gap-3 sm:pt-1.5 [@media(orientation:landscape)_and_(max-height:500px)]:gap-1.5! [@media(orientation:landscape)_and_(max-height:500px)]:pt-0.5!"
+              className="grid shrink-0 grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-2 2xl:gap-3 pt-1 sm:gap-3 sm:pt-1.5 desktop-medium-short:gap-1.5! desktop-medium-short:pt-0! [@media(orientation:landscape)_and_(max-height:500px)]:gap-1.5! [@media(orientation:landscape)_and_(max-height:500px)]:pt-0.5!"
             >
               {HQ_MODES.map((mode) => (
                 <HqModeCard

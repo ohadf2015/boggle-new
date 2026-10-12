@@ -270,8 +270,8 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
         data-testid="teacher-dashboard-grid"
         className={cn(
           // ~1280 content cap: wide monitors keep desktop density without stretching tables.
-          'relative mx-auto flex min-h-full min-w-0 w-full max-w-[1280px] flex-col gap-3 px-3 py-2 sm:gap-4 sm:px-5 sm:py-3 lg:px-8 lg:py-4 lg:[@media(max-height:800px)]:py-2',
-          deck && !split && 'lg:max-w-2xl',
+          'relative mx-auto flex min-h-full min-w-0 w-full max-w-[1280px] 2xl:max-w-[1600px] flex-col gap-3 px-3 py-2 sm:gap-4 sm:px-5 sm:py-3 lg:px-8 lg:py-4 lg:[@media(max-height:800px)]:py-1 lg:[@media(max-height:800px)]:gap-2',
+          deck && !split && 'lg:max-w-2xl 2xl:max-w-[1024px]',
           split && [
             // 640–1023: two-column (launcher | pulse/detail); <640 stays stacked.
             'sm:grid sm:min-h-0 sm:grid-cols-2 sm:content-start sm:items-start sm:gap-x-6 sm:gap-y-4 lg:gap-x-8 lg:gap-y-5',
@@ -329,7 +329,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
         </div>
 
         {hasTeacherAccess && step !== 'loading' && step !== 'error' ? (
-          <div className={cn('sm:col-span-full', `${LANDSCAPE}:col-span-full`)}>
+          <div className={cn('sm:col-span-full', `${LANDSCAPE}:col-span-full`, 'desktop-medium-short:[&:has(~*_[data-expanded=true])]:hidden')}>
             <TeacherOnboardingChecklistLive
               classroomCount={classrooms.length}
               classroomId={selectedClassroom?.id ?? null}
@@ -354,9 +354,9 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
         ) : step === 'createClass' || step === 'getStudents' ? (
           <div
             className={cn(
-              'mx-auto flex w-full max-w-2xl flex-col gap-3',
+              'mx-auto flex w-full max-w-2xl 2xl:max-w-4xl flex-col gap-3',
               // A just-made class puts its code and GO LIVE side by side on a laptop, so GO LIVE stays above the fold.
-              launcherShown && 'lg:max-w-4xl lg:grid lg:grid-cols-2 lg:items-start lg:gap-4',
+              launcherShown && 'lg:max-w-4xl 2xl:max-w-6xl lg:grid lg:grid-cols-2 lg:items-start lg:gap-4',
             )}
           >
             {step === 'createClass' ? (

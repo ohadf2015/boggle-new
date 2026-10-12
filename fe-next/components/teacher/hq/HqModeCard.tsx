@@ -48,6 +48,15 @@ export const HqModeCard = memo(function HqModeCard({
   const still = reduced || disabled;
   const Icon = mode.icon;
   const poster = hqModeFacts(mode.id).poster;
+  const posterImage = (
+    <Image
+      src={poster}
+      alt=""
+      width={96}
+      height={96}
+      className="size-full select-none object-contain drop-shadow-[2px_2px_0_rgba(0,0,0,0.55)]"
+    />
+  );
   return (
     <m.button
       type="button"
@@ -62,7 +71,7 @@ export const HqModeCard = memo(function HqModeCard({
       whileTap={still ? undefined : { scale: 0.96 }}
       transition={{ type: "spring", stiffness: 520, damping: 22 }}
       className={cn(
-        "group relative flex h-[3.25rem] w-full min-w-0 items-center gap-2 self-start rounded-neo border-2 ps-1.5 pe-2 text-start sm:h-16 sm:gap-2.5 lg:h-24 lg:gap-3 lg:ps-2",
+        "group relative flex h-[3.25rem] w-full min-w-0 items-center gap-2 self-start rounded-neo border-2 ps-1.5 pe-2 text-start sm:h-16 sm:gap-2.5 lg:h-24 lg:gap-3 lg:ps-2 desktop-medium-short:h-16! desktop-medium-short:gap-2! 2xl:h-32 2xl:gap-4 2xl:ps-3 2xl:pe-4",
         "max-sm:[@media(max-height:740px)]:h-12",
         "[@media(orientation:landscape)_and_(max-height:500px)]:h-10! [@media(orientation:landscape)_and_(max-height:600px)]:px-2! [@media(orientation:landscape)_and_(max-height:600px)]:py-0.5!",
         "transition-[box-shadow,border-color,background-color] duration-150",
@@ -76,36 +85,41 @@ export const HqModeCard = memo(function HqModeCard({
       <span
         aria-hidden="true"
         className={cn(
-          "relative flex size-12 shrink-0 items-end justify-center rounded-full sm:size-14 lg:size-20",
+          "relative flex size-12 shrink-0 items-end justify-center rounded-full sm:size-14 lg:size-20 desktop-medium-short:size-12! 2xl:size-28",
           "max-sm:[@media(max-height:740px)]:size-10 [@media(orientation:landscape)_and_(max-height:500px)]:size-8",
           selected ? "bg-neo-white/80" : STAGE_IDLE[mode.accent],
         )}
       >
         <m.span
-          className="absolute -inset-x-1 -top-2 -bottom-0.5 sm:-top-3 lg:-top-5"
+          className="absolute -inset-x-1 -top-2 -bottom-0.5 sm:-top-3 lg:-top-5 desktop-medium-short:-top-2! 2xl:-top-7 2xl:-inset-x-2"
           animate={still ? undefined : selected ? { scale: 1.14, rotate: -5, y: -2 } : { scale: 1, rotate: 0, y: 0 }}
           transition={{ type: "spring", stiffness: 420, damping: 14 }}
         >
-          <Image
-            src={poster}
-            alt=""
-            width={96}
-            height={96}
-            className="size-full select-none object-contain drop-shadow-[2px_2px_0_rgba(0,0,0,0.55)]"
-          />
+          {selected && !still ? (
+            <m.span
+              data-testid={`hq-mode-poster-${mode.id}`}
+              className="block size-full"
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            >
+              {posterImage}
+            </m.span>
+          ) : (
+            posterImage
+          )}
         </m.span>
         <span
           data-mode-icon={mode.id}
           className={cn(
-            "absolute -bottom-1.5 -end-1.5 flex size-5 items-center justify-center rounded-full border-2 border-neo-black lg:size-7",
+            "absolute -bottom-1.5 -end-1.5 flex size-5 items-center justify-center rounded-full border-2 border-neo-black lg:size-7 desktop-medium-short:size-5! 2xl:size-9",
             selected ? "bg-neo-white text-black" : cn("bg-neo-navy-light", HQ_ACCENT_TEXT[mode.accent]),
           )}
         >
-          <Icon className="size-3 lg:size-4" strokeWidth={3} />
+          <Icon className="size-3 lg:size-4 desktop-medium-short:size-3! 2xl:size-5" strokeWidth={3} />
         </span>
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className={cn("font-neo-display text-[0.7rem] font-black uppercase leading-tight tracking-wide sm:text-sm lg:line-clamp-2 lg:text-base", tagline ? "line-clamp-1" : "line-clamp-2")}>
+        <span className={cn("font-neo-display text-[0.7rem] font-black uppercase leading-tight tracking-wide sm:text-sm lg:line-clamp-2 lg:text-base desktop-medium-short:line-clamp-1! desktop-medium-short:text-sm! 2xl:line-clamp-none 2xl:text-xl", tagline ? "line-clamp-1" : "line-clamp-2")}>
           {label}
         </span>
         {tagline ? (
@@ -121,7 +135,7 @@ export const HqModeCard = memo(function HqModeCard({
         ) : null}
         <span
           className={cn(
-            "hidden font-neo-body text-xs font-bold leading-snug lg:line-clamp-2",
+            "max-lg:hidden font-neo-body text-xs font-bold leading-snug lg:line-clamp-2 desktop-medium-short:line-clamp-1! 2xl:line-clamp-none 2xl:text-sm",
             selected ? "text-black/70" : "text-neo-white/60",
           )}
         >

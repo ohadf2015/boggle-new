@@ -133,6 +133,19 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
               {t('education.projectorLobby.nobodyYetHint')}
             </p>
           </div>
+          <div aria-hidden="true" className="hidden shrink-0 flex-col gap-[0.6vh] md:flex">
+            {Array.from({ length: 3 }, (_, i) => (
+              <span
+                key={i}
+                data-testid="projector-roster-ghost-seat"
+                className="flex h-[min(6vw,6vh)] w-[min(18vw,18vh)] items-center gap-[0.6vw] rounded-neo border-2 border-dashed border-neo-cream/35 px-[0.8vw] motion-safe:animate-pulse"
+                style={{ animationDelay: `${i * 0.25}s` }}
+              >
+                <span className="size-[min(3.4vw,3.4vh)] rounded-full border-2 border-dashed border-neo-cream/35" />
+                <span className="h-[0.7vh] w-[40%] rounded-full bg-neo-cream/20" />
+              </span>
+            ))}
+          </div>
         </div>
       ) : (
         <ul

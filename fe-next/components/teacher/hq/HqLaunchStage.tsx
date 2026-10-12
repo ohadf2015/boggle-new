@@ -64,7 +64,7 @@ export function HqLaunchStage({ modeLabel, listTitle, poster, className }: HqLau
         className,
       )}
     >
-      <div className="relative w-full max-w-md rounded-neo-xl border-3 border-neo-cream bg-neo-navy-light p-5 shadow-hard-2xl sm:p-7">
+      <div className="relative w-full max-w-md 2xl:max-w-xl rounded-neo-xl border-3 border-neo-cream bg-neo-navy-light p-5 shadow-hard-2xl sm:p-7">
         <div className="relative mx-auto -mt-16 mb-3 flex size-32 items-center justify-center rounded-full border-3 border-neo-black bg-neo-lime shadow-hard-lg sm:-mt-20 sm:size-36">
           {poster ? (
             <m.span
