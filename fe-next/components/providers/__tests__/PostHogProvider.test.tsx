@@ -70,11 +70,54 @@ describe('PostHogProvider', () => {
     expect(ph.init).toHaveBeenCalledWith('test-key', expect.objectContaining({
       api_host: 'https://us.i.posthog.com',
       opt_out_capturing_by_default: true,
+      cookieless_mode: 'on_reject',
       capture_pageview: false,
       capture_pageleave: true,
       surveys: false,
       disable_surveys: true,
     }));
+  });
+
+  /**
+   * Under `cookieless_mode: 'on_reject'`, posthog-js captures only when consent
+   * is explicitly denied or granted — `is_capturing()` is
+   * `isExplicitlyOptedOut() || isOptedIn()`, and an undecided visitor is
+   * neither. These two cases are what keeps the banner-ignoring majority in the
+   * funnel (cookielessly) without re-resetting the instance for past decliners.
+   */
+  function runLoaded(consentStatus: 'granted' | 'denied' | 'pending') {
+    render(<PostHogProvider><div>child</div></PostHogProvider>);
+    const config = ph.init.mock.calls[0][1] as {
+      loaded: (ph: unknown) => void;
+    };
+    const instance = {
+      opt_in_capturing: vi.fn(),
+      opt_out_capturing: vi.fn(),
+      get_explicit_consent_status: vi.fn().mockReturnValue(consentStatus),
+    };
+    config.loaded(instance);
+    return instance;
+  }
+
+  it('opts an undecided visitor out, starting cookieless capture', () => {
+    const instance = runLoaded('pending');
+
+    expect(instance.opt_out_capturing).toHaveBeenCalled();
+    expect(instance.opt_in_capturing).not.toHaveBeenCalled();
+  });
+
+  it('leaves an already-declined visitor alone (no repeat reset)', () => {
+    const instance = runLoaded('denied');
+
+    expect(instance.opt_out_capturing).not.toHaveBeenCalled();
+  });
+
+  it('opts in a visitor whose stored consent already grants analytics', () => {
+    mockHasConsentValue = true;
+    const instance = runLoaded('granted');
+
+    expect(instance.opt_in_capturing).toHaveBeenCalled();
+    expect(instance.opt_out_capturing).not.toHaveBeenCalled();
   });
 
   it('subscribes to consent changes', () => {

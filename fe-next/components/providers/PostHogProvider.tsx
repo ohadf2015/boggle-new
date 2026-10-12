@@ -44,9 +44,9 @@ function initPostHog() {
 
   posthog.init(key, {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com',
-    // GDPR: start opted-out. We only opt in after the user grants analytics
-    // consent via the cookie banner (or if their stored consent already allows it).
+    // GDPR: opted-out visitors are captured cookielessly; only an accepted banner enables cookies.
     opt_out_capturing_by_default: true,
+    cookieless_mode: 'on_reject',
     capture_pageview: false, // We track manually on route change
     capture_pageleave: true,
     capture_exceptions: true, // Capture unhandled JS errors and promise rejections
@@ -69,6 +69,9 @@ function initPostHog() {
       // opt in immediately so this session is tracked.
       if (hasConsent('analytics')) {
         ph.opt_in_capturing();
+      } else if (ph.get_explicit_consent_status() === 'pending') {
+        // on_reject only captures after an explicit reject, so an undecided visitor would emit nothing.
+        ph.opt_out_capturing();
       }
     },
   });
