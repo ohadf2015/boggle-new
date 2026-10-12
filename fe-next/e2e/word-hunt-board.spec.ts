@@ -354,9 +354,22 @@ async function touchSwipe(page: Page, cells: Array<[number, number]>) {
   };
 }
 
+type Box = { x: number; y: number; width: number; height: number };
+
+function overlaps(a: Box, b: Box) {
+  return a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+}
+
+async function boxOf(page: Page, selector: string): Promise<Box> {
+  const box = await page.locator(selector).first().boundingBox();
+  if (!box) throw new Error(`no box for ${selector}`);
+  return box;
+}
+
 for (const phone of [
-  { name: 'phone', width: 390, height: 844, minTile: 55 },
-  { name: 'short phone', width: 375, height: 667, minTile: 44 },
+  { name: 'phone', width: 390, height: 844, minTile: 55, tall: true },
+  { name: 'tall phone', width: 412, height: 915, minTile: 55, tall: true },
+  { name: 'short phone', width: 375, height: 667, minTile: 44, tall: false },
 ]) {
   test.describe(`Word Hunt board, ${phone.name} ${phone.width}x${phone.height}`, () => {
     test.use({ viewport: { width: phone.width, height: phone.height }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
@@ -369,6 +382,45 @@ for (const phone of [
       expect(m.bottom).toBeLessThanOrEqual(m.viewport);
       expect(m.touchAction).toBe('none');
     });
+
+    test('the stage and board sit centred in the room under the life bar, with no dead band below', async ({ page }) => {
+      test.skip(!phone.tall, 'a short phone has no room to spare');
+      await startGame(page);
+      const life = await boxOf(page, '[data-testid="hunt-life-row"]');
+      const stage = await boxOf(page, '[data-testid="hunt-stage"]');
+      const board = await boxOf(page, '[role=grid]');
+      const slot = await boxOf(page, '[data-testid="wordhunt-discovered-words-slot"]');
+      const above = stage.y - (life.y + life.height);
+      const below = slot.y - (board.y + board.height);
+      expect(Math.abs(above - below)).toBeLessThanOrEqual(4);
+    });
+
+    test('mid-drag, the long-word badge clears the life number, the word pill and the board', async ({ page }) => {
+      await startGame(page);
+      const swipe = await touchSwipe(page, await serpentine(page, 5));
+      await expect(page.getByTestId('hunt-stage-count')).toHaveText('5');
+      const badge = page.getByTestId('hunt-stage-long');
+      await expect(badge).toBeVisible();
+      await page.waitForTimeout(400);
+      const b = await boxOf(page, '[data-testid="hunt-stage-long"]');
+      expect(overlaps(b, await boxOf(page, '[data-testid="life-bar-value"]'))).toBe(false);
+      expect(overlaps(b, await boxOf(page, '[data-testid="hunt-stage-pill"]'))).toBe(false);
+      expect(b.y + b.height).toBeLessThanOrEqual((await boxOf(page, '[role=grid]')).y);
+      await swipe.release();
+    });
+
+    for (const locale of ['en', 'he'] as const) {
+      test(`compact clue boxes carry no hard shadow (${locale})`, async ({ page }) => {
+        test.skip(phone.height > 860, 'full-size clue boxes keep their shadow');
+        await startGame(page, locale);
+        const shadows = await page.$$eval('[data-testid="clue-boxes"] [data-testid^="clue-box-"]', (els) =>
+          els.map((el) => getComputedStyle(el).boxShadow),
+        );
+        expect(shadows.length).toBeGreaterThan(0);
+        const opaque = shadows.filter((sh) => /rgb\(/.test(sh.replace(/rgba\([^)]*,\s*0\)/g, '')));
+        expect(opaque).toEqual([]);
+      });
+    }
 
     test('a touch swipe selects exactly the tiles under a diagonal path, never pans, and submits once on release', async ({ page }) => {
       await startGame(page);

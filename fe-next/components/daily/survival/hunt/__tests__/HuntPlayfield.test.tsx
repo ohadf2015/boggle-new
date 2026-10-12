@@ -30,13 +30,20 @@ function field(stage: HuntStageState, extra: Partial<React.ComponentProps<typeof
 }
 
 describe('HuntPlayfield', () => {
-  it('squares the board inside the room left under the word stage, so the stage never has to be guessed', () => {
+  it('squares the board in the room the stage leaves, sizing both from one stage height, and centres them as a block', () => {
     field(initialHuntStage);
+    const root = screen.getByTestId('hunt-playfield');
+    expect(root.className).toContain('[container-type:size]');
+    expect(root.className).toContain('justify-center');
     const box = screen.getByTestId('hunt-board-box');
-    expect(box.className).toContain('[container-type:size]');
     expect(box.contains(screen.getByRole('grid'))).toBe(true);
     expect(box.contains(screen.getByTestId('hunt-stage'))).toBe(false);
-    expect((box.firstElementChild as HTMLElement).className).toContain('w-[min(100cqw,100cqh)]');
+    expect(box.className).toContain('w-[min(100cqw,calc(100cqh-var(--hunt-stage-h)))]');
+  });
+
+  it('keeps the reward burst anchored on the stage wherever the stage lands', () => {
+    field(initialHuntStage, { stageOverlay: <span data-testid="anchor" /> });
+    expect(screen.getByTestId('anchor').parentElement!.contains(screen.getByTestId('hunt-stage'))).toBe(true);
   });
 
   it('pays the life won by the released word once, on the stage only', () => {

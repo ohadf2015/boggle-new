@@ -437,9 +437,16 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       )}
 
       <div className="relative flex-1 min-h-[220px] flex flex-col">
-        <span id={fx.rewardId} className="absolute left-1/2 top-8 pointer-events-none" />
-        {celebration}
-        <HuntPlayfield {...playfieldProps} size={inShell ? 'desktop' : 'phone'} />
+        <HuntPlayfield
+          {...playfieldProps}
+          size={inShell ? 'desktop' : 'phone'}
+          stageOverlay={
+            <>
+              <span id={fx.rewardId} className="absolute left-1/2 top-8 pointer-events-none" />
+              {celebration}
+            </>
+          }
+        />
       </div>
 
       <div className="shrink-0 min-h-[64px] pt-1 shell:hidden" data-testid="wordhunt-discovered-words-slot">

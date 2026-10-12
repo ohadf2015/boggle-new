@@ -156,7 +156,7 @@ export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
 
         {/* Life text — always visible, positioned center of bar */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <span className={cn(
+          <span data-testid="life-bar-value" className={cn(
             "text-xs sm:text-sm font-black tabular-nums tracking-wide",
             "drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]",
             pct > 50 ? "text-white" : pct > 0 ? "text-neo-white" : "text-neo-white"

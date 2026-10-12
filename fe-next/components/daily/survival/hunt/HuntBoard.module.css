@@ -226,7 +226,12 @@
 .tray[data-phase='pending'] .stitch { animation-duration: 220ms; }
 
 .submitHint {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  translate: -50% 0;
   margin-top: 10px;
+  white-space: nowrap;
   padding: 4px 12px;
   border: 2px solid var(--ink);
   border-radius: 999px;

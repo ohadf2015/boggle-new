@@ -5,6 +5,7 @@ import type { LetterGrid } from '@/types';
 import type { WordDiscovery } from '../types';
 import { HuntBoard } from './HuntBoard';
 import { HuntWordStage } from './HuntWordStage';
+import stageStyles from './HuntWordStage.module.css';
 import type { HuntCell, HuntStageState } from './huntStage';
 
 type TFn = (key: string, params?: Record<string, string | number> | string) => string;
@@ -23,6 +24,7 @@ export interface HuntPlayfieldProps {
   discoveredWords: WordDiscovery[];
   calm: boolean;
   size?: 'phone' | 'desktop';
+  stageOverlay?: React.ReactNode;
   t: TFn;
 }
 
@@ -45,6 +47,7 @@ export function HuntPlayfield({
   discoveredWords,
   calm,
   size = 'phone',
+  stageOverlay,
   t,
 }: HuntPlayfieldProps) {
   const typing =
@@ -57,36 +60,41 @@ export function HuntPlayfield({
   const coins = reward && reward.tokensGained > 0 ? reward.tokensGained : null;
 
   return (
-    <div className="flex w-full flex-1 min-h-0 flex-col items-center">
-      <HuntWordStage
-        phase={phase}
-        word={word}
-        verdict={stage.verdict}
-        points={points}
-        coins={coins}
-        message={feedbackMessage}
-        calm={calm}
-        size={size}
-        t={t as (key: string, params?: Record<string, string | number>) => string}
-      />
-      <div data-testid="hunt-board-box" className="w-full flex-1 min-h-0 [container-type:size]">
-        <div className="mx-auto w-[min(100cqw,100cqh)]">
-          <HuntBoard
-            grid={grid}
-            interactive={!isGameOver}
-            eliminatedLetters={eliminatedLetters}
-            onWordSubmit={onWordSubmit}
-            onWordChange={onWordChange}
-            onLive={onLive}
-            onRelease={onRelease}
-            phase={stage.phase}
-            verdict={stage.verdict}
-            heldPath={stage.path}
-            calm={calm}
-            size={size}
-            t={t as (key: string, fallback?: string) => string}
-          />
-        </div>
+    <div
+      data-testid="hunt-playfield"
+      data-size={size}
+      className={`${stageStyles.field} flex w-full flex-1 min-h-0 flex-col items-center justify-center [container-type:size]`}
+    >
+      <div className="relative w-full shrink-0">
+        {stageOverlay}
+        <HuntWordStage
+          phase={phase}
+          word={word}
+          verdict={stage.verdict}
+          points={points}
+          coins={coins}
+          message={feedbackMessage}
+          calm={calm}
+          size={size}
+          t={t as (key: string, params?: Record<string, string | number>) => string}
+        />
+      </div>
+      <div data-testid="hunt-board-box" className="w-[min(100cqw,calc(100cqh-var(--hunt-stage-h)))] shrink-0">
+        <HuntBoard
+          grid={grid}
+          interactive={!isGameOver}
+          eliminatedLetters={eliminatedLetters}
+          onWordSubmit={onWordSubmit}
+          onWordChange={onWordChange}
+          onLive={onLive}
+          onRelease={onRelease}
+          phase={stage.phase}
+          verdict={stage.verdict}
+          heldPath={stage.path}
+          calm={calm}
+          size={size}
+          t={t as (key: string, fallback?: string) => string}
+        />
       </div>
     </div>
   );

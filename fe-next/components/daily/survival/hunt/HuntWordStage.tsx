@@ -37,7 +37,7 @@ export function HuntWordStage({ phase, word, verdict, points, coins = null, mess
       aria-live="polite"
     >
       {phase === 'idle' && <span className={styles.prompt}>{t('wordHunt.survival.stage.prompt')}</span>}
-      <div className={styles.pill} data-empty={letters.length === 0 ? 'true' : undefined}>
+      <div data-testid="hunt-stage-pill" className={styles.pill} data-empty={letters.length === 0 ? 'true' : undefined}>
         <span data-testid="hunt-live-word" className={styles.word} style={{ '--n': letters.length } as React.CSSProperties}>
           {letters.map((ch, i) => (
             <span key={i} data-letter={ch} className={styles.letter} style={{ '--i': i } as React.CSSProperties}>
@@ -49,7 +49,7 @@ export function HuntWordStage({ phase, word, verdict, points, coins = null, mess
           <span data-testid="hunt-stage-count" className={styles.count}>{letters.length}</span>
         )}
         {bonus > 0 && (
-          <span key={bonus} className={styles.long}>
+          <span key={bonus} data-testid="hunt-stage-long" className={styles.long}>
             {t('wordHunt.survival.stage.longWord', { bonus })}
           </span>
         )}
