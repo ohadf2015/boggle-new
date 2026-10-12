@@ -14,7 +14,7 @@ export function DailyLoadingFallback({ mode }: DailyLoadingFallbackProps): React
 
   return (
     <div className="flex-1 flex items-center justify-center bg-neo-navy">
-      <PageLoader size="lg" text={text} />
+      <PageLoader size="lg" text={text} priority={false} />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { AnimatePresence, m } from 'framer-motion';
-import { Sparkles, Flame } from 'lucide-react';
+import { Sparkles, Flame, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface WheelCelebration {
@@ -44,19 +44,30 @@ export const WheelRushCelebration: React.FC<Props> = ({ celebration, t, prefersR
             'flex flex-col items-center gap-1 px-5 py-3 rounded-neo border-3 border-neo-black shadow-hard-lg',
             celebration.tier === 'all'
               ? 'bg-neo-yellow text-neo-black'
-              : 'bg-neo-lime text-neo-black',
+              : 'bg-neo-orange text-neo-black',
           )}
           initial={prefersReduced ? { opacity: 0 } : { opacity: 0, scale: 0.6, y: 12 }}
-          animate={prefersReduced ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+          animate={
+            prefersReduced
+              ? { opacity: 1 }
+              : celebration.tier === 'almost'
+                // Near-miss reads as TENSE, not celebratory: a quick shake instead of a clean pop-in.
+                ? { opacity: 1, scale: 1, y: 0, x: [0, -4, 4, -2, 0] }
+                : { opacity: 1, scale: 1, y: 0 }
+          }
           exit={prefersReduced ? { opacity: 0 } : { opacity: 0, scale: 0.8, y: -12 }}
-          transition={prefersReduced ? { duration: 0.15 } : { type: 'spring', stiffness: 380, damping: 18, delay }}
+          transition={
+            prefersReduced
+              ? { duration: 0.15 }
+              : { type: 'spring', stiffness: 380, damping: 18, delay, x: { duration: 0.3, delay } }
+          }
         >
           <span className="flex items-center gap-1.5 font-neo-display font-black text-lg sm:text-xl tracking-wide">
-            <Sparkles className="w-5 h-5" />
+            {celebration.tier === 'all' ? <Sparkles className="w-5 h-5" /> : <Zap className="w-5 h-5" />}
             {celebration.tier === 'all'
               ? t('wordWheel.allLettersUsed')
               : t('wordWheel.almostAllLetters')}
-            <Sparkles className="w-5 h-5" />
+            {celebration.tier === 'all' ? <Sparkles className="w-5 h-5" /> : <Zap className="w-5 h-5" />}
           </span>
           <span className="flex items-center gap-2">
             <span dir="auto" className="font-neo-body font-bold text-sm uppercase tracking-widest opacity-80">

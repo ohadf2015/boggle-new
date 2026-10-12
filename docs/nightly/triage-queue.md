@@ -2526,3 +2526,18 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 - `exp-mp-quickplay-eager-disable-v1` (live since 2026-07-29, 100% rollout) and `exp-mp-quickplay-wait-v1` (live since 2026-06-16) have been running 10+ and 17+ weeks respectively on a surface doing single-digit-to-low-20s rage clicks/week — unlikely to ever accumulate n≥1000/arm on that metric. Recommend a human pull the PostHog experiment-results UI directly for both rather than waiting on volume; flagging for review per the 14-day-inconclusive rule.
 - Stale/dead flags found, no action taken (neither blocks anything): `exp-mp-room-join-loading-v1` (PostHog id 219697, `active:false`) has ZERO matching `defineExperiment` entry in `lib/experiments.ts` and zero code call sites — orphaned flag from removed code, already inactive. `exp-practice-wheel-cta-v1` (id 209540, `active:false`) is defined in `lib/experiments.ts` but has 0 non-test call sites — still unwired (confirms prior-run note), left as-is since WheelRush isn't in scope tonight.
 - recommended owner: lane-03 next run — pull the two eager-disable/quickplay-wait experiment results directly instead of relying on rage-click volume to decide.
+
+## 2026-10-12
+- [PostHog] lesson_assignments select failed: column lesson_assignments.title does not exist
+  - issue: posthog-issue:01a12a5e-8be0-7840-8e03-94b7821153b6, occurrences=1
+  - status: shipped (fix below)
+  - why: n/a — shipped autonomously (pure bug fix, no schema change)
+  - recommended owner: review-by-eod
+
+## 2026-10-12
+
+### [Flag review] `exp-wordwheel-drag-hint-v1` — inconclusive, volume-starved not time-starved
+- Live 100% rollout since 2026-06-29 (~105 days), fully wired (`components/daily/WordWheelGame.tsx`), exposure tracking correct (`trackExposure()` fires on mount). Code is healthy — this is a traffic problem, not a bug.
+- 30d `game_completed` filtered to `mode='word-wheel'`, grouped by `$feature/exp-wordwheel-drag-hint-v1`, flood-capped (exclude >50 events/distinct_id): control 7 uniques/11 completions, drag-hint 11 uniques/66 completions. Both arms orders of magnitude below the 1000/arm significance threshold — cannot decide winner.
+- This also explains tonight's brief item "rage clicks on /he/daily/word-wheel" (reach=2): the surface gets so little daily traffic that even 2 rage-click sessions register as a top-score signal.
+- Recommendation: either (a) leave running and accept it may never reach significance at current traffic (daily word-wheel is a low-traffic surface), or (b) make a product call to ship `drag-hint` to 100% on priors (it's a strictly additive idle coachmark, no plausible downside) and retire the flag without a statistical winner. Not an automated-safe call either way — human judgment on risk tolerance for an unmeasurable flag.

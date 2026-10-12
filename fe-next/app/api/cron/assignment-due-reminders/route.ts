@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
       const { data: assignmentRows, error: assignmentError } = await supabase
         .from('lesson_assignments')
-        .select('id, classroom_id, lesson_id, due_date, title')
+        .select('id, classroom_id, lesson_id, due_date')
         .not('due_date', 'is', null)
         .gte('due_date', since)
         .lte('due_date', until);
@@ -69,7 +69,6 @@ export async function POST(request: NextRequest) {
         classroom_id: string;
         lesson_id: string;
         due_date: string;
-        title: string | null;
       }>;
       if (rawAssignments.length === 0) {
         return { sent: 0, failed: 0, due: 0 };
@@ -134,7 +133,7 @@ export async function POST(request: NextRequest) {
           classroomName: classroom.name,
           teacherId: classroom.teacher_id,
           lessonId: a.lesson_id,
-          title: a.title || lessonName.get(a.lesson_id) || 'Untitled lesson',
+          title: lessonName.get(a.lesson_id) || 'Untitled lesson',
           dueDate: a.due_date,
         });
       }

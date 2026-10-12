@@ -233,9 +233,9 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       mode: gameMode ?? 'unknown',
       score: currentPlayerData?.score ?? 0,
     });
-    if (isMultiplayer) {
-      trackGrowthEvent('mp_results_viewed', { gameMode: gameMode ?? 'unknown', language });
-    }
+    // mp_results_viewed now fires from MpResultsStage mount (always-on reveal
+    // screen) — this component only mounts once DETAILS is opened, which
+    // cratered that event. Don't re-fire it here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

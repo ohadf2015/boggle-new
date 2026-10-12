@@ -41,6 +41,7 @@ import { StudentMissedWords } from '@/components/student/live/StudentMissedWords
 import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
 import { myMissedWords } from '@/components/student/live/missedWords';
 import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/MultiplayerSignupSheet'), { ssr: false });
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
@@ -116,6 +117,16 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
 
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+
+  // Canonical MP results-viewed funnel event. This stage is the always-mounted
+  // reveal screen; ResultsMainContent (where this used to fire) only mounts
+  // once DETAILS is opened, which cratered the event to near-zero.
+  useEffect(() => {
+    if (data.sortedScores.length > 1) {
+      trackGrowthEvent('mp_results_viewed', { gameMode: c.resolvedGameMode ?? 'unknown', language: c.language });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once per stage mount
+  }, []);
 
   // Win share prompt: once per room, and only after the show (never over it).
   const { shouldFireShareOpen } = useShareOpenGuard();

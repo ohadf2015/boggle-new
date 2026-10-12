@@ -18,6 +18,7 @@ const h = vi.hoisted(() => ({
   confetti: vi.fn(),
   win: vi.fn(),
   lose: vi.fn(),
+  trackGrowthEvent: vi.fn(),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -85,6 +86,7 @@ vi.mock('@/utils/confettiUtils', () => ({ fireRankConfetti: h.confetti }));
 vi.mock('@/lib/native/webViewLayerFlash', () => ({ prefersStaticFullscreenOverlay: () => false }));
 vi.mock('@/utils/guestManager', () => ({ getGuestStatsSummary: () => ({ gamesPlayed: 3 }) }));
 vi.mock('@/lib/boardSelection', () => ({ pickRichestBoardClient: () => [['A']] }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: h.trackGrowthEvent }));
 
 import MpResultsScreen from '../MpResultsScreen';
 import { useGameStore } from '@/hooks/gameState/store';
@@ -133,6 +135,7 @@ describe('MpResultsScreen', () => {
     h.lose.mockClear();
     h.showInterstitial.mockReset();
     h.showInterstitial.mockResolvedValue(undefined);
+    h.trackGrowthEvent.mockClear();
     sessionStorage.clear();
     emitRewardAdActive(false); // module-level bus flag survives across tests
   });
@@ -170,6 +173,13 @@ describe('MpResultsScreen', () => {
     act(() => { vi.advanceTimersByTime(600); });
     expect(screen.getAllByTestId('mp-standing-row').every((r) => r.getAttribute('data-revealed') === 'true')).toBe(true);
     expect(screen.getByTestId('mp-primary-cta')).toBeTruthy();
+  });
+
+  it('fires mp_results_viewed once on mount — every MP viewer, not just those who open Details', () => {
+    renderScreen();
+    const calls = h.trackGrowthEvent.mock.calls.filter((c) => c[0] === 'mp_results_viewed');
+    expect(calls).toHaveLength(1);
+    expect(calls[0][1]).toMatchObject({ language: 'en' });
   });
 
   it('does not fire the interstitial on mount, and mounts the MP banner slot', () => {

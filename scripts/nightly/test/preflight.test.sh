@@ -270,6 +270,39 @@ assert "  …sets NIGHTLY_ISOLATED_SHIP=1"                 '[ "${NIGHTLY_ISOLATE
 ( cd "$REPO"; git reset --hard origin/master -q )
 unset NIGHTLY_ISOLATED_SHIP
 
+# ── clean tree + DIVERGED from origin, local commits non-docs → isolated ship ──
+# The case above never diverges (local merely ahead → ff-pull is a no-op). When
+# origin has ALSO advanced, `git pull --ff-only` fails and preflight used to
+# ABORT on "local-only commits touch non-docs paths". That abort cost the entire
+# 2026-10-11 run (clean tree, 7 unpushed solver/wheelRush files, zero lanes, no
+# report) even though isolated ship already handles exactly this. Must PROCEED.
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null; git reset --hard origin/master -q )
+rm -f "$LOCK_FILE"
+unset NIGHTLY_ISOLATED_SHIP
+echo
+echo "clean tree + diverged, local non-docs commits → isolated ship (must NOT abort)"
+( cd "$REPO"
+  _base=$(git rev-parse HEAD)
+  echo "remote work" >> base.txt
+  git add base.txt
+  git -c user.email=t@t -c user.name=t commit -qm "remote: advance origin"
+  git push -q origin master
+  git reset --hard "$_base" -q
+  echo "founder solver work" > solver.ts
+  git add solver.ts
+  git -c user.email=t@t -c user.name=t commit -qm "hand: local non-docs commit" )
+_outd=$(mktemp); preflight_check > "$_outd" 2>&1; rcD=$?; OUTD=$(cat "$_outd"); rm -f "$_outd"
+assert "diverged + non-docs → PROCEEDS (return 0)"       "[ $rcD -eq 0 ]"
+assert "  …does NOT abort on divergence"                 '! printf "%s" "$OUTD" | grep -q "ABORT — diverged"'
+assert "  …logs the offending path"                      'printf "%s" "$OUTD" | grep -q "solver.ts"'
+assert "  …enables isolated ship in the log"             'printf "%s" "$OUTD" | grep -q "enabling isolated ship"'
+assert "  …sets NIGHTLY_ISOLATED_SHIP=1"                 '[ "${NIGHTLY_ISOLATED_SHIP:-0}" = 1 ]'
+assert "  …never auto-rebased the founder's commit"      '! printf "%s" "$OUTD" | grep -q "auto-rebase OK"'
+assert "  …left the founder commit on local HEAD"        '[ -n "$(cd "$REPO" && git log -1 --format=%s | grep "hand: local non-docs commit")" ]'
+# Reset for next case — local back in sync with the advanced origin.
+( cd "$REPO"; git reset --hard origin/master -q )
+unset NIGHTLY_ISOLATED_SHIP
+
 # Mirror: unpushed DOCS-only commit must NOT abort (loop's own salvage commits
 # and stranded seo-daily reports are common; ff-pull/rebase paths handle them).
 rm -f "$LOCK_FILE" "$LAST_RUN_FILE"

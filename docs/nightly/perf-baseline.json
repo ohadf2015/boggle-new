@@ -1,27 +1,28 @@
 {
-  "date": "2026-10-10",
-  "note": "4th+ consecutive night this pattern repeats (09-15, 10-01, 10-06, tonight): brief's top item (es/education 14660ms LCP) re-queried at n=1 -- sub-floor noise, correctly deferred per sample-gate, not fixed. Brief's other 'frontend' items were catalogsentry.com/imposketch.io -- confirmed NOT lexiclash (cross-tenant PostHog contamination, same finding as 10-06). Unfiltered $pathname='/' query returned n=119 (looked real) but re-running WITH $host='www.lexiclash.live' returned ZERO rows -- that n=119 was 100% cross-tenant, proving the contamination inflates even generic routes, not just imposketch's own paths. No own-domain route cleared n>50 in 24h. Backend: vocabulary_lessons FK still 42 rows (was 28 on 10-01) -- still below any size where EXPLAIN ANALYZE would show a seq-scan cost, re-confirmed skip. auth_db_connections_absolute unchanged, still dashboard-only. Net: no safe fix existed tonight under the hard rules -- research-only night, same as 10-06. ESCALATING: this is now a brief/data-quality defect, not a nightly-lane defect -- the $host filter needs to live in the brief generator (phase 0), not be re-discovered every lane that happens to query PostHog.",
+  "date": "2026-10-12",
+  "note": "5th+ consecutive night the brief/PostHog data-quality defect repeats (09-15, 10-01, 10-06, 10-10, tonight). Brief's top 5 LCP items were ALL imposketch.io (confirmed cross-tenant contamination, not lexiclash) except one lexiclash.live/en/daily/word-wheel entry at 7428ms -- re-queried with $host='www.lexiclash.live' filter: n=1, pure sub-floor noise, correctly deferred per mandatory sample gate, not treated as a regression. Broad own-domain sweep ($host filter, no route filter, HAVING n>50) returned ZERO rows for ANY route in 24h -- same as 10-10. Backend: vocabulary_lessons_classroom_id_fkey advisor item is STALE -- idx_vocabulary_lessons_classroom_id already exists (verified via pg_indexes); table only 42 rows anyway. pg_stat_statements top-8 by total_exec_time show no N+1/slow-query outlier in app code (dominated by realtime.list_changes + PostgREST schema-cache introspection, neither app-fixable). auth_db_connections_absolute unchanged, still dashboard-only, deferred. Since no PostHog-driven regression cleared the sample floor, applied founder SPEED directive fallback: code-read of the daily/word-wheel lazy-load chain found DailyLoadingFallback.tsx rendering PageLoader without priority=false -- the mascot image was fetching at HIGH priority during a Suspense fallback that is NOT the LCP element (the word wheel board is), stealing bandwidth from real first paint. Fixed to priority=false, matching the exact pattern PageLoader's own doc describes for [locale]/loading.tsx. Shared by both daily/word-wheel AND daily/word-hunt (same fallback component, mode prop). ESCALATING (5th night): brief generator phase 0 still needs a $host filter on its PostHog web-vitals query -- this is a brief-generator defect, not a nightly-lane defect.",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
     "closed": {
-      "vocabulary_lessons_classroom_id_fkey_unindexed": "re-verified 10-10: table is 42 rows, 5 distinct classroom_id (was 28 rows on 10-01). Index would add write cost for zero measurable read benefit at this scale. Advisor INFO-level lint fires regardless of table size -- not a real regression, skip."
+      "vocabulary_lessons_classroom_id_fkey_unindexed": "re-verified 10-12: idx_vocabulary_lessons_classroom_id ALREADY EXISTS (pg_indexes confirmed). Advisor lint is stale/cached. Table still only 42 rows. No action needed -- not a real gap."
     },
     "deferred": {
-      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (re-flagged 10-01, 10-06, 10-10, no change)",
+      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (re-flagged 10-01, 10-06, 10-10, 10-12, no change)",
       "realtime_wal_json_parser_cpu": "systemic, tracked by existing 50-supabase-perf.md pg_cron guardrails -- founder-scope publication-membership call, not this lane's fix"
     }
   },
   "frontend": {
     "by_route": [],
     "shipped": [
-      { "route": "/multiplayer", "fix": "lazy-load 4 classroom-only components via next/dynamic ssr:false", "baseline_lcp_ms": 11220, "route_variant": "/he/multiplayer" }
+      { "route": "/multiplayer", "fix": "lazy-load 4 classroom-only components via next/dynamic ssr:false", "baseline_lcp_ms": 11220, "route_variant": "/he/multiplayer" },
+      { "route": "/daily/word-wheel", "fix": "DailyLoadingFallback PageLoader priority=false (non-LCP mascot was stealing bandwidth from real LCP element during Suspense fallback); also benefits /daily/word-hunt (shared fallback component)", "baseline_lcp_ms": 7428, "note": "PostHog-reported LCP was n=1 sub-floor noise -- fix applied on founder SPEED-directive grounds (code-read found a real priority misconfiguration), not as a confirmed regression fix" }
     ],
-    "note": "No new frontend fix shipped tonight -- 4th+ consecutive night all own-domain routes are sub-floor (n<50) or the apparent signal is cross-tenant contamination. Confirmed $host='www.lexiclash.live' + n>50 -> zero rows in 24h. Needs the brief generator fixed (add $host filter at source), not another nightly re-discovery.",
-    "real_fix_needed": "brief-generator phase 0 must add properties.$host filter to its PostHog web-vitals query -- confirmed 3rd time (10-06, 10-10) that unfiltered queries surface other tenants' routes as if they were lexiclash regressions"
+    "note": "No own-domain route cleared the n>50 sample floor tonight (5th consecutive night) -- same brief-generator cross-tenant contamination defect as 10-06/10-10. Shipped one SPEED-directive fix found by code review instead of PostHog data.",
+    "real_fix_needed": "brief-generator phase 0 must add properties.$host filter to its PostHog web-vitals query -- confirmed 4th time (10-06, 10-10, 10-12) that unfiltered queries surface other tenants' routes as if they were lexiclash regressions"
   },
   "bundle": {
-    "note": "not re-measured tonight (no fresh .next build in time budget) -- carrying 09-26 numbers unchanged. Next lane with a fresh build should confirm the education-chrome split shows as new lazy chunks, not folded into the main /multiplayer route chunk.",
+    "note": "not re-measured tonight (no fresh .next build present) -- carrying 09-26 numbers unchanged.",
     "total_kb": 34104,
     "top_chunks": [
       { "name": "82055-76fbea40d9b5ce20.js", "kb": 856 },

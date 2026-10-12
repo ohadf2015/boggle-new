@@ -367,7 +367,9 @@ export type GrowthEvent =
   // Multiplayer results page funnel — fills mp_round blind spots.
   //   results_viewed: also fired on ResultsMainContent mount (canonical mode funnel;
   //     props { mode, score }) so classic/survival/wheel-rush join word-wheel/blast.
-  //   mp_results_viewed: fires on ResultsMainContent mount (isMultiplayer=true).
+  //   mp_results_viewed: fires on MpResultsStage mount (every MP results
+  //     viewer, not just those who open DETAILS — moved 2026-10-12, was
+  //     cratered to 0/wk inside the opt-in ResultsMainContent/Details sheet).
   //     Props: { gameMode, language }. Baseline reach for round-result funnel.
   //   mp_round_ready_clicked: fires when player marks ready for next round.
   //     Props: { language }. Measures round-transition engagement.

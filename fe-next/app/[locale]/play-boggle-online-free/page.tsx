@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Boggle Online Free — Multiplayer, No Signup | LexiClash',
-    description: 'Play Boggle online free — no download, no signup, real-time multiplayer up to 50 players. Play with friends or AI, start instantly →',
+    description: 'Play Boggle online free — no download, no signup. Classroom-ready for up to 50 students, or real-time multiplayer with friends. Start instantly →',
     keywords: 'play boggle online free no download, boggle online free no download, play boggle online free, free boggle online no download, free online boggle no download, boggle game free no download, play boggle word shake free no download, play boggle online free with other players, boggle alternatives 2026, games like boggle online free, word game no download, boggle word shake free, word games online free, word making games, word hunt game online, free word game no download, word puzzle game free',
     openGraph: {
       title: 'Free Boggle Online — Play Solo or Multiplayer | LexiClash',
@@ -400,10 +400,13 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
           <p className="text-sm leading-relaxed text-neo-white sm:text-base">
             Teachers use LexiClash as a free classroom Boggle game — no accounts, no downloads, no setup. Spin up a
             room in seconds, share the link or QR code, and up to 50 students compete live on the same word grid. Great
-            for vocabulary practice, spelling drills, and ESL classes. Want a version built for schools, with
-            classroom-ready tools?{' '}
+            for vocabulary practice, spelling drills, and ESL classes. See the{' '}
+            <Link href={`/${locale}/education/boggle-for-the-classroom`} className="text-neo-cyan underline">
+              step-by-step classroom guide
+            </Link>{' '}
+            or check out{' '}
             <Link href={`/${locale}/education/for-schools`} className="text-neo-cyan underline">
-              Check out LexiClash for Schools
+              LexiClash for Schools
             </Link>
             .
           </p>

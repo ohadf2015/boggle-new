@@ -236,24 +236,31 @@ preflight_check() {
       sleep "$_pf_slp"
     done
     if ! git pull --ff-only origin master --quiet; then
-      # ff failed → local diverged from origin. Self-heal ONLY when every local-only
+      # ff failed → local diverged from origin. Self-heal when every local-only
       # commit is docs/-only (a stranded seo-daily report, or our own failed-push
-      # from a prior run). If ANY local-only commit touches non-docs paths, abort
-      # for manual review — never auto-rebase code we can't re-gate.
+      # from a prior run) by rebasing below.
+      #
+      # Non-docs local-only commits used to ABORT here. That abort pre-dates
+      # isolated ship and describes the very case the block below already
+      # handles — the founder's unpushed code — so it only ever cost us runs
+      # (all of 2026-10-11: clean tree, 7 unpushed solver/wheelRush files, zero
+      # lanes, no report). Fall through instead: local stays untouched and the
+      # origin/master..HEAD check below enables the isolated path. We still
+      # never auto-rebase code we can't re-gate.
       local non_docs
       non_docs=$(git diff --name-only origin/master..master | grep -vE '^docs/' || true)
       if [ -n "$non_docs" ]; then
-        echo "preflight: ABORT — diverged & local-only commits touch non-docs paths (manual review):"
+        echo "preflight: diverged & local-only commits touch non-docs paths — leaving local alone, isolated ship handles it:"
         echo "$non_docs" | sed 's/^/  /'
-        return 1
-      fi
-      echo "preflight: ff-only failed — local-only commits are docs-only, auto-rebasing onto origin/master"
-      if git rebase origin/master >/dev/null 2>&1; then
-        echo "preflight: auto-rebase OK"
       else
-        git rebase --abort 2>/dev/null || true
-        echo "preflight: ABORT — auto-rebase onto origin/master conflicted (manual fix needed)"
-        return 1
+        echo "preflight: ff-only failed — local-only commits are docs-only, auto-rebasing onto origin/master"
+        if git rebase origin/master >/dev/null 2>&1; then
+          echo "preflight: auto-rebase OK"
+        else
+          git rebase --abort 2>/dev/null || true
+          echo "preflight: ABORT — auto-rebase onto origin/master conflicted (manual fix needed)"
+          return 1
+        fi
       fi
     fi
     # When local HEAD carries unpushed NON-docs commits (the founder's own hand-work
