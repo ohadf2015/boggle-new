@@ -94,6 +94,6 @@ export async function GET() {
     configured: !!INDEXNOW_KEY,
     keyLocation: INDEXNOW_KEY ? `${BASE_URL}/${INDEXNOW_KEY}.txt` : null,
   }, {
-    headers: { 'Cache-Control': 's-maxage=3600, stale-while-revalidate=7200' },
+    headers: { 'Cache-Control': 'private, max-age=3600' },
   });
 }
