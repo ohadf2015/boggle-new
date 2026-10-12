@@ -76,4 +76,13 @@ describe('SerpGapSections — competitor heading gaps + unique round table', () 
       expect(screen.getByRole('rowheader', { name: row.tile })).toBeInTheDocument();
     });
   });
+
+  it('renders the measured Spanish dictionary floor and the Ñ tile row', () => {
+    render(<SerpGapSections locale="es" />);
+    expect(screen.getAllByText(new RegExp(ES_DICT_FLOOR.replace(',', ','))).length).toBeGreaterThan(0);
+    expect(screen.getByRole('rowheader', { name: 'Ñ' })).toBeInTheDocument();
+    SPANISH_TILES.forEach((row) => {
+      expect(screen.getByRole('rowheader', { name: row.tile })).toBeInTheDocument();
+    });
+  });
 });
