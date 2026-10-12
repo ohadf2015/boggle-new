@@ -85,7 +85,7 @@ vi.mock('@/hooks/useMpExit', () => ({ useMpExit: () => h.mpExit }));
 vi.mock('@/utils/confettiUtils', () => ({ fireRankConfetti: h.confetti }));
 vi.mock('@/lib/native/webViewLayerFlash', () => ({ prefersStaticFullscreenOverlay: () => false }));
 vi.mock('@/utils/guestManager', () => ({ getGuestStatsSummary: () => ({ gamesPlayed: 3 }) }));
-vi.mock('@/utils/growthTracking', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/utils/growthTracking')>()), trackModalInteraction: vi.fn() }));
+vi.mock('@/utils/growthTracking', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/utils/growthTracking')>()), trackModalInteraction: vi.fn(), trackGrowthEvent: vi.fn() }));
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: h.push }) }));
 vi.mock('@/lib/speech/textToSpeech', () => ({ speakWord: vi.fn(async () => true) }));
 vi.mock('@/lib/boardSelection', () => ({ pickRichestBoardClient: () => [['A']] }));
