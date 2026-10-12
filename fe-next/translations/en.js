@@ -13048,6 +13048,23 @@ const en = {
         "submitted": "{{submitted}} / {{roster}} submitted",
         "upgrade": "Teacher Pro {{price}}"
       },
+      "rosterProgress": {
+        "title": "Roster progress",
+        "columns": {
+          "student": "Student",
+          "completion": "Assignments",
+          "lastActive": "Last active",
+          "joinStatus": "Join status"
+        },
+        "status": {
+          "signed_in": "Signed in",
+          "guest": "Guest",
+          "joined_idle": "Joined, not practiced"
+        },
+        "completion": "{{completed}}/{{total}}",
+        "upgrade": "More per-student detail with Teacher Pro {{price}}",
+        "never": "Never"
+      },
       "exportAllClasses": {
         "button": "Export all classes",
         "downloading": "Exporting…",

@@ -21,6 +21,7 @@ import { ClassArcPanel } from '@/components/teacher/reports/ClassArcPanel';
 import { StudentArcView } from '@/components/teacher/reports/StudentArcView';
 import { AssignmentCompletionReport } from '@/components/teacher/reports/AssignmentCompletionReport';
 import { AssignmentProgressReport } from '@/components/teacher/reports/AssignmentProgressReport';
+import { ClassroomRosterProgress } from '@/components/teacher/reports/ClassroomRosterProgress';
 import { ClassAssignmentGrid } from '@/components/teacher/reports/ClassAssignmentGrid';
 import { GoogleClassroomGradePassback } from '@/components/teacher/reports/GoogleClassroomGradePassback';
 import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
@@ -277,6 +278,10 @@ function TeacherReportsInner() {
           </div>
           <TeacherPlanBadge />
         </div>
+        {/* Free surface, deliberately above the fold and outside ProGate: the
+            per-student join-funnel view (who converted but never practiced) is
+            the reason a free teacher upgrades. */}
+        <ClassroomRosterProgress classroomId={selectedClassroomId} />
         <WordMasteryReport
           classroomId={selectedClassroomId}
           classroomName={selectedClassroom?.name ?? ''}

@@ -15027,6 +15027,23 @@ const sv = {
         "submitted": "{{submitted}} / {{roster}} inlämnade",
         "upgrade": "Teacher Pro {{price}}"
       },
+      "rosterProgress": {
+        "title": "Klassens framsteg",
+        "columns": {
+          "student": "Elev",
+          "completion": "Uppgifter",
+          "lastActive": "Senast aktiv",
+          "joinStatus": "Anslutningsstatus"
+        },
+        "status": {
+          "signed_in": "Inloggad",
+          "guest": "Gäst",
+          "joined_idle": "Ansluten, ej övat"
+        },
+        "completion": "{{completed}}/{{total}}",
+        "upgrade": "Mer detaljer per elev med Teacher Pro {{price}}",
+        "never": "Aldrig"
+      },
       "exportAllClasses": {
         "button": "Exportera alla klasser",
         "downloading": "Exporterar…",

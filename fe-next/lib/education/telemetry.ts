@@ -614,6 +614,11 @@ export function trackTeacherAssignmentReportUpgradeClicked(args: { classroomId: 
   safeCapture('teacher_assignment_report_upgrade_clicked', { classroom_id: args.classroomId });
 }
 
+/** Free roster progress report on the class view — its upgrade link click. */
+export function trackTeacherRosterProgressUpgradeClicked(args: { classroomId: string }): void {
+  safeCapture('teacher_roster_progress_upgrade_clicked', { classroom_id: args.classroomId });
+}
+
 export interface EduInviteStudentsCtaArgs {
   classroomId: string;
 }
