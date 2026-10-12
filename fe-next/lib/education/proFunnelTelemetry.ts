@@ -4,10 +4,11 @@
  * Full funnel (all `$host`-visible):
  *   trial_cta_view                 client  — Polar 14-day trial CTA rendered
  *   trial_cta_tap                  client  — trial CTA tap (HQ banner or upgrade page)
- *   checkout_started               server  — Polar trial checkout session created
+ *   checkout_started               server  — Polar checkout session created (paid or trial)
  *   trial_activated                server  — Polar webhook status=trialing (teacher row upgraded)
  *   edu_pro_upgrade_clicked        client  — pricing page or dashboard *paid* CTA tap
  *   edu_pro_checkout_started       server  — /api/subscription/checkout made a paid Polar checkout
+ *   checkout_complete              server  — Polar webhook `subscription.active` not trialing
  *   edu_pro_checkout_succeeded     server  — Polar webhook `subscription.active` (authoritative)
  *   edu_pro_checkout_success_seen  client  — teacher landed back on Teacher HQ, Pro welcome shown
  *

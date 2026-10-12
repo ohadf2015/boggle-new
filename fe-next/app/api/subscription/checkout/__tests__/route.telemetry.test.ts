@@ -54,11 +54,12 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
     expect(res.status).toBe(200)
     expect(capture).toHaveBeenCalledTimes(2)
     const events = capture.mock.calls.map((c) => c[0].event)
-    expect(events).toEqual(['edu_pro_checkout_started', 'checkout_complete'])
+    expect(events).toEqual(['edu_pro_checkout_started', 'checkout_started'])
     const arg = capture.mock.calls[0][0]
     expect(arg.distinctId).toBe('u1')
     expect(arg.event).toBe('edu_pro_checkout_started')
     expect(arg.properties.$host).toBe(EDU_ANALYTICS_HOST)
+    expect(capture.mock.calls[1][0].event).toBe('checkout_started')
     expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
