@@ -65,4 +65,22 @@ describe('SurvivalClueBoxes - compact (short landscape)', () => {
     const slot = screen.getByTestId('match-target-warning-slot');
     expect(slot.className).toContain('hidden');
   });
+
+  it('drops the hard shadow when compact, in RTL as well (the RTL shadow-hard rule outranks a plain shadow-none)', () => {
+    for (const gameDir of ['ltr', 'rtl'] as const) {
+      const { unmount } = render(<SurvivalClueBoxes {...baseProps} gameDir={gameDir} compact />);
+      for (const tile of screen.getAllByText('?')) {
+        const classes = tile.className.split(/\s+/);
+        expect(classes.includes('shadow-hard') ? classes : 'no hard shadow').toBe('no hard shadow');
+      }
+      unmount();
+    }
+  });
+
+  it('the cramped variant removes the shadow with !important so it beats the RTL shadow-hard rule', () => {
+    render(<SurvivalClueBoxes {...baseProps} gameDir="rtl" />);
+    for (const tile of screen.getAllByText('?')) {
+      expect(tile.className.split(/\s+/)).toContain('cramped:shadow-none!');
+    }
+  });
 });

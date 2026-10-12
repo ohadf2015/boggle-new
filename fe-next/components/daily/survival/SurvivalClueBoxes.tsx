@@ -43,18 +43,18 @@ export interface SurvivalClueBoxesProps {
 function tileSizeClass(wordLength: number, compact?: boolean): string {
   if (compact) {
     return wordLength <= 4
-      ? 'w-7 h-7 text-xs rounded border shadow-none'
+      ? 'w-7 h-7 text-xs rounded border'
       : wordLength <= 8
-        ? 'w-6 h-6 text-[10px] rounded border shadow-none'
-        : 'w-5 h-5 text-[9px] rounded border shadow-none';
+        ? 'w-6 h-6 text-[10px] rounded border'
+        : 'w-5 h-5 text-[9px] rounded border';
   }
   return wordLength <= 4
-    ? 'w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl cramped:w-7 cramped:h-7 cramped:text-xs cramped:rounded cramped:border cramped:shadow-none'
+    ? 'shadow-hard w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl cramped:w-7 cramped:h-7 cramped:text-xs cramped:rounded cramped:border cramped:shadow-none!'
     : wordLength <= 6
-      ? 'w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg cramped:w-6 cramped:h-6 cramped:text-[10px] cramped:rounded cramped:border cramped:shadow-none'
+      ? 'shadow-hard w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg cramped:w-6 cramped:h-6 cramped:text-[10px] cramped:rounded cramped:border cramped:shadow-none!'
       : wordLength <= 8
-        ? 'w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-base cramped:w-6 cramped:h-6 cramped:text-[10px] cramped:rounded cramped:border cramped:shadow-none'
-        : 'w-7 h-7 sm:w-9 sm:h-9 text-xs sm:text-sm cramped:w-5 cramped:h-5 cramped:text-[9px] cramped:rounded cramped:border cramped:shadow-none';
+        ? 'shadow-hard w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-base cramped:w-6 cramped:h-6 cramped:text-[10px] cramped:rounded cramped:border cramped:shadow-none!'
+        : 'shadow-hard w-7 h-7 sm:w-9 sm:h-9 text-xs sm:text-sm cramped:w-5 cramped:h-5 cramped:text-[9px] cramped:rounded cramped:border cramped:shadow-none!';
 }
 
 /**
@@ -276,7 +276,7 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
               damping: 20
             }}
             className={cn(
-              "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard transition-colors duration-500",
+              "flex items-center justify-center border-2 rounded-neo font-bold transition-colors duration-500",
               sizeClass,
               letterFb.feedback === 'green' && "bg-neo-lime border-neo-black text-neo-black ring-1 ring-neo-lime/50",
               letterFb.feedback === 'yellow' && "bg-neo-yellow border-neo-black text-neo-black ring-1 ring-neo-yellow/50",
@@ -379,7 +379,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: idx * 0.03, type: "spring", stiffness: 300 }}
             className={cn(
-              "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard",
+              "flex items-center justify-center border-2 rounded-neo font-bold",
               sizeClass,
               bgClass,
               isRevealed && clueType === 'green' && "ring-1 ring-neo-lime/50",
