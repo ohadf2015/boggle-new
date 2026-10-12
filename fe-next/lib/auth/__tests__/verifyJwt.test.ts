@@ -34,6 +34,21 @@ describe('verifyJwtLocal', () => {
     expect(user).toEqual({ id: 'user-123', email: 'a@b.com', role: 'authenticated' });
   });
 
+  it.each(['https://proj.supabase.co/', 'https://proj.supabase.co//', ' https://proj.supabase.co/ '])(
+    'accepts the Supabase issuer when NEXT_PUBLIC_SUPABASE_URL is %j',
+    async (url) => {
+      const { verifyJwtLocal } = await import('../verifyJwt');
+      const previous = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      process.env.NEXT_PUBLIC_SUPABASE_URL = url;
+      try {
+        expect(await verifyJwtLocal(await makeToken({ sub: 'user-123' }))).toMatchObject({ id: 'user-123' });
+        expect(await verifyJwtLocal(await makeToken({ sub: 'user-123' }, { iss: 'https://proj.supabase.co//auth/v1' }))).toBeNull();
+      } finally {
+        process.env.NEXT_PUBLIC_SUPABASE_URL = previous;
+      }
+    },
+  );
+
   it('returns null for invalid signature', async () => {
     const { verifyJwtLocal } = await import('../verifyJwt');
     const wrongSecret = new TextEncoder().encode('wrong-secret-also-32-chars-or-more');

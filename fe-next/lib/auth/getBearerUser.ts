@@ -2,12 +2,13 @@
  * Auth helper for Bearer-token API routes (client sends
  * `Authorization: Bearer <jwt>`, no cookie session).
  *
- * Fast path: local HS256 JWT verify (sub-ms, no network) when
- * SUPABASE_JWT_SECRET is configured and the token is valid.
+ * Read-only requests (GET/HEAD not flagged `writes`): local HS256 JWT verify
+ * (sub-ms, no network) when SUPABASE_JWT_SECRET is configured and the token is
+ * valid. Writes always use remote `supabase.auth.getUser(token)`, which sees
+ * revocation — the same rule `getAuthedUser` applies to cookie sessions.
  *
- * Fallback: remote `supabase.auth.getUser(token)` — used only when local
- * verify misses (secret not provisioned, or token signed with a different
- * secret). This keeps behavior identical to the old inline `getUserFromRequest`
+ * Read fallback: remote verify when local verify misses (secret not
+ * provisioned, or token signed with a different secret). This keeps behavior identical to the old inline `getUserFromRequest`
  * helpers, so there is NO regression while the secret is absent, and NO 401
  * outage if the provisioned secret turns out not to match — the worst case
  * degrades to today's behavior, not an auth failure.
@@ -41,22 +42,25 @@ function warnSecretMissingThrottled(): void {
   );
 }
 
-export async function getBearerUser(req: Request): Promise<LocalUser | null> {
+const READ_METHODS = new Set(['GET', 'HEAD']);
+
+/** `writes`: the handler writes even on GET. Writes always verify remotely, so a revoked token can't write. */
+export async function getBearerUser(req: Request, opts: { writes?: boolean } = {}): Promise<LocalUser | null> {
   const token = bearerToken(req);
   if (!token) return null;
 
-  // Fast path: local verify, no network.
-  const local = await verifyJwtLocal(token);
-  if (local) return local;
+  if (READ_METHODS.has(req.method) && !opts.writes) {
+    const local = await verifyJwtLocal(token);
+    if (local) return local;
 
-  // Local verify missed. If the secret is entirely unset that's the systemic
-  // regression (not a per-token mismatch) — alarm it, throttled.
-  if (!process.env.SUPABASE_JWT_SECRET) {
-    warnSecretMissingThrottled();
+    // Local verify missed. If the secret is entirely unset that's the systemic
+    // regression (not a per-token mismatch) — alarm it, throttled.
+    if (!process.env.SUPABASE_JWT_SECRET) {
+      warnSecretMissingThrottled();
+    }
   }
 
-  // Fallback: remote token verify (legacy behavior). Reached when the secret is
-  // unset or the token didn't verify locally.
+  // Remote token verify: every write, and reads whose token didn't verify locally.
   const supabase = getAnonClient();
   if (!supabase) return null;
   const {

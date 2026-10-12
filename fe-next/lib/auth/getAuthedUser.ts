@@ -1,9 +1,7 @@
 /**
- * Tier-A auth helper: tries local JWT verify first (sub-ms),
- * falls back to remote `supabase.auth.getUser()` if local fails or
- * SUPABASE_JWT_SECRET is not configured.
- *
- * Use only on read-only paths. For mutations, keep `auth.getUser()` direct.
+ * Tier-A auth helper: read-only requests try local JWT verify first (sub-ms) and
+ * fall back to remote `supabase.auth.getUser()` if local fails or
+ * SUPABASE_JWT_SECRET is not configured. Writes always verify remotely.
  *
  * Migration: replace
  *   const supabase = await createClient();
@@ -49,25 +47,32 @@ async function cookieAccessToken(req: Request): Promise<string | null> {
   }
 }
 
-/** `writes`: the handler writes even on GET, so a cookie session keeps the remote (revocation-aware) check. */
+/**
+ * Local verification only for read-only requests. A write (non-GET/HEAD, or a GET
+ * flagged `writes`) always goes remote so a revoked session can't write — Bearer
+ * and cookie alike.
+ */
 export async function getAuthedUser(req: Request, opts: { writes?: boolean } = {}): Promise<LocalUser | null> {
-  if (process.env.SUPABASE_JWT_SECRET) {
-    const cookieLocal = READ_METHODS.has(req.method) && !opts.writes;
-    const token = bearerToken(req) ?? (cookieLocal ? await cookieAccessToken(req) : null);
+  const bearer = bearerToken(req);
+  const readOnly = READ_METHODS.has(req.method) && !opts.writes;
+  if (readOnly && process.env.SUPABASE_JWT_SECRET) {
+    const token = bearer ?? (await cookieAccessToken(req));
     if (token) {
       const local = await verifyJwtLocal(token);
       if (local) return local;
     }
   }
 
-  // Slow path: cookie-based session via Supabase auth helper.
   const { createClient } = await import('@/utils/supabase/server');
   const supabase = await createClient();
+  if (bearer && !readOnly) {
+    const { data: { user } } = await supabase.auth.getUser(bearer);
+    if (user) return toLocalUser(user);
+  }
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-  return {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-  };
+  return user ? toLocalUser(user) : null;
+}
+
+function toLocalUser(user: { id: string; email?: string; role?: string }): LocalUser {
+  return { id: user.id, email: user.email, role: user.role };
 }
