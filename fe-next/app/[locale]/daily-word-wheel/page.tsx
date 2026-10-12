@@ -16,7 +16,7 @@ const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 // SEO keywords per locale
 const KEYWORDS: Record<Locale, string> = {
-  en: 'daily word wheel, word wheel puzzles free online, word wheel puzzle, word wheel game free online, free daily word game, word wheel online, daily word challenge, wordle alternative daily, daily word game free, word wheel puzzle game online, free word wheel puzzle',
+  en: 'word wheel daily record, daily word wheel, word wheel puzzles free online, word wheel puzzle, word wheel game free online, free daily word game, word wheel online, daily word challenge, wordle alternative daily, daily word game free, word wheel puzzle game online, free word wheel puzzle, daily record word wheel',
   he: 'גלגל מילים יומי, פאזל מילים, משחק מילים חינם, משחק מילים יומי, אתגר מילים',
   sv: 'ordhjulet, dagligt ordhjul, ordpussel, gratis ordspel, dagligt ordspel, ordhjul online',
   ja: 'デイリーワードホイール, ワードパズル, 無料ワードゲーム, 毎日のワードゲーム',
@@ -28,9 +28,9 @@ const KEYWORDS: Record<Locale, string> = {
 const META_FALLBACK: Record<Locale, { title: string; description: string; ogTitle: string; ogDescription: string }> = {
   en: {
     title: 'Daily Word Wheel — Free Daily Puzzle | LexiClash',
-    description: 'Play the free Daily Word Wheel — find every hidden word, track your streak, rank globally. New puzzle every day. No signup, no download.',
+    description: 'The Word Wheel daily record is today\'s #1 LexiClash score (resets midnight UTC). 5-letter words score 60. Play free — see the leaderboard.',
     ogTitle: 'Daily Word Wheel Puzzle — Free Daily Challenge',
-    ogDescription: 'Spin the word wheel, find all hidden words. New free puzzle every day — streak tracking, global leaderboard!',
+    ogDescription: 'The Word Wheel daily record is today\'s top score. Scoring: 3-letter=12, 5-letter=60. Play free, then open the global leaderboard.',
   },
   he: {
     title: 'גלגל מילים יומי — פאזל מילים חינם אונליין | LexiClash',
@@ -140,6 +140,14 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
   const t = await loadTranslation(validLocale as Language) as Record<string, unknown>;
   const resolve = (key: string, fallback: string) => getNestedValue(t, key) || fallback;
   const faqItems = getNestedArray(t, 'dailyWordWheelLanding.faq.items');
+  const geoFaq = {
+    q: 'word wheel daily record',
+    a: "The Word Wheel daily record on LexiClash is the #1 score on today's shared puzzle. It resets every day at midnight UTC. Scores add per valid word that includes the center letter: 3 letters = 12 points, 4 = 30, 5 = 60, 6 = 96, 7 = 144, 8 = 210, 9+ = 300. Example: BLEND (5 letters) scores 60 points; CAT + CARE + CRATE scores 12+30+60=102. See today's record on the global leaderboard at https://www.lexiclash.live/en/leaderboard after you play, or tap View world record on this page.",
+  };
+  const faqWithGeo =
+    validLocale === 'en' && !faqItems.some((item) => item.q === geoFaq.q)
+      ? [geoFaq, ...faqItems]
+      : faqItems;
 
   const steps = [
     { step: '1', title: resolve('dailyWordWheelLanding.steps.1.title', 'New puzzle daily'), desc: resolve('dailyWordWheelLanding.steps.1.desc', 'A fresh wheel of letters appears every day at midnight UTC.') },
@@ -153,7 +161,7 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
     {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
-      mainEntity: faqItems.map((faq) => ({
+      mainEntity: faqWithGeo.map((faq) => ({
         '@type': 'Question',
         name: faq.q,
         acceptedAnswer: { '@type': 'Answer', text: faq.a },
@@ -175,7 +183,7 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
       name: 'LexiClash Daily Word Wheel',
-      url: `${BASE_URL}/${validLocale}/daily/word-wheel`,
+      url: `${BASE_URL}/${validLocale}/daily-word-wheel`,
       applicationCategory: 'GameApplication',
       operatingSystem: 'Any',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -208,14 +216,14 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
         hero={{
           title: resolve('dailyWordWheelLanding.hero.title', 'Daily Word Wheel'),
           subtitle: resolve('dailyWordWheelLanding.hero.subtitle', 'Free Daily Word Puzzle'),
-          description: resolve('dailyWordWheelLanding.hero.description', "LexiClash's Daily Word Wheel is a free daily word puzzle: spin the wheel, find every word containing today's center letter."),
+          description: resolve('dailyWordWheelLanding.hero.description', "The Word Wheel daily record is the top score on today's LexiClash puzzle — the same wheel for every player, reset at midnight UTC. See it on the global leaderboard (View world record). How it's computed: each valid word that uses the center letter scores by length — 3 letters 12 points, 4=30, 5=60, 6=96, 7=144, 8=210, 9+=300. Example: BLEND is 60 points; CAT + CARE + CRATE is 12+30+60=102. Play free in the browser."),
           cta: resolve('dailyWordWheelLanding.hero.cta', "Play Today's Word Wheel"),
           leaderboard: resolve('dailyWordWheelLanding.hero.leaderboard', 'View World Record'),
         }}
         steps={steps}
         stepsHeading={resolve('dailyWordWheelLanding.steps.heading', 'How the Daily Word Wheel Works')}
         faqHeading={resolve('dailyWordWheelLanding.faq.heading', 'Frequently Asked Questions')}
-        faqItems={faqItems}
+        faqItems={faqWithGeo}
         finalCta={{
           heading: resolve('dailyWordWheelLanding.finalCta.heading', "Play Today's Puzzle"),
           description: resolve('dailyWordWheelLanding.finalCta.description', 'The Daily Word Wheel resets every day.'),

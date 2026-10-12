@@ -23,4 +23,13 @@ describe('/daily-word-wheel metadata', () => {
     expect(String(meta.title)).toContain('LexiClash');
     expect(String(meta.description).length).toBeGreaterThan(50);
   });
+
+  it('en snippet answers word wheel daily record intent', async () => {
+    const meta = await metaFor('en');
+    const description = String(meta.description);
+    expect(description.toLowerCase()).toContain('daily record');
+    expect(description).toMatch(/60/);
+    expect(description.length).toBeLessThanOrEqual(155);
+    expect(String(meta.keywords)).toContain('word wheel daily record');
+  });
 });
