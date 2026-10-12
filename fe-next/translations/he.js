@@ -50,7 +50,19 @@ const he = {
       "replay": "צפו שוב",
       "found": "נמצא: {word}",
       "timeLeft": "נשארו {count} שניות",
-      "wordsFound": "נמצאו {count} מילים"
+      "wordsFound": "{count} / {total} מילים נמצאו",
+      "wordsFoundOne": "{count} / {total} מילה נמצאה",
+      "wordsFoundFew": "{count} / {total} מילים נמצאו"
+    },
+    "projector": {
+      "joinLabel": "קוד הצטרפות",
+      "srOnly": "התלמידים מצטרפים עם הקוד {code}. לוח התוצאות החי מדרג את כולם בזמן המשחק.",
+      "you": "אני",
+      "players": {
+        "maya": "מאיה",
+        "dani": "דני",
+        "noa": "נועה"
+      }
     },
     "resources": {
       "heading": "גלו מצבי לימוד",

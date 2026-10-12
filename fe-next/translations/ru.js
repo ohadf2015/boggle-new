@@ -50,7 +50,19 @@ const ru = {
       "replay": "Смотреть снова",
       "found": "Найдено: {word}",
       "timeLeft": "Осталось {count} с",
-      "wordsFound": "Найдено слов: {count}"
+      "wordsFound": "{count} / {total} слов найдено",
+      "wordsFoundOne": "{count} / {total} слово найдено",
+      "wordsFoundFew": "{count} / {total} слова найдено"
+    },
+    "projector": {
+      "joinLabel": "Код входа",
+      "srOnly": "Ученики входят по коду {code}. Живая таблица лидеров ранжирует всех во время игры.",
+      "you": "Вы",
+      "players": {
+        "maya": "Майя",
+        "dani": "Дани",
+        "noa": "Ноа"
+      }
     },
     "resources": {
       "heading": "Режимы для обучения",

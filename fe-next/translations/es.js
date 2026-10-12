@@ -50,7 +50,19 @@ const es = {
       "replay": "Ver otra vez",
       "found": "Encontrada: {word}",
       "timeLeft": "Quedan {count} s",
-      "wordsFound": "{count} palabras encontradas"
+      "wordsFound": "{count} / {total} palabras encontradas",
+      "wordsFoundOne": "{count} / {total} palabra encontrada",
+      "wordsFoundFew": "{count} / {total} palabras encontradas"
+    },
+    "projector": {
+      "joinLabel": "Código",
+      "srOnly": "Los alumnos se unen con el código {code}. La clasificación en vivo ordena a todos mientras juegan.",
+      "you": "Tú",
+      "players": {
+        "maya": "Lucía",
+        "dani": "Diego",
+        "noa": "Sofía"
+      }
     },
     "resources": {
       "heading": "Explora los modos educativos",

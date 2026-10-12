@@ -36,6 +36,8 @@ const LANDING_SOURCES = [
   'app/[locale]/education/PageClient.tsx',
   'components/education/EducationHero.tsx',
   'components/education/EducationLandingDemo.tsx',
+  'components/education/EducationLandingProjector.tsx',
+  'lib/education/landingDemo.ts',
   'components/education/ProFramingSection.tsx',
 ];
 
@@ -68,6 +70,12 @@ describe('education landing (p6)', () => {
     expect(src.match(/data-testid="education-hero-pro-cta"/g)).toHaveLength(1);
     expect(src).not.toMatch(/education-hero-join-cta/);
     expect(src).not.toMatch(/education-hero-secondary-cta/);
+  });
+
+  it('hero carries no absolutely positioned mascot over the board or its counter', () => {
+    const src = read('components/education/EducationHero.tsx');
+    expect(src).not.toMatch(/absolute bottom-10/);
+    expect(src).not.toMatch(/insetInlineStart: 'calc\(50%/);
   });
 
   it('pro card names the live-room cap from the shared constant, not a claimed unlimited roster', () => {

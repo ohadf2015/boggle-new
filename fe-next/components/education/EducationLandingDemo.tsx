@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { demoBoard, isAdjacent, isTargetWord, wordFromPath, type CefrLevel } from '@/lib/education/eslCefrDemo';
-import { nextHintPath } from '@/lib/education/landingDemo';
+import { nextHintPath, wordsFoundKey } from '@/lib/education/landingDemo';
+import { EducationLandingProjector } from './EducationLandingProjector';
 
 const LEVEL: CefrLevel = 'A1';
 const STEP_MS = 240;
@@ -17,7 +18,7 @@ const reducedMotion = () =>
  * board and adjacency rules as the ESL demo; no network calls.
  */
 export function EducationLandingDemo() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { letters, targets } = demoBoard(LEVEL);
   const cols = Math.round(Math.sqrt(letters.length));
   const [path, setPath] = useState<number[]>([]);
@@ -91,12 +92,13 @@ export function EducationLandingDemo() {
       aria-label={t('eg6Land.demo.label')}
       className="rounded-neo border-neo-thick border-neo-cream/60 bg-neo-navy-light p-4 shadow-hard-lg sm:p-5"
     >
-      <p aria-live="polite" className="font-neo-display text-sm font-black uppercase tracking-wider text-neo-lime">
+      <EducationLandingProjector youScore={found.length} />
+      <p aria-live="polite" className="mt-4 font-neo-display text-sm font-black uppercase tracking-wider text-neo-lime">
         {watching ? t('eg6Land.demo.watching') : t('eg6Land.demo.yourTurn')}
       </p>
       <div
         dir="ltr"
-        className="mt-4 grid gap-2"
+        className="mx-auto mt-3 grid max-w-xs gap-2"
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
         {letters.map((ch, i) => {
@@ -134,9 +136,10 @@ export function EducationLandingDemo() {
       </div>
       <div className="mt-4 flex items-center justify-between gap-3">
         <p className="text-sm font-bold text-neo-cream/80">
-          {t('eg6Land.demo.wordsFound', undefined, { count: String(found.length) })}
-          {' / '}
-          {targets.length}
+          {t(wordsFoundKey(found.length, language), undefined, {
+            count: String(found.length),
+            total: String(targets.length),
+          })}
         </p>
         <button
           type="button"

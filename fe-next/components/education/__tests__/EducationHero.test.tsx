@@ -86,22 +86,6 @@ describe('EducationHero', () => {
     expect(pro.className).not.toMatch(/animate-pulse/);
   });
 
-  it('renders the animated scholar mascot so the hero has real motion, not a still', () => {
-    render(<EducationHero />);
-    const mascot = Array.from(document.querySelectorAll('img')).find((img) =>
-      (img.getAttribute('src') ?? '').includes('scholar'),
-    );
-    expect(mascot).toBeTruthy();
-  });
-
-  it('keeps the mascot decorative — hidden from assistive tech, copy carries the meaning', () => {
-    render(<EducationHero />);
-    const mascot = Array.from(document.querySelectorAll('img')).find((img) =>
-      (img.getAttribute('src') ?? '').includes('scholar'),
-    );
-    expect(mascot?.closest('[aria-hidden="true"]')).toBeTruthy();
-  });
-
   it('never sends the free CTA through the /teacher gate, so no ?from= bounce notice', () => {
     render(<EducationHero />);
     const href = screen.getByTestId('education-hero-free-cta').getAttribute('href') ?? '';
@@ -114,15 +98,5 @@ describe('EducationHero', () => {
     const free = screen.getByTestId('education-hero-free-cta');
     expect(free).toHaveAttribute('href', '/en/education/access');
     expect(free).toHaveTextContent('eg2Land.hero.ctaFinishSetup');
-  });
-
-  it('hangs the mascot off the outer edge of the board, clear of its controls', () => {
-    render(<EducationHero />);
-    const mascot = Array.from(document.querySelectorAll('img')).find((img) =>
-      (img.getAttribute('src') ?? '').includes('scholar'),
-    );
-    const wrap = mascot?.closest('[aria-hidden="true"]') as HTMLElement;
-    expect(wrap.className).not.toMatch(/-bottom-/);
-    expect(wrap.style.insetInlineStart).toMatch(/- 5\.5rem/);
   });
 });

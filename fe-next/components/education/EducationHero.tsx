@@ -6,7 +6,6 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { locales } from '@/lib/i18n';
-import Mascot from '@/components/ui/Mascot';
 import { TEACHER_PRO_CHECKOUT_PATH, teacherProCheckoutCtaLabel } from './TeacherProCheckoutCta';
 
 // Derived from the shipped locales so the "built for N languages" line can't go stale.
@@ -18,7 +17,7 @@ const EducationLandingDemo = dynamic(
   () => import('./EducationLandingDemo').then((m) => m.EducationLandingDemo),
   {
     ssr: false,
-    loading: () => <div aria-hidden className="min-h-[22rem] rounded-neo border-neo-thick border-neo-cream/60 bg-neo-navy-light" />,
+    loading: () => <div aria-hidden className="min-h-[52rem] rounded-neo border-neo-thick border-neo-cream/60 bg-neo-navy-light" />,
   },
 );
 
@@ -73,13 +72,6 @@ export function EducationHero({ setupPending = false }: { setupPending?: boolean
             unprefixed `order-first` would hoist it above the h1 on every viewport under lg. */}
         <div data-hero-item className="relative">
           <EducationLandingDemo />
-          <div
-            aria-hidden
-            style={{ insetInlineStart: 'calc(50% - 14rem - 5.5rem)' }}
-            className="pointer-events-none absolute bottom-10 hidden sm:block"
-          >
-            <Mascot variant="scholar" size="xs" clipShape="circle" clipBorder="lime" />
-          </div>
         </div>
       </div>
     </section>

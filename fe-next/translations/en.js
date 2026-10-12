@@ -50,7 +50,19 @@ const en = {
       "replay": "Watch again",
       "found": "Found: {word}",
       "timeLeft": "{count}s left",
-      "wordsFound": "{count} words found"
+      "wordsFound": "{count} / {total} words found",
+      "wordsFoundOne": "{count} / {total} word found",
+      "wordsFoundFew": "{count} / {total} words found"
+    },
+    "projector": {
+      "joinLabel": "Join code",
+      "srOnly": "Students join with the code {code}. The live leaderboard ranks everyone as they play.",
+      "you": "You",
+      "players": {
+        "maya": "Maya",
+        "dani": "Dani",
+        "noa": "Noa"
+      }
     },
     "resources": {
       "heading": "Explore Education Modes",

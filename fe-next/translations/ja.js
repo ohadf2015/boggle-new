@@ -50,7 +50,19 @@ const ja = {
       "replay": "もう一度見る",
       "found": "見つけた：{word}",
       "timeLeft": "残り{count}秒",
-      "wordsFound": "{count}語見つけました"
+      "wordsFound": "{count} / {total} 語見つけた",
+      "wordsFoundOne": "{count} / {total} 語見つけた",
+      "wordsFoundFew": "{count} / {total} 語見つけた"
+    },
+    "projector": {
+      "joinLabel": "参加コード",
+      "srOnly": "生徒はコード {code} で参加します。ライブのランキングが、プレイ中の全員を順位づけします。",
+      "you": "あなた",
+      "players": {
+        "maya": "マヤ",
+        "dani": "ダニ",
+        "noa": "ノア"
+      }
     },
     "resources": {
       "heading": "教育モードを探索",

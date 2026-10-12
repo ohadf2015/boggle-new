@@ -50,7 +50,19 @@ const sv = {
       "replay": "Titta igen",
       "found": "Hittat: {word}",
       "timeLeft": "{count} s kvar",
-      "wordsFound": "{count} ord hittade"
+      "wordsFound": "{count} / {total} ord hittade",
+      "wordsFoundOne": "{count} / {total} ord hittat",
+      "wordsFoundFew": "{count} / {total} ord hittade"
+    },
+    "projector": {
+      "joinLabel": "Anslutningskod",
+      "srOnly": "Eleverna ansluter med koden {code}. Ledartavlan i realtid rankar alla medan de spelar.",
+      "you": "Du",
+      "players": {
+        "maya": "Maja",
+        "dani": "Erik",
+        "noa": "Lina"
+      }
     },
     "resources": {
       "heading": "Utforska utbildningslägen",
