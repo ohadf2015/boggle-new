@@ -66,11 +66,11 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
   },
 ];
 
-/** Modes a given viewer may see — admins see all; everyone else sees public ones. */
 export function requiredDailyModes(modes: readonly DailyModeDef[]): DailyModeDef[] {
   return modes.filter((mode) => !mode.optional);
 }
 
+/** Modes a given viewer may see — admins see all; everyone else sees public ones. */
 export function visibleDailyModes(isAdmin: boolean): DailyModeDef[] {
   return DAILY_MODES.filter((mode) => isAdmin || !mode.adminOnly);
 }
