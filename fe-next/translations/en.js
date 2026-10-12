@@ -2762,10 +2762,10 @@ const en = {
       "ogDescription": "Free word tools — solver, anagram finder, and vocabulary builder."
     },
     "dailyWordWheel": {
-      "title": "Daily Word Wheel — Free Puzzle Like Wordle, But Better | LexiClash",
-      "description": "New letter wheel every day — find every word, beat the timer. Share results, climb the global leaderboard, build your streak. Free, no signup. Play today →",
-      "ogTitle": "Today's Word Wheel — Find Every Word",
-      "ogDescription": "Spin the daily wheel, race the clock, share your streak. Free puzzle, new every day."
+      "title": "Daily Word Wheel — Free Daily Puzzle | LexiClash",
+      "description": "The Word Wheel daily record is today's #1 LexiClash score (resets midnight UTC). 5-letter words score 60. Play free — see the leaderboard.",
+      "ogTitle": "Today's Word Wheel — Daily Record & Free Puzzle",
+      "ogDescription": "The Word Wheel daily record is today's top score. Scoring: 3-letter=12, 5-letter=60. Play free, then open the global leaderboard."
     },
     "playerProfile": {
       "title": "Player Profile & Game Stats | LexiClash",
@@ -8761,7 +8761,7 @@ const en = {
     "hero": {
       "title": "Daily Word Wheel",
       "subtitle": "Free Daily Word Puzzle",
-      "description": "LexiClash's Daily Word Wheel is a free daily word puzzle: spin the wheel, find every word containing today's center letter. New puzzle every day, streak tracking, global leaderboard, no download.",
+      "description": "The Word Wheel daily record is the top score on today's LexiClash puzzle — the same wheel for every player, reset at midnight UTC. See it on the global leaderboard (View world record). How it's computed: each valid word that uses the center letter scores by length — 3 letters 12 points, 4=30, 5=60, 6=96, 7=144, 8=210, 9+=300. Example: BLEND is 60 points; CAT + CARE + CRATE is 12+30+60=102. Play free in the browser.",
       "cta": "Play today's Word Wheel",
       "leaderboard": "View world record"
     },
@@ -8787,6 +8787,14 @@ const en = {
     "faq": {
       "heading": "Frequently Asked Questions",
       "items": [
+        {
+          "q": "word wheel daily record",
+          "a": "The Word Wheel daily record on LexiClash is the #1 score on today's shared puzzle. It resets every day at midnight UTC. Scores add per valid word that includes the center letter: 3 letters = 12 points, 4 = 30, 5 = 60, 6 = 96, 7 = 144, 8 = 210, 9+ = 300. Example: BLEND (5 letters) scores 60 points; CAT + CARE + CRATE scores 12+30+60=102. See today's record on the global leaderboard at https://www.lexiclash.live/en/leaderboard after you play, or tap View world record on this page."
+        },
+        {
+          "q": "Is this the Daily Record Word Wheel?",
+          "a": "No. LexiClash is an independent free Daily Word Wheel — not affiliated with the Daily Record newspaper. If you searched “word wheel daily record”, the daily record here is our global #1 score for today's shared puzzle (example: a 5-letter word like BLEND scores 60 points). Play in the browser at https://www.lexiclash.live/en/daily-word-wheel."
+        },
         {
           "q": "What is the Daily Word Wheel?",
           "a": "The Daily Word Wheel is a free daily word puzzle on LexiClash. Every day at midnight UTC, a new wheel of letters appears. Your goal is to find as many words as possible using those letters. Everyone worldwide plays the same puzzle."
