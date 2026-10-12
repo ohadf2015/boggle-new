@@ -94,12 +94,9 @@ describe('ResultsMainContent — results_viewed instrumentation', () => {
     );
   });
 
-  it('still fires mp_results_viewed for multiplayer (does not regress)', () => {
+  it('leaves mp_results_viewed to MpResultsStage, which every MP viewer mounts', () => {
     render(<ResultsMainContent {...baseProps} gameMode="classic" />);
-    expect(trackGrowthEvent).toHaveBeenCalledWith(
-      'mp_results_viewed',
-      expect.objectContaining({ gameMode: 'classic' }),
-    );
+    expect(trackGrowthEvent).not.toHaveBeenCalledWith('mp_results_viewed', expect.anything());
   });
 
   it('uses mode unknown and score 0 when props are missing', () => {

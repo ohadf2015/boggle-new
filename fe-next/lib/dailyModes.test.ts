@@ -153,7 +153,7 @@ describe('pickNextUnplayedMode', () => {
       wordTower: false,
       connections: false,
     };
-    expect(pickNextUnplayedMode(state, 'word-wheel')).toBe('word-tower');
+    expect(pickNextUnplayedMode(state, 'word-wheel')).toBe('connections');
   });
 
   describe('follows the chain from the mode just finished', () => {
@@ -164,12 +164,12 @@ describe('pickNextUnplayedMode', () => {
       connections: false,
     };
 
-    it('Word Wheel points at Word Tower even when Word Hunt is unplayed', () => {
-      expect(pickNextUnplayedMode(allNew, 'word-wheel')).toBe('word-tower');
+    it('Word Wheel points at Connections even when Word Hunt is unplayed', () => {
+      expect(pickNextUnplayedMode(allNew, 'word-wheel')).toBe('connections');
     });
 
-    it('Word Tower points at Connections even when Word Hunt/Wheel are unplayed', () => {
-      expect(pickNextUnplayedMode(allNew, 'word-tower')).toBe('connections');
+    it('Connections points at the optional Word Tower even when Word Hunt/Wheel are unplayed', () => {
+      expect(pickNextUnplayedMode(allNew, 'connections')).toBe('word-tower');
     });
 
     it('wraps around to earlier modes once the later ones are played', () => {
