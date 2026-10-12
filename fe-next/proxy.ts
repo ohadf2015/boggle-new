@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { matchAcceptLanguage } from './lib/localeResolution';
 import { isHiddenQaRoute } from './lib/qaRoutes';
+import { decideNextHandle } from './lib/seo/nextHandleGate';
 
 const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 const DEFAULT_LOCALE = 'en';
@@ -43,6 +44,13 @@ export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   if (PROBE_RE.test(pathname)) {
+    return new NextResponse(null, { status: 404 });
+  }
+
+  // Unknown slugs must not be rewritten into /{locale}/… (that SSRs the
+  // 718-line locale layout per scanner URL — idle old-space leak, t_f5eb034e).
+  const gate = decideNextHandle(pathname, request.headers.get('user-agent'));
+  if (gate.action === 'drop') {
     return new NextResponse(null, { status: 404 });
   }
 

@@ -40,7 +40,8 @@ import { withBootTimeout } from './bootTimeout';
 import { sendOpsAlert } from '../backend/modules/notificationService';
 import { startMemoryWatchdog } from '../backend/modules/memoryWatchdog';
 import { formatMemwatchCounts } from '../backend/modules/memoryWatchdogCounts';
-import { noteNextHandle } from '../backend/modules/nextHandleStats';
+import { noteNextHandle, noteNextHandleDrop } from '../backend/modules/nextHandleStats';
+import { decideNextHandle } from '../lib/seo/nextHandleGate';
 import { registerActiveGamesProvider } from '../backend/modules/scoreManager';
 import { getAllGameCodes } from '../backend/modules/gameStateManager';
 
@@ -223,6 +224,17 @@ async function start(): Promise<void> {
       // the Android WebView — device-verified 2026-09-03). See
       // server/offlineShellCache.ts for the safety invariants.
       applyOfflineShellCacheHeader(req, res, pathname ?? '');
+
+      // Drop scanner / unknown-segment URLs before Next handle() — proxy.ts
+      // used to rewrite them into /{locale}/… which SSRs the locale layout
+      // and is the idle old-space leak (t_f5eb034e). Count drops separately
+      // so MEMWATCH can see the gate working.
+      const gate = decideNextHandle(pathname ?? '', req.headers['user-agent']);
+      if (gate.action === 'drop') {
+        noteNextHandleDrop(gate.reason);
+        res.status(404).end();
+        return;
+      }
 
       // Next 16.2 self-host leaks (router LRU / RSC abort / fetch tee) grow
       // with handle() traffic even when games=0. Count hits vs unique paths
