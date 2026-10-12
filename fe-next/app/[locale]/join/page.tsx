@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { redirect } from 'next/navigation';
+import { autoJoinSignedInStudent } from '@/lib/education/runSignedInJoin';
 import { JoinCodePageClient } from './PageClient';
 
 const META: Record<string, { title: string; description: string }> = {
@@ -19,11 +21,29 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return { title: m.title, description: m.description, robots: { index: false, follow: true } };
 }
 
-export default function Page() {
-  // `useSearchParams` (for `?code=`) needs a Suspense boundary or `next build`
-  // refuses to prerender this route. The fallback is the page's own navy, not
-  // a spinner: the client component mounts in the same frame, and flashing a
-  // loader in front of a student holding a code is the thing we are removing.
+export const dynamic = 'force-dynamic';
+
+function firstParam(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) return value[0] ?? '';
+  return value ?? '';
+}
+
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  // `?code=` / `?pin=` is how the projector share sheet arrives. A signed-in
+  // student is enrolled before the form paints; a guest still sees the form.
+  // `useSearchParams` needs a Suspense boundary or `next build` refuses to
+  // prerender this route. The fallback is the page's own navy, not a spinner.
+  const { locale } = await params;
+  const query = await searchParams;
+  const code = firstParam(query.code) || firstParam(query.pin);
+  const href = await autoJoinSignedInStudent(locale, code);
+  if (href) redirect(href);
   return (
     <Suspense fallback={<div className="min-h-dvh bg-neo-navy" />}>
       <JoinCodePageClient />

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { autoJoinSignedInStudent } from '@/lib/education/runSignedInJoin';
 import JoinWithCodePageClient from './PageClient';
 
 const BASE_URL = 'https://www.lexiclash.live';
@@ -83,6 +85,19 @@ export async function generateMetadata({
 
 export const dynamic = 'force-dynamic';
 
-export default function JoinWithCodePage() {
+/**
+ * A signed-in student already has an account. Enrol them here, before the
+ * form paints, and send them to the assignment (or the live room). Rendering
+ * the form only prefills the code and drops them on the bare student hub.
+ * A guest still gets the form — they have to choose a name first.
+ */
+export default async function JoinWithCodePage({
+  params,
+}: {
+  params: Promise<{ locale: string; code: string }>;
+}) {
+  const { locale, code } = await params;
+  const href = await autoJoinSignedInStudent(locale, code);
+  if (href) redirect(href);
   return <JoinWithCodePageClient />;
 }
