@@ -61,6 +61,11 @@ html.lexi-native [data-selectable] {
    scoped to small phones only, without it leaking onto short desktops. Tailwind
    v4 does not emit a stacked `max-sm:short:` utility, so we name the combo. */
 @custom-variant phone-short (@media (max-width: 639px) and (max-height: 600px));
+/* Short landscape, or a phone/tablet too short to fit a full-width board under full-size chrome. */
+@custom-variant cramped {
+  @media (max-height: 560px) { @slot; }
+  @media (max-width: 1023px) and (max-height: 860px) { @slot; }
+}
 /* TV / party screen (MP shell): every size token scales by 1.5 via --mp-u. */
 @custom-variant tv (@media (min-width: 1800px) and (min-height: 1000px));
 /* The desktop game shell (components/game/shell/gameShell.module.css). */

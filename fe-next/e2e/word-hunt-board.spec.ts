@@ -318,3 +318,79 @@ test.describe('Word Hunt board, desktop', () => {
     await expect(page.getByTestId('grid-doubleclick-submit-hint')).toBeVisible();
   });
 });
+
+async function boardMetrics(page: Page) {
+  return page.evaluate(() => {
+    const grid = document.querySelector('[role=grid]')!;
+    const cells = [...document.querySelectorAll<HTMLElement>('[role=gridcell][data-letter]')];
+    const glyph = document.querySelector('[role=grid] [aria-hidden] span span');
+    const tile = cells[0].getBoundingClientRect();
+    const box = grid.getBoundingClientRect();
+    return {
+      tile: tile.width,
+      font: glyph ? parseFloat(getComputedStyle(glyph).fontSize) : 0,
+      bottom: box.bottom,
+      viewport: window.innerHeight,
+      touchAction: getComputedStyle(grid).touchAction,
+    };
+  });
+}
+
+async function touchSwipe(page: Page, cells: Array<[number, number]>) {
+  const cdp = await page.context().newCDPSession(page);
+  const pts = [];
+  for (const [r, c] of cells) pts.push(await centreOf(page, r, c));
+  const touch = (p: { x: number; y: number }) => [{ x: p.x, y: p.y, id: 1, radiusX: 10, radiusY: 10, force: 1 }];
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: touch(pts[0]) });
+  for (let i = 1; i < pts.length; i++) {
+    for (let s = 1; s <= 5; s++) {
+      const p = { x: pts[i - 1].x + ((pts[i].x - pts[i - 1].x) * s) / 5, y: pts[i - 1].y + ((pts[i].y - pts[i - 1].y) * s) / 5 };
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: touch(p) });
+    }
+  }
+  return {
+    selected: () => page.$$eval(`${CELLS}[data-state="sel"]`, (els) => els.map((e) => `${(e as HTMLElement).dataset.row},${(e as HTMLElement).dataset.col}`).sort()),
+    release: () => cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }),
+  };
+}
+
+for (const phone of [
+  { name: 'phone', width: 390, height: 844, minTile: 55 },
+  { name: 'short phone', width: 375, height: 667, minTile: 44 },
+]) {
+  test.describe(`Word Hunt board, ${phone.name} ${phone.width}x${phone.height}`, () => {
+    test.use({ viewport: { width: phone.width, height: phone.height }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+
+    test('tiles are finger-sized, letters scale with them, and the whole board is on screen', async ({ page }) => {
+      await startGame(page);
+      const m = await boardMetrics(page);
+      expect(m.tile).toBeGreaterThanOrEqual(phone.minTile);
+      expect(m.font / m.tile).toBeGreaterThanOrEqual(0.5);
+      expect(m.bottom).toBeLessThanOrEqual(m.viewport);
+      expect(m.touchAction).toBe('none');
+    });
+
+    test('a touch swipe selects exactly the tiles under a diagonal path, never pans, and submits once on release', async ({ page }) => {
+      await startGame(page);
+      await page.evaluate(() => {
+        const w = window as unknown as { __pending: number };
+        w.__pending = 0;
+        const stage = document.querySelector('[data-testid="hunt-stage"]')!;
+        let last = stage.getAttribute('data-phase');
+        new MutationObserver(() => {
+          const p = stage.getAttribute('data-phase');
+          if (p === 'pending' && last !== 'pending') w.__pending++;
+          last = p;
+        }).observe(stage, { attributes: true, attributeFilter: ['data-phase'] });
+      });
+      const scrollBefore = await page.evaluate(() => [window.scrollY, document.querySelector('.overflow-y-auto')?.scrollTop ?? 0]);
+      const swipe = await touchSwipe(page, [[0, 0], [1, 1], [2, 2], [2, 3]]);
+      expect(await swipe.selected()).toEqual(['0,0', '1,1', '2,2', '2,3']);
+      await swipe.release();
+      await expectVerdict(page, /^(good|bad|dupe)$/);
+      expect(await page.evaluate(() => (window as unknown as { __pending: number }).__pending)).toBe(1);
+      expect(await page.evaluate(() => [window.scrollY, document.querySelector('.overflow-y-auto')?.scrollTop ?? 0])).toEqual(scrollBefore);
+      await expect(page.locator(`${CELLS}[data-state="sel"]`)).toHaveCount(0);
+    });
+  });
+}

@@ -436,15 +436,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
       )}
 
-      <div className="relative flex-1 min-h-[320px] [container-type:size] [--hunt-stage-h:104px] [@media(min-width:1024px)_and_(min-height:600px)_and_(max-height:799px)]:[--hunt-stage-h:86px] [@media(min-width:1024px)_and_(min-height:800px)]:[--hunt-stage-h:114px]">
+      <div className="relative flex-1 min-h-[220px] flex flex-col">
         <span id={fx.rewardId} className="absolute left-1/2 top-8 pointer-events-none" />
         {celebration}
-        <div className="mx-auto w-[min(100cqw,calc(100cqh-var(--hunt-stage-h)))]">
-          <HuntPlayfield {...playfieldProps} size={inShell ? 'desktop' : 'phone'} />
-        </div>
+        <HuntPlayfield {...playfieldProps} size={inShell ? 'desktop' : 'phone'} />
       </div>
 
-      <div className="shrink-0 min-h-[64px] pt-2 shell:hidden" data-testid="wordhunt-discovered-words-slot">
+      <div className="shrink-0 min-h-[64px] pt-1 shell:hidden" data-testid="wordhunt-discovered-words-slot">
         {state.discoveredWords.length > 0 && <DiscoveredWordsList words={state.discoveredWords} t={t} />}
       </div>
 

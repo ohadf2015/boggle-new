@@ -57,7 +57,7 @@ export function HuntPlayfield({
   const coins = reward && reward.tokensGained > 0 ? reward.tokensGained : null;
 
   return (
-    <div className="flex w-full flex-col items-center">
+    <div className="flex w-full flex-1 min-h-0 flex-col items-center">
       <HuntWordStage
         phase={phase}
         word={word}
@@ -69,21 +69,25 @@ export function HuntPlayfield({
         size={size}
         t={t as (key: string, params?: Record<string, string | number>) => string}
       />
-      <HuntBoard
-        grid={grid}
-        interactive={!isGameOver}
-        eliminatedLetters={eliminatedLetters}
-        onWordSubmit={onWordSubmit}
-        onWordChange={onWordChange}
-        onLive={onLive}
-        onRelease={onRelease}
-        phase={stage.phase}
-        verdict={stage.verdict}
-        heldPath={stage.path}
-        calm={calm}
-        size={size}
-        t={t as (key: string, fallback?: string) => string}
-      />
+      <div data-testid="hunt-board-box" className="w-full flex-1 min-h-0 [container-type:size]">
+        <div className="mx-auto w-[min(100cqw,100cqh)]">
+          <HuntBoard
+            grid={grid}
+            interactive={!isGameOver}
+            eliminatedLetters={eliminatedLetters}
+            onWordSubmit={onWordSubmit}
+            onWordChange={onWordChange}
+            onLive={onLive}
+            onRelease={onRelease}
+            phase={stage.phase}
+            verdict={stage.verdict}
+            heldPath={stage.path}
+            calm={calm}
+            size={size}
+            t={t as (key: string, fallback?: string) => string}
+          />
+        </div>
+      </div>
     </div>
   );
 }

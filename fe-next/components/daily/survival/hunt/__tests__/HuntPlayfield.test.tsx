@@ -30,6 +30,15 @@ function field(stage: HuntStageState, extra: Partial<React.ComponentProps<typeof
 }
 
 describe('HuntPlayfield', () => {
+  it('squares the board inside the room left under the word stage, so the stage never has to be guessed', () => {
+    field(initialHuntStage);
+    const box = screen.getByTestId('hunt-board-box');
+    expect(box.className).toContain('[container-type:size]');
+    expect(box.contains(screen.getByRole('grid'))).toBe(true);
+    expect(box.contains(screen.getByTestId('hunt-stage'))).toBe(false);
+    expect((box.firstElementChild as HTMLElement).className).toContain('w-[min(100cqw,100cqh)]');
+  });
+
   it('pays the life won by the released word once, on the stage only', () => {
     field(
       { phase: 'verdict', verdict: 'good', word: 'CAT', path, releaseSeq: 0 },
