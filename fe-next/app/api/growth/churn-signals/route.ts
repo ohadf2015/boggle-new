@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { getBearerUser } from '@/lib/auth/getBearerUser';
+import { withTimeout } from '@/lib/server/routeTimeout';
 
 function getSupabaseAdmin() {
   return createAdminClient()!;
@@ -23,6 +24,9 @@ const SIGNAL_WEIGHTS = {
   notification_dismissals: 15, // more than DISMISSAL_THRESHOLD dismissals
   no_social_interactions: 20, // zero social interactions
 } as const;
+
+// Past this Railway's proxy 502s the request; dropping one beacon is cheaper.
+const AUTH_VERIFY_TIMEOUT_MS = 1500;
 
 const SHORT_SESSION_SECONDS = 60;
 const LOW_GAMES = 1;
@@ -66,7 +70,18 @@ function num(value: unknown): number {
  */
 export async function POST(req: NextRequest) {
   try {
-    const user = await getBearerUser(req);
+    let authTimedOut = false;
+    let user;
+    try {
+      user = await withTimeout(getBearerUser(req), AUTH_VERIFY_TIMEOUT_MS, () => {
+        authTimedOut = true;
+      });
+    } catch (err) {
+      if (authTimedOut) {
+        return NextResponse.json({ skipped: 'auth-timeout' }, { status: 202 });
+      }
+      throw err;
+    }
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

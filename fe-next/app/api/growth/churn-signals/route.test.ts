@@ -97,6 +97,34 @@ describe('POST /api/growth/churn-signals', () => {
     expect(body.riskLevel).toBe('low');
   });
 
+  it('skips without writing when remote token verification hangs past the cap', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.mocked(getBearerUser).mockReturnValue(new Promise(() => {}));
+      const { upsert } = mockAdmin();
+      const pending = post(validPayload);
+      let settled = false;
+      void pending.then(() => { settled = true; });
+      await vi.advanceTimersByTimeAsync(1499);
+      expect(settled).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      const res = await pending;
+      expect(res.status).toBe(202);
+      expect(await res.json()).toEqual({ skipped: 'auth-timeout' });
+      expect(upsert).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('returns 401 for an invalid token and writes nothing', async () => {
+    vi.mocked(getBearerUser).mockResolvedValue(null);
+    const { upsert } = mockAdmin();
+    const res = await post(validPayload);
+    expect(res.status).toBe(401);
+    expect(upsert).not.toHaveBeenCalled();
+  });
+
   it('returns 500 when the upsert fails', async () => {
     mockAdmin({ message: 'boom' });
     const res = await post(validPayload);
