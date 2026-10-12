@@ -5,6 +5,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 import { withSentryConfig } from '@sentry/nextjs';
 import { withPostHogConfig } from '@posthog/nextjs-config';
 import { RETIRED_PRACTICE_REDIRECTS } from './lib/seo/retiredPracticeRedirects.mjs';
+import { GAME_ROUTE_ALIASES } from './lib/seo/gameRouteAliases.mjs';
 import { ChunkLoadRetryPlugin } from './lib/deploy/chunkLoadRetryPlugin.mjs';
 
 const pkg = createRequire(import.meta.url)('./package.json');
@@ -200,6 +201,9 @@ const nextConfig = {
       // game). The URLs were live for months, so they redirect per-mode instead
       // of 404ing the people still holding old links.
       ...RETIRED_PRACTICE_REDIRECTS,
+      // /play and /room never existed as routes but are the two paths a person
+      // guesses for a multiplayer word game. Both 404 today.
+      ...GAME_ROUTE_ALIASES,
       // Redirect bare root to default locale (prevents 404 and duplicate content flags).
       // NOTE: in production the custom Express server (server/localeRedirect.ts)
       // handles `/` BEFORE Next sees it — locale-detecting 301 for browsers,
