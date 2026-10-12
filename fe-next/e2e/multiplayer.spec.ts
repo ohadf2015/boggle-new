@@ -47,6 +47,11 @@ test.describe('Room List Page', () => {
   test('page loads and room list view is visible', async ({ page }) => {
     const mp = await setupMultiplayerPage(page);
     await expect(mp.roomListView).toBeVisible();
+    // A `flex-1` shell still has a box, so toBeVisible alone passes on the
+    // empty shell obscura reported on /en/multiplayer. ArenaList's heading is
+    // unconditional in every state (loading, empty, populated), so it is only
+    // absent when the arena list never rendered.
+    await expect(mp.roomListView).toContainText(/open arenas/i);
   });
 
   test('create room button is accessible', async ({ page }) => {

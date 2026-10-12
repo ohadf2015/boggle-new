@@ -52,7 +52,10 @@ export class MultiplayerPage {
     this.page = page;
 
     // Room List
-    this.roomListView = page.locator('[data-testid="room-list-view"]');
+    // `room-list-view` only ever existed in vitest stubs of RoomListView — it is
+    // not in shipped markup, so this matched zero nodes and the empty-shell specs
+    // below could not fail. `entry-body` is RoomListView's real root.
+    this.roomListView = page.locator('[data-testid="entry-body"]');
     this.createRoomButton = page.getByRole('button', { name: /create.*room|צר.*חדר/i });
     this.refreshButton = page.getByRole('button', { name: /refresh|רענן/i });
 
