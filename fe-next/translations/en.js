@@ -154,6 +154,10 @@ const en = {
         "owned": "Owned",
         "roundOnly": "Only during a round",
         "buy": "Buy",
+        "round": "Spend your cash before the next round",
+        "open": "Spend cash ({cash})",
+        "close": "Close",
+        "off": "Power-ups are off for this class",
         "doubleCash": {
           "name": "Double cash",
           "desc": "2x cash for 30 seconds. Only you."
@@ -166,6 +170,10 @@ const en = {
           "name": "Hint",
           "desc": "Shows the first letter of a lesson word."
         }
+      },
+      "goal": {
+        "save": "Save {missing} more for {name}",
+        "ready": "{name} is yours to buy"
       },
       "hud": {
         "cash": "Cash: {cash}",
@@ -193,6 +201,9 @@ const en = {
         "already_active": "Already active",
         "already_held": "You already hold one",
         "unknown_power_up": "Unknown power-up",
+        "not_signed_in": "Sign in to use the shop",
+        "no_game": "No live round right now",
+        "not_seated": "Join this class round to use the shop",
         "unavailable": "Economy is unavailable right now",
         "no_hint": "No hint to use",
         "not_teacher": "Only the teacher can change this",

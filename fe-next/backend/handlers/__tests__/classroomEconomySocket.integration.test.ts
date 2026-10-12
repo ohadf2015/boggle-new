@@ -41,6 +41,9 @@ vi.mock('../../modules/classroomEconomyService.js', () => ({
   spendHintFor: vi.fn(),
 }));
 vi.mock('../../redisClient.js', () => ({ getRedisClient: () => null }));
+vi.mock('../../modules/supabase/classroomMembership.js', () => ({
+  resolveClassroomRole: vi.fn(async () => ({ status: 'ok', role: 'student' })),
+}));
 vi.mock('@/lib/server/claimOnce', () => ({ claimOnce: vi.fn(async () => 'claimed') }));
 vi.mock('../../modules/supabase/client.js', () => ({
   getSupabase: () => ({
@@ -108,7 +111,7 @@ describe('round chest over a live socket', () => {
       gameState: 'finished',
       gameSessionId: 7,
       letterGrid: [['a']],
-      users: { ana: {} },
+      users: { Ann: { authUserId: 'student-1' }, ana: {} },
       playerScores: { ana: 3 },
       playerWords: { ana: [] },
       cachedResultsPayload: buildFallbackResultsPayload({
@@ -127,7 +130,7 @@ describe('round chest over a live socket', () => {
   });
 
   it('Given the round is over, Then a double-cash power-up is refused until the next round', async () => {
-    mocks.game = { gameState: 'finished', gameSessionId: 7, cachedResultsPayload: null };
+    mocks.game = { gameState: 'finished', gameSessionId: 7, cachedResultsPayload: null, users: { Ann: { authUserId: 'student-1' } } };
     mocks.classroomGame = { teacherId: 't', players: [{ userId: 'student-1' }] };
     const error = await new Promise<unknown>((resolve) => {
       client.once('classroomEconomy:error', resolve);

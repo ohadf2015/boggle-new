@@ -154,6 +154,10 @@ const ja = {
         "owned": "所持中",
         "roundOnly": "ラウンド中のみ",
         "buy": "購入",
+        "round": "次のラウンドの前にコインを使おう",
+        "open": "コインを使う ({cash})",
+        "close": "閉じる",
+        "off": "このクラスではパワーアップはオフです",
         "doubleCash": {
           "name": "ダブルキャッシュ",
           "desc": "30秒間、獲得金額が2倍。自分だけ。"
@@ -166,6 +170,10 @@ const ja = {
           "name": "ヒント",
           "desc": "レッスンの単語の最初の文字を表示。"
         }
+      },
+      "goal": {
+        "save": "{name}まであと{missing}",
+        "ready": "{name}を買えます"
       },
       "hud": {
         "cash": "所持金: {cash}",
@@ -193,6 +201,9 @@ const ja = {
         "already_active": "すでに有効です",
         "already_held": "すでに持っています",
         "unknown_power_up": "不明なパワーアップ",
+        "not_signed_in": "ショップを使うにはサインインしてください",
+        "no_game": "今はラウンドがありません",
+        "not_seated": "ショップを使うにはこのクラスのラウンドに参加してください",
         "unavailable": "今は利用できません",
         "no_hint": "使えるヒントがありません",
         "not_teacher": "先生だけが変更できます",

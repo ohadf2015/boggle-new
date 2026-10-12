@@ -24,7 +24,7 @@ export function useClassroomEconomy(gameCode: string | null) {
   const [hint, setHint] = useState<HintPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const onState = useCallback((s: ClassroomEconomySnapshot) => setSnapshot(s), []);
+  const onState = useCallback((s: ClassroomEconomySnapshot) => { setSnapshot(s); setError(null); }, []);
   const onBoard = useCallback((b: ClassroomEconomyBoard) => setBoard(b), []);
   const onHint = useCallback((h: HintPayload) => setHint(h), []);
   const onError = useCallback((e: { reason?: string }) => setError(e?.reason ?? 'error'), []);

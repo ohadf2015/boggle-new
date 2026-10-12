@@ -17,6 +17,11 @@ export function chestArtSrc(rarity: ChestRarity, revealed: boolean): string {
   return `/images/classroom-chests/classroom-chest-${rarity}-${revealed ? 'open' : 'closed'}.webp`;
 }
 
+/** The burst frame already shows the open chest, so the moment it bursts is never a blank glow. */
+export function chestSrcForPhase(phase: ChestPhase, rarity: ChestRarity): string {
+  return chestArtSrc(rarity, phase === 'bursting' || phase === 'revealed');
+}
+
 export function rarityTone(rarity: ChestRarity): { glow: string; text: string; ring: string } {
   if (rarity === 'epic') return { glow: 'bg-neo-pink/60', text: 'text-neo-pink', ring: 'border-neo-pink' };
   if (rarity === 'rare') return { glow: 'bg-neo-cyan/50', text: 'text-neo-cyan', ring: 'border-neo-cyan' };

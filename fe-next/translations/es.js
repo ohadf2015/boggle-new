@@ -154,6 +154,10 @@ const es = {
         "owned": "Tuyo",
         "roundOnly": "Solo durante una ronda",
         "buy": "Comprar",
+        "round": "Gasta tu dinero antes de la próxima ronda",
+        "open": "Gastar dinero ({cash})",
+        "close": "Cerrar",
+        "off": "Los potenciadores están desactivados en esta clase",
         "doubleCash": {
           "name": "Doble dinero",
           "desc": "2x de dinero durante 30 segundos. Solo para ti."
@@ -166,6 +170,10 @@ const es = {
           "name": "Pista",
           "desc": "Muestra la primera letra de una palabra de la lección."
         }
+      },
+      "goal": {
+        "save": "Ahorra {missing} más para {name}",
+        "ready": "{name} ya puedes comprarlo"
       },
       "hud": {
         "cash": "Dinero: {cash}",
@@ -193,6 +201,9 @@ const es = {
         "already_active": "Ya está activo",
         "already_held": "Ya tienes uno",
         "unknown_power_up": "Potenciador desconocido",
+        "not_signed_in": "Inicia sesión para usar la tienda",
+        "no_game": "No hay ronda activa ahora",
+        "not_seated": "Únete a la ronda de la clase para usar la tienda",
         "unavailable": "La economía no está disponible ahora",
         "no_hint": "No hay pista que usar",
         "not_teacher": "Solo el profesor puede cambiar esto",

@@ -33,6 +33,7 @@ describe('RoundShop', () => {
       config: { wrongAnswerCost: false, powerUps: true }, lastDelta: null,
     };
     render(<RoundShop gameCode="ABC" />);
+    fireEvent.click(screen.getByTestId('round-shop-open'));
     expect((screen.getByTestId('shop-item-doubleCash') as HTMLButtonElement).disabled).toBe(true);
     fireEvent.click(screen.getByTestId('shop-item-streakShield'));
     expect(hook.buy).toHaveBeenCalledWith('streakShield');

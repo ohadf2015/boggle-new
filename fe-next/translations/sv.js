@@ -154,6 +154,10 @@ const sv = {
         "owned": "Ägs",
         "roundOnly": "Bara under en runda",
         "buy": "Köp",
+        "round": "Spendera dina pengar innan nästa rond",
+        "open": "Spendera pengar ({cash})",
+        "close": "Stäng",
+        "off": "Power-ups är avstängda i den här klassen",
         "doubleCash": {
           "name": "Dubbla pengar",
           "desc": "2x pengar i 30 sekunder. Bara för dig."
@@ -166,6 +170,10 @@ const sv = {
           "name": "Ledtråd",
           "desc": "Visar första bokstaven i ett lektionsord."
         }
+      },
+      "goal": {
+        "save": "Spara {missing} till för {name}",
+        "ready": "Du kan köpa {name} nu"
       },
       "hud": {
         "cash": "Pengar: {cash}",
@@ -193,6 +201,9 @@ const sv = {
         "already_active": "Redan aktiv",
         "already_held": "Du har redan en",
         "unknown_power_up": "Okänd power-up",
+        "not_signed_in": "Logga in för att använda butiken",
+        "no_game": "Ingen aktiv omgång just nu",
+        "not_seated": "Gå med i klassrundan för att använda butiken",
         "unavailable": "Ekonomin är otillgänglig just nu",
         "no_hint": "Ingen ledtråd att använda",
         "not_teacher": "Bara läraren kan ändra detta",

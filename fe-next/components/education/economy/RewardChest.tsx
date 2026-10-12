@@ -12,10 +12,11 @@ import { REVEAL_CATEGORY_KEY, applyUnlockToConfig, revealPartNameKey } from '@/l
 import { chestPartUnlock } from '@/backend/modules/classroomEconomyPool';
 import { CHEST_RARITIES, type ClassroomChestReveal } from '@/shared/constants/classroomEconomy';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { chestArtSrc, nextChestPhase, oddsLabel, rarityTone, type ChestPhase } from './chestPhase';
+import { chestArtSrc, chestSrcForPhase, nextChestPhase, oddsLabel, rarityTone, type ChestPhase } from './chestPhase';
 
 const CONFETTI_COLORS = ['#c6f432', '#ff5fa2', '#38e1ff', '#ffd23f', '#ffffff'];
 const CONFETTI = Array.from({ length: 36 }, (_, i) => i);
+const BURST = Array.from({ length: 18 }, (_, i) => i);
 
 interface RewardChestProps {
   reveal: ClassroomChestReveal;
@@ -65,7 +66,7 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
               phase === 'shaking'
                 ? { rotate: [0, -8, 8, -8, 8, 0] }
                 : phase === 'bursting'
-                  ? { scale: [1, 1.3, 0], opacity: [1, 1, 0] }
+                  ? { scale: [1, 1.18, 1.05], opacity: 1 }
                   : { rotate: 0 }
             }
             transition={{ duration: 0.5 }}
@@ -74,9 +75,28 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
               if (phase === 'bursting') advance('revealed');
             }}
           >
-            <img src={chestArtSrc(reveal.rarity, false)} alt="" className="h-full w-full object-contain drop-shadow-[6px_6px_0_#000]" />
+            {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized chest art; the optimizer would re-encode it */}
+            <img src={chestSrcForPhase(phase, reveal.rarity)} alt="" className="h-full w-full object-contain drop-shadow-[6px_6px_0_#000]" />
           </m.button>
         )}
+
+        {phase === 'bursting' && !reduced &&
+          BURST.map((i) => (
+            <m.span
+              key={i}
+              aria-hidden="true"
+              className={cn('absolute left-1/2 top-1/2 h-3 w-3 rounded-full', tone.glow)}
+              style={{ background: CONFETTI_COLORS[i % CONFETTI_COLORS.length] }}
+              initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+              animate={{
+                x: Math.cos((i / BURST.length) * Math.PI * 2) * (120 + (i % 3) * 22),
+                y: Math.sin((i / BURST.length) * Math.PI * 2) * (120 + (i % 3) * 22),
+                opacity: 0,
+                scale: 0.4,
+              }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            />
+          ))}
 
         {phase === 'sealed' && (
           <p className="absolute bottom-0 text-lg font-bold text-neo-lime">{t('economy.chest.tapToOpen')}</p>
@@ -103,6 +123,7 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
               </>
             ) : (
               <>
+                {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized chest art; the optimizer would re-encode it */}
                 <img src={chestArtSrc(reveal.rarity, true)} alt="" className="h-[min(52vw,200px)] w-auto object-contain drop-shadow-[6px_6px_0_#000]" />
                 {legacyName && <span className="text-3xl font-bold leading-tight">{t(legacyName)}</span>}
                 <span className={cn('rounded-full border-2 bg-black/40 px-4 py-1 text-base font-bold uppercase tracking-wider', tone.text, tone.ring)}>

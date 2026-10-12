@@ -4,6 +4,7 @@ import { Flame } from 'lucide-react';
 import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ClassroomEconomySnapshot } from '@/shared/constants/classroomEconomy';
+import { cashBurstPieces } from './cashBurst';
 
 interface EconomyHudProps {
   snapshot: ClassroomEconomySnapshot;
@@ -25,10 +26,25 @@ export default function EconomyHud({ snapshot }: EconomyHudProps) {
     <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-sm font-bold text-white" aria-live="polite">
       <span className="relative inline-flex items-baseline gap-2 text-2xl font-black" data-testid="hud-cash">
         <span>{t('economy.hud.cash', { cash: snapshot.cash })}</span>
+        {delta?.kind === 'correct' && delta.delta > 0 && !reduced && (
+          <span key={`burst-${snapshot.cashEarned}`} aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 h-0 w-0">
+            {cashBurstPieces(8).map((p, i) => (
+              <m.span
+                key={i}
+                data-testid="cash-burst-piece"
+                className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                style={{ background: p.color }}
+                initial={{ x: 0, y: 0, opacity: 1, scale: 0.6 }}
+                animate={{ x: p.x, y: p.y, opacity: 0, scale: 1.2 }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+              />
+            ))}
+          </span>
+        )}
         {delta?.kind === 'correct' && delta.delta > 0 && (
           <m.span
             key={`${snapshot.cashEarned}-${delta.delta}`}
-            className="text-xl text-neo-lime"
+            className="relative text-2xl text-neo-lime"
             initial={reduced ? false : { scale: 1.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 380, damping: 12 }}

@@ -10,6 +10,7 @@ import { checkRateLimit } from '../utils/rateLimiter.js';
 import { getRedisClient } from '../redisClient.js';
 import { getGameAsync } from '../modules/gameStateManager.js';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
+import { resolveClassroomRole } from '../modules/supabase/classroomMembership.js';
 import { CLASSROOM_ECONOMY_EVENTS } from '@/shared/constants/classroomEconomy';
 import {
   applyCorrectWord,
@@ -46,9 +47,14 @@ async function isClassroomGame(gameCode: string): Promise<boolean> {
   return (await getClassroomGame(gameCode)) !== null;
 }
 
+/** Seated = a verified non-bot user of this round; the class roster misses students who joined via the base `join` door. */
+export function isSeatedInRound(game: unknown, userId: string): boolean {
+  const users = (game as { users?: Record<string, { authUserId?: string | null; isBot?: boolean } | undefined> } | null)?.users ?? {};
+  return Object.values(users).some((u) => !!u && !u.isBot && u.authUserId === userId);
+}
+
 async function isPlayer(gameCode: string, userId: string): Promise<boolean> {
-  const game = await getClassroomGame(gameCode);
-  return !!game?.players?.some((p) => p.userId === userId);
+  return isSeatedInRound(await getGameAsync(gameCode), userId);
 }
 
 /** Word path hook: a socket without a verified identity simply gets no economy. */
@@ -102,13 +108,34 @@ export function roundIsOver(cachedResultsPayload: unknown, roundId: string): boo
   return id !== undefined && id !== null && String(id) === roundId;
 }
 
+/** A silent refusal looks like "nothing to show" on the phone, so every early exit says why. */
+function refused(action: string, gameCode: string, reason: string): void {
+  logger.warn('CLASSROOM_ECONOMY', `${action} refused in ${gameCode}: ${reason}`);
+}
+
+/** Logs the refusal and tells this student's socket, so the phone never waits on silence. */
+function refusedTo(
+  socket: Socket,
+  action: string,
+  gameCode: string,
+  reason: string,
+  event: string,
+  payload: unknown
+): void {
+  refused(action, gameCode, reason);
+  socket.emit(event, payload);
+}
+
 export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): void {
   socket.on(E.requestState, async (data: { gameCode?: unknown }) => {
     const userId = getAuthUserId(socket);
     const gameCode = typeof data?.gameCode === 'string' ? data.gameCode : null;
-    if (!userId || !gameCode || !checkRateLimit(socket.id)) return;
+    if (!gameCode) return;
+    if (!userId) return refusedTo(socket, 'requestState', gameCode, 'not_signed_in', E.error, { reason: 'not_signed_in' });
+    if (!checkRateLimit(socket.id)) return refused('requestState', gameCode, 'rate_limited');
     const roundId = await roundOf(gameCode);
-    if (!roundId || !(await isPlayer(gameCode, userId))) return;
+    if (!roundId) return refusedTo(socket, 'requestState', gameCode, 'no_game', E.error, { reason: 'no_game' });
+    if (!(await isPlayer(gameCode, userId))) return refusedTo(socket, 'requestState', gameCode, 'not_seated', E.error, { reason: 'not_seated' });
     const state = await readEconomy(gameCode, userId);
     const config = await loadConfig(gameCode);
     if (!state) { socket.emit(E.error, { reason: 'unavailable' }); return; }
@@ -120,13 +147,22 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
     const userId = getAuthUserId(socket);
     const gameCode = typeof data?.gameCode === 'string' ? data.gameCode : null;
     const roundId = typeof data?.roundId === 'string' ? data.roundId : null;
-    if (!userId || !gameCode || !roundId || !checkRateLimit(socket.id)) return;
+    if (!gameCode || !roundId) return;
+    if (!userId) return refusedTo(socket, 'requestReward', gameCode, 'not_signed_in', E.reward, null);
+    if (!checkRateLimit(socket.id)) return refusedTo(socket, 'requestReward', gameCode, 'rate_limited', E.reward, null);
     const game = await getGameAsync(gameCode);
-    if (!game || game.gameState !== 'finished' || roundId !== roundIdOf(game, gameCode) || !roundIsOver(game.cachedResultsPayload, roundId)) {
-      socket.emit(E.reward, null);
-      return;
+    if (!game) return refusedTo(socket, 'requestReward', gameCode, 'no_game', E.reward, null);
+    if (game.gameState !== 'finished') return refusedTo(socket, 'requestReward', gameCode, 'round_not_over', E.reward, null);
+    if (roundId !== roundIdOf(game, gameCode)) return refusedTo(socket, 'requestReward', gameCode, 'round_mismatch', E.reward, null);
+    if (!roundIsOver(game.cachedResultsPayload, roundId)) return refusedTo(socket, 'requestReward', gameCode, 'no_results', E.reward, null);
+    if (!(await isPlayer(gameCode, userId))) return refusedTo(socket, 'requestReward', gameCode, 'not_seated', E.reward, null);
+    const classroom = await getClassroomGame(gameCode);
+    if (!classroom) return refusedTo(socket, 'requestReward', gameCode, 'no_classroom', E.reward, null);
+    const membership = await resolveClassroomRole(userId, classroom.classroomId);
+    if (membership.role !== 'student') {
+      const reason = membership.status === 'unavailable' ? 'membership_unavailable' : 'not_a_student';
+      return refusedTo(socket, 'requestReward', gameCode, reason, E.reward, null);
     }
-    if (!(await isPlayer(gameCode, userId))) return;
     const summary = await roundSummaryFor(gameCode, roundId, userId);
     const reveal = await grantRoundChest({ gameCode, roundId, userId, summary });
     socket.emit(E.reward, reveal);
@@ -141,9 +177,11 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
   socket.on(E.buyPowerUp, async (data: { gameCode?: unknown; powerUpId?: unknown }) => {
     const userId = getAuthUserId(socket);
     const gameCode = typeof data?.gameCode === 'string' ? data.gameCode : null;
-    if (!userId || !gameCode || typeof data?.powerUpId !== 'string' || !checkRateLimit(socket.id)) return;
+    if (!userId || !gameCode || typeof data?.powerUpId !== 'string') return;
+    if (!checkRateLimit(socket.id)) return refused('buyPowerUp', gameCode, 'rate_limited');
     const roundId = await roundOf(gameCode);
-    if (!roundId || !(await isPlayer(gameCode, userId))) return;
+    if (!roundId) return refused('buyPowerUp', gameCode, 'no_game');
+    if (!(await isPlayer(gameCode, userId))) return refused('buyPowerUp', gameCode, 'not_seated');
     const live = (await getGameAsync(gameCode))?.gameState !== 'finished';
     if (!live && data.powerUpId === 'doubleCash') { socket.emit(E.error, { reason: 'between_rounds' }); return; }
     const res = await buyPowerUpFor({ gameCode, roundId, userId, powerUpId: data.powerUpId, now: Date.now() });
