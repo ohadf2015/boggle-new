@@ -1,6 +1,29 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 
+const MOTION_PATH = {
+  name: "framer-motion",
+  importNames: ["motion"],
+  message: "Import `m` from framer-motion; app/LazyMotionRoot provides its features.",
+};
+const PIXI_PATH = {
+  name: "pixi.js",
+  message: "Pixi is confined to the modules that already import it (see lib/pixiFx). Add new Pixi code there.",
+};
+const PIXI_ALLOWED = [
+  "lib/pixiFx/**",
+  "lib/word-craft/pixi/**",
+  "lib/gameEngine/**",
+  "lib/blast/v2/fx/**",
+  "components/wordTowerV2/**",
+  "components/wordTower/**",
+  "components/results/**",
+  "components/daily/WordWheelPixiRing.tsx",
+  "components/blast/legacy/**",
+  "components/adventure/play/arena/**",
+];
+const TEST_FILES = ["**/__tests__/**", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "e2e/**"];
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   // Override default ignores of eslint-config-next.
@@ -46,6 +69,23 @@ const eslintConfig = defineConfig([
       "react-hooks/immutability": "off",
       // Prevent duplicate imports (caught build error)
       "no-duplicate-imports": "error",
+    },
+  },
+  // `motion` pulls the full framer engine into its chunk; Pixi must stay behind a route leaf.
+  {
+    files: ["**/*.{ts,tsx}"],
+    ignores: [...PIXI_ALLOWED, ...TEST_FILES],
+    rules: {
+      "no-restricted-imports": ["error", {
+        paths: [MOTION_PATH, PIXI_PATH],
+      }],
+    },
+  },
+  {
+    files: PIXI_ALLOWED,
+    ignores: TEST_FILES,
+    rules: {
+      "no-restricted-imports": ["error", { paths: [MOTION_PATH] }],
     },
   },
 ]);

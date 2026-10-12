@@ -17,7 +17,7 @@
  */
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { lootBurst, LOOT_WINDOW_MS, type LootPiece } from '../arena/arenaBeats';
 import { relicArt } from '../run/art';
 import type { RelicId } from '@/lib/adventure/play/relics';
@@ -73,7 +73,7 @@ export default function LootFlight({ from, gold, relic, onDone }: Props) {
         const mid = { x: from.x + (p.to.x - from.x) * 0.45 + p.spread * 70, y: Math.min(from.y, p.to.y) - 64 };
         const size = p.kind === 'relic' ? 44 : 22;
         return (
-          <motion.img
+          <m.img
             key={p.id}
             src={p.kind === 'relic' && relic ? relicArt(relic) : COIN}
             alt=""

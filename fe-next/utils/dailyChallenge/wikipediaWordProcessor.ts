@@ -398,11 +398,8 @@ export async function getRecentlyUsedWords(
   days: number = 30
 ): Promise<Set<string>> {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const { requireAdminClient } = await import('@/utils/supabase/admin');
+    const supabase = requireAdminClient();
 
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
@@ -510,11 +507,8 @@ export async function updateWordValidationStatus(
   score?: number
 ): Promise<void> {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const { requireAdminClient } = await import('@/utils/supabase/admin');
+    const supabase = requireAdminClient();
 
     // Map old status values to new unified values
     const statusMap: Record<string, string> = {

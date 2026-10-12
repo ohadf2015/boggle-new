@@ -5,31 +5,23 @@
  * NOTE: This file should only be imported in server-side code (API routes, server components)
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 import logger from '@/backend/utils/logger';
+import { createAdminClient } from '@/utils/supabase/admin';
 
 /**
- * Create Supabase admin client with service role key
- * Used for admin operations that bypass RLS
+ * Service-role client for admin operations that bypass RLS. One shared instance
+ * per process (see createAdminClient).
  *
  * @returns Supabase client or null if not configured
  */
 export function getSupabaseAdmin(): SupabaseClient | null {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
+  const client = createAdminClient();
+  if (!client) {
     logger.error('ADMIN', 'Missing Supabase environment variables');
-    return null;
   }
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
+  return client;
 }
 
 /**

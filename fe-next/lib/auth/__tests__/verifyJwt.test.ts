@@ -6,19 +6,25 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { SignJWT } from 'jose';
 
 const TEST_SECRET = 'test-secret-for-jwt-verify-needs-32-chars';
+const ISSUER = 'https://proj.supabase.co/auth/v1';
 
 beforeAll(() => {
   process.env.SUPABASE_JWT_SECRET = TEST_SECRET;
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://proj.supabase.co';
 });
 
-async function makeToken(claims: Record<string, unknown>, exp = '1h'): Promise<string> {
+async function makeToken(
+  claims: Record<string, unknown>,
+  { exp = '1h', iss = ISSUER, aud = 'authenticated' }: { exp?: string; iss?: string | null; aud?: string | null } = {},
+): Promise<string> {
   const secret = new TextEncoder().encode(TEST_SECRET);
-  return new SignJWT(claims)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime(exp)
-    .sign(secret);
+  const jwt = new SignJWT(claims).setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime(exp);
+  if (iss) jwt.setIssuer(iss);
+  if (aud) jwt.setAudience(aud);
+  return jwt.sign(secret);
 }
+
+const b64url = (v: unknown) => Buffer.from(JSON.stringify(v)).toString('base64url');
 
 describe('verifyJwtLocal', () => {
   it('returns user for valid token', async () => {
@@ -50,6 +56,30 @@ describe('verifyJwtLocal', () => {
       .sign(secret);
     const user = await verifyJwtLocal(expired);
     expect(user).toBeNull();
+  });
+
+  it('rejects a token from another issuer', async () => {
+    const { verifyJwtLocal } = await import('../verifyJwt');
+    expect(await verifyJwtLocal(await makeToken({ sub: 'user-123' }, { iss: 'https://other.supabase.co/auth/v1' }))).toBeNull();
+    expect(await verifyJwtLocal(await makeToken({ sub: 'user-123' }, { iss: null }))).toBeNull();
+  });
+
+  it('rejects a token for another audience', async () => {
+    const { verifyJwtLocal } = await import('../verifyJwt');
+    expect(await verifyJwtLocal(await makeToken({ sub: 'user-123' }, { aud: 'anon' }))).toBeNull();
+    expect(await verifyJwtLocal(await makeToken({ sub: 'user-123' }, { aud: null }))).toBeNull();
+  });
+
+  it('rejects an unsigned alg:none token', async () => {
+    const { verifyJwtLocal } = await import('../verifyJwt');
+    const now = Math.floor(Date.now() / 1000);
+    const unsigned = `${b64url({ alg: 'none', typ: 'JWT' })}.${b64url({ sub: 'user-123', iss: ISSUER, aud: 'authenticated', iat: now, exp: now + 3600 })}.`;
+    expect(await verifyJwtLocal(unsigned)).toBeNull();
+  });
+
+  it('rejects a signed token with no subject (the anon/service key shape)', async () => {
+    const { verifyJwtLocal } = await import('../verifyJwt');
+    expect(await verifyJwtLocal(await makeToken({ role: 'service_role' }))).toBeNull();
   });
 
   it('returns null for malformed token', async () => {

@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import { isPremiumPart, getPartPrice } from '@/shared/types/customAvatar';
 import { captureApiError } from '@/utils/sentry';
 import { lockOnPartsSnapshot } from '@/lib/avatar/partsSnapshotLock';
@@ -22,9 +22,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Too many requests' }, { status: 429 });
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !supabaseServiceKey) {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
     return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
   }
 
@@ -50,8 +49,6 @@ export async function POST(request: NextRequest) {
     }
 
     const price = getPartPrice(category, partId);
-
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
     let { data: profile, error: fetchError } = await supabase
       .from('profiles')

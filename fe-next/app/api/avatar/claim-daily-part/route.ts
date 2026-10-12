@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { getPremiumParts, PREMIUM_CATEGORIES } from '@/shared/types/customAvatar';
 import { captureApiError } from '@/utils/sentry';
@@ -36,9 +36,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !supabaseServiceKey) {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
     return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
   }
 
@@ -48,7 +47,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
     const { data: profile, error: fetchError } = await supabase
       .from('profiles')
       .select('premium_avatar_parts, last_daily_part_claim_at')
@@ -90,9 +88,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !supabaseServiceKey) {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
     return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
   }
 
@@ -103,8 +100,6 @@ export async function POST(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey);
 
     const { data: profile, error: fetchError } = await supabase
       .from('profiles')

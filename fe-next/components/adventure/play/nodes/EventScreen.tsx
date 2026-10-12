@@ -10,7 +10,7 @@
  * re-reads `taken` with no outcome, so the screen names the choice instead.
  */
 import { useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Dices } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -104,7 +104,7 @@ export default function EventScreen({ id, choices, taken, run, before, world, bu
           FRAME (signpost at the bottom, canopy at the top), so the slack has to
           stay split between the two bands instead of collapsing to one side. */}
       <div className="flex h-full flex-col justify-center gap-2.5 pb-2">
-        <motion.div
+        <m.div
           initial={reduce ? false : { scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 24 }}
           className={cn('relative overflow-hidden rounded-2xl border-[3px] border-black shadow-[4px_4px_0_#000]',
@@ -113,7 +113,7 @@ export default function EventScreen({ id, choices, taken, run, before, world, bu
           <img src={art} alt="" aria-hidden draggable={false} onError={() => setArt(nodeScene('event', world))}
             className="h-full w-full object-cover" />
           <span aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top,rgba(9,14,34,0.9)_0%,transparent_60%)]" />
-        </motion.div>
+        </m.div>
 
         <p className="rounded-2xl border-[3px] border-black bg-black/70 p-2.5 text-sm font-semibold leading-snug">
           {t(eventKey(id, 'body'))}
@@ -125,7 +125,7 @@ export default function EventScreen({ id, choices, taken, run, before, world, bu
             return (
               <AnimatePresence key={key}>
                 {!gone && (
-                  <motion.button
+                  <m.button
                     type="button"
                     data-testid={`event-choice-${i}`}
                     disabled={chosen != null || busy}
@@ -139,7 +139,7 @@ export default function EventScreen({ id, choices, taken, run, before, world, bu
                   >
                     <span className="block leading-tight">{t(key)}</span>
                     {hints[i] && !resolved && <HintChips hint={hints[i]} />}
-                  </motion.button>
+                  </m.button>
                 )}
               </AnimatePresence>
             );
@@ -148,7 +148,7 @@ export default function EventScreen({ id, choices, taken, run, before, world, bu
 
         <AnimatePresence>
           {resolved && (
-            <motion.div data-testid="event-outcome"
+            <m.div data-testid="event-outcome"
               initial={reduce ? false : { y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 24, delay: reduce ? 0 : 0.12 }}
               className="rounded-2xl border-[3px] border-black bg-black/80 p-3 text-center">
@@ -160,7 +160,7 @@ export default function EventScreen({ id, choices, taken, run, before, world, bu
                 : nothingToShow
                   ? <p className="mt-1 font-neo-display text-lg font-bold">{t('adventurePlay.map.outNothing')}</p>
                   : <div className="mt-1.5"><DeltaChips lines={lines} testId="event-delta" /></div>}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

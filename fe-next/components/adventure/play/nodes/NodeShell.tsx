@@ -7,7 +7,7 @@
  * `dark:` pair flashes cream on a lazy mount).
  */
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { NodeKind } from '@/lib/adventure/play/runMap';
@@ -76,7 +76,7 @@ export default function NodeShell({ kind, world, title, subtitle, gold, hp, maxH
           </span>
         </div>
 
-        <motion.h2
+        <m.h2
           initial={reduce ? false : { y: -14, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 320, damping: 22 }}
@@ -84,7 +84,7 @@ export default function NodeShell({ kind, world, title, subtitle, gold, hp, maxH
         >
           {title}
           {subtitle && <span className="mt-0.5 block text-sm font-semibold leading-snug opacity-85">{subtitle}</span>}
-        </motion.h2>
+        </m.h2>
 
         {/* A shelf that runs past the fold must say so: without this the sixth
             row (and its "N gold short" line) is simply invisible at 390x844. */}

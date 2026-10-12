@@ -22,7 +22,7 @@
  */
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Crown, Swords } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { getBossConfig } from '@/lib/adventure/bossConfig';
@@ -213,24 +213,24 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
       {/* Taunt, over the hero's side of the sky. */}
       <AnimatePresence>
         {taunt && !combat.defeated && (
-          <motion.p key={taunt} initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+          <m.p key={taunt} initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
             className="absolute top-8 start-1 z-20 max-w-[11rem] rounded-xl rounded-es-none border-[3px] border-black bg-neo-cream px-2 py-1 text-[11px] font-bold leading-snug text-black line-clamp-3 shadow-[3px_3px_0_#000]">
             {t(taunt, { requirement: t('adventurePlay.longerWords') })}
-          </motion.p>
+          </m.p>
         )}
       </AnimatePresence>
 
       {/* Stamp: Interrupted! / Enraged! / Deflected! */}
       <AnimatePresence>
         {onEnemy && (
-          <motion.div key={status.id} role="status"
+          <m.div key={status.id} role="status"
             initial={reduce ? { opacity: 0 } : { scale: 1.8, rotate: -16, opacity: 0 }}
             animate={{ scale: 1, rotate: -8, opacity: 1 }} exit={{ opacity: 0, y: -12 }}
             transition={{ type: 'spring', stiffness: 520, damping: 18 }}
             className={cn('absolute inset-x-0 top-[44%] z-20 mx-auto w-fit max-w-full rounded-lg border-[3px] border-black px-2 py-0.5 text-center font-neo-display text-lg font-black uppercase leading-tight shadow-[3px_3px_0_#000]',
               STATUS_STYLE[status.kind] ?? 'bg-neo-pink text-black')}>
             {status.kind === 'phase' && combat.phase < 2 ? t('adventurePlay.combat.phaseTwo') : t(`adventurePlay.combat.status.${status.kind}`)}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 

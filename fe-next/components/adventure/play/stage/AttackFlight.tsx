@@ -13,7 +13,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { AttackEffect, CombatState } from '@/lib/adventure/play/combat';
 import { cn } from '@/lib/utils';
@@ -111,7 +111,7 @@ export default function AttackFlight({ combat, status }: Props) {
     <div className="fixed inset-0 z-58 pointer-events-none overflow-hidden" aria-hidden={!playerHit}>
       <AnimatePresence>
         {flight && arc && (
-          <motion.div key={flight.id} className="absolute left-0 top-0"
+          <m.div key={flight.id} className="absolute left-0 top-0"
             initial={{ x: arc.xs[0], y: arc.ys[0], scale: 0.9 }}
             animate={{ x: arc.xs, y: arc.ys, scale: [0.9, 1.3, 1.6] }}
             exit={{ opacity: 0, scale: 0.2, transition: { duration: 0.15 } }}
@@ -127,13 +127,13 @@ export default function AttackFlight({ combat, status }: Props) {
             {/* eslint-disable-next-line @next/next/no-img-element -- fx sprite */}
             <img src={missileArt(flight.effect)} alt=""
               className={cn('absolute z-10 -left-10 -top-10 w-20 h-20 object-contain drop-shadow-[3px_3px_0_#000]', flight.effect !== 'hit' && flight.effect !== 'drain' && 'animate-spin [animation-duration:700ms]')} />
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {impact && (
-          <motion.div key={`imp-${impact.id}`} className="absolute w-40 h-40 -ml-20 -mt-20 rounded-full border-[6px] border-black"
+          <m.div key={`imp-${impact.id}`} className="absolute w-40 h-40 -ml-20 -mt-20 rounded-full border-[6px] border-black"
             style={{ left: impact.at.x, top: impact.at.y, background: `radial-gradient(circle, #fff 0%, ${impact.color} 45%, transparent 70%)` }}
             initial={{ scale: 0.2, opacity: 1 }} animate={{ scale: 1.6, opacity: 0 }} transition={{ duration: 0.45, ease: 'easeOut' }} />
         )}
@@ -142,7 +142,7 @@ export default function AttackFlight({ combat, status }: Props) {
       {/* The hit banner: a consequence of the shot you just watched land. */}
       <AnimatePresence>
         {playerHit && (
-          <motion.div key={playerHit.id} role="status"
+          <m.div key={playerHit.id} role="status"
             className="absolute inset-x-3 flex flex-col items-center gap-1.5"
             style={{ top: board ? (onTiles ? Math.max(8, board.top - 104) : board.top + board.height / 2 - 56) : '50%' }}
             initial={reduce ? { opacity: 0 } : { scale: 2.4, rotate: 8, opacity: 0 }}
@@ -163,7 +163,7 @@ export default function AttackFlight({ combat, status }: Props) {
                 {t(line.key, { count: line.count })}
               </div>
             )}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>,

@@ -3,7 +3,7 @@
 /** One review card: pick-the-meaning or unscramble. Remounted per card (keyed by the parent). */
 
 import { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { graphemes, type ReviewCard } from '@/lib/education/missedWordsReview';
 import { cn } from '@/lib/utils';
@@ -139,7 +139,7 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
         {card.tiles.map((ch, i) => {
           const used = picked.includes(i);
           return (
-            <motion.button
+            <m.button
               key={i}
               type="button"
               data-testid="review-tile"
@@ -160,7 +160,7 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
               )}
             >
               {ch}
-            </motion.button>
+            </m.button>
           );
         })}
       </div>

@@ -5,7 +5,7 @@
  * grows. The coin burst flies into `anchorRef`.
  */
 import { useEffect, useRef, useState, type Ref } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { COIN_ART } from './art';
 import { cn } from '@/lib/utils';
@@ -49,7 +49,7 @@ export default function GoldCounter({ value, from, delayMs, durationMs, anchorRe
   const shown = useCountUp(value, { from, delayMs, durationMs });
   const counting = shown !== value;
   return (
-    <motion.span
+    <m.span
       animate={counting ? { scale: [1, 1.08, 1] } : { scale: 1 }}
       transition={{ duration: 0.25, repeat: counting ? Infinity : 0 }}
       className={cn('inline-flex items-center gap-1 rounded-full border-[3px] border-black bg-black/70 font-neo-display font-bold tabular-nums text-neo-yellow shadow-[2px_2px_0_#000]',
@@ -61,6 +61,6 @@ export default function GoldCounter({ value, from, delayMs, durationMs, anchorRe
         <img src={COIN_ART} alt="" className={size === 'lg' ? 'h-8 w-8' : 'h-5 w-5'} draggable={false} />
       </span>
       <span aria-hidden>{shown}</span>
-    </motion.span>
+    </m.span>
   );
 }

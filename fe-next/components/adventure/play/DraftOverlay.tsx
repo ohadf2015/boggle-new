@@ -6,7 +6,7 @@
  * the relic bar before the next board is dealt. Skip is always allowed.
  */
 import { useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -116,7 +116,7 @@ export default function DraftOverlay({ offer, onPick, run }: Props) {
         <div className="mt-4 min-h-[5.5rem]">
           <AnimatePresence mode="wait">
             {chosen ? (
-              <motion.div key={sel} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
+              <m.div key={sel} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
                 className="rounded-2xl border-[3px] border-black bg-black/50 p-3 text-center shadow-[4px_4px_0_#000]" aria-live="polite">
                 <div className="flex items-center justify-center gap-2 font-neo-display text-lg font-bold">
                   {text(chosen).name}
@@ -131,11 +131,11 @@ export default function DraftOverlay({ offer, onPick, run }: Props) {
                 {chosenValue?.synergy && (
                   <div className="mt-1 text-xs font-bold text-neo-yellow">{t('adventurePlay.loot.value.synergyHint')}</div>
                 )}
-              </motion.div>
+              </m.div>
             ) : (
-              <motion.p key="hint" initial={{ opacity: 0 }} animate={{ opacity: 0.75 }} exit={{ opacity: 0 }} className="pt-4 text-center text-sm font-bold">
+              <m.p key="hint" initial={{ opacity: 0 }} animate={{ opacity: 0.75 }} exit={{ opacity: 0 }} className="pt-4 text-center text-sm font-bold">
                 {t('adventurePlay.loot.tapCard')}
-              </motion.p>
+              </m.p>
             )}
           </AnimatePresence>
         </div>
@@ -154,7 +154,7 @@ export default function DraftOverlay({ offer, onPick, run }: Props) {
       </div>
 
       {flight && (
-        <motion.div aria-hidden className="pointer-events-none fixed z-70"
+        <m.div aria-hidden className="pointer-events-none fixed z-70"
           style={{ left: flight.from.left, top: flight.from.top, width: flight.from.width, height: flight.from.height }}
           initial={{ x: 0, y: 0, scale: 1, opacity: 1 }}
           animate={flight.to
@@ -162,7 +162,7 @@ export default function DraftOverlay({ offer, onPick, run }: Props) {
             : { scale: [1, 1.8, 2.4], opacity: [1, 1, 0], y: [0, -40, -60] }}
           transition={{ duration: flight.to ? 0.62 : 0.5, ease: 'easeInOut', times: [0, 0.35, 1] }}>
           <OfferArt item={flight.item} className="h-full w-full" />
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

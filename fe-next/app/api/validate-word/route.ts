@@ -7,7 +7,7 @@
 
 import { NextRequest } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
-import { createClient } from '@supabase/supabase-js';
+import { getAnonClient } from '@/utils/supabase/anon';
 import { captureApiError } from '@/utils/sentry';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import {
@@ -59,19 +59,12 @@ function loadJapaneseDictionary(): Set<string> {
   return japaneseDictionary;
 }
 
-// Supabase client for checking community words
-function getSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) return null;
-  return createClient(url, anonKey);
-}
 
 /**
  * Check if a word is community-validated (net_score >= 6)
  */
 async function checkCommunityWord(word: string, language: string): Promise<boolean> {
-  const supabase = getSupabase();
+  const supabase = getAnonClient();
   if (!supabase) return false;
 
   try {

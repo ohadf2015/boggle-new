@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import type { ChestRoll, ChestTier } from '@/lib/wordTowerV2/estate';
 import { type ChestItem, type ChestTease, type RevealBeat, revealBeats, tierFx } from '@/lib/wordTowerV2/rewards';
 import { ITEM } from '../estate/estateArt';
@@ -83,7 +83,7 @@ export function ChestReveal({ t, coins, chest, tease, guest, onSignIn, onDone, o
       {/* Tap anywhere: opens, then skips the rest. */}
       <button type="button" onClick={seq.skip} aria-label={t(opened ? 'wordTowerV2.chest.skip' : 'wordTowerV2.chest.tap')} className="absolute inset-0 cursor-pointer" />
 
-      <motion.div
+      <m.div
         className="pointer-events-none relative flex w-full max-w-sm flex-col items-center sm:max-w-md lg:max-w-2xl"
         animate={popped && !reducedMotion ? { x: [0, -fx.shakePx, fx.shakePx, -fx.shakePx * 0.5, 0] } : undefined}
         transition={{ duration: 0.34 }}
@@ -91,7 +91,7 @@ export function ChestReveal({ t, coins, chest, tease, guest, onSignIn, onDone, o
         {/* The rarity word is the PAYOFF, so it is withheld until the lid blows —
             before that the plate just says the box is shut. The plate keeps its
             size across the swap so nothing below it jumps. */}
-        <motion.div
+        <m.div
           key={popped ? 'tier' : 'sealed'}
           className={`relative z-10 rounded-neo border-neo-thick border-black px-5 py-1 font-neo-display text-lg font-black uppercase tracking-widest shadow-hard lg:px-10 lg:py-2 lg:text-4xl ${
             popped ? `text-neo-navy ${TIER_CLASS[chest.tier]}` : 'bg-neo-navy-light text-neo-cream/70'
@@ -109,7 +109,7 @@ export function ChestReveal({ t, coins, chest, tease, guest, onSignIn, onDone, o
           transition={{ duration: 0.45 }}
         >
           {popped ? t(`wordTowerV2.chest.tier.${chest.tier}`) : t('wordTowerV2.chest.sealed')}
-        </motion.div>
+        </m.div>
 
         {/* The chest, in a frame whose colour and thickness are the rarity.
             Fixed width + bottom anchor: the open sprite is TALLER than the shut
@@ -123,7 +123,7 @@ export function ChestReveal({ t, coins, chest, tease, guest, onSignIn, onDone, o
               boxShadow: popped ? `0 0 ${18 + fx.spread * 36}px ${hex}` : undefined,
             }}
           />
-          <motion.img
+          <m.img
             src={CHEST_ART(chest.tier, popped)}
             alt=""
             aria-hidden
@@ -148,7 +148,7 @@ export function ChestReveal({ t, coins, chest, tease, guest, onSignIn, onDone, o
         </div>
 
         {!opened ? (
-          <motion.button
+          <m.button
             type="button"
             onClick={seq.open}
             animate={reducedMotion ? undefined : { y: [0, -5, 0] }}
@@ -156,12 +156,12 @@ export function ChestReveal({ t, coins, chest, tease, guest, onSignIn, onDone, o
             className="pointer-events-auto mt-3 rounded-neo border-neo-thick border-black bg-neo-lime px-5 py-2 font-neo-display text-xl font-black uppercase text-neo-navy shadow-hard lg:mt-6 lg:px-10 lg:py-4 lg:text-4xl"
           >
             {t('wordTowerV2.chest.tap')}
-          </motion.button>
+          </m.button>
         ) : null}
 
         <AnimatePresence>
           {coinsShowing ? (
-            <motion.div
+            <m.div
               key="coins"
               initial={reducedMotion ? false : { scale: 0.4, opacity: 0, y: 14 }}
               animate={reducedMotion ? { scale: 1, opacity: 1 } : { scale: [0.4, 1.12, 1], opacity: 1, y: 0 }}
@@ -174,14 +174,14 @@ export function ChestReveal({ t, coins, chest, tease, guest, onSignIn, onDone, o
               <span dir="ltr" className="font-neo-display text-4xl font-black tabular-nums lg:text-6xl">
                 +{shownCoins.toLocaleString()}
               </span>
-            </motion.div>
+            </m.div>
           ) : null}
         </AnimatePresence>
 
         <ul className="mt-3 flex flex-wrap justify-center gap-2 lg:mt-5 lg:gap-4">
           <AnimatePresence>
             {shownItems.map((item) => (
-              <motion.li
+              <m.li
                 key={item.item}
                 initial={reducedMotion ? false : { scale: 0.2, rotate: -14, opacity: 0 }}
                 animate={{ scale: 1, rotate: -2, opacity: 1 }}
@@ -195,7 +195,7 @@ export function ChestReveal({ t, coins, chest, tease, guest, onSignIn, onDone, o
                     snaps out from under it, so three cards read as three wins
                     rather than one list appearing. */}
                 {reducedMotion ? null : (
-                  <motion.span
+                  <m.span
                     aria-hidden
                     className="pointer-events-none absolute inset-0 rounded-neo border-[3px]"
                     style={{ borderColor: hex }}
@@ -209,7 +209,7 @@ export function ChestReveal({ t, coins, chest, tease, guest, onSignIn, onDone, o
                 <span className="font-neo-display text-sm font-black uppercase leading-tight lg:text-xl">
                   {t(`wordTowerV2.chest.item.${item.item}`, { n: item.n })}
                 </span>
-              </motion.li>
+              </m.li>
             ))}
           </AnimatePresence>
         </ul>
@@ -240,7 +240,7 @@ export function ChestReveal({ t, coins, chest, tease, guest, onSignIn, onDone, o
             </button>
           </div>
         ) : null}
-      </motion.div>
+      </m.div>
     </div>
   );
 }

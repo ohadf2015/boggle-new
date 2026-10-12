@@ -6,7 +6,7 @@
  * The depth is the map's (`MAP_ROWS`), not the world's old level list — a run
  * walks one node per row, so a completed world used to read "8/7".
  */
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Skull, Crown } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { MAP_ROWS } from '@/lib/adventure/play/runMap';
@@ -57,11 +57,11 @@ export function RunPips({ cleared, fell }: { cleared: number; fell: boolean }) {
           const done = n <= cleared;
           const fatal = fell && n === cleared + 1;
           return (
-            <motion.li key={n} initial={reduce ? false : { scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3 + n * 0.07, type: 'spring', stiffness: 500, damping: 18 }}
+            <m.li key={n} initial={reduce ? false : { scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3 + n * 0.07, type: 'spring', stiffness: 500, damping: 18 }}
               className={cn('grid h-7 flex-1 place-items-center rounded-lg border-[3px] border-black text-xs font-bold',
                 done ? 'bg-neo-lime text-black' : fatal ? 'bg-neo-pink text-black' : 'bg-white/10 text-neo-cream/60')}>
               {fatal ? <Skull className="h-4 w-4" /> : n === MAP_ROWS ? <Crown className="h-4 w-4" /> : n}
-            </motion.li>
+            </m.li>
           );
         })}
       </ol>

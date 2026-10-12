@@ -1,7 +1,7 @@
 'use client';
 
 import { Check } from 'lucide-react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { SoloMission } from '@/lib/soloMissions';
@@ -23,7 +23,7 @@ export function MissionChips({ missions }: MissionChipsProps) {
   return (
     <div className="flex w-full gap-1.5" data-testid="mission-chips">
       {missions.map((mission) => (
-        <motion.div
+        <m.div
           key={mission.id}
           data-testid={`mission-${mission.id}`}
           data-done={mission.done ? 'true' : 'false'}
@@ -59,7 +59,7 @@ export function MissionChips({ missions }: MissionChipsProps) {
               style={{ width: `${Math.min(100, Math.round((mission.progress / Math.max(1, mission.target)) * 100))}%` }}
             />
           </span>
-        </motion.div>
+        </m.div>
       ))}
     </div>
   );

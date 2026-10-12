@@ -18,6 +18,8 @@ async function makeToken(claims: Record<string, unknown>, secret = TEST_SECRET):
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('1h')
+    .setIssuer(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1`)
+    .setAudience('authenticated')
     .sign(key);
 }
 

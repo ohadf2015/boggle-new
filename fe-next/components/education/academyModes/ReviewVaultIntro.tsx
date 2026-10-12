@@ -8,7 +8,7 @@
  */
 
 import { useId, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { KeyRound } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { claimIntroEntrance } from '@/lib/education/introEntrance';
@@ -80,7 +80,7 @@ export function ReviewVaultIntro({
         <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(circle at 50% 48%, rgba(0,255,255,0.28), rgba(139,92,246,0.18) 35%, transparent 65%)' }} />
         <div className="relative [--door:min(72cqw,68cqh,62rem)]" style={{ width: 'var(--door)', height: 'var(--door)' }}>
           {/* The vault door: steel rim, 12 bolts, a recessed dial well holding the chest. */}
-          <motion.div
+          <m.div
             aria-hidden
             className="absolute inset-0 rounded-full border-[4px] border-neo-cyan"
             style={{
@@ -104,8 +104,8 @@ export function ReviewVaultIntro({
               />
             ))}
             <span className="absolute inset-[16%] rounded-full" style={{ background: 'radial-gradient(circle at 50% 40%, #1f2a44, #0b1020 80%)', boxShadow: 'inset 0 6px 14px rgba(0,0,0,0.8), 0 0 0 4px #000' }} />
-          </motion.div>
-          <motion.img
+          </m.div>
+          <m.img
             src={ACADEMY_ART.chest}
             alt=""
             draggable={false}
@@ -116,7 +116,7 @@ export function ReviewVaultIntro({
             transition={reduce ? undefined : { scale: { type: 'spring', stiffness: 260, damping: 14, delay: 0.3 }, y: { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } }}
           />
           {/* Five word-gems orbiting the door. */}
-          <motion.ul
+          <m.ul
             className="absolute inset-0"
             translate="no"
             animate={reduce ? undefined : { rotate: 360 }}
@@ -131,7 +131,7 @@ export function ReviewVaultIntro({
                   className="absolute -translate-x-1/2 -translate-y-1/2"
                   style={{ left: `${50 + Math.cos(a) * 47}%`, top: `${50 + Math.sin(a) * 47}%` }}
                 >
-                  <motion.span
+                  <m.span
                     className="block"
                     animate={reduce ? undefined : { rotate: -360 }}
                     transition={reduce ? undefined : { duration: 40, repeat: Infinity, ease: 'linear' }}
@@ -141,11 +141,11 @@ export function ReviewVaultIntro({
                     ) : (
                       <span aria-hidden className="block h-[min(1.75rem+2cqmin,4.5rem)] w-[min(2rem+2.4cqmin,5.25rem)] opacity-50" style={{ clipPath: GEM_SHAPE, background: 'linear-gradient(135deg, #9fb0cc, #2c3650)' }} />
                     )}
-                  </motion.span>
+                  </m.span>
                 </li>
               );
             })}
-          </motion.ul>
+          </m.ul>
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element -- static art */}
         <img
@@ -157,7 +157,7 @@ export function ReviewVaultIntro({
         />
       </div>
 
-      <motion.div
+      <m.div
         initial={still ? false : { y: 30 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22, delay: reduce ? 0 : 0.15 }}
@@ -170,7 +170,7 @@ export function ReviewVaultIntro({
         <p className="mb-3 font-neo-body text-sm text-neo-cream sm:text-base [@media(orientation:landscape)_and_(max-height:520px)]:mb-2! [@media(orientation:landscape)_and_(max-height:520px)]:text-sm! lg:mb-[clamp(1rem,3.5vh,2rem)] lg:text-[clamp(1rem,min(1.6vw,2.6vh),1.75rem)]">
           {t('academy.modes.review.introBody', '10 quick cards. Keep the streak alive, open the chest.')}
         </p>
-        <motion.button
+        <m.button
           type="button"
           data-testid={loading ? 'review-start-pending' : 'review-start'}
           disabled={loading}
@@ -197,8 +197,8 @@ export function ReviewVaultIntro({
           <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-white/60" />
           <KeyRound className="relative h-[1.2em] w-[1.2em] shrink-0" aria-hidden />
           <span className="relative">{loading ? t('common.loading', 'Loading…') : t('academy.modes.review.crack', 'Crack the vault')}</span>
-        </motion.button>
-      </motion.div>
+        </m.button>
+      </m.div>
     </div>
   );
 }

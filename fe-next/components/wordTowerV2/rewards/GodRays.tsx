@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 /**
  * The light fan that wheels out from behind an opened chest — the one cue both
@@ -39,7 +39,7 @@ export function GodRays({ rays, hex, strength, reducedMotion }: Props) {
   }
 
   return (
-    <motion.div
+    <m.div
       className="pointer-events-none absolute left-1/2 top-[42%] h-[160vmin] w-[160vmin]"
       aria-hidden
       initial={{ rotate: 0 }}

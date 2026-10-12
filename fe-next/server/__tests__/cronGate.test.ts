@@ -26,4 +26,15 @@ describe('cronsDisabledReason', () => {
   it('leaves non-Railway servers as before', () => {
     expect(cronsDisabledReason({})).toBeNull();
   });
+
+  it('runs crons on the production service when WEB_CRONS is unset or anything but 0', () => {
+    for (const WEB_CRONS of [undefined, '', '1', 'true', 'false']) {
+      expect(cronsDisabledReason({ RAILWAY_SERVICE_NAME: 'boggle-new', WEB_CRONS })).toBeNull();
+    }
+  });
+
+  it('keeps crons on the canonical service unless WEB_CRONS=0 opts the web process out', () => {
+    expect(cronsDisabledReason({ RAILWAY_SERVICE_NAME: 'boggle-new', WEB_CRONS: '1' })).toBeNull();
+    expect(cronsDisabledReason({ RAILWAY_SERVICE_NAME: 'boggle-new', WEB_CRONS: '0' })).toMatch(/WEB_CRONS=0/);
+  });
 });

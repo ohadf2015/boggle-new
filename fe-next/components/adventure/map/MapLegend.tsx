@@ -8,7 +8,7 @@
  * survives the run (relics + potions carry, half the gold banks as coins).
  */
 import { X } from 'lucide-react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import MapLegendList from './MapLegendList';
 
@@ -25,14 +25,14 @@ export default function MapLegend({ open, onClose }: Props) {
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           className="absolute inset-0 z-30 flex items-end bg-black/50"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           onClick={onClose}
           role="dialog"
           aria-label={t('adventurePlay.map.legend')}
         >
-          <motion.div
+          <m.div
             className="max-h-[88dvh] w-full overflow-y-auto rounded-t-2xl border-t-[3px] border-black bg-[#151f45] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
             initial={reduce ? false : { y: 40 }} animate={{ y: 0 }} exit={reduce ? undefined : { y: 40 }}
             onClick={(e) => e.stopPropagation()}
@@ -61,8 +61,8 @@ export default function MapLegend({ open, onClose }: Props) {
             <p className="mt-3 rounded-lg border-2 border-black bg-black/40 px-3 py-2 text-xs leading-snug">
               {t('adventurePlay.map.eliteWarning')}
             </p>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -7,7 +7,7 @@
  * hotter as the streak climbs.
  */
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
 import { REVIEW_MASCOT_ART, type ReviewMascotMood } from '@/lib/education/academyReactions';
@@ -34,7 +34,7 @@ export function ReviewMascot({ mood, className, big }: { mood: ReviewMascotMood;
   return (
     <div data-testid="review-mascot" data-mood={mood} className={cn('pointer-events-none flex flex-col items-center gap-1', className)}>
       <AnimatePresence mode="popLayout" initial={false}>
-        <motion.p
+        <m.p
           key={mood}
           role="status"
           initial={reduce ? false : { scale: 0.5, y: 8 }}
@@ -48,9 +48,9 @@ export function ReviewMascot({ mood, className, big }: { mood: ReviewMascotMood;
           )}
         >
           {t(line.key, line.en)}
-        </motion.p>
+        </m.p>
       </AnimatePresence>
-      <motion.img
+      <m.img
         key={`m-${mood}`}
         src={REVIEW_MASCOT_ART[mood]}
         alt=""
@@ -116,7 +116,7 @@ export function ReviewRing({ answers, index, total, streak, chestLabel, progress
         })}
       </svg>
       <div className="absolute inset-[16%] grid place-items-center">
-        <motion.img
+        <m.img
           src={ACADEMY_ART.chest}
           alt=""
           draggable={false}

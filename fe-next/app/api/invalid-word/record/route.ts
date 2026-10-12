@@ -9,7 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import logger from '@/utils/logger';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import type { Language } from '@/types';
 import { captureApiError } from '@/utils/sentry';
 
@@ -117,16 +117,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<RecordInv
     }
 
     // Check if Supabase is configured
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
       // Silently succeed if Supabase is not configured (non-critical feature)
       logger.warn('[InvalidWord] Supabase not configured, skipping record');
       return NextResponse.json({ success: true });
     }
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Use the same RPC function as the backend
     const { error } = await supabase.rpc('record_invalid_word_submission', {

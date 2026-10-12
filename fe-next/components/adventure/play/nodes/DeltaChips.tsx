@@ -5,7 +5,7 @@
  * for a gain, pink for a cost. Relic / potion lines carry a name KEY, resolved
  * here so the six locales all read their own item names.
  */
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { Line } from './nodeText';
 import { cn } from '@/lib/utils';
@@ -26,7 +26,7 @@ export default function DeltaChips({ lines, size = 'md', testId }: { lines: Line
   return (
     <div data-testid={testId} className="flex flex-wrap items-center justify-center gap-1.5">
       {lines.map((line, i) => (
-        <motion.span
+        <m.span
           key={`${line.key}-${i}`}
           initial={reduce ? false : { scale: 0.6, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -36,7 +36,7 @@ export default function DeltaChips({ lines, size = 'md', testId }: { lines: Line
             line.tone === 'bad' ? 'bg-neo-pink' : 'bg-neo-lime')}
         >
           {lineText(line)}
-        </motion.span>
+        </m.span>
       ))}
     </div>
   );

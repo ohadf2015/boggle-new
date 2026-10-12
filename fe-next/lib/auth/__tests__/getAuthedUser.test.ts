@@ -13,6 +13,8 @@ async function makeToken(claims: Record<string, unknown>): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('1h')
+    .setIssuer(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1`)
+    .setAudience('authenticated')
     .sign(secret);
 }
 
@@ -26,6 +28,7 @@ vi.mock('@/utils/supabase/server', () => ({
 describe('getAuthedUser', () => {
   beforeEach(() => {
     process.env.SUPABASE_JWT_SECRET = TEST_SECRET;
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://proj.supabase.co';
     mockGetUser.mockReset();
   });
 
@@ -77,6 +80,8 @@ describe('getAuthedUser', () => {
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setExpirationTime('1h')
+    .setIssuer(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1`)
+    .setAudience('authenticated')
       .sign(wrongSecret);
     mockGetUser.mockResolvedValue({ data: { user: { id: 'remote-3' } }, error: null });
     const req = new Request('http://x', { headers: { authorization: `Bearer ${tampered}` } });

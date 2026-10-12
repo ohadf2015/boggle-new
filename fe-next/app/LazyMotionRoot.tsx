@@ -1,22 +1,15 @@
 'use client';
 
-import { LazyMotion, domMax } from 'framer-motion';
-import type { ReactNode } from 'react';
+import { LazyMotion, domAnimation, type FeatureBundle } from 'framer-motion';
+import { useEffect, useState, type ReactNode } from 'react';
 
-/**
- * App-wide LazyMotion provider.
- *
- * Every component was migrated from `motion` to `m`, so this single `domMax`
- * feature bundle is the only framer-motion feature payload the app ships — the
- * full `motion` engine is tree-shaken out of the common chunk.
- *
- * `domMax` (not `domAnimation`) is required: the render tree uses drag
- * (MobileGameDrawer), layout/layoutId (RoomListView, TvLeaderboard, TvPlayerCard)
- * and useMotionValue/animate (TvResultsWinnersPodium).
- *
- * Mounted at the true root (`app/layout.tsx`) so it also covers `party-screen`,
- * which bypasses `EssentialProviders`.
- */
+// Drag and layout features arrive after hydration; swapping `features` re-renders every `m` so mounted elements pick them up.
 export function LazyMotionRoot({ children }: { children: ReactNode }) {
-  return <LazyMotion features={domMax}>{children}</LazyMotion>;
+  const [features, setFeatures] = useState<FeatureBundle>(domAnimation);
+  useEffect(() => {
+    let live = true;
+    import('./motionMaxFeatures').then((mod) => { if (live) setFeatures(mod.default); });
+    return () => { live = false; };
+  }, []);
+  return <LazyMotion features={features}>{children}</LazyMotion>;
 }

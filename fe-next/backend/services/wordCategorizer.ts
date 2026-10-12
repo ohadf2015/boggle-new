@@ -14,7 +14,7 @@
  *   (these are the ONLY "prior knowledge" — 50 words per language, not 500)
  */
 
-import { getCacheClient } from '../cache/redisCache';
+import { getCacheClient, failFast } from '../cache/redisCache';
 import logger from '@/utils/logger';
 
 // ─── Types ───────────────────────────────────────
@@ -205,7 +205,7 @@ export async function categorizeWord(
   try {
     const redis = getCacheClient();
     if (redis) {
-      const cached = await redis.get(cacheKey);
+      const cached = await failFast(redis.get(cacheKey));
       if (cached === '__none__') return null;
       if (cached && CATEGORIES.includes(cached as WordCategory)) {
         return cached as WordCategory;
@@ -223,7 +223,7 @@ export async function categorizeWord(
     const redis = getCacheClient();
     if (redis) {
       // Cache forever (no TTL) — words don't change categories
-      redis.set(cacheKey, category ?? '__none__').catch(() => {});
+      failFast(redis.set(cacheKey, category ?? '__none__')).catch(() => {});
     }
   } catch {
     // Redis unavailable — that's fine, we'll re-classify next time

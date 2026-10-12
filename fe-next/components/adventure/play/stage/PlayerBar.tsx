@@ -7,7 +7,7 @@
  * hit banner itself is AttackFlight's (it lands with the shot).
  */
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Heart, Shield } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { MAX_SHIELDS, type CombatEvent, type CombatState } from '@/lib/adventure/play/combat';
@@ -55,16 +55,16 @@ export default function PlayerBar({ combat, dispatchCombat, playing }: Props) {
               <Heart className={cn('w-6 h-6 stroke-black stroke-[2.5]', h === 'full' ? 'fill-neo-pink' : 'fill-[#2a2a4e]')} />
               <AnimatePresence>
                 {shattering && !reduce && (
-                  <motion.span key={broken.id} className="absolute inset-0" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 0.7 }}>
-                    <motion.span className="absolute inset-0 grid place-items-center [clip-path:polygon(0_0,55%_0,40%_100%,0_100%)]"
+                  <m.span key={broken.id} className="absolute inset-0" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 0.7 }}>
+                    <m.span className="absolute inset-0 grid place-items-center [clip-path:polygon(0_0,55%_0,40%_100%,0_100%)]"
                       initial={{ x: 0, y: 0, rotate: 0 }} animate={{ x: -10, y: 14, rotate: -35 }} transition={{ duration: 0.6 }}>
                       <Heart className="w-6 h-6 fill-neo-pink stroke-black stroke-[2.5]" />
-                    </motion.span>
-                    <motion.span className="absolute inset-0 grid place-items-center [clip-path:polygon(55%_0,100%_0,100%_100%,40%_100%)]"
+                    </m.span>
+                    <m.span className="absolute inset-0 grid place-items-center [clip-path:polygon(55%_0,100%_0,100%_100%,40%_100%)]"
                       initial={{ x: 0, y: 0, rotate: 0 }} animate={{ x: 10, y: 14, rotate: 35 }} transition={{ duration: 0.6 }}>
                       <Heart className="w-6 h-6 fill-neo-pink stroke-black stroke-[2.5]" />
-                    </motion.span>
-                  </motion.span>
+                    </m.span>
+                  </m.span>
                 )}
               </AnimatePresence>
             </span>
@@ -77,7 +77,7 @@ export default function PlayerBar({ combat, dispatchCombat, playing }: Props) {
         )}
       </div>
 
-      <motion.button
+      <m.button
         type="button"
         onClick={() => dispatchCombat({ type: 'tapShield' })}
         disabled={!playing || !ready}
@@ -102,7 +102,7 @@ export default function PlayerBar({ combat, dispatchCombat, playing }: Props) {
         {/* Guard window: drains until the shield drops. */}
         {combat.guard && (
           <span className="absolute inset-x-1.5 bottom-1 h-1.5 rounded-full bg-black/40 overflow-hidden" aria-hidden>
-            <motion.span key={combat.guardUntil} className="block h-full bg-black origin-left rtl:origin-right"
+            <m.span key={combat.guardUntil} className="block h-full bg-black origin-left rtl:origin-right"
               initial={{ scaleX: 1 }} animate={{ scaleX: 0 }}
               transition={{ duration: Math.max(0, combat.guardUntil - combat.now) / 1000, ease: 'linear' }} />
           </span>
@@ -110,7 +110,7 @@ export default function PlayerBar({ combat, dispatchCombat, playing }: Props) {
         {!combat.shields && !combat.guard && (
           <span className="block text-[9px] font-bold leading-tight mt-0.5">{t('adventurePlay.combat.shieldEarn', { count: earnLen })}</span>
         )}
-      </motion.button>
+      </m.button>
     </div>
   );
 }

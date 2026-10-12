@@ -13,7 +13,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import type { TreasureChestState, TranslateFn } from '@/shared/types/vocabQuiz';
 import { cn } from '@/lib/utils';
 
@@ -46,7 +46,7 @@ export function TreasureChestTicker({ chestEvents, t }: TreasureChestTickerProps
       : t('vocabQuiz.treasure.tickerSwap', { actor: latest.actor, target });
 
   return (
-    <motion.div
+    <m.div
       key={`${latest.actor}:${latest.outcome}:${chestEvents.length}`}
       role="status"
       aria-live="polite"
@@ -68,7 +68,7 @@ export function TreasureChestTicker({ chestEvents, t }: TreasureChestTickerProps
       >
         {label}
       </p>
-    </motion.div>
+    </m.div>
   );
 }
 

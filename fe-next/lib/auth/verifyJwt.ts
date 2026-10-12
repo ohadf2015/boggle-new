@@ -10,6 +10,9 @@
  * API → JWT Secret. Add to `.env.local` and Railway env. Never expose as
  * `NEXT_PUBLIC_*` — leaking the secret = forged-token CVE.
  *
+ * Accepts only Supabase user access tokens: HS256, unexpired, issued by
+ * `<NEXT_PUBLIC_SUPABASE_URL>/auth/v1` for audience `authenticated`.
+ *
  * If `SUPABASE_JWT_SECRET` is not set, all calls return null. Caller should
  * fall back to `supabase.auth.getUser()` in that case.
  */
@@ -24,11 +27,16 @@ export type LocalUser = {
 /** Returns the verified user, or null if invalid/expired/secret-missing. */
 export async function verifyJwtLocal(token: string): Promise<LocalUser | null> {
   const rawSecret = process.env.SUPABASE_JWT_SECRET;
-  if (!rawSecret || !token) return null;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim().replace(/\/+$/, '');
+  if (!rawSecret || !supabaseUrl || !token) return null;
 
   try {
     const secret = new TextEncoder().encode(rawSecret);
-    const { payload } = await jwtVerify(token, secret, { algorithms: ['HS256'] });
+    const { payload } = await jwtVerify(token, secret, {
+      algorithms: ['HS256'],
+      issuer: `${supabaseUrl}/auth/v1`,
+      audience: 'authenticated',
+    });
     if (!payload.sub || typeof payload.sub !== 'string') return null;
     return {
       id: payload.sub,

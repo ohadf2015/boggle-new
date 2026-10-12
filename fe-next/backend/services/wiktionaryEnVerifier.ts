@@ -9,6 +9,7 @@
 import ky, { HTTPError } from 'ky';
 import { getRedisClient } from '../redisClient';
 import logger from '../utils/logger';
+import { requireAdminClient } from '@/utils/supabase/admin';
 
 const USER_AGENT = 'LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)';
 const RATE_LIMIT_MS = 200; // Wikimedia allows 200 req/s; we go light at 5/s
@@ -218,11 +219,7 @@ export async function processWiktionaryEnVerificationQueue(
   const { batchSize = 50, minSubmissions = 2, maxAttempts = 3 } = options;
   const result: ProcessQueueResult = { processed: 0, verified: 0, notFound: 0, rejectedType: 0, errors: 0 };
 
-  const { createClient } = await import('@supabase/supabase-js');
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const supabase = requireAdminClient();
 
   const { data: queue, error: queueError } = await supabase.rpc('get_verification_queue', {
     p_language: 'en',
@@ -283,11 +280,7 @@ export async function getVerifiedEnglishWordsForPromotion(
   limit: number = 100
 ): Promise<Array<{ id: string; word: string; url: string | null }>> {
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = requireAdminClient();
     const { data, error } = await supabase.rpc('get_verified_words_for_promotion', {
       p_language: 'en',
       p_limit: limit,

@@ -5,7 +5,7 @@
  * Owns everything the player fights or races against.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { motion, useAnimationControls, useReducedMotion } from 'framer-motion';
+import { m, useAnimationControls, useReducedMotion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { getBossTaunt } from '@/lib/adventure/bossConfig';
@@ -62,7 +62,7 @@ function CombatStage({ world, run, lastHit, onFinaleDone }: { world: number; run
   }, [taunt]);
 
   return (
-    <motion.div className="w-full" animate={shake}>
+    <m.div className="w-full" animate={shake}>
       <EnemyStage world={world} isBoss={isBoss} combat={combat} juice={juice} taunt={taunt}
         lastHit={lastHit} fxFeed={run.combatFx ?? []} gold={run.run?.gold ?? 0} trophy={run.trophy ?? null} />
       <PlayerBar combat={combat} dispatchCombat={run.dispatchCombat} playing={run.phase === 'playing' && !!run.combat} />
@@ -73,7 +73,7 @@ function CombatStage({ world, run, lastHit, onFinaleDone }: { world: number; run
           trophy={run.trophy} bossTrophy={!!run.result?.rewards?.some((r) => r.startsWith('boss-trophy-'))}
           bossStars={run.result?.won ? run.result.stars : 0} onFinaleDone={onFinaleDone} />
       )}
-    </motion.div>
+    </m.div>
   );
 }
 

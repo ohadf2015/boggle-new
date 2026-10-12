@@ -2,7 +2,7 @@
 
 /** One draft card: rarity frame, art, name, one-line effect. Lifts when selected. */
 import { forwardRef } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Heart, Link2 } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { OfferItem } from '@/lib/adventure/play/runToken';
@@ -85,7 +85,7 @@ const OfferCard = forwardRef<HTMLSpanElement, Props>(function OfferCard({ item, 
   const rarity = offerRarity(item);
   const frame = RARITY_FRAME[rarity];
   return (
-    <motion.button
+    <m.button
       type="button"
       data-testid={`draft-card-${index}`}
       aria-pressed={selected}
@@ -115,7 +115,7 @@ const OfferCard = forwardRef<HTMLSpanElement, Props>(function OfferCard({ item, 
         <span className={cn('mt-0.5 w-full text-center text-xs font-semibold leading-snug opacity-85', compact && value ? 'line-clamp-2' : 'line-clamp-3')}>{text.desc}</span>
         {value && <ValueChip value={value} compact={compact} />}
       </span>
-    </motion.button>
+    </m.button>
   );
 });
 

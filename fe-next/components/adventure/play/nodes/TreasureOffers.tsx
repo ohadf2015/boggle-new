@@ -9,7 +9,7 @@
  * and the row that was taken wears its "yours" line. Nothing is ever granted
  * before the player answers.
  */
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { RELICS } from '@/lib/adventure/play/relics';
@@ -51,7 +51,7 @@ export default function TreasureOffers({ offers, taken, busy, onPick }: Props) {
         const descKey = offer.kind === 'relic' ? relicDescKey(offer.id) : 'adventurePlay.loot.goldDesc';
         return (
           <li key={`${offer.kind}-${i}`}>
-            <motion.button
+            <m.button
               type="button"
               data-testid={`treasure-offer-${i}`}
               data-state={mine ? 'taken' : passed ? 'passed' : 'open'}
@@ -106,7 +106,7 @@ export default function TreasureOffers({ offers, taken, busy, onPick }: Props) {
                   {t('adventurePlay.loot.take')}
                 </span>
               )}
-            </motion.button>
+            </m.button>
           </li>
         );
       })}

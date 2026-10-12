@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, type RefObject } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import type { LandingQuality } from '@/lib/wordTowerV2/landing';
 import { chipAnchor } from '@/lib/wordTowerV2/rewards';
 import type { Impact, LandingFx } from './useLandingFx';
@@ -162,14 +162,14 @@ function Burst({ t, impact, points, hostRef, counterRef, onDone, reducedMotion }
     <>
     <div className="absolute" style={{ left: impact.x, top: impact.y }}>
       {/* Shock ring — it expands out of the seam the floor just made. */}
-      <motion.span
+      <m.span
         className={`absolute rounded-full border-[9px] ${RING[impact.quality]}`}
         style={{ width: size, height: size, marginLeft: -size / 2, marginTop: -size / 2 }}
         initial={{ scale: 0.3, opacity: 1 }}
         animate={{ scale: 1, opacity: [1, 0.9, 0] }}
         transition={{ duration: reducedMotion ? 0.2 : RING_MS, ease: 'easeOut', times: [0, 0.55, 1] }}
       />
-      <motion.span
+      <m.span
         className="absolute rounded-full border-[5px] border-black"
         style={{ width: size * 0.7, height: size * 0.7, marginLeft: -size * 0.35, marginTop: -size * 0.35 }}
         initial={{ scale: 0.28, opacity: 0.9 }}
@@ -184,7 +184,7 @@ function Burst({ t, impact, points, hostRef, counterRef, onDone, reducedMotion }
             const dist = (gold ? 130 : 96) + (i % 3) * 18;
             const s = i % 2 === 0 ? 18 : 12;
             return (
-              <motion.span
+              <m.span
                 key={deg}
                 className={`absolute rounded-[2px] border-2 border-black ${gold ? 'bg-neo-yellow' : SHARD[impact.quality]}`}
                 style={{ width: s, height: s, marginLeft: -s / 2, marginTop: -s / 2 }}
@@ -202,7 +202,7 @@ function Burst({ t, impact, points, hostRef, counterRef, onDone, reducedMotion }
           is the biggest type on screen for its beat, then it arcs to the
           counter, which only catches up once it arrives. */}
       {impact.amount > 0 || scored > 0 ? (
-        <motion.span
+        <m.span
           className="absolute flex -translate-x-1/2 items-center gap-1"
           style={{ marginTop: CHIP_OFFSET }}
           initial={reducedMotion ? { opacity: 1 } : { scale: 0.3, opacity: 1, x: 0, y: 0 }}
@@ -257,9 +257,9 @@ function Burst({ t, impact, points, hostRef, counterRef, onDone, reducedMotion }
               {t('wordTowerV2.streak.crate')}
             </span>
           ) : null}
-        </motion.span>
+        </m.span>
       ) : (
-        <motion.span
+        <m.span
           className="absolute"
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}

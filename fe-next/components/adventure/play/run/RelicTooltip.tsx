@@ -21,7 +21,7 @@
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { RELICS, type RelicId } from '@/lib/adventure/play/relics';
 import type { LevelWords } from '@/lib/adventure/play/relicStack';
@@ -85,7 +85,7 @@ export default function RelicTooltip({ id, onClose, stackCtx, anchor, avoid }: P
   const frame = RARITY_FRAME[rarity];
 
   const bubble = (
-    <motion.div
+    <m.div
       ref={boxRef}
       role="tooltip"
       initial={{ opacity: 0, y: -6, scale: 0.96 }}
@@ -120,7 +120,7 @@ export default function RelicTooltip({ id, onClose, stackCtx, anchor, avoid }: P
           </span>
         )}
       </span>
-    </motion.div>
+    </m.div>
   );
 
   // Before hydration (and in any environment without a document) it renders inline,

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import logger from '@/utils/logger';
 import { captureApiError } from '@/utils/sentry';
 import { isAuthorizedCronRequest } from '@/lib/cronAuth';
 import { withTimeout, EMAIL_COLORS } from '@/lib/email';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 
 /**
  * Close the loop on a bug report — automatically.
@@ -38,13 +38,6 @@ function escapeHtml(str: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
-}
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return createClient(url, key, { auth: { persistSession: false } });
 }
 
 /**

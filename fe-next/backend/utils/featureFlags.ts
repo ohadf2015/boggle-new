@@ -1,19 +1,8 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/utils/supabase/admin';
 import crypto from 'crypto';
 import logger from './logger';
 
-// Lazy initialization to avoid build-time errors when env vars are missing
-let supabase: SupabaseClient | null = null;
-
-function getSupabase(): SupabaseClient | null {
-  if (!supabase && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
-  }
-  return supabase;
-}
+const getSupabase = createAdminClient;
 
 export interface FeatureFlag {
   flag_name: string;

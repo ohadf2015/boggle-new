@@ -6,10 +6,10 @@
  */
 
 import { Resend } from 'resend';
-import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
 import logger from '@/backend/utils/logger';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 
 // Initialize Resend client
 const resend = process.env.RESEND_API_KEY
@@ -28,19 +28,7 @@ export function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMess
   ]);
 }
 
-// Get Supabase admin client for database operations
-export function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: { persistSession: false },
-  });
-}
+export { getSupabaseAdmin };
 
 /**
  * Check if email service is properly configured

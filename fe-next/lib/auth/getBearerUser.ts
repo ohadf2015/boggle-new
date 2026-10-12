@@ -18,7 +18,7 @@
  * Provision SUPABASE_JWT_SECRET (Supabase → Project Settings → API → JWT Secret)
  * and the legit-token hot path stops touching the network entirely.
  */
-import { createClient } from '@supabase/supabase-js';
+import { getAnonClient } from '@/utils/supabase/anon';
 import * as Sentry from '@sentry/nextjs';
 import { verifyJwtLocal, bearerToken, type LocalUser } from './verifyJwt';
 
@@ -57,11 +57,8 @@ export async function getBearerUser(req: Request): Promise<LocalUser | null> {
 
   // Fallback: remote token verify (legacy behavior). Reached when the secret is
   // unset or the token didn't verify locally.
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } }
-  );
+  const supabase = getAnonClient();
+  if (!supabase) return null;
   const {
     data: { user },
   } = await supabase.auth.getUser(token);

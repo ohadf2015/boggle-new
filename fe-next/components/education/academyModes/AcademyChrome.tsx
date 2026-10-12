@@ -9,7 +9,7 @@
  */
 
 import { useEffect, type ReactNode } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -134,7 +134,7 @@ export function XpChip({ xp, className }: { xp: number | null; className?: strin
     );
   }
   return (
-    <motion.span
+    <m.span
       data-testid="academy-xp"
       initial={{ scale: 0.6, rotate: -6 }}
       animate={{ scale: 1, rotate: -2 }}
@@ -143,7 +143,7 @@ export function XpChip({ xp, className }: { xp: number | null; className?: strin
     >
       <Sparkles className="h-4 w-4" aria-hidden />
       {t('academy.modes.xpEarned', '+{xp} XP', { xp })}
-    </motion.span>
+    </m.span>
   );
 }
 

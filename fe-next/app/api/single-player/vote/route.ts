@@ -5,19 +5,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getAnonClient } from '@/utils/supabase/anon';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { captureApiError } from '@/utils/sentry';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Create a simple Supabase client for anonymous operations (no cookies needed)
-function getSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  return createClient(supabaseUrl, supabaseAnonKey);
-}
 
 // Constants from communityWordManager (must match database is_potentially_valid threshold)
 const PROMINENT_THRESHOLD = 6;
@@ -95,7 +89,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getSupabaseClient();
+    const supabase = getAnonClient();
+    if (!supabase) throw new Error('Supabase not configured');
     const normalizedWord = normalizeWord(word, language);
     const guestId = `sp_${sessionId}`;
     const gameCode = `sp_${sessionId}`;

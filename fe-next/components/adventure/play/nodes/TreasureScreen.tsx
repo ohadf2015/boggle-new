@@ -13,7 +13,7 @@
  * granted prize (`relic` / `gold`); that case renders the old one-prize card.
  */
 import { useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -48,16 +48,16 @@ function Chest({ open, big, onOpen, label }: { open: boolean; big: boolean; onOp
       className={cn('relative mx-auto grid shrink-0 place-items-center disabled:cursor-default', big ? 'h-44 w-44' : 'h-24 w-24')}>
       {open && (
         <>
-          <motion.span aria-hidden className="absolute inset-[-40%] rounded-full"
+          <m.span aria-hidden className="absolute inset-[-40%] rounded-full"
             style={{ background: 'repeating-conic-gradient(from 0deg, rgba(255,230,120,0.5) 0deg 10deg, transparent 10deg 30deg)', maskImage: 'radial-gradient(circle, #000 20%, transparent 68%)', WebkitMaskImage: 'radial-gradient(circle, #000 20%, transparent 68%)' }}
             initial={{ opacity: 0, scale: 0.4 }}
             animate={reduce ? { opacity: 1, scale: 1 } : { opacity: 1, scale: 1, rotate: 360 }}
             transition={reduce ? { duration: 0 } : { opacity: { duration: 0.3 }, scale: { duration: 0.4 }, rotate: { duration: 16, repeat: Infinity, ease: 'linear' } }} />
-          <motion.span aria-hidden className="absolute inset-3 rounded-full bg-[radial-gradient(circle,rgba(255,244,180,0.95)_0%,rgba(255,214,0,0.35)_45%,transparent_70%)]"
+          <m.span aria-hidden className="absolute inset-3 rounded-full bg-[radial-gradient(circle,rgba(255,244,180,0.95)_0%,rgba(255,214,0,0.35)_45%,transparent_70%)]"
             initial={{ opacity: 0, scale: 0.3 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.35 }} />
         </>
       )}
-      <motion.img key={open ? 'open' : 'closed'} src={open ? CHEST_OPEN_ART : CHEST_CLOSED_ART} alt="" draggable={false}
+      <m.img key={open ? 'open' : 'closed'} src={open ? CHEST_OPEN_ART : CHEST_CLOSED_ART} alt="" draggable={false}
         className="relative h-full w-full object-contain drop-shadow-[5px_5px_0_#000]"
         initial={open && !reduce ? { scale: 0.7, y: 10 } : false}
         animate={open || reduce ? { scale: 1, y: 0 } : { rotate: [0, -6, 6, -4, 4, 0], y: [0, -5, 0] }}
@@ -154,12 +154,12 @@ export default function TreasureScreen({ offers, taken, relic, gold, run, world,
             {/* What the chest actually paid, read off the offer the run took —
                 not off a diff, so a reload states it just as plainly. */}
             {ledger && (
-              <motion.p data-testid="treasure-ledger"
+              <m.p data-testid="treasure-ledger"
                 initial={reduce ? false : { y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
                 className={cn('rounded-xl border-[3px] border-black px-3 py-1.5 text-center font-neo-display text-sm font-bold text-black shadow-[3px_3px_0_#000]',
                   ledger.tone === 'good' ? 'bg-neo-lime' : 'bg-neo-cream')}>
                 <bdi>{t(ledger.key, ledger.params)}</bdi>
-              </motion.p>
+              </m.p>
             )}
             <NodeButton testId="node-leave" onClick={() => {
               trackGrowthEvent('adventure_exit', { from: 'chest' });
@@ -189,7 +189,7 @@ export default function TreasureScreen({ offers, taken, relic, gold, run, world,
         {confirm != null && (
           <div className="fixed inset-0 z-30 grid place-items-center bg-black/75 p-5 animate-in fade-in duration-200"
             onClick={() => setConfirm(null)}>
-            <motion.div role="dialog" aria-modal="true" data-testid="treasure-confirm"
+            <m.div role="dialog" aria-modal="true" data-testid="treasure-confirm"
               initial={reduce ? false : { scale: 0.85, y: 20 }} animate={{ scale: 1, y: 0 }} exit={reduce ? undefined : { scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 380, damping: 26 }}
               onClick={(e) => e.stopPropagation()}
@@ -236,7 +236,7 @@ export default function TreasureScreen({ offers, taken, relic, gold, run, world,
                   {skipping ? t('adventurePlay.node.chestSkip') : t('adventurePlay.loot.take')}
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         )}
       </AnimatePresence>

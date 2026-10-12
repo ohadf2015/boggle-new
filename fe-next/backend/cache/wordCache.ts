@@ -1,4 +1,4 @@
-import { getCacheClient } from './redisCache';
+import { getCacheClient, failFast } from './redisCache';
 
 const WORD_KEY = (lang: string, word: string) =>
   `word:${lang}:${word.toLowerCase()}`;
@@ -10,7 +10,7 @@ export async function getCachedWordValidation(
 ): Promise<boolean | null> {
   const redis = getCacheClient();
   try {
-    const result = await redis.get(WORD_KEY(lang, word));
+    const result = await failFast(redis.get(WORD_KEY(lang, word)));
     if (result === null) return null;
     return result === '1';
   } catch {
@@ -25,7 +25,7 @@ export async function setCachedWordValidation(
 ): Promise<void> {
   const redis = getCacheClient();
   try {
-    await redis.setex(WORD_KEY(lang, word), WORD_TTL, isValid ? '1' : '0');
+    await failFast(redis.setex(WORD_KEY(lang, word), WORD_TTL, isValid ? '1' : '0'));
   } catch {
     /* non-fatal */
   }

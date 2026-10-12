@@ -4,7 +4,8 @@
  */
 
 import { GoogleGenAI } from '@google/genai';
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { captureAIServiceError } from '@/utils/sentry';
 import { TOKEN_COSTS, type GoogleCredentials, type TokenUsageStats } from './types';
 import logger from '@/backend/utils/logger';
@@ -71,23 +72,14 @@ export function parseGoogleCredentials(): GoogleCredentials {
 }
 
 /**
- * Create a Supabase client with service role key to bypass RLS.
+ * Service-role client (RLS bypass) for the AI word jobs; the shared instance.
  */
 export function createServiceClient(): SupabaseClient | null {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
+  const client = createAdminClient();
+  if (!client) {
     logger.info('AI_SERVICE', 'Supabase service role not configured. Word caching will be disabled.');
-    return null;
   }
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
+  return client;
 }
 
 /**

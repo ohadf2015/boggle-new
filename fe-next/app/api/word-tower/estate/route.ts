@@ -14,7 +14,7 @@ export const runtime = 'nodejs';
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthedUser(request);
+    const user = await getAuthedUser(request, { writes: true });
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const db = getSupabaseAdmin();
     if (!db) return NextResponse.json({ error: 'db unavailable' }, { status: 503 });

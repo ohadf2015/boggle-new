@@ -9,7 +9,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Star, Swords, Zap } from 'lucide-react';
 import type { CombatEvent, CombatState } from '@/lib/adventure/play/combat';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -142,7 +142,7 @@ export default function FoeTarget({ world, score, stars, lastHit, combat = null,
             tele && !reduce && 'animate-pulse')} />
           {/* The rival's hand: AttackFlight's shot leaves from here. */}
           <span data-enemy-anchor aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2" />
-          <motion.div
+          <m.div
             className="absolute inset-1"
             animate={reduce ? undefined
               : down ? { rotate: -12, y: 6, scale: 0.92 }
@@ -152,7 +152,7 @@ export default function FoeTarget({ world, score, stars, lastHit, combat = null,
           >
             <Image src={`/images/adventure/enemies/w${world}-${frame}.webp`} alt={name} fill sizes="92px" priority
               className={cn('object-contain drop-shadow-[3px_3px_0_#000]', hurt && !down && 'brightness-150 saturate-50', down && 'grayscale opacity-70')} />
-          </motion.div>
+          </m.div>
           {tele && (
             /* The countdown rides the portrait's corner; the words live in the
                name row's tag (below), so nothing here is wider than the art. */

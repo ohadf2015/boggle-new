@@ -6,7 +6,7 @@
  * leads into the next level's draft.
  */
 import { useEffect, useRef, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Star, Map as MapIcon, ChevronRight } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -78,12 +78,12 @@ export default function LevelCleared({ result, run, onNext, onMap }: Props) {
 
       <div ref={coinFrom} className="mt-5 flex justify-center gap-2" aria-label={t('adventurePlay.starsEarned', { stars: result.stars })}>
         {[1, 2, 3].map((n) => (
-          <motion.span key={n}
+          <m.span key={n}
             initial={reduce ? false : { scale: 0, rotate: -90 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 420, damping: 14, delay: 0.25 + n * 0.12 }}>
             <Star className={cn('h-14 w-14 stroke-black stroke-[2.5]', n <= result.stars ? 'fill-neo-yellow' : 'fill-white/10', n === 2 && '-mt-3')} />
-          </motion.span>
+          </m.span>
         ))}
       </div>
       <div className="mt-2 text-center font-neo-display text-lg font-bold tabular-nums opacity-90">
@@ -102,9 +102,9 @@ export default function LevelCleared({ result, run, onNext, onMap }: Props) {
           clipped by the button row on a short viewport. */}
       <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden pb-1 [&>*]:max-h-full">
         {hasChest && counted && (
-          <motion.div initial={reduce ? false : { y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 20 }}>
+          <m.div initial={reduce ? false : { y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 20 }}>
             <ChestOpen loot={loot} onOpened={() => setOpened(true)} />
-          </motion.div>
+          </m.div>
         )}
       </div>
 

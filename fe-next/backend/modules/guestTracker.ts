@@ -6,24 +6,14 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import logger from '../utils/logger';
-
-// Create Supabase client (lazy loaded)
-let supabase: SupabaseClient | null = null;
+import { createAdminClient } from '@/utils/supabase/admin';
 
 function getSupabaseClient(): SupabaseClient | null {
-  if (supabase) return supabase;
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey || supabaseServiceKey === 'placeholder') {
+  const client = createAdminClient();
+  if (!client) {
     logger.warn('GUEST_TRACKER', 'Supabase not configured (missing or placeholder service key). Guest sessions will not be tracked.');
-    return null;
   }
-
-  const { createClient } = require('@supabase/supabase-js');
-  supabase = createClient(supabaseUrl, supabaseServiceKey);
-  return supabase;
+  return client;
 }
 
 const DB_TIMEOUT_MS = 5000;

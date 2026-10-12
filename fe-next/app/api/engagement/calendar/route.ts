@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
   try {
     // Local JWT verify (sub-ms) — callers send a Bearer via authFetch. Read-only
     // GET; POST keeps getUserIdFromRequest (remote) for mutation safety.
-    const user = await getAuthedUser(request);
+    const user = await getAuthedUser(request, { writes: true });
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

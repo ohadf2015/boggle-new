@@ -86,9 +86,24 @@ const mockAdminUser = {
 describe('Bulk Approve Invalid Words API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-service-role');
     mockSelectData = [];
     mockUpsertResults = [];
     upsertCallIndex = 0;
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('returns 500 without touching the database when the service role is not configured', async () => {
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', '');
+
+    const result = await handleBulkApprove({ wordIds: ['word-1'] }, mockAdminUser);
+
+    expect(result.status).toBe(500);
+    expect(mockSupabaseFrom).not.toHaveBeenCalled();
   });
 
   describe('Input validation', () => {

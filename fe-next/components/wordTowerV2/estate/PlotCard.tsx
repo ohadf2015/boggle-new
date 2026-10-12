@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Coins, Construction, Crown, Hammer, Layers, type LucideIcon, Lock, Shield, Wrench } from 'lucide-react';
 import type { Plot } from '@/lib/wordTowerV2/estate';
 import { MAX_PLOT_LEVEL, type PlotSlot } from '@/lib/wordTowerV2/estateCatalog';
@@ -111,12 +111,12 @@ export function PlotCard({ t, district, plot, material, name, cost, affordable, 
       aria-label={`${name} ${t('wordTowerV2.estate.level', { n: plot.level })}`}
       className="group relative flex w-full flex-col items-center justify-end focus:outline-none"
     >
-      <motion.div
+      <m.div
         className="relative flex w-full items-end justify-center"
         animate={building && !reducedMotion ? { scale: [0.72, 1.12, 1], y: [10, -6, 0] } : { scale: 1, y: 0 }}
         transition={{ duration: 0.55, ease: 'easeOut' }}
       >
-        <motion.span
+        <m.span
           className="relative inline-flex items-end justify-center"
           animate={lively ? { y: [0, -5, 0] } : { y: 0 }}
           transition={lively ? { duration: 1.8, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
@@ -146,8 +146,8 @@ export function PlotCard({ t, district, plot, material, name, cost, affordable, 
           >
             {t('wordTowerV2.estate.level', { n: plot.level })}
           </span>
-        </motion.span>
-      </motion.div>
+        </m.span>
+      </m.div>
 
       <div className={`-mt-1 flex items-center gap-1 rounded-neo border-neo px-1.5 py-0.5 font-neo-display text-[11px] font-black shadow-hard-sm md:text-sm ${TAG_CLS[id.state]}`}>
         <Icon className="h-3.5 w-3.5 md:h-4 md:w-4" aria-hidden />

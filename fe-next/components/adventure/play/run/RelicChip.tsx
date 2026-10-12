@@ -12,7 +12,7 @@
  * `RelicFireCallout`, which NAMES the relic. A 30px tag stuck on the icon was
  * the round-3 gap, not the fix for it.
  */
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { RELICS, type RelicId } from '@/lib/adventure/play/relics';
 import { RARITY_FRAME, relicArt } from './art';
@@ -42,7 +42,7 @@ export default function RelicChip({ id, contrib, firing, fireKey = 0, open, onTo
 
   return (
     <span className="relative block">
-      <motion.button
+      <m.button
         key={firing ? `${id}-${fireKey}` : id}
         ref={innerRef}
         type="button"
@@ -65,10 +65,10 @@ export default function RelicChip({ id, contrib, firing, fireKey = 0, open, onTo
         {/* eslint-disable-next-line @next/next/no-img-element -- small static art */}
         <img src={relicArt(id)} alt="" draggable={false}
           className="h-full w-full object-contain drop-shadow-[1px_1px_0_rgba(0,0,0,0.65)]" />
-      </motion.button>
+      </m.button>
 
       {/* The numeral, baked onto the chip's bottom edge (off on the in-level HUD). */}
-      {!bare && <motion.span
+      {!bare && <m.span
         key={`${badge.tone}-${badge.text}`}
         data-testid={badge.tone === 'points' ? `relic-contrib-${id}` : `relic-tag-${id}`}
         role="img"
@@ -85,7 +85,7 @@ export default function RelicChip({ id, contrib, firing, fireKey = 0, open, onTo
         )}
       >
         {badge.text}
-      </motion.span>}
+      </m.span>}
 
     </span>
   );

@@ -8,7 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
-import { createClient as createServiceClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import { getRankTier, DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
 import { captureApiError } from '@/utils/sentry';
 import { cacheAside } from '@/backend/cache/redisCache';
@@ -18,16 +19,8 @@ import { cacheKeys } from '@/lib/cache/cacheKeys';
 // under one shared key (30s). Leaderboards tolerate a few seconds of staleness.
 const LEADERBOARD_TTL_SECONDS = 30;
 
-// Plain SupabaseClient (defaults to the `any` schema) — matches the loose typing
-// the original inline createServiceClient(...) call inferred for these queries.
+// Plain SupabaseClient (defaults to the `any` schema) for these queries.
 type ServiceClient = SupabaseClient;
-
-function getSupabaseConfig() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return { url, key };
-}
 
 /**
  * Fetch + enrich the public top-50 leaderboard. Deliberately takes NO user
@@ -101,12 +94,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
-    const config = getSupabaseConfig();
-    if (!config) {
+    const serviceClient = getSupabaseAdmin();
+    if (!serviceClient) {
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
-
-    const serviceClient = createServiceClient(config.url, config.key);
 
     // Get authenticated user (optional - leaderboard is public)
     const user = await getAuthedUser(request);

@@ -1,7 +1,7 @@
 'use client';
 
 /** What came out of the chest: gold, potions, collection items — each pops in. */
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Trophy, ScrollText, Gem, Sparkles } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { getCollectibleById, type CollectibleCategory } from '@/lib/adventure/collectibleConfig';
@@ -23,26 +23,26 @@ export default function RewardChips({ loot, delay = 0 }: { loot: LevelLoot; dela
   return (
     <ul className="flex flex-wrap justify-center gap-2" aria-label={t('adventurePlay.loot.chestTitle')}>
       {loot.gold > 0 && (
-        <motion.li {...pop(i++)} className="inline-flex items-center gap-1.5 rounded-xl border-[3px] border-black bg-neo-yellow px-2.5 py-1 font-neo-display font-bold text-black shadow-[3px_3px_0_#000]">
+        <m.li {...pop(i++)} className="inline-flex items-center gap-1.5 rounded-xl border-[3px] border-black bg-neo-yellow px-2.5 py-1 font-neo-display font-bold text-black shadow-[3px_3px_0_#000]">
           {/* eslint-disable-next-line @next/next/no-img-element -- small static art */}
           <img src={COIN_ART} alt="" className="h-6 w-6" /> {t('adventurePlay.offerGold', { amount: loot.gold })}
-        </motion.li>
+        </m.li>
       )}
       {loot.potions.map((id, k) => (
-        <motion.li key={`p-${id}-${k}`} {...pop(i++)} className="inline-flex items-center gap-1.5 rounded-xl border-[3px] border-black bg-neo-lime px-2.5 py-1 font-bold text-black shadow-[3px_3px_0_#000]">
+        <m.li key={`p-${id}-${k}`} {...pop(i++)} className="inline-flex items-center gap-1.5 rounded-xl border-[3px] border-black bg-neo-lime px-2.5 py-1 font-bold text-black shadow-[3px_3px_0_#000]">
           {/* eslint-disable-next-line @next/next/no-img-element -- small static art */}
           <img src={potionArt(id)} alt="" className="h-6 w-6" /> {t(`adventurePlay.potion.${id}`)}
-        </motion.li>
+        </m.li>
       ))}
       {loot.items.map((id) => {
         const item = getCollectibleById(id);
         const cat = item?.category ?? 'relic';
         const Icon = CAT_ICON[cat];
         return (
-          <motion.li key={id} {...pop(i++)} className={`inline-flex items-center gap-1.5 rounded-xl border-[3px] border-black ${CAT_BG[cat]} px-2.5 py-1 font-bold text-black shadow-[3px_3px_0_#000]`}>
+          <m.li key={id} {...pop(i++)} className={`inline-flex items-center gap-1.5 rounded-xl border-[3px] border-black ${CAT_BG[cat]} px-2.5 py-1 font-bold text-black shadow-[3px_3px_0_#000]`}>
             <Icon className="h-5 w-5" /> <span className="text-sm">{item ? t(item.nameKey) : id}</span>
             <span className="rounded bg-black px-1 text-[9px] font-black uppercase text-neo-cream">{t('adventurePlay.loot.newItem')}</span>
-          </motion.li>
+          </m.li>
         );
       })}
     </ul>

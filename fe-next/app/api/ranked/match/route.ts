@@ -10,20 +10,13 @@
 import { timingSafeEqual } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import {
   calculateNewRatings,
   calculateMultiplayerRatings,
   type PlayerRating,
 } from '@/shared/utils/eloRating';
 import { captureApiError } from '@/utils/sentry';
-
-function getSupabaseConfig() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return { url, key };
-}
 
 interface MatchPlayer {
   userId: string;
@@ -51,8 +44,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
-    const config = getSupabaseConfig();
-    if (!config) {
+    const serviceClient = getSupabaseAdmin();
+    if (!serviceClient) {
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
@@ -85,8 +78,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    const serviceClient = createServiceClient(config.url, config.key);
 
     // Fetch current ratings for all players
     const userIds = players.map(p => p.userId);

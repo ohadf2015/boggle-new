@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-let _adminClient: SupabaseClient | null = null;
+let _adminClient: { url: string; key: string; client: SupabaseClient } | null = null;
 
 /**
  * Returns a Supabase client using the service role key.
@@ -23,13 +23,25 @@ export function createAdminClient(): SupabaseClient | null {
     return null;
   }
 
-  if (!_adminClient) {
-    // Build from the TRIMMED values: a key pasted into a hosting dashboard
-    // with a trailing newline passes the placeholder check above but sends a
-    // malformed apikey header, 401ing every admin call.
-    _adminClient = createClient(supabaseUrl.trim(), trimmed, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
+  // Built from the TRIMMED values: a key pasted into a hosting dashboard with a
+  // trailing newline passes the placeholder check above but sends a malformed
+  // apikey header, 401ing every admin call.
+  const url = supabaseUrl.trim();
+  if (!_adminClient || _adminClient.url !== url || _adminClient.key !== trimmed) {
+    _adminClient = {
+      url,
+      key: trimmed,
+      client: createClient(url, trimmed, {
+        auth: { autoRefreshToken: false, persistSession: false },
+      }),
+    };
   }
-  return _adminClient;
+  return _adminClient.client;
+}
+
+/** createAdminClient for jobs that cannot run without it (crons, verifiers). */
+export function requireAdminClient(): SupabaseClient {
+  const client = createAdminClient();
+  if (!client) throw new Error('Supabase service role is not configured');
+  return client;
 }

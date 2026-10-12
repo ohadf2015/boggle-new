@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Flame, RotateCcw, Check, X, Target, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
@@ -209,7 +209,7 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
       theme="vault"
       testId="review-screen"
       right={
-        <motion.div
+        <m.div
           key={streak}
           data-testid="review-streak"
           initial={reduce || streak === 0 ? false : { scale: 1.4 }}
@@ -224,7 +224,7 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
         >
           <Flame className="h-5 w-5 lg:h-8 lg:w-8" aria-hidden />
           {streak}
-        </motion.div>
+        </m.div>
       }
     >
       <div className="flex min-h-0 w-full flex-1 flex-col [@media(orientation:landscape)_and_(max-height:520px)]:flex-row [@media(orientation:landscape)_and_(max-height:520px)]:items-center [@media(orientation:landscape)_and_(max-height:520px)]:gap-4 lg:grid lg:max-w-[150rem] lg:grid-cols-[minmax(0,1fr)_minmax(0,min(52rem,58vw))_minmax(0,1fr)] lg:items-center lg:gap-[clamp(1rem,2vw,2.5rem)] min-[2200px]:grid-cols-[minmax(0,1fr)_minmax(0,72rem)_minmax(0,1fr)]">
@@ -247,7 +247,7 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
         </div>
         <div className="relative flex w-full shrink-0 items-center justify-center pb-1 [@media(orientation:landscape)_and_(max-height:520px)]:min-w-0 [@media(orientation:landscape)_and_(max-height:520px)]:flex-1 lg:order-2">
           <AnimatePresence mode="wait" initial={false}>
-            <motion.div
+            <m.div
               key={card.id}
               initial={reduce ? false : { x: 60, rotate: 3, opacity: 0.4 }}
               animate={lastCorrect === false && !reduce ? { x: [0, -10, 10, -6, 0], rotate: 0, opacity: 1 } : { x: 0, rotate: 0, opacity: 1 }}
@@ -257,11 +257,11 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
               className="w-full"
             >
               <ReviewCardView card={card} answered={answered} correct={lastCorrect} onAnswer={answer} onTile={() => sfx.playTileSelectSound?.()} />
-            </motion.div>
+            </m.div>
           </AnimatePresence>
           <AnimatePresence>
             {lastPoints !== null && (
-              <motion.div
+              <m.div
                 key={`pts-${answers.length}`}
                 initial={reduce ? false : { y: 10, scale: 0.6 }}
                 animate={{ y: -8, scale: 1 }}
@@ -273,7 +273,7 @@ export default function MissedWordsReview({ cards, lessonName, onBack, onFinish,
               >
                 {lastPoints > 0 ? <Check className="h-5 w-5" aria-hidden /> : <X className="h-5 w-5" aria-hidden />}
                 {lastPoints > 0 ? `+${lastPoints}` : card.word}
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>

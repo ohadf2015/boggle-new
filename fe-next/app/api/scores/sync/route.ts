@@ -29,7 +29,7 @@ import {
   type ProcessDrillContext,
   type DrillSubmitBody,
 } from '@/app/api/drills/submit/processCompletion';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/admin/server';
 import { validateBlastResult } from '@/app/api/blast/utils';
 import { processBlastCompletion } from '@/app/api/blast/result/processCompletion';
 import { processConnectionsCompletion } from '@/app/api/connections/daily/score/processCompletion';
@@ -110,22 +110,12 @@ async function dispatchBrain({ sub, userId, supabase }: AwardHandlerArgs): Promi
   };
 }
 
-// Blast persistence needs the service-role client (the route uses it too, to
-// bypass RLS on profiles/XP). The sync route's per-request client is the authed
-// user client, so dispatchBlast creates its own service client.
-function getBlastServiceClient(): SupabaseLike | null {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return createServiceClient(url, key);
-}
-
 async function dispatchBlast({ sub, userId }: AwardHandlerArgs): Promise<Record<string, unknown>> {
   const validation = validateBlastResult(sub.payload as Record<string, unknown>);
   if (!validation.valid || !validation.data) {
     throw new AwardError(`blast payload invalid: ${validation.error}`, false);
   }
-  const supabase = getBlastServiceClient();
+  const supabase = getSupabaseAdmin();
   if (!supabase) {
     // Misconfiguration is transient from the client's view — retry next sync.
     throw new AwardError('blast service unavailable', true);
@@ -157,7 +147,7 @@ async function dispatchConnections({ sub, userId }: AwardHandlerArgs): Promise<R
     throw new AwardError(`connections payload invalid: ${validation.error}`, false);
   }
 
-  const supabase = getBlastServiceClient(); // Reuse the service-role client
+  const supabase = getSupabaseAdmin(); // Reuse the service-role client
   if (!supabase) {
     throw new AwardError('connections service unavailable', true);
   }

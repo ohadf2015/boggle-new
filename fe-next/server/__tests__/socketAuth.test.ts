@@ -13,6 +13,7 @@ const TEST_SECRET = 'test-secret-for-socket-auth-needs-32-chars';
 
 beforeAll(() => {
   process.env.SUPABASE_JWT_SECRET = TEST_SECRET;
+  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://proj.supabase.co';
 });
 
 async function makeToken(secret: string, claims: Record<string, unknown>, exp = '1h'): Promise<string> {
@@ -21,6 +22,8 @@ async function makeToken(secret: string, claims: Record<string, unknown>, exp = 
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(exp)
+    .setIssuer('https://proj.supabase.co/auth/v1')
+    .setAudience('authenticated')
     .sign(key);
 }
 

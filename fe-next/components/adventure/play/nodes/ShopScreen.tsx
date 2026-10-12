@@ -11,7 +11,7 @@
  * after, read from the run the server handed back.
  */
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Heart, X } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -131,11 +131,11 @@ export default function ShopScreen({ items, bought, run, world, busy, onBuy, onL
           {/* The last purchase's real ledger, pinned over the shelf so it never hides a row. */}
           <AnimatePresence>
             {receipt && (
-              <motion.div key={receipt.map((l) => l.key).join()}
+              <m.div key={receipt.map((l) => l.key).join()}
                 initial={reduce ? false : { y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ opacity: 0 }}
                 className="rounded-xl border-[3px] border-black bg-black/85 px-2 py-1.5">
                 <DeltaChips lines={receipt} size="sm" testId="shop-receipt" />
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
           <NodeButton testId="node-leave" onClick={() => {
@@ -147,7 +147,7 @@ export default function ShopScreen({ items, bought, run, world, busy, onBuy, onL
 
       {/* The keeper himself: the backdrop puts him behind the counter, where a
           full shelf hides him, so his face and his line ride above the stock. */}
-      <motion.div
+      <m.div
         initial={reduce ? false : { x: -24, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 320, damping: 24 }}
         className="mb-2 flex items-center gap-2">
@@ -160,7 +160,7 @@ export default function ShopScreen({ items, bought, run, world, busy, onBuy, onL
         <p className="min-w-0 flex-1 rounded-2xl border-[3px] border-black bg-neo-cream px-2.5 py-1.5 font-neo-display text-sm font-bold leading-snug text-black shadow-[3px_3px_0_#000]">
           {t(shopGreetingKey(items, run, bought))}
         </p>
-      </motion.div>
+      </m.div>
 
       <ul className="grid grid-cols-2 gap-2 pb-2">
         {items.map((it, i) => {
@@ -170,7 +170,7 @@ export default function ShopScreen({ items, bought, run, world, busy, onBuy, onL
           const short = it.price - run.gold;
           return (
             <li key={`${it.type}-${i}`} className="min-w-0">
-              <motion.button
+              <m.button
                 type="button"
                 data-testid={`shop-item-${i}`}
                 data-state={state}
@@ -223,7 +223,7 @@ export default function ShopScreen({ items, bought, run, world, busy, onBuy, onL
                     </span>
                   </span>
                 )}
-              </motion.button>
+              </m.button>
             </li>
           );
         })}
@@ -237,7 +237,7 @@ export default function ShopScreen({ items, bought, run, world, busy, onBuy, onL
         {item && text && frame && (
           <div className="fixed inset-0 z-30 grid place-items-center bg-black/75 p-5 animate-in fade-in duration-200"
             onClick={() => setConfirm(null)}>
-            <motion.div role="dialog" aria-modal="true" data-testid="shop-confirm"
+            <m.div role="dialog" aria-modal="true" data-testid="shop-confirm"
               initial={reduce ? false : { scale: 0.85, y: 20 }} animate={{ scale: 1, y: 0 }} exit={reduce ? undefined : { scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 380, damping: 26 }}
               onClick={(e) => e.stopPropagation()}
@@ -265,7 +265,7 @@ export default function ShopScreen({ items, bought, run, world, busy, onBuy, onL
                   {t('adventurePlay.node.buy')}
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         )}
       </AnimatePresence>
