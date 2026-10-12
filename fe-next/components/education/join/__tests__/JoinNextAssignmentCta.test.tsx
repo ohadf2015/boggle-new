@@ -19,9 +19,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 vi.mock('@/components/student/StudentAssignmentPlayCta', () => ({
   StudentAssignmentPlayCta: ({ next }: { next: { title: string } }) => (
-    <a data-testid="student_assignment_cta" href="/play">
-      {next.title}
-    </a>
+    <span data-testid="student_assignment_cta">{next.title}</span>
   ),
 }));
 
