@@ -65,7 +65,7 @@ describe('SerpGapSections — competitor heading gaps + unique round table', () 
 
   it('uses the exact target query in body copy', () => {
     render(<SerpGapSections locale="es" />);
-    expect(screen.getByText(/scrabble online español multijugador/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/scrabble online español multijugador/i).length).toBeGreaterThan(0);
   });
 
   it('renders the measured Spanish dictionary floor and the Ñ tile row', () => {
