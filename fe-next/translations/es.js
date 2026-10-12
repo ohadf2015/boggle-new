@@ -619,6 +619,8 @@ const es = {
       "classGotIt": "{{got}} de {{total}} acertaron"
     },
     "swipeHint": "{{count}} juegos · desliza",
+    "scrollPrev": "Juegos anteriores",
+    "scrollNext": "Más juegos",
     "needsMeanings": "Esta lista no tiene significados para preguntar: añade definiciones o elige un juego de tablero.",
     "noQuizWords": "Esta lista no tiene palabras que sirvan como preguntas de test: elige otra lista o juega Clásico.",
     "playClassicInstead": "Jugar Clásico"

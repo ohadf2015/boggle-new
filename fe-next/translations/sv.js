@@ -619,6 +619,8 @@ const sv = {
       "classGotIt": "{{got}} av {{total}} hade rätt"
     },
     "swipeHint": "{{count}} spel · svep",
+    "scrollPrev": "Föregående spel",
+    "scrollNext": "Fler spel",
     "needsMeanings": "Listan har inga betydelser att fråga om. Lägg till definitioner eller välj ett brädspel.",
     "noQuizWords": "Den här listan har inga ord som går att göra frågor av. Välj en annan lista eller spela Klassiskt.",
     "playClassicInstead": "Spela Klassiskt i stället"

@@ -31,6 +31,18 @@ import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { TeacherProNavLink } from '@/components/teacher/TeacherProNavLink';
 import { educationBackHref } from '@/lib/navigation/educationBackHref';
 
+/**
+ * Flattens the controls inside the utility bar: no per-button border, hard
+ * shadow, fill or hover lift — just a soft hover wash. `!` because each
+ * control's own `hover:shadow-hard` etc. out-specifies a plain descendant rule.
+ * Spelled out in full: Tailwind v4 only emits class names it can read verbatim.
+ */
+const UTILITY_BAR = [
+  'bg-neo-black/5 dark:bg-neo-cream/5',
+  '[&>*>button]:border-0! [&>*>button]:shadow-none! [&>*>button]:bg-transparent! [&>*>button]:translate-none! [&>*>button]:rounded-neo! [&>*>button]:text-neo-black! [&>*>button]:dark:text-neo-cream! [&>*>button]:hover:bg-neo-black/10! [&>*>button]:dark:hover:bg-neo-cream/15!',
+  '[&>*>*>button]:border-0! [&>*>*>button]:shadow-none! [&>*>*>button]:bg-transparent! [&>*>*>button]:translate-none! [&>*>*>button]:rounded-neo! [&>*>*>button]:text-neo-black! [&>*>*>button]:dark:text-neo-cream! [&>*>*>button]:hover:bg-neo-black/10! [&>*>*>button]:dark:hover:bg-neo-cream/15!',
+].join(' ');
+
 interface EducationHeaderProps {
   /** Additional class names */
   className?: string;
@@ -254,26 +266,47 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           <EducationBreadcrumbs />
         </div>
 
-        {/* Right Section: Controls */}
-        <div className={cn('flex shrink-0 items-center gap-2 sm:gap-3', isRTL && 'flex-row-reverse')}>
+        {/* Right Section: ONE borderless utility bar. Each control ships its
+            own boxed neo-brutalist frame for use elsewhere; side by side that
+            was six bordered squares of noise. The bar strips the frame off its
+            direct triggers only (`>*>button`, `>*>*>button`), never off the
+            menus they open, and follows the page `dir` instead of a manual
+            flex-row-reverse. Order from the inner side: Sound, Language, Help,
+            then the menu at the outer edge. */}
+        <div
+          data-testid="edu-utility-bar"
+          dir={isRTL ? 'rtl' : 'ltr'}
+          className={cn('flex shrink-0 items-center gap-0.5 rounded-neo-lg p-1 sm:gap-1', UTILITY_BAR)}
+        >
           {/* ponytail: What's new + Search are desktop conveniences; at 390px they pushed the hamburger off-screen */}
           {isTeacher && (
-            <div className="hidden sm:flex items-center gap-3">
-              <TeacherWhatsNew />
-              <SearchIconButton />
-            </div>
+            <>
+              <span className="hidden sm:flex">
+                <TeacherWhatsNew />
+              </span>
+              <span className="hidden sm:flex">
+                <SearchIconButton />
+              </span>
+              <span aria-hidden="true" className="mx-1 hidden h-6 w-px bg-neo-black/20 sm:block dark:bg-neo-cream/25" />
+            </>
           )}
-          {isTeacher && <TeacherHelpButton />}
 
-          {/* Desktop Controls */}
-          <div className="hidden sm:flex items-center gap-3">
-            {/* Language Switcher */}
-            <QuickLanguageSwitcher compact />
-
-            {/* Music Controls */}
+          <span className="flex">
             <MusicControls />
+          </span>
 
-            {/* Education Menu Dropdown */}
+          <span className="hidden sm:flex">
+            <QuickLanguageSwitcher compact />
+          </span>
+
+          {isTeacher && (
+            <span className="flex">
+              <TeacherHelpButton />
+            </span>
+          )}
+
+          {/* Desktop: education menu dropdown (profile, dashboards, sign out) */}
+          <span className="hidden sm:flex">
             <EducationMenuDropdown
               isTeacher={isTeacher}
               exitHref={exitHref}
@@ -282,26 +315,13 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               onSignOut={handleSignOut}
               isAuthenticated={isAuthenticated}
             />
-          </div>
+          </span>
 
-          {/* Mobile Controls */}
-          <div className="sm:hidden flex items-center gap-2" ref={mobileMenuRef}>
-            {/* Music Controls */}
-            <MusicControls />
-
-            {/* Hamburger menu button */}
+          {/* Mobile: hamburger opens the slide-out pane */}
+          <div className="flex sm:hidden" ref={mobileMenuRef}>
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className={cn(
-                'flex items-center justify-center shrink-0',
-                'w-11 h-11 min-w-[44px] min-h-[44px]',
-                'bg-neo-cream text-neo-black',
-                'border-3 border-neo-black',
-                'rounded-neo shadow-hard-sm',
-                'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
-                'active:translate-x-px active:translate-y-px active:shadow-none',
-                'transition-all duration-100'
-              )}
+              className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center"
               aria-label={showMobileMenu ? t('common.closeMenu') : t('common.openMenu')}
               aria-expanded={showMobileMenu}
             >
