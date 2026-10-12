@@ -619,6 +619,8 @@ const ja = {
       "classGotIt": "{{total}}人中{{got}}人が正解"
     },
     "swipeHint": "全{{count}}ゲーム・スワイプ",
+    "scrollPrev": "前のゲーム",
+    "scrollNext": "ほかのゲーム",
     "needsMeanings": "このリストには出題できる意味がありません。定義を追加するか、盤面のゲームを選んでください。",
     "noQuizWords": "このリストにはクイズの問題にできる単語がありません。別のリストを選ぶか、クラシックで遊びましょう。",
     "playClassicInstead": "クラシックで遊ぶ"

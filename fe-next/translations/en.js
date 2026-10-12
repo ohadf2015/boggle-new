@@ -619,6 +619,8 @@ const en = {
       "classGotIt": "{{got}} of {{total}} got it"
     },
     "swipeHint": "{{count}} games · swipe",
+    "scrollPrev": "Previous games",
+    "scrollNext": "More games",
     "needsMeanings": "This list has no meanings to quiz on. Add definitions, or pick a board game.",
     "noQuizWords": "This list has no words that work as quiz questions. Pick another list or play Classic.",
     "playClassicInstead": "Play Classic instead"

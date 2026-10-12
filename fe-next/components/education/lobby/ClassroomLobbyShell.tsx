@@ -32,10 +32,11 @@ export interface ClassroomLobbyShellProps {
 }
 
 export function ClassroomLobbyShell({ pinned, children, footer, className }: ClassroomLobbyShellProps) {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   return (
     <div
       data-testid="classroom-lobby-shell"
+      dir={dir}
       // Transparent on purpose: the route paints `bg-neo-navy` and the arena
       // art (LaunchStageBackdrop) behind this shell.
       className={cn('relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden', className)}
@@ -46,16 +47,18 @@ export function ClassroomLobbyShell({ pinned, children, footer, className }: Cla
           stranding 500px of empty navy under it, and a tall one still gets its
           own scrollbar without ever handing the scroll to the page. */}
       <div className="mx-auto flex w-full max-w-3xl min-h-0 flex-1 flex-col justify-center-safe gap-2 px-1 py-1 lg:max-w-5xl lg:gap-3">
-        {/* The stage title: what this screen is for, in one line, on a
-            show-card — the arena behind it says the rest. */}
-        <header className="flex shrink-0 flex-col items-center gap-1 text-center lg:flex-row lg:justify-center lg:gap-3">
-          <h1
-            data-testid="lobby-stage-title"
-            className="rounded-neo border-[3px] border-neo-black bg-neo-yellow px-3 py-0.5 font-neo-display text-lg font-black uppercase leading-tight tracking-tight text-neo-black lg:px-4 lg:text-2xl"
-          >
+        {/* The stage line is information, not an action. The title used to be
+            a yellow bordered slab that read as a second START button beside
+            GO LIVE — two CTAs for one job. It stays as the page's h1 for
+            screen readers; GO LIVE in the spotlight is the only call to action. */}
+        <header className="flex shrink-0 justify-center text-center">
+          <h1 data-testid="lobby-stage-title" className="sr-only">
             {tr(t, 'academy.launch.title', 'Start a live game')}
           </h1>
-          <p className="rounded-full bg-neo-navy/85 px-3 py-0.5 font-neo-body text-xs font-bold text-neo-cream lg:text-base">
+          <p
+            data-testid="lobby-stage-subtitle"
+            className="rounded-full bg-neo-navy/85 px-3 py-0.5 font-neo-body text-xs font-bold text-neo-cream lg:px-4 lg:py-1 lg:text-lg"
+          >
             {tr(t, 'academy.launch.subtitle', 'Pick a game. Your class joins with one code.')}
           </p>
         </header>
