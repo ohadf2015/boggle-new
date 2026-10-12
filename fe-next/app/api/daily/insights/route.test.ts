@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
 vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }))
@@ -7,13 +7,56 @@ vi.mock('@/backend/cache/redisCache', () => ({
 }))
 
 import { createClient } from '@/utils/supabase/server'
+import { cacheAside } from '@/backend/cache/redisCache'
 import { GET } from './route'
 
 const req = (mode: string, date = '2026-05-12') =>
   new NextRequest(`http://localhost/api/daily/insights?mode=${mode}&date=${date}`)
 
 describe('GET /api/daily/insights', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-05-12T12:00:00Z'))
+  })
+  afterEach(() => vi.useRealTimers())
+
+  const authed = () =>
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { getUser: async () => ({ data: { user: { id: 'u1' } }, error: null }) },
+      from: () => chain(),
+    } as never)
+
+  function chain(): unknown {
+    const result = { data: [], error: null }
+    return new Proxy({}, {
+      get: (_t, prop) => {
+        if (prop === 'then') return (resolve: (v: unknown) => void) => resolve(result)
+        if (prop === 'single') return async () => ({ data: { efficiency_score: 50 }, error: null })
+        return () => chain()
+      },
+    })
+  }
+
+  it.each([
+    ['not a date', 'banana'],
+    ['wrong shape', '2026-5-12'],
+    ['trailing junk', '2026-05-12x'],
+    ['impossible calendar date', '2026-02-30'],
+    ['future day', '2026-05-13'],
+    ['older than the lookback window', '2024-01-01'],
+  ])('rejects a %s with 400 and never touches the cache', async (_label, date) => {
+    authed()
+    const res = await GET(req('word_hunt', encodeURIComponent(date)))
+    expect(res.status).toBe(400)
+    expect(cacheAside).not.toHaveBeenCalled()
+  })
+
+  it('keys the peer cache on the validated date', async () => {
+    authed()
+    await GET(req('word_hunt', '2026-05-11'))
+    expect(vi.mocked(cacheAside).mock.calls[0][0]).toBe('lc:next:daily:peers:word_hunt:2026-05-11')
+  })
 
   it('returns 401 unauthenticated', async () => {
     vi.mocked(createClient).mockResolvedValue({

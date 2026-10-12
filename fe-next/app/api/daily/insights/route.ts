@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 import { cacheAside } from '@/backend/cache/redisCache'
 import { cacheKeys } from '@/lib/cache/cacheKeys'
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils'
 
 interface Insight {
   type: string
@@ -21,6 +22,18 @@ type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>
 // failed scan is never cached. Takes mode+date only — no per-user data.
 const PEER_POOL_TTL_SECONDS = 300
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+const DAY_MS = 86_400_000
+const MAX_LOOKBACK_DAYS = 400
+
+function validDailyDate(raw: string): string | null {
+  if (!DATE_RE.test(raw)) return null
+  const ms = Date.parse(`${raw}T00:00:00Z`)
+  if (Number.isNaN(ms) || new Date(ms).toISOString().slice(0, 10) !== raw) return null
+  const todayMs = Date.parse(`${getDailyChallengeDate()}T00:00:00Z`)
+  return ms <= todayMs && ms >= todayMs - MAX_LOOKBACK_DAYS * DAY_MS ? raw : null
+}
+
 async function fetchPeerScores(supabase: SupabaseServerClient, date: string): Promise<number[]> {
   const { data, error } = await supabase
     .from('daily_word_hunt_attempts').select('efficiency_score')
@@ -36,7 +49,8 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const mode = searchParams.get('mode') ?? 'word_hunt'
-  const date = searchParams.get('date') ?? new Date().toISOString().split('T')[0]
+  const date = validDailyDate(searchParams.get('date') ?? getDailyChallengeDate())
+  if (!date) return NextResponse.json({ error: 'Invalid date' }, { status: 400 })
   const insights: Insight[] = []
 
   if (mode === 'word_hunt') {
