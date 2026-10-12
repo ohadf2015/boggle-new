@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
-import { generateDailyPuzzle } from '@/utils/dailyChallenge';
+import { generateDailyPuzzle, getDailyChallengeDate } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
 const VALID_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
@@ -34,13 +34,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
+  const today = getDailyChallengeDate();
   const puzzles = dates.map((date) => {
     const puzzle = generateDailyPuzzle(date, language as Language);
+    const started = date <= today;
     return {
       date,
       language,
       mode: 'wordhunt',
-      payload: { grid: puzzle.grid, targetWord: puzzle.targetWord },
+      payload: started ? { grid: puzzle.grid, targetWord: puzzle.targetWord } : { grid: puzzle.grid },
       validUntil: endOfDateUtcMs(date),
     };
   });

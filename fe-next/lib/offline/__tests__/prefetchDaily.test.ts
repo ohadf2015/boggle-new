@@ -173,6 +173,25 @@ describe('prefetchDailyPuzzles', () => {
     expect(await getCachedDailyPuzzle(store, d1, 'en', 'wordhunt', now)).toEqual(MOCK_PUZZLE);
     expect(await getCachedDailyPuzzle(store, d2, 'en', 'wordhunt', now)).toEqual(MOCK_PUZZLE);
   });
+
+  it('skips an answerless puzzle so a not-yet-started day falls through to offline-miss', async () => {
+    const now = Date.now();
+    const d1 = new Date(now).toISOString().slice(0, 10);
+    const d2 = new Date(now + 86400_000).toISOString().slice(0, 10);
+
+    const result = await prefetchDailyPuzzles({
+      language: 'en',
+      store,
+      _fetchFn: mockFetchWith([
+        { date: d1, language: 'en', mode: 'wordhunt', payload: MOCK_PUZZLE, validUntil: now + 86400_000 },
+        { date: d2, language: 'en', mode: 'wordhunt', payload: { grid: MOCK_PUZZLE.grid }, validUntil: now + 2 * 86400_000 },
+      ]),
+      _nowMs: () => now,
+    });
+
+    expect(result.stored).toBe(1);
+    expect(await getCachedDailyPuzzle(store, d2, 'en', 'wordhunt', now)).toBeNull();
+  });
 });
 
 describe('getCachedDailyPuzzle', () => {

@@ -8,7 +8,7 @@ import { getSupabase, isSupabaseConfigured } from '../modules/supabaseServer';
 import { getCachedDailyPuzzle, cacheDailyPuzzle, getCachedDailyLeaderboard, cacheDailyLeaderboard } from '../redisClient';
 import { coalesce } from '../utils/requestCoalescing';
 import logger from '../utils/logger';
-import { generateDailyPuzzle } from '../../utils/dailyChallenge';
+import { generateDailyPuzzle, getDailyChallengeDate } from '../../utils/dailyChallenge';
 import { generateDailyPuzzleAsync } from '../../utils/dailyChallenge/gridGeneration.server';
 import { isUsableDailyPuzzle } from '../../utils/dailyChallenge/puzzlePayload';
 import { COIN_COSTS } from '../../utils/coinManager';
@@ -54,6 +54,11 @@ router.get('/puzzle/:date/:language', async (req: Request<LeaderboardParams>, re
 
     if (!isValidLanguage(language)) {
       res.status(400).json({ error: 'Invalid language code' });
+      return;
+    }
+
+    if (date > getDailyChallengeDate()) {
+      res.status(404).json({ error: 'Puzzle not available yet' });
       return;
     }
 

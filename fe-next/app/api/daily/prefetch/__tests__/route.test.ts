@@ -104,6 +104,21 @@ describe('GET /api/daily/prefetch', () => {
     expect(validUntil).toBeLessThan(beforeDate);
   });
 
+  it('never returns the target word for a day that has not started (UTC)', async () => {
+    const res = await GET(makeRequest({ language: 'en', dates: '2026-05-12,2026-05-13' }));
+    expect(res.status).toBe(200);
+    const [today, tomorrow] = res.data.puzzles;
+    expect(today.payload.targetWord).toBe('WORD-2026-05-12-en');
+    expect(tomorrow.date).toBe('2026-05-13');
+    expect(tomorrow.payload).not.toHaveProperty('targetWord');
+    expect(JSON.stringify(res.data)).not.toContain('WORD-2026-05-13');
+  });
+
+  it('still returns the target word for past days', async () => {
+    const res = await GET(makeRequest({ language: 'en', dates: '2026-05-11' }));
+    expect(res.data.puzzles[0].payload.targetWord).toBe('WORD-2026-05-11-en');
+  });
+
   it('caps to 3 dates to prevent abuse', async () => {
     const res = await GET(
       makeRequest({ language: 'en', dates: '2026-05-12,2026-05-13,2026-05-14,2026-05-15' }),

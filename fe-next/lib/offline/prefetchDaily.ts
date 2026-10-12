@@ -17,6 +17,10 @@ interface RemotePuzzle {
   validUntil: number;
 }
 
+function hasTargetWord(payload: unknown): boolean {
+  return typeof (payload as { targetWord?: unknown } | null)?.targetWord === 'string';
+}
+
 function getKvKey(language: string): string {
   return `prefetch_last_${language}`;
 }
@@ -85,6 +89,7 @@ export async function prefetchDailyPuzzles(opts: PrefetchOptions): Promise<Prefe
 
   let stored = 0;
   for (const p of data.puzzles ?? []) {
+    if (!hasTargetWord(p.payload)) continue;
     await store.sql.run(
       'INSERT OR REPLACE INTO daily_puzzles_cache(date, language, mode, payload, valid_until) VALUES (?, ?, ?, ?, ?)',
       [p.date, p.language, p.mode, JSON.stringify(p.payload), p.validUntil],
