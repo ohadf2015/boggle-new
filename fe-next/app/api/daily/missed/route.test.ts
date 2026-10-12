@@ -33,7 +33,7 @@ describe('GET /api/daily/missed', () => {
 
   it('returns an empty list for guests (no session)', async () => {
     vi.mocked(createClient).mockResolvedValue(makeSupabase({ user: null }) as any)
-    const res = await GET()
+    const res = await GET(new Request('http://localhost/api/daily/missed') as never)
     const json = await res.json()
     expect(json.today).toBe('2026-05-12')
     expect(json.missed).toEqual([])
@@ -42,7 +42,7 @@ describe('GET /api/daily/missed', () => {
   it('returns catch-up days the player has not completed, newest first', async () => {
     // Completed yesterday only → 05-10 and 05-09 remain missed.
     vi.mocked(createClient).mockResolvedValue(makeSupabase({ solved: ['2026-05-11'] }) as any)
-    const res = await GET()
+    const res = await GET(new Request('http://localhost/api/daily/missed') as never)
     const json = await res.json()
     expect(json.missed.map((m: any) => m.date)).toEqual(['2026-05-10', '2026-05-09'])
     expect(json.missed[0].puzzleNumber).toBe(getPuzzleNumber('2026-05-10'))
@@ -50,7 +50,7 @@ describe('GET /api/daily/missed', () => {
 
   it('returns all three when nothing in the window is completed', async () => {
     vi.mocked(createClient).mockResolvedValue(makeSupabase({ solved: [] }) as any)
-    const res = await GET()
+    const res = await GET(new Request('http://localhost/api/daily/missed') as never)
     const json = await res.json()
     expect(json.missed.map((m: any) => m.date)).toEqual(['2026-05-11', '2026-05-10', '2026-05-09'])
   })
@@ -59,7 +59,7 @@ describe('GET /api/daily/missed', () => {
     vi.mocked(createClient).mockResolvedValue(
       makeSupabase({ solved: ['2026-05-11', '2026-05-10', '2026-05-09'] }) as any,
     )
-    const res = await GET()
+    const res = await GET(new Request('http://localhost/api/daily/missed') as never)
     const json = await res.json()
     expect(json.missed).toEqual([])
   })

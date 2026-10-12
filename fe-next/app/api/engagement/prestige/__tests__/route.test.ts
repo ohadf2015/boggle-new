@@ -48,7 +48,7 @@ import { NextRequest } from 'next/server';
 // ---------- Helpers ----------
 
 function makeRequest(): NextRequest {
-  return {} as unknown as NextRequest;
+  return new Request('http://localhost/api/engagement/prestige') as unknown as NextRequest;
 }
 
 function authAs(userId = 'user-1') {

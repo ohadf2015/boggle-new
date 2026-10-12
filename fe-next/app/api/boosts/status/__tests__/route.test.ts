@@ -19,7 +19,7 @@ beforeEach(() => {
 describe('GET /api/boosts/status', () => {
   it('401 when unauthenticated', async () => {
     mockGetUser.mockResolvedValueOnce({ data: { user: null }, error: { message: 'x' } });
-    const res = await GET();
+    const res = await GET(new Request('http://localhost/api/boosts/status') as never);
     expect(res.status).toBe(401);
   });
 
@@ -35,7 +35,7 @@ describe('GET /api/boosts/status', () => {
         }),
       }),
     });
-    const res = await GET();
+    const res = await GET(new Request('http://localhost/api/boosts/status') as never);
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.capPerDay).toBe(5);
@@ -54,7 +54,7 @@ describe('GET /api/boosts/status', () => {
         }),
       }),
     });
-    const res = await GET();
+    const res = await GET(new Request('http://localhost/api/boosts/status') as never);
     const body = await res.json();
     expect(body.remaining).toBe(5);
   });
@@ -67,7 +67,7 @@ describe('GET /api/boosts/status', () => {
         }),
       }),
     });
-    const res = await GET();
+    const res = await GET(new Request('http://localhost/api/boosts/status') as never);
     expect(res.status).toBe(404);
   });
 });

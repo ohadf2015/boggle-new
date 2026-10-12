@@ -59,9 +59,7 @@ function makeInvalidJsonRequest(): NextRequest {
 }
 
 function makeGetRequest(query = ''): Request {
-  return {
-    url: `http://localhost:3000/api/blast/result${query ? `?${query}` : ''}`,
-  } as unknown as Request;
+  return new Request(`http://localhost:3000/api/blast/result${query ? `?${query}` : ''}`);
 }
 
 const validBody = {
