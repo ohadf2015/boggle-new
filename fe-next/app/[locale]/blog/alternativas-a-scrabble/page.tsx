@@ -4,6 +4,7 @@ import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { extractFaqFromSections } from '@/utils/seo/parseFaqProse';
 import AlternativasAScrabblePageClient from './PageClient';
 import { contentByLocale } from './content';
+import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 
 export const revalidate = 86400;
 
@@ -64,6 +65,9 @@ export default async function AlternativasAScrabblePage({ params }: PageProps) {
         articleSection="Comparativa"
       />
       <AlternativasAScrabblePageClient />
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <EsScrabbleCrossLink locale={locale} anchorVariant="query" />
+      </div>
     </>
   );
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SerpGapSections } from '../SerpGapSections';
-import { EXAMPLE_TOTAL_POINTS, EXAMPLE_WORDS, LENGTH_SCORES, SIMILAR_GAMES, TIPS } from '../../data';
+import { EXAMPLE_TOTAL_POINTS, EXAMPLE_WORDS, LENGTH_SCORES, SIMILAR_GAMES, SPANISH_TILES, TIPS, ES_DICT_FLOOR } from '../../data';
 
 vi.mock('next/link', () => ({
   default: ({ children, href, ...rest }: { children: React.ReactNode; href: string }) => (
@@ -28,6 +28,12 @@ describe('SerpGapSections — competitor heading gaps + unique round table', () 
     expect(
       screen.getByRole('heading', { level: 2, name: /qué juegos son parecidos a scrabble online/i }),
     ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /^objetivo$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /fichas de letras/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /diccionario medido/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /^dificultad$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /fin de la partida/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /controles del juego/i })).toBeInTheDocument();
   });
 
   it('renders the worked 4×4 example with every scored word and the live total', () => {
@@ -60,5 +66,14 @@ describe('SerpGapSections — competitor heading gaps + unique round table', () 
   it('uses the exact target query in body copy', () => {
     render(<SerpGapSections locale="es" />);
     expect(screen.getByText(/scrabble online español multijugador/i)).toBeInTheDocument();
+  });
+
+  it('renders the measured Spanish dictionary floor and the Ñ tile row', () => {
+    render(<SerpGapSections locale="es" />);
+    expect(screen.getAllByText(new RegExp(ES_DICT_FLOOR.replace(',', ','))).length).toBeGreaterThan(0);
+    expect(screen.getByRole('rowheader', { name: 'Ñ' })).toBeInTheDocument();
+    SPANISH_TILES.forEach((row) => {
+      expect(screen.getByRole('rowheader', { name: row.tile })).toBeInTheDocument();
+    });
   });
 });

@@ -4,6 +4,7 @@ import { loadTranslation, type TranslationData } from '@/translations/loadTransl
 import type { Metadata } from 'next';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
+import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
 
@@ -195,6 +196,7 @@ export default async function HowToPlayPage({ params }: PageParams) {
         <BreadcrumbJsonLd items={breadcrumbItems} />
         <FaqPageJsonLd faqs={content.faq.map(({ question, answer }) => ({ q: question, a: answer }))} />
         <HowToPlayPageClient locale={locale} />
+        <EsScrabbleCrossLink locale={locale} anchorVariant="query" />
         <GuidesCalloutLink locale={locale} />
         <GamePageSeoContent
           title={content.title}

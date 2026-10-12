@@ -1,10 +1,13 @@
 import Link from 'next/link';
 import {
+  CONTROLS,
+  ES_DICT_FLOOR,
   EXAMPLE_GRID,
   EXAMPLE_TOTAL_POINTS,
   EXAMPLE_WORDS,
   LENGTH_SCORES,
   SIMILAR_GAMES,
+  SPANISH_TILES,
   TIPS,
 } from '../data';
 
@@ -50,7 +53,7 @@ export function SerpGapSections({ locale }: { locale: string }) {
         <ul className="grid gap-2 font-neo-body text-sm text-neo-white sm:grid-cols-2 sm:text-base">
           <li className="rounded-neo border-2 border-neo-cyan/40 bg-neo-navy-light/40 p-3">Tiempo real, no por turnos</li>
           <li className="rounded-neo border-2 border-neo-pink/40 bg-neo-navy-light/40 p-3">2–50 jugadores en una sala</li>
-          <li className="rounded-neo border-2 border-neo-lime/40 bg-neo-navy-light/40 p-3">Diccionario ES 10.000+ palabras</li>
+          <li className="rounded-neo border-2 border-neo-lime/40 bg-neo-navy-light/40 p-3">Diccionario ES {ES_DICT_FLOOR}+ palabras</li>
           <li className="rounded-neo border-2 border-neo-yellow/40 bg-neo-navy-light/40 p-3">8 modos, 6 idiomas, 0€</li>
           <li className="rounded-neo border-2 border-neo-purple/40 bg-neo-navy-light/40 p-3">Móvil y PC, sin app</li>
           <li className="rounded-neo border-2 border-neo-cyan/40 bg-neo-navy-light/40 p-3">Ronda media: 180 segundos</li>
@@ -210,6 +213,123 @@ export function SerpGapSections({ locale }: { locale: string }) {
           </Link>{' '}
           antes de la partida.
         </p>
+      </section>
+
+      <section className="mb-14 max-w-3xl">
+        <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+          Objetivo
+        </h2>
+        <p className="font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+          En el Scrabble clásico el objetivo es colocar fichas en un tablero 15×15
+          y vaciar el atril. En{' '}
+          <strong className="text-neo-cyan">scrabble online español multijugador</strong>{' '}
+          en LexiClash el objetivo es otro: encontrar más palabras válidas que el
+          resto de la sala en la misma cuadrícula, en 2–3 minutos. Gana el marcador
+          más alto, no la última ficha.
+        </p>
+      </section>
+
+      <section className="mb-14 max-w-3xl">
+        <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+          Fichas de letras
+        </h2>
+        <p className="mb-6 font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+          El Scrabble en español (FISE) paga por ficha: la Ñ vale 8, la Z vale 10,
+          CH/LL/RR son fichas propias. LexiClash no tiene atril. La Ñ es una letra
+          más; lo que paga es la longitud (tabla de arriba).
+        </p>
+        <div className="overflow-x-auto rounded-neo border-3 border-neo-black shadow-hard-lg">
+          <table className="w-full min-w-[28rem] border-collapse bg-neo-navy-light/40 text-left">
+            <caption className="sr-only">
+              Valor de las fichas del Scrabble en español frente a LexiClash.
+            </caption>
+            <thead>
+              <tr className="border-b-3 border-neo-black">
+                <th scope="col" className="p-3 font-neo-display text-xs font-black uppercase text-neo-white sm:p-4">
+                  Letra
+                </th>
+                <th scope="col" className="p-3 font-neo-display text-xs font-black uppercase text-neo-yellow sm:p-4">
+                  Scrabble ES
+                </th>
+                <th scope="col" className="p-3 font-neo-display text-xs font-black uppercase text-neo-lime sm:p-4">
+                  LexiClash
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {SPANISH_TILES.map((row) => (
+                <tr key={row.tile} className="border-b-2 border-neo-white/10 last:border-b-0">
+                  <th scope="row" className="p-3 font-neo-display text-sm font-black text-neo-cyan sm:p-4">
+                    {row.tile}
+                  </th>
+                  <td className="p-3 font-neo-body text-sm text-neo-white sm:p-4">{row.scrabble}</td>
+                  <td className="p-3 font-neo-body text-sm text-neo-white sm:p-4">{row.lexiclash}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="mb-14 max-w-3xl">
+        <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+          Diccionario medido (dato propio)
+        </h2>
+        <p className="mb-4 font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+          Minijuegos, JuegoSpot y Locura de Letras no publican el tamaño real de
+          su léxico. El nuestro se mide igual que el validador en vivo:{' '}
+          <Link href={`/${locale}/words`} className="text-neo-cyan underline">
+            más de {ES_DICT_FLOOR} palabras en español
+          </Link>
+          , Set deduplicado, no un <code>wc -l</code> del archivo fuente. Suelo
+          redondeado: el Set crece cuando se aprueban palabras de la comunidad.
+        </p>
+        <p className="font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+          Cifra: <strong className="text-neo-lime">{ES_DICT_FLOOR}+</strong> en
+          español. Inglés, hebreo, sueco, japonés y ruso tienen su propio Set —
+          seis diccionarios, no uno traducido.
+        </p>
+      </section>
+
+      <section className="mb-14 max-w-3xl">
+        <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+          Dificultad
+        </h2>
+        <p className="font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+          Contra humanos no hay niveles: el tablero es el mismo. Si practicas
+          solo, hay bots fácil / medio / difícil en{' '}
+          <Link href={`/${locale}/singleplayer?autoStart=bots`} className="text-neo-lime underline">
+            modo individual
+          </Link>
+          . No es una IA de Scrabble 15×15 (Minijuegos, Locura de Letras): busca
+          en la misma rejilla que tú, a distinta velocidad.
+        </p>
+      </section>
+
+      <section className="mb-14 max-w-3xl">
+        <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+          Fin de la partida
+        </h2>
+        <p className="font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+          Se acaba el reloj (≈180 s en Clásico) y el marcador se congela. No se
+          vacía una bolsa ni se restan las fichas del atril. Empate: mismo
+          tablero, misma ronda — gana quien encontró más. Luego creas otra sala
+          o cambias de modo.
+        </p>
+      </section>
+
+      <section className="mb-14 max-w-3xl">
+        <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+          Controles del juego
+        </h2>
+        <ul className="space-y-3">
+          {CONTROLS.map((c) => (
+            <li key={c.device} className="rounded-neo border-2 border-neo-white/15 bg-neo-navy-light/40 p-4">
+              <h3 className="font-neo-display text-sm font-black uppercase text-neo-yellow">{c.device}</h3>
+              <p className="mt-1 font-neo-body text-sm text-neo-white">{c.how}</p>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="mb-14 max-w-3xl">
