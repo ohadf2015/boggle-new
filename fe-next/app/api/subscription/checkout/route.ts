@@ -5,7 +5,7 @@ import { getPolarClient, getProProductId } from '@/lib/polar';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { locales, defaultLocale } from '@/i18n/config';
 import logger from '@/utils/logger';
-import { buildProCheckoutStartedEvent, buildProTrialStartedEvent, buildTrialCheckoutStartedEvent, buildCheckoutCompleteEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
+import { buildProCheckoutStartedEvent, buildProTrialStartedEvent, buildCheckoutStartedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 
 /**
  * A second free trial, or a trial on top of Pro, is a paid checkout instead.
@@ -115,13 +115,15 @@ export async function POST(request: NextRequest) {
     });
 
     // Analytics only, after the checkout exists; never able to change the answer.
+    // URL creation is `checkout_started` (plus the edu_* names). `checkout_complete`
+    // fires from the Polar webhook on paid `subscription.active` — not here.
     try {
       if (trial) {
         captureProFunnelServerEvent(buildProTrialStartedEvent(user.id));
-        captureProFunnelServerEvent(buildTrialCheckoutStartedEvent(user.id));
+        captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id));
       } else {
         captureProFunnelServerEvent(buildProCheckoutStartedEvent(user.id));
-        captureProFunnelServerEvent(buildCheckoutCompleteEvent(user.id));
+        captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id));
       }
     } catch {
       /* the teacher's checkout url matters more than the funnel */

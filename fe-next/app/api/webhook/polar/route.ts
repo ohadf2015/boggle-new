@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
-import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
+import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
 
 // Polar payloads are large; we only read a handful of fields.
@@ -162,10 +162,11 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * `edu_pro_checkout_succeeded` — analytics only, after the entitlement write
- * landed. Only `subscription.active` counts (created/uncanceled/resumed are not
- * new conversions), only for the Pro product. Never throws: a 500 here would
- * make Polar redeliver and re-run the state writes.
+ * `edu_pro_checkout_succeeded` + `checkout_complete` + `paid` — analytics only,
+ * after the entitlement write landed. Only `subscription.active` counts
+ * (created/uncanceled/resumed are not new conversions), only for the Pro
+ * product. Never throws: a 500 here would make Polar redeliver and re-run
+ * the state writes.
  */
 function trackProConversion(payload: WebhookPayload, userId?: string) {
   try {
@@ -173,6 +174,7 @@ function trackProConversion(payload: WebhookPayload, userId?: string) {
     if (mapStatus(payload?.data?.status) === 'trialing') return
     const subId = String(payload?.data?.id ?? '')
     captureProFunnelServerEvent(buildProCheckoutSucceededEvent(userId, subId))
+    captureProFunnelServerEvent(buildCheckoutCompleteEvent(userId, subId))
     captureProFunnelServerEvent(buildPaidEvent(userId, subId))
     if (trialMarker(payload?.data).trial) {
       captureProFunnelServerEvent(buildTeacherTrialConvertedEvent(userId, subId))

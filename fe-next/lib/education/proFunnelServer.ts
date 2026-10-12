@@ -33,10 +33,13 @@ export function buildProTrialStartedEvent(userId: string): EduServerEvent {
   return { distinctId: userId, event: 'edu_pro_trial_started', properties: { ...BASE } };
 }
 
-/** Measurable trial funnel step 3 — same moment as `edu_pro_trial_started`. */
-export function buildTrialCheckoutStartedEvent(userId: string): EduServerEvent {
+/** Conversion funnel step 2 — Polar checkout session created (paid or trial). */
+export function buildCheckoutStartedEvent(userId: string): EduServerEvent {
   return { distinctId: userId, event: 'checkout_started', properties: { ...BASE } };
 }
+
+/** Alias: trial checkout URL creation is the same `checkout_started` step. */
+export const buildTrialCheckoutStartedEvent = buildCheckoutStartedEvent;
 
 export function buildProTrialSucceededEvent(userId: string, subscriptionId: string): EduServerEvent {
   return {
@@ -73,9 +76,17 @@ export function buildTeacherTrialStartedEvent(userId: string, subscriptionId: st
   };
 }
 
-/** Conversion funnel step 3 — Polar paid checkout session created (user entered Polar). */
-export function buildCheckoutCompleteEvent(userId: string): EduServerEvent {
-  return { distinctId: userId, event: 'checkout_complete', properties: { ...BASE } };
+/**
+ * Conversion funnel step 3 — Polar `subscription.active` and not trialing.
+ * Must NOT fire at checkout-URL creation: that is only `checkout_started`.
+ * `subscription_id` lets a query match completions to webhook paid count.
+ */
+export function buildCheckoutCompleteEvent(userId: string, subscriptionId: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'checkout_complete',
+    properties: { ...BASE, subscription_id: subscriptionId },
+  };
 }
 
 /** Conversion funnel step 4 — Polar `subscription.active` and not trialing. */

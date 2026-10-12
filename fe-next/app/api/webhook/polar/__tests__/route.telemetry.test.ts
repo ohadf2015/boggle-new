@@ -1,6 +1,7 @@
 /**
- * `edu_pro_checkout_succeeded` — the authoritative "a teacher paid" step,
- * fired from the Polar webhook on `subscription.active` for the Pro product.
+ * `edu_pro_checkout_succeeded` + `checkout_complete` + `paid` — the
+ * authoritative "a teacher paid" steps, fired from the Polar webhook on
+ * `subscription.active` for the Pro product (not at checkout-URL creation).
  * Server-side ⇒ `$host` is mandatory. Analytics only: a PostHog failure must
  * never 500 the webhook (Polar would redeliver and re-run the state writes).
  */
@@ -55,16 +56,19 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     const res = await POST(polarEvent('subscription.active', sub()))
     expect(res.status).toBe(200)
     expect(upsertSubscription).toHaveBeenCalledTimes(1)
-    expect(capture).toHaveBeenCalledTimes(2)
+    expect(capture).toHaveBeenCalledTimes(3)
     const arg = capture.mock.calls[0][0]
     expect(arg).toMatchObject({ distinctId: 'u1', event: 'edu_pro_checkout_succeeded' })
     expect(arg.properties.subscription_id).toBe('sub_1')
     expect(arg.properties.$host).toBe(EDU_ANALYTICS_HOST)
     expect(capture.mock.calls.map((c) => c[0].event)).toEqual([
       'edu_pro_checkout_succeeded',
+      'checkout_complete',
       'paid',
     ])
+    expect(capture.mock.calls[1][0].properties.subscription_id).toBe('sub_1')
     expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
+    expect(capture.mock.calls[2][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
   it('Given subscription.active after a Polar trial, When handled, Then it also fires teacher_trial_converted', async () => {
@@ -75,11 +79,13 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     expect(res.status).toBe(200)
     expect(capture.mock.calls.map((c) => c[0].event)).toEqual([
       'edu_pro_checkout_succeeded',
+      'checkout_complete',
       'paid',
       'teacher_trial_converted',
     ])
-    expect(capture.mock.calls[2][0].properties.subscription_id).toBe('sub_1')
-    expect(capture.mock.calls[2][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
+    expect(capture.mock.calls[3][0].event).toBe('teacher_trial_converted')
+    expect(capture.mock.calls[3][0].properties.subscription_id).toBe('sub_1')
+    expect(capture.mock.calls[3][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
   it('Given subscription.canceled after a Polar trial, When handled, Then it fires trial_expired with $host', async () => {
