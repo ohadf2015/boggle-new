@@ -10,8 +10,8 @@
  *      container at build- or run-time.
  *   2. The RECENT-changes list comes from a committed JSON file
  *      (`deploymentChangelog.generated.json`) written by
- *      `scripts/generate-deployment-info.ts` during a LOCAL build, where `.git`
- *      exists. The generator no-ops when git is unavailable, so the committed
+ *      `npm run build:changelog`, run locally where `.git` exists. The
+ *      generator no-ops when git is unavailable, so the committed
  *      file (baked into the image) is never blanked on Railway.
  *
  * All functions here are pure so they can be unit-tested without a real env or

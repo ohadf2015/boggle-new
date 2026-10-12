@@ -1,7 +1,9 @@
 /**
- * Build-time changelog capture for the admin "Deployment" panel.
+ * Changelog capture for the admin "Deployment" panel.
  *
- * Runs during `npm run build`. Reads the last N commits via `git log` and writes
+ * Run manually with `npm run build:changelog` and commit the result; it is kept out
+ * of `npm run build` so builds leave the tree clean. Reads the last N commits via
+ * `git log` and writes
  * `lib/admin/deploymentChangelog.generated.json`, which the admin API imports.
  *
  * CRITICAL: this only writes when git actually returns commits. Inside Railway's

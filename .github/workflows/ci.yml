@@ -111,6 +111,10 @@ jobs:
             npm ci --prefer-offline --no-audit
           fi
 
+      - name: Build i18n assets
+        working-directory: fe-next
+        run: npx tsx scripts/build-i18n-assets.ts --skip-brotli
+
       - name: Type check
         working-directory: fe-next
         run: npx tsc --noEmit
@@ -148,6 +152,10 @@ jobs:
           if [ ! -d "node_modules" ]; then
             npm ci --prefer-offline --no-audit
           fi
+
+      - name: Build i18n assets
+        working-directory: fe-next
+        run: npx tsx scripts/build-i18n-assets.ts --skip-brotli
 
       - name: Build backend schemas (required by handler tests)
         if: matrix.shard == 1

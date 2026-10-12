@@ -86,6 +86,8 @@ release_test_lock() { rm -rf "$PREPUSH_LOCK" 2>/dev/null || true; }
 ) > "$TMPDIR/lint.log" 2>&1 &
 PID_LINT=$!
 
+./node_modules/.bin/tsx scripts/build-i18n-assets.ts --skip-brotli >/dev/null
+
 # Type check
 (
   if [ -z "$TYPE_RELEVANT" ]; then

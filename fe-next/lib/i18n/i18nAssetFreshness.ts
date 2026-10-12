@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
  * Two independent things can invalidate it, and BOTH have shipped as bugs:
  *
  * 1. The files the manifest names are absent. `lib/i18n/messagesManifest.json`
- *    is committed; the assets are gitignored and written only by
+ *    used to be committed while the assets were gitignored and written only by
  *    `scripts/build-i18n-assets.ts`. A fresh worktree therefore had a manifest
  *    pointing at nothing, the `<head>` script 404'd, `__LEXI_MESSAGES__` was
  *    never assigned, and every client `t()` returned a raw key path while the

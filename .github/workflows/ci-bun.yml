@@ -110,6 +110,10 @@ jobs:
             bun install
           fi
 
+      - name: Build i18n assets
+        working-directory: fe-next
+        run: bunx tsx scripts/build-i18n-assets.ts --skip-brotli
+
       - name: Type check
         working-directory: fe-next
         run: bunx tsc --noEmit
@@ -143,6 +147,10 @@ jobs:
           if [ ! -d "node_modules" ]; then
             bun install
           fi
+
+      - name: Build i18n assets
+        working-directory: fe-next
+        run: bunx tsx scripts/build-i18n-assets.ts --skip-brotli
 
       - name: Run backend tests with Bun
         working-directory: fe-next

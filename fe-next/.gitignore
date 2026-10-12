@@ -127,3 +127,7 @@ lighthouse-report*.json
 .playwright-mcp/
 test-results*.json
 test-results-*/
+
+# Written by scripts/find-missing-translations.js and scripts/build-i18n-assets.ts
+scripts/translation-report.json
+lib/i18n/messagesManifest.json
