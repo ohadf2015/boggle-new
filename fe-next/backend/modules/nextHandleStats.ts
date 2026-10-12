@@ -12,6 +12,7 @@ export const NEXT_HANDLE_UNIQUE_CAP = 2048;
 let hits = 0;
 const unique = new Set<string>();
 let overflow = 0;
+let drops = 0;
 
 function normalizePath(pathname: string): string {
   const cut = pathname.split('?')[0] || '/';
@@ -29,12 +30,17 @@ export function noteNextHandle(pathname: string): void {
   overflow += 1;
 }
 
+export function noteNextHandleDrop(_reason?: string): void {
+  drops += 1;
+}
+
 export function formatNextHandleCounts(): string {
-  return `next[hits=${hits} unique=${unique.size} overflow=${overflow}]`;
+  return `next[hits=${hits} unique=${unique.size} overflow=${overflow} drop=${drops}]`;
 }
 
 export function resetNextHandleStatsForTests(): void {
   hits = 0;
   unique.clear();
   overflow = 0;
+  drops = 0;
 }

@@ -169,3 +169,28 @@ describe('Proxy — Probe short-circuit (Sentry JAVASCRIPT-NEXTJS-NE)', () => {
     });
   });
 });
+
+describe('Proxy — unknown slug gate (idle old-space / t_f5eb034e)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetSession.mockResolvedValue({ data: { session: null }, error: null });
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
+  });
+
+  it('404s unlocalized junk instead of rewriting bots into /{locale}/…', async () => {
+    const res = await proxy(makeRequest('/not-a-real-page', { userAgent: 'Googlebot/2.1' }));
+    expect((res as unknown as { status: number }).status).toBe(404);
+    expect(NextResponse.rewrite).not.toHaveBeenCalled();
+  });
+
+  it('404s unknown locale segments before App Router', async () => {
+    const res = await proxy(makeRequest('/en/not-a-real-page', { userAgent: 'Googlebot/2.1' }));
+    expect((res as unknown as { status: number }).status).toBe(404);
+  });
+
+  it('still rewrites known unlocalized paths for bots', async () => {
+    await proxy(makeRequest('/blog', { userAgent: 'Googlebot/2.1' }));
+    expect(NextResponse.rewrite).toHaveBeenCalled();
+  });
+});
