@@ -78,7 +78,10 @@
     inset 0 3px 0 rgb(255 255 255 / 0.9),
     inset 0 -5px 0 rgb(170 150 100 / 0.3);
   transform-origin: 50% 55%;
-  transition: transform 160ms cubic-bezier(0.3, 1.5, 0.5, 1);
+  transition: transform 140ms cubic-bezier(0.25, 1.35, 0.5, 1);
+  /* own compositor layer: selection pops are transform-only, no repaint of neighbours */
+  will-change: transform;
+  backface-visibility: hidden;
   cursor: pointer;
   touch-action: none;
 }
@@ -101,7 +104,7 @@
     inset 0 3px 0 rgb(255 255 255 / 0.5),
     inset 0 -4px 0 rgb(0 0 0 / 0.22);
   transform: translateY(3px) scale(1.05);
-  animation: tile-pop 260ms cubic-bezier(0.2, 1.8, 0.4, 1) both;
+  animation: tile-pop 200ms cubic-bezier(0.22, 1.4, 0.4, 1) both;
   z-index: 1;
 }
 
@@ -382,9 +385,9 @@
 }
 
 @keyframes tile-pop {
-  0% { transform: translateY(4px) scale(0.84); }
-  45% { transform: translateY(-5px) scale(1.2); }
-  100% { transform: translateY(3px) scale(1.05); }
+  0% { transform: translate3d(0, 2px, 0) scale(0.94); }
+  55% { transform: translate3d(0, -2px, 0) scale(1.1); }
+  100% { transform: translate3d(0, 3px, 0) scale(1.05); }
 }
 
 @keyframes head-ring {

@@ -49,12 +49,12 @@ function tileSizeClass(wordLength: number, compact?: boolean): string {
         : 'w-5 h-5 text-[9px] rounded border';
   }
   return wordLength <= 4
-    ? 'shadow-hard w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl cramped:w-7 cramped:h-7 cramped:text-xs cramped:rounded cramped:border cramped:shadow-none!'
+    ? 'shadow-hard w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl cramped:w-10 cramped:h-10 cramped:text-lg cramped:shadow-none!'
     : wordLength <= 6
-      ? 'shadow-hard w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg cramped:w-6 cramped:h-6 cramped:text-[10px] cramped:rounded cramped:border cramped:shadow-none!'
+      ? 'shadow-hard w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg cramped:w-10 cramped:h-10 cramped:text-lg cramped:shadow-none!'
       : wordLength <= 8
-        ? 'shadow-hard w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-base cramped:w-6 cramped:h-6 cramped:text-[10px] cramped:rounded cramped:border cramped:shadow-none!'
-        : 'shadow-hard w-7 h-7 sm:w-9 sm:h-9 text-xs sm:text-sm cramped:w-5 cramped:h-5 cramped:text-[9px] cramped:rounded cramped:border cramped:shadow-none!';
+        ? 'shadow-hard w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-base cramped:w-8 cramped:h-8 cramped:text-base cramped:shadow-none!'
+        : 'shadow-hard w-7 h-7 sm:w-9 sm:h-9 text-xs sm:text-sm cramped:w-7 cramped:h-7 cramped:text-sm cramped:shadow-none!';
 }
 
 /**
@@ -182,12 +182,16 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
             <FeedbackLegend t={t} />
           ) : (
             <KnownLettersDisplay
+              key="known-letters"
               knownLetters={knownLetters}
               noCluesYet={accumulatedClues.size === 0 && knownLetters.size === 0 && revealedLetters.size === 0}
               t={t}
             />
           )}
         </AdaptiveAnimatePresence>
+        {!showFeedbackOverlay && (attempts.length > 0 || knownLetters.size > 0) && !compact && (
+          <FeedbackLegend t={t} />
+        )}
       </div>
     </AdaptiveMotion.div>
   );
@@ -278,9 +282,9 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
             className={cn(
               "flex items-center justify-center border-2 rounded-neo font-bold transition-colors duration-500",
               sizeClass,
-              letterFb.feedback === 'green' && "bg-neo-lime border-neo-black text-neo-black ring-1 ring-neo-lime/50",
-              letterFb.feedback === 'yellow' && "bg-neo-yellow border-neo-black text-neo-black ring-1 ring-neo-yellow/50",
-              isGray && showGrayLetter && "bg-neo-navy-light border-neo-cream/30 text-neo-white",
+              letterFb.feedback === 'green' && "bg-emerald-500 border-neo-black text-neo-white",
+              letterFb.feedback === 'yellow' && "bg-amber-400 border-neo-black text-neo-black",
+              isGray && showGrayLetter && "bg-slate-500 border-neo-black text-neo-white",
               isGray && !showGrayLetter && "bg-neo-black border-neo-black text-neo-white"
             )}
           >
@@ -348,25 +352,25 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
           displayChar = accumulatedClue.letter;
           clueType = accumulatedClue.type;
           bgClass = accumulatedClue.type === 'green'
-            ? "bg-neo-lime border-neo-black text-neo-black"
-            : "bg-neo-yellow border-neo-black text-neo-black";
+            ? "bg-emerald-500 border-neo-black text-neo-white"
+            : "bg-amber-400 border-neo-black text-neo-black";
         } else if (isShopRevealed) {
           displayChar = targetWord[idx]?.toUpperCase() || '?';
           clueType = 'green';
-          bgClass = "bg-neo-lime border-neo-black text-neo-black";
+          bgClass = "bg-emerald-500 border-neo-black text-neo-white";
         } else if (isHintRevealed) {
           displayChar = char;
           clueType = 'green';
-          bgClass = "bg-neo-lime border-neo-black text-neo-black";
+          bgClass = "bg-emerald-500 border-neo-black text-neo-white";
         } else if (persistedLetter) {
           displayChar = persistedLetter.letter;
           clueType = persistedLetter.type;
           bgClass = persistedLetter.type === 'green'
-            ? "bg-neo-lime border-neo-black text-neo-black"
-            : "bg-neo-yellow border-neo-black text-neo-black";
+            ? "bg-emerald-500 border-neo-black text-neo-white"
+            : "bg-amber-400 border-neo-black text-neo-black";
         } else {
           displayChar = '?';
-          bgClass = "bg-neo-black border-neo-black text-neo-white";
+          bgClass = "bg-neo-black border-neo-cream/25 text-neo-cream/60";
         }
 
         const isRevealed = !!accumulatedClue || isHintRevealed || isShopRevealed || !!persistedLetter;
@@ -375,6 +379,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
           <AdaptiveMotion.div
             key={`hint-${idx}`}
             data-testid={`clue-box-${idx}`}
+            data-state={clueType ?? 'unknown'}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: idx * 0.03, type: "spring", stiffness: 300 }}
@@ -382,8 +387,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
               "flex items-center justify-center border-2 rounded-neo font-bold",
               sizeClass,
               bgClass,
-              isRevealed && clueType === 'green' && "ring-1 ring-neo-lime/50",
-              isRevealed && clueType === 'yellow' && "ring-1 ring-neo-yellow/50"
+              
             )}
           >
             {displayChar}
@@ -406,17 +410,18 @@ const FeedbackLegend: React.FC<FeedbackLegendProps> = ({ t }) => (
     exit={{ opacity: 0 }}
     transition={{ duration: 0.15 }}
     className="flex items-center justify-center gap-2 mt-1 text-[10px] sm:text-xs"
+    data-testid="clue-legend"
   >
     <span className="flex items-center gap-1">
-      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-neo-lime rounded border border-neo-black"></span>
+      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-emerald-500 rounded border border-neo-black"></span>
       <span className="text-neo-white">{t('wordHunt.feedback.correct')}</span>
     </span>
     <span className="flex items-center gap-1">
-      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-neo-yellow rounded border border-neo-black"></span>
+      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-amber-400 rounded border border-neo-black"></span>
       <span className="text-neo-white">{t('wordHunt.feedback.wrongPlace')}</span>
     </span>
     <span className="flex items-center gap-1">
-      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-neo-navy-light rounded border border-neo-cream/30"></span>
+      <span className="w-3 h-3 sm:w-4 sm:h-4 bg-slate-500 rounded border border-neo-black"></span>
       <span className="text-neo-white">{t('wordHunt.feedback.notInWord')}</span>
     </span>
   </AdaptiveMotion.div>
@@ -457,14 +462,14 @@ const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters,
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center gap-1 text-[10px] sm:text-xs"
       >
-        <span className="text-neo-yellow font-medium">
+        <span className="text-amber-300 font-bold">
           {t('wordHunt.survival.knownLetters')}
         </span>
         <div className="flex gap-0.5">
           {Array.from(knownLetters).map((letter) => (
             <span
               key={letter}
-              className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center bg-neo-yellow border border-neo-black rounded text-neo-black font-bold text-xs"
+              className="w-7 h-7 flex items-center justify-center bg-amber-400 border-2 border-neo-black rounded text-neo-black font-black text-sm"
             >
               {letter}
             </span>
