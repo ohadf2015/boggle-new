@@ -69,3 +69,14 @@ describe('CSP allows the growth-radar tracker', () => {
     expect(connectSrc).toContain('https://growthradar.app');
   });
 });
+
+describe('CSP — GA4 with Google Signals (consent granted)', () => {
+  // `https://*.analytics.google.com` does not match the bare host, and gtag also
+  // beacons to www.google.com/g/collect once consent is granted.
+  it('permits the consented GA4 beacons in connect-src', () => {
+    const csp = getCspHeader();
+    const connectSrc = csp.split(';').find((d) => d.trim().startsWith('connect-src')) ?? '';
+    expect(connectSrc).toContain('https://analytics.google.com');
+    expect(connectSrc).toContain('https://www.google.com');
+  });
+});
