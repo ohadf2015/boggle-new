@@ -193,6 +193,10 @@ export function createHelmetMiddleware(isDev: boolean): RequestHandler {
         connectSrc: ["'self'", 'https://*.supabase.co', 'https://*.sentry.io',
           'https://*.logrocket.io', 'https://*.lr-in-prod.com', 'https://*.lgrckt-in.com',
           'https://*.google-analytics.com', 'https://*.analytics.google.com',
+          // GA4 with consent granted (Google Signals) also beacons to the bare
+          // analytics.google.com and www.google.com/g/collect; `*.` does not match
+          // the apex, so without these every consented page view logs CSP errors.
+          'https://analytics.google.com', 'https://www.google.com',
           'https://*.googletagmanager.com', 'https://*.crazygames.com',
           'https://*.googlesyndication.com', 'https://*.doubleclick.net',
           'https://*.googleadservices.com', 'https://*.adtrafficquality.google',
