@@ -19,6 +19,7 @@ import {
 import { incrementGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import { incrementGamesPlayed } from '@/utils/pushNotifications';
 import posthog from '@/lib/analytics/lazyPosthog';
+import { mirrorGrowthEvent } from '@/utils/growthRadarMirror';
 import {
   setPostHogUserProps,
   setPostHogUserPropsOnce,
@@ -688,6 +689,13 @@ export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {})
   } catch {
     // Silently fail if PostHog not initialized
   }
+
+  // Mirror the funnel spine to Growth Radar (window.gr). PostHog is
+  // consent-gated, so without this twin ~97% of human visitors never reach
+  // Growth Radar's product funnel (t_eb26d5c5: coverage sat at 3%).
+  // Best-effort: allowlist-only, PII-stripped, queued until gr.js loads,
+  // never throws, never blocks the game path.
+  mirrorGrowthEvent(event, enrichedData);
 
   // Send to GA4 for unified analytics
   // Convert GrowthEventData to Record<string, string | number | boolean>
