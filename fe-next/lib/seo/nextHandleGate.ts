@@ -140,6 +140,52 @@ export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
   'words-with-friends-alternative',
 ]);
 
+/**
+ * Top-level directories under `public/`. Files inside them are static assets
+ * that Next serves from disk. Keep in sync — `nextHandleGate.test.ts` asserts it.
+ */
+export const PUBLIC_DIRS: ReadonlySet<string> = new Set([
+  '.well-known',
+  'adventure-v2',
+  'archetypes',
+  'assets',
+  'audio',
+  'avatars',
+  'badges',
+  'blast',
+  'brain-drills',
+  'collectibles',
+  'daily',
+  'email',
+  'email-assets',
+  'fonts',
+  'ftue',
+  'gifs',
+  'home',
+  'images',
+  'landing',
+  'logos',
+  'marketing',
+  'mascot',
+  'mascot-new',
+  'mascots',
+  'modes',
+  'multiplayer',
+  'music',
+  'og',
+  'onboarding',
+  'practice',
+  'screenshots',
+  'seasons',
+  'showcase3d',
+  'sounds',
+  'textures',
+  'themes',
+  'vendor',
+  'videos',
+  'word-craft',
+]);
+
 /** Scanner/secret probes. Same family as proxy.ts PROBE_RE. */
 export const PROBE_RE =
   /^\/(?:\.(?:env|git|aws|ssh|DS_Store)|wp-admin|wp-login|wp-includes|wp-content|phpmyadmin|phpinfo|xmlrpc\.php|config\.json|credentials|secrets\.json|backup\.zip|admin\.php|\.well-known\/security\.txt)/i;
@@ -188,6 +234,13 @@ export function decideNextHandle(
   const first = parts[0];
   if (first === '_next' || first === 'static' || first === 'api') return { action: 'pass' };
   if (first.includes('.')) return { action: 'pass' }; // public files: favicon.ico, ads.txt, …
+  // Static files in public/ subdirectories (/mascot/winner.webp,
+  // /mascots/styles/arcade.png, /home/daily-streak.webp …). These never hit the
+  // locale layout SSR, so the leak gate must not 404 them — it did, which broke
+  // every mascot (incl. the homepage loader) in production.
+  if (PUBLIC_DIRS.has(first) && /\.[a-z0-9]{1,8}$/i.test(parts[parts.length - 1])) {
+    return { action: 'pass' };
+  }
 
   if (LOCALE_SET.has(first)) {
     if (parts.length === 1) return { action: 'pass' };

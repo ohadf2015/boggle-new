@@ -17,7 +17,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedToday: vi.fn(() => false),
   getWordHuntStatusToday: vi.fn(() => null),
-  hasPlayedWordWheelToday: vi.fn(() => false),
+  hasPlayedWordWheelToday: vi.fn(() => true), // wheel (step 1) done → Word Hunt is the hero
 }));
 
 vi.mock('@/utils/dailyChallenge/guestPlayer', () => ({
@@ -197,8 +197,8 @@ describe('DailyChallengeLanding Completion Indicator', () => {
         expect(compactRows.length).toBe(3);
       });
 
-      // No done badges yet (nothing played)
-      expect(screen.queryByTestId(/^.*-done-badge$/)).not.toBeInTheDocument();
+      // Word Wheel (step 1) is played, so exactly its row carries the done badge
+      expect(screen.getAllByTestId(/^.*-done-badge$/)).toHaveLength(1);
     });
   });
 

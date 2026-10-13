@@ -61,12 +61,13 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
         'transition-[transform,box-shadow] duration-100 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
         tint.ring,
-        anchor ? 'min-h-[5.75rem] flex-1 md:min-h-0' : 'aspect-square',
+        anchor ? 'min-h-[5.75rem] flex-1 md:min-h-0' : 'h-[4.5rem] md:h-auto md:aspect-square',
         model.highlighted && 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
         locked && 'cursor-not-allowed',
       )}
     >
       {hasArt ? (
+        <span className={cn('absolute inset-0', !anchor && 'max-md:inset-y-0 max-md:start-0 max-md:end-auto max-md:w-[4.5rem] max-md:overflow-hidden max-md:border-e-[3px] max-md:border-black')}>
         <Image
           src={model.genIcon as string}
           alt=""
@@ -77,13 +78,14 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
           onError={() => setImgFailed(true)}
           className={cn('object-cover', styles.art)}
         />
+        </span>
       ) : (
         <span className={cn('absolute start-2 top-2 flex h-9 w-9 items-center justify-center rounded-neo border-2 border-black', tint.chip)}>
           <model.Icon className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
         </span>
       )}
       <span aria-hidden="true" className="cube-glow pointer-events-none absolute inset-0 z-[1]" />
-      <span aria-hidden="true" className="absolute inset-x-0 bottom-0 z-[1] h-3/5 bg-gradient-to-t from-neo-navy via-neo-navy/70 to-transparent" />
+      <span aria-hidden="true" className={cn('absolute inset-x-0 bottom-0 z-[1] h-3/5 bg-gradient-to-t from-neo-navy via-neo-navy/70 to-transparent', !anchor && 'max-md:hidden')} />
       {anchor && (
         <span
           aria-hidden="true"
@@ -123,7 +125,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
         </span>
       ) : (
         <span
-          className="absolute inset-x-0 bottom-0 z-[2] line-clamp-2 px-1.5 pb-1.5 font-neo-display text-[0.62rem] font-black uppercase leading-[1.05] text-neo-white drop-shadow-[0_1px_0_rgba(0,0,0,0.8)] md:px-2.5 md:pb-2 md:text-sm"
+          className="absolute inset-y-0 start-[5rem] end-2 z-[2] flex items-center font-neo-display text-[0.95rem] font-black uppercase leading-[1.1] text-neo-white drop-shadow-[0_1px_0_rgba(0,0,0,0.8)] md:inset-x-0 md:inset-y-auto md:bottom-0 md:start-0 md:end-0 md:block md:line-clamp-2 md:px-2.5 md:pb-2 md:text-sm"
           style={{ textWrap: 'balance' } as CSSProperties}
         >
           {model.title}
@@ -229,7 +231,7 @@ export function HomeModeGrid({ models, extras, liveCount }: HomeModeGridProps) {
           </div>
         )}
 
-        <div className="grid grid-cols-4 gap-2 md:contents">
+        <div className="grid grid-cols-2 gap-2 md:contents" data-testid="home-mode-tiles">
           {tiles.map((m, i) => (
             <ModeTile key={m.key} model={m} index={i + 1} />
           ))}
@@ -242,7 +244,7 @@ export function HomeModeGrid({ models, extras, liveCount }: HomeModeGridProps) {
             aria-haspopup="dialog"
             onClick={() => setMoreOpen(true)}
             className={cn(
-              'flex h-11 w-full items-center gap-2.5 rounded-neo border-[3px] border-black bg-neo-navy-light px-2.5 text-start font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow] duration-100 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
+              'flex h-11 w-[calc(100%-3.5rem)] md:w-full items-center gap-2.5 rounded-neo border-[3px] border-black bg-neo-navy-light px-2.5 text-start font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow] duration-100 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
               'md:aspect-square md:h-auto md:flex-col md:justify-center md:gap-2 md:px-2 md:text-center',
             )}
           >

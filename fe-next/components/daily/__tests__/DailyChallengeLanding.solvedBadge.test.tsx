@@ -17,7 +17,7 @@ import * as storage from '@/utils/dailyChallenge/storage';
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedToday: vi.fn(() => false),
   getWordHuntStatusToday: vi.fn(() => null), // null = not played yet
-  hasPlayedWordWheelToday: vi.fn(() => false),
+  hasPlayedWordWheelToday: vi.fn(() => true), // wheel (step 1) done → Word Hunt is the hero
 }));
 
 const mockUseDailyChallengeStatus = vi.fn(() => ({

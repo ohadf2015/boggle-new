@@ -26,7 +26,7 @@ vi.mock('next/navigation', async () => {
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedToday: vi.fn(() => false),
   getWordHuntStatusToday: vi.fn(() => null),
-  hasPlayedWordWheelToday: vi.fn(() => false),
+  hasPlayedWordWheelToday: vi.fn(() => true), // wheel (step 1) done → Word Hunt is the hero
 }));
 
 vi.mock('@/utils/dailyChallenge/guestPlayer', () => ({
@@ -133,7 +133,7 @@ describe('DailyChallengeLanding — progress counts the required quests; Word To
   it('shows progress over the three required quests', async () => {
     renderHub();
     const bar = await screen.findByTestId('xp-progress-bar');
-    expect(bar).toHaveAttribute('aria-valuemax', '3');
+    expect(bar).toHaveAttribute('aria-valuemax', '2');
   });
 
   it('lists Word Tower last among the quests, tagged as a bonus', async () => {
@@ -145,7 +145,8 @@ describe('DailyChallengeLanding — progress counts the required quests; Word To
       'compact-row-purple',
       'compact-row-cyan',
     ]);
-    expect(rows[2]).toHaveTextContent(/bonus/i);
+    expect(rows[1]).toHaveTextContent(/optional/i);
+    expect(rows[2]).toHaveTextContent(/optional/i);
   });
 
   it('renders primary hero card and secondary modes', async () => {
@@ -173,7 +174,7 @@ describe('DailyChallengeLanding — progress counts the required quests; Word To
     renderHub();
 
     const bar = await screen.findByTestId('xp-progress-bar');
-    expect(bar).toHaveAttribute('aria-valuemax', '3');
+    expect(bar).toHaveAttribute('aria-valuemax', '2');
 
     // Verify all 4 modes are present:
     // Primary: quest-card-word-hunt
@@ -191,7 +192,7 @@ describe('DailyChallengeLanding — progress counts the required quests; Word To
 
     // Component should still work and show the progress bar
     const bar = await screen.findByTestId('xp-progress-bar');
-    expect(bar).toHaveAttribute('aria-valuemax', '3');
+    expect(bar).toHaveAttribute('aria-valuemax', '2');
 
     // The compact row for Connections should NOT show as played
     // (the done badge should NOT appear)

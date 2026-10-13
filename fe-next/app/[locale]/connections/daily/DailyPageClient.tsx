@@ -8,6 +8,7 @@ import PyramidChallenge from '@/components/connections/pyramid/PyramidChallenge'
 import { dailyConnectionsVariant } from '@/lib/connections/dailyVariant';
 import { todayUTC } from '@/lib/connections/dailyClient';
 import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
+import { DailyFlowChrome } from '@/components/daily/flow/DailyFlowChrome';
 
 interface Props {
   locale: string;
@@ -37,6 +38,7 @@ export default function DailyPageClient({ locale }: Props): React.JSX.Element {
 
   return (
     <div data-testid="connections-daily-root" className="flex-1 flex flex-col min-h-0">
+      <DailyFlowChrome modeId="connections" />
       <Suspense fallback={<LoadingFallback />}>
         {hostPyramid ? (
           <PyramidChallenge sharePath={`${locale}/connections/daily`} />

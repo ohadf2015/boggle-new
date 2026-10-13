@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { WordTowerV2PageClient } from '../PageClient';
+import { DailyFlowChrome } from '@/components/daily/flow/DailyFlowChrome';
 
 // Daily run URLs are user-specific and time-based — keep out of the index.
 // The game mode itself (/word-tower) is public and indexable.
@@ -10,5 +11,10 @@ export const metadata: Metadata = {
 };
 
 export default function WordTowerV2DailyPage() {
-  return <WordTowerV2PageClient daily />;
+  return (
+    <>
+      <DailyFlowChrome modeId="word-tower" />
+      <WordTowerV2PageClient daily />
+    </>
+  );
 }

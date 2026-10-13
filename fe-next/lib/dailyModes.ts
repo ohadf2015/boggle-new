@@ -28,15 +28,6 @@ export interface DailyModeDef {
 
 export const DAILY_MODES: readonly DailyModeDef[] = [
   {
-    id: 'word-hunt',
-    path: '/daily/word-hunt',
-    adminOnly: false,
-    titleKey: 'daily.wordHunt.title',
-    descKey: 'daily.wordHunt.desc',
-    accent: 'orange',
-    art: '/daily/word-hunt-mascot.jpg',
-  },
-  {
     id: 'word-wheel',
     path: '/daily/word-wheel',
     adminOnly: false,
@@ -46,9 +37,19 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
     art: '/daily/word-wheel-mascot.jpg',
   },
   {
+    id: 'word-hunt',
+    path: '/daily/word-hunt',
+    adminOnly: false,
+    titleKey: 'daily.wordHunt.title',
+    descKey: 'daily.wordHunt.desc',
+    accent: 'orange',
+    art: '/daily/word-hunt-mascot.jpg',
+  },
+  {
     id: 'connections',
     path: '/connections/daily',
     adminOnly: false,
+    optional: true,
     titleKey: 'connections.daily.questTitle',
     descKey: 'connections.daily.questDesc',
     accent: 'purple',
@@ -95,30 +96,18 @@ export interface DailyModePlayState {
  * This ensures "what do I do right now" is answered by a single card.
  */
 export function pickPrimaryMode(state: DailyModePlayState): DailyModeId {
-  // Word Hunt unplayed (new or lost) → it's the primary
-  if (state.wordHunt === 'new' || state.wordHunt === 'lost') {
-    return 'word-hunt';
-  }
-
-  // Word Hunt played (won), Word Wheel unplayed → it's the primary
-  if (state.wordWheel === 'new') {
-    return 'word-wheel';
-  }
-
-  if (!state.connections) {
-    return 'connections';
-  }
-
-  if (!state.wordTower) {
-    return 'word-tower';
-  }
-
-  // All played → default to Word Hunt (safe fallback)
-  return 'word-hunt';
+  // Daily flow: Word Wheel → Word Hunt → (optional) Connections → (optional) Word Tower.
+  // A lost Word Hunt stays the hero so the player can retry it.
+  if (state.wordWheel === 'new') return 'word-wheel';
+  if (state.wordHunt === 'new' || state.wordHunt === 'lost') return 'word-hunt';
+  if (!state.connections) return 'connections';
+  if (!state.wordTower) return 'word-tower';
+  // All played → Word Wheel (first of the day, safe fallback).
+  return 'word-wheel';
 }
 
 /** Priority order the hub and the end-of-game handoff both follow. */
-const MODE_PRIORITY: readonly DailyModeId[] = ['word-hunt', 'word-wheel', 'connections', 'word-tower'];
+export const MODE_PRIORITY: readonly DailyModeId[] = ['word-wheel', 'word-hunt', 'connections', 'word-tower'];
 
 /** Has this mode been played today, per the unified play state? */
 function isModePlayed(state: DailyModePlayState, id: DailyModeId): boolean {
@@ -136,7 +125,7 @@ function isModePlayed(state: DailyModePlayState, id: DailyModeId): boolean {
 
 /**
  * What to play NEXT once `justFinished` is done — the next unplayed mode along
- * the Hunt → Wheel → Connections → Tower chain (wrapping), minus the mode just
+ * the Wheel → Hunt → Connections → Tower chain (wrapping), minus the mode just
  * completed, and `null` when the whole day is cleared.
  *
  * Distinct from pickPrimaryMode on purpose: that one falls back to 'word-hunt'
