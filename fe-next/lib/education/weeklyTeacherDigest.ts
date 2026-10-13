@@ -15,6 +15,12 @@ import {
   type WindowSession,
   type WindowedClassroomProgress,
 } from './windowedClassroomProgress';
+import {
+  deriveWeeklyProgressDigest,
+  isPolarTrialDay7EmailWindow,
+  type WeeklyAssignmentCompletion,
+  type WeeklyProgressDigestMetrics,
+} from './weeklyProgressDigest';
 
 export const POLAR_TRIAL_EXPIRED_DIGEST_KEY = 'teacher.digest.polarTrialExpiredLine' as const;
 export const POLAR_TRIAL_ACTIVE_DIGEST_KEY = 'teacher.digest.polarTrialActiveLine' as const;
@@ -24,12 +30,15 @@ export interface WeeklyClassroomInput {
   classroomName: string;
   roster: WindowRosterStudent[];
   sessions: WindowSession[];
+  assignmentCompletions?: WeeklyAssignmentCompletion[];
+  assignmentExpected?: number;
 }
 
 export interface WeeklyTeacherDigestClassroom {
   classroomId: string;
   classroomName: string;
   progress: WindowedClassroomProgress;
+  metrics: WeeklyProgressDigestMetrics;
 }
 
 export interface WeeklyTeacherDigest {
@@ -46,6 +55,8 @@ export interface WeeklyTeacherDigest {
   polarTrialActive: boolean;
   polarTrialDaysLeft: number | null;
   polarTrialActiveLineKey: typeof POLAR_TRIAL_ACTIVE_DIGEST_KEY | null;
+  /** Mid-trial day-7 conversion beat (email catch-up window 5–7 days left). */
+  polarTrialDay7: boolean;
   classrooms: WeeklyTeacherDigestClassroom[];
 }
 
@@ -98,6 +109,7 @@ export function buildWeeklyTeacherDigest({
     polarTrialActive: activeTrial,
     polarTrialDaysLeft: activeTrial ? polarTrialDaysLeft : null,
     polarTrialActiveLineKey: activeTrial ? POLAR_TRIAL_ACTIVE_DIGEST_KEY : null,
+    polarTrialDay7: activeTrial && isPolarTrialDay7EmailWindow(polarTrialDaysLeft),
     classrooms: classrooms.map((c) => ({
       classroomId: c.classroomId,
       classroomName: c.classroomName,
@@ -105,6 +117,13 @@ export function buildWeeklyTeacherDigest({
         windowDays,
         roster: c.roster,
         sessions: c.sessions,
+        now,
+      }),
+      metrics: deriveWeeklyProgressDigest({
+        roster: c.roster,
+        sessions: c.sessions,
+        assignmentCompletions: c.assignmentCompletions ?? [],
+        assignmentExpected: c.assignmentExpected ?? 0,
         now,
       }),
     })),
@@ -142,12 +161,19 @@ export interface WeeklySessionRow {
   missedCount: number;
 }
 
+export interface WeeklyAssignmentCompletionRow {
+  classroomId: string;
+  completedAt: string;
+}
+
 /** Fold already-fetched rows into one digest per teacher. Dedupes by email. */
 export function assembleWeeklyDigests({
   teachers,
   classrooms,
   memberships,
   sessions,
+  assignmentCompletions = [],
+  assignmentExpectedByClassroom = new Map<string, number>(),
   proUserIds,
   expiredTrialUserIds = new Set<string>(),
   trialingDaysByUser = new Map<string, number>(),
@@ -157,6 +183,8 @@ export function assembleWeeklyDigests({
   classrooms: WeeklyClassroomRow[];
   memberships: WeeklyMembershipRow[];
   sessions: WeeklySessionRow[];
+  assignmentCompletions?: WeeklyAssignmentCompletionRow[];
+  assignmentExpectedByClassroom?: Map<string, number>;
   proUserIds: Set<string>;
   expiredTrialUserIds?: Set<string>;
   /** userId → whole days remaining on a live Polar trial. */
@@ -181,6 +209,12 @@ export function assembleWeeklyDigests({
     const list = sessionsByRoom.get(s.classroomId) ?? [];
     list.push(s);
     sessionsByRoom.set(s.classroomId, list);
+  }
+  const assignmentsByRoom = new Map<string, WeeklyAssignmentCompletionRow[]>();
+  for (const row of assignmentCompletions) {
+    const list = assignmentsByRoom.get(row.classroomId) ?? [];
+    list.push(row);
+    assignmentsByRoom.set(row.classroomId, list);
   }
 
   const out: WeeklyTeacherDigest[] = [];
@@ -213,6 +247,10 @@ export function assembleWeeklyDigests({
           foundCount: s.foundCount,
           missedCount: s.missedCount,
         })),
+        assignmentCompletions: (assignmentsByRoom.get(room.id) ?? []).map((row) => ({
+          completedAt: row.completedAt,
+        })),
+        assignmentExpected: assignmentExpectedByClassroom.get(room.id) ?? 0,
       })),
     });
     if (shouldSendWeeklyDigest(digest)) out.push(digest);

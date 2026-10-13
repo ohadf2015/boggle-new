@@ -41,6 +41,7 @@ import {
   trackEduTeacherDashboardViewed,
   trackEduTeacherToolsOpened,
   trackEduProgressDigestViewed,
+  trackTeacherDigestViewed,
   trackEduReteachLiveScheduled,
   trackEduTeacherActionFailed,
   setEduClassroomContext,
@@ -348,6 +349,15 @@ describe('education telemetry', () => {
       expect(captureMock).toHaveBeenCalledWith('edu_progress_digest_viewed', {
         has_pro: false,
         pulse_state: 'needsReview',
+      });
+    });
+
+    it('Given the weekly HQ digest, When viewed, Then teacher_digest_viewed carries trial_day_7 without student names', () => {
+      trackTeacherDigestViewed({ hasPro: true, trialDay7: true, studentsActive: 4 });
+      expect(captureMock).toHaveBeenCalledWith('teacher_digest_viewed', {
+        has_pro: true,
+        trial_day_7: true,
+        students_active: 4,
       });
     });
 

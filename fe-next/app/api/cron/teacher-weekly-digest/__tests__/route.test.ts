@@ -71,6 +71,8 @@ describe('/api/cron/teacher-weekly-digest', () => {
       classrooms: { data: [], error: null },
       classroom_memberships: { data: [], error: null },
       practice_sessions: { data: [], error: null },
+      lesson_assignments: { data: [], error: null },
+      student_lesson_progress: { data: [], error: null },
       subscriptions: { data: [], error: null },
       subscription_events: { data: [], error: null },
     };

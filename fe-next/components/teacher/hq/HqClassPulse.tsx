@@ -4,9 +4,11 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { ClassPulseRow } from './ClassPulseRow';
 import { ClassProgressStrip } from './ClassProgressStrip';
+import { WeeklyProgressDigestCard } from '@/components/teacher/digest/WeeklyProgressDigestCard';
 
 export interface HqClassPulseProps {
   classroomId: string;
+  classroomName: string;
   studentCount: number;
   assignmentCount: number | null;
   submittedCount: number | null;
@@ -22,6 +24,7 @@ export interface HqClassPulseProps {
 /** The class pulse hero (who needs help, hardest word, one report action) over the students/assigned/submitted line. */
 export function HqClassPulse({
   classroomId,
+  classroomName,
   studentCount,
   assignmentCount,
   submittedCount,
@@ -49,6 +52,14 @@ export function HqClassPulse({
         onUpgrade={onUpgrade}
         upgradeLabel={t('hqCalm.pulseUpsell')}
         onOpenAssignments={onOpenAssignments}
+      />
+      <WeeklyProgressDigestCard
+        classroomId={classroomId}
+        classroomName={classroomName}
+        assignmentExpected={
+          assignmentCount != null && studentCount > 0 ? assignmentCount * studentCount : null
+        }
+        assignmentSubmitted={submittedCount}
       />
     </section>
   );

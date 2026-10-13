@@ -35,6 +35,10 @@ import TeacherDashboard from '../TeacherDashboard';
 vi.mock('@/components/teacher/dashboard/PlayNowLauncher', () => ({
   PlayNowLauncher: () => <div data-testid="play-now-launcher" />,
 }));
+vi.mock('@/components/teacher/digest/WeeklyProgressDigestCard', () => ({
+  WeeklyProgressDigestCard: () => <div data-testid="weekly-progress-digest" />,
+}));
+
 
 
 const grant = { id: 'g1', expires_at: '2027-09-05T12:00:00Z', days: 365, note: 'Sorry about Thursday.', welcomed: false };
