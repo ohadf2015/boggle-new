@@ -64,6 +64,11 @@ vi.mock('@/components/teacher/reports/AssignmentProgressReport', () => ({
   ),
 }));
 
+vi.mock('@/components/teacher/reports/ClassroomRosterProgress', () => ({
+  ClassroomRosterProgress: ({ classroomId }: { classroomId: string }) => (
+    <div data-testid="classroom-roster-progress">{classroomId}</div>
+  ),
+}));
 vi.mock('@/components/teacher/reports/ClassAssignmentGrid', () => ({
   ClassAssignmentGrid: ({ classroomId }: { classroomId: string }) => (
     <div data-testid="class-assignment-grid" data-classroom-id={classroomId} />

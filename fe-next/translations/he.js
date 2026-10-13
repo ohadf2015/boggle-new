@@ -14622,6 +14622,23 @@ const he = {
         "submitted": "{{submitted}} / {{roster}} הוגשו",
         "upgrade": "פרו למורים {{price}}"
       },
+      "rosterProgress": {
+        "title": "מעקב תלמידים",
+        "columns": {
+          "student": "תלמיד",
+          "completion": "משימות",
+          "lastActive": "פעילות אחרונה",
+          "joinStatus": "סטטוס הצטרפות"
+        },
+        "status": {
+          "signed_in": "מחובר",
+          "guest": "אורח",
+          "joined_idle": "הצטרף, לא התאמן"
+        },
+        "completion": "{{completed}}/{{total}}",
+        "upgrade": "פרטים נוספים לכל תלמיד עם פרו למורים {{price}}",
+        "never": "אף פעם"
+      },
       "exportAllClasses": {
         "button": "ייצוא כל הכיתות",
         "downloading": "מייצאים...",
