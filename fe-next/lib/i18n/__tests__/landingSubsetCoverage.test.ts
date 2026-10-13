@@ -20,6 +20,10 @@ describe('landing i18n subset covers what landing renders', () => {
     ...Object.values(MODE_META).flatMap((m) => [m.titleKey, m.descKey]),
     'education.nav.forTeachers',
     'education.nav.myClassroom',
+    // VersionChecker renders on landing; raw keys painted on prod 2026-10-13.
+    'system.newVersionAvailable',
+    'system.refreshToUpdate',
+    'system.updatingToNewVersion',
   ];
 
   it.each(keys)('resolves %s', (key) => {
