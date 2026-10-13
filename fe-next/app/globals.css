@@ -2580,11 +2580,6 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
        animations.css sums them instead; that token is for elements that do NOT
        already anchor to the banner. */
     --adventure-bottom-inset: max(var(--admob-banner-height, 0px), env(safe-area-inset-bottom, 0px));
-    /* WEB AdSense anchor-ad band height — published by WebAnchorAdObserver. The
-       AdSense Auto-Ads anchor is injected outside the React tree as a fixed band
-       pinned to the viewport bottom; AdMob's var stays 0 for it. On native AdMob
-       builds this stays 0 (no AdSense anchor), so the clamp/sum below is a no-op. */
-    --web-anchor-ad-height: 0px;
     /* Single composed offset every fixed-bottom-aware page consumes. Avoids
        triple-counting safe-area: each layer's var already includes its own.
        Each component is CLAMPED to a sane max: the Android 15+ safe-area plugin
@@ -2596,8 +2591,7 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
        On web both vars are 0px, so the clamps are no-ops there. */
     --bottom-stack-height: calc(
       max(16px, min(var(--bottom-nav-height, 0px), 120px)) +
-        min(var(--admob-banner-height, 0px), 120px) +
-        min(var(--web-anchor-ad-height, 0px), 120px)
+        min(var(--admob-banner-height, 0px), 120px)
     );
 
     /* Snappy Timing Functions */
@@ -5616,24 +5610,6 @@ html[data-cosy='true'] .animate-neo-press {
 html.feedback-capturing [role="dialog"],
 html.feedback-capturing [data-dialog-overlay] {
   visibility: hidden !important;
-}
-
-/* Education / teacher / student / classroom / admin are ad-free in every
-   format. AdSenseLoader tags <html> while on such a route; any Auto-Ads unit
-   already placed before a soft-nav into it is hidden here, and the loader
-   pauses new requests (adsbygoogle.pauseAdRequests). See lib/admob-routes.ts. */
-html.ads-free-route ins.adsbygoogle,
-html.ads-free-route [id^='google_ads_iframe'],
-html.ads-free-route .google-auto-placed {
-  display: none !important;
-}
-
-/* A modal is open (html.modal-open, ref-counted by DialogContent and the avatar builder): stand
-   the web AdSense ANCHOR down so it doesn't cover the modal's bottom CTAs. The native banner is
-   handled by BannerCoordinatorMount off the same class. In-content ad units are untouched. */
-html.modal-open ins.adsbygoogle-noablate,
-html.modal-open ins.adsbygoogle[data-anchor-status] {
-  display: none !important;
 }
 
 /* ── Adventure word-hit juice (components/adventure/play/fx) ── */
