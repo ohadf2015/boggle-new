@@ -29,3 +29,16 @@ describe('DailyFlowChrome', () => {
     expect(screen.queryByTestId('daily-intro')).toBeNull();
   });
 });
+
+describe('DailyFlowChrome placement', () => {
+  it('inline nav sits in normal flow, not floating over the game', () => {
+    render(<DailyFlowChrome modeId="connections" intro={false} inline />);
+    const nav = screen.getByTestId('daily-flow-nav');
+    expect(nav.className).not.toMatch(/\bfixed\b/);
+  });
+  it('word tower daily page keeps only the game’s own back button', async () => {
+    const fs = await import('node:fs');
+    const src = fs.readFileSync('app/[locale]/word-tower/daily/page.tsx', 'utf8');
+    expect(src).toMatch(/modeId="word-tower" backLink=\{false\}/);
+  });
+});

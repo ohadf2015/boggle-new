@@ -14767,6 +14767,23 @@ const ja = {
         "submitted": "{{submitted}} / {{roster}} 提出",
         "upgrade": "Teacher Pro {{price}}"
       },
+      "rosterProgress": {
+        "title": "クラス名簿の進捗",
+        "columns": {
+          "student": "生徒",
+          "completion": "課題",
+          "lastActive": "最終アクティブ",
+          "joinStatus": "参加ステータス"
+        },
+        "status": {
+          "signed_in": "サインイン済み",
+          "guest": "ゲスト",
+          "joined_idle": "参加済み・未練習"
+        },
+        "completion": "{{completed}}/{{total}}",
+        "upgrade": "Teacher Pro {{price}} で各生徒の詳細を見る",
+        "never": "なし"
+      },
       "exportAllClasses": {
         "button": "全クラスを書き出す",
         "downloading": "書き出し中…",

@@ -14614,6 +14614,23 @@ const es = {
         "submitted": "{{submitted}} / {{roster}} entregadas",
         "upgrade": "Teacher Pro {{price}}"
       },
+      "rosterProgress": {
+        "title": "Progreso de la clase",
+        "columns": {
+          "student": "Alumno",
+          "completion": "Tareas",
+          "lastActive": "Última actividad",
+          "joinStatus": "Estado de incorporación"
+        },
+        "status": {
+          "signed_in": "Registrado",
+          "guest": "Invitado",
+          "joined_idle": "Incorporado, sin practicar"
+        },
+        "completion": "{{completed}}/{{total}}",
+        "upgrade": "Más detalles por alumno con Teacher Pro {{price}}",
+        "never": "Nunca"
+      },
       "exportAllClasses": {
         "button": "Exportar todas las clases",
         "downloading": "Exportando…",

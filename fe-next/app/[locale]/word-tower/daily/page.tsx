@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function WordTowerV2DailyPage() {
   return (
     <>
-      <DailyFlowChrome modeId="word-tower" />
+      <DailyFlowChrome modeId="word-tower" backLink={false} />
       <WordTowerV2PageClient daily />
     </>
   );

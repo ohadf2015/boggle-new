@@ -13974,6 +13974,23 @@ const ru = {
         "submitted": "{{submitted}} / {{roster}} сдано",
         "upgrade": "Teacher Pro {{price}}"
       },
+      "rosterProgress": {
+        "title": "Прогресс класса",
+        "columns": {
+          "student": "Ученик",
+          "completion": "Задания",
+          "lastActive": "Последняя активность",
+          "joinStatus": "Статус присоединения"
+        },
+        "status": {
+          "signed_in": "Вошёл в систему",
+          "guest": "Гость",
+          "joined_idle": "Присоединился, не занимался"
+        },
+        "completion": "{{completed}}/{{total}}",
+        "upgrade": "Подробнее о каждом ученике с Teacher Pro {{price}}",
+        "never": "Никогда"
+      },
       "exportAllClasses": {
         "button": "Экспортировать все классы",
         "downloading": "Экспорт…",
