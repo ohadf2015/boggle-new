@@ -13,6 +13,8 @@ interface DailyFlowChromeProps {
   intro?: boolean;
   /** Show the floating "back to daily" pill (modes with their own back control opt out). */
   backLink?: boolean;
+  /** Render the nav in normal flow (above the game) instead of floating over it. */
+  inline?: boolean;
 }
 
 const INTRO_MS = 1600;
@@ -26,7 +28,7 @@ const introKey = (id: DailyModeId) => `lc:daily-intro:${id}:${new Date().toISOSt
  *  - an always-available "back to daily" pill, plus "skip" for optional modes,
  *    so the player can return to the daily hub from any challenge.
  */
-export function DailyFlowChrome({ modeId, intro = true, backLink = true }: DailyFlowChromeProps) {
+export function DailyFlowChrome({ modeId, intro = true, backLink = true, inline = false }: DailyFlowChromeProps) {
   const { t, language } = useLanguage();
   const index = DAILY_MODES.findIndex((md) => md.id === modeId);
   const mode = DAILY_MODES[index];
@@ -49,7 +51,7 @@ export function DailyFlowChrome({ modeId, intro = true, backLink = true }: Daily
   return (
     <>
       {backLink && (
-        <div className="fixed top-[max(env(safe-area-inset-top),0.5rem)] start-2 z-40 flex gap-1.5" data-testid="daily-flow-nav">
+        <div className={cn(inline ? 'relative z-10 flex w-full gap-1.5 px-3 pt-2 pb-1' : 'fixed top-[max(env(safe-area-inset-top),0.5rem)] start-2 z-40 flex gap-1.5')} data-testid="daily-flow-nav" data-inline={inline ? 'true' : 'false'}>
           <Link
             href={hubHref}
             data-testid="back-to-daily"
