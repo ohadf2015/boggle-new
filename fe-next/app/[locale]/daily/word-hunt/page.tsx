@@ -5,6 +5,7 @@ import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 
 import { DailyLoadingFallback } from '@/components/daily/DailyLoadingFallback';
 import { retryImport } from '@/utils/retryImport';
+import { DailyFlowChrome } from '@/components/daily/flow/DailyFlowChrome';
 
 interface PageParams {
   params: Promise<{ locale: string }>;
@@ -34,6 +35,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 export default function WordHuntPage(): React.JSX.Element {
   return (
     <Suspense fallback={<LoadingFallback />}>
+      <DailyFlowChrome modeId="word-hunt" backLink={false} />
       <DailyChallenge />
     </Suspense>
   );

@@ -557,7 +557,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const { handlePointerDown, handlePointerMove, handlePointerUp } = useWheelDragSpell({
     draggingRef,
     pointerPosRef,
-    hubIndex: -1,
+    // No hubIndex: the center letter joins a drag the instant the finger
+    // reaches it, exactly like the outer letters (players reported the
+    // deferred "rest on the hub" pass-through as the center letter not working).
     isIndexUsed: (i) => usedIndicesRef.current.has(i),
     addLetter: (i, letter, el) => handleLetterPress(letter, i, el),
     getBuiltLength: () => builtLettersRef.current.length,

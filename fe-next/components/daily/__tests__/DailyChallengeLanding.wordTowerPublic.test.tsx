@@ -150,7 +150,7 @@ describe('DailyChallengeLanding — Word Tower is a first-class daily quest', ()
     renderHub();
     await waitFor(() => {
       const bar = screen.getByTestId('xp-progress-bar');
-      expect(bar).toHaveAttribute('aria-valuemax', '3');
+      expect(bar).toHaveAttribute('aria-valuemax', '2');
     });
   });
 

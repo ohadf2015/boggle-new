@@ -46,7 +46,7 @@ export default function ModeResumeChip({ resume, anchor = false }: Props) {
         aria-hidden="true"
         className={cn(
           'absolute end-1.5 z-[2] inline-flex items-center gap-0.5 rounded-full border-2 border-black bg-neo-navy/90 font-neo-display font-black leading-none text-neo-pink shadow-hard-sm',
-          anchor ? 'top-9 px-2 py-0.5 text-[0.7rem]' : 'top-7 px-1.5 py-0.5 text-[0.55rem]',
+          anchor ? 'top-9 px-2 py-0.5 text-[0.7rem]' : 'top-7 px-1.5 py-0.5 text-[0.55rem] max-md:hidden',
         )}
       >
         <Heart className={cn('fill-neo-pink', anchor ? 'h-3 w-3' : 'h-2.5 w-2.5')} strokeWidth={2.5} />
@@ -59,7 +59,7 @@ export default function ModeResumeChip({ resume, anchor = false }: Props) {
         <span
           aria-hidden="true"
           data-testid="mode-resume-relics"
-          className={cn('absolute start-1.5 z-[2] flex items-center gap-0.5', anchor ? 'top-9' : 'top-7')}
+          className={cn('absolute start-1.5 z-[2] flex items-center gap-0.5', anchor ? 'top-9' : 'top-7 max-md:hidden')}
         >
           {resume.relics.slice(0, anchor ? 3 : 2).map((id) => (
             // eslint-disable-next-line @next/next/no-img-element -- tiny static relic art, already in the adventure bundle

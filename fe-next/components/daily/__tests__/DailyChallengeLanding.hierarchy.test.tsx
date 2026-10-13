@@ -39,7 +39,7 @@ vi.mock('@/hooks/useDailyPlayedStatus', () => ({
 }));
 
 vi.mock('@/utils/dailyChallenge/storage', () => ({
-  hasPlayedWordWheelToday: vi.fn(() => false),
+  hasPlayedWordWheelToday: vi.fn(() => true), // wheel (step 1) done → Word Hunt is the hero
 }));
 
 vi.mock('@/utils/guestManager', () => ({

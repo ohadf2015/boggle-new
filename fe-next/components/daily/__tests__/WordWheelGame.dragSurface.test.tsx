@@ -123,7 +123,7 @@ describe('WordWheelGame — a drag never turns into a text selection', () => {
     }
   });
 
-  it('Given a straight swipe across the hub between opposite letters, Then the hub is not added', async () => {
+  it('Given a straight swipe across the center letter, Then it joins the word like any other letter', async () => {
     mountGame();
     const orbit = document.querySelector('[data-testid="wheel-orbit"]') as HTMLElement;
     const at: Record<string, string> = { '0,-100': 'B', '0,-50': 'B', '0,0': 'A', '0,50': 'E', '0,100': 'E', '50,100': 'F' };
@@ -135,7 +135,7 @@ describe('WordWheelGame — a drag never turns into a text selection', () => {
       }
     });
     const built = [...document.querySelectorAll('[data-testid="built-letter-tile"]')].map((el) => el.textContent).join('');
-    expect(built).toBe('BEF');
+    expect(built).toBe('BAEF');
     fireEvent.pointerUp(orbit);
   });
 });

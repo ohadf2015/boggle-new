@@ -3,14 +3,14 @@ import { pickPrimaryMode, pickNextUnplayedMode, type DailyModePlayState } from '
 
 describe('pickPrimaryMode', () => {
   describe('all modes unplayed', () => {
-    it('returns word-hunt when all modes are new/unplayed', () => {
+    it('returns word-wheel (first of the day) when all modes are new/unplayed', () => {
       const state: DailyModePlayState = {
         wordHunt: 'new',
         wordWheel: 'new',
         wordTower: false,
         connections: false,
       };
-      expect(pickPrimaryMode(state)).toBe('word-hunt');
+      expect(pickPrimaryMode(state)).toBe('word-wheel');
     });
   });
 
@@ -59,14 +59,14 @@ describe('pickPrimaryMode', () => {
   });
 
   describe('all modes played', () => {
-    it('returns word-hunt when all modes are completed', () => {
+    it('returns word-wheel when all modes are completed', () => {
       const state: DailyModePlayState = {
         wordHunt: 'won',
         wordWheel: 'played',
         wordTower: true,
         connections: true,
       };
-      expect(pickPrimaryMode(state)).toBe('word-hunt');
+      expect(pickPrimaryMode(state)).toBe('word-wheel');
     });
 
     it('prioritizes connections when first three modes played but connections unplayed', () => {
@@ -84,18 +84,18 @@ describe('pickPrimaryMode', () => {
     it('treats word-hunt won and lost differently for priority', () => {
       const stateWon: DailyModePlayState = {
         wordHunt: 'won',
-        wordWheel: 'new',
+        wordWheel: 'played',
         wordTower: false,
         connections: false,
       };
       const stateLost: DailyModePlayState = {
         wordHunt: 'lost',
-        wordWheel: 'new',
+        wordWheel: 'played',
         wordTower: false,
         connections: false,
       };
-      // Won → prioritize word-wheel (move to next mode)
-      expect(pickPrimaryMode(stateWon)).toBe('word-wheel');
+      // Won → move on to the optional Connections
+      expect(pickPrimaryMode(stateWon)).toBe('connections');
       // Lost → prioritize word-hunt (unfinished challenge)
       expect(pickPrimaryMode(stateLost)).toBe('word-hunt');
     });
@@ -117,7 +117,7 @@ describe('pickNextUnplayedMode', () => {
   };
 
   it('suggests the next mode in priority order, never the one just finished', () => {
-    expect(pickNextUnplayedMode({ ...allNew, wordHunt: 'won' }, 'word-hunt')).toBe('word-wheel');
+    expect(pickNextUnplayedMode({ ...allNew, wordHunt: 'won' }, 'word-hunt')).toBe('connections');
   });
 
   it('skips modes already played today', () => {
@@ -143,7 +143,7 @@ describe('pickNextUnplayedMode', () => {
   it('never suggests the just-finished mode even when it reads as unplayed', () => {
     // A losing Word Hunt run still counts as "played today" for this purpose:
     // re-offering the mode the player just failed is not a next step.
-    expect(pickNextUnplayedMode({ ...allNew, wordHunt: 'lost' }, 'word-hunt')).toBe('word-wheel');
+    expect(pickNextUnplayedMode({ ...allNew, wordHunt: 'lost' }, 'word-hunt')).toBe('connections');
   });
 
   it('works from any finished mode, not just word-hunt', () => {
@@ -164,8 +164,8 @@ describe('pickNextUnplayedMode', () => {
       connections: false,
     };
 
-    it('Word Wheel points at Connections even when Word Hunt is unplayed', () => {
-      expect(pickNextUnplayedMode(allNew, 'word-wheel')).toBe('connections');
+    it('Word Wheel points at Word Hunt next', () => {
+      expect(pickNextUnplayedMode(allNew, 'word-wheel')).toBe('word-hunt');
     });
 
     it('Connections points at the optional Word Tower even when Word Hunt/Wheel are unplayed', () => {
@@ -174,7 +174,7 @@ describe('pickNextUnplayedMode', () => {
 
     it('wraps around to earlier modes once the later ones are played', () => {
       const state: DailyModePlayState = { ...allNew, wordTower: true, connections: true };
-      expect(pickNextUnplayedMode(state, 'word-tower')).toBe('word-hunt');
+      expect(pickNextUnplayedMode(state, 'word-tower')).toBe('word-wheel');
     });
   });
 });

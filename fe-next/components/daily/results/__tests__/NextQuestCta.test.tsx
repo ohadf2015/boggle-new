@@ -16,7 +16,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 const playedStatus = {
-  today: { wordHunt: true, wordWheel: false, wordTower: false, connections: false },
+  today: { wordHunt: false, wordWheel: true, wordTower: false, connections: false },
   streak: { current: 1, longest: 1 },
   allCompletedDates: [],
   freezeCount: 0,
@@ -47,27 +47,27 @@ describe('NextQuestCta', () => {
   beforeEach(() => {
     push.mockClear();
     vi.mocked(trackGrowthEvent).mockClear();
-    playedStatus.today = { wordHunt: true, wordWheel: false, wordTower: false, connections: false };
+    playedStatus.today = { wordHunt: false, wordWheel: true, wordTower: false, connections: false };
     playedStatus.loading = false;
   });
 
   it('offers the next unplayed mode, not the one just finished', () => {
-    renderCta('word-hunt');
+    renderCta('word-wheel');
     const cta = screen.getByTestId('next-quest-cta');
-    expect(cta).toHaveAttribute('data-next-mode', 'word-wheel');
+    expect(cta).toHaveAttribute('data-next-mode', 'word-hunt');
   });
 
   it('links to that mode, locale-prefixed', () => {
-    renderCta('word-hunt');
-    expect(screen.getByTestId('next-quest-cta')).toHaveAttribute('href', '/en/daily/word-wheel');
+    renderCta('word-wheel');
+    expect(screen.getByTestId('next-quest-cta')).toHaveAttribute('href', '/en/daily/word-hunt');
   });
 
   it('reports the handoff so the cross-promo stays measurable', async () => {
-    renderCta('word-hunt');
+    renderCta('word-wheel');
     await userEvent.click(screen.getByTestId('next-quest-cta'));
     expect(trackGrowthEvent).toHaveBeenCalledWith(
       'cross_promo_click',
-      expect.objectContaining({ target: 'word-wheel', source: 'word_hunt_results' }),
+      expect.objectContaining({ target: 'word-hunt', source: 'word_hunt_results' }),
     );
   });
 

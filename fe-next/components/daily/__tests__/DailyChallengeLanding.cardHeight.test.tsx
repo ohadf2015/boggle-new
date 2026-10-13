@@ -142,7 +142,7 @@ describe('DailyChallengeLanding - Quest Card Layout', () => {
     );
 
     // With all modes unplayed, pickPrimaryMode selects word-hunt
-    expect(screen.getByTestId('quest-card-word-hunt')).toBeInTheDocument();
+    expect(screen.getByTestId('quest-card-word-wheel')).toBeInTheDocument();
   });
 
   it('should render three secondary compact rows', () => {
@@ -165,7 +165,7 @@ describe('DailyChallengeLanding - Quest Card Layout', () => {
       </Wrapper>
     );
 
-    const wordHuntCard = screen.getByTestId('quest-card-word-hunt');
+    const wordHuntCard = screen.getByTestId('quest-card-word-wheel');
 
     // Under the new design, the primary card is sized by its content + optional image,
     // not by a fixed min-height rule that forces all cards equal.

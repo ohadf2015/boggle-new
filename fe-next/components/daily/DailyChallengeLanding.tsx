@@ -22,6 +22,7 @@ import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
 import { DailyHubHeader } from './landing/DailyHubHeader';
 import { QuestCard } from './landing/QuestCard';
 import { CompactModeRow } from './landing/CompactModeRow';
+import { DailyJourney } from './landing/DailyJourney';
 import { LeaderboardTeaser } from './landing/LeaderboardTeaser';
 import WeeklyChestCard from './WeeklyChestCard';
 import WeeklyChestModal from './WeeklyChestModal';
@@ -168,12 +169,12 @@ export function DailyChallengeLanding({
   const showsWordTower = visibleModes.some((mode) => mode.id === 'word-tower');
   const showsConnections = visibleModes.some((mode) => mode.id === 'connections');
   const wordTowerHref = `/${currentLanguage}/word-tower/daily`;
-  // Word Tower is an optional bonus: it never counts toward clearing the day.
-  const totalQuests = 2 + (showsConnections ? 1 : 0);
+  // Daily flow: Word Wheel → Word Hunt are required; Connections and Word Tower
+  // are optional bonuses that never count toward clearing the day.
+  const totalQuests = 2;
   const completedCount =
-    (wordHuntStatus === 'won' ? 1 : 0) +
     (wordWheelStatus === 'played' ? 1 : 0) +
-    (showsConnections && connectionsPlayed ? 1 : 0);
+    (wordHuntStatus === 'won' || wordHuntStatus === 'lost' ? 1 : 0);
 
   const wordHuntPlayed = wordHuntStatus === 'won' || wordHuntStatus === 'lost';
   const wordWheelPlayed = wordWheelStatus === 'played';
@@ -206,18 +207,6 @@ export function DailyChallengeLanding({
 
   const modesInfo: ModeInfo[] = [
     {
-      id: 'word-hunt',
-      title: t('daily.wordHunt.title'),
-      tagline: t('daily.wordHunt.desc'),
-      icon: <Timer className="w-8 h-8" />,
-      color: 'orange',
-      artUrl: '/daily/word-hunt-mascot.jpg',
-      played: wordHuntPlayed,
-      onPlay: onSelectWordHunt,
-      visible: true,
-      timeMode: 'timed',
-    },
-    {
       id: 'word-wheel',
       title: t('wordWheel.hub.wordWheelQuest'),
       tagline: t('wordWheel.hub.wordWheelDesc'),
@@ -226,6 +215,18 @@ export function DailyChallengeLanding({
       artUrl: '/daily/word-wheel-mascot.jpg',
       played: wordWheelPlayed,
       onPlay: onSelectWordWheel,
+      visible: true,
+      timeMode: 'timed',
+    },
+    {
+      id: 'word-hunt',
+      title: t('daily.wordHunt.title'),
+      tagline: t('daily.wordHunt.desc'),
+      icon: <Timer className="w-8 h-8" />,
+      color: 'orange',
+      artUrl: '/daily/word-hunt-mascot.jpg',
+      played: wordHuntPlayed,
+      onPlay: onSelectWordHunt,
       visible: true,
       timeMode: 'timed',
     },
@@ -240,6 +241,7 @@ export function DailyChallengeLanding({
       onPlay: () => router.push(`/${currentLanguage}/connections/daily`),
       visible: showsConnections,
       timeMode: 'relaxed',
+      badge: t('daily.journeyOptional'),
     },
     {
       id: 'word-tower',
@@ -252,7 +254,7 @@ export function DailyChallengeLanding({
       onPlay: () => router.push(wordTowerHref),
       visible: showsWordTower,
       timeMode: 'relaxed',
-      badge: t('daily.bonusQuest'),
+      badge: t('daily.journeyOptional'),
     },
   ];
 
@@ -268,6 +270,25 @@ export function DailyChallengeLanding({
       <DailyHubHeader />
 
       <DailyMissionsHeader completedCount={completedCount} total={totalQuests} />
+
+      <DailyJourney
+        currentId={primaryModeId}
+        steps={modesInfo.filter((md) => md.visible).map((md) => ({
+          id: md.id,
+          title: md.title,
+          icon: md.icon,
+          artUrl: md.artUrl,
+          played: md.played,
+          optional: md.id === 'connections' || md.id === 'word-tower',
+          onPlay: md.onPlay,
+        }))}
+      />
+
+      {completedCount >= totalQuests && (
+        <p className="w-full text-center text-sm font-black text-neo-lime" data-testid="required-done-note">
+          {t('daily.journeyAllRequiredDone')}
+        </p>
+      )}
 
       {/* Score Gauntlet Banner: shown when arriving via a challenge share link.
           Nested empty Suspense so useSearchParams does not deopt the hub SSR. */}

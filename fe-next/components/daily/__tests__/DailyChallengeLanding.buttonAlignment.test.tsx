@@ -151,7 +151,7 @@ describe('DailyChallengeLanding - Button Layout', () => {
 
     // In new design, the primary mode is selected by pickPrimaryMode
     // With all modes unplayed, word-hunt is the primary
-    const wordHuntCard = screen.getByTestId('quest-card-word-hunt');
+    const wordHuntCard = screen.getByTestId('quest-card-word-wheel');
     expect(wordHuntCard).toBeInTheDocument();
 
     // CTA buttons should be present (START QUEST for new cards)
@@ -174,7 +174,7 @@ describe('DailyChallengeLanding - Button Layout', () => {
   it('should render clickable primary card with role="button"', () => {
     renderComponent();
 
-    const wordHuntCard = screen.getByTestId('quest-card-word-hunt');
+    const wordHuntCard = screen.getByTestId('quest-card-word-wheel');
     // Quest card should be clickable (role="button")
     expect(wordHuntCard.querySelector('[role="button"]')).toBeTruthy();
   });
