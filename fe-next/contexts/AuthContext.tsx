@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, ReactNode } from 'react';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import { syncAuthAnalyticsTransition } from '@/utils/authAnalytics';
-import { consumePendingSignupCompletion, maybeTrackSignupCompleted, setAnalyticsIdentity } from '@/utils/growthTracking';
+import { consumePendingSignupCompletion, consumeSignupSource, maybeTrackSignupCompleted, setAnalyticsIdentity } from '@/utils/growthTracking';
 
 // Import hooks from auth module (types are re-exported separately below)
 import {
@@ -131,12 +131,15 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
           typeof window !== 'undefined'
             ? sessionStorage.getItem('lexiclash_signup_funnel_pending')
             : null;
-        const source =
-          pending === 'first_win'
+        // results_inline: a tap on the post-results inline card latches its
+        // own source and wins attribution over the sheet funnel variant.
+        const latchedSource = consumeSignupSource();
+        const source = latchedSource ??
+          (pending === 'first_win'
             ? 'first_win_prompt'
             : pending === 'multi_game'
             ? 'multi_game_prompt'
-            : 'header_or_menu';
+            : 'header_or_menu');
         // Re-fire-proof: only fires for a *just-created* account, deduped per
         // user per device. A restored session on cold load (returning user)
         // resets `wasGuest` to true via the in-memory ref, but its account is

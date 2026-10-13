@@ -28,7 +28,7 @@ import {
   trackRageQuit,
   trackSessionDepth,
 } from '@/utils/posthogEngagement';
-import { markGameActive, markGameInactive } from '@/utils/abandonOnPagehide';
+import { markGameActive, markGameInactive, isGameActive } from '@/utils/abandonOnPagehide';
 import { trackRetentionPlay } from '@/lib/retention/tracking';
 import {
   stampFirstWinClockStart,
@@ -1023,6 +1023,86 @@ export const trackSignupFunnel = (
  * "clicked but OAuth failed". `source` identifies the surface that served
  * the tap (e.g. 'first_win_sheet', 'mp_sheet').
  */
+/**
+ * Post-results inline signup CTA (`results_inline`, after #1247's soft sheet
+ * graded FAIL: 20 shown / 0 clicks). The inline card must never render before
+ * `growth:game_completed` and never mid-round, so trackGameEnd stamps a
+ * completion signal (memory + sessionStorage for results-page reloads) and
+ * broadcasts it; results surfaces can mount a tick before trackGameEnd runs
+ * (see #1260), so the card listens for the broadcast instead of racing it.
+ */
+export const GAME_COMPLETED_SIGNAL = 'lexiclash:game-completed';
+const GAME_COMPLETED_AT_KEY = 'lexiclash_last_game_completed_at';
+let lastGameCompletedAt: number | null = null;
+
+export const markGameCompletedSignal = (nowMs: number = Date.now()): void => {
+  lastGameCompletedAt = nowMs;
+  if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.setItem(GAME_COMPLETED_AT_KEY, String(nowMs));
+  } catch {
+    /* storage unavailable — in-memory signal still works */
+  }
+  try {
+    window.dispatchEvent(new CustomEvent(GAME_COMPLETED_SIGNAL, { detail: { at: nowMs } }));
+  } catch {
+    /* never block the game path */
+  }
+};
+
+export const getLastGameCompletedAt = (): number | null => {
+  if (lastGameCompletedAt !== null) return lastGameCompletedAt;
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem(GAME_COMPLETED_AT_KEY);
+    const n = raw ? Number(raw) : NaN;
+    return Number.isFinite(n) ? n : null;
+  } catch {
+    return null;
+  }
+};
+
+/** True only once a game has emitted `game_completed` and no round is live. */
+export const isPostGameCompleted = (): boolean =>
+  getLastGameCompletedAt() !== null && !isGameActive();
+
+export const __resetGameCompletedSignalForTests = (): void => {
+  lastGameCompletedAt = null;
+  if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.removeItem(GAME_COMPLETED_AT_KEY);
+  } catch {
+    /* noop */
+  }
+};
+
+/**
+ * Signup-source latch: set when a player taps a sign-in button on a prompt
+ * surface that owns attribution (e.g. `results_inline`), read once by
+ * AuthContext so `signup_completed` carries `source: 'results_inline'`.
+ */
+export const SIGNUP_SOURCE_PENDING_KEY = 'lexiclash_signup_source_pending';
+
+export const latchSignupSource = (source: string): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.setItem(SIGNUP_SOURCE_PENDING_KEY, source);
+  } catch {
+    /* noop */
+  }
+};
+
+export const consumeSignupSource = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const v = sessionStorage.getItem(SIGNUP_SOURCE_PENDING_KEY);
+    if (v) sessionStorage.removeItem(SIGNUP_SOURCE_PENDING_KEY);
+    return v || null;
+  } catch {
+    return null;
+  }
+};
+
 export const trackSignupPromptClicked = (source: string): void => {
   trackGrowthEvent('signup_prompt_clicked', { source });
 };
@@ -1478,6 +1558,8 @@ export const trackGameEnd = (
     wordCount,
     durationSec,
   });
+  // results_inline signup CTA gate: only after a real game_completed.
+  if (completed) markGameCompletedSignal();
 
   // Lifetime person properties — enable cohort slicing in PostHog
   // (e.g. "players with ≥10 games" × "first_mode_played = adventure").

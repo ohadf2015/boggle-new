@@ -413,6 +413,7 @@ const PracticeResults = memo(function PracticeResults({
               titleKey="auth.firstWin.title"
               bodyKey="auth.firstWin.subtitleValueProp"
               className="mb-4"
+              analyticsSource="results_inline"
             />
           )}
 
