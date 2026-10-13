@@ -35,7 +35,7 @@ const BASE_PROPS = {
 };
 
 describe('SurvivalClueBoxes — design system color contract', () => {
-  it('FeedbackOverlay green letter uses bg-neo-lime', () => {
+  it('FeedbackOverlay green letter uses bg-emerald-500', () => {
     const feedback: LetterFeedback[] = [
       { letter: 'A', position: 0, feedback: 'green' },
       { letter: 'P', position: 1, feedback: 'gray' },
@@ -50,11 +50,11 @@ describe('SurvivalClueBoxes — design system color contract', () => {
       attempts={[{ word: 'APPLE', feedback, timestamp: 0 }]}
     />);
     const greenBox = screen.getByText('A').closest('[class]') as HTMLElement;
-    expect(greenBox?.className).toContain('bg-neo-lime');
+    expect(greenBox?.className).toContain('bg-emerald-500');
     expect(greenBox?.className).not.toContain('bg-green-');
   });
 
-  it('FeedbackOverlay yellow letter uses bg-neo-yellow', () => {
+  it('FeedbackOverlay yellow letter uses bg-amber-400', () => {
     const feedback: LetterFeedback[] = [
       { letter: 'X', position: 0, feedback: 'gray' },
       { letter: 'A', position: 1, feedback: 'yellow' },
@@ -69,29 +69,29 @@ describe('SurvivalClueBoxes — design system color contract', () => {
       attempts={[{ word: 'XAXXX', feedback, timestamp: 0 }]}
     />);
     const yellowBox = screen.getByText('A').closest('[class]') as HTMLElement;
-    expect(yellowBox?.className).toContain('bg-neo-yellow');
+    expect(yellowBox?.className).toContain('bg-amber-400');
     expect(yellowBox?.className).not.toContain('bg-yellow-');
   });
 
-  it('HintBoxes accumulated green clue uses bg-neo-lime', () => {
+  it('HintBoxes accumulated green clue uses bg-emerald-500', () => {
     const clues = new Map<number, AccumulatedClue>([[0, { letter: 'A', type: 'green' }]]);
     render(<SurvivalClueBoxes
       {...BASE_PROPS}
       accumulatedClues={clues}
     />);
     const greenBox = screen.getByText('A').closest('[class]') as HTMLElement;
-    expect(greenBox?.className).toContain('bg-neo-lime');
+    expect(greenBox?.className).toContain('bg-emerald-500');
     expect(greenBox?.className).not.toContain('bg-green-');
   });
 
-  it('HintBoxes accumulated yellow clue uses bg-neo-yellow', () => {
+  it('HintBoxes accumulated yellow clue uses bg-amber-400', () => {
     const clues = new Map<number, AccumulatedClue>([[1, { letter: 'P', type: 'yellow' }]]);
     render(<SurvivalClueBoxes
       {...BASE_PROPS}
       accumulatedClues={clues}
     />);
     const yellowBox = screen.getByText('P').closest('[class]') as HTMLElement;
-    expect(yellowBox?.className).toContain('bg-neo-yellow');
+    expect(yellowBox?.className).toContain('bg-amber-400');
     expect(yellowBox?.className).not.toContain('bg-yellow-');
   });
 });

@@ -215,7 +215,7 @@ describe('SurvivalClueBoxes - Yellow Letter Persistence', () => {
 
     // The yellow letter should have yellow background styling
     const yellowBox = screen.getByText('P').closest('div');
-    expect(yellowBox).toHaveClass('bg-neo-yellow');
+    expect(yellowBox).toHaveClass('bg-amber-400');
   });
 
   // Tests for different-length word discovery attempts
@@ -373,7 +373,7 @@ describe('SurvivalClueBoxes - Yellow Letter Persistence', () => {
 
       // Position 0 should show 'A' with green styling (green beats yellow)
       const greenBox = screen.getByText('A').closest('div');
-      expect(greenBox).toHaveClass('bg-neo-lime');
+      expect(greenBox).toHaveClass('bg-emerald-500');
     });
   });
 });
