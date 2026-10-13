@@ -192,8 +192,6 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
         {!showFeedbackOverlay && (attempts.length > 0 || knownLetters.size > 0) && !compact && (
           <FeedbackLegend t={t} />
         )}
-        <AdaptiveAnimatePresence mode="sync">
-        </AdaptiveAnimatePresence>
       </div>
     </AdaptiveMotion.div>
   );
