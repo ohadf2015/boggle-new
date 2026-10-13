@@ -56,6 +56,9 @@ export const LANDING_NAMESPACES = [
   'languages',
   'share',
   'newModes',
+  // VersionChecker toast ("New version available" / "Refresh") mounts on every
+  // page, including the landing before the full catalogue upgrades in.
+  'system',
 ] as const;
 
 export const LANDING_EXTRA_KEYS = [
