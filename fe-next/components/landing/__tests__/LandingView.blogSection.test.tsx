@@ -117,7 +117,6 @@ vi.mock('../LandingSEOSection', () => ({ LandingSEOSection: () => <div /> }));
 vi.mock('@/components/ads', () => ({ AdPlaceholder: () => <div />, InlineBannerAd: () => <div /> }));
 vi.mock('@/components/events/EventBanner', () => ({ default: () => <div /> }));
 vi.mock('@/components/auth/AuthModal', () => ({ default: () => <div /> }));
-vi.mock('../ShareReferralModal', () => ({ ShareReferralModal: () => <div /> }));
 vi.mock('@/components/ui/PlayfulBackground', () => ({ PlayfulBackground: () => <div /> }));
 vi.mock('@/components/education/HomeEducationCardConnected', () => ({ HomeEducationCardConnected: () => <div /> }));
 vi.mock('@/components/CrazyGamesBanner', () => ({ default: () => <div /> }));
