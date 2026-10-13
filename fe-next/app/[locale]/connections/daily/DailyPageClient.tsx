@@ -38,7 +38,7 @@ export default function DailyPageClient({ locale }: Props): React.JSX.Element {
 
   return (
     <div data-testid="connections-daily-root" className="flex-1 flex flex-col min-h-0">
-      <DailyFlowChrome modeId="connections" />
+      <DailyFlowChrome modeId="connections" inline />
       <Suspense fallback={<LoadingFallback />}>
         {hostPyramid ? (
           <PyramidChallenge sharePath={`${locale}/connections/daily`} />
