@@ -80,9 +80,9 @@ export default function AvatarBuilderModal({ isOpen, onClose, onSave, initialCon
     if (isOpen) setActiveTab('face');
   }, [isOpen]);
 
-  // Custom portal, not the shared DialogContent — raise html.modal-open ourselves so the bottom
-  // banner (native AdMob via BannerCoordinatorMount, web AdSense anchor via globals.css) stands
-  // down instead of painting over the Save/Cancel row.
+  // Custom portal, not the shared DialogContent — raise html.modal-open ourselves so the
+  // native AdMob bottom banner (via BannerCoordinatorMount) stands down instead of
+  // painting over the Save/Cancel row.
   useEffect(() => {
     if (!isOpen) return;
     acquireModalOpen();
@@ -184,7 +184,7 @@ export default function AvatarBuilderModal({ isOpen, onClose, onSave, initialCon
     <div
       role="presentation"
       onClick={onClose}
-      className="fixed inset-0 z-[110] flex items-stretch md:items-center justify-center bg-black/70 md:bg-black/85 md:p-6 pb-[calc(min(var(--admob-banner-height,0px),120px)+min(var(--web-anchor-ad-height,0px),120px))] md:pb-[calc(1.5rem+min(var(--web-anchor-ad-height,0px),120px))]"
+      className="fixed inset-0 z-[110] flex items-stretch md:items-center justify-center bg-black/70 md:bg-black/85 md:p-6 pb-[calc(min(var(--admob-banner-height,0px),120px))] md:pb-[1.5rem]"
     >
       <div
         ref={dialogRef}

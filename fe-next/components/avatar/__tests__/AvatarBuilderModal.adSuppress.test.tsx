@@ -29,10 +29,10 @@ import AvatarBuilderModal from '../AvatarBuilderModal';
 
 
 /**
- * The bottom banner ad (native AdMob SurfaceView, or the web AdSense anchor) painted over the
- * builder's Save/Cancel row. The builder is a custom portal, not the shared DialogContent, so it
- * never raised html.modal-open — the one signal BannerCoordinatorMount and the web anchor CSS use
- * to stand the banner down.
+ * The bottom banner ad (native AdMob SurfaceView) painted over the builder's Save/Cancel row.
+ * The builder is a custom portal, not the shared DialogContent, so it never raised
+ * html.modal-open — the one signal BannerCoordinatorMount uses to stand the banner down.
+ * (The web AdSense anchor this also used to suppress was deleted with Auto-Ads — t_79e9fcc1.)
  */
 describe('AvatarBuilderModal — stands the bottom ad down while open', () => {
   const props = { onClose: vi.fn(), onSave: vi.fn(), premium: null as null, initialConfig: DEFAULT_AVATAR_CONFIG };
@@ -48,11 +48,5 @@ describe('AvatarBuilderModal — stands the bottom ad down while open', () => {
     rerender(<AvatarBuilderModal {...props} isOpen />);
     unmount();
     expect(document.documentElement.classList.contains('modal-open')).toBe(false);
-  });
-
-  it('the web anchor ad is hidden by CSS while any modal is open', async () => {
-    const fs = await import('node:fs');
-    const css = fs.readFileSync(require('node:path').join(__dirname, '../../../app/globals.css'), 'utf8');
-    expect(css).toMatch(/html\.modal-open\s+ins\.adsbygoogle-noablate/);
   });
 });
