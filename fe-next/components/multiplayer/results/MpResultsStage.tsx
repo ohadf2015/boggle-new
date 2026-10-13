@@ -44,6 +44,7 @@ import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
 const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/MultiplayerSignupSheet'), { ssr: false });
+const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
 const FloatingReaction = dynamic(() => import('@/components/game/QuickReactions').then((m) => m.FloatingReaction), { ssr: false });
@@ -299,6 +300,16 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         ) : awards && !hideOutcome ? (
           <MpRoundAwards awards={awards} t={t} className="hidden lg:block" />
         ) : null)}
+        {/* results_inline: guest signup CTA on the round-end screen. The card
+            itself waits for growth:game_completed and hides mid-round. */}
+        {c.isGuest && !c.isClassroom && seen('card') && (
+          <InlineSignupCard
+            isAuthenticated={c.isAuthenticated}
+            analyticsSource="results_inline"
+            compact
+            className={cn('shrink-0', fx.cardIn)}
+          />
+        )}
         {/* Native AdMob banner / CrazyGames banner. The web dev placeholder
             ([data-ad-zone], null in production) is hidden so dev matches prod. */}
         <div className="shrink-0 empty:hidden [&_[data-ad-zone]]:hidden">

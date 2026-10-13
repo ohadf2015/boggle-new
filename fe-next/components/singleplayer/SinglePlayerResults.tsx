@@ -423,6 +423,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       titleKey="results.saveStreak.title"
       bodyKey="results.saveStreak.body"
       onCTAClick={() => trackGrowthEvent('save_streak_clicked', { source: 'solo_results' })}
+      analyticsSource="results_inline"
     />
   ) : null;
 

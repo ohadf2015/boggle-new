@@ -599,7 +599,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       {/* ── 3b. GUESTS STOP HERE — no XP, level, rank tier or history exists for
           them, so the recap below is empty or meaningless. One signup CTA takes
           the place of the whole secondary stack. */}
-      {isGuest && <InlineSignupCard isAuthenticated={isAuthenticated} />}
+      {isGuest && <InlineSignupCard isAuthenticated={isAuthenticated} analyticsSource="results_inline" />}
 
       {/* ── 3c. AUTHENTICATED PLAYERS — the incentivized referral CTA (code +
           coin/XP reward) that previously only reached players who opted into

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { m } from 'framer-motion';
 import { TrendingUp, Medal, Users, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,6 +14,12 @@ import {
   type AuthBenefit,
 } from './shared';
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';
+import {
+  GAME_COMPLETED_SIGNAL,
+  isPostGameCompleted,
+  latchSignupSource,
+  trackGrowthEvent,
+} from '@/utils/growthTracking';
 
 interface InlineSignupCardProps {
   isAuthenticated: boolean;
@@ -25,6 +31,15 @@ interface InlineSignupCardProps {
   bodyKey?: string;
   /** Fired when the player taps any sign-in button (analytics). */
   onCTAClick?: () => void;
+  /**
+   * Prompt-surface id (e.g. 'results_inline'). When set the card: renders only
+   * after `growth:game_completed` with no live round; emits
+   * `signup_prompt_shown` / `signup_prompt_clicked` with this `source`; and
+   * latches it so `signup_completed` is attributed to it.
+   */
+  analyticsSource?: string;
+  /** Drop the benefits list + stats teaser (tight layouts, e.g. MP results). */
+  compact?: boolean;
 }
 
 const benefits: AuthBenefit[] = [
@@ -44,18 +59,50 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
   titleKey = 'auth.multiGames.title',
   bodyKey = 'auth.multiGames.subtitle',
   onCTAClick,
+  analyticsSource,
+  compact = false,
 }) => {
   const { t } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
-  const { signIn, loadingProvider, error } = useOAuthSignIn();
+  const { signIn, loadingProvider, error } = useOAuthSignIn({ analyticsSource });
+
+  // Gate attributed surfaces on a real game_completed (never mid-round).
+  const gated = !!analyticsSource;
+  const [gameCompleted, setGameCompleted] = useState<boolean>(() => !gated || isPostGameCompleted());
+  useEffect(() => {
+    if (!gated || gameCompleted || typeof window === 'undefined') return;
+    const onCompleted = () => {
+      if (isPostGameCompleted()) setGameCompleted(true);
+    };
+    window.addEventListener(GAME_COMPLETED_SIGNAL, onCompleted);
+    onCompleted();
+    return () => window.removeEventListener(GAME_COMPLETED_SIGNAL, onCompleted);
+  }, [gated, gameCompleted]);
+
+  const visible = !isAuthenticated && !isOnCrazyGamesPlatform && gameCompleted;
+
+  const shownRef = useRef(false);
+  useEffect(() => {
+    if (!visible || !analyticsSource || shownRef.current) return;
+    shownRef.current = true;
+    trackGrowthEvent('signup_prompt_shown', {
+      source: analyticsSource,
+      surface: analyticsSource,
+      trigger: analyticsSource,
+    });
+  }, [visible, analyticsSource]);
+
+  const latch = () => {
+    if (analyticsSource) latchSignupSource(analyticsSource);
+  };
 
   const handleSignIn = (provider: 'google' | 'discord') => {
+    latch();
     onCTAClick?.();
     signIn(provider);
   };
 
-  if (isAuthenticated) return null;
-  if (isOnCrazyGamesPlatform) return null;
+  if (!visible) return null;
 
   const guestStats = getGuestStatsSummary();
 
@@ -69,6 +116,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
         className,
       )}
       aria-label={t(titleKey)}
+      data-signup-surface={analyticsSource}
     >
       {/* Decorative accent stripe */}
       <div
@@ -88,6 +136,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
       </p>
 
       {/* Benefits */}
+      {!compact && (
       <ul className="space-y-2 mb-4">
         {benefits.map((benefit, index) => (
           <m.li
@@ -102,9 +151,10 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
           </m.li>
         ))}
       </ul>
+      )}
 
       {/* Guest stats teaser */}
-      {guestStats.gamesPlayed > 0 && (
+      {!compact && guestStats.gamesPlayed > 0 && (
         <div className="mb-4 px-3 py-2 rounded-neo bg-neo-navy border-neo border-neo-cyan/40 text-center text-xs text-neo-cyan">
           {t('auth.firstWin.statsTeaser', {
             games: guestStats.gamesPlayed,
@@ -114,7 +164,11 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
       )}
 
       {/* OAuth buttons */}
-      <OAuthButtonGroup onSignIn={handleSignIn} loadingProvider={loadingProvider} />
+      {/* Capture-phase latch: the GSI Google button is an iframe that never
+          calls onSignIn, so attribute on pointerdown for every provider. */}
+      <div onPointerDownCapture={latch}>
+        <OAuthButtonGroup onSignIn={handleSignIn} loadingProvider={loadingProvider} analyticsSource={analyticsSource} />
+      </div>
 
       {error && <AuthErrorMessage message={error} className="mt-3" />}
 
