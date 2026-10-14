@@ -23,12 +23,11 @@ const Sparks: React.FC<{ count: number; reach: number }> = ({ count, reach }) =>
           key={k}
           data-testid="wheel-spark"
           className={cn('absolute w-[3.2%] h-[3.2%] -ml-[1.6%] -mt-[1.6%] border-[0.4cqw] border-neo-black', SPARK_COLORS[k % SPARK_COLORS.length], k % 2 ? 'rounded-full' : 'rounded-[0.6cqw]')}
-          initial={{ left: '50%', top: '50%', scale: 0.4, rotate: 0, opacity: 1 }}
+          initial={{ left: '50%', top: '50%', scale: 0.4, opacity: 1 }}
           animate={{
             left: ['50%', `${50 + Math.sin(a) * d}%`, `${50 + Math.sin(a) * d * 1.08}%`],
             top: ['50%', `${50 - Math.cos(a) * d}%`, `${50 - Math.cos(a) * d * 1.08 + 6}%`],
             scale: [0.4, 1.25, 0.5],
-            rotate: [0, 140, 260],
             opacity: [1, 1, 0],
           }}
           transition={{ duration: 0.95, times: [0, 0.4, 1], ease: 'easeOut', delay: 0.02 }}

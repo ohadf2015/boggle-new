@@ -1,15 +1,16 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useHuntStage } from '../useHuntStage';
-import { VERDICT_HOLD_MS, PENDING_TIMEOUT_MS } from '../huntStage';
+import { VERDICT_HOLD_MS, PENDING_TIMEOUT_MS, verdictHoldMs } from '../huntStage';
 import type { FeedbackType } from '../../types';
 
 const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
 
 function setup() {
   return renderHook(
-    ({ seq, type }: { seq: number; type: FeedbackType | null }) => useHuntStage({ feedbackSeq: seq, feedbackType: type }),
-    { initialProps: { seq: 0, type: null as FeedbackType | null } },
+    ({ seq, type, word = 'CAT' }: { seq: number; type: FeedbackType | null; word?: string | null }) =>
+      useHuntStage({ feedbackSeq: seq, feedbackType: type, feedbackWord: word }),
+    { initialProps: { seq: 0, type: null as FeedbackType | null, word: null as string | null } },
   );
 }
 
@@ -55,9 +56,20 @@ describe('useHuntStage', () => {
     const { result, rerender } = setup();
     act(() => result.current.release('CAT', path));
     rerender({ seq: 1, type: 'not-in-dictionary' });
-    act(() => vi.advanceTimersByTime(VERDICT_HOLD_MS + 5));
+    act(() => vi.advanceTimersByTime(verdictHoldMs('bad') + 5));
     act(() => result.current.release('CAB', path));
-    rerender({ seq: 2, type: 'not-in-dictionary' });
+    rerender({ seq: 2, type: 'not-in-dictionary', word: 'CAB' });
     expect(result.current.stage).toMatchObject({ phase: 'verdict', verdict: 'bad', word: 'CAB' });
+  });
+
+  it('Given a rejected word, When the verdict shows, Then the reason stays up past the short good-word hold', () => {
+    vi.useFakeTimers();
+    const { result, rerender } = setup();
+    act(() => result.current.release('CAT', path));
+    rerender({ seq: 1, type: 'not-in-dictionary' });
+    act(() => vi.advanceTimersByTime(VERDICT_HOLD_MS + 50));
+    expect(result.current.stage).toMatchObject({ phase: 'verdict', verdict: 'bad' });
+    act(() => vi.advanceTimersByTime(verdictHoldMs('bad')));
+    expect(result.current.stage.phase).toBe('idle');
   });
 });

@@ -13,6 +13,7 @@ import {
   NEW_PLAYER_THRESHOLD,
   NEW_PLAYER_LIFE_FLOOR,
   getLanguageDrainMultiplier,
+  SOLVE_CELEBRATION_MS,
 } from './constants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -377,7 +378,12 @@ export function useSurvivalGameLogic({
       { isWinner: won, attemptsUsed: targetAttemptsCount, lifeRemaining: state.lifePoints }
     );
 
-    onComplete(result);
+    if (won) {
+      // Not a safe (unmount-cancelled) timeout: a win must always be reported.
+      setTimeout(() => onComplete(result), SOLVE_CELEBRATION_MS);
+    } else {
+      onComplete(result);
+    }
   }, [state.attempts, state.discoveredWords, state.lifePoints, state.clueTokens, state.gameSessionId, hintState.tokensSpent, hintState.currentHint, targetWord, onComplete, lifeDrainInterval, fadeToTrack, TRACKS]);
 
   // Token adjustment helper for hint purchases

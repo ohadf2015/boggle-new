@@ -118,3 +118,6 @@ export const LANGUAGE_DRAIN_MULTIPLIER: Record<string, number> = {
 export function getLanguageDrainMultiplier(language: string): number {
   return LANGUAGE_DRAIN_MULTIPLIER[language] ?? 1.0;
 }
+
+/** A solved target holds the board for its celebration before results take over. */
+export const SOLVE_CELEBRATION_MS = 1800;

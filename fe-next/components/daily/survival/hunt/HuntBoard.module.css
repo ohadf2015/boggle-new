@@ -103,6 +103,8 @@
   transition: transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1), color 120ms;
 }
 
+.wrap[data-large='true'] .ch { font-size: 1.2em; }
+
 .glyph[data-state] .ch {
   display: inline-block;
   text-shadow: 0 0 6px #fffef0, 0 0 2px #fffef0;

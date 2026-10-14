@@ -93,7 +93,7 @@ export function HuntPlayfield({
           heldPath={stage.path}
           calm={calm}
           size={size}
-          t={t as (key: string, fallback?: string) => string}
+          t={t}
         />
       </div>
     </div>

@@ -6,12 +6,13 @@ import type { LetterGrid } from '@/types';
 
 // Mock framer-motion to avoid matchMedia issues
 vi.mock('framer-motion', () => {
-  const motion = {
-    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
-      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
-      return <div {...domProps}>{children}</div>;
+  // Any m.<tag>: the board's celebration and pills use span/button, not only div.
+  const motion = new Proxy({}, {
+    get: (_, tag: string) => ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, variants, layout, ...domProps } = props as Record<string, unknown>;
+      return React.createElement(tag, domProps, children as React.ReactNode);
     },
-  };
+  });
   return {
     motion,
     m: motion,
