@@ -8,7 +8,7 @@ import { ru } from '@/translations/ru.js';
 
 const LOCALES: Record<string, Record<string, unknown>> = { en, he, sv, ja, es, ru };
 
-const KEYS = ['prompt', 'praiseShort', 'praiseMid', 'praiseLong', 'boardLabel', 'longWord'];
+const KEYS = ['prompt', 'praiseShort', 'praiseMid', 'praiseLong', 'boardLabel', 'longWord', 'usesTry'];
 
 function resolve(bundle: Record<string, unknown>, path: string): unknown {
   return path.split('.').reduce<unknown>((node, part) => (node as Record<string, unknown> | undefined)?.[part], bundle);

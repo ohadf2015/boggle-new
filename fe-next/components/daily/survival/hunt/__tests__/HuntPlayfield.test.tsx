@@ -90,4 +90,20 @@ describe('HuntPlayfield', () => {
     expect(screen.getByTestId('hunt-live-word').textContent).toBe('TA');
     expect(screen.getByTestId('hunt-stage').getAttribute('data-phase')).toBe('live');
   });
+
+  it('given a verdict is still showing, when the player types the next word, then the stage spells the new word at once', () => {
+    field({ phase: 'verdict', verdict: 'bad', word: 'CTA', path, releaseSeq: 0 }, { typedWord: 'TA', feedbackMessage: 'Not a word -4' });
+    expect(screen.getByTestId('hunt-live-word').textContent).toBe('TA');
+    expect(screen.getByTestId('hunt-stage').getAttribute('data-phase')).toBe('live');
+  });
+
+  it('given the typed word is the one just judged, then its verdict stays up', () => {
+    field({ phase: 'verdict', verdict: 'good', word: 'CAT', path, releaseSeq: 0 }, { typedWord: 'cat' });
+    expect(screen.getByTestId('hunt-stage').getAttribute('data-phase')).toBe('verdict');
+  });
+
+  it('given the live word would be a guess at the hidden word, then the stage flags that it costs a try', () => {
+    field({ ...initialHuntStage, phase: 'live', word: 'CATS' }, { guessWarning: true });
+    expect(screen.getByTestId('hunt-stage-guess')).toBeTruthy();
+  });
 });

@@ -289,7 +289,6 @@ export function useSurvivalGameLogic({
     isGameOver: state.isGameOver,
     attempts: state.attempts,
     discoveredWords: state.discoveredWords,
-    lifePoints: state.lifePoints,
     dispatch,
     showToast,
     playWordAcceptedSound,

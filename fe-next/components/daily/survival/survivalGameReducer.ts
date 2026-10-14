@@ -60,7 +60,7 @@ export type SurvivalAction =
   | { type: 'GAME_OVER'; payload: { won: boolean } }
 
   // Word discovery
-  | { type: 'DISCOVER_WORD'; payload: { discovery: WordDiscovery; newLife: number } }
+  | { type: 'DISCOVER_WORD'; payload: { discovery: WordDiscovery } }
 
   // Target attempts
   | { type: 'ADD_ATTEMPT'; payload: { attempt: TargetAttempt } }
@@ -170,13 +170,18 @@ export function survivalGameReducer(
       };
 
     // Word discovery
-    case 'DISCOVER_WORD':
+    // The dictionary check is async: apply the reward to the life the player has
+    // NOW (drain and other words may have landed meanwhile), and pay a word once.
+    case 'DISCOVER_WORD': {
+      const { discovery } = action.payload;
+      if (state.discoveredWords.some((d) => d.word === discovery.word)) return state;
       return {
         ...state,
-        discoveredWords: [...state.discoveredWords, action.payload.discovery],
-        lifePoints: action.payload.newLife,
-        clueTokens: state.clueTokens + action.payload.discovery.tokensGained,
+        discoveredWords: [...state.discoveredWords, discovery],
+        lifePoints: Math.min(INITIAL_LIFE, state.lifePoints + discovery.lifeGained),
+        clueTokens: state.clueTokens + discovery.tokensGained,
       };
+    }
 
     // Target attempts
     case 'ADD_ATTEMPT':

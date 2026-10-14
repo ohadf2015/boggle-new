@@ -25,6 +25,8 @@ export interface HuntPlayfieldProps {
   calm: boolean;
   size?: 'phone' | 'desktop';
   stageOverlay?: React.ReactNode;
+  /** The live word is as long as the hidden word, so submitting it spends a try. */
+  guessWarning?: boolean;
   t: TFn;
 }
 
@@ -48,11 +50,14 @@ export function HuntPlayfield({
   calm,
   size = 'phone',
   stageOverlay,
+  guessWarning = false,
   t,
 }: HuntPlayfieldProps) {
+  // Typing the next word takes the stage at once, even over a verdict still on show;
+  // only the word just submitted (still echoed by the keyboard hook) leaves it alone.
   const typing =
     typedWord.length > 0 &&
-    (stage.phase === 'idle' || (stage.phase === 'pending' && typedWord.toUpperCase() !== stage.word.toUpperCase()));
+    (stage.phase === 'idle' || (stage.phase !== 'live' && typedWord.toUpperCase() !== stage.word.toUpperCase()));
   const phase = typing ? 'live' : stage.phase;
   const word = typing ? typedWord : stage.word;
   const reward = stage.verdict === 'good' ? rewardFor(stage.word, discoveredWords) : null;
@@ -76,6 +81,7 @@ export function HuntPlayfield({
           message={feedbackMessage}
           calm={calm}
           size={size}
+          guess={guessWarning}
           t={t as (key: string, params?: Record<string, string | number>) => string}
         />
       </div>

@@ -44,6 +44,7 @@ import { HuntPlayfield } from './survival/hunt/HuntPlayfield';
 import { useHuntStage } from './survival/hunt/useHuntStage';
 import { HuntSolveCelebration } from './survival/hunt/HuntSolveCelebration';
 import { HuntHintSlots } from './survival/hunt/HuntHintSlots';
+import { matchesTargetLength } from './survival/hunt/huntStage';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
@@ -197,6 +198,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const { stage, live: onStageLive, release: onStageRelease } = useHuntStage({
     feedbackSeq: state.feedbackSeq,
     feedbackType: state.feedbackType,
+    feedbackWord: state.feedbackWord,
   });
 
   const { handleWordSubmit, handleWordChange } = actions;
@@ -217,6 +219,11 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     minWordLength: MIN_DISCOVERY_WORD_LENGTH,
     disablePathHighlighting: true,
   });
+
+  // A word as long as the hidden one is a guess: it spends a try (and life if wrong).
+  // Say so before the player lets go, as Word Hunt multiplayer already does.
+  const liveWord = keyboardInput.typedWord || (stage.phase === 'live' ? stage.word : '');
+  const guessWarning = !state.isGameOver && matchesTargetLength(liveWord, Array.from(targetWord).length);
 
   const pixiOverlay =
     !skipAnimations && fx.canvasSize.width > 0 && fx.canvasSize.height > 0 ? (
@@ -417,6 +424,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           isClueGaining={state.isClueGaining}
           skipAnimations={skipAnimations}
           gameDir={actions.gameDir}
+          matchesTargetLength={guessWarning}
           t={t}
         />
       </div>
@@ -440,6 +448,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         <HuntPlayfield
           {...playfieldProps}
           size={inShell ? 'desktop' : 'phone'}
+          guessWarning={guessWarning}
           stageOverlay={
             <>
               <span id={fx.rewardId} className="absolute left-1/2 top-8 pointer-events-none" />

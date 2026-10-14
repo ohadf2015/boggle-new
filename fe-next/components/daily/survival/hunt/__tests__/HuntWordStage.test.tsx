@@ -67,4 +67,36 @@ describe('HuntWordStage', () => {
     expect(screen.getByTestId('hunt-stage').dataset.phase).toBe('pending');
     expect(screen.getByTestId('hunt-live-word').textContent).toBe('PLANE');
   });
+
+  it('given letters are being dragged, then screen readers are not spammed with every letter', () => {
+    stage({ phase: 'live', word: 'CAT' });
+    expect(screen.getByTestId('hunt-stage').getAttribute('aria-live')).toBeNull();
+    expect(screen.getByRole('status').textContent).toBe('');
+  });
+
+  it('given a rejected word, then the word and its reason are announced', () => {
+    stage({ phase: 'verdict', verdict: 'bad', word: 'SFRK', message: 'Not a word -4' });
+    expect(screen.getByRole('status').textContent).toBe('SFRK: Not a word -4');
+  });
+
+  it('given an accepted word, then the word, cheer and life won are announced', () => {
+    stage({ phase: 'verdict', verdict: 'good', word: 'PLANE', points: 14 });
+    expect(screen.getByRole('status').textContent).toBe('PLANE: wordHunt.survival.stage.praiseMid +14');
+  });
+
+  it('given the word being built is as long as the hidden word, then a sticker on the pill says it costs a try', () => {
+    stage({ phase: 'live', word: 'HOUSE', guess: true });
+    expect(screen.getByTestId('hunt-stage-guess').textContent).toBe('wordHunt.survival.stage.usesTry');
+    expect(screen.getByTestId('hunt-stage').dataset.guess).toBe('true');
+  });
+
+  it('given a free discovery or a verdict on show, then there is no try sticker', () => {
+    stage({ phase: 'live', word: 'HOU', guess: false });
+    expect(screen.queryByTestId('hunt-stage-guess')).toBeNull();
+  });
+
+  it('given the guess has been judged, then the try sticker makes way for the verdict', () => {
+    stage({ phase: 'verdict', verdict: 'good', word: 'HOUSE', points: 5, guess: true });
+    expect(screen.queryByTestId('hunt-stage-guess')).toBeNull();
+  });
 });

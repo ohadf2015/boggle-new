@@ -71,7 +71,7 @@ export function DailyTowerBoard({ t, language, refreshKey = 0 }: { t: T; languag
         {title}
         <div className="mt-2 space-y-1.5" aria-hidden>
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-10 animate-pulse rounded-neo border-neo border-black bg-neo-navy-light motion-reduce:animate-none" />
+            <div key={i} className="h-10 animate-pulse rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light motion-reduce:animate-none" />
           ))}
         </div>
       </section>

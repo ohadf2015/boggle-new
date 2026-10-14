@@ -17,14 +17,24 @@ export interface HuntWordStageProps {
   message: string;
   calm: boolean;
   size?: 'phone' | 'desktop';
+  /** The word being built is as long as the hidden word: submitting it spends a try. */
+  guess?: boolean;
   t: TFn;
 }
 
-export function HuntWordStage({ phase, word, verdict, points, coins = null, message, calm, size = 'phone', t }: HuntWordStageProps) {
+export function HuntWordStage({ phase, word, verdict, points, coins = null, message, calm, size = 'phone', guess = false, t }: HuntWordStageProps) {
   const letters = phase === 'idle' ? [] : Array.from(word);
   const showVerdict = phase === 'verdict' && verdict;
   const building = phase === 'live' || phase === 'pending';
   const bonus = building ? getLifeBonusForWord(letters.length) : 0;
+  const showGuess = building && guess && letters.length > 0;
+  const announcement = !showVerdict
+    ? ''
+    : verdict === 'good'
+      ? `${word}: ${t(praiseKeyFor(letters.length))}${points != null ? ` +${points}` : ''}`
+      : message
+        ? `${word}: ${message}`
+        : word;
 
   return (
     <div
@@ -33,9 +43,11 @@ export function HuntWordStage({ phase, word, verdict, points, coins = null, mess
       data-verdict={showVerdict ? verdict : undefined}
       data-size={size}
       data-calm={calm ? 'true' : 'false'}
+      data-guess={showGuess ? 'true' : undefined}
       className={styles.stage}
-      aria-live="polite"
     >
+      {/* Only verdicts are announced; the letters of a word in progress are not. */}
+      <span role="status" aria-live="polite" className="sr-only">{announcement}</span>
       {phase === 'idle' && <span className={styles.prompt}>{t('wordHunt.survival.stage.prompt')}</span>}
       <div data-testid="hunt-stage-pill" className={styles.pill} data-empty={letters.length === 0 ? 'true' : undefined}>
         <span data-testid="hunt-live-word" className={styles.word} style={{ '--n': letters.length } as React.CSSProperties}>
@@ -51,6 +63,11 @@ export function HuntWordStage({ phase, word, verdict, points, coins = null, mess
         {bonus > 0 && (
           <span key={bonus} data-testid="hunt-stage-long" className={styles.long}>
             {t('wordHunt.survival.stage.longWord', { bonus })}
+          </span>
+        )}
+        {showGuess && (
+          <span data-testid="hunt-stage-guess" className={styles.guess}>
+            {t('wordHunt.survival.stage.usesTry')}
           </span>
         )}
         {showVerdict && verdict === 'good' && <span className={styles.praise}>{t(praiseKeyFor(letters.length))}</span>}

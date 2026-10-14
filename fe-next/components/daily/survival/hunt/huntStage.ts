@@ -15,10 +15,14 @@ export interface HuntStageState {
 export type HuntStageEvent =
   | { type: 'live'; word: string }
   | { type: 'release'; word: string; path: HuntCell[]; seq: number }
-  | { type: 'feedback'; seq: number; verdict: HuntVerdict | null }
+  /** `word` names the word the feedback is about; null falls back to sequence order. */
+  | { type: 'feedback'; seq: number; verdict: HuntVerdict | null; word?: string | null }
   | { type: 'expire' };
 
-export const VERDICT_HOLD_MS = 700;
+/** How long an accepted word's payout stays up before the stage clears. */
+export const VERDICT_HOLD_MS = 900;
+/** Rejections carry a reason (penalty, "already found") that needs time to be read. */
+export const REJECT_HOLD_MS = 1800;
 export const PENDING_TIMEOUT_MS = 8000;
 
 export const initialHuntStage: HuntStageState = {
@@ -40,6 +44,17 @@ export function verdictFor(type: FeedbackType | null): HuntVerdict | null {
   return null;
 }
 
+export function verdictHoldMs(verdict: HuntVerdict | null): number {
+  return verdict === 'good' ? VERDICT_HOLD_MS : REJECT_HOLD_MS;
+}
+
+/** Letters, not UTF-16 units, so Hebrew/Japanese words compare like Latin ones. */
+export function matchesTargetLength(word: string, targetLength: number): boolean {
+  return targetLength > 0 && Array.from(word).length === targetLength;
+}
+
+const sameWord = (a: string, b: string) => a.toUpperCase() === b.toUpperCase();
+
 export function praiseKeyFor(length: number): string {
   if (length >= 7) return 'wordHunt.survival.stage.praiseLong';
   if (length >= 5) return 'wordHunt.survival.stage.praiseMid';
@@ -56,6 +71,8 @@ export function huntStageReducer(state: HuntStageState, event: HuntStageEvent): 
       return { phase: 'pending', word: event.word, path: event.path, verdict: null, releaseSeq: event.seq };
     case 'feedback':
       if (state.phase !== 'pending' || event.seq <= state.releaseSeq || !event.verdict) return state;
+      // A slow server check for an earlier word must not paint its verdict on the word held now.
+      if (event.word && !sameWord(event.word, state.word)) return state;
       return { ...state, phase: 'verdict', verdict: event.verdict };
     case 'expire':
       return initialHuntStage;

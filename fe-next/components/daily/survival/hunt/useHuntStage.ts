@@ -6,28 +6,39 @@ import {
   huntStageReducer,
   initialHuntStage,
   verdictFor,
-  VERDICT_HOLD_MS,
+  verdictHoldMs,
   PENDING_TIMEOUT_MS,
   type HuntCell,
 } from './huntStage';
 
-export function useHuntStage({ feedbackSeq, feedbackType }: { feedbackSeq: number; feedbackType: FeedbackType | null }) {
+export function useHuntStage({
+  feedbackSeq,
+  feedbackType,
+  feedbackWord = null,
+}: {
+  feedbackSeq: number;
+  feedbackType: FeedbackType | null;
+  /** The word the latest feedback is about, so a late verdict never lands on a newer word. */
+  feedbackWord?: string | null;
+}) {
   const [stage, dispatch] = useReducer(huntStageReducer, initialHuntStage);
   const seqRef = useRef(feedbackSeq);
 
   useEffect(() => {
     seqRef.current = feedbackSeq;
-    dispatch({ type: 'feedback', seq: feedbackSeq, verdict: verdictFor(feedbackType) });
+    dispatch({ type: 'feedback', seq: feedbackSeq, verdict: verdictFor(feedbackType), word: feedbackWord });
+    // feedbackWord travels with feedbackSeq; a new seq is the only news.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feedbackSeq, feedbackType]);
 
   useEffect(() => {
     if (stage.phase !== 'pending' && stage.phase !== 'verdict') return;
     const id = setTimeout(
       () => dispatch({ type: 'expire' }),
-      stage.phase === 'verdict' ? VERDICT_HOLD_MS : PENDING_TIMEOUT_MS,
+      stage.phase === 'verdict' ? verdictHoldMs(stage.verdict) : PENDING_TIMEOUT_MS,
     );
     return () => clearTimeout(id);
-  }, [stage.phase, stage.releaseSeq, stage.word]);
+  }, [stage.phase, stage.releaseSeq, stage.word, stage.verdict]);
 
   const live = useCallback((word: string) => dispatch({ type: 'live', word }), []);
   const release = useCallback(
