@@ -9203,6 +9203,11 @@ const he = {
     "modesPlayedCount": "{count} מתוך 4 משחקים היום",
     "nextUp": "הבא בתור",
     "allClearToday": "סיימתם הכול להיום — נתראה מחר",
+    "allClear": {
+      "title": "הכול הושלם!",
+      "body": "סיימתם את כל המשימות של היום.",
+      "streak": "רצף של {n} ימים. חזרו מחר כדי לשמור עליו."
+    },
     "adminBeta": "ביתא",
     "replay": "שחקו שוב",
     "cleared": "הושלם!",
@@ -9737,7 +9742,8 @@ const he = {
         "praiseMid": "אחלה!",
         "praiseLong": "מילה ענקית!",
         "boardLabel": "לוח אותיות",
-        "longWord": "מילה ארוכה +{bonus}"
+        "longWord": "מילה ארוכה +{bonus}",
+        "usesTry": "עולה ניסיון"
       },
       "score": {
         "tier": {
@@ -18528,6 +18534,7 @@ const he = {
       "triesLeft": "נשארו {count} ניסיונות",
       "lastTry": "ניסיון אחרון!",
       "completeTough": "יום קשה!",
+      "alreadyPlayed": "כבר שיחקתם היום בגשר מילים. ככה זה הלך:",
       "zeroSolved": "לא נבנה אף גשר, אבל עכשיו אתם מכירים את כל {total}. מחר מחכה סט חדש.",
       "answerKey": "הגשרים של היום",
       "shareCallout": {

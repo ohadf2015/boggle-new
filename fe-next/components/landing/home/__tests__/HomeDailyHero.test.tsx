@@ -43,6 +43,12 @@ vi.mock('@/hooks/useDailyChallengeStats', () => ({
   useDailyChallengeStats: () => mockStats,
 }));
 
+// The card IS today's Word Wheel, so its CTA follows Word Wheel's played state.
+let mockPlayed: { loading: boolean; today: { wordHunt: boolean; wordWheel: boolean; wordTower: boolean; connections: boolean } };
+vi.mock('@/hooks/useDailyPlayedStatus', () => ({
+  useDailyPlayedStatus: () => mockPlayed,
+}));
+
 vi.mock('@/hooks/useWeeklyChest', () => ({
   useWeeklyChest: () => ({
     loading: false,
@@ -76,10 +82,12 @@ function baseStats(over: Partial<DailyChallengeStats> = {}): DailyChallengeStats
 describe('HomeDailyHero — CTA hydration gate', () => {
   beforeEach(() => {
     mockStats = baseStats();
+    mockPlayed = { loading: false, today: { wordHunt: false, wordWheel: false, wordTower: false, connections: false } };
   });
 
   it('shows a skeleton for the CTA while the daily status is still loading — never the optimistic PLAY default', () => {
     mockStats = baseStats({ loading: true, hasPlayed: false, hasSolved: false });
+    mockPlayed.loading = true;
     render(<HomeDailyHero preloadedStats={{ hasPlayed: false, hasSolved: null, currentStreak: 0, loading: true }} />);
 
     expect(screen.getByTestId('daily-cta-skeleton')).toBeInTheDocument();
@@ -90,6 +98,7 @@ describe('HomeDailyHero — CTA hydration gate', () => {
 
   it('keeps the pending CTA a lit lime action bar, not a dark empty slot', () => {
     mockStats = baseStats({ loading: true });
+    mockPlayed.loading = true;
     render(<HomeDailyHero preloadedStats={{ hasPlayed: false, hasSolved: null, currentStreak: 0, loading: true }} />);
 
     const pending = screen.getByTestId('daily-cta-skeleton');
@@ -99,6 +108,7 @@ describe('HomeDailyHero — CTA hydration gate', () => {
 
   it('renders VIEW RESULTS once a completed daily resolves', () => {
     mockStats = baseStats({ loading: false, hasPlayed: true, hasSolved: true });
+    mockPlayed.today.wordWheel = true;
     render(<HomeDailyHero preloadedStats={{ hasPlayed: true, hasSolved: true, currentStreak: 3, loading: false }} />);
 
     expect(screen.queryByTestId('daily-cta-skeleton')).not.toBeInTheDocument();
@@ -113,5 +123,32 @@ describe('HomeDailyHero — CTA hydration gate', () => {
     expect(screen.queryByTestId('daily-cta-skeleton')).not.toBeInTheDocument();
     expect(screen.getByText('PLAY')).toBeInTheDocument();
     expect(screen.queryByText('VIEW RESULTS')).not.toBeInTheDocument();
+  });
+
+  // The card links to Word Wheel but used to read WORD HUNT's played state:
+  // a player who had only done the wheel saw PLAY (and landed on a finished
+  // game), one who had only done the hunt saw VIEW RESULTS for a wheel they
+  // never played (rules/60 Class 3).
+  it('given only Word Hunt is played today, still offers PLAY for the Word Wheel it links to', () => {
+    mockStats = baseStats({ hasPlayed: true, hasSolved: true });
+    mockPlayed.today = { wordHunt: true, wordWheel: false, wordTower: false, connections: false };
+    render(<HomeDailyHero preloadedStats={{ hasPlayed: true, hasSolved: true, currentStreak: 2, loading: false }} />);
+    expect(screen.getByText('PLAY')).toBeInTheDocument();
+    expect(screen.queryByText('VIEW RESULTS')).not.toBeInTheDocument();
+  });
+
+  it('given only Word Wheel is played today, shows VIEW RESULTS', () => {
+    mockStats = baseStats({ hasPlayed: false, hasSolved: false });
+    mockPlayed.today = { wordHunt: false, wordWheel: true, wordTower: false, connections: false };
+    render(<HomeDailyHero preloadedStats={{ hasPlayed: false, hasSolved: null, currentStreak: 0, loading: false }} />);
+    expect(screen.getByText('VIEW RESULTS')).toBeInTheDocument();
+    expect(screen.queryByText('PLAY')).not.toBeInTheDocument();
+  });
+
+  it('given the played state is still resolving, shows the skeleton even if the hunt stats are in', () => {
+    mockStats = baseStats({ loading: false });
+    mockPlayed.loading = true;
+    render(<HomeDailyHero />);
+    expect(screen.getByTestId('daily-cta-skeleton')).toBeInTheDocument();
   });
 });

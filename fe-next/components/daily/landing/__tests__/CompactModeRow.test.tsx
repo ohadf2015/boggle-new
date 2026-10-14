@@ -67,7 +67,11 @@ describe('CompactModeRow', () => {
     expect(motionDiv).toBeInTheDocument();
   });
 
-  it('should show check badge and disable button when played is true', () => {
+  // A finished quest used to be a disabled row — a dead end: no way back to
+  // your Word Hunt / Word Wheel results or the leaderboard, and no way to keep
+  // climbing the daily tower. The journey strip above it already let the same
+  // step be tapped (rules/60 Class 3: two paths, same outcome).
+  it('given a played quest, shows the done badge and still opens the quest (results / replay)', async () => {
     const mockPlay = vi.fn();
     render(
       <CompactModeRow
@@ -76,31 +80,29 @@ describe('CompactModeRow', () => {
         color="cyan"
         onPlay={mockPlay}
         played={true}
+        doneLabel="Done"
       />
     );
 
-    // Should have the done badge
-    expect(screen.getByTestId('cyan-done-badge')).toBeInTheDocument();
-
-    // Button should be disabled
+    expect(screen.getByTestId('cyan-done-badge')).toHaveTextContent('Done');
     const button = screen.getByRole('button');
-    expect(button).toBeDisabled();
+    expect(button).not.toBeDisabled();
+    await userEvent.click(button);
+    expect(mockPlay).toHaveBeenCalledTimes(1);
   });
 
-  it('should not call onPlay when clicked while played', async () => {
-    const mockPlay = vi.fn();
+  it('given a played optional quest, drops the optional tag so the row does not overflow on a phone', () => {
     render(
       <CompactModeRow
         icon={<Building2 className="w-6 h-6" />}
         title="Word Tower"
         color="cyan"
-        onPlay={mockPlay}
+        onPlay={vi.fn()}
         played={true}
+        badge="Optional"
+        doneLabel="Done"
       />
     );
-
-    const button = screen.getByRole('button');
-    await userEvent.click(button);
-    expect(mockPlay).not.toHaveBeenCalled();
+    expect(screen.queryByText('Optional')).not.toBeInTheDocument();
   });
 });

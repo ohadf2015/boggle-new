@@ -23,6 +23,7 @@ import { DailyHubHeader } from './landing/DailyHubHeader';
 import { QuestCard } from './landing/QuestCard';
 import { CompactModeRow } from './landing/CompactModeRow';
 import { DailyJourney } from './landing/DailyJourney';
+import { DailyAllClearCard } from './landing/DailyAllClearCard';
 import { LeaderboardTeaser } from './landing/LeaderboardTeaser';
 import WeeklyChestCard from './WeeklyChestCard';
 import WeeklyChestModal from './WeeklyChestModal';
@@ -100,14 +101,16 @@ export function DailyChallengeLanding({
     };
   }, []);
 
-  // Derive Word Hunt status from hook (server-aware for cross-device play)
-  const wordHuntStatus: 'new' | 'won' | 'lost' = dailyStatus.loading
+  // Derive Word Hunt status from hook (server-aware for cross-device play).
+  // NOT gated on `loading`: every refresh (tab return, back nav) flips loading
+  // on while keeping the last-known hasPlayed, and mapping loading → 'new' made
+  // the hero bounce back to a finished Word Hunt on each return (rules/60
+  // Class 1). Played state only ever moves forward within a day.
+  const wordHuntStatus: 'new' | 'won' | 'lost' = !dailyStatus.hasPlayed
     ? 'new'
-    : !dailyStatus.hasPlayed
-      ? 'new'
-      : dailyStatus.hasSolved
-        ? 'won'
-        : 'lost';
+    : dailyStatus.hasSolved
+      ? 'won'
+      : 'lost';
 
   // Check Word Wheel status from localStorage
   // Server truth wins: localStorage only knows what THIS device did, so a player who finished on
@@ -178,13 +181,18 @@ export function DailyChallengeLanding({
 
   const wordHuntPlayed = wordHuntStatus === 'won' || wordHuntStatus === 'lost';
   const wordWheelPlayed = wordWheelStatus === 'played';
+  // This device's marker OR the server (played on another device). The
+  // localStorage-only read showed a tower climbed on the phone as unplayed on
+  // the laptop, while the results CTA (server-backed) already skipped it.
+  const towerDone = wordTowerPlayed || dailyPlayedStatus.today.wordTower;
+  const connectionsDone = connectionsPlayed || dailyPlayedStatus.today.connections;
 
   // Build play state for primary mode selection
   const playState: DailyModePlayState = {
     wordHunt: wordHuntStatus,
     wordWheel: wordWheelStatus === 'played' ? 'played' : 'new',
-    wordTower: wordTowerPlayed,
-    connections: connectionsPlayed,
+    wordTower: towerDone,
+    connections: connectionsDone,
   };
 
   // Determine which mode should be the primary (hero) card
@@ -237,7 +245,7 @@ export function DailyChallengeLanding({
       icon: <Link2 className="w-8 h-8" />,
       color: 'purple',
       artUrl: '/daily/connections-mascot.jpg',
-      played: connectionsPlayed,
+      played: connectionsDone,
       onPlay: () => router.push(`/${currentLanguage}/connections/daily`),
       visible: showsConnections,
       timeMode: 'relaxed',
@@ -250,7 +258,7 @@ export function DailyChallengeLanding({
       icon: <Building2 className="w-8 h-8" />,
       color: 'cyan',
       artUrl: '/daily/word-tower-mascot.jpg',
-      played: wordTowerPlayed,
+      played: towerDone,
       onPlay: () => router.push(wordTowerHref),
       visible: showsWordTower,
       timeMode: 'relaxed',
@@ -258,7 +266,13 @@ export function DailyChallengeLanding({
     },
   ];
 
-  const primaryMode = modesInfo.find((mode) => mode.id === primaryModeId && mode.visible);
+  const visibleModesInfo = modesInfo.filter((mode) => mode.visible);
+  // Whole day done → closure card in the hero slot. A LOST Word Hunt is not
+  // "done": it stays the hero so the retry is one tap away.
+  const dayCleared = visibleModesInfo.every((mode) => mode.played) && wordHuntStatus !== 'lost';
+  const primaryMode = dayCleared
+    ? undefined
+    : visibleModesInfo.find((mode) => mode.id === primaryModeId);
 
   return (
     <m.div
@@ -273,7 +287,7 @@ export function DailyChallengeLanding({
 
       <DailyJourney
         currentId={primaryModeId}
-        steps={modesInfo.filter((md) => md.visible).map((md) => ({
+        steps={visibleModesInfo.map((md) => ({
           id: md.id,
           title: md.title,
           icon: md.icon,
@@ -284,7 +298,7 @@ export function DailyChallengeLanding({
         }))}
       />
 
-      {completedCount >= totalQuests && (
+      {completedCount >= totalQuests && !dayCleared && (
         <p className="w-full text-center text-sm font-black text-neo-lime" data-testid="required-done-note">
           {t('daily.journeyAllRequiredDone')}
         </p>
@@ -295,6 +309,8 @@ export function DailyChallengeLanding({
       <Suspense fallback={null}>
         <DailyShareDecorations t={t} />
       </Suspense>
+
+      {dayCleared && <DailyAllClearCard streak={dailyPlayedStatus.streak.current} />}
 
       {/* Primary hero card — the one mode to play right now, selected by pickPrimaryMode */}
       {primaryMode && (
@@ -323,8 +339,8 @@ export function DailyChallengeLanding({
 
       {/* Secondary modes — compact single-line cards for the modes not selected as primary */}
       <div className="w-full flex flex-col gap-2" data-testid="secondary-modes">
-        {modesInfo
-          .filter((m) => m.visible && m.id !== primaryModeId)
+        {visibleModesInfo
+          .filter((m) => m.id !== primaryMode?.id)
           .map((mode, i) => (
             <CompactModeRow
               key={mode.id}
@@ -335,6 +351,7 @@ export function DailyChallengeLanding({
               onPlay={mode.onPlay}
               played={mode.played}
               badge={mode.badge}
+              doneLabel={t('daily.journeyDone')}
               delay={0.25 + i * 0.05}
             />
           ))}

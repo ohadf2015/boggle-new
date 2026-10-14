@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { DAILY_MODES, type DailyModeId } from '@/lib/dailyModes';
+import { DAILY_MODES, dailyModeHref, type DailyModeId } from '@/lib/dailyModes';
 import { cn } from '@/lib/utils';
 
 interface DailyFlowChromeProps {
@@ -47,6 +47,9 @@ export function DailyFlowChrome({ modeId, intro = true, backLink = true, inline 
 
   if (!mode) return null;
   const hubHref = `/${language}/daily`;
+  // Skip = move on along the chain; only the last quest skips back to the hub.
+  const nextMode = DAILY_MODES[index + 1];
+  const skipHref = nextMode ? dailyModeHref(nextMode, language) : hubHref;
 
   return (
     <>
@@ -62,7 +65,7 @@ export function DailyFlowChrome({ modeId, intro = true, backLink = true, inline 
           </Link>
           {mode.optional && (
             <Link
-              href={hubHref}
+              href={skipHref}
               data-testid="skip-optional"
               className="flex items-center gap-1 h-9 px-3 rounded-full border-2 border-neo-black bg-white/10 text-neo-cream text-xs font-black backdrop-blur"
             >

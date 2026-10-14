@@ -2186,6 +2186,7 @@ const sv = {
       "triesLeft": "{count} försök kvar",
       "lastTry": "Sista försöket!",
       "completeTough": "Tuff dag!",
+      "alreadyPlayed": "Du har redan spelat dagens Ordbro. Så här gick det.",
       "zeroSolved": "Inga broar byggda, men nu kan du alla {total}. Nytt set i morgon.",
       "answerKey": "Dagens broar",
       "shareCallout": {
@@ -9373,14 +9374,14 @@ const sv = {
     "nextQuestsIn": "Nästa uppdrag om",
     "timedQuest": "Tidsbegränsat",
     "relaxedQuest": "Lugnt uppdrag",
-    "journeyRequired": "Required",
-    "journeyOptional": "Optional",
-    "journeyNow": "Now",
-    "journeyDone": "Done",
-    "journeyStep": "Step",
-    "journeyAllRequiredDone": "You've cleared today's quests! Bonus rounds are optional",
-    "backToDailyHub": "Back to daily",
-    "skipOptional": "Skip",
+    "journeyRequired": "Obligatorisk",
+    "journeyOptional": "Valfri",
+    "journeyNow": "Nu",
+    "journeyDone": "Klar",
+    "journeyStep": "Steg",
+    "journeyAllRequiredDone": "Dagens uppdrag är klara! Bonusrundorna är valfria",
+    "backToDailyHub": "Tillbaka till dagens",
+    "skipOptional": "Hoppa över",
     "bonusQuest": "Bonus",
     "untimedQuest": "Utan timer",
     "startQuest": "STARTA QUEST",
@@ -9388,6 +9389,11 @@ const sv = {
     "modesPlayedCount": "{count} av 4 spel idag",
     "nextUp": "Härnäst",
     "allClearToday": "Klart för idag — vi ses i morgon",
+    "allClear": {
+      "title": "Allt klart!",
+      "body": "Du har klarat alla dagens uppdrag.",
+      "streak": "{n} dagar i rad. Kom tillbaka i morgon så håller sviten."
+    },
     "adminBeta": "Beta",
     "replay": "Spela igen",
     "cleared": "Klarat!",
@@ -10082,7 +10088,8 @@ const sv = {
         "praiseMid": "Grymt!",
         "praiseLong": "Vilket monsterord!",
         "boardLabel": "Bokstavsbräde",
-        "longWord": "Långt ord +{bonus}"
+        "longWord": "Långt ord +{bonus}",
+        "usesTry": "Kostar ett försök"
       },
       "score": {
         "tier": {

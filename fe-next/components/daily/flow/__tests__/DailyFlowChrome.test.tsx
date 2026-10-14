@@ -15,7 +15,7 @@ describe('DailyFlowChrome', () => {
   });
   it('offers skip on optional challenges only', () => {
     const { unmount } = render(<DailyFlowChrome modeId="connections" intro={false} />);
-    expect(screen.getByTestId('skip-optional').getAttribute('href')).toBe('/he/daily');
+    expect(screen.getByTestId('skip-optional')).toBeTruthy();
     unmount();
     render(<DailyFlowChrome modeId="word-hunt" intro={false} />);
     expect(screen.queryByTestId('skip-optional')).toBeNull();
@@ -27,6 +27,15 @@ describe('DailyFlowChrome', () => {
     unmount();
     render(<DailyFlowChrome modeId="connections" backLink={false} />);
     expect(screen.queryByTestId('daily-intro')).toBeNull();
+  });
+});
+
+describe('DailyFlowChrome skip', () => {
+  // "Skip" on an optional quest used to link to the hub, which is "quit", not
+  // "skip": the player had to find Word Tower again themselves.
+  it('given an optional quest with a quest after it, skip goes straight to the next quest', () => {
+    render(<DailyFlowChrome modeId="connections" intro={false} />);
+    expect(screen.getByTestId('skip-optional').getAttribute('href')).toBe('/he/word-tower/daily');
   });
 });
 

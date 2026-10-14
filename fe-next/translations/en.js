@@ -8477,6 +8477,11 @@ const en = {
     "modesPlayedCount": "{count} of 4 games today",
     "nextUp": "Next up",
     "allClearToday": "Today's board is clear. See you tomorrow.",
+    "allClear": {
+      "title": "All clear!",
+      "body": "You finished every quest today.",
+      "streak": "{n}-day streak. Come back tomorrow to keep it alive."
+    },
     "adminBeta": "Beta",
     "replay": "Replay",
     "cleared": "Cleared!",
@@ -9210,7 +9215,8 @@ const en = {
         "praiseMid": "Sweet!",
         "praiseLong": "Monster word!",
         "boardLabel": "Letter board",
-        "longWord": "Long word +{bonus}"
+        "longWord": "Long word +{bonus}",
+        "usesTry": "Costs 1 try"
       },
       "score": {
         "tier": {
@@ -16964,6 +16970,7 @@ const en = {
       "triesLeft": "{count} tries left",
       "lastTry": "Last try!",
       "completeTough": "Tough one today!",
+      "alreadyPlayed": "You've played today's Word Bridge. Here's how it went.",
       "zeroSolved": "No bridges built, but now you know all {total}. Fresh set tomorrow.",
       "answerKey": "Today's bridges",
       "shareCallout": {
