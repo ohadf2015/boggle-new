@@ -51,7 +51,7 @@ export function V2OverBar({ t, daily, language, onBadges, onRestart, onHome }: V
           type="button"
           onClick={onHome}
           aria-label={t('wordTowerV2.results.home')}
-          className="flex h-9 w-9 items-center justify-center rounded-neo border-neo border-black bg-neo-navy text-neo-cream shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+          className="flex h-9 w-9 items-center justify-center rounded-neo border-neo border-neo-cream bg-neo-navy text-neo-cream shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
         >
           <Home className="h-4 w-4" aria-hidden />
         </button>
