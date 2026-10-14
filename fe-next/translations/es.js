@@ -1163,7 +1163,7 @@ const es = {
       "blogAll": "Todos los artículos",
       "faqMore": "{count} preguntas más",
       "faqAll": "Todas las preguntas",
-      "crossLink": "Jugar Scrabble online gratis",
+      "crossLink": "Jugar scrabble online español multijugador",
       "readMore": "¿Primera vez por aquí? Aprende {howToPlay}, juega {withFriends}, descubre trucos en las {guides} o date una vuelta por {blog}.",
       "readMoreLinks": {
         "howToPlay": "cómo se juega",
