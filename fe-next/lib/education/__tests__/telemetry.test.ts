@@ -34,6 +34,7 @@ vi.mock('@/utils/growthTracking', () => ({
 import {
   trackEduPracticeComplete,
   trackEduClassroomJoin,
+  trackStudentJoinStarted,
   trackEduClassroomCreated,
   trackEduTeacherOnboardingStep,
   trackTeacherOnboardingStep,
@@ -262,6 +263,62 @@ describe('education telemetry', () => {
       expect(captureMock).toHaveBeenCalledWith('edu_classroom_join', {
         result: 'error',
       });
+    });
+  });
+
+  describe('student join funnel — started then completed', () => {
+    it('started fires on PostHog and mirrors to growth, carrying source and never the code', () => {
+      trackStudentJoinStarted({ source: 'typed_code' });
+      expect(captureMock).toHaveBeenCalledWith('student_join_started', { source: 'typed_code' });
+      expect(growthMock).toHaveBeenCalledWith('student_join_started', { source: 'typed_code' });
+    });
+
+    it('started omits props it does not know rather than faking them', () => {
+      trackStudentJoinStarted({});
+      expect(captureMock).toHaveBeenCalledWith('student_join_started', {});
+    });
+
+    it('completed on success twins to growth with classroom_id, already_member and source', () => {
+      trackEduClassroomJoin({
+        result: 'success',
+        classroomId: 'cls-1',
+        matchedCodeType: 'roster_code',
+        attemptedCode: 'UHMKL4',
+        source: 'invite_link',
+      });
+      const completedProps = {
+        already_member: false,
+        classroom_id: 'cls-1',
+        matched_code_type: 'roster_code',
+        source: 'invite_link',
+      };
+      expect(captureMock).toHaveBeenCalledWith('student_join_completed', completedProps);
+      expect(growthMock).toHaveBeenCalledWith('student_join_completed', completedProps);
+    });
+
+    it('already_member still emits completed (flagged) and mirrors it', () => {
+      trackEduClassroomJoin({ result: 'already_member', classroomId: 'cls-1', source: 'invite_link' });
+      const completedProps = {
+        already_member: true,
+        classroom_id: 'cls-1',
+        source: 'invite_link',
+      };
+      expect(captureMock).toHaveBeenCalledWith('student_join_completed', completedProps);
+      expect(growthMock).toHaveBeenCalledWith('student_join_completed', completedProps);
+    });
+
+    it('failed joins keep student_join_failed bare — never on growth — and never carry the code', () => {
+      trackEduClassroomJoin({ result: 'invalid_code', attemptedCode: 'AB1', source: 'typed_code' });
+      expect(captureMock).toHaveBeenCalledWith('student_join_failed', {
+        reason: 'invalid_code',
+        code_length: 3,
+        code_charset: 'alphanumeric',
+        source: 'typed_code',
+      });
+      // edu_classroom_join itself is activation-mirrored (existing behavior);
+      // the failed student-funnel event is not.
+      expect(growthMock.mock.calls.map((c) => c[0])).toEqual(['edu_classroom_join']);
+      expect(JSON.stringify(captureMock.mock.calls)).not.toContain('AB1');
     });
   });
 
@@ -568,8 +625,14 @@ describe('education telemetry', () => {
         'edu_first_assignment_cta_shown',
         'edu_first_assignment_cta_clicked',
       ]);
-      // Same 9 events, same order, same props on the growth channel.
-      expect(growthMock.mock.calls.map((c) => c[0])).toEqual(bare);
+      // Same 9 events, same order, same props on the growth channel. The
+      // student_join_completed twin from the success join above rides along
+      // (student funnel, separately asserted) — filter it to keep this test
+      // about the activation allowlist.
+      const growthBare = growthMock.mock.calls
+        .map((c) => c[0])
+        .filter((n) => n !== 'student_join_started' && n !== 'student_join_completed');
+      expect(growthBare).toEqual(bare);
       growthMock.mock.calls.forEach((call, i) => {
         const edu = captureMock.mock.calls.find((c) => c[0] === call[0]);
         expect(edu?.[1]).toEqual(call[1]);
