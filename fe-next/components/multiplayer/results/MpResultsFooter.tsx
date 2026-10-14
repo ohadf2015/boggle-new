@@ -18,6 +18,21 @@ interface AutoRingProps {
 const R = 20;
 const C = 2 * Math.PI * R;
 
+/** Ready joiner: status only. Never a disabled primary CTA (GR #10820). */
+function MpWaitingHostChip({ t }: { t: TFn }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      data-testid="mp-waiting-host"
+      className="flex-1 min-w-0 flex flex-col justify-center px-1 py-2 font-neo-display font-bold uppercase text-neo-cyan/70"
+    >
+      <span className="leading-tight text-xl tv:text-3xl">{t('mpUi.results.youreReady')}</span>
+      <span className="text-xs font-neo-body normal-case leading-tight text-neo-cyan/50">{t('mpUi.results.waitingHost')}</span>
+    </div>
+  );
+}
+
 /** 10s auto-advance ring: tap to stop it. One stroke step per second (no rAF). */
 export function MpAutoRing({ secondsLeft, total, onCancel, t }: AutoRingProps) {
   const urgent = secondsLeft <= 3;
@@ -95,7 +110,7 @@ export function MpIntermissionFooter({ isHost, isClassroom, isReady, ready, tota
           className="flex-1 min-w-0"
         />
       ) : isReady ? (
-        <MpPrimaryCta tone="cyan" label={t('mpUi.results.youreReady')} sublabel={t('mpUi.results.waitingHost')} onPress={() => {}} disabled className="flex-1 min-w-0 disabled:opacity-100" />
+        <MpWaitingHostChip t={t} />
       ) : (
         <MpPrimaryCta tone="lime" label={t('mpUi.results.ready')} sublabel={status} onPress={onReady} className="flex-1 min-w-0" />
       )}
@@ -123,7 +138,7 @@ export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, le
   return (
     <div className="flex items-center gap-[calc(10px*var(--mp-u,1))]">
       {!isHost && isReady ? (
-        <MpPrimaryCta tone="cyan" label={t('mpUi.results.youreReady')} sublabel={t('mpUi.results.waitingHost')} onPress={() => {}} disabled className="flex-1 min-w-0 disabled:opacity-100" />
+        <MpWaitingHostChip t={t} />
       ) : (
         <MpPrimaryCta tone="lime" label={t('mpUi.results.rematch')} sublabel={isHost ? t('mpUi.results.newSeries') : undefined} onPress={onRematch} className="flex-1 min-w-0" />
       )}
