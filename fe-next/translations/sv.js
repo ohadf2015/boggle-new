@@ -7976,11 +7976,25 @@ const sv = {
     "index": {
       "title": "Juridisk information",
       "intro": "Granska våra juridiska dokument för att förstå dina rättigheter och hur vi skyddar dina data när du använder LexiClash.",
-      "aboutDescription": "Lär dig mer om vårt företag, uppdrag och team",
-      "termsDescription": "Regler och riktlinjer för användning av LexiClash",
+      "overviewTitle": "Om dessa dokument",
+      "overview": "LexiClash (drivs av LexiClash Ltd) publicerar dessa juridiska sidor så att spelare, föräldrar, lärare och skolor kan förstå reglerna för det flerspelarordspel som finns på lexiclash.live, vad som händer när du skapar ett konto eller går med i en klass med en sexteckenskod, och hur vi hanterar personuppgifter.",
+      "overviewSecondary": "Dokumenten som länkas nedan är den auktoritativa källan för våra avtalsvillkor, integritetspraxis, cookieanvändning, återbetalningar och avbokningar för betalda Pro / Teacher Pro-prenumerationer samt viktiga ansvarsfriskrivningar. Läs den fullständiga policyn som gäller dig innan du förlitar dig på en kort sammanfattning.",
+      "scopeTitle": "Vad du hittar här",
+      "scopeTerms": "Användarvillkor — regler för konton, schysst spel, användarinnehåll, immateriella rättigheter och tvistlösning enligt israelisk lag.",
+      "scopePrivacy": "Integritetspolicy — vad vi samlar in via OAuth, spel och analys; hur vi använder det; annonsering under barnriktad behandling; och dina rättigheter.",
+      "scopeCookies": "Cookiepolicy — nödvändiga, analytiska och annonscookies samt hur du hanterar samtycke och webbläsarinställningar.",
+      "scopeDisclaimer": "Ansvarsfriskrivning — underhållnings- och utbildningsbruk, tjänst i befintligt skick, tredjepartsannonser och länkar samt ansvarsbegränsningar.",
+      "scopeRefund": "Återbetalnings- och avbokningspolicy — hur du avbokar Teacher Pro / Pro, vad som händer med dina data och när återbetalning kan gälla.",
+      "scopeAbout": "Om LexiClash — företagets uppdrag, produktöversikt och hur du når teamet.",
+      "companyTitle": "Operatör och kontakt",
+      "companyBody": "LexiClash Ltd driver LexiClash-plattformen. Om inte en specifik policy säger något annat styrs dessa dokument av lagstiftningen i Staten Israel. Vi kan uppdatera enskilda policyer; datumet \"Senast uppdaterad\" på varje sida speglar den aktuella versionen.",
+      "contactHint": "För skolupphandlingskopior, integritetsförfrågningar (åtkomst, radering eller föräldramedgivande) eller faktureringsfrågor om Teacher Pro, använd Kontakta oss och bifoga tillräckliga uppgifter för verifiering. Du kan också öppna valfri policy via korten nedan.",
+      "aboutDescription": "Lär dig om vårt företag, uppdrag och team",
+      "termsDescription": "Regler och riktlinjer för att använda LexiClash",
       "privacyDescription": "Hur vi samlar in, använder och skyddar dina data",
       "cookiesDescription": "Hur vi använder cookies och hur du hanterar dem",
-      "disclaimerDescription": "Viktiga friskrivningar om vår tjänst och innehåll"
+      "disclaimerDescription": "Viktiga ansvarsfriskrivningar om vår tjänst och innehåll",
+      "refundDescription": "Avboka när som helst och förstå återbetalningar för LexiClash Pro / Teacher Pro"
     },
     "terms": {
       "title": "Användarvillkor",

@@ -6369,11 +6369,25 @@ const en = {
     "index": {
       "title": "Legal Information",
       "intro": "Review our legal documents to understand your rights and how we protect your data when using LexiClash.",
+      "overviewTitle": "About these documents",
+      "overview": "LexiClash (operated by LexiClash Ltd) publishes these legal pages so players, parents, teachers, and schools can understand the rules for using the multiplayer word game at lexiclash.live, what happens when you create an account or join a classroom with a six-character code, and how we handle personal data.",
+      "overviewSecondary": "The documents linked below are the authoritative source for our contractual terms, privacy practices, cookie use, refunds and cancellations for paid Pro / Teacher Pro subscriptions, and important service disclaimers. Please read the full policy that applies to your situation before relying on a short summary.",
+      "scopeTitle": "What you will find here",
+      "scopeTerms": "Terms of Service — rules for accounts, fair play, user content, intellectual property, and dispute resolution under Israeli law.",
+      "scopePrivacy": "Privacy Policy — what we collect via OAuth, gameplay, and analytics; how we use it; advertising under child-directed treatment; and your rights.",
+      "scopeCookies": "Cookie Policy — essential, analytics, and advertising cookies, plus how to manage consent and browser controls.",
+      "scopeDisclaimer": "Disclaimer — entertainment and educational use, as-is service, third-party ads and links, and limits of liability.",
+      "scopeRefund": "Refund & Cancellation Policy — how to cancel Teacher Pro / Pro, what happens to your data, and when refunds may apply.",
+      "scopeAbout": "About LexiClash — company mission, product overview, and how to reach the team behind the game.",
+      "companyTitle": "Operator and contact",
+      "companyBody": "LexiClash Ltd operates the LexiClash platform. Unless a specific policy says otherwise, these documents are governed by the laws of the State of Israel. We may update individual policies; the “Last updated” date on each page reflects the current version.",
+      "contactHint": "For school procurement copies, privacy requests (access, deletion, or parental consent), or billing questions about Teacher Pro, use Contact Us and include enough detail for us to verify your request. You can also open any linked policy from the cards below.",
       "aboutDescription": "Learn about our company, mission, and team",
       "termsDescription": "Rules and guidelines for using LexiClash",
       "privacyDescription": "How we collect, use, and protect your data",
       "cookiesDescription": "How we use cookies and how to manage them",
-      "disclaimerDescription": "Important disclaimers about our service and content"
+      "disclaimerDescription": "Important disclaimers about our service and content",
+      "refundDescription": "Cancel anytime and understand refunds for LexiClash Pro / Teacher Pro"
     },
     "terms": {
       "title": "Terms of Service",

@@ -47,7 +47,7 @@ vi.mock('@/components/legal/LegalPageLayout', () => ({
   default: ({ children, title }: any) => <div><h1>{title}</h1>{children}</div>,
 }));
 
-describe('Legal Index - Cookies card', () => {
+describe('Legal Index hub', () => {
   let LegalIndexPageClient: any;
 
   beforeAll(async () => {
@@ -64,5 +64,22 @@ describe('Legal Index - Cookies card', () => {
   it('renders cookies description', () => {
     render(<LegalIndexPageClient />);
     expect(screen.getByText('legal.index.cookiesDescription')).toBeInTheDocument();
+  });
+
+  it('renders refund card linking to refund policy', () => {
+    render(<LegalIndexPageClient />);
+    const refundLink = screen.getByRole('link', { name: /legal\.refundPolicy/i });
+    expect(refundLink).toHaveAttribute('href', '/en/legal/refund');
+    expect(screen.getByText('legal.index.refundDescription')).toBeInTheDocument();
+  });
+
+  it('renders substantive overview and scope copy keys', () => {
+    render(<LegalIndexPageClient />);
+    expect(screen.getByText('legal.index.overviewTitle')).toBeInTheDocument();
+    expect(screen.getByText('legal.index.overview')).toBeInTheDocument();
+    expect(screen.getByText('legal.index.overviewSecondary')).toBeInTheDocument();
+    expect(screen.getByText('legal.index.scopeTitle')).toBeInTheDocument();
+    expect(screen.getByText('legal.index.companyTitle')).toBeInTheDocument();
+    expect(screen.getByText('legal.index.contactHint')).toBeInTheDocument();
   });
 });
