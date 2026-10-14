@@ -45,18 +45,50 @@ export default function LegalIndexPageClient(): React.ReactElement {
       descriptionKey: 'legal.index.disclaimerDescription',
       icon: '⚠️',
     },
+    {
+      href: `/${locale}/legal/refund`,
+      titleKey: 'legal.refundPolicy',
+      descriptionKey: 'legal.index.refundDescription',
+      icon: '💳',
+    },
   ];
+
+  const muted = isDarkMode ? 'text-gray-300' : 'text-gray-600';
+  const heading = isDarkMode ? 'text-white' : 'text-gray-900';
 
   return (
     <LegalPageLayout title={t('legal.index.title')}>
-      <p className={cn(
-        'text-lg mb-8',
-        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-      )}>
+      <p className={cn('text-lg mb-6', muted)}>
         {t('legal.index.intro')}
       </p>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <section className="mb-8">
+        <h2 className={cn('text-xl font-bold mb-3', heading)}>
+          {t('legal.index.overviewTitle')}
+        </h2>
+        <p className={cn('leading-relaxed mb-4', muted)}>
+          {t('legal.index.overview')}
+        </p>
+        <p className={cn('leading-relaxed', muted)}>
+          {t('legal.index.overviewSecondary')}
+        </p>
+      </section>
+
+      <section className="mb-8">
+        <h2 className={cn('text-xl font-bold mb-3', heading)}>
+          {t('legal.index.scopeTitle')}
+        </h2>
+        <ul className={cn('list-disc ps-5 space-y-2 leading-relaxed', muted)}>
+          <li>{t('legal.index.scopeTerms')}</li>
+          <li>{t('legal.index.scopePrivacy')}</li>
+          <li>{t('legal.index.scopeCookies')}</li>
+          <li>{t('legal.index.scopeDisclaimer')}</li>
+          <li>{t('legal.index.scopeRefund')}</li>
+          <li>{t('legal.index.scopeAbout')}</li>
+        </ul>
+      </section>
+
+      <div className="grid gap-6 md:grid-cols-2 mb-8">
         {legalPages.map((page) => (
           <Link
             key={page.href}
@@ -73,7 +105,7 @@ export default function LegalIndexPageClient(): React.ReactElement {
               <div>
                 <h2 className={cn(
                   'text-xl font-bold mb-2',
-                  isDarkMode ? 'text-white' : 'text-gray-900'
+                  heading
                 )}>
                   {t(page.titleKey)}
                 </h2>
@@ -85,6 +117,18 @@ export default function LegalIndexPageClient(): React.ReactElement {
           </Link>
         ))}
       </div>
+
+      <section className="mb-6">
+        <h2 className={cn('text-xl font-bold mb-3', heading)}>
+          {t('legal.index.companyTitle')}
+        </h2>
+        <p className={cn('leading-relaxed mb-4', muted)}>
+          {t('legal.index.companyBody')}
+        </p>
+        <p className={cn('leading-relaxed', muted)}>
+          {t('legal.index.contactHint')}
+        </p>
+      </section>
     </LegalPageLayout>
   );
 }

@@ -7655,11 +7655,25 @@ const ja = {
     "index": {
       "title": "法的情報",
       "intro": "LexiClashをご利用いただく際の権利と、私たちがどのようにお客様のデータを保護するかを理解するため、法的文書をご確認ください。",
+      "overviewTitle": "これらの文書について",
+      "overview": "LexiClash（運営：LexiClash Ltd）は、lexiclash.live のマルチプレイヤー単語ゲームの利用ルール、アカウント作成や6文字コードでの授業参加時の扱い、個人データの取り扱いを、プレイヤー・保護者・教員・学校が理解できるよう、これらの法的ページを公開しています。",
+      "overviewSecondary": "以下にリンクする文書は、契約条件、プライバシー慣行、Cookieの利用、有料の Pro / Teacher Pro の返金・解約、および重要な免責事項についての正式な根拠です。短い要約だけに頼らず、ご自身の状況に該当する全文をお読みください。",
+      "scopeTitle": "ここに掲載されている内容",
+      "scopeTerms": "利用規約 — アカウント、公正なプレイ、ユーザーコンテンツ、知的財産、イスラエル法に基づく紛争解決のルール。",
+      "scopePrivacy": "プライバシーポリシー — OAuth・プレイ・分析で収集する情報、利用方法、子ども向け広告扱い、お客様の権利。",
+      "scopeCookies": "Cookieポリシー — 必須・分析・広告Cookie、同意とブラウザ設定の管理方法。",
+      "scopeDisclaimer": "免責事項 — 娯楽・教育目的の利用、現状有姿のサービス、第三者広告・リンク、責任の制限。",
+      "scopeRefund": "返金・解約ポリシー — Teacher Pro / Pro の解約方法、データの扱い、返金が適用される場合。",
+      "scopeAbout": "LexiClashについて — 会社のミッション、製品概要、チームへの連絡方法。",
+      "companyTitle": "運営者とお問い合わせ",
+      "companyBody": "LexiClash Ltd が LexiClash プラットフォームを運営します。個別のポリシーに別段の定めがない限り、これらの文書はイスラエル国法に準拠します。ポリシーは更新されることがあり、各ページの「最終更新」日付が現行版を示します。",
+      "contactHint": "学校調達用の写し、プライバシー請求（アクセス、削除、保護者同意）、Teacher Pro の請求に関するお問い合わせは、お問い合わせフォームから十分な確認情報を添えてご連絡ください。下のカードから各ポリシーを開くこともできます。",
       "aboutDescription": "当社、ミッション、チームについて",
       "termsDescription": "LexiClashを使用するためのルールとガイドライン",
       "privacyDescription": "データの収集、使用、保護方法",
       "cookiesDescription": "Cookieの使用方法と管理方法",
-      "disclaimerDescription": "サービスとコンテンツに関する重要な免責事項"
+      "disclaimerDescription": "サービスとコンテンツに関する重要な免責事項",
+      "refundDescription": "いつでも解約でき、LexiClash Pro / Teacher Pro の返金を理解する"
     },
     "terms": {
       "title": "利用規約",

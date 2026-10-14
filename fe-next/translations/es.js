@@ -6450,11 +6450,25 @@ const es = {
     "index": {
       "title": "Información Legal",
       "intro": "Revisa nuestros documentos legales para entender tus derechos y cómo protegemos tus datos cuando usas LexiClash.",
+      "overviewTitle": "Sobre estos documentos",
+      "overview": "LexiClash (operado por LexiClash Ltd) publica estas páginas legales para que jugadores, padres, docentes y escuelas entiendan las reglas de uso del juego de palabras multijugador en lexiclash.live, qué ocurre al crear una cuenta o unirse a una clase con un código de seis caracteres, y cómo tratamos los datos personales.",
+      "overviewSecondary": "Los documentos enlazados abajo son la fuente autoritativa de nuestros términos contractuales, prácticas de privacidad, uso de cookies, reembolsos y cancelaciones de suscripciones Pro / Teacher Pro, y avisos importantes del servicio. Lee la política completa que aplique a tu caso antes de confiar en un resumen breve.",
+      "scopeTitle": "Qué encontrarás aquí",
+      "scopeTerms": "Términos de Servicio — reglas de cuentas, juego limpio, contenido de usuario, propiedad intelectual y resolución de disputas bajo la ley israelí.",
+      "scopePrivacy": "Política de Privacidad — qué recopilamos vía OAuth, juego y analítica; cómo lo usamos; publicidad bajo tratamiento dirigido a menores; y tus derechos.",
+      "scopeCookies": "Política de Cookies — cookies esenciales, de analítica y publicidad, y cómo gestionar el consentimiento y los controles del navegador.",
+      "scopeDisclaimer": "Aviso legal — uso recreativo y educativo, servicio tal cual, anuncios y enlaces de terceros, y límites de responsabilidad.",
+      "scopeRefund": "Política de Reembolsos y Cancelación — cómo cancelar Teacher Pro / Pro, qué ocurre con tus datos y cuándo pueden aplicarse reembolsos.",
+      "scopeAbout": "Acerca de LexiClash — misión de la empresa, resumen del producto y cómo contactar al equipo.",
+      "companyTitle": "Operador y contacto",
+      "companyBody": "LexiClash Ltd opera la plataforma LexiClash. Salvo que una política específica diga lo contrario, estos documentos se rigen por las leyes del Estado de Israel. Podemos actualizar políticas individuales; la fecha de «Última actualización» en cada página refleja la versión vigente.",
+      "contactHint": "Para copias de compras escolares, solicitudes de privacidad (acceso, eliminación o consentimiento parental) o preguntas de facturación de Teacher Pro, usa Contacto e incluye detalles suficientes para verificar tu solicitud. También puedes abrir cualquier política desde las tarjetas de abajo.",
       "aboutDescription": "Conoce nuestra empresa, misión y equipo",
       "termsDescription": "Reglas y directrices para usar LexiClash",
       "privacyDescription": "Cómo recopilamos, usamos y protegemos tus datos",
       "cookiesDescription": "Cómo usamos cookies y cómo gestionarlas",
-      "disclaimerDescription": "Descargos de responsabilidad importantes sobre nuestro servicio y contenido"
+      "disclaimerDescription": "Avisos importantes sobre nuestro servicio y contenido",
+      "refundDescription": "Cancela en cualquier momento y entiende los reembolsos de LexiClash Pro / Teacher Pro"
     },
     "terms": {
       "title": "Términos de Servicio",
