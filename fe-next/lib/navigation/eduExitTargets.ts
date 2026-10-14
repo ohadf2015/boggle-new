@@ -9,9 +9,13 @@ export function quickPlayBackHref(locale: string, academy: boolean): string | un
   return academy ? `/${locale}/student` : undefined;
 }
 
-/** A join that resolves to a live game walks straight into the room, keeping classroom context. */
+/**
+ * A join that resolves to a live game walks straight into the room, keeping classroom context.
+ * With no live game the destination is the class view: /student?class=open opens ClassSheet
+ * on the Academy hub with the student's next open assignment surfaced.
+ */
 export function joinSuccessHref(locale: string, gameCode: string | null | undefined): string {
-  return gameCode ? `/${locale}/multiplayer?room=${gameCode}&classroom=true` : `/${locale}/student`;
+  return gameCode ? `/${locale}/multiplayer?room=${gameCode}&classroom=true` : `/${locale}/student?class=open`;
 }
 
 const CLASSROOM_GAME_RE = /^\/([a-z]{2})\/education\/classroom-game\/?$/;

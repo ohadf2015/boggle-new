@@ -11,15 +11,13 @@
  * classroom join route and then uses the href and events built here.
  */
 
-import { focusPracticeHref, readAssignmentFocus } from '@/lib/education/vocabFocus';
-import { readAssignmentMode, wordCraftPracticeHref, WORDCRAFT_FOCUS } from '@/lib/education/wordcraftAssignment';
-
 export const EDUCATION_JOIN_STARTED = 'education_join_started';
 export const EDUCATION_JOIN_COMPLETED = 'education_join_completed';
+export const STUDENT_JOIN_STARTED = 'student_join_started';
+export const STUDENT_JOIN_COMPLETED = 'student_join_completed';
 
 const JOIN_CODE_RE = /^[A-Z0-9]{6}$/;
 const LOCALE_RE = /^[a-z]{2}$/;
-const LESSON_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 /** `sb-<ref>-auth-token`, plus the `.0` / `.1` chunks @supabase/ssr uses. */
 const AUTH_COOKIE_RE = /^sb-.+-auth-token(\.\d+)?$/;
 
@@ -40,93 +38,44 @@ export function hasAuthSessionCookie(names: readonly string[]): boolean {
   return names.some((name) => AUTH_COOKIE_RE.test(name));
 }
 
-export interface AssignmentPick {
-  lessonId: string;
-  practiceFocus: string | null;
-  dueDate: string | null;
-  createdAt: string;
-}
-
-export interface AssignmentRow {
-  lesson_id: string | null;
-  practice_focus?: string | null;
-  due_date?: string | null;
-  created_at?: string | null;
-}
-
-/**
- * The homework a freshly joined student should open. Soonest due date wins;
- * an undated row loses to a dated one; equal dues keep the older assignment.
- * Same ordering as `nextOpenAssignment`, minus completion (unknown here).
- */
-export function pickAssignment(rows: readonly AssignmentRow[]): AssignmentPick | null {
-  const usable = rows.filter(
-    (row): row is AssignmentRow & { lesson_id: string } =>
-      typeof row.lesson_id === 'string' && LESSON_ID_RE.test(row.lesson_id)
-  );
-  if (usable.length === 0) return null;
-
-  usable.sort((a, b) => {
-    const ad = a.due_date || null;
-    const bd = b.due_date || null;
-    if (ad && bd && ad !== bd) return ad < bd ? -1 : 1;
-    if (ad && !bd) return -1;
-    if (!ad && bd) return 1;
-    const ac = a.created_at || '';
-    const bc = b.created_at || '';
-    if (ac !== bc) return ac < bc ? -1 : 1;
-    return 0;
-  });
-
-  const pick = usable[0];
-  return {
-    lessonId: pick.lesson_id,
-    practiceFocus: pick.practice_focus ?? null,
-    dueDate: pick.due_date ?? null,
-    createdAt: pick.created_at || '',
-  };
-}
-
-/**
- * Where the hub's own lesson opener would send this assignment. Word Craft
- * and a pinned vocab focus are different URLs from a plain lesson; sending
- * every student to the plain lesson drops them out of the assigned mode.
- */
-export function assignmentViewHref(locale: string, assignment: AssignmentPick): string {
-  const row = { practice_focus: assignment.practiceFocus };
-  if (readAssignmentMode(row) === WORDCRAFT_FOCUS) {
-    return wordCraftPracticeHref(locale, assignment.lessonId);
-  }
-  const focus = readAssignmentFocus(row);
-  if (focus) return focusPracticeHref(locale, assignment.lessonId, focus);
-  return `/${locale}/student/lessons/${assignment.lessonId}`;
-}
-
 export interface SignedInJoinDest {
   gameCode: string | null;
-  assignment: AssignmentPick | null;
 }
 
 /**
- * Never the bare `/student` hub. A live game is the classroom right now; an
- * assignment is the homework; otherwise the lesson list, which is the class
- * once a membership exists.
+ * Never the bare `/student` hub. A live game is the classroom right now; with
+ * no live game the class view opens on the hub — `?class=open` surfaces
+ * ClassSheet with the student's next open assignment (the hub's own
+ * `nextOpenAssignment`, not a second picker).
  */
 export function signedInJoinHref(locale: string, dest: SignedInJoinDest): string {
   if (dest.gameCode && JOIN_CODE_RE.test(dest.gameCode)) {
     return `/${locale}/multiplayer?room=${dest.gameCode}&classroom=true`;
   }
-  if (dest.assignment) return assignmentViewHref(locale, dest.assignment);
-  return `/${locale}/student/lessons`;
+  return `/${locale}/student?class=open`;
 }
+
+export type JoinFunnelEventName =
+  | typeof EDUCATION_JOIN_STARTED
+  | typeof EDUCATION_JOIN_COMPLETED
+  | typeof STUDENT_JOIN_STARTED
+  | typeof STUDENT_JOIN_COMPLETED;
 
 export interface JoinFunnelEvent {
   distinctId: string;
-  event: typeof EDUCATION_JOIN_STARTED | typeof EDUCATION_JOIN_COMPLETED;
+  event: JoinFunnelEventName;
   properties: { classroom_id: string; is_test_account: boolean };
 }
 
-/** Both funnel steps, in order, each carrying the classroom the join landed in. */
+/**
+ * Both funnel steps of BOTH funnels, in order, each carrying the classroom
+ * the join landed in. `education_join_*` is the #1310 teacher-facing pair;
+ * `student_join_*` mirrors it for the student join funnel so the server
+ * auto-join path (which bypasses the client `useJoinFlow`) is counted there
+ * too. The client is the source of truth for `student_join_*` on the typed/
+ * guest path — this server pair is the invite auto-join only, and the two
+ * never fire for the same join (the server redirects before the form paints).
+ */
 export function signedInJoinEvents(args: {
   studentId: string;
   classroomId: string;
@@ -139,6 +88,8 @@ export function signedInJoinEvents(args: {
   return [
     { distinctId: args.studentId, event: EDUCATION_JOIN_STARTED, properties: { ...properties } },
     { distinctId: args.studentId, event: EDUCATION_JOIN_COMPLETED, properties: { ...properties } },
+    { distinctId: args.studentId, event: STUDENT_JOIN_STARTED, properties: { ...properties } },
+    { distinctId: args.studentId, event: STUDENT_JOIN_COMPLETED, properties: { ...properties } },
   ];
 }
 
@@ -175,7 +126,6 @@ export async function completeSignedInJoin(args: {
   user: SignedInJoinUser;
   isTestAccount: boolean;
   join: (code: string) => Promise<SignedInJoinOutcome>;
-  findAssignment: (classroomId: string) => Promise<AssignmentPick | null>;
   capture: (events: JoinFunnelEvent[]) => void;
 }): Promise<string | null> {
   if (!isJoinLocale(args.locale) || !isAutoJoinCode(args.code)) return null;
@@ -193,18 +143,9 @@ export async function completeSignedInJoin(args: {
     );
   }
 
-  // The membership is already written. A homework lookup that fails must not
-  // put the student back on the form — the lesson list still knows the class.
-  // A game code that is not six letters-and-digits is not a room, so it must
-  // not also hide the assignment.
+  // The membership is written at this point. A game code that is not six
+  // letters-and-digits is not a room; with no live game the class view on the
+  // hub is the destination and it finds the next open assignment itself.
   const liveGame = joined.gameCode && JOIN_CODE_RE.test(joined.gameCode) ? joined.gameCode : null;
-  let assignment: AssignmentPick | null = null;
-  if (!liveGame) {
-    try {
-      assignment = await args.findAssignment(joined.classroomId);
-    } catch {
-      assignment = null;
-    }
-  }
-  return signedInJoinHref(args.locale, { gameCode: liveGame, assignment });
+  return signedInJoinHref(args.locale, { gameCode: liveGame });
 }

@@ -181,6 +181,11 @@ export function buildClassroomGameCompletedEvents(
 const GROWTH_TWIN_EVENTS: ReadonlySet<string> = new Set([
   'edu_classroom_game_started',
   'edu_classroom_game_completed',
+  // Student join funnel — emitted (with education_join_*) by the signed-in
+  // invite auto-join in lib/education/signedInJoin.ts, which bypasses the
+  // client telemetry mirror. Same privacy rule: classroom_id only.
+  'student_join_started',
+  'student_join_completed',
 ]);
 
 /**

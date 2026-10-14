@@ -18,7 +18,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { Socket } from 'socket.io-client';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import posthog from '@/lib/analytics/lazyPosthog';
@@ -47,6 +47,7 @@ import { ClassSheet } from './ClassSheet';
 import { FirstDayCard } from './FirstDayCard';
 import { buildFirstDayGoals } from './firstDayGoals';
 import { nextOpenAssignment } from '@/components/student/nextOpenAssignment';
+import { shouldOpenClassSheet } from './classSheetDeepLink';
 import { AssignmentDueCard } from './AssignmentDueCard';
 import {
   classifyAssignmentDue,
@@ -138,6 +139,13 @@ export function AcademyHub(props: AcademyHubProps) {
   const topRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [classOpen, setClassOpen] = useState(false);
+  // A fresh join lands here as /student?class=open — open the class sheet on
+  // mount so the next open assignment (already computed below for ClassSheet)
+  // is one tap away. Re-runs when the classroom resolves late.
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    if (shouldOpenClassSheet(searchParams, classroomId)) setClassOpen(true);
+  }, [searchParams, classroomId]);
   const [grantedXp, setGrantedXp] = useState<number | null>(null);
   const [live, setLive] = useState<LiveState>(NO_LIVE);
   const [note, setNote] = useState<Note>(null);

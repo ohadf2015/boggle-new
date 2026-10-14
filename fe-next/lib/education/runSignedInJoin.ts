@@ -1,7 +1,6 @@
 /**
  * I/O for the signed-in invite join. The decision lives in `signedInJoin`;
- * this file only reads the session, calls the classroom join route, and
- * looks up the assignment the redirect should open.
+ * this file only reads the session and calls the classroom join route.
  */
 
 import { cookies } from 'next/headers';
@@ -9,15 +8,12 @@ import { NextRequest } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { isQaEmail } from '@/backend/utils/educationRoundTelemetry';
 import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
-import { createAdminClient } from '@/utils/supabase/admin';
 import logger from '@/utils/logger';
 import {
   completeSignedInJoin,
   hasAuthSessionCookie,
   isAutoJoinCode,
   isJoinLocale,
-  pickAssignment,
-  type AssignmentPick,
   type SignedInJoinOutcome,
   type SignedInJoinUser,
 } from '@/lib/education/signedInJoin';
@@ -63,25 +59,10 @@ async function joinClassroom(code: string): Promise<SignedInJoinOutcome> {
   };
 }
 
-async function findAssignment(classroomId: string): Promise<AssignmentPick | null> {
-  // Same read as practice/lessons: a student's own session is not a reliable
-  // way to see lesson_assignments (RLS is assignment-shaped and has hidden
-  // this list before). No service-role key → the lesson list, not a guessed id.
-  const admin = createAdminClient();
-  if (!admin) return null;
-  const { data, error } = await admin
-    .from('lesson_assignments')
-    .select('lesson_id, practice_focus, due_date, created_at')
-    .eq('classroom_id', classroomId);
-  if (error || !data) return null;
-  return pickAssignment(data);
-}
-
 export interface RunSignedInJoinDeps {
   hasSession: () => Promise<boolean>;
   currentUser: () => Promise<SignedInJoinUser | null>;
   join: (code: string) => Promise<SignedInJoinOutcome>;
-  findAssignment: (classroomId: string) => Promise<AssignmentPick | null>;
   capture: (events: Parameters<typeof captureEduServerEvents>[0]) => void;
   isTestAccount: (email: string | null | undefined) => boolean;
 }
@@ -90,7 +71,6 @@ const realDeps: RunSignedInJoinDeps = {
   hasSession,
   currentUser,
   join: joinClassroom,
-  findAssignment,
   capture: captureEduServerEvents,
   isTestAccount: isQaEmail,
 };
@@ -118,7 +98,6 @@ export async function autoJoinSignedInStudent(
       user,
       isTestAccount: deps.isTestAccount(user.email),
       join: deps.join,
-      findAssignment: deps.findAssignment,
       capture: deps.capture,
     });
   } catch (err) {

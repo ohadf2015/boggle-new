@@ -29,7 +29,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));
 vi.mock('@/hooks/useJoinClassroom', () => ({ useJoinClassroom: () => ({ joinClassroom: mockJoin }) }));
-vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn() }));
+vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn(), trackStudentJoinStarted: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: mockToast }));
 vi.mock('../joinTarget', () => ({ resolveJoinTarget: mockResolve }));
 
@@ -105,7 +105,7 @@ describe('<JoinFlow> — simplified for Blooket parity', () => {
     }, { timeout: 100 });
   });
 
-  it('keeps a roster joiner on the success panel instead of bouncing to the hub', async () => {
+  it('navigates a roster joiner to the class view (?class=open), keeping the success panel as fallback', async () => {
     mockJoin.mockResolvedValue({ success: true, classroomId: 'class-123' });
     mockResolve.mockResolvedValue({ verdict: 'classroom', label: 'Ms Levy' });
 
@@ -115,7 +115,7 @@ describe('<JoinFlow> — simplified for Blooket parity', () => {
     fireEvent.change(nameInput, { target: { value: 'Bob' } });
     fireEvent.click(goButton()!);
 
-    expect(mockPush).not.toHaveBeenCalled();
     expect(await screen.findByTestId('join-success-panel')).toBeInTheDocument();
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/en/student?class=open'));
   });
 });

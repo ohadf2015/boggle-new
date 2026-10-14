@@ -23,6 +23,8 @@ const knobs = vi.hoisted(() => ({
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: knobs.push }),
   usePathname: () => '/en/student',
+  // AcademyHub deep-links the class view via ?class=open; these tests don't.
+  useSearchParams: () => new URLSearchParams(),
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: knobs.auth }));
 vi.mock('@/contexts/LanguageContext', () => ({

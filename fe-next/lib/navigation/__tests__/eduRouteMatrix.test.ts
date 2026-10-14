@@ -143,8 +143,8 @@ describe.each(LOCALES)('education route matrix, locale=%s', (locale) => {
       expect(href).toBe(`${at('multiplayer')}?room=ABC123&classroom=true`);
     });
 
-    it('success without a game code lands on the student hub', () => {
-      expect(joinSuccessHref(locale, null)).toBe(at('student'));
+    it('success without a game code lands on the class view on the student hub', () => {
+      expect(joinSuccessHref(locale, null)).toBe(`${at('student')}?class=open`);
     });
   });
 });
