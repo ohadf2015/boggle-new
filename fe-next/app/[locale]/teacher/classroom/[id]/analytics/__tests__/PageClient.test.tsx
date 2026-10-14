@@ -53,6 +53,9 @@ const teacherPro = { hasPro: true, loading: false };
 vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => teacherPro,
 }));
+vi.mock('@/hooks/useTeacherProCheckout', () => ({
+  useTeacherProCheckout: () => ({ pending: false, start: vi.fn() }),
+}));
 
 // Mock all analytics components
 vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({
@@ -177,10 +180,8 @@ describe('AnalyticsPageClient', () => {
       // The gate must SELL, not just refuse — a bare "not available" is the version of this
       // paywall that loses the sale it exists to make.
       expect(screen.getByText('teacher.proGate.analytics.title')).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'teacher.proGate.cta' })).toHaveAttribute(
-        'href',
-        '/en/teacher/upgrade',
-      );
+      expect(screen.getByTestId('pro-gate-upgrade-analytics')).toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: 'teacher.proGate.cta' })).not.toBeInTheDocument();
     });
 
     it('shows neither the dashboard nor the upsell until Pro state resolves', () => {

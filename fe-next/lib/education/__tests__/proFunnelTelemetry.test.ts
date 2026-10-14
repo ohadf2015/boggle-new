@@ -31,6 +31,8 @@ import {
   trackTeacherProUpgradeClick,
   trackTeacherProCheckoutStarted,
   trackTeacherTrialUpgradeCtaClicked,
+  trackProGateViewed,
+  trackProUpgradeClicked,
   PRO_SUCCESS_SEEN_STORAGE_KEY,
 } from '../proFunnelTelemetry';
 
@@ -59,6 +61,34 @@ describe('trackEduProUpgradeClicked', () => {
       source: 'dashboard_trial_lifecycle',
       product: 'teacher_pro',
     });
+  });
+});
+
+describe('mid-session ProGate events', () => {
+  beforeEach(() => captureMock.mockReset());
+
+  it('Given a free teacher sees the analytics gate, When tracked, Then pro_gate_viewed fires with the feature', () => {
+    trackProGateViewed({ feature: 'analytics' });
+    expect(captureMock).toHaveBeenCalledWith('pro_gate_viewed', {
+      feature: 'analytics',
+      product: 'teacher_pro',
+    });
+  });
+
+  it('Given the reports gate Upgrade tap, When tracked, Then pro_upgrade_clicked fires with the feature', () => {
+    trackProUpgradeClicked({ feature: 'reports' });
+    expect(captureMock).toHaveBeenCalledWith('pro_upgrade_clicked', {
+      feature: 'reports',
+      product: 'teacher_pro',
+    });
+  });
+
+  it('Given PostHog throws, When a gate event is tracked, Then the caller is never broken', () => {
+    captureMock.mockImplementationOnce(() => {
+      throw new Error('posthog down');
+    });
+    expect(() => trackProGateViewed({ feature: 'analytics' })).not.toThrow();
+    expect(() => trackProUpgradeClicked({ feature: 'reports' })).not.toThrow();
   });
 });
 

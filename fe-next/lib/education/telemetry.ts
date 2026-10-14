@@ -74,6 +74,27 @@ function mirrorToGrowth(event: GrowthEvent, props: Record<string, unknown>): voi
 }
 
 /**
+ * Student JOIN funnel — opened the invite → join POST → membership written.
+ * Same mirror mechanics as the activation allowlist above: the bare PostHog
+ * capture in this file is the canonical one and the growth:* twin is what
+ * Growth Radar ingests. Deliberately NOT in CANONICAL_DUAL_EMIT (that would
+ * double-count PostHog). Privacy: classroom_id only — the join code never
+ * rides either event.
+ */
+const JOIN_FUNNEL_GROWTH_MIRROR = new Set<GrowthEvent>([
+  'student_join_started',
+  'student_join_completed',
+]);
+
+/** Capture a student-join funnel event: the bare PostHog name plus the growth:* twin. */
+const captureStudentJoin = (event: GrowthEvent, props: Record<string, unknown>): void => {
+  safeCapture(event, props);
+  if (JOIN_FUNNEL_GROWTH_MIRROR.has(event)) {
+    mirrorToGrowth(event, props);
+  }
+};
+
+/**
  * Capture an activation-funnel event: the bare PostHog name (unchanged — every
  * existing dashboard keeps working) plus the growth:* twin when the event is
  * on the activation allowlist. A failure in either channel never reaches the
@@ -170,6 +191,27 @@ export interface EduClassroomJoinArgs {
   source?: 'invite_link' | 'typed_code';
 }
 
+export interface StudentJoinStartedArgs {
+  /** Unknown until the join resolves — omit rather than fake it. */
+  classroomId?: string;
+  /** Invite URL vs typed on /join. Never the code itself. */
+  source?: 'invite_link' | 'typed_code';
+}
+
+/**
+ * `student_join_started` — the funnel step that was missing entirely: the
+ * student passed validation and is about to POST the join. Pairs with the
+ * `student_join_completed` branch of `trackEduClassroomJoin` so a drop-off
+ * between "pressed GO" and "is in the class" can be counted. Never carries
+ * the join code — classroom_id (when already known) and source only.
+ */
+export function trackStudentJoinStarted(args: StudentJoinStartedArgs): void {
+  const props: Record<string, unknown> = {};
+  if (args.classroomId) props.classroom_id = args.classroomId;
+  if (args.source) props.source = args.source;
+  captureStudentJoin('student_join_started', props);
+}
+
 /**
  * `edu_classroom_join` — the one event that has always worked, now carrying the
  * shape of its failures.
@@ -202,7 +244,7 @@ export function trackEduClassroomJoin(args: EduClassroomJoinArgs): void {
     if (args.classroomId) completed.classroom_id = args.classroomId;
     if (args.matchedCodeType) completed.matched_code_type = args.matchedCodeType;
     if (args.source) completed.source = args.source;
-    safeCapture('student_join_completed', completed);
+    captureStudentJoin('student_join_completed', completed);
     return;
   }
   const failed: Record<string, unknown> = { reason: args.result };

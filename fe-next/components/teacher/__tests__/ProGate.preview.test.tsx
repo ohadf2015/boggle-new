@@ -11,6 +11,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => mockPro }));
+vi.mock('@/hooks/useTeacherProCheckout', () => ({
+  useTeacherProCheckout: () => ({ pending: false, start: vi.fn() }),
+}));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 
 import { ProGate, PRO_FEATURES } from '../ProGate';
@@ -36,8 +39,8 @@ describe('ProGate — the locked panel previews the real feature', () => {
 
   it('offers exactly one action', () => {
     render(<ProGate feature="mastery"><div>real rows</div></ProGate>);
-    expect(screen.getAllByRole('link')).toHaveLength(1);
-    expect(screen.queryAllByRole('button')).toHaveLength(0);
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.queryAllByRole('link')).toHaveLength(0);
   });
 
   it('shows the real content and no preview to a Pro teacher', () => {

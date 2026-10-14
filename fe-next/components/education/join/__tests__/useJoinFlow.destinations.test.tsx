@@ -20,7 +20,7 @@ vi.mock('@/hooks/useJoinClassroom', () => ({
   useJoinClassroom: () => ({ joinClassroom: joinMock }),
 }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
-vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn() }));
+vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn(), trackStudentJoinStarted: vi.fn() }));
 vi.mock('@/utils/profileStorage', () => ({ setStoredUsername: vi.fn() }));
 
 import { useJoinFlow } from '../useJoinFlow';
@@ -52,10 +52,10 @@ describe('useJoinFlow destinations', () => {
     expect(pushMock).toHaveBeenCalledWith(`/en/multiplayer?room=${CODE}&classroom=true`);
   });
 
-  it('a join that resolves to no game stays on the join screen for the Play CTA', async () => {
-  const hook = await submitWith({ success: true, gameCode: null, classroomId: 'c1' });
-  expect(pushMock).not.toHaveBeenCalled();
-  expect(hook.result.current.joined).toEqual({ classroomId: 'c1', alreadyMember: false });
+  it('a join that resolves to no game leaves for the class view (?class=open) and keeps the fallback CTA state', async () => {
+    const hook = await submitWith({ success: true, gameCode: null, classroomId: 'c1' });
+    expect(pushMock).toHaveBeenCalledWith('/en/student?class=open');
+    expect(hook.result.current.joined).toEqual({ classroomId: 'c1', alreadyMember: false });
   });
 
   it('a full classroom stays on the join form with an inline error and never navigates', async () => {

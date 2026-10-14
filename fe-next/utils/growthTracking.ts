@@ -292,6 +292,13 @@ export type GrowthEvent =
   | 'edu_teacher_onboarding_step'
   | 'edu_first_assignment_cta_shown'
   | 'edu_first_assignment_cta_clicked'
+  // Student join funnel — mirrored from lib/education/telemetry.ts
+  // (trackStudentJoinStarted + the student_join_completed branch of
+  // trackEduClassroomJoin) with identical props. NOT in CANONICAL_DUAL_EMIT:
+  // the bare names are already captured by telemetry.ts, a dual-emit would
+  // double-count them in PostHog. Privacy: classroom_id only, never the code.
+  | 'student_join_started'
+  | 'student_join_completed'
   // ESL winner-page depth (t_25b9ddb1). Demo start + CEFR list pick on
   // /education/esl-word-games. Props: { cefr: 'A1'|'A2'|'B1', page }.
   | 'edu_page_play_demo_started'

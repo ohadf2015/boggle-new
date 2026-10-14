@@ -1,12 +1,17 @@
 'use client';
 
 import { useEffect } from 'react';
-import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { useTeacherProCheckout } from '@/hooks/useTeacherProCheckout';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { ProFeaturePreview } from '@/components/teacher/pro/ProFeaturePreview';
+import {
+  trackProGateViewed,
+  trackProUpgradeClicked,
+  type ProUpgradeSource,
+} from '@/lib/education/proFunnelTelemetry';
 
 /**
  * Renders a Teacher Pro surface, or an upsell in its place for a free teacher.
@@ -68,12 +73,15 @@ interface ProGateProps {
 }
 
 export function ProGate({ feature, children, active = true }: ProGateProps) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const { hasPro, loading } = useTeacherPro();
+  const checkoutSource = `pro_gate_${feature}` as ProUpgradeSource;
+  const { pending, start } = useTeacherProCheckout(checkoutSource);
 
   useEffect(() => {
     if (active && !loading && !hasPro) {
       trackGrowthEvent('iap_viewed', { source: `pro_gate_${feature}` });
+      trackProGateViewed({ feature });
     }
   }, [active, loading, hasPro, feature]);
 
@@ -96,13 +104,20 @@ export function ProGate({ feature, children, active = true }: ProGateProps) {
           <p className="mb-4 text-sm font-bold leading-relaxed text-neo-white/80">
             {t(`teacher.proGate.${feature}.body`)}
           </p>
-          <Link
-            href={`/${language}/teacher/upgrade`}
-            onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: `pro_gate_${feature}` })}
-            className="inline-block rounded-neo border-neo bg-neo-cyan px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg"
+          <button
+            type="button"
+            data-testid={`pro-gate-upgrade-${feature}`}
+            disabled={pending}
+            aria-busy={pending || undefined}
+            onClick={() => {
+              trackGrowthEvent('landing_cta_clicked', { cta: `pro_gate_${feature}` });
+              trackProUpgradeClicked({ feature });
+              void start();
+            }}
+            className="inline-block rounded-neo border-neo bg-neo-cyan px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg disabled:opacity-60"
           >
             {t('teacher.proGate.cta', { price: `$${TEACHER_PRO_PRICE_USD}` })}
-          </Link>
+          </button>
           <p className="mt-2 text-xs font-bold text-neo-white/60">{t('teacher.subscription.trustCancel')}</p>
         </div>
       </div>

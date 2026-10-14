@@ -36,7 +36,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));
 vi.mock('@/hooks/useJoinClassroom', () => ({ useJoinClassroom: () => ({ joinClassroom: mockJoin }) }));
-vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn() }));
+vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn(), trackStudentJoinStarted: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: mockToast }));
 vi.mock('../joinTarget', () => ({ resolveJoinTarget: mockResolve }));
 vi.mock('@/utils/profileStorage', () => ({
@@ -219,11 +219,11 @@ describe('<JoinFlow> — submitting', () => {
     });
   });
 
-  it('keeps a roster joiner on this screen with the next-assignment Play CTA', async () => {
+  it('sends a roster joiner to the class view, keeping the next-assignment Play CTA as fallback', async () => {
     mockJoin.mockResolvedValue({ success: true, classroomId: 'c1' });
     await join();
-    expect(mockPush).not.toHaveBeenCalled();
     expect(await screen.findByTestId('join-success-panel')).toBeInTheDocument();
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/en/student?class=open'));
   });
 
   it('passes the guest nickname through', async () => {

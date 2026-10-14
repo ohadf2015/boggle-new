@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useJoinClassroom } from '@/hooks/useJoinClassroom';
-import { trackEduClassroomJoin } from '@/lib/education/telemetry';
+import { trackEduClassroomJoin, trackStudentJoinStarted } from '@/lib/education/telemetry';
 import logger from '@/utils/logger';
 import { resolveJoinTarget, type JoinTarget } from './joinTarget';
 import { sanitizeJoinCode, joinCodeOverflows, JOIN_CODE_LENGTH } from './JoinCodeField';
@@ -80,10 +80,10 @@ export interface JoinFlowState {
   nameError: boolean;
   suggestedName: string | null;
   /**
-   * Set after a roster join (no live game). The screen stays here and shows
-   * the class's next assignment — leaving for `/student` was the drop-off.
-   * Null while the student is still on the form, and while a live-game join
-   * is walking them into the room.
+   * Set after a roster join (no live game) as the fallback success panel while
+   * the navigation to the class view (`/student?class=open`) is in flight —
+   * if the push is skipped, the next-assignment CTA is still on screen.
+   * Null while the student is still on the form.
    */
   joined: JoinedClassroom | null;
   canSubmit: boolean;
@@ -323,6 +323,10 @@ export function useJoinFlow(
       void (async () => {
         const source =
           sanitizeJoinCode(initialCode).length === JOIN_CODE_LENGTH ? 'invite_link' : 'typed_code';
+        // The funnel starts only once a real join POST is about to happen —
+        // validation above already refused bad codes and empty names. The
+        // completed/failed twin fires below on the join result.
+        trackStudentJoinStarted({ source });
         try {
           const result = await joinClassroom(
             trimmedCode,
@@ -351,14 +355,13 @@ export function useJoinFlow(
             // Call the success callback (e.g. to show confetti) before navigating
             // A student who typed the LIVE GAME code came to PLAY, not to be
             // enrolled. Walk them straight in; the enrolment already happened.
-            // A roster join (the teacher invite link) stays on this screen:
-            // the next open assignment is the thing they came to do, and
-            // bouncing them to the hub was where that step disappeared.
+            // A roster join (the teacher invite link) leaves for the class view:
+            // /student?class=open opens ClassSheet with the next open assignment.
+            // `joined` stays set as the fallback panel if the push is skipped.
             const targetGameCode =
               result.gameCode ||
               (target?.verdict === 'game' ? target.gameCode || trimmedCode : null);
-            const staying = !targetGameCode && !!result.classroomId;
-            if (staying && result.classroomId) {
+            if (!targetGameCode && result.classroomId) {
               setJoined({
                 classroomId: result.classroomId,
                 alreadyMember: !!result.alreadyMember,
@@ -375,9 +378,7 @@ export function useJoinFlow(
               }
             }
 
-            if (!staying) {
-              router.push(joinSuccessHref(language, targetGameCode));
-            }
+            router.push(joinSuccessHref(language, targetGameCode));
             return;
           }
 
