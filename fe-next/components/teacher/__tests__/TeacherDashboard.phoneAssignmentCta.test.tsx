@@ -52,6 +52,10 @@ vi.mock('@/hooks/useTeacherPro', () => ({
 vi.mock('@/components/teacher/dashboard/PlayNowLauncher', () => ({
   PlayNowLauncher: () => <div data-testid="play-now-launcher" />,
 }));
+vi.mock('@/components/teacher/digest/WeeklyProgressDigestCard', () => ({
+  WeeklyProgressDigestCard: () => <div data-testid="weekly-progress-digest" />,
+}));
+
 
 vi.mock('@/hooks/useMediaQuery', () => ({ useMediaQuery: () => media.wide }));
 vi.mock('@/components/teacher/hq/useFirstAssignmentCta', () => ({

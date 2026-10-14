@@ -98,6 +98,24 @@ describe('teacherWeeklyProgressDigest', () => {
     expect(html).not.toContain('/teacher/upgrade');
   });
 
+  it('appends the day-7 Teacher Pro CTA on mid-trial', () => {
+    const { html } = teacherWeeklyProgressDigest({
+      ...digest,
+      hasPro: true,
+      polarTrialExpired: false,
+      polarTrialExpiredLineKey: null,
+      polarTrialActive: true,
+      polarTrialDaysLeft: 7,
+      polarTrialActiveLineKey: 'teacher.digest.polarTrialActiveLine',
+      polarTrialDay7: true,
+    });
+    expect(html).toContain('Day 7 of your Teacher Pro trial');
+    expect(html).toContain('Upgrade to Teacher Pro');
+    expect(html).toContain('https://www.lexiclash.live/en/teacher/upgrade');
+    expect(html).toContain('Games');
+    expect(html).toContain('vs last week');
+  });
+
   it('appends a Keep-Pro nudge for a teacher still on the Polar trial', () => {
     const { html } = teacherWeeklyProgressDigest({
       ...digest,

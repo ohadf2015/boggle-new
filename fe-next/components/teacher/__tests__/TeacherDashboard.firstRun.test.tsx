@@ -104,6 +104,10 @@ vi.mock('@/components/teacher/PlayTabFirstRunCard', () => ({
 vi.mock('@/components/teacher/dashboard/TeacherOnboardingChecklist', () => ({
   TeacherOnboardingChecklistLive: () => <div data-testid="teacher-onboarding-checklist" />,
 }));
+vi.mock('@/components/teacher/digest/WeeklyProgressDigestCard', () => ({
+  WeeklyProgressDigestCard: () => <div data-testid="weekly-progress-digest" />,
+}));
+
 
 // ── useRecentGameSettings ─────────────────────────────────────────────────────
 const mockGetMostRecent = vi.fn<GameConfiguration | null, []>();

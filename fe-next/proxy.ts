@@ -3,6 +3,8 @@ import { createServerClient } from '@supabase/ssr';
 import { matchAcceptLanguage } from './lib/localeResolution';
 import { isHiddenQaRoute } from './lib/qaRoutes';
 import { decideNextHandle } from './lib/seo/nextHandleGate';
+// Shared with the [locale] layout (RUM beacon suppression for crawlers).
+import { isBotUserAgent } from './lib/seo/botUa';
 
 const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 const DEFAULT_LOCALE = 'en';
@@ -13,23 +15,9 @@ const DEFAULT_LOCALE = 'en';
 // (Sentry JAVASCRIPT-NEXTJS-NE).
 const PROBE_RE = /^\/(?:\.(?:env|git|aws|ssh|DS_Store)|wp-admin|wp-login|wp-includes|wp-content|phpmyadmin|phpinfo|xmlrpc\.php|config\.json|credentials|secrets\.json|backup\.zip|admin\.php|\.well-known\/security\.txt)/i;
 
-// SEO and social bot user-agent fragments (lowercase)
-const BOT_SIGNATURES = [
-  // SEO crawlers
-  'googlebot', 'bingbot', 'yandexbot', 'duckduckbot', 'baiduspider',
-  'sogou', 'exabot', 'ia_archiver', 'applebot', 'petalbot',
-  'semrushbot', 'ahrefsbot', 'mj12bot', 'dotbot', 'rogerbot',
-  'google-inspectiontool', 'google-extended', 'bytespider',
-  'gptbot', 'claudebot', 'anthropic-ai', 'ccbot',
-  // Social crawlers
-  'whatsapp', 'facebookexternalhit', 'facebot', 'twitterbot',
-  'linkedinbot', 'slackbot', 'telegrambot', 'discordbot',
-  'pinterest', 'redditbot',
-];
-
+// SEO and social bot user-agent fragments live in lib/seo/botUa.ts.
 function isBotRequest(request: NextRequest): boolean {
-  const ua = (request.headers.get('user-agent') || '').toLowerCase();
-  return BOT_SIGNATURES.some(sig => ua.includes(sig));
+  return isBotUserAgent(request.headers.get('user-agent'));
 }
 
 /**

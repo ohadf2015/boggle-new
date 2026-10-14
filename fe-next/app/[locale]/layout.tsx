@@ -21,6 +21,7 @@ import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew, fred
 import Script from "next/script";
 import { headers } from 'next/headers';
 import { getRumBeaconScript } from '@/lib/analytics/rumBeaconScript';
+import { isBotUserAgent } from '@/lib/seo/botUa';
 
 // Synchronously primes CSS vars from localStorage before paint to prevent CLS
 // from AdMob SizeChanged async event and GlobalBottomNav ResizeObserver.
@@ -223,7 +224,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     const headerList = await headers();
     const rumCountryCode = headerList.get('x-country-code') || headerList.get('cf-ipcountry') || headerList.get('x-vercel-ip-country') || '';
     const rumPostHogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY || '';
-    const rumBeaconScript = rumPostHogKey ? getRumBeaconScript(rumCountryCode, rumPostHogKey) : '';
+    // Crawlers that execute JS (Googlebot et al.) would each fire
+    // page_cold_start under a fresh random distinct_id — skip the beacon.
+    const rumIsBot = isBotUserAgent(headerList.get('user-agent'));
+    const rumBeaconScript = rumPostHogKey && !rumIsBot ? getRumBeaconScript(rumCountryCode, rumPostHogKey) : '';
     const schemaStrings = getLocalizedSchemaStrings(validLocale);
 
     // Locale-aware font preloading: Hebrew pages get all 4 font variables,

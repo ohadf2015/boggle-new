@@ -107,6 +107,28 @@ describe('buildWeeklyTeacherDigest', () => {
     expect(trialing.polarTrialDaysLeft).toBe(6);
     expect(trialing.polarTrialActiveLineKey).toBe('teacher.digest.polarTrialActiveLine');
     expect(trialing.polarTrialExpiredLineKey).toBeNull();
+    expect(trialing.polarTrialDay7).toBe(true);
+  });
+
+  it('flags Polar trial day 7 when 7 days remain', () => {
+    const day7 = buildWeeklyTeacherDigest({
+      teacherId: 't1',
+      email: 'ada@school.edu',
+      fullName: 'Ada',
+      locale: 'en',
+      hasPro: true,
+      polarTrialDaysLeft: 7,
+      classrooms: [
+        {
+          classroomId: 'c1',
+          classroomName: 'Year 7',
+          roster: [{ studentId: 's1', name: 'Sam' }],
+          sessions: [],
+        },
+      ],
+    });
+    expect(day7.polarTrialDay7).toBe(true);
+    expect(day7.classrooms[0].metrics.thisWeek.gamesCompleted).toBe(0);
   });
 
   it('does not send when the teacher has no classrooms', () => {

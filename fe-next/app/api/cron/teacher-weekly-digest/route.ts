@@ -7,12 +7,13 @@ import { teacherWeeklyProgressDigest } from '@/lib/email/templates/teacherWeekly
 import {
   assembleWeeklyDigests,
   isoWeekKey,
+  type WeeklyAssignmentCompletionRow,
   type WeeklyClassroomRow,
   type WeeklyMembershipRow,
   type WeeklySessionRow,
   type WeeklyTeacherRow,
 } from '@/lib/education/weeklyTeacherDigest';
-import { windowStartIso } from '@/lib/education/windowedClassroomProgress';
+import { WEEK_MS } from '@/lib/education/weeklyProgressDigest';
 import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
 import { captureApiError } from '@/utils/sentry';
 import { withCronLock } from '@/backend/redis/locking';
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
           studentId: m.student_id,
         }));
 
-        const since = windowStartIso(7, now);
+        const since = new Date(now - 2 * WEEK_MS).toISOString();
         const { data: sessionRows, error: sessionError } = await supabase
           .from('practice_sessions')
           .select('classroom_id, student_id, completed_at, results')
@@ -123,6 +124,59 @@ export async function POST(request: NextRequest) {
             foundCount: s.results?.lessonWordsFound?.length ?? 0,
             missedCount: s.results?.lessonWordsMissed?.length ?? 0,
           }));
+      }
+
+      let assignmentCompletions: WeeklyAssignmentCompletionRow[] = [];
+      const assignmentExpectedByClassroom = new Map<string, number>();
+      if (classroomIds.length > 0) {
+        const { data: assignmentRows, error: assignmentError } = await supabase
+          .from('lesson_assignments')
+          .select('id, classroom_id')
+          .in('classroom_id', classroomIds)
+          .limit(2000);
+        if (assignmentError) {
+          logger.error(`[Weekly Digest] lesson_assignments select failed: ${assignmentError.message}`);
+        } else {
+          const assignmentList = (assignmentRows ?? []) as Array<{ id: string; classroom_id: string | null }>;
+          const countByRoom = new Map<string, number>();
+          const assignmentToRoom = new Map<string, string>();
+          for (const row of assignmentList) {
+            if (!row.classroom_id) continue;
+            assignmentToRoom.set(row.id, row.classroom_id);
+            countByRoom.set(row.classroom_id, (countByRoom.get(row.classroom_id) ?? 0) + 1);
+          }
+          const rosterByRoom = new Map<string, number>();
+          for (const m of memberships) {
+            rosterByRoom.set(m.classroomId, (rosterByRoom.get(m.classroomId) ?? 0) + 1);
+          }
+          for (const [roomId, n] of countByRoom) {
+            assignmentExpectedByClassroom.set(roomId, n * (rosterByRoom.get(roomId) ?? 0));
+          }
+          const assignmentIds = [...assignmentToRoom.keys()];
+          if (assignmentIds.length > 0) {
+            const since = new Date(now - 2 * WEEK_MS).toISOString();
+            const { data: completionRows, error: completionError } = await supabase
+              .from('student_lesson_progress')
+              .select('assignment_id, completed_at')
+              .in('assignment_id', assignmentIds)
+              .gte('completed_at', since)
+              .not('completed_at', 'is', null)
+              .limit(5000);
+            if (completionError) {
+              logger.error(`[Weekly Digest] student_lesson_progress select failed: ${completionError.message}`);
+            } else {
+              assignmentCompletions = ((completionRows ?? []) as Array<{
+                assignment_id: string | null;
+                completed_at: string | null;
+              }>)
+                .filter((row) => row.assignment_id && row.completed_at && assignmentToRoom.has(row.assignment_id))
+                .map((row) => ({
+                  classroomId: assignmentToRoom.get(row.assignment_id as string) as string,
+                  completedAt: row.completed_at as string,
+                }));
+            }
+          }
+        }
       }
 
       const { data: subRows, error: subError } = await supabase
@@ -166,6 +220,8 @@ export async function POST(request: NextRequest) {
         classrooms,
         memberships,
         sessions,
+        assignmentCompletions,
+        assignmentExpectedByClassroom,
         proUserIds,
         expiredTrialUserIds,
         trialingDaysByUser,

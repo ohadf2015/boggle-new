@@ -50,6 +50,10 @@ vi.mock('@/hooks/useMediaQuery', () => ({ useMediaQuery: () => false }));
 vi.mock('@/components/teacher/dashboard/PlayNowLauncher', () => ({
   PlayNowLauncher: () => <button type="button" data-testid="play-now-go" />,
 }));
+vi.mock('@/components/teacher/digest/WeeklyProgressDigestCard', () => ({
+  WeeklyProgressDigestCard: () => <div data-testid="weekly-progress-digest" />,
+}));
+
 vi.mock('@/components/teacher/PlayTabFirstRunCard', () => ({
   default: () => <button type="button" data-testid="first-run-create-class" />,
 }));

@@ -395,6 +395,7 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
                 >
                   <HqClassPulse
                     classroomId={selectedClassroom.id}
+                    classroomName={selectedClassroom.name}
                     studentCount={studentCount}
                     assignmentCount={assignmentCount}
                     submittedCount={submittedCount}
