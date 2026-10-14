@@ -7,7 +7,7 @@
  */
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -46,7 +46,9 @@ export function WeeklyProgressDigestCard({
     datedCompletions,
   );
 
-  const daysLeft = polarTrialDaysLeft(trialExpires, Date.now());
+  // Capture once per mount — Date.now() in render trips react-hooks/purity.
+  const [now] = useState(() => Date.now());
+  const daysLeft = polarTrialDaysLeft(trialExpires, now);
   const trialDay7 = isPolarTrialDay7(daysLeft);
   const week = metrics?.thisWeek;
   const wow = metrics?.wow;
