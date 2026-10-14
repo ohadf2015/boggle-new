@@ -5,13 +5,22 @@ import { wordListSitemapRoutes } from '@/lib/seo/wordLists/sitemapRoutes';
 import { WORD_LISTS_GENERATED_AT } from '@/lib/seo/wordLists/catalog';
 import { helpSitemapEntries } from '@/components/education/help/helpSitemap';
 import { SUPPORTED_LANDING_LOCALES as CONNECTIONS_LANDING_LOCALES } from './[locale]/connections/content';
+import buildInfo from '@/lib/seo/buildInfo.generated.json';
 
 const BASE_URL = 'https://www.lexiclash.live';
 const LOCALES = ['he', 'en', 'sv', 'ja', 'es', 'ru'] as const;
 
 // Use stable dates instead of new Date() to avoid telling Google every page changed on every request.
-// NEXT_PUBLIC_BUILD_TIME is set in next.config.mjs at build time, so this auto-updates on deploy.
-const LAST_DEPLOYED = process.env.NEXT_PUBLIC_BUILD_TIME || '2026-03-26T00:00:00.000Z';
+// NOTE: process.env.NEXT_PUBLIC_BUILD_TIME is inlined by next.config.mjs `env` for route
+// handlers (api/version proves it), but that inlining does NOT reach this metadata route in
+// the production standalone build — prod sitemap.xml served the hardcoded fallback below for
+// 434 URLs for months (verified 2026-10-14). The committed, prebuild-regenerated
+// buildInfo.generated.json is the channel that provably reaches prod (same pattern as
+// wordLists.generated.json), so it wins over the env var here.
+const LAST_DEPLOYED =
+  (buildInfo as { builtAt?: string }).builtAt ||
+  process.env.NEXT_PUBLIC_BUILD_TIME ||
+  '2026-03-26T00:00:00.000Z';
 const BLOG_UPDATED = '2026-05-15T00:00:00.000Z';
 const LEGAL_UPDATED = '2026-02-01T00:00:00.000Z';
 const GUIDES_UPDATED = '2026-03-01T00:00:00.000Z';
