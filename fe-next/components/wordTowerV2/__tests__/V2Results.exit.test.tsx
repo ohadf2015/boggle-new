@@ -47,6 +47,17 @@ describe('V2Results — getting out of the modal', () => {
     expect(onHome).toHaveBeenCalledOnce();
   });
 
+  it('given the daily tower, then the exit button is named for where it goes (the daily hub, not home)', () => {
+    // Given a daily run (its exit routes to /daily, see useV2Exit)
+    const onHome = vi.fn();
+    render(results({ onHome, daily: { growthM: 6, targetM: 12, totalM: 30, rank: null } }));
+    // When the exit control is used by its accessible name
+    fireEvent.click(screen.getByRole('button', { name: 'daily.backToDailyHub' }));
+    // Then it leaves, and nothing claims to go "home"
+    expect(onHome).toHaveBeenCalledOnce();
+    expect(screen.queryByLabelText('wordTowerV2.results.home')).toBeNull();
+  });
+
   it('given the run is over, when the close control is tapped, then the modal dismisses', () => {
     const onClose = vi.fn();
     render(results({ onClose }));
@@ -149,7 +160,8 @@ describe('V2Results — getting out of the modal', () => {
     const { container } = render(results({ daily: { growthM: 3, targetM: 9, totalM: 30, rank: null } }));
 
     const actionsBar = container.querySelector('[data-wt2-results-actions]');
-    const homeBtn = screen.getByLabelText('wordTowerV2.results.home');
+    // The daily exit is named for where it goes (the daily hub).
+    const homeBtn = screen.getByLabelText('daily.backToDailyHub');
     const keepBuilding = screen.getByText('wordTowerV2.dailyTower.keepBuilding');
 
     expect(actionsBar?.contains(homeBtn)).toBe(true);

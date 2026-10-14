@@ -31,7 +31,8 @@ const MEDAL = ['🥇', '🥈', '🥉'];
  * Your row is always shown, even from rank 40.
  */
 export function DailyTowerBoard({ t, language, refreshKey = 0 }: { t: T; language: string; refreshKey?: number }) {
-  const [rows, setRows] = useState<Row[] | null>(null);
+  // undefined = loading, null = failed (the board steps aside), [] = nobody yet.
+  const [rows, setRows] = useState<Row[] | null | undefined>(undefined);
 
   useEffect(() => {
     let live = true;
@@ -41,26 +42,49 @@ export function DailyTowerBoard({ t, language, refreshKey = 0 }: { t: T; languag
     getWithAuth(`/api/word-tower/daily/score?${params.toString()}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        if (live && d) setRows((d.leaderboard as Row[]) ?? []);
+        if (live) setRows(d ? ((d.leaderboard as Row[]) ?? []) : null);
       })
-      .catch(() => undefined);
+      .catch(() => {
+        if (live) setRows(null);
+      });
     return () => {
       live = false;
     };
   }, [language, refreshKey]);
 
   if (rows === null) return null;
+  const title = (
+    <h3 className="flex items-center justify-center gap-1.5 font-neo-display text-sm font-black uppercase tracking-widest text-neo-yellow">
+      <Trophy className="h-4 w-4" aria-hidden />
+      {t('wordTowerV2.dailyTower.boardTitle')}
+    </h3>
+  );
+  // While loading, hold the board's place in the results card so the CTAs
+  // below it do not jump when the rows land.
+  if (rows === undefined) {
+    return (
+      <section
+        data-testid="daily-tower-board"
+        aria-busy="true"
+        className="mt-4 rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy p-2.5 text-neo-cream shadow-hard"
+      >
+        {title}
+        <div className="mt-2 space-y-1.5" aria-hidden>
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="h-10 animate-pulse rounded-neo border-neo border-black bg-neo-navy-light motion-reduce:animate-none" />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   const top = rows.slice(0, TOP);
   const me = rows.find((r) => r.isYou);
   const shown = me && !top.includes(me) ? [...top, me] : top;
 
   return (
-    <section data-wt2-board className="mt-4 rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy p-2.5 text-neo-cream shadow-hard">
-      <h3 className="flex items-center justify-center gap-1.5 font-neo-display text-sm font-black uppercase tracking-widest text-neo-yellow">
-        <Trophy className="h-4 w-4" aria-hidden />
-        {t('wordTowerV2.dailyTower.boardTitle')}
-      </h3>
+    <section data-wt2-board data-testid="daily-tower-board" aria-busy="false" className="mt-4 rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy p-2.5 text-neo-cream shadow-hard">
+      {title}
       {shown.length === 0 ? (
         <p className="py-3 text-center font-neo-display text-sm font-bold opacity-80">{t('wordTowerV2.dailyTower.boardEmpty')}</p>
       ) : (

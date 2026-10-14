@@ -42,6 +42,10 @@ export function markConnectionsPlayedToday(dateISO: string = todayUTC()): void {
   if (typeof window === 'undefined') return;
   try {
     window.localStorage.setItem(PLAYED_KEY, dateISO);
+    // The shared guest status hook (useDailyPlayedStatus → NextQuestCta) reads a
+    // per-day flag under its own key. Nothing wrote it, so for guests Word Bridge
+    // never counted as played and every results screen pointed back at it.
+    window.localStorage.setItem(`connections_played_${dateISO}`, '1');
   } catch {
     /* quota / private mode — non-fatal */
   }

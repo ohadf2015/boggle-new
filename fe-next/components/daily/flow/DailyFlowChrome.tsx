@@ -41,9 +41,15 @@ export function DailyFlowChrome({ modeId, intro = true, backLink = true, inline 
     if (seen) return;
     setShowIntro(true);
     try { sessionStorage.setItem(introKey(modeId), '1'); } catch { /* storage off */ }
+  }, [intro, mode, modeId]);
+
+  // The dismiss timer follows the intro itself, not the "seen" check above: a
+  // remount (StrictMode, route re-render) must not leave the intro up for good.
+  useEffect(() => {
+    if (!showIntro) return;
     const timer = setTimeout(() => setShowIntro(false), INTRO_MS);
     return () => clearTimeout(timer);
-  }, [intro, mode, modeId]);
+  }, [showIntro]);
 
   if (!mode) return null;
   const hubHref = `/${language}/daily`;
@@ -83,7 +89,7 @@ export function DailyFlowChrome({ modeId, intro = true, backLink = true, inline 
             key="intro"
             data-testid="daily-intro"
             onClick={() => setShowIntro(false)}
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-neo-navy/95 backdrop-blur-sm"
+            className="fixed inset-0 z-[80] flex flex-col items-center justify-center gap-4 bg-neo-navy/95 backdrop-blur-sm"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 1.04 }}
             transition={{ duration: 0.28 }}

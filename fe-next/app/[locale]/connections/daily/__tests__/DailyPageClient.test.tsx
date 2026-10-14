@@ -55,7 +55,7 @@ describe('DailyPageClient variant host', () => {
     expect(screen.getByTestId('pyramid-daily')).toBeTruthy();
     expect(screen.queryByTestId('regular-daily')).toBeNull();
     expect(pyramidChallenge).toHaveBeenCalledWith(
-      expect.objectContaining({ sharePath: 'he/connections/daily' }),
+      expect.objectContaining({ sharePath: 'he/connections/daily', daily: true }),
     );
   });
 

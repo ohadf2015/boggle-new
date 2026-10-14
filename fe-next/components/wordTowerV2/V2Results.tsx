@@ -324,7 +324,9 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
               e.stopPropagation();
               onHome();
             }}
-            aria-label={t('wordTowerV2.results.home')}
+            // The daily exit lands on the daily hub — say so, not "home".
+            aria-label={daily ? t('daily.backToDailyHub') : t('wordTowerV2.results.home')}
+            title={daily ? t('daily.backToDailyHub') : undefined}
             className="flex h-14 w-14 items-center justify-center rounded-neo border-neo border-black bg-neo-navy text-neo-cream shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
           >
             <Home className="h-5 w-5" aria-hidden />

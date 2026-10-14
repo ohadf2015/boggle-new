@@ -56,6 +56,15 @@ describe('connections played-today marker — unconditional, works for authed + 
     expect(hasPlayedConnectionsToday()).toBe(false);
   });
 
+  it('also writes the per-day flag the shared daily status hook reads for guests', () => {
+    // Given a guest finishing today's Word Bridge
+    // When the played marker is written
+    markConnectionsPlayedToday('2026-10-14');
+    // Then useDailyPlayedStatus's guest key (`connections_played_<date>`) is set
+    // too — without it NextQuestCta kept offering Word Bridge after it was done.
+    expect(window.localStorage.getItem('connections_played_2026-10-14')).toBeTruthy();
+  });
+
   it('marks the current UTC day when no date is passed', () => {
     markConnectionsPlayedToday();
     expect(hasPlayedConnectionsToday()).toBe(true);

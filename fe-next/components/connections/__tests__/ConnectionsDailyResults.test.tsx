@@ -187,12 +187,26 @@ describe('ConnectionsDailyResults', () => {
     expect(getByText('connections.daily.leaderboard')).toBeTruthy();
   });
 
-  it('has a back link to the daily hub', () => {
+  it('leaves "back to daily" to the shared daily chrome (no second back control)', () => {
+    // Given the results inside the daily page (DailyFlowChrome renders the pill)
     render(<ConnectionsDailyResults {...defaultProps} />);
+    // Then the card does not stack its own back arrow under it
+    expect(screen.queryByTestId('back-button')).toBeNull();
+  });
 
-    const backLink = screen.getByTestId('back-button');
-    expect(backLink.tagName).toBe('A');
-    expect(backLink.getAttribute('href')).toBe('/en/daily');
+  it('flags a revisit as already played and skips the fanfare', async () => {
+    const { fireVictoryConfetti } = await import('@/utils/confettiUtils');
+    // Given the results re-opened later the same day
+    render(<ConnectionsDailyResults {...defaultProps} revisit />);
+    // Then the note shows, the final score is shown at once, no confetti
+    expect(screen.getByTestId('daily-already-played').textContent).toContain('connections.daily.alreadyPlayed');
+    expect(within(screen.getByTestId('score-circle')).getByText('350')).toBeTruthy();
+    expect(fireVictoryConfetti).not.toHaveBeenCalled();
+  });
+
+  it('does not flag a fresh finish as already played', () => {
+    render(<ConnectionsDailyResults {...defaultProps} />);
+    expect(screen.queryByTestId('daily-already-played')).toBeNull();
   });
 
   it('renders a labeled rank stat tile when rank is known', () => {

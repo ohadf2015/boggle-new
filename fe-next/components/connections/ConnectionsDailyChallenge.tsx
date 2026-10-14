@@ -1,16 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import Link from 'next/link';
 import { m } from 'framer-motion';
-import { Pyramid as PyramidIcon, Heart, ChevronRight } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
-import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import {
   initGameState,
   applyGuess,
@@ -38,10 +36,17 @@ import {
   trackDailyCompleted,
   trackDailyShared,
 } from '@/lib/connections/dailyTelemetry';
-import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
+import {
+  loadDailySnapshot,
+  saveDailySnapshot,
+  updateDailySnapshot,
+  type DailyBridgeSnapshot,
+} from '@/lib/connections/dailySnapshot';
 import ConnectionsProgressTrack from './ConnectionsProgressTrack';
 import PuzzleCard from './PuzzleCard';
 import ConnectionsDailyResults from './ConnectionsDailyResults';
+import ConnectionsDailyRevisit from './ConnectionsDailyRevisit';
+import DailyPyramidCta from './DailyPyramidCta';
 
 type Action =
   | { type: 'SET_INPUT'; input: string }
@@ -80,18 +85,47 @@ interface Results {
 
 /**
  * Daily Challenge — everyone plays the same deterministic 5-puzzle set for the
- * UTC day, then submits to a shared leaderboard. Reuses the tested engine and
- * PuzzleCard (on-screen keyboard); the daily set never consults the live ban
- * list so all players' games are comparable.
+ * UTC day, then submits to a shared leaderboard.
+ *
+ * Once per day: a run finished on this device comes back as its results
+ * (ConnectionsDailyRevisit) instead of a fresh board. The stored run is read
+ * after mount, so the first paint is a loader — never a playable board that
+ * flips to results (rules/60 Class 1: render the pessimistic state until every
+ * source has resolved).
  */
 export default function ConnectionsDailyChallenge() {
+  const { t } = useLanguage();
+  const today = useRef(todayUTC()).current;
+  const [snapshot, setSnapshot] = useState<DailyBridgeSnapshot | null | undefined>(undefined);
+
+  useEffect(() => {
+    const stored = loadDailySnapshot(today);
+    setSnapshot(stored?.kind === 'bridge' ? stored : null);
+  }, [today]);
+
+  if (snapshot === undefined) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <PageLoader size="lg" text={t('connections.loading')} />
+      </div>
+    );
+  }
+  if (snapshot) return <ConnectionsDailyRevisit snapshot={snapshot} />;
+  return <DailyRun today={today} />;
+}
+
+/**
+ * The live run. Reuses the tested engine and PuzzleCard (on-screen keyboard);
+ * the daily set never consults the live ban list so all players' games are
+ * comparable.
+ */
+function DailyRun({ today }: { today: string }) {
   const { t, language } = useLanguage();
   const { user, profile, isAdmin } = useAuth();
   const prefersReducedMotion = useReducedMotion();
   const { haptic, customHaptic } = useHapticFeedback();
   const sfx = useSoundEffects();
 
-  const today = useRef(todayUTC()).current;
   const [state, dispatch] = useReducer(reducer, language, (lang) =>
     initGameState(dailyPuzzleSet(today, lang), { attemptsPerPuzzle: DAILY_ATTEMPTS_PER_PUZZLE }),
   );
@@ -196,10 +230,24 @@ export default function ConnectionsDailyChallenge() {
 
     const timeTakenSeconds = startRef.current ? Math.max(0, Math.floor((Date.now() - startRef.current) / 1000)) : 0;
     const puzzlesSolved = solvedRef.current.size;
-    if (puzzlesSolved > 0) {
-      sfx.playVictorySound();
-      if (!prefersReducedMotion) fireVictoryConfetti();
-    }
+    // The fanfare belongs to the results screen — playing it here too made every
+    // finish sound twice.
+
+    // Keep the finished run for the rest of the day: re-opening the daily shows
+    // it again instead of a fresh board (and a free replay with the answer key).
+    saveDailySnapshot({
+      kind: 'bridge',
+      dateISO: today,
+      language,
+      score: state.score,
+      solvedCount: puzzlesSolved,
+      total,
+      outcomes: Array.from({ length: total }, (_, i) =>
+        outcomesRef.current.get(i) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
+      ),
+      streak: 0,
+      rank: null,
+    });
     trackDailyCompleted({
       locale: language,
       solved: puzzlesSolved,
@@ -226,15 +274,17 @@ export default function ConnectionsDailyChallenge() {
       });
       const streak = submitRes?.streak ?? advanceClientStreak(today).streak;
       const lb = await fetchDailyLeaderboard(today, { guestFingerprint, limit: 50 });
+      const rank = submitRes?.currentRank || lb?.ownRank || null;
+      updateDailySnapshot(today, { streak, rank });
       setResults({
         loading: false,
         streak,
-        rank: submitRes?.currentRank ?? lb?.ownRank ?? null,
+        rank,
         totalPlayers: submitRes?.totalPlayers ?? lb?.totalPlayers ?? 0,
         rows: lb?.leaderboard ?? [],
       });
     })();
-  }, [isTerminal, prefersReducedMotion, profile, user, today, language, state.score, total, sfx, t]);
+  }, [isTerminal, profile, user, today, language, state.score, total, t]);
 
   const handleInput = useCallback((value: string) => dispatch({ type: 'SET_INPUT', input: value }), []);
   const handleSubmit = useCallback(() => dispatch({ type: 'SUBMIT' }), []);
@@ -293,33 +343,7 @@ export default function ConnectionsDailyChallenge() {
           onShareClick={handleShareClick}
         />
 
-        {/* Pyramid is the deeper mode and the natural next step once the day's
-            5 bridges are spent — promoted from a thin text link to a real card. */}
-        {getPyramidsForLocale(language).length > 0 && (
-          <m.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.85 }}
-            className="mx-auto w-full max-w-md px-4"
-          >
-            <Link
-              href={`/${language}/connections/pyramid`}
-              data-testid="pyramid-cta"
-              className="flex items-center gap-3 rounded-neo border-neo-thick border-neo-purple bg-neo-purple/15 p-4 shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
-            >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-neo border-neo border-neo-purple bg-neo-purple/25">
-                <PyramidIcon className="h-6 w-6 text-neo-purple" strokeWidth={2.5} aria-hidden="true" />
-              </span>
-              <span className="flex min-w-0 flex-1 flex-col text-start">
-                <span className="font-neo-display text-base font-black text-neo-purple">
-                  {t('connections.pyramid.cta')}
-                </span>
-                <span className="font-neo-body text-xs text-neo-white/70">{t('connections.pyramid.tagline')}</span>
-              </span>
-              <DirectionalIcon icon={ChevronRight} className="h-5 w-5 shrink-0 text-neo-purple" />
-            </Link>
-          </m.div>
-        )}
+        <DailyPyramidCta />
       </>
     );
   }

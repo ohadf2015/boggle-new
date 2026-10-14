@@ -2,13 +2,10 @@
 
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { m } from 'framer-motion';
-import Link from 'next/link';
-import { Share2, ChevronRight, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
-import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -23,20 +20,20 @@ import {
 } from '@/lib/connections/pyramid/gameLogic';
 import { dailyPyramid } from '@/lib/connections/pyramid/daily';
 import { getSolvedIds, markSolved } from '@/lib/connections/solvedStore';
-import { buildPyramidShareGrid } from '@/lib/connections/pyramid/shareGrid';
+import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
+import type { PyramidPuzzle } from '@/lib/connections/pyramid/types';
 import { todayUTC, markConnectionsPlayedToday, advanceClientStreak } from '@/lib/connections/dailyClient';
-import { gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
-import { stripEmoji } from '@/lib/share/stripEmoji';
+import { loadDailySnapshot, saveDailySnapshot, type DailyPyramidSnapshot } from '@/lib/connections/dailySnapshot';
+import type { BridgeOutcome } from '@/lib/connections/shareGrid';
 import type { GameState } from '@/lib/connections/types';
-import PyramidProgress from './PyramidProgress';
 import PyramidHeader from './PyramidHeader';
+import PyramidResultCard from './PyramidResultCard';
 import { PyramidLeftRail, PyramidRightRail } from './PyramidShellRails';
 import { GameShell, SHELL_MEDIA } from '@/components/game/shell';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import FinaleCard from './FinaleCard';
 import PuzzleCard from '../PuzzleCard';
 import ConnectionsMascot from '../ConnectionsMascot';
-import DailyAnswerKey from '../DailyAnswerKey';
 
 type Action =
   | { type: 'GUESS'; input: string }
@@ -70,26 +67,72 @@ function reducer(state: PyramidState, action: Action): PyramidState {
  * `sharePath` — when the run is hosted as the day's daily variant
  * (/connections/daily), share links point back at the daily host so
  * recipients land on the same quest; standalone play keeps the pyramid route.
+ *
+ * `daily` — hosted as the day's Word Bridge quest: a finished run is kept for
+ * the rest of the UTC day and comes back on re-open (a won pyramid is marked
+ * solved, so without it a reload served a DIFFERENT pyramid), and the result
+ * hands off to the next daily quest.
  */
-export default function PyramidChallenge({ sharePath }: { sharePath?: string } = {}) {
+export default function PyramidChallenge({ sharePath, daily = false }: { sharePath?: string; daily?: boolean } = {}) {
   // Null-guard wrapper: the early return must happen BEFORE any of the run's
   // hooks mount (rules-of-hooks), so the actual game lives in PyramidRun.
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
   const today = useRef(todayUTC()).current;
   const [solvedPyramids] = useState<ReadonlySet<string>>(() => getSolvedIds('pyramid', language));
+  // undefined = not read yet. Read after mount (storage is client-only); until
+  // then the daily host shows a loader, never a board that flips to results.
+  const [finished, setFinished] = useState<{ snap: DailyPyramidSnapshot; pyramid: PyramidPuzzle } | null | undefined>(
+    daily ? undefined : null,
+  );
+  useEffect(() => {
+    if (!daily) return;
+    const snap = loadDailySnapshot(today);
+    const found =
+      snap?.kind === 'pyramid' ? getPyramidsForLocale(snap.language).find((p) => p.id === snap.pyramidId) : undefined;
+    setFinished(snap?.kind === 'pyramid' && found ? { snap, pyramid: found } : null);
+  }, [daily, today]);
+
+  if (finished === undefined) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <PageLoader size="lg" text={t('connections.loading')} />
+      </div>
+    );
+  }
+  if (finished) {
+    const { snap, pyramid: done } = finished;
+    return (
+      <PyramidResultCard
+        revisit
+        daily
+        pyramid={done}
+        won={snap.won}
+        score={snap.score}
+        gaveUpBase={[!!snap.gaveUpBase[0], !!snap.gaveUpBase[1], !!snap.gaveUpBase[2]]}
+        solvedBridges={done.base.map((b, i) => (snap.outcomes[i]?.reached ? b.bridge : ''))}
+        streak={snap.streak}
+        outcomes={snap.outcomes}
+        dateISO={snap.dateISO}
+        sharePath={sharePath}
+      />
+    );
+  }
+
   const pyramid = dailyPyramid(today, language, solvedPyramids);
   if (!pyramid) return null;
-  return <PyramidRun pyramid={pyramid} today={today} sharePath={sharePath} />;
+  return <PyramidRun pyramid={pyramid} today={today} sharePath={sharePath} daily={daily} />;
 }
 
 function PyramidRun({
   pyramid,
   today,
   sharePath,
+  daily,
 }: {
   pyramid: NonNullable<ReturnType<typeof dailyPyramid>>;
   today: string;
   sharePath?: string;
+  daily: boolean;
 }) {
   const { t, language } = useLanguage();
   const { isAdmin } = useAuth();
@@ -105,7 +148,6 @@ function PyramidRun({
   const wrongByStageRef = useRef<Record<number, number>>({});
   const outcomesRef = useRef<Map<number, BridgeOutcome>>(new Map());
   const prevStatusRef = useRef(pyramidState.status);
-  const [results, setResults] = useState<{ copied: boolean }>({ copied: false });
 
   const isTerminal = pyramidState.status === 'won' || pyramidState.status === 'lost';
   const isResolved = pyramidState.status === 'correct' || pyramidState.status === 'gaveUp';
@@ -196,6 +238,34 @@ function PyramidRun({
     prevStatusRef.current = pyramidState.status;
   }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, pyramidState.wrongAttempts, sfx, haptic, customHaptic, prefersReducedMotion, pyramid, language]);
 
+  const collectOutcomes = useCallback(
+    (): BridgeOutcome[] =>
+      [0, 1, 2, 3].map(
+        (i) => outcomesRef.current.get(i) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
+      ),
+    [],
+  );
+
+  // As the daily quest, keep the finished run for today. Runs after the outcome
+  // tracker above so the finale's outcome is already recorded; re-saves once
+  // when the day streak (set by the stamp effect in the same commit) lands.
+  const savedStreakRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!daily || !isTerminal || savedStreakRef.current === clientStreak) return;
+    savedStreakRef.current = clientStreak;
+    saveDailySnapshot({
+      kind: 'pyramid',
+      dateISO: today,
+      language,
+      pyramidId: pyramid.id,
+      won: pyramidState.status === 'won',
+      score: pyramidState.score,
+      gaveUpBase: [...pyramidState.gaveUpBase],
+      outcomes: collectOutcomes(),
+      streak: clientStreak,
+    });
+  }, [daily, isTerminal, today, language, pyramid.id, pyramidState.status, pyramidState.score, pyramidState.gaveUpBase, clientStreak, collectOutcomes]);
+
   const handleInput = useCallback((value: string) => setInput(value), []);
   const handleSubmit = useCallback(() => {
     if (input.trim().length > 0) {
@@ -233,134 +303,21 @@ function PyramidRun({
     context: { pyramidId: pyramid.id, stage: pyramidState.stage },
   });
 
-  const handleShare = useCallback(async () => {
-    const baseOutcomes: readonly [BridgeOutcome, BridgeOutcome, BridgeOutcome] = [
-      outcomesRef.current.get(0) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
-      outcomesRef.current.get(1) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
-      outcomesRef.current.get(2) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
-    ];
-    const finaleOutcome = outcomesRef.current.get(3) ?? {
-      reached: false,
-      solved: false,
-      wrongAttempts: 0,
-      hintUsed: false,
-    };
-    const url = typeof window !== 'undefined' ? `${window.location.origin}/${sharePath ?? `${language}/connections/pyramid`}` : undefined;
-    const text = buildPyramidShareGrid({
-      title: t('connections.pyramid.title'),
-      dateISO: today,
-      base: baseOutcomes,
-      finale: finaleOutcome,
-      score: pyramidState.score,
-      callout: t(`connections.daily.shareCallout.${gridCallout(Array.from([...baseOutcomes, finaleOutcome]))}`),
-      url,
-    });
-    try {
-      const shareText = stripEmoji(text);
-      if (typeof navigator !== 'undefined' && navigator.share) {
-        await navigator.share({ text: shareText });
-      } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(shareText);
-        setResults({ copied: true });
-      }
-    } catch {
-      /* user cancelled / unsupported */
-    }
-  }, [t, language, today, pyramidState.score, sharePath]);
-
   // Terminal state: won/lost
   if (isTerminal) {
     return (
-      <div className="mx-auto flex w-full max-w-md flex-col gap-4 px-4 py-6">
-        <m.div
-          initial={{ opacity: 0, y: 16, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-          className={[
-            'rounded-neo border-neo-thick bg-neo-navy-light p-5 text-center shadow-hard',
-            pyramidState.status === 'won' ? 'border-neo-lime' : 'border-neo-red',
-          ].join(' ')}
-        >
-          <ConnectionsMascot status={pyramidState.status} className="mb-3 h-24 w-24" />
-          <PyramidProgress
-            stage={3}
-            solvedBridges={pyramidState.solvedBridges}
-            gaveUpBase={pyramidState.gaveUpBase}
-            metaAnswer={pyramid.metaAnswer}
-            won={pyramidState.status === 'won'}
-          />
-          <h1 className="mt-4 font-neo-display text-2xl font-black text-neo-white">
-            {pyramidState.status === 'won' ? t('connections.pyramid.won') : t('connections.pyramid.lost')}
-          </h1>
-          <div className="mt-2 flex items-center justify-center gap-2">
-            <span className="font-neo-display text-lg font-black text-neo-white/70">
-              {t('connections.score')}
-            </span>
-            <span className="font-neo-display text-xl font-black text-neo-yellow tabular-nums">
-              {pyramidState.score}
-            </span>
-            {/* Same streak chip the 5-riddle daily results draw — pyramid days
-                advance the same client streak, so it should show it too. */}
-            {clientStreak > 0 && (
-              <m.span
-                data-testid="pyramid-streak-chip"
-                initial={{ scale: 0, rotate: -12 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.4 }}
-                className="inline-flex items-center gap-1 rounded-neo border-neo border-neo-orange bg-neo-orange/10 px-3 py-1 shadow-hard-sm"
-              >
-                <Flame className="h-4 w-4 text-neo-orange" strokeWidth={2.5} aria-hidden="true" />
-                <span className="font-neo-display font-black text-neo-orange">{clientStreak}</span>
-              </m.span>
-            )}
-          </div>
-          {pyramidState.status === 'lost' && (
-            <p className="mt-3 font-neo-body text-sm text-neo-white/70">
-              {t('connections.pyramid.reveal')}: <span className="font-bold text-neo-white">{pyramid.metaAnswer}</span>
-            </p>
-          )}
-          {/* The 3 base bridges the run passed through — a lost pyramid used to
-              reveal only the meta, so a player who burned the base stages left
-              without ever learning what those answers were. */}
-          <div className="mt-4">
-            <DailyAnswerKey
-              puzzles={pyramid.base}
-              solvedIndices={new Set(
-                pyramid.base.map((_, i) => i).filter((i) => !pyramidState.gaveUpBase[i]),
-              )}
-              title={t('connections.daily.answerKey')}
-              isRTL={language === 'he'}
-            />
-          </div>
-          <m.button
-            type="button"
-            onClick={handleShare}
-            whileTap={{ scale: 0.96 }}
-            className="mt-4 inline-flex items-center gap-2 rounded-neo border-neo-thick border-neo-pink bg-neo-pink px-5 py-2.5 font-neo-display font-black text-neo-navy shadow-hard"
-          >
-            <Share2 className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
-            {results.copied ? t('connections.daily.copied') : t('connections.daily.share')}
-          </m.button>
-        </m.div>
-
-        {/* The terminal screen was a dead end — no way onward without the back
-            button. Route players to the daily, which always has something to play. */}
-        <Link
-          href={`/${language}/connections/daily`}
-          data-testid="pyramid-back-to-daily"
-          className="flex items-center gap-3 rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan/15 p-4 shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
-        >
-          <span className="flex min-w-0 flex-1 flex-col text-start">
-            <span className="font-neo-display text-base font-black text-neo-cyan">
-              {t('connections.daily.cta')}
-            </span>
-            <span className="font-neo-body text-xs text-neo-white/70">{t('connections.daily.questDesc')}</span>
-          </span>
-          <DirectionalIcon icon={ChevronRight} className="h-5 w-5 shrink-0 text-neo-cyan" />
-        </Link>
-
-        <ResultsBannerSlot placement="daily-complete" />
-      </div>
+      <PyramidResultCard
+        pyramid={pyramid}
+        won={pyramidState.status === 'won'}
+        score={pyramidState.score}
+        gaveUpBase={pyramidState.gaveUpBase}
+        solvedBridges={pyramidState.solvedBridges}
+        streak={clientStreak}
+        outcomes={collectOutcomes()}
+        dateISO={today}
+        sharePath={sharePath}
+        daily={daily}
+      />
     );
   }
 

@@ -51,4 +51,28 @@ describe('DailyTowerBoard', () => {
     await waitFor(() => expect(getWithAuth).toHaveBeenCalledTimes(2));
     expect(container.querySelector('[data-wt2-board]')).toBeNull();
   });
+
+  it('given the board is still loading, then a titled frame holds its space (no jump when rows land)', () => {
+    // Given a request that has not answered yet
+    getWithAuth.mockReturnValue(new Promise(() => {}));
+    // When the board mounts
+    render(<DailyTowerBoard t={t} language="en" />);
+    // Then the frame and title are already there, marked busy
+    const board = screen.getByTestId('daily-tower-board');
+    expect(board.getAttribute('aria-busy')).toBe('true');
+    expect(board.textContent).toContain('wordTowerV2.dailyTower.boardTitle');
+  });
+
+  it('given rows arrive, then the frame is no longer busy', async () => {
+    respond([row(1, 'Ana', 30)]);
+    render(<DailyTowerBoard t={t} language="en" />);
+    expect(await screen.findByText('Ana')).toBeTruthy();
+    expect(screen.getByTestId('daily-tower-board').getAttribute('aria-busy')).toBe('false');
+  });
+
+  it('given the request throws, then the board steps aside instead of loading forever', async () => {
+    getWithAuth.mockRejectedValue(new Error('offline'));
+    render(<DailyTowerBoard t={t} language="en" />);
+    await waitFor(() => expect(screen.queryByTestId('daily-tower-board')).toBeNull());
+  });
 });

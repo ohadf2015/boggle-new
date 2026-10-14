@@ -2,13 +2,11 @@
 
 import { useMemo, useEffect, useState } from 'react';
 import { m, animate as fmAnimate } from 'framer-motion';
-import { Flame, Sparkles, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { Flame, Sparkles, CalendarCheck } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import type { LeaderboardRow } from '@/lib/connections/dailyClient';
 import type { BridgeOutcome } from '@/lib/connections/shareGrid';
@@ -37,6 +35,11 @@ interface ConnectionsDailyResultsProps {
   dateISO: string;
   /** Telemetry hook for the card's share/copy buttons. */
   onShareClick?: (method: 'native' | 'copy') => void;
+  /**
+   * Re-opened after finishing today: say so, and skip the fanfare — the run
+   * was celebrated when it ended.
+   */
+  revisit?: boolean;
 }
 
 // Tier calculation based on score
@@ -96,6 +99,7 @@ const ConnectionsDailyResults: React.FC<ConnectionsDailyResultsProps> = ({
   shareText,
   dateISO,
   onShareClick,
+  revisit = false,
 }) => {
   const { t, language } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
@@ -105,12 +109,15 @@ const ConnectionsDailyResults: React.FC<ConnectionsDailyResultsProps> = ({
   const blanked = solvedCount === 0;
   const tier = useMemo(() => getTierInfo(score, solvedCount, total), [score, solvedCount, total]);
 
-  // Animate score counting and play sounds
+  // Animate score counting and play the fanfare — the single place a finished
+  // run is celebrated (the run itself used to play it too: every finish sounded
+  // twice). A blanked run gets no victory sound; a revisit gets no fanfare.
   useEffect(() => {
-    if (prefersReducedMotion) {
+    if (prefersReducedMotion || revisit) {
       setAnimatedScore(score);
       return;
     }
+    if (blanked) return;
 
     playVictorySound();
 
@@ -120,29 +127,26 @@ const ConnectionsDailyResults: React.FC<ConnectionsDailyResultsProps> = ({
       onUpdate: (v) => setAnimatedScore(Math.round(v)),
       // `animationComplete` is not a framer-motion option — the confetti it
       // guarded never fired. The callback is `onComplete`.
-      onComplete: () => {
-        if (tier.isExceptional && !prefersReducedMotion) {
-          fireVictoryConfetti();
-        }
-      },
+      onComplete: () => fireVictoryConfetti(),
     });
 
     return () => result?.stop?.();
-  }, [score, prefersReducedMotion, tier.isExceptional, playVictorySound]);
+  }, [score, prefersReducedMotion, revisit, blanked, playVictorySound]);
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-4 px-4 py-6">
-      {/* Back to daily landing — same pattern as the wheel/hunt results pages. */}
-      <div className="flex items-center justify-start mb-2">
-        <Link
-          data-testid="back-button"
-          href={`/${language}/daily`}
-          className="flex items-center gap-1 rounded-neo border-neo border-neo-white/20 bg-neo-navy-light px-2 py-1.5 text-neo-white/70 transition-colors hover:bg-neo-navy hover:text-neo-white shadow-hard-sm"
-          aria-label={t('common.back')}
+      {/* No back arrow here: the daily chrome above the page already carries
+          "back to daily" — two back controls stacked on one screen. */}
+      {revisit && (
+        <div
+          data-testid="daily-already-played"
+          role="status"
+          className="flex items-center gap-2 rounded-neo border-neo border-neo-lime bg-neo-lime/10 px-3 py-2 shadow-hard-sm"
         >
-          <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
-        </Link>
-      </div>
+          <CalendarCheck className="h-5 w-5 shrink-0 text-neo-lime" strokeWidth={2.5} aria-hidden="true" />
+          <p className="font-neo-body text-sm font-bold text-neo-white">{t('connections.daily.alreadyPlayed')}</p>
+        </div>
+      )}
 
       {/* Title + Progress Number */}
       <m.div

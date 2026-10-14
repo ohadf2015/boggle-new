@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -49,5 +49,30 @@ describe('DailyFlowChrome placement', () => {
     const fs = await import('node:fs');
     const src = fs.readFileSync('app/[locale]/word-tower/daily/page.tsx', 'utf8');
     expect(src).toMatch(/modeId="word-tower" backLink=\{false\}/);
+  });
+});
+
+describe('DailyFlowChrome intro dismissal', () => {
+  // Under StrictMode the mount effect runs, cleans up, and runs again: the first
+  // run marked the intro "seen" and the cleanup killed its timer, so the second
+  // run bailed and the full-screen intro never closed.
+  it('given the chrome is remounted in StrictMode, when the intro time passes, then the intro closes', () => {
+    vi.useFakeTimers();
+    try {
+      sessionStorage.clear();
+      render(<React.StrictMode><DailyFlowChrome modeId="word-tower" backLink={false} /></React.StrictMode>);
+      expect(screen.getByTestId('daily-intro')).toBeTruthy();
+      act(() => { vi.advanceTimersByTime(5000); });
+      expect(screen.queryByTestId('daily-intro')).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('given a mode coach card (z-70) on the page, then the intro covers it', () => {
+    sessionStorage.clear();
+    render(<DailyFlowChrome modeId="word-tower" backLink={false} />);
+    const z = Number(/\bz-\[(\d+)\]/.exec(screen.getByTestId('daily-intro').className)?.[1] ?? 0);
+    expect(z).toBeGreaterThan(70);
   });
 });
