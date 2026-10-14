@@ -69,6 +69,10 @@ vi.mock('@/components/teacher/hq/useClassRoster', () => ({
 vi.mock('@/hooks/useVocabularyLesson', () => ({ useLessons: () => ({ lessons: [], isLoading: true }) }));
 vi.mock('@/hooks/useRecentGameSettings', () => ({ useRecentGameSettings: () => ({ recentConfigs: [] }) }));
 
+vi.mock('@/components/teacher/digest/WeeklyProgressDigestCard', () => ({
+  WeeklyProgressDigestCard: () => <div data-testid="weekly-progress-digest" />,
+}));
+
 import TeacherDashboard from '../TeacherDashboard';
 
 const LATIN = "Ms. Rivera's Class";

@@ -16,6 +16,10 @@
 
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+vi.mock('@/components/teacher/digest/WeeklyProgressDigestCard', () => ({
+  WeeklyProgressDigestCard: () => <div data-testid="weekly-progress-digest" />,
+}));
+
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 
 // ── Navigation ────────────────────────────────────────────────────────────────

@@ -53,6 +53,9 @@ vi.mock('@/components/teacher/dashboard/ClassroomWindowProgress', () => ({ Class
 vi.mock('@/components/teacher/dashboard/TeacherOnboardingChecklist', () => ({
   TeacherOnboardingChecklistLive: () => <div data-testid="teacher-onboarding-checklist" />,
 }));
+vi.mock('@/components/teacher/digest/WeeklyProgressDigestCard', () => ({
+  WeeklyProgressDigestCard: () => <div data-testid="weekly-progress-digest" />,
+}));
 vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => ({ grant: null, loading: false, hasPro: false, source: null, refresh: vi.fn() }),
 }));

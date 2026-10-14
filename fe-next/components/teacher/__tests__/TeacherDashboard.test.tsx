@@ -70,6 +70,10 @@ import TeacherDashboard from '../TeacherDashboard';
 vi.mock('@/components/teacher/dashboard/PlayNowLauncher', () => ({
   PlayNowLauncher: () => <div data-testid="play-now-launcher" />,
 }));
+vi.mock('@/components/teacher/digest/WeeklyProgressDigestCard', () => ({
+  WeeklyProgressDigestCard: () => <div data-testid="weekly-progress-digest" />,
+}));
+
 
 
 describe('<TeacherDashboard>', () => {

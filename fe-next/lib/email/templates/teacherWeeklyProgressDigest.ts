@@ -31,6 +31,12 @@ interface Copy {
   trialEndedLine: string;
   trialActiveCta: string;
   trialActiveLine: (days: number) => string;
+  trialDay7Cta: string;
+  trialDay7Line: string;
+  games: string;
+  words: string;
+  assignments: string;
+  wow: string;
   ctaNote: string;
   openDashboard: string;
   signoff: string;
@@ -57,6 +63,13 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
         : days === 1
           ? '1 day left in your Teacher Pro trial — keep reports and unlimited classes for $9/mo.'
           : `${days} days left in your Teacher Pro trial — keep reports and unlimited classes for $9/mo.`,
+    trialDay7Cta: 'Upgrade to Teacher Pro — $9/mo',
+    trialDay7Line:
+      'Day 7 of your Teacher Pro trial — keep reports and unlimited classes for $9/mo.',
+    games: 'Games',
+    words: 'Words found',
+    assignments: 'Assignments',
+    wow: 'vs last week',
     ctaNote: 'Unlimited classes, printable reports, Polar checkout. Cancel anytime.',
     openDashboard: 'Open teacher dashboard',
     signoff: '— LexiClash',
@@ -81,6 +94,12 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
         : days === 1
           ? 'נותר יום אחד בניסיון Teacher Pro — שמרו על דוחות וכיתות ללא הגבלה ב-9$ לחודש.'
           : `נותרו ${days} ימים בניסיון Teacher Pro — שמרו על דוחות וכיתות ללא הגבלה ב-9$ לחודש.`,
+    trialDay7Cta: 'שדרוג ל-Teacher Pro — 9$ לחודש',
+    trialDay7Line: 'יום 7 בניסיון Teacher Pro — שמרו על דוחות וכיתות ללא הגבלה ב-9$ לחודש.',
+    games: 'משחקים',
+    words: 'מילים שנמצאו',
+    assignments: 'מטלות',
+    wow: 'מול השבוע שעבר',
     ctaNote: 'כיתות ללא הגבלה, דוחות להדפסה, תשלום Polar. ביטול בכל עת.',
     openDashboard: 'ללוח המורה',
     signoff: '— LexiClash',
@@ -100,13 +119,22 @@ export function teacherWeeklyProgressDigest(digest: WeeklyTeacherDigest): { subj
   const rows = digest.classrooms
     .map((cl) => {
       const p = cl.progress;
+      const m = cl.metrics.thisWeek;
+      const wow = cl.metrics.wow;
       const completion = p.completionPct == null ? c.na : `${p.completionPct}%`;
       const accuracy = p.accuracyPct == null ? c.na : `${p.accuracyPct}%`;
+      const assignments =
+        m.assignmentCompletionPct == null ? c.na : `${m.assignmentCompletionPct}%`;
+      const wowLine = `${wow.studentsActive >= 0 ? '+' : ''}${wow.studentsActive} / ${wow.gamesCompleted >= 0 ? '+' : ''}${wow.gamesCompleted}`;
       return `<tr>
 <td>${escape(cl.classroomName)}</td>
+<td>${p.activeCount}/${p.rosterCount}</td>
+<td>${m.gamesCompleted}</td>
+<td>${m.wordsCompleted}</td>
+<td>${escape(assignments)}</td>
 <td>${escape(completion)}</td>
 <td>${escape(accuracy)}</td>
-<td>${p.activeCount}/${p.rosterCount}</td>
+<td>${escape(wowLine)}</td>
 </tr>`;
     })
     .join('');
@@ -114,18 +142,24 @@ export function teacherWeeklyProgressDigest(digest: WeeklyTeacherDigest): { subj
   const expiredLine = digest.polarTrialExpiredLineKey
     ? `<p style="color:#0b1220;font-size:15px;font-weight:700">${escape(c.trialEndedLine)}</p>`
     : '';
-  const activeLine = digest.polarTrialActiveLineKey
-    ? `<p style="color:#0b1220;font-size:15px;font-weight:700">${escape(c.trialActiveLine(digest.polarTrialDaysLeft ?? 0))}</p>`
+  const day7Line = digest.polarTrialDay7
+    ? `<p style="color:#0b1220;font-size:15px;font-weight:700">${escape(c.trialDay7Line)}</p>`
     : '';
+  const activeLine =
+    digest.polarTrialActiveLineKey && !digest.polarTrialDay7
+      ? `<p style="color:#0b1220;font-size:15px;font-weight:700">${escape(c.trialActiveLine(digest.polarTrialDaysLeft ?? 0))}</p>`
+      : '';
 
   const showUpgrade = !digest.hasPro || digest.polarTrialActive;
   const ctaLabel = digest.polarTrialExpired
     ? c.trialEndedCta
-    : digest.polarTrialActive
-      ? c.trialActiveCta
-      : c.cta;
+    : digest.polarTrialDay7
+      ? c.trialDay7Cta
+      : digest.polarTrialActive
+        ? c.trialActiveCta
+        : c.cta;
   const cta = showUpgrade
-    ? `${expiredLine}${activeLine}<p style="margin:24px 0">
+    ? `${expiredLine}${day7Line}${activeLine}<p style="margin:24px 0">
 <a href="${upgradeUrl(digest.locale)}" style="display:inline-block;background:#ff4d8d;color:#0b1220;font-weight:800;padding:12px 20px;text-decoration:none;border-radius:8px">${escape(ctaLabel)}</a>
 </p>
 <p style="color:#555;font-size:13px">${escape(c.ctaNote)}</p>`
@@ -137,7 +171,7 @@ export function teacherWeeklyProgressDigest(digest: WeeklyTeacherDigest): { subj
 <p>${escape(c.greeting(digest.fullName))}</p>
 <p>${escape(c.intro)}</p>
 <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse">
-<thead><tr><th>${escape(c.classroom)}</th><th>${escape(c.completion)}</th><th>${escape(c.accuracy)}</th><th>${escape(c.active)}</th></tr></thead>
+<thead><tr><th>${escape(c.classroom)}</th><th>${escape(c.active)}</th><th>${escape(c.games)}</th><th>${escape(c.words)}</th><th>${escape(c.assignments)}</th><th>${escape(c.completion)}</th><th>${escape(c.accuracy)}</th><th>${escape(c.wow)}</th></tr></thead>
 <tbody>${rows}</tbody>
 </table>
 ${cta}

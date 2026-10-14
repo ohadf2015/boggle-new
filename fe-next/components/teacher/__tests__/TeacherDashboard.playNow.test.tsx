@@ -55,6 +55,10 @@ vi.mock('@/hooks/useRecentGameSettings', () => ({
   }),
 }));
 
+vi.mock('@/components/teacher/digest/WeeklyProgressDigestCard', () => ({
+  WeeklyProgressDigestCard: () => <div data-testid="weekly-progress-digest" />,
+}));
+
 import TeacherDashboard from '../TeacherDashboard';
 import { readQuickLaunchIntent } from '../dashboard/quickLaunchIntent';
 

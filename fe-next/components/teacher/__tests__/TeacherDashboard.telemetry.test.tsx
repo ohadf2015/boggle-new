@@ -23,6 +23,10 @@ vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: ()
 vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({ AnalyticsDashboard: () => <div /> }));
 vi.mock('@/components/teacher/analytics/LastGameInsights', () => ({ LastGameInsights: () => <div /> }));
 vi.mock('@/components/teacher/dashboard/PlayNowLauncher', () => ({ PlayNowLauncher: () => <div /> }));
+vi.mock('@/components/teacher/digest/WeeklyProgressDigestCard', () => ({
+  WeeklyProgressDigestCard: () => <div data-testid="weekly-progress-digest" />,
+}));
+
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 
 let proState: Record<string, unknown>;

@@ -396,6 +396,22 @@ export function trackEduProgressDigestViewed(args: { hasPro: boolean; state: str
 }
 
 /**
+ * `teacher_digest_viewed` — weekly HQ digest impression. Mid-trial day 7
+ * is the conversion beat (Polar CTA on the same card). Never send student names.
+ */
+export function trackTeacherDigestViewed(args: {
+  hasPro: boolean;
+  trialDay7: boolean;
+  studentsActive: number;
+}): void {
+  safeCapture('teacher_digest_viewed', {
+    has_pro: args.hasPro,
+    trial_day_7: args.trialDay7,
+    students_active: args.studentsActive,
+  });
+}
+
+/**
  * `edu_reteach_live_scheduled` — one-click "schedule reteach Live in ~14 days"
  * from miss-gap words on the last-lesson digest. Kahoot Teacher Takeover foil:
  * rebuild hard Qs, replay ~2 weeks later. Counts words only — never student names.
