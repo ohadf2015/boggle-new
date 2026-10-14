@@ -20,28 +20,58 @@ import { getDailyStreak } from '@/utils/dailyChallenge/streaks';
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 import { dailyBestKey, isDailyTowerPlayed } from '@/lib/wordTower/dailyBest';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
+import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
+import { getWordHuntResultKey, getWordWheelResultKey } from '@/utils/dailyChallenge/constants';
+import { ALL_LANGUAGES } from '@/lib/languageConfig';
+
+type PlayedToday = DailyPlayedStatus['today'];
+
+/**
+ * This device's "played today" flags, read from the keys the games actually
+ * write: the per-language Word Hunt / Word Wheel result records (any language
+ * counts — the server's answer is language-agnostic too), the Connections
+ * played marker and the Word Tower daily best.
+ *
+ * Previously read `wh_played_<date>` / `ww_played_<date>` /
+ * `connections_played_<date>`, which nothing writes, so every guest looked
+ * like they had played nothing and the results handoff looped them back into
+ * Word Wheel instead of reaching "all clear".
+ */
+function getLocalPlayedToday(): PlayedToday {
+  const today = getDailyChallengeDate();
+  const anyLanguage = (key: (lang: (typeof ALL_LANGUAGES)[number], date: string) => string) =>
+    ALL_LANGUAGES.some((lang) => localStorage.getItem(key(lang, today)) !== null);
+  return {
+    wordHunt: anyLanguage(getWordHuntResultKey),
+    wordWheel: anyLanguage(getWordWheelResultKey),
+    // Tower keeps a per-UTC-day best climb; >0 means the daily was played.
+    wordTower: isDailyTowerPlayed(localStorage.getItem(dailyBestKey(utcDateKey()))),
+    connections: hasPlayedConnectionsToday(),
+  };
+}
+
+/** Played is monotonic within a day: either source saying "played" wins. */
+function mergePlayedToday(a: PlayedToday, b: PlayedToday | null): PlayedToday {
+  if (!b) return a;
+  return {
+    wordHunt: a.wordHunt || b.wordHunt,
+    wordWheel: a.wordWheel || b.wordWheel,
+    wordTower: a.wordTower || b.wordTower,
+    connections: a.connections || b.connections,
+  };
+}
+
+function readLocalPlayedToday(): PlayedToday | null {
+  try { return getLocalPlayedToday(); } catch { return null; /* storage disabled */ }
+}
 
 /**
  * Get guest's played state from localStorage
  */
 function getGuestPlayedStatus(): DailyPlayedStatus {
   const localStreak = getDailyStreak();
-  const today = getDailyChallengeDate();
-
-  // Guest: read localStorage played flags for each mode
-  const wordHuntPlayed = !!localStorage.getItem(`wh_played_${today}`);
-  const wordWheelPlayed = !!localStorage.getItem(`ww_played_${today}`);
-  const connectionsPlayed = !!localStorage.getItem(`connections_played_${today}`);
-  // Tower keeps a per-UTC-day best climb; >0 means the daily was played.
-  const wordTowerPlayed = isDailyTowerPlayed(localStorage.getItem(dailyBestKey(utcDateKey())));
-
   return {
-    today: {
-      wordHunt: wordHuntPlayed,
-      wordWheel: wordWheelPlayed,
-      wordTower: wordTowerPlayed,
-      connections: connectionsPlayed,
-    },
+    today: getLocalPlayedToday(),
     streak: {
       current: localStreak.currentStreak,
       longest: localStreak.longestStreak,
@@ -83,16 +113,10 @@ export function useDailyPlayedStatus(): DailyPlayedStatus & { refresh: () => Pro
   // the player just finished.
   const settleFromLocal = useCallback(() => {
     if (!isMounted.current) return;
-    let local: DailyPlayedStatus['today'] | null = null;
-    try { local = getGuestPlayedStatus().today; } catch { /* storage disabled */ }
+    const local = readLocalPlayedToday();
     setStatus((prev) => ({
       ...prev,
-      today: {
-        wordHunt: prev.today.wordHunt || !!local?.wordHunt,
-        wordWheel: prev.today.wordWheel || !!local?.wordWheel,
-        wordTower: prev.today.wordTower || !!local?.wordTower,
-        connections: prev.today.connections || !!local?.connections,
-      },
+      today: mergePlayedToday(prev.today, local),
       loading: false,
     }));
   }, []);
@@ -115,7 +139,9 @@ export function useDailyPlayedStatus(): DailyPlayedStatus & { refresh: () => Pro
       const data = (await response.json()) as DailyPlayedStatus;
 
       if (isMounted.current) {
-        setStatus(data);
+        // The server is authoritative ACROSS devices, but a score post from
+        // this device may not have landed yet — keep what this device knows.
+        setStatus({ ...data, today: mergePlayedToday(data.today, readLocalPlayedToday()) });
       }
     } catch (error) {
       console.warn('[useDailyPlayedStatus] fetch error:', error);

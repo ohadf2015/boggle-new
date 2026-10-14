@@ -2091,7 +2091,8 @@ const ru = {
         "praiseMid": "Отлично!",
         "praiseLong": "Вот это слово!",
         "boardLabel": "Поле с буквами",
-        "longWord": "Длинное слово +{bonus}"
+        "longWord": "Длинное слово +{bonus}",
+        "usesTry": "Тратит попытку"
       },
       "score": {
         "tier": {
@@ -2351,6 +2352,7 @@ const ru = {
       "triesLeft": "Осталось попыток: {count}",
       "lastTry": "Последняя попытка!",
       "completeTough": "Сегодня было сложно!",
+      "alreadyPlayed": "Вы уже сыграли в сегодняшний «Мост слов». Вот как всё прошло.",
       "zeroSolved": "Ни одного моста, зато теперь ты знаешь все {total}. Завтра новый набор.",
       "answerKey": "Сегодняшние мосты",
       "shareCallout": {
@@ -10105,14 +10107,14 @@ const ru = {
     "nextQuestsIn": "Новые квесты через",
     "timedQuest": "Квест на время",
     "relaxedQuest": "Спокойный квест",
-    "journeyRequired": "Required",
-    "journeyOptional": "Optional",
-    "journeyNow": "Now",
-    "journeyDone": "Done",
-    "journeyStep": "Step",
-    "journeyAllRequiredDone": "You've cleared today's quests! Bonus rounds are optional",
-    "backToDailyHub": "Back to daily",
-    "skipOptional": "Skip",
+    "journeyRequired": "Обязательно",
+    "journeyOptional": "По желанию",
+    "journeyNow": "Сейчас",
+    "journeyDone": "Готово",
+    "journeyStep": "Шаг",
+    "journeyAllRequiredDone": "Задания на сегодня выполнены! Бонусные раунды — по желанию",
+    "backToDailyHub": "К заданиям дня",
+    "skipOptional": "Пропустить",
     "bonusQuest": "Бонус",
     "untimedQuest": "Квест без таймера",
     "startQuest": "НАЧАТЬ КВЕСТ",
@@ -10120,6 +10122,11 @@ const ru = {
     "modesPlayedCount": "{count} из 4 игр сегодня",
     "nextUp": "Дальше",
     "allClearToday": "На сегодня всё — до завтра",
+    "allClear": {
+      "title": "Всё пройдено!",
+      "body": "Вы прошли все задания на сегодня.",
+      "streak": "Серия: {n} дн. подряд. Возвращайтесь завтра, чтобы её сохранить."
+    },
     "adminBeta": "Бета",
     "replay": "Повтор",
     "cleared": "Пройдено!",

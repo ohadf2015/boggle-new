@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { useDailyChallengeStats, type PreloadedDailyStats } from '@/hooks/useDailyChallengeStats';
 import { useWeeklyChest } from '@/hooks/useWeeklyChest';
+import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
 import { dailyProgressCells, cycleProgressCells } from '@/lib/landing/homeHubFormat';
 import { getLastSevenDaysCompletion } from '@/utils/dailyChallenge/storage';
 import type { Language } from '@/types';
@@ -34,16 +35,19 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
   const Arrow = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const launch = useHomeLaunch();
   const stats = useDailyChallengeStats(preloadedStats);
+  // The card links to today's Word Wheel, so its PLAY / VIEW RESULTS follows
+  // Word Wheel's played state. `stats.hasPlayed` is WORD HUNT's: reading it
+  // here offered PLAY on a finished wheel and VIEW RESULTS on an unplayed one.
+  const played = useDailyPlayedStatus();
   // Day cells mirror the weekly chest's all-modes, freeze-aware cycle; guests fall back to local completion.
   const chest = useWeeklyChest();
   // Countdown and outcome are client-only; SSR and the first client render share the loading state.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const countdown = mounted ? stats.countdown : '';
-  const hasPlayed = mounted ? stats.hasPlayed : false;
-  const hasSolved = mounted ? stats.hasSolved : false;
+  const hasPlayed = mounted ? played.today.wordWheel : false;
   // Pessimistic until the player's snapshot resolves, so Play never snaps to View results.
-  const ctaLoading = !mounted || stats.loading;
+  const ctaLoading = !mounted || stats.loading || played.loading;
   const streak = mounted ? (preloadedStats?.currentStreak ?? stats.streak) : 0;
   const puzzleNumber = stats.puzzleNumber;
   const cells = !mounted
@@ -132,7 +136,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
             {hasPlayed ? (
               <>
                 {t('daily.viewResults')}
-                {hasSolved && <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />}
+                <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
               </>
             ) : (
               <>

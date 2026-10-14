@@ -9074,14 +9074,14 @@ const ja = {
     "nextQuestsIn": "次のクエストまで",
     "timedQuest": "タイムクエスト",
     "relaxedQuest": "のんびりクエスト",
-    "journeyRequired": "Required",
-    "journeyOptional": "Optional",
-    "journeyNow": "Now",
-    "journeyDone": "Done",
-    "journeyStep": "Step",
-    "journeyAllRequiredDone": "You've cleared today's quests! Bonus rounds are optional",
-    "backToDailyHub": "Back to daily",
-    "skipOptional": "Skip",
+    "journeyRequired": "必須",
+    "journeyOptional": "任意",
+    "journeyNow": "いまここ",
+    "journeyDone": "クリア",
+    "journeyStep": "ステップ",
+    "journeyAllRequiredDone": "今日のクエストをクリア！ボーナスは自由参加です",
+    "backToDailyHub": "デイリーに戻る",
+    "skipOptional": "スキップ",
     "bonusQuest": "ボーナス",
     "untimedQuest": "フリークエスト",
     "startQuest": "クエスト開始",
@@ -9089,6 +9089,11 @@ const ja = {
     "modesPlayedCount": "今日のゲーム {count}/4",
     "nextUp": "次はこれ",
     "allClearToday": "今日はすべてクリア。また明日",
+    "allClear": {
+      "title": "オールクリア！",
+      "body": "今日のクエストはすべてクリアしました。",
+      "streak": "{n}日連続！明日も来て記録をつなごう。"
+    },
     "adminBeta": "ベータ",
     "replay": "もう一度",
     "cleared": "クリア！",
@@ -9812,7 +9817,8 @@ const ja = {
         "praiseMid": "うまい！",
         "praiseLong": "超ロング！",
         "boardLabel": "文字ボード",
-        "longWord": "ロング +{bonus}"
+        "longWord": "ロング +{bonus}",
+        "usesTry": "1回分を消費"
       },
       "score": {
         "tier": {
@@ -19071,6 +19077,7 @@ const ja = {
       "triesLeft": "残り{count}回",
       "lastTry": "最後のチャンス！",
       "completeTough": "今日は手ごわい！",
+      "alreadyPlayed": "今日のワードブリッジはプレイ済み。結果はこちら。",
       "zeroSolved": "橋はひとつも架からなかったけど、{total}個すべての答えがわかったよ。明日は新しい問題。",
       "answerKey": "今日の橋",
       "shareCallout": {

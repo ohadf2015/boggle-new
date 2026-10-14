@@ -38,7 +38,7 @@ const Sparks: React.FC<{ count: number; reach: number }> = ({ count, reach }) =>
   </>
 );
 
-/** Each spelled letter bursts where it sits; rendered inside the ring so it travels with a spin. */
+/** Each spelled letter bursts where it sits. */
 export const LetterBursts: React.FC<{ fx: WheelWordFxEvent | null; outerCount: number }> = ({ fx, outerCount }) => {
   if (!fx) return null;
   const good = fx.kind === 'good';

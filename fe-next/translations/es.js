@@ -9217,14 +9217,14 @@ const es = {
     "nextQuestsIn": "Próximas misiones en",
     "timedQuest": "Misión con tiempo",
     "relaxedQuest": "Misión relajada",
-    "journeyRequired": "Required",
-    "journeyOptional": "Optional",
-    "journeyNow": "Now",
-    "journeyDone": "Done",
-    "journeyStep": "Step",
-    "journeyAllRequiredDone": "You've cleared today's quests! Bonus rounds are optional",
-    "backToDailyHub": "Back to daily",
-    "skipOptional": "Skip",
+    "journeyRequired": "Obligatoria",
+    "journeyOptional": "Opcional",
+    "journeyNow": "Ahora",
+    "journeyDone": "Hecho",
+    "journeyStep": "Paso",
+    "journeyAllRequiredDone": "¡Completaste las misiones de hoy! Las rondas extra son opcionales",
+    "backToDailyHub": "Volver al reto diario",
+    "skipOptional": "Saltar",
     "bonusQuest": "Extra",
     "untimedQuest": "Misión libre",
     "startQuest": "INICIAR MISIÓN",
@@ -9232,6 +9232,11 @@ const es = {
     "modesPlayedCount": "{count} de 4 juegos hoy",
     "nextUp": "A continuación",
     "allClearToday": "Todo listo por hoy. Hasta mañana",
+    "allClear": {
+      "title": "¡Todo listo!",
+      "body": "Completaste todas las misiones de hoy.",
+      "streak": "Racha de {n} días. Vuelve mañana para mantenerla."
+    },
     "adminBeta": "Beta",
     "replay": "Repetir",
     "cleared": "¡Completado!",
@@ -9687,7 +9692,8 @@ const es = {
         "praiseMid": "¡Genial!",
         "praiseLong": "¡Qué palabra!",
         "boardLabel": "Tablero de letras",
-        "longWord": "Palabra larga +{bonus}"
+        "longWord": "Palabra larga +{bonus}",
+        "usesTry": "Gasta 1 intento"
       },
       "score": {
         "tier": {
@@ -19114,6 +19120,7 @@ const es = {
       "triesLeft": "{count} intentos restantes",
       "lastTry": "¡Último intento!",
       "completeTough": "¡Día difícil!",
+      "alreadyPlayed": "Ya jugaste el Puente de palabras de hoy. Así te fue.",
       "zeroSolved": "Ningún puente construido, pero ya conoces los {total}. Mañana hay set nuevo.",
       "answerKey": "Los puentes de hoy",
       "shareCallout": {

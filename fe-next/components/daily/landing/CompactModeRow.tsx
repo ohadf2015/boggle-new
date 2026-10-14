@@ -16,6 +16,8 @@ export interface CompactModeRowProps {
   artUrl?: string;
   /** Small tag after the title, e.g. the optional bonus quest. */
   badge?: string;
+  /** Visible text in the played badge, e.g. "Done". */
+  doneLabel?: string;
 }
 
 /* Every class is spelled out in full: Tailwind only emits a class when the
@@ -57,7 +59,10 @@ const COLOR_CONFIGS = {
  * carries its mode's artwork, a solid accent edge and an accent-coloured focus
  * ring, so the hub is scannable without reading the titles.
  *
- * When played: check-mark badge, dimmed, not clickable.
+ * When played: check-mark badge and dimmed, but still tappable — re-entering a
+ * finished quest shows its results (Hunt, Wheel, Connections) or keeps the
+ * daily tower climbing. A disabled row was a dead end the journey strip above
+ * it never had.
  */
 export function CompactModeRow({
   icon,
@@ -68,6 +73,7 @@ export function CompactModeRow({
   delay = 0,
   artUrl,
   badge,
+  doneLabel,
 }: CompactModeRowProps) {
   const config = COLOR_CONFIGS[color] ?? COLOR_CONFIGS.cyan;
 
@@ -82,7 +88,6 @@ export function CompactModeRow({
       <button
         type="button"
         onClick={onPlay}
-        disabled={played}
         className={cn(
           'relative w-full ps-5 pe-4 py-3 rounded-lg border-2 border-neo-black',
           'shadow-hard-xs overflow-hidden cursor-pointer',
@@ -91,7 +96,7 @@ export function CompactModeRow({
           config.ring,
           'transition-all duration-200 group',
           played
-            ? 'bg-neo-navy hover:bg-neo-navy cursor-default opacity-75'
+            ? 'bg-neo-navy hover:bg-neo-navy/90 opacity-75'
             : 'bg-neo-navy/60 hover:bg-neo-navy/80'
         )}
       >
@@ -137,7 +142,7 @@ export function CompactModeRow({
         {/* Title */}
         <h3 className="relative text-base font-neo-display font-black text-neo-white flex-1 text-start">
           {title}
-          {badge && (
+          {badge && !played && (
             <span className="ms-2 inline-block rounded-neo border-2 border-black bg-neo-cream px-1.5 py-0.5 align-middle text-[10px] font-black uppercase tracking-wide text-neo-navy">
               {badge}
             </span>
@@ -157,7 +162,8 @@ export function CompactModeRow({
             )}
             data-testid={`${color}-done-badge`}
           >
-            <CheckCircle2 className="w-3 h-3" />
+            <CheckCircle2 className="w-3 h-3" aria-hidden="true" />
+            {doneLabel && <span>{doneLabel}</span>}
           </m.div>
         ) : (
           <div className={cn(

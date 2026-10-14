@@ -19,6 +19,8 @@ export interface WheelDiscLetterProps {
   onHoldStart?: (letter: string, index: number, el: HTMLButtonElement) => void;
   onHoldEnd?: () => void;
   showHoldRing?: boolean;
+  /** Position in a just-accepted word: the letter flashes lime in place, staggered by order. */
+  cheerOrder?: number | null;
   tileSkin?: string | null;
   reducedMotion?: boolean;
 }
@@ -28,7 +30,7 @@ const POP = { type: 'spring' as const, stiffness: 520, damping: 17 };
 /** One letter on the disc: a cream keycap on the ring, or the inked hub with its lime ring. */
 const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
   letter, index, outerCount = 6, isUsed, isPressed = false, onPress, onHoldStart, onHoldEnd, showHoldRing = false,
-  tileSkin, reducedMotion = false,
+  cheerOrder = null, tileSkin, reducedMotion = false,
 }) => {
   const btnRef = useRef<HTMLButtonElement>(null);
   const { t } = useLanguage();
@@ -59,7 +61,8 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
         left: `${at.x - size / 2}%`,
         top: `${at.y - size / 2}%`,
         zIndex: isHub ? 3 : 2,
-      }}
+        ...(cheerOrder !== null && { '--ww-order': String(cheerOrder) }),
+      } as React.CSSProperties}
       initial={false}
       animate={{ scale: lit ? 1.12 : 1 }}
       transition={POP}
@@ -77,6 +80,7 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
       data-wheel-index={index}
       data-wheel-used={isUsed ? 'true' : 'false'}
       data-wheel-pressed={isPressed && !isUsed ? 'true' : 'false'}
+      {...(cheerOrder !== null && { 'data-wheel-celebrate': 'true' })}
       {...(skin && { 'data-tile-skin': skin })}
     >
       {isHub && !lit && !reducedMotion && (
