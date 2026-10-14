@@ -184,11 +184,11 @@ export default function WordWheelPixiRing({
         // preferred. Connection lines and drag trails still update below.
         if (!reducedMotion) angle += dt * 0.5;
 
-        // ── Orbital ring 1: lime dots ──
+        // ── Orbital ring 1: lime dots. Fixed in place (the wheel never spins); they only twinkle. ──
         orbitGfx.clear();
         const orbit1 = r + 16;
         for (let i = 0; i < 20; i++) {
-          const a = angle + (i / 20) * Math.PI * 2;
+          const a = (i / 20) * Math.PI * 2;
           const px = cx + Math.cos(a) * orbit1;
           const py = cy + Math.sin(a) * orbit1;
           const al = 0.25 + 0.12 * Math.sin(angle * 3 + i * 0.8);
@@ -197,10 +197,10 @@ export default function WordWheelPixiRing({
           orbitGfx.fill({ color: 0xbfff00, alpha: al });
         }
 
-        // ── Orbital ring 2: cyan, counter-rotating ──
+        // ── Orbital ring 2: cyan, offset between the lime dots ──
         const orbit2 = r + 26;
         for (let i = 0; i < 12; i++) {
-          const a = -angle * 0.7 + (i / 12) * Math.PI * 2;
+          const a = (i / 12) * Math.PI * 2 + Math.PI / 12;
           const px = cx + Math.cos(a) * orbit2;
           const py = cy + Math.sin(a) * orbit2;
           const al = 0.15 + 0.08 * Math.sin(angle * 2 + i);

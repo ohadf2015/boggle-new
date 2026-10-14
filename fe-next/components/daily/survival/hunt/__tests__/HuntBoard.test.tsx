@@ -104,3 +104,23 @@ describe('HuntBoard', () => {
     });
   });
 });
+
+const largeLetters = vi.hoisted(() => ({ on: false }));
+vi.mock('@/contexts/AccessibilityContext', () => ({ useLargeLetters: () => largeLetters.on }));
+
+describe('HuntBoard accessibility (restored from the pre-redesign grid)', () => {
+  afterEach(() => { largeLetters.on = false; });
+
+  it('Given a screen reader, When it reads a tile, Then it hears the row, column and letter', () => {
+    const t = (key: string, params?: Record<string, string | number> | string) =>
+      typeof params === 'object' ? `${key}:${params.row}/${params.col}/${params.letter}` : key;
+    board({ t });
+    expect(screen.getAllByRole('gridcell')[5].getAttribute('aria-label')).toBe('game.grid.cellLabel:2/2/E');
+  });
+
+  it('Given the large-letters setting, When the board renders, Then it is marked large', () => {
+    largeLetters.on = true;
+    const { container } = board();
+    expect(container.firstElementChild?.getAttribute('data-large')).toBe('true');
+  });
+});

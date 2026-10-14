@@ -10112,6 +10112,7 @@ const ru = {
     "journeyNow": "Сейчас",
     "journeyDone": "Готово",
     "journeyStep": "Шаг",
+    "journeyStepOf": "Шаг {n}/{total}",
     "journeyAllRequiredDone": "Задания на сегодня выполнены! Бонусные раунды — по желанию",
     "backToDailyHub": "К заданиям дня",
     "skipOptional": "Пропустить",

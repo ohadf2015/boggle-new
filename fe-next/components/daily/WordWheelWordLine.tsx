@@ -146,8 +146,8 @@ export default function WordWheelWordLine({
           aria-hidden
           dir={dir}
           className="absolute inset-0 flex items-center justify-center font-neo-display font-black uppercase text-[40px] sm:text-5xl tall:text-[52px] tracking-[0.06em] text-neo-red pointer-events-none [text-shadow:0_0_14px_rgba(255,59,48,0.55)]"
-          initial={{ x: 0, y: 0, opacity: 1, rotate: 0 }}
-          animate={reducedMotion ? { opacity: 0 } : { x: [0, -12, 10, -6, 0], y: [0, 0, 0, 4, 34], rotate: [0, -2, 2, 0, 6], opacity: [1, 1, 1, 0.9, 0] }}
+          initial={{ x: 0, y: 0, opacity: 1 }}
+          animate={reducedMotion ? { opacity: 0 } : { x: [0, -12, 10, -6, 0], y: [0, 0, 0, 4, 34], opacity: [1, 1, 1, 0.9, 0] }}
           transition={{ duration: reducedMotion ? 0.3 : 0.75, times: [0, 0.15, 0.3, 0.5, 1], ease: 'easeOut' }}
         >
           {rejected}
@@ -232,9 +232,9 @@ export default function WordWheelWordLine({
                 <m.span
                   data-testid="submit-pending"
                   aria-hidden
-                  className="w-5 h-5 rounded-full border-[3px] border-neo-black/25 border-t-neo-black"
-                  animate={reducedMotion ? undefined : { rotate: 360 }}
-                  transition={{ duration: 0.5, repeat: Infinity, ease: 'linear' }}
+                  className="w-3 h-3 rounded-full bg-neo-black"
+                  animate={reducedMotion ? undefined : { scale: [0.6, 1.1, 0.6], opacity: [0.45, 1, 0.45] }}
+                  transition={{ duration: 0.7, repeat: Infinity, ease: 'easeInOut' }}
                 />
               ) : (
                 <CornerDownLeft className="w-5 h-5" strokeWidth={3} aria-hidden />

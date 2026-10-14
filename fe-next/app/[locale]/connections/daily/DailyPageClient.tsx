@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useCallback, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import ConnectionsDailyChallenge from '@/components/connections/ConnectionsDailyChallenge';
@@ -35,15 +35,25 @@ export default function DailyPageClient({ locale }: Props): React.JSX.Element {
   const variant = dailyConnectionsVariant(todayUTC());
   const hasPyramids = getPyramidsForLocale(locale).length > 0;
   const hostPyramid = variant === 'pyramid' && hasPyramids;
+  // Once the run is terminal the results own the way on: "skip" would sit
+  // beside NextQuestCta, and the 5-riddle results carry their own back button
+  // (the pyramid end screen does not, so it keeps the chrome's back pill).
+  const [finished, setFinished] = useState(false);
+  const handleTerminal = useCallback(() => setFinished(true), []);
 
   return (
     <div data-testid="connections-daily-root" className="flex-1 flex flex-col min-h-0">
-      <DailyFlowChrome modeId="connections" inline />
+      <DailyFlowChrome
+        modeId="connections"
+        inline
+        skip={!finished}
+        backLink={!finished || hostPyramid}
+      />
       <Suspense fallback={<LoadingFallback />}>
         {hostPyramid ? (
-          <PyramidChallenge sharePath={`${locale}/connections/daily`} />
+          <PyramidChallenge sharePath={`${locale}/connections/daily`} onTerminal={handleTerminal} />
         ) : (
-          <ConnectionsDailyChallenge />
+          <ConnectionsDailyChallenge onTerminal={handleTerminal} />
         )}
       </Suspense>
     </div>

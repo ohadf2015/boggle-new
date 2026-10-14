@@ -4,11 +4,12 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useBoardSelection } from '@/components/board/useBoardSelection';
 import type { CellRef } from '@/components/board/selectionPath';
 import type { LetterGrid } from '@/types';
+import { useLargeLetters } from '@/contexts/AccessibilityContext';
 import { cellCentre, trailPath, CELL_UNIT } from './huntTrail';
 import type { HuntCell, HuntPhase, HuntVerdict } from './huntStage';
 import styles from './HuntBoard.module.css';
 
-type TFn = (key: string, fallback?: string) => string;
+type TFn = (key: string, fallbackOrParams?: string | Record<string, string | number>) => string;
 
 export interface HuntBoardProps {
   grid: LetterGrid;
@@ -72,6 +73,7 @@ export function HuntBoard({
 }: HuntBoardProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canHover = useCanHover();
+  const largeLetters = useLargeLetters();
   const [selectedCells, setSelectedCells] = useState<CellRef[]>([]);
   const [isClickSelecting, setIsClickSelecting] = useState(false);
 
@@ -107,9 +109,13 @@ export function HuntBoard({
   const rows = grid.length;
 
   const tipPos = tip ? cellCentre(tip) : null;
+  const boardSeed = grid.map((row) => row.join('')).join('|');
+  // Labels follow the board, not the selection; t() is stable for the round.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const cellLabels = useMemo(() => grid.map((row, r) => row.map((letter, c) => t('game.grid.cellLabel', { row: r + 1, col: c + 1, letter: String(letter) }))), [boardSeed]);
 
   return (
-    <div ref={wrapRef} className={styles.wrap} data-size={size} data-calm={calm ? 'true' : 'false'}>
+    <div ref={wrapRef} className={styles.wrap} data-size={size} data-calm={calm ? 'true' : 'false'} data-large={largeLetters ? 'true' : undefined}>
       <div
         role="grid"
         aria-label={t('wordHunt.survival.stage.boardLabel')}
@@ -131,7 +137,7 @@ export function HuntBoard({
               <div
                 key={`${r},${c}`}
                 role="gridcell"
-                aria-label={String(letter)}
+                aria-label={cellLabels[r]?.[c] ?? String(letter)}
                 aria-selected={idx !== undefined}
                 data-tile=""
                 data-row={r}

@@ -15,10 +15,13 @@ export interface HuntStageState {
 export type HuntStageEvent =
   | { type: 'live'; word: string }
   | { type: 'release'; word: string; path: HuntCell[]; seq: number }
-  | { type: 'feedback'; seq: number; verdict: HuntVerdict | null }
+  /** `word` is the word the verdict is about; feedback about no word (hints, tokens) never lands on the stage. */
+  | { type: 'feedback'; seq: number; verdict: HuntVerdict | null; word: string | null }
   | { type: 'expire' };
 
 export const VERDICT_HOLD_MS = 700;
+/** A rejection carries a reason (and usually a life cost): give it time to be read. */
+export const REJECT_HOLD_MS = 1600;
 export const PENDING_TIMEOUT_MS = 8000;
 
 export const initialHuntStage: HuntStageState = {
@@ -40,6 +43,10 @@ export function verdictFor(type: FeedbackType | null): HuntVerdict | null {
   return null;
 }
 
+export function verdictHoldMs(verdict: HuntVerdict | null): number {
+  return verdict === 'good' ? VERDICT_HOLD_MS : REJECT_HOLD_MS;
+}
+
 export function praiseKeyFor(length: number): string {
   if (length >= 7) return 'wordHunt.survival.stage.praiseLong';
   if (length >= 5) return 'wordHunt.survival.stage.praiseMid';
@@ -56,6 +63,8 @@ export function huntStageReducer(state: HuntStageState, event: HuntStageEvent): 
       return { phase: 'pending', word: event.word, path: event.path, verdict: null, releaseSeq: event.seq };
     case 'feedback':
       if (state.phase !== 'pending' || event.seq <= state.releaseSeq || !event.verdict) return state;
+      // A verdict for an earlier word that was still being checked must not land on this one.
+      if (!event.word || event.word.toUpperCase() !== state.word.toUpperCase()) return state;
       return { ...state, phase: 'verdict', verdict: event.verdict };
     case 'expire':
       return initialHuntStage;

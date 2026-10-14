@@ -136,11 +136,22 @@ describe('DailyWordHuntSurvival in the desktop game shell', () => {
       expect(screen.getAllByRole('progressbar').filter((el) => el.closest('[data-testid=survival-header]'))).toHaveLength(1);
       expect(screen.queryByTestId('hunt-life-row')).toBeNull();
     });
+
+    it('Given quick-play rivals on desktop, Then the standings show once, on the rail, not again in the header', () => {
+      renderHunt({ rivals: [{ username: 'Ada', score: 40 }], practice: true });
+      expect(within(screen.getByTestId('game-shell-left')).getByText('Ada')).toBeInTheDocument();
+      expect(screen.queryByTestId('survival-rank-indicator')).toBeNull();
+    });
   });
 
   it('given a phone, then the life bar keeps its own row under the clues', () => {
     renderHunt();
     expect(screen.queryByTestId('survival-header-center')).toBeNull();
     expect(within(screen.getByTestId('hunt-life-row')).getByRole('progressbar')).toBeInTheDocument();
+  });
+
+  it('Given quick-play rivals on a phone, Then the header keeps the live standing', () => {
+    renderHunt({ rivals: [{ username: 'Ada', score: 40 }], practice: true });
+    expect(screen.getByTestId('survival-rank-indicator')).toBeInTheDocument();
   });
 });

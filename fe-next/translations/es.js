@@ -9222,6 +9222,7 @@ const es = {
     "journeyNow": "Ahora",
     "journeyDone": "Hecho",
     "journeyStep": "Paso",
+    "journeyStepOf": "Paso {n}/{total}",
     "journeyAllRequiredDone": "¡Completaste las misiones de hoy! Las rondas extra son opcionales",
     "backToDailyHub": "Volver al reto diario",
     "skipOptional": "Saltar",

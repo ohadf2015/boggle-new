@@ -95,7 +95,7 @@ export function useSurvivalWordSubmission({
     const normalizedWord = normalizeWord(word, language);
     if (attempts.some(a => normalizeWord(a.word, language) === normalizedWord)) {
       playWordRejectedSound?.();
-      showToast('duplicate', t('wordHunt.alreadyGuessed', 'Already guessed!'));
+      showToast('duplicate', t('wordHunt.alreadyGuessed', 'Already guessed!'), word);
       return;
     }
 
@@ -123,6 +123,7 @@ export function useSurvivalWordSubmission({
     const won = isTargetWordFound(feedback);
     if (won) {
       feedbackTimeout.clear();
+      showToast('target-found', t('wordHunt.mp.youFoundIt', 'You Found It!'), word);
       handleGameOverRef.current?.(true, newAttempts);
       return;
     }
@@ -170,39 +171,39 @@ export function useSurvivalWordSubmission({
   const handleWordDiscovery = useCallback(async (word: string) => {
     if (word.length < MIN_DISCOVERY_WORD_LENGTH) {
       playWordRejectedSound?.();
-      showToast('too-short', t('wordHunt.feedback.tooShort') || `Minimum ${MIN_DISCOVERY_WORD_LENGTH} letters`);
+      showToast('too-short', t('wordHunt.feedback.tooShort') || `Minimum ${MIN_DISCOVERY_WORD_LENGTH} letters`, word);
       return;
     }
 
     if (word.length > MAX_DISCOVERY_WORD_LENGTH) {
       playWordRejectedSound?.();
-      showToast('too-long', t('wordHunt.feedback.tooLong') || `Maximum ${MAX_DISCOVERY_WORD_LENGTH} letters`);
+      showToast('too-long', t('wordHunt.feedback.tooLong') || `Maximum ${MAX_DISCOVERY_WORD_LENGTH} letters`, word);
       return;
     }
 
     if (discoveredWords.some(w => w.word === word)) {
       playWordRejectedSound?.();
-      showToast('duplicate', t('wordHunt.feedback.duplicate', 'Already found!'));
+      showToast('duplicate', t('wordHunt.feedback.duplicate', 'Already found!'), word);
       return;
     }
 
     if (!isWordOnBoard(word, grid, language)) {
       playWordRejectedSound?.();
       dispatch({ type: 'ADJUST_LIFE', payload: { delta: -INVALID_WORD_PENALTY } });
-      showToast('not-on-board', t('wordHunt.feedback.notOnBoardPenalty') || `Not on board -${INVALID_WORD_PENALTY}`);
+      showToast('not-on-board', t('wordHunt.feedback.notOnBoardPenalty') || `Not on board -${INVALID_WORD_PENALTY}`, word);
       recordNotOnBoard(word, language, 'daily_word_hunt');
       return;
     }
 
     const verdict = await validateWordInDictionary(word);
     if (verdict === 'unknown') {
-      showToast('duplicate', t('playerView.wordCheckUnavailable', "Couldn't check that word. Try again"));
+      showToast('duplicate', t('playerView.wordCheckUnavailable', "Couldn't check that word. Try again"), word);
       return;
     }
     if (verdict === 'invalid') {
       playWordRejectedSound?.();
       dispatch({ type: 'ADJUST_LIFE', payload: { delta: -NOT_IN_DICTIONARY_PENALTY } });
-      showToast('not-in-dictionary', t('wordHunt.feedback.notInDictionary') || `Not a word -${NOT_IN_DICTIONARY_PENALTY}`);
+      showToast('not-in-dictionary', t('wordHunt.feedback.notInDictionary') || `Not a word -${NOT_IN_DICTIONARY_PENALTY}`, word);
       recordNotInDictionary(word, language, 'daily_word_hunt');
       return;
     }
@@ -251,7 +252,7 @@ export function useSurvivalWordSubmission({
       handleTargetAttemptRef.current?.(displayWord, targetWord.toUpperCase());
     } else if (normalizedWord.length === normalizedTarget.length) {
       if (attempts.some(a => normalizeWord(a.word, language) === normalizedWord)) {
-        showToast('duplicate', t('wordHunt.alreadyGuessed', 'Already guessed!'));
+        showToast('duplicate', t('wordHunt.alreadyGuessed', 'Already guessed!'), displayWord);
         return;
       }
 
@@ -260,7 +261,7 @@ export function useSurvivalWordSubmission({
         handleTargetAttemptRef.current?.(displayWord, targetWord.toUpperCase());
       } else {
         dispatch({ type: 'ADJUST_LIFE', payload: { delta: -INVALID_WORD_PENALTY } });
-        showToast('not-on-board', t('wordHunt.feedback.notFormablePenalty') || `Not on board -${INVALID_WORD_PENALTY}`);
+        showToast('not-on-board', t('wordHunt.feedback.notFormablePenalty') || `Not on board -${INVALID_WORD_PENALTY}`, displayWord);
         recordNotOnBoard(displayWord, language, 'daily_word_hunt');
       }
     } else {

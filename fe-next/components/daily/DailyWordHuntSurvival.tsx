@@ -3,7 +3,7 @@
 import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { DiscoveredWordsList } from './DiscoveredWordsList';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 
 const WordHuntEffectsCanvas = dynamic(
   () => import('./WordHuntEffectsCanvas'),
@@ -197,6 +197,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const { stage, live: onStageLive, release: onStageRelease } = useHuntStage({
     feedbackSeq: state.feedbackSeq,
     feedbackType: state.feedbackType,
+    feedbackWord: state.feedbackWord,
   });
 
   const { handleWordSubmit, handleWordChange } = actions;
@@ -392,7 +393,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {coach}
 
       <SurvivalHeader
-        rivals={rivals}
+        // On desktop the start rail already races the rivals.
+        rivals={inShell ? undefined : rivals}
         selfUsername={t('mp.rivals.you')}
         liveScore={state.liveScore}
         lastScoreIncrement={state.lastScoreIncrement}
@@ -417,8 +419,43 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           isClueGaining={state.isClueGaining}
           skipAnimations={skipAnimations}
           gameDir={actions.gameDir}
+          matchesTargetLength={
+            !state.isGameOver
+            && (keyboardInput.typedWord || state.formedWord).length === targetWord.length
+          }
           t={t}
         />
+      </div>
+
+      {/* The last word's result stays readable here; the board stage only flashes it. */}
+      <div data-testid="hunt-feedback-row" className="shrink-0 h-6 flex items-center justify-center">
+        <AnimatePresence mode="wait">
+          {state.feedbackType && state.feedbackMessage && (
+            <m.div
+              key={state.feedbackSeq}
+              data-testid="hunt-feedback-pill"
+              data-type={state.feedbackType}
+              role="status"
+              initial={skipAnimations ? false : { opacity: 0, y: -6, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.12 } }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className={cn(
+                'max-w-full truncate text-xs font-bold px-2.5 py-0.5 rounded-full',
+                state.feedbackType === 'valid-word' || state.feedbackType === 'target-found'
+                  ? 'bg-neo-lime/15 text-neo-lime'
+                  : state.feedbackType === 'duplicate' || state.feedbackType === 'too-short' || state.feedbackType === 'too-long'
+                    ? 'bg-neo-orange/15 text-neo-orange'
+                    : 'bg-neo-red/15 text-neo-red',
+              )}
+            >
+              {state.feedbackWord && (
+                <span className="font-black uppercase tracking-wider me-1">{state.feedbackWord}</span>
+              )}
+              {state.feedbackMessage}
+            </m.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <HuntHintSlots
