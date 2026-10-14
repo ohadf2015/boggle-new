@@ -1,11 +1,16 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProGate } from '../ProGate';
 
 const mockUseTeacherPro = vi.fn();
 vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => mockUseTeacherPro(),
+}));
+
+const mockStartCheckout = vi.fn();
+vi.mock('@/hooks/useTeacherProCheckout', () => ({
+  useTeacherProCheckout: () => ({ pending: false, start: mockStartCheckout }),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -26,6 +31,7 @@ vi.mock('@/utils/growthTracking', () => ({
 describe('ProGate', () => {
   beforeEach(() => {
     mockTrackGrowthEvent.mockClear();
+    mockStartCheckout.mockClear();
   });
 
   it('renders the paid surface for a Pro teacher', () => {
@@ -37,6 +43,7 @@ describe('ProGate', () => {
     );
     expect(screen.getByText('paid surface')).toBeInTheDocument();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('pro-gate-upgrade-analytics')).not.toBeInTheDocument();
   });
 
   it('replaces the surface with an upsell for a free teacher', () => {
@@ -48,7 +55,8 @@ describe('ProGate', () => {
     );
     expect(screen.queryByText('paid surface')).not.toBeInTheDocument();
     expect(screen.getByText('teacher.proGate.analytics.title')).toBeInTheDocument();
-    expect(screen.getByRole('link')).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(screen.getByTestId('pro-gate-upgrade-analytics')).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('shows neither the surface nor the upsell while the entitlement is unresolved', () => {
@@ -117,9 +125,23 @@ describe('ProGate', () => {
       </ProGate>,
     );
 
-    const link = screen.getByRole('link');
-    expect(link).toBeInTheDocument();
+    const cta = screen.getByTestId('pro-gate-upgrade-analytics');
+    expect(cta).toBeInTheDocument();
     // After the fix, this will pass because price="$9" will be passed to t()
-    expect(link.textContent).toMatch(/\$\d+\/month/);
+    expect(cta.textContent).toMatch(/\$\d+\/month/);
+  });
+
+  it('POSTs Polar checkout via the shared till when a free teacher taps Upgrade', () => {
+    mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false });
+    render(
+      <ProGate feature="reports">
+        <div>paid surface</div>
+      </ProGate>,
+    );
+    fireEvent.click(screen.getByTestId('pro-gate-upgrade-reports'));
+    expect(mockStartCheckout).toHaveBeenCalledTimes(1);
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', {
+      cta: 'pro_gate_reports',
+    });
   });
 });

@@ -57,7 +57,12 @@ function captureStep(event: GrowthEvent, props: Record<string, unknown>): void {
 export type ProUpgradeSource =
   | 'pricing_page'
   | 'dashboard_trial_lifecycle'
-  | 'dashboard_trial_ended';
+  | 'dashboard_trial_ended'
+  | 'pro_gate_analytics'
+  | 'pro_gate_reports'
+  | 'pro_gate_pressureDials'
+  | 'pro_gate_mastery'
+  | 'pro_gate_missedPractice';
 
 export type TrialCtaSource = 'dashboard_trial_offer' | 'upgrade_page' | 'activation_checklist';
 
@@ -73,6 +78,24 @@ export function trackEduProUpgradeClicked(args: { source: ProUpgradeSource }): v
   captureStep('edu_pro_upgrade_clicked', { source: args.source });
   // Canonical conversion-funnel name (trial_start → checkout_open → checkout_complete → paid).
   safeCapture('checkout_open', { source: args.source, product: 'teacher_pro' });
+}
+
+/**
+ * Mid-session ProGate impression. Distinct from `iap_viewed` (Growth Radar)
+ * so HQ can count "free teacher hit a locked feature" without mixing in
+ * class-cap / trial banners.
+ */
+export function trackProGateViewed(args: { feature: string }): void {
+  safeCapture('pro_gate_viewed', { feature: args.feature, product: 'teacher_pro' });
+}
+
+/**
+ * Mid-session ProGate Upgrade tap, immediately before Polar checkout POST.
+ * `edu_pro_upgrade_clicked` still fires from useTeacherProCheckout — this
+ * name is the feature-scoped pair to `pro_gate_viewed`.
+ */
+export function trackProUpgradeClicked(args: { feature: string }): void {
+  safeCapture('pro_upgrade_clicked', { feature: args.feature, product: 'teacher_pro' });
 }
 
 /** Persistent HQ trial strip — impression. Not mirrored: name is HQ-only. */
