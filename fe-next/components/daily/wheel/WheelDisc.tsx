@@ -45,9 +45,14 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
   onPointerDown, onPointerMove, onPointerUp, onPress, onHoldStart, onHoldEnd, holdActiveIndex,
   tileSkin, fx, release = null, checking = false, reducedMotion, onPressedChange, large = false, children,
 }) => {
-  const [haltedSpin, setHaltedSpin] = useState<number | null>(null);
+  const [settledFx, setSettledFx] = useState<number | null>(null);
   const [pressed, setPressed] = useState<number | null>(null);
-  const spinning = fx?.kind === 'good' && !reducedMotion && fx.id !== haltedSpin;
+  // An accepted word lights its letters where they sit; the wheel itself never moves.
+  const celebrating = fx?.kind === 'good' && fx.id !== settledFx ? fx : null;
+  const cheerOrder = (index: number) => {
+    const order = celebrating ? celebrating.indices.indexOf(index) : -1;
+    return order === -1 ? null : order;
+  };
   const used = new Set(builtIndices);
   const livePress = pressed !== null && !used.has(pressed) ? pressed : null;
   const pressedLetter = livePress === null ? null : livePress === -1 ? centerLetter : outerLetters[livePress] ?? null;
@@ -79,7 +84,7 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
         'ww-orbit relative aspect-square [container-type:size] max-w-[min(100cqb,100cqi,max(176px,calc(100cqb-176px)))] max-h-[min(100cqb,100cqi,max(176px,calc(100cqb-176px)))] short:max-w-[min(100cqb,100cqi,max(132px,min(calc(100cqb-124px),46svh)))] short:max-h-[min(100cqb,100cqi,max(132px,min(calc(100cqb-124px),46svh)))] shrink-0 touch-none select-none',
       )}
       onPointerDown={(e) => {
-        if (spinning && fx) setHaltedSpin(fx.id);
+        if (celebrating) setSettledFx(celebrating.id);
         onPointerDown(e);
       }}
       onPointerMove={onPointerMove}
@@ -122,19 +127,13 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
           <circle cx={50} cy={50} r={36.6} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={0.6} />
           <circle cx={50} cy={50} r={17} fill="rgba(0,0,0,0.18)" stroke="rgba(0,255,255,0.12)" strokeWidth={0.5} />
         </svg>
-        <div className="absolute inset-[3%] motion-safe:animate-[spin_48s_linear_infinite]">
+        <div className="absolute inset-[3%]">
           <svg viewBox="0 0 100 100" className="w-full h-full">
             <circle cx={50} cy={50} r={48.5} fill="none" stroke="rgba(191,255,0,0.45)" strokeWidth={0.9} strokeDasharray="0.1 3.2" strokeLinecap="round" />
           </svg>
         </div>
       </m.div>
-      <div
-        data-testid="wheel-spin"
-        data-spin={spinning ? 'true' : 'false'}
-        data-spin-phase={fx ? fx.id % 2 : 0}
-        className="ww-spin absolute inset-0"
-        style={{ zIndex: 2 }}
-      >
+      <div data-testid="wheel-letters" className="absolute inset-0" style={{ zIndex: 2 }}>
         <WheelTrail
           indices={builtIndices}
           outerCount={outerLetters.length}
@@ -154,6 +153,7 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
           onHoldStart={holdStart}
           onHoldEnd={onHoldEnd}
           showHoldRing={holdActiveIndex === -1}
+          cheerOrder={cheerOrder(-1)}
           tileSkin={tileSkin}
           reducedMotion={reducedMotion}
         />
@@ -169,6 +169,7 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
             onHoldStart={holdStart}
             onHoldEnd={onHoldEnd}
             showHoldRing={holdActiveIndex === i}
+            cheerOrder={cheerOrder(i)}
             tileSkin={tileSkin}
             reducedMotion={reducedMotion}
           />

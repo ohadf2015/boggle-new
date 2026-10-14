@@ -133,24 +133,36 @@ describe('WordWheelGame release reaction', () => {
     await act(async () => { verdict.resolve(false); });
   });
 
-  it('given an accepted word, then the letter ring spins once around the hub', async () => {
+  it('given an accepted word, then the wheel stays put and the spelled letters light up in place, one after another', async () => {
     mountGame(Promise.resolve(true));
-    expect(screen.getByTestId('wheel-spin').dataset.spin).toBe('false');
     ['C', 'A', 'B'].forEach(tap);
     await act(async () => { fireEvent.click(screen.getByTestId('inline-submit-chip')); });
-    expect(screen.getByTestId('wheel-spin').dataset.spin).toBe('true');
+
+    const ring = screen.getByTestId('wheel-letters');
+    expect(ring.dataset.spin).toBeUndefined();
+    expect(ring.className).not.toMatch(/spin/);
+    const lit = Array.from(document.querySelectorAll<HTMLElement>('[data-wheel-celebrate="true"]'));
+    const bySpelling = lit.sort((x, y) => Number(x.style.getPropertyValue('--ww-order')) - Number(y.style.getPropertyValue('--ww-order')));
+    expect(bySpelling.map((el) => el.dataset.wheelLetter)).toEqual(['C', 'A', 'B']);
+    expect(bySpelling.map((el) => el.style.getPropertyValue('--ww-order'))).toEqual(['0', '1', '2']);
   });
 
-  it('given a spin in flight, when the next swipe starts, then the letters snap home under the finger', async () => {
+  it('given letters still celebrating, when the next swipe starts, then the glow clears under the finger', async () => {
     mountGame(Promise.resolve(true));
     ['C', 'A', 'B'].forEach(tap);
     await act(async () => { fireEvent.click(screen.getByTestId('inline-submit-chip')); });
-    expect(screen.getByTestId('wheel-spin').dataset.spin).toBe('true');
+    expect(document.querySelectorAll('[data-wheel-celebrate="true"]')).toHaveLength(3);
     fireEvent.pointerDown(screen.getByTestId('wheel-orbit'), { clientX: 0, clientY: 0 });
-    expect(screen.getByTestId('wheel-spin').dataset.spin).toBe('false');
+    expect(document.querySelectorAll('[data-wheel-celebrate="true"]')).toHaveLength(0);
   });
 
-  it('given a rejected word, then the ring does not spin and the release gives way to the red reaction', async () => {
+  it('given the wheel at rest, then no decorative layer rotates', () => {
+    mountGame(Promise.resolve(true));
+    const face = screen.getByTestId('wheel-face');
+    expect(face.querySelector('[class*="animate-[spin"]')).toBeNull();
+  });
+
+  it('given a rejected word, then no letter celebrates and the release gives way to the red reaction', async () => {
     const verdict = deferred();
     mountGame(verdict.promise);
     const orbit = drag(['A', 'C', 'B']);
@@ -158,6 +170,6 @@ describe('WordWheelGame release reaction', () => {
     await act(async () => { verdict.resolve(false); });
     expect(screen.queryByTestId('wheel-release')).toBeNull();
     expect(screen.getByTestId('wheel-disc-fx').dataset.kind).toBe('bad');
-    expect(screen.getByTestId('wheel-spin').dataset.spin).toBe('false');
+    expect(document.querySelectorAll('[data-wheel-celebrate="true"]')).toHaveLength(0);
   });
 });
