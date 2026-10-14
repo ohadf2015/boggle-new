@@ -119,6 +119,10 @@ export const FAQ_ACCENTS = [
 
 export const FAQS = [
   {
+    q: '¿Dónde jugar scrabble online español multijugador gratis?',
+    a: 'En LexiClash. Abre el navegador, pulsa Crear sala y comparte el enlace: hasta 50 jugadores en la misma cuadrícula, en tiempo real, sin turnos ni app. A diferencia de Minijuegos o JuegoSpot (solo contra la IA), aquí el multijugador es con amigos de verdad. Diccionario español medido, 100% gratis.',
+  },
+  {
     q: '¿Cómo puedo jugar al Scrabble online en español, gratis y con varios jugadores?',
     a: 'En LexiClash haces clic en "Crear sala" en la página multijugador, compartes el enlace con tus amigos y todos compiten en tiempo real al estilo Scrabble. LexiClash es una alternativa independiente al Scrabble — sin registro, sin descargas, 100% gratis. Funciona en móvil y ordenador.',
   },

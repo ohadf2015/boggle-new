@@ -284,7 +284,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
   es: {
     title: 'LexiClash — Juego de Palabras Multijugador Gratis Online',
     description:
-      'LexiClash es un juego de palabras multijugador gratuito en línea que combina la búsqueda de palabras en cuadrícula con jugabilidad competitiva en tiempo real. Encuentra palabras en un tablero compartido, compite contra amigos o desconocidos y sube en la tabla de clasificación — todo en tu navegador sin descarga ni registro.',
+      'LexiClash es un juego de palabras multijugador gratuito en línea — scrabble online español multijugador en tiempo real. Encuentra palabras en un tablero compartido, compite contra amigos o desconocidos y sube en la tabla de clasificación — todo en tu navegador sin descarga ni registro.',
     features: [
       'Batallas de palabras en tiempo real — de 2 a 20+ jugadores en el mismo tablero simultáneamente',
       'Seis modos de juego: Clásico, Caza de Palabras, Blast, Rueda de Palabras, Aventura y Entrenamiento Cerebral',
@@ -294,6 +294,11 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       'Sin descarga — juega directamente en cualquier navegador moderno',
     ],
     faq: [
+      {
+        question: '¿Puedo jugar scrabble online español multijugador en LexiClash?',
+        answer:
+          'Sí. Crea una sala desde la página de Scrabble online español multijugador, comparte el enlace y hasta 50 jugadores compiten en tiempo real en español — sin app ni registro.',
+      },
       {
         question: '¿Qué es LexiClash y cómo se juega?',
         answer:

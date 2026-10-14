@@ -5,6 +5,7 @@ import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { HeroAnimated } from './components/HeroAnimated';
+import { MultijugadorIntent } from './components/MultijugadorIntent';
 import { FeatureGrid } from './components/FeatureGrid';
 import { StepsSection } from './components/StepsSection';
 import { ModesShowcase } from './components/ModesShowcase';
@@ -29,12 +30,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/es/juego-de-palabras-multijugador`;
 
   return {
-    title: 'Scrabble Online en Español Gratis — Sin App | LexiClash',
-    description: 'Juega Scrabble en español online gratis — sin app, sin registro. Hasta 50 jugadores en tiempo real. Empieza ahora →',
+    title: 'Scrabble Online Español Multijugador Gratis | LexiClash',
+    description: 'Scrabble online español multijugador gratis: crea una sala, hasta 50 jugadores en tiempo real. Sin app ni registro. Empieza ahora →',
     keywords: 'scrabble online español multijugador, scrabble online gratis, scrabble juego online, scrabble español online, jugar scrabble en español online gratis, scrabble en español online gratis, scrabble online español, cruzaletras online, apalabrados online gratis, scrabble en linea, scrabble en línea español, jugar scrabble online en español, alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, scrabble online en español multijugador, jugar scrabble gratis multijugador, juegos de palabras online multijugador, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real, juegos de letras online',
     openGraph: {
-      title: 'Scrabble Online en Español Gratis — Sin App | LexiClash',
-      description: 'Juega Scrabble en español online gratis — sin app, sin registro. Hasta 50 jugadores en tiempo real. ¡Sin descarga, empieza ya! →',
+      title: 'Scrabble Online Español Multijugador Gratis | LexiClash',
+      description: 'Scrabble online español multijugador gratis: crea una sala, hasta 50 jugadores en tiempo real. Sin app ni registro. Empieza ahora →',
       locale: 'es_ES',
       type: 'website',
       url: pageUrl,
@@ -49,8 +50,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Scrabble Online en Español Gratis — Sin App | LexiClash',
-      description: 'Juega Scrabble en español online gratis — sin app, sin registro. Hasta 50 jugadores en tiempo real. ¡Sin descarga, empieza ya! →',
+      title: 'Scrabble Online Español Multijugador Gratis | LexiClash',
+      description: 'Scrabble online español multijugador gratis: crea una sala, hasta 50 jugadores en tiempo real. Sin app ni registro. Empieza ahora →',
       images: [`${BASE_URL}/og-image-es-multiplayer.webp`],
     },
     alternates: {
@@ -152,6 +153,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <TopBackLink className="mb-4" />
         <HeroAnimated locale={locale} />
+        <MultijugadorIntent locale={locale} />
         <FeatureGrid />
         <StepsSection />
         <ModesShowcase />

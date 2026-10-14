@@ -44,7 +44,7 @@ describe('Spanish MP landing — composition', () => {
   it('HeroAnimated renders title, all hero tiles, both CTAs and stats', () => {
     render(<HeroAnimated locale="es" />);
     const heading = screen.getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent('Juega Scrabble online gratis en español');
+    expect(heading).toHaveTextContent('Juega Scrabble online español multijugador');
     HERO_TILES.forEach((tile, i) => {
       // Each tile letter shows up — match by exact text in a span
       const matches = screen.getAllByText(tile.ch);

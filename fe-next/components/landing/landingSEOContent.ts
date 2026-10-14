@@ -591,7 +591,7 @@ const es: LandingSEOContent = {
   whatIsContent:
     'LexiClash es un juego de palabras multijugador gratuito y de ritmo acelerado que puedes jugar directamente en tu navegador. Compite con amigos en batallas de palabras en tiempo real sobre una cuadrícula de letras compartida — encuentra palabras, construye combos y escala en la clasificación. Es como Boggle se encuentra con Wordle, pero multijugador. Sin descargas, sin registro. Disponible en español, inglés, hebreo, sueco, japonés y ruso.',
   whatIsShort:
-    'Batallas de palabras multijugador gratis en tu navegador. Encuentra palabras, construye combos, aplasta a tus amigos. Sin descargas, sin registro.',
+    'Scrabble online español multijugador en el navegador: misma cuadrícula, tiempo real, sin descargas ni registro.',
   featuresTitle: 'Por qué los jugadores adoran LexiClash',
   gameModes: [
     {

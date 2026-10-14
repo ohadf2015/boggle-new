@@ -51,7 +51,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
                 className="absolute inset-x-0 -bottom-1 h-2 -skew-x-6 bg-neo-pink/40"
               />
             </span>{' '}
-            <span className="block text-neo-white">gratis en español</span>
+            <span className="block text-neo-white">español multijugador</span>
           </h1>
           <div className="mt-2 flex flex-wrap items-end gap-2 sm:gap-3" aria-hidden>
             {HERO_TILES.map((tile, i) => (
@@ -71,7 +71,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
           </div>
 
           <p className="mb-8 max-w-2xl font-neo-body text-base leading-relaxed text-neo-white sm:text-lg">
-            Juega <strong className="text-neo-white">Scrabble online gratis en español</strong>: crea una sala, comparte el enlace y compite en tiempo real. Más de {ES_DICT_FLOOR} palabras, sin descargas, sin registro, sin esperas.
+            Juega <strong className="text-neo-white">scrabble online español multijugador</strong>: crea una sala, comparte el enlace y compite en tiempo real. Más de {ES_DICT_FLOOR} palabras, sin descargas, sin registro, sin esperas.
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
@@ -105,7 +105,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
           <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-gradient-to-br from-neo-navy-light to-neo-navy shadow-hard-xl">
             <Image
               src="/es-mp-hero-mascots.webp"
-              alt="Dos mascotas de LexiClash compitiendo en Scrabble online gratis en español"
+              alt="Dos mascotas de LexiClash en scrabble online español multijugador"
               width={760}
               height={760}
               priority

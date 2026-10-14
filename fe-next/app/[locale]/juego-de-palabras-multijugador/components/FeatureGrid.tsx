@@ -11,7 +11,7 @@ export function FeatureGrid() {
     <section className="mb-14">
       <div className="mb-6 flex items-end justify-between gap-4">
         <h2 className="font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
-          Jugar Scrabble Online en Español<span className="text-neo-pink"> — ¿Por qué LexiClash?</span>
+          Jugar Scrabble Online Español Multijugador<span className="text-neo-pink"> — ¿Por qué LexiClash?</span>
         </h2>
         <div
           aria-hidden
