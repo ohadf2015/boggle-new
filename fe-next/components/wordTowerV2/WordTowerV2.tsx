@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { Language } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,6 +24,7 @@ import { V2Celebrations } from './V2Celebrations';
 import { V2Hud } from './V2Hud';
 import { V2Dock } from './V2Dock';
 import { V2Results } from './V2Results';
+import { V2OverBar } from './V2OverBar';
 import { RevengeHome } from './rivals/RevengeHome';
 import { RivalsScreen } from './rivals/RivalsScreen';
 import { towerBlocksFrom } from './rewards/useRunPayout';
@@ -819,30 +819,14 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
       {/* Closing the results card shows the fallen tower — but it must never be
           a dead end, so the three ways on stay pinned above the dock. */}
       {resultsDismissed && phase === 'over' && !smashing && !district ? (
-        <div className="absolute inset-x-0 bottom-[calc(var(--wt2-dock,17rem)+0.75rem)] z-40 mx-auto flex w-fit items-center gap-2 px-3">
-          <button
-            type="button"
-            onClick={() => setResultsDismissed(false)}
-            className="rounded-neo border-neo border-black bg-neo-cream px-3 py-1.5 font-neo-display text-sm font-bold text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
-          >
-            {t('wordTowerV2.results.badges')}
-          </button>
-          <button
-            type="button"
-            onClick={restartRun}
-            className="rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-1.5 font-neo-display text-base font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
-          >
-            {t('common.playAgain')}
-          </button>
-          <button
-            type="button"
-            onClick={exitFlow.goHome}
-            aria-label={t('wordTowerV2.results.home')}
-            className="flex h-9 w-9 items-center justify-center rounded-neo border-neo border-black bg-neo-navy text-neo-cream shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
-          >
-            <Home className="h-4 w-4" aria-hidden />
-          </button>
-        </div>
+        <V2OverBar
+          t={t}
+          daily={daily}
+          language={language}
+          onBadges={() => setResultsDismissed(false)}
+          onRestart={restartRun}
+          onHome={exitFlow.goHome}
+        />
       ) : null}
 
       {rivalsOpen && phase !== 'over' ? (

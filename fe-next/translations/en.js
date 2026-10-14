@@ -8467,6 +8467,7 @@ const en = {
     "journeyNow": "Now",
     "journeyDone": "Done",
     "journeyStep": "Step",
+    "journeyStepOf": "Step {n}/{total}",
     "journeyAllRequiredDone": "You've cleared today's quests! Bonus rounds are optional",
     "backToDailyHub": "Back to daily",
     "skipOptional": "Skip",

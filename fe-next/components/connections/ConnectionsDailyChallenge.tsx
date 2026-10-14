@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import Link from 'next/link';
 import { m } from 'framer-motion';
 import { Pyramid as PyramidIcon, Heart, ChevronRight } from 'lucide-react';
@@ -39,6 +39,8 @@ import {
   trackDailyShared,
 } from '@/lib/connections/dailyTelemetry';
 import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
+import { saveDailyResult } from '@/lib/connections/dailyResultStore';
+import { useStoredDailyResult } from './useStoredDailyResult';
 import ConnectionsProgressTrack from './ConnectionsProgressTrack';
 import PuzzleCard from './PuzzleCard';
 import ConnectionsDailyResults from './ConnectionsDailyResults';
@@ -78,20 +80,152 @@ interface Results {
   rows: LeaderboardRow[];
 }
 
+/** Today's finished 5-riddle run, as persisted for a same-day revisit. */
+interface StoredRegularResult {
+  kind: 'regular';
+  score: number;
+  solvedCount: number;
+  outcomes: BridgeOutcome[];
+  streak: number;
+  rank: number | null;
+}
+
+interface DailyChallengeProps {
+  /** Told once the run is terminal (live finish OR a restored revisit) so the host can drop in-game chrome. */
+  onTerminal?: () => void;
+}
+
 /**
  * Daily Challenge — everyone plays the same deterministic 5-puzzle set for the
  * UTC day, then submits to a shared leaderboard. Reuses the tested engine and
  * PuzzleCard (on-screen keyboard); the daily set never consults the live ban
  * list so all players' games are comparable.
+ *
+ * A run finished today is restored straight onto its results — revisiting used
+ * to restart the chain from scratch (and re-submit a second score).
  */
-export default function ConnectionsDailyChallenge() {
+export default function ConnectionsDailyChallenge({ onTerminal }: DailyChallengeProps = {}) {
+  const { language } = useLanguage();
+  const today = useRef(todayUTC()).current;
+  const stored = useStoredDailyResult<StoredRegularResult>(today, language, 'regular');
+  if (!stored.checked) return null;
+  if (stored.value) return <RestoredDailyResults result={stored.value} today={today} onTerminal={onTerminal} />;
+  return <DailyRun today={today} onTerminal={onTerminal} />;
+}
+
+function buildShareText(
+  t: (key: string) => string,
+  today: string,
+  outcomes: BridgeOutcome[],
+  streak: number,
+  rank: number | null,
+): string {
+  const url = typeof window !== 'undefined' ? `${window.location.origin}/connections/daily` : undefined;
+  return buildDailyBridgeGrid({
+    title: t('connections.title'),
+    dateISO: today,
+    outcomes,
+    streak,
+    rank,
+    callout: t(`connections.daily.shareCallout.${gridCallout(outcomes)}`),
+    url,
+  });
+}
+
+/**
+ * Pyramid is the deeper mode — offered as a quiet secondary link under the
+ * results. As a full card it competed with NextQuestCta, the one primary
+ * "what now" on this screen.
+ */
+function PyramidLink() {
+  const { t, language } = useLanguage();
+  if (getPyramidsForLocale(language).length === 0) return null;
+  return (
+    <div className="mx-auto w-full max-w-md px-4 pb-6 text-center">
+      <Link
+        href={`/${language}/connections/pyramid`}
+        data-testid="pyramid-cta"
+        className="inline-flex items-center gap-1 font-neo-body text-xs font-bold text-neo-purple underline-offset-2 hover:underline"
+      >
+        <PyramidIcon className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
+        {t('connections.pyramid.cta')}
+        <DirectionalIcon icon={ChevronRight} className="h-3.5 w-3.5" />
+      </Link>
+    </div>
+  );
+}
+
+function RestoredDailyResults({
+  result,
+  today,
+  onTerminal,
+}: {
+  result: StoredRegularResult;
+  today: string;
+  onTerminal?: () => void;
+}) {
+  const { t, language } = useLanguage();
+  const { user } = useAuth();
+  const [puzzles] = useState(() => dailyPuzzleSet(today, language));
+  const [board, setBoard] = useState<{ loading: boolean; rank: number | null; totalPlayers: number; rows: LeaderboardRow[] }>({
+    loading: true,
+    rank: result.rank,
+    totalPlayers: 0,
+    rows: [],
+  });
+
+  useLayoutEffect(() => {
+    onTerminal?.();
+    // Once per mount — the host only needs the edge.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const guestFingerprint = user ? undefined : getGuestFingerprint();
+      const lb = await fetchDailyLeaderboard(today, { guestFingerprint, limit: 50 });
+      if (cancelled) return;
+      setBoard({
+        loading: false,
+        rank: lb?.ownRank ?? result.rank,
+        totalPlayers: lb?.totalPlayers ?? 0,
+        rows: lb?.leaderboard ?? [],
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [today, user, result.rank]);
+
+  return (
+    <>
+      <ConnectionsDailyResults
+        score={result.score}
+        solvedCount={result.solvedCount}
+        total={puzzles.length}
+        streak={result.streak}
+        rank={board.rank}
+        totalPlayers={board.totalPlayers}
+        outcomes={result.outcomes}
+        puzzles={puzzles}
+        leaderboardRows={board.rows}
+        isLoading={board.loading}
+        shareText={buildShareText(t, today, result.outcomes, result.streak, board.rank)}
+        dateISO={today}
+      />
+      <PyramidLink />
+    </>
+  );
+}
+
+function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => void }) {
   const { t, language } = useLanguage();
   const { user, profile, isAdmin } = useAuth();
   const prefersReducedMotion = useReducedMotion();
   const { haptic, customHaptic } = useHapticFeedback();
   const sfx = useSoundEffects();
 
-  const today = useRef(todayUTC()).current;
   const [state, dispatch] = useReducer(reducer, language, (lang) =>
     initGameState(dailyPuzzleSet(today, lang), { attemptsPerPuzzle: DAILY_ATTEMPTS_PER_PUZZLE }),
   );
@@ -184,6 +318,20 @@ export default function ConnectionsDailyChallenge() {
     prevWrongAttemptsRef.current = state.wrongAttempts;
   }, [state.status, state.currentIndex, state.hintRevealed, state.wrongAttempts, state.puzzles, language, sfx, haptic, customHaptic]);
 
+  // Spoiler-free "story of the chain" — shared by the on-card recap + share text.
+  const collectOutcomes = useCallback((): BridgeOutcome[] =>
+    Array.from({ length: total }, (_, i) =>
+      outcomesRef.current.get(i) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
+    ), [total]);
+
+  // Tell the host before paint so its in-game chrome (skip/back) never
+  // lingers beside the results' own controls.
+  const onTerminalRef = useRef(onTerminal);
+  onTerminalRef.current = onTerminal;
+  useLayoutEffect(() => {
+    if (isTerminal) onTerminalRef.current?.();
+  }, [isTerminal]);
+
   // On finish: submit the result (once) and load the leaderboard.
   useEffect(() => {
     if (!isTerminal || submittedRef.current) return;
@@ -196,6 +344,18 @@ export default function ConnectionsDailyChallenge() {
 
     const timeTakenSeconds = startRef.current ? Math.max(0, Math.floor((Date.now() - startRef.current) / 1000)) : 0;
     const puzzlesSolved = solvedRef.current.size;
+    // Persist the terminal run so a same-day revisit opens on these results.
+    const finalOutcomes = collectOutcomes();
+    const persist = (streak: number, rank: number | null) =>
+      saveDailyResult(today, language, {
+        kind: 'regular',
+        score: state.score,
+        solvedCount: puzzlesSolved,
+        outcomes: finalOutcomes,
+        streak,
+        rank,
+      } satisfies StoredRegularResult);
+    persist(0, null);
     if (puzzlesSolved > 0) {
       sfx.playVictorySound();
       if (!prefersReducedMotion) fireVictoryConfetti();
@@ -226,6 +386,7 @@ export default function ConnectionsDailyChallenge() {
       });
       const streak = submitRes?.streak ?? advanceClientStreak(today).streak;
       const lb = await fetchDailyLeaderboard(today, { guestFingerprint, limit: 50 });
+      persist(streak, submitRes?.currentRank ?? lb?.ownRank ?? null);
       setResults({
         loading: false,
         streak,
@@ -234,7 +395,7 @@ export default function ConnectionsDailyChallenge() {
         rows: lb?.leaderboard ?? [],
       });
     })();
-  }, [isTerminal, prefersReducedMotion, profile, user, today, language, state.score, total, sfx, t]);
+  }, [isTerminal, prefersReducedMotion, profile, user, today, language, state.score, total, sfx, t, collectOutcomes]);
 
   const handleInput = useCallback((value: string) => dispatch({ type: 'SET_INPUT', input: value }), []);
   const handleSubmit = useCallback(() => dispatch({ type: 'SUBMIT' }), []);
@@ -246,28 +407,13 @@ export default function ConnectionsDailyChallenge() {
     if (puzzle) dispatch({ type: 'MARK_RATED', puzzleId: puzzle.id });
   }, [state.puzzles, state.currentIndex]);
 
-  // Spoiler-free "story of the chain" — shared by the on-card recap + share text.
-  const collectOutcomes = useCallback((): BridgeOutcome[] =>
-    Array.from({ length: total }, (_, i) =>
-      outcomesRef.current.get(i) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
-    ), [total]);
-
   // Paste-text share path — plain text only, never emoji (stripped in
   // buildDailyBridgeGrid; the unfurl is the page's og:image). Built once the run is terminal; the results card's
   // copy/native-share buttons put exactly this on the clipboard.
-  const buildShareText = useCallback((): string => {
-    const outcomes = collectOutcomes();
-    const url = typeof window !== 'undefined' ? `${window.location.origin}/connections/daily` : undefined;
-    return buildDailyBridgeGrid({
-      title: t('connections.title'),
-      dateISO: today,
-      outcomes,
-      streak: results?.streak ?? 0,
-      rank: results?.rank ?? null,
-      callout: t(`connections.daily.shareCallout.${gridCallout(outcomes)}`),
-      url,
-    });
-  }, [t, today, results, collectOutcomes]);
+  const shareTextFor = useCallback(
+    (): string => buildShareText(t, today, collectOutcomes(), results?.streak ?? 0, results?.rank ?? null),
+    [t, today, results, collectOutcomes],
+  );
 
   const handleShareClick = useCallback((_method: 'native' | 'copy') => {
     const outcomes = collectOutcomes();
@@ -288,38 +434,12 @@ export default function ConnectionsDailyChallenge() {
           puzzles={state.puzzles}
           leaderboardRows={results?.rows ?? []}
           isLoading={results?.loading ?? true}
-          shareText={buildShareText()}
+          shareText={shareTextFor()}
           dateISO={today}
           onShareClick={handleShareClick}
         />
 
-        {/* Pyramid is the deeper mode and the natural next step once the day's
-            5 bridges are spent — promoted from a thin text link to a real card. */}
-        {getPyramidsForLocale(language).length > 0 && (
-          <m.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.85 }}
-            className="mx-auto w-full max-w-md px-4"
-          >
-            <Link
-              href={`/${language}/connections/pyramid`}
-              data-testid="pyramid-cta"
-              className="flex items-center gap-3 rounded-neo border-neo-thick border-neo-purple bg-neo-purple/15 p-4 shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
-            >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-neo border-neo border-neo-purple bg-neo-purple/25">
-                <PyramidIcon className="h-6 w-6 text-neo-purple" strokeWidth={2.5} aria-hidden="true" />
-              </span>
-              <span className="flex min-w-0 flex-1 flex-col text-start">
-                <span className="font-neo-display text-base font-black text-neo-purple">
-                  {t('connections.pyramid.cta')}
-                </span>
-                <span className="font-neo-body text-xs text-neo-white/70">{t('connections.pyramid.tagline')}</span>
-              </span>
-              <DirectionalIcon icon={ChevronRight} className="h-5 w-5 shrink-0 text-neo-purple" />
-            </Link>
-          </m.div>
-        )}
+        <PyramidLink />
       </>
     );
   }

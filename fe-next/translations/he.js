@@ -9193,6 +9193,7 @@ const he = {
     "journeyNow": "עכשיו",
     "journeyDone": "הושלם",
     "journeyStep": "שלב",
+    "journeyStepOf": "שלב {n}/{total}",
     "journeyAllRequiredDone": "סיימתם את המשימות של היום! אפשר להמשיך לבונוס",
     "backToDailyHub": "חזרה לאתגר היומי",
     "skipOptional": "דלגו",

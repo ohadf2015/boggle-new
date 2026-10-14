@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
 import { Timer, CircleDot, Building2, Link2 } from 'lucide-react';
@@ -73,94 +73,80 @@ export function DailyChallengeLanding({
   // Use the unified hook for played status and streak across all modes and devices
   const dailyPlayedStatus = useDailyPlayedStatus();
 
-  // Word Wheel status from localStorage (no server endpoint for it yet)
-  const [wordWheelStatus, setWordWheelStatus] = useState<'new' | 'played'>('new');
   const [claimedChest, setClaimedChest] = useState<PendingChest | null>(null);
-  // Word Tower "played today" — client-only localStorage read (SSR-safe), kept
-  // fresh when the player returns from the game (visibility/back nav).
-  const [wordTowerPlayed, setWordTowerPlayed] = useState(false);
-  // Connections (Word Bridge) played today — same marker both daily flavors
-  // write on their terminal screens (5-riddle chain AND pyramid).
-  const [connectionsPlayed, setConnectionsPlayed] = useState(false);
 
+  // This device's played markers (Word Wheel result, Word Tower best, Word
+  // Bridge marker). Read in a LAYOUT effect so the first client paint already
+  // has them — a passive effect painted the optimistic all-unplayed hub (Word
+  // Wheel hero) and flipped a frame later. `resolved` stays false through SSR,
+  // where storage cannot be read, so the server HTML is the neutral skeleton.
+  const [local, setLocal] = useState({ resolved: false, wheel: false, tower: false, connections: false });
+  const readLocal = useCallback(() => {
+    const next = { resolved: true, wheel: false, tower: false, connections: false };
+    try { next.wheel = hasPlayedWordWheelToday(currentLanguage); } catch { /* storage disabled */ }
+    try { next.tower = isDailyTowerPlayed(localStorage.getItem(dailyBestKey(utcDateKey()))); } catch { /* storage disabled */ }
+    try { next.connections = hasPlayedConnectionsToday(); } catch { /* storage disabled */ }
+    setLocal(next);
+  }, [currentLanguage]);
+
+  useLayoutEffect(() => {
+    readLocal();
+  }, [readLocal, user?.id]);
+
+  // Re-read when the player comes back from a game (tab return, back/forward,
+  // client navigation back to the hub) and refresh the Word Hunt status.
   useEffect(() => {
-    const check = () => {
-      try {
-        setWordTowerPlayed(isDailyTowerPlayed(localStorage.getItem(dailyBestKey(utcDateKey()))));
-      } catch { /* storage disabled — treat as not played */ }
-      try {
-        setConnectionsPlayed(hasPlayedConnectionsToday());
-      } catch { /* storage disabled — treat as not played */ }
-    };
-    check();
-    document.addEventListener('visibilitychange', check);
-    window.addEventListener('popstate', check);
-    return () => {
-      document.removeEventListener('visibilitychange', check);
-      window.removeEventListener('popstate', check);
-    };
-  }, []);
-
-  // Derive Word Hunt status from hook (server-aware for cross-device play).
-  // NOT gated on `loading`: every refresh (tab return, back nav) flips loading
-  // on while keeping the last-known hasPlayed, and mapping loading → 'new' made
-  // the hero bounce back to a finished Word Hunt on each return (rules/60
-  // Class 1). Played state only ever moves forward within a day.
-  const wordHuntStatus: 'new' | 'won' | 'lost' = !dailyStatus.hasPlayed
-    ? 'new'
-    : dailyStatus.hasSolved
-      ? 'won'
-      : 'lost';
-
-  // Check Word Wheel status from localStorage
-  // Server truth wins: localStorage only knows what THIS device did, so a player who finished on
-  // their phone used to see a green "Play" on their laptop. dailyPlayedStatus is server-backed for
-  // an authed player (and localStorage-backed for a guest, where it is the only truth available).
-  const checkWordWheelStatus = () => {
-    const wwPlayed =
-      dailyPlayedStatus.today.wordWheel || hasPlayedWordWheelToday(currentLanguage);
-    setWordWheelStatus(wwPlayed ? 'played' : 'new');
-  };
-
-  // Initial check, and again when the server answer lands — the authed status starts as a skeleton,
-  // so without these deps the row keeps the first (localStorage-only) answer forever.
-  useEffect(() => {
-    checkWordWheelStatus();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentLanguage, user?.id, dailyPlayedStatus.today.wordWheel, dailyPlayedStatus.loading]);
-
-  // Refresh on visibility change (user returns from playing)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        checkWordWheelStatus();
-        dailyStatus.refresh();
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentLanguage, user?.id]);
-
-  // Refresh on popstate (browser back/forward)
-  useEffect(() => {
-    const handlePopState = () => {
-      checkWordWheelStatus();
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return;
+      readLocal();
       dailyStatus.refresh();
     };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    const onPopState = () => {
+      readLocal();
+      dailyStatus.refresh();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('popstate', onPopState);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('popstate', onPopState);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentLanguage, user?.id]);
+  }, [readLocal, user?.id]);
 
-  // Refresh on pathname change (Next.js router.push)
   useEffect(() => {
     if (pathname && pathname.endsWith('/daily')) {
-      checkWordWheelStatus();
+      readLocal();
       dailyStatus.refresh();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+  // Per-mode "done" comes from ONE rule for every mode: the unified played
+  // hook (server-backed when signed in, merged with this device's flags) OR
+  // this device's own marker. Played only ever moves forward within a day.
+  const played = dailyPlayedStatus.today;
+  const wordWheelPlayed = played.wordWheel || local.wheel;
+  const towerDone = played.wordTower || local.tower;
+  const connectionsDone = played.connections || local.connections;
+
+  // Word Hunt keeps its won/lost LABEL from the hunt status (a lost hunt stays
+  // the hero for the retry). NOT gated on `loading`: every refresh (tab
+  // return, back nav) flips loading on while keeping the last-known hasPlayed,
+  // and mapping loading → 'new' bounced the hero back to a finished Word Hunt
+  // (rules/60 Class 1). Played on another device but unknown to the hunt
+  // status yet → counted as done.
+  const wordHuntStatus: 'new' | 'won' | 'lost' = dailyStatus.hasPlayed
+    ? dailyStatus.hasSolved
+      ? 'won'
+      : 'lost'
+    : played.wordHunt
+      ? 'won'
+      : 'new';
+
+  // Pessimistic until every source of played-state has resolved: render a
+  // neutral skeleton rather than a Word Wheel hero that flips.
+  const statusReady = local.resolved && !dailyPlayedStatus.loading;
 
   // Word Tower is the 3rd quest: only expand the bar to /3 and count it when the
   // player actually sees the card. Read off the REGISTRY, not `questModes` — Word
@@ -175,22 +161,13 @@ export function DailyChallengeLanding({
   // Daily flow: Word Wheel → Word Hunt are required; Connections and Word Tower
   // are optional bonuses that never count toward clearing the day.
   const totalQuests = 2;
-  const completedCount =
-    (wordWheelStatus === 'played' ? 1 : 0) +
-    (wordHuntStatus === 'won' || wordHuntStatus === 'lost' ? 1 : 0);
-
   const wordHuntPlayed = wordHuntStatus === 'won' || wordHuntStatus === 'lost';
-  const wordWheelPlayed = wordWheelStatus === 'played';
-  // This device's marker OR the server (played on another device). The
-  // localStorage-only read showed a tower climbed on the phone as unplayed on
-  // the laptop, while the results CTA (server-backed) already skipped it.
-  const towerDone = wordTowerPlayed || dailyPlayedStatus.today.wordTower;
-  const connectionsDone = connectionsPlayed || dailyPlayedStatus.today.connections;
+  const completedCount = (wordWheelPlayed ? 1 : 0) + (wordHuntPlayed ? 1 : 0);
 
   // Build play state for primary mode selection
   const playState: DailyModePlayState = {
     wordHunt: wordHuntStatus,
-    wordWheel: wordWheelStatus === 'played' ? 'played' : 'new',
+    wordWheel: wordWheelPlayed ? 'played' : 'new',
     wordTower: towerDone,
     connections: connectionsDone,
   };
@@ -275,33 +252,38 @@ export function DailyChallengeLanding({
     : visibleModesInfo.find((mode) => mode.id === primaryModeId);
 
   return (
-    <m.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 280, damping: 26 }}
+    // No full-page opacity-0 entrance: the hub appears with its content
+    // (rules/60 Class 5 — fullscreen opacity tweens flash on mobile Chromium).
+    <div
       className="flex-1 flex flex-col items-center px-3 py-2 sm:px-4 sm:py-2 pb-bottom-stack sm:pb-2 max-w-3xl mx-auto w-full relative gap-3"
     >
       <DailyHubHeader />
 
       <DailyMissionsHeader completedCount={completedCount} total={totalQuests} />
 
-      <DailyJourney
-        currentId={primaryModeId}
-        steps={visibleModesInfo.map((md) => ({
-          id: md.id,
-          title: md.title,
-          icon: md.icon,
-          artUrl: md.artUrl,
-          played: md.played,
-          optional: md.id === 'connections' || md.id === 'word-tower',
-          onPlay: md.onPlay,
-        }))}
-      />
+      {statusReady ? (
+        <>
+        <DailyJourney
+          currentId={primaryModeId}
+          steps={visibleModesInfo.map((md) => ({
+            id: md.id,
+            title: md.title,
+            icon: md.icon,
+            artUrl: md.artUrl,
+            played: md.played,
+            optional: md.id === 'connections' || md.id === 'word-tower',
+            onPlay: md.onPlay,
+          }))}
+        />
 
-      {completedCount >= totalQuests && !dayCleared && (
-        <p className="w-full text-center text-sm font-black text-neo-lime" data-testid="required-done-note">
-          {t('daily.journeyAllRequiredDone')}
-        </p>
+        {completedCount >= totalQuests && !dayCleared && (
+          <p className="w-full text-center text-sm font-black text-neo-lime" data-testid="required-done-note">
+            {t('daily.journeyAllRequiredDone')}
+          </p>
+        )}
+        </>
+      ) : (
+        <div className="w-full h-16 rounded-xl skeleton" aria-hidden="true" data-testid="hub-journey-skeleton" />
       )}
 
       {/* Score Gauntlet Banner: shown when arriving via a challenge share link.
@@ -310,52 +292,62 @@ export function DailyChallengeLanding({
         <DailyShareDecorations t={t} />
       </Suspense>
 
-      {dayCleared && <DailyAllClearCard streak={dailyPlayedStatus.streak.current} />}
+      {statusReady ? (
+        <>
+        {dayCleared && <DailyAllClearCard streak={dailyPlayedStatus.streak.current} />}
 
-      {/* Primary hero card — the one mode to play right now, selected by pickPrimaryMode */}
-      {primaryMode && (
-        <QuestCard
-          challengeId={primaryMode.id}
-          icon={primaryMode.icon}
-          title={primaryMode.title}
-          tagline={primaryMode.tagline}
-          color={primaryMode.color}
-          status={
-            primaryMode.id === 'word-hunt'
-              ? wordHuntStatus
-              : primaryMode.played
-                ? 'won'
-                : 'new'
-          }
-          isLoadingStatus={primaryMode.id === 'word-hunt' ? dailyStatus.loading : false}
-          onPlay={primaryMode.onPlay}
-          timeMode={primaryMode.timeMode}
-          timeModeLabel={t(primaryMode.timeMode === 'timed' ? 'daily.timedQuest' : 'daily.relaxedQuest')}
-          previewImageUrl={primaryMode.artUrl}
-          buttonText={t('daily.startQuest')}
-          delay={0.15}
-        />
+        {/* Primary hero card — the one mode to play right now, selected by pickPrimaryMode */}
+        {primaryMode && (
+          <QuestCard
+            challengeId={primaryMode.id}
+            icon={primaryMode.icon}
+            title={primaryMode.title}
+            tagline={primaryMode.tagline}
+            color={primaryMode.color}
+            status={
+              primaryMode.id === 'word-hunt'
+                ? wordHuntStatus
+                : primaryMode.played
+                  ? 'won'
+                  : 'new'
+            }
+            isLoadingStatus={primaryMode.id === 'word-hunt' ? dailyStatus.loading : false}
+            onPlay={primaryMode.onPlay}
+            timeMode={primaryMode.timeMode}
+            timeModeLabel={t(primaryMode.timeMode === 'timed' ? 'daily.timedQuest' : 'daily.relaxedQuest')}
+            previewImageUrl={primaryMode.artUrl}
+            buttonText={t('daily.startQuest')}
+            delay={0.15}
+          />
+        )}
+
+        {/* Secondary modes — compact single-line cards for the modes not selected as primary */}
+        <div className="w-full flex flex-col gap-2" data-testid="secondary-modes">
+          {visibleModesInfo
+            .filter((m) => m.id !== primaryMode?.id)
+            .map((mode, i) => (
+              <CompactModeRow
+                key={mode.id}
+                icon={mode.icon}
+                title={mode.title}
+                color={mode.color}
+                artUrl={mode.artUrl}
+                onPlay={mode.onPlay}
+                played={mode.played}
+                badge={mode.badge}
+                doneLabel={t('daily.journeyDone')}
+                delay={0.25 + i * 0.05}
+              />
+            ))}
+        </div>
+        </>
+      ) : (
+        <div className="w-full flex flex-col gap-3" aria-hidden="true" data-testid="hub-status-skeleton">
+          <div className="w-full h-56 rounded-xl skeleton" />
+          <div className="w-full h-14 rounded-xl skeleton" />
+          <div className="w-full h-14 rounded-xl skeleton" />
+        </div>
       )}
-
-      {/* Secondary modes — compact single-line cards for the modes not selected as primary */}
-      <div className="w-full flex flex-col gap-2" data-testid="secondary-modes">
-        {visibleModesInfo
-          .filter((m) => m.id !== primaryMode?.id)
-          .map((mode, i) => (
-            <CompactModeRow
-              key={mode.id}
-              icon={mode.icon}
-              title={mode.title}
-              color={mode.color}
-              artUrl={mode.artUrl}
-              onPlay={mode.onPlay}
-              played={mode.played}
-              badge={mode.badge}
-              doneLabel={t('daily.journeyDone')}
-              delay={0.25 + i * 0.05}
-            />
-          ))}
-      </div>
 
       <LeaderboardTeaser currentLanguage={currentLanguage} />
 
@@ -379,6 +371,6 @@ export function DailyChallengeLanding({
           onClose={() => setClaimedChest(null)}
         />
       )}
-    </m.div>
+    </div>
   );
 }

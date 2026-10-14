@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { m } from 'framer-motion';
 import Link from 'next/link';
 import { Share2, ChevronRight, Flame } from 'lucide-react';
@@ -22,6 +22,10 @@ import {
   type PyramidState,
 } from '@/lib/connections/pyramid/gameLogic';
 import { dailyPyramid } from '@/lib/connections/pyramid/daily';
+import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
+import { saveDailyResult } from '@/lib/connections/dailyResultStore';
+import { NextQuestCta } from '@/components/daily/results/NextQuestCta';
+import type { Language } from '@/types';
 import { getSolvedIds, markSolved } from '@/lib/connections/solvedStore';
 import { buildPyramidShareGrid } from '@/lib/connections/pyramid/shareGrid';
 import { todayUTC, markConnectionsPlayedToday, advanceClientStreak } from '@/lib/connections/dailyClient';
@@ -37,6 +41,7 @@ import FinaleCard from './FinaleCard';
 import PuzzleCard from '../PuzzleCard';
 import ConnectionsMascot from '../ConnectionsMascot';
 import DailyAnswerKey from '../DailyAnswerKey';
+import { useStoredDailyResult } from '../useStoredDailyResult';
 
 type Action =
   | { type: 'GUESS'; input: string }
@@ -70,26 +75,68 @@ function reducer(state: PyramidState, action: Action): PyramidState {
  * `sharePath` — when the run is hosted as the day's daily variant
  * (/connections/daily), share links point back at the daily host so
  * recipients land on the same quest; standalone play keeps the pyramid route.
+ * It also marks the daily host: the end screen hands off to the next daily
+ * quest, and today's finished run is restored on revisit.
  */
-export default function PyramidChallenge({ sharePath }: { sharePath?: string } = {}) {
+export default function PyramidChallenge({
+  sharePath,
+  onTerminal,
+}: {
+  sharePath?: string;
+  /** Told once the run is terminal (live finish OR a restored revisit). */
+  onTerminal?: () => void;
+} = {}) {
   // Null-guard wrapper: the early return must happen BEFORE any of the run's
   // hooks mount (rules-of-hooks), so the actual game lives in PyramidRun.
   const { language } = useLanguage();
   const today = useRef(todayUTC()).current;
+  const isDailyHost = Boolean(sharePath);
   const [solvedPyramids] = useState<ReadonlySet<string>>(() => getSolvedIds('pyramid', language));
-  const pyramid = dailyPyramid(today, language, solvedPyramids);
+  const stored = useStoredDailyResult<StoredPyramidResult>(today, language, 'pyramid');
+  // Daily host: render nothing until storage is read, rather than a fresh
+  // pyramid that flips to the end screen a frame later.
+  if (isDailyHost && !stored.checked) return null;
+  const restored = isDailyHost ? stored.value : null;
+  // Today's run is stored → reopen THAT pyramid. Winning marks it solved, so
+  // the solved filter would otherwise serve a different one on revisit.
+  const pyramid = restored
+    ? (getPyramidsForLocale(language).find((p) => p.id === restored.pyramidId) ?? dailyPyramid(today, language))
+    : dailyPyramid(today, language, solvedPyramids);
   if (!pyramid) return null;
-  return <PyramidRun pyramid={pyramid} today={today} sharePath={sharePath} />;
+  const restoredRun = restored && restored.pyramidId === pyramid.id ? restored : null;
+  return (
+    <PyramidRun
+      key={restoredRun ? 'restored' : 'live'}
+      pyramid={pyramid}
+      today={today}
+      sharePath={sharePath}
+      restored={restoredRun}
+      onTerminal={onTerminal}
+    />
+  );
+}
+
+/** Today's finished daily pyramid, as persisted for a same-day revisit. */
+interface StoredPyramidResult {
+  kind: 'pyramid';
+  pyramidId: string;
+  state: Omit<PyramidState, 'pyramid'>;
+  outcomes: [number, BridgeOutcome][];
+  streak: number;
 }
 
 function PyramidRun({
   pyramid,
   today,
   sharePath,
+  restored,
+  onTerminal,
 }: {
   pyramid: NonNullable<ReturnType<typeof dailyPyramid>>;
   today: string;
   sharePath?: string;
+  restored: StoredPyramidResult | null;
+  onTerminal?: () => void;
 }) {
   const { t, language } = useLanguage();
   const { isAdmin } = useAuth();
@@ -98,12 +145,14 @@ function PyramidRun({
   const sfx = useSoundEffects();
   const inShell = useMediaQuery(SHELL_MEDIA);
 
-  const [pyramidState, dispatch] = useReducer(reducer, pyramid, initPyramidState);
+  const [pyramidState, dispatch] = useReducer(reducer, pyramid, (p) =>
+    restored ? { ...restored.state, pyramid: p } : initPyramidState(p),
+  );
   const [input, setInput] = useState('');
 
   const startRef = useRef<number>(0);
   const wrongByStageRef = useRef<Record<number, number>>({});
-  const outcomesRef = useRef<Map<number, BridgeOutcome>>(new Map());
+  const outcomesRef = useRef<Map<number, BridgeOutcome>>(new Map(restored?.outcomes ?? []));
   const prevStatusRef = useRef(pyramidState.status);
   const [results, setResults] = useState<{ copied: boolean }>({ copied: false });
 
@@ -142,14 +191,25 @@ function PyramidRun({
   // terminal, so without this a pyramid day would show an unplayed quest card
   // and silently break the day streak. Stamped once — the terminal effect can
   // re-fire on unrelated re-renders.
-  const dailyStampedRef = useRef(false);
-  const [clientStreak, setClientStreak] = useState(0);
+  // A restored run was stamped when it was played.
+  const dailyStampedRef = useRef(Boolean(restored));
+  const [clientStreak, setClientStreak] = useState(restored?.streak ?? 0);
+  const streakRef = useRef(restored?.streak ?? 0);
   useEffect(() => {
     if (!isTerminal || dailyStampedRef.current) return;
     dailyStampedRef.current = true;
     markConnectionsPlayedToday(today);
-    setClientStreak(advanceClientStreak(today).streak);
+    streakRef.current = advanceClientStreak(today).streak;
+    setClientStreak(streakRef.current);
   }, [isTerminal, today]);
+
+  // Tell the host before paint so its in-game chrome never lingers beside the
+  // end screen.
+  const onTerminalRef = useRef(onTerminal);
+  onTerminalRef.current = onTerminal;
+  useLayoutEffect(() => {
+    if (isTerminal) onTerminalRef.current?.();
+  }, [isTerminal]);
 
   // Per-answer feedback (sound + haptic) and outcome tracking
   useEffect(() => {
@@ -195,6 +255,22 @@ function PyramidRun({
     }
     prevStatusRef.current = pyramidState.status;
   }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, pyramidState.wrongAttempts, sfx, haptic, customHaptic, prefersReducedMotion, pyramid, language]);
+
+  // Daily host: persist the terminal run (after the outcome effect above has
+  // recorded the finale) so a same-day revisit reopens this end screen.
+  const savedRef = useRef(Boolean(restored));
+  useEffect(() => {
+    if (!isTerminal || !sharePath || savedRef.current) return;
+    savedRef.current = true;
+    const { pyramid: _omit, ...state } = pyramidState;
+    saveDailyResult(today, language, {
+      kind: 'pyramid',
+      pyramidId: pyramid.id,
+      state,
+      outcomes: Array.from(outcomesRef.current.entries()),
+      streak: streakRef.current,
+    } satisfies StoredPyramidResult);
+  }, [isTerminal, sharePath, pyramidState, today, language, pyramid.id]);
 
   const handleInput = useCallback((value: string) => setInput(value), []);
   const handleSubmit = useCallback(() => {
@@ -343,21 +419,30 @@ function PyramidRun({
           </m.button>
         </m.div>
 
-        {/* The terminal screen was a dead end — no way onward without the back
-            button. Route players to the daily, which always has something to play. */}
-        <Link
-          href={`/${language}/connections/daily`}
-          data-testid="pyramid-back-to-daily"
-          className="flex items-center gap-3 rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan/15 p-4 shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
-        >
-          <span className="flex min-w-0 flex-1 flex-col text-start">
-            <span className="font-neo-display text-base font-black text-neo-cyan">
-              {t('connections.daily.cta')}
+        {/* The terminal screen was a dead end. As the day's daily quest, hand off
+            to the next daily mode (a link to /connections/daily from here would
+            just reload this page); standalone play routes to the daily. */}
+        {sharePath ? (
+          <NextQuestCta
+            justFinished="connections"
+            currentLanguage={language as Language}
+            source="pyramid_daily_results"
+          />
+        ) : (
+          <Link
+            href={`/${language}/connections/daily`}
+            data-testid="pyramid-back-to-daily"
+            className="flex items-center gap-3 rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan/15 p-4 shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          >
+            <span className="flex min-w-0 flex-1 flex-col text-start">
+              <span className="font-neo-display text-base font-black text-neo-cyan">
+                {t('connections.daily.cta')}
+              </span>
+              <span className="font-neo-body text-xs text-neo-white/70">{t('connections.daily.questDesc')}</span>
             </span>
-            <span className="font-neo-body text-xs text-neo-white/70">{t('connections.daily.questDesc')}</span>
-          </span>
-          <DirectionalIcon icon={ChevronRight} className="h-5 w-5 shrink-0 text-neo-cyan" />
-        </Link>
+            <DirectionalIcon icon={ChevronRight} className="h-5 w-5 shrink-0 text-neo-cyan" />
+          </Link>
+        )}
 
         <ResultsBannerSlot placement="daily-complete" />
       </div>

@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 export default function WordHuntPage(): React.JSX.Element {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <DailyFlowChrome modeId="word-hunt" backLink={false} />
+      <DailyFlowChrome modeId="word-hunt" backLink={false} intro={false} />
       <DailyChallenge />
     </Suspense>
   );

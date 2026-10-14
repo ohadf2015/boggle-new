@@ -9079,6 +9079,7 @@ const ja = {
     "journeyNow": "いまここ",
     "journeyDone": "クリア",
     "journeyStep": "ステップ",
+    "journeyStepOf": "ステップ {n}/{total}",
     "journeyAllRequiredDone": "今日のクエストをクリア！ボーナスは自由参加です",
     "backToDailyHub": "デイリーに戻る",
     "skipOptional": "スキップ",

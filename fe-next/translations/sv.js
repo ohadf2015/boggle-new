@@ -9379,6 +9379,7 @@ const sv = {
     "journeyNow": "Nu",
     "journeyDone": "Klar",
     "journeyStep": "Steg",
+    "journeyStepOf": "Steg {n}/{total}",
     "journeyAllRequiredDone": "Dagens uppdrag är klara! Bonusrundorna är valfria",
     "backToDailyHub": "Tillbaka till dagens",
     "skipOptional": "Hoppa över",
