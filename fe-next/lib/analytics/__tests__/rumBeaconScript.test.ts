@@ -2,10 +2,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { getRumBeaconScript } from '../rumBeaconScript';
 
 /**
- * `page_cold_start` is a once-per-session signal, but the inline script re-runs on
- * every full document load — reload, back/forward, and the CHUNK_BOOT_GUARD self-heal
- * reload all count. 374,025 events / 28d (40x the next event, up to 14 per user per
- * day) made every volume-based denominator unusable.
+ * `page_cold_start` is a once-per-device-per-day signal, but the inline script
+ * re-runs on every full document load — reload, back/forward, and the
+ * CHUNK_BOOT_GUARD self-heal reload all count. 374,025 events / 28d (40x the
+ * next event, up to 14 per user per day) made every volume-based denominator
+ * unusable. A per-session guard still let new tabs / PWA relaunches / native
+ * WebView restarts average ~1.7 events per user per day, so the dedupe bucket
+ * is now the UTC day in localStorage.
  */
 
 function memStorage() {
@@ -49,11 +52,40 @@ describe('getRumBeaconScript', () => {
     expect(sendBeacon).toHaveBeenCalledTimes(1);
   });
 
-  it('sends again in a new session', () => {
+  it('does not send again in a new session the same day', () => {
     runBeacon();
+    // New tab / PWA relaunch / WebView restart: sessionStorage is gone,
+    // localStorage survives.
     vi.stubGlobal('sessionStorage', memStorage());
     runBeacon();
-    expect(sendBeacon).toHaveBeenCalledTimes(2);
+    expect(sendBeacon).toHaveBeenCalledTimes(1);
+  });
+
+  it('sends again on a new day', () => {
+    // Simulate a device whose last beacon went out yesterday.
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    const local = memStorage();
+    local.setItem('lc_rum_day', yesterday);
+    vi.stubGlobal('localStorage', local);
+    runBeacon();
+    expect(sendBeacon).toHaveBeenCalledTimes(1);
+  });
+
+  it('falls back to per-session dedupe when localStorage is blocked', () => {
+    const blocked = {
+      getItem: () => {
+        throw new Error('blocked');
+      },
+      setItem: () => {
+        throw new Error('blocked');
+      },
+    };
+    vi.stubGlobal('localStorage', blocked);
+    runBeacon();
+    runBeacon();
+    expect(sendBeacon).toHaveBeenCalledTimes(1);
   });
 
   it('still sends when storage is unavailable', () => {
