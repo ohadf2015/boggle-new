@@ -45,7 +45,7 @@ export function ClassroomModeCatalogueCard({
         onPick(mode.id);
       }}
       className={cn(
-        'group relative flex w-[6.6rem] shrink-0 snap-center flex-col items-stretch gap-1 rounded-neo-lg border-[3px] p-1.5 text-center lg:w-[8.5rem] lg:p-2',
+        'group relative flex w-[6.6rem] shrink-0 snap-center flex-col items-stretch gap-1 rounded-neo-lg border-[3px] p-1.5 text-center lg:w-auto lg:p-2',
         'transition-[transform,box-shadow] duration-150 motion-reduce:transition-none motion-safe:active:scale-95',
         'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy disabled:cursor-wait',
         !selected
