@@ -133,8 +133,19 @@ const ja = {
         "odds": {
           "label": "宝箱の確率"
         },
-        "continue": "つづける",
-        "tapToOpen": "タップして開く"
+        "continue": "受け取る",
+        "tapToOpen": "タップして開く",
+        "headline": {
+          "common": "コモン宝箱！",
+          "rare": "レア宝箱！",
+          "epic": "エピック宝箱！"
+        },
+        "chip": {
+          "label": "ゲットしたもの",
+          "cash": "このラウンドの所持金",
+          "xp": "XP",
+          "item": "新アイテム"
+        }
       },
       "reward": {
         "title": "ラウンド報酬",
@@ -172,7 +183,11 @@ const ja = {
         }
       },
       "goal": {
-        "save": "{name}まであと{missing}",
+        "save": {
+          "hintReveal": "次のラウンドであと{missing}ためるとヒント（単語の最初の文字）が買えます",
+          "doubleCash": "次のラウンドであと{missing}ためると30秒間お金が2倍になります",
+          "streakShield": "次のラウンドであと{missing}ためると連続記録を守るシールドが買えます"
+        },
         "ready": "{name}を買えます"
       },
       "hud": {

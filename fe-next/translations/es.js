@@ -133,8 +133,19 @@ const es = {
         "odds": {
           "label": "Probabilidades del cofre"
         },
-        "continue": "Continuar",
-        "tapToOpen": "Toca para abrir"
+        "continue": "Recoger",
+        "tapToOpen": "Toca para abrir",
+        "headline": {
+          "common": "¡Cofre común!",
+          "rare": "¡Cofre raro!",
+          "epic": "¡Cofre épico!"
+        },
+        "chip": {
+          "label": "Lo que ganaste",
+          "cash": "dinero de esta ronda",
+          "xp": "XP",
+          "item": "Objeto nuevo"
+        }
       },
       "reward": {
         "title": "Recompensa de la ronda",
@@ -172,7 +183,11 @@ const es = {
         }
       },
       "goal": {
-        "save": "Ahorra {missing} más para {name}",
+        "save": {
+          "hintReveal": "Consigue {missing} más en la próxima ronda y podrás comprar una pista (la primera letra de una palabra)",
+          "doubleCash": "Consigue {missing} más en la próxima ronda y podrás comprar dinero doble durante 30 segundos",
+          "streakShield": "Consigue {missing} más en la próxima ronda y podrás comprar un escudo para tu racha"
+        },
         "ready": "{name} ya puedes comprarlo"
       },
       "hud": {
