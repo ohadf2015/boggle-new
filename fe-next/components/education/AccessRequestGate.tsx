@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { resendEmailVerification } from '@/lib/supabase';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { trackGrowthEvent } from '@/utils/growthTracking';
+import { latchSignupSource, trackGrowthEvent } from '@/utils/growthTracking';
 import { AccessRequestForm } from './AccessRequestForm';
 
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -83,6 +83,8 @@ export function AccessRequestGate() {
           onClick={() => {
             try {
               trackGrowthEvent('edu_access_signup_tapped', { mode: 'signup' });
+              // Own attribution: signups from the edu gate are not header_or_menu.
+              latchSignupSource('edu_access');
             } catch {
               /* telemetry must never break access request */
             }
@@ -101,6 +103,8 @@ export function AccessRequestGate() {
           onClick={() => {
             try {
               trackGrowthEvent('edu_access_signup_tapped', { mode: 'signin' });
+              // Own attribution: signups from the edu gate are not header_or_menu.
+              latchSignupSource('edu_access');
             } catch {
               /* telemetry must never break access request */
             }

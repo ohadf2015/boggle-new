@@ -1018,6 +1018,14 @@ export const trackSignupFunnel = (
     trackGrowthEvent('signup_completed', merged);
     if (isFirstWin) trackGrowthEvent('first_win_signup_completed', merged);
   } else {
+    // t_147a0f0c: dismissals carry the surface/source that served the prompt so
+    // dismiss rate can be split per surface like shown/clicked.
+    const surface =
+      (props?.surface as string | undefined) ??
+      (props?.trigger as string | undefined) ??
+      (isFirstWin ? 'first_win_sheet' : 'soft_sheet');
+    merged.surface = surface;
+    if (merged.source == null) merged.source = surface;
     trackGrowthEvent('signup_dismissed', merged);
     if (isFirstWin) trackGrowthEvent('first_win_signup_dismissed', merged);
   }

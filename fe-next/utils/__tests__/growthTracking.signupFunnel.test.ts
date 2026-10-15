@@ -87,6 +87,19 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
     );
   });
 
+  it('dismissed carries surface/source (t_147a0f0c)', () => {
+    trackSignupFunnel('dismissed', false, { trigger: 'mp_sheet' });
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_dismissed',
+      expect.objectContaining({ surface: 'mp_sheet', source: 'mp_sheet' })
+    );
+    trackSignupFunnel('dismissed', true, { surface: 'soft-sheet' });
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_dismissed',
+      expect.objectContaining({ surface: 'soft-sheet', source: 'soft-sheet' })
+    );
+  });
+
   it('consumePendingSignupCompletion emits completed once and clears the key', () => {
     trackSignupFunnel('prompt_shown', false);
     consumePendingSignupCompletion();

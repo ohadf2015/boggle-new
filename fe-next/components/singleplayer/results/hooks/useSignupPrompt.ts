@@ -79,7 +79,7 @@ export function useSignupPrompt({
   const [statsVersion, setStatsVersion] = useState(0);
   // Capture the variant the prompt was shown under so dismissal/completion
   // events can attribute correctly without re-reading guest stats.
-  const shownVariantRef = useRef<{ isFirstWin: boolean } | null>(null);
+  const shownVariantRef = useRef<{ isFirstWin: boolean; surface?: string } | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -167,7 +167,7 @@ export function useSignupPrompt({
       setIsFirstWin(qualifiesAsFirstWin);
       setShowSignupModal(true);
       sessionStorage.setItem(SIGNUP_PROMPT_SHOWN_KEY, 'true');
-      shownVariantRef.current = { isFirstWin: qualifiesAsFirstWin };
+      shownVariantRef.current = { isFirstWin: qualifiesAsFirstWin, surface: frictionVariant ? String(frictionVariant) : undefined };
       trackSignupFunnel('prompt_shown', qualifiesAsFirstWin, { surface: frictionVariant });
       trackFrictionExposure();
       emitSignupPromptActive(true);
@@ -194,7 +194,7 @@ export function useSignupPrompt({
     const shown = shownVariantRef.current;
     if (shown) {
       shownVariantRef.current = null;
-      trackSignupFunnel('dismissed', shown.isFirstWin);
+      trackSignupFunnel('dismissed', shown.isFirstWin, shown.surface ? { surface: shown.surface } : undefined);
     }
   }, []);
 
