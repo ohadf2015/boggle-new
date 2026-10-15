@@ -28,14 +28,24 @@ describe('LobbyModeSwitcher — Boss Battle', () => {
     sessionStorage.setItem('lessonGameData', JSON.stringify({ lessonId: 'l1', gameMode: 'classic' }));
   });
 
-  it('offers Boss Battle in the sheet and asks the server for the quiz with the boss variant', () => {
+  it('offers Boss Battle in the sheet and asks the server for a classic board with the boss', () => {
     renderSwitcher('classic');
     fireEvent.click(screen.getByTestId('lobby-change-mode'));
     fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
-    expect(emit).toHaveBeenCalledWith('updateClassroomGameMode', { gameCode: CODE, gameMode: 'vocab-quiz', vocabQuizVariant: 'boss' });
+    expect(emit).toHaveBeenCalledWith('updateClassroomGameMode', { gameCode: CODE, gameMode: 'classic', classroomBossId: 'lexiconDragon' });
   });
 
-  it('renames the room and remembers the variant once the server agrees', async () => {
+  it('renames the room and remembers the boss once the server agrees', async () => {
+    renderSwitcher('classic');
+    fireEvent.click(screen.getByTestId('lobby-change-mode'));
+    fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
+    act(() => handlers['classroomGameModeChanged']?.({ gameCode: CODE, gameMode: 'classic', classroomBossId: 'lexiconDragon' }));
+    await waitFor(() => expect(screen.getByTestId('lobby-change-mode')).toHaveTextContent('eg2Modes.boss.name'));
+    expect(JSON.parse(sessionStorage.getItem('lessonGameData')!)).toMatchObject({ gameMode: 'classic', classroomBossId: 'lexiconDragon' });
+    expect(onModeApplied).toHaveBeenCalledWith('boss-battle');
+  });
+
+  it('still reads a room on the retired quiz-boss variant as Boss Battle, and renames the room and remembers the variant once the server agrees', async () => {
     renderSwitcher('classic');
     fireEvent.click(screen.getByTestId('lobby-change-mode'));
     fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));

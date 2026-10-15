@@ -32,7 +32,7 @@ export type ClassroomGameMode = GameMode | VocabQuizMode;
  * `GameMode` is wider (nine values) because it covers every board the app ships;
  * only these five are offered for a live class. The teacher-facing catalog built
  * from this list lives in `lib/education/gameModes.ts` (`TEACHER_GAME_MODES`);
- * the Zod enum in `backend/handlers/classroomGameHandler.ts` is the enforcing
+ * the Zod enum in `backend/handlers/classroomGameSchemas.ts` is the enforcing
  * twin. `app/[locale]/education/__tests__/playFormats.test.ts` asserts this
  * array still agrees with both.
  */

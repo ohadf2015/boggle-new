@@ -7,6 +7,7 @@
  * mode-reveal / countdown overlays. Views render inside their piece's screen
  * stub (PlayerLobbyScreen, MpRoundScreen, MpCountdown). FROZEN after FOUNDATION.
  */
+import { useClassroomBossSocket } from '@/hooks/useClassroomBossSocket';
 import React, { memo, useMemo } from 'react';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import PlayerWaitingView from './components/PlayerWaitingView';
@@ -39,6 +40,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
     showTournamentStandings, setShowTournamentStandings, handleWordSubmit, handleResetCombo, hints, earthquakeState,
     fireRoundActive, fireRoundRemaining, boardTheme, totalGameTimeRef,
   } = usePlayerPhase(props);
+  useClassroomBossSocket(socket, gameCode);
   const boardWaiting = useBoardWaitingScreen(socket, waitingForResults); // a quiz room has no board clock
   const inRound = useMemo(
     () => (isClassroomMode ? withoutClassroomHost(leaderboard, playersReady) : { leaderboard, users: playersReady }),

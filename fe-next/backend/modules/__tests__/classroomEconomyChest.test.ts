@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { grantRoundChest, type ChestDeps, type ChestReveal } from '../classroomEconomyChest';
+import { rollChest } from '../classroomEconomy';
 
 function fakeDeps(claim: 'claimed' | 'taken' | 'unavailable', insertError: unknown = null, grantError: Error | null = null) {
   const inserted: Record<string, unknown>[] = [];
@@ -42,6 +43,14 @@ describe('grantRoundChest', () => {
     expect(inserted).toHaveLength(1);
     expect(inserted[0]).toMatchObject({ game_code: 'ABC', round_id: 'sess-1', user_id: 'u1' });
     expect(xp).toEqual([['u1', chest!.xp]]);
+  });
+
+  it('Given the class beat the boss, When granted, Then the stored and revealed chest is the bumped roll', async () => {
+    const { deps, inserted } = fakeDeps('claimed');
+    const chest = await grantRoundChest({ ...input, bossWin: true }, deps);
+    const expected = rollChest('ABC:sess-1:u1', { bossWin: true });
+    expect(chest).toMatchObject({ rarity: expected.rarity, itemId: expected.itemId, bossWin: true });
+    expect(inserted[0]).toMatchObject({ rarity: expected.rarity });
   });
 
   it('Given a first claim, When granted, Then the row is written before the chest part is owned', async () => {

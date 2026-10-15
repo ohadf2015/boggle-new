@@ -7,6 +7,7 @@ import { toMpRoster, rankOf, type MpRosterPlayer, type MpRosterScoreLike, type M
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
 import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
 import { cn } from '@/lib/utils';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { MpCallouts, MpRosterStrip } from '../shell';
 import { WordsLadder, type LadderWord } from '../desktop/WordsLadder';
 import { MpRoundHud } from './MpRoundHud';
@@ -59,6 +60,8 @@ export interface MpRoundLayoutProps {
   canvas: ReactNode;
   /** Live room socket, for server moments mpFeedback does not carry (special word). */
   socket?: RoundSocket | null;
+  /** Classroom boss round: the boss strip takes the phone roster slot (desktop: top of the left rail). */
+  bossStrip?: ReactNode;
 }
 
 /**
@@ -80,7 +83,9 @@ function MpRoundLayoutImpl({
   onExit,
   canvas,
   socket,
+  bossStrip,
 }: MpRoundLayoutProps) {
+  const wide = useMediaQuery('(min-width: 1024px)');
   const { t } = useLanguage();
   const reduceMotion = useShouldReduceMotion();
   const mode = roundModeMeta(gameMode);
@@ -148,18 +153,21 @@ function MpRoundLayoutImpl({
         {/* At most four seats (the rest fold into "+N"; I always stay visible). From
             four seats a name only fits as "P…", so names go screen-reader-only and
             the avatars + scores carry the strip. */}
-        <MpRosterStrip
-          players={displayRoster}
-          meId={meId}
-          layout="row"
-          max={4}
-          showScores={!hideStandings}
-          className={cn('justify-center gap-1.5', displayRoster.length >= 4 && '[&_[data-player]>span[dir=auto]]:sr-only')}
-        />
+        {bossStrip && !wide ? bossStrip : (
+          <MpRosterStrip
+            players={displayRoster}
+            meId={meId}
+            layout="row"
+            max={4}
+            showScores={!hideStandings}
+            className={cn('justify-center gap-1.5', displayRoster.length >= 4 && '[&_[data-player]>span[dir=auto]]:sr-only')}
+          />
+        )}
       </div>
 
       {/* Desktop: roster rail */}
       <aside className={cn(styles.areaLeft, 'min-h-0 flex-col gap-2 pt-3')} aria-label={t('mpUi.round.players')}>
+        {bossStrip && wide && <div className="-mx-2 mb-6">{bossStrip}</div>}
         <h2 className="font-neo-display font-bold uppercase tracking-wider text-xs tv:text-lg text-neo-white/60 px-1">{t('mpUi.round.players')}</h2>
         {/* Full height, like YOUR WORDS opposite: the column is framed, never a void under a short roster. */}
         <div data-testid="mp-rail-roster" className="flex-1 min-h-0 overflow-y-auto rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard p-3 tv:p-4">

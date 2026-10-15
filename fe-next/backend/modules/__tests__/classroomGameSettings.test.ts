@@ -59,6 +59,19 @@ describe('setClassroomGameMode', () => {
     expect(written.settings.vocabQuizVariant).toBeUndefined();
   });
 
+  it('switches a room into Boss Battle v2 as a classic board carrying the chosen boss', async () => {
+    await setClassroomGameMode('ABC123', 'classic', undefined, 'spellingBee');
+    const written = JSON.parse(mockSetex.mock.calls[0][2] as string);
+    expect(written.settings).toMatchObject({ gameMode: 'classic', classroomBossId: 'spellingBee' });
+  });
+
+  it('drops a stale boss when the room switches back to plain classic', async () => {
+    mockGetClassroomGame.mockResolvedValue({ ...GAME, settings: { ...GAME.settings, classroomBossId: 'lexiconDragon' } });
+    await setClassroomGameMode('ABC123', 'classic');
+    const written = JSON.parse(mockSetex.mock.calls[0][2] as string);
+    expect(written.settings.classroomBossId).toBeUndefined();
+  });
+
   it('writes the new mode back under the same key and keeps everything else', async () => {
     const ok = await setClassroomGameMode('ABC123', 'vocab-quiz');
 

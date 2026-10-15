@@ -25,6 +25,8 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { VocabQuizHostView } from '@/components/education/vocabQuiz/VocabQuizHostView';
 import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { TEACHER_CONTROLS_INSET } from '@/components/education/controls/teacherBarInset';
+import { ProjectorBossStage } from '@/components/education/boss/ProjectorBossStage';
+import { useBossActive } from '@/stores/classroomBossStore';
 import { ClassroomLivePanel } from '@/components/education/projector/ClassroomLivePanel';
 import TvRoundFxLayers from './tv-broadcast/TvRoundFxLayers';
 import TvWordcraftBroadcast from './tv-broadcast/TvWordcraftBroadcast';
@@ -145,6 +147,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   // Is this room running a live Vocab Quiz? Detected from the server's quiz
   // traffic — the quiz is not a `GameMode`, so the room's mode cannot say.
   const isVocabQuizRoom = useIsVocabQuizRoom(socket);
+  const bossActive = useBossActive();
 
   // CrazyGames platform detection - fullscreen is managed by CrazyGames, not us
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -308,6 +311,10 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       trailing={isClassroom ? <>{fullscreenButton}{exitButton}</> : undefined}
     />
   );
+
+  if (bossActive) {
+    return <ProjectorBossStage remainingTime={remainingTime ?? 0} trailing={<>{fullscreenButton}{exitButton}</>} style={TEACHER_CONTROLS_INSET} />;
+  }
 
   if (gameMode === 'wordcraft') {
     return <TvWordcraftBroadcast joinBar={joinBar} socket={socket} leaderboard={leaderboardData} remainingTime={remainingTime} t={t} />;

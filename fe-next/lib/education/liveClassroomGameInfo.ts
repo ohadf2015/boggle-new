@@ -21,6 +21,8 @@ export interface LiveClassroomGameSettingsInfo {
   vocabQuizSeconds: number | null;
   /** 'boss' for a Boss Battle room; absent until the live-game route forwards it. */
   vocabQuizVariant?: 'classic' | 'boss' | null;
+  /** Boss Battle v2: the boss a classic room fights; absent until the live-game route forwards it. */
+  classroomBossId?: string | null;
   /** Null for a room launched without the dials — read as the loud default. */
   pressure: ResolvedClassroomPressure | null;
 }

@@ -16,6 +16,7 @@ import logger from '../utils/logger';
 import { normalizeClassroomPressure } from '@/shared/utils/classroomPressure';
 import type { ClassroomPressure } from '@/shared/types/classroom';
 import type { VocabQuizVariant } from '@/shared/types/vocabQuiz';
+import type { ClassroomBossId } from '@/shared/types/classroomBoss';
 import {
   CLASSROOM_GAME_TTL,
   getClassroomGame,
@@ -41,16 +42,18 @@ export type SwitchableClassroomMode = NonNullable<ClassroomGameSettings['gameMod
 export function setClassroomGameMode(
   gameCode: string,
   gameMode: SwitchableClassroomMode,
-  vocabQuizVariant?: VocabQuizVariant
+  vocabQuizVariant?: VocabQuizVariant,
+  classroomBossId?: ClassroomBossId
 ): Promise<boolean> {
   // Same queue as the roster writers — a join mid-switch must not drop the new mode.
-  return withClassroomGameLock(gameCode, () => setClassroomGameModeUnlocked(gameCode, gameMode, vocabQuizVariant));
+  return withClassroomGameLock(gameCode, () => setClassroomGameModeUnlocked(gameCode, gameMode, vocabQuizVariant, classroomBossId));
 }
 
 async function setClassroomGameModeUnlocked(
   gameCode: string,
   gameMode: SwitchableClassroomMode,
-  vocabQuizVariant?: VocabQuizVariant
+  vocabQuizVariant?: VocabQuizVariant,
+  classroomBossId?: ClassroomBossId
 ): Promise<boolean> {
   try {
     const redis = getRedisClient();
@@ -65,11 +68,12 @@ async function setClassroomGameModeUnlocked(
     }
 
     // The variant is rewritten on EVERY switch, so Boss -> Quiz (same gameMode) cannot keep a stale boss.
-    const { vocabQuizVariant: _stale, ...rest } = game.settings ?? {};
+    const { vocabQuizVariant: _stale, classroomBossId: _staleBoss, ...rest } = game.settings ?? {};
     game.settings = {
       ...rest,
       gameMode,
       ...(gameMode === 'vocab-quiz' && vocabQuizVariant === 'boss' ? { vocabQuizVariant } : {}),
+      ...(gameMode === 'classic' && classroomBossId ? { classroomBossId } : {}),
     };
 
     await redis.setex(

@@ -75,6 +75,8 @@ export interface ClassroomChestReveal {
   roundCash: number;
   rank: number | null;
   size: number;
+  /** The class beat the boss this round: the chest rolled one rarity tier up. */
+  bossWin?: boolean;
 }
 
 export interface ClassroomLockerEntry {

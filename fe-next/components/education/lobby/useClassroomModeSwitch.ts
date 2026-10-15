@@ -27,7 +27,8 @@ import type { Socket } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { useGameActions } from '@/hooks/gameState';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode, type VocabQuizVariant } from '@/shared/types/vocabQuiz';
-import { catalogueIdOf, launchOf, writeLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
+import { isClassroomBossId } from '@/shared/types/classroomBoss';
+import { catalogueIdOf, launchOf, readLocalBossId, writeLocalBossId, writeLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
 import { catalogueEntry } from '../ClassroomModeCatalogueData';
 import type { GameMode } from '@/shared/types/game';
 
@@ -94,7 +95,7 @@ export function useClassroomModeSwitch({
     if (!socket) return;
 
     const onChanged = (data?: unknown) => {
-      const payload = data as { gameCode?: string; gameMode?: ClassroomGameMode; vocabQuizVariant?: VocabQuizVariant } | undefined;
+      const payload = data as { gameCode?: string; gameMode?: ClassroomGameMode; vocabQuizVariant?: VocabQuizVariant; classroomBossId?: string } | undefined;
       // An ack for another room is not ours to paint.
       if (!payload?.gameMode || (payload.gameCode && payload.gameCode !== gameCode)) return;
 
@@ -102,9 +103,10 @@ export function useClassroomModeSwitch({
       // The server acks the teacher directly AND through the room broadcast; only the first ack of OUR switch speaks.
       const announce = pendingRef.current !== null;
       pendingRef.current = null;
-      const id = catalogueIdOf(mode, payload.vocabQuizVariant);
+      const id = catalogueIdOf(mode, payload.vocabQuizVariant, payload.classroomBossId);
       writeLocalGameMode(mode);
       writeLocalQuizVariant(payload.vocabQuizVariant ?? null);
+      writeLocalBossId(isClassroomBossId(payload.classroomBossId) ? payload.classroomBossId : null);
       // `vocab-quiz` is deliberately NOT a member of the board `GameMode`
       // union (see shared/types/vocabQuiz): it has no grid, no submitted words
       // and no rarity scoring, so writing it into the board store would drag
@@ -152,7 +154,7 @@ export function useClassroomModeSwitch({
       }
       setPendingMode(mode);
       pendingRef.current = mode;
-      socket.emit('updateClassroomGameMode', { gameCode, ...launchOf(mode) });
+      socket.emit('updateClassroomGameMode', { gameCode, ...launchOf(mode, readLocalBossId() ?? undefined) });
     },
     [appliedMode, currentMode, gameCode, socket, t]
   );

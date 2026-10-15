@@ -10,6 +10,7 @@
 
 'use client';
 
+import type { ClassroomBossId } from '@/shared/types/classroomBoss';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { io, type Socket } from 'socket.io-client';
@@ -42,6 +43,7 @@ export interface ClassroomLaunchPayload {
     vocabQuizQuestionCount?: number;
     vocabQuizSeconds?: number;
     vocabQuizVariant?: VocabQuizVariant;
+    classroomBossId?: ClassroomBossId;
     playStyle: PlayStyle;
     teamCount?: number;
     accessibility?: ClassroomAccessibility;

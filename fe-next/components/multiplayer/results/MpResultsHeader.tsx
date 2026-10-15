@@ -6,7 +6,8 @@ import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { MpHudBar } from '../shell/MpHudBar';
 import { MpBackButton } from '../shell/MpBackButton';
 import { getModePresentation } from '@/lib/multiplayer/modePresentation';
-import { classroomRoundModeMeta } from '../round/roundModes';
+import { BOSS_ROUND_META, classroomRoundModeMeta } from '../round/roundModes';
+import { useBossActive } from '@/stores/classroomBossStore';
 import { cn } from '@/lib/utils';
 import { MODE_TONE } from './MpNextModeCard';
 import fx from './mpResults.module.css';
@@ -32,7 +33,10 @@ export interface MpResultsHeaderProps {
  */
 export function MpResultsHeader({ branch, round, totalRounds, playedMode, onLeave, t }: MpResultsHeaderProps) {
   const mode = getModePresentation(playedMode);
-  const classroomOnly = playedMode === 'wordcraft' || playedMode === 'vocab-quiz' ? classroomRoundModeMeta(playedMode) : null;
+  const bossRound = useBossActive();
+  const classroomOnly = bossRound
+    ? BOSS_ROUND_META
+    : playedMode === 'wordcraft' || playedMode === 'vocab-quiz' ? classroomRoundModeMeta(playedMode) : null;
   const tone = MODE_TONE[classroomOnly?.color ?? mode.color];
   const modeLabelKey = classroomOnly?.nameKey ?? mode.labelKey;
   return (

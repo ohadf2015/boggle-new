@@ -181,14 +181,14 @@ describe('every classroom mode is complete on every surface', () => {
   });
 
   it.each([...CLASSROOM_GAME_MODES])('%s is accepted by the classroom create handler', (mode) => {
-    const src = read('backend/handlers/classroomGameHandler.ts');
+    const src = read('backend/handlers/classroomGameSchemas.ts');
     const enumLine = src.split('\n').find((l) => l.includes('gameMode: z.enum('));
     expect(enumLine, 'could not find the gameMode enum').toBeTruthy();
     expect(enumLine!, `the create handler rejects ${mode}`).toContain(`'${mode}'`);
   });
 
   it.each([...CLASSROOM_GAME_MODES])('%s is storable in the classroom game record', (mode) => {
-    const src = read('backend/modules/classroomGameManager.ts');
+    const src = read('backend/modules/classroomGameTypes.ts');
     expect(src, `ClassroomGameSettings cannot hold ${mode}`).toContain(`'${mode}'`);
   });
 });

@@ -45,7 +45,7 @@ type Row = Omit<CatalogueMode, 'suffix' | 'poster' | 'accent' | 'launch' | 'name
 
 const ROWS: readonly Row[] = [
   { id: 'vocab-quiz', category: 'meaning', complexity: 'simple', style: 'ffa', teamsCapable: false, bestFor: ['meanings', 'testPrep'], preview: 'quiz' },
-  { id: BOSS_BATTLE_ID, category: 'meaning', complexity: 'simple', style: 'class', teamsCapable: false, bestFor: ['teamwork', 'review'], preview: 'boss' },
+  { id: BOSS_BATTLE_ID, category: 'board', complexity: 'simple', style: 'class', teamsCapable: false, bestFor: ['teamwork', 'review'], preview: 'boss' },
   { id: 'wordcraft', category: 'meaning', complexity: 'tricky', style: 'solo', teamsCapable: false, bestFor: ['lessonWords', 'independent'], preview: 'craft' },
   { id: 'classic', category: 'board', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['spelling', 'mixedLevels'], preview: 'board' },
   { id: 'blast', category: 'board', complexity: 'simple', style: 'ffa', teamsCapable: true, bestFor: ['energy', 'warmup'], preview: 'blast' },
@@ -58,7 +58,7 @@ export const BOSS_POSTER = '/images/bosses/boss-lexicon-dragon.png';
 const MODES: readonly CatalogueMode[] = ROWS.flatMap((row): CatalogueMode[] => {
   const launch = launchOf(row.id);
   if (row.id === BOSS_BATTLE_ID) {
-    return [{ ...row, launch, suffix: 'bossBattle', nameKey: 'eg2Modes.boss.name', howKey: 'eg2Modes.boss.how', poster: BOSS_POSTER, accent: 'pink' }];
+    return [{ ...row, launch, suffix: 'bossBattle', nameKey: 'eg2Modes.boss.name', howKey: 'classroomBoss.cardHow', poster: BOSS_POSTER, accent: 'pink' }];
   }
   const base = teacherGameMode(launch.gameMode);
   if (!base) return [];

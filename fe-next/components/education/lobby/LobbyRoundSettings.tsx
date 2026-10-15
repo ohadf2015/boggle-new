@@ -20,6 +20,8 @@ import {
 } from '@/shared/utils/classroomHuntTarget';
 import { VocabQuizFocusPicker } from '../vocabQuiz/VocabQuizFocusPicker';
 import { LobbyChoiceRow } from './LobbyChoiceRow';
+import { ClassroomBossPicker } from '../boss/ClassroomBossPicker';
+import type { ClassroomBossId } from '@/shared/types/classroomBoss';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode, type PracticeFocusSetting } from '@/shared/types/vocabQuiz';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
@@ -50,6 +52,9 @@ export interface LobbyRoundSettingsProps {
   onVocabQuizQuestionCountChange: (count: number) => void;
   onVocabQuizSecondsChange: (seconds: number) => void;
   onTreasureChestsChange?: (enabled: boolean) => void;
+  /** Boss Battle only: the boss the class fights. */
+  bossId?: ClassroomBossId;
+  onBossChange?: (id: ClassroomBossId) => void;
 }
 
 export function LobbyRoundSettings({
@@ -74,6 +79,8 @@ export function LobbyRoundSettings({
   onVocabQuizQuestionCountChange,
   onVocabQuizSecondsChange,
   onTreasureChestsChange,
+  bossId,
+  onBossChange,
 }: LobbyRoundSettingsProps) {
   const { t } = useLanguage();
   const isQuiz = gameMode === VOCAB_QUIZ_MODE;
@@ -109,6 +116,7 @@ export function LobbyRoundSettings({
 
   return (
     <div data-testid="lobby-round-settings" className="space-y-3">
+      {bossId && onBossChange && <ClassroomBossPicker value={bossId} onChange={onBossChange} />}
       <LobbyChoiceRow
         id="lobby-timer-label"
         label={t('teacher.classroom.timer.title')}

@@ -36,6 +36,9 @@ export function roundModeMeta(mode: string | null | undefined): RoundModeMeta {
   };
 }
 
+/** Boss Battle v2: a classic board, announced (and taught) as the boss fight it is. */
+export const BOSS_ROUND_META: RoundModeMeta = { slug: 'boss-battle', color: 'pink', icon: 'Swords', nameKey: 'eg2Modes.boss.name', ruleKey: 'classroomBoss.howTo' };
+
 /**
  * A classroom room announces the TEACHER's mode: a quiz or wordcraft never sets
  * the store's board mode, which then reads Classic. Unresolved = neutral badge.

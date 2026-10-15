@@ -34,6 +34,8 @@ import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { setClassroomGameMode } from '../modules/classroomGameSettings.js';
 import type { SwitchableClassroomMode } from '../modules/classroomGameSettings';
 import { CLASSROOM_GAME_MODES, VOCAB_QUIZ_VARIANTS, type ClassroomGameMode, type VocabQuizVariant } from '@/shared/types/vocabQuiz';
+import { CLASSROOM_BOSS_IDS, type ClassroomBossId } from '@/shared/types/classroomBoss';
+import { resolveBossForTeacher } from '../services/classroomBoss/bossEntitlement.js';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { getAuthUserId } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
@@ -47,6 +49,7 @@ const updateModeSchema = z.object({
   // rejected here (recurring pitfall class 3).
   gameMode: z.enum(CLASSROOM_GAME_MODES as unknown as [ClassroomGameMode, ...ClassroomGameMode[]]),
   vocabQuizVariant: z.enum(VOCAB_QUIZ_VARIANTS).optional(),
+  classroomBossId: z.enum(CLASSROOM_BOSS_IDS).optional(),
 });
 
 /**
@@ -70,7 +73,7 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
       return;
     }
     // CLASSROOM_GAME_MODES (the zod enum above) is exactly the switchable set, so the narrower type is a fact, not a cast of convenience.
-    const payload = validation.data as { gameCode: string; gameMode: SwitchableClassroomMode; vocabQuizVariant?: VocabQuizVariant };
+    const payload = validation.data as { gameCode: string; gameMode: SwitchableClassroomMode; vocabQuizVariant?: VocabQuizVariant; classroomBossId?: ClassroomBossId };
     const boss = payload.gameMode === 'vocab-quiz' && payload.vocabQuizVariant === 'boss';
 
     const authUserId = getAuthUserId(socket);
@@ -92,6 +95,7 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
       // The one refusal with a reason the teacher can act on. Swapping the
       // engine under a class that is mid-round would end the round for
       // everyone, so say so rather than doing it or doing nothing.
+      const bossId = payload.gameMode === 'classic' ? await resolveBossForTeacher(game.teacherId, payload.classroomBossId) : undefined;
       if (game.status === 'playing') {
         socket.emit('classroomGameError', { error: 'education.modePicker.switchMidRound' });
         return;
@@ -99,13 +103,20 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
 
       const applied = boss
         ? await setClassroomGameMode(payload.gameCode, payload.gameMode, 'boss')
-        : await setClassroomGameMode(payload.gameCode, payload.gameMode);
+        : bossId
+          ? await setClassroomGameMode(payload.gameCode, payload.gameMode, undefined, bossId)
+          : await setClassroomGameMode(payload.gameCode, payload.gameMode);
       if (!applied) {
         socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' });
         return;
       }
 
-      const announcement = { gameCode: payload.gameCode, gameMode: payload.gameMode, ...(boss ? { vocabQuizVariant: 'boss' as const } : {}) };
+      const announcement = {
+        gameCode: payload.gameCode,
+        gameMode: payload.gameMode,
+        ...(boss ? { vocabQuizVariant: 'boss' as const } : {}),
+        ...(bossId ? { classroomBossId: bossId } : {}),
+      };
 
       // The teacher's own confirmation carries the code it applied to, so the
       // client can ignore an ack for a room it is no longer in.

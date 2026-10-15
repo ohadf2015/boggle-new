@@ -9,6 +9,7 @@
  * bookkeeping and the broadcasts all live here, so no mode can drift.
  */
 
+import { hitRoomBoss } from '../classroomBoss/roomBoss';
 import type { Server } from 'socket.io';
 import type { Language } from '@/shared/types';
 import type { Bot } from '../../modules/botBehavior';
@@ -164,6 +165,7 @@ export function playBotWord(ctx: BotRoundContext, bot: Bot, rules: BotPlayRules,
     isBot: true,
   });
   updatePlayerScore(gameCode, bot.username, credited, true);
+  hitRoomBoss(ctx.io, gameCode, game, { username: bot.username, word, score: credited });
   if (eventBonus !== 0) addPlayerEventBonus(gameCode, bot.username, eventBonus);
 
   bot.wordsFound.push(word);

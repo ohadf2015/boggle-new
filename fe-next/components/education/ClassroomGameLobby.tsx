@@ -48,6 +48,7 @@ import { trackEduLiveGameStarted } from '@/lib/education/telemetry';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { configuredRoundMinutes, recommendedModeBadge } from '@/lib/education/gameModes';
 import { launchOf, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
+import { FREE_CLASSROOM_BOSS_ID, type ClassroomBossId } from '@/shared/types/classroomBoss';
 import { availableFocuses } from '@/lib/education/vocabFocus';
 import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
 import { ClassroomModeCatalogue } from './ClassroomModeCatalogue';
@@ -144,6 +145,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   // default below is derived at render from whether a lesson is attached — ONE
   // source of truth, nothing that can flip it late (pitfalls class 1).
   const [pickedGameMode, setPickedGameMode] = useState<ClassroomCatalogueId | null>(null);
+  const [bossId, setBossId] = useState<ClassroomBossId>(FREE_CLASSROOM_BOSS_ID);
   const [vocabQuizFocus, setVocabQuizFocus] = useState<PracticeFocusSetting>('any');
   const [vocabQuizQuestionCount, setVocabQuizQuestionCount] = useState(VOCAB_QUIZ_DEFAULT_QUESTION_COUNT);
   const [vocabQuizSeconds, setVocabQuizSeconds] = useState(VOCAB_QUIZ_DEFAULT_SECONDS);
@@ -231,7 +233,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   );
   const pickedId: ClassroomCatalogueId =
     pickedGameMode ?? (selectedLessonIds.length > 0 && quizPlayable ? VOCAB_QUIZ_MODE : 'classic');
-  const { gameMode, vocabQuizVariant } = launchOf(pickedId);
+  const { gameMode, vocabQuizVariant, classroomBossId } = launchOf(pickedId, bossId);
   const recommended = useMemo(() => recommendedModeBadge(lessonWords), [lessonWords]);
   // The poster's minute chip quotes THIS room, not the catalog, so it cannot
   // promise five minutes and open a three-minute round (pitfall class 3).
@@ -251,7 +253,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
     selectedLessonIds.length === 0 || !selectedClassroomId || allPlayableWords.length === 0;
 
   const startGame = useCallback(
-    (mode: ClassroomGameMode, variant?: typeof vocabQuizVariant) => {
+    (mode: ClassroomGameMode, variant?: typeof vocabQuizVariant, boss?: ClassroomBossId) => {
       setStartError(null);
       const classroom = classrooms.find((c) => c.id === selectedClassroomId);
       if (mode === VOCAB_QUIZ_MODE && !quizPlayable) return;
@@ -275,6 +277,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             language,
             gameMode: mode,
             ...(variant ? { vocabQuizVariant: variant } : {}),
+            ...(boss ? { classroomBossId: boss } : {}),
             quizPlayable,
             targetWord,
             playStyle,
@@ -315,6 +318,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           boardSize,
           allowLateJoin: true,
           gameMode: mode,
+          ...(boss ? { classroomBossId: boss } : {}),
           targetWord: targetWord || undefined,
           ...(mode === VOCAB_QUIZ_MODE
             ? { vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds, treasureChestsEnabled, ...(variant ? { vocabQuizVariant: variant } : {}) }
@@ -412,7 +416,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           busy={isStarting}
           blockedKey={blockedKey}
           onPick={pickMode}
-          onGoLive={() => startGame(gameMode, vocabQuizVariant)}
+          onGoLive={() => startGame(gameMode, vocabQuizVariant, classroomBossId)}
         />
       }
     >
@@ -471,6 +475,8 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           vocabQuizSeconds={vocabQuizSeconds}
           treasureChestsEnabled={treasureChestsEnabled}
           treasureChestsAvailable={vocabQuizVariant !== 'boss'}
+          bossId={classroomBossId}
+          onBossChange={setBossId}
           onTimerChange={setTimerMinutes}
           onBoardSizeChange={setBoardSize}
           onMinWordLengthChange={setMinWordLength}

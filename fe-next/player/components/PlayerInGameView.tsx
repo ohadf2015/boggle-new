@@ -30,6 +30,8 @@ import { CrosswordVersus } from '@/components/multiplayer/crossword/CrosswordVer
 import { WordcraftLiveView } from '@/components/multiplayer/wordcraft/WordcraftLiveView';
 import type { LetterGrid, Language, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
+import { PhoneBossStrip } from '@/components/education/boss/PhoneBossStrip';
+import { useBossActive } from '@/stores/classroomBossStore';
 import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/multiplayer/inGameContainerClass';
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
 import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
@@ -198,6 +200,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   const shellEnabled = useDesktopShellEnabled();
   // Live Vocab Quiz rooms replace the board entirely.
   const isVocabQuizRoom = useIsVocabQuizRoom(socket);
+  const bossActive = useBossActive();
 
   // Wait for server to confirm mode before rendering — prevents one-frame classic flash
   // caused by the host handler setting tableData (React state) and gameMode (Zustand)
@@ -417,6 +420,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           onExit={onExitRoom}
           canvas={gameCanvas}
           socket={socket}
+          bossStrip={bossActive ? <PhoneBossStrip /> : undefined}
         />
       ) : (
         gameCanvas
