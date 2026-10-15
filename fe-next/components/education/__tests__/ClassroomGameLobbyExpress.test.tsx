@@ -95,7 +95,7 @@ describe('<ClassroomGameLobbyExpress>', () => {
 
     fire('classroomGameCreated', { success: true, gameCode: payload.gameCode });
     await waitFor(() =>
-      expect(replace).toHaveBeenCalledWith(`/en/multiplayer?room=${payload.gameCode}&classroom=true&host=true`)
+      expect(replace).toHaveBeenCalledWith(`/en/education/live?room=${payload.gameCode}&host=1`)
     );
   });
 
@@ -118,7 +118,7 @@ describe('<ClassroomGameLobbyExpress>', () => {
 
     fire('classroomGameCreated', { success: true, gameCode: payload.gameCode });
     await waitFor(() =>
-      expect(replace).toHaveBeenCalledWith(`/en/multiplayer?room=${payload.gameCode}&classroom=true&host=true`)
+      expect(replace).toHaveBeenCalledWith(`/en/education/live?room=${payload.gameCode}&host=1`)
     );
   });
 
@@ -207,6 +207,6 @@ describe('<ClassroomGameLobbyExpress>', () => {
     render(<ClassroomGameLobbyExpress intent={intent} onOpenFullSetup={vi.fn()} />);
     fire('classroomGameCreated', { success: true, gameCode: 'ZZZ999' });
 
-    await waitFor(() => expect(replace).toHaveBeenCalledWith('/en/multiplayer?room=ZZZ999&classroom=true&host=true'));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/en/education/live?room=ZZZ999&host=1'));
   });
 });

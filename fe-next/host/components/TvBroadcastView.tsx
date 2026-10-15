@@ -26,6 +26,7 @@ import { VocabQuizHostView } from '@/components/education/vocabQuiz/VocabQuizHos
 import { useIsVocabQuizRoom } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { TEACHER_CONTROLS_INSET } from '@/components/education/controls/teacherBarInset';
 import { ClassroomLivePanel } from '@/components/education/projector/ClassroomLivePanel';
+import ProjectorBoard, { projectorShowsBoard } from '@/components/education/live/ProjectorBoard';
 import TvRoundFxLayers from './tv-broadcast/TvRoundFxLayers';
 import TvWordcraftBroadcast from './tv-broadcast/TvWordcraftBroadcast';
 import TvBodyScroller from './tv-broadcast/TvBodyScroller';
@@ -118,6 +119,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   // Game state
   remainingTime,
   timerValue,
+  tableData,
 
   // Players
   playersReady,
@@ -400,13 +402,12 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       <div className={`${isClassroom ? 'shrink-0 md:shrink md:flex-1 md:min-h-0 grid-rows-[auto_auto]' : 'flex-1 min-h-0 grid-rows-[1fr_1fr]'} grid grid-cols-1 md:grid-cols-2 md:grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
         <div className={isClassroom ? 'md:min-h-0 md:overflow-hidden' : 'min-h-[180px] md:min-h-0 overflow-hidden'}>
           {isClassroom && gameMode !== 'word-hunt' ? (
-            <ClassroomLivePanel
-              socket={socket}
-              totalWords={roomWordTotal}
-              lessonWords={lessonWords}
-              hostUsername={username}
-              t={t}
-            />
+            <div className="flex h-full min-h-0 gap-2 md:gap-4">
+              {projectorShowsBoard(gameMode, tableData) && tableData && <ProjectorBoard grid={tableData} label={t('eduLiveRoom.round.boardLabel')} />}
+              <div className="min-w-0 flex-1">
+                <ClassroomLivePanel socket={socket} totalWords={roomWordTotal} lessonWords={lessonWords} hostUsername={username} t={t} />
+              </div>
+            </div>
           ) : (
           <TvActivityPanel
             playerScores={playerScores}

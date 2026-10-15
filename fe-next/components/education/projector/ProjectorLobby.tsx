@@ -19,7 +19,7 @@ import { catalogueEntry } from '@/components/education/ClassroomModeCatalogueDat
 import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 
-interface ProjectorLobbyProps {
+export interface ProjectorLobbyProps {
   gameCode: string;
   language: string;
   baseUrl?: string;

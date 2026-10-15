@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import ClassroomTvResults from '@/components/education/results/ClassroomTvResults';
 import { PROJECTOR_RESULTS_Z } from '@/lib/education/roundEndLayer';
 import { useTvFullscreen } from '../../hooks/useTvFullscreen';
+import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { PlayerResult } from '@/types/components';
 
@@ -51,7 +52,12 @@ export interface ClassroomTvResultsScreenProps {
   players?: PlayerResult[];
 }
 
-export function ClassroomTvResultsScreen({
+export function ClassroomTvResultsScreen(props: ClassroomTvResultsScreenProps) {
+  const EduResults = useEduLiveSurfaces().ClassroomResults;
+  return EduResults ? <EduResults {...props} /> : <SharedClassroomTvResultsScreen {...props} />;
+}
+
+function SharedClassroomTvResultsScreen({
   summary,
   onRematch,
   onClose,

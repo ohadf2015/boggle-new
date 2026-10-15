@@ -45,6 +45,7 @@ import { LobbyExitButton, LobbyChatButton, LobbyChatPanel, HowToPlaySheet, ChatS
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { ClassroomWaitingStage } from '@/components/education/lobby/ClassroomWaitingStage';
+import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import { AvatarQuickPick } from '@/components/student/live/AvatarQuickPick';
 import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
 
@@ -96,6 +97,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
     isClassroomMode = false, classroomGameMode,
   } = props;
   const t = props.t as T;
+  const eduSurfaces = useEduLiveSurfaces();
   const { isAuthenticated, updateProfile } = useAuth();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const gameMode = useGameMode();
@@ -142,6 +144,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
   const status = <LobbyAutoStartStatus readyCount={readyCount} readyTotal={readyTotal} t={t} />;
   const emote = <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />;
 
+  const StudentStage = eduSurfaces.StudentLobby ?? ClassroomWaitingStage;
   const dialogs = (
     <>
       <AvatarBuilderModal
@@ -173,9 +176,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
   if (isClassroomMode) {
     return (
       <>
-        <ClassroomWaitingStage
+        <StudentStage
           username={username}
-          avatar={<Avatar customAvatar={currentAvatar} size="2xl" className="!w-full !h-full" mood={emotesByUsername[username]?.emote} />}
+          avatar={<Avatar customAvatar={currentAvatar} userId={username} size="2xl" className="!w-full !h-full" mood={emotesByUsername[username]?.emote} />}
           onEditAvatar={openAvatarBuilder}
           nameSlot={<ClassroomNameEditor username={username} canEdit={!isAuthenticated} onSave={handleSelfNameChange} t={t} />}
           readySlot={readyButton}

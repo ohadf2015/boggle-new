@@ -88,7 +88,7 @@ describe('<JoinFlow> in Hebrew', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: /education\.student\.join\.flow\.go/ }));
     await vi.waitFor(() =>
-      expect(mockPush).toHaveBeenCalledWith('/he/multiplayer?room=P45KRT&classroom=true')
+      expect(mockPush).toHaveBeenCalledWith('/he/education/live?room=P45KRT')
     );
   });
 });

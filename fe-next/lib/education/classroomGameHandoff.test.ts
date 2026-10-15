@@ -26,18 +26,18 @@ import { UsernameSchema } from '@/shared/schemas/socketSchemas';
 describe('classroomMultiplayerPath', () => {
   it('carries the room code and marks the room as a host-run classroom game', () => {
     const path = classroomMultiplayerPath('en', 'ABC123');
-    expect(path).toBe('/en/multiplayer?room=ABC123&classroom=true&host=true');
+    expect(path).toBe('/en/education/live?room=ABC123&host=1');
   });
 
   it('respects the active locale so the teacher is not bounced to English', () => {
-    expect(classroomMultiplayerPath('he', 'XYZ789')).toContain('/he/multiplayer');
+    expect(classroomMultiplayerPath('he', 'XYZ789')).toContain('/he/education/live');
   });
 });
 
 describe('shouldLoadLessonData', () => {
   it('loads the lesson for the URL the classroom lobby actually navigates to', () => {
-    const search = new URL(`https://x${classroomMultiplayerPath('en', 'ABC123')}`).search;
-    expect(shouldLoadLessonData(search)).toBe(true);
+    const url = new URL(`https://x${classroomMultiplayerPath('en', 'ABC123')}`);
+    expect(shouldLoadLessonData(url.search, url.pathname)).toBe(true);
   });
 
   it('still honours the legacy ?fromLesson=true entry point', () => {

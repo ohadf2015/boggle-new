@@ -65,10 +65,8 @@ describe('<JoinFlow> — code step', () => {
     // A student typing the last character must not be handed a network wait.
     mockResolve.mockImplementation(hangingLookup);
     render(<JoinFlow />);
-
     typeCode('P45KR');
     expect(onNameStep()).toBe(false);
-
     typeCode('P45KRT');
     // Synchronously — no findBy, no waitFor. The lookup is still in flight.
     expect(onNameStep()).toBe(true);
@@ -97,11 +95,9 @@ describe('<JoinFlow> — code step', () => {
     expect(onNameStep()).toBe(false);
     expect(codeField()).toBeInTheDocument();
   });
-
   it('advances directly to nickname step when initialCode resolves late after mount', () => {
     const { rerender } = render(<JoinFlow initialCode="" />);
     expect(onNameStep()).toBe(false);
-
     rerender(<JoinFlow initialCode="P45KRT" />);
     expect(onNameStep()).toBe(true);
     expect(screen.getByText('P45KRT')).toBeInTheDocument();
@@ -199,7 +195,7 @@ describe('<JoinFlow> — submitting', () => {
     await join('Maya');
     await waitFor(() => {
       expect(mockSetStoredUsername).toHaveBeenCalledWith('Maya');
-      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=P45KRT&classroom=true');
+      expect(mockPush).toHaveBeenCalledWith('/en/education/live?room=P45KRT');
     });
   });
 
@@ -215,7 +211,7 @@ describe('<JoinFlow> — submitting', () => {
     fireEvent.click(goButton());
     await waitFor(() => {
       expect(mockSetStoredUsername).toHaveBeenCalledWith('Maya');
-      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=P45KRT&classroom=true');
+      expect(mockPush).toHaveBeenCalledWith('/en/education/live?room=P45KRT');
     });
   });
 

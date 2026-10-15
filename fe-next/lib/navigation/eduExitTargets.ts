@@ -3,6 +3,7 @@
  * hooks. Kept pure so the route matrix can pin them.
  */
 import { educationHomeFor } from '@/lib/navigation/educationBackHref';
+import { classroomLivePath } from '@/lib/education/classroomLivePath';
 
 /** Quick Play opened from the student Academy goes back to the Academy, not the arcade home. */
 export function quickPlayBackHref(locale: string, academy: boolean): string | undefined {
@@ -15,7 +16,7 @@ export function quickPlayBackHref(locale: string, academy: boolean): string | un
  * on the Academy hub with the student's next open assignment surfaced.
  */
 export function joinSuccessHref(locale: string, gameCode: string | null | undefined): string {
-  return gameCode ? `/${locale}/multiplayer?room=${gameCode}&classroom=true` : `/${locale}/student?class=open`;
+  return gameCode ? classroomLivePath(locale, gameCode) : `/${locale}/student?class=open`;
 }
 
 const CLASSROOM_GAME_RE = /^\/([a-z]{2})\/education\/classroom-game\/?$/;

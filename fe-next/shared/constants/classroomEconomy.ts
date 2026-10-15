@@ -98,3 +98,9 @@ export const ZERO_ECONOMY_SNAPSHOT: ClassroomEconomySnapshot = {
   config: { wrongAnswerCost: false, powerUps: true },
   lastDelta: null,
 };
+
+/** The round a chest belongs to — same rule as the server's `roundIdOf`: the saved session, else the room code. */
+export function rewardRoundId(gameSessionId: number | string | null | undefined, gameCode: string | null | undefined): string | null {
+  if (!gameCode) return null;
+  return String(gameSessionId ?? gameCode);
+}

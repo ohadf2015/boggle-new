@@ -69,6 +69,7 @@ export const EDUCATION_NAV_ITEMS: Record<EducationNavKind, readonly NavTemplate[
 const CHROME_FREE: readonly (readonly string[])[] = [
   ['student', 'join'],
   ['education'],
+  ['education', 'live'],
   ['multiplayer'],
 ];
 

@@ -75,7 +75,7 @@ describe('<JoinFlow> — the first tap counts', () => {
     await waitFor(() => expect(mockJoin).toHaveBeenCalledTimes(1));
     expect(mockJoin).toHaveBeenCalledWith('P45KRT', { guestName: 'Maya' });
     await waitFor(() =>
-      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=P45KRT&classroom=true')
+      expect(mockPush).toHaveBeenCalledWith('/en/education/live?room=P45KRT')
     );
   });
 

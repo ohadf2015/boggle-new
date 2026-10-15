@@ -11,6 +11,8 @@
  * classroom join route and then uses the href and events built here.
  */
 
+import { classroomLivePath } from '@/lib/education/classroomLivePath';
+
 export const EDUCATION_JOIN_STARTED = 'education_join_started';
 export const EDUCATION_JOIN_COMPLETED = 'education_join_completed';
 export const STUDENT_JOIN_STARTED = 'student_join_started';
@@ -50,7 +52,7 @@ export interface SignedInJoinDest {
  */
 export function signedInJoinHref(locale: string, dest: SignedInJoinDest): string {
   if (dest.gameCode && JOIN_CODE_RE.test(dest.gameCode)) {
-    return `/${locale}/multiplayer?room=${dest.gameCode}&classroom=true`;
+    return classroomLivePath(locale, dest.gameCode);
   }
   return `/${locale}/student?class=open`;
 }

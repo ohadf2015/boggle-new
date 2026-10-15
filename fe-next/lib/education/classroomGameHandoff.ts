@@ -10,10 +10,11 @@
  */
 
 import { sanitizeUsername } from '@/utils/consts';
+import { classroomLivePath, isClassroomLivePathname } from '@/lib/education/classroomLivePath';
 
-/** The URL ClassroomGameLobby sends the teacher to after the room is created. */
+/** @deprecated Use `classroomLivePath(locale, code, { host: true })`. Kept so lobby callers need no edit. */
 export function classroomMultiplayerPath(locale: string, gameCode: string): string {
-  return `/${locale}/multiplayer?room=${gameCode}&classroom=true&host=true`;
+  return classroomLivePath(locale, gameCode, { host: true });
 }
 
 /**
@@ -23,7 +24,8 @@ export function classroomMultiplayerPath(locale: string, gameCode: string): stri
  * when the teacher leaves without passing through results, so a casual room
  * opened afterwards would inherit the class vocabulary.
  */
-export function shouldLoadLessonData(search: string): boolean {
+export function shouldLoadLessonData(search: string, pathname?: string | null): boolean {
+  if (isClassroomLivePathname(pathname)) return true;
   const params = new URLSearchParams(search);
   return params.get('classroom') === 'true' || params.get('fromLesson') === 'true';
 }

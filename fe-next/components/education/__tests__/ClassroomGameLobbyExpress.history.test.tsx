@@ -85,7 +85,7 @@ describe('<ClassroomGameLobbyExpress> history', () => {
     const payload = emit.mock.calls[0][1] as { gameCode: string };
     fire('classroomGameCreated', { success: true, gameCode: payload.gameCode });
     await waitFor(() =>
-      expect(replace).toHaveBeenCalledWith(`/en/multiplayer?room=${payload.gameCode}&classroom=true&host=true`),
+      expect(replace).toHaveBeenCalledWith(`/en/education/live?room=${payload.gameCode}&host=1`),
     );
     expect(push).not.toHaveBeenCalled();
   });

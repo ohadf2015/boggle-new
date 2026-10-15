@@ -20520,6 +20520,68 @@ const ja = {
     "projector": "プロジェクター"
   }
   // @hqCalm:end
+  ,
+  // @eduLiveRoom:start
+  "eduLiveRoom": {
+    "round": {
+      "boardLabel": "クラスの盤面"
+    },
+    "lobby": {
+      "brand": "クラス",
+      "joinAt": "参加はこちら",
+      "joined": "{count}人参加",
+      "waitingTitle": "生徒の参加を待っています",
+      "waitingHint": "QRを読み取るか、上のアドレスでコードを入力",
+      "startBlocked": "生徒が1人参加するとスタートできます",
+      "copyLink": "リンクをコピー",
+      "minutes": "{count}分",
+      "leave": "ルームを出る",
+      "moreJoined": "ほか{count}人",
+      "readyCount": "{total}人中{ready}人準備OK"
+    },
+    "student": {
+      "youreIn": "参加できました！",
+      "watchBoard": "大きな画面を見てね。先生がゲームを始めます。",
+      "inClass": "クラス{count}人",
+      "changeLook": "見た目を変える",
+      "leave": "退出"
+    },
+    "entry": {
+      "connecting": "クラスに接続中…",
+      "openingRoom": "ルームを準備中…",
+      "waitingTeacher": "先生がまだゲームを開いていません",
+      "waitingTeacherHint": "このまま待っていてね。始まったらすぐ参加できます。",
+      "noRoomTitle": "ここにゲームはありません",
+      "noRoomStudent": "先生にコードを聞いて参加しよう。",
+      "noRoomHost": "先生ホームからゲームを始めましょう。",
+      "enterCode": "コードを入力",
+      "toTeacher": "先生ホームに戻る"
+    },
+    "hostResults": {
+      "noScoresHint": "同じ盤面でもう一度。クラスにもう一回チャンスを。",
+      "title": "ラウンド結果",
+      "statStudents": "生徒",
+      "statWords": "見つけた単語",
+      "statAvg": "平均スコア",
+      "statLesson": "授業の単語",
+      "playAgain": "もう一度",
+      "nextMode": "次のモード",
+      "viewReport": "レポートを見る",
+      "endGame": "ゲームを終了",
+      "noScores": "このラウンドは誰も得点できませんでした"
+    },
+    "studentResults": {
+      "placed": "あなたの順位",
+      "rankOf": "{total}人中{rank}位",
+      "points": "ポイント",
+      "yourWords": "あなたの単語",
+      "noWords": "今回は単語なし。次こそ！",
+      "nextRound": "次のラウンドは画面に注目",
+      "leave": "退出",
+      "calculating": "単語を集計中…"
+    }
+  }
+  // @eduLiveRoom:end
 };
 
 export { ja };

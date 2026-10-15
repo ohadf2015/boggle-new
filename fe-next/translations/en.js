@@ -19579,6 +19579,68 @@ const en = {
     "projector": "Projector"
   }
   // @hqCalm:end
+  ,
+  // @eduLiveRoom:start
+  "eduLiveRoom": {
+    "round": {
+      "boardLabel": "Class board"
+    },
+    "lobby": {
+      "brand": "Class",
+      "joinAt": "Join at",
+      "joined": "{count} joined",
+      "waitingTitle": "Waiting for students",
+      "waitingHint": "Scan the QR or type the code at the address above",
+      "startBlocked": "Start opens once a student joins",
+      "copyLink": "Copy link",
+      "minutes": "{count} min",
+      "leave": "Leave room",
+      "moreJoined": "+{count} more",
+      "readyCount": "{ready} of {total} ready"
+    },
+    "student": {
+      "youreIn": "You're in!",
+      "watchBoard": "Watch the board. Your teacher starts the game.",
+      "inClass": "{count} in class",
+      "changeLook": "Change look",
+      "leave": "Leave"
+    },
+    "entry": {
+      "connecting": "Connecting to your class…",
+      "openingRoom": "Opening your room…",
+      "waitingTeacher": "Your teacher hasn't opened the game yet",
+      "waitingTeacherHint": "Stay here. You'll join the moment it starts.",
+      "noRoomTitle": "No game here",
+      "noRoomStudent": "Ask your teacher for the code, then join.",
+      "noRoomHost": "Start a game from your teacher home.",
+      "enterCode": "Enter a code",
+      "toTeacher": "Back to teacher home"
+    },
+    "hostResults": {
+      "noScoresHint": "Same board, fresh start. Play again and the class gets another go.",
+      "title": "Round results",
+      "statStudents": "Students",
+      "statWords": "Words found",
+      "statAvg": "Avg score",
+      "statLesson": "Lesson words",
+      "playAgain": "Play again",
+      "nextMode": "Next mode",
+      "viewReport": "View report",
+      "endGame": "End game",
+      "noScores": "No one scored this round"
+    },
+    "studentResults": {
+      "placed": "You placed",
+      "rankOf": "#{rank} of {total}",
+      "points": "points",
+      "yourWords": "Your words",
+      "noWords": "No words this round. Next time!",
+      "nextRound": "Eyes on the board for the next round",
+      "leave": "Leave",
+      "calculating": "Counting up the words…"
+    }
+  }
+  // @eduLiveRoom:end
 };
 
 export { en };

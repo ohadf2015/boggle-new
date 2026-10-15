@@ -1,5 +1,6 @@
 'use client';
 
+import { readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
 import { memo, useMemo, useRef, useEffect, useState, Fragment } from 'react';
 import { m, LayoutGroup } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -75,9 +76,10 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   // The `classroom` prop derives from the start payload, and a coordinator
   // retry `startGame` arrives without it — the host keeps the last value, so it
   // went null after round 1. The teacher's URL carries `classroom=true` for the
-  // whole session (classroomMultiplayerPath), so it backs the prop up.
+  // whole session (classroomLivePath), so it backs the prop up.
   const [classroomUrl] = useState(
-    () => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('classroom') === 'true'
+    () => typeof window !== 'undefined'
+      && readClassroomLiveFlags(window.location.pathname, new URLSearchParams(window.location.search)).isClassroomMode
   );
 
   // Guest students retype their nickname every round, so the lookup is
