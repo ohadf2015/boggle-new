@@ -59,7 +59,8 @@ export function useWordPact(): UseWordPactReturn {
         .select('*')
         .eq('active', true)
         .or(`player1_id.eq.${user.id},player2_id.eq.${user.id}`)
-        .single();
+        // 0 rows is normal (no pact) — .single() turned that into a 406.
+        .maybeSingle();
 
       if (!data) {
         setPact(null);

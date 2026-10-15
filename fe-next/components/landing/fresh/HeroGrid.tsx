@@ -227,6 +227,7 @@ export function HeroGrid({ onFound }: HeroGridProps) {
                   <button
                     type="button"
                     data-cell={`${r}-${c}`}
+                    data-feedback-ignore-rage=""
                     aria-pressed={mode !== 'demo' && lit}
                     onPointerDown={(e) => {
                       lastPointer.current = e.pointerType;

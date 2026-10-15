@@ -42,7 +42,7 @@ import { useWeeklyQuest } from '../useWeeklyQuest';
 
 function setupChain(data: unknown, error: unknown = null) {
   mockSingle.mockResolvedValue({ data, error });
-  mockEq.mockReturnValue({ eq: vi.fn().mockReturnValue({ single: mockSingle }) });
+  mockEq.mockReturnValue({ eq: vi.fn().mockReturnValue({ single: mockSingle, maybeSingle: mockSingle }) });
   mockSelect.mockReturnValue({ eq: mockEq });
   mockFrom.mockReturnValue({ select: mockSelect, insert: mockInsert });
 }

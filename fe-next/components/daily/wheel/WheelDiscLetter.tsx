@@ -45,6 +45,7 @@ const WheelDiscLetter: React.FC<WheelDiscLetterProps> = ({
       ref={btnRef}
       type="button"
       translate="no"
+      data-feedback-ignore-rage=""
       className={cn(
         'wheel-letter-skinnable notranslate absolute pointer-events-auto flex items-center justify-center rounded-full',
         'border-[3px] border-neo-black font-neo-display font-black uppercase leading-none select-none touch-manipulation cursor-pointer',

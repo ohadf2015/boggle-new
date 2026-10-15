@@ -79,7 +79,8 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
         .select('id, quest_type, title, description, requirements, current_progress, xp_reward, completed, week_start')
         .eq('player_id', user.id)
         .eq('week_start', weekStart)
-        .single();
+        // 0 rows is normal (no quest yet) — .single() turned that into a 406.
+        .maybeSingle();
 
       if (error || !data) {
         setActiveQuest(null);

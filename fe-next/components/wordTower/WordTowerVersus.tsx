@@ -149,6 +149,7 @@ export function WordTowerVersus({ socket, username, onQuit, remainingTime }: Wor
                 key={i}
                 type="button"
                 disabled={isSel}
+                data-feedback-ignore-rage=""
                 onClick={() => tower.selectTile(i)}
                 aria-label={t('wordTower.a11y.tile', { letter })}
                 className={`flex aspect-square min-h-[44px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-2xl font-bold shadow-hard active:translate-y-0.5 ${
@@ -165,7 +166,7 @@ export function WordTowerVersus({ socket, username, onQuit, remainingTime }: Wor
           <button type="button" onClick={tower.scramble} disabled={you.scramblesLeft <= 0} aria-label={t('wordTower.hud.scramble')} className="flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-3 font-neo-display font-bold text-neo-white shadow-hard disabled:opacity-40">
             <Shuffle className="h-5 w-5" /> <span className="tabular-nums">{you.scramblesLeft}</span>
           </button>
-          <button type="button" onClick={tower.backspace} disabled={tower.state.selected.length === 0} aria-label={t('wordTower.hud.backspace')} className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-3 text-neo-white shadow-hard disabled:opacity-40">
+          <button type="button" data-feedback-ignore-rage="" onClick={tower.backspace} disabled={tower.state.selected.length === 0} aria-label={t('wordTower.hud.backspace')} className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-3 text-neo-white shadow-hard disabled:opacity-40">
             <Delete className="h-5 w-5" />
           </button>
           <button type="button" onClick={tower.submit} disabled={!canSubmit} className="flex flex-1 items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-cyan py-3 font-neo-display text-lg font-bold text-black shadow-hard disabled:opacity-40">

@@ -97,6 +97,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
       // rewriting a single letter into a word in the target language — e.g.
       // Google Translate turning the tile "I" into Indonesian "saya".
       translate="no"
+      data-feedback-ignore-rage=""
       data-size={large ? 'large' : compact ? 'compact' : 'default'}
       className={cn(
         'wheel-letter-skinnable notranslate absolute inset-0 m-auto flex items-center justify-center font-neo-display font-black uppercase select-none touch-manipulation',

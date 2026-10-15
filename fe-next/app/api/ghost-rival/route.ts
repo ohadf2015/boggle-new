@@ -60,7 +60,9 @@ export async function POST(request: NextRequest) {
 
     const result = await updateRivalScore(userId, points);
     if (!result) {
-      return NextResponse.json({ error: 'No active rivalry' }, { status: 404 });
+      // No rivalry this week is a normal state, not a missing resource: 200 so the
+      // fire-and-forget sync doesn't surface as a 404 in FDT.
+      return NextResponse.json({ newScore: null, rivalry: false });
     }
 
     return NextResponse.json({ newScore: result.newScore });

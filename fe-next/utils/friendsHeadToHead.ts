@@ -89,7 +89,8 @@ export async function getHeadToHead(opponentId: string): Promise<HeadToHeadRecor
     .select('*')
     .eq('player1_id', player1Id)
     .eq('player2_id', player2Id)
-    .single();
+    // No record yet between these two players is normal: .single() 406s on 0 rows.
+    .maybeSingle();
 
   if (error || !h2h) {
     return null;
