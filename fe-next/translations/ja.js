@@ -20503,8 +20503,147 @@ const ja = {
     "done": "完了",
     "pulseTitle": "クラスの様子",
     "projector": "プロジェクター"
-  }
+  },
   // @hqCalm:end
+  // @eduShell:start
+  "eduShell": {
+    "nav": {
+      "home": "ホーム",
+      "library": "ライブラリ",
+      "pro": "Pro"
+    },
+    "brand": {
+      "name": "LexiClash",
+      "tagline": "先生向け",
+      "homeLink": "先生向けLexiClash ホーム"
+    },
+    "account": {
+      "menuLabel": "アカウントメニュー",
+      "fallbackName": "先生",
+      "profile": "プロフィール",
+      "help": "ヘルプ",
+      "whatsNew": "新着情報"
+    },
+    "delivery": {
+      "projector": "プロジェクター",
+      "phones": "スマホで",
+      "both": "どちらでも"
+    },
+    "home": {
+      "regionLabel": "先生のホーム",
+      "railLabel": "今週の様子とプラン",
+      "greetMorning": "おはようございます、{name}さん",
+      "greetAfternoon": "こんにちは、{name}さん",
+      "greetEvening": "こんばんは、{name}さん",
+      "greetNoName": "おかえりなさい",
+      "startWith": "ゲームを始めるクラス：",
+      "switchClass": "クラスを選ぶ",
+      "startLive": "ライブゲームを始める",
+      "yourClasses": "あなたのクラス",
+      "newClass": "新しいクラス",
+      "colClass": "クラス",
+      "colStudents": "生徒",
+      "colLastPlayed": "最後のプレイ",
+      "students": "生徒 {count}人",
+      "notPlayedRecently": "30日間プレイなし",
+      "playWith": "{name}でゲームを始める",
+      "reviewTitle": "間違えた単語を練習する"
+    },
+    "week": {
+      "title": "今週",
+      "games": "プレイしたゲーム",
+      "students": "生徒の合計",
+      "active": "活動中のクラス",
+      "empty": "最初のゲームのあと、ここに数字が表示されます。",
+      "unavailable": "今週の数字を読み込めませんでした。次回また表示されます。"
+    },
+    "pro": {
+      "title": "毎回のゲーム後、つまずいた生徒が分かる",
+      "points": {
+        "struggled": "誰がどの単語でつまずいたか",
+        "reteach": "明日もう一度教えるべき単語",
+        "classes": "クラス数無制限、レポートも印刷可能"
+      },
+      "cta": "Proでできること",
+      "trialCta": "14日間の無料体験を始める",
+      "trialFine": "14日間無料、その後は月{price}。いつでも解約できます。",
+      "dismiss": "今はしない"
+    },
+    "onboarding": {
+      "title": "3ステップで最初のクラスゲーム",
+      "titleCompact": "準備をあと少しで完了",
+      "progress": "{total}つ中{done}つ完了",
+      "dismiss": "準備ステップを隠す",
+      "steps": {
+        "createClass": {
+          "title": "クラスを作る",
+          "body": "名前と言語だけ。20秒で終わります。",
+          "cta": "最初のクラスを作る"
+        },
+        "shareCode": {
+          "title": "参加コードを共有する",
+          "body": "生徒はどの端末からでも参加できます。アカウントは不要です。",
+          "cta": "参加コードを表示する"
+        },
+        "tryDemo": {
+          "title": "2分のゲームを試す",
+          "body": "短いラウンドを1回。まだ誰も参加していなければ、ロビーで練習用ボットを追加できます。",
+          "cta": "2分のゲームを始める"
+        }
+      }
+    },
+    "setup": {
+      "title": "新しいクラス",
+      "subtitle": "選ぶのは3つだけ。あとから変更できます。",
+      "stepsLabel": "クラス作成の進み具合",
+      "step1": "クラスの情報",
+      "step2": "コードを共有",
+      "nameLabel": "クラス名",
+      "namePlaceholder": "例：5年B組 英語",
+      "defaultName": "クラス{n}",
+      "gradeLabel": "学年・年齢",
+      "grade": {
+        "k2": "幼児〜小2",
+        "g35": "小3〜小5",
+        "g68": "小6〜中2",
+        "g912": "中3〜高3",
+        "adult": "大人"
+      },
+      "gradeName": {
+        "k2": "幼児〜小2クラス",
+        "g35": "小3〜小5クラス",
+        "g68": "小6〜中2クラス",
+        "g912": "中3〜高3クラス",
+        "adult": "大人のクラス"
+      },
+      "languageLabel": "ゲームの言語",
+      "languageHint": "生徒が使う辞書の言語になります。",
+      "capMeter": "無料クラス {limit}つ中{count}つ使用中",
+      "create": "クラスを作る",
+      "creating": "作成中…",
+      "retry": "もう一度試す",
+      "createFailed": "クラスを作成できませんでした。接続を確認して、もう一度お試しください。",
+      "readyTitle": "クラスの準備ができました！",
+      "joinCode": "参加コード",
+      "qrLabel": "参加リンクのQRコード",
+      "startNow": "今すぐゲームを始める",
+      "copyLink": "招待リンクをコピー",
+      "copied": "コピーしました",
+      "copyFailed": "コピーできませんでした。代わりにコードを共有してください。",
+      "noAccount": "生徒はアカウントなしで参加できます",
+      "showProjector": "プロジェクターに映す",
+      "backHome": "ホームに戻る"
+    },
+    "host": {
+      "classLabel": "クラス",
+      "lateJoin": "途中参加",
+      "lateJoinHint": "ラウンド開始後も生徒が参加できます。",
+      "options": "オプション",
+      "optionsHide": "オプションを隠す",
+      "retry": "もう一度試す"
+    }
+  }
+  // @eduShell:end
 };
 
 export { ja };

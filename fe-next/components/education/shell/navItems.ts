@@ -1,26 +1,9 @@
 /**
- * The tab set behind the education nav shell, derived from the path alone.
- *
- * Deliberately a pure module with no React and no context: `EducationShell`
- * resolves the nav itself from `usePathname()` instead of taking a `nav` prop.
- * Nine screens mount the shell and one of them, `student/profile/PageClient`,
- * is pinned at its 570-line ceiling — a prop every page had to pass would cost
- * that file a line it does not have, and would let a new screen forget to.
- *
- * Only the two CRUD areas get tabs. A projector or in-game surface stays
- * chrome-free on purpose: `/education/classroom-game` and `/multiplayer` are in
- * front of a class, and `/student/join` is the one screen where the student has
- * exactly one job. Those return `null` here, which is the same answer
- * `isQuietChromeSurface` gives the install prompts — but it is NOT the same
- * list, so the two are kept apart: `/teacher` is quiet-chrome (no install
- * pills) AND navigable (tabs).
- *
- * Tab budget: up to 5 per the addendum. Teacher used to stop at 4 because
- * `/teacher` had no classroom index route — classes lived only inside the
- * dashboard's tools section. The 2026-09-11 18:45 addendum update pins the
- * teacher row at Play · Classes · Lessons · Reports · Me explicitly, so
- * `/teacher/classroom` (a thin wrapper around the same `ClassroomManager` the
- * dashboard already mounts) now exists as that index route.
+ * The tab set behind the education nav shell, derived from the path alone —
+ * pure, so `EducationShell` resolves it from `usePathname()` with no prop for a
+ * page to forget. Projector, in-game and join surfaces return `null`.
+ * Teacher: Home · Classes · Library · Reports; Pro and Profile sit outside the
+ * row (sidebar bottom / avatar menu).
  */
 
 export type EducationNavKind = 'teacher' | 'student';
@@ -35,17 +18,16 @@ export interface EducationNavItem {
   /** Translation key — resolved by the caller, which owns `t`. */
   labelKey: string;
   /** lucide icon name, resolved in `EducationNav` so this module stays pure. */
-  icon: 'play' | 'book' | 'chart' | 'user' | 'trophy' | 'dumbbell' | 'users';
+  icon: 'home' | 'play' | 'book' | 'library' | 'chart' | 'user' | 'trophy' | 'dumbbell' | 'users';
 }
 
 type NavTemplate = Omit<EducationNavItem, 'href'>;
 
 const TEACHER_TABS: readonly NavTemplate[] = [
-  { key: 'play', segment: '', labelKey: 'teacher.nav.play', icon: 'play' },
+  { key: 'home', segment: '', labelKey: 'eduShell.nav.home', icon: 'home' },
   { key: 'classes', segment: 'classroom', labelKey: 'teacher.nav.classes', icon: 'users' },
-  { key: 'lessons', segment: 'curriculum', labelKey: 'teacher.nav.lessons', icon: 'book' },
+  { key: 'library', segment: 'curriculum', labelKey: 'eduShell.nav.library', icon: 'library' },
   { key: 'reports', segment: 'reports', labelKey: 'teacher.nav.reports', icon: 'chart' },
-  { key: 'me', segment: 'profile', labelKey: 'teacher.nav.me', icon: 'user' },
 ];
 
 const STUDENT_TABS: readonly NavTemplate[] = [
@@ -78,6 +60,9 @@ export interface ResolvedEducationNav {
   items: EducationNavItem[];
   /** `null` on a detail screen that owns no tab — the row still renders. */
   activeKey: string | null;
+  /** Teacher only: the gold Pro destination and the avatar menu's Profile. */
+  proHref?: string;
+  profileHref?: string;
 }
 
 /**
@@ -115,14 +100,23 @@ export function resolveEducationNav(
     href: `/${locale}/${area}${tpl.segment ? `/${tpl.segment}` : ''}`,
   }));
 
-  // Longest match wins, so `/student/lessons/42` lands on Practice rather than
-  // on Play (whose segment is '' and therefore a prefix of everything).
+  // The root tab ('' segment) is a prefix of everything, so it only wins on the root itself.
   const rest = tail.slice(1);
   const activeKey =
     rest.length === 0
-      ? 'play'
+      ? templates[0].key
       : (templates.find((tpl) => tpl.segment !== '' && tpl.segment === rest[0])?.key ?? null);
 
+  if (area === 'teacher') {
+    return {
+      kind: area,
+      locale,
+      items,
+      activeKey,
+      proHref: `/${locale}/teacher/upgrade`,
+      profileHref: `/${locale}/teacher/profile`,
+    };
+  }
   return { kind: area, locale, items, activeKey };
 }
 

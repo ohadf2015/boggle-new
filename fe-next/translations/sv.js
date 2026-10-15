@@ -20503,8 +20503,147 @@ const sv = {
     "done": "Klar",
     "pulseTitle": "Klasspuls",
     "projector": "Projektor"
-  }
+  },
   // @hqCalm:end
+  // @eduShell:start
+  "eduShell": {
+    "nav": {
+      "home": "Hem",
+      "library": "Bibliotek",
+      "pro": "Pro"
+    },
+    "brand": {
+      "name": "LexiClash",
+      "tagline": "för lärare",
+      "homeLink": "LexiClash för lärare, startsida"
+    },
+    "account": {
+      "menuLabel": "Kontomeny",
+      "fallbackName": "Lärare",
+      "profile": "Profil",
+      "help": "Hjälp",
+      "whatsNew": "Nyheter"
+    },
+    "delivery": {
+      "projector": "Projektor",
+      "phones": "På mobilen",
+      "both": "Båda"
+    },
+    "home": {
+      "regionLabel": "Lärarens startsida",
+      "railLabel": "Den här veckan och din plan",
+      "greetMorning": "God morgon, {name}",
+      "greetAfternoon": "God eftermiddag, {name}",
+      "greetEvening": "God kväll, {name}",
+      "greetNoName": "Välkommen tillbaka",
+      "startWith": "Starta ett spel med",
+      "switchClass": "Välj klass",
+      "startLive": "Starta livespel",
+      "yourClasses": "Dina klasser",
+      "newClass": "Ny klass",
+      "colClass": "Klass",
+      "colStudents": "Elever",
+      "colLastPlayed": "Senast spelat",
+      "students": "{count} elever",
+      "notPlayedRecently": "Inga spel på 30 dagar",
+      "playWith": "Starta ett spel med {name}",
+      "reviewTitle": "Öva på de missade orden"
+    },
+    "week": {
+      "title": "Den här veckan",
+      "games": "Spelade spel",
+      "students": "Elever totalt",
+      "active": "Aktiva klasser",
+      "empty": "Dina siffror visas här efter ert första spel.",
+      "unavailable": "Veckans siffror gick inte att hämta. De är tillbaka nästa gång."
+    },
+    "pro": {
+      "title": "Se vem som kämpade efter varje spel",
+      "points": {
+        "struggled": "Vem som fastnade, ord för ord",
+        "reteach": "Vilka ord ni ska repetera i morgon",
+        "classes": "Obegränsat antal klasser och utskrivbara rapporter"
+      },
+      "cta": "Se vad Pro ger",
+      "trialCta": "Starta 14 dagars gratis provperiod",
+      "trialFine": "Gratis i 14 dagar, sedan {price}/månad. Avsluta när du vill.",
+      "dismiss": "Inte nu"
+    },
+    "onboarding": {
+      "title": "Ditt första klasspel i 3 steg",
+      "titleCompact": "Gör klart starten",
+      "progress": "{done} av {total} klara",
+      "dismiss": "Dölj startstegen",
+      "steps": {
+        "createClass": {
+          "title": "Skapa en klass",
+          "body": "Ett namn och ett språk. Tar 20 sekunder.",
+          "cta": "Skapa din första klass"
+        },
+        "shareCode": {
+          "title": "Dela anslutningskoden",
+          "body": "Eleverna ansluter från vilken enhet som helst, utan konto.",
+          "cta": "Visa anslutningskoden"
+        },
+        "tryDemo": {
+          "title": "Testa ett 2-minutersspel",
+          "body": "Kör en kort runda. Lägg till övningsbottar i lobbyn om ingen har anslutit än.",
+          "cta": "Starta ett 2-minutersspel"
+        }
+      }
+    },
+    "setup": {
+      "title": "Ny klass",
+      "subtitle": "Tre snabba val. Du kan ändra dem senare.",
+      "stepsLabel": "Framsteg för klassen",
+      "step1": "Klassuppgifter",
+      "step2": "Dela koden",
+      "nameLabel": "Klassens namn",
+      "namePlaceholder": "t.ex. 5B Engelska",
+      "defaultName": "Klass {n}",
+      "gradeLabel": "Årskurs eller ålder",
+      "grade": {
+        "k2": "F–2",
+        "g35": "Åk 3–5",
+        "g68": "Åk 6–8",
+        "g912": "Åk 9 och gymnasiet",
+        "adult": "Vuxna"
+      },
+      "gradeName": {
+        "k2": "F–2-klass",
+        "g35": "Åk 3–5-klass",
+        "g68": "Åk 6–8-klass",
+        "g912": "Gymnasieklass",
+        "adult": "Vuxenklass"
+      },
+      "languageLabel": "Spelspråk",
+      "languageHint": "Bestämmer vilken ordlista eleverna spelar med.",
+      "capMeter": "{count} av {limit} gratisklasser använda",
+      "create": "Skapa klass",
+      "creating": "Skapar…",
+      "retry": "Försök igen",
+      "createFailed": "Klassen kunde inte skapas. Kontrollera anslutningen och försök igen.",
+      "readyTitle": "Din klass är klar!",
+      "joinCode": "Anslutningskod",
+      "qrLabel": "QR-kod för anslutningslänken",
+      "startNow": "Starta ett spel nu",
+      "copyLink": "Kopiera inbjudningslänk",
+      "copied": "Kopierat",
+      "copyFailed": "Det gick inte att kopiera. Dela koden i stället.",
+      "noAccount": "Eleverna ansluter utan konto",
+      "showProjector": "Visa på projektorn",
+      "backHome": "Tillbaka till startsidan"
+    },
+    "host": {
+      "classLabel": "Klass",
+      "lateJoin": "Sen anslutning",
+      "lateJoinHint": "Elever kan ansluta även efter att rundan har börjat.",
+      "options": "Alternativ",
+      "optionsHide": "Dölj alternativ",
+      "retry": "Försök igen"
+    }
+  }
+  // @eduShell:end
 };
 
 export { sv };

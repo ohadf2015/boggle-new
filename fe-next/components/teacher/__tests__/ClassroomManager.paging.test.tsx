@@ -89,11 +89,11 @@ describe('ClassroomManager — paging instead of page scroll', () => {
 
   // Round 2: on the Classes tab the card carries recent activity, the next
   // step and a Start-game shortcut into HQ; inside the HQ Tools sheet it does not.
-  it('Given the Classes tab (richCards), Then each card has activity and a Start game into HQ for that class', () => {
+  it('Given the Classes tab (richCards), Then each card has activity and a Start game into the host flow for that class', () => {
     state.classrooms = [mk(1)];
     render(<ClassroomManager richCards />);
     expect(screen.getByTestId('card-activity')).toHaveTextContent('cls-1');
-    expect(screen.getByTestId('classroom-card-start-game')).toHaveAttribute('href', '/en/teacher?classroomId=cls-1');
+    expect(screen.getByTestId('classroom-card-start-game')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=cls-1');
   });
 
   // A 375x667 phone spent ~70px on a title row AND a separate create row

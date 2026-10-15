@@ -37,7 +37,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EducationShell } from '@/components/education/shell/EducationShell';
-import { EducationHeader } from '@/components/education/EducationHeader';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 
 // ============================================
@@ -346,7 +345,6 @@ function AnalyticsShell({ children }: { children: ReactNode }) {
   const { t } = useLanguage();
   return (
     <EducationShell
-      header={<EducationHeader showBackButton />}
       scrollRegionLabel={t('teacher.shell.analyticsLabel')}
       contentClassName="p-4 md:p-8"
     >

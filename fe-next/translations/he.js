@@ -20433,8 +20433,147 @@ const he = {
     "done": "סיום",
     "pulseTitle": "דופק הכיתה",
     "projector": "מקרן"
-  }
+  },
   // @hqCalm:end
+  // @eduShell:start
+  "eduShell": {
+    "nav": {
+      "home": "בית",
+      "library": "ספרייה",
+      "pro": "Pro"
+    },
+    "brand": {
+      "name": "LexiClash",
+      "tagline": "למורים",
+      "homeLink": "LexiClash למורים, דף הבית"
+    },
+    "account": {
+      "menuLabel": "תפריט חשבון",
+      "fallbackName": "מורה",
+      "profile": "פרופיל",
+      "help": "עזרה",
+      "whatsNew": "מה חדש"
+    },
+    "delivery": {
+      "projector": "מקרן",
+      "phones": "בטלפונים",
+      "both": "שניהם"
+    },
+    "home": {
+      "regionLabel": "דף הבית של המורה",
+      "railLabel": "השבוע והמסלול שלך",
+      "greetMorning": "בוקר טוב, {name}",
+      "greetAfternoon": "צהריים טובים, {name}",
+      "greetEvening": "ערב טוב, {name}",
+      "greetNoName": "טוב לראות אותך שוב",
+      "startWith": "מתחילים משחק עם",
+      "switchClass": "בחירת כיתה",
+      "startLive": "התחלת משחק חי",
+      "yourClasses": "הכיתות שלך",
+      "newClass": "כיתה חדשה",
+      "colClass": "כיתה",
+      "colStudents": "תלמידים",
+      "colLastPlayed": "משחק אחרון",
+      "students": "{count} תלמידים",
+      "notPlayedRecently": "אין משחקים ב‑30 הימים האחרונים",
+      "playWith": "התחלת משחק עם {name}",
+      "reviewTitle": "תרגול המילים שפוספסו"
+    },
+    "week": {
+      "title": "השבוע",
+      "games": "משחקים",
+      "students": "תלמידים בסך הכול",
+      "active": "כיתות פעילות",
+      "empty": "הנתונים יופיעו כאן אחרי המשחק הראשון.",
+      "unavailable": "לא הצלחנו לטעון את נתוני השבוע. ננסה שוב בביקור הבא."
+    },
+    "pro": {
+      "title": "לראות מי התקשה אחרי כל משחק",
+      "points": {
+        "struggled": "מי נתקע, מילה אחרי מילה",
+        "reteach": "אילו מילים לחזור עליהן מחר",
+        "classes": "כיתות ללא הגבלה ודוחות להדפסה"
+      },
+      "cta": "מה מקבלים ב‑Pro",
+      "trialCta": "התחלת ניסיון חינם ל‑14 יום",
+      "trialFine": "חינם ל‑14 יום, אחר כך {price} לחודש. אפשר לבטל מתי שרוצים.",
+      "dismiss": "לא עכשיו"
+    },
+    "onboarding": {
+      "title": "משחק כיתתי ראשון ב‑3 צעדים",
+      "titleCompact": "עוד רגע מסיימים להתארגן",
+      "progress": "{done} מתוך {total} הושלמו",
+      "dismiss": "הסתרת צעדי ההתחלה",
+      "steps": {
+        "createClass": {
+          "title": "יוצרים כיתה",
+          "body": "שם ושפה. לוקח 20 שניות.",
+          "cta": "יצירת הכיתה הראשונה"
+        },
+        "shareCode": {
+          "title": "משתפים את קוד ההצטרפות",
+          "body": "התלמידים מצטרפים מכל מכשיר, בלי חשבון.",
+          "cta": "הצגת קוד ההצטרפות"
+        },
+        "tryDemo": {
+          "title": "מנסים משחק של 2 דקות",
+          "body": "סבב קצר. אם עוד אף אחד לא הצטרף, אפשר להוסיף בוטים לתרגול בלובי.",
+          "cta": "התחלת משחק של 2 דקות"
+        }
+      }
+    },
+    "setup": {
+      "title": "כיתה חדשה",
+      "subtitle": "שלוש בחירות קצרות. אפשר לשנות אחר כך.",
+      "stepsLabel": "התקדמות הקמת הכיתה",
+      "step1": "פרטי הכיתה",
+      "step2": "שיתוף הקוד",
+      "nameLabel": "שם הכיתה",
+      "namePlaceholder": "למשל: ה׳2 אנגלית",
+      "defaultName": "כיתה {n}",
+      "gradeLabel": "שכבה או גיל",
+      "grade": {
+        "k2": "גן–ב׳",
+        "g35": "ג׳–ה׳",
+        "g68": "ו׳–ח׳",
+        "g912": "ט׳–י״ב",
+        "adult": "מבוגרים"
+      },
+      "gradeName": {
+        "k2": "כיתת גן–ב׳",
+        "g35": "כיתת ג׳–ה׳",
+        "g68": "כיתת ו׳–ח׳",
+        "g912": "כיתת ט׳–י״ב",
+        "adult": "כיתת מבוגרים"
+      },
+      "languageLabel": "שפת המשחק",
+      "languageHint": "קובעת באיזה מילון התלמידים משחקים.",
+      "capMeter": "{count} מתוך {limit} כיתות חינמיות בשימוש",
+      "create": "יצירת כיתה",
+      "creating": "יוצרים…",
+      "retry": "לנסות שוב",
+      "createFailed": "לא הצלחנו ליצור את הכיתה. כדאי לבדוק את החיבור ולנסות שוב.",
+      "readyTitle": "הכיתה מוכנה!",
+      "joinCode": "קוד הצטרפות",
+      "qrLabel": "קוד QR לקישור ההצטרפות",
+      "startNow": "מתחילים משחק עכשיו",
+      "copyLink": "העתקת קישור הזמנה",
+      "copied": "הועתק",
+      "copyFailed": "ההעתקה לא הצליחה. אפשר לשתף את הקוד במקום.",
+      "noAccount": "התלמידים מצטרפים בלי חשבון",
+      "showProjector": "הצגה על המקרן",
+      "backHome": "חזרה לדף הבית"
+    },
+    "host": {
+      "classLabel": "כיתה",
+      "lateJoin": "הצטרפות מאוחרת",
+      "lateJoinHint": "תלמידים יכולים להצטרף גם אחרי שהסבב התחיל.",
+      "options": "אפשרויות",
+      "optionsHide": "הסתרת אפשרויות",
+      "retry": "לנסות שוב"
+    }
+  }
+  // @eduShell:end
 };
 
 export { he };

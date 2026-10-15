@@ -36,6 +36,9 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('lucide-react', () => ({
   Timer: () => null,
+  MonitorPlay: () => null,
+  MonitorSmartphone: () => null,
+  Smartphone: () => null,
   Zap: () => null,
   Monitor: () => null,
   Swords: () => null,

@@ -24,8 +24,11 @@ const ROOT = path.resolve(__dirname, '..', '..', '..', '..');
 
 const SCREENS: readonly [string, string][] = [
   ['/teacher', 'components/teacher/TeacherDashboard.tsx'],
-  ['/teacher (empty state)', 'components/teacher/PlayTabFirstRunCard.tsx'],
-  ['/teacher (status row)', 'components/teacher/dashboard/TeacherStatusRow.tsx'],
+  ['/teacher (hero)', 'components/teacher/home/HomeHero.tsx'],
+  ['/teacher (onboarding)', 'components/teacher/home/HomeOnboardingCard.tsx'],
+  ['/teacher (classes)', 'components/teacher/home/HomeClassList.tsx'],
+  ['/teacher/classroom/new', 'components/teacher/setup/ClassSetupDetails.tsx'],
+  ['/teacher/classroom/new (ready)', 'components/teacher/setup/ClassReady.tsx'],
   ['/teacher/curriculum', 'app/[locale]/teacher/curriculum/PageClient.tsx'],
   ['/teacher/reports', 'app/[locale]/teacher/reports/PageClient.tsx'],
   ['/teacher/classroom/[id]/analytics', 'app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx'],

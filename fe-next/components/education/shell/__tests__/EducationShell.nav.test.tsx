@@ -29,6 +29,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en', isRTL: false }),
 }));
 
+vi.mock('../TeacherAccountMenu', () => ({
+  TeacherAccountMenu: ({ variant }: { variant?: string }) => <button data-testid={`account-${variant ?? 'row'}`} />,
+}));
+
 afterEach(() => {
   cleanup();
   document.body.className = '';
@@ -41,6 +45,26 @@ describe('EducationShell — nav shell', () => {
     const { getByTestId } = render(<EducationShell>body</EducationShell>);
     expect(getByTestId('education-tabbar')).toBeTruthy();
     expect(getByTestId('education-sidebar')).toBeTruthy();
+  });
+
+  it('gives a teacher screen its own top bar with the avatar menu, and drops any page header', () => {
+    pathname.current = '/en/teacher/reports';
+    const { getByTestId, queryByTestId } = render(
+      <EducationShell header={<div data-testid="page-header" />}>body</EducationShell>,
+    );
+    expect(getByTestId('teacher-topbar').className).toContain('lg:hidden');
+    expect(getByTestId('account-icon')).toBeTruthy();
+    expect(getByTestId('education-sidebar').contains(getByTestId('account-row'))).toBe(true);
+    expect(queryByTestId('page-header')).toBeNull();
+  });
+
+  it('keeps the page header on a student screen', () => {
+    pathname.current = '/en/student';
+    const { getByTestId, queryByTestId } = render(
+      <EducationShell header={<div data-testid="page-header" />}>body</EducationShell>,
+    );
+    expect(getByTestId('page-header')).toBeTruthy();
+    expect(queryByTestId('teacher-topbar')).toBeNull();
   });
 
   it('gives a student screen its own tab set', () => {

@@ -19562,8 +19562,147 @@ const en = {
     "done": "Done",
     "pulseTitle": "Class pulse",
     "projector": "Projector"
-  }
+  },
   // @hqCalm:end
+  // @eduShell:start
+  "eduShell": {
+    "nav": {
+      "home": "Home",
+      "library": "Library",
+      "pro": "Pro"
+    },
+    "brand": {
+      "name": "LexiClash",
+      "tagline": "for Teachers",
+      "homeLink": "LexiClash for Teachers, home"
+    },
+    "account": {
+      "menuLabel": "Account menu",
+      "fallbackName": "Teacher",
+      "profile": "Profile",
+      "help": "Help",
+      "whatsNew": "What's new"
+    },
+    "delivery": {
+      "projector": "Projector",
+      "phones": "On phones",
+      "both": "Both"
+    },
+    "home": {
+      "regionLabel": "Teacher home",
+      "railLabel": "This week and your plan",
+      "greetMorning": "Good morning, {name}",
+      "greetAfternoon": "Good afternoon, {name}",
+      "greetEvening": "Good evening, {name}",
+      "greetNoName": "Welcome back",
+      "startWith": "Start a game with",
+      "switchClass": "Choose a class",
+      "startLive": "Start live game",
+      "yourClasses": "Your classes",
+      "newClass": "New class",
+      "colClass": "Class",
+      "colStudents": "Students",
+      "colLastPlayed": "Last played",
+      "students": "{count} students",
+      "notPlayedRecently": "No games in 30 days",
+      "playWith": "Start a game with {name}",
+      "reviewTitle": "Practise the missed words"
+    },
+    "week": {
+      "title": "This week",
+      "games": "Games played",
+      "students": "Total students",
+      "active": "Classes active",
+      "empty": "Your numbers show up here after your first game.",
+      "unavailable": "Couldn't load this week's numbers. They'll be back on the next visit."
+    },
+    "pro": {
+      "title": "See who struggled after every game",
+      "points": {
+        "struggled": "Who got stuck, word by word",
+        "reteach": "Which words to reteach tomorrow",
+        "classes": "Unlimited classes and printable reports"
+      },
+      "cta": "See what Pro adds",
+      "trialCta": "Start 14-day free trial",
+      "trialFine": "Free for 14 days, then {price}/month. Cancel anytime.",
+      "dismiss": "Not now"
+    },
+    "onboarding": {
+      "title": "Your first class game in 3 steps",
+      "titleCompact": "Finish setting up",
+      "progress": "{done} of {total} done",
+      "dismiss": "Hide setup steps",
+      "steps": {
+        "createClass": {
+          "title": "Create a class",
+          "body": "A name and a language. Takes 20 seconds.",
+          "cta": "Create your first class"
+        },
+        "shareCode": {
+          "title": "Share the join code",
+          "body": "Students join on any device. No accounts needed.",
+          "cta": "Show the join code"
+        },
+        "tryDemo": {
+          "title": "Try a 2-minute game",
+          "body": "Run a short round. Add practice bots in the lobby if no one has joined yet.",
+          "cta": "Start a 2-minute game"
+        }
+      }
+    },
+    "setup": {
+      "title": "New class",
+      "subtitle": "Three quick choices. You can change them later.",
+      "stepsLabel": "Class setup progress",
+      "step1": "Class details",
+      "step2": "Share the code",
+      "nameLabel": "Class name",
+      "namePlaceholder": "e.g. 5B English",
+      "defaultName": "Class {n}",
+      "gradeLabel": "Grade or age",
+      "grade": {
+        "k2": "K–2",
+        "g35": "Grades 3–5",
+        "g68": "Grades 6–8",
+        "g912": "Grades 9–12",
+        "adult": "Adults"
+      },
+      "gradeName": {
+        "k2": "K–2 class",
+        "g35": "Grades 3–5 class",
+        "g68": "Grades 6–8 class",
+        "g912": "Grades 9–12 class",
+        "adult": "Adult class"
+      },
+      "languageLabel": "Game language",
+      "languageHint": "Sets the dictionary your students play in.",
+      "capMeter": "{count} of {limit} free classes used",
+      "create": "Create class",
+      "creating": "Creating…",
+      "retry": "Try again",
+      "createFailed": "We couldn't create the class. Check your connection and try again.",
+      "readyTitle": "Your class is ready!",
+      "joinCode": "Join code",
+      "qrLabel": "QR code for the join link",
+      "startNow": "Start a game now",
+      "copyLink": "Copy invite link",
+      "copied": "Copied",
+      "copyFailed": "Couldn't copy. Share the code instead.",
+      "noAccount": "Students join with no account",
+      "showProjector": "Show on projector",
+      "backHome": "Back to Home"
+    },
+    "host": {
+      "classLabel": "Class",
+      "lateJoin": "Late join",
+      "lateJoinHint": "Students can still join after the round starts.",
+      "options": "Options",
+      "optionsHide": "Hide options",
+      "retry": "Try again"
+    }
+  }
+  // @eduShell:end
 };
 
 export { en };

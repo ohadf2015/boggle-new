@@ -20515,8 +20515,147 @@ const es = {
     "done": "Listo",
     "pulseTitle": "Pulso de la clase",
     "projector": "Proyector"
-  }
+  },
   // @hqCalm:end
+  // @eduShell:start
+  "eduShell": {
+    "nav": {
+      "home": "Inicio",
+      "library": "Biblioteca",
+      "pro": "Pro"
+    },
+    "brand": {
+      "name": "LexiClash",
+      "tagline": "para docentes",
+      "homeLink": "LexiClash para docentes, inicio"
+    },
+    "account": {
+      "menuLabel": "Menú de la cuenta",
+      "fallbackName": "Docente",
+      "profile": "Perfil",
+      "help": "Ayuda",
+      "whatsNew": "Novedades"
+    },
+    "delivery": {
+      "projector": "Proyector",
+      "phones": "En el móvil",
+      "both": "Ambos"
+    },
+    "home": {
+      "regionLabel": "Inicio del docente",
+      "railLabel": "Esta semana y tu plan",
+      "greetMorning": "Buenos días, {name}",
+      "greetAfternoon": "Buenas tardes, {name}",
+      "greetEvening": "Buenas noches, {name}",
+      "greetNoName": "Hola de nuevo",
+      "startWith": "Empieza una partida con",
+      "switchClass": "Elegir clase",
+      "startLive": "Empezar partida en vivo",
+      "yourClasses": "Tus clases",
+      "newClass": "Nueva clase",
+      "colClass": "Clase",
+      "colStudents": "Alumnos",
+      "colLastPlayed": "Última partida",
+      "students": "{count} alumnos",
+      "notPlayedRecently": "Sin partidas en 30 días",
+      "playWith": "Empezar una partida con {name}",
+      "reviewTitle": "Practicar las palabras falladas"
+    },
+    "week": {
+      "title": "Esta semana",
+      "games": "Partidas jugadas",
+      "students": "Alumnos en total",
+      "active": "Clases activas",
+      "empty": "Tus datos aparecerán aquí después de la primera partida.",
+      "unavailable": "No pudimos cargar los datos de esta semana. Volverán en tu próxima visita."
+    },
+    "pro": {
+      "title": "Mira quién tuvo dificultades en cada partida",
+      "points": {
+        "struggled": "Quién se atascó, palabra por palabra",
+        "reteach": "Qué palabras repasar mañana",
+        "classes": "Clases ilimitadas e informes imprimibles"
+      },
+      "cta": "Ver qué añade Pro",
+      "trialCta": "Empezar prueba gratis de 14 días",
+      "trialFine": "Gratis 14 días, luego {price}/mes. Cancela cuando quieras.",
+      "dismiss": "Ahora no"
+    },
+    "onboarding": {
+      "title": "Tu primera partida en clase en 3 pasos",
+      "titleCompact": "Termina de preparar todo",
+      "progress": "{done} de {total} hechos",
+      "dismiss": "Ocultar los pasos iniciales",
+      "steps": {
+        "createClass": {
+          "title": "Crea una clase",
+          "body": "Un nombre y un idioma. Son 20 segundos.",
+          "cta": "Crear tu primera clase"
+        },
+        "shareCode": {
+          "title": "Comparte el código",
+          "body": "Los alumnos entran desde cualquier dispositivo, sin cuenta.",
+          "cta": "Mostrar el código"
+        },
+        "tryDemo": {
+          "title": "Prueba una partida de 2 minutos",
+          "body": "Una ronda corta. Si aún no ha entrado nadie, añade bots de práctica en la sala.",
+          "cta": "Empezar una partida de 2 minutos"
+        }
+      }
+    },
+    "setup": {
+      "title": "Nueva clase",
+      "subtitle": "Tres elecciones rápidas. Puedes cambiarlas después.",
+      "stepsLabel": "Progreso de la creación de la clase",
+      "step1": "Datos de la clase",
+      "step2": "Compartir el código",
+      "nameLabel": "Nombre de la clase",
+      "namePlaceholder": "p. ej., 5.º B Inglés",
+      "defaultName": "Clase {n}",
+      "gradeLabel": "Curso o edad",
+      "grade": {
+        "k2": "Infantil–2.º",
+        "g35": "3.º–5.º",
+        "g68": "6.º–2.º ESO",
+        "g912": "3.º ESO–Bach.",
+        "adult": "Adultos"
+      },
+      "gradeName": {
+        "k2": "Clase de Infantil–2.º",
+        "g35": "Clase de 3.º–5.º",
+        "g68": "Clase de 6.º–2.º ESO",
+        "g912": "Clase de 3.º ESO–Bach.",
+        "adult": "Clase de adultos"
+      },
+      "languageLabel": "Idioma del juego",
+      "languageHint": "Define el diccionario con el que juegan tus alumnos.",
+      "capMeter": "{count} de {limit} clases gratis usadas",
+      "create": "Crear clase",
+      "creating": "Creando…",
+      "retry": "Reintentar",
+      "createFailed": "No pudimos crear la clase. Revisa tu conexión y vuelve a intentarlo.",
+      "readyTitle": "¡Tu clase está lista!",
+      "joinCode": "Código para unirse",
+      "qrLabel": "Código QR del enlace para unirse",
+      "startNow": "Empezar una partida ya",
+      "copyLink": "Copiar enlace de invitación",
+      "copied": "Copiado",
+      "copyFailed": "No se pudo copiar. Comparte el código.",
+      "noAccount": "Los alumnos entran sin cuenta",
+      "showProjector": "Mostrar en el proyector",
+      "backHome": "Volver al inicio"
+    },
+    "host": {
+      "classLabel": "Clase",
+      "lateJoin": "Unirse tarde",
+      "lateJoinHint": "Los alumnos pueden entrar aunque la ronda ya haya empezado.",
+      "options": "Opciones",
+      "optionsHide": "Ocultar opciones",
+      "retry": "Reintentar"
+    }
+  }
+  // @eduShell:end
 };
 
 export { es };

@@ -145,11 +145,9 @@ describe('free tier limits', () => {
   });
 
   it('refuses the analytics dashboard to free teachers everywhere it renders', () => {
-    // Two render sites, and a gate on only one of them is the asymmetric-path bug this repo
-    // keeps shipping: the dashboard tab would paywall while the direct URL stayed open.
+    // A gate on only one render site is the asymmetric-path bug this repo keeps shipping:
+    // one entry paywalls while a direct URL stays open. Add every new site here.
     const sites = [
-      // Teacher HQ (2026-09-24) moved the dashboard's analytics into the Class tools sheet.
-      '../../../components/teacher/hq/HqToolsContent.tsx',
       '../../../app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx',
     ];
     for (const site of sites) {
