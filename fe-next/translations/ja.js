@@ -14805,6 +14805,7 @@ const ja = {
         "columns": {
           "student": "生徒",
           "completion": "課題",
+          "averageScore": "平均点",
           "lastActive": "最終アクティブ",
           "joinStatus": "参加ステータス"
         },
@@ -14814,8 +14815,19 @@ const ja = {
           "joined_idle": "参加済み・未練習"
         },
         "completion": "{{completed}}/{{total}}",
+        "averageScore": "{{score}}%",
+        "averageScoreEmpty": "—",
         "upgrade": "Teacher Pro {{price}} で各生徒の詳細を見る",
-        "never": "なし"
+        "never": "なし",
+        "parentShare": {
+          "title": "保護者と共有",
+          "generated": "{{date}} 時点の進捗",
+          "print": "保護者向けサマリーを印刷",
+          "copy": "保護者向けサマリーをコピー",
+          "copied": "コピーしました",
+          "upgrade": "Teacher Pro {{price}} で保護者向けサマリーを印刷",
+          "footer": "LexiClash クラス進捗 — 課題完了数、平均点、最終アクティブ。"
+        }
       },
       "exportAllClasses": {
         "button": "全クラスを書き出す",

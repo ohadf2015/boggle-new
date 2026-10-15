@@ -2,8 +2,9 @@
  * Pure model for the free classroom roster progress report on the teacher
  * class view (components/teacher/reports/ClassroomRosterProgress.tsx).
  *
- * One row per roster student: assignment completion counts, last-active date,
- * and a join-funnel status a free teacher can act on. The #1310 student-join
+ * One row per roster student: assignment completion counts, average score
+ * across completed assignments, last-active date, and a join-funnel status a
+ * free teacher can act on. The #1310 student-join
  * events (student_join_completed / student_join_failed) made the join step
  * countable; the drop-off AFTER the join — invite converted, never practiced —
  * is only visible teacher-side if the roster surfaces it, which is what
@@ -48,6 +49,8 @@ export interface RosterAssignmentCounts {
   studentId: string;
   assignmentCount: number;
   completedCount: number;
+  /** Mean of completed assignment scores (0–100). Null when nothing is scored. */
+  averageScore: number | null;
 }
 
 export interface RosterLastPractice {
@@ -60,9 +63,42 @@ export interface RosterProgressRow {
   name: string;
   completedAssignments: number;
   totalAssignments: number;
+  /** Mean of completed assignment scores (0–100). Null when nothing is scored. */
+  averageScore: number | null;
   /** lastPracticeDate ?? joinedAt ?? null — what "stale first" sorts on. */
   lastActiveAt: string | null;
   joinFunnelStatus: RosterJoinFunnelStatus;
+}
+
+export interface ParentShareLine {
+  name: string;
+  completion: string;
+  averageScore: string;
+  lastActive: string;
+}
+
+/**
+ * Tab-separated parent handout. Join-funnel status stays off this surface —
+ * that is teacher ops, not something to send home.
+ */
+export function buildParentShareSummary(args: {
+  heading: string;
+  classroomName: string;
+  generatedAt: string;
+  columns: {
+    student: string;
+    completion: string;
+    averageScore: string;
+    lastActive: string;
+  };
+  lines: ParentShareLine[];
+}): string {
+  const { heading, classroomName, generatedAt, columns, lines } = args;
+  const header = [columns.student, columns.completion, columns.averageScore, columns.lastActive].join('\t');
+  const body = lines
+    .map((line) => [line.name, line.completion, line.averageScore, line.lastActive].join('\t'))
+    .join('\n');
+  return [heading, classroomName, generatedAt, '', header, body].join('\n');
 }
 
 /**
@@ -117,6 +153,7 @@ export function buildClassroomRosterProgress(args: {
       name: student.name,
       completedAssignments: counts?.completedCount ?? 0,
       totalAssignments: counts?.assignmentCount ?? 0,
+      averageScore: counts?.averageScore ?? null,
       lastActiveAt: practicedAt ?? student.joinedAt ?? null,
       joinFunnelStatus: resolveJoinFunnelStatus(student, practicedAt),
     };
@@ -142,15 +179,27 @@ export function buildClassroomRosterProgress(args: {
 export function countRosterAssignmentProgress(
   rows: AssignmentProgressRow[],
 ): RosterAssignmentCounts[] {
-  const byStudent = new Map<string, RosterAssignmentCounts>();
+  const byStudent = new Map<
+    string,
+    { studentId: string; assignmentCount: number; completedCount: number; scoreSum: number; scoredCount: number }
+  >();
   for (const row of rows) {
     let entry = byStudent.get(row.studentId);
     if (!entry) {
-      entry = { studentId: row.studentId, assignmentCount: 0, completedCount: 0 };
+      entry = { studentId: row.studentId, assignmentCount: 0, completedCount: 0, scoreSum: 0, scoredCount: 0 };
       byStudent.set(row.studentId, entry);
     }
     entry.assignmentCount += 1;
-    if (row.status === 'completed') entry.completedCount += 1;
+    if (row.status === 'completed') {
+      entry.completedCount += 1;
+      if (typeof row.score === 'number' && Number.isFinite(row.score)) {
+        entry.scoreSum += row.score;
+        entry.scoredCount += 1;
+      }
+    }
   }
-  return [...byStudent.values()];
+  return [...byStudent.values()].map(({ scoreSum, scoredCount, ...rest }) => ({
+    ...rest,
+    averageScore: scoredCount > 0 ? Math.round(scoreSum / scoredCount) : null,
+  }));
 }

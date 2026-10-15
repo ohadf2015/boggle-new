@@ -40,12 +40,31 @@ describe('<ClassroomModeCardRow> carousel', () => {
     expect(scrollBy).toHaveBeenCalledWith(expect.objectContaining({ left: 375 }));
   });
 
-  it('Given the row, When it renders, Then it scrolls sideways at every width and snaps cards to the centre', () => {
+  it('Given a phone or tablet, When the row renders, Then it scrolls sideways and snaps cards to the centre', () => {
+    render(<ClassroomModeCardRow selected="blast" onPick={vi.fn()} t={t} />);
+    expect(screen.getByTestId('mode-row-scroller').className).toContain('overflow-x-auto');
+    expect(screen.getByTestId('mode-tile-blast').className).toContain('snap-center');
+  });
+
+  it('Given a desktop, When the row renders, Then every card fits the panel: no scroll, no half-row padding, no clipped edges', () => {
+    // Regression: half-row inline padding forced the desktop row to overflow,
+    // so at most 4 of 7 cards showed, both edge cards were clipped and the
+    // selected card could scroll out of view.
     render(<ClassroomModeCardRow selected="blast" onPick={vi.fn()} t={t} />);
     const scroller = screen.getByTestId('mode-row-scroller');
-    expect(scroller.className).toContain('overflow-x-auto');
-    expect(scroller.className).not.toContain('lg:overflow-visible');
-    expect(screen.getByTestId('mode-tile-blast').className).toContain('snap-center');
+    expect(scroller.className).toContain('lg:overflow-visible');
+    expect(scroller.className).toContain('lg:px-0');
+    expect(scroller.className).not.toMatch(/lg:px-\[calc/);
+    expect(screen.getByTestId('mode-tile-blast').className).toContain('lg:w-auto');
+    for (const group of screen.getAllByTestId(/^mode-group-/)) {
+      expect(group.className).toContain('lg:basis-[var(--group-basis)]');
+    }
+  });
+
+  it('Given a desktop, When the row fits, Then the chevrons stand down instead of covering the edge cards', () => {
+    render(<ClassroomModeCardRow selected="blast" onPick={vi.fn()} t={t} />);
+    expect(screen.getByTestId('mode-row-prev').className).toContain('lg:hidden');
+    expect(screen.getByTestId('mode-row-next').className).toContain('lg:hidden');
   });
 
   it('Given the chevrons, When the teacher clicks next then previous, Then the row scrolls forward and back', () => {

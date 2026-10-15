@@ -14014,6 +14014,7 @@ const ru = {
         "columns": {
           "student": "Ученик",
           "completion": "Задания",
+          "averageScore": "Средний балл",
           "lastActive": "Последняя активность",
           "joinStatus": "Статус присоединения"
         },
@@ -14023,8 +14024,19 @@ const ru = {
           "joined_idle": "Присоединился, не занимался"
         },
         "completion": "{{completed}}/{{total}}",
+        "averageScore": "{{score}}%",
+        "averageScoreEmpty": "—",
         "upgrade": "Подробнее о каждом ученике с Teacher Pro {{price}}",
-        "never": "Никогда"
+        "never": "Никогда",
+        "parentShare": {
+          "title": "Поделиться с родителями",
+          "generated": "Прогресс на {{date}}",
+          "print": "Печать сводки для родителей",
+          "copy": "Копировать сводку для родителей",
+          "copied": "Скопировано",
+          "upgrade": "Печать сводки для родителей с Teacher Pro {{price}}",
+          "footer": "Прогресс класса LexiClash — выполнение заданий, средний балл, последняя активность."
+        }
       },
       "exportAllClasses": {
         "button": "Экспортировать все классы",

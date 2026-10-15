@@ -2,16 +2,18 @@
 
 /**
  * Free classroom roster progress on the class report view — one row per
- * student: assignment completion (completed/total), last-active, and the
- * join-funnel status (signed_in / guest / joined_idle) that makes the
+ * student: assignment completion (completed/total), average score, last-active,
+ * and the join-funnel status (signed_in / guest / joined_idle) that makes the
  * post-#1310 drop-off ("invite converted, never practiced") actionable for a
  * free teacher. Deliberately NOT wrapped in ProGate: per-student visibility
- * is the reason to upgrade, so the upgrade CTA below is the only Pro surface
- * here. Reuses the existing data helpers only — no new API routes.
+ * is the reason to upgrade. The printable parent-share summary is the Pro
+ * surface (a handout a teacher can print or copy — join-funnel stays off it).
+ * Reuses the existing data helpers only — no new API routes.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { Check, Printer, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { getClassroomAssignments, getAssignmentCompletions } from '@/lib/supabase/education/assignments';
@@ -24,16 +26,22 @@ import {
 } from '@/lib/education/assignmentProgressReport';
 import {
   buildClassroomRosterProgress,
+  buildParentShareSummary,
   countRosterAssignmentProgress,
   type RosterJoinFunnelStatus,
   type RosterProgressRow,
 } from '@/lib/education/classroomRosterProgress';
-import { trackTeacherRosterProgressUpgradeClicked } from '@/lib/education/telemetry';
+import {
+  trackTeacherRosterParentSharePrinted,
+  trackTeacherRosterProgressUpgradeClicked,
+} from '@/lib/education/telemetry';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import { ReportError, ReportSkeleton, useReportData } from './ReportChrome';
 
 export interface ClassroomRosterProgressProps {
   classroomId: string;
+  classroomName?: string;
 }
 
 /** Full quoted keys — the reports i18n contract test scans lookup maps like this one. */
@@ -49,9 +57,36 @@ const STATUS_BADGE_CLASS: Record<RosterJoinFunnelStatus, string> = {
   signed_in: 'border-neo-lime bg-neo-lime/15 text-neo-lime',
 };
 
-export function ClassroomRosterProgress({ classroomId }: ClassroomRosterProgressProps) {
+/**
+ * Print rules, scoped here rather than globals.css. A bare window.print()
+ * would carry HQ chrome onto the paper — hide everything except the parent
+ * handout (join-funnel is teacher ops, so it stays off the print root).
+ */
+const PRINT_CSS = `
+@media print {
+  body * { visibility: hidden; }
+  [data-print-root="parent-share"], [data-print-root="parent-share"] * { visibility: visible; }
+  [data-print-root="parent-share"] {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    width: 100%;
+    color: #111;
+    background: #fff;
+  }
+  [data-print-root="parent-share"] table { font-size: 12px; width: 100%; border-collapse: collapse; }
+  [data-print-root="parent-share"] th,
+  [data-print-root="parent-share"] td { border-bottom: 1px solid #ccc; padding: 6px 8px; text-align: start; }
+}
+`;
+
+const SHARE_BTN =
+  'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-bold text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white disabled:opacity-50';
+
+export function ClassroomRosterProgress({ classroomId, classroomName = '' }: ClassroomRosterProgressProps) {
   const { t, language } = useLanguage();
   const { hasPro, loading: proLoading } = useTeacherPro();
+  const [copied, setCopied] = useState(false);
 
   const load = useCallback(async () => {
     const [studentRes, practiceRes, assignmentRes] = await Promise.all([
@@ -128,6 +163,67 @@ export function ClassroomRosterProgress({ classroomId }: ClassroomRosterProgress
     [t],
   );
 
+  const formatScore = useCallback(
+    (score: number | null): string =>
+      score == null
+        ? t('teacher.reports.rosterProgress.averageScoreEmpty')
+        : t('teacher.reports.rosterProgress.averageScore', { score }),
+    [t],
+  );
+
+  const formatCompletion = useCallback(
+    (completed: number, total: number): string =>
+      t('teacher.reports.rosterProgress.completion', { completed, total }),
+    [t],
+  );
+
+  const generatedAt = useMemo(
+    () =>
+      new Intl.DateTimeFormat(language, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      }).format(new Date()),
+    [language],
+  );
+
+  const parentSummary = useCallback(() => {
+    const rows = data?.rows ?? [];
+    return buildParentShareSummary({
+      heading: t('teacher.reports.rosterProgress.parentShare.title'),
+      classroomName: classroomName || t('teacher.reports.title'),
+      generatedAt: t('teacher.reports.rosterProgress.parentShare.generated', { date: generatedAt }),
+      columns: {
+        student: t('teacher.reports.rosterProgress.columns.student'),
+        completion: t('teacher.reports.rosterProgress.columns.completion'),
+        averageScore: t('teacher.reports.rosterProgress.columns.averageScore'),
+        lastActive: t('teacher.reports.rosterProgress.columns.lastActive'),
+      },
+      lines: rows.map((row) => ({
+        name: row.name,
+        completion: formatCompletion(row.completedAssignments, row.totalAssignments),
+        averageScore: formatScore(row.averageScore),
+        lastActive: formatLastActive(row.lastActiveAt),
+      })),
+    });
+  }, [classroomName, data?.rows, formatCompletion, formatLastActive, formatScore, generatedAt, t]);
+
+  const handlePrint = useCallback(() => {
+    trackTeacherRosterParentSharePrinted({ classroomId });
+    if (typeof window !== 'undefined' && typeof window.print === 'function') window.print();
+  }, [classroomId]);
+
+  const handleCopy = useCallback(async () => {
+    const text = stripEmoji(parentSummary());
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2400);
+    } catch {
+      // jsdom / locked-down browsers — the print path is the fallback.
+    }
+  }, [parentSummary]);
+
   if (loading) return <ReportSkeleton />;
   if (failed) return <ReportError onRetry={retry} />;
   if (!data || data.rows.length === 0) return null;
@@ -137,9 +233,35 @@ export function ClassroomRosterProgress({ classroomId }: ClassroomRosterProgress
       data-testid="classroom-roster-progress"
       className="space-y-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy/40 p-4"
     >
-      <h3 className="font-neo-display text-lg font-bold text-neo-white">
-        {t('teacher.reports.rosterProgress.title')}
-      </h3>
+      <style>{PRINT_CSS}</style>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <h3 className="font-neo-display text-lg font-bold text-neo-white">
+          {t('teacher.reports.rosterProgress.title')}
+        </h3>
+        {proLoading ? null : hasPro ? (
+          <div className="flex flex-wrap gap-2" data-testid="classroom-roster-parent-share">
+            <button type="button" onClick={() => { void handleCopy(); }} className={SHARE_BTN}>
+              {copied ? <Check className="size-4" aria-hidden /> : <Share2 className="size-4" aria-hidden />}
+              {copied
+                ? t('teacher.reports.rosterProgress.parentShare.copied')
+                : t('teacher.reports.rosterProgress.parentShare.copy')}
+            </button>
+            <button type="button" onClick={handlePrint} className={SHARE_BTN}>
+              <Printer className="size-4" aria-hidden />
+              {t('teacher.reports.rosterProgress.parentShare.print')}
+            </button>
+          </div>
+        ) : (
+          <Link
+            href={`/${language}/teacher/upgrade`}
+            data-testid="classroom-roster-parent-share-upgrade"
+            onClick={() => trackTeacherRosterProgressUpgradeClicked({ classroomId })}
+            className={SHARE_BTN}
+          >
+            {t('teacher.reports.rosterProgress.parentShare.upgrade', { price: `$${TEACHER_PRO_PRICE_USD}` })}
+          </Link>
+        )}
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
@@ -149,6 +271,9 @@ export function ClassroomRosterProgress({ classroomId }: ClassroomRosterProgress
               </th>
               <th scope="col" className="p-3 text-end font-bold">
                 {t('teacher.reports.rosterProgress.columns.completion')}
+              </th>
+              <th scope="col" className="p-3 text-end font-bold">
+                {t('teacher.reports.rosterProgress.columns.averageScore')}
               </th>
               <th scope="col" className="p-3 text-end font-bold">
                 {t('teacher.reports.rosterProgress.columns.lastActive')}
@@ -168,10 +293,10 @@ export function ClassroomRosterProgress({ classroomId }: ClassroomRosterProgress
               >
                 <td className="px-3 py-2 font-bold text-neo-white">{row.name}</td>
                 <td className="px-3 py-2 text-end text-neo-white tabular-nums">
-                  {t('teacher.reports.rosterProgress.completion', {
-                    completed: row.completedAssignments,
-                    total: row.totalAssignments,
-                  })}
+                  {formatCompletion(row.completedAssignments, row.totalAssignments)}
+                </td>
+                <td className="px-3 py-2 text-end text-neo-white tabular-nums">
+                  {formatScore(row.averageScore)}
                 </td>
                 <td className="px-3 py-2 text-end text-neo-white tabular-nums">
                   {formatLastActive(row.lastActiveAt)}
@@ -199,6 +324,43 @@ export function ClassroomRosterProgress({ classroomId }: ClassroomRosterProgress
           {t('teacher.reports.rosterProgress.upgrade', { price: `$${TEACHER_PRO_PRICE_USD}` })}
         </Link>
       )}
+
+      {/* Parent handout: off-screen for teachers, the only thing window.print sees. */}
+      <article
+        data-print-root="parent-share"
+        data-testid="classroom-roster-parent-print"
+        className="pointer-events-none absolute -left-[10000px] top-0 w-[210mm] bg-white p-6 text-black"
+        aria-hidden="true"
+      >
+        <h1 className="mb-1 text-xl font-black">
+          {t('teacher.reports.rosterProgress.parentShare.title')}
+        </h1>
+        <p className="mb-1 font-bold">{classroomName || t('teacher.reports.title')}</p>
+        <p className="mb-4 text-sm">
+          {t('teacher.reports.rosterProgress.parentShare.generated', { date: generatedAt })}
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>{t('teacher.reports.rosterProgress.columns.student')}</th>
+              <th>{t('teacher.reports.rosterProgress.columns.completion')}</th>
+              <th>{t('teacher.reports.rosterProgress.columns.averageScore')}</th>
+              <th>{t('teacher.reports.rosterProgress.columns.lastActive')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.rows.map((row) => (
+              <tr key={`print-${row.studentId}`}>
+                <td>{row.name}</td>
+                <td>{formatCompletion(row.completedAssignments, row.totalAssignments)}</td>
+                <td>{formatScore(row.averageScore)}</td>
+                <td>{formatLastActive(row.lastActiveAt)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="mt-4 text-xs">{t('teacher.reports.rosterProgress.parentShare.footer')}</p>
+      </article>
     </section>
   );
 }

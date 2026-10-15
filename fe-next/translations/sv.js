@@ -15076,6 +15076,7 @@ const sv = {
         "columns": {
           "student": "Elev",
           "completion": "Uppgifter",
+          "averageScore": "Snittbetyg",
           "lastActive": "Senast aktiv",
           "joinStatus": "Anslutningsstatus"
         },
@@ -15085,8 +15086,19 @@ const sv = {
           "joined_idle": "Ansluten, ej övat"
         },
         "completion": "{{completed}}/{{total}}",
+        "averageScore": "{{score}}%",
+        "averageScoreEmpty": "—",
         "upgrade": "Mer detaljer per elev med Teacher Pro {{price}}",
-        "never": "Aldrig"
+        "never": "Aldrig",
+        "parentShare": {
+          "title": "Dela med föräldrar",
+          "generated": "Framsteg per {{date}}",
+          "print": "Skriv ut föräldrasammanfattning",
+          "copy": "Kopiera föräldrasammanfattning",
+          "copied": "Kopierad",
+          "upgrade": "Skriv ut en föräldrasammanfattning med Teacher Pro {{price}}",
+          "footer": "LexiClash klassframsteg — uppgiftskomplettering, snittbetyg, senast aktiv."
+        }
       },
       "exportAllClasses": {
         "button": "Exportera alla klasser",

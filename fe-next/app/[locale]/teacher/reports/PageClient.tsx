@@ -281,7 +281,10 @@ function TeacherReportsInner() {
         {/* Free surface, deliberately above the fold and outside ProGate: the
             per-student join-funnel view (who converted but never practiced) is
             the reason a free teacher upgrades. */}
-        <ClassroomRosterProgress classroomId={selectedClassroomId} />
+        <ClassroomRosterProgress
+          classroomId={selectedClassroomId}
+          classroomName={selectedClassroom?.name ?? ''}
+        />
         <WordMasteryReport
           classroomId={selectedClassroomId}
           classroomName={selectedClassroom?.name ?? ''}
