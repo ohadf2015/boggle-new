@@ -168,7 +168,7 @@ const en = {
     },
     "pro": {
       "rosterPro": "Unlimited students on your roster",
-      "liveCap": "Live games seat up to {count} players at once",
+      "liveCap": "Live games seat up to {count} players at once, on every plan.",
       "mastery": "Mastery heatmap: which words each student knows",
       "missedPractice": "Missed-practice rounds built from real gaps",
       "reports": "Printable class reports"
@@ -13391,12 +13391,12 @@ const en = {
       "assignmentLimitTitle": "Assignment limit reached",
       "assignmentLimitMessage": "You've created {{current}} of {{limit}} free assignments for this class. Upgrade to Pro for unlimited assignments.",
       "upgradeProDescription": "Pro gives you unlimited classrooms and unlimited students per class.",
-      "trialExpiredTitle": "Your free trial has ended",
-      "trialExpiredMessage": "Your 14-day teacher trial is over. Keep going with Pro: unlimited classes, live games, and progress reports.",
+      "trialExpiredTitle": "Want more than the free plan?",
+      "trialExpiredMessage": "The free plan keeps working with no time limit. Pro adds unlimited classes and progress reports, and new accounts get 14 days free.",
       "continueFree": "Continue with free tier",
       "proFeatures": "Pro includes",
       "unlimitedClasses": "Unlimited classrooms",
-      "unlimitedStudents": "Unlimited students per classroom",
+      "unlimitedStudents": "Unlimited students on every class roster",
       "priceUSD": "Pro subscription",
       "perMonth": "/month",
       "autoRenew": "Renews automatically each month. Cancel anytime.",
@@ -13405,8 +13405,8 @@ const en = {
       "trialOfferTitle": "Try Teacher Pro free for 14 days",
       "trialOfferBody": "Unlimited classes and reports. Free for 14 days, then $9/month. Cancel anytime.",
       "trialCtaSubtext": "Free for 14 days, then $9/month. Cancel anytime.",
-      "trialEndedTitle": "Trial expired. Upgrade to keep your classrooms",
-      "trialEndedBody": "Keep unlimited classes and printable reports for $9/month. This is not another free trial.",
+      "trialEndedTitle": "Your Pro trial has ended. Your classes are safe.",
+      "trialEndedBody": "Free still runs every class. Pro brings back unlimited classes and printable reports for $9/month. This is not another free trial.",
       "trialEndedCta": "Keep Pro: $9/mo",
       "trialReactivateCta": "Reactivate",
       "trialLifecycleTitle": "{count} days left in your Teacher Pro trial",
@@ -13432,7 +13432,7 @@ const en = {
       "freePlanName": "Free",
       "freeForever": "Free plan, no expiry",
       "freeClasses": "Up to {count} classes",
-      "freeStudents": "Up to {count} students per class",
+      "freeStudents": "Up to {count} students on each class roster",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Everything you need to scale",
       "popular": "Most popular",
@@ -13469,7 +13469,7 @@ const en = {
         "included": "Included",
         "notIncluded": "Not included",
         "classes": "Classrooms",
-        "studentsPerClass": "Students per class",
+        "studentsPerClass": "Students on each class roster",
         "customLists": "Your own word lists",
         "duels": "Head-to-head duels",
         "noAds": "Ad-free for students",
@@ -14470,8 +14470,8 @@ const en = {
     },
     "landing": {
       "pro": {
-        "title": "Two plans. No tricks.",
-        "subtitle": "Everything that gets you to a first lesson is free. Pro lifts the caps.",
+        "title": "Free runs the game. Teacher Pro shows you what they learned.",
+        "subtitle": "After one game: who struggled, which words to reteach, and practice built from the misses.",
         "comparisonAlt": "Side-by-side comparison of the Free plan and Teacher Pro",
         "freeTier": "Free",
         "perMonth": "/month",
@@ -14480,7 +14480,7 @@ const en = {
         "noAds": "No advertising for your students",
         "customLists": "Your own word lists",
         "duels": "Live word duels",
-        "freeForever": "The free plan never expires. No card, no trial clock.",
+        "freeForever": "The free plan never expires and needs no card.",
         "proTier": "Teacher Pro",
         "everythingInFree": "Everything in Free",
         "classLimitPro": "Unlimited classrooms",
@@ -19835,8 +19835,62 @@ const en = {
       "optionsHide": "Hide options",
       "retry": "Try again"
     }
-  }
+  },
   // @eduShell:end
+  // @eduPlans:start
+  "eduPlans": {
+    "hero": {
+      "sub": "Students join from any browser with a code. No student accounts, no ads, nothing to install. Built for {count} languages, Hebrew right-to-left included.",
+      "studentLead": "I'm a student",
+      "studentJoin": "Join with a code",
+      "proLink": "Teacher Pro from {price}/mo"
+    },
+    "how": {
+      "title": "How a class runs",
+      "createTitle": "Make a class",
+      "createBody": "Name it, pick the language. You get a join code and a QR right away.",
+      "shareTitle": "Students join",
+      "shareBody": "They type the code on any phone, tablet or Chromebook. No accounts, no emails.",
+      "playTitle": "Play live",
+      "playBody": "Pick a mode, put it on the board, and see results the moment the round ends."
+    },
+    "modes": {
+      "title": "{count} ways to play the same word list",
+      "sub": "Some run on the projector, some on students' phones. Every mode is free.",
+      "moreLabel": "More modes"
+    },
+    "pro": {
+      "trialLine": "New accounts get the first {days} days free. Cancel anytime."
+    },
+    "cards": {
+      "schoolMonthly": "From {monthly} a month per teacher, billed yearly: up to {save}% less than monthly Teacher Pro.",
+      "liveCapNote": "Every plan: a live game seats up to {players} players at once."
+    },
+    "manage": {
+      "active": "Active · {price}/month",
+      "renews": "Renews on {date} · {price}/month",
+      "trialing": "Free trial: {days} days left, then {price}/month unless you cancel.",
+      "ends": "Cancelled. Pro stays on until {date}.",
+      "pastDue": "Your last payment didn't go through. Update your card in billing to keep Pro.",
+      "gifted": "Complimentary Pro until {date}",
+      "giftedOpen": "Complimentary Pro",
+      "giftedNote": "Nothing to pay and nothing to cancel. It switches back to Free on its own."
+    },
+    "reports": {
+      "title": "See who struggled, after every game",
+      "body": "Pro turns each game into a class report: every student's accuracy, the words to reteach, and a printable page for parents or your department.",
+      "trialCta": "Try Pro free for {days} days",
+      "buyCta": "Get Teacher Pro · {price}/month",
+      "trialFine": "Free for {days} days, then {price}/month. Cancel anytime."
+    },
+    "cap": {
+      "used": "{count} of {limit} free classes used",
+      "full": "You're using all {limit} free classes",
+      "label": "Free classes used",
+      "cta": "Unlimited classes with Pro"
+    }
+  }
+  // @eduPlans:end
 };
 
 export { en };

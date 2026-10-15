@@ -22,6 +22,8 @@ describe('isQuietChromeSurface', () => {
     '/ru/education/classroom-game',
     '/multiplayer',
     '/en/multiplayer',
+    '/en/pricing',
+    '/he/education/live',
   ])('silences the install stack on %s', (path) => {
     expect(isQuietChromeSurface(path)).toBe(true);
   });
@@ -35,6 +37,7 @@ describe('isQuietChromeSurface', () => {
     '/en/teachers-lounge',
     '/en/students-union',
     '/en/multiplayer-tips',
+    '/en/pricing-tips',
   ])('leaves the rest of the app alone on %s', (path) => {
     expect(isQuietChromeSurface(path)).toBe(false);
   });

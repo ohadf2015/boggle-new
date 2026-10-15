@@ -64,7 +64,7 @@ export type ProUpgradeSource =
   | 'pro_gate_mastery'
   | 'pro_gate_missedPractice';
 
-export type TrialCtaSource = 'dashboard_trial_offer' | 'upgrade_page' | 'activation_checklist';
+export type TrialCtaSource = 'dashboard_trial_offer' | 'upgrade_page' | 'activation_checklist' | 'reports_teaser';
 
 export function trackTrialCtaView(args: { source: TrialCtaSource }): void {
   captureStep('trial_cta_view', { source: args.source, product: 'teacher_pro' });

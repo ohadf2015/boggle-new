@@ -27,10 +27,10 @@ describe('EducationLandingProjector', () => {
     expect(screen.getByText('eg6Land.projector.srOnly')).toBeInTheDocument();
   });
 
-  it('keeps the scholar mascot decorative inside the frame', () => {
+  it('keeps the education mascot decorative inside the frame', () => {
     const { container } = render(<EducationLandingProjector youScore={0} />);
     const mascot = Array.from(container.querySelectorAll('img')).find((img) =>
-      (img.getAttribute('src') ?? '').includes('scholar'),
+      (img.getAttribute('src') ?? '').includes('/mascot/edu/'),
     );
     expect(mascot?.closest('[aria-hidden="true"]')).toBeTruthy();
   });

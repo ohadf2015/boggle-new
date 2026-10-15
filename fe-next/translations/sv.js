@@ -168,7 +168,7 @@ const sv = {
     },
     "pro": {
       "rosterPro": "Obegränsat antal elever i din lista",
-      "liveCap": "Live-spel rymmer upp till {count} spelare samtidigt",
+      "liveCap": "I alla planer rymmer ett livespel upp till {count} spelare samtidigt.",
       "mastery": "Mastery-värmekarta: vilka ord varje elev kan",
       "missedPractice": "Övningsrundor för missade ord, byggda på riktiga luckor",
       "reports": "Utskrivbara klassrapporter"
@@ -14457,12 +14457,12 @@ const sv = {
       "assignmentLimitTitle": "Du har nått uppgiftsgränsen",
       "assignmentLimitMessage": "Du har skapat {{current}} av {{limit}} gratisuppgifter för den här klassen. Uppgradera till Pro för obegränsade uppgifter.",
       "upgradeProDescription": "Pro ger dig obegränsat antal klassrum och elever per klass. Inga gränser.",
-      "trialExpiredTitle": "Din kostnadsfria provperiod har tagit slut",
-      "trialExpiredMessage": "Din 14-dagars lärarprovperiod är över. Fortsätt med Pro: obegränsat antal klasser, live-spel och framstegsrapporter.",
+      "trialExpiredTitle": "Vill du ha mer än gratisplanen?",
+      "trialExpiredMessage": "Gratisplanen fortsätter att fungera utan tidsgräns. Pro lägger till obegränsat med klasser och framstegsrapporter, och nya konton får 14 dagar gratis.",
       "continueFree": "Fortsätt med gratisversionen",
       "proFeatures": "Pro innehåller",
       "unlimitedClasses": "Obegränsat antal klassrum",
-      "unlimitedStudents": "Obegränsat antal elever per klassrum",
+      "unlimitedStudents": "Obegränsat antal elever i varje klasslista",
       "priceUSD": "Pro-prenumeration",
       "perMonth": "/månad",
       "autoRenew": "Förnyas automatiskt varje månad. Avsluta när du vill.",
@@ -14471,8 +14471,8 @@ const sv = {
       "trialOfferTitle": "Prova Teacher Pro gratis i 14 dagar",
       "trialOfferBody": "Obegränsade klasser och rapporter. Gratis i 14 dagar, sedan 9 $/månad. Avsluta när du vill.",
       "trialCtaSubtext": "Gratis i 14 dagar, sedan 9 $/månad. Avsluta när du vill.",
-      "trialEndedTitle": "Provperioden är slut. Uppgradera för att behålla klasserna",
-      "trialEndedBody": "Behåll obegränsade klasser och utskrivbara rapporter för 9 $/månad. Det här är inte en ny gratis provperiod.",
+      "trialEndedTitle": "Din Pro-provperiod är slut. Dina klasser finns kvar.",
+      "trialEndedBody": "Gratisplanen kör fortfarande alla klasser. Pro ger tillbaka obegränsat med klasser och utskrivbara rapporter för $9/mån. Det här är ingen ny provperiod.",
       "trialEndedCta": "Behåll Pro – 9 $/mån",
       "trialReactivateCta": "Återaktivera",
       "trialLifecycleTitle": "{count} dagar kvar av din Teacher Pro-provperiod",
@@ -14497,7 +14497,7 @@ const sv = {
       "freePlanName": "Free",
       "freeForever": "Gratisplan, utan slutdatum",
       "freeClasses": "Upp till {count} klasser",
-      "freeStudents": "Upp till {count} elever per klass",
+      "freeStudents": "Upp till {count} elever i varje klasslista",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Allt du behöver för att växa",
       "popular": "Populärast",
@@ -14534,7 +14534,7 @@ const sv = {
         "included": "Ingår",
         "notIncluded": "Ingår inte",
         "classes": "Klasser",
-        "studentsPerClass": "Elever per klass",
+        "studentsPerClass": "Elever per klasslista",
         "customLists": "Egna ordlistor",
         "duels": "Dueller mot varandra",
         "noAds": "Reklamfritt för eleverna",
@@ -16297,8 +16297,8 @@ const sv = {
     },
     "landing": {
       "pro": {
-        "title": "Två planer. Inga trick.",
-        "subtitle": "Allt du behöver för din första lektion är gratis. Pro tar bort taken.",
+        "title": "Gratis kör spelet. Teacher Pro visar vad de lärde sig.",
+        "subtitle": "Efter ett spel: vem som kämpade, vilka ord som behöver repeteras och övning byggd på missarna.",
         "comparisonAlt": "Jämförelse mellan gratisplanen och Teacher Pro",
         "freeTier": "Gratis",
         "perMonth": "/månad",
@@ -16307,7 +16307,7 @@ const sv = {
         "noAds": "Inga annonser för dina elever",
         "customLists": "Dina egna ordlistor",
         "duels": "Orddueller i realtid",
-        "freeForever": "Gratisplanen upphör aldrig. Inget kort, ingen provperiod som tickar.",
+        "freeForever": "Gratisplanen går aldrig ut och kräver inget kort.",
         "proTier": "Teacher Pro",
         "everythingInFree": "Allt i gratisplanen",
         "classLimitPro": "Obegränsat antal klasser",
@@ -20776,8 +20776,62 @@ const sv = {
       "optionsHide": "Dölj alternativ",
       "retry": "Försök igen"
     }
-  }
+  },
   // @eduShell:end
+  // @eduPlans:start
+  "eduPlans": {
+    "hero": {
+      "sub": "Eleverna går med från vilken webbläsare som helst med en kod. Inga elevkonton, ingen reklam, inget att installera. Byggt för {count} språk, hebreiska från höger till vänster inräknat.",
+      "studentLead": "Jag är elev",
+      "studentJoin": "Gå med med en kod",
+      "proLink": "Teacher Pro från {price}/mån"
+    },
+    "how": {
+      "title": "Så går en lektion till",
+      "createTitle": "Skapa en klass",
+      "createBody": "Ge den ett namn och välj språk. Du får en kod och en QR-kod direkt.",
+      "shareTitle": "Eleverna går med",
+      "shareBody": "De skriver koden på valfri mobil, surfplatta eller Chromebook. Inga konton, ingen e-post.",
+      "playTitle": "Spela live",
+      "playBody": "Välj ett läge, visa det på tavlan och se resultaten så fort rundan är slut."
+    },
+    "modes": {
+      "title": "{count} sätt att spela samma ordlista",
+      "sub": "Vissa lägen körs på projektorn, andra på elevernas mobiler. Alla lägen är gratis.",
+      "moreLabel": "Fler lägen"
+    },
+    "pro": {
+      "trialLine": "Nya konton får de första {days} dagarna gratis. Avsluta när du vill."
+    },
+    "cards": {
+      "schoolMonthly": "Från {monthly} i månaden per lärare vid årsbetalning: upp till {save} % mindre än Teacher Pro per månad.",
+      "liveCapNote": "I alla planer: ett livespel rymmer upp till {players} spelare samtidigt."
+    },
+    "manage": {
+      "active": "Aktiv · {price}/mån",
+      "renews": "Förnyas {date} · {price}/mån",
+      "trialing": "Provperiod: {days} dagar kvar, sedan {price}/mån om du inte avslutar.",
+      "ends": "Avslutad. Pro gäller till {date}.",
+      "pastDue": "Din senaste betalning gick inte igenom. Uppdatera kortet under fakturering för att behålla Pro.",
+      "gifted": "Pro i gåva till {date}",
+      "giftedOpen": "Pro i gåva",
+      "giftedNote": "Inget att betala och inget att avsluta. Kontot går tillbaka till gratisplanen av sig självt."
+    },
+    "reports": {
+      "title": "Se vem som kämpade, efter varje spel",
+      "body": "Pro gör varje spel till en klassrapport: varje elevs träffsäkerhet, orden att repetera och en utskrivbar sida för föräldrar eller arbetslaget.",
+      "trialCta": "Prova Pro gratis i {days} dagar",
+      "buyCta": "Teacher Pro · {price}/mån",
+      "trialFine": "Gratis i {days} dagar, sedan {price}/mån. Avsluta när du vill."
+    },
+    "cap": {
+      "used": "{count} av {limit} gratisklasser använda",
+      "full": "Du använder alla {limit} gratisklasser",
+      "label": "Använda gratisklasser",
+      "cta": "Obegränsat med klasser med Pro"
+    }
+  }
+  // @eduPlans:end
 };
 
 export { sv };

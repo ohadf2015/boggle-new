@@ -30,6 +30,7 @@ const QUIET_ROUTES: readonly (readonly string[])[] = [
   ['multiplayer'],
   ['education', 'classroom-game'],
   ['education', 'live'],
+  ['pricing'],
 ];
 
 export function isQuietChromeSurface(pathname: string | null | undefined): boolean {

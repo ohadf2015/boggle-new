@@ -3,23 +3,23 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { demoBoard, isAdjacent, isTargetWord, wordFromPath, type CefrLevel } from '@/lib/education/eslCefrDemo';
-import { nextHintPath, wordsFoundKey } from '@/lib/education/landingDemo';
+import { isAdjacent, wordFromPath } from '@/lib/education/eslCefrDemo';
+import { wordsFoundKey } from '@/lib/education/landingDemo';
+import { displayDemoWord, landingDemoBoard, landingHintPath } from '@/lib/education/landingDemoBoards';
 import { EducationLandingProjector } from './EducationLandingProjector';
 
-const LEVEL: CefrLevel = 'A1';
 const STEP_MS = 240;
 const reducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
 
 /**
  * Playable hero board. It traces one word by itself on load so a teacher sees the
- * game working before touching it, then hands over the board. Built on the same
- * board and adjacency rules as the ESL demo; no network calls.
+ * game working before touching it, then hands over the board. The board is dealt in the
+ * visitor's language (landingDemoBoards); no network calls.
  */
 export function EducationLandingDemo() {
   const { t, language } = useLanguage();
-  const { letters, targets } = demoBoard(LEVEL);
+  const { letters, targets, minLength } = landingDemoBoard(language);
   const cols = Math.round(Math.sqrt(letters.length));
   const [path, setPath] = useState<number[]>([]);
   const [found, setFound] = useState<string[]>([]);
@@ -34,7 +34,7 @@ export function EducationLandingDemo() {
   const trace = useCallback(
     (foundNow: string[]) => {
       clearTimers();
-      const hint = nextHintPath(LEVEL, foundNow);
+      const hint = landingHintPath(language, foundNow);
       setPath([]);
       if (!hint) {
         setWatching(false);
@@ -42,7 +42,7 @@ export function EducationLandingDemo() {
       }
       setWatching(true);
       const gap = reducedMotion() ? 0 : STEP_MS;
-      const word = wordFromPath(letters, hint);
+      const word = wordFromPath(landingDemoBoard(language).letters, hint);
       hint.forEach((_, step) => {
         timers.current.push(window.setTimeout(() => setPath(hint.slice(0, step + 1)), gap * (step + 1)));
       });
@@ -54,7 +54,7 @@ export function EducationLandingDemo() {
         }, gap * (hint.length + 1)),
       );
     },
-    [clearTimers, letters],
+    [clearTimers, language],
   );
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export function EducationLandingDemo() {
     else next = [i];
 
     const word = wordFromPath(letters, next);
-    if (next.length >= 3 && isTargetWord(LEVEL, word) && !found.includes(word)) {
+    if (next.length >= minLength && targets.includes(word) && !found.includes(word)) {
       setFound([...found, word]);
       setPath([]);
       return;
@@ -90,61 +90,63 @@ export function EducationLandingDemo() {
       data-testid="education-landing-demo"
       role="group"
       aria-label={t('eg6Land.demo.label')}
-      className="rounded-neo border-neo-thick border-neo-cream/60 bg-neo-navy-light p-4 shadow-hard-lg sm:p-5"
+      className="overflow-hidden rounded-neo border-3 border-neo-cream/60 bg-neo-navy-light shadow-hard-lg"
     >
-      <EducationLandingProjector youScore={found.length} />
-      <p aria-live="polite" className="mt-4 font-neo-display text-sm font-black uppercase tracking-wider text-neo-lime">
-        {watching ? t('eg6Land.demo.watching') : t('eg6Land.demo.yourTurn')}
-      </p>
-      <div
-        dir="ltr"
-        className="mx-auto mt-3 grid max-w-xs gap-2"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-      >
-        {letters.map((ch, i) => {
-          const order = path.indexOf(i);
-          const active = order !== -1;
-          return (
-            <button
-              key={i}
-              type="button"
-              onClick={() => onTile(i)}
-              disabled={watching}
-              aria-label={ch}
-              className={cn(
-                'aspect-square rounded-neo border-2 border-black font-neo-display text-2xl font-black shadow-hard-sm transition-transform duration-150 motion-reduce:transition-none',
-                active ? 'bg-neo-lime text-neo-navy -translate-y-0.5' : 'bg-neo-cream text-neo-navy',
-                !watching && !active && 'hover:-translate-y-0.5',
-                'disabled:cursor-default',
-              )}
-            >
-              {ch}
-            </button>
-          );
-        })}
-      </div>
-      <div className="mt-4 flex min-h-9 flex-wrap items-center gap-2" aria-live="polite">
-        {found.map((w) => (
-          <span
-            key={w}
-            aria-label={t('eg6Land.demo.found', undefined, { word: w })}
-            className="rounded-neo border-2 border-black bg-neo-pink px-2 py-0.5 font-neo-display text-sm font-black text-neo-black"
-          >
-            {w}
-          </span>
-        ))}
-      </div>
-      <div className="mt-4 flex items-center justify-between gap-3">
-        <p className="text-sm font-bold text-neo-cream/80">
-          {t(wordsFoundKey(found.length, language), undefined, {
-            count: String(found.length),
-            total: String(targets.length),
-          })}
+      <EducationLandingProjector youScore={found.length}>
+        <p aria-live="polite" className="mb-2 truncate font-neo-display text-xs font-black uppercase tracking-wider text-neo-lime sm:text-sm">
+          {watching ? t('eg6Land.demo.watching') : t('eg6Land.demo.yourTurn')}
         </p>
+        <div
+          dir={language === 'he' ? 'rtl' : 'ltr'}
+          className="mx-auto grid max-w-[15rem] gap-1.5 sm:max-w-[17rem] sm:gap-2 lg:max-w-[20rem]"
+          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+        >
+          {letters.map((ch, i) => {
+            const active = path.includes(i);
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => onTile(i)}
+                disabled={watching}
+                aria-label={ch}
+                className={cn(
+                  'aspect-square rounded-neo border-2 border-neo-black font-neo-display text-xl font-black shadow-hard-sm sm:text-2xl',
+                  'transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] motion-reduce:transition-none',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
+                  active ? 'bg-neo-lime text-neo-navy -translate-y-0.5' : 'bg-neo-cream text-neo-navy',
+                  !watching && !active && 'hover:-translate-y-0.5',
+                  'disabled:cursor-default',
+                )}
+              >
+                {ch}
+              </button>
+            );
+          })}
+        </div>
+      </EducationLandingProjector>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t-2 border-neo-black/60 px-3 py-2.5 sm:px-4">
+        <div className="flex min-h-7 min-w-0 flex-1 flex-wrap items-center gap-1.5" aria-live="polite">
+          <span className="me-1 text-xs font-bold text-neo-cream/75">
+            {t(wordsFoundKey(found.length, language), undefined, {
+              count: String(found.length),
+              total: String(targets.length),
+            })}
+          </span>
+          {found.map((w) => (
+            <span
+              key={w}
+              aria-label={t('eg6Land.demo.found', undefined, { word: displayDemoWord(w, language) })}
+              className="rounded-neo border-2 border-neo-black bg-neo-pink px-1.5 font-neo-display text-xs font-black text-neo-black"
+            >
+              {displayDemoWord(w, language)}
+            </span>
+          ))}
+        </div>
         <button
           type="button"
           onClick={replay}
-          className="rounded-neo border-2 border-black bg-neo-cyan px-3 py-1.5 font-neo-display text-sm font-black uppercase text-neo-navy shadow-hard-sm transition-transform hover:-translate-y-0.5 motion-reduce:transition-none"
+          className="min-h-9 rounded-neo border-2 border-neo-black bg-neo-cyan px-3 font-neo-display text-xs font-black uppercase text-neo-navy shadow-hard-sm transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime"
         >
           {t('eg6Land.demo.replay')}
         </button>
