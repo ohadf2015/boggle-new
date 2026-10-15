@@ -32,14 +32,25 @@ const translations: Record<string, string> = {
   'teacher.reports.rosterProgress.title': 'Roster progress',
   'teacher.reports.rosterProgress.columns.student': 'Student',
   'teacher.reports.rosterProgress.columns.completion': 'Assignments',
+  'teacher.reports.rosterProgress.columns.averageScore': 'Avg score',
   'teacher.reports.rosterProgress.columns.lastActive': 'Last active',
   'teacher.reports.rosterProgress.columns.joinStatus': 'Join status',
   'teacher.reports.rosterProgress.status.signed_in': 'Signed in',
   'teacher.reports.rosterProgress.status.guest': 'Guest',
   'teacher.reports.rosterProgress.status.joined_idle': 'Joined, not practiced',
   'teacher.reports.rosterProgress.completion': '{{completed}}/{{total}}',
+  'teacher.reports.rosterProgress.averageScore': '{{score}}%',
+  'teacher.reports.rosterProgress.averageScoreEmpty': '—',
   'teacher.reports.rosterProgress.upgrade': 'Teacher Pro {{price}} — more per-student detail',
   'teacher.reports.rosterProgress.never': 'Never',
+  'teacher.reports.rosterProgress.parentShare.title': 'Share with parents',
+  'teacher.reports.rosterProgress.parentShare.generated': 'Progress as of {{date}}',
+  'teacher.reports.rosterProgress.parentShare.print': 'Print parent summary',
+  'teacher.reports.rosterProgress.parentShare.copy': 'Copy parent summary',
+  'teacher.reports.rosterProgress.parentShare.copied': 'Copied',
+  'teacher.reports.rosterProgress.parentShare.upgrade': 'Print a parent summary with Teacher Pro {{price}}',
+  'teacher.reports.rosterProgress.parentShare.footer': 'LexiClash classroom progress.',
+  'teacher.reports.title': 'Reports',
   'teacher.reports.assignmentProgress.untitled': 'Untitled lesson',
   'teacher.reports.assignmentProgress.anonymousStudent': 'Student {{id}}',
   'teacher.reports.loading': 'Loading report…',
@@ -91,12 +102,13 @@ vi.mock('@/lib/supabase/education/assignments', () => ({
 
 vi.mock('@/lib/education/telemetry', () => ({
   trackTeacherRosterProgressUpgradeClicked: vi.fn(),
+  trackTeacherRosterParentSharePrinted: vi.fn(),
 }));
 
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
 import { getStudentsProgressSummary } from '@/lib/supabase/analytics';
 import { getClassroomAssignments, getAssignmentCompletions } from '@/lib/supabase/education/assignments';
-import { trackTeacherRosterProgressUpgradeClicked } from '@/lib/education/telemetry';
+import { trackTeacherRosterProgressUpgradeClicked, trackTeacherRosterParentSharePrinted } from '@/lib/education/telemetry';
 import { ClassroomRosterProgress } from '../ClassroomRosterProgress';
 
 const todayIso = () => new Date().toISOString().split('T')[0];
@@ -282,5 +294,61 @@ describe('ClassroomRosterProgress', () => {
     expect(getStudentsProgressSummary).toHaveBeenCalledWith('c1');
     expect(getClassroomAssignments).toHaveBeenCalledWith('c1');
     expect(getAssignmentCompletions).not.toHaveBeenCalled(); // no assignments in this class
+  });
+
+  it('shows average score on each row (percent or em dash)', async () => {
+    studentsState.data = [
+      rosterStudent('sA', { display_name: 'Priya' }, '2026-10-01T09:00:00.000Z'),
+      rosterStudent('sC', { display_name: null, username: 'Player_11111111' }, '2026-10-03T09:00:00.000Z'),
+    ];
+    practiceState.data = [{ studentId: 'sA', lastPracticeDate: todayIso() }];
+    assignmentsState.data = [{ id: 'a1', title: 'Nouns', due_date: null }];
+    completionBatches = {
+      a1: [{ student_id: 'sA', words_attempted: [{ correct: true }], completed_at: todayIso() }],
+    };
+
+    render(<ClassroomRosterProgress classroomId="c1" classroomName="Year 5" />);
+
+    const rows = await screen.findAllByTestId('classroom-roster-row');
+    const idle = rows.find((r) => r.getAttribute('data-status') === 'joined_idle');
+    const signed = rows.find((r) => r.getAttribute('data-status') === 'signed_in');
+    expect(idle).toHaveTextContent('—');
+    expect(signed).toHaveTextContent('100%');
+    expect(screen.getByTestId('classroom-roster-parent-print')).toHaveTextContent('Share with parents');
+    expect(screen.getByTestId('classroom-roster-parent-print')).not.toHaveTextContent('Joined, not practiced');
+  });
+
+  it('offers a parent-share upgrade CTA to free teachers', async () => {
+    studentsState.data = [
+      rosterStudent('sA', { display_name: 'Priya' }, '2026-10-01T09:00:00.000Z'),
+    ];
+    practiceState.data = [{ studentId: 'sA', lastPracticeDate: todayIso() }];
+
+    render(<ClassroomRosterProgress classroomId="c1" />);
+
+    const link = await screen.findByTestId('classroom-roster-parent-share-upgrade');
+    expect(link).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(link).toHaveTextContent('Teacher Pro $9');
+    expect(screen.queryByTestId('classroom-roster-parent-share')).toBeNull();
+  });
+
+  it('prints the parent summary for a Pro teacher and tracks it', async () => {
+    studentsState.data = [
+      rosterStudent('sA', { display_name: 'Priya' }, '2026-10-01T09:00:00.000Z'),
+    ];
+    practiceState.data = [{ studentId: 'sA', lastPracticeDate: todayIso() }];
+    proState.hasPro = true;
+    const print = vi.fn();
+    window.print = print;
+
+    render(<ClassroomRosterProgress classroomId="c1" classroomName="Year 5" />);
+
+    await screen.findByTestId('classroom-roster-parent-share');
+    expect(screen.queryByTestId('classroom-roster-parent-share-upgrade')).toBeNull();
+    expect(screen.queryByTestId('classroom-roster-upgrade')).toBeNull();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Print parent summary' }));
+    expect(print).toHaveBeenCalledTimes(1);
+    expect(trackTeacherRosterParentSharePrinted).toHaveBeenCalledWith({ classroomId: 'c1' });
   });
 });

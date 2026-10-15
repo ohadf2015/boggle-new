@@ -677,6 +677,11 @@ export function trackTeacherRosterProgressUpgradeClicked(args: { classroomId: st
   safeCapture('teacher_roster_progress_upgrade_clicked', { classroom_id: args.classroomId });
 }
 
+/** Pro teacher printed the parent-share roster handout. */
+export function trackTeacherRosterParentSharePrinted(args: { classroomId: string }): void {
+  safeCapture('teacher_roster_parent_share_printed', { classroom_id: args.classroomId });
+}
+
 export interface EduInviteStudentsCtaArgs {
   classroomId: string;
 }

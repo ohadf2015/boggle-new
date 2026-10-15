@@ -14660,6 +14660,7 @@ const he = {
         "columns": {
           "student": "תלמיד",
           "completion": "משימות",
+          "averageScore": "ציון ממוצע",
           "lastActive": "פעילות אחרונה",
           "joinStatus": "סטטוס הצטרפות"
         },
@@ -14669,8 +14670,19 @@ const he = {
           "joined_idle": "הצטרף, לא התאמן"
         },
         "completion": "{{completed}}/{{total}}",
+        "averageScore": "{{score}}%",
+        "averageScoreEmpty": "—",
         "upgrade": "פרטים נוספים לכל תלמיד עם פרו למורים {{price}}",
-        "never": "אף פעם"
+        "never": "אף פעם",
+        "parentShare": {
+          "title": "שיתוף עם הורים",
+          "generated": "התקדמות נכון ל-{{date}}",
+          "print": "הדפסת סיכום להורים",
+          "copy": "העתקת סיכום להורים",
+          "copied": "הועתק",
+          "upgrade": "הדפסת סיכום להורים עם פרו למורים {{price}}",
+          "footer": "התקדמות כיתה ב-LexiClash — השלמת משימות, ציון ממוצע, פעילות אחרונה."
+        }
       },
       "exportAllClasses": {
         "button": "ייצוא כל הכיתות",
