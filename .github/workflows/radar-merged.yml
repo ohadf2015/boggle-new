@@ -1,0 +1,43 @@
+name: radar-merged
+
+# Reusable: closes the Growth Radar loop for a radar/* PR. A merge completes the recommendation
+# and records the intervention the 28-day scorer grades; a close without merge puts the
+# recommendation back in the backlog.
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  close-loop:
+    if: startsWith(github.head_ref, 'radar/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GROWTH_RADAR_TOKEN: ${{ secrets.GROWTH_RADAR_TOKEN }}
+      BODY: ${{ github.event.pull_request.body }}
+      PR_URL: ${{ github.event.pull_request.html_url }}
+      REF: ${{ github.head_ref }}
+      MERGED: ${{ github.event.pull_request.merged }}
+    steps:
+      - run: |
+          mcp() {
+            curl -sS --fail-with-body -H "Authorization: Bearer $GROWTH_RADAR_TOKEN" -H 'content-type: application/json' \
+              https://growthradar.app/api/mcp \
+              -d "$(jq -n --arg n "$1" --argjson a "$2" '{jsonrpc:"2.0",id:1,method:"tools/call",params:{name:$n,arguments:$a}}')" \
+              | tee /dev/stderr | jq -e '.error == null and .result.isError != true' > /dev/null
+          }
+          if [ "$MERGED" != true ]; then
+            id=${REF#radar/}
+            [[ "$id" =~ ^[0-9]+$ ]] || { echo "hunted fix, no recommendation to reopen"; exit 0; }
+            mcp update_recommendation "{\"id\":$id,\"action\":\"reopen\"}"
+            exit 0
+          fi
+          meta=$(printf '%s\n' "$BODY" | sed -n '/^```radar/,/^```$/p' | sed '1d;$d')
+          [ -n "$meta" ] || { echo "PR body has no radar block"; exit 1; }
+          id=$(printf '%s' "$meta" | jq -r '.rec_id // empty')
+          if [[ "$id" =~ ^[0-9]+$ ]]; then
+            mcp update_recommendation "{\"id\":$id,\"action\":\"complete\"}"
+          fi
+          args=$(printf '%s' "$meta" | jq -c --arg pr "$PR_URL" \
+            '{app,surface,kind,metric,summary,hypothesis,evidence:$pr} + (if (.rec_id|type)=="number" then {recommendationId:.rec_id} else {} end)')
+          mcp record_intervention "$args"
