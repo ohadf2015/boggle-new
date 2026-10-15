@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Pause, Play, Plus, Square, SkipForward, Users, Zap } from 'lucide-react';
+import { Clock, Pause, Play, Plus, Square, SkipForward, Users, Zap } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -139,6 +139,19 @@ export function TeacherLiveControls({
     }, END_ROUND_CONFIRM_MS);
   }, [endArmed, clearDisarm, onEndRound]);
 
+  const pauseToggle = (
+    <ControlButton
+      compact={compact}
+      testId="teacher-pause-toggle"
+      tone={isPaused ? 'go' : 'neutral'}
+      ariaPressed={isPaused}
+      icon={isPaused ? <Play /> : <Pause />}
+      label={isPaused ? t('education.liveControls.resume') : t('education.liveControls.pause')}
+      onClick={isPaused ? onResume : onPause}
+      className={isPaused ? 'flex-[2_1_12rem]' : 'flex-1 basis-[8rem]'}
+    />
+  );
+
   return (
     <div
       role="toolbar"
@@ -168,19 +181,10 @@ export function TeacherLiveControls({
           isPaused ? 'bg-neo-lime' : 'bg-neo-cream',
         )}
       >
-        {isPaused && (
-          <span
-            data-testid="teacher-paused-flag"
-            className={cn(
-              'inline-flex items-center gap-2 rounded-neo border-3 lg:border-4 border-neo-black',
-              'bg-neo-black font-neo-display font-black uppercase tracking-widest text-neo-lime',
-              sizeClasses,
-              'motion-safe:animate-pulse',
-            )}
-          >
-            {t('education.liveControls.pausedTitle')}
-          </span>
-        )}
+        {/* Paused: Resume takes the primary slot (first, widest). The words
+            "paused" live on the game surface — the quiz banner or
+            GamePausedOverlay — so the strip never says it a second time. */}
+        {isPaused && pauseToggle}
 
         {showPulse && (
           <button
@@ -222,22 +226,20 @@ export function TeacherLiveControls({
           </button>
         )}
 
-        <ControlButton
-          compact={compact}
-          testId="teacher-pause-toggle"
-          tone={isPaused ? 'go' : 'neutral'}
-          ariaPressed={isPaused}
-          icon={isPaused ? <Play /> : <Pause />}
-          label={isPaused ? t('education.liveControls.resume') : t('education.liveControls.pause')}
-          onClick={isPaused ? onResume : onPause}
-          className="flex-1 basis-[8rem]"
-        />
+        {!isPaused && pauseToggle}
 
         <ControlButton
           compact={compact}
           testId="teacher-extend-time"
           tone="time"
-          icon={<Plus />}
+          icon={
+            // A bare "+" next to "+30" read as "add 3 of something" once a
+            // narrow strip wrapped the label; the clock says what is added.
+            <span className="inline-flex items-center gap-0.5">
+              <Plus />
+              <Clock data-testid="teacher-extend-time-clock" />
+            </span>
+          }
           label={t('education.liveControls.addTime', { seconds: EXTEND_SECONDS })}
           onClick={() => onExtendTime(EXTEND_SECONDS)}
           className="flex-1 basis-[6.5rem]"
@@ -255,18 +257,23 @@ export function TeacherLiveControls({
           />
         )}
 
-        <ControlButton
-          compact={compact}
-          testId="teacher-end-round"
-          tone={endArmed ? 'armed' : 'danger'}
-          dataArmed={endArmed}
-          drainMs={endArmed ? END_ROUND_CONFIRM_MS : undefined}
-          drainTestId="teacher-end-round-drain"
-          icon={<Square />}
-          label={endArmed ? t('education.liveControls.endRoundConfirm') : t('education.liveControls.endRound')}
-          onClick={handleEndRound}
-          className="flex-1 basis-[8rem]"
-        />
+        {/* Destructive, so set apart: pushed to the far inline end (left in
+            Hebrew), divided from the cluster, outlined and content-sized until
+            the first tap arms it. Never the same size or fill as Resume. */}
+        <div className="ms-auto flex shrink-0 items-stretch border-s-3 border-neo-black/20 ps-2 sm:ps-3 tv:ps-5">
+          <ControlButton
+            compact
+            testId="teacher-end-round"
+            tone={endArmed ? 'armed' : 'quietDanger'}
+            dataArmed={endArmed}
+            drainMs={endArmed ? END_ROUND_CONFIRM_MS : undefined}
+            drainTestId="teacher-end-round-drain"
+            icon={<Square className={endArmed ? undefined : 'text-neo-pink'} />}
+            label={endArmed ? t('education.liveControls.endRoundConfirm') : t('education.liveControls.endRound')}
+            onClick={handleEndRound}
+            className="shrink-0 max-w-[9rem] lg:max-w-[11rem]"
+          />
+        </div>
       </div>
     </div>
   );

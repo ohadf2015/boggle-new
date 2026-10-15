@@ -184,11 +184,16 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
 
       {(phase === 'question' || phase === 'reveal') && question && (
         <div className="flex flex-col gap-3 md:gap-5 md:flex-1 md:min-h-0 md:overflow-hidden">
-          <div className="shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-4 md:p-6 shadow-hard">
-            <p className="text-sm font-bold uppercase tracking-widest text-neo-cyan mb-2">
+          {/* The prompt is what the back row reads, so it sits centred; the
+              category is a labelled chip above it, not loose text on an edge. */}
+          <div className="shrink-0 flex flex-col items-stretch gap-2 md:gap-3 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated p-4 md:p-6 shadow-hard">
+            <span
+              data-testid="vocab-quiz-focus-badge"
+              className="self-center rounded-full border-[2px] border-neo-black bg-neo-cyan px-3 py-0.5 md:px-4 md:py-1 text-xs md:text-sm font-bold uppercase tracking-widest text-neo-black"
+            >
               {t(`vocabQuiz.focus.${question.focus}`)}
-            </p>
-            <p className="font-neo-display font-bold text-2xl md:text-4xl leading-snug break-words">{question.prompt}</p>
+            </span>
+            <p className="text-center font-neo-display font-bold text-2xl md:text-4xl leading-snug break-words">{question.prompt}</p>
           </div>
 
           <VocabQuizChoiceBars

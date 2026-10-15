@@ -137,16 +137,21 @@ export function VocabQuizChoiceBars({
                 aria-hidden
               />
               <div className="relative h-full flex items-center gap-3 md:gap-4 px-4 py-3 md:px-5 md:py-4">
+                {/* Shape first, word right after it, both at the inline start —
+                    the same order on every bar, so the eye finds the word from
+                    the shape. 52px (was 40px): the shape is how a student
+                    matches the wall to the tile under their thumb. */}
                 <span
+                  data-testid={`vocab-quiz-shape-${index}`}
                   className={cn(
-                    'grid place-items-center w-10 h-10 shrink-0 rounded-neo border-[2px] border-neo-black text-xl',
+                    'grid place-items-center size-[3.25rem] shrink-0 rounded-neo border-[2px] border-neo-black text-[1.625rem] leading-none',
                     style.chip
                   )}
                   aria-hidden
                 >
                   {style.glyph}
                 </span>
-                <span className={cn('flex-1 min-w-0 font-neo-display font-bold text-lg md:text-2xl break-words', isCorrect && 'font-black text-neo-black')}>{choice}</span>
+                <span className={cn('flex-1 min-w-0 text-start font-neo-display font-bold text-lg md:text-2xl break-words', isCorrect && 'font-black text-neo-black')}>{choice}</span>
                 {isCorrect && (
                   <Check data-testid="vocab-quiz-bar-correct" className="w-8 h-8 shrink-0 text-neo-black" strokeWidth={3.5} aria-hidden />
                 )}

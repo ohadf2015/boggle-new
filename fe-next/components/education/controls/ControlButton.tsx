@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-export type ControlTone = 'go' | 'time' | 'neutral' | 'danger' | 'armed';
+export type ControlTone = 'go' | 'time' | 'neutral' | 'danger' | 'quietDanger' | 'armed';
 
 const TONE_CLASSES: Record<ControlTone, string> = {
   go: 'bg-neo-lime text-neo-black',
@@ -12,6 +12,10 @@ const TONE_CLASSES: Record<ControlTone, string> = {
   // Black, not white: white on neo-pink measures 3.64:1, under the 4.5:1 the
   // contrast sweep enforces (flagged on the quiz projector, 1440x900).
   danger: 'bg-neo-pink text-neo-black',
+  // Outlined and flat, for a destructive action that must not compete with the
+  // primary controls. The label stays black: neo-pink text on the cream strip
+  // measures ~3.5:1, so the pink lives on the border (3:1 non-text floor).
+  quietDanger: 'bg-neo-cream text-neo-black border-neo-pink',
   // No `animate-pulse`: the app-wide pulse keyframes scale the box, so the
   // confirm tap would chase a moving target.
   armed: 'bg-neo-red text-neo-white ring-4 ring-neo-yellow',
@@ -96,7 +100,8 @@ export function ControlButton({
         // Russian breaks onto a second LINE inside the button, never a second row that
         // would eat a third of the projector.
         'relative overflow-hidden inline-flex min-w-0 items-center justify-center',
-        'rounded-neo border-3 lg:border-4 border-neo-black shadow-hard lg:shadow-hard-lg',
+        'rounded-neo border-3 lg:border-4 border-neo-black',
+        tone === 'quietDanger' ? 'shadow-none' : 'shadow-hard lg:shadow-hard-lg',
         'font-neo-display font-black uppercase tracking-wide',
         // A classroom projector is usually 1280-1920px wide and read from 5m —
         // the size has to step up well before the 1920px `tv:` breakpoint.
@@ -110,8 +115,8 @@ export function ControlButton({
       <span
         aria-hidden="true"
         className={cn(
-          'shrink-0 [&>svg]:h-5 [&>svg]:w-5',
-          !compact && 'lg:[&>svg]:h-7 lg:[&>svg]:w-7 xl:[&>svg]:h-8 xl:[&>svg]:w-8 tv:[&>svg]:h-10 tv:[&>svg]:w-10',
+          'shrink-0 [&_svg]:h-5 [&_svg]:w-5',
+          !compact && 'lg:[&_svg]:h-7 lg:[&_svg]:w-7 xl:[&_svg]:h-8 xl:[&_svg]:w-8 tv:[&_svg]:h-10 tv:[&_svg]:w-10',
         )}
       >
         {icon}

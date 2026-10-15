@@ -82,7 +82,9 @@ describe('TeacherLiveControls', () => {
       expect(screen.getByTestId('teacher-live-controls')).toHaveAttribute('data-paused', 'false');
       rerender(<TeacherLiveControls {...props} isPaused />);
       expect(screen.getByTestId('teacher-live-controls')).toHaveAttribute('data-paused', 'true');
-      expect(screen.getByTestId('teacher-paused-flag')).toHaveTextContent('education.liveControls.pausedTitle');
+      // The strip goes lime and Resume becomes the primary action; the "paused"
+      // words live on the game surface (quiz banner / GamePausedOverlay), once.
+      expect(screen.queryByTestId('teacher-paused-flag')).toBeNull();
     });
 
     it('+30s calls onExtendTime(30)', () => {
