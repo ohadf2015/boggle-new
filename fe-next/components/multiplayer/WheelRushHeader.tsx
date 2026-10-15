@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Crown, X, Zap } from 'lucide-react';
+import { Crown, LogOut, Zap } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { MpRoundMute } from '@/components/multiplayer/round/MpRoundMute';
 import Avatar from '@/components/Avatar';
-import { Button } from '@/components/ui/button';
 import CircularTimer from '@/components/ui/CircularTimer';
 import { cn } from '@/lib/utils';
 import { selectClosestRival } from '@/lib/wheelRush/closestRival';
@@ -128,15 +129,16 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
               />
             </div>
           )}
-          <Button
-            size="icon"
-            variant="destructive"
+          <MpRoundMute />
+          <button
+            type="button"
+            data-testid="wheel-rush-leave"
             onClick={onQuit}
             aria-label={t('common.quit')}
-            className="shrink-0"
+            className="inline-flex size-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white/80 shadow-hard-sm transition-transform duration-150 ease-out hover:text-neo-white active:scale-[.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
           >
-            <X />
-          </Button>
+            <DirectionalIcon icon={LogOut} mirror className="size-4" />
+          </button>
         </div>
       </div>
 

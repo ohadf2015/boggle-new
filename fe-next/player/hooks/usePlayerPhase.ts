@@ -40,6 +40,7 @@ import { usePlayerRoundTelemetry } from './usePlayerRoundTelemetry';
 import type { WordToVote, PlayerViewProps } from '../types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { usePendingGameStart } from './usePendingGameStart';
+import { useClearStaleWordsOnMount } from './useClearStaleWordsOnMount';
 
 export function usePlayerPhase({
   onShowResults,
@@ -375,18 +376,13 @@ export function usePlayerPhase({
   }, [gameActive, setShufflingGrid]);
 
 
-  // Clear game state on mount and cleanup
-  useEffect(() => {
-    localStorage.removeItem('boggle_player_state');
-    setFoundWords([]);
-
-    return () => {
-      if (comboTimeoutRef.current) {
-        clearTimeout(comboTimeoutRef.current);
-        comboTimeoutRef.current = null;
-      }
-    };
-  }, [setFoundWords]);
+  useClearStaleWordsOnMount();
+  useEffect(() => () => {
+    if (comboTimeoutRef.current) {
+      clearTimeout(comboTimeoutRef.current);
+      comboTimeoutRef.current = null;
+    }
+  }, []);
 
   // Handle pending game start (results screen → next round, or reconnect)
   usePendingGameStart({

@@ -48,6 +48,7 @@ import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
 import { startRushTiles } from '../modules/rushTiles/rushTilesManager.js';
 import { buildLessonVocabulary } from '../utils/lessonVocabulary.js';
+import { embeddableLessonWords } from '@/shared/utils/classroomGameLanguage';
 import { getGameModeModule, getGameModeRules } from '../modes/index.js';
 import { buildRoundPayload } from '../modes/roundPayload.js';
 import {
@@ -125,7 +126,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     const validatedData = validation.data as StartGamePayload;
     let { letterGrid } = validatedData;
-    const { timerSeconds, language, minWordLength, difficulty, boardTheme, gameMode, tvMode } = validatedData;
+    const { timerSeconds, language: hostLanguage, minWordLength, difficulty, boardTheme, gameMode, tvMode } = validatedData;
     const gameCode = getGameBySocketId(socket.id);
     if (!gameCode) {
       emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
@@ -140,6 +141,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       emitError(socket, ErrorCodes.PLAYER_NOT_HOST);
       return;
     }
+    // A classroom room keeps the language it was created in (lesson/class), whatever the host's UI sends.
+    const language = game.isClassroom && game.language ? game.language : hostLanguage;
 
     // The game is starting (manually or via the lobby auto-start) — tear down
     // any in-flight lobby auto-start countdown so it can't fire again.
@@ -252,7 +255,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       const lessonVocabulary = classroomGame?.vocabularyWords
         ? buildLessonVocabulary(classroomGame.vocabularyWords, gameLang)
         : undefined;
-      const vocabToEmbed = classroomGame?.vocabularyWords?.map((w) => w.toUpperCase()) ?? [];
+      const vocabToEmbed = embeddableLessonWords(classroomGame?.vocabularyWords ?? [], gameLang);
 
       // SECURITY: the server deals the board for every competitive (2+) game —
       // a client grid would let the host rig it. Solo keeps the client grid,

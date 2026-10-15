@@ -132,8 +132,8 @@ describe('recommendedModeForWords — "recommended for this lesson"', () => {
  * two sources) and reads to a teacher as a lie on the poster.
  */
 describe('configuredRoundMinutes — the poster quotes the room, not the catalog', () => {
-  it('quotes the timer the teacher set, for every board mode', () => {
-    for (const mode of ['classic', 'word-hunt', 'blast', 'wheel-rush'] as const) {
+  it('quotes the timer the teacher set, for every timed board mode', () => {
+    for (const mode of ['classic', 'word-hunt', 'blast'] as const) {
       expect(configuredRoundMinutes(mode, { timerMinutes: 7 })).toBe(7);
       expect(configuredRoundMinutes(mode, { timerMinutes: 2 })).toBe(2);
     }

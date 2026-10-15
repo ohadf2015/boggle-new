@@ -1,6 +1,7 @@
 'use client';
 
-import { memo, useMemo, useRef, type ReactNode } from 'react';
+import { memo, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 import { toMpRoster, rankOf, type MpRosterPlayer, type MpRosterScoreLike, type MpRosterUserLike } from '@/lib/multiplayer/roster';
@@ -17,6 +18,7 @@ import { MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta, timerColor } 
 import { useRoundJuice, type RoundSocket } from './useRoundJuice';
 import { mergeServerWords, useServerAcceptedWords } from './useServerAcceptedWords';
 import { useRoundFrameToastLane } from './useRoundToastLane';
+import { MpRoundTrayContext, type MpRoundTrayValue } from './MpRoundTray';
 import styles from './round.module.css';
 
 interface FoundWordLike {
@@ -62,6 +64,8 @@ export interface MpRoundLayoutProps {
   socket?: RoundSocket | null;
   /** Classroom boss round: the boss strip takes the phone roster slot (desktop: top of the left rail). */
   bossStrip?: ReactNode;
+  /** Classroom student economy strip: the phone tray's foot (thumb zone); desktop: the left rail. */
+  dock?: ReactNode;
 }
 
 /**
@@ -84,6 +88,7 @@ function MpRoundLayoutImpl({
   canvas,
   socket,
   bossStrip,
+  dock,
 }: MpRoundLayoutProps) {
   const wide = useMediaQuery('(min-width: 1024px)');
   const { t } = useLanguage();
@@ -131,7 +136,23 @@ function MpRoundLayoutImpl({
   );
   const isBlast = mode.slug === 'blast';
 
+  // Phone: a board view that marks a tray slot under its grid gets my words, the callouts and its dock there.
+  const [slotNode, setSlotNode] = useState<HTMLElement | null>(null);
+  const [dockNode, setDockNode] = useState<HTMLElement | null>(null);
+  const trayValue = useMemo<MpRoundTrayValue | null>(() => (wide ? null : { registerSlot: setSlotNode, dockNode }), [wide, dockNode]);
+  const inTray = !wide && slotNode !== null;
+  const lanes = (
+    <>
+      {/* Word-hunt's clue strip already teaches; its rule stays on the countdown. */}
+      <MpRecentWords words={ladder} label={inTray ? undefined : t('mpUi.round.yourWords')} emptyHint={mode.slug === 'wordHunt' ? undefined : t(mode.ruleKey)} />
+      <div className="relative">
+        <MpCallouts callout={juice.callout} banners={juice.banners} onBannerDone={juice.dropBanner} />
+      </div>
+    </>
+  );
+
   return (
+    <MpRoundTrayContext.Provider value={trayValue}>
     <div data-testid="mp-round-layout" data-mode={mode.slug} className={cn(styles.layout, 'relative flex-1 min-h-0 w-full h-full bg-neo-navy')}>
       <div className={cn(styles.areaHud, 'relative z-20 min-w-0')}>
         <MpRoundHud
@@ -185,6 +206,7 @@ function MpRoundLayoutImpl({
             )}
           />
         </div>
+        {wide && dock}
         {/* The mode, anchoring the column's foot: what everyone is playing, for the room. */}
         <div
           data-testid="mp-rail-mode"
@@ -217,7 +239,7 @@ function MpRoundLayoutImpl({
       >
         {canvas}
         {/* Phone only: desktop counts in the YOUR WORDS header; blast's clear strip counts its own. */}
-        {!isBlast && (
+        {!isBlast && !inTray && (
           <span
             data-testid="mp-found-pill"
             className="lg:hidden pointer-events-none absolute bottom-1 end-2 z-10 rounded-full border-2 border-neo-black bg-neo-navy-light px-2.5 py-0.5 text-xs font-bold text-neo-white/80 shadow-hard-sm tabular-nums"
@@ -255,16 +277,14 @@ function MpRoundLayoutImpl({
         {/* The callout stage sits in the board area's free band: above the pill
             for classic, below the clue strip + life bar for word-hunt, below
             the clear strip for blast. */}
-        <div
-          data-testid="mp-callout-stage"
-          className={cn('absolute inset-x-0 top-0 px-3', mode.slug === 'wordHunt' && 'top-[calc(132px*var(--mp-u,1))]', isBlast && 'top-[52px]')}
-        >
-          {/* Word-hunt's clue strip already teaches; its rule stays on the countdown. */}
-          <MpRecentWords words={ladder} label={t('mpUi.round.yourWords')} emptyHint={mode.slug === 'wordHunt' ? undefined : t(mode.ruleKey)} />
-          <div className="relative">
-            <MpCallouts callout={juice.callout} banners={juice.banners} onBannerDone={juice.dropBanner} />
+        {!inTray && (
+          <div
+            data-testid="mp-callout-stage"
+            className={cn('absolute inset-x-0 top-0 px-3', mode.slug === 'wordHunt' && 'top-[calc(132px*var(--mp-u,1))]', isBlast && 'top-[52px]')}
+          >
+            {lanes}
           </div>
-        </div>
+        )}
         <span data-testid="mp-reject-sr" aria-live="polite" className="sr-only">{juice.rejectText ?? ''}</span>
         <MpScoreFloaters floaters={juice.floaters} />
       </div>
@@ -281,7 +301,22 @@ function MpRoundLayoutImpl({
           </span>
         </div>
       )}
+      {!wide && !inTray && dock && <div className={cn(styles.areaDock, 'min-w-0 pt-1')}>{dock}</div>}
+      {inTray && slotNode && createPortal(
+        <div data-testid="mp-round-tray" className="pointer-events-none flex min-h-0 flex-1 flex-col gap-1 pt-1">
+          <div data-testid="mp-callout-stage" className="min-h-0 overflow-hidden">
+            <p className="flex items-center justify-between px-3 font-neo-display text-[11px] font-bold uppercase tracking-wider text-neo-white/50">
+              <span dir="auto">{t('mpUi.round.yourWords')}</span>
+              <span className="tabular-nums">{t('mpUi.round.found', { count: ladder.length })}</span>
+            </p>
+            {lanes}
+          </div>
+          <div ref={setDockNode} className="pointer-events-auto mt-auto">{dock}</div>
+        </div>,
+        slotNode,
+      )}
     </div>
+    </MpRoundTrayContext.Provider>
   );
 }
 

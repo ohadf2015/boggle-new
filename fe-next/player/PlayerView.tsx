@@ -14,7 +14,6 @@ import PlayerWaitingView from './components/PlayerWaitingView';
 import PlayerInGameView from './components/PlayerInGameView';
 import FirstTimeAchievement from '../components/game/FirstTimeAchievement';
 import ModeRevealOverlay from '@/components/game/ModeRevealOverlay';
-import { MpModeCoach } from '@/components/tutorial/MpModeCoach';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Loader2 } from 'lucide-react';
 import { sendCountdownComplete, consumeStashedMessageId } from '@/shared/utils/gameEventUtils';
@@ -148,7 +147,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
           onIntroDismiss={() => dispatchReveal({ type: 'endReveal' })}
         />
       )}
-      <MpModeCoach />
       {showStartAnimation && (
         <MpCountdown>
         <GoRipplesAnimation

@@ -54,4 +54,14 @@ describe('MPDragCoachmark', () => {
       el = el.parentElement;
     }
   });
+
+  it('GIVEN an idle player mid-round WHEN the drag hint shows THEN it never dims or covers the board: no veil, label and dismiss hang below it', () => {
+    render(<MPDragCoachmark t={t} onDismiss={() => {}} reducedMotion />);
+    const root = screen.getByTestId('mp-drag-coachmark');
+    const veils = [...root.querySelectorAll('div')].filter((d) => /\binset-0\b/.test(d.className) && /bg-neo-navy\//.test(d.className));
+    expect(veils).toHaveLength(0);
+    const labelRow = screen.getByRole('button', { name: /got it/i }).parentElement!;
+    expect(labelRow.className).toMatch(/\btop-full\b/);
+    expect(labelRow.className).not.toMatch(/\bbottom-2\b/);
+  });
 });

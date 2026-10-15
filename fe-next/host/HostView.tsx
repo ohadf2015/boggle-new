@@ -31,7 +31,6 @@ import {
 } from './components/HostDialogs';
 import { HostLobbyScreen } from '@/components/multiplayer/lobby/HostLobbyScreen';
 import { MpRoundScreen } from '@/components/multiplayer/round/MpRoundScreen';
-import { MpModeCoach } from '@/components/tutorial/MpModeCoach';
 import { MpCountdown } from '@/components/multiplayer/round/MpCountdown';
 import { useHostPhase } from './hooks/useHostPhase';
 import { useClassroomSettingsSeed } from './hooks/useClassroomSettingsSeed';
@@ -245,7 +244,6 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
       {/* In-Game View - Host Playing */}
       {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && settings.hostPlaying && runtime.tableData) && (
         <MpRoundScreen>
-        <MpModeCoach />
         <HostInGameView
           gameCode={gameCode}
           username={username}

@@ -136,6 +136,7 @@ describe('ClassroomGameHandler', () => {
         lessonIds: gameData.lessonIds,
         lessonNames: gameData.lessonNames,
         vocabularyWords: gameData.vocabularyWords,
+        language: 'en',
         settings: {
           timerMinutes: gameData.settings.timerMinutes,
           boardSize: gameData.settings.boardSize,

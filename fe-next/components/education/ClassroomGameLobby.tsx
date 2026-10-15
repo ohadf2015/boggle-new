@@ -247,7 +247,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             lessonId: selectedLessonIds.join(','),
             lessonName: lessonNames.join(', '),
             vocabularyWords: playableWords,
-            language,
+            language: lessonLanguage ?? language,
             gameMode: mode,
             ...(variant ? { vocabQuizVariant: variant } : {}),
             ...(boss ? { classroomBossId: boss } : {}),
@@ -286,6 +286,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
         lessonIds: selectedLessonIds,
         lessonNames,
         vocabularyWords: playableWords,
+        language: lessonLanguage,
         settings: {
           timerMinutes,
           boardSize,
@@ -320,7 +321,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
       allPlayableWords, activePreset, gameCode, language, t, launch, saveConfig, setStartError,
       targetWord, minWordLength, timerMinutes, allowLateJoin, boardSize, playStyle, teamCount, accessibility,
       vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds, treasureChestsEnabled,
-      pressure, hasTeacherPro, quizPlayable,
+      pressure, hasTeacherPro, quizPlayable, lessonLanguage,
     ]
   );
 

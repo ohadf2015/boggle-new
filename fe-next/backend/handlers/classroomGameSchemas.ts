@@ -19,6 +19,8 @@ export const createClassroomGameSchema = z.object({
   lessonIds: z.array(z.string().uuid()).max(20).optional(),
   lessonNames: z.array(z.string().max(200)).max(20).optional(),
   vocabularyWords: z.array(z.string().max(100)).max(500).optional(),
+  /** The selected word list's language; re-resolved server-side against the class and the words. */
+  language: z.string().max(8).optional(),
   settings: z.object({
     timerMinutes: z.number().int().min(1).max(30).optional(),
     boardSize: z.enum(['small', 'medium', 'large']).optional(),

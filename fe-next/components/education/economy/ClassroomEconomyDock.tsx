@@ -9,13 +9,16 @@ import EconomyHud from './EconomyHud';
 import PowerUpShop from './PowerUpShop';
 import ClassroomBoardMoment from './ClassroomBoardMoment';
 
+const DOCK_BUTTON =
+  'min-h-11 rounded-neo border-3 border-neo-black px-3 font-neo-display text-xs font-bold uppercase text-neo-navy shadow-hard-sm transition-transform duration-150 ease-out hover:-translate-y-px active:scale-[.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan';
+
 interface ClassroomEconomyDockProps {
   gameCode: string;
 }
 
 /**
- * Student-only economy surface for a classroom live round. The HUD is a slim
- * strip, so play never scrolls. Shop and board open in a sheet on demand.
+ * Student-only economy surface for a classroom live round: a slim strip in the
+ * round tray under the board (thumb zone). Shop and board open in a sheet.
  */
 export default function ClassroomEconomyDock({ gameCode }: ClassroomEconomyDockProps) {
   const { t } = useLanguage();
@@ -30,33 +33,29 @@ export default function ClassroomEconomyDock({ gameCode }: ClassroomEconomyDockP
 
   return (
     <>
-      <div className="relative z-40 flex shrink-0 items-center justify-between gap-2 bg-neo-navy px-3 py-2">
+      <div data-testid="economy-dock" className="relative z-40 mx-2 mb-1 flex shrink-0 flex-col gap-2 rounded-neo border-3 border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard">
         <EconomyHud snapshot={econ.snapshot ?? ZERO_ECONOMY_SNAPSHOT} />
-        <div className="flex gap-2">
+        <div className={econ.snapshot?.config.powerUps ? 'grid grid-cols-2 gap-2' : 'grid grid-cols-1'}>
           {econ.snapshot?.config.powerUps && (
-            <button
-              type="button"
-              onClick={() => openSheet('shop')}
-              className="min-h-11 rounded-md border-2 border-black bg-neo-lime px-3 text-xs font-bold text-neo-navy"
-            >
+            <button type="button" onClick={() => openSheet('shop')} className={`${DOCK_BUTTON} bg-neo-lime`}>
               {t('economy.shop.title')}
             </button>
           )}
-          <button
-            type="button"
-            onClick={() => openSheet('board')}
-            className="min-h-11 rounded-md border-2 border-black bg-neo-cream px-3 text-xs font-bold text-neo-navy"
-          >
+          <button type="button" onClick={() => openSheet('board')} className={`${DOCK_BUTTON} bg-neo-cream`}>
             {t('economy.board.title')}
           </button>
         </div>
+        {econ.hint && (
+          <p role="status" className="text-center text-xs font-bold text-neo-lime">
+            {t('economy.hint.text', { letter: econ.hint.letter, length: econ.hint.length })}
+          </p>
+        )}
+        {econ.error && (
+          <m.p role="alert" initial={reduced ? false : { y: 4 }} animate={{ y: 0 }} className="text-center text-xs font-bold text-neo-pink">
+            {t(`economy.error.${econ.error}`)}
+          </m.p>
+        )}
       </div>
-
-      {econ.hint && (
-        <div role="status" className="fixed inset-x-0 top-14 z-40 text-center text-xs font-bold text-neo-lime">
-          {t('economy.hint.text', { letter: econ.hint.letter, length: econ.hint.length })}
-        </div>
-      )}
 
       {sheet && (
         <div className="fixed inset-x-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-2xl border-t-4 border-neo-cream bg-neo-navy p-4 pb-6">
@@ -83,13 +82,6 @@ export default function ClassroomEconomyDock({ gameCode }: ClassroomEconomyDockP
           {sheet === 'board' && econ.board && <ClassroomBoardMoment board={econ.board} />}
         </div>
       )}
-
-      {econ.error && (
-        <m.div role="alert" initial={reduced ? false : { y: 8 }} animate={{ y: 0 }} className="fixed inset-x-0 bottom-20 z-50 text-center text-xs text-neo-pink">
-          {t(`economy.error.${econ.error}`)}
-        </m.div>
-      )}
-
     </>
   );
 }

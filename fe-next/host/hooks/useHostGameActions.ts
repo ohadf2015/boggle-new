@@ -21,7 +21,7 @@ import type { Language, LetterGrid, DifficultyLevel } from '@/types';
 import type { TournamentData } from './useHostViewState';
 import type { BoardTheme } from '@/shared/types/socket';
 import { useGameMode, useHostSelectedGameMode } from '@/hooks/gameState';
-import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
+import { fixedRoundSeconds } from '@/shared/utils/fixedRoundTimer';
 
 interface UseHostGameActionsOptions {
   socket: Socket | null;
@@ -201,10 +201,8 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     }
 
     setTableData(newTable);
-    // Wheel-rush is design-locked to its 1-minute default (WHEEL_RUSH_DURATION_SEC).
-    const seconds = (hostSelectedGameMode === 'wheel-rush')
-      ? WHEEL_RUSH_DURATION_SEC
-      : timerValue * 60;
+    // Wheel-rush is design-locked to its 1-minute round; the lobby tile reads the same source.
+    const seconds = fixedRoundSeconds(hostSelectedGameMode) ?? timerValue * 60;
     setRemainingTime(seconds);
     // NOTE: Do NOT trigger the start animation optimistically here. The host's
     // 3-2-1-GO countdown is driven by the server `startGame` broadcast (see
@@ -426,9 +424,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
         }
 
         setTableData(newTable);
-        const seconds = (hostSelectedGameMode === 'wheel-rush')
-          ? WHEEL_RUSH_DURATION_SEC
-          : timerValue * 60;
+        const seconds = fixedRoundSeconds(hostSelectedGameMode) ?? timerValue * 60;
         setRemainingTime(seconds);
         // Animation is driven by the server `startGame` broadcast (same as
         // players) — see the sync note in executeStartGame. Don't start it

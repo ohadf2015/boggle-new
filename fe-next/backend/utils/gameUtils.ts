@@ -16,6 +16,7 @@ import {
 
 // Import word normalization for board verification
 import { normalizeWord } from '@/shared/utils/wordNormalization';
+import { placeWordPath } from '@/shared/utils/boardWordPath';
 
 // Japanese hiragana board pool — single source of truth shared with the frontend
 // grid, /api/dictionary-words, serverDicts validation, and the ja.dict.gz build.
@@ -25,18 +26,6 @@ import { ENGLISH_LETTER_POOL } from '@/shared/constants/englishLetters';
 // ==========================================
 // Type Definitions
 // ==========================================
-
-interface Direction {
-  dr: number;
-  dc: number;
-}
-
-interface Cell {
-  r: number;
-  c: number;
-  char: string;
-  key: string;
-}
 
 // ==========================================
 // Letter Constants (language-specific)
@@ -422,150 +411,11 @@ function generateVerifiedBoard(
   return grid as LetterGrid;
 }
 
-/**
- * Try to embed a word into the grid
- */
-function tryEmbedWord(
-  grid: (string | null)[][],
-  word: string,
-  rows: number,
-  cols: number,
-  usedCells: Set<string>,
-  language: Language
-): boolean {
-  const directions: Direction[] = [
-    { dr: 0, dc: 1 },
-    { dr: 0, dc: -1 },
-    { dr: 1, dc: 0 },
-    { dr: -1, dc: 0 },
-    { dr: 1, dc: 1 },
-    { dr: 1, dc: -1 },
-    { dr: -1, dc: -1 },
-    { dr: -1, dc: 1 },
-  ];
-
-  const shuffledDirs = [...directions].sort(() => Math.random() - 0.5);
-
-  const maxAttempts = 100;
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const startRow = Math.floor(Math.random() * rows);
-    const startCol = Math.floor(Math.random() * cols);
-
-    for (const dir of shuffledDirs) {
-      if (tryPlaceWordStraight(grid, word, startRow, startCol, dir, rows, cols, usedCells, language)) {
-        return true;
-      }
-    }
-
-    if (tryPlaceWordSnake(grid, word, startRow, startCol, rows, cols, usedCells, language)) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/**
- * Place a word in a straight line
- */
-function tryPlaceWordStraight(
-  grid: (string | null)[][],
-  word: string,
-  startRow: number,
-  startCol: number,
-  dir: Direction,
-  rows: number,
-  cols: number,
-  usedCells: Set<string>,
-  language: Language
-): boolean {
-  const wordLen = word.length;
-  const endRow = startRow + (wordLen - 1) * dir.dr;
-  const endCol = startCol + (wordLen - 1) * dir.dc;
-
-  if (endRow < 0 || endRow >= rows || endCol < 0 || endCol >= cols) {
-    return false;
-  }
-
-  const cellsToUse: Cell[] = [];
-  for (let i = 0; i < wordLen; i++) {
-    const r = startRow + i * dir.dr;
-    const c = startCol + i * dir.dc;
-    const cellKey = `${r},${c}`;
-    const char = normalizeLetterForBoard(word[i], language);
-
-    if (grid[r][c] !== null && grid[r][c] !== char) {
-      return false;
-    }
-
-    cellsToUse.push({ r, c, char, key: cellKey });
-  }
-
-  for (const cell of cellsToUse) {
-    grid[cell.r][cell.c] = cell.char;
-    usedCells.add(cell.key);
-  }
-  return true;
-}
-
-/**
- * Place a word in a snake/winding path
- */
-function tryPlaceWordSnake(
-  grid: (string | null)[][],
-  word: string,
-  startRow: number,
-  startCol: number,
-  rows: number,
-  cols: number,
-  usedCells: Set<string>,
-  language: Language
-): boolean {
-  const wordLen = word.length;
-  const path: Cell[] = [];
-  const visited = new Set<string>();
-
-  function dfs(row: number, col: number, index: number): boolean {
-    if (index === wordLen) return true;
-    if (row < 0 || row >= rows || col < 0 || col >= cols) return false;
-
-    const cellKey = `${row},${col}`;
-    if (visited.has(cellKey)) return false;
-
-    const char = normalizeLetterForBoard(word[index], language);
-    if (grid[row][col] !== null && grid[row][col] !== char) return false;
-
-    visited.add(cellKey);
-    path.push({ r: row, c: col, char, key: cellKey });
-
-    const directions: [number, number][] = [
-      [-1, -1], [-1, 0], [-1, 1],
-      [0, -1],           [0, 1],
-      [1, -1],  [1, 0],  [1, 1]
-    ];
-
-    const shuffled = [...directions].sort(() => Math.random() - 0.5);
-
-    for (const [dr, dc] of shuffled) {
-      if (dfs(row + dr, col + dc, index + 1)) {
-        return true;
-      }
-    }
-
-    visited.delete(cellKey);
-    path.pop();
-    return false;
-  }
-
-  if (dfs(startRow, startCol, 0)) {
-    for (const cell of path) {
-      grid[cell.r][cell.c] = cell.char;
-      usedCells.add(cell.key);
-    }
-    return true;
-  }
-
-  return false;
+/** Snakes `word` onto the grid (shared with the other deal, see shared/utils/boardWordPath). */
+function tryEmbedWord(grid: (string | null)[][], word: string, _rows: number, _cols: number, usedCells: Set<string>, language: Language): boolean {
+  const path = placeWordPath(grid, word, (ch) => normalizeLetterForBoard(ch, language));
+  path?.forEach((p) => usedCells.add(`${p.r},${p.c}`));
+  return path !== null;
 }
 
 /**

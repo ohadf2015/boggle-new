@@ -1,3 +1,4 @@
+import type { Language } from '@/shared/types';
 /** Classroom game record shapes (Redis `classroom_game:<code>`). */
 
 import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
@@ -67,6 +68,8 @@ export interface ClassroomGame {
   lessonIds: string[];
   lessonNames: string[];
   vocabularyWords: string[];
+  /** See CreateClassroomGameData.language. */
+  language?: Language;
   /**
    * The subset of `vocabularyWords` the generated board actually carries,
    * written once at game start. Embedding is best-effort — placement is capped
@@ -120,5 +123,7 @@ export interface CreateClassroomGameData {
   lessonIds: string[];
   lessonNames: string[];
   vocabularyWords: string[];
+  /** The round's deal + validation language (resolveClassroomGameLanguage). Absent on records made before it existed. */
+  language?: Language;
   settings: ClassroomGameSettings;
 }

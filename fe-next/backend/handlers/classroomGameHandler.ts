@@ -24,6 +24,7 @@ import {
   resolveClassroomRole,
   resolveClassroomName,
 } from '../modules/supabase/classroomMembership.js';
+import { resolveCreatedRoomLanguage } from '../modules/classroomRoomLanguage.js';
 import { ensureJoinableClassroomGame } from './classroomGameJoinGate.js';
 import { registerClassroomRecoveryHandlers } from './classroomGameRecovery.js';
 import { registerClassroomGameEndHandlers } from './classroomGameEndHandler.js';
@@ -67,7 +68,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     // Type assertion needed because gameCodeSchema/usernameSchema use compiled || fallback pattern
     const payload = validation.data as {
       classroomId: string; teacherId: string; teacherName: string; gameCode: string;
-      lessonIds?: string[]; lessonNames?: string[]; vocabularyWords?: string[];
+      lessonIds?: string[]; lessonNames?: string[]; vocabularyWords?: string[]; language?: string;
       settings?: {
         timerMinutes?: number; boardSize?: 'small' | 'medium' | 'large'; allowLateJoin?: boolean;
         gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz' | 'wordcraft'; targetWord?: string;
@@ -122,6 +123,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
         lessonIds: payload.lessonIds || [],
         lessonNames: payload.lessonNames || [],
         vocabularyWords: payload.vocabularyWords || [],
+        language: await resolveCreatedRoomLanguage(payload.classroomId, payload.language, payload.vocabularyWords),
         settings: {
           timerMinutes: payload.settings?.timerMinutes,
           boardSize: payload.settings?.boardSize,

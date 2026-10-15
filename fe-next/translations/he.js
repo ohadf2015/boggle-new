@@ -20509,7 +20509,8 @@ const he = {
   // @eduLiveRoom:start
   "eduLiveRoom": {
     "round": {
-      "boardLabel": "הלוח של הכיתה"
+      "boardLabel": "הלוח של הכיתה",
+      "wheelLabel": "גלגל הכיתה"
     },
     "lobby": {
       "brand": "כיתה",

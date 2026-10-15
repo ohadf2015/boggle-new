@@ -19638,7 +19638,8 @@ const en = {
   // @eduLiveRoom:start
   "eduLiveRoom": {
     "round": {
-      "boardLabel": "Class board"
+      "boardLabel": "Class board",
+      "wheelLabel": "Class wheel"
     },
     "lobby": {
       "brand": "Class",

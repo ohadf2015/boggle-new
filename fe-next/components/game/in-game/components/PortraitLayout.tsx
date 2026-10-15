@@ -12,6 +12,7 @@ import {
   trimLeaderboardForPressure,
 } from '@/shared/utils/classroomPressure';
 import { cn } from '@/lib/utils';
+import { MpRoundTraySlot } from '@/components/multiplayer/round/MpRoundTray';
 import { vibrateWordSubmit } from '@/components/grid/hapticFeedback';
 import { Trophy } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -209,10 +210,10 @@ interface PortraitLayoutProps {
  *  (1800x1000+) the 720 cap left a ~190px dead band over the board. */
 const MP_CHROME_ROOT_CLASS = 'flex flex-col flex-1 w-full min-h-0 overflow-hidden px-2';
 const MP_CHROME_FRAME_CLASS = 'relative aspect-square mx-auto w-[min(720px,100cqi,calc(100cqb-88px))] tv:w-[min(1080px,100cqi,calc(100cqb-88px))] max-h-full';
-/** mpChrome: pill + board anchored together at the bottom (thumb zone); the
- *  free space above is the round's callout stage. */
-const MP_CHROME_CENTER_CLASS = '@container/center [container-type:size] flex-1 flex flex-col justify-end min-w-0 min-h-0 overflow-hidden';
-const MP_CHROME_GRID_CLASS = 'flex flex-col items-center min-h-0 overflow-visible gap-1 pb-9 lg:pb-1';
+/** mpChrome: pill + board sit right under the round HUD; on a phone the band
+ *  left under the board is the round tray (my words, callouts, class strip). */
+const MP_CHROME_CENTER_CLASS = '@container/center [container-type:size] flex-1 flex flex-col justify-start lg:justify-end min-w-0 min-h-0 overflow-hidden';
+const MP_CHROME_GRID_CLASS = 'flex flex-col items-center min-h-0 overflow-visible gap-1 pb-1';
 
 /**
  * PortraitLayout - Portrait/Desktop mode layout for the game
@@ -718,6 +719,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               />
             )}
           </div>
+          {mpChrome && <MpRoundTraySlot />}
 
           {/* Words Remaining (single-player) */}
           {hints?.isSinglePlayer &&

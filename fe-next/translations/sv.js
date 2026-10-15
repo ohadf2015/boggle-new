@@ -20579,7 +20579,8 @@ const sv = {
   // @eduLiveRoom:start
   "eduLiveRoom": {
     "round": {
-      "boardLabel": "Klassens bräde"
+      "boardLabel": "Klassens bräde",
+      "wheelLabel": "Klassens bokstavshjul"
     },
     "lobby": {
       "brand": "Klass",

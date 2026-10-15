@@ -1,6 +1,7 @@
 import { hebrewLetters, swedishLetters, spanishLetters, russianLetterPool, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY, AVATAR_COLORS, AVATAR_EMOJIS, AVATAR_IMAGE_IDS } from "./consts";
 import type { Language, LetterGrid, GridPosition, Avatar } from "@/types";
 import { ENGLISH_LETTER_POOL } from '@/shared/constants/englishLetters';
+import { placeWordPath } from '@/shared/utils/boardWordPath';
 
 // Import and re-export word normalization functions from shared module
 import {
@@ -358,179 +359,13 @@ function generateVerifiedBoard(
   return grid as LetterGrid;
 }
 
-// Try to embed a word into the grid in any direction (including combinations)
-function tryEmbedWord(
-  grid: (string | null)[][],
-  word: string,
-  rows: number,
-  cols: number,
-  usedCells: Set<string>,
-  language: Language
-): boolean {
-  const wordLen = word.length;
-
-  // All 8 directions for straight paths
-  const directions = [
-    { dr: 0, dc: 1 },   // horizontal right
-    { dr: 0, dc: -1 },  // horizontal left
-    { dr: 1, dc: 0 },   // vertical down
-    { dr: -1, dc: 0 },  // vertical up
-    { dr: 1, dc: 1 },   // diagonal down-right
-    { dr: 1, dc: -1 },  // diagonal down-left
-    { dr: -1, dc: -1 }, // diagonal up-left
-    { dr: -1, dc: 1 },  // diagonal up-right
-  ];
-
-  // Shuffle directions for randomness
-  const shuffledDirs = [...directions].sort(() => Math.random() - 0.5);
-
-  // Try random starting positions with straight paths first
-  const maxAttempts = 100;
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const startRow = Math.floor(Math.random() * rows);
-    const startCol = Math.floor(Math.random() * cols);
-
-    // Try straight path in each direction
-    for (const dir of shuffledDirs) {
-      const result = tryPlaceWordStraight(grid, word, startRow, startCol, dir, rows, cols, usedCells, language);
-      if (result) return true;
-    }
-
-    // Try snake/winding path (combination of directions)
-    const snakeResult = tryPlaceWordSnake(grid, word, startRow, startCol, rows, cols, usedCells, language);
-    if (snakeResult) return true;
-  }
-
-  return false;
+/** Snakes `word` onto the grid (shared with the other deal, see shared/utils/boardWordPath). */
+function tryEmbedWord(grid: (string | null)[][], word: string, _rows: number, _cols: number, usedCells: Set<string>, language: Language): boolean {
+  const path = placeWordPath(grid, word, (ch) => normalizeLetterForBoard(ch, language));
+  path?.forEach((p) => usedCells.add(`${p.r},${p.c}`));
+  return path !== null;
 }
 
-// Try to place a word in a straight line
-function tryPlaceWordStraight(
-  grid: (string | null)[][],
-  word: string,
-  startRow: number,
-  startCol: number,
-  dir: { dr: number; dc: number },
-  rows: number,
-  cols: number,
-  usedCells: Set<string>,
-  language: Language
-): boolean {
-  const wordLen = word.length;
-  const endRow = startRow + (wordLen - 1) * dir.dr;
-  const endCol = startCol + (wordLen - 1) * dir.dc;
-
-  // Check bounds
-  if (endRow < 0 || endRow >= rows || endCol < 0 || endCol >= cols) {
-    return false;
-  }
-
-  // Check if all cells are available
-  const cellsToUse = [];
-  for (let i = 0; i < wordLen; i++) {
-    const r = startRow + i * dir.dr;
-    const c = startCol + i * dir.dc;
-    const cellKey = `${r},${c}`;
-    const char = normalizeLetterForBoard(word[i], language);
-
-    // Check if cell conflicts (has a different letter)
-    if (grid[r][c] !== null && grid[r][c] !== char) {
-      return false;
-    }
-
-    cellsToUse.push({ r, c, char, key: cellKey });
-  }
-
-  // Place the word
-  for (const cell of cellsToUse) {
-    grid[cell.r][cell.c] = cell.char;
-    usedCells.add(cell.key);
-  }
-  return true;
-}
-
-// Try to place a word in a snake/winding path (combination of directions)
-function tryPlaceWordSnake(
-  grid: (string | null)[][],
-  word: string,
-  startRow: number,
-  startCol: number,
-  rows: number,
-  cols: number,
-  usedCells: Set<string>,
-  language: Language
-): boolean {
-  const wordLen = word.length;
-
-  // Use DFS to find a valid winding path
-  const path: Array<{ r: number; c: number; char: string; key: string }> = [];
-  const visited = new Set<string>();
-
-  function dfs(row: number, col: number, index: number): boolean {
-    // Success - placed entire word
-    if (index === wordLen) {
-      return true;
-    }
-
-    // Check bounds
-    if (row < 0 || row >= rows || col < 0 || col >= cols) {
-      return false;
-    }
-
-    const cellKey = `${row},${col}`;
-
-    // Already in current path
-    if (visited.has(cellKey)) {
-      return false;
-    }
-
-    const char = normalizeLetterForBoard(word[index], language);
-
-    // Cell has conflicting letter
-    if (grid[row][col] !== null && grid[row][col] !== char) {
-      return false;
-    }
-
-    // Try placing this letter
-    visited.add(cellKey);
-    path.push({ r: row, c: col, char, key: cellKey });
-
-    // All 8 adjacent directions
-    const directions = [
-      [-1, -1], [-1, 0], [-1, 1],
-      [0, -1],           [0, 1],
-      [1, -1],  [1, 0],  [1, 1]
-    ];
-
-    // Shuffle for randomness
-    const shuffled = [...directions].sort(() => Math.random() - 0.5);
-
-    for (const [dr, dc] of shuffled) {
-      if (dfs(row + dr, col + dc, index + 1)) {
-        return true;
-      }
-    }
-
-    // Backtrack
-    visited.delete(cellKey);
-    path.pop();
-    return false;
-  }
-
-  // Start DFS from the given position
-  if (dfs(startRow, startCol, 0)) {
-    // Success - place all letters
-    for (const cell of path) {
-      grid[cell.r][cell.c] = cell.char;
-      usedCells.add(cell.key);
-    }
-    return true;
-  }
-
-  return false;
-}
-
-// Normalize letter for board display based on language
 function normalizeLetterForBoard(letter: string, language: Language): string {
   if (language === 'en' || language === 'sv' || language === 'es') {
     return letter.toUpperCase();

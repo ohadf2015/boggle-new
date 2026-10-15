@@ -15,6 +15,7 @@ import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue, TargetAttempt } from '@/components/daily/survival/types';
 import type { HintLevel } from '@/utils/aiHintGenerator';
 import type { HighlightedCell } from '@/components/GridComponent';
+import { MpRoundTraySlot } from '@/components/multiplayer/round/MpRoundTray';
 import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
 
 /** MP round frame on a 10-ft TV: the compact mode panel (12px text) scales with
@@ -248,7 +249,9 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
             // life bar) owns the band above, pb keeps a thumb-zone bias below and
             // clears the absolute found pill. items-end pooled ~230px of dead navy
             // above the board at 390x844 (r4 review).
-            mpChrome ? 'items-center pb-9 lg:pb-1' : 'items-center',
+            // MP round frame on a phone: the board sits under the clue strip and the
+            // band below it is the round tray (my words, callouts, class strip).
+            mpChrome ? 'items-start lg:items-center pb-1' : 'items-center',
           )}
           style={{ containerType: 'size' }}
         >
@@ -312,6 +315,9 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
               />
             )}
           </div>
+          {mpChrome && (
+            <MpRoundTraySlot className="absolute inset-x-0 bottom-0" style={{ top: 'calc(min(100cqw, 100cqh, 560px) + 4px)' }} />
+          )}
         </div>
 
         {/* MP Leaderboard — mobile strip. Cap by absolute px on short landscape so the grid keeps room. */}

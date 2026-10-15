@@ -33,6 +33,8 @@ export interface ClassroomLaunchPayload {
   lessonIds: string[];
   lessonNames: string[];
   vocabularyWords: string[];
+  /** The selected list's language; the server reconciles it with the class language. */
+  language?: string;
   settings: {
     timerMinutes: number;
     boardSize: 'small' | 'medium' | 'large';

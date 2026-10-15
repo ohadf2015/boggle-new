@@ -67,9 +67,9 @@ describe('EduProjectorLobby', () => {
     expect(start).toHaveAttribute('aria-busy', 'true');
   });
 
-  it('given the selected mode, when the lobby renders, then the mode card names it with the round length and the switcher', () => {
+  it('given the selected mode, when the lobby renders, then the mode card names it with the round length the clock will run (Wheel Rush is a fixed 1 min) and the switcher', () => {
     render(<EduProjectorLobby {...base} students={[{ username: 'Noa' }]} />);
-    expect(screen.getByTestId('edu-lobby-mode')).toHaveTextContent('eduLiveRoom.lobby.minutes:{"count":3}');
+    expect(screen.getByTestId('edu-lobby-mode')).toHaveTextContent('eduLiveRoom.lobby.minutes:{"count":1}');
     expect(screen.getByTestId('mode-switcher')).toBeInTheDocument();
   });
 

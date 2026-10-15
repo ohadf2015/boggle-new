@@ -29,6 +29,9 @@ import { ProjectorBossStage } from '@/components/education/boss/ProjectorBossSta
 import { useBossActive } from '@/stores/classroomBossStore';
 import { ClassroomLivePanel } from '@/components/education/projector/ClassroomLivePanel';
 import ProjectorBoard, { projectorShowsBoard } from '@/components/education/live/ProjectorBoard';
+import ProjectorWheel, { useProjectorWheelPuzzle } from '@/components/education/live/ProjectorWheel';
+import { roundHasScore } from '@/shared/utils/roundCelebration';
+import { wordHuntAlive } from './tv-broadcast/wordHuntAlive';
 import TvRoundFxLayers from './tv-broadcast/TvRoundFxLayers';
 import TvWordcraftBroadcast from './tv-broadcast/TvWordcraftBroadcast';
 import TvBodyScroller from './tv-broadcast/TvBodyScroller';
@@ -245,6 +248,8 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       });
   }, [playersReady, playerScores, playerWordCounts, username]);
 
+  const wheelPuzzle = useProjectorWheelPuzzle(socket, !!classroomLive && gameMode === 'wheel-rush');
+
   // Live Vocab Quiz — the classroom projector. A classroom teacher runs the room
   // as a NON-PLAYING host, the only way to reach this component (the quiz was
   // first wired only into `HostInGameView`, which a teacher never renders).
@@ -272,6 +277,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   }
 
   const isClassroom = !!classroomLive;
+  const hunt = wordHuntAlive(wordHuntPlayerLives, wordHuntEliminatedPlayers, leaderboardData.length);
   const roomWordTotal = leaderboardData.reduce((sum, p) => sum + p.wordCount, 0);
   const fullscreenButton = showFullscreenButton ? (
     <m.button
@@ -388,7 +394,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         urgencyLevel={urgencyLevel}
         gameMode={gameMode}
         wordHuntTargetLength={wordHuntTargetLength}
-        wordHuntAliveCount={Object.keys(wordHuntPlayerLives).length - wordHuntEliminatedPlayers.length}
+        wordHuntAliveCount={hunt.alive}
         t={t}
       />
 
@@ -411,6 +417,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
           {isClassroom && gameMode !== 'word-hunt' ? (
             <div className="flex h-full min-h-0 gap-2 md:gap-4">
               {projectorShowsBoard(gameMode, tableData) && tableData && <ProjectorBoard grid={tableData} label={t('eduLiveRoom.round.boardLabel')} />}
+              {wheelPuzzle && <ProjectorWheel puzzle={wheelPuzzle} label={t('eduLiveRoom.round.wheelLabel')} />}
               <div className="min-w-0 flex-1">
                 <ClassroomLivePanel socket={socket} totalWords={roomWordTotal} lessonWords={lessonWords} hostUsername={username} t={t} />
               </div>
@@ -424,8 +431,8 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
             fireRoundActive={fireRoundActive}
             earthquakeShaking={earthquakeState === 'shaking'}
             wordHuntTargetLength={wordHuntTargetLength}
-            wordHuntAliveCount={Object.keys(wordHuntPlayerLives).length - wordHuntEliminatedPlayers.length}
-            wordHuntTotalPlayers={Object.keys(wordHuntPlayerLives).length}
+            wordHuntAliveCount={hunt.alive}
+            wordHuntTotalPlayers={hunt.total}
           />
           )}
         </div>
@@ -455,7 +462,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         onTimesUp={() => {
           playTimesUpSound();
           // A round nobody scored in ends on the buzzer, not a party.
-          if (leaderboardData.some((p) => p.score > 0)) fireConfetti();
+          if (roundHasScore(leaderboardData)) fireConfetti();
         }}
       />
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { fixedRoundSeconds } from '@/shared/utils/fixedRoundTimer';
 import { useState } from 'react';
 import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
 import { catalogueIdOf, launchOf, readLocalQuizPlayable, readLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
@@ -34,7 +35,10 @@ export function useEduLobbyMode({ gameCode, classroomGameMode, templateSettings,
   const [quizPlayable] = useState(readLocalQuizPlayable);
   const settings = liveGame?.settings ?? null;
   const timerOff = settings?.pressure ? isStudentTimerHidden(settings.pressure) : false;
-  const timerMinutes = templateSettings ? Math.round(templateSettings.timerSeconds / 60) : settings?.timerMinutes ?? null;
+  const fixedSeconds = fixedRoundSeconds(mode);
+  const timerMinutes = fixedSeconds
+    ? Math.ceil(fixedSeconds / 60)
+    : templateSettings ? Math.round(templateSettings.timerSeconds / 60) : settings?.timerMinutes ?? null;
 
   const applyMode = (id: ClassroomCatalogueId) => {
     clearQuizRefused();

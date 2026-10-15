@@ -20579,7 +20579,8 @@ const ja = {
   // @eduLiveRoom:start
   "eduLiveRoom": {
     "round": {
-      "boardLabel": "クラスの盤面"
+      "boardLabel": "クラスの盤面",
+      "wheelLabel": "クラスの文字ホイール"
     },
     "lobby": {
       "brand": "クラス",

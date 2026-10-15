@@ -20275,7 +20275,8 @@ const ru = {
   // @eduLiveRoom:start
   "eduLiveRoom": {
     "round": {
-      "boardLabel": "Поле класса"
+      "boardLabel": "Поле класса",
+      "wheelLabel": "Колесо класса"
     },
     "lobby": {
       "brand": "Класс",
