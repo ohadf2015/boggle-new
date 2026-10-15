@@ -218,12 +218,12 @@ const content: Record<Locale, ToolContent> = {
     },
   },
   sv: {
-    title: 'Bilda ord av bokstäver — Ordlösare',
-    subtitle: 'Bilda ord av dina bokstäver och hitta alla möjliga ord',
+    title: 'Anagramlösare Svenska — Bilda ord av bokstäver',
+    subtitle: 'Lös anagram och hitta alla möjliga ord av dina bokstäver',
     description:
-      'Gratis anagramlösare och ordavkodare online. Ange dina bokstäver och hitta alla möjliga ord direkt. Perfekt för ordspel och LexiClash.',
+      'Gratis anagramlösare på svenska. Ange dina bokstäver och hitta alla möjliga ord direkt. Perfekt för Scrabble, Wordfeud och LexiClash.',
     metaDescription:
-      'Bilda ord av dina bokstäver gratis — hitta alla möjliga ord direkt. Ordlösare för Scrabble, Boggle och LexiClash. Prova nu!',
+      'Gratis anagramlösare på svenska — hitta alla ord av dina bokstäver direkt. Perfekt för Scrabble, Wordfeud och LexiClash. Prova nu →',
     inputPlaceholder: 'Ange dina bokstäver (t.ex. AELRST)',
     inputLabel: 'Dina bokstäver',
     languageLabel: 'Ordboksspråk',
