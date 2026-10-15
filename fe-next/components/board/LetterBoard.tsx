@@ -178,6 +178,9 @@ export default function LetterBoard({
       data-heat="0"
       data-word-dir={language === 'he' ? 'rtl' : 'ltr'}
       className={cn(styles.board, className)}
+      // Intentional multi-tap / double-click-submit surface; skip GR rage
+      // (same class as canvas / imposketch opt-out). Ghost boards stay measurable.
+      data-gr-no-rage={interactive && !ghost ? '' : undefined}
     >
       {showPreview && !ghost && (
         <div data-board-preview="" className={fx.preview} dir={language === 'he' ? 'rtl' : 'ltr'} aria-hidden="true">
@@ -195,6 +198,7 @@ export default function LetterBoard({
         aria-label={gridLabel}
         tabIndex={interactive ? 0 : -1}
         data-tutorial="grid"
+        data-gr-no-rage={interactive && !ghost ? '' : undefined}
         className={cn(styles.grid, gridClassName)}
         style={{
           ...template,
