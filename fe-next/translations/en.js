@@ -1,5 +1,61 @@
 // EN translations
 const en = {
+  // @eduBoss:start
+  "classroomBoss": {
+    "chestUpgraded": "Boss defeated: your chest was upgraded!",
+    "topHitter": "Top hitter",
+    "cardHow": "The whole class vs one boss. Every word you find is a hit.",
+    "howTo": "Find words to hit the boss. 7+ letters crit. Long words block its attacks.",
+    "attackIn": "Boss attack in",
+    "attack": {
+      "freeze": "Freeze incoming!",
+      "blur": "Blur incoming!",
+      "drain": "Shield drain!"
+    },
+    "staggerHint": "{n}/{need} long words to stagger it",
+    "shield": "Class shield",
+    "topHitters": "Top hitters",
+    "noHitsYet": "Find words to hit the boss!",
+    "dmg": "damage",
+    "crit": "CRIT!",
+    "timeLeft": "Time left",
+    "combo": "Class combo",
+    "intro": "{name} appears!",
+    "enraged": "Enraged!",
+    "phaseChange": "Phase {n}!",
+    "staggered": "Staggered! Attack cancelled",
+    "blocked": "Blocked by the class shield!",
+    "landed": {
+      "freeze": "Tiles frozen!",
+      "blur": "Letters blurred!",
+      "drain": "Shield drained!"
+    },
+    "healed": "Boss healed +{n}",
+    "defeated": "{name} defeated!",
+    "escaped": "{name} got away!",
+    "dealtPct": "Your class dealt {pct}% damage",
+    "phase": "Phase {n} of 3",
+    "hpLeft": "{pct}% HP left",
+    "phaseShort": "Phase {n}",
+    "yourDamage": "Your damage",
+    "critDamage": "CRIT +{n}",
+    "plusDamage": "+{n} damage",
+    "phoneWon": "Boss defeated! Great teamwork",
+    "warnPhone": "Attack in {s}s. Long words stop it!",
+    "phoneLanded": {
+      "freeze": "Frozen tiles! Use the others",
+      "blur": "Letters blurred for a moment",
+      "drain": "Your class shield got drained"
+    },
+    "frozenRejected": "That path uses a frozen tile",
+    "picker": {
+      "title": "Boss",
+      "unlock": "Pro: all 10 bosses",
+      "lockedName": "{name} (Pro)",
+      "freeHint": "Free classes fight the Lexicon Dragon. Pro unlocks all 10 bosses."
+    }
+  },
+  // @eduBoss:end
   // @eg6Land:start
   "eg6Land": {
     "vsGimkit": {
@@ -607,9 +663,9 @@ const en = {
         "3": "The clock is short, so every word counts."
       },
       "bossBattle": {
-        "1": "A meaning goes up and everyone answers on their phone.",
-        "2": "Every right answer hits the dragon; a streak of three hits double.",
-        "3": "Knock its HP to zero before the questions run out."
+        "1": "Letters go up on every phone. Everyone hunts words on the same board.",
+        "2": "Every word hits the boss. 7+ letters crit, fast words build the class combo.",
+        "3": "Long words charge the shield and stop attacks. Knock it to zero before time runs out."
       }
     },
     "boss": {

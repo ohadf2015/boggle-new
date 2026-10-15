@@ -34,6 +34,7 @@ export default function ChestRewardCta({ gameCode, roundId }: ChestRewardCtaProp
         <span className="flex flex-col">
           <span className="text-lg">{collected ? t('economy.reward.collected') : t('economy.reward.ready')}</span>
           <span className="text-sm">{t('economy.chest.xp', { xp: reveal.xp })}</span>
+          {reveal.bossWin && <span className="text-sm">{t('classroomBoss.chestUpgraded')}</span>}
         </span>
       </button>
       {opening && (

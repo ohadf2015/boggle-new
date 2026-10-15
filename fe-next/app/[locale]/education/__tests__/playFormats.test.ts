@@ -29,7 +29,7 @@ const LOCALES = ['en', 'he', 'es', 'sv', 'ja', 'ru'] as const;
 
 describe('the registries agree with the code that enforces them', () => {
   const handler = readFileSync(
-    join(FE_NEXT, 'backend', 'handlers', 'classroomGameHandler.ts'),
+    join(FE_NEXT, 'backend', 'handlers', 'classroomGameSchemas.ts'),
     'utf8',
   );
 

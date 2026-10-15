@@ -6,25 +6,23 @@
 import type { Server, Socket } from 'socket.io';
 import type { WordDetail, Language } from '@/shared/types';
 import type { GameState } from '../modules/gameState/types.js';
-import type { LeaderboardPlayer } from '../modules/scoreManager.js';
 
 import {
   addPlayerWord,
   updatePlayerScore,
   addPlayerEventBonus,
-  getLeaderboard,
   recordFirstFinder,
-  removePeerRejectedWordScore,
 } from '../modules/gameStateManager.js';
 
-import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
+import { broadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
 import { queueOpponentWord } from '../utils/opponentWordFeedBatcher.js';
 import { queuePlayerFoundWord } from '../utils/playerFoundWordBatcher.js';
 import { checkAndAwardAchievements, type GameWithAchievements } from '../modules/achievementManager.js';
-import { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } from '../modules/supabaseServer.js';
-import { addWordToBlacklist } from '../modules/botManager.js';
+import { isSupabaseConfigured, savePlayerWord } from '../modules/supabaseServer.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
+import { handlePeerRejection, type PeerValidationResult } from './peerRejectionHandler';
+import { hitRoomBoss } from '../services/classroomBoss/roomBoss.js';
 import { processLongWordEngagement } from './engagementHandler';
 import { getTilesOnPath, getTilesOnResolvedPath, recordBlastMove, getWordPath, getOrInitPlayerBoard, safeCascadeBlastWord, validateBlastWordPath } from '../modules/blastModeManager.js';
 import { regenerateBlastBoardIfExhausted } from '../modules/blastBoardRegen.js';
@@ -41,18 +39,6 @@ import { lessonWordBonus } from '@/shared/constants/lessonScoring';
 interface Achievement {
   key: string;
   icon: string;
-}
-
-interface PeerValidationResult {
-  success: boolean;
-  error?: string;
-  totalVotes?: number;
-  invalidVotes?: number;
-  validVotes?: number;
-  shouldReject?: boolean;
-  word?: string;
-  submitter?: string;
-  isBot?: boolean;
 }
 
 function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCode: string, username: string, normalizedWord: string, isInDictionary: boolean, comboType?: string | null, inputMethod: 'kb' | 'drag' = 'drag', clientPath?: Array<{ row: number; col: number }> | null): void {
@@ -314,6 +300,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     addPlayerEventBonus(gameCode, username, eventBonusDelta);
   }
   game.serverSeq = (game.serverSeq ?? 0) + 1;
+  const boss = hitRoomBoss(io, gameCode, game, { username, word: normalizedWord, score: totalDelta });
 
   inc('wordAccepted');
   incPerGame(gameCode, 'wordAccepted');
@@ -339,6 +326,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     ...(rushBonus > 0 ? { rushBonus } : {}),
     ...(lessonBonus > 0 ? { lessonBonus } : {}),
     ...(isSpecialWord ? { isSpecialWord: true } : {}),
+    ...(boss ? { boss } : {}),
     // Merged blast data (Fix 2): includes tile bonus, moves, combo info in single emit
     ...(blastMoveResult ? {
       blast: {
@@ -466,6 +454,7 @@ function handleWordBecameValid(io: Server, _socket: Socket, game: GameState, gam
       // Use atomic delta increment to avoid race conditions with concurrent score updates
       updatePlayerScore(gameCode, submitter, potentialScore, true);
       const newScore = game.playerScores?.[submitter] || 0;
+      const boss = hitRoomBoss(io, gameCode, game, { username: submitter, word, score: potentialScore });
 
       logger.info('VOTE', `Word "${word}" validated! Awarding ${potentialScore} to ${submitter}`);
 
@@ -476,7 +465,8 @@ function handleWordBecameValid(io: Server, _socket: Socket, game: GameState, gam
           safeEmit(submitterSocket, 'wordValidatedByVotes', {
             word,
             score: potentialScore,
-            newTotalScore: newScore
+            newTotalScore: newScore,
+            ...(boss ? { boss } : {}),
           });
         }
       }
@@ -487,52 +477,6 @@ function handleWordBecameValid(io: Server, _socket: Socket, game: GameState, gam
     word,
     language: game.language || 'en'
   });
-}
-
-function handlePeerRejection(io: Server, gameCode: string, game: GameState, result: PeerValidationResult): void {
-  // Guard against missing word or submitter
-  if (!result.word || !result.submitter) {
-    logger.warn('PEER_VALIDATION', 'Missing word or submitter in peer rejection result');
-    return;
-  }
-
-  // Type assertion after null checks
-  const word: string = result.word;
-  const submitter: string = result.submitter;
-
-  const scoreRemoved = removePeerRejectedWordScore(gameCode, word, submitter);
-
-  logger.info('PEER_VALIDATION', `Word "${word}" rejected. Removed ${scoreRemoved} from ${submitter}`);
-
-  // Record rejected word for admin review (if not a bot word)
-  if (!result.isBot && isSupabaseConfigured()) {
-    recordPlayerWrongWord(word, game.language || 'en', 'peer_rejected').catch((err: Error) => {
-      logger.error('WORD', `Failed to record peer-rejected word "${word}": ${err.message}`);
-    });
-  }
-
-  // Blacklist bot words
-  if (result.isBot && game.language) {
-    addWordToBlacklist(word, game.language)
-      .then((success: boolean) => {
-        if (success) {
-          logger.info('BOT', `Bot word "${word}" blacklisted for ${game.language}`);
-        }
-      })
-      .catch((err: Error) => logger.warn('BOT', `Failed to blacklist: ${err.message}`));
-  }
-
-  broadcastToRoom(io, getGameRoom(gameCode), 'peerValidationResult', {
-    word,
-    submitter,
-    rejected: true,
-    invalidVotes: result.invalidVotes,
-    validVotes: result.validVotes,
-    scoreRemoved
-  });
-
-  const leaderboard: LeaderboardPlayer[] = getLeaderboard(gameCode);
-  volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
 }
 
 export { handleValidatedWord, handleWordBecameValid, handlePeerRejection };

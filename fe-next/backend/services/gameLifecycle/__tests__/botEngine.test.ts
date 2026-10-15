@@ -39,6 +39,7 @@ import { volatileBroadcastToRoom } from '../../../utils/socketHelpers';
 import { clearBotRoundState } from '../../../modules/botRoundState';
 import { playBotWord, runBotLoop, creditBotBonus, type BotPlayRules, type BotRoundContext } from '../botEngine';
 import { boardWordSource } from '../botClassic';
+import { armRoomBoss, roomBossView } from '../../classroomBoss/roomBoss';
 import type { Bot } from '../../../modules/botBehavior';
 
 const GAME = 'ENGINE1';
@@ -77,6 +78,14 @@ describe('playBotWord (engine play path)', () => {
     expect(mocks.game!.playerCombos.TestBot).toBe(3);
     expect(mocks.incrementBotWordUsage).toHaveBeenCalledWith('hello', 'en');
     expect(volatileBroadcastToRoom).toHaveBeenCalledWith(ctx.io, `room:${GAME}`, 'botWordFound', expect.objectContaining({ word: 'hello', score: 7 }));
+  });
+
+  it('given a classroom boss round (practice with bots), a credited bot word hits the boss too', () => {
+    mocks.game = { ...mocks.game!, isClassroom: true, letterGrid: [['a', 'b'], ['c', 'd']], modeHistory: ['classic'] };
+    armRoomBoss(ctx.io, GAME, mocks.game as any, { bossId: 'lexiconDragon', students: 2, roundSeconds: 120 });
+    const maxHp = roomBossView(mocks.game as any)!.maxHp;
+    expect(playBotWord(ctx, makeBot(), flat(7), 'hello')).toBe(7);
+    expect(roomBossView(mocks.game as any)!.hp).toBe(maxHp - 7);
   });
 
   it('event bonus is credited live and mirrored into the event-bonus accumulator, not the stored word', () => {

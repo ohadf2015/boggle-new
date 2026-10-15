@@ -7,6 +7,7 @@
  * dialogs. Each phone view renders inside its piece's screen stub
  * (HostLobbyScreen, MpRoundScreen, MpCountdown). FROZEN after FOUNDATION.
  */
+import { useClassroomBossSocket } from '@/hooks/useClassroomBossSocket';
 import React, { memo } from 'react';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import '../style/animation.scss';
@@ -50,6 +51,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
     fireRoundRemaining, hasActiveGameData, resolvedClassroomGameMode, isVocabQuizRoom,
     handleHostNameChange, handleHostAvatarChange,
   } = useHostPhase(props);
+  useClassroomBossSocket(isClassroomMode ? socket : null, gameCode);
 
   useClassroomSettingsSeed({
     isClassroomMode,

@@ -192,6 +192,16 @@ describe('chest odds and roll', () => {
     expect(rollChest('ABC:r1:u1')).toEqual(rollChest('ABC:r1:u1'));
   });
 
+  it('Given a boss win, When the chest rolls, Then its rarity is one tier up (epic stays epic) from the same seed', () => {
+    const up = { common: 'rare', rare: 'epic', epic: 'epic' } as const;
+    for (let i = 0; i < 300; i++) {
+      const base = rollChest(`seed-${i}`);
+      const won = rollChest(`seed-${i}`, { bossWin: true });
+      expect(won.rarity).toBe(up[base.rarity]);
+      expect(chestPartPool(won.rarity)).toContain(won.itemId);
+    }
+  });
+
   it('Given many seeds, Then every rarity appears with its odds shape', () => {
     const counts = { common: 0, rare: 0, epic: 0 };
     for (let i = 0; i < 4000; i++) counts[rollChest(`seed-${i}`).rarity]++;

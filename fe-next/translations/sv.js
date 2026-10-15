@@ -1,5 +1,61 @@
 // Sv translations
 const sv = {
+  // @eduBoss:start
+  "classroomBoss": {
+    "chestUpgraded": "Bossen besegrad: din kista har uppgraderats!",
+    "topHitter": "Bästa träffen",
+    "cardHow": "Hela klassen mot en boss. Varje ord ni hittar är en träff.",
+    "howTo": "Hitta ord för att träffa bossen. 7+ bokstäver blir kritisk träff. Långa ord stoppar attackerna.",
+    "attackIn": "Bossattack om",
+    "attack": {
+      "freeze": "Frysning på väg!",
+      "blur": "Suddning på väg!",
+      "drain": "Sköldtömning!"
+    },
+    "staggerHint": "{n}/{need} långa ord för att stoppa den",
+    "shield": "Klassens sköld",
+    "topHitters": "Bästa träffarna",
+    "noHitsYet": "Hitta ord för att träffa bossen!",
+    "dmg": "skada",
+    "crit": "KRITISK!",
+    "timeLeft": "Tid kvar",
+    "combo": "Klasskombo",
+    "intro": "{name} dyker upp!",
+    "enraged": "Rasande!",
+    "phaseChange": "Fas {n}!",
+    "staggered": "Stoppad! Attacken avbröts",
+    "blocked": "Klassens sköld blockerade!",
+    "landed": {
+      "freeze": "Brickor frysta!",
+      "blur": "Bokstäverna suddas ut!",
+      "drain": "Skölden tömdes!"
+    },
+    "healed": "Bossen läkte +{n}",
+    "defeated": "{name} är besegrad!",
+    "escaped": "{name} kom undan!",
+    "dealtPct": "Er klass gjorde {pct}% skada",
+    "phase": "Fas {n} av 3",
+    "hpLeft": "{pct}% hälsa kvar",
+    "phaseShort": "Fas {n}",
+    "yourDamage": "Din skada",
+    "critDamage": "KRITISK +{n}",
+    "plusDamage": "+{n} skada",
+    "phoneWon": "Bossen besegrad! Snyggt lagarbete",
+    "warnPhone": "Attack om {s} s. Långa ord stoppar den!",
+    "phoneLanded": {
+      "freeze": "Frysta brickor! Använd de andra",
+      "blur": "Bokstäverna är suddiga en stund",
+      "drain": "Klassens sköld tömdes"
+    },
+    "frozenRejected": "Ordet går genom en fryst bricka",
+    "picker": {
+      "title": "Boss",
+      "unlock": "Pro: alla 10 bossar",
+      "lockedName": "{name} (Pro)",
+      "freeHint": "Gratisklasser möter Lexikondraken. Pro låser upp alla 10 bossar."
+    }
+  },
+  // @eduBoss:end
   // @eg6Land:start
   "eg6Land": {
     "vsGimkit": {
@@ -607,9 +663,9 @@ const sv = {
         "3": "Klockan är kort och varje ord räknas."
       },
       "bossBattle": {
-        "1": "En betydelse visas och alla svarar i mobilen.",
-        "2": "Varje rätt svar träffar draken; tre i rad ger dubbel träff.",
-        "3": "Få ner dess HP till noll innan frågorna tar slut."
+        "1": "Samma bokstäver på varje mobil. Alla letar ord på samma bräde.",
+        "2": "Varje ord träffar bossen. 7+ bokstäver blir kritisk, snabba ord bygger klassens kombo.",
+        "3": "Långa ord laddar skölden och stoppar attacker. Få ner den till noll innan tiden tar slut."
       }
     },
     "boss": {

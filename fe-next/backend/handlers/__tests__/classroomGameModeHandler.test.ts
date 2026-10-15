@@ -19,11 +19,15 @@
  */
 import { vi, type Mock } from 'vitest';
 
-const { mockGetClassroomGame, mockSetMode, mockBroadcastToRoom } = vi.hoisted(() => ({
+const { mockGetClassroomGame, mockSetMode, mockBroadcastToRoom, mockResolveBoss } = vi.hoisted(() => ({
   mockGetClassroomGame: vi.fn(),
   mockSetMode: vi.fn(),
   mockBroadcastToRoom: vi.fn(),
+  mockResolveBoss: vi.fn(),
 }));
+
+vi.mock('../../services/classroomBoss/bossEntitlement', () => ({ resolveBossForTeacher: mockResolveBoss }));
+vi.mock('../../services/classroomBoss/bossEntitlement.js', () => ({ resolveBossForTeacher: mockResolveBoss }));
 
 vi.mock('../../modules/classroomGameManager', () => ({
   createClassroomGame: vi.fn(),
@@ -181,6 +185,20 @@ describe('updateClassroomGameMode — the room keeps its code', () => {
       `game:${CODE}`,
       'classroomGameModeChanged',
       expect.objectContaining({ gameMode: 'vocab-quiz', vocabQuizVariant: 'boss' })
+    );
+  });
+
+  it('switches into Boss Battle v2 with the boss the SERVER allows for this teacher, not the one asked for', async () => {
+    mockResolveBoss.mockResolvedValue('lexiconDragon');
+    const socket = makeSocket(TEACHER_ID);
+    registerClassroomGameModeHandlers(makeIo(), socket as never);
+
+    await handlerOf(socket)({ gameCode: CODE, gameMode: 'classic', classroomBossId: 'spellingBee' });
+
+    expect(mockResolveBoss).toHaveBeenCalledWith(TEACHER_ID, 'spellingBee');
+    expect(mockSetMode).toHaveBeenCalledWith(CODE, 'classic', undefined, 'lexiconDragon');
+    expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+      expect.anything(), `game:${CODE}`, 'classroomGameModeChanged', expect.objectContaining({ classroomBossId: 'lexiconDragon' }),
     );
   });
 

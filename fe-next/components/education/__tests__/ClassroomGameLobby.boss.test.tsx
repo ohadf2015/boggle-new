@@ -56,14 +56,15 @@ describe('ClassroomGameLobby — launching from the catalogue', () => {
     lessonWords = DEFINED;
   });
 
-  it('launches Boss Battle as the quiz engine with the boss variant, and stores it for the host', () => {
+  it('launches Boss Battle as a classic board carrying the boss, and stores it for the host', () => {
     render(<ClassroomGameLobby onBack={vi.fn()} />);
     fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
     fireEvent.click(screen.getByTestId('lobby-go-live'));
 
     expect(launch).toHaveBeenCalledTimes(1);
-    expect(launch.mock.calls[0][0].settings).toMatchObject({ gameMode: 'vocab-quiz', vocabQuizVariant: 'boss' });
-    expect(JSON.parse(sessionStorage.getItem('lessonGameData')!)).toMatchObject({ gameMode: 'vocab-quiz', vocabQuizVariant: 'boss' });
+    expect(launch.mock.calls[0][0].settings).toMatchObject({ gameMode: 'classic', classroomBossId: 'lexiconDragon' });
+    expect(launch.mock.calls[0][0].settings).not.toHaveProperty('vocabQuizVariant');
+    expect(JSON.parse(sessionStorage.getItem('lessonGameData')!)).toMatchObject({ gameMode: 'classic', classroomBossId: 'lexiconDragon' });
   });
 
   it('launches a plain quiz with no variant at all', () => {
@@ -82,11 +83,19 @@ describe('ClassroomGameLobby — launching from the catalogue', () => {
   it('says why before the tap when a meaning mode cannot run on this list, and never launches it', () => {
     lessonWords = [{ word: 'horse' }, { word: 'sheep' }, { word: 'goat' }, { word: 'duck' }, { word: 'cow' }];
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
+    fireEvent.click(screen.getByTestId('mode-tile-vocab-quiz'));
     expect(screen.getByTestId('go-live-blocked')).toHaveTextContent('eg2Modes.needsMeanings');
     expect(screen.getByTestId('lobby-go-live')).toBeDisabled();
     fireEvent.click(screen.getByTestId('lobby-go-live'));
     expect(launch).not.toHaveBeenCalled();
+  });
+
+  it('launches Boss Battle on a list with no meanings, because the boss is fought on the board', () => {
+    lessonWords = [{ word: 'horse' }, { word: 'sheep' }, { word: 'goat' }, { word: 'duck' }, { word: 'cow' }];
+    render(<ClassroomGameLobby onBack={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
+    fireEvent.click(screen.getByTestId('lobby-go-live'));
+    expect(launch.mock.calls[0][0].settings.gameMode).toBe('classic');
   });
 
   it('hides the treasure-chest switch for Boss Battle, which never deals chests', () => {

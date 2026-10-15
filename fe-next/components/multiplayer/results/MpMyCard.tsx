@@ -1,5 +1,6 @@
 'use client';
 
+import { useClassroomBossStore } from '@/stores/classroomBossStore';
 import { memo } from 'react';
 import Image from 'next/image';
 import { Coins, Sparkles, Star } from 'lucide-react';
@@ -46,8 +47,10 @@ export interface MpMyCardProps {
  */
 function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, revealed, series = false, hideClassPosition = false, t, className }: MpMyCardProps) {
   const calm = hideClassPosition;
-  const mood = calm ? 'cheer' : mascotFor(rank, total, score);
-  const showWinner = !calm && winner;
+  // A class that lost to the boss has no winner: the top scorer keeps a rank, not a crown.
+  const lostBoss = useClassroomBossStore((s) => s.view?.status === 'escaped');
+  const mood = calm || (lostBoss && winner) ? 'cheer' : mascotFor(rank, total, score);
+  const showWinner = !calm && winner && !lostBoss;
   const gapLine = calm || !gap
     ? null
     : gap.kind === 'tied'
@@ -88,7 +91,7 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, gap, re
             className={cn(
               'absolute -bottom-1 -end-2 grid place-items-center rounded-neo border-[3px] border-neo-black shadow-hard-sm font-neo-display font-bold tabular-nums',
               'min-w-[calc(40px*var(--mp-u,1))] h-[calc(34px*var(--mp-u,1))] px-1 text-[calc(20px*var(--mp-u,1))]',
-              winner ? 'bg-neo-lime' : score > 0 && rank <= 3 ? 'bg-neo-cyan' : 'bg-neo-pink',
+              showWinner ? 'bg-neo-lime' : score > 0 && rank <= 3 ? 'bg-neo-cyan' : 'bg-neo-pink',
               revealed && fx.stamp,
             )}
           >

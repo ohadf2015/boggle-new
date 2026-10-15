@@ -1,5 +1,61 @@
 // Es translations
 const es = {
+  // @eduBoss:start
+  "classroomBoss": {
+    "chestUpgraded": "¡Jefe derrotado: tu cofre subió de nivel!",
+    "topHitter": "Más daño",
+    "cardHow": "Toda la clase contra un jefe. Cada palabra que encuentras es un golpe.",
+    "howTo": "Encuentra palabras para golpear al jefe. Con 7+ letras, golpe crítico. Las palabras largas frenan sus ataques.",
+    "attackIn": "Ataque del jefe en",
+    "attack": {
+      "freeze": "¡Viene una helada!",
+      "blur": "¡Viene un borrón!",
+      "drain": "¡Robo de escudo!"
+    },
+    "staggerHint": "{n}/{need} palabras largas para aturdirlo",
+    "shield": "Escudo de la clase",
+    "topHitters": "Más daño",
+    "noHitsYet": "¡Encuentra palabras para golpear al jefe!",
+    "dmg": "daño",
+    "crit": "¡CRÍTICO!",
+    "timeLeft": "Tiempo",
+    "combo": "Combo de la clase",
+    "intro": "¡Aparece {name}!",
+    "enraged": "¡Furioso!",
+    "phaseChange": "¡Fase {n}!",
+    "staggered": "¡Aturdido! Ataque cancelado",
+    "blocked": "¡El escudo de la clase lo paró!",
+    "landed": {
+      "freeze": "¡Letras congeladas!",
+      "blur": "¡Letras borrosas!",
+      "drain": "¡Escudo robado!"
+    },
+    "healed": "El jefe se curó +{n}",
+    "defeated": "¡{name} derrotado!",
+    "escaped": "¡{name} se escapó!",
+    "dealtPct": "Tu clase hizo {pct}% de daño",
+    "phase": "Fase {n} de 3",
+    "hpLeft": "Le queda {pct}% de vida",
+    "phaseShort": "Fase {n}",
+    "yourDamage": "Tu daño",
+    "critDamage": "CRÍTICO +{n}",
+    "plusDamage": "+{n} de daño",
+    "phoneWon": "¡Jefe derrotado! Gran trabajo en equipo",
+    "warnPhone": "Ataque en {s} s. ¡Las palabras largas lo frenan!",
+    "phoneLanded": {
+      "freeze": "¡Letras congeladas! Usa las demás",
+      "blur": "Las letras se ven borrosas un momento",
+      "drain": "Le robaron el escudo a tu clase"
+    },
+    "frozenRejected": "Esa palabra pasa por una letra congelada",
+    "picker": {
+      "title": "Jefe",
+      "unlock": "Pro: los 10 jefes",
+      "lockedName": "{name} (Pro)",
+      "freeHint": "Las clases gratis se enfrentan al Dragón del Léxico. Pro desbloquea los 10 jefes."
+    }
+  },
+  // @eduBoss:end
   // @eg6Land:start
   "eg6Land": {
     "vsGimkit": {
@@ -607,9 +663,9 @@ const es = {
         "3": "Hay poco tiempo: cada palabra cuenta."
       },
       "bossBattle": {
-        "1": "Aparece un significado y todos responden en el móvil.",
-        "2": "Cada acierto golpea al dragón; una racha de tres golpea doble.",
-        "3": "Bájenle la vida a cero antes de que se acaben las preguntas."
+        "1": "Las mismas letras en cada móvil. Todos buscan palabras en el mismo tablero.",
+        "2": "Cada palabra golpea al jefe. Con 7+ letras es crítico y las palabras rápidas suben el combo de la clase.",
+        "3": "Las palabras largas cargan el escudo y frenan ataques. Déjalo en cero antes de que acabe el tiempo."
       }
     },
     "boss": {

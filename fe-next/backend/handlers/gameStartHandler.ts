@@ -8,6 +8,7 @@
  * in backend/modes; this file never branches on a specific mode.
  */
 
+import { armRoomBoss, hasRoomBoss } from '../services/classroomBoss/roomBoss.js';
 import type { Server, Socket } from 'socket.io';
 import type { LetterGrid, Language, DifficultyLevel, GameMode } from '@/shared/types';
 import { classicMinWordLength } from '@/shared/utils/classicWordRules';
@@ -327,9 +328,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
         recordClassroomWordBank(io, gameCode, game, letterGrid, gameLang, vocabToEmbed);
       }
 
+      const bossId = resolvedMode === 'classic' ? classroomGame?.settings?.classroomBossId : undefined;
+      armRoomBoss(io, gameCode, game, { bossId, students: playerUsernames.length, roundSeconds: validTimer });
+
       const messageId = gameStartCoordinator.initializeSequence(gameCode, humanUsernames, timerSeconds);
       // Classroom fields ride every start-shaped payload of this round (retries too).
       const extras = buildClassroomStartExtras(gameCode, classroomGame, humanUsernames);
+      if (hasRoomBoss(game)) extras.classroomBossId = bossId;
       broadcastToRoom(io, getGameRoom(gameCode), 'startGame',
         buildRoundPayload(gameCode, game, { kind: 'start', messageId, extras }));
       getGameModeModule(resolvedMode).afterStart?.(io, gameCode, game);
@@ -342,7 +347,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       scheduleSpecialWords(gameCode, letterGrid, gameLang);
 
       // Round events + recurring rush tiles (modes that opt in, 2+ players).
-      if (getGameModeRules(resolvedMode).roundEvents && playerUsernames.length >= 2) {
+      // A boss round's attacks ARE its round events; a blizzard on top would fight the boss's freezes.
+      if (getGameModeRules(resolvedMode).roundEvents && playerUsernames.length >= 2 && !hasRoomBoss(game)) {
         scheduleRoundEvent(io, gameCode, game, validTimer);
         startRushTiles(io, gameCode);
       }

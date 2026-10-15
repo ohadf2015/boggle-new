@@ -102,6 +102,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
         not_on_board: 'playerView.wordNotOnBoard',
         too_short: 'playerView.wordTooShort',
         duplicate: 'playerView.alreadyFound',
+        boss_frozen: 'classroomBoss.frozenRejected',
       };
       const messageKey = data.reason && reasonKeyMap[data.reason]
         ? reasonKeyMap[data.reason]

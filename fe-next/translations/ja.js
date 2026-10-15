@@ -1,5 +1,61 @@
 // Ja translations
 const ja = {
+  // @eduBoss:start
+  "classroomBoss": {
+    "chestUpgraded": "ボス撃破! 宝箱がランクアップ!",
+    "topHitter": "ダメージ王",
+    "cardHow": "クラス全員で1体のボスに挑む。見つけた単語がそのまま攻撃に。",
+    "howTo": "単語を見つけてボスを攻撃しよう。7文字以上はクリティカル。長い単語で攻撃を止められる。",
+    "attackIn": "ボスの攻撃まで",
+    "attack": {
+      "freeze": "凍結がくる!",
+      "blur": "ぼかしがくる!",
+      "drain": "シールド吸収!"
+    },
+    "staggerHint": "長い単語 {n}/{need} でひるませる",
+    "shield": "クラスのシールド",
+    "topHitters": "ダメージランキング",
+    "noHitsYet": "単語を見つけてボスを攻撃しよう!",
+    "dmg": "ダメージ",
+    "crit": "クリティカル!",
+    "timeLeft": "残り時間",
+    "combo": "クラスコンボ",
+    "intro": "{name}があらわれた!",
+    "enraged": "激怒!",
+    "phaseChange": "フェーズ{n}!",
+    "staggered": "ひるんだ! 攻撃キャンセル",
+    "blocked": "クラスのシールドで防いだ!",
+    "landed": {
+      "freeze": "マスが凍った!",
+      "blur": "文字がぼやけた!",
+      "drain": "シールドが吸われた!"
+    },
+    "healed": "ボスが回復 +{n}",
+    "defeated": "{name}をたおした!",
+    "escaped": "{name}に逃げられた!",
+    "dealtPct": "クラスで{pct}%のダメージ",
+    "phase": "フェーズ {n} / 3",
+    "hpLeft": "残りHP {pct}%",
+    "phaseShort": "フェーズ{n}",
+    "yourDamage": "あなたのダメージ",
+    "critDamage": "クリティカル +{n}",
+    "plusDamage": "+{n} ダメージ",
+    "phoneWon": "ボスをたおした! ナイスチームワーク",
+    "warnPhone": "あと{s}秒で攻撃。長い単語で止めよう!",
+    "phoneLanded": {
+      "freeze": "凍ったマスがある! ほかのマスを使おう",
+      "blur": "少しのあいだ文字がぼやける",
+      "drain": "クラスのシールドが吸われた"
+    },
+    "frozenRejected": "凍ったマスを通っています",
+    "picker": {
+      "title": "ボス",
+      "unlock": "Pro: 10体すべて",
+      "lockedName": "{name}(Pro)",
+      "freeHint": "無料プランはレキシコンドラゴンと対戦。Proなら10体すべて選べます。"
+    }
+  },
+  // @eduBoss:end
   // @eg6Land:start
   "eg6Land": {
     "vsGimkit": {
@@ -607,9 +663,9 @@ const ja = {
         "3": "制限時間は短め。1語1語が勝負です。"
       },
       "bossBattle": {
-        "1": "意味が表示され、全員がスマホで答えます。",
-        "2": "正解するたびにドラゴンにダメージ。3連続正解で2倍ダメージ。",
-        "3": "問題がなくなる前にHPを0にしよう。"
+        "1": "全員のスマホに同じ文字盤。みんなで同じ盤面から単語を探す。",
+        "2": "見つけた単語がボスへの攻撃に。7文字以上はクリティカル、素早く続けるとクラスコンボ。",
+        "3": "長い単語でシールドをため、攻撃を止める。時間切れまでにHPをゼロにしよう。"
       }
     },
     "boss": {

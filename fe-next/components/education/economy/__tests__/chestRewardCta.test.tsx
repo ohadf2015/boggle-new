@@ -28,6 +28,16 @@ describe('ChestRewardCta', () => {
     expect(screen.queryByText('economy.reward.ready')).toBeNull();
   });
 
+  it('Given the class beat the boss, Then the chest says it was upgraded; a normal chest does not', () => {
+    reward.value = { gameCode: 'ABC', roundId: '7', rarity: 'epic', xp: 60, itemId: 'eyes:starEye', roundCash: 9, rank: 1, size: 3, bossWin: true };
+    render(<ChestRewardCta gameCode="ABC" roundId="7" />);
+    expect(screen.getByText('classroomBoss.chestUpgraded')).toBeTruthy();
+    cleanup();
+    reward.value = { ...reward.value, bossWin: undefined };
+    render(<ChestRewardCta gameCode="ABC" roundId="7" />);
+    expect(screen.queryByText('classroomBoss.chestUpgraded')).toBeNull();
+  });
+
   it('Given a reward, When the student taps it, Then the chest opens and closing collects it', () => {
     reward.value = { gameCode: 'ABC', roundId: '7', rarity: 'rare', xp: 25, itemId: 'eyes:starEye', roundCash: 9, rank: 1, size: 3 };
     render(<ChestRewardCta gameCode="ABC" roundId="7" />);

@@ -1,4 +1,4 @@
-/** The education mascot (Coach), by role. Change art here, never at call sites. */
+/** The education mascot, by role. Change art here, never at call sites. */
 
 const ROLES = ['welcome', 'gameStart', 'setup', 'empty', 'success', 'tip', 'noClasses', 'pro', 'shield', 'attack', 'error', 'podium'] as const;
 export type EduMascotPose = (typeof ROLES)[number];
