@@ -13084,6 +13084,7 @@ const en = {
         "columns": {
           "student": "Student",
           "completion": "Assignments",
+          "averageScore": "Avg score",
           "lastActive": "Last active",
           "joinStatus": "Join status"
         },
@@ -13093,8 +13094,19 @@ const en = {
           "joined_idle": "Joined, not practiced"
         },
         "completion": "{{completed}}/{{total}}",
+        "averageScore": "{{score}}%",
+        "averageScoreEmpty": "—",
         "upgrade": "More per-student detail with Teacher Pro {{price}}",
-        "never": "Never"
+        "never": "Never",
+        "parentShare": {
+          "title": "Share with parents",
+          "generated": "Progress as of {{date}}",
+          "print": "Print parent summary",
+          "copy": "Copy parent summary",
+          "copied": "Copied",
+          "upgrade": "Print a parent summary with Teacher Pro {{price}}",
+          "footer": "LexiClash classroom progress — assignment completion, average score, last active."
+        }
       },
       "exportAllClasses": {
         "button": "Export all classes",

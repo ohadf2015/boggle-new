@@ -14652,6 +14652,7 @@ const es = {
         "columns": {
           "student": "Alumno",
           "completion": "Tareas",
+          "averageScore": "Nota media",
           "lastActive": "Última actividad",
           "joinStatus": "Estado de incorporación"
         },
@@ -14661,8 +14662,19 @@ const es = {
           "joined_idle": "Incorporado, sin practicar"
         },
         "completion": "{{completed}}/{{total}}",
+        "averageScore": "{{score}}%",
+        "averageScoreEmpty": "—",
         "upgrade": "Más detalles por alumno con Teacher Pro {{price}}",
-        "never": "Nunca"
+        "never": "Nunca",
+        "parentShare": {
+          "title": "Compartir con las familias",
+          "generated": "Progreso a fecha de {{date}}",
+          "print": "Imprimir resumen para familias",
+          "copy": "Copiar resumen para familias",
+          "copied": "Copiado",
+          "upgrade": "Imprime un resumen para familias con Teacher Pro {{price}}",
+          "footer": "Progreso de clase en LexiClash: tareas completadas, nota media, última actividad."
+        }
       },
       "exportAllClasses": {
         "button": "Exportar todas las clases",

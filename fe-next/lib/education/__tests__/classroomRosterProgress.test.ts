@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   buildClassroomRosterProgress,
+  buildParentShareSummary,
   countRosterAssignmentProgress,
   resolveJoinFunnelStatus,
   hasRealProfileName,
@@ -91,6 +92,7 @@ describe('buildClassroomRosterProgress', () => {
         name: 'Sam',
         completedAssignments: 0,
         totalAssignments: 0,
+        averageScore: null,
         lastActiveAt: '2026-10-01T09:00:00.000Z',
         joinFunnelStatus: 'joined_idle',
       },
@@ -153,13 +155,17 @@ describe('buildClassroomRosterProgress', () => {
 });
 
 describe('countRosterAssignmentProgress', () => {
-  const row = (studentId: string, status: AssignmentProgressRow['status']): AssignmentProgressRow => ({
+  const row = (
+    studentId: string,
+    status: AssignmentProgressRow['status'],
+    score: number | null = null,
+  ): AssignmentProgressRow => ({
     studentId,
     studentName: studentId,
-    assignmentId: `a-${studentId}-${status}`,
+    assignmentId: `a-${studentId}-${status}-${score ?? 'none'}`,
     assignmentTitle: 'A',
     status,
-    score: null,
+    score,
     accuracy: null,
     completedAt: null,
   });
@@ -172,12 +178,66 @@ describe('countRosterAssignmentProgress', () => {
       row('s2', 'completed'),
     ]);
     expect(counts).toEqual([
-      { studentId: 's1', assignmentCount: 3, completedCount: 1 },
-      { studentId: 's2', assignmentCount: 1, completedCount: 1 },
+      { studentId: 's1', assignmentCount: 3, completedCount: 1, averageScore: null },
+      { studentId: 's2', assignmentCount: 1, completedCount: 1, averageScore: null },
     ]);
   });
 
   it('omits students with no progress rows (they render as 0/0 via the model default)', () => {
     expect(countRosterAssignmentProgress([])).toEqual([]);
+  });
+
+  it('averages completed scores and ignores missing/overdue and null scores', () => {
+    const counts = countRosterAssignmentProgress([
+      row('s1', 'completed', 80),
+      row('s1', 'completed', 100),
+      row('s1', 'missing', 50),
+      row('s1', 'completed', null),
+      row('s2', 'completed', 91),
+    ]);
+    expect(counts).toEqual([
+      { studentId: 's1', assignmentCount: 4, completedCount: 3, averageScore: 90 },
+      { studentId: 's2', assignmentCount: 1, completedCount: 1, averageScore: 91 },
+    ]);
+  });
+
+  it('rounds the mean to the nearest integer', () => {
+    const counts = countRosterAssignmentProgress([
+      row('s1', 'completed', 80),
+      row('s1', 'completed', 91),
+    ]);
+    expect(counts[0].averageScore).toBe(86);
+  });
+});
+
+describe('buildParentShareSummary', () => {
+  it('builds a tab-separated parent handout without join-funnel status', () => {
+    const text = buildParentShareSummary({
+      heading: 'Share with parents',
+      classroomName: 'Year 5',
+      generatedAt: 'Progress as of 15 Oct 2026',
+      columns: {
+        student: 'Student',
+        completion: 'Assignments',
+        averageScore: 'Avg score',
+        lastActive: 'Last active',
+      },
+      lines: [
+        { name: 'Priya', completion: '2/2', averageScore: '100%', lastActive: 'Today' },
+        { name: 'Sam', completion: '0/2', averageScore: '—', lastActive: 'Never' },
+      ],
+    });
+    expect(text).toBe(
+      [
+        'Share with parents',
+        'Year 5',
+        'Progress as of 15 Oct 2026',
+        '',
+        'Student\tAssignments\tAvg score\tLast active',
+        'Priya\t2/2\t100%\tToday',
+        'Sam\t0/2\t—\tNever',
+      ].join('\n'),
+    );
+    expect(text).not.toMatch(/joined_idle|Signed in|Guest/i);
   });
 });
