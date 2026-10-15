@@ -15766,6 +15766,7 @@ const he = {
         "join": "הצטרפות",
         "lessons": "שיעורים",
         "navigation": "ניווט",
+        "pricing": "תמחור",
         "profile": "פרופיל",
         "reports": "דוחות",
         "student": "תלמיד",
