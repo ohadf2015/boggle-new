@@ -15871,6 +15871,7 @@ const es = {
         "join": "Entrar",
         "lessons": "Lecciones",
         "navigation": "Navegación",
+        "pricing": "Precios",
         "profile": "Perfil",
         "reports": "Reportes",
         "student": "Estudiante",

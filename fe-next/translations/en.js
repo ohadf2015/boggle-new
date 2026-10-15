@@ -14366,6 +14366,7 @@ const en = {
         "join": "Join",
         "lessons": "Lessons",
         "navigation": "Navigation",
+        "pricing": "Pricing",
         "profile": "Profile",
         "reports": "Reports",
         "student": "Student",

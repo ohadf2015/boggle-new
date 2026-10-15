@@ -16194,6 +16194,7 @@ const sv = {
         "join": "Gå med",
         "lessons": "Lektioner",
         "navigation": "Meny",
+        "pricing": "Priser",
         "profile": "Profil",
         "reports": "Rapporter",
         "student": "Elev",

@@ -4246,6 +4246,7 @@ const ru = {
         "join": "Присоединиться",
         "lessons": "Уроки",
         "navigation": "Навигация",
+        "pricing": "Цены",
         "profile": "Профиль",
         "reports": "Отчёты",
         "student": "Ученик",
