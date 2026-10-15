@@ -112,6 +112,11 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
         case 'reports':
           label = t('education.header.breadcrumbs.reports');
           break;
+        case 'pricing':
+          // /[locale]/pricing renders inside EducationShell; without this the
+          // raw slug "pricing" leaked into the Hebrew/Spanish/... trail.
+          label = t('education.header.breadcrumbs.pricing');
+          break;
         default:
           /*
             A database id is not a place. This branch used to render

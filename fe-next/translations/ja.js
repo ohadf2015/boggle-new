@@ -15911,6 +15911,7 @@ const ja = {
         "join": "参加",
         "lessons": "レッスン",
         "navigation": "ナビゲーション",
+        "pricing": "料金",
         "profile": "プロフィール",
         "reports": "レポート",
         "student": "生徒",
