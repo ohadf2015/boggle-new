@@ -112,7 +112,7 @@ const es = {
     },
     "pro": {
       "rosterPro": "Alumnado ilimitado en tu lista",
-      "liveCap": "Los juegos en vivo admiten hasta {count} jugadores a la vez",
+      "liveCap": "En todos los planes, una partida en vivo admite hasta {count} jugadores a la vez.",
       "mastery": "Mapa de dominio: qué palabras domina cada alumno",
       "missedPractice": "Rondas de repaso creadas a partir de fallos reales",
       "reports": "Informes de clase imprimibles"
@@ -14064,12 +14064,12 @@ const es = {
       "assignmentLimitTitle": "Límite de tareas alcanzado",
       "assignmentLimitMessage": "Creaste {{current}} de {{limit}} tareas gratuitas para esta clase. Mejora a Pro para tener tareas ilimitadas.",
       "upgradeProDescription": "Pro te da aulas ilimitadas y estudiantes ilimitados por clase, sin límites.",
-      "trialExpiredTitle": "Tu prueba gratuita ha terminado",
-      "trialExpiredMessage": "Tu prueba de 14 días como docente ha terminado. Con Pro tienes clases ilimitadas, juegos en vivo e informes de progreso.",
+      "trialExpiredTitle": "¿Quieres más que el plan gratis?",
+      "trialExpiredMessage": "El plan gratis sigue funcionando sin límite de tiempo. Pro añade clases ilimitadas e informes de progreso, y las cuentas nuevas tienen 14 días gratis.",
       "continueFree": "Continuar con el plan gratuito",
       "proFeatures": "Pro incluye",
       "unlimitedClasses": "Aulas ilimitadas",
-      "unlimitedStudents": "Estudiantes ilimitados por aula",
+      "unlimitedStudents": "Estudiantes ilimitados en la lista de cada clase",
       "priceUSD": "Suscripción Pro",
       "perMonth": "/mes",
       "autoRenew": "Se renueva automáticamente cada mes. Cancela cuando quieras.",
@@ -14078,8 +14078,8 @@ const es = {
       "trialOfferTitle": "Prueba Teacher Pro 14 días gratis",
       "trialOfferBody": "Clases e informes ilimitados. Gratis 14 días y luego 9 $/mes. Cancela cuando quieras.",
       "trialCtaSubtext": "Gratis 14 días y luego 9 $/mes. Cancela cuando quieras.",
-      "trialEndedTitle": "Prueba caducada: mejora para conservar tus clases",
-      "trialEndedBody": "Conserva clases ilimitadas e informes imprimibles por 9 $/mes. No es otra prueba gratis.",
+      "trialEndedTitle": "Tu prueba de Pro terminó. Tus clases siguen a salvo.",
+      "trialEndedBody": "El plan gratis sigue funcionando en todas tus clases. Pro recupera las clases ilimitadas y los informes imprimibles por $9/mes. No es otra prueba gratis.",
       "trialEndedCta": "Seguir con Pro: 9 $/mes",
       "trialReactivateCta": "Reactivar",
       "trialLifecycleTitle": "Quedan {count} días de tu prueba de Teacher Pro",
@@ -14104,7 +14104,7 @@ const es = {
       "freePlanName": "Free",
       "freeForever": "Plan gratuito, sin caducidad",
       "freeClasses": "Hasta {count} clases",
-      "freeStudents": "Hasta {count} estudiantes por clase",
+      "freeStudents": "Hasta {count} estudiantes en la lista de cada clase",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Todo lo que necesitas para crecer",
       "popular": "Más popular",
@@ -14141,7 +14141,7 @@ const es = {
         "included": "Incluido",
         "notIncluded": "No incluido",
         "classes": "Clases",
-        "studentsPerClass": "Alumnos por clase",
+        "studentsPerClass": "Estudiantes por lista de clase",
         "customLists": "Tus propias listas de palabras",
         "duels": "Duelos cara a cara",
         "noAds": "Sin anuncios para el alumnado",
@@ -15904,8 +15904,8 @@ const es = {
     },
     "landing": {
       "pro": {
-        "title": "Dos planes. Sin trucos.",
-        "subtitle": "Todo lo que necesitas para dar tu primera clase es gratis. Pro quita los límites.",
+        "title": "El plan gratis lleva la partida. Teacher Pro te muestra lo que aprendieron.",
+        "subtitle": "Tras una partida: quién tuvo dificultades, qué palabras repasar y práctica hecha con los fallos.",
         "comparisonAlt": "Comparación entre el plan Gratis y Teacher Pro",
         "freeTier": "Gratis",
         "perMonth": "/mes",
@@ -15914,7 +15914,7 @@ const es = {
         "noAds": "Sin anuncios para tus estudiantes",
         "customLists": "Tus propias listas de palabras",
         "duels": "Duelos de palabras en vivo",
-        "freeForever": "El plan gratuito no caduca. Sin tarjeta y sin cuenta atrás.",
+        "freeForever": "El plan gratis no caduca y no pide tarjeta.",
         "proTier": "Teacher Pro",
         "everythingInFree": "Todo lo del plan Gratis",
         "classLimitPro": "Clases ilimitadas",
@@ -20654,8 +20654,62 @@ const es = {
       "optionsHide": "Ocultar opciones",
       "retry": "Reintentar"
     }
-  }
+  },
   // @eduShell:end
+  // @eduPlans:start
+  "eduPlans": {
+    "hero": {
+      "sub": "Tus estudiantes entran desde cualquier navegador con un código. Sin cuentas de estudiante, sin anuncios, sin instalar nada. Hecho para {count} idiomas, incluido el hebreo de derecha a izquierda.",
+      "studentLead": "Soy estudiante",
+      "studentJoin": "Entrar con un código",
+      "proLink": "Teacher Pro desde {price}/mes"
+    },
+    "how": {
+      "title": "Así funciona una clase",
+      "createTitle": "Crea una clase",
+      "createBody": "Ponle nombre y elige el idioma. Al momento tienes un código y un QR.",
+      "shareTitle": "Tus estudiantes entran",
+      "shareBody": "Escriben el código en cualquier móvil, tablet o Chromebook. Sin cuentas ni correos.",
+      "playTitle": "Juega en vivo",
+      "playBody": "Elige un modo, proyéctalo y mira los resultados en cuanto acaba la ronda."
+    },
+    "modes": {
+      "title": "{count} formas de jugar con la misma lista",
+      "sub": "Unos van en el proyector y otros en los móviles de tus estudiantes. Todos los modos son gratis.",
+      "moreLabel": "Más modos"
+    },
+    "pro": {
+      "trialLine": "Las cuentas nuevas tienen los primeros {days} días gratis. Cancela cuando quieras."
+    },
+    "cards": {
+      "schoolMonthly": "Desde {monthly} al mes por docente, con pago anual: hasta un {save}% menos que Teacher Pro mensual.",
+      "liveCapNote": "En todos los planes: una partida en vivo admite hasta {players} jugadores a la vez."
+    },
+    "manage": {
+      "active": "Activo · {price}/mes",
+      "renews": "Se renueva el {date} · {price}/mes",
+      "trialing": "Prueba gratis: te quedan {days} días; después, {price}/mes si no cancelas.",
+      "ends": "Cancelado. Pro sigue activo hasta el {date}.",
+      "pastDue": "Tu último pago no se completó. Actualiza la tarjeta en facturación para mantener Pro.",
+      "gifted": "Pro de regalo hasta el {date}",
+      "giftedOpen": "Pro de regalo",
+      "giftedNote": "No hay nada que pagar ni que cancelar. Al terminar vuelve solo al plan gratis."
+    },
+    "reports": {
+      "title": "Mira quién tuvo dificultades después de cada partida",
+      "body": "Pro convierte cada partida en un informe de clase: la precisión de cada estudiante, las palabras que conviene repasar y una hoja imprimible para familias o tu departamento.",
+      "trialCta": "Prueba Pro gratis {days} días",
+      "buyCta": "Teacher Pro · {price}/mes",
+      "trialFine": "Gratis {days} días y después {price}/mes. Cancela cuando quieras."
+    },
+    "cap": {
+      "used": "Usas {count} de {limit} clases gratis",
+      "full": "Ya usas las {limit} clases gratis",
+      "label": "Clases gratis usadas",
+      "cta": "Clases ilimitadas con Pro"
+    }
+  }
+  // @eduPlans:end
 };
 
 export { es };

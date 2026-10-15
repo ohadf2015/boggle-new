@@ -26,6 +26,7 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { ClassCapMeter } from '@/components/teacher/ClassCapMeter';
 import { trackEduClassroomCreated } from '@/lib/education/telemetry';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { isEligibleForTeacherProUpgradeCta } from '@/lib/education/trial';
@@ -306,6 +307,7 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false, he
         {heading}
         {heading ? <div className="flex shrink-0 items-center gap-3">{topActions}</div> : topActions}
       </div>
+      {richCards ? <ClassCapMeter count={classrooms.length} /> : null}
 
       <AnimatePresence initial={false}>
         {createdClassroom && (

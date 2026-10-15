@@ -112,7 +112,7 @@ const ja = {
     },
     "pro": {
       "rosterPro": "名簿の生徒数は無制限",
-      "liveCap": "ライブゲームは同時に{count}人まで参加できます",
+      "liveCap": "どのプランでも、ライブゲームには同時に最大{count}人まで参加できます。",
       "mastery": "習熟ヒートマップ：生徒ごとの習得単語",
       "missedPractice": "実際の苦手からつくる再練習ラウンド",
       "reports": "印刷できるクラスレポート"
@@ -14115,12 +14115,12 @@ const ja = {
       "assignmentLimitTitle": "課題の上限に達しました",
       "assignmentLimitMessage": "このクラスの無料課題を{{limit}}件中{{current}}件作成しました。Proにアップグレードすると課題は無制限。",
       "upgradeProDescription": "Proなら、クラス数も1クラスあたりの生徒数も無制限。指導の拡大に制限はありません。",
-      "trialExpiredTitle": "無料トライアルが終了しました",
-      "trialExpiredMessage": "14日間の教師トライアルが終了しました。Proならクラス無制限、ライブゲーム、進捗レポートを引き続き使えます。",
+      "trialExpiredTitle": "無料プラン以上の機能が必要ですか？",
+      "trialExpiredMessage": "無料プランは期限なしで使い続けられます。Proならクラス数無制限と進捗レポートが加わり、新しいアカウントは14日間無料です。",
       "continueFree": "無料プランで続ける",
       "proFeatures": "Proに含まれるもの",
       "unlimitedClasses": "無制限のクラス",
-      "unlimitedStudents": "1クラスあたり無制限の生徒",
+      "unlimitedStudents": "各クラスの名簿は人数無制限",
       "priceUSD": "Proサブスクリプション",
       "perMonth": "/月",
       "autoRenew": "毎月自動更新されます。いつでも解約できます。",
@@ -14129,8 +14129,8 @@ const ja = {
       "trialOfferTitle": "Teacher Proを14日間無料で試す",
       "trialOfferBody": "クラスもレポートも無制限。14日間無料、その後は月額9ドル。いつでも解約できます。",
       "trialCtaSubtext": "14日間無料、その後は月額9ドル。いつでも解約できます。",
-      "trialEndedTitle": "トライアル終了。クラスを維持するにはアップグレードしてください",
-      "trialEndedBody": "月額9ドルで無制限クラスと印刷レポートを維持できます。無料トライアルの再付与ではありません。",
+      "trialEndedTitle": "Proの無料体験が終了しました。クラスはそのまま残ります。",
+      "trialEndedBody": "無料プランでも全クラスで遊べます。Proなら月$9でクラス数無制限と印刷用レポートが戻ります。新しい無料体験ではありません。",
       "trialEndedCta": "Proを続ける（月額9ドル）",
       "trialReactivateCta": "再有効化",
       "trialLifecycleTitle": "Teacher Proトライアル残り{count}日",
@@ -14155,7 +14155,7 @@ const ja = {
       "freePlanName": "無料",
       "freeForever": "無料プラン、期限なし",
       "freeClasses": "最大{count}クラス",
-      "freeStudents": "クラスあたり最大{count}人",
+      "freeStudents": "各クラスの名簿に最大{count}人",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "拡大に必要なすべて",
       "popular": "一番人気",
@@ -14192,7 +14192,7 @@ const ja = {
         "included": "含む",
         "notIncluded": "含まない",
         "classes": "クラス数",
-        "studentsPerClass": "1クラスあたりの生徒数",
+        "studentsPerClass": "クラス名簿の人数",
         "customLists": "オリジナル単語リスト",
         "duels": "対戦デュエル",
         "noAds": "生徒には広告なし",
@@ -15955,8 +15955,8 @@ const ja = {
     },
     "landing": {
       "pro": {
-        "title": "プランは2つ。裏はありません。",
-        "subtitle": "最初の授業に必要なものはすべて無料です。Pro は上限を外すためのプラン。",
+        "title": "無料プランでゲームを。Teacher Proで学びの成果を。",
+        "subtitle": "1回のゲームのあとに、つまずいた生徒、もう一度教えたい単語、間違いから作る練習がわかります。",
         "comparisonAlt": "無料プランと Teacher Pro の比較",
         "freeTier": "無料",
         "perMonth": "/月",
@@ -15965,7 +15965,7 @@ const ja = {
         "noAds": "生徒には広告なし",
         "customLists": "自分だけの単語リスト",
         "duels": "リアルタイムの単語バトル",
-        "freeForever": "無料プランに期限はありません。カード登録も試用期限もありません。",
+        "freeForever": "無料プランに期限はなく、カードも不要です。",
         "proTier": "Teacher Pro",
         "everythingInFree": "無料プランの全機能",
         "classLimitPro": "クラス数は無制限",
@@ -20642,8 +20642,62 @@ const ja = {
       "optionsHide": "オプションを隠す",
       "retry": "もう一度試す"
     }
-  }
+  },
   // @eduShell:end
+  // @eduPlans:start
+  "eduPlans": {
+    "hero": {
+      "sub": "生徒はどのブラウザからでもコードで参加できます。生徒アカウントも広告もインストールも不要。ヘブライ語の右から左表示を含む{count}言語に対応しています。",
+      "studentLead": "生徒の方",
+      "studentJoin": "コードで参加",
+      "proLink": "Teacher Proは月{price}から"
+    },
+    "how": {
+      "title": "授業での使い方",
+      "createTitle": "クラスを作る",
+      "createBody": "名前と言語を決めるだけ。参加コードとQRコードがすぐに用意されます。",
+      "shareTitle": "生徒が参加する",
+      "shareBody": "スマホ、タブレット、Chromebookでコードを入力するだけ。アカウントもメールも不要です。",
+      "playTitle": "ライブで遊ぶ",
+      "playBody": "モードを選んで黒板に映せば、ラウンド終了と同時に結果がわかります。"
+    },
+    "modes": {
+      "title": "同じ単語リストで遊べる{count}つのモード",
+      "sub": "プロジェクターで遊ぶモードも、生徒のスマホで遊ぶモードもあります。どのモードも無料です。",
+      "moreLabel": "その他のモード"
+    },
+    "pro": {
+      "trialLine": "新しいアカウントは最初の{days}日間無料。いつでも解約できます。"
+    },
+    "cards": {
+      "schoolMonthly": "年払いで教員1人あたり月{monthly}から。月払いのTeacher Proより最大{save}%お得です。",
+      "liveCapNote": "どのプランでも、ライブゲームには同時に最大{players}人まで参加できます。"
+    },
+    "manage": {
+      "active": "利用中 · 月{price}",
+      "renews": "{date}に更新 · 月{price}",
+      "trialing": "無料体験：残り{days}日。解約しなければその後は月{price}です。",
+      "ends": "解約済み。{date}までProを使えます。",
+      "pastDue": "前回のお支払いが完了していません。Proを続けるには請求ページでカードを更新してください。",
+      "gifted": "{date}まで無償のPro",
+      "giftedOpen": "無償のPro",
+      "giftedNote": "お支払いも解約も不要です。期間が終わると自動で無料プランに戻ります。"
+    },
+    "reports": {
+      "title": "毎回のゲームのあとに、つまずいた生徒がわかる",
+      "body": "Proなら毎回のゲームがクラスのレポートになります。生徒ごとの正答率、もう一度教えたい単語、保護者や学年会に渡せる印刷用ページ。",
+      "trialCta": "Proを{days}日間無料で試す",
+      "buyCta": "Teacher Pro · 月{price}",
+      "trialFine": "{days}日間無料、その後は月{price}。いつでも解約できます。"
+    },
+    "cap": {
+      "used": "無料クラス{limit}つのうち{count}つを使用中",
+      "full": "無料クラス{limit}つをすべて使っています",
+      "label": "使用中の無料クラス",
+      "cta": "Proでクラス数無制限"
+    }
+  }
+  // @eduPlans:end
 };
 
 export { ja };

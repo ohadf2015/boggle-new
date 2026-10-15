@@ -32,6 +32,7 @@ import { TeacherPlanBadge } from '@/components/teacher/TeacherPlanBadge';
 import { ExportAllClassesButton } from '@/components/teacher/reports/ExportAllClassesButton';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { ProGate } from '@/components/teacher/ProGate';
+import { ReportsProTeaser } from '@/components/teacher/pro/ReportsProTeaser';
 import { trackEduReportsViewed } from '@/lib/education/telemetry';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
@@ -241,6 +242,7 @@ function TeacherReportsInner() {
         ) : (
           <ReportsNoClasses />
         )}
+        {classrooms && classrooms.length > 0 ? <ReportsProTeaser /> : null}
       </>
     );
   } else if (selectedStudentId) {

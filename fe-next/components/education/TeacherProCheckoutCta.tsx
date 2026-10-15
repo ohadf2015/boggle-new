@@ -118,10 +118,13 @@ export function TeacherProCheckoutCta({
   locale,
   className = '',
   copy,
+  variant = 'card',
 }: {
   locale: string;
   className?: string;
   copy?: TeacherProCheckoutCopy;
+  /** `inline` is just the button and note, for a Pro card that already says the rest. */
+  variant?: 'card' | 'inline';
 }): React.JSX.Element {
   const { t } = useLanguage();
   const raw = rawCopy(locale);
@@ -132,6 +135,20 @@ export function TeacherProCheckoutCta({
     return value && value !== key ? value : fill(raw[field], p);
   };
   const c = copy ?? { heading: tr('heading'), body: tr('body'), cta: tr('cta'), note: tr('note') };
+  if (variant === 'inline') {
+    return (
+      <div data-testid="teacher-pro-checkout-cta" className={className}>
+        <Link
+          href={`/${locale}${TEACHER_PRO_CHECKOUT_PATH}`}
+          data-testid="teacher-pro-checkout-link"
+          className="inline-flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-yellow px-4 text-center font-neo-display text-base font-black text-neo-navy shadow-hard-sm transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+        >
+          {c.cta}
+        </Link>
+        <p className="mt-2 text-center text-xs font-bold text-neo-white/70">{c.note}</p>
+      </div>
+    );
+  }
   return (
     <div
       data-testid="teacher-pro-checkout-cta"

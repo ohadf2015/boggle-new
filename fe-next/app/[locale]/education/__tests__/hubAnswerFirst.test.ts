@@ -24,7 +24,7 @@ describe('education hub GEO placement', () => {
   it('places the cite-able answer right under the hero and proof strip', () => {
     const hero = client.indexOf('<EducationHero');
     const answer = client.indexOf('<LandingHowItWorks geo={geo}');
-    const modes = client.indexOf('<SixModeTour');
+    const modes = client.indexOf('<LandingModes');
     expect(hero).toBeGreaterThan(-1);
     expect(answer).toBeGreaterThan(hero);
     expect(answer).toBeLessThan(modes);

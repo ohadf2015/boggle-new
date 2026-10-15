@@ -156,7 +156,7 @@ describe('Education Landing — redesign (WU-9)', () => {
      */
     it('shows the classroom setup steps to a visitor who has not signed up', () => {
       render(<EducationPageClient />);
-      for (const id of ['create', 'share', 'join', 'play', 'results']) {
+      for (const id of ['create', 'share', 'play']) {
         expect(screen.getByTestId(`onboarding-step-${id}`)).toBeInTheDocument();
       }
     });

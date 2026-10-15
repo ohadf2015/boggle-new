@@ -62,13 +62,13 @@ describe('education landing (p6)', () => {
     }
   });
 
-  it('hero has one primary CTA, one secondary, and the playable board instead of the CSS mock', () => {
+  it('hero has one primary CTA, the student join as its secondary, and the playable board instead of the CSS mock', () => {
     const src = read('components/education/EducationHero.tsx');
     expect(src).not.toMatch(/EducationModeMock/);
     expect(src).toMatch(/EducationLandingDemo/);
     expect(src.match(/data-testid="education-hero-free-cta"/g)).toHaveLength(1);
+    expect(src.match(/data-testid="education-hero-join-cta"/g)).toHaveLength(1);
     expect(src.match(/data-testid="education-hero-pro-cta"/g)).toHaveLength(1);
-    expect(src).not.toMatch(/education-hero-join-cta/);
     expect(src).not.toMatch(/education-hero-secondary-cta/);
   });
 

@@ -7,7 +7,7 @@ export function LandingFaq({ title, items }: { title: string; items: EducationFa
       <div className="mt-5 max-w-3xl divide-y-2 divide-neo-navy/15 overflow-hidden rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard">
         {items.map((item) => (
           <details key={item.question} className="group">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3.5 text-start font-bold text-neo-navy hover:bg-neo-white/60 [&::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 text-start text-sm font-bold text-neo-navy sm:py-3.5 sm:text-base hover:bg-neo-white/60 [&::-webkit-details-marker]:hidden">
               <span>{item.question}</span>
               <span aria-hidden className="shrink-0 text-xl font-black transition-transform duration-150 group-open:rotate-45 motion-reduce:transition-none">
                 +

@@ -50,7 +50,7 @@ vi.mock('@/components/education/EducationHero', () => ({
 }));
 
 vi.mock('@/components/education/ProFramingSection', () => ({
-  ProFramingSection: () => <div data-testid="pro-framing" />,
+  ProFramingSection: ({ cta }: { cta?: React.ReactNode }) => <div data-testid="pro-framing">{cta}</div>,
 }));
 
 vi.mock('@/components/education/SixModeTour', () => ({
@@ -134,9 +134,9 @@ describe('Education Landing — first-screen declutter (R1)', () => {
   });
 
   describe('teacher setup steps are visible pre-signup', () => {
-    it('shows all five onboarding steps for an unauthenticated user', () => {
+    it('shows the three setup steps to an unauthenticated user', () => {
       render(<EducationPageClient />);
-      for (const step of ['create', 'share', 'join', 'play', 'results']) {
+      for (const step of ['create', 'share', 'play']) {
         expect(screen.getByTestId(`onboarding-step-${step}`)).toBeInTheDocument();
       }
     });

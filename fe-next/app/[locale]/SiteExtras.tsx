@@ -6,8 +6,8 @@
  */
 
 import nextDynamic from 'next/dynamic';
-import AutoHideFooter from '@/components/AutoHideFooter';
-import GlobalBottomNav from '@/components/GlobalBottomNav';
+import SiteFooter from '@/components/navigation/SiteFooter';
+import PlayerBottomNav from '@/components/navigation/PlayerBottomNav';
 import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import NativePGSInitializer from '@/components/NativePGSInitializer';
@@ -45,8 +45,8 @@ export default function SiteExtras({ lang }: SiteExtrasProps) {
       <NativePGSInitializer />
       <OfflineBanner />
       <OfflineSyncBridge />
-      <AutoHideFooter className="relative z-0 shrink-0" />
-      <GlobalBottomNav />
+      <SiteFooter className="relative z-0 shrink-0" />
+      <PlayerBottomNav />
       <DeferredLayoutWidgets />
       <FeedbackDevtoolsWidget />
       <GoogleOneTapInitializer />

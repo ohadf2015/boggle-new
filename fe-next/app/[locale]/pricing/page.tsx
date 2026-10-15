@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
+import { hasSupabaseSessionCookie } from '@/lib/auth/hasSessionCookie';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { loadTranslation } from '@/translations/loadTranslation';
 import {
   buildTeacherProProductJsonLd,
   buildTeacherUpgradeFaqJsonLd,
 } from '@/lib/seo/teacherUpgradeJsonLd';
+import { buildUpgradeFaqEntries } from '@/lib/education/pro/upgradeFaq';
 import UpgradePricingPageClient from '../teacher/upgrade/PageClient';
 
 export const dynamic = 'force-dynamic';
@@ -29,14 +32,12 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
     ? (locale as SupportedLocale)
     : 'en';
   const t = (await loadTranslation(validLocale)) as Record<string, any>;
+  const hasSession = hasSupabaseSessionCookie((await cookies()).getAll().map((c) => c.name));
   const sub = (t?.teacher?.subscription ?? {}) as Record<string, string>;
   const seo = (t?.seo?.teacherUpgrade ?? {}) as Record<string, string>;
 
-  const faq = ['faqCancel', 'faqAutoRenew', 'faqDataLoss']
-    .map((key) => ({ question: sub[key], answer: sub[`${key}Answer`] }))
-    .filter((item): item is { question: string; answer: string } =>
-      Boolean(item.question && item.answer),
-    );
+  // Same entries UpgradeFaq renders on this page, so the FAQ JSON-LD matches what is visible.
+  const faq = buildUpgradeFaqEntries(t);
 
   const productSchema = buildTeacherProProductJsonLd(validLocale, {
     name: sub.proPlanName || 'Teacher Pro',
@@ -52,7 +53,7 @@ export default async function PricingPage({ params }: { params: Promise<{ locale
       {faqSchema && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       )}
-      <UpgradePricingPageClient />
+      <UpgradePricingPageClient hasSession={hasSession} />
     </>
   );
 }
