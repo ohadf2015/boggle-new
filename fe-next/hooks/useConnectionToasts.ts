@@ -26,6 +26,7 @@ export function useConnectionToasts() {
   const connectionError = socketContext?.connectionError ?? null;
   const previousConnectedRef = useRef<boolean | null>(null);
   const disconnectToastIdRef = useRef<string | null>(null);
+  const hasDroppedRef = useRef(false);
 
   useEffect(() => {
     // Skip initial mount
@@ -36,6 +37,7 @@ export function useConnectionToasts() {
 
     const wasConnected = previousConnectedRef.current;
     previousConnectedRef.current = isConnected;
+    if (wasConnected && !isConnected) hasDroppedRef.current = true;
 
     // Connection lost
     if (wasConnected && !isConnected && !isReconnecting) {
@@ -92,7 +94,7 @@ export function useConnectionToasts() {
     }
 
     // Reconnected
-    if (!wasConnected && isConnected) {
+    if (!wasConnected && isConnected && hasDroppedRef.current) {
       // Dismiss any existing toast
       if (disconnectToastIdRef.current) {
         toast.dismiss(disconnectToastIdRef.current);

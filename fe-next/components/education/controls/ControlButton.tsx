@@ -7,11 +7,10 @@ export type ControlTone = 'go' | 'time' | 'neutral' | 'danger' | 'armed';
 
 const TONE_CLASSES: Record<ControlTone, string> = {
   go: 'bg-neo-lime text-neo-black',
-  time: 'bg-neo-yellow text-neo-black',
-  neutral: 'bg-neo-cyan text-neo-black',
-  // Black, not white: white on neo-pink measures 3.64:1, under the 4.5:1 the
-  // contrast sweep enforces (flagged on the quiz projector, 1440x900).
-  danger: 'bg-neo-pink text-neo-black',
+  time: 'bg-neo-white text-neo-black',
+  neutral: 'bg-neo-white text-neo-black',
+  // Destructive-secondary: an outline until armed, so it never outweighs Pause.
+  danger: 'bg-neo-cream text-neo-black border-neo-red shadow-none lg:shadow-none [&_svg]:text-neo-red',
   // No `animate-pulse`: the app-wide pulse keyframes scale the box, so the
   // confirm tap would chase a moving target.
   armed: 'bg-neo-red text-neo-white ring-4 ring-neo-yellow',
@@ -57,7 +56,7 @@ function DrainBar({ ms, testId }: { ms: number; testId?: string }) {
 const FULL_SIZE = [
   'min-h-[56px] sm:min-h-[60px] lg:min-h-[72px] xl:min-h-[80px] tv:min-h-[92px]',
   'px-4 sm:px-5 lg:px-6 xl:px-8 tv:px-9',
-  'text-base sm:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl tv:text-4xl leading-none',
+  'text-base sm:text-lg lg:text-lg xl:text-xl 2xl:text-2xl tv:text-3xl leading-none',
   'gap-2 lg:gap-3 tv:gap-4',
 ].join(' ');
 
@@ -116,7 +115,7 @@ export function ControlButton({
       >
         {icon}
       </span>
-      <span className="line-clamp-2 min-w-0 text-balance text-center leading-[1.05] [overflow-wrap:anywhere]">{label}</span>
+      <span className="line-clamp-2 min-w-0 text-balance text-center leading-[1.05] [overflow-wrap:anywhere] lg:whitespace-nowrap">{label}</span>
       {drainMs ? <DrainBar ms={drainMs} testId={drainTestId} /> : null}
     </button>
   );

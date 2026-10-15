@@ -6,7 +6,8 @@
  * of PageClient (FOUNDATION 2026-09-26); the code moved verbatim.
  */
 import { useState, useCallback, useMemo, useEffect, useRef, useContext } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
 import { useClassroomLiveGame } from '@/hooks/useLiveClassroomGameInfo';
 import { useFollowedClassroomGame } from '@/components/student/live/useFollowedClassroomGame';
 import { useTeacherStripState } from '@/components/education/controls/useTeacherStripState';
@@ -27,6 +28,7 @@ import { useSeriesTracker } from '@/hooks/useSeriesTracker';
 import { usePlayerJoinLeaveNotifications } from '@/hooks/usePlayerJoinLeaveNotifications';
 import { useMultiplayerSounds } from '@/hooks/useMultiplayerSounds';
 import { useReloadRejoin } from '@/hooks/useReloadRejoin';
+import { useResultsSessionId, withResultsSessionId } from '@/hooks/useResultsSessionId';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { useGameActions, useGameStore, useGameActive, useShowStartAnimation } from '@/hooks/gameState';
@@ -47,8 +49,8 @@ import type { MpPhaseRouterProps } from './MpPhaseRouter';
 
 export function useMpPageState() {
   const searchParams = useSearchParams();
-  const isClassroomMode = searchParams?.get('classroom') === 'true';
-  const isClassroomHost = searchParams?.get('host') === 'true';
+  const pathname = usePathname();
+  const { isClassroomMode, isClassroomHost } = readClassroomLiveFlags(pathname, searchParams);
   const preselectedMode = searchParams?.get('mode') as GameMode | null;
   const autoCreate = searchParams?.get('autoCreate') === 'true';
   const quickPlay = searchParams?.get('quickPlay') === 'true';
@@ -294,6 +296,7 @@ export function useMpPageState() {
 
   // Sync ref bridge so hooks called before the room socket get the latest socket
   socketRef.current = socket;
+  const resultsSessionId = useResultsSessionId(socket);
 
   useReloadRejoin({ pending: reloadRejoinPending, socket, isConnected, isActive, onSettled: settleReloadRejoin });
 
@@ -349,7 +352,7 @@ export function useMpPageState() {
     isClassroomMode: classroomContext === 'classroom',
     classroomGameMode: liveClassroomGame?.gameMode,
     onExitToLobby: handleExitToLobby, onUsernameChange: setUsername,
-    resultsData, handleReturnToRoom, gameDuration, seriesTracker,
+    resultsData: withResultsSessionId(resultsData, resultsSessionId), handleReturnToRoom, gameDuration, seriesTracker,
     entry: {
       handleJoin, refreshRooms, activeRooms, roomsLoading,
       isJoining, isAuthenticated, autoCreate, quickPlay,

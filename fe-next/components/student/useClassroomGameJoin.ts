@@ -6,6 +6,7 @@ import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ActiveGame } from '@/hooks/useActiveClassroomGame';
 import { classifyClassroomJoinRefusal } from './classroomJoinRefusal';
+import { classroomLivePath } from '@/lib/education/classroomLivePath';
 
 /** Long enough for a slow phone on school wifi, short enough to not be a hang. */
 export const JOIN_TIMEOUT_MS = 12_000;
@@ -59,8 +60,7 @@ export function useClassroomGameJoin({ activeGame, socket, userId, username }: A
       if (data?.gameCode && data.gameCode !== gameCode) return;
       settle();
       setIsJoining(false);
-      // `room`, not `code` — nothing reads `?code=`.
-      router.push(`/${language}/multiplayer?room=${gameCode}&classroom=true`);
+      router.push(classroomLivePath(language, gameCode));
     };
 
     const onError = (data: { gameCode?: string; code?: string }) => {

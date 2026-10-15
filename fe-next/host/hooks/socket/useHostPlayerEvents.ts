@@ -213,8 +213,11 @@ export function useHostPlayerEvents({
     socket.on('playerReconnected', handlePlayerReconnected);
     socket.on('playerConnectionStatusChanged', handlePlayerConnectionStatusChanged);
     socket.on('playerLeft', handlePlayerLeft);
-    socket.on('xpGained', handleXpGained);
-    socket.on('levelUp', handleLevelUp);
+    // A broadcast host is the projector: the teacher's own XP must not toast over the class's screen.
+    if (hostPlaying) {
+      socket.on('xpGained', handleXpGained);
+      socket.on('levelUp', handleLevelUp);
+    }
 
     return () => {
       throttledApplyLeaderboard.cancel();

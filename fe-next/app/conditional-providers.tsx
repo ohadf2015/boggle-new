@@ -48,6 +48,7 @@ interface ConditionalProvidersProps {
 // Routes that need the full provider stack (Socket.IO, game state, etc.)
 const GAME_ROUTES = [
   '/multiplayer',
+  '/education/live',
   '/singleplayer',
   '/adventure',
   '/daily',

@@ -35,7 +35,7 @@ describe('signed-in invite join', () => {
   it('never sends a joined student to the bare hub', () => {
     expect(signedInJoinHref('en', { gameCode: null })).toBe('/en/student?class=open');
     expect(signedInJoinHref('en', { gameCode: 'ABC123' })).toBe(
-      '/en/multiplayer?room=ABC123&classroom=true'
+      '/en/education/live?room=ABC123'
     );
     expect(signedInJoinHref('en', { gameCode: null })).not.toBe('/en/student');
   });
@@ -106,7 +106,7 @@ describe('completeSignedInJoin', () => {
       join,
       capture,
     });
-    expect(href).toBe('/en/multiplayer?room=ABC123&classroom=true');
+    expect(href).toBe('/en/education/live?room=ABC123');
     expect(capture).toHaveBeenCalledTimes(1);
   });
 

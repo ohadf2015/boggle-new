@@ -63,7 +63,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
             {/* The address must carry the code. A bare "lexiclash.live" has no
                 game-code input anywhere on it, so a student who cannot scan the
                 QR had the code and nowhere to type it. */}
-            <p className={cn('text-neo-cream text-xl md:text-2xl lg:text-3xl font-black tracking-wide break-all', dense && 'md:medium-short:text-xl lg:whitespace-nowrap lg:break-normal lg:text-[clamp(1rem,1.45vw,1.875rem)]')}>
+            <p className={cn('text-neo-cream text-xl md:text-2xl lg:text-3xl font-black tracking-wide break-all', dense && 'md:medium-short:text-xl lg:whitespace-nowrap lg:break-normal lg:text-[clamp(1rem,1.15vw,1.875rem)]')}>
               {tvJoinAddress(baseUrl, language, gameCode)}
             </p>
           </div>

@@ -6,6 +6,7 @@
 const HEAVY_GAME_PREFIXES = [
   '/singleplayer',
   '/multiplayer',
+  '/education/live',
   '/adventure',
   '/daily',
   '/challenge',

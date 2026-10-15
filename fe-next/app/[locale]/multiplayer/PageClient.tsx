@@ -24,6 +24,7 @@ import { classroomStudentHomePath, CLASSROOM_ROOM_GONE_KEY } from '@/lib/educati
 import { useMpPageState } from './useMpPageState';
 import { MpPhaseRouter } from './MpPhaseRouter';
 import { MpExitProvider } from '@/hooks/useMpExit';
+import { useLegacyClassroomRedirect } from '@/components/education/live/useLegacyClassroomRedirect';
 
 export { VALID_MODES, applyMpPreselectMode } from './preselectMode';
 
@@ -68,6 +69,12 @@ const StudentWordBank = nextDynamic(
 );
 
 export default function MultiplayerPageClient(): React.JSX.Element {
+  const classroomTarget = useLegacyClassroomRedirect();
+  if (classroomTarget) return <div data-testid="mp-classroom-redirect" className="flex-1 bg-neo-navy" />;
+  return <MultiplayerPageFrame />;
+}
+
+function MultiplayerPageFrame(): React.JSX.Element {
   const {
     t, language, router, isClassroomHost, username, hostUsername, gameCode, prefilledRoomCode,
     isActive, isHost, showResults, gameActive, liveGameMode, playersInRoom, lessonDataState, liveClassroomGame,

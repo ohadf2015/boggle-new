@@ -20435,6 +20435,68 @@ const he = {
     "projector": "מקרן"
   }
   // @hqCalm:end
+  ,
+  // @eduLiveRoom:start
+  "eduLiveRoom": {
+    "round": {
+      "boardLabel": "הלוח של הכיתה"
+    },
+    "lobby": {
+      "brand": "כיתה",
+      "joinAt": "הצטרפו ב־",
+      "joined": "{count} הצטרפו",
+      "waitingTitle": "מחכים לתלמידים",
+      "waitingHint": "סרקו את הקוד או הקלידו אותו בכתובת שלמעלה",
+      "startBlocked": "אפשר להתחיל ברגע שתלמיד אחד מצטרף",
+      "copyLink": "העתקת קישור",
+      "minutes": "{count} דק׳",
+      "leave": "יציאה מהחדר",
+      "moreJoined": "ועוד {count}",
+      "readyCount": "{ready} מתוך {total} מוכנים"
+    },
+    "student": {
+      "youreIn": "אתם בפנים!",
+      "watchBoard": "תסתכלו על הלוח. המשחק יתחיל עוד רגע.",
+      "inClass": "{count} בכיתה",
+      "changeLook": "החלפת מראה",
+      "leave": "יציאה"
+    },
+    "entry": {
+      "connecting": "מתחברים לכיתה…",
+      "openingRoom": "פותחים את החדר…",
+      "waitingTeacher": "המשחק עוד לא נפתח",
+      "waitingTeacherHint": "נשארים כאן. תיכנסו ברגע שזה מתחיל.",
+      "noRoomTitle": "אין כאן משחק",
+      "noRoomStudent": "בקשו מהמורה את הקוד ואז הצטרפו.",
+      "noRoomHost": "התחילו משחק מדף הבית של המורה.",
+      "enterCode": "הקלדת קוד",
+      "toTeacher": "חזרה לדף המורה"
+    },
+    "hostResults": {
+      "noScoresHint": "אותו לוח, התחלה חדשה. עוד סיבוב והכיתה מנסה שוב.",
+      "title": "תוצאות הסיבוב",
+      "statStudents": "תלמידים",
+      "statWords": "מילים שנמצאו",
+      "statAvg": "ציון ממוצע",
+      "statLesson": "מילים מהשיעור",
+      "playAgain": "עוד סיבוב",
+      "nextMode": "למשחק הבא",
+      "viewReport": "לדוח",
+      "endGame": "סיום המשחק",
+      "noScores": "אף אחד לא צבר נקודות בסיבוב הזה"
+    },
+    "studentResults": {
+      "placed": "המקום שלך",
+      "rankOf": "#{rank} מתוך {total}",
+      "points": "נקודות",
+      "yourWords": "המילים שלך",
+      "noWords": "לא נמצאו מילים הפעם. בפעם הבאה!",
+      "nextRound": "עיניים ללוח לקראת הסיבוב הבא",
+      "leave": "יציאה",
+      "calculating": "סופרים את המילים…"
+    }
+  }
+  // @eduLiveRoom:end
 };
 
 export { he };

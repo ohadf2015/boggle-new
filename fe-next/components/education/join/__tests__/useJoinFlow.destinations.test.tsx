@@ -49,7 +49,7 @@ describe('useJoinFlow destinations', () => {
 
   it('a join that resolves to a live game walks into that room with classroom context', async () => {
     await submitWith({ success: true, gameCode: CODE, classroomId: 'c1' });
-    expect(pushMock).toHaveBeenCalledWith(`/en/multiplayer?room=${CODE}&classroom=true`);
+    expect(pushMock).toHaveBeenCalledWith(`/en/education/live?room=${CODE}`);
   });
 
   it('a join that resolves to no game leaves for the class view (?class=open) and keeps the fallback CTA state', async () => {

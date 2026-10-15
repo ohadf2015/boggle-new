@@ -105,7 +105,7 @@ export function useMultiplayerSession(
       // A teacher-launched classroom room arrives as `?classroom=true`; the
       // legacy lesson deeplink used `?fromLesson=true`. Gating on fromLesson
       // alone silently dropped every classroom game's vocabulary and mode.
-      const fromLesson = shouldLoadLessonData(window.location.search);
+      const fromLesson = shouldLoadLessonData(window.location.search, window.location.pathname);
       logger.log(
         '[Init] URL search:',
         window.location.search,

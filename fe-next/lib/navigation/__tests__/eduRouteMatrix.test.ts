@@ -140,7 +140,7 @@ describe.each(LOCALES)('education route matrix, locale=%s', (locale) => {
   describe('join', () => {
     it('success with a live game code walks into the room with classroom context', () => {
       const href = joinSuccessHref(locale, 'ABC123');
-      expect(href).toBe(`${at('multiplayer')}?room=ABC123&classroom=true`);
+      expect(href).toBe(`${at('education/live')}?room=ABC123`);
     });
 
     it('success without a game code lands on the class view on the student hub', () => {

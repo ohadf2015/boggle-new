@@ -20517,6 +20517,68 @@ const es = {
     "projector": "Proyector"
   }
   // @hqCalm:end
+  ,
+  // @eduLiveRoom:start
+  "eduLiveRoom": {
+    "round": {
+      "boardLabel": "Tablero de la clase"
+    },
+    "lobby": {
+      "brand": "Clase",
+      "joinAt": "Únete en",
+      "joined": "{count} dentro",
+      "waitingTitle": "Esperando a los alumnos",
+      "waitingHint": "Escanea el QR o escribe el código en la dirección de arriba",
+      "startBlocked": "Podrás empezar en cuanto entre un alumno",
+      "copyLink": "Copiar enlace",
+      "minutes": "{count} min",
+      "leave": "Salir de la sala",
+      "moreJoined": "+{count} más",
+      "readyCount": "{ready} de {total} listos"
+    },
+    "student": {
+      "youreIn": "¡Ya estás dentro!",
+      "watchBoard": "Mira la pantalla. Tu profe empieza el juego.",
+      "inClass": "{count} en clase",
+      "changeLook": "Cambiar look",
+      "leave": "Salir"
+    },
+    "entry": {
+      "connecting": "Conectando con tu clase…",
+      "openingRoom": "Abriendo tu sala…",
+      "waitingTeacher": "Tu profe todavía no ha abierto el juego",
+      "waitingTeacherHint": "Quédate aquí. Entrarás en cuanto empiece.",
+      "noRoomTitle": "Aquí no hay ningún juego",
+      "noRoomStudent": "Pídele el código a tu profe y únete.",
+      "noRoomHost": "Empieza un juego desde tu inicio de profe.",
+      "enterCode": "Escribir un código",
+      "toTeacher": "Volver al inicio de profe"
+    },
+    "hostResults": {
+      "noScoresHint": "Mismo tablero, nuevo intento. Juega otra vez y la clase lo vuelve a probar.",
+      "title": "Resultados de la ronda",
+      "statStudents": "Alumnos",
+      "statWords": "Palabras encontradas",
+      "statAvg": "Puntuación media",
+      "statLesson": "Palabras de la lección",
+      "playAgain": "Jugar otra vez",
+      "nextMode": "Siguiente modo",
+      "viewReport": "Ver informe",
+      "endGame": "Terminar juego",
+      "noScores": "Nadie ha puntuado en esta ronda"
+    },
+    "studentResults": {
+      "placed": "Tu puesto",
+      "rankOf": "#{rank} de {total}",
+      "points": "puntos",
+      "yourWords": "Tus palabras",
+      "noWords": "Esta vez sin palabras. ¡A la próxima!",
+      "nextRound": "Atento a la pantalla para la próxima ronda",
+      "leave": "Salir",
+      "calculating": "Contando las palabras…"
+    }
+  }
+  // @eduLiveRoom:end
 };
 
 export { es };

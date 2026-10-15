@@ -20201,6 +20201,68 @@ const ru = {
     "projector": "Проектор"
   }
   // @hqCalm:end
+  ,
+  // @eduLiveRoom:start
+  "eduLiveRoom": {
+    "round": {
+      "boardLabel": "Поле класса"
+    },
+    "lobby": {
+      "brand": "Класс",
+      "joinAt": "Заходите на",
+      "joined": "Присоединились: {count}",
+      "waitingTitle": "Ждём учеников",
+      "waitingHint": "Отсканируйте QR или введите код на сайте выше",
+      "startBlocked": "Начать можно, когда зайдёт хотя бы один ученик",
+      "copyLink": "Скопировать ссылку",
+      "minutes": "{count} мин",
+      "leave": "Выйти из комнаты",
+      "moreJoined": "ещё {count}",
+      "readyCount": "Готовы {ready} из {total}"
+    },
+    "student": {
+      "youreIn": "Ты в игре!",
+      "watchBoard": "Смотри на экран. Учитель запустит игру.",
+      "inClass": "В классе: {count}",
+      "changeLook": "Сменить образ",
+      "leave": "Выйти"
+    },
+    "entry": {
+      "connecting": "Подключаемся к классу…",
+      "openingRoom": "Открываем комнату…",
+      "waitingTeacher": "Учитель ещё не открыл игру",
+      "waitingTeacherHint": "Оставайся здесь — зайдёшь, как только она начнётся.",
+      "noRoomTitle": "Здесь нет игры",
+      "noRoomStudent": "Спроси код у учителя и заходи.",
+      "noRoomHost": "Запустите игру со страницы учителя.",
+      "enterCode": "Ввести код",
+      "toTeacher": "На страницу учителя"
+    },
+    "hostResults": {
+      "noScoresHint": "То же поле, новый старт. Сыграйте ещё раз — у класса будет вторая попытка.",
+      "title": "Итоги раунда",
+      "statStudents": "Ученики",
+      "statWords": "Найдено слов",
+      "statAvg": "Средний балл",
+      "statLesson": "Слова урока",
+      "playAgain": "Сыграть ещё",
+      "nextMode": "Следующий режим",
+      "viewReport": "Открыть отчёт",
+      "endGame": "Завершить игру",
+      "noScores": "В этом раунде никто не набрал очков"
+    },
+    "studentResults": {
+      "placed": "Твоё место",
+      "rankOf": "{rank}-е из {total}",
+      "points": "очков",
+      "yourWords": "Твои слова",
+      "noWords": "В этот раз без слов. В следующий раз получится!",
+      "nextRound": "Следи за экраном — скоро новый раунд",
+      "leave": "Выйти",
+      "calculating": "Считаем слова…"
+    }
+  }
+  // @eduLiveRoom:end
 };
 
 export { ru };

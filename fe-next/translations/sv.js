@@ -20505,6 +20505,68 @@ const sv = {
     "projector": "Projektor"
   }
   // @hqCalm:end
+  ,
+  // @eduLiveRoom:start
+  "eduLiveRoom": {
+    "round": {
+      "boardLabel": "Klassens bräde"
+    },
+    "lobby": {
+      "brand": "Klass",
+      "joinAt": "Gå med på",
+      "joined": "{count} med",
+      "waitingTitle": "Väntar på elever",
+      "waitingHint": "Skanna QR-koden eller skriv koden på adressen ovan",
+      "startBlocked": "Start går att trycka på när en elev är med",
+      "copyLink": "Kopiera länk",
+      "minutes": "{count} min",
+      "leave": "Lämna rummet",
+      "moreJoined": "+{count} till",
+      "readyCount": "{ready} av {total} redo"
+    },
+    "student": {
+      "youreIn": "Du är med!",
+      "watchBoard": "Titta på tavlan. Läraren startar spelet.",
+      "inClass": "{count} i klassen",
+      "changeLook": "Byt utseende",
+      "leave": "Lämna"
+    },
+    "entry": {
+      "connecting": "Ansluter till klassen…",
+      "openingRoom": "Öppnar ditt rum…",
+      "waitingTeacher": "Läraren har inte öppnat spelet än",
+      "waitingTeacherHint": "Stanna kvar. Du kommer in så fort det börjar.",
+      "noRoomTitle": "Inget spel här",
+      "noRoomStudent": "Be läraren om koden och gå med.",
+      "noRoomHost": "Starta ett spel från lärarstarten.",
+      "enterCode": "Skriv en kod",
+      "toTeacher": "Tillbaka till lärarstarten"
+    },
+    "hostResults": {
+      "noScoresHint": "Samma bräde, ny start. Spela igen så får klassen ett nytt försök.",
+      "title": "Rundans resultat",
+      "statStudents": "Elever",
+      "statWords": "Hittade ord",
+      "statAvg": "Snittpoäng",
+      "statLesson": "Lektionsord",
+      "playAgain": "Spela igen",
+      "nextMode": "Nästa läge",
+      "viewReport": "Visa rapport",
+      "endGame": "Avsluta spelet",
+      "noScores": "Ingen fick poäng den här rundan"
+    },
+    "studentResults": {
+      "placed": "Din placering",
+      "rankOf": "#{rank} av {total}",
+      "points": "poäng",
+      "yourWords": "Dina ord",
+      "noWords": "Inga ord den här gången. Nästa gång!",
+      "nextRound": "Håll koll på tavlan inför nästa runda",
+      "leave": "Lämna",
+      "calculating": "Räknar orden…"
+    }
+  }
+  // @eduLiveRoom:end
 };
 
 export { sv };

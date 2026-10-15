@@ -95,6 +95,32 @@ export interface MpPhaseRouterProps {
   classroomLive: HostViewProps['classroomLive'];
 }
 
+/** The results screen's props, shared by /multiplayer and the edu live route so both read one shape. */
+export function buildMpResultsProps({
+  gameCode, username, isHost, socket, roomLanguage, isClassroomMode, classroomGameMode,
+  onExitToLobby, resultsData, handleReturnToRoom, gameDuration, seriesTracker,
+}: Pick<MpPhaseRouterProps, 'gameCode' | 'username' | 'isHost' | 'socket' | 'roomLanguage' | 'isClassroomMode' | 'classroomGameMode' | 'onExitToLobby' | 'resultsData' | 'handleReturnToRoom' | 'gameDuration' | 'seriesTracker'>): MpResultsScreenProps {
+  return {
+    finalScores: resultsData?.scores ?? null, gameCode,
+    onReturnToRoom: handleReturnToRoom, onExitToLobby, username, socket,
+    duplicateRuleDisabled: resultsData?.duplicateRuleDisabled,
+    playerCount: resultsData?.playerCount,
+    gameSessionId: resultsData?.gameSessionId, isHost,
+    roomLanguage: roomLanguage ?? undefined,
+    gridSize: Array.isArray(resultsData?.letterGrid) && resultsData.letterGrid.length > 0 ? resultsData.letterGrid.length : 4,
+    gameDuration, seriesStandings: seriesTracker.standings,
+    seriesRoundNumber: seriesTracker.roundNumber,
+    seriesTotalGames: seriesTracker.totalGames,
+    seriesLeader: seriesTracker.seriesLeader,
+    onResetSeries: seriesTracker.reset,
+    wordHuntSummary: resultsData?.wordHuntSummary,
+    blastSummary: resultsData?.blastSummary,
+    wheelRushSummary: resultsData?.wheelRushSummary,
+    classroomSummary: resultsData?.classroomSummary,
+    classroomNextMode: isClassroomMode ? classroomGameMode ?? null : null,
+  } as MpResultsScreenProps;
+}
+
 export function MpPhaseRouter({
   phase, gameCode, username, isHost, socket, roomLanguage, isClassroomMode, classroomGameMode,
   onExitToLobby, onUsernameChange, resultsData, handleReturnToRoom, gameDuration, seriesTracker, entry,
@@ -102,25 +128,10 @@ export function MpPhaseRouter({
   quickPlay, classroomLive,
 }: MpPhaseRouterProps): React.JSX.Element {
   if (phase === 'results') {
-    const results: MpResultsScreenProps = {
-      finalScores: resultsData?.scores ?? null, gameCode,
-      onReturnToRoom: handleReturnToRoom, onExitToLobby, username, socket,
-      duplicateRuleDisabled: resultsData?.duplicateRuleDisabled,
-      playerCount: resultsData?.playerCount,
-      gameSessionId: resultsData?.gameSessionId, isHost,
-      roomLanguage: roomLanguage ?? undefined,
-      gridSize: Array.isArray(resultsData?.letterGrid) && resultsData.letterGrid.length > 0 ? resultsData.letterGrid.length : 4,
-      gameDuration, seriesStandings: seriesTracker.standings,
-      seriesRoundNumber: seriesTracker.roundNumber,
-      seriesTotalGames: seriesTracker.totalGames,
-      seriesLeader: seriesTracker.seriesLeader,
-      onResetSeries: seriesTracker.reset,
-      wordHuntSummary: resultsData?.wordHuntSummary,
-      blastSummary: resultsData?.blastSummary,
-      wheelRushSummary: resultsData?.wheelRushSummary,
-      classroomSummary: resultsData?.classroomSummary,
-      classroomNextMode: isClassroomMode ? classroomGameMode ?? null : null,
-    } as MpResultsScreenProps;
+    const results = buildMpResultsProps({
+      gameCode, username, isHost, socket, roomLanguage, isClassroomMode, classroomGameMode,
+      onExitToLobby, resultsData, handleReturnToRoom, gameDuration, seriesTracker,
+    });
     return (
       <FeatureErrorBoundary featureName="Results">
         <MpResultsScreen {...results} />
