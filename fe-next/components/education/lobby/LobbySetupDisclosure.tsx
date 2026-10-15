@@ -87,7 +87,7 @@ export function LobbySetupDisclosure({
           {summary}
         </span>
         <span className="shrink-0 font-neo-display text-[0.65rem] font-black uppercase tracking-wide">
-          {t(open ? 'education.modePicker.settingsHide' : 'education.modePicker.settings')}
+          {t(open ? 'eduShell.host.optionsHide' : 'eduShell.host.options')}
         </span>
         {open ? (
           <ChevronUp className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />

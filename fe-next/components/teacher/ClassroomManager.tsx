@@ -35,6 +35,8 @@ import {
   teacherProUpgradeCtaLabel,
 } from '@/components/education/TeacherProCheckoutCta';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { stagger, slideUp } from './teacherDashboardTabs';
 
 // Re-exported for the existing contract test; the map itself is shared with the
@@ -54,6 +56,7 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false, he
   const isRTL = language === 'he';
   const { classrooms, isLoading, createClassroom, updateClassroom, deleteClassroom } =
     useClassrooms();
+  const router = useRouter();
   const { trial, isLoading: accessLoading } = useTeacherAccess();
   const { hasPro, loading: proLoading } = useTeacherPro();
 
@@ -235,6 +238,11 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false, he
    * show nothing — an eager modal could fire on a paying teacher.
    */
   const openCreateDialog = () => {
+    // The Classes tab hands creation to the 2-step setup route (it owns the cap and trial asks).
+    if (richCards) {
+      router.push(`/${language}/teacher/classroom/new`);
+      return;
+    }
     if (!accessLoading && !proLoading && !hasPro && trial?.isExpired) {
       setIsTrialUpsellOpen(true);
       return;
@@ -380,7 +388,7 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false, he
                   ) : undefined
                 }
                 startGameHref={
-                  richCards ? `/${language}/teacher?classroomId=${classroom.id}` : undefined
+                  richCards ? teacherHostHref(language, { classroomId: classroom.id }) : undefined
                 }
               />
             ))}

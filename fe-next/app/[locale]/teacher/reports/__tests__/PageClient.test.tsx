@@ -156,6 +156,18 @@ vi.mock('@/lib/education/telemetry', () => ({
 }));
 
 describe('ReportsPageClient', () => {
+  describe('A teacher with one class', () => {
+    const all = [...mockClassrooms];
+    beforeEach(() => mockClassrooms.splice(1));
+    afterEach(() => mockClassrooms.splice(0, mockClassrooms.length, ...all));
+
+    it('Given one class, Then the report opens on it instead of asking to pick', () => {
+      render(<ReportsPageClient />);
+      expect(screen.queryByText('Select a Classroom')).not.toBeInTheDocument();
+      expect(screen.getByTestId('class-progress-report')).toHaveAttribute('data-classroom-id', 'classroom-1');
+    });
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockSearchParams.delete('studentId');

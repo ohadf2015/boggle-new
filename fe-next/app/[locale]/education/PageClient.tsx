@@ -18,7 +18,7 @@ import { isTeacherProfile } from '@/lib/education/teacherRole';
 
 /**
  * Teacher landing. Order: playable board → how a class runs → modes → price → proof → school quote → FAQ → close.
- * Approved teachers go to the live lobby; everyone else sees the page, including signed-in
+ * Approved teachers go to Teacher Home; everyone else sees the page, including signed-in
  * accounts without teacher access (every profile starts as `student`, so redirecting them
  * bounced players and fresh teacher signups to the student hub).
  */
@@ -32,7 +32,7 @@ export function PageClient({ geo, faq }: { geo?: GeoAnswer; faq?: ReactNode }) {
 
   useEffect(() => {
     if (hasTeacherAccess) {
-      router.replace(`/${language}/education/classroom-game`);
+      router.replace(`/${language}/teacher`);
     }
   }, [hasTeacherAccess, language, router]);
 

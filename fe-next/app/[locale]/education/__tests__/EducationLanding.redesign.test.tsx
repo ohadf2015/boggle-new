@@ -105,7 +105,7 @@ describe('Education Landing — redesign (WU-9)', () => {
 
     it('sends the teacher to the live lobby instead of a start-game button on the catalog', () => {
       render(<EducationPageClient />);
-      expect(mockReplace).toHaveBeenCalledWith('/en/education/classroom-game');
+      expect(mockReplace).toHaveBeenCalledWith('/en/teacher');
       expect(screen.queryByText('education.landing.startGame')).not.toBeInTheDocument();
     });
 

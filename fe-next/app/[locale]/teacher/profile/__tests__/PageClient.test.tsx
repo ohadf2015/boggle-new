@@ -94,11 +94,9 @@ describe('TeacherProfilePageClient', () => {
     expect(screen.getByTestId('teacher-profile-page')).toBeInTheDocument();
   });
 
-  test('uses EducationHeader with showBackButton', () => {
+  test('mounts no page header of its own: the teacher shell owns the chrome', () => {
     render(<TeacherProfilePageClient />);
-    const header = screen.getByTestId('education-header');
-    expect(header).toBeInTheDocument();
-    expect(header).toHaveAttribute('data-show-back', 'true');
+    expect(screen.queryByTestId('education-header')).not.toBeInTheDocument();
   });
 
   test('shows teacher display name', () => {

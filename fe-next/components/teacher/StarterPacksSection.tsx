@@ -9,6 +9,8 @@ import type { LessonWord } from '@/types/education';
 
 interface StarterPacksSectionProps {
   onSelectPack: (pack: { name: string; description: string; language: string; words: LessonWord[] }) => void;
+  /** The class's language: offer its packs first (all packs when it has none). */
+  language?: string;
 }
 
 const categoryIcons = {
@@ -85,7 +87,12 @@ function PackCard({
   );
 }
 
-export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPack }) => {
+export function packsForLanguage(language: string | undefined): readonly StarterLessonPack[] {
+  const matching = STARTER_LESSON_PACKS.filter((pack) => pack.language === language);
+  return matching.length > 0 ? matching : STARTER_LESSON_PACKS;
+}
+
+export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPack, language }) => {
   const { t } = useLanguage();
 
   const handleSelect = useCallback(
@@ -111,7 +118,7 @@ export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPac
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {STARTER_LESSON_PACKS.map((pack) => (
+        {packsForLanguage(language).map((pack) => (
           <PackCard
             key={pack.nameKey}
             pack={pack}

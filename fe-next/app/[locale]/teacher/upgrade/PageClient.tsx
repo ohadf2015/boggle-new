@@ -9,7 +9,6 @@ import { ShieldCheck, Lock, Smile, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import { EducationHeader } from '@/components/education/EducationHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { cn } from '@/lib/utils';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
@@ -244,7 +243,6 @@ export default function UpgradePricingPageClient() {
   return (
     <EducationShell
       data-testid="education-shell"
-      header={<EducationHeader showBackButton />}
       contentClassName={cn('w-full px-4 lg:px-6', isRTL && 'rtl')}
       footer={
         <div

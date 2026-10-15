@@ -21,6 +21,7 @@ import {
   readQuickLaunchIntent,
 } from '@/components/teacher/dashboard/quickLaunchIntent';
 import { CEFR_LEVELS, type CefrLevel } from '@/lib/education/eslCefrDemo';
+import { parseHostMinutes, parseHostMode } from '@/lib/education/teacherHostHref';
 import { cn } from '@/lib/utils';
 import type { LiveSurfacePreviewKind } from './LiveSurfacePreview';
 
@@ -69,6 +70,9 @@ function ClassroomGameInner() {
   const cefrLevel = (CEFR_LEVELS as readonly string[]).includes(cefrParam)
     ? (cefrParam as CefrLevel)
     : undefined;
+  // `?mode=` / `?minutes=` from Teacher Home and the onboarding demo; junk values are ignored.
+  const initialMode = parseHostMode(searchParams?.get('mode')) ?? undefined;
+  const initialMinutes = parseHostMinutes(searchParams?.get('minutes')) ?? undefined;
 
   // 'quickLaunch' — the dashboard's one-tap PLAY NOW. The intent is read ONCE,
   // at mount, so a reload (or a second tab, or a five-minute-old intent) falls
@@ -154,6 +158,8 @@ function ClassroomGameInner() {
             initialClassroomId={classroomIdParam || undefined}
             initialFlow={flow}
             cefrLevel={cefrLevel}
+            initialMode={initialMode}
+            initialMinutes={initialMinutes}
             onBack={handleBack}
           />
         )}

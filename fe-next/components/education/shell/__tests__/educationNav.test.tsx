@@ -42,26 +42,22 @@ describe('resolveEducationNav', () => {
   it('gives the teacher area its own tab set, with the dashboard active', () => {
     const nav = resolveEducationNav('/en/teacher');
     expect(nav?.kind).toBe('teacher');
-    expect(nav?.activeKey).toBe('play');
+    expect(nav?.activeKey).toBe('home');
   });
 
   it('keeps a deep teacher route inside the teacher tabs', () => {
     expect(resolveEducationNav('/he/teacher/reports')?.activeKey).toBe('reports');
-    expect(resolveEducationNav('/en/teacher/curriculum')?.activeKey).toBe('lessons');
-    expect(resolveEducationNav('/en/teacher/profile')?.activeKey).toBe('me');
+    expect(resolveEducationNav('/en/teacher/curriculum')?.activeKey).toBe('library');
+    // Profile lives in the avatar menu, so no tab claims it.
+    expect(resolveEducationNav('/en/teacher/profile')?.activeKey).toBeNull();
     expect(resolveEducationNav('/en/teacher/classroom')?.activeKey).toBe('classes');
   });
 
-  it('lists the teacher tabs as Play, Classes, Lessons, Reports, Me, in order', () => {
+  it('lists the teacher tabs as Home, Classes, Library, Reports, in order', () => {
     const nav = resolveEducationNav('/en/teacher');
-    expect(nav?.items.map((item) => item.key)).toEqual([
-      'play',
-      'classes',
-      'lessons',
-      'reports',
-      'me',
-    ]);
-    // Second position, per the addendum's "Play · Classes · Lessons · Reports · Me".
+    expect(nav?.items.map((item) => item.key)).toEqual(['home', 'classes', 'library', 'reports']);
+    expect(nav?.items[0].href).toBe('/en/teacher');
+    expect(nav?.items[2].href).toBe('/en/teacher/curriculum');
     const classes = nav?.items[1];
     expect(classes?.key).toBe('classes');
     expect(classes?.href).toBe('/en/teacher/classroom');
@@ -73,6 +69,13 @@ describe('resolveEducationNav', () => {
     const nav = resolveEducationNav('/en/teacher/classroom/abc-123/analytics');
     expect(nav?.kind).toBe('teacher');
     expect(nav?.items.length).toBeGreaterThan(0);
+  });
+
+  it('gives the teacher nav Pro and Profile links outside the tab row', () => {
+    const nav = resolveEducationNav('/he/teacher/reports');
+    expect(nav?.proHref).toBe('/he/teacher/upgrade');
+    expect(nav?.profileHref).toBe('/he/teacher/profile');
+    expect(nav?.items.some((item) => item.key === 'pro' || item.key === 'me')).toBe(false);
   });
 
   it('gives the student area a different tab set', () => {
@@ -126,7 +129,7 @@ describe('<EducationNav>', () => {
 
   it('marks the active tab with a tinted lime outline — never the hero CTA’s solid lime slab', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="tabs" />);
-    const active = getByTestId('education-tab-play');
+    const active = getByTestId('education-tab-home');
     const inactive = getByTestId('education-tab-reports');
 
     expect(active.getAttribute('aria-current')).toBe('page');
@@ -191,9 +194,45 @@ describe('EducationNav — the lg handover', () => {
 
   it('keeps every sidebar label painted (no tablet icon-rail hide)', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
-    const label = getByTestId('education-side-play').querySelector('[data-testid="education-side-label-play"]');
+    const label = getByTestId('education-side-home').querySelector('[data-testid="education-side-label-home"]');
     expect(label).not.toBeNull();
     expect(label!.className).toContain('truncate');
     expect(label!.className).not.toMatch(/hidden/);
+  });
+});
+
+describe('EducationNav — teacher sidebar extras', () => {
+  const t = (k: string) => k;
+
+  it('pins a gold Pro link to the bottom of the teacher sidebar', () => {
+    const nav = resolveEducationNav('/en/teacher/classroom')!;
+    const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
+    const pro = getByTestId('education-side-pro');
+    expect(pro.getAttribute('href')).toBe('/en/teacher/upgrade');
+    expect(pro.className).toContain('text-neo-yellow');
+    expect(pro.textContent).toContain('eduShell.nav.pro');
+  });
+
+  it('never shows the Pro link to students', () => {
+    const nav = resolveEducationNav('/en/student')!;
+    const { queryByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
+    expect(queryByTestId('education-side-pro')).toBeNull();
+  });
+
+  it('renders the brand and account slots inside the sidebar', () => {
+    const nav = resolveEducationNav('/en/teacher')!;
+    const { getByTestId } = render(
+      <EducationNav nav={nav} t={t} variant="sidebar" brand={<span data-testid="b" />} account={<span data-testid="acct" />} />,
+    );
+    const side = getByTestId('education-sidebar');
+    expect(side.contains(getByTestId('b'))).toBe(true);
+    expect(side.contains(getByTestId('acct'))).toBe(true);
+  });
+
+  it('keeps the phone tab bar to the four destinations (Pro lives in the avatar menu)', () => {
+    const nav = resolveEducationNav('/en/teacher')!;
+    const { getByTestId, queryByTestId } = render(<EducationNav nav={nav} t={t} variant="tabs" />);
+    expect(getByTestId('education-tabbar').querySelectorAll('a')).toHaveLength(4);
+    expect(queryByTestId('education-side-pro')).toBeNull();
   });
 });

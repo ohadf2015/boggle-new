@@ -17,7 +17,6 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
-import { EducationHeader } from '@/components/education/EducationHeader';
 import ClassroomManager from '@/components/teacher/ClassroomManager';
 import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
 
@@ -52,7 +51,6 @@ function ClassesShell({ children }: { children: React.ReactNode }) {
   return (
     <EducationShell
       className={TEACHER_TV_SCALE}
-      header={<EducationHeader showBackButton />}
       scrollRegionLabel={t('teacher.nav.classes')}
       contentClassName="relative p-4 sm:p-6 lg:px-8 lg:py-5 [@media(orientation:landscape)_and_(max-height:500px)]:px-3 [@media(orientation:landscape)_and_(max-height:500px)]:py-2"
     >

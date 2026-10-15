@@ -11,7 +11,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { TeacherLibrary } from '@/components/teacher/lesson-creation/library/TeacherLibrary';
 import { EducationShell } from '@/components/education/shell/EducationShell';
-import { EducationHeader } from '@/components/education/EducationHeader';
 import type { LibraryLesson } from '@/lib/education/libraryTypes';
 import logger from '@/utils/logger';
 
@@ -57,7 +56,6 @@ function CurriculumShell({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   return (
     <EducationShell
-      header={<EducationHeader showBackButton />}
       scrollRegionLabel={t('teacher.nav.lessons')}
       contentClassName="p-4 sm:p-6 lg:p-8"
     >

@@ -21,6 +21,8 @@ export type ModeBestFor =
   | 'independent'
   | 'mixedLevels'
   | 'teamwork';
+/** Where a mode is played: the class screen, students' phones, or either. */
+export type ModeDelivery = 'projector' | 'phones' | 'both';
 export type ModePreviewKind = 'quiz' | 'board' | 'blast' | 'hunt' | 'wheel' | 'craft' | 'boss';
 
 export interface CatalogueMode {
@@ -33,6 +35,7 @@ export interface CatalogueMode {
   teamsCapable: boolean;
   bestFor: readonly [ModeBestFor, ModeBestFor];
   preview: ModePreviewKind;
+  delivery: ModeDelivery;
   /** camelCase tail of the steps block (and of the name/how keys for an engine mode). */
   suffix: string;
   nameKey: string;
@@ -44,13 +47,13 @@ export interface CatalogueMode {
 type Row = Omit<CatalogueMode, 'suffix' | 'poster' | 'accent' | 'launch' | 'nameKey' | 'howKey'>;
 
 const ROWS: readonly Row[] = [
-  { id: 'vocab-quiz', category: 'meaning', complexity: 'simple', style: 'ffa', teamsCapable: false, bestFor: ['meanings', 'testPrep'], preview: 'quiz' },
-  { id: BOSS_BATTLE_ID, category: 'board', complexity: 'simple', style: 'class', teamsCapable: false, bestFor: ['teamwork', 'review'], preview: 'boss' },
-  { id: 'wordcraft', category: 'meaning', complexity: 'tricky', style: 'solo', teamsCapable: false, bestFor: ['lessonWords', 'independent'], preview: 'craft' },
-  { id: 'classic', category: 'board', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['spelling', 'mixedLevels'], preview: 'board' },
-  { id: 'blast', category: 'board', complexity: 'simple', style: 'ffa', teamsCapable: true, bestFor: ['energy', 'warmup'], preview: 'blast' },
-  { id: 'word-hunt', category: 'board', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['focus', 'spelling'], preview: 'hunt' },
-  { id: 'wheel-rush', category: 'board', complexity: 'simple', style: 'ffa', teamsCapable: true, bestFor: ['warmup', 'review'], preview: 'wheel' },
+  { id: 'vocab-quiz', category: 'meaning', complexity: 'simple', style: 'ffa', teamsCapable: false, bestFor: ['meanings', 'testPrep'], preview: 'quiz', delivery: 'projector' },
+  { id: BOSS_BATTLE_ID, category: 'board', complexity: 'simple', style: 'class', teamsCapable: false, bestFor: ['teamwork', 'review'], preview: 'boss', delivery: 'projector' },
+  { id: 'wordcraft', category: 'meaning', complexity: 'tricky', style: 'solo', teamsCapable: false, bestFor: ['lessonWords', 'independent'], preview: 'craft', delivery: 'phones' },
+  { id: 'classic', category: 'board', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['spelling', 'mixedLevels'], preview: 'board', delivery: 'both' },
+  { id: 'blast', category: 'board', complexity: 'simple', style: 'ffa', teamsCapable: true, bestFor: ['energy', 'warmup'], preview: 'blast', delivery: 'phones' },
+  { id: 'word-hunt', category: 'board', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['focus', 'spelling'], preview: 'hunt', delivery: 'phones' },
+  { id: 'wheel-rush', category: 'board', complexity: 'simple', style: 'ffa', teamsCapable: true, bestFor: ['warmup', 'review'], preview: 'wheel', delivery: 'both' },
 ];
 
 export const BOSS_POSTER = '/images/bosses/boss-lexicon-dragon.png';
@@ -64,6 +67,13 @@ const MODES: readonly CatalogueMode[] = ROWS.flatMap((row): CatalogueMode[] => {
   if (!base) return [];
   return [{ ...row, launch, suffix: base.nameKeySuffix, nameKey: base.nameKey, howKey: base.howKey, poster: base.poster, accent: base.accent }];
 });
+
+/** Teacher Home's three featured modes, in display order. */
+export const FEATURED_HOME_MODES: readonly ClassroomCatalogueId[] = ['wheel-rush', 'word-hunt', 'classic'];
+
+export function deliveryKey(delivery: ModeDelivery): string {
+  return `eduShell.delivery.${delivery}`;
+}
 
 export function catalogueModes(): readonly CatalogueMode[] {
   return MODES;

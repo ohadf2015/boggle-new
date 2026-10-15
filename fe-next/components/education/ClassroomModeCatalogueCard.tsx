@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { Check, Clock, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ModeAccent } from '@/lib/education/gameModes';
@@ -18,6 +19,8 @@ export interface ClassroomModeCatalogueCardProps {
   name: string;
   minutesLabel: string;
   recommendedLabel: string | null;
+  /** Where the mode is played (Projector / On phones / Both). */
+  deliveryTag?: ReactNode;
   selected: boolean;
   busy?: boolean;
   onPick: (id: CatalogueMode['id']) => void;
@@ -28,6 +31,7 @@ export function ClassroomModeCatalogueCard({
   name,
   minutesLabel,
   recommendedLabel,
+  deliveryTag,
   selected,
   busy,
   onPick,
@@ -97,6 +101,7 @@ export function ClassroomModeCatalogueCard({
         <Clock className="size-3 shrink-0" strokeWidth={3} aria-hidden="true" />
         {minutesLabel}
       </span>
+      {deliveryTag ? <span className="flex justify-center">{deliveryTag}</span> : null}
     </button>
   );
 }

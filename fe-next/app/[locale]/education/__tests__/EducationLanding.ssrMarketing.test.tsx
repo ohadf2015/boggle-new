@@ -102,7 +102,7 @@ describe('Education Landing — marketing body renders before auth resolves', ()
     });
     render(<EducationPageClient />);
     expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
-    expect(mockReplace).toHaveBeenCalledWith('/en/education/classroom-game');
+    expect(mockReplace).toHaveBeenCalledWith('/en/teacher');
     expect(screen.queryByTestId('auth-dashboard-shortcut')).not.toBeInTheDocument();
   });
 });
