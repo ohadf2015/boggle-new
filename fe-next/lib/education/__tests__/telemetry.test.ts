@@ -414,6 +414,7 @@ describe('education telemetry', () => {
       expect(captureMock).toHaveBeenCalledWith('teacher_digest_viewed', {
         has_pro: true,
         trial_day_7: true,
+        trial_expired: false,
         students_active: 4,
       });
     });

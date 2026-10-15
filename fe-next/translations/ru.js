@@ -13281,6 +13281,8 @@ const ru = {
       "weeklyWow": "Неделя к неделе",
       "weeklyDay7Cta": "Оставить Teacher Pro — {{price}}/мес",
       "weeklyDay7Hint": "7-й день пробного Teacher Pro. Сохраните отчёты и безлимитные классы.",
+      "weeklyExpiryCta": "Вернуть Teacher Pro — {{price}}/мес",
+      "weeklyExpiryHint": "Пробный Teacher Pro закончился. Сохраните отчёты этой недели и безлимитные классы.",
       "weeklyRegionLabel": "Недельный прогресс для {{classroom}}",
       "weeklyLoading": "Загружаем прогресс за неделю…",
       "weeklyLoadError": "Не удалось загрузить прогресс за неделю.",

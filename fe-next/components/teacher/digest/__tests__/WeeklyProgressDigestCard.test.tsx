@@ -12,6 +12,7 @@ const proState = {
   hasPro: true,
   loading: false,
   trialExpires: '2026-10-20T12:00:00.000Z',
+  trialUsed: false,
 };
 vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => proState,
@@ -64,6 +65,7 @@ describe('WeeklyProgressDigestCard', () => {
     vi.clearAllMocks();
     proState.hasPro = true;
     proState.loading = false;
+    proState.trialUsed = false;
     metricsMock.mockReturnValue({
       metrics: week(),
       isLoading: false,
@@ -100,9 +102,30 @@ describe('WeeklyProgressDigestCard', () => {
     expect(trackDigest).toHaveBeenCalledWith({
       hasPro: true,
       trialDay7: true,
+      trialExpired: false,
       studentsActive: 4,
     });
     const cta = screen.getByTestId('weekly-progress-digest-pro-link');
     expect(cta).toHaveAttribute('href', '/en/teacher/upgrade');
+  });
+
+  it('shows the expiry conversion CTA after Polar trial lapsed', () => {
+    proState.hasPro = false;
+    proState.trialUsed = true;
+    render(
+      <WeeklyProgressDigestCard
+        classroomId="c1"
+        classroomName="Year 7"
+        assignmentExpected={10}
+        assignmentSubmitted={3}
+      />,
+    );
+    expect(screen.getByTestId('weekly-progress-digest-expiry-cta')).toBeInTheDocument();
+    expect(trackDigest).toHaveBeenCalledWith({
+      hasPro: false,
+      trialDay7: true,
+      trialExpired: true,
+      studentsActive: 4,
+    });
   });
 });

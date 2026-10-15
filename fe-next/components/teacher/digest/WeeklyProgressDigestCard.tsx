@@ -15,6 +15,7 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useWeeklyProgressDigest } from '@/hooks/useWeeklyProgressDigest';
 import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
 import { formatWowDelta, isPolarTrialDay7 } from '@/lib/education/weeklyProgressDigest';
+import { isPolarTrialExpiryConversion } from '@/lib/education/polarTrialExpiryJourney';
 import { trackTeacherDigestViewed } from '@/lib/education/telemetry';
 import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProCheckoutCta';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
@@ -37,7 +38,7 @@ export function WeeklyProgressDigestCard({
   assignmentSubmitted,
 }: WeeklyProgressDigestCardProps) {
   const { t, language } = useLanguage();
-  const { hasPro, loading: proLoading, trialExpires } = useTeacherPro();
+  const { hasPro, loading: proLoading, trialExpires, trialUsed } = useTeacherPro();
   const expected = assignmentExpected ?? 0;
   const datedCompletions = useMemo(() => [] as string[], []);
   const { metrics, isLoading, error, refresh } = useWeeklyProgressDigest(
@@ -50,6 +51,7 @@ export function WeeklyProgressDigestCard({
   const [now] = useState(() => Date.now());
   const daysLeft = polarTrialDaysLeft(trialExpires, now);
   const trialDay7 = isPolarTrialDay7(daysLeft);
+  const trialExpired = isPolarTrialExpiryConversion(hasPro, trialUsed === true);
   const week = metrics?.thisWeek;
   const wow = metrics?.wow;
 
@@ -58,9 +60,10 @@ export function WeeklyProgressDigestCard({
     trackTeacherDigestViewed({
       hasPro,
       trialDay7,
+      trialExpired,
       studentsActive: week.studentsActive,
     });
-  }, [isLoading, proLoading, hasPro, trialDay7, week]);
+  }, [isLoading, proLoading, hasPro, trialDay7, trialExpired, week]);
 
   const assignmentPct =
     week && week.assignmentExpected > 0
@@ -136,18 +139,22 @@ export function WeeklyProgressDigestCard({
         </>
       )}
 
-      {!proLoading && trialDay7 && (
+      {!proLoading && (trialExpired || trialDay7) && (
         <div
-          data-testid="weekly-progress-digest-day7-cta"
+          data-testid={trialExpired ? 'weekly-progress-digest-expiry-cta' : 'weekly-progress-digest-day7-cta'}
           className="rounded-neo border-neo border-neo-lime bg-neo-navy-light p-5 text-center shadow-hard"
         >
-          <p className="mb-3 text-sm font-bold text-neo-white/85">{t('teacher.digest.weeklyDay7Hint')}</p>
+          <p className="mb-3 text-sm font-bold text-neo-white/85">
+            {t(trialExpired ? 'teacher.digest.weeklyExpiryHint' : 'teacher.digest.weeklyDay7Hint')}
+          </p>
           <Link
             href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
             data-testid="weekly-progress-digest-pro-link"
             className="inline-flex min-h-11 items-center rounded-neo border-neo bg-neo-cyan px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg"
           >
-            {t('teacher.digest.weeklyDay7Cta', { price: `$${TEACHER_PRO_PRICE_USD}` })}
+            {t(trialExpired ? 'teacher.digest.weeklyExpiryCta' : 'teacher.digest.weeklyDay7Cta', {
+              price: `$${TEACHER_PRO_PRICE_USD}`,
+            })}
           </Link>
         </div>
       )}

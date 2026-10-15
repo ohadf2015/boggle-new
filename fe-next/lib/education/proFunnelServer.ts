@@ -125,6 +125,15 @@ export function buildPolarTrialDay10SentEvent(userId: string, daysLeft: number):
   };
 }
 
+/** Polar trial t-0 / t+3 conversion email actually sent. */
+export function buildPolarTrialExpirySentEvent(userId: string, bucket: 't-0' | 't+3'): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'teacher_polar_trial_expiry_sent',
+    properties: { ...BASE, bucket },
+  };
+}
+
 /** Measurable gate step: teacher access request row durably created. */
 export function buildEduAccessRequestCreatedEvent(
   userId: string,

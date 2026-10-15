@@ -403,10 +403,12 @@ export function trackTeacherDigestViewed(args: {
   hasPro: boolean;
   trialDay7: boolean;
   studentsActive: number;
+  trialExpired?: boolean;
 }): void {
   safeCapture('teacher_digest_viewed', {
     has_pro: args.hasPro,
     trial_day_7: args.trialDay7,
+    trial_expired: args.trialExpired === true,
     students_active: args.studentsActive,
   });
 }
