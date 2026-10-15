@@ -133,8 +133,19 @@ const sv = {
         "odds": {
           "label": "Chanser i kistan"
         },
-        "continue": "Fortsätt",
-        "tapToOpen": "Tryck för att öppna"
+        "continue": "Hämta",
+        "tapToOpen": "Tryck för att öppna",
+        "headline": {
+          "common": "Vanlig kista!",
+          "rare": "Sällsynt kista!",
+          "epic": "Episk kista!"
+        },
+        "chip": {
+          "label": "Det här fick du",
+          "cash": "pengar den här rundan",
+          "xp": "XP",
+          "item": "Ny grej"
+        }
       },
       "reward": {
         "title": "Rundans belöning",
@@ -172,7 +183,11 @@ const sv = {
         }
       },
       "goal": {
-        "save": "Spara {missing} till för {name}",
+        "save": {
+          "hintReveal": "Tjäna {missing} pengar till nästa runda så kan du köpa en ledtråd (ett ords första bokstav)",
+          "doubleCash": "Tjäna {missing} pengar till nästa runda så kan du köpa dubbla pengar i 30 sekunder",
+          "streakShield": "Tjäna {missing} pengar till nästa runda så kan du köpa en sköld för din serie"
+        },
         "ready": "Du kan köpa {name} nu"
       },
       "hud": {

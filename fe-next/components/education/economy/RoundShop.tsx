@@ -5,6 +5,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomEconomy } from './useClassroomEconomy';
 import PowerUpShop from './PowerUpShop';
 import ShopGoalLine from './ShopGoalLine';
+import { canBuyBetweenRounds } from './shopGoal';
+import { cn } from '@/lib/utils';
 
 /**
  * Between-round shop. The results card always shows the shell and a big spend
@@ -17,6 +19,7 @@ export default function RoundShop({ gameCode }: { gameCode: string }) {
   const [open, setOpen] = useState(false);
   const snapshot = econ.snapshot;
   const shop = snapshot?.config.powerUps ? snapshot : null;
+  const canBuy = shop ? canBuyBetweenRounds(shop) : false;
 
   return (
     <>
@@ -33,7 +36,13 @@ export default function RoundShop({ gameCode }: { gameCode: string }) {
             type="button"
             data-testid="round-shop-open"
             onClick={() => setOpen(true)}
-            className="min-h-14 w-full rounded-xl border-4 border-black bg-neo-lime px-3 text-lg font-black text-neo-navy shadow-[4px_4px_0_0_#000] active:translate-x-0.5 active:translate-y-0.5"
+            disabled={!canBuy}
+            className={cn(
+              'min-h-14 w-full rounded-xl border-4 px-3 text-lg font-black transition-transform duration-150 ease-out',
+              canBuy
+                ? 'border-black bg-neo-lime text-neo-navy shadow-[4px_4px_0_0_#000] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:scale-[0.97]'
+                : 'cursor-not-allowed border-white/20 bg-white/5 text-white/50'
+            )}
           >
             {t('economy.shop.open', { cash: shop.cash })}
           </button>

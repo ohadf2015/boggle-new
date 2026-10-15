@@ -29,10 +29,11 @@ afterEach(() => cleanup());
 const reveal = { gameCode: 'ABC', roundId: 'r1', rarity: 'epic' as const, xp: 60, itemId: 'eyes:starEye', roundCash: 42, rank: 2, size: 5 };
 
 describe('RewardChest collect moment', () => {
-  it('Given the reveal, Then the part name is headline size and the XP is large', () => {
+  it('Given the reveal, Then the rarity headline leads and the part and XP each get a reward card', () => {
     render(<RewardChest reveal={reveal} onClose={() => {}} wearing={DEFAULT_AVATAR_CONFIG} />);
-    expect(screen.getByText('revealUnlock.parts.starEye').className).toContain('text-3xl');
-    expect(screen.getByText('economy.chest.xp:60').className).toContain('text-2xl');
+    expect(screen.getByRole('heading', { name: 'economy.chest.headline.epic' }).className).toContain('text-[clamp(2.5rem');
+    expect(screen.getByText('revealUnlock.parts.starEye').closest('li')).toBeTruthy();
+    expect(screen.getByText('+60').closest('li')?.textContent).toContain('economy.chest.chip.xp');
   });
 
   it('Given the reveal, Then the student avatar wears the part and the part shows its category and tier', () => {
@@ -47,9 +48,9 @@ describe('RewardChest collect moment', () => {
     expect(screen.getByText('cosmetics.items.tileNeon')).toBeTruthy();
   });
 
-  it('Given the reveal, Then the round cash and placing show under the item', () => {
+  it('Given the reveal, Then the round cash has its own card and the placing shows under the cards', () => {
     render(<RewardChest reveal={reveal} onClose={() => {}} wearing={DEFAULT_AVATAR_CONFIG} />);
-    expect(screen.getByText('economy.reward.round:42')).toBeTruthy();
+    expect(screen.getByText('+42').closest('li')?.textContent).toContain('economy.chest.chip.cash');
     expect(screen.getByText('economy.reward.rank:2,5')).toBeTruthy();
     expect(screen.getByText('economy.locker.added')).toBeTruthy();
   });

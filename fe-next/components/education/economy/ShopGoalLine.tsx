@@ -13,7 +13,7 @@ export default function ShopGoalLine({ cash }: { cash: number }) {
   return (
     <div data-testid="shop-goal" className="flex flex-col gap-1">
       <p className="text-base font-bold">
-        {goal.kind === 'save' ? t('economy.goal.save', { name, missing: goal.missing }) : t('economy.goal.ready', { name })}
+        {goal.kind === 'save' ? t(`economy.goal.save.${goal.id}`, { missing: goal.missing }) : t('economy.goal.ready', { name })}
       </p>
       <div
         role="progressbar"

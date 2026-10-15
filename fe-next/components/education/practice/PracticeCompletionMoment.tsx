@@ -31,7 +31,7 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 import { ArrowRight, RotateCcw, Star, X, Zap } from 'lucide-react';
 import { practiceCelebrationPlan, coinBurstCount } from '@/lib/education/practiceJuice';
-import XpCoinFlight from './XpCoinFlight';
+import CoinFlight from '@/components/education/rewards/CoinFlight';
 import { usePracticeCelebration } from './PracticeCelebrationContext';
 
 export interface CompletionStat {
@@ -292,7 +292,7 @@ export default function PracticeCompletionMoment({
       </div>
 
       {coinsFlying > 0 && (
-        <XpCoinFlight count={coinsFlying} originRef={xpChipRef} onLanded={handleCoinsLanded} />
+        <CoinFlight count={coinsFlying} fromRef={xpChipRef} toSelector="[data-xp-flight-target]" size={22} onDone={handleCoinsLanded} />
       )}
     </div>
   );

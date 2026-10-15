@@ -133,8 +133,19 @@ const en = {
         "odds": {
           "label": "Chest odds"
         },
-        "continue": "Continue",
-        "tapToOpen": "Tap to open"
+        "continue": "Collect",
+        "tapToOpen": "Tap to open",
+        "headline": {
+          "common": "Common chest!",
+          "rare": "Rare chest!",
+          "epic": "Epic chest!"
+        },
+        "chip": {
+          "label": "What you got",
+          "cash": "cash this round",
+          "xp": "XP",
+          "item": "New item"
+        }
       },
       "reward": {
         "title": "Round reward",
@@ -172,7 +183,11 @@ const en = {
         }
       },
       "goal": {
-        "save": "Save {missing} more for {name}",
+        "save": {
+          "hintReveal": "Earn {missing} more cash next round to buy a hint (shows a word's first letter)",
+          "doubleCash": "Earn {missing} more cash next round to buy double cash for 30 seconds",
+          "streakShield": "Earn {missing} more cash next round to buy a shield for your streak"
+        },
         "ready": "{name} is yours to buy"
       },
       "hud": {

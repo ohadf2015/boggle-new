@@ -133,8 +133,19 @@ const he = {
         "odds": {
           "label": "סיכויי הארגז"
         },
-        "continue": "המשך",
-        "tapToOpen": "הקש לפתיחה"
+        "continue": "לאסוף",
+        "tapToOpen": "הקש לפתיחה",
+        "headline": {
+          "common": "ארגז נפוץ!",
+          "rare": "ארגז נדיר!",
+          "epic": "ארגז אפי!"
+        },
+        "chip": {
+          "label": "מה קיבלת",
+          "cash": "כסף בסבב הזה",
+          "xp": "XP",
+          "item": "פריט חדש"
+        }
       },
       "reward": {
         "title": "פרס הסבב",
@@ -172,7 +183,11 @@ const he = {
         }
       },
       "goal": {
-        "save": "עוד {missing} לחסוך עבור {name}",
+        "save": {
+          "hintReveal": "עוד {missing} כסף בסבב הבא, ואפשר לקנות רמז (האות הראשונה של מילה)",
+          "doubleCash": "עוד {missing} כסף בסבב הבא, ואפשר לקנות כסף כפול ל-30 שניות",
+          "streakShield": "עוד {missing} כסף בסבב הבא, ואפשר לקנות מגן שישמור על הרצף"
+        },
         "ready": "אפשר לקנות את {name}"
       },
       "hud": {

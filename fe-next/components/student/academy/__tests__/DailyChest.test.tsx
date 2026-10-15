@@ -49,4 +49,12 @@ describe('<DailyChest>', () => {
     await screen.findByText('academy.student.chestFailed');
     expect(canOpenChest('u2', new Date())).toBe(true);
   });
+  it('shows the XP on the same reward card the round chest uses', async () => {
+    render(<DailyChest userId="u4" reducedMotion onGranted={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('academy-daily-chest'));
+    const list = await screen.findByRole('list', { name: 'academy.student.chestTitle' });
+    const card = list.querySelector('li');
+    expect(card?.textContent).toContain('economy.chest.chip.xp');
+    expect(card?.className).toContain('shadow-[4px_4px_0_0_#000]');
+  });
 });

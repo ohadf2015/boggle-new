@@ -101,7 +101,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
       data-testid="xp-progress-wrapper"
       /*
         The landing pad for the XP coins that fly off a finished practice round.
-        XpCoinFlight looks this node up by attribute rather than being handed a
+        CoinFlight looks this node up by attribute rather than being handed a
         ref, because the bar lives in a fixed header several components away
         from the score card — and falls back to the top of the viewport if the
         bar is not mounted, so a payout is never silently dropped.

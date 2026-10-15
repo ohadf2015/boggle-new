@@ -1,22 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
+import { Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { hapticGameWin } from '@/utils/haptics';
-import { COSMETICS } from '@/lib/cosmetics';
-import { cn } from '@/lib/utils';
-import AvatarRenderer from '@/components/avatar/AvatarRenderer';
-import { RARITY_TOKENS } from '@/lib/avatar/rarity';
-import { REVEAL_CATEGORY_KEY, applyUnlockToConfig, revealPartNameKey } from '@/lib/avatar/revealTrigger';
-import { chestPartUnlock } from '@/backend/modules/classroomEconomyPool';
+import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import { CHEST_RARITIES, type ClassroomChestReveal } from '@/shared/constants/classroomEconomy';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { chestArtSrc, chestSrcForPhase, nextChestPhase, oddsLabel, rarityTone, type ChestPhase } from './chestPhase';
-
-const CONFETTI_COLORS = ['#c6f432', '#ff5fa2', '#38e1ff', '#ffd23f', '#ffffff'];
-const CONFETTI = Array.from({ length: 36 }, (_, i) => i);
-const BURST = Array.from({ length: 18 }, (_, i) => i);
+import RewardChipRow from '@/components/education/rewards/RewardChipRow';
+import CoinFlight from '@/components/education/rewards/CoinFlight';
+import ChestStage from './ChestStage';
+import { useChestChips } from './chestChips';
+import { chestCoinCount, chestHeadlineKey, chestRays, nextChestPhase, oddsLabel, tapChestPhase, type ChestPhase } from './chestPhase';
 
 interface RewardChestProps {
   reveal: ClassroomChestReveal;
@@ -25,159 +22,121 @@ interface RewardChestProps {
   onClose: () => void;
 }
 
+const SHAKE_MS = 600;
+const BURST_MS = 700;
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
 /**
- * Full-screen collect moment. Dark-only: hardcoded navy, and only the chest
- * element animates so a phone never repaints a large layer. Reduced motion
- * shows the reveal at once.
+ * Full-screen collect moment. Dark-only (hardcoded navy). Tap the chest, it
+ * shakes, bursts, and pays out; a tap anywhere skips straight to the payout.
+ * The sound and haptic fire once, at the burst, however the student gets there.
  */
 export default function RewardChest({ reveal, wearing, onClose }: RewardChestProps) {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
+  const { playChestOpenSound, playCoinCascadeSound } = useSoundEffects();
   const reduced = useReducedMotion() ?? false;
   const [phase, setPhase] = useState<ChestPhase>(reduced ? 'revealed' : 'sealed');
-  const tone = rarityTone(reveal.rarity);
-  const unlock = chestPartUnlock(reveal.itemId);
-  const legacyName = unlock ? undefined : COSMETICS.find((c) => c.id === reveal.itemId)?.name;
+  const [skipped, setSkipped] = useState(false);
+  const cued = useRef(false);
+  const chestRef = useRef<HTMLDivElement>(null);
+  const chips = useChestChips(reveal, wearing);
+  const rays = chestRays(reveal.rarity);
+  useOverlayQuietZoneClaim(true, 'reward-chest');
 
-  const advance = (to: ChestPhase) => {
-    setPhase(to);
-    if (to === 'revealed') hapticGameWin();
+  useEffect(() => {
+    if (phase !== 'shaking' && phase !== 'bursting') return undefined;
+    const id = setTimeout(() => setPhase(nextChestPhase(phase, reduced)), phase === 'shaking' ? SHAKE_MS : BURST_MS);
+    return () => clearTimeout(id);
+  }, [phase, reduced]);
+
+  useEffect(() => {
+    if (cued.current || (phase !== 'bursting' && phase !== 'revealed')) return;
+    cued.current = true;
+    playChestOpenSound?.();
+    hapticGameWin();
+  }, [phase, playChestOpenSound]);
+
+  const tap = () => {
+    if (phase === 'revealed') return;
+    if (phase !== 'sealed') setSkipped(true);
+    setPhase(tapChestPhase(phase, reduced));
   };
-  const open = () => advance(nextChestPhase(phase, reduced));
+
+  const revealed = phase === 'revealed';
+  const coins = revealed && !reduced && !skipped ? chestCoinCount(reveal.roundCash) : 0;
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-label={t('economy.chest.title')}
-      className="fixed inset-0 z-[100] flex flex-col items-center gap-4 overflow-y-auto bg-neo-navy px-5 py-6 text-white"
+      dir={dir}
+      onClick={tap}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape' && revealed) onClose();
+      }}
+      className="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden bg-neo-navy text-white"
     >
-      <h2 className="text-center text-3xl font-bold tracking-wide">{t('economy.chest.title')}</h2>
-
-      <div className="relative flex min-h-[280px] w-full max-w-[min(88vw,380px)] flex-1 items-center justify-center">
-        <div aria-hidden="true" className={cn('absolute left-1/2 top-1/2 h-[80%] w-[80%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl', phase === 'revealed' ? tone.glow : 'bg-white/10')} />
-
-        {phase !== 'revealed' && (
-          <m.button
-            type="button"
-            onClick={phase === 'sealed' ? open : undefined}
-            aria-label={t('economy.chest.open')}
-            className="relative flex h-[min(72vw,320px)] w-[min(72vw,320px)] items-center justify-center"
-            animate={
-              phase === 'shaking'
-                ? { rotate: [0, -8, 8, -8, 8, 0] }
-                : phase === 'bursting'
-                  ? { scale: [1, 1.18, 1.05], opacity: 1 }
-                  : { rotate: 0 }
-            }
-            transition={{ duration: 0.5 }}
-            onAnimationComplete={() => {
-              if (phase === 'shaking') advance('bursting');
-              if (phase === 'bursting') advance('revealed');
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized chest art; the optimizer would re-encode it */}
-            <img src={chestSrcForPhase(phase, reveal.rarity)} alt="" className="h-full w-full object-contain drop-shadow-[6px_6px_0_#000]" />
-          </m.button>
+      <div className="mx-auto flex min-h-full w-full max-w-md flex-col items-center gap-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]">
+        {!revealed && (
+          <h2 className="pt-2 text-center font-neo-display text-3xl font-black uppercase tracking-wide" style={{ textShadow: '3px 3px 0 #000' }}>
+            {t('economy.chest.title')}
+          </h2>
         )}
 
-        {phase === 'bursting' && !reduced &&
-          BURST.map((i) => (
-            <m.span
-              key={i}
-              aria-hidden="true"
-              className={cn('absolute left-1/2 top-1/2 h-3 w-3 rounded-full', tone.glow)}
-              style={{ background: CONFETTI_COLORS[i % CONFETTI_COLORS.length] }}
-              initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-              animate={{
-                x: Math.cos((i / BURST.length) * Math.PI * 2) * (120 + (i % 3) * 22),
-                y: Math.sin((i / BURST.length) * Math.PI * 2) * (120 + (i % 3) * 22),
-                opacity: 0,
-                scale: 0.4,
-              }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-            />
-          ))}
+        <ChestStage ref={chestRef} phase={phase} rarity={reveal.rarity} onTap={tap} openLabel={t('economy.chest.open')} />
 
         {phase === 'sealed' && (
-          <p className="absolute bottom-0 text-lg font-bold text-neo-lime">{t('economy.chest.tapToOpen')}</p>
+          <p className="rounded-full border-[3px] border-black bg-neo-lime px-5 py-1.5 font-neo-display text-lg font-black uppercase text-neo-navy shadow-[3px_3px_0_0_#000]">
+            {t('economy.chest.tapToOpen')}
+          </p>
         )}
 
-        {phase === 'revealed' && (
-          <m.div
-            initial={reduced ? false : { scale: 0.4, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 240, damping: 14 }}
-            className="relative flex flex-col items-center gap-2 text-center"
-            data-testid="chest-reveal"
-          >
-            {unlock ? (
-              <>
-                <div className="h-[min(52vw,200px)] w-[min(52vw,200px)]">
-                  <AvatarRenderer config={applyUnlockToConfig(wearing, unlock)} size={200} />
-                </div>
-                <span className="text-3xl font-bold leading-tight">{t(revealPartNameKey(unlock))}</span>
-                <span className="text-base text-white/90">{t(REVEAL_CATEGORY_KEY[unlock.category])}</span>
-                <span className={cn('rounded-md border-2 bg-black/40 px-3 py-0.5 text-sm font-bold uppercase tracking-wider', RARITY_TOKENS[unlock.rarity].text, RARITY_TOKENS[unlock.rarity].border)}>
-                  {t(RARITY_TOKENS[unlock.rarity].labelKey)}
-                </span>
-              </>
-            ) : (
-              <>
-                {/* eslint-disable-next-line @next/next/no-img-element -- pre-sized chest art; the optimizer would re-encode it */}
-                <img src={chestArtSrc(reveal.rarity, true)} alt="" className="h-[min(52vw,200px)] w-auto object-contain drop-shadow-[6px_6px_0_#000]" />
-                {legacyName && <span className="text-3xl font-bold leading-tight">{t(legacyName)}</span>}
-                <span className={cn('rounded-full border-2 bg-black/40 px-4 py-1 text-base font-bold uppercase tracking-wider', tone.text, tone.ring)}>
-                  {t(`economy.chest.rarity.${reveal.rarity}`)}
-                </span>
-              </>
-            )}
-            <span className="text-2xl font-bold text-neo-lime">{t('economy.chest.xp', { xp: reveal.xp })}</span>
-            <span className="text-lg text-white/90">{t('economy.reward.round', { cash: reveal.roundCash })}</span>
+        {revealed && (
+          <div data-testid="chest-reveal" className="relative flex w-full flex-col items-center gap-3">
+            <m.h2
+              initial={reduced ? false : { opacity: 0, y: 16, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.3, ease: EASE_OUT }}
+              className="text-balance text-center font-neo-display text-[clamp(2.5rem,13vw,4rem)] font-black uppercase leading-[0.95]"
+              style={{ color: rays.hex, textShadow: '4px 4px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000' }}
+            >
+              {t(chestHeadlineKey(reveal.rarity))}
+            </m.h2>
+            <RewardChipRow label={t('economy.chest.chip.label')} chips={chips} reduced={reduced} delay={0.1} />
             {reveal.rank !== null && (
-              <span className="text-lg text-white/90">{t('economy.reward.rank', { rank: reveal.rank, size: reveal.size })}</span>
+              <p className="inline-flex items-center gap-2 rounded-full border-2 border-white/25 bg-white/10 px-4 py-1.5 text-base font-bold">
+                <Trophy aria-hidden="true" className="h-5 w-5 text-neo-yellow" />
+                {t('economy.reward.rank', { rank: reveal.rank, size: reveal.size })}
+              </p>
             )}
-            <span className="mt-1 text-base font-bold text-neo-cyan">{t('economy.locker.added')}</span>
-          </m.div>
+            <p className="text-sm font-bold text-neo-cyan">{t('economy.locker.added')}</p>
+            <button
+              type="button"
+              autoFocus
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="min-h-14 w-full rounded-2xl border-[3px] border-black bg-neo-lime px-8 font-neo-display text-2xl font-black text-neo-navy shadow-[4px_4px_0_0_#000] transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white active:scale-[0.97]"
+            >
+              {t('economy.chest.continue')}
+            </button>
+          </div>
         )}
 
-        {phase === 'revealed' && !reduced &&
-          CONFETTI.map((i) => (
-            <m.span
-              key={i}
-              aria-hidden="true"
-              className="absolute left-1/2 top-1/2 h-3 w-2 rounded-sm"
-              style={{ background: CONFETTI_COLORS[i % CONFETTI_COLORS.length] }}
-              initial={{ x: 0, y: 0, opacity: 1, rotate: 0 }}
-              animate={{
-                x: Math.cos((i / CONFETTI.length) * Math.PI * 2) * (90 + (i % 5) * 18),
-                y: Math.sin((i / CONFETTI.length) * Math.PI * 2) * (90 + (i % 5) * 18) - 60,
-                opacity: 0,
-                rotate: 360,
-              }}
-              transition={{ duration: 1.1, ease: 'easeOut' }}
-            />
-          ))}
+        {(phase === 'sealed' || revealed) && (
+          <ul aria-label={t('economy.chest.odds.label')} className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-white/60">
+            {CHEST_RARITIES.map((r) => (
+              <li key={r} className={r === reveal.rarity ? 'font-bold text-white' : undefined}>
+                {`${t(`economy.chest.rarity.${r}`)} ${oddsLabel(r)}`}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      {(phase === 'sealed' || phase === 'revealed') && (
-        <ul aria-label={t('economy.chest.odds.label')} className="flex flex-wrap justify-center gap-2 text-base text-white/90">
-          {CHEST_RARITIES.map((r) => (
-            <li key={r} className="rounded-md border-2 border-white/30 px-3 py-1">
-              {`${t(`economy.chest.rarity.${r}`)} ${oddsLabel(r)}`}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {phase === 'revealed' && (
-        <button
-          type="button"
-          onClick={onClose}
-          className="min-h-14 min-w-[min(70vw,300px)] rounded-xl border-2 border-black bg-neo-lime px-8 text-lg font-bold text-neo-navy shadow-[4px_4px_0_0_#000]"
-        >
-          {t('economy.chest.continue')}
-        </button>
-      )}
+      <CoinFlight count={coins} fromRef={chestRef} toSelector='[data-reward-landing="cash"] [data-reward-icon]' onDone={() => playCoinCascadeSound?.()} />
     </div>
   );
 }
