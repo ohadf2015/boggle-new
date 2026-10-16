@@ -295,7 +295,10 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
     if (typeof document === 'undefined') return sheet;
     return (
       <>
-        <GsiClientPreloader />
+        {/* Only while open: SignupPromptHost mounts this sheet closed for every
+            guest session, so an unconditional preloader pulled GSI (~102 KiB)
+            into the /en first paint and undid #1345. */}
+        {isOpen && <GsiClientPreloader />}
         {createPortal(sheet, document.body)}
       </>
     );
