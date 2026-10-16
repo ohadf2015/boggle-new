@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { gunzipSync } from 'node:zlib';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { gunzipSync } from 'node:zlib';
 import { findWordOnBoard } from '@/lib/education/eslCefrDemo';
 import {
   landingDemoBoard,
@@ -10,25 +10,39 @@ import {
   LANDING_DEMO_LOCALES,
 } from '@/lib/education/landingDemoBoards';
 
+const dictPath = (locale: string) => join(process.cwd(), 'public', 'dicts', `${locale}.dict.gz`);
+const hasDicts = LANDING_DEMO_LOCALES.every((locale) => existsSync(dictPath(locale)));
 const dict = (locale: string) =>
   new Set(
-    gunzipSync(readFileSync(join(process.cwd(), 'public', 'dicts', `${locale}.dict.gz`)))
+    gunzipSync(readFileSync(dictPath(locale)))
       .toString('utf8')
       .split('\n'),
   );
 
 describe('landing demo boards', () => {
-  it.each(LANDING_DEMO_LOCALES)('%s: every target is a real dictionary word the board can trace', (locale) => {
+  // public/dicts/*.dict.gz is gitignored and built by scripts/build-dict-assets.ts.
+  // CI never runs that script, so membership checks must skip (same pattern as
+  // curriculumGrade3En.test.ts). Traceability does not need the files.
+  it.each(LANDING_DEMO_LOCALES)('%s: every target is traceable on the board', (locale) => {
     const board = landingDemoBoard(locale);
-    const words = dict(locale);
     expect(board.letters).toHaveLength(16);
     expect(board.targets.length).toBeGreaterThanOrEqual(4);
     for (const target of board.targets) {
-      expect(words.has(target.toLowerCase()), `${locale}:${target} not in dictionary`).toBe(true);
       expect(findWordOnBoard(board.letters, target), `${locale}:${target} not traceable`).not.toBeNull();
       expect(target.length).toBeGreaterThanOrEqual(board.minLength);
     }
   });
+
+  it.skipIf(!hasDicts).each(LANDING_DEMO_LOCALES)(
+    '%s: every target is a real dictionary word (needs public/dicts/*.dict.gz)',
+    (locale) => {
+      const board = landingDemoBoard(locale);
+      const words = dict(locale);
+      for (const target of board.targets) {
+        expect(words.has(target.toLowerCase()), `${locale}:${target} not in dictionary`).toBe(true);
+      }
+    },
+  );
 
   it('deals a Hebrew board to a Hebrew visitor, not the English one', () => {
     const he = landingDemoBoard('he');
