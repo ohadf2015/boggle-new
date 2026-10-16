@@ -141,6 +141,27 @@ export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
 ]);
 
 /**
+ * Segments that exist only as next.config redirect sources. Next applies those
+ * redirects inside handle(), so the gate must pass them or they answer 404.
+ * `nextHandleGate.test.ts` asserts every static redirect source passes.
+ */
+export const REDIRECT_ONLY_SEGMENTS: ReadonlySet<string> = new Set([
+  'cookies',
+  'play',
+  'practice',
+  'privacy',
+  'privacy-policy',
+  'room',
+  'scrabble',
+  'scrabble-multijugador-online',
+  'scrabble-online-en-espanol',
+  'scrabble-online-multijugador',
+  'terms',
+  'terms-of-service',
+  'word-tower-v2',
+]);
+
+/**
  * Top-level directories under `public/`. Files inside them are static assets
  * that Next serves from disk. Keep in sync — `nextHandleGate.test.ts` asserts it.
  */
@@ -245,7 +266,7 @@ export function decideNextHandle(
   if (LOCALE_SET.has(first)) {
     if (parts.length === 1) return { action: 'pass' };
     const second = parts[1];
-    if (!KNOWN_APP_ROOT_SEGMENTS.has(second)) {
+    if (!KNOWN_APP_ROOT_SEGMENTS.has(second) && !REDIRECT_ONLY_SEGMENTS.has(second)) {
       return { action: 'drop', reason: 'unknown-segment' };
     }
     if (isSeoCrawler(userAgent) && HIGH_CARDINALITY_NOINDEX_RE.test(raw)) {
@@ -254,6 +275,6 @@ export function decideNextHandle(
     return { action: 'pass' };
   }
 
-  if (KNOWN_APP_ROOT_SEGMENTS.has(first)) return { action: 'pass' };
+  if (KNOWN_APP_ROOT_SEGMENTS.has(first) || REDIRECT_ONLY_SEGMENTS.has(first)) return { action: 'pass' };
   return { action: 'drop', reason: 'unknown-segment' };
 }
