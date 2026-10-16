@@ -24,7 +24,8 @@ vi.mock('@/hooks/useClassroom', () => ({
 }));
 let pro = { hasPro: false, loading: false };
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
-vi.mock('@/lib/education/useTeacherAccess', () => ({ useTeacherAccess: () => ({ trial: null, isLoading: false }) }));
+let trial: { isExpired: boolean } | null = null;
+vi.mock('@/lib/education/useTeacherAccess', () => ({ useTeacherAccess: () => ({ trial, isLoading: false }) }));
 const markInviteCopied = vi.fn();
 vi.mock('@/hooks/useTeacherActivationProgress', () => ({
   useTeacherActivationProgress: () => ({ progress: { inviteCopied: false, liveStarted: false, dismissed: false }, ready: true, markInviteCopied }),
@@ -37,6 +38,7 @@ const writeText = vi.fn().mockResolvedValue(undefined);
 beforeEach(() => {
   search = '';
   classrooms = [];
+  trial = null;
   pro = { hasPro: false, loading: false };
   createClassroom.mockReset();
   Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
@@ -132,5 +134,18 @@ describe('<ClassSetupFlow>', () => {
     classrooms = [{ id: 'a', name: 'A', join_code: 'ABCD', member_count: 0, language: 'en' }];
     render(<ClassSetupFlow />);
     expect(screen.getByTestId('setup-join-code')).toHaveTextContent('ABCD');
+  });
+
+  it('Given an expired trial and no class yet, Then the first class opens with no Pro ask in front of it', () => {
+    trial = { isExpired: true };
+    render(<ClassSetupFlow />);
+    expect(screen.queryByTestId('upsell-trial_expired')).toBeNull();
+  });
+
+  it('Given an expired trial and a class already made, Then the Pro ask still greets the next class', () => {
+    trial = { isExpired: true };
+    classrooms = [{ id: 'a', name: 'A', join_code: 'AAAA', member_count: 0, language: 'en' }];
+    render(<ClassSetupFlow />);
+    expect(screen.getByTestId('upsell-trial_expired')).toBeInTheDocument();
   });
 });

@@ -52,7 +52,7 @@ function makeSupabase() {
       if (table === 'classroom_rounds') {
         return {
           select: () => ({
-            eq: () => Promise.resolve({ count: fake.priorRounds, error: null }),
+            eq: () => ({ gte: () => Promise.resolve({ count: fake.priorRounds, error: null }) }),
           }),
           insert: (row: Record<string, unknown>) => {
             roundInserts.push(row);

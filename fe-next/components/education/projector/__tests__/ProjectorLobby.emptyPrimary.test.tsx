@@ -40,11 +40,18 @@ describe('ProjectorLobby — an empty room has one clear primary', () => {
     expect(reason.className).not.toMatch(/border-neo-pink|bg-neo-pink/);
   });
 
-  it('Given nobody joined, Then the practice round is a text link, not a second button-shaped primary', () => {
+  it('Given nobody joined, Then practicing with bots is the one solid action and says the bots leave', () => {
     render(<ProjectorLobby {...props} />);
     const practice = screen.getByTestId('projector-practice-round');
-    expect(practice.className).toContain('underline');
-    expect(practice.className).not.toMatch(/\bborder-3\b|shadow-hard/);
+    expect(practice).toHaveTextContent('education.projectorLobby.practiceFirst');
+    expect(practice.className).toMatch(/bg-neo-lime/);
+    expect(practice.className).not.toContain('underline');
+    expect(screen.getByText('education.projectorLobby.practiceFirstHint')).toBeInTheDocument();
+  });
+
+  it('Given a student joined, Then the practice action is gone', () => {
+    render(<ProjectorLobby {...props} students={[{ username: 'Ada' }]} />);
+    expect(screen.queryByTestId('projector-practice-round')).toBeNull();
   });
 
   it('Given a student joined, Then Start reads as Start again', () => {

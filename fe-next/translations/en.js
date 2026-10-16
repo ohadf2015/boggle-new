@@ -13626,6 +13626,8 @@ const en = {
       "nobodyYet": "Nobody's in yet",
       "nobodyYetHint": "Type the code above. First one in gets the bragging rights.",
       "startBlocked": "Waiting for one student to join before you can start.",
+      "practiceFirst": "Practice first with 3 bots",
+      "practiceFirstHint": "See what your class will see. The bots leave when your first student joins.",
       "lateJoinOn": "Late join on",
       "lateJoinOff": "Late join off"
     },

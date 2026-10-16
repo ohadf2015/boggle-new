@@ -49,13 +49,12 @@ describe('ProjectorLobby — one bottom bar, one START', () => {
     expect(screen.getByTestId('projector-start')).toHaveTextContent('hostView.creatingTournament');
   });
 
-  it('Given an empty room with bots available, Then practice is a quiet text link, not a second big button', () => {
+  it('Given an empty room with bots available, Then practice is a compact solid button, not a full-width bar', () => {
     const onPractice = vi.fn();
     render(<ProjectorLobby {...baseProps} onStartPracticeRound={onPractice} />);
     const link = screen.getByTestId('projector-practice-round');
-    expect(link).toHaveTextContent('tvLobby.tryPracticeRound');
-    expect(link.className).toMatch(/(^|\s)underline(\s|$)/);
-    expect(link.className).not.toMatch(/(^|\s)(border-3|w-full|shadow-hard-sm|uppercase)(\s|$)/);
+    expect(link).toHaveTextContent('education.projectorLobby.practiceFirst');
+    expect(link.className).not.toMatch(/(^|\s)(w-full|uppercase)(\s|$)/);
     fireEvent.click(link);
     expect(onPractice).toHaveBeenCalledTimes(1);
   });

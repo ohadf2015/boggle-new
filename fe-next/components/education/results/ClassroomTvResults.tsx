@@ -76,6 +76,7 @@ import { useIsPhoneRecap } from './useIsPhoneRecap';
 import { classFoundWords, lessonWordsLanded, podiumLessonCount } from './lessonTally';
 import { NoLessonWordsPanel } from './NoLessonWordsPanel';
 import type { PlayerResult } from '@/types/components';
+import { isPracticeRound } from './isPracticeRound';
 
 export interface ClassroomTvResultsProps {
   summary: ClassroomSummary;
@@ -357,7 +358,7 @@ export function ClassroomTvResults({
                   className={cn('flex justify-center', !revealSettled && 'motion-safe:animate-[lc-quiet-arrive_360ms_ease-out_5.8s_both]')}
                 >
                   <style>{`@keyframes lc-quiet-arrive{0%{transform:scale(0)}70%{transform:scale(1.06)}100%{transform:scale(1)}}`}</style>
-                  <ResultsPrimaryActions language={language} t={t} surface="projector" tone="quiet" />
+                  <ResultsPrimaryActions language={language} t={t} surface="projector" tone="quiet" hideUpgrade={isPracticeRound(players)} />
                 </div>
               ) : null
             }

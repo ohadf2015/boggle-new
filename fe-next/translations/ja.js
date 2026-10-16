@@ -15173,6 +15173,8 @@ const ja = {
       "nobodyYet": "まだ誰も入っていません",
       "nobodyYetHint": "上のコードを入力しよう。一番乗りは誰だ？",
       "startBlocked": "生徒が1人参加したらスタートできます。",
+      "practiceFirst": "まずボット3人で練習",
+      "practiceFirstHint": "クラスで映る画面をそのまま確認できます。最初の生徒が入るとボットは退出します。",
       "lateJoinOn": "途中参加OK",
       "lateJoinOff": "途中参加なし"
     },

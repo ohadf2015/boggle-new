@@ -15444,6 +15444,8 @@ const sv = {
       "nobodyYet": "Ingen är inne än",
       "nobodyYetHint": "Skriv in koden ovan. Först in tar tronen.",
       "startBlocked": "Vänta tills minst en elev har anslutit innan du startar.",
+      "practiceFirst": "Öva först med 3 bottar",
+      "practiceFirstHint": "Se exakt vad klassen kommer att se. Bottarna går när första eleven ansluter.",
       "lateJoinOn": "Sen anslutning tillåten",
       "lateJoinOff": "Sen anslutning stängd"
     },

@@ -89,7 +89,12 @@ export async function PATCH(req: NextRequest) {
     readError ? null : (existing as TeacherActivationProfileRow | null),
   );
   const next = applyActivationPatch(current, patch);
-  const update = profileUpdateFromPatch(patch, new Date().toISOString());
+  const unset: TeacherActivationPatch = {
+    inviteCopied: patch.inviteCopied && !current.inviteCopied,
+    liveStarted: patch.liveStarted && !current.liveStarted,
+    dismissed: patch.dismissed && !current.dismissed,
+  };
+  const update = profileUpdateFromPatch(unset, new Date().toISOString());
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ ok: true, ...next });
   }

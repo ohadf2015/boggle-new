@@ -13,6 +13,8 @@ import {
   buildTeacherFirstLiveGameEvent,
 } from '../utils/educationRoundTelemetry';
 
+const REAL_CLASS_MIN_PLAYERS = 2;
+
 export interface RoundMembership {
   userId: string;
   joinedAt: string | null;
@@ -22,7 +24,8 @@ export function planClassroomRoundEvents(args: {
   game: ClassroomGame;
   playerIds: string[];
   durationSeconds: number | null;
-  priorRounds: number;
+  /** Earlier rounds by this teacher with a real class (2+ players); a solo self-test is not a class. */
+  priorRealRounds: number;
   memberships: RoundMembership[];
   now: Date;
 }): EduServerEvent[] {
@@ -36,7 +39,7 @@ export function planClassroomRoundEvents(args: {
   });
   const events: EduServerEvent[] = completed ? [completed] : [];
 
-  if (args.priorRounds === 0) {
+  if (args.priorRealRounds === 0 && args.playerIds.length >= REAL_CLASS_MIN_PLAYERS) {
     events.push(
       buildTeacherFirstLiveGameEvent({
         teacherId: game.teacherId,
@@ -70,7 +73,8 @@ export async function recordClassroomRound(
     const { count, error: countError } = await supabase
       .from('classroom_rounds' as never)
       .select('id', { count: 'exact', head: true })
-      .eq('teacher_id', game.teacherId);
+      .eq('teacher_id', game.teacherId)
+      .gte('player_count', REAL_CLASS_MIN_PLAYERS);
     if (countError) throw new Error(countError.message);
 
     const now = new Date();
@@ -105,7 +109,7 @@ export async function recordClassroomRound(
         game,
         playerIds: opts.playerIds,
         durationSeconds: opts.durationSeconds,
-        priorRounds: count ?? 0,
+        priorRealRounds: count ?? 0,
         memberships,
         now,
       })

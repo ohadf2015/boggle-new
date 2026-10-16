@@ -82,6 +82,7 @@ function ProjectorPreview() {
       readyUsernames={roster.slice(0, Math.floor(shown / 3)).map((s) => s.username)}
       t={t}
       onStartGame={() => toast('Preview: start')}
+      onStartPracticeRound={() => toast('Preview: practice with bots')}
       startLabelKey="hostView.startClassGame"
       lessonName="Weekly Vocabulary"
       wordCount={14}

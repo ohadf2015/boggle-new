@@ -326,7 +326,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
         </ul>
 
         <div className="flex w-full min-w-0 flex-col gap-2 md:w-auto md:flex-row md:flex-wrap md:items-center md:justify-end md:gap-[0.8vw]">
-          {/* Empty room: Start itself says "waiting"; the reason and the practice run sit beside it as quiet text, so nothing competes with it. */}
+          {/* Empty room: Start is locked, so practicing with bots is the one live action — a teacher rehearses before the class arrives. */}
           {quizBlocked && (
             <ProjectorQuizBlocked
               gameCode={gameCode}
@@ -357,15 +357,21 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
                 </p>
               )}
               {onStartPracticeRound && (
-                <button
-                  type="button"
-                  data-testid="projector-practice-round"
-                  onClick={onStartPracticeRound}
-                  disabled={practiceRoundPending}
-                  className="rounded-sm font-neo-body text-[3.2vw] font-black text-neo-lime underline decoration-2 underline-offset-4 transition-colors hover:text-neo-cream focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan disabled:opacity-50 md:text-[0.95vw]"
-                >
-                  {practiceRoundPending ? t('common.loading') : t('tvLobby.tryPracticeRound')}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    data-testid="projector-practice-round"
+                    onClick={onStartPracticeRound}
+                    disabled={practiceRoundPending}
+                    className="mt-1 inline-flex items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-2 font-neo-display text-[3.6vw] font-black text-neo-black shadow-hard transition-all active:translate-y-0.5 active:shadow-none focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60 md:px-[1.2vw] md:py-[0.5vw] md:text-[1.15vw]"
+                  >
+                    <Play className="h-[0.9em] w-[0.9em] shrink-0" aria-hidden="true" />
+                    {practiceRoundPending ? t('common.loading') : t('education.projectorLobby.practiceFirst')}
+                  </button>
+                  <p className="font-neo-body text-[2.8vw] font-bold leading-snug text-neo-cream/70 md:text-[0.85vw]">
+                    {t('education.projectorLobby.practiceFirstHint')}
+                  </p>
+                </>
               )}
             </div>
           )}

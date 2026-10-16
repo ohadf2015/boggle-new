@@ -54,8 +54,9 @@ export function ClassSetupFlow() {
     created ?? (existing?.join_code ? { id: existing.id, name: existing.name, join_code: existing.join_code } : null);
 
   const cap = proLoading ? null : classCap({ count: classrooms.length, hasPro, limit: FREE_TIER_LIMITS.classes });
-  // An expired trial gets the Pro ask at the create-flow entrance — a nudge with a "continue free" door.
-  const trialAskOpen = !ready && !accessLoading && !proLoading && !hasPro && !!trial?.isExpired && !trialAskDismissed;
+  // Expired trial: ask at the entrance to the NEXT class, never in front of the first one.
+  const trialAskOpen =
+    !ready && classrooms.length > 0 && !accessLoading && !proLoading && !hasPro && !!trial?.isExpired && !trialAskDismissed;
 
   const submit = useCallback(async () => {
     if (isFreePlanUsageBlocked(hasPro, classrooms.length, FREE_TIER_LIMITS.classes)) {

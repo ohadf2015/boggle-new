@@ -291,8 +291,19 @@ export function trackEduJoinCodeShown(args: EduJoinCodeArgs): void {
   captureActivation('edu_join_code_shown', { classroom_id: args.classroomId });
 }
 
+// Every copy/launch surface reports here, so the activation checklist is saved here too.
+function persistTeacherActivation(patch: { inviteCopied?: true; liveStarted?: true }): void {
+  if (typeof fetch !== 'function') return;
+  fetch('/api/education/teacher/activation', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(patch),
+  }).catch(() => {});
+}
+
 export function trackEduJoinCodeCopied(args: EduJoinCodeArgs): void {
   captureActivation('edu_join_code_copied', { classroom_id: args.classroomId });
+  persistTeacherActivation({ inviteCopied: true });
 }
 
 export function trackEduFirstStudentJoined(args: EduJoinCodeArgs): void {
@@ -538,6 +549,7 @@ export function trackEduLiveGameStarted(args: EduLiveGameStartedArgs): void {
   };
   if (args.lessonCount !== undefined) props.lesson_count = args.lessonCount;
   captureActivation('edu_live_game_started', props);
+  persistTeacherActivation({ liveStarted: true });
 }
 
 export interface EduReportsViewedArgs {

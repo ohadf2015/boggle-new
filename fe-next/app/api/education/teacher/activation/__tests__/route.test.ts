@@ -95,4 +95,23 @@ describe('GET/PATCH /api/education/teacher/activation', () => {
     });
     expect(updateEq).toHaveBeenCalledWith('id', 'u1');
   });
+
+  it('keeps the first copy time when the teacher copies the link again', async () => {
+    getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
+    from.mockReturnValue(
+      profileChain({
+        teacher_activation_invite_copied_at: '2026-10-05T00:00:00Z',
+        teacher_activation_live_started_at: null,
+        teacher_activation_checklist_dismissed_at: null,
+      }),
+    );
+    const res = await PATCH(
+      new Request('http://local/api/education/teacher/activation', {
+        method: 'PATCH',
+        body: JSON.stringify({ inviteCopied: true }),
+      }) as never,
+    );
+    expect(await res.json()).toMatchObject({ ok: true, inviteCopied: true });
+    expect(updateEq).not.toHaveBeenCalled();
+  });
 });

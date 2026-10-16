@@ -23,7 +23,9 @@ import {
   canTransitionGameState,
   transitionGameState,
   resetGameForNewRound,
+  removeUserFromGame,
 } from '../modules/gameStateManager.js';
+import { practiceBotsToDrop } from '../modules/classroomPracticeBots.js';
 import { broadcastToRoom, getGameRoom, safeEmit, getSocketById } from '../utils/socketHelpers.js';
 import { clearAutoStartState } from '../modules/lobbyAutoStart.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
@@ -36,7 +38,7 @@ import logger from '../utils/logger.js';
 import { validatePayload, startGameSchema } from '../utils/socketValidation.js';
 import { startGameTimer } from './shared.js';
 import { scheduleGameStartSafetyNet, resolveGameStartSafetyNetDelayMs } from '../services/gameLifecycle/gameTimer.js';
-import { stopAllBots } from '../modules/botManager.js';
+import { stopAllBots, removeBot } from '../modules/botManager.js';
 import { notifyGameStarted } from '../modules/notificationService.js';
 import { selectNextGameMode, ALL_GAME_MODES } from '../modules/gameModeSelector.js';
 import { initializePlayerData } from './playerDataInit.js';
@@ -140,6 +142,14 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     if (game.hostSocketId !== socket.id) {
       emitError(socket, ErrorCodes.PLAYER_NOT_HOST);
       return;
+    }
+    const practiceBots = practiceBotsToDrop(game);
+    if (practiceBots.length > 0) {
+      for (const name of practiceBots) {
+        removeBot(gameCode, name);
+        removeUserFromGame(gameCode, name);
+      }
+      broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', { users: getGameUsers(gameCode) });
     }
     // A classroom room keeps the language it was created in (lesson/class), whatever the host's UI sends.
     const language = game.isClassroom && game.language ? game.language : hostLanguage;

@@ -15122,6 +15122,8 @@ const es = {
       "nobodyYet": "Todavía no hay nadie",
       "nobodyYetHint": "Escribe el código de arriba. Quien entre primero se lleva la gloria.",
       "startBlocked": "Espera a que entre al menos un alumno para empezar.",
+      "practiceFirst": "Practica primero con 3 bots",
+      "practiceFirstHint": "Mira lo que verá tu clase. Los bots se van cuando entra tu primer alumno.",
       "lateJoinOn": "Se puede entrar tarde",
       "lateJoinOff": "No se puede entrar tarde"
     },

@@ -250,7 +250,7 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false, he
       setIsUpsellModalOpen(true);
       return;
     }
-    if (!accessLoading && !proLoading && !hasPro && trial?.isExpired) {
+    if (classrooms.length > 0 && !accessLoading && !proLoading && !hasPro && trial?.isExpired) {
       setIsTrialUpsellOpen(true);
       return;
     }
