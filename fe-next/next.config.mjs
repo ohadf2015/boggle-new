@@ -321,6 +321,11 @@ const nextConfig = {
       // SEO: keyword-shaped URLs for "scrabble online español multijugador" GSC query
       // → canonical /es/juego-de-palabras-multijugador (ranks the existing page).
       {
+        source: '/es/scrabble',
+        destination: '/es/juego-de-palabras-multijugador',
+        permanent: true,
+      },
+      {
         source: '/es/scrabble-online-multijugador',
         destination: '/es/juego-de-palabras-multijugador',
         permanent: true,

@@ -6,8 +6,27 @@ import {
   decideNextHandle,
   isSeoCrawler,
 } from '../nextHandleGate';
+import { GAME_ROUTE_ALIASES } from '../gameRouteAliases.mjs';
+import { RETIRED_PRACTICE_REDIRECTS } from '../retiredPracticeRedirects.mjs';
 
 const LOCALE_DIR = path.resolve(__dirname, '../../../app/[locale]');
+const NEXT_CONFIG = path.resolve(__dirname, '../../../next.config.mjs');
+
+function staticRedirectSources(): string[] {
+  const config = fs.readFileSync(NEXT_CONFIG, 'utf8');
+  const start = config.indexOf('async redirects()');
+  const end = config.indexOf('\n  async ', start + 1);
+  const redirects = config.slice(start, end === -1 ? undefined : end);
+  const inline = [...redirects.matchAll(/source:\s*'([^']+)'/g)].map((m) => m[1]);
+  const imported = [...GAME_ROUTE_ALIASES, ...RETIRED_PRACTICE_REDIRECTS].map(
+    (r: { source: string }) => r.source,
+  );
+  return [...inline, ...imported].filter((s) => !s.includes('(?'));
+}
+
+function samplePath(source: string): string {
+  return source.replace(/:locale\([^)]*\)/g, 'es').replace(/:\w+[+*]?/g, 'x');
+}
 
 describe('decideNextHandle', () => {
   it('passes locale homepages and known SEO/game routes', () => {
@@ -65,5 +84,16 @@ describe('decideNextHandle', () => {
       .filter((n) => !n.startsWith('(') && n !== '__tests__');
     const missing = names.filter((n) => !KNOWN_APP_ROOT_SEGMENTS.has(n));
     expect(missing).toEqual([]);
+  });
+
+  it('passes every static next.config redirect source so the redirect can run', () => {
+    const sources = staticRedirectSources();
+    expect(sources).toContain('/es/scrabble');
+    const dropped = sources.map(samplePath).filter((p) => decideNextHandle(p).action === 'drop');
+    expect(dropped).toEqual([]);
+  });
+
+  it('still drops unknown slugs next to the redirect-only ones', () => {
+    expect(decideNextHandle('/es/scrabble-gratis').action).toBe('drop');
   });
 });
