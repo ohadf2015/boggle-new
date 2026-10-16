@@ -1,8 +1,8 @@
 'use client';
 
 import { useLanguage } from '@/contexts/LanguageContext';
-import { EDUCATION_LANGUAGES, type Language } from '@/lib/supabase/education/types';
-import { LANGUAGE_LABEL_KEYS } from '@/lib/i18n/languageLabels';
+import type { Language } from '@/lib/supabase/education/types';
+import { LanguagePicker } from '@/components/education/pickers/LanguagePicker';
 import { GRADE_BANDS, LIBRARY_TOPICS, isGradeBand, isLibraryTopic } from '@/lib/education/library';
 import type { ListDraft } from './ListEditorSheet';
 
@@ -20,20 +20,15 @@ interface ListMetaFieldsProps {
 export default function ListMetaFields({ draft, classrooms, onChange }: ListMetaFieldsProps) {
   const { t } = useLanguage();
   return (
-    <div className={classrooms.length > 0 ? 'grid grid-cols-2 gap-2 sm:grid-cols-4' : 'grid grid-cols-3 gap-2'}>
-      <label className="block min-w-0">
-        <span className={LABEL}>{t('eduLibrary.meta.language')}</span>
-        <select
-          data-testid="list-language"
-          value={draft.language}
-          onChange={(e) => onChange({ language: e.target.value as Language })}
-          className={SELECT}
-        >
-          {EDUCATION_LANGUAGES.map((code) => (
-            <option key={code} value={code}>{t(LANGUAGE_LABEL_KEYS[code])}</option>
-          ))}
-        </select>
-      </label>
+    <div className="space-y-3">
+      <LanguagePicker
+        testId="list-language"
+        label={<span className={LABEL}>{t('eduLibrary.meta.language')}</span>}
+        value={draft.language}
+        onChange={(language: Language) => onChange({ language })}
+        variant="compact"
+      />
+      <div className={classrooms.length > 0 ? 'grid grid-cols-1 gap-2 sm:grid-cols-3' : 'grid grid-cols-2 gap-2'}>
       <label className="block min-w-0">
         <span className={LABEL}>{t('eduLibrary.meta.grade')}</span>
         <select
@@ -78,6 +73,7 @@ export default function ListMetaFields({ draft, classrooms, onChange }: ListMeta
           </select>
         </label>
       )}
+      </div>
     </div>
   );
 }

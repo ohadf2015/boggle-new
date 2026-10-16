@@ -16,12 +16,14 @@
 
 import { Swords, Target, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import AvatarLite from '@/components/AvatarLite';
 import { duelTauntById, type DuelTauntId } from '@/lib/education/duelTaunts';
 import { cn } from '@/lib/utils';
 import { TauntStickerPicker } from './TauntStickerPicker';
 
 export interface AsyncDuelTurnCardProps {
   duelId: string;
+  opponentId: string;
   opponentName: string;
   lessonName: string;
   /** The opponent's score on this duel — 0 means they have not played yet. */
@@ -45,6 +47,7 @@ export interface AsyncDuelTurnCardProps {
 
 export function AsyncDuelTurnCard({
   duelId,
+  opponentId,
   opponentName,
   lessonName,
   opponentScore,
@@ -75,11 +78,10 @@ export function AsyncDuelTurnCard({
     >
       <div className="flex items-start gap-3">
         {/* Opponent tile */}
-        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-[2px] border-neo-black bg-neo-cyan shadow-hard-sm">
-          <span className="font-neo-display text-xl font-black text-neo-black">
-            {(opponentName || '?').charAt(0).toUpperCase()}
-          </span>
+        <div className="relative h-12 w-12 shrink-0">
+          <AvatarLite userId={opponentId} pixelSize={48} />
           {incoming && (
+            // eslint-disable-next-line @next/next/no-img-element -- tiny static taunt sticker
             <img
               data-testid="duel-turn-incoming-taunt"
               src={incoming.src}

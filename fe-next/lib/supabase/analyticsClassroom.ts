@@ -31,6 +31,12 @@ export function avatarForProgress(profile: {
   return null;
 }
 
+/** The object form of `avatar_config`, for the shared avatar components. */
+export function avatarConfigForProgress(profile: { avatar_config?: unknown }): Record<string, unknown> | null {
+  const c = profile.avatar_config;
+  return c && typeof c === 'object' && !Array.isArray(c) ? (c as Record<string, unknown>) : null;
+}
+
 /**
  * Get progress summary for all students in a classroom
  */
@@ -143,7 +149,7 @@ export async function getStudentsProgressSummary(
         // Placeholder display names ('Player_<hex>') are truthy, so the `|| 'Unknown'`
         // guard never fired and the teacher's progress table listed hex ids.
         displayName: resolveDisplayName([profile.display_name], 'Unknown'),
-        avatarUrl: avatarForProgress(profile), totalXp, currentLevel, vocabularyMastery,
+        avatarUrl: avatarForProgress(profile), avatarConfig: avatarConfigForProgress(profile), totalXp, currentLevel, vocabularyMastery,
         overallAccuracy, wordsAttempted, wordsMastered, lastPracticeDate,
         isStruggling, currentStreak,
       });

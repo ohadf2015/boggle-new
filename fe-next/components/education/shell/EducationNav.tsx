@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import Link from 'next/link';
 import {
   BarChart3,
@@ -57,12 +57,39 @@ const FOCUS =
 
 function tabClasses(active: boolean) {
   return cn(
-    'flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-neo px-1 py-1.5',
-    'font-neo-display text-[11px] font-bold transition-[colors,transform] duration-150 active:scale-[0.97]',
+    'relative z-10 flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-neo px-1 pb-1 pt-1.5',
+    'font-neo-display text-[11px] font-bold transition-[color,transform] duration-150 ease-out active:scale-[0.97]',
     FOCUS,
-    active
-      ? 'border-[2px] border-neo-lime bg-neo-lime/10 text-neo-lime shadow-hard-sm'
-      : 'border-[2px] border-neo-cream bg-neo-navy-light text-neo-cream hover:bg-neo-cyan hover:text-neo-black',
+    active ? 'text-neo-lime' : 'text-neo-cream/70 [@media(hover:hover)]:hover:text-neo-cream',
+  );
+}
+
+// Survives the shell remount on every tab tap, so the pill can slide from where it was.
+let lastTabIndex: number | null = null;
+
+function TabIndicator({ index, count }: { index: number; count: number }) {
+  const [shown, setShown] = useState(() => lastTabIndex ?? index);
+  useEffect(() => {
+    lastTabIndex = index;
+    const raf = requestAnimationFrame(() => setShown(index));
+    return () => cancelAnimationFrame(raf);
+  }, [index]);
+  return (
+    <div
+      aria-hidden
+      data-testid="education-tab-indicator-track"
+      style={{ '--tab-i': String(shown), '--tab-n': String(count) } as CSSProperties}
+      className={cn(
+        'pointer-events-none absolute start-2 top-2 flex h-8 w-[calc((100%-1rem)/var(--tab-n))] justify-center',
+        'translate-x-[calc(var(--tab-i)*100%)] rtl:translate-x-[calc(var(--tab-i)*-100%)]',
+        'transition-[translate] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none',
+      )}
+    >
+      <span
+        data-testid="education-tab-indicator"
+        className="h-8 w-14 rounded-full border-[2px] border-neo-lime bg-neo-lime/15 shadow-hard-sm"
+      />
+    </div>
   );
 }
 
@@ -72,7 +99,7 @@ function sideClasses(active: boolean) {
     'transition-[colors,transform] duration-150 active:scale-[0.97]',
     FOCUS,
     active
-      ? 'border-[2px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm'
+      ? 'border-[2px] border-neo-lime bg-neo-lime/15 text-neo-lime shadow-hard-sm'
       : 'border-[2px] border-transparent text-neo-cream hover:bg-neo-navy-light',
   );
 }
@@ -96,7 +123,15 @@ function NavLink({
       aria-current={active ? 'page' : undefined}
       className={variant === 'tabs' ? tabClasses(active) : sideClasses(active)}
     >
-      <Icon className="h-5 w-5 shrink-0" aria-hidden />
+      <Icon
+        className={cn(
+          'h-5 w-5 shrink-0',
+          variant === 'tabs' && 'mt-1.5 mb-1.5 transition-transform duration-200 ease-out',
+          variant === 'tabs' && active && 'scale-110',
+        )}
+        strokeWidth={variant === 'tabs' && active ? 2.5 : 2}
+        aria-hidden
+      />
       <span
         data-testid={variant === 'sidebar' ? `education-side-label-${item.key}` : undefined}
         className="truncate"
@@ -149,18 +184,21 @@ export function EducationNav({ nav, t, variant, brand, account, className }: Edu
     );
   }
 
+  const activeIndex = nav.items.findIndex((item) => item.key === nav.activeKey);
   return (
     <nav
       data-testid="education-tabbar"
       aria-label={t('teacher.nav.tabsLabel')}
+      style={{ gridTemplateColumns: `repeat(${nav.items.length}, minmax(0, 1fr))` }}
       className={cn(
         // Hidden the instant the sidebar arrives (lg): never carry both.
-        'shrink-0 lg:hidden flex items-stretch gap-1.5',
-        'border-t-[3px] border-neo-cream bg-neo-navy px-2 pt-2',
-        'pb-[max(0.5rem,env(safe-area-inset-bottom))]',
+        'relative shrink-0 lg:hidden grid',
+        'border-t-[3px] border-neo-cream bg-neo-navy px-2 pt-1',
+        'pb-[max(0.25rem,env(safe-area-inset-bottom))]',
         className,
       )}
     >
+      {activeIndex >= 0 ? <TabIndicator index={activeIndex} count={nav.items.length} /> : null}
       {links}
     </nav>
   );

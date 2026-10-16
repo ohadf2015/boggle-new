@@ -59,6 +59,13 @@ describe('<ClassRosterStatus>', () => {
     expect(rows[2]).toHaveTextContent('eg2Polish.classes.status.onTrack:100');
   });
 
+  it('Given nobody has played yet, Then it lists the students without repeating the same status pill', async () => {
+    getClassMastery.mockResolvedValue({ data: buildClassMastery([]), error: null });
+    render(<ClassRosterStatus classroomId="c1" />);
+    await waitFor(() => expect(screen.getAllByTestId('roster-status-row')).toHaveLength(3));
+    expect(screen.getByTestId('roster-status')).not.toHaveTextContent('eg2Polish.classes.status.notYet');
+  });
+
   it('links each student to their learning arc and the class to its report', async () => {
     render(<ClassRosterStatus classroomId="c1" />);
     await waitFor(() => expect(screen.getAllByTestId('roster-status-row')).toHaveLength(3));
@@ -91,5 +98,12 @@ describe('<ClassRosterStatus>', () => {
     expect(text).toContain('eg2Polish.classes.status.played');
     expect(text).toContain('eg2Polish.classes.status.notYet');
     expect(text).not.toMatch(/below|onTrack|%/);
+  });
+
+  it('puts the shared avatar before each student name', async () => {
+    render(<ClassRosterStatus classroomId="c1" />);
+    await waitFor(() => expect(screen.getAllByTestId('roster-status-row')).toHaveLength(3));
+    const rows = screen.getAllByTestId('roster-status-row');
+    expect(rows.map((r) => r.querySelector('[data-testid="avatar-lite"]')?.getAttribute('data-user-id'))).toEqual(['a', 'c', 'b']);
   });
 });

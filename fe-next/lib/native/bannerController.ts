@@ -176,6 +176,11 @@ export class BannerController {
     return this.schedule();
   }
 
+  /** Whether a banner is on screen right now, from any owner. */
+  isVisible(): boolean {
+    return this.applied.visible;
+  }
+
   clearRequest(key: string): Promise<void> {
     return this.setRequest(key, null);
   }

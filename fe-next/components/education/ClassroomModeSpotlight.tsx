@@ -29,11 +29,11 @@ function Spec({ testId, icon: Icon, label, value }: { testId: string; icon: type
       className="flex min-w-0 flex-1 items-center gap-1.5 rounded-neo border-[2px] border-neo-cream/80 bg-neo-navy px-1.5 py-1 text-start lg:gap-3 lg:px-4 lg:py-2"
     >
       <Icon className="hidden size-5 shrink-0 text-neo-cream sm:block lg:size-7" strokeWidth={2.5} aria-hidden="true" />
-      <span className="min-w-0 leading-tight lg:flex lg:items-baseline lg:gap-2">
+      <span className="min-w-0 leading-tight">
         <span data-spec="label" className="block truncate font-neo-display text-[0.55rem] font-black uppercase tracking-wide text-neo-cream/75 lg:text-sm">
           {label}
         </span>
-        <span data-spec="value" className="line-clamp-2 block font-neo-display text-[0.7rem] font-black leading-tight text-neo-cream lg:truncate lg:text-2xl">{value}</span>
+        <span data-spec="value" className="line-clamp-2 block font-neo-display text-[0.7rem] font-black leading-tight text-neo-cream lg:text-2xl">{value}</span>
       </span>
     </div>
   );

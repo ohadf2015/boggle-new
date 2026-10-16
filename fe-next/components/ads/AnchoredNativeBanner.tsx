@@ -87,7 +87,9 @@ export default function AnchoredNativeBanner() {
       // covers the button sometimes" race on navigation into a blocked route.
       void bannerController.clearRequest(BANNER_OWNER.anchor.key).finally(() => {
         if (!cancelled) {
+          if (bannerController.isVisible()) return;
           document.documentElement.style.setProperty('--admob-banner-height', '0px');
+          document.documentElement.classList.remove('has-admob-banner');
           try { localStorage.setItem('lc_admob_h', '0'); } catch {}
         }
       });

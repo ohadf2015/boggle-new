@@ -16,6 +16,7 @@ vi.mock('framer-motion', () => ({
 
 const base = {
   duelId: 'duel-1',
+  opponentId: 'maya-id',
   opponentName: 'Maya',
   lessonName: 'Unit 3 verbs',
   opponentScore: 340,
@@ -32,6 +33,12 @@ describe('AsyncDuelTurnCard', () => {
 
     expect(screen.getByTestId('duel-turn-card')).toHaveAttribute('data-state', 'target-set');
     expect(screen.getByTestId('duel-turn-target')).toHaveTextContent('340');
+  });
+
+  it('shows the opponent as the shared avatar', () => {
+    render(<AsyncDuelTurnCard {...base} />);
+
+    expect(screen.getByTestId('avatar-lite')).toHaveAttribute('data-user-id', 'maya-id');
   });
 
   it('names the opponent and the lesson', () => {

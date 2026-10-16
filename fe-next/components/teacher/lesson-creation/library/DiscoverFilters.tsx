@@ -4,8 +4,8 @@ import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { EDUCATION_LANGUAGES, type Language } from '@/lib/supabase/education/types';
-import { LANGUAGE_LABEL_KEYS } from '@/lib/i18n/languageLabels';
+import type { Language } from '@/lib/supabase/education/types';
+import { LanguagePicker } from '@/components/education/pickers/LanguagePicker';
 import { GRADE_BANDS, LIBRARY_TOPICS, isGradeBand, isLibraryTopic } from '@/lib/education/library';
 import type { DiscoverFilters as Filters } from './useDiscoverLibrary';
 
@@ -66,22 +66,14 @@ export default function DiscoverFilters({ filters, onChange, total }: DiscoverFi
         </button>
       </div>
 
-      <div className="flex gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none]" role="group" aria-label={t('eduLibrary.meta.language')}>
-        {(['all', ...EDUCATION_LANGUAGES] as const).map((code) => {
-          const active = filters.language === code;
-          return (
-            <button
-              key={code}
-              type="button"
-              aria-pressed={active}
-              onClick={() => onChange({ language: code as Language | 'all' })}
-              className={cn(PILL, active ? 'border-neo-black bg-neo-lime text-neo-black shadow-hard-sm' : 'border-neo-cream/50 bg-neo-navy-light text-neo-white')}
-            >
-              {code === 'all' ? t('eduLibrary.discover.allLanguages') : t(LANGUAGE_LABEL_KEYS[code])}
-            </button>
-          );
-        })}
-      </div>
+      <LanguagePicker
+        label={t('eduLibrary.meta.language')}
+        hideLabel
+        value={filters.language}
+        onChange={(code: Language | 'all') => onChange({ language: code })}
+        allLabel={t('eduLibrary.discover.allLanguages')}
+        variant="filter"
+      />
 
       <div className="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none]" role="group" aria-label={t('eduLibrary.discover.sourceLabel')}>
         {(['all', 'verified', 'teacher'] as const).map((s) => {

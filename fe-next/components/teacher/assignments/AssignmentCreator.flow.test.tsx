@@ -1,4 +1,5 @@
 import React from 'react';
+import { pickLesson } from './__tests__/pickLesson';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AssignmentCreator from './AssignmentCreator';
@@ -81,7 +82,7 @@ describe('AssignmentCreator — Wayground-order flow', () => {
 
   it('shows due-date chips up front, so list + chip + assign is three taps', async () => {
     renderCreator();
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'lesson-1' } });
+    pickLesson('lesson-1');
     const chip = screen.getByRole('button', { name: 'teacher.assignment.nextWeek' });
     fireEvent.click(chip);
     expect(chip).toHaveAttribute('aria-pressed', 'true');

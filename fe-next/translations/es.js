@@ -1,5 +1,26 @@
 // Es translations
 const es = {
+  // @eduPickers:start
+  "eduPickers": {
+    "language": {
+      "boardHint": "Define el diccionario y las letras del tablero en los juegos de esta clase"
+    },
+    "board": {
+      "label": "Tablero: {language}"
+    },
+    "lesson": {
+      "create": "Crear una lista de palabras",
+      "mixedWarning": "Estas listas están en idiomas distintos. El tablero usará letras de {language}.",
+      "classMismatch": "Esta clase está en {classLanguage}. El tablero usará letras de {language}.",
+      "switched": "Cambiado a {language}. Cada juego usa un solo idioma, así que se quitaron las otras listas.",
+      "searchLabel": "Buscar listas de palabras",
+      "searchPlaceholder": "Busca en tus listas",
+      "noMatch": "Ninguna lista coincide con \"{query}\"",
+      "noLanguage": "Otro",
+      "selectAllIn": "Seleccionar todo en {language}"
+    }
+  },
+  // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
     "chestUpgraded": "¡Jefe derrotado: tu cofre subió de nivel!",
@@ -14276,6 +14297,8 @@ const es = {
       "scanToJoin": "Escanea para unirte"
     },
     "classroom": {
+      "studentCap": "{{count}} / {{limit}} alumnos",
+      "studentCountPro": "{{count}} alumnos",
       "presets": {
         "title": "Rituales rápidos",
         "fridayBattle": { "name": "Batalla de vocabulario del viernes", "desc": "Equipos · tu última lista · rápido y ruidoso" },
@@ -15908,6 +15931,7 @@ const es = {
       "gameSettings": "Configuración del juego",
       "joinedStudents": "Estudiantes unidos",
       "lessonsSelected": "{{count}} lecciones elegidas",
+      "lessonSelected": "1 lección elegida",
       "missingRequirements": "Faltan requisitos",
       "startFailed": "No pudimos empezar la partida. Inténtalo de nuevo.",
       "tooFast": "Un momento: vuelve a intentarlo en unos segundos.",

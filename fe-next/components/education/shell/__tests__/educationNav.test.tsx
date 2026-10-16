@@ -23,7 +23,7 @@
  * `border-neo` into the same class group as `border-neo-<colour>` and drops it.
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { render, cleanup } from '@testing-library/react';
+import { waitFor, render, cleanup } from '@testing-library/react';
 import { resolveEducationNav, EDUCATION_NAV_ITEMS } from '../navItems';
 import { EducationNav } from '../EducationNav';
 
@@ -127,23 +127,44 @@ describe('<EducationNav>', () => {
     expect(bar.className).not.toMatch(/border-neo(\s|$)/);
   });
 
-  it('marks the active tab with a tinted lime outline — never the hero CTA’s solid lime slab', () => {
+  it('marks the active tab with one lime pill behind its icon, never a solid lime slab', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="tabs" />);
     const active = getByTestId('education-tab-home');
     const inactive = getByTestId('education-tab-reports');
 
     expect(active.getAttribute('aria-current')).toBe('page');
-    expect(active.className).toContain('border-neo-lime');
     expect(active.className).toContain('text-neo-lime');
-    // GO LIVE owns the one solid lime slab on the deck; a second one on the
-    // chrome competes with the button the screen exists for.
+    // GO LIVE owns the one solid lime slab on the deck.
     expect(active.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
 
+    const pill = getByTestId('education-tab-indicator');
+    expect(pill.className).toContain('border-neo-lime');
+    expect(pill.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+
     expect(inactive.getAttribute('aria-current')).toBeNull();
-    // Not a ghost: its own fill plus a 2px cream edge against the navy bar.
-    expect(inactive.className).toContain('bg-neo-navy-light');
-    expect(inactive.className).toContain('border-[2px]');
-    expect(inactive.className).toContain('border-neo-cream');
+    // One dock, not four boxed buttons.
+    expect(inactive.className).not.toMatch(/border-\[2px\]/);
+    expect(inactive.className).not.toContain('bg-neo-navy-light');
+  });
+
+  it('slides the pill to the active tab with a short transform-only transition', async () => {
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+      cb(0);
+      return 0;
+    });
+    const { getByTestId } = render(<EducationNav nav={resolveEducationNav('/en/teacher/curriculum')!} t={t} variant="tabs" />);
+    const track = getByTestId('education-tab-indicator-track');
+    await waitFor(() => expect(track.style.getPropertyValue('--tab-i')).toBe('2'));
+    expect(track.style.getPropertyValue('--tab-n')).toBe('4');
+    expect(track.className).toMatch(/transition-\[translate\]/);
+    expect(track.className).toMatch(/duration-200/);
+    expect(track.className).toContain('motion-reduce:transition-none');
+    expect(track.className).toMatch(/rtl:/);
+  });
+
+  it('hides the pill on a teacher screen that owns no tab', () => {
+    const { queryByTestId } = render(<EducationNav nav={resolveEducationNav('/en/teacher/profile')!} t={t} variant="tabs" />);
+    expect(queryByTestId('education-tab-indicator-track')).toBeNull();
   });
 
   it('labels every tab — an icon alone is not a label', () => {
@@ -190,6 +211,15 @@ describe('EducationNav — the lg handover', () => {
   it('hides the bottom tabs the moment the sidebar arrives — never both', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="tabs" />);
     expect(getByTestId('education-tabbar').className).toContain('lg:hidden');
+  });
+
+  it('marks the active sidebar item with the same tinted lime as the dock, never a solid lime slab', () => {
+    const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
+    const active = getByTestId('education-side-home');
+    expect(active.getAttribute('aria-current')).toBe('page');
+    expect(active.className).toContain('border-neo-lime');
+    expect(active.className).toContain('text-neo-lime');
+    expect(active.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
   });
 
   it('keeps every sidebar label painted (no tablet icon-rail hide)', () => {

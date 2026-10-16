@@ -9,6 +9,7 @@ import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
 import { getClassMastery } from '@/lib/supabase/wordMastery';
 import { resolveDisplayName } from '@/lib/displayName';
 import { buildClassInsights, type StudentInsight } from '@/components/teacher/reports/classInsights';
+import AvatarLite from '@/components/AvatarLite';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 
@@ -78,6 +79,7 @@ export function ClassRosterStatus({ classroomId }: { classroomId: string }) {
 
   const report = `/${language}/teacher/reports?classroomId=${classroomId}`;
   const hidden = rows.length - VISIBLE;
+  const anyPlayed = rows.some((row) => row.status !== 'notYet');
 
   return (
     <section
@@ -96,14 +98,19 @@ export function ClassRosterStatus({ classroomId }: { classroomId: string }) {
               href={`${report}&studentId=${row.id}`}
               className="flex min-h-9 items-center justify-between gap-2 rounded-sm py-1 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
             >
-              <span className="min-w-0 truncate font-bold" dir="auto">
-                {row.name}
+              <span className="flex min-w-0 items-center gap-2">
+                <AvatarLite userId={row.id} pixelSize={28} />
+                <span className="min-w-0 truncate font-bold" dir="auto">
+                  {row.name}
+                </span>
               </span>
-              <span className={cn('shrink-0 rounded-full border-2 px-2 py-0.5 text-xs font-black tabular-nums', CHIP[row.status])}>
-                {row.status === 'notYet' || row.status === 'played'
-                  ? t(`eg2Polish.classes.status.${row.status}`)
-                  : t(`eg2Polish.classes.status.${row.status}`, { pct: row.accuracy })}
-              </span>
+              {anyPlayed ? (
+                <span className={cn('shrink-0 rounded-full border-2 px-2 py-0.5 text-xs font-black tabular-nums', CHIP[row.status])}>
+                  {row.status === 'notYet' || row.status === 'played'
+                    ? t(`eg2Polish.classes.status.${row.status}`)
+                    : t(`eg2Polish.classes.status.${row.status}`, { pct: row.accuracy })}
+                </span>
+              ) : null}
             </Link>
           </li>
         ))}

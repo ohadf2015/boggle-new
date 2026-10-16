@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
@@ -15,5 +15,17 @@ describe('<ListMetaFields> assign-to select', () => {
     const options = screen.getByTestId('list-classroom').querySelectorAll('option');
     expect(options[0]).toHaveTextContent('eg2Polish.library.notAssigned');
     expect(options[1]).toHaveTextContent('My Class');
+  });
+});
+
+describe('<ListMetaFields> language', () => {
+  it('Given a draft, Then the language is a tappable radio group on its own row, not a squeezed select', () => {
+    const onChange = vi.fn();
+    render(<ListMetaFields draft={emptyListDraft('en')} classrooms={[]} onChange={onChange} />);
+    const group = screen.getByTestId('list-language');
+    expect(group).toHaveAttribute('role', 'radiogroup');
+    expect(screen.getByRole('radio', { name: /English/ })).toBeChecked();
+    fireEvent.click(screen.getByRole('radio', { name: /עברית/ }));
+    expect(onChange).toHaveBeenCalledWith({ language: 'he' });
   });
 });

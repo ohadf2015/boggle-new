@@ -57,11 +57,12 @@ const ROWS: readonly Row[] = [
 ];
 
 export const BOSS_POSTER = '/images/bosses/boss-lexicon-dragon.png';
+const BOSS_CARD_POSTER = '/mascot/teacher/modes/boss-battle.webp';
 
 const MODES: readonly CatalogueMode[] = ROWS.flatMap((row): CatalogueMode[] => {
   const launch = launchOf(row.id);
   if (row.id === BOSS_BATTLE_ID) {
-    return [{ ...row, launch, suffix: 'bossBattle', nameKey: 'eg2Modes.boss.name', howKey: 'classroomBoss.cardHow', poster: BOSS_POSTER, accent: 'pink' }];
+    return [{ ...row, launch, suffix: 'bossBattle', nameKey: 'eg2Modes.boss.name', howKey: 'classroomBoss.cardHow', poster: BOSS_CARD_POSTER, accent: 'pink' }];
   }
   const base = teacherGameMode(launch.gameMode);
   if (!base) return [];

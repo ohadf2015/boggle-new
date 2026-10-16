@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 const proState = {
@@ -350,5 +350,19 @@ describe('ClassroomRosterProgress', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Print parent summary' }));
     expect(print).toHaveBeenCalledTimes(1);
     expect(trackTeacherRosterParentSharePrinted).toHaveBeenCalledWith({ classroomId: 'c1' });
+  });
+
+  it('Given a roster, Then each row starts with the shared avatar for that student', async () => {
+    studentsState.data = [
+      rosterStudent('sA', { display_name: 'Priya', username: 'p' }, '2026-10-01T09:00:00.000Z'),
+      rosterStudent('sB', { display_name: 'Omar', username: 'o' }, '2026-10-02T09:00:00.000Z'),
+    ];
+    render(<ClassroomRosterProgress classroomId="c1" />);
+    const rows = await screen.findAllByTestId('classroom-roster-row');
+    for (const row of rows) {
+      const avatar = within(row).getByTestId('avatar-lite');
+      expect(['sA', 'sB']).toContain(avatar.getAttribute('data-user-id'));
+    }
+    expect(rows).toHaveLength(2);
   });
 });

@@ -24,6 +24,7 @@ export interface HomeOnboardingCardProps {
 export function HomeOnboardingCard({ onboarding, hrefs, onStepStart, onDismiss, variant, t }: HomeOnboardingCardProps) {
   const current = onboarding.current ?? 'tryDemo';
   const full = variant === 'full';
+  if (!full) return <CompactOnboarding onboarding={onboarding} current={current} hrefs={hrefs} onStepStart={onStepStart} onDismiss={onDismiss} t={t} />;
   return (
     <section
       data-testid="home-onboarding"
@@ -101,6 +102,63 @@ export function HomeOnboardingCard({ onboarding, hrefs, onStepStart, onDismiss, 
       {full ? (
         <EduMascot moment="welcome" animate size={224} className="mx-auto hidden size-56 sm:block" />
       ) : null}
+    </section>
+  );
+}
+
+function CompactOnboarding({
+  onboarding,
+  current,
+  hrefs,
+  onStepStart,
+  onDismiss,
+  t,
+}: Omit<HomeOnboardingCardProps, 'variant'> & { current: HomeOnboardingStepId }) {
+  return (
+    <section
+      data-testid="home-onboarding"
+      aria-labelledby="home-onboarding-title"
+      className={cn(PANEL, 'flex items-center gap-3 px-3 py-3 sm:px-4')}
+    >
+      <ol aria-label={t('eduShell.onboarding.titleCompact')} className="flex shrink-0 gap-1">
+        {onboarding.steps.map((step) => (
+          <li
+            key={step.id}
+            data-testid={`home-onboarding-step-${step.id}`}
+            data-status={step.status}
+            className={cn(
+              'h-2.5 w-5 rounded-full border-[2px] border-neo-black sm:w-7',
+              step.status === 'done' ? 'bg-neo-lime' : step.status === 'current' ? 'bg-neo-lime/35' : 'bg-neo-cream/15',
+            )}
+          >
+            <span className="sr-only">{t(`eduShell.onboarding.steps.${step.id}.title`)}</span>
+          </li>
+        ))}
+      </ol>
+      <h2 id="home-onboarding-title" className="sr-only">
+        {t(`eduShell.onboarding.steps.${current}.title`)}
+      </h2>
+      <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
+        <Link
+          href={hrefs[current]}
+          data-testid="home-onboarding-cta"
+          onClick={() => onStepStart?.(current)}
+          className={cn(SECONDARY_BUTTON, 'min-h-[44px] min-w-0 flex-1 px-3 py-2 text-base sm:flex-none sm:px-5')}
+        >
+          {t(`eduShell.onboarding.steps.${current}.cta`)}
+        </Link>
+        {onboarding.dismissible && onDismiss ? (
+          <button
+            type="button"
+            data-testid="home-onboarding-dismiss"
+            onClick={onDismiss}
+            aria-label={t('eduShell.onboarding.dismiss')}
+            className="grid size-11 shrink-0 place-items-center rounded-neo text-neo-cream/70 transition-colors hover:bg-neo-cream/10 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+          >
+            <X className="size-5" aria-hidden="true" />
+          </button>
+        ) : null}
+      </div>
     </section>
   );
 }

@@ -13,6 +13,7 @@ import { AssignmentCreator } from './assignments';
 import { TeacherHqWelcome } from './TeacherHqWelcome';
 import { TeacherPlanBadge } from './TeacherPlanBadge';
 import { HqLoadError } from './hq/HqLoadError';
+import { greetingName } from './home/greetingName';
 import { HomeHero } from './home/HomeHero';
 import { HomeClassList } from './home/HomeClassList';
 import { HomeWeekCard } from './home/HomeWeekCard';
@@ -23,6 +24,7 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
 import { useTeacherWeekStats } from '@/hooks/useTeacherWeekStats';
+import { useClassStudentPreview } from '@/hooks/useClassStudentPreview';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
 import { polarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
 import { trackEduTeacherDashboardViewed } from '@/lib/education/telemetry';
@@ -66,6 +68,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const { hasPro, loading: proLoading } = pro;
   const activation = useTeacherActivationProgress();
   const week = useTeacherWeekStats(classrooms, !classroomsLoading && !classroomsError);
+  const studentPreview = useClassStudentPreview(classrooms, !classroomsLoading && !classroomsError);
 
   const [selectedId, setSelectedId] = useState('');
   const requestedClassroomId = searchParams?.get('classroomId') ?? null;
@@ -141,7 +144,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
 
   const ready = !classroomsLoading && activation.ready;
   const hasClasses = classrooms.length > 0;
-  const firstName = (profile?.display_name ?? '').trim().split(/\s+/)[0] ?? '';
+  const firstName = greetingName(profile?.display_name);
   const [nowMs] = useState(() => Date.now());
   const hour = new Date(nowMs).getHours();
   const proHref = `/${language}/teacher/upgrade`;
@@ -153,6 +156,9 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   ) : proOffer ? (
     <HomeProCard kind={proOffer.kind} href={proHref} onDismiss={proOffer.onDismiss} trackImpression={!proOffer.tracked} language={language} t={t} />
   ) : null;
+
+  const showWeek = hasClasses && !(week.summary && Object.keys(week.summary.lastPlayedAt).length === 0);
+  const hasRail = !ready || proCard !== null || showWeek;
 
   return (
     <EducationShell
@@ -166,7 +172,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
 
       <div
         data-testid="teacher-home"
-        className="mx-auto grid w-full max-w-[1280px] gap-6 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-8 lg:py-6"
+        className={cn('mx-auto grid w-full max-w-[1280px] gap-6 px-4 py-4 sm:px-6 lg:px-8 lg:py-6', hasRail && 'lg:grid-cols-[minmax(0,1fr)_20rem]')}
       >
         <div className="flex min-w-0 flex-col gap-6">
           <header className="flex flex-wrap items-center justify-between gap-3">
@@ -204,6 +210,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
               />
               <HomeClassList
                 classrooms={classrooms}
+                studentPreview={studentPreview}
                 lastPlayedAt={week.summary?.lastPlayedAt ?? null}
                 activityFailed={week.status === 'error'}
                 newClassHref={newClassHref}
@@ -217,14 +224,12 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
           )}
         </div>
 
-        <aside aria-label={t('eduShell.home.railLabel')} className="flex min-w-0 flex-col gap-6">
-          {!ready ? (
-            <HomeRailSkeleton />
-          ) : hasClasses ? (
-            <HomeWeekCard summary={week.summary} status={week.status} t={t} />
-          ) : null}
-          {proCard}
-        </aside>
+        {hasRail ? (
+          <aside aria-label={t('eduShell.home.railLabel')} className="flex min-w-0 flex-col gap-6">
+            {proCard}
+            {!ready ? <HomeRailSkeleton /> : showWeek ? <HomeWeekCard summary={week.summary} status={week.status} t={t} /> : null}
+          </aside>
+        ) : null}
       </div>
 
       <Dialog open={lessonsOpen} onOpenChange={setLessonsOpen}>

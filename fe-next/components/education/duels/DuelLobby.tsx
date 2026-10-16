@@ -22,6 +22,7 @@ import { getPendingDuelsForStudent, type DuelRow } from '@/lib/supabase/educatio
 import { cn } from '@/lib/utils';
 import { Users, Swords } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import AvatarLite from '@/components/AvatarLite';
 import { AsyncDuelTurnCard } from './AsyncDuelTurnCard';
 import {
   rememberSentTaunt,
@@ -303,6 +304,7 @@ export default function DuelLobby({
               <AsyncDuelTurnCard
                 key={challenge.id}
                 duelId={challenge.id}
+                opponentId={challenge.challenger_id}
                 opponentName={resolveDuelOpponentName({
                   duelId: challenge.id,
                   challengerId: challenge.challenger_id,
@@ -399,11 +401,8 @@ export default function DuelLobby({
                   'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan'
                 )}
               >
-                {/* Avatar placeholder */}
-                <div className="w-12 h-12 rounded-neo bg-neo-cyan border-[3px] border-neo-black flex items-center justify-center relative shadow-hard-sm">
-                  <span className="text-black font-black text-xl font-neo-display">
-                    {(opponent.displayName ?? '?').charAt(0).toUpperCase()}
-                  </span>
+                <div className="relative">
+                  <AvatarLite userId={opponent.userId} pixelSize={48} />
                   {/* Online indicator — neo-cyan glow */}
                   <div className="absolute -top-1.5 -inset-e-1.5 w-4 h-4 rounded-full bg-neo-cyan border-[3px] border-neo-black shadow-[0_0_8px_var(--color-neo-cyan)]" aria-label={t('education.duels.online')} role="status" />
                 </div>

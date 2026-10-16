@@ -1,4 +1,5 @@
 import React from 'react';
+import { pickLesson } from './__tests__/pickLesson';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AssignmentCreator from './AssignmentCreator';
@@ -80,7 +81,7 @@ describe('AssignmentCreator — the disabled submit explains itself', () => {
     const submit = screen.getByText('teacher.assignment.create');
     expect(submit).toHaveAttribute('aria-describedby', hint.id);
 
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'lesson-1' } });
+    pickLesson('lesson-1');
     expect(screen.getByTestId('assignment-submit-hint')).toHaveTextContent('eduPro.assign.needDate');
 
     fireEvent.click(screen.getByText('teacher.assignment.selectDate'));

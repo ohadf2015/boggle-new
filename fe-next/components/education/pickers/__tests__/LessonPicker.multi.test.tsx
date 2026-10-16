@@ -1,9 +1,9 @@
 /**
- * Tests for MultiLessonSelector Component
+ * LessonPicker multi mode: the lobby behaviour ported from MultiLessonSelector
  */
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import { MultiLessonSelector } from '../MultiLessonSelector';
+import { LessonPicker } from '../LessonPicker';
 
 // Mock LanguageContext
 const mockT = vi.fn((key: string) => key);
@@ -15,7 +15,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-describe('MultiLessonSelector', () => {
+describe('LessonPicker (multi)', () => {
   const mockLessons = [
     {
       id: 'lesson-1',
@@ -57,10 +57,10 @@ describe('MultiLessonSelector', () => {
 
     // WHEN
     render(
-      <MultiLessonSelector
+      <LessonPicker mode="multi"
         lessons={mockLessons}
-        selectedLessonIds={[]}
-        onSelectChange={onSelectChange}
+        selectedIds={[]}
+        onChange={onSelectChange}
       />
     );
 
@@ -75,10 +75,10 @@ describe('MultiLessonSelector', () => {
 
     // WHEN
     render(
-      <MultiLessonSelector
+      <LessonPicker mode="multi"
         lessons={mockLessons}
-        selectedLessonIds={[]}
-        onSelectChange={onSelectChange}
+        selectedIds={[]}
+        onChange={onSelectChange}
       />
     );
 
@@ -87,7 +87,7 @@ describe('MultiLessonSelector', () => {
     // false for 'blue' — i.e. it pinned the bug in place. `canIntegrate` is a
     // Boggle-grid rule (3-12 letters), and using it here is what made a
     // ten-word lesson read "9 words" beside its own checkbox one screen after
-    // the editor said 10. See MultiLessonSelector.lessonCount.test.tsx.
+    // the editor said 10. See LessonPicker.lessonCount.test.tsx.
     expect(screen.getAllByText(/2.*word/i)).toHaveLength(2);
     expect(screen.queryByText(/1.*word/i)).not.toBeInTheDocument();
   });
@@ -97,10 +97,10 @@ describe('MultiLessonSelector', () => {
     const onSelectChange = vi.fn();
 
     render(
-      <MultiLessonSelector
+      <LessonPicker mode="multi"
         lessons={mockLessons}
-        selectedLessonIds={[]}
-        onSelectChange={onSelectChange}
+        selectedIds={[]}
+        onChange={onSelectChange}
       />
     );
 
@@ -117,10 +117,10 @@ describe('MultiLessonSelector', () => {
     const onSelectChange = vi.fn();
 
     render(
-      <MultiLessonSelector
+      <LessonPicker mode="multi"
         lessons={mockLessons}
-        selectedLessonIds={['lesson-1']}
-        onSelectChange={onSelectChange}
+        selectedIds={['lesson-1']}
+        onChange={onSelectChange}
       />
     );
 
@@ -137,10 +137,10 @@ describe('MultiLessonSelector', () => {
     const onSelectChange = vi.fn();
 
     render(
-      <MultiLessonSelector
+      <LessonPicker mode="multi"
         lessons={mockLessons}
-        selectedLessonIds={['lesson-1', 'lesson-2']}
-        onSelectChange={onSelectChange}
+        selectedIds={['lesson-1', 'lesson-2']}
+        onChange={onSelectChange}
       />
     );
 
@@ -158,10 +158,10 @@ describe('MultiLessonSelector', () => {
 
     // WHEN
     render(
-      <MultiLessonSelector
+      <LessonPicker mode="multi"
         lessons={[]}
-        selectedLessonIds={[]}
-        onSelectChange={onSelectChange}
+        selectedIds={[]}
+        onChange={onSelectChange}
       />
     );
 
@@ -175,10 +175,10 @@ describe('MultiLessonSelector', () => {
 
     // WHEN
     render(
-      <MultiLessonSelector
+      <LessonPicker mode="multi"
         lessons={mockLessons}
-        selectedLessonIds={['lesson-1', 'lesson-2']}
-        onSelectChange={onSelectChange}
+        selectedIds={['lesson-1', 'lesson-2']}
+        onChange={onSelectChange}
       />
     );
 
@@ -189,16 +189,22 @@ describe('MultiLessonSelector', () => {
     );
   });
 
+  it('should say "1 lesson selected" in the singular', () => {
+    render(<LessonPicker mode="multi" lessons={mockLessons} selectedIds={['lesson-1']} onChange={vi.fn()} />);
+    expect(mockT).toHaveBeenCalledWith('education.classroomGame.lessonSelected', expect.objectContaining({ count: 1 }));
+    expect(mockT).not.toHaveBeenCalledWith('education.classroomGame.lessonsSelected', expect.anything());
+  });
+
   it('should highlight selected lessons visually', () => {
     // GIVEN
     const onSelectChange = vi.fn();
 
     // WHEN
     render(
-      <MultiLessonSelector
+      <LessonPicker mode="multi"
         lessons={mockLessons}
-        selectedLessonIds={['lesson-1']}
-        onSelectChange={onSelectChange}
+        selectedIds={['lesson-1']}
+        onChange={onSelectChange}
       />
     );
 
@@ -214,10 +220,10 @@ describe('MultiLessonSelector', () => {
 
       // WHEN
       render(
-        <MultiLessonSelector
+        <LessonPicker mode="multi"
           lessons={mockLessons}
-          selectedLessonIds={[]}
-          onSelectChange={onSelectChange}
+          selectedIds={[]}
+          onChange={onSelectChange}
         />
       );
 
@@ -232,10 +238,10 @@ describe('MultiLessonSelector', () => {
       const onSelectChange = vi.fn();
 
       render(
-        <MultiLessonSelector
+        <LessonPicker mode="multi"
           lessons={mockLessons}
-          selectedLessonIds={[]}
-          onSelectChange={onSelectChange}
+          selectedIds={[]}
+          onChange={onSelectChange}
         />
       );
 
@@ -254,10 +260,10 @@ describe('MultiLessonSelector', () => {
 
       // WHEN
       render(
-        <MultiLessonSelector
+        <LessonPicker mode="multi"
           lessons={mockLessons}
-          selectedLessonIds={['lesson-1', 'lesson-2']}
-          onSelectChange={onSelectChange}
+          selectedIds={['lesson-1', 'lesson-2']}
+          onChange={onSelectChange}
         />
       );
 
@@ -272,10 +278,10 @@ describe('MultiLessonSelector', () => {
       const onSelectChange = vi.fn();
 
       render(
-        <MultiLessonSelector
+        <LessonPicker mode="multi"
           lessons={mockLessons}
-          selectedLessonIds={['lesson-1', 'lesson-2']}
-          onSelectChange={onSelectChange}
+          selectedIds={['lesson-1', 'lesson-2']}
+          onChange={onSelectChange}
         />
       );
 
@@ -294,10 +300,10 @@ describe('MultiLessonSelector', () => {
 
       // WHEN
       render(
-        <MultiLessonSelector
+        <LessonPicker mode="multi"
           lessons={[]}
-          selectedLessonIds={[]}
-          onSelectChange={onSelectChange}
+          selectedIds={[]}
+          onChange={onSelectChange}
         />
       );
 
@@ -311,10 +317,10 @@ describe('MultiLessonSelector', () => {
   describe('accessibility', () => {
     it('renders a list with each lesson as a checkbox-role button', () => {
       render(
-        <MultiLessonSelector
+        <LessonPicker mode="multi"
           lessons={mockLessons}
-          selectedLessonIds={['lesson-1']}
-          onSelectChange={vi.fn()}
+          selectedIds={['lesson-1']}
+          onChange={vi.fn()}
         />
       );
 
@@ -326,10 +332,10 @@ describe('MultiLessonSelector', () => {
 
     it('Select All control meets the 40px+ TV/kid touch target', () => {
       render(
-        <MultiLessonSelector
+        <LessonPicker mode="multi"
           lessons={mockLessons}
-          selectedLessonIds={[]}
-          onSelectChange={vi.fn()}
+          selectedIds={[]}
+          onChange={vi.fn()}
         />
       );
 
@@ -341,10 +347,10 @@ describe('MultiLessonSelector', () => {
 
     it('lesson buttons expose a focus-visible ring for keyboard / TV users', () => {
       render(
-        <MultiLessonSelector
+        <LessonPicker mode="multi"
           lessons={mockLessons}
-          selectedLessonIds={[]}
-          onSelectChange={vi.fn()}
+          selectedIds={[]}
+          onChange={vi.fn()}
         />
       );
 

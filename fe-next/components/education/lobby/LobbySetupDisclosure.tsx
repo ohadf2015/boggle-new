@@ -20,11 +20,14 @@ import type { ReactNode } from 'react';
 import { ChevronDown, ChevronUp, School, TriangleAlert } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { BoardLanguageChip } from '../pickers/BoardLanguageChip';
 
 export interface LobbySetupDisclosureProps {
   classroomName: string;
   lessonNames: string[];
   wordCount: number;
+  /** What launch sends as the board language; null until a list is picked. */
+  boardLanguage?: string | null;
   /** True while GO LIVE cannot fire — the summary becomes the call to action. */
   incomplete: boolean;
   open: boolean;
@@ -36,6 +39,7 @@ export function LobbySetupDisclosure({
   classroomName,
   lessonNames,
   wordCount,
+  boardLanguage,
   incomplete,
   open,
   onToggle,
@@ -86,6 +90,7 @@ export function LobbySetupDisclosure({
         >
           {summary}
         </span>
+        {boardLanguage && !incomplete && <BoardLanguageChip language={boardLanguage} />}
         <span className="shrink-0 font-neo-display text-[0.65rem] font-black uppercase tracking-wide">
           {t(open ? 'eduShell.host.optionsHide' : 'eduShell.host.options')}
         </span>

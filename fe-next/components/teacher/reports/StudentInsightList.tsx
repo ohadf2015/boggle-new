@@ -3,6 +3,7 @@
 import { m, useReducedMotion } from 'framer-motion';
 import { ChevronRight, Minus, Sparkle, TrendingDown, TrendingUp, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import AvatarLite from '@/components/AvatarLite';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 import type { StudentInsight, StudentTrend } from './classInsights';
@@ -55,15 +56,7 @@ function StudentRow({
             'transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0 motion-reduce:transition-none',
         )}
       >
-        <span
-          aria-hidden="true"
-          className={cn(
-            'grid size-8 place-items-center rounded-neo border-2 border-black font-neo-display text-sm font-black text-neo-black',
-            student.belowGoal ? 'bg-neo-pink' : 'bg-neo-lime',
-          )}
-        >
-          {name.trim().charAt(0).toUpperCase() || '?'}
-        </span>
+        <AvatarLite userId={student.studentId} pixelSize={32} />
         <span className="min-w-0">
           <span className="flex min-w-0 items-center gap-1.5">
             <span dir="auto" className="truncate font-neo-display text-base font-bold text-neo-white">

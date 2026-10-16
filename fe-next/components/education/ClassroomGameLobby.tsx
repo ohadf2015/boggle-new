@@ -37,6 +37,7 @@ import { availableFocuses } from '@/lib/education/vocabFocus';
 import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
 import { ClassroomModeCardRow, ClassroomModeCatalogue } from './ClassroomModeCatalogue';
 import { LobbySetupPanel } from './lobby/LobbySetupPanel';
+import { playableLessonWords } from '@/lib/education/lessonPickerModel';
 import { LobbyRoundSettings } from './lobby/LobbyRoundSettings';
 import { LobbySetupDisclosure } from './lobby/LobbySetupDisclosure';
 import { LobbyPressureDials } from './lobby/LobbyPressureDials';
@@ -182,12 +183,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   // which answers "can a Boggle grid hold this?" (3-12 letters) and not "is this
   // part of the lesson?". Using it here turned a ten-word list into nine and
   // dropped "photosynthesis" with no error anywhere (measured 2026-09-07).
-  const allPlayableWords = useMemo(() => {
-    const words = selectedLessons.flatMap(
-      (lesson) => lesson.words?.map((w) => w.word).filter((w): w is string => !!w?.trim()) || []
-    );
-    return [...new Set(words)];
-  }, [selectedLessons]);
+  const allPlayableWords = useMemo(() => playableLessonWords(selectedLessons), [selectedLessons]);
 
   // The RICH per-word rows the quiz builds questions from — and what the
   // "best fit" flag is computed off.
@@ -425,6 +421,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
         classroomName={classrooms.find((c) => c.id === selectedClassroomId)?.name ?? ''}
         lessonNames={selectedLessons.map((l) => l.name)}
         wordCount={allPlayableWords.length}
+        boardLanguage={lessonLanguage}
         incomplete={cannotStart}
         open={setupOpen}
         onToggle={() => setSetupOpen((v) => !v)}

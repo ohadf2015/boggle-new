@@ -1,5 +1,26 @@
 // RU translations
 const ru = {
+  // @eduPickers:start
+  "eduPickers": {
+    "language": {
+      "boardHint": "Задаёт словарь и буквы на поле в играх этого класса"
+    },
+    "board": {
+      "label": "Поле: {language}"
+    },
+    "lesson": {
+      "create": "Создать список слов",
+      "mixedWarning": "Эти списки на разных языках. На поле будут буквы языка: {language}.",
+      "classMismatch": "Язык класса: {classLanguage}. На поле будут буквы языка: {language}.",
+      "switched": "Переключено на {language}. В одной игре один язык, поэтому другие списки сняты.",
+      "searchLabel": "Поиск по спискам слов",
+      "searchPlaceholder": "Найти в своих списках",
+      "noMatch": "Нет списков по запросу «{query}»",
+      "noLanguage": "Другое",
+      "selectAllIn": "Выбрать все: {language}"
+    }
+  },
+  // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
     "chestUpgraded": "Босс повержен: твой сундук улучшен!",
@@ -4279,6 +4300,7 @@ const ru = {
       "gameSettings": "Настройки игры",
       "joinedStudents": "Присоединившиеся ученики",
       "lessonsSelected": "Выбрано уроков: {{count}}",
+      "lessonSelected": "Выбран 1 урок",
       "missingRequirements": "Не выполнены требования",
       "startFailed": "Не удалось запустить игру. Попробуйте ещё раз.",
       "tooFast": "Секунду. Попробуйте ещё раз через несколько секунд.",
@@ -13557,6 +13579,8 @@ const ru = {
       "scanToJoin": "Сканируйте, чтобы войти"
     },
     "classroom": {
+      "studentCap": "Учеников: {{count}} из {{limit}}",
+      "studentCountPro": "Учеников: {{count}}",
       "presets": {
         "title": "Быстрые ритуалы",
         "fridayBattle": { "name": "Пятничная битва слов", "desc": "Команды · ваш последний список · громко и быстро" },

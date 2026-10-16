@@ -1,5 +1,26 @@
 // HE translations
 const he = {
+  // @eduPickers:start
+  "eduPickers": {
+    "language": {
+      "boardHint": "קובעת את המילון ואת האותיות על הלוח במשחקים של הכיתה"
+    },
+    "board": {
+      "label": "לוח: {language}"
+    },
+    "lesson": {
+      "create": "יצירת רשימת מילים",
+      "mixedWarning": "הרשימות האלה בשפות שונות. אותיות הלוח: {language}.",
+      "classMismatch": "שפת הכיתה: {classLanguage}. אותיות הלוח: {language}.",
+      "switched": "השפה עכשיו: {language}. כל משחק הוא בשפה אחת, אז הרשימות האחרות בוטלו.",
+      "searchLabel": "חיפוש ברשימות מילים",
+      "searchPlaceholder": "חפשו ברשימות שלכם",
+      "noMatch": "אין רשימות שמתאימות ל\"{query}\"",
+      "noLanguage": "אחר",
+      "selectAllIn": "בחירת כל הרשימות ב{language}"
+    }
+  },
+  // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
     "chestUpgraded": "הבוס הובס: התיבה שלך שודרגה!",
@@ -14203,6 +14224,8 @@ const he = {
       "scanToJoin": "סרקו להצטרפות"
     },
     "classroom": {
+      "studentCap": "{{count}} מתוך {{limit}} תלמידים",
+      "studentCountPro": "{{count}} תלמידים",
       "presets": {
         "title": "תבניות מהירות",
         "fridayBattle": { "name": "קרב אוצר המילים של שישי", "desc": "קבוצות · הרשימה האחרונה · מהר ורועש" },
@@ -15814,6 +15837,7 @@ const he = {
       "gameSettings": "הגדרות משחק",
       "joinedStudents": "תלמידים שהצטרפו",
       "lessonsSelected": "{{count}} שיעורים נבחרו",
+      "lessonSelected": "שיעור אחד נבחר",
       "missingRequirements": "חסרים פרטים",
       "startFailed": "לא הצלחנו להתחיל את המשחק. נסו שוב.",
       "tooFast": "רגע, נסו שוב בעוד כמה שניות.",

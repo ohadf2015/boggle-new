@@ -54,6 +54,7 @@ vi.mock('@/lib/native/bannerController', async () => {
     bannerController: {
       setRequest: vi.fn().mockResolvedValue(undefined),
       clearRequest: vi.fn().mockResolvedValue(undefined),
+      isVisible: vi.fn(() => false),
     },
   };
 });
@@ -62,6 +63,7 @@ import AnchoredNativeBanner from '../AnchoredNativeBanner';
 
 const setRequest = bannerController.setRequest as ReturnType<typeof vi.fn>;
 const clearRequest = bannerController.clearRequest as ReturnType<typeof vi.fn>;
+const isVisible = bannerController.isVisible as ReturnType<typeof vi.fn>;
 
 /** Convenience: the anchor request shape with the given margin. */
 const anchorReq = (margin: number) => ['anchor', { margin, variant: 'content', priority: 1 }] as const;
@@ -238,6 +240,32 @@ describe('AnchoredNativeBanner', () => {
     await Promise.resolve();
     await Promise.resolve();
     expect(document.documentElement.style.getPropertyValue('--admob-banner-height')).toBe('0px');
+  });
+
+  it('drops has-admob-banner after a blocked-route clear leaves no banner on screen', async () => {
+    document.documentElement.classList.add('has-admob-banner');
+    isVisible.mockReturnValue(false);
+    mockPathname.current = '/en/teacher';
+
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(document.documentElement.classList.contains('has-admob-banner')).toBe(false);
+  });
+
+  it('keeps has-admob-banner when another owner (results slot) still shows a banner', async () => {
+    document.documentElement.classList.add('has-admob-banner');
+    isVisible.mockReturnValue(true);
+    mockPathname.current = '/daily/word-hunt';
+
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(document.documentElement.classList.contains('has-admob-banner')).toBe(true);
+    document.documentElement.classList.remove('has-admob-banner');
+    isVisible.mockReturnValue(false);
   });
 
   it('registers SizeChanged listener on mount', async () => {

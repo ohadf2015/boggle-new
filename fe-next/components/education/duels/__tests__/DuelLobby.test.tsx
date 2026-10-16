@@ -212,6 +212,8 @@ describe('DuelLobby', () => {
         expect(screen.getByText('Player 1')).toBeInTheDocument();
         expect(screen.getByText('Player 2')).toBeInTheDocument();
       });
+      const ids = screen.getAllByTestId('avatar-lite').map((el) => el.getAttribute('data-user-id'));
+      expect(ids).toEqual(['user-1', 'user-2']);
     });
 
     it('shows empty state message when no opponents', () => {

@@ -74,7 +74,7 @@ describe('AssignmentCreator — first-assignment starter packs', () => {
     expect(screen.getByTestId('first-assignment-template-starter-animals-en')).toBeInTheDocument();
     expect(screen.getByTestId('first-assignment-template-starter-colors-en')).toBeInTheDocument();
     expect(screen.queryByText('teacher.assignment.typeLabel')).toBeNull();
-    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(screen.queryByTestId('assignment-lesson-picker')).toBeNull();
   });
 
   it('one tap assigns the pack as a Word Craft homework due tomorrow', async () => {

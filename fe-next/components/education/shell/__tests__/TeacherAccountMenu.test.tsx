@@ -19,7 +19,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'he' }),
 }));
 vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({ profile: { display_name: 'Dana Levi', user_role: 'teacher' }, user: { email: 'dana@school.test' } }),
+  useAuth: () => ({
+    profile: { display_name: 'Dana Levi', user_role: 'teacher', avatar_config: { bgColor: '#123456' } },
+    user: { id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479', email: 'dana@school.test' },
+  }),
 }));
 vi.mock('@/lib/supabase', () => ({ signOut: () => signOut() }));
 vi.mock('@/components/teacher/TeacherWhatsNew', () => ({
@@ -39,10 +42,13 @@ async function openMenu() {
 }
 
 describe('<TeacherAccountMenu>', () => {
-  it('Given a teacher, When the avatar is shown, Then it carries their initials and an accessible name', () => {
+  it('Given a teacher, When the avatar is shown, Then it is the shared avatar with an accessible name', () => {
     render(<TeacherAccountMenu proHref="/he/teacher/upgrade" profileHref="/he/teacher/profile" />);
     const trigger = screen.getByTestId('teacher-account-trigger');
-    expect(trigger).toHaveTextContent('DL');
+    const avatar = screen.getByTestId('avatar-lite');
+    expect(avatar).toHaveAttribute('data-user-id', 'f47ac10b-58cc-4372-a567-0e02b2c3d479');
+    expect(avatar).toHaveAttribute('data-has-custom', 'true');
+    expect(trigger).not.toHaveTextContent('DL');
     expect(trigger).toHaveAccessibleName('eduShell.account.menuLabel');
   });
 

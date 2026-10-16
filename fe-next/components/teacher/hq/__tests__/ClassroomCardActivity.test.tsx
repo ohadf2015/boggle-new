@@ -57,7 +57,7 @@ describe('<ClassroomCardActivity>', () => {
     expect(screen.getByTestId('classroom-card-next')).toHaveTextContent('osmosis, mitosis');
   });
 
-  it('Given a class that never played, Then it says so rather than a fake date', () => {
+  it('Given a class that never played, Then it shows no empty activity box (the join code is the next step)', () => {
     pulse.mockReturnValue({
       pulse: { ...base, state: 'neverPlayed', nextAction: 'play', daysSinceLastGame: null, averageAccuracyPct: null },
       isLoading: false,
@@ -65,8 +65,8 @@ describe('<ClassroomCardActivity>', () => {
       refresh: vi.fn(),
     });
     render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
-    expect(screen.getByTestId('classroom-card-last')).toHaveTextContent('teacher.pulse.state.neverPlayed');
-    expect(screen.getByTestId('classroom-card-next')).toHaveTextContent('teacher.pulse.action.play');
+    expect(screen.queryByTestId('classroom-card-last')).toBeNull();
+    expect(screen.queryByTestId('classroom-card-next')).toBeNull();
   });
 
   it('Given the read is still open, Then it claims nothing yet', () => {

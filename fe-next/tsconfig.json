@@ -71,7 +71,9 @@
     ".next-hs/types/**/*.ts",
     ".next-hs/dev/types/**/*.ts",
     ".next-gate/types/**/*.ts",
-    ".next-gate/dev/types/**/*.ts"
+    ".next-gate/dev/types/**/*.ts",
+    ".next-polish/types/**/*.ts",
+    ".next-polish/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

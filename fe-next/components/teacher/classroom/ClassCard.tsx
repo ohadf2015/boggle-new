@@ -18,6 +18,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import ClassroomStudentList from '../ClassroomStudentList';
 import { StudentCapMeter } from '../StudentCapMeter';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { slideUp } from '../teacherDashboardTabs';
 
 export interface ClassCardData {
@@ -73,6 +74,7 @@ export function ClassCard({
   startGameHref,
 }: ClassCardProps) {
   const { t } = useLanguage();
+  const { hasPro, loading: proLoading } = useTeacherPro();
   const count = classroom.member_count || 0;
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -240,11 +242,13 @@ export function ClassCard({
           </div>
         ) : null}
 
-        <StudentCapMeter
-          studentCount={count}
-          source="classroom_card"
-          className="py-1.5 [@media(orientation:landscape)_and_(max-height:500px)]:col-start-2 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-1"
-        />
+        {hasPro || proLoading ? null : (
+          <StudentCapMeter
+            studentCount={count}
+            source="classroom_card"
+            className="py-1.5 [@media(orientation:landscape)_and_(max-height:500px)]:col-start-2 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-1"
+          />
+        )}
 
         <button
           type="button"

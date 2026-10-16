@@ -50,6 +50,7 @@ export interface StudentProgressSummary {
   studentId: string;
   displayName: string;
   avatarUrl: string | null;
+  avatarConfig?: Record<string, unknown> | null;
   totalXp: number;
   currentLevel: number;
   vocabularyMastery: number;

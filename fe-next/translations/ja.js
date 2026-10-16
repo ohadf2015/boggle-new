@@ -1,5 +1,26 @@
 // Ja translations
 const ja = {
+  // @eduPickers:start
+  "eduPickers": {
+    "language": {
+      "boardHint": "このクラスのゲームで使う辞書と盤面の文字が決まります"
+    },
+    "board": {
+      "label": "盤面: {language}"
+    },
+    "lesson": {
+      "create": "単語リストを作る",
+      "mixedWarning": "選んだリストの言語がそろっていません。盤面は{language}の文字になります。",
+      "classMismatch": "このクラスは{classLanguage}に設定されていますが、盤面は{language}の文字になります。",
+      "switched": "{language}に切り替えました。1つのゲームは1つの言語なので、ほかのリストは外しました。",
+      "searchLabel": "単語リストを検索",
+      "searchPlaceholder": "リストを検索",
+      "noMatch": "「{query}」に一致するリストはありません",
+      "noLanguage": "その他",
+      "selectAllIn": "{language}のリストをすべて選ぶ"
+    }
+  },
+  // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
     "chestUpgraded": "ボス撃破! 宝箱がランクアップ!",
@@ -14348,6 +14369,8 @@ const ja = {
       "scanToJoin": "スキャンして参加"
     },
     "classroom": {
+      "studentCap": "生徒 {{count}} / {{limit}} 人",
+      "studentCountPro": "生徒 {{count}} 人",
       "presets": {
         "title": "定型プリセット",
         "fridayBattle": { "name": "金曜単語バトル", "desc": "チーム戦 · 前回のリスト · 速くてにぎやか" },
@@ -15959,6 +15982,7 @@ const ja = {
       "gameSettings": "ゲーム設定",
       "joinedStudents": "参加した生徒",
       "lessonsSelected": "{{count}}個選択中",
+      "lessonSelected": "1個選択中",
       "missingRequirements": "必要項目が足りません",
       "startFailed": "ゲームを開始できませんでした。もう一度お試しください。",
       "tooFast": "少し待ってから、もう一度お試しください。",

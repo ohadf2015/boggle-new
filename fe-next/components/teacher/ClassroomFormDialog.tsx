@@ -13,8 +13,8 @@ import {
   DialogDescription,
   DialogBody,
 } from '@/components/ui/dialog';
-import { EDUCATION_LANGUAGES, type Language } from '@/lib/supabase/education/types';
-import { LANGUAGE_LABEL_KEYS } from '@/lib/i18n/languageLabels';
+import type { Language } from '@/lib/supabase/education/types';
+import { LanguagePicker } from '@/components/education/pickers/LanguagePicker';
 
 interface ClassroomFormDialogProps {
   open: boolean;
@@ -89,7 +89,7 @@ export function ClassroomFormDialog({
           <div>
             <label
               htmlFor="classroom-form-name"
-              className="block text-sm font-neo-body font-black text-neo-black mb-2"
+              className="block text-sm font-neo-body font-black text-neo-black dark:text-neo-cream mb-2"
             >
               {t('teacher.classroom.name')}
             </label>
@@ -105,30 +105,13 @@ export function ClassroomFormDialog({
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="classroom-form-language"
-              className="block text-sm font-neo-body font-black text-neo-black mb-2"
-            >
-              {t('teacher.classroom.language')}
-            </label>
-            <select
-              id="classroom-form-language"
-              value={selectedLanguage}
-              onChange={(e) => setSelectedLanguage(e.target.value as Language)}
-              className={cn(
-                'w-full px-4 py-2 bg-neo-cream border-2 border-black',
-                'text-black font-neo-body font-bold shadow-hard-sm rounded-neo',
-                'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan'
-              )}
-            >
-              {EDUCATION_LANGUAGES.map((code) => (
-                <option key={code} value={code}>
-                  {t(LANGUAGE_LABEL_KEYS[code])}
-                </option>
-              ))}
-            </select>
-          </div>
+          <LanguagePicker
+            label={t('teacher.classroom.language')}
+            value={selectedLanguage}
+            onChange={setSelectedLanguage}
+            tone="theme"
+            showBoardHint
+          />
 
           <div className="flex gap-3 pt-2">
             <Button

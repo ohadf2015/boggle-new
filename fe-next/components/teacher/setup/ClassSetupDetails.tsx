@@ -2,8 +2,8 @@
 
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { EDUCATION_LANGUAGES, type Language } from '@/lib/supabase/education/types';
-import { LANGUAGE_LABEL_KEYS } from '@/lib/i18n/languageLabels';
+import type { Language } from '@/lib/supabase/education/types';
+import { LanguagePicker } from '@/components/education/pickers/LanguagePicker';
 import { EduMascot } from '@/components/education/EduMascot';
 import { PANEL, PRIMARY_BUTTON } from '../home/homeStyles';
 import { GRADE_BANDS, type GradeBand } from './classSetupDefaults';
@@ -90,24 +90,12 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
         </div>
       </fieldset>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="setup-language" className={FIELD_LABEL}>
-          {t('eduShell.setup.languageLabel')}
-        </label>
-        <select
-          id="setup-language"
-          value={language}
-          onChange={(e) => onLanguageChange(e.target.value as Language)}
-          className={cn(INPUT, 'appearance-auto')}
-        >
-          {EDUCATION_LANGUAGES.map((code) => (
-            <option key={code} value={code} className="bg-neo-navy">
-              {t(LANGUAGE_LABEL_KEYS[code])}
-            </option>
-          ))}
-        </select>
-        <p className="font-neo-body text-xs text-neo-cream/65">{t('eduShell.setup.languageHint')}</p>
-      </div>
+      <LanguagePicker
+        label={<span className={FIELD_LABEL}>{t('eduShell.setup.languageLabel')}</span>}
+        value={language}
+        onChange={onLanguageChange}
+        showBoardHint
+      />
 
       {cap ? (
         <div data-testid="setup-cap-meter" className="flex flex-col gap-1.5">

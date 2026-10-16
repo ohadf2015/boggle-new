@@ -20,6 +20,7 @@ import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDuelSocket, type OpponentInfo } from '@/hooks/useDuelSocket';
 import { cn } from '@/lib/utils';
+import AvatarLite from '@/components/AvatarLite';
 import { X, Swords, ChevronDown, Zap } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -144,11 +145,7 @@ export default function DuelChallengeModal({
         <div className="mb-4">
           <div className="flex items-center gap-4 p-4 rounded-neo border-[2px] border-neo-cream/80 bg-neo-navy/50">
             {/* Avatar */}
-            <div className="w-12 h-12 rounded-full bg-neo-cyan flex items-center justify-center">
-              <span className="text-neo-black font-black text-xl">
-                {(opponent.displayName ?? '?').charAt(0).toUpperCase()}
-              </span>
-            </div>
+            <AvatarLite userId={opponent.userId} pixelSize={48} />
 
             {/* Name */}
             <div>

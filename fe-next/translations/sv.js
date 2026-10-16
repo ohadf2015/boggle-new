@@ -1,5 +1,26 @@
 // Sv translations
 const sv = {
+  // @eduPickers:start
+  "eduPickers": {
+    "language": {
+      "boardHint": "Styr ordlistan och bokstäverna på brädet i klassens spel"
+    },
+    "board": {
+      "label": "Bräde: {language}"
+    },
+    "lesson": {
+      "create": "Skapa en ordlista",
+      "mixedWarning": "De här listorna är på olika språk. Brädet får bokstäver på {language}.",
+      "classMismatch": "Klassen är inställd på {classLanguage}. Brädet får bokstäver på {language}.",
+      "switched": "Bytte till {language}. Ett spel använder ett språk, så de andra listorna togs bort.",
+      "searchLabel": "Sök bland ordlistor",
+      "searchPlaceholder": "Sök i dina listor",
+      "noMatch": "Inga listor matchar \"{query}\"",
+      "noLanguage": "Övrigt",
+      "selectAllIn": "Välj alla på {language}"
+    }
+  },
+  // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
     "chestUpgraded": "Bossen besegrad: din kista har uppgraderats!",
@@ -14619,6 +14640,8 @@ const sv = {
       "scanToJoin": "Skanna för att gå med"
     },
     "classroom": {
+      "studentCap": "{{count}} / {{limit}} elever",
+      "studentCountPro": "{{count}} elever",
       "presets": {
         "title": "Snabbritualer",
         "fridayBattle": { "name": "Fredagens ordkamp", "desc": "Lag · din senaste lista · högljutt och snabbt" },
@@ -16230,6 +16253,7 @@ const sv = {
       "gameSettings": "Spelinställningar",
       "joinedStudents": "Elever som gick med",
       "lessonsSelected": "{{count}} lektioner valda",
+      "lessonSelected": "1 lektion vald",
       "missingRequirements": "Det saknas något",
       "startFailed": "Vi kunde inte starta spelet. Försök igen.",
       "tooFast": "Ett ögonblick – försök igen om några sekunder.",

@@ -4,6 +4,7 @@
  * practice_focus 'wordcraft' (see lib/education/wordcraftAssignment.ts).
  */
 import React from 'react';
+import { pickLesson } from './__tests__/pickLesson';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AssignmentCreator from './AssignmentCreator';
@@ -34,7 +35,7 @@ const renderIt = () =>
   render(<AssignmentCreator classroomId="classroom-1" onComplete={vi.fn()} isOpen onClose={vi.fn()} />);
 
 async function submit() {
-  fireEvent.change(screen.getByRole('combobox'), { target: { value: 'lesson-1' } });
+  pickLesson('lesson-1');
   fireEvent.click(screen.getByText('teacher.assignment.selectDate'));
   fireEvent.click(screen.getByText('teacher.assignment.tomorrow'));
   fireEvent.click(screen.getByText('teacher.assignment.create'));
@@ -66,7 +67,7 @@ describe('AssignmentCreator — Word Craft', () => {
 
   it('Given Word Craft, Then no focus drill picker is shown (no decision overload)', () => {
     renderIt();
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'lesson-1' } });
+    pickLesson('lesson-1');
     expect(screen.queryByRole('radiogroup', { name: 'teacher.assignment.focus.label' })).not.toBeInTheDocument();
   });
 

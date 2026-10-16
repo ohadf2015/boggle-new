@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { MultiLessonSelector } from '../MultiLessonSelector';
+import { LessonPicker } from '../LessonPicker';
 
 /**
  * The lesson picker must count the lesson, not the board.
@@ -30,14 +30,11 @@ const lesson = {
   ],
 } as never;
 
-describe('MultiLessonSelector — the count next to a lesson', () => {
+describe('LessonPicker — the count next to a lesson', () => {
   it('counts every word the teacher put in the lesson', () => {
     render(
-      <MultiLessonSelector lessons={[lesson]} selectedLessonIds={[]} onSelectChange={vi.fn()} />
+      <LessonPicker mode="multi" lessons={[lesson]} selectedIds={[]} onChange={vi.fn()} />
     );
-    // The number and the pluralised label share one element, so match the node.
-    expect(
-      screen.getByText((_, el) => el?.textContent?.trim() === '2 education.lesson.words|{"count":2}')
-    ).toBeInTheDocument();
+    expect(screen.getByRole('checkbox')).toHaveTextContent('2 education.lesson.words|{"count":2}');
   });
 });

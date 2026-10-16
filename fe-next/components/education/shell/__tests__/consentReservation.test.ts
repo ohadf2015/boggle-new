@@ -44,8 +44,20 @@ describe('cookie-consent reservation vs the education shell', () => {
     expect(optOut).toBeGreaterThan(generic);
   });
 
-  it('still keeps the bottom-stack (nav / ad banner) reservation', () => {
-    const block = css.slice(css.indexOf(OPT_OUT), css.indexOf(OPT_OUT) + 240);
+  it('pads nothing when no nav or ad banner is actually on screen', () => {
+    // --bottom-nav-height is a static 64px default, so an ungated
+    // --bottom-stack-height reservation left a 64px band under the tab bar.
+    const block = css.slice(css.indexOf(OPT_OUT), css.indexOf('}', css.indexOf(OPT_OUT)));
+    expect(block).toMatch(/padding-bottom:\s*0\s*;/);
+  });
+
+  it('keeps the bottom-stack reservation only behind a real nav / banner class', () => {
+    const gated = css.indexOf('body.edu-shell-locked', css.indexOf(OPT_OUT) + OPT_OUT.length);
+    const selector = css.slice(css.lastIndexOf('}', gated) + 1, gated);
+    expect(selector).toContain('has-cookie-consent');
+    expect(selector).toMatch(/has-admob-banner/);
+    expect(selector).toMatch(/has-global-bottom-nav/);
+    const block = css.slice(gated, css.indexOf('}', gated));
     expect(block).toContain('--bottom-stack-height');
     expect(block).not.toContain('--cookie-consent-height');
   });

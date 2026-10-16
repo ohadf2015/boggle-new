@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -20,8 +20,9 @@ describe('ClassroomFormDialog', () => {
   it('offers every language the create route accepts', () => {
     render(<ClassroomFormDialog {...baseProps} mode="create" />);
 
-    const select = screen.getByRole('combobox') as HTMLSelectElement;
-    expect(Array.from(select.options).map((o) => o.value)).toEqual([...EDUCATION_LANGUAGES]);
+    const group = screen.getByRole('radiogroup', { name: 'teacher.classroom.language' });
+    const radios = within(group).getAllByRole('radio') as HTMLInputElement[];
+    expect(radios.map((r) => r.value)).toEqual([...EDUCATION_LANGUAGES]);
   });
 
   it('seeds name and language from initial values', () => {
@@ -30,13 +31,13 @@ describe('ClassroomFormDialog', () => {
     );
 
     expect(screen.getByPlaceholderText('teacher.classroom.namePlaceholder')).toHaveValue('Period 3');
-    expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe('es');
+    expect(screen.getByRole('radio', { name: /Español/ })).toBeChecked();
   });
 
   it('seeds language from the teacher locale when no initial value is given', () => {
     render(<ClassroomFormDialog {...baseProps} mode="create" />);
 
-    expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe('en');
+    expect(screen.getByRole('radio', { name: /English/ })).toBeChecked();
   });
 
   it('prefills the localized default name in create mode, so creating is one tap', () => {

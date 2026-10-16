@@ -37,11 +37,10 @@ export interface TeacherGameMode {
   /** `education.modePicker.how.<suffix>` — one line, what a student does. */
   howKey: string;
   /**
-   * Transparent mascot poster, served from `public/mascot/teacher/`. The
-   * `-nobg` suffix is the repo's convention for background-stripped mascot art
-   * — and it is also the cache key: `/_next/image` answers a stable URL with a
-   * one-year immutable header, so replacing the bytes under an existing name
-   * leaves every warm browser rendering the old opaque square forever.
+   * Transparent sticker art, served from `public/mascot/teacher/modes/`. The
+   * path is the cache key: `/_next/image` answers a stable URL with a one-year
+   * immutable header, so new art needs a new filename, never new bytes under
+   * an old one.
    */
   poster: string;
   accent: ModeAccent;
@@ -71,12 +70,12 @@ interface ModeShape {
 }
 
 const MODE_SHAPE: Record<string, ModeShape> = {
-  classic: { poster: '/mascot/teacher/mode-classic-nobg.webp', accent: 'cyan', minutes: 3, needsDefinitions: false },
-  'word-hunt': { poster: '/mascot/teacher/mode-word-hunt-nobg.webp', accent: 'lime', minutes: 4, needsDefinitions: false },
-  blast: { poster: '/mascot/teacher/mode-blast-nobg.webp', accent: 'pink', minutes: 3, needsDefinitions: false },
-  'wheel-rush': { poster: '/mascot/teacher/mode-wheel-rush-v2-nobg.webp', accent: 'purple', minutes: Math.ceil(fixedRoundSeconds('wheel-rush')! / 60), needsDefinitions: false },
-  [VOCAB_QUIZ_MODE]: { poster: '/mascot/teacher/mode-vocab-quiz-nobg.webp', accent: 'cyan', minutes: 5, needsDefinitions: true },
-  wordcraft: { poster: '/mascot/teacher/mode-wordcraft-nobg.webp', accent: 'lime', minutes: 5, needsDefinitions: false },
+  classic: { poster: '/mascot/teacher/modes/classic.webp', accent: 'cyan', minutes: 3, needsDefinitions: false },
+  'word-hunt': { poster: '/mascot/teacher/modes/word-hunt.webp', accent: 'lime', minutes: 4, needsDefinitions: false },
+  blast: { poster: '/mascot/teacher/modes/blast.webp', accent: 'pink', minutes: 3, needsDefinitions: false },
+  'wheel-rush': { poster: '/mascot/teacher/modes/wheel-rush.webp', accent: 'purple', minutes: Math.ceil(fixedRoundSeconds('wheel-rush')! / 60), needsDefinitions: false },
+  [VOCAB_QUIZ_MODE]: { poster: '/mascot/teacher/modes/vocab-quiz.webp', accent: 'cyan', minutes: 5, needsDefinitions: true },
+  wordcraft: { poster: '/mascot/teacher/modes/wordcraft.webp', accent: 'lime', minutes: 5, needsDefinitions: false },
 };
 
 /** A round with no catalog entry still needs a plannable number on screen. */
@@ -90,7 +89,7 @@ export const FALLBACK_MODE_MINUTES = 3;
 export const TEACHER_GAME_MODES: readonly TeacherGameMode[] = CLASSROOM_GAME_MODES.map((id) => {
   const suffix = MODE_KEY_SUFFIX[id] ?? String(id);
   const shape = MODE_SHAPE[id] ?? {
-    poster: `/mascot/teacher/mode-${id}-nobg.webp`,
+    poster: `/mascot/teacher/modes/${id}.webp`,
     accent: 'cyan' as const,
     minutes: FALLBACK_MODE_MINUTES,
     needsDefinitions: false,

@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { pickLesson } from './__tests__/pickLesson';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AssignmentCreator from './AssignmentCreator';
 import { useAssignments } from '@/hooks/useAssignments';
@@ -82,6 +83,16 @@ describe('AssignmentCreator', () => {
     expect(screen.getByText('teacher.assignment.duelChallenge')).toBeInTheDocument();
   });
 
+  it('step 1 is a radio list named by its step heading, with the playable word count per list', () => {
+    render(
+      <AssignmentCreator classroomId="classroom-1" onComplete={mockOnComplete} isOpen={true} onClose={mockOnClose} />
+    );
+    const group = screen.getByRole('radiogroup', { name: /teacher.assignment.lessonLabel/ });
+    const radios = within(group).getAllByRole('radio');
+    expect(radios).toHaveLength(2);
+    expect(within(group).getByRole('radio', { name: /Advanced Words/ })).toHaveAccessibleName(/2/);
+  });
+
   it('allows selecting assignment type', () => {
     render(
       <AssignmentCreator
@@ -132,8 +143,7 @@ describe('AssignmentCreator', () => {
     fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
 
     // Select lesson
-    const lessonSelect = screen.getByRole('combobox');
-    fireEvent.change(lessonSelect, { target: { value: 'lesson-1' } });
+    pickLesson('lesson-1');
 
     // Open date picker
     const datePicker = screen.getByText('teacher.assignment.selectDate');
@@ -175,8 +185,7 @@ describe('AssignmentCreator', () => {
 
     // Select type and lesson
     fireEvent.click(screen.getByText('teacher.assignment.practiceMode'));
-    const lessonSelect = screen.getByRole('combobox');
-    fireEvent.change(lessonSelect, { target: { value: 'lesson-1' } });
+    pickLesson('lesson-1');
 
     // Open date picker and select today
     const datePicker = screen.getByText('teacher.assignment.selectDate');

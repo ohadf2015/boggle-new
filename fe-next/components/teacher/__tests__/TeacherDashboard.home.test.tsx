@@ -33,6 +33,7 @@ let activation: Record<string, unknown>;
 vi.mock('@/hooks/useTeacherActivationProgress', () => ({ useTeacherActivationProgress: () => activation }));
 let week: Record<string, unknown>;
 vi.mock('@/hooks/useTeacherWeekStats', () => ({ useTeacherWeekStats: () => week }));
+vi.mock('@/hooks/useClassStudentPreview', () => ({ useClassStudentPreview: () => null }));
 
 import TeacherDashboard from '../TeacherDashboard';
 
@@ -154,11 +155,33 @@ describe('Teacher Home', () => {
     expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
   });
 
-  it('Given a brand-new week with no games, Then This week says so instead of three zeros', () => {
+  it('Given a brand-new week with no games, Then Home shows no This week card at all', () => {
     week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('home-week-empty')).toHaveTextContent('eduShell.week.empty');
-    expect(screen.queryByTestId('home-week-games')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('home-week')).not.toBeInTheDocument();
+  });
+
+  it('Given a Pro teacher with no games yet, Then Home drops the empty side rail and uses the full width', () => {
+    proState = PRO;
+    week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
+    render(<TeacherDashboard />);
+    expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
+    expect(screen.getByTestId('teacher-home').className).not.toMatch(/lg:grid-cols-/);
+  });
+
+  it('Given a Pro offer, Then the card is words and a button, no blurred fake chart', () => {
+    render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
+    expect(screen.getByTestId('home-pro-card').querySelector('.blur-\\[3px\\]')).toBeNull();
+  });
+
+  it('Given setup half done, Then the compact card is one slim row with no progress sentence or step blurbs', () => {
+    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, dismissed: false } };
+    render(<TeacherDashboard />);
+    const card = screen.getByTestId('home-onboarding');
+    expect(card).not.toHaveTextContent('eduShell.onboarding.progress');
+    expect(card).not.toHaveTextContent(/eduShell\.onboarding\.steps\.\w+\.body/);
+    expect(within(card).getAllByTestId(/^home-onboarding-step-/)).toHaveLength(3);
+    expect(within(card).getByTestId('home-onboarding-cta')).toBeInTheDocument();
   });
 
   it('Given ?reviewWords= from a results card, Then the lesson creator opens with those words', () => {

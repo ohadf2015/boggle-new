@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Flame, Lock } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SegmentedTabs } from '@/components/education/shell/SegmentedTabs';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -173,39 +173,30 @@ function ReportTabs({
   ];
   const panels: Record<ReportTab, React.ReactNode> = { students, words, grid };
   return (
-    <Tabs value={tab} onValueChange={(v) => setTab(v as ReportTab)}>
-      <TabsList
-        aria-label={t('eg2Rep.report.tabs.label')}
-        data-print-hide
-        className="grid h-auto w-full grid-cols-3 gap-1 rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-1"
-      >
-        {tabs.map(({ id, label, count }) => (
-          <TabsTrigger
-            key={id}
-            value={id}
-            className={cn(
-              'min-h-10 rounded-neo px-2 font-neo-display text-xs font-black uppercase text-neo-cream/80 sm:text-sm',
-              'data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:bg-neo-cyan data-[state=active]:text-neo-black data-[state=active]:shadow-hard-sm',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime',
-            )}
-          >
-            {label}
-            {typeof count === 'number' && <span className="ms-1 tabular-nums opacity-70">{count}</span>}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+    <div>
+      <div data-print-hide>
+        <SegmentedTabs
+          items={tabs.map(({ id, label, count }) => ({ key: id, label, count }))}
+          value={tab}
+          onChange={setTab}
+          ariaLabel={t('eg2Rep.report.tabs.label')}
+          idPrefix="report"
+        />
+      </div>
       {tabs.map(({ id }) => (
-        <TabsContent
+        <div
           key={id}
-          value={id}
-          forceMount
+          role="tabpanel"
+          id={`report-panel-${id}`}
+          aria-labelledby={`report-tab-${id}`}
+          data-state={tab === id ? 'active' : 'inactive'}
           data-print-hide={id === 'grid' ? '' : undefined}
-          className="mt-3 data-[state=inactive]:hidden print:block!"
+          className={cn('mt-3 print:block!', tab !== id && 'hidden')}
         >
           {panels[id]}
-        </TabsContent>
+        </div>
       ))}
-    </Tabs>
+    </div>
   );
 }
 

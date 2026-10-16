@@ -13,7 +13,8 @@
 import { School, BookOpen, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { MultiLessonSelector } from '../MultiLessonSelector';
+import { LessonPicker } from '../pickers/LessonPicker';
+import { BoardLanguageChip } from '../pickers/BoardLanguageChip';
 import { ClassroomBattleSettings } from '../ClassroomBattleSettings';
 import { SPED_VOCAB_CAP, type ClassroomPresetId } from '@/lib/education/classroomPresets';
 import type { VocabularyLesson, Classroom } from '@/lib/supabase/education';
@@ -61,7 +62,10 @@ export function LobbySetupPanel({
   onTeamCountChange,
   onAccessibilityChange,
 }: LobbySetupPanelProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const classLanguage = classrooms.find((c) => c.id === selectedClassroomId)?.language;
+  // Same rule launch uses: the first selected list (in lessons order) sets the board.
+  const boardLanguage = lessons.find((l) => selectedLessonIds.includes(l.id))?.language;
 
   return (
     <div className="space-y-5">
@@ -110,21 +114,22 @@ export function LobbySetupPanel({
 
       {/* Which words */}
       <section>
-        {/* No heading of our own: `MultiLessonSelector` renders "Select Lessons"
-            itself, and two identical headings one above the other is the kind of
-            stacked chrome this screen is supposed to be free of. */}
         {selectedLessonIds.length > 0 && (
-          <div className="mb-2 flex justify-end">
+          <div className="mb-2 flex flex-wrap justify-end gap-2">
+            {boardLanguage && <BoardLanguageChip language={boardLanguage} />}
             <span className="inline-flex items-center gap-1.5 rounded-neo border-[2px] border-neo-lime bg-neo-navy-light px-2 py-0.5 font-neo-display text-[0.65rem] font-black uppercase text-neo-lime">
               <BookOpen className="size-3.5" strokeWidth={3} aria-hidden="true" />
               {t('education.classroomGame.words', { count: wordCount })}
             </span>
           </div>
         )}
-        <MultiLessonSelector
+        <LessonPicker
+          mode="multi"
           lessons={lessons}
-          selectedLessonIds={selectedLessonIds}
-          onSelectChange={onSelectLessons}
+          selectedIds={selectedLessonIds}
+          onChange={onSelectLessons}
+          classLanguage={classLanguage}
+          createHref={`/${language}/teacher/curriculum${selectedClassroomId ? `?classroomId=${selectedClassroomId}` : ''}`}
         />
         {activePreset === 'sped' && wordCount > SPED_VOCAB_CAP && (
           <p className="mt-2 font-neo-body text-[0.7rem] text-neo-white/60" data-testid="sped-vocab-cap-note">

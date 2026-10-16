@@ -1,5 +1,26 @@
 // EN translations
 const en = {
+  // @eduPickers:start
+  "eduPickers": {
+    "language": {
+      "boardHint": "Sets the dictionary and board letters for this class's games"
+    },
+    "board": {
+      "label": "Board: {language}"
+    },
+    "lesson": {
+      "create": "Create a word list",
+      "mixedWarning": "These lists use different languages. The board will use {language} letters.",
+      "classMismatch": "This class is set to {classLanguage}. The board will use {language} letters.",
+      "switched": "Switched to {language}. A game uses one language, so the other lists were cleared.",
+      "searchLabel": "Search word lists",
+      "searchPlaceholder": "Search your lists",
+      "noMatch": "No lists match \"{query}\"",
+      "noLanguage": "Other",
+      "selectAllIn": "Select all {language}"
+    }
+  },
+  // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
     "chestUpgraded": "Boss defeated: your chest was upgraded!",
@@ -12623,6 +12644,8 @@ const en = {
       "scanToJoin": "Scan to join"
     },
     "classroom": {
+      "studentCap": "{{count}} / {{limit}} students",
+      "studentCountPro": "{{count}} students",
       "presets": {
         "title": "Ritual presets",
         "fridayBattle": { "name": "Friday Vocab Battle", "desc": "Teams · your last list · loud and fast" },
@@ -14403,6 +14426,7 @@ const en = {
       "gameSettings": "Game settings",
       "joinedStudents": "Joined students",
       "lessonsSelected": "{{count}} lessons selected",
+      "lessonSelected": "1 lesson selected",
       "missingRequirements": "Missing requirements",
       "startFailed": "We couldn't start the game. Try again.",
       "tooFast": "Slow down. Try again in a few seconds.",

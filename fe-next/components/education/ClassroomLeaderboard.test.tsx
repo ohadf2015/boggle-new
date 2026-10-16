@@ -551,21 +551,20 @@ describe('ClassroomLeaderboard', () => {
       expect(screen.getByLabelText('education.leaderboard.ariaLabel')).toBeInTheDocument();
     });
 
-    it('includes alt text for avatars', () => {
-      // GIVEN: Student with avatar
+    it('renders the shared avatar for every entry, with or without an avatarUrl', () => {
       const fullList = [
         createEntry({ userId: 'student-1', displayName: 'Alice', avatarUrl: 'https://example.com/alice.jpg', totalXp: 500, rank: 1 }),
+        createEntry({ userId: 'student-2', displayName: 'Bob', avatarUrl: null, totalXp: 300, rank: 2 }),
       ];
-      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 1 }));
+      mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ fullList, totalStudents: 2 }));
 
-      // WHEN: Component is rendered
       renderWithLanguage(
         <ClassroomLeaderboard classroomId={mockClassroomId} currentUserId={mockCurrentUserId} />
       );
 
-      // THEN: Avatar should have alt text
-      const avatar = screen.getByAltText("Alice's avatar");
-      expect(avatar).toBeInTheDocument();
+      const ids = screen.getAllByTestId('avatar-lite').map((el) => el.getAttribute('data-user-id'));
+      expect(ids).toEqual(['student-1', 'student-2']);
+      expect(screen.queryByAltText("Alice's avatar")).toBeNull();
     });
   });
 });

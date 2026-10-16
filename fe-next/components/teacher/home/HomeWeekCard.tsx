@@ -13,18 +13,13 @@ const STATS = [
   { id: 'active', key: 'activeClasses', label: 'eduShell.week.active', ink: 'text-neo-pink' },
 ] as const;
 
-/** Three real numbers for the last 7 days; one friendly line before the first game; "—" when the read failed. */
+/** Three real numbers for the last 7 days; "—" when the read failed. Home hides it until a first game. */
 export function HomeWeekCard({ summary, status, t }: { summary: TeacherWeekSummary | null; status: TeacherWeekStatus; t: T }) {
   return (
     <section data-testid="home-week" aria-labelledby="home-week-title" className={cn(PANEL, 'p-4')}>
       <h2 id="home-week-title" className="font-neo-display text-lg font-black text-neo-cream">
         {t('eduShell.week.title')}
       </h2>
-      {summary && Object.keys(summary.lastPlayedAt).length === 0 ? (
-        <p data-testid="home-week-empty" className="mt-2 font-neo-body text-sm text-neo-cream/80">
-          {t('eduShell.week.empty')}
-        </p>
-      ) : (
       <dl className="mt-3 grid grid-cols-3 divide-x-[2px] divide-neo-cream/15 rtl:divide-x-reverse">
         {STATS.map((s) => (
           <div key={s.id} className="flex flex-col items-center gap-1 px-1 text-center">
@@ -41,7 +36,6 @@ export function HomeWeekCard({ summary, status, t }: { summary: TeacherWeekSumma
           </div>
         ))}
       </dl>
-      )}
       {status === 'error' ? (
         <p role="status" className="mt-3 font-neo-body text-xs font-semibold text-neo-cream/70">
           {t('eduShell.week.unavailable')}

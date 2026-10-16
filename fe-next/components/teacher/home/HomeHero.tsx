@@ -46,9 +46,9 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
   return (
     <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(PANEL, 'relative overflow-hidden p-4 sm:p-6')}>
       <EduMascot
-        moment="tip"
+        moment="gameStart"
         size={176}
-        className="pointer-events-none absolute -end-2 -top-2 hidden size-44 sm:block lg:size-48"
+        className="pointer-events-none absolute -end-2 -top-2 hidden size-44 sm:block lg:size-48 motion-safe:animate-[edu-mascot-bob_4.5s_ease-in-out_infinite]"
       />
       <div className="relative flex flex-col gap-4 sm:max-w-[calc(100%-11rem)]">
         <h2 id="home-hero-title" className="flex flex-wrap items-center gap-x-2 gap-y-1 font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl">
@@ -71,7 +71,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
         </Link>
       </div>
 
-      <ul className="relative mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+      <ul className="relative mt-10 grid grid-cols-3 gap-2 sm:mt-8 sm:gap-3">
         {FEATURED_HOME_MODES.map((id) => {
           const mode = catalogueEntry(id);
           if (!mode) return null;
@@ -90,10 +90,10 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
                 )}
               >
                 {pending === id ? (
-                  <Loader2 className="size-10 shrink-0 animate-spin p-2 motion-reduce:animate-none sm:size-12" aria-hidden="true" />
+                  <Loader2 className="-mt-9 size-16 shrink-0 animate-spin p-4 motion-reduce:animate-none sm:-mt-7 sm:size-20" aria-hidden="true" />
                 ) : (
-                  // eslint-disable-next-line @next/next/no-img-element -- small transparent mode poster
-                  <img src={mode.poster} alt="" aria-hidden="true" width={48} height={48} className="size-10 shrink-0 object-contain sm:size-12" />
+                  // eslint-disable-next-line @next/next/no-img-element -- transparent mode sticker
+                  <img src={mode.poster} alt="" aria-hidden="true" width={96} height={96} className="-mt-9 size-16 shrink-0 object-contain drop-shadow-[3px_3px_0_rgba(0,0,0,0.35)] transition-transform duration-200 ease-out motion-reduce:transition-none sm:-mt-7 sm:size-20 [@media(hover:hover)]:group-hover:-rotate-6 [@media(hover:hover)]:group-hover:scale-110" />
                 )}
                 <span className="flex min-w-0 flex-col items-center gap-1 sm:flex-1 sm:items-start">
                   <span className="line-clamp-2 font-neo-display text-sm font-black leading-tight sm:text-base">{t(mode.nameKey)}</span>

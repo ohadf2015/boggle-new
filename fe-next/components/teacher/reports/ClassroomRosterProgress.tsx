@@ -14,6 +14,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Check, Printer, Share2 } from 'lucide-react';
+import AvatarLite from '@/components/AvatarLite';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { getClassroomAssignments, getAssignmentCompletions } from '@/lib/supabase/education/assignments';
@@ -269,7 +270,7 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
               <th scope="col" className="p-3 text-start font-bold">
                 {t('teacher.reports.rosterProgress.columns.student')}
               </th>
-              <th scope="col" className="p-3 text-end font-bold">
+              <th scope="col" className="hidden p-3 text-end font-bold sm:table-cell">
                 {t('teacher.reports.rosterProgress.columns.completion')}
               </th>
               <th scope="col" className="p-3 text-end font-bold">
@@ -278,7 +279,7 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
               <th scope="col" className="p-3 text-end font-bold">
                 {t('teacher.reports.rosterProgress.columns.lastActive')}
               </th>
-              <th scope="col" className="p-3 text-start font-bold">
+              <th scope="col" className="hidden p-3 text-start font-bold sm:table-cell">
                 {t('teacher.reports.rosterProgress.columns.joinStatus')}
               </th>
             </tr>
@@ -291,8 +292,13 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
                 data-status={row.joinFunnelStatus}
                 className="border-b border-neo-cream/15 last:border-b-0"
               >
-                <td className="px-3 py-2 font-bold text-neo-white">{row.name}</td>
-                <td className="px-3 py-2 text-end text-neo-white tabular-nums">
+                <td className="px-3 py-2 font-bold text-neo-white">
+                  <span className="flex items-center gap-2.5">
+                    <AvatarLite userId={row.studentId} pixelSize={28} />
+                    <span dir="auto">{row.name}</span>
+                  </span>
+                </td>
+                <td className="hidden px-3 py-2 text-end text-neo-white tabular-nums sm:table-cell">
                   {formatCompletion(row.completedAssignments, row.totalAssignments)}
                 </td>
                 <td className="px-3 py-2 text-end text-neo-white tabular-nums">
@@ -301,7 +307,7 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
                 <td className="px-3 py-2 text-end text-neo-white tabular-nums">
                   {formatLastActive(row.lastActiveAt)}
                 </td>
-                <td className="px-3 py-2">
+                <td className="hidden px-3 py-2 sm:table-cell">
                   <span
                     data-testid="classroom-roster-status"
                     className={`inline-flex items-center rounded border-2 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wide ${STATUS_BADGE_CLASS[row.joinFunnelStatus]}`}

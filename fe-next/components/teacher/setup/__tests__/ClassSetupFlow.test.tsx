@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup, waitFor } from '@testing-library/react';
+import { render, screen, cleanup, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
@@ -54,7 +54,8 @@ describe('<ClassSetupFlow>', () => {
     expect(screen.getByTestId('setup-step-details')).toBeInTheDocument();
     expect(screen.getByLabelText('eduShell.setup.nameLabel')).toHaveValue('');
     expect(screen.getAllByTestId(/^setup-grade-/)).toHaveLength(5);
-    expect(screen.getByLabelText('eduShell.setup.languageLabel')).toHaveValue('en');
+    const language = screen.getByRole('radiogroup', { name: 'eduShell.setup.languageLabel' });
+    expect(within(language).getByRole('radio', { name: /English/ })).toBeChecked();
   });
 
   it('Given a free teacher, Then the cap meter shows how many classes are left', () => {

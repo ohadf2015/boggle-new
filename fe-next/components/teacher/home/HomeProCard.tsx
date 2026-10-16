@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { Crown, Loader2, Lock, X } from 'lucide-react';
+import { Crown, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EduMascot } from '@/components/education/EduMascot';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -69,22 +69,6 @@ export function HomeProCard({ kind, href, onDismiss, trackImpression, language, 
           </li>
         ))}
       </ul>
-
-      <div aria-hidden="true" className="relative mt-3 rounded-neo border-[2px] border-neo-cream/60 bg-neo-navy p-2">
-        <div className="flex flex-col gap-1.5 blur-[3px]">
-          {[72, 54, 38].map((w) => (
-            <div key={w} className="flex items-center gap-2">
-              <span className="size-5 rounded-full bg-neo-cyan/60" />
-              <span className="h-2 flex-1 rounded-full bg-neo-cream/15">
-                <span className="block h-2 rounded-full bg-neo-pink/70" style={{ width: `${w}%` }} />
-              </span>
-            </div>
-          ))}
-        </div>
-        <span className="absolute inset-0 grid place-items-center">
-          <Lock className="size-5 text-neo-yellow" />
-        </span>
-      </div>
 
       <div className="mt-3">
         {kind === 'trial' ? (

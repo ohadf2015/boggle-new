@@ -24,6 +24,9 @@ vi.mock('@/components/teacher/StudentCapMeter', () => ({
   StudentCapMeter: () => <div data-testid="student-cap-meter" />,
 }));
 
+let hasPro = false;
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro, loading: false }) }));
+
 import { ClassCard } from '../ClassCard';
 
 const CLASSROOM = {
@@ -47,7 +50,21 @@ const baseProps = {
 };
 
 describe('ClassCard — refined surfaces', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    hasPro = false;
+  });
+
+  it('Given a free teacher, Then the card shows the student cap meter', () => {
+    render(<ClassCard {...baseProps} />);
+    expect(screen.getByTestId('student-cap-meter')).toBeInTheDocument();
+  });
+
+  it('Given a Pro teacher, Then no cap meter repeats the student count the roster toggle already shows', () => {
+    hasPro = true;
+    render(<ClassCard {...baseProps} />);
+    expect(screen.queryByTestId('student-cap-meter')).toBeNull();
+  });
 
   it('is a calm navy panel: hairline cream border, no cream slab, no border-3', () => {
     render(<ClassCard {...baseProps} />);

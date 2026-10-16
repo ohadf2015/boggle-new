@@ -16,20 +16,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { TeacherWhatsNewDialog } from '@/components/teacher/TeacherWhatsNew';
+import AvatarLite from '@/components/AvatarLite';
 
 export interface TeacherAccountMenuProps {
   proHref: string;
   profileHref: string;
   /** `row` = sidebar footer (avatar + name); `icon` = phone top bar (avatar only). */
   variant?: 'row' | 'icon';
-}
-
-/** Up to two initials from the display name, or the email's first letter. */
-export function teacherInitials(name: string | null | undefined, email?: string | null): string {
-  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
-  if (parts.length >= 2) return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (email?.[0] ?? '?').toUpperCase();
 }
 
 const ITEM = 'min-h-[44px] font-neo-body font-semibold text-neo-cream';
@@ -40,7 +33,6 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: Te
   const router = useRouter();
   const [whatsNewOpen, setWhatsNewOpen] = useState(false);
   const name = profile?.display_name ?? '';
-  const initials = teacherInitials(name, user?.email);
 
   const handleSignOut = useCallback(async () => {
     await signOut();
@@ -59,12 +51,11 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: Te
             variant === 'row' ? 'min-h-[48px] w-full px-2 py-1.5 hover:bg-neo-navy-light' : 'size-11 justify-center',
           )}
         >
-          <span
-            aria-hidden="true"
-            className="grid size-9 shrink-0 place-items-center rounded-full border-[2px] border-neo-black bg-neo-cyan font-neo-display text-sm font-black text-neo-black"
-          >
-            {initials}
-          </span>
+          <AvatarLite
+            userId={user?.id}
+            customAvatar={profile?.avatar_config}
+            pixelSize={36}
+          />
           {variant === 'row' ? (
             <>
               <span dir="auto" className="min-w-0 flex-1 truncate font-neo-body text-sm font-bold text-neo-cream">

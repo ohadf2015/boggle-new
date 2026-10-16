@@ -10,7 +10,6 @@ import { AssignmentLimitUpsell } from './AssignmentLimitUpsell';
 import { FirstAssignmentTemplatePicker } from './FirstAssignmentTemplatePicker';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassrooms } from '@/hooks/useClassroom';
-import { labelLessonsForPicker } from '@/lib/education/lessonLabels';
 import { cn } from '@/lib/utils';
 import {
   Dialog,
@@ -20,6 +19,7 @@ import {
 import { Swords, BookOpen, Crosshair, Lock, Grid2x2 } from 'lucide-react';
 import { AssignmentCreatorDueDate, assignmentSubmitHintKey } from './AssignmentCreatorDueDate';
 import { AssignmentStep } from './AssignmentStep';
+import { AssignmentLessonStep } from './AssignmentLessonStep';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import {
@@ -83,17 +83,7 @@ export default function AssignmentCreator({
   const atAssignmentCap =
     !proLoading && !hasPro && assignmentCount >= FREE_TIER_LIMITS.assignmentsPerClass;
   const { lessons, isLoading: isLoadingLessons, createLesson } = useLessons();
-  // `useLessons()` spans every class this teacher owns, and reusing one list
-  // across periods is intended — so two rows can read "Week 3 Vocabulary" with
-  // nothing to tell them apart. Name the classroom, but only where it is
-  // actually ambiguous.
   const { classrooms = [] } = useClassrooms();
-  const lessonLabels = useMemo(() => {
-    const namesById: Record<string, string> = {};
-    for (const c of classrooms) namesById[c.id] = c.name;
-    const labelled = labelLessonsForPicker(lessons, namesById);
-    return new Map(labelled.map((l) => [l.id, l.label]));
-  }, [lessons, classrooms]);
 
   const [selectedType, setSelectedType] = useState<AssignmentType>('wordcraft');
   const [selectedLessonId, setSelectedLessonId] = useState<string>('');
@@ -285,21 +275,15 @@ export default function AssignmentCreator({
         ) : (
         <div className="space-y-4">
             {!isWordGoal && (
-            <AssignmentStep step="list" n={1} label={t('teacher.assignment.lessonLabel')}>
-              <select
-                value={selectedLessonId}
-                onChange={(e) => setSelectedLessonId(e.target.value)}
-                className="w-full p-3 rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white font-neo-body"
-                disabled={isLoadingLessons}
-              >
-                <option value="">{t('teacher.assignment.selectLesson')}</option>
-                {lessons.map((lesson) => (
-                  <option key={lesson.id} value={lesson.id}>
-                    {lessonLabels.get(lesson.id) ?? lesson.name} ({lesson.words.length} {t('teacher.assignment.words')})
-                  </option>
-                ))}
-              </select>
-            </AssignmentStep>
+            <AssignmentLessonStep
+              lessons={lessons}
+              classrooms={classrooms}
+              classroomId={classroomId}
+              classroomLanguage={classroomLanguage}
+              selectedLessonId={selectedLessonId}
+              isLoading={isLoadingLessons}
+              onSelect={setSelectedLessonId}
+            />
             )}
 
             <AssignmentStep step="who" n={2} label={t('eg2Rep.assign.who')}>

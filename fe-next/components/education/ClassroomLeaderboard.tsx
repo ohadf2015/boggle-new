@@ -15,9 +15,9 @@
  */
 
 import { memo, useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
+import AvatarLite from '@/components/AvatarLite';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { Users, ArrowUp, ArrowDown, Flame, User, Trophy } from 'lucide-react';
+import { Users, ArrowUp, ArrowDown, Flame, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomLeaderboard } from '@/hooks/useClassroomLeaderboard';
 import { getLeaderboardTier } from '@/lib/supabase/education/leaderboard';
@@ -230,7 +230,7 @@ interface LeaderboardEntryRowProps extends LeaderboardEntryWithDelta {
 }
 
 const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
-  ({ userId, displayName, avatarUrl, totalXp, currentLevel, rank, isCurrentUser, isInactive, currentStreak, previousRank: _previousRank, rankDelta, isNew, totalStudents, index }) => {
+  ({ userId, displayName, totalXp, currentLevel, rank, isCurrentUser, isInactive, currentStreak, previousRank: _previousRank, rankDelta, isNew, totalStudents, index }) => {
     const { t } = useLanguage();
     const animatedXp = useAnimatedValue(totalXp);
 
@@ -271,19 +271,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
         </div>
 
         {/* Avatar */}
-        {avatarUrl ? (
-          <Image
-            src={avatarUrl}
-            alt={`${displayName}'s avatar`}
-            width={48}
-            height={48}
-            className="w-12 h-12 rounded-full border-neo border-neo-black"
-          />
-        ) : (
-          <div className="w-12 h-12 rounded-full bg-neo-navy border-neo border-neo-cream/40 flex items-center justify-center">
-            <User className="w-4 h-4" />
-          </div>
-        )}
+        <AvatarLite userId={userId} pixelSize={48} />
 
         {/* Info */}
         <div className="flex-1 min-w-0">

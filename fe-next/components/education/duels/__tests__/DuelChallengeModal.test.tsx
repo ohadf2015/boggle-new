@@ -108,6 +108,12 @@ describe('DuelChallengeModal', () => {
       expect(screen.getByText('Test Opponent')).toBeInTheDocument();
     });
 
+    it('shows the opponent as the shared avatar, not a letter tile', () => {
+      render(<DuelChallengeModal {...defaultProps} />);
+
+      expect(screen.getByTestId('avatar-lite')).toHaveAttribute('data-user-id', 'opponent-1');
+    });
+
     it('renders lesson selector dropdown', () => {
       render(<DuelChallengeModal {...defaultProps} />);
       openSetup();

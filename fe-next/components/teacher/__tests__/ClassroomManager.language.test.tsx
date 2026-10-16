@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -42,8 +42,8 @@ describe('ClassroomManager language picker', () => {
   it('offers every language the create route accepts', async () => {
     await openCreateDialog();
 
-    const select = screen.getByRole('combobox') as HTMLSelectElement;
-    const offered = Array.from(select.options).map((o) => o.value);
+    const group = screen.getByRole('radiogroup', { name: /teacher.classroom.language/ });
+    const offered = (within(group).getAllByRole('radio') as HTMLInputElement[]).map((r) => r.value);
 
     expect(offered).toEqual([...EDUCATION_LANGUAGES]);
   });
@@ -51,6 +51,6 @@ describe('ClassroomManager language picker', () => {
   it("defaults to the teacher's own locale rather than a language they did not pick", async () => {
     await openCreateDialog();
 
-    expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe('es');
+    expect(screen.getByRole('radio', { name: /Español/ })).toBeChecked();
   });
 });

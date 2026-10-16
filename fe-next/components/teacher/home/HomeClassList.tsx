@@ -3,12 +3,32 @@
 import Link from 'next/link';
 import { CalendarDays, Play, Plus, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import AvatarLite from '@/components/AvatarLite';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { PANEL, QUIET_LINK, SKELETON } from './homeStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 const BADGE = ['bg-neo-purple', 'bg-neo-cyan', 'bg-neo-pink', 'bg-neo-lime'] as const;
+
+function StudentStack({ ids, total }: { ids: readonly string[]; total: number }) {
+  const extra = total - ids.length;
+  return (
+    <span data-testid="home-class-avatars" className="flex shrink-0 items-center ps-1">
+      {ids.map((id) => (
+        <AvatarLite key={id} userId={id} pixelSize={30} className="-ms-2 ring-2 ring-neo-navy first:ms-0" />
+      ))}
+      {extra > 0 ? (
+        <span
+          aria-hidden="true"
+          className="-ms-2 grid h-[30px] min-w-[30px] place-items-center rounded-full border-2 border-neo-black bg-neo-cream px-1 font-neo-display text-[0.7rem] font-black text-neo-black ring-2 ring-neo-navy"
+        >
+          +{extra}
+        </span>
+      ) : null}
+    </span>
+  );
+}
 
 /** Short badge text for a class: its first token, capped ("5B - English" → "5B"). */
 export function classBadge(name: string): string {
@@ -35,6 +55,8 @@ function startOfDay(ms: number): number {
 
 export interface HomeClassListProps {
   classrooms: readonly { id: string; name: string; member_count?: number | null }[];
+  /** First few student ids per class; null while loading or failed. */
+  studentPreview?: Record<string, string[]> | null;
   /** null while the activity read is in flight or failed. */
   lastPlayedAt: Record<string, string> | null;
   activityFailed: boolean;
@@ -48,6 +70,7 @@ export interface HomeClassListProps {
 
 export function HomeClassList({
   classrooms,
+  studentPreview = null,
   lastPlayedAt,
   activityFailed,
   newClassHref,
@@ -84,6 +107,7 @@ export function HomeClassList({
         </li>
         {classrooms.map((c, i) => {
           const played = lastPlayedAt?.[c.id];
+          const previewIds = studentPreview?.[c.id] ?? [];
           return (
             <li
               key={c.id}
@@ -91,15 +115,20 @@ export function HomeClassList({
               className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_7rem_11rem_3rem] sm:px-4"
             >
               <span className="flex min-w-0 items-center gap-3">
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    'grid size-9 shrink-0 place-items-center rounded-neo border-[2px] border-neo-black font-neo-display text-xs font-black text-neo-black',
-                    BADGE[i % BADGE.length],
-                  )}
-                >
-                  {classBadge(c.name)}
-                </span>
+                {previewIds.length > 0 ? (
+                  <StudentStack ids={previewIds} total={c.member_count ?? previewIds.length} />
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    data-testid="home-class-badge"
+                    className={cn(
+                      'grid size-9 shrink-0 place-items-center rounded-neo border-[2px] border-neo-black font-neo-display text-xs font-black text-neo-black',
+                      BADGE[i % BADGE.length],
+                    )}
+                  >
+                    {classBadge(c.name)}
+                  </span>
+                )}
                 <span className="flex min-w-0 flex-col">
                   <Link
                     href={`/${language}/teacher/classroom/${c.id}/analytics`}
