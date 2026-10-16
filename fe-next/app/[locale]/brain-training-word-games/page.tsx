@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { getBrainLandingCopy } from './content';
 
@@ -137,10 +136,10 @@ export default async function BrainTrainingWordGamesPage({ params }: PageProps) 
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      <Script id="ld-faq-brain" type="application/ld+json">{faqJsonLd}</Script>
-      <Script id="ld-videogame-brain" type="application/ld+json">{videoGameJsonLd}</Script>
-      <Script id="ld-itemlist-brain" type="application/ld+json">{itemListJsonLd}</Script>
-      <Script id="ld-howto-brain" type="application/ld+json">{howToJsonLd}</Script>
+      <script id="ld-faq-brain" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+      <script id="ld-videogame-brain" type="application/ld+json" dangerouslySetInnerHTML={{ __html: videoGameJsonLd }} />
+      <script id="ld-itemlist-brain" type="application/ld+json" dangerouslySetInnerHTML={{ __html: itemListJsonLd }} />
+      <script id="ld-howto-brain" type="application/ld+json" dangerouslySetInnerHTML={{ __html: howToJsonLd }} />
 
       <div className="border-y-3 border-neo-black bg-neo-purple overflow-hidden">
         <div className="flex animate-[scrollBT_30s_linear_infinite] gap-6 whitespace-nowrap py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-white sm:text-base">

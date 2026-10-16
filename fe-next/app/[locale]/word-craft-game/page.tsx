@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 
 const BASE_URL = 'https://www.lexiclash.live';
 
@@ -172,9 +171,9 @@ export default async function WordCraftGameLandingPage({ params }: PageProps) {
 
   return (
     <main className="min-h-dvh bg-neo-navy text-neo-white">
-      <Script id="ld-wc-faq" type="application/ld+json">{faqJsonLd}</Script>
-      <Script id="ld-wc-howto" type="application/ld+json">{howToJsonLd}</Script>
-      <Script id="ld-wc-game" type="application/ld+json">{gameJsonLd}</Script>
+      <script id="ld-wc-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+      <script id="ld-wc-howto" type="application/ld+json" dangerouslySetInnerHTML={{ __html: howToJsonLd }} />
+      <script id="ld-wc-game" type="application/ld+json" dangerouslySetInnerHTML={{ __html: gameJsonLd }} />
 
       {/* Sticker marquee */}
       <div className="overflow-hidden border-y-2 border-black bg-neo-purple">

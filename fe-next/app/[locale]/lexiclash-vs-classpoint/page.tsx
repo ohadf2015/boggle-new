@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { ClassPointBasicFreeHonestyStrip } from '@/components/education/ClassPointBasicFreeHonestyStrip';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
@@ -109,7 +108,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10 text-neo-gray-100">
-      <Script
+      <script
         id="lexiclash-vs-classpoint-faq"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 interface PageProps {
@@ -154,10 +153,10 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
   await params;
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      <Script id="ld-faq" type="application/ld+json">{faqJsonLd}</Script>
-      <Script id="ld-videogame" type="application/ld+json">{videoGameJsonLd}</Script>
-      <Script id="ld-howto" type="application/ld+json">{howToJsonLd}</Script>
-      <Script id="ld-breadcrumb" type="application/ld+json">{breadcrumbJsonLd}</Script>
+      <script id="ld-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+      <script id="ld-videogame" type="application/ld+json" dangerouslySetInnerHTML={{ __html: videoGameJsonLd }} />
+      <script id="ld-howto" type="application/ld+json" dangerouslySetInnerHTML={{ __html: howToJsonLd }} />
+      <script id="ld-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
 
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <TopBackLink className="mb-4" />

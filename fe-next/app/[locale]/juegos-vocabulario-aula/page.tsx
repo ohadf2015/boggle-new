@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 interface PageProps {
@@ -121,9 +120,9 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      <Script id="ld-es-jva-faq" type="application/ld+json">{JSON.stringify(faqJsonLd)}</Script>
-      <Script id="ld-es-jva-resource" type="application/ld+json">{JSON.stringify(learningResourceJsonLd)}</Script>
-      <Script id="ld-es-jva-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</Script>
+      <script id="ld-es-jva-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script id="ld-es-jva-resource" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(learningResourceJsonLd) }} />
+      <script id="ld-es-jva-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <TopBackLink className="mb-4" />

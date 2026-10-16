@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import {
   getWordCraftLandingContent,
   buildWordCraftLandingJsonLd,
@@ -61,9 +60,9 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      <Script id="ld-wc-game" type="application/ld+json">{JSON.stringify(jsonLd.game)}</Script>
-      <Script id="ld-wc-faq" type="application/ld+json">{JSON.stringify(jsonLd.faq)}</Script>
-      <Script id="ld-wc-breadcrumb" type="application/ld+json">{JSON.stringify(jsonLd.breadcrumb)}</Script>
+      <script id="ld-wc-game" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd.game) }} />
+      <script id="ld-wc-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd.faq) }} />
+      <script id="ld-wc-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd.breadcrumb) }} />
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <TopBackLink className="mb-4" />

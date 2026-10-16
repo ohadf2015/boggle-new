@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import ConnectionsPageClient from './PageClient';
 import {
   SUPPORTED_LANDING_LOCALES,
@@ -158,15 +157,9 @@ export default async function ConnectionsPage({ params }: PageProps) {
     <>
       {supported && (
         <>
-          <Script id="ld-faq-connections" type="application/ld+json">
-            {faqJsonLd}
-          </Script>
-          <Script id="ld-videogame-connections" type="application/ld+json">
-            {videoGameJsonLd}
-          </Script>
-          <Script id="ld-breadcrumb-connections" type="application/ld+json">
-            {breadcrumbJsonLd}
-          </Script>
+          <script id="ld-faq-connections" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+          <script id="ld-videogame-connections" type="application/ld+json" dangerouslySetInnerHTML={{ __html: videoGameJsonLd }} />
+          <script id="ld-breadcrumb-connections" type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
         </>
       )}
       <ConnectionsPageClient locale={locale} copy={copy} renderLanding={supported} />

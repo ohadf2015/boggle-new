@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { WaygroundStarterLimitHonestyStrip } from '@/components/education/WaygroundStarterLimitHonestyStrip';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
@@ -106,7 +105,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <Script
+      <script
         id="lexiclash-vs-wayground-faq-jsonld"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
