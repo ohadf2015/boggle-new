@@ -37,6 +37,10 @@ interface Copy {
   words: string;
   assignments: string;
   wow: string;
+  inactive: string;
+  avgScore: string;
+  movers: string;
+  assignmentsDone: string;
   ctaNote: string;
   openDashboard: string;
   signoff: string;
@@ -70,6 +74,10 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     words: 'Words found',
     assignments: 'Assignments',
     wow: 'vs last week',
+    inactive: 'Inactive 7d',
+    avgScore: 'Avg score',
+    movers: 'Student movement',
+    assignmentsDone: 'Assignments done',
     ctaNote: 'Unlimited classes, printable reports, Polar checkout. Cancel anytime.',
     openDashboard: 'Open teacher dashboard',
     signoff: '— LexiClash',
@@ -100,6 +108,10 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     words: 'מילים שנמצאו',
     assignments: 'מטלות',
     wow: 'מול השבוע שעבר',
+    inactive: 'לא פעילים 7 ימים',
+    avgScore: 'ציון ממוצע',
+    movers: 'תנועת תלמידים',
+    assignmentsDone: 'מטלות שהושלמו',
     ctaNote: 'כיתות ללא הגבלה, דוחות להדפסה, תשלום Polar. ביטול בכל עת.',
     openDashboard: 'ללוח המורה',
     signoff: '— LexiClash',
@@ -124,18 +136,36 @@ export function teacherWeeklyProgressDigest(digest: WeeklyTeacherDigest): { subj
       const completion = p.completionPct == null ? c.na : `${p.completionPct}%`;
       const accuracy = p.accuracyPct == null ? c.na : `${p.accuracyPct}%`;
       const assignments =
-        m.assignmentCompletionPct == null ? c.na : `${m.assignmentCompletionPct}%`;
+        m.assignmentCompletionPct == null
+          ? `${m.assignmentCompleted}`
+          : `${m.assignmentCompleted} (${m.assignmentCompletionPct}%)`;
+      const avg = cl.metrics.averageScorePct == null ? c.na : `${cl.metrics.averageScorePct}%`;
       const wowLine = `${wow.studentsActive >= 0 ? '+' : ''}${wow.studentsActive} / ${wow.gamesCompleted >= 0 ? '+' : ''}${wow.gamesCompleted}`;
+      const inactiveNames = cl.metrics.students
+        .filter((s) => s.inactive7d)
+        .map((s) => escape(s.name))
+        .join(', ');
+      const movers = cl.metrics.students
+        .filter((s) => !s.inactive7d)
+        .slice(0, 5)
+        .map((s) => {
+          const delta = s.accuracyDelta == null ? '' : ` ${s.accuracyDelta >= 0 ? '+' : ''}${s.accuracyDelta}`;
+          return `${escape(s.name)}${escape(delta)}`;
+        })
+        .join(', ');
       return `<tr>
 <td>${escape(cl.classroomName)}</td>
 <td>${p.activeCount}/${p.rosterCount}</td>
 <td>${m.gamesCompleted}</td>
 <td>${m.wordsCompleted}</td>
 <td>${escape(assignments)}</td>
+<td>${escape(avg)}</td>
+<td>${cl.metrics.inactiveCount}</td>
 <td>${escape(completion)}</td>
 <td>${escape(accuracy)}</td>
 <td>${escape(wowLine)}</td>
-</tr>`;
+</tr>
+<tr><td colspan="10" style="font-size:13px;color:#333">${escape(c.movers)}: ${movers || c.na}. ${escape(c.inactive)}: ${inactiveNames || cl.metrics.inactiveCount}</td></tr>`;
     })
     .join('');
 
@@ -171,7 +201,7 @@ export function teacherWeeklyProgressDigest(digest: WeeklyTeacherDigest): { subj
 <p>${escape(c.greeting(digest.fullName))}</p>
 <p>${escape(c.intro)}</p>
 <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse">
-<thead><tr><th>${escape(c.classroom)}</th><th>${escape(c.active)}</th><th>${escape(c.games)}</th><th>${escape(c.words)}</th><th>${escape(c.assignments)}</th><th>${escape(c.completion)}</th><th>${escape(c.accuracy)}</th><th>${escape(c.wow)}</th></tr></thead>
+<thead><tr><th>${escape(c.classroom)}</th><th>${escape(c.active)}</th><th>${escape(c.games)}</th><th>${escape(c.words)}</th><th>${escape(c.assignmentsDone)}</th><th>${escape(c.avgScore)}</th><th>${escape(c.inactive)}</th><th>${escape(c.completion)}</th><th>${escape(c.accuracy)}</th><th>${escape(c.wow)}</th></tr></thead>
 <tbody>${rows}</tbody>
 </table>
 ${cta}
