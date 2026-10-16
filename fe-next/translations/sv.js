@@ -5034,6 +5034,7 @@ const sv = {
     "wordDropLetters": "{count} bokstäver",
     "wordDropEmpty": "Första ordet landar här",
     "wordDropEmptyHint": "Orden hålls hemliga. Du ser vem som fick poäng och hur långt.",
+    "wordDropLongest": "Längsta",
     "activeCombos": "Aktiva kombos",
     "highestCombo": "Högsta kombo",
     "hunting": "Jagar",

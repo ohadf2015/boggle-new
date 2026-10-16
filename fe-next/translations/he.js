@@ -4758,6 +4758,7 @@ const he = {
     "wordDropLetters": "{count} אותיות",
     "wordDropEmpty": "המילה הראשונה נוחתת כאן",
     "wordDropEmptyHint": "המילים נשארות בסוד. רואים רק מי מצא ובאיזה אורך.",
+    "wordDropLongest": "הכי ארוכה",
     "activeCombos": "קומבו פעיל",
     "highestCombo": "קומבו הגבוה ביותר",
     "hunting": "ציד",

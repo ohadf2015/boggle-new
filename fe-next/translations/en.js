@@ -4313,6 +4313,7 @@ const en = {
     "wordDropLetters": "{count} letters",
     "wordDropEmpty": "First word drops here",
     "wordDropEmptyHint": "Words stay secret. You see who scored and how long.",
+    "wordDropLongest": "Longest",
     "activeCombos": "Active combos",
     "highestCombo": "Highest combo",
     "hunting": "Hunting",

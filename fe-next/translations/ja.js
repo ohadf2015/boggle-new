@@ -4715,6 +4715,7 @@ const ja = {
     "wordDropLetters": "{count}文字",
     "wordDropEmpty": "最初の単語がここに登場",
     "wordDropEmptyHint": "単語は秘密。誰が何文字の単語を見つけたかだけ表示されます。",
+    "wordDropLongest": "最長",
     "activeCombos": "アクティブコンボ",
     "highestCombo": "最高コンボ",
     "hunting": "ハンティング中",

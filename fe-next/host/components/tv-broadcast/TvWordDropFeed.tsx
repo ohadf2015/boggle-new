@@ -78,13 +78,13 @@ export const TvWordDropFeed = memo<TvWordDropFeedProps>(function TvWordDropFeed(
                   </span>
                   <span
                     className={cn(
-                      'min-w-0 max-w-[14ch] truncate rounded-neo border-2 px-3 py-1 font-neo-display text-xl 2xl:text-3xl font-black',
+                      'min-w-0 truncate rounded-neo border-2 px-3 py-1 font-neo-display text-xl 2xl:text-3xl font-black',
                       chipAccent(drop.username, i)
                     )}
                   >
                     {drop.username}
                   </span>
-                  <span aria-hidden="true" className="ms-auto flex gap-1.5">
+                  <span aria-hidden="true" className="ms-auto flex shrink-0 gap-1.5">
                     {Array.from({ length: drop.length }, (_, k) => (
                       <span
                         key={k}
@@ -113,7 +113,7 @@ export const TvWordDropFeed = memo<TvWordDropFeedProps>(function TvWordDropFeed(
       )}
       <div className="grid grid-cols-3 border-t-3 border-neo-black bg-neo-navy-elevated px-4 py-4 2xl:py-5">
         <Stat id="total" label={t('tvBroadcast.totalWords')} value={totalWords} accent="text-neo-cream" />
-        <Stat id="longest" label={t('tvBroadcast.longestWord')} value={longest} accent="text-neo-lime" />
+        <Stat id="longest" label={t('tvBroadcast.wordDropLongest')} value={longest} accent="text-neo-lime" />
         <Stat id="avg" label={t('tvBroadcast.avgLength')} value={avgLength} accent="text-neo-cyan" />
       </div>
     </div>

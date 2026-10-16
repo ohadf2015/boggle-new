@@ -4774,6 +4774,7 @@ const es = {
     "wordDropLetters": "{count} letras",
     "wordDropEmpty": "Aquí cae la primera palabra",
     "wordDropEmptyHint": "Las palabras son secretas. Verás quién anotó y de cuántas letras.",
+    "wordDropLongest": "Más larga",
     "activeCombos": "Combos activos",
     "highestCombo": "Combo más alto",
     "hunting": "Cazando",

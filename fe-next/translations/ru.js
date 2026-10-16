@@ -14534,6 +14534,7 @@ const ru = {
     "wordDropLetters": "{count} букв",
     "wordDropEmpty": "Первое слово появится здесь",
     "wordDropEmptyHint": "Слова скрыты. Видно только, кто нашёл и какой длины.",
+    "wordDropLongest": "Самое длинное",
     "activeCombos": "Активные комбо",
     "highestCombo": "Лучшее комбо",
     "hunting": "Охота",
