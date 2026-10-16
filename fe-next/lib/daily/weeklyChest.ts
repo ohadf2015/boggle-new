@@ -189,6 +189,11 @@ export function computeCycleProgress(
   const uniqueDateSet = new Set(allCompletedDates)
   const streak: string[] = []
   const cursor = new Date(today + 'T00:00:00Z')
+  // Same grace day as computeCurrentStreak: before today is played, the run
+  // through yesterday is still the live cycle — otherwise every player reads
+  // 0/7 each morning until they finish a game.
+  const playedToday = uniqueDateSet.has(today)
+  if (!playedToday) cursor.setUTCDate(cursor.getUTCDate() - 1)
 
   while (true) {
     const iso = cursor.toISOString().slice(0, 10)
@@ -199,6 +204,11 @@ export function computeCycleProgress(
 
   if (streak.length === 0) {
     return { cycleStart: today, cycleNumber: 1, completedDates: [], daysCompleted: 0, isClaimable: false }
+  }
+  // A full week finished yesterday: that chest is findCompletedCycles' to
+  // surface; the live cycle is the fresh one that starts today.
+  if (!playedToday && streak.length % 7 === 0) {
+    return { cycleStart: today, cycleNumber: streak.length / 7 + 1, completedDates: [], daysCompleted: 0, isClaimable: false }
   }
 
   const streakLen = streak.length

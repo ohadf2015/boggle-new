@@ -9327,6 +9327,7 @@ const he = {
     "takeYourTime": "ללא הגבלת זמן",
     "play": "שחקו עכשיו",
     "viewResults": "צפו בתוצאות",
+    "openHub": "לאתגרים היומיים",
     "failed": "נכשל",
     "wordHunt": {
       "title": "ציד מילים",
@@ -9941,6 +9942,8 @@ const he = {
       "guestNameLabel": "בטבלה בתור",
       "guestNameRejected": "בחרו שם אחר",
       "guestNameFailed": "לא הצלחנו לשמור את השם. נסו שוב.",
+      "guestNamePrompt": "באיזה שם לשמור את התוצאה שלך?",
+      "guestNameKeep": "להשאיר את השם הזה",
       "wordsFound": "מילים שנמצאו",
       "masteryRatingLabel": "דירוג",
       "masteryRatingChangeLabel": "שינוי",

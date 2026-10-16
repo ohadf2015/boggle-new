@@ -122,6 +122,7 @@ vi.mock('../../../utils/profileStorage', () => ({
 vi.mock('../../../utils/guestManager', () => ({
   setGuestName: vi.fn(),
   saveGuestNameEverywhere: vi.fn(),
+  markGuestNameChosen: vi.fn(),
   ensureGuestDisplayName: () => 'Sly Fox',
 }));
 vi.mock('../../../utils/dailyChallenge/guestPlayer', () => ({ updateGuestDailyPlayer: vi.fn() }));

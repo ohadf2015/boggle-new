@@ -12,6 +12,10 @@ import { markPostGameCompleted } from '@/lib/auth/signupPromptCoordination';
 const GUEST_SESSION_KEY = 'boggle_guest_session_id';
 const GUEST_STATS_KEY = 'boggle_guest_stats';
 const GUEST_NAME_KEY = 'boggle_guest_name';
+// Set once the guest typed a name or explicitly kept the suggested one. Every
+// guest gets an auto-generated name, so the stores alone can't tell a real
+// name from a random one.
+const GUEST_NAME_CHOSEN_KEY = 'lexiclash_guest_name_chosen';
 
 export interface GuestStats {
   games: number;
@@ -306,6 +310,23 @@ export function saveGuestNameEverywhere(name: string): void {
   setStoredUsername(name);
   setGuestName(name);
   updateGuestDailyPlayer({ displayName: name });
+}
+
+export function hasChosenGuestName(): boolean {
+  try {
+    return localStorage.getItem(GUEST_NAME_CHOSEN_KEY) === '1';
+  } catch {
+    // No storage (private mode / SSR): never nag on every finish.
+    return true;
+  }
+}
+
+export function markGuestNameChosen(): void {
+  try {
+    localStorage.setItem(GUEST_NAME_CHOSEN_KEY, '1');
+  } catch {
+    // best effort
+  }
 }
 
 /**

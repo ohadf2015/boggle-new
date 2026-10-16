@@ -22,6 +22,7 @@ const T_MAP: Record<string, string> = {
   'daily.title': 'Daily Challenge',
   'daily.play': 'PLAY',
   'daily.viewResults': 'VIEW RESULTS',
+  'daily.openHub': 'DAILY HUB',
   'landing.home.todaysPuzzle': "Today's Puzzle",
 };
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -106,13 +107,17 @@ describe('HomeDailyHero — CTA hydration gate', () => {
     expect(pending.querySelector('svg')).not.toBeNull();
   });
 
-  it('renders VIEW RESULTS once a completed daily resolves', () => {
+  it('sends the player to the daily hub, not the wheel results, once the wheel is done', () => {
+    // Given today's Word Wheel is finished
     mockStats = baseStats({ loading: false, hasPlayed: true, hasSolved: true });
     mockPlayed.today.wordWheel = true;
+    // When the home card renders
     render(<HomeDailyHero preloadedStats={{ hasPlayed: true, hasSolved: true, currentStreak: 3, loading: false }} />);
-
+    // Then it links to the hub and says so
     expect(screen.queryByTestId('daily-cta-skeleton')).not.toBeInTheDocument();
-    expect(screen.getByText('VIEW RESULTS')).toBeInTheDocument();
+    expect(screen.getByTestId('home-daily-hero')).toHaveAttribute('href', '/en/daily');
+    expect(screen.getByText('DAILY HUB')).toBeInTheDocument();
+    expect(screen.queryByText('VIEW RESULTS')).not.toBeInTheDocument();
     expect(screen.queryByText('PLAY')).not.toBeInTheDocument();
   });
 
@@ -125,24 +130,20 @@ describe('HomeDailyHero — CTA hydration gate', () => {
     expect(screen.queryByText('VIEW RESULTS')).not.toBeInTheDocument();
   });
 
-  // The card links to Word Wheel but used to read WORD HUNT's played state:
-  // a player who had only done the wheel saw PLAY (and landed on a finished
-  // game), one who had only done the hunt saw VIEW RESULTS for a wheel they
-  // never played (rules/60 Class 3).
-  it('given only Word Hunt is played today, still offers PLAY for the Word Wheel it links to', () => {
+  // Any finished daily makes the hub the next stop: it shows what is left today,
+  // the streak and the weekly chest — the wheel's results screen shows none of that.
+  it('given only Word Hunt is played today, sends the player to the daily hub', () => {
     mockStats = baseStats({ hasPlayed: true, hasSolved: true });
     mockPlayed.today = { wordHunt: true, wordWheel: false, wordTower: false, connections: false };
     render(<HomeDailyHero preloadedStats={{ hasPlayed: true, hasSolved: true, currentStreak: 2, loading: false }} />);
-    expect(screen.getByText('PLAY')).toBeInTheDocument();
-    expect(screen.queryByText('VIEW RESULTS')).not.toBeInTheDocument();
+    expect(screen.getByTestId('home-daily-hero')).toHaveAttribute('href', '/en/daily');
+    expect(screen.getByText('DAILY HUB')).toBeInTheDocument();
   });
 
-  it('given only Word Wheel is played today, shows VIEW RESULTS', () => {
-    mockStats = baseStats({ hasPlayed: false, hasSolved: false });
-    mockPlayed.today = { wordHunt: false, wordWheel: true, wordTower: false, connections: false };
+  it('given nothing is played today, links straight into the Word Wheel', () => {
     render(<HomeDailyHero preloadedStats={{ hasPlayed: false, hasSolved: null, currentStreak: 0, loading: false }} />);
-    expect(screen.getByText('VIEW RESULTS')).toBeInTheDocument();
-    expect(screen.queryByText('PLAY')).not.toBeInTheDocument();
+    expect(screen.getByTestId('home-daily-hero')).toHaveAttribute('href', '/en/daily/word-wheel');
+    expect(screen.getByText('PLAY')).toBeInTheDocument();
   });
 
   it('given the played state is still resolving, shows the skeleton even if the hunt stats are in', () => {

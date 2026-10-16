@@ -126,15 +126,16 @@ describe('GET /api/daily/weekly-chest/status', () => {
   })
 
   it('keeps currentStreak alive on a grace day (played through yesterday, not today)', async () => {
-    // Played 05-08..05-11; today (05-12) not yet played. Streak must stay 4
-    // while the chest cycle (today-anchored) shows no progress yet.
+    // Played 05-08..05-11; today (05-12) not yet played. Streak stays 4 and the
+    // chest agrees (4/7) — it used to read 0/7 every morning next to a 4-day fire.
     makeMockSupabase({
         huntAttempts: ['2026-05-08','2026-05-09','2026-05-10','2026-05-11'].map(d => ({ puzzle_date: d })),
       })
     const res = await GET(req())
     const body = await res.json()
     expect(body.currentStreak).toBe(4)
-    expect(body.daysCompleted).toBe(0)
+    expect(body.daysCompleted).toBe(4)
+    expect(body.cycleStart).toBe('2026-05-08')
   })
 
   it('returns daysCompleted 1 for single day attempt', async () => {
