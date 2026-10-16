@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 
 export interface ClassPagerProps {
@@ -17,7 +18,7 @@ const STEP =
 
 /**
  * Prev / "2 of 5" / next for the Classes tab. Renders nothing for one page.
- * Arrows are chevrons flipped for RTL by the `rtl:` variant, so "next" always
+ * Arrows are chevrons flipped for RTL by `DirectionalIcon`, so "next" always
  * points the way the reader reads.
  */
 export function ClassPager({ page, pages, onChange, className }: ClassPagerProps) {
@@ -38,7 +39,7 @@ export function ClassPager({ page, pages, onChange, className }: ClassPagerProps
         aria-label={t('academy.classes.prevPage', 'Previous classes')}
         className={STEP}
       >
-        <ChevronLeft className="size-5 rtl:rotate-180" strokeWidth={3} aria-hidden="true" />
+        <DirectionalIcon icon={ChevronLeft} className="size-5" />
       </button>
       <span
         data-testid="class-pager-status"
@@ -55,7 +56,7 @@ export function ClassPager({ page, pages, onChange, className }: ClassPagerProps
         aria-label={t('academy.classes.nextPage', 'More classes')}
         className={STEP}
       >
-        <ChevronRight className="size-5 rtl:rotate-180" strokeWidth={3} aria-hidden="true" />
+        <DirectionalIcon icon={ChevronRight} className="size-5" />
       </button>
     </nav>
   );

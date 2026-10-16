@@ -125,7 +125,7 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
   };
 
   return (
-    <div className={cn('rounded-neo-lg border-3 border-neo-black bg-neo-navy-light p-3 lg:p-4 tv:p-6 shadow-hard', className)}>
+    <div className={cn('rounded-neo-lg border-3 border-neo-cream/40 bg-neo-navy-light p-3 lg:p-4 tv:p-6 shadow-hard', className)}>
       <p className="mb-2 flex items-center gap-1.5 text-[11px] tv:text-base font-bold uppercase tracking-[0.15em] text-neo-pink">
         <KeyRound aria-hidden="true" className="h-3.5 w-3.5" />
         {t('mpUi.entry.codeLabel')}
@@ -154,10 +154,10 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
             aria-label={t('mpUi.entry.codeAria', { n: i + 1, total: CODE_LENGTH })}
             aria-describedby={hintId}
             className={cn(
-              'h-12 lg:h-14 tv:h-20 w-full min-w-0 rounded-neo border-3 border-neo-black text-center font-neo-display! text-2xl! tv:text-4xl! font-bold uppercase outline-hidden transition-transform duration-100',
+              'h-12 lg:h-14 tv:h-20 w-full min-w-0 rounded-neo border-3 text-center font-neo-display! text-2xl! tv:text-4xl! font-bold uppercase outline-hidden transition-transform duration-100',
               'focus:-translate-y-0.5 focus:border-neo-lime focus:shadow-hard-sm disabled:opacity-60',
               // A filled box pops once as its character lands (the class arrives with the character).
-              ch ? 'bg-neo-lime text-neo-black animate-mp-bump' : 'bg-neo-navy text-neo-white',
+              ch ? 'border-neo-black bg-neo-lime text-neo-black animate-mp-bump' : 'border-neo-cream/40 bg-neo-navy text-neo-white',
             )}
           />
         ))}

@@ -50,9 +50,10 @@ export function TeacherTrialWelcome({ trialExpires }: { trialExpires: string | n
         role="dialog"
         aria-modal="true"
         aria-labelledby="teacher-trial-welcome-title"
+        dir={isRTL ? 'rtl' : 'ltr'}
         className={cn(
-          'relative w-full max-w-md rounded-neo border-3 border-black bg-neo-cream p-6 shadow-hard-lg',
-          isRTL && 'rtl text-right',
+          'relative w-full max-w-md rounded-neo border-3 border-black bg-neo-cream p-6 text-start shadow-hard-lg',
+          isRTL && 'rtl',
         )}
       >
         <h2

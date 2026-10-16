@@ -45,14 +45,6 @@ const ALLOWLIST: Record<string, { tokens: string[]; why: string }> = {
     why: 'isRTL ? right-0 : left-0 ternary',
   },
   // ---- components/teacher ----
-  'teacher/ProWelcomeCelebration.tsx': {
-    tokens: ['text-right'],
-    why: 'applied only inside isRTL && "rtl text-right"',
-  },
-  'teacher/TeacherTrialWelcome.tsx': {
-    tokens: ['text-right'],
-    why: 'applied only inside isRTL && "rtl text-right"',
-  },
 };
 
 /**

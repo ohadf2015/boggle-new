@@ -18,6 +18,7 @@ const FOR_SCHOOLS_FOOTER: Record<string, string> = {
   sv: 'Vill du ta LexiClash till hela din skola eller kommun?',
   ja: '学校や地域全体でLexiClashを使いませんか？',
   es: '¿Quieres llevar LexiClash a toda tu escuela o distrito?',
+  ru: 'Внедряете LexiClash во всей школе или учебном округе?',
 };
 const FOR_SCHOOLS_CTA: Record<string, string> = {
   en: 'See LexiClash for Schools →',
@@ -25,6 +26,7 @@ const FOR_SCHOOLS_CTA: Record<string, string> = {
   sv: 'Se LexiClash för skolor →',
   ja: '学校向けLexiClashを見る →',
   es: 'Ver LexiClash para escuelas →',
+  ru: 'LexiClash для школ →',
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -70,7 +72,7 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
           <Link
             href={`/${locale}/education/for-schools`}
             data-ph-capture-attribute-cta="classroom_for_schools"
-            className="mt-4 inline-block rounded-neo border-neo-thick bg-neo-lime px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg"
+            className="mt-4 inline-block rounded-neo border-neo-thick border-neo-black bg-neo-lime px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg"
           >
             {FOR_SCHOOLS_CTA[locale] ?? FOR_SCHOOLS_CTA.en}
           </Link>

@@ -33,7 +33,7 @@ export function FirstDayCard({ goals, hasClass }: Props) {
         <span className="relative h-9 w-9 shrink-0">
           <Image src="/images/classroom-chests/classroom-chest-common-closed.webp" alt="" aria-hidden="true" fill unoptimized sizes="36px" className="object-contain" />
         </span>
-        <ul className="grid min-w-0 flex-1 grid-cols-3 gap-1">
+        <ul className="grid min-w-0 flex-1 grid-cols-1 min-[420px]:grid-cols-3 gap-1">
           {goals.map((g) => (
             <li
               key={g.id}
@@ -45,7 +45,7 @@ export function FirstDayCard({ goals, hasClass }: Props) {
             >
               <span className="flex items-center gap-1">
                 {g.done && <Check aria-hidden="true" className="h-3 w-3 shrink-0" strokeWidth={3} />}
-                <span className="min-w-0 truncate">{label(g)}</span>
+                <span className="min-w-0 line-clamp-2 break-words">{label(g)}</span>
               </span>
               <span className="tabular-nums opacity-80">{`${g.have}/${g.need}`}</span>
             </li>

@@ -55,7 +55,7 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
               'relative flex items-center min-h-0 grow shrink overflow-hidden rounded-neo border-[3px] shadow-hard-sm',
               'gap-[calc(10px*var(--mp-u,1))] px-[calc(10px*var(--mp-u,1))]',
               first ? 'basis-[calc(76px*var(--mp-u,1))] max-h-[calc(108px*var(--mp-u,1))] min-h-[calc(44px*var(--mp-u,1))]' : 'basis-[calc(58px*var(--mp-u,1))] max-h-[calc(84px*var(--mp-u,1))] min-h-[calc(34px*var(--mp-u,1))]',
-              podium ? podium.row : 'bg-neo-navy-light border-neo-black',
+              podium ? podium.row : 'bg-neo-navy-light border-neo-cream/40',
               r.isMe && !first && 'outline-[3px] outline-offset-2 outline-neo-lime outline',
               r.isMe && first && 'outline-[3px] outline-offset-2 outline-neo-white outline',
               !shown && 'invisible',
@@ -69,9 +69,9 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
             )}
             <span
               className={cn(
-                'relative shrink-0 grid place-items-center rounded-neo border-2 border-neo-black font-neo-display font-bold tabular-nums',
+                'relative shrink-0 grid place-items-center rounded-neo border-2 font-neo-display font-bold tabular-nums',
                 'w-[calc(34px*var(--mp-u,1))] h-[calc(34px*var(--mp-u,1))] text-[calc(17px*var(--mp-u,1))]',
-                podium ? (first ? 'bg-neo-black text-neo-lime' : podium.badge) : 'bg-neo-navy text-neo-white',
+                podium ? (first ? 'border-neo-black bg-neo-black text-neo-lime' : cn('border-neo-black', podium.badge)) : 'border-neo-cream/40 bg-neo-navy text-neo-white',
               )}
             >
               {r.rank}
@@ -79,7 +79,7 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
             <span
               className={cn(
                 'relative shrink-0 rounded-full border-2',
-                first ? 'border-neo-black' : r.isMe ? 'border-neo-lime' : 'border-neo-black',
+                first ? 'border-neo-black' : r.isMe ? 'border-neo-lime' : 'border-neo-cream/40',
               )}
               style={{ width: 'calc(40px * var(--mp-u, 1))', height: 'calc(40px * var(--mp-u, 1))' }}
             >
@@ -160,7 +160,7 @@ function MpStandingsBoardImpl({ rows, hiddenCount, isRevealed, t, className }: M
         );
       })}
       {hiddenCount > 0 && (
-        <li className="shrink-0 self-center rounded-full bg-neo-navy-light border-2 border-neo-black px-3 py-0.5 text-xs font-bold text-neo-white/80">
+        <li className="shrink-0 self-center rounded-full bg-neo-navy-light border-2 border-neo-cream/40 px-3 py-0.5 text-xs font-bold text-neo-white/80">
           {t('mpUi.results.moreHidden', { count: hiddenCount })}
         </li>
       )}

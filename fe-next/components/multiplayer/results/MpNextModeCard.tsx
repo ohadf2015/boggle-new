@@ -100,7 +100,7 @@ export function MpNextModeCard({ mode, onChange, onPickerOpenChange, t, classNam
                   }}
                   className={cn(
                     'flex items-center gap-2 min-w-0 rounded-neo border-[3px] p-2 text-start',
-                    active ? cn(mt.card, 'bg-neo-navy shadow-hard-sm') : 'border-neo-black bg-neo-navy/60',
+                    active ? cn(mt.card, 'bg-neo-navy shadow-hard-sm') : 'border-neo-cream/40 bg-neo-navy/60',
                     m === 'random' && 'col-span-2',
                   )}
                 >

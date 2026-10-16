@@ -122,11 +122,14 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
   const hasGrid = grid.students.length > 0 && grid.assignments.length > 0;
 
   return (
-    <section data-testid="class-assignment-grid" className="space-y-4">
+    <section
+      data-testid="class-assignment-grid"
+      className="space-y-4 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 shadow-hard sm:p-5"
+    >
       <SectionTitle>{t('teacher.reports.classGrid.title')}</SectionTitle>
 
       {hasGrid ? (
-        <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/25">
+        <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-neo-navy text-neo-cream/80">
@@ -142,7 +145,7 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
             </thead>
             <tbody>
               {grid.students.map((student, studentIndex) => (
-                <tr key={student.id} className="border-t border-neo-cream/40">
+                <tr key={student.id} className="border-t border-neo-cream/20">
                   <th scope="row" className="px-3 py-2 text-start font-bold text-neo-white">
                     {student.name}
                   </th>
@@ -187,7 +190,7 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
         </>
       )}
 
-      <div className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-4">
+      <div className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-4">
         <pre
           data-testid="weekly-summary"
           className="whitespace-pre-wrap break-words font-sans text-sm text-neo-white"

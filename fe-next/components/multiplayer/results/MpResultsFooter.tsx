@@ -42,7 +42,7 @@ export function MpAutoRing({ secondsLeft, total, onCancel, t }: AutoRingProps) {
       onClick={onCancel}
       data-testid="mp-auto-ring"
       aria-label={`${t('mpUi.results.autoIn', { seconds: secondsLeft })} — ${t('mpUi.results.cancelAuto')}`}
-      className="group relative shrink-0 grid place-items-center rounded-full bg-neo-navy-light border-[3px] border-neo-black shadow-hard-sm w-[calc(64px*var(--mp-u,1))] h-[calc(64px*var(--mp-u,1))]"
+      className="group relative shrink-0 grid place-items-center rounded-full bg-neo-navy-light border-[3px] border-neo-cream/40 shadow-hard-sm w-[calc(64px*var(--mp-u,1))] h-[calc(64px*var(--mp-u,1))]"
     >
       <svg viewBox="0 0 48 48" aria-hidden="true" className="absolute inset-0 w-full h-full -rotate-90">
         <circle cx="24" cy="24" r={R} fill="none" strokeWidth="4" className="stroke-neo-white/15" />
@@ -134,7 +134,7 @@ export interface MpFinalFooterProps {
 
 /** Final results: [REMATCH] [LEAVE] [share]. One primary; the rest are quiet. */
 export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, leaveKey = 'mpUi.results.leave', t }: MpFinalFooterProps) {
-  const quiet = 'shrink-0 inline-flex flex-col items-center justify-center gap-0.5 rounded-neo border-[3px] border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm font-bold uppercase w-[calc(64px*var(--mp-u,1))] h-[calc(64px*var(--mp-u,1))] text-[calc(10px*var(--mp-u,1))] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none';
+  const quiet = 'shrink-0 inline-flex flex-col items-center justify-center gap-0.5 rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light text-neo-white shadow-hard-sm font-bold uppercase w-[calc(64px*var(--mp-u,1))] h-[calc(64px*var(--mp-u,1))] text-[calc(10px*var(--mp-u,1))] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none';
   return (
     <div className="flex items-center gap-[calc(10px*var(--mp-u,1))]">
       {!isHost && isReady ? (
@@ -146,7 +146,7 @@ export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, le
         <DirectionalIcon icon={LogOut} mirror className="w-5 h-5" />
         {t(leaveKey)}
       </button>
-      <button type="button" data-testid="mp-results-share" onClick={onShare} className={cn(quiet, 'bg-neo-pink text-neo-black')}>
+      <button type="button" data-testid="mp-results-share" onClick={onShare} className={cn(quiet, 'border-neo-black bg-neo-pink text-neo-black')}>
         <Share2 aria-hidden="true" className="w-5 h-5" />
         {t('mpUi.results.share')}
       </button>

@@ -82,19 +82,19 @@ export function MpSheet({ open, onClose, title, side = 'bottom', children, testI
         data-testid="mp-sheet-panel"
         data-side={side}
         className={cn(
-          'absolute flex flex-col bg-neo-navy-light text-neo-white border-neo-black shadow-hard-lg outline-none',
+          'absolute flex flex-col bg-neo-navy-light text-neo-white border-neo-cream/40 shadow-hard-lg outline-none',
           side === 'bottom'
             ? 'inset-x-0 bottom-0 max-h-[85%] rounded-t-neo-lg border-t-4 pb-[env(safe-area-inset-bottom)] animate-mp-sheet-up'
             : 'inset-y-0 end-0 w-full max-w-[560px] border-s-4 animate-mp-sheet-in',
         )}
       >
-        <div className="flex items-center justify-between gap-2 px-4 py-3 border-b-2 border-neo-black">
+        <div className="flex items-center justify-between gap-2 px-4 py-3 border-b-2 border-neo-cream/30">
           <h2 id={titleId} className="font-neo-display font-bold text-lg uppercase truncate">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label={t('mpUi.shell.close')}
-            className="inline-flex items-center justify-center w-11 h-11 rounded-neo border-2 border-neo-black bg-neo-navy text-neo-white"
+            className="inline-flex items-center justify-center w-11 h-11 rounded-neo border-2 border-neo-cream/40 bg-neo-navy text-neo-white"
           >
             <X aria-hidden="true" className="w-5 h-5" />
           </button>

@@ -133,9 +133,8 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
         {!still && (
           <m.span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 w-1/4 -skew-x-12 bg-white/45"
-            initial={{ left: '-40%' }}
-            animate={{ left: '140%' }}
+            className="pointer-events-none absolute inset-y-0 left-0 w-1/4 -skew-x-12 bg-white/45"
+            animate={{ x: ['-100%', '400%'] }}
             transition={{ duration: 1.4, repeat: Infinity, repeatDelay: kind === 'live' ? 0.5 : 2.2, ease: 'easeInOut' }}
           />
         )}

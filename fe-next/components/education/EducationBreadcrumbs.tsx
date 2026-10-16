@@ -160,8 +160,7 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
       <ol
         className={cn(
           'flex items-center gap-1 sm:gap-2 text-sm font-neo-body',
-          'overflow-x-auto scrollbar-hide',
-          language === 'he' && 'flex-row-reverse'
+          'overflow-x-auto scrollbar-hide'
         )}
       >
         {items.map((item, index) => {
@@ -171,10 +170,7 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
           return (
             <li
               key={item.href}
-              className={cn(
-                'flex items-center gap-1 sm:gap-2 whitespace-nowrap',
-                language === 'he' && 'flex-row-reverse'
-              )}
+              className="flex items-center gap-1 sm:gap-2 whitespace-nowrap"
             >
               {/* Separator (except for first item) */}
               {!isFirst && (

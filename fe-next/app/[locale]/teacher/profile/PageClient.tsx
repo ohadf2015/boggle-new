@@ -7,16 +7,20 @@
 'use client';
 
 import { type ReactNode, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { NeoPanel } from '@/components/ui/panel';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import SubscriptionStatusCard from '@/components/teacher/SubscriptionStatusCard';
 import { cn } from '@/lib/utils';
-import { GraduationCap, Users, BookOpen, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowRight, GraduationCap, Users, BookOpen, Mail, ShieldCheck } from 'lucide-react';
+
+const REPORT_CARD =
+  'rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light p-5 text-neo-white shadow-hard';
 
 function TeacherProfileInner() {
   const { user, profile, loading } = useAuth();
@@ -77,136 +81,145 @@ function TeacherProfileInner() {
   const userRole = profile?.user_role || (profile?.is_admin ? 'teacher' : 'student');
 
   return (
-    <div data-testid="teacher-profile-page" className="w-full max-w-3xl mx-auto">
+    <div data-testid="teacher-profile-page" className="w-full max-w-3xl mx-auto space-y-6">
+      {/* Profile Header */}
+      <div className={cn(REPORT_CARD, 'p-6')}>
+        <div className="flex flex-wrap items-center gap-4">
+          <Avatar
+            customAvatar={profile?.avatar_config ?? null}
+            userId={user?.id}
+            size="xl"
+            className="shrink-0"
+          />
 
-        {/* Profile Header */}
-        <NeoPanel tone="cream" className="mb-8 p-6">
-          <div className="flex items-center gap-4">
-            {/* Avatar */}
-            <Avatar
-              customAvatar={profile?.avatar_config ?? null}
-              userId={user?.id}
-              size="xl"
-              className="shrink-0"
-            />
-
-            {/* Name + role */}
-            <div>
-              <h1
-                data-testid="teacher-display-name"
-                className="text-3xl font-neo-display font-black text-neo-black"
-              >
-                {displayName}
-              </h1>
-              <div className="flex items-center gap-2 mt-1">
-                <div className="px-3 py-1 bg-neo-cyan text-neo-black font-bold text-sm rounded-neo border-2 border-neo-black uppercase">
-                  {t('teacher.profile.teacherBadge')}
-                </div>
+          <div className="min-w-0 flex-1">
+            <h1
+              data-testid="teacher-display-name"
+              className="text-2xl sm:text-3xl font-neo-display font-bold text-neo-white break-words"
+            >
+              {displayName}
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              <div className="px-3 py-1 bg-neo-cyan text-neo-black font-bold text-xs rounded-neo border-2 border-neo-black uppercase tracking-wide">
+                {t('teacher.profile.teacherBadge')}
               </div>
+              {user.email && (
+                <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-cream/70">
+                  <GraduationCap className="w-4 h-4 text-neo-cyan shrink-0" aria-hidden="true" />
+                  <span>{user.email}</span>
+                </span>
+              )}
             </div>
           </div>
-        </NeoPanel>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          {classroomsLoading ? (
-            <>
-              {['a', 'b', 'c'].map((id) => (
-                <NeoPanel key={`skeleton-${id}`} tone="cream" className="p-5 animate-pulse">
-                  <div className="h-4 w-24 bg-neo-black/10 rounded mb-3" />
-                  <div className="h-9 w-16 bg-neo-black/20 rounded" />
-                </NeoPanel>
-              ))}
-            </>
-          ) : (
-            <>
-              {/* Classroom count */}
-              <NeoPanel tone="cream" className="p-5">
-                <div className="flex items-center gap-2 mb-2 text-neo-black/60 font-bold text-sm uppercase">
-                  <BookOpen className="w-4 h-4" />
-                  <span>{t('teacher.profile.classrooms')}</span>
-                </div>
-                <div
-                  data-testid="classroom-count"
-                  className="text-4xl font-neo-display font-black text-neo-black"
-                >
-                  {classrooms.length}
-                </div>
-              </NeoPanel>
-
-              {/* Student count */}
-              <NeoPanel tone="cream" className="p-5">
-                <div className="flex items-center gap-2 mb-2 text-neo-black/60 font-bold text-sm uppercase">
-                  <Users className="w-4 h-4" />
-                  <span>{t('teacher.profile.totalStudents')}</span>
-                </div>
-                <div
-                  data-testid="total-student-count"
-                  // Was text-neo-cyan on a cream panel — 1.24:1, the biggest
-                  // number on the screen and the hardest to read. Black on
-                  // cream is ~17:1; the cyan chip above still carries the hue.
-                  className="text-4xl font-neo-display font-black text-neo-black"
-                >
-                  {totalStudents}
-                </div>
-              </NeoPanel>
-
-              {/* Role status */}
-              <NeoPanel tone="cream" className="p-5">
-                <div className="flex items-center gap-2 mb-2 text-neo-black/60 font-bold text-sm uppercase">
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>{t('teacher.profile.roleStatus')}</span>
-                </div>
-                <div
-                  data-testid="user-role-status"
-                  className="text-lg font-neo-display font-black text-neo-black capitalize"
-                >
-                  {userRole}
-                </div>
-              </NeoPanel>
-            </>
-          )}
         </div>
+      </div>
 
-        {/* Contact Admin Section - SKIPPED: neo-lime is not a standard NeoPanel tone */}
-        <div
-          data-testid="contact-admin-section"
-          className="p-6 bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard mb-8"
-        >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-neo bg-neo-black border-2 border-neo-black flex items-center justify-center shrink-0 shadow-hard-sm">
-              <Mail className="w-6 h-6 text-neo-lime" />
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {classroomsLoading ? (
+          <>
+            {['a', 'b', 'c'].map((id) => (
+              <div key={`skeleton-${id}`} className={cn(REPORT_CARD, 'animate-pulse')}>
+                <div className="h-4 w-24 bg-neo-cream/10 rounded mb-3" />
+                <div className="h-9 w-16 bg-neo-cream/20 rounded" />
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            {/* Classroom count */}
+            <div className={REPORT_CARD}>
+              <div className="flex items-center gap-2 mb-2 text-neo-cream/70 font-bold text-xs uppercase tracking-wide">
+                <BookOpen className="w-4 h-4 text-neo-cyan shrink-0" aria-hidden="true" />
+                <span>{t('teacher.profile.classrooms')}</span>
+              </div>
+              <div
+                data-testid="classroom-count"
+                className="text-3xl sm:text-4xl font-neo-display font-black text-neo-white tabular-nums"
+              >
+                {classrooms.length}
+              </div>
+            </div>
+
+            {/* Student count */}
+            <div className={REPORT_CARD}>
+              <div className="flex items-center gap-2 mb-2 text-neo-cream/70 font-bold text-xs uppercase tracking-wide">
+                <Users className="w-4 h-4 text-neo-lime shrink-0" aria-hidden="true" />
+                <span>{t('teacher.profile.totalStudents')}</span>
+              </div>
+              <div
+                data-testid="total-student-count"
+                className="text-3xl sm:text-4xl font-neo-display font-black text-neo-white tabular-nums"
+              >
+                {totalStudents}
+              </div>
+            </div>
+
+            {/* Role status */}
+            <div className={REPORT_CARD}>
+              <div className="flex items-center gap-2 mb-2 text-neo-cream/70 font-bold text-xs uppercase tracking-wide">
+                <ShieldCheck className="w-4 h-4 text-neo-cyan shrink-0" aria-hidden="true" />
+                <span>{t('teacher.profile.roleStatus')}</span>
+              </div>
+              <div
+                data-testid="user-role-status"
+                className="text-xl font-neo-display font-bold text-neo-white capitalize"
+              >
+                {userRole}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Subscription Status Card */}
+      <div>
+        <SubscriptionStatusCard />
+      </div>
+
+      {/* School / District Contact Admin Section */}
+      <div
+        data-testid="contact-admin-section"
+        className="p-5 sm:p-6 bg-neo-navy-light border-2 border-neo-cyan rounded-neo-lg shadow-hard text-neo-white"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <div className="w-11 h-11 rounded-neo bg-neo-cyan/15 border-2 border-neo-cyan flex items-center justify-center shrink-0">
+              <Mail className="w-5 h-5 text-neo-cyan" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-xl font-neo-display font-black text-neo-black mb-1">
+              <h2 className="text-lg font-neo-display font-bold text-neo-white mb-1">
                 {t('teacher.profile.contactAdmin')}
               </h2>
-              <p className="text-neo-black/70 font-bold text-sm leading-relaxed">
+              <p className="text-neo-cream/70 font-bold text-sm leading-relaxed">
                 {t('teacher.profile.contactAdminDesc')}
               </p>
             </div>
           </div>
+          <Link
+            href={`/${language}/education/for-schools`}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-neo border-2 border-neo-black bg-neo-cyan px-4 py-2 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white"
+          >
+            <span>{t('teacher.profile.contactAdmin')}</span>
+            <DirectionalIcon icon={ArrowRight} className="w-4 h-4" />
+          </Link>
         </div>
+      </div>
 
-        {/* Subscription Status Card */}
-        <div className="mb-8">
-          <SubscriptionStatusCard />
-        </div>
-
-        {/* Email Info */}
-        {user.email && (
-          <div className="p-5 bg-neo-navy-light border-3 border-neo-cream/40 rounded-neo shadow-hard">
-            <div className="flex items-center gap-3">
-              <GraduationCap className="w-5 h-5 text-neo-cyan shrink-0" />
-              <div>
-                <p className="text-neo-white text-xs font-bold uppercase mb-0.5">
-                  {t('common.email')}
-                </p>
-                <p className="text-neo-white font-bold">{user.email}</p>
-              </div>
+      {/* Account Info */}
+      {user.email && (
+        <div className={cn(REPORT_CARD, 'divide-y divide-neo-cream/20')}>
+          <div className="flex items-center gap-3">
+            <GraduationCap className="w-5 h-5 text-neo-cyan shrink-0" aria-hidden="true" />
+            <div>
+              <p className="text-neo-cream/70 text-xs font-bold uppercase mb-0.5">
+                {t('common.email')}
+              </p>
+              <p className="text-neo-white font-bold">{user.email}</p>
             </div>
           </div>
-        )}
+        </div>
+      )}
     </div>
   );
 }

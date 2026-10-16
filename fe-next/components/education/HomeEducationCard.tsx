@@ -69,7 +69,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       data-testid="home-education-card"
       className={cn(
         'group flex w-full items-center gap-3 sm:gap-4',
-        'rounded-neo border-neo bg-neo-white dark:bg-neo-navy-light',
+        'rounded-neo border-neo border-neo-black dark:border-neo-cream/40 bg-neo-white dark:bg-neo-navy-light',
         'p-3 sm:p-4 shadow-hard',
         'transition-all duration-100',
         'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg',
@@ -92,7 +92,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
 
       {/* Copy */}
       <div className="min-w-0 flex-1">
-        <span className="inline-block rounded-full border-2 border-neo-black bg-neo-cream px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-neo-black dark:bg-neo-navy dark:text-neo-white">
+        <span className="inline-block rounded-full border-2 border-neo-black dark:border-neo-cream/40 bg-neo-cream px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-neo-black dark:bg-neo-navy dark:text-neo-white">
           {badge}
         </span>
         <h3

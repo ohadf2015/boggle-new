@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { LogOut } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { trackModalInteraction } from '@/utils/growthTracking';
 import {
   AlertDialog,
@@ -56,7 +57,7 @@ export function StudentExitDialog({ open, onOpenChange, onConfirm, t, analyticsI
             aria-hidden="true"
             className="mb-1 flex size-12 -rotate-6 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-red shadow-hard-sm"
           >
-            <LogOut className="size-6 text-neo-black rtl:scale-x-[-1]" strokeWidth={2.75} />
+            <DirectionalIcon icon={LogOut} mirror className="size-6 text-neo-black" />
           </span>
           <AlertDialogTitle className="font-neo-display text-xl font-black text-neo-white">
             {t('eduStudent.exit.title')}

@@ -79,7 +79,7 @@ export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefr
         {online > 0 && (
           <span
             data-testid="arena-online"
-            className="inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-navy-light px-2 py-0.5 text-[11px] tv:text-base font-bold text-neo-cyan"
+            className="inline-flex items-center gap-1.5 rounded-full border-2 border-neo-cream/40 bg-neo-navy-light px-2 py-0.5 text-[11px] tv:text-base font-bold text-neo-cyan"
           >
             <span aria-hidden="true" className="h-2 w-2 rounded-full bg-neo-lime" />
             {t('mpUi.entry.playingNow', { count: online })}
@@ -90,7 +90,7 @@ export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefr
           onClick={onRefresh}
           disabled={loading}
           aria-label={t('common.refresh')}
-          className="ms-auto inline-flex h-9 w-9 tv:h-14 tv:w-14 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm transition-transform hover:rotate-90 active:translate-y-0.5 active:shadow-hard-pressed disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
+          className="ms-auto inline-flex h-9 w-9 tv:h-14 tv:w-14 items-center justify-center rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light text-neo-white shadow-hard-sm transition-transform hover:rotate-90 active:translate-y-0.5 active:shadow-hard-pressed disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
         >
           <RefreshCw aria-hidden="true" className={cn('h-4 w-4', loading && 'animate-spin')} />
         </button>
@@ -112,7 +112,7 @@ export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefr
       {loading && rooms.length === 0 ? (
         <div data-testid="room-list-skeleton" aria-hidden="true" className="flex flex-col gap-2">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="flex h-[60px] items-center gap-3 rounded-neo border-2 border-neo-black border-s-[6px] border-s-neo-cyan/40 bg-neo-navy-light/50 px-3 motion-safe:animate-pulse">
+            <div key={i} className="flex h-[60px] items-center gap-3 rounded-neo border-2 border-neo-cream/40 border-s-[6px] border-s-neo-cyan/40 bg-neo-navy-light/50 px-3 motion-safe:animate-pulse">
               <div className="h-10 w-10 rounded-neo bg-neo-navy" />
               <div className="flex flex-1 flex-col gap-1.5">
                 <div className="h-3 w-2/3 rounded bg-neo-navy" />
@@ -142,7 +142,7 @@ export function ArenaList({ rooms, loading, joiningRoomCode, onRoomClick, onRefr
             >
               {/* The tail is a size container, which isolates blending: the sticker's
                   baked dark box lightens away against this group's own navy. */}
-              <div className="mp-arena-tail-inner isolate flex w-full flex-col items-center justify-center gap-2 rounded-neo-lg border-3 border-dashed border-neo-white/15 bg-neo-navy px-4 text-center">
+              <div className="mp-arena-tail-inner isolate flex w-full flex-col items-center justify-center gap-2 rounded-neo-lg border-3 border-dashed border-neo-cream/40 bg-neo-navy px-4 text-center">
                 <Image
                   src="/mascot/waiting.webp"
                   alt=""

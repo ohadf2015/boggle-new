@@ -20,7 +20,7 @@ function MpRankChipImpl({ rank, total, flipKey, className }: MpRankChipProps) {
       data-testid="mp-rank-chip"
       aria-label={rank > 0 ? t('mpUi.shell.rankOf', { rank, total }) : undefined}
       className={cn(
-        'inline-flex items-baseline rounded-neo border-2 border-neo-black bg-neo-navy-light px-2 h-10 font-neo-display font-bold tabular-nums text-neo-white [perspective:400px]',
+        'inline-flex items-baseline rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-2 h-10 font-neo-display font-bold tabular-nums text-neo-white [perspective:400px]',
         className,
       )}
     >

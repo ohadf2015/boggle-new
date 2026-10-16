@@ -97,7 +97,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     "px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5 short:py-1 medium-short:py-1.5 desktop-short:lg:py-1.5",
                     "bg-neo-white/90 dark:bg-neo-navy",
                     "backdrop-blur-xs",
-                    "border-b-4 border-neo-black",
+                    "border-b-4 border-neo-black dark:border-neo-cream/30",
                     "transition-all duration-100",
                     "min-w-0"
                 )}

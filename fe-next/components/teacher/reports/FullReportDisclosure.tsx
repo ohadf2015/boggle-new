@@ -26,20 +26,20 @@ export function ReportDisclosure({ testId, icon: Icon, accent, title, hint, chil
   return (
     <details
       data-testid={testId}
-      className="group rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 shadow-hard transition-transform has-[summary:active]:translate-x-[2px] has-[summary:active]:translate-y-[2px] has-[summary:active]:shadow-none motion-reduce:transition-none"
+      className="group rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 shadow-hard-sm transition-transform has-[summary:active]:translate-x-[1px] has-[summary:active]:translate-y-[1px] has-[summary:active]:shadow-none motion-reduce:transition-none"
       onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
     >
-      <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan sm:px-6 [&::-webkit-details-marker]:hidden">
+      <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-4 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan sm:px-5 [&::-webkit-details-marker]:hidden">
         <span className={`grid size-9 shrink-0 place-items-center rounded-neo border-2 ${ACCENTS[accent]}`}>
           <Icon className="size-4" aria-hidden="true" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-neo-display text-lg font-bold text-neo-white">{title}</span>
-          <span className="block text-xs font-bold text-neo-cream/70">{hint}</span>
+          <span className="block font-neo-display text-base sm:text-lg font-bold text-neo-white leading-snug">{title}</span>
+          <span className="block text-xs font-bold text-neo-cream/70 leading-snug">{hint}</span>
         </span>
-        <ChevronDown className="size-5 shrink-0 text-neo-white transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+        <ChevronDown className="size-5 shrink-0 text-neo-cream/80 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
       </summary>
-      <div className="border-t-2 border-neo-cream/20 p-3 sm:p-5">{children(open)}</div>
+      <div className="border-t border-neo-cream/20 p-3.5 sm:p-5">{children(open)}</div>
     </details>
   );
 }

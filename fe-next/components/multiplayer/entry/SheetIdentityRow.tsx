@@ -24,8 +24,8 @@ export function SheetIdentityRow({ id, onEnter }: {
   }, [id.error]);
 
   return (
-    <div className="flex items-center gap-3 tv:gap-4 rounded-neo border-2 border-neo-black bg-neo-navy p-2.5 tv:p-4">
-      <span className="h-12 w-12 tv:h-[72px] tv:w-[72px] shrink-0 overflow-hidden rounded-full border-2 border-neo-black bg-neo-navy-light">
+    <div className="flex items-center gap-3 tv:gap-4 rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-2.5 tv:p-4">
+      <span className="h-12 w-12 tv:h-[72px] tv:w-[72px] shrink-0 overflow-hidden rounded-full border-2 border-neo-cream/40 bg-neo-navy-light">
         {id.avatar && (
           <AvatarRenderer config={id.avatar} size={72} mode="multiplayer" circular disableEffects className="h-full w-full" />
         )}
@@ -63,7 +63,7 @@ export function SheetIdentityRow({ id, onEnter }: {
           type="button"
           onClick={id.editName}
           aria-label={t('mpUi.entry.editName')}
-          className="flex h-10 w-10 tv:h-14 tv:w-14 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm active:translate-y-0.5 active:shadow-hard-pressed"
+          className="flex h-10 w-10 tv:h-14 tv:w-14 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light text-neo-white shadow-hard-sm active:translate-y-0.5 active:shadow-hard-pressed"
         >
           <Pencil aria-hidden="true" className="h-4 w-4 tv:h-6 tv:w-6" />
         </button>

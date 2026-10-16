@@ -101,8 +101,8 @@ function AwardCard({ id, a, t }: { id: string; a: Achievement; t: T }) {
         <span className="flex w-full items-center gap-1.5" aria-label={`${a.count}/${tier.nextThreshold}`}>
           <span className="h-2.5 flex-1 overflow-hidden rounded-full border-2 border-neo-black bg-black/40">
             <span
-              className="block h-full rounded-full motion-safe:transition-[width] motion-safe:duration-700"
-              style={{ width: `${Math.max(0, Math.min(100, tier.progress))}%`, backgroundImage: 'linear-gradient(90deg,#fff27a,#ffcf3a)' }}
+              className="block h-full w-full origin-left rtl:origin-right rounded-full motion-safe:transition-transform motion-safe:duration-700"
+              style={{ transform: `scaleX(${Math.max(0, Math.min(100, tier.progress)) / 100})`, backgroundImage: 'linear-gradient(90deg,#fff27a,#ffcf3a)' }}
             />
           </span>
           <span className="shrink-0 font-neo-body text-[11px] font-bold text-neo-white/85">

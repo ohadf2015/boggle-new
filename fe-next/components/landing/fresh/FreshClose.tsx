@@ -82,7 +82,7 @@ export function FreshClose({ locale, onPlay }: FreshCloseProps) {
             cta="bottom_cta"
             locale={locale}
             className={cn(
-              'mt-3 inline-flex items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-navy px-8 py-4',
+              'mt-3 inline-flex items-center gap-2 rounded-neo border-3 border-neo-cream/40 bg-neo-navy px-8 py-4',
               'font-neo-display text-xl font-bold text-neo-lime shadow-hard-lg active:shadow-hard-pressed',
               'motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-[2px]',
               'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-black'

@@ -27,7 +27,7 @@ export function MpBackButton({ onPress, kind, className }: MpBackButtonProps) {
       aria-label={t(LABEL[kind])}
       data-testid={`mp-back-${kind}`}
       className={cn(
-        'inline-flex items-center justify-center w-11 h-11 tv:w-16 tv:h-16 shrink-0 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm',
+        'inline-flex items-center justify-center w-11 h-11 tv:w-16 tv:h-16 shrink-0 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light text-neo-white shadow-hard-sm',
         className,
       )}
     >

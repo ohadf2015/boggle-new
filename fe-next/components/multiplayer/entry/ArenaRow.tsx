@@ -78,7 +78,7 @@ export const ArenaRow = memo(function ArenaRow({ room, joining, locked, onPick }
         else if (e.key === 'ArrowUp') moveFocus(e, -1);
       }}
       className={cn(
-        'group relative flex w-full items-center gap-3 tv:gap-4 rounded-neo border-2 border-neo-black border-s-[6px] bg-neo-navy-light px-3 py-2 tv:px-4 tv:py-3 text-start shadow-hard-sm',
+        'group relative flex w-full items-center gap-3 tv:gap-4 rounded-neo border-2 border-neo-cream/40 border-s-[6px] bg-neo-navy-light px-3 py-2 tv:px-4 tv:py-3 text-start shadow-hard-sm',
         'transition-transform duration-100 hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0',
         mode.stripe,

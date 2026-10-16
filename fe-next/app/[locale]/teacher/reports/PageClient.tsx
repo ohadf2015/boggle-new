@@ -190,14 +190,14 @@ function TeacherReportsInner() {
   if (!selectedClassroomId) {
     view = (
       <>
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-neo-display text-3xl font-bold leading-tight text-neo-white sm:text-4xl">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">
             {t('teacher.reports.title')}
           </h1>
           <TeacherPlanBadge />
         </div>
 
-        <h2 className="mb-4 text-lg font-bold text-neo-cream/80">{t('teacher.reports.selectClassroom')}</h2>
+        <h2 className="mb-3 text-base font-bold text-neo-cream/80">{t('teacher.reports.selectClassroom')}</h2>
 
         {classroomsLoading ? (
           <div aria-busy="true" className="grid gap-3 sm:grid-cols-2">
@@ -247,7 +247,7 @@ function TeacherReportsInner() {
     );
   } else if (selectedStudentId) {
     view = (
-      <div className="space-y-8">
+      <div className="space-y-5">
         <button
           type="button"
           onClick={handleBackToClass}
@@ -272,11 +272,11 @@ function TeacherReportsInner() {
   } else {
     const selectedClassroom = classrooms?.find((c) => c.id === selectedClassroomId);
     view = (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-5">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-black uppercase tracking-wide text-neo-cyan">{t('eduPro.reports.classEyebrow')}</p>
-            <h1 className="break-words font-neo-display text-3xl font-bold leading-tight text-neo-white sm:text-4xl">
+            <h1 className="break-words font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">
               {selectedClassroom?.name ?? t('teacher.reports.title')}
             </h1>
           </div>
@@ -298,13 +298,15 @@ function TeacherReportsInner() {
           classroomId={selectedClassroomId}
           classroomName={selectedClassroom?.name ?? ''}
         />
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           <SectionDisclosure section="assignments">
-            <AssignmentCompletionReport classroomId={selectedClassroomId} />
-            <AssignmentProgressReport
-              classroomId={selectedClassroomId}
-              classroomName={selectedClassroom?.name ?? ''}
-            />
+            <div className="space-y-4">
+              <AssignmentCompletionReport classroomId={selectedClassroomId} />
+              <AssignmentProgressReport
+                classroomId={selectedClassroomId}
+                classroomName={selectedClassroom?.name ?? ''}
+              />
+            </div>
           </SectionDisclosure>
           <SectionDisclosure section="arc">
             <ClassArcPanel
@@ -325,14 +327,16 @@ function TeacherReportsInner() {
           <FullReportDisclosure>
             {(open) => (
               <ProGate feature="reports" active={open}>
-                <div className="mb-4 flex justify-end">
-                  {/* Reuses this screen's own ProGate — the button's own internal
-                      ProGate only ever mounts once the teacher is already Pro, so a
-                      free teacher never sees two upsell cards stacked here. */}
-                  <ExportAllClassesButton />
+                <div className="space-y-4">
+                  <div className="flex justify-end">
+                    {/* Reuses this screen's own ProGate — the button's own internal
+                        ProGate only ever mounts once the teacher is already Pro, so a
+                        free teacher never sees two upsell cards stacked here. */}
+                    <ExportAllClassesButton />
+                  </div>
+                  <GoogleClassroomGradePassback classroomId={selectedClassroomId} />
+                  <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
                 </div>
-                <GoogleClassroomGradePassback classroomId={selectedClassroomId} />
-                <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
               </ProGate>
             )}
           </FullReportDisclosure>

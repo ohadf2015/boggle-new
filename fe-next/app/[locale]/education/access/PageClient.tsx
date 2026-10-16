@@ -146,7 +146,7 @@ export function PageClient() {
   // A returning teacher came here for one thing: their HQ. No re-pitch, no steps, no upsell strip.
   if (approved) {
     return (
-      <main className="min-h-screen bg-neo-navy text-neo-white">
+      <main className="min-h-dvh bg-neo-navy text-neo-white">
         <LandingHeader showStart={false} />
         <section className="mx-auto flex min-h-[80dvh] max-w-xl flex-col justify-center px-4 pb-10 pt-16">
           <div className="relative rounded-neo-xl border-neo-thick border-black bg-neo-lime p-6 pt-14 text-neo-navy shadow-hard-xl sm:p-8 sm:pt-16">
@@ -175,7 +175,7 @@ export function PageClient() {
   }
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <main className="min-h-dvh bg-neo-navy text-neo-white">
       <LandingHeader showStart={false} />
       <section
         className={`mx-auto px-4 py-10 sm:py-14 ${showPitch ? 'max-w-6xl' : 'max-w-2xl'}`}
@@ -248,7 +248,7 @@ export function PageClient() {
         <div ref={belowRef} className="mt-16">
           <ol
             data-access-reveal
-            className="grid divide-y-2 divide-black overflow-hidden rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light sm:grid-cols-3 sm:divide-x-2 sm:divide-y-0"
+            className="grid divide-y-2 divide-neo-cream/30 overflow-hidden rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light sm:grid-cols-3 sm:divide-x-2 sm:rtl:divide-x-reverse sm:divide-y-0"
           >
             {(['step1', 'step2', 'step3'] as const).map((k, i) => (
               <li key={k} className="p-5">

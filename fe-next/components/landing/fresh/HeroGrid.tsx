@@ -195,7 +195,7 @@ export function HeroGrid({ onFound }: HeroGridProps) {
         dir="ltr"
         role="group"
         aria-label={t('homeFresh.hero.gridLabel', { word: demo.word })}
-        className="hg-board relative w-full rounded-neo-xl border-3 border-neo-black bg-neo-navy-light p-[5%] shadow-[7px_7px_0_0_var(--neo-pink)]"
+        className="hg-board relative w-full rounded-neo-xl border-3 border-neo-cream/40 bg-neo-navy-light p-[5%] shadow-[7px_7px_0_0_var(--neo-pink)]"
       >
         <div
           aria-hidden="true"

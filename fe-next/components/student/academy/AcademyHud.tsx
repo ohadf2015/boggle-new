@@ -119,9 +119,8 @@ export function AcademyHud({ userId, name, avatarConfig, totalXp, streak, streak
             {!still && (
               <m.span
                 aria-hidden="true"
-                className="absolute inset-y-0 w-6 -skew-x-12 bg-white/60"
-                initial={{ left: '-30%' }}
-                animate={{ left: '130%' }}
+                className="absolute inset-y-0 left-0 w-6 -skew-x-12 bg-white/60"
+                animate={{ x: ['-100%', '400%'] }}
                 transition={{ duration: 1.3, repeat: Infinity, repeatDelay: 2.6, ease: 'easeInOut', delay: 1.4 }}
               />
             )}

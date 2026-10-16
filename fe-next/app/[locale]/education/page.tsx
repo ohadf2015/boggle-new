@@ -97,7 +97,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
   const resourcesAriaLabel = translateKey('education.landing.resourcesAriaLabel', locale, 'Education resources');
 
   return (
-    <section aria-label={resourcesAriaLabel} className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 border-t-3 border-neo-black/30">
+    <section aria-label={resourcesAriaLabel} className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 border-t-2 border-neo-cream/25">
       {/* ~19 SEO cards under three headings were 5-6 of the landing's 17+
           screens at 390px, standing between a first-time teacher and the FAQ.
           A native <details> collapses them to one row while every link still

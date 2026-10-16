@@ -127,7 +127,7 @@ export function ModeRow() {
                   'focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-cream'
                 )}
               >
-                <div className="relative aspect-[4/3] overflow-hidden rounded-[6px] border-3 border-neo-black bg-neo-navy">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-[6px] border-3 border-neo-cream/40 bg-neo-navy">
                   <div className="absolute inset-0" style={artScale}>
                     <Image
                       src={meta.genIcon}

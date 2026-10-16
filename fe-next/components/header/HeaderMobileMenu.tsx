@@ -392,15 +392,15 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                     // `max-h-[100dvh]` keeps it bounded to the visible viewport
                                     // regardless of which ancestor is the containing block.
                                     "max-h-[100dvh]",
-                                    "bg-neo-navy border-neo-black",
+                                    "bg-neo-navy border-neo-cream/40",
                                     // Non-scrolling shell. Vertical scrolling lives on the inner
                                     // body below; swipe-to-close is handled by the passive touch
                                     // handlers above (no framer `drag`, so nothing fights scroll).
                                     "shadow-hard-xl overflow-hidden flex flex-col",
                                     'animate-in duration-300',
                                     isRtl
-                                        ? "left-0 border-r-4 rounded-r-neo-lg slide-in-from-left-full"
-                                        : "right-0 border-l-4 rounded-l-neo-lg slide-in-from-right-full"
+                                        ? "left-0 border-r-4 border-neo-cream/40 rounded-r-neo-lg slide-in-from-left-full"
+                                        : "right-0 border-l-4 border-neo-cream/40 rounded-l-neo-lg slide-in-from-right-full"
                                 )}
                             >
                               {/* ── Scrollable body — owns vertical scroll, decoupled from the
@@ -428,7 +428,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             "flex items-center justify-center",
                                             "w-9 h-9",
                                             "bg-neo-white/10 text-neo-white",
-                                            "border-2 border-neo-white/20",
+                                            "border-2 border-neo-cream/40",
                                             "rounded-full",
                                             "hover:bg-neo-white/20 hover:text-neo-white",
                                             "active:scale-90",
@@ -444,8 +444,8 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                 <div
                                     className={cn(
                                         "relative px-5 pb-5",
-                                        "bg-linear-to-b from-neo-purple/30 via-neo-navy to-neo-navy",
-                                        "border-b-3 border-neo-black/40"
+                                        "bg-neo-navy-light",
+                                        "border-b-3 border-neo-cream/25"
                                     )}
                                     style={{ paddingTop: 'max(3rem, calc(env(safe-area-inset-top, 0px) + 2.25rem))' }}
                                 >
@@ -475,7 +475,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                     ) : (
                                         <div className="flex flex-col gap-3">
                                             <div className="flex items-center gap-3">
-                                                <div className="rounded-full border-3 border-neo-white/20 shadow-hard-sm p-0.5 bg-neo-navy">
+                                                <div className="rounded-full border-3 border-neo-cream/40 shadow-hard-sm p-0.5 bg-neo-navy">
                                                     <AvatarLite
                                                         customAvatar={avatarConfig}
                                                         userId="guest"
@@ -720,7 +720,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                     onClick={handleOpenGift}
                                                     className={cn(
                                                         "relative flex items-center gap-3 w-full px-4 py-3 text-sm font-bold rounded-neo",
-                                                        "bg-linear-to-r from-amber-500/90 to-amber-400/90 text-neo-black",
+                                                        "bg-amber-400 text-neo-black",
                                                         "border-3 border-neo-black shadow-hard-sm",
                                                         "hover:shadow-hard hover:-translate-y-px",
                                                         "active:translate-y-px active:shadow-none",
@@ -750,7 +750,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                             .filter(n => n.notification_type === 'gift')
                                                             .forEach(n => dismissNotification(n.id));
                                                     }}
-                                                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-neo-black/80 border-2 border-neo-white/20 flex items-center justify-center text-neo-white hover:text-neo-white hover:bg-neo-black transition-colors z-10"
+                                                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-neo-black/80 border-2 border-neo-cream/40 flex items-center justify-center text-neo-white hover:text-neo-white hover:bg-neo-black transition-colors z-10"
                                                     aria-label={t('notifications.dismiss')}
                                                 >
                                                     <X size={12} />
@@ -856,14 +856,14 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                     onClick={closeMenu}
                                                     className={cn(
                                                         "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo w-full",
-                                                        "bg-linear-to-r from-neo-pink/30 to-neo-pink/10 text-neo-white",
-                                                        "border-2 border-neo-pink/40",
-                                                        "hover:border-neo-pink/60 hover:from-neo-pink/40",
+                                                        "bg-neo-pink/10 text-neo-white",
+                                                        "border-2 border-neo-pink",
+                                                        "hover:bg-neo-pink/20",
                                                         "active:scale-[0.98]",
                                                         "transition-all duration-100"
                                                     )}
                                                 >
-                                                    <MenuIcon className="bg-neo-pink/30 border-neo-pink/50">
+                                                    <MenuIcon className="bg-neo-pink/30 border-neo-pink">
                                                         <Sparkles className="w-4 h-4 text-neo-pink" aria-hidden="true" />
                                                     </MenuIcon>
                                                     <span>{t('common.adminDashboard')}</span>
@@ -886,14 +886,14 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             onClick={() => { closeMenu(); setShowBugReport(true); }}
                                             className={cn(
                                                 "flex items-center gap-3 w-full px-4 py-3 text-sm font-bold rounded-neo",
-                                                "bg-linear-to-r from-neo-pink/30 to-neo-purple/20 text-neo-white",
-                                                "border-2 border-neo-pink/40",
-                                                "hover:border-neo-pink/60 hover:from-neo-pink/40",
+                                                "bg-neo-pink/10 text-neo-white",
+                                                "border-2 border-neo-pink",
+                                                "hover:bg-neo-pink/20",
                                                 "active:scale-[0.98]",
                                                 "transition-all duration-100"
                                             )}
                                         >
-                                            <MenuIcon className="bg-neo-pink/30 border-neo-pink/50">
+                                            <MenuIcon className="bg-neo-pink/30 border-neo-pink">
                                                 <Bug className="w-4 h-4 text-neo-pink" aria-hidden="true" />
                                             </MenuIcon>
                                             <span>{t('bugReport.menuLabel')}</span>
@@ -921,13 +921,13 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 aria-label="Instagram"
                                                 className={cn(
                                                     "flex items-center gap-2 flex-1 px-3 py-2 text-xs font-bold rounded-neo",
-                                                    "bg-linear-to-r from-purple-500/20 to-pink-500/20 text-neo-white",
-                                                    "border-2 border-neo-white/10",
-                                                    "hover:border-neo-white/20 hover:text-neo-white",
+                                                    "bg-neo-purple/15 text-neo-white",
+                                                    "border-2 border-neo-purple",
+                                                    "hover:bg-neo-purple/25 hover:text-neo-white",
                                                     "transition-all duration-100"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-5 h-5 rounded-md bg-linear-to-br from-purple-500 to-pink-500 text-white">
+                                                <span className="flex items-center justify-center w-5 h-5 rounded-md bg-neo-purple text-white">
                                                     <InstagramIcon className="w-3 h-3" size="0.75em" />
                                                 </span>
                                                 <span>Instagram</span>

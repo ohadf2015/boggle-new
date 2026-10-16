@@ -232,7 +232,7 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
   return (
     <section
       data-testid="classroom-roster-progress"
-      className="space-y-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy/40 p-4"
+      className="space-y-3 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 shadow-hard sm:p-5"
     >
       <style>{PRINT_CSS}</style>
       <div className="flex flex-wrap items-start justify-between gap-3">

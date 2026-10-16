@@ -90,8 +90,8 @@ export default function CreateSheet({
                 aria-label={LANGUAGE_CONFIG[code].nativeName}
                 onClick={() => setLanguage(code)}
                 className={cn(
-                  'flex h-11 tv:h-16 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black px-2.5 font-neo-display text-sm tv:text-xl font-bold shadow-hard-sm transition-transform duration-100 active:translate-y-0.5 active:shadow-hard-pressed',
-                  active ? 'flex-1 bg-neo-lime text-neo-black' : 'w-11 tv:w-16 shrink-0 bg-neo-navy text-neo-white hover:-translate-y-0.5',
+                  'flex h-11 tv:h-16 items-center justify-center gap-1.5 rounded-neo border-2 px-2.5 font-neo-display text-sm tv:text-xl font-bold shadow-hard-sm transition-transform duration-100 active:translate-y-0.5 active:shadow-hard-pressed',
+                  active ? 'flex-1 border-neo-black bg-neo-lime text-neo-black' : 'w-11 tv:w-16 shrink-0 border-neo-cream/40 bg-neo-navy text-neo-white hover:-translate-y-0.5',
                 )}
               >
                 <span className="text-xl tv:text-3xl leading-none" aria-hidden="true">{LANGUAGE_CONFIG[code].flag}</span>
@@ -114,7 +114,7 @@ export default function CreateSheet({
             dir="auto"
             aria-label={t('mpUi.entry.roomName')}
             placeholder={defaultRoomName(t, id.name)}
-            className="h-11 tv:h-16 w-full rounded-neo border-2 border-neo-black bg-neo-navy px-3 font-bold tv:text-2xl text-neo-white outline-hidden placeholder:text-neo-white/50 focus:border-neo-lime"
+            className="h-11 tv:h-16 w-full rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-3 font-bold tv:text-2xl text-neo-white outline-hidden placeholder:text-neo-white/50 focus:border-neo-lime"
           />
         </label>
       ) : (

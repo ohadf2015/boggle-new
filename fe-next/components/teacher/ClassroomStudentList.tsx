@@ -162,7 +162,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
   return (
     <div className="space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Legend: what each level does. One line, wraps on narrow screens. */}
-      <div className="flex items-start gap-2 px-1 text-black/70 text-xs font-bold leading-snug">
+      <div className="flex items-start gap-2 px-1 text-neo-cream/75 text-xs font-bold leading-snug">
         <SlidersHorizontal className="w-4 h-4 shrink-0 mt-px" aria-hidden="true" />
         <p>{t('teacher.levels.legend')}</p>
       </div>

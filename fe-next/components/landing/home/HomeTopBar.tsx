@@ -162,7 +162,7 @@ export function HomeTopBar({
       <div className="flex shrink-0 items-center gap-2">
         <span
           data-testid="home-streak-chip"
-          className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-black bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm"
+          className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-neo-cream/40 bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm"
         >
           <Flame
             className="h-[15px] w-[15px] text-neo-orange motion-safe:animate-streak-flicker"
@@ -177,7 +177,7 @@ export function HomeTopBar({
         </span>
         <span
           data-coin-counter="true"
-          className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-black bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm"
+          className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-neo-cream/40 bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm"
         >
           <CoinArt size={16} />
           {showProfileSkeleton ? (

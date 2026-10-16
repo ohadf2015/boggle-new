@@ -101,7 +101,8 @@ export function ProWelcomeCelebration({ grant, paid = false }: { grant: TeacherP
         role="dialog"
         aria-modal="true"
         aria-labelledby="pro-welcome-title"
-        className={cn('relative w-full max-w-md rounded-neo border-3 border-black bg-neo-cream p-6 shadow-hard-lg', isRTL && 'rtl text-right')}
+        dir={isRTL ? 'rtl' : 'ltr'}
+        className={cn('relative w-full max-w-md rounded-neo border-3 border-black bg-neo-cream p-6 text-start shadow-hard-lg', isRTL && 'rtl')}
       >
         <button
           type="button"

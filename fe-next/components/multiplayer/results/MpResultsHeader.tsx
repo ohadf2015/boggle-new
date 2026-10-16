@@ -41,7 +41,7 @@ export function MpResultsHeader({ branch, round, totalRounds, playedMode, onLeav
   const modeLabelKey = classroomOnly?.nameKey ?? mode.labelKey;
   return (
     <MpHudBar
-      className="border-b-[3px] border-neo-black bg-neo-navy"
+      className="border-b-[3px] border-neo-cream/30 bg-neo-navy"
       start={<MpBackButton kind="leave" onPress={onLeave} />}
       center={
         branch === null ? (
@@ -86,7 +86,7 @@ function MpResultsMute() {
       aria-label={label}
       aria-pressed={!allMuted}
       title={title}
-      className="inline-flex items-center justify-center w-11 h-11 tv:w-16 tv:h-16 shrink-0 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm"
+      className="inline-flex items-center justify-center w-11 h-11 tv:w-16 tv:h-16 shrink-0 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light text-neo-white shadow-hard-sm"
     >
       {allMuted ? <VolumeX aria-hidden="true" className="w-5 h-5" /> : <Volume2 aria-hidden="true" className="w-5 h-5" />}
     </button>

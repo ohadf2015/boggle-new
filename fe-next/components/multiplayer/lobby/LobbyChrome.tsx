@@ -30,7 +30,7 @@ function useSheetSide(open: boolean): 'bottom' | 'end' {
 }
 
 const ICON_BUTTON =
-  'relative inline-flex items-center justify-center shrink-0 w-10 h-10 tv:w-16 tv:h-16 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm transition-transform active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-neo-cyan';
+  'relative inline-flex items-center justify-center shrink-0 w-10 h-10 tv:w-16 tv:h-16 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light text-neo-white shadow-hard-sm transition-transform active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-neo-cyan';
 
 /**
  * Leave the room. Labelled "Exit" (common.exit) — the joiner's guard tests and
@@ -44,7 +44,7 @@ export function LobbyExitButton({ onPress, t, className }: { onPress: () => void
       onClick={onPress}
       aria-label={t('common.exit')}
       data-testid="lobby-exit"
-      className={cn(ICON_BUTTON, 'bg-neo-red text-neo-black', className)}
+      className={cn(ICON_BUTTON, 'border-neo-black bg-neo-red text-neo-black', className)}
     >
       <LogOut aria-hidden="true" className="w-5 h-5 rtl:-scale-x-100" />
     </button>
@@ -81,7 +81,7 @@ export function LobbyChatLauncher({ onPress, unread, t, className }: { onPress: 
       onClick={onPress}
       data-testid="lobby-chat-launcher"
       className={cn(
-        'group w-full flex items-center gap-3 rounded-neo-lg border-3 border-neo-black bg-neo-navy-light/70 px-4 py-3 text-start shadow-hard',
+        'group w-full flex items-center gap-3 rounded-neo-lg border-3 border-neo-cream/40 bg-neo-navy-light/70 px-4 py-3 text-start shadow-hard',
         'transition-transform hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-neo-cyan',
         className,
       )}
@@ -111,7 +111,7 @@ export function LobbyCountPill({ count, max, className }: { count: number; max: 
     <span
       data-testid="lobby-count"
       dir="ltr"
-      className={cn('inline-flex items-center h-10 px-3 rounded-neo border-2 border-neo-black bg-neo-navy-light font-neo-display font-bold text-neo-white tabular-nums shadow-hard-sm', className)}
+      className={cn('inline-flex items-center h-10 px-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light font-neo-display font-bold text-neo-white tabular-nums shadow-hard-sm', className)}
     >
       {count}/{max}
     </span>

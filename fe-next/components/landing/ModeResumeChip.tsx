@@ -46,7 +46,7 @@ export default function ModeResumeChip({ resume, anchor = false }: Props) {
       <span
         aria-hidden="true"
         className={cn(
-          'absolute end-1.5 z-[2] inline-flex items-center gap-0.5 rounded-full border-2 border-black bg-neo-navy/90 font-neo-display font-black leading-none text-neo-pink shadow-hard-sm',
+          'absolute end-1.5 z-[2] inline-flex items-center gap-0.5 rounded-full border-2 border-neo-cream/40 bg-neo-navy/90 font-neo-display font-black leading-none text-neo-pink shadow-hard-sm',
           anchor ? 'top-9 px-2 py-0.5 text-[0.7rem]' : 'top-7 px-1.5 py-0.5 text-[0.55rem] max-md:hidden',
         )}
       >
@@ -69,11 +69,11 @@ export default function ModeResumeChip({ resume, anchor = false }: Props) {
               src={relicArt(id)}
               alt=""
               draggable={false}
-              className={cn('rounded border-2 border-black bg-neo-navy', anchor ? 'h-6 w-6' : 'h-5 w-5')}
+              className={cn('rounded border-2 border-neo-cream/40 bg-neo-navy', anchor ? 'h-6 w-6' : 'h-5 w-5')}
             />
           ))}
           {resume.relics.length > (anchor ? 3 : 2) && (
-            <span className={cn('rounded border-2 border-black bg-neo-navy px-1 font-neo-display font-black leading-none text-neo-cream', anchor ? 'py-0.5 text-[0.6rem]' : 'py-0.5 text-[0.5rem]')}>
+            <span className={cn('rounded border-2 border-neo-cream/40 bg-neo-navy px-1 font-neo-display font-black leading-none text-neo-cream', anchor ? 'py-0.5 text-[0.6rem]' : 'py-0.5 text-[0.5rem]')}>
               +{resume.relics.length - (anchor ? 3 : 2)}
             </span>
           )}

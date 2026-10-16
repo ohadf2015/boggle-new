@@ -32,7 +32,7 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({ onQuickPlay, onCreateRoom
   return (
     <section
       data-testid="arena-cta-strip"
-      className="border-t-2 border-neo-black/70 bg-neo-navy px-4 pt-3 pb-3 lg:pb-5 tv:pb-8"
+      className="border-t-2 border-neo-cream/30 bg-neo-navy px-4 pt-3 pb-3 lg:pb-5 tv:pb-8"
     >
       <div data-cta-row="" className="mx-auto flex w-full max-w-xl items-stretch gap-3 lg:max-w-[calc(480px*var(--mp-u,1))]">
         <div className="relative flex-[2] min-w-0">

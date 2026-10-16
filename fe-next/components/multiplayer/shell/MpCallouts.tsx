@@ -72,7 +72,7 @@ function MpCalloutsImpl({ callout, banners, onBannerDone }: MpCalloutsProps) {
           key={head.id}
           data-testid="mp-banner"
           className={cn(
-            'rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-1.5 font-neo-display font-bold uppercase shadow-hard-sm animate-mp-drop',
+            'rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-4 py-1.5 font-neo-display font-bold uppercase shadow-hard-sm animate-mp-drop',
             COLOR[head.color ?? 'cyan'],
           )}
         >

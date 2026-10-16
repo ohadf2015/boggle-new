@@ -42,7 +42,7 @@ export function MpRoomCode({ code, size, onCopy, className }: MpRoomCodeProps) {
       aria-label={t('mpUi.shell.copyCode')}
       dir="ltr"
       className={cn(
-        'relative inline-flex items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-navy-light font-neo-display font-bold uppercase text-neo-white shadow-hard-sm',
+        'relative inline-flex items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light font-neo-display font-bold uppercase text-neo-white shadow-hard-sm',
         size === 'chip' ? 'h-10 px-3 text-[calc(28px*var(--mp-u,1))] tracking-[0.2em]' : 'px-6 py-3 text-[calc(56px*var(--mp-u,1))] tracking-[0.25em]',
         className,
       )}

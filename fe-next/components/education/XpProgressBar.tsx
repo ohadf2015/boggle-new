@@ -115,7 +115,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <span className={cn(
-              'font-neo-display font-black text-neo-black dark:text-neo-white',
+              'font-neo-display font-black text-neo-white',
               sizeConfig.levelText
             )}>
               {t('education.xp.level')}
@@ -132,25 +132,25 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           {!progress.isMaxLevel && (
             <div className="flex items-center gap-1">
               <span className={cn(
-                'font-neo-body font-bold text-neo-black/70 dark:text-neo-white tabular-nums',
+                'font-neo-body font-bold text-neo-white tabular-nums',
                 sizeConfig.xpText
               )}>
                 {progress.xpInCurrentLevel}
               </span>
               <span className={cn(
-                'font-neo-body text-neo-black/50 dark:text-neo-white',
+                'font-neo-body text-neo-white/70',
                 sizeConfig.xpText
               )}>
                 /
               </span>
               <span className={cn(
-                'font-neo-body font-bold text-neo-black/70 dark:text-neo-white tabular-nums',
+                'font-neo-body font-bold text-neo-white tabular-nums',
                 sizeConfig.xpText
               )}>
                 {progress.xpNeededForNextLevel}
               </span>
               <span className={cn(
-                'font-neo-body text-neo-black/50 dark:text-neo-white',
+                'font-neo-body text-neo-white/70',
                 sizeConfig.xpText
               )}>
                 {t('education.xp.xpLabel')}
@@ -233,13 +233,13 @@ const XpProgressBar = memo<XpProgressBarProps>(({
       {showNextLevel && !progress.isMaxLevel && (
         <div className="flex items-center justify-between mt-2">
           <span className={cn(
-            'font-neo-body text-neo-black/60 dark:text-neo-white',
+            'font-neo-body text-neo-white/70',
             sizeConfig.xpText
           )}>
             {t('education.xp.nextLevel')}: {progress.currentLevel + 1}
           </span>
           <span className={cn(
-            'font-neo-body text-neo-black/50 dark:text-neo-white',
+            'font-neo-body text-neo-white/70',
             sizeConfig.xpText
           )}>
             {t('education.xp.keepGoing')}

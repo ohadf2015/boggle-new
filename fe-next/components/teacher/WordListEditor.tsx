@@ -343,7 +343,7 @@ export default function WordListEditor({
                     placeholder={t('teacher.lesson.definitionPlaceholder')}
                     data-ai-filled={isAiFilled(word, 'definition') ? 'true' : undefined}
                     className={cn(
-                      'mt-1 text-xs h-8 border-neo-black/50 bg-neo-black/20',
+                      'mt-1 text-xs h-8 bg-neo-navy border-neo-cream/40 text-neo-white',
                       isAiFilled(word, 'definition') && aiHighlight
                     )}
                   />
@@ -352,7 +352,7 @@ export default function WordListEditor({
                     <div
                       id={`word-details-${idx}`}
                       data-testid={`word-details-${idx}`}
-                      className="mt-2 space-y-2 border-t border-neo-black/40 pt-2"
+                      className="mt-2 space-y-2 border-t border-neo-cream/20 pt-2"
                     >
                       {/* Level */}
                       <div
@@ -397,7 +397,7 @@ export default function WordListEditor({
                               placeholder={t(`teacher.wordDetails.${field}Placeholder`)}
                               data-ai-filled={isAiFilled(word, field) ? 'true' : undefined}
                               className={cn(
-                                'mt-1 text-xs h-9 border-neo-black/50 bg-neo-black/20',
+                                'mt-1 text-xs h-9 bg-neo-navy border-neo-cream/40 text-neo-white',
                                 isAiFilled(word, field) && aiHighlight
                               )}
                             />
@@ -417,7 +417,7 @@ export default function WordListEditor({
                           placeholder={t('teacher.wordDetails.examplePlaceholder')}
                           data-ai-filled={isAiFilled(word, 'example') ? 'true' : undefined}
                           className={cn(
-                            'mt-1 text-xs h-9 border-neo-black/50 bg-neo-black/20',
+                            'mt-1 text-xs h-9 bg-neo-navy border-neo-cream/40 text-neo-white',
                             isAiFilled(word, 'example') && aiHighlight
                           )}
                         />

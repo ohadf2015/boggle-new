@@ -25,7 +25,7 @@ function MiniAvatar({ avatar, userId, px = 22 }: { avatar?: AvatarData; userId: 
   );
 }
 
-const panel = 'rounded-neo-lg border-[3px] border-neo-black bg-neo-navy-light text-neo-white shadow-hard';
+const panel = 'rounded-neo-lg border-[3px] border-neo-cream/40 bg-neo-navy-light text-neo-white shadow-hard';
 const panelTitle = 'font-neo-display font-bold uppercase tracking-wider text-neo-cyan text-[calc(12px*var(--mp-u,1))]';
 
 const AWARDS: { key: keyof RoundAwards; label: string; icon: LucideIcon; tone: string }[] = [
@@ -58,7 +58,7 @@ function MpRoundAwardsImpl({ awards, t, className }: { awards: RoundAwards; t: T
             <li
               key={key}
               data-testid={`mp-award-${key}`}
-              className={cn('min-w-0 flex flex-col gap-[calc(4px*var(--mp-u,1))] rounded-neo border-2 border-neo-black bg-neo-navy p-[calc(8px*var(--mp-u,1))]', fx.awardIn)}
+              className={cn('min-w-0 flex flex-col gap-[calc(4px*var(--mp-u,1))] rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-[calc(8px*var(--mp-u,1))]', fx.awardIn)}
               style={{ animationDelay: `${i * 110}ms` } as CSSProperties}
             >
               <span className="flex items-center gap-1 min-w-0">

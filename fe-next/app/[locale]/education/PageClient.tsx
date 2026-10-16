@@ -41,7 +41,7 @@ export function PageClient({ geo, faq }: { geo?: GeoAnswer; faq?: ReactNode }) {
   }
 
   return (
-    <main className="min-h-screen bg-neo-navy">
+    <main className="min-h-dvh bg-neo-navy">
       <LandingHeader />
       {setupPending && (
         <p className="mx-auto max-w-6xl px-4 pt-3 text-end text-sm text-neo-cream/80 sm:px-6 lg:px-8">
