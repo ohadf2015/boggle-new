@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { InviteCard } from '../InviteCard';
 
@@ -42,7 +42,7 @@ vi.mock('react-dom', async (orig) => {
   return { ...actual, createPortal: (node: React.ReactNode) => node };
 });
 
-vi.mock('../../../../utils/share', () => ({
+vi.mock('@/utils/share', () => ({
   getJoinUrl: (code: string) => `https://example.test/join?code=${code}`,
   copyJoinUrl: vi.fn().mockResolvedValue(true),
 }));
@@ -84,6 +84,41 @@ describe('InviteCard share-only lobby surface', () => {
   it('invite sheet: SHARE stays the solid-lime primary (it is the only action there)', () => {
     render(<InviteCard gameCode="ABC123" t={t} variant="sheet" />);
     expect(screen.getByTestId('native-share-button').className).toMatch(/\bbg-neo-lime(?![/\w-])/);
+  });
+
+  // GR #10878 / #11063: in-app webviews and gesture-less contexts expose
+  // navigator.share but reject it. The tap must not die silently.
+  it('falls back to copying the link when navigator.share rejects with a non-cancel error', async () => {
+    // Given a browser whose Web Share API exists but refuses to share
+    (navigator.share as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new DOMException('Permission denied', 'NotAllowedError'),
+    );
+    const { copyJoinUrl } = await import('@/utils/share');
+    vi.mocked(copyJoinUrl).mockClear();
+    render(<InviteCard gameCode="ABC123" t={t} />);
+
+    // When the player taps SHARE
+    fireEvent.click(screen.getByTestId('native-share-button'));
+
+    // Then the join link is copied instead
+    await waitFor(() => expect(copyJoinUrl).toHaveBeenCalledWith('ABC123', t));
+  });
+
+  it('does not copy when the player dismisses the share sheet', async () => {
+    // Given the player cancels the native share sheet
+    (navigator.share as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new DOMException('Share canceled', 'AbortError'),
+    );
+    const { copyJoinUrl } = await import('@/utils/share');
+    vi.mocked(copyJoinUrl).mockClear();
+    render(<InviteCard gameCode="ABC123" t={t} />);
+
+    // When the player taps SHARE
+    fireEvent.click(screen.getByTestId('native-share-button'));
+
+    // Then nothing else happens
+    await waitFor(() => expect(navigator.share).toHaveBeenCalled());
+    expect(copyJoinUrl).not.toHaveBeenCalled();
   });
 
   it('still renders the share button when navigator.share is unavailable so users on non-Web-Share browsers get the copy fallback', () => {

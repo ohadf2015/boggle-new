@@ -51,8 +51,11 @@ export function InviteCard({ gameCode, t, className, showHint = false, variant =
         text: t('share.text', { code: gameCode }) || `Join my game with code: ${gameCode}`,
         url: joinUrl,
       });
-    } catch {
-      /* share sheet dismissed */
+    } catch (err) {
+      // Dismissing the sheet is a choice. Anything else (in-app webviews, a lost
+      // gesture) refused the share: copy instead of dying silently (GR #10878).
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      await handleCopyLink();
     }
   }, [gameCode, joinUrl, t, handleCopyLink]);
 
