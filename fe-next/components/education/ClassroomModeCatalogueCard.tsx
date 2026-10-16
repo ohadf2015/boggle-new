@@ -74,18 +74,18 @@ export function ClassroomModeCatalogueCard({
           {recommendedLabel}
         </span>
       )}
-      <span className="relative grid aspect-square w-full place-items-center lg:aspect-[5/4] overflow-hidden rounded-neo border-[2px] border-neo-cream bg-neo-navy">
-        <span aria-hidden="true" className={cn('absolute inset-x-0 bottom-0 h-1.5', ACCENT_FILL[mode.accent])} />
-        {/* eslint-disable-next-line @next/next/no-img-element -- small transparent mascot poster, same file as the catalog */}
+      <span className="relative block aspect-square w-full overflow-hidden rounded-neo border-[2px] border-neo-cream bg-neo-navy lg:aspect-[5/4]">
+        {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover, same file as the catalog */}
         <img
-          src={mode.poster}
+          data-testid="mode-card-cover"
+          src={mode.cover}
           alt=""
           aria-hidden="true"
           loading="eager"
           decoding="async"
           className={cn(
-            'pointer-events-none h-[86%] w-[86%] select-none object-contain transition-transform duration-200',
-            selected ? 'scale-110' : 'motion-safe:group-hover:scale-105'
+            'pointer-events-none h-full w-full select-none object-cover object-[50%_28%] transition-transform duration-200 ease-out',
+            selected ? 'scale-105' : 'motion-safe:group-hover:scale-105'
           )}
         />
       </span>

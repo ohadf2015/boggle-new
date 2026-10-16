@@ -71,7 +71,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
         </Link>
       </div>
 
-      <ul className="relative mt-10 grid grid-cols-3 gap-2 sm:mt-8 sm:gap-3">
+      <ul className="relative mt-4 grid grid-cols-3 gap-2 sm:gap-3">
         {FEATURED_HOME_MODES.map((id) => {
           const mode = catalogueEntry(id);
           if (!mode) return null;
@@ -83,19 +83,30 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
                 onClick={() => go(id)}
                 aria-busy={pending === id || undefined}
                 className={cn(
-                  'group flex h-full min-h-[104px] flex-col items-center justify-center gap-1.5 rounded-neo border-[3px] border-neo-black p-2 text-center text-neo-black shadow-hard-sm sm:flex-row sm:justify-start sm:gap-2 sm:p-3 sm:text-start',
+                  'group flex h-full flex-col overflow-hidden rounded-neo border-[3px] border-neo-black text-neo-black shadow-hard-sm',
                   'transition-[transform,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-y-0.5 hover:shadow-hard active:scale-[0.97] motion-reduce:transition-none',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                   ACCENT_FILL[mode.accent],
                 )}
               >
-                {pending === id ? (
-                  <Loader2 className="-mt-9 size-16 shrink-0 animate-spin p-4 motion-reduce:animate-none sm:-mt-7 sm:size-20" aria-hidden="true" />
-                ) : (
-                  // eslint-disable-next-line @next/next/no-img-element -- transparent mode sticker
-                  <img src={mode.poster} alt="" aria-hidden="true" width={96} height={96} className="-mt-9 size-16 shrink-0 object-contain drop-shadow-[3px_3px_0_rgba(0,0,0,0.35)] transition-transform duration-200 ease-out motion-reduce:transition-none sm:-mt-7 sm:size-20 [@media(hover:hover)]:group-hover:-rotate-6 [@media(hover:hover)]:group-hover:scale-110" />
-                )}
-                <span className="flex min-w-0 flex-col items-center gap-1 sm:flex-1 sm:items-start">
+                <span className="relative block aspect-square overflow-hidden border-b-[3px] border-neo-black sm:aspect-[16/10]">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover */}
+                  <img
+                    data-testid="home-tile-cover"
+                    src={mode.cover}
+                    alt=""
+                    aria-hidden="true"
+                    width={560}
+                    height={700}
+                    className="h-full w-full object-cover object-[50%_25%] transition-transform duration-200 ease-out motion-reduce:transition-none [@media(hover:hover)]:group-hover:scale-105"
+                  />
+                  {pending === id ? (
+                    <span className="absolute inset-0 grid place-items-center bg-neo-black/40">
+                      <Loader2 className="size-8 animate-spin text-neo-cream motion-reduce:animate-none" aria-hidden="true" />
+                    </span>
+                  ) : null}
+                </span>
+                <span className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:justify-between sm:px-3 sm:text-start">
                   <span className="line-clamp-2 font-neo-display text-sm font-black leading-tight sm:text-base">{t(mode.nameKey)}</span>
                   <DeliveryTag delivery={mode.delivery} t={t} />
                 </span>

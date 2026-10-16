@@ -18,4 +18,11 @@ describe('classroom mode card art', () => {
     expect(existsSync(file)).toBe(true);
     expect(statSync(file).size).toBeLessThan(80_000);
   });
+
+  it.each(modes.map((m) => [m.id, m.cover]))('%s has a full poster cover for its card, shipped and light', (id, cover) => {
+    expect(cover).toBe(`/mascot/teacher/modes/covers/${id}.webp`);
+    const file = path.join(PUBLIC, cover);
+    expect(existsSync(file)).toBe(true);
+    expect(statSync(file).size).toBeLessThan(80_000);
+  });
 });

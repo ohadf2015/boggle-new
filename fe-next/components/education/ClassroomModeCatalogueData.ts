@@ -41,10 +41,12 @@ export interface CatalogueMode {
   nameKey: string;
   howKey: string;
   poster: string;
+  /** Full poster for the mode's picker card and Home tile; `poster` stays the transparent sticker. */
+  cover: string;
   accent: ModeAccent;
 }
 
-type Row = Omit<CatalogueMode, 'suffix' | 'poster' | 'accent' | 'launch' | 'nameKey' | 'howKey'>;
+type Row = Omit<CatalogueMode, 'suffix' | 'poster' | 'cover' | 'accent' | 'launch' | 'nameKey' | 'howKey'>;
 
 const ROWS: readonly Row[] = [
   { id: 'vocab-quiz', category: 'meaning', complexity: 'simple', style: 'ffa', teamsCapable: false, bestFor: ['meanings', 'testPrep'], preview: 'quiz', delivery: 'projector' },
@@ -61,12 +63,13 @@ const BOSS_CARD_POSTER = '/mascot/teacher/modes/boss-battle.webp';
 
 const MODES: readonly CatalogueMode[] = ROWS.flatMap((row): CatalogueMode[] => {
   const launch = launchOf(row.id);
+  const cover = `/mascot/teacher/modes/covers/${row.id}.webp`;
   if (row.id === BOSS_BATTLE_ID) {
-    return [{ ...row, launch, suffix: 'bossBattle', nameKey: 'eg2Modes.boss.name', howKey: 'classroomBoss.cardHow', poster: BOSS_CARD_POSTER, accent: 'pink' }];
+    return [{ ...row, launch, suffix: 'bossBattle', nameKey: 'eg2Modes.boss.name', howKey: 'classroomBoss.cardHow', poster: BOSS_CARD_POSTER, cover, accent: 'pink' }];
   }
   const base = teacherGameMode(launch.gameMode);
   if (!base) return [];
-  return [{ ...row, launch, suffix: base.nameKeySuffix, nameKey: base.nameKey, howKey: base.howKey, poster: base.poster, accent: base.accent }];
+  return [{ ...row, launch, suffix: base.nameKeySuffix, nameKey: base.nameKey, howKey: base.howKey, poster: base.poster, cover, accent: base.accent }];
 });
 
 /** Teacher Home's three featured modes, in display order. */
