@@ -235,6 +235,14 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
     expect(screen.getByTestId('lobby-scroll')).not.toContainElement(create[0]);
   });
 
+  it('GIVEN a tall spotlight (Boss Battle on a laptop) WHEN the lobby lays out THEN only GO LIVE and the poster stay pinned; the mode cards and options share the one scroller', async () => {
+    await renderLobby('lesson-defs');
+    const scroller = screen.getByTestId('lobby-scroll');
+    expect(scroller).toContainElement(screen.getByTestId('mode-row-scroller'));
+    expect(scroller).toContainElement(screen.getByTestId('lobby-setup-summary'));
+    expect(scroller).not.toContainElement(screen.getByTestId('lobby-go-live'));
+  });
+
   it('locks the shell and scrolls exactly one region', async () => {
     await renderLobby('lesson-defs');
     const shell = screen.getByTestId('classroom-lobby-shell');

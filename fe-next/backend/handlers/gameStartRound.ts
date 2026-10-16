@@ -19,6 +19,7 @@ import { getSupabase } from '../modules/supabase/client.js';
 import { verifyBoostToken } from '../utils/boostToken.js';
 import { setClassroomGamePlacedVocabulary, saveClassroomTeams, type ClassroomGame } from '../modules/classroomGameManager.js';
 import { buildClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { getGameModeRules } from '../modes/index.js';
 import logger from '../utils/logger.js';
 
@@ -157,7 +158,9 @@ export function scheduleSpecialWords(gameCode: string, letterGrid: LetterGrid, g
  */
 export function recordClassroomWordBank(io: Server, gameCode: string, game: GameState, letterGrid: LetterGrid, gameLang: Language, vocabToEmbed: string[]): void {
   const finalPositions = makePositionsMap(letterGrid, gameLang);
-  const placedVocabulary = vocabToEmbed.filter((word) => isWordOnBoard(word, letterGrid, finalPositions, gameLang));
+  const placedVocabulary = vocabToEmbed
+    .filter((word) => isWordOnBoard(word, letterGrid, finalPositions, gameLang))
+    .map((word) => (gameLang === 'he' ? applyHebrewFinalLetters(word) : word));
   void setClassroomGamePlacedVocabulary(gameCode, placedVocabulary).then(() => {
     for (const user of Object.values(game.users || {})) {
       const memberSocket = getSocketById(io, (user as { socketId?: string })?.socketId ?? '');

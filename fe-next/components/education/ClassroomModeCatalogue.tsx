@@ -33,6 +33,8 @@ export interface ClassroomModeCatalogueProps {
   blockedKey: string | null;
   onPick: (id: CatalogueMode['id']) => void;
   onGoLive: () => void;
+  /** False when the host lays the card row out itself, e.g. inside its scroll region. */
+  withCardRow?: boolean;
 }
 
 export function ClassroomModeCatalogue({
@@ -45,6 +47,7 @@ export function ClassroomModeCatalogue({
   blockedKey,
   onPick,
   onGoLive,
+  withCardRow = true,
 }: ClassroomModeCatalogueProps) {
   const { t, language, dir } = useLanguage();
   const tt = t as (key: string, params?: Record<string, string | number>) => string;
@@ -64,16 +67,18 @@ export function ClassroomModeCatalogue({
         t={tt}
       />
 
-      <ClassroomModeCardRow
-        selected={live.id}
-        recommended={recommended}
-        selectedMinutes={minutes}
-        minutesFor={minutesFor}
-        busy={busy}
-        onPick={onPick}
-        dir={dir}
-        t={tt}
-      />
+      {withCardRow && (
+        <ClassroomModeCardRow
+          selected={live.id}
+          recommended={recommended}
+          selectedMinutes={minutes}
+          minutesFor={minutesFor}
+          busy={busy}
+          onPick={onPick}
+          dir={dir}
+          t={tt}
+        />
+      )}
     </div>
   );
 }

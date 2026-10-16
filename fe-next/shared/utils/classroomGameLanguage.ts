@@ -1,4 +1,5 @@
 import type { Language } from '@/shared/types';
+import { boardSeedWord } from '@/shared/utils/wordNormalization';
 
 /**
  * The ONE language a classroom round is dealt and validated in.
@@ -51,7 +52,10 @@ export function wordsMatchLanguage(word: string, language: Language): boolean {
 
 /** Lesson words a `language` board can carry: a word in another alphabet would plant foreign letters no one can play. */
 export function embeddableLessonWords(words: readonly string[], language: Language): string[] {
-  return words.filter((w) => wordsMatchLanguage(w, language)).map((w) => w.toUpperCase());
+  return words
+    .filter((w) => wordsMatchLanguage(w, language))
+    .map((w) => boardSeedWord(w, language))
+    .filter((w) => /^\p{L}{2,}$/u.test(w));
 }
 
 export interface ClassroomGameLanguageInput {

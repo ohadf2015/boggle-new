@@ -103,7 +103,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, language, dir, bus
       {/* Full card width, not squeezed into the text column: at projector
           size three steps in a third of a column each wrapped to
           four lines and pushed the mode row off a 960px wall. */}
-      <ol data-testid="how-it-plays-inline" aria-label={t('eg2Modes.howItPlays')} className="mt-3 hidden grid-cols-3 gap-4 text-start lg:grid">
+      <ol data-testid="how-it-plays-inline" aria-label={t('eg2Modes.howItPlays')} className="mt-3 hidden grid-cols-3 gap-4 text-start lg:[@media(min-height:800px)]:grid">
         {keys.steps.map((k, i) => (
           <li key={k} className="flex items-start gap-2 font-neo-body text-sm font-bold leading-snug text-neo-cream lg:text-lg">
             <StepNumber n={i + 1} accent={mode.accent} />

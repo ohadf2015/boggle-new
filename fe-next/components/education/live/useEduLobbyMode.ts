@@ -3,7 +3,7 @@
 import { fixedRoundSeconds } from '@/shared/utils/fixedRoundTimer';
 import { useState } from 'react';
 import { useLiveClassroomGameInfo } from '@/hooks/useLiveClassroomGameInfo';
-import { catalogueIdOf, launchOf, readLocalQuizPlayable, readLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
+import { catalogueIdOf, launchOf, readLocalBossId, readLocalQuizPlayable, readLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
 import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
 import { useQuizStartRefused } from '@/components/education/projector/ProjectorQuizBlocked';
 import { isStudentTimerHidden } from '@/shared/utils/classroomPressure';
@@ -23,12 +23,16 @@ export function useEduLobbyMode({ gameCode, classroomGameMode, templateSettings,
   const liveGame = useLiveClassroomGameInfo(gameCode, true);
   const [switchedMode, setSwitchedMode] = useState<ClassroomCatalogueId | null>(() => {
     const local = readLocalGameMode();
-    const id = local ? catalogueIdOf(local, readLocalQuizVariant()) : null;
+    const id = local ? catalogueIdOf(local, readLocalQuizVariant(), readLocalBossId()) : null;
     return id && id !== classroomGameMode ? id : null;
   });
   const modeId: ClassroomCatalogueId =
     switchedMode ??
-    catalogueIdOf(classroomGameMode ?? liveGame?.gameMode ?? 'classic', readLocalQuizVariant() ?? liveGame?.settings?.vocabQuizVariant);
+    catalogueIdOf(
+      classroomGameMode ?? liveGame?.gameMode ?? 'classic',
+      readLocalQuizVariant() ?? liveGame?.settings?.vocabQuizVariant,
+      readLocalBossId() ?? liveGame?.settings?.classroomBossId,
+    );
   const mode: ClassroomGameMode = launchOf(modeId).gameMode;
   const isQuiz = mode === VOCAB_QUIZ_MODE;
   const [quizRefused, clearQuizRefused] = useQuizStartRefused(gameCode, t);
@@ -51,6 +55,11 @@ export function useEduLobbyMode({ gameCode, classroomGameMode, templateSettings,
     quizBlocked: isQuiz && (quizRefused || quizPlayable === false),
     timerMinutes: isQuiz || timerOff ? null : timerMinutes,
     className: liveGame?.classroomName ?? null,
+    roundSettings: {
+      timerMinutes: settings?.timerMinutes ?? undefined,
+      vocabQuizQuestionCount: settings?.vocabQuizQuestionCount ?? undefined,
+      vocabQuizSeconds: settings?.vocabQuizSeconds ?? undefined,
+    },
     applyMode,
   };
 }

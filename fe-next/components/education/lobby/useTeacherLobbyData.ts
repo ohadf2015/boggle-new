@@ -3,13 +3,12 @@
  * (a starter pack becomes a real lesson).
  *
  * Lifted out of `ClassroomGameLobby` so that file could lead with the mode
- * picker and still fit the size cap — behaviour is unchanged, including the
- * functional `setSelectedClassroomId` update that keeps the fetch from looping.
+ * picker and still fit the size cap.
  */
 
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
 import {
@@ -32,6 +31,12 @@ export interface StarterPackInput {
   words: Parameters<typeof convertPackWordsToLessonWords>[0];
 }
 
+/** The newest list in the class's language, or none: a list in another language deals a board the class cannot read. */
+export function defaultLessonIdsFor(lessons: readonly VocabularyLesson[], classroomLanguage: string | null | undefined): string[] {
+  const match = classroomLanguage ? lessons.find((l) => l.language === classroomLanguage) : lessons[0];
+  return match ? [match.id] : [];
+}
+
 export function useTeacherLobbyData(
   userId: string | undefined,
   t: Translate,
@@ -42,12 +47,34 @@ export function useTeacherLobbyData(
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingFromPack, setIsCreatingFromPack] = useState(false);
-  const [selectedLessonIds, setSelectedLessonIds] = useState<string[]>(
+  const [selectedLessonIds, setLessonIdsState] = useState<string[]>(
     initialLessonId ? [initialLessonId] : []
   );
-  const [selectedClassroomId, setSelectedClassroomId] = useState<string>(
+  const [selectedClassroomId, setClassroomIdState] = useState<string>(
     initialClassroomId ?? ''
   );
+  // An auto-picked list follows the class; one the teacher chose is never swapped out.
+  const lessonPickIsAuto = useRef(!initialLessonId);
+  const classroomIdRef = useRef(selectedClassroomId);
+  const lessonsRef = useRef<VocabularyLesson[]>([]);
+  const classroomsRef = useRef<Classroom[]>([]);
+
+  const setSelectedLessonIds = useCallback((ids: string[] | ((prev: string[]) => string[])) => {
+    lessonPickIsAuto.current = false;
+    setLessonIdsState(ids);
+  }, []);
+
+  const autoPickLessonFor = useCallback((classroomId: string) => {
+    if (!lessonPickIsAuto.current) return;
+    const language = classroomsRef.current.find((c) => c.id === classroomId)?.language;
+    setLessonIdsState(defaultLessonIdsFor(lessonsRef.current, language));
+  }, []);
+
+  const setSelectedClassroomId = useCallback((id: string) => {
+    classroomIdRef.current = id;
+    setClassroomIdState(id);
+    autoPickLessonFor(id);
+  }, [autoPickLessonFor]);
 
   const fetchTeacherData = useCallback(async () => {
     if (!userId) return;
@@ -57,40 +84,29 @@ export function useTeacherLobbyData(
         getLessons(userId),
         getClassrooms(userId),
       ]);
+      // Class before list, both BEFORE `setIsLoading(false)`, so the picker never
+      // paints a blocked or wrong-language state that flips a frame later (pitfall class 1).
       if (lessonsResult.data) {
+        lessonsRef.current = lessonsResult.data;
         setLessons(lessonsResult.data);
-        // PRE-SELECT THE NEWEST LIST. A greyed GO LIVE behind "pick a word
-        // list first" is a choice dressed as an empty state — it is the reason
-        // the round-1 lobby could not be played in one tap. `getLessons`
-        // returns newest-first, and the newest list is the one a teacher who
-        // just built it came here to run.
-        //
-        // Set BEFORE `setIsLoading(false)`, so the picker never paints a
-        // blocked state and then unblocks a frame later (pitfall class 1); the
-        // functional form keeps an explicit `?lessonId=` and the repeat-last
-        // restore both authoritative.
-        const newest = lessonsResult.data[0];
-        if (newest) setSelectedLessonIds((prev) => (prev.length > 0 ? prev : [newest.id]));
       }
       if (classroomsResult.data) {
+        classroomsRef.current = classroomsResult.data;
         setClassrooms(classroomsResult.data);
-        if (classroomsResult.data.length > 0) {
-          // Functional update so this callback does not depend on
-          // selectedClassroomId — that dependency re-created the callback,
-          // re-ran the effect and re-fetched forever.
-          setSelectedClassroomId((prev) => {
-            if (prev && classroomsResult.data!.some((c) => c.id === prev)) return prev;
-            return classroomsResult.data![0].id;
-          });
+        const prev = classroomIdRef.current;
+        if (classroomsResult.data.length > 0 && !(prev && classroomsResult.data.some((c) => c.id === prev))) {
+          classroomIdRef.current = classroomsResult.data[0].id;
+          setClassroomIdState(classroomIdRef.current);
         }
       }
+      if (lessonsResult.data) autoPickLessonFor(classroomIdRef.current);
     } catch (error) {
       logger.error('Failed to fetch teacher data:', error);
       toast.error(t('errors.loadFailed'));
     } finally {
       setIsLoading(false);
     }
-  }, [userId, t]);
+  }, [userId, t, autoPickLessonFor]);
 
   useEffect(() => {
     if (!userId) return;
@@ -121,6 +137,7 @@ export function useTeacherLobbyData(
           return;
         }
         setLessons((prev) => [newLesson, ...prev]);
+        lessonsRef.current = [newLesson, ...lessonsRef.current];
         setSelectedLessonIds([newLesson.id]);
         toast.success(t('education.lesson.created'));
       } catch (err) {
@@ -130,7 +147,7 @@ export function useTeacherLobbyData(
         setIsCreatingFromPack(false);
       }
     },
-    [userId, t]
+    [userId, t, setSelectedLessonIds]
   );
 
   return {

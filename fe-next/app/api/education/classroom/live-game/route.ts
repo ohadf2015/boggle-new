@@ -30,7 +30,7 @@ const querySchema = z.object({ code: z.string().min(1).max(10) });
  * Response codes:
  * - 200: live game found
  * - 400: malformed code
- * - 404: no live game with that code
+ * - 204: no live game with that code (every arcade room asks, so this is not an error)
  * - 429: rate limited
  * - 500: server error
  */
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
     const game = await lookupLiveClassroomGame(code);
     if (!game) {
-      return NextResponse.json({ error: 'No live game with that code' }, { status: 404 });
+      return new NextResponse(null, { status: 204 });
     }
 
     // The classroom's name is the one field the Redis record does not carry, and

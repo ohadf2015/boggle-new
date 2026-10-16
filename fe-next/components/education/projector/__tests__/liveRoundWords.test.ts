@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { emptyLiveRoundWords, foldLiveWords, maskWord } from '../liveRoundWords';
+import { emptyLiveRoundWords, foldLiveWords, lessonWordSet, maskWord } from '../liveRoundWords';
 
 const lesson = new Set(['house', 'water', 'light']);
 
@@ -48,5 +48,14 @@ describe('maskWord — a teaser, not an answer key', () => {
   });
   it('handles an empty word', () => {
     expect(maskWord('')).toEqual([]);
+  });
+});
+
+describe('foldLiveWords — Hebrew lesson words written with niqqud', () => {
+  it('GIVEN a vowelled Hebrew list WHEN a student finds the plain word off the board THEN the projector counts it', () => {
+    const lesson = lessonWordSet(['לֶחֶם', 'מַיִם', 'חָלָב'], 'he');
+    const s = foldLiveWords(emptyLiveRoundWords(), [{ username: 'Noa', word: 'לחמ' }, { username: 'Ido', word: 'מים' }], lesson, undefined, 'he');
+    expect(s.lessonFound).toHaveLength(2);
+    expect(lesson.size).toBe(3);
   });
 });

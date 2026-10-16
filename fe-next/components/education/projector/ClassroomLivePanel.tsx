@@ -5,7 +5,8 @@ import { m, useReducedMotion } from 'framer-motion';
 import { BookOpen, Sparkles } from 'lucide-react';
 import { useCountUp } from '@/hooks/useCountUp';
 import { cn } from '@/lib/utils';
-import { emptyLiveRoundWords, foldLiveWords, maskWord, type LiveWordItem } from './liveRoundWords';
+import type { Language } from '@/shared/types';
+import { emptyLiveRoundWords, foldLiveWords, lessonWordSet, maskWord, type LiveWordItem } from './liveRoundWords';
 
 interface FeedSocket {
   on(event: string, fn: (payload: unknown) => void): void;
@@ -17,6 +18,8 @@ export interface ClassroomLivePanelProps {
   /** Authoritative room total (sum of the server's per-player counts). */
   totalWords: number;
   lessonWords: readonly string[];
+  /** The room's board language: lesson keys fold its alternate spellings. */
+  language?: Language;
   hostUsername?: string;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
@@ -29,11 +32,12 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
   socket,
   totalWords,
   lessonWords,
+  language = 'en',
   hostUsername,
   t,
 }) {
   const reduceMotion = useReducedMotion();
-  const lessonSet = useMemo(() => new Set(lessonWords.map((w) => w.toLowerCase())), [lessonWords]);
+  const lessonSet = useMemo(() => lessonWordSet(lessonWords, language), [lessonWords, language]);
   const [state, setState] = useState(emptyLiveRoundWords);
 
   useEffect(() => {
@@ -41,11 +45,11 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
     const onBatch = (payload: unknown) => {
       const words = (payload as { words?: LiveWordItem[] } | null)?.words;
       if (!words?.length) return;
-      setState((prev) => foldLiveWords(prev, words, lessonSet, hostUsername));
+      setState((prev) => foldLiveWords(prev, words, lessonSet, hostUsername, language));
     };
     socket.on('playerFoundWordBatch', onBatch);
     return () => socket.off('playerFoundWordBatch', onBatch);
-  }, [socket, lessonSet, hostUsername]);
+  }, [socket, lessonSet, hostUsername, language]);
 
   const shownTotal = useCountUp({ target: totalWords, duration: 500, immediate: !!reduceMotion });
   const tiles = state.best ? maskWord(state.best.word) : [];

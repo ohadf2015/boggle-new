@@ -45,6 +45,28 @@ describe('GameStartCoordinator — countdownComplete', () => {
     expect(r2.allReady).toBe(true);
   });
 
+  it('GIVEN every client acknowledged the start first (the real order) WHEN all countdowns finish THEN the round timer starts then, not at the safety net', () => {
+    const messageId = coordinator.initializeSequence('GAME1', ['host', 'noa'], 60);
+    coordinator.recordAcknowledgment('GAME1', 'host', messageId);
+    coordinator.recordAcknowledgment('GAME1', 'noa', messageId);
+    expect(coordinator.getSequenceStats('GAME1')!.timerStarted).toBe(false);
+
+    expect(coordinator.recordCountdownComplete('GAME1', 'host', messageId).allReady).toBe(false);
+    const last = coordinator.recordCountdownComplete('GAME1', 'noa', messageId);
+    expect(last.allReady).toBe(true);
+  });
+
+  it('GIVEN all acks but one countdown never reports WHEN the countdown fallback fires THEN it still starts the timer', () => {
+    const messageId = coordinator.initializeSequence('GAME1', ['host', 'noa'], 60);
+    const onTimeout = vi.fn();
+    coordinator.setCountdownCompleteTimeout('GAME1', 8000, onTimeout);
+    coordinator.recordAcknowledgment('GAME1', 'host', messageId);
+    coordinator.recordAcknowledgment('GAME1', 'noa', messageId);
+    coordinator.recordCountdownComplete('GAME1', 'host', messageId);
+    vi.advanceTimersByTime(8000);
+    expect(onTimeout).toHaveBeenCalledTimes(1);
+  });
+
   it('rejects countdownComplete with wrong messageId', () => {
     coordinator.initializeSequence('GAME1', ['alice'], 60);
     const r = coordinator.recordCountdownComplete('GAME1', 'alice', 'stale-id');

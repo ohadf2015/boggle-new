@@ -28,11 +28,18 @@ export function useClassroomEconomy(gameCode: string | null) {
   const onBoard = useCallback((b: ClassroomEconomyBoard) => setBoard(b), []);
   const onHint = useCallback((h: HintPayload) => setHint(h), []);
   const onError = useCallback((e: { reason?: string }) => setError(e?.reason ?? 'error'), []);
+  // The server folds the streak lazily on the next word; the HUD must not show last round's run meanwhile.
+  const onRoundStart = useCallback(() => {
+    setSnapshot((s) => (s ? { ...s, streak: 0, multiplier: 1, lastDelta: null } : s));
+    setHint(null);
+    if (gameCode) emit(E.requestState, { gameCode });
+  }, [emit, gameCode]);
 
   useSocketEvent<ClassroomEconomySnapshot>(E.state, onState);
   useSocketEvent<ClassroomEconomyBoard>(E.board, onBoard);
   useSocketEvent<HintPayload>(E.hint, onHint);
   useSocketEvent<{ reason?: string }>(E.error, onError);
+  useSocketEvent('startGame', onRoundStart);
 
   const requestState = useCallback(() => {
     if (gameCode) emit(E.requestState, { gameCode });

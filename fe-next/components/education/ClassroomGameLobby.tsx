@@ -35,7 +35,7 @@ import { launchOf, type ClassroomCatalogueId } from '@/lib/education/classroomCa
 import { FREE_CLASSROOM_BOSS_ID, type ClassroomBossId } from '@/shared/types/classroomBoss';
 import { availableFocuses } from '@/lib/education/vocabFocus';
 import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
-import { ClassroomModeCatalogue } from './ClassroomModeCatalogue';
+import { ClassroomModeCardRow, ClassroomModeCatalogue } from './ClassroomModeCatalogue';
 import { LobbySetupPanel } from './lobby/LobbySetupPanel';
 import { LobbyRoundSettings } from './lobby/LobbyRoundSettings';
 import { LobbySetupDisclosure } from './lobby/LobbySetupDisclosure';
@@ -43,7 +43,7 @@ import { LobbyPressureDials } from './lobby/LobbyPressureDials';
 import { LobbyNoClassrooms, LobbyNoLessons } from './lobby/LobbyEmptyStates';
 import { LobbyClassPicker } from './lobby/LobbyClassPicker';
 import { LobbyLateJoinToggle } from './lobby/LobbyLateJoinToggle';
-import { useTeacherLobbyData } from './lobby/useTeacherLobbyData';
+import { defaultLessonIdsFor, useTeacherLobbyData } from './lobby/useTeacherLobbyData';
 import { useClassroomLaunchSocket } from './lobby/useClassroomLaunchSocket';
 import { useRepeatLastSetup } from './lobby/useRepeatLastSetup';
 
@@ -151,10 +151,11 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
       setAccessibility(preset.accessibility);
       setActivePreset(id);
       if (id === 'friday-battle') {
-        setSelectedLessonIds((prev) => (prev.length > 0 ? prev : lessons.slice(0, 1).map((l) => l.id)));
+        const classLanguage = classrooms.find((c) => c.id === selectedClassroomId)?.language;
+        setSelectedLessonIds((prev) => (prev.length > 0 ? prev : defaultLessonIdsFor(lessons, classLanguage)));
       }
     },
-    [lessons, setSelectedLessonIds]
+    [lessons, classrooms, selectedClassroomId, setSelectedLessonIds]
   );
 
   const { pending: repeatPending } = useRepeatLastSetup({
@@ -385,10 +386,22 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           blockedKey={blockedKey}
           onPick={pickMode}
           onGoLive={() => startGame(gameMode, vocabQuizVariant, classroomBossId)}
+          withCardRow={false}
         />
         </div>
       }
     >
+      {/* In the scroller, not pinned: a tall poster (Boss Battle) left the scroller 4px and options out of reach. */}
+      <ClassroomModeCardRow
+        selected={pickedId}
+        recommended={recommended}
+        selectedMinutes={roundMinutes}
+        minutesFor={minutesFor}
+        busy={isStarting}
+        onPick={pickMode}
+        t={t as (key: string, params?: Record<string, string | number>) => string}
+      />
+
       {startError && (
         <div
           role="alert"
@@ -400,7 +413,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
             type="button"
             data-testid="create-room-retry"
             disabled={isStarting}
-            onClick={() => startGame(gameMode, vocabQuizVariant)}
+            onClick={() => startGame(gameMode, vocabQuizVariant, classroomBossId)}
             className="mt-2 inline-flex min-h-[44px] items-center rounded-neo border-[3px] border-neo-black bg-neo-cream px-4 font-neo-display text-sm font-black text-neo-black shadow-hard-sm transition-transform active:scale-[0.97] disabled:opacity-60"
           >
             {t('eduShell.host.retry')}

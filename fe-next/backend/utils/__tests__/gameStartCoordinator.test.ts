@@ -87,14 +87,14 @@ describe('GameStartCoordinator', () => {
       expect(result.waitTime).toBeGreaterThanOrEqual(0);
     });
 
-    it('marks timerStarted when all ACK', () => {
+    it('leaves the timer to the countdowns when all ACK (ack confirms delivery only)', () => {
       coordinator.recordAcknowledgment('GAME1', 'alice', messageId);
       coordinator.recordAcknowledgment('GAME1', 'bob', messageId);
       coordinator.recordAcknowledgment('GAME1', 'charlie', messageId);
 
       const stats = coordinator.getSequenceStats('GAME1');
-      expect(stats!.timerStarted).toBe(true);
-      expect(stats!.timerStartedAt).not.toBeNull();
+      expect(stats!.timerStarted).toBe(false);
+      expect(stats!.timerStartedAt).toBeNull();
     });
 
     it('single player: first ACK triggers allReady', () => {
@@ -278,7 +278,7 @@ describe('GameStartCoordinator', () => {
 
     it('returns void if timer already started', () => {
       const messageId = coordinator.initializeSequence('GAME1', ['alice'], 60);
-      coordinator.recordAcknowledgment('GAME1', 'alice', messageId);
+      coordinator.recordCountdownComplete('GAME1', 'alice', messageId);
 
       // Timer already started
       const result = coordinator.handlePlayerDisconnect('GAME1', 'alice');

@@ -110,10 +110,10 @@ describe('GET /api/education/classroom/live-game', () => {
     expect(serialized).not.toContain('Maya');
   });
 
-  it('404s a code with no live game', async () => {
+  it('answers 204 for a code with no live game, so every arcade room does not log a failed request', async () => {
     lookupLiveClassroomGame.mockResolvedValue(null);
     const res = await GET(req('ZZZZZZ'));
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(204);
   });
 
   it('rejects a malformed code without touching Redis', async () => {

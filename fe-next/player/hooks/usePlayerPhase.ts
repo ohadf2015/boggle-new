@@ -33,7 +33,8 @@ import { useFirstTimeAchievement } from '@/components/game/FirstTimeAchievement'
 import usePlayerSocketEvents from './usePlayerSocketEvents';
 import { usePublishGameActive } from './usePublishGameActive';
 import { resetComboState } from '@/shared/utils/comboUtils';
-import { useFoundWords, useBoardTheme, useTotalBoardWords, useWaitingForResults, useLetterGrid, useShufflingGrid, useLeaderboard, useGameActions, useGameMode, useGameModeConfirmed, useGameLanguage } from '@/hooks/gameState';
+import { useFoundWords, useBoardTheme, useTotalBoardWords, useWaitingForResults, useLetterGrid, useShufflingGrid, useLeaderboard, useGameActions, useGameMode, useGameModeConfirmed, useGameLanguage, useShowStartAnimation, useGameStore } from '@/hooks/gameState';
+import { shouldActivateRound } from '../roundActivation';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { usePlayerRoundTelemetry } from './usePlayerRoundTelemetry';
 
@@ -346,15 +347,25 @@ export function usePlayerPhase({
 
 
   // Activate game when countdown animation completes
+  const freshStartPending = useShowStartAnimation();
+  const countdownSeenRef = useRef(false);
   useEffect(() => {
-    if (!showModeReveal && !showStartAnimation && letterGrid && remainingTime && remainingTime > 0 && !gameActive && !waitingForResults) {
+    if (showModeReveal || showStartAnimation) countdownSeenRef.current = true;
+  }, [showModeReveal, showStartAnimation]);
+  useEffect(() => {
+    if (shouldActivateRound({
+      showModeReveal, showStartAnimation, hasBoard: !!letterGrid, remainingTime, gameActive, waitingForResults,
+      freshStartPending, countdownSeen: countdownSeenRef.current,
+    })) {
       logger.log('[PLAYER] Countdown animation complete, activating game');
+      countdownSeenRef.current = false;
+      useGameStore.setState({ showStartAnimation: false });
       setGameActive(true);
       // Resume internal timer so local countdown ticks between server syncs.
       // reset() sets internalPaused=true (autoStart=false), and nothing else clears it.
       timerResume();
     }
-  }, [showModeReveal, showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults, timerResume]);
+  }, [showModeReveal, showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults, freshStartPending, timerResume]);
 
   // Auto-dismiss mode reveal, then trigger countdown. Kept short (1.1s) so the
   // splash → 3-2-1 handoff reads as one quick flourish rather than two separate

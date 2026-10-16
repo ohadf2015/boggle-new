@@ -156,21 +156,17 @@ class GameStartCoordinator {
     // Check if all players have acknowledged
     const allAcknowledged = ackCount === expectedCount;
 
-    if (allAcknowledged && !sequence.timerStarted) {
-      sequence.timerStarted = true;
-      sequence.timerStartedAt = Date.now();
-
-      // Clear the timeout since we got all acks
+    if (allAcknowledged) {
+      // Delivery only. Marking the timer started here made every countdownComplete
+      // "late", so the round clock waited for the 10s safety net instead of GO.
       if (sequence.ackTimeout) {
         clearTimeout(sequence.ackTimeout);
         sequence.ackTimeout = null;
       }
-
-      // Clear any pending retries
       this.clearRetryTimeouts(sequence);
 
-      const waitTime = sequence.timerStartedAt - sequence.startedAt;
-      logger.info('GAME_START', `All players ready! Starting timer after ${waitTime}ms wait`);
+      const waitTime = Date.now() - sequence.startedAt;
+      logger.info('GAME_START', `All players received the start after ${waitTime}ms; timer waits for their countdowns`);
 
       return {
         valid: true,

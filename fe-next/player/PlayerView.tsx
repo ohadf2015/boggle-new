@@ -22,8 +22,7 @@ import { PlayerLobbyScreen } from '@/components/multiplayer/lobby/PlayerLobbyScr
 import { MpRoundScreen } from '@/components/multiplayer/round/MpRoundScreen';
 import { MpCountdown } from '@/components/multiplayer/round/MpCountdown';
 import { usePlayerPhase } from './hooks/usePlayerPhase';
-import { modeRevealKey } from './modeRevealKey';
-import { MODE_TRANSLATION_KEY } from '@/components/education/classroomModeLabels';
+import { roundRevealKey } from './modeRevealKey';
 import { withoutClassroomHost } from '@/components/student/live/classroomRoster';
 import type { PlayerViewProps } from './types';
 
@@ -39,7 +38,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
     showTournamentStandings, setShowTournamentStandings, handleWordSubmit, handleResetCombo, hints, earthquakeState,
     fireRoundActive, fireRoundRemaining, boardTheme, totalGameTimeRef,
   } = usePlayerPhase(props);
-  useClassroomBossSocket(socket, gameCode);
+  const bossRound = useClassroomBossSocket(socket, gameCode);
   const boardWaiting = useBoardWaitingScreen(socket, waitingForResults); // a quiz room has no board clock
   const inRound = useMemo(
     () => (isClassroomMode ? withoutClassroomHost(leaderboard, playersReady) : { leaderboard, users: playersReady }),
@@ -53,9 +52,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
   const showGameView = gameActive || (hasGameData && !boardWaiting);
 
   // Map game mode to display label
-  const modeRevealLabel = isClassroomMode && classroomGameMode
-    ? t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[classroomGameMode] ?? 'classic'}`)
-    : t(modeRevealKey(gameMode));
+  const modeRevealLabel = t(roundRevealKey({ bossRound, classroomGameMode: isClassroomMode ? classroomGameMode : null, gameMode }));
 
   // The mode-reveal / countdown sequence always routes through the main
   // in-game-view return below, so GoRipplesAnimation (and ModeRevealOverlay)

@@ -183,4 +183,26 @@ describe('game start records the word bank against the FINAL board', () => {
     // THEN no word bank is recorded at all
     expect(mockSetPlaced).not.toHaveBeenCalled();
   });
+  it('GIVEN a vowelled Hebrew list WHEN the board is dealt THEN the word bank shows plain words with their final letters', async () => {
+    mockGetGame.mockReturnValue({
+      gameCode: 'GAME1', hostSocketId: 'socket-host', hostUsername: 'Host',
+      users: { Host: { socketId: 'socket-host', isHost: true } },
+      gameState: 'waiting', language: 'he', modeHistory: [], roomName: 'R',
+      isRanked: false, gameSessionId: 's1',
+    });
+    mockGetClassroomGame.mockResolvedValue({
+      gameCode: 'GAME1', classroomId: 'c1', language: 'he', vocabularyWords: ['לֶחֶם', 'חָלָב'],
+    } as never);
+    mockGenerateRandomTable.mockReturnValue(FIRST_GRID);
+    mockAutoAdd.mockResolvedValue({ botsAdded: 0 } as never);
+
+    const handlers = makeSocket();
+    await handlers['startGame']({
+      letterGrid: CLIENT_GRID, timerSeconds: 60, language: 'he',
+      minWordLength: 3, difficulty: 'MEDIUM', boardTheme: null, gameMode: 'classic',
+    });
+
+    expect(mockGenerateRandomTable.mock.calls[0][3]).toEqual(['לחמ', 'חלב']);
+    expect(mockSetPlaced).toHaveBeenCalledWith('GAME1', ['לחם', 'חלב']);
+  });
 });

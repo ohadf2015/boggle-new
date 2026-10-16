@@ -236,3 +236,21 @@ describe('LobbyModeSwitcher — the room keeps its code', () => {
     );
   });
 });
+
+describe('LobbyModeSwitcher — the sheet quotes the round this room will run', () => {
+  it('GIVEN a room set to 3-minute boards and a 10x20s quiz WHEN the change-game sheet opens THEN every card quotes those settings, as the pre-live picker did', () => {
+    render(
+      <LobbyModeSwitcher
+        gameCode={CODE}
+        currentMode={'classic' as never}
+        socket={socket}
+        t={t}
+        roundSettings={{ timerMinutes: 3, vocabQuizQuestionCount: 10, vocabQuizSeconds: 20 }}
+      />
+    );
+    fireEvent.click(screen.getByTestId('lobby-change-mode'));
+    expect(screen.getByTestId('mode-tile-word-hunt')).toHaveTextContent('"count":3');
+    expect(screen.getByTestId('mode-tile-wordcraft')).toHaveTextContent('"count":3');
+    expect(screen.getByTestId('mode-tile-vocab-quiz')).toHaveTextContent('"count":4');
+  });
+});

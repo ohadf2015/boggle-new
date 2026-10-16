@@ -32,7 +32,8 @@ import { Shuffle, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ClassroomModeCardRow } from '../ClassroomModeCatalogue';
 import { catalogueEntry } from '../ClassroomModeCatalogueData';
-import type { ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
+import { launchOf, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
+import { configuredRoundMinutes, type ConfiguredRoundSettings } from '@/lib/education/gameModes';
 import { useClassroomModeSwitch } from './useClassroomModeSwitch';
 
 export interface LobbyModeSwitcherProps {
@@ -56,6 +57,8 @@ export interface LobbyModeSwitcherProps {
    * written from the same ack, in the same tick, so they cannot disagree.
    */
   onModeApplied?: (mode: ClassroomCatalogueId) => void;
+  /** The room's own round settings, so each card quotes what a switch would run — the pre-live picker's answer. */
+  roundSettings?: ConfiguredRoundSettings;
 }
 
 export function LobbyModeSwitcher({
@@ -64,6 +67,7 @@ export function LobbyModeSwitcher({
   socket,
   t,
   onModeApplied,
+  roundSettings,
 }: LobbyModeSwitcherProps) {
   const [open, setOpen] = useState(false);
   const { liveMode, pendingMode, switchTo } = useClassroomModeSwitch({
@@ -144,6 +148,7 @@ export function LobbyModeSwitcher({
 
             <ClassroomModeCardRow
               selected={liveMode}
+              minutesFor={roundSettings ? (id) => configuredRoundMinutes(launchOf(id).gameMode, roundSettings) : undefined}
               busy={!!pendingMode}
               onPick={(mode) => {
                 switchTo(mode);

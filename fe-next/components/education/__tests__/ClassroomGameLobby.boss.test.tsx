@@ -40,9 +40,10 @@ vi.mock('../lobby/useTeacherLobbyData', () => ({
   }),
 }));
 const launch = vi.fn();
+let startError: string | null = null;
 vi.mock('../lobby/useClassroomLaunchSocket', () => ({
   useClassroomLaunchSocket: () => ({
-    gameCode: 'BOSS01', isStarting: false, startError: null, setStartError: vi.fn(), launch,
+    gameCode: 'BOSS01', isStarting: false, startError, setStartError: vi.fn(), launch,
     socket: null, roomCreatedGameCode: null, startLiveGame: vi.fn(),
   }),
 }));
@@ -54,6 +55,7 @@ describe('ClassroomGameLobby — launching from the catalogue', () => {
     launch.mockClear();
     sessionStorage.clear();
     lessonWords = DEFINED;
+    startError = null;
   });
 
   it('launches Boss Battle as a classic board carrying the boss, and stores it for the host', () => {
@@ -105,5 +107,14 @@ describe('ClassroomGameLobby — launching from the catalogue', () => {
     expect(screen.getByText('vocabQuiz.setup.treasureChests')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
     expect(screen.queryByText('vocabQuiz.setup.treasureChests')).not.toBeInTheDocument();
+  });
+  it('GIVEN a Boss Battle launch failed WHEN the teacher taps retry THEN the retry still carries the boss', () => {
+    startError = 'errors.network';
+    render(<ClassroomGameLobby onBack={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
+    fireEvent.click(screen.getByTestId('create-room-retry'));
+
+    expect(launch).toHaveBeenCalledTimes(1);
+    expect(launch.mock.calls[0][0].settings).toMatchObject({ gameMode: 'classic', classroomBossId: 'lexiconDragon' });
   });
 });

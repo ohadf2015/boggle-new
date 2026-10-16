@@ -252,6 +252,28 @@ export function sanitizeWord(word: string, language?: Language): string {
   return sanitized;
 }
 
+/**
+ * The key a teacher's lesson word and a word traced off the board share. NFKC first:
+ * a pasted or IME-typed word can look identical and differ in bytes (decomposed kana,
+ * full-width Latin); sanitize then drops niqqud and invisible marks; normalizeWord folds
+ * per-language alternate forms (Hebrew finals, Spanish accents, Russian ё).
+ */
+export function lessonWordKey(word: string, language: Language): string {
+  if (typeof word !== 'string') return '';
+  return normalizeWord(sanitizeWord(word.normalize('NFKC'), language), language).toUpperCase();
+}
+
+/**
+ * The letters a lesson word puts on a board, one tile per letter. A vowelled
+ * Hebrew word or a decomposed accent otherwise lands its marks as tiles of their own.
+ */
+export function boardSeedWord(word: string, language: Language): string {
+  if (typeof word !== 'string') return '';
+  const letters = sanitizeWord(word.normalize('NFKC'), language).replace(/\p{M}/gu, '');
+  const folded = language === 'he' || language === 'ru' ? normalizeWord(letters, language) : letters;
+  return folded.toUpperCase();
+}
+
 // ============================================================
 // VALIDATION PATTERNS
 // ============================================================

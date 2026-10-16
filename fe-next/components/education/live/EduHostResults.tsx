@@ -11,6 +11,8 @@ import type { ClassroomTvResultsScreenProps } from '@/host/components/tv-results
 import { chipAccent } from '@/components/education/projector/projectorLobbyModel';
 import { classStats, hostPodium, type ClassStats, type PodiumSeat } from './eduResultsModel';
 import { LIVE_KEYFRAMES, PRESS, PRIMARY_BUTTON, SECONDARY_BUTTON, type Translate } from './eduLiveStyles';
+import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
+import { useClassroomBossStore } from '@/stores/classroomBossStore';
 
 const SEAT_STYLE: Record<number, { order: string; height: string; color: string }> = {
   1: { order: 'order-2', height: 'h-36 md:h-[13vw]', color: 'bg-neo-yellow' },
@@ -105,12 +107,21 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
   const stats = classStats(summary, players);
   const podium = hostPodium(summary, players).filter((s) => s.score > 0);
   const actions = <Actions t={t} language={language} onRematch={onRematch} onClose={onClose} onExitRoom={onExitRoom} />;
+  // A boss round's story is the boss: board points may all be zero while the class still dealt real damage.
+  const bossOver = useClassroomBossStore((s) => s.view?.status === 'defeated' || s.view?.status === 'escaped');
 
   return (
     <div data-testid="edu-host-results" className="fixed inset-0 z-[75] flex flex-col overflow-y-auto bg-neo-navy text-neo-cream">
       <style>{LIVE_KEYFRAMES}</style>
       {podium.length === 0 ? (
         <div className="m-auto w-full max-w-2xl p-4 pt-16 md:pt-[5vw]">
+          {bossOver ? (
+            <section className="flex flex-col gap-4 md:gap-[1.2vw]">
+              <BossOutcomeCard size="tv" />
+              <Stats stats={stats} t={t} />
+              {actions}
+            </section>
+          ) : (
           <section data-testid="edu-results-empty" className="flex flex-col gap-4 rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light p-5 shadow-hard-lg md:gap-[1.2vw] md:p-[2vw]">
             <div className="flex items-center gap-4">
               {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
@@ -123,14 +134,19 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
             <Stats stats={stats} t={t} />
             {actions}
           </section>
+          )}
         </div>
       ) : (
         <div className="mx-auto flex w-full max-w-[1800px] flex-1 flex-col gap-4 p-4 pt-16 md:gap-[1.5vw] md:p-[2vw] md:pt-[5vw]">
+          {bossOver ? (
+            <BossOutcomeCard size="tv" />
+          ) : (
           <header className="flex items-center justify-center gap-4 md:gap-[1.5vw]">
             {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
             <img src={EDU_MASCOT.podium} alt="" aria-hidden="true" className="size-20 shrink-0 select-none motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite] md:size-[8vw]" />
             <h1 className={cn(TITLE, 'text-4xl md:text-[3.6vw]')}>{t('eduLiveRoom.hostResults.title')}</h1>
           </header>
+          )}
           <div className="grid flex-1 items-center gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:gap-[2vw]">
             <section data-testid="edu-podium" className={cn('flex min-h-[18rem] items-end justify-center rounded-neo-lg border-4 border-neo-cream bg-neo-purple/40 px-4 pt-10 shadow-hard-lg md:min-h-[26vw] md:px-[2vw] md:pt-[4vw]', HALFTONE)}>
               <ol className="flex w-full items-end justify-center gap-3 md:gap-[1.5vw]">

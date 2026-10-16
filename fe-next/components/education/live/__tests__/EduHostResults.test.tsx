@@ -1,11 +1,14 @@
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import EduHostResults from '@/components/education/live/EduHostResults';
 import type { ClassroomSummary } from '@/shared/types/classroom';
+import type { ClassroomBossView } from '@/shared/types/classroomBoss';
+import { useClassroomBossStore } from '@/stores/classroomBossStore';
 
-vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'he' }) }));
+vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'he', t: (key: string) => key }) }));
+vi.mock('next/image', () => ({ default: () => <span data-testid="boss-art" /> }));
 vi.mock('@/components/Avatar', () => ({ default: () => <span data-testid="avatar" /> }));
 vi.mock('next/link', () => ({ default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => <a href={href} {...rest}>{children}</a> }));
 
@@ -19,6 +22,8 @@ const players = [
 ];
 
 describe('EduHostResults', () => {
+  beforeEach(() => useClassroomBossStore.getState().reset());
+
   it('given a finished round, when the projector shows results, then a podium and class stats appear', () => {
     render(<EduHostResults summary={summary} players={players} t={t} />);
     expect(screen.getAllByTestId('edu-podium-seat').map((el) => el.getAttribute('data-name'))).toEqual(['Noa', 'Ido']);
@@ -55,5 +60,25 @@ describe('EduHostResults', () => {
     render(<EduHostResults summary={summary} players={[...players, { username: 'Maya', score: 20, wordsFoundCount: 3 }]} t={t} />);
     expect(screen.getAllByTestId('edu-podium-seat').map((el) => el.getAttribute('data-name'))).toEqual(['Noa', 'Maya', 'Ido']);
     expect(screen.getByTestId('edu-podium-crown')).toBeInTheDocument();
+  });
+
+  const bossEnd = (status: 'defeated' | 'escaped') =>
+    useClassroomBossStore.getState().receiveState({ bossId: 'lexiconDragon', status, pctDealt: status === 'defeated' ? 100 : 62, lastHits: [{ username: 'Noa' }] } as unknown as ClassroomBossView);
+
+  it('given the class beat the boss, when the projector shows results, then the boss outcome leads instead of a generic title', () => {
+    bossEnd('defeated');
+    render(<EduHostResults summary={summary} players={players} t={t} />);
+    const outcome = screen.getByTestId('boss-outcome');
+    expect(outcome).toHaveAttribute('data-outcome', 'defeated');
+    expect(screen.queryByText('eduLiveRoom.hostResults.title')).not.toBeInTheDocument();
+  });
+
+  it('given the boss escaped and no one scored points, when results show, then the projector says the boss escaped with the share dealt, not "No one scored"', () => {
+    bossEnd('escaped');
+    render(<EduHostResults summary={summary} players={[{ username: 'Noa', score: 0, wordsFoundCount: 4 }]} t={t} onRematch={vi.fn()} />);
+    expect(screen.getByTestId('boss-outcome')).toHaveAttribute('data-outcome', 'escaped');
+    expect(screen.getByTestId('boss-outcome')).toHaveTextContent('classroomBoss.dealtPct');
+    expect(screen.queryByTestId('edu-results-no-scores')).not.toBeInTheDocument();
+    expect(screen.getByTestId('edu-results-play-again')).toBeInTheDocument();
   });
 });

@@ -419,7 +419,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
               {projectorShowsBoard(gameMode, tableData) && tableData && <ProjectorBoard grid={tableData} label={t('eduLiveRoom.round.boardLabel')} />}
               {wheelPuzzle && <ProjectorWheel puzzle={wheelPuzzle} label={t('eduLiveRoom.round.wheelLabel')} />}
               <div className="min-w-0 flex-1">
-                <ClassroomLivePanel socket={socket} totalWords={roomWordTotal} lessonWords={lessonWords} hostUsername={username} t={t} />
+                <ClassroomLivePanel socket={socket} totalWords={roomWordTotal} lessonWords={lessonWords} language={roomLanguage} hostUsername={username} t={t} />
               </div>
             </div>
           ) : (

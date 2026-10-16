@@ -53,6 +53,13 @@ describe('useClassroomLiveGame', () => {
     expect(result.current.info).toBeNull();
   });
 
+  it('resolves absent on a 204 (arcade room, answered without an error in the console)', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(null, { status: 204 })));
+    const { result } = renderHook(() => useClassroomLiveGame('ZZZ999', true));
+    await waitFor(() => expect(result.current.status).toBe('absent'));
+    expect(result.current.info).toBeNull();
+  });
+
   it('stays loading through a 429 and retries until a definitive answer', async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(jsonResponse(429, { error: 'Too many requests' }))

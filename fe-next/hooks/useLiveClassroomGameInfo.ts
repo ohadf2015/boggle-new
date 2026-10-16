@@ -58,13 +58,14 @@ export function useClassroomLiveGame(
           { signal: controller.signal }
         );
         if (cancelled) return;
+        // 204 = arcade room. 404 is the same answer from a server deployed before 204.
+        if (res.status === 204 || res.status === 404) {
+          setState({ info: null, status: 'absent' });
+          return;
+        }
         if (res.ok) {
           const data = (await res.json()) as LiveClassroomGameInfo;
           if (!cancelled) setState({ info: data, status: 'found' });
-          return;
-        }
-        if (res.status === 404) {
-          setState({ info: null, status: 'absent' });
           return;
         }
         if (res.status === 429 && retriesLeft > 0) {

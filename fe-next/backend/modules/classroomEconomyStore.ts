@@ -41,11 +41,13 @@ function parseState(raw: string | null | undefined): EconomyState | null {
   }
 }
 
-export async function readEconomy(gameCode: string, userId: string): Promise<EconomyState | null> {
+/** With `roundId`, the state as that round sees it: a streak never carries into the next round's first frame. */
+export async function readEconomy(gameCode: string, userId: string, roundId?: string): Promise<EconomyState | null> {
   const redis = getRedisClient();
   if (!redis) return null;
   try {
-    return parseState(await redis.hget(hashKey(gameCode), userId)) ?? emptyEconomyState();
+    const state = parseState(await redis.hget(hashKey(gameCode), userId)) ?? emptyEconomyState();
+    return roundId ? applyRoundBoundary(state, roundId) : state;
   } catch {
     return null;
   }

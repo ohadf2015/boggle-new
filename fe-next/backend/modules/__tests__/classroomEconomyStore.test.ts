@@ -51,6 +51,20 @@ describe('classroomEconomyStore', () => {
     expect((await readEconomy('ABC', 'u1'))?.cash).toBe(2);
   });
 
+  it('Given a 7-word streak last round, When the next round reads the state, Then the streak and round cash start over', async () => {
+    for (let i = 0; i < 7; i++) {
+      await mutateEconomy('ABC', 'u1', 'r1', (s) => {
+        const res = recordCorrectWord(s, { wordLength: 4, fromLesson: false, now: 0 });
+        return { state: res.state, result: res.delta };
+      });
+    }
+    const next = await readEconomy('ABC', 'u1', 'r2');
+    expect(next?.streak).toBe(0);
+    expect(next?.roundCash).toBe(0);
+    expect(next?.cash).toBeGreaterThan(0);
+    expect((await readEconomy('ABC', 'u1', 'r1'))?.streak).toBe(7);
+  });
+
   it('Given Redis is down, When read, Then null is returned (fail closed)', async () => {
     redisAvailable = false;
     expect(await readEconomy('ABC', 'u1')).toBeNull();

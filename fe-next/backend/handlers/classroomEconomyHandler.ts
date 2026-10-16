@@ -137,7 +137,7 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
     const roundId = await roundOf(gameCode);
     if (!roundId) return refusedTo(socket, 'requestState', gameCode, 'no_game', E.error, { reason: 'no_game' });
     if (!(await isPlayer(gameCode, userId))) return refusedTo(socket, 'requestState', gameCode, 'not_seated', E.error, { reason: 'not_seated' });
-    const state = await readEconomy(gameCode, userId);
+    const state = await readEconomy(gameCode, userId, roundId);
     const config = await loadConfig(gameCode);
     if (!state) { socket.emit(E.error, { reason: 'unavailable' }); return; }
     socket.emit(E.state, toSnapshot(state, config, null, Date.now()));

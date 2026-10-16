@@ -203,7 +203,9 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setTableData(newTable);
     // Wheel-rush is design-locked to its 1-minute round; the lobby tile reads the same source.
     const seconds = fixedRoundSeconds(hostSelectedGameMode) ?? timerValue * 60;
-    setRemainingTime(seconds);
+    // The server's startGame seeds the clock with the countdown. A value here (or last round's
+    // leftover) let the host activate and tick before the 3-2-1 even began.
+    setRemainingTime(null);
     // NOTE: Do NOT trigger the start animation optimistically here. The host's
     // 3-2-1-GO countdown is driven by the server `startGame` broadcast (see
     // useHostGameEvents.handleStartGame) — the exact same trigger players use.
@@ -425,7 +427,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
 
         setTableData(newTable);
         const seconds = fixedRoundSeconds(hostSelectedGameMode) ?? timerValue * 60;
-        setRemainingTime(seconds);
+        setRemainingTime(null);
         // Animation is driven by the server `startGame` broadcast (same as
         // players) — see the sync note in executeStartGame. Don't start it
         // optimistically or the host runs ahead of the players.

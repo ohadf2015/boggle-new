@@ -69,3 +69,14 @@ describe('embeddableLessonWords', () => {
     expect(embeddableLessonWords(['garden', 'שולחן', 'bridge'], 'en')).toEqual(['GARDEN', 'BRIDGE']);
   });
 });
+
+describe('embeddableLessonWords — board-safe letters', () => {
+  it('GIVEN a vowelled Hebrew list WHEN picking words to plant THEN no niqqud reaches the board', () => {
+    const planted = embeddableLessonWords(['לֶחֶם', 'גְּבִינָה', 'חָלָב'], 'he');
+    expect(planted).toEqual(['לחמ', 'גבינה', 'חלב']);
+  });
+
+  it('GIVEN a multi-word entry WHEN picking words to plant THEN it is skipped, not planted with a space tile', () => {
+    expect(embeddableLessonWords(['ice cream', 'water'], 'en')).toEqual(['WATER']);
+  });
+});

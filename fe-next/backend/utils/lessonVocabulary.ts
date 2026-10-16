@@ -28,28 +28,11 @@
  */
 
 import type { Language } from '@/shared/types';
-import { normalizeWord, sanitizeWord } from '@/shared/utils/wordNormalization';
+import { lessonWordKey } from '@/shared/utils/wordNormalization';
 
-/**
- * The canonical key for one word in a given language.
- *
- * `sanitizeWord` first, because the teacher's side of this compare is typed or
- * pasted text, not board output: it strips Hebrew niqqud (a teacher of young
- * learners writes the vowelled form, which no board can ever produce) plus the
- * zero-width and directional marks a paste out of Google Docs or Word carries.
- * `normalizeWord` then folds the per-language alternate forms. Same order as
- * lib/education/produceAnswer.ts, which had already worked this out.
- *
- * Uppercased last so the stored keys stay human-readable in logs.
- */
+/** The canonical key for one word in a given language — shared with the projector's live count. */
 function lessonKey(word: string, language: Language): string {
-  // NFKC first. The student's word comes off the board and is always precomposed
-  // ASCII or kana; the teacher's is typed or pasted, so it can be visually
-  // identical and byte-different — decomposed kana (か + U+3099 rather than が,
-  // which is what macOS and some IMEs hand over), full-width Latin (a Japanese
-  // IME left in Japanese mode types English vocabulary as ＷＡＴＥＲ), or
-  // half-width katakana. NFKC folds all three onto the board's form.
-  return normalizeWord(sanitizeWord(word.normalize('NFKC'), language), language).toUpperCase();
+  return lessonWordKey(word, language);
 }
 
 /**

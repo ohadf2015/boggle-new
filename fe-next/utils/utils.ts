@@ -11,6 +11,7 @@ import {
   filterHebrewWord,
   applyHebrewFinalLetters,
   normalizeWord,
+  boardSeedWord,
 } from '@/shared/utils/wordNormalization';
 
 // Re-export for backwards compatibility
@@ -228,11 +229,7 @@ function generateTableWithEmbeddedWords(
   wordsToEmbed: string[],
   language: Language
 ): LetterGrid {
-  // Filter and prepare words once
-  // For Hebrew, normalize final letters to regular letters before embedding
-  const cleanedWords = language === 'he'
-    ? wordsToEmbed.map(w => normalizeHebrewWord(filterHebrewWord(w))).filter(w => w.length >= 2)
-    : wordsToEmbed;
+  const cleanedWords = wordsToEmbed.map(w => boardSeedWord(w, language)).filter(w => /^\p{L}{2,}$/u.test(w));
 
   // Sort words by length (longer first) for better placement
   const sortedWords = [...cleanedWords].sort((a, b) => b.length - a.length);

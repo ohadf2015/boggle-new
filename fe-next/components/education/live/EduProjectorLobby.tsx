@@ -94,7 +94,7 @@ export const EduProjectorLobby = memo<ProjectorLobbyProps>(function EduProjector
               </p>
             )}
           </div>
-          <LobbyModeSwitcher gameCode={gameCode} currentMode={lobbyMode.modeId} socket={getSharedSocketIfExists()} t={t} onModeApplied={lobbyMode.applyMode} />
+          <LobbyModeSwitcher gameCode={gameCode} currentMode={lobbyMode.modeId} socket={getSharedSocketIfExists()} t={t} onModeApplied={lobbyMode.applyMode} roundSettings={lobbyMode.roundSettings} />
         </div>
 
         <div className="relative flex flex-col items-stretch gap-2 md:row-start-3 md:flex-row md:items-center md:gap-[1vw] md:pe-[11vw]">

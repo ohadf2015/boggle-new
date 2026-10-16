@@ -15,7 +15,7 @@ import {
 } from './consts';
 
 // Import word normalization for board verification
-import { normalizeWord } from '@/shared/utils/wordNormalization';
+import { boardSeedWord, normalizeWord } from '@/shared/utils/wordNormalization';
 import { placeWordPath } from '@/shared/utils/boardWordPath';
 
 // Japanese hiragana board pool — single source of truth shared with the frontend
@@ -297,10 +297,7 @@ function generateTableWithEmbeddedWords(
   wordsToEmbed: string[],
   language: Language
 ): LetterGrid {
-  // For Hebrew, normalize final letters to regular letters before embedding
-  const cleanedWords = language === 'he'
-    ? wordsToEmbed.map(w => normalizeWord(w, 'he')).filter(w => w.length >= 2)
-    : wordsToEmbed;
+  const cleanedWords = wordsToEmbed.map(w => boardSeedWord(w, language)).filter(w => /^\p{L}{2,}$/u.test(w));
 
   const sortedWords = [...cleanedWords].sort((a, b) => b.length - a.length);
 
