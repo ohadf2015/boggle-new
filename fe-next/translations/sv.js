@@ -5064,6 +5064,8 @@ const sv = {
   "tvResults": {
     "installHeading": "TA MED HEM 📱",
     "installCta": "Skanna · Hämta på Google Play",
+    "roundOf": "Runda {current} av {total}",
+    "wpm": "ord/min",
     "title": "VI HAR EN VINNARE!",
     "champion": "Mästare",
     "runnerUp": "Tvåa",

@@ -44,6 +44,8 @@ interface GameStat {
 interface TvResultsStatsGridProps {
   players: PlayerData[];
   visible: boolean;
+  /** Cards that fit; when trimming, the room-wide word count goes first since it names nobody. */
+  max?: number;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
@@ -54,6 +56,7 @@ interface TvResultsStatsGridProps {
 const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
   players,
   visible,
+  max = 4,
   t,
 }) => {
   // Calculate game stats from player data
@@ -185,71 +188,71 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
           username: hero.player.username,
           avatar: hero.player.avatar,
         },
-        color: 'bg-linear-to-r from-neo-orange to-neo-red',
+        color: 'bg-neo-lime',
       });
     }
 
-    return calculatedStats.slice(0, 6); // Max 6 stats
-  }, [players, t]);
+    const ordered = max < calculatedStats.length ? calculatedStats.filter(s => s.id !== 'total-words') : calculatedStats;
+    return ordered.slice(0, max);
+  }, [players, t, max]);
 
   return (
     <AnimatePresence>
       {visible && (
         <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="grid grid-cols-2 md:grid-cols-3 gap-4"
+          initial={{ y: 24 }}
+          animate={{ y: 0 }}
+          exit={{ y: 24 }}
+          className="grid grid-cols-2 gap-4"
         >
           {stats.map((stat, index) => (
             <m.div
               key={stat.id}
-              initial={{ y: 30, opacity: 0, rotateX: -20 }}
-              animate={{ y: 0, opacity: 1, rotateX: 0 }}
-              transition={{
-                delay: index * 0.15,
-                type: 'spring',
-                stiffness: 300,
-                damping: 20,
-              }}
+              data-testid={`stat-card-${stat.id}`}
+              initial={{ y: 30, rotateX: -20 }}
+              animate={{ y: 0, rotateX: 0 }}
+              transition={{ delay: index * 0.15, type: 'spring', stiffness: 300, damping: 20 }}
               className={cn(
-                'relative p-4 rounded-neo border-4 border-neo-black shadow-hard-lg',
+                'flex min-w-0 flex-col gap-1 rounded-neo border-4 border-neo-black px-4 py-3 shadow-hard-lg',
+                stats.length % 2 === 1 && index === 0 && 'col-span-2',
                 stat.color
               )}
             >
-              {/* Icon */}
-              <div className="absolute -top-3 -left-3 w-10 h-10 bg-neo-cream text-neo-black rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard-sm">
-                <stat.icon className="w-5 h-5 text-neo-black" />
+              <div className="flex items-center gap-2">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-3 border-neo-black bg-neo-cream">
+                  <stat.icon className="h-4 w-4 text-neo-black" />
+                </span>
+                <p className="text-[clamp(0.75rem,1.5vh,1rem)] font-black uppercase leading-tight tracking-wide text-neo-black/75">
+                  {stat.label}
+                </p>
               </div>
 
-              {/* Label */}
-              <p className="text-sm font-bold uppercase tracking-wide text-neo-black/70 mt-2 mb-1">
-                {stat.label}
-              </p>
-
-              {/* Value */}
-              <p className="font-black text-2xl md:text-3xl text-neo-black truncate">
-                {stat.value}
-              </p>
-
-              {/* Sub Value */}
-              {stat.subValue && (
-                <p className="text-sm font-bold text-neo-black/60">
-                  {stat.subValue}
+              <div className="flex flex-wrap items-baseline gap-x-3">
+                <p
+                  data-testid={`stat-value-${stat.id}`}
+                  className="font-neo-display text-[clamp(1.6rem,3.6vh,2.75rem)] font-black leading-none text-neo-black [overflow-wrap:anywhere]"
+                >
+                  {stat.value}
                 </p>
-              )}
+                {stat.subValue && (
+                  <p className="text-[clamp(0.8rem,1.5vh,1rem)] font-bold text-neo-black/70">
+                    {stat.subValue}
+                  </p>
+                )}
+              </div>
 
-              {/* Player Attribution */}
               {stat.player && (
-                <div className="flex items-center gap-2 mt-2 pt-2 border-t-2 border-neo-black/20">
+                <div className="mt-auto flex items-center gap-2 border-t-2 border-neo-black/20 pt-1.5">
                   <Avatar
-
                     avatarImage={stat.player.avatar?.avatarImage}
                     customAvatar={stat.player.avatar?.customAvatar}
-                    size="sm"
-                    className="border-2 border-neo-black"
+                    size="md"
+                    className="shrink-0 border-2 border-neo-black"
                   />
-                  <span className="font-bold text-sm text-neo-black truncate">
+                  <span
+                    data-testid={`stat-player-${stat.id}`}
+                    className="min-w-0 text-[clamp(0.85rem,1.6vh,1.1rem)] font-black leading-tight text-neo-black [overflow-wrap:anywhere]"
+                  >
                     {stat.player.username}
                   </span>
                 </div>

@@ -15334,6 +15334,8 @@ const ru = {
   "tvResults": {
     "installHeading": "ЗАБЕРИ С СОБОЙ 📱",
     "installCta": "Сканируй и скачивай в Google Play",
+    "roundOf": "Раунд {current} из {total}",
+    "wpm": "сл/мин",
     "title": "ЕСТЬ ПОБЕДИТЕЛЬ!",
     "champion": "Чемпион",
     "runnerUp": "Второе место",

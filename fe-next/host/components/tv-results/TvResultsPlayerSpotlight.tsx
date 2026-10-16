@@ -5,6 +5,8 @@ import { m, AnimatePresence } from 'framer-motion';
 import Avatar from '../../../components/Avatar';
 import { cn } from '../../../lib/utils';
 import { assignArchetypes, type SpotlightPlayer } from './playerSpotlightEngine';
+import { seededRandom } from './awardsEngine';
+import TvResultsSectionHeading from './TvResultsSectionHeading';
 import type { Avatar as AvatarType } from '@/shared/types/game';
 
 interface PlayerData {
@@ -18,10 +20,12 @@ interface TvResultsPlayerSpotlightProps {
   players: PlayerData[];
   visible: boolean;
   gameDuration?: number;
+  /** Cards the lower band can hold; the rest collapse into "+N more". */
+  maxVisible?: number;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
-const MAX_VISIBLE = 8;
+const MAX_VISIBLE = 4;
 
 const MASCOT_INTRO_KEYS = [
   'tvResults.spotlight.mascotIntro1',
@@ -31,19 +35,12 @@ const MASCOT_INTRO_KEYS = [
   'tvResults.spotlight.mascotIntro5',
 ];
 
-// Seeded RNG (same as TvResultsAwards)
-function seededRandom(seed: number): () => number {
-  let s = seed;
-  return () => {
-    s = (s * 16807 + 0) % 2147483647;
-    return (s - 1) / 2147483646;
-  };
-}
 
 const TvResultsPlayerSpotlight = memo<TvResultsPlayerSpotlightProps>(({
   players,
   visible,
   gameDuration = 180,
+  maxVisible = MAX_VISIBLE,
   t,
 }) => {
   const seed = useMemo(() => {
@@ -71,46 +68,27 @@ const TvResultsPlayerSpotlight = memo<TvResultsPlayerSpotlightProps>(({
 
   if (assignments.length === 0) return null;
 
-  const visibleAssignments = assignments.slice(0, MAX_VISIBLE);
-  const remaining = assignments.length - MAX_VISIBLE;
+  const visibleAssignments = assignments.slice(0, maxVisible);
+  const remaining = assignments.length - maxVisible;
 
   return (
     <AnimatePresence>
       {visible && (
         <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="space-y-4"
+          initial={{ y: 24 }}
+          animate={{ y: 0 }}
+          exit={{ y: 24 }}
+          className="flex h-full flex-col gap-3"
         >
-          {/* Mascot Speech Bubble */}
-          <m.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className="relative inline-block bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm px-4 py-2 mb-2"
-          >
-            <p className="font-black text-neo-black text-sm italic">
-              {mascotIntro}
-            </p>
-            <div
-              className="absolute -bottom-2 left-6 w-4 h-4 bg-neo-cream border-b-3 border-r-3 border-neo-black"
-              style={{ transform: 'rotate(45deg)' }}
-            />
-          </m.div>
+          <TvResultsSectionHeading
+            title={t('tvResults.spotlight.heading')}
+            quip={mascotIntro}
+            aside={remaining > 0
+              ? t(remaining === 1 ? 'tvResults.spotlight.andMore' : 'tvResults.spotlight.andMorePlural', { count: remaining })
+              : undefined}
+          />
 
-          {/* Section Heading */}
-          <m.h3
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-            className="text-xl font-black uppercase tracking-wide text-neo-cream"
-          >
-            {t('tvResults.spotlight.heading')}
-          </m.h3>
-
-          {/* Player Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid flex-1 auto-rows-fr grid-cols-2 gap-3">
             {visibleAssignments.map((assignment, index) => {
               const { player, archetype, quip, keyStat } = assignment;
               const originalPlayer = players.find(p => p.username === player.username);
@@ -118,49 +96,34 @@ const TvResultsPlayerSpotlight = memo<TvResultsPlayerSpotlightProps>(({
               return (
                 <m.div
                   key={player.username}
-                  initial={{ scale: 0.8, opacity: 0, y: 20 }}
-                  animate={{ scale: 1, opacity: 1, y: 0 }}
-                  transition={{
-                    delay: index * 0.15,
-                    type: 'spring',
-                    stiffness: 300,
-                    damping: 20,
-                  }}
+                  initial={{ scale: 0.8, y: 20 }}
+                  animate={{ scale: 1, y: 0 }}
+                  transition={{ delay: index * 0.15, type: 'spring', stiffness: 300, damping: 20 }}
                   className={cn(
-                    'relative p-4 rounded-neo border-4 border-neo-black shadow-hard',
+                    'flex flex-col gap-1 rounded-neo border-4 border-neo-black px-3 py-2 shadow-hard',
                     archetype.color
                   )}
                 >
-                  {/* Avatar (top-right) */}
-                  <div className="absolute -top-3 -right-3">
-                    <Avatar
-
-                      avatarImage={originalPlayer?.avatar?.avatarImage}
-                      customAvatar={originalPlayer?.avatar?.customAvatar}
-                      size="sm"
-                      className="border-3 border-neo-black shadow-hard-sm"
-                    />
-                  </div>
-
-                  {/* Archetype Title */}
-                  <h4 className="font-black text-base uppercase text-neo-black mb-1 pe-10">
+                  <h4 className="font-neo-display text-[clamp(0.9rem,1.8vh,1.2rem)] font-black uppercase leading-tight text-neo-black">
                     {t(archetype.titleKey)}
                   </h4>
-
-                  {/* Quip */}
-                  <p className="text-xs font-bold text-neo-black/60 italic mb-3 line-clamp-2">
+                  <p className="text-[clamp(0.75rem,1.4vh,0.95rem)] font-bold italic leading-snug text-neo-black/70">
                     {t(quip)}
                   </p>
-
-                  {/* Divider */}
-                  <div className="border-t-2 border-neo-black/20 mb-2" />
-
-                  {/* Player name + stat */}
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="font-black text-neo-black truncate text-sm">
+                  <div className="mt-auto flex items-center gap-2 border-t-2 border-neo-black/20 pt-1.5">
+                    <Avatar
+                      avatarImage={originalPlayer?.avatar?.avatarImage}
+                      customAvatar={originalPlayer?.avatar?.customAvatar}
+                      size="md"
+                      className="shrink-0 border-2 border-neo-black"
+                    />
+                    <p
+                      data-testid="spotlight-name"
+                      className="min-w-0 flex-1 text-[clamp(0.85rem,1.6vh,1.05rem)] font-black leading-tight text-neo-black [overflow-wrap:anywhere]"
+                    >
                       {player.username}
                     </p>
-                    <p className="font-black text-neo-black/80 text-sm whitespace-nowrap">
+                    <p className="shrink-0 font-neo-display text-[clamp(0.9rem,1.7vh,1.15rem)] font-black text-neo-black">
                       {keyStat.formatted}
                     </p>
                   </div>
@@ -169,21 +132,6 @@ const TvResultsPlayerSpotlight = memo<TvResultsPlayerSpotlightProps>(({
             })}
           </div>
 
-          {/* "+X more" indicator */}
-          {remaining > 0 && (
-            <m.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: MAX_VISIBLE * 0.15 + 0.3 }}
-              className="text-sm font-bold text-neo-cream/60 text-center mt-2"
-            >
-              {t(remaining === 1
-                ? 'tvResults.spotlight.andMore'
-                : 'tvResults.spotlight.andMorePlural',
-                { count: remaining }
-              )}
-            </m.p>
-          )}
         </m.div>
       )}
     </AnimatePresence>

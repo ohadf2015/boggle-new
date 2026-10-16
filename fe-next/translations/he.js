@@ -4786,6 +4786,8 @@ const he = {
   "tvResults": {
     "installHeading": "📱 קחו הביתה",
     "installCta": "סרקו · הורידו מ‑Google Play",
+    "roundOf": "סיבוב {current} מתוך {total}",
+    "wpm": "מילים לדקה",
     "title": "יש לנו מנצח!",
     "champion": "אלוף",
     "runnerUp": "סגן אלוף",

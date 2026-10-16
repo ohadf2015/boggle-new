@@ -4802,6 +4802,8 @@ const es = {
   "tvResults": {
     "installHeading": "LLÉVATELO 📱",
     "installCta": "Escanea · Disponible en Google Play",
+    "roundOf": "Ronda {current} de {total}",
+    "wpm": "pal/min",
     "title": "¡TENEMOS UN GANADOR!",
     "champion": "Campeón",
     "runnerUp": "Segundo lugar",

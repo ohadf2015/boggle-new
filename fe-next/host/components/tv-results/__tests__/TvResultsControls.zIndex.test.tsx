@@ -29,20 +29,18 @@ describe('TvResultsControls - Z-Index Visibility', () => {
     t: mockT,
   };
 
-  it('should have z-index higher than footer (z-10)', () => {
+  it('sits above the footer (z-10) and the results root (z-60) while staying in flow', () => {
     // GIVEN: TV results controls are rendered
-    const { container } = render(<TvResultsControls {...defaultProps} />);
+    const { getByTestId } = render(<TvResultsControls {...defaultProps} />);
 
-    // WHEN: Checking the controls bar z-index
-    const controlsBar = container.querySelector('[class*="fixed"][class*="bottom-0"]');
+    // WHEN: Checking the dock
+    const dock = getByTestId('tv-results-dock');
 
-    // THEN: Controls bar should exist
-    expect(controlsBar).toBeInTheDocument();
+    // THEN: It is in normal flow, so the stage above is never painted underneath it
+    expect(dock.className).not.toMatch(/\bfixed\b|\babsolute\b/);
 
-    // THEN: Controls should have z-index >= 70 to be above footer (z-10)
-    // and above TvResultsView container (z-60)
-    const zIndexClass = controlsBar?.className.match(/z-\[(\d+)\]/)?.[1];
-    expect(zIndexClass).toBeDefined();
+    // THEN: Its z-index still clears the footer and the results root
+    const zIndexClass = dock.className.match(/z-\[(\d+)\]/)?.[1];
     expect(parseInt(zIndexClass || '0', 10)).toBeGreaterThanOrEqual(70);
   });
 
@@ -91,12 +89,9 @@ describe('TvResultsControls - Z-Index Visibility', () => {
       ...defaultProps,
       visible: false,
     };
-    const { container } = render(<TvResultsControls {...props} />);
-
-    // WHEN: Checking for controls bar
-    const controlsBar = container.querySelector('[class*="fixed"][class*="bottom-0"]');
+    const { queryByTestId } = render(<TvResultsControls {...props} />);
 
     // THEN: Controls should not be rendered
-    expect(controlsBar).not.toBeInTheDocument();
+    expect(queryByTestId('tv-results-dock')).not.toBeInTheDocument();
   });
 });

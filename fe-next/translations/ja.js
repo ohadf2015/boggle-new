@@ -4743,6 +4743,8 @@ const ja = {
   "tvResults": {
     "installHeading": "スマホでも 📱",
     "installCta": "スキャンして Google Play で入手",
+    "roundOf": "ラウンド {current}/{total}",
+    "wpm": "語/分",
     "title": "勝者誕生!",
     "champion": "チャンピオン",
     "runnerUp": "準優勝",

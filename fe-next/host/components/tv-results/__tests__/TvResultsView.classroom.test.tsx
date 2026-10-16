@@ -21,6 +21,7 @@ import type { PlayerResult } from '@/types/components';
 vi.mock('framer-motion', () => ({
   m: { div: 'div', p: 'p', h1: 'h1', h2: 'h2', span: 'span', header: 'header', section: 'section', li: 'li' },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  MotionConfig: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useReducedMotion: () => true,
 }));
 

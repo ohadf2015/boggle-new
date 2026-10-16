@@ -5,6 +5,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import { Play, SkipForward, QrCode, Users } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { cn } from '../../../lib/utils';
+import TvResultsReadyStrip, { type ReadyPlayer } from './TvResultsReadyStrip';
 
 const MIN_WAIT_MS = 15_000;
 
@@ -19,12 +20,14 @@ interface TvResultsControlsProps {
   onStartNewGame: () => void;
   onNextRound: () => void;
   onShowQR: () => void;
+  /** Every player with their ready state; when present the dock shows faces instead of a bare count. */
+  readyPlayers?: ReadyPlayer[];
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
 /**
  * TvResultsControls - Host controls bar at bottom of TV results
- * Shows start game button, players ready indicator, and QR code access
+ * In normal flow (not fixed) so the stage above it is never painted underneath.
  */
 const TvResultsControls = memo<TvResultsControlsProps>(({
   visible,
@@ -37,6 +40,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
   onStartNewGame,
   onNextRound,
   onShowQR,
+  readyPlayers,
   t,
 }) => {
   const allReady = playersReadyCount === totalPlayers && totalPlayers > 0;
@@ -64,109 +68,72 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
   // Unlock when EITHER all players ready OR 15s elapsed.
   const continueDisabled = gateLocked && !(totalPlayers > 0 && allReady);
 
+  const ctaLabel = showNextRound ? t('tvResults.nextRound') : t('tvResults.startNewGame');
+
   return (
     <AnimatePresence>
       {visible && (
         <m.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 50, opacity: 0 }}
+          data-testid="tv-results-dock"
+          initial={{ y: 80 }}
+          animate={{ y: 0 }}
+          exit={{ y: 80 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          className="fixed bottom-0 left-0 right-0 z-[70] bg-linear-to-t from-slate-900 via-slate-900/95 to-transparent pt-8 pb-6 px-6"
+          className="relative z-[70] shrink-0 border-t-4 border-neo-black bg-neo-navy-light px-6 py-3"
         >
-          <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
-            {/* Skip Button (only during animation) */}
-            <div className="flex-1">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-6">
+            <div className="flex min-w-0 items-center gap-4">
               {isAnimating && (
-                <m.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
+                <Button
+                  onClick={onSkip}
+                  variant="outline"
+                  className="shrink-0 border-3 border-neo-cream/60 bg-neo-navy font-black uppercase text-neo-cream hover:bg-neo-navy-elevated"
                 >
-                  <Button
-                    onClick={onSkip}
-                    variant="outline"
-                    className="bg-transparent border-2 border-neo-cream/50 text-neo-cream hover:bg-neo-cream/10"
-                  >
-                    <SkipForward className="w-5 h-5 me-2" />
-                    {t('tvResults.skip')}
-                  </Button>
-                </m.div>
+                  <SkipForward className="me-2 h-5 w-5" />
+                  {t('tvResults.skip')}
+                </Button>
               )}
-            </div>
-
-            {/* Center: Main CTA */}
-            <div className="flex items-center gap-4">
-              {/* Players Ready Indicator */}
-              {totalPlayers > 0 && (
-                <m.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
+              {readyPlayers && readyPlayers.length > 0 ? (
+                <TvResultsReadyStrip players={readyPlayers} t={t} />
+              ) : totalPlayers > 0 && (
+                <div
                   className={cn(
-                    'flex items-center gap-2 px-4 py-2 rounded-neo border-3 border-neo-black',
+                    'flex items-center gap-2 rounded-neo border-3 border-neo-black px-4 py-2',
                     allReady ? 'bg-neo-lime' : 'bg-neo-yellow'
                   )}
                 >
-                  <Users className="w-5 h-5 text-neo-black" />
-                  <span className="font-black text-neo-black">
-                    {playersReadyCount}/{totalPlayers}
-                  </span>
-                  <span className="font-bold text-neo-black/70 text-sm">
-                    {t('tvResults.playersReady')}
-                  </span>
-                  {allReady && (
-                    <m.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="text-lg"
-                    >
-                      🎉
-                    </m.span>
-                  )}
-                </m.div>
+                  <Users className="h-5 w-5 text-neo-black" />
+                  <span className="font-black text-neo-black">{playersReadyCount}/{totalPlayers}</span>
+                  <span className="text-sm font-bold text-neo-black/70">{t('tvResults.playersReady')}</span>
+                </div>
               )}
-
-              {/* Start New Game / Next Round Button */}
-              <m.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
-              >
-                <Button
-                  onClick={showNextRound ? onNextRound : onStartNewGame}
-                  disabled={continueDisabled}
-                  className={cn(
-                    'h-14 px-8 text-lg font-black uppercase',
-                    'bg-neo-lime text-neo-black border-4 border-neo-black',
-                    'shadow-hard-lg hover:shadow-hard-xl',
-                    'hover:translate-x-[-3px] hover:translate-y-[-3px]',
-                    'active:shadow-hard active:translate-x-px active:translate-y-px',
-                    'transition-all',
-                    continueDisabled && 'opacity-60 cursor-not-allowed hover:translate-x-0 hover:translate-y-0 hover:shadow-hard-lg'
-                  )}
-                >
-                  <Play className="w-6 h-6 me-2" />
-                  {gateLocked
-                    ? `${showNextRound ? t('tvResults.nextRound') : t('tvResults.startNewGame')} (${secondsLeft}s)`
-                    : (showNextRound ? t('tvResults.nextRound') : t('tvResults.startNewGame'))}
-                </Button>
-              </m.div>
             </div>
 
-            {/* QR Code Button */}
-            <div className="flex-1 flex justify-end">
-              <m.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
+            <Button
+              onClick={showNextRound ? onNextRound : onStartNewGame}
+              disabled={continueDisabled}
+              className={cn(
+                'h-16 px-10 font-neo-display text-2xl font-black uppercase',
+                'border-4 border-neo-black bg-neo-lime text-neo-black shadow-hard-lg',
+                'hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-hard-xl',
+                'active:translate-x-px active:translate-y-px active:shadow-hard',
+                'transition-transform',
+                continueDisabled && 'cursor-not-allowed opacity-60 hover:translate-x-0 hover:translate-y-0 hover:shadow-hard-lg'
+              )}
+            >
+              <Play className="me-3 h-7 w-7" />
+              {gateLocked ? `${ctaLabel} (${secondsLeft}s)` : ctaLabel}
+            </Button>
+
+            <div className="flex justify-end">
+              <Button
+                onClick={onShowQR}
+                variant="outline"
+                className="h-12 border-3 border-neo-cream/60 bg-neo-navy px-5 font-black uppercase text-neo-cream hover:bg-neo-navy-elevated"
               >
-                <Button
-                  onClick={onShowQR}
-                  variant="outline"
-                  className="bg-transparent border-2 border-neo-cream/50 text-neo-cream hover:bg-neo-cream/10"
-                >
-                  <QrCode className="w-5 h-5 me-2" />
-                  {t('tvResults.qrCode')}
-                </Button>
-              </m.div>
+                <QrCode className="me-2 h-6 w-6" />
+                {t('tvResults.qrCode')}
+              </Button>
             </div>
           </div>
         </m.div>

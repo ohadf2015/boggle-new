@@ -36,10 +36,10 @@ const TvInstallQr = memo<TvInstallQrProps>(({ language, t }) => {
 
   return (
     <m.div
-      initial={{ opacity: 0, scale: 0.85 }}
-      animate={{ opacity: 1, scale: 1 }}
+      initial={{ scale: 0.85 }}
+      animate={{ scale: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 24, delay: 0.4 }}
-      className="absolute top-4 start-4 z-[70] flex items-center gap-3 rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-2 shadow-hard"
+      className="flex items-center gap-3 rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-2 shadow-hard"
     >
       <div className="text-start max-w-[8rem]">
         <p className="font-neo-display text-sm font-black uppercase leading-tight tracking-tight text-neo-black">
@@ -49,8 +49,14 @@ const TvInstallQr = memo<TvInstallQrProps>(({ language, t }) => {
           {t('tvResults.installCta')}
         </p>
       </div>
-      <div className="rounded-md border-2 border-neo-black bg-white p-1.5">
-        <QRCodeSVG value={installUrl} size={72} level="M" bgColor="#ffffff" fgColor="#000000" />
+      <div className="rounded-md border-2 border-neo-black bg-neo-white p-1.5">
+        <QRCodeSVG
+          value={installUrl}
+          size={60}
+          level="M"
+          bgColor="#ffffff"
+          fgColor="#000000"
+        />
       </div>
     </m.div>
   );

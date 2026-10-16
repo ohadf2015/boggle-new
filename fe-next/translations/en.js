@@ -4343,6 +4343,8 @@ const en = {
   "tvResults": {
     "installHeading": "TAKE IT HOME 📱",
     "installCta": "Scan · Get it on Google Play",
+    "roundOf": "Round {current} of {total}",
+    "wpm": "wpm",
     "title": "WE HAVE A WINNER!",
     "champion": "Champion",
     "runnerUp": "Runner up",
