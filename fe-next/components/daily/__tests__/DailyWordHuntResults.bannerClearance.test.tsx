@@ -138,7 +138,6 @@ vi.mock('../results', () => ({
   RankBadge: () => <div data-testid="rank-badge" />,
   MoreOptionsAccordion: () => <div data-testid="more-options" />,
   SharePanel: () => <div data-testid="share-panel" />,
-  EmojiShareCard: () => <div data-testid="emoji-share-card" />,
   DailyWordHuntFacts: () => <div data-testid="daily-word-hunt-facts" />,
   StatsBlurb: () => <div data-testid="stats-blurb" />,
   StreakFreezeIndicator: () => <div data-testid="streak-freeze-indicator" />,

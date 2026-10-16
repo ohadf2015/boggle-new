@@ -36,7 +36,6 @@ vi.mock('../results', () => ({
   StatsBlurb: () => <div data-testid="stats-blurb" />,
   PastPerformanceCompare: () => <div data-testid="past-performance-compare" />,
   DailyWordHuntFacts: () => <div data-testid="facts" />,
-  EmojiShareCard: () => <div data-testid="emoji-share" />,
   ShareSection: () => <div data-testid="share-section" />,
   CoinUnlockCard: () => <div data-testid="coin-unlock" />,
   MoreOptionsAccordion: () => <div data-testid="more-options" />,
@@ -74,7 +73,6 @@ const baseProps: WordHuntResultsContentProps = {
   isNewCompletion: true,
   survivalBonusTime: 2,
   rarestWord: null,
-  emojiWords: [],
   stats: null,
   shareHandlers: {
     handleNativeShare: vi.fn(), handleChallengeShare: vi.fn(), handleWhatsApp: vi.fn(),

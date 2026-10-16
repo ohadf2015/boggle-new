@@ -31,7 +31,6 @@ vi.mock('../results', () => ({
   PerformanceSection: () => <div data-testid="performance-section" />,
   RankBadge: () => <div data-testid="rank-badge" />,
   DailyWordHuntFacts: () => <div data-testid="facts" />,
-  EmojiShareCard: () => <div data-testid="emoji-share" />,
   ShareSection: () => <div data-testid="share-section" />,
   CoinUnlockCard: () => <div data-testid="coin-unlock" />,
   MoreOptionsAccordion: () => <div data-testid="more-options" />,
@@ -98,7 +97,6 @@ const baseProps: WordHuntResultsContentProps = {
   isNewCompletion: true,
   survivalBonusTime: 2,
   rarestWord: null,
-  emojiWords: [{ word: 'HELLO', found: true }],
   stats: null,
   shareHandlers: {
     handleNativeShare: vi.fn(),
@@ -167,14 +165,14 @@ describe('WordHuntResultsContent', () => {
     expect(screen.queryByTestId('mascot')).toBeNull();
   });
 
-  // Reversed (2026-09-20): a prior round of this test asserted the grid was
-  // gone as "redundant, info already in hero". That call was overturned — the
-  // emoji grid is the spoiler-free artifact that leaves the app, not a restated
-  // scoreboard, and this product's growth depends on it being shareable. See
-  // DailyWordHuntResults.emojiCard.test.tsx for the pinned "must render" case.
-  it('renders emoji-share-card as the shareable artifact', () => {
+  // Reversed again (2026-10-16, owner call): the recap card duplicated the
+  // ShareSection directly under it — two share surfaces stacked on one screen.
+  // ShareSection (native share, challenge link, image, WhatsApp/X/Telegram/copy)
+  // is the single share path now.
+  it('does not render the duplicate emoji share card — ShareSection is the only share surface', () => {
     render(<WordHuntResultsContent {...baseProps} />);
-    expect(screen.getByTestId('emoji-share')).toBeInTheDocument();
+    expect(screen.queryByTestId('emoji-share')).toBeNull();
+    expect(screen.getByTestId('share-section')).toBeInTheDocument();
   });
 
   // Regression for the gauntlet subtraction: CatchUpSuggestion, RivalCompareCard,
@@ -208,13 +206,12 @@ describe('WordHuntResultsContent', () => {
       expect(screen.getByTestId('signup-line')).toBeInTheDocument();
     });
 
-    // Pins the call that cost a round: the signup nudge must never suppress the
-    // one growth mechanic that works at this size (spoiler-free shareable
-    // grid). A guest who has NOT dismissed the nudge still gets the emoji grid
-    // and a share action — this is the regression guard for that decision.
-    it('gives a guest who has not dismissed the nudge the emoji grid and a share action', () => {
+    // The signup nudge must never suppress sharing: ~90% of daily players are
+    // guests. A guest who has NOT dismissed the nudge still gets the share
+    // action — and only the one (the duplicate recap card is gone here too).
+    it('gives a guest who has not dismissed the nudge a single share action', () => {
       render(<WordHuntResultsContent {...guestProps} />);
-      expect(screen.getByTestId('emoji-share')).toBeInTheDocument();
+      expect(screen.queryByTestId('emoji-share')).toBeNull();
       expect(screen.getByTestId('share-section')).toBeInTheDocument();
     });
 
