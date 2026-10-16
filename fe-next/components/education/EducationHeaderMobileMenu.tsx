@@ -52,7 +52,7 @@ export function EducationHeaderMobileMenu({
         ref={paneRef}
         className={cn(
           'fixed top-0 bottom-0 w-[280px] max-w-[85vw] z-80 sm:hidden',
-          'bg-neo-cream dark:bg-neo-navy border-neo-black dark:border-slate-600',
+          'bg-neo-navy border-neo-cream/40',
           'shadow-hard-xl overflow-y-auto',
           'pb-[max(env(safe-area-inset-bottom),1rem)]',
           'animate-in duration-300',
@@ -62,8 +62,8 @@ export function EducationHeaderMobileMenu({
         )}
       >
         {/* Pane Header */}
-        <div className="flex items-center justify-between p-4 border-b-3 border-neo-black/20 dark:border-slate-600">
-          <span className="text-lg font-bold text-neo-black dark:text-white">
+        <div className="flex items-center justify-between p-4 border-b-3 border-neo-cream/30">
+          <span className="text-lg font-bold text-neo-white">
             {t('education.header.menu')}
           </span>
           <button
@@ -71,8 +71,8 @@ export function EducationHeaderMobileMenu({
             className={cn(
               'flex items-center justify-center',
               'min-w-[48px] min-h-[48px] w-12 h-12',
-              'bg-neo-cream dark:bg-neo-navy text-neo-black dark:text-white',
-              'border-3 border-neo-black dark:border-neo-cream',
+              'bg-neo-navy text-neo-white',
+              'border-3 border-neo-cream/40',
               'rounded-neo shadow-hard-sm',
               'active:translate-x-px active:translate-y-px active:shadow-none',
               'transition-all duration-100'
@@ -87,19 +87,19 @@ export function EducationHeaderMobileMenu({
         <div className="flex flex-col gap-3 p-4">
           {/* Language Section */}
           <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white uppercase tracking-wide">
+            <span className="text-xs font-bold text-neo-white/80 uppercase tracking-wide">
               {t('settings.language')}
             </span>
-            <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black dark:border-neo-cream bg-neo-cream dark:bg-neo-navy">
+            <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-cream bg-neo-navy">
               <QuickLanguageSwitcher showLabel />
             </div>
           </div>
 
-          <div className="h-0.5 bg-neo-black/20 dark:bg-neo-navy-light rounded-full" />
+          <div className="h-0.5 bg-neo-cream/20 rounded-full" />
 
           {/* Navigation Section */}
           <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white uppercase tracking-wide">
+            <span className="text-xs font-bold text-neo-white/80 uppercase tracking-wide">
               {t('education.header.navigation')}
             </span>
 
@@ -112,7 +112,7 @@ export function EducationHeaderMobileMenu({
                   'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
                   isOnTeacherSection
                     ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard'
-                    : 'bg-neo-cream dark:bg-neo-navy hover:bg-neo-cyan/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white border-neo-black dark:border-neo-cream shadow-hard-sm hover:shadow-hard'
+                    : 'bg-neo-navy-light hover:bg-neo-cyan/20 text-neo-white border-neo-cream/40 shadow-hard-sm hover:shadow-hard'
                 )}
               >
                 <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-cyan/50 border-3 border-neo-black text-neo-black">
@@ -127,7 +127,7 @@ export function EducationHeaderMobileMenu({
                 onNavigate={onClose}
                 className={cn(
                   'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
-                  'bg-neo-cream dark:bg-neo-navy hover:bg-neo-lime/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white border-neo-black dark:border-neo-cream shadow-hard-sm hover:shadow-hard',
+                  'bg-neo-navy-light hover:bg-neo-lime/20 text-neo-white border-neo-cream/40 shadow-hard-sm hover:shadow-hard',
                 )}
               />
             )}
@@ -141,7 +141,7 @@ export function EducationHeaderMobileMenu({
                   'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
                   isOnStudentSection
                     ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard'
-                    : 'bg-neo-cream dark:bg-neo-navy hover:bg-neo-cyan/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white border-neo-black dark:border-neo-cream shadow-hard-sm hover:shadow-hard'
+                    : 'bg-neo-navy-light hover:bg-neo-cyan/20 text-neo-white border-neo-cream/40 shadow-hard-sm hover:shadow-hard'
                 )}
               >
                 <span className="flex items-center justify-center w-7 h-7 rounded-neo bg-neo-pink border-3 border-neo-black text-neo-black">
@@ -156,8 +156,8 @@ export function EducationHeaderMobileMenu({
               href={`/${language}/education`}
               onClick={() => onClose()}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-neo-cream transition-all w-full',
-                'bg-neo-cream dark:bg-neo-navy hover:bg-neo-lime/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white',
+                'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-cream/40 transition-all w-full',
+                'bg-neo-navy-light hover:bg-neo-lime/20 text-neo-white',
                 'shadow-hard-sm hover:shadow-hard'
               )}
             >
@@ -170,11 +170,11 @@ export function EducationHeaderMobileMenu({
 
           {isAuthenticated && (
             <>
-              <div className="h-0.5 bg-neo-black/20 dark:bg-neo-navy-light rounded-full" />
+              <div className="h-0.5 bg-neo-cream/20 rounded-full" />
 
               {/* Account Section */}
               <div className="flex flex-col gap-2">
-                <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white uppercase tracking-wide">
+                <span className="text-xs font-bold text-neo-white/80 uppercase tracking-wide">
                   {t('common.account')}
                 </span>
 
@@ -182,8 +182,8 @@ export function EducationHeaderMobileMenu({
                 <button
                   onClick={onSignOut}
                   className={cn(
-                    'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-neo-cream transition-all w-full',
-                    'bg-neo-cream dark:bg-neo-navy hover:bg-neo-pink/30 dark:hover:bg-neo-navy-light text-neo-black dark:text-white',
+                    'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-cream/40 transition-all w-full',
+                    'bg-neo-navy-light hover:bg-neo-pink/20 text-neo-white',
                     'shadow-hard-sm hover:shadow-hard'
                   )}
                 >
@@ -196,7 +196,7 @@ export function EducationHeaderMobileMenu({
             </>
           )}
 
-          <div className="h-0.5 bg-neo-black/20 dark:bg-neo-navy-light rounded-full" />
+          <div className="h-0.5 bg-neo-cream/20 rounded-full" />
 
           {/* Leave Education Section — rendered for EVERY user, including
               unauthenticated guest students, who have no other escape
@@ -205,7 +205,7 @@ export function EducationHeaderMobileMenu({
               no shadow-hard, transparent fill) so it never reads as the
               primary action next to "Education Home". */}
           <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white uppercase tracking-wide">
+            <span className="text-xs font-bold text-neo-white/80 uppercase tracking-wide">
               {t('common.leave')}
             </span>
 
@@ -214,11 +214,11 @@ export function EducationHeaderMobileMenu({
               href={exitHref}
               onClick={() => onClose()}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-neo-cream/40 transition-all w-full',
-                'bg-transparent dark:bg-transparent hover:bg-black/5 dark:hover:bg-white/10 text-neo-black dark:text-white'
+                'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-cream/40 transition-all w-full',
+                'bg-transparent hover:bg-neo-cream/10 text-neo-white'
               )}
             >
-              <span className="flex items-center justify-center w-6 h-6 text-neo-black/60 dark:text-neo-cream/60">
+              <span className="flex items-center justify-center w-6 h-6 text-neo-cream/60">
                 <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               </span>
               <span>{t('education.header.exitEducation')}</span>

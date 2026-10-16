@@ -28,9 +28,9 @@ import { educationBackHref } from '@/lib/navigation/educationBackHref';
  * Spelled out in full: Tailwind v4 only emits class names it can read verbatim.
  */
 const UTILITY_BAR = [
-  'bg-neo-black/5 dark:bg-neo-cream/5',
-  '[&>*>button]:border-0! [&>*>button]:shadow-none! [&>*>button]:bg-transparent! [&>*>button]:translate-none! [&>*>button]:rounded-neo! [&>*>button]:text-neo-black! [&>*>button]:dark:text-neo-cream! [&>*>button]:hover:bg-neo-black/10! [&>*>button]:dark:hover:bg-neo-cream/15!',
-  '[&>*>*>button]:border-0! [&>*>*>button]:shadow-none! [&>*>*>button]:bg-transparent! [&>*>*>button]:translate-none! [&>*>*>button]:rounded-neo! [&>*>*>button]:text-neo-black! [&>*>*>button]:dark:text-neo-cream! [&>*>*>button]:hover:bg-neo-black/10! [&>*>*>button]:dark:hover:bg-neo-cream/15!',
+  'bg-neo-cream/5',
+  '[&>*>button]:border-0! [&>*>button]:shadow-none! [&>*>button]:bg-transparent! [&>*>button]:translate-none! [&>*>button]:rounded-neo! [&>*>button]:text-neo-cream! [&>*>button]:hover:bg-neo-cream/15!',
+  '[&>*>*>button]:border-0! [&>*>*>button]:shadow-none! [&>*>*>button]:bg-transparent! [&>*>*>button]:translate-none! [&>*>*>button]:rounded-neo! [&>*>*>button]:text-neo-cream! [&>*>*>button]:hover:bg-neo-cream/15!',
 ].join(' ');
 
 interface EducationHeaderProps {
@@ -143,7 +143,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
       className={cn(
         'w-full mb-1 sm:mb-2 lg:mb-3 px-2 sm:px-3 lg:px-4 pb-1 lg:pb-2',
         'sticky lg:static',
-        'z-[60] bg-neo-cream dark:bg-neo-navy',
+        'z-[60] bg-neo-navy',
         'min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]',
         className
       )}
@@ -157,9 +157,9 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           'w-full mx-auto',
           'flex items-center justify-between',
           'px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5',
-          'bg-neo-white/90 dark:bg-neo-navy',
+          'bg-neo-navy',
           'backdrop-blur-md',
-          'border-4 lg:border-4 border-neo-black',
+          'border-4 lg:border-4 border-neo-cream/40',
           'shadow-hard-lg',
           'rounded-neo-lg',
           'transition-all duration-100',
@@ -167,7 +167,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
         )}
       >
         {/* Left Section: Back button + Logo */}
-        <div className={cn('flex min-w-0 items-center gap-2 sm:gap-3', isRTL && 'flex-row-reverse')}>
+        <div className={cn('flex min-w-0 items-center gap-2 sm:gap-3')}>
           {/* Back Button (optional) */}
           {showBackButton && (
             <button
@@ -175,8 +175,8 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               className={cn(
                 'flex items-center justify-center',
                 'w-10 h-10 min-w-[40px] min-h-[40px]',
-                'bg-neo-cream text-neo-black dark:bg-neo-navy dark:text-white',
-                'border-3 border-neo-black dark:border-neo-cream',
+                'bg-neo-navy text-neo-white',
+                'border-3 border-neo-cream',
                 'rounded-neo shadow-hard-sm',
                 'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
                 'active:translate-x-px active:translate-y-px active:shadow-none',
@@ -217,7 +217,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               <span
                 className={cn(
                   'truncate text-lg sm:text-xl lg:text-2xl font-black uppercase tracking-tight',
-                  'text-neo-black dark:text-neo-white',
+                  'text-neo-white',
                   'leading-none',
                   !title && 'hidden sm:block'
                 )}
@@ -226,7 +226,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               </span>
               {!title && (
                 <span data-testid="edu-header-phone-title" className="flex min-w-0 flex-col leading-none sm:hidden">
-                  <span className="truncate text-lg font-black uppercase tracking-tight text-neo-black dark:text-neo-white">
+                  <span className="truncate text-lg font-black uppercase tracking-tight text-neo-white">
                     {t('eg2Polish.header.brand')}
                   </span>
                   <span className="truncate text-[0.65rem] font-black uppercase tracking-wide text-neo-cyan">
@@ -238,7 +238,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 className={cn(
                   'hidden sm:block',
                   'text-xs sm:text-sm font-bold uppercase tracking-wide',
-                  'text-neo-cyan dark:text-neo-cyan',
+                  'text-neo-cyan',
                   'leading-none'
                 )}
               >
@@ -277,7 +277,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               <span className="hidden sm:flex">
                 <SearchIconButton />
               </span>
-              <span aria-hidden="true" className="mx-1 hidden h-6 w-px bg-neo-black/20 sm:block dark:bg-neo-cream/25" />
+              <span aria-hidden="true" className="mx-1 hidden h-6 w-px bg-neo-cream/25 sm:block" />
             </>
           )}
 

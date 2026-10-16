@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import { NoAccountCta } from '@/components/education/NoAccountCta';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { getForSchoolsContent, EDUCATION_LOCALES, type EducationLocale } from './content';
 import { ForSchoolsPackages } from '@/components/education/EducationPackages';
@@ -87,7 +89,7 @@ export default async function Page({ params }: PageProps) {
   });
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+    <main className="relative min-h-dvh overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
       <JsonLd data={faqJsonLd} />
       <JsonLd data={orgJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
@@ -98,7 +100,7 @@ export default async function Page({ params }: PageProps) {
         {/* Hero */}
         <section className="grid items-center gap-10 lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
+            <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
               {c.heroTag}
             </span>
             <h1 className="mt-5 font-neo-display text-5xl font-black leading-[0.95] tracking-tight sm:text-6xl">
@@ -111,7 +113,7 @@ export default async function Page({ params }: PageProps) {
             <NoAccountCta locale={locale} className="mt-7" />
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href={`/${locale}/education/classroom-game`} data-ph-capture-attribute-cta="hero_free_game" className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
+              <Link href={`/${locale}/education/classroom-game`} data-ph-capture-attribute-cta="hero_free_game" className="rounded-neo border-4 border-neo-black bg-neo-lime px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
                 {c.heroCta1}
               </Link>
               <a href="#lead" data-ph-capture-attribute-cta="hero_tell_us" className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
@@ -145,9 +147,9 @@ export default async function Page({ params }: PageProps) {
           <h2 className="font-neo-display text-3xl font-black sm:text-4xl">{c.compareTitle}</h2>
           <p className="mt-3 max-w-3xl text-neo-gray-200">{c.compareIntro}</p>
           <div className="mt-6 overflow-x-auto">
-            <table className="w-full border-collapse text-left text-sm">
+            <table className="w-full border-collapse text-start text-sm">
               <thead>
-                <tr className="border-b-3 border-neo-black font-neo-display">
+                <tr className="border-b-2 border-neo-cream/30 font-neo-display">
                   <th className="p-3">{c.compareHeaders.tool}</th>
                   <th className="p-3">{c.compareHeaders.theirFreeTier}</th>
                   <th className="p-3 text-neo-lime">LexiClash</th>
@@ -165,9 +167,10 @@ export default async function Page({ params }: PageProps) {
             </table>
           </div>
           <p className="mt-3 text-xs text-neo-gray-300">
-            Want the full breakdown?{' '}
-            <Link href={`/${locale}/lexiclash-vs-kahoot`} className="text-neo-cyan underline underline-offset-2 hover:text-neo-lime">
-              LexiClash vs Kahoot — feature-by-feature comparison →
+            {c.compareBreakdownPrompt}{' '}
+            <Link href={`/${locale}/lexiclash-vs-kahoot`} className="inline-flex items-center gap-1 text-neo-cyan underline underline-offset-2 hover:text-neo-lime">
+              <span>{c.compareBreakdownCta}</span>
+              <DirectionalIcon icon={ArrowRight} className="inline size-4" />
             </Link>
           </p>
         </section>

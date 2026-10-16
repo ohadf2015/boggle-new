@@ -73,7 +73,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
       }}
       aria-label={`${t('sitemap.wordWheel', 'Word Wheel')} #${puzzleNumber}`}
       className={cn(
-        'group relative overflow-hidden rounded-neo-xl border-neo-thick border-black bg-neo-navy-light shadow-hard-lg',
+        'group relative overflow-hidden rounded-neo-xl border-neo-thick border-neo-yellow bg-neo-navy-light shadow-hard-lg',
         'transition-[transform,box-shadow] duration-100 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
         wheelStyles.hero,
@@ -108,8 +108,8 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
             <span
               key={i}
               className={cn(
-                'h-[15px] w-[15px] rounded-[3px] border-[1.5px] border-black md:h-7 md:w-7 md:rounded-[5px] md:border-2',
-                filled ? 'bg-neo-yellow' : 'bg-neo-navy/60',
+                'h-[15px] w-[15px] rounded-[3px] border-[1.5px] md:h-7 md:w-7 md:rounded-[5px] md:border-2',
+                filled ? 'border-black bg-neo-yellow' : 'border-neo-cream/40 bg-neo-navy/60',
               )}
             />
           ))}
@@ -134,7 +134,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
         ) : (
           <span
             data-testid="daily-cta"
-            className={cn(CTA_BAR, anyPlayed ? 'bg-neo-navy text-neo-cream' : 'bg-neo-lime text-neo-navy')}
+            className={cn(CTA_BAR, anyPlayed ? 'border-neo-cream/40 bg-neo-navy text-neo-cream' : 'bg-neo-lime text-neo-navy')}
           >
             {anyPlayed ? (
               <>

@@ -122,7 +122,7 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
             {data.topPerformers.map((performer, index) => (
               <li
                 key={performer.studentId}
-                className="flex items-center gap-3 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light p-3 shadow-hard-sm"
+                className="flex items-center gap-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 shadow-hard-sm"
               >
                 <span
                   aria-hidden="true"
@@ -166,7 +166,7 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
 
       <section>
         <SectionTitle>{t('teacher.reports.sections.studentRankings')}</SectionTitle>
-        <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/25">
+        <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-neo-navy text-neo-cream/80">

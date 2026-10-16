@@ -73,10 +73,10 @@ export function PlanComparisonMatrix({ compact = false }: { compact?: boolean } 
       {/* Horizontal scroll container, not a squeeze: at 390px three columns of short values
           fit, but a long row label in German-length Swedish or Russian would otherwise force
           the whole page body to scroll sideways. Keep the overflow on the wrapper. */}
-      <div className="overflow-x-auto rounded-neo border-neo border-black shadow-hard">
+      <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light shadow-hard">
         <table className="w-full border-collapse bg-neo-navy-light text-start">
           <thead>
-            <tr className="border-b-2 border-black">
+            <tr className="border-b-2 border-neo-cream/40 bg-neo-navy">
               <th
                 scope="col"
                 className={`${pad} text-start font-neo-display font-black text-neo-white/80 text-sm sm:text-base`}

@@ -1,5 +1,6 @@
 'use client';
 
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useState, useEffect, useRef } from 'react';
 import nextDynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -242,7 +243,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                         }}
                         className="inline-flex items-center justify-center gap-1 text-sm font-black text-neo-black underline decoration-2 underline-offset-2"
                       >
-                        {t('eg2Pro.plans.askSchool')} <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden />
+                        {t('eg2Pro.plans.askSchool')} <DirectionalIcon icon={ArrowRight} className="h-3.5 w-3.5" />
                       </button>
                     )
                   }

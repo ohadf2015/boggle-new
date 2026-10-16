@@ -62,7 +62,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
       }}
       style={{ '--i': index, '--art-scale': model.imgScale ?? 1, '--cube-glow': tint.glow } as CSSProperties}
       className={cn(
-        'group relative block overflow-hidden rounded-neo border-[3px] border-black bg-neo-navy',
+        'group relative block overflow-hidden rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy',
         tint.shadow,
         'transition-[transform,box-shadow] duration-100 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
@@ -79,7 +79,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
             'absolute inset-0',
             // Phone row tile: the mascot sits in its own inset well rather than a
             // hard-ruled slab glued to the edge, so the card reads as one object.
-            !anchor && 'max-md:inset-y-2 max-md:start-2 max-md:end-auto max-md:w-[4.125rem] max-md:overflow-hidden max-md:rounded-neo max-md:border-2 max-md:border-black max-md:bg-black/30',
+            !anchor && 'max-md:inset-y-2 max-md:start-2 max-md:end-auto max-md:w-[4.125rem] max-md:overflow-hidden max-md:rounded-neo max-md:border-2 max-md:border-neo-cream/40 max-md:bg-black/30',
           )}
         >
         <Image
@@ -191,7 +191,7 @@ function MoreSheet({ extras, open, onClose }: { extras: ModeCubeModel[]; open: b
       }}
       onClose={onClose}
       onClick={(e) => e.target === e.currentTarget && onClose()}
-      className="mb-0 mt-auto w-full max-w-none rounded-t-neo-xl border-[3px] border-b-0 border-black bg-neo-navy p-0 text-neo-cream shadow-hard-lg backdrop:bg-black/70 md:m-auto md:max-w-2xl md:rounded-neo-xl md:border-b-[3px]"
+      className="mb-0 mt-auto w-full max-w-none rounded-t-neo-xl border-[3px] border-b-0 border-neo-cream/40 bg-neo-navy p-0 text-neo-cream shadow-hard-lg backdrop:bg-black/70 md:m-auto md:max-w-2xl md:rounded-neo-xl md:border-b-[3px]"
     >
       <div className="p-4 md:p-6">
         <div className="mb-4 flex items-center justify-between gap-3">
@@ -202,7 +202,7 @@ function MoreSheet({ extras, open, onClose }: { extras: ModeCubeModel[]; open: b
             type="button"
             onClick={onClose}
             aria-label={t('common.close')}
-            className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-black bg-neo-navy-light text-neo-cream shadow-hard-sm active:translate-y-px active:shadow-none"
+            className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-neo-cream/40 bg-neo-navy-light text-neo-cream shadow-hard-sm active:translate-y-px active:shadow-none"
           >
             <X className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
           </button>
@@ -268,7 +268,7 @@ export function HomeModeGrid({ models, extras, liveCount }: HomeModeGridProps) {
             aria-haspopup="dialog"
             onClick={() => setMoreOpen(true)}
             className={cn(
-              'flex h-11 w-[calc(100%-3.5rem)] md:w-full items-center gap-2.5 rounded-neo border-[3px] border-black bg-neo-navy-light px-2.5 text-start font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow] duration-100 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
+              'flex h-11 w-[calc(100%-3.5rem)] md:w-full items-center gap-2.5 rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light px-2.5 text-start font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow] duration-100 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
               'md:aspect-square md:h-auto md:flex-col md:justify-center md:gap-2 md:px-2 md:text-center',
             )}
           >

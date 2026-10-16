@@ -189,7 +189,7 @@ export function AccessRequestForm({
             type="button"
             data-testid="access-success-hq"
             onClick={() => void goToTeacherHq()}
-            className="w-full rounded-neo border-neo border-neo-navy/40 bg-neo-lime px-4 py-3 font-bold text-neo-navy font-neo-display shadow-hard-sm hover:shadow-hard"
+            className="w-full rounded-neo border-neo border-neo-navy bg-neo-lime px-4 py-3 font-bold text-neo-navy font-neo-display shadow-hard-sm hover:shadow-hard"
           >
             {t('education.access.go_to_teacher')}
           </button>

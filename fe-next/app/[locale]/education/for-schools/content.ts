@@ -51,6 +51,8 @@ export interface ForSchoolsContent {
   /** Comparison-table column headers. Previously hardcoded English. */
   compareHeaders: { tool: string; theirFreeTier: string };
   compareRows: ForSchoolsCompareRow[];
+  compareBreakdownPrompt: string;
+  compareBreakdownCta: string;
   comingTitle: string;
   comingIntro: string;
   coming: { title: string; body: string }[];
@@ -96,6 +98,8 @@ const EN: ForSchoolsContent = {
     { competitor: 'Vocabulary.com', freeTierLimit: 'No meaningful free tier for real classroom use -- paid plans required to get started.', lexiclash: 'Free for the whole class, no card required. Teacher Pro $9/mo adds analytics and reports.' },
     { competitor: 'Wordwall', freeTierLimit: 'Free tier limited to a small number of activity types.', lexiclash: 'Every activity, free for the whole class, up to 50 students. Teacher Pro $9/mo unlocks unlimited classes.' },
   ],
+  compareBreakdownPrompt: 'Want the full breakdown?',
+  compareBreakdownCta: 'LexiClash vs Kahoot — feature-by-feature comparison',
   comingTitle: 'On our roadmap for schools & districts',
   comingIntro:
     "These are the features schools tell us they need at scale. The classroom game and Teacher Pro's analytics and reports are shipping today -- the items below are not built yet. Tell us what your school needs and we'll follow up as they become available.",
@@ -158,6 +162,8 @@ const RU: ForSchoolsContent = {
     { competitor: 'Vocabulary.com', freeTierLimit: 'Нет полноценной бесплатной версии для реального использования в классе — для начала нужен платный план.', lexiclash: 'Бесплатно для всего класса, без карты. Teacher Pro за $9/мес добавляет аналитику и отчёты.' },
     { competitor: 'Wordwall', freeTierLimit: 'Бесплатная версия ограничена небольшим числом типов активностей.', lexiclash: 'Любая активность, бесплатно для всего класса, до 50 учеников. Teacher Pro за $9/мес снимает ограничение на число классов.' },
   ],
+  compareBreakdownPrompt: 'Хотите полное сравнение?',
+  compareBreakdownCta: 'LexiClash против Kahoot — сравнение функций',
   comingTitle: 'В нашей дорожной карте для школ и районов',
   comingIntro:
     'Это функции, которые школы говорят нам, что им нужны в большом масштабе. Командная игра, а также аналитика и отчёты Teacher Pro уже доступны сегодня — пункты ниже пока не реализованы. Расскажите нам, что нужно вашей школе, и мы свяжемся с вами, когда они появятся.',
@@ -220,6 +226,8 @@ const HE: ForSchoolsContent = {
     { competitor: 'Vocabulary.com', freeTierLimit: 'אין מסלול חינמי משמעותי לשימוש כיתתי אמיתי — נדרשת תוכנית בתשלום כדי להתחיל.', lexiclash: 'חינם לכל הכיתה, בלי כרטיס אשראי. Teacher Pro ב-$9 לחודש מוסיף ניתוח נתונים ודוחות.' },
     { competitor: 'Wordwall', freeTierLimit: 'המסלול החינמי מוגבל למספר קטן של סוגי פעילויות.', lexiclash: 'כל פעילות, חינם לכל הכיתה, עד 50 תלמידים. Teacher Pro ב-$9 לחודש מסיר את הגבלת הכיתות.' },
   ],
+  compareBreakdownPrompt: 'רוצים את הפירוט המלא?',
+  compareBreakdownCta: 'LexiClash מול Kahoot — השוואת יכולות מלאה',
   comingTitle: 'במפת הדרכים שלנו לבתי ספר ורשויות',
   comingIntro:
     'אלה היכולות שבתי ספר אומרים לנו שהם צריכים בקנה מידה גדול. המשחק הכיתתי וניתוח הנתונים והדוחות של Teacher Pro כבר קיימים היום — הפריטים למטה עדיין לא נבנו. ספרו לנו מה בית הספר שלכם צריך ונחזור אליכם כשהם יהיו זמינים.',
@@ -282,6 +290,8 @@ const SV: ForSchoolsContent = {
     { competitor: 'Vocabulary.com', freeTierLimit: 'Ingen meningsfull gratisversion för verklig klassrumsanvändning — betalplan krävs för att komma igång.', lexiclash: 'Gratis för hela klassen, inget kort krävs. Teacher Pro $9/mån lägger till statistik och rapporter.' },
     { competitor: 'Wordwall', freeTierLimit: 'Gratisversionen begränsad till ett fåtal aktivitetstyper.', lexiclash: 'Alla aktiviteter, gratis för hela klassen, upp till 50 elever. Teacher Pro $9/mån låser upp obegränsat antal klasser.' },
   ],
+  compareBreakdownPrompt: 'Vill du se hela jämförelsen?',
+  compareBreakdownCta: 'LexiClash vs Kahoot — jämförelse funktion för funktion',
   comingTitle: 'På vår färdplan för skolor och distrikt',
   comingIntro:
     'Det här är funktionerna som skolor säger att de behöver i stor skala. Klassrumsspelet och Teacher Pros statistik och rapporter finns redan idag — punkterna nedan är inte byggda än. Berätta vad er skola behöver, så hör vi av oss när de blir tillgängliga.',
@@ -344,6 +354,8 @@ const JA: ForSchoolsContent = {
     { competitor: 'Vocabulary.com', freeTierLimit: '実際のクラス運用に使える無料プランは実質なく、始めるには有料プランが必要です。', lexiclash: 'クラス全体が無料、カード登録不要。Teacher Pro（月額$9）が分析とレポートを追加します。' },
     { competitor: 'Wordwall', freeTierLimit: '無料プランは少数のアクティビティ種類に制限されています。', lexiclash: 'すべてのアクティビティが、最大50人のクラス全体で無料。Teacher Pro（月額$9）でクラス数無制限に。' },
   ],
+  compareBreakdownPrompt: '詳しい比較をご覧になりますか？',
+  compareBreakdownCta: 'LexiClash vs Kahoot — 機能ごとの徹底比較',
   comingTitle: '学校・学区向けの今後の開発計画',
   comingIntro:
     'これらは、規模を拡大する際に学校が必要だと教えてくれる機能です。クラスルームゲームとTeacher Proの分析・レポートはすでに提供中です — 以下の項目はまだ構築されていません。学校に必要なことを教えてください。ご利用可能になり次第、ご連絡します。',
@@ -406,6 +418,8 @@ const ES: ForSchoolsContent = {
     { competitor: 'Vocabulary.com', freeTierLimit: 'Sin un nivel gratuito real para uso real en el aula — se requiere un plan de pago para empezar.', lexiclash: 'Gratis para toda la clase, sin tarjeta. Teacher Pro $9/mes agrega análisis e informes.' },
     { competitor: 'Wordwall', freeTierLimit: 'El nivel gratuito se limita a un pequeño número de tipos de actividad.', lexiclash: 'Cada actividad, gratis para toda la clase, hasta 50 estudiantes. Teacher Pro $9/mes desbloquea clases ilimitadas.' },
   ],
+  compareBreakdownPrompt: '¿Quieres ver el desglose completo?',
+  compareBreakdownCta: 'LexiClash vs Kahoot — comparación función por función',
   comingTitle: 'En nuestra hoja de ruta para escuelas y distritos',
   comingIntro:
     'Estas son las funciones que las escuelas nos dicen que necesitan a escala. El juego de aula y el análisis e informes de Teacher Pro ya están disponibles hoy — lo de abajo todavía no está construido. Cuéntanos qué necesita tu escuela y te avisaremos cuando esté disponible.',

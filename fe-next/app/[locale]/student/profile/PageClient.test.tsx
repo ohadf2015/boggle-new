@@ -168,7 +168,7 @@ describe('StudentProfilePageClient - Duel Features', () => {
     });
 
     // Check "View All" link exists and points to achievements page
-    const viewAllLink = screen.getByText('student.dashboard.viewAll →');
+    const viewAllLink = screen.getByText('student.dashboard.viewAll');
     expect(viewAllLink).toBeInTheDocument();
     expect(viewAllLink.closest('a')).toHaveAttribute('href', '/en/student/achievements');
   });
