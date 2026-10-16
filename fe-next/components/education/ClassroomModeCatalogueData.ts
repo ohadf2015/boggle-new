@@ -63,7 +63,7 @@ const BOSS_CARD_POSTER = '/mascot/teacher/modes/boss-battle.webp';
 
 const MODES: readonly CatalogueMode[] = ROWS.flatMap((row): CatalogueMode[] => {
   const launch = launchOf(row.id);
-  const cover = `/mascot/teacher/modes/covers/${row.id}.webp`;
+  const cover = `/mascot/teacher/modes/covers-v3/${row.id}.webp`;
   if (row.id === BOSS_BATTLE_ID) {
     return [{ ...row, launch, suffix: 'bossBattle', nameKey: 'eg2Modes.boss.name', howKey: 'classroomBoss.cardHow', poster: BOSS_CARD_POSTER, cover, accent: 'pink' }];
   }
