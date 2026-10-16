@@ -27,6 +27,7 @@ import {
   buildTeacherTrialConvertedEvent,
   buildTrialExpiredEvent,
   buildPolarTrialDay10SentEvent,
+  buildPolarTrialExpirySentEvent,
   captureProFunnelServerEvent,
 } from '../proFunnelServer';
 
@@ -135,6 +136,14 @@ describe('Pro funnel server events', () => {
       distinctId: 'u-1',
       event: 'teacher_polar_trial_day10_sent',
       properties: { product: 'teacher_pro', provider: 'polar', days_left: 4 },
+    });
+  });
+
+  it('Given a Polar t-0 expiry email actually sent, When built, Then it is teacher_polar_trial_expiry_sent', () => {
+    expect(buildPolarTrialExpirySentEvent('u-1', 't-0')).toEqual({
+      distinctId: 'u-1',
+      event: 'teacher_polar_trial_expiry_sent',
+      properties: { product: 'teacher_pro', provider: 'polar', bucket: 't-0' },
     });
   });
 

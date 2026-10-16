@@ -13349,6 +13349,8 @@ const en = {
       "weeklyWow": "Week-over-week",
       "weeklyDay7Cta": "Keep Teacher Pro — {{price}}/mo",
       "weeklyDay7Hint": "Day 7 of your Teacher Pro trial. Keep reports and unlimited classes.",
+      "weeklyExpiryCta": "Reactivate Teacher Pro — {{price}}/mo",
+      "weeklyExpiryHint": "Your Teacher Pro trial ended. Keep this week's reports and unlimited classes.",
       "weeklyRegionLabel": "Weekly progress for {{classroom}}",
       "weeklyLoading": "Loading this week's progress…",
       "weeklyLoadError": "Couldn't load this week's progress.",

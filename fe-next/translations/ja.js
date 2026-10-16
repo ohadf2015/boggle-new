@@ -14143,6 +14143,8 @@ const ja = {
       "weeklyWow": "前週比",
       "weeklyDay7Cta": "Teacher Proを続ける — {{price}}/月",
       "weeklyDay7Hint": "Teacher Proトライアル7日目。レポートと無制限クラスを維持できます。",
+      "weeklyExpiryCta": "Teacher Proを再開 — {{price}}/月",
+      "weeklyExpiryHint": "Teacher Proトライアルは終了しました。今週のレポートと無制限クラスを維持できます。",
       "weeklyRegionLabel": "{{classroom}}の週間進捗",
       "weeklyLoading": "今週の進捗を読み込み中…",
       "weeklyLoadError": "今週の進捗を読み込めませんでした。",

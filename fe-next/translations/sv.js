@@ -14414,6 +14414,8 @@ const sv = {
       "weeklyWow": "Vecka mot vecka",
       "weeklyDay7Cta": "Fortsätt med Teacher Pro — {{price}}/mån",
       "weeklyDay7Hint": "Dag 7 av din Teacher Pro-provperiod. Behåll rapporter och obegränsade klasser.",
+      "weeklyExpiryCta": "Återaktivera Teacher Pro — {{price}}/mån",
+      "weeklyExpiryHint": "Din Teacher Pro-provperiod är slut. Behåll veckans rapporter och obegränsade klasser.",
       "weeklyRegionLabel": "Veckoprogress för {{classroom}}",
       "weeklyLoading": "Laddar veckans progress…",
       "weeklyLoadError": "Kunde inte ladda veckans progress.",

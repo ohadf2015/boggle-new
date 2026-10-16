@@ -14092,6 +14092,8 @@ const es = {
       "weeklyWow": "Semana a semana",
       "weeklyDay7Cta": "Sigue con Teacher Pro — {{price}}/mes",
       "weeklyDay7Hint": "Día 7 de tu prueba de Teacher Pro. Conserva informes y clases ilimitadas.",
+      "weeklyExpiryCta": "Reactiva Teacher Pro — {{price}}/mes",
+      "weeklyExpiryHint": "Tu prueba de Teacher Pro terminó. Conserva los informes de esta semana y las clases ilimitadas.",
       "weeklyRegionLabel": "Progreso semanal de {{classroom}}",
       "weeklyLoading": "Cargando el progreso de esta semana…",
       "weeklyLoadError": "No se pudo cargar el progreso de esta semana.",
