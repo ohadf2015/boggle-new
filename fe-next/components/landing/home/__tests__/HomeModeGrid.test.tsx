@@ -122,6 +122,28 @@ describe('HomeModeGrid', () => {
     expect(screen.queryByText('NEW')).not.toBeInTheDocument();
   });
 
+  it('stacks the badge above the title instead of floating it over the art', () => {
+    // Given a small tile tagged NEW
+    const tagged = [model('arena'), model('wordTowerV2', { badge: 'NEW' })];
+    // When the grid renders
+    render(<HomeModeGrid models={tagged} extras={[]} liveCount={0} />);
+    // Then the badge sits in the tile's label column, next to its title
+    const label = screen.getByTestId('mode-tile-label');
+    expect(within(label).getByText('landing.badge.new')).toBeInTheDocument();
+    expect(within(label).getByText('WORDTOWERV2')).toBeInTheDocument();
+  });
+
+  it('lets a run in progress replace the NEW badge so the tile carries one chip', () => {
+    // Given the adventure tile is both NEW and has a run to resume
+    const resume = { world: 2, step: 5, hp: 3, maxHp: 6, relics: [], gold: 0 };
+    const tagged = [model('arena'), model('adventure', { badge: 'NEW', resume })];
+    // When the grid renders
+    render(<HomeModeGrid models={tagged} extras={[]} liveCount={0} />);
+    // Then only the resume pill shows
+    expect(screen.getByTestId('mode-resume-chip')).toBeInTheDocument();
+    expect(screen.queryByText('landing.badge.new')).not.toBeInTheDocument();
+  });
+
   it('keeps the extra-modes count reading "+2" in right-to-left pages', () => {
     render(<HomeModeGrid models={models} extras={extras} liveCount={0} />);
     expect(screen.getByText('+2')).toHaveAttribute('dir', 'ltr');

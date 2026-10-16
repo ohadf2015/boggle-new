@@ -9513,6 +9513,7 @@ const sv = {
     "takeYourTime": "Ingen timer",
     "play": "SPELA NU",
     "viewResults": "VISA RESULTAT",
+    "openHub": "DAGENS UTMANINGAR",
     "solved": "Löst",
     "failed": "Misslyckades",
     "wordHunt": {
@@ -10287,6 +10288,8 @@ const sv = {
       "guestNameLabel": "På topplistan som",
       "guestNameRejected": "Välj ett annat namn",
       "guestNameFailed": "Kunde inte spara ditt namn. Försök igen.",
+      "guestNamePrompt": "Vilket namn ska poängen sparas under?",
+      "guestNameKeep": "Behåll det här namnet",
       "wordsFound": "Hittade ord",
       "masteryRatingLabel": "Rating",
       "masteryRatingChangeLabel": "Förändring",

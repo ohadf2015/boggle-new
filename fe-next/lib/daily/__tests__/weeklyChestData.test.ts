@@ -48,6 +48,14 @@ describe('loadChestActivity', () => {
     )
   })
 
+  it('leaves Word Wheel catch-up plays out of the chest cycle, like Word Hunt', async () => {
+    const { db, calls } = makeDb({})
+    await loadChestActivity(db, 'u1')
+    expect(calls.daily_word_wheel_attempts).toEqual(
+      expect.arrayContaining([['eq', 'player_id', 'u1'], ['eq', 'is_catchup', false]]),
+    )
+  })
+
   it('throws when a query errors, so routes never silently under-count', async () => {
     const db: any = {
       from: () => {

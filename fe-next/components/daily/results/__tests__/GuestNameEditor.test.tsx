@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { GuestNameEditor } from '../GuestNameEditor';
 import { getStoredUsername } from '@/utils/profileStorage';
-import { getGuestName } from '@/utils/guestManager';
+import { getGuestName, hasChosenGuestName, markGuestNameChosen } from '@/utils/guestManager';
 import { GUEST_DAILY_PLAYER_KEY } from '@/utils/dailyChallenge/constants';
 
 const t = (key: string, fallback?: string) => fallback ?? key;
@@ -22,6 +22,8 @@ describe('GuestNameEditor', () => {
 
   beforeEach(() => {
     localStorage.clear();
+    // These cover the compact "change name" row a guest sees once they own their name.
+    markGuestNameChosen();
     fetchMock.mockReset();
     vi.stubGlobal('fetch', fetchMock);
   });
@@ -63,5 +65,50 @@ describe('GuestNameEditor', () => {
     rename('   ');
     rename('WordNinja');
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('GuestNameEditor — first finish with an auto-generated name', () => {
+  const fetchMock = vi.fn();
+
+  beforeEach(() => {
+    localStorage.clear();
+    fetchMock.mockReset();
+    vi.stubGlobal('fetch', fetchMock);
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('asks for the name to save the score under instead of silently using the random one', () => {
+    // Given a guest who never picked a name
+    // When their results render
+    render(<GuestNameEditor name="WordNinja" guestFingerprint="fp-1" onRenamed={vi.fn()} t={t} />);
+    // Then a prompt with an empty name field is open
+    expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toHaveValue('');
+    expect(screen.getByRole('textbox')).toHaveAttribute('placeholder', 'WordNinja');
+  });
+
+  it('saves the typed name and stops asking', async () => {
+    fetchMock.mockResolvedValue(jsonResponse(200, { displayName: 'Ohad' }));
+    const onRenamed = vi.fn();
+    render(<GuestNameEditor name="WordNinja" guestFingerprint="fp-1" onRenamed={onRenamed} t={t} />);
+
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Ohad' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => expect(onRenamed).toHaveBeenCalledWith('Ohad'));
+    expect(hasChosenGuestName()).toBe(true);
+    expect(screen.queryByTestId('guest-name-prompt')).not.toBeInTheDocument();
+  });
+
+  it('lets the guest keep the suggested name, and does not ask again', () => {
+    render(<GuestNameEditor name="WordNinja" guestFingerprint="fp-1" onRenamed={vi.fn()} t={t} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Keep this name' }));
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(hasChosenGuestName()).toBe(true);
+    expect(screen.queryByTestId('guest-name-prompt')).not.toBeInTheDocument();
+    expect(screen.getByText('WordNinja')).toBeInTheDocument();
   });
 });

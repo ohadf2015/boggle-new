@@ -9213,6 +9213,7 @@ const ja = {
     "takeYourTime": "時間無制限",
     "play": "プレイ",
     "viewResults": "結果を見る",
+    "openHub": "今日のチャレンジへ",
     "solved": "解決済み",
     "failed": "失敗",
     "wordHunt": {
@@ -10016,6 +10017,8 @@ const ja = {
       "guestNameLabel": "ランキング表示名",
       "guestNameRejected": "別の名前を選んでください",
       "guestNameFailed": "名前を保存できませんでした。もう一度お試しください。",
+      "guestNamePrompt": "スコアを保存する名前を入力",
+      "guestNameKeep": "この名前のままにする",
       "wordsFound": "見つかった単語",
       "masteryRatingLabel": "レーティング",
       "masteryRatingChangeLabel": "変動",

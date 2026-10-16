@@ -24,7 +24,7 @@ import GetAppMenuRow from '@/components/android-install/GetAppMenuRow';
 import { teacherMenuEntry } from '@/lib/education/teacherRole';
 import AvatarLite from '@/components/AvatarLite';
 import { getStoredCustomAvatar } from '../../utils/profileStorage';
-import { saveGuestNameEverywhere, ensureGuestDisplayName } from '../../utils/guestManager';
+import { saveGuestNameEverywhere, ensureGuestDisplayName, markGuestNameChosen } from '../../utils/guestManager';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { useDailyMissions } from '@/hooks/useDailyMissions';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
@@ -126,6 +126,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
         const trimmed = editGuestNameValue.trim().slice(0, 20);
         if (trimmed) {
             saveGuestNameEverywhere(trimmed);
+            markGuestNameChosen();
             setGuestNameState(trimmed);
         }
         setIsEditingGuestName(false);

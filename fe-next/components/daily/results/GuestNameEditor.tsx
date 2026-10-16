@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { saveGuestNameEverywhere } from '@/utils/guestManager';
+import { hasChosenGuestName, markGuestNameChosen, saveGuestNameEverywhere } from '@/utils/guestManager';
 
 const MAX_NAME_LENGTH = 20;
 
@@ -13,8 +13,11 @@ interface GuestNameEditorProps {
 }
 
 export function GuestNameEditor({ name, guestFingerprint, onRenamed, t }: GuestNameEditorProps) {
+  // A guest still on the auto-generated name is asked once, right after the
+  // finish, so the board shows a real name rather than "WordNinja".
+  const [prompting, setPrompting] = useState(() => !!guestFingerprint && !hasChosenGuestName());
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(name);
+  const [draft, setDraft] = useState(() => (prompting ? '' : name));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,9 +27,16 @@ export function GuestNameEditor({ name, guestFingerprint, onRenamed, t }: GuestN
     setEditing(true);
   };
 
+  const keepName = () => {
+    markGuestNameChosen();
+    setPrompting(false);
+  };
+
   const save = async () => {
     const trimmed = draft.trim().slice(0, MAX_NAME_LENGTH);
+    if (prompting && !trimmed) return;
     if (!trimmed || trimmed === name || !guestFingerprint) {
+      if (prompting) keepName();
       setEditing(false);
       return;
     }
@@ -46,7 +56,9 @@ export function GuestNameEditor({ name, guestFingerprint, onRenamed, t }: GuestN
         return;
       }
       saveGuestNameEverywhere(body.displayName);
+      markGuestNameChosen();
       onRenamed(body.displayName);
+      setPrompting(false);
       setEditing(false);
     } catch {
       setError(t('wordHunt.results.guestNameFailed', "Couldn't save your name. Try again."));
@@ -54,6 +66,51 @@ export function GuestNameEditor({ name, guestFingerprint, onRenamed, t }: GuestN
       setSaving(false);
     }
   };
+
+  if (prompting) {
+    return (
+      <form
+        data-testid="guest-name-prompt"
+        className="w-full mb-2 flex flex-col gap-2 p-3 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard"
+        onSubmit={(e) => {
+          e.preventDefault();
+          void save();
+        }}
+      >
+        <label htmlFor="guest-name-prompt-input" className="font-neo-display font-black text-sm text-neo-white">
+          {t('wordHunt.results.guestNamePrompt', 'Save your score under your name')}
+        </label>
+        <div className="flex items-center gap-2">
+          <input
+            id="guest-name-prompt-input"
+            type="text"
+            value={draft}
+            placeholder={name}
+            onChange={(e) => setDraft(e.target.value)}
+            maxLength={MAX_NAME_LENGTH}
+            autoComplete="nickname"
+            enterKeyHint="done"
+            className="flex-1 min-w-0 px-3 py-2 rounded-neo border-2 border-neo-cyan bg-neo-navy text-neo-white font-bold placeholder:text-neo-white/40"
+          />
+          <button
+            type="submit"
+            disabled={saving || !draft.trim()}
+            className="shrink-0 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black font-bold shadow-hard-sm disabled:opacity-50"
+          >
+            {t('common.save', 'Save')}
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={keepName}
+          className="self-start text-xs font-bold text-neo-white/70 underline underline-offset-2"
+        >
+          {t('wordHunt.results.guestNameKeep', 'Keep this name')}
+        </button>
+        {error && <p role="alert" className="text-xs text-neo-pink font-bold">{error}</p>}
+      </form>
+    );
+  }
 
   if (!editing) {
     return (

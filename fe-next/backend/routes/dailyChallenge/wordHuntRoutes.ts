@@ -452,7 +452,7 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
         const [puzzleRes, huntRes, wheelRes] = await Promise.all([
           supabase.from('daily_puzzle_attempts').select('puzzle_date,score,time_seconds').eq('player_id', playerId).gt('word_count', 0),
           supabase.from('daily_word_hunt_attempts').select('puzzle_date,efficiency_score').eq('player_id', playerId).eq('solved', true).eq('is_catchup', false),
-          supabase.from('daily_word_wheel_attempts').select('puzzle_date,score,time_seconds').eq('player_id', playerId).gt('word_count', 0),
+          supabase.from('daily_word_wheel_attempts').select('puzzle_date,score,time_seconds').eq('player_id', playerId).gt('word_count', 0).eq('is_catchup', false),
         ])
         const allDates = [
           ...(puzzleRes.data ?? []).map((r: { puzzle_date: string }) => r.puzzle_date),

@@ -186,6 +186,35 @@ describe('computeCycleProgress', () => {
     expect(r.cycleNumber).toBe(1)
   })
 
+  it('keeps a run alive through yesterday before today is played (no 0/7 every morning)', () => {
+    // Given five straight days ending yesterday, and nothing yet today
+    const dates = ['2026-05-07','2026-05-08','2026-05-09','2026-05-10','2026-05-11']
+    // When the chest progress is computed this morning
+    const r = computeCycleProgress(dates, today)
+    // Then the cycle still reads 5/7 from its real start
+    expect(r.daysCompleted).toBe(5)
+    expect(r.cycleStart).toBe('2026-05-07')
+    expect(r.completedDates).toEqual(dates)
+    expect(r.isClaimable).toBe(false)
+  })
+
+  it('opens a fresh cycle this morning when yesterday finished a full week', () => {
+    // Given a complete 7-day run ending yesterday (that chest is surfaced by findCompletedCycles)
+    const dates = ['2026-05-05','2026-05-06','2026-05-07','2026-05-08','2026-05-09','2026-05-10','2026-05-11']
+    // When today is not played yet
+    const r = computeCycleProgress(dates, today)
+    // Then the live cycle is the new, empty one starting today
+    expect(r.daysCompleted).toBe(0)
+    expect(r.cycleStart).toBe(today)
+    expect(r.cycleNumber).toBe(2)
+  })
+
+  it('reads 0/7 once yesterday was missed too', () => {
+    const r = computeCycleProgress(['2026-05-09','2026-05-10'], today)
+    expect(r.daysCompleted).toBe(0)
+    expect(r.cycleStart).toBe(today)
+  })
+
   it('returns empty progress with no dates', () => {
     const r = computeCycleProgress([], today)
     expect(r.daysCompleted).toBe(0)

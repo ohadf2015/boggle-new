@@ -46,6 +46,9 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
   useEffect(() => setMounted(true), []);
   const countdown = mounted ? stats.countdown : '';
   const hasPlayed = mounted ? played.today.wordWheel : false;
+  // Once any daily is done the hub is the next stop — it shows what is left
+  // today, the streak and the weekly chest. The wheel's results screen doesn't.
+  const anyPlayed = mounted && Object.values(played.today).some(Boolean);
   // Pessimistic until the player's snapshot resolves, so Play never snaps to View results.
   const ctaLoading = !mounted || stats.loading || played.loading;
   const streak = mounted ? (preloadedStats?.currentStreak ?? stats.streak) : 0;
@@ -55,7 +58,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
     : chest.cycleStart
       ? cycleProgressCells(chest.completedDates, chest.cycleStart, 7)
       : dailyProgressCells(getLastSevenDaysCompletion(language as Language), 7);
-  const href = `/${language}/daily/word-wheel`;
+  const href = anyPlayed ? `/${language}/daily` : `/${language}/daily/word-wheel`;
 
   return (
     <Link
@@ -65,8 +68,8 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
       onPointerEnter={() => launch?.prefetch(href)}
       onPointerDown={() => launch?.prefetch(href)}
       onClick={(e) => {
-        trackLandingCtaClick('daily_banner', { mode: 'word-wheel', hasPlayed });
-        launch?.start(e, { href, tone: 'yellow', title: t('sitemap.wordWheel', 'Word Wheel'), art: '/modes/cubes/daily.png' });
+        trackLandingCtaClick('daily_banner', { mode: anyPlayed ? 'hub' : 'word-wheel', hasPlayed });
+        launch?.start(e, { href, tone: 'yellow', title: anyPlayed ? t('daily.title') : t('sitemap.wordWheel', 'Word Wheel'), art: '/modes/cubes/daily.png' });
       }}
       aria-label={`${t('sitemap.wordWheel', 'Word Wheel')} #${puzzleNumber}`}
       className={cn(
@@ -131,12 +134,16 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
         ) : (
           <span
             data-testid="daily-cta"
-            className={cn(CTA_BAR, hasPlayed ? 'bg-neo-navy text-neo-cream' : 'bg-neo-lime text-neo-navy')}
+            className={cn(CTA_BAR, anyPlayed ? 'bg-neo-navy text-neo-cream' : 'bg-neo-lime text-neo-navy')}
           >
-            {hasPlayed ? (
+            {anyPlayed ? (
               <>
-                {t('daily.viewResults')}
-                <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
+                {t('daily.openHub')}
+                {hasPlayed ? (
+                  <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
+                ) : (
+                  <Arrow className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
+                )}
               </>
             ) : (
               <>

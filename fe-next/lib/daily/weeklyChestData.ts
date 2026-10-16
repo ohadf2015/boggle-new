@@ -37,7 +37,8 @@ export async function loadChestActivity(db: SupabaseClient, userId: string): Pro
       .eq('player_id', userId).eq('solved', true)
       .eq('is_catchup', false), // catch-up plays don't count toward the chest cycle
     db.from('daily_word_wheel_attempts').select('puzzle_date,score,time_seconds')
-      .eq('player_id', userId).gt('word_count', 0),
+      .eq('player_id', userId).gt('word_count', 0)
+      .eq('is_catchup', false), // a catch-up filling an old gap would re-chunk claimed cycles
     db.from('daily_word_tower_attempts').select('puzzle_date')
       .eq('player_id', userId).gt('best_height_m', 0),
     db.from('connections_daily_scores').select('puzzle_date')

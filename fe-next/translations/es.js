@@ -9354,6 +9354,7 @@ const es = {
     "takeYourTime": "Sin límite",
     "play": "JUGAR AHORA",
     "viewResults": "VER RESULTADOS",
+    "openHub": "RETOS DEL DÍA",
     "failed": "Fallido",
     "wordHunt": {
       "title": "Caza de Palabras",
@@ -9891,6 +9892,8 @@ const es = {
       "guestNameLabel": "En la clasificación como",
       "guestNameRejected": "Elige otro nombre",
       "guestNameFailed": "No se pudo guardar tu nombre. Inténtalo de nuevo.",
+      "guestNamePrompt": "¿Con qué nombre guardamos tu puntuación?",
+      "guestNameKeep": "Mantener este nombre",
       "wordsFound": "Palabras encontradas",
       "masteryRatingLabel": "Rating",
       "masteryRatingChangeLabel": "Cambio",

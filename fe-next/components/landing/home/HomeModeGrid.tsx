@@ -21,6 +21,9 @@ const TINT: Record<ModeCubeVariant, { shadow: string; chip: string; ring: string
   blue: { shadow: 'shadow-hard-blue', chip: 'bg-blue-500 text-neo-white', ring: 'focus-visible:ring-blue-400', glow: 'rgba(59,130,246,0.42)' },
 };
 
+const BADGE_CLASS =
+  'w-fit rounded-full border-2 border-black px-1.5 py-0.5 font-neo-display font-black uppercase leading-none shadow-hard-sm';
+
 interface ModeTileProps {
   model: ModeCubeModel;
   index: number;
@@ -36,6 +39,9 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
   const locked = !!model.locked;
   const [imgFailed, setImgFailed] = useState(false);
   const hasArt = !!model.genIcon && !imgFailed;
+  // A run in progress is the more useful thing to say than "new" — one chip per tile.
+  const showRun = !!model.resume && !locked;
+  const badge = model.badge && !showRun ? t(`landing.badge.${model.badge.toLowerCase()}`, model.badge) : null;
 
   return (
     <Link
@@ -61,13 +67,21 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
         'transition-[transform,box-shadow] duration-100 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
         tint.ring,
-        anchor ? 'min-h-[5.75rem] flex-1 md:min-h-0' : 'h-[4.5rem] md:h-auto md:aspect-square',
+        anchor ? 'min-h-[5.75rem] flex-1 md:min-h-0' : 'h-[5.5rem] md:h-auto md:aspect-square',
         model.highlighted && 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
         locked && 'cursor-not-allowed',
       )}
     >
       {hasArt ? (
-        <span className={cn('absolute inset-0', !anchor && 'max-md:inset-y-0 max-md:start-0 max-md:end-auto max-md:w-[4.5rem] max-md:overflow-hidden max-md:border-e-[3px] max-md:border-black')}>
+        <span
+          data-testid={anchor ? undefined : 'mode-tile-art'}
+          className={cn(
+            'absolute inset-0',
+            // Phone row tile: the mascot sits in its own inset well rather than a
+            // hard-ruled slab glued to the edge, so the card reads as one object.
+            !anchor && 'max-md:inset-y-2 max-md:start-2 max-md:end-auto max-md:w-[4.125rem] max-md:overflow-hidden max-md:rounded-neo max-md:border-2 max-md:border-black max-md:bg-black/30',
+          )}
+        >
         <Image
           src={model.genIcon as string}
           alt=""
@@ -84,6 +98,14 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
           <model.Icon className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
         </span>
       )}
+      {!anchor && (
+        // Mode-hue wash across the whole card so each tile owns its colour, not just its shadow.
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-40"
+          style={{ background: 'linear-gradient(160deg, var(--cube-glow) 0%, transparent 70%)' }}
+        />
+      )}
       <span aria-hidden="true" className="cube-glow pointer-events-none absolute inset-0 z-[1]" />
       <span aria-hidden="true" className={cn('absolute inset-x-0 bottom-0 z-[1] h-3/5 bg-gradient-to-t from-neo-navy via-neo-navy/70 to-transparent', !anchor && 'max-md:hidden')} />
       {anchor && (
@@ -93,17 +115,10 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
         />
       )}
 
-      {model.badge && (
-        <span
-          className={cn(
-            'absolute end-1 top-1 z-[2] rounded-full border-2 border-black px-1.5 py-0.5 font-neo-display text-[0.55rem] font-black uppercase leading-none shadow-hard-sm md:end-1.5 md:top-1.5 md:text-[0.65rem]',
-            tint.chip,
-          )}
-        >
-          {t(`landing.badge.${model.badge.toLowerCase()}`, model.badge)}
-        </span>
+      {anchor && badge && (
+        <span className={cn('absolute end-1.5 top-1.5 z-[2]', BADGE_CLASS, 'text-[0.65rem]', tint.chip)}>{badge}</span>
       )}
-      {model.resume && !locked && <ModeResumeChip resume={model.resume} anchor={anchor} />}
+      {showRun && model.resume && <ModeResumeChip resume={model.resume} anchor={anchor} />}
 
       {anchor ? (
         <span className="absolute inset-0 z-[2] flex flex-col justify-end p-3 md:p-4">
@@ -125,10 +140,19 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
         </span>
       ) : (
         <span
-          className="absolute inset-y-0 start-[5rem] end-2 z-[2] flex items-center font-neo-display text-[0.95rem] font-black uppercase leading-[1.1] text-neo-white drop-shadow-[0_1px_0_rgba(0,0,0,0.8)] md:inset-x-0 md:inset-y-auto md:bottom-0 md:start-0 md:end-0 md:block md:line-clamp-2 md:px-2.5 md:pb-2 md:text-sm"
-          style={{ textWrap: 'balance' } as CSSProperties}
+          data-testid="mode-tile-label"
+          className={cn(
+            'absolute inset-y-0 start-[5.25rem] end-2 z-[2] flex flex-col items-start justify-center gap-1',
+            'md:inset-x-0 md:inset-y-auto md:bottom-0 md:start-0 md:end-0 md:justify-end md:px-2.5 md:pb-2',
+          )}
         >
-          {model.title}
+          {badge && <span className={cn(BADGE_CLASS, 'text-[0.6rem] md:text-[0.65rem]', tint.chip)}>{badge}</span>}
+          <span
+            className="line-clamp-2 font-neo-display text-[0.95rem] font-black uppercase leading-[1.1] text-neo-white drop-shadow-[0_1px_0_rgba(0,0,0,0.8)] md:text-sm"
+            style={{ textWrap: 'balance' } as CSSProperties}
+          >
+            {model.title}
+          </span>
         </span>
       )}
 
@@ -183,7 +207,7 @@ function MoreSheet({ extras, open, onClose }: { extras: ModeCubeModel[]; open: b
             <X className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
           </button>
         </div>
-        <div className="grid grid-cols-3 gap-3 pb-[env(safe-area-inset-bottom)] md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 pb-[env(safe-area-inset-bottom)] md:grid-cols-4">
           {extras.map((m, i) => (
             <ModeTile key={m.key} model={m} index={i} onPicked={onClose} />
           ))}
