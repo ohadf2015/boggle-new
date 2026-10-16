@@ -7872,6 +7872,7 @@ const es = {
     "beat": "Superar",
     "youAreFirst": "¡Eres el #1!",
     "keepItUp": "Sigue jugando para mantener tu liderazgo",
+    "players": "Jugadores",
     "nearbyPlayers": "Jugadores cercanos",
     "points": "pts",
     "hint": "Toca un nombre para ver sus palabras",
@@ -7907,7 +7908,9 @@ const es = {
       "climbToNext": "Juega más para subir a {{nextTier}}",
       "peersInTier": "Jugadores en {{tier}}",
       "nobodyAbove": "Nadie por encima de ti en {{tier}}",
-      "distanceToFirst": "{{score}} para llegar a #1"
+      "distanceToFirst": "{{score}} para llegar a #1",
+      "toNextTier": "{{pct}}% para el siguiente nivel",
+      "maxTier": "¡Nivel máximo!"
     },
     "global": "global"
   },

@@ -2,13 +2,11 @@
 
 // Note: Dynamic rendering is set in page.tsx (server component)
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { m } from 'framer-motion';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
-import { Trophy, ArrowLeft, RefreshCw, PencilRuler } from 'lucide-react';
+import { Trophy, ArrowLeft, PencilRuler } from 'lucide-react';
 
 const CreatorLeaderboard = dynamic(() => import('@/components/ugc/CreatorLeaderboard'), { ssr: false });
-import { Loader } from '@/components/ui/Loader';
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
 import { ErrorState, EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useRouter } from 'next/navigation';
@@ -25,25 +23,17 @@ import { safeToLocaleString } from '@/utils/bcp47Locale';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import { InlineBannerAd } from '@/components/ads';
-import ReferralShareBanner from '@/components/referral/ReferralShareBanner';
-const NearRankIndicator = dynamic(() => import('@/components/leaderboard/NearRankIndicator'), { ssr: false });
 import LeaderboardPodium from '@/components/leaderboard/LeaderboardPodium';
-import { TierBadge, TierProgressBar } from '@/components/ui/TierBadge';
+import { TierBadge } from '@/components/ui/TierBadge';
+import { YouCard } from '@/components/leaderboard/YouCard';
 import { useTierPromotion } from '@/hooks/useTierPromotion';
 import { useTierPosition } from '@/hooks/useTierPosition';
 import { useExperiment } from '@/hooks/useExperiment';
-import { LeaderboardPlayCta } from './LeaderboardPlayCta';
 const TierPositionPanel = dynamic(() => import('@/components/leaderboard/TierPositionPanel'), { ssr: false });
 import { SeasonLeaderboardTabs, seasonScopeLabelKey, type SeasonTabKey } from '@/components/seasons/SeasonLeaderboardTabs';
-const SeasonBanner = dynamic(() => import('@/components/multiplayer/SeasonBanner').then(m => ({ default: m.SeasonBanner })), { ssr: false });
 const PastSeasonsLeaderboard = dynamic(() => import('@/components/seasons/PastSeasonsLeaderboard').then(m => ({ default: m.PastSeasonsLeaderboard })), { ssr: false });
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import {
-  getGlobalLeaderboardTier,
-  getLeaderboardTierProgress,
-  getNextTierThreshold,
-  GLOBAL_LEADERBOARD_TIERS,
-} from '@/lib/ranked/leaderboardTiers';
+import { getGlobalLeaderboardTier } from '@/lib/ranked/leaderboardTiers';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface LeaderboardEntry {
@@ -56,24 +46,10 @@ interface LeaderboardEntry {
   games_played?: number;
 }
 
-function getRankIcon(rank: number): React.ReactNode {
-  switch (rank) {
-    case 1:
-      return <span className="text-2xl">🥇</span>;
-    case 2:
-      return <span className="text-2xl">🥈</span>;
-    case 3:
-      return <span className="text-2xl">🥉</span>;
-    default:
-      return <span className="text-lg font-bold text-slate-400">#{rank}</span>;
-  }
-}
-
-// Leaderboard glow-up: top-3 podium + neo-brutalist table + correct rival avatars.
 export default function LeaderboardPageClient(): React.JSX.Element {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
-  const { user, profile, isSupabaseEnabled } = useAuth();
+  const { user, profile, loading: authLoading, isSupabaseEnabled } = useAuth();
   const router = useRouter();
   const isDarkMode = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'players' | 'creators'>('players');
@@ -90,7 +66,6 @@ export default function LeaderboardPageClient(): React.JSX.Element {
     data: leaderboard,
     loading,
     error,
-    subscriptionStatus,
     refetch,
   } = useLeaderboard<LeaderboardEntry>({
     limit: 100,
@@ -98,7 +73,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
     seasonId: querySeasonId,
   });
 
-  const { rank: userRank } = useUserRank<{ total_score?: number; rank_position?: number }>(user?.id, querySeasonId);
+  const { rank: userRank, loading: rankLoading } = useUserRank<{ total_score?: number; rank_position?: number }>(user?.id, querySeasonId);
 
   // Compute current user's tier for promotion detection
   const currentUserTier = userRank?.total_score != null
@@ -169,233 +144,85 @@ export default function LeaderboardPageClient(): React.JSX.Element {
     );
   }
 
+
+  const tabClass = (active: boolean, activeBg: string) => cn(
+    'inline-flex min-h-[40px] items-center gap-1.5 rounded-neo border-neo border-neo-black px-3 font-neo-display text-sm font-bold transition-transform active:translate-y-px',
+    active ? `${activeBg} text-neo-black shadow-hard-sm` : 'bg-neo-navy-light text-neo-cream/70 hover:text-neo-white',
+  );
+
   return (
     <PageLayout onRefresh={handleRefresh} padding="md" maxWidth="4xl">
-      <div className={cn('py-4')}>
-        <div className="mb-4">
-          <Button
-            data-testid="leaderboard-home"
-            onClick={() => router.push(`/${language}`)}
-            variant="outline"
-            size="sm"
-            className="min-h-[44px]"
-            haptic
-          >
-            <ArrowLeft className="me-2 rtl:rotate-180" />
-            {t('common.backToMenu')}
-          </Button>
-        </div>
-
-        {/* Page Title */}
-        <m.div
-          initial={{ opacity: 1, y: 0 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-6"
-        >
-          <h1
-            className={cn(
-              'text-3xl sm:text-4xl font-bold flex items-center justify-center gap-3',
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            )}
-          >
-            <Trophy className="text-yellow-500" />
-            {t('leaderboard.title')}
-          </h1>
-          <div className="flex items-center justify-center gap-3 mt-2">
-            <p className={cn((isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
-              {t(seasonScopeLabelKey(seasonScope))}
-            </p>
-            {/* Live indicator */}
-            <div className="flex items-center gap-1.5">
-              <span
-                className={cn(
-                  'w-2 h-2 rounded-full animate-pulse',
-                  subscriptionStatus === 'SUBSCRIBED' ? 'bg-green-500' : 'bg-yellow-500'
-                )}
-              />
-              <span className={cn('text-xs', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
-                {subscriptionStatus === 'SUBSCRIBED'
-                  ? t('leaderboard.live')
-                  : t('common.connecting')}
-              </span>
-            </div>
+      <div className="py-4">
+        <header className="mb-5 flex flex-wrap items-center gap-3">
+          {/* CrazyGames hides the app header and bottom nav, so this is the only way out there. */}
+          {isOnCrazyGamesPlatform && (
             <Button
-              variant="ghost"
+              data-testid="leaderboard-home"
+              onClick={() => router.push(`/${language}`)}
+              variant="outline"
               size="icon"
-              onClick={() => refetch()}
-              className={cn(
-                'h-7 w-7 p-0 rounded-full',
-                isDarkMode ? 'hover:bg-neo-navy-elevated' : 'hover:bg-gray-100'
-              )}
-              title={t('leaderboard.refresh')}
-              aria-label={t('leaderboard.refresh')}
+              className="h-11 w-11 shrink-0"
+              aria-label={t('common.backToMenu')}
               haptic
             >
-              {loading ? (
-                <Loader size="sm" />
-              ) : (
-                <RefreshCw
-                  className={cn(
-                    'w-3 h-3',
-                    (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600')
-                  )}
-                />
-              )}
+              <ArrowLeft className="rtl:rotate-180" />
             </Button>
-          </div>
-        </m.div>
-
-        {/* Tab Switcher */}
-        <div className="flex gap-2 mb-6 justify-center">
-          <button
-            type="button"
-            onClick={() => setActiveTab('players')}
-            className={cn(
-              'px-4 py-2 font-bold text-sm rounded-neo border-3 border-neo-black transition-all',
-              activeTab === 'players'
-                ? 'bg-neo-yellow text-neo-black shadow-hard'
-                : 'bg-transparent text-gray-400 hover:text-white'
-            )}
-          >
-            <Trophy className="inline w-4 h-4 me-1" />
+          )}
+          <h1 className="me-auto font-neo-display text-2xl font-black text-neo-white sm:text-3xl">
             {t('leaderboard.title')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('creators')}
-            className={cn(
-              'px-4 py-2 font-bold text-sm rounded-neo border-3 border-neo-black transition-all',
-              activeTab === 'creators'
-                ? 'bg-neo-pink text-neo-black shadow-hard'
-                : 'bg-transparent text-gray-400 hover:text-white'
-            )}
-          >
-            <PencilRuler className="inline w-4 h-4 me-1" />
-            {t('ugc.creator.stats')}
-          </button>
-        </div>
+          </h1>
+          <div role="tablist" className="flex gap-1.5">
+            <button type="button" role="tab" aria-selected={activeTab === 'players'} onClick={() => setActiveTab('players')} className={tabClass(activeTab === 'players', 'bg-neo-yellow')}>
+              <Trophy className="h-4 w-4" aria-hidden="true" />
+              {t('leaderboard.players')}
+            </button>
+            <button type="button" role="tab" aria-selected={activeTab === 'creators'} onClick={() => setActiveTab('creators')} className={tabClass(activeTab === 'creators', 'bg-neo-pink')}>
+              <PencilRuler className="h-4 w-4" aria-hidden="true" />
+              {t('ugc.creator.stats')}
+            </button>
+          </div>
+        </header>
 
         {activeTab === 'creators' ? (
           <CreatorLeaderboard />
         ) : (
         <>
         {!isOnCrazyGamesPlatform && (
-          <>
-            <div className="mb-4">
-              <SeasonBanner />
-            </div>
-
-            <div className="mb-4 flex justify-center">
-              <SeasonLeaderboardTabs active={seasonScope} onChange={setSeasonScope} />
-            </div>
-          </>
+          <div className="mb-5">
+            <SeasonLeaderboardTabs active={seasonScope} onChange={setSeasonScope} />
+          </div>
         )}
 
         {seasonScope === 'pastSeasons' && !isOnCrazyGamesPlatform ? (
           <PastSeasonsLeaderboard />
         ) : (
         <>
-        {/* User's Rank Card (if authenticated) */}
-        {profile && userRank && (
-          <div className="space-y-4 mb-6">
-            <m.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className={cn(
-                'p-4 rounded-neo-lg border-3 border-neo-black shadow-hard-cyan',
-                isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
-              )}
-            >
-              {tierPanelEnabled && tierPosition && user?.id ? (
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-4">
-                    <Avatar
-                      customAvatar={profile.avatar_config}
-                      userId={user?.id}
-                      size="lg"
-                    />
-                    <div className="flex-1">
-                      <p className={cn('text-xs', 'text-gray-500')}>
-                        {t('leaderboard.yourRank')} · #{userRank.rank_position || '—'} {t('leaderboard.global')}
-                      </p>
-                      <p className={cn('text-sm font-semibold', isDarkMode ? 'text-white' : 'text-gray-900')}>
-                        {safeToLocaleString(userRank.total_score ?? 0, language)} {t('leaderboard.score')}
-                      </p>
-                    </div>
-                  </div>
-                  <TierPositionPanel position={tierPosition} userId={user.id} />
-                </div>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <Avatar
-                      customAvatar={profile.avatar_config}
-                      userId={user?.id}
-                      size="lg"
-                    />
-                    <div>
-                      <p className={cn('text-sm', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
-                        {t('leaderboard.yourRank')}
-                      </p>
-                      <p className={cn('text-2xl font-bold', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
-                        #{userRank.rank_position || '—'}
-                      </p>
-                      {currentUserTier && (
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <TierBadge tier={currentUserTier} size="sm" showLabel />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right flex flex-col items-end gap-2">
-                    <div>
-                      <p className={cn('text-sm', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
-                        {t('leaderboard.score')}
-                      </p>
-                      <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
-                        {safeToLocaleString(userRank.total_score ?? 0, language)}
-                      </p>
-                    </div>
-                    {currentUserTier && (
-                      <TierProgressBar
-                        tier={currentUserTier}
-                        progress={getLeaderboardTierProgress(userRank.total_score ?? 0, GLOBAL_LEADERBOARD_TIERS)}
-                        nextThreshold={getNextTierThreshold(userRank.total_score ?? 0, GLOBAL_LEADERBOARD_TIERS)}
-                        className="w-32"
-                      />
-                    )}
-                  </div>
-                </div>
-              )}
-            </m.div>
+        <YouCard
+          userId={user?.id}
+          avatarConfig={profile?.avatar_config}
+          rank={user ? userRank?.rank_position : undefined}
+          score={user ? userRank?.total_score : undefined}
+          leaderboard={leaderboard}
+          onPlay={() => router.push(`/${language}/singleplayer`)}
+          pending={authLoading || (!!user && rankLoading)}
+        >
+          {tierPanelEnabled && tierPosition && user?.id && (
+            <div className="mt-3">
+              <TierPositionPanel position={tierPosition} userId={user.id} />
+            </div>
+          )}
+        </YouCard>
 
-            {/* Near-Rank Progress Indicator */}
-            <NearRankIndicator
-              leaderboard={leaderboard}
-              userRank={userRank}
-              userId={user?.id}
-              totalPlayers={leaderboard.length}
-              nearbyRange={100}
-            />
-          </div>
-        )}
-
-        {/* Content with loading/error states */}
         <PageStateHandler
           isLoading={loading}
           error={error?.toString()}
           onRetry={refetch}
           isEmpty={!loading && !error && leaderboard.length === 0}
           loadingComponent={
-            <div className="space-y-4">
-              {/* Skeleton for user rank card */}
-              {profile && <SkeletonCard hasImage={false} lines={2} className="bg-neo-cream dark:bg-neo-navy" />}
-              {/* Skeleton for leaderboard table */}
-              <div className="space-y-2">
-                {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((id) => (
-                  <SkeletonCard key={`lb-skel-${id}`} hasImage={false} lines={1} className="py-3 bg-neo-cream dark:bg-neo-navy" />
-                ))}
-              </div>
+            <div className="space-y-2">
+              {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((id) => (
+                <SkeletonCard key={`lb-skel-${id}`} hasImage={false} lines={1} className="py-3 bg-neo-navy" />
+              ))}
             </div>
           }
           emptyComponent={
@@ -418,9 +245,6 @@ export default function LeaderboardPageClient(): React.JSX.Element {
             />
           }
         >
-          {/* exp-leaderboard-play-cta-v1: "Play to rank up" strip (play-cta arm only). */}
-          <LeaderboardPlayCta language={language} />
-          {/* Top-3 Podium — celebratory crown for the leaders */}
           {leaderboard.length > 0 && (
             <div className="mb-6 px-2 overflow-x-auto">
               <LeaderboardPodium
@@ -431,75 +255,33 @@ export default function LeaderboardPageClient(): React.JSX.Element {
             </div>
           )}
 
-          {/* Referral Share Banner — invite friends for rewards */}
-          {profile && <div className="mb-6"><ReferralShareBanner /></div>}
-
-          {/* Leaderboard Table — ranks 4+ (top 3 live in the podium above).
-              Horizontal scroll on narrow viewports keeps rank/player/score/games
-              in one row instead of stacking avatars and scores. */}
           {leaderboard.length > 3 && (
-          <div data-testid="leaderboard-table-scroll" className="overflow-x-auto -mx-1 px-1">
-          <div
-            data-testid="leaderboard-table"
-            className={cn(
-              'rounded-neo-lg overflow-hidden border-3 border-neo-black shadow-hard min-w-[36rem]',
-              isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
-            )}
-          >
-            {/* Table Header */}
-            <div
-              data-testid="leaderboard-table-header"
-              className={cn(
-                'grid grid-cols-10 gap-3 px-3 py-2 text-sm font-semibold uppercase tracking-wide',
-                isDarkMode ? 'bg-neo-navy-elevated/50 text-gray-300' : 'bg-gray-50 text-gray-600'
-              )}
+            <ol
+              data-testid="leaderboard-table"
+              start={4}
+              className="divide-y-2 divide-neo-black/40 overflow-hidden rounded-neo-lg border-neo-thick border-neo-black bg-neo-navy-light shadow-hard"
             >
-              <div className="col-span-1 min-w-[3rem] text-center">{t('leaderboard.rank')}</div>
-              <div className="col-span-5 min-w-[10rem]">{t('leaderboard.player')}</div>
-              <div className="col-span-2 min-w-[4.5rem] text-right">{t('leaderboard.score')}</div>
-              <div className="col-span-2 min-w-[4.5rem] text-right">{t('leaderboard.games')}</div>
-            </div>
-
-            {/* Table Body */}
-            <div className="divide-y divide-gray-200 dark:divide-slate-700">
               {leaderboard.slice(3).map((entry: LeaderboardEntry, index: number) => {
                 const rank = index + 4;
                 const isCurrentUser = user?.id === entry.player_id;
-
                 return (
-                  <div
+                  <li
                     key={entry.player_id}
                     data-testid="leaderboard-row"
+                    aria-current={isCurrentUser ? 'true' : undefined}
                     className={cn(
-                      'grid grid-cols-10 gap-3 px-3 py-3 items-center transition-all duration-150',
-                      isCurrentUser
-                        ? isDarkMode
-                          ? 'bg-cyan-900/20'
-                          : 'bg-cyan-50'
-                        : isDarkMode
-                          ? 'hover:bg-neo-navy-elevated/30'
-                          : 'hover:bg-gray-50'
+                      'grid grid-cols-[2.5rem_1fr_auto] items-center gap-3 px-3 py-2.5',
+                      isCurrentUser ? 'bg-neo-cyan/15 shadow-[inset_4px_0_0_var(--neo-cyan)]' : 'hover:bg-neo-navy-elevated/40',
                     )}
                   >
-                    <div className="col-span-1 min-w-[3rem] text-center">{getRankIcon(rank)}</div>
-                    <div className="flex min-w-0 items-center gap-2 col-span-5">
-                      <Avatar
-                        customAvatar={entry.avatar_config}
-                        userId={entry.player_id}
-                        size="sm"
-                      />
+                    <span className="text-center font-neo-display text-base font-bold tabular-nums text-neo-cream/50">
+                      {rank}
+                    </span>
+                    <div className="flex min-w-0 items-center gap-2">
+                      <Avatar customAvatar={entry.avatar_config} userId={entry.player_id} size="sm" />
                       <Link
                         href={`/${language}/player/${encodeURIComponent(entry.player_id)}`}
-                        className={cn(
-                          'font-medium truncate text-sm hover:underline',
-                          isCurrentUser
-                            ? isDarkMode
-                              ? 'text-cyan-400'
-                              : 'text-cyan-600'
-                            : isDarkMode
-                              ? 'text-white'
-                              : 'text-gray-900'
-                        )}
+                        className={cn('truncate text-sm font-semibold hover:underline', isCurrentUser ? 'text-neo-cyan' : 'text-neo-white')}
                       >
                         {entry.display_name || entry.username}
                       </Link>
@@ -509,47 +291,21 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                         animated={isCurrentUser}
                       />
                     </div>
-                    <div
-                      className={cn(
-                        'col-span-2 min-w-[4.5rem] text-right font-semibold text-sm',
-                        isDarkMode ? 'text-white' : 'text-gray-900'
-                      )}
-                    >
+                    <span className="text-end font-neo-display text-sm font-bold tabular-nums text-neo-white">
                       {safeToLocaleString(entry.total_score ?? 0, language)}
-                    </div>
-                    <div className={cn('col-span-2 min-w-[4.5rem] text-right text-sm', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
-                      {entry.games_played || 0}
-                    </div>
-                  </div>
+                    </span>
+                  </li>
                 );
               })}
-            </div>
-          </div>
-          </div>
+            </ol>
           )}
         </PageStateHandler>
-
+        </>
+        )}
         </>
         )}
 
-        </>
-        )}
-
-        {/* Non-sticky inline ad — passive page, appears after content before back button */}
         <InlineBannerAd webZone="content-page" className="my-8" />
-
-        {/* Back Button */}
-        <div className="mt-8 text-center">
-          <Button
-            onClick={() => router.push(`/${language}`)}
-            variant="cyan"
-            haptic
-            animation="pop"
-          >
-            <ArrowLeft className="me-2 rtl:rotate-180" />
-            {t('common.backToMenu')}
-          </Button>
-        </div>
       </div>
     </PageLayout>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import Image from 'next/image';
 import { GLOBAL_LEADERBOARD_TIERS, type LeaderboardTierDef, type LeaderboardTierId } from '@/lib/ranked/leaderboardTiers';
 
@@ -37,12 +38,14 @@ const SIZE_CONFIG: Record<TierBadgeSize, { img: number; wrapper: string; font: s
 
 export const TierBadge = memo<TierBadgeProps>(
   ({ tier, size = 'sm', showLabel = false, animated = false, className = '' }) => {
+    const { t } = useLanguage();
+    const tierName = t(`leaderboard.tiers.${tier.id}`);
     const { img, wrapper, font } = SIZE_CONFIG[size];
 
     return (
       <div
         className={`flex items-center gap-1 shrink-0 ${className}`}
-        title={tier.name}
+        title={tierName}
         data-testid={`tier-badge-${tier.id}`}
       >
         <div
@@ -55,7 +58,7 @@ export const TierBadge = memo<TierBadgeProps>(
         >
           <Image
             src={tier.imagePath}
-            alt={tier.name}
+            alt={tierName}
             width={img}
             height={img}
             className="object-contain w-full h-full"
@@ -68,7 +71,7 @@ export const TierBadge = memo<TierBadgeProps>(
             className={`font-bold ${font} leading-none`}
             style={{ color: tier.color }}
           >
-            {tier.name}
+            {tierName}
           </span>
         )}
       </div>
@@ -91,6 +94,8 @@ interface TierProgressBarProps {
 
 export const TierProgressBar = memo<TierProgressBarProps>(
   ({ tier, progress, nextThreshold, className = '' }) => {
+    const { t } = useLanguage();
+    const tierName = t(`leaderboard.tiers.${tier.id}`);
     const isMaxTier = tier.maxScore === Infinity;
     const pct = Math.round(progress * 100);
 
@@ -98,12 +103,12 @@ export const TierProgressBar = memo<TierProgressBarProps>(
       <div className={`flex flex-col gap-1 ${className}`}>
         <div className="flex items-center justify-between text-[10px] text-slate-400">
           <span style={{ color: tier.color }} className="font-bold">
-            {tier.name}
+            {tierName}
           </span>
           {!isMaxTier && nextThreshold != null && (
-            <span>{pct}% to next tier</span>
+            <span>{t('leaderboard.tier.toNextTier', { pct })}</span>
           )}
-          {isMaxTier && <span className="text-purple-400">Max tier!</span>}
+          {isMaxTier && <span className="text-neo-purple">{t('leaderboard.tier.maxTier')}</span>}
         </div>
         <div className="h-1.5 rounded-full bg-neo-navy-elevated overflow-hidden">
           <div
@@ -129,8 +134,10 @@ interface TierPillProps {
 }
 
 export const TierPill = memo<TierPillProps>(({ tierId, size = 'sm', className = '' }) => {
-  const tier = GLOBAL_LEADERBOARD_TIERS.find((t) => t.id === tierId);
+  const { t } = useLanguage();
+  const tier = GLOBAL_LEADERBOARD_TIERS.find((def) => def.id === tierId);
   if (!tier) return null;
+  const tierName = t(`leaderboard.tiers.${tier.id}`);
 
   const isXs = size === 'xs';
 
@@ -145,11 +152,11 @@ export const TierPill = memo<TierPillProps>(({ tierId, size = 'sm', className = 
         borderColor: `${tier.color}66`,
         backgroundColor: `${tier.color}18`,
       }}
-      title={tier.name}
+      title={tierName}
     >
       <Image
         src={tier.imagePath}
-        alt={tier.name}
+        alt={tierName}
         width={isXs ? 12 : 16}
         height={isXs ? 12 : 16}
         className="object-contain"
@@ -159,7 +166,7 @@ export const TierPill = memo<TierPillProps>(({ tierId, size = 'sm', className = 
         className={`font-bold leading-none ${isXs ? 'text-[9px]' : 'text-[11px]'}`}
         style={{ color: tier.color }}
       >
-        {tier.name}
+        {tierName}
       </span>
     </div>
   );

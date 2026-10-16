@@ -515,34 +515,6 @@ export function trackDailySignupRank(data: {
   safe(() => (posthog.capture as PHFn)('daily_signup_rank_revealed', data));
 }
 
-// ---------- Leaderboard engagement (exp-leaderboard-play-cta-v1) ----------
-
-/**
- * Leaderboard play-CTA shown. Fire when the experiment variant renders
- * the "Play to rank up" banner. Used to compute show→click conversion.
- */
-export function trackLeaderboardPlayCtaShown(args: { variant: string }): void {
-  safe(() =>
-    (posthog.capture as PHFn)('leaderboard_play_cta_shown', {
-      experiment: 'exp-leaderboard-play-cta-v1',
-      variant: args.variant,
-    })
-  );
-}
-
-/**
- * Leaderboard play-CTA clicked. Pair with game_started to compute
- * leaderboard → game funnel from the experiment variant.
- */
-export function trackLeaderboardPlayCtaClicked(args: { variant: string }): void {
-  safe(() =>
-    (posthog.capture as PHFn)('leaderboard_play_cta_clicked', {
-      experiment: 'exp-leaderboard-play-cta-v1',
-      variant: args.variant,
-    })
-  );
-}
-
 // ---------- Results screen (funnel instrumentation gap) ----------
 
 /**

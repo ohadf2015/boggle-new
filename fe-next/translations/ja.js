@@ -7507,6 +7507,7 @@ const ja = {
     "beat": "追い越す",
     "youAreFirst": "あなたが1位!",
     "keepItUp": "プレイを続けてリードを守ろう",
+    "players": "プレイヤー",
     "nearbyPlayers": "近いプレイヤー",
     "points": "pt",
     "hint": "💡 名前をタップすると単語が見えるよ",
@@ -7542,7 +7543,9 @@ const ja = {
       "climbToNext": "プレイして{{nextTier}}に昇格しよう",
       "peersInTier": "{{tier}}のプレイヤー",
       "nobodyAbove": "{{tier}}にあなたより上はいません",
-      "distanceToFirst": "#1まであと{{score}}"
+      "distanceToFirst": "#1まであと{{score}}",
+      "toNextTier": "次のティアまで{{pct}}%",
+      "maxTier": "最高ティア！"
     },
     "global": "グローバル"
   },

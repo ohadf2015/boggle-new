@@ -7829,6 +7829,7 @@ const sv = {
     "beat": "Slå",
     "youAreFirst": "Du är #1!",
     "keepItUp": "Fortsätt spela för att behålla ledningen",
+    "players": "Spelare",
     "nearbyPlayers": "Spelare nära dig",
     "points": "poäng",
     "hint": "Tryck på namnen för att se deras ord",
@@ -7864,7 +7865,9 @@ const sv = {
       "climbToNext": "Spela mer för att nå {{nextTier}}",
       "peersInTier": "Spelare i {{tier}}",
       "nobodyAbove": "Ingen ovanför dig i {{tier}}",
-      "distanceToFirst": "{{score}} till #1"
+      "distanceToFirst": "{{score}} till #1",
+      "toNextTier": "{{pct}}% till nästa nivå",
+      "maxTier": "Högsta nivån!"
     },
     "global": "globalt"
   },

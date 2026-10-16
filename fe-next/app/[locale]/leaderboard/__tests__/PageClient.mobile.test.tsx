@@ -3,6 +3,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const push = vi.fn();
+let authState: { user: { id: string } | null; profile: Record<string, unknown> | null } = { user: null, profile: null };
+let rankState: { total_score?: number; rank_position?: number } | null = null;
+let rankLoading = false;
+let authLoading = false;
+let onCrazyGames = false;
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
@@ -36,7 +41,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({ user: { id: 'me' }, profile: null, isSupabaseEnabled: true }),
+  useAuth: () => ({ ...authState, loading: authLoading, isSupabaseEnabled: true }),
 }));
 
 vi.mock('@/hooks/useSupabaseRealtime', () => ({
@@ -53,7 +58,7 @@ vi.mock('@/hooks/useSupabaseRealtime', () => ({
     subscriptionStatus: 'SUBSCRIBED',
     refetch: vi.fn(),
   }),
-  useUserRank: () => ({ rank: null }),
+  useUserRank: () => ({ rank: rankState, loading: rankLoading }),
 }));
 
 vi.mock('@/hooks/useTierPromotion', () => ({ useTierPromotion: () => undefined }));
@@ -62,7 +67,7 @@ vi.mock('@/hooks/useExperiment', () => ({
   useExperiment: () => ({ variant: 'control', trackExposure: vi.fn() }),
 }));
 vi.mock('@/components/CrazyGamesSDK', () => ({
-  useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }),
+  useCrazyGames: () => ({ isOnCrazyGamesPlatform: onCrazyGames }),
 }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 vi.mock('@/components/layout/PageLayout', () => ({
@@ -75,7 +80,6 @@ vi.mock('@/components/Avatar', () => ({
   default: () => <div data-testid="avatar" />,
 }));
 vi.mock('@/components/ads', () => ({ InlineBannerAd: () => null }));
-vi.mock('@/components/referral/ReferralShareBanner', () => ({ default: () => null }));
 vi.mock('@/components/ui/TierBadge', () => ({
   TierBadge: () => null,
   TierProgressBar: () => null,
@@ -83,7 +87,6 @@ vi.mock('@/components/ui/TierBadge', () => ({
 vi.mock('@/components/leaderboard/LeaderboardPodium', () => ({
   default: () => <div data-testid="podium" />,
 }));
-vi.mock('../LeaderboardPlayCta', () => ({ LeaderboardPlayCta: () => null }));
 vi.mock('@/components/seasons/SeasonLeaderboardTabs', () => ({
   SeasonLeaderboardTabs: () => null,
   seasonScopeLabelKey: () => 'leaderboard.allTime',
@@ -108,34 +111,91 @@ vi.mock('@/components/ui/button', () => ({
 
 import LeaderboardPageClient from '../PageClient';
 
-describe('Leaderboard PageClient mobile layout', () => {
+describe('Leaderboard PageClient', () => {
   beforeEach(() => {
     push.mockClear();
+    authState = { user: null, profile: null };
+    rankState = null;
+    rankLoading = false;
+    authLoading = false;
+    onCrazyGames = false;
   });
 
-  it('shouldWrapTheTableInAHorizontalScrollContainerWithFixedColumns', () => {
-    // GIVEN a populated leaderboard on a narrow viewport
+  it('shouldKeepRankPlayerAndScoreOnScreenWithoutHorizontalScroll', () => {
     render(<LeaderboardPageClient />);
 
-    // WHEN the table wrapper is inspected
-    const scroller = screen.getByTestId('leaderboard-table-scroll');
-
-    // THEN it scrolls horizontally instead of stacking rank/avatar/score
-    expect(scroller.className).toMatch(/overflow-x-auto/);
+    expect(screen.queryByTestId('leaderboard-table-scroll')).toBeNull();
     const table = screen.getByTestId('leaderboard-table');
-    expect(table.className).toMatch(/min-w-/);
-    expect(screen.getByTestId('leaderboard-table-header').className).toMatch(/grid-cols-10/);
-    expect(screen.getByText('Dee').closest('[data-testid="leaderboard-row"]')?.className).toMatch(
-      /grid-cols-10/,
-    );
-    expect(screen.getByText('Dee').closest('[data-testid="leaderboard-row"]')?.className).not.toMatch(
-      /flex-col/,
-    );
+    expect(table.className).not.toMatch(/min-w-/);
+    const row = screen.getByText('Dee').closest('[data-testid="leaderboard-row"]');
+    expect(row?.textContent).toContain('400');
+    expect(screen.queryByText('leaderboard.games')).toBeNull();
   });
 
-  it('shouldRouteTheTopHomeButtonToTheCurrentLocaleHomepage', () => {
+  it('shouldLeaveBackNavigationToTheAppChrome', () => {
+    render(<LeaderboardPageClient />);
+    expect(screen.queryByLabelText('common.backToMenu')).toBeNull();
+    expect(screen.queryByText('common.backToMenu')).toBeNull();
+  });
+
+  it('shouldKeepAPageBackButtonOnCrazyGamesWhereTheAppHeaderIsHidden', () => {
+    onCrazyGames = true;
     render(<LeaderboardPageClient />);
     fireEvent.click(screen.getByTestId('leaderboard-home'));
     expect(push).toHaveBeenCalledWith('/en');
+  });
+
+  it('shouldLabelTheTabsPlayersAndCreators', () => {
+    render(<LeaderboardPageClient />);
+    expect(screen.getByRole('tab', { name: 'leaderboard.players' }).getAttribute('aria-selected')).toBe('true');
+    expect(screen.getByRole('tab', { name: 'ugc.creator.stats' })).toBeTruthy();
+  });
+
+  it('shouldInviteAGuestToPlayFromTheYouCard', () => {
+    render(<LeaderboardPageClient />);
+    const card = screen.getByTestId('leaderboard-you');
+    expect(card.textContent).toContain('leaderboard.noRankYet');
+    fireEvent.click(screen.getByRole('button', { name: 'common.playNow' }));
+    expect(push).toHaveBeenCalledWith('/en/singleplayer');
+  });
+
+  it('shouldShowARankedPlayerTheirRankAndThePointsToPassThePlayerAbove', () => {
+    authState = { user: { id: 'e' }, profile: { avatar_config: null } };
+    rankState = { rank_position: 5, total_score: 200 };
+    render(<LeaderboardPageClient />);
+
+    const card = screen.getByTestId('leaderboard-you');
+    expect(card.textContent).toContain('#5');
+    expect(card.textContent).toContain('201');
+    expect(card.textContent).toContain('Dee');
+    expect(screen.getByText('Eve').closest('[data-testid="leaderboard-row"]')?.getAttribute('aria-current')).toBe('true');
+  });
+
+  it('shouldNotFlashThePlayPromptWhileASignedInPlayersRankIsLoading', () => {
+    authState = { user: { id: 'e' }, profile: { avatar_config: null } };
+    rankLoading = true;
+    render(<LeaderboardPageClient />);
+    expect(screen.getByTestId('leaderboard-you-pending')).toBeTruthy();
+    expect(screen.queryByText('common.playNow')).toBeNull();
+  });
+
+  it('shouldNotFlashThePlayPromptWhileAuthIsResolving', () => {
+    authLoading = true;
+    render(<LeaderboardPageClient />);
+    expect(screen.queryByText('common.playNow')).toBeNull();
+  });
+
+  it('shouldNeverOfferThePlayerThemselvesAsThePassTarget', () => {
+    authState = { user: { id: 'e' }, profile: { avatar_config: null } };
+    rankState = { rank_position: 6, total_score: 200 };
+    render(<LeaderboardPageClient />);
+    expect(screen.getByTestId('leaderboard-you').textContent).not.toContain('Eve');
+  });
+
+  it('shouldCongratulateTheLeaderInsteadOfAPassTarget', () => {
+    authState = { user: { id: 'a' }, profile: { avatar_config: null } };
+    rankState = { rank_position: 1, total_score: 3000 };
+    render(<LeaderboardPageClient />);
+    expect(screen.getByTestId('leaderboard-you').textContent).toContain('leaderboard.youAreFirst');
   });
 });

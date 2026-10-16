@@ -5406,6 +5406,7 @@ const ru = {
     "beat": "Обойди",
     "youAreFirst": "Ты #1!",
     "keepItUp": "Продолжай играть, чтобы сохранить лидерство",
+    "players": "Игроки",
     "nearbyPlayers": "Рядом в рейтинге",
     "points": "очк.",
     "hint": "Нажимай на имена, чтобы увидеть их слова",
@@ -5441,7 +5442,9 @@ const ru = {
       "climbToNext": "Играй больше, чтобы подняться на {{nextTier}}",
       "peersInTier": "Игроки в {{tier}}",
       "nobodyAbove": "Никого выше тебя в {{tier}}",
-      "distanceToFirst": "{{score}} до #1"
+      "distanceToFirst": "{{score}} до #1",
+      "toNextTier": "{{pct}}% до следующего уровня",
+      "maxTier": "Максимальный уровень!"
     },
     "global": "глобально"
   },

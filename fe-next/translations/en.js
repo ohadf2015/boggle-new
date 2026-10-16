@@ -7429,6 +7429,7 @@ const en = {
     "beat": "Beat",
     "youAreFirst": "You're #1!",
     "keepItUp": "Keep playing to maintain your lead",
+    "players": "Players",
     "nearbyPlayers": "Nearby players",
     "points": "pts",
     "hint": "Tap names to see their words.",
@@ -7464,7 +7465,9 @@ const en = {
       "climbToNext": "Play more to climb to {{nextTier}}",
       "peersInTier": "Peers in {{tier}}",
       "nobodyAbove": "Nobody above you in {{tier}}",
-      "distanceToFirst": "{{score}} to #1"
+      "distanceToFirst": "{{score}} to #1",
+      "toNextTier": "{{pct}}% to next tier",
+      "maxTier": "Max tier!"
     },
     "global": "global"
   },

@@ -7933,6 +7933,7 @@ const he = {
     "beat": "לנצח",
     "youAreFirst": "אתם במקום #1!",
     "keepItUp": "המשיכו לשחק כדי להישאר בראש",
+    "players": "שחקנים",
     "nearbyPlayers": "שחקנים קרובים",
     "points": "נק'",
     "hint": "הקישו על שם כדי לראות את המילים שלו",
@@ -7968,7 +7969,9 @@ const he = {
       "climbToNext": "‫שחקו עוד כדי להעפיל ל-{{nextTier}}‬",
       "peersInTier": "‫שחקנים ב-{{tier}}‬",
       "nobodyAbove": "‫אין אף אחד מעליך ב-{{tier}}‬",
-      "distanceToFirst": "‫{{score}} עד #1‬"
+      "distanceToFirst": "‫{{score}} עד #1‬",
+      "toNextTier": "{{pct}}% לדרגה הבאה",
+      "maxTier": "דרגה מקסימלית!"
     },
     "global": "גלובלי"
   },
