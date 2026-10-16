@@ -72,6 +72,10 @@ const faqs = [
     q: 'What game modes are good for competitive play?',
     a: 'Multiplayer Grid Battle (real-time head-to-head), the ranked Daily Word Wheel and Daily Word Hunt (same puzzle for everyone, leaderboard-scored), and Party mode for 20+ players. Each feeds into your global ranking.',
   },
+  {
+    q: 'Which browser word games are best for building vocabulary over time?',
+    a: 'Competitive play builds vocabulary as a side effect — every ranked match and daily challenge scores real dictionary words, so repeat players pick up new words under time pressure. If you want vocabulary practice as the main goal rather than the leaderboard, LexiClash also runs a dedicated ESL and classroom vocabulary mode with themed word lists and no ranking pressure.',
+  },
 ];
 
 /* Static JSON-LD — all content is hardcoded string literals, rendered via next/script (no dangerouslySetInnerHTML). */
@@ -216,6 +220,10 @@ export default async function CompetitiveWordGamesPage({ params }: PageProps) {
             <Link href={`/${locale}/free-multiplayer-word-game`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
               <h3 className="font-bold text-neo-pink">Multiplayer Word Game Online</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time, browser-based, free</p>
+            </Link>
+            <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-yellow/40">
+              <h3 className="font-bold text-neo-yellow">Vocabulary-Building Word Games</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">ESL & classroom vocabulary practice mode</p>
             </Link>
           </div>
         </section>

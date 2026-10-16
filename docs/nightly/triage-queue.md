@@ -2541,3 +2541,11 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 - 30d `game_completed` filtered to `mode='word-wheel'`, grouped by `$feature/exp-wordwheel-drag-hint-v1`, flood-capped (exclude >50 events/distinct_id): control 7 uniques/11 completions, drag-hint 11 uniques/66 completions. Both arms orders of magnitude below the 1000/arm significance threshold — cannot decide winner.
 - This also explains tonight's brief item "rage clicks on /he/daily/word-wheel" (reach=2): the surface gets so little daily traffic that even 2 rage-click sessions register as a top-score signal.
 - Recommendation: either (a) leave running and accept it may never reach significance at current traffic (daily word-wheel is a low-traffic surface), or (b) make a product call to ship `drag-hint` to 100% on priors (it's a strictly additive idle coachmark, no plausible downside) and retire the flag without a statistical winner. Not an automated-safe call either way — human judgment on risk tolerance for an unmeasurable flag.
+
+## 2026-10-16
+- [Sentry] GUEST_TRACKER duplicate key race (guest_sessions_session_id_key) — JAVASCRIPT-NEXTJS-2C7 (re-opened)
+  - first seen 2026-10-08, last seen 2026-10-14, occurrences 7 (up from baseline 2 on 10-10), userCount 0
+  - https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-2C7
+  - status: shipped (re-fix, see below)
+  - why: the 10-10 lane's claimed fix (`getOrCreateGuestSession` returns the winner's row on a 23505 race) never actually landed in `fe-next/backend/modules/guestTracker.ts` — the insert-error branch still unconditionally returned null regardless of error code. Classic "gate PASS, nothing shipped" (nightly Class 4). Re-implemented tonight with a TDD test (`backend/modules/__tests__/guestTracker.test.ts`, was also missing).
+  - recommended owner: review-by-eod

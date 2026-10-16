@@ -606,6 +606,25 @@ export const EXPERIMENTS = {
   }),
 
   /**
+   * Education landing hero demo (EducationLandingDemo) auto-plays one word
+   * on load, disabling the letter tiles until the trace finishes. PostHog
+   * rage-clicks on /es/education/esl-word-games landed on tile letters
+   * ("O", "L") — eager visitors tap the board while it's still disabled.
+   * control = tile clicks ignored while watching (legacy). interrupt =
+   * a tile click during the auto-trace immediately hands control to the
+   * visitor (stops the demo, starts their own path at that tile).
+   * Conversion = education_demo_tile_clicked rate after the demo loads.
+   * Guardrail = rage clicks on the esl-word-games page must drop or hold.
+   * Ship to PostHog: flag key = 'exp-edu-demo-interrupt-v1', 50/50.
+   */
+  'exp-edu-demo-interrupt-v1': defineExperiment({
+    variants: ['control', 'interrupt'] as const,
+    default: 'control',
+    description:
+      'Education landing demo tile-lock. control = tiles ignore clicks during auto-trace, interrupt = a click during auto-trace hands the board over immediately. Targets esl-word-games rage-click on demo letters.',
+  }),
+
+  /**
    * Classic/survival word-count goal badge. Classic mode 7d completion = 16%
    * (73 started, 12 completed) — worst of all modes. Hypothesis: players
    * abandon because there is no concrete progress anchor (only a timer). The

@@ -7,6 +7,8 @@ import { isAdjacent, wordFromPath } from '@/lib/education/eslCefrDemo';
 import { wordsFoundKey } from '@/lib/education/landingDemo';
 import { displayDemoWord, landingDemoBoard, landingHintPath } from '@/lib/education/landingDemoBoards';
 import { EducationLandingProjector } from './EducationLandingProjector';
+import { useExperiment } from '@/hooks/useExperiment';
+import posthog from '@/lib/analytics/lazyPosthog';
 
 const STEP_MS = 240;
 const reducedMotion = () =>
@@ -19,12 +21,17 @@ const reducedMotion = () =>
  */
 export function EducationLandingDemo() {
   const { t, language } = useLanguage();
+  const { variant: interruptVariant, trackExposure } = useExperiment('exp-edu-demo-interrupt-v1');
   const { letters, targets, minLength } = landingDemoBoard(language);
   const cols = Math.round(Math.sqrt(letters.length));
   const [path, setPath] = useState<number[]>([]);
   const [found, setFound] = useState<string[]>([]);
   const [watching, setWatching] = useState(true);
   const timers = useRef<number[]>([]);
+
+  useEffect(() => {
+    trackExposure();
+  }, [trackExposure]);
 
   const clearTimers = useCallback(() => {
     timers.current.forEach((id) => window.clearTimeout(id));
@@ -51,6 +58,7 @@ export function EducationLandingDemo() {
           setFound((prev) => (prev.includes(word) ? prev : [...prev, word]));
           setPath([]);
           setWatching(false);
+          posthog.capture('education_demo_watch_completed', { word });
         }, gap * (hint.length + 1)),
       );
     },
@@ -63,7 +71,15 @@ export function EducationLandingDemo() {
   }, [trace, clearTimers]);
 
   const onTile = (i: number) => {
-    if (watching) return;
+    if (watching) {
+      if (interruptVariant !== 'interrupt') return;
+      clearTimers();
+      setWatching(false);
+      setPath([i]);
+      posthog.capture('education_demo_tile_clicked', { duringWatch: true });
+      return;
+    }
+    posthog.capture('education_demo_tile_clicked', { duringWatch: false });
     const last = path[path.length - 1];
     let next: number[];
     if (last === i) next = path.slice(0, -1);
@@ -108,7 +124,7 @@ export function EducationLandingDemo() {
                 key={i}
                 type="button"
                 onClick={() => onTile(i)}
-                disabled={watching}
+                disabled={watching && interruptVariant !== 'interrupt'}
                 aria-label={ch}
                 className={cn(
                   'aspect-square rounded-neo border-2 border-neo-black font-neo-display text-xl font-black shadow-hard-sm sm:text-2xl',

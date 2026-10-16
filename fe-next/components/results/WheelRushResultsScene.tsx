@@ -10,7 +10,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useReducedMotion } from 'framer-motion';
 import { gsap } from 'gsap';
-import { Crown, Lock, Percent, Sparkles, Swords, Trophy } from 'lucide-react';
+import { Crown, Lock, Percent, Sparkles, Trophy, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ScoreCountUp } from '@/components/results/shared';
 import Avatar from '@/components/Avatar';
@@ -97,11 +97,11 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
     if (topSteals?.[1].wordsStolen > 0) {
       out.push({
         key: 'bandit',
-        icon: <Swords className="w-4 h-4" />,
+        icon: <Zap className="w-4 h-4" />,
         titleKey: 'wheelRush.results.bandit',
         username: topSteals[0],
         value: topSteals[1].wordsStolen,
-        tone: 'text-neo-red',
+        tone: 'text-neo-cyan',
       });
     }
     const topWord = [...list].sort(([, a], [, b]) => (b.bestWord?.length || 0) - (a.bestWord?.length || 0))[0];
@@ -261,10 +261,10 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
           delay={prefersReduced ? 0 : 1100}
         />
         <StatTile
-          icon={<Swords className="w-3 h-3" />}
+          icon={<Zap className="w-3 h-3" />}
           label={t('wheelRush.results.steals')}
           value={recap.totalSteals}
-          tone="text-neo-red"
+          tone="text-neo-cyan"
           countUp
           delay={prefersReduced ? 0 : 1200}
         />

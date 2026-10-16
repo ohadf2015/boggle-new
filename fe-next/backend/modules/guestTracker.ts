@@ -128,6 +128,22 @@ export async function getOrCreateGuestSession(
     );
 
     if (insertError) {
+      // 23505 = unique-violation on session_id — a concurrent request for the
+      // same sessionId won the race between our existence SELECT and this
+      // INSERT. Re-fetch and return the winner's row instead of 500ing.
+      if (insertError.code === '23505') {
+        const { data: raced } = await runQuery(
+          (signal) => client
+            .from('guest_sessions')
+            .select('id, session_id, first_visit_at, last_visit_at, device_type, browser, language, utm_source, utm_medium, utm_campaign, referrer, country, user_id, linked_at, created_at')
+            .eq('session_id', sessionData.sessionId)
+            .abortSignal(signal)
+            .single(),
+          'getOrCreate:refetch'
+        );
+        return raced ?? null;
+      }
+
       logger.error('GUEST_TRACKER', `Failed to create guest session: ${insertError.message}`);
       return null;
     }

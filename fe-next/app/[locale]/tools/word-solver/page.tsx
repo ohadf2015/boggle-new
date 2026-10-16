@@ -4,6 +4,7 @@ import { loadTranslation, type TranslationData } from '@/translations/loadTransl
 import WordSolverPageClient from './PageClient';
 import { getContent, type Locale } from './content';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
 
 const POPULAR_ANAGRAM_SEEDS = ['listen', 'stared', 'heart', 'stone', 'rates', 'learn', 'smart', 'great', 'earth', 'words'];
 
@@ -154,6 +155,9 @@ export default async function WordSolverPage({ params }: PageParams) {
         features={content.howToSteps}
         faq={content.faqs}
       />
+      <div className="mx-auto max-w-4xl px-4">
+        <GuidesCalloutLink locale={locale} />
+      </div>
       <section className="mx-auto max-w-4xl px-4 pb-12">
         <h2 className="text-xl font-neo-display font-bold text-neo-pink uppercase tracking-wider mb-3">
           Popular Anagram Lookups
