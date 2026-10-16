@@ -55,4 +55,14 @@ describe('DiscoveredWordsList', () => {
     expect(screen.queryByText('puzzle')).not.toBeInTheDocument();
     expect(screen.getByText('••••••')).toBeInTheDocument();
   });
+
+  it('Given many found words, Then they stay on one row that scrolls sideways (never wraps and grows taller)', () => {
+    const words = Array.from({ length: 20 }, (_, i) => makeWord(`word${i}`, i));
+    render(<DiscoveredWordsList words={words} t={t} />);
+    const row = screen.getByTestId('found-words-row');
+    expect(row.className).not.toMatch(/flex-wrap/);
+    expect(row.className).toMatch(/flex-nowrap/);
+    expect(row.className).toMatch(/overflow-x-auto/);
+    for (const chip of Array.from(row.children)) expect((chip as HTMLElement).className).toMatch(/shrink-0/);
+  });
 });
