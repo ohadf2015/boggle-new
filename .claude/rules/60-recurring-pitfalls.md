@@ -47,6 +47,8 @@
 - [ ] Two code paths to the same state? Diff their payloads field-by-field. Carry shared data (e.g. `leaderboard[]`) INSIDE the common payload so both paths restore it atomically.
 - [ ] Reconnect/rehydrate: server in-memory socket→game maps are wiped on restart. Client must re-emit `join` (rebuilds the map), not a lighter `requestX` that gates on `getGameBySocketId` → null no-op.
 - [ ] Client and server computing the "same" number independently → they WILL drift. One side is the source of truth; the other displays it.
+- [ ] **Optimistic client mutation (Blast pops, local cascades):** every server branch that REJECTS must still reach the client, or the optimistic state stays on screen. Rejections usually emit nothing board-shaped — give the client an ack-or-resync path (unacked after N ms → request the authoritative state) and drop stale acks while a newer optimistic move is in flight. Gate on a pending-ack count, never on two server counters that only look alike.
+- [ ] **Callback wrappers drop arguments silently:** a child calling `onX(a, b, c)` through a parent typed `(a, b) => …` compiles and loses `c`. When a child grows an argument, grep every wrapper that forwards it.
 
 ---
 
