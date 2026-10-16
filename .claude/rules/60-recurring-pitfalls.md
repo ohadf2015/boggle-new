@@ -63,6 +63,8 @@
 - [ ] Querying a table for a job's input: assert the row count is plausible. Zero rows for a job that should always have work = alert, not silent success.
 - [ ] **Supabase PAT:** always mint with **Expires = Never**. Default `sbp_` tokens expire in 30 days and die silently mid-nightly. See `nightly-supabase-mcp-token-expiry`.
 - [ ] **Agent background tasks / piped commands:** NEVER trust the `<task-notification>` "exit code" or a `cmd | tail` pipeline's status — both report the wrapper, not the command. Verify by STATE: build → `echo "RC=$?"` sentinel inside the command + check `.next/BUILD_ID` mtime (`find .next -maxdepth 1 -name BUILD_ID -mmin -3`); push → `git merge-base --is-ancestor <sha> origin/master` after fetch; grep the real log for `error TS|failed to compile`. See `bg-task-exit-masking-and-concurrent-sessions-2026-06-27`.
+- [ ] **`t(key, fallback)` renders the English fallback when a key is missing**, so a new string looks done in English and ships untranslated everywhere else (a paywall meter once reached every locale in English, and RTL flipped its "50 / 6"). Add new keys to all six locales in the same change; `components/education/__tests__/eduTranslationKeysResolve.guard.test.ts` enforces it for the teacher module.
+- [ ] **A crashed checker is not a pass:** bare `npx tsc --noEmit` and `next build` can abort out of memory (RC 134 / SIGABRT) with zero errors printed. Use `NODE_OPTIONS=--max-old-space-size=8192` or `npm run build`.
 - [ ] **Concurrent agent sessions in this repo** wipe scratchpad/`tasks/*.output` files mid-read (ENOENT) and hold `.next/lock` / race `git push`. Write critical logs to `/tmp`; `ps aux | grep "next build"` and wait for the lock (don't fight it); `git fetch` immediately before pushing. Pre-push hook can hang >8min under contention → `--no-verify` is justified ONLY after lint0/tsc0/build0/tests-green were verified independently.
 
 ---
@@ -76,6 +78,7 @@
 **Pre-flight:**
 - [ ] Gating a heavy/animated effect on `isNativeApp()`? Mobile web needs the same gate — use `!isNativeApp() && !isMobileViewport()` or `prefersStaticFullscreenOverlay()`.
 - [ ] **Dark-only** surfaces (game overlays, fanfare, fullscreen results) → hardcode `bg-neo-navy`. Do NOT use `bg-neo-cream dark:bg-neo-navy` there — that pair is correct ONLY for genuinely theme-responsive surfaces (it flashes cream before the dark class resolves on lazy mounts).
+- [ ] **Bottom reservations need a real owner on screen:** `--bottom-nav-height` defaults to 64px even on pages with no nav. A body `padding-bottom` keyed on a class that outlived its banner/nav (or on the cookie sheet) shrinks an `h-dvh` shell in the flex-column body and leaves a blank band under the tab bar. Gate on the nav/banner class, and clear the class when the owner leaves.
 - [ ] Entrance opacity tweens on large/fullscreen layers on mobile: prefer a static appear (no `opacity-0` start) over a tween, or keep the tween bounded to a small element.
 
 ---
