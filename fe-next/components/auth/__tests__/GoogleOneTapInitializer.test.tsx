@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 
 const mockUseAuth = vi.fn();
 vi.mock('@/contexts/AuthContext', () => ({
@@ -15,6 +15,14 @@ vi.mock('@/lib/supabase', () => ({
   supabase: { auth: { signInWithIdToken: vi.fn() } },
 }));
 
+const mockPathname = vi.fn(() => '/en/how-to-play');
+vi.mock('next/navigation', () => ({
+  usePathname: () => mockPathname(),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), prefetch: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
+  useParams: () => ({}),
+}));
+
 // Render next/script as a plain tag so we can assert it mounts.
 vi.mock('next/script', () => ({
   // data-src (not src) so the @next/next/no-sync-scripts lint rule doesn't fire on the mock
@@ -27,6 +35,7 @@ describe('GoogleOneTapInitializer', () => {
   beforeEach(() => {
     mockIsNative.mockReturnValue(false);
     mockUseAuth.mockReturnValue({ user: null, isAuthenticated: false });
+    mockPathname.mockReturnValue('/en/how-to-play');
     vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', 'cid-123.apps.googleusercontent.com');
   });
   afterEach(() => {
@@ -78,6 +87,24 @@ describe('GoogleOneTapInitializer', () => {
     localStorage.clear();
     render(<GoogleOneTapInitializer />);
     expect(screen.queryByTestId('gsi-script')).not.toBeNull();
+  });
+
+  it('does not load GSI on the PSI landing until pointerdown', () => {
+    mockPathname.mockReturnValue('/en');
+    render(<GoogleOneTapInitializer />);
+    expect(screen.queryByTestId('gsi-script')).toBeNull();
+    act(() => {
+      window.dispatchEvent(new Event('pointerdown'));
+    });
+    expect(screen.getByTestId('gsi-script').getAttribute('data-src')).toContain(
+      'https://accounts.google.com/gsi/client',
+    );
+  });
+
+  it('does not load GSI on locale-root `/` until pointerdown', () => {
+    mockPathname.mockReturnValue('/');
+    render(<GoogleOneTapInitializer />);
+    expect(screen.queryByTestId('gsi-script')).toBeNull();
   });
 
   it('cancels a live One Tap when the growth signup prompt becomes active (t_da22db9a)', () => {
