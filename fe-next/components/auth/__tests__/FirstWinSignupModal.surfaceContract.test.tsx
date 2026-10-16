@@ -74,6 +74,10 @@ vi.mock('../../ui/dialog', () => ({
   DialogBody: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 }));
 
+vi.mock('../GsiClientPreloader', () => ({
+  GsiClientPreloader: () => <div data-testid="gsi-client-preload" />,
+}));
+
 vi.mock('../../ui/Reveal', () => ({
   Reveal: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
@@ -120,6 +124,32 @@ describe('FirstWinSignupModal — surface contract (t_da22db9a)', () => {
     expect(mockUseOAuthSignIn).toHaveBeenCalledWith(
       expect.objectContaining({ analyticsSource: 'multi_games_dialog' })
     );
+  });
+
+  it('does not preload GSI while the sheet surface is mounted closed (/en PSI)', () => {
+    render(
+      <FirstWinSignupModal
+        isOpen={false}
+        onClose={vi.fn()}
+        isFirstWin
+        variant="firstWin"
+        surface="sheet"
+      />
+    );
+    expect(document.querySelector('[data-testid="gsi-client-preload"]')).toBeNull();
+  });
+
+  it('preloads GSI once the sheet is open', () => {
+    render(
+      <FirstWinSignupModal
+        isOpen
+        onClose={vi.fn()}
+        isFirstWin
+        variant="firstWin"
+        surface="sheet"
+      />
+    );
+    expect(document.querySelector('[data-testid="gsi-client-preload"]')).not.toBeNull();
   });
 
   it('sheet stacking context: portaled above results chrome (source shape, #1051)', () => {
