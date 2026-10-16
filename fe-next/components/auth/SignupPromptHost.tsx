@@ -51,8 +51,11 @@ export function SignupPromptHost() {
 
   return (
     <>
-      {/* Preload GSI on guest sessions so soft-sheet CTA is not an empty frame. */}
-      {!isAuthenticated && <GsiClientPreloader />}
+      {/* Preload GSI only once the sheet is actually open. Mounting it for every
+          guest session pulled accounts.google.com/gsi/client (~102 KiB) into the
+          /en mobile PSI window via afterInteractive — same weight class as the
+          deleted AdSense loader. FirstWinSignupModal also mounts the preloader. */}
+      {!isAuthenticated && showSignupModal && <GsiClientPreloader />}
       <FirstWinSignupModal
         isOpen={showSignupModal}
         onClose={dismissSignupModal}

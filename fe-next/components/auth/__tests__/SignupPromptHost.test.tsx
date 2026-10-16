@@ -18,6 +18,10 @@ vi.mock('next/navigation', () => ({
   usePathname: () => mockUsePathname(),
 }));
 
+vi.mock('@/components/auth/GsiClientPreloader', () => ({
+  GsiClientPreloader: () => React.createElement('div', { 'data-testid': 'gsi-client-preload' }),
+}));
+
 vi.mock('next/dynamic', () => ({
   default: () => {
     const Stub = (props: { isOpen: boolean; variant?: string; surface?: string }) =>
@@ -55,6 +59,12 @@ describe('SignupPromptHost', () => {
   it('renders nothing when hook says not to show', () => {
     render(<SignupPromptHost />);
     expect(screen.queryByTestId('first-win-signup-modal')).toBeNull();
+    expect(screen.queryByTestId('gsi-client-preload')).toBeNull();
+  });
+
+  it('does not preload GSI for guests until the signup sheet is open', () => {
+    render(<SignupPromptHost />);
+    expect(screen.queryByTestId('gsi-client-preload')).toBeNull();
   });
 
   it('renders modal when guest hook signals show', () => {
@@ -67,6 +77,7 @@ describe('SignupPromptHost', () => {
     });
     render(<SignupPromptHost />);
     expect(screen.getByTestId('first-win-signup-modal')).toBeInTheDocument();
+    expect(screen.getByTestId('gsi-client-preload')).toBeInTheDocument();
   });
 
   it('uses the firstWin celebration variant when the hook flags a first win', () => {

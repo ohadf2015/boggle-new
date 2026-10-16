@@ -1,12 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Script from 'next/script';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isNative } from '@/utils/platform';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
+import { isLandingPath } from '@/lib/i18n/isLandingPath';
 import { supabase } from '@/lib/supabase';
 import {
   ensureGoogleIdInitialized,
@@ -20,6 +21,9 @@ import {
 } from '@/lib/auth/signupPromptCoordination';
 
 const GSI_SRC = 'https://accounts.google.com/gsi/client';
+
+/** Pointer-only: PSI/Lighthouse scroll must not pull GSI (~100KiB) into the LCP window. */
+const LANDING_GSI_EVENTS = ['pointerdown', 'keydown', 'touchstart'] as const;
 
 function cancelOneTapPrompt(): void {
   const google = (window as unknown as { google?: GoogleIdServices }).google;
@@ -60,6 +64,21 @@ export default function GoogleOneTapInitializer() {
   const pathname = usePathname();
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const promptedRef = useRef(false);
+  // Landing (`/` `/en`): same class as the deleted AdSense loader — GSI was
+  // unused-JS #1 on mobile PSI (102 KiB transfer). Wait for a real key/pointer
+  // so PageSpeed cannot compile it during LCP. Nested routes keep lazyOnload.
+  const deferForPsi = isLandingPath(pathname ?? '');
+  const [landingGsiArmed, setLandingGsiArmed] = useState(!deferForPsi);
+
+  useEffect(() => {
+    if (!deferForPsi || landingGsiArmed) return;
+    const opts = { capture: true, passive: true } as const;
+    const arm = () => setLandingGsiArmed(true);
+    for (const type of LANDING_GSI_EVENTS) window.addEventListener(type, arm, opts);
+    return () => {
+      for (const type of LANDING_GSI_EVENTS) window.removeEventListener(type, arm, opts);
+    };
+  }, [deferForPsi, landingGsiArmed]);
 
   const enabled = shouldEnableGoogleOneTap({
     isNativePlatform: isNative(),
@@ -104,6 +123,7 @@ export default function GoogleOneTapInitializer() {
   // Fullscreen game routes: GSI (~100KiB) was unused JS #1 on /singleplayer PSI.
   // One Tap is not useful over the board; GoogleSignInButton still loads GSI on demand.
   if (isHeavyGamePath(pathname)) return null;
+  if (deferForPsi && !landingGsiArmed) return null;
 
   // hl on the script URL controls GSI's rendered language (see GoogleSignInButton) —
   // without it, One Tap falls back to the browser/OS locale instead of the site's.
