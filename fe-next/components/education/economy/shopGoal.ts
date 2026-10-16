@@ -23,3 +23,20 @@ export function canBuyBetweenRounds(snapshot: Pick<ClassroomEconomySnapshot, 'ca
     (id) => id !== 'doubleCash' && !(id === 'streakShield' && snapshot.shieldHeld) && POWER_UPS[id].cost <= snapshot.cash
   );
 }
+
+export type PowerUpStatus = { kind: 'owned' } | { kind: 'roundOnly' } | { kind: 'short'; missing: number } | { kind: 'ready' };
+
+type ShopView = Pick<ClassroomEconomySnapshot, 'cash' | 'shieldHeld' | 'doubleCashMsLeft'>;
+
+/** What one shop card says: held, round-only, how much is missing, or buyable now. */
+export function powerUpStatus(snapshot: ShopView, id: PowerUpId, between = false): PowerUpStatus {
+  if (id === 'streakShield' && snapshot.shieldHeld) return { kind: 'owned' };
+  if (id === 'doubleCash' && snapshot.doubleCashMsLeft > 0) return { kind: 'owned' };
+  if (id === 'doubleCash' && between) return { kind: 'roundOnly' };
+  const missing = POWER_UPS[id].cost - snapshot.cash;
+  return missing > 0 ? { kind: 'short', missing } : { kind: 'ready' };
+}
+
+export function readyPowerUpCount(snapshot: ShopView, between = false): number {
+  return POWER_UP_IDS.filter((id) => powerUpStatus(snapshot, id, between).kind === 'ready').length;
+}

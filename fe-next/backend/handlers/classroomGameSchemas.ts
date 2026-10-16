@@ -25,6 +25,7 @@ export const createClassroomGameSchema = z.object({
     timerMinutes: z.number().int().min(1).max(30).optional(),
     boardSize: z.enum(['small', 'medium', 'large']).optional(),
     allowLateJoin: z.boolean().optional(),
+    economy: z.object({ wrongAnswerCost: z.boolean().optional(), powerUps: z.boolean().optional() }).optional(),
     gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'vocab-quiz', 'wordcraft']).optional(),
     vocabQuizVariant: z.enum(['classic', 'boss']).optional(),
     classroomBossId: z.enum(CLASSROOM_BOSS_IDS).optional(),

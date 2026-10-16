@@ -4,6 +4,7 @@ import { Flame } from 'lucide-react';
 import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ClassroomEconomySnapshot } from '@/shared/constants/classroomEconomy';
+import { CoinArt } from '@/components/ui/CoinArt';
 import { cashBurstPieces } from './cashBurst';
 
 interface EconomyHudProps {
@@ -24,8 +25,10 @@ export default function EconomyHud({ snapshot }: EconomyHudProps) {
 
   return (
     <div className="flex min-w-0 items-center justify-between gap-2 whitespace-nowrap text-sm font-bold text-white" aria-live="polite">
-      <span className="relative inline-flex items-baseline gap-2 font-neo-display text-xl font-black" data-testid="hud-cash">
-        <span>{t('economy.hud.cash', { cash: snapshot.cash })}</span>
+      <span className="relative inline-flex items-center gap-2 font-neo-display text-xl font-black" data-testid="hud-cash">
+        <CoinArt size={24} />
+        <span className="sr-only">{t('economy.hud.cash', { cash: snapshot.cash })}</span>
+        <span aria-hidden="true" className="tabular-nums">{snapshot.cash}</span>
         {delta?.kind === 'correct' && delta.delta > 0 && !reduced && (
           <span key={`burst-${snapshot.cashEarned}`} aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 h-0 w-0">
             {cashBurstPieces(8).map((p, i) => (
@@ -44,6 +47,7 @@ export default function EconomyHud({ snapshot }: EconomyHudProps) {
         {delta?.kind === 'correct' && delta.delta > 0 && (
           <m.span
             key={`${snapshot.cashEarned}-${delta.delta}`}
+            dir="ltr"
             className="relative text-xl text-neo-lime"
             initial={reduced ? false : { scale: 1.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -52,13 +56,13 @@ export default function EconomyHud({ snapshot }: EconomyHudProps) {
             {`+${delta.delta}`}
           </m.span>
         )}
-        {delta?.kind === 'wrong' && delta.cost > 0 && <span className="text-xl text-neo-pink">{`-${delta.cost}`}</span>}
+        {delta?.kind === 'wrong' && delta.cost > 0 && <span dir="ltr" className="text-xl text-neo-pink">{`-${delta.cost}`}</span>}
       </span>
 
       {snapshot.streak >= 1 && (
         <m.span
           key={`streak-${snapshot.multiplier}`}
-          className={hot ? 'inline-flex items-center gap-1 rounded-full border-2 border-black bg-orange-400 px-2 py-0.5 text-neo-navy' : 'inline-flex items-center gap-1 rounded-full border-2 border-white/40 px-2 py-0.5 text-white'}
+          className={hot ? 'inline-flex items-center gap-1 rounded-full border-2 border-black bg-neo-orange px-2 py-0.5 text-neo-navy' : 'inline-flex items-center gap-1 rounded-full border-2 border-white/40 px-2 py-0.5 text-white'}
           data-testid="hud-streak"
           initial={reduced ? false : { scale: 1.25 }}
           animate={{ scale: 1 }}

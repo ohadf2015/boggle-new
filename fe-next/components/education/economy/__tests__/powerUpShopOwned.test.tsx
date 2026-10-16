@@ -49,4 +49,11 @@ describe('PowerUpShop owned and between-round states', () => {
     fireEvent.click(screen.getByTestId('shop-item-hintReveal'));
     expect(onBuy).toHaveBeenCalledWith('hintReveal');
   });
+
+  it('Given too little cash, Then the price says how much more is needed', () => {
+    render(<PowerUpShop snapshot={snap({ cash: 12 })} onBuy={vi.fn()} />);
+    const shield = screen.getByTestId('shop-item-streakShield') as HTMLButtonElement;
+    expect(shield.disabled).toBe(true);
+    expect(shield.textContent).toContain('economy.shop.need');
+  });
 });

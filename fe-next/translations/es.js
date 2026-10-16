@@ -241,6 +241,8 @@ const es = {
         "cost": "Coste: {cost}",
         "owned": "Tuyo",
         "roundOnly": "Solo durante una ronda",
+        "need": "Faltan {missing}",
+        "readyCount": "{count} para comprar",
         "buy": "Comprar",
         "round": "Gasta tu dinero antes de la próxima ronda",
         "open": "Gastar dinero ({cash})",
@@ -285,6 +287,13 @@ const es = {
       },
       "sheet": {
         "close": "Cerrar"
+      },
+      "teacher": {
+        "title": "Economía de la clase",
+        "powerUps": "Tienda de potenciadores",
+        "powerUpsHint": "Los alumnos gastan el dinero que ganan en mejoras",
+        "wrongCost": "Fallar cuesta dinero",
+        "wrongCostHint": "Cada fallo quita 2. El escudo de racha lo bloquea."
       },
       "error": {
         "power_ups_off": "Los potenciadores están desactivados en esta clase",

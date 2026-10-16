@@ -78,6 +78,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
         treasureChestsEnabled?: boolean;
         playStyle?: 'ffa' | 'teams'; teamCount?: number;
         accessibility?: { largeText?: boolean; audioCues?: boolean; participationPoints?: boolean };
+        economy?: { wrongAnswerCost?: boolean; powerUps?: boolean };
       };
     };
 
@@ -139,6 +140,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
           playStyle: payload.settings?.playStyle,
           teamCount: payload.settings?.teamCount,
           accessibility: payload.settings?.accessibility,
+          economy: payload.settings?.economy,
         },
       };
 

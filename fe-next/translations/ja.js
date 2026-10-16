@@ -241,6 +241,8 @@ const ja = {
         "cost": "価格: {cost}",
         "owned": "所持中",
         "roundOnly": "ラウンド中のみ",
+        "need": "あと{missing}",
+        "readyCount": "{count}個 買える",
         "buy": "購入",
         "round": "次のラウンドの前にコインを使おう",
         "open": "コインを使う ({cash})",
@@ -285,6 +287,13 @@ const ja = {
       },
       "sheet": {
         "close": "閉じる"
+      },
+      "teacher": {
+        "title": "クラスの経済",
+        "powerUps": "パワーアップショップ",
+        "powerUpsHint": "生徒は稼いだお金でブーストを買えます",
+        "wrongCost": "ミスでお金が減る",
+        "wrongCostHint": "ミスごとに2減ります。連続シールドで防げます。"
       },
       "error": {
         "power_ups_off": "このクラスではパワーアップは無効です",

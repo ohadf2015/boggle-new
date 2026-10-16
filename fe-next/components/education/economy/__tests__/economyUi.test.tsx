@@ -117,6 +117,14 @@ describe('EconomyHud', () => {
     expect(screen.getByTestId('hud-streak').textContent).toContain('economy.hud.streak:1');
   });
 
+  it('Given cash, Then it reads as a coin and a number, with the full sentence for screen readers', () => {
+    render(<EconomyHud snapshot={snap({ cash: 14 })} />);
+    const cash = screen.getByTestId('hud-cash');
+    expect(cash.querySelector('svg')).toBeTruthy();
+    expect(screen.getByText('economy.hud.cash:14').className).toContain('sr-only');
+    expect(screen.getByText('14').getAttribute('aria-hidden')).toBe('true');
+  });
+
   it('Given no streak yet, Then no chip shows', () => {
     render(<EconomyHud snapshot={snap({ streak: 0 })} />);
     expect(screen.queryByTestId('hud-streak')).toBeNull();

@@ -17,9 +17,11 @@ vi.mock('framer-motion', async () => {
 
 const locker = { items: [] as Array<Record<string, unknown>> };
 const refreshLocker = vi.fn();
+vi.mock('../useStudentAvatar', () => ({ useStudentAvatar: () => DEFAULT_AVATAR_CONFIG }));
 vi.mock('../useChestLocker', () => ({ useChestLocker: () => ({ items: locker.items, refresh: refreshLocker }) }));
 
 import ClassroomRoundReward from '../ClassroomRoundReward';
+import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 
 afterEach(() => {
   cleanup();
@@ -33,5 +35,12 @@ describe('ClassroomRoundReward', () => {
     render(<ClassroomRoundReward gameCode="ABC" />);
     expect(screen.getByText('economy.locker.title')).toBeTruthy();
     expect(screen.getByText('cosmetics.items.tileNeon')).toBeTruthy();
+  });
+
+  it('Given a chest avatar part, Then the locker shows its name, never the raw part id', () => {
+    locker.items = [{ gameCode: 'ABC', roundId: '5', rarity: 'rare', xp: 25, itemId: 'accessory:cowboyHat', createdAt: 'z' }];
+    render(<ClassroomRoundReward gameCode="ABC" />);
+    expect(screen.getByText('revealUnlock.parts.cowboyHat')).toBeTruthy();
+    expect(screen.queryByText('accessory:cowboyHat')).toBeNull();
   });
 });

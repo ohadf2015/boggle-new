@@ -39,6 +39,8 @@ export interface ClassroomLaunchPayload {
     timerMinutes: number;
     boardSize: 'small' | 'medium' | 'large';
     allowLateJoin: boolean;
+    /** In-round cash economy switches; stored on the room by the create handler. */
+    economy?: { wrongAnswerCost: boolean; powerUps: boolean };
     gameMode: ClassroomGameMode;
     targetWord?: string;
     vocabQuizFocus?: PracticeFocusSetting;

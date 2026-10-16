@@ -44,6 +44,8 @@ import { LobbyPressureDials } from './lobby/LobbyPressureDials';
 import { LobbyNoClassrooms, LobbyNoLessons } from './lobby/LobbyEmptyStates';
 import { LobbyClassPicker } from './lobby/LobbyClassPicker';
 import { LobbyLateJoinToggle } from './lobby/LobbyLateJoinToggle';
+import { LobbyEconomyToggles, type ClassroomEconomyConfig } from './lobby/LobbyEconomyToggles';
+import { ZERO_ECONOMY_SNAPSHOT } from '@/shared/constants/classroomEconomy';
 import { defaultLessonIdsFor, useTeacherLobbyData } from './lobby/useTeacherLobbyData';
 import { useClassroomLaunchSocket } from './lobby/useClassroomLaunchSocket';
 import { useRepeatLastSetup } from './lobby/useRepeatLastSetup';
@@ -127,6 +129,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   const [minWordLength, setMinWordLength] = useState(3);
   const [timerMinutes, setTimerMinutes] = useState(initialMinutes ?? 3);
   const [allowLateJoin, setAllowLateJoin] = useState(true);
+  const [economy, setEconomy] = useState<ClassroomEconomyConfig>(ZERO_ECONOMY_SNAPSHOT.config);
   const [boardSize, setBoardSize] = useState<'small' | 'medium' | 'large'>('medium');
   const [playStyle, setPlayStyle] = useState<PlayStyle>('ffa');
   const [teamCount, setTeamCount] = useState(2);
@@ -288,6 +291,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           timerMinutes,
           boardSize,
           allowLateJoin,
+          economy,
           gameMode: mode,
           ...(boss ? { classroomBossId: boss } : {}),
           targetWord: targetWord || undefined,
@@ -316,7 +320,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
     [
       user, profile, classrooms, selectedClassroomId, selectedLessonIds, selectedLessons,
       allPlayableWords, activePreset, gameCode, language, t, launch, saveConfig, setStartError,
-      targetWord, minWordLength, timerMinutes, allowLateJoin, boardSize, playStyle, teamCount, accessibility,
+      targetWord, minWordLength, timerMinutes, allowLateJoin, economy, boardSize, playStyle, teamCount, accessibility,
       vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds, treasureChestsEnabled,
       pressure, hasTeacherPro, quizPlayable, lessonLanguage,
     ]
@@ -481,6 +485,8 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           label={t('eduShell.host.lateJoin')}
           hint={t('eduShell.host.lateJoinHint')}
         />
+
+        <LobbyEconomyToggles value={economy} onChange={setEconomy} />
 
       </LobbySetupDisclosure>
     </ClassroomLobbyShell>

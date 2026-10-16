@@ -87,7 +87,7 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
         <ChestStage ref={chestRef} phase={phase} rarity={reveal.rarity} onTap={tap} openLabel={t('economy.chest.open')} />
 
         {phase === 'sealed' && (
-          <p className="rounded-full border-[3px] border-black bg-neo-lime px-5 py-1.5 font-neo-display text-lg font-black uppercase text-neo-navy shadow-[3px_3px_0_0_#000]">
+          <p className="rounded-full border-[3px] border-black bg-neo-lime px-5 py-1.5 font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard-lg">
             {t('economy.chest.tapToOpen')}
           </p>
         )}
@@ -118,7 +118,7 @@ export default function RewardChest({ reveal, wearing, onClose }: RewardChestPro
                 e.stopPropagation();
                 onClose();
               }}
-              className="min-h-14 w-full rounded-2xl border-[3px] border-black bg-neo-lime px-8 font-neo-display text-2xl font-black text-neo-navy shadow-[4px_4px_0_0_#000] transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white active:scale-[0.97]"
+              className="min-h-14 w-full rounded-2xl border-[3px] border-black bg-neo-lime px-8 font-neo-display text-2xl font-black text-neo-navy shadow-hard-lg transition-transform duration-150 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white active:scale-[0.97]"
             >
               {t('economy.chest.continue')}
             </button>

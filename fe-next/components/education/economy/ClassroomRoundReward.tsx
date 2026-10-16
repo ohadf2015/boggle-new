@@ -1,10 +1,10 @@
 'use client';
 
-import { COSMETICS } from '@/lib/cosmetics';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useChestLocker } from './useChestLocker';
 import { useClassroomEconomy } from './useClassroomEconomy';
 import ClassroomBoardMoment from './ClassroomBoardMoment';
+import LockerGrid from './LockerGrid';
 
 interface ClassroomRoundRewardProps {
   gameCode: string;
@@ -27,19 +27,9 @@ export default function ClassroomRoundReward({ gameCode }: ClassroomRoundRewardP
       )}
 
       {locker.items.length > 0 && (
-        <div className="w-full max-w-sm rounded-2xl border-4 border-neo-cream/40 bg-neo-navy p-3 text-white shadow-[6px_6px_0_0_#000]">
+        <div className="w-full max-w-sm rounded-neo border-3 border-neo-cream bg-neo-navy p-3 text-white shadow-hard-xl">
           <h3 className="mb-2 text-lg font-bold">{t('economy.locker.title')}</h3>
-          <ul className="grid grid-cols-2 gap-2">
-            {locker.items.map((item) => {
-              const name = COSMETICS.find((c) => c.id === item.itemId)?.name;
-              return (
-                <li key={`${item.gameCode}-${item.roundId}`} className="rounded-lg border-2 border-white/30 p-2 text-sm">
-                  <span className="block font-bold">{name ? t(name) : item.itemId}</span>
-                  <span className="text-white/80">{t(`economy.chest.rarity.${item.rarity}`)}</span>
-                </li>
-              );
-            })}
-          </ul>
+          <LockerGrid items={locker.items} />
         </div>
       )}
     </section>

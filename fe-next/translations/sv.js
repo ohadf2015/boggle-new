@@ -241,6 +241,8 @@ const sv = {
         "cost": "Pris: {cost}",
         "owned": "Ägs",
         "roundOnly": "Bara under en runda",
+        "need": "{missing} kvar",
+        "readyCount": "{count} att köpa",
         "buy": "Köp",
         "round": "Spendera dina pengar innan nästa rond",
         "open": "Spendera pengar ({cash})",
@@ -285,6 +287,13 @@ const sv = {
       },
       "sheet": {
         "close": "Stäng"
+      },
+      "teacher": {
+        "title": "Klassens ekonomi",
+        "powerUps": "Power-up-butik",
+        "powerUpsHint": "Eleverna köper boosts för pengarna de tjänar",
+        "wrongCost": "Fel svar kostar pengar",
+        "wrongCostHint": "Varje miss tar 2. En seriesköld stoppar det."
       },
       "error": {
         "power_ups_off": "Power-ups är avstängda i den här klassen",

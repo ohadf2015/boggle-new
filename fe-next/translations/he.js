@@ -241,6 +241,8 @@ const he = {
         "cost": "מחיר: {cost}",
         "owned": "בבעלותך",
         "roundOnly": "רק במהלך סיבוב",
+        "need": "חסר עוד {missing}",
+        "readyCount": "{count} מוכנים לקנייה",
         "buy": "קנה",
         "round": "הוציאו את הכסף שלכם לפני הסיבוב הבא",
         "open": "להוציא כסף ({cash})",
@@ -285,6 +287,13 @@ const he = {
       },
       "sheet": {
         "close": "סגור"
+      },
+      "teacher": {
+        "title": "כלכלת הכיתה",
+        "powerUps": "חנות שדרוגים",
+        "powerUpsHint": "התלמידים קונים שדרוגים בכסף שהרוויחו",
+        "wrongCost": "טעות עולה כסף",
+        "wrongCostHint": "כל טעות מורידה 2. מגן רצף חוסם את זה."
       },
       "error": {
         "power_ups_off": "השדרוגים כבויים בכיתה הזו",

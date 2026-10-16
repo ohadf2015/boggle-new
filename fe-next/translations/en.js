@@ -241,6 +241,8 @@ const en = {
         "cost": "Cost: {cost}",
         "owned": "Owned",
         "roundOnly": "Only during a round",
+        "need": "Need {missing} more",
+        "readyCount": "{count} ready to buy",
         "buy": "Buy",
         "round": "Spend your cash before the next round",
         "open": "Spend cash ({cash})",
@@ -285,6 +287,13 @@ const en = {
       },
       "sheet": {
         "close": "Close"
+      },
+      "teacher": {
+        "title": "Class economy",
+        "powerUps": "Power-up shop",
+        "powerUpsHint": "Students spend the cash they earn on boosts",
+        "wrongCost": "Wrong answers cost cash",
+        "wrongCostHint": "Each miss takes 2 cash. A streak shield blocks it."
       },
       "error": {
         "power_ups_off": "Power-ups are off for this class",

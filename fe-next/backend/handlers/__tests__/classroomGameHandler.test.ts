@@ -191,6 +191,25 @@ describe('ClassroomGameHandler', () => {
       expect(calls[1].vocabQuizVariant).toBeUndefined();
     });
 
+    it("stores the teacher's economy switches on the room, so the first round already uses them", async () => {
+      (classroomGameManager.createClassroomGame as Mock).mockResolvedValue(undefined);
+      registerClassroomGameHandlers(mockIo, mockSocket);
+      const createHandler = mockSocket.on.mock.calls.find((call: any[]) => call[0] === 'createClassroomGame')[1];
+      const base = {
+        classroomId: '00000000-0000-4000-8000-000000000002',
+        teacherId: '00000000-0000-4000-8000-000000000001',
+        teacherName: 'Mr Smith',
+        lessonIds: ['00000000-0000-4000-8000-000000000003'],
+      };
+
+      await createHandler({ ...base, gameCode: 'ECO123', settings: { gameMode: 'blast', economy: { powerUps: false, wrongAnswerCost: true } } });
+      await createHandler({ ...base, gameCode: 'ECO124', settings: { gameMode: 'blast' } });
+
+      const calls = (classroomGameManager.createClassroomGame as Mock).mock.calls.map((c) => c[0].settings);
+      expect(calls[0].economy).toEqual({ powerUps: false, wrongAnswerCost: true });
+      expect(calls[1].economy).toBeUndefined();
+    });
+
     it('should emit error if creation fails', async () => {
       // GIVEN
       const gameData = {

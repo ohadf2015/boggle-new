@@ -25,7 +25,7 @@ export default function RoundShop({ gameCode }: { gameCode: string }) {
     <>
       <section
         data-testid="round-shop"
-        className="flex w-full flex-col gap-3 rounded-2xl border-4 border-neo-lime bg-neo-navy p-3 text-white shadow-[6px_6px_0_0_#000]"
+        className="flex w-full flex-col gap-3 rounded-2xl border-4 border-neo-lime bg-neo-navy p-3 text-white shadow-hard-xl"
       >
         <h2 className="text-xl font-black text-neo-lime">{t('economy.shop.round')}</h2>
         {!snapshot && !econ.error && <p className="text-sm font-bold">{t('economy.hud.loading')}</p>}
@@ -40,7 +40,7 @@ export default function RoundShop({ gameCode }: { gameCode: string }) {
             className={cn(
               'min-h-14 w-full rounded-xl border-4 px-3 text-lg font-black transition-transform duration-150 ease-out',
               canBuy
-                ? 'border-black bg-neo-lime text-neo-navy shadow-[4px_4px_0_0_#000] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:scale-[0.97]'
+                ? 'border-black bg-neo-lime text-neo-navy shadow-hard-lg hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:scale-[0.97]'
                 : 'cursor-not-allowed border-white/20 bg-white/5 text-white/50'
             )}
           >
