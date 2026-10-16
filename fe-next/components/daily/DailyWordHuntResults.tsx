@@ -122,22 +122,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     return result.wordsDiscovered.reduce((total, word) => total + (word.lifeGained || 0), 0);
   }, [result.wordsDiscovered]);
 
-  const emojiWords = useMemo(() => {
-    // For Word Hunt, use attempt history with per-letter feedback (green/yellow/gray)
-    if (result.attempts && result.attempts.length > 0) {
-      return result.attempts.map((attempt) => ({
-        word: attempt.word || '',
-        found: attempt.feedback?.every((f) => f.feedback === 'green') ?? false,
-        feedback: attempt.feedback,
-      }));
-    }
-    // Fallback: discovered words without feedback
-    if (!result.wordsDiscovered) return [];
-    return result.wordsDiscovered.map((w: { word: string }) => ({
-      word: w.word || '',
-      found: true,
-    }));
-  }, [result.attempts, result.wordsDiscovered]);
 
   const displayName = isAuthenticated && profile
     ? profile.display_name || profile.username || t('common.player')
@@ -299,7 +283,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     isNewCompletion,
     survivalBonusTime,
     rarestWord,
-    emojiWords,
     stats,
     shareHandlers,
     coinActions,

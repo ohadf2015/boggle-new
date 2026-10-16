@@ -41,7 +41,6 @@ import {
   PastPerformanceCompare,
   DailyWordHuntFacts,
   ShareSection,
-  EmojiShareCard,
   CoinUnlockCard,
   StreakFreezeIndicator,
   MasteryRatingSection,
@@ -58,7 +57,6 @@ export interface WordHuntResultsContentProps {
   isNewCompletion?: boolean;
   survivalBonusTime: number;
   rarestWord: { word: string; rarity: number; emoji: string; label: string } | null;
-  emojiWords: Array<{ word: string; found: boolean }>;
   stats: WordHuntStats | null;
   shareHandlers: {
     handleNativeShare: () => void;
@@ -119,7 +117,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   isNewCompletion: _isNewCompletion,
   survivalBonusTime,
   rarestWord,
-  emojiWords,
   stats,
   shareHandlers,
   coinActions,
@@ -347,20 +344,9 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
             branch that most needed one. */}
         <NextQuestCta justFinished="word-hunt" currentLanguage={language} source="word_hunt_results_guest" />
 
-        {/* The signup nudge must never cost the product its only viral loop.
-            ~90% of daily players are guests, so the guest-simplified branch is
-            where the emoji grid and its share action matter MOST, not where
-            they can be dropped. Keep it here even though the recap (and its
-            heavier ShareSection copy) is gone for this branch. */}
-        <EmojiShareCard
-          puzzleNumber={puzzleNumber}
-          score={result.efficiencyScore ?? 0}
-          solved={result.solved}
-          words={emojiWords}
-          language={language}
-          t={t}
-          shareUrl={shareHandlers.challengeUrl}
-        />
+        {/* ShareSection is the one share surface on this screen (native share,
+            challenge link, image, WhatsApp/X/Telegram/copy). The recap card that
+            used to sit above it was a second, duplicate share block. */}
         <ShareSection
           solved={result.solved}
           onShare={shareHandlers.handleNativeShare}
@@ -410,24 +396,10 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       className={STICKY_CTA_WORD_HUNT}
     />
 
-    {/* Share and retry sit with the emoji grid, NOT inside the recap. The grid
-        is the shareable artifact and this is how it leaves the app — burying the
-        share action behind a disclosure is the opposite of the goal.
-
-        The grid was dropped from this screen during the subtraction rounds and
-        restored here: it is the one growth mechanic that works with a population
-        of one (a spoiler-free result anyone can post), and the bar's own research
-        credits this exact format as the biggest driver of Wordle's spread. It was
-        never on the deliberate removal list. */}
-    <EmojiShareCard
-      puzzleNumber={puzzleNumber}
-      score={result.efficiencyScore ?? 0}
-      solved={result.solved}
-      words={emojiWords}
-      language={language}
-      t={t}
-      shareUrl={shareHandlers.challengeUrl}
-    />
+    {/* Share and retry sit right under the CTA, NOT inside the recap — burying
+        the share action behind a disclosure is the opposite of the goal. This
+        is the only share surface: the recap card that used to sit above it
+        duplicated it (removed 2026-10-16, owner call). */}
     <ShareSection
       solved={result.solved}
       onShare={shareHandlers.handleNativeShare}

@@ -2,8 +2,7 @@
  * TDD: EmojiShareCard in DailyWordHuntResults
  *
  * Tests that:
- * - EmojiShareCard renders when solved === true and words exist
- * - EmojiShareCard does NOT render when solved === false
+ * - EmojiShareCard is NOT rendered (ShareSection is the only share surface)
  * - handleChallengeShare is passed to ShareSection as onChallengeShare
  */
 
@@ -149,9 +148,6 @@ vi.mock('../results', () => ({
   RankBadge: () => <div data-testid="rank-badge" />,
   MoreOptionsAccordion: () => <div data-testid="more-options" />,
   SharePanel: () => <div data-testid="share-panel" />,
-  EmojiShareCard: ({ words }: { words: Array<{ word: string; found: boolean }> }) => (
-    <div data-testid="emoji-share-card" data-word-count={words.length} />
-  ),
   DailyWordHuntFacts: () => <div data-testid="daily-word-hunt-facts" />,
   StatsBlurb: () => <div data-testid="stats-blurb" />,
   StreakFreezeIndicator: () => <div data-testid="streak-freeze-indicator" />,
@@ -356,14 +352,12 @@ describe('DailyWordHuntResults - EmojiShareCard', () => {
     vi.clearAllMocks();
   });
 
-  /* Reversed deliberately (2026-08-27). The card was pulled from results once and
-     this test pinned its absence. It is back, and it is now the hero of the screen:
-     the emoji grid IS the shareable artifact, the thing a player posts and the
-     reason anyone else hears about the puzzle. Leaving it unrendered left the
-     component reachable from nothing but the barrel export and this test. */
-  it('renders EmojiShareCard as the shareable artifact', () => {
+  /* Reversed again (2026-10-16, owner call): the recap card stacked a second
+     share surface directly above ShareSection. ShareSection is the one share
+     path; the card must not come back on this screen. */
+  it('does not render the duplicate EmojiShareCard', () => {
     render(<DailyWordHuntResults {...baseProps} />);
-    expect(screen.getAllByTestId('emoji-share-card').length).toBeGreaterThan(0);
+    expect(screen.queryByTestId('emoji-share-card')).toBeNull();
   });
 
   it('passes onChallengeShare to ShareSection when solved=true', () => {

@@ -21,7 +21,6 @@
  * - StatsSection.tsx   - Statistics with histogram
  * - TryAnotherLanguage.tsx - Language switching component
  * - SharePanel.tsx     - Share modal component
- * - EmojiShareCard.tsx   - LexiClash recap share card (score + length bars)
  */
 
 // Types
@@ -102,8 +101,6 @@ export type { GuestBrainScorePreviewProps } from './GuestBrainScorePreview';
 export { MoreOptionsAccordion } from './MoreOptionsAccordion';
 export type { MoreOptionsAccordionProps } from './MoreOptionsAccordion';
 
-export { EmojiShareCard } from './EmojiShareCard';
-export type { EmojiShareCardProps } from './EmojiShareCard';
 
 export { default as DailyWordHuntFacts } from './DailyWordHuntFacts';
 

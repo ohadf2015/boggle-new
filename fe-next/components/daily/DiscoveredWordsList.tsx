@@ -36,7 +36,10 @@ export const DiscoveredWordsList: React.FC<DiscoveredWordsListProps> = ({ words,
           {obfuscated ? t('common.show') : t('common.hide')}
         </button>
       </div>
-      <div className="flex flex-wrap gap-1 px-1 max-h-[72px] overflow-y-auto scrollbar-thin scrollbar-thumb-neo-cream/10">
+      {/* One row, newest first, scrolling sideways: a wrapping list grew taller
+          with every found word, and the board (sized from the leftover height)
+          shrank to make room. */}
+      <div data-testid="found-words-row" className="flex flex-nowrap gap-1 px-1 pt-0.5 pb-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <AnimatePresence mode="popLayout">
           {sortedWords.map((w) => (
             <m.span
@@ -45,7 +48,7 @@ export const DiscoveredWordsList: React.FC<DiscoveredWordsListProps> = ({ words,
               animate={{ scale: 1, rotate: 0 }}
               exit={{ scale: 0.7 }}
               transition={{ type: 'spring', stiffness: 520, damping: 18 }}
-              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg border-2 border-neo-black shadow-hard-sm text-xs font-black uppercase tracking-wider ${
+              className={`inline-flex shrink-0 items-center gap-1 px-2.5 py-0.5 rounded-lg border-2 border-neo-black shadow-hard-sm text-xs font-black uppercase tracking-wider ${
                 w.word.length >= 7
                   ? 'bg-neo-pink text-neo-white'
                   : w.word.length >= 5

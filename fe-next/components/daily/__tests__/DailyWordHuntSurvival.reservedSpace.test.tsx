@@ -121,4 +121,23 @@ describe('DailyWordHuntSurvival - reserved layout slots (no CLS)', () => {
     expect(slot).toBeInTheDocument();
     expect(slot.className).toMatch(/min-h-\[64px\]/);
   });
+
+  // The board's width is derived from the playfield height, so a slot that
+  // grows when the found-words list wraps shrinks the board mid-game. The slot
+  // is a fixed height; the list scrolls sideways inside it instead.
+  it('keeps the discovered-words slot at a fixed height so finding words never shrinks the board', () => {
+    render(
+      <DailyWordHuntSurvival
+        grid={mockGrid}
+        puzzleNumber={1}
+        language="en"
+        targetWord="HOUSE"
+        onComplete={mockOnComplete}
+        onQuit={mockOnQuit}
+      />
+    );
+    const slot = screen.getByTestId('wordhunt-discovered-words-slot');
+    expect(slot.className).toMatch(/(^|\s)h-\[64px\]/);
+    expect(slot.className).toMatch(/overflow-hidden/);
+  });
 });

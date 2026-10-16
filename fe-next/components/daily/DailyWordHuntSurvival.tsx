@@ -486,7 +486,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
       </div>
 
-      <div className="shrink-0 min-h-[64px] pt-1 shell:hidden" data-testid="wordhunt-discovered-words-slot">
+      {/* Fixed height, not just a floor: the board is sized from what's left, so a
+          slot that grows would shrink the board every time a word is found. */}
+      <div className="shrink-0 min-h-[64px] h-[64px] overflow-hidden shell:hidden" data-testid="wordhunt-discovered-words-slot">
         {state.discoveredWords.length > 0 && <DiscoveredWordsList words={state.discoveredWords} t={t} />}
       </div>
 
