@@ -2,6 +2,7 @@
  * Host Game Events Hook
  * Handles core game lifecycle socket events: startGame, endGame, timeUpdate, validationComplete, resetGame
  */
+import { applyBlastBoardUpdate } from '@/hooks/gameState/applyBlastBoardUpdate';
 import { roundHasScore } from '@/shared/utils/roundCelebration';
 import { useEffect, useCallback, useRef, useMemo, useState, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
@@ -672,6 +673,7 @@ export function useHostGameEvents({
     socket.on('earthquakeShake', earthquakeHandlers.handleEarthquakeShake);
     socket.on('fireRoundStart', earthquakeHandlers.handleFireRoundStart);
     socket.on('fireRoundEnd', earthquakeHandlers.handleFireRoundEnd);
+    socket.on('blastBoardUpdate', applyBlastBoardUpdate);
     // Word Hunt handlers
     socket.on('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
     socket.on('wordHuntTargetResult', handleWordHuntTargetResult);
@@ -708,6 +710,7 @@ export function useHostGameEvents({
       socket.off('earthquakeShake', earthquakeHandlers.handleEarthquakeShake);
       socket.off('fireRoundStart', earthquakeHandlers.handleFireRoundStart);
       socket.off('fireRoundEnd', earthquakeHandlers.handleFireRoundEnd);
+      socket.off('blastBoardUpdate', applyBlastBoardUpdate);
       earthquakeHandlers.cleanup();
       // Word Hunt handlers cleanup
       socket.off('wordHuntLifeUpdate', handleWordHuntLifeUpdate);

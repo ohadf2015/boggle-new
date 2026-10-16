@@ -6,6 +6,7 @@ import type { Socket } from 'socket.io-client';
 import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 import { useBlastMultiplayerBridge } from '@/components/blast/legacy/hooks/useBlastMultiplayerBridge';
 import type { LetterGrid } from '@/shared/types/game';
+import { BLAST_RESYNC_REQUEST } from '@/shared/utils/blastServerSync';
 
 const BlastGame = dynamic(
   () => import('@/components/blast/legacy/BlastGame').then((m) => ({ default: m.BlastGame })),
@@ -21,7 +22,7 @@ export interface MpBlastCanvasProps {
   /** Round length. Any number keeps BlastStage in MP mode; the round HUD owns the live clock. */
   totalTime: number;
   onQuit: () => void;
-  onWordWithComboType: (word: string, comboType: string | null) => void;
+  onWordWithComboType: (word: string, comboType: string | null, path?: Array<{ row: number; col: number }>) => void;
   onBoardCleared: () => void;
 }
 
@@ -39,6 +40,7 @@ function MpBlastCanvasImpl({ grid, username, socket, totalTime, onQuit, onWordWi
   // state-resync path (same emit the timer-stall watchdog uses in
   // usePlayerPhase) — the server re-emits startGame with the current board.
   const onGridRetry = useCallback(() => socket?.emit('requestGameState'), [socket]);
+  const onRequestBoard = useCallback(() => socket?.emit(BLAST_RESYNC_REQUEST), [socket]);
   return (
     <BlastGame
       config={bridge.config}
@@ -57,6 +59,7 @@ function MpBlastCanvasImpl({ grid, username, socket, totalTime, onQuit, onWordWi
       serverPointsOnly
       isDesktopCanvas
       onGridRetry={onGridRetry}
+      onRequestBoard={onRequestBoard}
     />
   );
 }

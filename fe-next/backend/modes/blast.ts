@@ -10,8 +10,9 @@ export const blastMode: GameModeModule = {
 
   initRound({ game, gameCode, letterGrid, playerUsernames }) {
     const wave = playerUsernames.length >= 2 ? 3 : 1;
-    // Seeded from the room so every player's template overlay is identical.
-    game.blastModeState = initBlastModeState(letterGrid, playerUsernames, wave, hashStringToSeed(gameCode));
+    // Room + this round's letters: one layout for every player, a new one each round.
+    const seed = hashStringToSeed(`${gameCode}:${letterGrid.map((row) => row.join('')).join('/')}`);
+    game.blastModeState = initBlastModeState(letterGrid, playerUsernames, wave, seed);
   },
 
   payloadFields(game, { username, resume }) {

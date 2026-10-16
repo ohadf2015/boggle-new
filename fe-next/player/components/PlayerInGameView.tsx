@@ -1,5 +1,6 @@
 'use client';
 
+import { blastSubmitPayload } from '@/shared/utils/blastServerSync';
 import React, { memo, useCallback } from 'react';
 import type { Socket } from 'socket.io-client';
 import dynamic from 'next/dynamic';
@@ -178,10 +179,10 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   }, [mpExit, letterGrid, gameCode]);
 
   // Blast multiplayer: emit word + comboType to server via socket
-  const handleBlastWordWithCombo = useCallback((word: string, comboType: string | null) => {
+  const handleBlastWordWithCombo = useCallback((word: string, comboType: string | null, path?: Array<{ row: number; col: number }>) => {
     if (!socket) return;
     enqueuePending(word);
-    socket.emit('submitWord', { word, comboType });
+    socket.emit('submitWord', blastSubmitPayload(word, comboType, path));
   }, [socket, enqueuePending]);
 
   // Word hunt guess handler — emits to server

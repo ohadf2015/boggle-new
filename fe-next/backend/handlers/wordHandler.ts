@@ -36,6 +36,7 @@ import { isSocketMigrating } from './shared';
 import { validatePayload, submitWordSchema } from '../utils/socketValidation.js';
 import { handleValidatedWord } from './wordValidationHandler';
 import { registerWordVoteHandlers } from './wordVoteHandlers';
+import { registerBlastBoardResyncHandler } from './blastBoardResyncHandler';
 import { hitRoomBoss, wordBlockedByFreeze } from '../services/classroomBoss/roomBoss.js';
 import { BOSS_FROZEN_REASON } from '@/shared/types/classroomBoss';
 import { ensurePlayerState } from './playerDataInit';
@@ -139,6 +140,7 @@ function handleSpamDetection(socket: Socket, gameCode: string, username: string,
  * @param socket - Socket.IO socket instance
  */
 function registerWordHandlers(io: Server, socket: Socket): void {
+  registerBlastBoardResyncHandler(socket);
 
   // Handle word submission
   socket.on('submitWord', async (data: SubmitWordPayload) => {

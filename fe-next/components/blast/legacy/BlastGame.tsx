@@ -13,6 +13,7 @@ import { useWordSubmission } from '@/components/singleplayer/game/hooks/useWordS
 import { withBlastCredit, type BlastCredit } from './utils/withBlastCredit';
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastEngine } from './hooks/useBlastEngine';
+import { useBlastServerSync } from './hooks/useBlastServerSync';
 import { useBlastObjectives } from './hooks/useBlastObjectives';
 import { useBlastHint } from './hooks/useBlastHint';
 import { pickHintTarget } from './utils/blastHintPicker';
@@ -106,6 +107,8 @@ interface BlastGameProps {
   /** MP only: loading-gate Retry when the server board never arrived — parent
    *  re-requests game state over the socket (`requestGameState` resync path). */
   onGridRetry?: () => void;
+  /** Live MP only: ask the server for this player's board (a sent word was never acked). */
+  onRequestBoard?: () => void;
   /** True when rendered as the center slot of the MP desktop shell. Collapses
    *  BlastStage's own desktop side-rails (rivals/word-area) so the board fills
    *  the slot and stops duplicating the shell's rails. */
@@ -137,6 +140,7 @@ export function BlastGame({
   blastSeed,
   serverGrid,
   serverPointsOnly = false,
+  onRequestBoard,
   remainingTime: _remainingTime,
   totalTime: _totalTime,
   leaderboard,
@@ -208,10 +212,12 @@ export function BlastGame({
   // Queue updates during cascade to prevent ref corruption mid-animation
   const pendingBoardUpdatesRef = useRef<Array<{ grid: LetterGrid; tileStates: BlastTileState[][] }>>([]);
   const blastBoardUpdate = useGameStore((s) => s.blastBoardUpdate);
+  const { noteSubmit: noteServerSubmit, receive: receiveServerBoard } = useBlastServerSync({ enabled: isMultiplayer && !!onRequestBoard, username, onRequestBoard });
   useEffect(() => {
     if (!isMultiplayer || !blastBoardUpdate) return;
     const boardData = { grid: blastBoardUpdate.grid, tileStates: blastBoardUpdate.tileStates };
     useGameStore.getState().setBlastBoardUpdate(null);
+    if (!receiveServerBoard(blastBoardUpdate.clearedBy)) return;
     // If mid-cascade, queue — apply after cascade completes
     if (engine.isCascading) {
       pendingBoardUpdatesRef.current.push(boardData);
@@ -220,7 +226,7 @@ export function BlastGame({
     // Not cascading: apply immediately to correct any drift
     engine.applyServerBoard(boardData.grid, boardData.tileStates);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally using engine.* properties, not full engine object
-  }, [blastBoardUpdate, isMultiplayer, username, engine.isCascading, engine.applyServerBoard]);
+  }, [blastBoardUpdate, isMultiplayer, username, engine.isCascading, engine.applyServerBoard, receiveServerBoard]);
 
   // Flush queued board updates after cascade completes.
   // Coalesce to last is intentional: each blastBoardUpdate is a full (grid, tileStates)
@@ -293,7 +299,11 @@ export function BlastGame({
   const { sessionCoins, walletCoins, launchCoins, creditCoins } = useBlastSessionCoins({ isMultiplayer, gridSize: config.gridSize });
 
   const onWordWithComboTypeRef = useRef(onWordWithComboType);
-  useEffect(() => { onWordWithComboTypeRef.current = onWordWithComboType; }, [onWordWithComboType]);
+  useEffect(() => {
+    onWordWithComboTypeRef.current = onWordWithComboType
+      ? (word, comboType, path) => { noteServerSubmit(); onWordWithComboType(word, comboType, path); }
+      : undefined;
+  }, [onWordWithComboType, noteServerSubmit]);
 
   // Cascade system (extracted hook)
   const { runCascade } = useBlastCascade({

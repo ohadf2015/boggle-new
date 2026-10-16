@@ -5,6 +5,7 @@
  * REFACTORED: Now uses GameStateContext instead of massive prop drilling
  * Reduced from 20+ state setter props to just a few local state props
  */
+import { applyBlastBoardUpdate } from '@/hooks/gameState/applyBlastBoardUpdate';
 import { useEffect, useRef, useMemo, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast, TOAST_ICONS } from '../../../components/NeoToast';
@@ -221,7 +222,6 @@ export function usePlayerGameEvents({
     setLevelUpData,
     setTotalBoardWords,
     setBlastComboSync,
-    setBlastBoardUpdate,
     setWordHuntMyLife,
     setWordHuntPlayerLives,
     setWordHuntTargetAttempts,
@@ -866,27 +866,6 @@ export function usePlayerGameEvents({
     // Handle server-authoritative blast board update (MP board sync)
     // A full board-clear regenerate carries optional overlay + seed for lock-step sync.
     // Regular per-word updates omit these fields.
-    const handleBlastBoardUpdate = (data: {
-      grid: string[][];
-      tileStates: BlastTileState[][];
-      clearedBy: string;
-      word: string;
-      clearedCount: number;
-      totalMoves: number;
-      overlay?: BlastTileOverlay[];
-      seed?: number;
-    }) => {
-      logger.log('[PLAYER] Blast board update from', data.clearedBy, '- word:', data.word, 'cleared:', data.clearedCount);
-      // A full board-clear regenerates the overlay server-side; apply it so the
-      // client board stays in lock-step. Regular per-word updates omit overlay/seed.
-      if (data.overlay && typeof data.seed === 'number') {
-        useGameStore.setState({
-          blastTileOverlay: data.overlay,
-          blastSeed: data.seed,
-        });
-      }
-      setBlastBoardUpdate(data);
-    };
 
 
     // Handle total board words count (for "words remaining" display)
@@ -955,7 +934,7 @@ export function usePlayerGameEvents({
     socket.on('totalBoardWords', handleTotalBoardWords);
     socket.on('blastComboSync', handleBlastComboSync);
     socket.on('playerFoundWordBatch', handlePlayerFoundWordBatch);
-    socket.on('blastBoardUpdate', handleBlastBoardUpdate);
+    socket.on('blastBoardUpdate', applyBlastBoardUpdate);
     socket.on('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
     socket.on('wordHuntTargetResult', handleWordHuntTargetResult);
     socket.on('wordHuntTargetFound', handleWordHuntTargetFound);
@@ -1001,7 +980,7 @@ export function usePlayerGameEvents({
       socket.off('totalBoardWords', handleTotalBoardWords);
       socket.off('blastComboSync', handleBlastComboSync);
       socket.off('playerFoundWordBatch', handlePlayerFoundWordBatch);
-      socket.off('blastBoardUpdate', handleBlastBoardUpdate);
+      socket.off('blastBoardUpdate', applyBlastBoardUpdate);
       socket.off('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
       socket.off('wordHuntTargetResult', handleWordHuntTargetResult);
       socket.off('wordHuntTargetFound', handleWordHuntTargetFound);
