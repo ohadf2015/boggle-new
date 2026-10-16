@@ -37,6 +37,8 @@ export interface ClassroomBossHit {
   word: string;
   dmg: number;
   crit: boolean;
+  /** Landed while the boss was exposed (optional: older servers never send it). */
+  exposed?: boolean;
 }
 
 export interface ClassroomBossView {
@@ -57,6 +59,8 @@ export interface ClassroomBossView {
   effect: { kind: ClassroomBossAttackKind; tiles: BossTile[]; msLeft: number } | null;
   /** Times the class cancelled an attack; an increment is the stagger cue. */
   staggers: number;
+  /** Open after a stagger; optional so older servers' views still parse. */
+  exposed?: { msLeft: number; totalMs: number } | null;
   pctDealt: number;
 }
 

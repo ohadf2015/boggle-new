@@ -17,8 +17,11 @@ export interface FxLayerContext {
   container: Container;
 }
 
-/** Returns a synchronous detach, safe to call at any time and more than once. */
-export function attachFxLayer(build: (ctx: FxLayerContext) => FxLayer): () => void {
+/**
+ * Returns a synchronous detach, safe to call at any time and more than once. `onUnavailable` fires when the
+ * shared app declines (native, calm mode, failed GPU init), so a caller can fall back to a DOM effect.
+ */
+export function attachFxLayer(build: (ctx: FxLayerContext) => FxLayer, onUnavailable?: () => void): () => void {
   let done = false;
   let finish: ((deferRelease?: boolean) => void) | null = null;
 
@@ -29,6 +32,7 @@ export function attachFxLayer(build: (ctx: FxLayerContext) => FxLayer): () => vo
     const pixi = app && !done ? await import('pixi.js') : null;
     if (!app || !pixi || done || SharedFxApp.getApplication() !== app) {
       SharedFxApp.release();
+      if (!done) onUnavailable?.();
       return;
     }
 
@@ -56,6 +60,7 @@ export function attachFxLayer(build: (ctx: FxLayerContext) => FxLayer): () => vo
       layer = build({ pixi, app, container });
     } catch {
       finish();
+      onUnavailable?.();
       return;
     }
     if (done) {

@@ -38,6 +38,7 @@ export interface BossState {
   lastHits: ClassroomBossHit[];
   hitSeq: number;
   staggers: number;
+  exposedUntil: number;
   rng: number;
   rows: number;
   cols: number;
@@ -88,6 +89,7 @@ export function createBoss(input: BossCreateInput): BossState {
     lastHits: [],
     hitSeq: 0,
     staggers: 0,
+    exposedUntil: 0,
     rng: hashSeed(input.seed),
     rows: Math.max(1, input.rows),
     cols: Math.max(1, input.cols),
@@ -123,7 +125,8 @@ export function applyWord(s: BossState, w: WordInput): WordResult {
   const count = w.now - s.combo.lastAt <= R.comboWindowMs ? s.combo.count + 1 : 1;
   const multiplier = comboMultiplier(count);
   const crit = len >= R.critLen;
-  const raw = Math.max(1, Math.round(w.score * (crit ? 2 : 1) * multiplier));
+  const exposed = w.now < s.exposedUntil;
+  const raw = Math.max(1, Math.round(w.score * (crit ? 2 : 1) * multiplier * (exposed ? R.exposedMult : 1)));
   // Armor: word scores are exponential, so one long crit at x4 would otherwise one-shot a small class's boss.
   const dmg = Math.min(raw, Math.ceil(s.maxHp * R.maxHitPct));
   const hp = Math.max(0, s.hp - dmg);
@@ -136,13 +139,13 @@ export function applyWord(s: BossState, w: WordInput): WordResult {
     shield: len >= R.shieldLen ? Math.min(R.shieldMax, s.shield + 1) : s.shield,
     damageBy: { ...s.damageBy, [w.username]: (s.damageBy[w.username] ?? 0) + dmg },
     hitSeq: s.hitSeq + 1,
-    lastHits: [{ id: s.hitSeq + 1, username: w.username, word: w.word, dmg, crit }, ...s.lastHits].slice(0, R.lastHits),
+    lastHits: [{ id: s.hitSeq + 1, username: w.username, word: w.word, dmg, crit, ...(exposed && { exposed }) }, ...s.lastHits].slice(0, R.lastHits),
   };
 
   if (next.telegraph && len >= R.staggerLen) {
     const longWords = next.telegraph.longWords + 1;
     if (longWords >= R.staggerWords) {
-      next = { ...next, telegraph: null, nextTelegraphAt: w.now + R.cadenceMs[next.phase - 1], staggers: next.staggers + 1 };
+      next = { ...next, telegraph: null, nextTelegraphAt: w.now + R.cadenceMs[next.phase - 1], staggers: next.staggers + 1, exposedUntil: w.now + R.exposedMs };
       events.push('staggered');
     } else {
       next = { ...next, telegraph: { ...next.telegraph, longWords } };
@@ -281,6 +284,7 @@ export function toView(s: BossState, now: number): ClassroomBossView {
     topHitters,
     effect: s.effect && now < s.effect.until ? { kind: s.effect.kind, tiles: s.effect.tiles, msLeft: s.effect.until - now } : null,
     staggers: s.staggers,
+    exposed: !isOver(s) && now < s.exposedUntil ? { msLeft: s.exposedUntil - now, totalMs: R.exposedMs } : null,
     pctDealt: Math.round(((s.maxHp - s.hp) / s.maxHp) * 100),
   };
 }
@@ -295,5 +299,6 @@ export function shiftBoss(s: BossState, ms: number): BossState {
     combo: { ...s.combo, lastAt: s.combo.lastAt + ms },
     telegraph: s.telegraph ? { ...s.telegraph, startsAt: s.telegraph.startsAt + ms, landsAt: s.telegraph.landsAt + ms } : null,
     effect: s.effect ? { ...s.effect, until: s.effect.until + ms } : null,
+    exposedUntil: s.exposedUntil > 0 ? s.exposedUntil + ms : 0,
   };
 }

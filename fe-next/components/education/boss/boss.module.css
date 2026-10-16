@@ -78,6 +78,84 @@
   transform-origin: right center;
 }
 
+
+/* v3: the boss is alive between hits. */
+.breathe {
+  animation: breathe 3.2s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+@keyframes breathe {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50% { transform: translateY(-1.6%) scale(1.012, 0.992); }
+}
+
+.shadowBreathe {
+  animation: shadowBreathe 3.2s ease-in-out infinite;
+}
+@keyframes shadowBreathe {
+  0%, 100% { transform: scaleX(1); opacity: 1; }
+  50% { transform: scaleX(0.92); opacity: 0.8; }
+}
+
+.aura {
+  animation: aura 1.6s ease-in-out infinite alternate;
+}
+@keyframes aura {
+  from { transform: scale(0.94); opacity: 0.75; }
+  to { transform: scale(1.04); opacity: 1; }
+}
+
+.wobble {
+  animation: wobble 900ms ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+@keyframes wobble {
+  0%, 100% { transform: rotate(-2.2deg); }
+  50% { transform: rotate(2.2deg) translateY(1%); }
+}
+
+.death {
+  animation: death 1900ms cubic-bezier(0.5, 0, 0.75, 0) both;
+  transform-origin: 50% 100%;
+}
+@keyframes death {
+  0% { transform: none; filter: none; opacity: 1; }
+  8% { transform: translateX(-2%) rotate(-2deg); filter: brightness(2.2); }
+  16% { transform: translateX(2%) rotate(2deg); }
+  24% { transform: translateX(-1.5%) rotate(-1deg); filter: brightness(1.4); }
+  32% { transform: translateX(1%); }
+  45% { transform: translateY(0) scale(1); filter: grayscale(0.4); }
+  100% { transform: translateY(14%) scale(0.86, 0.8) rotate(-6deg); filter: grayscale(0.85) brightness(0.75); opacity: 0.8; }
+}
+
+.hpGhost {
+  transform-origin: left center;
+  transition: transform 650ms cubic-bezier(0.65, 0, 0.35, 1) 380ms;
+}
+[dir='rtl'] .hpGhost {
+  transform-origin: right center;
+}
+
+.banner {
+  animation: banner 2200ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+@keyframes banner {
+  0% { transform: scale(1.6) rotate(-4deg); opacity: 0; }
+  12% { transform: scale(0.96) rotate(-2deg); opacity: 1; }
+  18% { transform: scale(1.02) rotate(-2deg); }
+  85% { transform: scale(1) rotate(-2deg); opacity: 1; }
+  100% { transform: scale(1.04) rotate(-2deg); opacity: 0; }
+}
+
+.stamp {
+  animation: stamp 700ms cubic-bezier(0.23, 1, 0.32, 1) 500ms both;
+}
+@keyframes stamp {
+  0% { transform: scale(2.2) rotate(-8deg); opacity: 0; }
+  60% { transform: scale(0.94) rotate(-3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-3deg); opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .intro,
   .windup,
@@ -85,14 +163,22 @@
   .pop,
   .flash,
   .slideIn,
-  .pulse {
+  .pulse,
+  .breathe,
+  .shadowBreathe,
+  .aura,
+  .wobble,
+  .death,
+  .banner,
+  .stamp {
     animation: none;
   }
   .projectile {
     display: none;
   }
   .ring,
-  .hpFill {
+  .hpFill,
+  .hpGhost {
     transition: none;
   }
 }

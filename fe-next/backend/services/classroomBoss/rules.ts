@@ -15,6 +15,9 @@ export const BOSS_RULES = {
   shieldMax: 5,
   staggerLen: 6,
   staggerWords: 3,
+  /** A stagger leaves the boss open: every word in the window deals extra damage. */
+  exposedMs: 5000,
+  exposedMult: 1.5,
   healPct: 0.05,
   freezeTiles: 3,
   freezeMs: 5000,

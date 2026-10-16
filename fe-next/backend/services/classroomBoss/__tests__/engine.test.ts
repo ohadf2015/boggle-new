@@ -289,3 +289,38 @@ describe('shiftBoss (pause / clock start)', () => {
     expect(frozenTiles(shiftBoss(s, 5000), T0 + 12_000)).toHaveLength(1);
   });
 });
+
+describe('exposed window (stagger reward)', () => {
+  function staggered(): { s: BossState; t: number } {
+    const base = fighting();
+    let s = tick(base, base.nextTelegraphAt).state;
+    const t = s.telegraph!.startsAt + 100;
+    for (let i = 0; i < R.staggerWords; i++) s = applyWord(s, { username: `p${i}`, word: 'planet', score: 5, now: t + i }).state;
+    return { s, t: t + R.staggerWords - 1 };
+  }
+
+  it('given a fresh boss, then it is not exposed', () => {
+    expect(toView(fighting(), T0 + R.introMs).exposed).toBeNull();
+  });
+
+  it('given the class staggers the boss, then it is exposed for the window', () => {
+    const { s, t } = staggered();
+    expect(toView(s, t).exposed).toEqual({ msLeft: R.exposedMs, totalMs: R.exposedMs });
+    expect(toView(s, t + R.exposedMs).exposed).toBeNull();
+  });
+
+  it('given the boss is exposed, when a word lands, then it deals the exposed multiplier and the hit says so', () => {
+    const { s, t } = staggered();
+    const normal = applyWord({ ...s, exposedUntil: 0, combo: { count: 0, lastAt: -Infinity } }, { username: 'z', word: 'cat', score: 10, now: t + 1 });
+    const boosted = applyWord({ ...s, combo: { count: 0, lastAt: -Infinity } }, { username: 'z', word: 'cat', score: 10, now: t + 1 });
+    expect(boosted.hit!.dmg).toBe(Math.round(normal.hit!.dmg * R.exposedMult));
+    expect(boosted.state.lastHits[0].exposed).toBe(true);
+    expect(normal.state.lastHits[0].exposed).toBeFalsy();
+  });
+
+  it('given a teacher pause while exposed, when shifted, then the window keeps its time left', () => {
+    const { s, t } = staggered();
+    const shifted = shiftBoss(s, 30_000);
+    expect(toView(shifted, t + 30_000).exposed?.msLeft).toBe(R.exposedMs);
+  });
+});

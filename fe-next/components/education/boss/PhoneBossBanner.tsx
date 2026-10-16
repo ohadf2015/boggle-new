@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertTriangle, ShieldCheck, Wind, Trophy } from 'lucide-react';
+import { AlertTriangle, ShieldCheck, Wind, Trophy, Crosshair } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ClassroomBossView } from '@/shared/types/classroomBoss';
@@ -30,6 +30,14 @@ export function PhoneBossBanner({ view, cue }: { view: ClassroomBossView; cue: B
           {t('classroomBoss.warnPhone', { s: Math.ceil(ms / 1000) })}{' '}
           <span dir="ltr" className="tabular-nums">({view.telegraph.longWords}/{view.telegraph.need})</span>
         </span>
+      </p>
+    );
+  }
+  if (view.exposed) {
+    return (
+      <p data-testid="phone-boss-exposed" role="status" className={cn(base, 'bg-neo-yellow text-neo-black', styles.slideIn)}>
+        <Crosshair className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
+        {t('classroomBoss.exposedPhone')}
       </p>
     );
   }

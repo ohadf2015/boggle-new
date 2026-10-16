@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
 
-const created = vi.hoisted(() => ({ apps: 0 }));
+const created = vi.hoisted(() => ({ apps: 0, failInit: false }));
 
 vi.mock('pixi.js', () => {
   class MockGraphics {
@@ -45,7 +45,7 @@ vi.mock('pixi.js', () => {
     stage = new MockContainer();
     ticker = new MockTicker();
     canvas: HTMLCanvasElement = document.createElement('canvas');
-    init = vi.fn().mockResolvedValue(undefined);
+    init = vi.fn(() => (created.failInit ? Promise.reject(new Error('no GPU')) : Promise.resolve(undefined)));
     destroy = vi.fn();
     constructor() {
       created.apps++;
@@ -82,8 +82,8 @@ const flush = async () => {
 };
 
 const detaches: Array<() => void> = [];
-const attachFxLayer: typeof attachRaw = (build) => {
-  const detach = attachRaw(build);
+const attachFxLayer: typeof attachRaw = (build, onUnavailable) => {
+  const detach = attachRaw(build, onUnavailable);
   detaches.push(detach);
   return detach;
 };
@@ -115,6 +115,7 @@ describe('attachFxLayer', () => {
 
   beforeEach(() => {
     created.apps = 0;
+    created.failInit = false;
   });
 
   afterEach(async () => {
@@ -257,12 +258,34 @@ describe('attachFxLayer', () => {
     expect(SharedFxApp.isInitialized()).toBe(false);
   });
 
+  it('given the GPU init fails, then the caller is told the layer is unavailable', async () => {
+    created.failInit = true;
+    const onUnavailable = vi.fn();
+    const build = vi.fn(() => layerFor(3));
+    attachFxLayer(build, onUnavailable);
+    await flush();
+
+    expect(build).not.toHaveBeenCalled();
+    expect(onUnavailable).toHaveBeenCalledOnce();
+  });
+
+  it('given the shared app mounts, then the unavailable callback never fires', async () => {
+    const onUnavailable = vi.fn();
+    attachFxLayer(() => layerFor(3), onUnavailable);
+    await flush();
+
+    expect(onUnavailable).not.toHaveBeenCalled();
+  });
+
   it('a layer whose build throws is dropped without breaking the app', async () => {
     await SharedFxApp.mount(document.body);
+    const onUnavailable = vi.fn();
     attachFxLayer(() => {
       throw new Error('boom');
-    });
+    }, onUnavailable);
     await flush();
+
+    expect(onUnavailable).toHaveBeenCalledOnce();
 
     expect(appNow().stage.children.every((c) => c.destroyed)).toBe(true);
     expect(SharedFxApp.isInitialized()).toBe(true);

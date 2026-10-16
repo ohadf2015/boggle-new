@@ -47,7 +47,7 @@ export function PhoneBossStrip() {
   return (
     <div data-testid="phone-boss-strip" className="relative z-20 mx-auto w-full max-w-md px-2 pb-1">
       {blurred && <style>{'.game-board-frame{filter:blur(5px) saturate(.6);transition:filter .2s ease-out}'}</style>}
-      <div className="flex items-center gap-2 rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-light p-1.5 shadow-hard-lg">
+      <div className={cn('flex items-center gap-2 rounded-neo border-[3px] bg-neo-navy-light p-1.5 shadow-hard-lg transition-colors duration-300', view.exposed ? 'border-neo-yellow' : view.telegraph ? 'border-neo-pink' : 'border-neo-cream/50')}>
         <div className="relative size-12 shrink-0 overflow-hidden rounded-[10px] border-2 border-neo-black bg-neo-purple-dark">
           <Image src={bossImage(view.bossId, bossPose(view, recentlyHit))} alt="" fill sizes="48px" className="object-cover object-top" />
         </div>

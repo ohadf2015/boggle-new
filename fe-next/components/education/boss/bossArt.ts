@@ -8,7 +8,11 @@ export function bossNameKey(id: ClassroomBossId): string {
   return BY_ID.get(id)?.displayName ?? `adventure.bosses.${id}.name`;
 }
 
+/** Projector-size (1024px) art: the free boss is the one most classes see on a 1080p screen. */
+const HD = new Set<ClassroomBossId>(['lexiconDragon']);
+
 export function bossImage(id: ClassroomBossId, pose: BossVisualState = 'idle'): string {
+  if (HD.has(id)) return `/images/bosses/hd/boss-lexicon-dragon-${pose}.webp`;
   return BY_ID.get(id)?.images[pose] ?? '/images/bosses/boss-lexicon-dragon.png';
 }
 
