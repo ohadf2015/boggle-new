@@ -22,8 +22,9 @@ vi.mock('@/utils/growthTracking', () => ({
 }));
 
 import { ModeRow, FRESH_MODE_KEYS } from '../fresh/ModeRow';
+import { modeRoute } from '@/lib/landing/modeMeta';
 
-const PUBLIC_HREFS = ['/en/multiplayer'];
+const PUBLIC_HREFS = FRESH_MODE_KEYS.map((k) => modeRoute(k, 'en'));
 
 function cards(container: HTMLElement) {
   const ul = container.querySelector('[data-fresh-section="modes"] ul');
@@ -56,11 +57,6 @@ describe('ModeRow (fresh section 4)', () => {
     for (const a of cards(container)) {
       expect(a.getAttribute('href')).not.toMatch(/crossword|quick-play|blast\/v2/);
     }
-    // Adventure is now public (GA) and should appear for guests
-    expect(FRESH_MODE_KEYS).not.toContain('adventure');
-    expect(container.querySelector('[data-parked-mode="adventure"]')).not.toBeNull();
-    expect(container.querySelector('[data-parked-mode="wordTowerV2"]')).not.toBeNull();
-    expect(container.querySelector('[data-parked-mode="blast"]')).not.toBeNull();
     expect(FRESH_MODE_KEYS).not.toContain('crossword');
   });
 
@@ -118,17 +114,6 @@ describe('ModeRow (fresh section 4)', () => {
     }
   });
 
-  it('wordCraft, connections and brainGym stay parked, not on the lead row', () => {
-    const { container } = render(<ModeRow />);
-    const more = container.querySelector('[data-testid="fresh-modes-more"]');
-    expect(more).not.toBeNull();
-    for (const mode of ['wordCraft', 'connections', 'brainGym', 'blast', 'adventure', 'wordTowerV2']) {
-      const card = container.querySelector(`[data-parked-mode="${mode}"]`);
-      expect(card).toBeTruthy();
-      expect(more!.contains(card)).toBe(true);
-    }
-  });
-
   describe('prev / next buttons', () => {
     const scrollBy = vi.fn();
     beforeEach(() => {
@@ -159,5 +144,12 @@ describe('ModeRow (fresh section 4)', () => {
       expect(Math.sign(left)).toBe(-Math.sign(back));
       expect(left).toBeLessThan(0);
     });
+  });
+
+  it('Given a fresh visitor, Then every public mode is a visible card, not a link hidden in a collapsed list', () => {
+    const { container } = render(<ModeRow />);
+    expect(cards(container).map((a) => a.dataset.mode)).toEqual([...FRESH_MODE_KEYS]);
+    expect(FRESH_MODE_KEYS.length).toBeGreaterThanOrEqual(5);
+    expect(container.querySelector('details')).toBeNull();
   });
 });

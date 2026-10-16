@@ -93,15 +93,11 @@ describe('ModeRow — image loading', () => {
     expect(missingFiles, `Missing files or case mismatches:\n${missingFiles.join('\n')}`).toHaveLength(0);
   });
 
-  it('adventure, word tower and blast are parked off the lead row', () => {
+  it('adventure, word tower and blast are cards in the lead row', () => {
     const { container } = render(<ModeRow />);
-    const more = container.querySelector('[data-testid="fresh-modes-more"]');
+    const lead = container.querySelector('[data-fresh-section="modes"] ul');
     for (const mode of ['adventure', 'wordTowerV2', 'blast']) {
-      const card = container.querySelector(`a[data-parked-mode="${mode}"]`);
-      expect(card).toBeTruthy();
-      expect(more?.contains(card!)).toBe(true);
-      const lead = container.querySelector('[data-fresh-section="modes"] ul');
-      expect(lead?.querySelector(`[data-mode="${mode}"]`)).toBeNull();
+      expect(lead?.querySelector(`a[data-mode="${mode}"]`)).toBeTruthy();
     }
   });
 

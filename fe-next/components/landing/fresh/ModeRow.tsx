@@ -5,11 +5,8 @@
  *
  * - Only modes a logged-out visitor can open. crossword / quick-play
  *   remain beta-gated in LandingChallengeCards (and route-guards).
- * - The new modes (Adventure, Word Tower) lead the section as the
- *   NewModesSpotlight pair (key art + loot chest), so the row skips them.
  * - Order is newcomer-first: blast ranks lowest for first-day players
- *   (lib/landing/newcomerModeOrder.ts), so it goes last. Arena removed to avoid
- *   clutter — the returning-visitor hub surfaces it prominently.
+ *   (lib/landing/newcomerModeOrder.ts), so it goes last.
  * - A card click fires the same `mode_card` + `mode_selected` events the hub
  *   cubes fire, so before/after funnels still compare.
  * - Visible at rest. Motion is CSS only (hover lift + art zoom, press tilt),
@@ -25,11 +22,9 @@ import { MODE_META, modeRoute } from '@/lib/landing/modeMeta';
 import { trackLandingCtaClick, trackModeSelected } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 
-/** First screen: one live grid race. Word Wheel is the daily banner, not a second card. */
-export const FRESH_MODE_KEYS = ['arena'] as const;
-/** Still reachable. Adventure, Word Tower and Blast are parked, not deleted. */
-export const FRESH_PARKED_KEYS = ['adventure', 'wordTowerV2', 'blast', 'wordCraft', 'connections', 'brainGym'] as const;
-type FreshModeKey = (typeof FRESH_MODE_KEYS)[number] | (typeof FRESH_PARKED_KEYS)[number];
+/** Every public mode is a card: a lone card read as "this site has one game". Blast last (newcomer order). */
+export const FRESH_MODE_KEYS = ['arena', 'adventure', 'wordTowerV2', 'wordCraft', 'connections', 'brainGym', 'blast'] as const;
+type FreshModeKey = (typeof FRESH_MODE_KEYS)[number];
 
 /** Literal class strings (Tailwind v4 only sees literals). Neighbours never share a colour. */
 const CARD_TONE = ['bg-neo-pink', 'bg-neo-lime', 'bg-neo-cyan', 'bg-neo-purple'] as const;
@@ -161,31 +156,6 @@ export function ModeRow() {
         })}
       </ul>
 
-      <details data-testid="fresh-modes-more" className="mx-auto mt-4 w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <summary className="cursor-pointer font-neo-display text-base font-bold text-neo-cream">
-          {t('homeFresh.modes.next')}
-        </summary>
-        <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {FRESH_PARKED_KEYS.map((key) => {
-            const meta = MODE_META[key];
-            const href = modeRoute(key, language);
-            if (!meta?.genIcon || !href) return null;
-            return (
-              <li key={key}>
-                <Link
-                  href={href}
-                  data-mode={key}
-                  data-parked-mode={key}
-                  onClick={() => onCardClick(key)}
-                  className="flex items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-cream p-2 font-neo-display text-sm font-bold text-neo-black"
-                >
-                  {t(`homeFresh.modes.items.${key}.title`)}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </details>
     </section>
   );
 }

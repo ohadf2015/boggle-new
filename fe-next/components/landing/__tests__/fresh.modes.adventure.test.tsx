@@ -1,7 +1,6 @@
 /**
- * The fresh home puts the daily Word Wheel banner and one grid race on the
- * first screen. Adventure, Word Tower and Blast remain reachable under More;
- * they must not return to the lead carousel as a spotlight pair.
+ * Adventure, Word Tower and Blast are ordinary cards in the fresh mode row,
+ * not a spotlight pair and not links in a collapsed list.
  */
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -19,25 +18,18 @@ vi.mock('@/utils/growthTracking', () => ({
 
 import { ModeRow } from '../fresh/ModeRow';
 
-describe('ModeRow (fresh) — modes moved under More', () => {
+describe('ModeRow (fresh) — every mode is a card', () => {
   beforeEach(() => {
     trackLandingCtaClick.mockClear();
     trackModeSelected.mockClear();
   });
 
-  it('keeps one grid race in the lead row and parks Adventure, Word Tower and Blast under More', () => {
+  it('leads with the grid race and shows Adventure, Word Tower and Blast as cards', () => {
     const { container } = render(<ModeRow />);
-    const section = container.querySelector('[data-fresh-section="modes"]')!;
-    const lead = section.querySelector('ul')!;
-    const more = section.querySelector('[data-testid="fresh-modes-more"]')!;
-
-    expect([...lead.querySelectorAll('a[data-mode]')].map((a) => a.getAttribute('href'))).toEqual(['/en/multiplayer']);
-    for (const mode of ['adventure', 'wordTowerV2', 'blast']) {
-      const card = section.querySelector(`a[data-parked-mode="${mode}"]`);
-      expect(card).not.toBeNull();
-      expect(more.contains(card)).toBe(true);
-      expect(lead.querySelector(`[data-mode="${mode}"]`)).toBeNull();
-    }
+    const lead = container.querySelector('[data-fresh-section="modes"] ul')!;
+    const modes = [...lead.querySelectorAll<HTMLAnchorElement>('a[data-mode]')].map((a) => a.dataset.mode);
+    expect(modes[0]).toBe('arena');
+    for (const mode of ['adventure', 'wordTowerV2', 'blast']) expect(modes).toContain(mode);
   });
 
   it('does not render the old Adventure and Word Tower spotlight cards', () => {
@@ -46,7 +38,7 @@ describe('ModeRow (fresh) — modes moved under More', () => {
     expect(section.querySelectorAll('a[data-spotlight-mode]')).toHaveLength(0);
   });
 
-  it('tracks clicks from both the lead race and a parked mode', () => {
+  it('tracks clicks from the lead race and a later card', () => {
     const { container } = render(<ModeRow />);
     const section = container.querySelector('[data-fresh-section="modes"]')!;
 
@@ -56,7 +48,7 @@ describe('ModeRow (fresh) — modes moved under More', () => {
 
     trackLandingCtaClick.mockClear();
     trackModeSelected.mockClear();
-    fireEvent.click(section.querySelector('a[data-parked-mode="adventure"]')!);
+    fireEvent.click(section.querySelector('a[data-mode="adventure"]')!);
     expect(trackModeSelected).toHaveBeenCalledWith('adventure', 'home');
     expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', expect.objectContaining({ mode: 'adventure' }));
   });
