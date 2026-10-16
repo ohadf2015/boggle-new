@@ -2514,7 +2514,7 @@ const en = {
     "language": "English",
     "showcase3d": {
       "title": "Free Online Word Game | LexiClash - Real-Time Multiplayer",
-      "description": "Play LexiClash for free — a real-time multiplayer word game with up to 4 players. Build word combos, climb the global leaderboard, no download, no signup. Play now in your browser."
+      "description": "Play LexiClash free — real-time multiplayer word game, 2–20 players. Build combos, climb the global leaderboard. No download, no signup. Start now →"
     },
     "leaderboard": {
       "title": "Word Game Leaderboard — Live Global Rankings | LexiClash",
