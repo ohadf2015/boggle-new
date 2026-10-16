@@ -23,7 +23,7 @@ import {
 import { CEFR_LEVELS, type CefrLevel } from '@/lib/education/eslCefrDemo';
 import { parseHostMinutes, parseHostMode } from '@/lib/education/teacherHostHref';
 import { cn } from '@/lib/utils';
-import type { LiveSurfacePreviewKind } from './LiveSurfacePreview';
+import { LIVE_SURFACE_PREVIEW_KINDS, type LiveSurfacePreviewKind } from './previewKinds';
 
 /**
  * DEV-ONLY: `?preview=podium|projector|waiting` renders the live classroom surfaces
@@ -36,7 +36,7 @@ const LiveSurfacePreview =
     : null;
 
 function previewKind(value: string | null | undefined): LiveSurfacePreviewKind | null {
-  return value === 'podium' || value === 'projector' || value === 'waiting' ? value : null;
+  return (LIVE_SURFACE_PREVIEW_KINDS as readonly string[]).includes(value ?? '') ? (value as LiveSurfacePreviewKind) : null;
 }
 
 /**

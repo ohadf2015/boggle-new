@@ -19,7 +19,7 @@ import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { PlayerResult } from '@/types/components';
 
 vi.mock('framer-motion', () => ({
-  m: { div: 'div', p: 'p', h1: 'h1', h2: 'h2', span: 'span', header: 'header', section: 'section' },
+  m: { div: 'div', p: 'p', h1: 'h1', h2: 'h2', span: 'span', header: 'header', section: 'section', li: 'li' },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useReducedMotion: () => true,
 }));
@@ -33,6 +33,11 @@ vi.mock('lucide-react', () => ({
   EyeOff: () => null,
   RotateCcw: () => null,
   BarChart3: () => null,
+  BookOpen: () => null,
+  BookOpenCheck: () => null,
+  Users: () => null,
+  Gauge: () => null,
+  ArrowUp: () => null,
 }));
 
 vi.mock('@/components/education/results/ReteachActions', () => ({

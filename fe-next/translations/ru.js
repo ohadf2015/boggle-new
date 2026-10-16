@@ -20576,6 +20576,14 @@ const ru = {
     }
   }
   // @eduPlans:end
+  ,
+  // @eduResultsV3:start
+  "eduResultsV3": {
+    "coverageLabel": "слов урока нашёл класс",
+    "bossStaggers": "Отбито атак: {count}",
+    "bossDamage": "урон {dmg}"
+  }
+  // @eduResultsV3:end
 };
 
 export { ru };

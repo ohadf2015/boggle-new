@@ -25,8 +25,9 @@
 'use client';
 
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
-import { bossImage } from '@/components/education/boss/bossArt';
 import { useEffect, useRef } from 'react';
+import { m } from 'framer-motion';
+import Avatar from '@/components/Avatar';
 import { cn } from '@/lib/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireRankConfetti, cleanupConfetti } from '@/utils/confettiUtils';
@@ -62,6 +63,7 @@ export interface WinnerSpotlightProps {
   /** Everyone sharing first place, for a tie. */
   leaders?: string[];
   t: (key: string, params?: Record<string, string | number>) => string;
+  className?: string;
 }
 
 const BANNER: Record<RoundOutcomeKind, string> = {
@@ -89,6 +91,7 @@ export function WinnerSpotlight({
   outcome = 'winner',
   leaders,
   t,
+  className,
 }: WinnerSpotlightProps) {
   const projector = size === 'projector';
   const kind: RoundOutcomeKind = !winner || winner.score <= 0 ? 'zero' : outcome;
@@ -131,9 +134,10 @@ export function WinnerSpotlight({
       data-active={String(active)}
       data-outcome={kind}
       className={cn(
-        'flex items-center gap-4 rounded-neo border-[2px] border-neo-cream shadow-hard',
+        'relative flex items-center gap-4 rounded-neo border-[2px] border-neo-cream shadow-hard',
         'bg-neo-navy-elevated text-neo-white',
-        projector ? 'px-6 py-4 gap-6 min-[2200px]:px-10 min-[2200px]:py-6' : 'px-4 py-3'
+        projector ? 'px-6 py-4 gap-6 min-[2200px]:px-10 min-[2200px]:py-6' : 'px-4 py-3',
+        className
       )}
     >
       {/* The mascot is the constant: it is on the wall before the name is, so
@@ -158,15 +162,17 @@ export function WinnerSpotlight({
           // nothing about hit-testing, and a capture run lost a lobby click to
           // `covered by <video>`. Nothing here is ever the target of a tap.
           'pointer-events-none shrink-0 overflow-hidden rounded-neo border-[2px] border-neo-cream bg-neo-navy',
-          projector ? 'w-28 h-28 min-[2200px]:w-44 min-[2200px]:h-44' : 'w-16 h-16'
+          projector ? 'w-28 h-28 2xl:w-32 2xl:h-32 min-[2200px]:w-44 min-[2200px]:h-44' : 'w-16 h-16'
         )}
       >
         {active && earned && !calm && (
           <style>{`@keyframes lc-trophy-pulse{0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.08) rotate(-3deg)}}`}</style>
         )}
-        {lostBoss ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img data-testid="winner-boss-escaped" src={bossImage(lostBoss, 'enraged')} alt="" aria-hidden className="pointer-events-none w-full h-full object-cover object-top" />
+        {lostBoss && winner ? (
+          // The boss has its own card above; this bar is about the student who hit it hardest.
+          <span data-testid="winner-hitter-avatar" data-username={winner.username} className="grid h-full w-full place-items-center bg-neo-yellow [&_svg]:h-full [&_svg]:w-full">
+            <Avatar userId={winner.username} size="xl" disableEffects className="!h-full !w-full" />
+          </span>
         ) : calm || (active && !earned) ? (
           // The still IS the video's own poster frame; routing it through
           // next/image would request a second, differently-encoded copy of an
@@ -240,6 +246,27 @@ export function WinnerSpotlight({
           </p>
         )}
       </div>
+
+      {/* The winner's own face lands on the beat, so the moment is a person, not only a name. */}
+      {projector && active && earned && !lostBoss && (
+        <span data-testid="winner-avatars" aria-hidden="true" className="pointer-events-none hidden shrink-0 items-center md:flex">
+          {names.slice(0, 2).map((name, i) => (
+            <m.span
+              key={name}
+              initial={calm ? false : { scale: 0.4, rotate: -10 }}
+              animate={{ scale: 1, rotate: i === 0 ? -4 : 5 }}
+              transition={calm ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 14, delay: 0.15 + i * 0.12 }}
+              className={cn(
+                'grid place-items-center overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-yellow shadow-hard [&_svg]:h-full [&_svg]:w-full',
+                'size-24 2xl:size-32 min-[2200px]:size-48',
+                i > 0 && '-ms-6'
+              )}
+            >
+              <Avatar userId={name} size="xl" disableEffects className="!h-full !w-full" />
+            </m.span>
+          ))}
+        </span>
+      )}
     </div>
   );
 }

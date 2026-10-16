@@ -41,4 +41,37 @@ describe('BossOutcomeCard', () => {
     render(<BossOutcomeCard size="phone" />);
     expect(screen.queryByTestId('boss-outcome')).toBeNull();
   });
+
+  const hitters = [{ username: 'Maya', dmg: 41 }, { username: 'Leo', dmg: 27 }, { username: 'Noa', dmg: 19 }, { username: 'Ari', dmg: 4 }];
+
+  it('given the fight is over, then the top three hitters are named with their damage, best first', () => {
+    useClassroomBossStore.getState().receiveState(view({ topHitters: hitters }));
+    render(<BossOutcomeCard size="tv" />);
+    const rows = screen.getAllByTestId('boss-top-hitter');
+    expect(rows).toHaveLength(3);
+    expect(rows.map((r) => r.getAttribute('data-username'))).toEqual(['Maya', 'Leo', 'Noa']);
+    expect(rows[0]).toHaveTextContent('eduResultsV3.bossDamage:{"dmg":41}');
+  });
+
+  it('given the boss escaped, then it shows how much health it ran off with', () => {
+    useClassroomBossStore.getState().receiveState(view({ hp: 38, maxHp: 100 }));
+    render(<BossOutcomeCard size="phone" />);
+    expect(screen.getByTestId('boss-hp-left')).toHaveTextContent('classroomBoss.hpLeft:{"pct":38}');
+  });
+
+  it('given the class defeated it, then no health is left to report', () => {
+    useClassroomBossStore.getState().receiveState(view({ status: 'defeated', hp: 0, pctDealt: 100 }));
+    render(<BossOutcomeCard size="tv" />);
+    expect(screen.queryByTestId('boss-hp-left')).toBeNull();
+  });
+
+  it('given the class blocked attacks, then the card counts them; none blocked, no chip', () => {
+    useClassroomBossStore.getState().receiveState(view({ staggers: 2 }));
+    const { unmount } = render(<BossOutcomeCard size="tv" />);
+    expect(screen.getByTestId('boss-staggers')).toHaveTextContent('eduResultsV3.bossStaggers:{"count":2}');
+    unmount();
+    useClassroomBossStore.getState().receiveState(view({ staggers: 0 }));
+    render(<BossOutcomeCard size="tv" />);
+    expect(screen.queryByTestId('boss-staggers')).toBeNull();
+  });
 });

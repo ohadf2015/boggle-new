@@ -59,14 +59,17 @@ const PIECE_COLOURS = ['#bfff00', '#00ffff', '#ff1493', '#ffe135', '#fffef0'];
  */
 const PIECE_DURATIONS = [2.6, 3.1, 3.7, 4.3];
 
+// A piece is a full-height column, so a % translate is a % of the LAYER: on a
+// 7px chip the same keyframe travelled 14px and the confetti froze as a row of
+// dots above the podium.
 const KEYFRAMES = `
 @keyframes lc-celebrate-fall {
-  0%   { transform: translate3d(0, -14%, 0) rotate(0deg); }
-  100% { transform: translate3d(0, 116%, 0) rotate(420deg); }
+  0%   { transform: translate3d(0, -12%, 0); }
+  100% { transform: translate3d(0, 104%, 0); }
 }
-@keyframes lc-celebrate-drift {
-  0%, 100% { margin-left: -6px; }
-  50%      { margin-left: 6px; }
+@keyframes lc-celebrate-sway {
+  0%, 100% { transform: translate3d(-6px, 0, 0) rotate(0deg); }
+  50%      { transform: translate3d(6px, 0, 0) rotate(210deg); }
 }
 `;
 
@@ -124,25 +127,41 @@ export function CelebrationLoop({ active, className }: CelebrationLoopProps) {
             style={{
               position: 'absolute',
               top: 0,
+              bottom: 0,
               left: `${left}%`,
               width: wide ? 10 : 7,
-              height: wide ? 7 : 12,
-              backgroundColor: colour,
-              borderRadius: 1,
-              opacity: 0.95,
               ...(calm
-                ? // Static scatter: no animation at all, but spread down the
-                  // box so it reads as confetti in mid-air, not a row of dots.
-                  { transform: `translate3d(0, ${(i * 37) % 90}%, 0) rotate(${(i * 47) % 360}deg)` }
+                ? // Static scatter: no animation, spread down the layer so it reads as confetti in mid-air.
+                  { transform: `translate3d(0, ${(i * 37) % 90}%, 0)` }
                 : {
-                    animationName: 'lc-celebrate-fall, lc-celebrate-drift',
-                    animationDuration: `${duration}s, ${(duration / 2).toFixed(2)}s`,
-                    animationTimingFunction: 'linear, ease-in-out',
+                    animationName: 'lc-celebrate-fall',
+                    animationDuration: `${duration}s`,
+                    animationTimingFunction: 'linear',
                     animationIterationCount: 'infinite',
                     animationDelay: `${delay.toFixed(2)}s`,
                   }),
             }}
-          />
+          >
+            <span
+              style={{
+                display: 'block',
+                width: wide ? 10 : 7,
+                height: wide ? 7 : 12,
+                backgroundColor: colour,
+                borderRadius: 1,
+                opacity: 0.95,
+                ...(calm
+                  ? { transform: `rotate(${(i * 47) % 360}deg)` }
+                  : {
+                      animationName: 'lc-celebrate-sway',
+                      animationDuration: `${(duration / 2).toFixed(2)}s`,
+                      animationTimingFunction: 'ease-in-out',
+                      animationIterationCount: 'infinite',
+                      animationDelay: `${delay.toFixed(2)}s`,
+                    }),
+              }}
+            />
+          </span>
         );
       })}
     </div>

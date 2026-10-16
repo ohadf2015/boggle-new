@@ -97,6 +97,35 @@ describe('CelebrationLoop', () => {
     expect(pieces[0].style.animationIterationCount).toBe('');
   });
 
+  it('falls the full height of the layer, not the height of one piece', () => {
+    render(<CelebrationLoop active />);
+    const pieces = screen
+      .getByTestId('celebration-loop')
+      .querySelectorAll<HTMLElement>('[data-celebration-piece]');
+    for (const piece of pieces) {
+      expect(piece.style.top).toBe('0px');
+      expect(piece.style.bottom).toBe('0px');
+    }
+  });
+
+  it('under reduced motion still spreads the scatter down the whole layer', () => {
+    setReducedMotion(true);
+    render(<CelebrationLoop active />);
+    const pieces = screen
+      .getByTestId('celebration-loop')
+      .querySelectorAll<HTMLElement>('[data-celebration-piece]');
+    expect(pieces[0].style.bottom).toBe('0px');
+    const offsets = new Set(Array.from(pieces).map((p) => p.style.transform));
+    expect(offsets.size).toBeGreaterThan(4);
+  });
+
+  it('moves pieces with transform only, never a layout property', () => {
+    const { container } = render(<CelebrationLoop active />);
+    const css = container.querySelector('style')?.textContent ?? '';
+    expect(css).toContain('@keyframes');
+    expect(css).not.toMatch(/margin|left:|top:|width|height/);
+  });
+
   it('never intercepts a tap on the Rematch button underneath it', () => {
     render(<CelebrationLoop active />);
     const layer = screen.getByTestId('celebration-loop');

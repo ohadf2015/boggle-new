@@ -29,7 +29,7 @@ export interface HostNextActionsProps {
 const PILL = cn(
   'inline-flex min-h-11 items-center gap-2 rounded-neo px-3 py-2 lg:px-4',
   'border-[3px] border-neo-cream bg-neo-navy-elevated text-neo-cream shadow-hard-sm',
-  'font-neo-display text-sm font-black uppercase tracking-wide lg:text-lg min-[2200px]:px-6 min-[2200px]:py-3 min-[2200px]:text-3xl',
+  'font-neo-display text-sm font-black uppercase tracking-wide lg:text-base 2xl:text-lg min-[2200px]:px-6 min-[2200px]:py-3 min-[2200px]:text-3xl',
   'transition-transform hover:-translate-y-0.5 hover:bg-neo-navy-light active:translate-y-0.5 active:shadow-none',
   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
 );
@@ -61,7 +61,7 @@ export function HostNextActions({
           }}
           className={cn(
             'w-full flex items-center justify-center gap-3 px-4 py-3 md:px-6 md:py-4 min-[2200px]:gap-6 min-[2200px]:py-7',
-            'font-neo-display font-black text-2xl md:text-4xl min-[2200px]:text-7xl',
+            'font-neo-display font-black text-2xl md:text-4xl lg:text-3xl 2xl:text-4xl min-[2200px]:text-7xl',
             'bg-neo-lime text-neo-black border-4 border-neo-black rounded-neo-lg',
             'shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-0.5 active:translate-y-0.5 transition-all'
           )}
@@ -69,7 +69,7 @@ export function HostNextActions({
           <RotateCcw className="w-8 h-8 shrink-0 min-[2200px]:w-14 min-[2200px]:h-14" aria-hidden />
           <span className="flex flex-col items-start leading-none">
             <span className="uppercase">{tr(t, 'academy.results.playAgain', 'Play again')}</span>
-            <span className="mt-1 font-neo-body text-sm font-bold normal-case md:text-base min-[2200px]:mt-3 min-[2200px]:text-3xl">
+            <span className="mt-1 font-neo-body text-sm font-bold normal-case md:text-base lg:text-sm 2xl:text-base min-[2200px]:mt-3 min-[2200px]:text-3xl">
               {tr(t, 'academy.results.playAgainHint', 'Same words, same code. Nobody rejoins.')}
             </span>
           </span>

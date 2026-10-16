@@ -20880,6 +20880,14 @@ const sv = {
     }
   }
   // @eduPlans:end
+  ,
+  // @eduResultsV3:start
+  "eduResultsV3": {
+    "coverageLabel": "lektionsord som klassen hittade",
+    "bossStaggers": "Stoppade attacker: {count}",
+    "bossDamage": "{dmg} skada"
+  }
+  // @eduResultsV3:end
 };
 
 export { sv };

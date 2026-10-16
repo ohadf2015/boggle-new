@@ -73,4 +73,20 @@ describe('VocabQuizStandings — podium', () => {
     expect(screen.getByText('vocabQuiz.standings.empty')).toBeInTheDocument();
     expect(screen.queryByTestId('podium-place-1')).not.toBeInTheDocument();
   });
+
+  it('marks the top three of the between-question strip with medal discs, never emoji', () => {
+    const { container } = render(<VocabQuizStandings standings={five} limit={5} t={t} />);
+    expect(container.textContent).not.toMatch(/\p{Extended_Pictographic}/u);
+    const medals = screen.getAllByTestId('standings-medal');
+    expect(medals.map((m) => m.textContent)).toEqual(['1', '2', '3']);
+    expect(medals.map((m) => m.getAttribute('data-medal'))).toEqual(['gold', 'silver', 'bronze']);
+  });
+
+  it('on the wall finale, sets the podium and the rest of the class side by side', () => {
+    render(<VocabQuizStandings standings={five} limit={5} size="projector" podium split t={t} />);
+    const split = screen.getByTestId('standings-split');
+    expect(split.className).toMatch(/lg:grid-cols-/);
+    expect(split).toContainElement(screen.getByTestId('podium-place-1'));
+    expect(split).toContainElement(screen.getByRole('list', { name: 'vocabQuiz.standings.title' }));
+  });
 });

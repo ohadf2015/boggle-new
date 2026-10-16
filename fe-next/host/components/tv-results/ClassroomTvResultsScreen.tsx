@@ -112,8 +112,8 @@ function SharedClassroomTvResultsScreen({
 
       {/* The shell is locked; this is the one region allowed to scroll (it
           rarely needs to — the recap is built to fit a 16:9 wall). */}
-      <div className="flex h-full flex-col gap-4 px-3 pt-20 pb-4 md:px-8 md:pt-6 md:pb-6">
-        <BossOutcomeCard size="tv" />
+      <div className="flex h-full flex-col gap-3 px-3 pt-20 pb-4 md:px-8 md:pt-6 md:pb-6 lg:gap-4">
+        <BossOutcomeCard size="tv" className="shrink-0" />
         <ClassroomTvResults
           summary={summary}
           onRematch={onRematch}

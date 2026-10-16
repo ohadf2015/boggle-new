@@ -201,7 +201,7 @@ export function ClassroomResultsCard({
           <p className="mb-3 font-neo-display font-bold text-xs uppercase tracking-widest text-neo-yellow">
             {t('education.results.podium.title')}
           </p>
-          <ResultsPodium entries={podium} stage={stage} t={t} />
+          <ResultsPodium entries={podium} stage={stage} layout="row" t={t} />
           {podium[0] && (
             <div className="mt-3">
               <WinnerSpotlight

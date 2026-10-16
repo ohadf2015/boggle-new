@@ -101,11 +101,11 @@ function rankOf(entry: PodiumEntry): 1 | 2 | 3 {
   return entry.rank === 1 || entry.rank === 2 ? entry.rank : 3;
 }
 
-function MedalDisc({ rank }: { rank: 1 | 2 | 3 }) {
+function MedalDisc({ position, rank }: { position: 1 | 2 | 3; rank: 1 | 2 | 3 }) {
   const disc = DISC[rank];
   return (
     <span
-      data-testid={`podium-medal-${rank}`}
+      data-testid={`podium-medal-${position}`}
       aria-hidden="true"
       className="absolute left-1/2 top-0 flex -translate-x-1/2 -translate-y-[70%] flex-col items-center"
     >
@@ -131,7 +131,13 @@ function MedalDisc({ rank }: { rank: 1 | 2 | 3 }) {
   );
 }
 
-function Placing({ entry, stage, floor, muted }: { entry: PodiumEntry; stage: RoundEndStage; floor: number; muted: boolean }) {
+/** Competition place: equal scores share a place, so a tie for first is gold twice. */
+function placeOf(entry: PodiumEntry, ordered: PodiumEntry[]): 1 | 2 | 3 {
+  const place = 1 + ordered.filter((o) => o.score > entry.score).length;
+  return place === 1 || place === 2 ? place : 3;
+}
+
+function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; place: 1 | 2 | 3; stage: RoundEndStage; floor: number; muted: boolean }) {
   const reduceMotion = useReducedMotion();
   const rank = rankOf(entry);
   const spot = PEDESTALS[rank];
@@ -152,7 +158,7 @@ function Placing({ entry, stage, floor, muted }: { entry: PodiumEntry; stage: Ro
       data-rank={String(rank)}
       data-plinth-height={String(spot.plinth)}
       data-revealed={String(revealed)}
-      data-medal={muted ? undefined : MEDAL[rank]}
+      data-medal={muted ? undefined : MEDAL[place]}
       aria-hidden={revealed ? undefined : true}
       className="contents"
     >
@@ -162,7 +168,7 @@ function Placing({ entry, stage, floor, muted }: { entry: PodiumEntry; stage: Ro
         data-testid={`podium-plate-${rank}`}
         className={cn(
           'absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-neo border-[3px] border-neo-black px-[1cqw] pt-[1.6cqw] shadow-[0.35cqw_0.35cqw_0_#000]',
-          muted ? MUTED_PLATE : PLATE[rank]
+          muted ? MUTED_PLATE : PLATE[place]
         )}
         style={{
           left: `${spot.x}%`,
@@ -170,12 +176,12 @@ function Placing({ entry, stage, floor, muted }: { entry: PodiumEntry; stage: Ro
           minWidth: `${spot.width * 0.62}%`,
           maxWidth: `${spot.width * 0.9}%`,
           minHeight: `${spot.plinth * 0.6}cqw`,
-          backgroundImage: muted ? undefined : SHEEN[rank],
+          backgroundImage: muted ? undefined : SHEEN[place],
           // An inner trim line in the metal's own dark tone: a plate, not a sticker.
           boxShadow: `inset 0 0 0 0.3cqw rgba(255,255,255,0.55), inset 0 -0.6cqw 0 rgba(0,0,0,0.18), 0.35cqw 0.35cqw 0 #000`,
         }}
       >
-        {!muted && <MedalDisc rank={rank} />}
+        {!muted && <MedalDisc position={rank} rank={place} />}
         <span
           aria-hidden="true"
           className="font-neo-display font-black tabular-nums leading-none"
@@ -197,7 +203,8 @@ function Placing({ entry, stage, floor, muted }: { entry: PodiumEntry; stage: Ro
       {/* The student, standing on the pedestal top: face, crown, name plate. */}
       <m.div
         className="absolute flex -translate-x-1/2 flex-col items-center"
-        style={{ left: `${spot.x}%`, bottom: `${100 - spot.top - 2.5}%`, width: `${spot.width + 4}%` }}
+        // The lower plates sit close under their pedestal tops; lifting those two students keeps the medal clear of the name.
+        style={{ left: `${spot.x}%`, bottom: `${100 - spot.top - 2.5 + (winner ? 0 : 3)}%`, width: `${spot.width + 4}%` }}
         initial={false}
         animate={revealed ? { scale: 1, y: 0 } : { scale: 0.85, y: 6 }}
         transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 13 }}
@@ -299,7 +306,7 @@ export function PodiumStage({ entries, stage = FINAL_STAGE, t, children, classNa
 
       <ol aria-label={t('education.results.podium.title')} className="absolute inset-0 m-0 list-none p-0">
         {ordered.map((entry) => (
-          <Placing key={entry.username} entry={entry} stage={stage} floor={podiumCountFloor(ordered, entry.rank)} muted={muted} />
+          <Placing key={entry.username} entry={entry} place={placeOf(entry, ordered)} stage={stage} floor={podiumCountFloor(ordered, entry.rank)} muted={muted} />
         ))}
       </ol>
 

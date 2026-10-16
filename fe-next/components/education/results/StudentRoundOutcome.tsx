@@ -76,11 +76,13 @@ export function StudentRoundOutcome({
   // nothing rather than invent a placing.
   if (index < 0) return null;
 
-  const rank = index + 1;
   const entry = humans[index];
-  const beaten = humans.length - rank;
-  const ahead = index > 0 ? humans[index - 1] : null;
-  const gap = ahead ? Math.max(0, ahead.score - entry.score) : 0;
+  // Competition rank, the rule the live HUD and the /education/live phone use: a shared first is first on both routes.
+  const rank = 1 + humans.filter((p) => p.score > entry.score).length;
+  const beaten = humans.filter((p) => p.score < entry.score).length;
+  const ahead = humans.slice(0, index).reverse().find((p) => p.score > entry.score) ?? null;
+  const gap = ahead ? ahead.score - entry.score : 0;
+  const tiedWith = ahead ? null : humans.find((p, i) => i !== index && p.score === entry.score) ?? null;
 
   const headline = hideClassPosition
     ? t('education.results.you.roundComplete')
@@ -161,60 +163,7 @@ export function StudentRoundOutcome({
       {/* The session's story, and the reason a student wants round three. A
           placing rewards the same three children every round; a delta rewards
           everyone who improved. Round one carries none of this. */}
-      {momentum && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          <span
-            data-testid="student-outcome-delta"
-            className={cn(
-              CHIP,
-              momentum.delta > 0 && 'bg-neo-lime text-neo-black',
-              momentum.delta < 0 && 'bg-neo-pink text-neo-black',
-              momentum.delta === 0 && 'bg-neo-navy text-neo-white'
-            )}
-          >
-            {momentum.delta > 0 ? (
-              <TrendingUp className="w-4 h-4 shrink-0" aria-hidden />
-            ) : momentum.delta < 0 ? (
-              <TrendingDown className="w-4 h-4 shrink-0" aria-hidden />
-            ) : (
-              <Minus className="w-4 h-4 shrink-0" aria-hidden />
-            )}
-            {momentum.delta > 0
-              ? t('education.results.moment.deltaUp', { points: momentum.delta })
-              : momentum.delta < 0
-                ? t('education.results.moment.deltaDown', { points: Math.abs(momentum.delta) })
-                : t('education.results.moment.deltaSame')}
-          </span>
-
-          {momentum.personalBest && (
-            <span
-              data-testid="student-outcome-best"
-              className={cn(CHIP, 'bg-neo-yellow text-neo-black')}
-            >
-              <Star className="w-4 h-4 shrink-0" aria-hidden />
-              {t('education.results.moment.personalBest')}
-            </span>
-          )}
-
-          {momentum.rankDelta > 0 && !hideClassPosition && (
-            <span
-              data-testid="student-outcome-climb"
-              className={cn(CHIP, 'bg-neo-cyan text-neo-black')}
-            >
-              <ArrowUpNarrowWide className="w-4 h-4 shrink-0" aria-hidden />
-              {t('education.results.moment.climbed', { places: momentum.rankDelta })}
-            </span>
-          )}
-
-          <span
-            data-testid="student-outcome-round"
-            className={cn(CHIP, 'bg-neo-navy text-neo-white')}
-          >
-            <Flame className="w-4 h-4 shrink-0 text-neo-orange" aria-hidden />
-            {t('education.results.moment.roundOfSession', { round: momentum.roundNumber })}
-          </span>
-        </div>
-      )}
+      {momentum && <StudentMomentumChips momentum={momentum} hideClassPosition={hideClassPosition} t={t} className="mt-3" />}
 
       <div className="mt-3 flex flex-wrap gap-2">
         {mastery && (
@@ -225,17 +174,91 @@ export function StudentRoundOutcome({
             {t('education.results.you.words', { found: mastery.found, total: mastery.total })}
           </span>
         )}
-        {ahead && !hideClassPosition && (
+        {(ahead || tiedWith) && !hideClassPosition && (
           <span
             data-testid="student-outcome-gap"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-[2px] border-neo-cream bg-neo-navy text-neo-white font-bold text-sm shadow-hard-sm"
           >
-            <TrendingUp className="w-4 h-4 shrink-0 text-neo-yellow" aria-hidden />
-            {t('education.results.you.gapToNext', { points: gap, name: ahead.username })}
+            {ahead ? (
+              <TrendingUp className="w-4 h-4 shrink-0 text-neo-yellow" aria-hidden />
+            ) : (
+              <Users className="w-4 h-4 shrink-0 text-neo-cyan" aria-hidden />
+            )}
+            {ahead
+              ? t('education.results.you.gapToNext', { points: gap, name: ahead.username })
+              : t('mpUi.results.tiedWith', { name: tiedWith!.username })}
           </span>
         )}
       </div>
     </section>
+  );
+}
+
+/** How this round compares with the earlier ones of the session. Shared by both phone routes. */
+export function StudentMomentumChips({
+  momentum,
+  hideClassPosition = false,
+  t,
+  className,
+}: {
+  momentum: RoundMomentum;
+  hideClassPosition?: boolean;
+  t: StudentRoundOutcomeProps['t'];
+  className?: string;
+}) {
+  return (
+    <div className={cn('flex flex-wrap gap-2', className)}>
+      <span
+        data-testid="student-outcome-delta"
+        className={cn(
+          CHIP,
+          momentum.delta > 0 && 'bg-neo-lime text-neo-black',
+          momentum.delta < 0 && 'bg-neo-pink text-neo-black',
+          momentum.delta === 0 && 'bg-neo-navy text-neo-white'
+        )}
+      >
+        {momentum.delta > 0 ? (
+          <TrendingUp className="w-4 h-4 shrink-0" aria-hidden />
+        ) : momentum.delta < 0 ? (
+          <TrendingDown className="w-4 h-4 shrink-0" aria-hidden />
+        ) : (
+          <Minus className="w-4 h-4 shrink-0" aria-hidden />
+        )}
+        {momentum.delta > 0
+          ? t('education.results.moment.deltaUp', { points: momentum.delta })
+          : momentum.delta < 0
+            ? t('education.results.moment.deltaDown', { points: Math.abs(momentum.delta) })
+            : t('education.results.moment.deltaSame')}
+      </span>
+
+      {momentum.personalBest && (
+        <span
+          data-testid="student-outcome-best"
+          className={cn(CHIP, 'bg-neo-yellow text-neo-black')}
+        >
+          <Star className="w-4 h-4 shrink-0" aria-hidden />
+          {t('education.results.moment.personalBest')}
+        </span>
+      )}
+
+      {momentum.rankDelta > 0 && !hideClassPosition && (
+        <span
+          data-testid="student-outcome-climb"
+          className={cn(CHIP, 'bg-neo-cyan text-neo-black')}
+        >
+          <ArrowUpNarrowWide className="w-4 h-4 shrink-0" aria-hidden />
+          {t('education.results.moment.climbed', { places: momentum.rankDelta })}
+        </span>
+      )}
+
+      <span
+        data-testid="student-outcome-round"
+        className={cn(CHIP, 'bg-neo-navy text-neo-white')}
+      >
+        <Flame className="w-4 h-4 shrink-0 text-neo-orange" aria-hidden />
+        {t('education.results.moment.roundOfSession', { round: momentum.roundNumber })}
+      </span>
+    </div>
   );
 }
 

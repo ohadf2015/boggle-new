@@ -39,12 +39,15 @@ describe('boss lost: no winner on results', () => {
   });
   afterEach(cleanup);
 
-  it('given the boss escaped, then the projector names a top hitter with the boss art and no trophy, confetti or win sting', () => {
+  it('given the boss escaped, then the projector names a top hitter with the student\'s own face and no trophy, confetti or win sting', () => {
     useClassroomBossStore.getState().receiveState(ended('escaped'));
     render(<WinnerSpotlight winner={{ username: 'Avery', score: 335 }} active t={t} />);
     expect(screen.getByText('classroomBoss.topHitter')).toBeInTheDocument();
     expect(screen.queryByText(/winnerBanner/)).toBeNull();
-    expect(screen.getByTestId('winner-boss-escaped')).toBeInTheDocument();
+    // The bar is about the student; the boss already has its own card above.
+    expect(screen.getByTestId('winner-hitter-avatar')).toHaveAttribute('data-username', 'Avery');
+    expect(screen.queryByTestId('winner-boss-escaped')).toBeNull();
+    expect(screen.queryByTestId('winner-mascot-still')).toBeNull();
     expect(screen.queryByTestId('winner-mascot-video')).toBeNull();
     expect(fireRankConfetti).not.toHaveBeenCalled();
     expect(playRoundEndCue).not.toHaveBeenCalled();

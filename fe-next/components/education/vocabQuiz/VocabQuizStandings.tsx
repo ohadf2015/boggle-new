@@ -18,7 +18,12 @@ import { cn } from '@/lib/utils';
 import { ResultsPodium } from '../results/ResultsPodium';
 import type { VocabQuizStanding, TranslateFn } from '@/shared/types/vocabQuiz';
 
-const MEDALS = ['🥇', '🥈', '🥉'];
+/** Same metals as the board podium's plates, so a medal reads the same in every mode. */
+const MEDALS = [
+  { name: 'gold', fill: 'bg-neo-yellow' },
+  { name: 'silver', fill: 'bg-[#dfe5ee]' },
+  { name: 'bronze', fill: 'bg-[#e8894b]' },
+] as const;
 
 export interface VocabQuizStandingsProps {
   standings: VocabQuizStanding[];
@@ -29,6 +34,8 @@ export interface VocabQuizStandingsProps {
   size?: 'compact' | 'projector';
   /** End of the quiz: top three on plinths, the rest listed underneath. */
   podium?: boolean;
+  /** Wall finale: the podium and the rest of the class side by side on wide screens. */
+  split?: boolean;
   t: TranslateFn;
 }
 
@@ -38,6 +45,7 @@ export function VocabQuizStandings({
   limit = 5,
   size = 'compact',
   podium = false,
+  split = false,
   t,
 }: VocabQuizStandingsProps) {
   const shown = standings.slice(0, limit);
@@ -57,7 +65,10 @@ export function VocabQuizStandings({
   const rankOffset = podium ? top.length : 0;
 
   return (
-    <div className="space-y-4">
+    <div
+      data-testid={split ? 'standings-split' : undefined}
+      className={cn(split && rest.length > 0 ? 'grid grid-cols-1 items-center gap-4 lg:grid-cols-5 lg:gap-8' : 'space-y-4')}
+    >
       {/*
         The rank passed down is the array index, NOT a second ranking. The
         server sorts `standings` and every client renders that order verbatim
@@ -65,6 +76,7 @@ export function VocabQuizStandings({
         one ranking in the system, not two that can drift.
       */}
       {top.length > 0 && (
+        <div className={cn(split && rest.length > 0 && 'lg:col-span-3')}>
         <ResultsPodium
           size={projector ? 'projector' : 'card'}
           layout={projector ? 'auto' : 'row'}
@@ -76,10 +88,11 @@ export function VocabQuizStandings({
           }))}
           t={t}
         />
+        </div>
       )}
 
       {rest.length > 0 && (
-        <ol className="space-y-2" aria-label={t('vocabQuiz.standings.title')}>
+        <ol className={cn('space-y-2', split && 'lg:col-span-2')} aria-label={t('vocabQuiz.standings.title')}>
           {rest.map((player, index) => {
             const rank = index + rankOffset;
             const isMe = !!meUsername && player.username === meUsername;
@@ -94,15 +107,27 @@ export function VocabQuizStandings({
                     : 'bg-neo-navy-elevated text-neo-white shadow-hard-sm'
                 )}
               >
-                <span
-                  className={cn(
-                    'shrink-0 font-neo-display font-bold',
-                    projector ? 'text-2xl w-10' : 'text-base w-7'
-                  )}
-                  aria-hidden
-                >
-                  {MEDALS[rank] ?? rank + 1}
-                </span>
+                {MEDALS[rank] ? (
+                  <span
+                    data-testid="standings-medal"
+                    data-medal={MEDALS[rank].name}
+                    aria-hidden
+                    className={cn(
+                      'grid shrink-0 place-items-center rounded-full border-[2px] border-neo-black font-neo-display font-black text-neo-black shadow-hard-sm',
+                      MEDALS[rank].fill,
+                      projector ? 'size-10 text-xl' : 'size-7 text-sm'
+                    )}
+                  >
+                    {rank + 1}
+                  </span>
+                ) : (
+                  <span
+                    className={cn('shrink-0 text-center font-neo-display font-bold tabular-nums', projector ? 'text-2xl w-10' : 'text-base w-7')}
+                    aria-hidden
+                  >
+                    {rank + 1}
+                  </span>
+                )}
                 <span
                   className={cn(
                     'flex-1 min-w-0 truncate font-neo-body font-bold',

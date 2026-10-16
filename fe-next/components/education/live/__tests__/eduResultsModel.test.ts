@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { classStats, hostPodium, studentPlacing } from '@/components/education/live/eduResultsModel';
+import { classStats, hostPodium, studentGap, studentPlacing } from '@/components/education/live/eduResultsModel';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { PlayerResult } from '@/types/components';
 
@@ -49,5 +49,35 @@ describe('studentPlacing', () => {
 
   it('given a student missing from the scores, then the placing is unknown', () => {
     expect(studentPlacing(players, 'Zed', 'Ms Cohen')).toBeNull();
+  });
+});
+
+describe('studentPlacing and studentGap — the same numbers the /multiplayer phone prints', () => {
+  const tied: PlayerResult[] = [
+    { username: 'Ms Cohen', score: 0, isHost: true },
+    { username: 'Noa', score: 30 },
+    { username: 'Maya', score: 30 },
+    { username: 'Ido', score: 10 },
+  ];
+
+  it('given a shared top score, when placed, then both students read first (competition rank)', () => {
+    expect(studentPlacing(tied, 'Maya', 'Ms Cohen')).toEqual({ rank: 1, total: 3, score: 30 });
+    expect(studentPlacing(tied, 'Ido', 'Ms Cohen')).toEqual({ rank: 3, total: 3, score: 10 });
+  });
+
+  it('given a student behind, when the gap is read, then it names the nearest higher score', () => {
+    expect(studentGap(players, 'Maya', 'Ms Cohen')).toEqual({ kind: 'behind', name: 'Noa', points: 10 });
+  });
+
+  it('given the leader, when the gap is read, then it is the margin over second', () => {
+    expect(studentGap(players, 'Noa', 'Ms Cohen')).toEqual({ kind: 'ahead', name: 'Maya', points: 10 });
+  });
+
+  it('given a tie on top, when the gap is read, then it says who the place is shared with', () => {
+    expect(studentGap(tied, 'Maya', 'Ms Cohen')).toEqual({ kind: 'tied', name: 'Noa', more: 0 });
+  });
+
+  it('given a solo student, when the gap is read, then there is none', () => {
+    expect(studentGap([{ username: 'Noa', score: 30 }], 'Noa', 'Ms Cohen')).toBeNull();
   });
 });

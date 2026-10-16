@@ -2,6 +2,8 @@ import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { PlayerResult } from '@/types/components';
 import { podiumWithoutHost, standingsWithoutHost } from '@/lib/education/roundEndPodium';
 import { lessonWordsLanded } from '@/components/education/results/lessonTally';
+import { rivalGap, type RivalGap } from '@/components/multiplayer/results/mpResultsView';
+import type { MpStandingRow } from '@/components/multiplayer/results/mpStandings';
 
 export interface ClassStats {
   students: number;
@@ -47,9 +49,21 @@ export function hostPodium(summary: ClassroomSummary, players: PlayerResult[] | 
   return seats.slice(0, 3).map((s) => ({ ...s, avatar: avatarOf.get(s.username) }));
 }
 
+function rankedStudents(players: PlayerResult[] | undefined, teacherName: string): PlayerResult[] {
+  return [...studentsOnly(players, teacherName)].sort((a, b) => b.score - a.score);
+}
+
+/** Competition rank (1, 1, 3): the rule the live HUD and the /multiplayer phone use, so a tie never reads as second. */
 export function studentPlacing(players: PlayerResult[] | undefined, username: string, teacherName: string) {
-  const sorted = [...studentsOnly(players, teacherName)].sort((a, b) => b.score - a.score);
+  const sorted = rankedStudents(players, teacherName);
   const index = sorted.findIndex((p) => p.username === username);
   if (index < 0) return null;
-  return { rank: index + 1, total: sorted.length, score: sorted[index].score };
+  const score = sorted[index].score;
+  return { rank: 1 + sorted.filter((p) => p.score > score).length, total: sorted.length, score };
+}
+
+/** The one line under my score — behind, ahead or tied — through the same helper the /multiplayer phone uses. */
+export function studentGap(players: PlayerResult[] | undefined, username: string, teacherName: string): RivalGap | null {
+  const rows = rankedStudents(players, teacherName).map((p) => ({ username: p.username, score: p.score, isMe: p.username === username }));
+  return rivalGap(rows as MpStandingRow[]);
 }

@@ -1,165 +1,170 @@
 'use client';
 
-/** Mounts only in the host tree, so no student ever sees the report link; z-[75] clears the lobby's z-[65]. */
-import Link from 'next/link';
-import { Crown, FileBarChart, LogOut, RotateCcw, Shuffle } from 'lucide-react';
-import Avatar from '@/components/Avatar';
+/**
+ * The /education/live projector at round end: its own screen (the rebuild gives the live route its own
+ * lobby and results), built from the shared round-end pieces: the staged podium, the winner bar, the
+ * class's numbers, the words still to teach, the boss verdict and the "See who struggled" Pro preview.
+ * Mounts only in the host tree, so no student sees the report or the upsell; z-[75] clears the lobby's
+ * z-[65]. Dark-only and painted from frame one: the reveal only swaps what is written inside (Class 5).
+ */
+import { LogOut, RotateCcw, Shuffle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import type { ClassroomTvResultsScreenProps } from '@/host/components/tv-results/ClassroomTvResultsScreen';
-import { chipAccent } from '@/components/education/projector/projectorLobbyModel';
-import { classStats, hostPodium, type ClassStats, type PodiumSeat } from './eduResultsModel';
-import { LIVE_KEYFRAMES, PRESS, PRIMARY_BUTTON, SECONDARY_BUTTON, type Translate } from './eduLiveStyles';
 import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
+import { PodiumStage } from '@/components/education/results/PodiumStage';
+import { ClassChest } from '@/components/education/results/ClassChest';
+import { WinnerSpotlight } from '@/components/education/results/WinnerSpotlight';
+import { CelebrationLoop } from '@/components/education/results/CelebrationLoop';
+import { ClassPulse } from '@/components/education/results/ClassPulse';
+import { TvCoveragePanel } from '@/components/education/results/TvCoveragePanel';
+import { TvRecapHeader } from '@/components/education/results/TvRecapHeader';
+import { StrugglePreview } from '@/components/education/results/StrugglePreview';
+import { ZeroRoundNote } from '@/components/education/results/ZeroRoundNote';
+import { EmptyRoundCard } from '@/components/education/results/EmptyRoundCard';
+import { useRoundEndReveal } from '@/components/education/results/useRoundEndReveal';
+import { useIsPhoneRecap } from '@/components/education/results/useIsPhoneRecap';
+import { buildTvRecap } from '@/components/education/results/tvRecapModel';
+import { trackResultsAction } from '@/components/education/results/trackResultsAction';
+import { isRevealed } from '@/lib/education/roundEndStage';
+import { classSwept } from '@/lib/education/roundEndSweep';
+import { PRESS, PRIMARY_BUTTON, SECONDARY_BUTTON, type Translate } from './eduLiveStyles';
 
-const SEAT_STYLE: Record<number, { order: string; height: string; color: string }> = {
-  1: { order: 'order-2', height: 'h-36 md:h-[13vw]', color: 'bg-neo-yellow' },
-  2: { order: 'order-1', height: 'h-24 md:h-[9vw]', color: 'bg-neo-cyan' },
-  3: { order: 'order-3', height: 'h-16 md:h-[6vw]', color: 'bg-neo-pink' },
-};
-
-function Seat({ seat, index }: { seat: PodiumSeat; index: number }) {
-  const style = SEAT_STYLE[seat.rank] ?? SEAT_STYLE[3];
+function Actions({ t, onRematch, onClose, onExitRoom }: Pick<ClassroomTvResultsScreenProps, 'onRematch' | 'onClose' | 'onExitRoom'> & { t: Translate }) {
   return (
-    <li
-      data-testid="edu-podium-seat"
-      data-name={seat.username}
-      style={{ animationDelay: `${(3 - seat.rank) * 120}ms` }}
-      className={cn('flex w-1/3 max-w-[16rem] flex-col items-center gap-2 motion-safe:animate-[edu-live-pop_240ms_cubic-bezier(0.23,1,0.32,1)_both]', style.order)}
-    >
-      <span className="relative inline-flex">
-        {seat.rank === 1 && (
-          <Crown data-testid="edu-podium-crown" aria-hidden="true" className="absolute -top-7 start-1/2 size-9 -translate-x-1/2 rotate-[-8deg] fill-neo-yellow text-neo-black rtl:translate-x-1/2 md:-top-[2.6vw] md:size-[3.2vw]" />
-        )}
-        <span className="inline-flex size-16 overflow-hidden rounded-full border-4 border-neo-black bg-neo-cream shadow-hard md:size-[6vw]">
-          <Avatar userId={seat.username} customAvatar={seat.avatar?.customAvatar ?? undefined} size="xl" disableEffects className="!h-full !w-full" />
-        </span>
-      </span>
-      <span dir="auto" className={cn('max-w-full truncate rounded-full border-[3px] border-neo-black px-3 py-0.5 font-neo-display text-lg font-black shadow-hard-sm md:px-[0.9vw] md:text-[1.6vw]', chipAccent(seat.username, index))}>
-        {seat.username}
-      </span>
-      <div className={cn('flex w-full flex-col items-center justify-start rounded-t-neo-lg border-4 border-b-0 border-neo-black pt-2 text-neo-black shadow-hard', style.height, style.color)}>
-        <span className="font-neo-display text-4xl font-black md:text-[3.5vw]">{seat.rank}</span>
-        <span className="font-neo-body text-base font-bold tabular-nums md:text-[1.3vw]">{seat.score.toLocaleString()}</span>
-      </div>
-    </li>
-  );
-}
-
-function Stat({ id, label, value }: { id: string; label: string; value: string }) {
-  return (
-    <div data-testid={id} className="flex flex-col rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard-sm md:px-[1vw] md:py-[0.6vw]">
-      <span className="font-neo-display text-3xl font-black tabular-nums text-neo-lime md:text-[2.6vw]">{value}</span>
-      <span className="font-neo-body text-sm font-bold text-neo-cream/80 md:text-[1vw]">{label}</span>
-    </div>
-  );
-}
-
-function Stats({ stats, t }: { stats: ClassStats; t: Translate }) {
-  return (
-    <div className="grid grid-cols-2 gap-3 md:gap-[1vw]">
-      <Stat id="edu-stat-students" label={t('eduLiveRoom.hostResults.statStudents')} value={String(stats.students)} />
-      <Stat id="edu-stat-words" label={t('eduLiveRoom.hostResults.statWords')} value={String(stats.words)} />
-      <Stat id="edu-stat-avg" label={t('eduLiveRoom.hostResults.statAvg')} value={String(stats.avgScore)} />
-      {stats.lesson && <Stat id="edu-stat-lesson" label={t('eduLiveRoom.hostResults.statLesson')} value={`${stats.lesson.found}/${stats.lesson.total}`} />}
-    </div>
-  );
-}
-
-function Actions({ t, language, onRematch, onClose, onExitRoom }: Pick<ClassroomTvResultsScreenProps, 't' | 'onRematch' | 'onClose' | 'onExitRoom'> & { language: string }) {
-  return (
-    <div className="flex flex-col gap-3 md:gap-[0.8vw]">
+    <div data-testid="edu-results-actions" className="flex shrink-0 flex-col gap-2 max-lg:order-first lg:gap-3">
       {onRematch && (
-        <button type="button" data-testid="edu-results-play-again" onClick={onRematch} className={cn(PRIMARY_BUTTON, PRESS, 'min-h-14 px-6 py-3 text-2xl md:text-[2vw]')}>
+        <button
+          type="button"
+          data-testid="edu-results-play-again"
+          onClick={() => {
+            trackResultsAction('rematch', 'projector');
+            onRematch();
+          }}
+          className={cn(PRIMARY_BUTTON, PRESS, 'min-h-16 w-full px-6 py-3 text-2xl lg:text-3xl 2xl:min-h-20 2xl:text-4xl')}
+        >
           <RotateCcw className="size-[0.9em]" aria-hidden="true" />
           {t('eduLiveRoom.hostResults.playAgain')}
         </button>
       )}
-      <div className="grid grid-cols-2 gap-3 md:gap-[0.8vw]">
-        {onClose && (
-          <button type="button" data-testid="edu-results-next-mode" onClick={onClose} className={cn(SECONDARY_BUTTON, PRESS, 'md:text-[1.1vw]')}>
-            <Shuffle className="size-4" aria-hidden="true" />
-            {t('eduLiveRoom.hostResults.nextMode')}
-          </button>
-        )}
-        <Link href={`/${language}/teacher/reports`} data-testid="edu-results-report" className={cn(SECONDARY_BUTTON, PRESS, 'md:text-[1.1vw]')}>
-          <FileBarChart className="size-4" aria-hidden="true" />
-          {t('eduLiveRoom.hostResults.viewReport')}
-        </Link>
-      </div>
-      {onExitRoom && (
-        <button type="button" data-testid="edu-results-end" onClick={onExitRoom} className={cn(SECONDARY_BUTTON, PRESS, 'border-neo-cream/50 bg-transparent md:text-[1vw]')}>
-          <LogOut className="size-4" aria-hidden="true" />
-          {t('eduLiveRoom.hostResults.endGame')}
-        </button>
+      {(onClose || onExitRoom) && (
+        <div className="grid grid-cols-2 gap-2 lg:gap-3">
+          {onClose && (
+            <button type="button" data-testid="edu-results-next-mode" onClick={onClose} className={cn(SECONDARY_BUTTON, PRESS, '2xl:text-base')}>
+              <Shuffle className="size-4" aria-hidden="true" />
+              {t('eduLiveRoom.hostResults.nextMode')}
+            </button>
+          )}
+          {onExitRoom && (
+            <button type="button" data-testid="edu-results-end" onClick={onExitRoom} className={cn(SECONDARY_BUTTON, PRESS, '2xl:text-base')}>
+              <LogOut className="size-4" aria-hidden="true" />
+              {t('eduLiveRoom.hostResults.endGame')}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
 }
 
-const TITLE = 'font-neo-display font-black text-neo-white [-webkit-text-stroke:2px_#000] [paint-order:stroke_fill] drop-shadow-[3px_3px_0_#000]';
-const HALFTONE = '[background-image:radial-gradient(rgba(255,255,255,0.07)_1.5px,transparent_1.5px)] [background-size:14px_14px]';
-
 export function EduHostResults({ summary, players, t, onRematch, onClose, onExitRoom }: ClassroomTvResultsScreenProps) {
   const { language } = useLanguage();
-  const stats = classStats(summary, players);
-  const podium = hostPodium(summary, players).filter((s) => s.score > 0);
-  const actions = <Actions t={t} language={language} onRematch={onRematch} onClose={onClose} onExitRoom={onExitRoom} />;
-  // A boss round's story is the boss: board points may all be zero while the class still dealt real damage.
-  const bossOver = useClassroomBossStore((s) => s.view?.status === 'defeated' || s.view?.status === 'escaped');
+  const phone = useIsPhoneRecap();
+  const { podium, outcome, landed, stats } = buildTvRecap(summary, players, t);
+  const bossStatus = useClassroomBossStore((s) => s.view?.status);
+  const bossOver = bossStatus === 'defeated' || bossStatus === 'escaped';
+  // A boss round's points can all be zero while the class dealt real damage: then the boss card is the story.
+  const showPodium = podium.length > 0 && !(bossOver && !outcome.celebrate);
+  const hasStage = showPodium || (outcome.kind === 'empty' && !bossOver);
+  const stage = useRoundEndReveal(outcome.celebrate);
+  const winnerBeat = outcome.celebrate && isRevealed(1, stage);
+  const neverPlaced = new Set((summary.neverPlacedWords ?? []).map((w) => w.toLowerCase()));
+  const swept = classSwept({
+    totalWords: summary.totalWords,
+    classFoundCount: summary.classFoundCount,
+    neverPlacedCount: summary.neverPlacedWords ? neverPlaced.size : undefined,
+  });
 
   return (
-    <div data-testid="edu-host-results" className="fixed inset-0 z-[75] flex flex-col overflow-y-auto bg-neo-navy text-neo-cream">
-      <style>{LIVE_KEYFRAMES}</style>
-      {podium.length === 0 ? (
-        <div className="m-auto w-full max-w-2xl p-4 pt-16 md:pt-[5vw]">
-          {bossOver ? (
-            <section className="flex flex-col gap-4 md:gap-[1.2vw]">
-              <BossOutcomeCard size="tv" />
-              <Stats stats={stats} t={t} />
-              {actions}
-            </section>
-          ) : (
-          <section data-testid="edu-results-empty" className="flex flex-col gap-4 rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light p-5 shadow-hard-lg md:gap-[1.2vw] md:p-[2vw]">
-            <div className="flex items-center gap-4">
-              {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
-              <img src={EDU_MASCOT.empty} alt="" aria-hidden="true" className="size-24 shrink-0 select-none md:size-[8vw]" />
-              <div className="min-w-0">
-                <h1 data-testid="edu-results-no-scores" className={cn(TITLE, 'text-3xl md:text-[2.6vw]')}>{t('eduLiveRoom.hostResults.noScores')}</h1>
-                <p className="mt-1 font-neo-body text-base font-bold text-neo-cream/85 md:text-[1.2vw]">{t('eduLiveRoom.hostResults.noScoresHint')}</p>
-              </div>
-            </div>
-            <Stats stats={stats} t={t} />
-            {actions}
-          </section>
-          )}
-        </div>
-      ) : (
-        <div className="mx-auto flex w-full max-w-[1800px] flex-1 flex-col gap-4 p-4 pt-16 md:gap-[1.5vw] md:p-[2vw] md:pt-[5vw]">
-          {bossOver ? (
-            <BossOutcomeCard size="tv" />
-          ) : (
-          <header className="flex items-center justify-center gap-4 md:gap-[1.5vw]">
-            {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
-            <img src={EDU_MASCOT.podium} alt="" aria-hidden="true" className="size-20 shrink-0 select-none motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite] md:size-[8vw]" />
-            <h1 className={cn(TITLE, 'text-4xl md:text-[3.6vw]')}>{t('eduLiveRoom.hostResults.title')}</h1>
-          </header>
-          )}
-          <div className="grid flex-1 items-center gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:gap-[2vw]">
-            <section data-testid="edu-podium" className={cn('flex min-h-[18rem] items-end justify-center rounded-neo-lg border-4 border-neo-cream bg-neo-purple/40 px-4 pt-10 shadow-hard-lg md:min-h-[26vw] md:px-[2vw] md:pt-[4vw]', HALFTONE)}>
-              <ol className="flex w-full items-end justify-center gap-3 md:gap-[1.5vw]">
-                {podium.map((seat, i) => <Seat key={seat.username} seat={seat} index={i} />)}
-              </ol>
-            </section>
-            <section className="flex flex-col gap-4 md:justify-center md:gap-[1.2vw]">
-              <Stats stats={stats} t={t} />
-              {actions}
-            </section>
+    <div
+      data-testid="edu-host-results"
+      data-round-end-stage={stage}
+      data-outcome={outcome.kind}
+      className="fixed inset-0 z-[75] flex flex-col gap-3 overflow-y-auto bg-neo-navy px-3 pb-4 pt-16 text-neo-cream lg:gap-4 lg:overflow-hidden lg:px-8 lg:pb-6 lg:pt-6"
+    >
+      <BossOutcomeCard size="tv" className="shrink-0" />
+      <TvRecapHeader
+        title={
+          !hasStage
+            ? null
+            : outcome.celebrate
+              ? t('education.results.podium.title')
+              : t(outcome.kind === 'empty' ? 'eduLive.results.emptyTitle' : 'eduLive.results.lineupTitle')
+        }
+        lessonNames={summary.lessonNames ?? []}
+      />
+
+      <div className="grid grid-cols-1 gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-5 lg:gap-5 2xl:grid-cols-3">
+        {hasStage && (
+          <div className="relative flex flex-col gap-3 lg:col-span-3 lg:min-h-0 lg:gap-4 2xl:col-span-2">
+            {/* The winner bar stands down to "top hitter" when the boss got away; so does the party. */}
+            <CelebrationLoop active={winnerBeat && showPodium && bossStatus !== 'escaped'} className="z-10" />
+            {outcome.kind === 'empty' && !bossOver && <EmptyRoundCard t={t} />}
+            {showPodium && (
+              <PodiumStage
+                entries={podium}
+                muted={!outcome.celebrate}
+                stage={stage}
+                t={t}
+                className={bossOver ? 'lg:w-[min(100%,calc((100dvh_-_30rem)*1.768))]' : 'lg:w-[min(100%,calc((100dvh_-_19rem)*1.768))]'}
+              >
+                {landed && <ClassChest found={summary.classFoundCount} total={summary.totalWords} open={winnerBeat} t={t} />}
+                {!outcome.celebrate && <ZeroRoundNote t={t} />}
+              </PodiumStage>
+            )}
+            {showPodium && podium[0] && (
+              <WinnerSpotlight
+                winner={{ username: podium[0].username, score: podium[0].score }}
+                outcome={outcome.kind}
+                leaders={outcome.leaders}
+                active={isRevealed(1, stage)}
+                cue={!swept}
+                size={phone ? 'card' : 'projector'}
+                t={t}
+                className="z-20 shrink-0"
+              />
+            )}
           </div>
+        )}
+
+        <div className={cn('flex flex-col gap-3 lg:min-h-0 lg:gap-4', hasStage ? 'lg:col-span-2 2xl:col-span-1' : 'lg:col-span-5 lg:mx-auto lg:w-full lg:max-w-4xl 2xl:col-span-3')}>
+          {stats && (
+            <div className={cn(!phone && bossOver && 'lg:[@media(max-height:900px)]:hidden')}>
+              <ClassPulse stats={stats} active={winnerBeat} size={phone ? 'card' : 'projector'} t={t} />
+            </div>
+          )}
+          {summary.totalWords > 0 && (
+            <TvCoveragePanel
+              summary={summary}
+              players={players}
+              neverPlaced={neverPlaced}
+              stage={stage}
+              pointsWithoutLesson={!landed && outcome.celebrate}
+              phone={phone}
+              maxChips={bossOver ? 6 : 9}
+              t={t}
+            />
+          )}
+          <Actions t={t} onRematch={onRematch} onClose={onClose} onExitRoom={onExitRoom} />
+          {summary.totalWords > 0 && (
+            // With the boss card up, a short wall keeps the words to reteach over the report teaser.
+            <div className={cn(!phone && bossOver && 'lg:[@media(max-height:900px)]:hidden')}>
+              <StrugglePreview masteryByPlayer={summary.masteryByPlayer ?? {}} teacherName={summary.teacherName ?? ''} language={language} t={t} />
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -111,4 +111,22 @@ describe('PodiumStage', () => {
     );
     expect(new Set(fills).size).toBe(3);
   });
+
+  it('gives a shared first place gold on both plates, while the pedestals still step', () => {
+    const tie = [
+      { username: 'Maya', score: 96, rank: 1 },
+      { username: 'Leo', score: 96, rank: 2 },
+      { username: 'Noa', score: 41, rank: 3 },
+    ];
+    render(<PodiumStage entries={tie} stage={FINAL_STAGE} t={t} />);
+    expect(screen.getByTestId('podium-place-2')).toHaveAttribute('data-medal', 'gold');
+    expect(screen.getByTestId('podium-medal-2')).toHaveTextContent('1');
+    // Competition ranking, as at the Olympics: two golds, then bronze.
+    expect(screen.getByTestId('podium-place-3')).toHaveAttribute('data-medal', 'bronze');
+    expect(screen.getByTestId('podium-medal-3')).toHaveTextContent('3');
+    expect(screen.getByTestId('podium-plate-2').className).toBe(screen.getByTestId('podium-plate-1').className);
+    expect(Number(screen.getByTestId('podium-place-1').dataset.plinthHeight)).toBeGreaterThan(
+      Number(screen.getByTestId('podium-place-2').dataset.plinthHeight)
+    );
+  });
 });

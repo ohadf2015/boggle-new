@@ -165,7 +165,7 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
         data-testid="vocab-quiz-finale-stage"
         className="flex flex-col justify-center md:flex-1 md:min-h-fit"
       >
-        <VocabQuizStandings standings={standings} limit={5} size="projector" podium t={t} />
+        <VocabQuizStandings standings={standings} limit={5} size="projector" podium split t={t} />
       </div>
 
       {onPlayAgain && (
@@ -178,9 +178,9 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
           }}
           className={cn(
             'shrink-0 w-full flex items-center justify-center gap-3 px-6 py-4',
-            'font-neo-display font-bold text-3xl',
-            'bg-neo-yellow text-neo-black border-[3px] border-neo-black rounded-neo',
-            'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+            'font-neo-display font-black uppercase text-2xl md:text-4xl',
+            'bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg',
+            'shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-0.5 active:translate-y-0.5 active:scale-[0.99] active:shadow-hard transition-all'
           )}
         >
           <RotateCcw className="w-8 h-8 shrink-0" aria-hidden />

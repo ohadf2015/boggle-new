@@ -20880,6 +20880,14 @@ const ja = {
     }
   }
   // @eduPlans:end
+  ,
+  // @eduResultsV3:start
+  "eduResultsV3": {
+    "coverageLabel": "クラスで見つけたレッスンの単語",
+    "bossStaggers": "防いだ攻撃: {count}",
+    "bossDamage": "{dmg}ダメージ"
+  }
+  // @eduResultsV3:end
 };
 
 export { ja };

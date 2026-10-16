@@ -19939,6 +19939,14 @@ const en = {
     }
   }
   // @eduPlans:end
+  ,
+  // @eduResultsV3:start
+  "eduResultsV3": {
+    "coverageLabel": "lesson words found by the class",
+    "bossStaggers": "Attacks blocked: {count}",
+    "bossDamage": "{dmg} dmg"
+  }
+  // @eduResultsV3:end
 };
 
 export { en };

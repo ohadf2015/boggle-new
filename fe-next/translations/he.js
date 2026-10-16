@@ -20810,6 +20810,14 @@ const he = {
     }
   }
   // @eduPlans:end
+  ,
+  // @eduResultsV3:start
+  "eduResultsV3": {
+    "coverageLabel": "מילים מהשיעור שהכיתה מצאה",
+    "bossStaggers": "התקפות שנחסמו: {count}",
+    "bossDamage": "{dmg} נזק"
+  }
+  // @eduResultsV3:end
 };
 
 export { he };

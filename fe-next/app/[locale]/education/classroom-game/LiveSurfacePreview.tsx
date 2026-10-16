@@ -10,6 +10,7 @@
  *   /en/education/classroom-game?preview=projector  — the projector lobby, students popping in
  *   /en/education/classroom-game?preview=waiting    — a student's waiting-for-teacher stage
  *   (&count=N sets the projector roster size, default 12)
+ *   ?preview=hostresults|phone|quiz|duel|ended — the round-end surfaces, see LiveResultsPreviews
  *
  * Mounted from PageClient behind `process.env.NODE_ENV !== 'production'` on a
  * lazy `dynamic()` import, so production never ships this chunk (same pattern
@@ -33,8 +34,11 @@ import {
   sampleProjectorStudents,
   type PreviewOutcome,
 } from '@/components/education/results/previewFixtures';
+import { DuelPreview, EndedPreview, HostResultsPreview, PhoneResultsPreview, QuizPreview } from './LiveResultsPreviews';
 
-export type LiveSurfacePreviewKind = 'podium' | 'projector' | 'waiting';
+import type { LiveSurfacePreviewKind } from './previewKinds';
+
+export type { LiveSurfacePreviewKind };
 
 function PodiumPreview() {
   const { t } = useLanguage();
@@ -146,5 +150,10 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
 
   if (kind === 'podium') return <PodiumPreview />;
   if (kind === 'waiting') return <WaitingPreview />;
+  if (kind === 'hostresults') return <HostResultsPreview />;
+  if (kind === 'phone') return <PhoneResultsPreview />;
+  if (kind === 'quiz') return <QuizPreview />;
+  if (kind === 'duel') return <DuelPreview />;
+  if (kind === 'ended') return <EndedPreview />;
   return <ProjectorPreview />;
 }

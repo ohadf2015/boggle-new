@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { RotateCcw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
+import { EDU_MASCOT } from '@/lib/education/mascotArt';
 
 interface ClassroomGameEndedStateProps {
   /** The room the student tried to reach; empty when unknown. */
@@ -27,7 +28,14 @@ export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }:
       aria-labelledby="classroom-game-ended-title"
       className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy px-4"
     >
-      <div className="w-full max-w-sm rounded-neo border-3 border-black bg-neo-lime p-6 text-neo-black shadow-hard">
+      <div className="relative w-full max-w-sm rounded-neo-lg border-3 border-black bg-neo-lime px-6 pb-6 pt-16 text-neo-black shadow-hard-lg">
+        {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
+        <img
+          src={EDU_MASCOT.empty}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-14 start-1/2 size-28 -translate-x-1/2 select-none drop-shadow-[3px_3px_0_#000] rtl:translate-x-1/2"
+        />
         <h1 id="classroom-game-ended-title" className="mb-2 font-neo-display text-2xl font-black">
           {t('education.student.gameEnded.title')}
         </h1>

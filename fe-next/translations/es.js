@@ -20892,6 +20892,14 @@ const es = {
     }
   }
   // @eduPlans:end
+  ,
+  // @eduResultsV3:start
+  "eduResultsV3": {
+    "coverageLabel": "palabras de la lección que encontró la clase",
+    "bossStaggers": "Ataques bloqueados: {count}",
+    "bossDamage": "{dmg} de daño"
+  }
+  // @eduResultsV3:end
 };
 
 export { es };
