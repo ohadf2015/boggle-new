@@ -34,8 +34,9 @@ export default function ModeResumeChip({ resume, anchor = false }: Props) {
         aria-hidden="true"
         data-testid="mode-resume-chip"
         className={cn(
-          'absolute top-1.5 start-1.5 z-[2] inline-flex items-center gap-1 rounded-full border-2 border-black bg-neo-lime font-neo-display font-black uppercase leading-none text-neo-navy shadow-hard-sm',
-          anchor ? 'px-2.5 py-1 text-[0.7rem]' : 'px-1.5 py-0.5 text-[0.6rem]',
+          'absolute top-1.5 z-[2] inline-flex items-center gap-1 rounded-full border-2 border-black bg-neo-lime font-neo-display font-black uppercase leading-none text-neo-navy shadow-hard-sm',
+          // On a small tile the start edge is the mascot's well; the pill takes the badge's corner instead.
+          anchor ? 'start-1.5 px-2.5 py-1 text-[0.7rem]' : 'end-1.5 px-1.5 py-0.5 text-[0.6rem]',
         )}
       >
         <Play className={cn('fill-neo-navy rtl:rotate-180', anchor ? 'h-3 w-3' : 'h-2.5 w-2.5')} strokeWidth={3} />
