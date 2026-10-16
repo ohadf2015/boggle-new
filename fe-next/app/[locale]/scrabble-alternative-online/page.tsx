@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const isTargetLocale = locale === 'en';
 
   return {
-    title: 'Scrabble Alternative Online — Free Multiplayer Word Game (No Download) | LexiClash',
-    description: 'Free Scrabble-alternative word game online — real-time multiplayer for 2-20+ players. Play in your browser, no app, no signup. Compare LexiClash vs Scrabble GO.',
+    title: 'Scrabble Alternative Online — Free Multiplayer | LexiClash',
+    description: 'Free Scrabble-alternative online — real-time multiplayer, 2–20 players. No app, no signup. Compare LexiClash vs Scrabble GO →',
     keywords: 'scrabble alternative online, scrabble online free, scrabble alternative free, online scrabble alternative no download, scrabble online multiplayer free, scrabble like word game online, word game like scrabble online, online word battle scrabble alternative, scrabble browser game free',
     openGraph: {
       title: 'Scrabble Alternative Online — Free, Real-Time, 2-20 Players | LexiClash',
