@@ -438,7 +438,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         </div>
         <div
           data-testid="tv-leaderboard-card"
-          className={`min-h-[120px] md:min-h-0 bg-neo-cream text-neo-black rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg ${isClassroom ? 'md:overflow-auto' : 'overflow-auto'}`}
+          className={`min-h-[120px] md:min-h-0 bg-neo-navy-light text-neo-cream rounded-neo border-3 md:border-4 border-neo-black shadow-hard-lg ${isClassroom ? 'md:overflow-auto' : 'overflow-auto'}`}
         >
           <TvLeaderboard
             players={leaderboardData}

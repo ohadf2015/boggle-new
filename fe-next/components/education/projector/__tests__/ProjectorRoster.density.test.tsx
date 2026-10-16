@@ -133,4 +133,11 @@ describe('ProjectorRoster — a whole class fits on the wall', () => {
       .filter((el) => el.getAttribute('data-ready') === 'true');
     expect(ready).toHaveLength(2);
   });
+  it('gathers a small class in the middle of the arena instead of pinning it to the top', () => {
+    render(<ProjectorRoster students={classOf(12)} t={t} />);
+    const list = screen.getByTestId('projector-roster-list').className;
+    // `safe` so a room that overflows still scrolls from its first name.
+    expect(list).toContain('md:[align-content:safe_center]');
+    expect(list).toContain('md:justify-center');
+  });
 });

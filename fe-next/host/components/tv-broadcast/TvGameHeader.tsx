@@ -65,19 +65,12 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
         <m.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className={compact ? 'flex-1 min-w-0 flex items-center gap-2' : 'flex items-center gap-2'}
+          data-testid="tv-header-start"
+          className="flex-1 min-w-0 flex items-center gap-2"
         >
           <m.div
             data-testid="live-badge"
             className="flex items-center gap-2 bg-neo-red text-neo-cream px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm"
-            animate={{
-              boxShadow: [
-                '4px 4px 0 rgba(0,0,0,1), 0 0 0px rgba(239,68,68,0)',
-                '4px 4px 0 rgba(0,0,0,1), 0 0 12px rgba(239,68,68,0.6)',
-                '4px 4px 0 rgba(0,0,0,1), 0 0 0px rgba(239,68,68,0)',
-              ],
-            }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             role="status"
             aria-live="polite"
             aria-label={t('tvBroadcast.liveGameInProgress')}
@@ -119,7 +112,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
-                className={urgencyLevel === 'extreme' ? 'rounded-full ring-4 ring-red-500/60' : ''}
+                className={urgencyLevel === 'extreme' ? 'rounded-full ring-4 ring-neo-red/60' : ''}
               >
                 <CircularTimer
                   remainingTime={remainingTime}
@@ -140,7 +133,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
         {/* Right: Fire Round / Earthquake indicator */}
         <div
           data-testid="tv-header-end"
-          className={compact ? 'flex-1 min-w-0 flex items-center justify-end gap-3' : 'flex items-center gap-3'}
+          className="flex-1 min-w-0 flex items-center justify-end gap-3"
         >
           {/* Earthquake Warning */}
           <AnimatePresence>

@@ -43,34 +43,16 @@ interface TvPlayerCardProps {
 
 // Rank badge configurations
 const RANK_CONFIGS = {
-  1: {
-    icon: Crown,
-    bgColor: 'bg-linear-to-r from-yellow-400 to-amber-500',
-    textColor: 'text-yellow-900',
-    borderColor: 'border-yellow-600',
-    shadowColor: 'shadow-[4px_4px_0_rgba(202,138,4,1)]',
-  },
-  2: {
-    icon: Medal,
-    bgColor: 'bg-linear-to-r from-gray-300 to-gray-400',
-    textColor: 'text-gray-700',
-    borderColor: 'border-gray-500',
-    shadowColor: 'shadow-[4px_4px_0_rgba(107,114,128,1)]',
-  },
-  3: {
-    icon: Award,
-    bgColor: 'bg-linear-to-r from-amber-600 to-amber-700',
-    textColor: 'text-amber-100',
-    borderColor: 'border-amber-800',
-    shadowColor: 'shadow-[4px_4px_0_rgba(146,64,14,1)]',
-  },
+  1: { icon: Crown, bgColor: 'bg-neo-yellow', textColor: 'text-neo-black' },
+  2: { icon: Medal, bgColor: 'bg-neo-cyan', textColor: 'text-neo-black' },
+  3: { icon: Award, bgColor: 'bg-neo-pink', textColor: 'text-neo-black' },
 };
 
-// Score bar colors by rank
+// Score bar colors by rank: a medal row already carries its colour, so its bar is a dark track.
 const SCORE_BAR_COLORS: Record<number, string> = {
-  1: 'bg-neo-yellow',
-  2: 'bg-gray-300',
-  3: 'bg-amber-600',
+  1: 'bg-neo-black/30',
+  2: 'bg-neo-black/30',
+  3: 'bg-neo-black/30',
 };
 
 /**
@@ -101,7 +83,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
 
   // Score bar
   const barPercentage = leaderScore > 0 ? Math.round((score / leaderScore) * 100) : 0;
-  const barColor = SCORE_BAR_COLORS[rank] || 'bg-neo-cyan/30';
+  const barColor = SCORE_BAR_COLORS[rank] || 'bg-neo-cyan';
 
   const isAway = disconnected || presenceStatus === 'afk' || presenceStatus === 'idle';
 
@@ -157,13 +139,13 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       layoutId={`player-${username}`}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       className={cn(
-        'relative flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black transition-colors overflow-hidden',
+        'relative flex items-center gap-3 p-3 2xl:gap-4 2xl:p-4 rounded-neo border-3 border-neo-black transition-colors overflow-hidden',
         isEliminated && 'opacity-50',
         isTopThree && !isEliminated
-          ? `${rankConfig?.bgColor} ${rankConfig?.shadowColor}`
+          ? `${rankConfig?.bgColor} shadow-hard`
           : isTopThree && isEliminated
-            ? 'bg-gray-400 shadow-hard-sm'
-            : 'bg-neo-cream shadow-hard-sm hover:shadow-hard hover:-translate-x-0.5 hover:-translate-y-0.5',
+            ? 'bg-neo-navy shadow-hard-sm'
+            : 'bg-neo-navy shadow-hard-sm',
         isFlashing && !isEliminated && 'ring-2 ring-neo-yellow'
       )}
     >
@@ -199,7 +181,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
               exit={{ opacity: 0, scale: 0.5 }}
               className={cn(
                 'absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center border border-neo-black',
-                rankChange === 'up' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                rankChange === 'up' ? 'bg-neo-lime text-neo-black' : 'bg-neo-red text-neo-cream'
               )}
               aria-label={rankChange === 'up' ? t('tvBroadcast.rankUp') : t('tvBroadcast.rankDown')}
             >
@@ -259,9 +241,9 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
         <div className="flex items-center gap-1.5">
           <p
             className={cn(
-              'font-black text-lg uppercase truncate',
+              'font-neo-display font-black text-lg 2xl:text-2xl uppercase truncate',
               isEliminated && 'line-through',
-              isTopThree ? rankConfig?.textColor : 'text-neo-black'
+              isTopThree ? rankConfig?.textColor : 'text-neo-cream'
             )}
           >
             {username}
@@ -292,8 +274,8 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
         <div className="flex items-center gap-2">
           <p
             className={cn(
-              'text-sm font-bold',
-              isTopThree ? `${rankConfig?.textColor} opacity-80` : 'text-neo-black/60'
+              'text-sm 2xl:text-base font-bold',
+              isTopThree ? `${rankConfig?.textColor} opacity-80` : 'text-neo-cream/60'
             )}
           >
             {wordCount} {t('tvResults.words')}
@@ -334,7 +316,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
             className={cn(
               'relative flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-neo-black',
               comboLevel >= 10
-                ? 'bg-linear-to-r from-neo-red to-neo-pink text-neo-cream'
+                ? 'bg-neo-red text-neo-cream'
                 : comboLevel >= 5
                 ? 'bg-neo-orange text-neo-black'
                 : 'bg-neo-yellow text-neo-black'
@@ -355,7 +337,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-green-400 text-neo-black font-black text-sm"
+              className="px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black font-black text-sm 2xl:text-lg"
             >
               +{scoreDelta}
             </m.div>
@@ -365,8 +347,8 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
           <AnimatedCounter
             value={score}
             className={cn(
-              'font-black text-2xl',
-              isTopThree ? rankConfig?.textColor : 'text-neo-black'
+              'font-neo-display font-black text-2xl 2xl:text-4xl tabular-nums',
+              isTopThree ? rankConfig?.textColor : 'text-neo-cream'
             )}
             size="xl"
             formatValue={(v) => Math.round(v).toLocaleString()}
@@ -374,7 +356,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
           <p
             className={cn(
               'text-xs font-bold uppercase',
-              isTopThree ? `${rankConfig?.textColor} opacity-70` : 'text-neo-black/50'
+              isTopThree ? `${rankConfig?.textColor} opacity-70` : 'text-neo-cream/50'
             )}
           >
             {t('tvResults.pts')}
@@ -387,7 +369,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
           per frame. origin-left keeps it growing from the left exactly as before. */}
       <m.div
         data-testid="score-bar"
-        className={cn('absolute bottom-0 left-0 h-1 w-full origin-left rounded-b-neo', barColor)}
+        className={cn('absolute bottom-0 left-0 h-1.5 w-full origin-left rounded-b-neo', barColor)}
         animate={{ scaleX: barPercentage / 100 }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       />

@@ -103,7 +103,7 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
           // handset must scroll the sixth character into view rather than clip it
           // off-screen where nobody knows it exists. The `py` keeps the hard
           // shadow and the ±1.4° tilt inside the scroller instead of shaving them.
-          className="mt-[0.5vw] flex max-w-full flex-nowrap items-center gap-[0.06em] overflow-x-auto py-[0.1em] font-neo-display text-[min(16vw,11vh)] font-black leading-none md:text-[min(12vw,18vh)]"
+          className="mt-[0.5vw] flex max-w-full flex-nowrap items-center gap-[0.06em] overflow-x-auto py-[0.1em] font-neo-display text-[min(16vw,11vh)] font-black leading-none md:text-[min(12vw,21vh)]"
         >
           {chars.map((char, index) => (
             <span

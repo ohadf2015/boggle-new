@@ -128,9 +128,9 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
         role="status"
         aria-live="polite"
       >
-        <Users className="w-12 h-12 text-neo-black/30 mb-3" />
-        <p className="text-neo-black/60 font-bold text-lg md:text-xl text-center">{t('tvBroadcast.noPlayersYet')}</p>
-        <p className="text-neo-black/40 text-sm mt-2 text-center">{t('tvBroadcast.waitingForPlayers')}</p>
+        <Users className="w-12 h-12 text-neo-cream/30 mb-3" />
+        <p className="text-neo-cream/70 font-bold text-lg md:text-xl text-center">{t('tvBroadcast.noPlayersYet')}</p>
+        <p className="text-neo-cream/50 text-sm mt-2 text-center">{t('tvBroadcast.waitingForPlayers')}</p>
       </div>
     );
   }
@@ -139,7 +139,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
     const hiddenStudents = classroomStudents - classroomRows;
     return (
       <div className="h-full overflow-hidden p-4 flex flex-col" data-testid="tv-classroom-standings">
-        <h3 className="text-xl font-black uppercase text-neo-black mb-2 text-center border-b-2 border-neo-black pb-2 shrink-0">
+        <h3 className="font-neo-display text-xl 2xl:text-3xl font-black uppercase tracking-widest text-neo-yellow mb-2 text-center border-b-3 border-neo-cream/15 pb-2 shrink-0">
           {t('tvBroadcast.leaderboard')}
         </h3>
         <div ref={classroomRowsRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
@@ -154,7 +154,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
         {hiddenStudents > 0 && (
           <p
             data-testid="tv-classroom-more"
-            className="shrink-0 pt-1 text-center font-neo-display text-lg font-black uppercase text-neo-black/70"
+            className="shrink-0 pt-1 text-center font-neo-display text-lg font-black uppercase text-neo-cream/70"
           >
             {t('tvBroadcast.moreStudents', { count: hiddenStudents })}
           </p>
@@ -172,7 +172,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
           animate={{ opacity: 1 }}
           className="h-full overflow-y-auto overscroll-contain scrollable-area p-4 flex flex-col gap-2"
         >
-          <h3 className="text-xl font-black uppercase text-neo-black mb-4 text-center border-b-2 border-neo-black pb-2">
+          <h3 className="font-neo-display text-xl 2xl:text-3xl font-black uppercase tracking-widest text-neo-yellow mb-4 text-center border-b-3 border-neo-cream/15 pb-2">
             {t('tvBroadcast.leaderboard')}
           </h3>
           {sortedPlayers.map((player, index) => (
@@ -215,7 +215,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   // Virtual rendering for large player counts
   return (
     <div className="h-full flex flex-col p-4">
-      <h3 className="text-xl font-black uppercase text-neo-black mb-4 text-center border-b-2 border-neo-black pb-2 shrink-0">
+      <h3 className="font-neo-display text-xl 2xl:text-3xl font-black uppercase tracking-widest text-neo-yellow mb-4 text-center border-b-3 border-neo-cream/15 pb-2 shrink-0">
         {t('tvBroadcast.leaderboard')} ({sortedPlayers.length})
       </h3>
       <div

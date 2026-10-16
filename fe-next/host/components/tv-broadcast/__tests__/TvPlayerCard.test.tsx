@@ -129,28 +129,35 @@ describe('TvPlayerCard score bar', () => {
     expect(bar.style.transform).toBe('scaleX(0.25)');
   });
 
-  it('score bar color is neo-yellow for rank 1', () => {
-    render(<TvPlayerCard {...defaultProps} rank={1} />);
-    const bar = screen.getByTestId('score-bar');
-    expect(bar.className).toContain('bg-neo-yellow');
+  it('score bar on a medal row is a dark track the medal colour shows through', () => {
+    for (const rank of [1, 2, 3]) {
+      const { unmount } = render(<TvPlayerCard {...defaultProps} rank={rank} />);
+      expect(screen.getByTestId('score-bar').className).toContain('bg-neo-black/30');
+      unmount();
+    }
   });
 
-  it('score bar color is gray-300 for rank 2', () => {
-    render(<TvPlayerCard {...defaultProps} rank={2} />);
-    const bar = screen.getByTestId('score-bar');
-    expect(bar.className).toContain('bg-gray-300');
-  });
-
-  it('score bar color is amber-600 for rank 3', () => {
-    render(<TvPlayerCard {...defaultProps} rank={3} />);
-    const bar = screen.getByTestId('score-bar');
-    expect(bar.className).toContain('bg-amber-600');
-  });
-
-  it('score bar color is neo-cyan/30 for ranks beyond 3', () => {
+  it('score bar color is neo-cyan for ranks beyond 3', () => {
     render(<TvPlayerCard {...defaultProps} rank={5} />);
-    const bar = screen.getByTestId('score-bar');
-    expect(bar.className).toContain('bg-neo-cyan/30');
+    expect(screen.getByTestId('score-bar').className).toContain('bg-neo-cyan');
+  });
+
+  it('dresses the medal rows in brand colours, not soft gradients', () => {
+    const fills: Record<number, string> = { 1: 'bg-neo-yellow', 2: 'bg-neo-cyan', 3: 'bg-neo-pink' };
+    for (const rank of [1, 2, 3]) {
+      const { container, unmount } = render(<TvPlayerCard {...defaultProps} rank={rank} />);
+      expect((container.firstElementChild as HTMLElement).className).toContain(fills[rank]);
+      unmount();
+    }
+  });
+
+  it('never paints a hardcoded or off-brand colour', () => {
+    for (const rank of [1, 2, 3, 5]) {
+      const { container, unmount } = render(<TvPlayerCard {...defaultProps} rank={rank} comboLevel={12} />);
+      const classes = Array.from(container.querySelectorAll('*')).map((el) => el.getAttribute('class') ?? '').join(' ');
+      expect(classes).not.toMatch(/\b(?:bg|text|border|from|to|shadow)-(?:gray|amber|yellow|green|red|white)-\d{2,3}\b|bg-linear|rgba\(|#[0-9a-f]{3,6}\b|\btext-white\b/i);
+      unmount();
+    }
   });
 
   it('shows score delta badge when score increases', () => {

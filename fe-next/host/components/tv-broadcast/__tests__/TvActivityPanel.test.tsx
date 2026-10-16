@@ -44,6 +44,7 @@ vi.mock('framer-motion', () => {
           </div>
         );
       }),
+      li: ({ children, className, ...rest }: any) => <li className={className} data-testid={rest['data-testid']}>{children}</li>,
       span: React.forwardRef(function MotionSpan(
         { children, className, ...rest }: any,
         ref: any
@@ -115,32 +116,32 @@ describe('TvActivityPanel', () => {
     expect(screen.getByTestId('tv-wordhunt-panel')).toBeInTheDocument();
   });
 
-  it('shows mode badge label', () => {
-    (useGameMode as Mock).mockReturnValue('classic');
-    render(<TvActivityPanel {...defaultProps} />);
-    expect(screen.getByTestId('tv-mode-badge')).toHaveTextContent('CLASSIC');
+  it('leaves the mode label to the header instead of repeating it on the panel', () => {
+    for (const mode of ['classic', 'blast', 'word-hunt']) {
+      (useGameMode as Mock).mockReturnValue(mode);
+      const { unmount } = render(<TvActivityPanel {...defaultProps} />);
+      expect(screen.queryByTestId('tv-mode-badge')).toBeNull();
+      unmount();
+    }
   });
 
-  it('shows BLAST mode badge for blast mode', () => {
-    (useGameMode as Mock).mockReturnValue('blast');
-    render(<TvActivityPanel {...defaultProps} />);
-    expect(screen.getByTestId('tv-mode-badge')).toHaveTextContent('BLAST');
+  it('classic panel drops each found word as blank tiles, never the letters', () => {
+    const handlers: Record<string, (d: any) => void> = {};
+    const socket = { on: (ev: string, fn: any) => { handlers[ev] = fn; }, off: vi.fn() } as any;
+    const { container } = render(<TvActivityPanel {...defaultProps} socket={socket} />);
+    act(() => handlers.playerFoundWordBatch({ words: [{ username: 'maya', word: 'planet', comboLevel: 0 }] }));
+    const row = screen.getByTestId('word-drop');
+    expect(row.querySelectorAll('[data-testid="word-drop-tile"]')).toHaveLength(6);
+    expect(container.textContent?.toLowerCase()).not.toContain('planet');
   });
 
-  it('shows WORD HUNT mode badge for word-hunt mode', () => {
-    (useGameMode as Mock).mockReturnValue('word-hunt');
-    render(<TvActivityPanel {...defaultProps} />);
-    expect(screen.getByTestId('tv-mode-badge')).toHaveTextContent('WORD HUNT');
-  });
-
-  it('classic panel renders abstract tile grid (no letters)', () => {
-    render(<TvActivityPanel {...defaultProps} />);
-    const tiles = screen.getAllByTestId('abstract-tile');
-    expect(tiles.length).toBe(16); // 4x4
-    // No text content on tiles (no letters)
-    tiles.forEach((tile) => {
-      expect(tile.textContent).toBe('');
-    });
+  it('averages the real word lengths from the batch payload', () => {
+    const handlers: Record<string, (d: any) => void> = {};
+    const socket = { on: (ev: string, fn: any) => { handlers[ev] = fn; }, off: vi.fn() } as any;
+    render(<TvActivityPanel {...defaultProps} socket={socket} />);
+    act(() => handlers.playerFoundWordBatch({ words: [{ username: 'a', word: 'cat' }, { username: 'b', word: 'planets' }] }));
+    expect(screen.getByTestId('word-drop-stat-avg')).toHaveTextContent('5.0');
+    expect(screen.getByTestId('word-drop-stat-longest')).toHaveTextContent('7');
   });
 
   it('blast panel renders cascade visualization area', () => {
@@ -159,15 +160,6 @@ describe('TvActivityPanel', () => {
     render(<TvActivityPanel {...defaultProps} />);
     expect(screen.getByText('Total Words')).toBeInTheDocument();
     expect(screen.getByText('15')).toBeInTheDocument(); // 10 + 5
-  });
-
-  it('tiles pulse on activity events', () => {
-    render(<TvActivityPanel {...defaultProps} activityPulse={true} />);
-    const panel = screen.getByTestId('tv-classic-panel');
-    expect(panel).toBeInTheDocument();
-    // activityPulse triggers pulse class on random tiles
-    const pulsingTiles = screen.getByTestId('tv-classic-panel').querySelectorAll('.animate-pulse, [data-pulsing="true"]');
-    expect(pulsingTiles.length).toBeGreaterThanOrEqual(0); // may or may not have pulsing tiles at render time
   });
 
   it('respects reduced motion (no animations)', () => {

@@ -80,19 +80,19 @@ export interface RosterDensityTier {
 export const ROSTER_DENSITY_TIERS: readonly RosterDensityTier[] = [
   {
     upTo: 8,
-    chip: 'gap-[0.6vw] border-4 px-[1.3vw] py-[0.6vw] text-[4.2vw] md:text-[2.2vw]',
+    chip: 'gap-[0.6vw] border-4 px-[1.3vw] py-[0.6vw] text-[4.2vw] md:text-[2.6vw]',
     gap: 'gap-[1.1vw]',
     portrait: 'md:portrait:text-[5.5vw]',
   },
   {
     upTo: 16,
-    chip: 'gap-[0.5vw] border-4 px-[1.1vw] py-[0.5vw] text-[3.6vw] md:text-[1.7vw]',
+    chip: 'gap-[0.5vw] border-4 px-[1.1vw] py-[0.5vw] text-[3.6vw] md:text-[2.1vw]',
     gap: 'gap-[0.9vw]',
     portrait: 'md:portrait:text-[4.6vw]',
   },
   {
     upTo: 26,
-    chip: 'gap-[0.4vw] border-[3px] px-[0.9vw] py-[0.38vw] text-[3vw] md:text-[1.28vw]',
+    chip: 'gap-[0.4vw] border-[3px] px-[0.9vw] py-[0.38vw] text-[3vw] md:text-[1.5vw]',
     gap: 'gap-[0.65vw]',
     portrait: 'md:portrait:text-[3.6vw]',
   },

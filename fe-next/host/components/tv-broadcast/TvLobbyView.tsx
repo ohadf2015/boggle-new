@@ -3,7 +3,7 @@
 import React, { memo, useState, useEffect, useMemo } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Zap, Monitor } from 'lucide-react';
-import TvJoinBar from './TvJoinBar';
+import { tvJoinAddress } from '@/lib/education/tvJoinAddress';
 import { PlayerRoster } from '../pre-game/PlayerRoster';
 import { StartButton } from '../pre-game/StartButton';
 import { BattleModeCard } from '../pre-game/BattleModeCard';
@@ -237,16 +237,14 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     );
   }
 
-  // Same address the join bar encodes, so both QRs land in the same place.
-  const joinUrl = typeof window !== 'undefined' ? `${window.location.origin}/${roomLanguage}/join/${gameCode}` : '';
+  // Same address the round's join bar encodes, so the lobby QR and the in-round QR land in the same place.
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const joinUrl = origin ? `${origin}/${roomLanguage}/join/${gameCode}` : '';
 
-  // Projector lobby, 10-ft readable: persistent join bar on top (the same bar
-  // the round broadcast keeps), then the room — seats + mode — beside a hero
-  // join card (QR + code) and the one START. Fits 1920×1080 with no scroll.
+  // One join surface on the wall (the hero card), like the classroom projector:
+  // a join bar above it printed a second code and a second QR.
   return (
     <div data-testid="tv-lobby-view" className="flex-1 flex flex-col h-full min-h-0 overflow-hidden bg-neo-navy text-neo-white tv:[--mp-u:1.25]">
-      <TvJoinBar gameCode={gameCode} playerCount={playerCount} language={roomLanguage} t={t} />
-
       <div className="flex-1 min-h-0 grid grid-cols-12 gap-6 tv:gap-10 px-6 py-5 tv:px-10 tv:py-6 w-full max-w-[1800px] mx-auto">
         {/* Left: who's in + what we play */}
         <div className="col-span-7 min-h-0 flex flex-col gap-4 tv:gap-5">
@@ -292,7 +290,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
             <p className="font-neo-display font-bold uppercase tracking-wider text-neo-lime text-xl tv:text-3xl">
               {t('mpUi.lobby.tvJoinHeadline')}
             </p>
-            <div className="rounded-neo border-4 border-neo-black bg-white p-3 shadow-hard">
+            <div className="rounded-neo border-4 border-neo-black bg-neo-white p-3 shadow-hard">
               <QRCodeSVG
                 value={joinUrl || gameCode}
                 size={360}
@@ -304,6 +302,11 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
                 aria-label={t('hostView.scanToJoin')}
               />
             </div>
+            {origin && (
+              <p dir="ltr" data-testid="tv-lobby-address" className="font-neo-display font-bold text-neo-cream text-[clamp(18px,2.4vh,32px)] break-all">
+                {tvJoinAddress(origin, roomLanguage, gameCode)}
+              </p>
+            )}
             <span
               dir="ltr"
               data-testid="tv-lobby-code"

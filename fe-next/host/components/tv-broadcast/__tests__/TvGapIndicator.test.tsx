@@ -59,6 +59,11 @@ describe('TvGapIndicator', () => {
     expect(screen.getByText(/100 pts gap/)).toBeInTheDocument();
   });
 
+
+  it('says "gap" once, not "GAP: 100 pts gap"', () => {
+    render(<TvGapIndicator leaderScore={200} secondScore={100} leaderName="a" secondName="b" t={mockT} />);
+    expect(screen.getByTestId('gap-indicator').textContent?.match(/gap/gi)).toHaveLength(1);
+  });
   it('shows point difference', () => {
     render(<TvGapIndicator {...defaultProps} leaderScore={300} secondScore={60} />);
     expect(screen.getByText(/240 pts gap/)).toBeInTheDocument();

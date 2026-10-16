@@ -107,10 +107,11 @@ describe('TvLobbyView — one lobby surface per room type', () => {
     expect(screen.getByTestId('projector-lobby')).toHaveAttribute('data-label', 'hostView.startQuiz');
   });
 
-  it('leaves the arcade TV lobby exactly as it was', () => {
+  it('gives the arcade TV lobby its own single join card, not the projector lobby', () => {
     render(<TvLobbyView {...baseProps} />);
 
-    expect(screen.getByTestId('tv-join-bar')).toBeInTheDocument();
+    expect(screen.queryByTestId('tv-join-bar')).not.toBeInTheDocument();
+    expect(screen.getByTestId('tv-lobby-code')).toBeInTheDocument();
     expect(screen.queryByTestId('projector-lobby')).not.toBeInTheDocument();
     expect(screen.getByTestId('battle-mode-card')).toBeInTheDocument();
   });

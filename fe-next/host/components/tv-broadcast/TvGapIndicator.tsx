@@ -57,7 +57,7 @@ const TvGapIndicator = memo<TvGapIndicatorProps>(({
       animate={{ opacity: 1 }}
       className={cn(
         'flex items-center justify-center gap-2 py-1.5 px-3 my-1 border-dashed border-2 rounded-neo',
-        isClosingFast ? 'border-neo-orange bg-neo-orange/10' : 'border-neo-black/30 bg-neo-cream/50'
+        isClosingFast ? 'border-neo-orange bg-neo-orange/10' : 'border-neo-cream/25 bg-neo-navy/40'
       )}
       aria-label={label}
     >
@@ -76,15 +76,8 @@ const TvGapIndicator = memo<TvGapIndicatorProps>(({
           </m.div>
         ) : (
           <m.div key="gap" className="flex items-center gap-1.5">
-            <span className="text-neo-black/50 text-xs font-bold">
-              {'--- '}
-            </span>
-            <span className="font-black text-xs text-neo-black/60 uppercase">
-              {t('tvBroadcast.gap')}:{' '}
+            <span className="font-neo-display font-black text-sm 2xl:text-base text-neo-cream/70 uppercase tracking-widest">
               {label}
-            </span>
-            <span className="text-neo-black/50 text-xs font-bold">
-              {' ---'}
             </span>
           </m.div>
         )}

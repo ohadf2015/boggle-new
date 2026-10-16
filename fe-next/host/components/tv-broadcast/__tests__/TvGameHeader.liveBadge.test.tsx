@@ -107,4 +107,9 @@ describe('TvGameHeader LIVE badge', () => {
     const liveBadge = screen.getByTestId('live-badge');
     expect(liveBadge).toBeInTheDocument();
   });
+  it('balances the header on equal tracks so the timer sits dead centre', () => {
+    render(<TvGameHeader remainingTime={60} timerValue={2} t={mockT} />);
+    expect(screen.getByTestId('tv-header-start').className).toContain('flex-1');
+    expect(screen.getByTestId('tv-header-end').className).toContain('flex-1');
+  });
 });

@@ -76,9 +76,11 @@ describe('TvLobbyView', () => {
     vi.clearAllMocks();
   });
 
-  it('renders TvJoinBar with game code', () => {
+  it('prints the join instructions once: one code, one QR, with the address beside them', () => {
     render(<TvLobbyView {...defaultProps} />);
-    expect(screen.getByTestId('tv-join-bar')).toHaveTextContent('ABC123');
+    expect(screen.queryByTestId('tv-join-bar')).not.toBeInTheDocument();
+    expect(screen.getByTestId('tv-lobby-code')).toHaveTextContent('ABC123');
+    expect(screen.getByTestId('tv-lobby-address')).toHaveTextContent('/join/ABC123');
   });
 
   it('renders PlayerRoster with players', () => {

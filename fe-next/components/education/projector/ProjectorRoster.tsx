@@ -152,7 +152,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
           data-testid="projector-roster-list"
           className={cn(
             // Top/end padding so a ready tile's corner check is never clipped by the list.
-            'flex min-h-0 flex-1 flex-wrap content-start overflow-y-auto pe-3 pt-3 md:portrait:flex-none md:portrait:overflow-visible md:portrait:pb-3',
+            'flex min-h-0 flex-1 flex-wrap content-start overflow-y-auto pe-3 pt-3 md:justify-center md:[align-content:safe_center] md:portrait:flex-none md:portrait:overflow-visible md:portrait:pb-3',
             density.gap
           )}
         >
@@ -183,7 +183,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                     'font-neo-display font-black leading-none',
                     'transition-[filter,box-shadow] duration-300 motion-reduce:transition-none',
                     isReady
-                      ? 'shadow-[0_0_0_3px_#bfff00,0_0_1.4em_0.2em_rgba(191,255,0,0.75),4px_4px_0_#000]'
+                      ? 'shadow-[0_0_0_3px_var(--neo-lime),0_0_1.4em_0.2em_color-mix(in_srgb,var(--neo-lime)_75%,transparent),4px_4px_0_rgb(var(--neo-black))]'
                       : 'shadow-hard',
                     dim && 'brightness-[0.62] saturate-[0.55]',
                     density.chip,
