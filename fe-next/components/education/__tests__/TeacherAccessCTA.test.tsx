@@ -94,6 +94,19 @@ describe('TeacherAccessCTA', () => {
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', { cta: 'teacher_individual' });
   });
 
+  it('renders Polar trial link to the upgrade page', () => {
+    render(<TeacherAccessCTA />);
+    const link = screen.getByTestId('teacher-pro-trial-landing-cta');
+    expect(link).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(link).toHaveTextContent('teacher.subscription.startTrial');
+  });
+
+  it('tracks Polar trial landing click', () => {
+    render(<TeacherAccessCTA />);
+    fireEvent.click(screen.getByTestId('teacher-pro-trial-landing-cta'));
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', { cta: 'teacher_pro_trial' });
+  });
+
   it('tracks district link click', () => {
     render(<TeacherAccessCTA />);
     const link = screen.getByRole('link', { name: /education\.landing\.districtCta\.button/ });

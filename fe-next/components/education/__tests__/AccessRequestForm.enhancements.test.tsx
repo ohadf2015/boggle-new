@@ -22,6 +22,10 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ refreshProfile: refreshProfileMock }),
 }));
 
+vi.mock('@/hooks/useStartTeacherProTrial', () => ({
+  useStartTeacherProTrial: () => ({ start: vi.fn(), pending: false }),
+}));
+
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: any) => {
@@ -55,6 +59,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'education.access.success_title': "You're in! 🎉",
         'education.access.success_body': 'Teacher access granted instantly.',
         'education.access.success_next': 'Taking you to your Teacher Dashboard…',
+        'education.access.go_to_teacher': 'Open Teacher Dashboard',
+        'teacher.subscription.startTrial': 'Start 14-day free trial',
       };
       const raw = keys[key] || key;
       return params ? raw.replace(/\{(\w+)\}/g, (_m, k) => String(params[k] ?? '')) : raw;
@@ -225,16 +231,15 @@ describe('AccessRequestForm', () => {
       });
     });
 
-    it('refreshes the profile, then redirects to the locale teacher dashboard', async () => {
+    it('refreshes the profile, then redirects to the locale teacher dashboard when HQ is tapped', async () => {
       const user = userEvent.setup();
       (global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true, success: true }) });
       render(<AccessRequestForm />);
       await fillValid(user);
       await user.click(screen.getByRole('button', { name: /Send application/i }));
 
-      // Redirect fires ~1.2s after the success beat; the profile refresh must
-      // happen first so /teacher's role gate sees the promoted user_role.
-      await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/en/teacher'), { timeout: 3000 });
+      await user.click(await screen.findByTestId('access-success-hq'));
+      await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/en/teacher'));
       expect(refreshProfileMock).toHaveBeenCalled();
     });
   });

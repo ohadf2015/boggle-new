@@ -21,12 +21,18 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
 }));
 
+const startPolarTrialMock = vi.fn();
+vi.mock('@/hooks/useStartTeacherProTrial', () => ({
+  useStartTeacherProTrial: () => ({ start: startPolarTrialMock, pending: false }),
+}));
+
 import { AccessRequestForm } from '../AccessRequestForm';
 
 describe('<AccessRequestForm>', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockTrackGrowthEvent.mockClear();
+    startPolarTrialMock.mockClear();
   });
 
   it('disables submit until required fields filled', () => {
@@ -117,7 +123,7 @@ describe('<AccessRequestForm>', () => {
     expect(screen.getByRole('button', { name: /education\.access\.submit/i })).toBeEnabled();
   });
 
-  it('shows the success card and redirects to /teacher on a clean 200, tracking submission', async () => {
+  it('shows the success card with Polar trial + HQ CTAs and does not auto-redirect', async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
       status: 200,
@@ -133,8 +139,44 @@ describe('<AccessRequestForm>', () => {
 
     await screen.findByText('education.access.success_title');
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('edu_access_request_submitted', { ok: true, status: 200 });
-    // The redirect fires after a 1200ms success beat.
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/en/teacher'), { timeout: 2500 });
+    expect(screen.getByTestId('access-success-trial')).toHaveTextContent('teacher.subscription.startTrial');
+    expect(screen.getByTestId('access-success-hq')).toHaveTextContent('education.access.go_to_teacher');
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it('starts Polar trial from the success card', async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true, success: true }),
+    } as any));
+    global.fetch = fetchMock as any;
+    const user = userEvent.setup();
+    render(<AccessRequestForm />);
+
+    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
+    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
+    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
+    await screen.findByTestId('access-success-trial');
+    await user.click(screen.getByTestId('access-success-trial'));
+    expect(startPolarTrialMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens Teacher HQ from the success card after refreshing the profile', async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true, success: true }),
+    } as any));
+    global.fetch = fetchMock as any;
+    const user = userEvent.setup();
+    render(<AccessRequestForm />);
+
+    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
+    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
+    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
+    await user.click(await screen.findByTestId('access-success-hq'));
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/en/teacher'));
   });
 
   it('tracks edu_access_request_submitted on 202 approvalPending response', async () => {
@@ -190,8 +232,7 @@ describe('<AccessRequestForm>', () => {
     await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
     await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
 
-    // Form still succeeds despite tracker throwing!
     await screen.findByText('education.access.success_title');
-    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/en/teacher'), { timeout: 2500 });
+    expect(pushMock).not.toHaveBeenCalled();
   });
 });

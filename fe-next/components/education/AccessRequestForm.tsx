@@ -1,10 +1,11 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { m, useReducedMotion, type Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { useStartTeacherProTrial } from '@/hooks/useStartTeacherProTrial';
 import type { TeacherAccessSubmission, TeacherAccessRole, TeacherLocale } from '@/lib/education/types';
 
 /** Fun emoji per role — turns a boring dropdown into a tap-to-pick card grid. */
@@ -41,6 +42,7 @@ export function AccessRequestForm({
   const { t, language } = useLanguage();
   const { refreshProfile } = useAuth();
   const router = useRouter();
+  const polarTrial = useStartTeacherProTrial(t, language, 'access_success');
   const shouldReduceMotion = useReducedMotion();
   const [role, setRole] = useState<TeacherAccessRole | null>(null);
   const [useCase, setUseCase] = useState('');
@@ -58,20 +60,13 @@ export function AccessRequestForm({
   // redirect — the account isn't promoted yet, so pushing would bounce.
   const [approvalPending, setApprovalPending] = useState(false);
 
-  // Access is granted the moment the POST succeeds — show the success beat
-  // briefly, then send the new teacher straight to their dashboard. The
-  // profile is refreshed BEFORE navigating so /teacher's role gate reads the
-  // freshly-promoted user_role instead of bouncing a stale 'student' home.
-  useEffect(() => {
-    if (!success) return;
-    let cancelled = false;
-    const go = async () => {
-      try { await refreshProfile(); } catch {}
-      if (!cancelled) router.push(`/${language}/teacher`);
-    };
-    const id = setTimeout(go, 1200);
-    return () => { cancelled = true; clearTimeout(id); };
-  }, [success, refreshProfile, router, language]);
+  // Access is granted on POST. Do not auto-redirect: the 1.2s success beat
+  // ate the Polar trial CTA (0 trial_cta_tap / 13 access requests in 14d).
+  // HQ is one explicit tap; Polar 14-day trial is the other.
+  const goToTeacherHq = async () => {
+    try { await refreshProfile(); } catch { /* role gate re-reads on /teacher */ }
+    router.push(`/${language}/teacher`);
+  };
 
   const firstName = (knownName ?? '').trim().split(/\s+/)[0] || '';
   const roleOk = role !== null;
@@ -180,7 +175,25 @@ export function AccessRequestForm({
         </svg>
         <h3 className="text-2xl font-bold font-neo-display">{t('education.access.success_title')}</h3>
         <p className="mt-2 text-neo-navy/85">{t('education.access.success_body')}</p>
-        <p className="mt-3 text-sm text-neo-navy/75">{t('education.access.success_next')}</p>
+        <div className="mt-4 flex flex-col gap-2">
+          <button
+            type="button"
+            data-testid="access-success-trial"
+            disabled={polarTrial.pending}
+            onClick={() => void polarTrial.start()}
+            className="w-full rounded-neo border-neo-thick border-black bg-neo-black px-4 py-3 font-bold text-neo-white font-neo-display shadow-hard hover:shadow-hard-sm active:shadow-hard-pressed disabled:opacity-50"
+          >
+            {polarTrial.pending ? t('common.loading') : t('teacher.subscription.startTrial')}
+          </button>
+          <button
+            type="button"
+            data-testid="access-success-hq"
+            onClick={() => void goToTeacherHq()}
+            className="w-full rounded-neo border-neo border-neo-navy/40 bg-neo-lime px-4 py-3 font-bold text-neo-navy font-neo-display shadow-hard-sm hover:shadow-hard"
+          >
+            {t('education.access.go_to_teacher')}
+          </button>
+        </div>
       </m.div>
     );
   }

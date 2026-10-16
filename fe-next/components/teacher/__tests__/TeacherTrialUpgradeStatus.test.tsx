@@ -60,9 +60,11 @@ vi.mock('@/hooks/useTeacherPro', () => ({
 
 const trackViewed = vi.fn();
 const trackClicked = vi.fn();
+const trackTrialTap = vi.fn();
 vi.mock('@/lib/education/proFunnelTelemetry', () => ({
   trackTeacherTrialUpgradeCtaViewed: (...a: unknown[]) => trackViewed(...a),
   trackTeacherTrialUpgradeCtaClicked: (...a: unknown[]) => trackClicked(...a),
+  trackTrialCtaTap: (...a: unknown[]) => trackTrialTap(...a),
 }));
 
 const goToPolarCheckout = vi.fn();
@@ -87,11 +89,12 @@ describe('TeacherTrialUpgradeStatus', () => {
     proState.trialExpires = null;
     trackViewed.mockReset();
     trackClicked.mockReset();
+    trackTrialTap.mockReset();
     goToPolarCheckout.mockReset();
     postTeacherProCheckout.mockReset();
   });
 
-  it('shows days remaining and the Upgrade to Teacher Pro CTA', () => {
+  it('shows days remaining and the Start 14-day free trial CTA while Polar trial is still available', () => {
     render(<TeacherTrialUpgradeStatus />);
     const bar = screen.getByTestId('teacher-trial-upgrade-status');
     expect(bar).toHaveAttribute('data-days', '11');
@@ -99,7 +102,7 @@ describe('TeacherTrialUpgradeStatus', () => {
       'teacher.plan.trialDaysLeft:11',
     );
     expect(screen.getByTestId('teacher-trial-upgrade-status-cta')).toHaveTextContent(
-      'Upgrade to Teacher Pro',
+      'teacher.subscription.startTrial',
     );
   });
 
@@ -117,6 +120,7 @@ describe('TeacherTrialUpgradeStatus', () => {
     });
     expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: true });
     expect(trackClicked).toHaveBeenCalledWith({ trial_days_remaining: 11 });
+    expect(trackTrialTap).toHaveBeenCalledWith({ source: 'dashboard_trial_offer' });
     expect(goToPolarCheckout).toHaveBeenCalledWith('https://polar.sh/c/hq');
   });
 
@@ -129,6 +133,9 @@ describe('TeacherTrialUpgradeStatus', () => {
     render(<TeacherTrialUpgradeStatus />);
     const bar = screen.getByTestId('teacher-trial-upgrade-status');
     expect(bar).toHaveAttribute('data-days', '4');
+    expect(screen.getByTestId('teacher-trial-upgrade-status-cta')).toHaveTextContent(
+      'Upgrade to Teacher Pro',
+    );
     fireEvent.click(screen.getByTestId('teacher-trial-upgrade-status-cta'));
     await waitFor(() => {
       expect(postTeacherProCheckout).toHaveBeenCalledTimes(1);

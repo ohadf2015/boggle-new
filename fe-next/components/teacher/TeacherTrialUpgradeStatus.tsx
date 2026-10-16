@@ -14,6 +14,7 @@ import {
 import {
   trackTeacherTrialUpgradeCtaClicked,
   trackTeacherTrialUpgradeCtaViewed,
+  trackTrialCtaTap,
 } from '@/lib/education/proFunnelTelemetry';
 import { teacherProUpgradeCtaLabel } from '@/components/education/TeacherProCheckoutCta';
 
@@ -69,6 +70,9 @@ export function TeacherTrialUpgradeStatus({ suppressed = false }: { suppressed?:
     try {
       if (days !== null) {
         trackTeacherTrialUpgradeCtaClicked({ trial_days_remaining: days });
+      }
+      if (startPolarTrial) {
+        trackTrialCtaTap({ source: 'dashboard_trial_offer' });
       }
     } catch {
       /* analytics must never block the till */
@@ -131,7 +135,11 @@ export function TeacherTrialUpgradeStatus({ suppressed = false }: { suppressed?:
           }}
           className="inline-flex shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-black px-4 py-2 font-neo-display text-sm font-black text-white shadow-hard hover:-translate-y-0.5 disabled:opacity-60"
         >
-          {pending ? t('common.loading') : teacherProUpgradeCtaLabel(language)}
+          {pending
+            ? t('common.loading')
+            : startPolarTrial
+              ? t('teacher.subscription.startTrial')
+              : teacherProUpgradeCtaLabel(language)}
         </button>
       </div>
     </aside>
