@@ -292,6 +292,8 @@ export type GrowthEvent =
   | 'edu_teacher_onboarding_step'
   | 'edu_first_assignment_cta_shown'
   | 'edu_first_assignment_cta_clicked'
+  | 'edu_digest_viewed'
+  | 'edu_digest_upgrade_cta_clicked'
   // Student join funnel — mirrored from lib/education/telemetry.ts
   // (trackStudentJoinStarted + the student_join_completed branch of
   // trackEduClassroomJoin) with identical props. NOT in CANONICAL_DUAL_EMIT:
