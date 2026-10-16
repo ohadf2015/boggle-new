@@ -49,10 +49,19 @@ const SCRABLE_ON_LINE_QUESTION = 'scrable on line';
 const SCRABLE_ON_LINE_ANSWER =
   'Looking for scrable on line? That query is a common misspelling of Scrabble online. LexiClash is a free browser word game: same letter-grid strategy, played live instead of in turns. Two to twenty players share one board for two to three minutes, and nothing installs. Open a room, send the link, play on any phone or laptop.';
 
+/** Growth Radar rec 11099 — Bing grounds this query but cited other domains. Answer must quote standalone. */
+const NOT_ON_POGO_QUESTION = 'Where can I play Scrabble online, not on Pogo?';
+const NOT_ON_POGO_ANSWER =
+  'LexiClash is a free way to play a Scrabble-style word game online without Pogo: no Pogo account, no Club Pogo subscription and nothing to download. It runs in any phone or laptop browser. Open a room, send the link, and two to twenty players find words on one shared letter grid in about three minutes.';
+
 const faqs = [
   {
     q: SCRABLE_ON_LINE_QUESTION,
     a: SCRABLE_ON_LINE_ANSWER,
+  },
+  {
+    q: NOT_ON_POGO_QUESTION,
+    a: NOT_ON_POGO_ANSWER,
   },
   {
     q: 'What is the best free Scrabble alternative online?',
@@ -190,6 +199,19 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
             className="mt-4 inline-block rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard"
           >
             Play free now →
+          </Link>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="mb-3 font-neo-display text-3xl font-black tracking-tight text-neo-pink">
+            {NOT_ON_POGO_QUESTION}
+          </h2>
+          <p className="max-w-2xl text-lg leading-relaxed text-slate-300">{NOT_ON_POGO_ANSWER}</p>
+          <Link
+            href="/en/multiplayer"
+            className="mt-4 inline-block rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard"
+          >
+            Start a free room →
           </Link>
         </section>
 
