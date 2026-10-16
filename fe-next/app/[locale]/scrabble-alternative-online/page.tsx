@@ -278,7 +278,7 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
         <nav className="border-t-2 border-neo-black/50 pt-6 text-sm text-slate-400">
           <p className="mb-2 font-neo-display font-bold uppercase tracking-wider text-slate-300">More from LexiClash</p>
           <ul className="flex flex-wrap gap-3">
-            <li><Link className="text-neo-cyan hover:underline" href="/en/multiplayer-word-game-online">Multiplayer word game online</Link></li>
+            <li><Link className="text-neo-cyan hover:underline" href="/en/free-multiplayer-word-game">Multiplayer word game online</Link></li>
             <li><Link className="text-neo-pink hover:underline" href="/en/words-with-friends-alternative">Words With Friends alternative</Link></li>
             <li><Link className="text-neo-lime hover:underline" href="/en/best-online-word-games">9 best word games (compare)</Link></li>
             <li><Link className="text-neo-cyan hover:underline" href="/en/blog/boggle-vs-scrabble">Boggle vs Scrabble</Link></li>

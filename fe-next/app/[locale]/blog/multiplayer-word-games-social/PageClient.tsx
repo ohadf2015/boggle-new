@@ -188,7 +188,7 @@ export default function MultiplayerSocialPageClient(): React.ReactElement {
                         ? '/he/hebrew-multiplayer-word-game'
                         : locale === 'ja'
                           ? '/ja/japanese-word-game'
-                          : '/en/multiplayer-word-game-online'
+                          : '/en/free-multiplayer-word-game'
                 }
               >
                 <Button className="rounded-neo border-3 border-neo-black bg-neo-pink text-neo-black font-bold shadow-hard hover:shadow-hard-lg">

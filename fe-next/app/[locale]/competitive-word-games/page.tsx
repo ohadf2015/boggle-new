@@ -213,7 +213,7 @@ export default async function CompetitiveWordGamesPage({ params }: PageProps) {
               <h3 className="font-bold text-neo-lime">Best Online Word Games</h3>
               <p className="mt-1 text-xs text-neo-gray-200">9 honest picks, no download</p>
             </Link>
-            <Link href={`/${locale}/multiplayer-word-game-online`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
+            <Link href={`/${locale}/free-multiplayer-word-game`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
               <h3 className="font-bold text-neo-pink">Multiplayer Word Game Online</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time, browser-based, free</p>
             </Link>

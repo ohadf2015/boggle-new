@@ -108,6 +108,22 @@ describe('sitemap', () => {
     }
   });
 
+  // /:locale/multiplayer-word-game-online 308-redirects to /:locale/free-multiplayer-word-game
+  // (next.config.mjs). A sitemap <loc> or hreflang target that redirects is wasted crawl budget
+  // and an annotation Google discards, so neither may reference the retired slug.
+  it('never lists or hreflang-targets the redirecting /multiplayer-word-game-online slug', () => {
+    const offenders: string[] = [];
+    for (const entry of sitemap()) {
+      if (entry.url.includes('/multiplayer-word-game-online')) offenders.push(entry.url);
+      for (const [lang, target] of Object.entries(entry.alternates?.languages ?? {})) {
+        if (String(target).includes('/multiplayer-word-game-online')) {
+          offenders.push(`${entry.url} (${lang} -> ${target})`);
+        }
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
   // AdSense low-value-content remediation (2026-06-04): per-date archive pages
   // are thin per-puzzle stat snapshots. They are now noindex,follow at the page
   // level (app/[locale]/daily/archive/[date]/page.tsx) and are NO LONGER listed

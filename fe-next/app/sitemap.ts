@@ -629,14 +629,21 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   //
   // The clusters below mirror what each page's generateMetadata declares, which is what makes
   // them survive pruneUnconfirmedAlternates.
+  //
+  // /en/multiplayer-word-game-online 308-redirects to /en/free-multiplayer-word-game
+  // (next.config.mjs slug consolidation), so it must not be a <loc> or an alternate target:
+  // a sitemap URL that redirects is a wasted crawl and an hreflang Google discards. The cluster's
+  // English member is the canonical showcase, which already has its own entry above, so only the
+  // four localized slugs are pushed here.
   const wordGameCluster: Record<string, string> = {
-    en: `${BASE_URL}/en/multiplayer-word-game-online`,
+    en: `${BASE_URL}/en/free-multiplayer-word-game`,
     es: `${BASE_URL}/es/juego-de-palabras-multijugador`,
     he: `${BASE_URL}/he/hebrew-multiplayer-word-game`,
     sv: `${BASE_URL}/sv/swedish-multiplayer-word-game`,
     ja: `${BASE_URL}/ja/japanese-word-game`,
   };
-  Object.values(wordGameCluster).forEach((url) => {
+  Object.entries(wordGameCluster).forEach(([locale, url]) => {
+    if (locale === 'en') return;
     routes.push({
       url,
       lastModified: LAST_DEPLOYED,
