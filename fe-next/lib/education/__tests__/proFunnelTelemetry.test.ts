@@ -33,6 +33,8 @@ import {
   trackTeacherTrialUpgradeCtaClicked,
   trackProGateViewed,
   trackProUpgradeClicked,
+  trackTeacherPlanGateShown,
+  trackTeacherPlanGateUpgradeClick,
   PRO_SUCCESS_SEEN_STORAGE_KEY,
 } from '../proFunnelTelemetry';
 
@@ -61,6 +63,43 @@ describe('trackEduProUpgradeClicked', () => {
       source: 'dashboard_trial_lifecycle',
       product: 'teacher_pro',
     });
+  });
+});
+
+describe('teacher plan usage gate events', () => {
+  beforeEach(() => captureMock.mockReset());
+
+  it('Given the classroom cap sheet opens, When tracked, Then teacher_plan_gate_shown carries surface and limit_type', () => {
+    trackTeacherPlanGateShown({ surface: 'classroom_create', limit_type: 'classrooms' });
+    expect(captureMock).toHaveBeenCalledWith('teacher_plan_gate_shown', {
+      surface: 'classroom_create',
+      limit_type: 'classrooms',
+      product: 'teacher_pro',
+    });
+  });
+
+  it('Given the student cap sheet Upgrade tap, When tracked, Then teacher_plan_gate_upgrade_click fires', () => {
+    trackTeacherPlanGateUpgradeClick({ surface: 'student_enroll', limit_type: 'students' });
+    expect(captureMock).toHaveBeenCalledWith('teacher_plan_gate_upgrade_click', {
+      surface: 'student_enroll',
+      limit_type: 'students',
+      product: 'teacher_pro',
+    });
+  });
+
+  it('Given PostHog throws, When a plan-gate event is tracked, Then the caller is never broken', () => {
+    captureMock.mockImplementationOnce(() => {
+      throw new Error('posthog down');
+    });
+    expect(() =>
+      trackTeacherPlanGateShown({ surface: 'classroom_create', limit_type: 'classrooms' }),
+    ).not.toThrow();
+    captureMock.mockImplementationOnce(() => {
+      throw new Error('posthog down');
+    });
+    expect(() =>
+      trackTeacherPlanGateUpgradeClick({ surface: 'student_enroll', limit_type: 'students' }),
+    ).not.toThrow();
   });
 });
 

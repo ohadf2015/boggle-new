@@ -14129,6 +14129,8 @@ const es = {
       "classLimitTitle": "Has alcanzado el límite de clases",
       "classLimitReached": "Límite de clases alcanzado. Pásate a Teacher Pro para tener clases ilimitadas.",
       "classLimitMessage": "Has creado {{current}} de {{limit}} clases gratuitas. Mejora a Pro para tener clases y estudiantes ilimitados.",
+      "studentLimitTitle": "Has alcanzado el límite de estudiantes",
+      "studentLimitMessage": "Esta clase tiene {{current}} de {{limit}} estudiantes en el plan gratuito. Mejora a Pro para tener estudiantes ilimitados.",
       "usagePromptTitle": "Tu clase va en serio",
       "usagePromptStudentsBody": "Ya tienes {{count}} estudiantes en tu clase. Teacher Pro los cubre a todos: clases y estudiantes ilimitados, más análisis de progreso e informes imprimibles.",
       "usagePromptAssignmentsBody": "Creaste {{count}} tareas para tu clase. Teacher Pro quita el límite: tareas ilimitadas, más análisis de progreso e informes.",

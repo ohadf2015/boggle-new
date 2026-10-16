@@ -98,6 +98,18 @@ describe('<ClassSetupFlow>', () => {
     expect(toastSuccess).toHaveBeenCalledWith('eduShell.setup.copied');
   });
 
+  it('Given the free class cap already hit, When create is tapped, Then the upsell opens without posting', async () => {
+    classrooms = [
+      { id: 'a', name: 'A', join_code: 'AAAA', member_count: 0, language: 'en' },
+      { id: 'b', name: 'B', join_code: 'BBBB', member_count: 0, language: 'en' },
+      { id: 'c', name: 'C', join_code: 'CCCC', member_count: 0, language: 'en' },
+    ];
+    render(<ClassSetupFlow />);
+    await userEvent.click(screen.getByTestId('setup-create'));
+    expect(createClassroom).not.toHaveBeenCalled();
+    expect(await screen.findByTestId('upsell-class_limit')).toBeInTheDocument();
+  });
+
   it('Given the free class cap, When create is refused, Then the class-limit upsell opens', async () => {
     createClassroom.mockResolvedValue({ success: false, code: 'CLASS_LIMIT_REACHED', currentCount: 3, limit: 3 });
     render(<ClassSetupFlow />);

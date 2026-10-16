@@ -13385,6 +13385,8 @@ const en = {
       "giftedBadge": "Gift",
       "classLimitTitle": "You've reached your class limit",
       "classLimitMessage": "You've created {{current}} of {{limit}} free classes. Upgrade to Pro for unlimited classes and students.",
+      "studentLimitTitle": "You've reached your student limit",
+      "studentLimitMessage": "This class has {{current}} of {{limit}} free students. Upgrade to Pro for unlimited students.",
       "usagePromptTitle": "Your class is getting real",
       "usagePromptStudentsBody": "You now have {{count}} students in a classroom. Teacher Pro keeps them all covered: unlimited classes and students, plus progress analytics and printable reports.",
       "usagePromptAssignmentsBody": "You've created {{count}} assignments for a classroom. Teacher Pro lifts the cap: unlimited assignments, plus progress analytics and printable reports.",
