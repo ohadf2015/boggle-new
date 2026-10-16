@@ -52,7 +52,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   // Indexable, self-canonical, hreflang x5 (title/description from seo.showcase3d).
-  const meta = generatePageMetadata({ seoKey: 'showcase3d', path: PATH, locale });
+  const meta = await generatePageMetadata({ seoKey: 'showcase3d', path: PATH, locale });
   if (locale !== 'en') return meta;
   return { ...meta, alternates: { ...meta.alternates, languages: EN_CLUSTER.languages } };
 }

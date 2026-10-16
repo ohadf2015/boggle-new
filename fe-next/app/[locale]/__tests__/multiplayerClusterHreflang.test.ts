@@ -4,7 +4,10 @@
  * and Google discards hreflang that points at a redirect. They must name the canonical page,
  * and that page (in English) must name them back.
  */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// The showcase client pulls in gsap plugins that do not resolve under vitest; metadata does not need it.
+vi.mock('../free-multiplayer-word-game/Showcase3DClient', () => ({ default: () => null }));
 import { generateMetadata as es } from '../juego-de-palabras-multijugador/page';
 import { generateMetadata as he } from '../hebrew-multiplayer-word-game/page';
 import { generateMetadata as sv } from '../swedish-multiplayer-word-game/page';
