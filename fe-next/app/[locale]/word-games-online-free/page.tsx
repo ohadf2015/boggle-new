@@ -152,7 +152,7 @@ export default async function WordGamesOnlineFreePage({ params }: PageProps) {
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Explore More Word Games</h2>
           <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/multiplayer-word-game-online`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/free-multiplayer-word-game`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-lime">Multiplayer Word Game Online</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time Scrabble alternative — play live against friends</p>
             </Link>

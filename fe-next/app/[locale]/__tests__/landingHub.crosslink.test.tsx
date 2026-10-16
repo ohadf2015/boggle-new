@@ -16,6 +16,10 @@ const SIBLINGS = {
   withFriends: 'online-word-games-with-friends',
 } as const;
 
+// /multiplayer-word-game-online 308-redirects here (next.config.mjs slug consolidation), so
+// siblings must link the canonical slug directly instead of bouncing through the redirect.
+const CANONICAL_MULTIPLAYER = 'free-multiplayer-word-game';
+
 async function hrefsOf(Page: (p: { params: Promise<{ locale: string }> }) => Promise<React.ReactElement>) {
   const { container } = render(await Page({ params: Promise.resolve({ locale: 'en' }) }));
   return Array.from(container.querySelectorAll('a')).map((a) => a.getAttribute('href') || '');
@@ -30,13 +34,13 @@ describe('multiplayer/free-word-game landing hub — reciprocal cross-linking', 
 
   it('word-games-online-free links to both siblings', async () => {
     const hrefs = await hrefsOf(WordGamesFree);
-    expect(hrefs.some((h) => h.includes(SIBLINGS.multiplayerOnline))).toBe(true);
+    expect(hrefs.some((h) => h.endsWith(`/${CANONICAL_MULTIPLAYER}`))).toBe(true);
     expect(hrefs.some((h) => h.includes(SIBLINGS.withFriends))).toBe(true);
   });
 
   it('online-word-games-with-friends links to both siblings', async () => {
     const hrefs = await hrefsOf(WithFriends);
-    expect(hrefs.some((h) => h.includes(SIBLINGS.multiplayerOnline))).toBe(true);
+    expect(hrefs.some((h) => h.endsWith(`/${CANONICAL_MULTIPLAYER}`))).toBe(true);
     expect(hrefs.some((h) => h.includes(SIBLINGS.wordGamesFree))).toBe(true);
   });
 });
