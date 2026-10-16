@@ -7,6 +7,7 @@ import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { usePlayerGameEvents } from '../socket/usePlayerGameEvents';
 import { usePendingGameStart } from '../usePendingGameStart';
+import { useClearStaleWordsOnMount } from '../useClearStaleWordsOnMount';
 import { useGameStore } from '@/hooks/gameState/store';
 
 vi.mock('@/utils/logger', () => ({
@@ -39,6 +40,7 @@ const basePayload = {
 const freshPayload = () => ({ ...basePayload, messageId: `reconnect-${++seq}` });
 
 function useReloadedPlayer(pendingGameStart: unknown, onGameStartConsumed: () => void) {
+  useClearStaleWordsOnMount();
   usePlayerGameEvents({
     socket: mockSocket as never,
     t: (key: string) => key,
@@ -90,5 +92,28 @@ describe('usePendingGameStart — reload mid-round (reconnect payload)', () => {
     const payload = freshPayload();
     renderHook(() => useReloadedPlayer(payload, vi.fn()));
     expect(mockSocket.emit).toHaveBeenCalledWith('countdownComplete', { messageId: payload.messageId });
+  });
+
+  it('GIVEN the player view remounts after the reload restore (StrictMode, phase swap) WHEN it mounts again THEN my words survive', () => {
+    const payload = freshPayload();
+    const first = renderHook(() => useReloadedPlayer(payload, vi.fn()));
+    first.unmount();
+    // Live order: the remount lands before the resumed round flips gameActive back on.
+    act(() => { useGameStore.setState({ gameActive: false }); });
+    renderHook(() => useReloadedPlayer(null, vi.fn()));
+    expect(useGameStore.getState().foundWords.map((w: { word: string }) => w.word)).toEqual(['cab']);
+  });
+
+  it('GIVEN no round is running WHEN the player view mounts THEN words from an old room are cleared', () => {
+    act(() => { useGameStore.setState({ foundWords: [{ word: 'old', score: 1, validated: true, isDuplicate: false }] as never, gameActive: false }); });
+    renderHook(() => useClearStaleWordsOnMount());
+    expect(useGameStore.getState().foundWords).toEqual([]);
+  });
+
+  it('GIVEN a returning player re-seated as a late join WHEN the payload carries their words THEN the list is restored', () => {
+    const { reconnect: _r, ...rest } = freshPayload();
+    renderHook(() => useReloadedPlayer(null, vi.fn()));
+    act(() => { handlers.startGame?.({ ...rest, lateJoin: true }); });
+    expect(useGameStore.getState().foundWords.map((w: { word: string }) => w.word)).toEqual(['cab']);
   });
 });

@@ -1,119 +1,83 @@
-/** Teacher HQ: one primary action chosen by the class's state (create class → get students in → go live + pulse); the rest opens as dock sheets. */
+/** Teacher Home: greeting, one "start a game" hero, your classes, and a rail with this week + one Pro card. */
 'use client';
 
-import { type ReactNode, useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
-import dynamic from 'next/dynamic';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { EducationHeader } from '@/components/education/EducationHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
-// First-load cost: modal only for a first-time teacher. ssr:false — overlay.
-const TeacherOnboarding = dynamic(
-  () => import('@/components/education/TeacherOnboarding').then((m) => m.TeacherOnboarding),
-  { ssr: false },
-);
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import LessonBuilder from './LessonBuilder';
-import PlayTabFirstRunCard from './PlayTabFirstRunCard';
-import { PlayNowLauncher } from './dashboard/PlayNowLauncher';
-import { ClassSwitcher } from './dashboard/ClassSwitcher';
-import {
-  QUICK_LAUNCH_FLOW,
-  writeQuickLaunchIntent,
-  type QuickLaunchIntent,
-} from './dashboard/quickLaunchIntent';
-import { useClassrooms } from '@/hooks/useClassroom';
 import { AssignmentCreator } from './assignments';
-import { TeacherStatusRow } from './dashboard/TeacherStatusRow';
-import { TeacherTrialUpgradeStatus } from './TeacherTrialUpgradeStatus';
 import { TeacherHqWelcome } from './TeacherHqWelcome';
-import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { polarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
-import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
-import { isTeacherProfile } from '@/lib/education/teacherRole';
-import {
-  trackEduTeacherDashboardViewed,
-  trackEduTeacherToolsOpened,
-} from '@/lib/education/telemetry';
-import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
-import { liveClassroomHref } from '@/lib/education/startLiveClassCta';
-import { GetStudentsInCard } from './hq/GetStudentsInCard';
-import { GetStudentsInSkeleton } from './hq/GetStudentsInSkeleton';
-import { useFirstAssignmentCta } from './hq/useFirstAssignmentCta';
-import { HqProjectorSheet } from './hq/HqProjectorSheet';
-import { HqDock } from './hq/HqDock';
-import { HqToolsContent, type HqToolsPanel } from './hq/HqToolsContent';
-import { pickHqUpsell } from './hq/pickHqUpsell';
-import { FirstAssignmentInlineCta } from './hq/FirstAssignmentInlineCta';
-import { StartLiveClassCta } from './hq/StartLiveClassCta';
-import { HqClassPulse } from './hq/HqClassPulse';
-import { HqJoinStrip } from './hq/HqJoinStrip';
+import { TeacherPlanBadge } from './TeacherPlanBadge';
 import { HqLoadError } from './hq/HqLoadError';
-import { pickHqStep, showLauncher } from './hq/hqStep';
-import { TeacherOnboardingChecklistLive } from './dashboard/TeacherOnboardingChecklist';
-import { shouldShowClassProgressStrip } from '@/lib/education/classProgressStrip';
-
-const QUIET_LINK =
-  'inline-flex min-h-10 items-center rounded-neo px-3 font-neo-body text-sm font-bold text-neo-white/70 underline decoration-1 underline-offset-4 transition-colors hover:text-neo-white focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan';
+import { HomeHero } from './home/HomeHero';
+import { HomeClassList } from './home/HomeClassList';
+import { HomeWeekCard } from './home/HomeWeekCard';
+import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
+import { HomeOnboardingCard } from './home/HomeOnboardingCard';
+import { HomeRailSkeleton, HomeSkeleton } from './home/HomeSkeleton';
+import { useClassrooms } from '@/hooks/useClassroom';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
+import { useTeacherWeekStats } from '@/hooks/useTeacherWeekStats';
+import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
+import { polarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
+import { trackEduTeacherDashboardViewed } from '@/lib/education/telemetry';
+import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { homeOnboarding, type HomeOnboardingStepId } from '@/lib/education/homeOnboarding';
+import { teacherHostHref } from '@/lib/education/teacherHostHref';
 
 export interface TeacherDashboardProps {
-  /**
-   * The trial / Pro strip, when the route client has one to show. A slot, not
-   * a sibling: next to an `h-dvh` root it grew the page past the viewport.
-   * Milestone Pro ask lives behind the "Go Pro" dock chip. Polar trial /
-   * expired-trial banners pin to the deck (`pinBanner`) so conversion is not
-   * one extra tap behind a chip.
-   */
+  /** Account-state strip for a teacher already on (or just off) a Pro trial: days left / renew. */
   banner?: ReactNode;
-  /** Polar trial countdown / expired-trial: render `banner` on the deck. */
+  /** The one free-teacher Pro ask, picked by the route client. Rendered as the rail card. */
+  proOffer?: { kind: HomeProOfferKind; onDismiss: () => void; tracked: boolean } | null;
+  /** Kept for the route client's contract: a pinned banner also lives in the Pro slot. */
   pinBanner?: boolean;
-  /** The usage-triggered Pro card (10+ students / 3+ assignments). Same chip. */
+  /** The usage-triggered Pro card (10+ students / 3+ assignments). Same slot. */
   usagePrompt?: ReactNode;
 }
 
-export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: TeacherDashboardProps = {}) {
-  const { t, language } = useLanguage();
+type T = (key: string, params?: Record<string, string | number>) => string;
+
+function greetingKey(hour: number): string {
+  if (hour < 12) return 'eduShell.home.greetMorning';
+  if (hour < 18) return 'eduShell.home.greetAfternoon';
+  return 'eduShell.home.greetEvening';
+}
+
+export default function TeacherDashboard({ banner, proOffer, usagePrompt }: TeacherDashboardProps = {}) {
+  const { t: rawT, language } = useLanguage();
+  const t = rawT as T;
   const { profile } = useAuth();
   const router = useRouter();
-  const isRTL = language === 'he';
-  const deepLink = useTeacherDashboardDeepLink();
-  const [showAssignmentCreator, setShowAssignmentCreator] = useState(() => deepLink.openAssignment);
-  const [toolsOpen, setToolsOpen] = useState(false);
-  const [toolsPanel, setToolsPanel] = useState<HqToolsPanel>('home');
-  const [lessonsOpen, setLessonsOpen] = useState(() => deepLink.reviewWords.length > 0);
-  const [proOpen, setProOpen] = useState(false);
-  const [projectorOpen, setProjectorOpen] = useState(false);
-  const [newlyCreatedJoinCode, setNewlyCreatedJoinCode] = useState<string | null>(null);
-  const [walkthroughOpen, setWalkthroughOpen] = useState(false);
-  const {
-    classrooms,
-    isLoading: classroomsLoading,
-    error: classroomsError,
-    refresh: refreshClassrooms,
-  } = useClassrooms();
-  const [selectedClassroomId, setSelectedClassroomId] = useState<string>('');
-  const {
-    grant: proGrant,
-    loading: proLoading,
-    hasPro,
-    source: proSource,
-    status: proStatus,
-    trialExpires,
-    periodEnd,
-    refresh: refreshPro,
-  } = useTeacherPro();
   const searchParams = useSearchParams();
-  const checkoutSuccess = searchParams?.get('checkout') === 'success';
-  const welcomeKind = polarCheckoutWelcomeKind({
-    checkoutSuccess,
-    hasPro,
-    source: proSource,
-    status: proStatus ?? 'active',
-  });
-  // "Start game" on a Classes card lands here with its class preselected.
+  const deepLink = useTeacherDashboardDeepLink();
+  const isRTL = language === 'he';
+
+  const classroomsState = useClassrooms();
+  const classrooms = useMemo(() => classroomsState.classrooms ?? [], [classroomsState.classrooms]);
+  const classroomsLoading = classroomsState.isLoading === true;
+  const classroomsError = classroomsState.error ?? null;
+  const pro = useTeacherPro();
+  const { hasPro, loading: proLoading } = pro;
+  const activation = useTeacherActivationProgress();
+  const week = useTeacherWeekStats(classrooms, !classroomsLoading && !classroomsError);
+
+  const [selectedId, setSelectedId] = useState('');
   const requestedClassroomId = searchParams?.get('classroomId') ?? null;
+  // Resolved together with the default, never as a second pick that lands later (pitfall class 1).
+  const effectiveId =
+    classrooms.find((c) => c.id === selectedId)?.id ??
+    classrooms.find((c) => c.id === requestedClassroomId)?.id ??
+    classrooms[0]?.id ??
+    '';
+
+  const [showAssignmentCreator, setShowAssignmentCreator] = useState(() => deepLink.openAssignment);
+  const [lessonsOpen, setLessonsOpen] = useState(() => deepLink.reviewWords.length > 0);
   // One-shot: drop ?assign=1 once read so a refresh doesn't reopen the creator.
   useEffect(() => {
     if (!deepLink.openAssignment) return;
@@ -122,8 +86,12 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
     const query = rest.toString();
     router.replace(`/${language}/teacher${query ? `?${query}` : ''}`, { scroll: false });
   }, [deepLink.openAssignment, searchParams, router, language]);
+
+  // Back from Polar checkout: the webhook can land after the redirect, so keep re-reading.
+  const checkoutSuccess = searchParams?.get('checkout') === 'success';
+  const refreshPro = pro.refresh;
   useEffect(() => {
-    if (!checkoutSuccess || proLoading || hasPro) return;
+    if (!checkoutSuccess || proLoading || hasPro || !refreshPro) return;
     let tries = 0;
     const id = setInterval(() => {
       tries += 1;
@@ -132,370 +100,148 @@ export default function TeacherDashboard({ banner, pinBanner, usagePrompt }: Tea
     }, 2000);
     return () => clearInterval(id);
   }, [checkoutSuccess, proLoading, hasPro, refreshPro]);
+  const welcomeKind = polarCheckoutWelcomeKind({
+    checkoutSuccess,
+    hasPro,
+    source: pro.source,
+    status: pro.status ?? 'active',
+  });
 
-  const hasTeacherAccess = isTeacherProfile(profile);
-
-  // Sent once both sources resolve: a "0 classrooms" mid-load is a false zero.
-  const snapshotReady = !classroomsLoading && !proLoading;
-  const snapshot = useMemo(
-    () => ({
+  // Sent once both sources resolve: "0 classrooms" mid-load is a false zero.
+  const viewTracked = useRef(false);
+  useEffect(() => {
+    if (classroomsLoading || proLoading || viewTracked.current) return;
+    viewTracked.current = true;
+    trackEduTeacherDashboardViewed({
       classroomCount: classrooms.length,
       studentCount: classrooms.reduce((n, c) => n + (c.member_count ?? 0), 0),
       hasPro,
-    }),
-    [classrooms, hasPro],
-  );
-  const viewTracked = useRef(false);
-  useEffect(() => {
-    if (!snapshotReady || viewTracked.current) return;
-    viewTracked.current = true;
-    trackEduTeacherDashboardViewed(snapshot);
-  }, [snapshotReady, snapshot]);
+    });
+  }, [classroomsLoading, proLoading, classrooms, hasPro]);
 
-  useEffect(() => {
-    if (classrooms.length >= 1 && !selectedClassroomId) {
-      // Resolved in the same step as the default, never as a second pick that
-      // lands later (pitfall class 1). A foreign/stale id falls back.
-      const requested = classrooms.find((c) => c.id === requestedClassroomId);
-      setSelectedClassroomId((requested ?? classrooms[0]).id);
-    }
-  }, [classrooms, selectedClassroomId, requestedClassroomId]);
-
-  // Derived, not a second piece of state (pitfall class 1).
-  const selectedClassroom = classrooms.find((c) => c.id === selectedClassroomId) ?? null;
-  const { assignmentCount, submittedCount, hasActiveRoom } = useFirstAssignmentCta(
-    selectedClassroomId || null,
-  );
-  const reportsHref = selectedClassroomId
-    ? `/${language}/teacher/reports?classroomId=${selectedClassroomId}`
-    : `/${language}/teacher/reports`;
-
-  const openTools = useCallback(
-    (open: boolean) => {
-      if (open && !toolsOpen) trackEduTeacherToolsOpened(snapshot);
-      if (!open) setToolsPanel('home');
-      setToolsOpen(open);
-    },
-    [toolsOpen, snapshot],
-  );
-
-  /** Close the sheet and put the teacher on a control that is already on the deck. */
-  const focusDeck = useCallback((testId: string) => {
-    setToolsOpen(false);
-    requestAnimationFrame(() =>
-      document.querySelector<HTMLElement>(`[data-testid="${testId}"]`)?.focus(),
-    );
-  }, []);
-
-  const focusCreateClassroom = useCallback(() => {
-    setToolsOpen(false);
-    requestAnimationFrame(() =>
-      document.querySelector<HTMLButtonElement>('[data-testid="first-run-create-class"]')?.focus(),
-    );
-  }, []);
-
-  // Land back here with the missed words in hand, straight into the lessons.
-  const openReviewLesson = useCallback(
-    (words: string[]) => {
-      router.push(`/${language}/teacher?reviewWords=${encodeURIComponent(words.join(','))}`);
-    },
-    [router, language],
-  );
-
-  const handleQuickLaunch = useCallback(
-    (intent: Omit<QuickLaunchIntent, 'createdAt'>) => {
-      writeQuickLaunchIntent({
-        ...intent,
-        ...(selectedClassroomId ? { classroomId: selectedClassroomId } : {}),
-      });
-      router.push(`/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`);
-    },
-    [router, language, selectedClassroomId],
-  );
-
-  const closeProjector = useCallback(() => setProjectorOpen(false), []);
-
-  const [launcherOpen, setLauncherOpen] = useState(false);
-  const studentCount = selectedClassroom?.member_count ?? 0;
-  const { step, offerFirstAssignment } = pickHqStep({
-    classroomsLoading,
-    classroomsError: !!classroomsError,
+  const onboarding = homeOnboarding({
     classroomCount: classrooms.length,
-    justCreatedClass: !!newlyCreatedJoinCode,
-    hasSelectedClass: !!selectedClassroom,
-    studentCount,
-    assignmentCount,
-    hasActiveRoom,
+    inviteCopied: activation.progress.inviteCopied,
+    liveStarted: activation.progress.liveStarted,
+    dismissed: activation.progress.dismissed,
   });
-  const upsell = pickHqUpsell({
-    hasBanner: !!banner,
-    pinBanner: !!pinBanner,
-    hasUsagePrompt: !!usagePrompt,
-    hasPro,
-    pulseHome:
-      step !== 'goLive' ? false : assignmentCount === null ? null : shouldShowClassProgressStrip({ studentCount, assignmentCount }),
-  });
-  const deck = step === 'goLive';
-  // Nothing to put beside the launcher until the class has homework or games: one calm column instead of a half-empty rail.
-  const split = deck && !offerFirstAssignment;
-  const launcher = <PlayNowLauncher onLaunch={handleQuickLaunch} />;
-  const LANDSCAPE = '[@media(orientation:landscape)_and_(max-height:500px)]';
-  const launcherShown = showLauncher({ armed: launcherOpen, justCreatedClass: !!newlyCreatedJoinCode });
-  const showLauncherLink = (label: string) =>
-    launcherShown ? null : (
-      <button type="button" data-testid="hq-show-launcher" onClick={() => setLauncherOpen(true)} className={QUIET_LINK}>
-        {label}
-      </button>
-    );
+  const { markLiveStarted } = activation;
+  const onStepStart = useCallback(
+    (id: HomeOnboardingStepId) => {
+      if (id === 'tryDemo') markLiveStarted();
+    },
+    [markLiveStarted],
+  );
+  const newClassHref = `/${language}/teacher/classroom/new`;
+  const onboardingHrefs: Record<HomeOnboardingStepId, string> = {
+    createClass: newClassHref,
+    shareCode: effectiveId ? `${newClassHref}?classroomId=${encodeURIComponent(effectiveId)}` : newClassHref,
+    tryDemo: teacherHostHref(language, { classroomId: effectiveId || undefined, minutes: 2 }),
+  };
+
+  const ready = !classroomsLoading && activation.ready;
+  const hasClasses = classrooms.length > 0;
+  const firstName = (profile?.display_name ?? '').trim().split(/\s+/)[0] ?? '';
+  const [nowMs] = useState(() => Date.now());
+  const hour = new Date(nowMs).getHours();
+  const proHref = `/${language}/teacher/upgrade`;
+
+  // One Pro ask at most, and none before a first class: a limit-hit prompt beats the general card.
+  const accountBanner = hasClasses ? (banner ?? null) : null;
+  const proCard = !hasClasses || proLoading || hasPro ? null : usagePrompt ? (
+    <div data-testid="home-pro-slot">{usagePrompt}</div>
+  ) : proOffer ? (
+    <HomeProCard kind={proOffer.kind} href={proHref} onDismiss={proOffer.onDismiss} trackImpression={!proOffer.tracked} language={language} t={t} />
+  ) : null;
 
   return (
     <EducationShell
-      className={cn(TEACHER_TV_SCALE, isRTL && 'rtl')}
-      scrollRegionLabel={t('teacher.dashboard.title')}
-      header={<EducationHeader />}
-      statusRow={<TeacherStatusRow quietPlan={!upsell.planUpgradeWord} />}
-      // HQ fits one tall screen: there the cookie sheet overlays it until a choice is made instead of padding it into a scroll; sideways phones keep the padding so GO LIVE can scroll clear.
-      contentClassName="relative [@media(min-height:501px)]:[html.has-cookie-consent_&]:pb-0!"
+      className={cn(isRTL && 'rtl')}
+      scrollRegionLabel={t('eduShell.home.regionLabel')}
+      contentClassName="relative"
     >
-      {!proLoading && !walkthroughOpen && (
-        <TeacherHqWelcome
-          welcomeKind={welcomeKind}
-          grant={proGrant}
-          trialExpires={trialExpires ?? periodEnd}
-        />
+      {!proLoading && (
+        <TeacherHqWelcome welcomeKind={welcomeKind} grant={pro.grant} trialExpires={pro.trialExpires ?? pro.periodEnd} />
       )}
 
-      {/* No transform anywhere on this subtree — the sheets below are `position: fixed`. */}
       <div
-        data-testid="teacher-dashboard-grid"
-        className={cn(
-          // ~1280 content cap: wide monitors keep desktop density without stretching tables.
-          'relative mx-auto flex min-h-full min-w-0 w-full max-w-[1280px] 2xl:max-w-[1600px] flex-col gap-3 px-3 py-2 sm:gap-4 sm:px-5 sm:py-3 lg:px-8 lg:py-4 lg:[@media(max-height:800px)]:py-1 lg:[@media(max-height:800px)]:gap-2',
-          deck && !split && 'lg:max-w-2xl 2xl:max-w-[1024px]',
-          split && [
-            // 640–1023: two-column (launcher | pulse/detail); <640 stays stacked.
-            'sm:grid sm:min-h-0 sm:grid-cols-2 sm:content-start sm:items-start sm:gap-x-6 sm:gap-y-4 lg:gap-x-8 lg:gap-y-5',
-            // A phone turned sideways (844x390) is short, not narrow: it gets the desktop split.
-            `${LANDSCAPE}:grid ${LANDSCAPE}:min-h-0 ${LANDSCAPE}:grid-cols-2 ${LANDSCAPE}:content-start ${LANDSCAPE}:items-start ${LANDSCAPE}:gap-2 ${LANDSCAPE}:py-1.5`,
-          ],
-        )}
+        data-testid="teacher-home"
+        className="mx-auto grid w-full max-w-[1280px] gap-6 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-8 lg:py-6"
       >
-        {upsell.pinned ? (
-          <div data-testid="teacher-dashboard-pinned-banner" data-hq-upsell="pinned" className={cn('sm:col-span-full', `${LANDSCAPE}:col-span-full`)}>
-            {banner}
-          </div>
-        ) : (
-          <TeacherTrialUpgradeStatus suppressed={!!pinBanner} />
-        )}
-        {/* Top row: which class, and the ONE Tools entry (+ Go Pro chip). The dock is rendered LAST so keyboard order meets the primary action first. */}
-        <div className={cn('flex min-h-9 shrink-0 items-center gap-2 sm:col-span-full lg:min-h-10', `${LANDSCAPE}:col-span-full`)}>
-          {/* `contain: inline-size` — a long class name must truncate here, not widen the shell past a 390px phone. */}
-          <div className="min-w-0 flex-1 [contain:inline-size]">
-            {classroomsLoading ? (
-              <span
-                data-testid="hq-class-chip-skeleton"
-                aria-hidden="true"
-                className="block h-9 w-28 animate-pulse rounded-neo bg-neo-navy-light motion-reduce:animate-none"
-              />
-            ) : classrooms.length > 1 ? (
-              <ClassSwitcher
-                className="flex-nowrap overflow-x-auto pb-1 [scrollbar-width:none]"
+        <div className="flex min-w-0 flex-col gap-6">
+          <header className="flex flex-wrap items-center justify-between gap-3">
+            <h1 suppressHydrationWarning className="font-neo-display text-2xl font-black text-neo-cream sm:text-3xl">
+              {firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName')}
+            </h1>
+            <TeacherPlanBadge quiet className="shrink-0" />
+          </header>
+
+          {!ready ? (
+            <HomeSkeleton />
+          ) : classroomsError ? (
+            <HqLoadError onRetry={() => void classroomsState.refresh?.()} />
+          ) : !hasClasses ? (
+            <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} onStepStart={onStepStart} variant="full" t={t} />
+          ) : (
+            <>
+              {onboarding.visible ? (
+                <HomeOnboardingCard
+                  onboarding={onboarding}
+                  hrefs={onboardingHrefs}
+                  onStepStart={onStepStart}
+                  onDismiss={activation.dismiss}
+                  variant="compact"
+                  t={t}
+                />
+              ) : null}
+              <HomeHero
                 classrooms={classrooms}
-                selectedId={selectedClassroomId}
-                onSelect={setSelectedClassroomId}
-                studentLimit={hasPro ? undefined : FREE_TIER_LIMITS.studentsPerClass}
+                selectedId={effectiveId}
+                onSelect={setSelectedId}
+                onStart={onboarding.current === 'tryDemo' ? markLiveStarted : undefined}
+                language={language}
+                t={t}
               />
-            ) : selectedClassroom ? (
-              <span
-                data-testid="hq-class-chip"
-                className="inline-flex min-h-9 max-w-full items-center font-neo-display text-sm font-bold uppercase tracking-wide text-neo-cyan lg:text-base"
-              >
-                {/* Class names are DATA, often in another script: `dir="auto"` isolates it so the ellipsis lands at the name's own end. */}
-                <span dir="auto" className="min-w-0 truncate text-start">
-                  {selectedClassroom.name}
-                </span>
-              </span>
-            ) : null}
-            {/* First-run only, and a chip in the empty class slot: a modal here covered the first action on first visit. */}
-            {!classroomsLoading && classrooms.length === 0 && (
-              <TeacherOnboarding onDismiss={() => setWalkthroughOpen(false)} presentation="chip" onOpenChange={setWalkthroughOpen} />
-            )}
-          </div>
-          {/* Room for the absolute dock at this row's end. */}
-          <div
-            aria-hidden="true"
-            className={cn('shrink-0', upsell.chipVisible ? 'w-36 max-[360px]:w-28 sm:w-60 md:w-72' : 'w-10 sm:w-36 md:w-44')}
-          />
+              <HomeClassList
+                classrooms={classrooms}
+                lastPlayedAt={week.summary?.lastPlayedAt ?? null}
+                activityFailed={week.status === 'error'}
+                newClassHref={newClassHref}
+                classLimit={!proLoading && !hasPro ? FREE_TIER_LIMITS.classes : null}
+                language={language}
+                nowMs={nowMs}
+                t={t}
+              />
+              {accountBanner ? <div data-testid="home-account-banner">{accountBanner}</div> : null}
+            </>
+          )}
         </div>
 
-        {hasTeacherAccess && step !== 'loading' && step !== 'error' ? (
-          <div className={cn('sm:col-span-full', `${LANDSCAPE}:col-span-full`, 'desktop-medium-short:[&:has(~*_[data-expanded=true])]:hidden')}>
-            <TeacherOnboardingChecklistLive
-              classroomCount={classrooms.length}
-              classroomId={selectedClassroom?.id ?? null}
-              rosterCount={studentCount}
-              joinCode={selectedClassroom?.join_code}
-              reportsHref={reportsHref}
-              onCreateClassroom={focusCreateClassroom}
-              onCreateAssignment={() => setShowAssignmentCreator(true)}
-              onStartLive={() => setLauncherOpen(true)}
-              hideCreateClassroomCta={step === 'createClass'}
-              hideAssignmentCta={offerFirstAssignment}
-              hideStartLiveCta={step === 'goLive'}
-              hasPro={hasPro}
-              compact
-            />
-          </div>
-        ) : null}
-        {step === 'error' ? (
-          <HqLoadError onRetry={() => refreshClassrooms()} className={cn('sm:col-span-full', `${LANDSCAPE}:col-span-full`)} />
-        ) : step === 'loading' ? (
-          <GetStudentsInSkeleton className="mx-auto w-full max-w-2xl" />
-        ) : step === 'createClass' || step === 'getStudents' ? (
-          <div
-            className={cn(
-              'mx-auto flex w-full max-w-2xl 2xl:max-w-4xl flex-col gap-3',
-              // A just-made class puts its code and GO LIVE side by side on a laptop, so GO LIVE stays above the fold.
-              launcherShown && 'lg:max-w-4xl 2xl:max-w-6xl lg:grid lg:grid-cols-2 lg:items-start lg:gap-4',
-            )}
-          >
-            {step === 'createClass' ? (
-              <div data-hq-primary="createClass" className="flex flex-col">
-                <PlayTabFirstRunCard onJoinCodeCreated={setNewlyCreatedJoinCode} initialJoinCode={newlyCreatedJoinCode} />
-              </div>
-            ) : selectedClassroom ? (
-              <div data-hq-primary="getStudents" className="flex flex-col">
-                <GetStudentsInCard
-                  classroom={{ ...selectedClassroom, join_code: selectedClassroom.join_code || '' }}
-                  onOpenProjector={() => setProjectorOpen(true)}
-                />
-              </div>
-            ) : null}
-            {!launcherShown ? (
-              <div className="flex justify-center">
-                {showLauncherLink(t(step === 'createClass' ? 'hqCalm.playWithoutClass' : 'hqCalm.startAnyway'))}
-              </div>
-            ) : null}
-            {launcherShown ? launcher : null}
-          </div>
-        ) : (
-          <>
-            <div
-              data-testid="teacher-dashboard-main"
-              data-hq-primary="goLive"
-              className={cn('min-w-0 shrink-0 sm:col-span-1', `${LANDSCAPE}:col-span-1`)}
-            >
-              {launcher}
-            </div>
-            {selectedClassroom ? (
-              <>
-                <div
-                  data-testid="teacher-dashboard-aside"
-                  className={cn('flex min-w-0 flex-col gap-3 sm:col-span-1 sm:row-span-2', `${LANDSCAPE}:col-span-1 ${LANDSCAPE}:row-span-2`)}
-                >
-                  <HqClassPulse
-                    classroomId={selectedClassroom.id}
-                    classroomName={selectedClassroom.name}
-                    studentCount={studentCount}
-                    assignmentCount={assignmentCount}
-                    submittedCount={submittedCount}
-                    hasPro={hasPro}
-                    upsell={upsell.pulse}
-                    onUpgrade={upsell.chip ? () => setProOpen(true) : undefined}
-                    onOpenAssignments={() => {
-                      setToolsPanel('assignments');
-                      openTools(true);
-                    }}
-                  />
-                  {offerFirstAssignment ? (
-                    <div className="flex">
-                      <FirstAssignmentInlineCta classroomId={selectedClassroom.id} onCta={() => setShowAssignmentCreator(true)} />
-                    </div>
-                  ) : null}
-                  <StartLiveClassCta
-                    classroomId={selectedClassroom.id}
-                    studentCount={studentCount}
-                    assignmentCount={assignmentCount}
-                    joinCode={selectedClassroom.join_code || ''}
-                    onStart={() => router.push(liveClassroomHref(language, selectedClassroom.id))}
-                  />
-                </div>
-                <HqJoinStrip
-                  className={cn('sm:col-span-1 sm:col-start-1', `${LANDSCAPE}:col-span-1 ${LANDSCAPE}:col-start-1`)}
-                  classroomId={selectedClassroom.id}
-                  joinCode={selectedClassroom.join_code || ''}
-                  studentCount={studentCount}
-                  onOpenProjector={() => setProjectorOpen(true)}
-                />
-              </>
-            ) : null}
-          </>
-        )}
-
-        <HqDock
-          className="absolute end-3 top-2 z-10 max-w-[calc(100%-0.75rem)] sm:end-5 sm:top-3 lg:end-8 lg:top-4"
-          classroomCount={classrooms.length}
-          reportsHref={reportsHref}
-          lessonsOpen={lessonsOpen}
-          onLessonsOpenChange={setLessonsOpen}
-          lessons={<LessonBuilder initialReviewWords={deepLink.reviewWords} />}
-          toolsOpen={toolsOpen}
-          onToolsOpenChange={openTools}
-          onLastGame={() => setToolsPanel('lastGame')}
-          hideShortcuts={toolsPanel !== 'home'}
-          tools={
-            hasTeacherAccess ? (
-              <HqToolsContent
-                open={toolsOpen}
-                panel={toolsPanel}
-                onPanelChange={setToolsPanel}
-                assignmentCount={assignmentCount}
-                classroomCount={classrooms.length}
-                selectedClassroom={selectedClassroom}
-                reportsHref={reportsHref}
-                hideCreateClassroomCta={classrooms.length === 0 || !!newlyCreatedJoinCode}
-                onCreateClassroom={focusCreateClassroom}
-                onCreateAssignment={() => setShowAssignmentCreator(true)}
-                onInvite={() => focusDeck('hq-copy-link')}
-                onPlay={() => {
-                  setLauncherOpen(true);
-                  focusDeck('play-now-go');
-                }}
-                onReviewWords={openReviewLesson}
-              />
-            ) : undefined
-          }
-          pro={
-            upsell.chip === 'banner' ? (
-              banner
-            ) : upsell.chip === 'usage' ? (
-              <div data-testid="teacher-dashboard-usage-prompt">{usagePrompt}</div>
-            ) : undefined
-          }
-          proChipHidden={!upsell.chipVisible}
-          proOpen={proOpen}
-          onProOpenChange={setProOpen}
-        />
+        <aside aria-label={t('eduShell.home.railLabel')} className="flex min-w-0 flex-col gap-6">
+          {!ready ? (
+            <HomeRailSkeleton />
+          ) : hasClasses ? (
+            <HomeWeekCard summary={week.summary} status={week.status} t={t} />
+          ) : null}
+          {proCard}
+        </aside>
       </div>
 
-      {projectorOpen && selectedClassroom ? (
-        <HqProjectorSheet
-          classroom={{
-            ...selectedClassroom,
-            join_code: selectedClassroom.join_code || '',
-          }}
-          onClose={closeProjector}
-        />
-      ) : null}
+      <Dialog open={lessonsOpen} onOpenChange={setLessonsOpen}>
+        <DialogContent className="max-h-[90dvh] overflow-auto border-[3px] border-neo-cream bg-neo-navy sm:max-w-3xl">
+          <DialogTitle className="font-neo-display text-xl font-black text-neo-cream">{t('eduShell.home.reviewTitle')}</DialogTitle>
+          {lessonsOpen ? <LessonBuilder initialReviewWords={deepLink.reviewWords} /> : null}
+        </DialogContent>
+      </Dialog>
 
-      {selectedClassroomId && (
+      {effectiveId ? (
         <AssignmentCreator
-          classroomId={selectedClassroomId}
+          classroomId={effectiveId}
           isOpen={showAssignmentCreator}
           onClose={() => setShowAssignmentCreator(false)}
           onComplete={() => setShowAssignmentCreator(false)}
         />
-      )}
+      ) : null}
     </EducationShell>
   );
 }

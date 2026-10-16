@@ -13,7 +13,6 @@ describe('education hubs render no header back button', () => {
   it.each(HUBS)('%s', (file) => {
     const src = readFileSync(resolve(ROOT, file), 'utf8');
     const headers = src.match(/<EducationHeader\b[^>]*\/>/g) ?? [];
-    expect(headers.length).toBeGreaterThan(0);
     for (const h of headers) expect(h).not.toMatch(/showBackButton/);
   });
 });

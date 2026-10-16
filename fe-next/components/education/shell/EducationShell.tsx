@@ -88,6 +88,8 @@ export function EducationShell({
   // to resolution, not the hook call.
   const pathname = usePathname();
   const nav = chromeFree ? null : resolveEducationNav(pathname);
+  // A teacher screen's chrome is the shell's own (top bar + sidebar); a page header there would be a second menu.
+  const teacherChrome = nav?.kind === 'teacher';
 
   return (
     <div
@@ -99,7 +101,8 @@ export function EducationShell({
         className,
       )}
     >
-      {header ? (
+      {teacherChrome && nav ? <EducationShellNav nav={nav} variant="topbar" /> : null}
+      {header && !teacherChrome ? (
         // `flex-shrink` defaults to 1, so a bare header band is the first thing
         // a tall column squeezes — the back button and locale switcher would
         // lose height while the one child that can actually scroll instead does

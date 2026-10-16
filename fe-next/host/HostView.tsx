@@ -7,6 +7,7 @@
  * dialogs. Each phone view renders inside its piece's screen stub
  * (HostLobbyScreen, MpRoundScreen, MpCountdown). FROZEN after FOUNDATION.
  */
+import { useClassroomBossSocket } from '@/hooks/useClassroomBossSocket';
 import React, { memo } from 'react';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import '../style/animation.scss';
@@ -30,7 +31,6 @@ import {
 } from './components/HostDialogs';
 import { HostLobbyScreen } from '@/components/multiplayer/lobby/HostLobbyScreen';
 import { MpRoundScreen } from '@/components/multiplayer/round/MpRoundScreen';
-import { MpModeCoach } from '@/components/tutorial/MpModeCoach';
 import { MpCountdown } from '@/components/multiplayer/round/MpCountdown';
 import { useHostPhase } from './hooks/useHostPhase';
 import { useClassroomSettingsSeed } from './hooks/useClassroomSettingsSeed';
@@ -50,6 +50,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
     fireRoundRemaining, hasActiveGameData, resolvedClassroomGameMode, isVocabQuizRoom,
     handleHostNameChange, handleHostAvatarChange,
   } = useHostPhase(props);
+  useClassroomBossSocket(isClassroomMode ? socket : null, gameCode);
 
   useClassroomSettingsSeed({
     isClassroomMode,
@@ -243,7 +244,6 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
       {/* In-Game View - Host Playing */}
       {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && settings.hostPlaying && runtime.tableData) && (
         <MpRoundScreen>
-        <MpModeCoach />
         <HostInGameView
           gameCode={gameCode}
           username={username}

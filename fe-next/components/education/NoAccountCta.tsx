@@ -72,11 +72,14 @@ export function NoAccountCta({
   locale,
   className = '',
   copy,
+  compact = false,
 }: {
   locale: string;
   className?: string;
   /** Page-specific wording. Omit for the shared copy above. */
   copy?: NoAccountCopy;
+  /** Heading and button only, for a page that already explains the join. */
+  compact?: boolean;
 }): React.JSX.Element {
   const c = copy ?? noAccountCopy(locale);
   return (
@@ -87,7 +90,7 @@ export function NoAccountCta({
       <p className="font-neo-display text-base font-bold leading-snug text-neo-lime sm:text-lg">
         {c.heading}
       </p>
-      <p className="mt-1.5 text-sm leading-relaxed text-neo-white/80">{c.body}</p>
+      {compact ? null : <p className="mt-1.5 text-sm leading-relaxed text-neo-white/80">{c.body}</p>}
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
         <Link
           href={`/${locale}${QUICK_PLAY_PATH}`}

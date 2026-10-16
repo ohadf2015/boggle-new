@@ -27,12 +27,12 @@ import { GoogleClassroomGradePassback } from '@/components/teacher/reports/Googl
 import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
-import { EducationHeader } from '@/components/education/EducationHeader';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { TeacherPlanBadge } from '@/components/teacher/TeacherPlanBadge';
 import { ExportAllClassesButton } from '@/components/teacher/reports/ExportAllClassesButton';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { ProGate } from '@/components/teacher/ProGate';
+import { ReportsProTeaser } from '@/components/teacher/pro/ReportsProTeaser';
 import { trackEduReportsViewed } from '@/lib/education/telemetry';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
@@ -60,7 +60,10 @@ function TeacherReportsInner() {
   const studentIdFromUrl = searchParams.get('studentId');
 
   // Local state so a click switches views without waiting on navigation...
-  const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(classroomIdFromUrl);
+  const [pickedClassroomId, setSelectedClassroomId] = useState<string | null>(classroomIdFromUrl);
+  // One class means nothing to pick: open its report directly.
+  const onlyClassroomId = !classroomsLoading && classrooms?.length === 1 ? classrooms[0].id : null;
+  const selectedClassroomId = pickedClassroomId ?? onlyClassroomId;
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(studentIdFromUrl);
   const [selectedStudentName, setSelectedStudentName] = useState<string | null>(null);
 
@@ -239,6 +242,7 @@ function TeacherReportsInner() {
         ) : (
           <ReportsNoClasses />
         )}
+        {classrooms && classrooms.length > 0 ? <ReportsProTeaser /> : null}
       </>
     );
   } else if (selectedStudentId) {
@@ -391,7 +395,6 @@ function ReportsShell({ children }: { children: React.ReactNode }) {
   return (
     <EducationShell
       className={TEACHER_TV_SCALE}
-      header={<EducationHeader showBackButton />}
       scrollRegionLabel={t('teacher.reports.title')}
       contentClassName="relative p-4 sm:p-6 lg:p-8"
     >

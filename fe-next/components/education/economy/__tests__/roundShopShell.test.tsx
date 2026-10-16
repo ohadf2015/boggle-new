@@ -42,7 +42,7 @@ describe('RoundShop is always visible on the results card', () => {
   it('Given cash short of the next power-up, Then the save-for goal names it and how much is missing', () => {
     hook.snapshot = snap(12);
     render(<RoundShop gameCode="ABC" />);
-    expect(screen.getByTestId('shop-goal').textContent).toContain('economy.goal.save:economy.shop.doubleCash.name,3');
+    expect(screen.getByTestId('shop-goal').textContent).toContain('economy.goal.save.doubleCash:3');
   });
 
   it('Given cash covers every power-up, Then the goal says one is ready to buy', () => {

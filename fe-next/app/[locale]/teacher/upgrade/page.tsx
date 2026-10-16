@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
+import { hasSupabaseSessionCookie } from '@/lib/auth/hasSessionCookie';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { loadTranslation } from '@/translations/loadTranslation';
 import {
@@ -25,6 +27,7 @@ export default async function UpgradePricingPage({ params }: { params: Promise<{
     ? (locale as SupportedLocale)
     : 'en';
   const t = (await loadTranslation(validLocale)) as Record<string, any>;
+  const hasSession = hasSupabaseSessionCookie((await cookies()).getAll().map((c) => c.name));
   const sub = (t?.teacher?.subscription ?? {}) as Record<string, string>;
   const seo = (t?.seo?.teacherUpgrade ?? {}) as Record<string, string>;
 
@@ -46,7 +49,7 @@ export default async function UpgradePricingPage({ params }: { params: Promise<{
       {faqSchema && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       )}
-      <UpgradePricingPageClient />
+      <UpgradePricingPageClient hasSession={hasSession} />
     </>
   );
 }

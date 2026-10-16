@@ -1,5 +1,61 @@
 // Sv translations
 const sv = {
+  // @eduBoss:start
+  "classroomBoss": {
+    "chestUpgraded": "Bossen besegrad: din kista har uppgraderats!",
+    "topHitter": "Bästa träffen",
+    "cardHow": "Hela klassen mot en boss. Varje ord ni hittar är en träff.",
+    "howTo": "Hitta ord för att träffa bossen. 7+ bokstäver blir kritisk träff. Långa ord stoppar attackerna.",
+    "attackIn": "Bossattack om",
+    "attack": {
+      "freeze": "Frysning på väg!",
+      "blur": "Suddning på väg!",
+      "drain": "Sköldtömning!"
+    },
+    "staggerHint": "{n}/{need} långa ord för att stoppa den",
+    "shield": "Klassens sköld",
+    "topHitters": "Bästa träffarna",
+    "noHitsYet": "Hitta ord för att träffa bossen!",
+    "dmg": "skada",
+    "crit": "KRITISK!",
+    "timeLeft": "Tid kvar",
+    "combo": "Klasskombo",
+    "intro": "{name} dyker upp!",
+    "enraged": "Rasande!",
+    "phaseChange": "Fas {n}!",
+    "staggered": "Stoppad! Attacken avbröts",
+    "blocked": "Klassens sköld blockerade!",
+    "landed": {
+      "freeze": "Brickor frysta!",
+      "blur": "Bokstäverna suddas ut!",
+      "drain": "Skölden tömdes!"
+    },
+    "healed": "Bossen läkte +{n}",
+    "defeated": "{name} är besegrad!",
+    "escaped": "{name} kom undan!",
+    "dealtPct": "Er klass gjorde {pct}% skada",
+    "phase": "Fas {n} av 3",
+    "hpLeft": "{pct}% hälsa kvar",
+    "phaseShort": "Fas {n}",
+    "yourDamage": "Din skada",
+    "critDamage": "KRITISK +{n}",
+    "plusDamage": "+{n} skada",
+    "phoneWon": "Bossen besegrad! Snyggt lagarbete",
+    "warnPhone": "Attack om {s} s. Långa ord stoppar den!",
+    "phoneLanded": {
+      "freeze": "Frysta brickor! Använd de andra",
+      "blur": "Bokstäverna är suddiga en stund",
+      "drain": "Klassens sköld tömdes"
+    },
+    "frozenRejected": "Ordet går genom en fryst bricka",
+    "picker": {
+      "title": "Boss",
+      "unlock": "Pro: alla 10 bossar",
+      "lockedName": "{name} (Pro)",
+      "freeHint": "Gratisklasser möter Lexikondraken. Pro låser upp alla 10 bossar."
+    }
+  },
+  // @eduBoss:end
   // @eg6Land:start
   "eg6Land": {
     "vsGimkit": {
@@ -112,7 +168,7 @@ const sv = {
     },
     "pro": {
       "rosterPro": "Obegränsat antal elever i din lista",
-      "liveCap": "Live-spel rymmer upp till {count} spelare samtidigt",
+      "liveCap": "I alla planer rymmer ett livespel upp till {count} spelare samtidigt.",
       "mastery": "Mastery-värmekarta: vilka ord varje elev kan",
       "missedPractice": "Övningsrundor för missade ord, byggda på riktiga luckor",
       "reports": "Utskrivbara klassrapporter"
@@ -133,8 +189,19 @@ const sv = {
         "odds": {
           "label": "Chanser i kistan"
         },
-        "continue": "Fortsätt",
-        "tapToOpen": "Tryck för att öppna"
+        "continue": "Hämta",
+        "tapToOpen": "Tryck för att öppna",
+        "headline": {
+          "common": "Vanlig kista!",
+          "rare": "Sällsynt kista!",
+          "epic": "Episk kista!"
+        },
+        "chip": {
+          "label": "Det här fick du",
+          "cash": "pengar den här rundan",
+          "xp": "XP",
+          "item": "Ny grej"
+        }
       },
       "reward": {
         "title": "Rundans belöning",
@@ -172,7 +239,11 @@ const sv = {
         }
       },
       "goal": {
-        "save": "Spara {missing} till för {name}",
+        "save": {
+          "hintReveal": "Tjäna {missing} pengar till nästa runda så kan du köpa en ledtråd (ett ords första bokstav)",
+          "doubleCash": "Tjäna {missing} pengar till nästa runda så kan du köpa dubbla pengar i 30 sekunder",
+          "streakShield": "Tjäna {missing} pengar till nästa runda så kan du köpa en sköld för din serie"
+        },
         "ready": "Du kan köpa {name} nu"
       },
       "hud": {
@@ -592,9 +663,9 @@ const sv = {
         "3": "Klockan är kort och varje ord räknas."
       },
       "bossBattle": {
-        "1": "En betydelse visas och alla svarar i mobilen.",
-        "2": "Varje rätt svar träffar draken; tre i rad ger dubbel träff.",
-        "3": "Få ner dess HP till noll innan frågorna tar slut."
+        "1": "Samma bokstäver på varje mobil. Alla letar ord på samma bräde.",
+        "2": "Varje ord träffar bossen. 7+ bokstäver blir kritisk, snabba ord bygger klassens kombo.",
+        "3": "Långa ord laddar skölden och stoppar attacker. Få ner den till noll innan tiden tar slut."
       }
     },
     "boss": {
@@ -14388,12 +14459,12 @@ const sv = {
       "assignmentLimitTitle": "Du har nått uppgiftsgränsen",
       "assignmentLimitMessage": "Du har skapat {{current}} av {{limit}} gratisuppgifter för den här klassen. Uppgradera till Pro för obegränsade uppgifter.",
       "upgradeProDescription": "Pro ger dig obegränsat antal klassrum och elever per klass. Inga gränser.",
-      "trialExpiredTitle": "Din kostnadsfria provperiod har tagit slut",
-      "trialExpiredMessage": "Din 14-dagars lärarprovperiod är över. Fortsätt med Pro: obegränsat antal klasser, live-spel och framstegsrapporter.",
+      "trialExpiredTitle": "Vill du ha mer än gratisplanen?",
+      "trialExpiredMessage": "Gratisplanen fortsätter att fungera utan tidsgräns. Pro lägger till obegränsat med klasser och framstegsrapporter, och nya konton får 14 dagar gratis.",
       "continueFree": "Fortsätt med gratisversionen",
       "proFeatures": "Pro innehåller",
       "unlimitedClasses": "Obegränsat antal klassrum",
-      "unlimitedStudents": "Obegränsat antal elever per klassrum",
+      "unlimitedStudents": "Obegränsat antal elever i varje klasslista",
       "priceUSD": "Pro-prenumeration",
       "perMonth": "/månad",
       "autoRenew": "Förnyas automatiskt varje månad. Avsluta när du vill.",
@@ -14402,8 +14473,8 @@ const sv = {
       "trialOfferTitle": "Prova Teacher Pro gratis i 14 dagar",
       "trialOfferBody": "Obegränsade klasser och rapporter. Gratis i 14 dagar, sedan 9 $/månad. Avsluta när du vill.",
       "trialCtaSubtext": "Gratis i 14 dagar, sedan 9 $/månad. Avsluta när du vill.",
-      "trialEndedTitle": "Provperioden är slut. Uppgradera för att behålla klasserna",
-      "trialEndedBody": "Behåll obegränsade klasser och utskrivbara rapporter för 9 $/månad. Det här är inte en ny gratis provperiod.",
+      "trialEndedTitle": "Din Pro-provperiod är slut. Dina klasser finns kvar.",
+      "trialEndedBody": "Gratisplanen kör fortfarande alla klasser. Pro ger tillbaka obegränsat med klasser och utskrivbara rapporter för $9/mån. Det här är ingen ny provperiod.",
       "trialEndedCta": "Behåll Pro – 9 $/mån",
       "trialReactivateCta": "Återaktivera",
       "trialLifecycleTitle": "{count} dagar kvar av din Teacher Pro-provperiod",
@@ -14428,7 +14499,7 @@ const sv = {
       "freePlanName": "Free",
       "freeForever": "Gratisplan, utan slutdatum",
       "freeClasses": "Upp till {count} klasser",
-      "freeStudents": "Upp till {count} elever per klass",
+      "freeStudents": "Upp till {count} elever i varje klasslista",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Allt du behöver för att växa",
       "popular": "Populärast",
@@ -14465,7 +14536,7 @@ const sv = {
         "included": "Ingår",
         "notIncluded": "Ingår inte",
         "classes": "Klasser",
-        "studentsPerClass": "Elever per klass",
+        "studentsPerClass": "Elever per klasslista",
         "customLists": "Egna ordlistor",
         "duels": "Dueller mot varandra",
         "noAds": "Reklamfritt för eleverna",
@@ -16228,8 +16299,8 @@ const sv = {
     },
     "landing": {
       "pro": {
-        "title": "Två planer. Inga trick.",
-        "subtitle": "Allt du behöver för din första lektion är gratis. Pro tar bort taken.",
+        "title": "Gratis kör spelet. Teacher Pro visar vad de lärde sig.",
+        "subtitle": "Efter ett spel: vem som kämpade, vilka ord som behöver repeteras och övning byggd på missarna.",
         "comparisonAlt": "Jämförelse mellan gratisplanen och Teacher Pro",
         "freeTier": "Gratis",
         "perMonth": "/månad",
@@ -16238,7 +16309,7 @@ const sv = {
         "noAds": "Inga annonser för dina elever",
         "customLists": "Dina egna ordlistor",
         "duels": "Orddueller i realtid",
-        "freeForever": "Gratisplanen upphör aldrig. Inget kort, ingen provperiod som tickar.",
+        "freeForever": "Gratisplanen går aldrig ut och kräver inget kort.",
         "proTier": "Teacher Pro",
         "everythingInFree": "Allt i gratisplanen",
         "classLimitPro": "Obegränsat antal klasser",
@@ -20505,8 +20576,264 @@ const sv = {
     "done": "Klar",
     "pulseTitle": "Klasspuls",
     "projector": "Projektor"
-  }
+  },
   // @hqCalm:end
+  // @eduLiveRoom:start
+  "eduLiveRoom": {
+    "round": {
+      "boardLabel": "Klassens bräde",
+      "wheelLabel": "Klassens bokstavshjul"
+    },
+    "lobby": {
+      "brand": "Klass",
+      "joinAt": "Gå med på",
+      "joined": "{count} med",
+      "waitingTitle": "Väntar på elever",
+      "waitingHint": "Skanna QR-koden eller skriv koden på adressen ovan",
+      "startBlocked": "Start går att trycka på när en elev är med",
+      "copyLink": "Kopiera länk",
+      "minutes": "{count} min",
+      "leave": "Lämna rummet",
+      "moreJoined": "+{count} till",
+      "readyCount": "{ready} av {total} redo"
+    },
+    "student": {
+      "youreIn": "Du är med!",
+      "watchBoard": "Titta på tavlan. Läraren startar spelet.",
+      "inClass": "{count} i klassen",
+      "changeLook": "Byt utseende",
+      "leave": "Lämna"
+    },
+    "entry": {
+      "connecting": "Ansluter till klassen…",
+      "openingRoom": "Öppnar ditt rum…",
+      "waitingTeacher": "Läraren har inte öppnat spelet än",
+      "waitingTeacherHint": "Stanna kvar. Du kommer in så fort det börjar.",
+      "noRoomTitle": "Inget spel här",
+      "noRoomStudent": "Be läraren om koden och gå med.",
+      "noRoomHost": "Starta ett spel från lärarstarten.",
+      "enterCode": "Skriv en kod",
+      "toTeacher": "Tillbaka till lärarstarten"
+    },
+    "hostResults": {
+      "noScoresHint": "Samma bräde, ny start. Spela igen så får klassen ett nytt försök.",
+      "title": "Rundans resultat",
+      "statStudents": "Elever",
+      "statWords": "Hittade ord",
+      "statAvg": "Snittpoäng",
+      "statLesson": "Lektionsord",
+      "playAgain": "Spela igen",
+      "nextMode": "Nästa läge",
+      "viewReport": "Visa rapport",
+      "endGame": "Avsluta spelet",
+      "noScores": "Ingen fick poäng den här rundan"
+    },
+    "studentResults": {
+      "placed": "Din placering",
+      "rankOf": "#{rank} av {total}",
+      "points": "poäng",
+      "yourWords": "Dina ord",
+      "noWords": "Inga ord den här gången. Nästa gång!",
+      "nextRound": "Håll koll på tavlan inför nästa runda",
+      "leave": "Lämna",
+      "calculating": "Räknar orden…"
+    }
+  }
+  // @eduLiveRoom:end
+  ,
+  // @eduShell:start
+  "eduShell": {
+    "nav": {
+      "home": "Hem",
+      "library": "Bibliotek",
+      "pro": "Pro"
+    },
+    "brand": {
+      "name": "LexiClash",
+      "tagline": "för lärare",
+      "homeLink": "LexiClash för lärare, startsida"
+    },
+    "account": {
+      "menuLabel": "Kontomeny",
+      "fallbackName": "Lärare",
+      "profile": "Profil",
+      "help": "Hjälp",
+      "whatsNew": "Nyheter"
+    },
+    "delivery": {
+      "projector": "Projektor",
+      "phones": "På mobilen",
+      "both": "Båda"
+    },
+    "home": {
+      "regionLabel": "Lärarens startsida",
+      "railLabel": "Den här veckan och din plan",
+      "greetMorning": "God morgon, {name}",
+      "greetAfternoon": "God eftermiddag, {name}",
+      "greetEvening": "God kväll, {name}",
+      "greetNoName": "Välkommen tillbaka",
+      "startWith": "Starta ett spel med",
+      "switchClass": "Välj klass",
+      "startLive": "Starta livespel",
+      "yourClasses": "Dina klasser",
+      "newClass": "Ny klass",
+      "colClass": "Klass",
+      "colStudents": "Elever",
+      "colLastPlayed": "Senast spelat",
+      "students": "{count} elever",
+      "notPlayedRecently": "Inga spel på 30 dagar",
+      "playWith": "Starta ett spel med {name}",
+      "reviewTitle": "Öva på de missade orden"
+    },
+    "week": {
+      "title": "Den här veckan",
+      "games": "Spelade spel",
+      "students": "Elever totalt",
+      "active": "Aktiva klasser",
+      "empty": "Dina siffror visas här efter ert första spel.",
+      "unavailable": "Veckans siffror gick inte att hämta. De är tillbaka nästa gång."
+    },
+    "pro": {
+      "title": "Se vem som kämpade efter varje spel",
+      "points": {
+        "struggled": "Vem som fastnade, ord för ord",
+        "reteach": "Vilka ord ni ska repetera i morgon",
+        "classes": "Obegränsat antal klasser och utskrivbara rapporter"
+      },
+      "cta": "Se vad Pro ger",
+      "trialCta": "Starta 14 dagars gratis provperiod",
+      "trialFine": "Gratis i 14 dagar, sedan {price}/månad. Avsluta när du vill.",
+      "dismiss": "Inte nu"
+    },
+    "onboarding": {
+      "title": "Ditt första klasspel i 3 steg",
+      "titleCompact": "Gör klart starten",
+      "progress": "{done} av {total} klara",
+      "dismiss": "Dölj startstegen",
+      "steps": {
+        "createClass": {
+          "title": "Skapa en klass",
+          "body": "Ett namn och ett språk. Tar 20 sekunder.",
+          "cta": "Skapa din första klass"
+        },
+        "shareCode": {
+          "title": "Dela anslutningskoden",
+          "body": "Eleverna ansluter från vilken enhet som helst, utan konto.",
+          "cta": "Visa anslutningskoden"
+        },
+        "tryDemo": {
+          "title": "Testa ett 2-minutersspel",
+          "body": "Kör en kort runda. Lägg till övningsbottar i lobbyn om ingen har anslutit än.",
+          "cta": "Starta ett 2-minutersspel"
+        }
+      }
+    },
+    "setup": {
+      "title": "Ny klass",
+      "subtitle": "Tre snabba val. Du kan ändra dem senare.",
+      "stepsLabel": "Framsteg för klassen",
+      "step1": "Klassuppgifter",
+      "step2": "Dela koden",
+      "nameLabel": "Klassens namn",
+      "namePlaceholder": "t.ex. 5B Engelska",
+      "defaultName": "Klass {n}",
+      "gradeLabel": "Årskurs eller ålder",
+      "grade": {
+        "k2": "F–2",
+        "g35": "Åk 3–5",
+        "g68": "Åk 6–8",
+        "g912": "Åk 9 och gymnasiet",
+        "adult": "Vuxna"
+      },
+      "gradeName": {
+        "k2": "F–2-klass",
+        "g35": "Åk 3–5-klass",
+        "g68": "Åk 6–8-klass",
+        "g912": "Gymnasieklass",
+        "adult": "Vuxenklass"
+      },
+      "languageLabel": "Spelspråk",
+      "languageHint": "Bestämmer vilken ordlista eleverna spelar med.",
+      "capMeter": "{count} av {limit} gratisklasser använda",
+      "create": "Skapa klass",
+      "creating": "Skapar…",
+      "retry": "Försök igen",
+      "createFailed": "Klassen kunde inte skapas. Kontrollera anslutningen och försök igen.",
+      "readyTitle": "Din klass är klar!",
+      "joinCode": "Anslutningskod",
+      "qrLabel": "QR-kod för anslutningslänken",
+      "startNow": "Starta ett spel nu",
+      "copyLink": "Kopiera inbjudningslänk",
+      "copied": "Kopierat",
+      "copyFailed": "Det gick inte att kopiera. Dela koden i stället.",
+      "noAccount": "Eleverna ansluter utan konto",
+      "showProjector": "Visa på projektorn",
+      "backHome": "Tillbaka till startsidan"
+    },
+    "host": {
+      "classLabel": "Klass",
+      "lateJoin": "Sen anslutning",
+      "lateJoinHint": "Elever kan ansluta även efter att rundan har börjat.",
+      "options": "Alternativ",
+      "optionsHide": "Dölj alternativ",
+      "retry": "Försök igen"
+    }
+  },
+  // @eduShell:end
+  // @eduPlans:start
+  "eduPlans": {
+    "hero": {
+      "sub": "Eleverna går med från vilken webbläsare som helst med en kod. Inga elevkonton, ingen reklam, inget att installera. Byggt för {count} språk, hebreiska från höger till vänster inräknat.",
+      "studentLead": "Jag är elev",
+      "studentJoin": "Gå med med en kod",
+      "proLink": "Teacher Pro från {price}/mån"
+    },
+    "how": {
+      "title": "Så går en lektion till",
+      "createTitle": "Skapa en klass",
+      "createBody": "Ge den ett namn och välj språk. Du får en kod och en QR-kod direkt.",
+      "shareTitle": "Eleverna går med",
+      "shareBody": "De skriver koden på valfri mobil, surfplatta eller Chromebook. Inga konton, ingen e-post.",
+      "playTitle": "Spela live",
+      "playBody": "Välj ett läge, visa det på tavlan och se resultaten så fort rundan är slut."
+    },
+    "modes": {
+      "title": "{count} sätt att spela samma ordlista",
+      "sub": "Vissa lägen körs på projektorn, andra på elevernas mobiler. Alla lägen är gratis.",
+      "moreLabel": "Fler lägen"
+    },
+    "pro": {
+      "trialLine": "Nya konton får de första {days} dagarna gratis. Avsluta när du vill."
+    },
+    "cards": {
+      "schoolMonthly": "Från {monthly} i månaden per lärare vid årsbetalning: upp till {save} % mindre än Teacher Pro per månad.",
+      "liveCapNote": "I alla planer: ett livespel rymmer upp till {players} spelare samtidigt."
+    },
+    "manage": {
+      "active": "Aktiv · {price}/mån",
+      "renews": "Förnyas {date} · {price}/mån",
+      "trialing": "Provperiod: {days} dagar kvar, sedan {price}/mån om du inte avslutar.",
+      "ends": "Avslutad. Pro gäller till {date}.",
+      "pastDue": "Din senaste betalning gick inte igenom. Uppdatera kortet under fakturering för att behålla Pro.",
+      "gifted": "Pro i gåva till {date}",
+      "giftedOpen": "Pro i gåva",
+      "giftedNote": "Inget att betala och inget att avsluta. Kontot går tillbaka till gratisplanen av sig självt."
+    },
+    "reports": {
+      "title": "Se vem som kämpade, efter varje spel",
+      "body": "Pro gör varje spel till en klassrapport: varje elevs träffsäkerhet, orden att repetera och en utskrivbar sida för föräldrar eller arbetslaget.",
+      "trialCta": "Prova Pro gratis i {days} dagar",
+      "buyCta": "Teacher Pro · {price}/mån",
+      "trialFine": "Gratis i {days} dagar, sedan {price}/mån. Avsluta när du vill."
+    },
+    "cap": {
+      "used": "{count} av {limit} gratisklasser använda",
+      "full": "Du använder alla {limit} gratisklasser",
+      "label": "Använda gratisklasser",
+      "cta": "Obegränsat med klasser med Pro"
+    }
+  }
+  // @eduPlans:end
 };
 
 export { sv };

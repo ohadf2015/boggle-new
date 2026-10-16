@@ -21,8 +21,10 @@ describe('multiplayer mode coach', () => {
     expect(mpCoachMode('not-a-mode')).toBeUndefined();
   });
 
-  it('a host who plays gets the same coach as a joining player', () => {
-    expect(src('host/HostView.tsx')).toMatch(/<MpModeCoach \/>/);
-    expect(src('player/PlayerView.tsx')).toMatch(/<MpModeCoach \/>/);
+  it('a host who plays and a joining player learn the mode in the same 3-2-1, never from a card over the live board', () => {
+    for (const view of ['host/HostView.tsx', 'player/PlayerView.tsx']) {
+      expect(src(view)).toMatch(/<MpCountdown\b/);
+      expect(src(view)).not.toMatch(/ModeCoach/);
+    }
   });
 });

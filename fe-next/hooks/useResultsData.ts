@@ -13,6 +13,7 @@
  * - Banner player/rank determination
  */
 
+import { roundHasScore } from '@/shared/utils/roundCelebration';
 import { useMemo, useCallback, useDeferredValue } from 'react';
 import {
   calculateAllPlayerArchetypes,
@@ -192,7 +193,7 @@ export function useResultsData({
 
   /** Whether current user won */
   const isCurrentUserWinner =
-    normalizeUsername(winner?.username) === normalizeUsername(username);
+    roundHasScore(sortedScores) && normalizeUsername(winner?.username) === normalizeUsername(username);
 
   /** Current player's rank (1-based: 1st, 2nd, 3rd, etc.) */
   const currentPlayerRank = useMemo(() => {

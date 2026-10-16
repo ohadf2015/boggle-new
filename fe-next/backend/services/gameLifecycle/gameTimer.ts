@@ -14,6 +14,7 @@ import { drainLife, areAllPlayersEliminated } from '../../modules/wordHuntManage
 import { isInProgress } from '../../utils/gameStateMachine';
 import { startBotsForGame, restoreBotsForGame } from './botGame';
 import { endGame } from './gameEnd';
+import { startRoomBossClock, tickRoomBoss, pauseRoomBoss, resumeRoomBoss } from '../classroomBoss/roomBoss';
 import { ensureLanguageLoaded } from '../../dictionary';
 import logger from '../../utils/logger';
 
@@ -63,6 +64,7 @@ export function startGameTimer(
     });
   }
 
+  startRoomBossClock(game);
   launchGameInterval(io, gameCode, timerSeconds * 1000, 0);
 
   // Start bots if any are in the game
@@ -224,6 +226,8 @@ function launchGameInterval(
       }
     }
 
+    tickRoomBoss(io, gameCode, currentGame, now);
+
     if (remainingTime <= 0) {
       clearGameTimer(gameCode);
       endGame(io, gameCode).catch(err => {
@@ -263,6 +267,7 @@ export function pauseGameTimer(io: Server, gameCode: string): { remainingTime: n
   const remainingTime = Math.ceil(remainingMs / 1000);
 
   clearGameTimer(gameCode);
+  pauseRoomBoss(game, now);
   updateGame(gameCode, {
     isPaused: true,
     pausedRemainingMs: remainingMs,
@@ -292,6 +297,7 @@ export function resumeGameTimer(io: Server, gameCode: string): { remainingTime: 
   const remainingTime = Math.ceil(remainingMs / 1000);
 
   updateGame(gameCode, { isPaused: false, pausedRemainingMs: null, remainingTime });
+  resumeRoomBoss(game);
   launchGameInterval(io, gameCode, remainingMs, game.timerElapsedOffsetMs ?? 0);
 
   broadcastToRoom(io, getGameRoom(gameCode), 'gameResumed', {

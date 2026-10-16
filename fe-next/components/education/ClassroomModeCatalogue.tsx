@@ -19,6 +19,7 @@ import {
   type CatalogueMode,
 } from './ClassroomModeCatalogueData';
 import { teacherGameMode } from '@/lib/education/gameModes';
+import { DeliveryTag } from './DeliveryTag';
 
 export interface ClassroomModeCatalogueProps {
   selected: CatalogueMode['id'];
@@ -196,6 +197,7 @@ export function ClassroomModeCardRow({ selected, recommended = null, selectedMin
                     name={t(catalogueKeys(mode).name)}
                     minutesLabel={t('education.modePicker.minutes', { count: cardMinutes })}
                     recommendedLabel={recommended === mode.id ? t('education.modePicker.recommended') : null}
+                    deliveryTag={<DeliveryTag delivery={mode.delivery} t={t} />}
                     selected={isLive}
                     busy={busy}
                     onPick={onPick}

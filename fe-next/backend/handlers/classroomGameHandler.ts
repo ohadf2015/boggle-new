@@ -24,6 +24,7 @@ import {
   resolveClassroomRole,
   resolveClassroomName,
 } from '../modules/supabase/classroomMembership.js';
+import { resolveCreatedRoomLanguage } from '../modules/classroomRoomLanguage.js';
 import { ensureJoinableClassroomGame } from './classroomGameJoinGate.js';
 import { registerClassroomRecoveryHandlers } from './classroomGameRecovery.js';
 import { registerClassroomGameEndHandlers } from './classroomGameEndHandler.js';
@@ -32,110 +33,20 @@ import { getAuthUserId } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
 import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
+import type { ClassroomBossId } from '@/shared/types/classroomBoss';
 import logger from '../utils/logger.js';
+import { createClassroomGameSchema, startClassroomGameSchema, getActiveGamesSchema, joinClassroomGameSchema, leaveClassroomGameSchema } from './classroomGameSchemas.js';
+import { refuseClassroomJoin } from './classroomJoinRefusal.js';
+import { resolveBossForTeacher } from '../services/classroomBoss/bossEntitlement.js';
 import { buildLiveRoundStartedEvent } from '../utils/educationRoundTelemetry';
 import {
   buildClassroomGameStartedEvent,
-  buildClassroomJoinRefusedEvent,
   captureEduServerEvents,
 } from '../utils/educationTelemetry';
-
-// ==========================================
-// Zod Schemas for classroom events
-// ==========================================
-
-const classroomIdSchema = z.string()
-  .uuid('classroomId must be a valid UUID');
-
-const createClassroomGameSchema = z.object({
-  classroomId: classroomIdSchema,
-  teacherId: z.string().uuid('teacherId must be a valid UUID'),
-  teacherName: usernameSchema,
-  gameCode: gameCodeSchema,
-  lessonIds: z.array(z.string().uuid()).max(20).optional(),
-  lessonNames: z.array(z.string().max(200)).max(20).optional(),
-  vocabularyWords: z.array(z.string().max(100)).max(500).optional(),
-  settings: z.object({
-    timerMinutes: z.number().int().min(1).max(30).optional(),
-    boardSize: z.enum(['small', 'medium', 'large']).optional(),
-    allowLateJoin: z.boolean().optional(),
-    gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'vocab-quiz', 'wordcraft']).optional(),
-    vocabQuizVariant: z.enum(['classic', 'boss']).optional(),
-    // Word Hunt: teacher-pinned target. Length/charset is re-checked against the
-    // lesson at game start (shared/utils/classroomHuntTarget), so this bound is
-    // only a payload-size guard.
-    targetWord: z.string().max(100).optional(),
-    // Vocab Quiz: the skill drilled and the round shape. All three are
-    // re-clamped in the engine against what the lesson can actually build, so
-    // these bounds are a payload guard, not the real limits.
-    vocabQuizFocus: z
-      .enum(['any', 'definition', 'synonym', 'antonym', 'context', 'multiple_meaning', 'roots_affixes'])
-      .optional(),
-    vocabQuizQuestionCount: z.number().int().min(4).max(30).optional(),
-    vocabQuizSeconds: z.number().int().min(5).max(90).optional(),
-    treasureChestsEnabled: z.boolean().optional(),
-    // Team battle (weekly teams / juegos en equipo).
-    playStyle: z.enum(['ffa', 'teams']).optional(),
-    teamCount: z.number().int().min(2).max(4).optional(),
-    // SPED-friendly accommodations.
-    accessibility: z.object({
-      largeText: z.boolean().optional(),
-      audioCues: z.boolean().optional(),
-      participationPoints: z.boolean().optional(),
-    }).optional(),
-  }).optional(),
-});
-
-const startClassroomGameSchema = z.object({
-  gameCode: gameCodeSchema,
-});
-
-const getActiveGamesSchema = z.object({
-  classroomId: classroomIdSchema,
-});
-
-const joinClassroomGameSchema = z.object({
-  gameCode: gameCodeSchema,
-  userId: z.string().uuid('userId must be a valid UUID'),
-  username: usernameSchema,
-});
-
-const leaveClassroomGameSchema = z.object({
-  gameCode: gameCodeSchema,
-  userId: z.string().uuid('userId must be a valid UUID'),
-});
 
 /**
  * Register classroom game socket event handlers
  */
-/**
- * Turn a student away from a live classroom game, and leave a record that they
- * were turned away.
- *
- * The refusal itself is unchanged — several of these strings are deliberately
- * vague, and this must not make them less so. What changes is that the server
- * now writes down which gate fired. Before this, a student who could not get in
- * left no row and no event anywhere, which is why the 2026-09-14 report could
- * not be diagnosed at all. See `buildClassroomJoinRefusedEvent`.
- */
-function refuseClassroomJoin(
-  socket: Socket,
-  gameCode: string,
-  reason: string,
-  payload: Record<string, unknown>,
-  classroomId: string | null
-): void {
-  socket.emit('classroomGameError', { ...payload, code: reason, gameCode });
-  const event = buildClassroomJoinRefusedEvent({
-    gameCode,
-    classroomId,
-    reason,
-    door: 'classroomBanner',
-    actorId: getAuthUserId(socket),
-  });
-  if (event) captureEduServerEvents([event]);
-}
-
 export function registerClassroomGameHandlers(io: Server, socket: Socket): void {
   registerClassroomRecoveryHandlers(socket);
   /**
@@ -157,11 +68,11 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     // Type assertion needed because gameCodeSchema/usernameSchema use compiled || fallback pattern
     const payload = validation.data as {
       classroomId: string; teacherId: string; teacherName: string; gameCode: string;
-      lessonIds?: string[]; lessonNames?: string[]; vocabularyWords?: string[];
+      lessonIds?: string[]; lessonNames?: string[]; vocabularyWords?: string[]; language?: string;
       settings?: {
         timerMinutes?: number; boardSize?: 'small' | 'medium' | 'large'; allowLateJoin?: boolean;
         gameMode?: 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'vocab-quiz' | 'wordcraft'; targetWord?: string;
-        vocabQuizVariant?: 'classic' | 'boss';
+        vocabQuizVariant?: 'classic' | 'boss'; classroomBossId?: ClassroomBossId;
         vocabQuizFocus?: PracticeFocusSetting;
         vocabQuizQuestionCount?: number; vocabQuizSeconds?: number;
         treasureChestsEnabled?: boolean;
@@ -201,6 +112,9 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
 
     try {
       // Build game data with settings (including gameMode, default to 'classic')
+      const classroomBossId = (payload.settings?.gameMode ?? 'classic') === 'classic'
+        ? await resolveBossForTeacher(payload.teacherId, payload.settings?.classroomBossId)
+        : undefined;
       const gameData: CreateClassroomGameData = {
         gameCode: payload.gameCode,
         classroomId: payload.classroomId,
@@ -209,6 +123,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
         lessonIds: payload.lessonIds || [],
         lessonNames: payload.lessonNames || [],
         vocabularyWords: payload.vocabularyWords || [],
+        language: await resolveCreatedRoomLanguage(payload.classroomId, payload.language, payload.vocabularyWords),
         settings: {
           timerMinutes: payload.settings?.timerMinutes,
           boardSize: payload.settings?.boardSize,
@@ -219,6 +134,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
           vocabQuizQuestionCount: payload.settings?.vocabQuizQuestionCount,
           vocabQuizSeconds: payload.settings?.vocabQuizSeconds,
           vocabQuizVariant: payload.settings?.gameMode === 'vocab-quiz' ? payload.settings?.vocabQuizVariant : undefined,
+          classroomBossId,
           treasureChestsEnabled: payload.settings?.treasureChestsEnabled ?? true,
           playStyle: payload.settings?.playStyle,
           teamCount: payload.settings?.teamCount,

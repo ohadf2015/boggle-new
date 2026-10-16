@@ -386,11 +386,13 @@ export function usePlayerGameEvents({
       // This prevents cascading re-renders (was 15+ individual updates)
       const isReconnect = data.reconnect === true;
       const storeUpdates: Record<string, unknown> = {};
-      if (!isReconnect) {
+      // A returning player can come back as a late join (seat dropped) and still own words this round.
+      const resumesWithWords = (isReconnect || data.lateJoin === true) && (ext.myFoundWords?.length ?? 0) > 0;
+      if (!isReconnect && !resumesWithWords) {
         // Fresh game: clear words + achievements
         storeUpdates.foundWords = [];
         storeUpdates.achievements = [];
-      } else if (ext.myFoundWords && ext.myFoundWords.length > 0) {
+      } else if (resumesWithWords && ext.myFoundWords) {
         // Reconnect snapshot: replay player's own words. Per-word score is not
         // persisted server-side (only the string list); total score is restored
         // separately via updateLeaderboard. score:0 is a UX placeholder.

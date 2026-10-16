@@ -12,6 +12,7 @@
 
 import { locales as LOCALES } from '@/lib/i18n';
 import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
+import { isClassroomLivePathname, readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
 import { EDUCATION_SEO_TOP_LEVEL_SEGMENTS } from '@/lib/navigation/educationSeoSegments';
 
 export interface SectionHomeParams {
@@ -113,6 +114,12 @@ function isMultiplayerClassroomPath(pathOnly: string, search: string): boolean {
 export function sectionHome({ pathname, locale: explicitLocale, search }: SectionHomeParams): string {
   const locale = explicitLocale || detectLocale(pathname) || 'en';
   const pathOnly = (pathname || '').split('?')[0].split('#')[0];
+
+  if (isClassroomLivePathname(pathOnly)) {
+    const { isClassroomHost } = readClassroomLiveFlags(pathOnly, new URLSearchParams(search || ''));
+    const destination = multiplayerExitDestination({ isClassroomMode: true, isHost: isClassroomHost, locale });
+    if (destination) return destination;
+  }
 
   if (search && isMultiplayerClassroomPath(pathOnly, search)) {
     const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);

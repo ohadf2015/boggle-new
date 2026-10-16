@@ -748,6 +748,17 @@ describe('registerStartGameHandler', () => {
       expect(mockEnsureLanguageLoaded).toHaveBeenCalledWith('sv');
     });
 
+    it('GIVEN a classroom room created in English WHEN a Hebrew-UI host starts it THEN the round loads English, not the host locale', async () => {
+      mockGetGame.mockReturnValue(makeGame({ language: 'en', isClassroom: true }));
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload({ language: 'he' }));
+
+      expect(mockEnsureLanguageLoaded).toHaveBeenCalledWith('en');
+      expect(mockEnsureLanguageLoaded).not.toHaveBeenCalledWith('he');
+    });
+
     it('falls back to English when neither payload nor game has a language', async () => {
       mockGetGame.mockReturnValue(makeGame({ language: undefined }));
       const { socket, handlers } = createMockSocket('socket-host');

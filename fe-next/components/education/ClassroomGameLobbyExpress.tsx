@@ -271,7 +271,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
             lessonCount: result.payload.lessonIds.length,
           };
           startedLessonIds = result.payload.lessonIds;
-          live.emit('createClassroomGame', result.payload);
+          live.emit('createClassroomGame', { ...result.payload, language: result.lesson.language });
 
           // Bookkeeping only, and AFTER the room is asked for: a throw in the
           // recents store must never be the reason a class has no game.

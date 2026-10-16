@@ -94,7 +94,7 @@ describe('Education Landing — authenticated dashboard shortcut', () => {
       profile: { display_name: 'Mr. Smith', user_role: 'teacher' },
     });
     render(<EducationPageClient />);
-    expect(mockReplace).toHaveBeenCalledWith('/en/education/classroom-game');
+    expect(mockReplace).toHaveBeenCalledWith('/en/teacher');
     expect(screen.queryByTestId('auth-dashboard-shortcut')).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
   });
@@ -116,7 +116,7 @@ describe('Education Landing — authenticated dashboard shortcut', () => {
       profile: { display_name: 'Ms. Jones', user_role: undefined, is_admin: true },
     });
     render(<EducationPageClient />);
-    expect(mockReplace).toHaveBeenCalledWith('/en/education/classroom-game');
+    expect(mockReplace).toHaveBeenCalledWith('/en/teacher');
   });
 
   it('does NOT show shortcut while auth is loading', () => {

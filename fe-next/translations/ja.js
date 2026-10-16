@@ -1,5 +1,61 @@
 // Ja translations
 const ja = {
+  // @eduBoss:start
+  "classroomBoss": {
+    "chestUpgraded": "ボス撃破! 宝箱がランクアップ!",
+    "topHitter": "ダメージ王",
+    "cardHow": "クラス全員で1体のボスに挑む。見つけた単語がそのまま攻撃に。",
+    "howTo": "単語を見つけてボスを攻撃しよう。7文字以上はクリティカル。長い単語で攻撃を止められる。",
+    "attackIn": "ボスの攻撃まで",
+    "attack": {
+      "freeze": "凍結がくる!",
+      "blur": "ぼかしがくる!",
+      "drain": "シールド吸収!"
+    },
+    "staggerHint": "長い単語 {n}/{need} でひるませる",
+    "shield": "クラスのシールド",
+    "topHitters": "ダメージランキング",
+    "noHitsYet": "単語を見つけてボスを攻撃しよう!",
+    "dmg": "ダメージ",
+    "crit": "クリティカル!",
+    "timeLeft": "残り時間",
+    "combo": "クラスコンボ",
+    "intro": "{name}があらわれた!",
+    "enraged": "激怒!",
+    "phaseChange": "フェーズ{n}!",
+    "staggered": "ひるんだ! 攻撃キャンセル",
+    "blocked": "クラスのシールドで防いだ!",
+    "landed": {
+      "freeze": "マスが凍った!",
+      "blur": "文字がぼやけた!",
+      "drain": "シールドが吸われた!"
+    },
+    "healed": "ボスが回復 +{n}",
+    "defeated": "{name}をたおした!",
+    "escaped": "{name}に逃げられた!",
+    "dealtPct": "クラスで{pct}%のダメージ",
+    "phase": "フェーズ {n} / 3",
+    "hpLeft": "残りHP {pct}%",
+    "phaseShort": "フェーズ{n}",
+    "yourDamage": "あなたのダメージ",
+    "critDamage": "クリティカル +{n}",
+    "plusDamage": "+{n} ダメージ",
+    "phoneWon": "ボスをたおした! ナイスチームワーク",
+    "warnPhone": "あと{s}秒で攻撃。長い単語で止めよう!",
+    "phoneLanded": {
+      "freeze": "凍ったマスがある! ほかのマスを使おう",
+      "blur": "少しのあいだ文字がぼやける",
+      "drain": "クラスのシールドが吸われた"
+    },
+    "frozenRejected": "凍ったマスを通っています",
+    "picker": {
+      "title": "ボス",
+      "unlock": "Pro: 10体すべて",
+      "lockedName": "{name}(Pro)",
+      "freeHint": "無料プランはレキシコンドラゴンと対戦。Proなら10体すべて選べます。"
+    }
+  },
+  // @eduBoss:end
   // @eg6Land:start
   "eg6Land": {
     "vsGimkit": {
@@ -112,7 +168,7 @@ const ja = {
     },
     "pro": {
       "rosterPro": "名簿の生徒数は無制限",
-      "liveCap": "ライブゲームは同時に{count}人まで参加できます",
+      "liveCap": "どのプランでも、ライブゲームには同時に最大{count}人まで参加できます。",
       "mastery": "習熟ヒートマップ：生徒ごとの習得単語",
       "missedPractice": "実際の苦手からつくる再練習ラウンド",
       "reports": "印刷できるクラスレポート"
@@ -133,8 +189,19 @@ const ja = {
         "odds": {
           "label": "宝箱の確率"
         },
-        "continue": "つづける",
-        "tapToOpen": "タップして開く"
+        "continue": "受け取る",
+        "tapToOpen": "タップして開く",
+        "headline": {
+          "common": "コモン宝箱！",
+          "rare": "レア宝箱！",
+          "epic": "エピック宝箱！"
+        },
+        "chip": {
+          "label": "ゲットしたもの",
+          "cash": "このラウンドの所持金",
+          "xp": "XP",
+          "item": "新アイテム"
+        }
       },
       "reward": {
         "title": "ラウンド報酬",
@@ -172,7 +239,11 @@ const ja = {
         }
       },
       "goal": {
-        "save": "{name}まであと{missing}",
+        "save": {
+          "hintReveal": "次のラウンドであと{missing}ためるとヒント（単語の最初の文字）が買えます",
+          "doubleCash": "次のラウンドであと{missing}ためると30秒間お金が2倍になります",
+          "streakShield": "次のラウンドであと{missing}ためると連続記録を守るシールドが買えます"
+        },
         "ready": "{name}を買えます"
       },
       "hud": {
@@ -592,9 +663,9 @@ const ja = {
         "3": "制限時間は短め。1語1語が勝負です。"
       },
       "bossBattle": {
-        "1": "意味が表示され、全員がスマホで答えます。",
-        "2": "正解するたびにドラゴンにダメージ。3連続正解で2倍ダメージ。",
-        "3": "問題がなくなる前にHPを0にしよう。"
+        "1": "全員のスマホに同じ文字盤。みんなで同じ盤面から単語を探す。",
+        "2": "見つけた単語がボスへの攻撃に。7文字以上はクリティカル、素早く続けるとクラスコンボ。",
+        "3": "長い単語でシールドをため、攻撃を止める。時間切れまでにHPをゼロにしよう。"
       }
     },
     "boss": {
@@ -14117,12 +14188,12 @@ const ja = {
       "assignmentLimitTitle": "課題の上限に達しました",
       "assignmentLimitMessage": "このクラスの無料課題を{{limit}}件中{{current}}件作成しました。Proにアップグレードすると課題は無制限。",
       "upgradeProDescription": "Proなら、クラス数も1クラスあたりの生徒数も無制限。指導の拡大に制限はありません。",
-      "trialExpiredTitle": "無料トライアルが終了しました",
-      "trialExpiredMessage": "14日間の教師トライアルが終了しました。Proならクラス無制限、ライブゲーム、進捗レポートを引き続き使えます。",
+      "trialExpiredTitle": "無料プラン以上の機能が必要ですか？",
+      "trialExpiredMessage": "無料プランは期限なしで使い続けられます。Proならクラス数無制限と進捗レポートが加わり、新しいアカウントは14日間無料です。",
       "continueFree": "無料プランで続ける",
       "proFeatures": "Proに含まれるもの",
       "unlimitedClasses": "無制限のクラス",
-      "unlimitedStudents": "1クラスあたり無制限の生徒",
+      "unlimitedStudents": "各クラスの名簿は人数無制限",
       "priceUSD": "Proサブスクリプション",
       "perMonth": "/月",
       "autoRenew": "毎月自動更新されます。いつでも解約できます。",
@@ -14131,8 +14202,8 @@ const ja = {
       "trialOfferTitle": "Teacher Proを14日間無料で試す",
       "trialOfferBody": "クラスもレポートも無制限。14日間無料、その後は月額9ドル。いつでも解約できます。",
       "trialCtaSubtext": "14日間無料、その後は月額9ドル。いつでも解約できます。",
-      "trialEndedTitle": "トライアル終了。クラスを維持するにはアップグレードしてください",
-      "trialEndedBody": "月額9ドルで無制限クラスと印刷レポートを維持できます。無料トライアルの再付与ではありません。",
+      "trialEndedTitle": "Proの無料体験が終了しました。クラスはそのまま残ります。",
+      "trialEndedBody": "無料プランでも全クラスで遊べます。Proなら月$9でクラス数無制限と印刷用レポートが戻ります。新しい無料体験ではありません。",
       "trialEndedCta": "Proを続ける（月額9ドル）",
       "trialReactivateCta": "再有効化",
       "trialLifecycleTitle": "Teacher Proトライアル残り{count}日",
@@ -14157,7 +14228,7 @@ const ja = {
       "freePlanName": "無料",
       "freeForever": "無料プラン、期限なし",
       "freeClasses": "最大{count}クラス",
-      "freeStudents": "クラスあたり最大{count}人",
+      "freeStudents": "各クラスの名簿に最大{count}人",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "拡大に必要なすべて",
       "popular": "一番人気",
@@ -14194,7 +14265,7 @@ const ja = {
         "included": "含む",
         "notIncluded": "含まない",
         "classes": "クラス数",
-        "studentsPerClass": "1クラスあたりの生徒数",
+        "studentsPerClass": "クラス名簿の人数",
         "customLists": "オリジナル単語リスト",
         "duels": "対戦デュエル",
         "noAds": "生徒には広告なし",
@@ -15957,8 +16028,8 @@ const ja = {
     },
     "landing": {
       "pro": {
-        "title": "プランは2つ。裏はありません。",
-        "subtitle": "最初の授業に必要なものはすべて無料です。Pro は上限を外すためのプラン。",
+        "title": "無料プランでゲームを。Teacher Proで学びの成果を。",
+        "subtitle": "1回のゲームのあとに、つまずいた生徒、もう一度教えたい単語、間違いから作る練習がわかります。",
         "comparisonAlt": "無料プランと Teacher Pro の比較",
         "freeTier": "無料",
         "perMonth": "/月",
@@ -15967,7 +16038,7 @@ const ja = {
         "noAds": "生徒には広告なし",
         "customLists": "自分だけの単語リスト",
         "duels": "リアルタイムの単語バトル",
-        "freeForever": "無料プランに期限はありません。カード登録も試用期限もありません。",
+        "freeForever": "無料プランに期限はなく、カードも不要です。",
         "proTier": "Teacher Pro",
         "everythingInFree": "無料プランの全機能",
         "classLimitPro": "クラス数は無制限",
@@ -20505,8 +20576,264 @@ const ja = {
     "done": "完了",
     "pulseTitle": "クラスの様子",
     "projector": "プロジェクター"
-  }
+  },
   // @hqCalm:end
+  // @eduLiveRoom:start
+  "eduLiveRoom": {
+    "round": {
+      "boardLabel": "クラスの盤面",
+      "wheelLabel": "クラスの文字ホイール"
+    },
+    "lobby": {
+      "brand": "クラス",
+      "joinAt": "参加はこちら",
+      "joined": "{count}人参加",
+      "waitingTitle": "生徒の参加を待っています",
+      "waitingHint": "QRを読み取るか、上のアドレスでコードを入力",
+      "startBlocked": "生徒が1人参加するとスタートできます",
+      "copyLink": "リンクをコピー",
+      "minutes": "{count}分",
+      "leave": "ルームを出る",
+      "moreJoined": "ほか{count}人",
+      "readyCount": "{total}人中{ready}人準備OK"
+    },
+    "student": {
+      "youreIn": "参加できました！",
+      "watchBoard": "大きな画面を見てね。先生がゲームを始めます。",
+      "inClass": "クラス{count}人",
+      "changeLook": "見た目を変える",
+      "leave": "退出"
+    },
+    "entry": {
+      "connecting": "クラスに接続中…",
+      "openingRoom": "ルームを準備中…",
+      "waitingTeacher": "先生がまだゲームを開いていません",
+      "waitingTeacherHint": "このまま待っていてね。始まったらすぐ参加できます。",
+      "noRoomTitle": "ここにゲームはありません",
+      "noRoomStudent": "先生にコードを聞いて参加しよう。",
+      "noRoomHost": "先生ホームからゲームを始めましょう。",
+      "enterCode": "コードを入力",
+      "toTeacher": "先生ホームに戻る"
+    },
+    "hostResults": {
+      "noScoresHint": "同じ盤面でもう一度。クラスにもう一回チャンスを。",
+      "title": "ラウンド結果",
+      "statStudents": "生徒",
+      "statWords": "見つけた単語",
+      "statAvg": "平均スコア",
+      "statLesson": "授業の単語",
+      "playAgain": "もう一度",
+      "nextMode": "次のモード",
+      "viewReport": "レポートを見る",
+      "endGame": "ゲームを終了",
+      "noScores": "このラウンドは誰も得点できませんでした"
+    },
+    "studentResults": {
+      "placed": "あなたの順位",
+      "rankOf": "{total}人中{rank}位",
+      "points": "ポイント",
+      "yourWords": "あなたの単語",
+      "noWords": "今回は単語なし。次こそ！",
+      "nextRound": "次のラウンドは画面に注目",
+      "leave": "退出",
+      "calculating": "単語を集計中…"
+    }
+  }
+  // @eduLiveRoom:end
+  ,
+  // @eduShell:start
+  "eduShell": {
+    "nav": {
+      "home": "ホーム",
+      "library": "ライブラリ",
+      "pro": "Pro"
+    },
+    "brand": {
+      "name": "LexiClash",
+      "tagline": "先生向け",
+      "homeLink": "先生向けLexiClash ホーム"
+    },
+    "account": {
+      "menuLabel": "アカウントメニュー",
+      "fallbackName": "先生",
+      "profile": "プロフィール",
+      "help": "ヘルプ",
+      "whatsNew": "新着情報"
+    },
+    "delivery": {
+      "projector": "プロジェクター",
+      "phones": "スマホで",
+      "both": "どちらでも"
+    },
+    "home": {
+      "regionLabel": "先生のホーム",
+      "railLabel": "今週の様子とプラン",
+      "greetMorning": "おはようございます、{name}さん",
+      "greetAfternoon": "こんにちは、{name}さん",
+      "greetEvening": "こんばんは、{name}さん",
+      "greetNoName": "おかえりなさい",
+      "startWith": "ゲームを始めるクラス：",
+      "switchClass": "クラスを選ぶ",
+      "startLive": "ライブゲームを始める",
+      "yourClasses": "あなたのクラス",
+      "newClass": "新しいクラス",
+      "colClass": "クラス",
+      "colStudents": "生徒",
+      "colLastPlayed": "最後のプレイ",
+      "students": "生徒 {count}人",
+      "notPlayedRecently": "30日間プレイなし",
+      "playWith": "{name}でゲームを始める",
+      "reviewTitle": "間違えた単語を練習する"
+    },
+    "week": {
+      "title": "今週",
+      "games": "プレイしたゲーム",
+      "students": "生徒の合計",
+      "active": "活動中のクラス",
+      "empty": "最初のゲームのあと、ここに数字が表示されます。",
+      "unavailable": "今週の数字を読み込めませんでした。次回また表示されます。"
+    },
+    "pro": {
+      "title": "毎回のゲーム後、つまずいた生徒が分かる",
+      "points": {
+        "struggled": "誰がどの単語でつまずいたか",
+        "reteach": "明日もう一度教えるべき単語",
+        "classes": "クラス数無制限、レポートも印刷可能"
+      },
+      "cta": "Proでできること",
+      "trialCta": "14日間の無料体験を始める",
+      "trialFine": "14日間無料、その後は月{price}。いつでも解約できます。",
+      "dismiss": "今はしない"
+    },
+    "onboarding": {
+      "title": "3ステップで最初のクラスゲーム",
+      "titleCompact": "準備をあと少しで完了",
+      "progress": "{total}つ中{done}つ完了",
+      "dismiss": "準備ステップを隠す",
+      "steps": {
+        "createClass": {
+          "title": "クラスを作る",
+          "body": "名前と言語だけ。20秒で終わります。",
+          "cta": "最初のクラスを作る"
+        },
+        "shareCode": {
+          "title": "参加コードを共有する",
+          "body": "生徒はどの端末からでも参加できます。アカウントは不要です。",
+          "cta": "参加コードを表示する"
+        },
+        "tryDemo": {
+          "title": "2分のゲームを試す",
+          "body": "短いラウンドを1回。まだ誰も参加していなければ、ロビーで練習用ボットを追加できます。",
+          "cta": "2分のゲームを始める"
+        }
+      }
+    },
+    "setup": {
+      "title": "新しいクラス",
+      "subtitle": "選ぶのは3つだけ。あとから変更できます。",
+      "stepsLabel": "クラス作成の進み具合",
+      "step1": "クラスの情報",
+      "step2": "コードを共有",
+      "nameLabel": "クラス名",
+      "namePlaceholder": "例：5年B組 英語",
+      "defaultName": "クラス{n}",
+      "gradeLabel": "学年・年齢",
+      "grade": {
+        "k2": "幼児〜小2",
+        "g35": "小3〜小5",
+        "g68": "小6〜中2",
+        "g912": "中3〜高3",
+        "adult": "大人"
+      },
+      "gradeName": {
+        "k2": "幼児〜小2クラス",
+        "g35": "小3〜小5クラス",
+        "g68": "小6〜中2クラス",
+        "g912": "中3〜高3クラス",
+        "adult": "大人のクラス"
+      },
+      "languageLabel": "ゲームの言語",
+      "languageHint": "生徒が使う辞書の言語になります。",
+      "capMeter": "無料クラス {limit}つ中{count}つ使用中",
+      "create": "クラスを作る",
+      "creating": "作成中…",
+      "retry": "もう一度試す",
+      "createFailed": "クラスを作成できませんでした。接続を確認して、もう一度お試しください。",
+      "readyTitle": "クラスの準備ができました！",
+      "joinCode": "参加コード",
+      "qrLabel": "参加リンクのQRコード",
+      "startNow": "今すぐゲームを始める",
+      "copyLink": "招待リンクをコピー",
+      "copied": "コピーしました",
+      "copyFailed": "コピーできませんでした。代わりにコードを共有してください。",
+      "noAccount": "生徒はアカウントなしで参加できます",
+      "showProjector": "プロジェクターに映す",
+      "backHome": "ホームに戻る"
+    },
+    "host": {
+      "classLabel": "クラス",
+      "lateJoin": "途中参加",
+      "lateJoinHint": "ラウンド開始後も生徒が参加できます。",
+      "options": "オプション",
+      "optionsHide": "オプションを隠す",
+      "retry": "もう一度試す"
+    }
+  },
+  // @eduShell:end
+  // @eduPlans:start
+  "eduPlans": {
+    "hero": {
+      "sub": "生徒はどのブラウザからでもコードで参加できます。生徒アカウントも広告もインストールも不要。ヘブライ語の右から左表示を含む{count}言語に対応しています。",
+      "studentLead": "生徒の方",
+      "studentJoin": "コードで参加",
+      "proLink": "Teacher Proは月{price}から"
+    },
+    "how": {
+      "title": "授業での使い方",
+      "createTitle": "クラスを作る",
+      "createBody": "名前と言語を決めるだけ。参加コードとQRコードがすぐに用意されます。",
+      "shareTitle": "生徒が参加する",
+      "shareBody": "スマホ、タブレット、Chromebookでコードを入力するだけ。アカウントもメールも不要です。",
+      "playTitle": "ライブで遊ぶ",
+      "playBody": "モードを選んで黒板に映せば、ラウンド終了と同時に結果がわかります。"
+    },
+    "modes": {
+      "title": "同じ単語リストで遊べる{count}つのモード",
+      "sub": "プロジェクターで遊ぶモードも、生徒のスマホで遊ぶモードもあります。どのモードも無料です。",
+      "moreLabel": "その他のモード"
+    },
+    "pro": {
+      "trialLine": "新しいアカウントは最初の{days}日間無料。いつでも解約できます。"
+    },
+    "cards": {
+      "schoolMonthly": "年払いで教員1人あたり月{monthly}から。月払いのTeacher Proより最大{save}%お得です。",
+      "liveCapNote": "どのプランでも、ライブゲームには同時に最大{players}人まで参加できます。"
+    },
+    "manage": {
+      "active": "利用中 · 月{price}",
+      "renews": "{date}に更新 · 月{price}",
+      "trialing": "無料体験：残り{days}日。解約しなければその後は月{price}です。",
+      "ends": "解約済み。{date}までProを使えます。",
+      "pastDue": "前回のお支払いが完了していません。Proを続けるには請求ページでカードを更新してください。",
+      "gifted": "{date}まで無償のPro",
+      "giftedOpen": "無償のPro",
+      "giftedNote": "お支払いも解約も不要です。期間が終わると自動で無料プランに戻ります。"
+    },
+    "reports": {
+      "title": "毎回のゲームのあとに、つまずいた生徒がわかる",
+      "body": "Proなら毎回のゲームがクラスのレポートになります。生徒ごとの正答率、もう一度教えたい単語、保護者や学年会に渡せる印刷用ページ。",
+      "trialCta": "Proを{days}日間無料で試す",
+      "buyCta": "Teacher Pro · 月{price}",
+      "trialFine": "{days}日間無料、その後は月{price}。いつでも解約できます。"
+    },
+    "cap": {
+      "used": "無料クラス{limit}つのうち{count}つを使用中",
+      "full": "無料クラス{limit}つをすべて使っています",
+      "label": "使用中の無料クラス",
+      "cta": "Proでクラス数無制限"
+    }
+  }
+  // @eduPlans:end
 };
 
 export { ja };

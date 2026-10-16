@@ -30,10 +30,12 @@ export default function ChestRewardCta({ gameCode, roundId }: ChestRewardCtaProp
         onClick={() => setOpening(true)}
         className="flex w-full items-center gap-3 rounded-2xl border-4 border-black bg-neo-lime p-3 text-start font-bold text-neo-navy shadow-[4px_4px_0_0_#000] active:translate-x-0.5 active:translate-y-0.5"
       >
+        {/* eslint-disable-next-line @next/next/no-img-element -- small transparent chest sprite */}
         <img src={chestArtSrc(reveal.rarity, false)} alt="" className="h-14 w-14 shrink-0 object-contain" />
         <span className="flex flex-col">
           <span className="text-lg">{collected ? t('economy.reward.collected') : t('economy.reward.ready')}</span>
           <span className="text-sm">{t('economy.chest.xp', { xp: reveal.xp })}</span>
+          {reveal.bossWin && <span className="text-sm">{t('classroomBoss.chestUpgraded')}</span>}
         </span>
       </button>
       {opening && (

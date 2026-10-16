@@ -23,6 +23,7 @@ import {
 } from '../modules/classroomEconomyService.js';
 import { loadConfig, saveEconomyConfig, readEconomy } from '../modules/classroomEconomyStore.js';
 import { grantRoundChest } from '../modules/classroomEconomyChest.js';
+import { roomBossWon } from '../services/classroomBoss/roomBoss.js';
 import { readLocker } from '../modules/classroomEconomyLocker.js';
 import logger from '../utils/logger.js';
 
@@ -164,7 +165,7 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
       return refusedTo(socket, 'requestReward', gameCode, reason, E.reward, null);
     }
     const summary = await roundSummaryFor(gameCode, roundId, userId);
-    const reveal = await grantRoundChest({ gameCode, roundId, userId, summary });
+    const reveal = await grantRoundChest({ gameCode, roundId, userId, summary, bossWin: roomBossWon(gameCode, roundId) });
     socket.emit(E.reward, reveal);
   });
 

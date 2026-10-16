@@ -37,7 +37,7 @@ function formatDate(iso: string, language: string): string {
 }
 
 export function TeacherWhatsNew() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   // Read after mount: localStorage is not available during SSR.
   const [unseen, setUnseen] = useState(false);
@@ -75,61 +75,72 @@ export function TeacherWhatsNew() {
         )}
       </button>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        {/* Light-only surface (Pitfalls Class 5): every child sets its own dark text. */}
-        <DialogContent
-          className="sm:max-w-lg bg-neo-cream dark:bg-neo-cream text-black dark:text-black border-3 border-black shadow-hard-lg rounded-neo overflow-hidden p-0"
-          hideCloseButton
-        >
-          <div className="bg-neo-lime px-5 py-4 border-b-3 border-black flex items-center justify-between gap-3">
-            <div>
-              <DialogTitle className="text-2xl font-neo-display font-black normal-case text-black">
-                {t('education.whatsNew.title')}
-              </DialogTitle>
-              <p className="text-sm font-bold text-black/70">{t('education.whatsNew.subtitle')}</p>
-            </div>
-            <DialogClose asChild>
-              <button className="text-black hover:bg-black/10 p-1 rounded transition-colors" aria-label={t('common.close')}>
-                <X className="size-5" />
-              </button>
-            </DialogClose>
-          </div>
-
-          <div className="max-h-[65dvh] overflow-y-auto p-5 space-y-6">
-            {TEACHER_CHANGELOG.map((entry) => (
-              <section key={entry.id} aria-labelledby={`whats-new-${entry.id}`}>
-                <p className="text-xs font-black uppercase tracking-wider text-black/60">{formatDate(entry.date, language)}</p>
-                <h3 id={`whats-new-${entry.id}`} className="font-neo-display font-black text-lg text-black mb-3">
-                  {t(`education.whatsNew.entries.${entry.id}.title`)}
-                </h3>
-                <ul className="space-y-2.5">
-                  {entry.items.map(({ key, icon }) => {
-                    const Icon = ICONS[icon];
-                    return (
-                      <li key={key} className="flex items-start gap-3">
-                        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan">
-                          <Icon className="size-4 text-black" aria-hidden="true" />
-                        </span>
-                        <span className="text-sm font-semibold leading-snug text-black">
-                          {t(`education.whatsNew.entries.${entry.id}.${key}`)}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            ))}
-          </div>
-
-          <div className="border-t-3 border-black p-4">
-            <DialogClose asChild>
-              <button className="w-full rounded-neo border-3 border-black bg-neo-black py-3 font-neo-display font-black uppercase text-white shadow-hard-sm">
-                {t('education.whatsNew.close')}
-              </button>
-            </DialogClose>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <TeacherWhatsNewDialog open={open} onOpenChange={setOpen} />
     </>
+  );
+}
+
+/** The changelog sheet alone, for callers with their own trigger (the teacher avatar menu). */
+export function TeacherWhatsNewDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const { t, language } = useLanguage();
+  useEffect(() => {
+    if (open) markTeacherUpdatesSeen();
+  }, [open]);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {/* Light-only surface (Pitfalls Class 5): every child sets its own dark text. */}
+      <DialogContent
+        className="sm:max-w-lg bg-neo-cream dark:bg-neo-cream text-black dark:text-black border-3 border-black shadow-hard-lg rounded-neo overflow-hidden p-0"
+        hideCloseButton
+      >
+        <div className="bg-neo-lime px-5 py-4 border-b-3 border-black flex items-center justify-between gap-3">
+          <div>
+            <DialogTitle className="text-2xl font-neo-display font-black normal-case text-black">
+              {t('education.whatsNew.title')}
+            </DialogTitle>
+            <p className="text-sm font-bold text-black/70">{t('education.whatsNew.subtitle')}</p>
+          </div>
+          <DialogClose asChild>
+            <button className="text-black hover:bg-black/10 p-1 rounded transition-colors" aria-label={t('common.close')}>
+              <X className="size-5" />
+            </button>
+          </DialogClose>
+        </div>
+
+        <div className="max-h-[65dvh] overflow-y-auto p-5 space-y-6">
+          {TEACHER_CHANGELOG.map((entry) => (
+            <section key={entry.id} aria-labelledby={`whats-new-${entry.id}`}>
+              <p className="text-xs font-black uppercase tracking-wider text-black/60">{formatDate(entry.date, language)}</p>
+              <h3 id={`whats-new-${entry.id}`} className="font-neo-display font-black text-lg text-black mb-3">
+                {t(`education.whatsNew.entries.${entry.id}.title`)}
+              </h3>
+              <ul className="space-y-2.5">
+                {entry.items.map(({ key, icon }) => {
+                  const Icon = ICONS[icon];
+                  return (
+                    <li key={key} className="flex items-start gap-3">
+                      <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan">
+                        <Icon className="size-4 text-black" aria-hidden="true" />
+                      </span>
+                      <span className="text-sm font-semibold leading-snug text-black">
+                        {t(`education.whatsNew.entries.${entry.id}.${key}`)}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
+
+        <div className="border-t-3 border-black p-4">
+          <DialogClose asChild>
+            <button className="w-full rounded-neo border-3 border-black bg-neo-black py-3 font-neo-display font-black uppercase text-white shadow-hard-sm">
+              {t('education.whatsNew.close')}
+            </button>
+          </DialogClose>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

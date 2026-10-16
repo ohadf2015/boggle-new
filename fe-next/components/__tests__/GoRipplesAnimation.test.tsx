@@ -40,7 +40,10 @@ vi.mock('framer-motion', () => {
     m: {
       div: MotionDiv,
       p: MotionP,
+      span: MotionDiv,
     },
+    // The countdown's per-mode how-to demo reads it.
+    useReducedMotion: () => true,
     AnimatePresence: ({ children }: React.PropsWithChildren<{ mode?: string }>) => React.createElement(React.Fragment, null, children),
   };
 });

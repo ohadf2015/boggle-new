@@ -1,5 +1,61 @@
 // EN translations
 const en = {
+  // @eduBoss:start
+  "classroomBoss": {
+    "chestUpgraded": "Boss defeated: your chest was upgraded!",
+    "topHitter": "Top hitter",
+    "cardHow": "The whole class vs one boss. Every word you find is a hit.",
+    "howTo": "Find words to hit the boss. 7+ letters crit. Long words block its attacks.",
+    "attackIn": "Boss attack in",
+    "attack": {
+      "freeze": "Freeze incoming!",
+      "blur": "Blur incoming!",
+      "drain": "Shield drain!"
+    },
+    "staggerHint": "{n}/{need} long words to stagger it",
+    "shield": "Class shield",
+    "topHitters": "Top hitters",
+    "noHitsYet": "Find words to hit the boss!",
+    "dmg": "damage",
+    "crit": "CRIT!",
+    "timeLeft": "Time left",
+    "combo": "Class combo",
+    "intro": "{name} appears!",
+    "enraged": "Enraged!",
+    "phaseChange": "Phase {n}!",
+    "staggered": "Staggered! Attack cancelled",
+    "blocked": "Blocked by the class shield!",
+    "landed": {
+      "freeze": "Tiles frozen!",
+      "blur": "Letters blurred!",
+      "drain": "Shield drained!"
+    },
+    "healed": "Boss healed +{n}",
+    "defeated": "{name} defeated!",
+    "escaped": "{name} got away!",
+    "dealtPct": "Your class dealt {pct}% damage",
+    "phase": "Phase {n} of 3",
+    "hpLeft": "{pct}% HP left",
+    "phaseShort": "Phase {n}",
+    "yourDamage": "Your damage",
+    "critDamage": "CRIT +{n}",
+    "plusDamage": "+{n} damage",
+    "phoneWon": "Boss defeated! Great teamwork",
+    "warnPhone": "Attack in {s}s. Long words stop it!",
+    "phoneLanded": {
+      "freeze": "Frozen tiles! Use the others",
+      "blur": "Letters blurred for a moment",
+      "drain": "Your class shield got drained"
+    },
+    "frozenRejected": "That path uses a frozen tile",
+    "picker": {
+      "title": "Boss",
+      "unlock": "Pro: all 10 bosses",
+      "lockedName": "{name} (Pro)",
+      "freeHint": "Free classes fight the Lexicon Dragon. Pro unlocks all 10 bosses."
+    }
+  },
+  // @eduBoss:end
   // @eg6Land:start
   "eg6Land": {
     "vsGimkit": {
@@ -112,7 +168,7 @@ const en = {
     },
     "pro": {
       "rosterPro": "Unlimited students on your roster",
-      "liveCap": "Live games seat up to {count} players at once",
+      "liveCap": "Live games seat up to {count} players at once, on every plan.",
       "mastery": "Mastery heatmap: which words each student knows",
       "missedPractice": "Missed-practice rounds built from real gaps",
       "reports": "Printable class reports"
@@ -133,8 +189,19 @@ const en = {
         "odds": {
           "label": "Chest odds"
         },
-        "continue": "Continue",
-        "tapToOpen": "Tap to open"
+        "continue": "Collect",
+        "tapToOpen": "Tap to open",
+        "headline": {
+          "common": "Common chest!",
+          "rare": "Rare chest!",
+          "epic": "Epic chest!"
+        },
+        "chip": {
+          "label": "What you got",
+          "cash": "cash this round",
+          "xp": "XP",
+          "item": "New item"
+        }
       },
       "reward": {
         "title": "Round reward",
@@ -172,7 +239,11 @@ const en = {
         }
       },
       "goal": {
-        "save": "Save {missing} more for {name}",
+        "save": {
+          "hintReveal": "Earn {missing} more cash next round to buy a hint (shows a word's first letter)",
+          "doubleCash": "Earn {missing} more cash next round to buy double cash for 30 seconds",
+          "streakShield": "Earn {missing} more cash next round to buy a shield for your streak"
+        },
         "ready": "{name} is yours to buy"
       },
       "hud": {
@@ -592,9 +663,9 @@ const en = {
         "3": "The clock is short, so every word counts."
       },
       "bossBattle": {
-        "1": "A meaning goes up and everyone answers on their phone.",
-        "2": "Every right answer hits the dragon; a streak of three hits double.",
-        "3": "Knock its HP to zero before the questions run out."
+        "1": "Letters go up on every phone. Everyone hunts words on the same board.",
+        "2": "Every word hits the boss. 7+ letters crit, fast words build the class combo.",
+        "3": "Long words charge the shield and stop attacks. Knock it to zero before time runs out."
       }
     },
     "boss": {
@@ -13322,12 +13393,12 @@ const en = {
       "assignmentLimitTitle": "Assignment limit reached",
       "assignmentLimitMessage": "You've created {{current}} of {{limit}} free assignments for this class. Upgrade to Pro for unlimited assignments.",
       "upgradeProDescription": "Pro gives you unlimited classrooms and unlimited students per class.",
-      "trialExpiredTitle": "Your free trial has ended",
-      "trialExpiredMessage": "Your 14-day teacher trial is over. Keep going with Pro: unlimited classes, live games, and progress reports.",
+      "trialExpiredTitle": "Want more than the free plan?",
+      "trialExpiredMessage": "The free plan keeps working with no time limit. Pro adds unlimited classes and progress reports, and new accounts get 14 days free.",
       "continueFree": "Continue with free tier",
       "proFeatures": "Pro includes",
       "unlimitedClasses": "Unlimited classrooms",
-      "unlimitedStudents": "Unlimited students per classroom",
+      "unlimitedStudents": "Unlimited students on every class roster",
       "priceUSD": "Pro subscription",
       "perMonth": "/month",
       "autoRenew": "Renews automatically each month. Cancel anytime.",
@@ -13336,8 +13407,8 @@ const en = {
       "trialOfferTitle": "Try Teacher Pro free for 14 days",
       "trialOfferBody": "Unlimited classes and reports. Free for 14 days, then $9/month. Cancel anytime.",
       "trialCtaSubtext": "Free for 14 days, then $9/month. Cancel anytime.",
-      "trialEndedTitle": "Trial expired. Upgrade to keep your classrooms",
-      "trialEndedBody": "Keep unlimited classes and printable reports for $9/month. This is not another free trial.",
+      "trialEndedTitle": "Your Pro trial has ended. Your classes are safe.",
+      "trialEndedBody": "Free still runs every class. Pro brings back unlimited classes and printable reports for $9/month. This is not another free trial.",
       "trialEndedCta": "Keep Pro: $9/mo",
       "trialReactivateCta": "Reactivate",
       "trialLifecycleTitle": "{count} days left in your Teacher Pro trial",
@@ -13363,7 +13434,7 @@ const en = {
       "freePlanName": "Free",
       "freeForever": "Free plan, no expiry",
       "freeClasses": "Up to {count} classes",
-      "freeStudents": "Up to {count} students per class",
+      "freeStudents": "Up to {count} students on each class roster",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Everything you need to scale",
       "popular": "Most popular",
@@ -13400,7 +13471,7 @@ const en = {
         "included": "Included",
         "notIncluded": "Not included",
         "classes": "Classrooms",
-        "studentsPerClass": "Students per class",
+        "studentsPerClass": "Students on each class roster",
         "customLists": "Your own word lists",
         "duels": "Head-to-head duels",
         "noAds": "Ad-free for students",
@@ -14401,8 +14472,8 @@ const en = {
     },
     "landing": {
       "pro": {
-        "title": "Two plans. No tricks.",
-        "subtitle": "Everything that gets you to a first lesson is free. Pro lifts the caps.",
+        "title": "Free runs the game. Teacher Pro shows you what they learned.",
+        "subtitle": "After one game: who struggled, which words to reteach, and practice built from the misses.",
         "comparisonAlt": "Side-by-side comparison of the Free plan and Teacher Pro",
         "freeTier": "Free",
         "perMonth": "/month",
@@ -14411,7 +14482,7 @@ const en = {
         "noAds": "No advertising for your students",
         "customLists": "Your own word lists",
         "duels": "Live word duels",
-        "freeForever": "The free plan never expires. No card, no trial clock.",
+        "freeForever": "The free plan never expires and needs no card.",
         "proTier": "Teacher Pro",
         "everythingInFree": "Everything in Free",
         "classLimitPro": "Unlimited classrooms",
@@ -19564,8 +19635,264 @@ const en = {
     "done": "Done",
     "pulseTitle": "Class pulse",
     "projector": "Projector"
-  }
+  },
   // @hqCalm:end
+  // @eduLiveRoom:start
+  "eduLiveRoom": {
+    "round": {
+      "boardLabel": "Class board",
+      "wheelLabel": "Class wheel"
+    },
+    "lobby": {
+      "brand": "Class",
+      "joinAt": "Join at",
+      "joined": "{count} joined",
+      "waitingTitle": "Waiting for students",
+      "waitingHint": "Scan the QR or type the code at the address above",
+      "startBlocked": "Start opens once a student joins",
+      "copyLink": "Copy link",
+      "minutes": "{count} min",
+      "leave": "Leave room",
+      "moreJoined": "+{count} more",
+      "readyCount": "{ready} of {total} ready"
+    },
+    "student": {
+      "youreIn": "You're in!",
+      "watchBoard": "Watch the board. Your teacher starts the game.",
+      "inClass": "{count} in class",
+      "changeLook": "Change look",
+      "leave": "Leave"
+    },
+    "entry": {
+      "connecting": "Connecting to your class…",
+      "openingRoom": "Opening your room…",
+      "waitingTeacher": "Your teacher hasn't opened the game yet",
+      "waitingTeacherHint": "Stay here. You'll join the moment it starts.",
+      "noRoomTitle": "No game here",
+      "noRoomStudent": "Ask your teacher for the code, then join.",
+      "noRoomHost": "Start a game from your teacher home.",
+      "enterCode": "Enter a code",
+      "toTeacher": "Back to teacher home"
+    },
+    "hostResults": {
+      "noScoresHint": "Same board, fresh start. Play again and the class gets another go.",
+      "title": "Round results",
+      "statStudents": "Students",
+      "statWords": "Words found",
+      "statAvg": "Avg score",
+      "statLesson": "Lesson words",
+      "playAgain": "Play again",
+      "nextMode": "Next mode",
+      "viewReport": "View report",
+      "endGame": "End game",
+      "noScores": "No one scored this round"
+    },
+    "studentResults": {
+      "placed": "You placed",
+      "rankOf": "#{rank} of {total}",
+      "points": "points",
+      "yourWords": "Your words",
+      "noWords": "No words this round. Next time!",
+      "nextRound": "Eyes on the board for the next round",
+      "leave": "Leave",
+      "calculating": "Counting up the words…"
+    }
+  }
+  // @eduLiveRoom:end
+  ,
+  // @eduShell:start
+  "eduShell": {
+    "nav": {
+      "home": "Home",
+      "library": "Library",
+      "pro": "Pro"
+    },
+    "brand": {
+      "name": "LexiClash",
+      "tagline": "for Teachers",
+      "homeLink": "LexiClash for Teachers, home"
+    },
+    "account": {
+      "menuLabel": "Account menu",
+      "fallbackName": "Teacher",
+      "profile": "Profile",
+      "help": "Help",
+      "whatsNew": "What's new"
+    },
+    "delivery": {
+      "projector": "Projector",
+      "phones": "On phones",
+      "both": "Both"
+    },
+    "home": {
+      "regionLabel": "Teacher home",
+      "railLabel": "This week and your plan",
+      "greetMorning": "Good morning, {name}",
+      "greetAfternoon": "Good afternoon, {name}",
+      "greetEvening": "Good evening, {name}",
+      "greetNoName": "Welcome back",
+      "startWith": "Start a game with",
+      "switchClass": "Choose a class",
+      "startLive": "Start live game",
+      "yourClasses": "Your classes",
+      "newClass": "New class",
+      "colClass": "Class",
+      "colStudents": "Students",
+      "colLastPlayed": "Last played",
+      "students": "{count} students",
+      "notPlayedRecently": "No games in 30 days",
+      "playWith": "Start a game with {name}",
+      "reviewTitle": "Practise the missed words"
+    },
+    "week": {
+      "title": "This week",
+      "games": "Games played",
+      "students": "Total students",
+      "active": "Classes active",
+      "empty": "Your numbers show up here after your first game.",
+      "unavailable": "Couldn't load this week's numbers. They'll be back on the next visit."
+    },
+    "pro": {
+      "title": "See who struggled after every game",
+      "points": {
+        "struggled": "Who got stuck, word by word",
+        "reteach": "Which words to reteach tomorrow",
+        "classes": "Unlimited classes and printable reports"
+      },
+      "cta": "See what Pro adds",
+      "trialCta": "Start 14-day free trial",
+      "trialFine": "Free for 14 days, then {price}/month. Cancel anytime.",
+      "dismiss": "Not now"
+    },
+    "onboarding": {
+      "title": "Your first class game in 3 steps",
+      "titleCompact": "Finish setting up",
+      "progress": "{done} of {total} done",
+      "dismiss": "Hide setup steps",
+      "steps": {
+        "createClass": {
+          "title": "Create a class",
+          "body": "A name and a language. Takes 20 seconds.",
+          "cta": "Create your first class"
+        },
+        "shareCode": {
+          "title": "Share the join code",
+          "body": "Students join on any device. No accounts needed.",
+          "cta": "Show the join code"
+        },
+        "tryDemo": {
+          "title": "Try a 2-minute game",
+          "body": "Run a short round. Add practice bots in the lobby if no one has joined yet.",
+          "cta": "Start a 2-minute game"
+        }
+      }
+    },
+    "setup": {
+      "title": "New class",
+      "subtitle": "Three quick choices. You can change them later.",
+      "stepsLabel": "Class setup progress",
+      "step1": "Class details",
+      "step2": "Share the code",
+      "nameLabel": "Class name",
+      "namePlaceholder": "e.g. 5B English",
+      "defaultName": "Class {n}",
+      "gradeLabel": "Grade or age",
+      "grade": {
+        "k2": "K–2",
+        "g35": "Grades 3–5",
+        "g68": "Grades 6–8",
+        "g912": "Grades 9–12",
+        "adult": "Adults"
+      },
+      "gradeName": {
+        "k2": "K–2 class",
+        "g35": "Grades 3–5 class",
+        "g68": "Grades 6–8 class",
+        "g912": "Grades 9–12 class",
+        "adult": "Adult class"
+      },
+      "languageLabel": "Game language",
+      "languageHint": "Sets the dictionary your students play in.",
+      "capMeter": "{count} of {limit} free classes used",
+      "create": "Create class",
+      "creating": "Creating…",
+      "retry": "Try again",
+      "createFailed": "We couldn't create the class. Check your connection and try again.",
+      "readyTitle": "Your class is ready!",
+      "joinCode": "Join code",
+      "qrLabel": "QR code for the join link",
+      "startNow": "Start a game now",
+      "copyLink": "Copy invite link",
+      "copied": "Copied",
+      "copyFailed": "Couldn't copy. Share the code instead.",
+      "noAccount": "Students join with no account",
+      "showProjector": "Show on projector",
+      "backHome": "Back to Home"
+    },
+    "host": {
+      "classLabel": "Class",
+      "lateJoin": "Late join",
+      "lateJoinHint": "Students can still join after the round starts.",
+      "options": "Options",
+      "optionsHide": "Hide options",
+      "retry": "Try again"
+    }
+  },
+  // @eduShell:end
+  // @eduPlans:start
+  "eduPlans": {
+    "hero": {
+      "sub": "Students join from any browser with a code. No student accounts, no ads, nothing to install. Built for {count} languages, Hebrew right-to-left included.",
+      "studentLead": "I'm a student",
+      "studentJoin": "Join with a code",
+      "proLink": "Teacher Pro from {price}/mo"
+    },
+    "how": {
+      "title": "How a class runs",
+      "createTitle": "Make a class",
+      "createBody": "Name it, pick the language. You get a join code and a QR right away.",
+      "shareTitle": "Students join",
+      "shareBody": "They type the code on any phone, tablet or Chromebook. No accounts, no emails.",
+      "playTitle": "Play live",
+      "playBody": "Pick a mode, put it on the board, and see results the moment the round ends."
+    },
+    "modes": {
+      "title": "{count} ways to play the same word list",
+      "sub": "Some run on the projector, some on students' phones. Every mode is free.",
+      "moreLabel": "More modes"
+    },
+    "pro": {
+      "trialLine": "New accounts get the first {days} days free. Cancel anytime."
+    },
+    "cards": {
+      "schoolMonthly": "From {monthly} a month per teacher, billed yearly: up to {save}% less than monthly Teacher Pro.",
+      "liveCapNote": "Every plan: a live game seats up to {players} players at once."
+    },
+    "manage": {
+      "active": "Active · {price}/month",
+      "renews": "Renews on {date} · {price}/month",
+      "trialing": "Free trial: {days} days left, then {price}/month unless you cancel.",
+      "ends": "Cancelled. Pro stays on until {date}.",
+      "pastDue": "Your last payment didn't go through. Update your card in billing to keep Pro.",
+      "gifted": "Complimentary Pro until {date}",
+      "giftedOpen": "Complimentary Pro",
+      "giftedNote": "Nothing to pay and nothing to cancel. It switches back to Free on its own."
+    },
+    "reports": {
+      "title": "See who struggled, after every game",
+      "body": "Pro turns each game into a class report: every student's accuracy, the words to reteach, and a printable page for parents or your department.",
+      "trialCta": "Try Pro free for {days} days",
+      "buyCta": "Get Teacher Pro · {price}/month",
+      "trialFine": "Free for {days} days, then {price}/month. Cancel anytime."
+    },
+    "cap": {
+      "used": "{count} of {limit} free classes used",
+      "full": "You're using all {limit} free classes",
+      "label": "Free classes used",
+      "cta": "Unlimited classes with Pro"
+    }
+  }
+  // @eduPlans:end
 };
 
 export { en };

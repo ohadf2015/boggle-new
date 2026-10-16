@@ -21,12 +21,12 @@ import type { Mock } from 'vitest';
 
 // `t` interpolates in production, and the word count is a `{count}` param — a
 // key-only mock would make the count assertion below vacuous.
+// Stable like the real context's `t`: a fresh function per render re-runs the lobby's fetch effect forever.
+const { stableT } = vi.hoisted(() => ({
+  stableT: (key: string, params?: Record<string, unknown>) => (params ? `${key}|${JSON.stringify(params)}` : key),
+}));
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    t: (key: string, params?: Record<string, unknown>) =>
-      params ? `${key}|${JSON.stringify(params)}` : key,
-    language: 'en',
-  }),
+  useLanguage: () => ({ t: stableT, language: 'en' }),
 }));
 
 vi.mock('@/contexts/AuthContext', () => ({

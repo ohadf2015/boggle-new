@@ -28,8 +28,10 @@
 import { Maximize, Minimize } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ClassroomTvResults from '@/components/education/results/ClassroomTvResults';
+import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
 import { PROJECTOR_RESULTS_Z } from '@/lib/education/roundEndLayer';
 import { useTvFullscreen } from '../../hooks/useTvFullscreen';
+import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { PlayerResult } from '@/types/components';
 
@@ -51,7 +53,12 @@ export interface ClassroomTvResultsScreenProps {
   players?: PlayerResult[];
 }
 
-export function ClassroomTvResultsScreen({
+export function ClassroomTvResultsScreen(props: ClassroomTvResultsScreenProps) {
+  const EduResults = useEduLiveSurfaces().ClassroomResults;
+  return EduResults ? <EduResults {...props} /> : <SharedClassroomTvResultsScreen {...props} />;
+}
+
+function SharedClassroomTvResultsScreen({
   summary,
   onRematch,
   onClose,
@@ -105,7 +112,8 @@ export function ClassroomTvResultsScreen({
 
       {/* The shell is locked; this is the one region allowed to scroll (it
           rarely needs to — the recap is built to fit a 16:9 wall). */}
-      <div className="h-full px-3 pt-20 pb-4 md:px-8 md:pt-6 md:pb-6">
+      <div className="flex h-full flex-col gap-4 px-3 pt-20 pb-4 md:px-8 md:pt-6 md:pb-6">
+        <BossOutcomeCard size="tv" />
         <ClassroomTvResults
           summary={summary}
           onRematch={onRematch}

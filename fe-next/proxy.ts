@@ -1,3 +1,4 @@
+import { legacyClassroomLiveRedirect } from './lib/education/classroomLivePath';
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { matchAcceptLanguage } from './lib/localeResolution';
@@ -67,13 +68,18 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const classroomLive = pathnameHasLocale ? legacyClassroomLiveRedirect(pathname, request.nextUrl.search) : null;
+  if (classroomLive) {
+    return NextResponse.redirect(new URL(classroomLive, request.url), 307);
+  }
+
   const isBot = isBotRequest(request);
 
   // Routes that need Supabase session refresh (game pages, auth)
   // API routes handle their own auth — skip proxy refresh to avoid 200-500ms overhead.
   // Public routes (landing, SEO, static pages) skip auth for faster navigation.
   const AUTH_ROUTES = [
-    '/multiplayer', '/singleplayer', '/adventure', '/daily',
+    '/multiplayer', '/education/live', '/singleplayer', '/adventure', '/daily',
     '/challenge', '/join', '/brain', '/custom', '/party-screen',
     '/teacher', '/student', '/auth', '/settings', '/profile',
   ];

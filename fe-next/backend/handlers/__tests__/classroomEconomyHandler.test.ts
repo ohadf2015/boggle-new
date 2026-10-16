@@ -48,6 +48,7 @@ vi.mock('../../modules/gameStateManager', () => ({
 vi.mock('../classroomSocketAuth.js', () => ({ getAuthUserId: () => 'u1' }));
 vi.mock('../../utils/rateLimiter.js', () => ({ checkRateLimit: () => true }));
 
+import { recordRoomBossOutcome } from '../../services/classroomBoss/roomBoss';
 import {
   economyOnWordAccepted,
   registerClassroomEconomyHandlers,
@@ -106,6 +107,18 @@ describe('classroomEconomy:requestReward', () => {
     await handlers['classroomEconomy:requestReward']({ gameCode: 'ABC', roundId: '7' });
     expect(grant).toHaveBeenCalledWith(expect.objectContaining({ gameCode: 'ABC', roundId: '7', userId: 'u1', summary: { roundCash: 12, rank: 2, size: 3 } }));
     expect(emitted).toEqual([{ event: 'classroomEconomy:reward', data: reveal }]);
+  });
+
+  it('Given the class beat the boss this round, Then the chest is asked for one tier up; otherwise it is not', async () => {
+    memGame.value = { gameSessionId: 7, gameState: 'finished', cachedResultsPayload: { gameSessionId: 7 }, users: SEATED_USERS };
+    grant.mockResolvedValue(reveal);
+    handlerSocket();
+    recordRoomBossOutcome('ABC', '7', 'defeated');
+    await handlers['classroomEconomy:requestReward']({ gameCode: 'ABC', roundId: '7' });
+    expect(grant).toHaveBeenLastCalledWith(expect.objectContaining({ bossWin: true }));
+    recordRoomBossOutcome('ABC', '7', 'escaped');
+    await handlers['classroomEconomy:requestReward']({ gameCode: 'ABC', roundId: '7' });
+    expect(grant).toHaveBeenLastCalledWith(expect.objectContaining({ bossWin: false }));
   });
 
   it('Given a student who joined through the base multiplayer join (not in the class roster), Then the chest is still rolled', async () => {

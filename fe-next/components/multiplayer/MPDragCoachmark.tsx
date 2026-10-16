@@ -155,9 +155,6 @@ export const MPDragCoachmark: React.FC<Props> = ({
       className="pointer-events-none absolute inset-0 z-30"
       data-testid="mp-drag-coachmark"
     >
-      {/* Soft veil to focus attention without blocking the wheel touches */}
-      <div className="absolute inset-0 bg-neo-navy/30" aria-hidden />
-
       {/* Halos at letter targets */}
       {[0, 1, 2].map(i => (
         <div
@@ -197,7 +194,8 @@ export const MPDragCoachmark: React.FC<Props> = ({
       />
 
       {/* Bottom label pill + dismiss */}
-      <div className="absolute bottom-2 inset-x-0 flex flex-col items-center gap-2">
+      {/* Hangs under the board, never over a tile the clock is running on. */}
+      <div className="absolute top-full mt-2 inset-x-0 flex flex-col items-center gap-2">
         <div
           className={cn(
             'px-4 py-2 rounded-neo border-neo-thick font-neo-display font-bold text-sm sm:text-base shadow-hard',

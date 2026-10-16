@@ -105,7 +105,7 @@ describe('Education Landing — redesign (WU-9)', () => {
 
     it('sends the teacher to the live lobby instead of a start-game button on the catalog', () => {
       render(<EducationPageClient />);
-      expect(mockReplace).toHaveBeenCalledWith('/en/education/classroom-game');
+      expect(mockReplace).toHaveBeenCalledWith('/en/teacher');
       expect(screen.queryByText('education.landing.startGame')).not.toBeInTheDocument();
     });
 
@@ -156,7 +156,7 @@ describe('Education Landing — redesign (WU-9)', () => {
      */
     it('shows the classroom setup steps to a visitor who has not signed up', () => {
       render(<EducationPageClient />);
-      for (const id of ['create', 'share', 'join', 'play', 'results']) {
+      for (const id of ['create', 'share', 'play']) {
         expect(screen.getByTestId(`onboarding-step-${id}`)).toBeInTheDocument();
       }
     });

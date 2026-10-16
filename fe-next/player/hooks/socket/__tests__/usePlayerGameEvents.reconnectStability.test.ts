@@ -43,8 +43,8 @@ describe('usePlayerGameEvents — MP stability fixes 2026-05-10', () => {
     });
 
     it('clears foundWords ONLY when not reconnecting', () => {
-      // The `foundWords: []` clear must be inside the !isReconnect branch
-      const branch = /if\s*\(\s*!isReconnect\s*\)\s*\{[\s\S]{0,200}storeUpdates\.foundWords\s*=\s*\[\]/;
+      // The `foundWords: []` clear must be inside the not-resuming branch (a late-join resume with words also keeps them)
+      const branch = /if\s*\(\s*!isReconnect\s*&&\s*!resumesWithWords\s*\)\s*\{[\s\S]{0,200}storeUpdates\.foundWords\s*=\s*\[\]/;
       expect(source).toMatch(branch);
     });
 

@@ -10,6 +10,7 @@
 
 'use client';
 
+import type { ClassroomBossId } from '@/shared/types/classroomBoss';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { io, type Socket } from 'socket.io-client';
@@ -32,6 +33,8 @@ export interface ClassroomLaunchPayload {
   lessonIds: string[];
   lessonNames: string[];
   vocabularyWords: string[];
+  /** The selected list's language; the server reconciles it with the class language. */
+  language?: string;
   settings: {
     timerMinutes: number;
     boardSize: 'small' | 'medium' | 'large';
@@ -42,6 +45,7 @@ export interface ClassroomLaunchPayload {
     vocabQuizQuestionCount?: number;
     vocabQuizSeconds?: number;
     vocabQuizVariant?: VocabQuizVariant;
+    classroomBossId?: ClassroomBossId;
     playStyle: PlayStyle;
     teamCount?: number;
     accessibility?: ClassroomAccessibility;

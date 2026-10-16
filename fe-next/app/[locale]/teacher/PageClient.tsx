@@ -2,15 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
-import { TeacherProAskBanner } from '@/components/teacher/TeacherProAskBanner';
 import { TeacherProTrialEndedBanner } from '@/components/teacher/TeacherProTrialEndedBanner';
 import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTrialExpiringBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
-import { TeacherProTrialOfferBanner } from '@/components/teacher/TeacherProTrialOfferBanner';
 import { TeacherProUsagePromptCard } from '@/components/teacher/TeacherProUsagePromptCard';
-import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherProMilestone } from '@/hooks/useTeacherProMilestone';
@@ -23,10 +19,6 @@ import { pickTeacherBanner } from '@/lib/education/teacherBannerPriority';
 import { polarTrialUx, polarTrialDaysLeft, isPolarTrialDay10Expiring } from '@/lib/education/polarTrial';
 import { isTrialUpgradeNudgeWindow } from '@/lib/education/trial';
 import { useTrialUpgradeNudge } from '@/lib/education/useTrialUpgradeNudge';
-import {
-  TEACHER_PRO_CHECKOUT_PATH,
-  teacherProUpgradeCtaLabel,
-} from '@/components/education/TeacherProCheckoutCta';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
 // Access is settled by <TeacherGate> above: it owns the loading state and the
@@ -136,24 +128,27 @@ function TeacherDashboardInner() {
   const trialDaysLeft = polarTrialDaysLeft(trialExpires ?? periodEnd, nowMs);
   const isTrialExpiring = isPolarTrialDay10Expiring(trialDaysLeft);
 
+  // Free-teacher asks collapse into Home's ONE rail card; only trial account state stays a strip.
+  const proOffer =
+    banner === 'offerTrial'
+      ? { kind: 'trial' as const, onDismiss: dismissTrialOffer, tracked: true }
+      : banner === 'pro'
+        ? { kind: 'upgrade' as const, onDismiss: dismiss, tracked: true }
+        : banner === 'trial' && trialNudgeOpen && !trial?.isExpired
+          ? { kind: 'upgrade' as const, onDismiss: dismissTrialNudge, tracked: false }
+          : null;
+
   return (
     <TeacherDashboard
       pinBanner={
         (banner === 'trialing' && (!isTrialExpiring || !trialExpiringDismissed)) ||
         banner === 'reactivate'
       }
+      proOffer={proOffer}
       banner={
-        banner === 'trial' && trial ? (
-          <TrialUrgencyBanner
-            trial={trial}
-            href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
-            onDismiss={trialNudgeOpen ? dismissTrialNudge : undefined}
-            ctaLabel={trialNudgeOpen ? teacherProUpgradeCtaLabel(language) : undefined}
-          />
-        ) : banner === 'offerTrial' ? (
-          <TeacherProTrialOfferBanner onDismiss={dismissTrialOffer} />
-        ) : banner === 'pro' ? (
-          <TeacherProAskBanner onDismiss={dismiss} />
+        banner === 'trial' && trial?.isExpired ? (
+          // An expired access trial is account state: the renewal card, never dismissible.
+          <TrialUrgencyBanner trial={trial} href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`} />
         ) : banner === 'reactivate' ? (
           <TeacherProTrialEndedBanner onDismiss={dismissTrialEnded} />
         ) : banner === 'trialing' ? (
@@ -182,6 +177,9 @@ function TeacherDashboardInner() {
   );
 }
 
+import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
+import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProCheckoutCta';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 
 export default function TeacherPage() {

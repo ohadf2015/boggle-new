@@ -1,0 +1,74 @@
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen, cleanup, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
+
+const push = vi.fn();
+const signOut = vi.fn().mockResolvedValue(undefined);
+
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }));
+vi.mock('next/link', () => ({
+  __esModule: true,
+  default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
+}));
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'he' }),
+}));
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ profile: { display_name: 'Dana Levi', user_role: 'teacher' }, user: { email: 'dana@school.test' } }),
+}));
+vi.mock('@/lib/supabase', () => ({ signOut: () => signOut() }));
+vi.mock('@/components/teacher/TeacherWhatsNew', () => ({
+  TeacherWhatsNewDialog: ({ open }: { open: boolean }) => (open ? <div role="dialog">whats-new</div> : null),
+}));
+
+import { TeacherAccountMenu } from '../TeacherAccountMenu';
+
+afterEach(() => {
+  cleanup();
+  push.mockReset();
+});
+
+async function openMenu() {
+  await userEvent.click(screen.getByTestId('teacher-account-trigger'));
+  return screen.findByRole('menu');
+}
+
+describe('<TeacherAccountMenu>', () => {
+  it('Given a teacher, When the avatar is shown, Then it carries their initials and an accessible name', () => {
+    render(<TeacherAccountMenu proHref="/he/teacher/upgrade" profileHref="/he/teacher/profile" />);
+    const trigger = screen.getByTestId('teacher-account-trigger');
+    expect(trigger).toHaveTextContent('DL');
+    expect(trigger).toHaveAccessibleName('eduShell.account.menuLabel');
+  });
+
+  it('When opened, Then it lists Profile, Help, What’s new, Pro, Sign out and Exit education in the locale', async () => {
+    render(<TeacherAccountMenu proHref="/he/teacher/upgrade" profileHref="/he/teacher/profile" />);
+    await openMenu();
+    expect(screen.getByRole('menuitem', { name: /eduShell.account.profile/ })).toHaveAttribute('href', '/he/teacher/profile');
+    expect(screen.getByRole('menuitem', { name: /eduShell.account.help/ })).toHaveAttribute('href', '/he/education/help');
+    expect(screen.getByRole('menuitem', { name: /eduShell.account.whatsNew/ })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: /eduShell.nav.pro/ })).toHaveAttribute('href', '/he/teacher/upgrade');
+    expect(screen.getByRole('menuitem', { name: /auth.signOut/ })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: /education.header.exitEducation/ })).toHaveAttribute('href', '/he');
+  });
+
+  it('When What’s new is chosen, Then the changelog dialog opens', async () => {
+    render(<TeacherAccountMenu proHref="/he/teacher/upgrade" profileHref="/he/teacher/profile" />);
+    await openMenu();
+    await userEvent.click(screen.getByRole('menuitem', { name: /eduShell.account.whatsNew/ }));
+    expect(await screen.findByRole('dialog')).toHaveTextContent('whats-new');
+  });
+
+  it('When Sign out is chosen, Then the session ends and the teacher lands on the education landing', async () => {
+    render(<TeacherAccountMenu proHref="/he/teacher/upgrade" profileHref="/he/teacher/profile" />);
+    await openMenu();
+    await userEvent.click(screen.getByRole('menuitem', { name: /auth.signOut/ }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith('/he/education'));
+    expect(signOut).toHaveBeenCalled();
+  });
+});

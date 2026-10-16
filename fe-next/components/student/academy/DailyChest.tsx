@@ -17,6 +17,7 @@ import { GodRays } from '@/components/wordTowerV2/rewards/GodRays';
 import { CoinFountain } from '@/components/wordTowerV2/rewards/CoinFountain';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
 import { cn } from '@/lib/utils';
+import RewardChipRow, { XpIcon } from '@/components/education/rewards/RewardChipRow';
 import { toneStyle } from './chrome';
 import { canOpenChest, markChestOpened, clearChestOpened, claimDailyChestXp, DAILY_CHEST_XP } from './dailyChestStore';
 
@@ -144,9 +145,13 @@ export function DailyChest({ userId, reducedMotion, onGranted, size = 'sm' }: Pr
                 animate={{ y: 0, scale: 1 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.15 }}
               >
-                <p className={cn('rounded-neo border-3 px-5', claimFailed ? 'border-neo-cream bg-neo-navy-light text-neo-white/60 line-through' : 'border-neo-black bg-neo-lime text-neo-black', 'py-2 font-neo-display text-4xl font-black shadow-hard-lg tabular-nums sm:text-5xl')}>
-                  {t('academy.student.rewardXp', '+{xp} XP', { xp: shownXp })}
-                </p>
+                <div className={cn('w-40', claimFailed && 'line-through opacity-60')}>
+                  <RewardChipRow
+                    label={t('academy.student.chestTitle', 'Daily chest')}
+                    reduced={reducedMotion}
+                    chips={[{ id: 'xp', icon: <XpIcon />, value: <span dir="ltr">{`+${shownXp}`}</span>, label: t('economy.chest.chip.xp') }]}
+                  />
+                </div>
                 <p className="font-neo-display text-lg font-black uppercase text-neo-white">
                   {claimFailed
                     ? t('academy.student.chestFailed', "Couldn't save your XP — tap the chest to try again")

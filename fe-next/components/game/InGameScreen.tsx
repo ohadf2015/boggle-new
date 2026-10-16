@@ -39,7 +39,7 @@ import {
 
 // Extracted sub-components
 import { PortraitLayout } from './in-game/components';
-import ClassroomEconomyDock from '@/components/education/economy/ClassroomEconomyDock';
+import { MpTrayNudge } from '@/components/multiplayer/round/MpRoundTray';
 import { isClassroomStudentPlay as resolveClassroomStudentPlay } from '@/lib/education/classroomPlaySurface';
 import type { RoundEventState } from './in-game/components/RoundEventOverlay';
 import type { SpecialWordEvent } from './in-game/components/SpecialWordToast';
@@ -708,7 +708,6 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
   // Portrait/Desktop Layout
   return (
     <>
-      {isClassroomStudentPlay && gameCode && <ClassroomEconomyDock gameCode={gameCode} />}
       <PortraitLayout
         {...sharedLayoutProps}
         gameCode={gameCode}
@@ -725,15 +724,15 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
       >
         {children}
       </PortraitLayout>
-      {/* Stuck-player coach: fixed bottom-center, above the grid. Mobile + desktop. */}
+      {/* Stuck-player coach: under the board in the phone tray, else at the screen's foot. */}
       {stuckCoach.visible && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-4 z-[60] flex justify-center px-3">
+        <MpTrayNudge>
           <MPStuckCoachCard
             stage={stuckCoach.stage}
             exampleWord={coachExampleWord}
             onDismiss={() => stuckCoach.dismiss('manual')}
           />
-        </div>
+        </MpTrayNudge>
       )}
     </>
   );

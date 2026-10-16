@@ -16,12 +16,12 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { m } from 'framer-motion';
 import { Coins } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useSkipAnimations } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
+import CoinFlight from '@/components/education/rewards/CoinFlight';
 
 /** Most tokens we ever fly, however big the award. */
 const MAX_TOKENS = 8;
@@ -47,6 +47,8 @@ export function DuelCoinFlight({ coins, active, onComplete, className }: DuelCoi
   const [awarded, setAwarded] = useState(0);
   const [flying, setFlying] = useState(false);
   const completedRef = useRef(false);
+  const counterRef = useRef<HTMLDivElement>(null);
+  const launchRef = useRef<HTMLSpanElement>(null);
 
   const tokenCount = useMemo(() => {
     if (coins <= 0) return 0;
@@ -97,6 +99,7 @@ export function DuelCoinFlight({ coins, active, onComplete, className }: DuelCoi
     <div className={cn('relative inline-flex items-center', className)}>
       {/* The counter the coins land in */}
       <div
+        ref={counterRef}
         data-testid="duel-coin-counter"
         aria-live="polite"
         aria-label={t('education.duels.coinsEarned', undefined, { count: awarded })}
@@ -109,23 +112,17 @@ export function DuelCoinFlight({ coins, active, onComplete, className }: DuelCoi
         {awarded}
       </div>
 
-      {/* Coins in flight — they converge on the counter above */}
-      {flying &&
-        Array.from({ length: tokenCount }).map((_, index) => (
-          <m.div
-            key={`coin-${index}`}
-            data-testid="duel-coin-token"
-            aria-hidden="true"
-            className="pointer-events-none absolute start-1/2 top-1/2 h-5 w-5 rounded-full border-2 border-neo-black bg-neo-yellow shadow-hard-sm"
-            initial={{ x: (index - tokenCount / 2) * 26, y: 96, scale: 0.7 }}
-            animate={{ x: 0, y: 0, scale: 1 }}
-            transition={{
-              duration: FLIGHT_MS / 1000,
-              delay: (index * LANDING_INTERVAL_MS) / 1000,
-              ease: 'easeIn',
-            }}
-          />
-        ))}
+      {/* Coins launch from just below the counter and land in it */}
+      <span ref={launchRef} aria-hidden="true" className="pointer-events-none absolute start-1/2 top-full mt-20 h-px w-px" />
+      <CoinFlight
+        count={flying ? tokenCount : 0}
+        fromRef={launchRef}
+        toRef={counterRef}
+        size={20}
+        tokenTestId="duel-coin-token"
+        staggerMs={LANDING_INTERVAL_MS}
+        travelMs={FLIGHT_MS}
+      />
     </div>
   );
 }

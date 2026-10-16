@@ -11,7 +11,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('@/components/education/TeacherSetupSteps', () => ({
   TeacherSetupSteps: () => (
     <ol>
-      {['create', 'share', 'join', 'play', 'results'].map((id) => (
+      {['create', 'share', 'play'].map((id) => (
         <li key={id} data-testid={`onboarding-step-${id}`} />
       ))}
     </ol>
@@ -32,11 +32,11 @@ describe('LandingProofStrip', () => {
 });
 
 describe('LandingHowItWorks', () => {
-  it('leads with the answer-first question as the section heading and keeps all five setup steps public', () => {
+  it('leads with the answer-first question as the section heading and keeps the three setup steps public', () => {
     render(<LandingHowItWorks geo={{ question: 'How do I run it?', answer: 'Share a code.' }} />);
     expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('How do I run it?');
     expect(screen.getByText('Share a code.')).toBeInTheDocument();
-    for (const id of ['create', 'share', 'join', 'play', 'results']) {
+    for (const id of ['create', 'share', 'play']) {
       expect(screen.getByTestId(`onboarding-step-${id}`)).toBeInTheDocument();
     }
     expect(document.querySelector('section#how-it-works')).not.toBeNull();
@@ -44,7 +44,7 @@ describe('LandingHowItWorks', () => {
 
   it('falls back to its own heading without a geo answer', () => {
     render(<LandingHowItWorks />);
-    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('eg2Land.how.title');
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('eduPlans.how.title');
   });
 });
 

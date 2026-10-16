@@ -26,7 +26,8 @@ function MpComboMeterImpl({ level, className }: { level: number; className?: str
       aria-valuemax={COMBO_SEGMENTS}
       aria-valuenow={lit}
       aria-label={t('mpUi.round.combo', { level: lit })}
-      className={cn('flex items-end gap-[3px] h-[calc(22px*var(--mp-u,1))] lg:h-[calc(28px*var(--mp-u,1))]', className)}
+      // Phone: empty bars are top-bar clutter; the meter appears with the first combo.
+      className={cn('flex items-end gap-[3px] h-[calc(22px*var(--mp-u,1))] lg:h-[calc(28px*var(--mp-u,1))]', lit === 0 && 'max-lg:hidden', className)}
     >
       {Array.from({ length: COMBO_SEGMENTS }, (_, i) => {
         const on = i < lit;

@@ -52,13 +52,13 @@ describe('classroom mode catalogue data', () => {
     }
   });
 
-  it('offers Boss Battle as a class-vs-boss run of the quiz engine', () => {
+  it('offers Boss Battle as a class-vs-boss classic board (the free boss by default)', () => {
     const boss = catalogueEntry('boss-battle')!;
-    expect(boss.launch).toEqual({ gameMode: 'vocab-quiz', vocabQuizVariant: 'boss' });
+    expect(boss.launch).toEqual({ gameMode: 'classic', classroomBossId: 'lexiconDragon' });
     expect(boss.style).toBe('class');
-    expect(boss.category).toBe('meaning');
+    expect(boss.category).toBe('board');
     expect(catalogueKeys(boss).name).toBe('eg2Modes.boss.name');
-    expect(catalogueKeys(boss).how).toBe('eg2Modes.boss.how');
+    expect(catalogueKeys(boss).how).toBe('classroomBoss.cardHow');
   });
 
   it('shows Teams as the style only for a mode whose engine plays teams', () => {

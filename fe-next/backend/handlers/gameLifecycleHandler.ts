@@ -57,6 +57,7 @@ import { saveGameState } from '../redisClient.js';
 import { inc, ensureGame } from '../utils/metrics.js';
 import { generateRandomAvatar } from '../utils/gameUtils.js';
 import { getRandomLongWordsWithTheme, ensureLanguageLoaded } from '../dictionary.js';
+import { classroomRoomLanguage } from '../modules/classroomRoomLanguage.js';
 import logger from '../utils/logger.js';
 import { startGameTimer, endGame } from './shared.js';
 import { resendFinishedResults } from './finishedResultsResend';
@@ -179,6 +180,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       if (authUserId) {
         await handleExistingAuthConnection(io, socket, authUserId, gameCode);
       }
+      const roomLanguage = isClassroom ? await classroomRoomLanguage(gameCode, language) : (language || 'en');
 
       // Re-check after async yield — another socket may have created it
       if (gameExists(gameCode)) {
@@ -193,14 +195,14 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         hostUsername: hostUsername || 'Host',
         hostPlayerId: sanitizedPlayerId,
         roomName: roomName || gameCode,
-        language: language || 'en',
+        language: roomLanguage,
         isRanked: isRanked || false,
         isPrivate: isPrivate || false,
         isClassroom: isClassroom || false,
         allowLateJoin: isRanked ? false : true
       });
 
-      const gameLang = language || 'en';
+      const gameLang = roomLanguage;
       try {
         await ensureLanguageLoaded(gameLang);
         logger.debug('DICT', `Language ${gameLang} preloaded for game ${gameCode}`);
@@ -228,7 +230,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         isHost: true,
         username: hostUsername || 'Host',
         roomName: roomName || gameCode,
-        language: language || 'en',
+        language: roomLanguage,
         isPrivate: isPrivate || false,
         users: getGameUsers(gameCode)
       });
@@ -257,7 +259,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       notifyRoomCreated({
         gameCode,
         roomName: roomName || gameCode,
-        language: language || 'en',
+        language: roomLanguage,
         hostUsername: hostUsername || 'Host',
         isAuthenticated: !!authUserId,
         isRanked: isRanked || false

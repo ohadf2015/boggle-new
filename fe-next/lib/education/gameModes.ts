@@ -13,6 +13,7 @@
  * tables quietly disagreeing is recurring pitfall class 3.
  */
 
+import { fixedRoundSeconds } from '@/shared/utils/fixedRoundTimer';
 import {
   CLASSROOM_GAME_MODES,
   VOCAB_QUIZ_MODE,
@@ -73,7 +74,7 @@ const MODE_SHAPE: Record<string, ModeShape> = {
   classic: { poster: '/mascot/teacher/mode-classic-nobg.webp', accent: 'cyan', minutes: 3, needsDefinitions: false },
   'word-hunt': { poster: '/mascot/teacher/mode-word-hunt-nobg.webp', accent: 'lime', minutes: 4, needsDefinitions: false },
   blast: { poster: '/mascot/teacher/mode-blast-nobg.webp', accent: 'pink', minutes: 3, needsDefinitions: false },
-  'wheel-rush': { poster: '/mascot/teacher/mode-wheel-rush-v2-nobg.webp', accent: 'purple', minutes: 4, needsDefinitions: false },
+  'wheel-rush': { poster: '/mascot/teacher/mode-wheel-rush-v2-nobg.webp', accent: 'purple', minutes: Math.ceil(fixedRoundSeconds('wheel-rush')! / 60), needsDefinitions: false },
   [VOCAB_QUIZ_MODE]: { poster: '/mascot/teacher/mode-vocab-quiz-nobg.webp', accent: 'cyan', minutes: 5, needsDefinitions: true },
   wordcraft: { poster: '/mascot/teacher/mode-wordcraft-nobg.webp', accent: 'lime', minutes: 5, needsDefinitions: false },
 };
@@ -187,6 +188,8 @@ export function configuredRoundMinutes(
     if (!count || !seconds) return modeDurationMinutes(id);
     return Math.max(1, Math.round((count * (seconds + VOCAB_QUIZ_REVEAL_MS / 1000)) / 60));
   }
+  const fixed = fixedRoundSeconds(id);
+  if (fixed) return Math.max(1, Math.ceil(fixed / 60));
   if (settings.timerMinutes === undefined) return modeDurationMinutes(id);
   return Math.max(1, Math.round(settings.timerMinutes));
 }

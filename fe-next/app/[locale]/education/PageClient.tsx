@@ -6,19 +6,19 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { EducationHero } from '@/components/education/EducationHero';
 import { ProFramingSection } from '@/components/education/ProFramingSection';
-import { SixModeTour } from '@/components/education/SixModeTour';
 import { TeacherProCheckoutCta } from '@/components/education/TeacherProCheckoutCta';
 import { NoAccountCta } from '@/components/education/NoAccountCta';
 import { LandingHeader } from '@/components/education/landing/LandingHeader';
-import { LandingProofStrip } from '@/components/education/landing/LandingProofStrip';
+import { LandingModes } from '@/components/education/landing/LandingModes';
 import { LandingHowItWorks, type GeoAnswer } from '@/components/education/landing/LandingHowItWorks';
 import { LandingSchoolLead } from '@/components/education/landing/LandingSchoolLead';
 import { LandingFinalCta } from '@/components/education/landing/LandingFinalCta';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 
 /**
- * Teacher landing. Order: playable board → how a class runs → modes → price → proof → school quote → FAQ → close.
- * Approved teachers go to the live lobby; everyone else sees the page, including signed-in
+ * Teacher landing. Order: hero (start free, student join, the class moment) → how a class runs →
+ * modes → the one Pro section → school quote → FAQ → close.
+ * Approved teachers go to Teacher Home; everyone else sees the page, including signed-in
  * accounts without teacher access (every profile starts as `student`, so redirecting them
  * bounced players and fresh teacher signups to the student hub).
  */
@@ -32,7 +32,7 @@ export function PageClient({ geo, faq }: { geo?: GeoAnswer; faq?: ReactNode }) {
 
   useEffect(() => {
     if (hasTeacherAccess) {
-      router.replace(`/${language}/education/classroom-game`);
+      router.replace(`/${language}/teacher`);
     }
   }, [hasTeacherAccess, language, router]);
 
@@ -57,19 +57,13 @@ export function PageClient({ geo, faq }: { geo?: GeoAnswer; faq?: ReactNode }) {
       )}
       <EducationHero setupPending={setupPending} />
       <LandingHowItWorks geo={geo} />
-      <div id="modes">
-        <SixModeTour />
-      </div>
-      <ProFramingSection />
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <TeacherProCheckoutCta locale={language} />
-      </div>
-      <LandingProofStrip />
+      <LandingModes />
+      <ProFramingSection cta={<TeacherProCheckoutCta locale={language} variant="inline" />} />
       <LandingSchoolLead />
       {faq}
       <LandingFinalCta setupPending={setupPending} />
       <div className="mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6 lg:px-8">
-        <NoAccountCta locale={language} />
+        <NoAccountCta locale={language} compact />
       </div>
     </main>
   );

@@ -23,8 +23,8 @@ export default function EconomyHud({ snapshot }: EconomyHudProps) {
   const doubling = snapshot.doubleCashMsLeft > 0;
 
   return (
-    <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-sm font-bold text-white" aria-live="polite">
-      <span className="relative inline-flex items-baseline gap-2 text-2xl font-black" data-testid="hud-cash">
+    <div className="flex min-w-0 items-center justify-between gap-2 whitespace-nowrap text-sm font-bold text-white" aria-live="polite">
+      <span className="relative inline-flex items-baseline gap-2 font-neo-display text-xl font-black" data-testid="hud-cash">
         <span>{t('economy.hud.cash', { cash: snapshot.cash })}</span>
         {delta?.kind === 'correct' && delta.delta > 0 && !reduced && (
           <span key={`burst-${snapshot.cashEarned}`} aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 h-0 w-0">
@@ -44,7 +44,7 @@ export default function EconomyHud({ snapshot }: EconomyHudProps) {
         {delta?.kind === 'correct' && delta.delta > 0 && (
           <m.span
             key={`${snapshot.cashEarned}-${delta.delta}`}
-            className="relative text-2xl text-neo-lime"
+            className="relative text-xl text-neo-lime"
             initial={reduced ? false : { scale: 1.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 380, damping: 12 }}

@@ -1,5 +1,6 @@
 'use client';
 
+import { readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
@@ -67,9 +68,10 @@ export default function MultiplayerError({
               // MP entry — never the LexiClash homepage.
               const search = typeof window !== 'undefined' ? window.location.search : '';
               const query = new URLSearchParams(search);
+              const flags = readClassroomLiveFlags(typeof window !== 'undefined' ? window.location.pathname : '', query);
               const action = mpExit('error', {
-                isClassroomMode: query.get('classroom') === 'true',
-                isHost: query.get('host') === 'true',
+                isClassroomMode: flags.isClassroomMode,
+                isHost: flags.isClassroomHost,
                 locale,
               });
               let target = `/${locale}/multiplayer`;

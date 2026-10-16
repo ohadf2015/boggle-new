@@ -42,7 +42,7 @@ describe('wordcraft is a classroom mode everywhere a teacher looks', () => {
   });
 
   it('is accepted by the createClassroomGame socket enum', () => {
-    const handler = readFileSync(join(FE_NEXT, 'backend', 'handlers', 'classroomGameHandler.ts'), 'utf8');
+    const handler = readFileSync(join(FE_NEXT, 'backend', 'handlers', 'classroomGameSchemas.ts'), 'utf8');
     expect(handler).toContain("'wordcraft'");
   });
 

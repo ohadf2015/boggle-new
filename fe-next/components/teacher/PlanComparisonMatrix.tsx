@@ -89,11 +89,11 @@ export function PlanComparisonMatrix({ compact = false }: { compact?: boolean } 
               >
                 {t('teacher.subscription.freePlanName')}
               </th>
-              {/* The paid column is the lime one everywhere else on this page; carrying that
+              {/* The paid column is the gold one everywhere else on this page; carrying that
                   through means the eye lands on it without the table needing a badge. */}
               <th
                 scope="col"
-                className={`${pad} text-center font-neo-display font-black bg-neo-lime text-neo-navy text-sm sm:text-base`}
+                className={`${pad} text-center font-neo-display font-black bg-neo-yellow text-neo-navy text-sm sm:text-base`}
               >
                 {t('teacher.subscription.proPlanName')}
               </th>
@@ -111,7 +111,7 @@ export function PlanComparisonMatrix({ compact = false }: { compact?: boolean } 
                 <td className={`${pad} text-center text-neo-white`}>
                   <Cell value={row.free} />
                 </td>
-                <td className={`${pad} text-center text-neo-white bg-neo-lime/10`}>
+                <td className={`${pad} text-center text-neo-white bg-neo-yellow/10`}>
                   <Cell value={row.pro} />
                 </td>
               </tr>

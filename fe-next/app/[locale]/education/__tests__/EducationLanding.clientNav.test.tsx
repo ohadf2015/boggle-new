@@ -84,7 +84,7 @@ describe('Education Landing — teacher shortcuts navigate client-side', () => {
 
   it('sends the teacher to the classroom lobby with a client navigation, not a document reload', () => {
     render(<EducationPageClient />);
-    expect(mockReplace).toHaveBeenCalledWith('/en/education/classroom-game');
+    expect(mockReplace).toHaveBeenCalledWith('/en/teacher');
     expect(mockPush).not.toHaveBeenCalled();
   });
 });

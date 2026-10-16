@@ -9,6 +9,7 @@ import { StartButton } from '../pre-game/StartButton';
 import { BattleModeCard } from '../pre-game/BattleModeCard';
 import { LobbyReactions } from '@/components/lobby/LobbyReactions';
 import ProjectorLobby from '@/components/education/projector/ProjectorLobby';
+import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import { useHostSelectedGameMode } from '@/hooks/gameState/store';
 import { useGameActions } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
@@ -112,6 +113,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   classroomTemplateSettings = null,
 }) => {
   const { isAdmin, canSeeInWorkModes } = useAuth();
+  const ClassroomLobby = useEduLiveSurfaces().ProjectorLobby ?? ProjectorLobby;
   // Display the server-owned auto-start countdown on the TV screen too, with a
   // Cancel so a spectating host can still abort (the start itself fires from
   // HostView's hook regardless of which lobby surface is mounted).
@@ -209,7 +211,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   if (isClassroomMode) {
     return (
       <>
-        <ProjectorLobby
+        <ClassroomLobby
           gameCode={gameCode}
           language={roomLanguage}
           students={projectorStudents}

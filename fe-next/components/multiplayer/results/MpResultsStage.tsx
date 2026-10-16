@@ -30,6 +30,7 @@ import { MpNextModeCard } from './MpNextModeCard';
 import { MpFinalFooter, MpIntermissionFooter } from './MpResultsFooter';
 import MpResultsDetails from './MpResultsDetails';
 import ChestRewardCta from '@/components/education/economy/ChestRewardCta';
+import { rewardRoundId } from '@/shared/constants/classroomEconomy';
 import RoundShop from '@/components/education/economy/RoundShop';
 import { MpRoundAwards, MpSeriesGrid } from './MpResultsAlbum';
 import { roundAwards, seriesGrid } from './mpResultsStory';
@@ -42,6 +43,8 @@ import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
 import { myMissedWords } from '@/components/student/live/missedWords';
 import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
+import { useClassroomBossStore } from '@/stores/classroomBossStore';
 
 const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/MultiplayerSignupSheet'), { ssr: false });
 const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
@@ -191,6 +194,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const awards = useMemo(() => (grid ? null : roundAwards(data.sortedScores)), [grid, data.sortedScores]);
 
   const exitCopy = resultsExitCopy({ isClassroom: c.isClassroom, isHost });
+  const bossOutcome = useClassroomBossStore((s) => s.view?.status === 'defeated' || s.view?.status === 'escaped');
 
   const header = (
     <MpResultsHeader
@@ -216,7 +220,9 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       )}
     >
       <div aria-hidden="true" className={fx.halftone} />
-      <div className="min-h-0 flex-1 flex flex-col justify-center gap-[calc(8px*var(--mp-u,1))] lg:h-full">
+      <BossOutcomeCard size="phone" className="relative z-10 shrink-0 lg:col-span-2" />
+      {/* On a phone the class outcome takes the standings' slot (the column cannot fit both); wide screens show both. */}
+      <div className={cn('min-h-0 flex-1 flex-col justify-center gap-[calc(8px*var(--mp-u,1))] lg:flex lg:h-full', bossOutcome ? 'hidden' : 'flex')}>
         {champions.length > 0 && (
           <p data-testid="mp-series-champion" className={cn('shrink-0 self-center inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-0.5 text-neo-black font-bold text-[calc(12px*var(--mp-u,1))]', fx.chipPop)}>
             <Trophy aria-hidden="true" className="w-4 h-4" />
@@ -275,7 +281,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         />
         </div>
         {classroomStudent && props.gameCode && (
-          <ChestRewardCta gameCode={props.gameCode} roundId={props.gameSessionId != null ? String(props.gameSessionId) : null} />
+          <ChestRewardCta gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
         )}
         {classroomStudent && props.gameCode && <RoundShop gameCode={props.gameCode} />}
         {classroomStudent ? (

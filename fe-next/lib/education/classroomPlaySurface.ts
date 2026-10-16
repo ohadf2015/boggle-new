@@ -19,9 +19,16 @@
  * path segments instead; `usePathname()` carries no query string, so it cannot
  * use this. The two are not duplicates — they read different things.
  */
+import { isClassroomLivePathname, readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
+
 export function isClassroomStudentPlay(
   params: URLSearchParams | null | undefined,
+  pathname: string | null | undefined = typeof window !== 'undefined' ? window.location.pathname : null,
 ): boolean {
+  if (isClassroomLivePathname(pathname)) {
+    const flags = readClassroomLiveFlags(pathname, params);
+    return !flags.isClassroomHost;
+  }
   if (!params) return false;
   // Literal 'true' only. `?classroom=1` is not a shape anything in this repo
   // emits, and accepting truthy-looking values would let a stray link quietly

@@ -11,7 +11,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
-import { EducationHeader } from '@/components/education/EducationHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { NeoPanel } from '@/components/ui/panel';
@@ -235,7 +234,6 @@ function ProfileShell({ children }: { children: ReactNode }) {
   return (
     <EducationShell
       className={cn(language === 'he' && 'rtl')}
-      header={<EducationHeader showBackButton />}
       scrollRegionLabel={t('teacher.shell.profileLabel')}
       contentClassName="px-4 py-6 sm:px-6 lg:px-8"
     >

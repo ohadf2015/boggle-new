@@ -7,13 +7,13 @@
  * mode-reveal / countdown overlays. Views render inside their piece's screen
  * stub (PlayerLobbyScreen, MpRoundScreen, MpCountdown). FROZEN after FOUNDATION.
  */
+import { useClassroomBossSocket } from '@/hooks/useClassroomBossSocket';
 import React, { memo, useMemo } from 'react';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import PlayerWaitingView from './components/PlayerWaitingView';
 import PlayerInGameView from './components/PlayerInGameView';
 import FirstTimeAchievement from '../components/game/FirstTimeAchievement';
 import ModeRevealOverlay from '@/components/game/ModeRevealOverlay';
-import { MpModeCoach } from '@/components/tutorial/MpModeCoach';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Loader2 } from 'lucide-react';
 import { sendCountdownComplete, consumeStashedMessageId } from '@/shared/utils/gameEventUtils';
@@ -39,6 +39,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
     showTournamentStandings, setShowTournamentStandings, handleWordSubmit, handleResetCombo, hints, earthquakeState,
     fireRoundActive, fireRoundRemaining, boardTheme, totalGameTimeRef,
   } = usePlayerPhase(props);
+  useClassroomBossSocket(socket, gameCode);
   const boardWaiting = useBoardWaitingScreen(socket, waitingForResults); // a quiz room has no board clock
   const inRound = useMemo(
     () => (isClassroomMode ? withoutClassroomHost(leaderboard, playersReady) : { leaderboard, users: playersReady }),
@@ -146,7 +147,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
           onIntroDismiss={() => dispatchReveal({ type: 'endReveal' })}
         />
       )}
-      <MpModeCoach />
       {showStartAnimation && (
         <MpCountdown>
         <GoRipplesAnimation

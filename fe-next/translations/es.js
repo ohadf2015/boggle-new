@@ -1,5 +1,61 @@
 // Es translations
 const es = {
+  // @eduBoss:start
+  "classroomBoss": {
+    "chestUpgraded": "¡Jefe derrotado: tu cofre subió de nivel!",
+    "topHitter": "Más daño",
+    "cardHow": "Toda la clase contra un jefe. Cada palabra que encuentras es un golpe.",
+    "howTo": "Encuentra palabras para golpear al jefe. Con 7+ letras, golpe crítico. Las palabras largas frenan sus ataques.",
+    "attackIn": "Ataque del jefe en",
+    "attack": {
+      "freeze": "¡Viene una helada!",
+      "blur": "¡Viene un borrón!",
+      "drain": "¡Robo de escudo!"
+    },
+    "staggerHint": "{n}/{need} palabras largas para aturdirlo",
+    "shield": "Escudo de la clase",
+    "topHitters": "Más daño",
+    "noHitsYet": "¡Encuentra palabras para golpear al jefe!",
+    "dmg": "daño",
+    "crit": "¡CRÍTICO!",
+    "timeLeft": "Tiempo",
+    "combo": "Combo de la clase",
+    "intro": "¡Aparece {name}!",
+    "enraged": "¡Furioso!",
+    "phaseChange": "¡Fase {n}!",
+    "staggered": "¡Aturdido! Ataque cancelado",
+    "blocked": "¡El escudo de la clase lo paró!",
+    "landed": {
+      "freeze": "¡Letras congeladas!",
+      "blur": "¡Letras borrosas!",
+      "drain": "¡Escudo robado!"
+    },
+    "healed": "El jefe se curó +{n}",
+    "defeated": "¡{name} derrotado!",
+    "escaped": "¡{name} se escapó!",
+    "dealtPct": "Tu clase hizo {pct}% de daño",
+    "phase": "Fase {n} de 3",
+    "hpLeft": "Le queda {pct}% de vida",
+    "phaseShort": "Fase {n}",
+    "yourDamage": "Tu daño",
+    "critDamage": "CRÍTICO +{n}",
+    "plusDamage": "+{n} de daño",
+    "phoneWon": "¡Jefe derrotado! Gran trabajo en equipo",
+    "warnPhone": "Ataque en {s} s. ¡Las palabras largas lo frenan!",
+    "phoneLanded": {
+      "freeze": "¡Letras congeladas! Usa las demás",
+      "blur": "Las letras se ven borrosas un momento",
+      "drain": "Le robaron el escudo a tu clase"
+    },
+    "frozenRejected": "Esa palabra pasa por una letra congelada",
+    "picker": {
+      "title": "Jefe",
+      "unlock": "Pro: los 10 jefes",
+      "lockedName": "{name} (Pro)",
+      "freeHint": "Las clases gratis se enfrentan al Dragón del Léxico. Pro desbloquea los 10 jefes."
+    }
+  },
+  // @eduBoss:end
   // @eg6Land:start
   "eg6Land": {
     "vsGimkit": {
@@ -112,7 +168,7 @@ const es = {
     },
     "pro": {
       "rosterPro": "Alumnado ilimitado en tu lista",
-      "liveCap": "Los juegos en vivo admiten hasta {count} jugadores a la vez",
+      "liveCap": "En todos los planes, una partida en vivo admite hasta {count} jugadores a la vez.",
       "mastery": "Mapa de dominio: qué palabras domina cada alumno",
       "missedPractice": "Rondas de repaso creadas a partir de fallos reales",
       "reports": "Informes de clase imprimibles"
@@ -133,8 +189,19 @@ const es = {
         "odds": {
           "label": "Probabilidades del cofre"
         },
-        "continue": "Continuar",
-        "tapToOpen": "Toca para abrir"
+        "continue": "Recoger",
+        "tapToOpen": "Toca para abrir",
+        "headline": {
+          "common": "¡Cofre común!",
+          "rare": "¡Cofre raro!",
+          "epic": "¡Cofre épico!"
+        },
+        "chip": {
+          "label": "Lo que ganaste",
+          "cash": "dinero de esta ronda",
+          "xp": "XP",
+          "item": "Objeto nuevo"
+        }
       },
       "reward": {
         "title": "Recompensa de la ronda",
@@ -172,7 +239,11 @@ const es = {
         }
       },
       "goal": {
-        "save": "Ahorra {missing} más para {name}",
+        "save": {
+          "hintReveal": "Consigue {missing} más en la próxima ronda y podrás comprar una pista (la primera letra de una palabra)",
+          "doubleCash": "Consigue {missing} más en la próxima ronda y podrás comprar dinero doble durante 30 segundos",
+          "streakShield": "Consigue {missing} más en la próxima ronda y podrás comprar un escudo para tu racha"
+        },
         "ready": "{name} ya puedes comprarlo"
       },
       "hud": {
@@ -592,9 +663,9 @@ const es = {
         "3": "Hay poco tiempo: cada palabra cuenta."
       },
       "bossBattle": {
-        "1": "Aparece un significado y todos responden en el móvil.",
-        "2": "Cada acierto golpea al dragón; una racha de tres golpea doble.",
-        "3": "Bájenle la vida a cero antes de que se acaben las preguntas."
+        "1": "Las mismas letras en cada móvil. Todos buscan palabras en el mismo tablero.",
+        "2": "Cada palabra golpea al jefe. Con 7+ letras es crítico y las palabras rápidas suben el combo de la clase.",
+        "3": "Las palabras largas cargan el escudo y frenan ataques. Déjalo en cero antes de que acabe el tiempo."
       }
     },
     "boss": {
@@ -14066,12 +14137,12 @@ const es = {
       "assignmentLimitTitle": "Límite de tareas alcanzado",
       "assignmentLimitMessage": "Creaste {{current}} de {{limit}} tareas gratuitas para esta clase. Mejora a Pro para tener tareas ilimitadas.",
       "upgradeProDescription": "Pro te da aulas ilimitadas y estudiantes ilimitados por clase, sin límites.",
-      "trialExpiredTitle": "Tu prueba gratuita ha terminado",
-      "trialExpiredMessage": "Tu prueba de 14 días como docente ha terminado. Con Pro tienes clases ilimitadas, juegos en vivo e informes de progreso.",
+      "trialExpiredTitle": "¿Quieres más que el plan gratis?",
+      "trialExpiredMessage": "El plan gratis sigue funcionando sin límite de tiempo. Pro añade clases ilimitadas e informes de progreso, y las cuentas nuevas tienen 14 días gratis.",
       "continueFree": "Continuar con el plan gratuito",
       "proFeatures": "Pro incluye",
       "unlimitedClasses": "Aulas ilimitadas",
-      "unlimitedStudents": "Estudiantes ilimitados por aula",
+      "unlimitedStudents": "Estudiantes ilimitados en la lista de cada clase",
       "priceUSD": "Suscripción Pro",
       "perMonth": "/mes",
       "autoRenew": "Se renueva automáticamente cada mes. Cancela cuando quieras.",
@@ -14080,8 +14151,8 @@ const es = {
       "trialOfferTitle": "Prueba Teacher Pro 14 días gratis",
       "trialOfferBody": "Clases e informes ilimitados. Gratis 14 días y luego 9 $/mes. Cancela cuando quieras.",
       "trialCtaSubtext": "Gratis 14 días y luego 9 $/mes. Cancela cuando quieras.",
-      "trialEndedTitle": "Prueba caducada: mejora para conservar tus clases",
-      "trialEndedBody": "Conserva clases ilimitadas e informes imprimibles por 9 $/mes. No es otra prueba gratis.",
+      "trialEndedTitle": "Tu prueba de Pro terminó. Tus clases siguen a salvo.",
+      "trialEndedBody": "El plan gratis sigue funcionando en todas tus clases. Pro recupera las clases ilimitadas y los informes imprimibles por $9/mes. No es otra prueba gratis.",
       "trialEndedCta": "Seguir con Pro: 9 $/mes",
       "trialReactivateCta": "Reactivar",
       "trialLifecycleTitle": "Quedan {count} días de tu prueba de Teacher Pro",
@@ -14106,7 +14177,7 @@ const es = {
       "freePlanName": "Free",
       "freeForever": "Plan gratuito, sin caducidad",
       "freeClasses": "Hasta {count} clases",
-      "freeStudents": "Hasta {count} estudiantes por clase",
+      "freeStudents": "Hasta {count} estudiantes en la lista de cada clase",
       "proPlanName": "Teacher Pro",
       "unlimitedAccess": "Todo lo que necesitas para crecer",
       "popular": "Más popular",
@@ -14143,7 +14214,7 @@ const es = {
         "included": "Incluido",
         "notIncluded": "No incluido",
         "classes": "Clases",
-        "studentsPerClass": "Alumnos por clase",
+        "studentsPerClass": "Estudiantes por lista de clase",
         "customLists": "Tus propias listas de palabras",
         "duels": "Duelos cara a cara",
         "noAds": "Sin anuncios para el alumnado",
@@ -15906,8 +15977,8 @@ const es = {
     },
     "landing": {
       "pro": {
-        "title": "Dos planes. Sin trucos.",
-        "subtitle": "Todo lo que necesitas para dar tu primera clase es gratis. Pro quita los límites.",
+        "title": "El plan gratis lleva la partida. Teacher Pro te muestra lo que aprendieron.",
+        "subtitle": "Tras una partida: quién tuvo dificultades, qué palabras repasar y práctica hecha con los fallos.",
         "comparisonAlt": "Comparación entre el plan Gratis y Teacher Pro",
         "freeTier": "Gratis",
         "perMonth": "/mes",
@@ -15916,7 +15987,7 @@ const es = {
         "noAds": "Sin anuncios para tus estudiantes",
         "customLists": "Tus propias listas de palabras",
         "duels": "Duelos de palabras en vivo",
-        "freeForever": "El plan gratuito no caduca. Sin tarjeta y sin cuenta atrás.",
+        "freeForever": "El plan gratis no caduca y no pide tarjeta.",
         "proTier": "Teacher Pro",
         "everythingInFree": "Todo lo del plan Gratis",
         "classLimitPro": "Clases ilimitadas",
@@ -20517,8 +20588,264 @@ const es = {
     "done": "Listo",
     "pulseTitle": "Pulso de la clase",
     "projector": "Proyector"
-  }
+  },
   // @hqCalm:end
+  // @eduLiveRoom:start
+  "eduLiveRoom": {
+    "round": {
+      "boardLabel": "Tablero de la clase",
+      "wheelLabel": "Rueda de la clase"
+    },
+    "lobby": {
+      "brand": "Clase",
+      "joinAt": "Únete en",
+      "joined": "{count} dentro",
+      "waitingTitle": "Esperando a los alumnos",
+      "waitingHint": "Escanea el QR o escribe el código en la dirección de arriba",
+      "startBlocked": "Podrás empezar en cuanto entre un alumno",
+      "copyLink": "Copiar enlace",
+      "minutes": "{count} min",
+      "leave": "Salir de la sala",
+      "moreJoined": "+{count} más",
+      "readyCount": "{ready} de {total} listos"
+    },
+    "student": {
+      "youreIn": "¡Ya estás dentro!",
+      "watchBoard": "Mira la pantalla. Tu profe empieza el juego.",
+      "inClass": "{count} en clase",
+      "changeLook": "Cambiar look",
+      "leave": "Salir"
+    },
+    "entry": {
+      "connecting": "Conectando con tu clase…",
+      "openingRoom": "Abriendo tu sala…",
+      "waitingTeacher": "Tu profe todavía no ha abierto el juego",
+      "waitingTeacherHint": "Quédate aquí. Entrarás en cuanto empiece.",
+      "noRoomTitle": "Aquí no hay ningún juego",
+      "noRoomStudent": "Pídele el código a tu profe y únete.",
+      "noRoomHost": "Empieza un juego desde tu inicio de profe.",
+      "enterCode": "Escribir un código",
+      "toTeacher": "Volver al inicio de profe"
+    },
+    "hostResults": {
+      "noScoresHint": "Mismo tablero, nuevo intento. Juega otra vez y la clase lo vuelve a probar.",
+      "title": "Resultados de la ronda",
+      "statStudents": "Alumnos",
+      "statWords": "Palabras encontradas",
+      "statAvg": "Puntuación media",
+      "statLesson": "Palabras de la lección",
+      "playAgain": "Jugar otra vez",
+      "nextMode": "Siguiente modo",
+      "viewReport": "Ver informe",
+      "endGame": "Terminar juego",
+      "noScores": "Nadie ha puntuado en esta ronda"
+    },
+    "studentResults": {
+      "placed": "Tu puesto",
+      "rankOf": "#{rank} de {total}",
+      "points": "puntos",
+      "yourWords": "Tus palabras",
+      "noWords": "Esta vez sin palabras. ¡A la próxima!",
+      "nextRound": "Atento a la pantalla para la próxima ronda",
+      "leave": "Salir",
+      "calculating": "Contando las palabras…"
+    }
+  }
+  // @eduLiveRoom:end
+  ,
+  // @eduShell:start
+  "eduShell": {
+    "nav": {
+      "home": "Inicio",
+      "library": "Biblioteca",
+      "pro": "Pro"
+    },
+    "brand": {
+      "name": "LexiClash",
+      "tagline": "para docentes",
+      "homeLink": "LexiClash para docentes, inicio"
+    },
+    "account": {
+      "menuLabel": "Menú de la cuenta",
+      "fallbackName": "Docente",
+      "profile": "Perfil",
+      "help": "Ayuda",
+      "whatsNew": "Novedades"
+    },
+    "delivery": {
+      "projector": "Proyector",
+      "phones": "En el móvil",
+      "both": "Ambos"
+    },
+    "home": {
+      "regionLabel": "Inicio del docente",
+      "railLabel": "Esta semana y tu plan",
+      "greetMorning": "Buenos días, {name}",
+      "greetAfternoon": "Buenas tardes, {name}",
+      "greetEvening": "Buenas noches, {name}",
+      "greetNoName": "Hola de nuevo",
+      "startWith": "Empieza una partida con",
+      "switchClass": "Elegir clase",
+      "startLive": "Empezar partida en vivo",
+      "yourClasses": "Tus clases",
+      "newClass": "Nueva clase",
+      "colClass": "Clase",
+      "colStudents": "Alumnos",
+      "colLastPlayed": "Última partida",
+      "students": "{count} alumnos",
+      "notPlayedRecently": "Sin partidas en 30 días",
+      "playWith": "Empezar una partida con {name}",
+      "reviewTitle": "Practicar las palabras falladas"
+    },
+    "week": {
+      "title": "Esta semana",
+      "games": "Partidas jugadas",
+      "students": "Alumnos en total",
+      "active": "Clases activas",
+      "empty": "Tus datos aparecerán aquí después de la primera partida.",
+      "unavailable": "No pudimos cargar los datos de esta semana. Volverán en tu próxima visita."
+    },
+    "pro": {
+      "title": "Mira quién tuvo dificultades en cada partida",
+      "points": {
+        "struggled": "Quién se atascó, palabra por palabra",
+        "reteach": "Qué palabras repasar mañana",
+        "classes": "Clases ilimitadas e informes imprimibles"
+      },
+      "cta": "Ver qué añade Pro",
+      "trialCta": "Empezar prueba gratis de 14 días",
+      "trialFine": "Gratis 14 días, luego {price}/mes. Cancela cuando quieras.",
+      "dismiss": "Ahora no"
+    },
+    "onboarding": {
+      "title": "Tu primera partida en clase en 3 pasos",
+      "titleCompact": "Termina de preparar todo",
+      "progress": "{done} de {total} hechos",
+      "dismiss": "Ocultar los pasos iniciales",
+      "steps": {
+        "createClass": {
+          "title": "Crea una clase",
+          "body": "Un nombre y un idioma. Son 20 segundos.",
+          "cta": "Crear tu primera clase"
+        },
+        "shareCode": {
+          "title": "Comparte el código",
+          "body": "Los alumnos entran desde cualquier dispositivo, sin cuenta.",
+          "cta": "Mostrar el código"
+        },
+        "tryDemo": {
+          "title": "Prueba una partida de 2 minutos",
+          "body": "Una ronda corta. Si aún no ha entrado nadie, añade bots de práctica en la sala.",
+          "cta": "Empezar una partida de 2 minutos"
+        }
+      }
+    },
+    "setup": {
+      "title": "Nueva clase",
+      "subtitle": "Tres elecciones rápidas. Puedes cambiarlas después.",
+      "stepsLabel": "Progreso de la creación de la clase",
+      "step1": "Datos de la clase",
+      "step2": "Compartir el código",
+      "nameLabel": "Nombre de la clase",
+      "namePlaceholder": "p. ej., 5.º B Inglés",
+      "defaultName": "Clase {n}",
+      "gradeLabel": "Curso o edad",
+      "grade": {
+        "k2": "Infantil–2.º",
+        "g35": "3.º–5.º",
+        "g68": "6.º–2.º ESO",
+        "g912": "3.º ESO–Bach.",
+        "adult": "Adultos"
+      },
+      "gradeName": {
+        "k2": "Clase de Infantil–2.º",
+        "g35": "Clase de 3.º–5.º",
+        "g68": "Clase de 6.º–2.º ESO",
+        "g912": "Clase de 3.º ESO–Bach.",
+        "adult": "Clase de adultos"
+      },
+      "languageLabel": "Idioma del juego",
+      "languageHint": "Define el diccionario con el que juegan tus alumnos.",
+      "capMeter": "{count} de {limit} clases gratis usadas",
+      "create": "Crear clase",
+      "creating": "Creando…",
+      "retry": "Reintentar",
+      "createFailed": "No pudimos crear la clase. Revisa tu conexión y vuelve a intentarlo.",
+      "readyTitle": "¡Tu clase está lista!",
+      "joinCode": "Código para unirse",
+      "qrLabel": "Código QR del enlace para unirse",
+      "startNow": "Empezar una partida ya",
+      "copyLink": "Copiar enlace de invitación",
+      "copied": "Copiado",
+      "copyFailed": "No se pudo copiar. Comparte el código.",
+      "noAccount": "Los alumnos entran sin cuenta",
+      "showProjector": "Mostrar en el proyector",
+      "backHome": "Volver al inicio"
+    },
+    "host": {
+      "classLabel": "Clase",
+      "lateJoin": "Unirse tarde",
+      "lateJoinHint": "Los alumnos pueden entrar aunque la ronda ya haya empezado.",
+      "options": "Opciones",
+      "optionsHide": "Ocultar opciones",
+      "retry": "Reintentar"
+    }
+  },
+  // @eduShell:end
+  // @eduPlans:start
+  "eduPlans": {
+    "hero": {
+      "sub": "Tus estudiantes entran desde cualquier navegador con un código. Sin cuentas de estudiante, sin anuncios, sin instalar nada. Hecho para {count} idiomas, incluido el hebreo de derecha a izquierda.",
+      "studentLead": "Soy estudiante",
+      "studentJoin": "Entrar con un código",
+      "proLink": "Teacher Pro desde {price}/mes"
+    },
+    "how": {
+      "title": "Así funciona una clase",
+      "createTitle": "Crea una clase",
+      "createBody": "Ponle nombre y elige el idioma. Al momento tienes un código y un QR.",
+      "shareTitle": "Tus estudiantes entran",
+      "shareBody": "Escriben el código en cualquier móvil, tablet o Chromebook. Sin cuentas ni correos.",
+      "playTitle": "Juega en vivo",
+      "playBody": "Elige un modo, proyéctalo y mira los resultados en cuanto acaba la ronda."
+    },
+    "modes": {
+      "title": "{count} formas de jugar con la misma lista",
+      "sub": "Unos van en el proyector y otros en los móviles de tus estudiantes. Todos los modos son gratis.",
+      "moreLabel": "Más modos"
+    },
+    "pro": {
+      "trialLine": "Las cuentas nuevas tienen los primeros {days} días gratis. Cancela cuando quieras."
+    },
+    "cards": {
+      "schoolMonthly": "Desde {monthly} al mes por docente, con pago anual: hasta un {save}% menos que Teacher Pro mensual.",
+      "liveCapNote": "En todos los planes: una partida en vivo admite hasta {players} jugadores a la vez."
+    },
+    "manage": {
+      "active": "Activo · {price}/mes",
+      "renews": "Se renueva el {date} · {price}/mes",
+      "trialing": "Prueba gratis: te quedan {days} días; después, {price}/mes si no cancelas.",
+      "ends": "Cancelado. Pro sigue activo hasta el {date}.",
+      "pastDue": "Tu último pago no se completó. Actualiza la tarjeta en facturación para mantener Pro.",
+      "gifted": "Pro de regalo hasta el {date}",
+      "giftedOpen": "Pro de regalo",
+      "giftedNote": "No hay nada que pagar ni que cancelar. Al terminar vuelve solo al plan gratis."
+    },
+    "reports": {
+      "title": "Mira quién tuvo dificultades después de cada partida",
+      "body": "Pro convierte cada partida en un informe de clase: la precisión de cada estudiante, las palabras que conviene repasar y una hoja imprimible para familias o tu departamento.",
+      "trialCta": "Prueba Pro gratis {days} días",
+      "buyCta": "Teacher Pro · {price}/mes",
+      "trialFine": "Gratis {days} días y después {price}/mes. Cancela cuando quieras."
+    },
+    "cap": {
+      "used": "Usas {count} de {limit} clases gratis",
+      "full": "Ya usas las {limit} clases gratis",
+      "label": "Clases gratis usadas",
+      "cta": "Clases ilimitadas con Pro"
+    }
+  }
+  // @eduPlans:end
 };
 
 export { es };

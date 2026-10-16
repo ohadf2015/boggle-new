@@ -9,7 +9,11 @@ import { useGameMode } from '@/hooks/gameState/selectors';
 import { prefersStaticFullscreenOverlay } from '@/lib/native/webViewLayerFlash';
 import { cn } from '@/lib/utils';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { MODE_FILL, MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta, classroomRoundModeMeta } from './roundModes';
+import { MODE_FILL, MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta, classroomRoundModeMeta, BOSS_ROUND_META } from './roundModes';
+import { useBossActive } from '@/stores/classroomBossStore';
+import { CoachDemo } from '@/components/tutorial/CoachDemo';
+import { getModeCoach } from '@/lib/tutorial/modeCoachContent';
+import { mpCoachMode } from '@/lib/tutorial/mpCoachMode';
 import styles from './round.module.css';
 
 /** Max avatars in the "who am I about to play?" row; the rest become "+N". */
@@ -73,7 +77,12 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
   const reduceMotion = useShouldReduceMotion();
   const [staticLayer] = useState(() => prefersStaticFullscreenOverlay());
   const storeMode = useGameMode();
-  const mode = classroom ? classroomRoundModeMeta(classroom.mode, classroom.vocabQuizVariant) : roundModeMeta(storeMode);
+  const bossRound = useBossActive();
+  const mode = bossRound
+    ? BOSS_ROUND_META
+    : classroom ? classroomRoundModeMeta(classroom.mode, classroom.vocabQuizVariant) : roundModeMeta(storeMode);
+  const coachKey = bossRound ? undefined : mpCoachMode((classroom ? classroom.mode : storeMode) ?? undefined);
+  const howTo = coachKey ? getModeCoach(coachKey) : null;
 
   // onComplete in a ref: parent re-renders (timeUpdate) pass new callbacks and
   // must never reset the countdown clock (the old "stuck at 3" bug).
@@ -139,6 +148,15 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
         <p data-testid="mp-countdown-rule" dir="auto" className="font-neo-body font-bold text-base lg:text-xl tv:text-3xl text-neo-white/90 leading-snug text-balance">
           {t(mode.ruleKey)}
         </p>
+        {howTo?.steps[0] && (
+          <div data-testid="mp-countdown-howto" className="flex w-64 tv:w-96 flex-col items-center gap-1.5 rounded-neo border-3 border-neo-black bg-neo-navy-light p-2 shadow-hard">
+            {/* The demo spells a Latin sample word: keep it left-to-right inside an RTL page. */}
+            <div dir="ltr" className="w-full">
+              <CoachDemo demo={howTo.steps[0].demo} accent={howTo.accent} emoji={howTo.steps[0].emoji} />
+            </div>
+            <span dir="auto" className="font-neo-body text-sm tv:text-xl font-bold text-neo-white/85">{t(howTo.steps[0].captionKey)}</span>
+          </div>
+        )}
       </div>
 
       {/* The numeral — 40vh, keyed so the punch runs once per step */}

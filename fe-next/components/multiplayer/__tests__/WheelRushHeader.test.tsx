@@ -1,6 +1,8 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
+vi.mock('@/components/multiplayer/round/MpRoundMute', () => ({ MpRoundMute: () => <button type="button" data-testid="mp-round-mute">mute</button> }));
+
 import { WheelRushHeader, type WheelRushPlayer } from '../WheelRushHeader';
 
 const t = (k: string, p?: Record<string, string | number>) => (p ? `${k}` : k);
@@ -82,6 +84,18 @@ describe('WheelRushHeader', () => {
     unmount();
     setup({ remainingTime: null });
     expect(screen.queryByTestId('wheel-rush-timer')).toBeNull();
+  });
+
+  it('GIVEN a running wheel WHEN the phone header renders THEN leaving is a quiet control, not the loudest red button', () => {
+    setup();
+    const leave = screen.getByRole('button', { name: /quit/i });
+    expect(leave.getAttribute('data-testid')).toBe('wheel-rush-leave');
+    expect(leave.className).not.toMatch(/destructive|bg-red|bg-neo-red|bg-neo-pink/);
+  });
+
+  it('GIVEN the wheel header WHEN it renders THEN mute lives in it, so no floating sound button sits on the exit', () => {
+    setup();
+    expect(screen.getByTestId('mp-round-mute')).toBeTruthy();
   });
 
   it('calls onQuit when the quit button is clicked', () => {

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { EducationHero } from '../EducationHero';
 
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
+  useLanguage: () => ({ t: (k: string, p?: Record<string, unknown>) => (p ? `${k}|${Object.values(p).join('|')}` : k), language: 'en' }),
 }));
 
 vi.mock('next/dynamic', () => ({
@@ -31,15 +31,15 @@ describe('EducationHero', () => {
     expect(grid?.className).not.toMatch(/items-center/);
   });
 
-  it('renders one primary free-access CTA and one secondary Teacher Pro checkout CTA', () => {
+  it('renders one primary free start, a student join as the secondary, and Pro only as a quiet price link', () => {
     render(<EducationHero />);
     const free = screen.getByTestId('education-hero-free-cta');
     expect(free).toHaveAttribute('href', '/en/education/access');
     expect(free).toHaveTextContent('eg2Land.hero.ctaPrimary');
+    expect(screen.getByTestId('education-hero-join-cta')).toHaveAttribute('href', '/en/join');
     const pro = screen.getByTestId('education-hero-pro-cta');
     expect(pro).toHaveAttribute('href', '/en/teacher/upgrade');
     expect(pro.textContent).toMatch(/\$9/);
-    expect(screen.queryByTestId('education-hero-join-cta')).toBeNull();
   });
 
   it('tracks Pro and free hero CTA clicks separately', () => {
@@ -74,16 +74,18 @@ describe('EducationHero', () => {
     expect(className).not.toMatch(/\border-\d+\b/);
   });
 
-  it('renders free CTA as the one lime action and Pro as a quiet outline', () => {
+  it('renders free CTA as the one lime action; the join and Pro links carry no fill', () => {
     render(<EducationHero />);
     const free = screen.getByTestId('education-hero-free-cta');
+    const join = screen.getByTestId('education-hero-join-cta');
     const pro = screen.getByTestId('education-hero-pro-cta');
     expect(free.className).toMatch(/bg-neo-lime/);
     expect(free.className).toMatch(/text-lg/);
     expect(free.className).not.toMatch(/animate-pulse/);
-    expect(pro.className).toMatch(/border-neo-cyan/);
-    expect(pro.className).not.toMatch(/bg-neo-lime/);
-    expect(pro.className).not.toMatch(/animate-pulse/);
+    for (const quiet of [join, pro]) {
+      expect(quiet.className).not.toMatch(/\bbg-neo-/);
+      expect(quiet.className).not.toMatch(/animate-pulse/);
+    }
   });
 
   it('never sends the free CTA through the /teacher gate, so no ?from= bounce notice', () => {

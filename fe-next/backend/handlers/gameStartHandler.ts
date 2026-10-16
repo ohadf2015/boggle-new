@@ -8,6 +8,7 @@
  * in backend/modes; this file never branches on a specific mode.
  */
 
+import { armRoomBoss, hasRoomBoss } from '../services/classroomBoss/roomBoss.js';
 import type { Server, Socket } from 'socket.io';
 import type { LetterGrid, Language, DifficultyLevel, GameMode } from '@/shared/types';
 import { classicMinWordLength } from '@/shared/utils/classicWordRules';
@@ -47,6 +48,7 @@ import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
 import { startRushTiles } from '../modules/rushTiles/rushTilesManager.js';
 import { buildLessonVocabulary } from '../utils/lessonVocabulary.js';
+import { embeddableLessonWords } from '@/shared/utils/classroomGameLanguage';
 import { getGameModeModule, getGameModeRules } from '../modes/index.js';
 import { buildRoundPayload } from '../modes/roundPayload.js';
 import {
@@ -124,7 +126,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     const validatedData = validation.data as StartGamePayload;
     let { letterGrid } = validatedData;
-    const { timerSeconds, language, minWordLength, difficulty, boardTheme, gameMode, tvMode } = validatedData;
+    const { timerSeconds, language: hostLanguage, minWordLength, difficulty, boardTheme, gameMode, tvMode } = validatedData;
     const gameCode = getGameBySocketId(socket.id);
     if (!gameCode) {
       emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
@@ -139,6 +141,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       emitError(socket, ErrorCodes.PLAYER_NOT_HOST);
       return;
     }
+    // A classroom room keeps the language it was created in (lesson/class), whatever the host's UI sends.
+    const language = game.isClassroom && game.language ? game.language : hostLanguage;
 
     // The game is starting (manually or via the lobby auto-start) — tear down
     // any in-flight lobby auto-start countdown so it can't fire again.
@@ -251,7 +255,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       const lessonVocabulary = classroomGame?.vocabularyWords
         ? buildLessonVocabulary(classroomGame.vocabularyWords, gameLang)
         : undefined;
-      const vocabToEmbed = classroomGame?.vocabularyWords?.map((w) => w.toUpperCase()) ?? [];
+      const vocabToEmbed = embeddableLessonWords(classroomGame?.vocabularyWords ?? [], gameLang);
 
       // SECURITY: the server deals the board for every competitive (2+) game —
       // a client grid would let the host rig it. Solo keeps the client grid,
@@ -327,9 +331,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
         recordClassroomWordBank(io, gameCode, game, letterGrid, gameLang, vocabToEmbed);
       }
 
+      const bossId = resolvedMode === 'classic' ? classroomGame?.settings?.classroomBossId : undefined;
+      armRoomBoss(io, gameCode, game, { bossId, students: playerUsernames.length, roundSeconds: validTimer });
+
       const messageId = gameStartCoordinator.initializeSequence(gameCode, humanUsernames, timerSeconds);
       // Classroom fields ride every start-shaped payload of this round (retries too).
       const extras = buildClassroomStartExtras(gameCode, classroomGame, humanUsernames);
+      if (hasRoomBoss(game)) extras.classroomBossId = bossId;
       broadcastToRoom(io, getGameRoom(gameCode), 'startGame',
         buildRoundPayload(gameCode, game, { kind: 'start', messageId, extras }));
       getGameModeModule(resolvedMode).afterStart?.(io, gameCode, game);
@@ -342,7 +350,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       scheduleSpecialWords(gameCode, letterGrid, gameLang);
 
       // Round events + recurring rush tiles (modes that opt in, 2+ players).
-      if (getGameModeRules(resolvedMode).roundEvents && playerUsernames.length >= 2) {
+      // A boss round's attacks ARE its round events; a blizzard on top would fight the boss's freezes.
+      if (getGameModeRules(resolvedMode).roundEvents && playerUsernames.length >= 2 && !hasRoomBoss(game)) {
         scheduleRoundEvent(io, gameCode, game, validTimer);
         startRushTiles(io, gameCode);
       }

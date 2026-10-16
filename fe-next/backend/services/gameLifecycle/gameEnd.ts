@@ -5,6 +5,7 @@
  * triggers score calculation, and handles post-game workflows.
  */
 
+import { endRoomBoss } from '../classroomBoss/roomBoss';
 import { buildFallbackResultsPayload } from './fallbackResultsPayload';
 import type { Server } from 'socket.io';
 
@@ -61,6 +62,7 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
 
   // Stop timer (must use clearGameTimer which prefixes 'game:' to match setGameTimer key)
   clearGameTimer(gameCode);
+  endRoomBoss(io, gameCode, game);
 
   // Teacher pause bookkeeping dies with the round: "End round now" while paused
   // must not leave the room flagged paused for results / the next round.

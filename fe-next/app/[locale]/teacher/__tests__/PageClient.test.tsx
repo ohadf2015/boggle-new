@@ -26,8 +26,22 @@ vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div /> }));
 // `h-dvh` root it made the page taller than the viewport. The mock has to render
 // what it is handed, or these assertions would pass on a dropped banner.
 vi.mock('@/components/teacher/TeacherDashboard', () => ({
-  default: ({ banner, usagePrompt }: { banner?: React.ReactNode; usagePrompt?: React.ReactNode }) => (
-    <div data-testid="teacher-dashboard">{banner}{usagePrompt}</div>
+  default: ({
+    banner,
+    usagePrompt,
+    proOffer,
+  }: {
+    banner?: React.ReactNode;
+    usagePrompt?: React.ReactNode;
+    proOffer?: { kind: string; tracked: boolean; onDismiss: () => void } | null;
+  }) => (
+    <div data-testid="teacher-dashboard">
+      {banner}
+      {usagePrompt}
+      {proOffer ? (
+        <button data-testid="pro-offer" data-kind={proOffer.kind} data-tracked={String(proOffer.tracked)} onClick={proOffer.onDismiss} />
+      ) : null}
+    </div>
   ),
 }));
 vi.mock('@/components/education/TrialUrgencyBanner', () => ({
@@ -125,7 +139,7 @@ describe('TeacherPage upgrade CTA', () => {
     proState = { ...proState, hasPro: true, source: 'admin_grant' };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
     expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith(
       'iap_viewed',
       expect.objectContaining({ product: 'teacher_pro', event_type: 'impression' }),
@@ -136,24 +150,22 @@ describe('TeacherPage upgrade CTA', () => {
     proState = { ...proState, loading: true };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
   });
 
-  it('shows Teacher Pro ask with price, reports, and /pricing checkout for a free teacher', () => {
+  it('hands the milestone Pro ask to Home as its one rail card for a free teacher', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    expect(screen.getByTestId('teacher-pro-ask')).toBeInTheDocument();
-    expect(screen.getByText(/\$9/)).toBeInTheDocument();
-    expect(screen.getByText('teacher.subscription.unlimitedClasses')).toBeInTheDocument();
-    expect(screen.getByText('education.landing.pro.analytics')).toBeInTheDocument();
-    const link = screen.getByRole('link', { name: /teacher\.subscription\.upgradeNow/i });
-    expect(link).toHaveAttribute('href', '/en/pricing');
+    // Home renders it as the one rail card (its copy and CTA are pinned in TeacherDashboard.home).
+    const offer = screen.getByTestId('pro-offer');
+    expect(offer).toHaveAttribute('data-kind', 'upgrade');
+    expect(offer).toHaveAttribute('data-tracked', 'true');
   });
 
   it('hides upgrade link for admin', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: adminProfile, isAdmin: true, loading: false });
     render(<TeacherPage />);
-    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
   });
 
   it('fires iap_viewed impression on mount for non-admin teacher', () => {
@@ -179,7 +191,7 @@ describe('TeacherPage upgrade CTA', () => {
     milestoneState = { ...milestoneState, hasMilestone: false };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
     expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith(
       'iap_viewed',
       expect.objectContaining({ product: 'teacher_pro', event_type: 'impression' }),
@@ -190,14 +202,14 @@ describe('TeacherPage upgrade CTA', () => {
     milestoneState = { ...milestoneState, dismissed: true };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
   });
 
   it('shows no Pro ask while the milestone read is still open', () => {
     milestoneState = { ...milestoneState, loading: true, hasMilestone: false };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
   });
 
   it('shows the usage prompt card when a free teacher hits a usage limit', () => {
@@ -216,7 +228,7 @@ describe('TeacherPage upgrade CTA', () => {
     usageState = { reason: 'assignments', count: 3, loading: false, dismissed: false, dismiss: vi.fn() };
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
     render(<TeacherPage />);
-    expect(screen.getByTestId('teacher-pro-ask')).toBeInTheDocument();
+    expect(screen.getByTestId('pro-offer')).toBeInTheDocument();
     expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();
   });
 
@@ -229,7 +241,7 @@ describe('TeacherPage upgrade CTA', () => {
     expect(screen.getByRole('button', { name: 'teacher.subscription.trialLifecycleCta' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'teacher.subscription.trialLifecycleCta' })).toBeNull();
     expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
-    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
     expect(screen.queryByTestId('teacher-pro-trial-ended')).toBeNull();
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', {
       product: 'teacher_pro',
@@ -266,7 +278,7 @@ describe('TeacherPage upgrade CTA', () => {
     expect(screen.getByRole('button', { name: 'teacher.subscription.trialReactivateCta' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'teacher.subscription.trialReactivateCta' })).toBeNull();
     expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
-    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
     expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', {
       product: 'teacher_pro',
@@ -330,14 +342,15 @@ describe('TeacherPage 7-day trial upgrade nudge', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
   });
 
-  it('shows a dismissible days-remaining banner linked to Polar checkout inside 7 days', () => {
+  it('turns the 7-day upgrade nudge into Home\'s dismissible Pro card', () => {
     accessState = { trial: mkTrial({ daysLeft: 5 }) };
     render(<TeacherPage />);
-    const banner = screen.getByTestId('trial-urgency-banner');
-    expect(banner).toHaveAttribute('data-href', '/en/teacher/upgrade');
-    expect(banner).toHaveAttribute('data-dismissible', '1');
-    expect(banner).toHaveAttribute('data-cta', 'Upgrade to Teacher Pro');
-    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+    // Inside the 7-day window the nudge is Home's one Pro card; its dismiss is the nudge's.
+    expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
+    const offer = screen.getByTestId('pro-offer');
+    expect(offer).toHaveAttribute('data-kind', 'upgrade');
+    offer.click();
+    expect(trialNudgeState.dismiss).toHaveBeenCalled();
   });
 
   it('does not show the trial banner with more than 7 days left', () => {
@@ -358,7 +371,7 @@ describe('TeacherPage 7-day trial upgrade nudge', () => {
     proState = { ...proState, hasPro: true, source: 'admin_grant' };
     render(<TeacherPage />);
     expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
-    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
   });
 
   it('still shows the expired renewal card, without a dismiss control', () => {
@@ -384,11 +397,12 @@ describe('TeacherPage Polar 14-day trial offer', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
   });
 
-  it('shows the Start 14-day free trial banner even before a milestone, not the $9 strip', () => {
+  it('offers the 14-day trial as Home\'s Pro card even before a milestone', () => {
     render(<TeacherPage />);
-    expect(screen.getByTestId('teacher-pro-trial-offer')).toBeInTheDocument();
-    expect(screen.getByTestId('teacher-pro-trial-offer-cta')).toHaveTextContent('teacher.subscription.startTrial');
-    expect(screen.queryByTestId('teacher-pro-ask')).toBeNull();
+    const offer = screen.getByTestId('pro-offer');
+    expect(offer).toHaveAttribute('data-kind', 'trial');
+    offer.click();
+    expect(trialOfferState.dismiss).toHaveBeenCalled();
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', {
       product: 'teacher_pro',
       source: 'dashboard_trial_offer',
@@ -400,7 +414,6 @@ describe('TeacherPage Polar 14-day trial offer', () => {
     trialOfferState = { dismissed: true, dismiss: vi.fn() };
     milestoneState = { hasMilestone: true, loading: false, dismissed: false, dismiss: vi.fn() };
     render(<TeacherPage />);
-    expect(screen.queryByTestId('teacher-pro-trial-offer')).toBeNull();
-    expect(screen.getByTestId('teacher-pro-ask')).toBeInTheDocument();
+    expect(screen.getByTestId('pro-offer')).toHaveAttribute('data-kind', 'upgrade');
   });
 });

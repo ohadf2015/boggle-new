@@ -2,6 +2,7 @@
  * Host Game Events Hook
  * Handles core game lifecycle socket events: startGame, endGame, timeUpdate, validationComplete, resetGame
  */
+import { roundHasScore } from '@/shared/utils/roundCelebration';
 import { useEffect, useCallback, useRef, useMemo, useState, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast, TOAST_ICONS } from '../../../components/NeoToast';
@@ -532,7 +533,7 @@ export function useHostGameEvents({
       setWaitingForResults(false);
       waitingStartTimeRef.current = null;
 
-      showGameCompleteToast(t);
+      if (roundHasScore(data.scores)) showGameCompleteToast(t);
 
       // Always set final scores (needed for TV broadcast mode)
       setFinalScores({

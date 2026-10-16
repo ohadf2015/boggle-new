@@ -24,6 +24,8 @@
 
 'use client';
 
+import { useClassroomBossStore } from '@/stores/classroomBossStore';
+import { bossImage } from '@/components/education/boss/bossArt';
 import { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -96,10 +98,12 @@ export function WinnerSpotlight({
   const celebratedRef = useRef(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const calm = prefersReducedMotion();
+  // The class lost to the boss: the top scorer is a top hitter, never a trophy winner (no win cue, no cup).
+  const lostBoss = useClassroomBossStore((s) => (s.view?.status === 'escaped' ? s.view.bossId : null));
   const shownScore = useCountUp({ target: active && earned ? winner?.score ?? 0 : 0, duration: 900, immediate: calm });
 
   useEffect(() => {
-    if (!active || !winner || !earned || !cue || celebratedRef.current) return;
+    if (!active || !winner || !earned || !cue || lostBoss || celebratedRef.current) return;
     celebratedRef.current = true;
     if (!calm) fireRankConfetti(1);
     audioRef.current = playRoundEndCue(ROUND_WIN_SOUND, {
@@ -107,7 +111,7 @@ export function WinnerSpotlight({
       muted: sfxMuted,
       volume: sfxVolume,
     });
-  }, [active, winner, earned, cue, calm, sfxMuted, sfxVolume]);
+  }, [active, winner, earned, cue, lostBoss, calm, sfxMuted, sfxVolume]);
 
   // A rematch remounts this surface. Leave nothing of the last round running.
   useEffect(
@@ -141,9 +145,9 @@ export function WinnerSpotlight({
         // reveal). Then the trophy is a photograph, and two shots a second
         // apart are identical — half of why round 4's five frames matched.
         // This CSS pulse does not care whether the video decodes.
-        data-trophy-pulse={active && earned && !calm ? 'on' : 'off'}
+        data-trophy-pulse={active && earned && !calm && !lostBoss ? 'on' : 'off'}
         style={
-          active && earned && !calm
+          active && earned && !calm && !lostBoss
             ? {
                 animation: 'lc-trophy-pulse 1.8s ease-in-out infinite',
               }
@@ -160,7 +164,10 @@ export function WinnerSpotlight({
         {active && earned && !calm && (
           <style>{`@keyframes lc-trophy-pulse{0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.08) rotate(-3deg)}}`}</style>
         )}
-        {calm || (active && !earned) ? (
+        {lostBoss ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img data-testid="winner-boss-escaped" src={bossImage(lostBoss, 'enraged')} alt="" aria-hidden className="pointer-events-none w-full h-full object-cover object-top" />
+        ) : calm || (active && !earned) ? (
           // The still IS the video's own poster frame; routing it through
           // next/image would request a second, differently-encoded copy of an
           // asset the browser already has.
@@ -198,7 +205,7 @@ export function WinnerSpotlight({
             projector ? 'text-3xl min-[2200px]:text-5xl' : 'text-sm'
           )}
         >
-          {active ? t(BANNER[kind]) : t('education.results.moment.drumroll')}
+          {active ? t(lostBoss ? 'classroomBoss.topHitter' : BANNER[kind]) : t('education.results.moment.drumroll')}
         </p>
         {active && earned && (
           <p

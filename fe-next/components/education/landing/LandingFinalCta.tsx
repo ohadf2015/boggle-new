@@ -6,9 +6,9 @@ import { trackLandingCtaClick } from '@/utils/growthTracking';
 export function LandingFinalCta({ setupPending = false }: { setupPending?: boolean }) {
   const { t, language } = useLanguage();
   return (
-    <section className="mx-auto max-w-6xl px-4 pb-14 pt-4 sm:px-6 lg:px-8">
-      <div className="rounded-neo-xl border-3 border-neo-black bg-neo-lime p-6 text-center text-neo-navy shadow-hard-xl sm:p-10">
-        <h2 className="text-balance font-neo-display text-3xl font-black leading-tight sm:text-4xl">{t('eg2Land.final.title')}</h2>
+    <section className="mx-auto max-w-6xl px-4 pb-8 pt-2 sm:px-6 sm:pb-14 sm:pt-4 lg:px-8">
+      <div className="rounded-neo-xl border-3 border-neo-black bg-neo-lime p-5 text-center text-neo-navy shadow-hard-xl sm:p-10">
+        <h2 className="text-balance font-neo-display text-2xl font-black leading-tight sm:text-4xl">{t('eg2Land.final.title')}</h2>
         <p className="mx-auto mt-3 max-w-[52ch] text-base font-semibold text-neo-navy/80">{t('eg2Land.final.body')}</p>
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link

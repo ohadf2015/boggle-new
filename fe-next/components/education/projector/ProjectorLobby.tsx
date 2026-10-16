@@ -13,13 +13,13 @@ import ProjectorJoinPanel from './ProjectorJoinPanel';
 import ProjectorRoster, { type ProjectorStudent } from './ProjectorRoster';
 import { canStartProjectorRound } from './projectorLobbyModel';
 import { LobbyModeSwitcher } from '@/components/education/lobby/LobbyModeSwitcher';
-import { BOSS_BATTLE_ID, catalogueIdOf, launchOf, readLocalQuizPlayable, readLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
+import { BOSS_BATTLE_ID, catalogueIdOf, launchOf, readLocalBossId, readLocalQuizPlayable, readLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
 import { ProjectorQuizBlocked, useQuizStartRefused } from './ProjectorQuizBlocked';
 import { catalogueEntry } from '@/components/education/ClassroomModeCatalogueData';
 import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 
-interface ProjectorLobbyProps {
+export interface ProjectorLobbyProps {
   gameCode: string;
   language: string;
   baseUrl?: string;
@@ -111,16 +111,19 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   // The shell reads lessonGameData once at mount, so a lobby remounted after a round would revert to the launch mode.
   const [switchedMode, setSwitchedMode] = useState<ClassroomCatalogueId | null>(() => {
     const local = readLocalGameMode();
-    const id = local ? catalogueIdOf(local, readLocalQuizVariant()) : null;
+    const id = local ? catalogueIdOf(local, readLocalQuizVariant(), readLocalBossId()) : null;
     return id && id !== classroomGameMode ? id : null;
   });
   const modeId: ClassroomCatalogueId =
     switchedMode ??
     catalogueIdOf(
       classroomGameMode ?? liveGame?.gameMode ?? 'classic',
-      readLocalQuizVariant() ?? liveGame?.settings?.vocabQuizVariant
+      readLocalQuizVariant() ?? liveGame?.settings?.vocabQuizVariant,
+      readLocalBossId() ?? liveGame?.settings?.classroomBossId
     );
-  const mode: ClassroomGameMode = launchOf(modeId).gameMode;
+  // A room still on the retired quiz-boss variant keeps running the quiz engine until it ends.
+  const legacyQuizBoss = modeId === BOSS_BATTLE_ID && (readLocalQuizVariant() ?? liveGame?.settings?.vocabQuizVariant) === 'boss';
+  const mode: ClassroomGameMode = legacyQuizBoss ? VOCAB_QUIZ_MODE : launchOf(modeId).gameMode;
   const isQuiz = mode === VOCAB_QUIZ_MODE;
   const [quizRefused, clearQuizRefused] = useQuizStartRefused(gameCode, t);
   const [quizPlayable] = useState(readLocalQuizPlayable);
