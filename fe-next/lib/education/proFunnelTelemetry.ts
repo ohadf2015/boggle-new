@@ -234,3 +234,35 @@ export function trackTrialExpiredShown(args: { source: 'dashboard_trial_ended' }
     surface: 'hq_banner',
   });
 }
+
+export type TeacherPlanGateShownArgs = {
+  surface: 'classroom_create' | 'student_enroll';
+  limit_type: 'classrooms' | 'students';
+};
+
+/**
+ * Free-tier usage wall impression (class or student cap). Distinct from
+ * `pro_gate_viewed` (feature lock) and `iap_viewed` (Growth Radar).
+ */
+export function trackTeacherPlanGateShown(args: TeacherPlanGateShownArgs): void {
+  safeCapture('teacher_plan_gate_shown', {
+    surface: args.surface,
+    limit_type: args.limit_type,
+    product: 'teacher_pro',
+  });
+}
+
+/** Upgrade tap on the usage-wall sheet, immediately before Polar checkout POST. */
+export function trackTeacherPlanGateUpgradeClick(args: TeacherPlanGateShownArgs): void {
+  safeCapture('teacher_plan_gate_upgrade_click', {
+    surface: args.surface,
+    limit_type: args.limit_type,
+    product: 'teacher_pro',
+  });
+  safeCapture('checkout_open', {
+    source: 'plan_gate',
+    surface: args.surface,
+    limit_type: args.limit_type,
+    product: 'teacher_pro',
+  });
+}

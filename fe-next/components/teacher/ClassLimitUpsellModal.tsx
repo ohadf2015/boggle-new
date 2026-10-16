@@ -1,14 +1,26 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TEACHER_PRO_PRICE_USD, FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import {
+  goToPolarCheckout,
+  postTeacherProCheckout,
+} from '@/lib/education/postTeacherProCheckout';
+import {
+  trackTeacherPlanGateShown,
+  trackTeacherPlanGateUpgradeClick,
+} from '@/lib/education/proFunnelTelemetry';
+import { teacherProUpgradeCtaLabel } from '@/components/education/TeacherProCheckoutCta';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { X, Zap } from 'lucide-react';
 import { ProFeaturePreview } from '@/components/teacher/pro/ProFeaturePreview';
+
+export type PlanGateLimitType = 'classrooms' | 'students';
 
 interface ClassLimitUpsellModalProps {
   isOpen: boolean;
@@ -16,14 +28,21 @@ interface ClassLimitUpsellModalProps {
   currentCount: number;
   limit: number | null;
   /**
-   * Why the ask is up. 'class_limit' (default) is the hard cap; 'trial_expired'
-   * is the nudge shown when a teacher whose 14-day trial ended re-enters the
-   * create flow — the free tier still works, so that variant gets a
-   * "continue free" escape instead of a plain cancel.
+   * Why the ask is up. 'class_limit' (default) / 'student_limit' are hard
+   * usage walls. 'trial_expired' is a nudge with a "continue free" escape.
    */
-  reason?: 'class_limit' | 'trial_expired';
+  reason?: 'class_limit' | 'student_limit' | 'trial_expired';
   /** Trial-expired variant only: dismiss the ask and continue into the create wizard. */
   onContinueFree?: () => void;
+}
+
+function gateArgs(
+  reason: 'class_limit' | 'student_limit' | 'trial_expired',
+): { surface: 'classroom_create' | 'student_enroll'; limit_type: PlanGateLimitType } {
+  if (reason === 'student_limit') {
+    return { surface: 'student_enroll', limit_type: 'students' };
+  }
+  return { surface: 'classroom_create', limit_type: 'classrooms' };
 }
 
 export default function ClassLimitUpsellModal({
@@ -36,18 +55,75 @@ export default function ClassLimitUpsellModal({
 }: ClassLimitUpsellModalProps) {
   const { t, language } = useLanguage();
   const isTrialExpired = reason === 'trial_expired';
-  const source = isTrialExpired ? 'trial_expired' : 'class_limit';
+  const isStudentLimit = reason === 'student_limit';
+  const source = isTrialExpired ? 'trial_expired' : isStudentLimit ? 'student_limit' : 'class_limit';
+  const [pending, setPending] = useState(false);
 
-  // Track the upgrade surface when modal opens
   useEffect(() => {
-    if (isOpen) {
-      trackGrowthEvent('iap_viewed', {
-        source,
-        currentCount,
-        limit,
-      });
+    if (!isOpen) return;
+    trackGrowthEvent('iap_viewed', {
+      source,
+      currentCount,
+      limit,
+    });
+    if (!isTrialExpired) {
+      try {
+        trackTeacherPlanGateShown(gateArgs(reason));
+      } catch {
+        /* analytics must never block the till */
+      }
     }
-  }, [isOpen, currentCount, limit, source]);
+  }, [isOpen, currentCount, limit, source, isTrialExpired, reason]);
+
+  const startPolarCheckout = useCallback(async () => {
+    if (pending) return;
+    try {
+      trackTeacherPlanGateUpgradeClick(gateArgs(reason));
+    } catch {
+      /* analytics must never block the till */
+    }
+    trackGrowthEvent('landing_cta_clicked', {
+      cta: 'teacher_pro',
+      source: isStudentLimit ? 'student_limit_modal' : 'class_limit_modal',
+    });
+    setPending(true);
+    try {
+      const result = await postTeacherProCheckout(fetch, { trial: false, locale: language });
+      if (!result.ok) {
+        if (result.status === 401) {
+          toast.error(t('teacher.subscription.signInRequired'));
+        } else if (result.status === 503) {
+          toast.error(t('teacher.subscription.checkoutUnavailable'));
+        } else {
+          toast.error(t('teacher.subscription.checkoutError'));
+        }
+        return;
+      }
+      goToPolarCheckout(result.url);
+    } catch {
+      toast.error(t('teacher.subscription.checkoutError'));
+    } finally {
+      setPending(false);
+    }
+  }, [pending, reason, isStudentLimit, language, t]);
+
+  const titleKey = isTrialExpired
+    ? 'teacher.subscription.trialExpiredTitle'
+    : isStudentLimit
+      ? 'teacher.subscription.studentLimitTitle'
+      : 'teacher.subscription.classLimitTitle';
+
+  const message = isTrialExpired
+    ? t('teacher.subscription.trialExpiredMessage')
+    : isStudentLimit
+      ? t('teacher.subscription.studentLimitMessage', {
+          current: currentCount,
+          limit: limit ?? FREE_TIER_LIMITS.studentsPerClass,
+        })
+      : t('teacher.subscription.classLimitMessage', {
+          current: currentCount,
+          limit: limit ?? FREE_TIER_LIMITS.classes,
+        });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -59,9 +135,7 @@ export default function ClassLimitUpsellModal({
       >
           <div className="bg-neo-cyan px-6 py-4 border-b-3 border-black flex items-center justify-between">
             <DialogTitle className="text-2xl font-neo-display font-black normal-case text-black">
-              {isTrialExpired
-                ? t('teacher.subscription.trialExpiredTitle')
-                : t('teacher.subscription.classLimitTitle')}
+              {t(titleKey)}
             </DialogTitle>
             <DialogClose asChild>
               <button
@@ -77,14 +151,7 @@ export default function ClassLimitUpsellModal({
             <div className="bg-neo-pink/20 border-2 border-neo-cream/40 rounded-neo p-4">
               <div className="flex items-center gap-3 mb-2">
                 <Zap className="w-5 h-5 text-black flex-shrink-0" />
-                <p className="font-bold text-black">
-                  {isTrialExpired
-                    ? t('teacher.subscription.trialExpiredMessage')
-                    : t('teacher.subscription.classLimitMessage', {
-                        current: currentCount,
-                        limit: limit ?? FREE_TIER_LIMITS.classes,
-                      })}
-                </p>
+                <p className="font-bold text-black">{message}</p>
               </div>
               <p className="text-sm text-black/70 font-bold leading-relaxed">
                 {t('teacher.subscription.upgradeProDescription')}
@@ -123,28 +190,37 @@ export default function ClassLimitUpsellModal({
             </div>
 
             <div className="flex gap-3 pt-4">
-              {/* This modal used to POST /api/subscription/checkout itself — a second,
-                  degraded copy of the upgrade page's handler that was missing its 401
-                  (sign-in) and 503 (checkout kill switch) branches. With the switch off
-                  the highest-intent teacher in the product got a generic "try again"
-                  toast and retried forever. One checkout implementation, not two that
-                  drift: send them to the page that owns it. */}
-              <Button
-                asChild
-                className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
-              >
-                <Link
-                  href={`/${language}/teacher/upgrade`}
-                  onClick={() =>
-                    trackGrowthEvent('landing_cta_clicked', {
-                      cta: 'teacher_pro',
-                      source: isTrialExpired ? 'trial_expired_modal' : 'class_limit_modal',
-                    })
-                  }
+              {isTrialExpired ? (
+                <Button
+                  asChild
+                  className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
                 >
-                  {t('teacher.subscription.upgradeNow')}
-                </Link>
-              </Button>
+                  <Link
+                    href={`/${language}/teacher/upgrade`}
+                    onClick={() =>
+                      trackGrowthEvent('landing_cta_clicked', {
+                        cta: 'teacher_pro',
+                        source: 'trial_expired_modal',
+                      })
+                    }
+                  >
+                    {t('teacher.subscription.upgradeNow')}
+                  </Link>
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  data-testid="plan-gate-upgrade"
+                  disabled={pending}
+                  aria-busy={pending || undefined}
+                  onClick={() => {
+                    void startPolarCheckout();
+                  }}
+                  className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all disabled:opacity-60"
+                >
+                  {pending ? t('common.loading') : teacherProUpgradeCtaLabel(language)}
+                </Button>
+              )}
               <Button
                 onClick={isTrialExpired && onContinueFree ? onContinueFree : onClose}
                 variant="outline"
@@ -165,7 +241,7 @@ export default function ClassLimitUpsellModal({
                 onClick={() =>
                   trackGrowthEvent('landing_cta_clicked', {
                     cta: 'district_upsell',
-                    source: 'class_limit_modal',
+                    source: isStudentLimit ? 'student_limit_modal' : 'class_limit_modal',
                   })
                 }
                 className="mt-1 inline-block text-sm font-black text-neo-purple underline underline-offset-2 hover:text-black"

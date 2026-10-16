@@ -10,6 +10,7 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { isFreePlanUsageBlocked } from '@/lib/education/teacherPlanGate';
 import { trackEduClassroomCreated } from '@/lib/education/telemetry';
 import type { Language } from '@/lib/supabase/education/types';
 import { cn } from '@/lib/utils';
@@ -57,6 +58,10 @@ export function ClassSetupFlow() {
   const trialAskOpen = !ready && !accessLoading && !proLoading && !hasPro && !!trial?.isExpired && !trialAskDismissed;
 
   const submit = useCallback(async () => {
+    if (isFreePlanUsageBlocked(hasPro, classrooms.length, FREE_TIER_LIMITS.classes)) {
+      setLimitHit({ currentCount: classrooms.length, limit: FREE_TIER_LIMITS.classes });
+      return;
+    }
     setBusy(true);
     setErrorKey(null);
     const finalName = resolveClassName(name, grade, t, classrooms.map((c) => c.name));
@@ -73,7 +78,7 @@ export function ClassSetupFlow() {
     }
     setErrorKey('eduShell.setup.createFailed');
     toast.error(t('eduShell.setup.createFailed'));
-  }, [name, grade, t, classrooms, createClassroom, classLanguage]);
+  }, [name, grade, t, classrooms, createClassroom, classLanguage, hasPro]);
 
   const copy = useCallback(
     async (url: string) => {

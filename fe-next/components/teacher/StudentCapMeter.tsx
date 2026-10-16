@@ -6,19 +6,22 @@
  * Pro strip was a dismissible banner that never named student count. The
  * conversion lever is a teacher who can see they are at (or past) the wall.
  *
- * CTA fires at the existing engagement milestone (>=3 students) OR at the
- * hard cap (`FREE_TIER_LIMITS.studentsPerClass`). Polar checkout stays on
- * /teacher/upgrade — do not POST /api/subscription/checkout from here.
+ * Below the hard cap the CTA still links to /teacher/upgrade. At the cap it
+ * opens the usage-gate sheet, which POSTs the same Polar checkout as the HQ
+ * trial countdown.
  */
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { isFreePlanUsageBlocked } from '@/lib/education/teacherPlanGate';
 import { TEACHER_PRO_MILESTONE_MIN_STUDENTS } from '@/lib/education/teacherProMilestone';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
+import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
 
 export function shouldShowStudentCapUpgradeCta(studentCount: number, hasPro: boolean): boolean {
   if (hasPro) return false;
@@ -42,8 +45,9 @@ export function StudentCapMeter({
   const { hasPro, loading } = useTeacherPro();
   const count = studentCount ?? 0;
   const limit = FREE_TIER_LIMITS.studentsPerClass;
-  const atCap = !hasPro && count >= limit;
+  const atCap = isFreePlanUsageBlocked(hasPro, count, limit);
   const showCta = !loading && shouldShowStudentCapUpgradeCta(count, hasPro);
+  const [gateOpen, setGateOpen] = useState(false);
 
   return (
     <div
@@ -66,9 +70,6 @@ export function StudentCapMeter({
             })}
       </p>
       {showCta ? (
-        // Free and Pro are BOTH capped per class — so the ask never sits as if
-        // it lifted the number above. It names what Pro adds (round 2, critic
-        // cp1). Link, tracking and when it shows are unchanged.
         <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 border-t-2 border-dashed border-black/20 pt-1.5">
           <p
             data-testid="student-cap-pro-unlocks"
@@ -76,24 +77,51 @@ export function StudentCapMeter({
           >
             {t('academy.classes.proUnlocks', 'Pro adds class analytics + printable reports')}
           </p>
-          <Link
-            href={`/${language}/teacher/upgrade`}
-            data-testid="student-cap-upgrade-cta"
-            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard"
-            onClick={() =>
-              trackGrowthEvent('landing_cta_clicked', {
-                cta: 'teacher_pro',
-                source: `student_cap_${source}`,
-                studentCount: count,
-                limit,
-                atCap,
-              })
-            }
-          >
-            {t('academy.classes.proCta', 'Get Pro — {{price}}/mo', { price: `$${TEACHER_PRO_PRICE_USD}` })}
-          </Link>
+          {atCap ? (
+            <button
+              type="button"
+              data-testid="student-cap-upgrade-cta"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard"
+              onClick={() => {
+                trackGrowthEvent('landing_cta_clicked', {
+                  cta: 'teacher_pro',
+                  source: `student_cap_${source}`,
+                  studentCount: count,
+                  limit,
+                  atCap: true,
+                });
+                setGateOpen(true);
+              }}
+            >
+              {t('academy.classes.proCta', 'Get Pro — {{price}}/mo', { price: `$${TEACHER_PRO_PRICE_USD}` })}
+            </button>
+          ) : (
+            <Link
+              href={`/${language}/teacher/upgrade`}
+              data-testid="student-cap-upgrade-cta"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard"
+              onClick={() =>
+                trackGrowthEvent('landing_cta_clicked', {
+                  cta: 'teacher_pro',
+                  source: `student_cap_${source}`,
+                  studentCount: count,
+                  limit,
+                  atCap: false,
+                })
+              }
+            >
+              {t('academy.classes.proCta', 'Get Pro — {{price}}/mo', { price: `$${TEACHER_PRO_PRICE_USD}` })}
+            </Link>
+          )}
         </div>
       ) : null}
+      <ClassLimitUpsellModal
+        isOpen={gateOpen}
+        onClose={() => setGateOpen(false)}
+        currentCount={count}
+        limit={limit}
+        reason="student_limit"
+      />
     </div>
   );
 }

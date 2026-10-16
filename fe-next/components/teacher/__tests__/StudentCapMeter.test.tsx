@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { StudentCapMeter, shouldShowStudentCapUpgradeCta } from '../StudentCapMeter';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
@@ -17,6 +17,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+vi.mock('@/components/teacher/ClassLimitUpsellModal', () => ({
+  default: ({ isOpen, reason }: { isOpen: boolean; reason?: string }) =>
+    isOpen ? <div data-testid="plan-gate-sheet" data-reason={reason ?? ''} /> : null,
+}));
 vi.mock('next/link', () => ({
   default: ({
     children,
@@ -77,10 +81,13 @@ describe('StudentCapMeter', () => {
     expect(cta).toHaveAttribute('href', '/en/teacher/upgrade');
   });
 
-  it('shows the Polar upgrade CTA at the student cap', () => {
+  it('opens the Polar plan-gate sheet at the student cap instead of linking away', () => {
     render(<StudentCapMeter studentCount={FREE_TIER_LIMITS.studentsPerClass} />);
     expect(screen.getByTestId('student-cap-meter')).toHaveAttribute('data-at-cap', 'true');
-    expect(screen.getByTestId('student-cap-upgrade-cta')).toHaveAttribute('href', '/en/teacher/upgrade');
+    const cta = screen.getByTestId('student-cap-upgrade-cta');
+    expect(cta).not.toHaveAttribute('href');
+    fireEvent.click(cta);
+    expect(screen.getByTestId('plan-gate-sheet')).toHaveAttribute('data-reason', 'student_limit');
   });
 
   it('hides the CTA for a Pro teacher', () => {

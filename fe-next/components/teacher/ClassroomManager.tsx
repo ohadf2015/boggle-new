@@ -26,6 +26,7 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { isFreePlanUsageBlocked } from '@/lib/education/teacherPlanGate';
 import { ClassCapMeter } from '@/components/teacher/ClassCapMeter';
 import { trackEduClassroomCreated } from '@/lib/education/telemetry';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
@@ -242,6 +243,11 @@ export default function ClassroomManager({ autoOpenCreate, richCards = false, he
     // The Classes tab hands creation to the 2-step setup route (it owns the cap and trial asks).
     if (richCards) {
       router.push(`/${language}/teacher/classroom/new`);
+      return;
+    }
+    if (!proLoading && isFreePlanUsageBlocked(hasPro, classrooms.length, FREE_TIER_LIMITS.classes)) {
+      setUpsellData({ currentCount: classrooms.length, limit: FREE_TIER_LIMITS.classes });
+      setIsUpsellModalOpen(true);
       return;
     }
     if (!accessLoading && !proLoading && !hasPro && trial?.isExpired) {
