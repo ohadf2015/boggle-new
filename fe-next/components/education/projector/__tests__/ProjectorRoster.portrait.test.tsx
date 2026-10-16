@@ -30,7 +30,7 @@ describe('rosterDensity — portrait step-up', () => {
   it('gives every tier a whole-literal portrait type size above its landscape md size', () => {
     for (const tier of ROSTER_DENSITY_TIERS) {
       expect(tier.portrait).toMatch(/^md:portrait:text-\[[\d.]+vw\]$/);
-      const md = /md:text-\[([\d.]+)vw\]/.exec(tier.chip)![1];
+      const md = /md:text-\[(?:min\()?([\d.]+)vw/.exec(tier.chip)![1];
       expect(vw(tier.portrait)).toBeGreaterThan(Number(md));
     }
   });

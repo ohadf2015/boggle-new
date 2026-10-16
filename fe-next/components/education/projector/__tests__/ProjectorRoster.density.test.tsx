@@ -79,7 +79,7 @@ describe('rosterDensity — the chip shrinks as the room fills', () => {
       expect(tier.chip).not.toContain('${');
       expect(tier.gap).not.toContain('${');
       expect(tier.chip).toMatch(/text-\[[\d.]+vw\]/);
-      expect(tier.chip).toMatch(/md:text-\[[\d.]+vw\]/);
+      expect(tier.chip).toMatch(/md:text-\[(?:min\()?[\d.]+vw(?:,[\d.]+vh\))?\]/);
     }
   });
 });
@@ -139,5 +139,11 @@ describe('ProjectorRoster — a whole class fits on the wall', () => {
     // `safe` so a room that overflows still scrolls from its first name.
     expect(list).toContain('md:[align-content:safe_center]');
     expect(list).toContain('md:justify-center');
+  });
+
+  it('caps the roomier chips by height too, so a short 1366x768 wall still fits its rows', () => {
+    for (const tier of ROSTER_DENSITY_TIERS.slice(0, 3)) {
+      expect(tier.chip).toMatch(/md:text-\[min\([\d.]+vw,[\d.]+vh\)\]/);
+    }
   });
 });
