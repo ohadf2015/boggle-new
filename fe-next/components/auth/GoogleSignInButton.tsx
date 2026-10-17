@@ -7,7 +7,7 @@ import { supabase, signInWithGoogle } from '@/lib/supabase';
 import { ensureGoogleIdInitialized, type GoogleIdServices } from '@/lib/auth/googleOneTap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { latchSignupSource, trackSignupPromptClicked } from '@/utils/growthTracking';
+import { latchSignupSource, trackSignupFailed, trackSignupPromptClicked } from '@/utils/growthTracking';
 import { GoogleIcon } from '@/components/auth/shared/icons/BrandIcons';
 
 const GSI_SRC = 'https://accounts.google.com/gsi/client';
@@ -118,7 +118,20 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
         <button
           type="button"
           data-testid="google-signin-edge-fallback"
-          onClick={() => { handlePromptClickIntent(); void signInWithGoogle(); }}
+          onClick={() => {
+            handlePromptClickIntent();
+            void signInWithGoogle()
+              .then((res) => {
+                const err = (res as { error?: { message?: string } | null } | undefined)?.error;
+                if (err) trackSignupFailed('oauth_redirect_error', { source: analyticsSource, message: err.message });
+              })
+              .catch((e: unknown) =>
+                trackSignupFailed('oauth_redirect_error', {
+                  source: analyticsSource,
+                  message: e instanceof Error ? e.message : String(e),
+                }),
+              );
+          }}
           className={cn(
             'w-full flex items-center justify-center gap-2 py-3 rounded-xl',
             'border-3 border-neo-black bg-white text-neo-black font-black text-sm',

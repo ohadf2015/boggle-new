@@ -35,6 +35,7 @@ vi.mock('@/utils/logger', () => ({
 import {
   consumePendingSignupCompletion,
   trackSignupFunnel,
+  trackSignupFailed,
   trackSignupPromptClicked,
 } from '@/utils/growthTracking';
 
@@ -165,5 +166,22 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
     );
     // peek, not consume: the completion path still sees the latch
     expect(window.sessionStorage.getItem('lexiclash_signup_source_pending')).toBe('results_inline');
+  });
+
+  it('signup_failed carries reason + the latched source (t_147a0f0c)', () => {
+    window.sessionStorage.setItem('lexiclash_signup_source_pending', 'results_inline');
+    trackSignupFailed('gsi_exchange_error', { message: 'Invalid nonce' });
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_failed',
+      expect.objectContaining({ source: 'results_inline', reason: 'gsi_exchange_error', provider: 'google', message: 'Invalid nonce' })
+    );
+  });
+
+  it('signup_failed falls back to source unknown without a latch', () => {
+    trackSignupFailed('gsi_cancel');
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_failed',
+      expect.objectContaining({ source: 'unknown', reason: 'gsi_cancel' })
+    );
   });
 });

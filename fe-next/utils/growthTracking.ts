@@ -170,6 +170,7 @@ export type GrowthEvent =
   | 'signup_prompt_clicked'
   | 'signup_completed'
   | 'signup_dismissed'
+  | 'signup_failed'
   | 'first_win_signup_shown'
   | 'first_win_signup_completed'
   | 'first_win_signup_dismissed'
@@ -1132,6 +1133,25 @@ export const consumeSignupSource = (): string | null => {
 
 export const trackSignupPromptClicked = (source: string): void => {
   trackGrowthEvent('signup_prompt_clicked', { source });
+};
+
+/**
+ * t_147a0f0c: a tap that never becomes `signup_completed` was invisible
+ * (7 clicks / 0 signups on 10-16, flow after the tap unobserved). Emitted from
+ * the GSI credential exchange error, a GSI callback without a credential
+ * (cancel), and the Edge redirect-OAuth error. `source` defaults to the tap latch.
+ */
+export const trackSignupFailed = (
+  reason: string,
+  props: { source?: string | null; provider?: string; message?: string } = {},
+): void => {
+  const source = props.source ?? peekSignupSource() ?? 'unknown';
+  trackGrowthEvent('signup_failed', {
+    source,
+    reason,
+    provider: props.provider ?? 'google',
+    ...(props.message ? { message: String(props.message).slice(0, 200) } : {}),
+  });
 };
 
 /**
