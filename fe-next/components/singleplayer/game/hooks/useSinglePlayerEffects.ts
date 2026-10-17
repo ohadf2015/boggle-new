@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { LetterGrid } from '@/shared/types/game';
 import type { FoundWord } from '../types';
 import { trackGameStart } from '@/utils/growthTracking';
+import { updateActiveGameExtras } from '@/utils/abandonOnPagehide';
 import { useAuth } from '@/contexts/AuthContext';
 import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 import { ensureGuestDisplayName } from '@/utils/guestManager';
@@ -99,15 +100,25 @@ export function useSinglePlayerEffects({
     // prod starts in the week to 2026-09-16 were duplicates <500ms apart). This
     // hook is the right home: Quick Play mounts useSinglePlayerCore without
     // SinglePlayerGame, so emitting there would have missed it.
+    const landing_path =
+      typeof window !== 'undefined' ? `${window.location.pathname}${window.location.search}` : undefined;
     trackGameStart('singleplayer', {
       subMode: mode,
+      sp_mode: mode,
       boardSize: grid?.length ?? 0,
       ...(difficulty ? { difficulty } : {}),
       language,
+      words_found: 0,
+      landing_path,
     });
     // Mount-only — one event per game instance; remount = new game.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Keep pagehide abandon payload current (words found mid-round).
+  useEffect(() => {
+    updateActiveGameExtras({ words_found: foundWords.length, sp_mode: mode });
+  }, [foundWords.length, mode]);
 
   // Set game active for sound context
   useEffect(() => {

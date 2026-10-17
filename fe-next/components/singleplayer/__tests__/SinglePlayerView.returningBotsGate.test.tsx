@@ -126,6 +126,8 @@ describe('SinglePlayerView — returning-player bots gate', () => {
     vi.clearAllMocks();
     mockSearchParams = new Map();
     localStorage.clear();
+    sessionStorage.clear();
+    Object.defineProperty(document, 'referrer', { value: '', configurable: true });
   });
 
   afterEach(() => {
@@ -194,6 +196,34 @@ describe('SinglePlayerView — returning-player bots gate', () => {
     });
 
     await new Promise(r => setTimeout(r, 50));
+    expect(mockRouterReplace).not.toHaveBeenCalled();
+  });
+
+  it('does NOT redirect returning player on bare /singleplayer (SEO lander)', async () => {
+    markBotsGamePlayed();
+    // no search params → bare SEO/CTA URL
+
+    await act(async () => {
+      render(<SinglePlayerView />);
+    });
+
+    await new Promise((r) => setTimeout(r, 50));
+    expect(mockRouterReplace).not.toHaveBeenCalled();
+  });
+
+  it('does NOT redirect a Google-referred autoStart=bots lander', async () => {
+    markBotsGamePlayed();
+    mockSearchParams.set('autoStart', 'bots');
+    Object.defineProperty(document, 'referrer', {
+      value: 'https://www.google.com/search?q=lexiclash',
+      configurable: true,
+    });
+
+    await act(async () => {
+      render(<SinglePlayerView />);
+    });
+
+    await new Promise((r) => setTimeout(r, 50));
     expect(mockRouterReplace).not.toHaveBeenCalled();
   });
 

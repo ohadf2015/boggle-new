@@ -13,17 +13,42 @@ import posthog from '@/lib/analytics/lazyPosthog';
 
 const MIN_ENGAGED_MS = 2000;
 
+export interface AbandonExtras {
+  words_found?: number;
+  sp_mode?: string;
+  landing_path?: string;
+}
+
 interface ActiveGame {
   mode: string;
   startedAt: number;
+  extras: AbandonExtras;
 }
 
 let active: ActiveGame | null = null;
 let alreadyEmitted = false;
 
-export function markGameActive(mode: string): void {
-  active = { mode, startedAt: Date.now() };
+function currentLandingPath(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  return `${window.location.pathname}${window.location.search}`;
+}
+
+export function markGameActive(mode: string, extras: AbandonExtras = {}): void {
+  active = {
+    mode,
+    startedAt: Date.now(),
+    extras: {
+      words_found: extras.words_found ?? 0,
+      sp_mode: extras.sp_mode,
+      landing_path: extras.landing_path ?? currentLandingPath(),
+    },
+  };
   alreadyEmitted = false;
+}
+
+export function updateActiveGameExtras(patch: AbandonExtras): void {
+  if (!active) return;
+  active.extras = { ...active.extras, ...patch };
 }
 
 export function markGameInactive(): void {
@@ -47,6 +72,7 @@ function emitAbandonIfActive() {
       gameMode: active.mode,
       durationSec: Math.round(durationMs / 1000),
       reason: 'pagehide',
+      ...active.extras,
     });
   } catch {
     // PostHog not initialized — analytics never block UX
@@ -94,6 +120,7 @@ export function emitAbandonOnSpaNavigate(): void {
         gameMode: snapshot.mode,
         durationSec: Math.round(durationMs / 1000),
         reason: 'spa_navigate',
+        ...snapshot.extras,
       });
     } catch {
       // PostHog not initialized — analytics never block UX

@@ -18,6 +18,7 @@ import {
   markGameActive,
   markGameInactive,
   emitAbandonOnSpaNavigate,
+  updateActiveGameExtras,
   __resetAbandonStateForTests,
 } from '../abandonOnPagehide';
 
@@ -50,6 +51,31 @@ describe('abandonOnPagehide', () => {
     expect(eventNames).toContain('growth:game_abandoned');
     const payload = captureMock.mock.calls.find((c) => c[0] === 'growth:game_abandoned')?.[1];
     expect((payload as { mode?: string })?.mode).toBe('singleplayer');
+    vi.useRealTimers();
+  });
+
+  it('includes durationSec, words_found, sp_mode and landing_path on singleplayer abandon', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    markGameActive('singleplayer', {
+      sp_mode: 'solo-bots',
+      words_found: 0,
+      landing_path: '/es/singleplayer',
+    });
+    updateActiveGameExtras({ words_found: 3 });
+    vi.setSystemTime(new Date('2026-01-01T00:00:39Z'));
+
+    fireEvent('pagehide');
+
+    const payload = captureMock.mock.calls.find((c) => c[0] === 'growth:game_abandoned')?.[1] as Record<string, unknown>;
+    expect(payload).toMatchObject({
+      mode: 'singleplayer',
+      durationSec: 39,
+      reason: 'pagehide',
+      words_found: 3,
+      sp_mode: 'solo-bots',
+      landing_path: '/es/singleplayer',
+    });
     vi.useRealTimers();
   });
 

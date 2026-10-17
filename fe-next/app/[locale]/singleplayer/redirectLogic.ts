@@ -6,7 +6,9 @@
  *   /multiplayer?quickPlay=true (cold SEO traffic auto-matched with strangers).
  * - #897 retargeted that 308 to /{locale}/singleplayer?autoStart=bots so new
  *   visitors got the first-win-fast solo game. Returning players still re-route
- *   to MP Quick Play client-side via hasPlayedBotsGame.
+ *   to MP Quick Play client-side via hasPlayedBotsGame — but only for explicit
+ *   in-app `?autoStart=bots`, never for bare SEO hits (UR P2 2026-10-17).
+ * - Bare entries now autoStart=coach (clock held until first word, no start gate).
  *
  * Post-#897 regression (2026-09-06 audit): /es/singleplayer stayed at 100%
  * bounce while /en/singleplayer was 0%. Root cause was the 308 itself —
