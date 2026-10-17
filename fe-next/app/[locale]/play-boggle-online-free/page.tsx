@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 
@@ -187,9 +186,9 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      <Script id="ld-faq" type="application/ld+json">{faqJsonLd}</Script>
-      <Script id="ld-howto" type="application/ld+json">{howToJsonLd}</Script>
-      <Script id="ld-app" type="application/ld+json">{softwareAppJsonLd}</Script>
+      <script id="ld-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+      <script id="ld-howto" type="application/ld+json" dangerouslySetInnerHTML={{ __html: howToJsonLd }} />
+      <script id="ld-app" type="application/ld+json" dangerouslySetInnerHTML={{ __html: softwareAppJsonLd }} />
 
       {/* STICKER MARQUEE */}
       <div className="border-y-3 border-neo-black bg-neo-lime overflow-hidden">

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 export const dynamic = 'force-dynamic';
@@ -110,8 +109,8 @@ export default async function CompetitiveWordGamesPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
-      <Script id="ld-faq-competitive" type="application/ld+json">{faqJsonLd}</Script>
-      <Script id="ld-videogame-competitive" type="application/ld+json">{videoGameJsonLd}</Script>
+      <script id="ld-faq-competitive" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+      <script id="ld-videogame-competitive" type="application/ld+json" dangerouslySetInnerHTML={{ __html: videoGameJsonLd }} />
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <TopBackLink className="mb-4" />

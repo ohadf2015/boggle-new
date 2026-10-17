@@ -1,5 +1,3 @@
-import Script from 'next/script';
-
 interface FaqEntry {
   question: string;
   answer: string;
@@ -26,8 +24,6 @@ export function FaqJsonLd({ items, locale, path }: { items: FaqEntry[]; locale: 
     })),
   };
   return (
-    <Script id="s3d-faq-jsonld" type="application/ld+json" strategy="afterInteractive">
-      {JSON.stringify(schema).replace(/</g, '\\u003c')}
-    </Script>
+    <script id="s3d-faq-jsonld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} />
   );
 }

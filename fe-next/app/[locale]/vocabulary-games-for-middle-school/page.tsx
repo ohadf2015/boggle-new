@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { getMiddleSchoolContent } from './content';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
@@ -87,8 +86,8 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
-      <Script id="ld-msvocab-faq" type="application/ld+json">{JSON.stringify(faqJsonLd)}</Script>
-      <Script id="ld-msvocab-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</Script>
+      <script id="ld-msvocab-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script id="ld-msvocab-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <TopBackLink className="mb-4" />

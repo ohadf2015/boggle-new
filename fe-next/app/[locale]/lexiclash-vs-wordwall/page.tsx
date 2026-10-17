@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 
 export const dynamic = 'force-dynamic';
@@ -93,8 +92,8 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
-      <Script id="ld-vs-wordwall-faq" type="application/ld+json">{JSON.stringify(faqJsonLd)}</Script>
-      <Script id="ld-vs-wordwall-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</Script>
+      <script id="ld-vs-wordwall-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script id="ld-vs-wordwall-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">

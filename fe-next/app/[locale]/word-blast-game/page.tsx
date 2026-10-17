@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 
 // Keyword landing for the LIVE Blast mode (its play route /blast is a
 // noindexed game shell). English body → EN canonical, same convention as
@@ -144,9 +143,9 @@ export default async function WordBlastGameLandingPage({ params }: PageProps) {
 
   return (
     <main className="min-h-dvh bg-neo-navy text-neo-white">
-      <Script id="ld-wb-faq" type="application/ld+json">{faqJsonLd}</Script>
-      <Script id="ld-wb-howto" type="application/ld+json">{howToJsonLd}</Script>
-      <Script id="ld-wb-game" type="application/ld+json">{gameJsonLd}</Script>
+      <script id="ld-wb-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+      <script id="ld-wb-howto" type="application/ld+json" dangerouslySetInnerHTML={{ __html: howToJsonLd }} />
+      <script id="ld-wb-game" type="application/ld+json" dangerouslySetInnerHTML={{ __html: gameJsonLd }} />
 
       {/* Sticker marquee */}
       <div className="overflow-hidden border-y-2 border-black bg-neo-orange">

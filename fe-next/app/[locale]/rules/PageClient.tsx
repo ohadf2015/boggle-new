@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Script from 'next/script';
 import dynamic from 'next/dynamic';
 import { m } from 'framer-motion';
 import { Gamepad2, Trophy, Lightbulb, Users, ArrowLeft, Play, Bot, CheckCircle } from 'lucide-react';
@@ -96,7 +95,7 @@ export default function RulesPageClient(): React.JSX.Element {
     return (
         <>
             {/* JSON-LD Schema for SEO */}
-            <Script
+            <script
                 id="howto-schema"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: schemaJson }}

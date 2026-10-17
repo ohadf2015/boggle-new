@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import Script from 'next/script';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -232,11 +231,11 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      <Script id="ld-faq" type="application/ld+json">{faqJsonLd}</Script>
-      <Script id="ld-videogame" type="application/ld+json">{videoGameJsonLd}</Script>
-      <Script id="ld-software" type="application/ld+json">{softwareAppJsonLd}</Script>
-      <Script id="ld-howto" type="application/ld+json">{howToJsonLd}</Script>
-      <Script id="ld-breadcrumb" type="application/ld+json">{breadcrumbJsonLd}</Script>
+      <script id="ld-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+      <script id="ld-videogame" type="application/ld+json" dangerouslySetInnerHTML={{ __html: videoGameJsonLd }} />
+      <script id="ld-software" type="application/ld+json" dangerouslySetInnerHTML={{ __html: softwareAppJsonLd }} />
+      <script id="ld-howto" type="application/ld+json" dangerouslySetInnerHTML={{ __html: howToJsonLd }} />
+      <script id="ld-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
 
       {/* STICKER MARQUEE */}
       <div className="border-y-3 border-neo-black bg-neo-pink overflow-hidden">

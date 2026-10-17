@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import Script from 'next/script';
 import PlayStoreCTA from '@/components/PlayStoreCTA';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { PLAY_STORE_URL } from '@/utils/androidApp';
@@ -135,10 +134,10 @@ export default async function DownloadWordGameAndroidPage({ params }: PageProps)
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      <Script id="ld-app-android" type="application/ld+json">{appJsonLd}</Script>
-      <Script id="ld-faq-android" type="application/ld+json">{faqJsonLd}</Script>
-      <Script id="ld-breadcrumb-android" type="application/ld+json">{breadcrumbJsonLd}</Script>
-      <Script id="ld-howto-android" type="application/ld+json">{howToJsonLd}</Script>
+      <script id="ld-app-android" type="application/ld+json" dangerouslySetInnerHTML={{ __html: appJsonLd }} />
+      <script id="ld-faq-android" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
+      <script id="ld-breadcrumb-android" type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
+      <script id="ld-howto-android" type="application/ld+json" dangerouslySetInnerHTML={{ __html: howToJsonLd }} />
 
       {/* MARQUEE */}
       <div className="border-y-3 border-neo-black bg-neo-pink overflow-hidden">

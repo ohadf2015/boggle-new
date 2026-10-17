@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
@@ -315,8 +314,8 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
       <FaqPageJsonLd faqs={faqs} />
       <VideoGameJsonLd />
       {/* Article + ItemList remain client-side until wrapper components exist */}
-      <Script id="ld-itemlist" type="application/ld+json">{itemListJsonLd}</Script>
-      <Script id="ld-article" type="application/ld+json">{articleJsonLd}</Script>
+      <script id="ld-itemlist" type="application/ld+json" dangerouslySetInnerHTML={{ __html: itemListJsonLd }} />
+      <script id="ld-article" type="application/ld+json" dangerouslySetInnerHTML={{ __html: articleJsonLd }} />
 
       {/* STICKER MARQUEE */}
       <div className="border-y-3 border-neo-black bg-neo-yellow overflow-hidden">
