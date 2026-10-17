@@ -2,47 +2,47 @@
 
 Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All lane prompts inject this file as preamble.
 
-> **Window: 2026-10-06..10-12. 7 scheduled nights. Lanes ran on 5. CODE SHIPPED ON 2.**
+> **Window: 2026-10-11..10-17. 7 scheduled nights. Lanes ran on 4. CODE SHIPPED ON 0.**
 >
-> | Night | Lane phase | authored | Gate | Outcome |
+> | Night | Lanes | authored | Gate | Outcome |
 > |---|---|---|---|---|
-> | 10-06 | 01:06→02:02 (**56 min**, 8 lanes) | 23 | PASS @43m | **SHIPPED** |
-> | 10-07 | — | 0 | — | `MONTHLY SPEND CAP (rc=76)` → circuit breaker @ 09:27 |
-> | 10-08 | 01:36→05:10 (3h34m, 8 lanes) | 15 | **PASS** @70m | **0 CODE SHIPPED** — `nothing to commit after excluding generated artifacts`; `c547ba1df` is the residual *docs* ship, NOT a code ship |
-> | 10-09 | 01:06→02:34 (8 lanes) | 23 | **FAIL, 3 tiers, to 06:43** | docs-only salvage — **all 23 DROPPED** |
-> | 10-10 | 01:07→02:22 (8 lanes) | 23 | FAIL @03:10 → repaired | **SHIPPED** `88f710507` @05:11 |
-> | 10-11 | **never started** | 0 | — | `preflight: ABORT — diverged & local-only commits touch non-docs paths` @01:39 |
-> | 10-12 | 01:08→ (9/12 lanes) | 21+ | pending | 6 lanes done at write time |
+> | 10-11 | **0** | 0 | — | `preflight ABORT — diverged` (clean tree + unpushed code) |
+> | 10-12 | 9 | 21+ | — | lanes ran; 7 lane-sections in report |
+> | 10-13 | **0** | 0 | — | `MONTHLY SPEND CAP (rc=76)` @10:16 → circuit breaker |
+> | 10-14 | **0** | 0 | — | `MONTHLY SPEND CAP (rc=76)` @01:06 → circuit breaker |
+> | 10-15 | 9 | 27 | **FAIL @02:51** → baseline re-gate @02:54 | no ship line in log |
+> | 10-16 | 9 | 21 | **FAIL ×3 tiers → 03:41** | **CODE DROPPED**, docs-only |
+> | 10-17 | 5+ | 29+ (lane 4 alone kept **18**) | pending | in flight |
 >
-> **Read that table again: 76 authored files across 5 run-nights produced TWO code commits.** `kept N
-> authored file(s)` is NOT a ship, and **`preflight: OK — repo @ <sha>` is the BASE sha — this file called it
-> a ship for a week.** Verify with `rg "isolated-shipped|residual ship" <log>` + `git log --grep="autonomous
-> improvement loop"`; there is no 2026-10-08 loop commit on master.
->
-> **HEADLINE 1 — I CLOSED THE PREFLIGHT ABORT TOO EARLY, AND 10-11 PROVES IT. THIS IS #1.**
-> Last week's rewrite said "CLOSE #2 and #3 — dirty-tree isolated-ship replaced the preflight abort."
-> Wrong: **the fix only covers the DIRTY-tree path.** `scripts/nightly/lib/preflight.sh:224` still runs
-> `git pull --ff-only` whenever `tree_clean=1`, and L240-250 still hard-ABORTS when the local-only commits
-> touch non-docs paths. On 10-11 the founder's tree was **clean** with 7 unpushed code files (solver word
-> index + wheelRush bots) → `fatal: Not possible to fast-forward` → **ABORT at 01:39, zero lanes, zero
-> files, no `docs/nightly/reports/2026-10-11.md` at all.** The abort is now **dead code**: 20 lines BELOW
-> it, the same branch already handles unpushed non-docs commits by setting `NIGHTLY_ISOLATED_SHIP=1` —
-> which is exactly the right answer for a divergence too. **Fix: on ff-only failure with non-docs local
-> commits, set `NIGHTLY_ISOLATED_SHIP=1` + `NIGHTLY_FOUNDER_BASE` and continue instead of `return 1`.**
-> ~6 lines, S-effort, recovers a whole night. Lane 7 shipped this tonight — see loop-improvements/2026-10-12.md.
->
-> **HEADLINE 2 — THE GATE'S REPAIR CHAIN NOW ACTUALLY WORKS, ONCE. 10-10 vs 10-09 is the experiment.**
-> Both nights authored 23 files and both FAILED the first gate. 10-09 ping-ponged `oneMoreCrown`
-> TS2353↔TS2741 through 3 tiers and dropped everything. 10-10 hit the new **`baseline-gate`** tier —
-> it re-gated a CLEAN HEAD scoped to just the failing test file (`MpResultsScreen.studentMissed.test.tsx`),
-> got PASS, correctly concluded "not a decidable pre-existing baseline", continued salvage, and
-> **isolated-shipped `88f710507`**. The wedge-proof pre-existing-red check is the single best infra
-> addition of the window. Residual cost: 4h11m wall-clock for one night's 23 files.
->
-> **HEADLINE 3 — "the gate has no per-file bisect" WAS FALSE. `nightly_bisect_offenders` is built, tested,
-> and wired** (`lib/gate-isolated.sh:373` ← `run.sh:1143`, `test/bisect-offenders.test.sh`). It logged 3
-> lines on 10-10 (shipped) and **1 on 10-09** (dropped 23). The work is debugging that one invocation, not
-> rebuilding the feature. **Grep for the helper before proposing to write it.**
+> **No `fix(nightly)`/loop commit on master in 9 days.** Every commit `243dc74b5..9a55227dd` is founder or
+> company-brain work. Verify a ship with `git log --grep="autonomous improvement loop"`, never with
+> `preflight: OK — repo @ <sha>` (that is the BASE sha) and never with `kept N authored file(s)`.
+
+> ## 🔴 HEADLINE — THE ISOLATED GATE'S TYPECHECK TIER IS STRUCTURALLY RED. FIX THIS FIRST.
+> 10-16 final error, verbatim:
+> `app/[locale]/layout.tsx(4,31): error TS2307: Cannot find module '@/lib/i18n/messagesManifest.json'`
+> That file is **gitignored** (`fe-next/.gitignore:133`) and **generated** by `scripts/build-i18n-assets.ts`
+> (`npm run build:i18n`). The gate's clean-HEAD worktree runs only `npm run build:schemas`
+> (`scripts/nightly/lib/gate-isolated.sh:142,160,173`), so `tsc --noEmit` **cannot resolve it in any fresh
+> checkout** — regardless of what the lanes wrote. The import has been in `app/[locale]/layout.tsx` since
+> `c533d6211` (2026-08-07). Consequences, all observed on 10-16:
+> - every `typecheck`/`typeonly` tier returns FAIL → "unattributable gate failure"
+> - `nightly_bisect_offenders` then "named an offender" that is innocent (03:19:09)
+> - drop-and-re-gate concluded "not a clean baseline-poison" and **dropped 21 real files**
+> **Fix (one word, 3 sites): `npm run build:schemas && npm run build:i18n && npx --no-install tsc --noEmit`**
+> at `gate-isolated.sh:142`, `:160`, `:173`. `build:prebuild` already chains exactly these two (package.json:11).
+> This single edit plausibly un-drops a whole night's code. Nothing else in this file matters more.
+
+> **HEADLINE 2 — THE SPEND CAP KILLED TWO NIGHTS AND NOTHING WARNED BEFORE 01:00.** 10-13 and 10-14 both
+> died at lane 1 on `rc=76` with zero lanes, zero files, **zero `docs/nightly/reports/` section**. That is
+> Pitfalls Class 4 (silent no-op) at the run level. The circuit breaker is correct; the *blindness* is not.
+> **Fix: a pre-lane spend probe that writes `docs/nightly/artifacts/run-aborted-<date>.md` + sends the
+> Telegram card.** (This is item #6 from last week, now with 2 more nights of cost.)
+
+> **HEADLINE 3 — #1 FROM LAST WEEK IS CONFIRMED FIXED. CLOSE IT.** 10-13's log shows the new path firing:
+> `preflight: diverged & local-only commits touch non-docs paths — leaving local alone, isolated ship
+> handles it`. No abort. 10-16 and 10-17 also reached lanes with unpushed non-docs commits. Lane 7's
+> 10-12 `preflight.sh` change works. Do not re-litigate it.
 
 ## FOUNDER DIRECTIVE — highest priority
 - **2026-06-23 (standing):** (1) SPEED without bugs, (2) MODE READINESS to release quality,
@@ -51,132 +51,96 @@ Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All l
 - **ADMIN-BETA TARGET LIST.** NOT admin-gated, never pick as STEP-0 targets: `blast`/`blast/v2`, `crossword`
   (noindex-only), `shiritori` (**DELETED 09-08**), `word-tower` (public), `party`/`word-alchemy`/`word-forge`/
   `word-vault` (DELETED 07-06). **Surviving admin-gated set: `sealed-bid`, `word-craft` (`?mode=gems`,
-  `?mode=cards`), `brain-drill`, `wheel-rush`.** `wheel-rush` has **no standalone route** (0.15-weight
-  MP-rotation pick only) — its report URL 404s by design; 10-12 lane 05 correctly used `/en/multiplayer/`.
-- **The lane scheduler skipping lanes is BY DESIGN.** `run.sh:421`. 8-9 of 12 every night this window.
-  `NIGHTLY_SCHEDULER=0` restores all 12. **Not a defect.**
+  `?mode=cards`), `brain-drill`, `wheel-rush`.** `wheel-rush` has **no standalone route** (MP-rotation pick
+  only) — its report URL 404s by design; use `/en/multiplayer/`.
+- **The lane scheduler skipping lanes is BY DESIGN** (`run.sh:421`). `NIGHTLY_SCHEDULER=0` restores all 12.
 - **2026-06-27 (blog cadence):** new blog every 2 days — word-game + education/"AI to learn a language"
-  angles, link a live MODE. Lane 08 got 1 of 6 run-nights this window.
+  angles, link a live MODE.
 - **Improve admin-beta modes nightly — NO new modes** (2026-06-16). Lane 05 STEP 0 improves ONE existing
   admin-gated mode/night, EXISTING files only, keeps the admin gate.
-- **No hard file-count cap**, but the guard enforces **`file-cap=8` per lane** and blocks new edits past the
-  finalize cutoff. Write all locale translations FIRST — **`ru` is a live 6th locale** despite CLAUDE.md's 5.
+- **The guard enforces `file-cap=8` per lane** (confirmed in 10-17's time-guard line). **10-17 lane 4 kept
+  18 files** — either the cap is not enforced on that lane's path or docs are exempt. A 18-file lane is the
+  exact shape that poisons a gate. Write all locale translations FIRST — **`ru` is a live 6th locale**.
 
 ## Telegram-button feedback (last 7 days)
-- **ZERO callbacks. `docs/nightly/feedback/*.ndjson` still stops at 2026-07-26 — now 78 days.** Twelfth
-  consecutive window at 0: `night:good`/`night:meh`/`polish:try`/`idea:build`/`reddit:*`/`mode:*` all 0.
-  **The Telegram card CTA is dead as a steering channel. Stop adding buttons.** A lane prompt waiting on a
-  `polish:try` vote is unreachable — self-select instead. Outbound still works (10-12 sent 2 cards); only
-  the inbound leg is dead. `feedback-poll` now defers to the daemon as sole poller.
-- Not the same as `feedback/summary-*.md` — the **player** sentiment digest is a live signal, injected into
-  triage + engagement on 10-12.
+- **ZERO callbacks. `docs/nightly/feedback/*.ndjson` still stops at 2026-07-26 — now 83 days.** Thirteenth
+  consecutive window at 0 across `night:*`, `polish:*`, `idea:*`, `reddit:*`, `mode:*`. **The inbound
+  Telegram leg is dead. Stop adding buttons; never gate a lane on a vote.** Outbound cards still send.
+- The **player** sentiment digest (`feedback/summary-*.md`) is a different, live signal — keep using it.
 
 ## What works (validated this week)
-- **`baseline-gate` wedge-proof pre-existing-red check turned a dropped night into a shipped one** (10-10,
-  `88f710507`). Scope a CLEAN-HEAD re-gate to only the failing test file, then decide. (validated ×1, highest value)
-- **Recoverable salvage backup + `restore-salvaged-code.sh`.** 10-09's 23 dropped files are still on disk at
-  `~/logs/lexi-nightly/salvaged-code-20261009-010003`. A dropped night is a deferred night, not a lost one.
-- **Dirty-tree isolated-ship.** 10-07/08/09/10 skipped ff-pull and reached lanes within 7 min of 01:00.
-  Correct but **incomplete** — see Headline 1. Founder WIP restored byte-identical on every shipped night.
-- **Per-lane self-revert contains blast radius.** 10-07 lane 1 (rc=76) reverted only its own files.
-- **The Mandatory-Minimum-Artifact floor holds.** 10-12 produced 7 lane artifacts before the gate even ran.
-- **Mandatory sample-size gate on perf claims.** 10-12 lane 02 re-queried a 7428ms LCP row with `$host`,
-  found n=1, and refused to call it a regression. Fifth night of imposketch.io contamination caught.
-- **"Verified clean with evidence" is a legitimate lane output.** 10-12 lane 11 closed 2 blast dimensions
-  with file:line proof and shipped no code — better than a half-wired 6-file fix at the cutoff.
-- **Doctrine:** Pixi `.destroyed`/`.geometry` null-guards in rAF · BOOLEAN not bare Capacitor proxy ·
-  try/catch on async generation · `initial={false}` on above-fold Framer entrances · `DirectionalIcon` NAMED
-  import (default = `undefined`, silent no-op) + logical `start-`/`end-` for RTL · local JWT verify on
-  read-only GET · `priority={false}` on Suspense-fallback images · Supabase Management API raw-SQL fallback.
+- **Preflight divergence → isolated ship** (Headline 3). 10-13/15/16/17 all reached the lane phase with
+  founder WIP left byte-identical. Validated ×4 — the single best infra change of the prior window.
+- **Per-tier gate escalation DOES localize a failure** — 10-16 walked lint→typecheck→1-file re-gates
+  without wedging. The machinery is sound; its oracle is poisoned (Headline 1). Repair the oracle, not the loop.
+- **Recoverable salvage backup.** 10-16's 21 dropped files are on disk; `restore-salvaged-code.sh <stamp>`
+  replays them. 10-15 lane 1 and 10-16 lane 1 both *used* it unprompted. A dropped night is a deferred night.
+- **The Mandatory-Minimum-Artifact floor holds** — `docs/nightly/artifacts/lane-*` written on every
+  lane-running night, including nights whose code was dropped.
+- **Doctrine (unchanged, all still true):** Pixi `.destroyed`/`.geometry` null-guards in rAF · BOOLEAN not
+  bare Capacitor proxy · try/catch on async generation · `initial={false}` on above-fold Framer entrances ·
+  `DirectionalIcon` NAMED import + logical `start-`/`end-` for RTL · local JWT verify on read-only GET ·
+  `priority={false}` on Suspense-fallback images · no hardcoded colors, `neo-*` tokens only.
 
 ## What to avoid (failed this week)
-- **#1 — THE CLEAN-TREE PREFLIGHT ABORT COST ALL OF 10-11.** **FIXED + regression-tested by lane 7 on
-  10-12** (`preflight.sh`, `test/preflight.test.sh`: RED 54/4 on old, GREEN 58/0 on new). Verify on the next
-  clean-tree diverged night before closing it here.
-- **#2 — A GATE "PASS" THAT SHIPS ZERO CODE IS A SILENT FAILURE, AND IT ATE 10-08's 15 FILES.** Gate PASSED
-  06:20:01; next line is `nothing to commit after excluding generated artifacts — treating as no-change`
-  (twice), then `residual ship OK (c547ba1df)` — docs only. No alert, run reported success. Pitfalls
-  **Class 4** exactly. **Fix: gate PASS on N>0 authored code files + 0 committed = ERROR; alert with the
-  excluded-path list, never "no-change".** (open, **#2**, S-effort, 15 files/night)
-- **#3 — ONE FILE'S TYPE ERROR CAN STILL DROP ALL 8 LANES — but the bisect is BUILT, so debug it.**
-  `nightly_bisect_offenders` exists (`lib/gate-isolated.sh:373` ← `run.sh:1143`, has a test) and ran: 3
-  `bisect` lines on 10-10 (shipped) vs **1 on 10-09** (dropped 23). **Read why the 10-09 invocation found no
-  offenders** — its oracle is the `quick` typecheck tier, which a `next build` TS wedge can make
-  inconclusive rather than attributing. (open, **#3**, M-effort)
-- **#4 — ADDING A COPY/PROPS KEY TO AN INLINE-INFERRED OBJECT LITERAL IS A TWO-SITE EDIT.** 10-09's
-  `oneMoreCrown` TS2353 at the consumer ↔ TS2741 at the literal is the same mismatch from each end.
-  **Every lane: when you add a key, `rg` a sibling key (`crownGoal`) and edit EVERY site in one edit, then
-  `cd fe-next && npx tsc --noEmit`.** `npx eslint` does NOT type-check. (open, **#3**, prompt-only)
-- **#5 — THE GATE IS THE LONGEST PHASE AND HAS NO PROGRESS CHECK.** 43m (10-06 PASS) · 70m (10-08 PASS) ·
-  **4h09m (10-09 FAIL×3 tiers)** · **2h49m (10-10 FAIL→repair→ship)**. 10-09 flipped between two errors —
-  the error *moved* but never shrank. **Abort the loop when attempt N's error set is no smaller than N-1's,
-  or after 2 attempts.** (open, carried, S-effort)
-- **#6 — Early exits ship zero artifacts (10-07 spend cap, 10-11 preflight).** Both nights are invisible
-  outside the raw log. **Write `docs/nightly/artifacts/run-aborted-<date>.md` with the reason + unblock
-  command, commit it docs-only.** (open, carried 2 windows, S-effort)
-- **#7 — Stranded `refs/nightly-pending/` is STILL 2026-08-03, -08-06, -08-28** — ~70 nights,
-  `cherry-pick/push failed` on all 7 nights. Blocker: conflicts in append-only artifacts.
-  **Give `impact-ledger.ndjson`, `mode-readiness.md`, `perf-baseline.json` a `merge=union` driver in
-  `.gitattributes`.** (open, carried, M — oldest item here; note #1's fix raises conflict odds, so these
-  two are coupled)
-- **#8 — `supabase` MCP fails its boot probe; `sentry` now joins it.** Both failed 3 attempts on 10-08 and
-  10-12. Cause: **`npx` cold-boot under load hangs subagents** (MEMORY 09-07). **Pin both to a local
-  install.** (open, S/M)
-- **`collector supabase failed/timed out → stale fallback` on 7 of 7 nights**, yet the brief printed
-  `supabase=346` signals. 10-12 now marks `(stale: …)`. **Next: per-source age in days; >3d = no-signal.**
-- **The brief's LCP top-5 is cross-tenant PostHog contamination** (imposketch.io), 5 consecutive nights; an
-  own-domain `$host`+`n>50` sweep returns ZERO rows. Lane 02 burns 10 min/night re-deriving this.
-  **Filter `$host` in the collector, not the lane.**
-- **agent-browser cannot dismiss the cookie-consent overlay** — dialog renders outside the snapshot a11y
-  tree. Blocks lane 11 visual QA (10-12: "code-audit only"). (open, longest-running)
-- **`reddit-fetch search` returns garbage**; the RSS *feed* path works. Fall through to WebSearch. (lane 04)
-- **Subagents fabricate non-English word lists** — spot-check 5 real words per locale before shipping any
-  he/ja/sv/es/ru content. (lane 10)
-- **A bare `count` in a supabase-js select is a PostgREST AGGREGATE (42803), not a column.** Verify live
-  names in `information_schema.columns`; import socket payload types from `@/shared/types/socket`.
-- **Supabase advisor warnings go stale** — 10-12's `vocabulary_lessons.classroom_id` FK-index row was
-  already satisfied. Confirm against `pg_indexes` before "fixing" one.
-- **Grep for the helper before proposing to build it.** Two of last week's "missing" items existed
-  (`bisect_offenders`; the dirty-tree isolated ship). `ls scripts/nightly/lib scripts/nightly/test` first.
+- **#1 — THE GATE'S FRESH-CHECKOUT TYPECHECK IS MISSING `build:i18n`.** See Headline 1. Cost: 21 files on
+  10-16 + every false "offender" the bisect has ever named. (open, **S-effort, 3 one-word edits**)
+- **#2 — A SPEND-CAP ABORT LEAVES NO ARTIFACT AND NO ALERT.** 10-13, 10-14. (open, carried 3 windows, S)
+- **#3 — A GATE "PASS" THAT SHIPS ZERO CODE IS STILL UNGUARDED.** Not observed this window only because no
+  gate passed. **N>0 authored code files + 0 committed must be an ERROR with the excluded-path list.** (open, S)
+- **#4 — ADDING A KEY TO AN INLINE-INFERRED OBJECT LITERAL IS A TWO-SITE EDIT.** `rg` a sibling key and
+  edit every site in one pass. `npx eslint` does NOT type-check. (open, prompt-only)
+- **#5 — THE GATE IS THE LONGEST PHASE AND HAS NO SHRINK CHECK.** 10-15: 02:51→02:54+. 10-16: **02:58→03:41,
+  5 re-gates, ended dropping everything.** **Abort the peel loop when attempt N's error set is no smaller
+  than N-1's.** With #1 fixed this mostly evaporates. (open, carried, S)
+- **#6 — Stranded `refs/nightly-pending/` is STILL 2026-08-03, -08-06, -08-28** — ~75 nights,
+  `cherry-pick/push failed` on 7 of 7. **Give `impact-ledger.ndjson`, `mode-readiness.md`,
+  `perf-baseline.json` a `merge=union` driver in `.gitattributes`.** Oldest open item here. (M)
+- **#7 — `supabase` + `sentry` MCP fail the boot probe** (10-12 both, 3 attempts). `npx` cold-boot under
+  load hangs subagents. **Pin both to a local install.** (open, S/M)
+- **#8 — stale preflight lock seen twice** (10-16 `pid=11512 age=86402s`, 10-17 `pid=25706 age=86402s`).
+  Auto-cleared correctly, but an 86400s age means **the prior run never released it** — a run is dying
+  without its trap firing. Watch. (new)
+- **Brief hygiene, unchanged:** collector `supabase` stale-fallback on 7/7 nights · the LCP top-5 is
+  cross-tenant PostHog contamination (imposketch.io) — **filter `$host` in the collector, not the lane** ·
+  `reddit-fetch search` returns garbage, the RSS feed path works · subagents fabricate non-English word
+  lists (spot-check 5 real words/locale) · a bare `count` in supabase-js select is a PostgREST AGGREGATE
+  (42803) · Supabase advisor warnings go stale — confirm against `pg_indexes`.
+- **Grep for the helper before proposing to build it.** `ls scripts/nightly/lib scripts/nightly/test` first.
 
 ## Open watches (carry forward)
-- **#1-#8 above are the live watches** — preflight abort (10-11), gate-PASS-ships-nothing (10-08), bisect
-  invocation (10-09), two-site copy keys, gate progress check, abort artifacts, stranded refs, MCP npx boot.
-  **#1 fixed + regression-tested by lane 7 on 10-12 — do not re-close it in this file until a clean-tree
-  diverged night has demonstrably reached the lane phase.**
-- **Blast disconnect/reconnect-mid-wave board reset** — MAJOR, carried **3 nights** (10-10, 10-12).
-  `blastGrid`/`blastTileStates`/`blastPlayerMoves` computed server-side, never read client-side. Fix spans
-  6 files + a gating condition + a TDD reconnect test. **Never fits a 15-min lane — needs a human session.
-  Stop re-auditing it nightly.**
-- **No per-lane ship signal** — `kept N authored file(s)` over-reports (10-09 "kept 23", shipped 0; 10-08
-  "kept 15", shipped 0). **Emit `files_shipped=` per lane AFTER the gate.** Status: open, carried.
-- **agent-browser cookie-consent dismissal** — re-test after #1046. **Gate `rc=134` SIGABRT** — not seen
-  this window, watch. **Per-lane stall / rc 75-76** — guard held 5/5, CLOSED at lane level.
+- **#1–#8 above are the live watches.** Do not re-close last window's preflight item (Headline 3 closed it).
+- **Blast disconnect/reconnect-mid-wave board reset** — MAJOR, carried **4 nights**. 6 files + a gating
+  condition + a TDD reconnect test. **Never fits a 15-min lane. Stop re-auditing it nightly — human queue.**
+- **No per-lane ship signal.** `kept N` over-reports on every dropped night. **Emit `files_shipped=` per
+  lane AFTER the gate.** (open, carried)
+- **agent-browser cannot dismiss the cookie-consent overlay** (dialog outside the a11y snapshot tree) —
+  blocks lane 11 visual QA. Longest-running open item.
 - **Unwired-but-typed experiments** — `exp-practice-wheel-cta-v1`, `exp-game-abandon-confirm-v1`,
-  `exp-mp-round-feedback-top-v1` + 7 more, 0 non-test call sites. Search `rg "n\('exp-" fe-next`, NOT
-  `useExperiment`. **Brain Drill has no traffic** (`drill_completed` 0) — discoverability, not features.
+  `exp-mp-round-feedback-top-v1` + 7 more, 0 non-test call sites (`rg "n\('exp-" fe-next`).
+  **Brain Drill has no traffic** (`drill_completed` 0) — discoverability, not features.
   **MP CLS 0.92+** (socket `connecting→lobby` DOM swap) — fix = a `RoomListView` skeleton; human queue.
 - **GSC/human queue** — GSC creds drifted to `lf-finance.co.il`; IndexNow Bing parity; AdSense re-submit
   after ≥5 informational pages clear 400w; Sentry MCP write-403; Supabase never-expire PAT.
-- **`/es/juego-de-palabras-multijugador` CTR** — 23.5k impr, ~0.4% CTR, 3 prior title rewrites (Jul/Aug)
-  moved nothing. **Not a meta problem. Lane 06: stop rewriting its title; it needs a structural look.**
+- **`/es/juego-de-palabras-multijugador`** — 23.5k impr, ~0.4% CTR, 3 title rewrites moved nothing.
+  **Not a meta problem. Lane 06: stop rewriting its title.**
 
 ## Specialized Skills (maintained by lane 7)
 
 | Lane | Recommended skills | Evidence |
 |---|---|---|
-| 01 triage | `security`, `supabase-db-manager` | 5/5 run-nights, kept 2·2·5·4 — most reliable lane |
-| 02 perf | `superpowers:systematic-debugging`, `agent-browser:agent-browser` | 5/5; kept 3·1·3·3 — but burns 10 min/night re-deriving the brief's cross-tenant LCP noise |
-| 03 engagement | `frontend-design` | 5/5, kept 1·1·3·1 — consistent, low volume |
-| 04 competitor | `humanizer`, `game-designer` | 1/7 slots (scheduler-skipped); stable when it runs |
-| 05 landing | `frontend-design`, `impeccable`, `animate-ai` | 5/5 — authored 10-09's gate-killing `oneMoreCrown`; design quality non-negotiable, **add `tsc --noEmit` to its finalize** |
-| 06 seo | `seo-daily` | 4/7 slots; mandatory when it runs |
-| 07 self-learn | none — prompt-only | 2/7 (10-10, 10-12); its time-guard proposal shipped and holds |
-| 08 adsense | `humanizer`, `higgsfield-generate` | 1/7, kept 2 |
-| 09 monetization | `frontend-design` | kept 1-2 files/night — prompt still too narrow |
-| 10 dict | `dictionary-improvement`, `crossword-clue-craft` | 0/7 — scheduler-skipped every night |
-| 11 mode-qa | `senior-qa`, `ccgs-design-review`, `agent-browser:agent-browser` | 5/5, kept 2·3·2·2 — but 3 nights on one carried blast MAJOR it cannot finish in 15 min |
-| 12 telemetry | none — prompt-only | 2/7; **kept 7 files on 10-12 — the window's single biggest lane yield** |
+| 01 triage | `security`, `supabase-db-manager` | ran 4/4 lane-nights, kept 4·8·5·3; also self-served `restore-salvaged-code.sh` twice |
+| 02 perf | `superpowers:systematic-debugging`, `agent-browser:agent-browser` | 4/4, kept 2·4·2·3; still burns ~10 min/night on the brief's cross-tenant LCP noise |
+| 03 engagement | `frontend-design` | 4/4, kept 3·3·2·1 — consistent, low volume |
+| 04 competitor | `humanizer`, `game-designer` | 4/4 but **kept 18 on 10-17** — over cap; needs a scope clamp, not a new skill |
+| 05 landing | `frontend-design`, `impeccable` | 4/4, kept 2·3·2 — design quality non-negotiable; keep `tsc --noEmit` in its finalize |
+| 06 seo | `seo-daily` | 3/4, kept 1·1·3 — mandatory when it runs |
+| 07 self-learn | none — prompt-only | 3/7 nights (10-12, 10-16, 10-17); its preflight fix shipped and is validated |
+| 08 adsense | `humanizer`, `higgsfield-generate` | 2/4, kept 4·1 |
+| 09 monetization | `frontend-design` | 2/4, kept 1·2 — prompt still too narrow |
+| 10 dict | `dictionary-improvement`, `crossword-clue-craft` | 0/7 — scheduler-skipped every night, 2 windows running |
+| 11 mode-qa | `senior-qa`, `ccgs-design-review`, `agent-browser:agent-browser` | scheduler-skipped most nights; carried blast MAJOR it cannot finish in 15 min |
+| 12 telemetry | none — prompt-only | kept 7 files on 10-12 — prior window's biggest single-lane yield |
 
 ## Reddit reply etiquette (lane 4 sub-output)
 - **Never auto-post.** Drafts only. User reviews + posts manually.

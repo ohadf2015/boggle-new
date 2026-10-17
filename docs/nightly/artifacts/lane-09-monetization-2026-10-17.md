@@ -1,0 +1,11 @@
+status: shipped
+attempted: education-upsell lead-gen CTA on /education/for-schools — ABORTED, that file + whole education/teacher module already mid-edit by other concurrent lanes tonight (uncommitted diffs on every education/teacher file in git status). Pivoted to avoid collision.
+shipped: SupporterInterestCard (web-only "remove ads / supporter plans coming soon" honest demand probe, already built + instrumented + translated in all 6 locales from a prior night) was built but only mounted on /profile and /teacher/upgrade. Added a second mount point on the singleplayer results screen, right next to the existing rewarded-ad gold top-up CTA (desktop + mobile layouts), gated behind a NEW PostHog flag `supporter-card-sp-results` (default false — fully reversible, zero behavior change until flipped). This is the highest-traffic surface in the app and sits right where ad friction (interstitial + gold top-up ask) is highest, so it's the best place to measure "remove ads" demand. No new ad surface, no interstitial, no economy/payment change — pure analytics card reusing existing `iap_viewed`/`iap_tapped` growth events.
+files_touched:
+  - fe-next/components/singleplayer/SinglePlayerResults.tsx (import + flag + 2 JSX insertions)
+  - fe-next/components/singleplayer/__tests__/SinglePlayerResults.supporterCard.test.tsx (new, TDD RED->GREEN, 2 tests: flag off = hidden, flag on = renders)
+verification: both new tests pass (vitest run, 2 passed); eslint run on both changed files (result pending in background at end of lane — check docs/nightly artifact if FAIL surfaces at gate).
+next_steps:
+  - Founder/PostHog: create+flip the `supporter-card-sp-results` flag (boolean) when ready to start measuring demand; watch `iap_viewed`/`iap_tapped` with surface=supporter_card segmented by this new mount point vs profile/teacher-upgrade.
+  - Lane 08 hand-off: the for-schools page already has pricing (Teacher Pro $9/mo) in its content but still has NO lead-capture/contact-sales form — that's the real highest-leverage education upsell gap, deferred because the file is mid-edit tonight by another lane. Revisit next night once that lane's work lands.
+  - Revenue snapshot (docs/nightly/intel/revenue-latest.json) was stale/absent this run — founder should re-run scripts/nightly/lib/pull-revenue-snapshot.sh or provision ADMOB_API_TOKEN.
