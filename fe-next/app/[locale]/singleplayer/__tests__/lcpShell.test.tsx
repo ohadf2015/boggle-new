@@ -31,6 +31,8 @@ describe('singleplayer LCP shell (server HTML)', () => {
     expect(html).toMatch(/fetchPriority="high"/);
     expect(html).not.toContain('data-nimg');
     expect(html).not.toMatch(/src="\/mascot\/winner\.webp"/);
+    // Stay in the DOM; hide only after html[data-sp-ready] so results is not covered.
+    expect(html).toMatch(/html\[data-sp-ready\]\s*#sp-lcp-paint\s*\{\s*display\s*:\s*none/);
   });
 
   it('is mounted from the route layout so it survives the ssr:false swap', async () => {
