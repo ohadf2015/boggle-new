@@ -1486,7 +1486,17 @@ export const trackGameStart = (
     mode,
   });
   trackSessionDepth(sessionGameCount);
-  markGameActive(mode);
+  const spMode =
+    typeof extras.sp_mode === 'string'
+      ? extras.sp_mode
+      : typeof extras.subMode === 'string'
+        ? extras.subMode
+        : undefined;
+  markGameActive(mode, {
+    sp_mode: spMode,
+    words_found: typeof extras.words_found === 'number' ? extras.words_found : 0,
+    landing_path: typeof extras.landing_path === 'string' ? extras.landing_path : undefined,
+  });
   // First-win-fast: start the clock on a brand-new player's first game so the
   // eventual `first_game_won` carries time_to_first_win_sec (target: <60s).
   stampFirstWinClockStart();

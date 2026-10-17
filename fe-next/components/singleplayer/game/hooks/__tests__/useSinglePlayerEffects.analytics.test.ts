@@ -92,6 +92,7 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
     expect(trackGameStart).toHaveBeenCalledTimes(1);
     expect(trackGameStart).toHaveBeenCalledWith('singleplayer', expect.objectContaining({
       subMode: 'classic', boardSize: 4, difficulty: 'HARD', language: 'en',
+      sp_mode: 'classic', words_found: 0,
     }));
   });
 
@@ -99,34 +100,39 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
     renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'practice', grid: grid4 })));
 
     expect(trackGameStart).toHaveBeenCalledTimes(1);
-    expect(trackGameStart).toHaveBeenCalledWith('singleplayer', {
+    expect(trackGameStart).toHaveBeenCalledWith('singleplayer', expect.objectContaining({
       subMode: 'practice',
       boardSize: 4,
       difficulty: 'EASY',
       language: 'en',
-    });
+      sp_mode: 'practice',
+      words_found: 0,
+    }));
   });
 
   it('uses grid length for boardSize when grid is 5x5', () => {
     renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'classic', grid: grid5 })));
 
-    expect(trackGameStart).toHaveBeenCalledWith('singleplayer', {
+    expect(trackGameStart).toHaveBeenCalledWith('singleplayer', expect.objectContaining({
       subMode: 'classic',
       boardSize: 5,
       difficulty: 'EASY',
       language: 'en',
-    });
+      sp_mode: 'classic',
+    }));
   });
 
   it('reports boardSize=0 when grid is null on mount', () => {
     renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'practice', grid: null })));
 
-    expect(trackGameStart).toHaveBeenCalledWith('singleplayer', {
+    expect(trackGameStart).toHaveBeenCalledWith('singleplayer', expect.objectContaining({
       subMode: 'practice',
       boardSize: 0,
       difficulty: 'EASY',
       language: 'en',
-    });
+      sp_mode: 'practice',
+      words_found: 0,
+    }));
   });
 
   it('does not re-fire on prop changes (mount-only)', () => {

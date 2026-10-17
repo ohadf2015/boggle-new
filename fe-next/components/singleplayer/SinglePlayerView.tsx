@@ -129,6 +129,7 @@ const SinglePlayerView: React.FC = () => {
     handleQuickRematch,
     handleBackToLobby,
     handleStartPreset,
+    pendingMpRedirect,
   } = useSinglePlayerConfig({ searchParams });
 
   const setIsInGame = useHideNavigation();
@@ -321,7 +322,12 @@ const SinglePlayerView: React.FC = () => {
             <PracticeBadge />
           </div>
         )}
-        {phase === 'playing' && (
+        {phase === 'playing' && pendingMpRedirect && (
+          <div className="flex min-h-[60vh] items-center justify-center" aria-busy="true">
+            <PageLoader size="lg" />
+          </div>
+        )}
+        {phase === 'playing' && !pendingMpRedirect && (
           <SinglePlayerGame
             settings={gameState}
             targetHighScore={currentHighScore?.score || null}

@@ -10,7 +10,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 /**
- * Bare /singleplayer is handled client-side as autoStart=bots (see
+ * Bare /singleplayer is handled client-side as autoStart=coach (see
  * redirectLogic.ts + useSinglePlayerConfig). Do NOT permanentRedirect here —
  * a 308 breaks Next.js soft navigation (RSC payload fail) and was the
  * locale-specific dead end behind /es/singleplayer's post-#897 100% bounce.

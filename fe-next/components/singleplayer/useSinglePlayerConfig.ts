@@ -9,6 +9,12 @@ import {
 } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding, markOnboardingComplete, hasPlayedBotsGame } from '@/utils/onboardingStorage';
 import { shouldRedirectBareSingleplayer, searchParamsToRecord } from '@/app/[locale]/singleplayer/redirectLogic';
+import {
+  shouldRedirectReturningBots,
+  readBotsRedirectedThisSession,
+  markBotsRedirectedThisSession,
+  BARE_SINGLEPLAYER_AUTOSTART,
+} from './returningBotsGate';
 import { getStoredUsername } from '@/utils/profileStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackReplayClicked, trackNextGameStarted } from '@/utils/posthogEngagement';
@@ -140,6 +146,8 @@ interface UseSinglePlayerConfigResult {
   /** Start a preset in-page from the results screen (no navigation, no re-entry gate). */
   handleStartPreset: (presetId: string) => void;
   wasFirstTimerPracticeRef: React.MutableRefObject<boolean>;
+  /** True while the returning-player bots gate is sending the user to MP. */
+  pendingMpRedirect: boolean;
 }
 
 /** Game state for a preset — shared by the URL auto-start and the in-page picker. */
@@ -175,9 +183,12 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   const mpHandoff = searchParams?.get('mpHandoff') === '1';
   const masteryPractice = searchParams?.get('mastery') === '1';
   // Bare /singleplayer (no preserved params) is the SEO/CTA entry. Treat it as
-  // autoStart=bots client-side — NEVER server 308 (soft-nav RSC fail; see redirectLogic).
+  // autoStart=coach client-side — NEVER server 308 (soft-nav RSC fail; see redirectLogic).
+  // Coach (not bots): clock held until first word, no start gate, no MP yank
+  // after the first finish. Google → /es/singleplayer was 48% complete vs 76–88%
+  // for other modes (UR P2 2026-10-17).
   const isBareEntry = shouldRedirectBareSingleplayer(searchParamsToRecord(searchParams));
-  const autoStart = rawAutoStart ?? (isBareEntry ? 'bots' : null);
+  const autoStart = rawAutoStart ?? (isBareEntry ? BARE_SINGLEPLAYER_AUTOSTART : null);
 
   const [phase, setPhase] = useState<SinglePlayerPhase>(() => {
     const hasAutoStart = searchParams?.get('autoStart');
@@ -200,7 +211,10 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   }, [phase, isAuthenticated, profile]);
 
   const [gameState, setGameState] = useState<SinglePlayerGameState>(() => {
-    if (searchParams?.get('autoStart') === 'coach') {
+    const coachEntry =
+      searchParams?.get('autoStart') === 'coach' ||
+      shouldRedirectBareSingleplayer(searchParamsToRecord(searchParams));
+    if (coachEntry) {
       return {
         mode: 'challenge',
         difficulty: 'EASY',
@@ -229,19 +243,41 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
   // Drives the next_game_started event which feeds CG's engagement metric.
   const sessionPlayCountRef = useRef(1);
   const hasRedirectedRef = useRef(false);
+  const [pendingMpRedirect, setPendingMpRedirect] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const botsEntry =
+      searchParams?.get('autoStart') === 'bots' || searchParams?.get('preset') === 'bots';
+    return shouldRedirectReturningBots({
+      hasPlayedBots: hasPlayedBotsGame(),
+      isBotsEntry: Boolean(botsEntry),
+      isBareEntry: shouldRedirectBareSingleplayer(searchParamsToRecord(searchParams)),
+      referrer: document.referrer || '',
+      alreadyRedirectedThisSession: readBotsRedirectedThisSession(),
+    });
+  });
 
-  // Returning-player gate: SP-vs-bots is FTUE-only. Once flag is set,
-  // autoStart=bots / preset=bots entries redirect to multiplayer Quick Play.
+  // Returning-player gate: SP-vs-bots is FTUE-only for in-app `?autoStart=bots`.
+  // Bare SEO / Google referrers stay on a solo game (see returningBotsGate.ts).
   useEffect(() => {
     if (hasRedirectedRef.current) return;
     const isBotsEntry = autoStart === 'bots' || presetParam === 'bots';
-    if (!isBotsEntry) return;
-    if (!hasPlayedBotsGame()) return;
+    if (!shouldRedirectReturningBots({
+      hasPlayedBots: hasPlayedBotsGame(),
+      isBotsEntry,
+      isBareEntry,
+      referrer: typeof document !== 'undefined' ? document.referrer : '',
+      alreadyRedirectedThisSession: readBotsRedirectedThisSession(),
+    })) {
+      setPendingMpRedirect(false);
+      return;
+    }
     hasRedirectedRef.current = true;
     hasAutoStartedRef.current = true; // suppress subsequent auto-start effects
+    setPendingMpRedirect(true);
+    markBotsRedirectedThisSession();
     trackBotsToMpRedirect(uiLanguage, autoStart === 'bots' ? 'autoStart=bots' : 'preset=bots');
     router.replace(`/${uiLanguage}/multiplayer?quickPlay=true`);
-  }, [autoStart, presetParam, router, uiLanguage]);
+  }, [autoStart, presetParam, router, uiLanguage, isBareEntry]);
 
   // Auto-start practice mode (autoStart=practice)
   useEffect(() => {
@@ -510,5 +546,6 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     handleBackToLobby,
     handleStartPreset,
     wasFirstTimerPracticeRef,
+    pendingMpRedirect,
   };
 }
