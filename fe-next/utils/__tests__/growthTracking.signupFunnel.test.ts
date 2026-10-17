@@ -35,6 +35,7 @@ vi.mock('@/utils/logger', () => ({
 import {
   consumePendingSignupCompletion,
   trackSignupFunnel,
+  trackSignupFailed,
   trackSignupPromptClicked,
 } from '@/utils/growthTracking';
 
@@ -87,6 +88,19 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
     );
   });
 
+  it('dismissed carries surface/source (t_147a0f0c)', () => {
+    trackSignupFunnel('dismissed', false, { trigger: 'mp_sheet' });
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_dismissed',
+      expect.objectContaining({ surface: 'mp_sheet', source: 'mp_sheet' })
+    );
+    trackSignupFunnel('dismissed', true, { surface: 'soft-sheet' });
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_dismissed',
+      expect.objectContaining({ surface: 'soft-sheet', source: 'soft-sheet' })
+    );
+  });
+
   it('consumePendingSignupCompletion emits completed once and clears the key', () => {
     trackSignupFunnel('prompt_shown', false);
     consumePendingSignupCompletion();
@@ -127,5 +141,57 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
       'growth:signup_prompt_clicked',
       expect.objectContaining({ source: 'mp_sheet' })
     );
+  });
+
+  it('signup_dismissed always carries source + surface (t_147a0f0c)', () => {
+    trackSignupFunnel('dismissed', false, { surface: 'mp_sheet' });
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_dismissed',
+      expect.objectContaining({ source: 'mp_sheet', surface: 'mp_sheet' })
+    );
+    mockCapture.mockClear();
+    trackSignupFunnel('dismissed', true);
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_dismissed',
+      expect.objectContaining({ source: 'first_win_sheet', surface: 'first_win_sheet' })
+    );
+  });
+
+  it('signup_dismissed prefers the latched tap source over the default surface', () => {
+    window.sessionStorage.setItem('lexiclash_signup_source_pending', 'results_inline');
+    trackSignupFunnel('dismissed', false);
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_dismissed',
+      expect.objectContaining({ source: 'results_inline', surface: 'soft_sheet' })
+    );
+    // peek, not consume: the completion path still sees the latch
+    expect(window.sessionStorage.getItem('lexiclash_signup_source_pending')).toBe('results_inline');
+  });
+
+  it('signup_failed carries reason + the latched source (t_147a0f0c)', () => {
+    window.sessionStorage.setItem('lexiclash_signup_source_pending', 'results_inline');
+    trackSignupFailed('gsi_exchange_error', { message: 'Invalid nonce' });
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_failed',
+      expect.objectContaining({ source: 'results_inline', reason: 'gsi_exchange_error', provider: 'google', message: 'Invalid nonce' })
+    );
+  });
+
+  it('signup_failed falls back to source unknown without a latch', () => {
+    trackSignupFailed('gsi_cancel');
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_failed',
+      expect.objectContaining({ source: 'unknown', reason: 'gsi_cancel' })
+    );
+  });
+
+  it('signup_prompt_shown carries a per-session impression_seq (t_147a0f0c)', () => {
+    window.sessionStorage.removeItem('lexiclash_signup_impression_seq');
+    trackSignupFunnel('prompt_shown', false, { surface: 'soft_sheet' });
+    trackSignupFunnel('prompt_shown', false, { surface: 'mp_sheet' });
+    const seqs = mockCapture.mock.calls
+      .filter(([e]) => e === 'growth:signup_prompt_shown')
+      .map(([, p]) => (p as { impression_seq?: number }).impression_seq);
+    expect(seqs).toEqual([1, 2]);
   });
 });

@@ -148,7 +148,7 @@ export function useMultiplayerSignupNudge({
       // proper dismissed step (also clears the pending completion latch so a
       // later header signup attributes as header_or_menu, matching the solo
       // prompt's semantics).
-      trackSignupFunnel('dismissed', false, { trigger: 'mp_sheet', mpSessionGame: mpGames });
+      trackSignupFunnel('dismissed', false, { trigger: 'mp_sheet', surface: 'mp_sheet', source: 'mp_sheet', mpSessionGame: mpGames });
     }
     setActiveNudge(null);
   }, [activeNudge, mpGames]);
