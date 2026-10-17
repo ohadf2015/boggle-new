@@ -63,6 +63,17 @@ const LEXICLASH_THEME = JSON.stringify({
     font: 'Fredoka, Rubik, sans-serif',
 });
 
+/**
+ * Expected network failures (widget >= 2.0.7 `data-ignore-network`, t_5fbf2fd9):
+ * heartbeat status-0 aborts on tab hide/navigation, and the admin insights
+ * probe that 401s for every non-admin.
+ */
+export const FEEDBACK_WIDGET_IGNORE_NETWORK = JSON.stringify([
+    { url: '/api/presence/heartbeat', status: 0 },
+    { url: '/api/dictionary/check', status: 0 },
+    { url: '/api/admin/insights', status: 401 },
+]);
+
 function injectFeedbackWidget(): void {
     if (document.getElementById(FEEDBACK_WIDGET_SCRIPT_ID)) return;
     const s = document.createElement('script');
@@ -74,6 +85,7 @@ function injectFeedbackWidget(): void {
     s.setAttribute('data-theme', LEXICLASH_THEME);
     s.setAttribute('data-dir', 'auto');
     s.setAttribute('data-app-version', 'web');
+    s.setAttribute('data-ignore-network', FEEDBACK_WIDGET_IGNORE_NETWORK);
     document.body.appendChild(s);
 }
 

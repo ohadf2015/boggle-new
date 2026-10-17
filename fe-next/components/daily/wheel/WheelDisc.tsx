@@ -76,6 +76,8 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
     <div
       ref={orbitRef}
       data-testid="wheel-orbit"
+      // FDT: rapid letter taps on the wheel are gameplay, not rage.
+      data-feedback-ignore-rage=""
       data-release={release ? 'true' : 'false'}
       data-size={large ? 'large' : 'default'}
       // Each cap is wrapped in min(100cqb, …): the box is shrink-0 in the flex-1 cluster, so these caps alone keep it inside (see wordWheelOrbitClamp.contract).

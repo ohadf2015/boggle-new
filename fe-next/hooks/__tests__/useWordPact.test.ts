@@ -12,8 +12,8 @@ const { mockSingle, mockFrom, mockOr, mockEq, mockSelect, mockInsert, mockUpdate
   const mockSingle = vi.fn();
   const mockInsert = vi.fn().mockResolvedValue({ data: null, error: null });
   const mockUpdate = vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ data: null, error: null }) });
-  const mockOr = vi.fn().mockReturnValue({ single: mockSingle });
-  const mockEq = vi.fn().mockReturnValue({ or: mockOr, single: mockSingle });
+  const mockOr = vi.fn().mockReturnValue({ single: mockSingle, maybeSingle: mockSingle });
+  const mockEq = vi.fn().mockReturnValue({ or: mockOr, single: mockSingle, maybeSingle: mockSingle });
   const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
   const mockFrom = vi.fn().mockReturnValue({
     select: mockSelect,

@@ -53,6 +53,8 @@ export function V2Dock(p: Props) {
   return (
     <div
       ref={p.dockRef}
+      // FDT: tower tiles + backspace are tapped rapidly by design.
+      data-feedback-ignore-rage=""
       className={
         p.wide
           ? 'absolute bottom-0 end-0 top-0 z-30 flex w-[22rem] flex-col justify-center border-s-4 border-neo-cream/30 bg-neo-navy px-6 pb-24 xl:w-[26rem]'

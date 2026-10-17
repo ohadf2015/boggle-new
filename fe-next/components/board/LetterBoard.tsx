@@ -169,6 +169,8 @@ export default function LetterBoard({
     <div
       ref={containerRef}
       data-board=""
+      // FDT: tile taps / path drags / double-click submit are the game, not rage.
+      data-feedback-ignore-rage={interactive ? '' : undefined}
       data-ghost={ghost ? '' : undefined}
       data-enter={animateOnMount ? '' : undefined}
       data-shaking={shaking ? '' : undefined}
