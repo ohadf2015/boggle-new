@@ -1025,7 +1025,9 @@ export const trackSignupFunnel = (
       (props?.trigger as string | undefined) ??
       (isFirstWin ? 'first_win_sheet' : 'soft_sheet');
     merged.surface = surface;
-    if (merged.source == null) merged.source = surface;
+    // `source` is the attribution key shared with prompt_shown/clicked/failed/
+    // completed; prefer an explicit one, then the tap latch, then the surface.
+    if (merged.source == null) merged.source = peekSignupSource() ?? surface;
     trackGrowthEvent('signup_dismissed', merged);
     if (isFirstWin) trackGrowthEvent('first_win_signup_dismissed', merged);
   }
@@ -1104,6 +1106,16 @@ export const latchSignupSource = (source: string): void => {
     sessionStorage.setItem(SIGNUP_SOURCE_PENDING_KEY, source);
   } catch {
     /* noop */
+  }
+};
+
+/** Read the latched signup source without clearing it (dismiss/failure tagging). */
+export const peekSignupSource = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    return sessionStorage.getItem(SIGNUP_SOURCE_PENDING_KEY) || null;
+  } catch {
+    return null;
   }
 };
 

@@ -141,4 +141,29 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
       expect.objectContaining({ source: 'mp_sheet' })
     );
   });
+
+  it('signup_dismissed always carries source + surface (t_147a0f0c)', () => {
+    trackSignupFunnel('dismissed', false, { surface: 'mp_sheet' });
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_dismissed',
+      expect.objectContaining({ source: 'mp_sheet', surface: 'mp_sheet' })
+    );
+    mockCapture.mockClear();
+    trackSignupFunnel('dismissed', true);
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_dismissed',
+      expect.objectContaining({ source: 'first_win_sheet', surface: 'first_win_sheet' })
+    );
+  });
+
+  it('signup_dismissed prefers the latched tap source over the default surface', () => {
+    window.sessionStorage.setItem('lexiclash_signup_source_pending', 'results_inline');
+    trackSignupFunnel('dismissed', false);
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_dismissed',
+      expect.objectContaining({ source: 'results_inline', surface: 'soft_sheet' })
+    );
+    // peek, not consume: the completion path still sees the latch
+    expect(window.sessionStorage.getItem('lexiclash_signup_source_pending')).toBe('results_inline');
+  });
 });

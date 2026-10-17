@@ -194,7 +194,11 @@ export function useSignupPrompt({
     const shown = shownVariantRef.current;
     if (shown) {
       shownVariantRef.current = null;
-      trackSignupFunnel('dismissed', shown.isFirstWin, shown.surface ? { surface: shown.surface } : undefined);
+      trackSignupFunnel(
+        'dismissed',
+        shown.isFirstWin,
+        shown.surface ? { surface: shown.surface, source: shown.surface } : undefined,
+      );
     }
   }, []);
 
