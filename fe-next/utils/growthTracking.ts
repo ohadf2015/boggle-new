@@ -637,6 +637,21 @@ export const getReferralSource = (): string | null => {
   return params.get('ref') || params.get('utm_source') || null;
 };
 
+const SIGNUP_IMPRESSION_SEQ_KEY = 'lexiclash_signup_impression_seq';
+let memoryImpressionSeq = 0;
+
+/** 1-based count of signup prompts shown in this browser session. */
+export const nextSignupImpressionSeq = (): number => {
+  if (typeof window === 'undefined') return ++memoryImpressionSeq;
+  try {
+    const n = (parseInt(sessionStorage.getItem(SIGNUP_IMPRESSION_SEQ_KEY) || '0', 10) || 0) + 1;
+    sessionStorage.setItem(SIGNUP_IMPRESSION_SEQ_KEY, String(n));
+    return n;
+  } catch {
+    return ++memoryImpressionSeq;
+  }
+};
+
 /**
  * Track a growth event
  */
@@ -655,6 +670,12 @@ export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {})
   // results event, so real abandons are untouched.
   if (event === 'results_viewed' || event === 'mp_results_viewed') {
     markGameInactive();
+  }
+
+  // t_147a0f0c: per-session impression ordinal so #1319 can be graded per user
+  // (one player produced 147 prompt_shown in 9h on 10-16).
+  if (event === 'signup_prompt_shown' && data.impression_seq == null) {
+    data = { ...data, impression_seq: nextSignupImpressionSeq() };
   }
 
   const enrichedData: GrowthEventData = {

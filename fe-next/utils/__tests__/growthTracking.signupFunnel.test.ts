@@ -184,4 +184,14 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
       expect.objectContaining({ source: 'unknown', reason: 'gsi_cancel' })
     );
   });
+
+  it('signup_prompt_shown carries a per-session impression_seq (t_147a0f0c)', () => {
+    window.sessionStorage.removeItem('lexiclash_signup_impression_seq');
+    trackSignupFunnel('prompt_shown', false, { surface: 'soft_sheet' });
+    trackSignupFunnel('prompt_shown', false, { surface: 'mp_sheet' });
+    const seqs = mockCapture.mock.calls
+      .filter(([e]) => e === 'growth:signup_prompt_shown')
+      .map(([, p]) => (p as { impression_seq?: number }).impression_seq);
+    expect(seqs).toEqual([1, 2]);
+  });
 });
