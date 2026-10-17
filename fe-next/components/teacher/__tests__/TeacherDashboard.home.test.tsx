@@ -161,12 +161,12 @@ describe('Teacher Home', () => {
     expect(screen.queryByTestId('home-week')).not.toBeInTheDocument();
   });
 
-  it('Given a Pro teacher with no games yet, Then Home drops the empty side rail and uses the full width', () => {
+  it('Given a Pro teacher with no games yet, Then the weekly digest still sits in the rail', () => {
     proState = PRO;
     week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
     render(<TeacherDashboard />);
-    expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
-    expect(screen.getByTestId('teacher-home').className).not.toMatch(/lg:grid-cols-/);
+    expect(screen.getByRole('complementary')).toBeInTheDocument();
+    expect(screen.getByTestId('weekly-progress-digest')).toBeInTheDocument();
   });
 
   it('Given a Pro offer, Then the card is words and a button, no blurred fake chart', () => {

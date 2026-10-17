@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import {
   isFreePlanUsageBlocked,
+  isDigestOverFreeTierCaps,
   freeClassroomCap,
   freeStudentCap,
 } from '@/lib/education/teacherPlanGate';
@@ -34,5 +35,50 @@ describe('isFreePlanUsageBlocked', () => {
     expect(freeStudentCap()).toBe(FREE_TIER_LIMITS.studentsPerClass);
     expect(freeClassroomCap()).toBeGreaterThanOrEqual(1);
     expect(freeStudentCap()).toBeGreaterThanOrEqual(25);
+  });
+});
+
+describe('isDigestOverFreeTierCaps', () => {
+  it('treats at-cap the same as over-cap (StudentCapMeter >=), including assignments', () => {
+    expect(
+      isDigestOverFreeTierCaps({
+        hasPro: false,
+        classroomCount: FREE_TIER_LIMITS.classes,
+        studentCounts: [1],
+        assignmentCounts: [0],
+      }),
+    ).toBe(true);
+    expect(
+      isDigestOverFreeTierCaps({
+        hasPro: false,
+        classroomCount: FREE_TIER_LIMITS.classes - 1,
+        studentCounts: [FREE_TIER_LIMITS.studentsPerClass],
+        assignmentCounts: [0],
+      }),
+    ).toBe(true);
+    expect(
+      isDigestOverFreeTierCaps({
+        hasPro: false,
+        classroomCount: 1,
+        studentCounts: [FREE_TIER_LIMITS.studentsPerClass - 1],
+        assignmentCounts: [FREE_TIER_LIMITS.assignmentsPerClass],
+      }),
+    ).toBe(true);
+    expect(
+      isDigestOverFreeTierCaps({
+        hasPro: false,
+        classroomCount: FREE_TIER_LIMITS.classes - 1,
+        studentCounts: [FREE_TIER_LIMITS.studentsPerClass - 1],
+        assignmentCounts: [FREE_TIER_LIMITS.assignmentsPerClass - 1],
+      }),
+    ).toBe(false);
+    expect(
+      isDigestOverFreeTierCaps({
+        hasPro: true,
+        classroomCount: 99,
+        studentCounts: [99],
+        assignmentCounts: [99],
+      }),
+    ).toBe(false);
   });
 });

@@ -7,10 +7,15 @@ import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { resolveDisplayName } from '@/lib/displayName';
 import { windowStartIso, type WindowRosterStudent, type WindowSession } from '@/lib/education/windowedClassroomProgress';
+import { foldClassroomAssignmentWindow } from '@/lib/education/classroomAssignmentWindow';
+import { WEEK_MS, type WeeklyAssignmentCompletion } from '@/lib/education/weeklyProgressDigest';
 
 export interface ClassroomWindowSource {
   roster: WindowRosterStudent[];
   sessions: WindowSession[];
+  assignmentCompletions: WeeklyAssignmentCompletion[];
+  assignmentExpected: number;
+  assignmentCount: number;
 }
 
 interface SessionRow {
@@ -29,11 +34,23 @@ export async function getClassroomWindowSource(
 ): Promise<{ data: ClassroomWindowSource | null; error: { message: string } | null }> {
   const db = client ?? supabase;
   if (!db) return { data: null, error: { message: 'Supabase not configured' } };
-  if (!classroomId) return { data: { roster: [], sessions: [] }, error: null };
+  if (!classroomId) {
+    return {
+      data: {
+        roster: [],
+        sessions: [],
+        assignmentCompletions: [],
+        assignmentExpected: 0,
+        assignmentCount: 0,
+      },
+      error: null,
+    };
+  }
 
   try {
     const since = windowStartIso(30, now);
-    const [rosterResult, sessionResult] = await Promise.all([
+    const assignmentSince = new Date(now - 2 * WEEK_MS).toISOString();
+    const [rosterResult, sessionResult, assignmentResult] = await Promise.all([
       db.from('classroom_memberships').select('student_id').eq('classroom_id', classroomId),
       db
         .from('practice_sessions')
@@ -43,6 +60,7 @@ export async function getClassroomWindowSource(
         .not('completed_at', 'is', null)
         .order('completed_at', { ascending: false })
         .limit(2000),
+      db.from('lesson_assignments').select('id, classroom_id').eq('classroom_id', classroomId).limit(2000),
     ]);
 
     if (rosterResult.error) {
@@ -99,7 +117,47 @@ export async function getClassroomWindowSource(
         };
       });
 
-    return { data: { roster, sessions }, error: null };
+    let assignmentList: Array<{ id: string; classroom_id: string | null }> = [];
+    if (assignmentResult.error) {
+      logger.error('Error fetching lesson_assignments for weekly digest:', assignmentResult.error);
+    } else {
+      assignmentList = (assignmentResult.data ?? []) as Array<{ id: string; classroom_id: string | null }>;
+    }
+    const assignmentIds = assignmentList.map((row) => row.id).filter(Boolean);
+    let completionRows: Array<{ assignment_id: string | null; completed_at: string | null }> = [];
+    if (assignmentIds.length > 0) {
+      const completionResult = await db
+        .from('student_lesson_progress')
+        .select('assignment_id, completed_at')
+        .in('assignment_id', assignmentIds)
+        .gte('completed_at', assignmentSince)
+        .not('completed_at', 'is', null)
+        .limit(5000);
+      if (completionResult.error) {
+        logger.error('Error fetching student_lesson_progress for weekly digest:', completionResult.error);
+      } else {
+        completionRows = (completionResult.data ?? []) as Array<{
+          assignment_id: string | null;
+          completed_at: string | null;
+        }>;
+      }
+    }
+    const folded = foldClassroomAssignmentWindow({
+      assignments: assignmentList,
+      completionRows,
+      rosterSize: roster.length,
+    });
+
+    return {
+      data: {
+        roster,
+        sessions,
+        assignmentCompletions: folded.assignmentCompletions,
+        assignmentExpected: folded.assignmentExpected,
+        assignmentCount: folded.assignmentCount,
+      },
+      error: null,
+    };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in getClassroomWindowSource:', message);
