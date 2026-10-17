@@ -20,7 +20,9 @@ import {
   OVERLAY_QUIET_ZONE_GRACE_MS,
   claimOverlayQuietZone,
   resetOverlayQuietZoneForTests,
+  suspendInGameOverlayQuietZone,
 } from '@/lib/overlayQuietZone';
+import { IN_GAME_BODY_CLASS } from '@/lib/inGameSurface';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
@@ -97,5 +99,19 @@ describe('CookieConsent — overlay quiet zone', () => {
     renderAfterIdle();
     expect(document.documentElement.classList.contains('has-cookie-consent')).toBe(false);
     release();
+  });
+
+  it('returns on SP results once in-game quiet-zone input is suspended and grace ends', () => {
+    document.body.classList.add(IN_GAME_BODY_CLASS);
+    renderAfterIdle();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    act(() => {
+      suspendInGameOverlayQuietZone();
+      vi.advanceTimersByTime(OVERLAY_QUIET_ZONE_GRACE_MS + 100);
+    });
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    document.body.classList.remove(IN_GAME_BODY_CLASS);
   });
 });

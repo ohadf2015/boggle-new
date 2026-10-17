@@ -638,7 +638,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       </div>
 
       {!isDesktop && (
-        <div ref={stickyCtaRef} className="fixed bottom-0 inset-x-0 z-50 bg-neo-navy/95 border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
+        <div ref={stickyCtaRef} className="fixed bottom-[var(--cookie-consent-height,0px)] inset-x-0 z-50 bg-neo-navy/95 border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
           <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant="landscape" beforeNavigate={gateWithInterstitial} />
         </div>
       )}

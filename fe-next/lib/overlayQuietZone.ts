@@ -77,8 +77,16 @@ let observer: MutationObserver | null = null;
 /** Last DOM reading, so the observer can spot the true→false edge. */
 let bodyWasInGame = false;
 
+/**
+ * Count of surfaces that still need screen-fit-locked (nav hidden) but must
+ * not hold the quiet zone forever. SP results is the one: guests never leave
+ * /singleplayer, so a locked in-game class would hide the cookie bar for the
+ * whole visit. Playing does not suspend.
+ */
+let inGameSuspends = 0;
+
 function hardActive(): boolean {
-  return claims.size > 0 || isInGameSurface();
+  return claims.size > 0 || (inGameSuspends === 0 && isInGameSurface());
 }
 
 function graceRemaining(now: number): number {
@@ -99,7 +107,7 @@ export function isOverlayQuietZoneActive(): boolean {
 /** The reason string published on <body>, or null when the zone is closed. */
 export function overlayQuietZoneReason(): string | null {
   if (claims.size > 0) return Array.from(new Set(claims.values())).join(' ');
-  if (isInGameSurface()) return 'in-game';
+  if (inGameSuspends === 0 && isInGameSurface()) return 'in-game';
   if (graceRemaining(Date.now()) > 0) return 'round-end-grace';
   return null;
 }
@@ -144,6 +152,26 @@ function beginGrace(): void {
 export function noteOverlayQuietZoneGameOver(): void {
   beginGrace();
   emit();
+}
+
+/**
+ * Keep screen-fit-locked (bottom nav hidden) but stop treating it as a hard
+ * quiet-zone hold. Starts the round-end grace window so deferred prompts —
+ * the cookie bar — return after OVERLAY_QUIET_ZONE_GRACE_MS, not never.
+ * Call on SP results mount; release on unmount / leaving results.
+ */
+export function suspendInGameOverlayQuietZone(): () => void {
+  inGameSuspends += 1;
+  if (inGameSuspends === 1 && claims.size === 0) beginGrace();
+  emit();
+
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    inGameSuspends = Math.max(0, inGameSuspends - 1);
+    emit();
+  };
 }
 
 /**
@@ -235,6 +263,7 @@ export function useOverlayQuietZoneGate(): { quietZone: boolean; mayOpen: () => 
 export function resetOverlayQuietZoneForTests(): void {
   claims.clear();
   listeners.clear();
+  inGameSuspends = 0;
   releasedAt = 0;
   if (graceTimer) clearTimeout(graceTimer);
   graceTimer = null;
