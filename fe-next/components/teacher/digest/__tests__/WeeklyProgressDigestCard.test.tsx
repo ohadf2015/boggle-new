@@ -102,6 +102,7 @@ describe('WeeklyProgressDigestCard', () => {
       isLoading: false,
       error: null,
       refresh,
+      assignmentCount: 0,
     });
   });
 
@@ -195,5 +196,23 @@ describe('WeeklyProgressDigestCard', () => {
       />,
     );
     expect(screen.queryByTestId('weekly-progress-digest-pro-link')).not.toBeInTheDocument();
+  });
+
+  it('shows an over-cap CTA when the selected class is at the assignment cap', () => {
+    proState.hasPro = false;
+    proState.trialUsed = false;
+    proState.status = 'active';
+    daysLeftMock = null;
+    metricsMock.mockReturnValue({
+      metrics: week(),
+      isLoading: false,
+      error: null,
+      refresh,
+      assignmentCount: 3,
+    });
+    render(
+      <WeeklyProgressDigestCard classroomId="c1" classroomName="Year 7" />,
+    );
+    expect(screen.getByTestId('weekly-progress-digest-overcap-cta')).toBeInTheDocument();
   });
 });

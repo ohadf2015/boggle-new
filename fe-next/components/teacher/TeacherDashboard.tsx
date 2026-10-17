@@ -32,6 +32,7 @@ import { trackEduTeacherDashboardViewed } from '@/lib/education/telemetry';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { homeOnboarding, type HomeOnboardingStepId } from '@/lib/education/homeOnboarding';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
+import { isDigestOverFreeTierCaps } from '@/lib/education/teacherPlanGate';
 
 export interface TeacherDashboardProps {
   /** Account-state strip for a teacher already on (or just off) a Pro trial: days left / renew. */
@@ -160,10 +161,11 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
 
   const showWeek = hasClasses && !(week.summary && Object.keys(week.summary.lastPlayedAt).length === 0);
   const selectedClassroom = classrooms.find((c) => c.id === effectiveId) ?? null;
-  const overFreeTierCaps =
-    !hasPro &&
-    (classrooms.length > FREE_TIER_LIMITS.classes ||
-      classrooms.some((c) => (c.member_count ?? 0) > FREE_TIER_LIMITS.studentsPerClass));
+  const overFreeTierCaps = isDigestOverFreeTierCaps({
+    hasPro,
+    classroomCount: classrooms.length,
+    studentCounts: classrooms.map((c) => c.member_count ?? 0),
+  });
   const hasRail = !ready || proCard !== null || showWeek || Boolean(selectedClassroom);
 
   return (
@@ -238,8 +240,6 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
               <WeeklyProgressDigestCard
                 classroomId={selectedClassroom.id}
                 classroomName={selectedClassroom.name}
-                assignmentExpected={0}
-                assignmentSubmitted={null}
                 overFreeTierCaps={overFreeTierCaps}
               />
             )}

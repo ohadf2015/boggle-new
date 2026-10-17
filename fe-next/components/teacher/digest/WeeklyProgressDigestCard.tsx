@@ -6,7 +6,7 @@
  */
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -24,7 +24,7 @@ import {
   trackTeacherDigestViewed,
 } from '@/lib/education/telemetry';
 import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProCheckoutCta';
-import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { Stat } from '@/components/ui/Stat';
 import { NeoPanel } from '@/components/ui/panel';
 
@@ -32,10 +32,10 @@ export interface WeeklyProgressDigestCardProps {
   classroomId: string;
   classroomName: string;
   /** Snapshot expected completions (assignments × roster). Null = unknown. */
-  assignmentExpected: number | null;
+  assignmentExpected?: number | null;
   /** All-time submitted count used only when we lack dated completions. */
-  assignmentSubmitted: number | null;
-  /** Free-tier class/student/assignment cap already binding. */
+  assignmentSubmitted?: number | null;
+  /** Free-tier class/student cap already binding. Assignment cap is read from the window source. */
   overFreeTierCaps?: boolean;
 }
 
@@ -49,12 +49,7 @@ export function WeeklyProgressDigestCard({
   const { t, language } = useLanguage();
   const { hasPro, loading: proLoading, trialExpires, trialUsed, status } = useTeacherPro();
   const expected = assignmentExpected ?? 0;
-  const datedCompletions = useMemo(() => [] as string[], []);
-  const { metrics, isLoading, error, refresh } = useWeeklyProgressDigest(
-    classroomId,
-    expected,
-    datedCompletions,
-  );
+  const { metrics, isLoading, error, refresh, assignmentCount } = useWeeklyProgressDigest(classroomId);
 
   const [now] = useState(() => Date.now());
   const daysLeft = polarTrialDaysLeft(trialExpires, now);
@@ -62,11 +57,13 @@ export function WeeklyProgressDigestCard({
   const trialExpired = isPolarTrialExpiryConversion(hasPro, trialUsed === true);
   const isTrialing = daysLeft !== null || status === 'trialing';
   const isPaidPro = hasPro && !isTrialing;
+  const overCap =
+    overFreeTierCaps || assignmentCount >= FREE_TIER_LIMITS.assignmentsPerClass;
   const showCta = shouldShowDigestUpgradeCta({
     isPaidPro,
     isTrialing,
     trialExpired,
-    overFreeTierCaps,
+    overFreeTierCaps: overCap,
   });
   const week = metrics?.thisWeek;
   const wow = metrics?.wow;
@@ -91,7 +88,7 @@ export function WeeklyProgressDigestCard({
         ? Math.round((assignmentSubmitted / expected) * 100)
         : null;
 
-  const ctaKind = trialExpired ? 'expiry' : overFreeTierCaps && !isTrialing ? 'overcap' : trialDay7 ? 'day7' : 'trial';
+  const ctaKind = trialExpired ? 'expiry' : overCap && !isTrialing ? 'overcap' : trialDay7 ? 'day7' : 'trial';
   const ctaHintKey =
     ctaKind === 'expiry'
       ? 'teacher.digest.weeklyExpiryHint'
@@ -205,7 +202,7 @@ export function WeeklyProgressDigestCard({
                 hasPro,
                 trialDay7,
                 trialExpired,
-                overCap: overFreeTierCaps,
+                overCap,
               })
             }
             className="inline-flex min-h-11 items-center rounded-neo border-neo bg-neo-cyan px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg"
