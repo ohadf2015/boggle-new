@@ -840,6 +840,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         data-testid="word-wheel-action-bar"
         // clear/submit/delete are tapped rapidly in normal play (top FDT rage fingerprint, t_c0ad9f99)
         data-feedback-ignore-rage=""
+        // Same for Growth Radar: backspace bursts were its top rage hotspot (86 sessions/wk, /he/daily/word-wheel)
+        data-gr-no-rage=""
         className="w-full flex items-center justify-center gap-3 mt-1 short:mt-0"
       >
         {/* Clear */}

@@ -105,3 +105,17 @@ describe('WordWheelGame controls — remove-letter replaces shuffle', () => {
     expect(screen.getByLabelText('wordWheel.removeLetter')).toBeDisabled();
   });
 });
+
+describe('WordWheelGame Growth Radar rage opt-out', () => {
+  it('given the action bar, then clear/submit/delete opt out of GR rage detection', () => {
+    mountGame();
+    const bar = screen.getByTestId('word-wheel-action-bar');
+    expect(bar).toHaveAttribute('data-gr-no-rage');
+    expect(screen.getByLabelText('wordWheel.removeLetter').closest('[data-gr-no-rage]')).toBe(bar);
+  });
+
+  it('given the wheel, then rapid letter taps opt out of GR rage detection', () => {
+    mountGame();
+    expect(screen.getByTestId('wheel-orbit')).toHaveAttribute('data-gr-no-rage');
+  });
+});
