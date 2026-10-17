@@ -170,6 +170,7 @@ export type GrowthEvent =
   | 'signup_prompt_clicked'
   | 'signup_completed'
   | 'signup_dismissed'
+  | 'signup_failed'
   | 'first_win_signup_shown'
   | 'first_win_signup_completed'
   | 'first_win_signup_dismissed'
@@ -636,6 +637,21 @@ export const getReferralSource = (): string | null => {
   return params.get('ref') || params.get('utm_source') || null;
 };
 
+const SIGNUP_IMPRESSION_SEQ_KEY = 'lexiclash_signup_impression_seq';
+let memoryImpressionSeq = 0;
+
+/** 1-based count of signup prompts shown in this browser session. */
+export const nextSignupImpressionSeq = (): number => {
+  if (typeof window === 'undefined') return ++memoryImpressionSeq;
+  try {
+    const n = (parseInt(sessionStorage.getItem(SIGNUP_IMPRESSION_SEQ_KEY) || '0', 10) || 0) + 1;
+    sessionStorage.setItem(SIGNUP_IMPRESSION_SEQ_KEY, String(n));
+    return n;
+  } catch {
+    return ++memoryImpressionSeq;
+  }
+};
+
 /**
  * Track a growth event
  */
@@ -654,6 +670,12 @@ export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {})
   // results event, so real abandons are untouched.
   if (event === 'results_viewed' || event === 'mp_results_viewed') {
     markGameInactive();
+  }
+
+  // t_147a0f0c: per-session impression ordinal so #1319 can be graded per user
+  // (one player produced 147 prompt_shown in 9h on 10-16).
+  if (event === 'signup_prompt_shown' && data.impression_seq == null) {
+    data = { ...data, impression_seq: nextSignupImpressionSeq() };
   }
 
   const enrichedData: GrowthEventData = {
@@ -1018,6 +1040,16 @@ export const trackSignupFunnel = (
     trackGrowthEvent('signup_completed', merged);
     if (isFirstWin) trackGrowthEvent('first_win_signup_completed', merged);
   } else {
+    // t_147a0f0c: dismissals carry the surface/source that served the prompt so
+    // dismiss rate can be split per surface like shown/clicked.
+    const surface =
+      (props?.surface as string | undefined) ??
+      (props?.trigger as string | undefined) ??
+      (isFirstWin ? 'first_win_sheet' : 'soft_sheet');
+    merged.surface = surface;
+    // `source` is the attribution key shared with prompt_shown/clicked/failed/
+    // completed; prefer an explicit one, then the tap latch, then the surface.
+    if (merged.source == null) merged.source = peekSignupSource() ?? surface;
     trackGrowthEvent('signup_dismissed', merged);
     if (isFirstWin) trackGrowthEvent('first_win_signup_dismissed', merged);
   }
@@ -1099,6 +1131,16 @@ export const latchSignupSource = (source: string): void => {
   }
 };
 
+/** Read the latched signup source without clearing it (dismiss/failure tagging). */
+export const peekSignupSource = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    return sessionStorage.getItem(SIGNUP_SOURCE_PENDING_KEY) || null;
+  } catch {
+    return null;
+  }
+};
+
 export const consumeSignupSource = (): string | null => {
   if (typeof window === 'undefined') return null;
   try {
@@ -1112,6 +1154,25 @@ export const consumeSignupSource = (): string | null => {
 
 export const trackSignupPromptClicked = (source: string): void => {
   trackGrowthEvent('signup_prompt_clicked', { source });
+};
+
+/**
+ * t_147a0f0c: a tap that never becomes `signup_completed` was invisible
+ * (7 clicks / 0 signups on 10-16, flow after the tap unobserved). Emitted from
+ * the GSI credential exchange error, a GSI callback without a credential
+ * (cancel), and the Edge redirect-OAuth error. `source` defaults to the tap latch.
+ */
+export const trackSignupFailed = (
+  reason: string,
+  props: { source?: string | null; provider?: string; message?: string } = {},
+): void => {
+  const source = props.source ?? peekSignupSource() ?? 'unknown';
+  trackGrowthEvent('signup_failed', {
+    source,
+    reason,
+    provider: props.provider ?? 'google',
+    ...(props.message ? { message: String(props.message).slice(0, 200) } : {}),
+  });
 };
 
 /**

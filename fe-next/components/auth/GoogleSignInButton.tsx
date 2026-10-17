@@ -7,7 +7,7 @@ import { supabase, signInWithGoogle } from '@/lib/supabase';
 import { ensureGoogleIdInitialized, type GoogleIdServices } from '@/lib/auth/googleOneTap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { trackSignupPromptClicked } from '@/utils/growthTracking';
+import { latchSignupSource, trackSignupFailed, trackSignupPromptClicked } from '@/utils/growthTracking';
 import { GoogleIcon } from '@/components/auth/shared/icons/BrandIcons';
 
 const GSI_SRC = 'https://accounts.google.com/gsi/client';
@@ -54,9 +54,22 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
 
   // GSI iframe swallows clicks — pointerdown on our chrome is the last
   // reliable signal that the soft-sheet Google CTA was engaged.
-  const handlePromptClickIntent = () => {
-    if (analyticsSource) trackSignupPromptClicked(analyticsSource);
-  };
+  // The GSI button is a cross-origin iframe: taps inside it never bubble a
+  // pointerdown to our wrapper. GSI's documented `click_listener` is the only
+  // signal for the Google tap itself (t_147a0f0c CHECK). Both paths share this
+  // handler, deduped so a frame pointerdown + click_listener counts once.
+  const sourceRef = useRef(analyticsSource);
+  sourceRef.current = analyticsSource;
+  const lastIntentAtRef = useRef(0);
+  const handlePromptClickIntent = useCallback(() => {
+    const source = sourceRef.current;
+    if (!source) return;
+    const now = Date.now();
+    if (now - lastIntentAtRef.current < 1500) return;
+    lastIntentAtRef.current = now;
+    trackSignupPromptClicked(source);
+    latchSignupSource(source);
+  }, []);
 
   const renderButton = useCallback(async () => {
     if (renderedRef.current || !clientId || !containerRef.current) return;
@@ -86,9 +99,10 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
       // on /he with a Dutch browser gets "Doorgaan met Google". `locale` is a
       // renderButton option (it is NOT part of the initialize config).
       locale: language,
+      click_listener: handlePromptClickIntent,
       ...(fitWidth != null ? { width: Math.min(fitWidth, GSI_MAX_WIDTH) } : {}),
     });
-  }, [clientId, width, language]);
+  }, [clientId, width, language, handlePromptClickIntent]);
 
   // GIS may already be loaded (the global One Tap initializer pulls it in) — render
   // immediately rather than waiting for a fresh onReady.
@@ -104,7 +118,20 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
         <button
           type="button"
           data-testid="google-signin-edge-fallback"
-          onClick={() => { handlePromptClickIntent(); void signInWithGoogle(); }}
+          onClick={() => {
+            handlePromptClickIntent();
+            void signInWithGoogle()
+              .then((res) => {
+                const err = (res as { error?: { message?: string } | null } | undefined)?.error;
+                if (err) trackSignupFailed('oauth_redirect_error', { source: analyticsSource, message: err.message });
+              })
+              .catch((e: unknown) =>
+                trackSignupFailed('oauth_redirect_error', {
+                  source: analyticsSource,
+                  message: e instanceof Error ? e.message : String(e),
+                }),
+              );
+          }}
           className={cn(
             'w-full flex items-center justify-center gap-2 py-3 rounded-xl',
             'border-3 border-neo-black bg-white text-neo-black font-black text-sm',

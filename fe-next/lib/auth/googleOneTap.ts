@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import { trackSignupFailed } from '@/utils/growthTracking';
 
 /**
  * Google One Tap / Sign In With Google (web).
@@ -94,6 +95,8 @@ interface OneTapCallbackDeps {
   rawNonce: string;
   onSuccess: () => void;
   onError: (message: string) => void;
+  /** GIS invoked the callback without a credential (user cancelled / closed). */
+  onCancel?: () => void;
   exchange?: (credential: string, rawNonce: string) => Promise<OneTapExchangeResult>;
 }
 
@@ -105,10 +108,14 @@ export function createOneTapCallback({
   rawNonce,
   onSuccess,
   onError,
+  onCancel,
   exchange = exchangeGoogleOneTapCredential,
 }: OneTapCallbackDeps): (response: GoogleCredentialResponse) => Promise<void> {
   return async (response: GoogleCredentialResponse) => {
-    if (!response?.credential) return;
+    if (!response?.credential) {
+      onCancel?.();
+      return;
+    }
     const result = await exchange(response.credential, rawNonce);
     if (result.success) {
       onSuccess();
@@ -152,7 +159,11 @@ export async function ensureGoogleIdInitialized(
   const callback = createOneTapCallback({
     rawNonce,
     onSuccess: () => logger.log('[GoogleAuth] sign-in successful'),
-    onError: (message) => logger.debug('[GoogleAuth] sign-in failed:', message),
+    onError: (message) => {
+      logger.debug('[GoogleAuth] sign-in failed:', message);
+      trackSignupFailed('gsi_exchange_error', { message });
+    },
+    onCancel: () => trackSignupFailed('gsi_cancel'),
   });
 
   google.accounts.id.initialize({
