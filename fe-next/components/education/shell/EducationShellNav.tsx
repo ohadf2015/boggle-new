@@ -1,6 +1,7 @@
 'use client';
 
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { EducationNav } from './EducationNav';
 import { TeacherAccountMenu } from './TeacherAccountMenu';
 import { TeacherBrand } from './TeacherBrand';
@@ -19,6 +20,9 @@ export function EducationShellNav({
   variant: 'tabs' | 'sidebar' | 'topbar';
 }) {
   const { t } = useLanguage();
+  const { hasPro, loading, known, status } = useTeacherPro();
+  // Nothing is claimed until the entitlement read lands: no false "Free plan" for a paying teacher.
+  const plan = nav.kind !== 'teacher' || loading || !known ? undefined : !hasPro ? 'free' : status === 'trialing' ? 'trial' : 'pro';
   const teacher = nav.kind === 'teacher' && nav.proHref && nav.profileHref;
   const home = `/${nav.locale}/${nav.kind}`;
 
@@ -40,6 +44,7 @@ export function EducationShellNav({
       nav={nav}
       t={t}
       variant={variant}
+      plan={plan}
       brand={teacher ? <TeacherBrand href={home} t={t} /> : undefined}
       account={
         teacher ? <TeacherAccountMenu proHref={nav.proHref!} profileHref={nav.profileHref!} /> : undefined
