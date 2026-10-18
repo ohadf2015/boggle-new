@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import Script from 'next/script';
 import { LazyMotionRoot } from './LazyMotionRoot';
-import { getAdSenseAccountMeta } from '@/lib/ads/adSensePolicy';
 
 // Check if this is a preview/staging environment (explicitly set or PR preview)
 // Only block indexing when NEXT_PUBLIC_IS_PREVIEW is explicitly true or when it's a PR preview
@@ -104,10 +103,10 @@ export const metadata: Metadata = {
         // so it is inlined rather than env-gated. Env var stays as an override for
         // re-issue. Yandex re-checks periodically — removing this un-verifies us.
         'yandex-verification': process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || 'a0492cff1a6bdd70',
-        // AdSense site-ownership signal — privacy-neutral (no script/cookie). Always
-        // present so the review crawler can verify the domain even while ad serving
-        // stays consent-gated/dark. See lib/ads/adSensePolicy.ts:getAdSenseAccountMeta.
-        'google-adsense-account': getAdSenseAccountMeta(),
+        // Do NOT ship google-adsense-account / adsbygoogle for ca-pub-1896836706464880.
+        // That publisher was REJECTED; the meta was still in prod HTML (t_02e92b5a)
+        // and Auto-Ads previously cost 162 KiB + mobile PSI 45→33. Re-add the meta
+        // only after a new approved publisher id is set in env.
         'rating': 'General',
         'msapplication-TileColor': '#1a1a2e',
         'msapplication-TileImage': '/icon-144.png',

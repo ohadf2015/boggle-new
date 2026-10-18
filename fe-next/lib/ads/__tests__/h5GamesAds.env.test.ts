@@ -20,15 +20,23 @@ describe('h5GamesAds — env var names the runbook actually documents', () => {
 
   it('is disabled by default', () => {
     expect(isH5EnvEnabled()).toBe(false);
+    expect(getH5Client()).toBe('');
   });
 
-  it('enables on the code name NEXT_PUBLIC_H5_ADS_ENABLED', () => {
+  it('does not enable on the flag alone — needs a non-rejected client', () => {
     process.env.NEXT_PUBLIC_H5_ADS_ENABLED = 'true';
+    expect(isH5EnvEnabled()).toBe(false);
+  });
+
+  it('enables on the code name NEXT_PUBLIC_H5_ADS_ENABLED plus a client', () => {
+    process.env.NEXT_PUBLIC_H5_ADS_ENABLED = 'true';
+    process.env.NEXT_PUBLIC_H5_GAMES_CLIENT = 'ca-pub-3333333333333333';
     expect(isH5EnvEnabled()).toBe(true);
   });
 
-  it('enables on the documented name NEXT_PUBLIC_H5_GAMES_ENABLED', () => {
+  it('enables on the documented name NEXT_PUBLIC_H5_GAMES_ENABLED plus a client', () => {
     process.env.NEXT_PUBLIC_H5_GAMES_ENABLED = 'true';
+    process.env.NEXT_PUBLIC_H5_GAMES_CLIENT = 'ca-pub-3333333333333333';
     expect(isH5EnvEnabled()).toBe(true);
   });
 
@@ -37,5 +45,12 @@ describe('h5GamesAds — env var names the runbook actually documents', () => {
     expect(getH5Client()).toBe('ca-pub-3333333333333333');
     process.env.NEXT_PUBLIC_ADSENSE_H5_CLIENT = 'ca-pub-4444444444444444';
     expect(getH5Client()).toBe('ca-pub-4444444444444444');
+  });
+
+  it('treats the rejected publisher as no client', () => {
+    process.env.NEXT_PUBLIC_H5_ADS_ENABLED = 'true';
+    process.env.NEXT_PUBLIC_H5_GAMES_CLIENT = 'ca-pub-1896836706464880';
+    expect(getH5Client()).toBe('');
+    expect(isH5EnvEnabled()).toBe(false);
   });
 });
