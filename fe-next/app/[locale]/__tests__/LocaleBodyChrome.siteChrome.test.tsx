@@ -14,6 +14,11 @@ vi.mock('next/dynamic', () => ({
   },
 }));
 
+// Consent on heavy paths is a separate mount. This file only asserts site chrome.
+vi.mock('@/components/consent/HeavyPathCookieConsent', () => ({
+  default: () => null,
+}));
+
 vi.mock('../../conditional-providers', () => ({
   ConditionalProviders: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
