@@ -1,12 +1,12 @@
 # Dictionary improvement run
 
-Languages: en, he, sv, ja, es · per-language cap: 40 · total new candidates: **66**
+Languages: en, he, sv, ja, es · per-language cap: 40 · total new candidates: **71**
 
-- **en**: generated 40, judge-kept 37, **added 25** new candidate(s)
-- **he**: generated 40, judge-kept 34, **added 16** new candidate(s)
-- **sv**: generated 40, judge-kept 40, **added 12** new candidate(s)
-- **ja**: generated 40, judge-kept 40, **added 3** new candidate(s)
-- **es**: generated 40, judge-kept 40, **added 10** new candidate(s)
+- **en**: generated 40, judge-kept 32, **added 17** new candidate(s)
+- **he**: generated 40, judge-kept 40, **added 20** new candidate(s)
+- **sv**: generated 40, judge-kept 40, **added 5** new candidate(s)
+- **ja**: generated 40, judge-kept 40, **added 12** new candidate(s)
+- **es**: generated 40, judge-kept 40, **added 17** new candidate(s)
 
 New candidates were appended to fe-next/backend/dictionary/candidates/<lang>.txt.
 They enter the backend verify→promote→heal pipeline (Wiktionary/Jisho/milog + offensive filter)
