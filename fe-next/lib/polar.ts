@@ -50,6 +50,12 @@ export function getPolarClient() {
   return new PolarClient(accessToken, getPolarEnvironment())
 }
 
+export class PolarApiError extends Error {
+  constructor(readonly status: number, readonly body: string) {
+    super(`Polar API error: ${status} ${body}`)
+  }
+}
+
 export class PolarClient {
   private accessToken: string
   private baseUrl: string
@@ -72,7 +78,7 @@ export class PolarClient {
 
     if (!response.ok) {
       const error = await response.text()
-      throw new Error(`Polar API error: ${response.status} ${error}`)
+      throw new PolarApiError(response.status, error)
     }
 
     return response.json()
@@ -106,22 +112,33 @@ export class PolarClient {
   }): Promise<string> {
     const trial = allowTrial === true
     const successLocale = locale ?? 'en'
-    const response = await this.request<{ url: string }>('/v1/checkouts/', {
-      method: 'POST',
-      body: JSON.stringify({
-        products: [productId],
-        success_url:
-          redirectUrl || `${process.env.NEXT_PUBLIC_APP_URL}/${successLocale}/teacher?checkout=success`,
-        ...(email ? { customer_email: email } : {}),
-        external_customer_id: userId,
-        metadata: { user_id: userId, trial },
-        // Paid path must not inherit a trial configured on the Polar product.
-        allow_trial: trial,
-        ...(trial
-          ? { trial_interval: 'day', trial_interval_count: POLAR_PRO_TRIAL_DAYS }
-          : {}),
-      }),
-    })
+    const payload = {
+      products: [productId],
+      success_url:
+        redirectUrl || `${process.env.NEXT_PUBLIC_APP_URL}/${successLocale}/teacher?checkout=success`,
+      external_customer_id: userId,
+      metadata: { user_id: userId, trial },
+      // Paid path must not inherit a trial configured on the Polar product.
+      allow_trial: trial,
+      ...(trial
+        ? { trial_interval: 'day', trial_interval_count: POLAR_PRO_TRIAL_DAYS }
+        : {}),
+    }
+    const post = (customerEmail?: string) =>
+      this.request<{ url: string }>('/v1/checkouts/', {
+        method: 'POST',
+        body: JSON.stringify({ ...payload, ...(customerEmail ? { customer_email: customerEmail } : {}) }),
+      })
+
+    let response: { url: string }
+    try {
+      response = await post(email)
+    } catch (err) {
+      // Polar 422s an email whose domain does not resolve; the email is only a prefill, so a
+      // teacher with such an address must still reach checkout.
+      if (!email || !(err instanceof PolarApiError) || err.status !== 422 || !err.body.includes('customer_email')) throw err
+      response = await post()
+    }
 
     return response.url
   }
