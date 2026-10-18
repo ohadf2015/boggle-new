@@ -19043,6 +19043,7 @@ const sv = {
     "VALIDATION_MISSING_FIELD": "Obligatoriskt fält saknas",
     "WORD_PROCESSING_ERROR": "Kunde inte bearbeta ditt ord. Försök igen.",
     "INTERNAL_ERROR": "Något gick sönder. Försök igen.",
+    "WHEEL_STATE_NOT_INITIALIZED": "Hjulet är inte redo än. Försök igen.",
     "PLAYER_KICKED": "Du har tagits bort från det här rummet"
   },
   "cg": {

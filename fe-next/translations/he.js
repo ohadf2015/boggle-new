@@ -18945,6 +18945,7 @@ const he = {
     "VALIDATION_MISSING_FIELD": "חסר שדה חובה",
     "WORD_PROCESSING_ERROR": "לא הצלחנו לעבד את המילה. נסו שוב.",
     "INTERNAL_ERROR": "משהו השתבש. נסו שוב.",
+    "WHEEL_STATE_NOT_INITIALIZED": "הגלגל עוד לא מוכן. נסו שוב.",
     "PLAYER_KICKED": "הוסרתם מהחדר"
   },
   "cg": {

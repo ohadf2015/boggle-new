@@ -75,6 +75,7 @@ export async function saveGameState(gameCode: string, gameData: GameDataInput): 
     gameMode: gameData.gameMode || '',
     blastModeState: JSON.stringify(gameData.blastModeState || null),
     wordHuntState: JSON.stringify(gameData.wordHuntState || null),
+    wheelRushState: JSON.stringify(gameData.wheelRushState || null),
     isRanked: String(gameData.isRanked ?? false),
     isPrivate: String(gameData.isPrivate ?? false),
     // Must be persisted alongside isRanked/isPrivate: a restored room that
@@ -174,6 +175,7 @@ export async function getGameState(gameCode: string): Promise<GameStateData | nu
       gameMode: data.gameMode || null,
       blastModeState: safeJsonParse<Record<string, unknown> | null>(data.blastModeState, null, 'blastModeState', gameCode),
       wordHuntState: safeJsonParse<Record<string, unknown> | null>(data.wordHuntState, null, 'wordHuntState', gameCode),
+      wheelRushState: safeJsonParse<Record<string, unknown> | null>(data.wheelRushState, null, 'wheelRushState', gameCode),
       isRanked: data.isRanked === 'true',
       isPrivate: data.isPrivate === 'true',
       // Defaults false for legacy records written before this field existed —

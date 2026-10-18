@@ -12998,6 +12998,7 @@ const ru = {
     "VALIDATION_MISSING_FIELD": "Отсутствует обязательное поле",
     "WORD_PROCESSING_ERROR": "Не удалось обработать слово. Попробуйте ещё раз.",
     "INTERNAL_ERROR": "Что-то сломалось. Попробуйте ещё раз.",
+    "WHEEL_STATE_NOT_INITIALIZED": "Колесо ещё не готово. Попробуйте снова.",
     "PLAYER_KICKED": "Вас удалили из комнаты"
   },
   "reengagement": {

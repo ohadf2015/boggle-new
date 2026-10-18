@@ -150,6 +150,7 @@ export async function restoreGameFromRedis(
       // throw inside submitWord (silently, so the player got no feedback at all).
       blastModeState: reviveBlastModeState(persisted.blastModeState),
       wordHuntState: persisted.wordHuntState || null,
+      wheelRushState: (persisted.wheelRushState as GameState['wheelRushState']) || null,
       chatHistory: persisted.chatHistory || undefined,
       cachedResultsPayload: persisted.cachedResultsPayload || undefined,
     };

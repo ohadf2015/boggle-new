@@ -18722,6 +18722,7 @@ const ja = {
     "VALIDATION_MISSING_FIELD": "必須フィールドがありません",
     "WORD_PROCESSING_ERROR": "単語を処理できませんでした。もう一度お試しください。",
     "INTERNAL_ERROR": "問題が発生しました。もう一度お試しください。",
+    "WHEEL_STATE_NOT_INITIALIZED": "ホイールの準備がまだだよ。もう一度試してね",
     "PLAYER_KICKED": "このルームから外されました"
   },
   "cg": {

@@ -17369,6 +17369,7 @@ const en = {
     "VALIDATION_MISSING_FIELD": "Missing required field",
     "WORD_PROCESSING_ERROR": "Couldn't process your word. Try again.",
     "INTERNAL_ERROR": "Something broke. Try again.",
+    "WHEEL_STATE_NOT_INITIALIZED": "The wheel isn't ready yet. Try again.",
     "PLAYER_KICKED": "You've been removed from this room"
   },
   "cg": {

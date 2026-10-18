@@ -18844,6 +18844,7 @@ const es = {
     "VALIDATION_MISSING_FIELD": "Falta un campo obligatorio",
     "WORD_PROCESSING_ERROR": "No se pudo procesar tu palabra. Inténtalo de nuevo.",
     "INTERNAL_ERROR": "Algo falló. Inténtalo de nuevo.",
+    "WHEEL_STATE_NOT_INITIALIZED": "La rueda aún no está lista. Inténtalo de nuevo.",
     "PLAYER_KICKED": "Te han expulsado de esta sala"
   },
   "cg": {
