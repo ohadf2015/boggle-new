@@ -106,6 +106,8 @@ export default function DeferredLayoutWidgets() {
           <NewYearCountdown />
         </>
       )}
+      {/* Chrome routes only. Heavy game paths skip this file; LocaleBodyChrome
+          mounts the same component via HeavyPathCookieConsent. Do not mount both. */}
       {!quietJoinScreen && <CookieConsent />}
       <ChurnSignalTracker />
       <ReferralCodeClaimer />

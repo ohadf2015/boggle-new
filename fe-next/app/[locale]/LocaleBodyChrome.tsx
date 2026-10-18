@@ -3,6 +3,9 @@
 /**
  * Client shell for the locale body. Site chrome (footer, nav, OAuth, pixels)
  * lives behind next/dynamic ssr:false so a /singleplayer load never parses it.
+ * Cookie consent is the exception: those routes never render SiteExtras, so
+ * HeavyPathCookieConsent mounts the same bar (still ssr:false) and CookieConsent
+ * itself keeps it hidden for the quiet zone.
  * ConditionalProviders (Auth/Music/Query) mounts immediately — the r6 revert
  * of #1175's two-rAF gate: gating its dynamic chunk on rAF timestamps made
  * Lighthouse's Lantern model serialize that fetch behind main-thread work,
@@ -17,6 +20,8 @@ import ScrollToTopOnNavigate from '@/components/ScrollToTopOnNavigate';
 import ChunkErrorRecovery from '@/components/ChunkErrorRecovery';
 import ChunkErrorBoundary from '@/components/ChunkErrorBoundary';
 import { rendersSiteChrome } from '@/lib/perf/heavyGamePath';
+import { isStudentJoinPath } from '@/components/education/join/joinRoutes';
+import HeavyPathCookieConsent from '@/components/consent/HeavyPathCookieConsent';
 import { ConditionalProviders } from '../conditional-providers';
 import type { Language } from '@/shared/types/game';
 
@@ -33,6 +38,11 @@ interface LocaleBodyChromeProps {
 export default function LocaleBodyChrome({ lang, children }: LocaleBodyChromeProps) {
   const pathname = usePathname();
   const siteChrome = rendersSiteChrome(pathname);
+  // Exclusive with SiteExtras: chrome routes already mount CookieConsent via
+  // DeferredLayoutWidgets. Join screens defer the ask (it covers the code
+  // cells) — that skip stays in DeferredLayoutWidgets, and this gate must
+  // not undo it if a join path is ever also heavy.
+  const heavyPathConsent = !siteChrome && !isStudentJoinPath(pathname);
 
   const inner = (
     <>
@@ -53,5 +63,10 @@ export default function LocaleBodyChrome({ lang, children }: LocaleBodyChromePro
     </>
   );
 
-  return <ConditionalProviders lang={lang}>{inner}</ConditionalProviders>;
+  return (
+    <ConditionalProviders lang={lang}>
+      {inner}
+      {heavyPathConsent && <HeavyPathCookieConsent />}
+    </ConditionalProviders>
+  );
 }
