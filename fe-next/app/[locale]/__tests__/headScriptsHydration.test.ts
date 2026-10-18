@@ -45,9 +45,9 @@ describe('<head> scripts cannot race hydration', () => {
    * REJECTED for web AdSense, so adsbygoogle.js + its 162 KiB show_ads_impl were
    * structurally unmonetizable main-thread cost (Lighthouse 2026-08-24 mobile PSI 33).
    * The remaining web ad path is H5 Games Ads (lib/ads/h5GamesAds.ts) — adBreak-only,
-   * injected on user intent from a useEffect, never from this layout.
-   * Site-ownership verification for a future resubmission is the
-   * `google-adsense-account` META in app/layout.tsx — it needs no script.
+   * injected on user intent from a useEffect, never from this layout, and never for
+   * the rejected publisher ca-pub-1896836706464880 (t_02e92b5a). Do not re-add a
+   * `google-adsense-account` meta until a new approved publisher id exists.
    */
   it('does not load AdSense from the layout at all — web Auto-Ads is deleted', () => {
     // Tags only. Prose naming the script is how this file explains itself.

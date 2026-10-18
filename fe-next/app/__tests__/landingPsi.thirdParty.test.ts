@@ -17,6 +17,13 @@ describe('landing PSI third-party first-paint guards', () => {
     expect(existsSync(join(feRoot, '..', 'components', 'ads', 'AdSenseLoader.tsx'))).toBe(false);
   });
 
+  it('does not ship the rejected AdSense publisher meta on the root layout', () => {
+    const root = readFileSync(join(feRoot, 'layout.tsx'), 'utf8');
+    expect(root).not.toContain('getAdSenseAccountMeta');
+    expect(root).not.toMatch(/['"]google-adsense-account['"]\s*:/);
+    expect(root).not.toMatch(/adsbygoogle\.js/);
+  });
+
   it('does not auto-inject a root sentry.client.config into main-app', () => {
     expect(existsSync(join(feRoot, '..', 'sentry.client.config.ts'))).toBe(false);
     const instr = readFileSync(join(feRoot, '..', 'instrumentation-client.ts'), 'utf8');
