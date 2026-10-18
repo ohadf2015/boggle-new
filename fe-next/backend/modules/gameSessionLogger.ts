@@ -154,7 +154,7 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
         difficulty: sessionData.difficulty || null,
         score: sessionData.score || 0,
         words_found: sessionData.wordsFound || [],
-        duration_seconds: sessionData.durationSeconds || null,
+        duration_seconds: sessionData.durationSeconds ? Math.round(sessionData.durationSeconds) : null,
         completed: sessionData.completed || false,
         daily_puzzle_number: sessionData.dailyPuzzleNumber || null,
         target_word: sessionData.targetWord || null,
@@ -218,7 +218,7 @@ export async function updateGameSession(
 
     if (updates.score !== undefined) updateData.score = updates.score;
     if (updates.wordsFound !== undefined) updateData.words_found = updates.wordsFound;
-    if (updates.durationSeconds !== undefined) updateData.duration_seconds = updates.durationSeconds;
+    if (updates.durationSeconds !== undefined) updateData.duration_seconds = Math.round(updates.durationSeconds);
     if (updates.completed !== undefined) updateData.completed = updates.completed;
     if (updates.targetFound !== undefined) updateData.target_found = updates.targetFound;
     if (updates.attemptsUsed !== undefined) updateData.attempts_used = updates.attemptsUsed;
