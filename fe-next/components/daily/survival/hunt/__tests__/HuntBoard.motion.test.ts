@@ -47,9 +47,9 @@ describe('Word Hunt board motion', () => {
     }
   });
 
-  it('Then the tile face and its letter move as one (no separate inner animations that drift apart)', () => {
+  it('Then the tile face and its letter move as one (no separate inner animations that drift apart; overlay pseudo-elements like the join ping are fine)', () => {
     for (const [sel, body] of rules()) {
-      if (/\[data-state='sel'\]\s+\.(face|ch)\b/.test(sel)) {
+      if (/\[data-state='sel'\]\s+\.(face|ch)(?![\w:-])/.test(sel)) {
         expect({ sel, animation: animationNames(body) }).toEqual({ sel, animation: [] });
       }
     }
@@ -65,5 +65,17 @@ describe('Word Hunt board motion', () => {
     const tipRules = rules().filter(([sel]) => /\.(tile|glyph)\[data-tip='true'\](,|$)/.test(sel));
     expect(tipRules.length).toBeGreaterThan(0);
     for (const [, body] of tipRules) expect(body).not.toMatch(/transform/);
+  });
+
+  it('Then the newest trail segment draws in and the live tip breathes, so the path feels alive', () => {
+    const lead = rules().find(([sel]) => sel === '.lead');
+    expect(lead && animationNames(lead[1])).toEqual(['segDraw']);
+    expect(() => keyframes('tipBreath')).not.toThrow();
+  });
+
+  it('Then each new segment sparks and the ribbon thickens with word length', () => {
+    const spark = rules().find(([sel]) => sel === '.spark');
+    expect(spark && animationNames(spark[1])).toEqual(['sparkFade']);
+    expect(css).toMatch(/data-tier='3'\]\s+\.ribbon\s*\{\s*stroke-width:\s*26/);
   });
 });

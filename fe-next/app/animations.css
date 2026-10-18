@@ -3244,3 +3244,8 @@ html.reduce-motion *::after {
   0% { transform: translateX(-140%) skewX(-20deg); }
   22%, 100% { transform: translateX(320%) skewX(-20deg); }
 }
+
+@keyframes clueToastTimer {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}

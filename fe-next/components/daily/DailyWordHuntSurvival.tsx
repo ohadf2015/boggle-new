@@ -313,18 +313,20 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   ) : null;
 
   const notifications = (
-    <AnimatePresence>
-      {state.activeNotifications.map((notification) => (
-        <AutoClueNotification
-          key={notification.id}
-          clueType={notification.clueType}
-          onDismiss={() => actions.dismissNotification(notification.id)}
-          direction={actions.gameDir}
-          t={t}
-          language={language}
-        />
-      ))}
-    </AnimatePresence>
+    <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+4.5rem)] z-50 flex flex-col items-center gap-2 px-4">
+      <AnimatePresence mode="popLayout">
+        {state.activeNotifications.map((notification) => (
+          <AutoClueNotification
+            key={notification.id}
+            clueType={notification.clueType}
+            onDismiss={() => actions.dismissNotification(notification.id)}
+            direction={actions.gameDir}
+            t={t}
+            language={language}
+          />
+        ))}
+      </AnimatePresence>
+    </div>
   );
 
   const quitConfirm = (orientation: 'landscape' | 'portrait') => (
@@ -436,10 +438,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
               data-testid="hunt-feedback-pill"
               data-type={state.feedbackType}
               role="status"
-              initial={skipAnimations ? false : { opacity: 0, y: -6, scale: 0.8 }}
+              initial={skipAnimations ? false : { opacity: 0, y: -8, scale: 0.7 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.12 } }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
+              exit={{ opacity: 0, transition: { duration: 0.1 } }}
+              transition={{ type: 'spring', stiffness: 520, damping: 26 }}
               className={cn(
                 'max-w-full truncate text-xs font-bold px-2.5 py-0.5 rounded-full',
                 state.feedbackType === 'valid-word' || state.feedbackType === 'target-found'

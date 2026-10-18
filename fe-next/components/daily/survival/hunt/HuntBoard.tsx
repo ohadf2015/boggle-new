@@ -5,6 +5,7 @@ import { useBoardSelection } from '@/components/board/useBoardSelection';
 import type { CellRef } from '@/components/board/selectionPath';
 import type { LetterGrid } from '@/types';
 import { useLargeLetters } from '@/contexts/AccessibilityContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cellCentre, trailPath, CELL_UNIT } from './huntTrail';
 import type { HuntCell, HuntPhase, HuntVerdict } from './huntStage';
 import styles from './HuntBoard.module.css';
@@ -28,6 +29,8 @@ export interface HuntBoardProps {
 }
 
 export const HUNT_IDLE_SUBMIT_MS = 2000;
+const RUBBER_MAX = 40;
+const RUBBER_MIN = 14;
 
 const cellStyle = (idx: number | undefined, r: number, c: number) =>
   ({ '--i': idx ?? 0, '--tilt': `${(r + c) % 2 ? 3 : -3}deg` }) as React.CSSProperties;
@@ -72,14 +75,18 @@ export function HuntBoard({
   t,
 }: HuntBoardProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const layerRef = useRef<HTMLDivElement>(null);
+  const rubberRef = useRef<SVGLineElement>(null);
   const canHover = useCanHover();
   const largeLetters = useLargeLetters();
+  const { playTileSelectSound } = useSoundEffects();
   const [selectedCells, setSelectedCells] = useState<CellRef[]>([]);
   const [isClickSelecting, setIsClickSelecting] = useState(false);
 
   const selection = useBoardSelection(wrapRef, {
     interactive,
     autoSubmitIdleMs: HUNT_IDLE_SUBMIT_MS,
+    onStep: () => playTileSelectSound?.(),
     onPathChange: (path) => {
       setSelectedCells(path);
       setIsClickSelecting(path.length > 0 && selection.current?.getMode() === 'click');
@@ -109,6 +116,22 @@ export function HuntBoard({
   const rows = grid.length;
 
   const tipPos = tip ? cellCentre(tip) : null;
+
+  const leanToward = (e: React.PointerEvent) => {
+    const line = rubberRef.current;
+    const box = layerRef.current?.getBoundingClientRect();
+    if (!line || !box || !tipPos || !box.width || !box.height) return;
+    const dx = ((e.clientX - box.left) / box.width) * cols * CELL_UNIT - tipPos.x;
+    const dy = ((e.clientY - box.top) / box.height) * rows * CELL_UNIT - tipPos.y;
+    const len = Math.hypot(dx, dy);
+    const k = len > RUBBER_MAX ? RUBBER_MAX / len : 1;
+    line.setAttribute('x2', String(tipPos.x + dx * k));
+    line.setAttribute('y2', String(tipPos.y + dy * k));
+    line.style.opacity = len > RUBBER_MIN ? '1' : '0';
+  };
+  const dropLean = () => {
+    if (rubberRef.current) rubberRef.current.style.opacity = '0';
+  };
   const boardSeed = grid.map((row) => row.join('')).join('|');
   // Labels follow the board, not the selection; t() is stable for the round.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -125,6 +148,10 @@ export function HuntBoard({
         data-verdict={holding && verdict ? verdict : undefined}
         data-tier={lengthTier(shown.length)}
         onContextMenu={(e) => e.preventDefault()}
+        onPointerMove={leanToward}
+        onPointerUp={dropLean}
+        onPointerCancel={dropLean}
+        onPointerLeave={dropLean}
         className={styles.tray}
         style={{ '--cols': cols, '--rows': rows } as React.CSSProperties}
       >
@@ -154,7 +181,7 @@ export function HuntBoard({
             );
           }),
         )}
-        <div className={styles.layer} aria-hidden="true">
+        <div ref={layerRef} className={styles.layer} aria-hidden="true">
         {shown.length > 0 && (
           <svg
             aria-hidden="true"
@@ -163,9 +190,19 @@ export function HuntBoard({
             className={styles.trail}
             viewBox={`0 0 ${cols * CELL_UNIT} ${rows * CELL_UNIT}`}
           >
-            <path className={styles.ribbonEdge} d={trailPath(shown)} />
-            <path className={styles.ribbon} d={trailPath(shown)} />
+            <path className={styles.ribbonEdge} d={trailPath(shown.slice(0, -1))} />
+            <path className={styles.ribbon} d={trailPath(shown.slice(0, -1))} />
+            {shown.length > 1 && (
+              <g key={shown.length}>
+                <path className={`${styles.ribbonEdge} ${styles.lead}`} pathLength={1} d={trailPath(shown.slice(-2))} />
+                <path className={`${styles.ribbon} ${styles.lead}`} pathLength={1} d={trailPath(shown.slice(-2))} />
+                <path className={styles.spark} d={trailPath(shown.slice(-2))} />
+              </g>
+            )}
             <path className={styles.stitch} d={trailPath(shown)} />
+            {kind === 'sel' && tipPos && (
+              <line ref={rubberRef} className={styles.rubber} x1={tipPos.x} y1={tipPos.y} x2={tipPos.x} y2={tipPos.y} />
+            )}
             <circle className={styles.cap} cx={cellCentre(shown[0]).x} cy={cellCentre(shown[0]).y} r={17} />
             {tipPos && shown.length > 1 && <circle className={styles.tipDot} cx={tipPos.x} cy={tipPos.y} r={10} />}
           </svg>
