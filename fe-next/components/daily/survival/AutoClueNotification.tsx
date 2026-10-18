@@ -16,8 +16,7 @@ export interface AutoClueNotificationProps {
 
 /**
  * Auto-Clue Notification Component
- * Side banner notification when auto-clue unlocks
- * Slides from edge with mascot animation
+ * Toast dropped in from the top when an auto-clue unlocks; stacked by the parent's fixed container
  */
 export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
   clueType,
@@ -70,93 +69,52 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
 
   return (
     <AdaptiveMotion.div
-      initial={{
-        x: direction === 'ltr' ? -300 : 300,
-        opacity: 0,
-      }}
-      animate={{
-        x: 0,
-        opacity: 1,
-      }}
-      exit={{
-        x: direction === 'ltr' ? -300 : 300,
-        opacity: 0,
-      }}
-      transition={{
-        type: 'spring',
-        damping: 20,
-        stiffness: 300,
-      }}
+      layout
+      role="status"
+      data-testid="auto-clue-toast"
+      initial={{ y: -28, opacity: 0, scale: 0.9 }}
+      animate={{ y: 0, opacity: 1, scale: 1 }}
+      exit={{ y: -16, opacity: 0, scale: 0.96, transition: { duration: 0.14, ease: 'easeIn' } }}
+      transition={{ type: 'spring', damping: 22, stiffness: 420, mass: 0.7 }}
+      dir={direction}
       className={cn(
-        'fixed top-20 z-50',
-        direction === 'ltr' ? 'left-4' : 'right-4'
+        'pointer-events-auto relative w-full max-w-xs overflow-hidden',
+        'bg-linear-to-r',
+        content.color,
+        'border-neo-thick border-neo-black',
+        'rounded-neo',
+        'shadow-hard-lg'
       )}
     >
-      <div
-        className={cn(
-          'relative flex items-center gap-3',
-          'px-4 py-3 max-w-xs',
-          'bg-linear-to-r',
-          content.color,
-          'border-neo-thick border-neo-black',
-          'rounded-neo',
-          'shadow-hard-lg'
-        )}
-      >
-        {/* Mascot/Icon Section */}
+      <div className="flex items-center gap-3 px-4 py-3">
         <AdaptiveMotion.div
-          animate={{
-            scale: [1, 1.1, 1],
-            rotate: [0, 5, -5, 0],
-          }}
-          transition={{
-            duration: 0.5,
-            repeat: 2,
-            repeatDelay: 0.3,
-          }}
-          className="shrink-0"
+          initial={{ scale: 0.4, rotate: -25 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', damping: 10, stiffness: 380, delay: 0.08 }}
+          className="shrink-0 grid place-items-center w-9 h-9 rounded-full bg-neo-cream/90 border-2 border-neo-black text-neo-black"
         >
           {content.icon}
         </AdaptiveMotion.div>
 
-        {/* Content Section */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start gap-2">
-            <div className="flex-1">
-              {/* Title */}
-              <div className="font-black text-sm text-neo-black font-neo-display mb-0.5">
-                {t('wordHunt.survival.autoClueUnlocked')}
-              </div>
-
-              {/* Subtitle */}
-              <div className="font-bold text-xs text-neo-black/80 font-neo-body">
-                {content.title}
-              </div>
-
-              {/* Cost Reference */}
-              <div className="text-[10px] text-neo-black/60 font-bold mt-1">
-                {t('wordHunt.survival.clueAutoMessage')?.replace('{cost}', safeToLocaleString(content.cost, language)) ||
-                  `Auto-unlocked at ${content.cost} tokens`}
-              </div>
-            </div>
-
-            {/* Icon */}
-            <div className="shrink-0 text-neo-black/70">{content.icon}</div>
+          <div className="font-black text-sm text-neo-black font-neo-display leading-tight">
+            {t('wordHunt.survival.autoClueUnlocked')}
+          </div>
+          <div className="font-bold text-xs text-neo-black/80 font-neo-body">{content.title}</div>
+          <div className="text-[10px] text-neo-black/60 font-bold mt-0.5">
+            {t('wordHunt.survival.clueAutoMessage')?.replace('{cost}', safeToLocaleString(content.cost, language)) ||
+              `Auto-unlocked at ${content.cost} tokens`}
           </div>
         </div>
 
-        {/* Close Button */}
         <button
           type="button"
           onClick={onDismiss}
           className={cn(
-            'absolute -top-2 -right-2',
-            'w-6 h-6',
+            'shrink-0 w-6 h-6',
             'flex items-center justify-center',
             'bg-neo-black text-white',
             'rounded-full',
-            'border-2 border-white',
-            'shadow-hard-sm',
             'hover:bg-neo-red transition-colors',
             'focus:outline-hidden focus:ring-2 focus:ring-neo-pink'
           )}
@@ -165,6 +123,11 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
           <X className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-0 bottom-0 h-1 origin-left bg-neo-black/70 rtl:origin-right motion-safe:animate-[clueToastTimer_1500ms_linear_forwards]"
+      />
     </AdaptiveMotion.div>
   );
 };

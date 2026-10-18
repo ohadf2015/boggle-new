@@ -9,22 +9,29 @@ import {
 } from '@/lib/education/weeklyProgressDigest';
 import logger from '@/utils/logger';
 
-export function useWeeklyProgressDigest(
-  classroomId: string,
-  assignmentExpected: number,
-  assignmentCompletedAt: string[] = [],
-) {
+export function useWeeklyProgressDigest(classroomId: string) {
   const isMounted = useMounted();
   const [source, setSource] = useState<{
     roster: Parameters<typeof deriveWeeklyProgressDigest>[0]['roster'];
     sessions: Parameters<typeof deriveWeeklyProgressDigest>[0]['sessions'];
+    assignmentCompletions: NonNullable<
+      Parameters<typeof deriveWeeklyProgressDigest>[0]['assignmentCompletions']
+    >;
+    assignmentExpected: number;
+    assignmentCount: number;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const load = useCallback(async () => {
     if (!classroomId) {
-      setSource({ roster: [], sessions: [] });
+      setSource({
+        roster: [],
+        sessions: [],
+        assignmentCompletions: [],
+        assignmentExpected: 0,
+        assignmentCount: 0,
+      });
       setIsLoading(false);
       setError(null);
       return;
@@ -40,7 +47,13 @@ export function useWeeklyProgressDigest(
         setIsLoading(false);
         return;
       }
-      setSource(data);
+      setSource({
+        roster: data.roster,
+        sessions: data.sessions,
+        assignmentCompletions: data.assignmentCompletions ?? [],
+        assignmentExpected: data.assignmentExpected ?? 0,
+        assignmentCount: data.assignmentCount ?? 0,
+      });
       setIsLoading(false);
     } catch (e) {
       logger.error('Error loading weekly progress digest:', e);
@@ -60,10 +73,16 @@ export function useWeeklyProgressDigest(
     return deriveWeeklyProgressDigest({
       roster: source.roster,
       sessions: source.sessions,
-      assignmentExpected,
-      assignmentCompletions: assignmentCompletedAt.map((completedAt) => ({ completedAt })),
+      assignmentExpected: source.assignmentExpected,
+      assignmentCompletions: source.assignmentCompletions,
     });
-  }, [source, assignmentExpected, assignmentCompletedAt]);
+  }, [source]);
 
-  return { metrics, isLoading, error, refresh: load };
+  return {
+    metrics,
+    isLoading,
+    error,
+    refresh: load,
+    assignmentCount: source?.assignmentCount ?? 0,
+  };
 }

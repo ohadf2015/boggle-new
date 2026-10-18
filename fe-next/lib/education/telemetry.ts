@@ -60,6 +60,8 @@ const ACTIVATION_GROWTH_MIRROR = new Set<GrowthEvent>([
   'edu_teacher_onboarding_step',
   'edu_first_assignment_cta_shown',
   'edu_first_assignment_cta_clicked',
+  'edu_digest_viewed',
+  'edu_digest_upgrade_cta_clicked',
 ]);
 
 /** Same event, same props, into Growth Radar's growth:* stream. Never throws. */
@@ -360,6 +362,17 @@ export function trackTeacherFirstAssignmentTemplate(args: {
   });
 }
 
+/** One-click assign from the grade/subject template gallery. */
+export function trackEduTemplateAssigned(args: {
+  templateId: string;
+  classroomId: string;
+}): void {
+  safeCapture('edu_template_assigned', {
+    template_id: args.templateId,
+    classroom_id: args.classroomId,
+  });
+}
+
 export interface EduTeacherSnapshot {
   classroomCount: number;
   studentCount: number;
@@ -416,12 +429,31 @@ export function trackTeacherDigestViewed(args: {
   studentsActive: number;
   trialExpired?: boolean;
 }): void {
-  safeCapture('teacher_digest_viewed', {
+  const props = {
     has_pro: args.hasPro,
     trial_day_7: args.trialDay7,
     trial_expired: args.trialExpired === true,
     students_active: args.studentsActive,
-  });
+  };
+  safeCapture('teacher_digest_viewed', props);
+  captureActivation('edu_digest_viewed', props);
+}
+
+/** Polar CTA tap on the weekly digest — never student names. */
+export function trackTeacherDigestUpgradeCtaClicked(args: {
+  hasPro: boolean;
+  trialDay7: boolean;
+  trialExpired?: boolean;
+  overCap?: boolean;
+}): void {
+  const props = {
+    has_pro: args.hasPro,
+    trial_day_7: args.trialDay7,
+    trial_expired: args.trialExpired === true,
+    over_cap: args.overCap === true,
+  };
+  safeCapture('teacher_digest_upgrade_cta_clicked', props);
+  captureActivation('edu_digest_upgrade_cta_clicked', props);
 }
 
 /**

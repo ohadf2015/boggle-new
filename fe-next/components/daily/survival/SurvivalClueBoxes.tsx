@@ -172,24 +172,26 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
         </AdaptiveAnimatePresence>
       </div>
 
-      {/* Legend / Known letters indicator. Floor collapses on short landscape so the grid keeps room. */}
+      {/* Legend / Known letters indicator. The floor holds the tallest state (chips + legend) so clues arriving never resize the board. */}
       <div className={cn(
         "flex flex-col justify-center",
-        compact ? "min-h-0" : "min-h-[40px] sm:min-h-[44px] cramped:min-h-0",
+        compact ? "min-h-0" : "min-h-[52px] sm:min-h-[56px] cramped:min-h-[44px]",
       )}>
-        <AdaptiveAnimatePresence mode="sync">
-          {showFeedbackOverlay && latestAttemptFeedback ? (
-            <FeedbackLegend t={t} />
-          ) : (
-            <KnownLettersDisplay
-              key="known-letters"
-              knownLetters={knownLetters}
-              noCluesYet={accumulatedClues.size === 0 && knownLetters.size === 0 && revealedLetters.size === 0}
-              t={t}
-            />
-          )}
-        </AdaptiveAnimatePresence>
-        {!showFeedbackOverlay && (attempts.length > 0 || knownLetters.size > 0) && !compact && (
+        {/* The legend is one persistent node: swapping it through AnimatePresence kept the exiting copy
+            in flow next to the new one, so every release grew this panel ~50px and shrank the board. */}
+        <div className="grid [&>*]:[grid-area:1/1]">
+          <AdaptiveAnimatePresence mode="sync">
+            {!(showFeedbackOverlay && latestAttemptFeedback) && (
+              <KnownLettersDisplay
+                key="known-letters"
+                knownLetters={knownLetters}
+                noCluesYet={accumulatedClues.size === 0 && knownLetters.size === 0 && revealedLetters.size === 0}
+                t={t}
+              />
+            )}
+          </AdaptiveAnimatePresence>
+        </div>
+        {((showFeedbackOverlay && latestAttemptFeedback) || ((attempts.length > 0 || knownLetters.size > 0) && !compact)) && (
           <FeedbackLegend t={t} />
         )}
       </div>
@@ -469,7 +471,7 @@ const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters,
           {Array.from(knownLetters).map((letter) => (
             <span
               key={letter}
-              className="w-7 h-7 flex items-center justify-center bg-amber-400 border-2 border-neo-black rounded text-neo-black font-black text-sm"
+              className="w-7 h-7 cramped:w-5 cramped:h-5 flex items-center justify-center bg-amber-400 border-2 border-neo-black rounded text-neo-black font-black text-sm cramped:text-xs"
             >
               {letter}
             </span>

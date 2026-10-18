@@ -11,26 +11,35 @@
  * Mounted from the route layout so the node survives the ssr:false swap.
  * The game overlay (z-70, later in the DOM) covers it once the board is
  * ready; we never unmount this node so LCP cannot retarget a later paint.
+ * After the client marks html[data-sp-ready] (results / pre-game), hide it
+ * so the z-70 navy+mascot cannot cover the results CTA.
  */
 export function SinglePlayerLcpShell() {
   return (
-    <div
-      id="sp-lcp-paint"
-      data-testid="sp-lcp-paint"
-      aria-hidden
-      className="pointer-events-none fixed inset-0 z-[70] flex flex-col items-center justify-center overflow-hidden bg-neo-navy"
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/mascot/winner-lcp.webp"
-        alt=""
-        width={112}
-        height={112}
-        fetchPriority="high"
-        decoding="sync"
-        className="h-28 w-28 object-contain"
+    <>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: 'html[data-sp-ready] #sp-lcp-paint{display:none}',
+        }}
       />
-    </div>
+      <div
+        id="sp-lcp-paint"
+        data-testid="sp-lcp-paint"
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-[70] flex flex-col items-center justify-center overflow-hidden bg-neo-navy"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/mascot/winner-lcp.webp"
+          alt=""
+          width={112}
+          height={112}
+          fetchPriority="high"
+          decoding="sync"
+          className="h-28 w-28 object-contain"
+        />
+      </div>
+    </>
   );
 }
 

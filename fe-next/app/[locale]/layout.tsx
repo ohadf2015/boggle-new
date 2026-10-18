@@ -598,14 +598,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <link rel="preconnect" href="https://connect.facebook.net" crossOrigin="anonymous" />
                 <link rel="dns-prefetch" href="https://analytics.tiktok.com" />
                 <link rel="dns-prefetch" href="https://ads.tiktok.com" />
-                {/* No AdSense script AND no pagead/doubleclick preconnect.
-                    Web AdSense was REJECTED ("low value content"); Auto-Ads
-                    (162 KiB show_ads_impl, Lighthouse 2026-08-24 mobile PSI 33)
-                    was deleted 2026-09-15 (t_79e9fcc1). Preconnects to those
-                    origins still opened sockets on every mobile load (kanban
-                    t_88511d33). H5 Games Ads (lib/ads/h5GamesAds.ts) loads
-                    adsbygoogle.js on user intent only. Ownership signal is the
-                    `google-adsense-account` meta in app/layout.tsx. */}
+                {/* No AdSense script, no pagead/doubleclick preconnect, and no
+                    google-adsense-account meta. Web AdSense was REJECTED
+                    ("low value content"); Auto-Ads (162 KiB show_ads_impl,
+                    Lighthouse 2026-08-24 mobile PSI 33) was deleted 2026-09-15
+                    (t_79e9fcc1). The rejected-pub meta was stripped 2026-10-18
+                    (t_02e92b5a). H5 Games Ads must not load adsbygoogle.js
+                    for ca-pub-1896836706464880. */}
                 {/* CrazyGames SDK — preconnect for game-distribution builds */}
                 <link rel="preconnect" href="https://sdk.crazygames.com" />
                 <link rel="dns-prefetch" href="https://sdk.crazygames.com" />

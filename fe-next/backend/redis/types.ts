@@ -27,6 +27,7 @@ export interface GameStateData {
   gameMode: string | null;
   blastModeState: Record<string, unknown> | null;
   wordHuntState: Record<string, unknown> | null;
+  wheelRushState: Record<string, unknown> | null;
   isRanked?: boolean;
   isPrivate?: boolean;
   isClassroom?: boolean;
@@ -125,6 +126,7 @@ export interface GameDataInput {
   gameMode?: string;
   blastModeState?: Record<string, unknown> | null;
   wordHuntState?: Record<string, unknown> | null;
+  wheelRushState?: Record<string, unknown> | null;
   isRanked?: boolean;
   isPrivate?: boolean;
   isClassroom?: boolean;

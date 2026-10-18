@@ -33,6 +33,7 @@ import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeBadge from '@/components/practice/PracticeBadge';
 import SessionRevealHost from '@/components/avatar/reveal/SessionRevealHost';
 import { levelUpFromRecordGame, publishLevelUp } from '@/lib/avatar/revealTrigger';
+import { useRetireSpLcpShell } from './retireSpLcpShell';
 
 // Off the LCP-critical path (phase 'playing' renders SinglePlayerGame only) —
 // deferred so results/tutorial JS (framer-motion, ads, confetti) doesn't block first paint.
@@ -152,6 +153,10 @@ const SinglePlayerView: React.FC = () => {
     setIsInGame(phase === 'pre-game' || phase === 'playing' || phase === 'results');
     return () => setIsInGame(false);
   }, [phase, setIsInGame]);
+
+  // Hide layout LCP shell (#sp-lcp-paint z-70) once results/tutorial mount.
+  // Playing keeps it: SinglePlayerGame's matching z-70 box is the cover.
+  useRetireSpLcpShell(phase);
 
   // Results keeps isInGame (nav hidden, screen-fit-locked) but must not hold
   // the overlay quiet zone forever — SP landers never leave this route, so

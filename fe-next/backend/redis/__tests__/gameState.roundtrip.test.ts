@@ -247,4 +247,21 @@ describe('Game state round-trip serialization', () => {
     expect(result!.isRanked).toBe(false);
     expect(result!.allowLateJoin).toBe(true); // default
   });
+
+  it('keeps a wheel-rush round alive across a server restart', async () => {
+    const wheelRushState = {
+      puzzle: { letters: ['A', 'B', 'C'] },
+      foundWords: { alice: ['CAB'] },
+      firstFinders: { CAB: 'alice' },
+      startedAt: 1700000000000,
+      playerStats: {},
+    };
+    await saveGameState('WHEEL', {
+      roomName: 'Wheel', users: {}, playerScores: {}, playerWords: {}, gameState: 'in-progress',
+      letterGrid: [], timerSeconds: 60, language: 'en', gameMode: 'wheel-rush', wheelRushState,
+    } as any);
+
+    const restored = await restoreGameFromRedis('WHEEL', {});
+    expect(restored!.wheelRushState).toEqual(wheelRushState);
+  });
 });

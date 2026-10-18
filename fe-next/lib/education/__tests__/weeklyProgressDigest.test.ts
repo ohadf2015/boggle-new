@@ -4,6 +4,7 @@ import {
   formatWowDelta,
   isPolarTrialDay7,
   isPolarTrialDay7EmailWindow,
+  shouldShowDigestUpgradeCta,
 } from '../weeklyProgressDigest';
 
 const NOW = Date.parse('2026-10-13T12:00:00.000Z');
@@ -59,6 +60,26 @@ describe('deriveWeeklyProgressDigest', () => {
     expect(digest.wow.gamesCompleted).toBe(2);
     expect(digest.wow.wordsCompleted).toBe(16);
     expect(digest.wow.assignmentCompletionPctPoints).toBe(16);
+    expect(digest.averageScorePct).toBe(86);
+    expect(digest.inactiveCount).toBe(1);
+    const jo = digest.students.find((s) => s.studentId === 's3');
+    expect(jo?.inactive7d).toBe(true);
+    const sam = digest.students.find((s) => s.studentId === 's1');
+    expect(sam?.thisWeekSessions).toBe(2);
+    expect(sam?.lastWeekSessions).toBe(1);
+    expect(sam?.accuracyDelta).toBe(-14);
+  });
+
+  it('hides the digest upgrade CTA for paid Pro and shows it for trial or over-cap', () => {
+    expect(
+      shouldShowDigestUpgradeCta({ isPaidPro: true, isTrialing: false, trialExpired: false, overFreeTierCaps: true }),
+    ).toBe(false);
+    expect(
+      shouldShowDigestUpgradeCta({ isPaidPro: false, isTrialing: true, trialExpired: false, overFreeTierCaps: false }),
+    ).toBe(true);
+    expect(
+      shouldShowDigestUpgradeCta({ isPaidPro: false, isTrialing: false, trialExpired: false, overFreeTierCaps: true }),
+    ).toBe(true);
   });
 
   it('leaves assignment pct null when nothing was assigned', () => {

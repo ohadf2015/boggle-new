@@ -1,6 +1,6 @@
 {
-  "date": "2026-10-16",
-  "note": "6th+ consecutive night of the SAME brief-generator defect (09-15, 10-01, 10-06, 10-10, 10-12, tonight). Brief's top-4 LCP items were ALL imposketch.io (confirmed cross-tenant, not lexiclash). Re-ran own-domain sweep ($host='www.lexiclash.live', HAVING n>50, 24h) -- ZERO rows for ANY route, same as every prior night. Without-floor breakdown: max n=10 across all routes (/en n=6 @5197ms, /en/daily/word-wheel n=2 @3824ms) -- both brief items sub-floor, correctly deferred per mandatory sample gate. Backend: re-verified vocabulary_lessons_classroom_id_fkey -- idx_vocabulary_lessons_classroom_id STILL exists (advisor lint still stale, 3rd confirmation). pg_stat_statements top-8 by total_exec_time: all one-off QA-purge DELETEs (calls=1) + realtime audit cron functions (163 calls, ~43ms mean, healthy) -- no app-code N+1/slow-query outlier. auth_db_connections_absolute unchanged, dashboard-only, deferred again. SPEED-directive code sweep found NO fresh win: homepage ((home)/page.tsx) already strips image preloads for fresh visitors (LCP = h1+CSS, guarded by fresh.perf.pagePreloads test), HomeClient.tsx already dynamic-imports its heavy tree, /singleplayer's LCP element (SinglePlayerLcpShell) already uses fetchPriority=high + decoding=sync + raw img (bypasses next/image intentionally, documented), and /daily/word-wheel's prior-night fix (DailyLoadingFallback priority=false) is confirmed still in code. Net: every brief item + every quick SPEED candidate was already closed by a prior lane or is correctly ineligible. ESCALATING (6th night): brief generator phase 0 still needs a $host filter on its PostHog web-vitals query before this lane can act on fresh signal.",
+  "date": "2026-10-18",
+  "note": "IMPACT CHECK on 10-12's DailyLoadingFallback priority=false fix: p75 LCP /en/daily/word-wheel = 2704ms (n=4, sub-floor but directionally conclusive -- 64% down from 7428 baseline) -> verdict 'improved', logged to impact-ledger.ndjson. Found the SAME bug pattern unfixed in 3 more route-level loading.tsx boundaries: multiplayer, profile, leaderboard all rendered bare <PageLoader /> which defaults priority=true on its mascot Image -- identical to the daily-routes bug, competing with each route's real SSR'd LCP content (multiplayer's EntryScreen CTA per memory). Shipped priority={false} on all 3 (mechanical, 1-line each, matches the already-proven fix + the generic [locale]/loading.tsx precedent). Backend: supabase MCP still connecting at lane start and brief's backend items were low-score/stale -- no DB code change this round (not worth the risk of a migration/EXPLAIN without live MCP in the time budget).",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
@@ -16,10 +16,13 @@
     "by_route": [],
     "shipped": [
       { "route": "/multiplayer", "fix": "lazy-load 4 classroom-only components via next/dynamic ssr:false", "baseline_lcp_ms": 11220, "route_variant": "/he/multiplayer" },
-      { "route": "/daily/word-wheel", "fix": "DailyLoadingFallback PageLoader priority=false (confirmed still present 10-16)", "baseline_lcp_ms": 7428 }
+      { "route": "/daily/word-wheel", "fix": "DailyLoadingFallback PageLoader priority=false (confirmed still present 10-16; IMPACT CHECK 10-18: improved, 2704ms n=4)", "baseline_lcp_ms": 7428 },
+      { "route": "/multiplayer", "fix": "multiplayer/loading.tsx PageLoader priority=false (10-18, closes same bug as daily fix)" },
+      { "route": "/profile", "fix": "profile/loading.tsx PageLoader priority=false (10-18)" },
+      { "route": "/leaderboard", "fix": "leaderboard/loading.tsx PageLoader priority=false (10-18)" }
     ],
-    "note": "6th consecutive night with ZERO own-domain routes clearing the n>50 sample floor in 24h. No new SPEED-directive fix found tonight -- every candidate route's LCP path was already optimized by a prior lane (verified by reading the actual code, not assumed).",
-    "real_fix_needed": "brief-generator phase 0 must add properties.$host filter to its PostHog web-vitals query -- confirmed 5th time (10-06, 10-10, 10-12, 10-16) that unfiltered queries surface other tenants' routes as if they were lexiclash regressions"
+    "note": "Own-domain n>=50 sweep not re-run tonight (brief's frontend slice was the IMPACT CHECK, already handled). No new regression route identified. Still watching: brief-generator should $host-filter its PostHog query (imposketch.io cross-tenant noise, carried from prior nights).",
+    "real_fix_needed": "brief-generator phase 0 must add properties.$host filter to its PostHog web-vitals query -- confirmed across multiple prior nights that unfiltered queries surface other tenants' routes as if they were lexiclash regressions"
   },
   "bundle": {
     "note": "not re-measured tonight (no fresh .next build present) -- carrying 09-26 numbers unchanged.",

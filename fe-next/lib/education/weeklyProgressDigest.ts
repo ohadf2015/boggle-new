@@ -54,10 +54,42 @@ export interface WeeklyProgressWow {
   assignmentCompletionPctPoints: number | null;
 }
 
+export interface WeeklyStudentMovement {
+  studentId: string;
+  name: string;
+  thisWeekSessions: number;
+  lastWeekSessions: number;
+  thisWeekAccuracyPct: number | null;
+  lastWeekAccuracyPct: number | null;
+  /** Percentage-point delta. Null when either week is unrated. */
+  accuracyDelta: number | null;
+  inactive7d: boolean;
+}
+
 export interface WeeklyProgressDigestMetrics {
   thisWeek: WeeklyProgressSlice;
   lastWeek: WeeklyProgressSlice;
   wow: WeeklyProgressWow;
+  /** Mean this-week accuracy of students with a rated session. */
+  averageScorePct: number | null;
+  inactiveCount: number;
+  students: WeeklyStudentMovement[];
+}
+
+/** Paid Pro (not a live Polar trial) never sees a digest upgrade CTA. */
+export function shouldShowDigestUpgradeCta({
+  isPaidPro,
+  isTrialing,
+  trialExpired,
+  overFreeTierCaps,
+}: {
+  isPaidPro: boolean;
+  isTrialing: boolean;
+  trialExpired: boolean;
+  overFreeTierCaps: boolean;
+}): boolean {
+  if (isPaidPro) return false;
+  return isTrialing || trialExpired || overFreeTierCaps;
 }
 
 const pct = (num: number, den: number): number | null =>
@@ -65,6 +97,58 @@ const pct = (num: number, den: number): number | null =>
 
 function inRange(iso: string, startIso: string, endIso: string): boolean {
   return iso >= startIso && iso <= endIso;
+}
+
+function studentWindowStats(
+  sessions: WindowSession[],
+  studentId: string,
+  startIso: string,
+  endIso: string,
+): { sessions: number; accuracyPct: number | null } {
+  let found = 0;
+  let missed = 0;
+  let count = 0;
+  for (const session of sessions) {
+    if (session.studentId !== studentId || !inRange(session.completedAt, startIso, endIso)) continue;
+    count += 1;
+    found += Math.max(0, session.foundCount);
+    missed += Math.max(0, session.missedCount);
+  }
+  const rated = found + missed;
+  return { sessions: count, accuracyPct: rated > 0 ? Math.round((found / rated) * 100) : null };
+}
+
+export function deriveWeeklyStudentMovement({
+  roster,
+  sessions,
+  now = Date.now(),
+}: {
+  roster: WindowRosterStudent[];
+  sessions: WindowSession[];
+  now?: number;
+}): WeeklyStudentMovement[] {
+  const thisEnd = new Date(now).toISOString();
+  const thisStart = new Date(now - WEEK_MS).toISOString();
+  const lastStart = new Date(now - 2 * WEEK_MS).toISOString();
+  const lastEnd = new Date(now - WEEK_MS - 1).toISOString();
+  return roster.map((member) => {
+    const thisWeek = studentWindowStats(sessions, member.studentId, thisStart, thisEnd);
+    const lastWeek = studentWindowStats(sessions, member.studentId, lastStart, lastEnd);
+    const accuracyDelta =
+      thisWeek.accuracyPct == null || lastWeek.accuracyPct == null
+        ? null
+        : thisWeek.accuracyPct - lastWeek.accuracyPct;
+    return {
+      studentId: member.studentId,
+      name: member.name,
+      thisWeekSessions: thisWeek.sessions,
+      lastWeekSessions: lastWeek.sessions,
+      thisWeekAccuracyPct: thisWeek.accuracyPct,
+      lastWeekAccuracyPct: lastWeek.accuracyPct,
+      accuracyDelta,
+      inactive7d: thisWeek.sessions === 0,
+    };
+  });
 }
 
 function sliceForWindow({
@@ -149,6 +233,13 @@ export function deriveWeeklyProgressDigest({
       ? null
       : thisWeek.assignmentCompletionPct - lastWeek.assignmentCompletionPct;
 
+  const students = deriveWeeklyStudentMovement({ roster, sessions, now });
+  const rated = students.filter((s) => s.thisWeekAccuracyPct != null);
+  const averageScorePct =
+    rated.length > 0
+      ? Math.round(rated.reduce((sum, s) => sum + (s.thisWeekAccuracyPct ?? 0), 0) / rated.length)
+      : null;
+
   return {
     thisWeek,
     lastWeek,
@@ -158,6 +249,9 @@ export function deriveWeeklyProgressDigest({
       wordsCompleted: thisWeek.wordsCompleted - lastWeek.wordsCompleted,
       assignmentCompletionPctPoints: assignmentWow,
     },
+    averageScorePct,
+    inactiveCount: students.filter((s) => s.inactive7d).length,
+    students,
   };
 }
 

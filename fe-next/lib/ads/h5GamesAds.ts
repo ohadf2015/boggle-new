@@ -14,6 +14,9 @@
  * Rewarded:        `adBreak({ type:'reward', beforeReward, adViewed, adDismissed, adBreakDone })`
  *
  * No banner — web users see no persistent ad. AdMob banner on Android only.
+ *
+ * The previous default client (ca-pub-1896836706464880) was REJECTED. loadH5Sdk
+ * must not inject adsbygoogle.js for that pub (t_02e92b5a, mobile PSI 45→33).
  */
 
 export type H5BreakStatus =
@@ -61,43 +64,53 @@ declare global {
 
 const SCRIPT_ID = 'h5-games-ads-sdk';
 const SCRIPT_SRC = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
-const DEFAULT_CLIENT = 'ca-pub-1896836706464880';
+/** Same rejected publisher as adSensePolicy.REJECTED_ADSENSE_PUBLISHER. */
+const REJECTED_ADSENSE_PUBLISHER = 'ca-pub-1896836706464880';
 
 let loadPromise: Promise<void> | null = null;
 let configured = false;
 
+function sanitizeH5Client(id: string | undefined): string {
+  if (!id) return '';
+  if (id === REJECTED_ADSENSE_PUBLISHER) return '';
+  return id;
+}
+
 /**
  * H5 client id. Reads BOTH spellings: the web-ad runbook's "Env-flip cheat sheet"
  * documents `NEXT_PUBLIC_H5_GAMES_CLIENT`, the code originally read
- * `NEXT_PUBLIC_ADSENSE_H5_CLIENT`. Following the runbook would silently have set
- * nothing — and a dark web ad path reports no error, so nobody would have noticed.
+ * `NEXT_PUBLIC_ADSENSE_H5_CLIENT`. No hardcoded default — the old default was the
+ * rejected AdSense publisher (t_02e92b5a).
  */
 export function getH5Client(): string {
   if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ADSENSE_H5_CLIENT) {
-    return process.env.NEXT_PUBLIC_ADSENSE_H5_CLIENT;
+    return sanitizeH5Client(process.env.NEXT_PUBLIC_ADSENSE_H5_CLIENT);
   }
   if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_H5_GAMES_CLIENT) {
-    return process.env.NEXT_PUBLIC_H5_GAMES_CLIENT;
+    return sanitizeH5Client(process.env.NEXT_PUBLIC_H5_GAMES_CLIENT);
   }
-  return DEFAULT_CLIENT;
+  return '';
 }
 
 /**
  * Whether H5 Games Ads is switched on by env. Accepts the runbook's
  * `NEXT_PUBLIC_H5_GAMES_ENABLED` as well as the code's original
  * `NEXT_PUBLIC_H5_ADS_ENABLED` — see getH5Client() for why.
+ * Also requires a non-rejected client so flipping the flag cannot load 162 KiB
+ * of adsbygoogle.js for a dead publisher.
  */
 export function isH5EnvEnabled(): boolean {
   if (typeof process === 'undefined') return false;
-  return (
+  const flag =
     process.env.NEXT_PUBLIC_H5_ADS_ENABLED === 'true' ||
-    process.env.NEXT_PUBLIC_H5_GAMES_ENABLED === 'true'
-  );
+    process.env.NEXT_PUBLIC_H5_GAMES_ENABLED === 'true';
+  return flag && getH5Client() !== '';
 }
 
 /** Idempotent: loads the SDK script once and resolves when ready. */
 export function loadH5Sdk(client: string = getH5Client()): Promise<void> {
   if (typeof window === 'undefined') return Promise.resolve();
+  if (!client || client === REJECTED_ADSENSE_PUBLISHER) return Promise.resolve();
   if (loadPromise) return loadPromise;
 
   loadPromise = new Promise<void>((resolve, reject) => {
@@ -161,6 +174,7 @@ export function adBreak(options: H5AdBreakOptions): void {
  */
 export function initH5GamesAds(client: string = getH5Client()): Promise<void> {
   if (typeof window === 'undefined') return Promise.resolve();
+  if (!client || client === REJECTED_ADSENSE_PUBLISHER) return Promise.resolve();
 
   return loadH5Sdk(client).then(() => {
     if (configured) return;
