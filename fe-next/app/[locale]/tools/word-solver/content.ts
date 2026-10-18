@@ -223,7 +223,7 @@ const content: Record<Locale, ToolContent> = {
     description:
       'Gratis anagramlösare på svenska. Ange dina bokstäver och hitta alla möjliga ord direkt. Perfekt för Scrabble, Wordfeud och LexiClash.',
     metaDescription:
-      'Gratis anagramlösare på svenska — hitta alla ord av dina bokstäver direkt. Perfekt för Scrabble, Wordfeud och LexiClash. Prova nu →',
+      'Bilda ord med bokstäver gratis — hitta alla möjliga ord av dina bokstäver direkt. Anagramlösare på svenska för Scrabble, Wordfeud och LexiClash. Prova nu →',
     inputPlaceholder: 'Ange dina bokstäver (t.ex. AELRST)',
     inputLabel: 'Dina bokstäver',
     languageLabel: 'Ordboksspråk',
@@ -249,7 +249,8 @@ const content: Record<Locale, ToolContent> = {
     ],
     faqTitle: 'Vanliga frågor',
     faqs: [
-      { question: 'Hur många ord kan man bilda av 7 bokstäver?', answer: 'Från 7 slumpmässiga bokstäver kan du vanligtvis bilda mellan 20 och 80 giltiga engelska ord. Vår lösare hittar alla möjligheter direkt.' },
+      { question: 'Hur bildar man ord med bokstäver?', answer: 'Ange dina bokstäver i fältet ovan och klicka "Hitta ord" — verktyget hittar automatiskt alla möjliga ord du kan bilda av dina bokstäver på svenska. Resultaten sorteras efter ordlängd.' },
+      { question: 'Hur många ord kan man bilda av 7 bokstäver?', answer: 'Från 7 slumpmässiga bokstäver kan du vanligtvis bilda mellan 20 och 80 giltiga ord. Vår lösare hittar alla möjligheter direkt.' },
       { question: 'Vad är en anagramlösare?', answer: 'En anagramlösare tar en uppsättning bokstäver och hittar alla giltiga ord som kan bildas.' },
       { question: 'Kan jag använda detta för Scrabble?', answer: 'Ja! Denna ordfinnare fungerar för alla ordspel inklusive Scrabble, Boggle och LexiClash.' },
       { question: 'Varför saknas vissa ord?', answer: 'Vårt gratisverktyg använder en lista med 500+ vanliga ord. För hela ordboken, spela LexiClash!' },

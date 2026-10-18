@@ -243,6 +243,28 @@ describe('EducationNav — teacher sidebar extras', () => {
     expect(pro.textContent).toContain('eduShell.nav.pro');
   });
 
+  it('says Free plan with an Upgrade pill while the teacher is on the free plan', () => {
+    const nav = resolveEducationNav('/en/teacher/classroom')!;
+    const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="free" />);
+    const pro = getByTestId('education-side-pro');
+    expect(pro.textContent).toContain('teacher.plan.free');
+    expect(getByTestId('education-side-pro-pill').textContent).toBe('teacher.plan.upgrade');
+  });
+
+  it('shows a lime check, not an ask, once the teacher is on Pro', () => {
+    const nav = resolveEducationNav('/en/teacher/classroom')!;
+    const { getByTestId, queryByText } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="pro" />);
+    expect(getByTestId('education-side-pro').textContent).toContain('eduShell.nav.pro');
+    expect(getByTestId('education-side-pro-pill').getAttribute('aria-label')).toBe('teacher.plan.pro');
+    expect(queryByText('teacher.plan.upgrade')).toBeNull();
+  });
+
+  it('labels a Polar trial in the pill', () => {
+    const nav = resolveEducationNav('/en/teacher/classroom')!;
+    const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="trial" />);
+    expect(getByTestId('education-side-pro-pill').textContent).toBe('teacher.plan.trialActive');
+  });
+
   it('never shows the Pro link to students', () => {
     const nav = resolveEducationNav('/en/student')!;
     const { queryByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);

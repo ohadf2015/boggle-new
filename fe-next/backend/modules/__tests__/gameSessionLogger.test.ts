@@ -15,18 +15,24 @@ import {
   type GameSessionFilters,
 } from '../gameSessionLogger';
 
+const { updateSpy, insertSpy } = vi.hoisted(() => ({ updateSpy: vi.fn(), insertSpy: vi.fn() }));
+
 // Mock Supabase
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => ({
     from: vi.fn(() => ({
-      insert: vi.fn(() => ({
+      insert: vi.fn((row: unknown) => {
+        insertSpy(row);
+        return {
         select: vi.fn(() => ({
           single: vi.fn(() => ({ data: { id: 'mock-session-id' }, error: null })),
         })),
-      })),
-      update: vi.fn(() => ({
-        eq: vi.fn(() => ({ error: null })),
-      })),
+        };
+      }),
+      update: vi.fn((row: unknown) => {
+        updateSpy(row);
+        return { eq: vi.fn(() => ({ error: null })) };
+      }),
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
           eq: vi.fn(() => ({
@@ -149,6 +155,14 @@ describe('Game Session Logger', () => {
     });
   });
 
+  describe('logGameSession durations', () => {
+    it('rounds fractional durationSeconds on insert', async () => {
+      await logGameSession({ guestSessionId: 'g-1', mode: 'singleplayer', language: 'en', durationSeconds: 12.7, startedAt: new Date() });
+
+      expect(insertSpy).toHaveBeenCalledWith(expect.objectContaining({ duration_seconds: 13 }));
+    });
+  });
+
   describe('updateGameSession', () => {
     it('should update session with completion data', async () => {
       const updates: GameSessionUpdateData = {
@@ -161,6 +175,12 @@ describe('Game Session Logger', () => {
       const success = await updateGameSession('session-123', updates);
 
       expect(success).toBe(true);
+    });
+
+    it('rounds fractional durationSeconds (duration_seconds is an integer column)', async () => {
+      await updateGameSession('session-789', { durationSeconds: 66.16000000000012 });
+
+      expect(updateSpy).toHaveBeenCalledWith({ duration_seconds: 66 });
     });
 
     it('should update daily challenge progress', async () => {

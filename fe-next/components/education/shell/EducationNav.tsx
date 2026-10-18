@@ -5,6 +5,7 @@ import Link from 'next/link';
 import {
   BarChart3,
   BookOpen,
+  Check,
   ChevronRight,
   Crown,
   Dumbbell,
@@ -49,6 +50,8 @@ export interface EducationNavProps {
   brand?: ReactNode;
   /** Sidebar only: the avatar/account menu under the Pro link. */
   account?: ReactNode;
+  /** Sidebar only: the teacher's plan, so the Pro link states it. Unknown (undefined) = plain link. */
+  plan?: 'free' | 'pro' | 'trial';
   className?: string;
 }
 
@@ -142,7 +145,7 @@ function NavLink({
   );
 }
 
-export function EducationNav({ nav, t, variant, brand, account, className }: EducationNavProps) {
+export function EducationNav({ nav, t, variant, brand, account, plan, className }: EducationNavProps) {
   const links = nav.items.map((item) => (
     <NavLink key={item.key} item={item} active={item.key === nav.activeKey} variant={variant} t={t} />
   ));
@@ -174,7 +177,23 @@ export function EducationNav({ nav, t, variant, brand, account, className }: Edu
               )}
             >
               <Crown className="h-5 w-5 shrink-0" aria-hidden />
-              <span className="flex-1 truncate">{t('eduShell.nav.pro')}</span>
+              <span className="flex-1 truncate">{t(plan === 'free' ? 'teacher.plan.free' : 'eduShell.nav.pro')}</span>
+              {plan === 'free' || plan === 'trial' ? (
+                <span
+                  data-testid="education-side-pro-pill"
+                  className="shrink-0 rounded-neo border-[2px] border-neo-lime px-2 py-0.5 text-xs font-black text-neo-lime"
+                >
+                  {t(plan === 'free' ? 'teacher.plan.upgrade' : 'teacher.plan.trialActive')}
+                </span>
+              ) : plan === 'pro' ? (
+                <span
+                  data-testid="education-side-pro-pill"
+                  aria-label={t('teacher.plan.pro')}
+                  className="grid size-5 shrink-0 place-items-center rounded-full bg-neo-lime text-neo-black"
+                >
+                  <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden />
+                </span>
+              ) : null}
               <DirectionalIcon icon={ChevronRight} className="h-4 w-4 shrink-0" />
             </Link>
           ) : null}

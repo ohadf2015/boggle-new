@@ -189,6 +189,34 @@ describe('PolarClient.createCheckout', () => {
   })
 })
 
+describe('PolarClient.createCheckout — rejected customer_email', () => {
+  const rejected = {
+    ok: false,
+    status: 422,
+    text: async () => '{"detail":[{"loc":["body","x","customer_email"],"msg":"The domain name school.example does not exist."}]}',
+  }
+  const created = { ok: true, json: async () => ({ url: 'https://polar.sh/checkout/ok' }) }
+
+  it('retries once without the email, so a teacher with an odd address can still subscribe', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(rejected).mockResolvedValueOnce(created)
+    vi.stubGlobal('fetch', fetchMock)
+    const url = await new PolarClient('tok', 'sandbox').createCheckout({ userId: 'u', productId: 'p', email: 'a@school.example' })
+    expect(url).toBe('https://polar.sh/checkout/ok')
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).customer_email).toBe('a@school.example')
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).not.toHaveProperty('customer_email')
+  })
+
+  it('does not retry a 422 that is not about the email', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 422, text: async () => '{"detail":[{"loc":["body","products"]}]}' })
+    vi.stubGlobal('fetch', fetchMock)
+    await expect(
+      new PolarClient('tok', 'sandbox').createCheckout({ userId: 'u', productId: 'p', email: 'a@b.co' }),
+    ).rejects.toThrow('Polar API error: 422')
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe('polar env helpers', () => {
   afterEach(() => {
     delete process.env.POLAR_ENVIRONMENT

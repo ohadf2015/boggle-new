@@ -20,6 +20,10 @@ const pinoInstance = pino({
     : { transport: { target: 'pino-pretty', options: { colorize: true } } }),
 });
 
+// Expected, self-describing conditions (a per-IP throttle, a refused classroom
+// action); they keep their pino line but must not open a Sentry issue per id.
+const SENTRY_QUIET_WARN_CATEGORIES = new Set(['RATE_LIMIT', 'CLASSROOM_ECONOMY']);
+
 // ==========================================
 // Logger class — preserves existing API
 // ==========================================
@@ -54,7 +58,7 @@ class Logger {
 
   warn(category: string, message: string, data?: unknown): void {
     this.pino.warn({ category, ...(data != null ? { data } : {}) }, message);
-    if (isProduction) this.captureToSentry('warning', category, message, data);
+    if (isProduction && !SENTRY_QUIET_WARN_CATEGORIES.has(category)) this.captureToSentry('warning', category, message, data);
   }
 
   info(category: string, message: string, data?: unknown): void {

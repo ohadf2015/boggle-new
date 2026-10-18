@@ -1,0 +1,3 @@
+status: research-only
+files_touched: docs/nightly/triage-queue.md, docs/nightly/impact-ledger.ndjson, docs/nightly/reports/2026-10-18.md
+next_steps: top brief rage-click signal (/en/multiplayer) turned out noisy (board-tile taps, not UI friction) — tomorrow's lane should NOT re-chase it until a human confirms the dashboard exclusion fix in triage-queue.md. exp-mp-quickplay-eager-disable-v1 stays volume-starved; re-check after Quick Play traffic grows or get a human priors-based call to ship-to-100%. No code changes attempted (none were safe/verified in remaining budget) — no fe-next/ files touched, zero gate risk.
