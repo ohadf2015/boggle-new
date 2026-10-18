@@ -12978,7 +12978,52 @@ const en = {
       "wordListGoalHint": "Paste words, one per line or comma-separated.",
       "wordListPlaceholder": "cat, dog, fish",
       "wordGoalMissing": "Add a word goal or a word list and a due date",
-      "findNWords": "Find {{count}} words"
+      "findNWords": "Find {{count}} words",
+      "templateGallery": {
+        "title": "Template gallery",
+        "hint": "Pre-made word lists by grade and subject. Preview the words, then assign in one click.",
+        "browse": "Start from a template",
+        "browseHint": "Pre-made word lists by grade band and subject",
+        "browseAll": "Browse all templates",
+        "back": "Back",
+        "bandLabel": "Grade band",
+        "allBands": "All grades",
+        "band": {
+          "elementary": "Elementary",
+          "middle": "Middle school",
+          "high": "High school"
+        },
+        "subjectLabel": "Subject",
+        "allSubjects": "All subjects",
+        "subject": {
+          "english": "English vocab",
+          "science": "Science",
+          "geography": "Geography"
+        },
+        "dueInWeek": "Due in one week",
+        "assign": "Assign",
+        "assignTo": "Assign to {{classroom}}"
+      },
+      "templates": {
+        "shortVowels": "Short vowel sounds",
+        "shortVowelsDesc": "CVC words with short a for early readers",
+        "plantParts": "Plant parts",
+        "plantPartsDesc": "The parts of a plant and what they do",
+        "landWater": "Land and water",
+        "landWaterDesc": "Basic places and features on a map",
+        "strongAdjectives": "Strong adjectives",
+        "strongAdjectivesDesc": "Precise describing words for richer writing",
+        "statesOfMatter": "States of matter",
+        "statesOfMatterDesc": "Solids, liquids, gases, and how they change",
+        "landforms": "Landforms",
+        "landformsDesc": "Major landforms around the world",
+        "collegePrep": "College-prep vocabulary",
+        "collegePrepDesc": "High-utility academic words for essays and tests",
+        "genetics": "Genetics basics",
+        "geneticsDesc": "Core vocabulary for heredity and DNA",
+        "worldGeography": "World geography",
+        "worldGeographyDesc": "Terms for maps, climate, and population"
+      }
     },
     "completion": {
       "overallProgress": "Overall progress",

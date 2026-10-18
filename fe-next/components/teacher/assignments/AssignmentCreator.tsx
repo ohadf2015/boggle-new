@@ -16,7 +16,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Swords, BookOpen, Crosshair, Lock, Grid2x2 } from 'lucide-react';
+import { Swords, BookOpen, Crosshair, Lock, Grid2x2, LayoutTemplate } from 'lucide-react';
 import { AssignmentCreatorDueDate, assignmentSubmitHintKey } from './AssignmentCreatorDueDate';
 import { AssignmentStep } from './AssignmentStep';
 import { AssignmentLessonStep } from './AssignmentLessonStep';
@@ -35,8 +35,15 @@ import {
   type FirstAssignmentTemplate,
 } from '@/lib/education/firstAssignmentTemplates';
 import {
+  assignAssignmentTemplate,
+  assignmentTemplatesFor,
+  type AssignmentTemplate,
+} from '@/lib/education/assignmentTemplates';
+import { AssignmentTemplateGallery } from './AssignmentTemplateGallery';
+import {
   trackTeacherFirstAssignmentTemplate,
   trackEduFirstAssignmentCreated,
+  trackEduTemplateAssigned,
 } from '@/lib/education/telemetry';
 import type { Language } from '@/lib/supabase/education/types';
 import { AssignmentGoalModes } from './AssignmentGoalModes';
@@ -114,6 +121,11 @@ export default function AssignmentCreator({
     [classroomLanguage],
   );
   const showStarterPacks = !isLoadingLessons && lessons.length === 0;
+  const galleryTemplates = useMemo(
+    () => assignmentTemplatesFor(classroomLanguage),
+    [classroomLanguage],
+  );
+  const [showTemplateGallery, setShowTemplateGallery] = useState(false);
 
   useEffect(() => {
     if (!isOpen || !showStarterPacks || starterPacks.length === 0) return;
@@ -130,6 +142,7 @@ export default function AssignmentCreator({
       setFocus('any');
       setWordCount(WORD_COUNT_DEFAULT);
       setWordListRaw('');
+      setShowTemplateGallery(false);
     }
   }, [isOpen, initialLessonId]);
 
@@ -247,6 +260,36 @@ export default function AssignmentCreator({
     );
   };
 
+  const handleAssignGalleryTemplate = async (template: AssignmentTemplate) => {
+    if (!user) {
+      toast.error(t('teacher.assignment.error'));
+      return;
+    }
+    setIsSubmitting(true);
+    trackEduTemplateAssigned({ templateId: template.id, classroomId });
+    const result = await assignAssignmentTemplate({
+      template,
+      classroomId,
+      teacherId: user.id,
+      lessonName: t(template.nameKey),
+      lessonDescription: t(template.descriptionKey),
+      createLesson,
+    });
+    setIsSubmitting(false);
+    if (result.success && result.assigned) {
+      toast.success(t('teacher.assignment.created'));
+      if (assignmentCount === 0) {
+        trackEduFirstAssignmentCreated({ classroomId });
+      }
+      onComplete();
+      onClose();
+      return;
+    }
+    toast.error(
+      result.assignmentError || result.error || t('teacher.assignment.error'),
+    );
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent
@@ -265,15 +308,44 @@ export default function AssignmentCreator({
 
         {atAssignmentCap ? (
           <AssignmentLimitUpsell currentCount={assignmentCount} onClose={onClose} />
+        ) : showTemplateGallery ? (
+          <AssignmentTemplateGallery
+            templates={galleryTemplates}
+            classroomName={classroom?.name}
+            isSubmitting={isSubmitting}
+            onAssign={(tpl) => void handleAssignGalleryTemplate(tpl)}
+            onBack={() => setShowTemplateGallery(false)}
+          />
         ) : showStarterPacks ? (
           <FirstAssignmentTemplatePicker
             packs={starterPacks}
             isSubmitting={isSubmitting}
             onAssign={(pack) => void handleAssignTemplate(pack)}
             onClose={onClose}
+            onBrowseTemplates={() => setShowTemplateGallery(true)}
           />
         ) : (
         <div className="space-y-4">
+            <button
+              type="button"
+              data-testid="assignment-browse-templates"
+              onClick={() => setShowTemplateGallery(true)}
+              className={cn(
+                'w-full px-4 py-3 rounded-neo border-3 border-dashed border-neo-cream/40',
+                'flex items-center gap-3 text-start transition-all hover:bg-neo-navy-light',
+              )}
+            >
+              <LayoutTemplate className="w-6 h-6 shrink-0 text-neo-yellow" aria-hidden="true" />
+              <span className="flex-1 min-w-0">
+                <span className="font-bold block text-neo-white">
+                  {t('teacher.assignment.templateGallery.browse')}
+                </span>
+                <span className="text-xs opacity-80 block text-neo-cream/70">
+                  {t('teacher.assignment.templateGallery.browseHint')}
+                </span>
+              </span>
+            </button>
+
             {!isWordGoal && (
             <AssignmentLessonStep
               lessons={lessons}

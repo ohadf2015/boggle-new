@@ -360,6 +360,17 @@ export function trackTeacherFirstAssignmentTemplate(args: {
   });
 }
 
+/** One-click assign from the assignment template gallery. */
+export function trackEduTemplateAssigned(args: {
+  templateId: string;
+  classroomId: string;
+}): void {
+  safeCapture('edu_template_assigned', {
+    template_id: args.templateId,
+    classroom_id: args.classroomId,
+  });
+}
+
 export interface EduTeacherSnapshot {
   classroomCount: number;
   studentCount: number;

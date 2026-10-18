@@ -14558,7 +14558,52 @@ const he = {
       "wordListGoalHint": "הדביקו מילים, שורה לכל מילה או מופרדות בפסיק.",
       "wordListPlaceholder": "חתול, כלב, דג",
       "wordGoalMissing": "הוסיפו יעד מילים או רשימה ותאריך יעד",
-      "findNWords": "מצאו {{count}} מילים"
+      "findNWords": "מצאו {{count}} מילים",
+      "templateGallery": {
+        "title": "גלריית תבניות",
+        "hint": "רשימות מילים מוכנות לפי כיתה ונושא. הציגו את המילים ושייכו בהקלקה אחת.",
+        "browse": "התחילו מתבנית",
+        "browseHint": "רשימות מילים מוכנות לפי שכבת גיל ונושא",
+        "browseAll": "עיונו בכל התבניות",
+        "back": "חזרה",
+        "bandLabel": "שכבת גיל",
+        "allBands": "כל הכיתות",
+        "band": {
+          "elementary": "יסודי",
+          "middle": "חטיבה",
+          "high": "תיכון"
+        },
+        "subjectLabel": "נושא",
+        "allSubjects": "כל הנושאים",
+        "subject": {
+          "english": "אנגלית",
+          "science": "מדעים",
+          "geography": "גאוגרפיה"
+        },
+        "dueInWeek": "להגשה בעוד שבוע",
+        "assign": "שיוך",
+        "assignTo": "שיוך לכיתה {{classroom}}"
+      },
+      "templates": {
+        "shortVowels": "צלילי תנועה קצרה",
+        "shortVowelsDesc": "מילים עם תנועת a קצרה לקוראים בתחילת דרכם",
+        "plantParts": "חלקי הצמח",
+        "plantPartsDesc": "חלקי הצמח ותפקידם",
+        "landWater": "יבשה ומים",
+        "landWaterDesc": "מקומות ותצורות בסיסיים במפה",
+        "strongAdjectives": "שמות תואר מדויקים",
+        "strongAdjectivesDesc": "מילי תיאור מדויקים לכתיבה עשירה",
+        "statesOfMatter": "מצבי צבירה",
+        "statesOfMatterDesc": "מוצקים, נוזלים, גזים ואופן ההפיכה ביניהם",
+        "landforms": "תצורות נוף",
+        "landformsDesc": "תצורות הנוף המרכזיות בעולם",
+        "collegePrep": "אוצר מילים אקדמי",
+        "collegePrepDesc": "מילים אקדמיות שימושיות לחיבורים ולמבחנים",
+        "genetics": "יסודות הגנטיקה",
+        "geneticsDesc": "אוצר המילים הבסיסי לתורשה ו-DNA",
+        "worldGeography": "גאוגרפיה של העולם",
+        "worldGeographyDesc": "מונחים של מפות, אקלים ואוכלוסייה"
+      }
     },
     "completion": {
       "overallProgress": "התקדמות כללית",

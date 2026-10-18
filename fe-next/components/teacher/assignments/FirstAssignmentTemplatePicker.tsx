@@ -10,11 +10,14 @@ export function FirstAssignmentTemplatePicker({
   isSubmitting,
   onAssign,
   onClose,
+  onBrowseTemplates,
 }: {
   packs: FirstAssignmentTemplate[];
   isSubmitting: boolean;
   onAssign: (pack: FirstAssignmentTemplate) => void;
   onClose: () => void;
+  /** Optional escape to the full template gallery (grade band + subject). */
+  onBrowseTemplates?: () => void;
 }) {
   const { t } = useLanguage();
 
@@ -61,6 +64,17 @@ export function FirstAssignmentTemplatePicker({
       >
         {t('common.cancel')}
       </Button>
+      {onBrowseTemplates && (
+        <button
+          type="button"
+          data-testid="first-assignment-browse-gallery"
+          onClick={onBrowseTemplates}
+          disabled={isSubmitting}
+          className="ms-2 font-neo-body text-xs font-bold text-neo-cyan underline-offset-2 hover:underline disabled:opacity-60"
+        >
+          {t('teacher.assignment.templateGallery.browseAll')}
+        </button>
+      )}
     </div>
   );
 }
