@@ -2,15 +2,16 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AssignmentCreator from './AssignmentCreator';
-import { assignFirstAssignmentTemplate } from '@/lib/education/firstAssignmentTemplates';
+import { assignAssignmentTemplate } from '@/lib/education/assignmentTemplates';
+import { trackEduTemplateAssigned } from '@/lib/education/telemetry';
 
-vi.mock('@/lib/education/firstAssignmentTemplates', async () => {
-  const actual = await vi.importActual<typeof import('@/lib/education/firstAssignmentTemplates')>(
-    '@/lib/education/firstAssignmentTemplates',
+vi.mock('@/lib/education/assignmentTemplates', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/education/assignmentTemplates')>(
+    '@/lib/education/assignmentTemplates',
   );
   return {
     ...actual,
-    assignFirstAssignmentTemplate: vi.fn(),
+    assignAssignmentTemplate: vi.fn(),
   };
 });
 
@@ -35,7 +36,7 @@ vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => ({ hasPro: false, loading: false }),
 }));
 vi.mock('@/lib/education/telemetry', () => ({
-  trackTeacherFirstAssignmentTemplate: vi.fn(),
+  trackEduTemplateAssigned: vi.fn(),
   trackEduTeacherActionFailed: vi.fn(),
   trackEduFirstAssignmentCreated: vi.fn(),
 }));
@@ -49,9 +50,9 @@ vi.mock('@/components/ui/button', () => ({
   ),
 }));
 
-const mockAssign = assignFirstAssignmentTemplate as unknown as ReturnType<typeof vi.fn>;
+const mockAssign = assignAssignmentTemplate as unknown as ReturnType<typeof vi.fn>;
 
-describe('AssignmentCreator — first-assignment starter packs', () => {
+describe('AssignmentCreator — assignment template gallery', () => {
   const onComplete = vi.fn();
   const onClose = vi.fn();
 
@@ -60,7 +61,7 @@ describe('AssignmentCreator — first-assignment starter packs', () => {
     mockAssign.mockResolvedValue({ success: true, assigned: true, lesson: { id: 'l1' } });
   });
 
-  it('shows starter packs instead of an empty lesson dropdown', () => {
+  it('shows the gallery instead of an empty lesson dropdown', () => {
     render(
       <AssignmentCreator
         classroomId="classroom-1"
@@ -70,14 +71,13 @@ describe('AssignmentCreator — first-assignment starter packs', () => {
       />,
     );
 
-    expect(screen.getByTestId('first-assignment-templates')).toBeInTheDocument();
-    expect(screen.getByTestId('first-assignment-template-starter-animals-en')).toBeInTheDocument();
-    expect(screen.getByTestId('first-assignment-template-starter-colors-en')).toBeInTheDocument();
+    expect(screen.getByTestId('assignment-template-gallery')).toBeInTheDocument();
+    expect(screen.getByTestId('assignment-template-en-k2-english-animals')).toBeInTheDocument();
     expect(screen.queryByText('teacher.assignment.typeLabel')).toBeNull();
     expect(screen.queryByTestId('assignment-lesson-picker')).toBeNull();
   });
 
-  it('one tap assigns the pack as a Word Craft homework due tomorrow', async () => {
+  it('one tap assigns the template and fires edu_template_assigned', async () => {
     render(
       <AssignmentCreator
         classroomId="classroom-1"
@@ -87,16 +87,20 @@ describe('AssignmentCreator — first-assignment starter packs', () => {
       />,
     );
 
-    fireEvent.click(screen.getByTestId('first-assignment-template-starter-animals-en'));
+    fireEvent.click(screen.getByTestId('assignment-template-assign-en-k2-english-animals'));
 
     await waitFor(() => {
       expect(mockAssign).toHaveBeenCalledWith(
         expect.objectContaining({
           classroomId: 'classroom-1',
           teacherId: 'teacher-1',
-          template: expect.objectContaining({ id: 'starter-animals-en' }),
+          template: expect.objectContaining({ id: 'en-k2-english-animals' }),
         }),
       );
+    });
+    expect(trackEduTemplateAssigned).toHaveBeenCalledWith({
+      templateId: 'en-k2-english-animals',
+      classroomId: 'classroom-1',
     });
     expect(onComplete).toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();

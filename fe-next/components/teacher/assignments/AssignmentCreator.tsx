@@ -7,7 +7,7 @@ import { useAssignments } from '@/hooks/useAssignments';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { AssignmentLimitUpsell } from './AssignmentLimitUpsell';
-import { FirstAssignmentTemplatePicker } from './FirstAssignmentTemplatePicker';
+import { AssignmentTemplateGallery } from './AssignmentTemplateGallery';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { cn } from '@/lib/utils';
@@ -30,12 +30,12 @@ import {
 } from '@/lib/education/vocabFocus';
 import { WORDCRAFT_FOCUS } from '@/lib/education/wordcraftAssignment';
 import {
-  assignFirstAssignmentTemplate,
-  firstAssignmentTemplatesFor,
-  type FirstAssignmentTemplate,
-} from '@/lib/education/firstAssignmentTemplates';
+  assignAssignmentTemplate,
+  assignmentTemplatesFor,
+  type AssignmentTemplate,
+} from '@/lib/education/assignmentTemplates';
 import {
-  trackTeacherFirstAssignmentTemplate,
+  trackEduTemplateAssigned,
   trackEduFirstAssignmentCreated,
 } from '@/lib/education/telemetry';
 import type { Language } from '@/lib/supabase/education/types';
@@ -93,6 +93,7 @@ export default function AssignmentCreator({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [wordCount, setWordCount] = useState(WORD_COUNT_DEFAULT);
   const [wordListRaw, setWordListRaw] = useState('');
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const isWordGoal = selectedType === 'word_count' || selectedType === 'word_list';
 
   const selectedLesson = lessons.find(l => l.id === selectedLessonId);
@@ -109,18 +110,14 @@ export default function AssignmentCreator({
 
   const classroom = classrooms.find((c) => c.id === classroomId);
   const classroomLanguage: Language = classroom?.language ?? 'en';
-  const starterPacks = useMemo(
-    () => firstAssignmentTemplatesFor(classroomLanguage),
+  const galleryTemplates = useMemo(
+    () => assignmentTemplatesFor(classroomLanguage),
     [classroomLanguage],
   );
-  const showStarterPacks = !isLoadingLessons && lessons.length === 0;
+  const emptyLessonList = !isLoadingLessons && lessons.length === 0;
 
-  useEffect(() => {
-    if (!isOpen || !showStarterPacks || starterPacks.length === 0) return;
-    trackTeacherFirstAssignmentTemplate({ templateId: starterPacks[0].id, action: 'view' });
-  }, [isOpen, showStarterPacks, starterPacks]);
-
-  // Reset form when dialog opens
+  // Reset form when dialog opens. Empty classrooms land on the gallery so the
+  // first assignment is a preview + one tap, not a blank lesson dropdown.
   useEffect(() => {
     if (isOpen) {
       setSelectedType('wordcraft');
@@ -130,8 +127,9 @@ export default function AssignmentCreator({
       setFocus('any');
       setWordCount(WORD_COUNT_DEFAULT);
       setWordListRaw('');
+      setGalleryOpen(emptyLessonList);
     }
-  }, [isOpen, initialLessonId]);
+  }, [isOpen, initialLessonId, emptyLessonList]);
 
   // A focus the newly chosen lesson cannot support falls back to "any"
   useEffect(() => {
@@ -217,14 +215,13 @@ export default function AssignmentCreator({
     }
   };
 
-  const handleAssignTemplate = async (template: FirstAssignmentTemplate) => {
+  const handleAssignTemplate = async (template: AssignmentTemplate) => {
     if (!user) {
       toast.error(t('teacher.assignment.error'));
       return;
     }
     setIsSubmitting(true);
-    trackTeacherFirstAssignmentTemplate({ templateId: template.id, action: 'assign' });
-    const result = await assignFirstAssignmentTemplate({
+    const result = await assignAssignmentTemplate({
       template,
       classroomId,
       teacherId: user.id,
@@ -234,6 +231,7 @@ export default function AssignmentCreator({
     });
     setIsSubmitting(false);
     if (result.success && result.assigned) {
+      trackEduTemplateAssigned({ templateId: template.id, classroomId });
       toast.success(t('teacher.assignment.created'));
       if (assignmentCount === 0) {
         trackEduFirstAssignmentCreated({ classroomId });
@@ -265,15 +263,25 @@ export default function AssignmentCreator({
 
         {atAssignmentCap ? (
           <AssignmentLimitUpsell currentCount={assignmentCount} onClose={onClose} />
-        ) : showStarterPacks ? (
-          <FirstAssignmentTemplatePicker
-            packs={starterPacks}
+        ) : galleryOpen ? (
+          <AssignmentTemplateGallery
+            templates={galleryTemplates}
             isSubmitting={isSubmitting}
             onAssign={(pack) => void handleAssignTemplate(pack)}
             onClose={onClose}
+            onCreateOwn={() => setGalleryOpen(false)}
           />
         ) : (
         <div className="space-y-4">
+            <Button
+              type="button"
+              variant="outline"
+              data-testid="assignment-browse-templates"
+              onClick={() => setGalleryOpen(true)}
+              className="w-full border-neo-cyan text-neo-cyan hover:bg-neo-cyan/20"
+            >
+              {t('teacher.assignment.galleryBrowse')}
+            </Button>
             {!isWordGoal && (
             <AssignmentLessonStep
               lessons={lessons}
