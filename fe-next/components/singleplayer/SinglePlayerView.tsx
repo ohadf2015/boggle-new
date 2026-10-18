@@ -20,6 +20,7 @@ import { awardCreatorCoins } from '@/utils/creatorRewards';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import { getCurrentSeasonDynamic } from '@/lib/seasons';
 import { useHideNavigation } from '@/contexts/NavigationContext';
+import { suspendInGameOverlayQuietZone } from '@/lib/overlayQuietZone';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNetworkState } from '@/hooks/useNetworkState';
 import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
@@ -156,6 +157,14 @@ const SinglePlayerView: React.FC = () => {
   // Hide layout LCP shell (#sp-lcp-paint z-70) once results/tutorial mount.
   // Playing keeps it: SinglePlayerGame's matching z-70 box is the cover.
   useRetireSpLcpShell(phase);
+
+  // Results keeps isInGame (nav hidden, screen-fit-locked) but must not hold
+  // the overlay quiet zone forever — SP landers never leave this route, so
+  // the cookie bar would never appear. Playing stays a live board.
+  useEffect(() => {
+    if (phase !== 'results') return undefined;
+    return suspendInGameOverlayQuietZone();
+  }, [phase]);
 
   // Map SinglePlayerPhase to GamePhase for the music hook
   const musicPhase: GamePhase = (phase === 'playing' || phase === 'pre-game') ? 'waiting' : phase;

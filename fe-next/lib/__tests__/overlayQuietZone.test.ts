@@ -13,8 +13,10 @@ import {
   claimOverlayQuietZone,
   isOverlayQuietZoneActive,
   noteOverlayQuietZoneGameOver,
+  overlayQuietZoneReason,
   resetOverlayQuietZoneForTests,
   subscribeOverlayQuietZone,
+  suspendInGameOverlayQuietZone,
 } from '../overlayQuietZone';
 import { IN_GAME_BODY_CLASS } from '../inGameSurface';
 
@@ -93,5 +95,28 @@ describe('overlayQuietZone', () => {
     release();
     vi.advanceTimersByTime(OVERLAY_QUIET_ZONE_GRACE_MS + 10);
     expect(document.body.hasAttribute(OVERLAY_QUIET_ZONE_ATTR)).toBe(false);
+  });
+
+  it('holds forever while screen-fit-locked unless the in-game input is suspended', () => {
+    document.body.classList.add(IN_GAME_BODY_CLASS);
+    expect(isOverlayQuietZoneActive()).toBe(true);
+    vi.advanceTimersByTime(OVERLAY_QUIET_ZONE_GRACE_MS + 50);
+    expect(isOverlayQuietZoneActive()).toBe(true);
+  });
+
+  it('lets SP results release the zone after grace while keeping screen-fit-locked (nav stays hidden)', () => {
+    document.body.classList.add(IN_GAME_BODY_CLASS);
+    const restore = suspendInGameOverlayQuietZone();
+
+    expect(isOverlayQuietZoneActive()).toBe(true);
+    expect(overlayQuietZoneReason()).toBe('round-end-grace');
+    vi.advanceTimersByTime(OVERLAY_QUIET_ZONE_GRACE_MS - 1);
+    expect(isOverlayQuietZoneActive()).toBe(true);
+    vi.advanceTimersByTime(2);
+    expect(isOverlayQuietZoneActive()).toBe(false);
+    expect(document.body.classList.contains(IN_GAME_BODY_CLASS)).toBe(true);
+
+    restore();
+    expect(isOverlayQuietZoneActive()).toBe(true);
   });
 });

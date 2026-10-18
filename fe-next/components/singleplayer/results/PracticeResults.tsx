@@ -506,7 +506,7 @@ const PracticeResults = memo(function PracticeResults({
       </div>
 
       {/* ── Mobile sticky bottom — single daily CTA + go home ── */}
-      <div ref={stickyCtaRef} className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
+      <div ref={stickyCtaRef} className="md:hidden fixed bottom-[var(--cookie-consent-height,0px)] inset-x-0 z-50 bg-neo-navy border-t-3 border-neo-black safe-area-bottom px-3 py-2.5">
         <div className="flex flex-col gap-2">
           {!dailyAlreadyPlayed && (
             <m.button
