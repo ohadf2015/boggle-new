@@ -13,6 +13,28 @@ for nv in v22 v23 v24; do
 done
 export PATH
 
+# Pushes whose every target ref is an agent branch skip ONLY the vitest step: on a real diff it
+# runs 20+ min and the executor's git push dies with ETIMEDOUT. Lint and type-check still run,
+# and ci.yml runs the full vitest suite on every agent/** push; a red run blocks the merge. Matched on the
+# REMOTE ref git hands this hook on stdin, so `git push origin HEAD:feat/x` from an agent/ branch
+# still runs the tests. There is deliberately no env-var override.
+AGENT_BRANCH_PATTERN='agent/*'
+PUSHED_REFS=""
+[ -t 0 ] || PUSHED_REFS=$(cat) || true
+SKIP_TESTS_FOR_AGENT=0
+if [ -n "$PUSHED_REFS" ]; then
+  SKIP_TESTS_FOR_AGENT=1
+  while read -r _lref _lsha _rref _rsha; do
+    [ -z "$_rref" ] && continue
+    case "${_rref#refs/heads/}" in
+      $AGENT_BRANCH_PATTERN) ;;
+      *) SKIP_TESTS_FOR_AGENT=0 ;;
+    esac
+  done <<EOF
+$PUSHED_REFS
+EOF
+fi
+
 cd fe-next
 
 # Collect changed files once (fast: no subshell per-file)
@@ -115,6 +137,11 @@ PID_TSC=$!
 # next worker pool starts clean.
 (
   FAIL=0
+
+  if [ "$SKIP_TESTS_FOR_AGENT" -eq 1 ]; then
+    echo "⏭️  Tests: SKIPPED for agent branch push (remote ref matches '$AGENT_BRANCH_PATTERN') — CI runs the full vitest suite on it before merge"
+    exit 0
+  fi
 
   # Serialize: only one pre-push test run at a time (see acquire_test_lock).
   acquire_test_lock
