@@ -1,24 +1,30 @@
 /**
  * Weekly progress digest card on Teacher HQ.
  *
- * Last-lesson digest lives on /teacher/reports. This card is the mid-trial
- * engagement beat: students / games / words / assignments + wow, and on
- * Polar trial day 7 a Teacher Pro checkout CTA.
+ * Per-class this-week numbers (assignments, average score, movers, inactive 7d)
+ * plus a Polar Teacher Pro CTA when the teacher is trialing or over free caps.
  */
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useWeeklyProgressDigest } from '@/hooks/useWeeklyProgressDigest';
 import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
-import { formatWowDelta, isPolarTrialDay7 } from '@/lib/education/weeklyProgressDigest';
+import {
+  formatWowDelta,
+  isPolarTrialDay7,
+  shouldShowDigestUpgradeCta,
+} from '@/lib/education/weeklyProgressDigest';
 import { isPolarTrialExpiryConversion } from '@/lib/education/polarTrialExpiryJourney';
-import { trackTeacherDigestViewed } from '@/lib/education/telemetry';
+import {
+  trackTeacherDigestUpgradeCtaClicked,
+  trackTeacherDigestViewed,
+} from '@/lib/education/telemetry';
 import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProCheckoutCta';
-import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { Stat } from '@/components/ui/Stat';
 import { NeoPanel } from '@/components/ui/panel';
 
@@ -26,9 +32,11 @@ export interface WeeklyProgressDigestCardProps {
   classroomId: string;
   classroomName: string;
   /** Snapshot expected completions (assignments × roster). Null = unknown. */
-  assignmentExpected: number | null;
+  assignmentExpected?: number | null;
   /** All-time submitted count used only when we lack dated completions. */
-  assignmentSubmitted: number | null;
+  assignmentSubmitted?: number | null;
+  /** Free-tier class/student cap already binding. Assignment cap is read from the window source. */
+  overFreeTierCaps?: boolean;
 }
 
 export function WeeklyProgressDigestCard({
@@ -36,24 +44,32 @@ export function WeeklyProgressDigestCard({
   classroomName,
   assignmentExpected,
   assignmentSubmitted,
+  overFreeTierCaps = false,
 }: WeeklyProgressDigestCardProps) {
   const { t, language } = useLanguage();
-  const { hasPro, loading: proLoading, trialExpires, trialUsed } = useTeacherPro();
+  const { hasPro, loading: proLoading, trialExpires, trialUsed, status } = useTeacherPro();
   const expected = assignmentExpected ?? 0;
-  const datedCompletions = useMemo(() => [] as string[], []);
-  const { metrics, isLoading, error, refresh } = useWeeklyProgressDigest(
-    classroomId,
-    expected,
-    datedCompletions,
-  );
+  const { metrics, isLoading, error, refresh, assignmentCount } = useWeeklyProgressDigest(classroomId);
 
-  // Capture once per mount — Date.now() in render trips react-hooks/purity.
   const [now] = useState(() => Date.now());
   const daysLeft = polarTrialDaysLeft(trialExpires, now);
   const trialDay7 = isPolarTrialDay7(daysLeft);
   const trialExpired = isPolarTrialExpiryConversion(hasPro, trialUsed === true);
+  const isTrialing = daysLeft !== null || status === 'trialing';
+  const isPaidPro = hasPro && !isTrialing;
+  const overCap =
+    overFreeTierCaps || assignmentCount >= FREE_TIER_LIMITS.assignmentsPerClass;
+  const showCta = shouldShowDigestUpgradeCta({
+    isPaidPro,
+    isTrialing,
+    trialExpired,
+    overFreeTierCaps: overCap,
+  });
   const week = metrics?.thisWeek;
   const wow = metrics?.wow;
+  const students = metrics?.students ?? [];
+  const inactive = students.filter((s) => s.inactive7d);
+  const movers = students.filter((s) => !s.inactive7d).slice(0, 8);
 
   useEffect(() => {
     if (isLoading || proLoading || !week) return;
@@ -71,6 +87,24 @@ export function WeeklyProgressDigestCard({
       : assignmentSubmitted != null && expected > 0
         ? Math.round((assignmentSubmitted / expected) * 100)
         : null;
+
+  const ctaKind = trialExpired ? 'expiry' : overCap && !isTrialing ? 'overcap' : trialDay7 ? 'day7' : 'trial';
+  const ctaHintKey =
+    ctaKind === 'expiry'
+      ? 'teacher.digest.weeklyExpiryHint'
+      : ctaKind === 'overcap'
+        ? 'teacher.digest.weeklyOverCapHint'
+        : ctaKind === 'day7'
+          ? 'teacher.digest.weeklyDay7Hint'
+          : 'teacher.digest.weeklyTrialHint';
+  const ctaLabelKey =
+    ctaKind === 'expiry'
+      ? 'teacher.digest.weeklyExpiryCta'
+      : ctaKind === 'overcap'
+        ? 'teacher.digest.weeklyOverCapCta'
+        : ctaKind === 'day7'
+          ? 'teacher.digest.weeklyDay7Cta'
+          : 'teacher.digest.weeklyTrialCta';
 
   return (
     <section
@@ -109,20 +143,20 @@ export function WeeklyProgressDigestCard({
         <>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <Stat
-              value={week.studentsActive}
-              label={`${t('teacher.digest.weeklyStudentsActive')} (${formatWowDelta(wow.studentsActive)})`}
+              value={week.assignmentCompleted}
+              label={t('teacher.digest.weeklyAssignmentsCompleted')}
               size="lg"
               className="w-full"
             />
             <Stat
-              value={week.gamesCompleted}
-              label={`${t('teacher.digest.weeklyGames')} (${formatWowDelta(wow.gamesCompleted)})`}
+              value={metrics?.averageScorePct != null ? `${metrics.averageScorePct}%` : '—'}
+              label={t('teacher.digest.weeklyAverageScore')}
               size="lg"
               className="w-full"
             />
             <Stat
-              value={week.wordsCompleted}
-              label={`${t('teacher.digest.weeklyWords')} (${formatWowDelta(wow.wordsCompleted)})`}
+              value={metrics?.inactiveCount ?? inactive.length}
+              label={t('teacher.digest.weeklyInactive')}
               size="lg"
               className="w-full"
             />
@@ -134,27 +168,46 @@ export function WeeklyProgressDigestCard({
             />
           </div>
           <p className="text-xs font-bold uppercase tracking-wide text-neo-cream/60">
-            {t('teacher.digest.weeklyWow')}
+            {t('teacher.digest.weeklyWow')} {formatWowDelta(wow.studentsActive)} / {formatWowDelta(wow.gamesCompleted)}
+          </p>
+          <div data-testid="weekly-progress-digest-movement" className="space-y-1">
+            <p className="text-sm font-bold text-neo-white">{t('teacher.digest.weeklyMovement')}</p>
+            <ul className="space-y-1 text-sm font-semibold text-neo-cream/85">
+              {movers.map((s) => (
+                <li key={s.studentId}>
+                  {s.name}
+                  {s.accuracyDelta == null ? '' : ` (${formatWowDelta(s.accuracyDelta)})`}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <p data-testid="weekly-progress-digest-inactive" className="text-sm font-semibold text-neo-cream/80">
+            {t('teacher.digest.weeklyInactiveCount', { count: inactive.length })}
+            {inactive.length > 0 ? `: ${inactive.map((s) => s.name).join(', ')}` : ''}
           </p>
         </>
       )}
 
-      {!proLoading && (trialExpired || trialDay7) && (
+      {!proLoading && showCta && (
         <div
-          data-testid={trialExpired ? 'weekly-progress-digest-expiry-cta' : 'weekly-progress-digest-day7-cta'}
+          data-testid={`weekly-progress-digest-${ctaKind}-cta`}
           className="rounded-neo border-neo border-neo-lime bg-neo-navy-light p-5 text-center shadow-hard"
         >
-          <p className="mb-3 text-sm font-bold text-neo-white/85">
-            {t(trialExpired ? 'teacher.digest.weeklyExpiryHint' : 'teacher.digest.weeklyDay7Hint')}
-          </p>
+          <p className="mb-3 text-sm font-bold text-neo-white/85">{t(ctaHintKey)}</p>
           <Link
             href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
             data-testid="weekly-progress-digest-pro-link"
+            onClick={() =>
+              trackTeacherDigestUpgradeCtaClicked({
+                hasPro,
+                trialDay7,
+                trialExpired,
+                overCap,
+              })
+            }
             className="inline-flex min-h-11 items-center rounded-neo border-neo bg-neo-cyan px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg"
           >
-            {t(trialExpired ? 'teacher.digest.weeklyExpiryCta' : 'teacher.digest.weeklyDay7Cta', {
-              price: `$${TEACHER_PRO_PRICE_USD}`,
-            })}
+            {t(ctaLabelKey, { price: `$${TEACHER_PRO_PRICE_USD}` })}
           </Link>
         </div>
       )}

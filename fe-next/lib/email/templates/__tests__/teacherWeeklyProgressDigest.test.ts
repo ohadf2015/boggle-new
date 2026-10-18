@@ -40,6 +40,11 @@ describe('teacherWeeklyProgressDigest', () => {
     expect(html).toContain('Year 7');
     expect(html).toContain('50%');
     expect(html).toContain('80%');
+    expect(html).toContain('Avg score');
+    expect(html).toContain('Inactive 7d');
+    expect(html).toContain('Student movement');
+    expect(html).toContain('Sam');
+    expect(html).toContain('Pat');
   });
 
   it('omits the Polar CTA for a Pro teacher', () => {

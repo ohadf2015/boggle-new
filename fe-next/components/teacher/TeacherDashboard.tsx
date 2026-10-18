@@ -17,6 +17,7 @@ import { greetingName } from './home/greetingName';
 import { HomeHero } from './home/HomeHero';
 import { HomeClassList } from './home/HomeClassList';
 import { HomeWeekCard } from './home/HomeWeekCard';
+import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
 import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
 import { HomeRailSkeleton, HomeSkeleton } from './home/HomeSkeleton';
@@ -31,6 +32,7 @@ import { trackEduTeacherDashboardViewed } from '@/lib/education/telemetry';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { homeOnboarding, type HomeOnboardingStepId } from '@/lib/education/homeOnboarding';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
+import { isDigestOverFreeTierCaps } from '@/lib/education/teacherPlanGate';
 
 export interface TeacherDashboardProps {
   /** Account-state strip for a teacher already on (or just off) a Pro trial: days left / renew. */
@@ -158,7 +160,13 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   ) : null;
 
   const showWeek = hasClasses && !(week.summary && Object.keys(week.summary.lastPlayedAt).length === 0);
-  const hasRail = !ready || proCard !== null || showWeek;
+  const selectedClassroom = classrooms.find((c) => c.id === effectiveId) ?? null;
+  const overFreeTierCaps = isDigestOverFreeTierCaps({
+    hasPro,
+    classroomCount: classrooms.length,
+    studentCounts: classrooms.map((c) => c.member_count ?? 0),
+  });
+  const hasRail = !ready || proCard !== null || showWeek || Boolean(selectedClassroom);
 
   return (
     <EducationShell
@@ -228,6 +236,13 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
           <aside aria-label={t('eduShell.home.railLabel')} className="flex min-w-0 flex-col gap-6">
             {proCard}
             {!ready ? <HomeRailSkeleton /> : showWeek ? <HomeWeekCard summary={week.summary} status={week.status} t={t} /> : null}
+            {!ready || !selectedClassroom ? null : (
+              <WeeklyProgressDigestCard
+                classroomId={selectedClassroom.id}
+                classroomName={selectedClassroom.name}
+                overFreeTierCaps={overFreeTierCaps}
+              />
+            )}
           </aside>
         ) : null}
       </div>
