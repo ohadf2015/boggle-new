@@ -13,8 +13,8 @@ describe('adSensePolicy — config', () => {
     delete process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
   });
 
-  it('defaults the client to the direct publisher id', () => {
-    expect(getAdSenseClient()).toBe('ca-pub-1896836706464880');
+  it('does not default the client to the rejected publisher', () => {
+    expect(getAdSenseClient()).toBe('');
   });
 
   it('allows overriding the client id via env', () => {
@@ -22,9 +22,11 @@ describe('adSensePolicy — config', () => {
     expect(getAdSenseClient()).toBe('ca-pub-9999999999999999');
   });
 
-  it('is dark (not configured) unless explicitly enabled', () => {
+  it('is dark (not configured) unless explicitly enabled with a non-rejected client', () => {
     expect(isAdSenseConfigured()).toBe(false);
     process.env.NEXT_PUBLIC_ADSENSE_ENABLED = 'true';
+    expect(isAdSenseConfigured()).toBe(false);
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT = 'ca-pub-9999999999999999';
     expect(isAdSenseConfigured()).toBe(true);
   });
 });
@@ -35,14 +37,16 @@ describe('adSensePolicy — account verification meta', () => {
     delete process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
   });
 
-  // The <meta name="google-adsense-account"> tag is Google's privacy-neutral
-  // site-ownership signal: no script, no cookie, no tracking. It MUST render even
-  // while ad *serving* is dark (NEXT_PUBLIC_ADSENSE_ENABLED unset), otherwise the
-  // AdSense review crawler — which never grants cookie consent and so never
-  // triggers the consent-gated adsbygoogle.js — cannot verify the site at all.
-  it('returns the publisher id for verification regardless of the dark flag', () => {
-    expect(isAdSenseConfigured()).toBe(false); // serving off
-    expect(getAdSenseAccountMeta()).toBe('ca-pub-1896836706464880'); // verify still on
+  // Rejected publisher must not ship as a verification meta (t_02e92b5a).
+  it('returns empty meta while the publisher is rejected / unset', () => {
+    expect(isAdSenseConfigured()).toBe(false);
+    expect(getAdSenseAccountMeta()).toBe('');
+  });
+
+  it('drops the rejected publisher even if env still names it', () => {
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT = 'ca-pub-1896836706464880';
+    expect(getAdSenseClient()).toBe('');
+    expect(getAdSenseAccountMeta()).toBe('');
   });
 
   it('reflects the env-overridden client id', () => {

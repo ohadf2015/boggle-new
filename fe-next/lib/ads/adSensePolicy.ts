@@ -4,12 +4,12 @@
  * HISTORY: this module used to drive a React Auto-Ads loader
  * (components/ads/AdSenseLoader.tsx). That loader was DELETED 2026-09-15
  * (kanban t_79e9fcc1): web AdSense was rejected, so adsbygoogle.js was 162 KiB
- * of first-paint main-thread cost with zero possible revenue. What remains here:
- * `getAdSenseAccountMeta()` powers the `google-adsense-account` meta in
- * app/layout.tsx — the privacy-neutral ownership signal a resubmission needs —
- * and the pure policy helpers below are kept (and tested) so an approved
- * resubmission can reintroduce a loader without re-deriving the gates.
- * The earning web ad path today is H5 Games Ads (lib/ads/h5GamesAds.ts).
+ * of first-paint main-thread cost with zero possible revenue. The rejected
+ * publisher meta (`google-adsense-account` / ca-pub-1896836706464880) was then
+ * stripped from app/layout.tsx (t_02e92b5a) — it was still in prod HTML with
+ * zero revenue. Policy helpers remain so an approved NEW publisher id (env)
+ * can reintroduce a loader without re-deriving the gates. Do not default to
+ * the rejected pub. The live web ad path is ayeT / GameDistribution, not H5.
  *
  * Ships DARK: gated on `NEXT_PUBLIC_ADSENSE_ENABLED==='true'` so it cannot double-serve while
  * any legacy PurpleAds tag still exists. Flip on once PurpleAds is removed (GTM tag + ads.txt)
@@ -19,24 +19,30 @@
  * child tier (Families/COPPA) and withheld entirely until advertising consent is granted
  * (Consent Mode v2: we fully gate the script, not just personalization).
  */
-const DEFAULT_ADSENSE_CLIENT = 'ca-pub-1896836706464880';
+/** Rejected web AdSense publisher. Never default to this; never ship it in HTML. */
+export const REJECTED_ADSENSE_PUBLISHER = 'ca-pub-1896836706464880';
+
+function sanitizeAdSenseClient(id: string | undefined): string {
+  if (!id) return '';
+  if (id === REJECTED_ADSENSE_PUBLISHER) return '';
+  return id;
+}
 
 /**
- * The AdSense client id (`ca-pub-…`). Defaults to our direct publisher id; env-overridable.
+ * The AdSense client id (`ca-pub-…`). Env-only — no hardcoded publisher.
+ * The previous default was REJECTED_ADSENSE_PUBLISHER (rejected account).
  *
  * Reads BOTH names: the deployment sets `NEXT_PUBLIC_ADSENSE_CLIENT_ID` while this module
- * originally read `NEXT_PUBLIC_ADSENSE_CLIENT`. The drift was invisible because both held
- * the same value as the default — so overriding the publisher id in the deployment was a
- * silent no-op. (Same class as the LemonSqueezy variant-id drift.)
+ * originally read `NEXT_PUBLIC_ADSENSE_CLIENT`.
  */
 export function getAdSenseClient(): string {
   if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ADSENSE_CLIENT) {
-    return process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+    return sanitizeAdSenseClient(process.env.NEXT_PUBLIC_ADSENSE_CLIENT);
   }
   if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID) {
-    return process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+    return sanitizeAdSenseClient(process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID);
   }
-  return DEFAULT_ADSENSE_CLIENT;
+  return '';
 }
 
 /** What Auto-Ads actually placed on the page. */
@@ -68,12 +74,9 @@ export function summarizeAdSenseFill(root: {
 }
 
 /**
- * The `<meta name="google-adsense-account">` content — Google's privacy-neutral
- * site-ownership signal (no script, no cookie, no tracking). Rendered UNCONDITIONALLY
- * in the root layout: it must verify the site even while ad serving is dark, because
- * the AdSense review crawler never grants cookie consent and so never triggers the
- * consent-gated adsbygoogle.js loader. Without this tag the crawler cannot connect
- * the domain to the publisher account, blocking (re-)approval.
+ * The `<meta name="google-adsense-account">` content if (and only if) env has a
+ * non-rejected publisher id. Root layout must NOT call this until a new approval
+ * lands — shipping the rejected pub in HTML was t_02e92b5a.
  */
 export function getAdSenseAccountMeta(): string {
   return getAdSenseClient();
