@@ -77,6 +77,52 @@ export function buildTeacherTrialStartedEvent(userId: string, subscriptionId: st
 }
 
 /**
+ * Teacher-onboarding funnel name (`teacher_onboarding_viewed → … →
+ * trial_started`). Emitted ONLY here, from the webhook: the /teacher/upgrade
+ * page redirects to Polar and never observes the outcome, so a client-side
+ * capture at click time would count intent as a trial. plan/locale match the
+ * funnel module's property convention.
+ */
+export function buildTrialStartedEvent(
+  userId: string,
+  subscriptionId: string,
+  locale?: string | null
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'trial_started',
+    properties: {
+      ...BASE,
+      plan: 'trial',
+      subscription_id: subscriptionId,
+      ...(locale ? { locale } : {}),
+    },
+  };
+}
+
+/**
+ * Teacher-onboarding funnel conversion step — Polar `subscription.active` and
+ * NOT trialing. Same server-only rule as `trial_started`: the upgrade page
+ * cannot see the money land.
+ */
+export function buildTeacherProUpgradedEvent(
+  userId: string,
+  subscriptionId: string,
+  locale?: string | null
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'teacher_pro_upgraded',
+    properties: {
+      ...BASE,
+      plan: 'pro',
+      subscription_id: subscriptionId,
+      ...(locale ? { locale } : {}),
+    },
+  };
+}
+
+/**
  * Conversion funnel step 3 — Polar `subscription.active` and not trialing.
  * Must NOT fire at checkout-URL creation: that is only `checkout_started`.
  * `subscription_id` lets a query match completions to webhook paid count.

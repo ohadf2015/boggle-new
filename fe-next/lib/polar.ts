@@ -117,7 +117,7 @@ export class PolarClient {
       success_url:
         redirectUrl || `${process.env.NEXT_PUBLIC_APP_URL}/${successLocale}/teacher?checkout=success`,
       external_customer_id: userId,
-      metadata: { user_id: userId, trial },
+      metadata: { user_id: userId, trial, locale: successLocale },
       // Paid path must not inherit a trial configured on the Polar product.
       allow_trial: trial,
       ...(trial

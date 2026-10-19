@@ -27,6 +27,9 @@ vi.mock('@/lib/education/telemetry', () => ({
   trackEduJoinCodeCopied: (a: unknown) => trackCopied(a),
   trackEduFirstStudentJoined: (a: unknown) => trackJoined(a),
 }));
+vi.mock('@/hooks/useTeacherPro', () => ({
+  useTeacherPro: () => ({ hasPro: false, loading: false }),
+}));
 
 import { GetStudentsInCard } from '../GetStudentsInCard';
 

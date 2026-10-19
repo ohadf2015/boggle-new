@@ -12,6 +12,10 @@ import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgre
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { isFreePlanUsageBlocked } from '@/lib/education/teacherPlanGate';
 import { trackEduClassroomCreated } from '@/lib/education/telemetry';
+import {
+  captureTeacherOnboardingFunnel,
+  TEACHER_ONBOARDING_FUNNEL_EVENTS,
+} from '@/lib/education/teacherOnboardingFunnel';
 import type { Language } from '@/lib/supabase/education/types';
 import { cn } from '@/lib/utils';
 import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
@@ -70,6 +74,11 @@ export function ClassSetupFlow() {
     setBusy(false);
     if (result.success && result.data?.join_code) {
       trackEduClassroomCreated({ classroomId: result.data.id, createdVia: 'dashboard', language: result.data.language ?? classLanguage });
+      // Onboarding-funnel step: card-pinned name, locale + plan only.
+      captureTeacherOnboardingFunnel(TEACHER_ONBOARDING_FUNNEL_EVENTS.classroomCreated, {
+        locale: language,
+        plan: hasPro ? 'pro' : 'free',
+      });
       setCreated({ id: result.data.id, name: result.data.name, join_code: result.data.join_code });
       return;
     }
@@ -79,7 +88,7 @@ export function ClassSetupFlow() {
     }
     setErrorKey('eduShell.setup.createFailed');
     toast.error(t('eduShell.setup.createFailed'));
-  }, [name, grade, t, classrooms, createClassroom, classLanguage, hasPro]);
+  }, [name, grade, t, language, classrooms, createClassroom, classLanguage, hasPro]);
 
   const copy = useCallback(
     async (url: string) => {
