@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SerpGapSections } from '../SerpGapSections';
-import { EXAMPLE_TOTAL_POINTS, EXAMPLE_WORDS, LENGTH_SCORES, SIMILAR_GAMES, SPANISH_TILES, TIPS, ES_DICT_FLOOR } from '../../data';
+import { EXAMPLE_TOTAL_POINTS, EXAMPLE_WORDS, LENGTH_SCORES, SIMILAR_GAMES, SPANISH_BAG, SPANISH_BAG_TOTAL, SPANISH_TILES, TIPS, ES_DICT_FLOOR } from '../../data';
 
 vi.mock('next/link', () => ({
   default: ({ children, href, ...rest }: { children: React.ReactNode; href: string }) => (
@@ -34,6 +34,14 @@ describe('SerpGapSections — competitor heading gaps + unique round table', () 
     expect(screen.getByRole('heading', { level: 2, name: /^dificultad$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: /fin de la partida/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: /controles del juego/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /casillas de bonificación/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /gameplays: la partida es en vivo/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: /para profesores: una clase entera en una sala/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 3, name: /distribución de las 100 fichas en español/i }),
+    ).toBeInTheDocument();
   });
 
   it('renders the worked 4×4 example with every scored word and the live total', () => {
@@ -71,18 +79,28 @@ describe('SerpGapSections — competitor heading gaps + unique round table', () 
   it('renders the measured Spanish dictionary floor and the Ñ tile row', () => {
     render(<SerpGapSections locale="es" />);
     expect(screen.getAllByText(new RegExp(ES_DICT_FLOOR.replace(',', ','))).length).toBeGreaterThan(0);
-    expect(screen.getByRole('rowheader', { name: 'Ñ' })).toBeInTheDocument();
+    const contrast = screen.getByRole('table', { name: /valor de las fichas del scrabble en español/i });
+    expect(within(contrast).getByRole('rowheader', { name: 'Ñ' })).toBeInTheDocument();
     SPANISH_TILES.forEach((row) => {
-      expect(screen.getByRole('rowheader', { name: row.tile })).toBeInTheDocument();
+      expect(within(contrast).getByRole('rowheader', { name: row.tile })).toBeInTheDocument();
     });
   });
 
-  it('renders the measured Spanish dictionary floor and the Ñ tile row', () => {
+  it('renders the public Spanish bag (100 tiles) and the teacher room the top 3 lack', () => {
     render(<SerpGapSections locale="es" />);
-    expect(screen.getAllByText(new RegExp(ES_DICT_FLOOR.replace(',', ','))).length).toBeGreaterThan(0);
-    expect(screen.getByRole('rowheader', { name: 'Ñ' })).toBeInTheDocument();
-    SPANISH_TILES.forEach((row) => {
-      expect(screen.getByRole('rowheader', { name: row.tile })).toBeInTheDocument();
+    expect(SPANISH_BAG_TOTAL).toBe(100);
+    const bag = screen.getByRole('table', { name: /distribución pública de las 100 fichas/i });
+    expect(within(bag).getByRole('rowheader', { name: 'Comodín' })).toBeInTheDocument();
+    SPANISH_BAG.forEach((row) => {
+      expect(within(bag).getByRole('rowheader', { name: row.tile })).toBeInTheDocument();
     });
+    expect(screen.getByRole('link', { name: /crear la sala de la clase/i })).toHaveAttribute(
+      'href',
+      '/es/multiplayer',
+    );
+    expect(screen.getByRole('link', { name: /centro para profesores/i })).toHaveAttribute(
+      'href',
+      '/es/education',
+    );
   });
 });
