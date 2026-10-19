@@ -25,7 +25,6 @@ import {
   COIN_COSTS,
   COIN_REWARDS,
 } from '@/utils/coinManager';
-import { syncCoinsToDatabase, spendCoinsFromDatabase, getProfile } from '@/lib/supabase';
 import { emitCoinEarned, emitCoinSpent } from '@/utils/coinEarnedFx';
 import toast from 'react-hot-toast';
 import { loadSentry } from '@/utils/sentryLazy';
@@ -116,6 +115,25 @@ interface CoinActionsValue {
 }
 const CoinActionsContext = createContext<CoinActionsValue | null>(null);
 
+// Static import of @/lib/supabase pulls @supabase/gotrue into EssentialProviders
+// (CoinProvider mounts on the landing route). Load it only when a signed-in
+// coin mutation actually needs the client.
+type CoinSupabaseApi = Pick<
+  typeof import('@/lib/supabase'),
+  'syncCoinsToDatabase' | 'spendCoinsFromDatabase' | 'getProfile'
+>;
+let coinSupabaseApi: Promise<CoinSupabaseApi> | null = null;
+function loadCoinSupabase(): Promise<CoinSupabaseApi> {
+  if (!coinSupabaseApi) {
+    coinSupabaseApi = import('@/lib/supabase').then((mod) => ({
+      syncCoinsToDatabase: mod.syncCoinsToDatabase,
+      spendCoinsFromDatabase: mod.spendCoinsFromDatabase,
+      getProfile: mod.getProfile,
+    }));
+  }
+  return coinSupabaseApi;
+}
+
 // Helper to check if award already given
 function isAlreadyAwarded(key: string): boolean {
   if (typeof window === 'undefined') return false;
@@ -168,6 +186,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
   const refreshCoins = useCallback(async (): Promise<number> => {
     if (isAuthenticated && user?.id) {
       await refreshProfile();
+      const { getProfile } = await loadCoinSupabase();
       const { data: freshProfile } = await getProfile(user.id);
       return freshProfile?.total_coins ?? 0;
     } else {
@@ -198,6 +217,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     const fireCoinEarnedFx = () => emitCoinEarned(amount);
 
     if (isAuthenticated && user) {
+      const { syncCoinsToDatabase, getProfile } = await loadCoinSupabase();
       const result = await syncCoinsToDatabase(user.id, amount, reason, metadata);
 
       if (result.success) {
@@ -235,6 +255,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     if (!canAfford(amount)) return false;
 
     if (isAuthenticated && user) {
+      const { spendCoinsFromDatabase } = await loadCoinSupabase();
       const result = await spendCoinsFromDatabase(user.id, amount, reason, metadata);
 
       if (result.success) {
@@ -457,6 +478,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     const metadata = { platform, timestamp: new Date().toISOString() };
 
     if (isAuthenticated && user) {
+      const { syncCoinsToDatabase, getProfile } = await loadCoinSupabase();
       const result = await syncCoinsToDatabase(user.id, amount, 'Watched Ad', metadata);
       if (!result.success) {
         console.error('[CoinContext] Failed to award ad coins:', result.error);

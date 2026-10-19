@@ -3,7 +3,6 @@
  * Subscribes to user_notifications table for real-time in-app notifications
  */
 
-import { createClient } from '@/utils/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 // Notification type matching database schema
@@ -43,58 +42,59 @@ export function subscribeToNotifications(
     return () => {};
   }
 
-  const supabase = createClient();
+  let supabase: Awaited<ReturnType<typeof import('@/utils/supabase/loadClient').loadSupabaseClient>> | null = null;
+  let channel: RealtimeChannel | null = null;
+  let cancelled = false;
 
-  // Create a unique channel name for this user
-  const channelName = `notifications:${userId}`;
+  void import(
+    /* webpackPrefetch: false, webpackPreload: false */
+    '@/utils/supabase/loadClient'
+  ).then(async ({ loadSupabaseClient }) => {
+    if (cancelled) return;
+    supabase = await loadSupabaseClient();
+    if (cancelled || !supabase) return;
 
-  const channel: RealtimeChannel = supabase
-    .channel(channelName)
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'user_notifications',
-        filter: `user_id=eq.${userId}`,
-      },
-      (payload) => {
-        const notification = payload.new as RealtimeNotification;
-        onNewNotification(notification);
-      }
-    )
-    .subscribe((status, err) => {
-      if (status === 'SUBSCRIBED') {
-        console.log('Subscribed to notifications channel');
-      } else if (status === 'CHANNEL_ERROR') {
-        // Log the actual error for debugging - Supabase passes error as second param
-        const errorMessage = err instanceof Error ? err.message : (err ? String(err) : 'Unknown channel error');
-
-        // Check if this is a configuration mismatch error (Supabase Dashboard issue)
-        // This requires enabling Realtime filters in Supabase Dashboard, not a code fix
-        // Using console.log instead of console.warn to avoid Sentry noise - graceful fallback works fine
-        if (errorMessage.includes('mismatch') || errorMessage.includes('bindings')) {
-          console.log(
-            '[Notifications] Realtime subscription unavailable (Supabase Dashboard config). ' +
-            'Using polling fallback - no action needed.'
-          );
-        } else {
-          // Non-fatal — polling fallback handles it. Use log to avoid Sentry noise.
-          console.log('[Notifications] Channel error (using polling fallback):', errorMessage);
+    const channelName = `notifications:${userId}`;
+    channel = supabase
+      .channel(channelName)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'user_notifications',
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          const notification = payload.new as RealtimeNotification;
+          onNewNotification(notification);
         }
+      )
+      .subscribe((status, err) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Subscribed to notifications channel');
+        } else if (status === 'CHANNEL_ERROR') {
+          const errorMessage = err instanceof Error ? err.message : (err ? String(err) : 'Unknown channel error');
+          if (errorMessage.includes('mismatch') || errorMessage.includes('bindings')) {
+            console.log(
+              '[Notifications] Realtime subscription unavailable (Supabase Dashboard config). ' +
+              'Using polling fallback - no action needed.'
+            );
+          } else {
+            console.log('[Notifications] Channel error (using polling fallback):', errorMessage);
+          }
+          onSubscriptionError?.(errorMessage);
+        } else if (status === 'TIMED_OUT') {
+          console.log('[Notifications] Channel subscription timed out - will retry');
+          onSubscriptionError?.('Subscription timed out');
+        }
+      });
+  });
 
-        // Notify caller so they can implement fallback (e.g., polling)
-        onSubscriptionError?.(errorMessage);
-      } else if (status === 'TIMED_OUT') {
-        console.log('[Notifications] Channel subscription timed out - will retry');
-        onSubscriptionError?.('Subscription timed out');
-      }
-    });
-
-  // Return cleanup function
   return () => {
+    cancelled = true;
     console.log('Unsubscribing from notifications channel');
-    supabase.removeChannel(channel);
+    if (supabase && channel) supabase.removeChannel(channel);
   };
 }
 

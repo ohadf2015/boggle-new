@@ -6,6 +6,9 @@ const authState = { isAuthenticated: true, loading: false }
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => authState,
 }))
+// authFetch lazy-loads @/lib/supabase via dynamic import now; mock it null so
+// tests keep exercising the same unauthenticated-fetch fallback as before.
+vi.mock('@/lib/supabase', () => ({ supabase: null }))
 
 const makeFetch = (body: object) =>
   vi.fn().mockResolvedValue({ ok: true, json: async () => body })
@@ -46,7 +49,10 @@ describe('useWeeklyChest', () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
     const claimed = await result.current.claim()
     expect(claimed?.tier).toBe('silver')
-    expect(global.fetch).toHaveBeenCalledTimes(3)
+    // The post-claim refresh is fire-and-forget and now hops through authFetch's
+    // lazy supabase dynamic import — wait for the third fetch instead of
+    // asserting synchronously (the claim itself has already resolved).
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(3))
   })
 
   it('claim() returns null on failed POST', async () => {

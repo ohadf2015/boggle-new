@@ -9,7 +9,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/contexts/AuthProvider';
 import { ProjectorLobby, type ProjectorLobbyProps } from './ProjectorLobby';
 
 const mockT = (key: string, params?: Record<string, string | number>) => {

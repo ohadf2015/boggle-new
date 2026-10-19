@@ -3,7 +3,7 @@
  * Head-to-head records, direct challenges, search, and online status
  */
 
-import { createClient } from '@/utils/supabase/client';
+import { loadSupabaseClient } from '@/utils/supabase/loadClient';
 import logger from '@/utils/logger';
 import { shouldWriteOnlineStatus } from './onlineStatusThrottle';
 import { PUBLIC_PROFILES_TABLE, PUBLIC_PROFILE_COLUMNS } from './publicProfiles';
@@ -20,7 +20,7 @@ import {
  * Search for users to add as friends
  */
 export async function searchUsers(query: string, limit: number = 10): Promise<Friend[]> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user || query.length < 2) return [];
@@ -74,7 +74,7 @@ export async function searchUsers(query: string, limit: number = 10): Promise<Fr
  * Get head-to-head record with a specific player
  */
 export async function getHeadToHead(opponentId: string): Promise<HeadToHeadRecord | null> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
@@ -122,7 +122,7 @@ export async function getHeadToHead(opponentId: string): Promise<HeadToHeadRecor
  * Get all head-to-head records for current user
  */
 export async function getAllHeadToHead(): Promise<HeadToHeadRecord[]> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
@@ -202,7 +202,7 @@ export async function sendDirectChallenge(
   challengeId: string,
   message?: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -231,7 +231,7 @@ export async function sendDirectChallenge(
  * Get pending direct challenges (incoming)
  */
 export async function getPendingChallenges(userId?: string): Promise<FriendChallenge[]> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   // Reuse the caller's user id when available — avoids a redundant auth.getUser() round-trip (50–200ms).
   const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
@@ -313,7 +313,7 @@ export async function updateOnlineStatus(userId?: string): Promise<void> {
   if (!shouldWriteOnlineStatus(now, lastOnlineStatusWrite)) return;
   lastOnlineStatusWrite = now;
 
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   // Best-effort: a stale last_seen is harmless, but an unhandled rejection here
   // (transient network / RLS / an incomplete client) crashes the fire-and-forget
@@ -341,7 +341,7 @@ export async function updateOnlineStatus(userId?: string): Promise<void> {
  * Get friend by username
  */
 export async function getUserByUsername(username: string): Promise<Friend | null> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: profile, error } = await supabase
     .from(PUBLIC_PROFILES_TABLE)

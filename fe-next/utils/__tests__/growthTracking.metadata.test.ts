@@ -50,11 +50,15 @@ beforeEach(() => {
 
 // getSessionId() fires a one-time 'session_start' event ahead of whichever
 // event a test triggers, whenever this is the first session-id generation of
-// the test run (sessionStorage isn't reset between tests). Skip it so
-// assertions target the event under test regardless of call order.
+// the test run (sessionStorage isn't reset between tests), and first-game
+// activation also posts /api/referral/milestone through postWithAuth (a
+// Headers-instance init, unrelated to the analytics assertion). Skip both so
+// assertions target the analytics event under test regardless of call order.
 function firstNonSessionStartCall(mockFetch: ReturnType<typeof vi.fn>) {
   const call = mockFetch.mock.calls.find(
-    (c) => !(c[1]?.body as string | undefined)?.includes('"event_type":"session_start"')
+    (c) =>
+      String(c[0]).includes('/api/analytics/track') &&
+      !(c[1]?.body as string | undefined)?.includes('"event_type":"session_start"')
   );
   if (!call) throw new Error('No non-session_start fetch call found');
   return call;
@@ -360,13 +364,23 @@ describe('Analytics Metadata Enrichment', () => {
 
   describe('Auth header — server verifies identity, not the body', () => {
     it('attaches the bearer token when a session exists', async () => {
+      // The bearer is only attached once auth is live — on a landing path the
+      // gotrue chunk is deferred until AuthProvider mounts, so force the
+      // non-landing (signed-in in-game) decision this assertion tests.
+      vi.doMock('@/lib/auth/landingGotrueDefer', () => ({
+        shouldDeferLandingGotrue: () => false,
+      }));
+      vi.doMock('@/lib/auth/authProviderMounted', () => ({
+        isAuthProviderMounted: () => true,
+        markAuthProviderMounted: () => {},
+      }));
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
         isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
-      vi.doMock('@/lib/supabase', () => ({
-        getSession: vi.fn(async () => ({ data: { session: { access_token: 'jwt-abc' } } })),
+      vi.doMock('@/utils/analyticsAuthToken', () => ({
+        getAnalyticsSessionToken: vi.fn(async () => 'jwt-abc'),
       }));
 
       const { trackGameEnd } = await import('../growthTracking');
@@ -386,8 +400,10 @@ describe('Analytics Metadata Enrichment', () => {
         isNative: vi.fn(() => false),
         isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
-      vi.doMock('@/lib/supabase', () => ({
-        getSession: vi.fn(async () => ({ data: { session: null } })),
+      // doMock registrations persist across tests in this file — explicitly pin
+      // the guest (no token) path so the bearer test's mock can't leak in.
+      vi.doMock('@/utils/analyticsAuthToken', () => ({
+        getAnalyticsSessionToken: vi.fn(async () => null),
       }));
 
       const { trackGameEnd } = await import('../growthTracking');

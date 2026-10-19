@@ -3,9 +3,11 @@
  * Analytics events for measuring viral coefficient and user engagement
  */
 
+import { isAuthProviderMounted } from '@/lib/auth/authProviderMounted';
+import { shouldDeferLandingGotrue } from '@/lib/auth/landingGotrueDefer';
+import { getAnalyticsSessionToken } from '@/utils/analyticsAuthToken';
 import logger from '@/utils/logger';
 import { getStoredUtmData } from './utmCapture';
-import { getSession } from '@/lib/supabase';
 import { getGuestSessionId, getGuestName } from './guestManager';
 import { getPlatform } from '@/utils/platform';
 import { trackEvent as trackGA4Event } from '@/components/GoogleAnalytics';
@@ -794,8 +796,15 @@ const getCurrentLanguage = (): string | null => {
 
 const getAnalyticsAuthHeaders = async (): Promise<Record<string, string>> => {
   try {
-    const { data } = await getSession();
-    const token = data?.session?.access_token;
+    // Landing PSI: do not import @supabase/gotrue until AuthProvider's chunk
+    // has evaluated (first pointer/key). Guests have no token anyway.
+    if (
+      typeof window !== 'undefined' &&
+      shouldDeferLandingGotrue(window.location.pathname, isAuthProviderMounted())
+    ) {
+      return {};
+    }
+    const token = await getAnalyticsSessionToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
   } catch {
     return {};

@@ -19,7 +19,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { supabase } from '@/lib/supabase';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import {
@@ -153,7 +152,16 @@ export function useDailyMissions(): UseDailyMissionsReturn {
   );
 
   const fetchMissions = useCallback(async () => {
-    if (!playerId || !supabase) {
+    if (!playerId) {
+      setMissions(buildMissions(null));
+      setLoading(false);
+      return;
+    }
+    const { supabase } = await import(
+      /* webpackPrefetch: false, webpackPreload: false */
+      '@/lib/supabase'
+    );
+    if (!supabase) {
       setMissions(buildMissions(null));
       setLoading(false);
       return;

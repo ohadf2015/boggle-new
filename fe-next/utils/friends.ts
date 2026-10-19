@@ -6,7 +6,7 @@
  * Head-to-head, challenges, search, online: ./friendsHeadToHead.ts
  */
 
-import { createClient } from '@/utils/supabase/client';
+import { loadSupabaseClient } from '@/utils/supabase/loadClient';
 import logger from '@/utils/logger';
 import {
   fetchPublicProfiles,
@@ -49,7 +49,7 @@ export {
  * Send a friend request to another user
  */
 export async function sendFriendRequest(targetUserId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -94,7 +94,7 @@ export async function sendFriendRequest(targetUserId: string): Promise<{ success
  * Accept a friend request
  */
 export async function acceptFriendRequest(requestId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -120,7 +120,7 @@ export async function acceptFriendRequest(requestId: string): Promise<{ success:
  * Decline a friend request
  */
 export async function declineFriendRequest(requestId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -146,7 +146,7 @@ export async function declineFriendRequest(requestId: string): Promise<{ success
  * Remove a friend (unfriend)
  */
 export async function removeFriend(friendUserId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -170,7 +170,7 @@ export async function removeFriend(friendUserId: string): Promise<{ success: boo
  * Block a user
  */
 export async function blockUser(targetUserId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -202,7 +202,7 @@ export async function blockUser(targetUserId: string): Promise<{ success: boolea
  * Unblock a user (removes the blocked relationship)
  */
 export async function unblockUser(targetUserId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -228,7 +228,7 @@ export async function unblockUser(targetUserId: string): Promise<{ success: bool
  * Get users blocked by the current user
  */
 export async function getBlockedUsers(): Promise<Friend[]> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
@@ -266,7 +266,7 @@ export async function getBlockedUsers(): Promise<Friend[]> {
  * Get all accepted friends for the current user
  */
 export async function getFriends(userId?: string): Promise<Friend[]> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   // Reuse the caller's user id when available — avoids a redundant auth.getUser() round-trip (50–200ms).
   const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
@@ -329,7 +329,7 @@ export async function getFriends(userId?: string): Promise<Friend[]> {
  * Get pending friend requests (incoming)
  */
 export async function getPendingRequests(userId?: string): Promise<FriendRequest[]> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   // Reuse the caller's user id when available — avoids a redundant auth.getUser() round-trip (50–200ms).
   const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
@@ -377,7 +377,7 @@ export async function getPendingRequests(userId?: string): Promise<FriendRequest
  * Cancel an outgoing friend request (sent by current user)
  */
 export async function cancelFriendRequest(requestId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -403,7 +403,7 @@ export async function cancelFriendRequest(requestId: string): Promise<{ success:
  * Get outgoing friend requests (sent by current user, still pending)
  */
 export async function getOutgoingRequests(userId?: string): Promise<FriendRequest[]> {
-  const supabase = createClient();
+  const supabase = await loadSupabaseClient();
 
   // Reuse the caller's user id when available — avoids a redundant auth.getUser() round-trip (50–200ms).
   const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
