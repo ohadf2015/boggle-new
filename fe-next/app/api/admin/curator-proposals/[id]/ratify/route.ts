@@ -11,7 +11,7 @@ import type { CuratorProposalKind } from '@/lib/curator/curatorScope';
 const VOTES_FOR_APPROVAL = 10;
 
 /**
- * POST /api/admin/curator-proposals/[id]/ratify   { decision?: 'ratify' | 'reject' }
+ * POST /api/admin/curator-proposals/[id]/ratify   { decision: 'ratify' | 'reject' }
  *
  * Admin resolves a curator's proposal. On ratify the effect is applied via the
  * EXISTING content paths (promoteWordToScores / connections_puzzle_reviews) and
@@ -36,7 +36,10 @@ export async function POST(
   const adminId = auth.user.id;
 
   try {
-    const body = (await request.json().catch(() => ({}))) as { decision?: string };
+    const body = (await request.json().catch(() => null)) as { decision?: string } | null;
+    if (body?.decision !== 'ratify' && body?.decision !== 'reject') {
+      return NextResponse.json({ error: 'invalid_decision' }, { status: 400 });
+    }
     const admin = createAdminClient();
     if (!admin) return NextResponse.json({ error: 'service unavailable' }, { status: 503 });
 
