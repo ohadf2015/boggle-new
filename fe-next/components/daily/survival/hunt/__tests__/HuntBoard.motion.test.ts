@@ -73,6 +73,15 @@ describe('Word Hunt board motion', () => {
     expect(() => keyframes('tipBreath')).not.toThrow();
   });
 
+  it('Then no animation loops forever on an SVG stroke or radius (main-thread repaint every frame of the drag)', () => {
+    const looping = rules().filter(([sel, body]) => /\.(stitch|tipDot)\b/.test(sel) && /animation:[^;]*infinite/.test(body));
+    expect(looping.map(([sel]) => sel)).toEqual([]);
+  });
+
+  it('Then tiles are not each promoted to their own compositor layer', () => {
+    expect(css).not.toMatch(/backface-visibility/);
+  });
+
   it('Then each new segment sparks and the ribbon thickens with word length', () => {
     const spark = rules().find(([sel]) => sel === '.spark');
     expect(spark && animationNames(spark[1])).toEqual(['sparkFade']);

@@ -97,6 +97,29 @@ describe('HuntBoard', () => {
       expect(screen.getByTestId('grid-doubleclick-submit-hint')).toBeTruthy();
     });
 
+    it('given one stray click, when the idle window passes, then the lone selection clears itself', () => {
+      vi.useFakeTimers();
+      try {
+        const { container } = board();
+        act(() => { press(container, 0, 0); release(container); });
+        expect(screen.getAllByRole('gridcell').filter((c) => c.dataset.state === 'sel')).toHaveLength(1);
+        act(() => { vi.advanceTimersByTime(HUNT_IDLE_SUBMIT_MS + 50); });
+        expect(screen.getAllByRole('gridcell').filter((c) => c.dataset.state)).toHaveLength(0);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('given a verdict still held, when a new drag starts, then the new selection shows at once and the old verdict clears', () => {
+      const { container } = board({ phase: 'verdict', verdict: 'bad', heldPath: [{ row: 0, col: 0 }, { row: 1, col: 1 }] });
+      act(() => { press(container, 3, 3); });
+      const grid = screen.getByRole('grid');
+      expect(grid.dataset.verdict).toBeUndefined();
+      const cells = screen.getAllByRole('gridcell');
+      expect(cells.filter((c) => c.dataset.state === 'held')).toHaveLength(0);
+      expect(cells[15].dataset.state).toBe('sel');
+    });
+
     it('given a drag through two tiles, then no click hint shows', () => {
       const { container } = board();
       act(() => { drag(container, [[0, 0], [0, 1]]); });

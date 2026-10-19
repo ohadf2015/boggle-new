@@ -77,6 +77,7 @@ export function HuntBoard({
   const wrapRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
   const rubberRef = useRef<SVGLineElement>(null);
+  const boxRef = useRef<DOMRect | null>(null);
   const canHover = useCanHover();
   const largeLetters = useLargeLetters();
   const { playTileSelectSound } = useSoundEffects();
@@ -106,7 +107,16 @@ export function HuntBoard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [word]);
 
-  const holding = phase === 'pending' || phase === 'verdict';
+  // The shared engine only auto-submits at 3+ letters, so a 1-2 tile click would linger forever.
+  useEffect(() => {
+    if (selectedCells.length === 0 || selectedCells.length >= 3) return undefined;
+    const id = window.setTimeout(() => {
+      if (selection.current?.getMode() === 'click') selection.current.setPath([]);
+    }, HUNT_IDLE_SUBMIT_MS);
+    return () => window.clearTimeout(id);
+  }, [selectedCells, selection]);
+
+  const holding =(phase === 'pending' || phase === 'verdict') && selectedCells.length === 0;
   const shown: HuntCell[] = holding ? heldPath : selectedCells;
   const kind = holding ? 'held' : selectedCells.length ? 'sel' : null;
 
@@ -119,7 +129,7 @@ export function HuntBoard({
 
   const leanToward = (e: React.PointerEvent) => {
     const line = rubberRef.current;
-    const box = layerRef.current?.getBoundingClientRect();
+    const box = (boxRef.current ??= layerRef.current?.getBoundingClientRect() ?? null);
     if (!line || !box || !tipPos || !box.width || !box.height) return;
     const dx = ((e.clientX - box.left) / box.width) * cols * CELL_UNIT - tipPos.x;
     const dy = ((e.clientY - box.top) / box.height) * rows * CELL_UNIT - tipPos.y;
@@ -148,6 +158,7 @@ export function HuntBoard({
         data-verdict={holding && verdict ? verdict : undefined}
         data-tier={lengthTier(shown.length)}
         onContextMenu={(e) => e.preventDefault()}
+        onPointerDown={() => { boxRef.current = null; }}
         onPointerMove={leanToward}
         onPointerUp={dropLean}
         onPointerCancel={dropLean}
