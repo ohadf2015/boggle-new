@@ -190,6 +190,10 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
     game.users[username].isHost = game.hostUsername === username;
 
     broadcastToRoom(io, getGameRoom(gameCode), 'playerReconnected', { username });
+    // Students saw "host dropped"; this is the matching all-clear.
+    if (game.hostUsername === username) {
+      broadcastToRoom(io, getGameRoom(gameCode), 'hostReconnected', { username });
+    }
   } else {
     // User entry missing (e.g., Redis restore didn't include user data)
     // Log and continue — updateUserSocketId will re-register the socket mapping

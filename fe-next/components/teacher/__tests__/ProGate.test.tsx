@@ -49,19 +49,12 @@ describe('ProGate', () => {
   describe('during a live access trial', () => {
     const inDays = (d: number) => new Date(Date.now() + d * 86_400_000).toISOString();
 
-    it.each(['analytics', 'reports'] as const)('lets a free teacher use the real %s surface, with a days-left Pro strip', (feature) => {
+    it.each(['analytics', 'reports', 'mastery', 'missedPractice', 'pressureDials'] as const)('lets a free teacher use the real %s surface, with a days-left Pro strip', (feature) => {
       mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: inDays(9) });
       render(<ProGate feature={feature}><div>paid surface</div></ProGate>);
       expect(screen.getByText('paid surface')).toBeInTheDocument();
       expect(screen.getByTestId('pro-trial-preview')).toBeInTheDocument();
       expect(screen.queryByTestId(`pro-gate-upgrade-${feature}`)).not.toBeInTheDocument();
-    });
-
-    it('keeps the server-enforced features locked', () => {
-      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: inDays(9) });
-      render(<ProGate feature="mastery"><div>paid surface</div></ProGate>);
-      expect(screen.queryByText('paid surface')).not.toBeInTheDocument();
-      expect(screen.getByTestId('pro-gate-upgrade-mastery')).toBeInTheDocument();
     });
 
     it('locks again once the window has passed', () => {

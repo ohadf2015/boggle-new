@@ -231,6 +231,29 @@ describe('PlayerJoinHandler — a taken display name is not a reconnect', () => 
   });
 });
 
+describe('PlayerJoinHandler — joining while the results screen is up (session still live)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetGameUsers.mockReturnValue([]);
+    mockGetActiveRooms.mockReturnValue([]);
+    mockGetSocketIdByUsername.mockReturnValue(undefined);
+    mockCheckSeat.mockResolvedValue({ game: null, refused: false });
+    mockShouldSendGameState.mockReturnValue(false);
+  });
+
+  it('seats the student in the waiting room for the next round: no error, no stale board replayed', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ gameState: 'finished' }));
+    const { socket, join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Straggler' });
+
+    expect(emitError).not.toHaveBeenCalled();
+    expect(mockAddUserToGame).toHaveBeenCalled();
+    const joined = (socket.emit as ReturnType<typeof vi.fn>).mock.calls.find((c) => c[0] === 'joined');
+    expect(joined![1]).toMatchObject({ success: true, gameInProgress: false });
+    expect(handleLateJoin).not.toHaveBeenCalled();
+  });
+});
+
 describe('PlayerJoinHandler — late-join recovery flag', () => {
   beforeEach(() => {
     vi.clearAllMocks();

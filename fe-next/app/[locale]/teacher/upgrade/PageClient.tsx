@@ -24,6 +24,7 @@ import { UpgradePlanCards } from '@/components/teacher/pro/UpgradePlanCards';
 import { AskSchoolPanel } from '@/components/teacher/pro/AskSchoolPanel';
 import { SchoolPlanSection } from '@/components/teacher/pro/SchoolPlanSection';
 import { ProPreviewStrip } from '@/components/teacher/pro/ProPreviewStrip';
+import { TeacherProofLine } from '@/components/teacher/pro/TeacherProofLine';
 import { UpgradeFaq } from '@/components/teacher/pro/UpgradeFaq';
 import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
 import { ProPlanPanel, PlanCardsSkeleton } from '@/components/teacher/pro/ProPlanPanel';
@@ -267,6 +268,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                     </div>
                   ))}
                 </div>
+                <TeacherProofLine />
                 <ProPreviewStrip />
                 <div className="mt-8">
                   <PlanComparisonMatrix compact />

@@ -60,6 +60,9 @@ vi.mock('@/lib/teacher/resumeCheckout', () => ({
 
 import PageClient from '../PageClient';
 
+// Social proof has its own test and its own fetch; these flows assert the checkout fetch only.
+vi.mock('@/components/teacher/pro/TeacherProofLine', () => ({ TeacherProofLine: () => null }));
+
 const fetchMock = vi.fn();
 
 beforeEach(() => {

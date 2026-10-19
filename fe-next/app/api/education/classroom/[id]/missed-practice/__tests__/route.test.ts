@@ -3,11 +3,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/utils/supabase/server', () => ({ createRequestClient: vi.fn() }));
 vi.mock('@/utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('@/lib/subscriptions', () => ({ checkTeacherSubscription: vi.fn() }));
+vi.mock('@/lib/education/accessTrialServer', () => ({ teacherHasProAccess: vi.fn(async (_u: string, s: { has_pro: boolean }) => s.has_pro) }));
 vi.mock('@/lib/supabase/wordMastery', () => ({ getClassMastery: vi.fn() }));
 
 import { POST } from '../route';
 import { createRequestClient } from '@/utils/supabase/server';
 import { checkTeacherSubscription } from '@/lib/subscriptions';
+import { teacherHasProAccess } from '@/lib/education/accessTrialServer';
 import { getClassMastery } from '@/lib/supabase/wordMastery';
 import { buildClassMastery } from '@/lib/education/wordMasteryTrend';
 
@@ -127,6 +129,13 @@ describe('POST /api/education/classroom/[id]/missed-practice', () => {
     vi.mocked(checkTeacherSubscription).mockResolvedValue(pro(false));
     expect((await POST(req({ today: TODAY, names: NAMES }), ctx)).status).toBe(402);
     expect(d.inserted.lessons).toHaveLength(0);
+  });
+
+  it('lets a free teacher through the paywall while their access trial is live', async () => {
+    vi.mocked(createRequestClient).mockResolvedValue({ supabase: db().client, token: null } as never);
+    vi.mocked(checkTeacherSubscription).mockResolvedValue(pro(false));
+    vi.mocked(teacherHasProAccess).mockResolvedValueOnce(true);
+    expect((await POST(req({ today: TODAY, names: NAMES }), ctx)).status).not.toBe(402);
   });
 
   it('400s a body without three round names or with an implausible day', async () => {

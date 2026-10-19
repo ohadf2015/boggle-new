@@ -123,6 +123,16 @@ describe('handleReconnection', () => {
     mockIsInProgress.mockReturnValue(false);
   });
 
+  it('tells the room the host is back, but only when it is the host who returned', () => {
+    const hostGame = makeGame({ users: { Host: { socketId: 'old', isHost: true, disconnected: true, authUserId: null, guestTokenHash: null } as any } });
+    handleReconnection(mockIo, createMockSocket('socket-new'), hostGame, 'GAME1', 'Host');
+    expect(mockBroadcastToRoom).toHaveBeenCalledWith(mockIo, 'game:GAME1', 'hostReconnected', { username: 'Host' });
+
+    mockBroadcastToRoom.mockClear();
+    handleReconnection(mockIo, createMockSocket('socket-new'), makeGame(), 'GAME1', 'Player1');
+    expect(mockBroadcastToRoom).not.toHaveBeenCalledWith(mockIo, 'game:GAME1', 'hostReconnected', expect.anything());
+  });
+
   // 1. Disconnected flag is cleared on reconnect
   it('clears disconnected flag for reconnecting player', () => {
     const game = makeGame();

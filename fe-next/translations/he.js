@@ -5061,6 +5061,7 @@ const he = {
     "editName": "שנו שם",
     "editAvatar": "שנו אווטאר",
     "hostDisconnected": "המארח התנתק. מחכים שיחזור...",
+    "hostReconnected": "המורה חזר.",
     "isNowHost": "הוא עכשיו המארח",
     "disconnected": "התנתק. ממתין לחיבור מחדש...",
     "reconnected": "התחבר מחדש",
@@ -20219,6 +20220,7 @@ const he = {
       "featureMastery": "10 המילים שהכי מפוספסות + מפת חום תלמיד × מילה",
       "featureMissedPractice": "קליק אחד: תרגול מרווח של הפספוסים (1, 3, 7 ימים)",
       "freeMastery": "מפת שליטה במילים",
+      "socialProof": "{{teachers}} מורים הריצו {{games}} משחקים חיים עם הכיתות שלהם ב־30 הימים האחרונים",
       "freePractice": "תרגול מרווח של מילים שפוספסו"
     },
     "assign": {

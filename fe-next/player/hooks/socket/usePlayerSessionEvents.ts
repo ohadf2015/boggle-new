@@ -159,6 +159,10 @@ export function usePlayerSessionEvents({
       );
     };
 
+    const handleHostReconnected = () => {
+      neoInfoToast(t('playerView.hostReconnected'), { icon: TOAST_ICONS.check, duration: 3000 });
+    };
+
     const handleHostTransferred = (data: HostTransferredPayload) => {
       logger.log('[PLAYER] Host transferred to:', data.newHost);
       // Silent — the host crown moves on the player roster, no toast needed.
@@ -203,6 +207,7 @@ export function usePlayerSessionEvents({
     socket.on('updateLeaderboard', handleUpdateLeaderboard);
     socket.on('liveAchievementUnlocked', handleLiveAchievementUnlocked);
     socket.on('hostDisconnected', handleHostDisconnected);
+    socket.on('hostReconnected', handleHostReconnected);
     socket.on('hostTransferred', handleHostTransferred);
     socket.on('playerDisconnected', handlePlayerDisconnected);
     socket.on('playerReconnected', handlePlayerReconnected);
@@ -225,6 +230,7 @@ export function usePlayerSessionEvents({
       socket.off('updateLeaderboard', handleUpdateLeaderboard);
       socket.off('liveAchievementUnlocked', handleLiveAchievementUnlocked);
       socket.off('hostDisconnected', handleHostDisconnected);
+      socket.off('hostReconnected', handleHostReconnected);
       socket.off('hostTransferred', handleHostTransferred);
       socket.off('playerDisconnected', handlePlayerDisconnected);
       socket.off('playerReconnected', handlePlayerReconnected);

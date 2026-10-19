@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { teacherHasProAccess } from '@/lib/education/accessTrialServer';
 import { checkTeacherSubscription } from '@/lib/subscriptions';
 import { getClassMastery } from '@/lib/supabase/wordMastery';
 import { buildWordMasteryReport, toFreePreview } from '@/lib/education/wordMasteryReport';
@@ -27,7 +28,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   }
 
   const report = buildWordMasteryReport(mastery.data);
-  if (!subscription.has_pro) {
+  if (!(await teacherHasProAccess(auth.userId, subscription))) {
     return NextResponse.json(
       { ok: false, error: 'Teacher Pro required', locked: true, preview: toFreePreview(report) },
       { status: 402 },

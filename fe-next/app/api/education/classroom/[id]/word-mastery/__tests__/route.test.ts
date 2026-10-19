@@ -3,11 +3,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/utils/supabase/server', () => ({ createRequestClient: vi.fn() }));
 vi.mock('@/utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('@/lib/subscriptions', () => ({ checkTeacherSubscription: vi.fn() }));
+vi.mock('@/lib/education/accessTrialServer', () => ({ teacherHasProAccess: vi.fn(async (_u: string, s: { has_pro: boolean }) => s.has_pro) }));
 vi.mock('@/lib/supabase/wordMastery', () => ({ getClassMastery: vi.fn() }));
 
 import { GET } from '../route';
 import { createRequestClient } from '@/utils/supabase/server';
 import { checkTeacherSubscription } from '@/lib/subscriptions';
+import { teacherHasProAccess } from '@/lib/education/accessTrialServer';
 import { getClassMastery } from '@/lib/supabase/wordMastery';
 import { buildClassMastery, type MasterySessionRow } from '@/lib/education/wordMasteryTrend';
 
@@ -74,6 +76,15 @@ describe('GET /api/education/classroom/[id]/word-mastery', () => {
     expect(body.preview.hiddenWords).toBe(2);
     expect(body.report).toBeUndefined();
     expect(JSON.stringify(body)).not.toContain('s1');
+  });
+
+  it('gives a free teacher the full report while their access trial is live', async () => {
+    vi.mocked(createRequestClient).mockResolvedValue({ supabase: userClient({ user: { id: 't' }, owns: true }), token: null } as never);
+    vi.mocked(checkTeacherSubscription).mockResolvedValue(pro(false));
+    vi.mocked(teacherHasProAccess).mockResolvedValueOnce(true);
+    const res = await GET(req(), ctx());
+    expect(res.status).toBe(200);
+    expect((await res.json()).locked).toBe(false);
   });
 
   it('gives a Pro teacher the full report', async () => {

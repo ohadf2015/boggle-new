@@ -5072,6 +5072,7 @@ const es = {
     "hostWillStart": "El anfitrión iniciará el juego cuando todos estén listos",
     "autoStartingSoon": "¡Todos listos! Empezando en {seconds}…",
     "hostDisconnected": "Anfitrión desconectado. Esperando reconexión...",
+    "hostReconnected": "Tu profesor ha vuelto.",
     "isNowHost": "ahora es el anfitrión",
     "disconnected": "desconectado. Esperando reconexión...",
     "reconnected": "reconectado",
@@ -20301,6 +20302,7 @@ const es = {
       "featureMastery": "Las 10 palabras más falladas + mapa alumno × palabra",
       "featureMissedPractice": "Un clic: práctica espaciada de los fallos (1, 3, 7 días)",
       "freeMastery": "Mapa de dominio de palabras",
+      "socialProof": "{{teachers}} profesores jugaron {{games}} partidas en vivo con sus clases en los últimos 30 días",
       "freePractice": "Práctica espaciada de palabras falladas"
     },
     "assign": {

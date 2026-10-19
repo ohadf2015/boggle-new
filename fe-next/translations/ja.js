@@ -5017,6 +5017,7 @@ const ja = {
     "editName": "名前を変更",
     "editAvatar": "アバターを変更",
     "hostDisconnected": "ホストが切断されました。再接続を待っています...",
+    "hostReconnected": "先生が戻ってきました。",
     "isNowHost": "が新しいホストになりました",
     "disconnected": "が切断されました。再接続を待っています...",
     "reconnected": "再接続しました",
@@ -20289,6 +20290,7 @@ const ja = {
       "featureMastery": "ミスの多い上位10語+生徒×単語ヒートマップ",
       "featureMissedPractice": "ワンクリックでミスを間隔練習(1・3・7日後)",
       "freeMastery": "単語の定着度ヒートマップ",
+      "socialProof": "過去30日間に{{teachers}}人の教師が、クラスで{{games}}回のライブゲームを実施しました",
       "freePractice": "ミス単語の間隔練習"
     },
     "assign": {

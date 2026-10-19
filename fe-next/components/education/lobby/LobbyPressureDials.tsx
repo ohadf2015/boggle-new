@@ -15,11 +15,12 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Gauge, Trophy, Timer, Target, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { teacherTrialStatus } from '@/lib/education/trial';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { LobbyChoiceRow } from './LobbyChoiceRow';
 import {
@@ -38,14 +39,18 @@ export interface LobbyPressureDialsProps {
 
 export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsProps) {
   const { t, language } = useLanguage();
-  const { hasPro, loading } = useTeacherPro();
-  const locked = loading || !hasPro;
+  const { hasPro, loading, accessTrialExpires } = useTeacherPro();
+  const [nowMs] = useState(() => Date.now());
+  // A live access trial opens the dials (client-gated only; the server takes whatever the room saves).
+  const trial = teacherTrialStatus(accessTrialExpires, nowMs);
+  const trialLive = !!trial && !trial.isExpired;
+  const locked = loading || (!hasPro && !trialLive);
 
   useEffect(() => {
-    if (!loading && !hasPro) {
+    if (!loading && !hasPro && !trialLive) {
       trackGrowthEvent('iap_viewed', { source: 'pro_gate_pressureDials' });
     }
-  }, [loading, hasPro]);
+  }, [loading, hasPro, trialLive]);
 
   // A free teacher sees the loud defaults frozen — the game runs what the
   // rows show, so the rows show what the game runs.
@@ -61,7 +66,7 @@ export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsPro
           <Gauge className="size-4 shrink-0 text-neo-purple" strokeWidth={3} aria-hidden="true" />
           {t('teacher.classroom.pressure.title')}
         </span>
-        {!loading && !hasPro && (
+        {!loading && !hasPro && !trialLive && (
           <Link
             href={`/${language}/teacher/upgrade`}
             data-testid="pressure-pro-lock"

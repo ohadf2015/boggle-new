@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { teacherHasProAccess } from '@/lib/education/accessTrialServer';
 import { checkTeacherSubscription } from '@/lib/subscriptions';
 import { getClassMastery } from '@/lib/supabase/wordMastery';
 import { buildWordMasteryReport, buildSpacedReviewDates, SPACED_REVIEW_DAYS } from '@/lib/education/wordMasteryReport';
@@ -25,7 +26,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   const { sb, userId, classroom } = auth;
 
   const subscription = await checkTeacherSubscription(userId);
-  if (!subscription.has_pro) {
+  if (!(await teacherHasProAccess(userId, subscription))) {
     return NextResponse.json({ ok: false, error: 'Teacher Pro required' }, { status: 402 });
   }
 

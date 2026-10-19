@@ -13,7 +13,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 const mockTrackGrowthEvent = vi.hoisted(() => vi.fn());
-let mockProState = { hasPro: true, loading: false };
+let mockProState: { hasPro: boolean; loading: boolean; accessTrialExpires?: string | null } = { hasPro: true, loading: false };
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
@@ -59,6 +59,20 @@ describe('LobbyPressureDials', () => {
       .toHaveAttribute('aria-checked', 'true');
     expect(screen.getByRole('radio', { name: 'teacher.classroom.pressure.scoring.accuracy' }))
       .toHaveAttribute('aria-checked', 'true');
+  });
+
+  it('unlocks the dials for a free teacher while their access trial is live, and re-locks after', () => {
+    mockProState = { hasPro: false, loading: false, accessTrialExpires: new Date(Date.now() + 5 * 86_400_000).toISOString() };
+    const { onChange } = setup();
+    expect(screen.queryByTestId('pressure-pro-lock')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('radio', { name: 'teacher.classroom.pressure.leaderboard.hidden' }));
+    expect(onChange).toHaveBeenCalledWith({ ...DEFAULT_CLASSROOM_PRESSURE, leaderboard: 'hidden' });
+  });
+
+  it('keeps the dials locked once the access trial window has passed', () => {
+    mockProState = { hasPro: false, loading: false, accessTrialExpires: new Date(Date.now() - 86_400_000).toISOString() };
+    setup();
+    expect(screen.getByTestId('pressure-pro-lock')).toBeInTheDocument();
   });
 
   it('emits the flipped dial on choice', () => {

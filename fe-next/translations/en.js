@@ -4623,6 +4623,7 @@ const en = {
     "editName": "Change name",
     "editAvatar": "Change avatar",
     "hostDisconnected": "Host dropped. Waiting for them to come back...",
+    "hostReconnected": "Your teacher is back.",
     "isNowHost": "is now the host",
     "disconnected": "disconnected. Waiting for reconnection...",
     "reconnected": "reconnected",
@@ -19348,6 +19349,7 @@ const en = {
       "featureMastery": "Top 10 missed words + a student × word heatmap",
       "featureMissedPractice": "One click: spaced practice of the misses (1, 3, 7 days)",
       "freeMastery": "Word mastery heatmap",
+      "socialProof": "{{teachers}} teachers ran {{games}} live games with their classes in the last 30 days",
       "freePractice": "Spaced missed-words practice"
     },
     "assign": {

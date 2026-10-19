@@ -21,8 +21,10 @@ describe('Teacher Pro: per-word mastery and missed-words practice', () => {
     ]) {
       const src = read(route);
       expect(src, route).toContain('checkTeacherSubscription');
-      expect(src, route).toContain('has_pro');
+      // The entitlement is paid Pro OR a live access trial; the helper is where `has_pro` is read.
+      expect(src, route).toContain('teacherHasProAccess');
     }
+    expect(read('lib/education/accessTrialServer.ts')).toContain('has_pro');
   });
 
   it('sells both on the Pro tier config and the plan matrix', () => {

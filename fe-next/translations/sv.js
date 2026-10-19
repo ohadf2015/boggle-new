@@ -5338,6 +5338,7 @@ const sv = {
     "editName": "Byt namn",
     "editAvatar": "Byt avatar",
     "hostDisconnected": "Värden kopplades bort. Väntar på återanslutning...",
+    "hostReconnected": "Din lärare är tillbaka.",
     "isNowHost": "är nu värd",
     "disconnected": "kopplades bort. Väntar på återanslutning...",
     "reconnected": "återansluten",
@@ -20289,6 +20290,7 @@ const sv = {
       "featureMastery": "Topp 10 missade ord + värmekarta elev × ord",
       "featureMissedPractice": "Ett klick: utspridd övning på missarna (1, 3, 7 dagar)",
       "freeMastery": "Värmekarta för ordbehärskning",
+      "socialProof": "{{teachers}} lärare körde {{games}} livespel med sina klasser de senaste 30 dagarna",
       "freePractice": "Utspridd övning på missade ord"
     },
     "assign": {

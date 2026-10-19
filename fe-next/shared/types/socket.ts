@@ -208,6 +208,7 @@ export interface ServerToClientEvents {
   playerDisconnected: (data: { username: string; message: string }) => void;
   playerReconnected: (data: { username: string }) => void;
   playerLeft: (data: { username: string; message: string }) => void;
+  hostReconnected: (data: { username: string }) => void;
   hostDisconnected: (data: {
     message: string;
     gracePeriodMs: number;

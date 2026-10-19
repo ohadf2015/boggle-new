@@ -62,13 +62,6 @@ export const PRO_FEATURES = ['analytics', 'reports', 'pressureDials', 'mastery',
 
 export type ProFeature = (typeof PRO_FEATURES)[number];
 
-/**
- * Client-gated surfaces a free teacher may use for real while their access trial is live. The
- * server-enforced ones (mastery, missedPractice) answer 402 whatever the client shows, so
- * opening them here would be a broken page, not a preview.
- */
-const ACCESS_TRIAL_PREVIEW: ReadonlySet<ProFeature> = new Set<ProFeature>(['analytics', 'reports']);
-
 interface ProGateProps {
   feature: ProFeature;
   children: React.ReactNode;
@@ -84,9 +77,9 @@ export function ProGate({ feature, children, active = true }: ProGateProps) {
   const { t } = useLanguage();
   const { hasPro, loading, accessTrialExpires } = useTeacherPro();
   const [nowMs] = useState(() => Date.now());
-  const previewDaysLeft = ACCESS_TRIAL_PREVIEW.has(feature)
-    ? ((s) => (s && !s.isExpired ? s.daysLeft : null))(teacherTrialStatus(accessTrialExpires, nowMs))
-    : null;
+  // A live access trial opens every Pro surface (the server-enforced reads honour it too).
+  const trial = teacherTrialStatus(accessTrialExpires, nowMs);
+  const previewDaysLeft = trial && !trial.isExpired ? trial.daysLeft : null;
   const checkoutSource = `pro_gate_${feature}` as ProUpgradeSource;
   const { pending, start } = useTeacherProCheckout(checkoutSource);
 

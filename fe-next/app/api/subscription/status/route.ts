@@ -4,6 +4,7 @@ import { checkTeacherSubscription } from '@/lib/subscriptions';
 import { polarTrialExpires } from '@/lib/education/polarTrial';
 import { getPolarClient } from '@/lib/polar';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { liveAccessTrialExpiry } from '@/lib/education/accessTrialServer';
 import logger from '@/utils/logger';
 
 /**
@@ -26,31 +27,6 @@ async function hasPolarTrialEvent(userId: string): Promise<boolean> {
   } catch (err) {
     logger.warn('Polar trial marker lookup failed:', err);
     return false;
-  }
-}
-
-/**
- * End of the teacher's live ACCESS trial (the 14-day window stamped on approval), or null.
- * Not the Polar trial: this one carries no card and no Pro entitlement, it only lets the
- * client show a free teacher what Pro does while the window is open. Fail closed to null.
- */
-async function liveAccessTrialExpiry(userId: string): Promise<string | null> {
-  try {
-    const admin = createAdminClient();
-    if (!admin) return null;
-    const { data, error } = await admin
-      .from('teacher_access_requests')
-      .select('trial_expires_at')
-      .eq('user_id', userId)
-      .eq('status', 'approved')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    const end = (data as { trial_expires_at?: string | null } | null)?.trial_expires_at;
-    if (error || !end || Date.parse(end) <= Date.now()) return null;
-    return end;
-  } catch {
-    return null;
   }
 }
 
