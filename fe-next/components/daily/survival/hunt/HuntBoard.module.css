@@ -62,7 +62,6 @@
   cursor: pointer;
   transform: translateY(0) scale(1);
   transition: transform 150ms var(--ease);
-  backface-visibility: hidden;
 }
 
 .face {
@@ -122,14 +121,13 @@
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   transform: translateY(0) scale(1);
   transition: transform 150ms var(--ease), color 120ms;
-  backface-visibility: hidden;
 }
 
 .wrap[data-large='true'] .ch { font-size: 1.2em; }
 
 .glyph[data-state] .ch {
   display: inline-block;
-  text-shadow: 0 0 6px #fffef0, 0 0 2px #fffef0;
+  text-shadow: 0 0 2px #fffef0;
 }
 
 .glyph[data-eliminated='true']:not([data-state]) { color: #9a98b0; }
@@ -228,7 +226,6 @@
   stroke-width: 3;
   opacity: 0.75;
   stroke-dasharray: 10 12;
-  animation: march 420ms linear infinite;
 }
 
 .lead { stroke-dasharray: 1 1; animation: segDraw 150ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
@@ -251,8 +248,6 @@
 
 .tray[data-tier='2'] .ribbon { stroke-width: 23; }
 .tray[data-tier='3'] .ribbon { stroke-width: 26; }
-.tray[data-tier='2'] .stitch { animation-duration: 320ms; }
-.tray[data-tier='3'] .stitch { animation-duration: 230ms; }
 
 .cap { fill: var(--rib); stroke: var(--ink); stroke-width: 5; opacity: 0.7; }
 .tipDot {
@@ -262,11 +257,9 @@
   stroke-width: 4;
   transform-box: fill-box;
   transform-origin: center;
-  animation: tipPulse 600ms ease-in-out infinite alternate;
 }
 
 .tray[data-phase='verdict'] .trail { animation: trailOut 700ms ease-in both; }
-.tray[data-phase='pending'] .stitch { animation-duration: 220ms; }
 
 .submitHint {
   position: absolute;
@@ -297,7 +290,6 @@
   .wrap *, .tray { animation: none !important; transition: none !important; }
 }
 
-@keyframes march { to { stroke-dashoffset: -44; } }
 @keyframes tileJoin {
   0% { transform: translateY(0) scale(1); }
   55% { transform: translateY(-8px) scale(1.08); }
@@ -336,8 +328,6 @@
   55% { transform: translateX(-4px); }
   75% { transform: translateX(2px); }
 }
-@keyframes tipPulse {
-  from { transform: scale(0.85); }
   to { transform: scale(1.25); }
 }
 @keyframes trailOut {

@@ -41,10 +41,10 @@ export interface NextQuestCtaProps {
 
 /* Full class strings only — Tailwind emits nothing for `bg-neo-${accent}`. */
 const ACCENTS = {
-  orange: { bar: 'bg-neo-orange', ring: 'focus-visible:ring-neo-orange', tint: 'bg-neo-orange/10' },
-  yellow: { bar: 'bg-neo-yellow', ring: 'focus-visible:ring-neo-yellow', tint: 'bg-neo-yellow/10' },
-  cyan: { bar: 'bg-neo-cyan', ring: 'focus-visible:ring-neo-cyan', tint: 'bg-neo-cyan/10' },
-  purple: { bar: 'bg-neo-purple', ring: 'focus-visible:ring-neo-purple', tint: 'bg-neo-purple/10' },
+  orange: { bar: 'bg-neo-orange', ring: 'focus-visible:ring-neo-orange' },
+  yellow: { bar: 'bg-neo-yellow', ring: 'focus-visible:ring-neo-yellow' },
+  cyan: { bar: 'bg-neo-cyan', ring: 'focus-visible:ring-neo-cyan' },
+  purple: { bar: 'bg-neo-purple', ring: 'focus-visible:ring-neo-purple' },
 } as const;
 
 /**
@@ -83,7 +83,7 @@ export function NextQuestCta({
   if (played.loading) {
     return (
       <div
-        className={cn('w-full h-[68px] rounded-xl skeleton', className)}
+        className={cn('w-full h-[84px] rounded-xl skeleton', className)}
         aria-hidden="true"
         data-testid="next-quest-loading"
       />
@@ -140,8 +140,8 @@ export function NextQuestCta({
       data-testid="next-quest-cta"
       data-next-mode={mode.id}
       className={cn(
-        'relative w-full overflow-hidden ps-5 pe-4 py-3 rounded-xl',
-        'border-3 border-black shadow-hard bg-neo-navy/95',
+        'group relative w-full overflow-hidden ps-6 pe-3 py-3 rounded-xl',
+        'border-2 border-neo-cream/40 shadow-hard bg-neo-navy-light/95',
         'flex items-center gap-3 text-start cursor-pointer',
         'focus-visible:outline-hidden focus-visible:ring-4',
         accent.ring,
@@ -150,8 +150,7 @@ export function NextQuestCta({
       )}
     >
       {/* Accent edge — start-anchored so it flips in Hebrew. */}
-      <span aria-hidden="true" className={cn('absolute start-0 top-0 bottom-0 w-1.5', accent.bar)} />
-      <span aria-hidden="true" className={cn('absolute inset-0 pointer-events-none', accent.tint)} />
+      <span aria-hidden="true" className={cn('absolute start-0 top-0 bottom-0 w-2', accent.bar)} />
 
       {/* Decorative mascot, as a CSS background for the same reasons as the
           hub's compact rows — the label beside it names the mode. */}
@@ -160,19 +159,28 @@ export function NextQuestCta({
         role="presentation"
         data-art-url={mode.art}
         style={{ backgroundImage: `url(${mode.art})` }}
-        className="relative shrink-0 w-10 h-10 rounded-md bg-cover bg-center border-2 border-black/60"
+        className="relative shrink-0 w-14 h-14 rounded-lg bg-cover bg-center border-2 border-neo-cream/40"
       />
 
       <span className="relative flex-1 min-w-0">
-        <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400">
+        <span className="block text-xs font-bold text-neo-cream/70">
           {t('daily.nextUp')}
         </span>
-        <span className="block text-sm font-neo-display font-black text-white truncate">
+        <span className="block text-lg leading-tight font-neo-display font-black text-neo-cream line-clamp-2">
           {t(mode.titleKey)}
         </span>
       </span>
 
-      <ArrowRight className="relative shrink-0 w-5 h-5 text-neo-lime rtl:rotate-180" />
+      <span
+        aria-hidden="true"
+        className={cn(
+          'relative shrink-0 w-11 h-11 rounded-xl border-2 border-black flex items-center justify-center',
+          'text-neo-black shadow-hard-sm transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5',
+          accent.bar,
+        )}
+      >
+        <ArrowRight className="w-5 h-5 rtl:rotate-180" />
+      </span>
     </Link>
   );
 }

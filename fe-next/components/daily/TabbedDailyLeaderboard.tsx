@@ -1000,50 +1000,22 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
         <div className="flex-1 min-w-0">
           <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-neo-white flex items-center gap-2 flex-wrap">
             <span>{t('wordHunt.leaderboard.title')}</span>
-            <span
-              className={`
-                inline-flex items-center gap-1 text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full border-2 border-neo-black shadow-xs normal-case tracking-normal
-                ${scope === 'word-hunt' ? 'bg-neo-cyan text-neo-black' : ''}
-                ${scope === 'word-wheel' ? 'bg-neo-purple text-white' : ''}
-                ${scope === 'combined' ? 'bg-neo-lime text-neo-black' : ''}
-              `}
-              title={
-                scope === 'combined'
-                  ? t('wordHunt.leaderboard.scopeCombined')
-                  : scope === 'word-hunt'
-                    ? t('wordHunt.leaderboard.scopeWordHunt')
-                    : t('wordHunt.leaderboard.scopeWordWheel')
-              }
-            >
-              {scope === 'combined' && (
-                <>
-                  <Target aria-hidden className="w-3 h-3" />
-                  <CircleDot aria-hidden className="w-3 h-3" />
-                  {t('wordHunt.leaderboard.scopeCombined')}
-                </>
-              )}
-              {scope === 'word-hunt' && (
-                <>
-                  <Target aria-hidden className="w-3 h-3" />
-                  {t('wordHunt.leaderboard.scopeWordHunt')}
-                </>
-              )}
-              {scope === 'word-wheel' && (
-                <>
-                  <CircleDot aria-hidden className="w-3 h-3" />
-                  {t('wordHunt.leaderboard.scopeWordWheel')}
-                </>
-              )}
-            </span>
+            {scope === 'combined' && (
+              <span
+                className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full border-2 border-neo-black shadow-xs normal-case tracking-normal bg-neo-lime text-neo-black"
+                title={t('wordHunt.leaderboard.scopeCombined')}
+              >
+                <Target aria-hidden className="w-3 h-3" />
+                <CircleDot aria-hidden className="w-3 h-3" />
+                {t('wordHunt.leaderboard.scopeCombined')}
+              </span>
+            )}
             {activeTab === 'today' && !isLoading && !error && (
               <span
                 className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-black normal-case tracking-normal text-neo-lime"
                 data-testid="live-indicator"
               >
-                <span aria-hidden className="relative flex h-2 w-2">
-                  <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-lime opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-lime" />
-                </span>
+                <span aria-hidden className="inline-flex rounded-full h-2 w-2 bg-neo-lime" />
                 {t('wordHunt.leaderboard.live')}
               </span>
             )}
