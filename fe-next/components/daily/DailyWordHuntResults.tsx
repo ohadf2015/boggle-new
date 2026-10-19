@@ -16,7 +16,6 @@ import { ArrowLeft, Trophy, BarChart3 } from 'lucide-react';
 import { CoinSpendAnimation } from '@/components/animations/CoinSpendAnimation';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { Button } from '@/components/ui/button';
-import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
@@ -78,12 +77,10 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const isPractice = usePracticeFlag();
   const { user, profile, isAuthenticated } = useAuth();
 
-  const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
 
-  // Ads + leaderboard on mount
+  // Leaderboard on mount (the interstitial runs before this screen, in DailyChallenge)
   useEffect(() => {
-    showInterstitial('word-hunt-complete');
     if (result.efficiencyScore != null && result.efficiencyScore > 0) {
       submitLeaderboardScore(result.efficiencyScore);
     }

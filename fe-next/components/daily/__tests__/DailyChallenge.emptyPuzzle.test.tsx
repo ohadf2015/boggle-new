@@ -29,6 +29,7 @@ vi.mock('framer-motion', async () => {
   };
 });
 
+vi.mock('@/hooks/useInterstitialAd', () => ({ useInterstitialAd: () => ({ showInterstitial: () => Promise.resolve() }) }));
 import DailyChallenge from '../DailyChallenge';
 
 vi.mock('@/contexts/LanguageContext', () => ({

@@ -140,6 +140,7 @@ vi.mock('../DailyChallengeTutorial', () => ({ DailyChallengeTutorial: () => null
 
 global.fetch = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ hasPlayed: false }) })) as unknown as typeof fetch;
 
+vi.mock('@/hooks/useInterstitialAd', () => ({ useInterstitialAd: () => ({ showInterstitial: () => Promise.resolve() }) }));
 import DailyChallenge from '../DailyChallenge';
 
 describe('DailyChallenge — daily_challenge_completed funnel event', () => {

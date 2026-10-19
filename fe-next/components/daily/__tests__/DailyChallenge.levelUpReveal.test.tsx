@@ -151,6 +151,7 @@ const { publishLevelUp, levelUpFromRecordGame } = vi.hoisted(() => ({
 vi.mock('@/lib/avatar/revealTrigger', () => ({ publishLevelUp, levelUpFromRecordGame }));
 vi.mock('@/components/avatar/reveal/SessionRevealHost', () => ({ __esModule: true, default: () => null }));
 
+vi.mock('@/hooks/useInterstitialAd', () => ({ useInterstitialAd: () => ({ showInterstitial: () => Promise.resolve() }) }));
 import DailyChallenge from '../DailyChallenge';
 
 describe('DailyChallenge — level-up from the daily fires the avatar unlock reveal', () => {

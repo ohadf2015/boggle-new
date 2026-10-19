@@ -7,6 +7,7 @@ import { useInterval } from '@/hooks/useSafeTimeout';
 import { m, AnimatePresence } from 'framer-motion';
 import { isNative } from '@/utils/platform';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 
 import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyWordHuntSurvival, { type SurvivalGameResult } from './DailyWordHuntSurvival';
@@ -71,6 +72,7 @@ const DailyChallenge: React.FC = () => {
   useEffect(() => () => stopMusic(500), [stopMusic]);
   const { recordWin: recordStreak } = useWinStreak();
   const isPractice = usePracticeFlag();
+  const { showInterstitial } = useInterstitialAd();
   const { online } = useNetworkState();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -534,7 +536,9 @@ const DailyChallenge: React.FC = () => {
       result: wordHuntResult,
       completedAt: new Date().toISOString(),
     });
-    setPhase('completed');
+    // Ad sits between the game and the results; catch-up days already paid with a rewarded ad.
+    const adGate = isCatchup ? Promise.resolve() : showInterstitial(`word-hunt-complete-${extraTries}`);
+    adGate.catch(() => {}).finally(() => setPhase('completed'));
 
     // Update weekly quest progress for daily challenge completion
     if (isAuthenticated && result.solved) {
@@ -567,7 +571,7 @@ const DailyChallenge: React.FC = () => {
         .catch(() => { /* non-critical */ });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable from LanguageContext
-}, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak, isPractice, isCatchup]);
+}, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak, isPractice, isCatchup, showInterstitial, extraTries]);
 
   const handleTutorialComplete = useCallback(() => {
     setShowTutorial(false);

@@ -114,6 +114,7 @@ vi.mock('../DailyChallengeTutorial', () => ({
 
 global.fetch = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ hasPlayed: false }) })) as unknown as typeof fetch;
 
+vi.mock('@/hooks/useInterstitialAd', () => ({ useInterstitialAd: () => ({ showInterstitial: () => Promise.resolve() }) }));
 import DailyChallenge from '../DailyChallenge';
 
 describe('DailyChallenge — tutorial no longer auto-shows', () => {

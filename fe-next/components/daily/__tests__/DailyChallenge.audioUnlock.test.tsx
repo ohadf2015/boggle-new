@@ -235,6 +235,7 @@ global.fetch = vi.fn(() =>
   })
 ) as Mock;
 
+vi.mock('@/hooks/useInterstitialAd', () => ({ useInterstitialAd: () => ({ showInterstitial: () => Promise.resolve() }) }));
 import DailyChallenge from '../DailyChallenge';
 import type { Mock } from 'vitest';
 
