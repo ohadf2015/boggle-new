@@ -1,11 +1,11 @@
 /**
  * Honest social proof for the upgrade page: how many teachers actually ran live games lately.
  * Counts only real games (one per class + room code) from real teachers, and the page shows
- * the line only when both numbers are large enough to persuade; a small true number would
- * hurt more than it helps, and a rounded-up one would be a lie.
+ * the line only above a small floor: enough that the number is specific and not an anecdote,
+ * never rounded up. Raise the floor as the product grows.
  */
-export const TEACHER_PROOF_MIN_TEACHERS = 25;
-export const TEACHER_PROOF_MIN_GAMES = 60;
+export const TEACHER_PROOF_MIN_TEACHERS = 5;
+export const TEACHER_PROOF_MIN_GAMES = 10;
 
 export interface TeacherProof {
   teachers: number;

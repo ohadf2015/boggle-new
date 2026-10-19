@@ -31,9 +31,13 @@ describe('summarizeTeacherProof', () => {
 
 describe('teacherProofToShow', () => {
   it('stays silent until BOTH numbers are big enough to be persuasive', () => {
-    expect(teacherProofToShow({ teachers: 8, games: 16 })).toBeNull();
+    expect(teacherProofToShow({ teachers: 4, games: 9 })).toBeNull();
     expect(teacherProofToShow({ teachers: TEACHER_PROOF_MIN_TEACHERS, games: TEACHER_PROOF_MIN_GAMES - 1 })).toBeNull();
     expect(teacherProofToShow({ teachers: TEACHER_PROOF_MIN_TEACHERS - 1, games: 999 })).toBeNull();
+  });
+
+  it("shows today's real numbers (8 teachers, 16 games): small but true and specific", () => {
+    expect(teacherProofToShow({ teachers: 8, games: 16 })).toEqual({ teachers: 8, games: 16 });
   });
 
   it('returns the real numbers once both clear the bar', () => {

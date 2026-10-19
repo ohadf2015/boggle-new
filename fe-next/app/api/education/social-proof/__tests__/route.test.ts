@@ -67,7 +67,7 @@ describe('GET /api/education/social-proof', () => {
 
   it('excludes test-account teachers', async () => {
     bigWorld();
-    testProfiles = Array.from({ length: 10 }, (_, i) => ({ id: `t${i}` }));
+    testProfiles = Array.from({ length: 28 }, (_, i) => ({ id: `t${i}` }));
     const body = await (await GET()).json();
     expect(body).toEqual({ show: false });
   });
