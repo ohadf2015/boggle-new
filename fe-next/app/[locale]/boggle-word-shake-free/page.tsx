@@ -18,12 +18,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Boggle WordShake Free Online — Play Boggle Shake | LexiClash',
-    description: 'Shake the letter grid, find hidden words, score combos. Play Boggle Word Shake free — instant browser play, no download, no signup. Solo or challenge 2–20 friends live.',
-    keywords: 'boggle wordshake, boggle shake, boggle shake free, wordshake boggle, play boggle shake online, free boggle online no download, boggle word shake free no download, boggle word shake online, word shake game free, boggle shake free online, word scramble game free no download, boggle word game free, word shake multiplayer',
+    description: 'Wordplay boggle shake: shake a 4x4 letter grid, find words in 3 minutes. Play free in the browser — no download, no signup. Solo or 2-20 friends live.',
+    keywords: 'wordplay boggle shake, boggle wordshake, boggle shake, boggle shake free, wordshake boggle, play boggle shake online, free boggle online no download, boggle word shake free no download, boggle word shake online, word shake game free, boggle shake free online, word scramble game free no download, boggle word game free, word shake multiplayer',
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {
       title: 'Boggle Word Shake Free — Play Online | LexiClash',
-      description: 'Shake the grid, find words, compete with friends. Free, no download!',
+      description: 'Wordplay boggle shake: shake a 4x4 letter grid, find words in 3 minutes. Free, no download.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -45,7 +45,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+const WORDPLAY_BOGGLE_SHAKE_ANSWER =
+  'Wordplay boggle shake is the opening move of classic Boggle, the letter-cube game Allan Turoff designed and Parker Brothers released in 1973. Sixteen letter cubes sit in a 4x4 grid under a clear dome. Players shake the dome so each cube shows one letter, then have 3 minutes to find words of at least 3 letters by linking letters that touch on a side or a corner. A cube may be used only once in a word, and the Qu face counts as two letters. Classic Boggle scoring is 1 point for a 3- or 4-letter word, 2 points for 5 letters, 3 for 6, 5 for 7, and 11 for 8 or more. LexiClash plays that same shake-and-find game free in the browser at lexiclash.live, with no download, no signup, 5x5 and 6x6 grids, and live rooms for 2 to 20 players. Wordplay boggle shake is the game you shake, not the dictionary verb boggle (to be overwhelmed, from the old word bogle).';
+
+const classicBoggleScoring = [
+  { letters: '3-4', points: '1' },
+  { letters: '5', points: '2' },
+  { letters: '6', points: '3' },
+  { letters: '7', points: '5' },
+  { letters: '8+', points: '11' },
+];
+
 const faqs = [
+  {
+    q: 'What is wordplay boggle shake?',
+    a: WORDPLAY_BOGGLE_SHAKE_ANSWER,
+  },
   {
     q: 'What is Boggle Word Shake?',
     a: 'Boggle Word Shake is a word-finding game where letters are scrambled on a grid and you find words by connecting adjacent letters. LexiClash brings this classic gameplay online — free, no download, with multiplayer support for up to 20 players.',
@@ -107,6 +122,35 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
         <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
           Boggle Shake Free Online — Play in Browser, No Download
         </h1>
+
+        <section className="mb-8" aria-labelledby="wordplay-boggle-shake">
+          <h2 id="wordplay-boggle-shake" className="mb-3 font-neo-display text-2xl font-bold sm:text-3xl">
+            What is wordplay boggle shake?
+          </h2>
+          <p className="mb-4 text-lg leading-relaxed text-neo-gray-200">{WORDPLAY_BOGGLE_SHAKE_ANSWER}</p>
+          <p className="mb-3 text-sm text-neo-gray-400">
+            Classic Boggle scoring (Parker Brothers, 1973). Page updated October 2026.
+          </p>
+          <table className="mb-2 w-full max-w-sm border-collapse text-sm">
+            <caption className="mb-2 text-left font-bold text-neo-lime">
+              Classic Boggle points by word length
+            </caption>
+            <thead>
+              <tr className="border-b-2 border-neo-cyan text-left">
+                <th className="py-2 pr-4 font-bold">Letters</th>
+                <th className="py-2 font-bold">Points</th>
+              </tr>
+            </thead>
+            <tbody>
+              {classicBoggleScoring.map((row) => (
+                <tr key={row.letters} className="border-b border-neo-gray-400/40">
+                  <td className="py-2 pr-4">{row.letters}</td>
+                  <td className="py-2">{row.points}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
 
         <p className="mb-4 text-lg font-bold leading-relaxed text-neo-lime">
           LexiClash is a free online Boggle Word Shake game: shake a letter grid, find hidden words, and compete live with friends — no download, no signup.

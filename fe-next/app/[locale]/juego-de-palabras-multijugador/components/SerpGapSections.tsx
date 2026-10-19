@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import {
+  BONUS_SQUARES,
   CONTROLS,
   ES_DICT_FLOOR,
   EXAMPLE_GRID,
@@ -7,15 +8,19 @@ import {
   EXAMPLE_WORDS,
   LENGTH_SCORES,
   SIMILAR_GAMES,
+  SPANISH_BAG,
+  SPANISH_BAG_TOTAL,
   SPANISH_TILES,
   TIPS,
 } from '../data';
 
 /**
- * Headings the top-3 SERP pages rank with that this landing lacked
- * (minijuegos: cómo jugar / características / similares;
- *  solitaireparadise: consejos, fichas, validación).
- * Unique asset: a scored Spanish 4×4 from our own Classic rules + dictionary.
+ * Headings the top-3 SERP pages rank with that this landing lacked.
+ * 2026-10 pass (query "scrabble online español multijugador", DDG top 3 =
+ * solitaireparadise Locura de Letras, isc.ro, minijuegos):
+ * bonus-square Puntuación, full 100-tile Spanish bag, Gameplays,
+ * FAQ gaps (desafío / reparto / atril) live in data.ts.
+ * Unique asset none of those three have: a whole class in one browser room.
  */
 export function SerpGapSections({ locale }: { locale: string }) {
   return (
@@ -268,6 +273,133 @@ export function SerpGapSections({ locale }: { locale: string }) {
               ))}
             </tbody>
           </table>
+        </div>
+        <h3 className="mb-3 mt-8 font-neo-display text-lg font-black uppercase text-neo-yellow">
+          Distribución de las {SPANISH_BAG_TOTAL} fichas en español
+        </h3>
+        <p className="mb-4 font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+          Locura de Letras publica la bolsa del Scrabble de tablero. Esta es la
+          edición castellana de 100 fichas (fuera de Norteamérica): la A sale 12
+          veces y vale 1; la Z sale una vez y vale 10; hay 2 comodines. No es la
+          bolsa de LexiClash — aquí no se reparten fichas. Sirve para comparar,
+          no para jugar nuestra ronda.
+        </p>
+        <div className="overflow-x-auto rounded-neo border-3 border-neo-black shadow-hard-lg">
+          <table className="w-full min-w-[22rem] border-collapse bg-neo-navy-light/40 text-left">
+            <caption className="sr-only">
+              Distribución pública de las 100 fichas del Scrabble en español. No es el atril de LexiClash.
+            </caption>
+            <thead>
+              <tr className="border-b-3 border-neo-black">
+                <th scope="col" className="p-3 font-neo-display text-xs font-black uppercase text-neo-white sm:p-4">
+                  Ficha
+                </th>
+                <th scope="col" className="p-3 text-center font-neo-display text-xs font-black uppercase text-neo-cyan sm:p-4">
+                  Cuántas
+                </th>
+                <th scope="col" className="p-3 text-center font-neo-display text-xs font-black uppercase text-neo-yellow sm:p-4">
+                  Puntos Scrabble
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {SPANISH_BAG.map((row) => (
+                <tr key={row.tile} className="border-b-2 border-neo-white/10 last:border-b-0">
+                  <th scope="row" className="p-3 font-neo-display text-sm font-black text-neo-cyan sm:p-4">
+                    {row.tile}
+                  </th>
+                  <td className="p-3 text-center font-neo-body text-sm text-neo-white sm:p-4">{row.count}</td>
+                  <td className="p-3 text-center font-neo-display text-sm font-black text-neo-yellow sm:p-4">
+                    {row.points}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="mb-14 max-w-3xl">
+        <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+          Casillas de bonificación
+        </h2>
+        <p className="mb-4 font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+          En el tablero 15×15 de Locura de Letras y de Minijuegos la puntuación
+          no es solo la ficha: hay casillas que doblan o triplican. Por eso su
+          sección de puntuación habla de colocación, no de longitud.
+        </p>
+        <ul className="mb-4 space-y-3">
+          {BONUS_SQUARES.map((sq) => (
+            <li key={sq.mark} className="rounded-neo border-2 border-neo-white/15 bg-neo-navy-light/40 p-4">
+              <h3 className="font-neo-display text-sm font-black uppercase text-neo-pink">
+                {sq.name}{' '}
+                <span className="text-neo-yellow">({sq.mark})</span>
+              </h3>
+              <p className="mt-1 font-neo-body text-sm text-neo-white">{sq.effect}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+          En{' '}
+          <strong className="text-neo-cyan">scrabble online español multijugador</strong>{' '}
+          en LexiClash esas casillas no existen. Todos juegan a la vez sobre la
+          misma cuadrícula: una casilla doble sería una carrera al mismo recuadro,
+          no una decisión. Lo que paga es la longitud (tabla de arriba). Las reglas
+          están en{' '}
+          <Link href={`/${locale}/rules`} className="text-neo-yellow underline">
+            las reglas
+          </Link>
+          .
+        </p>
+      </section>
+
+      <section className="mb-14 max-w-3xl">
+        <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+          Gameplays: la partida es en vivo
+        </h2>
+        <p className="font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+          Minijuegos tiene un apartado de gameplays para su Scrabble contra la
+          computadora. Aquí no hay vídeo embebido ni grabación que mirar. La
+          partida multijugador es la sala: abres{' '}
+          <Link href={`/${locale}/multiplayer`} className="text-neo-cyan underline">
+            Crear sala
+          </Link>
+          , pegas el enlace y ves el marcador de tus amigos en la misma cuadrícula.
+          No es un gameplay de un extraño contra una IA.
+        </p>
+      </section>
+
+      <section className="mb-14 max-w-3xl" data-seo="teacher-room">
+        <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+          Para profesores: una clase entera en una sala
+        </h2>
+        <div className="space-y-3 font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+          <p>
+            Locura de Letras y Minijuegos enfrentan a un alumno contra el
+            ordenador. El Internet Scrabble Club es multijugador, pero pide cuenta
+            y un cliente. Ninguno sienta a una clase.
+          </p>
+          <p>
+            En LexiClash el profesor pulsa Crear sala y proyecta el enlace o el
+            QR. Hasta 50 estudiantes entran en la misma cuadrícula, en español
+            (ñ incluida), sin email de alumno y sin app — vale en el navegador
+            del Chromebook o del móvil. La ronda dura 2–3 minutos, así que cabe
+            entre dos explicaciones.
+          </p>
+          <p>
+            El Internet Scrabble Club publica un contador de jugadores conectados
+            a su lobby. Una sala de LexiClash es privada: la prueba es el marcador
+            en vivo de quien abrió tu enlace, no un número de un club ajeno.
+          </p>
+          <p>
+            <Link href={`/${locale}/multiplayer`} className="text-neo-pink underline">
+              Crear la sala de la clase
+            </Link>
+            {' · '}
+            <Link href={`/${locale}/education`} className="text-neo-yellow underline">
+              Centro para profesores
+            </Link>
+          </p>
         </div>
       </section>
 
