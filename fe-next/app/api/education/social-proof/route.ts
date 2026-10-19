@@ -36,14 +36,23 @@ async function readProof(): Promise<Record<string, unknown>> {
     if (error || !rows) return { ...NONE };
     const sessions = rows as unknown as ProofSessionRow[];
 
-    const classroomIds = [...new Set(sessions.map((r) => r.classroom_id))];
+    // Some practice rows have no classroom; a null in a uuid IN list errors the whole lookup.
+    const classroomIds = [...new Set(sessions.map((r) => r.classroom_id).filter((id): id is string => !!id))];
     if (classroomIds.length === 0) return { ...NONE };
-    const { data: owners } = await admin.from('classrooms').select('id, teacher_id').in('id', classroomIds);
+    const { data: owners, error: ownersError } = await admin.from('classrooms').select('id, teacher_id').in('id', classroomIds);
+    if (ownersError) {
+      logger.warn('[social-proof] owner lookup failed', ownersError.message);
+      return { ...NONE };
+    }
     const teacherOfClassroom: Record<string, string> = {};
     for (const o of (owners ?? []) as Array<{ id: string; teacher_id: string }>) teacherOfClassroom[o.id] = o.teacher_id;
 
     const teacherIds = [...new Set(Object.values(teacherOfClassroom))];
-    const { data: tests } = await admin.from('profiles').select('id').in('id', teacherIds).eq('is_test_account', true);
+    const { data: tests, error: testsError } = await admin.from('profiles').select('id').in('id', teacherIds).eq('is_test_account', true);
+    if (testsError) {
+      logger.warn('[social-proof] test-account lookup failed', testsError.message);
+      return { ...NONE };
+    }
     const testTeachers = new Set(((tests ?? []) as Array<{ id: string }>).map((p) => p.id));
 
     const shown = teacherProofToShow(summarizeTeacherProof(sessions, teacherOfClassroom, testTeachers));

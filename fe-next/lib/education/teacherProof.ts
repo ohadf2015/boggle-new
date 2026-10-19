@@ -13,7 +13,7 @@ export interface TeacherProof {
 }
 
 export interface ProofSessionRow {
-  classroom_id: string;
+  classroom_id: string | null;
   game_code: string | null;
 }
 
@@ -25,7 +25,7 @@ export function summarizeTeacherProof(
   const games = new Set<string>();
   const teachers = new Set<string>();
   for (const row of rows) {
-    const teacher = teacherOfClassroom[row.classroom_id];
+    const teacher = row.classroom_id ? teacherOfClassroom[row.classroom_id] : undefined;
     if (!row.game_code || !teacher || testTeachers.has(teacher)) continue;
     games.add(`${row.classroom_id}:${row.game_code}`);
     teachers.add(teacher);
