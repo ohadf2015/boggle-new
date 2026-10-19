@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { isNative } from '@/utils/platform';
-import { initializeNativeOAuth } from '@/utils/nativeOAuth';
 import logger from '@/utils/logger';
 
 /**
@@ -27,7 +26,11 @@ export default function NativeOAuthInitializer() {
 
     // Initialize native OAuth in the background
     // Don't block app startup - auth will initialize when needed if this fails
-    initializeNativeOAuth()
+    void import(
+      /* webpackPrefetch: false, webpackPreload: false */
+      '@/utils/nativeOAuth'
+    )
+      .then(({ initializeNativeOAuth }) => initializeNativeOAuth())
       .then(success => {
         if (success) {
           logger.log('[NativeOAuthInitializer] Native OAuth ready');

@@ -328,8 +328,6 @@
   55% { transform: translateX(-4px); }
   75% { transform: translateX(2px); }
 }
-  to { transform: scale(1.25); }
-}
 @keyframes trailOut {
   0%, 55% { opacity: 1; }
   100% { opacity: 0; }

@@ -5,6 +5,7 @@ import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import { syncAuthAnalyticsTransition } from '@/utils/authAnalytics';
 import { consumePendingSignupCompletion, consumeSignupSource, maybeTrackSignupCompleted, setAnalyticsIdentity } from '@/utils/growthTracking';
 import { markAuthProviderMounted } from '@/lib/auth/authProviderMounted';
+import type { AuthContextValue } from './auth/authTypes';
 import { AuthContext } from './AuthContext';
 
 // Hooks value-import @supabase/ssr (gotrue). This module is loaded only via
