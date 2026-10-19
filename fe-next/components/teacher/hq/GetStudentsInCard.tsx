@@ -18,6 +18,7 @@ import {
 import {
   captureTeacherOnboardingFunnel,
   TEACHER_ONBOARDING_FUNNEL_EVENTS,
+  teacherFunnelPlan,
 } from "@/lib/education/teacherOnboardingFunnel";
 import { useTeacherPro } from "@/hooks/useTeacherPro";
 import { useClassRoster } from "./useClassRoster";
@@ -62,7 +63,7 @@ export function GetStudentsInCard({
 }: GetStudentsInCardProps) {
   const { t, language } = useLanguage();
   const { reduced, sfx } = useHqJuice();
-  const { hasPro, loading: proLoading } = useTeacherPro();
+  const { hasPro, status, loading: proLoading } = useTeacherPro();
   const {
     students,
     arrivals,
@@ -122,11 +123,11 @@ export function GetStudentsInCard({
       // the event while the entitlement read is still in flight.
       captureTeacherOnboardingFunnel(TEACHER_ONBOARDING_FUNNEL_EVENTS.studentJoined, {
         locale: language,
-        plan: proLoading ? 'unknown' : hasPro ? 'pro' : 'free',
+        plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
       });
     }
     prevCount.current = count;
-  }, [rosterLoading, count, classroom.id, language, proLoading, hasPro]);
+  }, [rosterLoading, count, classroom.id, language, proLoading, hasPro, status]);
 
   const copyLink = useCallback(async () => {
     const url = classroomJoinUrl(

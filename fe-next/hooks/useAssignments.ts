@@ -13,6 +13,9 @@ import type { AssignmentFocusValue } from '@/lib/education/wordcraftAssignment';
 import logger from '@/utils/logger';
 import { trackEduTeacherActionFailed } from '@/lib/education/telemetry';
 import { trackAssignmentCreated } from '@/lib/education/assignmentEvents';
+import { teacherFunnelPlan } from '@/lib/education/teacherOnboardingFunnel';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
 
 interface UseAssignmentsState {
   assignments: TeacherAssignment[];
@@ -49,6 +52,8 @@ export type UseAssignmentsReturn = UseAssignmentsState & UseAssignmentsActions;
  * - Manual refresh capability
  */
 export function useAssignments(classroomId: string | null): UseAssignmentsReturn {
+  const { language } = useLanguage();
+  const { hasPro, status, loading: proLoading } = useTeacherPro();
   const [state, setState] = useState<UseAssignmentsState>({
     assignments: [],
     isLoading: false,
@@ -161,6 +166,11 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
           kind: typeof data.word_count_target === 'number' ? 'word_count' : 'lesson',
           due_date: data.due_date ?? null,
           word_count_target: data.word_count_target ?? null,
+          // Same event the template path emits. Locale + plan so a plan
+          // breakdown of assignment_created does not drop the lesson publish.
+          // teacherFunnelPlan keeps a trialing teacher off the paying slice.
+          locale: language,
+          plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
         });
 
         return { success: true };
@@ -178,7 +188,7 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
         return { success: false, error };
       }
     },
-    []
+    [language, hasPro, status, proLoading]
   );
 
   const deleteAssignment = useCallback(async (assignmentId: string): Promise<void> => {

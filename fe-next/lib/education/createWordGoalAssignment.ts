@@ -8,6 +8,7 @@ import { createAssignment } from '@/lib/supabase/education/assignments';
 import type { Language, VocabularyWord } from '@/lib/supabase/education/types';
 import type { CreateLessonFn } from './createLessonWithAssignment';
 import { trackAssignmentCreated } from './assignmentEvents';
+import { teacherFunnelPlan } from './teacherOnboardingFunnel';
 import {
   type WordGoal,
   wordGoalLessonName,
@@ -34,6 +35,16 @@ export interface CreateWordGoalAssignmentArgs {
   language: Language;
   createLesson: CreateLessonFn;
   findNWordsLabel: (n: number) => string;
+  /**
+   * UI locale + entitlement at publish time. Mapped here (not by the caller)
+   * so a hasPro ternary cannot stamp a trial as pro on this path.
+   */
+  funnel: {
+    locale: string;
+    hasPro: boolean;
+    status?: string | null;
+    loading?: boolean;
+  };
 }
 
 export interface CreateWordGoalAssignmentResult {
@@ -50,6 +61,7 @@ export async function createWordGoalAssignment({
   language,
   createLesson,
   findNWordsLabel,
+  funnel,
 }: CreateWordGoalAssignmentArgs): Promise<CreateWordGoalAssignmentResult> {
   const name = wordGoalLessonName(goal, findNWordsLabel);
   const words = goal.kind === 'word_list' ? asWords(goal.words) : asWords(COUNT_SEED[language] ?? COUNT_SEED.en);
@@ -90,6 +102,12 @@ export async function createWordGoalAssignment({
       due_date: goal.dueDate,
       word_count_target: goal.kind === 'word_count' ? goal.target : null,
       word_list_length: goal.kind === 'word_list' ? goal.words.length : null,
+      locale: funnel.locale,
+      plan: teacherFunnelPlan({
+        hasPro: funnel.hasPro,
+        status: funnel.status,
+        loading: funnel.loading,
+      }),
     });
     return { success: true, assigned: true, assignmentId: assignment.data.id };
   } catch (err) {

@@ -6,9 +6,10 @@
  * class → first assignment → first student" had no measurable drop-off step.
  *
  * Names are the card-pinned snake_case strings. `assignment_created` is NOT a
- * new event — assignmentEvents.ts already emits it on every publish; this
- * module reuses the exact same string and the template-gallery path is the
- * only first-publish path that previously missed it.
+ * new event — assignmentEvents.ts already emits it on lesson and word-goal
+ * publish, and those captures now also carry locale + plan. This module
+ * reuses the exact same string; the template-gallery path is the only
+ * first-publish path that previously missed the event entirely.
  *
  * The upgrade steps (`trial_started` / `teacher_pro_upgraded`) are NOT emitted
  * here on purpose: /teacher/upgrade redirects to Polar and never observes the

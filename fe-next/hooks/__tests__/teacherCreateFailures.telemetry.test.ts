@@ -11,6 +11,13 @@ import { useClassrooms } from '../useClassroom';
 import { useLessons } from '../useVocabularyLesson';
 import { useAssignments } from '../useAssignments';
 
+vi.mock('@/hooks/useTeacherPro', () => ({
+  useTeacherPro: () => ({ hasPro: false, status: 'active', loading: false }),
+}));
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ language: 'en', t: (k: string) => k }),
+}));
+
 vi.mock('@/lib/supabase/education');
 vi.mock('@/lib/supabase/education/assignments');
 

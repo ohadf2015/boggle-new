@@ -78,6 +78,11 @@ describe('teacher onboarding funnel — pinned event names', () => {
     expect(teacherFunnelPlan({ hasPro: true, status: 'trialing' })).toBe('trial');
     expect(teacherFunnelPlan({ hasPro: true, status: 'active' })).toBe('pro');
     expect(teacherFunnelPlan({ hasPro: false, loading: true })).toBe('unknown');
+    // Loading wins over a settled-looking hasPro. A capture before the
+    // entitlement read must not stamp a paying or trial teacher as free,
+    // and a trialing teacher (hasPro true) must not land in the paying slice.
+    expect(teacherFunnelPlan({ hasPro: true, status: 'trialing', loading: true })).toBe('unknown');
+    expect(teacherFunnelPlan({ hasPro: true, status: 'active', loading: true })).toBe('unknown');
   });
 });
 
@@ -140,5 +145,43 @@ describe('teacher onboarding funnel — call sites stay wired', () => {
   it('Polar checkout metadata carries the locale so webhook events can slice by it', () => {
     const src = readSrc('lib/polar.ts');
     expect(src).toMatch(/metadata:\s*\{[^}]*locale/);
+  });
+});
+
+/** A hasPro ternary stamps trial as pro. The name-constant pin does not catch that. */
+const PLAN_TERNARY = /plan:\s*(?:proLoading\s*\?\s*'unknown'\s*:\s*)?hasPro\s*\?\s*'pro'\s*:\s*'free'/;
+
+describe('teacher onboarding funnel — plan slice cannot regress to a hasPro ternary', () => {
+  const clientSteps = [
+    'components/teacher/setup/ClassSetupFlow.tsx',
+    'components/teacher/assignments/AssignmentCreator.tsx',
+    'components/teacher/hq/GetStudentsInCard.tsx',
+  ];
+
+  it('the three client steps the re-invite hits call teacherFunnelPlan with loading', () => {
+    for (const rel of clientSteps) {
+      const src = readSrc(rel);
+      expect(src, rel).toContain('teacherFunnelPlan({ hasPro, status, loading: proLoading })');
+      expect(src, rel).not.toMatch(PLAN_TERNARY);
+    }
+  });
+
+  it('lesson publish stamps locale + plan on the existing assignment_created, not a second event', () => {
+    const src = readSrc('hooks/useAssignments.ts');
+    expect(src).toContain('teacherFunnelPlan({ hasPro, status, loading: proLoading })');
+    expect(src).toContain('locale: language');
+    expect(src.match(/trackAssignmentCreated\(/g)).toHaveLength(1);
+    expect(src).not.toContain('captureTeacherOnboardingFunnel');
+  });
+
+  it('word-goal publish stamps locale + plan on the existing assignment_created, not a second event', () => {
+    const src = readSrc('lib/education/createWordGoalAssignment.ts');
+    expect(src).toContain('teacherFunnelPlan(');
+    expect(src).toContain('locale: funnel.locale');
+    expect(src.match(/trackAssignmentCreated\(/g)).toHaveLength(1);
+    expect(src).not.toContain('captureTeacherOnboardingFunnel');
+    // The caller must hand the entitlement in, not a pre-baked plan string.
+    const caller = readSrc('components/teacher/assignments/AssignmentCreator.tsx');
+    expect(caller).toContain('funnel: { locale: language, hasPro, status, loading: proLoading }');
   });
 });

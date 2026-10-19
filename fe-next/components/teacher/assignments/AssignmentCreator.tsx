@@ -41,6 +41,7 @@ import {
 import {
   captureTeacherOnboardingFunnel,
   TEACHER_ONBOARDING_FUNNEL_EVENTS,
+  teacherFunnelPlan,
 } from '@/lib/education/teacherOnboardingFunnel';
 import type { Language } from '@/lib/supabase/education/types';
 import { AssignmentGoalModes } from './AssignmentGoalModes';
@@ -77,7 +78,7 @@ export default function AssignmentCreator({
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { createAssignment, assignments } = useAssignments(classroomId);
-  const { hasPro, loading: proLoading } = useTeacherPro();
+  const { hasPro, status, loading: proLoading } = useTeacherPro();
   // Soft paywall: a free teacher at the per-class assignment cap gets the
   // upsell instead of the form. Pro lifts the cap; the entitlement must be
   // resolved first so we neither flash the gate at a paying teacher nor lock
@@ -173,6 +174,9 @@ export default function AssignmentCreator({
         language: classroomLanguage,
         createLesson,
         findNWordsLabel: (n) => t('teacher.assignment.findNWords', { count: n }),
+        // UI locale, not the class language. Plan is mapped inside
+        // createWordGoalAssignment so this path cannot stamp trial as pro.
+        funnel: { locale: language, hasPro, status, loading: proLoading },
       });
       setIsSubmitting(false);
       if (result.success && result.assigned) {
@@ -242,7 +246,7 @@ export default function AssignmentCreator({
       // FIRST assignment is a starter pack showed up as a funnel drop-off.
       captureTeacherOnboardingFunnel(TEACHER_ONBOARDING_FUNNEL_EVENTS.assignmentCreated, {
         locale: language,
-        plan: hasPro ? 'pro' : 'free',
+        plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
       });
       toast.success(t('teacher.assignment.created'));
       if (assignmentCount === 0) {

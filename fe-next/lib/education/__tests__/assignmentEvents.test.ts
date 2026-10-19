@@ -53,6 +53,20 @@ describe('assignment funnel events', () => {
     expect(captureMock.mock.calls[0][0]).toBe('assignment_created');
   });
 
+  it('forwards locale and plan when the publish path has an entitlement read', () => {
+    const props = assignmentCreatedProperties({
+      classroom_id: 'cls-1',
+      kind: 'lesson',
+      locale: 'he',
+      plan: 'trial',
+    });
+    expect(props.locale).toBe('he');
+    expect(props.plan).toBe('trial');
+    const bare = assignmentCreatedProperties({ classroom_id: 'cls-1', kind: 'lesson' });
+    expect(bare).not.toHaveProperty('locale');
+    expect(bare).not.toHaveProperty('plan');
+  });
+
   it('client module does not import posthog-node (webpack client graph)', () => {
     const src = readFileSync(path.join(process.cwd(), 'lib/education/assignmentEvents.ts'), 'utf8');
     expect(src).not.toMatch(/from ['"]@\/lib\/posthog['"]/);
