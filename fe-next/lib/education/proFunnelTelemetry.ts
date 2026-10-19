@@ -103,6 +103,19 @@ export function trackProUpgradeClicked(args: { feature: string }): void {
   safeCapture('pro_upgrade_clicked', { feature: args.feature, product: 'teacher_pro' });
 }
 
+/**
+ * A teacher inside their live access trial is USING a Pro surface (not locked out of it).
+ * Kept apart from `pro_gate_viewed` so "hit a locked feature" and "previewing Pro" never
+ * share a number; the pair view -> upgrade tap is the trial-preview conversion funnel.
+ */
+export function trackProTrialPreviewViewed(args: { feature: string; days_left: number }): void {
+  safeCapture('pro_trial_preview_viewed', { feature: args.feature, days_left: args.days_left, product: 'teacher_pro' });
+}
+
+export function trackProTrialPreviewUpgradeClicked(args: { feature: string; days_left: number }): void {
+  safeCapture('pro_trial_preview_upgrade_clicked', { feature: args.feature, days_left: args.days_left, product: 'teacher_pro' });
+}
+
 /** Persistent HQ trial strip — impression. Not mirrored: name is HQ-only. */
 export function trackTeacherTrialUpgradeCtaViewed(args: {
   trial_days_remaining: number;

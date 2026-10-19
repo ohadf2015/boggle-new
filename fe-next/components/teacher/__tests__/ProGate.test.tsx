@@ -11,6 +11,16 @@ vi.mock('@/hooks/useTeacherPro', () => ({
 let mockRecap: { games: number; students: number } | null = null;
 vi.mock('@/hooks/useTeacherTrialRecap', () => ({ useTeacherTrialRecap: () => mockRecap }));
 
+const mockGateViewed = vi.fn();
+const mockPreviewViewed = vi.fn();
+const mockPreviewUpgrade = vi.fn();
+vi.mock('@/lib/education/proFunnelTelemetry', () => ({
+  trackProGateViewed: (...a: unknown[]) => mockGateViewed(...a),
+  trackProUpgradeClicked: vi.fn(),
+  trackProTrialPreviewViewed: (...a: unknown[]) => mockPreviewViewed(...a),
+  trackProTrialPreviewUpgradeClicked: (...a: unknown[]) => mockPreviewUpgrade(...a),
+}));
+
 const mockStartCheckout = vi.fn();
 vi.mock('@/hooks/useTeacherProCheckout', () => ({
   useTeacherProCheckout: () => ({ pending: false, start: mockStartCheckout }),
@@ -36,6 +46,9 @@ describe('ProGate', () => {
     mockTrackGrowthEvent.mockClear();
     mockStartCheckout.mockClear();
     mockRecap = null;
+    mockGateViewed.mockClear();
+    mockPreviewViewed.mockClear();
+    mockPreviewUpgrade.mockClear();
   });
 
   it('renders the paid surface for a Pro teacher', () => {
@@ -73,6 +86,29 @@ describe('ProGate', () => {
       mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: inDays(5) });
       render(<ProGate feature="analytics"><div>paid surface</div></ProGate>);
       expect(screen.queryByTestId('trial-recap')).not.toBeInTheDocument();
+    });
+
+    it('counts a preview as a preview, never as a locked-feature hit, so the funnel stays readable', () => {
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: inDays(6) });
+      render(<ProGate feature="reports"><div>paid surface</div></ProGate>);
+      expect(mockPreviewViewed).toHaveBeenCalledWith({ feature: 'reports', days_left: 6 });
+      expect(mockGateViewed).not.toHaveBeenCalled();
+      expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith('iap_viewed', expect.anything());
+    });
+
+    it('tapping upgrade in the strip is recorded against the preview, then starts checkout', () => {
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: inDays(6) });
+      render(<ProGate feature="reports"><div>paid surface</div></ProGate>);
+      fireEvent.click(screen.getByTestId('pro-trial-preview-upgrade'));
+      expect(mockPreviewUpgrade).toHaveBeenCalledWith({ feature: 'reports', days_left: 6 });
+      expect(mockStartCheckout).toHaveBeenCalled();
+    });
+
+    it('a locked (non-trial) teacher still fires the original gate event', () => {
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: null });
+      render(<ProGate feature="reports"><div>paid surface</div></ProGate>);
+      expect(mockGateViewed).toHaveBeenCalledWith({ feature: 'reports' });
+      expect(mockPreviewViewed).not.toHaveBeenCalled();
     });
 
     it('locks again once the window has passed', () => {

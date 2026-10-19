@@ -11,6 +11,8 @@ import { TrialStripRecap } from '@/components/teacher/TrialStripRecap';
 import { ProFeaturePreview } from '@/components/teacher/pro/ProFeaturePreview';
 import {
   trackProGateViewed,
+  trackProTrialPreviewUpgradeClicked,
+  trackProTrialPreviewViewed,
   trackProUpgradeClicked,
   type ProUpgradeSource,
 } from '@/lib/education/proFunnelTelemetry';
@@ -85,11 +87,14 @@ export function ProGate({ feature, children, active = true }: ProGateProps) {
   const { pending, start } = useTeacherProCheckout(checkoutSource);
 
   useEffect(() => {
-    if (active && !loading && !hasPro) {
-      trackGrowthEvent('iap_viewed', { source: `pro_gate_${feature}` });
-      trackProGateViewed({ feature });
+    if (!active || loading || hasPro) return;
+    if (previewDaysLeft !== null) {
+      trackProTrialPreviewViewed({ feature, days_left: previewDaysLeft });
+      return;
     }
-  }, [active, loading, hasPro, feature]);
+    trackGrowthEvent('iap_viewed', { source: `pro_gate_${feature}` });
+    trackProGateViewed({ feature });
+  }, [active, loading, hasPro, feature, previewDaysLeft]);
 
   // Neither branch while the entitlement is unresolved: painting the surface then removing it
   // is the flash, painting the upsell tells a paying teacher they are not paying.
@@ -112,7 +117,7 @@ export function ProGate({ feature, children, active = true }: ProGateProps) {
             data-testid="pro-trial-preview-upgrade"
             disabled={pending}
             onClick={() => {
-              trackProUpgradeClicked({ feature });
+              trackProTrialPreviewUpgradeClicked({ feature, days_left: previewDaysLeft });
               void start();
             }}
             className="shrink-0 rounded-neo border-neo bg-neo-cyan px-4 py-2 text-sm font-black text-neo-navy shadow-hard-sm disabled:opacity-60"
