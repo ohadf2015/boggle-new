@@ -15,6 +15,12 @@ import {
   trackEduJoinCodeCopied,
   trackEduJoinCodeShown,
 } from "@/lib/education/telemetry";
+import {
+  captureTeacherOnboardingFunnel,
+  TEACHER_ONBOARDING_FUNNEL_EVENTS,
+  teacherFunnelPlan,
+} from "@/lib/education/teacherOnboardingFunnel";
+import { useTeacherPro } from "@/hooks/useTeacherPro";
 import { useClassRoster } from "./useClassRoster";
 import { RosterSeats } from "./RosterSeats";
 import { useHqJuice } from "./useHqJuice";
@@ -57,6 +63,7 @@ export function GetStudentsInCard({
 }: GetStudentsInCardProps) {
   const { t, language } = useLanguage();
   const { reduced, sfx } = useHqJuice();
+  const { hasPro, status, loading: proLoading } = useTeacherPro();
   const {
     students,
     arrivals,
@@ -111,9 +118,16 @@ export function GetStudentsInCard({
     if (rosterLoading) return;
     if (prevCount.current === 0 && count >= 1) {
       trackEduFirstStudentJoined({ classroomId: classroom.id });
+      // Onboarding-funnel step (teacher's own person; the server-side
+      // edu_student_joined is the STUDENT's). `unknown` plan beats dropping
+      // the event while the entitlement read is still in flight.
+      captureTeacherOnboardingFunnel(TEACHER_ONBOARDING_FUNNEL_EVENTS.studentJoined, {
+        locale: language,
+        plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
+      });
     }
     prevCount.current = count;
-  }, [rosterLoading, count, classroom.id]);
+  }, [rosterLoading, count, classroom.id, language, proLoading, hasPro, status]);
 
   const copyLink = useCallback(async () => {
     const url = classroomJoinUrl(

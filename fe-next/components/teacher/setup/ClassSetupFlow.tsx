@@ -12,6 +12,11 @@ import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgre
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { isFreePlanUsageBlocked } from '@/lib/education/teacherPlanGate';
 import { trackEduClassroomCreated } from '@/lib/education/telemetry';
+import {
+  captureTeacherOnboardingFunnel,
+  TEACHER_ONBOARDING_FUNNEL_EVENTS,
+  teacherFunnelPlan,
+} from '@/lib/education/teacherOnboardingFunnel';
 import type { Language } from '@/lib/supabase/education/types';
 import { cn } from '@/lib/utils';
 import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
@@ -34,7 +39,7 @@ export function ClassSetupFlow() {
   const t = rawT as T;
   const searchParams = useSearchParams();
   const { classrooms, createClassroom } = useClassrooms();
-  const { hasPro, loading: proLoading } = useTeacherPro();
+  const { hasPro, status, loading: proLoading } = useTeacherPro();
   const { trial, isLoading: accessLoading } = useTeacherAccess();
   const { markInviteCopied } = useTeacherActivationProgress();
 
@@ -70,6 +75,14 @@ export function ClassSetupFlow() {
     setBusy(false);
     if (result.success && result.data?.join_code) {
       trackEduClassroomCreated({ classroomId: result.data.id, createdVia: 'dashboard', language: result.data.language ?? classLanguage });
+      // Onboarding-funnel step: card-pinned name, locale + plan only.
+      // teacherFunnelPlan, not a hasPro ternary: trialing has hasPro true
+      // (proGrant) and must stay plan=trial. A submit before the entitlement
+      // read settles is unknown, not free.
+      captureTeacherOnboardingFunnel(TEACHER_ONBOARDING_FUNNEL_EVENTS.classroomCreated, {
+        locale: language,
+        plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
+      });
       setCreated({ id: result.data.id, name: result.data.name, join_code: result.data.join_code });
       return;
     }
@@ -79,7 +92,7 @@ export function ClassSetupFlow() {
     }
     setErrorKey('eduShell.setup.createFailed');
     toast.error(t('eduShell.setup.createFailed'));
-  }, [name, grade, t, classrooms, createClassroom, classLanguage, hasPro]);
+  }, [name, grade, t, language, classrooms, createClassroom, classLanguage, hasPro, status, proLoading]);
 
   const copy = useCallback(
     async (url: string) => {

@@ -14,6 +14,7 @@
  */
 import posthog from '@/lib/analytics/lazyPosthog';
 import logger from '@/utils/logger';
+import type { TeacherPlan } from './teacherOnboardingFunnel';
 
 export const ASSIGNMENT_CREATED = 'assignment_created';
 export const ASSIGNMENT_COMPLETED = 'assignment_completed';
@@ -25,6 +26,10 @@ export interface AssignmentCreatedProps {
   due_date?: string | null;
   word_count_target?: number | null;
   word_list_length?: number | null;
+  /** UI locale. The onboarding funnel slices assignment_created by this. */
+  locale?: string;
+  /** Entitlement slice. Omit only when the caller has no entitlement read. */
+  plan?: TeacherPlan;
 }
 
 export interface AssignmentCompletedProps {
@@ -42,6 +47,10 @@ export function assignmentCreatedProperties(args: AssignmentCreatedProps): Recor
     due_date: args.due_date ?? null,
     word_count_target: args.word_count_target ?? null,
     word_list_length: args.word_list_length ?? null,
+    // Funnel slices. Omitted when the caller has no read — a missing key is
+    // not plan=free, and a null would invent a fifth slice.
+    ...(args.locale !== undefined ? { locale: args.locale } : {}),
+    ...(args.plan !== undefined ? { plan: args.plan } : {}),
   };
 }
 

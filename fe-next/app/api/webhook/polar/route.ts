@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
-import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
+import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
 
 // Polar payloads are large; we only read a handful of fields.
@@ -61,6 +61,12 @@ function getUserId(p: WebhookPayload): string | undefined {
   const fromCustomer = p?.data?.customer?.external_id
   if (fromCustomer) return String(fromCustomer)
   return undefined
+}
+
+/** UI locale stamped at checkout (polar.ts metadata.locale) — undefined for pre-locale subscriptions. */
+function getLocale(p: WebhookPayload): string | undefined {
+  const fromMetadata = p?.data?.metadata?.locale
+  return typeof fromMetadata === 'string' && fromMetadata ? fromMetadata : undefined
 }
 
 /**
@@ -176,6 +182,7 @@ function trackProConversion(payload: WebhookPayload, userId?: string) {
     captureProFunnelServerEvent(buildProCheckoutSucceededEvent(userId, subId))
     captureProFunnelServerEvent(buildCheckoutCompleteEvent(userId, subId))
     captureProFunnelServerEvent(buildPaidEvent(userId, subId))
+    captureProFunnelServerEvent(buildTeacherProUpgradedEvent(userId, subId, getLocale(payload)))
     if (trialMarker(payload?.data).trial) {
       captureProFunnelServerEvent(buildTeacherTrialConvertedEvent(userId, subId))
     }
@@ -199,6 +206,7 @@ function trackProTrial(payload: WebhookPayload, userId?: string) {
     captureProFunnelServerEvent(buildTrialActivatedEvent(userId, subId))
     captureProFunnelServerEvent(buildTrialStartEvent(userId, subId))
     captureProFunnelServerEvent(buildTeacherTrialStartedEvent(userId, subId))
+    captureProFunnelServerEvent(buildTrialStartedEvent(userId, subId, getLocale(payload)))
   } catch (err) {
     console.error('[Polar] trial telemetry threw:', err)
   }

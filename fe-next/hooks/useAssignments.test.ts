@@ -9,6 +9,13 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { useAssignments } from './useAssignments';
 import * as assignmentsAPI from '@/lib/supabase/education/assignments';
 
+vi.mock('@/hooks/useTeacherPro', () => ({
+  useTeacherPro: () => ({ hasPro: false, status: 'active', loading: false }),
+}));
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ language: 'en', t: (k: string) => k }),
+}));
+
 // Mock the assignments API
 vi.mock('@/lib/supabase/education/assignments');
 

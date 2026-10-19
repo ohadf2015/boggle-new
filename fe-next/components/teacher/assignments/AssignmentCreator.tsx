@@ -38,6 +38,11 @@ import {
   trackEduTemplateAssigned,
   trackEduFirstAssignmentCreated,
 } from '@/lib/education/telemetry';
+import {
+  captureTeacherOnboardingFunnel,
+  TEACHER_ONBOARDING_FUNNEL_EVENTS,
+  teacherFunnelPlan,
+} from '@/lib/education/teacherOnboardingFunnel';
 import type { Language } from '@/lib/supabase/education/types';
 import { AssignmentGoalModes } from './AssignmentGoalModes';
 import { createWordGoalAssignment } from '@/lib/education/createWordGoalAssignment';
@@ -70,10 +75,10 @@ export default function AssignmentCreator({
   onClose,
   initialLessonId,
 }: AssignmentCreatorProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user } = useAuth();
   const { createAssignment, assignments } = useAssignments(classroomId);
-  const { hasPro, loading: proLoading } = useTeacherPro();
+  const { hasPro, status, loading: proLoading } = useTeacherPro();
   // Soft paywall: a free teacher at the per-class assignment cap gets the
   // upsell instead of the form. Pro lifts the cap; the entitlement must be
   // resolved first so we neither flash the gate at a paying teacher nor lock
@@ -169,6 +174,9 @@ export default function AssignmentCreator({
         language: classroomLanguage,
         createLesson,
         findNWordsLabel: (n) => t('teacher.assignment.findNWords', { count: n }),
+        // UI locale, not the class language. Plan is mapped inside
+        // createWordGoalAssignment so this path cannot stamp trial as pro.
+        funnel: { locale: language, hasPro, status, loading: proLoading },
       });
       setIsSubmitting(false);
       if (result.success && result.assigned) {
@@ -232,6 +240,14 @@ export default function AssignmentCreator({
     setIsSubmitting(false);
     if (result.success && result.assigned) {
       trackEduTemplateAssigned({ templateId: template.id, classroomId });
+      // The template gallery is the one publish path that never emitted
+      // `assignment_created` (lesson/word-goal paths fire it inside
+      // useAssignments/createWordGoalAssignment). Without it a teacher whose
+      // FIRST assignment is a starter pack showed up as a funnel drop-off.
+      captureTeacherOnboardingFunnel(TEACHER_ONBOARDING_FUNNEL_EVENTS.assignmentCreated, {
+        locale: language,
+        plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
+      });
       toast.success(t('teacher.assignment.created'));
       if (assignmentCount === 0) {
         trackEduFirstAssignmentCreated({ classroomId });

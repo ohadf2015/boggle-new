@@ -18,6 +18,8 @@ beforeEach(() => {
   mockCreateAssignment.mockResolvedValue({ data: { id: 'asg-1' }, error: null });
 });
 
+const FUNNEL = { locale: 'he', hasPro: true, status: 'trialing' as const, loading: false };
+
 describe('createWordGoalAssignment', () => {
   it('creates a lesson + assignment for a word-count goal and emits assignment_created', async () => {
     const createLesson = vi.fn().mockResolvedValue({ success: true, data: { id: 'les-1' } });
@@ -28,6 +30,7 @@ describe('createWordGoalAssignment', () => {
       language: 'en',
       createLesson,
       findNWordsLabel: (n) => `Find ${n} words`,
+      funnel: FUNNEL,
     });
     expect(result).toEqual({ success: true, assigned: true, assignmentId: 'asg-1' });
     expect(createLesson).toHaveBeenCalledWith(expect.objectContaining({
@@ -45,6 +48,8 @@ describe('createWordGoalAssignment', () => {
       assignment_id: 'asg-1',
       kind: 'word_count',
       word_count_target: 12,
+      locale: 'he',
+      plan: 'trial',
     }));
   });
 
@@ -57,6 +62,7 @@ describe('createWordGoalAssignment', () => {
       language: 'en',
       createLesson,
       findNWordsLabel: (n) => `Find ${n} words`,
+      funnel: { locale: 'en', hasPro: false, loading: true },
     });
     expect(createLesson.mock.calls[0][0].words.map((w: { word: string }) => w.word)).toEqual(['cat', 'dog', 'fish']);
     expect(mockCreateAssignment).toHaveBeenCalledWith(expect.objectContaining({
@@ -66,6 +72,8 @@ describe('createWordGoalAssignment', () => {
     expect(mockTrack).toHaveBeenCalledWith(expect.objectContaining({
       kind: 'word_list',
       word_list_length: 3,
+      locale: 'en',
+      plan: 'unknown',
     }));
   });
 
@@ -79,6 +87,7 @@ describe('createWordGoalAssignment', () => {
       language: 'en',
       createLesson,
       findNWordsLabel: (n) => `Find ${n} words`,
+      funnel: { locale: 'en', hasPro: false, loading: true },
     });
     expect(result.success).toBe(true);
     expect(result.assigned).toBe(false);

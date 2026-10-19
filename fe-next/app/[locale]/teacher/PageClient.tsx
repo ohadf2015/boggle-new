@@ -20,6 +20,10 @@ import { polarTrialUx, polarTrialDaysLeft, isPolarTrialDay10Expiring } from '@/l
 import { isTrialUpgradeNudgeWindow } from '@/lib/education/trial';
 import { useTrialUpgradeNudge } from '@/lib/education/useTrialUpgradeNudge';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import {
+  captureTeacherOnboardingViewedOnce,
+  teacherFunnelPlan,
+} from '@/lib/education/teacherOnboardingFunnel';
 
 // Access is settled by <TeacherGate> above: it owns the loading state and the
 // redirect for anyone without teacher access. This component previously
@@ -102,6 +106,16 @@ function TeacherDashboardInner() {
     banner !== 'pro' &&
     banner !== 'reactivate' &&
     banner !== 'offerTrial';
+
+  // First-view funnel step. Waits for the entitlement read so the plan stamped
+  // on the event is the real one, then fires at most once per browser.
+  useEffect(() => {
+    if (proLoading) return;
+    captureTeacherOnboardingViewedOnce({
+      locale: language,
+      plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
+    });
+  }, [proLoading, hasPro, status, language]);
 
   useEffect(() => {
     if (banner === 'pro' || banner === 'reactivate' || banner === 'trialing' || banner === 'offerTrial') {
