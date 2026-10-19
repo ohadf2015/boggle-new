@@ -178,6 +178,18 @@ export const FAQS = [
     q: '¿Cuándo termina la partida?',
     a: 'Cuando se acaba el temporizador de la ronda (unos 180 segundos en Clásico). No hay bolsa de fichas que vaciar ni restar puntos del atril. El marcador se congela y puedes repetir o cambiar de modo.',
   },
+  {
+    q: '¿Puedo desafiar una palabra colocada por otro jugador?',
+    a: 'No hay desafío ni árbitro. Cada palabra se comprueba al instante contra el mismo diccionario español, también si la juega un bot. Si está, cuenta para quien la envió. Si no está, 0 puntos. En Locura de Letras la computadora tampoco se puede desafiar; aquí la regla es la misma para humanos y bots.',
+  },
+  {
+    q: '¿Cómo se reparten las letras?',
+    a: 'No se reparten. En el Scrabble de tablero cada quien recibe 7 fichas al azar de una bolsa de 100. En LexiClash no hay bolsa ni atril: la sala comparte una cuadrícula y todos buscan a la vez. Si el tablero no te gusta, la ronda dura unos 180 segundos y la siguiente trae otra rejilla.',
+  },
+  {
+    q: '¿Puedo ver las letras del rival?',
+    a: 'No hay atril que esconder ni que espiar. Todo el mundo ve la misma cuadrícula y el marcador en vivo. No ves las palabras que el otro aún no ha enviado. En el Scrabble de club el atril del rival está tapado; aquí no existe ese atril.',
+  },
 ];
 
 /** Classic-mode length scoring (also documented on /es/rules). */
@@ -241,6 +253,52 @@ export const SPANISH_TILES: { tile: string; scrabble: string; lexiclash: string 
   { tile: 'RR', scrabble: '8 pts · 1 ficha', lexiclash: 'No es ficha; R y R van aparte' },
   { tile: 'Z', scrabble: '10 pts · 1 ficha', lexiclash: 'Letra normal; paga la longitud' },
   { tile: 'Q / J / X', scrabble: '5 / 8 / 8 pts', lexiclash: 'Igual que una A: cuenta la palabra' },
+];
+
+/**
+ * Public Spanish Scrabble bag (edición castellana fuera de Norteamérica, 100 fichas).
+ * Not LexiClash's rack — we do not deal tiles. Counts sum to 100 including 2 blanks.
+ */
+export const SPANISH_BAG: { tile: string; count: number; points: number }[] = [
+  { tile: 'A', count: 12, points: 1 },
+  { tile: 'E', count: 12, points: 1 },
+  { tile: 'O', count: 9, points: 1 },
+  { tile: 'I', count: 6, points: 1 },
+  { tile: 'S', count: 6, points: 1 },
+  { tile: 'N', count: 5, points: 1 },
+  { tile: 'R', count: 5, points: 1 },
+  { tile: 'U', count: 5, points: 1 },
+  { tile: 'L', count: 4, points: 1 },
+  { tile: 'T', count: 4, points: 1 },
+  { tile: 'D', count: 5, points: 2 },
+  { tile: 'G', count: 2, points: 2 },
+  { tile: 'C', count: 4, points: 3 },
+  { tile: 'B', count: 2, points: 3 },
+  { tile: 'M', count: 2, points: 3 },
+  { tile: 'P', count: 2, points: 3 },
+  { tile: 'H', count: 2, points: 4 },
+  { tile: 'F', count: 1, points: 4 },
+  { tile: 'V', count: 1, points: 4 },
+  { tile: 'Y', count: 1, points: 4 },
+  { tile: 'CH', count: 1, points: 5 },
+  { tile: 'Q', count: 1, points: 5 },
+  { tile: 'J', count: 1, points: 8 },
+  { tile: 'LL', count: 1, points: 8 },
+  { tile: 'Ñ', count: 1, points: 8 },
+  { tile: 'RR', count: 1, points: 8 },
+  { tile: 'X', count: 1, points: 8 },
+  { tile: 'Z', count: 1, points: 10 },
+  { tile: 'Comodín', count: 2, points: 0 },
+];
+
+export const SPANISH_BAG_TOTAL = SPANISH_BAG.reduce((n, row) => n + row.count, 0);
+
+/** Classic 15×15 bonus squares. LexiClash does not use them (simultaneous grid). */
+export const BONUS_SQUARES: { name: string; mark: string; effect: string }[] = [
+  { name: 'Doble letra', mark: 'DL', effect: 'La ficha sobre esa casilla vale el doble al sumar la palabra.' },
+  { name: 'Triple letra', mark: 'TL', effect: 'La ficha vale el triple. La Ñ o la Z aquí cambian la partida.' },
+  { name: 'Doble palabra', mark: 'DP', effect: 'Toda la palabra (con sus dobles y triples de letra) se duplica.' },
+  { name: 'Triple palabra', mark: 'TP', effect: 'Toda la palabra se triplica. La estrella central de la apertura es doble palabra.' },
 ];
 
 export const CONTROLS = [
