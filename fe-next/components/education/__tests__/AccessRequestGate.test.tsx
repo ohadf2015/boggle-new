@@ -33,6 +33,27 @@ describe('<AccessRequestGate>', () => {
     mockTrackGrowthEvent.mockClear();
   });
 
+  it('re-checks verification when the teacher returns to the tab after confirming', () => {
+    const reload = vi.fn();
+    const original = window.location;
+    Object.defineProperty(window, 'location', { configurable: true, value: { ...original, reload } });
+    mockAuth = { user: { email: 'jane@school.edu', email_confirmed_at: null }, loading: false };
+    render(<AccessRequestGate />);
+    window.dispatchEvent(new Event('focus'));
+    expect(reload).toHaveBeenCalledTimes(1);
+    Object.defineProperty(window, 'location', { configurable: true, value: original });
+  });
+
+  it('does not reload on focus when nothing is waiting on email', () => {
+    const reload = vi.fn();
+    const original = window.location;
+    Object.defineProperty(window, 'location', { configurable: true, value: { ...original, reload } });
+    render(<AccessRequestGate />);
+    window.dispatchEvent(new Event('focus'));
+    expect(reload).not.toHaveBeenCalled();
+    Object.defineProperty(window, 'location', { configurable: true, value: original });
+  });
+
   it('prompts unauthenticated visitors to sign up instead of showing the form', () => {
     render(<AccessRequestGate />);
     expect(screen.getByText('education.access.auth_required_title')).toBeInTheDocument();

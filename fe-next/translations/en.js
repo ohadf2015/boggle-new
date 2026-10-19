@@ -13405,6 +13405,8 @@ const en = {
         "title": "Calm mode for anxious students",
         "body": "Pro hands you the pressure dials: hide the leaderboard until the end, soften or switch off the timer, and score accuracy instead of speed. The same game runs as a hyped game-show or a calm mastery check."
       },
+      "trialPreview": "Pro preview: this page is open for {{days}} more days. After that it needs Pro.",
+      "trialPreviewCta": "Keep it with Pro",
       "cta": "Unlock this with Pro: {{price}}/month"
     },
     "digest": {
@@ -14031,6 +14033,8 @@ const en = {
       "moreWaysToReteach": "More ways to reteach these words",
       "fullReport": "Full report",
       "unlockReport": "Unlock full report, {{price}}/mo",
+      "unlockReportMissed": "See who missed these {{count}} words, {{price}}/mo",
+      "unlockReportTrial": "Try Pro free for {{days}} days: see who missed what",
       "neverPlaced": "Never appeared on the board",
       "neverPlacedHint": "The board could not fit these, so the class never saw them. Run a rematch to give them another chance.",
       "needsHelp": {
@@ -15445,6 +15449,8 @@ const en = {
       "hour_left": "hour left",
       "cta": "Start your first class",
       "expired_title": "Your teacher trial has ended",
+      "expired_kept": "Your classes and word lists stay free. Reports, word mastery and calm mode need Pro.",
+      "recap": "In your trial you ran {{games}} games for {{students}} students.",
       "expired_body": "Your free trial window is over. Reapply or reach out to keep classroom mode.",
       "renew_cta": "Renew teacher access"
     },

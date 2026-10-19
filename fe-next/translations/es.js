@@ -14111,6 +14111,8 @@ const es = {
         "title": "Modo tranquilo para alumnos con ansiedad",
         "body": "Pro pone los diales de presión en tus manos: oculta la clasificación hasta el final, suaviza o apaga el temporizador y puntúa la precisión en lugar de la velocidad. El mismo juego puede ser un concurso trepidante o una comprobación de dominio tranquila."
       },
+      "trialPreview": "Vista previa de Pro: esta página está abierta {{days}} días más. Después requiere Pro.",
+      "trialPreviewCta": "Quedarme con Pro",
       "cta": "Desbloquéalo con Pro: {{price}}/mes"
     },
     "digest": {
@@ -15527,6 +15529,8 @@ const es = {
       "moreWaysToReteach": "Más formas de repasar estas palabras",
       "fullReport": "Informe completo",
       "unlockReport": "Desbloquear informe completo por {{price}}/mes",
+      "unlockReportMissed": "Mira quién falló estas {{count}} palabras por {{price}}/mes",
+      "unlockReportTrial": "Prueba Pro gratis {{days}} días: mira quién falló qué",
       "neverPlaced": "Nunca aparecieron en el tablero",
       "neverPlacedHint": "No cabían en el tablero: la clase nunca las vio. Juega una revancha para darles otra oportunidad.",
       "needsHelp": {
@@ -16941,6 +16945,8 @@ const es = {
       "hour_left": "hora restante",
       "cta": "Crea tu primera clase",
       "expired_title": "Tu prueba de profesor ha terminado",
+      "expired_kept": "Tus clases y listas de palabras siguen gratis. Los informes, el dominio de palabras y el modo calmado requieren Pro.",
+      "recap": "En tu prueba hiciste {{games}} juegos para {{students}} estudiantes.",
       "expired_body": "Tu periodo de prueba gratis ha terminado. Vuelve a solicitarlo o escríbenos para conservar el modo aula.",
       "renew_cta": "Renovar acceso de profesor"
     },

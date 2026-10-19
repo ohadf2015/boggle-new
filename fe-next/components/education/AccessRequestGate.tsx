@@ -59,6 +59,14 @@ export function AccessRequestGate() {
     }
   }, [gateState]);
 
+  // The teacher confirms in their mail tab, then comes back to a stale wall.
+  useEffect(() => {
+    if (gateState !== 'verify_email') return;
+    const recheck = () => window.location.reload();
+    window.addEventListener('focus', recheck, { once: true });
+    return () => window.removeEventListener('focus', recheck);
+  }, [gateState]);
+
   // Wait for auth to resolve before choosing a branch — rendering the sign-up
   // prompt optimistically would flash it for already-authed users on reload.
   if (loading) {

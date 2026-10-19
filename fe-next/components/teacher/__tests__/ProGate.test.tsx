@@ -46,6 +46,44 @@ describe('ProGate', () => {
     expect(screen.queryByTestId('pro-gate-upgrade-analytics')).not.toBeInTheDocument();
   });
 
+  describe('during a live access trial', () => {
+    const inDays = (d: number) => new Date(Date.now() + d * 86_400_000).toISOString();
+
+    it.each(['analytics', 'reports'] as const)('lets a free teacher use the real %s surface, with a days-left Pro strip', (feature) => {
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: inDays(9) });
+      render(<ProGate feature={feature}><div>paid surface</div></ProGate>);
+      expect(screen.getByText('paid surface')).toBeInTheDocument();
+      expect(screen.getByTestId('pro-trial-preview')).toBeInTheDocument();
+      expect(screen.queryByTestId(`pro-gate-upgrade-${feature}`)).not.toBeInTheDocument();
+    });
+
+    it('keeps the server-enforced features locked', () => {
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: inDays(9) });
+      render(<ProGate feature="mastery"><div>paid surface</div></ProGate>);
+      expect(screen.queryByText('paid surface')).not.toBeInTheDocument();
+      expect(screen.getByTestId('pro-gate-upgrade-mastery')).toBeInTheDocument();
+    });
+
+    it('locks again once the window has passed', () => {
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: inDays(-1) });
+      render(<ProGate feature="analytics"><div>paid surface</div></ProGate>);
+      expect(screen.queryByText('paid surface')).not.toBeInTheDocument();
+    });
+
+    it('a Pro teacher gets the surface with no trial strip', () => {
+      mockUseTeacherPro.mockReturnValue({ hasPro: true, loading: false, accessTrialExpires: inDays(9) });
+      render(<ProGate feature="analytics"><div>paid surface</div></ProGate>);
+      expect(screen.queryByTestId('pro-trial-preview')).not.toBeInTheDocument();
+    });
+
+    it('the strip upgrade button starts checkout', () => {
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: inDays(3) });
+      render(<ProGate feature="analytics"><div>paid surface</div></ProGate>);
+      fireEvent.click(screen.getByTestId('pro-trial-preview-upgrade'));
+      expect(mockStartCheckout).toHaveBeenCalled();
+    });
+  });
+
   it('replaces the surface with an upsell for a free teacher', () => {
     mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false });
     render(

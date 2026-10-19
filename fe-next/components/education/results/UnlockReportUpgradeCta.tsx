@@ -20,6 +20,7 @@ import { BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { TEACHER_PRO_TRIAL_DAYS } from '@/lib/education/pro/trialDays';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
 import { trackResultsAction, type ResultsSurface } from './trackResultsAction';
@@ -48,6 +49,8 @@ export interface UnlockReportUpgradeCtaProps {
    * tracking, same entitlement gate.
    */
   tone?: 'default' | 'quiet';
+  /** Words the class missed this round: names the thing the report would show. */
+  missedCount?: number;
 }
 
 export function UnlockReportUpgradeCta({
@@ -55,8 +58,11 @@ export function UnlockReportUpgradeCta({
   t,
   surface = 'teacher_card',
   tone = 'default',
+  missedCount = 0,
 }: UnlockReportUpgradeCtaProps) {
-  const { hasPro, loading } = useTeacherPro();
+  const { hasPro, loading, known, trialUsed } = useTeacherPro();
+  // Only a successful status read proves "never trialed"; a failed read must not promise a free trial.
+  const offerTrial = known && !trialUsed;
   const show = shouldShowUnlockReportUpgradeCta(hasPro, loading);
 
   useEffect(() => {
@@ -96,7 +102,11 @@ export function UnlockReportUpgradeCta({
       )}
     >
       <BarChart3 className={tone === 'quiet' ? 'w-3.5 h-3.5 shrink-0' : 'w-4 h-4 shrink-0'} aria-hidden />
-      {t('education.results.unlockReport', { price: `$${TEACHER_PRO_PRICE_USD}` })}
+      {offerTrial
+        ? t('education.results.unlockReportTrial', { days: TEACHER_PRO_TRIAL_DAYS })
+        : missedCount > 0
+        ? t('education.results.unlockReportMissed', { count: missedCount, price: `$${TEACHER_PRO_PRICE_USD}` })
+        : t('education.results.unlockReport', { price: `$${TEACHER_PRO_PRICE_USD}` })}
     </Link>
   );
 }

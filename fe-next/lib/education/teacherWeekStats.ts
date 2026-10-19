@@ -18,6 +18,8 @@ export interface TeacherActivityRow {
 
 export interface TeacherWeekSummary {
   gamesPlayed: number;
+  /** Distinct games in the whole activity window; the trial recap's "what you ran". */
+  gamesLast30d: number;
   totalStudents: number;
   activeClasses: number;
   /** Most recent live game per class within the activity window. */
@@ -31,10 +33,12 @@ export function summarizeTeacherWeek(
 ): TeacherWeekSummary {
   const weekStart = nowMs - WEEK_DAYS * DAY_MS;
   const games = new Set<string>();
+  const allGames = new Set<string>();
   const active = new Set<string>();
   const lastPlayedAt: Record<string, string> = {};
   for (const row of rows) {
     if (!row.game_code) continue;
+    allGames.add(`${row.classroom_id}:${row.game_code}`);
     const prev = lastPlayedAt[row.classroom_id];
     if (!prev || row.completed_at > prev) lastPlayedAt[row.classroom_id] = row.completed_at;
     if (Date.parse(row.completed_at) >= weekStart) {
@@ -44,6 +48,7 @@ export function summarizeTeacherWeek(
   }
   return {
     gamesPlayed: games.size,
+    gamesLast30d: allGames.size,
     totalStudents: classrooms.reduce((n, c) => n + (c.member_count ?? 0), 0),
     activeClasses: active.size,
     lastPlayedAt,

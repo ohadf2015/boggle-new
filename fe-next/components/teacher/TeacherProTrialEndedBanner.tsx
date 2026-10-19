@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherProCheckoutButton } from '@/components/teacher/TeacherProCheckoutButton';
+import { TrialRecapLine, type TrialRecap } from '@/components/education/TrialRecapLine';
 import { trackTrialExpiredShown } from '@/lib/education/proFunnelTelemetry';
 
 /**
@@ -11,7 +12,7 @@ import { trackTrialExpiredShown } from '@/lib/education/proFunnelTelemetry';
  * /api/subscription/checkout till. Not another free trial, and not the
  * access-trial `TrialUrgencyBanner`. Dismiss is a week-long "not now".
  */
-export function TeacherProTrialEndedBanner({ onDismiss }: { onDismiss?: () => void }) {
+export function TeacherProTrialEndedBanner({ onDismiss, recap }: { onDismiss?: () => void; recap?: TrialRecap | null }) {
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -35,6 +36,7 @@ export function TeacherProTrialEndedBanner({ onDismiss }: { onDismiss?: () => vo
           <p className="mt-0.5 font-neo-body text-xs font-bold text-black/80">
             {t('teacher.subscription.trialEndedBody')}
           </p>
+          <TrialRecapLine recap={recap} className="mt-0.5 font-neo-body text-xs font-black text-black" />
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <TeacherProCheckoutButton

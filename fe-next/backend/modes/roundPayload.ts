@@ -80,6 +80,9 @@ export function buildRoundPayload(gameCode: string, game: GameState, opts: Round
     Object.assign(payload, quizShellStartFor(gameCode));
   }
 
+  // Classroom extras (accessibility, team rosters, boss) stashed at round start: a
+  // student who rejoins mid-round must get the same room, not a default one.
+  if (resume && game.classroomRoundExtras) Object.assign(payload, game.classroomRoundExtras);
   if (extras) Object.assign(payload, extras);
   return payload;
 }

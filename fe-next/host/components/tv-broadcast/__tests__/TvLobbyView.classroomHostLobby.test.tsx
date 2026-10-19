@@ -72,8 +72,12 @@ vi.mock('../TvJoinBar', () => ({
 // what the roster is handed, not on how the roster renders it (PlayerRoster's own
 // ready rendering is covered by PlayerRoster.ready.test.tsx).
 vi.mock('../../pre-game/PlayerRoster', () => ({
-  PlayerRoster: ({ readyUsernames = [] }: { readyUsernames?: string[] }) => (
-    <div data-testid="player-roster" data-ready={readyUsernames.join(',')} />
+  PlayerRoster: ({ readyUsernames = [], players = [] }: { readyUsernames?: string[]; players?: Array<string | { username: string }> }) => (
+    <div
+      data-testid="player-roster"
+      data-ready={readyUsernames.join(',')}
+      data-players={players.map((p) => (typeof p === 'string' ? p : p.username)).join(',')}
+    />
   ),
 }));
 
@@ -134,6 +138,18 @@ describe('TvLobbyView — ready count reaches the host', () => {
     render(<TvLobbyView {...baseProps} readyUsernames={[]} />);
 
     expect(screen.getByTestId('player-roster')).toHaveAttribute('data-ready', '');
+  });
+});
+
+describe('TvLobbyView — a dropped phone is not a student in the room', () => {
+  it('leaves students whose socket is in the reconnect grace out of the roster', () => {
+    const mixed = [
+      { username: 'Ada', isHost: false },
+      { username: 'Bo', isHost: false, disconnected: true },
+    ];
+    render(<TvLobbyView {...baseProps} playersReady={mixed} readyUsernames={[]} />);
+
+    expect(screen.getByTestId('player-roster')).toHaveAttribute('data-players', 'Ada');
   });
 });
 

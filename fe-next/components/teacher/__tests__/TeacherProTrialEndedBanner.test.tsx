@@ -40,6 +40,13 @@ describe('TeacherProTrialEndedBanner', () => {
     expect(trackTrialExpiredShown).toHaveBeenCalledWith({ source: 'dashboard_trial_ended' });
   });
 
+  it('recaps real games when the teacher ran some, and stays quiet when they did not', () => {
+    const { rerender } = render(<TeacherProTrialEndedBanner recap={{ games: 4, students: 30 }} />);
+    expect(screen.getByTestId('trial-recap')).toHaveTextContent('education.trial.recap');
+    rerender(<TeacherProTrialEndedBanner recap={{ games: 0, students: 30 }} />);
+    expect(screen.queryByTestId('trial-recap')).not.toBeInTheDocument();
+  });
+
   it('POSTs paid Polar checkout (not another trial) from the Reactivate CTA', async () => {
     postTeacherProCheckout.mockResolvedValue({ ok: true, url: 'https://polar.sh/c/reactivate' });
     render(<TeacherProTrialEndedBanner />);

@@ -50,6 +50,11 @@ const HOST_RECONNECTION_GRACE_PERIOD = parseInt(process.env.HOST_RECONNECTION_GR
 // the same release would contaminate the very signal we're adding. Env-overridable.
 const PLAYER_RECONNECTION_GRACE_PERIOD = parseInt(process.env.PLAYER_RECONNECTION_GRACE_PERIOD || '120000');
 
+// Classroom rooms get their own, longer seat hold: a student's locked phone or a switch to
+// the camera app drops the socket for minutes, and 2 min loses their whole round. A separate
+// cohort, so the multiplayer baseline above stays clean.
+const CLASSROOM_PLAYER_RECONNECTION_GRACE_PERIOD = parseInt(process.env.CLASSROOM_PLAYER_RECONNECTION_GRACE_PERIOD || '600000');
+
 // Extended GameUser type with reconnection timeout
 interface GameUserWithTimeout extends GameUser {
   reconnectionTimeout?: ReturnType<typeof setTimeout>;
@@ -380,6 +385,7 @@ function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCod
     }
 
     // Start player reconnection grace period
+    const playerGraceMs = game.isClassroom ? CLASSROOM_PLAYER_RECONNECTION_GRACE_PERIOD : PLAYER_RECONNECTION_GRACE_PERIOD;
     timerManager.setTimeout(`reconnect:${gameCode}:${username}`, () => {
       try {
         const currentGame = getGame(gameCode);
@@ -436,9 +442,9 @@ function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCod
         const err = error as Error;
         logger.error('SOCKET', `Error in player reconnection timeout for ${username} in ${gameCode}: ${err.message}`);
       }
-    }, PLAYER_RECONNECTION_GRACE_PERIOD);
+    }, playerGraceMs);
 
-    logger.debug('SOCKET', `Started ${PLAYER_RECONNECTION_GRACE_PERIOD}ms reconnection timer for ${username} in game ${gameCode}`);
+    logger.debug('SOCKET', `Started ${playerGraceMs}ms reconnection timer for ${username} in game ${gameCode}`);
   }
 }
 

@@ -41,6 +41,7 @@ vi.mock('react-hot-toast', () => ({ default: mockToast }));
 vi.mock('../joinTarget', () => ({ resolveJoinTarget: mockResolve }));
 vi.mock('@/utils/profileStorage', () => ({
   setStoredUsername: (...args: unknown[]) => mockSetStoredUsername(...args),
+  getStoredUsername: () => null,
 }));
 
 import JoinFlow from '../JoinFlow';

@@ -24,6 +24,18 @@ describe('summarizeTeacherWeek', () => {
     expect(s.totalStudents).toBe(54);
   });
 
+  it('Given games older than a week, Then gamesLast30d still counts every distinct game in the window', () => {
+    const rows = [
+      { classroom_id: 'a', completed_at: daysAgo(1), game_code: 'K7Q2' },
+      { classroom_id: 'a', completed_at: daysAgo(1), game_code: 'K7Q2' },
+      { classroom_id: 'a', completed_at: daysAgo(20), game_code: 'OLD1' },
+      { classroom_id: 'b', completed_at: daysAgo(25), game_code: 'OLD1' },
+    ];
+    const s = summarizeTeacherWeek(rows, classrooms, NOW);
+    expect(s.gamesPlayed).toBe(1);
+    expect(s.gamesLast30d).toBe(3);
+  });
+
   it('Given a rematch that reuses a room code in two classes, Then each class-and-code pair is its own game', () => {
     const rows = [
       { classroom_id: 'a', completed_at: daysAgo(1), game_code: 'SAME' },
@@ -45,6 +57,7 @@ describe('summarizeTeacherWeek', () => {
   it('Given no games at all, Then the week is zeros, not missing', () => {
     expect(summarizeTeacherWeek([], classrooms, NOW)).toEqual({
       gamesPlayed: 0,
+      gamesLast30d: 0,
       totalStudents: 54,
       activeClasses: 0,
       lastPlayedAt: {},

@@ -119,6 +119,12 @@ export interface GameState {
    * non-classroom rooms: presence is the signal.
    */
   classroomPressure?: import('@/shared/types/classroom').ResolvedClassroomPressure;
+  /**
+   * Classroom start extras (accessibility, live context, boss) stashed at round start so
+   * reconnect / late-join / recovery payloads replay them. Reset every round; absent
+   * on non-classroom rooms.
+   */
+  classroomRoundExtras?: Record<string, unknown>;
   allowLateJoin: boolean;
   aiApprovedWords: AiApprovedWord[];
   peerValidationWord: AiApprovedWord | null;

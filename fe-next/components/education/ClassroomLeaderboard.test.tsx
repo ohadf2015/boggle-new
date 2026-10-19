@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import ClassroomLeaderboard from './ClassroomLeaderboard';
 import * as useClassroomLeaderboardHook from '@/hooks/useClassroomLeaderboard';
 import { LanguageProvider } from '@/contexts/LanguageContext';
@@ -116,6 +116,17 @@ const renderWithLanguage = (ui: React.ReactElement, language: 'en' | 'he' | 'sv'
     </LanguageProvider>
   );
 };
+
+describe('ClassroomLeaderboard — a failed load is not a missing leaderboard', () => {
+  it('says so, with a retry, instead of rendering nothing', () => {
+    const refresh = vi.fn();
+    mockUseClassroomLeaderboard.mockReturnValue(defaultMock({ error: new Error('boom'), refresh }));
+    renderWithLanguage(<ClassroomLeaderboard classroomId="c1" currentUserId="u1" />);
+    expect(screen.getByTestId('leaderboard-error')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button'));
+    expect(refresh).toHaveBeenCalled();
+  });
+});
 
 describe('ClassroomLeaderboard', () => {
   const mockClassroomId = 'classroom-123';

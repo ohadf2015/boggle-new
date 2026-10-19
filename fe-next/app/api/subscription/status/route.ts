@@ -30,12 +30,37 @@ async function hasPolarTrialEvent(userId: string): Promise<boolean> {
 }
 
 /**
+ * End of the teacher's live ACCESS trial (the 14-day window stamped on approval), or null.
+ * Not the Polar trial: this one carries no card and no Pro entitlement, it only lets the
+ * client show a free teacher what Pro does while the window is open. Fail closed to null.
+ */
+async function liveAccessTrialExpiry(userId: string): Promise<string | null> {
+  try {
+    const admin = createAdminClient();
+    if (!admin) return null;
+    const { data, error } = await admin
+      .from('teacher_access_requests')
+      .select('trial_expires_at')
+      .eq('user_id', userId)
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const end = (data as { trial_expires_at?: string | null } | null)?.trial_expires_at;
+    if (error || !end || Date.parse(end) <= Date.now()) return null;
+    return end;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * GET /api/subscription/status
  * Get the current subscription status and portal URL for the authenticated teacher
  *
  * Response:
  * - 200: { has_pro, tier, status, source, grant_expired, portal_url, current_period_end,
- *          cancel_at_period_end, trial_expires, trial_used,
+ *          cancel_at_period_end, trial_expires, trial_used, access_trial_expires,
  *          grant: { id, expires_at, days, note, welcomed } | null }
  *   trial_expires is the ISO trial end while status is trialing, else null.
  *   trial_used is true once a Polar trial has started (no second free trial).
@@ -93,6 +118,7 @@ export async function GET(request: NextRequest) {
       subscription.source !== 'admin_grant'
     );
     const trialUsed = onPolarTrial || await hasPolarTrialEvent(user.id);
+    const accessTrialExpires = subscription.has_pro ? null : await liveAccessTrialExpiry(user.id);
 
     return NextResponse.json({
       has_pro: subscription.has_pro,
@@ -105,6 +131,7 @@ export async function GET(request: NextRequest) {
       cancel_at_period_end: subscription.cancel_at_period_end,
       trial_expires: trialExpires,
       trial_used: trialUsed,
+      access_trial_expires: accessTrialExpires,
       grant,
     });
   } catch (err) {

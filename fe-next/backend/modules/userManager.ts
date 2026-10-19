@@ -66,6 +66,8 @@ export interface GameUserInfo {
   lastActivityAt?: number;
   isBot?: boolean;
   botDifficulty?: string | null;
+  /** Socket dropped; seat held for the reconnect grace. */
+  disconnected?: boolean;
 }
 
 export interface AuthContext {
@@ -388,6 +390,7 @@ export function getGameUsers(game: GameBase | null): GameUserInfo[] {
       // Include bot information
       isBot: data.isBot || false,
       botDifficulty: data.botDifficulty || null,
+      disconnected: data.disconnected === true,
     }));
 }
 

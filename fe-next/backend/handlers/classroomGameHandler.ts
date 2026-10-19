@@ -30,6 +30,7 @@ import { registerClassroomRecoveryHandlers } from './classroomGameRecovery.js';
 import { registerClassroomGameEndHandlers } from './classroomGameEndHandler.js';
 import { registerClassroomGameModeHandlers } from './classroomGameModeHandler.js';
 import { getAuthUserId } from './classroomSocketAuth.js';
+import { markTeacherLiveStarted } from '../modules/supabase/teacherActivation.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload, gameCodeSchema, usernameSchema } from '../utils/socketValidation.js';
 import type { PracticeFocusSetting } from '@/lib/education/vocabFocus';
@@ -146,6 +147,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
 
       // Create the game in Redis
       await createClassroomGame(gameData);
+      void markTeacherLiveStarted(payload.teacherId);
 
       // Join classroom room for notifications and game room for live lobby roster
       socket.join(`classroom:${payload.classroomId}`);

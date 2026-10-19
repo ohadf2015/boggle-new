@@ -25,6 +25,8 @@ export interface TeacherProState {
   periodEnd: string | null;
   /** ISO Polar trial end while status is trialing, else null. */
   trialExpires: string | null;
+  /** ISO end of the live ACCESS trial (no card, no Pro entitlement), else null. */
+  accessTrialExpires: string | null;
   /** A Polar trial was started. Hides the free-trial CTA after it ends. */
   trialUsed: boolean;
   /** True only after a successful status read. A failure must not look like "never trialed". */
@@ -40,7 +42,7 @@ export interface TeacherProState {
 }
 
 const FREE: Omit<TeacherProState, 'loading' | 'refresh'> = {
-  hasPro: false, source: 'polar', status: 'active', periodEnd: null, trialExpires: null, trialUsed: false, known: false, grant: null, grantExpired: false, portalUrl: null,
+  hasPro: false, source: 'polar', status: 'active', periodEnd: null, trialExpires: null, accessTrialExpires: null, trialUsed: false, known: false, grant: null, grantExpired: false, portalUrl: null,
 };
 
 // The dashboard mounts several consumers at once (plan badge, ProGate, the
@@ -95,6 +97,7 @@ export function useTeacherPro(): TeacherProState {
         status,
         periodEnd: (data?.current_period_end as string | null) ?? null,
         trialExpires: typeof data?.trial_expires === 'string' ? data.trial_expires : null,
+        accessTrialExpires: typeof data?.access_trial_expires === 'string' ? data.access_trial_expires : null,
         trialUsed: data?.trial_used === true || status === 'trialing',
         known: true,
         grant: (data?.grant as TeacherProGrant | null) ?? null,

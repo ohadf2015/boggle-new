@@ -227,6 +227,25 @@ describe('connectionHandler', () => {
       expect(mockRemoveUserFromGame).toHaveBeenCalledWith('GAME1', 'Player1');
     });
 
+    it('holds a classroom student\'s seat past the 2-minute multiplayer grace (a sleeping phone is not a leaver)', () => {
+      const game = { ...makeGame(), isClassroom: true };
+      const { socket, handlers } = createMockSocket('socket-p1');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Player1');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+
+      handlers['disconnect']('transport close');
+
+      vi.advanceTimersByTime(120000);
+      expect(mockRemoveUserFromGame).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(8 * 60 * 1000);
+      expect(mockRemoveUserFromGame).toHaveBeenCalledWith('GAME1', 'Player1');
+    });
+
     it('does not remove player if they reconnected before timeout', () => {
       const game = makeGame();
       const { socket, handlers } = createMockSocket('socket-p1');

@@ -58,6 +58,37 @@ describe('UnlockReportUpgradeCta', () => {
     expect(cta.textContent).toContain('$9');
   });
 
+  it('offers the free trial, not a price, when this teacher has not used one yet', () => {
+    useTeacherPro.mockReturnValue({ hasPro: false, loading: false, known: true, trialUsed: false } as never);
+    render(<UnlockReportUpgradeCta language="en" t={t} missedCount={7} />);
+    const cta = screen.getByTestId('unlock-report-upgrade-cta');
+    expect(cta.textContent).toContain('education.results.unlockReportTrial');
+    expect(cta.textContent).not.toContain('$9');
+  });
+
+  it('shows the price once the trial is used, or when the status read failed (unknown is not "never trialed")', () => {
+    useTeacherPro.mockReturnValue({ hasPro: false, loading: false, known: true, trialUsed: true } as never);
+    const { unmount } = render(<UnlockReportUpgradeCta language="en" t={t} missedCount={7} />);
+    expect(screen.getByTestId('unlock-report-upgrade-cta').textContent).toContain('unlockReportMissed');
+    unmount();
+    useTeacherPro.mockReturnValue({ hasPro: false, loading: false, known: false, trialUsed: false } as never);
+    render(<UnlockReportUpgradeCta language="en" t={t} missedCount={7} />);
+    expect(screen.getByTestId('unlock-report-upgrade-cta').textContent).toContain('unlockReportMissed');
+  });
+
+  it('names the missed words when the class missed some', () => {
+    render(<UnlockReportUpgradeCta language="en" t={t} missedCount={7} />);
+    const cta = screen.getByTestId('unlock-report-upgrade-cta');
+    expect(cta.textContent).toContain('education.results.unlockReportMissed');
+    expect(cta.textContent).toContain('"count":7');
+  });
+
+  it('falls back to the generic label when nothing was missed', () => {
+    render(<UnlockReportUpgradeCta language="en" t={t} missedCount={0} />);
+    const cta = screen.getByTestId('unlock-report-upgrade-cta');
+    expect(cta.textContent).not.toContain('unlockReportMissed');
+  });
+
   it('does not render while loading', () => {
     useTeacherPro.mockReturnValue({ hasPro: false, loading: true });
     render(<UnlockReportUpgradeCta language="en" t={t} />);

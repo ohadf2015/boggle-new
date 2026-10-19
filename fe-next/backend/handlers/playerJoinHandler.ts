@@ -206,6 +206,32 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       }
     }
 
+    // Same display name, different person: not a reconnect. Identities were already
+    // normalised above (auth id / guest-token hash map back to their own seat), so a
+    // mismatch here is a second student typing a taken name, who would otherwise
+    // inherit the first one's score and silence their words.
+    const seated = game.users[username];
+    if (
+      seated &&
+      ((seated.authUserId && authUserId && seated.authUserId !== authUserId) ||
+        (seated.guestTokenHash && guestTokenHash && seated.guestTokenHash !== guestTokenHash))
+    ) {
+      emitError(socket, ErrorCodes.PLAYER_USERNAME_TAKEN, { message: 'That name is already taken' });
+      return;
+    }
+
+    // Classroom "late join: off" — the teacher's switch. A student already seated
+    // may still reconnect; only a brand-new seat is refused mid-round.
+    if (
+      seat.game?.settings?.allowLateJoin === false &&
+      isInProgress(game.gameState) &&
+      !game.users[username] &&
+      !getSocketIdByUsername(gameCode, username)
+    ) {
+      emitError(socket, ErrorCodes.GAME_CLOSED, { message: 'This game has already started' });
+      return;
+    }
+
     // Check for existing user (reconnection)
     const existingSocketId = getSocketIdByUsername(gameCode, username);
 

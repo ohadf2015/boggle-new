@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
-import { TeacherProTrialEndedBanner } from '@/components/teacher/TeacherProTrialEndedBanner';
+import { TrialEndedBannerWithRecap, TrialUrgencyBannerWithRecap } from '@/components/teacher/TrialRecapBanners';
 import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTrialExpiringBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
 import { TeacherProUsagePromptCard } from '@/components/teacher/TeacherProUsagePromptCard';
@@ -162,9 +162,9 @@ function TeacherDashboardInner() {
       banner={
         banner === 'trial' && trial?.isExpired ? (
           // An expired access trial is account state: the renewal card, never dismissible.
-          <TrialUrgencyBanner trial={trial} href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`} />
+          <TrialUrgencyBannerWithRecap trial={trial} href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`} />
         ) : banner === 'reactivate' ? (
-          <TeacherProTrialEndedBanner onDismiss={dismissTrialEnded} />
+          <TrialEndedBannerWithRecap onDismiss={dismissTrialEnded} />
         ) : banner === 'trialing' ? (
           isTrialExpiring ? (
             !trialExpiringDismissed ? (
@@ -191,7 +191,6 @@ function TeacherDashboardInner() {
   );
 }
 
-import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProCheckoutCta';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';

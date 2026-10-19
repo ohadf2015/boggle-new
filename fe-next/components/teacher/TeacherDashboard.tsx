@@ -1,7 +1,7 @@
 /** Teacher Home: greeting, one "start a game" hero, your classes, and a rail with this week + one Pro card. */
 'use client';
 
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -130,13 +130,6 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
     liveStarted: activation.progress.liveStarted,
     dismissed: activation.progress.dismissed,
   });
-  const { markLiveStarted } = activation;
-  const onStepStart = useCallback(
-    (id: HomeOnboardingStepId) => {
-      if (id === 'tryDemo') markLiveStarted();
-    },
-    [markLiveStarted],
-  );
   const newClassHref = `/${language}/teacher/classroom/new`;
   const onboardingHrefs: Record<HomeOnboardingStepId, string> = {
     createClass: newClassHref,
@@ -195,14 +188,14 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
           ) : classroomsError ? (
             <HqLoadError onRetry={() => void classroomsState.refresh?.()} />
           ) : !hasClasses ? (
-            <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} onStepStart={onStepStart} variant="full" t={t} />
+            <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} variant="full" t={t} />
           ) : (
             <>
               {onboarding.visible ? (
                 <HomeOnboardingCard
                   onboarding={onboarding}
                   hrefs={onboardingHrefs}
-                  onStepStart={onStepStart}
+                 
                   onDismiss={activation.dismiss}
                   variant="compact"
                   t={t}
@@ -212,7 +205,6 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                 classrooms={classrooms}
                 selectedId={effectiveId}
                 onSelect={setSelectedId}
-                onStart={onboarding.current === 'tryDemo' ? markLiveStarted : undefined}
                 language={language}
                 t={t}
               />

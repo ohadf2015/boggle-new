@@ -3,7 +3,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-const { mockJoin, mockResolve, mockUseAuth } = vi.hoisted(() => ({
+const { mockJoin, mockResolve, mockUseAuth, mockStoredName } = vi.hoisted(() => ({
+  mockStoredName: vi.fn(() => null as string | null),
   mockJoin: vi.fn(),
   mockResolve: vi.fn(),
   mockUseAuth: vi.fn(),
@@ -22,6 +23,10 @@ vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));
 vi.mock('@/hooks/useJoinClassroom', () => ({ useJoinClassroom: () => ({ joinClassroom: mockJoin }) }));
 vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn(), trackStudentJoinStarted: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
+vi.mock('@/utils/profileStorage', () => ({
+  getStoredUsername: mockStoredName,
+  setStoredUsername: vi.fn(),
+}));
 vi.mock('../joinTarget', () => ({ resolveJoinTarget: mockResolve }));
 
 import JoinFlow from '../JoinFlow';
@@ -32,6 +37,7 @@ const goButton = () => screen.getAllByRole('button').find((b) => b.textContent?.
 describe('<JoinFlow> nickname step polish', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockStoredName.mockReturnValue(null);
     mockUseAuth.mockReturnValue({ user: null, loading: false });
     mockResolve.mockResolvedValue({ verdict: 'game', label: 'Ms Levy', gameCode: 'P45KRT' });
   });
@@ -45,6 +51,17 @@ describe('<JoinFlow> nickname step polish', () => {
     expect(nameField().className).toContain('bg-neo-cream');
     expect(nameField().className).toContain('text-neo-navy');
     expect(nameField().className).not.toMatch(/bg-neo-red\/\d+/);
+  });
+
+  it('Given a returning student with a saved nickname, Then the invite link greets them with it, not a new random one', async () => {
+    mockStoredName.mockReturnValue('Maya');
+    render(<JoinFlow initialCode="P45KRT" />);
+    await waitFor(() => expect(nameField().value).toBe('Maya'));
+  });
+
+  it('Given a first-time student, Then the invite link still seeds a fun name', async () => {
+    render(<JoinFlow initialCode="P45KRT" />);
+    await waitFor(() => expect(['Pixel Panda', 'Captain Otter', 'Turbo Toast']).toContain(nameField().value));
   });
 
   it('When "surprise me" is tapped, Then a fun classroom-safe name fills the field', () => {

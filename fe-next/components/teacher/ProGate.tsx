@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherProCheckout } from '@/hooks/useTeacherProCheckout';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { teacherTrialStatus } from '@/lib/education/trial';
 import { ProFeaturePreview } from '@/components/teacher/pro/ProFeaturePreview';
 import {
   trackProGateViewed,
@@ -61,6 +62,13 @@ export const PRO_FEATURES = ['analytics', 'reports', 'pressureDials', 'mastery',
 
 export type ProFeature = (typeof PRO_FEATURES)[number];
 
+/**
+ * Client-gated surfaces a free teacher may use for real while their access trial is live. The
+ * server-enforced ones (mastery, missedPractice) answer 402 whatever the client shows, so
+ * opening them here would be a broken page, not a preview.
+ */
+const ACCESS_TRIAL_PREVIEW: ReadonlySet<ProFeature> = new Set<ProFeature>(['analytics', 'reports']);
+
 interface ProGateProps {
   feature: ProFeature;
   children: React.ReactNode;
@@ -74,7 +82,11 @@ interface ProGateProps {
 
 export function ProGate({ feature, children, active = true }: ProGateProps) {
   const { t } = useLanguage();
-  const { hasPro, loading } = useTeacherPro();
+  const { hasPro, loading, accessTrialExpires } = useTeacherPro();
+  const [nowMs] = useState(() => Date.now());
+  const previewDaysLeft = ACCESS_TRIAL_PREVIEW.has(feature)
+    ? ((s) => (s && !s.isExpired ? s.daysLeft : null))(teacherTrialStatus(accessTrialExpires, nowMs))
+    : null;
   const checkoutSource = `pro_gate_${feature}` as ProUpgradeSource;
   const { pending, start } = useTeacherProCheckout(checkoutSource);
 
@@ -89,6 +101,32 @@ export function ProGate({ feature, children, active = true }: ProGateProps) {
   // is the flash, painting the upsell tells a paying teacher they are not paying.
   if (loading) return null;
   if (hasPro) return <>{children}</>;
+  if (previewDaysLeft !== null) {
+    return (
+      <>
+        <div
+          data-testid="pro-trial-preview"
+          role="status"
+          className="mb-4 flex flex-col gap-2 rounded-neo border-neo border-neo-lime bg-neo-navy-light p-3 shadow-hard-sm sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p className="text-sm font-bold text-neo-white">{t('teacher.proGate.trialPreview', { days: previewDaysLeft })}</p>
+          <button
+            type="button"
+            data-testid="pro-trial-preview-upgrade"
+            disabled={pending}
+            onClick={() => {
+              trackProUpgradeClicked({ feature });
+              void start();
+            }}
+            className="shrink-0 rounded-neo border-neo bg-neo-cyan px-4 py-2 text-sm font-black text-neo-navy shadow-hard-sm disabled:opacity-60"
+          >
+            {t('teacher.proGate.trialPreviewCta')}
+          </button>
+        </div>
+        {children}
+      </>
+    );
+  }
 
   return (
     <div className="rounded-neo border-neo border-neo-lime bg-neo-navy-light p-4 shadow-hard sm:p-5">

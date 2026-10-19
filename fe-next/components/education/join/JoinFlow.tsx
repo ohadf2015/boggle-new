@@ -9,6 +9,7 @@ import { JoinCodeField, JOIN_CODE_LENGTH, joinCodeOverflows, sanitizeJoinCode } 
 import { useJoinFlow } from './useJoinFlow';
 import { useFitStage } from './fitStage';
 import { pickFunName } from './funName';
+import { getStoredUsername } from '@/utils/profileStorage';
 import { JoinSuccessPanel } from './JoinSuccessPanel';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
 import { PopPressButton } from '@/components/motion/PopPressButton';
@@ -92,7 +93,7 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
     if (flow.step !== 'name' || !flow.showNameField || flow.name.trim()) return;
     if (sanitizeJoinCode(initialCode).length !== JOIN_CODE_LENGTH) return;
     if (flow.isChecking || !flow.target || flow.target.verdict === 'invalid') return;
-    flow.setName(pickFunName(t('eduStudent.join.funNames'), ''));
+    flow.setName(getStoredUsername() || pickFunName(t('eduStudent.join.funNames'), ''));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [flow.step, flow.showNameField, initialCode, flow.isChecking, flow.target]);
 

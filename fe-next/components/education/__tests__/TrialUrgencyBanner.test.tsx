@@ -52,6 +52,21 @@ describe('TrialUrgencyBanner', () => {
     expect(screen.queryByTestId('trial-count')).toBeNull();
   });
 
+  it('recaps what the expired teacher actually ran, when they ran something', () => {
+    render(<TrialUrgencyBanner trial={mk({ isExpired: true, daysLeft: 0, hoursLeft: 0 })} recap={{ games: 6, students: 54 }} />);
+    expect(screen.getByTestId('trial-recap')).toHaveTextContent('education.trial.recap');
+  });
+
+  it('shows no recap for a teacher who ran nothing (never print a zero as an achievement)', () => {
+    render(<TrialUrgencyBanner trial={mk({ isExpired: true, daysLeft: 0, hoursLeft: 0 })} recap={{ games: 0, students: 54 }} />);
+    expect(screen.queryByTestId('trial-recap')).not.toBeInTheDocument();
+  });
+
+  it('tells an expired teacher what stays free and what needs Pro', () => {
+    render(<TrialUrgencyBanner trial={mk({ isExpired: true, daysLeft: 0, hoursLeft: 0 })} />);
+    expect(screen.getByTestId('trial-expired-kept')).toHaveTextContent('education.trial.expired_kept');
+  });
+
   // The expired banner is the only in-app moment a teacher is asked to pay. It
   // used to link to the free access-request form, so the ask never happened.
   it('sends an expired teacher to the paid upgrade page, not back to the free form', () => {

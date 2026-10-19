@@ -14162,6 +14162,8 @@ const ja = {
         "title": "不安な生徒のための落ち着いたモード",
         "body": "Proならプレッシャーダイヤルを自由に調整できます。リーダーボードを終了まで非表示に、タイマーを弱めるかオフに、採点はスピードではなく正確さで。同じゲームを熱狂的なゲームショーにも、落ち着いた習熟度チェックにもできます。"
       },
+      "trialPreview": "Proプレビュー：このページはあと{{days}}日間開けます。その後はProが必要です。",
+      "trialPreviewCta": "Proで使い続ける",
       "cta": "Proで使えるようにする（月額 {{price}}）"
     },
     "digest": {
@@ -15578,6 +15580,8 @@ const ja = {
       "moreWaysToReteach": "この単語を復習する他の方法",
       "fullReport": "詳細レポート",
       "unlockReport": "詳細レポートを解除（月{{price}}）",
+      "unlockReportMissed": "この{{count}}語を誰が間違えたか確認（月{{price}}）",
+      "unlockReportTrial": "Proを{{days}}日間無料で試す：誰が何を間違えたか確認",
       "neverPlaced": "盤面に出なかった単語",
       "neverPlacedHint": "盤面に入りきらず、クラスは一度も見ていません。もう一度対戦すればチャンスがあります。",
       "needsHelp": {
@@ -17019,6 +17023,8 @@ const ja = {
       "hour_left": "時間残り",
       "cta": "最初のクラスを作成",
       "expired_title": "教師トライアルが終了しました",
+      "expired_kept": "クラスと単語リストは引き続き無料です。レポート、単語の習熟度、落ち着きモードはProが必要です。",
+      "recap": "トライアル中に、{{students}}人の生徒と{{games}}回のゲームを行いました。",
       "expired_body": "無料トライアル期間が終了しました。教室モードを続けるには、再申請またはお問い合わせください。",
       "renew_cta": "教師アクセスを更新"
     },

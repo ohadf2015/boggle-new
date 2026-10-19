@@ -14433,6 +14433,8 @@ const sv = {
         "title": "Lugnt läge för ängsliga elever",
         "body": "Pro ger dig reglagen för press: dölj topplistan till slutet, mjuka upp eller stäng av timern och poängsätt noggrannhet i stället för tempo. Samma spel kan köras som en uppumpad gameshow eller en lugn kunskapskontroll."
       },
+      "trialPreview": "Pro-förhandsvisning: den här sidan är öppen i {{days}} dagar till. Därefter krävs Pro.",
+      "trialPreviewCta": "Behåll med Pro",
       "cta": "Lås upp med Pro för {{price}}/månad"
     },
     "digest": {
@@ -15849,6 +15851,8 @@ const sv = {
       "moreWaysToReteach": "Fler sätt att repetera orden",
       "fullReport": "Fullständig rapport",
       "unlockReport": "Lås upp fullständig rapport – {{price}}/mån",
+      "unlockReportMissed": "Se vem som missade de här {{count}} orden – {{price}}/mån",
+      "unlockReportTrial": "Prova Pro gratis i {{days}} dagar: se vem som missade vad",
       "neverPlaced": "Kom aldrig med på spelplanen",
       "neverPlacedHint": "Spelplanen fick inte plats med dem, så klassen såg dem aldrig. Kör en revansch så får de en ny chans.",
       "needsHelp": {
@@ -17290,6 +17294,8 @@ const sv = {
       "hour_left": "timme kvar",
       "cta": "Skapa din första klass",
       "expired_title": "Din lärarprovperiod har tagit slut",
+      "expired_kept": "Dina klasser och ordlistor förblir gratis. Rapporter, ordbehärskning och lugnt läge kräver Pro.",
+      "recap": "Under provperioden körde du {{games}} spel för {{students}} elever.",
       "expired_body": "Din gratis provperiod är slut. Ansök igen eller kontakta oss för att behålla klassrumsläget.",
       "renew_cta": "Förnya lärarbehörighet"
     },

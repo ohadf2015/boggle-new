@@ -378,7 +378,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
     const { t, dir } = useLanguage();
     const isRTL = dir === 'rtl';
 
-    const { fullList, totalStudents, isLoading, error, timeScope, setTimeScope } =
+    const { fullList, totalStudents, isLoading, error, refresh, timeScope, setTimeScope } =
       useClassroomLeaderboard({
         classroomId,
         currentUserId,
@@ -402,9 +402,21 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
       );
     }
 
-    // Error state (silent fail)
+    // A failed read must not look like "no leaderboard": say so, and let the tap retry it.
     if (error) {
-      return null;
+      return (
+        <button
+          type="button"
+          data-testid="leaderboard-error"
+          onClick={() => void refresh()}
+          className={cn(
+            'w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-3 text-start font-neo-body text-sm font-bold text-neo-white',
+            className
+          )}
+        >
+          {t('errors.failedToLoadLeaderboard')}
+        </button>
+      );
     }
 
     // Empty state

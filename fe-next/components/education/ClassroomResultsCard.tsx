@@ -251,7 +251,12 @@ export function ClassroomResultsCard({
           only for the teacher — the Pro check inside must not fire on thirty
           student phones that never see the link. */}
       {isTeacher && (
-        <ResultsPrimaryActions language={language} onRematch={onRematch} t={t} />
+        <ResultsPrimaryActions
+          language={language}
+          onRematch={onRematch}
+          missedCount={summary.missedWords.length}
+          t={t}
+        />
       )}
 
       {isTeacher &&

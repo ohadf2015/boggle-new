@@ -17,8 +17,9 @@ import { Server, Socket } from 'socket.io';
 
 const {
   mockGetGame, mockGetSocketIdByUsername, mockAddUserToGame, mockGetGameUsers,
-  mockGetActiveRooms, mockRestoreGameFromRedis, mockShouldSendGameState,
+  mockGetActiveRooms, mockRestoreGameFromRedis, mockShouldSendGameState, mockCheckSeat,
 } = vi.hoisted(() => ({
+  mockCheckSeat: vi.fn(),
   mockGetGame: vi.fn(),
   mockGetSocketIdByUsername: vi.fn(),
   mockAddUserToGame: vi.fn(),
@@ -123,6 +124,7 @@ vi.mock('../playerReconnectHandler', () => ({
   handleExistingAuthConnectionJoin: vi.fn().mockResolvedValue({ handled: false }),
 }));
 
+vi.mock('../classroomSeatGate', () => ({ checkClassroomSeat: mockCheckSeat }));
 vi.mock('../playerDataInit', () => ({ ensurePlayerState: vi.fn().mockResolvedValue(undefined) }));
 
 import { registerPlayerJoinHandlers } from '../playerJoinHandler';
@@ -156,12 +158,86 @@ function inProgressGame(overrides: Record<string, unknown> = {}) {
   };
 }
 
+import { emitError } from '../../utils/errorHandler';
+
+describe('PlayerJoinHandler — classroom late join switch', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetGameUsers.mockReturnValue([]);
+    mockGetActiveRooms.mockReturnValue([]);
+    mockGetSocketIdByUsername.mockReturnValue(undefined);
+    mockShouldSendGameState.mockReturnValue(true);
+  });
+
+  it('refuses a NEW student when the teacher turned late join off and the round is running', async () => {
+    mockGetGame.mockReturnValue(inProgressGame());
+    mockCheckSeat.mockResolvedValue({ game: { settings: { allowLateJoin: false } }, refused: false });
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Latecomer' });
+    expect(emitError).toHaveBeenCalledWith(expect.anything(), 'GAME_CLOSED', expect.anything());
+    expect(mockAddUserToGame).not.toHaveBeenCalled();
+  });
+
+  it('still lets a student already in the room reconnect', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ users: { Sam: { socketId: 'old' } } }));
+    mockCheckSeat.mockResolvedValue({ game: { settings: { allowLateJoin: false } }, refused: false });
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Sam' });
+    expect(emitError).not.toHaveBeenCalled();
+    expect(handleReconnection).toHaveBeenCalled();
+  });
+
+  it('lets a late student in when the switch is on or unset', async () => {
+    mockGetGame.mockReturnValue(inProgressGame());
+    mockCheckSeat.mockResolvedValue({ game: { settings: { allowLateJoin: true } }, refused: false });
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Latecomer' });
+    expect(emitError).not.toHaveBeenCalled();
+    expect(mockAddUserToGame).toHaveBeenCalled();
+  });
+});
+
+describe('PlayerJoinHandler — a taken display name is not a reconnect', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetGameUsers.mockReturnValue([]);
+    mockGetActiveRooms.mockReturnValue([]);
+    mockGetSocketIdByUsername.mockReturnValue('old-socket');
+    mockShouldSendGameState.mockReturnValue(true);
+    mockCheckSeat.mockResolvedValue({ game: null, refused: false });
+  });
+
+  it('refuses a different guest who types the name of a seated student', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ users: { Sam: { socketId: 'old-socket', guestTokenHash: 'h1' } } }));
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Sam', guestTokenHash: 'h2' });
+    expect(emitError).toHaveBeenCalledWith(expect.anything(), 'PLAYER_USERNAME_TAKEN', expect.anything());
+    expect(handleReconnection).not.toHaveBeenCalled();
+  });
+
+  it('still reconnects the same guest (same token hash)', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ users: { Sam: { socketId: 'old-socket', guestTokenHash: 'h1' } } }));
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Sam', guestTokenHash: 'h1' });
+    expect(emitError).not.toHaveBeenCalled();
+    expect(handleReconnection).toHaveBeenCalled();
+  });
+
+  it('keeps reconnecting when the seat or the joiner carries no identity to compare', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ users: { Sam: { socketId: 'old-socket' } } }));
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Sam', guestTokenHash: 'h2' });
+    expect(handleReconnection).toHaveBeenCalled();
+  });
+});
+
 describe('PlayerJoinHandler — late-join recovery flag', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetGameUsers.mockReturnValue([]);
     mockGetActiveRooms.mockReturnValue([]);
     mockGetSocketIdByUsername.mockReturnValue(undefined);
+    mockCheckSeat.mockResolvedValue({ game: null, refused: false });
   });
 
   it('marks gameInProgress=true in the joined payload for a late joiner', async () => {

@@ -18,6 +18,8 @@
  * callers; this file only answers "has this teacher earned the usage ask".
  */
 
+import { TEACHER_PRO_ASK_DISMISS_TTL_MS } from './teacherProMilestone';
+
 export const TEACHER_USAGE_PROMPT_MIN_STUDENTS = 10;
 export const TEACHER_USAGE_PROMPT_MIN_ASSIGNMENTS = 3;
 
@@ -68,21 +70,32 @@ export function teacherUsagePrompt(
   return null;
 }
 
+export const TEACHER_USAGE_PROMPT_DISMISS_TTL_MS = TEACHER_PRO_ASK_DISMISS_TTL_MS;
+
 export function isTeacherUsagePromptDismissed(
-  storage: { getItem(key: string): string | null } | null | undefined,
+  storage: { getItem(key: string): string | null; setItem?(key: string, value: string): void } | null | undefined,
+  now: number = Date.now(),
 ): boolean {
   try {
-    return storage?.getItem(TEACHER_USAGE_PROMPT_DISMISS_KEY) === '1';
+    const raw = storage?.getItem(TEACHER_USAGE_PROMPT_DISMISS_KEY);
+    if (!raw) return false;
+    if (raw === '1') {
+      persistTeacherUsagePromptDismissed(storage, now);
+      return true;
+    }
+    const ts = Number(raw);
+    return Number.isFinite(ts) && now - ts < TEACHER_USAGE_PROMPT_DISMISS_TTL_MS;
   } catch {
     return false;
   }
 }
 
 export function persistTeacherUsagePromptDismissed(
-  storage: { setItem(key: string, value: string): void } | null | undefined,
+  storage: { setItem?(key: string, value: string): void } | null | undefined,
+  now: number = Date.now(),
 ): void {
   try {
-    storage?.setItem(TEACHER_USAGE_PROMPT_DISMISS_KEY, '1');
+    storage?.setItem?.(TEACHER_USAGE_PROMPT_DISMISS_KEY, String(now));
   } catch {
     // Private mode / quota — the in-session hide still works.
   }

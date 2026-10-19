@@ -30,6 +30,8 @@ interface PlayerData {
   isHost?: boolean;
   presenceStatus?: PresenceStatus;
   isBot?: boolean;
+  /** Socket dropped; the seat is held for the reconnect grace. */
+  disconnected?: boolean;
 }
 
 interface TvLobbyViewProps {
@@ -128,7 +130,8 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     return playersReady.filter((player) => {
       const name = typeof player === 'string' ? player : player.username;
       const isHostPlayer = typeof player === 'object' ? player.isHost : false;
-      return !isHostPlayer && name !== username;
+      const isDropped = typeof player === 'object' && player.disconnected === true;
+      return !isHostPlayer && !isDropped && name !== username;
     });
   }, [playersReady, username]);
   const playerCount = filteredPlayers.length;

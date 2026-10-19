@@ -47,4 +47,30 @@ describe('buildRoundPayload', () => {
     expect(p).not.toHaveProperty('reconnect');
     expect(p.myFoundWords).toEqual([]);
   });
+
+  describe('classroom round extras survive a rejoin', () => {
+    const withExtras = {
+      ...game,
+      classroomRoundExtras: { accessibility: { largeText: true, audioCues: false }, classroom: { teams: ['A', 'B'] }, classroomBossId: 'dragon' },
+    } as any;
+
+    it.each(['reconnect', 'lateJoin', 'recovery'] as const)('%s carries the stashed extras', (kind) => {
+      const p = buildRoundPayload('G', withExtras, { kind, username: 'ann' });
+      expect(p).toMatchObject({ accessibility: { largeText: true }, classroom: { teams: ['A', 'B'] }, classroomBossId: 'dragon' });
+    });
+
+    it('explicit extras win over the stash', () => {
+      const p = buildRoundPayload('G', withExtras, { kind: 'reconnect', username: 'ann', extras: { accessibility: { largeText: false } } });
+      expect(p.accessibility).toEqual({ largeText: false });
+    });
+
+    it('a fresh start without explicit extras does not replay a previous round stash', () => {
+      const p = buildRoundPayload('G', withExtras, { kind: 'start', messageId: 'm' });
+      expect(p).not.toHaveProperty('accessibility');
+    });
+
+    it('a non-classroom room is unchanged', () => {
+      expect(buildRoundPayload('G', game, { kind: 'reconnect', username: 'ann' })).not.toHaveProperty('classroom');
+    });
+  });
 });

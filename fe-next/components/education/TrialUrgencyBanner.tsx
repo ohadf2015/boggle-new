@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { TrialRecapLine, type TrialRecap } from '@/components/education/TrialRecapLine';
 import { trialCountdownUnit, type TrialStatus } from '@/lib/education/trial';
 import {
   TEACHER_PRO_CHECKOUT_PATH,
@@ -24,9 +25,11 @@ interface Props {
   onDismiss?: () => void;
   /** Override the active-trial CTA label (dashboard uses "Upgrade to Teacher Pro"). */
   ctaLabel?: string;
+  /** Expired state only: real games and students from the last 30 days. */
+  recap?: TrialRecap | null;
 }
 
-export function TrialUrgencyBanner({ trial, href, onDismiss, ctaLabel }: Props) {
+export function TrialUrgencyBanner({ trial, href, onDismiss, ctaLabel, recap }: Props) {
   const { t, language } = useLanguage();
   if (!trial) return null;
 
@@ -49,6 +52,10 @@ export function TrialUrgencyBanner({ trial, href, onDismiss, ctaLabel }: Props) 
           {t('education.trial.expired_title')}
         </h3>
         <p className="mt-1 text-sm">{t('teacher.subscription.upgradeProDescription')}</p>
+        <TrialRecapLine recap={recap} className="mt-1 text-sm font-bold" />
+        <p data-testid="trial-expired-kept" className="mt-1 text-sm font-semibold">
+          {t('education.trial.expired_kept')}
+        </p>
         {/* The expired CTA used to point at /education/access — the free access
             request form, which auto-approves. So the one screen where a teacher
             has just lost something sent them to ask for more free access instead

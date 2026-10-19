@@ -348,6 +348,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       // Classroom fields ride every start-shaped payload of this round (retries too).
       const extras = buildClassroomStartExtras(gameCode, classroomGame, humanUsernames);
       if (hasRoomBoss(game)) extras.classroomBossId = bossId;
+      game.classroomRoundExtras = classroomGame ? extras : undefined;
       broadcastToRoom(io, getGameRoom(gameCode), 'startGame',
         buildRoundPayload(gameCode, game, { kind: 'start', messageId, extras }));
       getGameModeModule(resolvedMode).afterStart?.(io, gameCode, game);

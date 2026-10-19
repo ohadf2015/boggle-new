@@ -6,6 +6,7 @@ import {
   classroomUsagePromptReason,
   teacherUsagePrompt,
   isTeacherUsagePromptDismissed,
+  TEACHER_USAGE_PROMPT_DISMISS_TTL_MS,
   persistTeacherUsagePromptDismissed,
 } from '../teacherUsagePrompt';
 
@@ -100,8 +101,30 @@ describe('usage prompt dismiss', () => {
     };
     expect(isTeacherUsagePromptDismissed(stub)).toBe(false);
     persistTeacherUsagePromptDismissed(stub);
-    expect(storage.get(TEACHER_USAGE_PROMPT_DISMISS_KEY)).toBe('1');
     expect(isTeacherUsagePromptDismissed(stub)).toBe(true);
+  });
+
+  it('asks again once the TTL has passed', () => {
+    const storage = new Map<string, string>();
+    const stub = {
+      getItem: (k: string) => storage.get(k) ?? null,
+      setItem: (k: string, v: string) => void storage.set(k, v),
+    };
+    const now = 1_700_000_000_000;
+    persistTeacherUsagePromptDismissed(stub, now);
+    expect(isTeacherUsagePromptDismissed(stub, now + TEACHER_USAGE_PROMPT_DISMISS_TTL_MS - 1)).toBe(true);
+    expect(isTeacherUsagePromptDismissed(stub, now + TEACHER_USAGE_PROMPT_DISMISS_TTL_MS)).toBe(false);
+  });
+
+  it('turns the legacy permanent "1" flag into a TTL window', () => {
+    const storage = new Map<string, string>([[TEACHER_USAGE_PROMPT_DISMISS_KEY, '1']]);
+    const stub = {
+      getItem: (k: string) => storage.get(k) ?? null,
+      setItem: (k: string, v: string) => void storage.set(k, v),
+    };
+    const now = 1_700_000_000_000;
+    expect(isTeacherUsagePromptDismissed(stub, now)).toBe(true);
+    expect(isTeacherUsagePromptDismissed(stub, now + TEACHER_USAGE_PROMPT_DISMISS_TTL_MS)).toBe(false);
   });
 
   it('fails open when storage is unavailable', () => {

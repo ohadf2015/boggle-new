@@ -160,13 +160,13 @@ export function AccessRequestForm({
       >
         <svg viewBox="0 0 52 52" className="mx-auto mb-3 h-14 w-14" aria-hidden="true">
           <m.circle
-            cx="26" cy="26" r="24" fill="none" stroke="#1a1a2e" strokeWidth="3"
+            cx="26" cy="26" r="24" fill="none" stroke="currentColor" strokeWidth="3"
             initial={shouldReduceMotion ? false : { pathLength: 0 }}
             animate={{ pathLength: 1 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
           />
           <m.path
-            d="M14 27l8 8 16-16" fill="none" stroke="#1a1a2e" strokeWidth="4"
+            d="M14 27l8 8 16-16" fill="none" stroke="currentColor" strokeWidth="4"
             strokeLinecap="round" strokeLinejoin="round"
             initial={shouldReduceMotion ? false : { pathLength: 0 }}
             animate={{ pathLength: 1 }}
@@ -178,20 +178,20 @@ export function AccessRequestForm({
         <div className="mt-4 flex flex-col gap-2">
           <button
             type="button"
-            data-testid="access-success-trial"
-            disabled={polarTrial.pending}
-            onClick={() => void polarTrial.start()}
-            className="w-full rounded-neo border-neo-thick border-black bg-neo-black px-4 py-3 font-bold text-neo-white font-neo-display shadow-hard hover:shadow-hard-sm active:shadow-hard-pressed disabled:opacity-50"
-          >
-            {polarTrial.pending ? t('common.loading') : t('teacher.subscription.startTrial')}
-          </button>
-          <button
-            type="button"
             data-testid="access-success-hq"
             onClick={() => void goToTeacherHq()}
             className="w-full rounded-neo border-neo border-neo-navy bg-neo-lime px-4 py-3 font-bold text-neo-navy font-neo-display shadow-hard-sm hover:shadow-hard"
           >
             {t('education.access.go_to_teacher')}
+          </button>
+          <button
+            type="button"
+            data-testid="access-success-trial"
+            disabled={polarTrial.pending}
+            onClick={() => void polarTrial.start()}
+            className="w-full rounded-neo border-neo border-neo-navy/40 px-4 py-2 text-sm font-bold text-neo-navy font-neo-display hover:bg-neo-navy/10 disabled:opacity-50"
+          >
+            {polarTrial.pending ? t('common.loading') : t('teacher.subscription.startTrial')}
           </button>
         </div>
       </m.div>

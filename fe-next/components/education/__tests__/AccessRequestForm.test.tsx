@@ -144,6 +144,24 @@ describe('<AccessRequestForm>', () => {
     expect(pushMock).not.toHaveBeenCalled();
   });
 
+  it('puts Go to HQ before the trial offer so value comes before the ask', async () => {
+    global.fetch = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ ok: true, success: true }),
+    } as any)) as any;
+    const user = userEvent.setup();
+    render(<AccessRequestForm />);
+
+    await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
+    await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
+    await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
+
+    const hq = await screen.findByTestId('access-success-hq');
+    const trial = screen.getByTestId('access-success-trial');
+    expect(hq.compareDocumentPosition(trial) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('starts Polar trial from the success card', async () => {
     const fetchMock = vi.fn(async () => ({
       ok: true,
