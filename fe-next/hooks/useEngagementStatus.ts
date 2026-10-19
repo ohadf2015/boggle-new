@@ -8,7 +8,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
 import { getXpForLevel } from '@/shared/utils/adventureXpUtils';
 
 const CACHE_KEY = 'lexiclash_engagement_status';
@@ -102,6 +101,12 @@ export function useEngagementStatus(): EngagementStatusData {
     fetchingRef.current = true;
 
     try {
+      // Guest landing must not download @supabase/gotrue. Import only once a
+      // signed-in fetch actually runs (playerId is set above).
+      const { supabase } = await import(
+        /* webpackPrefetch: false, webpackPreload: false */
+        '@/lib/supabase'
+      );
       if (!supabase) {
         if (isMounted.current) setStatus(prev => ({ ...prev, loading: false }));
         return;

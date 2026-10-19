@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/contexts/AuthProvider';
 import { VOCAB_QUIZ_EVENTS } from '@/shared/types/vocabQuiz';
 
 const { fakeSocket, listeners, toastError } = vi.hoisted(() => {

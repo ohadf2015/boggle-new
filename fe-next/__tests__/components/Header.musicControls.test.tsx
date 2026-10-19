@@ -4,7 +4,7 @@ import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Header from '@/components/Header';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/contexts/AuthProvider';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
 import { HapticsProvider } from '@/contexts/HapticsContext';

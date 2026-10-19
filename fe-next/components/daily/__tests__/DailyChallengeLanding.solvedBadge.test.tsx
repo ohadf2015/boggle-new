@@ -10,7 +10,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/contexts/AuthProvider';
 import * as storage from '@/utils/dailyChallenge/storage';
 
 // Mock the hooks and utilities

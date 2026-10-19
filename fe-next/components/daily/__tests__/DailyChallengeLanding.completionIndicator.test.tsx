@@ -11,7 +11,7 @@ import React from 'react';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { DailyChallengeLanding } from '../DailyChallengeLanding';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/contexts/AuthProvider';
 
 // Mock the hooks and utilities
 vi.mock('@/utils/dailyChallenge/storage', () => ({

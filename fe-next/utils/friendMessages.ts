@@ -3,7 +3,7 @@
  * Supabase client functions for direct messaging between friends
  */
 
-import { createClient } from '@/utils/supabase/client';
+import { loadSupabaseClient } from '@/utils/supabase/loadClient';
 import type { Message, MessageThread, Challenge, FriendThreadRow } from '@/shared/types/friends';
 import logger from '@/utils/logger';
 import { PUBLIC_PROFILES_TABLE } from '@/utils/publicProfiles';
@@ -16,7 +16,7 @@ export async function sendMessage(
   message: string
 ): Promise<{ success: boolean; message?: Message; error?: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await loadSupabaseClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -90,7 +90,7 @@ export async function getConversation(
   userId?: string
 ): Promise<{ messages: Message[]; hasMore: boolean; oldestTimestamp: number }> {
   try {
-    const supabase = createClient();
+    const supabase = await loadSupabaseClient();
     const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
 
     if (!uid) {
@@ -157,7 +157,7 @@ export async function markMessagesRead(
   lastMessageId: string
 ): Promise<{ success: boolean }> {
   try {
-    const supabase = createClient();
+    const supabase = await loadSupabaseClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -201,7 +201,7 @@ export async function markMessagesRead(
  */
 export async function getUnreadCount(friendId?: string, userId?: string): Promise<number> {
   try {
-    const supabase = createClient();
+    const supabase = await loadSupabaseClient();
     const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
 
     if (!uid) {
@@ -247,7 +247,7 @@ function isJwtExpiredError(message?: string): boolean {
  */
 export async function getThreads(userId?: string): Promise<MessageThread[]> {
   try {
-    const supabase = createClient();
+    const supabase = await loadSupabaseClient();
     const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
 
     if (!uid) {
@@ -316,7 +316,7 @@ export async function getThreads(userId?: string): Promise<MessageThread[]> {
  */
 export async function deleteMessage(messageId: string): Promise<{ success: boolean }> {
   try {
-    const supabase = createClient();
+    const supabase = await loadSupabaseClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -367,7 +367,7 @@ export async function sendChallenge(
   message?: string
 ): Promise<{ success: boolean; challenge?: Challenge; error?: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await loadSupabaseClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -445,7 +445,7 @@ export async function sendChallenge(
  */
 export async function acceptChallenge(challengeId: string): Promise<{ success: boolean; roomCode?: string }> {
   try {
-    const supabase = createClient();
+    const supabase = await loadSupabaseClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -488,7 +488,7 @@ export async function acceptChallenge(challengeId: string): Promise<{ success: b
  */
 export async function declineChallenge(challengeId: string): Promise<{ success: boolean }> {
   try {
-    const supabase = createClient();
+    const supabase = await loadSupabaseClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -519,7 +519,7 @@ export async function declineChallenge(challengeId: string): Promise<{ success: 
  */
 export async function getPendingChallenges(userId?: string): Promise<{ sent: Challenge[]; received: Challenge[] }> {
   try {
-    const supabase = createClient();
+    const supabase = await loadSupabaseClient();
     const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
 
     if (!uid) {

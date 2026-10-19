@@ -12,7 +12,7 @@ import dynamic from 'next/dynamic';
 import { ThemeProvider } from '@/utils/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { RadixDirectionProvider } from '@/components/providers/RadixDirectionProvider';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { DeferredAuthProvider } from './deferredAuthProvider';
 import { MotionConfigProvider } from '@/components/motion/MotionConfigProvider';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
@@ -176,9 +176,10 @@ const initLogRocket = () => {
  * Loads ~50KB of essential JavaScript + AuthProvider
  * LogRocket (~100KB) is deferred to avoid blocking initial load
  *
- * IMPORTANT: AuthProvider is included to ensure profile dropdown works on ALL pages
- * Bug fix: Profile dropdown was only appearing after visiting settings page
- * Root cause: AuthProvider was missing from EssentialProviders
+ * AuthProvider (and @supabase/gotrue) is NOT a static import here. Landing
+ * (`/` `/en`) mounts it on first pointer/key via DeferredAuthProvider so the
+ * 224KB gotrue chunk stays out of the eager PSI bundle. Every other route
+ * mounts it immediately. useAuth returns a loading default until then.
  */
 export function EssentialProviders({ children, lang, initialTranslations }: EssentialProvidersProps) {
     // Initialize session tracking for analytics
@@ -236,7 +237,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
             <ThemeProvider>
                 <LanguageProvider initialLanguage={lang} initialTranslations={initialTranslations}>
                     <RadixDirectionProvider>
-                    <AuthProvider>
+                    <DeferredAuthProvider>
                         <LogRocketIdentify />
                         <PostHogProvider>
                         {/* Mounted globally so chrome (header auth buttons, landing
@@ -325,7 +326,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                     </CoinProvider>
                     </CrazyGamesProvider>
                     </PostHogProvider>
-                    </AuthProvider>
+                    </DeferredAuthProvider>
                     </RadixDirectionProvider>
                 </LanguageProvider>
             </ThemeProvider>

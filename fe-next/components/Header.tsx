@@ -41,10 +41,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
 
     // Auth Modal State
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [authEverOpened, setAuthEverOpened] = useState(false);
     const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
 
     const openSignIn = useCallback(() => {
         setAuthModalMode('signin');
+        setAuthEverOpened(true);
         setShowAuthModal(true);
     }, []);
 
@@ -53,6 +55,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
         // is attributable (header vs hero vs bottom), not silent.
         trackLandingCtaClick('header_signup');
         setAuthModalMode('signup');
+        setAuthEverOpened(true);
         setShowAuthModal(true);
     }, []);
 
@@ -139,12 +142,14 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 overlaid by Header (z-60) when mounted separately in the layout. */}
             <DesktopGameNav />
 
+            {authEverOpened && (
             <AuthModal
                 isOpen={showAuthModal}
                 onClose={() => setShowAuthModal(false)}
                 showGuestStats={true}
                 initialMode={authModalMode}
             />
+            )}
 
             <AdminGiftModal
                 gift={selectedGift}
