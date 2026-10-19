@@ -11,10 +11,10 @@ interface PageProps {
 const BASE_URL = 'https://www.lexiclash.live';
 
 /** Lead with "Scrabble Svenska" exact-match query (1.37k impr/28d, pos 5.3, CTR 1.4% vs 4% expected). ≤60 chars. */
-const SV_TITLE = 'Scrabble Svenska Online Gratis — Spela Nu | LexiClash';
-/** Question hook ("Vill du spela…") improves CTR for "scrabble svenska" (pos 4.6, 1.32% vs 6% expected). ≤130 chars. */
+const SV_TITLE = 'Alfapet Online Gratis — Scrabble på Svenska | LexiClash';
+/** Action-first — "alfapet online" at pos 3.2, 374 impr, 1.34% CTR vs 11% expected. Title now leads with exact query. ≤130 chars desc. */
 const SV_DESCRIPTION =
-  'Vill du spela Scrabble svenska online gratis? Ingen app, inget konto. Upp till 50 spelare i realtid. Starta nu! →';
+  'Spela Alfapet & Scrabble på svenska online gratis — ingen app, inget konto. Upp till 50 spelare i realtid. Starta nu! →';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;

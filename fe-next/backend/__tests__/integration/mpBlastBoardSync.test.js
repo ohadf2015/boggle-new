@@ -149,6 +149,7 @@ describe('MP blast board sync (real socket flow)', () => {
     expect(hit, 'no traceable word on the blast board').toBeTruthy();
 
     await joiner.receiveEvent('submitWord', { word: hit.word, path: hit.path });
+    await sleep(0); // yield to event loop for async blastBoardUpdate emission
     const ack = snap(lastEvent(joiner, 'blastBoardUpdate'));
     expect(ack?.clearedBy, eventDump(joiner)).toBe(JOINER);
     expect(ack.grid).toEqual(board().grid);
