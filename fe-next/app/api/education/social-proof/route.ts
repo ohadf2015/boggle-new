@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import logger from '@/utils/logger';
-import { summarizeTeacherProof, teacherProofToShow, type ProofSessionRow } from '@/lib/education/teacherProof';
+import {
+  summarizeTeacherProof,
+  teacherProofCache,
+  teacherProofToShow,
+  type ProofSessionRow,
+} from '@/lib/education/teacherProof';
 
 /**
  * GET /api/education/social-proof — { show: false } or { show: true, teachers, games }.
@@ -13,11 +18,6 @@ const ROW_CAP = 5000;
 const READ_TIMEOUT_MS = 6000;
 const CACHE_MS = 60 * 60 * 1000;
 const NONE = { show: false } as const;
-
-let cache: { at: number; body: Record<string, unknown> } | null = null;
-export function __resetTeacherProofCache() {
-  cache = null;
-}
 
 async function readProof(): Promise<Record<string, unknown>> {
   const admin = createAdminClient();
@@ -57,10 +57,11 @@ async function readProof(): Promise<Record<string, unknown>> {
 }
 
 export async function GET() {
-  if (!cache || Date.now() - cache.at > CACHE_MS) {
-    cache = { at: Date.now(), body: await readProof() };
+  if (!teacherProofCache.body || Date.now() - teacherProofCache.at > CACHE_MS) {
+    teacherProofCache.body = await readProof();
+    teacherProofCache.at = Date.now();
   }
-  return NextResponse.json(cache.body, {
+  return NextResponse.json(teacherProofCache.body, {
     headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
   });
 }

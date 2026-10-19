@@ -29,7 +29,8 @@ vi.mock('@/utils/supabase/admin', () => ({
       : null,
 }));
 
-import { GET, __resetTeacherProofCache } from '../route';
+import { GET } from '../route';
+import { resetTeacherProofCache as __resetTeacherProofCache } from '@/lib/education/teacherProof';
 
 function bigWorld() {
   sessions = [];

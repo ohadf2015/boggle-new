@@ -36,3 +36,11 @@ export function summarizeTeacherProof(
 export function teacherProofToShow(proof: TeacherProof): TeacherProof | null {
   return proof.teachers >= TEACHER_PROOF_MIN_TEACHERS && proof.games >= TEACHER_PROOF_MIN_GAMES ? proof : null;
 }
+
+/** One-hour server cache for the public count. Lives here, not in the route file: a Next route may only export HTTP handlers. */
+export const teacherProofCache: { at: number; body: Record<string, unknown> | null } = { at: 0, body: null };
+
+export function resetTeacherProofCache() {
+  teacherProofCache.at = 0;
+  teacherProofCache.body = null;
+}
