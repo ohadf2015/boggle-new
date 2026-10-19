@@ -7,6 +7,7 @@ import { useTeacherProCheckout } from '@/hooks/useTeacherProCheckout';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { teacherTrialStatus } from '@/lib/education/trial';
+import { TrialStripRecap } from '@/components/teacher/TrialStripRecap';
 import { ProFeaturePreview } from '@/components/teacher/pro/ProFeaturePreview';
 import {
   trackProGateViewed,
@@ -102,7 +103,10 @@ export function ProGate({ feature, children, active = true }: ProGateProps) {
           role="status"
           className="mb-4 flex flex-col gap-2 rounded-neo border-neo border-neo-lime bg-neo-navy-light p-3 shadow-hard-sm sm:flex-row sm:items-center sm:justify-between"
         >
-          <p className="text-sm font-bold text-neo-white">{t('teacher.proGate.trialPreview', { days: previewDaysLeft })}</p>
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-neo-white">{t('teacher.proGate.trialPreview', { days: previewDaysLeft })}</p>
+            <TrialStripRecap />
+          </div>
           <button
             type="button"
             data-testid="pro-trial-preview-upgrade"

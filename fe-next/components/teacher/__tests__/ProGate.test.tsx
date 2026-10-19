@@ -8,6 +8,9 @@ vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => mockUseTeacherPro(),
 }));
 
+let mockRecap: { games: number; students: number } | null = null;
+vi.mock('@/hooks/useTeacherTrialRecap', () => ({ useTeacherTrialRecap: () => mockRecap }));
+
 const mockStartCheckout = vi.fn();
 vi.mock('@/hooks/useTeacherProCheckout', () => ({
   useTeacherProCheckout: () => ({ pending: false, start: mockStartCheckout }),
@@ -32,6 +35,7 @@ describe('ProGate', () => {
   beforeEach(() => {
     mockTrackGrowthEvent.mockClear();
     mockStartCheckout.mockClear();
+    mockRecap = null;
   });
 
   it('renders the paid surface for a Pro teacher', () => {
@@ -55,6 +59,20 @@ describe('ProGate', () => {
       expect(screen.getByText('paid surface')).toBeInTheDocument();
       expect(screen.getByTestId('pro-trial-preview')).toBeInTheDocument();
       expect(screen.queryByTestId(`pro-gate-upgrade-${feature}`)).not.toBeInTheDocument();
+    });
+
+    it('shows the teacher their own real numbers in the strip, so the trial reads as value they would lose', () => {
+      mockRecap = { games: 4, students: 30 };
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: inDays(5) });
+      render(<ProGate feature="analytics"><div>paid surface</div></ProGate>);
+      expect(screen.getByTestId('trial-recap')).toBeInTheDocument();
+    });
+
+    it('prints no number for a teacher who has run nothing yet', () => {
+      mockRecap = { games: 0, students: 30 };
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: inDays(5) });
+      render(<ProGate feature="analytics"><div>paid surface</div></ProGate>);
+      expect(screen.queryByTestId('trial-recap')).not.toBeInTheDocument();
     });
 
     it('locks again once the window has passed', () => {
