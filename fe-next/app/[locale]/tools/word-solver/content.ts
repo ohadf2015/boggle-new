@@ -280,7 +280,7 @@ const content: Record<Locale, ToolContent> = {
       '無料オンラインアナグラムソルバーとワードアンスクランブラー。文字を入力してすべての可能な単語を瞬時に見つけましょう。LexiClashに最適です。',
     metaDescription:
       '無料アナグラムソルバーとワードファインダー。文字を解読してすべての可能な単語を見つけましょう。今すぐお試しください！',
-    inputPlaceholder: '文字を入力（例：AELRST）',
+    inputPlaceholder: '文字を入力（例：さくらんぼ）',
     inputLabel: 'あなたの文字',
     languageLabel: '辞書の言語',
     solveButton: '単語を検索',
@@ -294,7 +294,7 @@ const content: Record<Locale, ToolContent> = {
     ctaTitle: 'もっと速く単語を見つける練習をしよう',
     ctaButton: 'LexiClashを無料でプレイ',
     ctaDescription: 'リアルタイムのワードバトルで友達に挑戦。脳を鍛えよう！',
-    fullDictionaryNote: '500以上の一般的な単語リストから結果を表示。完全な辞書はLexiClashでプレイ！',
+    fullDictionaryNote: '長い単語から順に最大500語を表示。LexiClashのゲームと同じ辞書で判定しています。',
     howToTitle: 'ワードソルバーの使い方',
     howToSteps: [
       '上の入力フィールドに利用可能な文字を入力またはペーストしてください。',
@@ -306,10 +306,10 @@ const content: Record<Locale, ToolContent> = {
     tipsTitle: 'ワードゲームのコツ',
     faqTitle: 'よくある質問',
     faqs: [
+      { question: 'アナグラムソルバーとは？', answer: 'LexiClashのアナグラムソルバーは、入力した文字を並べ替えて作れる日本語の単語をすべて表示する無料ツールです。ひらがな・カタカナ・漢字に対応し、約40万語の日本語辞書と照合します。例：「さくらんぼ」と入力すると「ぼんくら」「ぼくら」など20語が見つかります。最大20文字、登録不要。英語・スペイン語・スウェーデン語・ヘブライ語の辞書にも切り替えられます。' },
       { question: '7文字からいくつの単語が作れますか？', answer: '7つのランダムな文字から、通常20〜80個の有効な英単語を作ることができます。当ソルバーはすべての可能性を瞬時に見つけます。' },
-      { question: 'アナグラムソルバーとは？', answer: 'アナグラムソルバーは文字のセットから、それらを使って作れるすべての有効な単語を見つけるツールです。' },
       { question: 'スクラブルなどに使えますか？', answer: 'はい！このワードファインダーはScrabble、Boggle、LexiClashなどすべてのワードゲームで使えます。' },
-      { question: 'なぜ一部の単語が結果にないのですか？', answer: '無料ツールは500以上の一般的な単語リストを使用しています。完全な辞書はLexiClashで！' },
+      { question: 'なぜ一部の単語が結果にないのですか？', answer: 'LexiClashのゲーム辞書（日本語は約40万語）に載っていない語は表示されません。また、1回の検索で表示されるのは長い単語から順に最大500語です。' },
       { question: '単語探しが上手くなるには？', answer: 'LexiClashのような時間制限付きワードゲームで定期的に練習しましょう。一般的な接頭辞と接尾辞を探しましょう。' },
     ],
     tips: [
