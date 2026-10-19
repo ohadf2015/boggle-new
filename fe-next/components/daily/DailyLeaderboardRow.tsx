@@ -2,9 +2,9 @@
 
 import React, { memo } from 'react';
 import { m } from 'framer-motion';
-import { Clock, Sparkles, Crown, Eye, Target, CircleDot, CalendarDays } from 'lucide-react';
+import { Crown, Eye, Target, CircleDot, CalendarDays } from 'lucide-react';
 import { getRankDisplay } from '@/utils/rankingStyles';
-import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
+import { getCountryFlag } from '@/shared/utils';
 import { LANGUAGE_CONFIG } from '@/lib/languageConfig';
 import type { Language } from '@/types';
 import Avatar from '@/components/Avatar';
@@ -112,10 +112,14 @@ export const TodayParticipantRow = memo<{
   movement?: RankMovement | null;
 }>(({ participant, index, isCurrentUser, compact, t, onViewWheelWords, onViewHuntWords, scope = 'combined', showLanguage = false, movement }) => {
   const rank = participant.rank_position;
-  const countryFlag = getCountryFlag(participant.country_code);
+  const hasScore = participant.score != null && participant.score > 0;
 
-  // Format time since completion
-  const timeAgo = formatDistanceToNow(participant.completed_at, t);
+  const seeWords =
+    scope === 'word-wheel' && onViewWheelWords && participant.player_id && !isCurrentUser
+      ? { open: () => onViewWheelWords(participant), label: t('wordWheel.viewWordsYouMissed') || t('wordWheel.viewSubmittedWords'), tone: 'border-neo-purple/60 bg-neo-purple/15 hover:bg-neo-purple/30 text-neo-purple-light' }
+      : scope === 'word-hunt' && onViewHuntWords && participant.player_id && !isCurrentUser && (participant.words_discovered?.length ?? 0) > 0
+        ? { open: () => onViewHuntWords(participant), label: t('wordHunt.results.tapPlayerHint'), tone: 'border-neo-cyan/60 bg-neo-cyan/15 hover:bg-neo-cyan/30 text-neo-cyan' }
+        : null;
 
   return (
     <m.div
@@ -123,16 +127,14 @@ export const TodayParticipantRow = memo<{
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
       className={`
-        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
+        flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-xl border-2 transition-colors duration-200
         ${getRankColors(rank, isCurrentUser)}
         ${compact ? 'py-2' : ''}
-        ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
       `}
     >
-      {/* Rank Badge */}
       <div
         className={`
-          w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
+          w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
           ${getRankBadgeColors(rank)}
           border-2 shadow-xs
         `}
@@ -140,29 +142,18 @@ export const TodayParticipantRow = memo<{
         {getRankDisplay(rank)}
       </div>
 
-      {/* Avatar with Country Flag */}
-      <div className="relative">
-        <div className="w-11 h-11 sm:w-14 sm:h-14 border-3 border-neo-black/80 shadow-hard-sm rounded-full overflow-hidden">
-          <Avatar
-
-            avatarImage={participant.avatar_image ?? undefined}
-            customAvatar={participant.custom_avatar ?? undefined}
-            userId={avatarSeed(participant)}
-            size="lg"
-            className="w-full h-full"
-          />
-        </div>
-        {/* Country Flag Badge */}
-        {countryFlag && (
-          <div className="absolute -bottom-1 -inset-e-1 text-sm sm:text-base drop-shadow-xs" title={participant.country_code || undefined}>
-            {countryFlag}
-          </div>
-        )}
+      <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 border-2 border-neo-black/80 rounded-full overflow-hidden">
+        <Avatar
+          avatarImage={participant.avatar_image ?? undefined}
+          customAvatar={participant.custom_avatar ?? undefined}
+          userId={avatarSeed(participant)}
+          size="lg"
+          className="w-full h-full"
+        />
       </div>
 
-      {/* Name & Stats */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 flex-wrap">
+        <div className="flex items-center gap-1.5">
           <PlayerProfileTooltip
             player={{
               id: participant.player_id ?? undefined,
@@ -175,27 +166,17 @@ export const TodayParticipantRow = memo<{
             isCurrentUser={isCurrentUser}
             side="bottom"
           >
-            <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white cursor-pointer hover:underline'}`}>
+            <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan' : 'text-slate-800 dark:text-white cursor-pointer hover:underline'}`}>
               {participant.display_name || 'Player'}
             </span>
           </PlayerProfileTooltip>
           {showLanguage && <LanguageChip language={participant.language} />}
           {isCurrentUser && (
-            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-xs animate-pulse">
+            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0">
               {t('wordHunt.leaderboard.you', 'YOU')}
             </span>
           )}
           <MovementChip movement={movement} t={t} />
-          {participant.score != null && (
-            <TierBadge
-              tier={getDailyLeaderboardTier(participant.score)}
-              size="xs"
-              animated={rank === 1}
-            />
-          )}
-          {rank === 1 && (
-            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-tier-gold shrink-0 animate-pulse" />
-          )}
         </div>
         <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
           {participant.solved !== undefined && (
@@ -207,48 +188,8 @@ export const TodayParticipantRow = memo<{
                   : `✗ ${t('wordHunt.leaderboard.failed', 'Failed')}`}
             </span>
           )}
-          {participant.score != null && participant.score > 0 && (
-            <>
-              {participant.solved !== undefined && (
-                <span className="text-slate-400 dark:text-slate-500">•</span>
-              )}
-              {scope === 'word-wheel' && onViewWheelWords && participant.player_id && !isCurrentUser ? (
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); onViewWheelWords(participant); }}
-                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-neo border-2 border-neo-purple/60 bg-neo-purple/20 hover:bg-neo-purple/35 text-neo-purple dark:text-neo-purple-light font-bold transition-colors cursor-pointer shadow-hard-xs"
-                  aria-label={t('wordWheel.viewWordsYouMissed') || t('wordWheel.viewSubmittedWords')}
-                  title={t('wordWheel.viewWordsYouMissed') || t('wordWheel.viewSubmittedWords')}
-                >
-                  <span>{participant.score} {t('wordHunt.leaderboard.pts')}</span>
-                  <span aria-hidden className="flex items-center gap-1 ps-1.5 border-s border-neo-purple/40">
-                    <Eye className="w-3.5 h-3.5" />
-                    <span className="text-[11px] uppercase tracking-wide">{t('wordHunt.leaderboard.seeWords')}</span>
-                  </span>
-                </button>
-              ) : scope === 'word-hunt' && onViewHuntWords && participant.player_id && !isCurrentUser && (participant.words_discovered?.length ?? 0) > 0 ? (
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); onViewHuntWords(participant); }}
-                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-neo border-2 border-neo-cyan/60 bg-neo-cyan/20 hover:bg-neo-cyan/35 text-neo-cyan font-bold transition-colors cursor-pointer shadow-hard-xs"
-                  aria-label={t('wordHunt.results.tapPlayerHint')}
-                  title={t('wordHunt.results.tapPlayerHint')}
-                >
-                  <span>{participant.score} {t('wordHunt.leaderboard.pts')}</span>
-                  <span aria-hidden className="flex items-center gap-1 ps-1.5 border-s border-neo-cyan/40">
-                    <Eye className="w-3.5 h-3.5" />
-                    <span className="text-[11px] uppercase tracking-wide">{t('wordHunt.leaderboard.seeWords')}</span>
-                  </span>
-                </button>
-              ) : (
-                <span className="text-purple-600 dark:text-purple-400 font-bold">
-                  {participant.score} {t('wordHunt.leaderboard.pts')}
-                </span>
-              )}
-            </>
-          )}
           {(participant.word_hunt_score ?? 0) > 0 && (participant.word_wheel_score ?? 0) > 0 && (
-            <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium ms-1 inline-flex items-center gap-1">
+            <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium inline-flex items-center gap-1">
               <Target aria-hidden className="w-3 h-3" />
               {participant.word_hunt_score}
               <span aria-hidden>·</span>
@@ -275,12 +216,24 @@ export const TodayParticipantRow = memo<{
         </div>
       </div>
 
-      {/* Time */}
-      {!compact && (
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/50 dark:bg-neo-navy-elevated/50 px-2 py-1 rounded-lg">
-          <Clock className="w-3.5 h-3.5" />
-          <span>{timeAgo}</span>
-        </div>
+      {hasScore && (
+        seeWords ? (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); seeWords.open(); }}
+            className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-neo border-2 font-black tabular-nums transition-colors cursor-pointer ${seeWords.tone}`}
+            aria-label={seeWords.label}
+            title={seeWords.label}
+          >
+            <span>{participant.score} {t('wordHunt.leaderboard.pts')}</span>
+            <Eye aria-hidden className="w-4 h-4" />
+            <span className="sr-only">{t('wordHunt.leaderboard.seeWords')}</span>
+          </button>
+        ) : (
+          <span className="shrink-0 font-black tabular-nums text-base sm:text-lg text-neo-cream">
+            {participant.score} <span className="text-xs font-bold text-neo-cream/70">{t('wordHunt.leaderboard.pts')}</span>
+          </span>
+        )
       )}
     </m.div>
   );
