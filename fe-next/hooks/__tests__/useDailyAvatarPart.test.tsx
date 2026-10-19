@@ -21,6 +21,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ isAuthenticated }) }));
 vi.mock('@/hooks/useHasRealAdProvider', () => ({ useHasRealAdProvider: () => hasRealAdProvider }));
+// authFetch lazy-loads @/lib/supabase via dynamic import; under fake timers the
+// first real module load never resolves while waitFor spins. Mock it null —
+// same unauthenticated-fetch fallback these tests always exercised.
+vi.mock('@/lib/supabase', () => ({ supabase: null }));
 
 import { useDailyAvatarPart } from '../useDailyAvatarPart';
 
