@@ -80,7 +80,7 @@ describe('<ClassSetupFlow>', () => {
     expect(createClassroom).toHaveBeenCalledWith('eduShell.setup.gradeName.g35', 'en');
     expect(await screen.findByTestId('setup-step-ready')).toBeInTheDocument();
     expect(screen.getByTestId('setup-join-code')).toHaveTextContent('K7Q2');
-    expect(screen.getByTestId('setup-qr').querySelector('svg')).not.toBeNull();
+    await waitFor(() => expect(screen.getByTestId('setup-qr').querySelector('svg')).not.toBeNull());
     expect(screen.getByTestId('setup-start-game')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c9');
   });
 
