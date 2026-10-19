@@ -152,22 +152,22 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
         mode: sessionData.mode,
         language: sessionData.language,
         difficulty: sessionData.difficulty || null,
-        score: sessionData.score || 0,
+        score: Math.round(sessionData.score || 0),
         words_found: sessionData.wordsFound || [],
         duration_seconds: sessionData.durationSeconds ? Math.round(sessionData.durationSeconds) : null,
         completed: sessionData.completed || false,
         daily_puzzle_number: sessionData.dailyPuzzleNumber || null,
         target_word: sessionData.targetWord || null,
         target_found: sessionData.targetFound || false,
-        attempts_used: sessionData.attemptsUsed || null,
-        life_remaining: sessionData.lifeRemaining || null,
-        life_gained: sessionData.lifeGained || 0,
-        tokens_earned: sessionData.tokensEarned || 0,
-        tokens_spent: sessionData.tokensSpent || 0,
-        clues_used: sessionData.cluesUsed || 0,
+        attempts_used: sessionData.attemptsUsed ? Math.round(sessionData.attemptsUsed) : null,
+        life_remaining: sessionData.lifeRemaining ? Math.round(sessionData.lifeRemaining) : null,
+        life_gained: Math.round(sessionData.lifeGained || 0),
+        tokens_earned: Math.round(sessionData.tokensEarned || 0),
+        tokens_spent: Math.round(sessionData.tokensSpent || 0),
+        clues_used: Math.round(sessionData.cluesUsed || 0),
         room_code: sessionData.roomCode || null,
         player_count: sessionData.playerCount || null,
-        final_rank: sessionData.finalRank || null,
+        final_rank: sessionData.finalRank ? Math.round(sessionData.finalRank) : null,
         device_type: sessionData.deviceType || null,
         browser: sessionData.browser || null,
         country: sessionData.country || null,
@@ -216,18 +216,18 @@ export async function updateGameSession(
   try {
     const updateData: Record<string, unknown> = {};
 
-    if (updates.score !== undefined) updateData.score = updates.score;
+    if (updates.score !== undefined) updateData.score = Math.round(updates.score);
     if (updates.wordsFound !== undefined) updateData.words_found = updates.wordsFound;
     if (updates.durationSeconds !== undefined) updateData.duration_seconds = Math.round(updates.durationSeconds);
     if (updates.completed !== undefined) updateData.completed = updates.completed;
     if (updates.targetFound !== undefined) updateData.target_found = updates.targetFound;
-    if (updates.attemptsUsed !== undefined) updateData.attempts_used = updates.attemptsUsed;
-    if (updates.lifeRemaining !== undefined) updateData.life_remaining = updates.lifeRemaining;
-    if (updates.lifeGained !== undefined) updateData.life_gained = updates.lifeGained;
-    if (updates.tokensEarned !== undefined) updateData.tokens_earned = updates.tokensEarned;
-    if (updates.tokensSpent !== undefined) updateData.tokens_spent = updates.tokensSpent;
-    if (updates.cluesUsed !== undefined) updateData.clues_used = updates.cluesUsed;
-    if (updates.finalRank !== undefined) updateData.final_rank = updates.finalRank;
+    if (updates.attemptsUsed !== undefined) updateData.attempts_used = Math.round(updates.attemptsUsed);
+    if (updates.lifeRemaining !== undefined) updateData.life_remaining = Math.round(updates.lifeRemaining);
+    if (updates.lifeGained !== undefined) updateData.life_gained = Math.round(updates.lifeGained);
+    if (updates.tokensEarned !== undefined) updateData.tokens_earned = Math.round(updates.tokensEarned);
+    if (updates.tokensSpent !== undefined) updateData.tokens_spent = Math.round(updates.tokensSpent);
+    if (updates.cluesUsed !== undefined) updateData.clues_used = Math.round(updates.cluesUsed);
+    if (updates.finalRank !== undefined) updateData.final_rank = Math.round(updates.finalRank);
     if (updates.completedAt !== undefined) updateData.completed_at = updates.completedAt.toISOString();
 
     const { error } = await client

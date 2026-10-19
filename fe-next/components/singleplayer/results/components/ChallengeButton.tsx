@@ -11,6 +11,7 @@ import { getGuestSessionId } from '@/utils/guestManager';
 import { neoSuccessToast, neoErrorToast } from '@/components/NeoToast';
 import { cn } from '@/lib/utils';
 import type { LetterGrid, Language } from '@/shared/types/game';
+import logger from '@/utils/logger';
 
 interface ChallengeButtonProps {
   /** Grid from the completed game */
@@ -106,7 +107,7 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
         neoErrorToast(t('daily.createChallengeFailed'));
       }
     } catch (error) {
-      console.error('Error creating challenge:', error);
+      logger.debug('Error creating challenge:', error);
       neoErrorToast(t('daily.createChallengeFailed'));
     } finally {
       setIsCreating(false);

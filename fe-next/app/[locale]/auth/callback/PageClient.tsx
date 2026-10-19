@@ -412,8 +412,11 @@ function AuthCallbackContent(): React.JSX.Element {
                 return;
               }
             }
-            logger.error('Auth callback: Code exchange error:', getAuthErrorMessage(authError));
-            broadcastAuthFailed(getAuthErrorMessage(authError));
+            const authMessage = getAuthErrorMessage(authError);
+            // Link opened in another browser/device: expected, user retries sign-in
+            const logExchange = /code verifier not found/i.test(authMessage) ? logger.log : logger.error;
+            logExchange.call(logger, 'Auth callback: Code exchange error:', authMessage);
+            broadcastAuthFailed(authMessage);
             safeRedirect(`/${locale}?auth_error=true`);
             return;
           }

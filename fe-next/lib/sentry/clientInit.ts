@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
-import { WASM_STREAMING_COMPILE_FAILED, isStaleAssetLinkRejection } from "@/lib/sentry/benignErrorPatterns";
+import { WASM_STREAMING_COMPILE_FAILED, THIRD_PARTY_SCRIPT_NOISE, isStaleAssetLinkRejection } from "@/lib/sentry/benignErrorPatterns";
 
 const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
@@ -257,6 +257,7 @@ Sentry.init({
     WASM_STREAMING_COMPILE_FAILED,
     /failed to asynchronously prepare wasm/i,
     /falling back to ArrayBuffer instantiation/i,
+    ...THIRD_PARTY_SCRIPT_NOISE,
     // Blast mode access rejection — expected for non-admin users trying blast
     /Blast mode requires special access/i,
     // DissolveEffect texture race — PixiJS texture not ready during effect init

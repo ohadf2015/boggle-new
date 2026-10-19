@@ -35,6 +35,11 @@ describe('EducationShell', () => {
     expect(root.className).toContain('flex-col');
   });
 
+  it('is the containing block for absolute descendants, so overflow-hidden clips them instead of growing the page', () => {
+    const { getByTestId } = render(<EducationShell>body</EducationShell>);
+    expect(getByTestId('education-shell').className).toMatch(/\brelative\b/);
+  });
+
   it('gives the scroll region the flex-1 min-h-0 chain, so it scrolls instead of clipping', () => {
     const { getByTestId } = render(<EducationShell>body</EducationShell>);
     const region = getByTestId('education-shell-scroll');

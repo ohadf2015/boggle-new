@@ -26,7 +26,10 @@ vi.mock('@/utils/authFetch', () => ({
   postWithAuth: vi.fn(),
 }));
 
+vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
+
 import { postWithAuth } from '@/utils/authFetch';
+import { captureApiError } from '@/utils/sentry';
 import type { MockedFunction } from 'vitest';
 const mockPostWithAuth = postWithAuth as MockedFunction<typeof postWithAuth>;
 
@@ -91,6 +94,16 @@ describe('ComebackBonusModal', () => {
     await waitFor(() => {
       expect(onClaimed).toHaveBeenCalled();
     }, { timeout: 3000 });
+  });
+
+  it.each([[400, 0], [500, 1]])('on HTTP %i reports to Sentry %i time(s)', async (status, reports) => {
+    mockPostWithAuth.mockResolvedValueOnce({ ok: false, status } as Response);
+    render(
+      <ComebackBonusModal isOpen={true} daysAway={7} tier={tier} onClose={vi.fn()} onClaimed={vi.fn()} />
+    );
+    fireEvent.click(screen.getByText('comebackBonus.claimButton'));
+    await waitFor(() => expect(mockPostWithAuth).toHaveBeenCalled());
+    await waitFor(() => expect(captureApiError).toHaveBeenCalledTimes(reports));
   });
 
   it('calls onClose when close button clicked', () => {

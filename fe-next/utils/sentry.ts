@@ -255,6 +255,8 @@ const EXPECTED_SOCKET_ERROR_CODES = new Set([
   "GAME_ALREADY_IN_PROGRESS",
   "GAME_ALREADY_STARTED",
   "AUTH_REQUIRED",
+  "PLAYER_NOT_HOST",
+  "VALIDATION_INVALID_PAYLOAD",
 ]);
 
 /** Locale-independent expectedness check for a typed socket error code. */

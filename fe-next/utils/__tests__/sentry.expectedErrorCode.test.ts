@@ -23,6 +23,8 @@ describe('isExpectedSocketErrorCode', () => {
       'GAME_ALREADY_IN_PROGRESS',
       'GAME_ALREADY_STARTED',
       'AUTH_REQUIRED',
+      'PLAYER_NOT_HOST',
+      'VALIDATION_INVALID_PAYLOAD',
     ]) {
       expect(isExpectedSocketErrorCode(code)).toBe(true);
     }

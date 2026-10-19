@@ -8,6 +8,10 @@ import type { Message, MessageThread, Challenge, FriendThreadRow } from '@/share
 import logger from '@/utils/logger';
 import { PUBLIC_PROFILES_TABLE } from '@/utils/publicProfiles';
 
+// Web Locks contention or a browser refusing the lock (iOS WebView, private mode): retried on next poll
+const isBenignBrowserLockError = (msg?: string) =>
+  !!msg && /Lock broken|stole it|request was denied/i.test(msg);
+
 /**
  * Send a message to a friend
  */
@@ -302,7 +306,7 @@ export async function getThreads(userId?: string): Promise<MessageThread[]> {
       .sort((a, b) => b.lastMessageAt - a.lastMessageAt);
   } catch (error) {
     const msg = (error as Error).message;
-    if (msg?.includes('Lock broken') || msg?.includes('stole it')) {
+    if (isBenignBrowserLockError(msg)) {
       logger.debug('FRIEND_MESSAGES', `Lock contention getting threads: ${msg}`);
     } else {
       logger.error('FRIEND_MESSAGES', `Exception getting threads: ${msg}`);
@@ -613,7 +617,7 @@ export async function getPendingChallenges(userId?: string): Promise<{ sent: Cha
     return { sent, received };
   } catch (error) {
     const msg = (error as Error).message;
-    if (msg?.includes('Lock broken') || msg?.includes('stole it')) {
+    if (isBenignBrowserLockError(msg)) {
       logger.debug('FRIEND_MESSAGES', `Lock contention getting challenges: ${msg}`);
     } else {
       logger.error('FRIEND_MESSAGES', `Exception getting pending challenges: ${msg}`);

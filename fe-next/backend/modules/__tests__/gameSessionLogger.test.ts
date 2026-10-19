@@ -183,6 +183,30 @@ describe('Game Session Logger', () => {
       expect(updateSpy).toHaveBeenCalledWith({ duration_seconds: 66 });
     });
 
+    it('rounds every integer column, not just duration', async () => {
+      await updateGameSession('session-789', {
+        score: 10.4,
+        attemptsUsed: 2.6,
+        lifeRemaining: 33.879999999999775,
+        lifeGained: 1.5,
+        tokensEarned: 7.2,
+        tokensSpent: 1.9,
+        cluesUsed: 0.4,
+        finalRank: 2.2,
+      });
+
+      expect(updateSpy).toHaveBeenCalledWith({
+        score: 10,
+        attempts_used: 3,
+        life_remaining: 34,
+        life_gained: 2,
+        tokens_earned: 7,
+        tokens_spent: 2,
+        clues_used: 0,
+        final_rank: 2,
+      });
+    });
+
     it('should update daily challenge progress', async () => {
       const updates: GameSessionUpdateData = {
         targetFound: true,

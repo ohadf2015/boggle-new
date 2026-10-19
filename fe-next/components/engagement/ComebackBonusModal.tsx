@@ -55,11 +55,13 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
         setClaimState('success');
         setTimeout(() => onClaimed(), 1800);
       } else {
-        captureApiError(
-          new Error(`comeback claim failed: ${response.status}`),
-          '/api/engagement/comeback',
-          { method: 'POST', statusCode: response.status },
-        );
+        if (response.status >= 500) {
+          captureApiError(
+            new Error(`comeback claim failed: ${response.status}`),
+            '/api/engagement/comeback',
+            { method: 'POST', statusCode: response.status },
+          );
+        }
         setClaimState('error');
         setCooling(true);
         cooldownRef.current = setTimeout(() => setCooling(false), COOLDOWN_MS);

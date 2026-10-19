@@ -30,3 +30,17 @@ export function isStaleAssetLinkRejection(reason: unknown): boolean {
   const tagName = (target as { tagName?: unknown }).tagName;
   return tagName === 'LINK' || tagName === 'SCRIPT';
 }
+
+/**
+ * Errors thrown by code we don't ship: Google Identity Services' minified
+ * client, in-app-browser injected bridges, WebView JS bridges, and the browser's
+ * WebGL driver on lost contexts. No frame of ours can act on them
+ * (JAVASCRIPT-NEXTJS-2FA/2GF/2FV/1QY).
+ */
+export const THIRD_PARTY_SCRIPT_NOISE: RegExp[] = [
+  /^TypeError: a\.Vc is not a function/,
+  /window\.setDgResult is not a function/,
+  /to WebGL2RenderingContext\.shaderSource must be an instance of WebGLShader/,
+  /Error invoking postMessage: Java object is gone/,
+  /^SecurityError: The request was denied\.?$/,
+];

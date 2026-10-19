@@ -15,6 +15,7 @@ vi.mock('@/utils/logger', () => ({
   default: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
 
+import logger from '@/utils/logger';
 import { getThreads } from '@/utils/friendMessages';
 
 const FRESH = new Date(Date.now() - 60 * 1000).toISOString(); // seen 1 min ago → online
@@ -97,5 +98,11 @@ describe('getThreads — single-RPC mapping', () => {
     mockRpc.mockResolvedValue({ data: null, error: { message: 'boom' } });
     const result = await getThreads('me-123');
     expect(result).toEqual([]);
+  });
+
+  it('treats a browser "request was denied" SecurityError as benign, not an error log', async () => {
+    mockRpc.mockRejectedValue(new Error('The request was denied.'));
+    expect(await getThreads('me-123')).toEqual([]);
+    expect(logger.error).not.toHaveBeenCalled();
   });
 });

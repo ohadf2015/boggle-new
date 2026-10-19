@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { WASM_STREAMING_COMPILE_FAILED, isStaleAssetLinkRejection } from '../benignErrorPatterns';
+import { WASM_STREAMING_COMPILE_FAILED, THIRD_PARTY_SCRIPT_NOISE, isStaleAssetLinkRejection } from '../benignErrorPatterns';
 
 /**
  * PixiJS lazily loads its basis-transcoder WASM. When the browser rejects
@@ -80,5 +80,21 @@ describe('isStaleAssetLinkRejection', () => {
   it('does NOT match null/undefined', () => {
     expect(isStaleAssetLinkRejection(null)).toBe(false);
     expect(isStaleAssetLinkRejection(undefined)).toBe(false);
+  });
+});
+
+describe('THIRD_PARTY_SCRIPT_NOISE', () => {
+  it.each([
+    'TypeError: a.Vc is not a function',
+    'TypeError: window.setDgResult is not a function',
+    "TypeError: Argument 1 ('shader') to WebGL2RenderingContext.shaderSource must be an instance of WebGLShader",
+    'Error invoking postMessage: Java object is gone',
+    'SecurityError: The request was denied.',
+  ])('matches %s', (msg) => {
+    expect(THIRD_PARTY_SCRIPT_NOISE.some((re) => re.test(msg))).toBe(true);
+  });
+
+  it('does not swallow first-party errors', () => {
+    expect(THIRD_PARTY_SCRIPT_NOISE.some((re) => re.test('TypeError: x.foo is not a function'))).toBe(false);
   });
 });

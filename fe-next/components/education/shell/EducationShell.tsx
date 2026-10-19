@@ -97,7 +97,8 @@ export function EducationShell({
       className={cn(
         // h-dvh (not min-h) + overflow-hidden is the half of the contract the
         // body lock cannot provide: it stops THIS subtree growing the page.
-        'flex h-dvh w-full flex-col overflow-hidden bg-neo-navy',
+        // `relative` makes overflow-hidden clip absolute descendants (sr-only text) that otherwise grow the page.
+        'relative flex h-dvh w-full flex-col overflow-hidden bg-neo-navy',
         className,
       )}
     >

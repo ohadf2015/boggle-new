@@ -14,6 +14,7 @@ import { useNativeShare } from '@/hooks/useNativeShare';
 import { addCoins } from '@/utils/coinManager';
 import { createChallenge, getChallengeUrl, generateChallengeShareMessage, type ChallengeCreatorData, type ChallengeGameConfig, type ChallengePerformance } from '@/utils/challenges';
 import toast from 'react-hot-toast';
+import logger from '@/utils/logger';
 
 /**
  * Share context determines the modal's appearance and behavior
@@ -218,7 +219,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
         );
       }
     } catch (error) {
-      console.error('Error creating challenge:', error);
+      logger.debug('Error creating challenge:', error);
       toast.error(
         t('share.errorCreatingChallenge'),
         { duration: 3000 }
