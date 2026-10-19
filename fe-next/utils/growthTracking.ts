@@ -5,6 +5,7 @@
 
 import { isAuthProviderMounted } from '@/lib/auth/authProviderMounted';
 import { shouldDeferLandingGotrue } from '@/lib/auth/landingGotrueDefer';
+import { getAnalyticsSessionToken } from '@/utils/analyticsAuthToken';
 import logger from '@/utils/logger';
 import { getStoredUtmData } from './utmCapture';
 import { getGuestSessionId, getGuestName } from './guestManager';
@@ -803,9 +804,7 @@ const getAnalyticsAuthHeaders = async (): Promise<Record<string, string>> => {
     ) {
       return {};
     }
-    const { getSession } = await import('@/lib/supabase');
-    const { data } = await getSession();
-    const token = data?.session?.access_token;
+    const token = await getAnalyticsSessionToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
   } catch {
     return {};
