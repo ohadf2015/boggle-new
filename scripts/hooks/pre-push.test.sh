@@ -25,7 +25,7 @@ git add -A && git commit -qm base && git push -q origin master
 
 CALLS="$ROOT/calls.log"
 for bin in eslint tsc tsx vitest; do
-  printf '#!/bin/sh\necho "%s $*" >> "%s"\n[ "$1" = list ] && echo lib/a.test.ts\nexit 0\n' "$bin" "$CALLS" > "fe-next/node_modules/.bin/$bin"
+  printf '#!/bin/sh\necho "%s $*" >> "%s"\nexit 0\n' "$bin" "$CALLS" > "fe-next/node_modules/.bin/$bin"
   chmod +x "fe-next/node_modules/.bin/$bin"
 done
 printf '#!/bin/sh\nexec sh -e "%s" "$@"\n' "$HOOK" > "$ROOT/hooks/pre-push"
@@ -33,44 +33,34 @@ chmod +x "$ROOT/hooks/pre-push"
 git config core.hooksPath "$ROOT/hooks"
 
 git checkout -qb work
-echo 'export const a = 2;' > fe-next/lib/a.ts
-git commit -qam change
 
 push() { # refspec... → sets OUT, RC, and the per-run CALLS log
   : > "$CALLS"
-  OUT=$(TMPDIR="$ROOT" git push -q origin "$@" 2>&1); RC=$?
+  OUT=$(TMPDIR="$ROOT" PREPUSH_LOCK="$ROOT/test.lock" git push -q origin "$@" 2>&1); RC=$?
 }
 
-echo "▸ agent/x: vitest skipped, lint + type-check still run"
-push work:agent/x
-assert "push succeeds" '[ "$RC" -eq 0 ]'
-assert "prints the skip line" 'grep -q "Tests: SKIPPED for agent branch push" <<<"$OUT"'
-assert "vitest never invoked" '! grep -q "^vitest" "$CALLS"'
-assert "eslint ran" 'grep -q "^eslint" "$CALLS"'
-assert "tsc ran" 'grep -q "^tsc" "$CALLS"'
-
-echo "▸ feat/x: full hook, vitest runs"
+echo "▸ source-only change: lint + incremental tsc run, no vitest"
+echo 'export const a = 2;' > fe-next/lib/a.ts
+git commit -qam change
 push work:feat/x
 assert "push succeeds" '[ "$RC" -eq 0 ]'
-assert "no skip line" '! grep -q "SKIPPED" <<<"$OUT"'
-assert "vitest invoked" 'grep -q "^vitest run" "$CALLS"'
-assert "eslint ran" 'grep -q "^eslint" "$CALLS"'
-assert "tsc ran" 'grep -q "^tsc" "$CALLS"'
+assert "eslint invoked" 'grep -q "^eslint" "$CALLS"'
+assert "tsc invoked incrementally" 'grep -q "^tsc --noEmit --incremental" "$CALLS"'
+assert "vitest never invoked" '! grep -q "^vitest" "$CALLS"'
 
-echo "▸ agent/y + feat/y in one push: any non-agent ref keeps the tests"
-push work:agent/y work:feat/y
-assert "vitest invoked" 'grep -q "^vitest run" "$CALLS"'
-assert "no skip line" '! grep -q "SKIPPED" <<<"$OUT"'
+echo "▸ test file in the diff: vitest runs on that file only (no cone, no list, no shards)"
+echo 'it("x", () => {});' > fe-next/lib/a.test.ts
+git add -A && git commit -qm test
+push work:feat/y
+assert "push succeeds" '[ "$RC" -eq 0 ]'
+assert "vitest runs the changed test file" 'grep -q "^vitest run lib/a.test.ts" "$CALLS"'
+assert "no --changed cone" '! grep -q -- "--changed" "$CALLS"'
+assert "no shards" '! grep -q -- "--shard" "$CALLS"'
 
-echo "▸ local agent/ branch pushed to a non-agent remote name keeps the tests"
-git branch -q agent/local work
-push agent/local:fix/z
-assert "vitest invoked" 'grep -q "^vitest run" "$CALLS"'
+echo "▸ agent branch gets the same gate (no special skip)"
+push work:agent/z
+assert "vitest runs the changed test file" 'grep -q "^vitest run lib/a.test.ts" "$CALLS"'
 
-echo "▸ a branch merely containing 'agent' is not an agent branch"
-push work:feat/agent/q
-assert "vitest invoked" 'grep -q "^vitest run" "$CALLS"'
-
-echo ""
-echo "pre-push: $PASS passed, $FAIL failed"
+echo
+echo "pass=$PASS fail=$FAIL"
 [ "$FAIL" -eq 0 ]
