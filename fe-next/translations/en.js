@@ -1267,7 +1267,7 @@ const en = {
       "blogAll": "All articles",
       "faqMore": "{count} more questions",
       "faqAll": "All questions",
-      "crossLink": "Play Boggle online free",
+      "crossLink": "Play Boggle with friends online",
       "readMore": "New here? Learn {howToPlay}, play {withFriends}, pick up tricks in our {guides}, or browse {blog}.",
       "readMoreLinks": {
         "howToPlay": "how to play",
