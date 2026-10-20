@@ -2,7 +2,7 @@
 describe('public subdirectory assets', () => {
   it('passes static files under public/ subdirectories (mascot loader regression)', async () => {
     const { decideNextHandle } = await import('./nextHandleGate');
-    for (const p of ['/mascot/winner.webp', '/mascots/styles/arcade.png', '/home/daily-streak.webp', '/mascot/posters/x.jpg']) {
+    for (const p of ['/mascot/winner.webp', '/mascots/styles/arcade.png', '/home/daily-streak.webp', '/mascot/posters/x.jpg', '/sql/sql-wasm.wasm']) {
       expect(decideNextHandle(p)).toEqual({ action: 'pass' });
     }
   });

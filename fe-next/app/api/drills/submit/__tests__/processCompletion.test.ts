@@ -47,6 +47,7 @@ function makeMockSupabase(opts: {
     sessionInsert: vi.fn(),
     progressInsert: vi.fn().mockResolvedValue({ error: null }),
     progressUpdate: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+    historyUpsert: vi.fn().mockResolvedValue({ error: null }),
   };
 
   return {
@@ -114,12 +115,14 @@ function makeMockSupabase(opts: {
         };
       }
       if (table === 'brain_score_history') {
+        const row = { data: null, error: null };
         return {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
               eq: vi.fn().mockReturnValue({
                 eq: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({ data: null, error: null }),
+                  single: vi.fn().mockResolvedValue(row),
+                  maybeSingle: vi.fn().mockResolvedValue(row),
                 }),
               }),
             }),
@@ -128,6 +131,7 @@ function makeMockSupabase(opts: {
           update: vi.fn().mockReturnValue({
             eq: vi.fn().mockResolvedValue({ error: null }),
           }),
+          upsert: spies.historyUpsert,
         };
       }
       return {};
@@ -169,6 +173,24 @@ describe('processBrainDrillCompletion', () => {
       expect(result.body.idempotent).toBe(true);
       expect(result.body.xpAwarded).toBe(0);
     }
+  });
+
+  it('upserts daily history with integer scores instead of insert', async () => {
+    const supabase = makeMockSupabase();
+    const result = await processBrainDrillCompletion(
+      validBody,
+      'user-1',
+      'sub-history',
+      { supabase: supabase as unknown as never, source: 'live' },
+    );
+    expect(result.ok).toBe(true);
+    expect(supabase.spies.historyUpsert).toHaveBeenCalledTimes(1);
+    const [row, opts] = supabase.spies.historyUpsert.mock.calls[0];
+    expect(opts).toEqual({ onConflict: 'user_id,period_type,period_start' });
+    expect(Number.isInteger(row.overall_score)).toBe(true);
+    expect(Number.isInteger(row.processing_speed)).toBe(true);
+    expect(row.drills_completed).toBe(1);
+    expect(row.games_played).toBe(0);
   });
 
   it('happy path returns success with brainScore + xpAwarded', async () => {

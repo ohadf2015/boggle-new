@@ -20,6 +20,7 @@ import type {
   CognitiveDomain,
 } from '@/shared/types/cognitive';
 import { getValidUUIDOrUndefined } from '@/utils/validation/uuid';
+import { upsertDailyBrainScoreHistory } from '@/lib/brain/dailyHistoryWrite';
 
 // Word length thresholds for rarity classification
 const RARE_WORD_MIN_LENGTH = 6;
@@ -266,47 +267,22 @@ export function useSaveCognitiveScore() {
         tierProgress = updated.tierProgress;
         scoreDelta = overallScore - currentBrainScore.overall_score;
 
-        // Update brain_score_history for trend tracking (fetch-then-update to handle unique constraint)
-        const today = new Date().toISOString().split('T')[0];
-        const { data: existingHistory } = await supabase
-          .from('brain_score_history')
-          .select('*')
-          .eq('user_id', userId)
-          .eq('period_type', 'daily')
-          .eq('period_start', today)
-          .maybeSingle();
-
-        if (existingHistory) {
-          // Update existing entry for today (ensure all scores are integers)
-          await supabase
-            .from('brain_score_history')
-            .update({
-              overall_score: Math.round(updated.overallScore),
-              processing_speed: Math.round(updated.domainScores.processingSpeed),
-              working_memory: Math.round(updated.domainScores.workingMemory),
-              attention: Math.round(updated.domainScores.attention),
-              flexibility: Math.round(updated.domainScores.flexibility),
-              vocabulary: Math.round(updated.domainScores.vocabulary),
-              games_played: (existingHistory.games_played || 0) + 1,
-            })
-            .eq('id', existingHistory.id);
-        } else {
-          // Insert new entry for today (ensure all scores are integers)
-          await supabase
-            .from('brain_score_history')
-            .insert({
-              user_id: userId,
-              period_type: 'daily',
-              period_start: today,
-              overall_score: Math.round(updated.overallScore),
-              processing_speed: Math.round(updated.domainScores.processingSpeed),
-              working_memory: Math.round(updated.domainScores.workingMemory),
-              attention: Math.round(updated.domainScores.attention),
-              flexibility: Math.round(updated.domainScores.flexibility),
-              vocabulary: Math.round(updated.domainScores.vocabulary),
-              games_played: 1,
-              drills_completed: 0,
-            });
+        // One rounded upsert. A float 400s the integer columns; a second insert 409s.
+        const { error: historyError } = await upsertDailyBrainScoreHistory(supabase, {
+          userId,
+          periodStart: new Date().toISOString().split('T')[0],
+          scores: {
+            overallScore: updated.overallScore,
+            processingSpeed: updated.domainScores.processingSpeed,
+            workingMemory: updated.domainScores.workingMemory,
+            attention: updated.domainScores.attention,
+            flexibility: updated.domainScores.flexibility,
+            vocabulary: updated.domainScores.vocabulary,
+          },
+          gamesPlayedDelta: 1,
+        });
+        if (historyError) {
+          logger.error('[useSaveCognitiveScore] Failed to upsert brain score history:', historyError);
         }
 
       } else {
@@ -344,45 +320,21 @@ export function useSaveCognitiveScore() {
           logger.error('[useSaveCognitiveScore] Failed to create brain score:', createError);
         }
 
-        // Also add to history (fetch-then-update to handle case where drill was done first)
-        const todayDate = new Date().toISOString().split('T')[0];
-        const { data: existingHistoryNew } = await supabase
-          .from('brain_score_history')
-          .select('*')
-          .eq('user_id', userId)
-          .eq('period_type', 'daily')
-          .eq('period_start', todayDate)
-          .maybeSingle();
-
-        if (existingHistoryNew) {
-          await supabase
-            .from('brain_score_history')
-            .update({
-              overall_score: overallScore,
-              processing_speed: safeProcessingSpeed,
-              working_memory: safeWorkingMemory,
-              attention: safeAttention,
-              flexibility: safeFlexibility,
-              vocabulary: safeVocabulary,
-              games_played: (existingHistoryNew.games_played || 0) + 1,
-            })
-            .eq('id', existingHistoryNew.id);
-        } else {
-          await supabase
-            .from('brain_score_history')
-            .insert({
-              user_id: userId,
-              period_type: 'daily',
-              period_start: todayDate,
-              overall_score: overallScore,
-              processing_speed: safeProcessingSpeed,
-              working_memory: safeWorkingMemory,
-              attention: safeAttention,
-              flexibility: safeFlexibility,
-              vocabulary: safeVocabulary,
-              games_played: 1,
-              drills_completed: 0,
-            });
+        const { error: historyError } = await upsertDailyBrainScoreHistory(supabase, {
+          userId,
+          periodStart: new Date().toISOString().split('T')[0],
+          scores: {
+            overallScore,
+            processingSpeed: safeProcessingSpeed,
+            workingMemory: safeWorkingMemory,
+            attention: safeAttention,
+            flexibility: safeFlexibility,
+            vocabulary: safeVocabulary,
+          },
+          gamesPlayedDelta: 1,
+        });
+        if (historyError) {
+          logger.error('[useSaveCognitiveScore] Failed to upsert brain score history:', historyError);
         }
       }
 
