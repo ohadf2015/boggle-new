@@ -15,6 +15,8 @@ const MIN_ENGAGED_MS = 2000;
 
 export interface AbandonExtras {
   words_found?: number;
+  /** Standing floors when the mode's unit of progress is not words (Word Tower). */
+  floors?: number;
   sp_mode?: string;
   landing_path?: string;
 }

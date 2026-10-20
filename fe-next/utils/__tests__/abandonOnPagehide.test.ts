@@ -62,7 +62,7 @@ describe('abandonOnPagehide', () => {
       words_found: 0,
       landing_path: '/es/singleplayer',
     });
-    updateActiveGameExtras({ words_found: 3 });
+    updateActiveGameExtras({ words_found: 3, floors: 2 });
     vi.setSystemTime(new Date('2026-01-01T00:00:39Z'));
 
     fireEvent('pagehide');
@@ -73,6 +73,7 @@ describe('abandonOnPagehide', () => {
       durationSec: 39,
       reason: 'pagehide',
       words_found: 3,
+      floors: 2,
       sp_mode: 'solo-bots',
       landing_path: '/es/singleplayer',
     });
