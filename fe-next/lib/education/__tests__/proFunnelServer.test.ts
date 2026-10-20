@@ -13,6 +13,7 @@ vi.mock('@/lib/posthog', () => ({
 import { EDU_ANALYTICS_HOST } from '@/backend/utils/educationTelemetry';
 import {
   buildProCheckoutStartedEvent,
+  buildProCheckoutFailedEvent,
   buildProCheckoutSucceededEvent,
   buildProTrialStartedEvent,
   buildProTrialSucceededEvent,
@@ -39,6 +40,14 @@ describe('Pro funnel server events', () => {
       distinctId: 'u-1',
       event: 'edu_pro_checkout_started',
       properties: { product: 'teacher_pro', provider: 'polar' },
+    });
+  });
+
+  it('Given a checkout failed, When built, Then it is edu_pro_checkout_failed carrying the reason', () => {
+    expect(buildProCheckoutFailedEvent('u-1', 'polar_not_configured')).toEqual({
+      distinctId: 'u-1',
+      event: 'edu_pro_checkout_failed',
+      properties: { product: 'teacher_pro', provider: 'polar', reason: 'polar_not_configured' },
     });
   });
 

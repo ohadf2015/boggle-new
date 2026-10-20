@@ -5,7 +5,7 @@ import { getPolarClient, getProProductId } from '@/lib/polar';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { locales, defaultLocale } from '@/i18n/config';
 import logger from '@/utils/logger';
-import { buildProCheckoutStartedEvent, buildProTrialStartedEvent, buildCheckoutStartedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
+import { buildProCheckoutStartedEvent, buildProTrialStartedEvent, buildCheckoutStartedEvent, buildProCheckoutFailedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 
 /**
  * A second free trial, or a trial on top of Pro, is a paid checkout instead.
@@ -84,6 +84,7 @@ function resolveCheckoutLocale(bodyLocale: string, cookieHeader: string | null):
  * - 500: Server error
  */
 export async function POST(request: NextRequest) {
+  let user: Awaited<ReturnType<typeof getAuthedUser>> = null;
   try {
     // Checkout gate: keep the till shut while Polar wiring is missing.
     // This is a runtime check, so it auto-opens the moment env vars are set
@@ -91,13 +92,14 @@ export async function POST(request: NextRequest) {
     const polarAccessToken = process.env.POLAR_ACCESS_TOKEN;
     const polarProductId = process.env.POLAR_PRO_PRODUCT_ID;
     if (!polarAccessToken || !polarProductId) {
+      captureProFunnelServerEvent(buildProCheckoutFailedEvent('anonymous', 'polar_not_configured'));
       return NextResponse.json(
         { error: 'Checkout is not available yet — Polar billing is not configured' },
         { status: 503 }
       );
     }
 
-    const user = await getAuthedUser(request);
+    user = await getAuthedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -133,6 +135,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in POST /api/subscription/checkout:', error);
+    captureProFunnelServerEvent(buildProCheckoutFailedEvent(user?.id ?? 'anonymous', 'server_error'));
     return NextResponse.json(
       { error: 'Failed to create checkout' },
       { status: 500 }

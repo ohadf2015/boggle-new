@@ -20,6 +20,16 @@ export function buildProCheckoutStartedEvent(userId: string): EduServerEvent {
   return { distinctId: userId, event: 'edu_pro_checkout_started', properties: { ...BASE } };
 }
 
+/**
+ * Fired on both checkout failure paths — `reason` is what tells a 503
+ * (Polar env vars missing) apart from a 500 (Polar API itself rejected the
+ * call), which is otherwise indistinguishable from a teacher who just closed
+ * the tab.
+ */
+export function buildProCheckoutFailedEvent(userId: string, reason: string): EduServerEvent {
+  return { distinctId: userId, event: 'edu_pro_checkout_failed', properties: { ...BASE, reason } };
+}
+
 export function buildProCheckoutSucceededEvent(userId: string, subscriptionId: string): EduServerEvent {
   return {
     distinctId: userId,
