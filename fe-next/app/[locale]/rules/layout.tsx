@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { defaultOgImages, defaultOgImageUrl } from '@/lib/seo/defaultOgImage';
 import type { ReactNode } from 'react';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 interface LayoutParams {
     params: Promise<{ locale: string }>;
@@ -181,7 +182,7 @@ export default async function RulesLayout({ children, params }: RulesLayoutProps
         <>
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, howToSchema, webPageSchema]) }}
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([breadcrumbSchema, howToSchema, webPageSchema])) }}
             />
             {children}
         </>

@@ -22,6 +22,8 @@ export interface WindowSession {
 export interface WindowRosterStudent {
   studentId: string;
   name: string;
+  /** Membership joined_at, when the source query selects it. Drives "students joined this week". */
+  joinedAt?: string | null;
 }
 
 export interface WindowStudentProgress {

@@ -7,6 +7,7 @@ import { InlineBannerAd } from '@/components/ads';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { parseWordLength } from '../_utils/wordListData';
 import { nLetterWordsMetadata, NLetterWordsView } from '../_nletter/NLetterWordsView';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 // /words/{n}-letter-words (e.g. 3-letter-words) is served by THIS dynamic route and
 // delegated to NLetterWordsView. It used to be a sibling [n]-letter-words route, but two
@@ -165,7 +166,7 @@ export default async function WordExplorerPage({ params }: PageParams) {
   ];
 
   // JSON-LD schema — all values are sanitized via sanitizeWord() (letters only, max 20 chars)
-  const schemaJson = JSON.stringify([
+  const schemaJson = JSON.stringify(jsonLdGraph([
     {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
@@ -186,7 +187,7 @@ export default async function WordExplorerPage({ params }: PageParams) {
         url: `${BASE_URL}/${locale}/tools/word-solver`,
       },
     },
-  ]);
+  ]));
 
   return (
     <>

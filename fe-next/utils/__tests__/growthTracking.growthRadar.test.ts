@@ -57,7 +57,12 @@ function installWindow(withGr: boolean): void {
   g.window = withGr ? { ...base, gr: { capture: grCapture } } : base;
 }
 
-import { trackGrowthEvent, type GrowthEvent } from '../growthTracking';
+import {
+  maybeTrackSignupCompleted,
+  trackGrowthEvent,
+  trackSignupFunnel,
+  type GrowthEvent,
+} from '../growthTracking';
 import { __resetGrowthRadarMirrorForTests } from '../growthRadarMirror';
 
 describe('trackGrowthEvent → Growth Radar mirror', () => {
@@ -166,5 +171,49 @@ describe('trackGrowthEvent → Growth Radar mirror', () => {
     expect(grCapture).not.toHaveBeenCalled();
     // No runaway poll: advancing further is a no-op and nothing throws.
     expect(() => vi.advanceTimersByTime(60_000)).not.toThrow();
+  });
+
+  it('does not mirror funnel events from a loopback page', () => {
+    for (const hostname of ['localhost', '127.0.0.1', '::1', 'classroom.localhost']) {
+      grCapture.mockClear();
+      (g.window as { location: { hostname: string; search: string } }).location = {
+        hostname,
+        search: '',
+      };
+      trackGrowthEvent('game_started', { mode: 'classic' });
+      trackGrowthEvent('signup_completed', { source: 'header_or_menu' });
+      expect(grCapture, hostname).not.toHaveBeenCalled();
+    }
+  });
+
+  it('does not mirror signup_completed from the undeduped funnel emitter', () => {
+    (g.window as { location: { hostname: string; search: string } }).location = {
+      hostname: 'www.lexiclash.live',
+      search: '',
+    };
+    trackSignupFunnel('completed', false, { source: 'multi_game_prompt' });
+    expect(grCapture.mock.calls.map(([event]) => event)).not.toContain('growth:signup_completed');
+    // PostHog still records the prompt-funnel step. Only the Growth Radar twin is gated.
+    expect(captureMock.mock.calls.map((c) => c[0])).toContain('growth:signup_completed');
+  });
+
+  it('mirrors signup_completed from the deduped emitter', () => {
+    (g.window as { location: { hostname: string; search: string } }).location = {
+      hostname: 'www.lexiclash.live',
+      search: '',
+    };
+    const store = new Map<string, string>();
+    g.localStorage = {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => void store.set(k, v),
+      removeItem: (k: string) => void store.delete(k),
+    };
+    const emitted = maybeTrackSignupCompleted({
+      userId: 'u-fresh',
+      createdAt: new Date(Date.now() - 10_000).toISOString(),
+      source: 'header_or_menu',
+    });
+    expect(emitted).toBe(true);
+    expect(grCapture.mock.calls.map(([event]) => event)).toContain('growth:signup_completed');
   });
 });

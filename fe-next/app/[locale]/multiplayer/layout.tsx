@@ -1,6 +1,7 @@
 import { loadTranslation } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
@@ -138,7 +139,7 @@ export default async function MultiplayerLayout({ children, params }: Multiplaye
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema]) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([breadcrumbSchema, webPageSchema])) }}
       />
       {children}
     </>

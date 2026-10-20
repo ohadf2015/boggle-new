@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
+  countStudentsJoinedThisWeek,
+  countWordsMasteredThisWeek,
   deriveWeeklyProgressDigest,
   formatWowDelta,
   isPolarTrialDay7,
@@ -61,6 +63,7 @@ describe('deriveWeeklyProgressDigest', () => {
     expect(digest.wow.wordsCompleted).toBe(16);
     expect(digest.wow.assignmentCompletionPctPoints).toBe(16);
     expect(digest.averageScorePct).toBe(86);
+    expect(digest.averageScoreWowDeltaPct).toBe(-14);
     expect(digest.inactiveCount).toBe(1);
     const jo = digest.students.find((s) => s.studentId === 's3');
     expect(jo?.inactive7d).toBe(true);
@@ -99,5 +102,40 @@ describe('formatWowDelta', () => {
     expect(formatWowDelta(3)).toBe('+3');
     expect(formatWowDelta(0)).toBe('0');
     expect(formatWowDelta(-2)).toBe('-2');
+  });
+});
+
+describe('countStudentsJoinedThisWeek', () => {
+  it('counts memberships whose joined_at falls inside the last 7 days', () => {
+    const roster = [
+      { studentId: 's1', name: 'Sam', joinedAt: day(1) },
+      { studentId: 's2', name: 'Pat', joinedAt: day(6) },
+      { studentId: 's3', name: 'Jo', joinedAt: day(8) },
+      { studentId: 's4', name: 'Kim', joinedAt: null },
+      { studentId: 's5', name: 'Zed' },
+    ];
+    expect(countStudentsJoinedThisWeek(roster, NOW)).toBe(2);
+  });
+});
+
+describe('countWordsMasteredThisWeek', () => {
+  it('dedupes words across students and only counts rows completed in the window', () => {
+    const count = countWordsMasteredThisWeek(
+      [
+        { studentId: 's1', completedAt: day(1), words: ['Cat', 'dog'] },
+        { studentId: 's2', completedAt: day(2), words: ['cat', 'sun'] },
+        { studentId: 's3', completedAt: day(9), words: ['old'] },
+        { studentId: 's4', completedAt: day(3), words: ['  ', 'moon'] },
+      ],
+      NOW,
+    );
+    expect(count).toBe(4);
+  });
+
+  it('returns 0 when nothing was mastered this week', () => {
+    expect(
+      countWordsMasteredThisWeek([{ studentId: 's1', completedAt: day(10), words: ['old'] }], NOW),
+    ).toBe(0);
+    expect(countWordsMasteredThisWeek([], NOW)).toBe(0);
   });
 });

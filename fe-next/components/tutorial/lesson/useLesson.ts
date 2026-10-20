@@ -47,6 +47,8 @@ export interface UseLessonResult {
   bestStreak: number;
   skip: () => void;
   closeComplete: () => void;
+  /** Player tapped skip (this session or a remembered one). */
+  skipped: boolean;
 }
 
 export function useLesson({ definition, enabled, words, feedback }: UseLessonArgs): UseLessonResult {
@@ -125,6 +127,7 @@ export function useLesson({ definition, enabled, words, feedback }: UseLessonArg
     bestStreak,
     skip,
     closeComplete,
+    skipped: outcome === 'skipped',
   };
 }
 

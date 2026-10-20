@@ -2,6 +2,7 @@ import { loadTranslation, type TranslationData } from '@/translations/loadTransl
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { SinglePlayerLcpShell } from '@/components/singleplayer/SinglePlayerLcpShell';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
@@ -137,7 +138,7 @@ export default async function SinglePlayerLayout({ children, params }: SinglePla
       <SinglePlayerLcpShell />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema]) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([breadcrumbSchema, webPageSchema])) }}
       />
       {children}
     </>
