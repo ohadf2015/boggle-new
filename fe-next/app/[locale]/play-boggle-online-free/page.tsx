@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { EducationIntentCta } from '@/components/education/EducationIntentCta';
+import { FRIENDS_ANSWER, PlayBoggleWithFriendsSection } from '@/components/seo/PlayBoggleWithFriendsSection';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -53,6 +54,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 const faqs = [
   {
+    q: 'How do I play Boggle online with others?',
+    a: FRIENDS_ANSWER,
+  },
+  {
     q: 'What is Boggle online?',
     a: 'Boggle online is the browser version of the classic letter-grid word game: you get a grid of random letters and race a timer to find as many words as possible by connecting adjacent letters. LexiClash is a free online Boggle-style game with no download — solo against AI bots, or real-time multiplayer where everyone plays the same grid at once.',
   },
@@ -66,7 +71,7 @@ const faqs = [
   },
   {
     q: 'Can I play with friends online?',
-    a: 'Absolutely! Create a room, share the link with friends, and compete in real-time word battles. Up to 50 players can join. No account required — just share the room code or QR code.',
+    a: 'Yes. Create a room in Multiplayer, then share the 4-letter code, the QR, or the share button. Friends join from any browser. No download and no account. One room holds up to 50 players.',
   },
   {
     q: 'Is LexiClash better than Words With Friends?',
@@ -104,7 +109,7 @@ const howToJsonLd = JSON.stringify({
   totalTime: 'PT1M',
   step: [
     { '@type': 'HowToStep', name: 'Open LexiClash', text: 'Visit lexiclash.live in any browser — works on phone, tablet, and desktop. No download or signup needed.', url: 'https://www.lexiclash.live/en/singleplayer' },
-    { '@type': 'HowToStep', name: 'Choose Your Mode', text: 'Pick Solo (vs AI bots), Multiplayer (2-20+ friends), Daily Challenge (same puzzle worldwide), or Adventure Mode (boss battles).' },
+    { '@type': 'HowToStep', name: 'Choose Your Mode', text: 'Pick Solo (vs AI bots), Multiplayer (a room of up to 50), Daily Challenge (same puzzle worldwide), or Adventure Mode (boss battles).' },
     { '@type': 'HowToStep', name: 'Find Words & Score', text: 'Swipe or click to connect adjacent letters and form words. Longer words and fast combos score more points. Compete on the global leaderboard!' },
   ],
 });
@@ -265,6 +270,8 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             </div>
           </div>
         </section>
+
+        <PlayBoggleWithFriendsSection locale={locale} />
 
         {/* WORDS WITH FRIENDS CROSS-LINK BANNER */}
         <section className="mt-12">

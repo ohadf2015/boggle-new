@@ -233,6 +233,15 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
                       {tryCtaByLocale[locale] || tryCtaByLocale.en}
                     </Button>
                   </Link>
+                  {locale === 'en' && (
+                    <p className={cn('mt-3 text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
+                      Or{' '}
+                      <Link href="/en/play-boggle-online-free" className="font-bold underline">
+                        play Boggle with friends online
+                      </Link>
+                      : create a room, share the code or QR, no download.
+                    </p>
+                  )}
                 </div>
               )}
 
