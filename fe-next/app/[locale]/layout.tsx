@@ -22,6 +22,7 @@ import Script from "next/script";
 import { headers } from 'next/headers';
 import { getRumBeaconScript } from '@/lib/analytics/rumBeaconScript';
 import { isBotUserAgent } from '@/lib/seo/botUa';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 // Synchronously primes CSS vars from localStorage before paint to prevent CLS
 // from AdMob SizeChanged async event and GlobalBottomNav ResizeObserver.
@@ -642,7 +643,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <link rel="apple-touch-icon" sizes="144x144" href="/icon-144.png" />
                 <script
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph(structuredData)) }}
                 />
                 <link rel="manifest" href="/manifest.webmanifest" />
                 <meta name="mobile-web-app-capable" content="yes" />

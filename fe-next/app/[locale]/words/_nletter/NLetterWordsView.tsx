@@ -11,6 +11,7 @@ import {
 } from '../_utils/wordListData';
 import { getNLetterWordsFaqs } from '../_utils/wordPageFaqSchema';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 // Private module (folder is `_nletter`, not a route). The /words/{n}-letter-words URLs
 // are served by the sibling [word] dynamic route, which delegates here. This used to be
@@ -108,7 +109,7 @@ function buildSchemaJson(n: number, locale: string, words: string[]): string {
     })),
   };
   const faqSchema = getNLetterWordsFaqs(n, words.length, locale);
-  return JSON.stringify([breadcrumb, itemList, faqSchema]);
+  return JSON.stringify(jsonLdGraph([breadcrumb, itemList, faqSchema]));
 }
 
 export async function NLetterWordsView({ locale, n }: { locale: string; n: WordLength }) {

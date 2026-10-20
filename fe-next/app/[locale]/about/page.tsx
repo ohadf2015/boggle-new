@@ -4,6 +4,7 @@ import AboutPageClient from './PageClient';
 export const revalidate = 86400;
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -129,7 +130,7 @@ export default async function AboutPage({ params }: PageProps) {
   // Safe: schemas built from static constants above, no user-supplied data
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph(schemas)) }} />
       <AboutPageClient />
       {(() => {
         const aboutSeoContent: Record<string, {

@@ -5,6 +5,7 @@ import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
 import { InlineBannerAd } from '@/components/ads';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,7 +103,7 @@ export default async function DailyArchivePage({ params }: PageParams) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph(schemas)) }}
       />
       <div className="min-h-screen bg-neo-navy text-neo-white">
         <div className="max-w-2xl mx-auto px-4 py-8">

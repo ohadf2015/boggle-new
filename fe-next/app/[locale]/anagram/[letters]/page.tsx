@@ -7,6 +7,7 @@ import { calculateWordScore } from '@/shared/utils/scoring';
 import { parseLetters, findAnagramsFromLetters } from '../lib/anagramLogic';
 import { loadDictionaryWords } from '@/app/api/word-solver/dictionaryLoader';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
@@ -119,7 +120,7 @@ function buildSchemaJson(letters: string, locale: string, words: string[], total
     isPartOf: { '@type': 'WebSite', name: 'LexiClash', url: BASE_URL },
   };
 
-  return JSON.stringify([breadcrumb, itemList, faq, webPage]);
+  return JSON.stringify(jsonLdGraph([breadcrumb, itemList, faq, webPage]));
 }
 
 export default async function AnagramPage({ params }: PageParams) {

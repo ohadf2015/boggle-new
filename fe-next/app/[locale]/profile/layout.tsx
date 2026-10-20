@@ -1,6 +1,7 @@
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
@@ -141,7 +142,7 @@ export default async function ProfileLayout({ children, params }: ProfileLayoutP
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, profilePageSchema]) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([breadcrumbSchema, profilePageSchema])) }}
       />
       {children}
     </>

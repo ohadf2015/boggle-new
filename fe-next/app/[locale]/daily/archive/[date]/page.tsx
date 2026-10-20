@@ -5,6 +5,7 @@ import { loadTranslation, type TranslationData } from '@/translations/loadTransl
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
 import { safeToLocaleDateString, safeToLocaleString } from '@/utils/bcp47Locale';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 export const dynamic = 'force-dynamic';
 
@@ -159,7 +160,7 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
   const nextDateStr = nextDate.toISOString().split('T')[0];
 
   // JSON-LD — server-generated trusted data only
-  const schemaJson = JSON.stringify([{
+  const schemaJson = JSON.stringify(jsonLdGraph([{
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
@@ -168,7 +169,7 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
       { '@type': 'ListItem', position: 3, name: 'Archive', item: `${BASE_URL}/${locale}/daily/archive` },
       { '@type': 'ListItem', position: 4, name: `#${puzzleNumber}`, item: `${BASE_URL}/${locale}/daily/archive/${date}` },
     ],
-  }]);
+  }]));
 
   return (
     <>
