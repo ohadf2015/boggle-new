@@ -1,6 +1,6 @@
 import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ResultsTeacherProTrialCard } from '@/components/education/results/ResultsTeacherProTrialCard';
 import { resultsTrialCopy } from '@/lib/education/pro/trialCtaCopy';
@@ -38,16 +38,8 @@ describe('ResultsTeacherProTrialCard', () => {
     expect(screen.getByTestId('results-teacher-pro-trial-card')).toHaveTextContent('$49 per teacher / year for 5+ teachers');
   });
 
-  it('fires education_upsell_impression with placement classroom_results, and the upgrade click on tap', () => {
+  it('fires the upgrade click with placement classroom_results on tap (impressions: see the viewport-gated suite)', () => {
     render(<ResultsTeacherProTrialCard language="he" />);
-    expect(growth.trackGrowthEvent).toHaveBeenCalledWith(
-      'education_upsell_impression',
-      expect.objectContaining({ cta: 'teacher_pro_trial', placement: 'classroom_results' }),
-    );
-    expect(growth.trackGrowthEvent).toHaveBeenCalledWith(
-      'education_upsell_impression',
-      expect.objectContaining({ cta: 'district_upsell', placement: 'classroom_results' }),
-    );
     fireEvent.click(screen.getByTestId('results-teacher-pro-trial-cta'));
     expect(funnel.trackTeacherProUpgradeClick).toHaveBeenCalledWith(
       expect.objectContaining({ locale: 'he', placement: 'classroom_results' }),
@@ -81,5 +73,74 @@ describe('ResultsTeacherProTrialCard', () => {
       }
       expect(c.trialCta).toContain('14');
     }
+  });
+});
+
+describe('ResultsTeacherProTrialCard impressions are viewport-gated', () => {
+  type Cb = (entries: Array<{ isIntersecting: boolean; intersectionRatio: number }>) => void;
+  let observers: Array<{ cb: Cb; targets: Element[] }> = [];
+  const original = globalThis.IntersectionObserver;
+
+  beforeEach(() => {
+    Object.assign(pro, { hasPro: false, loading: false, known: true, trialUsed: false });
+    growth.trackGrowthEvent.mockClear();
+    observers = [];
+    class FakeIO {
+      private o: { cb: Cb; targets: Element[] };
+      constructor(cb: Cb) {
+        this.o = { cb, targets: [] };
+        observers.push(this.o);
+      }
+      observe(el: Element) {
+        this.o.targets.push(el);
+      }
+      disconnect() {}
+      unobserve() {}
+      takeRecords() {
+        return [];
+      }
+    }
+    globalThis.IntersectionObserver = FakeIO as unknown as typeof IntersectionObserver;
+  });
+  afterEach(() => {
+    globalThis.IntersectionObserver = original;
+  });
+
+  const impressions = () =>
+    growth.trackGrowthEvent.mock.calls.filter(([e]) => e === 'education_upsell_impression').map(([, d]) => (d as { cta: string }).cta);
+
+  it('does not count an impression while the card is hidden or off screen (display:none on a short projector, below the fold on a phone)', () => {
+    render(<ResultsTeacherProTrialCard language="en" />);
+    const card = screen.getByTestId('results-teacher-pro-trial-card');
+    expect(observers.length).toBe(2);
+    expect(observers.every((o) => o.targets.includes(card))).toBe(true);
+    act(() => observers.forEach((o) => o.cb([{ isIntersecting: false, intersectionRatio: 0 }])));
+    expect(impressions()).toEqual([]);
+  });
+
+  it('counts trial + school impressions once, when half the card is on screen', () => {
+    render(<ResultsTeacherProTrialCard language="he" />);
+    act(() => observers.forEach((o) => o.cb([{ isIntersecting: true, intersectionRatio: 0.6 }])));
+    act(() => observers.forEach((o) => o.cb([{ isIntersecting: true, intersectionRatio: 1 }])));
+    expect(impressions().sort()).toEqual(['district_upsell', 'teacher_pro_trial']);
+    expect(growth.trackGrowthEvent).toHaveBeenCalledWith(
+      'education_upsell_impression',
+      expect.objectContaining({ cta: 'teacher_pro_trial', placement: 'classroom_results', locale: 'he' }),
+    );
+    expect(growth.trackGrowthEvent).toHaveBeenCalledWith(
+      'education_upsell_impression',
+      expect.objectContaining({ cta: 'district_upsell', placement: 'classroom_results', locale: 'he' }),
+    );
+  });
+
+  it('attaches the observer only after the entitlement read settles', () => {
+    pro.loading = true;
+    const { rerender } = render(<ResultsTeacherProTrialCard language="en" />);
+    expect(observers.length).toBe(0);
+    pro.loading = false;
+    rerender(<ResultsTeacherProTrialCard language="en" />);
+    expect(observers.length).toBe(2);
+    act(() => observers.forEach((o) => o.cb([{ isIntersecting: true, intersectionRatio: 1 }])));
+    expect(impressions().length).toBe(2);
   });
 });
