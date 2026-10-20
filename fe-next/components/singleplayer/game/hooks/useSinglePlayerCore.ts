@@ -124,7 +124,7 @@ export function useSinglePlayerCore({
   // briefly looked like solo-bots and got a Start card it should never have).
   const [started, setStarted] = useState(false);
   const coach = !!settings.coach;
-  const awaitingStart = startsBehindGate(settings.mode, coach) && !started;
+  const awaitingStart = startsBehindGate(settings.mode, coach, !!settings.shortCoach) && !started;
   const validWordCount = foundWords.filter((fw) => fw.isValid === true).length;
   const clockHeldForCoach = coachClockHeld(coach, validWordCount);
   const handleStart = useCallback(() => setStarted(true), []);

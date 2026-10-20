@@ -25,6 +25,11 @@ describe('startsBehindGate', () => {
     expect(startsBehindGate('challenge', true)).toBe(false);
   });
 
+  it('a search lander (shortCoach) starts with the clock running, no Start card', () => {
+    expect(startsBehindGate('challenge', false, true)).toBe(false);
+    expect(coachClockHeld(false, 0)).toBe(false);
+  });
+
   it('a coached round has no earthquake and holds the clock until one real word', () => {
     expect(roundEventsEnabled('challenge', false, true)).toBe(false);
     expect(coachClockHeld(true, 0)).toBe(true);
