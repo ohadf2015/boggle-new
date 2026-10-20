@@ -105,10 +105,10 @@ const settings = {
   minWordLength: 3,
 } as unknown as SinglePlayerGameState;
 
-const renderGame = (props: { hideModeCoach?: boolean; mode?: string } = {}) =>
+const renderGame = (props: { hideModeCoach?: boolean; mode?: string; shortCoach?: boolean } = {}) =>
   render(
     <SinglePlayerGame
-      settings={{ ...settings, mode: props.mode ?? 'challenge' } as SinglePlayerGameState}
+      settings={{ ...settings, mode: props.mode ?? 'challenge', shortCoach: props.shortCoach } as SinglePlayerGameState}
       targetHighScore={null}
       onGameEnd={vi.fn()}
       onQuit={vi.fn()}
@@ -138,6 +138,12 @@ describe('SinglePlayerGame first-round lesson', () => {
   it('stays out of practice', () => {
     renderGame({ mode: 'practice' });
     expect(screen.queryByTestId('lesson-hud')).toBeNull();
+  });
+
+  it('search landers get one inline hint instead of the lesson', () => {
+    renderGame({ shortCoach: true });
+    expect(screen.queryByTestId('lesson-hud')).toBeNull();
+    expect(screen.getByTestId('search-inline-hint')).toBeInTheDocument();
   });
 
   it('does not return once the player finished or skipped it', () => {

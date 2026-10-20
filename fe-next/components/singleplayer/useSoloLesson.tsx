@@ -35,6 +35,10 @@ export interface SoloLesson {
   holdClock: boolean;
   hud: ReactNode;
   overlay: ReactNode;
+  /** Lesson step id while the lesson is running; null otherwise. */
+  stepId: string | null;
+  complete: boolean;
+  skipped: boolean;
 }
 
 /** Classic solo's first round, taught as a lesson on the real board. */
@@ -82,7 +86,17 @@ export function useSoloLesson({
     return path ? { key: event.key, cells: path, points } : null;
   }, [event, grid, language, foundWords]);
 
-  if (!lesson.active) return { active: false, holdClock: false, hud: null, overlay: null };
+  if (!lesson.active) {
+    return {
+      active: false,
+      holdClock: false,
+      hud: null,
+      overlay: null,
+      stepId: null,
+      complete: lesson.complete,
+      skipped: lesson.skipped,
+    };
+  }
 
   const dragging = formedWord.length > 0;
   const nextIndex = hint && dragging ? nextTraceIndex(hint.word, formedWord) : -1;
@@ -124,6 +138,9 @@ export function useSoloLesson({
         )}
       </>
     ),
+    stepId: step?.id ?? null,
+    complete: lesson.complete,
+    skipped: lesson.skipped,
   };
 }
 
