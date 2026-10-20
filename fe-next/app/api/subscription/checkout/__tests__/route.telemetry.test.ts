@@ -63,18 +63,33 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
     expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
-  it('Given Polar fails, When the route answers 500, Then nothing is counted as started', async () => {
+  it('Given Polar fails, When the route answers 500, Then nothing is counted as started, but edu_pro_checkout_failed fires for the user', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1' })
     createCheckout.mockRejectedValue(new Error('polar down'))
     const res = await POST(req())
     expect(res.status).toBe(500)
-    expect(capture).not.toHaveBeenCalled()
+    expect(capture).toHaveBeenCalledTimes(1)
+    const arg = capture.mock.calls[0][0]
+    expect(arg).toMatchObject({ distinctId: 'u1', event: 'edu_pro_checkout_failed' })
+    expect(arg.properties.reason).toBe('server_error')
+    expect(arg.properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
   it('Given an unauthenticated caller, When refused, Then nothing fires', async () => {
     getAuthedUser.mockResolvedValue(null)
     await POST(req())
     expect(capture).not.toHaveBeenCalled()
+  })
+
+  it('Given Polar env vars are missing, When the route answers 503, Then edu_pro_checkout_failed fires with that reason', async () => {
+    delete process.env.POLAR_ACCESS_TOKEN
+    const res = await POST(req())
+    expect(res.status).toBe(503)
+    expect(capture).toHaveBeenCalledTimes(1)
+    const arg = capture.mock.calls[0][0]
+    expect(arg).toMatchObject({ distinctId: 'anonymous', event: 'edu_pro_checkout_failed' })
+    expect(arg.properties.reason).toBe('polar_not_configured')
+    expect(getAuthedUser).not.toHaveBeenCalled()
   })
 
   it('Given PostHog itself throws, When a checkout is created, Then the teacher still gets the same checkout url', async () => {
