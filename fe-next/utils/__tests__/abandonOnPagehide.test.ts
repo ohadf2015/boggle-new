@@ -20,6 +20,8 @@ import {
   emitAbandonOnSpaNavigate,
   updateActiveGameExtras,
   __resetAbandonStateForTests,
+  setPagehideFinalizer,
+  clearPagehideFinalizer,
 } from '../abandonOnPagehide';
 
 function fireEvent(name: string) {
@@ -187,5 +189,47 @@ describe('abandonOnPagehide', () => {
       expect(calls[0][1]).toMatchObject({ reason: 'spa_navigate', mode: 'classic', durationSec: 30 });
       vi.useRealTimers();
     });
+  });
+
+  it('runs the pagehide finalizer first; a finalizer that ends the game suppresses the abandon', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    markGameActive('word-tower');
+    vi.setSystemTime(new Date('2026-01-01T00:00:30Z'));
+    const finalizer = vi.fn(() => markGameInactive());
+    setPagehideFinalizer(finalizer);
+
+    fireEvent('pagehide');
+
+    expect(finalizer).toHaveBeenCalledTimes(1);
+    expect(captureMock.mock.calls.map((c) => c[0])).not.toContain('growth:game_abandoned');
+    vi.useRealTimers();
+  });
+
+  it('a finalizer that does not end the game (or throws) leaves the abandon in place', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    markGameActive('word-tower');
+    vi.setSystemTime(new Date('2026-01-01T00:00:30Z'));
+    setPagehideFinalizer(() => {
+      throw new Error('boom');
+    });
+
+    fireEvent('pagehide');
+
+    expect(captureMock.mock.calls.map((c) => c[0])).toContain('growth:game_abandoned');
+    vi.useRealTimers();
+  });
+
+  it('clearPagehideFinalizer only clears the finalizer it was given', () => {
+    const mine = vi.fn();
+    const theirs = vi.fn();
+    setPagehideFinalizer(theirs);
+    clearPagehideFinalizer(mine);
+    fireEvent('pagehide');
+    expect(theirs).toHaveBeenCalledTimes(1);
+    clearPagehideFinalizer(theirs);
+    fireEvent('pagehide');
+    expect(theirs).toHaveBeenCalledTimes(1);
   });
 });

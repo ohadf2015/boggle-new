@@ -18,6 +18,7 @@ interface Args {
   phase: string;
   floors: number;
   peakM: number;
+  heightM: number;
   score: number;
   resultsShown: boolean;
   seedDemo: (words?: string[]) => void;
@@ -42,6 +43,7 @@ export function useV2Ready({
   phase,
   floors,
   peakM,
+  heightM,
   score,
   resultsShown,
   seedDemo,
@@ -88,7 +90,7 @@ export function useV2Ready({
     extras: { v2: true, daily, heightM: Math.round(peakM) },
   });
   // After the start hook so this cleanup runs first and cancels its SPA abandon.
-  useDailyTowerLifecycle({ daily, floors, peakM, score });
+  useDailyTowerLifecycle({ daily, floors, peakM, heightM, score });
 
   useEffect(() => {
     const onLeave = (e: BeforeUnloadEvent) => {

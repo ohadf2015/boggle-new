@@ -575,6 +575,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     phase,
     floors: run.floors,
     peakM: game.peakM,
+    heightM: game.heightM,
     score: liveScore,
     resultsShown: showOver || forceResults,
     seedDemo,

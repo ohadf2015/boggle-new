@@ -31,6 +31,27 @@ interface ActiveGame {
 
 let active: ActiveGame | null = null;
 let alreadyEmitted = false;
+let pagehideFinalizer: (() => void) | null = null;
+
+/**
+ * Lets a mode settle its own end on pagehide before the generic abandon
+ * decides (daily Word Tower: floors > 0 is a completed climb).
+ *
+ * A mode's own `pagehide` listener cannot do this: Chromium runs `window`
+ * listeners in registration order, capture or not, and this module's handler
+ * is installed at app mount — so it always ran first, logged
+ * `game_abandoned`, and the completion landed after PostHog's unload flush.
+ * The finalizer runs inside the abandon handler instead; if it ends the game
+ * (`trackGameEnd` → `markGameInactive`), no abandon is emitted.
+ */
+export function setPagehideFinalizer(fn: (() => void) | null): void {
+  pagehideFinalizer = fn;
+}
+
+/** Clears the finalizer only if it is still the one the caller set. */
+export function clearPagehideFinalizer(fn: () => void): void {
+  if (pagehideFinalizer === fn) pagehideFinalizer = null;
+}
 
 function currentLandingPath(): string | undefined {
   if (typeof window === 'undefined') return undefined;
@@ -66,6 +87,13 @@ export function isGameActive(): boolean {
 }
 
 function emitAbandonIfActive() {
+  if (pagehideFinalizer) {
+    try {
+      pagehideFinalizer();
+    } catch {
+      // A finalizer must never block the abandon path.
+    }
+  }
   if (!active || alreadyEmitted) return;
   const durationMs = Date.now() - active.startedAt;
   if (durationMs < MIN_ENGAGED_MS) return;
@@ -137,4 +165,5 @@ export function emitAbandonOnSpaNavigate(): void {
 export function __resetAbandonStateForTests(): void {
   active = null;
   alreadyEmitted = false;
+  pagehideFinalizer = null;
 }

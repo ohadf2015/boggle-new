@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const trackGameEnd = vi.fn();
 const updateActiveGameExtras = vi.fn();
+const setPagehideFinalizer = vi.fn();
+const clearPagehideFinalizer = vi.fn();
 
 vi.mock('@/utils/growthTracking', () => ({
   trackGameEnd: (...args: unknown[]) => trackGameEnd(...args),
@@ -10,6 +12,8 @@ vi.mock('@/utils/growthTracking', () => ({
 }));
 vi.mock('@/utils/abandonOnPagehide', () => ({
   updateActiveGameExtras: (...args: unknown[]) => updateActiveGameExtras(...args),
+  setPagehideFinalizer: (...args: unknown[]) => setPagehideFinalizer(...args),
+  clearPagehideFinalizer: (...args: unknown[]) => clearPagehideFinalizer(...args),
 }));
 
 import { useDailyTowerLifecycle } from '../useDailyTowerLifecycle';
@@ -18,6 +22,35 @@ describe('useDailyTowerLifecycle', () => {
   beforeEach(() => {
     trackGameEnd.mockClear();
     updateActiveGameExtras.mockClear();
+    setPagehideFinalizer.mockClear();
+    clearPagehideFinalizer.mockClear();
+  });
+
+  it('registers a pagehide finalizer that completes once, and clears it on unmount', () => {
+    const { unmount } = renderHook(() =>
+      useDailyTowerLifecycle({ daily: true, floors: 2, peakM: 0, heightM: 6, score: 20 }),
+    );
+    expect(setPagehideFinalizer).toHaveBeenCalledTimes(1);
+    const finalize = setPagehideFinalizer.mock.calls[0][0] as () => void;
+    finalize();
+    finalize();
+    expect(trackGameEnd).toHaveBeenCalledTimes(1);
+    expect(trackGameEnd.mock.calls[0][3]).toBe(true);
+    unmount();
+    expect(clearPagehideFinalizer).toHaveBeenCalledWith(finalize);
+    expect(trackGameEnd).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports the live height mid-climb, when peakM has not been set by a run end', () => {
+    const { rerender, unmount } = renderHook(
+      ({ heightM }: { heightM: number }) =>
+        useDailyTowerLifecycle({ daily: true, floors: 2, peakM: 0, heightM, score: 20 }),
+      { initialProps: { heightM: 3 } },
+    );
+    rerender({ heightM: 6.2 });
+    rerender({ heightM: 5.9 });
+    unmount();
+    expect(trackGameEnd.mock.calls[0][5]).toMatchObject({ floors: 2, heightM: 6 });
   });
 
   it('SPA leave with floors > 0 emits one game_completed and does not abandon', () => {
