@@ -162,12 +162,26 @@ export function __resetGrowthRadarMirrorForTests(): void {
   pendingEvents = [];
 }
 
+/** A developer's machine. next dev posts to the production write key; those
+ *  rows are not customers. Match the hosts Growth Radar's events_real drops. */
+function isLoopbackPage(): boolean {
+  try {
+    if (typeof window === 'undefined') return false;
+    const host = String(window.location?.hostname ?? '').toLowerCase().replace(/^\[|\]$/g, '').split('%')[0] ?? '';
+    return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host.endsWith('.localhost');
+  } catch {
+    return false;
+  }
+}
+
 /** Mirror one event to Growth Radar if it is on the allowlist, as
- *  growth:<event> with PII stripped. Never throws. */
+ *  growth:<event> with PII stripped. Never throws. Loopback pages are skipped:
+ *  a classroom session on localhost:3011 is not a LexiClash signup. */
 export function mirrorGrowthEvent(
   event: string,
   properties?: Record<string, unknown>,
 ): void {
   if (!MIRRORED_EVENTS.has(event)) return;
+  if (isLoopbackPage()) return;
   grCaptureOrQueue(`growth:${event}`, sanitizeProps(properties));
 }

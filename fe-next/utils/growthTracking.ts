@@ -659,7 +659,11 @@ export const nextSignupImpressionSeq = (): number => {
 /**
  * Track a growth event
  */
-export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {}): void => {
+export const trackGrowthEvent = (
+  event: GrowthEvent,
+  data: GrowthEventData = {},
+  opts?: { mirror?: boolean },
+): void => {
   // Seeing a results screen ends the round, whoever reported it. `trackGameEnd`
   // used to be the only thing clearing the active-game flag, but it is driven by
   // `useGameEndTelemetry`, which keys off `tournament.finalScores` /
@@ -728,7 +732,9 @@ export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {})
   // Growth Radar's product funnel (t_eb26d5c5: coverage sat at 3%).
   // Best-effort: allowlist-only, PII-stripped, queued until gr.js loads,
   // never throws, never blocks the game path.
-  mirrorGrowthEvent(event, enrichedData);
+  // `mirror: false` is the undeduped signup funnel step — Growth Radar must
+  // count signup_completed only from maybeTrackSignupCompleted.
+  if (opts?.mirror !== false) mirrorGrowthEvent(event, enrichedData);
 
   // Send to GA4 for unified analytics
   // Convert GrowthEventData to Record<string, string | number | boolean>
@@ -1048,8 +1054,11 @@ export const trackSignupFunnel = (
     trackGrowthEvent('signup_prompt_shown', merged);
     if (isFirstWin) trackGrowthEvent('first_win_signup_shown', merged);
   } else if (step === 'completed') {
-    trackGrowthEvent('signup_completed', merged);
-    if (isFirstWin) trackGrowthEvent('first_win_signup_completed', merged);
+    // AuthProvider also calls maybeTrackSignupCompleted on the same transition.
+    // That emitter is recency-gated and per-user deduped. This one is not, so
+    // mirroring both counted one signup twice. PostHog still gets this step.
+    trackGrowthEvent('signup_completed', merged, { mirror: false });
+    if (isFirstWin) trackGrowthEvent('first_win_signup_completed', merged, { mirror: false });
   } else {
     // t_147a0f0c: dismissals carry the surface/source that served the prompt so
     // dismiss rate can be split per surface like shown/clicked.
