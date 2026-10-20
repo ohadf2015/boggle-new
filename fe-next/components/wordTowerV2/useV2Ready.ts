@@ -8,6 +8,7 @@ import { getGuestFingerprint } from '@/utils/guestManager';
 import { canUseV2ReviewHooks, v2ReviewHooksFromSearch } from '@/lib/wordTowerV2/reviewHooks';
 import { rankFromDailyBoard } from '@/lib/wordTowerV2/daily';
 import { shouldConfirmLeave } from '@/lib/wordTowerV2/runPersist';
+import { useDailyTowerLifecycle } from './useDailyTowerLifecycle';
 
 interface Args {
   daily: boolean;
@@ -86,6 +87,8 @@ export function useV2Ready({
     wordCount: floors,
     extras: { v2: true, daily, heightM: Math.round(peakM) },
   });
+  // After the start hook so this cleanup runs first and cancels its SPA abandon.
+  useDailyTowerLifecycle({ daily, floors, peakM, score });
 
   useEffect(() => {
     const onLeave = (e: BeforeUnloadEvent) => {

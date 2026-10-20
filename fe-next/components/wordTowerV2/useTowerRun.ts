@@ -223,6 +223,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean }) {
     endV2Run(startedAtRef, {
       floors: statsRef.current.peakFloors,
       heightM: peak,
+      daily: !!dailySeed,
     });
     // Mark run as ended to prevent double-firing the event
     endedRef.current = true;
