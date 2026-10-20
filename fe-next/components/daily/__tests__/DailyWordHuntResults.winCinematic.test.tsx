@@ -160,7 +160,6 @@ vi.mock('../results', () => ({
   MoreOptionsAccordion: () => <div data-testid="more-options" />,
   SharePanel: () => <div data-testid="share-panel" />,
   DailyWordHuntFacts: () => <div data-testid="daily-word-hunt-facts" />,
-  MasteryRatingSection: () => <div data-testid="mastery-rating-section" />,
 }));
 
 // ── Inline sub-components ─────────────────────────────────────────────────────
