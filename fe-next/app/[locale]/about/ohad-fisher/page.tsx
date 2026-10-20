@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 export const revalidate = 86400;
 
@@ -119,7 +120,7 @@ export default async function OhadFisherPage({ params }: PageProps) {
     };
 
     // Safe: schemas built from static hardcoded constants above; no user input is serialized.
-    const jsonLd = JSON.stringify([personSchema, breadcrumbSchema]);
+    const jsonLd = JSON.stringify(jsonLdGraph([personSchema, breadcrumbSchema]));
 
     return (
         <>

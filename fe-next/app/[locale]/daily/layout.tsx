@@ -2,6 +2,7 @@ import { loadTranslation } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { dailySeoContent } from './dailySeo.data';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
@@ -290,14 +291,14 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([
+          __html: JSON.stringify(jsonLdGraph([
             breadcrumbSchema,
             webPageSchema,
             challengeListSchema,
             softwareAppSchema,
             wordHuntEventSchema,
             howToSchema,
-          ]),
+          ])),
         }}
       />
       {children}

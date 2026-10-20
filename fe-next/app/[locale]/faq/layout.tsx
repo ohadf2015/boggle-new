@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { loadTranslation } from '@/translations/loadTranslation';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
@@ -60,7 +61,7 @@ function buildFAQSchemas(localePath: string, faqT: Record<string, any>): string 
     },
   };
 
-  return JSON.stringify([breadcrumbSchema, faqSchema, webPageSchema]);
+  return JSON.stringify(jsonLdGraph([breadcrumbSchema, faqSchema, webPageSchema]));
 }
 
 interface FAQLayoutProps {

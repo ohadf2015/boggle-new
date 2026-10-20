@@ -3,6 +3,7 @@ import { loadTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { AnimatedLanding } from './AnimatedLanding';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 export const dynamic = 'force-dynamic';
 
@@ -208,7 +209,7 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
       <script
         type="application/ld+json"
 
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDataPayload) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph(structuredDataPayload)) }}
       />
 
       <AnimatedLanding

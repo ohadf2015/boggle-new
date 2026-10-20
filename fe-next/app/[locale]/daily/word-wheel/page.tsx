@@ -3,6 +3,7 @@ import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { DailyLoadingFallback } from '@/components/daily/DailyLoadingFallback';
 import { retryImport } from '@/utils/retryImport';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
@@ -226,7 +227,7 @@ export default async function WordWheelPage({ params }: PageParams): Promise<Rea
   return (
     <>
       {/* Static JSON-LD — all content from hardcoded constants, no user input */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph(schemas)) }} />
       <Suspense fallback={<LoadingFallback />}>
         <WordWheelChallenge />
       </Suspense>

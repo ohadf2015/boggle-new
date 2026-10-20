@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 const SITE_URL = 'https://www.lexiclash.live';
 
@@ -134,7 +135,7 @@ export function GameModeJsonLd({ mode, locale, includeFaq = false }: GameModeJso
     return (
         <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph(schemas)) }}
         />
     );
 }
