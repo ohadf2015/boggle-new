@@ -50,7 +50,7 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
 
   const state = game.wheelRushState;
   if (!state) {
-    logger.warn('WHEEL_RUSH', `submitWheelWord from ${username} in ${gameCode} — wheelRushState is null (mode=${game.gameMode}, state=${game.gameState}, users=${Object.keys(game.users).length})`);
+    logger.debug('WHEEL_RUSH', `submitWheelWord from ${username} in ${gameCode} — wheelRushState is null (mode=${game.gameMode}, state=${game.gameState}, users=${Object.keys(game.users).length})`);
     socket.emit('error', { code: 'WHEEL_STATE_NOT_INITIALIZED' });
     return;
   }

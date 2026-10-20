@@ -34,7 +34,6 @@ vi.mock('../results', () => ({
   ShareSection: () => <div data-testid="share-section" />,
   CoinUnlockCard: () => <div data-testid="coin-unlock" />,
   MoreOptionsAccordion: () => <div data-testid="more-options" />,
-  MasteryRatingSection: () => <div data-testid="mastery-rating-section" />,
 }));
 vi.mock('../TabbedDailyLeaderboard', () => ({ default: function MockLeaderboard() { return <div data-testid="leaderboard" />; } }));
 // The heavy signup card is gone from this screen (replaced by DismissibleSignupLine
@@ -155,7 +154,6 @@ describe('WordHuntResultsContent', () => {
   it('renders core sections for a solved puzzle', () => {
     render(<WordHuntResultsContent {...baseProps} />);
     expect(screen.getByTestId('result-display')).toBeInTheDocument();
-    expect(screen.getByTestId('mastery-rating-section')).toBeInTheDocument();
     expect(screen.getByTestId('share-section')).toBeInTheDocument();
     expect(screen.getByTestId('leaderboard')).toBeInTheDocument();
   });
@@ -198,10 +196,9 @@ describe('WordHuntResultsContent', () => {
   describe('guest simplification', () => {
     const guestProps = { ...baseProps, isAuthenticated: false, inlineSignupDismissed: false };
 
-    it('keeps score, mastery rating, the share artifact, leaderboard and the signup line', () => {
+    it('keeps score, the share artifact, leaderboard and the signup line', () => {
       render(<WordHuntResultsContent {...guestProps} />);
       expect(screen.getByTestId('result-display')).toBeInTheDocument();
-      expect(screen.getByTestId('mastery-rating-section')).toBeInTheDocument();
       expect(screen.getByTestId('leaderboard')).toBeInTheDocument();
       expect(screen.getByTestId('signup-line')).toBeInTheDocument();
     });

@@ -652,7 +652,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       // persistence key — that is how game GHYRVS lost a full round of
       // student answers on 2026-09-05. The quiz answers for itself.
       if (handleQuizRequestResults(io, socket, gameCode)) return;
-      logger.warn('SOCKET', `requestResults on ${clockExpired ? 'overdue' : 'orphaned (no start stamp + no timer)'} in-progress game ${gameCode} — forcing endGame`);
+      logger.info('SOCKET', `requestResults on ${clockExpired ? 'overdue' : 'orphaned (no start stamp + no timer)'} in-progress game ${gameCode} — forcing endGame`);
       endGame(io, gameCode);
     }
   });

@@ -161,11 +161,17 @@ describe('Education Landing — redesign (WU-9)', () => {
       }
     });
 
-    it('ships an above-fold Teacher Pro checkout CTA to teacher/upgrade with $9', () => {
+    it('ships a Teacher Pro trial CTA to teacher/upgrade, with $9/mo after the trial', () => {
       render(<EducationPageClient />);
       const pro = screen.getByTestId('teacher-pro-checkout-link');
       expect(pro).toHaveAttribute('href', expect.stringContaining('teacher/upgrade'));
-      expect(pro.textContent).toMatch(/\$9/);
+      expect(pro.textContent).toBe('Start your 14-day Teacher Pro trial');
+      expect(screen.getByTestId('teacher-pro-checkout-cta').textContent).toMatch(/\$9/);
+    });
+
+    it('never says "no trial clock" — Teacher Pro has a 14-day trial', () => {
+      const { container } = render(<EducationPageClient />);
+      expect(container.textContent ?? '').not.toMatch(/trial clock/i);
     });
   });
 });

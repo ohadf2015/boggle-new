@@ -17296,7 +17296,8 @@ const sv = {
       "cta": "Skapa din första klass",
       "expired_title": "Din lärarprovperiod har tagit slut",
       "expired_kept": "Dina klasser och ordlistor förblir gratis. Rapporter, ordbehärskning och lugnt läge kräver Pro.",
-      "recap": "Under provperioden körde du {{games}} spel för {{students}} elever.",
+            "recap": "Under din provperiod — spel du kört: {{games}}, elever i din lista: {{students}}",
+      "recapGamesOnly": "Under din provperiod — spel du kört: {{games}}",
       "expired_body": "Din gratis provperiod är slut. Ansök igen eller kontakta oss för att behålla klassrumsläget.",
       "renew_cta": "Förnya lärarbehörighet"
     },
