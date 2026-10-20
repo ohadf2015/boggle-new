@@ -75,6 +75,15 @@ describe('ModeRow (fresh section 4)', () => {
     });
   });
 
+  it('each card names who you play with (Multiplayer / Solo / vs bot) in a chip', () => {
+    const { container } = render(<ModeRow />);
+    const byKey = (k: string) => container.querySelector(`a[data-mode="${k}"]`) as HTMLElement;
+    expect(byKey('arena').textContent).toContain('landing.home.modeTag.multiplayer');
+    expect(byKey('wordCraft').textContent).toContain('landing.home.modeTag.vsBot');
+    expect(byKey('wordCraft').textContent).toContain('landing.home.modeTag.untimed');
+    expect(byKey('adventure').textContent).toContain('landing.home.modeTag.solo');
+  });
+
   it('a card click keeps the hub instrumentation (mode_card + mode_selected)', () => {
     const { container } = render(<ModeRow />);
     fireEvent.click(cards(container)[0]);

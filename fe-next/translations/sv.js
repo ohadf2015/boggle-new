@@ -8726,6 +8726,12 @@ const sv = {
       },
       "online": "online",
       "gameModes": "Spellägen",
+      "modeTag": {
+        "solo": "Solo",
+        "multiplayer": "Flerspelare",
+        "vsBot": "Mot bot",
+        "untimed": "Ingen timer"
+      },
       "todaysPuzzle": "Dagens pussel",
       "wheelWord": "ORDHJUL",
       "puzzleNo": "Pussel #{n}",
@@ -16414,6 +16420,8 @@ const sv = {
       "promo_title": "Undervisa med LexiClash, helt gratis",
       "promo_subtitle": "Kör ordspel med klassen, gör egna ordlistor och se vem som fastnar.",
       "promo_cta": "Se klassläget",
+      "promo_line": "Lärare: ordspel live med klassen och egna ordlistor. Elever: gå med via en kod.",
+      "join_cta": "Gå med med en kod",
       "teacher_title": "Ditt klassrum är redo",
       "teacher_subtitle": "Skapa klasser, tilldela spel och följ elevernas framsteg.",
       "teacher_cta": "Öppna lärarpanelen",

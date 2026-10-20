@@ -16,7 +16,7 @@ import { placeBlastAfterArena } from '@/lib/landing/blastPlacement';
 import { orderModesForNewcomer } from '@/lib/landing/newcomerModeOrder';
 import { HomeModeGrid } from './home/HomeModeGrid';
 import { useAdventureResume } from './useAdventureResume';
-import { MODE_META, modeRoute, isCalmMode, type ModeCubeModel } from '@/lib/landing/modeMeta';
+import { MODE_META, MODE_TAGS, modeLineKey, modeRoute, isCalmMode, type ModeCubeModel } from '@/lib/landing/modeMeta';
 
 interface LandingChallengeCardsProps {
   language: string;
@@ -230,9 +230,11 @@ export function LandingChallengeCards({
         });
       }
     };
+    const lineKey = modeLineKey(key);
     const base: ModeCubeModel = {
       key, title: t(meta.titleKey), href, variant: meta.variant, Icon: meta.Icon,
       genIcon: meta.genIcon, imgScale: meta.imgScale, badge: meta.badge, category: meta.category, role, onClick,
+      description: lineKey ? t(lineKey) : undefined, tag: MODE_TAGS[key],
     };
     if (key === 'arena') {
       const arenaHighlight = isFirstTimer && !isNewbie && !practiceWinsHighlight;

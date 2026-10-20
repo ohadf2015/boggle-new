@@ -18,6 +18,7 @@ import { LandingChallengeCards } from './LandingChallengeCards';
 import { HomeTopBar } from './home/HomeTopBar';
 import { HomeDailyHero } from './home/HomeDailyHero';
 import { LaunchProvider } from './home/HomeLaunch';
+import { HomeEducationCardConnected } from '@/components/education/HomeEducationCardConnected';
 
 const EventBanner = dynamic(() => import('@/components/events/EventBanner'), { ssr: false });
 const PlayfulBackground = dynamic(
@@ -116,6 +117,9 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
           t={t}
           cardOrder={initialData?.cardOrder}
         />
+        {/* Education entry: teacher dashboard, the student's class, or the
+            classroom-mode promo for everyone else. Slim, after the modes. */}
+        <HomeEducationCardConnected />
       </section>
     </LaunchProvider>
   );

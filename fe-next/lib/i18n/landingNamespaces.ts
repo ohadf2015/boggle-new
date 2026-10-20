@@ -66,6 +66,8 @@ export const LANDING_EXTRA_KEYS = [
   'education.home.badge_student',
   'education.home.badge_teacher',
   'education.home.promo_cta',
+  'education.home.promo_line',
+  'education.home.join_cta',
   'education.home.promo_subtitle',
   'education.home.promo_title',
   'education.home.student_cta',

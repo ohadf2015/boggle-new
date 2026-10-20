@@ -168,9 +168,48 @@ export interface ModeCubeModel {
    * the bento.
    */
   readonly resume?: AdventureResume;
+  /** one-line pitch under the title (homeFresh line, or the mode's own tagline) */
+  readonly description?: string;
+  /** who you play with + pacing, painted as a small chip — see MODE_TAGS */
+  readonly tag?: ModeTag;
   /** bento role: the anchor gets the 2×2 hero slot, the rest are 1×1 cubes */
   readonly role: 'anchor' | 'normal';
   readonly onClick: () => void;
+}
+
+/**
+ * Static "who / how" facts per mode for the homepage chip: who you play with,
+ * and whether there is a clock. Only modes whose facts are certain are listed:
+ * arena is the live room; wordCraft is played against the bot; crossword,
+ * wordCraft and connections are the untimed calm puzzles (see `category`).
+ * A mode missing here simply renders no chip.
+ */
+export interface ModeTag {
+  readonly players: 'solo' | 'multiplayer' | 'vsBot';
+  readonly untimed?: boolean;
+}
+
+export const MODE_TAGS: Readonly<Record<string, ModeTag>> = {
+  arena: { players: 'multiplayer' },
+  adventure: { players: 'solo' },
+  wordTowerV2: { players: 'solo' },
+  brainGym: { players: 'solo' },
+  blast: { players: 'solo' },
+  connections: { players: 'solo', untimed: true },
+  crossword: { players: 'solo', untimed: true },
+  wordCraft: { players: 'vsBot', untimed: true },
+};
+
+/**
+ * i18n key for a mode's one-line pitch. The fresh homepage already ships a
+ * short, sentence-case line per public mode (homeFresh.modes.items.*), so the
+ * hub reuses it instead of growing a second copy; crossword has its tagline.
+ */
+const FRESH_LINE_MODES = new Set(['arena', 'adventure', 'wordTowerV2', 'wordCraft', 'connections', 'brainGym', 'blast']);
+export function modeLineKey(key: string): string | null {
+  if (FRESH_LINE_MODES.has(key)) return `homeFresh.modes.items.${key}.line`;
+  if (key === 'crossword') return 'crossword.tagline';
+  return null;
 }
 
 /** Full route for a mode cube, language-prefixed. Returns null for unknown keys. */

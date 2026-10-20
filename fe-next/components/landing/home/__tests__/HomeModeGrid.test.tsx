@@ -148,4 +148,25 @@ describe('HomeModeGrid', () => {
     render(<HomeModeGrid models={models} extras={extras} liveCount={0} />);
     expect(screen.getByText('+2')).toHaveAttribute('dir', 'ltr');
   });
+
+  it('gives each tile a who-you-play-with chip and a one-line pitch', () => {
+    const tagged = [
+      model('arena', { tag: { players: 'multiplayer' } }),
+      model('wordCraft', { tag: { players: 'vsBot', untimed: true }, description: 'Claim the grid' }),
+    ];
+    render(<HomeModeGrid models={tagged} extras={[]} liveCount={0} />);
+    const label = screen.getByTestId('mode-tile-label');
+    expect(within(label).getByTestId('mode-tag')).toHaveTextContent('landing.home.modeTag.vsBot');
+    expect(within(label).getByTestId('mode-tag')).toHaveTextContent('landing.home.modeTag.untimed');
+    expect(within(label).getByTestId('mode-tile-desc')).toHaveTextContent('Claim the grid');
+    expect(screen.getByTestId('mode-cube-anchor')).toHaveTextContent('landing.home.modeTag.multiplayer');
+  });
+
+  it('keeps the hover lift behind motion-safe (reduced motion gets no movement)', () => {
+    render(<HomeModeGrid models={models} extras={[]} liveCount={0} />);
+    for (const tile of screen.getAllByTestId('mode-cube')) {
+      expect(tile.className).toContain('motion-safe:hover:-translate-y-0.5');
+      expect(tile.className).not.toMatch(/(^|\s)hover:-translate-y/);
+    }
+  });
 });

@@ -19,6 +19,7 @@ import { FreshFriends } from './FreshFriends';
 import { ModeRow } from './ModeRow';
 import { FreshAdSlot } from './FreshAdSlot';
 import { FreshClassrooms } from './FreshClassrooms';
+import { FreshEduStrip } from './FreshEduStrip';
 
 export interface FreshPageProps {
   /**
@@ -36,6 +37,7 @@ export function FreshPage({ onPlay }: FreshPageProps) {
       <FreshDaily />
       <FreshFriends />
       <ModeRow />
+      <FreshEduStrip />
       <FreshAdSlot />
       <FreshClassrooms />
     </div>

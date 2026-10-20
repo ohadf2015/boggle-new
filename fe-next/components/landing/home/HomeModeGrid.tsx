@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, ChevronDown, Lock, Sparkles, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bot, ChevronDown, Lock, Sparkles, User, Users, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { CUBE_BLUR_DATA_URL, type ModeCubeModel, type ModeCubeVariant } from '@/lib/landing/modeMeta';
+import { CUBE_BLUR_DATA_URL, type ModeCubeModel, type ModeCubeVariant, type ModeTag } from '@/lib/landing/modeMeta';
 import { formatLiveShort } from '@/lib/landing/homeHubFormat';
 import ModeResumeChip from '../ModeResumeChip';
 import { useHomeLaunch } from './HomeLaunch';
@@ -23,6 +23,43 @@ const TINT: Record<ModeCubeVariant, { shadow: string; chip: string; ring: string
 
 const BADGE_CLASS =
   'w-fit rounded-full border-2 border-black px-1.5 py-0.5 font-neo-display font-black uppercase leading-none shadow-hard-sm';
+
+/** Literal keys (not a template) so i18n key guards can see every one. */
+const TAG_LABEL_KEY: Record<ModeTag['players'], string> = {
+  solo: 'landing.home.modeTag.solo',
+  multiplayer: 'landing.home.modeTag.multiplayer',
+  vsBot: 'landing.home.modeTag.vsBot',
+};
+const TAG_ICON = { solo: User, multiplayer: Users, vsBot: Bot } as const;
+
+/**
+ * "Solo" / "Multiplayer" / "vs bot" chip; "· No timer" joins it from md up.
+ * `compact` (phone row tiles, ~85px of label) keeps the icon and moves the word
+ * to screen readers only, so it shares one row with the NEW badge.
+ */
+function ModeTagChip({ tag, compact = false }: { tag: ModeTag; compact?: boolean }) {
+  const { t } = useLanguage();
+  const Icon = TAG_ICON[tag.players];
+  return (
+    <span
+      data-testid="mode-tag"
+      title={compact ? t(TAG_LABEL_KEY[tag.players]) : undefined}
+      className={cn(
+        'inline-flex w-fit max-w-full items-center gap-1 rounded-full border border-neo-cream/35 bg-black/45 py-0.5 font-neo-body text-[0.6rem] font-bold uppercase leading-none tracking-wide text-neo-cream md:px-1.5 md:text-[0.62rem]',
+        compact ? 'px-1' : 'px-1.5',
+      )}
+    >
+      <Icon className="h-3 w-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+      <span className={cn('truncate', compact && 'max-md:sr-only')}>{t(TAG_LABEL_KEY[tag.players])}</span>
+      {tag.untimed && (
+        <span className="hidden truncate md:inline">
+          <span aria-hidden="true">· </span>
+          {t('landing.home.modeTag.untimed')}
+        </span>
+      )}
+    </span>
+  );
+}
 
 interface ModeTileProps {
   model: ModeCubeModel;
@@ -64,7 +101,9 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
       className={cn(
         'group relative block overflow-hidden rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy',
         tint.shadow,
-        'transition-[transform,box-shadow] duration-100 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
+        // Hover: border brightens for everyone; the lift only when motion is welcome.
+        'transition-[transform,box-shadow,border-color] duration-150 ease-out hover:border-neo-cream/80 motion-safe:hover:-translate-y-0.5',
+        'active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-[border-color]',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
         tint.ring,
         anchor ? 'min-h-[5.75rem] flex-1 md:min-h-0' : 'h-[5.5rem] md:h-auto md:aspect-square',
@@ -79,7 +118,8 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
             'absolute inset-0',
             // Phone row tile: the mascot sits in its own inset well rather than a
             // hard-ruled slab glued to the edge, so the card reads as one object.
-            !anchor && 'max-md:inset-y-2 max-md:start-2 max-md:end-auto max-md:w-[4.125rem] max-md:overflow-hidden max-md:rounded-neo max-md:border-2 max-md:border-neo-cream/40 max-md:bg-black/30',
+            // A touch narrower than before so long titles (ADVENTURE, WORD TOWER) fit.
+            !anchor && 'max-md:inset-y-2.5 max-md:start-2.5 max-md:end-auto max-md:w-[3.875rem] max-md:overflow-hidden max-md:rounded-neo max-md:border-2 max-md:border-neo-cream/40 max-md:bg-black/30',
           )}
         >
         <Image
@@ -107,7 +147,13 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
         />
       )}
       <span aria-hidden="true" className="cube-glow pointer-events-none absolute inset-0 z-[1]" />
-      <span aria-hidden="true" className={cn('absolute inset-x-0 bottom-0 z-[1] h-3/5 bg-gradient-to-t from-neo-navy via-neo-navy/70 to-transparent', !anchor && 'max-md:hidden')} />
+      <span
+        aria-hidden="true"
+        className={cn(
+          'absolute inset-x-0 bottom-0 z-[1] h-3/5 bg-gradient-to-t from-neo-navy via-neo-navy/80 to-transparent',
+          !anchor && 'max-md:hidden md:h-3/4',
+        )}
+      />
       {anchor && (
         <span
           aria-hidden="true"
@@ -122,9 +168,19 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
 
       {anchor ? (
         <span className="absolute inset-0 z-[2] flex flex-col justify-end p-3 md:p-4">
+          {model.tag && (
+            <span className="mb-1.5">
+              <ModeTagChip tag={model.tag} />
+            </span>
+          )}
           <span className="font-neo-display text-2xl font-black uppercase leading-none tracking-tight text-neo-white drop-shadow-[0_2px_0_rgba(0,0,0,0.7)] md:text-2xl">
             {model.title}
           </span>
+          {model.description && (
+            <span className="mt-1 hidden max-w-[32ch] font-neo-body text-sm leading-snug text-neo-cream/90 drop-shadow-[0_1px_0_rgba(0,0,0,0.8)] md:line-clamp-2">
+              {model.description}
+            </span>
+          )}
           {model.livePill && (
             <span className="mt-1.5 inline-flex w-fit items-center gap-1.5 rounded-full border-2 border-black bg-neo-lime px-2 py-0.5 font-neo-display text-[0.65rem] font-black uppercase tracking-wide text-neo-navy shadow-hard-sm md:text-xs">
               <span className="relative flex h-2 w-2">
@@ -142,17 +198,30 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
         <span
           data-testid="mode-tile-label"
           className={cn(
-            'absolute inset-y-0 start-[5.25rem] end-2 z-[2] flex flex-col items-start justify-center gap-1',
+            'absolute inset-y-0 start-[4.875rem] end-1.5 z-[2] flex flex-col items-start justify-center gap-1',
             'md:inset-x-0 md:inset-y-auto md:bottom-0 md:start-0 md:end-0 md:justify-end md:px-2.5 md:pb-2',
           )}
         >
-          {badge && <span className={cn(BADGE_CLASS, 'text-[0.6rem] md:text-[0.65rem]', tint.chip)}>{badge}</span>}
+          {(badge || model.tag) && (
+            <span className="flex max-w-full flex-wrap items-center gap-1">
+              {badge && <span className={cn(BADGE_CLASS, 'text-[0.6rem] md:text-[0.65rem]', tint.chip)}>{badge}</span>}
+              {model.tag && <ModeTagChip tag={model.tag} compact />}
+            </span>
+          )}
           <span
-            className="line-clamp-2 font-neo-display text-[0.95rem] font-black uppercase leading-[1.1] text-neo-white drop-shadow-[0_1px_0_rgba(0,0,0,0.8)] md:text-sm"
+            className="line-clamp-2 max-w-full font-neo-display text-[0.84rem] font-black uppercase leading-[1.1] text-neo-white drop-shadow-[0_1px_0_rgba(0,0,0,0.8)] md:text-sm"
             style={{ textWrap: 'balance' } as CSSProperties}
           >
             {model.title}
           </span>
+          {model.description && (
+            <span
+              data-testid="mode-tile-desc"
+              className="hidden font-neo-body text-[0.7rem] leading-snug text-neo-cream/85 drop-shadow-[0_1px_0_rgba(0,0,0,0.8)] lg:line-clamp-2"
+            >
+              {model.description}
+            </span>
+          )}
         </span>
       )}
 
@@ -268,7 +337,7 @@ export function HomeModeGrid({ models, extras, liveCount }: HomeModeGridProps) {
             aria-haspopup="dialog"
             onClick={() => setMoreOpen(true)}
             className={cn(
-              'flex h-11 w-[calc(100%-3.5rem)] md:w-full items-center gap-2.5 rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light px-2.5 text-start font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow] duration-100 hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
+              'flex h-11 w-[calc(100%-3.5rem)] md:w-full items-center gap-2.5 rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light px-2.5 text-start font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow,border-color] duration-150 hover:border-neo-cream/80 motion-safe:hover:-translate-y-0.5 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
               'md:aspect-square md:h-auto md:flex-col md:justify-center md:gap-2 md:px-2 md:text-center',
             )}
           >

@@ -8402,6 +8402,12 @@ const ja = {
       },
       "online": "オンライン",
       "gameModes": "ゲームモード",
+      "modeTag": {
+        "solo": "ひとりで",
+        "multiplayer": "マルチプレイ",
+        "vsBot": "ボット対戦",
+        "untimed": "時間制限なし"
+      },
       "todaysPuzzle": "今日のパズル",
       "wheelWord": "ことばあそび",
       "puzzleNo": "パズル #{n}",
@@ -16141,6 +16147,8 @@ const ja = {
       "promo_title": "LexiClash で授業を、無料で",
       "promo_subtitle": "クラスで単語ゲーム。自分の単語リストを作り、誰がつまずいているかも分かります。",
       "promo_cta": "クラスモードを見る",
+      "promo_line": "先生：クラスで遊べるライブゲームと単語リスト。生徒：コードで参加。",
+      "join_cta": "コードで参加",
       "teacher_title": "クラスの準備ができました",
       "teacher_subtitle": "クラスを作成し、ゲームを割り当て、生徒の進捗を確認しましょう。",
       "teacher_cta": "先生ダッシュボードを開く",

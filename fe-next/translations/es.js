@@ -8385,6 +8385,12 @@ const es = {
       },
       "online": "en línea",
       "gameModes": "Modos de juego",
+      "modeTag": {
+        "solo": "Individual",
+        "multiplayer": "Multijugador",
+        "vsBot": "Contra bot",
+        "untimed": "Sin reloj"
+      },
       "todaysPuzzle": "Reto de hoy",
       "wheelWord": "PALABRA",
       "puzzleNo": "Puzle #{n}",
@@ -16090,6 +16096,8 @@ const es = {
       "promo_title": "Enseña con LexiClash, gratis",
       "promo_subtitle": "Juega con tu clase, crea tus listas de palabras y mira quién se atasca.",
       "promo_cta": "Ver el modo clase",
+      "promo_line": "Docentes: juegos en vivo para la clase y listas de palabras. Alumnos: entra con un código.",
+      "join_cta": "Entrar con un código",
       "teacher_title": "Tu clase está lista",
       "teacher_subtitle": "Crea clases, asigna partidas y sigue el progreso de tus alumnos.",
       "teacher_cta": "Abrir panel del profesor",
