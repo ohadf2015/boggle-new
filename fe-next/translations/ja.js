@@ -19735,7 +19735,9 @@ const ja = {
     "statWords": "言葉",
     "statPoints": "ポイント",
     "statStreak": "連続",
-    "keepPlaying": "このまま続ける"
+    "keepPlaying": "このまま続ける",
+    "inlineHint": "つながった文字をなぞって言葉を作ろう。タイマーは動いてるよ。",
+    "inlineDismiss": "OK"
   },
   "modeCoach": {
     "skip": "スキップ",

@@ -17556,7 +17556,9 @@ const he = {
     "statWords": "מילים",
     "statPoints": "נקודות",
     "statStreak": "רצף",
-    "keepPlaying": "ממשיכים לשחק"
+    "keepPlaying": "ממשיכים לשחק",
+    "inlineHint": "החליקו על אותיות מחוברות כדי ליצור מילה. השעון רץ.",
+    "inlineDismiss": "הבנתי"
   },
   "modeCoach": {
     "skip": "דלגו",

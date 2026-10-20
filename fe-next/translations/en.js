@@ -16097,7 +16097,9 @@ const en = {
     "statWords": "Words",
     "statPoints": "Points",
     "statStreak": "Streak",
-    "keepPlaying": "Keep playing"
+    "keepPlaying": "Keep playing",
+    "inlineHint": "Swipe connected letters to spell a word. The clock is running.",
+    "inlineDismiss": "Got it"
   },
   "modeCoach": {
     "skip": "Skip",

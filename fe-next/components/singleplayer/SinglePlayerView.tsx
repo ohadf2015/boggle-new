@@ -69,6 +69,8 @@ export interface SinglePlayerGameState {
   minWordLength: number; // Classic floor: 3 (2 in Japanese)
   /** First round: find one real word, then the 60s clock. No bots, no start gate. */
   coach?: boolean;
+  /** Search/SEO lander: skip the lesson, clock runs, one inline hint. */
+  shortCoach?: boolean;
 }
 
 export interface PlayerWordData {

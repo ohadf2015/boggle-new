@@ -79,6 +79,25 @@ describe('abandonOnPagehide', () => {
     vi.useRealTimers();
   });
 
+  it('forwards coach_step on a challenge abandon', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    markGameActive('singleplayer', {
+      sp_mode: 'challenge',
+      words_found: 0,
+      landing_path: '/en/singleplayer?autoStart=coach',
+    });
+    updateActiveGameExtras({ coach_step: 'trace', words_found: 0 });
+    vi.setSystemTime(new Date('2026-01-01T00:00:08Z'));
+
+    fireEvent('pagehide');
+
+    const payload = captureMock.mock.calls.find((c) => c[0] === 'growth:game_abandoned')?.[1] as Record<string, unknown>;
+    expect(payload.coach_step).toBe('trace');
+    expect(payload.sp_mode).toBe('challenge');
+    vi.useRealTimers();
+  });
+
   it('does not emit when no game is active', () => {
     fireEvent('pagehide');
 

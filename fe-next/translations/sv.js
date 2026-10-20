@@ -2088,7 +2088,9 @@ const sv = {
     "statWords": "Ord",
     "statPoints": "Poäng",
     "statStreak": "I rad",
-    "keepPlaying": "Spela vidare"
+    "keepPlaying": "Spela vidare",
+    "inlineHint": "Dra över sammankopplade bokstäver. Klockan går.",
+    "inlineDismiss": "Fattar"
   },
   "modeCoach": {
     "skip": "Hoppa över",

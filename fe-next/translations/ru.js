@@ -11173,7 +11173,9 @@ const ru = {
     "statWords": "Слова",
     "statPoints": "Очки",
     "statStreak": "Серия",
-    "keepPlaying": "Играть дальше"
+    "keepPlaying": "Играть дальше",
+    "inlineHint": "Проведи по соседним буквам. Часы уже идут.",
+    "inlineDismiss": "Понял"
   },
   "modeCoach": {
     "skip": "Пропустить",

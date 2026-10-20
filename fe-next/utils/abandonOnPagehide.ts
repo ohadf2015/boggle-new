@@ -17,6 +17,8 @@ export interface AbandonExtras {
   words_found?: number;
   sp_mode?: string;
   landing_path?: string;
+  /** Last coach step reached. Set only for sp_mode=challenge. */
+  coach_step?: string;
 }
 
 interface ActiveGame {
@@ -41,6 +43,7 @@ export function markGameActive(mode: string, extras: AbandonExtras = {}): void {
       words_found: extras.words_found ?? 0,
       sp_mode: extras.sp_mode,
       landing_path: extras.landing_path ?? currentLandingPath(),
+      ...(extras.coach_step ? { coach_step: extras.coach_step } : {}),
     },
   };
   alreadyEmitted = false;

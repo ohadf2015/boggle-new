@@ -17357,7 +17357,9 @@ const es = {
     "statWords": "Palabras",
     "statPoints": "Puntos",
     "statStreak": "Racha",
-    "keepPlaying": "Seguir jugando"
+    "keepPlaying": "Seguir jugando",
+    "inlineHint": "Desliza letras unidas para formar una palabra. El reloj ya corre.",
+    "inlineDismiss": "Listo"
   },
   "modeCoach": {
     "skip": "Saltar",

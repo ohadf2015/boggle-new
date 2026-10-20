@@ -19,6 +19,9 @@ import type { LetterGrid } from '@/shared/types/game';
 import PracticeContinuePrompt from './PracticeContinuePrompt';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { useSoloLesson } from './useSoloLesson';
+import { SearchInlineHint } from './SearchInlineHint';
+import { coachStepFor } from './coachStep';
+import { updateActiveGameExtras } from '@/utils/abandonOnPagehide';
 import { useSelectionStore } from '@/hooks/useSelectionStore';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { evaluateSelectionAchievements } from '@/lib/achievements/hiddenAchievementBus';
@@ -179,7 +182,7 @@ function SinglePlayerGame({
   );
   const wrappedWordSubmit = core.handleWordSubmit;
 
-  const lessonEnabled = settings.mode !== 'practice' && !hideModeCoach && !core.awaitingStart && !core.isGameOver;
+  const lessonEnabled = settings.mode !== 'practice' && !hideModeCoach && !settings.shortCoach && !core.awaitingStart && !core.isGameOver;
   const tracedWord = useSelectionStore((s) => (lessonEnabled ? s.formedWord : ''));
   const lesson = useSoloLesson({
     enabled: lessonEnabled,
@@ -193,6 +196,23 @@ function SinglePlayerGame({
     friendHref: `/${settings.language}/multiplayer`,
   });
   useEffect(() => setLessonHold(lesson.holdClock), [lesson.holdClock]);
+
+  const [hintGone, setHintGone] = useState(false);
+  const dismissHint = useCallback(() => setHintGone(true), []);
+  const showSearchHint = !!settings.shortCoach && !hintGone;
+  const coachStep = coachStepFor({
+    spMode: settings.mode,
+    shortCoach: !!settings.shortCoach,
+    hintVisible: showSearchHint,
+    lessonActive: lesson.active,
+    stepId: lesson.stepId,
+    lessonComplete: lesson.complete,
+    lessonSkipped: lesson.skipped,
+  });
+  useEffect(() => {
+    if (!coachStep) return;
+    updateActiveGameExtras({ coach_step: coachStep });
+  }, [coachStep]);
 
   // Wrap path submit to detect the "select every tile in one drag" hidden
   // achievement. Cosmetic + fire-and-forget; always delegates to the real handler.
@@ -403,7 +423,7 @@ function SinglePlayerGame({
         soloMultiplier={core.soloCombo?.multiplier ?? 1}
         soloPraiseKey={core.soloCombo?.praiseKey ?? null}
         soloMissions={lesson.active ? undefined : core.soloMissions}
-        soloChrome={lesson.hud ?? practiceCoachElement}
+        soloChrome={lesson.hud ?? (showSearchHint ? <SearchInlineHint onDismiss={dismissHint} /> : practiceCoachElement)}
         soloLessonActive={lesson.active}
       />
     </div>

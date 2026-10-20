@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
@@ -15,6 +15,7 @@ import {
   markBotsRedirectedThisSession,
   BARE_SINGLEPLAYER_AUTOSTART,
 } from './returningBotsGate';
+import { shouldShortenCoach } from './searchCoachPolicy';
 import { getStoredUsername } from '@/utils/profileStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackReplayClicked, trackNextGameStarted } from '@/utils/posthogEngagement';
@@ -306,10 +307,19 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     }
   }, [autoStart, uiLanguage, masteryPractice]);
 
-  // First screen: one coached classic round. Not bots, and not the returning-player redirect.
-  useEffect(() => {
+  // First screen: one coached classic round, unless this is a search/SEO lander.
+  // Those leave on the trace step (8s desktop / 22s mobile, 0–1 words). Skip the
+  // lesson and run the clock; SearchInlineHint is the only coach chrome.
+  // useLayoutEffect so the shorten lands before paint (referrer is client-only;
+  // reading it in useState would mismatch the server render).
+  useLayoutEffect(() => {
     if (autoStart !== 'coach' || hasAutoStartedRef.current) return;
     hasAutoStartedRef.current = true;
+    const shorten = shouldShortenCoach({
+      referrer: typeof document !== 'undefined' ? document.referrer : '',
+      autoStart,
+      isBareEntry,
+    });
     const difficulty = 'EASY' as const;
     setGameState({
       mode: 'challenge',
@@ -319,10 +329,11 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
       language: (uiLanguage as Language) || 'en',
       grid: null,
       minWordLength: getMinWordLength(uiLanguage, difficulty),
-      coach: true,
+      coach: !shorten,
+      shortCoach: shorten,
     });
     setPhase('playing');
-  }, [autoStart, uiLanguage]);
+  }, [autoStart, uiLanguage, isBareEntry]);
 
   // Auto-start bot game (autoStart=bots)
   useEffect(() => {
