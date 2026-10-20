@@ -43,7 +43,6 @@ import {
   ShareSection,
   CoinUnlockCard,
   StreakFreezeIndicator,
-  MasteryRatingSection,
   type WordHuntStats,
   type CoinReward,
 } from './results';
@@ -264,20 +263,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     />
   );
 
-  /* "Am I getting better?" belongs at a glance, not behind a tap — it used to
-     sit inside the collapsed "Full recap" accordion (defaultExpanded=false),
-     which meant NOBODY saw it without expanding, and guests never even
-     mounted it until they dismissed the signup nudge. Rendered once, right
-     under the hero, for guests and authed players alike, win or lose. */
-  const masteryRatingNode = (
-    <MasteryRatingSection
-      playerId={profile?.id}
-      guestFingerprint={guestFingerprint}
-      language={language}
-      t={t}
-    />
-  );
-
   const leaderboardNode = (
     <>
       {isGuest && guestName && onGuestRenamed && (
@@ -337,7 +322,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     return (
       <div className="space-y-4">
         {heroNode}
-        {masteryRatingNode}
 
         {/* Guests never had a next step here at all — the wheel CTA lived only in
             the full recap. With ~90% of daily players unregistered, that was the
@@ -378,7 +362,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   return (
   <div className="space-y-4">
     {heroNode}
-    {masteryRatingNode}
 
     {/* Primary CTA — exactly one next step.
         This used to be a pair of hardcoded nodes: "STEP 2 OF 2 → Word Wheel"

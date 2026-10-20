@@ -32,7 +32,17 @@ export function MobileTabBar({
   endSlot,
 }: MobileTabBarProps) {
   return (
-    <nav className={cn('mobile-tab-bar md:hidden', className)}>
+    <nav
+      className={cn(
+        // Layout lives in utilities, not only in `.mobile-tab-bar` (animations.css):
+        // that stylesheet loads after page load, and until it did the tabs
+        // stacked vertically over the global bottom nav.
+        'mobile-tab-bar flex items-center justify-around md:hidden',
+        'min-h-14 pt-2 pb-[max(0.5rem,var(--combined-safe-area-bottom,0px))]',
+        'bg-neo-navy/85 backdrop-blur-lg border-t-[3px] border-black/50',
+        className,
+      )}
+    >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
 

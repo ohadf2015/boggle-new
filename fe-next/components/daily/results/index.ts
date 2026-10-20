@@ -107,6 +107,3 @@ export { default as DailyWordHuntFacts } from './DailyWordHuntFacts';
 export { StreakFreezeIndicator } from './StreakFreezeIndicator';
 export type { StreakFreezeIndicatorProps } from './StreakFreezeIndicator';
 
-export { MasteryRating } from './mastery/MasteryRating';
-export type { MasteryRatingProps } from './mastery/MasteryRating';
-export { MasteryRatingSection } from './mastery/MasteryRatingSection';
