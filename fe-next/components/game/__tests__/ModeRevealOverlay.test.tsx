@@ -112,4 +112,16 @@ describe('ModeRevealOverlay', () => {
     expect(screen.getByTestId('round-splash')).toBeInTheDocument();
     expect(screen.getByTestId('round-splash')).toHaveTextContent('ROUND 5');
   });
+
+  it('given the splash, when it renders, then it is a solid full-screen layer that hides the not-yet-interactive board', () => {
+    // PlayerView renders the splash next to the in-game view, whose board stays
+    // inert until the countdown ends. An in-flow splash shared the column with
+    // the board, so players tapped a dead board (GR #11487/#11488 rage clicks).
+    render(<ModeRevealOverlay modeLabel="CLASSIC!" t={mockT} />);
+    const layer = screen.getByTestId('mode-reveal');
+    expect(layer.className).toMatch(/\bfixed\b/);
+    expect(layer.className).toMatch(/\binset-0\b/);
+    expect(layer.className).toMatch(/\bbg-neo-navy\b/);
+    expect(layer.className).not.toMatch(/\bopacity-0\b|transition-opacity/);
+  });
 });
