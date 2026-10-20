@@ -307,6 +307,14 @@ Sentry.init({
     /\[SOCKET\.IO\].*Error received.*eliminated/i,
     /\[SOCKET\.IO\].*Error received.*kicked/i,
     /\[SOCKET\.IO\].*Error received.*Target word already found/i,
+    // Name collision on join: the join form already tells the user to pick another
+    /\[SOCKET\.IO\].*(Error received|Socket error event).*(name is already taken|PLAYER_USERNAME_TAKEN)/i,
+    /^That name is already taken$/i,
+    /\[SOCKET\.IO\] Rate limited by server/i,
+    // Per-attempt dictionary fetch lines; the exhausted case throws DictionaryLoadError
+    /\[loadWordCraftDictionary\].*\(attempt \d+\/\d+\)/i,
+    // Browser refused Cache.put (quota / offline); the SW falls back to network
+    /SW cache error:.*Cache\.put\(\)/i,
     // Socket.IO AUTH_REQUIRED — unauth users hitting friends sockets; server rejects correctly (JAVASCRIPT-NEXTJS-12G)
     /\[SOCKET\.IO\].*AUTH_REQUIRED/i,
     /\[SOCKET\.IO\].*Authentication required/i,

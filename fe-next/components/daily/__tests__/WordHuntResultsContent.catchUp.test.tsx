@@ -68,7 +68,6 @@ vi.mock('../results', () => ({
   CoinUnlockCard: () => <div data-testid="coin-unlock" />,
   MoreOptionsAccordion: () => <div data-testid="more-options" />,
   StreakFreezeIndicator: () => <div data-testid="streak-freeze" />,
-  MasteryRatingSection: () => <div data-testid="mastery-rating-section" />,
 }));
 
 vi.mock('../CatchUpSuggestion', () => ({

@@ -1,18 +1,22 @@
 'use client';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Building2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { SchoolLeadForm } from '@/components/education/SchoolLeadForm';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
 
 export function LandingSchoolLead() {
   const { t, language } = useLanguage();
   const [open, setOpen] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  // The hub's school ask: pairs with the old DistrictUpsellStrip impression (cta: district_upsell).
+  useUpsellImpression(sectionRef, { cta: 'district_upsell', placement: 'education_landing' }, { locale: language });
 
   return (
-    <section id="school-quote" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-6 sm:px-6 sm:py-14 lg:px-8">
+    <section ref={sectionRef} id="school-quote" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-6 sm:px-6 sm:py-14 lg:px-8">
       <div className="grid gap-3 rounded-neo-xl border-3 border-neo-black bg-neo-purple p-4 sm:gap-6 sm:p-5 text-neo-black shadow-hard-lg sm:p-8 lg:grid-cols-[1fr_1.1fr] lg:gap-10">
         <div>
           <span className="hidden items-center gap-1.5 rounded-neo-pill border-2 border-neo-black bg-neo-cream px-2.5 sm:inline-flex py-0.5 font-neo-display text-xs font-black uppercase tracking-wider">
