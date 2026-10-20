@@ -14,7 +14,7 @@
  */
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,6 +22,7 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { resultsTrialCopy, trialCopyBase, TRIAL_COPY_RTL } from '@/lib/education/pro/trialCtaCopy';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
+import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
 
 export const RESULTS_TRIAL_PLACEMENT = 'classroom_results' as const;
 
@@ -31,28 +32,25 @@ export function ResultsTeacherProTrialCard({ language, className }: { language: 
   // Only a successful status read proves "never trialed"; an unknown read still
   // offers the trial — /teacher/upgrade re-checks eligibility before the POST.
   const offerTrial = !(known && trialUsed);
-  const firedRef = useRef(false);
   const copy = resultsTrialCopy(language);
   const dir = TRIAL_COPY_RTL.has(trialCopyBase(language)) ? 'rtl' : undefined;
+  const cardRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (!show || firedRef.current) return;
-    firedRef.current = true;
-    try {
-      trackGrowthEvent('education_upsell_impression', {
-        cta: offerTrial ? 'teacher_pro_trial' : 'teacher_pro',
-        placement: RESULTS_TRIAL_PLACEMENT,
-        locale: language,
-      });
-      trackGrowthEvent('education_upsell_impression', {
-        cta: 'district_upsell',
-        placement: RESULTS_TRIAL_PLACEMENT,
-        locale: language,
-      });
-    } catch {
-      /* analytics must never block */
-    }
-  }, [show, offerTrial, language]);
+  // Count an impression only once half the card is actually on screen, same as
+  // the hub (useUpsellImpression). EduHostResults hides this card with CSS on a
+  // short laptop/projector after a boss round (display:none), and on a phone it
+  // sits below the fold; firing on mount counted both as seen. `null` until the
+  // entitlement read settles, so the observer attaches once the card renders.
+  useUpsellImpression(
+    cardRef,
+    show ? { cta: offerTrial ? 'teacher_pro_trial' : 'teacher_pro', placement: RESULTS_TRIAL_PLACEMENT } : null,
+    { locale: language },
+  );
+  useUpsellImpression(
+    cardRef,
+    show ? { cta: 'district_upsell', placement: RESULTS_TRIAL_PLACEMENT } : null,
+    { locale: language },
+  );
 
   if (!show) return null;
 
@@ -60,6 +58,7 @@ export function ResultsTeacherProTrialCard({ language, className }: { language: 
 
   return (
     <aside
+      ref={cardRef}
       data-testid="results-teacher-pro-trial-card"
       data-placement={RESULTS_TRIAL_PLACEMENT}
       dir={dir}
