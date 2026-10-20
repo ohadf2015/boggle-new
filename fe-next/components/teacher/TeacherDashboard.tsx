@@ -18,6 +18,7 @@ import { HomeHero } from './home/HomeHero';
 import { HomeClassList } from './home/HomeClassList';
 import { HomeWeekCard } from './home/HomeWeekCard';
 import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
+import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
 import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
 import { HomeRailSkeleton, HomeSkeleton } from './home/HomeSkeleton';
@@ -233,6 +234,12 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                 classroomId={selectedClassroom.id}
                 classroomName={selectedClassroom.name}
                 overFreeTierCaps={overFreeTierCaps}
+              />
+            )}
+            {!ready || !selectedClassroom ? null : (
+              <WeeklyEmailReport
+                classroomId={selectedClassroom.id}
+                classroomName={selectedClassroom.name}
               />
             )}
           </aside>

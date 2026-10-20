@@ -27,11 +27,12 @@ describe('useWeeklyProgressDigest', () => {
   it('counts a seeded this-week lesson completion from the classroom window source', async () => {
     vi.mocked(getClassroomWindowSource).mockResolvedValue({
       data: {
-        roster: [{ studentId: 's1', name: 'Sam' }],
+        roster: [{ studentId: 's1', name: 'Sam', joinedAt: '2026-10-11T08:00:00.000Z' }],
         sessions: [],
         assignmentCompletions: [{ completedAt: '2026-10-12T12:00:00.000Z' }],
         assignmentExpected: 1,
         assignmentCount: 1,
+        wordsMastered: [{ studentId: 's1', completedAt: '2026-10-12T12:00:00.000Z', words: ['cat', 'sun'] }],
       },
       error: null,
     });
@@ -41,5 +42,7 @@ describe('useWeeklyProgressDigest', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.metrics?.thisWeek.assignmentCompleted).toBeGreaterThan(0);
     expect(result.current.assignmentCount).toBe(1);
+    expect(result.current.studentsJoinedThisWeek).toBe(1);
+    expect(result.current.wordsMasteredThisWeek).toBe(2);
   });
 });

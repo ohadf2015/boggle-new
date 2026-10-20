@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMounted } from '@/hooks/useMounted';
 import { getClassroomWindowSource } from '@/lib/supabase/windowedClassroomProgressQuery';
 import {
+  countStudentsJoinedThisWeek,
+  countWordsMasteredThisWeek,
   deriveWeeklyProgressDigest,
   type WeeklyProgressDigestMetrics,
 } from '@/lib/education/weeklyProgressDigest';
@@ -19,6 +21,7 @@ export function useWeeklyProgressDigest(classroomId: string) {
     >;
     assignmentExpected: number;
     assignmentCount: number;
+    wordsMastered: Parameters<typeof countWordsMasteredThisWeek>[0];
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -31,6 +34,7 @@ export function useWeeklyProgressDigest(classroomId: string) {
         assignmentCompletions: [],
         assignmentExpected: 0,
         assignmentCount: 0,
+        wordsMastered: [],
       });
       setIsLoading(false);
       setError(null);
@@ -53,6 +57,7 @@ export function useWeeklyProgressDigest(classroomId: string) {
         assignmentCompletions: data.assignmentCompletions ?? [],
         assignmentExpected: data.assignmentExpected ?? 0,
         assignmentCount: data.assignmentCount ?? 0,
+        wordsMastered: data.wordsMastered ?? [],
       });
       setIsLoading(false);
     } catch (e) {
@@ -78,11 +83,22 @@ export function useWeeklyProgressDigest(classroomId: string) {
     });
   }, [source]);
 
+  const studentsJoinedThisWeek = useMemo(
+    () => (source ? countStudentsJoinedThisWeek(source.roster) : 0),
+    [source],
+  );
+  const wordsMasteredThisWeek = useMemo(
+    () => (source ? countWordsMasteredThisWeek(source.wordsMastered) : 0),
+    [source],
+  );
+
   return {
     metrics,
     isLoading,
     error,
     refresh: load,
     assignmentCount: source?.assignmentCount ?? 0,
+    studentsJoinedThisWeek,
+    wordsMasteredThisWeek,
   };
 }

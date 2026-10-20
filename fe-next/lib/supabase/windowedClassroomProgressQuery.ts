@@ -8,7 +8,11 @@ import logger from '@/utils/logger';
 import { resolveDisplayName } from '@/lib/displayName';
 import { windowStartIso, type WindowRosterStudent, type WindowSession } from '@/lib/education/windowedClassroomProgress';
 import { foldClassroomAssignmentWindow } from '@/lib/education/classroomAssignmentWindow';
-import { WEEK_MS, type WeeklyAssignmentCompletion } from '@/lib/education/weeklyProgressDigest';
+import {
+  WEEK_MS,
+  type WeeklyAssignmentCompletion,
+  type WeeklyWordsMasteredRow,
+} from '@/lib/education/weeklyProgressDigest';
 
 export interface ClassroomWindowSource {
   roster: WindowRosterStudent[];
@@ -16,6 +20,8 @@ export interface ClassroomWindowSource {
   assignmentCompletions: WeeklyAssignmentCompletion[];
   assignmentExpected: number;
   assignmentCount: number;
+  /** Classroom-scoped mastered words (via lesson_assignments) with completion dates. */
+  wordsMastered: WeeklyWordsMasteredRow[];
 }
 
 interface SessionRow {
@@ -42,6 +48,7 @@ export async function getClassroomWindowSource(
         assignmentCompletions: [],
         assignmentExpected: 0,
         assignmentCount: 0,
+        wordsMastered: [],
       },
       error: null,
     };
@@ -51,7 +58,7 @@ export async function getClassroomWindowSource(
     const since = windowStartIso(30, now);
     const assignmentSince = new Date(now - 2 * WEEK_MS).toISOString();
     const [rosterResult, sessionResult, assignmentResult] = await Promise.all([
-      db.from('classroom_memberships').select('student_id').eq('classroom_id', classroomId),
+      db.from('classroom_memberships').select('student_id, joined_at').eq('classroom_id', classroomId),
       db
         .from('practice_sessions')
         .select('student_id, completed_at, results')
@@ -74,11 +81,13 @@ export async function getClassroomWindowSource(
 
     const seen = new Set<string>();
     const studentIds: string[] = [];
-    for (const row of (rosterResult.data ?? []) as Array<{ student_id?: string | null }>) {
+    const joinedAtById = new Map<string, string>();
+    for (const row of (rosterResult.data ?? []) as Array<{ student_id?: string | null; joined_at?: string | null }>) {
       const id = row.student_id;
       if (typeof id !== 'string' || id === '' || seen.has(id)) continue;
       seen.add(id);
       studentIds.push(id);
+      if (typeof row.joined_at === 'string') joinedAtById.set(id, row.joined_at);
     }
 
     const profilesResult =
@@ -101,7 +110,7 @@ export async function getClassroomWindowSource(
     const roster: WindowRosterStudent[] = studentIds.map((id) => {
       const p = profiles.get(id);
       const resolved = resolveDisplayName([p?.display_name, p?.username], '');
-      return { studentId: id, name: resolved || `Student ${++unnamed}` };
+      return { studentId: id, name: resolved || `Student ${++unnamed}`, joinedAt: joinedAtById.get(id) ?? null };
     });
 
     const sessions: WindowSession[] = ((sessionResult.data ?? []) as SessionRow[])
@@ -125,10 +134,11 @@ export async function getClassroomWindowSource(
     }
     const assignmentIds = assignmentList.map((row) => row.id).filter(Boolean);
     let completionRows: Array<{ assignment_id: string | null; completed_at: string | null }> = [];
+    let wordsMastered: WeeklyWordsMasteredRow[] = [];
     if (assignmentIds.length > 0) {
       const completionResult = await db
         .from('student_lesson_progress')
-        .select('assignment_id, completed_at')
+        .select('assignment_id, completed_at, student_id, words_mastered')
         .in('assignment_id', assignmentIds)
         .gte('completed_at', assignmentSince)
         .not('completed_at', 'is', null)
@@ -140,6 +150,17 @@ export async function getClassroomWindowSource(
           assignment_id: string | null;
           completed_at: string | null;
         }>;
+        wordsMastered = ((completionResult.data ?? []) as Array<{
+          student_id?: string | null;
+          completed_at?: string | null;
+          words_mastered?: string[] | null;
+        }>)
+          .filter((row) => typeof row.student_id === 'string' && typeof row.completed_at === 'string')
+          .map((row) => ({
+            studentId: row.student_id as string,
+            completedAt: row.completed_at as string,
+            words: Array.isArray(row.words_mastered) ? row.words_mastered : [],
+          }));
       }
     }
     const folded = foldClassroomAssignmentWindow({
@@ -155,6 +176,7 @@ export async function getClassroomWindowSource(
         assignmentCompletions: folded.assignmentCompletions,
         assignmentExpected: folded.assignmentExpected,
         assignmentCount: folded.assignmentCount,
+        wordsMastered,
       },
       error: null,
     };

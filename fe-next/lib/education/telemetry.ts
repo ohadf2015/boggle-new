@@ -608,6 +608,12 @@ export function trackWeeklySummaryCopied(classId: string): void {
   safeCapture('weekly_summary_copied', { class_id: classId });
 }
 
+/** HQ weekly email report: teacher copied the paste-ready report text. Same `class_id` property as the digest view events. */
+export function trackTeacherWeeklyEmailReportCopied(args: { classroomId: string }): void {
+  if (!args.classroomId) return;
+  safeCapture('teacher_weekly_email_report_copied', { class_id: args.classroomId });
+}
+
 export interface EduFirstAssignmentCtaArgs {
   classroomId: string;
 }
