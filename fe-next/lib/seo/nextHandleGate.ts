@@ -147,11 +147,13 @@ export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
  */
 export const REDIRECT_ONLY_SEGMENTS: ReadonlySet<string> = new Set([
   'cookies',
+  'for-schools',
   'play',
   'practice',
   'privacy',
   'privacy-policy',
   'room',
+  'schools',
   'scrabble',
   'scrabble-multijugador-online',
   'scrabble-online-en-espanol',

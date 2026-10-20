@@ -5,7 +5,7 @@ import { Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 /** Real, server-gated count of teachers running live games. Renders nothing unless the server says it is worth showing. */
-export function TeacherProofLine() {
+export function TeacherProofLine({ className }: { className?: string }) {
   const { t } = useLanguage();
   const [proof, setProof] = useState<{ teachers: number; games: number } | null>(null);
 
@@ -29,7 +29,7 @@ export function TeacherProofLine() {
 
   if (!proof) return null;
   return (
-    <p data-testid="teacher-proof" className="mt-3 flex items-center justify-center gap-2 text-center text-xs font-bold text-neo-white/85">
+    <p data-testid="teacher-proof" className={className ?? 'mt-3 flex items-center justify-center gap-2 text-center text-xs font-bold text-neo-white/85'}>
       <Users className="h-4 w-4 shrink-0 text-neo-lime" aria-hidden />
       {t('eduPro.upgrade.socialProof', { teachers: proof.teachers, games: proof.games })}
     </p>

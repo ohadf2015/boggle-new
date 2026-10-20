@@ -105,7 +105,12 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
         </p>
         <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
           Create a room, share one link, and up to 50 friends join instantly from any browser — phone,
-          laptop, whatever they&apos;re holding. No download, no account, no &quot;your move... eventually.&quot;
+          laptop, whatever they&apos;re holding. No download, no account, no &quot;your move... eventually.&quot;{' '}
+          If the game you wanted is Boggle, you can{' '}
+          <Link href={`/${locale}/play-boggle-online-free`} className="text-neo-cyan underline">
+            play Boggle with friends online
+          </Link>{' '}
+          the same way: a room code, a QR, or the share button.
         </p>
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">

@@ -8,6 +8,7 @@ import {
 } from '../nextHandleGate';
 import { GAME_ROUTE_ALIASES } from '../gameRouteAliases.mjs';
 import { RETIRED_PRACTICE_REDIRECTS } from '../retiredPracticeRedirects.mjs';
+import { SCHOOL_ROUTE_ALIASES } from '../schoolRouteAliases.mjs';
 
 const LOCALE_DIR = path.resolve(__dirname, '../../../app/[locale]');
 const NEXT_CONFIG = path.resolve(__dirname, '../../../next.config.mjs');
@@ -18,7 +19,7 @@ function staticRedirectSources(): string[] {
   const end = config.indexOf('\n  async ', start + 1);
   const redirects = config.slice(start, end === -1 ? undefined : end);
   const inline = [...redirects.matchAll(/source:\s*'([^']+)'/g)].map((m) => m[1]);
-  const imported = [...GAME_ROUTE_ALIASES, ...RETIRED_PRACTICE_REDIRECTS].map(
+  const imported = [...GAME_ROUTE_ALIASES, ...RETIRED_PRACTICE_REDIRECTS, ...SCHOOL_ROUTE_ALIASES].map(
     (r: { source: string }) => r.source,
   );
   return [...inline, ...imported].filter((s) => !s.includes('(?'));

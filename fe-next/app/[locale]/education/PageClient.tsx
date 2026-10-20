@@ -58,7 +58,16 @@ export function PageClient({ geo, faq }: { geo?: GeoAnswer; faq?: ReactNode }) {
       <EducationHero setupPending={setupPending} />
       <LandingHowItWorks geo={geo} />
       <LandingModes />
-      <ProFramingSection cta={<TeacherProCheckoutCta locale={language} variant="inline" />} />
+      <ProFramingSection
+        cta={
+          <TeacherProCheckoutCta
+            locale={language}
+            variant="inline"
+            trial
+            impression={{ cta: 'teacher_pro_trial', placement: 'education_landing' }}
+          />
+        }
+      />
       <LandingSchoolLead />
       {faq}
       <LandingFinalCta setupPending={setupPending} />

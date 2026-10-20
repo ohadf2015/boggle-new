@@ -151,7 +151,6 @@ vi.mock('../results', () => ({
   DailyWordHuntFacts: () => <div data-testid="daily-word-hunt-facts" />,
   StatsBlurb: () => <div data-testid="stats-blurb" />,
   StreakFreezeIndicator: () => <div data-testid="streak-freeze-indicator" />,
-  MasteryRatingSection: () => <div data-testid="mastery-rating-section" />,
 }));
 
 // ── Inline sub-components ────────────────────────────────────────────────────
