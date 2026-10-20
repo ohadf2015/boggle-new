@@ -7906,6 +7906,12 @@ const en = {
       },
       "online": "online",
       "gameModes": "Game modes",
+      "modeTag": {
+        "solo": "Solo",
+        "multiplayer": "Multiplayer",
+        "vsBot": "vs bot",
+        "untimed": "No timer"
+      },
       "todaysPuzzle": "Today's puzzle",
       "wheelWord": "PUZZLE",
       "puzzleNo": "Puzzle #{n}",
@@ -14585,6 +14591,8 @@ const en = {
       "promo_title": "Teach with LexiClash for free",
       "promo_subtitle": "Run word games with your class, set your own word lists, see who is stuck.",
       "promo_cta": "See classroom mode",
+      "promo_line": "Teachers: live class games and word lists. Students: join with a code.",
+      "join_cta": "Join with a code",
       "teacher_title": "Your classroom is ready",
       "teacher_subtitle": "Create classes, assign games, and track student progress.",
       "teacher_cta": "Open teacher dashboard",

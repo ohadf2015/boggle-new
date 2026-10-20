@@ -15,10 +15,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRef, type CSSProperties } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bot, User, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { MODE_META, modeRoute } from '@/lib/landing/modeMeta';
+import { MODE_META, MODE_TAGS, modeRoute } from '@/lib/landing/modeMeta';
 import { trackLandingCtaClick, trackModeSelected } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 
@@ -40,6 +40,14 @@ const CARD_TILT = ['-rotate-1', 'rotate-1'] as const;
 const ART_ZOOM: Partial<Record<FreshModeKey, number>> = {
   arena: 1, wordCraft: 1.15, connections: 1.25, brainGym: 1, blast: 1,
 };
+
+/** Literal keys so i18n guards can see them; same chip facts as the returning hub. */
+const TAG_LABEL_KEY = {
+  solo: 'landing.home.modeTag.solo',
+  multiplayer: 'landing.home.modeTag.multiplayer',
+  vsBot: 'landing.home.modeTag.vsBot',
+} as const;
+const TAG_ICON = { solo: User, multiplayer: Users, vsBot: Bot } as const;
 
 function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
@@ -104,6 +112,8 @@ export function ModeRow() {
           const href = modeRoute(key, language);
           if (!meta?.genIcon || !href) return null;
           const zoom = ART_ZOOM[key] ?? 1;
+          const tag = MODE_TAGS[key];
+          const TagIcon = tag ? TAG_ICON[tag.players] : null;
           const artScale: CSSProperties | undefined =
             zoom > 1 ? { transform: `scale(${zoom})` } : undefined;
           return (
@@ -136,6 +146,21 @@ export function ModeRow() {
                 </div>
                 <div className="mt-3 flex flex-1 items-end justify-between gap-3">
                   <div className="min-w-0">
+                    {tag && TagIcon && (
+                      <span
+                        data-testid="mode-tag"
+                        className="mb-1.5 inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-cream px-2 py-0.5 font-neo-body text-[0.65rem] font-bold uppercase leading-none tracking-wide text-neo-black"
+                      >
+                        <TagIcon className="h-3 w-3" strokeWidth={2.75} aria-hidden="true" />
+                        {t(TAG_LABEL_KEY[tag.players])}
+                        {tag.untimed && (
+                          <>
+                            <span aria-hidden="true">·</span>
+                            {t('landing.home.modeTag.untimed')}
+                          </>
+                        )}
+                      </span>
+                    )}
                     <h3 className="font-neo-display text-xl font-bold leading-tight">
                       {t(`homeFresh.modes.items.${key}.title`)}
                     </h3>

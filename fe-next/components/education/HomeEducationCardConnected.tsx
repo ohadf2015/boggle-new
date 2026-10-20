@@ -1,9 +1,12 @@
 'use client';
 
+import { useSyncExternalStore } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import { useIsGuest } from '@/hooks/useIsGuest';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { HomeEducationCard } from './HomeEducationCard';
 
 /**
@@ -24,16 +27,24 @@ import { HomeEducationCard } from './HomeEducationCard';
  * Guests and unenrolled players always see the promo — education stays on the
  * homepage every visit, not a one-shot that vanishes after the first paint.
  */
+const noopSubscribe = () => () => {};
+
 export function HomeEducationCardConnected() {
   const { isAuthenticated, isTeacher, isAdmin } = useAuth();
   const isGuest = useIsGuest(isAuthenticated);
+  // false on the server and during hydration (no storage there), so the server
+  // HTML and the first client render agree; the real value lands right after.
+  const noStoredSession = useSyncExternalStore(noopSubscribe, () => !hasSupabaseSession(), () => false);
 
   if (isTeacher || isAdmin) return <TeacherHomeCard />;
   // Guests get the promo but no classroom lookup — there is no session to look up.
   if (isGuest) return <EducationPromoCard />;
-  // Neither a guest nor authed yet = auth still resolving. Render nothing rather than
-  // flashing the guest promo at a signed-in teacher (pitfall Class 1).
-  if (!isAuthenticated) return null;
+  // Neither a guest nor authed yet = auth still resolving. On the homepage that can
+  // last until the first tap (DeferredAuthProvider keeps gotrue off the landing
+  // trace), so a visitor with NO stored session is already known to be a guest:
+  // show the promo now. Anyone holding a session waits, rather than flashing the
+  // guest promo at a signed-in teacher (pitfall Class 1).
+  if (!isAuthenticated) return noStoredSession ? <EducationPromoCard /> : null;
   return <StudentHomeCard />;
 }
 
@@ -57,14 +68,16 @@ function StudentHomeCard() {
 }
 
 /** Always-on pitch for everyone education has never enrolled: guests and
- * unenrolled players. Shown on every homepage visit so teachers can find
- * classroom mode without having seen it "once" in a previous session.
- * Phone widths only: from md up the landing leads with the classroom hero, and the
- * strip above it repeated the same pitch. `order-last` puts it after the
- * player's hub instead of above their greeting. */
+ * unenrolled players. Shown on every homepage visit, at every width, so teachers
+ * and students can find classroom mode without having seen it "once" in a
+ * previous session. `order-last` keeps it after the player's hub instead of above
+ * their greeting. Hidden inside CrazyGames (a CONFIRMED CrazyGames env only, same
+ * rule as FreshClassrooms) so the embed never links off-platform. */
 function EducationPromoCard() {
+  const { isOnCrazyGamesPlatform, isLoading } = useCrazyGames();
+  if (isOnCrazyGamesPlatform && !isLoading) return null;
   return (
-    <div className="order-last px-1.5 md:hidden">
+    <div className="order-last">
       <HomeEducationCard role="promo" />
     </div>
   );

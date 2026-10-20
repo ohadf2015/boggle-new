@@ -103,10 +103,21 @@ describe('FreshPage', () => {
     expect(hrefs).toEqual(expect.arrayContaining(['/en/daily/word-wheel', '/en/multiplayer', '/en/education']));
   });
 
+  it('puts a slim education strip (teachers + join with a code) right after the modes row', () => {
+    const { container } = render(<FreshPage />);
+    const strip = container.querySelector('[data-fresh-edu-strip]');
+    expect(strip).not.toBeNull();
+    expect(strip?.previousElementSibling?.getAttribute('data-fresh-section')).toBe('modes');
+    expect(strip?.querySelector('a[href="/en/education"]')).not.toBeNull();
+    expect(strip?.querySelector('a[href="/en/join"]')).not.toBeNull();
+    expect(strip?.querySelector('h2')).toBeNull();
+  });
+
   it('hides the classrooms section inside CrazyGames', () => {
     cg.isOnCrazyGamesPlatform = true;
     const { container } = render(<FreshPage />);
     expect(container.querySelector('[data-fresh-section="classrooms"]')).toBeNull();
+    expect(container.querySelector('[data-fresh-edu-strip]')).toBeNull();
     const hrefs = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href'));
     expect(hrefs).not.toContain('/en/education');
   });

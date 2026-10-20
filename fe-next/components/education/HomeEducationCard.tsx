@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { trialCountdownUnit, type TrialStatus } from '@/lib/education/trial';
+import { trackLandingCtaClick } from '@/utils/growthTracking';
 
 export type EducationHomeRole = 'teacher' | 'student' | 'promo';
 
@@ -44,7 +45,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       ? t('education.home.teacher_title')
       : t('education.home.student_title');
   const subtitle = isPromo
-    ? t('education.home.promo_subtitle')
+    ? t('education.home.promo_line')
     : isTeacher
       ? t('education.home.teacher_subtitle')
       : classroomName || t('education.home.student_subtitle');
@@ -60,50 +61,67 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       : t('education.home.badge_student');
 
   // Icon tile + accent per role. Teacher = cyan, student = lime, promo = purple — matches
-  // the education header/menu color language.
+  // the education header/menu color language. Literal class strings (Tailwind v4).
   const accent = isPromo ? 'bg-neo-purple' : isTeacher ? 'bg-neo-cyan' : 'bg-neo-lime';
+  const shadow = isPromo ? 'shadow-hard-purple' : isTeacher ? 'shadow-hard-cyan' : 'shadow-hard-lime';
+  const ring = isPromo
+    ? 'focus-visible:after:ring-neo-purple'
+    : isTeacher
+      ? 'focus-visible:after:ring-neo-cyan'
+      : 'focus-visible:after:ring-neo-lime';
 
+  // One slim strip: the main link stretches over the whole card (::after), so the
+  // strip is a single tap target on phones; from sm up the promo adds a second,
+  // stacked-above link for students who arrive with a class code.
   return (
-    <Link
-      href={target}
-      data-testid="home-education-card"
+    <div
+      data-testid="home-education-strip"
+      data-edu-role={role}
       className={cn(
-        'group flex w-full items-center gap-3 sm:gap-4',
-        'rounded-neo border-neo border-neo-black dark:border-neo-cream/40 bg-neo-white dark:bg-neo-navy-light',
-        'p-3 sm:p-4 shadow-hard',
-        'transition-all duration-100',
-        'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg',
-        'active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-sm',
-        'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2'
+        'group relative flex w-full items-center gap-3 sm:gap-4',
+        'rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light',
+        'px-3 py-2.5 sm:px-4 sm:py-3',
+        shadow,
+        'motion-safe:transition-transform motion-safe:duration-150',
+        'motion-safe:hover:-translate-y-0.5 active:translate-y-px'
       )}
     >
       {/* Role icon tile */}
       <span
         className={cn(
           'flex shrink-0 items-center justify-center',
-          'h-11 w-11 sm:h-14 sm:w-14',
-          'rounded-neo border-neo text-neo-black shadow-hard-sm',
+          'h-10 w-10 sm:h-12 sm:w-12',
+          'rounded-neo border-2 border-neo-black text-neo-black shadow-hard-sm',
           accent
         )}
         aria-hidden="true"
       >
-        <Icon className="h-6 w-6 sm:h-7 sm:w-7" />
+        <Icon className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={2.5} />
       </span>
 
-      {/* Copy */}
+      {/* Copy — the title is the main link; its ::after covers the whole strip. */}
       <div className="min-w-0 flex-1">
-        <span className="inline-block rounded-full border-2 border-neo-black dark:border-neo-cream/40 bg-neo-cream px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-neo-black dark:bg-neo-navy dark:text-neo-white">
-          {badge}
-        </span>
-        <h3
-          data-testid="home-education-title"
-          className="mt-1 truncate text-base font-black leading-tight text-neo-black dark:text-neo-white sm:text-lg font-neo-display"
-        >
-          {title}
-        </h3>
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="hidden shrink-0 rounded-full border-2 border-neo-black bg-neo-cream px-1.5 py-0.5 font-neo-display text-[10px] font-black uppercase leading-none tracking-wide text-neo-black sm:inline-block">
+            {badge}
+          </span>
+          <Link
+            href={target}
+            data-testid="home-education-card"
+            onClick={() => trackLandingCtaClick('education_strip', { role, target: isPromo ? 'education' : role })}
+            className={cn(
+              'min-w-0 truncate font-neo-display text-[0.95rem] font-black leading-tight text-neo-white sm:text-base',
+              'after:absolute after:inset-0 after:rounded-[inherit] after:content-[""]',
+              'focus:outline-hidden focus-visible:after:ring-4 focus-visible:after:ring-offset-2 focus-visible:after:ring-offset-neo-navy',
+              ring
+            )}
+          >
+            <span data-testid="home-education-title">{title}</span>
+          </Link>
+        </div>
         <p
           data-testid="home-education-subtitle"
-          className="truncate text-xs font-semibold text-neo-black/70 dark:text-neo-white/70 sm:text-sm"
+          className="mt-0.5 line-clamp-2 font-neo-body text-xs leading-snug text-neo-cream/80 sm:truncate sm:text-sm"
         >
           {subtitle}
         </p>
@@ -112,23 +130,43 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       {/* Teacher trial pill */}
       {isTeacher && trial && <TrialPill trial={trial} t={t} />}
 
-      {/* CTA affordance */}
+      {/* Students with a class code skip the teacher pitch (sm and up; on phones
+          the whole strip is one tap target and /education carries the join link). */}
+      {isPromo && (
+        <Link
+          href={`/${language}/join`}
+          data-testid="home-education-join"
+          onClick={() => trackLandingCtaClick('education_strip', { role, target: 'join' })}
+          className={cn(
+            'relative z-10 hidden shrink-0 items-center rounded-neo border-2 border-neo-cream/50 px-3 py-2',
+            'font-neo-display text-sm font-bold text-neo-cream sm:inline-flex',
+            'hover:border-neo-lime hover:text-neo-lime',
+            'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+          )}
+        >
+          {t('education.home.join_cta')}
+        </Link>
+      )}
+
+      {/* CTA affordance (decorative: the stretched title link is the target) */}
       <span
+        aria-hidden="true"
         className={cn(
-          'ms-auto hidden shrink-0 items-center gap-1.5 sm:flex',
-          'rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-3 py-2 text-sm font-bold text-neo-white shadow-hard-sm',
-          'transition-transform group-hover:translate-x-0.5'
+          'hidden shrink-0 items-center gap-1.5 sm:flex',
+          'rounded-neo border-2 border-neo-black px-3 py-2 font-neo-display text-sm font-black text-neo-black shadow-hard-sm',
+          accent,
+          'motion-safe:transition-transform motion-safe:group-hover:translate-x-0.5 rtl:motion-safe:group-hover:-translate-x-0.5'
         )}
       >
         {cta}
         <DirectionalIcon icon={ArrowRight} className="h-4 w-4" />
       </span>
-      {/* Mobile: chevron only (label lives above) */}
+      {/* Mobile: chevron only */}
       <DirectionalIcon
         icon={ArrowRight}
-        className="ms-auto h-5 w-5 shrink-0 text-neo-black/60 dark:text-neo-white/60 sm:hidden"
+        className="h-5 w-5 shrink-0 text-neo-cream/70 sm:hidden"
       />
-    </Link>
+    </div>
   );
 }
 

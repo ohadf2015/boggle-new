@@ -5,6 +5,13 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
+const cg = { isOnCrazyGamesPlatform: false, isLoading: false };
+vi.mock('@/components/CrazyGamesSDK', () => ({ useCrazyGames: () => cg }));
+vi.mock('@/utils/growthTracking', () => ({ trackLandingCtaClick: vi.fn() }));
+
+const storedSession = { value: false };
+vi.mock('@/utils/onboardingStorage', () => ({ hasSupabaseSession: () => storedSession.value }));
+
 const useAuthMock = vi.fn();
 const useTeacherAccessMock = vi.fn();
 const useStudentClassroomMock = vi.fn();
@@ -49,6 +56,8 @@ const studentClassroom = (over: Record<string, unknown> = {}) => ({
 
 describe('HomeEducationCardConnected', () => {
   beforeEach(() => {
+    cg.isOnCrazyGamesPlatform = false;
+    storedSession.value = false;
     localStorage.clear();
     useAuthMock.mockReset();
     useTeacherAccessMock.mockReset();
@@ -65,12 +74,26 @@ describe('HomeEducationCardConnected', () => {
     expect(screen.getByTestId('home-education-card')).toHaveAttribute('href', '/en/education');
   });
 
-  // Desktop web already leads with the classroom hero, so the promo strip above it
-  // repeated the same pitch. Phones (HomeHub) have no such hero and keep it.
-  it('limits the promo to phone widths', () => {
+  // The returning home no longer has a classroom hero at any width, so the promo
+  // is the only education entry there: it shows on desktop too (was phones only).
+  it('shows the promo at every width, not phones only', () => {
     useAuthMock.mockReturnValue(auth({ isAuthenticated: false }));
     render(<HomeEducationCardConnected />);
-    expect(screen.getByTestId('home-education-card').closest('.md\\:hidden')).not.toBeNull();
+    expect(screen.getByTestId('home-education-card').closest('.md\\:hidden')).toBeNull();
+  });
+
+  it('gives students a direct "join with a code" link next to the teacher pitch', () => {
+    useAuthMock.mockReturnValue(auth({ isAuthenticated: false }));
+    render(<HomeEducationCardConnected />);
+    expect(screen.getByTestId('home-education-join')).toHaveAttribute('href', '/en/join');
+    expect(screen.getByTestId('home-education-subtitle')).toHaveTextContent('education.home.promo_line');
+  });
+
+  it('hides the promo inside CrazyGames so the embed never links off-platform', () => {
+    cg.isOnCrazyGamesPlatform = true;
+    useAuthMock.mockReturnValue(auth({ isAuthenticated: false }));
+    const { container } = render(<HomeEducationCardConnected />);
+    expect(container.firstChild).toBeNull();
   });
 
   // On a player's phone home the promo led the page, above their own greeting.
@@ -102,7 +125,15 @@ describe('HomeEducationCardConnected', () => {
     expect(localStorage.getItem('edu_home_promo_seen_v1')).toBeNull();
   });
 
-  it('renders nothing while auth is still resolving', () => {
+  it('promotes education straight away to a visitor with no stored session, even before auth resolves', () => {
+    // The homepage defers auth until the first tap; no session = certainly a guest.
+    useAuthMock.mockReturnValue(auth({ isAuthenticated: false, loading: true }));
+    render(<HomeEducationCardConnected />);
+    expect(screen.getByTestId('home-education-card')).toHaveAttribute('href', '/en/education');
+  });
+
+  it('renders nothing while auth is still resolving for a visitor holding a session', () => {
+    storedSession.value = true;
     // isAuthenticated starts false — without the loading gate this frame shows the guest promo
     // to a signed-in teacher.
     useAuthMock.mockReturnValue(auth({ isAuthenticated: false, loading: true }));
