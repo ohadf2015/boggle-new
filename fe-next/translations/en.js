@@ -15451,7 +15451,8 @@ const en = {
       "cta": "Start your first class",
       "expired_title": "Your teacher trial has ended",
       "expired_kept": "Your classes and word lists stay free. Reports, word mastery and calm mode need Pro.",
-      "recap": "In your trial you ran {{games}} games for {{students}} students.",
+            "recap": "In your trial — games run: {{games}}, students on your roster: {{students}}",
+      "recapGamesOnly": "In your trial — games run: {{games}}",
       "expired_body": "Your free trial window is over. Reapply or reach out to keep classroom mode.",
       "renew_cta": "Renew teacher access"
     },

@@ -16947,7 +16947,8 @@ const es = {
       "cta": "Crea tu primera clase",
       "expired_title": "Tu prueba de profesor ha terminado",
       "expired_kept": "Tus clases y listas de palabras siguen gratis. Los informes, el dominio de palabras y el modo calmado requieren Pro.",
-      "recap": "En tu prueba hiciste {{games}} juegos para {{students}} estudiantes.",
+            "recap": "En tu prueba — partidas jugadas: {{games}}, estudiantes en tu lista: {{students}}",
+      "recapGamesOnly": "En tu prueba — partidas jugadas: {{games}}",
       "expired_body": "Tu periodo de prueba gratis ha terminado. Vuelve a solicitarlo o escríbenos para conservar el modo aula.",
       "renew_cta": "Renovar acceso de profesor"
     },
