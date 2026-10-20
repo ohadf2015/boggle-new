@@ -367,6 +367,18 @@ describe('DailyWordHuntResults - banner/tab-bar clearance', () => {
     expect(cls).not.toMatch(/(^|\s)bottom-0(\s|$)/);
   });
 
+  // /daily/word-hunt never mounts GlobalBottomNav (heavy game path), so
+  // --bottom-nav-height keeps its 64px CSS default there. Lifting the bar by it
+  // unconditionally left a 64px band of scrolling results under the tab bar.
+  it('only lifts the tab bar by the nav height when the global nav is on screen', () => {
+    render(<DailyWordHuntResults {...baseProps} />);
+    const cls = screen.getByTestId('mobile-tab-bar').parentElement!.className.split(/\s+/);
+    expect(cls).toContain('bottom-[var(--admob-banner-height,0px)]');
+    const navOffset = cls.filter((c) => c.includes('--bottom-nav-height'));
+    expect(navOffset.length).toBeGreaterThan(0);
+    for (const c of navOffset) expect(c.startsWith('[html.has-global-bottom-nav_&]:')).toBe(true);
+  });
+
   // Body padding (has-global-bottom-nav) already reserves nav + banner for the
   // page, so the scroller only has to clear the tab bar itself.
   it('reserves scroller bottom space for the tab bar height', () => {

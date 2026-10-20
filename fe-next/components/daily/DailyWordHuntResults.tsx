@@ -413,12 +413,16 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         <ResultsBannerSlot placement="word-hunt-complete" className="px-4" />
       </div>
 
-      {/* Mobile Tab Bar — stacked ABOVE the global bottom nav (--bottom-nav-height,
-          0 when the nav is hidden) and the native AdMob banner (a SurfaceView
-          composited above the WebView, pinned to the viewport bottom) so neither
-          covers the Results/Stats CTA. --bottom-stack-height is not used: its
-          16px floor would float the bar above empty space when the nav is hidden. */}
-      <div className="shrink-0 fixed bottom-[calc(var(--bottom-nav-height,0px)+var(--admob-banner-height,0px))] inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black md:hidden">
+      {/* Mobile Tab Bar — stacked ABOVE the global bottom nav and the native AdMob
+          banner (a SurfaceView composited above the WebView, pinned to the
+          viewport bottom) so neither covers the Results/Stats CTA.
+          The nav offset is gated on html.has-global-bottom-nav: /daily/word-hunt
+          is a heavy game path that never mounts GlobalBottomNav, so
+          --bottom-nav-height keeps its 64px CSS default there and an ungated
+          offset floated the bar 64px up with results scrolling in the band
+          below it. --bottom-stack-height is not used: its 16px floor would float
+          the bar above empty space when the nav is hidden. */}
+      <div className="shrink-0 fixed bottom-[var(--admob-banner-height,0px)] [html.has-global-bottom-nav_&]:bottom-[calc(var(--bottom-nav-height,0px)+var(--admob-banner-height,0px))] inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black md:hidden">
         <MobileTabBar
           tabs={[
             { id: 'results', icon: <Trophy className="w-5 h-5" />, label: t('wordHunt.results.title') },
