@@ -72,6 +72,8 @@ export interface WeeklyProgressDigestMetrics {
   wow: WeeklyProgressWow;
   /** Mean this-week accuracy of students with a rated session. */
   averageScorePct: number | null;
+  /** This-week minus last-week average accuracy, points. Null when a week is unrated. */
+  averageScoreWowDeltaPct: number | null;
   inactiveCount: number;
   students: WeeklyStudentMovement[];
 }
@@ -239,6 +241,13 @@ export function deriveWeeklyProgressDigest({
     rated.length > 0
       ? Math.round(rated.reduce((sum, s) => sum + (s.thisWeekAccuracyPct ?? 0), 0) / rated.length)
       : null;
+  const ratedLastWeek = students.filter((s) => s.lastWeekAccuracyPct != null);
+  const averageScoreLastWeekPct =
+    ratedLastWeek.length > 0
+      ? Math.round(
+          ratedLastWeek.reduce((sum, s) => sum + (s.lastWeekAccuracyPct ?? 0), 0) / ratedLastWeek.length,
+        )
+      : null;
 
   return {
     thisWeek,
@@ -250,6 +259,10 @@ export function deriveWeeklyProgressDigest({
       assignmentCompletionPctPoints: assignmentWow,
     },
     averageScorePct,
+    averageScoreWowDeltaPct:
+      averageScorePct != null && averageScoreLastWeekPct != null
+        ? averageScorePct - averageScoreLastWeekPct
+        : null,
     inactiveCount: students.filter((s) => s.inactive7d).length,
     students,
   };
@@ -258,4 +271,40 @@ export function deriveWeeklyProgressDigest({
 export function formatWowDelta(delta: number): string {
   if (delta > 0) return `+${delta}`;
   return String(delta);
+}
+
+/** Classroom-scoped lesson-progress row: which words a student mastered, and when. */
+export interface WeeklyWordsMasteredRow {
+  studentId: string;
+  completedAt: string;
+  words: string[];
+}
+
+/** Roster memberships whose joined_at falls inside the last 7 days. */
+export function countStudentsJoinedThisWeek(
+  roster: WindowRosterStudent[],
+  now: number = Date.now(),
+): number {
+  const startIso = new Date(now - WEEK_MS).toISOString();
+  return roster.filter((m) => typeof m.joinedAt === 'string' && m.joinedAt >= startIso).length;
+}
+
+/**
+ * Words newly mastered in the last 7 days, deduped across students
+ * (case-insensitive) so two kids mastering "cat" counts once.
+ */
+export function countWordsMasteredThisWeek(
+  rows: WeeklyWordsMasteredRow[],
+  now: number = Date.now(),
+): number {
+  const startIso = new Date(now - WEEK_MS).toISOString();
+  const seen = new Set<string>();
+  for (const row of rows) {
+    if (typeof row.completedAt !== 'string' || row.completedAt < startIso) continue;
+    for (const word of row.words) {
+      const key = word.trim().toLowerCase();
+      if (key) seen.add(key);
+    }
+  }
+  return seen.size;
 }
