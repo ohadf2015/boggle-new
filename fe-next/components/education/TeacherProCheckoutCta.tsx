@@ -4,6 +4,9 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { resultsTrialCopy } from '@/lib/education/pro/trialCtaCopy';
+import { useUpsellImpression, type UpsellImpression } from '@/lib/education/useUpsellImpression';
+import { trackTeacherProUpgradeClick, type TeacherProUpgradePlacement } from '@/lib/education/proFunnelTelemetry';
 
 /**
  * Hard Teacher Pro checkout CTA for SSR classroom traffic.
@@ -119,14 +122,35 @@ export function TeacherProCheckoutCta({
   className = '',
   copy,
   variant = 'card',
+  trial = false,
+  impression,
 }: {
   locale: string;
   className?: string;
   copy?: TeacherProCheckoutCopy;
   /** `inline` is just the button and note, for a Pro card that already says the rest. */
   variant?: 'card' | 'inline';
+  /** Lead with the 14-day trial ("Start your 14-day Teacher Pro trial", then $9/mo). */
+  trial?: boolean;
+  /** When set, fires education_upsell_impression on view and teacher_pro_upgrade_click on tap. */
+  impression?: UpsellImpression & { placement: TeacherProUpgradePlacement };
 }): React.JSX.Element {
   const { t } = useLanguage();
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  useUpsellImpression(rootRef, impression, { locale });
+  const onClick = impression
+    ? () => {
+        try {
+          trackTeacherProUpgradeClick({
+            page: typeof window !== 'undefined' ? window.location.pathname : `/${locale}`,
+            locale,
+            placement: impression.placement,
+          });
+        } catch {
+          /* analytics must never block */
+        }
+      }
+    : undefined;
   const raw = rawCopy(locale);
   const p = ctaParams(locale);
   const tr = (field: keyof TeacherProCheckoutCopy) => {
@@ -134,12 +158,18 @@ export function TeacherProCheckoutCta({
     const value = t(key, raw[field], p);
     return value && value !== key ? value : fill(raw[field], p);
   };
-  const c = copy ?? { heading: tr('heading'), body: tr('body'), cta: tr('cta'), note: tr('note') };
+  const c = copy ? { ...copy } : { heading: tr('heading'), body: tr('body'), cta: tr('cta'), note: tr('note') };
+  if (trial && !copy) {
+    const tc = resultsTrialCopy(locale);
+    c.cta = tc.trialCta;
+    c.note = tc.trialNote;
+  }
   if (variant === 'inline') {
     return (
-      <div data-testid="teacher-pro-checkout-cta" className={className}>
+      <div ref={rootRef} data-testid="teacher-pro-checkout-cta" className={className}>
         <Link
           href={`/${locale}${TEACHER_PRO_CHECKOUT_PATH}`}
+          onClick={onClick}
           data-testid="teacher-pro-checkout-link"
           className="inline-flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-yellow px-4 text-center font-neo-display text-base font-black text-neo-navy shadow-hard-sm transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
@@ -151,6 +181,7 @@ export function TeacherProCheckoutCta({
   }
   return (
     <div
+      ref={rootRef}
       data-testid="teacher-pro-checkout-cta"
       className={`max-w-xl rounded-neo border-2 border-s-4 border-neo-cream/40 border-s-neo-pink bg-neo-navy-light p-4 text-neo-white sm:p-5 ${className}`}
     >
@@ -161,6 +192,7 @@ export function TeacherProCheckoutCta({
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
         <Link
           href={`/${locale}${TEACHER_PRO_CHECKOUT_PATH}`}
+          onClick={onClick}
           data-testid="teacher-pro-checkout-link"
           className="inline-flex min-h-11 items-center rounded-neo border-2 border-neo-black bg-neo-pink px-5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
         >
