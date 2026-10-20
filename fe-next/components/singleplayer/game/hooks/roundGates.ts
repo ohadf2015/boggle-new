@@ -13,9 +13,11 @@ export function roundEventsEnabled(mode: string, isFirstGame: boolean, coach = f
 }
 
 /** Timed rounds deal the board, then wait for a Start tap before the clock runs.
- *  A coached first round is playable immediately; the clock stays held instead. */
-export function startsBehindGate(mode: string, coach = false): boolean {
-  return mode !== 'practice' && !coach;
+ *  A coached first round is playable immediately; the clock stays held instead.
+ *  A search lander (shortCoach) is playable immediately with the clock running:
+ *  its only chrome is the inline hint, which tells them the clock is running. */
+export function startsBehindGate(mode: string, coach = false, shortCoach = false): boolean {
+  return mode !== 'practice' && !coach && !shortCoach;
 }
 
 /** Hold the 60s clock until the player has one real word. Searching does not burn time. */
