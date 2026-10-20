@@ -20,6 +20,7 @@ import {
 import { computeDrillProgressUpdate } from '@/shared/utils/drillLeveling';
 import { validateDrillSubmission } from '@/shared/utils/drillSubmissionValidation';
 import { computeDrillImprovement, type DrillImprovement } from '@/shared/utils/drillImprovement';
+import { upsertDailyBrainScoreHistory } from '@/lib/brain/dailyHistoryWrite';
 import {
   BRAIN_CHECK_COOLDOWN_MS,
   BRAIN_CHECK_PROTOCOL,
@@ -371,44 +372,21 @@ export async function processBrainDrillCompletion(
     };
   }
 
-  const today = new Date().toISOString().split('T')[0];
-  const { data: existingHistory } = await supabase
-    .from('brain_score_history')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('period_type', 'daily')
-    .eq('period_start', today)
-    .single();
-
-  if (existingHistory) {
-    await supabase
-      .from('brain_score_history')
-      .update({
-        overall_score: updatedBrainScore.overallScore,
-        processing_speed: updatedBrainScore.domainScores.processingSpeed,
-        working_memory: updatedBrainScore.domainScores.workingMemory,
-        attention: updatedBrainScore.domainScores.attention,
-        flexibility: updatedBrainScore.domainScores.flexibility,
-        vocabulary: updatedBrainScore.domainScores.vocabulary,
-        drills_completed: (existingHistory.drills_completed || 0) + 1,
-      })
-      .eq('id', existingHistory.id);
-  } else {
-    await supabase
-      .from('brain_score_history')
-      .insert({
-        user_id: userId,
-        period_type: 'daily',
-        period_start: today,
-        overall_score: updatedBrainScore.overallScore,
-        processing_speed: updatedBrainScore.domainScores.processingSpeed,
-        working_memory: updatedBrainScore.domainScores.workingMemory,
-        attention: updatedBrainScore.domainScores.attention,
-        flexibility: updatedBrainScore.domainScores.flexibility,
-        vocabulary: updatedBrainScore.domainScores.vocabulary,
-        games_played: 0,
-        drills_completed: 1,
-      });
+  const { error: historyError } = await upsertDailyBrainScoreHistory(supabase, {
+    userId,
+    periodStart: new Date().toISOString().split('T')[0],
+    scores: {
+      overallScore: updatedBrainScore.overallScore,
+      processingSpeed: updatedBrainScore.domainScores.processingSpeed,
+      workingMemory: updatedBrainScore.domainScores.workingMemory,
+      attention: updatedBrainScore.domainScores.attention,
+      flexibility: updatedBrainScore.domainScores.flexibility,
+      vocabulary: updatedBrainScore.domainScores.vocabulary,
+    },
+    drillsCompletedDelta: 1,
+  });
+  if (historyError) {
+    console.error('Error upserting brain score history:', historyError);
   }
 
   const DRILL_XP_BASE: Record<number, number> = { 1: 30, 2: 30, 3: 50, 4: 80, 5: 80 };

@@ -42,6 +42,7 @@ import { startMemoryWatchdog } from '../backend/modules/memoryWatchdog';
 import { formatMemwatchCounts } from '../backend/modules/memoryWatchdogCounts';
 import { noteNextHandle, noteNextHandleDrop } from '../backend/modules/nextHandleStats';
 import { decideNextHandle } from '../lib/seo/nextHandleGate';
+import { registerSqlWasmRoute } from './sqlWasmRoute';
 import { registerActiveGamesProvider } from '../backend/modules/scoreManager';
 import { getAllGameCodes } from '../backend/modules/gameStateManager';
 
@@ -205,6 +206,9 @@ async function start(): Promise<void> {
       next(err);
     }
   });
+
+  // Before the catch-all gate. /sql is not a Next route; the gate 404s it.
+  registerSqlWasmRoute(app);
 
   // Next.js request handler (catch-all)
   app.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
