@@ -48,7 +48,9 @@ const ModeRevealOverlay: React.FC<ModeRevealOverlayProps> = ({
   const displayRound = showRound ? seriesRoundNumber + 1 : null;
 
   return (
-    <div className="h-full bg-neo-navy flex items-center justify-center overflow-hidden">
+    // Solid full-screen layer like MpCountdownStage: the board behind it is not
+    // interactive until GO, so it must not be visible (GR #11487 rage clicks).
+    <div data-testid="mode-reveal" className="fixed inset-0 z-[10000] bg-neo-navy flex items-center justify-center overflow-hidden">
       <AdaptiveAnimatePresence>
         <AdaptiveMotion.div
           key="mode-reveal"
