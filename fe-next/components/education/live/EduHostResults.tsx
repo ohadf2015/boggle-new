@@ -3,7 +3,8 @@
 /**
  * The /education/live projector at round end: its own screen (the rebuild gives the live route its own
  * lobby and results), built from the shared round-end pieces: the staged podium, the winner bar, the
- * class's numbers, the words still to teach, the boss verdict and the "See who struggled" Pro preview.
+ * class's numbers, the words still to teach, the boss verdict, the "See who struggled" Pro preview and the
+ * Teacher Pro trial / school quote card.
  * Mounts only in the host tree, so no student sees the report or the upsell; z-[75] clears the lobby's
  * z-[65]. Dark-only and painted from frame one: the reveal only swaps what is written inside (Class 5).
  */
@@ -21,6 +22,7 @@ import { ClassPulse } from '@/components/education/results/ClassPulse';
 import { TvCoveragePanel } from '@/components/education/results/TvCoveragePanel';
 import { TvRecapHeader } from '@/components/education/results/TvRecapHeader';
 import { StrugglePreview } from '@/components/education/results/StrugglePreview';
+import { ResultsTeacherProTrialCard } from '@/components/education/results/ResultsTeacherProTrialCard';
 import { ZeroRoundNote } from '@/components/education/results/ZeroRoundNote';
 import { EmptyRoundCard } from '@/components/education/results/EmptyRoundCard';
 import { useRoundEndReveal } from '@/components/education/results/useRoundEndReveal';
@@ -163,6 +165,10 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               <StrugglePreview masteryByPlayer={summary.masteryByPlayer ?? {}} teacherName={summary.teacherName ?? ''} language={language} t={t} />
             </div>
           )}
+          {/* Teacher Pro trial + school quote, after a class has actually played. Host tree only. */}
+          <div className={cn(!phone && bossOver && 'lg:[@media(max-height:900px)]:hidden')}>
+            <ResultsTeacherProTrialCard language={language} />
+          </div>
         </div>
       </div>
     </div>
