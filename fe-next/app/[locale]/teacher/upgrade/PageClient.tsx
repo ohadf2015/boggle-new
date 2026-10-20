@@ -200,9 +200,12 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
           <>
             <div ref={tabsRef} className="mb-4 flex flex-col gap-3 scroll-mt-4 lg:flex-row lg:items-end lg:justify-between">
               <div className="min-w-0">
-                <p data-testid="upgrade-value-eyebrow" className="text-xs font-black uppercase tracking-widest text-neo-cyan">
-                  {t('teacher.subscription.proPlanName')}
-                </p>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
+                  <p data-testid="upgrade-value-eyebrow" className="text-xs font-black uppercase tracking-widest text-neo-cyan">
+                    {t('teacher.subscription.proPlanName')}
+                  </p>
+                  <TeacherProofLine className="flex items-center gap-1.5 text-xs font-bold text-neo-white/85" />
+                </div>
                 <h1 className="font-neo-display text-2xl font-black text-neo-white md:text-3xl" style={{ textWrap: 'balance' }}>
                   {t('teacher.subscription.upgradePricingTitle')}
                 </h1>
@@ -268,7 +271,6 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                     </div>
                   ))}
                 </div>
-                <TeacherProofLine />
                 <ProPreviewStrip />
                 <div className="mt-8">
                   <PlanComparisonMatrix compact />
