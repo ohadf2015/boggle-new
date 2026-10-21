@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/en/word-games-online-free`;
 
   return {
-    title: 'Word Games Online Free — Play Instantly, No Download | LexiClash',
+    title: 'Word Games Online Free — No Download | LexiClash',
     description: 'Play word games online free — no download, no signup. Multiplayer battles, daily word wheels, word hunts, brain training, and adventure mode. Start now →',
     keywords: 'word games online free, free word games, word games no download, online word games, word puzzle games free, word games for groups, multiplayer word games online free, word games like boggle, word game free no download, brain training word games, daily word puzzle',
     openGraph: {
