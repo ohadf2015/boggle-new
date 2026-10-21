@@ -61,6 +61,7 @@ Print the picked targets (query · intent · topic · citation_share · current 
 - Pick UP TO: 3 CTR opportunities, 2 rank-up (pos 8–25), 1 new landing page (only if a >50-impr/28d high-intent query has no good page).
 - New landing pages exist in **all 5 locales** (en/he/sv/ja/es) via `t()`, Hebrew RTL-safe. English-only intent → `isTargetLocale` + `META_FALLBACK` + `robots:{index:false}` on non-English.
 - **Autonomous native-language review** (06-seo.md STEP 4b): for every non-English string you write, back-translate → meaning check → native-fluency rewrite. Never emit "needs human review."
+- HARD rule (security): NEVER write a secret value (Bing/GSC API key, token, `apikey=<value>` URL, Authorization header) into any report, file, commit or PR — the repo is PUBLIC. Reference keys by env var name only (`$BING_WMT_API_KEY`). Run `bash scripts/redact-secrets.sh` before committing.
 - HARD rules: JSON-LD only via `components/seo/*` wrappers; no fake `aggregateRating`; no fabricated stats; positive framing only ("ad-free"/"browser-based", never "0 downloads"); reuse existing i18n keys; new routes update `sitemap.ts` + `llms.txt`.
 
 ### 6. Validate + finish
