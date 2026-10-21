@@ -1,6 +1,6 @@
 /**
  * Server-side backstop for single-word teacher lists
- * (supabase/migrations/20261021100000_reject_multi_word_lesson_terms.sql).
+ * (supabase/migrations/20261021150000_reject_multi_word_lesson_terms.sql).
  * The pattern was checked read-only against prod Postgres: "Rely on",
  * "Blood transfusion", "well-being", "בית ספר" match; "cat", "don't",
  * "ג'ירפה", "café", "pre-" do not.
@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 
 const root = path.resolve(__dirname, '../../..');
-const sql = fs.readFileSync(path.join(root, 'supabase/migrations/20261021100000_reject_multi_word_lesson_terms.sql'), 'utf8');
+const sql = fs.readFileSync(path.join(root, 'supabase/migrations/20261021150000_reject_multi_word_lesson_terms.sql'), 'utf8');
 const ts = fs.readFileSync(path.join(root, 'lib/education/singleWordTerm.ts'), 'utf8');
 
 describe('reject multi-word lesson terms migration', () => {

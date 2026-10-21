@@ -1,3 +1,6 @@
+-- Versioned above 20261021143000 (already in the remote ledger): the
+-- forward-only migrator skips anything at or below the ledger max.
+--
 -- Teacher word lists (vocabulary_lessons.words) feed the letter board, and the
 -- board can only place a single word. Lists like "If you are reading this...."
 -- saved "Rely on", "Hospice care" and "Blood transfusion", which can never be
