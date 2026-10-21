@@ -96,7 +96,7 @@ export interface ResultsPageProps {
   /** Current user's username */
   username: string;
   /** Socket.IO connection */
-  socket: Socket | null;
+  socket: typeof Socket | null;
   /** Player achievements from the game */
   achievements?: GameAchievement[];
   /** Whether duplicate word rule is disabled (for rooms with >7 players) */

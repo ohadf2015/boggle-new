@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-08-07T14:17:51.064Z",
+  "generatedAt": "2026-08-12T18:08:56.841Z",
   "commits": [
     {
-      "sha": "39289b1ba2bf2997b9731e9f4601eff1a245ae55",
-      "shortSha": "39289b1",
-      "subject": "fix(react-doctor): unwedge duel loaders, fix render-phase callbacks, restore the linter's ignore lists",
+      "sha": "d6c7652c218bb48b3a795a921981a59013f2d0df",
+      "shortSha": "d6c7652",
+      "subject": "perf(landing): compress hero/idle mascot WebPs (256px->192px, ~50% frames)",
       "author": "Ohad Fisher",
-      "date": "2026-08-07T16:13:41+03:00"
+      "date": "2026-08-11T11:44:58+00:00"
     },
     {
-      "sha": "5adb1644d990aa18c8cda7864ad4fbd01906f195",
-      "shortSha": "5adb164",
-      "subject": "feat(footer): add inline email newsletter signup form (sitewide email capture)",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T13:10:10Z"
-    },
-    {
-      "sha": "c533d6211111950525363c705e355be28d1dab39",
-      "shortSha": "c533d62",
-      "subject": "perf(shell): stop inlining the message catalogue in every page's HTML",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T15:55:31+03:00"
-    },
-    {
-      "sha": "767feb7ccaefcad445277f7672ddb9ff0b40fd0e",
-      "shortSha": "767feb7",
-      "subject": "fix(onboarding): stop new players dead-ending right after the FTUE",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T15:32:57+03:00"
-    },
-    {
-      "sha": "48190619b0a2ddcb6363b61845f9507e568dbe0d",
-      "shortSha": "4819061",
-      "subject": "test(practice): await the now-lazy sandboxes in the skip-intro test",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T13:03:37+03:00"
-    },
-    {
-      "sha": "55fc22d6dfb7d47f34add079e3dddcb6ebc2286c",
-      "shortSha": "55fc22d",
-      "subject": "fix(connections): stop hints leaking answers and give players real attempts",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T12:33:11+03:00"
-    },
-    {
-      "sha": "e1add9bce11cf8c1f834adedc6227ba973d3cd92",
-      "shortSha": "e1add9b",
-      "subject": "docs: flag the two deliberate divergences left by the previous commits",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T11:48:03+03:00"
-    },
-    {
-      "sha": "eacafe1e1df1afdc4e21114245213e9f8ec13c7f",
-      "shortSha": "eacafe1",
-      "subject": "fix(sentry): judge socket errors by code, not by their translated message",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T11:46:43+03:00"
-    },
-    {
-      "sha": "0acd6a92d681e10bddb62b3e5c97d4c82883c4eb",
-      "shortSha": "0acd6a9",
-      "subject": "perf(word-craft): stop shipping 9.5MB of dictionary to the browser",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T11:46:25+03:00"
-    },
-    {
-      "sha": "63f9239866b0d63868d7af2670636618b69cda4c",
-      "shortSha": "63f9239",
-      "subject": "fix(nightly): close the 18 pre-07-05 restore-queue tags + recover 2 stranded files",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T11:33:09+03:00"
-    },
-    {
-      "sha": "860a01b2c592d711db424350e7bffe875a9e98cc",
-      "shortSha": "860a01b",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-07",
-      "author": "Ohad Fisher",
-      "date": "2026-08-07T04:58:10+03:00"
-    },
-    {
-      "sha": "c7eb4c81db5675764cb582f894e40f7a6fcc4522",
-      "shortSha": "c7eb4c8",
-      "subject": "fix(dictionary): share one server-side copy of each word list to stop heap OOM (#791)",
+      "sha": "fc24397b71a52d72f60ce035ad652ca2e9877cc4",
+      "shortSha": "fc24397",
+      "subject": "feat(retention): D1 sprint — daily streak + weekly freeze, first-win-fast, post-win push opt-in (#799)",
       "author": "ohadf2015",
-      "date": "2026-08-06T17:56:00+03:00"
+      "date": "2026-08-10T11:41:41+03:00"
     },
     {
-      "sha": "ca0bc318d18300dd913829bd83128604762c92b9",
-      "shortSha": "ca0bc31",
-      "subject": "fix(android-install): stop native app flashing the \"Get the App\" promo (#789)",
-      "author": "ohadf2015",
-      "date": "2026-08-06T17:15:06+03:00"
-    },
-    {
-      "sha": "8443b0d3f49aca8b9ebeea4c82951d72945ba84c",
-      "shortSha": "8443b0d",
-      "subject": "fix(word-wheel): re-measure the pixi canvases instead of freezing mount-time size",
+      "sha": "33b4a11f040a88f7aafbc18dc34aa594e35e8cd6",
+      "shortSha": "33b4a11",
+      "subject": "assets(standalone): portal resubmission store package (covers, videos, copy, QA)",
       "author": "Ohad Fisher",
-      "date": "2026-08-06T11:04:09+03:00"
+      "date": "2026-08-10T08:36:07+00:00"
     },
     {
-      "sha": "d6deb3f7f33457bd9f605dffe76a9e7262cad23b",
-      "shortSha": "d6deb3f",
-      "subject": "fix(nightly): restore code stranded by the 08-03/08-04/08-06 gate salvages",
+      "sha": "ee1cd0bc81180ce9096d7209e456bb506b569c3b",
+      "shortSha": "ee1cd0b",
+      "subject": "fix(standalone): portal packaging hardening for CrazyGames/Poki resubmission",
       "author": "Ohad Fisher",
-      "date": "2026-08-06T11:03:47+03:00"
+      "date": "2026-08-10T08:16:20+00:00"
     },
     {
-      "sha": "14a78f6eeac03f8ac4c3e107bdcd3641bf38cf90",
-      "shortSha": "14a78f6",
-      "subject": "fix(layout): remove EmailCaptureModal so it no longer pops over the game screen (#787)",
-      "author": "ohadf2015",
-      "date": "2026-08-05T12:31:38+03:00"
-    },
-    {
-      "sha": "c2c082b699bce00556812c8519dd75b07c136448",
-      "shortSha": "c2c082b",
-      "subject": "fix(feedback): cache-bust widget.js so returning users get the neo-brutalist mobile launcher (#785)",
-      "author": "ohadf2015",
-      "date": "2026-08-04T20:13:03+03:00"
-    },
-    {
-      "sha": "2dc9e50a897d25e5e1bbcad33aea55f0352fc196",
-      "shortSha": "2dc9e50",
-      "subject": "fix(feedback): collapse mobile launcher to icon-only chip on real phones (#784)",
-      "author": "ohadf2015",
-      "date": "2026-08-04T18:26:17+03:00"
-    },
-    {
-      "sha": "5fde7409aa37fdbdea6e645942fe6ba7409f1cbf",
-      "shortSha": "5fde740",
-      "subject": "docs(onboarding): fix stale comment — FTUE routes to auto-start practice, not Daily Challenge",
+      "sha": "dc42fea79fcfd65ec33bcdd41f3867a2cb71a215",
+      "shortSha": "dc42fea",
+      "subject": "fix(types): mirror supabase's RealtimeChannelSendResponse instead of narrowing it",
       "author": "Ohad Fisher",
-      "date": "2026-08-04T09:43:55Z"
+      "date": "2026-08-10T09:55:29+03:00"
     },
     {
-      "sha": "dccd4e6c3c4ee4f76a2128e2488f6cdf73c95fb6",
-      "shortSha": "dccd4e6",
-      "subject": "fix(server): no-cache /widget.js and /sw.js — 1yr immutable header froze the feedback button for returning users",
+      "sha": "2832f9d8c97c9b33576e2c0455f492e1a9764975",
+      "shortSha": "2832f9d",
+      "subject": "fix(legal): name Polar as merchant of record, not Lemon Squeezy",
       "author": "Ohad Fisher",
-      "date": "2026-08-04T09:15:32Z"
+      "date": "2026-08-10T09:48:23+03:00"
+    },
+    {
+      "sha": "1b14990b0dbbcce6ac8d03b1fea9e13dbae63754",
+      "shortSha": "1b14990",
+      "subject": "Pivot teacher checkout from Lemon Squeezy to Polar.sh",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T21:02:53+00:00"
+    },
+    {
+      "sha": "3fd103577df442883d8fd488fe296bc131f246c8",
+      "shortSha": "3fd1035",
+      "subject": "feat(ga4): install the measurement tag",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T23:18:27+03:00"
+    },
+    {
+      "sha": "202fde363671e1d8be6dd3b303e40b9712ed2370",
+      "shortSha": "202fde3",
+      "subject": "feat(growth): experiment on install-promo timing (exp-install-promo-after-first-game-v1)",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T21:40:12+03:00"
+    },
+    {
+      "sha": "b3b1210785966384c96f90c57a119df476e8e685",
+      "shortSha": "b3b1210",
+      "subject": "fix(seo): retire the last generated word-list pages for the AdSense reapply",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T21:39:48+03:00"
+    },
+    {
+      "sha": "1a7558b24f99cf41a31eb18c8cdc8707bf482fbb",
+      "shortSha": "1a7558b",
+      "subject": "fix(ads): scope rewarded daily cap to coin grants; accept deployed ad env names",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T21:39:18+03:00"
+    },
+    {
+      "sha": "e46ad6a83da00cec46f28d5f0dfc572ef5e438bb",
+      "shortSha": "e46ad6a",
+      "subject": "chore(indexnow): serve the shared portfolio IndexNow key",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T21:25:07+03:00"
+    },
+    {
+      "sha": "27f58e0276ca3bdc164087da9aec700b2e08f0ed",
+      "shortSha": "27f58e0",
+      "subject": "chore(generated): refresh i18n manifest hashes for the restored translations",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T16:38:15+03:00"
+    },
+    {
+      "sha": "68dc528e4a52f0b539167b517e704ca62755813c",
+      "shortSha": "68dc528",
+      "subject": "chore(nightly): mark the 08-09 salvage restored",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T16:37:12+03:00"
+    },
+    {
+      "sha": "b0bbf2f378926f45377be8f5444062079643a89d",
+      "shortSha": "b0bbf2f",
+      "subject": "fix(nightly): restore lane code the 08-08/08-09 gates false-dropped",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T11:43:00+03:00"
+    },
+    {
+      "sha": "8e18d6cecdc3453f89f21dc219ece771832909da",
+      "shortSha": "8e18d6c",
+      "subject": "fix(security,i18n): authenticate /api/indexnow; unblock Japanese Connections",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T11:51:34+03:00"
+    },
+    {
+      "sha": "2566d7e99b6d1b8ab90d1e75fc6a8f446041b9c2",
+      "shortSha": "2566d7e",
+      "subject": "Merge remote-tracking branch 'origin/master' into worktree-ru-seo-connections-landings",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T10:08:16+03:00"
+    },
+    {
+      "sha": "e22324a3414dd18a85f3af31a15ee2daf92ce716",
+      "shortSha": "e22324a",
+      "subject": "fix(connections): render Word Bridge keyboard LTR so Hebrew isn't mirrored (#797)",
+      "author": "ohadf2015",
+      "date": "2026-08-09T09:21:18+03:00"
+    },
+    {
+      "sha": "0595fe78b84c3f0f04eb8eb1f4dcce053c87fbd3",
+      "shortSha": "0595fe7",
+      "subject": "Merge remote-tracking branch 'origin/master' into worktree-ru-seo-connections-landings",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T08:55:26+03:00"
+    },
+    {
+      "sha": "c166efdaf2beea8c774556fe33e61ca776a966e3",
+      "shortSha": "c166efd",
+      "subject": "docs(seo): record Yandex Webmaster registration state and the deploy-gated verify step",
+      "author": "Ohad Fisher",
+      "date": "2026-08-09T08:45:14+03:00"
     }
   ]
 }
