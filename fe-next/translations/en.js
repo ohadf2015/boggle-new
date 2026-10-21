@@ -12862,6 +12862,8 @@ const en = {
       "removeWord": "Remove",
       "wordPlaceholder": "Enter a word...",
       "canIntegrate": "Can embed in games",
+      "singleWordsOnly": "Only single words can be played on the board. Remove or split: {{terms}}",
+      "notSingleWord": "Not one word",
       "cannotIntegrate": "Track only",
       "assignToClassroom": "Assign to class (optional)",
       "noClassroomSelected": "No classroom (personal lesson)",
@@ -13020,6 +13022,8 @@ const en = {
       "wordListGoalHint": "Paste words, one per line or comma-separated.",
       "wordListPlaceholder": "cat, dog, fish",
       "wordGoalMissing": "Add a word goal or a word list and a due date",
+      "alreadyAssignedUpdated": "This lesson was already assigned to this class. We updated its due date and settings.",
+      "alreadyAssigned": "This lesson is already assigned to this class",
       "findNWords": "Find {{count}} words"
     },
     "completion": {

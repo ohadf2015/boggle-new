@@ -1,6 +1,7 @@
 import { EDUCATION_LANGUAGES, normalizeForStorage, type Language, type VocabularyWord } from '@/lib/supabase/education/types';
 import { checkWordIntegration } from '@/hooks/wordIntegrationLogic';
 import { isBlockedWord } from '@/lib/wordTowerV2/blocked';
+import { isMultiWordTerm } from '@/lib/education/singleWordTerm';
 
 export interface WordEntry {
   word: string;
@@ -77,12 +78,16 @@ export function mergeWords(
   existing: VocabularyWord[],
   incoming: WordEntry[],
   language: Language,
-): { words: VocabularyWord[]; added: number; duplicates: number } {
+): { words: VocabularyWord[]; added: number; duplicates: number; rejected: string[] } {
   const seen = new Set(existing.map((w) => normalizeForStorage(w.word, language)));
   const words = [...existing];
   let added = 0;
   let duplicates = 0;
+  // Multi-word terms ("Rely on", "Blood transfusion") can't be played on the
+  // board — never add them; the caller shows them back to the teacher.
+  const rejected: string[] = [];
   for (const entry of incoming) {
+    if (isMultiWordTerm(entry.word)) { rejected.push(entry.word.trim()); continue; }
     const key = normalizeForStorage(entry.word, language);
     if (!key || seen.has(key)) { duplicates++; continue; }
     if (words.length >= MAX_LIST_WORDS) break;
@@ -95,7 +100,7 @@ export function mergeWords(
     });
     added++;
   }
-  return { words, added, duplicates };
+  return { words, added, duplicates, rejected };
 }
 
 export type WordIssue = 'digits' | 'tooLong' | 'wrongScript' | 'blocked';

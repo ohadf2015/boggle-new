@@ -6,6 +6,8 @@
  * send home the same minute a student joins.
  */
 
+import { isMultiWordTerm } from '@/lib/education/singleWordTerm';
+
 export type WordGoalKind = 'word_count' | 'word_list';
 
 export const WORD_COUNT_MIN = 1;
@@ -33,7 +35,8 @@ export type WordGoalError =
   | 'invalid_word_count'
   | 'word_list_too_short'
   | 'word_list_too_long'
-  | 'empty_goal';
+  | 'empty_goal'
+  | 'multi_word_terms';
 
 export function parseWordList(raw: string): string[] {
   const seen = new Set<string>();
@@ -105,7 +108,7 @@ export function validateWordGoal(input: {
   dueDate?: string | null;
   target?: number | string | null;
   wordListRaw?: string | null;
-}): { ok: true; goal: WordGoal } | { ok: false; error: WordGoalError } {
+}): { ok: true; goal: WordGoal } | { ok: false; error: WordGoalError; rejected?: string[] } {
   const dueDate = (input.dueDate ?? '').trim();
   if (!dueDate) return { ok: false, error: 'missing_due_date' };
 
@@ -125,6 +128,9 @@ export function validateWordGoal(input: {
 
   const words = parseWordList(input.wordListRaw ?? '');
   if (words.length === 0) return { ok: false, error: 'empty_goal' };
+  // The board plays single words only; "Rely on" could never be found.
+  const rejected = words.filter(isMultiWordTerm);
+  if (rejected.length > 0) return { ok: false, error: 'multi_word_terms', rejected };
   if (words.length < WORD_LIST_MIN) return { ok: false, error: 'word_list_too_short' };
   if (words.length > WORD_LIST_MAX) return { ok: false, error: 'word_list_too_long' };
   return { ok: true, goal: { kind: 'word_list', words, dueDate } };

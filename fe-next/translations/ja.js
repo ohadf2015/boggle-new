@@ -14620,6 +14620,8 @@ const ja = {
       "removeWord": "削除",
       "wordPlaceholder": "単語を入力...",
       "canIntegrate": "ゲーム連携可能",
+      "singleWordsOnly": "ボードで遊べるのは1語だけです。削除するか分けてください: {{terms}}",
+      "notSingleWord": "1語ではありません",
       "cannotIntegrate": "進捗のみ記録",
       "assignToClassroom": "クラスに割り当て（任意）",
       "noClassroomSelected": "クラスなし（個人レッスン）",
@@ -14778,6 +14780,8 @@ const ja = {
       "wordListGoalHint": "単語を1行ずつ、またはカンマ区切りで貼り付けます。",
       "wordListPlaceholder": "ねこ, いぬ, さかな",
       "wordGoalMissing": "単語ゴールかリストと期限を入れてください",
+      "alreadyAssignedUpdated": "このレッスンはすでにこのクラスに割り当て済みです。期限と設定を更新しました。",
+      "alreadyAssigned": "このレッスンはすでにこのクラスに割り当て済みです",
       "findNWords": "{{count}}語見つけよう"
     },
     "completion": {

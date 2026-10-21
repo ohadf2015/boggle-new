@@ -15,6 +15,7 @@ import {
   type LibraryTopic,
   type WordEntry,
 } from '@/lib/education/library';
+import { SINGLE_WORDS_ONLY_KEY, formatRejectedTerms, invalidLessonTerms } from '@/lib/education/singleWordTerm';
 import WordChips from './WordChips';
 import ListImportBar from './ListImportBar';
 import ListMetaFields from './ListMetaFields';
@@ -55,7 +56,7 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
   const [draft, setDraft] = useState<ListDraft>(initial);
   const [fragment, setFragment] = useState('');
   const [fresh, setFresh] = useState<Map<string, number>>(new Map());
-  const [feedback, setFeedback] = useState<{ added: number; duplicates: number } | null>(null);
+  const [feedback, setFeedback] = useState<{ added: number; duplicates: number; rejected: string[] } | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
   const [view, setView] = useState<'chips' | 'details'>('chips');
   const [hint, setHint] = useState<string | null>(null);
@@ -89,11 +90,11 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
 
   const addEntries = (entries: WordEntry[], base: ListDraft = draft): ListDraft => {
     if (entries.length === 0) return base;
-    const { words, added, duplicates } = mergeWords(base.words, entries, base.language);
+    const { words, added, duplicates, rejected } = mergeWords(base.words, entries, base.language);
     const nextFresh = new Map<string, number>();
     words.slice(base.words.length).forEach((w, i) => nextFresh.set(w.word, i));
     setFresh(nextFresh);
-    setFeedback({ added, duplicates });
+    setFeedback({ added, duplicates, rejected });
     const next = { ...base, words };
     setDraft(next);
     setHint(null);
@@ -128,6 +129,13 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
     }
     if (next.words.length === 0) {
       setHint(t('eduLibrary.editor.needWords'));
+      return;
+    }
+    // A list saved before multi-word terms were blocked (or edited in another
+    // tab) must not be saved with them: the board can't play "Rely on".
+    const multiWord = invalidLessonTerms(next.words);
+    if (multiWord.length > 0) {
+      setHint(t(SINGLE_WORDS_ONLY_KEY, { terms: formatRejectedTerms(multiWord) }));
       return;
     }
     if (next.isPublic && listModerationIssues(next).length > 0) {
@@ -237,6 +245,11 @@ export default function ListEditorSheet({ open, onOpenChange, initial, classroom
               )}
               {feedback && feedback.duplicates > 0 && (
                 <span className="text-neo-yellow">{t('eduLibrary.editor.skippedDuplicates', { count: feedback.duplicates })}</span>
+              )}
+              {feedback && feedback.rejected.length > 0 && (
+                <span data-testid="list-paste-rejected" className="ms-2 inline-block text-neo-pink">
+                  {t(SINGLE_WORDS_ONLY_KEY, { terms: formatRejectedTerms(feedback.rejected) })}
+                </span>
               )}
             </p>
           </div>

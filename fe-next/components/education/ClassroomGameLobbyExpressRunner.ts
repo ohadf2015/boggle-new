@@ -20,6 +20,7 @@
  * "still working").
  */
 
+import { isMultiWordTerm } from '@/lib/education/singleWordTerm';
 import type { Classroom, VocabularyLesson, VocabularyWord, Language } from '@/lib/supabase/education/types';
 import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
 import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromPack';
@@ -169,7 +170,8 @@ async function ensureLesson(
     language = pack.language;
     description = intent.title;
   } else {
-    const pasted = (intent.words || []).filter((w) => w.trim());
+    // Single words only: the board can't place "Rely on".
+    const pasted = (intent.words || []).filter((w) => w.trim() && !isMultiWordTerm(w));
     if (pasted.length === 0) return { ok: false, failure: { code: 'lesson', reason: 'EMPTY' } };
     words = pasted.map((word) => ({ word, canIntegrate: true }));
     name = intent.title;
