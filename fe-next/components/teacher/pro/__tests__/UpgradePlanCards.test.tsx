@@ -46,7 +46,10 @@ describe('UpgradePlanCards', () => {
   it('never tells a logged-out visitor they are on a plan; offers Start free instead', () => {
     setup('anon');
     expect(screen.queryByTestId('pricing-free-current')).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'eg2Pro.plans.startFree' })).toHaveAttribute('href', '/en/education/access');
+    expect(screen.getByRole('link', { name: 'eg2Pro.plans.startFree' })).toHaveAttribute(
+      'href',
+      '/en/education/access?from=%2Fen%2Fteacher%2Fupgrade',
+    );
   });
 
   it.each(['anon', 'free', 'pro', 'loading'] as UpgradeViewer[])('gives the Free card a price note for %s, like the Pro card has', (viewer) => {

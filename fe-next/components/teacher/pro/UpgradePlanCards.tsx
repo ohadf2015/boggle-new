@@ -115,7 +115,10 @@ export function UpgradePlanCards({
         </p>
         <div className="mt-4 min-h-12">
           {viewer === 'anon' && (
-            <Link href={`/${language}/education/access`} className={cn(BTN, 'bg-neo-white text-neo-black')}>
+            <Link
+              href={`/${language}/education/access?from=${encodeURIComponent(`/${language}/teacher/upgrade`)}`}
+              className={cn(BTN, 'bg-neo-white text-neo-black')}
+            >
               {t('eg2Pro.plans.startFree')}
             </Link>
           )}

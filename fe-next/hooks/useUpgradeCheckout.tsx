@@ -13,6 +13,7 @@ import {
   trackTeacherProUpgradeClick,
   trackTeacherProCheckoutStarted,
   trackTeacherProCheckoutRedirect,
+  trackEduProCheckoutFailed,
 } from '@/lib/education/proFunnelTelemetry';
 import { resumeDecision } from '@/lib/education/pro/resumeDecision';
 
@@ -64,6 +65,7 @@ export function useUpgradeCheckout({ t, language, user, authLoading, proLoading,
       });
       if (!response.ok) {
         if (response.status === 401) {
+          // Designed anon gate: open sign-in and resume. Not a failed checkout.
           toast.error(t('teacher.subscription.signInRequired'));
           markResumeCheckoutIntent({ trial });
           setShowAuthModal(true);
@@ -92,6 +94,11 @@ export function useUpgradeCheckout({ t, language, user, authLoading, proLoading,
       }
       window.location.href = url;
     } catch {
+      try {
+        trackEduProCheckoutFailed({ reason: 'network', trial });
+      } catch {
+        /* analytics must never block the till */
+      }
       toast.error(t('teacher.subscription.checkoutError'));
     } finally {
       setPending(null);

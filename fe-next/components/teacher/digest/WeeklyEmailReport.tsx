@@ -18,6 +18,7 @@ import {
 } from '@/lib/education/weeklyEmailReport';
 import { WEEK_MS, formatWowDelta } from '@/lib/education/weeklyProgressDigest';
 import { trackTeacherWeeklyEmailReportCopied } from '@/lib/education/telemetry';
+import { stripEmoji } from '@/lib/share/stripEmoji';
 import { Stat } from '@/components/ui/Stat';
 import { NeoPanel } from '@/components/ui/panel';
 import { cn } from '@/lib/utils';
@@ -61,7 +62,7 @@ export function WeeklyEmailReport({ classroomId, classroomName }: WeeklyEmailRep
 
   const copy = async () => {
     const { subject, body } = report();
-    const text = `${subject}\n\n${body}`;
+    const text = stripEmoji(`${subject}\n\n${body}`);
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(text);
