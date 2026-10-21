@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { withoutMultiWordTerms } from '@/lib/education/singleWordTerm';
 import { fetchWithAuth } from '@/utils/authFetch';
 import logger from '@/utils/logger';
 import { notifyLessonsChanged } from '@/hooks/useVocabularyLesson';
@@ -93,7 +94,8 @@ export async function copyToMine(
     name: item.name,
     description: item.description,
     language: item.language,
-    words: item.words,
+    // A copy only carries words the board can play ("Rely on" is dropped).
+    words: withoutMultiWordTerms(item.words),
     is_public: false,
     source_game_code: null,
   };

@@ -18,6 +18,7 @@ import {
 } from '@/lib/education/vocabEnrich';
 import WordSkillFields, { parseSenses } from './lesson-creation/WordSkillFields';
 import logger from '@/utils/logger';
+import { SINGLE_WORDS_ONLY_KEY, formatRejectedTerms, isMultiWordTerm } from '@/lib/education/singleWordTerm';
 
 interface WordListEditorProps {
   words: VocabularyWord[];
@@ -57,6 +58,7 @@ export default function WordListEditor({
   const { t } = useLanguage();
   const { checkWordIntegration } = useWordIntegration();
   const [currentWord, setCurrentWord] = useState('');
+  const [addError, setAddError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<number>>(() => new Set());
   // Local drafts so comma-typing / blank-insertion never fights the controlled value
   const [drafts, setDrafts] = useState<Record<string, string>>({});
@@ -76,6 +78,12 @@ export default function WordListEditor({
 
   const handleAddWord = useCallback(() => {
     if (!currentWord.trim()) return;
+    // The board plays single words only — "Rely on" would never appear.
+    if (isMultiWordTerm(currentWord)) {
+      setAddError(t(SINGLE_WORDS_ONLY_KEY, { terms: formatRejectedTerms([currentWord.trim()]) }));
+      return;
+    }
+    setAddError(null);
     const result = checkWordIntegration(currentWord.trim(), language);
     const newWord: VocabularyWord = {
       word: result.word,
@@ -84,7 +92,7 @@ export default function WordListEditor({
     };
     onWordsChange([...words, newWord]);
     setCurrentWord('');
-  }, [currentWord, checkWordIntegration, language, onWordsChange, words]);
+  }, [currentWord, checkWordIntegration, language, onWordsChange, words, t]);
 
   const handleRemoveWord = useCallback((index: number) => {
     onWordsChange(words.filter((_, i) => i !== index));
@@ -212,7 +220,9 @@ export default function WordListEditor({
         <div className="flex gap-2 mb-3">
           <Input
             value={currentWord}
-            onChange={(e) => setCurrentWord(e.target.value)}
+            onChange={(e) => { setCurrentWord(e.target.value); setAddError(null); }}
+            aria-invalid={addError ? true : undefined}
+            aria-describedby={addError ? 'word-add-error' : undefined}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
@@ -231,6 +241,11 @@ export default function WordListEditor({
             <Plus className="w-5 h-5" />
           </Button>
         </div>
+      )}
+      {showAddInput && addError && (
+        <p id="word-add-error" data-testid="word-add-error" role="alert" className="-mt-2 mb-3 text-xs font-bold text-neo-pink">
+          {addError}
+        </p>
       )}
 
       {words.length > 0 && (
@@ -310,6 +325,14 @@ export default function WordListEditor({
                         </div>
                       )}
                       <span className="text-neo-white font-neo-body ms-2 truncate">{word.word}</span>
+                      {isMultiWordTerm(word.word) && (
+                        <span
+                          data-testid="word-multi-word-flag"
+                          className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-neo-pink text-neo-black"
+                        >
+                          {t('teacher.lesson.notSingleWord')}
+                        </span>
+                      )}
                       {word.level && word.level !== 'core' && (
                         <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-neo-black/40 text-neo-white/80">
                           {t(LEVELS.find((l) => l.value === word.level)?.key ?? 'teacher.wordDetails.levelCore')}

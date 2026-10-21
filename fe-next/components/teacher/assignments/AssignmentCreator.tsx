@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAssignments } from '@/hooks/useAssignments';
@@ -46,6 +46,7 @@ import {
 import type { Language } from '@/lib/supabase/education/types';
 import { AssignmentGoalModes } from './AssignmentGoalModes';
 import { createWordGoalAssignment } from '@/lib/education/createWordGoalAssignment';
+import { SINGLE_WORDS_ONLY_KEY, formatRejectedTerms } from '@/lib/education/singleWordTerm';
 import {
   validateWordGoal,
   WORD_COUNT_DEFAULT,
@@ -96,6 +97,9 @@ export default function AssignmentCreator({
   const [instructions, setInstructions] = useState<string>('');
   const [focus, setFocus] = useState<PracticeFocusSetting>('any');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Synchronous guard: a double-click fires twice before `isSubmitting`
+  // re-renders the button disabled, which inserted the same lesson twice.
+  const submittingRef = useRef(false);
   const [wordCount, setWordCount] = useState(WORD_COUNT_DEFAULT);
   const [wordListRaw, setWordListRaw] = useState('');
   const [galleryOpen, setGalleryOpen] = useState(false);
@@ -150,6 +154,16 @@ export default function AssignmentCreator({
     : assignmentSubmitHintKey(Boolean(selectedLessonId), Boolean(dueDate));
 
   const handleSubmit = async () => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    try {
+      await submitAssignment();
+    } finally {
+      submittingRef.current = false;
+    }
+  };
+
+  const submitAssignment = async () => {
     if (!user) {
       toast.error(t('teacher.assignment.missingFields'));
       return;
@@ -163,7 +177,11 @@ export default function AssignmentCreator({
         wordListRaw,
       });
       if (!validated.ok) {
-        toast.error(t('teacher.assignment.wordGoalMissing'));
+        toast.error(
+          validated.error === 'multi_word_terms'
+            ? t(SINGLE_WORDS_ONLY_KEY, { terms: formatRejectedTerms(validated.rejected ?? []) })
+            : t('teacher.assignment.wordGoalMissing'),
+        );
         return;
       }
       setIsSubmitting(true);
@@ -211,6 +229,19 @@ export default function AssignmentCreator({
 
     setIsSubmitting(false);
 
+    if (result.alreadyAssigned) {
+      // Re-assigning a lesson this class already has updates that assignment
+      // (due date, mode) rather than failing or creating a second copy.
+      if (result.success) {
+        toast.success(t('teacher.assignment.alreadyAssignedUpdated'));
+        onComplete();
+        onClose();
+      } else {
+        toast.error(t('teacher.assignment.alreadyAssigned'));
+      }
+      return;
+    }
+
     if (result.success) {
       toast.success(t('teacher.assignment.created'));
       if (assignmentCount === 0) {
@@ -224,6 +255,16 @@ export default function AssignmentCreator({
   };
 
   const handleAssignTemplate = async (template: AssignmentTemplate) => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    try {
+      await assignTemplate(template);
+    } finally {
+      submittingRef.current = false;
+    }
+  };
+
+  const assignTemplate = async (template: AssignmentTemplate) => {
     if (!user) {
       toast.error(t('teacher.assignment.error'));
       return;

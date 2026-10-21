@@ -21,6 +21,7 @@ import { containsHebrew, type Language, type VocabularyWord, type VocabularyLeve
 import { sanitizeWord } from '@/shared/utils/wordNormalization';
 import { withBlank } from '@/lib/education/vocabFocus';
 import { stripHyphens } from '@/lib/education/vocabFocusSkills';
+import { SINGLE_WORDS_ONLY_KEY, formatRejectedTerms, isMultiWordTerm } from '@/lib/education/singleWordTerm';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -47,6 +48,8 @@ interface ValidationResult {
   hasNiqqud: boolean;
   /** The row looks like several words crammed onto one line. */
   tooManyWords: boolean;
+  /** "Rely on", "Blood transfusion" — the board only plays single words. */
+  multiWord: boolean;
   extras: Omit<ParsedImportLine, 'word' | 'definition'>;
 }
 
@@ -223,6 +226,7 @@ export default function BulkImportEnhanced({
         rowNumber: index + 1,
         hasNiqqud,
         tooManyWords: countWordBoundaries(line) > 1,
+        multiWord: isMultiWordTerm(originalWord) || isMultiWordTerm(result.word),
         extras,
       };
     });
@@ -233,7 +237,7 @@ export default function BulkImportEnhanced({
   // become a word. It is shown as an error row and excluded from the import —
   // importing it would create a nameless entry, and dropping it in silence
   // would leave the teacher believing the paste worked.
-  const isUnreadable = (r: ValidationResult) => r.word.trim().length === 0 || r.tooManyWords;
+  const isUnreadable = (r: ValidationResult) => r.word.trim().length === 0 || r.tooManyWords || r.multiWord;
   const unreadableRows = useMemo(() => validationResults.filter(isUnreadable), [validationResults]);
   const importableRows = useMemo(
     () => validationResults.filter((r) => !isUnreadable(r)),
@@ -241,6 +245,10 @@ export default function BulkImportEnhanced({
   );
   const crammedRows = useMemo(
     () => validationResults.filter((r) => r.tooManyWords),
+    [validationResults]
+  );
+  const multiWordRows = useMemo(
+    () => validationResults.filter((r) => r.multiWord && !r.tooManyWords),
     [validationResults]
   );
 
@@ -400,6 +408,13 @@ export default function BulkImportEnhanced({
                           <span className="block mt-1">
                             {t('teacher.lesson.bulkImportOneWordPerLine', {
                               rows: crammedRows.map((r) => r.rowNumber).join(', '),
+                            })}
+                          </span>
+                        )}
+                        {multiWordRows.length > 0 && (
+                          <span data-testid="bulk-import-multi-word" className="block mt-1">
+                            {t(SINGLE_WORDS_ONLY_KEY, {
+                              terms: formatRejectedTerms(multiWordRows.map((r) => r.originalWord.trim())),
                             })}
                           </span>
                         )}

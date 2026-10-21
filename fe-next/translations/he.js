@@ -14475,6 +14475,8 @@ const he = {
       "removeWord": "הסרה",
       "wordPlaceholder": "הקלידו מילה...",
       "canIntegrate": "ניתן לשלב במשחקים",
+      "singleWordsOnly": "על הלוח אפשר לשחק רק מילים בודדות. הסירו או פצלו: {{terms}}",
+      "notSingleWord": "לא מילה אחת",
       "cannotIntegrate": "מעקב בלבד",
       "assignToClassroom": "שייך לכיתה (אופציונלי)",
       "noClassroomSelected": "ללא כיתה (שיעור אישי)",
@@ -14633,6 +14635,8 @@ const he = {
       "wordListGoalHint": "הדביקו מילים, שורה לכל מילה או מופרדות בפסיק.",
       "wordListPlaceholder": "חתול, כלב, דג",
       "wordGoalMissing": "הוסיפו יעד מילים או רשימה ותאריך יעד",
+      "alreadyAssignedUpdated": "השיעור הזה כבר הוקצה לכיתה. עדכנו את תאריך היעד וההגדרות.",
+      "alreadyAssigned": "השיעור הזה כבר הוקצה לכיתה הזו",
       "findNWords": "מצאו {{count}} מילים"
     },
     "completion": {

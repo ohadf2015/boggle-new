@@ -1,3 +1,4 @@
+import { withoutMultiWordTerms } from '@/lib/education/singleWordTerm';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import type { CurriculumWordList, CurriculumWordListFilters, VocabularyLesson } from './types';
@@ -114,7 +115,8 @@ export async function importCurriculumToLesson(
         name: curriculumList.name,
         description: curriculumList.description,
         language: curriculumList.language,
-        words: curriculumList.words,
+        // Single words only — curriculum rows like "in addition" can't be played on the board.
+        words: withoutMultiWordTerms(curriculumList.words),
         is_public: false,
         source_game_code: null,
       })

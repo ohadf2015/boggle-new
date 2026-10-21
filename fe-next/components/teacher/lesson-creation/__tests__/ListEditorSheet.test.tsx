@@ -122,3 +122,28 @@ describe('ListEditorSheet', () => {
     return waitFor(() => expect((onSave.mock.calls[0][0] as { isPublic: boolean }).isPublic).toBe(true));
   });
 });
+
+describe('ListEditorSheet — single words only', () => {
+  it('drops multi-word terms from a paste and names them', () => {
+    setup();
+    fireEvent.paste(box(), { clipboardData: { getData: () => 'osmosis\nRely on\nHospice care' } });
+    expect(chips()).toHaveLength(1);
+    expect(screen.getByTestId('list-paste-rejected')).toHaveTextContent('teacher.lesson.singleWordsOnly');
+    expect(screen.getByTestId('list-paste-rejected')).toHaveTextContent('Rely on');
+  });
+
+  it('will not save an older list that still has multi-word terms', async () => {
+    const { onSave } = setup({
+      initial: {
+        ...emptyListDraft('en'),
+        id: 'l1',
+        name: 'If you are reading this....',
+        words: [{ word: 'Blood transfusion', canIntegrate: false }, { word: 'rely', canIntegrate: true }],
+      },
+    });
+    fireEvent.click(screen.getByTestId('list-save'));
+    expect(screen.getByTestId('list-save-hint')).toHaveTextContent('teacher.lesson.singleWordsOnly');
+    expect(screen.getByTestId('list-save-hint')).toHaveTextContent('Blood transfusion');
+    expect(onSave).not.toHaveBeenCalled();
+  });
+});

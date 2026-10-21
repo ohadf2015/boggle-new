@@ -13830,6 +13830,8 @@ const ru = {
       "removeWord": "Удалить",
       "wordPlaceholder": "Введите слово...",
       "canIntegrate": "Можно встроить в игры",
+      "singleWordsOnly": "На поле можно играть только отдельными словами. Удалите или разделите: {{terms}}",
+      "notSingleWord": "Не одно слово",
       "cannotIntegrate": "Только отслеживание",
       "assignToClassroom": "Назначить классу (необязательно)",
       "noClassroomSelected": "Класс не выбран (личный урок)",
@@ -13988,6 +13990,8 @@ const ru = {
       "wordListGoalHint": "Вставьте слова, по одному в строке или через запятую.",
       "wordListPlaceholder": "кот, пёс, рыба",
       "wordGoalMissing": "Добавьте цель или список и срок",
+      "alreadyAssignedUpdated": "Этот урок уже был назначен классу. Мы обновили срок и настройки.",
+      "alreadyAssigned": "Этот урок уже назначен этому классу",
       "findNWords": "Найди {{count}} слов"
     },
     "completion": {
