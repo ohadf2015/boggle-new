@@ -74,6 +74,13 @@ export const FEEDBACK_WIDGET_IGNORE_NETWORK = JSON.stringify([
     { url: '/api/admin/insights', status: 401 },
 ]);
 
+/**
+ * Host-expected console noise (widget >= 2.0.10 `data-ignore-console`, opt-in).
+ * Google Identity Services logs FedCM/GSI_LOGGER on every page that loads the
+ * GIS script. Substring filters only — a broad pattern would drop real errors.
+ */
+export const FEEDBACK_WIDGET_IGNORE_CONSOLE = JSON.stringify(['GSI_LOGGER', 'FedCM']);
+
 function injectFeedbackWidget(): void {
     if (document.getElementById(FEEDBACK_WIDGET_SCRIPT_ID)) return;
     const s = document.createElement('script');
@@ -86,6 +93,7 @@ function injectFeedbackWidget(): void {
     s.setAttribute('data-dir', 'auto');
     s.setAttribute('data-app-version', 'web');
     s.setAttribute('data-ignore-network', FEEDBACK_WIDGET_IGNORE_NETWORK);
+    s.setAttribute('data-ignore-console', FEEDBACK_WIDGET_IGNORE_CONSOLE);
     document.body.appendChild(s);
 }
 
