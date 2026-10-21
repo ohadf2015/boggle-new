@@ -78,6 +78,12 @@ _push_master_retrying() {
 }
 
 ship_nightly_commit() {
+  # Scrub secrets (e.g. the Bing Webmaster API key) out of generated reports
+  # before anything is staged — this repo is PUBLIC and this path can bypass
+  # the pre-commit hook (commit-tree / NIGHTLY_RUN=1).
+  local _redact
+  _redact="$(git rev-parse --show-toplevel 2>/dev/null)/scripts/redact-secrets.sh"
+  [ -f "$_redact" ] && bash "$_redact" >>"${RUN_LOG:-/dev/null}" 2>&1 || true
   # Stage ONLY the paths the nightly's own lanes authored (the allowlist run.sh
   # built as per-lane (dirty after) − (dirty before)). NEVER `git add -A`: a
   # blanket stage sweeps the founder's concurrent WIP — including files dirtied

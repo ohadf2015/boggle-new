@@ -29,6 +29,8 @@ For the top 5 grounding queries from `ai-search/__TODAY__.json`, call Bing's `Ge
 GET https://ssl.bing.com/webmaster/api.svc/json/GetKeywordStats?q=<urlencoded>&country=us&language=en-US&apikey=$BING_WMT_API_KEY
 ```
 
+NEVER write the key value anywhere (report, artifact, commit, PR, Telegram). This repo is PUBLIC. Always reference it as `$BING_WMT_API_KEY`.
+
 Returns historical impressions per date — use to identify queries where we have AI citations but LOW Bing organic (= opportunity to capture the organic clicks too).
 
 **Action priority** (use this data to bias seo-daily picks):
