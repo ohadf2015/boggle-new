@@ -1,6 +1,23 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import type { VocabularyLesson } from './types';
+import { INVALID_TERMS_ERROR, formatRejectedTerms, invalidLessonTerms } from '@/lib/education/singleWordTerm';
+
+/**
+ * Last stop before the write: a lesson's words feed the letter board, which
+ * only plays single words. The editors reject multi-word terms with a localized
+ * message first; this keeps any other caller from saving them, and the DB
+ * trigger (reject_multi_word_lesson_terms) backs it up server-side.
+ */
+function multiWordError(words: unknown): { message: string; code: string; terms: string[] } | null {
+  const terms = invalidLessonTerms(Array.isArray(words) ? (words as { word?: string }[]) : []);
+  if (terms.length === 0) return null;
+  return {
+    message: `Only single words can be played on the board. Remove: ${formatRejectedTerms(terms)}`,
+    code: INVALID_TERMS_ERROR,
+    terms,
+  };
+}
 
 /**
  * Get all lessons for a teacher, optionally filtered by classroom
@@ -74,6 +91,8 @@ export async function createLesson(
   data: Omit<VocabularyLesson, 'id' | 'created_at' | 'updated_at'>
 ): Promise<{ data: VocabularyLesson | null; error: { message: string } | null }> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+  const termError = multiWordError(data.words);
+  if (termError) return { data: null, error: termError };
 
   try {
     const { data: lesson, error } = await supabase
@@ -103,6 +122,10 @@ export async function updateLesson(
   updates: Partial<Omit<VocabularyLesson, 'id' | 'teacher_id' | 'created_at' | 'updated_at'>>
 ): Promise<{ data: VocabularyLesson | null; error: { message: string } | null }> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+  if (updates.words !== undefined) {
+    const termError = multiWordError(updates.words);
+    if (termError) return { data: null, error: termError };
+  }
 
   try {
     const { data: lesson, error } = await supabase

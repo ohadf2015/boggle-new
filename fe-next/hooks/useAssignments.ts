@@ -34,7 +34,7 @@ interface UseAssignmentsActions {
     instructions?: string | null;
     practice_focus?: AssignmentFocusValue | null;
     word_count_target?: number | null;
-  }) => Promise<{ success: boolean; error?: string }>;
+  }) => Promise<{ success: boolean; error?: string; alreadyAssigned?: boolean }>;
   deleteAssignment: (assignmentId: string) => Promise<void>;
   refresh: () => Promise<void>;
   getAssignmentStatus: (assignment: TeacherAssignment) => AssignmentStatus;
@@ -112,7 +112,7 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
       instructions?: string | null;
       practice_focus?: AssignmentFocusValue | null;
       word_count_target?: number | null;
-    }): Promise<{ success: boolean; error?: string }> => {
+    }): Promise<{ success: boolean; error?: string; alreadyAssigned?: boolean }> => {
       // Optimistic update: add temporary assignment
       const tempId = `temp-${Date.now()}`;
       const optimisticAssignment: TeacherAssignment = {
@@ -136,7 +136,27 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
       }));
 
       try {
-        const { data: newAssignment, error } = await createAssignmentAPI(data);
+        const { data: newAssignment, error, alreadyAssigned } = await createAssignmentAPI(data);
+
+        if (alreadyAssigned) {
+          // Same lesson, same class: the existing assignment was updated with
+          // the new due date/settings (or could not be). Never list it twice.
+          setState(prev => ({
+            ...prev,
+            assignments: prev.assignments
+              .filter(a => a.id !== tempId)
+              .map(a =>
+                newAssignment && a.id === newAssignment.id
+                  ? ({ ...a, ...newAssignment } as TeacherAssignment)
+                  : a
+              ),
+          }));
+          if (!newAssignment) return { success: false, alreadyAssigned: true, error: error?.message };
+          window.dispatchEvent(new CustomEvent(ASSIGNMENTS_CHANGED_EVENT, {
+            detail: { classroomId: data.classroom_id, source: instanceId.current },
+          }));
+          return { success: true, alreadyAssigned: true };
+        }
 
         if (error) {
           // Rollback optimistic update

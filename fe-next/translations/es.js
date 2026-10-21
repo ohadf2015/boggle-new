@@ -14548,6 +14548,8 @@ const es = {
       "removeWord": "Quitar",
       "wordPlaceholder": "Escribe una palabra...",
       "canIntegrate": "Se puede usar en juegos",
+      "singleWordsOnly": "En el tablero solo se pueden jugar palabras sueltas. Quita o separa: {{terms}}",
+      "notSingleWord": "No es una palabra",
       "cannotIntegrate": "Solo seguimiento",
       "assignToClassroom": "Asignar a una clase (opcional)",
       "noClassroomSelected": "Sin aula (lección personal)",
@@ -15063,6 +15065,8 @@ const es = {
       "wordListGoalHint": "Pega palabras, una por línea o separadas por comas.",
       "wordListPlaceholder": "gato, perro, pez",
       "wordGoalMissing": "Añade una meta o una lista y una fecha",
+      "alreadyAssignedUpdated": "Esta lección ya estaba asignada a esta clase. Actualizamos la fecha y los ajustes.",
+      "alreadyAssigned": "Esta lección ya está asignada a esta clase",
       "findNWords": "Encuentra {{count}} palabras"
     },
     "completion": {

@@ -116,10 +116,13 @@ cd "$PROJECT_DIR" || { log "ERROR: cd $PROJECT_DIR failed"; exit 1; }
   log "ERROR: gcloud ADC missing. Run: gcloud auth application-default login --scopes=...,webmasters.readonly"
   exit 1
 }
-[ -f "$HOME/.config/bing-wmt/credentials" ] || {
-  log "ERROR: Bing WMT creds missing at ~/.config/bing-wmt/credentials"
+# Bing WMT API key: prefer the BING_WMT_API_KEY env var; fall back to the local
+# creds file the seo-daily skill reads. NEVER put the key value in the prompt,
+# the report, a commit, or a log — this repo is PUBLIC.
+if [ -z "${BING_WMT_API_KEY:-}" ] && [ ! -f "$HOME/.config/bing-wmt/credentials" ]; then
+  log "ERROR: Bing WMT creds missing (set BING_WMT_API_KEY or ~/.config/bing-wmt/credentials)"
   exit 1
-}
+fi
 
 if ! git diff --quiet || ! git diff --cached --quiet; then
   log "ERROR: working tree dirty. Commit or stash first."
@@ -218,7 +221,10 @@ If any fails: read the error, fix root cause, retry ONCE. Still failing → HARD
 ═══ STEP 7 — Sanity cap + commit + push PR branch ═══
 Run `git diff --stat` and count touched files. If >8 files → HARD STOP (probably ran wild). Print the diff stat and exit without committing.
 
-Otherwise (only files you intentionally changed; never `git add -A`):
+Otherwise, FIRST scrub secrets from the report (the Bing key leaked into
+docs/seo-daily/*.md before — this repo is PUBLIC):
+  bash scripts/redact-secrets.sh
+Then (only files you intentionally changed; never `git add -A`):
   git add <list>
   git commit -m "feat(seo): daily landing improvements __TODAY__
 
@@ -230,14 +236,10 @@ Otherwise (only files you intentionally changed; never `git add -A`):
   (only list locales actually touched)
 
   Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
-  git push -u origin seo/daily-__TODAY__
 
-Open a ready PR if one does not already exist:
-  gh pr create --base master --head seo/daily-__TODAY__ \
-    --title "seo: daily landing improvements __TODAY__" \
-    --body "Automated daily SEO improvements for __TODAY__. See commit body for query-level rationale and validation notes."
-
-Do NOT push to master and do NOT merge the PR. The wrapper rebases the branch onto latest origin/master and closes superseded seo/daily PRs.
+Do NOT push and do NOT open the PR yourself. The wrapper secret-scans the commits,
+then pushes the branch, opens the PR, rebases onto latest origin/master and closes
+superseded seo/daily PRs. Never push to master and never merge.
 
 ═══ STEP 8 — Summary ═══
 Final stdout (concise):
@@ -254,6 +256,10 @@ Final stdout (concise):
   • NO new files outside the approved landing page + its translation entries.
   • NO fabricated features, stats, modes, or testimonials.
   • If unsure → write `docs/seo-daily/__TODAY__-NOTES.md` and skip the edit.
+  • NEVER write a secret value (Bing/GSC API key, token, password, Authorization
+    header, `apikey=<value>` URL) into ANY file, commit message or PR text. The repo
+    is PUBLIC. Refer to secrets by env var name only, e.g. `apikey=$BING_WMT_API_KEY`
+    or "the Bing API key is configured".
 PROMPT_EOF
 
 # Substitute __TODAY__ in place
@@ -273,7 +279,24 @@ log "----------------------------------------"
 log "Completed: $(date) | exit=$EXIT_CODE"
 log "----------------------------------------"
 
-if [ "$EXIT_CODE" -eq 0 ]; then
+# Secret guard: never push a branch whose commits contain a secret (the Bing
+# Webmaster API key was leaked into docs/seo-daily/*.md this way).
+secret_scan_branch() {
+  local files
+  files="$(git diff --name-only --diff-filter=d "origin/$BASE_BRANCH...$BRANCH" 2>/dev/null || true)"
+  [ -n "$files" ] || return 0
+  # shellcheck disable=SC2086
+  bash "$PROJECT_DIR/scripts/redact-secrets.sh" --check $files 2>&1 | tee -a "$LOG_FILE"
+  return "${PIPESTATUS[0]}"
+}
+
+if [ "$EXIT_CODE" -eq 0 ] && ! secret_scan_branch; then
+  log "ERROR: secret detected in $BRANCH — refusing to push. Run scripts/redact-secrets.sh and amend."
+  EXIT_CODE=1
+  SKIP_SYNC=1
+fi
+
+if [ "$EXIT_CODE" -eq 0 ] && [ -z "${SKIP_SYNC:-}" ]; then
   if ! sync_current_pr_branch; then
     log "ERROR: unable to sync today's SEO PR branch onto origin/$BASE_BRANCH"
     EXIT_CODE=1

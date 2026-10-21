@@ -14,6 +14,22 @@
 # worktree (scripts/nightly/lib/gate-isolated.sh) — and its working tree holds
 # concurrent founder WIP that a whole-tree check here would wrongly trip. So it
 # legitimately skips this hook; it is NOT an ungated committer.
+
+# 0) Secret guard — runs for EVERYONE, including the nightly (before its bypass).
+#    Generated SEO reports leaked the Bing Webmaster API key into this PUBLIC repo.
+#    Blocks staged report markdown that contains an API key / token / auth header.
+SECRET_FILES=$(git diff --cached --name-only --diff-filter=d \
+  | grep -E '^(fe-next/)?docs/.*\.md$' || true)
+if [ -n "$SECRET_FILES" ] && [ -f scripts/redact-secrets.sh ]; then
+  # shellcheck disable=SC2086
+  if ! bash scripts/redact-secrets.sh --check $SECRET_FILES; then
+    echo ""
+    echo "❌ pre-commit: secret found in staged docs (see file:line above)."
+    echo "   Run: bash scripts/redact-secrets.sh  — then re-stage. Reference keys by env var name."
+    exit 1
+  fi
+fi
+
 [ "${NIGHTLY_RUN:-}" = "1" ] && exit 0
 
 cd fe-next || exit 1

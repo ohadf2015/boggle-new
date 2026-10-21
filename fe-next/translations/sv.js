@@ -14893,6 +14893,8 @@ const sv = {
       "removeWord": "Ta bort",
       "wordPlaceholder": "Skriv ett ord...",
       "canIntegrate": "Kan användas i spel",
+      "singleWordsOnly": "Bara enstaka ord kan spelas på brädet. Ta bort eller dela upp: {{terms}}",
+      "notSingleWord": "Inte ett ord",
       "cannotIntegrate": "Endast spårning",
       "assignToClassroom": "Tilldela klass (valfritt)",
       "noClassroomSelected": "Inget klassrum (privat lektion)",
@@ -15051,6 +15053,8 @@ const sv = {
       "wordListGoalHint": "Klistra in ord, ett per rad eller kommaseparerade.",
       "wordListPlaceholder": "katt, hund, fisk",
       "wordGoalMissing": "Lägg till ett ordmål eller en lista och ett datum",
+      "alreadyAssignedUpdated": "Lektionen var redan tilldelad klassen. Vi uppdaterade datum och inställningar.",
+      "alreadyAssigned": "Lektionen är redan tilldelad den här klassen",
       "findNWords": "Hitta {{count}} ord"
     },
     "completion": {

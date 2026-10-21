@@ -108,7 +108,12 @@ export async function createAssignment(data: {
    * 'wordcraft' = play Word Craft.
    */
   practice_focus?: AssignmentFocusValue | null;
-}): Promise<{ data: TeacherAssignment | null; error: { message: string } | null }> {
+}): Promise<{
+  data: TeacherAssignment | null;
+  error: { message: string; code?: string } | null;
+  /** The lesson was already assigned to this classroom; its settings were updated instead. */
+  alreadyAssigned?: boolean;
+}> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
   try {
@@ -130,8 +135,16 @@ export async function createAssignment(data: {
       .single();
 
     if (error) {
+      // lesson_assignments is unique on (lesson_id, classroom_id): the lesson is
+      // already assigned to this class (re-assign, double-click, second tab).
+      // Re-assigning means "this is the homework, with these settings": update
+      // the existing row (same id, so student progress stays attached) and
+      // report it as already assigned instead of failing.
+      if (error.code === UNIQUE_VIOLATION) {
+        return reassignExisting(data);
+      }
       logger.error('Error creating assignment:', error);
-      return { data: null, error: { message: error.message } };
+      return { data: null, error: { message: error.message, code: error.code } };
     }
 
     void recordLessonPlays([data.lesson_id]);
@@ -141,6 +154,64 @@ export async function createAssignment(data: {
     logger.error('Exception in createAssignment:', error);
     return { data: null, error: { message: error } };
   }
+}
+
+const UNIQUE_VIOLATION = '23505';
+
+/**
+ * The settings a re-assign carries over onto the existing assignment. A field
+ * the caller did not pass is left as it is.
+ */
+export function reassignUpdates(data: {
+  due_date?: string | null;
+  word_count_target?: number | null;
+  practice_focus?: AssignmentFocusValue | null;
+}): Record<string, unknown> {
+  const updates: Record<string, unknown> = {};
+  if (data.due_date !== undefined) updates.due_date = data.due_date || null;
+  if (data.word_count_target !== undefined) {
+    updates.word_count_target = typeof data.word_count_target === 'number' ? data.word_count_target : null;
+  }
+  if (data.practice_focus !== undefined) {
+    updates.practice_focus =
+      isVocabFocus(data.practice_focus) || data.practice_focus === WORDCRAFT_FOCUS ? data.practice_focus : null;
+  }
+  return updates;
+}
+
+async function reassignExisting(data: {
+  classroom_id: string;
+  lesson_id: string;
+  due_date?: string | null;
+  word_count_target?: number | null;
+  practice_focus?: AssignmentFocusValue | null;
+}): Promise<{ data: TeacherAssignment | null; error: { message: string; code?: string } | null; alreadyAssigned?: boolean }> {
+  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+  const updates = reassignUpdates(data);
+  const { data: existing, error } = Object.keys(updates).length > 0
+    ? await supabase
+        .from('lesson_assignments')
+        .update(updates)
+        .eq('lesson_id', data.lesson_id)
+        .eq('classroom_id', data.classroom_id)
+        .select()
+        .maybeSingle()
+    : await supabase
+        .from('lesson_assignments')
+        .select()
+        .eq('lesson_id', data.lesson_id)
+        .eq('classroom_id', data.classroom_id)
+        .maybeSingle();
+
+  if (error || !existing) {
+    logger.warn('Lesson already assigned; could not update the existing assignment', {
+      lessonId: data.lesson_id,
+      classroomId: data.classroom_id,
+      reason: error?.message ?? 'not found',
+    });
+    return { data: null, error: { message: 'already_assigned', code: UNIQUE_VIOLATION }, alreadyAssigned: true };
+  }
+  return { data: existing as TeacherAssignment, error: null, alreadyAssigned: true };
 }
 
 /**
