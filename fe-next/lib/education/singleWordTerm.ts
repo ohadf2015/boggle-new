@@ -3,7 +3,7 @@
  * single run of letters. "Rely on", "Blood transfusion" or "well-being" can
  * never be found on a grid, so they are rejected before a list is saved —
  * in the editor, in bulk/paste import, in the save helpers and (for new terms)
- * by a database trigger (migration 20261021100000_reject_multi_word_lesson_terms).
+ * by a database trigger (migration 20261021150000_reject_multi_word_lesson_terms).
  *
  * A term is multi-word when whitespace or a joining mark (hyphen, dash,
  * underscore, slash, middle dot, Hebrew maqaf) sits between two characters. Other characters
@@ -16,7 +16,7 @@ export type TermProblem = 'multi_word';
 const SEP = '\\s\\-‐‑‒–—_/·־';
 /**
  * A separator run between two non-separator characters. Kept in step with the
- * Postgres pattern in migration 20261021100000_reject_multi_word_lesson_terms.
+ * Postgres pattern in migration 20261021150000_reject_multi_word_lesson_terms.
  */
 const MULTI_WORD = new RegExp(`[^${SEP}][${SEP}]+[^${SEP}]`, 'u');
 
