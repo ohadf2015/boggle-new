@@ -62,15 +62,19 @@ describe('GET /api/events', () => {
     const activeEvent = { id: '1', name: 'Active', status: 'active', start_time: '2026-01-01T00:00:00Z', end_time: '2026-01-02T00:00:00Z', description: '', type: 'battle', config: null, rewards: null };
     const upcomingEvent = { id: '2', name: 'Upcoming', status: 'upcoming', start_time: '2026-02-01T00:00:00Z', end_time: '2026-02-02T00:00:00Z', description: '', type: 'battle', config: null, rewards: null };
 
+    const tables: string[] = [];
     mockCreateClient.mockResolvedValueOnce({
-      from: vi.fn((table: string) => ({
-        select: vi.fn(() => ({
-          in: vi.fn(() => ({
-            order: vi.fn(() => Promise.resolve({ data: [activeEvent, upcomingEvent], error: null })),
+      from: vi.fn((table: string) => {
+        tables.push(table);
+        return {
+          select: vi.fn(() => ({
+            in: vi.fn(() => ({
+              order: vi.fn(() => Promise.resolve({ data: [activeEvent, upcomingEvent], error: null })),
+            })),
+            eq: vi.fn(() => Promise.resolve({ data: [{ event_id: '1' }], error: null })),
           })),
-          eq: vi.fn(() => Promise.resolve({ data: [{ event_id: '1' }], error: null })),
-        })),
-      })),
+        };
+      }),
       auth: {
         getUser: vi.fn(() => ({ data: { user: { id: 'user-123' } } })),
       },
@@ -82,6 +86,10 @@ describe('GET /api/events', () => {
     expect(body.active).toHaveLength(1);
     expect(body.upcoming).toHaveLength(1);
     expect(body.myEvents).toHaveLength(1);
+    // Prod table is event_participation. event_participants 404s.
+    expect(tables).toContain('events');
+    expect(tables).toContain('event_participation');
+    expect(tables).not.toContain('event_participants');
   });
 
   it('returns default empty arrays on database error', async () => {

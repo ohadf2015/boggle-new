@@ -1,0 +1,29 @@
+name: Schema drift
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+jobs:
+  check:
+    name: Referenced tables and RPCs exist in prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Unit-test the ref extractor
+        run: node --test fe-next/scripts/schema-drift/extractRefs.test.mjs
+
+      - name: Assert referenced objects exist in prod
+        run: node fe-next/scripts/check-schema-drift.mjs
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}

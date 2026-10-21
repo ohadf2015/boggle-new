@@ -1,0 +1,17 @@
+# Pre-existing prod gaps as of 2026-10-21. One `table:<name>` or `rpc:<name>` per line.
+# The drift check FAILS when a referenced object is missing and not listed here,
+# and FAILS when a listed object now exists (delete the line).
+# Do not add a line to hide a read you just introduced.
+#
+# auth_users_view: admin/email jobs read a view that is not in prod.
+# The RPCs below are called and 404; creating them is out of this card's scope.
+# `rpc('increment')` is not listed: the scanner treats it as a supabase-js
+# update sentinel, not a PostgREST function.
+
+table:auth_users_view
+rpc:batch_update_ranked_mmr
+rpc:get_guest_session_totals
+rpc:get_server_timezone
+rpc:grant_remove_ads
+rpc:increment_board_play_count
+rpc:update_board_rating_aggregates

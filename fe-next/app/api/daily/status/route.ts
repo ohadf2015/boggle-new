@@ -71,9 +71,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         return NextResponse.json({ ...DEFAULT_STATUS, loading: false }, { status: 401 });
       }
 
-      // Reads go through the admin client, filtered by the VERIFIED id:
-      // `daily_puzzle_streaks` has no SELECT policy, so a user-scoped read
-      // returns 0 rows with error:null and the longest streak reads as 0.
+      // Reads go through the admin client, filtered by the VERIFIED id.
+      // A user-scoped read of the attempt tables misses rows the player cannot
+      // select, and longest would come back as 0.
       const supabase = createAdminClient() ?? requestClient;
 
       // Fetch all attempts across modes (NO is_catchup)
@@ -122,18 +122,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         freezeApplied = { date: freezeBridgeDate, freezesRemaining: freezeCount - 1 };
       }
 
-      // Compute longest streak from all historical dates
-      const allHistoricalDates = await supabase
-        .from('daily_puzzle_streaks')
-        .select('completed_dates')
-        .eq('player_id', userId)
-        .single()
-        .then(({ data }) => {
-          const dates = data?.completed_dates ?? [];
-          return Array.isArray(dates) ? dates : [];
-        });
-
-      const longestStreak = computeLongestConsecutiveStreak(allHistoricalDates);
+      // Longest streak comes from the attempt rows already fetched above.
+      // `daily_puzzle_streaks` is not in prod (015 never landed) and its repo
+      // shape has no `completed_dates` column, so that read 404'd and longest
+      // stayed 0. Tower dates are included: they were already loaded, and a
+      // tower-only history is still a daily history. Current streak keeps the
+      // older hunt/wheel/connections set (allDates) — that split is pre-existing.
+      const historyDates = Array.from(
+        new Set([...huntRows, ...wheelRows, ...towerRows, ...connectionRows]),
+      );
+      const longestStreak = computeLongestConsecutiveStreak(historyDates);
 
       // Build the response
       const response: DailyPlayedStatus = {

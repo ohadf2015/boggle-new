@@ -59,8 +59,10 @@ export async function updateDailyProfileStats(args: UpdateDailyProfileStatsArgs)
 
   const newDay = isNewUtcDay(profile.last_game_at, now);
 
-  // Try atomic RPC first (handles score + games). RPC doesn't know about
-  // unique_days_played, so we apply that as a follow-up update when needed.
+  // Atomic score + games bump. The RPC does not touch unique_days_played;
+  // that stays a follow-up update. Defined in
+  // 20261021143000_fix_brain_score_updated_at_and_profile_stats.sql —
+  // a missing function 404s and falls back to the racy read-modify-write.
   const { error: rpcError } = await supabase.rpc('increment_profile_stats', {
     p_user_id: playerId,
     p_score: scoreToAdd,

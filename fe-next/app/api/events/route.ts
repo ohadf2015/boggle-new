@@ -30,8 +30,10 @@ export async function GET(request: NextRequest) {
     let myEvents: typeof active = [];
 
     if (user) {
+      // Prod table is event_participation (20260305000000). `event_participants`
+      // was never created; that read 404'd and myEvents stayed empty.
       const { data: participations } = await supabase
-        .from('event_participants')
+        .from('event_participation')
         .select('event_id')
         .eq('user_id', user.id);
 
