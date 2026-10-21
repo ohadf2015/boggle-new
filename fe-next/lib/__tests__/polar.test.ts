@@ -223,10 +223,17 @@ describe('polar env helpers', () => {
     delete process.env.POLAR_PRO_PRODUCT_ID
   })
 
-  it('defaults to sandbox and switches to production explicitly', () => {
-    expect(getPolarEnvironment()).toBe('sandbox')
+  it('defaults to production so an unset env var cannot bill into sandbox', () => {
+    expect(getPolarEnvironment()).toBe('production')
+    process.env.POLAR_ENVIRONMENT = ''
+    expect(getPolarEnvironment()).toBe('production')
     process.env.POLAR_ENVIRONMENT = 'production'
     expect(getPolarEnvironment()).toBe('production')
+  })
+
+  it('uses sandbox only when explicitly opted in', () => {
+    process.env.POLAR_ENVIRONMENT = 'sandbox'
+    expect(getPolarEnvironment()).toBe('sandbox')
   })
 
   it('throws when POLAR_PRO_PRODUCT_ID is missing', () => {
