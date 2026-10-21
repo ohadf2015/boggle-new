@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { SCROLL_QUIET_MS } from '@/lib/perf/runWhenScrollSettles';
 import { act, render } from '@testing-library/react';
 import FeedbackDevtoolsWidget, {
+    FEEDBACK_WIDGET_IGNORE_CONSOLE,
     FEEDBACK_WIDGET_INTENT_EVENTS,
     FEEDBACK_WIDGET_SCRIPT_ID,
     FEEDBACK_WIDGET_SRC,
@@ -92,6 +93,23 @@ describe('<FeedbackDevtoolsWidget>', () => {
         });
         expect(widgetScript()).toBeNull();
         expect(FEEDBACK_WIDGET_INTENT_EVENTS).not.toContain('scroll');
+    });
+
+    it('opts the hosted widget into the FedCM/GSI_LOGGER console filter only', async () => {
+        expect(JSON.parse(FEEDBACK_WIDGET_IGNORE_CONSOLE)).toEqual(['GSI_LOGGER', 'FedCM']);
+        render(<FeedbackDevtoolsWidget />);
+        await flushEffects();
+        await act(async () => {
+            window.dispatchEvent(new Event('pointerdown'));
+        });
+        settle();
+        const script = widgetScript();
+        expect(script).not.toBeNull();
+        const raw = script!.getAttribute('data-ignore-console');
+        expect(raw).toBe(FEEDBACK_WIDGET_IGNORE_CONSOLE);
+        const rules = JSON.parse(raw || '[]') as string[];
+        expect(rules).toEqual(['GSI_LOGGER', 'FedCM']);
+        expect(rules).toHaveLength(2);
     });
 
     it('injects the script at most once across repeated gestures', async () => {
