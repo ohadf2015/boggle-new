@@ -10,7 +10,7 @@
  * - POLAR_ACCESS_TOKEN       Organization access token (sandbox or production)
  * - POLAR_PRO_PRODUCT_ID     Product ID for Teacher Pro ($9/mo)
  * - POLAR_WEBHOOK_SECRET     Webhook endpoint secret from Polar dashboard
- * - POLAR_ENVIRONMENT        'sandbox' (default) | 'production'
+ * - POLAR_ENVIRONMENT        'production' (default) | 'sandbox' (local/dev opt-in)
  */
 
 import { createHmac, timingSafeEqual } from 'crypto'
@@ -25,8 +25,13 @@ export const POLAR_API_BASES = {
 
 export type PolarEnvironment = keyof typeof POLAR_API_BASES
 
+/**
+ * Production is the default: an unset/typo'd POLAR_ENVIRONMENT used to route
+ * real teachers at sandbox-api.polar.sh, where checkout returns 201 and
+ * collects nothing. Sandbox is opt-in only.
+ */
 export function getPolarEnvironment(): PolarEnvironment {
-  return process.env.POLAR_ENVIRONMENT === 'production' ? 'production' : 'sandbox'
+  return process.env.POLAR_ENVIRONMENT === 'sandbox' ? 'sandbox' : 'production'
 }
 
 export function getProProductId(): string {
@@ -60,7 +65,7 @@ export class PolarClient {
   private accessToken: string
   private baseUrl: string
 
-  constructor(accessToken: string, environment: PolarEnvironment = 'sandbox') {
+  constructor(accessToken: string, environment: PolarEnvironment) {
     this.accessToken = accessToken
     this.baseUrl = POLAR_API_BASES[environment]
   }
