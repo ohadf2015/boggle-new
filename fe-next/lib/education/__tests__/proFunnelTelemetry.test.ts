@@ -30,6 +30,7 @@ import {
   trackTrialCtaTap,
   trackTeacherProUpgradeClick,
   trackTeacherProCheckoutStarted,
+  trackEduProCheckoutFailed,
   trackTeacherTrialUpgradeCtaClicked,
   trackProGateViewed,
   trackProUpgradeClicked,
@@ -148,6 +149,16 @@ describe('other Teacher Pro checkout touchpoints', () => {
     expect(captureMock).toHaveBeenCalledWith('checkout_open', {
       source: 'checkout_start',
       product: 'teacher_pro',
+      trial: false,
+    });
+  });
+
+  it('Given a checkout POST that never returned, When tracked, Then edu_pro_checkout_failed fires', () => {
+    trackEduProCheckoutFailed({ reason: 'network', trial: false });
+    expect(captureMock).toHaveBeenCalledWith('edu_pro_checkout_failed', {
+      product: 'teacher_pro',
+      provider: 'polar',
+      reason: 'network',
       trial: false,
     });
   });

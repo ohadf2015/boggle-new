@@ -222,6 +222,16 @@ export function trackTeacherProCheckoutStarted(args: { trial: boolean; signed_in
   }
 }
 
+/**
+ * Client-only: the checkout POST never returned (network). Not 401 — that opens
+ * sign-in and resumes. Not 503/500 — the server already emits this same name
+ * (route.ts, distinctId anonymous on a missing Polar env). Re-emitting those
+ * here would count one shut till twice.
+ */
+export function trackEduProCheckoutFailed(args: { reason: 'network'; trial: boolean }): void {
+  safeCapture('edu_pro_checkout_failed', { product: 'teacher_pro', provider: 'polar', reason: args.reason, trial: args.trial });
+}
+
 /** Fired when the checkout provider returns a redirect URL. */
 export function trackTeacherProCheckoutRedirect(args?: { trial?: boolean }): void {
   const props = args?.trial !== undefined ? { trial: args.trial } : {};

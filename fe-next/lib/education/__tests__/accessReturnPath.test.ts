@@ -5,6 +5,9 @@ describe('accessReturnPath', () => {
   it('accepts the education page TeacherGate blocked', () => {
     expect(accessReturnPath('/en/teacher')).toBe('/en/teacher');
     expect(accessReturnPath('/he/teacher/classroom/abc/analytics')).toBe('/he/teacher/classroom/abc/analytics');
+    // Upgrade-page "Start free" carries this so a signup returns to the Polar till.
+    expect(accessReturnPath('/en/teacher/upgrade')).toBe('/en/teacher/upgrade');
+    expect(accessReturnPath('/he/teacher/upgrade')).toBe('/he/teacher/upgrade');
   });
 
   it.each([
