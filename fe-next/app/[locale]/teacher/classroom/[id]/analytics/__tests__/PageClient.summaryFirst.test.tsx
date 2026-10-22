@@ -25,7 +25,6 @@ vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => teacherPro }));
 vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: () => null }));
 
 type DashProps = {
-  summaryOnly?: boolean;
   onViewStudents?: (f: 'struggling') => void;
   onCreateReviewLesson?: (w: string[]) => void;
 };
@@ -85,7 +84,6 @@ describe('analytics page: summary first, every control does something', () => {
     // The practice rounds are named after the class, so the report needs the real name.
     await waitFor(() => expect(mastery).toHaveTextContent('Room 4'));
     expect(mastery.compareDocumentPosition(dashboard) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(dash.props.summaryOnly).toBe(true);
   });
 
   it('keeps the mastery report behind the same single Pro gate for free teachers', () => {

@@ -116,6 +116,28 @@ describe('POST /api/teacher/pro/parent-links', () => {
     expect((await res.json()).links).toEqual([]);
   });
 
+  it('with studentIds, mints links only for the selected students, in roster order, deduped', async () => {
+    vi.mocked(createClient).mockResolvedValue(userClient({ user: { id: 't' }, owned: { id: CLASSROOM, name: '4B' } }) as never);
+    vi.mocked(createAdminClient).mockReturnValue(adminClient({ members: [S1, S2], profiles: [] }) as never);
+    const res = await POST(req({ classroomId: CLASSROOM, studentIds: [S2, S2] }));
+    expect(res.status).toBe(200);
+    expect((await res.json()).links.map((l: { studentId: string }) => l.studentId)).toEqual([S2]);
+  });
+
+  it('never signs a link for a selected id that is not on the roster', async () => {
+    const OUTSIDER = '44444444-4444-4444-8444-444444444444';
+    vi.mocked(createClient).mockResolvedValue(userClient({ user: { id: 't' }, owned: { id: CLASSROOM, name: '4B' } }) as never);
+    vi.mocked(createAdminClient).mockReturnValue(adminClient({ members: [S1], profiles: [] }) as never);
+    const res = await POST(req({ classroomId: CLASSROOM, studentIds: [OUTSIDER, S1] }));
+    expect((await res.json()).links.map((l: { studentId: string }) => l.studentId)).toEqual([S1]);
+  });
+
+  it('400s on a malformed or oversized studentIds list', async () => {
+    vi.mocked(createClient).mockResolvedValue(userClient({ user: { id: 't' }, owned: { id: CLASSROOM, name: '4B' } }) as never);
+    expect((await POST(req({ classroomId: CLASSROOM, studentIds: ['nope'] }))).status).toBe(400);
+    expect((await POST(req({ classroomId: CLASSROOM, studentIds: Array(301).fill(S1) }))).status).toBe(400);
+  });
+
   it('fails closed with 500 when the signing secret is missing', async () => {
     delete process.env.PARENT_REPORT_SECRET;
     vi.mocked(createClient).mockResolvedValue(userClient({ user: { id: 't' }, owned: { id: CLASSROOM, name: '4B' } }) as never);

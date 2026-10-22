@@ -67,29 +67,6 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('@/hooks/useClassroomAnalytics');
-vi.mock('@/hooks/useStudentProgressMetrics', () => ({
-  useStudentProgressMetrics: () => ({
-    students: [],
-    isLoading: false,
-    error: null,
-    refresh: vi.fn(),
-  }),
-}));
-vi.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
-    open ? <div>{children}</div> : null,
-  DialogContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DialogTitle: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
-  DialogClose: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
-}));
-vi.mock('@/components/teacher/reports/StudentProgressReport', () => ({
-  StudentProgressReport: () => null,
-}));
-vi.mock('../LessonEffectivenessChart', () => ({
-  __esModule: true,
-  default: () => null,
-}));
 
 // ============================================
 // TEST HELPERS
@@ -271,12 +248,11 @@ describe('AnalyticsDashboard - Actionable Callbacks', () => {
     });
   });
 
-  it('renders View Students and Export Report buttons even when callbacks not provided', () => {
+  it('renders View Students even when callbacks are not provided, and no export button', () => {
     renderDashboard({ classroomId: 'class-123' });
 
-    const buttons = screen.queryAllByRole('button');
-    // View Students + Export Report are always rendered
-    expect(buttons.length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByRole('button', { name: 'View Students' })).toBeInTheDocument();
+    expect(screen.queryByText(/Export/i)).not.toBeInTheDocument();
   });
 });
 

@@ -26,6 +26,7 @@ export function FreshClassrooms() {
     <FreshSection
       id="classrooms"
       accent="purple"
+      size="compact"
       title={t('homeFresh.sections.classrooms.title')}
       line={t('homeFresh.sections.classrooms.line')}
       link={{ href: `/${language}/education`, label: t('homeFresh.sections.classrooms.cta') }}

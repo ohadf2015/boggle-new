@@ -16,17 +16,13 @@ function read(rel: string): string {
 describe('education surfaces stay calm', () => {
   it('does not fade or pulse the landing hero', () => {
     const hero = read('components/education/EducationHero.tsx');
-    const mock = read('components/education/EducationModeMock.tsx');
     expect(hero).not.toMatch(/from 'gsap'/);
     expect(hero).not.toMatch(/animate-pulse/);
-    expect(mock).not.toMatch(/animate-float/);
-    expect(mock).not.toMatch(/animate-pulse/);
   });
 
   it('shows landing sections immediately, without a scroll-in hide', () => {
     for (const rel of [
       'components/education/ComparisonStrip.tsx',
-      'components/education/SixModeTour.tsx',
       'components/education/TeacherAccessCTA.tsx',
     ]) {
       const src = read(rel);

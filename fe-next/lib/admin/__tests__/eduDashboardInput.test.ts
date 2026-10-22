@@ -100,6 +100,47 @@ describe('prepareEduDashboardInput', () => {
     expect(input.subscriptions).toEqual([{ user_id: 't1', status: 'active', created_at: daysAgo(4) }]);
   });
 
+  it('excludes every test account, not only test teachers: students, approvals and payers', () => {
+    const input = prepareEduDashboardInput(
+      raw({
+        testAccountIds: ['qs', 'qa-applicant'],
+        profiles: [{ id: 't1', user_role: 'teacher', last_seen_at: daysAgo(1), display_name: 'Ada', username: null, is_test_account: false }],
+        requests: [
+          { user_id: 't1', email: 'a@school.org', status: 'approved', reviewed_at: daysAgo(2), trial_expires_at: null },
+          { user_id: 'qa-applicant', email: 'q@school.org', status: 'approved', reviewed_at: daysAgo(2), trial_expires_at: null },
+        ],
+        classrooms: [{ id: 'c1', teacher_id: 't1', name: 'Math', join_code: null }],
+        memberships: [
+          { classroom_id: 'c1', student_id: 's1' },
+          { classroom_id: 'c1', student_id: 'qs' },
+        ],
+        subscriptions: [{ user_id: 'qa-applicant', status: 'active', created_at: daysAgo(1), tier: 'pro', source: 'polar' }],
+      }),
+      NOW,
+      30,
+    );
+    expect(input.requested).toBe(1);
+    expect(input.approvals.map((a) => a.user_id)).toEqual(['t1']);
+    expect(input.memberships).toEqual([{ classroom_id: 'c1', student_id: 's1' }]);
+    expect(input.subscriptions).toEqual([]);
+  });
+
+  it('counts only paid Pro as paid: a free row or a complimentary grant is not revenue', () => {
+    const input = prepareEduDashboardInput(
+      raw({
+        subscriptions: [
+          { user_id: 'free', status: 'active', created_at: daysAgo(1), tier: 'free', source: 'grant' },
+          { user_id: 'gift', status: 'active', created_at: daysAgo(1), tier: 'pro', source: 'grant' },
+          { user_id: 'paid', status: 'active', created_at: daysAgo(1), tier: 'pro', source: 'polar' },
+          { user_id: 'legacy', status: 'active', created_at: daysAgo(1), tier: 'pro' },
+        ],
+      }),
+      NOW,
+      30,
+    );
+    expect(input.subscriptions.map((s) => s.user_id).sort()).toEqual(['legacy', 'paid']);
+  });
+
   it('reports rounds as unmeasured when the table is absent', () => {
     expect(prepareEduDashboardInput(raw(), NOW, 7).rounds).toBeNull();
   });

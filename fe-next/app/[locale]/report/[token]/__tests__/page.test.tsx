@@ -154,6 +154,49 @@ describe('parent report page', () => {
       }
     });
 
+    it('an old-shape summary (no insights, class or teacher) renders cleanly with the new sections hidden', async () => {
+      (createAdminClient as any).mockReturnValue({});
+      (loadParentReportData as any).mockResolvedValue({ status: 'ok', data: okData });
+      const token = signParentReportToken(STUDENT, CLASSROOM);
+
+      const { container, queryByTestId } = render(await Page({ params: params('en', token) }));
+
+      expect(queryByTestId('report-insight')).toBeNull();
+      expect(queryByTestId('report-teacher')).toBeNull();
+      expect(container.textContent).not.toMatch(/undefined|NaN|parentReport\./);
+    });
+
+    it('a full summary shows class, teacher, period, the insight body and a print button', async () => {
+      (createAdminClient as any).mockReturnValue({});
+      (loadParentReportData as any).mockResolvedValue({
+        status: 'ok',
+        data: {
+          ...okData,
+          classroomName: '5B English',
+          teacherName: 'Ms. Levi',
+          generatedAt: '2026-10-21T12:00:00.000Z',
+          insights: {
+            totalXp: 120, lessonsCompleted: 4, wordsMastered: 17, wordsPracticed: 20, accuracy: 72,
+            currentStreak: 3, longestStreak: 5,
+            thisWeek: { sessions: 3, minutes: 25, activeDays: 2, accuracy: 70 },
+            lastWeek: { sessions: 1, minutes: 5, activeDays: 1, accuracy: 50 },
+            wordsToPractice: [{ word: 'sun', accuracy: 25, attempts: 4 }],
+            recentWins: [{ word: 'tree', accuracy: 100, attempts: 3 }],
+            insight: 'more_active', activity: 'practice_weak_words',
+          },
+        },
+      });
+      const token = signParentReportToken(STUDENT, CLASSROOM);
+
+      const { container, getByTestId, getByRole } = render(await Page({ params: params('en', token) }));
+
+      expect(container.textContent).toContain('5B English');
+      expect(getByTestId('report-teacher').textContent).toContain('Ms. Levi');
+      expect(getByTestId('report-period').textContent).toMatch(/Oct/);
+      expect(getByTestId('report-insight').textContent).toContain('Ana');
+      expect(getByRole('button', { name: /print/i })).toBeTruthy();
+    });
+
     it('renders Hebrew right-to-left', async () => {
       (createAdminClient as any).mockReturnValue({});
       (loadParentReportData as any).mockResolvedValue({ status: 'ok', data: okData });

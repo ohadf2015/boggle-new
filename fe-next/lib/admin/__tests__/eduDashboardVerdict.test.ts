@@ -40,12 +40,12 @@ const stuckFixture = (): EduDashboardInput =>
   });
 
 describe('funnel stage per approved teacher', () => {
-  it('reports the furthest funnel stage each approved teacher reached', () => {
+  it('reports where each approved teacher stopped', () => {
     const out = buildEduDashboard(stuckFixture());
     const stage = (id: string) => out.teachers.find((t) => t.id === id)?.stage;
-    expect(stage('t1')).toBe('student');
-    expect(stage('t2')).toBe('classroom');
-    expect(stage('t4')).toBe('approved');
+    expect(stage('t1')).toBe('has_students');
+    expect(stage('t2')).toBe('no_students');
+    expect(stage('t4')).toBe('no_class');
   });
 
   it('gives no stage to a teacher who was never approved', () => {
@@ -56,11 +56,36 @@ describe('funnel stage per approved teacher', () => {
       classrooms: [...fixture.classrooms, { id: 'cx', teacher_id: 'x', name: 'X' }],
     });
     expect(out.teachers.find((t) => t.id === 'x')?.stage).toBeNull();
-    expect(out.verdict!.rescue.map((r) => r.id)).not.toContain('x');
+    expect(out.drill.funnel.classroom).not.toContain('x');
+  });
+
+  it('lists an approved person with no teacher role as locked out, so they show up at all', () => {
+    const fixture = stuckFixture();
+    const out = buildEduDashboard({
+      ...fixture,
+      approvals: [...fixture.approvals, { ...approved('lock'), email: 'lock@school.org' }],
+    });
+    const row = out.teachers.find((t) => t.id === 'lock');
+    expect(row).toMatchObject({ stage: 'locked_out', canSignIn: false, email: 'lock@school.org' });
+    expect(out.teachers.find((t) => t.id === 't1')?.canSignIn).toBe(true);
   });
 });
 
-describe('biggest-leak verdict', () => {
+describe('funnel', () => {
+  it('has a can-sign-in step between approval and the first class', () => {
+    const fixture = stuckFixture();
+    const out = buildEduDashboard({ ...fixture, approvals: [...fixture.approvals, approved('lock')] });
+    expect(out.funnel.map((s) => [s.key, s.count])).toEqual([
+      ['requested', 5],
+      ['approved', 5],
+      ['signin', 4],
+      ['classroom', 3],
+      ['student', 1],
+    ]);
+  });
+});
+
+describe('biggest drop-off verdict', () => {
   it('names the drop step and how many teachers it lost, from the funnel', () => {
     const out = buildEduDashboard(stuckFixture());
     expect(out.verdict).toMatchObject({
@@ -74,44 +99,16 @@ describe('biggest-leak verdict', () => {
     });
   });
 
-  it('keeps the verdict count, the rescue total and the funnel in agreement', () => {
+  it('keeps the verdict count and the drill-down cohort in agreement', () => {
     const out = buildEduDashboard(stuckFixture());
-    const idx = out.funnel.findIndex((s) => s.key === out.verdict!.stepKey);
-    const prev = out.funnel[idx - 1].count;
-    const drop = out.funnel[idx].count;
-    expect(out.verdict!.lost).toBe(prev - drop);
-    expect(out.verdict!.rescueTotal).toBe(out.verdict!.lost);
-  });
-
-  it('lists the stuck teachers most recently active first, excluding teachers past the drop', () => {
-    const out = buildEduDashboard(stuckFixture());
-    expect(out.verdict!.rescue.map((r) => r.id)).toEqual(['t2', 't3']);
-    expect(out.verdict!.rescue.map((r) => r.stage)).toEqual(['classroom', 'classroom']);
-  });
-
-  it('caps the rescue list at eight rows but keeps the full total', () => {
-    const teachers = Array.from({ length: 10 }, (_, i) => ({
-      id: `s${i}`,
-      name: `T${i}`,
-      last_seen_at: ago(i + 1),
-    }));
-    const out = buildEduDashboard(
-      base({
-        requested: 10,
-        teachers,
-        approvals: teachers.map((t) => approved(t.id)),
-        classrooms: teachers.map((t) => ({ id: `c-${t.id}`, teacher_id: t.id, name: t.name })),
-      }),
-    );
-    expect(out.verdict!.rescueTotal).toBe(10);
-    expect(out.verdict!.rescue).toHaveLength(8);
+    expect(out.drill.funnel[out.verdict!.fromKey as 'classroom']).toHaveLength(out.verdict!.lost);
   });
 
   it('returns no verdict when nothing reached the funnel', () => {
     expect(buildEduDashboard(base()).verdict).toBeNull();
   });
 
-  it('marks the cohort unavailable when the leak is the application step itself', () => {
+  it('marks the cohort unavailable when the drop is at the application step itself', () => {
     const out = buildEduDashboard(
       base({
         requested: 10,
@@ -125,7 +122,5 @@ describe('biggest-leak verdict', () => {
       }),
     );
     expect(out.verdict).toMatchObject({ stepKey: 'approved', lost: 8, cohortAvailable: false });
-    expect(out.verdict!.rescue).toEqual([]);
-    expect(out.verdict!.rescueTotal).toBe(0);
   });
 });

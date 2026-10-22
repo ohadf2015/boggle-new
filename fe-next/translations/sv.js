@@ -4259,7 +4259,68 @@ const sv = {
     "invalidTitle": "Länken är inte tillgänglig",
     "invalidBody": "Den här rapportlänken har gått ut eller är inte längre giltig. Be läraren om en ny länk.",
     "footerNote": "Delad av ditt barns lärare via LexiClash. Inget konto behövs.",
-    "language": "Visa på"
+    "language": "Visa på",
+    "printButton": "Skriv ut eller spara som PDF",
+    "classLabel": "Klass",
+    "teacherLabel": "Lärare",
+    "periodLabel": "Period",
+    "periodRange": "{start} – {end}",
+    "noValue": "—",
+    "allTime": "Totalt: {xp} XP · {lessons} lektioner klara",
+    "statWordsMeaning": "Ord som sitter så bra att de räknas som behärskade.",
+    "statAccuracy": "Träffsäkerhet",
+    "statAccuracyMeaning": "Andelen av alla svar som var rätt.",
+    "statWeekMinutes": "Minuter i veckan",
+    "statWeekMinutesMeaning": "Tid som lagts på övning de senaste 7 dagarna.",
+    "statStreak": "Dagar i rad",
+    "statStreakMeaning": "Dagar i rad med övning. Rekord hittills: {best}.",
+    "weekTitle": "Den här veckan jämfört med förra",
+    "weekThis": "Senaste 7 dagarna",
+    "weekLast": "7 dagarna innan",
+    "rowSessions": "Övningspass",
+    "rowMinutes": "Minuter övning",
+    "rowActiveDays": "Aktiva dagar",
+    "rowAccuracy": "Träffsäkerhet",
+    "practiceTitle": "Ord att öva på",
+    "practiceHint": "Oftast fel. En snabb repetition hemma hjälper.",
+    "winsTitle": "Senaste framgångar",
+    "winsHint": "Ord som nyligen besvarats rätt eller som sitter.",
+    "wordAccuracy": "{value} % rätt",
+    "wordMastered": "Behärskat",
+    "insightTitle": "Kort sagt",
+    "activityTitle": "Prova hemma",
+    "insight": {
+      "quiet": "{name} har inte övat de senaste två veckorna. Ett kort pass tillsammans kan få igång vanan igen.",
+      "started_this_week": "{name} har börjat öva igen den här veckan efter en lugn vecka. Pass den här veckan: {count}.",
+      "more_active": "{name} övade mer den här veckan än veckan innan. Pass: {count} (var {previous}).",
+      "less_active": "{name} övade lite mindre den här veckan. Pass: {count} (var {previous}).",
+      "steady": "{name} håller ett jämnt tempo. Pass den här veckan: {count}, samma som veckan innan.",
+      "paused": "{name} övade förra veckan men inte än den här veckan. Pass förra veckan: {previous}."
+    },
+    "activity": {
+      "practice_weak_words": "Be {name} använda de här orden i en mening vid middagen: {words}.",
+      "celebrate_wins": "Be {name} lära dig ett ord från den senaste tiden, till exempel {words}.",
+      "short_daily_session": "Välj tre dagar den här veckan för 10 minuters övning tillsammans."
+    },
+    "teacherPreviewTitle": "Det här visar föräldrarapporten",
+    "teacherPreviewHint": "Samma siffror som föräldern ser i den delade länken.",
+    "loadFailed": "Det gick inte att läsa in sammanfattningen. Ladda om för att försöka igen."
+  },
+  "parentReportsFlow": {
+    "title": "Föräldrarapporter",
+    "lead": "Välj elever, förhandsgranska en rapport och kopiera sedan länkar eller ladda ner en CSV.",
+    "disclosureHint": "Välj elever och dela deras framsteg med hemmet",
+    "search": "Sök elever",
+    "selectAll": "Välj alla",
+    "selectNone": "Rensa",
+    "selectedCount": "{count} av {total} valda",
+    "noMatch": "Inga elever matchar sökningen.",
+    "rosterFailed": "Det gick inte att läsa in elevlistan. Försök igen.",
+    "make": "Skapa länkar för {count} valda",
+    "preview": "Förhandsgranska",
+    "previewFor": "Förhandsgranska rapporten för {name}",
+    "copyOne": "Kopiera länk",
+    "copyOneFor": "Kopiera länken för {name}"
   },
   "share": {
     "button": "Dela",
@@ -11414,21 +11475,16 @@ const sv = {
       }
     },
     "eduDashboard": {
-      "verdict": {
-        "none": "Inte tillräckligt med data i det här fönstret än.",
-        "eyebrow": "Största läckan",
-        "label": {
-          "approved": "ansökningar om åtkomst blev aldrig godkända",
-          "classroom": "godkända lärare skapade aldrig en klass",
-          "student": "lärare skapade en klass men ingen elev har gått med ännu"
-        },
-        "action": {
-          "approved": "Gå igenom de väntande ansökningarna under Läraråtkomst.",
-          "classroom": "Påminn dem att skapa sin första klass.",
-          "student": "Skicka anslutningskoden till dessa lärare, senast aktiva först."
-        },
-        "convert": "når det här steget",
-        "openTop": "Öppna främsta läraren"
+      "healthTitle": "Lärarnas hälsa",
+      "title": "Utbildningsöversikt",
+      "window": "Period",
+      "loadFailed": "Kunde inte ladda utbildningsöversikten.",
+      "loading": "Laddar…",
+      "noData": "Inga data ännu",
+      "health": {
+        "thriving": "Blomstrar",
+        "at_risk": "Riskerar",
+        "dormant": "Vilande"
       },
       "rescue": {
         "nudge": {
@@ -11447,46 +11503,26 @@ const sv = {
         "nudged": "Påmind {date}",
         "copy": "Kopiera påminnelse",
         "email": "Mejl",
-        "mark": "Markera som klar",
-        "title": "Räddningslista",
-        "empty": "Ingen fastnar på det här steget.",
-        "rowAction": {
-          "approved": "Påminn om att skapa en klass",
-          "classroom": "Skicka anslutningskoden"
+        "mark": "Markera som klar"
+      },
+      "verdict": {
+        "none": "Inte tillräckligt med data i det här fönstret än.",
+        "eyebrow": "Största avhoppet",
+        "label": {
+          "approved": "sökande godkändes aldrig",
+          "signin": "godkända lärare kan inte logga in: lärarrollen gavs aldrig",
+          "classroom": "lärare kan logga in men skapade aldrig en klass",
+          "student": "lärare skapade en klass, men ingen elev har gått med än"
         },
-        "more": "fler under Alla lärare nedan"
-      },
-      "healthTitle": "Lärarnas hälsa",
-      "quiet": "Tysta mätvärden",
-      "posthogHidden": "Konvertering från landningssida och uppsälj är dold: ingen PostHog-serverkey är konfigurerad.",
-      "title": "Utbildningsöversikt",
-      "subtitle": "Testkonton exkluderas. Förändringar jämförs med föregående period.",
-      "window": "Period",
-      "loadFailed": "Kunde inte ladda utbildningsöversikten.",
-      "loading": "Laddar…",
-      "noData": "Inga data ännu",
-      "kpi": {
-        "activeTeachers": "Aktiva lärare",
-        "newTeachers": "Nya lärare",
-        "classesWithLiveGame": "Klasser med ett live-spel",
-        "liveRounds": "Spelade live-omgångar",
-        "trialsStarted": "Pro-provperioder startade",
-        "trialsPaid": "Provperioder som blev betalda"
-      },
-      "funnel": {
-        "title": "Lärartratt",
-        "requested": "Ansökt",
-        "approved": "Godkänd",
-        "classroom": "Skapade en klass",
-        "student": "Första eleven gick med"
-      },
-      "health": {
-        "thriving": "Blomstrar",
-        "at_risk": "Riskerar",
-        "dormant": "Vilande"
-      },
-      "modeMix": {
-        "title": "Lägesfördelning i klassrum"
+        "action": {
+          "approved": "Gå igenom väntande ansökningar under Lärarbehörighet.",
+          "signin": "Ge lärarrollen under Lärarbehörighet.",
+          "classroom": "Påminn dem om att skapa sin första klass.",
+          "student": "Skicka klasskoden till de här lärarna, de senast aktiva först."
+        },
+        "convert": "Bara {pct}% av \"{from}\" når \"{to}\".",
+        "seeCohort": "Visa de här {count} lärarna",
+        "openAccess": "Öppna Lärarbehörighet"
       },
       "teachers": {
         "all": "Alla lärare",
@@ -11499,16 +11535,118 @@ const sv = {
         "lastActive": "Senast aktiv",
         "classes": "Klasser",
         "students": "Elever",
-        "rounds7d": "Omgångar 7 d",
-        "health": "Hälsa"
-      },
-      "dying": {
-        "title": "Döende klasser",
-        "empty": "Inga just nu."
+        "health": "Hälsa",
+        "rounds7d": "Klassmatcher, senaste 7 dagarna",
+        "plan": "Plan",
+        "planPaid": "Betald Pro",
+        "planTrial": "Provperiod",
+        "planFree": "Gratis",
+        "lockedOut": "Kan inte logga in",
+        "healthDefinition": "Blomstrar: var inne och körde en klassmatch de senaste 7 dagarna. I riskzonen: var inne de senaste 21 dagarna utan det. Vilande: inget besök på 21 dagar."
       },
       "classes": {
-        "title": "Klasser"
+        "title": "Klasser",
+        "name": "Klass",
+        "gamesInWindow": "Matcher under perioden",
+        "lastGame": "Senaste match"
+      },
+      "subtitle": "Testkonton räknas inte i någon siffra. Varje förändring jämförs med lika många dagar precis innan.",
+      "windowLast": "Senaste {days} dagarna",
+      "notMeasured": "Mäts inte än: tabellen för klassmatcher saknas i den här databasen.",
+      "delta": {
+        "vsPrior": "{pct} jämfört med de {days} dagarna innan (var {prior})",
+        "fromZero": "Upp från 0 under de {days} dagarna innan",
+        "noneEither": "Inga under de {days} dagarna innan heller"
+      },
+      "drill": {
+        "show": "Visa listan ({count})",
+        "stoppedAt": "Stannade vid: {step}",
+        "clear": "Visa alla",
+        "empty": "Ingen här."
+      },
+      "kpi": {
+        "activeTeachers": "Lärare som var inne",
+        "newTeachers": "Nyss godkända lärare",
+        "classesWithLiveGame": "Klasser som spelade",
+        "liveRounds": "Spelade klassmatcher",
+        "trialsStarted": "Startade Pro-provperioder",
+        "trialsPaid": "Provperioder som blev betalda"
+      },
+      "kpiDefinition": {
+        "activeTeachers": "Lärare vars senaste besök ligger i den här perioden. Bara senaste besöket sparas, så det finns ingen jämförelse bakåt.",
+        "newTeachers": "Ansökningar om åtkomst som godkändes under perioden, en per person.",
+        "classesWithLiveGame": "Klasser som avslutade minst en livematch under perioden.",
+        "liveRounds": "Livematcher i klassrummet som avslutades under perioden.",
+        "trialsStarted": "Godkända lärare vars Pro-provperiod började under perioden.",
+        "trialsPaid": "Lärare på provperiod som startade betald Pro under perioden. Gratis eller skänkt Pro räknas inte."
+      },
+      "funnel": {
+        "title": "Lärarens väg",
+        "hint": "All tid. % är andelen av steget ovanför. Klicka på ett steg för att se vilka som stannade där.",
+        "requested": "Ansökte",
+        "approved": "Godkända",
+        "signin": "Kan logga in",
+        "classroom": "Skapade en klass",
+        "student": "Har elever"
+      },
+      "funnelDefinition": {
+        "requested": "Personer som fyllde i formuläret för lärarbehörighet, all tid.",
+        "approved": "Sökande som en admin godkände.",
+        "signin": "Godkända och har fått lärarrollen, så /teacher släpper in dem.",
+        "classroom": "Skapade minst en klass.",
+        "student": "Minst en elev gick med i någon av deras klasser."
+      },
+      "attention": {
+        "title": "Behöver åtgärd",
+        "hint": "Mest brådskande först: inloggningsproblem, provperioder som snart tar slut, sedan lärare som fastnat på ett steg.",
+        "empty": "Ingen behöver en knuff just nu.",
+        "more": "+{count} till. Se dem i tratten eller lärarlistan nedan.",
+        "fixAccess": "Åtgärda under Lärarbehörighet",
+        "reason": {
+          "locked_out": "Godkänd men kan inte logga in: lärarrollen saknas.",
+          "trial_ending": "Pro-provperioden slutar {date} och de betalar inte än.",
+          "no_students": "Skapade en klass, men ingen elev har gått med.",
+          "class_stalled": "Har elever, men ingen klassmatch på 14 dagar:",
+          "no_class": "Kan logga in, men skapade aldrig en klass.",
+          "went_quiet": "Var inne den här veckan, men körde ingen klassmatch."
+        }
+      },
+      "modeMix": {
+        "title": "Vilka spel klasserna spelar",
+        "mode": "Spelläge",
+        "rounds": "Matcher",
+        "players": "Spelarplatser"
       }
+    },
+    "eduClass": {
+      "error": "Kunde inte ladda klassen.",
+      "teacher": "Lärare",
+      "testTeacher": "Testkonto",
+      "joinCode": "Klasskod",
+      "language": "Språk",
+      "created": "Skapad",
+      "lastGame": "Senaste klassmatch",
+      "students": "Elever",
+      "studentsEmpty": "Ingen elev har gått med än.",
+      "student": "Elev",
+      "joined": "Gick med",
+      "lastSeen": "Senast sedd",
+      "noName": "Inget namn ({id})",
+      "testStudents": "Testkonton som inte räknas: {count}.",
+      "assignments": "Uppgifter",
+      "assignmentsEmpty": "Inget tilldelat än.",
+      "completion": "{done} av {total} klara",
+      "due": "senast {date}",
+      "games": "Klassmatcher",
+      "roundsSummary": "{count} klassmatcher de senaste 30 dagarna",
+      "unnamed": "(namnlös)",
+      "colPlayed": "Spelad",
+      "colMode": "Läge",
+      "colPlayers": "Spelare",
+      "colCoverage": "Hittade ord",
+      "colTop": "Bästa spelare",
+      "colMissed": "Mest missade",
+      "noGames": "Inga livematcher spelade än."
     },
     "teacherFunnel": {
       "excludedMachineRows": "{count} maskinskrivna rader (testkonton) exkluderade från alla siffror ovan.",
@@ -14817,6 +14955,10 @@ const sv = {
       "googleClassroomBody": "Tryck på länken för att gå med i klassen. Inget konto behövs – välj bara ett namn.",
       "createdBannerBody": "Dela koden med dina elever.",
       "dismissBanner": "Okej",
+      "card": {
+        "assign": "Tilldela",
+        "report": "Rapport"
+      },
       "wizard": {
         "title": "Tre steg till klassrum",
         "subtitle": "Du har en kod på under en minut.",
@@ -17047,6 +17189,12 @@ const sv = {
           "joinedHeadline": "Din nästa uppgift",
           "joinedSub": "Du är inne i klassen. Spela läxan som väntar.",
           "openAcademy": "Öppna min klass",
+          "whereCode": "Var hittar jag koden?",
+          "whereCodeAnswer": "Din lärare visar den på tavlan eller projektorn: 6 bokstäver och siffror. Har du en QR-kod? Skanna den med kameran så hoppar du över det här steget.",
+          "genericError": "Något gick fel hos oss. Tryck på knappen igen. Om det fortsätter, säg till din lärare.",
+          "stepOf": "Steg {{current}} av {{total}}",
+          "successGame": "Tar dig in i spelet…",
+          "yourClass": "Din klass",
           "findingAssignment": "Letar upp din uppgift…"
         },
         "heroLine": "Fråga din lärare om klasskoden",
@@ -17068,6 +17216,7 @@ const sv = {
           "label": "Går med i:",
           "confirm": "Det här är ditt klassrum",
           "gameLabel": "Live-spel:",
+          "classroomNext": "Inget spel pågår just nu. Du går med i klassen och ser vad din lärare har lagt upp.",
           "gameConfirm": "Din klass spelar nu – du hoppar in direkt"
         },
         "subtitle": "Skriv in din lärares kod",
@@ -20737,7 +20886,14 @@ const sv = {
       "minutes": "{count} min",
       "leave": "Lämna rummet",
       "moreJoined": "+{count} till",
-      "readyCount": "{ready} av {total} redo"
+      "readyCount": "{ready} av {total} redo",
+      "editRoster": "Redigera listan",
+      "doneEditing": "Klar",
+      "removeStudent": "Ta bort {name}",
+      "removeConfirmTitle": "Ta bort {name}?",
+      "removeConfirmBody": "Eleven lämnar spelet och kan inte gå med igen med det här namnet.",
+      "removeConfirm": "Ta bort",
+      "removeFailed": "Det gick inte att ta bort. Försök igen."
     },
     "student": {
       "youreIn": "Du är med!",
@@ -20768,7 +20924,14 @@ const sv = {
       "nextMode": "Nästa läge",
       "viewReport": "Visa rapport",
       "endGame": "Avsluta spelet",
-      "noScores": "Ingen fick poäng den här rundan"
+      "noScores": "Ingen fick poäng den här rundan",
+      "mostMissed": "Mest missade ord",
+      "needHelpCount": "Elever under hälften: {count}. Namnen finns i rapporten.",
+      "replayMissed": "Spela de missade orden igen ({count})",
+      "replayFailed": "Det gick inte att förbereda omgången. Försök igen.",
+      "moreWords": "+{count} till",
+      "notOnBoard": "fanns inte på brädet",
+      "replayReady": "Klart. Spela igen använder nu de här orden."
     },
     "studentResults": {
       "placed": "Din placering",

@@ -6,8 +6,9 @@
  * delete a class was buried inside the dashboard's "teacher-tools" section —
  * exactly the surface the addendum's nav spec wants promoted to its own tab.
  *
- * `ClassroomManager` already owns the whole surface (create/edit/delete,
- * rosters, share/invite) and fetches its own data via `useClassrooms()`, so
+ * `ClassroomManager` owns the list (rename/delete, rosters, share/invite,
+ * start/assign/report); creating a class is `/teacher/classroom/new`. It
+ * fetches its own data via `useClassrooms()`, so
  * this file stays a thin shell wrapper — the same shape as
  * `teacher/curriculum/PageClient.tsx` and `teacher/reports/PageClient.tsx`.
  */
@@ -27,7 +28,7 @@ export default function TeacherClassroomsPage() {
     <ClassesShell>
       <TeacherGate>
         <main className="relative mx-auto max-w-6xl">
-          <ClassroomManager richCards heading={<ClassesTitle />} />
+          <ClassroomManager heading={<ClassesTitle />} />
         </main>
       </TeacherGate>
     </ClassesShell>

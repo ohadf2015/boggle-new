@@ -66,6 +66,10 @@ vi.mock('@/hooks/useTeacherPro', () => ({
   }),
 }));
 
+vi.mock('@/components/teacher/hq/ClassroomCardActivity', () => ({
+  ClassroomCardActivity: () => <div data-testid="card-activity" />,
+}));
+
 import ClassroomManager from '../ClassroomManager';
 import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProCheckoutCta';
 

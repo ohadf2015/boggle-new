@@ -33,8 +33,20 @@ export interface RawRound {
   completed_at: string;
 }
 
+export interface RawSubscription {
+  user_id: string;
+  status: string;
+  created_at: string;
+  tier?: string | null;
+  /** 'grant' for complimentary Pro. Absent before the source column was migrated. */
+  source?: string | null;
+}
+
 export interface EduRawRows {
+  /** Teacher-role profiles. */
   profiles: RawProfile[];
+  /** Every profile flagged is_test_account, any role: QA students and applicants too. */
+  testAccountIds?: string[];
   requests: RawRequest[];
   classrooms: Array<{ id: string; teacher_id: string | null; name: string | null; join_code: string | null }>;
   memberships: Array<{ classroom_id: string; student_id: string }>;
@@ -42,10 +54,13 @@ export interface EduRawRows {
   outreach: Array<{ teacher_id: string; channel: string; created_at: string }> | null;
   /** null when classroom_rounds is not migrated in this database. */
   rounds: RawRound[] | null;
-  subscriptions: Array<{ user_id: string; status: string; created_at: string }>;
+  subscriptions: RawSubscription[];
 }
 
 const toMs = (ts: string | null) => (ts ? Date.parse(ts) : NaN);
+
+const isPaidPro = (s: RawSubscription) =>
+  s.status === 'active' && (s.tier ?? 'pro') === 'pro' && s.source !== 'grant';
 
 function personKey(r: { user_id: string | null; email: string | null }): string {
   return r.user_id ?? (r.email ?? '').trim().toLowerCase();
@@ -56,7 +71,10 @@ export function prepareEduDashboardInput(
   nowMs: number,
   windowDays: WindowDays,
 ): EduDashboardInput {
-  const testIds = new Set(raw.profiles.filter((p) => p.is_test_account).map((p) => p.id));
+  const testIds = new Set([
+    ...(raw.testAccountIds ?? []),
+    ...raw.profiles.filter((p) => p.is_test_account).map((p) => p.id),
+  ]);
 
   const teachers = raw.profiles
     .filter((p) => !p.is_test_account)
@@ -90,14 +108,14 @@ export function prepareEduDashboardInput(
 
   const classrooms = raw.classrooms.filter((c) => !(c.teacher_id && testIds.has(c.teacher_id)));
   const classroomIds = new Set(classrooms.map((c) => c.id));
-  const memberships = raw.memberships.filter((m) => classroomIds.has(m.classroom_id));
+  const memberships = raw.memberships.filter((m) => classroomIds.has(m.classroom_id) && !testIds.has(m.student_id));
   const outreach = raw.outreach ? raw.outreach.filter((o) => !testIds.has(o.teacher_id)) : null;
 
   const rounds = raw.rounds === null ? null : raw.rounds.filter((r) => !testIds.has(r.teacher_id));
 
   const earliestPaid = new Map<string, string>();
   for (const s of raw.subscriptions) {
-    if (s.status !== 'active' || testIds.has(s.user_id)) continue;
+    if (!isPaidPro(s) || testIds.has(s.user_id)) continue;
     const prev = earliestPaid.get(s.user_id);
     if (!prev || toMs(s.created_at) < toMs(prev)) earliestPaid.set(s.user_id, s.created_at);
   }

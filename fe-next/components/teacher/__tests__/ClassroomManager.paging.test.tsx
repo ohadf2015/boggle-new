@@ -7,7 +7,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -87,11 +86,9 @@ describe('ClassroomManager — paging instead of page scroll', () => {
     expect(screen.queryByTestId('class-pager')).toBeNull();
   });
 
-  // Round 2: on the Classes tab the card carries recent activity, the next
-  // step and a Start-game shortcut into HQ; inside the HQ Tools sheet it does not.
-  it('Given the Classes tab (richCards), Then each card has activity and a Start game into the host flow for that class', () => {
+  it('Given a class, Then its card has activity and a Start game into the host flow for that class', () => {
     state.classrooms = [mk(1)];
-    render(<ClassroomManager richCards />);
+    render(<ClassroomManager />);
     expect(screen.getByTestId('card-activity')).toHaveTextContent('cls-1');
     expect(screen.getByTestId('classroom-card-start-game')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=cls-1');
   });
@@ -100,24 +97,17 @@ describe('ClassroomManager — paging instead of page scroll', () => {
   // above the one card; the title now shares the create button's row.
   it('Given a heading, Then it shares one row with the Create classroom button', () => {
     state.classrooms = [mk(1)];
-    render(<ClassroomManager richCards heading={<h1 data-testid="classes-title">Your classes</h1>} />);
+    render(<ClassroomManager heading={<h1 data-testid="classes-title">Your classes</h1>} />);
     const row = screen.getByTestId('classroom-manager-toprow');
     expect(row.contains(screen.getByTestId('classes-title'))).toBe(true);
-    expect(row.contains(screen.getByRole('button', { name: /teacher.classroom.create/ }))).toBe(true);
-  });
-
-  it('Given the default (HQ Tools sheet), Then cards stay lean', () => {
-    state.classrooms = [mk(1)];
-    render(<ClassroomManager />);
-    expect(screen.queryByTestId('card-activity')).toBeNull();
-    expect(screen.queryByTestId('classroom-card-start-game')).toBeNull();
+    expect(row.contains(screen.getByRole('link', { name: /teacher.classroom.create/ }))).toBe(true);
   });
 
   it('Given one class on a wide Classes tab, Then the free slot is a "new class" seat, not a void', () => {
     state.classrooms = [mk(1)];
     mq.wide = true;
-    render(<ClassroomManager richCards />);
-    expect(screen.getByTestId('classroom-add-tile')).toBeInTheDocument();
+    render(<ClassroomManager />);
+    expect(screen.getByTestId('classroom-add-tile')).toHaveAttribute('href', '/en/teacher/classroom/new');
   });
 
   // r3 critic: beside ONE class the seat took half the desktop row — a second
@@ -125,8 +115,8 @@ describe('ClassroomManager — paging instead of page scroll', () => {
   it('Given one class on a wide Classes tab, Then the add seat is compact — content-sized, not a card-sized slab', () => {
     state.classrooms = [mk(1)];
     mq.wide = true;
-    render(<ClassroomManager richCards />);
-    const cls = screen.getByTestId('classroom-add-tile').className.toString();
+    render(<ClassroomManager />);
+    const cls = screen.getByTestId('classroom-add-tile').parentElement!.className.toString();
     expect(cls).toMatch(/(^|\s)self-start(\s|$)/);
     expect(cls).toMatch(/(^|\s)justify-self-start(\s|$)/);
     expect(cls).not.toMatch(/self-stretch|min-h-64/);
@@ -134,7 +124,7 @@ describe('ClassroomManager — paging instead of page scroll', () => {
 
   it('Given a full page, Then there is no add seat', () => {
     state.classrooms = [mk(1)];
-    render(<ClassroomManager richCards />);
+    render(<ClassroomManager />);
     expect(screen.queryByTestId('classroom-add-tile')).toBeNull();
   });
 
@@ -143,7 +133,7 @@ describe('ClassroomManager — paging instead of page scroll', () => {
   it('Given the add seat, Then its accessible name is distinct from the header Create button', () => {
     state.classrooms = [mk(1)];
     mq.wide = true;
-    render(<ClassroomManager richCards />);
+    render(<ClassroomManager />);
     expect(screen.getByTestId('classroom-add-tile')).toHaveAccessibleName(
       'teacher.classroom.createAnother',
     );

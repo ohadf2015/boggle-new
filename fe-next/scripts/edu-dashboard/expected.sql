@@ -31,18 +31,22 @@ paid as (
   select s.user_id, min(s.created_at) as created_at
   from public.subscriptions s
   join trial_users t on t.user_id = s.user_id
-  where s.status = 'active'
+  where s.status = 'active' and s.tier = 'pro'
+    and coalesce(to_jsonb(s)->>'source', '') <> 'grant'
+    and not exists (select 1 from public.profiles p where p.id = s.user_id and p.is_test_account)
   group by s.user_id
 ),
 classes as (
   select c.id, c.teacher_id from public.classrooms c
   where not exists (select 1 from public.profiles p where p.id = c.teacher_id and p.is_test_account)
+),
+real_members as (
+  select m.classroom_id, m.student_id from public.classroom_memberships m
+  where not exists (select 1 from public.profiles p where p.id = m.student_id and p.is_test_account)
 )
 select
   (select count(*) from public.profiles p, w where p.user_role = 'teacher' and not p.is_test_account
      and p.last_seen_at > w.start_at and p.last_seen_at <= w.end_at) as active_teachers_cur,
-  (select count(*) from public.profiles p, w where p.user_role = 'teacher' and not p.is_test_account
-     and p.last_seen_at > w.prior_start and p.last_seen_at <= w.start_at) as active_teachers_prior,
   (select count(*) from approved, w where reviewed_at > w.start_at and reviewed_at <= w.end_at) as new_teachers_cur,
   (select count(*) from approved, w where reviewed_at > w.prior_start and reviewed_at <= w.start_at) as new_teachers_prior,
   (select count(*) from trial_users, w where reviewed_at > w.start_at and reviewed_at <= w.end_at) as trials_started_cur,
@@ -52,14 +56,19 @@ select
   (select count(distinct coalesce(user_id::text, lower(trim(coalesce(email, ''))))) from machine_req) as funnel_requested,
   (select count(distinct user_id) from approved where user_id is not null) as funnel_approved,
   (select count(distinct a.user_id) from approved a
+     where a.user_id is not null and (
+       exists (select 1 from classes c where c.teacher_id = a.user_id)
+       or exists (select 1 from public.profiles p where p.id = a.user_id and p.user_role = 'teacher' and not p.is_test_account)
+     )) as funnel_signin,
+  (select count(distinct a.user_id) from approved a
      where a.user_id is not null and exists (select 1 from classes c where c.teacher_id = a.user_id)) as funnel_classroom,
   (select count(distinct a.user_id) from approved a
      where a.user_id is not null and exists (
-       select 1 from classes c join public.classroom_memberships m on m.classroom_id = c.id
+       select 1 from classes c join real_members m on m.classroom_id = c.id
        where c.teacher_id = a.user_id)) as funnel_student,
   (select count(*) from public.classroom_rounds r, w where r.completed_at > w.start_at and r.completed_at <= w.end_at
      and not exists (select 1 from public.profiles p where p.id = r.teacher_id and p.is_test_account)) as live_rounds_cur,
   (select count(*) from public.classroom_rounds r, w where r.completed_at > w.prior_start and r.completed_at <= w.start_at
      and not exists (select 1 from public.profiles p where p.id = r.teacher_id and p.is_test_account)) as live_rounds_prior,
   (select count(*) from classes) as classes_total,
-  (select count(distinct m.student_id) from public.classroom_memberships m join classes c on c.id = m.classroom_id) as students_distinct;
+  (select count(distinct m.student_id) from real_members m join classes c on c.id = m.classroom_id) as students_distinct;

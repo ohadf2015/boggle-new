@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 
 let search = '';
 vi.mock('next/navigation', () => ({
@@ -137,6 +137,19 @@ describe('<TeacherReportsPage> class view — summary first, detail on demand', 
     expect(details).not.toBeNull();
     expect(details).not.toHaveAttribute('open');
     expect(gate).toHaveAttribute('data-active', 'false');
+  });
+
+  it('offers parent reports in their own closed disclosure, gated by Pro only once opened', () => {
+    render(<TeacherReportsPage />);
+    const details = screen.getByTestId('parent-reports-disclosure') as HTMLDetailsElement;
+    expect(details).not.toHaveAttribute('open');
+    expect(screen.getByText('parentReportsFlow.title')).toBeInTheDocument();
+    expect(screen.getAllByTestId('pro-gate')).toHaveLength(1);
+    act(() => {
+      details.open = true;
+      details.dispatchEvent(new Event('toggle'));
+    });
+    expect(screen.getAllByTestId('pro-gate')).toHaveLength(2);
   });
 
   it('keeps the summary short: assignments, arc and digest fold into closed disclosures between the mastery report and the full report', () => {

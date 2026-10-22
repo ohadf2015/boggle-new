@@ -5,12 +5,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchWithAuth } from '@/utils/authFetch';
 import type { WindowDays } from '@/lib/admin/eduMetrics';
 import { EduDashboardSections, type EduDashboardView } from './EduDashboardSections';
+import { CHIP_OFF, CHIP_ON } from './edu-dashboard/eduDashboardShared';
 
 const WINDOWS: WindowDays[] = [7, 30, 90];
 
 function isDashboardView(json: unknown): json is EduDashboardView {
   const v = json as Partial<EduDashboardView> | null;
-  return !!v && typeof v.kpis === 'object' && v.kpis !== null && !!v.sparklines;
+  return !!v && typeof v.kpis === 'object' && v.kpis !== null && !!v.sparklines && !!v.drill && !!v.attention;
 }
 
 export function EduDashboardPanel() {
@@ -41,45 +42,40 @@ export function EduDashboardPanel() {
   }, [windowDays]);
 
   return (
-    <section className="space-y-4 text-white" aria-labelledby="edu-dashboard-title">
+    <section className="space-y-4 text-neo-cream" aria-labelledby="edu-dashboard-title">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 id="edu-dashboard-title" className="font-bold text-lg">
             {t('admin.eduDashboard.title', 'Education overview')}
           </h2>
-          <p className="text-xs text-white/60">
-            {t('admin.eduDashboard.subtitle', 'Test accounts excluded. Deltas compare with the prior period.')}
+          <p className="text-xs text-neo-cream/70">
+            {t('admin.eduDashboard.subtitle', 'Test accounts are left out of every number. Each change compares with the same number of days just before.')}
           </p>
         </div>
-        <div role="group" aria-label={t('admin.eduDashboard.window', 'Window')} className="flex gap-1">
+        <div role="group" aria-label={t('admin.eduDashboard.window', 'Window')} className="flex flex-wrap gap-1">
           {WINDOWS.map((w) => (
             <button
               key={w}
               type="button"
               aria-pressed={windowDays === w}
               onClick={() => setWindowDays(w)}
-              className={`rounded border px-3 py-1 text-xs font-semibold tabular-nums ${
-                windowDays === w ? 'border-white bg-white text-black' : 'border-white/30 text-white/80'
-              }`}
+              className={`rounded border px-3 py-1 text-xs font-semibold tabular-nums ${windowDays === w ? CHIP_ON : CHIP_OFF}`}
             >
-              {`${w}d`}
+              {t('admin.eduDashboard.windowLast', 'Last {days} days', { days: w })}
             </button>
           ))}
         </div>
       </header>
 
       {failed && (
-        <p role="alert" className="rounded border border-red-400/60 p-3 text-sm text-red-300">
+        <p role="alert" className="rounded border-2 border-neo-red p-3 text-sm text-neo-red">
           {t('admin.eduDashboard.loadFailed', 'Could not load the education overview.')}
         </p>
       )}
       {!failed && !data && (
-        <p className="text-sm text-white/60">{t('admin.eduDashboard.loading', 'Loading…')}</p>
+        <p className="text-sm text-neo-cream/70">{t('admin.eduDashboard.loading', 'Loading…')}</p>
       )}
       {data && <EduDashboardSections data={data} />}
-      <p className="text-xs text-white/50">
-        {t('admin.eduDashboard.posthogHidden', 'Landing and upsell conversion are hidden: no server PostHog key is configured.')}
-      </p>
     </section>
   );
 }

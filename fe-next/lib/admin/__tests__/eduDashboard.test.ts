@@ -18,7 +18,7 @@ const base = (over: Partial<EduDashboardInput> = {}): EduDashboardInput => ({
 });
 
 describe('buildEduDashboard KPIs', () => {
-  it('counts active teachers and computes the change against the prior window', () => {
+  it('counts active teachers but does not compare them with the prior window, since only the last visit is stored', () => {
     const out = buildEduDashboard(
       base({
         teachers: [
@@ -27,7 +27,8 @@ describe('buildEduDashboard KPIs', () => {
         ],
       }),
     );
-    expect(out.kpis.activeTeachers).toEqual({ current: 1, prior: 1, pct: 0 });
+    expect(out.kpis.activeTeachers).toEqual({ current: 1, prior: 0, pct: null });
+    expect(out.sparklines.activeTeachers).toBeNull();
   });
 
   it('reports rounds-based KPIs as null when classroom_rounds is not live', () => {

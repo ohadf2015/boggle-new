@@ -97,75 +97,76 @@ export function JoinCodeField({
     <div
       // The code itself is direction-neutral data. Pin it.
       dir="ltr"
-      className="relative w-full select-none"
+      className="group relative w-full select-none"
     >
-      <div className="flex items-center gap-2">
-        <div className="flex-1 grid grid-cols-6 gap-1.5 sm:gap-2.5">
-          {cells.map((char, i) => {
-            const filled = char !== '';
-            const isActive = !invalid && i === activeIndex && value.length < JOIN_CODE_LENGTH;
-            return (
-              <div
-                key={i}
-                aria-hidden="true"
-                className={cn(
-                  'flex aspect-[4/5] items-center justify-center rounded-neo border-3 font-neo-display text-3xl font-black leading-none transition-colors duration-100 sm:text-5xl',
-                  invalid
-                    ? 'border-neo-black bg-neo-red/90 text-neo-white shadow-hard'
-                    : filled
-                      ? 'border-neo-black bg-neo-lime text-neo-navy shadow-hard'
-                      : 'border-neo-cream bg-neo-navy-light text-neo-white/30 shadow-hard-sm',
-                  isActive && 'bg-neo-cyan text-neo-navy shadow-hard'
-                )}
-              >
-                {filled ? (
-                  <span className="animate-neo-pop">{char}</span>
-                ) : isActive ? (
-                  <span className="h-7 w-1.5 rounded-full bg-neo-navy animate-pulse sm:h-10" />
-                ) : null}
-              </div>
-            );
-          })}
+      <div className="flex items-center gap-2 lg:gap-3">
+        <div className="@container relative flex-1">
+          <div className="grid grid-cols-6 gap-[clamp(0.25rem,2cqi,0.75rem)]">
+            {cells.map((char, i) => {
+              const filled = char !== '';
+              const isActive = !invalid && i === activeIndex && value.length < JOIN_CODE_LENGTH;
+              return (
+                <div
+                  key={i}
+                  aria-hidden="true"
+                  data-testid="join-code-cell"
+                  className={cn(
+                    'flex aspect-[4/5] items-center justify-center rounded-neo border-3 font-neo-display text-[clamp(1.5rem,11cqi,4.5rem)] font-black leading-none transition-colors duration-100',
+                    invalid
+                      ? 'border-neo-black bg-neo-red text-neo-white shadow-hard'
+                      : filled
+                        ? 'border-neo-black bg-neo-lime text-neo-navy shadow-hard'
+                        : 'border-neo-cream bg-neo-navy-light text-neo-white/30 shadow-hard-sm',
+                    isActive && 'group-focus-within:border-neo-black group-focus-within:bg-neo-cyan group-focus-within:text-neo-navy group-focus-within:shadow-hard'
+                  )}
+                >
+                  {filled ? (
+                    <span className="motion-safe:animate-neo-pop">{char}</span>
+                  ) : isActive ? (
+                    <span className="hidden h-[45%] w-1.5 rounded-full bg-neo-navy group-focus-within:block motion-safe:animate-pulse" />
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+          <input
+            ref={inputRef}
+            type="text"
+            value={value}
+            onChange={handleChange}
+            onPaste={handleNativePaste}
+            aria-label={label}
+            aria-describedby={describedBy}
+            aria-invalid={invalid || undefined}
+            maxLength={JOIN_CODE_LENGTH}
+            inputMode="text"
+            enterKeyHint="next"
+            // `one-time-code` would summon the iOS SMS-autofill bar over a code that
+            // never arrives by SMS.
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="characters"
+            spellCheck={false}
+            autoFocus={autoFocus}
+            data-testid="join-code-input"
+            // Transparent, but a real focusable input covering the cells: the
+            // software keyboard, the caret and long-press-paste all belong to it.
+            className="absolute inset-0 h-full w-full cursor-pointer rounded-neo bg-transparent text-center font-neo-display text-3xl tracking-[0.6em] text-transparent caret-transparent outline-none focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-cyan"
+          />
         </div>
 
-        {/* Paste button integrated into the field */}
         {onPaste && (
           <button
             type="button"
             onClick={onPaste}
-            className="flex shrink-0 items-center justify-center rounded-neo border-3 border-neo-cyan bg-neo-navy-light p-2.5 text-neo-cyan shadow-hard transition-transform active:translate-y-0.5 sm:p-3"
+            className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-cyan bg-neo-navy-light text-neo-cyan shadow-hard transition-transform active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan lg:size-14"
             aria-label={t('joinView.pasteCode')}
             title={t('joinView.pasteCode')}
           >
-            <ClipboardPaste className="h-5 w-5 sm:h-6 sm:w-6" />
+            <ClipboardPaste aria-hidden="true" className="size-6" />
           </button>
         )}
       </div>
-
-      <input
-        ref={inputRef}
-        type="text"
-        value={value}
-        onChange={handleChange}
-        onPaste={handleNativePaste}
-        aria-label={label}
-        aria-describedby={describedBy}
-        aria-invalid={invalid || undefined}
-        maxLength={JOIN_CODE_LENGTH}
-        inputMode="text"
-        enterKeyHint="next"
-        // `one-time-code` would summon the iOS SMS-autofill bar over a code that
-        // never arrives by SMS.
-        autoComplete="off"
-        autoCorrect="off"
-        autoCapitalize="characters"
-        spellCheck={false}
-        autoFocus={autoFocus}
-        data-testid="join-code-input"
-        // Transparent, but a real focusable input covering the whole strip: the
-        // software keyboard, the caret and long-press-paste all belong to it.
-        className="absolute inset-0 h-full w-full cursor-pointer bg-transparent text-center font-neo-display text-3xl tracking-[0.6em] text-transparent caret-transparent outline-none focus-visible:outline-none"
-      />
     </div>
   );
 }

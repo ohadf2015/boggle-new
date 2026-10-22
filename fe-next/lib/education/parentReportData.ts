@@ -8,14 +8,12 @@
  * must stop showing up here even on an unexpired link.
  *
  * Returns a discriminated union rather than an empty summary on failure —
- * a query error must never render as "this student has no progress yet"
- * (recurring-pitfalls Class 4: silent failure).
+ * a query error must never render as "this student has no progress yet".
  */
 import { resolveDisplayName } from '@/lib/displayName';
-
-interface MinimalSupabaseClient {
-  from: (table: string) => any;
-}
+import { loadStudentInsights, type InsightsClient } from './studentInsightsLoader';
+import type { StudentInsights } from './studentInsights';
+import logger from '@/utils/logger';
 
 export interface ParentReportSummary {
   displayName: string;
@@ -23,6 +21,11 @@ export interface ParentReportSummary {
   lessonsCompleted: number;
   wordsMastered: number;
   recentActivity: Array<{ completedAt: string }>;
+  /** Optional so a summary without them still renders, with those sections hidden. */
+  classroomName?: string;
+  teacherName?: string;
+  generatedAt?: string;
+  insights?: StudentInsights;
 }
 
 export type ParentReportResult =
@@ -32,10 +35,25 @@ export type ParentReportResult =
 
 const RECENT_ACTIVITY_LIMIT = 5;
 
+async function loadTeacherName(admin: InsightsClient, teacherId: string | null | undefined): Promise<string | undefined> {
+  if (!teacherId) return undefined;
+  const { data, error } = await admin
+    .from('public_profiles')
+    .select('display_name, username')
+    .eq('id', teacherId)
+    .maybeSingle();
+  if (error) {
+    logger.warn('[parent-report] teacher name read failed, line hidden', error);
+    return undefined;
+  }
+  return resolveDisplayName([data?.display_name, data?.username], '') || undefined;
+}
+
 export async function loadParentReportData(
-  admin: MinimalSupabaseClient,
+  admin: InsightsClient,
   studentId: string,
   classroomId: string,
+  now: Date = new Date(),
 ): Promise<ParentReportResult> {
   const membership = await admin
     .from('classroom_memberships')
@@ -46,53 +64,32 @@ export async function loadParentReportData(
   if (membership.error) return { status: 'error', message: membership.error.message };
   if (!membership.data) return { status: 'not_member' };
 
-  const [profileResult, progressResult, sessionsResult] = await Promise.all([
+  const [profileResult, classroomResult, insightsResult] = await Promise.all([
     admin.from('public_profiles').select('display_name, username').eq('id', studentId).maybeSingle(),
-    admin.from('student_lesson_progress').select('total_xp, words_mastered, completed_at').eq('student_id', studentId),
-    admin
-      .from('practice_sessions')
-      .select('completed_at')
-      .eq('student_id', studentId)
-      .eq('classroom_id', classroomId)
-      .not('completed_at', 'is', null)
-      .order('completed_at', { ascending: false })
-      .limit(RECENT_ACTIVITY_LIMIT),
+    admin.from('classrooms').select('name, teacher_id').eq('id', classroomId).maybeSingle(),
+    loadStudentInsights(admin, studentId, classroomId, now),
   ]);
 
   if (profileResult.error) return { status: 'error', message: profileResult.error.message };
-  if (progressResult.error) return { status: 'error', message: progressResult.error.message };
-  if (sessionsResult.error) return { status: 'error', message: sessionsResult.error.message };
+  if (classroomResult.error) return { status: 'error', message: classroomResult.error.message };
+  if (!insightsResult.ok) return { status: 'error', message: insightsResult.message };
 
-  const displayName = resolveDisplayName(
-    [profileResult.data?.display_name, profileResult.data?.username],
-    'Student',
-  );
-
-  type ProgressRow = { total_xp: number | null; words_mastered: string[] | null; completed_at: string | null };
-  const progressRows = (progressResult.data ?? []) as ProgressRow[];
-
-  let totalXp = 0;
-  let lessonsCompleted = 0;
-  const masteredWords = new Set<string>();
-  for (const row of progressRows) {
-    totalXp += row.total_xp ?? 0;
-    if (row.completed_at) lessonsCompleted += 1;
-    for (const word of row.words_mastered ?? []) masteredWords.add(word);
-  }
-
-  type SessionRow = { completed_at: string | null };
-  const recentActivity = ((sessionsResult.data ?? []) as SessionRow[])
-    .filter((row): row is { completed_at: string } => typeof row.completed_at === 'string')
-    .map((row) => ({ completedAt: row.completed_at }));
+  const classroom = classroomResult.data as { name?: string | null; teacher_id?: string | null } | null;
+  const teacherName = await loadTeacherName(admin, classroom?.teacher_id);
+  const { insights, recentSessions } = insightsResult;
 
   return {
     status: 'ok',
     data: {
-      displayName,
-      totalXp,
-      lessonsCompleted,
-      wordsMastered: masteredWords.size,
-      recentActivity,
+      displayName: resolveDisplayName([profileResult.data?.display_name, profileResult.data?.username], 'Student'),
+      totalXp: insights.totalXp,
+      lessonsCompleted: insights.lessonsCompleted,
+      wordsMastered: insights.wordsMastered,
+      recentActivity: recentSessions.slice(0, RECENT_ACTIVITY_LIMIT).map((completedAt) => ({ completedAt })),
+      classroomName: classroom?.name || undefined,
+      teacherName,
+      generatedAt: now.toISOString(),
+      insights,
     },
   };
 }

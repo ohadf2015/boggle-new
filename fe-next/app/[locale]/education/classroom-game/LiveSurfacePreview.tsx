@@ -24,7 +24,7 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { ClassroomTvResults } from '@/components/education/results/ClassroomTvResults';
-import ProjectorLobby from '@/components/education/projector/ProjectorLobby';
+import EduProjectorLobby from '@/components/education/live/EduProjectorLobby';
 import Avatar from '@/components/Avatar';
 import { ClassroomWaitingStage } from '@/components/education/lobby/ClassroomWaitingStage';
 import { EducationHeader } from '@/components/education/EducationHeader';
@@ -68,7 +68,7 @@ function PodiumPreview() {
 function ProjectorPreview() {
   const { t, language } = useLanguage();
   const params = useSearchParams();
-  const total = Math.max(0, Math.min(40, Number(params?.get('count') ?? 12) || 0));
+  const total = Math.max(0, Math.min(60, Number(params?.get('count') ?? 12) || 0));
   const roster = useMemo(() => sampleProjectorStudents(total), [total]);
   // Students arrive one at a time so the pop-in + join sting can be judged.
   const [shown, setShown] = useState(0);
@@ -79,7 +79,7 @@ function ProjectorPreview() {
   }, [shown, roster.length]);
 
   return (
-    <ProjectorLobby
+    <EduProjectorLobby
       gameCode="YHNCF4"
       language={language}
       students={roster.slice(0, shown)}

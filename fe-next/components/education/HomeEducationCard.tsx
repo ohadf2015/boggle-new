@@ -92,6 +92,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
           'flex shrink-0 items-center justify-center',
           'h-10 w-10 sm:h-12 sm:w-12',
           'rounded-neo border-2 border-neo-black text-neo-black shadow-hard-sm',
+          'motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-safe:group-hover:-rotate-6 motion-safe:group-hover:scale-110',
           accent
         )}
         aria-hidden="true"

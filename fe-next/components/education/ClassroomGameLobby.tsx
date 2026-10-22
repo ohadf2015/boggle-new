@@ -49,6 +49,7 @@ import { ZERO_ECONOMY_SNAPSHOT } from '@/shared/constants/classroomEconomy';
 import { defaultLessonIdsFor, useTeacherLobbyData } from './lobby/useTeacherLobbyData';
 import { useClassroomLaunchSocket } from './lobby/useClassroomLaunchSocket';
 import { useRepeatLastSetup } from './lobby/useRepeatLastSetup';
+import { readRememberedRoundDefaults } from './lobby/rememberedRoundDefaults';
 
 export interface ClassroomGameLobbyProps {
   initialLessonId?: string;
@@ -127,10 +128,11 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   const [treasureChestsEnabled, setTreasureChestsEnabled] = useState(true);
   const [targetWord, setTargetWord] = useState('');
   const [minWordLength, setMinWordLength] = useState(3);
-  const [timerMinutes, setTimerMinutes] = useState(initialMinutes ?? 3);
-  const [allowLateJoin, setAllowLateJoin] = useState(true);
+  const [remembered] = useState(readRememberedRoundDefaults);
+  const [timerMinutes, setTimerMinutes] = useState(initialMinutes ?? remembered?.timerMinutes ?? 3);
+  const [allowLateJoin, setAllowLateJoin] = useState(remembered?.allowLateJoin ?? true);
   const [economy, setEconomy] = useState<ClassroomEconomyConfig>(ZERO_ECONOMY_SNAPSHOT.config);
-  const [boardSize, setBoardSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const [boardSize, setBoardSize] = useState<'small' | 'medium' | 'large'>(remembered?.boardSize ?? 'medium');
   const [playStyle, setPlayStyle] = useState<PlayStyle>('ffa');
   const [teamCount, setTeamCount] = useState(2);
   const [accessibility, setAccessibility] = useState<ClassroomAccessibility>({});
