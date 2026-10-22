@@ -79,7 +79,10 @@ export function TeacherGate({
   useEffect(() => {
     if (!isLoading && !hasAccess && pathname) {
       const locale = pathname.split('/')[1] || 'en';
-      const from = encodeURIComponent(pathname);
+      // Keep ?checkout=success. Dropping it here is how a paid return never
+      // recorded: the dashboard that fires the event never mounts.
+      const search = typeof window !== 'undefined' ? window.location.search : '';
+      const from = encodeURIComponent(`${pathname}${search}`);
       router.replace(`/${locale}/education/access?from=${from}`);
     }
   }, [hasAccess, isLoading, pathname, router]);

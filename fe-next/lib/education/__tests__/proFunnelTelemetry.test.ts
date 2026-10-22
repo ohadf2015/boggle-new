@@ -37,6 +37,8 @@ import {
   trackTeacherPlanGateShown,
   trackTeacherPlanGateUpgradeClick,
   PRO_SUCCESS_SEEN_STORAGE_KEY,
+  RETURN_LANDED_STORAGE_KEY,
+  trackEduProCheckoutReturnLanded,
 } from '../proFunnelTelemetry';
 
 describe('trackEduProUpgradeClicked', () => {
@@ -221,6 +223,32 @@ describe('trackEduProCheckoutSuccessSeen', () => {
   it('exposes the storage key it writes', () => {
     trackEduProCheckoutSuccessSeen(5_000);
     expect(localStorage.getItem(PRO_SUCCESS_SEEN_STORAGE_KEY)).toBe('5000');
+  });
+});
+
+describe('trackEduProCheckoutReturnLanded', () => {
+  beforeEach(() => {
+    captureMock.mockReset();
+    growthMock.mockReset();
+    localStorage.clear();
+  });
+
+  it('Given a checkout return, When tracked, Then both names fire once and the webhook name does not', () => {
+    expect(trackEduProCheckoutReturnLanded(1_000)).toBe(true);
+    expect(captureMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
+    expect(captureMock).toHaveBeenCalledWith('checkout_return_landed', {
+      product: 'teacher_pro',
+      provider: 'polar',
+    });
+    expect(captureMock.mock.calls.map((c) => c[0])).not.toContain('edu_pro_checkout_succeeded');
+    expect(growthMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
+    expect(localStorage.getItem(RETURN_LANDED_STORAGE_KEY)).toBe('1000');
+  });
+
+  it('Given a reload that keeps ?checkout=success, When tracked again, Then it does not fire twice', () => {
+    trackEduProCheckoutReturnLanded(1_000);
+    expect(trackEduProCheckoutReturnLanded(2_000)).toBe(false);
+    expect(captureMock).toHaveBeenCalledTimes(2);
   });
 });
 

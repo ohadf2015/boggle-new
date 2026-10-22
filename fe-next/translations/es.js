@@ -14221,6 +14221,16 @@ const es = {
       "manage": "Gestionar suscripción",
       "cta": "Vamos"
     },
+    "checkoutReturn": {
+      "activatingTitle": "Activando Teacher Pro",
+      "activatingBody": "Pago recibido. Confirmando el acceso — suele tardar unos segundos.",
+      "successTitle": "Teacher Pro está activo",
+      "successBody": "El acceso ya está en tu cuenta.",
+      "failureTitle": "Aún no confirmamos Pro",
+      "failureBody": "Si te cobramos, el acceso suele llegar en un minuto. Vuelve a comprobarlo, o escríbenos si sigue faltando.",
+      "retry": "Comprobar de nuevo",
+      "close": "Cerrar"
+    },
     "plan": {
       "pro": "Pro",
       "free": "Plan gratuito",

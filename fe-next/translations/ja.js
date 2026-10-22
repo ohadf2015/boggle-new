@@ -14273,6 +14273,16 @@ const ja = {
       "manage": "サブスクリプションを管理",
       "cta": "はじめる"
     },
+    "checkoutReturn": {
+      "activatingTitle": "Teacher Pro を有効化しています",
+      "activatingBody": "お支払いを受け取りました。アクセスを確認しています。通常は数秒です。",
+      "successTitle": "Teacher Pro が有効です",
+      "successBody": "アクセスはアカウントに反映済みです。",
+      "failureTitle": "Pro はまだ確認できていません",
+      "failureBody": "請求済みの場合、アクセスは通常1分以内に届きます。もう一度確認するか、まだ無いときはご連絡ください。",
+      "retry": "もう一度確認",
+      "close": "閉じる"
+    },
     "plan": {
       "pro": "Pro",
       "free": "無料プラン",

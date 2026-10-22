@@ -145,6 +145,8 @@ export function trackTeacherTrialUpgradeCtaClicked(args: {
 }
 
 export const PRO_SUCCESS_SEEN_STORAGE_KEY = 'lexi_edu_pro_success_seen_at';
+/** Same window as the welcome event: a reload is not a second return. */
+export const RETURN_LANDED_STORAGE_KEY = 'lexi_edu_pro_return_landed_at';
 /** A reload within this window is the same return from checkout, not a new one. */
 const SUCCESS_DEDUPE_MS = 24 * 3_600_000;
 
@@ -173,13 +175,34 @@ export function trackEduProCheckoutSuccessSeen(now: number = Date.now()): boolea
 }
 
 /**
- * Fire `edu_pro_checkout_return_landed` unconditionally on `?checkout=success`,
- * before entitlement is known. Unlike `trackEduProCheckoutSuccessSeen` (gated
- * on `hasPro`, so a broken webhook means it never fires), this always fires —
+ * Fire the return signal unconditionally on `?checkout=success`, before
+ * entitlement is known. Unlike `trackEduProCheckoutSuccessSeen` (gated on
+ * `hasPro`, so a broken webhook means it never fires), this always fires —
  * the only way to tell "webhook never landed" from "user abandoned on Polar".
+ *
+ * Two PostHog names, one step: `edu_pro_checkout_return_landed` is the funnel
+ * name, `checkout_return_landed` is the name QA counts. Neither is the webhook
+ * grant (`edu_pro_checkout_succeeded`), so a return is not a second conversion.
+ * A reload inside 24h does not count again.
  */
-export function trackEduProCheckoutReturnLanded(): void {
+export function trackEduProCheckoutReturnLanded(now: number = Date.now()): boolean {
+  let last: number | null = null;
+  try {
+    const raw = localStorage.getItem(RETURN_LANDED_STORAGE_KEY);
+    last = raw ? Number(raw) : null;
+  } catch {
+    /* storage blocked — count it; a rare double beats a silent zero */
+  }
+  if (last !== null && Number.isFinite(last) && now - last < SUCCESS_DEDUPE_MS) return false;
+
   captureStep('edu_pro_checkout_return_landed', {});
+  safeCapture('checkout_return_landed', { product: 'teacher_pro', provider: 'polar' });
+  try {
+    localStorage.setItem(RETURN_LANDED_STORAGE_KEY, String(now));
+  } catch {
+    /* best effort */
+  }
+  return true;
 }
 
 /**

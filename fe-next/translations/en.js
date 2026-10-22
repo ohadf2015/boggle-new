@@ -12649,6 +12649,16 @@ const en = {
       "manage": "Manage subscription",
       "cta": "Let's go"
     },
+    "checkoutReturn": {
+      "activatingTitle": "Activating Teacher Pro",
+      "activatingBody": "Payment received. Confirming access — this usually takes a few seconds.",
+      "successTitle": "Teacher Pro is on",
+      "successBody": "Access is active. The payment grant is already on your account.",
+      "failureTitle": "Pro is not confirmed yet",
+      "failureBody": "If you were charged, access usually arrives within a minute. Check again, or write to us if it is still missing.",
+      "retry": "Check again",
+      "close": "Close"
+    },
     "plan": {
       "pro": "Pro",
       "free": "Free plan",
