@@ -224,6 +224,16 @@ describe('StudentProgressReport', () => {
       });
     });
 
+    it('shows a dash, not 0%, when the student has no answers yet (same as the parent report)', async () => {
+      mockGetStudentReportData.mockResolvedValue({
+        data: { ...mockStudentData, metrics: { ...mockStudentData.metrics, accuracy: null, averageScore: null } },
+        error: null,
+      });
+      render(<StudentProgressReport studentId="student-123" classroomId="classroom-456" />);
+      await waitFor(() => expect(screen.getAllByText('parentReport.noValue').length).toBeGreaterThan(0));
+      expect(screen.queryByText('null%')).not.toBeInTheDocument();
+    });
+
     it('displays practice time metric', async () => {
       render(
         <StudentProgressReport studentId="student-123" classroomId="classroom-456" />
@@ -405,7 +415,6 @@ describe('StudentProgressReport', () => {
         <StudentProgressReport
           studentId="student-123"
           classroomId="classroom-456"
-          lessonId="lesson-789"
         />
       );
 
@@ -413,7 +422,6 @@ describe('StudentProgressReport', () => {
         expect(mockGetStudentReportData).toHaveBeenCalledWith(
           'student-123',
           'classroom-456',
-          'lesson-789',
           undefined
         );
       });
@@ -437,7 +445,6 @@ describe('StudentProgressReport', () => {
         expect(mockGetStudentReportData).toHaveBeenCalledWith(
           'student-123',
           'classroom-456',
-          undefined,
           dateRange
         );
       });

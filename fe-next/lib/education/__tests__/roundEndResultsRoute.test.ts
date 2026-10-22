@@ -188,7 +188,7 @@ describe('the projector file mounts the shared actions, and the student card doe
 
   it('still gates the phone card on isTeacher, so a student phone does not grow the ask', () => {
     expect(card).toContain('{isTeacher && (\n        <ResultsPrimaryActions');
-    expect(card).toContain('<ReteachActions links={links} onReteach={onReteach} t={t} />');
+    expect(card).toContain('<ReteachActions links={links} onReteach={onReteach}');
     expect(card).toContain('{!isTeacher && (');
     expect(card).toContain('<StudentNextActions');
   });

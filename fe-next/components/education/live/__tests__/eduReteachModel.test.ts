@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { ClassroomSummary } from '@/shared/types/classroom';
-import { mostMissedWords, studentsUnderHalf } from '@/components/education/live/eduReteachModel';
+import { mostMissedWords, reteachList, studentsUnderHalf } from '@/components/education/live/eduReteachModel';
 
 const mastery = (rows: Record<string, [number, number]>) =>
   Object.fromEntries(Object.entries(rows).map(([name, [found, total]]) => [name, { found, total }]));
@@ -85,3 +85,32 @@ describe('studentsUnderHalf', () => {
     expect(studentsUnderHalf(summary)).toBe(1);
   });
 });
+
+describe('reteachList — the one list every replay button sends', () => {
+  const twoStudents = mastery({ Ada: [1, 2], Ben: [0, 2] });
+
+  it('given some words most of the class missed, when listed, then those are the replay words', () => {
+    const summary = summaryOf({
+      totalWords: 2,
+      masteryByPlayer: twoStudents,
+      coverage: [
+        { word: 'osmosis', foundBy: ['Ada', 'Ben'] },
+        { word: 'enzyme', foundBy: [] },
+      ],
+    });
+    expect(reteachList(summary).map((w) => w.word)).toEqual(['enzyme']);
+  });
+
+  it('given every lesson word went unfound, when listed, then there is no replay (that is Play again)', () => {
+    const summary = summaryOf({
+      totalWords: 2,
+      masteryByPlayer: twoStudents,
+      coverage: [
+        { word: 'osmosis', foundBy: [] },
+        { word: 'enzyme', foundBy: [] },
+      ],
+    });
+    expect(reteachList(summary)).toEqual([]);
+  });
+});
+

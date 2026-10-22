@@ -20931,7 +20931,9 @@ const ja = {
       "replayFailed": "もう一回の準備ができませんでした。もう一度お試しください。",
       "moreWords": "ほか{count}語",
       "notOnBoard": "盤面になし",
-      "replayReady": "準備OK。次の「もう一回」はこの単語で遊びます。"
+      "replayReady": "準備OK。次の「もう一回」はこの単語で遊びます。",
+      "useFullList": "全部の単語に戻す",
+      "fullListFailed": "全部の単語に戻せませんでした。もう一度お試しください。"
     },
     "studentResults": {
       "placed": "あなたの順位",

@@ -34,6 +34,7 @@ import { useTvFullscreen } from '../../hooks/useTvFullscreen';
 import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { PlayerResult } from '@/types/components';
+import type { Socket } from 'socket.io-client';
 
 export interface ClassroomTvResultsScreenProps {
   summary: ClassroomSummary;
@@ -51,6 +52,8 @@ export interface ClassroomTvResultsScreenProps {
   onExitRoom?: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
   players?: PlayerResult[];
+  gameCode?: string;
+  socket?: Socket | null;
 }
 
 export function ClassroomTvResultsScreen(props: ClassroomTvResultsScreenProps) {
@@ -65,6 +68,8 @@ function SharedClassroomTvResultsScreen({
   onExitRoom,
   t,
   players,
+  gameCode,
+  socket,
 }: ClassroomTvResultsScreenProps) {
   const { isFullscreen, toggleFullscreen, isSupported } = useTvFullscreen({ enabled: true });
 
@@ -120,6 +125,8 @@ function SharedClassroomTvResultsScreen({
           onChangeGame={onClose}
           onBackToClass={onExitRoom}
           players={players}
+          gameCode={gameCode}
+          socket={socket}
           t={t}
         />
       </div>

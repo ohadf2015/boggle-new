@@ -91,6 +91,20 @@ describe('buildStudentInsights', () => {
     expect(out.insight).toBe('more_active');
   });
 
+  it('totals practice minutes and completed sessions across every loaded session, not just the last two weeks', () => {
+    const result = buildStudentInsights({
+      progressRows: [],
+      sessionRows: [
+        session({ completed_at: daysAgo(1), time_spent_seconds: 600, duration_seconds: null }),
+        session({ completed_at: daysAgo(40), time_spent_seconds: 0, duration_seconds: 300 }),
+        session({ completed_at: null, time_spent_seconds: 900 }),
+      ],
+      now: NOW,
+    });
+    expect(result.totalMinutes).toBe(15);
+    expect(result.sessionsCompleted).toBe(2);
+  });
+
   it('never reads the mixed-scale session `accuracy` column: no attempted words means null week accuracy', () => {
     const out = buildStudentInsights({
       progressRows: [],

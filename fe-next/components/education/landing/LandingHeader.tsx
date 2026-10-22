@@ -52,7 +52,7 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
               href={`/${language}/education/access`}
               data-testid="landing-header-start"
               onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'education_header_start' })}
-              className="inline-flex min-h-10 items-center whitespace-nowrap rounded-neo border-2 border-neo-black bg-neo-lime px-2.5 font-neo-display text-sm font-black uppercase text-neo-navy shadow-hard-sm transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed motion-reduce:transition-none sm:px-4"
+              className="inline-flex min-h-10 items-center whitespace-nowrap rounded-neo border-2 border-neo-cream bg-transparent px-2.5 font-neo-display text-sm font-bold text-neo-cream transition-colors duration-150 hover:bg-neo-cream/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan motion-reduce:transition-none sm:px-4"
             >
               {t('eg2Land.header.start')}
             </Link>

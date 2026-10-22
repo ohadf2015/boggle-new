@@ -4,6 +4,7 @@ import { Loader2, RotateCcw, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { MissedWord } from './eduReteachModel';
 import type { ReteachStatus } from './useReteachRound';
+import { ReteachStatusNote } from './ReteachStatusNote';
 import { PRESS, type Translate } from './eduLiveStyles';
 
 const MAX_CHIPS = 8;
@@ -13,10 +14,11 @@ interface EduReteachPanelProps {
   underHalf: number;
   status: ReteachStatus;
   onReplay: (words: string[]) => void;
+  onRestoreFull?: () => void;
   t: Translate;
 }
 
-export function EduReteachPanel({ words, underHalf, status, onReplay, t }: EduReteachPanelProps) {
+export function EduReteachPanel({ words, underHalf, status, onReplay, onRestoreFull, t }: EduReteachPanelProps) {
   if (words.length === 0) return null;
   const shown = words.slice(0, MAX_CHIPS);
   const rest = words.length - shown.length;
@@ -74,16 +76,7 @@ export function EduReteachPanel({ words, underHalf, status, onReplay, t }: EduRe
           {pending ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <RotateCcw className="size-4" aria-hidden="true" />}
           {t('eduLiveRoom.hostResults.replayMissed', { count: words.length })}
         </button>
-        {status === 'ready' && (
-          <p data-testid="edu-replay-ready" role="status" className="font-neo-body text-sm font-bold text-neo-lime">
-            {t('eduLiveRoom.hostResults.replayReady')}
-          </p>
-        )}
-        {status === 'failed' && (
-          <p data-testid="edu-replay-failed" role="alert" className="font-neo-body text-sm font-bold text-neo-pink">
-            {t('eduLiveRoom.hostResults.replayFailed')}
-          </p>
-        )}
+        <ReteachStatusNote status={status} onRestoreFull={onRestoreFull} t={t} />
       </div>
     </section>
   );

@@ -21,7 +21,7 @@ export function ReportHeader({ data, locale, t }: { data: ParentReportSummary; l
   const start = end ? new Date(end.getTime() - (PERIOD_DAYS - 1) * 86400000) : null;
 
   return (
-    <header className="border-b-2 border-neo-black pb-4">
+    <header className="border-b-2 border-neo-black pb-4 print:pb-2">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-black uppercase tracking-wide text-neo-black/70">{t('parentReport.subtitle')}</p>
@@ -31,7 +31,7 @@ export function ReportHeader({ data, locale, t }: { data: ParentReportSummary; l
         </div>
         <PrintReportButton label={t('parentReport.printButton')} />
       </div>
-      <dl className="mt-3 grid gap-3 sm:grid-cols-3">
+      <dl className="mt-3 grid gap-3 sm:grid-cols-3 print:mt-2 print:grid-cols-3">
         {data.classroomName && <Meta label={t('parentReport.classLabel')} value={data.classroomName} />}
         {data.teacherName && <Meta testId="report-teacher" label={t('parentReport.teacherLabel')} value={data.teacherName} />}
         {start && end && (

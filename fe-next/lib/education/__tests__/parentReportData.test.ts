@@ -76,6 +76,21 @@ describe('loadParentReportData', () => {
     expect(result.data.insights?.thisWeek.sessions).toBe(6);
   });
 
+  it('lists each practice day once, even when a day had several sessions', async () => {
+    const at = (d: number, h: number) => new Date(Date.UTC(2026, 9, 21 - d, h)).toISOString();
+    const sessions = [at(0, 11), at(0, 9), at(1, 18), at(1, 8), at(2, 10), at(4, 10), at(5, 10), at(6, 10)].map((completed_at) => ({
+      completed_at,
+      words_attempted: 1,
+      words_correct: 1,
+      time_spent_seconds: 60,
+      duration_seconds: null,
+    }));
+    const { client } = db({ practice_sessions: ok(sessions) });
+    const result = await loadParentReportData(client, STUDENT, CLASSROOM, NOW);
+    if (result.status !== 'ok') throw new Error('expected ok');
+    expect(result.data.recentActivity.map((e) => e.completedAt)).toEqual([at(0, 11), at(1, 18), at(2, 10), at(4, 10), at(5, 10)]);
+  });
+
   it('scopes sessions to this classroom and only completed ones', async () => {
     const { client, calls } = db();
     await loadParentReportData(client, STUDENT, CLASSROOM, NOW);

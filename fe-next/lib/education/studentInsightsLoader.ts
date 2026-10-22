@@ -15,8 +15,8 @@ export interface InsightsClient {
   from: (table: string) => any;
 }
 
-/** Newest-first sessions; two weeks of comparison fits well inside this. */
-export const INSIGHT_SESSION_LIMIT = 200;
+/** Newest-first sessions. High enough that the all-time practice total is not cut short for any real student. */
+export const INSIGHT_SESSION_LIMIT = 2000;
 
 export type StudentInsightsResult =
   | { ok: true; insights: StudentInsights; recentSessions: string[] }

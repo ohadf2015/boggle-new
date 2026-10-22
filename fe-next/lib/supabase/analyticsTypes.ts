@@ -99,12 +99,12 @@ export interface StudentReportData {
   metrics: {
     wordsLearned: number;
     totalWords: number;
-    accuracy: number;
+    accuracy: number | null;
     practiceTimeMinutes: number;
     currentStreak: number;
     longestStreak: number;
     sessionsCompleted: number;
-    averageScore: number;
+    averageScore: number | null;
     masteryLevel: string;
   };
   wordMastery: Array<{

@@ -83,7 +83,7 @@ vi.mock('@/components/education/TeacherProCheckoutCta', () => ({
 }));
 
 vi.mock('@/components/education/NoAccountCta', () => ({
-  NoAccountCta: () => <div data-testid="no-account-cta" />,
+  NoAccountCta: ({ ctaStyle }: { ctaStyle?: string }) => <div data-testid="no-account-cta" data-cta-style={ctaStyle} />,
 }));
 
 vi.mock('@/components/navigation/TopBackLink', () => ({
@@ -100,11 +100,18 @@ describe('Education Landing — first-screen declutter (R1)', () => {
   });
 
   describe('teacher host path is primary', () => {
-    it('shows a lime free-start CTA in the sticky header', () => {
+    it('keeps the sticky header free-start as an outline, so the hero lime CTA is the only primary on the first screen', () => {
       render(<EducationPageClient />);
       const start = screen.getByTestId('landing-header-start');
-      expect(start).toHaveClass('bg-neo-lime');
+      expect(start.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+      expect(start.className).not.toMatch(/(^|\s)shadow-hard/);
+      expect(start).toHaveClass('border-neo-cream');
       expect(start).toHaveAttribute('href', '/en/education/access');
+    });
+
+    it('passes the closing no-account join as a link, so it never sits as a second lime button under the final CTA', () => {
+      render(<EducationPageClient />);
+      expect(screen.getByTestId('no-account-cta')).toHaveAttribute('data-cta-style', 'link');
     });
 
     it('puts the hero before the Pro checkout card', () => {

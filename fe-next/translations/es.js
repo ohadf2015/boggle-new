@@ -20943,7 +20943,9 @@ const es = {
       "replayFailed": "No se pudo preparar la repetición. Inténtalo de nuevo.",
       "moreWords": "+{count} más",
       "notOnBoard": "no salió en el tablero",
-      "replayReady": "Listo. Jugar otra vez usará estas palabras."
+      "replayReady": "Listo. Jugar otra vez usará estas palabras.",
+      "useFullList": "Usar la lista completa",
+      "fullListFailed": "No se pudo volver a la lista completa. Inténtalo de nuevo."
     },
     "studentResults": {
       "placed": "Tu puesto",

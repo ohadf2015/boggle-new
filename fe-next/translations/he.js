@@ -3943,7 +3943,7 @@ const he = {
     "periodLabel": "תקופה",
     "periodRange": "{start} – {end}",
     "noValue": "—",
-    "allTime": "מאז ההתחלה: {xp} XP · {lessons} שיעורים הושלמו",
+    "allTime": "מאז ההתחלה: {lessons} שיעורים הושלמו · {xp} XP",
     "statWordsMeaning": "מילים שנלמדו מספיק טוב כדי להיחשב שלוטות.",
     "statAccuracy": "דיוק",
     "statAccuracyMeaning": "החלק מכל התשובות שהיו נכונות.",
@@ -20861,7 +20861,9 @@ const he = {
       "replayFailed": "לא הצלחנו להכין את הסיבוב. נסו שוב.",
       "moreWords": "ועוד {count}",
       "notOnBoard": "לא היה על הלוח",
-      "replayReady": "מוכן. בסיבוב הבא יהיו רק המילים האלה."
+      "replayReady": "מוכן. בסיבוב הבא יהיו רק המילים האלה.",
+      "useFullList": "חזרה לרשימה המלאה",
+      "fullListFailed": "לא הצלחנו לחזור לרשימה המלאה. נסו שוב."
     },
     "studentResults": {
       "placed": "המקום שלך",

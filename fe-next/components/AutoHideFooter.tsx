@@ -46,6 +46,8 @@ const GAME_ROUTES = new Set([
   'crossword',
   'word-tower',
   'word-craft',
+  // Private parent report: a parent reading (or printing) a child's progress gets no marketing footer.
+  'report',
 ]);
 
 // NO_FOOTER_ROUTES: admin panels + internal dev/test screens. No footer at all,

@@ -79,6 +79,8 @@ export interface ClassroomGame {
    * list until then.
    */
   placedVocabulary?: string[];
+  /** Set while `vocabularyWords` is narrowed for a replay; `pending` until that replay round starts. */
+  reteach?: { fullVocabularyWords: string[]; fullTargetWord?: string; pending: boolean };
   settings: ClassroomGameSettings;
   players: ClassroomGamePlayer[];
   createdAt: string;

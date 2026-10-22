@@ -20931,7 +20931,9 @@ const sv = {
       "replayFailed": "Det gick inte att förbereda omgången. Försök igen.",
       "moreWords": "+{count} till",
       "notOnBoard": "fanns inte på brädet",
-      "replayReady": "Klart. Spela igen använder nu de här orden."
+      "replayReady": "Klart. Spela igen använder nu de här orden.",
+      "useFullList": "Använd hela listan",
+      "fullListFailed": "Det gick inte att byta tillbaka till hela listan. Försök igen."
     },
     "studentResults": {
       "placed": "Din placering",

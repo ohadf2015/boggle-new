@@ -72,7 +72,7 @@ export function PageClient({ geo, faq }: { geo?: GeoAnswer; faq?: ReactNode }) {
       {faq}
       <LandingFinalCta setupPending={setupPending} />
       <div className="mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6 lg:px-8">
-        <NoAccountCta locale={language} compact />
+        <NoAccountCta locale={language} compact ctaStyle="link" />
       </div>
     </main>
   );

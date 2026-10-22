@@ -19990,7 +19990,9 @@ const en = {
       "replayFailed": "Couldn't set up the replay. Try again.",
       "moreWords": "+{count} more",
       "notOnBoard": "not on board",
-      "replayReady": "Set. Play again now uses these words."
+      "replayReady": "Set. Play again now uses these words.",
+      "useFullList": "Use the full list",
+      "fullListFailed": "Couldn't switch back to the full list. Try again."
     },
     "studentResults": {
       "placed": "You placed",

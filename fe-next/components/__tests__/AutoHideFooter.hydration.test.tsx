@@ -54,6 +54,14 @@ describe('AutoHideFooter - hydration + behavior', () => {
     expect(screen.queryByTestId('full-footer')).toBeNull();
   });
 
+  it('keeps the marketing footer off the private parent report (desktop gets the legal strip)', () => {
+    mockUsePathname.mockReturnValue('/he/report/some-token');
+    mockUseIsDesktop.mockReturnValue(true);
+    render(<AutoHideFooter />);
+    expect(screen.queryByTestId('full-footer')).toBeNull();
+    expect(renderToString(<AutoHideFooter />)).not.toContain('full-footer');
+  });
+
   it('renders NO footer at all on /admin (desktop) — not even the compact legal strip', () => {
     mockUseIsDesktop.mockReturnValue(true);
     mockUsePathname.mockReturnValue('/he/admin');

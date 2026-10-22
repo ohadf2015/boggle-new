@@ -123,6 +123,24 @@ describe('ClassroomResultsCard', () => {
     expect(onReteach).toHaveBeenCalledTimes(1);
   });
 
+  it('given the server is still narrowing the room, when shown, then the reteach button is busy and a refusal is said', () => {
+    const { rerender } = render(
+      <ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher onReteach={vi.fn()} reteachStatus="pending" />
+    );
+    expect(screen.getByTestId('play-reteach-round')).toBeDisabled();
+    rerender(<ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher onReteach={vi.fn()} reteachStatus="failed" />);
+    expect(screen.getByTestId('edu-replay-failed')).toBeInTheDocument();
+  });
+
+  it('given a replay set for later, when the teacher wants the whole lesson, then the full list is one tap away', () => {
+    const onRestoreFull = vi.fn();
+    render(
+      <ClassroomResultsCard summary={summary} username="Ms. Cohen" isTeacher onReteach={vi.fn()} reteachStatus="ready" onRestoreFull={onRestoreFull} />
+    );
+    fireEvent.click(screen.getByTestId('edu-use-full-list'));
+    expect(onRestoreFull).toHaveBeenCalledTimes(1);
+  });
+
   it('never offers a student the reteach round — only the teacher drives the class', () => {
     render(
       <ClassroomResultsCard summary={summary} username="Noa" isTeacher={false} onReteach={vi.fn()} />

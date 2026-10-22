@@ -73,4 +73,14 @@ describe('ReportInsights', () => {
     expect(container.querySelectorAll('bdi').length).toBeGreaterThan(0);
     expect(container.querySelector('[dir="ltr"]')).not.toBeNull();
   });
+
+  it('lets a lone word list and an odd last stat tile use the full row instead of leaving a hole', () => {
+    const onlyWeak = { ...rich, recentWins: [], longestStreak: 0, currentStreak: 0 };
+    render(<ReportInsights insights={onlyWeak} name="Ana" t={tFor('en')} />);
+    expect(screen.getByTestId('report-practice').parentElement?.className).not.toContain('grid-cols-2');
+    const tiles = screen.getByTestId('report-headline').children;
+    expect(tiles).toHaveLength(3);
+    expect(tiles[2].className).toContain('col-span-2');
+  });
 });
+

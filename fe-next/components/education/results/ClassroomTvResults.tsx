@@ -36,7 +36,6 @@ import { useRoundEndReveal } from './useRoundEndReveal';
 import { FINAL_STAGE, isRevealed } from '@/lib/education/roundEndStage';
 import { classSwept } from '@/lib/education/roundEndSweep';
 import { sessionKeyFor } from '@/lib/education/roundEndHistory';
-import { stageReteachLessonData } from '@/lib/education/classroomGameHandoff';
 import { projectorRecapShowsTeacherFollowUp } from '@/lib/education/roundEndResultsRoute';
 import { useSessionRoundHistory } from '@/hooks/useSessionRoundHistory';
 import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
@@ -48,10 +47,13 @@ import { cn } from '@/lib/utils';
 import { ZeroRoundNote } from './ZeroRoundNote';
 import { EmptyRoundCard } from './EmptyRoundCard';
 import { useReteachLinks } from './useReteachLinks';
+import { useReplayMissedWords } from '@/components/education/live/useReteachRound';
+import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import { useIsPhoneRecap } from './useIsPhoneRecap';
 import { buildTvRecap } from './tvRecapModel';
 import type { PlayerResult } from '@/types/components';
+import type { Socket } from 'socket.io-client';
 import { isPracticeRound } from './isPracticeRound';
 
 export interface ClassroomTvResultsProps {
@@ -67,6 +69,8 @@ export interface ClassroomTvResultsProps {
   onBackToClass?: () => void;
   /** Final scores: the class's numbers, the podium when the round carries none, and the words found when no lesson word landed. */
   players?: PlayerResult[];
+  gameCode?: string;
+  socket?: Socket | null;
 }
 
 export function ClassroomTvResults({
@@ -77,16 +81,15 @@ export function ClassroomTvResults({
   onChangeGame,
   onBackToClass,
   players,
+  gameCode,
+  socket,
 }: ClassroomTvResultsProps) {
   // Mounts only for the non-playing classroom host; the predicate still asks,
   // so a routing change drops the follow-up instead of doubling it.
   const showTeacherFollowUp = projectorRecapShowsTeacherFollowUp({ hostPlaying: false, hasClassroomSummary: true });
   const { language } = useLanguage();
   const links = useReteachLinks(summary, true);
-  const handleReteach = () => {
-    if (!stageReteachLessonData(summary)) return;
-    window.location.reload();
-  };
+  const reteach = useReplayMissedWords({ summary, gameCode, socket: socket ?? getSharedSocketIfExists(), onRematch });
 
   // A projector in front of thirty children is no place for an install banner.
   useOverlayQuietZoneClaim(true, 'classroom-tv-results');
@@ -227,7 +230,14 @@ export function ClassroomTvResults({
             reteachSlot={
               showTeacherFollowUp && summary.missedWords.length > 0 ? (
                 <div data-testid="classroom-tv-reteach">
-                  <ReteachActions links={links} onReteach={handleReteach} t={t} variant="more" />
+                  <ReteachActions
+                    links={links}
+                    onReteach={reteach.start}
+                    reteachStatus={reteach.status}
+                    onRestoreFull={reteach.restoreFull}
+                    t={t}
+                    variant="more"
+                  />
                 </div>
               ) : null
             }

@@ -17,7 +17,7 @@ vi.mock('../../utils/logger', () => ({
   default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
 }));
 
-import { setClassroomReteachWords } from '../classroomReteach';
+import { restoreClassroomFullLesson, setClassroomReteachWords } from '../classroomReteach';
 
 const GAME = {
   gameCode: 'ABC123',
@@ -85,4 +85,38 @@ describe('setClassroomReteachWords', () => {
     mockGetClassroomGame.mockResolvedValue(null);
     expect(await setClassroomReteachWords('ABC123', ['enzyme'])).toBeNull();
   });
+
+  it('given a reteach, when written, then the record keeps the full lesson so a later round can get it back', async () => {
+    await setClassroomReteachWords('ABC123', ['enzyme']);
+    expect(written().reteach).toEqual({ fullVocabularyWords: GAME.vocabularyWords, fullTargetWord: 'nucleus', pending: true });
+  });
 });
+
+describe('restoreClassroomFullLesson', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('given a narrowed room, when the teacher asks for the full list, then the record gets the lesson and target back', async () => {
+    mockGetClassroomGame.mockResolvedValue({
+      ...JSON.parse(JSON.stringify(GAME)),
+      vocabularyWords: ['enzyme'],
+      settings: { gameMode: 'classic', timerMinutes: 3 },
+      reteach: { fullVocabularyWords: GAME.vocabularyWords, fullTargetWord: 'nucleus', pending: true },
+    });
+    expect(await restoreClassroomFullLesson('ABC123')).toEqual(GAME.vocabularyWords);
+    expect(written().vocabularyWords).toEqual(GAME.vocabularyWords);
+    expect(written().settings.targetWord).toBe('nucleus');
+    expect(written().reteach).toBeUndefined();
+  });
+
+  it('given a room already on the full lesson, when restored, then it answers with the list and writes nothing', async () => {
+    mockGetClassroomGame.mockResolvedValue(JSON.parse(JSON.stringify(GAME)));
+    expect(await restoreClassroomFullLesson('ABC123')).toEqual(GAME.vocabularyWords);
+    expect(mockSetex).not.toHaveBeenCalled();
+  });
+
+  it('given an unknown game, when restored, then null', async () => {
+    mockGetClassroomGame.mockResolvedValue(null);
+    expect(await restoreClassroomFullLesson('ABC123')).toBeNull();
+  });
+});
+

@@ -31,6 +31,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ReteachLinks } from './useReteachLinks';
+import type { ReteachStatus } from '@/components/education/live/useReteachRound';
+import { ReteachStatusNote } from '@/components/education/live/ReteachStatusNote';
 
 const ACTION =
   'flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm text-center ' +
@@ -40,6 +42,8 @@ const ACTION =
 export interface ReteachActionsProps {
   links: ReteachLinks;
   onReteach?: () => void;
+  reteachStatus?: ReteachStatus;
+  onRestoreFull?: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
   /**
    * `stack` (default, the phone card): the pink reteach round is its own
@@ -57,7 +61,9 @@ function revealOpenPanel(event: SyntheticEvent<HTMLDetailsElement>) {
   details.querySelector('[data-testid="reteach-more-panel"]')?.scrollIntoView({ block: 'nearest', behavior: calm ? 'auto' : 'smooth' });
 }
 
-export function ReteachActions({ links, onReteach, t, variant = 'stack' }: ReteachActionsProps) {
+export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRestoreFull, t, variant = 'stack' }: ReteachActionsProps) {
+  const pending = reteachStatus === 'pending';
+  const statusNote = onReteach ? <ReteachStatusNote status={reteachStatus} onRestoreFull={onRestoreFull} t={t} /> : null;
   if (variant === 'more') {
     return (
       // `static`, not `relative`: the panel anchors to the ROW that holds
@@ -90,19 +96,24 @@ export function ReteachActions({ links, onReteach, t, variant = 'stack' }: Retea
             t={t}
             reteachSlot={
               onReteach && (
-                <button
-                  type="button"
-                  data-testid="play-reteach-round"
-                  onClick={onReteach}
-                  className={cn(
-                    'w-full flex items-center justify-center gap-2 px-4 py-3 font-neo-display font-bold text-base',
-                    'bg-neo-pink text-neo-black border-[3px] border-neo-black rounded-neo',
-                    'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
-                  )}
-                >
-                  <Play className="w-5 h-5" aria-hidden />
-                  {t('education.results.playReteachRound')}
-                </button>
+                <>
+                  <button
+                    type="button"
+                    data-testid="play-reteach-round"
+                    disabled={pending}
+                    aria-busy={pending}
+                    onClick={onReteach}
+                    className={cn(
+                      'w-full flex items-center justify-center gap-2 px-4 py-3 font-neo-display font-bold text-base',
+                      'bg-neo-pink text-neo-black border-[3px] border-neo-black rounded-neo',
+                      'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+                    )}
+                  >
+                    <Play className="w-5 h-5" aria-hidden />
+                    {t('education.results.playReteachRound')}
+                  </button>
+                  {statusNote}
+                </>
               )
             }
           />
@@ -117,6 +128,8 @@ export function ReteachActions({ links, onReteach, t, variant = 'stack' }: Retea
         <button
           type="button"
           data-testid="play-reteach-round"
+          disabled={pending}
+          aria-busy={pending}
           onClick={onReteach}
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3.5 font-neo-display font-bold text-base',
@@ -128,6 +141,7 @@ export function ReteachActions({ links, onReteach, t, variant = 'stack' }: Retea
           {t('education.results.playReteachRound')}
         </button>
       )}
+      {statusNote && <div className="mt-2">{statusNote}</div>}
 
       <details className="group mt-3 rounded-neo border-[3px] border-neo-cream bg-neo-navy overflow-hidden">
         <summary

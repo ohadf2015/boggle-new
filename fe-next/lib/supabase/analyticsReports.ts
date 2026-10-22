@@ -7,6 +7,7 @@
 
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import { fetchStudentInsights } from '@/lib/education/studentInsightsClient';
 import type {
   WordsAttemptedRecord,
   DateRange,
@@ -19,105 +20,56 @@ import type {
 } from './analyticsTypes';
 
 /**
- * Get student report data for PDF generation
+ * Get student report data for PDF generation. The headline numbers come from the
+ * shared student insights, so this report and the parent report always agree.
  */
 export async function getStudentReportData(
   studentId: string,
   classroomId: string,
-  lessonId?: string,
-  dateRange?: DateRange
+  dateRange?: DateRange,
+  fetcher: typeof fetch = fetch
 ): Promise<{ data: StudentReportData | null; error: { message: string } | null }> {
   if (!supabase) {
     return { data: null, error: { message: 'Supabase not configured' } };
   }
 
   try {
-    // Get student profile
-    const { data: student, error: studentError } = await supabase
-      .from('public_profiles')
-      .select('id, display_name, avatar_config')
-      .eq('id', studentId)
-      .single();
+    const [studentResult, classroomResult, progressResult, insightsResult] = await Promise.all([
+      supabase.from('public_profiles').select('id, display_name, avatar_config').eq('id', studentId).single(),
+      supabase.from('classrooms').select('id, name').eq('id', classroomId).single(),
+      supabase.from('student_lesson_progress').select('*').eq('student_id', studentId),
+      fetchStudentInsights(classroomId, studentId, fetcher),
+    ]);
+    const { data: student, error: studentError } = studentResult;
+    const { data: classroom, error: classroomError } = classroomResult;
+    const { data: progressData, error: progressError } = progressResult;
 
     if (studentError) {
       logger.error('Error fetching student:', studentError);
       return { data: null, error: { message: studentError.message } };
     }
-
-    // Get classroom info
-    const { data: classroom, error: classroomError } = await supabase
-      .from('classrooms')
-      .select('id, name')
-      .eq('id', classroomId)
-      .single();
-
     if (classroomError) {
       logger.error('Error fetching classroom:', classroomError);
       return { data: null, error: { message: classroomError.message } };
     }
-
-    // Get student's lesson progress
-    let progressQuery = supabase
-      .from('student_lesson_progress')
-      .select('*')
-      .eq('student_id', studentId);
-
-    if (lessonId) {
-      progressQuery = progressQuery.eq('lesson_id', lessonId);
-    }
-
-    const { data: progressData, error: progressError } = await progressQuery;
-
     if (progressError) {
       logger.error('Error fetching progress:', progressError);
       return { data: null, error: { message: progressError.message } };
     }
-
-    // Practice time + completed sessions. (These used to come from
-    // `student_xp_tracking`, a table that never existed — every report showed 0.)
-    let sessionsQuery = supabase
-      .from('practice_sessions')
-      .select('time_spent_seconds, duration_seconds, completed_at')
-      .eq('student_id', studentId);
-
-    if (lessonId) {
-      sessionsQuery = sessionsQuery.eq('lesson_id', lessonId);
+    if (!insightsResult.ok) {
+      logger.error('Error fetching student insights:', insightsResult.status);
+      return { data: null, error: { message: `Student insights unavailable (${insightsResult.status})` } };
     }
+    const insights = insightsResult.insights;
 
-    const { data: sessionRows, error: sessionsError } = await sessionsQuery;
-
-    if (sessionsError) {
-      logger.error('Error fetching practice sessions:', sessionsError);
-    }
-
-    const practiceSeconds = (sessionRows || []).reduce(
-      (sum, row) => sum + (row.time_spent_seconds || row.duration_seconds || 0),
-      0
-    );
-    const sessionsCompleted = (sessionRows || []).filter((row) => row.completed_at).length;
-    const currentStreak = Math.max(0, ...(progressData || []).map((p) => p.current_streak || 0));
-    const longestStreak = Math.max(0, ...(progressData || []).map((p) => p.longest_streak || 0));
-
-    // Calculate metrics from progress data
-    let totalWordsLearned = 0;
-    let totalWords = 0;
-    let totalCorrect = 0;
-    let totalAttempts = 0;
     const wordMasteryList: StudentReportData['wordMastery'] = [];
-
+    let totalAttempts = 0;
     progressData?.forEach((progress) => {
-      const masteredWords = progress.words_mastered?.length || 0;
       const attemptedWords = progress.words_attempted as WordsAttemptedRecord || {};
-
-      totalWordsLearned += masteredWords;
-
       Object.entries(attemptedWords).forEach(([word, data]) => {
-        totalWords++;
         const correct = data.correct || 0;
         const attempts = data.attempts || 0;
-        totalCorrect += correct;
         totalAttempts += attempts;
-
         wordMasteryList.push({
           word,
           mastered: (progress.words_mastered || []).includes(word),
@@ -128,27 +80,18 @@ export async function getStudentReportData(
       });
     });
 
-    const accuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
-
-    // Determine mastery level
+    const accuracy = insights.accuracy;
+    const score = accuracy ?? 0;
     let masteryLevel = 'beginner';
-    if (accuracy >= 90) masteryLevel = 'mastered';
-    else if (accuracy >= 70) masteryLevel = 'proficient';
-    else if (accuracy >= 50) masteryLevel = 'developing';
+    if (score >= 90) masteryLevel = 'mastered';
+    else if (score >= 70) masteryLevel = 'proficient';
+    else if (score >= 50) masteryLevel = 'developing';
 
-    // Generate recommendations — MACHINE CODES, translated at render via
-    // RECOMMENDATION_LABEL_KEY in StudentProgressReport (English used to leak
-    // from this layer onto reports in all six locales).
+    // Machine codes, translated at render via RECOMMENDATION_LABEL_KEY in StudentProgressReport.
     const recommendations: StudentRecommendation[] = [];
-    if (accuracy < 60) {
-      recommendations.push('low_accuracy_focus');
-    }
-    if (totalAttempts < 50) {
-      recommendations.push('practice_frequency');
-    }
-    if (wordMasteryList.filter(w => !w.mastered).length > 5) {
-      recommendations.push('mastery_work');
-    }
+    if (score < 60) recommendations.push('low_accuracy_focus');
+    if (totalAttempts < 50) recommendations.push('practice_frequency');
+    if (wordMasteryList.filter(w => !w.mastered).length > 5) recommendations.push('mastery_work');
 
     const reportData: StudentReportData = {
       studentId,
@@ -157,13 +100,13 @@ export async function getStudentReportData(
       classroomName: classroom.name,
       dateRange: dateRange || null,
       metrics: {
-        wordsLearned: totalWordsLearned,
-        totalWords: totalWords || 0,
+        wordsLearned: insights.wordsMastered,
+        totalWords: insights.wordsPracticed,
         accuracy,
-        practiceTimeMinutes: Math.round(practiceSeconds / 60),
-        currentStreak,
-        longestStreak,
-        sessionsCompleted,
+        practiceTimeMinutes: insights.totalMinutes,
+        currentStreak: insights.currentStreak,
+        longestStreak: insights.longestStreak,
+        sessionsCompleted: insights.sessionsCompleted,
         averageScore: accuracy,
         masteryLevel,
       },

@@ -9,7 +9,7 @@ import { ResultsDetailsContent } from '@/components/results/ResultsDetailsConten
 import BlastMpResults, { buildBlastMpResults } from '@/components/blast/legacy/BlastMpResults';
 import { resolveWheelRushStats } from '@/lib/results/wheelRushStatsFallback';
 import { toStandings } from '@/components/education/results/resultsStandings';
-import { stageReteachLessonData } from '@/lib/education/classroomGameHandoff';
+import { useReplayMissedWords } from '@/components/education/live/useReteachRound';
 import { modeSceneOwnsHeroSlot } from '@/lib/education/roundEndResultsRoute';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastPlayerStats, useWheelRushPlayerStats, useBlastBoardClearedByLocal } from '@/hooks/gameState/store';
@@ -100,16 +100,6 @@ function DetailsBody({ c }: { c: MpResultsController }) {
     currentUsername: username,
   }, [resolvedGameMode, wordHuntSummary, sortedScores, wordHuntEliminatedPlayers, wordHuntPlayerLives, username]);
 
-  // Teacher reteach: restage the lesson narrowed to the missed words, then
-  // reload so the session rehydrates it in the SAME room (students stay put).
-  const handleReteachRound = useCallback(() => {
-    if (!classroomSummary) return;
-    if (!stageReteachLessonData(classroomSummary)) {
-      logger.warn('[RESULTS] Could not stage reteach round');
-      return;
-    }
-    window.location.reload();
-  }, [classroomSummary]);
   // Teacher rematch: same lesson payload, same room — a plain reload rejoins it.
   const handleRematch = useCallback(() => {
     if (!classroomSummary) return;
@@ -121,6 +111,7 @@ function DetailsBody({ c }: { c: MpResultsController }) {
     }
     window.location.reload();
   }, [classroomSummary]);
+  const reteach = useReplayMissedWords({ summary: classroomSummary, gameCode, socket: props.socket ?? null, onRematch: handleRematch });
   const classroomStandings = useMemo(() => toStandings(sortedScores), [sortedScores]);
   const openLessonPractice = useOpenLessonPractice();
 
@@ -143,7 +134,9 @@ function DetailsBody({ c }: { c: MpResultsController }) {
         isTeacher={isHost}
         standings={classroomStandings}
         hideClassPlacings={hideClassPlacings}
-        onReteach={isHost && classroomSummary.missedWords.length > 0 ? handleReteachRound : undefined}
+        onReteach={isHost ? reteach.start : undefined}
+        reteachStatus={reteach.status}
+        onRestoreFull={reteach.restoreFull}
         onRematch={isHost ? handleRematch : undefined}
         onPractice={classroomSummary.lessonIds[0] ? () => openLessonPractice(classroomSummary.lessonIds[0]) : undefined}
       />

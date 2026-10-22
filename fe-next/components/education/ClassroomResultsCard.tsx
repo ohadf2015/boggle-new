@@ -45,6 +45,7 @@ import { ResultsPrimaryActions } from './results/ResultsPrimaryActions';
 import { StudentNextActions } from './results/StudentNextActions';
 import { useReteachLinks } from './results/useReteachLinks';
 import type { ClassroomSummary } from '@/shared/types/classroom';
+import type { ReteachStatus } from './live/useReteachRound';
 
 export interface ClassroomResultsCardProps {
   summary: ClassroomSummary;
@@ -54,6 +55,8 @@ export interface ClassroomResultsCardProps {
   onPractice?: () => void;
   /** Teacher-only: starts a new round on exactly the words the class missed. */
   onReteach?: () => void;
+  reteachStatus?: ReteachStatus;
+  onRestoreFull?: () => void;
   /** Teacher-only: same list, same code — a new round without recreating the room. */
   onRematch?: () => void;
   /** Student-only: re-launch the same game mode+settings (play again). */
@@ -80,6 +83,8 @@ export function ClassroomResultsCard({
   isTeacher,
   onPractice,
   onReteach,
+  reteachStatus,
+  onRestoreFull,
   onRematch,
   onPlayAgain,
   standings,
@@ -304,7 +309,7 @@ export function ClassroomResultsCard({
               </div>
             )}
 
-            <ReteachActions links={links} onReteach={onReteach} t={t} />
+            <ReteachActions links={links} onReteach={onReteach} reteachStatus={reteachStatus} onRestoreFull={onRestoreFull} t={t} />
           </div>
         ) : (
           <p className="p-3 rounded-neo border border-neo-lime/40 bg-neo-lime/10 text-neo-white font-neo-body text-sm">

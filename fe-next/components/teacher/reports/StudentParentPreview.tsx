@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { StudentInsights } from '@/lib/education/studentInsights';
+import { fetchStudentInsights } from '@/lib/education/studentInsightsClient';
 import { ReportInsights, type ReportT } from '@/components/parentReport/ReportInsights';
 import { ShareParentReportButton } from '@/components/teacher/analytics/ShareParentReportButton';
 
@@ -22,13 +23,9 @@ export function StudentParentPreview({ classroomId, studentId, studentName }: St
   useEffect(() => {
     let live = true;
     setState({ status: 'loading' });
-    fetch(`/api/education/classroom/${classroomId}/members/${studentId}/insights`)
-      .then(async (res) => {
-        const body = await res.json().catch(() => null);
-        if (!live) return;
-        setState(res.ok && body?.ok && body.insights ? { status: 'ok', insights: body.insights } : { status: 'error' });
-      })
-      .catch(() => live && setState({ status: 'error' }));
+    fetchStudentInsights(classroomId, studentId).then((result) => {
+      if (live) setState(result.ok ? { status: 'ok', insights: result.insights } : { status: 'error' });
+    });
     return () => { live = false; };
   }, [classroomId, studentId]);
 

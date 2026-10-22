@@ -37,6 +37,20 @@ describe('education CTA tickets', () => {
     expect(heading.className).toContain('text-neo-pink-light');
   });
 
+  it('keeps the no-account join a solid lime button by default for the landings where it is the hero action', () => {
+    render(<NoAccountCta locale="en" />);
+    expect(screen.getByRole('link', { name: 'Play now — no sign-up' }).className).toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+  });
+
+  it('drops the no-account join to an underlined lime link when a page already has its own lime primary', () => {
+    render(<NoAccountCta locale="en" compact ctaStyle="link" />);
+    const link = screen.getByRole('link', { name: 'Play now — no sign-up' });
+    expect(link.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+    expect(link.className).not.toMatch(/shadow-hard/);
+    expect(link.className).toContain('underline');
+    expect(link).toHaveAttribute('href', '/en/education/classroom-game');
+  });
+
   it('puts navy ink on the pink Teacher Pro button', () => {
     render(<TeacherProCheckoutCta locale="en" />);
     const link = screen.getByTestId('teacher-pro-checkout-link');

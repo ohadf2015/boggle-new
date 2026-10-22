@@ -12,6 +12,7 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { getStudentReportData } from '../analyticsReports';
 import { supabase } from '@/lib/supabase';
+import { buildStudentInsights } from '@/lib/education/studentInsights';
 
 vi.mock('@/lib/supabase', () => ({ supabase: { from: vi.fn() } }));
 
@@ -54,17 +55,25 @@ describe('getStudentReportData — streak / time / session metrics', () => {
     });
   });
 
+  // Metrics now come from the shared insights route (completed sessions in this classroom only); see analyticsReports.parity.test.ts.
+  const insights = buildStudentInsights({
+    progressRows: TABLES.student_lesson_progress.data as never,
+    sessionRows: (TABLES.practice_sessions.data as Array<Record<string, unknown>>).filter((r) => r.completed_at) as never,
+    now: new Date('2026-09-12T00:00:00Z'),
+  });
+  const fetcher = (async () => new Response(JSON.stringify({ ok: true, insights }), { status: 200 })) as unknown as typeof fetch;
+
   it('never queries the non-existent student_xp_tracking table', async () => {
-    await getStudentReportData('s1', 'c1');
+    await getStudentReportData('s1', 'c1', undefined, fetcher);
     expect((supabase!.from as Mock).mock.calls.map((c) => c[0])).not.toContain('student_xp_tracking');
   });
 
   it('derives streaks from lesson progress and time/sessions from practice_sessions', async () => {
-    const { data, error } = await getStudentReportData('s1', 'c1');
+    const { data, error } = await getStudentReportData('s1', 'c1', undefined, fetcher);
     expect(error).toBeNull();
     expect(data!.metrics.currentStreak).toBe(3);
     expect(data!.metrics.longestStreak).toBe(7);
-    expect(data!.metrics.practiceTimeMinutes).toBe(9); // (300 + 150 + 90) / 60
+    expect(data!.metrics.practiceTimeMinutes).toBe(8); // (300 + 150) / 60; the unfinished session no longer counts
     expect(data!.metrics.sessionsCompleted).toBe(2);
   });
 });

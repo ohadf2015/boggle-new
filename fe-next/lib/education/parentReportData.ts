@@ -35,6 +35,16 @@ export type ParentReportResult =
 
 const RECENT_ACTIVITY_LIMIT = 5;
 
+function latestPerDay(newestFirst: string[]): string[] {
+  const seen = new Set<string>();
+  return newestFirst.filter((at) => {
+    const day = at.slice(0, 10);
+    if (seen.has(day)) return false;
+    seen.add(day);
+    return true;
+  });
+}
+
 async function loadTeacherName(admin: InsightsClient, teacherId: string | null | undefined): Promise<string | undefined> {
   if (!teacherId) return undefined;
   const { data, error } = await admin
@@ -85,7 +95,7 @@ export async function loadParentReportData(
       totalXp: insights.totalXp,
       lessonsCompleted: insights.lessonsCompleted,
       wordsMastered: insights.wordsMastered,
-      recentActivity: recentSessions.slice(0, RECENT_ACTIVITY_LIMIT).map((completedAt) => ({ completedAt })),
+      recentActivity: latestPerDay(recentSessions).slice(0, RECENT_ACTIVITY_LIMIT).map((completedAt) => ({ completedAt })),
       classroomName: classroom?.name || undefined,
       teacherName,
       generatedAt: now.toISOString(),

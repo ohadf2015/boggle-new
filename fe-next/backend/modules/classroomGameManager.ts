@@ -9,6 +9,7 @@ import { getRedisClient } from '../redisClient';
 import type { ClassroomTeam } from '@/shared/utils/teamBattle';
 import logger from '../utils/logger';
 import { isClassroomSessionEnded } from './classroomGameSessionState';
+import { advanceReteachForRound } from './classroomReteachRound';
 import type { ClassroomSessionScores } from './classroomSessionScores';
 
 /** Exported so in-place settings edits (classroomGameSettings) re-use ONE TTL. */
@@ -367,6 +368,7 @@ async function markRoundLive(game: ClassroomGame): Promise<void> {
   if (isClassroomSessionEnded(game)) return;
 
   const redis = getRedis();
+  advanceReteachForRound(game);
   game.status = 'playing';
   if (!game.startedAt) game.startedAt = new Date().toISOString();
 

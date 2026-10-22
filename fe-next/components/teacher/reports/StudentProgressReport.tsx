@@ -29,16 +29,15 @@ import {
 export interface StudentProgressReportProps {
   studentId: string;
   classroomId: string;
-  lessonId?: string;
   dateRange?: DateRange;
 }
 
-export function StudentProgressReport({ studentId, classroomId, lessonId, dateRange }: StudentProgressReportProps) {
+export function StudentProgressReport({ studentId, classroomId, dateRange }: StudentProgressReportProps) {
   const { t, language, dir } = useLanguage();
 
   const load = useCallback(
-    () => getStudentReportData(studentId, classroomId, lessonId, dateRange),
-    [studentId, classroomId, lessonId, dateRange]
+    () => getStudentReportData(studentId, classroomId, dateRange),
+    [studentId, classroomId, dateRange]
   );
   const { data, loading, failed, retry } = useReportData(load);
 
@@ -82,7 +81,7 @@ export function StudentProgressReport({ studentId, classroomId, lessonId, dateRa
       <section aria-label={t('teacher.reports.sections.summary')} className="space-y-5">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <Stat value={`${metrics.wordsLearned} / ${metrics.totalWords}`} label={t('teacher.reports.metrics.wordsLearned')} size="lg" className="w-full" />
-          <Stat value={`${metrics.accuracy}%`} label={t('teacher.reports.metrics.accuracy')} size="lg" className="w-full" />
+          <Stat value={metrics.accuracy === null ? t('parentReport.noValue') : `${metrics.accuracy}%`} label={t('teacher.reports.metrics.accuracy')} size="lg" className="w-full" />
           <Stat value={formatPracticeMinutes(t, metrics.practiceTimeMinutes)} label={t('teacher.reports.metrics.practiceTime')} size="lg" className="w-full" />
           <Stat value={t('teacher.reports.streakDays', { count: metrics.currentStreak })} label={t('teacher.reports.metrics.currentStreak')} size="lg" className="w-full" />
         </div>
@@ -92,7 +91,7 @@ export function StudentProgressReport({ studentId, classroomId, lessonId, dateRa
         <dl className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
           {[
             [t('teacher.reports.metrics.sessionsCompleted'), metrics.sessionsCompleted],
-            [t('teacher.reports.metrics.averageScore'), metrics.averageScore],
+            [t('teacher.reports.metrics.averageScore'), metrics.averageScore ?? t('parentReport.noValue')],
             [t('teacher.reports.metrics.longestStreak'), t('teacher.reports.streakDays', { count: metrics.longestStreak })],
           ].map(([label, value]) => (
             <div key={String(label)} className="flex items-baseline gap-2">

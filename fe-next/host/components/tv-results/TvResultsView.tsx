@@ -239,7 +239,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
   // The general game's results are untouched below.
   if (classroomSummary) {
     return (
-      <ClassroomTvResultsScreen summary={classroomSummary} players={finalScores} onRematch={onStartNewGame} onClose={onClose} onExitRoom={onExitRoom} t={t} />
+      <ClassroomTvResultsScreen summary={classroomSummary} players={finalScores} onRematch={onStartNewGame} onClose={onClose} onExitRoom={onExitRoom} gameCode={gameCode} socket={socket} t={t} />
     );
   }
 

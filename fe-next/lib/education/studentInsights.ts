@@ -46,6 +46,8 @@ export interface StudentInsights {
   accuracy: number | null;
   currentStreak: number;
   longestStreak: number;
+  totalMinutes: number;
+  sessionsCompleted: number;
   thisWeek: WeekActivity;
   lastWeek: WeekActivity;
   wordsToPractice: WordInsight[];
@@ -96,6 +98,8 @@ function tallyWords(rows: InsightProgressRow[]): Map<string, WordTally> {
   return words;
 }
 
+const sessionSeconds = (row: InsightSessionRow): number => num(row.time_spent_seconds) || num(row.duration_seconds);
+
 function weekOf(rows: InsightSessionRow[], from: number, to: number): WeekActivity {
   let sessions = 0;
   let seconds = 0;
@@ -107,7 +111,7 @@ function weekOf(rows: InsightSessionRow[], from: number, to: number): WeekActivi
     const at = Date.parse(row.completed_at);
     if (!(at > from && at <= to)) continue;
     sessions += 1;
-    seconds += num(row.time_spent_seconds) || num(row.duration_seconds);
+    seconds += sessionSeconds(row);
     correct += num(row.words_correct);
     attempted += num(row.words_attempted);
     days.add(new Date(at).toISOString().slice(0, 10));
@@ -171,6 +175,8 @@ export function buildStudentInsights(input: {
     .slice(0, LIST_LIMIT)
     .map(toInsight);
 
+  const completedSessions = sessionRows.filter((row) => row.completed_at);
+  const totalSeconds = completedSessions.reduce((sum, row) => sum + sessionSeconds(row), 0);
   const thisWeek = weekOf(sessionRows, now - WEEK_MS, now);
   const lastWeek = weekOf(sessionRows, now - 2 * WEEK_MS, now - WEEK_MS);
 
@@ -185,6 +191,8 @@ export function buildStudentInsights(input: {
     accuracy: pct(correct, attempts),
     currentStreak,
     longestStreak,
+    totalMinutes: Math.round(totalSeconds / 60),
+    sessionsCompleted: completedSessions.length,
     thisWeek,
     lastWeek,
     wordsToPractice,

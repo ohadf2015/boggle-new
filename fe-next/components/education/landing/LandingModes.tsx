@@ -44,8 +44,8 @@ export function LandingModes() {
               m.reveal
             )}
           >
-            <div className={cn('relative grid size-16 shrink-0 place-items-end overflow-hidden rounded-neo border-2 border-neo-black md:h-32 md:w-full md:rounded-none md:border-0 md:border-b-3', ACCENT_BG[mode.accent])}>
-              <Image src={mode.poster} alt="" aria-hidden="true" width={128} height={128} className={cn('mx-auto h-full w-auto object-contain object-bottom', m.modeArt)} />
+            <div className={cn('relative size-16 shrink-0 overflow-hidden rounded-neo border-2 border-neo-black md:h-32 md:w-full md:rounded-none md:border-0 md:border-b-3', ACCENT_BG[mode.accent])}>
+              <Image src={mode.poster} alt="" aria-hidden="true" width={128} height={128} className={cn('absolute inset-0 size-full object-contain object-bottom', m.modeArt)} />
             </div>
             <div className="min-w-0 flex-1 md:px-4 md:pb-4">
               <div className="flex flex-wrap items-center gap-2">
@@ -65,8 +65,8 @@ export function LandingModes() {
             data-testid="landing-mode-card"
             className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light py-1.5 pe-2 ps-1.5"
           >
-            <span className={`grid size-8 shrink-0 place-items-end overflow-hidden rounded-neo-sm border-2 border-neo-black ${ACCENT_BG[mode.accent]}`}>
-              <Image src={mode.poster} alt="" aria-hidden="true" width={32} height={32} className="h-full w-auto object-contain" />
+            <span className={`relative size-8 shrink-0 overflow-hidden rounded-neo-sm border-2 border-neo-black ${ACCENT_BG[mode.accent]}`}>
+              <Image src={mode.poster} alt="" aria-hidden="true" width={32} height={32} className="absolute inset-0 size-full object-contain object-bottom" />
             </span>
             <span className="font-neo-display text-sm font-black text-neo-white">{t(mode.nameKey)}</span>
             <DeliveryTag delivery={mode.delivery} t={t} className="bg-neo-cream/15" />

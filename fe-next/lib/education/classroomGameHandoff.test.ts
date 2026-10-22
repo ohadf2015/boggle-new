@@ -15,11 +15,9 @@
 
 import { describe, it, expect } from 'vitest';
 import {
-  buildReteachLessonData,
   classroomMultiplayerPath,
   shouldLoadLessonData,
   socketTeacherName,
-  stageReteachLessonData,
 } from './classroomGameHandoff';
 import { UsernameSchema } from '@/shared/schemas/socketSchemas';
 
@@ -48,95 +46,6 @@ describe('shouldLoadLessonData', () => {
     expect(shouldLoadLessonData('?room=ABC123')).toBe(false);
     expect(shouldLoadLessonData('')).toBe(false);
     expect(shouldLoadLessonData('?classroom=false')).toBe(false);
-  });
-});
-
-describe('buildReteachLessonData', () => {
-  const summary = {
-    missedWords: ['neutron', 'photon'],
-    lessonIds: ['lesson-1', 'lesson-2'],
-    lessonNames: ['Physics 101'],
-  };
-
-  const previous = {
-    lessonId: 'lesson-1,lesson-2',
-    lessonName: 'Physics 101',
-    vocabularyWords: ['neutron', 'photon', 'atom'],
-    language: 'en',
-    gameMode: 'word-hunt',
-    targetWord: 'atom',
-    templateSettings: {
-      timerSeconds: 180,
-      difficulty: 'medium',
-      minWordLength: 3,
-      allowLateJoin: true,
-    },
-  };
-
-  it('returns null when there is nothing to reteach', () => {
-    expect(buildReteachLessonData(previous, { ...summary, missedWords: [] })).toBeNull();
-  });
-
-  it('narrows the vocabulary to only the words nobody found', () => {
-    const reteach = buildReteachLessonData(previous, summary);
-    expect(reteach?.vocabularyWords).toEqual(['neutron', 'photon']);
-  });
-
-  it('carries over the teacher\'s mode, language, and board settings from the round just played', () => {
-    const reteach = buildReteachLessonData(previous, summary);
-    expect(reteach?.gameMode).toBe('word-hunt');
-    expect(reteach?.language).toBe('en');
-    expect(reteach?.templateSettings).toEqual(previous.templateSettings);
-    expect(reteach?.lessonId).toBe(previous.lessonId);
-    expect(reteach?.lessonName).toBe(previous.lessonName);
-  });
-
-  it('clears the pinned word-hunt target — it may be a word the class already found', () => {
-    const reteach = buildReteachLessonData(previous, summary);
-    expect(reteach?.targetWord).toBe('');
-  });
-
-  it('falls back to the summary\'s lesson ids and names when the stored payload is gone', () => {
-    const reteach = buildReteachLessonData(null, summary);
-    expect(reteach?.lessonId).toBe('lesson-1,lesson-2');
-    expect(reteach?.lessonName).toBe('Physics 101');
-    expect(reteach?.vocabularyWords).toEqual(['neutron', 'photon']);
-  });
-
-  it('returns null rather than staging a payload the session reader would reject', () => {
-    // useMultiplayerSession discards lesson data without lessonId/lessonName —
-    // staging one anyway would silently re-run the FULL lesson instead.
-    expect(
-      buildReteachLessonData(null, { missedWords: ['neutron'], lessonIds: [], lessonNames: [] })
-    ).toBeNull();
-  });
-});
-
-describe('stageReteachLessonData — same staging the phone results page uses', () => {
-  const summary = {
-    missedWords: ['neutron', 'photon'],
-    lessonIds: ['lesson-1'],
-    lessonNames: ['Physics 101'],
-  };
-
-  it('writes the narrowed reteach payload into lessonGameData', () => {
-    sessionStorage.setItem(
-      'lessonGameData',
-      JSON.stringify({
-        lessonId: 'lesson-1',
-        lessonName: 'Physics 101',
-        vocabularyWords: ['neutron', 'photon', 'atom'],
-        gameMode: 'classic',
-      })
-    );
-    expect(stageReteachLessonData(summary)).toBe(true);
-    const stored = JSON.parse(sessionStorage.getItem('lessonGameData') ?? '{}');
-    expect(stored.vocabularyWords).toEqual(['neutron', 'photon']);
-    expect(stored.gameMode).toBe('classic');
-  });
-
-  it('returns false when there is nothing to reteach — never reload the full lesson', () => {
-    expect(stageReteachLessonData({ ...summary, missedWords: [] })).toBe(false);
   });
 });
 

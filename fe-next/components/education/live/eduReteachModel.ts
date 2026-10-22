@@ -36,6 +36,12 @@ export function mostMissedWords(summary: ClassroomSummary): MissedWord[] {
     .sort((a, b) => a.found - b.found);
 }
 
+/** What a replay sends: every lesson word unfound is the whole lesson again, which is Play again, not a replay. */
+export function reteachList(summary: ClassroomSummary): MissedWord[] {
+  const struggled = mostMissedWords(summary);
+  return struggled.length < summary.totalWords ? struggled : [];
+}
+
 /** How many students found under half the lesson. A count only: the projector never names a struggling child. */
 export function studentsUnderHalf(summary: ClassroomSummary): number {
   const students = studentNames(summary);

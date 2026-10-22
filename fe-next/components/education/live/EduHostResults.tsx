@@ -35,8 +35,8 @@ import { useSearchParams } from 'next/navigation';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import { PRESS, PRIMARY_BUTTON, SECONDARY_BUTTON, type Translate } from './eduLiveStyles';
 import { EduReteachPanel } from './EduReteachPanel';
-import { mostMissedWords, studentsUnderHalf } from './eduReteachModel';
-import { useReteachRound } from './useReteachRound';
+import { studentsUnderHalf } from './eduReteachModel';
+import { useReplayMissedWords } from './useReteachRound';
 
 function Actions({ t, onRematch, onClose, onExitRoom }: Pick<ClassroomTvResultsScreenProps, 'onRematch' | 'onClose' | 'onExitRoom'> & { t: Translate }) {
   return (
@@ -75,7 +75,7 @@ function Actions({ t, onRematch, onClose, onExitRoom }: Pick<ClassroomTvResultsS
   );
 }
 
-export function EduHostResults({ summary, players, t, onRematch, onClose, onExitRoom }: ClassroomTvResultsScreenProps) {
+export function EduHostResults({ summary, players, t, onRematch, onClose, onExitRoom, gameCode: roomCode, socket }: ClassroomTvResultsScreenProps) {
   const { language } = useLanguage();
   const phone = useIsPhoneRecap();
   const { podium, outcome, landed, stats } = buildTvRecap(summary, players, t);
@@ -92,11 +92,10 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
     classFoundCount: summary.classFoundCount,
     neverPlacedCount: summary.neverPlacedWords ? neverPlaced.size : undefined,
   });
-  const gameCode = useSearchParams()?.get('room') ?? null;
-  const struggled = onRematch ? mostMissedWords(summary) : [];
-  // Every word unfound is the whole lesson again: that is Play again, not a reteach.
-  const missed = struggled.length < summary.totalWords ? struggled : [];
-  const reteach = useReteachRound({ gameCode, socket: getSharedSocketIfExists(), summary, onApplied: () => onRematch?.() });
+  const roomParam = useSearchParams()?.get('room') ?? null;
+  const gameCode = roomCode || roomParam;
+  const reteach = useReplayMissedWords({ summary, gameCode, socket: socket ?? getSharedSocketIfExists(), onRematch });
+  const missed = reteach.missed;
 
   return (
     <div
@@ -169,7 +168,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
             />
           )}
           <Actions t={t} onRematch={onRematch} onClose={onClose} onExitRoom={onExitRoom} />
-          <EduReteachPanel words={missed} underHalf={studentsUnderHalf(summary)} status={reteach.status} onReplay={reteach.replay} t={t} />
+          <EduReteachPanel words={missed} underHalf={studentsUnderHalf(summary)} status={reteach.status} onReplay={reteach.replay} onRestoreFull={reteach.restoreFull} t={t} />
           {summary.totalWords > 0 && (
             // With the boss card up, a short wall keeps the words to reteach over the report teaser.
             <div className={cn(!phone && bossOver && 'lg:[@media(max-height:900px)]:hidden')}>

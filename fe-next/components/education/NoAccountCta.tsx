@@ -73,6 +73,7 @@ export function NoAccountCta({
   className = '',
   copy,
   compact = false,
+  ctaStyle = 'button',
 }: {
   locale: string;
   className?: string;
@@ -80,6 +81,8 @@ export function NoAccountCta({
   copy?: NoAccountCopy;
   /** Heading and button only, for a page that already explains the join. */
   compact?: boolean;
+  /** `link` when the page already has its own lime primary nearby. */
+  ctaStyle?: 'button' | 'link';
 }): React.JSX.Element {
   const c = copy ?? noAccountCopy(locale);
   return (
@@ -94,7 +97,11 @@ export function NoAccountCta({
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
         <Link
           href={`/${locale}${QUICK_PLAY_PATH}`}
-          className="inline-flex min-h-11 items-center rounded-neo border-2 border-neo-black bg-neo-lime px-5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed"
+          className={
+            ctaStyle === 'link'
+              ? 'inline-flex min-h-11 items-center font-neo-display text-base font-bold text-neo-lime underline decoration-2 underline-offset-4 hover:text-neo-lime-light'
+              : 'inline-flex min-h-11 items-center rounded-neo border-2 border-neo-black bg-neo-lime px-5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed'
+          }
         >
           {c.cta}
         </Link>

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { Socket } from 'socket.io';
 
 import { getClassroomGame } from '../modules/classroomGameManager.js';
-import { setClassroomReteachWords } from '../modules/classroomReteach.js';
+import { restoreClassroomFullLesson, setClassroomReteachWords } from '../modules/classroomReteach.js';
 import { getAuthUserId } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { gameCodeSchema } from '../utils/socketValidation.js';
@@ -14,22 +14,31 @@ const reteachSchema = z.object({
   gameCode: gameCodeSchema,
   words: z.array(z.string().trim().min(1).max(40)).min(1).max(100),
 });
+const restoreSchema = z.object({ gameCode: gameCodeSchema });
 
-/** Every refusal emits: a teacher who taps "replay missed words" must never see nothing happen. */
-export function registerClassroomReteachHandlers(socket: Socket): void {
-  socket.on('classroomReteachWords', async (data: unknown) => {
+interface Route<T> {
+  event: string;
+  schema: z.ZodType<T>;
+  applied: string;
+  refused: string;
+  apply: (data: T) => Promise<string[] | null>;
+}
+
+/** Every refusal emits: a teacher who taps a replay control must never see nothing happen. */
+function registerTeacherRoomChange<T extends { gameCode: string }>(socket: Socket, route: Route<T>): void {
+  socket.on(route.event, async (data: unknown) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
-    const parsed = reteachSchema.safeParse(data);
+    const parsed = route.schema.safeParse(data);
     const gameCode = (data as { gameCode?: unknown } | null)?.gameCode;
-    const refuse = () => socket.emit('classroomReteachRefused', { error: RETEACH_FAILED, gameCode: typeof gameCode === 'string' ? gameCode : undefined });
+    const refuse = () => socket.emit(route.refused, { error: RETEACH_FAILED, gameCode: typeof gameCode === 'string' ? gameCode : undefined });
     if (!parsed.success) {
       refuse();
       return;
     }
-    const { gameCode: code, words } = parsed.data as { gameCode: string; words: string[] };
+    const code = parsed.data.gameCode;
 
     try {
       const authUserId = getAuthUserId(socket);
@@ -38,16 +47,33 @@ export function registerClassroomReteachHandlers(socket: Socket): void {
         refuse();
         return;
       }
-      const applied = await setClassroomReteachWords(code, words);
-      if (!applied) {
+      const words = await route.apply(parsed.data);
+      if (!words) {
         refuse();
         return;
       }
-      socket.emit('classroomReteachApplied', { gameCode: code, words: applied });
+      socket.emit(route.applied, { gameCode: code, words });
     } catch (error) {
-      logger.error('CLASSROOM_GAME', `Reteach failed for ${code}: ${error}`);
+      logger.error('CLASSROOM_GAME', `${route.event} failed for ${code}: ${error}`);
       refuse();
     }
+  });
+}
+
+export function registerClassroomReteachHandlers(socket: Socket): void {
+  registerTeacherRoomChange(socket, {
+    event: 'classroomReteachWords',
+    schema: reteachSchema as z.ZodType<{ gameCode: string; words: string[] }>,
+    applied: 'classroomReteachApplied',
+    refused: 'classroomReteachRefused',
+    apply: ({ gameCode, words }) => setClassroomReteachWords(gameCode, words),
+  });
+  registerTeacherRoomChange(socket, {
+    event: 'classroomRestoreFullLesson',
+    schema: restoreSchema as z.ZodType<{ gameCode: string }>,
+    applied: 'classroomFullLessonRestored',
+    refused: 'classroomFullLessonRefused',
+    apply: ({ gameCode }) => restoreClassroomFullLesson(gameCode),
   });
 }
 

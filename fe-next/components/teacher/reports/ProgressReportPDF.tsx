@@ -34,12 +34,12 @@ export interface StudentReportPDFData {
   metrics: {
     wordsLearned: number;
     totalWords: number;
-    accuracy: number;
+    accuracy: number | null;
     practiceTimeMinutes: number;
     currentStreak: number;
     longestStreak: number;
     sessionsCompleted: number;
-    averageScore: number;
+    averageScore: number | null;
     masteryLevel: string;
   };
   wordMastery: Array<{ word: string; mastered: boolean; accuracy: number; attempts: number }>;
@@ -236,7 +236,7 @@ function StudentReport({ data, t, language, s }: { data: StudentReportPDFData; t
         s={s}
         items={[
           { label: t('teacher.reports.metrics.wordsLearned'), value: `${metrics.wordsLearned} / ${metrics.totalWords}` },
-          { label: t('teacher.reports.metrics.accuracy'), value: `${metrics.accuracy}%` },
+          { label: t('teacher.reports.metrics.accuracy'), value: metrics.accuracy === null ? t('parentReport.noValue') : `${metrics.accuracy}%` },
           { label: t('teacher.reports.metrics.practiceTime'), value: formatPracticeMinutes(t, metrics.practiceTimeMinutes) },
           { label: t('teacher.reports.metrics.currentStreak'), value: t('teacher.reports.streakDays', { count: metrics.currentStreak }) },
         ]}
@@ -253,7 +253,7 @@ function StudentReport({ data, t, language, s }: { data: StudentReportPDFData; t
         <View style={s.inlineStats}>
           {[
             `${t('teacher.reports.metrics.sessionsCompleted')}: ${metrics.sessionsCompleted}`,
-            `${t('teacher.reports.metrics.averageScore')}: ${metrics.averageScore}`,
+            `${t('teacher.reports.metrics.averageScore')}: ${metrics.averageScore ?? t('parentReport.noValue')}`,
             `${t('teacher.reports.metrics.longestStreak')}: ${t('teacher.reports.streakDays', { count: metrics.longestStreak })}`,
           ].map((line) => (
             <View key={line} style={s.grow}>
