@@ -139,7 +139,7 @@ export default async function WordsHubPage({ params }: PageParams) {
 
         <InlineBannerAd webZone="content-page" className="my-6" />
 
-        <EsScrabbleCrossLink locale={locale} anchorVariant="words" />
+        <EsScrabbleCrossLink locale={locale} anchorVariant="words" queryAnchor />
         <SvScrabbleCrossLink locale={locale} anchorVariant="words" />
         <EnBoggleCrossLink locale={locale} anchorVariant="words" />
         <HeScrabbleCrossLink locale={locale} anchorVariant="words" />

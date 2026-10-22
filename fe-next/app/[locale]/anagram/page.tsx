@@ -387,7 +387,7 @@ export default async function AnagramHubPage({ params }: PageParams) {
           </ol>
         </section>
 
-        <EsScrabbleCrossLink locale={locale} anchorVariant="anagram" />
+        <EsScrabbleCrossLink locale={locale} anchorVariant="anagram" queryAnchor />
         <SvScrabbleCrossLink locale={locale} anchorVariant="anagram" />
         <EnBoggleCrossLink locale={locale} anchorVariant="anagram" />
         <HeScrabbleCrossLink locale={locale} anchorVariant="anagram" />

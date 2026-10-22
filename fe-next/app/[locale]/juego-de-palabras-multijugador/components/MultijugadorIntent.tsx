@@ -23,7 +23,7 @@ export function MultijugadorIntent({ locale }: { locale: string }) {
           Minijuegos, JuegoSpot y Locura de Letras son Scrabble contra el ordenador. El
           Club de Scrabble de Internet sí es multijugador, pero pide cuenta y un cliente.
           Aquí: pulsa Crear sala, pega el enlace en WhatsApp, y la sala se llena. Sin app,
-          sin registro, diccionario español (Ñ incluida).
+          sin registrarse, diccionario español (Ñ incluida).
         </p>
         <p>
           ¿Solo quieres practicar? Hay bots. ¿Quieres la partida de verdad?{' '}

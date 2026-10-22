@@ -5,6 +5,8 @@ type AnchorVariant = 'words' | 'anagram' | 'daily' | 'leaderboard' | 'blog' | 'h
 interface Props {
   locale: string;
   anchorVariant: AnchorVariant;
+  /** Exact-query anchor for GR #11111. Off by default so other anchors stay diverse. */
+  queryAnchor?: boolean;
 }
 
 const ANCHORS: Record<AnchorVariant, { text: string; tagline: string }> = {
@@ -38,7 +40,7 @@ const ANCHORS: Record<AnchorVariant, { text: string; tagline: string }> = {
   },
 };
 
-export function EsScrabbleCrossLink({ locale, anchorVariant }: Props) {
+export function EsScrabbleCrossLink({ locale, anchorVariant, queryAnchor = false }: Props) {
   if (locale !== 'es') return null;
   const { text, tagline } = ANCHORS[anchorVariant];
   return (
@@ -52,6 +54,14 @@ export function EsScrabbleCrossLink({ locale, anchorVariant }: Props) {
         </h3>
         <p className="mt-2 text-sm text-slate-300">{tagline}</p>
       </Link>
+      {queryAnchor ? (
+        <Link
+          href="/es/juego-de-palabras-multijugador"
+          className="mt-3 block text-sm font-bold text-neo-cyan underline decoration-2 underline-offset-4"
+        >
+          scrabble español online gratis sin registrarse
+        </Link>
+      ) : null}
     </aside>
   );
 }

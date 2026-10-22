@@ -44,14 +44,16 @@ describe('Spanish MP landing — composition', () => {
   it('HeroAnimated renders title, all hero tiles, both CTAs and stats', () => {
     render(<HeroAnimated locale="es" />);
     const heading = screen.getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent('Juega Scrabble online español multijugador');
+    expect(heading).toHaveTextContent('Juega gratis Scrabble español sin registrarse');
+    expect(screen.getByText('Scrabble español online gratis sin registrarse')).toBeInTheDocument();
+    expect(screen.getAllByText(/sin email/i).length).toBeGreaterThan(0);
     HERO_TILES.forEach((tile, i) => {
       // Each tile letter shows up — match by exact text in a span
       const matches = screen.getAllByText(tile.ch);
       expect(matches.length).toBeGreaterThan(0);
       void i;
     });
-    expect(screen.getByRole('link', { name: /crear sala/i })).toHaveAttribute('href', '/es/multiplayer');
+    expect(screen.getByRole('link', { name: /jugar ahora/i })).toHaveAttribute('href', '/es/multiplayer');
     expect(screen.getByRole('link', { name: /probar solo/i })).toHaveAttribute('href', '/es/singleplayer?autoStart=bots');
     STATS.forEach((s) => {
       expect(screen.getByText(s.num)).toBeInTheDocument();

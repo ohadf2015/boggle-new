@@ -25,7 +25,7 @@ export const STATS = [
 
 export const FEATURES = [
   { icon: '⚡', text: 'Batallas en tiempo real con puntos al instante', accent: 'border-neo-pink shadow-hard-pink' },
-  { icon: '🔗', text: 'Crea sala e invita por enlace — sin registro', accent: 'border-neo-cyan shadow-hard-cyan' },
+  { icon: '🔗', text: 'Crea sala e invita por enlace — sin registrarse', accent: 'border-neo-cyan shadow-hard-cyan' },
   { icon: '📚', text: `Más de ${ES_DICT_FLOOR} palabras en español`, accent: 'border-neo-lime shadow-hard-lime' },
   { icon: '🎮', text: 'Modos múltiples: Boggle, Cazador, Explosión', accent: 'border-neo-purple shadow-hard' },
   { icon: '📅', text: 'Desafíos diarios con clasificaciones', accent: 'border-neo-pink shadow-hard-pink' },
@@ -38,7 +38,7 @@ export const STEPS = [
   {
     n: '01',
     title: 'Crea tu sala',
-    body: 'Un clic en "Crear sala" y listo. Sin formularios, sin email, sin esperas.',
+    body: 'Un clic en "Crear sala" y listo. Sin registrarse, sin email, sin esperas.',
     mascot: '/mascot/explorer-nobg.webp',
     bg: 'bg-neo-pink',
     text: 'text-neo-navy',
@@ -100,7 +100,7 @@ export const COMPARISON: {
   columns: ['LexiClash', 'Scrabble (app)', 'Apalabrados'],
   rows: [
     { label: '100 % gratis, sin pagar por ganar', cells: [true, 'Compras', 'Compras'] },
-    { label: 'Sin registro ni descarga', cells: [true, false, false] },
+    { label: 'Sin registrarse ni descargar', cells: [true, false, false] },
     { label: 'Multijugador en tiempo real', cells: ['2-50', 'Por turnos', 'Por turnos'] },
     { label: `Diccionario español ${ES_DICT_FLOOR}+`, cells: [true, true, true] },
     { label: 'Modos de juego', cells: ['8 modos', '1', '1'] },
@@ -118,6 +118,10 @@ export const FAQ_ACCENTS = [
 ];
 
 export const FAQS = [
+  {
+    q: '¿Hay scrabble español online gratis sin registrarse?',
+    a: 'Sí. LexiClash es scrabble español online gratis sin registrarse: abres el navegador, pulsas Crear sala y la partida empieza. No pide email ni contraseña. Si no tienes un nombre guardado, escribes un apodo — eso no crea una cuenta. Quien entra por el enlace de WhatsApp tampoco se registra.',
+  },
   {
     q: '¿Dónde jugar scrabble online español multijugador gratis?',
     a: 'En LexiClash. Abre el navegador, pulsa Crear sala y comparte el enlace: hasta 50 jugadores en la misma cuadrícula, en tiempo real, sin turnos ni app. A diferencia de Minijuegos o JuegoSpot (solo contra la IA), aquí el multijugador es con amigos de verdad. Diccionario español medido, 100% gratis.',

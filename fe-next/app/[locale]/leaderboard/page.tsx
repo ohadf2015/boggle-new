@@ -166,7 +166,7 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ lo
         faq={content.faq}
         collapsible
       />
-      <EsScrabbleCrossLink locale={locale} anchorVariant="query" />
+      <EsScrabbleCrossLink locale={locale} anchorVariant="query" queryAnchor />
       <script type="application/ld+json">{encodeJsonLd(breadcrumbJsonLd)}</script>
       {faqJsonLd && (
         <script type="application/ld+json">{encodeJsonLd(faqJsonLd)}</script>

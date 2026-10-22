@@ -36,22 +36,22 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
           <div className="mb-6 inline-flex items-center gap-2 rounded-neo border-3 border-neo-pink bg-neo-pink/10 px-3 py-1 shadow-hard-pink">
             <span className="h-2 w-2 animate-pulse rounded-full bg-neo-pink" />
             <span className="font-neo-body text-xs font-black uppercase tracking-widest text-neo-pink">
-              Sin registro · Sin descarga · Multijugador
+              Gratis · Sin registrarse · Sin descarga
             </span>
           </div>
 
           <h1 className="mb-5 font-neo-display text-4xl font-black leading-[1.05] sm:text-6xl lg:text-7xl">
-            <span className="block text-neo-white">Juega</span>{' '}
+            <span className="block text-neo-white">Juega gratis</span>{' '}
             <span className="relative inline-block">
               <span className="bg-gradient-to-br from-neo-pink via-neo-pink to-neo-cyan bg-clip-text text-transparent">
-                Scrabble online
+                Scrabble español
               </span>
               <span
                 aria-hidden
                 className="absolute inset-x-0 -bottom-1 h-2 -skew-x-6 bg-neo-pink/40"
               />
             </span>{' '}
-            <span className="block text-neo-white">español multijugador</span>
+            <span className="block text-neo-white">sin registrarse</span>
           </h1>
           <div className="mt-2 flex flex-wrap items-end gap-2 sm:gap-3" aria-hidden>
             {HERO_TILES.map((tile, i) => (
@@ -71,7 +71,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
           </div>
 
           <p className="mb-8 max-w-2xl font-neo-body text-base leading-relaxed text-neo-white sm:text-lg">
-            Juega <strong className="text-neo-white">scrabble online español multijugador</strong>: crea una sala, comparte el enlace y compite en tiempo real. Más de {ES_DICT_FLOOR} palabras, sin descargas, sin registro, sin esperas.
+            <strong className="text-neo-white">Scrabble español online gratis sin registrarse</strong>: pulsa Crear sala y juegas en el navegador. Sin email, sin cuenta, sin app. Más de {ES_DICT_FLOOR} palabras, multijugador en tiempo real.
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
@@ -83,7 +83,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
                 'transition-all duration-150 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed sm:text-lg'
               )}
             >
-              Crear sala ahora
+              Jugar ahora
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
@@ -96,6 +96,9 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
               Probar solo
             </Link>
           </div>
+          <p className="mt-3 font-neo-body text-sm font-bold text-neo-lime">
+            Sin registrarte. Sin email. La sala se abre en el navegador.
+          </p>
         </div>
 
         <m.div
