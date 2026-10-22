@@ -8,6 +8,7 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { fetchStudentInsights } from '@/lib/education/studentInsightsClient';
+import { percent, summarizeStudentWords, tallyStudentWords } from '@/lib/education/wordTally';
 import type {
   WordsAttemptedRecord,
   DateRange,
@@ -18,6 +19,16 @@ import type {
   HeatmapCell,
   VocabularyHeatmapData,
 } from './analyticsTypes';
+
+function latestPracticeFor(rows: Array<{ words_attempted?: unknown; last_practice_date?: string | null }>, word: string): string | null {
+  let latest: string | null = null;
+  for (const row of rows) {
+    const attempted = row.words_attempted as WordsAttemptedRecord | null | undefined;
+    if (!attempted?.[word] || !row.last_practice_date) continue;
+    if (!latest || row.last_practice_date > latest) latest = row.last_practice_date;
+  }
+  return latest;
+}
 
 /**
  * Get student report data for PDF generation. The headline numbers come from the
@@ -62,23 +73,21 @@ export async function getStudentReportData(
     }
     const insights = insightsResult.insights;
 
+    const rows = progressData ?? [];
+    const tally = tallyStudentWords(rows);
     const wordMasteryList: StudentReportData['wordMastery'] = [];
     let totalAttempts = 0;
-    progressData?.forEach((progress) => {
-      const attemptedWords = progress.words_attempted as WordsAttemptedRecord || {};
-      Object.entries(attemptedWords).forEach(([word, data]) => {
-        const correct = data.correct || 0;
-        const attempts = data.attempts || 0;
-        totalAttempts += attempts;
-        wordMasteryList.push({
-          word,
-          mastered: (progress.words_mastered || []).includes(word),
-          accuracy: attempts > 0 ? Math.round((correct / attempts) * 100) : 0,
-          attempts,
-          lastPracticed: progress.last_practice_date,
-        });
+    for (const [word, w] of tally) {
+      if (!rows.some((p) => p.words_attempted?.[word])) continue;
+      totalAttempts += w.attempts;
+      wordMasteryList.push({
+        word,
+        mastered: w.mastered,
+        accuracy: percent(w.correct, w.attempts) ?? 0,
+        attempts: w.attempts,
+        lastPracticed: latestPracticeFor(rows, word),
       });
-    });
+    }
 
     const accuracy = insights.accuracy;
     const score = accuracy ?? 0;
@@ -206,26 +215,17 @@ export async function getClassReportData(
       const profile = profileById.get(studentId) || null;
       const studentProgress = progressData?.filter(p => p.student_id === studentId) || [];
 
-      let studentCorrect = 0;
-      let studentAttempts = 0;
-      let studentWords = 0;
+      const words = summarizeStudentWords(studentProgress);
+      const studentAttempts = words.attempts;
+      const studentWords = words.wordsMastered;
       let lastActive: string | null = null;
-
       studentProgress.forEach((progress) => {
-        const attemptedWords = progress.words_attempted as WordsAttemptedRecord || {};
-        studentWords += progress.words_mastered?.length || 0;
-
-        Object.values(attemptedWords).forEach((data) => {
-          studentCorrect += data.correct || 0;
-          studentAttempts += data.attempts || 0;
-        });
-
         if (!lastActive || (progress.last_practice_date && progress.last_practice_date > lastActive)) {
           lastActive = progress.last_practice_date;
         }
       });
 
-      const studentAccuracy = studentAttempts > 0 ? Math.round((studentCorrect / studentAttempts) * 100) : 0;
+      const studentAccuracy = words.accuracy ?? 0;
 
       if (studentAttempts > 0) {
         totalAccuracy += studentAccuracy;

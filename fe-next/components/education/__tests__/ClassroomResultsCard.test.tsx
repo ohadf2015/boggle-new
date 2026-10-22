@@ -102,7 +102,7 @@ describe('ClassroomResultsCard', () => {
   });
 
   it('congratulates instead of showing an empty reteach list', () => {
-    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    const clean = { ...summary, coverage: summary.coverage.map((c) => ({ ...c, foundBy: ['Maya', 'Noa'] })), missedWords: [], classFoundCount: 3 };
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('reteach-list')).not.toBeInTheDocument();
     expect(screen.getByText(/allFound/)).toBeInTheDocument();
@@ -149,7 +149,7 @@ describe('ClassroomResultsCard', () => {
   });
 
   it('offers no reteach round when the class found every word', () => {
-    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    const clean = { ...summary, coverage: summary.coverage.map((c) => ({ ...c, foundBy: ['Maya', 'Noa'] })), missedWords: [], classFoundCount: 3 };
     render(
       <ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher onReteach={vi.fn()} />
     );
@@ -230,7 +230,7 @@ describe('ClassroomResultsCard', () => {
   });
 
   it('hides the Google Classroom reteach post when every word was found', () => {
-    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    const clean = { ...summary, coverage: summary.coverage.map((c) => ({ ...c, foundBy: ['Maya', 'Noa'] })), missedWords: [], classFoundCount: 3 };
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('post-reteach-google-classroom')).not.toBeInTheDocument();
   });
@@ -254,7 +254,7 @@ describe('ClassroomResultsCard', () => {
   });
 
   it('hides the Google Classroom practice assignment when every word was found', () => {
-    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    const clean = { ...summary, coverage: summary.coverage.map((c) => ({ ...c, foundBy: ['Maya', 'Noa'] })), missedWords: [], classFoundCount: 3 };
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('assign-practice-google-classroom')).not.toBeInTheDocument();
   });
@@ -277,7 +277,7 @@ describe('ClassroomResultsCard', () => {
   });
 
   it('hides the printable practice sheet when every word was found', () => {
-    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    const clean = { ...summary, coverage: summary.coverage.map((c) => ({ ...c, foundBy: ['Maya', 'Noa'] })), missedWords: [], classFoundCount: 3 };
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('print-missed-words-practice-sheet')).not.toBeInTheDocument();
   });
@@ -298,7 +298,7 @@ describe('ClassroomResultsCard', () => {
   });
 
   it('hides the unplugged reteach Live CTA when every word was found', () => {
-    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    const clean = { ...summary, coverage: summary.coverage.map((c) => ({ ...c, foundBy: ['Maya', 'Noa'] })), missedWords: [], classFoundCount: 3 };
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('start-unplugged-reteach-live')).not.toBeInTheDocument();
   });
@@ -324,7 +324,7 @@ describe('ClassroomResultsCard', () => {
   });
 
   it('hides the Google Classroom Unplugged assignment when every word was found', () => {
-    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    const clean = { ...summary, coverage: summary.coverage.map((c) => ({ ...c, foundBy: ['Maya', 'Noa'] })), missedWords: [], classFoundCount: 3 };
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('assign-unplugged-google-classroom')).not.toBeInTheDocument();
   });
@@ -350,7 +350,7 @@ describe('ClassroomResultsCard', () => {
   });
 
   it('hides the miss-gap practice share CTA when every word was found', () => {
-    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    const clean = { ...summary, coverage: summary.coverage.map((c) => ({ ...c, foundBy: ['Maya', 'Noa'] })), missedWords: [], classFoundCount: 3 };
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('share-miss-gap-practice')).not.toBeInTheDocument();
   });
@@ -372,7 +372,7 @@ describe('ClassroomResultsCard', () => {
   });
 
   it('hides the async miss-gap homework CTA when every word was found', () => {
-    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    const clean = { ...summary, coverage: summary.coverage.map((c) => ({ ...c, foundBy: ['Maya', 'Noa'] })), missedWords: [], classFoundCount: 3 };
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('assign-miss-gap-async-homework')).not.toBeInTheDocument();
   });
@@ -394,7 +394,7 @@ describe('ClassroomResultsCard', () => {
   });
 
   it('hides the unplugged reteach printable pack when every word was found', () => {
-    const clean = { ...summary, missedWords: [], classFoundCount: 3 };
+    const clean = { ...summary, coverage: summary.coverage.map((c) => ({ ...c, foundBy: ['Maya', 'Noa'] })), missedWords: [], classFoundCount: 3 };
     render(<ClassroomResultsCard summary={clean} username="Ms. Cohen" isTeacher />);
     expect(screen.queryByTestId('print-unplugged-reteach-pack')).not.toBeInTheDocument();
   });

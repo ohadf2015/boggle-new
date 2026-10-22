@@ -11,7 +11,7 @@ interface ReteachStatusNoteProps {
 }
 
 export function ReteachStatusNote({ status, onRestoreFull, t }: ReteachStatusNoteProps) {
-  const offerFullList = status === 'ready' || status === 'restoring' || status === 'restoreFailed';
+  const offerFullList = status === 'ready' || status === 'unconfirmed' || status === 'restoring' || status === 'restoreFailed';
   if (!offerFullList && status !== 'failed') return null;
 
   return (
@@ -24,6 +24,11 @@ export function ReteachStatusNote({ status, onRestoreFull, t }: ReteachStatusNot
       {status === 'failed' && (
         <p data-testid="edu-replay-failed" role="alert" className="font-neo-body text-sm font-bold text-neo-pink">
           {t('eduLiveRoom.hostResults.replayFailed')}
+        </p>
+      )}
+      {status === 'unconfirmed' && (
+        <p data-testid="edu-replay-unconfirmed" role="status" className="font-neo-body text-sm font-bold text-neo-cream">
+          {t('eduLiveRoom.hostResults.replayUnconfirmed')}
         </p>
       )}
       {status === 'restoreFailed' && (

@@ -84,4 +84,38 @@ describe('ClassroomTvResults — the fallback wall replays through the server', 
     render(<ClassroomTvResults summary={summary} gameCode="ABC123" t={t} />);
     expect(screen.queryByTestId('play-reteach-round')).not.toBeInTheDocument();
   });
+
+  it('given a word only one of three found and none missed outright, when shown, then the wall still offers the replay, with nothing empty to send home', () => {
+    const threeStudents = {
+      ...summary,
+      missedWords: [],
+      coverage: [
+        { word: 'photon', foundBy: ['Maya', 'Noa', 'Eli'] },
+        { word: 'atom', foundBy: ['Maya', 'Noa', 'Eli'] },
+        { word: 'quark', foundBy: ['Maya', 'Noa', 'Eli'] },
+        { word: 'boson', foundBy: ['Eli'] },
+      ],
+      masteryByPlayer: { Maya: { found: 3, total: 4 }, Noa: { found: 3, total: 4 }, Eli: { found: 4, total: 4 } },
+    } as unknown as ClassroomSummary;
+    render(<ClassroomTvResults summary={threeStudents} gameCode="ABC123" onRematch={vi.fn()} t={t} />);
+    fireEvent.click(screen.getByTestId('play-reteach-round'));
+    expect(socket.emit).toHaveBeenCalledWith('classroomReteachWords', { gameCode: 'ABC123', words: ['boson'] });
+    expect(screen.queryByTestId('print-missed-words-practice-sheet')).not.toBeInTheDocument();
+  });
+
+  it('given the server never answers, when the wait runs out, then the wall offers the full list back', () => {
+    vi.useFakeTimers();
+    try {
+      render(<ClassroomTvResults summary={summary} gameCode="ABC123" onRematch={vi.fn()} t={t} />);
+      fireEvent.click(screen.getByTestId('play-reteach-round'));
+      act(() => {
+        vi.advanceTimersByTime(6_001);
+      });
+      expect(screen.getByTestId('edu-replay-unconfirmed')).toBeInTheDocument();
+      fireEvent.click(screen.getByTestId('edu-use-full-list'));
+      expect(socket.emit).toHaveBeenLastCalledWith('classroomRestoreFullLesson', { gameCode: 'ABC123' });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

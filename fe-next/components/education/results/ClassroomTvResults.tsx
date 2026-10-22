@@ -228,13 +228,14 @@ export function ClassroomTvResults({
             roundNumber={summary.sessionStandings?.length ? 0 : rounds}
             sweepStreak={sweepStreak}
             reteachSlot={
-              showTeacherFollowUp && summary.missedWords.length > 0 ? (
+              showTeacherFollowUp && (reteach.missed.length > 0 || summary.missedWords.length > 0) ? (
                 <div data-testid="classroom-tv-reteach">
                   <ReteachActions
                     links={links}
                     onReteach={reteach.start}
                     reteachStatus={reteach.status}
                     onRestoreFull={reteach.restoreFull}
+                    sendHome={summary.missedWords.length > 0}
                     t={t}
                     variant="more"
                   />

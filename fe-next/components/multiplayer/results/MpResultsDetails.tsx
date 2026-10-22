@@ -2,7 +2,6 @@
 
 import { useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import logger from '@/utils/logger';
 import { MpSheet } from '../shell/MpSheet';
 import { ResultsMainContent } from '@/components/results/ResultsMainContent';
 import { ResultsDetailsContent } from '@/components/results/ResultsDetailsContent';
@@ -10,6 +9,7 @@ import BlastMpResults, { buildBlastMpResults } from '@/components/blast/legacy/B
 import { resolveWheelRushStats } from '@/lib/results/wheelRushStatsFallback';
 import { toStandings } from '@/components/education/results/resultsStandings';
 import { useReplayMissedWords } from '@/components/education/live/useReteachRound';
+import { useClassroomCardRematch } from './useClassroomCardRematch';
 import { modeSceneOwnsHeroSlot } from '@/lib/education/roundEndResultsRoute';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastPlayerStats, useWheelRushPlayerStats, useBlastBoardClearedByLocal } from '@/hooks/gameState/store';
@@ -18,6 +18,7 @@ import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
 import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { MpResultsController } from './useMpResultsController';
 import { useOpenLessonPractice } from './useOpenLessonPractice';
+import type { GameModeOption } from '@/components/GameModeSelector';
 
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 const BlastResultsScene = dynamic(() => import('@/components/results/BlastResultsScene'), { ssr: false });
@@ -100,18 +101,11 @@ function DetailsBody({ c }: { c: MpResultsController }) {
     currentUsername: username,
   }, [resolvedGameMode, wordHuntSummary, sortedScores, wordHuntEliminatedPlayers, wordHuntPlayerLives, username]);
 
-  // Teacher rematch: same lesson payload, same room — a plain reload rejoins it.
-  const handleRematch = useCallback(() => {
-    if (!classroomSummary) return;
-    try {
-      if (!sessionStorage.getItem('lessonGameData')) return;
-    } catch (err) {
-      logger.warn('[RESULTS] Could not verify rematch payload:', err);
-      return;
-    }
-    window.location.reload();
-  }, [classroomSummary]);
-  const reteach = useReplayMissedWords({ summary: classroomSummary, gameCode, socket: props.socket ?? null, onRematch: handleRematch });
+  const { handleStartGame } = c.nextRound;
+  const replayMode = resolvedGameMode as GameModeOption | undefined;
+  const startSameMode = useCallback(() => handleStartGame(replayMode ? { gameMode: replayMode } : undefined), [handleStartGame, replayMode]);
+  const rematch = useClassroomCardRematch({ socket: props.socket ?? null, start: startSameMode });
+  const reteach = useReplayMissedWords({ summary: classroomSummary, gameCode, socket: props.socket ?? null, onRematch: rematch.rematch });
   const classroomStandings = useMemo(() => toStandings(sortedScores), [sortedScores]);
   const openLessonPractice = useOpenLessonPractice();
 
@@ -137,7 +131,8 @@ function DetailsBody({ c }: { c: MpResultsController }) {
         onReteach={isHost ? reteach.start : undefined}
         reteachStatus={reteach.status}
         onRestoreFull={reteach.restoreFull}
-        onRematch={isHost ? handleRematch : undefined}
+        onRematch={isHost ? rematch.rematch : undefined}
+        rematchOffline={rematch.offline}
         onPractice={classroomSummary.lessonIds[0] ? () => openLessonPractice(classroomSummary.lessonIds[0]) : undefined}
       />
       {!isHost && gameCode && (

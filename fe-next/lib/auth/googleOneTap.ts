@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { trackSignupFailed } from '@/utils/growthTracking';
+import { stripLocalePrefix } from '@/lib/perf/heavyGamePath';
 
 /**
  * Google One Tap / Sign In With Google (web).
@@ -187,6 +188,16 @@ export interface OneTapEnableInput {
   clientId: string | undefined;
   supabaseConfigured: boolean;
   isAuthenticated: boolean;
+  pathname?: string | null;
+}
+
+// Parents open the report from a shared link with no account; a sign-in prompt there reads as a broken page.
+const SIGN_IN_FREE_PREFIXES = ['/report'] as const;
+
+export function isSignInFreePath(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
+  const path = stripLocalePrefix(pathname);
+  return SIGN_IN_FREE_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 }
 
 /**
@@ -195,6 +206,7 @@ export interface OneTapEnableInput {
  */
 export function shouldEnableGoogleOneTap(input: OneTapEnableInput): boolean {
   return (
+    !isSignInFreePath(input.pathname) &&
     !input.isNativePlatform &&
     !!input.clientId &&
     input.supabaseConfigured &&

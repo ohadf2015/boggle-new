@@ -38,8 +38,18 @@ export function mostMissedWords(summary: ClassroomSummary): MissedWord[] {
 
 /** What a replay sends: every lesson word unfound is the whole lesson again, which is Play again, not a replay. */
 export function reteachList(summary: ClassroomSummary): MissedWord[] {
+  return reteachVerdict(summary).words;
+}
+
+export type ReteachVerdictKind = 'replay' | 'allFound' | 'wholeLesson' | 'none';
+
+/** Whether a results surface offers the replay; every surface gates on this, so they cannot disagree. */
+export function reteachVerdict(summary: ClassroomSummary): { kind: ReteachVerdictKind; words: MissedWord[] } {
   const struggled = mostMissedWords(summary);
-  return struggled.length < summary.totalWords ? struggled : [];
+  if (!summary.totalWords || studentNames(summary).length === 0) return { kind: 'none', words: [] };
+  if (struggled.length === 0) return { kind: 'allFound', words: [] };
+  if (struggled.length >= summary.totalWords) return { kind: 'wholeLesson', words: [] };
+  return { kind: 'replay', words: struggled };
 }
 
 /** How many students found under half the lesson. A count only: the projector never names a struggling child. */

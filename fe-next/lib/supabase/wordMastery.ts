@@ -61,6 +61,7 @@ export async function getClassMastery(
       // than scan and discard in buildClassMastery.
       .eq('classroom_id', classroomId)
       .not('results->>lessonWordsAsked', 'is', null)
+      .not('completed_at', 'is', null)
       .order('started_at', { ascending: true })
       .limit(MAX_ROWS);
 
@@ -110,6 +111,7 @@ export async function getStudentMasterySeries(
       .eq('classroom_id', classroomId)
       .eq('student_id', studentId)
       .not('results->>lessonWordsAsked', 'is', null)
+      .not('completed_at', 'is', null)
       .order('started_at', { ascending: true })
       .limit(MAX_ROWS);
 

@@ -5,6 +5,8 @@
  * numbers only — every label is translated at render.
  */
 
+import { percent, summarizeTally, tallyStudentWords } from './wordTally';
+
 export interface InsightProgressRow {
   total_xp: number | null;
   words_mastered: string[] | null;
@@ -64,39 +66,6 @@ const WEAK_BELOW = 70;
 const WIN_FROM = 80;
 
 const num = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
-const pct = (correct: number, attempts: number): number | null =>
-  attempts > 0 ? Math.round((correct / attempts) * 100) : null;
-
-interface WordTally {
-  correct: number;
-  attempts: number;
-  lastAt: string;
-  mastered: boolean;
-}
-
-function tallyWords(rows: InsightProgressRow[]): Map<string, WordTally> {
-  const words = new Map<string, WordTally>();
-  const get = (word: string) => {
-    let w = words.get(word);
-    if (!w) {
-      w = { correct: 0, attempts: 0, lastAt: '', mastered: false };
-      words.set(word, w);
-    }
-    return w;
-  };
-  for (const row of rows) {
-    const attempted = row.words_attempted && typeof row.words_attempted === 'object' ? row.words_attempted : {};
-    for (const [word, data] of Object.entries(attempted)) {
-      if (!data || typeof data !== 'object') continue;
-      const w = get(word);
-      w.correct += num(data.correct);
-      w.attempts += num(data.attempts);
-      if (typeof data.lastAttemptAt === 'string' && data.lastAttemptAt > w.lastAt) w.lastAt = data.lastAttemptAt;
-    }
-    for (const word of Array.isArray(row.words_mastered) ? row.words_mastered : []) get(word).mastered = true;
-  }
-  return words;
-}
 
 const sessionSeconds = (row: InsightSessionRow): number => num(row.time_spent_seconds) || num(row.duration_seconds);
 
@@ -116,7 +85,7 @@ function weekOf(rows: InsightSessionRow[], from: number, to: number): WeekActivi
     attempted += num(row.words_attempted);
     days.add(new Date(at).toISOString().slice(0, 10));
   }
-  return { sessions, minutes: Math.round(seconds / 60), activeDays: days.size, accuracy: pct(correct, attempted) };
+  return { sessions, minutes: Math.round(seconds / 60), activeDays: days.size, accuracy: percent(correct, attempted) };
 }
 
 function insightFor(thisWeek: WeekActivity, lastWeek: WeekActivity): InsightCode {
@@ -148,19 +117,10 @@ export function buildStudentInsights(input: {
     longestStreak = Math.max(longestStreak, num(row.longest_streak));
   }
 
-  const words = tallyWords(progressRows);
-  let correct = 0;
-  let attempts = 0;
-  let wordsPracticed = 0;
-  let wordsMastered = 0;
-  for (const w of words.values()) {
-    correct += w.correct;
-    attempts += w.attempts;
-    if (w.attempts > 0) wordsPracticed += 1;
-    if (w.mastered) wordsMastered += 1;
-  }
+  const words = tallyStudentWords(progressRows);
+  const { wordsMastered, wordsPracticed, accuracy } = summarizeTally(words);
 
-  const entries = [...words.entries()].map(([word, w]) => ({ word, ...w, accuracy: pct(w.correct, w.attempts) }));
+  const entries = [...words.entries()].map(([word, w]) => ({ word, ...w, accuracy: percent(w.correct, w.attempts) }));
   const toInsight = (e: (typeof entries)[number]): WordInsight => ({ word: e.word, accuracy: e.accuracy, attempts: e.attempts });
 
   const wordsToPractice = entries
@@ -188,7 +148,7 @@ export function buildStudentInsights(input: {
     lessonsCompleted,
     wordsMastered,
     wordsPracticed,
-    accuracy: pct(correct, attempts),
+    accuracy,
     currentStreak,
     longestStreak,
     totalMinutes: Math.round(totalSeconds / 60),

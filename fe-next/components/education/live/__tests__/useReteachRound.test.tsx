@@ -60,14 +60,40 @@ describe('useReteachRound', () => {
     expect(onApplied).not.toHaveBeenCalled();
   });
 
-  it('given no answer at all, when the wait runs out, then it fails visibly instead of spinning', () => {
+  it('given no answer at all, when the wait runs out, then it stops spinning without claiming the room is unchanged', () => {
     const socket = fakeSocket();
     const { result } = renderHook(() => useReteachRound({ gameCode: 'ABC123', socket: socket as never, onApplied: vi.fn() }));
     act(() => result.current.replay(['b']));
     act(() => {
       vi.advanceTimersByTime(RETEACH_ACK_TIMEOUT_MS + 1);
     });
+    expect(result.current.status).toBe('unconfirmed');
+  });
+
+  it('given the wait ran out, when the full list is asked for, then the room is asked to restore it', () => {
+    const socket = fakeSocket();
+    const { result } = renderHook(() => useReteachRound({ gameCode: 'ABC123', socket: socket as never, onApplied: vi.fn() }));
+    act(() => result.current.replay(['b']));
+    act(() => {
+      vi.advanceTimersByTime(RETEACH_ACK_TIMEOUT_MS + 1);
+    });
+    act(() => result.current.restoreFull());
+    expect(socket.emit).toHaveBeenLastCalledWith('classroomRestoreFullLesson', { gameCode: 'ABC123' });
+    act(() => socket.fire('classroomFullLessonRestored', { gameCode: 'ABC123', words: ['a', 'b'] }));
+    expect(result.current.status).toBe('idle');
+  });
+
+  it('given the wait ran out, when a refusal lands late, then the replay reads failed', () => {
+    const socket = fakeSocket();
+    const onApplied = vi.fn();
+    const { result } = renderHook(() => useReteachRound({ gameCode: 'ABC123', socket: socket as never, onApplied }));
+    act(() => result.current.replay(['b']));
+    act(() => {
+      vi.advanceTimersByTime(RETEACH_ACK_TIMEOUT_MS + 1);
+    });
+    act(() => socket.fire('classroomReteachRefused', { gameCode: 'ABC123' }));
     expect(result.current.status).toBe('failed');
+    expect(onApplied).not.toHaveBeenCalled();
   });
 
   it('given an ack that lands after the wait ran out, when it arrives, then the wall says the replay is set without starting a round on its own', () => {
@@ -78,6 +104,7 @@ describe('useReteachRound', () => {
     act(() => {
       vi.advanceTimersByTime(RETEACH_ACK_TIMEOUT_MS + 1);
     });
+    expect(result.current.status).toBe('unconfirmed');
     act(() => socket.fire('classroomReteachApplied', { gameCode: 'ABC123', words: ['b'] }));
     expect(result.current.status).toBe('ready');
     expect(onApplied).not.toHaveBeenCalled();

@@ -67,6 +67,8 @@ const summary = (over: Partial<ClassroomSummary> = {}): ClassroomSummary => ({
   ...over,
 });
 
+const allFoundCoverage = ['photon', 'atom', 'quark', 'boson'].map((word) => ({ word, foundBy: ['Maya', 'Noa'] }));
+
 describe('ClassroomTvResults', () => {
   beforeEach(() => {
     window.sessionStorage.clear();
@@ -217,7 +219,7 @@ describe('ClassroomTvResults — host reteach / share / assign on the wall', () 
   it('hides reteach when the class found every word', () => {
     render(
       <ClassroomTvResults
-        summary={summary({ classFoundCount: 4, missedWords: [] })}
+        summary={summary({ classFoundCount: 4, coverage: allFoundCoverage, missedWords: [] })}
         onRematch={vi.fn()}
         t={t}
       />
@@ -279,7 +281,7 @@ describe('ClassroomTvResults — Pro progress report on the host wall', () => {
     proState.loading = false;
     render(
       <ClassroomTvResults
-        summary={summary({ classFoundCount: 4, missedWords: [] })}
+        summary={summary({ classFoundCount: 4, coverage: allFoundCoverage, missedWords: [] })}
         onRematch={vi.fn()}
         t={t}
       />,

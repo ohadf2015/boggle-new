@@ -10,7 +10,15 @@ const source = readFileSync(resolve(__dirname, '../MpResultsDetails.tsx'), 'utf8
 
 describe('MpResultsDetails — the phone card replays through the server like the wall', () => {
   it('uses the shared replay hook with this room and its own Play again', () => {
-    expect(source).toMatch(/useReplayMissedWords\(\{[^}]*gameCode[^}]*onRematch: [^}]*handleRematch/);
+    expect(source).toMatch(/useReplayMissedWords\(\{[^}]*gameCode[^}]*onRematch: [^}]*rematch\.rematch/);
+  });
+
+  it('starts Play again through the room the screen already uses, never a reload of the browser copy', () => {
+    expect(source).toMatch(/handleStartGame\(replayMode \? \{ gameMode: replayMode \}/);
+    expect(source).toMatch(/useClassroomCardRematch\(\{[^}]*start: startSameMode/);
+    expect(source).not.toContain('location.reload');
+    expect(source).not.toMatch(/sessionStorage\.getItem\('lessonGameData'\)/);
+    expect(source).toMatch(/<ClassroomResultsCard[\s\S]*?rematchOffline=\{rematch\.offline\}/);
   });
 
   it('never stages the words in the browser and reloads', () => {

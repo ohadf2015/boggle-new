@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { ClassroomSummary } from '@/shared/types/classroom';
-import { mostMissedWords, reteachList, studentsUnderHalf } from '@/components/education/live/eduReteachModel';
+import { mostMissedWords, reteachList, reteachVerdict, studentsUnderHalf } from '@/components/education/live/eduReteachModel';
 
 const mastery = (rows: Record<string, [number, number]>) =>
   Object.fromEntries(Object.entries(rows).map(([name, [found, total]]) => [name, { found, total }]));
@@ -114,3 +114,66 @@ describe('reteachList — the one list every replay button sends', () => {
   });
 });
 
+
+describe('reteachVerdict — the one rule every results surface reads', () => {
+  const two = mastery({ Ada: [2, 3], Ben: [1, 3] });
+
+  it('given a word only some students found, when nobody missed it outright, then it is still a replay', () => {
+    const summary = summaryOf({
+      totalWords: 3,
+      masteryByPlayer: mastery({ Ada: [3, 3], Ben: [2, 3], Cy: [2, 3] }),
+      coverage: [
+        { word: 'osmosis', foundBy: ['Ada', 'Ben', 'Cy'] },
+        { word: 'enzyme', foundBy: ['Ada'] },
+        { word: 'membrane', foundBy: ['Ada', 'Ben', 'Cy'] },
+      ],
+      missedWords: [],
+    });
+    expect(reteachVerdict(summary)).toEqual({ kind: 'replay', words: [{ word: 'enzyme', found: 1, of: 3 }] });
+  });
+
+  it('given every word found by at least half, when shown, then the class found them all', () => {
+    const summary = summaryOf({
+      totalWords: 2,
+      masteryByPlayer: two,
+      coverage: [
+        { word: 'osmosis', foundBy: ['Ada', 'Ben'] },
+        { word: 'enzyme', foundBy: ['Ada'] },
+      ],
+      missedWords: [],
+    });
+    expect(reteachVerdict(summary)).toEqual({ kind: 'allFound', words: [] });
+  });
+
+  it('given every lesson word under half, when shown, then it is the whole lesson again, never "all found"', () => {
+    const summary = summaryOf({
+      totalWords: 2,
+      masteryByPlayer: mastery({ Ada: [0, 2], Ben: [0, 2] }),
+      coverage: [
+        { word: 'osmosis', foundBy: [] },
+        { word: 'enzyme', foundBy: [] },
+      ],
+      missedWords: ['osmosis', 'enzyme'],
+    });
+    expect(reteachVerdict(summary)).toEqual({ kind: 'wholeLesson', words: [] });
+  });
+
+  it('given no lesson words or no students, when shown, then there is nothing to say', () => {
+    expect(reteachVerdict(summaryOf({ totalWords: 0 })).kind).toBe('none');
+    expect(reteachVerdict(summaryOf({ totalWords: 2, missedWords: ['osmosis'] })).kind).toBe('none');
+  });
+
+  it('agrees with reteachList on the words it replays', () => {
+    const summary = summaryOf({
+      totalWords: 3,
+      masteryByPlayer: two,
+      coverage: [
+        { word: 'osmosis', foundBy: ['Ada', 'Ben'] },
+        { word: 'enzyme', foundBy: [] },
+        { word: 'membrane', foundBy: ['Ada', 'Ben'] },
+      ],
+      missedWords: ['enzyme'],
+    });
+    expect(reteachVerdict(summary).words).toEqual(reteachList(summary));
+  });
+});

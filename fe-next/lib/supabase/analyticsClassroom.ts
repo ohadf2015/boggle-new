@@ -7,6 +7,7 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { resolveDisplayName } from '@/lib/displayName';
+import { summarizeStudentWords } from '@/lib/education/wordTally';
 import type {
   WordsAttemptedRecord,
   StudentProgressSummary,
@@ -85,7 +86,7 @@ export async function getStudentsProgressSummary(
     }
 
     const lessonIds = [...new Set(progressData?.map(p => p.lesson_id) || [])];
-    const lessonWordsMap = new Map<string, number>();
+    const lessonWordsMap = new Map<string, string[]>();
     if (lessonIds.length > 0) {
       const { data: lessonsData, error: lessonError } = await supabase
         .from('vocabulary_lessons')
@@ -94,7 +95,7 @@ export async function getStudentsProgressSummary(
 
       if (!lessonError && lessonsData) {
         lessonsData.forEach(lesson => {
-          lessonWordsMap.set(lesson.id, lesson.words?.length || 0);
+          lessonWordsMap.set(lesson.id, (lesson.words ?? []).map((w: { word?: string } | string) => (typeof w === 'string' ? w : w?.word ?? '')).filter(Boolean));
         });
       }
     }
@@ -110,28 +111,14 @@ export async function getStudentsProgressSummary(
       let totalXp = 0;
       let currentLevel = 1;
       let currentStreak = 0;
-      let wordsMastered = 0;
-      let totalLessonWords = 0;
-      let wordsAttempted = 0;
-      let totalCorrect = 0;
-      let totalAttempts = 0;
+      const lessonWords = new Set<string>();
       let lastPracticeDate: string | null = null;
 
       studentProgress.forEach(progress => {
         totalXp += progress.total_xp || 0;
         currentLevel = Math.max(currentLevel, progress.current_level || 1);
         currentStreak = Math.max(currentStreak, progress.current_streak || 0);
-        wordsMastered += progress.words_mastered?.length || 0;
-        totalLessonWords += lessonWordsMap.get(progress.lesson_id) || 0;
-
-        if (progress.words_attempted) {
-          const wordsData = progress.words_attempted as WordsAttemptedRecord;
-          Object.values(wordsData).forEach(word => {
-            totalCorrect += word.correct || 0;
-            totalAttempts += word.attempts || 0;
-            wordsAttempted += word.attempts || 0;
-          });
-        }
+        for (const word of lessonWordsMap.get(progress.lesson_id) ?? []) lessonWords.add(word);
 
         if (progress.last_practice_date) {
           if (!lastPracticeDate || progress.last_practice_date > lastPracticeDate) {
@@ -140,8 +127,11 @@ export async function getStudentsProgressSummary(
         }
       });
 
-      const overallAccuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
-      const vocabularyMastery = totalLessonWords > 0 ? Math.round((wordsMastered / totalLessonWords) * 100) : 0;
+      const words = summarizeStudentWords(studentProgress);
+      const { wordsMastered, attempts: totalAttempts } = words;
+      const wordsAttempted = totalAttempts;
+      const overallAccuracy = words.accuracy ?? 0;
+      const vocabularyMastery = lessonWords.size > 0 ? Math.round((wordsMastered / lessonWords.size) * 100) : 0;
       const isStruggling = totalAttempts > 0 && overallAccuracy < 60;
 
       summaries.push({

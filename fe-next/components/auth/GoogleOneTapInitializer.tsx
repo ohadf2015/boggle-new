@@ -85,6 +85,7 @@ export default function GoogleOneTapInitializer() {
     clientId,
     supabaseConfigured: !!supabase,
     isAuthenticated,
+    pathname,
   });
 
   const initOneTap = useCallback(async () => {

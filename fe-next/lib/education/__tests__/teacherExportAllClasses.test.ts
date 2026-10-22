@@ -36,9 +36,9 @@ describe('buildTeacherExportRows', () => {
         { classroomId: 'c2', lessonId: 'l2' },
       ],
       progress: [
-        { studentId: 's1', lessonId: 'l1', totalXp: 100, wordsMasteredCount: 5, lastPracticeDate: '2026-09-01', completedAt: '2026-09-01' },
-        { studentId: 's1', lessonId: 'l2', totalXp: 40, wordsMasteredCount: 2, lastPracticeDate: '2026-09-10', completedAt: null },
-        { studentId: 's2', lessonId: 'l1', totalXp: 30, wordsMasteredCount: 1, lastPracticeDate: '2026-08-20', completedAt: null },
+        { studentId: 's1', lessonId: 'l1', totalXp: 100, wordsMastered: ['w0', 'w1', 'w2', 'w3', 'w4'], lastPracticeDate: '2026-09-01', completedAt: '2026-09-01' },
+        { studentId: 's1', lessonId: 'l2', totalXp: 40, wordsMastered: ['w0', 'w1'], lastPracticeDate: '2026-09-10', completedAt: null },
+        { studentId: 's2', lessonId: 'l1', totalXp: 30, wordsMastered: ['w0'], lastPracticeDate: '2026-08-20', completedAt: null },
       ],
       sessions: [
         { studentId: 's1', lessonId: 'l1', completedAt: '2026-09-02' },
@@ -115,7 +115,7 @@ describe('buildTeacherExportRows', () => {
       memberships: [{ classroomId: 'c1', studentId: 's1' }],
       profiles: [{ studentId: 's1', name: 'Ada' }],
       lessonAssignments: [],
-      progress: [{ studentId: 's1', lessonId: 'l-unassigned', totalXp: 999, wordsMasteredCount: 9, lastPracticeDate: '2026-09-01', completedAt: '2026-09-01' }],
+      progress: [{ studentId: 's1', lessonId: 'l-unassigned', totalXp: 999, wordsMastered: ['w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8'], lastPracticeDate: '2026-09-01', completedAt: '2026-09-01' }],
       sessions: [],
     });
 
@@ -160,6 +160,24 @@ describe('buildTeacherExportRows', () => {
         sessions: [],
       }),
     ).toEqual([]);
+  });
+
+  it('counts a word mastered in two of the class lessons once', () => {
+    const rows = buildTeacherExportRows({
+      classrooms: [{ id: 'c1', name: 'Grade 5A' }],
+      memberships: [{ classroomId: 'c1', studentId: 's1' }],
+      profiles: [{ studentId: 's1', name: 'Ada' }],
+      lessonAssignments: [
+        { classroomId: 'c1', lessonId: 'l1' },
+        { classroomId: 'c1', lessonId: 'l2' },
+      ],
+      progress: [
+        { studentId: 's1', lessonId: 'l1', totalXp: 10, wordsMastered: ['tree', 'sun'], lastPracticeDate: null, completedAt: null },
+        { studentId: 's1', lessonId: 'l2', totalXp: 10, wordsMastered: ['tree'], lastPracticeDate: null, completedAt: null },
+      ],
+      sessions: [],
+    });
+    expect(rows[0].wordsMastered).toBe(2);
   });
 });
 

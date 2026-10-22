@@ -8,10 +8,11 @@ import { reteachList } from './eduReteachModel';
 export const RETEACH_ACK_TIMEOUT_MS = 6_000;
 
 /**
+ * `failed`: the server refused, so the room is unchanged. `unconfirmed`: no answer in time, so the room may be narrowed.
  * `ready`: the room was narrowed after the wait ran out, so the next Play again uses the reteach words.
  * `restoring` / `restoreFailed`: the teacher asked for the full lesson back before that round ran.
  */
-export type ReteachStatus = 'idle' | 'pending' | 'failed' | 'ready' | 'restoring' | 'restoreFailed';
+export type ReteachStatus = 'idle' | 'pending' | 'failed' | 'unconfirmed' | 'ready' | 'restoring' | 'restoreFailed';
 
 interface Input {
   gameCode: string | null;
@@ -86,7 +87,7 @@ export function useReteachRound({ gameCode, socket, onApplied }: Input) {
   useEffect(() => clear, []);
 
   const send = useCallback(
-    (kind: Exclude<Request, null>, event: string, payload: Record<string, unknown>, failed: ReteachStatus) => {
+    (kind: Exclude<Request, null>, event: string, payload: Record<string, unknown>, failed: ReteachStatus, unanswered: ReteachStatus) => {
       if (!socket || !gameCode) {
         setStatus(failed);
         return;
@@ -97,7 +98,7 @@ export function useReteachRound({ gameCode, socket, onApplied }: Input) {
       socket.emit(event, { gameCode, ...payload });
       timer.current = setTimeout(() => {
         timer.current = null;
-        setStatus(failed);
+        setStatus(unanswered);
       }, RETEACH_ACK_TIMEOUT_MS);
     },
     [socket, gameCode]
@@ -109,12 +110,12 @@ export function useReteachRound({ gameCode, socket, onApplied }: Input) {
         setStatus('failed');
         return;
       }
-      send('replay', 'classroomReteachWords', { words }, 'failed');
+      send('replay', 'classroomReteachWords', { words }, 'failed', 'unconfirmed');
     },
     [send]
   );
 
-  const restoreFull = useCallback(() => send('restore', 'classroomRestoreFullLesson', {}, 'restoreFailed'), [send]);
+  const restoreFull = useCallback(() => send('restore', 'classroomRestoreFullLesson', {}, 'restoreFailed', 'restoreFailed'), [send]);
 
   return { status, replay, restoreFull };
 }

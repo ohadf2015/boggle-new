@@ -49,6 +49,7 @@ describe('getClassMastery', () => {
 
     expect(q.eq).toHaveBeenCalledWith('classroom_id', 'class-1');
     expect(q.not).toHaveBeenCalledWith('results->>lessonWordsAsked', 'is', null);
+    expect(q.not).toHaveBeenCalledWith('completed_at', 'is', null);
     expect(q.order).toHaveBeenCalledWith('started_at', { ascending: true });
   });
 
@@ -116,6 +117,7 @@ describe('getStudentMasterySeries — the per-student arc read', () => {
     expect(q.eq).toHaveBeenCalledWith('classroom_id', 'class-1');
     expect(q.eq).toHaveBeenCalledWith('student_id', 'stu-1');
     expect(q.not).toHaveBeenCalledWith('results->>lessonWordsAsked', 'is', null);
+    expect(q.not).toHaveBeenCalledWith('completed_at', 'is', null);
   });
 
   it('returns the accuracy series and this student\'s word trajectories', async () => {

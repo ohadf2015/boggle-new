@@ -68,7 +68,7 @@ export function useMpNextRound({ socket, isHost, gameCode, roomLanguage, selecte
     if (overlayReleaseTimerRef.current) clearTimeout(overlayReleaseTimerRef.current);
   }, []);
 
-  const handleStartGame = useCallback(async () => {
+  const handleStartGame = useCallback(async (options?: { gameMode?: GameModeOption }) => {
     if (!socket || !isHost) return;
     logger.log('[RESULTS] Host starting new game from results');
 
@@ -91,7 +91,7 @@ export function useMpNextRound({ socket, isHost, gameCode, roomLanguage, selecte
       language: roomLanguage,
       hostPlaying: true,
       boardTheme: null,
-      gameMode: selectedGameMode,
+      gameMode: typeof options?.gameMode === 'string' ? options.gameMode : selectedGameMode,
     };
 
     let callbackFired = false;

@@ -179,7 +179,7 @@ export async function getTeacherExportRows(
         studentId: p.student_id,
         lessonId: p.lesson_id,
         totalXp: p.total_xp ?? 0,
-        wordsMasteredCount: p.words_mastered?.length ?? 0,
+        wordsMastered: (p.words_mastered ?? []).filter((w): w is string => typeof w === 'string'),
         // last_practice_date is a DATE column but completed_at/practice
         // session timestamps are timestamptz — normalize both to YYYY-MM-DD
         // so "last active" never mixes date-only and full-timestamp values

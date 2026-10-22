@@ -75,6 +75,12 @@ describe('GoogleOneTapInitializer', () => {
     expect(screen.queryByTestId('gsi-script')).toBeNull();
   });
 
+  it('never loads GIS on the public parent report, even for a signed-out visitor', () => {
+    mockPathname.mockReturnValue('/he/report/tok.sig');
+    render(<GoogleOneTapInitializer />);
+    expect(screen.queryByTestId('gsi-script')).toBeNull();
+  });
+
   it('loads GIS even while cookie consent is still undecided', () => {
     // Regression: #1046 held GIS back until useConsentDecided() was true, but that
     // flag only flips on an explicit Accept/Decline CLICK. Visitors who ignored the

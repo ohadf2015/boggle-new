@@ -23,7 +23,7 @@
 
 'use client';
 
-import { GraduationCap, Check, RotateCcw, Share2, EyeOff } from 'lucide-react';
+import { GraduationCap, Check, RotateCcw, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { ResultsPodium, type PodiumEntry } from './results/ResultsPodium';
@@ -40,7 +40,7 @@ import { podiumWithoutHost, standingsWithoutHost } from '@/lib/education/roundEn
 import { isRevealed, sweepReached } from '@/lib/education/roundEndStage';
 import { classSwept as isClassSwept } from '@/lib/education/roundEndSweep';
 import { ClassNeedsHelp } from './results/ClassNeedsHelp';
-import { ReteachActions } from './results/ReteachActions';
+import { ClassroomReteachBox } from './results/ClassroomReteachBox';
 import { ResultsPrimaryActions } from './results/ResultsPrimaryActions';
 import { StudentNextActions } from './results/StudentNextActions';
 import { useReteachLinks } from './results/useReteachLinks';
@@ -59,6 +59,7 @@ export interface ClassroomResultsCardProps {
   onRestoreFull?: () => void;
   /** Teacher-only: same list, same code — a new round without recreating the room. */
   onRematch?: () => void;
+  rematchOffline?: boolean;
   /** Student-only: re-launch the same game mode+settings (play again). */
   onPlayAgain?: () => void;
   /**
@@ -86,6 +87,7 @@ export function ClassroomResultsCard({
   reteachStatus,
   onRestoreFull,
   onRematch,
+  rematchOffline = false,
   onPlayAgain,
   standings,
   hideClassPlacings = false,
@@ -142,7 +144,6 @@ export function ClassroomResultsCard({
   // generator never embedded. Absent means "we cannot tell" — then every miss
   // reads as a miss, exactly as before. Never treat an unknown source as proof.
   const neverPlaced = new Set((summary.neverPlacedWords ?? []).map((w) => w.toLowerCase()));
-  const missedOnBoard = summary.missedWords.filter((w) => !neverPlaced.has(w.toLowerCase()));
 
   const podium: PodiumEntry[] = podiumWithoutHost(summary.podium, summary.teacherName).map((p) => ({
     username: p.username,
@@ -263,59 +264,23 @@ export function ClassroomResultsCard({
           t={t}
         />
       )}
+      {isTeacher && rematchOffline && (
+        <p data-testid="classroom-rematch-offline" role="alert" className="mb-4 font-neo-body text-sm font-bold text-neo-pink">
+          {t('eduLiveRoom.hostResults.playAgainOffline')}
+        </p>
+      )}
 
-      {isTeacher &&
-        (summary.missedWords.length > 0 ? (
-          <div
-            data-testid="reteach-list"
-            className="p-3 rounded-neo border border-neo-pink bg-neo-pink/10"
-          >
-            {missedOnBoard.length > 0 ? (
-              <>
-                <p className="text-neo-white font-bold text-sm mb-1">
-                  {t('education.results.reteach')}
-                </p>
-                <p
-                  data-testid="missed-on-board-words"
-                  className="text-neo-white/80 font-neo-body text-sm"
-                >
-                  {missedOnBoard.join(', ')}
-                </p>
-              </>
-            ) : (
-              <p
-                data-testid="all-board-words-found"
-                className="text-neo-white font-bold text-sm"
-              >
-                {t('education.results.allBoardWordsFound')}
-              </p>
-            )}
-
-            {neverPlaced.size > 0 && (
-              <div
-                data-testid="never-placed-words"
-                className="mt-3 p-3 rounded-neo border border-dashed border-neo-white/50 bg-neo-navy/60"
-              >
-                <p className="flex items-center gap-2 text-neo-white/80 font-bold text-sm mb-1">
-                  <EyeOff className="w-4 h-4 shrink-0" aria-hidden />
-                  {t('education.results.neverPlaced')}
-                </p>
-                <p className="text-neo-white/70 font-neo-body text-sm">
-                  {summary.neverPlacedWords?.join(', ')}
-                </p>
-                <p className="mt-1 text-neo-white/50 font-neo-body text-xs">
-                  {t('education.results.neverPlacedHint')}
-                </p>
-              </div>
-            )}
-
-            <ReteachActions links={links} onReteach={onReteach} reteachStatus={reteachStatus} onRestoreFull={onRestoreFull} t={t} />
-          </div>
-        ) : (
-          <p className="p-3 rounded-neo border border-neo-lime/40 bg-neo-lime/10 text-neo-white font-neo-body text-sm">
-            {t('education.results.allFound')}
-          </p>
-        ))}
+      {isTeacher && (
+        <ClassroomReteachBox
+          summary={summary}
+          neverPlaced={neverPlaced}
+          links={links}
+          onReteach={onReteach}
+          reteachStatus={reteachStatus}
+          onRestoreFull={onRestoreFull}
+          t={t}
+        />
+      )}
 
       {/* Teacher only. The class's gap, worded for an adult, is a report — and
           a report sent from thirty student phones is thirty copies of the same

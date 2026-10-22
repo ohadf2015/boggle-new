@@ -52,6 +52,8 @@ export interface ReteachActionsProps {
    * single quiet "More" control: its panel opens up on the wall, down on a phone.
    */
   variant?: 'stack' | 'more';
+  /** False when no word went unfound: the send-home actions would have nothing to send. */
+  sendHome?: boolean;
 }
 
 function revealOpenPanel(event: SyntheticEvent<HTMLDetailsElement>) {
@@ -61,7 +63,7 @@ function revealOpenPanel(event: SyntheticEvent<HTMLDetailsElement>) {
   details.querySelector('[data-testid="reteach-more-panel"]')?.scrollIntoView({ block: 'nearest', behavior: calm ? 'auto' : 'smooth' });
 }
 
-export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRestoreFull, t, variant = 'stack' }: ReteachActionsProps) {
+export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRestoreFull, t, variant = 'stack', sendHome = true }: ReteachActionsProps) {
   const pending = reteachStatus === 'pending';
   const statusNote = onReteach ? <ReteachStatusNote status={reteachStatus} onRestoreFull={onRestoreFull} t={t} /> : null;
   if (variant === 'more') {
@@ -94,6 +96,7 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
           <ReteachOptionGrid
             links={links}
             t={t}
+            sendHome={sendHome}
             reteachSlot={
               onReteach && (
                 <>
@@ -143,6 +146,7 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
       )}
       {statusNote && <div className="mt-2">{statusNote}</div>}
 
+      {sendHome && (
       <details className="group mt-3 rounded-neo border-[3px] border-neo-cream bg-neo-navy overflow-hidden">
         <summary
           data-testid="reteach-more-actions"
@@ -162,6 +166,7 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
 
         <ReteachOptionGrid links={links} t={t} className="p-3" />
       </details>
+      )}
     </div>
   );
 }
@@ -195,7 +200,8 @@ function ReteachOptionGrid({
   t,
   className,
   reteachSlot,
-}: Pick<ReteachActionsProps, 'links' | 't'> & { className?: string; reteachSlot?: ReactNode }) {
+  sendHome = true,
+}: Pick<ReteachActionsProps, 'links' | 't' | 'sendHome'> & { className?: string; reteachSlot?: ReactNode }) {
   const googleLinks = [
     { href: links.googleClassroomReteachHref, testId: 'post-reteach-google-classroom', key: 'education.results.postReteachGoogleClassroom' },
     { href: links.googleClassroomAssignHref, testId: 'assign-practice-google-classroom', key: 'education.results.assignPracticeGoogleClassroom' },
@@ -207,7 +213,7 @@ function ReteachOptionGrid({
     <div className={cn('flex flex-col gap-3', className)}>
       <Group testId="reteach-group-play" title={t('eduLive.reteach.playNow')}>
         {reteachSlot && <div className="sm:col-span-2">{reteachSlot}</div>}
-        {links.canLaunchMissGapQuestionPack && (
+        {sendHome && links.canLaunchMissGapQuestionPack && (
           <button
             type="button"
             data-testid="launch-miss-gap-question-pack-live"
@@ -235,6 +241,8 @@ function ReteachOptionGrid({
         )}
       </Group>
 
+      {sendHome && (
+      <>
       <Group testId="reteach-group-send" title={t('eduLive.reteach.sendHome')}>
         {links.missGapAsyncAssignHref && (
           <Link href={links.missGapAsyncAssignHref} data-testid="assign-miss-gap-async-homework" className={ROW}>
@@ -273,6 +281,8 @@ function ReteachOptionGrid({
           />
         </button>
       </Group>
+      </>
+      )}
     </div>
   );
 }

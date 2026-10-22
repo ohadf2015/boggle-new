@@ -226,14 +226,16 @@ export function buildWeeklySummary(args: {
     }
     grid.students.forEach((student, studentIndex) => {
       let missingCount = 0;
+      const studentWords = new Set<string>();
       for (const index of indexes) {
         const cell = grid.cells[studentIndex]?.[index];
         if (!cell || cell.status !== 'completed') {
           missingCount += 1;
           continue;
         }
-        if (cell.bestWord) wordCounts.set(cell.bestWord, (wordCounts.get(cell.bestWord) ?? 0) + 1);
+        if (cell.bestWord) studentWords.add(cell.bestWord);
       }
+      for (const word of studentWords) wordCounts.set(word, (wordCounts.get(word) ?? 0) + 1);
       if (missingCount > 0) {
         attention.push({ studentId: student.id, name: student.name, missingCount });
       }

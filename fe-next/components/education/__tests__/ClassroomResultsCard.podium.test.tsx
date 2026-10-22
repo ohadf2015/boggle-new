@@ -123,11 +123,12 @@ describe('ClassroomResultsCard — the podium', () => {
 describe('ClassroomResultsCard — honest coverage', () => {
   const withNeverPlaced: ClassroomSummary = { ...base, neverPlacedWords: ['quark'] };
 
-  it('keeps a word the board never carried out of the "nobody found these" list', () => {
+  const word = (w: string) => screen.getAllByTestId('reteach-word').find((el) => el.getAttribute('data-word') === w);
+
+  it('tags a word the board never carried instead of counting it as missed by the class', () => {
     render(<ClassroomResultsCard summary={withNeverPlaced} username="Ms. Cohen" isTeacher />);
-    const reteach = screen.getByTestId('missed-on-board-words');
-    expect(reteach).toHaveTextContent('neutron');
-    expect(reteach).not.toHaveTextContent('quark');
+    expect(word('neutron')).toHaveTextContent('0/2');
+    expect(word('quark')).toHaveTextContent('eduLiveRoom.hostResults.notOnBoard');
   });
 
   it('names the never-placed words separately so the teacher does not reteach unseen vocabulary', () => {
@@ -137,7 +138,7 @@ describe('ClassroomResultsCard — honest coverage', () => {
     expect(block).toHaveTextContent('education.results.neverPlaced');
   });
 
-  it('says the class cleared the board when every miss was a word never placed', () => {
+  it('given every miss was a word never placed, when shown, then each is tagged not on board and named apart', () => {
     render(
       <ClassroomResultsCard
         summary={{ ...base, neverPlacedWords: ['neutron', 'quark'] }}
@@ -145,15 +146,15 @@ describe('ClassroomResultsCard — honest coverage', () => {
         isTeacher
       />
     );
-    expect(screen.queryByTestId('missed-on-board-words')).not.toBeInTheDocument();
-    expect(screen.getByTestId('all-board-words-found')).toBeInTheDocument();
+    expect(word('neutron')).toHaveTextContent('eduLiveRoom.hostResults.notOnBoard');
+    expect(word('quark')).toHaveTextContent('eduLiveRoom.hostResults.notOnBoard');
     expect(screen.getByTestId('never-placed-words')).toHaveTextContent('quark');
   });
 
   it('falls back to one undivided reteach list when the placed words are unknown', () => {
     render(<ClassroomResultsCard summary={base} username="Ms. Cohen" isTeacher />);
-    expect(screen.getByTestId('missed-on-board-words')).toHaveTextContent('neutron');
-    expect(screen.getByTestId('missed-on-board-words')).toHaveTextContent('quark');
+    expect(word('neutron')).toHaveTextContent('0/2');
+    expect(word('quark')).toHaveTextContent('0/2');
     expect(screen.queryByTestId('never-placed-words')).not.toBeInTheDocument();
   });
 

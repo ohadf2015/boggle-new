@@ -43,7 +43,7 @@ export interface TeacherExportProgress {
   studentId: string;
   lessonId: string;
   totalXp: number;
-  wordsMasteredCount: number;
+  wordsMastered: readonly string[];
   lastPracticeDate: string | null;
   completedAt: string | null;
 }
@@ -118,7 +118,7 @@ export function buildTeacherExportRows(args: {
       const studentSessions = (sessionsByStudent.get(studentId) ?? []).filter((s) => lessonIds.has(s.lessonId));
 
       const lessonsCompleted = studentProgress.filter((p) => p.completedAt != null).length;
-      const wordsMastered = studentProgress.reduce((sum, p) => sum + p.wordsMasteredCount, 0);
+      const wordsMastered = new Set(studentProgress.flatMap((p) => p.wordsMastered)).size;
       const totalXp = studentProgress.reduce((sum, p) => sum + p.totalXp, 0);
       const gamesPlayed = studentSessions.filter((s) => s.completedAt != null).length;
 

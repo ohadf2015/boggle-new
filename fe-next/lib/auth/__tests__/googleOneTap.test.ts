@@ -156,4 +156,15 @@ describe('shouldEnableGoogleOneTap', () => {
   it('disables when the user is already authenticated', () => {
     expect(shouldEnableGoogleOneTap({ ...base, isAuthenticated: true })).toBe(false);
   });
+
+  it.each(['/report/abc.def', '/en/report/abc.def', '/he/report/abc.def', '/report'])(
+    'never prompts a parent on the no-login report link %s',
+    (pathname) => {
+      expect(shouldEnableGoogleOneTap({ ...base, pathname })).toBe(false);
+    },
+  );
+
+  it.each(['/en', '/en/education', '/reports', '/en/reporting'])('still prompts on %s', (pathname) => {
+    expect(shouldEnableGoogleOneTap({ ...base, pathname })).toBe(true);
+  });
 });

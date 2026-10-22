@@ -206,6 +206,23 @@ describe('buildWeeklySummary', () => {
     expect(summary.topWords).toEqual(['lime']);
   });
 
+  it('counts a student once per best word, however many assignments it topped', () => {
+    const grid2 = buildClassProgressGrid({
+      students,
+      assignments: [
+        { id: 'a1', title: 'W1', dueDate: '2026-10-06' },
+        { id: 'a2', title: 'W2', dueDate: '2026-10-07' },
+      ],
+      completions: [
+        { assignmentId: 'a1', studentId: 's1', score: 10, bestWord: 'zebra' },
+        { assignmentId: 'a2', studentId: 's1', score: 10, bestWord: 'zebra' },
+        { assignmentId: 'a1', studentId: 's2', score: 10, bestWord: 'apple' },
+      ],
+    });
+    const summary = buildWeeklySummary({ className: 'English 101', grid: grid2, now: NOW });
+    expect(summary.topWords).toEqual(['apple', 'zebra']);
+  });
+
   it('keeps the five most common best words', () => {
     const words = ['fig', 'apple', 'zebra', 'mango', 'kiwi', 'date'];
     const many = buildClassProgressGrid({
