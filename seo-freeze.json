@@ -3,8 +3,8 @@
   "frozen": [
     {
       "path": "/es/juego-de-palabras-multijugador",
-      "until": "2026-11-17",
-      "why": "Title tag 'Scrabble Online Gratis en Español — Sin Registro | LexiClash' shipped 2026-10-19/20 for the 10.6k-imp head query 'scrabble online' (pos 6.7). Do not rewrite <title> or meta description before 2026-11-17 or both windows are unmeasurable. The 2026-10-22 near-top-3 push for 'scrabble español online gratis sin registrarse' (GR #11111) is H1/body/internal anchors only — leave the title tag alone."
+      "until": "2026-11-19",
+      "why": "Title tag is 'Juega Scrabble Online Gratis en Español | LexiClash' as of #1406 (merged 2026-10-22). Do not rewrite <title> or meta description before 2026-11-19. GR #11111 (sin registrarse, pos 4.29) is an H1/body/internal-anchor push only — a same-day title rewrite would make #1406 unmeasurable and risk the 10.6k-imp head query."
     },
     {
       "path": "/sv/swedish-multiplayer-word-game",
