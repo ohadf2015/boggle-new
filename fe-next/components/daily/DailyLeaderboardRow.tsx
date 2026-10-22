@@ -115,9 +115,9 @@ export const TodayParticipantRow = memo<{
   const hasScore = participant.score != null && participant.score > 0;
 
   const seeWords =
-    scope === 'word-wheel' && onViewWheelWords && participant.player_id && !isCurrentUser
+    scope === 'word-wheel' && onViewWheelWords && (participant.player_id || participant.guest_fingerprint) && !isCurrentUser
       ? { open: () => onViewWheelWords(participant), label: t('wordWheel.viewWordsYouMissed') || t('wordWheel.viewSubmittedWords'), tone: 'border-neo-purple/60 bg-neo-purple/15 hover:bg-neo-purple/30 text-neo-purple-light' }
-      : scope === 'word-hunt' && onViewHuntWords && participant.player_id && !isCurrentUser && (participant.words_discovered?.length ?? 0) > 0
+      : scope === 'word-hunt' && onViewHuntWords && (participant.player_id || participant.guest_fingerprint) && !isCurrentUser && (participant.words_discovered?.length ?? 0) > 0
         ? { open: () => onViewHuntWords(participant), label: t('wordHunt.results.tapPlayerHint'), tone: 'border-neo-cyan/60 bg-neo-cyan/15 hover:bg-neo-cyan/30 text-neo-cyan' }
         : null;
 
@@ -193,7 +193,7 @@ export const TodayParticipantRow = memo<{
               <Target aria-hidden className="w-3 h-3" />
               {participant.word_hunt_score}
               <span aria-hidden>·</span>
-              {onViewWheelWords && participant.player_id ? (
+              {onViewWheelWords && (participant.player_id || participant.guest_fingerprint) ? (
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onViewWheelWords(participant); }}
