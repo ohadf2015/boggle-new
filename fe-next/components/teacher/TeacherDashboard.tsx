@@ -30,6 +30,7 @@ import { useClassStudentPreview } from '@/hooks/useClassStudentPreview';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
 import { polarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
 import { trackEduTeacherDashboardViewed } from '@/lib/education/telemetry';
+import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { homeOnboarding, type HomeOnboardingStepId } from '@/lib/education/homeOnboarding';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
@@ -95,6 +96,15 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
 
   // Back from Polar checkout: the webhook can land after the redirect, so keep re-reading.
   const checkoutSuccess = searchParams?.get('checkout') === 'success';
+  // Unconditional on entitlement — fires even if the webhook never lands, so it can
+  // distinguish "webhook broken" (this fires, checkout_complete never does) from
+  // "user abandoned on Polar" (neither fires).
+  const returnLandedTracked = useRef(false);
+  useEffect(() => {
+    if (!checkoutSuccess || returnLandedTracked.current) return;
+    returnLandedTracked.current = true;
+    trackEduProCheckoutReturnLanded();
+  }, [checkoutSuccess]);
   const refreshPro = pro.refresh;
   useEffect(() => {
     if (!checkoutSuccess || proLoading || hasPro || !refreshPro) return;

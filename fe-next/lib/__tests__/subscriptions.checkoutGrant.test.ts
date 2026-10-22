@@ -79,4 +79,41 @@ describe('grantProFromCheckout — checkout completion must not wipe provider fi
     expect(upsert).not.toHaveBeenCalled();
     expect(update).toHaveBeenCalledWith({ lemon_squeezy_subscription_id: 'sub_9' });
   });
+
+  it('re-activates a revoked provider row instead of leaving status canceled', async () => {
+    const { client, upsert, update } = adminClient({
+      existing: {
+        tier: 'free',
+        status: 'canceled',
+        source: 'polar',
+        current_period_end: '2026-09-01T00:00:00Z',
+        lemon_squeezy_subscription_id: 'sub_old',
+      },
+    });
+    vi.mocked(createAdminClient).mockReturnValue(client as never);
+
+    await grantProFromCheckout({
+      userId: 'u1',
+      status: 'active',
+      providerSubscriptionId: 'sub_new',
+      currentPeriodEnd: null,
+    });
+
+    expect(upsert).not.toHaveBeenCalled();
+    expect(update).toHaveBeenCalledWith({ tier: 'pro', status: 'active' });
+  });
+
+  it('upgrades a trialing row to active on a paid checkout without wiping the period end', async () => {
+    const { client, upsert, update } = adminClient({ existing: { ...polarRow, status: 'trialing' } });
+    vi.mocked(createAdminClient).mockReturnValue(client as never);
+
+    await grantProFromCheckout({
+      userId: 'u1',
+      status: 'active',
+      currentPeriodEnd: null,
+    });
+
+    expect(upsert).not.toHaveBeenCalled();
+    expect(update).toHaveBeenCalledWith({ status: 'active' });
+  });
 });

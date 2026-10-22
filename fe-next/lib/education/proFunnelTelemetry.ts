@@ -11,6 +11,9 @@
  *   checkout_complete              server  — Polar webhook `subscription.active` not trialing
  *   edu_pro_checkout_succeeded     server  — Polar webhook `subscription.active` (authoritative)
  *   edu_pro_checkout_success_seen  client  — teacher landed back on Teacher HQ, Pro welcome shown
+ *   edu_pro_checkout_return_landed client  — teacher landed back with ?checkout=success, REGARDLESS
+ *                                             of entitlement. Compares against edu_pro_checkout_succeeded
+ *                                             (webhook) to tell "webhook broken" from "user abandoned".
  *
  * The last one deliberately does NOT reuse the server's name: the webhook is the
  * truth about money, the client step is only "the teacher saw it land". One
@@ -167,6 +170,16 @@ export function trackEduProCheckoutSuccessSeen(now: number = Date.now()): boolea
     /* best effort */
   }
   return true;
+}
+
+/**
+ * Fire `edu_pro_checkout_return_landed` unconditionally on `?checkout=success`,
+ * before entitlement is known. Unlike `trackEduProCheckoutSuccessSeen` (gated
+ * on `hasPro`, so a broken webhook means it never fires), this always fires —
+ * the only way to tell "webhook never landed" from "user abandoned on Polar".
+ */
+export function trackEduProCheckoutReturnLanded(): void {
+  captureStep('edu_pro_checkout_return_landed', {});
 }
 
 /**

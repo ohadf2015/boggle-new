@@ -367,8 +367,10 @@ export async function grantProFromOrder({
  * Same wipe rule as grantProFromOrder: checkout events often arrive in the
  * same burst as subscription.active, and a full upsert with a null period end
  * would erase the renewal date that event just wrote. A provider-owned row is
- * only stamped with fields it is still missing. No row, or an admin gift, gets
- * the full upsert — a payment replaces a gift.
+ * only stamped with fields it is still missing, except status: a completed
+ * checkout must leave status active (or trialing), because hasPro is
+ * tier=pro AND active|trialing. No row, or an admin gift, gets the full
+ * upsert — a payment replaces a gift.
  */
 export async function grantProFromCheckout({
   userId,
@@ -405,6 +407,17 @@ export async function grantProFromCheckout({
     if (providerOrderId) patch.lemon_squeezy_order_id = providerOrderId
     if (currentPeriodEnd && !existing.current_period_end) patch.current_period_end = currentPeriodEnd
     if (existing.tier !== 'pro') patch.tier = 'pro'
+    // hasPro requires tier=pro AND status active|trialing (proGrant.ts). A
+    // revoked/canceled/past_due row that only gets tier flipped stays unpaid
+    // in the product while checkout telemetry already fired. Paid completion
+    // also upgrades trialing → active. Never downgrade active → trialing, and
+    // never write a null period end (that wipe is why this is a patch).
+    const live = existing.status === 'active' || existing.status === 'trialing'
+    if (status === 'active' && existing.status !== 'active') {
+      patch.status = 'active'
+    } else if (!live) {
+      patch.status = status
+    }
     if (Object.keys(patch).length === 0) return
     const { error } = await supabase.from('subscriptions').update(patch).eq('user_id', userId)
     if (error) {
