@@ -29,6 +29,11 @@ vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: ()
 vi.mock('@/components/teacher/analytics/AnalyticsDashboard', () => ({ AnalyticsDashboard: () => <div /> }));
 vi.mock('@/components/teacher/analytics/LastGameInsights', () => ({ LastGameInsights: () => <div /> }));
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
+const trackEduProCheckoutReturnLanded = vi.fn();
+vi.mock('@/lib/education/proFunnelTelemetry', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  trackEduProCheckoutReturnLanded: (...a: unknown[]) => trackEduProCheckoutReturnLanded(...a),
+}));
 
 let proState: Record<string, unknown>;
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState }));
@@ -61,6 +66,7 @@ describe('<TeacherDashboard> after Polar checkout', () => {
   beforeEach(() => {
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) }) as unknown as typeof fetch;
     search = 'checkout=success';
+    trackEduProCheckoutReturnLanded.mockReset();
   });
   afterEach(() => { global.fetch = originalFetch; vi.useRealTimers(); });
 
@@ -103,5 +109,18 @@ describe('<TeacherDashboard> after Polar checkout', () => {
     expect(screen.getByTestId('teacher-trial-welcome')).toBeInTheDocument();
     expect(screen.getByTestId('teacher-trial-welcome-upgrade')).toBeInTheDocument();
     expect(screen.queryByText('teacher.proWelcome.paidBody')).not.toBeInTheDocument();
+  });
+
+  it('fires the unconditional return-landed signal even when the webhook has not granted Pro yet', () => {
+    proState = { ...FREE, refresh: vi.fn() };
+    render(<TeacherDashboard />);
+    expect(trackEduProCheckoutReturnLanded).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not fire the return-landed signal without ?checkout=success', () => {
+    search = '';
+    proState = { ...FREE, refresh: vi.fn() };
+    render(<TeacherDashboard />);
+    expect(trackEduProCheckoutReturnLanded).not.toHaveBeenCalled();
   });
 });
