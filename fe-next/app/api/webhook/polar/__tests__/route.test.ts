@@ -7,10 +7,12 @@ vi.mock('@/lib/polar', () => ({
 }))
 const upsertSubscription = vi.fn()
 const grantProFromOrder = vi.fn()
+const grantProFromCheckout = vi.fn()
 const logSubscriptionEvent = vi.fn()
 vi.mock('@/lib/subscriptions', () => ({
   upsertSubscription: (...args: unknown[]) => upsertSubscription(...args),
   grantProFromOrder: (...args: unknown[]) => grantProFromOrder(...args),
+  grantProFromCheckout: (...args: unknown[]) => grantProFromCheckout(...args),
   logSubscriptionEvent: (...args: unknown[]) => logSubscriptionEvent(...args),
 }))
 const maybeSendPaymentFailedEmail = vi.fn()
@@ -47,13 +49,17 @@ const subscriptionData = {
 describe('polar webhook', () => {
   beforeEach(() => {
     upsertSubscription.mockClear()
+    grantProFromOrder.mockClear()
+    grantProFromCheckout.mockClear()
     logSubscriptionEvent.mockClear()
     signatureValid = true
     process.env.POLAR_PRO_PRODUCT_ID = PRO_PRODUCT_ID
+    process.env.POLAR_WEBHOOK_SECRET = 'test-webhook-secret'
   })
 
   afterEach(() => {
     delete process.env.POLAR_PRO_PRODUCT_ID
+    delete process.env.POLAR_WEBHOOK_SECRET
   })
 
   it('rejects invalid signatures', async () => {
@@ -210,6 +216,84 @@ describe('polar webhook', () => {
         polarEvent('order.created', { id: 'ord_2', product_id: 'prod-something-else', metadata: { user_id: 'u1' } })
       )
       expect(grantProFromOrder).not.toHaveBeenCalled()
+      expect(upsertSubscription).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('checkout completion — grant Teacher Pro, never a silent 200', () => {
+    it('grants Pro on checkout.completed', async () => {
+      const res = await POST(polarEvent('checkout.completed', {
+        id: 'chk_1',
+        status: 'succeeded',
+        product_id: PRO_PRODUCT_ID,
+        subscription_id: 'sub_9',
+        metadata: { user_id: 'u1' },
+      }))
+      expect(res.status).toBe(200)
+      expect(await res.json()).toMatchObject({ received: true })
+      expect(grantProFromCheckout).toHaveBeenCalledWith({
+        userId: 'u1',
+        status: 'active',
+        providerSubscriptionId: 'sub_9',
+        providerOrderId: null,
+        providerProductId: PRO_PRODUCT_ID,
+        currentPeriodEnd: null,
+      })
+      expect(upsertSubscription).not.toHaveBeenCalled()
+    })
+
+    it('grants Pro on checkout.updated when Polar status is succeeded', async () => {
+      await POST(polarEvent('checkout.updated', {
+        id: 'chk_2',
+        status: 'succeeded',
+        product_id: PRO_PRODUCT_ID,
+        external_customer_id: 'u3',
+      }))
+      expect(grantProFromCheckout).toHaveBeenCalledWith(expect.objectContaining({
+        userId: 'u3',
+        status: 'active',
+        providerProductId: PRO_PRODUCT_ID,
+      }))
+    })
+
+    it('does not grant on checkout.updated while the session is still open', async () => {
+      const res = await POST(polarEvent('checkout.updated', {
+        id: 'chk_3',
+        status: 'open',
+        product_id: PRO_PRODUCT_ID,
+        metadata: { user_id: 'u1' },
+      }))
+      expect(res.status).toBe(200)
+      expect(grantProFromCheckout).not.toHaveBeenCalled()
+    })
+
+    it('503s naming POLAR_PRO_PRODUCT_ID instead of acking a completion it cannot tier', async () => {
+      delete process.env.POLAR_PRO_PRODUCT_ID
+      const res = await POST(polarEvent('checkout.completed', {
+        id: 'chk_4',
+        status: 'succeeded',
+        product_id: 'prod-anything',
+        metadata: { user_id: 'u1' },
+      }))
+      expect(res.status).toBe(503)
+      expect(await res.json()).toMatchObject({
+        error: 'POLAR_PRO_PRODUCT_ID is not configured',
+        missing: ['POLAR_PRO_PRODUCT_ID'],
+      })
+      expect(grantProFromCheckout).not.toHaveBeenCalled()
+    })
+
+    it('503s naming POLAR_WEBHOOK_SECRET when the secret is unset (Polar retries 5xx, not 401)', async () => {
+      delete process.env.POLAR_WEBHOOK_SECRET
+      const res = await POST(polarEvent('checkout.completed', {
+        id: 'chk_5',
+        status: 'succeeded',
+        product_id: PRO_PRODUCT_ID,
+        metadata: { user_id: 'u1' },
+      }))
+      expect(res.status).toBe(503)
+      expect(await res.json()).toMatchObject({ missing: ['POLAR_WEBHOOK_SECRET'] })
+      expect(grantProFromCheckout).not.toHaveBeenCalled()
       expect(upsertSubscription).not.toHaveBeenCalled()
     })
   })

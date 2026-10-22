@@ -11,6 +11,15 @@ function sign(id: string, timestamp: string, body: string, secret = SECRET): str
     .digest('base64')
 }
 
+/**
+ * Sign exactly how a real Polar delivery is signed (Standard Webhooks spec):
+ * secret is `whsec_<base64>`; the key is the base64 part DECODED to raw bytes.
+ */
+function signStandardWebhooks(id: string, timestamp: string, body: string, whsecSecret: string): string {
+  const keyBytes = Buffer.from(whsecSecret.replace(/^whsec_/, ''), 'base64')
+  return createHmac('sha256', keyBytes).update(`${id}.${timestamp}.${body}`).digest('base64')
+}
+
 function nowSeconds(): string {
   return String(Math.floor(Date.now() / 1000))
 }
@@ -38,6 +47,17 @@ describe('PolarClient.validateWebhookSignature', () => {
     const body = '{"type":"subscription.active","data":{}}'
     const ts = nowSeconds()
     const sig = sign('msg_1', ts, body)
+    expect(
+      PolarClient.validateWebhookSignature(body, { id: 'msg_1', timestamp: ts, signature: `v1,${sig}` })
+    ).toBe(true)
+  })
+
+  it('accepts a payload signed the way a real Polar delivery signs it (whsec_ secret, decoded to raw key bytes)', () => {
+    const whsecSecret = 'whsec_' + Buffer.from('actual-raw-key-bytes').toString('base64')
+    process.env.POLAR_WEBHOOK_SECRET = whsecSecret
+    const body = '{"type":"checkout.completed","data":{}}'
+    const ts = nowSeconds()
+    const sig = signStandardWebhooks('msg_1', ts, body, whsecSecret)
     expect(
       PolarClient.validateWebhookSignature(body, { id: 'msg_1', timestamp: ts, signature: `v1,${sig}` })
     ).toBe(true)

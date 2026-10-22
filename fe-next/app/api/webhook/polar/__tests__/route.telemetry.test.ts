@@ -14,6 +14,7 @@ const upsertSubscription = vi.fn()
 vi.mock('@/lib/subscriptions', () => ({
   upsertSubscription: (...args: unknown[]) => upsertSubscription(...args),
   grantProFromOrder: vi.fn(),
+  grantProFromCheckout: vi.fn(),
   logSubscriptionEvent: vi.fn(),
 }))
 vi.mock('@/lib/education/dunning', () => ({ maybeSendPaymentFailedEmail: vi.fn() }))
@@ -47,9 +48,11 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     capture.mockReset()
     posthogThrows = false
     process.env.POLAR_PRO_PRODUCT_ID = PRO
+    process.env.POLAR_WEBHOOK_SECRET = 'test-webhook-secret'
   })
   afterEach(() => {
     delete process.env.POLAR_PRO_PRODUCT_ID
+    delete process.env.POLAR_WEBHOOK_SECRET
   })
 
   it('Given subscription.active for Pro, When handled, Then it fires once with $host and the subscription id', async () => {

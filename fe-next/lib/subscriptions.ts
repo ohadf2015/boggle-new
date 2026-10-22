@@ -361,6 +361,71 @@ export async function grantProFromOrder({
 }
 
 /**
+ * Belt-and-braces Pro grant from a completed checkout
+ * (`checkout.completed`, or `checkout.updated` with a success status).
+ *
+ * Same wipe rule as grantProFromOrder: checkout events often arrive in the
+ * same burst as subscription.active, and a full upsert with a null period end
+ * would erase the renewal date that event just wrote. A provider-owned row is
+ * only stamped with fields it is still missing. No row, or an admin gift, gets
+ * the full upsert — a payment replaces a gift.
+ */
+export async function grantProFromCheckout({
+  userId,
+  status = 'active',
+  providerSubscriptionId,
+  providerOrderId,
+  providerProductId,
+  currentPeriodEnd,
+}: {
+  userId: string
+  status?: SubscriptionStatus
+  providerSubscriptionId?: string | null
+  providerOrderId?: string | null
+  providerProductId?: string | null
+  currentPeriodEnd?: string | null
+}): Promise<void> {
+  const supabase = createAdminClient() ?? (await createClient())
+
+  const { data: existing, error: readError } = await supabase
+    .from('subscriptions')
+    .select('tier,status,source,current_period_end,lemon_squeezy_subscription_id')
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (readError) {
+    console.error('[Subscription] grantProFromCheckout: read failed, falling back to upsert:', readError)
+  }
+
+  if (existing && !readError && existing.source !== 'admin_grant') {
+    const patch: Record<string, string> = {}
+    if (providerSubscriptionId && !existing.lemon_squeezy_subscription_id) {
+      patch.lemon_squeezy_subscription_id = providerSubscriptionId
+    }
+    if (providerOrderId) patch.lemon_squeezy_order_id = providerOrderId
+    if (currentPeriodEnd && !existing.current_period_end) patch.current_period_end = currentPeriodEnd
+    if (existing.tier !== 'pro') patch.tier = 'pro'
+    if (Object.keys(patch).length === 0) return
+    const { error } = await supabase.from('subscriptions').update(patch).eq('user_id', userId)
+    if (error) {
+      console.error('[Subscription] grantProFromCheckout: failed to stamp provider row:', error)
+      throw error
+    }
+    return
+  }
+
+  await upsertSubscription({
+    userId,
+    tier: 'pro',
+    status,
+    providerSubscriptionId,
+    providerOrderId,
+    providerProductId,
+    currentPeriodEnd,
+  })
+}
+
+/**
  * PostgREST reports a column the schema cache does not know as PGRST204; the
  * database itself says 42703. Either means "this migration has not landed here".
  */

@@ -190,9 +190,11 @@ export class PolarClient {
    * Header `webhook-signature` is a space-delimited list of `v1,<base64>` pairs
    * (multiple during secret rotation).
    *
-   * Gotcha per Polar docs: the secret configured on Polar must be base64
-   * encoded before being used as the HMAC key. We also accept the raw secret
-   * as a fallback so a dashboard/format change fails soft, never open.
+   * Polar issues POLAR_WEBHOOK_SECRET as `whsec_<base64>`. The HMAC key is that
+   * base64 payload DECODED to raw bytes — re-encoding the whole secret string
+   * 401s every real delivery even when the env var is set correctly. Raw-string
+   * and base64(secret) keys stay as fallbacks so a dashboard format change
+   * fails soft, never open.
    */
   static validateWebhookSignature(
     rawBody: string,
@@ -215,8 +217,10 @@ export class PolarClient {
     if (Math.abs(Date.now() / 1000 - timestampSeconds) > 300) return false
 
     const signedContent = `${id}.${timestamp}.${rawBody}`
-    const candidates = [
-      Buffer.from(secret).toString('base64'), // documented: base64-encoded secret
+    const stripped = secret.replace(/^whsec_/, '')
+    const candidates: Array<string | Buffer> = [
+      Buffer.from(stripped, 'base64'), // spec: whsec_ secret, base64-decoded to raw key bytes
+      Buffer.from(secret).toString('base64'), // legacy misread of the Polar docs
       secret, // fallback: raw secret bytes
     ]
 
