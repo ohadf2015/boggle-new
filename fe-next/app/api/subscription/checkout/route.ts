@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { resolveProEntitlement } from '@/lib/education/proGrant';
-import { getPolarClient, getProProductId } from '@/lib/polar';
+import { getPolarClient, getProProductId, probeCheckoutUrl } from '@/lib/polar';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { locales, defaultLocale } from '@/i18n/config';
 import logger from '@/utils/logger';
@@ -141,6 +141,15 @@ export async function POST(request: NextRequest) {
       } else {
         captureProFunnelServerEvent(buildProCheckoutStartedEvent(user.id));
         captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id));
+      }
+
+      // Diagnostic only — never blocks the redirect. A teacher who started
+      // checkout but never returns leaves no trace otherwise: URL creation
+      // succeeding doesn't mean the hosted checkout page the browser lands
+      // on is actually up (sandbox/prod mismatch, Polar outage).
+      const probe = await probeCheckoutUrl(checkoutUrl);
+      if (probe && !probe.ok) {
+        captureProFunnelServerEvent(buildProCheckoutFailedEvent(user.id, `checkout_page_${probe.status}`));
       }
     } catch {
       /* the teacher's checkout url matters more than the funnel */

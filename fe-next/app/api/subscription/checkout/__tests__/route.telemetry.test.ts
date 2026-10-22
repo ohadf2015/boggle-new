@@ -7,9 +7,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 const createCheckout = vi.fn()
+const probeCheckoutUrl = vi.fn(async () => ({ ok: true, status: 200 }))
 vi.mock('@/lib/polar', () => ({
   getPolarClient: () => ({ createCheckout }),
   getProProductId: () => process.env.POLAR_PRO_PRODUCT_ID,
+  probeCheckoutUrl: (...args: unknown[]) => probeCheckoutUrl(...args),
 }))
 vi.mock('@/utils/supabase/admin', () => ({
   createAdminClient: () => null,
@@ -37,6 +39,8 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
     createCheckout.mockReset()
     getAuthedUser.mockReset()
     capture.mockReset()
+    probeCheckoutUrl.mockReset()
+    probeCheckoutUrl.mockResolvedValue({ ok: true, status: 200 })
     posthogThrows = false
     process.env.POLAR_ACCESS_TOKEN = 'polar-token'
     process.env.POLAR_PRO_PRODUCT_ID = 'prod-pro-1'
@@ -99,6 +103,32 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
     const res = await POST(req())
     expect(res.status).toBe(200)
     expect(await res.json()).toEqual({ url: 'https://polar.sh/checkout/u1' })
+  })
+
+  it('Given the Polar checkout page itself 503s, When the route answers, Then edu_pro_checkout_failed fires but the teacher still gets the url', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    probeCheckoutUrl.mockResolvedValue({ ok: false, status: 503 })
+
+    const res = await POST(req())
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ url: 'https://polar.sh/checkout/u1' })
+    const events = capture.mock.calls.map((c) => c[0].event)
+    expect(events).toEqual(['edu_pro_checkout_started', 'checkout_started', 'edu_pro_checkout_failed'])
+    const failedArg = capture.mock.calls[2][0]
+    expect(failedArg.distinctId).toBe('u1')
+    expect(failedArg.properties.reason).toBe('checkout_page_503')
+  })
+
+  it('Given the probe cannot reach Polar at all (network error), When the route answers, Then nothing extra fires and the teacher still gets the url', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    probeCheckoutUrl.mockResolvedValue(null)
+
+    const res = await POST(req())
+    expect(res.status).toBe(200)
+    const events = capture.mock.calls.map((c) => c[0].event)
+    expect(events).toEqual(['edu_pro_checkout_started', 'checkout_started'])
   })
 
   it('Given { trial: true }, When Polar creates checkout, Then it fires edu_pro_trial_started and checkout_started, not the paid event', async () => {

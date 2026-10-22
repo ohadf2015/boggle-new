@@ -34,6 +34,23 @@ export function getPolarEnvironment(): PolarEnvironment {
   return process.env.POLAR_ENVIRONMENT === 'sandbox' ? 'sandbox' : 'production'
 }
 
+/**
+ * GET the Polar-hosted checkout page itself. Creating the checkout URL is one
+ * Polar API call succeeding; it says nothing about whether the page a teacher's
+ * browser is about to land on is actually up (a sandbox/production mismatch or
+ * a Polar outage 503s the page while URL creation still returns 201). Returns
+ * null — never throws — on a network error, so an unrelated probe failure is
+ * never mistaken for a confirmed-dead checkout page.
+ */
+export async function probeCheckoutUrl(url: string): Promise<{ ok: boolean; status: number } | null> {
+  try {
+    const response = await fetch(url, { method: 'GET', signal: AbortSignal.timeout(3000) })
+    return { ok: response.ok, status: response.status }
+  } catch {
+    return null
+  }
+}
+
 export function getProProductId(): string {
   const productId = process.env.POLAR_PRO_PRODUCT_ID
   if (!productId) {
