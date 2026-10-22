@@ -17,11 +17,13 @@ const DEMO_GRID: string[][] = [
   ['P', 'M', 'A', 'D'],
 ];
 
+// Base points before combos — must match shared/utils/scoring.ts BASE_SCORES.
+// The old 1/2/3/5 list was classic-Boggle-shaped and contradicted the live game.
 const SCORING_RULES = [
-  { len: '3 letters', pts: '1 pt' },
-  { len: '4 letters', pts: '2 pts' },
-  { len: '5 letters', pts: '3 pts' },
-  { len: '6+ letters', pts: '5 pts' },
+  { len: '3 letters', pts: '10 pts' },
+  { len: '4 letters', pts: '20 pts' },
+  { len: '5 letters', pts: '50 pts' },
+  { len: '8+ letters', pts: '500 pts' },
 ];
 
 function HeaderButton({
@@ -108,7 +110,7 @@ function InfoPanel(): React.JSX.Element {
         {/* Scoring rules card */}
         <div className="rounded-xl border-3 border-neo-black bg-neo-navy-elevated/60 p-3 shadow-hard-sm">
           <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-neo-lime">
-            Scoring
+            Base points
           </div>
           <ul className="space-y-0.5 text-[10px] text-neo-white/80">
             {SCORING_RULES.map((rule) => (
