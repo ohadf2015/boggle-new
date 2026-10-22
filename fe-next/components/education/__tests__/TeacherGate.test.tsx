@@ -34,6 +34,16 @@ describe('<TeacherGate>', () => {
     expect(screen.queryByText('INSIDE')).toBeNull();
   });
 
+  it('keeps ?checkout=success on the return path so the grant poll can resume', () => {
+    window.history.pushState({}, '', '/en/teacher/curriculum?checkout=success');
+    mockUseTeacherAccess.mockReturnValue({ hasAccess: false, status: 'none', isLoading: false });
+    render(<TeacherGate><div>INSIDE</div></TeacherGate>);
+    expect(mockRouterReplace).toHaveBeenCalledWith(
+      '/en/education/access?from=' + encodeURIComponent('/en/teacher/curriculum?checkout=success'),
+    );
+    window.history.pushState({}, '', '/');
+  });
+
   // A blank page while auth resolves reads as "the dashboard failed to load" —
   // the children's own loader is below this gate and never gets to mount.
   it('shows a loader (not a blank page, not the children) while loading', () => {

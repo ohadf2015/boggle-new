@@ -14546,6 +14546,16 @@ const sv = {
       "manage": "Hantera prenumeration",
       "cta": "Kör!"
     },
+    "checkoutReturn": {
+      "activatingTitle": "Aktiverar Teacher Pro",
+      "activatingBody": "Betalningen är mottagen. Bekräftar åtkomst — det tar oftast några sekunder.",
+      "successTitle": "Teacher Pro är på",
+      "successBody": "Åtkomsten finns redan på kontot.",
+      "failureTitle": "Pro är inte bekräftat ännu",
+      "failureBody": "Om du blev debiterad brukar åtkomsten komma inom en minut. Kontrollera igen, eller skriv till oss om den fortfarande saknas.",
+      "retry": "Kontrollera igen",
+      "close": "Stäng"
+    },
     "plan": {
       "pro": "Pro",
       "free": "Gratisplan",

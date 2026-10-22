@@ -8,6 +8,8 @@ describe('accessReturnPath', () => {
     // Upgrade-page "Start free" carries this so a signup returns to the Polar till.
     expect(accessReturnPath('/en/teacher/upgrade')).toBe('/en/teacher/upgrade');
     expect(accessReturnPath('/he/teacher/upgrade')).toBe('/he/teacher/upgrade');
+    expect(accessReturnPath('/en/teacher?checkout=success')).toBe('/en/teacher?checkout=success');
+    expect(accessReturnPath('/he/teacher/upgrade?checkout=success')).toBe('/he/teacher/upgrade?checkout=success');
   });
 
   it.each([
