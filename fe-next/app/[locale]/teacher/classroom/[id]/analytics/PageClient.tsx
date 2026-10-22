@@ -199,7 +199,6 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
               onViewStudents={handleViewStudents}
               onCreateReviewLesson={handleCreateReviewLesson}
               showHeader={false}
-              summaryOnly
             />
           </div>
 

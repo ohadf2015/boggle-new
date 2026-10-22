@@ -3537,7 +3537,68 @@ const en = {
     "invalidTitle": "Link not available",
     "invalidBody": "This report link has expired or is no longer valid. Ask the teacher for a new link.",
     "footerNote": "Shared by your child's teacher via LexiClash. No account needed.",
-    "language": "View in"
+    "language": "View in",
+    "printButton": "Print or save as PDF",
+    "classLabel": "Class",
+    "teacherLabel": "Teacher",
+    "periodLabel": "Period",
+    "periodRange": "{start} – {end}",
+    "noValue": "—",
+    "allTime": "All time: {xp} XP · {lessons} lessons completed",
+    "statWordsMeaning": "Words learned well enough to count as mastered.",
+    "statAccuracy": "Accuracy",
+    "statAccuracyMeaning": "Share of all answers that were right.",
+    "statWeekMinutes": "Minutes this week",
+    "statWeekMinutesMeaning": "Time spent practicing in the last 7 days.",
+    "statStreak": "Day streak",
+    "statStreakMeaning": "Days in a row with practice. Best so far: {best}.",
+    "weekTitle": "This week vs last week",
+    "weekThis": "Last 7 days",
+    "weekLast": "7 days before",
+    "rowSessions": "Practice sessions",
+    "rowMinutes": "Minutes practiced",
+    "rowActiveDays": "Days active",
+    "rowAccuracy": "Accuracy",
+    "practiceTitle": "Words to practice",
+    "practiceHint": "Missed most often. A quick review at home helps.",
+    "winsTitle": "Recent wins",
+    "winsHint": "Words recently answered well or mastered.",
+    "wordAccuracy": "{value}% right",
+    "wordMastered": "Mastered",
+    "insightTitle": "In short",
+    "activityTitle": "Try at home",
+    "insight": {
+      "quiet": "{name} hasn't practiced in the last two weeks. A short session together can restart the habit.",
+      "started_this_week": "{name} is back to practicing this week after a quiet week. Sessions this week: {count}.",
+      "more_active": "{name} practiced more this week than the week before. Sessions: {count} (was {previous}).",
+      "less_active": "{name} practiced a bit less this week. Sessions: {count} (was {previous}).",
+      "steady": "{name} kept a steady rhythm. Sessions this week: {count}, same as the week before.",
+      "paused": "{name} practiced last week but not yet this week. Sessions last week: {previous}."
+    },
+    "activity": {
+      "practice_weak_words": "Ask {name} to use these words in a sentence at dinner: {words}.",
+      "celebrate_wins": "Ask {name} to teach you a word they learned recently, like {words}.",
+      "short_daily_session": "Pick three days this week for a 10-minute practice together."
+    },
+    "teacherPreviewTitle": "What the parent report shows",
+    "teacherPreviewHint": "The same numbers a parent sees on the shared link.",
+    "loadFailed": "Couldn't load this summary. Refresh to try again."
+  },
+  "parentReportsFlow": {
+    "title": "Parent reports",
+    "lead": "Pick the students, preview a report, then copy links or download them as a CSV.",
+    "disclosureHint": "Choose students and share their progress with home",
+    "search": "Search students",
+    "selectAll": "Select all",
+    "selectNone": "Clear",
+    "selectedCount": "{count} of {total} selected",
+    "noMatch": "No students match that search.",
+    "rosterFailed": "Couldn't load the student list. Please try again.",
+    "make": "Make links for {count} selected",
+    "preview": "Preview",
+    "previewFor": "Preview {name}'s report",
+    "copyOne": "Copy link",
+    "copyOneFor": "Copy {name}'s link"
   },
   "share": {
     "button": "Share",
@@ -12786,6 +12847,10 @@ const en = {
       "googleClassroomBody": "Tap the link to join our class. No account needed, just pick a name.",
       "createdBannerBody": "Share this code with your students.",
       "dismissBanner": "Got it",
+      "card": {
+        "assign": "Assign",
+        "report": "Report"
+      },
       "wizard": {
         "title": "Get students in 3 steps",
         "subtitle": "You'll have a join code in under a minute.",
@@ -15217,6 +15282,12 @@ const en = {
           "joinedHeadline": "Your next assignment",
           "joinedSub": "You're in the class. Play the homework that's waiting.",
           "openAcademy": "Open my class",
+          "whereCode": "Where do I find the code?",
+          "whereCodeAnswer": "Your teacher shows it on the board or the projector: 6 letters and numbers. Got a QR code? Scan it with your camera and you skip this step.",
+          "genericError": "Something went wrong on our side. Tap the button again. If it keeps happening, tell your teacher.",
+          "stepOf": "Step {{current}} of {{total}}",
+          "successGame": "Taking you into the game…",
+          "yourClass": "Your class",
           "findingAssignment": "Finding your assignment…"
         },
         "heroLine": "Ask your teacher for the class code",
@@ -15236,6 +15307,7 @@ const en = {
           "label": "Joining:",
           "confirm": "This is your classroom",
           "gameLabel": "Live game:",
+          "classroomNext": "No game running right now. You'll join the class and see what your teacher set.",
           "gameConfirm": "Your class is playing now. You'll join straight in"
         },
         "subtitle": "Enter your teacher's code",
@@ -17936,21 +18008,16 @@ const en = {
       }
     },
     "eduDashboard": {
-      "verdict": {
-        "none": "Not enough data in this window yet.",
-        "eyebrow": "Biggest leak",
-        "label": {
-          "approved": "access requests were never approved",
-          "classroom": "approved teachers never made a class",
-          "student": "teachers made a class but no student has joined yet"
-        },
-        "action": {
-          "approved": "Work through the pending requests in Teacher access.",
-          "classroom": "Nudge them to create their first class.",
-          "student": "Send the join code to these teachers, most recently active first."
-        },
-        "convert": "reach this step",
-        "openTop": "Open top teacher"
+      "healthTitle": "Teacher health",
+      "title": "Education overview",
+      "window": "Window",
+      "loadFailed": "Could not load the education overview.",
+      "loading": "Loading…",
+      "noData": "No data yet",
+      "health": {
+        "thriving": "Thriving",
+        "at_risk": "At risk",
+        "dormant": "Dormant"
       },
       "rescue": {
         "nudge": {
@@ -17969,46 +18036,26 @@ const en = {
         "nudged": "Nudged {date}",
         "copy": "Copy nudge",
         "email": "Email",
-        "mark": "Mark done",
-        "title": "Rescue list",
-        "empty": "No one is stuck at this step.",
-        "rowAction": {
-          "approved": "Nudge to create a class",
-          "classroom": "Send the join code"
+        "mark": "Mark done"
+      },
+      "verdict": {
+        "none": "Not enough data in this window yet.",
+        "eyebrow": "Biggest drop-off",
+        "label": {
+          "approved": "applicants were never approved",
+          "signin": "approved teachers cannot sign in: the teacher role was never granted",
+          "classroom": "teachers can sign in but never made a class",
+          "student": "teachers made a class but no student has joined yet"
         },
-        "more": "more in All teachers below"
-      },
-      "healthTitle": "Teacher health",
-      "quiet": "Quiet metrics",
-      "posthogHidden": "Landing and upsell conversion are hidden: no server PostHog key is configured.",
-      "title": "Education overview",
-      "subtitle": "Test accounts excluded. Deltas compare with the prior period.",
-      "window": "Window",
-      "loadFailed": "Could not load the education overview.",
-      "loading": "Loading…",
-      "noData": "No data yet",
-      "kpi": {
-        "activeTeachers": "Active teachers",
-        "newTeachers": "New teachers",
-        "classesWithLiveGame": "Classes with a live game",
-        "liveRounds": "Live rounds played",
-        "trialsStarted": "Pro trials started",
-        "trialsPaid": "Trials converted to paid"
-      },
-      "funnel": {
-        "title": "Teacher funnel",
-        "requested": "Requested",
-        "approved": "Approved",
-        "classroom": "Created a class",
-        "student": "First student joined"
-      },
-      "health": {
-        "thriving": "Thriving",
-        "at_risk": "At risk",
-        "dormant": "Dormant"
-      },
-      "modeMix": {
-        "title": "Classroom mode mix"
+        "action": {
+          "approved": "Work through the pending requests in Teacher access.",
+          "signin": "Grant the teacher role in Teacher access.",
+          "classroom": "Nudge them to create their first class.",
+          "student": "Send the join code to these teachers, most recently active first."
+        },
+        "convert": "Only {pct}% of \"{from}\" reach \"{to}\".",
+        "seeCohort": "See these {count} teachers",
+        "openAccess": "Open Teacher access"
       },
       "teachers": {
         "all": "All teachers",
@@ -18021,16 +18068,118 @@ const en = {
         "lastActive": "Last active",
         "classes": "Classes",
         "students": "Students",
-        "rounds7d": "Rounds 7d",
-        "health": "Health"
-      },
-      "dying": {
-        "title": "Dying classes",
-        "empty": "None right now."
+        "health": "Health",
+        "rounds7d": "Class games, last 7 days",
+        "plan": "Plan",
+        "planPaid": "Paid Pro",
+        "planTrial": "Trial",
+        "planFree": "Free",
+        "lockedOut": "Cannot sign in",
+        "healthDefinition": "Thriving: visited and ran a class game in the last 7 days. At risk: visited in the last 21 days without that. Dormant: no visit in 21 days."
       },
       "classes": {
-        "title": "Classes"
+        "title": "Classes",
+        "name": "Class",
+        "gamesInWindow": "Games this period",
+        "lastGame": "Last game"
+      },
+      "subtitle": "Test accounts are left out of every number. Each change compares with the same number of days just before.",
+      "windowLast": "Last {days} days",
+      "notMeasured": "Not measured yet: the class games table is missing in this database.",
+      "delta": {
+        "vsPrior": "{pct} vs the previous {days} days (was {prior})",
+        "fromZero": "Up from 0 in the previous {days} days",
+        "noneEither": "None in the previous {days} days either"
+      },
+      "drill": {
+        "show": "Show the list ({count})",
+        "stoppedAt": "Stopped at: {step}",
+        "clear": "Show everyone",
+        "empty": "Nobody here."
+      },
+      "kpi": {
+        "activeTeachers": "Teachers who visited",
+        "newTeachers": "Newly approved teachers",
+        "classesWithLiveGame": "Classes that played",
+        "liveRounds": "Class games played",
+        "trialsStarted": "Pro trials started",
+        "trialsPaid": "Trials that paid"
+      },
+      "kpiDefinition": {
+        "activeTeachers": "Teachers whose last visit falls in this period. Only the last visit is stored, so there is no earlier comparison.",
+        "newTeachers": "Access requests approved in this period, one per person.",
+        "classesWithLiveGame": "Classes that finished at least one live game in this period.",
+        "liveRounds": "Live classroom games finished in this period.",
+        "trialsStarted": "Approved teachers whose Pro trial began in this period.",
+        "trialsPaid": "Trial teachers who started a paid Pro plan in this period. Free and gifted Pro are not counted."
+      },
+      "funnel": {
+        "title": "Teacher journey",
+        "hint": "All time. % is the share of the step above. Click a step to see who stopped there.",
+        "requested": "Applied",
+        "approved": "Approved",
+        "signin": "Can sign in",
+        "classroom": "Made a class",
+        "student": "Has students"
+      },
+      "funnelDefinition": {
+        "requested": "People who filled in the teacher access form, all time.",
+        "approved": "Applicants an admin approved.",
+        "signin": "Approved and given the teacher role, so /teacher lets them in.",
+        "classroom": "Created at least one class.",
+        "student": "At least one student joined one of their classes."
+      },
+      "attention": {
+        "title": "Needs attention",
+        "hint": "Most urgent first: sign-in problems, trials about to end, then teachers stuck at a step.",
+        "empty": "Nobody needs a nudge right now.",
+        "more": "+{count} more. Use the funnel or the teacher list below to see them.",
+        "fixAccess": "Fix in Teacher access",
+        "reason": {
+          "locked_out": "Approved, but cannot sign in: the teacher role is missing.",
+          "trial_ending": "Pro trial ends {date} and they are not paying yet.",
+          "no_students": "Made a class, but no student has joined.",
+          "class_stalled": "Has students, but no class game in 14 days:",
+          "no_class": "Can sign in, but never made a class.",
+          "went_quiet": "Visited this week, but ran no class game."
+        }
+      },
+      "modeMix": {
+        "title": "Which games classes play",
+        "mode": "Game mode",
+        "rounds": "Games",
+        "players": "Player seats"
       }
+    },
+    "eduClass": {
+      "error": "Could not load this class.",
+      "teacher": "Teacher",
+      "testTeacher": "Test account",
+      "joinCode": "Join code",
+      "language": "Language",
+      "created": "Created",
+      "lastGame": "Last class game",
+      "students": "Students",
+      "studentsEmpty": "No student has joined yet.",
+      "student": "Student",
+      "joined": "Joined",
+      "lastSeen": "Last seen",
+      "noName": "No name ({id})",
+      "testStudents": "Test accounts left out: {count}.",
+      "assignments": "Assignments",
+      "assignmentsEmpty": "Nothing assigned yet.",
+      "completion": "{done} of {total} finished",
+      "due": "due {date}",
+      "games": "Class games",
+      "roundsSummary": "{count} class games in the last 30 days",
+      "unnamed": "(unnamed)",
+      "colPlayed": "Played",
+      "colMode": "Mode",
+      "colPlayers": "Players",
+      "colCoverage": "Words found",
+      "colTop": "Top players",
+      "colMissed": "Most missed",
+      "noGames": "No live games played yet."
     },
     "teacherFunnel": {
       "excludedMachineRows": "{count} machine-written rows (test accounts) excluded from every number above.",
@@ -19796,7 +19945,14 @@ const en = {
       "minutes": "{count} min",
       "leave": "Leave room",
       "moreJoined": "+{count} more",
-      "readyCount": "{ready} of {total} ready"
+      "readyCount": "{ready} of {total} ready",
+      "editRoster": "Edit list",
+      "doneEditing": "Done",
+      "removeStudent": "Remove {name}",
+      "removeConfirmTitle": "Remove {name}?",
+      "removeConfirmBody": "They leave the game and can't rejoin with this name.",
+      "removeConfirm": "Remove",
+      "removeFailed": "Didn't remove. Try again."
     },
     "student": {
       "youreIn": "You're in!",
@@ -19827,7 +19983,14 @@ const en = {
       "nextMode": "Next mode",
       "viewReport": "View report",
       "endGame": "End game",
-      "noScores": "No one scored this round"
+      "noScores": "No one scored this round",
+      "mostMissed": "Most missed words",
+      "needHelpCount": "Students under half: {count}. Names are in the report.",
+      "replayMissed": "Replay missed words ({count})",
+      "replayFailed": "Couldn't set up the replay. Try again.",
+      "moreWords": "+{count} more",
+      "notOnBoard": "not on board",
+      "replayReady": "Set. Play again now uses these words."
     },
     "studentResults": {
       "placed": "You placed",

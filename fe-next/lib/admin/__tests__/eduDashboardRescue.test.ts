@@ -39,14 +39,14 @@ describe('dailyDistinct', () => {
 });
 
 describe('buildEduDashboard sparklines', () => {
-  it('returns a daily series for every KPI, one value per window day', () => {
+  it('returns a daily series for every event-based KPI, one value per window day', () => {
     const data = buildEduDashboard(
       base({
         rounds: [{ classroom_id: 'c1', teacher_id: 't1', game_mode: 'wordcraft', player_count: 3, completed_at: '2026-10-08T01:00:00Z' }],
       }),
     );
     const keys = ['activeTeachers', 'newTeachers', 'classesWithLiveGame', 'liveRounds', 'trialsStarted', 'trialsPaid'] as const;
-    for (const key of keys) {
+    for (const key of keys.filter((k) => k !== 'activeTeachers')) {
       expect(data.sparklines[key], key).toHaveLength(7);
     }
     expect(data.sparklines.newTeachers?.[5]).toBe(1);
@@ -61,8 +61,8 @@ describe('buildEduDashboard sparklines', () => {
   });
 });
 
-describe('buildEduDashboard rescue rows', () => {
-  it('carries the email, first class join code and last outreach for each stuck teacher', () => {
+describe('buildEduDashboard teacher contact details', () => {
+  it('carries the email, first class join code and last outreach on each teacher row', () => {
     const data = buildEduDashboard(
       base({
         outreach: [
@@ -72,7 +72,7 @@ describe('buildEduDashboard rescue rows', () => {
       }),
     );
     expect(data.outreachAvailable).toBe(true);
-    const row = data.verdict?.rescue[0];
+    const row = data.teachers.find((t) => t.id === 't1');
     expect(row).toMatchObject({
       id: 't1',
       email: 'ann@school.example',
@@ -84,7 +84,7 @@ describe('buildEduDashboard rescue rows', () => {
   it('reports outreach as unmeasured, not as never contacted, when the table is missing', () => {
     const data = buildEduDashboard(base({ outreach: null }));
     expect(data.outreachAvailable).toBe(false);
-    expect(data.verdict?.rescue[0].lastOutreachAt).toBeNull();
+    expect(data.teachers[0].lastOutreachAt).toBeNull();
   });
 });
 

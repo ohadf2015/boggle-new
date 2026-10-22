@@ -35,7 +35,6 @@ async function main() {
 
   const actual: Record<string, number> = {
     active_teachers_cur: dash.kpis.activeTeachers.current,
-    active_teachers_prior: dash.kpis.activeTeachers.prior,
     new_teachers_cur: dash.kpis.newTeachers.current,
     new_teachers_prior: dash.kpis.newTeachers.prior,
     trials_started_cur: dash.kpis.trialsStarted.current,
@@ -46,6 +45,7 @@ async function main() {
     live_rounds_prior: dash.kpis.liveRounds?.prior ?? -1,
     funnel_requested: funnel.requested,
     funnel_approved: funnel.approved,
+    funnel_signin: funnel.signin,
     funnel_classroom: funnel.classroom,
     funnel_student: funnel.student,
     classes_total: dash.classes.length,

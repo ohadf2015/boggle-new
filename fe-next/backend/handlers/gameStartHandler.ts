@@ -224,6 +224,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
         return;
       }
       if (quizStart) {
+        // The board path below arms or clears the boss; a quiz round returns first, so it clears here.
+        armRoomBoss(io, gameCode, game, { bossId: undefined, students: 0, roundSeconds: 0 });
         gamesStarting.delete(gameCode);
         logger.info('SOCKET', `Game ${gameCode} started as a live vocab quiz`);
         return;

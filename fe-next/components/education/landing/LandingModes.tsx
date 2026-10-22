@@ -1,6 +1,9 @@
 'use client';
 import Image from 'next/image';
+import type { CSSProperties } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+import m from './landingMotion.module.css';
 import { DeliveryTag } from '@/components/education/DeliveryTag';
 import {
   catalogueModes,
@@ -29,15 +32,20 @@ export function LandingModes() {
       </h2>
       <p className="mt-2 max-w-[60ch] text-base text-neo-white/75">{t('eduPlans.modes.sub')}</p>
 
-      <ul className="mt-6 grid gap-3 md:grid-cols-3 md:gap-5">
-        {featured.map((mode) => (
+      <ul className="mt-6 grid gap-3 md:grid-cols-[1.4fr_1fr_1fr] md:gap-5">
+        {featured.map((mode, i) => (
           <li
             key={mode.id}
             data-testid="landing-mode-card"
-            className="flex items-center gap-3 overflow-hidden rounded-neo border-3 border-neo-black bg-neo-cream p-2 pe-3 shadow-hard md:flex-col md:items-stretch md:p-0"
+            style={{ '--i': i } as CSSProperties}
+            className={cn(
+              'flex items-center gap-3 overflow-hidden rounded-neo border-3 border-neo-black bg-neo-cream p-2 pe-3 shadow-hard hover:shadow-hard-lg md:flex-col md:items-stretch md:p-0',
+              m.card,
+              m.reveal
+            )}
           >
-            <div className={`relative grid size-16 shrink-0 place-items-end overflow-hidden rounded-neo border-2 border-neo-black md:h-28 md:w-full md:rounded-none md:border-0 md:border-b-3 ${ACCENT_BG[mode.accent]}`}>
-              <Image src={mode.poster} alt="" aria-hidden="true" width={112} height={112} className="mx-auto h-full w-auto object-contain object-bottom" />
+            <div className={cn('relative grid size-16 shrink-0 place-items-end overflow-hidden rounded-neo border-2 border-neo-black md:h-32 md:w-full md:rounded-none md:border-0 md:border-b-3', ACCENT_BG[mode.accent])}>
+              <Image src={mode.poster} alt="" aria-hidden="true" width={128} height={128} className={cn('mx-auto h-full w-auto object-contain object-bottom', m.modeArt)} />
             </div>
             <div className="min-w-0 flex-1 md:px-4 md:pb-4">
               <div className="flex flex-wrap items-center gap-2">

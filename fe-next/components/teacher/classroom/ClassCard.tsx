@@ -13,6 +13,9 @@ import {
   GraduationCap,
   MoreHorizontal,
   Rocket,
+  MonitorPlay,
+  ClipboardList,
+  BarChart3,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -43,10 +46,19 @@ export interface ClassCardProps {
   activity?: ReactNode;
   /** "Start game" → Teacher HQ with this class preselected (one more tap: GO LIVE). */
   startGameHref?: string;
+  /** The dashboard with this class preselected and the assignment creator open. */
+  assignHref?: string;
+  /** This class's report. */
+  reportHref?: string;
+  /** Opens the projector view of the join code. */
+  onOpenProjector?: () => void;
 }
 
 const PRESS =
   'shadow-hard-sm transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed';
+
+const QUIET_ACTION =
+  'flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream/40 px-2 py-1.5 font-neo-body text-sm font-bold text-neo-cream hover:bg-neo-cream/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan';
 
 const MENU_ITEM =
   'flex min-h-11 w-full items-center gap-2 rounded-neo px-3 text-start font-neo-body text-sm font-black text-black hover:bg-black/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan';
@@ -72,6 +84,9 @@ export function ClassCard({
   onDelete,
   activity,
   startGameHref,
+  assignHref,
+  reportHref,
+  onOpenProjector,
 }: ClassCardProps) {
   const { t } = useLanguage();
   const { hasPro, loading: proLoading } = useTeacherPro();
@@ -198,6 +213,17 @@ export function ClassCard({
             >
               {classroom.join_code}
             </code>
+            {onOpenProjector ? (
+              <button
+                type="button"
+                data-testid="classroom-card-projector"
+                onClick={onOpenProjector}
+                className="mt-0.5 inline-flex min-h-8 items-center gap-1 rounded-neo px-1.5 font-neo-body text-xs font-black text-black/80 underline-offset-2 hover:underline focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
+              >
+                <MonitorPlay className="size-3.5 shrink-0" aria-hidden="true" />
+                {t('eduShell.setup.showProjector')}
+              </button>
+            ) : null}
           </div>
           {/* Stacked, and each button may shrink: side by side, SHARE sliced
               to "SHAR" in a ~300px card. `min-w-0` is what actually lets a
@@ -305,6 +331,23 @@ export function ClassCard({
             <Rocket className="size-5 shrink-0" strokeWidth={3} aria-hidden="true" />
             {t('academy.hq.startTitle', 'Start a game')}
           </Link>
+        ) : null}
+
+        {assignHref || reportHref ? (
+          <div className="flex gap-2 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-2">
+            {assignHref ? (
+              <Link href={assignHref} data-testid="classroom-card-assign" className={cn(QUIET_ACTION, PRESS)}>
+                <ClipboardList className="size-4 shrink-0" aria-hidden="true" />
+                <span className="line-clamp-2">{t('teacher.classroom.card.assign')}</span>
+              </Link>
+            ) : null}
+            {reportHref ? (
+              <Link href={reportHref} data-testid="classroom-card-report" className={cn(QUIET_ACTION, PRESS)}>
+                <BarChart3 className="size-4 shrink-0" aria-hidden="true" />
+                <span className="line-clamp-2">{t('teacher.classroom.card.report')}</span>
+              </Link>
+            ) : null}
+          </div>
         ) : null}
       </div>
     </m.div>

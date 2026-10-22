@@ -1,75 +1,60 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { ArrowLeft, Dices, Sparkles } from 'lucide-react';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { JoinCodeField, JOIN_CODE_LENGTH, joinCodeOverflows, sanitizeJoinCode } from './JoinCodeField';
+import { JOIN_CODE_LENGTH, joinCodeOverflows, sanitizeJoinCode } from './JoinCodeField';
 import { useJoinFlow } from './useJoinFlow';
-import { useFitStage } from './fitStage';
 import { pickFunName } from './funName';
 import { getStoredUsername } from '@/utils/profileStorage';
 import { JoinSuccessPanel } from './JoinSuccessPanel';
+import { JoinCodeStep } from './JoinCodeStep';
+import { JoinNameStep } from './JoinNameStep';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
-import { PopPressButton } from '@/components/motion/PopPressButton';
 
 /**
  * The student's whole way in: code, nickname, playing.
  *
- * Two screens, one per decision, each with exactly one thing to do — because
- * the target reader is fifteen, standing up, on a phone, with a code read off
- * a projector and about nine seconds of patience. What was here before was a
- * *form*: two labelled fields, two hint lines, a tooltip, a hero image and a
- * back link, all at once, with the code field below the name field.
+ * Two screens, one per decision, each with exactly one thing to do. Every
+ * refusal is inline and stays on screen; the confirmation slot has a reserved
+ * height so a late class name cannot move GO under a finger; this is a
+ * dark-only surface, so the navy is hardcoded (recurring pitfall class 5).
  *
- * Non-negotiables encoded in the markup:
- *  - every refusal is inline and stays on screen (`role="alert"`), never a
- *    toast that is gone before it is read;
- *  - the confirmation slot has a reserved height, so a class name arriving
- *    late cannot shove the button out from under a finger already in flight
- *    (the original "first tap does nothing, second tap works" report);
- *  - no entrance opacity tween on the fullscreen surface, and the navy is
- *    hardcoded — this is a dark-only surface (recurring pitfall class 5).
- *  - confetti burst on success, with navigation deferred until animation
- *    completes (~750ms), so the celebration is not instantly erased by
- *    page transition.
+ * The layout is fluid CSS on every door: one column that grows with the
+ * screen, two columns on a phone on its side, and a scrolling root so an open
+ * keyboard can never hide the field or its button.
  */
+export type JoinFlowVariant = 'standalone' | 'academy';
+
 interface JoinFlowProps {
   /** From `/join/[code]` or `/join?code=` — the QR lands here pre-filled. */
   initialCode?: string;
-  /**
-   * Called on successful join, before navigation. Can return a Promise
-   * to delay navigation (e.g. for celebration animations).
-   */
+  /** Called on successful join, before navigation. May return a Promise to delay it. */
   onSuccessBeforeNavigation?: () => Promise<void> | void;
   /**
-   * Own the whole viewport and never scroll: the column is sized and zoomed to
-   * fit (two columns on a phone on its side, bigger on desktops/TVs). Used by
-   * the in-app `/student/join`; `/join` keeps its document flow.
+   * `standalone` (default) paints its own navy and decorations in page flow.
+   * `academy` owns the viewport with a transparent root, so the page's arena
+   * backdrop shows through.
    */
-  fit?: boolean;
+  variant?: JoinFlowVariant;
 }
 
 const K = 'education.student.join';
+const STEPS = ['code', 'name'] as const;
 
-export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: externalCallback, fit = false }: JoinFlowProps) {
+export function JoinFlow({
+  initialCode = '',
+  onSuccessBeforeNavigation: externalCallback,
+  variant = 'standalone',
+}: JoinFlowProps) {
   const { t, dir } = useLanguage();
-  const { ref: stageRef, stage } = useFitStage(fit);
-  const rail = fit && stage.rail;
-  // PopPressButton wraps its <button> in an inline-block motion div that
-  // shrinks it to its label. In fit mode, give it a full-width cell (column 2 on
-  // the rail); `/join` keeps its markup untouched.
-  const inColumn2 = (node: React.ReactNode) =>
-    fit ? <div className={cn('[&>div]:!block [&_button]:w-full', rail && 'col-start-2')}>{node}</div> : node;
+  const academy = variant === 'academy';
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
 
-  // Create a callback that shows confetti and waits for animation
+  // Confetti, then navigation: the celebration must not be erased instantly.
   const handleSuccessBeforeNavigation = useCallback(async () => {
     setShowSuccessCelebration(true);
-    // Wait for confetti animation (~750ms)
     await new Promise((resolve) => setTimeout(resolve, 750));
-    // Then call external callback if provided
     if (externalCallback) {
       await Promise.resolve(externalCallback());
     }
@@ -77,13 +62,16 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
 
   const flow = useJoinFlow(initialCode, handleSuccessBeforeNavigation);
   const nameRef = useRef<HTMLInputElement>(null);
+  const goRef = useRef<HTMLButtonElement>(null);
   const [pasteNoteKey, setPasteNoteKey] = useState<string | null>(null);
-  const [diceSpin, setDiceSpin] = useState(0);
+  const funNames = t('eduStudent.join.funNames');
 
-  // Land on the nickname with the keyboard already up: on the QR path this is
-  // the only field between the student and the game.
+  // Land on the nickname with the keyboard already up; a signed-in student
+  // with nothing to type lands on GO.
   useEffect(() => {
-    if (flow.step === 'name' && flow.showNameField) nameRef.current?.focus();
+    if (flow.step !== 'name') return;
+    if (flow.showNameField) nameRef.current?.focus();
+    else goRef.current?.focus();
   }, [flow.step, flow.showNameField]);
 
   // Invite link + guest: one GO, not type-a-name-from-blank. Wait until the
@@ -93,13 +81,13 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
     if (flow.step !== 'name' || !flow.showNameField || flow.name.trim()) return;
     if (sanitizeJoinCode(initialCode).length !== JOIN_CODE_LENGTH) return;
     if (flow.isChecking || !flow.target || flow.target.verdict === 'invalid') return;
-    flow.setName(getStoredUsername() || pickFunName(t('eduStudent.join.funNames'), ''));
+    const seed = getStoredUsername() || pickFunName(funNames, '');
+    if (seed) flow.setName(seed);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [flow.step, flow.showNameField, initialCode, flow.isChecking, flow.target]);
+  }, [flow.step, flow.showNameField, initialCode, flow.isChecking, flow.target, funNames]);
 
-  // Any refusal about the NAME — empty, or already taken by a classmate — puts
-  // the cursor back in the field that fixes it. One place, so the two refusals
-  // cannot behave differently (recurring pitfall class 3).
+  // Any refusal about the NAME — empty, or taken — puts the cursor back in the
+  // field that fixes it, so the two refusals behave the same (class 3).
   useEffect(() => {
     if (flow.nameError) nameRef.current?.focus();
   }, [flow.nameError]);
@@ -121,287 +109,76 @@ export function JoinFlow({ initialCode = '', onSuccessBeforeNavigation: external
       setPasteNoteKey(`${K}.codePasted`);
       if (cleaned.length === JOIN_CODE_LENGTH) flow.advance(cleaned);
     } catch {
-      // Clipboard read is permission-gated on mobile Safari and simply refuses
-      // sometimes. Say so where they can read it; the field still works.
+      // Clipboard read is permission-gated on mobile Safari. Say so; typing still works.
       setPasteNoteKey(`${K}.clipboardError`);
     }
   };
 
-  const confirmLabel =
-    flow.target?.verdict === 'game'
-      ? `${K}.preview.gameLabel`
-      : flow.target?.verdict === 'classroom'
-        ? `${K}.preview.label`
-        : null;
+  const currentStep = STEPS.indexOf(flow.step) + 1;
 
   return (
-    <BoundedConfettiBurst
-      trigger={showSuccessCelebration}
-      colors={['#22C55E', '#EC4899', '#06B6D4', '#D946EF']}
-    >
+    <BoundedConfettiBurst trigger={showSuccessCelebration}>
       <div
+        data-testid="join-root"
         dir={dir}
         className={cn(
-          'flex flex-col overflow-hidden bg-neo-navy text-neo-white',
-          fit ? 'fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] items-center justify-center' : 'relative min-h-dvh pb-[var(--cookie-consent-height,0px)]'
+          'flex flex-col overflow-x-hidden overflow-y-auto overscroll-contain text-neo-white',
+          academy
+            ? 'fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)]'
+            : 'relative min-h-dvh bg-neo-navy pb-[var(--cookie-consent-height,0px)]'
         )}
       >
-        {/* Loud, cheap, and behind everything — no layout cost, no tween. */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -start-16 -top-16 h-56 w-56 rotate-12 rounded-neo border-3 border-neo-purple bg-neo-purple/20" />
-          <div className="absolute -end-20 top-1/3 h-64 w-64 -rotate-6 rounded-neo border-3 border-neo-pink bg-neo-pink/20" />
-          <div className="absolute -bottom-24 start-1/4 h-52 w-52 rotate-6 rounded-neo border-3 border-neo-cyan bg-neo-cyan/15" />
-        </div>
+        {!academy && (
+          <div data-testid="join-decor" aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -start-16 -top-16 h-56 w-56 rotate-12 rounded-neo border-3 border-neo-purple bg-neo-purple/20" />
+            <div className="absolute -end-20 top-1/3 h-64 w-64 -rotate-6 rounded-neo border-3 border-neo-pink bg-neo-pink/20" />
+            <div className="absolute -bottom-24 start-1/4 h-52 w-52 rotate-6 rounded-neo border-3 border-neo-cyan bg-neo-cyan/15" />
+          </div>
+        )}
 
         <main
-          ref={stageRef as React.RefObject<HTMLElement>}
           data-testid="join-stage"
-          data-rail={rail || undefined}
-          className={cn(
-            'relative z-10 flex flex-col',
-            fit ? (rail ? 'px-2 py-2' : 'px-0 py-4') : 'mx-auto w-full max-w-md flex-1 justify-center px-4 py-6'
-          )}
-          // Inline: a global landscape-phone rule forces every <main> to relative
-          // and caps widths; the fit column must be exactly this wide.
-          style={fit ? { width: stage.width, maxWidth: 'none', ...(stage.zoom !== 1 ? { zoom: stage.zoom } : {}) } : undefined}
+          className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-6 short:justify-start short:py-3 sm:max-w-lg lg:max-w-xl tv:max-w-3xl [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:max-w-3xl [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:justify-center"
         >
-        <header className={cn('flex items-center justify-between gap-3', rail ? 'mb-2' : 'mb-5')}>
-          <span className="inline-block -rotate-2 rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-lg font-black uppercase tracking-tight text-neo-navy shadow-hard">
-            LexiClash
-          </span>
-          <ol className="flex items-center gap-1.5" aria-label={t(`${K}.flow.steps`)}>
-            {(['code', 'name'] as const).map((s) => (
-              <li
-                key={s}
-                aria-current={flow.step === s ? 'step' : undefined}
-                className={cn(
-                  'h-2.5 rounded-full border-2 border-neo-black transition-all',
-                  flow.step === s ? 'w-8 bg-neo-cyan' : 'w-2.5 bg-neo-white/30'
-                )}
-              />
-            ))}
-          </ol>
-        </header>
-
-        {flow.joined ? (
-          <JoinSuccessPanel
-            classroomId={flow.joined.classroomId}
-            alreadyMember={flow.joined.alreadyMember}
-          />
-        ) : flow.step === 'code' ? (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              flow.advance();
-            }}
-            className={cn(rail ? 'grid grid-flow-row-dense grid-cols-2 items-start gap-x-6 gap-y-2' : 'flex flex-col gap-4')}
-          >
-            <div className={cn(rail && 'col-start-1 row-span-3 self-center')}>
-              <h1 className="font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-neo-white sm:text-5xl">
-                {t(`${K}.flow.codeHeadline`)}
-              </h1>
-              <p className="mt-2 font-neo-body text-base font-bold text-neo-cyan">
-                {t(`${K}.flow.codeSub`)}
-              </p>
-            </div>
-
-            <div className={cn(rail && 'col-start-2')}>
-              <JoinCodeField
-                value={flow.code}
-                onChange={flow.setCode}
-                onComplete={(next) => flow.advance(next)}
-                onPaste={handlePaste}
-                onOverflow={flow.refuseTooLong}
-                label={t(`${K}.codeLabel`)}
-                describedBy="join-code-note"
-                invalid={!!flow.codeErrorKey || flow.codeRejected}
-                autoFocus
-              />
-            </div>
-
-            <div id="join-code-note" className={cn('min-h-[44px]', rail && 'col-start-2')}>
-              {flow.codeErrorKey || flow.codeRejected ? (
-                <p
-                  role="alert"
-                  className="animate-neo-shake rounded-neo border-3 border-neo-black bg-neo-red px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard"
-                >
-                  {t(flow.codeErrorKey ?? `${K}.invalidCode`)}
-                </p>
-              ) : pasteNoteKey ? (
-                <p className="font-neo-body text-sm font-bold text-neo-lime">{t(pasteNoteKey)}</p>
-              ) : (
-                <p className="font-neo-body text-sm text-neo-white/70">{t(`${K}.codeHint`)}</p>
-              )}
-            </div>
-
-            {inColumn2(
-              <PopPressButton
-                type="submit"
-                className="font-neo-display text-xl font-black uppercase tracking-wide"
-              >
-                {t(`${K}.flow.next`)}
-              </PopPressButton>
-            )}
-          </form>
-        ) : (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              flow.submit();
-            }}
-            className={cn(rail ? 'grid grid-flow-row-dense grid-cols-2 items-start gap-x-6 gap-y-2' : 'flex flex-col gap-4')}
-          >
-            {/* The code, and the way back to it. One control, so there is no
-                second "change code" affordance to diverge from this one. */}
-            <button
-              type="button"
-              onClick={flow.backToCode}
-              aria-label={t(`${K}.flow.changeCode`)}
-              /* Cream edge, not black: black on navy measures 1.23:1 and the
-                 audit reads this control as borderless. */
-              className={cn('flex items-center gap-3 self-start justify-self-start rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard', rail && 'col-start-1')}
-            >
-              <DirectionalIcon icon={ArrowLeft} className="h-4 w-4 text-neo-cyan" />
-              <span
-                dir="ltr"
-                className="font-neo-display text-2xl font-black tracking-[0.2em] text-neo-lime"
-              >
-                {flow.code}
-              </span>
-            </button>
-
-            {/* Reserved height: the confirmation resolves over the network and
-                must never move the button underneath it. */}
-            <div data-testid="join-confirm-slot" className={cn('min-h-[76px]', rail && 'col-start-1')}>
-              {flow.codeRejected ? (
-                <div
-                  role="alert"
-                  className="animate-neo-shake rounded-neo border-3 border-neo-black bg-neo-red p-3 shadow-hard"
-                >
-                  <p className="font-neo-body text-sm font-bold text-neo-white">
-                    {t(`${K}.invalidCode`)}
-                  </p>
-                </div>
-              ) : flow.target?.label ? (
-                <div className="rounded-neo border-3 border-neo-black bg-neo-lime p-3 shadow-hard">
-                  <p className="font-neo-display text-xs font-black uppercase tracking-wide text-neo-navy/70">
-                    {t(confirmLabel ?? `${K}.preview.label`)}
-                  </p>
-                  <p className="font-neo-display text-lg font-black leading-tight text-neo-navy">
-                    {flow.target.label}
-                  </p>
-                </div>
-              ) : flow.isChecking ? (
-                <div className="rounded-neo border-3 border-neo-cream bg-neo-navy-light p-3 shadow-hard">
-                  <div className="h-3 w-24 animate-pulse rounded-full bg-neo-cyan/40" />
-                  <div className="mt-2 h-4 w-40 animate-pulse rounded-full bg-neo-cyan/25" />
-                </div>
-              ) : null}
-            </div>
-
-            <h1 className={cn('font-neo-display text-3xl font-black uppercase leading-[0.95] tracking-tight text-neo-white sm:text-4xl', rail && 'col-start-1')}>
-              {t(flow.showNameField ? `${K}.flow.nameHeadline` : `${K}.flow.readyHeadline`)}
-            </h1>
-
-            {flow.showNameField ? (
-              <div className={cn('flex flex-col gap-2', rail && 'col-start-2 row-start-1 row-span-2')}>
-                <label
-                  htmlFor="join-nickname"
-                  className="font-neo-display text-sm font-black uppercase tracking-wide text-neo-cyan"
-                >
-                  {t(`${K}.nameLabel`)}
-                </label>
-                <div className="relative">
-                  <input
-                    id="join-nickname"
-                    ref={nameRef}
-                    value={flow.name}
-                    onChange={(e) => flow.setName(e.target.value)}
-                    maxLength={40}
-                    autoComplete="off"
-                    enterKeyHint="go"
-                    placeholder={t(`${K}.namePlaceholder`)}
-                    aria-invalid={flow.nameError || undefined}
+          <header className="mb-5 flex items-center justify-between gap-3 short:mb-3 lg:mb-8">
+            <span className="inline-block -rotate-2 rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-lg font-black uppercase tracking-tight text-neo-navy shadow-hard lg:text-2xl">
+              LexiClash
+            </span>
+            {!flow.joined && !showSuccessCelebration && (
+              <ol className="flex items-center gap-1.5" aria-label={t(`${K}.flow.steps`)}>
+                {STEPS.map((s) => (
+                  <li
+                    key={s}
+                    aria-current={flow.step === s ? 'step' : undefined}
                     className={cn(
-                      'w-full rounded-neo border-3 border-neo-black bg-neo-cream py-4 pe-16 ps-4 text-center font-neo-display text-2xl font-black text-neo-navy shadow-hard outline-none placeholder:font-neo-body placeholder:text-xl placeholder:font-bold placeholder:text-neo-navy/40',
-                      flow.nameError && 'border-neo-red shadow-hard-pink motion-safe:animate-neo-shake'
+                      'h-2.5 rounded-full border-2 border-neo-black transition-all lg:h-3',
+                      flow.step === s ? 'w-8 bg-neo-cyan lg:w-10' : 'w-2.5 bg-neo-white/30 lg:w-3'
                     )}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      flow.setName(pickFunName(t('eduStudent.join.funNames'), flow.name));
-                      setDiceSpin((n) => n + 1);
-                      nameRef.current?.focus();
-                    }}
-                    aria-label={t('eduStudent.join.surpriseMe')}
-                    title={t('eduStudent.join.surpriseMe')}
-                    className="absolute end-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-yellow text-neo-black shadow-hard-sm transition-transform active:translate-y-[-45%] active:shadow-none"
                   >
-                    <Dices key={diceSpin} aria-hidden="true" className="size-6 motion-safe:animate-[lc-join-dice_450ms_ease-out]" strokeWidth={2.5} />
-                  </button>
-                  <style>{'@keyframes lc-join-dice{0%{transform:rotate(0) scale(.8)}60%{transform:rotate(300deg) scale(1.15)}100%{transform:rotate(360deg) scale(1)}}'}</style>
-                </div>
-                <p className="font-neo-body text-sm text-neo-white/70">{t(`${K}.nameHint`)}</p>
-              </div>
-            ) : (
-              <p className={cn('font-neo-body text-base font-bold text-neo-white/80', rail && 'col-start-2 row-start-1')}>
-                {t(`${K}.flow.readySub`)}
-              </p>
+                    {flow.step === s && (
+                      <span className="sr-only">{t(`${K}.flow.stepOf`, { current: currentStep, total: STEPS.length })}</span>
+                    )}
+                  </li>
+                ))}
+              </ol>
             )}
+          </header>
 
-            {flow.suggestedName && (
-              <div
-                role="alert"
-                className={cn('flex flex-col gap-2 rounded-neo border-3 border-neo-black bg-neo-yellow p-3 shadow-hard', rail && 'col-start-2')}
-              >
-                <p className="font-neo-body text-sm font-bold text-neo-navy">
-                  {t(`${K}.nameTaken`, { suggestedName: flow.suggestedName })}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => flow.submit(flow.suggestedName ?? undefined)}
-                  className="rounded-neo border-3 border-neo-cream bg-neo-navy px-3 py-2 font-neo-display text-sm font-black uppercase text-neo-lime shadow-hard-sm"
-                >
-                  {t(`${K}.useSuggestedName`, { suggestedName: flow.suggestedName })}
-                </button>
-              </div>
-            )}
-
-            {flow.formErrorKey && !flow.suggestedName && (
-              <p
-                role="alert"
-                className={cn('animate-neo-shake rounded-neo border-3 border-neo-black bg-neo-red px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard', rail && 'col-start-2')}
-              >
-                {t(flow.formErrorKey)}
-              </p>
-            )}
-
-            {inColumn2(
-              <PopPressButton
-                type="submit"
-                disabled={!flow.canSubmit}
-                variant="primary"
-                className="flex items-center justify-center gap-2 font-neo-display text-2xl font-black uppercase tracking-wide disabled:opacity-45"
-              >
-                <Sparkles aria-hidden="true" className="h-6 w-6" />
-                {flow.isSubmitting ? t(`${K}.joining`) : t(`${K}.flow.go`)}
-              </PopPressButton>
-            )}
-
-            {/* A held or in-flight tap says what it is waiting on. A button that
-                just sits there is the silent no-op with a spinner painted on. */}
-            {(flow.isHolding || flow.isSubmitting) && (
-              <p
-                role="status"
-                className={cn('text-center font-neo-body text-sm font-bold text-neo-lime', rail && 'col-start-2')}
-              >
-                {t(flow.isSubmitting ? `${K}.flow.entering` : `${K}.preparing`)}
-              </p>
-            )}
-          </form>
-        )}
-      </main>
+          {flow.joined ? (
+            <JoinSuccessPanel
+              mode="class"
+              classroomId={flow.joined.classroomId}
+              alreadyMember={flow.joined.alreadyMember}
+              label={flow.target?.label}
+            />
+          ) : showSuccessCelebration ? (
+            <JoinSuccessPanel mode="game" label={flow.target?.label} />
+          ) : flow.step === 'code' ? (
+            <JoinCodeStep flow={flow} pasteNoteKey={pasteNoteKey} onPaste={handlePaste} />
+          ) : (
+            <JoinNameStep flow={flow} nameRef={nameRef} goRef={goRef} />
+          )}
+        </main>
       </div>
     </BoundedConfettiBurst>
   );

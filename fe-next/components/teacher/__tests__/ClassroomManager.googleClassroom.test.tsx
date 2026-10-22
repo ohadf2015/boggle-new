@@ -56,6 +56,10 @@ vi.mock('@/hooks/useClassroom', () => ({
   }),
 }));
 
+vi.mock('@/components/teacher/hq/ClassroomCardActivity', () => ({
+  ClassroomCardActivity: () => <div data-testid="card-activity" />,
+}));
+
 import ClassroomManager from '../ClassroomManager';
 
 const CLASSROOM = {

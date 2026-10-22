@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { GRADE_BANDS, defaultClassLanguage, resolveClassName, classCap } from '../classSetupDefaults';
+import { EDUCATION_LANGUAGES } from '@/lib/supabase/education/types';
 
 const t = (k: string, p?: Record<string, unknown>) => (p ? `T(${k}:${JSON.stringify(p)})` : `T(${k})`);
 
@@ -11,6 +12,10 @@ describe('class setup defaults', () => {
   it('Given the teacher’s UI language, Then the class language defaults to it when supported', () => {
     expect(defaultClassLanguage('he')).toBe('he');
     expect(defaultClassLanguage('fr')).toBe('en');
+  });
+
+  it('Given any UI language the classroom routes accept, Then the class keeps it (a Spanish teacher gets Spanish)', () => {
+    for (const lang of EDUCATION_LANGUAGES) expect(defaultClassLanguage(lang)).toBe(lang);
   });
 
   it('Given an empty name, Then the grade band names the class; a typed name always wins', () => {

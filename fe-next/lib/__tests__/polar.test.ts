@@ -4,11 +4,20 @@ import { PolarClient, getPolarEnvironment, getProProductId } from '../polar'
 
 const SECRET = 'polar-test-secret'
 
-/** Sign exactly like Polar's docs prescribe: base64-encoded secret as HMAC key. */
+/** Sign using the raw secret string as the HMAC key (back-compat fallback path). */
 function sign(id: string, timestamp: string, body: string, secret = SECRET): string {
-  return createHmac('sha256', Buffer.from(secret).toString('base64'))
+  return createHmac('sha256', secret)
     .update(`${id}.${timestamp}.${body}`)
     .digest('base64')
+}
+
+/**
+ * Sign exactly how a real Polar delivery is signed (Standard Webhooks spec):
+ * secret is `whsec_<base64>`; the key is the base64 part DECODED to raw bytes.
+ */
+function signStandardWebhooks(id: string, timestamp: string, body: string, whsecSecret: string): string {
+  const keyBytes = Buffer.from(whsecSecret.replace(/^whsec_/, ''), 'base64')
+  return createHmac('sha256', keyBytes).update(`${id}.${timestamp}.${body}`).digest('base64')
 }
 
 function nowSeconds(): string {
@@ -49,6 +58,17 @@ describe('PolarClient.validateWebhookSignature', () => {
     expect(
       PolarClient.validateWebhookSignature('{"tampered":true}', { id: 'msg_1', timestamp: ts, signature: `v1,${sig}` })
     ).toBe(false)
+  })
+
+  it('accepts a payload signed the way a real Polar delivery signs it (whsec_ secret, decoded to raw key bytes)', () => {
+    const whsecSecret = 'whsec_' + Buffer.from('actual-raw-key-bytes').toString('base64')
+    process.env.POLAR_WEBHOOK_SECRET = whsecSecret
+    const body = '{"type":"subscription.active","data":{}}'
+    const ts = nowSeconds()
+    const sig = signStandardWebhooks('msg_1', ts, body, whsecSecret)
+    expect(
+      PolarClient.validateWebhookSignature(body, { id: 'msg_1', timestamp: ts, signature: `v1,${sig}` })
+    ).toBe(true)
   })
 
   it('accepts when one of several rotated signatures matches', () => {

@@ -1,0 +1,85 @@
+/*
+ * Teacher landing motion. The un-animated style is the finished frame;
+ * transform only, never opacity, and scroll reveals are feature-detected.
+ * Cards stagger by `--i` (set inline per card). Hover/press move `translate`,
+ * a separate property, so they compose with the reveal's `transform`.
+ */
+
+.modeArt,
+.peek {
+  transform-origin: 50% 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card {
+    transition:
+      translate 160ms cubic-bezier(0.23, 1, 0.32, 1),
+      box-shadow 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .modeArt {
+    transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .stepIcon {
+    transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @media (hover: hover) {
+    .card:hover {
+      translate: 0 -4px;
+    }
+    .card:hover .modeArt {
+      transform: translateY(-4px) scale(1.08) rotate(-2deg);
+    }
+    .card:hover .stepIcon {
+      transform: rotate(-8deg) scale(1.1);
+    }
+  }
+  .card:active {
+    translate: 0 2px;
+  }
+
+  /* The closing mascot sways, then ducks and pops back every few seconds. */
+  .peek {
+    animation: edu-peek 5.6s ease-in-out 1s infinite;
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      /* Longhands: a minifier folding view() into the `animation` shorthand
+         makes Chromium drop the whole declaration. */
+      animation-name: edu-reveal;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 12%) cover calc(28% + var(--i, 0) * 8%);
+    }
+  }
+}
+
+@keyframes edu-reveal {
+  from {
+    transform: translateY(40px) rotate(calc(-2deg + var(--i, 0) * 2deg)) scale(0.95);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes edu-peek {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  25% {
+    transform: rotate(-5deg) translateY(-2px);
+  }
+  50% {
+    transform: rotate(4deg) translateY(0);
+  }
+  62% {
+    transform: rotate(0deg) translateY(10px);
+  }
+  72% {
+    transform: rotate(-3deg) translateY(-6px);
+  }
+}

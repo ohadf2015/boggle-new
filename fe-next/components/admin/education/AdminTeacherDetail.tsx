@@ -14,6 +14,7 @@
  */
 
 import { useEffect, useState, type ReactNode } from 'react';
+import Link from 'next/link';
 import {
   BookOpen,
   CheckCircle2,
@@ -59,7 +60,7 @@ function fmtDateTime(iso: string): string {
 }
 
 export function AdminTeacherDetail({ userId }: { userId: string }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [data, setData] = useState<TeacherActivityDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -162,9 +163,9 @@ export function AdminTeacherDetail({ userId }: { userId: string }) {
               return (
                 <li key={c.id} className="rounded-neo border-2 border-black/20 p-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-black">
+                    <Link href={`/${language}/admin/education/class/${c.id}`} className="font-black underline-offset-2 hover:underline">
                       {c.name || t('admin.teacherFunnel.classrooms.unnamed', '(unnamed)')}
-                    </p>
+                    </Link>
                     <p className="text-xs font-bold text-neo-navy/60">
                       {[c.language, c.joinCode && `code ${c.joinCode}`, fmtDate(c.createdAt)]
                         .filter(Boolean)

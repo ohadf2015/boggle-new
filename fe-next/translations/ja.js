@@ -3936,7 +3936,68 @@ const ja = {
     "invalidTitle": "リンクが無効です",
     "invalidBody": "このレポートのリンクは期限切れか、無効になっています。先生に新しいリンクをお願いしてください。",
     "footerNote": "お子様の先生がLexiClashで共有しました。アカウントは不要です。",
-    "language": "表示言語"
+    "language": "表示言語",
+    "printButton": "印刷 / PDFで保存",
+    "classLabel": "クラス",
+    "teacherLabel": "先生",
+    "periodLabel": "期間",
+    "periodRange": "{start}〜{end}",
+    "noValue": "—",
+    "allTime": "累計：{xp} XP・完了したレッスン {lessons}",
+    "statWordsMeaning": "しっかり身についたと判定された単語です。",
+    "statAccuracy": "正答率",
+    "statAccuracyMeaning": "すべての回答のうち正解だった割合です。",
+    "statWeekMinutes": "今週の練習時間（分）",
+    "statWeekMinutesMeaning": "直近7日間に練習した時間です。",
+    "statStreak": "連続日数",
+    "statStreakMeaning": "練習が続いている日数です。これまでの最高：{best}日。",
+    "weekTitle": "今週と先週の比較",
+    "weekThis": "直近7日間",
+    "weekLast": "その前の7日間",
+    "rowSessions": "練習回数",
+    "rowMinutes": "練習時間（分）",
+    "rowActiveDays": "練習した日数",
+    "rowAccuracy": "正答率",
+    "practiceTitle": "練習したい単語",
+    "practiceHint": "間違いが多かった単語です。家で少し復習すると効果的です。",
+    "winsTitle": "最近できるようになった単語",
+    "winsHint": "最近よく正解している単語や、身についた単語です。",
+    "wordAccuracy": "正解 {value}%",
+    "wordMastered": "習得済み",
+    "insightTitle": "まとめ",
+    "activityTitle": "おうちで試してみましょう",
+    "insight": {
+      "quiet": "{name}さんはこの2週間練習していません。一緒に短く練習すると、習慣を取り戻すきっかけになります。",
+      "started_this_week": "{name}さんは練習のなかった週のあと、今週また練習を始めました。今週の練習回数：{count}回。",
+      "more_active": "{name}さんは先週より今週のほうが多く練習しました。練習回数：{count}回（先週{previous}回）。",
+      "less_active": "{name}さんの今週の練習は先週より少し減りました。練習回数：{count}回（先週{previous}回）。",
+      "steady": "{name}さんは安定したペースで練習しています。今週の練習回数：{count}回（先週と同じ）。",
+      "paused": "{name}さんは先週は練習しましたが、今週はまだです。先週の練習回数：{previous}回。"
+    },
+    "activity": {
+      "practice_weak_words": "夕食のときに、{name}さんにこの単語を使って文を作ってもらいましょう：{words}",
+      "celebrate_wins": "{name}さんに、最近覚えた単語（{words} など）を教えてもらいましょう。",
+      "short_daily_session": "今週は3日を選んで、一緒に10分間練習してみましょう。"
+    },
+    "teacherPreviewTitle": "保護者向けレポートの内容",
+    "teacherPreviewHint": "保護者が共有リンクで見るのと同じ数値です。",
+    "loadFailed": "まとめを読み込めませんでした。ページを再読み込みしてください。"
+  },
+  "parentReportsFlow": {
+    "title": "保護者向けレポート",
+    "lead": "生徒を選んでレポートをプレビューし、リンクをコピーするかCSVでダウンロードします。",
+    "disclosureHint": "生徒を選んで、家庭に学習の様子を共有します",
+    "search": "生徒を検索",
+    "selectAll": "すべて選択",
+    "selectNone": "選択を解除",
+    "selectedCount": "{total}人中{count}人を選択",
+    "noMatch": "一致する生徒がいません。",
+    "rosterFailed": "生徒の一覧を読み込めませんでした。もう一度お試しください。",
+    "make": "選択した{count}人のリンクを作成",
+    "preview": "プレビュー",
+    "previewFor": "{name}さんのレポートをプレビュー",
+    "copyOne": "リンクをコピー",
+    "copyOneFor": "{name}さんのリンクをコピー"
   },
   "share": {
     "button": "シェア",
@@ -11292,21 +11353,16 @@ const ja = {
       }
     },
     "eduDashboard": {
-      "verdict": {
-        "none": "この期間のデータはまだ十分ではありません。",
-        "eyebrow": "最大の離脱",
-        "label": {
-          "approved": "アクセス申請が承認されなかった",
-          "classroom": "承認済みの教師がクラスを作成していない",
-          "student": "クラスは作成されたが、まだ生徒が参加していない"
-        },
-        "action": {
-          "approved": "教師アクセスで保留中の申請を処理してください。",
-          "classroom": "最初のクラスを作成するよう促してください。",
-          "student": "参加コードをこれらの教師に送ってください（直近で活動した順）。"
-        },
-        "convert": "この段階に到達",
-        "openTop": "最上位の教師を開く"
+      "healthTitle": "教師の状態",
+      "title": "教育の概要",
+      "window": "期間",
+      "loadFailed": "教育の概要を読み込めませんでした。",
+      "loading": "読み込み中…",
+      "noData": "データがありません",
+      "health": {
+        "thriving": "好調",
+        "at_risk": "要注意",
+        "dormant": "休眠"
       },
       "rescue": {
         "nudge": {
@@ -11325,46 +11381,26 @@ const ja = {
         "nudged": "{date} に連絡済み",
         "copy": "連絡文をコピー",
         "email": "メール",
-        "mark": "連絡済みにする",
-        "title": "救済リスト",
-        "empty": "この段階で止まっている人はいません。",
-        "rowAction": {
-          "approved": "クラス作成を促す",
-          "classroom": "参加コードを送る"
+        "mark": "連絡済みにする"
+      },
+      "verdict": {
+        "none": "この期間のデータはまだ十分ではありません。",
+        "eyebrow": "いちばん大きな離脱",
+        "label": {
+          "approved": "人の申請者が一度も承認されていません",
+          "signin": "人の承認済みの先生がログインできません(先生の権限が付いていない)",
+          "classroom": "人の先生はログインできるのに、クラスを作っていません",
+          "student": "人の先生がクラスを作ったのに、まだ生徒が参加していません"
         },
-        "more": "件はすべての教師の下に表示"
-      },
-      "healthTitle": "教師の状態",
-      "quiet": "静かな指標",
-      "posthogHidden": "ランディングとアップセルのコンバージョンは非表示です。サーバーの PostHog キーが未設定です。",
-      "title": "教育の概要",
-      "subtitle": "テストアカウントは除外しています。変化率は前期間との比較です。",
-      "window": "期間",
-      "loadFailed": "教育の概要を読み込めませんでした。",
-      "loading": "読み込み中…",
-      "noData": "データがありません",
-      "kpi": {
-        "activeTeachers": "アクティブな教師",
-        "newTeachers": "新規の教師",
-        "classesWithLiveGame": "ライブゲームのあるクラス",
-        "liveRounds": "ライブラウンド数",
-        "trialsStarted": "Proトライアル開始数",
-        "trialsPaid": "有料に転換したトライアル"
-      },
-      "funnel": {
-        "title": "教師ファネル",
-        "requested": "申請",
-        "approved": "承認",
-        "classroom": "クラスを作成",
-        "student": "最初の生徒が参加"
-      },
-      "health": {
-        "thriving": "好調",
-        "at_risk": "要注意",
-        "dormant": "休眠"
-      },
-      "modeMix": {
-        "title": "クラスのモード構成"
+        "action": {
+          "approved": "「先生の利用申請」で保留中の申請を処理してください。",
+          "signin": "「先生の利用申請」で先生の権限を付けてください。",
+          "classroom": "最初のクラスを作るよう声をかけましょう。",
+          "student": "最近アクティブな先生から順に、参加コードを送りましょう。"
+        },
+        "convert": "「{from}」のうち「{to}」に進むのは{pct}%だけです。",
+        "seeCohort": "この{count}人の先生を見る",
+        "openAccess": "「先生の利用申請」を開く"
       },
       "teachers": {
         "all": "すべての教師",
@@ -11377,16 +11413,118 @@ const ja = {
         "lastActive": "最終アクティブ",
         "classes": "クラス",
         "students": "生徒",
-        "rounds7d": "7日間のラウンド",
-        "health": "状態"
-      },
-      "dying": {
-        "title": "休眠しかけのクラス",
-        "empty": "現在ありません。"
+        "health": "状態",
+        "rounds7d": "クラス対戦(直近7日)",
+        "plan": "プラン",
+        "planPaid": "有料Pro",
+        "planTrial": "トライアル",
+        "planFree": "無料",
+        "lockedOut": "ログイン不可",
+        "healthDefinition": "好調:直近7日に訪問してクラス対戦をした。要注意:直近21日に訪問したが対戦はなし。休眠:21日間訪問なし。"
       },
       "classes": {
-        "title": "クラス"
+        "title": "クラス",
+        "name": "クラス",
+        "gamesInWindow": "期間中の対戦",
+        "lastGame": "最後の対戦"
+      },
+      "subtitle": "テスト用アカウントはどの数字にも含めていません。変化は直前の同じ日数と比べています。",
+      "windowLast": "直近{days}日",
+      "notMeasured": "まだ計測していません。このデータベースにはクラス対戦のテーブルがありません。",
+      "delta": {
+        "vsPrior": "前の{days}日と比べて{pct}(前回 {prior})",
+        "fromZero": "前の{days}日の0から増加",
+        "noneEither": "前の{days}日も0"
+      },
+      "drill": {
+        "show": "一覧を見る({count})",
+        "stoppedAt": "止まった段階:{step}",
+        "clear": "全員を表示",
+        "empty": "該当者はいません。"
+      },
+      "kpi": {
+        "activeTeachers": "訪問した先生",
+        "newTeachers": "新しく承認された先生",
+        "classesWithLiveGame": "対戦したクラス",
+        "liveRounds": "クラス対戦の回数",
+        "trialsStarted": "開始したProトライアル",
+        "trialsPaid": "有料になったトライアル"
+      },
+      "kpiDefinition": {
+        "activeTeachers": "最後の訪問がこの期間にある先生。最後の訪問しか記録しないため、前の期間とは比べられません。",
+        "newTeachers": "この期間に承認された利用申請。1人につき1件。",
+        "classesWithLiveGame": "この期間にライブ対戦を1回以上終えたクラス。",
+        "liveRounds": "この期間に終わったクラスのライブ対戦。",
+        "trialsStarted": "この期間にProトライアルが始まった承認済みの先生。",
+        "trialsPaid": "この期間に有料のProを始めたトライアル中の先生。無料や贈呈のProは数えません。"
+      },
+      "funnel": {
+        "title": "先生の歩み",
+        "hint": "全期間。%は一つ上の段階に対する割合です。段階をクリックすると、そこで止まった人が見られます。",
+        "requested": "申請した",
+        "approved": "承認済み",
+        "signin": "ログインできる",
+        "classroom": "クラスを作った",
+        "student": "生徒がいる"
+      },
+      "funnelDefinition": {
+        "requested": "先生向け利用申請フォームを送った人(全期間)。",
+        "approved": "管理者が承認した申請者。",
+        "signin": "承認され、先生の権限があるので /teacher に入れる人。",
+        "classroom": "クラスを1つ以上作った。",
+        "student": "クラスのどれかに生徒が1人以上参加した。"
+      },
+      "attention": {
+        "title": "対応が必要",
+        "hint": "急ぎの順:ログインの問題、終わりそうなトライアル、そのあと途中で止まっている先生。",
+        "empty": "今は声をかける必要のある人はいません。",
+        "more": "ほか{count}人。下のファネルか先生一覧で確認できます。",
+        "fixAccess": "「先生の利用申請」で直す",
+        "reason": {
+          "locked_out": "承認済みですがログインできません。先生の権限がありません。",
+          "trial_ending": "Proトライアルが{date}に終わりますが、まだ有料ではありません。",
+          "no_students": "クラスを作りましたが、生徒が参加していません。",
+          "class_stalled": "生徒はいますが、14日間クラス対戦がありません:",
+          "no_class": "ログインできますが、クラスを作っていません。",
+          "went_quiet": "今週訪問しましたが、クラス対戦はしていません。"
+        }
+      },
+      "modeMix": {
+        "title": "クラスで遊ばれているゲーム",
+        "mode": "ゲームモード",
+        "rounds": "対戦数",
+        "players": "参加のべ人数"
       }
+    },
+    "eduClass": {
+      "error": "このクラスを読み込めませんでした。",
+      "teacher": "先生",
+      "testTeacher": "テスト用アカウント",
+      "joinCode": "参加コード",
+      "language": "言語",
+      "created": "作成日",
+      "lastGame": "最後のクラス対戦",
+      "students": "生徒",
+      "studentsEmpty": "まだ生徒が参加していません。",
+      "student": "生徒",
+      "joined": "参加日",
+      "lastSeen": "最終アクセス",
+      "noName": "名前なし({id})",
+      "testStudents": "除外したテスト用アカウント:{count}。",
+      "assignments": "課題",
+      "assignmentsEmpty": "まだ何も出していません。",
+      "completion": "{total}人中{done}人が完了",
+      "due": "期限 {date}",
+      "games": "クラス対戦",
+      "roundsSummary": "直近30日のクラス対戦:{count}回",
+      "unnamed": "(名前なし)",
+      "colPlayed": "日時",
+      "colMode": "モード",
+      "colPlayers": "参加者",
+      "colCoverage": "見つけた単語",
+      "colTop": "上位",
+      "colMissed": "よく見逃した単語",
+      "noGames": "まだライブ対戦はありません。"
     },
     "teacherFunnel": {
       "excludedMachineRows": "{count} 件の自動生成行（テストアカウント）は上のすべての数値から除外されています。",
@@ -14544,6 +14682,10 @@ const ja = {
       "googleClassroomBody": "リンクをタップしてクラスに参加。アカウントは不要、名前を決めるだけです。",
       "createdBannerBody": "このコードを生徒に共有してください。",
       "dismissBanner": "OK",
+      "card": {
+        "assign": "課題に出す",
+        "report": "レポート"
+      },
       "wizard": {
         "title": "3ステップでクラス準備",
         "subtitle": "1分足らずで参加コードが手に入ります。",
@@ -16721,6 +16863,12 @@ const ja = {
           "joinedHeadline": "次の課題",
           "joinedSub": "クラスに入れました。待っている課題をプレイしよう。",
           "openAcademy": "クラスを開く",
+          "whereCode": "コードはどこにあるの？",
+          "whereCodeAnswer": "先生が黒板やプロジェクターに出しているよ。英字と数字の6文字。QRコードがあるなら、カメラで読みとればこのステップはとばせるよ。",
+          "genericError": "こちらで問題が起きました。もう一度ボタンを押してね。何度も起きるときは先生に伝えてね。",
+          "stepOf": "ステップ {{current}} / {{total}}",
+          "successGame": "ゲームに入ります…",
+          "yourClass": "あなたのクラス",
           "findingAssignment": "課題を探しています…"
         },
         "heroLine": "先生にクラスコードを聞いてね",
@@ -16742,6 +16890,7 @@ const ja = {
           "label": "参加先:",
           "confirm": "このクラスへ参加します",
           "gameLabel": "ライブゲーム:",
+          "classroomNext": "いまはゲームをしていません。クラスに参加して、先生が出した課題を見られます。",
           "gameConfirm": "クラスがプレイ中です。そのまま参加します"
         },
         "subtitle": "先生からもらったコードを入力してね",
@@ -20737,7 +20886,14 @@ const ja = {
       "minutes": "{count}分",
       "leave": "ルームを出る",
       "moreJoined": "ほか{count}人",
-      "readyCount": "{total}人中{ready}人準備OK"
+      "readyCount": "{total}人中{ready}人準備OK",
+      "editRoster": "リストを編集",
+      "doneEditing": "完了",
+      "removeStudent": "{name}さんを外す",
+      "removeConfirmTitle": "{name}さんを外しますか？",
+      "removeConfirmBody": "ゲームから退出し、この名前では再参加できません。",
+      "removeConfirm": "外す",
+      "removeFailed": "外せませんでした。もう一度お試しください。"
     },
     "student": {
       "youreIn": "参加できました！",
@@ -20768,7 +20924,14 @@ const ja = {
       "nextMode": "次のモード",
       "viewReport": "レポートを見る",
       "endGame": "ゲームを終了",
-      "noScores": "このラウンドは誰も得点できませんでした"
+      "noScores": "このラウンドは誰も得点できませんでした",
+      "mostMissed": "見逃しが多かった単語",
+      "needHelpCount": "半分未満の生徒：{count}人（名前はレポートで確認）",
+      "replayMissed": "見逃した単語でもう一回（{count}）",
+      "replayFailed": "もう一回の準備ができませんでした。もう一度お試しください。",
+      "moreWords": "ほか{count}語",
+      "notOnBoard": "盤面になし",
+      "replayReady": "準備OK。次の「もう一回」はこの単語で遊びます。"
     },
     "studentResults": {
       "placed": "あなたの順位",

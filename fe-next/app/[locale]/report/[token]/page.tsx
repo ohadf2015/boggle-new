@@ -3,8 +3,11 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { verifyParentReportToken } from '@/lib/education/parentReportToken';
 import { loadParentReportData, type ParentReportSummary } from '@/lib/education/parentReportData';
 import { translateKey } from '@/lib/i18n/serverTranslate';
+import { interpolate } from '@/components/education/lobby/eduText';
 import { locales, isRTL, type Locale } from '@/i18n/config';
 import { languageLabelKey } from '@/lib/i18n/languageLabels';
+import { ReportInsights, type ReportT } from '@/components/parentReport/ReportInsights';
+import { ReportHeader } from '@/components/parentReport/ReportHeader';
 import logger from '@/utils/logger';
 
 /**
@@ -13,10 +16,8 @@ import logger from '@/utils/logger';
  *
  * Every failure mode (malformed/tampered/expired token, service role not
  * configured, student no longer on the roster, or a query error) renders
- * the SAME friendly "link not available" view — never a stack trace, never
- * a hint about which check failed (that would help an attacker enumerate
- * valid tokens). A real backend error still gets logged (recurring-pitfalls
- * Class 4: a query error must never look identical to "nothing to report").
+ * the SAME friendly "link not available" view, so the page never hints at
+ * which check failed. A real backend error still gets logged.
  *
  * `robots: noindex,nofollow` unconditionally — this page carries a minor's
  * name and activity, it must never be crawled or show up in search.
@@ -35,7 +36,7 @@ export async function generateMetadata({
   };
 }
 
-function InvalidReportView({ locale, t }: { locale: string; t: (key: string) => string }) {
+function InvalidReportView({ locale, t }: { locale: string; t: ReportT }) {
   return (
     <main
       dir={isRTL(locale as Locale) ? 'rtl' : 'ltr'}
@@ -49,18 +50,52 @@ function InvalidReportView({ locale, t }: { locale: string; t: (key: string) => 
   );
 }
 
-function StatTile({ value, label }: { value: number; label: string }) {
+function LegacyStats({ data, t }: { data: ParentReportSummary; t: ReportT }) {
+  const tiles: Array<[number, string]> = [
+    [data.totalXp, t('parentReport.statXp')],
+    [data.lessonsCompleted, t('parentReport.statLessons')],
+    [data.wordsMastered, t('parentReport.statWords')],
+  ];
   return (
-    <div className="border-3 bg-neo-navy border-neo-cream/40 shadow-hard-sm rounded-neo p-4 text-center">
-      <div className="font-neo-display text-3xl text-neo-lime">{value}</div>
-      <div className="font-neo-body text-xs uppercase text-neo-white/70 mt-1">{label}</div>
+    <div className="grid grid-cols-3 gap-3">
+      {tiles.map(([value, label]) => (
+        <div key={label} className="rounded-neo border-2 border-neo-black bg-neo-white p-4 text-center">
+          <div dir="ltr" className="font-neo-display text-3xl font-bold tabular-nums text-neo-black">{value}</div>
+          <div className="mt-1 text-xs font-black uppercase text-neo-black/75">{label}</div>
+        </div>
+      ))}
     </div>
   );
 }
 
-function LocaleSwitcher({ token, current }: { token: string; current: string }) {
+function RecentActivity({ data, locale, t }: { data: ParentReportSummary; locale: string; t: ReportT }) {
+  const date = new Intl.DateTimeFormat(locale, { dateStyle: 'medium' });
   return (
-    <nav className="flex flex-wrap justify-center gap-2 mt-6" aria-label="language">
+    <section className="break-inside-avoid rounded-neo border-2 border-neo-black bg-neo-white p-4">
+      <h2 className="font-neo-display text-lg font-bold text-neo-black">{t('parentReport.recentActivity')}</h2>
+      {data.insights && (
+        <p className="text-xs text-neo-black/75">
+          {t('parentReport.allTime', { xp: data.totalXp, lessons: data.lessonsCompleted })}
+        </p>
+      )}
+      {data.recentActivity.length === 0 ? (
+        <p className="mt-2 text-neo-black/75">{t('parentReport.noRecentActivity')}</p>
+      ) : (
+        <ul className="mt-2 flex flex-wrap gap-2">
+          {data.recentActivity.map((entry, i) => (
+            <li key={`${entry.completedAt}-${i}`} className="rounded-neo border-2 border-neo-black px-2 py-0.5 text-sm font-bold text-neo-black">
+              {date.format(new Date(entry.completedAt))}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function LocaleSwitcher({ token, current, t }: { token: string; current: string; t: ReportT }) {
+  return (
+    <nav className="mt-6 flex flex-wrap justify-center gap-2 print:hidden" aria-label={t('parentReport.language')}>
       {locales.map((code) => (
         <a
           key={code}
@@ -78,53 +113,23 @@ function LocaleSwitcher({ token, current }: { token: string; current: string }) 
   );
 }
 
-function ReportView({
-  locale,
-  token,
-  data,
-  t,
-}: {
-  locale: string;
-  token: string;
-  data: ParentReportSummary;
-  t: (key: string) => string;
-}) {
+function ReportView({ locale, token, data, t }: { locale: string; token: string; data: ParentReportSummary; t: ReportT }) {
   return (
     <main
       dir={isRTL(locale as Locale) ? 'rtl' : 'ltr'}
-      className="min-h-dvh bg-neo-navy p-6 flex flex-col items-center"
+      className="min-h-dvh bg-neo-navy p-4 sm:p-6 print:min-h-0 print:bg-neo-white print:p-0"
     >
-      <div className="w-full max-w-lg">
-        <div className="border-3 bg-neo-navy border-neo-cream/40 shadow-hard rounded-neo p-6 text-center mb-4">
-          <h1 className="font-neo-display text-3xl text-neo-white">{data.displayName}</h1>
-          <p className="font-neo-body text-neo-white/70 mt-1">{t('parentReport.subtitle')}</p>
-        </div>
-
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <StatTile value={data.totalXp} label={t('parentReport.statXp')} />
-          <StatTile value={data.lessonsCompleted} label={t('parentReport.statLessons')} />
-          <StatTile value={data.wordsMastered} label={t('parentReport.statWords')} />
-        </div>
-
-        <div className="border-3 bg-neo-navy border-neo-cream/40 shadow-hard-sm rounded-neo p-4 mb-4">
-          <h2 className="font-neo-display text-lg text-neo-white mb-2">{t('parentReport.recentActivity')}</h2>
-          {data.recentActivity.length === 0 ? (
-            <p className="font-neo-body text-neo-white/70">{t('parentReport.noRecentActivity')}</p>
-          ) : (
-            <ul className="font-neo-body text-neo-white/90 space-y-1">
-              {data.recentActivity.map((entry, i) => (
-                <li key={`${entry.completedAt}-${i}`}>
-                  {new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(entry.completedAt))}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <p className="font-neo-body text-xs text-neo-white/50 text-center">{t('parentReport.footerNote')}</p>
-
-        <LocaleSwitcher token={token} current={locale} />
-      </div>
+      <article className="mx-auto w-full max-w-3xl space-y-4 rounded-neo border-3 border-neo-black bg-neo-cream p-4 font-neo-body text-neo-black shadow-hard sm:p-6 print:max-w-none print:border-0 print:bg-neo-white print:shadow-none">
+        <ReportHeader data={data} locale={locale} t={t} />
+        {data.insights ? (
+          <ReportInsights insights={data.insights} name={data.displayName} t={t} />
+        ) : (
+          <LegacyStats data={data} t={t} />
+        )}
+        <RecentActivity data={data} locale={locale} t={t} />
+        <p className="text-center text-xs text-neo-black/70">{t('parentReport.footerNote')}</p>
+      </article>
+      <LocaleSwitcher token={token} current={locale} t={t} />
     </main>
   );
 }
@@ -135,7 +140,7 @@ export default async function ParentReportPage({
   params: Promise<{ locale: string; token: string }>;
 }) {
   const { locale, token } = await params;
-  const t = (key: string) => translateKey(key, locale);
+  const t: ReportT = (key, values) => interpolate(translateKey(key, locale), values);
 
   const payload = verifyParentReportToken(token);
   if (!payload) return <InvalidReportView locale={locale} t={t} />;

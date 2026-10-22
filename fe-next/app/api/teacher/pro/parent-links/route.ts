@@ -7,18 +7,22 @@ import { signParentReportToken } from '@/lib/education/parentReportToken';
 import { resolveDisplayName } from '@/lib/displayName';
 import logger from '@/utils/logger';
 
-const bodySchema = z.object({ classroomId: z.string().uuid() });
 const MAX_STUDENTS = 300;
+const bodySchema = z.object({
+  classroomId: z.string().uuid(),
+  studentIds: z.array(z.string().uuid()).max(MAX_STUDENTS).optional(),
+});
 
 /**
  * POST /api/teacher/pro/parent-links — one signed parent-report link per student
- * in a class the caller owns (Teacher Pro). Same token and checks as the
- * single-student route, batched: 400 → 401 → 403 → 402 → 500 → 200.
+ * in a class the caller owns (Teacher Pro), or only the `studentIds` picked.
+ * Same token and checks as the single-student route, batched: 400 → 401 → 403 → 402 → 500 → 200.
  */
 export async function POST(req: Request) {
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ ok: false, error: 'Invalid classroom id' }, { status: 400 });
   const { classroomId } = parsed.data;
+  const picked = parsed.data.studentIds ? new Set(parsed.data.studentIds) : null;
 
   const sb = await createClient();
   const { data: { user } } = await sb.auth.getUser();
@@ -56,7 +60,7 @@ export async function POST(req: Request) {
 
   const studentIds = ((members ?? []) as Array<{ student_id: string | null }>)
     .map((m) => m.student_id)
-    .filter((id): id is string => typeof id === 'string' && id !== '')
+    .filter((id): id is string => typeof id === 'string' && id !== '' && (!picked || picked.has(id)))
     .slice(0, MAX_STUDENTS);
 
   const names = new Map<string, string>();

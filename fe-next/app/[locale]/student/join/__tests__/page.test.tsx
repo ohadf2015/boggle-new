@@ -21,8 +21,8 @@ const { mockPush, mockUseAuth } = vi.hoisted(() => ({
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: mockUseAuth }));
 vi.mock('@/components/education/join/JoinFlow', () => ({
-  default: ({ initialCode }: { initialCode?: string }) => (
-    <div data-testid="join-flow">{initialCode ?? ''}</div>
+  default: ({ initialCode, variant }: { initialCode?: string; variant?: string }) => (
+    <div data-testid="join-flow" data-variant={variant}>{initialCode ?? ''}</div>
   ),
 }));
 
@@ -61,13 +61,10 @@ describe('<StudentJoinPageClient>', () => {
     expect(container.querySelector('img[src*="arena-lobby-bg"]')).not.toBeNull();
   });
 
-  it("stretches the flow's fixed 390x844 confetti anchor to the viewport width", () => {
+  it('asks the shared flow for its academy skin instead of overriding its markup', () => {
     const { container } = render(<StudentJoinPageClient />);
-    const wrapper = container.firstElementChild as HTMLElement;
-    expect(wrapper.className).toContain('[&>[data-testid=bounded-confetti-anchor]]:!w-full');
-    expect(wrapper.className).toContain('[&>[data-testid=bounded-confetti-anchor]]:!h-auto');
-    // The flow's own navy is cleared so the arena shows through it.
-    expect(wrapper.className).toContain('[&>[data-testid=bounded-confetti-anchor]>div]:!bg-transparent');
+    expect(screen.getByTestId('join-flow')).toHaveAttribute('data-variant', 'academy');
+    expect(container.innerHTML).not.toContain(':!');
   });
 
   it('paints the backdrop BEFORE the flow, so the flow and its confetti sit above it', () => {

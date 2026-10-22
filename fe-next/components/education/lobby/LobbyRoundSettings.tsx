@@ -25,7 +25,7 @@ import type { ClassroomBossId } from '@/shared/types/classroomBoss';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode, type PracticeFocusSetting } from '@/shared/types/vocabQuiz';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 
-const TIMER_MINUTES = [1, 2, 3, 5] as const;
+export const TIMER_MINUTES = [1, 2, 3, 5] as const;
 const BOARD_SIZES = ['small', 'medium', 'large'] as const;
 const MIN_WORD_LENGTHS = [2, 3, 4, 5] as const;
 

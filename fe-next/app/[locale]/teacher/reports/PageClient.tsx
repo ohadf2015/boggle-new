@@ -10,7 +10,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, ChevronRight, Users } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Send, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
@@ -37,7 +37,9 @@ import { trackEduReportsViewed } from '@/lib/education/telemetry';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
 import { ReportsNoClasses } from '@/components/teacher/reports/ReportsNoClasses';
-import { FullReportDisclosure, SectionDisclosure } from '@/components/teacher/reports/FullReportDisclosure';
+import { FullReportDisclosure, ReportDisclosure, SectionDisclosure } from '@/components/teacher/reports/FullReportDisclosure';
+import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
+import { StudentParentPreview } from '@/components/teacher/reports/StudentParentPreview';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
 const SLIDE_PX = 32;
@@ -265,7 +267,14 @@ function TeacherReportsInner() {
           studentName={selectedStudentName ?? undefined}
         />
         <ProGate feature="reports">
-          <StudentProgressReport studentId={selectedStudentId} classroomId={selectedClassroomId} />
+          <div className="space-y-5">
+            <StudentParentPreview
+              classroomId={selectedClassroomId}
+              studentId={selectedStudentId}
+              studentName={selectedStudentName ?? undefined}
+            />
+            <StudentProgressReport studentId={selectedStudentId} classroomId={selectedClassroomId} />
+          </div>
         </ProGate>
       </div>
     );
@@ -324,6 +333,21 @@ function TeacherReportsInner() {
               rosterCount={selectedClassroom?.member_count ?? 0}
             />
           </SectionDisclosure>
+          <ReportDisclosure
+            testId="parent-reports-disclosure"
+            icon={Send}
+            accent="cyan"
+            title={t('parentReportsFlow.title')}
+            hint={t('parentReportsFlow.disclosureHint')}
+          >
+            {(open) =>
+              open ? (
+                <ProGate feature="reports">
+                  <ParentReportPack classroomId={selectedClassroomId} />
+                </ProGate>
+              ) : null
+            }
+          </ReportDisclosure>
           <FullReportDisclosure>
             {(open) => (
               <ProGate feature="reports" active={open}>

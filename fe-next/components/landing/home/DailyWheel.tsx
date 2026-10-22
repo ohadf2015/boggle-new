@@ -47,7 +47,7 @@ export function DailyWheel({ className }: { className?: string }) {
               } as CSSProperties
             }
             className={cn(
-              'absolute flex h-[23%] w-[23%] items-center justify-center rounded-[22%] border-[2.5px] border-black bg-[#1a1a2e] font-neo-display text-[10cqi] font-black uppercase leading-none text-[#fffef0] shadow-hard-sm',
+              'absolute flex h-[23%] w-[23%] items-center justify-center rounded-[22%] border-[2.5px] border-black bg-neo-navy font-neo-display text-[10cqi] font-black uppercase leading-none text-neo-cream shadow-hard-sm',
               styles.tile,
             )}
           >

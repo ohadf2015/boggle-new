@@ -1,6 +1,9 @@
 'use client';
 import { Users, QrCode, Play } from 'lucide-react';
+import type { CSSProperties } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+import m from './landingMotion.module.css';
 
 export interface GeoAnswer {
   question: string;
@@ -27,9 +30,14 @@ export function LandingHowItWorks({ geo }: { geo?: GeoAnswer }) {
           <li
             key={id}
             data-testid={`onboarding-step-${id}`}
-            className="flex items-start gap-3 sm:rounded-neo sm:border-3 sm:border-neo-cream/40 sm:bg-neo-navy-light sm:p-4 sm:shadow-hard"
+            style={{ '--i': i } as CSSProperties}
+            className={cn(
+              'flex items-start gap-3 sm:rounded-neo sm:border-3 sm:border-neo-cream/40 sm:bg-neo-navy-light sm:p-4 sm:shadow-hard sm:hover:shadow-hard-lg',
+              m.card,
+              m.reveal
+            )}
           >
-            <span className={`grid size-11 shrink-0 place-items-center rounded-neo border-2 border-neo-black ${tone} text-neo-navy shadow-hard-sm`}>
+            <span className={cn('grid size-11 shrink-0 place-items-center rounded-neo border-2 border-neo-black text-neo-navy shadow-hard-sm', tone, m.stepIcon)}>
               <Icon className="size-5" strokeWidth={2.5} aria-hidden="true" />
             </span>
             <div className="min-w-0">

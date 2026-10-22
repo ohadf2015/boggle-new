@@ -142,6 +142,14 @@ describe('<AdminTeacherDetail>', () => {
     expect(screen.getAllByText('Week 1').length).toBeGreaterThan(0);
   });
 
+  it('shouldLinkEachClassroomToItsClassDetailPage', async () => {
+    fetchWithAuth.mockResolvedValue({ ok: true, json: async () => details() });
+    render(<AdminTeacherDetail userId="u1" />);
+
+    const link = await screen.findByRole('link', { name: '3RD GRADE' });
+    expect(link.getAttribute('href')).toBe('/en/admin/education/class/c1');
+  });
+
   it('shouldShowAnEmptyStatePerSectionWhenTeacherHasNoActivity', async () => {
     fetchWithAuth.mockResolvedValue({
       ok: true,

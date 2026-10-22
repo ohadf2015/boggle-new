@@ -1,0 +1,133 @@
+/*
+ * Homepage entrance and ambient motion. The un-animated style is the finished
+ * frame; motion moves transform only, never opacity, so a frame caught at any
+ * point is fully legible. Scroll reveals are feature-detected: no support =
+ * the resting frame.
+ */
+
+/* ── word-tile marquee under the hero ────────────────────────────────────── */
+
+.marquee {
+  display: flex;
+  width: max-content;
+}
+
+/* ── hero mascot ─────────────────────────────────────────────────────────── */
+
+.mascot {
+  transform-origin: 50% 90%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee {
+    animation: fresh-marquee 48s linear infinite;
+  }
+  .marquee:dir(rtl) {
+    animation-name: fresh-marquee-rtl;
+  }
+  .marqueeBand:hover .marquee {
+    animation-play-state: paused;
+  }
+  .marqueeTile {
+    transition: transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .marqueeWord:hover .marqueeTile {
+    transform: translateY(-5px) rotate(-4deg);
+  }
+  .marqueeWord:hover .marqueeTile:nth-child(even) {
+    transform: translateY(-3px) rotate(4deg);
+  }
+
+  /* A slow idle sway with a wave every few seconds; a found word makes it hop. */
+  .mascot {
+    animation: fresh-mascot-idle 4.8s ease-in-out 1.2s infinite;
+  }
+  [data-found='true'] .mascot {
+    animation: fresh-mascot-hop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 2;
+  }
+
+  @supports (animation-timeline: view()) {
+    /* Section art drifts up and un-tilts as it scrolls in. */
+    .revealArt {
+      /* Longhands: a minifier folding view() into the `animation` shorthand
+         makes Chromium drop the whole declaration. */
+      animation-name: fresh-reveal-art;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+    /* The accent bar under each headline stretches out from the start edge. */
+    .revealBar {
+      animation-name: fresh-reveal-bar;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 45%;
+    }
+  }
+}
+
+@keyframes fresh-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes fresh-marquee-rtl {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+
+@keyframes fresh-mascot-idle {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  30% {
+    transform: rotate(-4deg) translateY(-3px);
+  }
+  60% {
+    transform: rotate(3deg) translateY(0);
+  }
+  70% {
+    transform: rotate(-6deg) translateY(-4px);
+  }
+  80% {
+    transform: rotate(5deg) translateY(-2px);
+  }
+}
+
+@keyframes fresh-mascot-hop {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-14px) scale(1.06) rotate(-6deg);
+  }
+}
+
+@keyframes fresh-reveal-art {
+  from {
+    transform: translateY(56px) rotate(-3deg) scale(0.94);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes fresh-reveal-bar {
+  from {
+    transform: scaleX(0.25);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

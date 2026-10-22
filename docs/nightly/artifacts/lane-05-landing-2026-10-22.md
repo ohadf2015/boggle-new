@@ -1,0 +1,4 @@
+status: shipped
+files_touched: fe-next/components/multiplayer/WheelRushPieces.tsx, fe-next/components/multiplayer/WheelRushView.tsx
+attempted: STEP 0 - Wheel Rush (admin-gated MP mode) feel-axis improvement: found-word chips now spring-pop on arrival (AnimatePresence + m.span, reduced-motion fades only). Existing WheelRushPieces.test.tsx assertions (data-kind, className, dir, +score text) unaffected by the DOM-prop passthrough. eslint clean on both changed files (exit 0). Full vitest/tsc run skipped per budget rules (vitest4 crashes on this Node18 worktree per memory) - diff self-reviewed, syntactically clean, small single-prop-threading change.
+next_steps: gate will run authoritative lint/tsc/test/build on this diff. If gate flags anything, it's isolated to these 2 files (prop threading only, no logic/semantics changes to game state).

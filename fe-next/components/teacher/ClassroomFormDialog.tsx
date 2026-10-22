@@ -19,25 +19,16 @@ import { LanguagePicker } from '@/components/education/pickers/LanguagePicker';
 interface ClassroomFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  mode: 'create' | 'edit';
   initialName?: string;
   initialLanguage?: Language;
   isSaving?: boolean;
   onSubmit: (name: string, language: Language) => void;
 }
 
-/**
- * Create / edit classroom form, extracted from ClassroomManager so that file
- * stays under the 500-line cap and both modes share one skinned dialog.
- *
- * Built on components/ui/dialog (neo-brutalist skin, entrance animation,
- * modal-open signal for the native ad banner) instead of the raw Radix pair
- * the manager used to hand-roll.
- */
+/** Rename a class or change its language. Creating a class is the /teacher/classroom/new flow. */
 export function ClassroomFormDialog({
   open,
   onOpenChange,
-  mode,
   initialName = '',
   initialLanguage,
   isSaving = false,
@@ -49,13 +40,10 @@ export function ClassroomFormDialog({
     initialLanguage ?? (language as Language)
   );
 
-  // Re-seed every time the dialog opens — the parent keeps one mounted dialog
-  // for both modes, so stale values from the previous open must not leak in.
-  // Create mode prefills the localized default: "name + go" is one tap, and
-  // the prefill is selected on focus so typing replaces it wholesale.
+  // Re-seed on every open: the parent keeps one mounted dialog across classes.
   useEffect(() => {
     if (open) {
-      setName(mode === 'create' ? t('teacher.classroom.defaultName') : initialName);
+      setName(initialName);
       setSelectedLanguage(initialLanguage ?? (language as Language));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,14 +63,10 @@ export function ClassroomFormDialog({
         aria-describedby={undefined}
       >
         <DialogHeader variant="cyan">
-          <DialogTitle>
-            {mode === 'create' ? t('teacher.classroom.create') : t('teacher.classroom.edit')}
-          </DialogTitle>
+          <DialogTitle>{t('teacher.classroom.edit')}</DialogTitle>
         </DialogHeader>
         <DialogDescription className="sr-only">
-          {mode === 'create'
-            ? t('teacher.classroom.dialog.createDescription')
-            : t('teacher.classroom.dialog.editDescription')}
+          {t('teacher.classroom.dialog.editDescription')}
         </DialogDescription>
 
         <DialogBody className="space-y-4">
@@ -127,11 +111,7 @@ export function ClassroomFormDialog({
               disabled={isSaving || !name.trim()}
               className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
             >
-              {isSaving
-                ? t('common.loading')
-                : mode === 'create'
-                  ? t('teacher.classroom.create')
-                  : t('teacher.classroom.edit')}
+              {isSaving ? t('common.loading') : t('teacher.classroom.edit')}
             </Button>
           </div>
         </DialogBody>

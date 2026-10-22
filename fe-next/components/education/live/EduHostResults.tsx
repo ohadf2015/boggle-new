@@ -31,7 +31,12 @@ import { buildTvRecap } from '@/components/education/results/tvRecapModel';
 import { trackResultsAction } from '@/components/education/results/trackResultsAction';
 import { isRevealed } from '@/lib/education/roundEndStage';
 import { classSwept } from '@/lib/education/roundEndSweep';
+import { useSearchParams } from 'next/navigation';
+import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import { PRESS, PRIMARY_BUTTON, SECONDARY_BUTTON, type Translate } from './eduLiveStyles';
+import { EduReteachPanel } from './EduReteachPanel';
+import { mostMissedWords, studentsUnderHalf } from './eduReteachModel';
+import { useReteachRound } from './useReteachRound';
 
 function Actions({ t, onRematch, onClose, onExitRoom }: Pick<ClassroomTvResultsScreenProps, 'onRematch' | 'onClose' | 'onExitRoom'> & { t: Translate }) {
   return (
@@ -87,6 +92,11 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
     classFoundCount: summary.classFoundCount,
     neverPlacedCount: summary.neverPlacedWords ? neverPlaced.size : undefined,
   });
+  const gameCode = useSearchParams()?.get('room') ?? null;
+  const struggled = onRematch ? mostMissedWords(summary) : [];
+  // Every word unfound is the whole lesson again: that is Play again, not a reteach.
+  const missed = struggled.length < summary.totalWords ? struggled : [];
+  const reteach = useReteachRound({ gameCode, socket: getSharedSocketIfExists(), summary, onApplied: () => onRematch?.() });
 
   return (
     <div
@@ -146,7 +156,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               <ClassPulse stats={stats} active={winnerBeat} size={phone ? 'card' : 'projector'} t={t} />
             </div>
           )}
-          {summary.totalWords > 0 && (
+          {summary.totalWords > 0 && missed.length === 0 && (
             <TvCoveragePanel
               summary={summary}
               players={players}
@@ -159,14 +169,15 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
             />
           )}
           <Actions t={t} onRematch={onRematch} onClose={onClose} onExitRoom={onExitRoom} />
+          <EduReteachPanel words={missed} underHalf={studentsUnderHalf(summary)} status={reteach.status} onReplay={reteach.replay} t={t} />
           {summary.totalWords > 0 && (
             // With the boss card up, a short wall keeps the words to reteach over the report teaser.
             <div className={cn(!phone && bossOver && 'lg:[@media(max-height:900px)]:hidden')}>
               <StrugglePreview masteryByPlayer={summary.masteryByPlayer ?? {}} teacherName={summary.teacherName ?? ''} language={language} t={t} />
             </div>
           )}
-          {/* Teacher Pro trial + school quote, after a class has actually played. Host tree only. */}
-          <div className={cn(!phone && bossOver && 'lg:[@media(max-height:900px)]:hidden')}>
+          {/* Teacher Pro trial + school quote, after a class has actually played. Host tree only. On a short wall the reteach outranks it. */}
+          <div className={cn(!phone && (bossOver || missed.length > 0) && 'lg:[@media(max-height:900px)]:hidden')}>
             <ResultsTeacherProTrialCard language={language} />
           </div>
         </div>

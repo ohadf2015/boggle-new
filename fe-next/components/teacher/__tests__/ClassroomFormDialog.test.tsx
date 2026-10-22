@@ -14,69 +14,65 @@ const baseProps = {
   onOpenChange: vi.fn(),
   isSaving: false,
   onSubmit: vi.fn(),
+  initialName: 'Period 3',
 };
 
-describe('ClassroomFormDialog', () => {
-  it('offers every language the create route accepts', () => {
-    render(<ClassroomFormDialog {...baseProps} mode="create" />);
+describe('ClassroomFormDialog (edit a class)', () => {
+  it('offers every language the classroom routes accept', () => {
+    render(<ClassroomFormDialog {...baseProps} />);
 
     const group = screen.getByRole('radiogroup', { name: 'teacher.classroom.language' });
     const radios = within(group).getAllByRole('radio') as HTMLInputElement[];
     expect(radios.map((r) => r.value)).toEqual([...EDUCATION_LANGUAGES]);
   });
 
-  it('seeds name and language from initial values', () => {
-    render(
-      <ClassroomFormDialog {...baseProps} mode="edit" initialName="Period 3" initialLanguage="es" />
-    );
+  it('seeds name and language from the class being edited', () => {
+    render(<ClassroomFormDialog {...baseProps} initialLanguage="es" />);
 
     expect(screen.getByPlaceholderText('teacher.classroom.namePlaceholder')).toHaveValue('Period 3');
     expect(screen.getByRole('radio', { name: /Español/ })).toBeChecked();
   });
 
-  it('seeds language from the teacher locale when no initial value is given', () => {
-    render(<ClassroomFormDialog {...baseProps} mode="create" />);
+  it('seeds language from the teacher locale when the class has none', () => {
+    render(<ClassroomFormDialog {...baseProps} />);
 
     expect(screen.getByRole('radio', { name: /English/ })).toBeChecked();
   });
 
-  it('prefills the localized default name in create mode, so creating is one tap', () => {
-    render(<ClassroomFormDialog {...baseProps} mode="create" />);
+  it('is an edit dialog, never a create one', () => {
+    render(<ClassroomFormDialog {...baseProps} />);
 
-    expect(screen.getByPlaceholderText('teacher.classroom.namePlaceholder')).toHaveValue(
-      'teacher.classroom.defaultName',
-    );
-    expect(screen.getByRole('button', { name: 'teacher.classroom.create' })).toBeEnabled();
+    expect(screen.getByRole('heading', { name: 'teacher.classroom.edit' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'teacher.classroom.create' })).toBeNull();
   });
 
-  it('a custom name replaces the prefilled default via standard select-all', async () => {
+  it('submits the trimmed new name', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(<ClassroomFormDialog {...baseProps} mode="create" onSubmit={onSubmit} />);
+    render(<ClassroomFormDialog {...baseProps} onSubmit={onSubmit} />);
 
-    await user.click(screen.getByPlaceholderText('teacher.classroom.namePlaceholder'));
-    await user.keyboard('{Control>}a{/Control}  Period 3  ');
-    await user.click(screen.getByRole('button', { name: 'teacher.classroom.create' }));
+    const input = screen.getByPlaceholderText('teacher.classroom.namePlaceholder');
+    await user.clear(input);
+    await user.type(input, '  Period 4  ');
+    await user.click(screen.getByRole('button', { name: 'teacher.classroom.edit' }));
 
-    expect(onSubmit).toHaveBeenCalledWith('Period 3', 'en');
+    expect(onSubmit).toHaveBeenCalledWith('Period 4', 'en');
   });
 
-  it('clearing the prefilled name disables submit again', async () => {
+  it('clearing the name disables submit', async () => {
     const user = userEvent.setup();
-    render(<ClassroomFormDialog {...baseProps} mode="create" />);
+    render(<ClassroomFormDialog {...baseProps} />);
 
     await user.clear(screen.getByPlaceholderText('teacher.classroom.namePlaceholder'));
 
-    expect(screen.getByRole('button', { name: 'teacher.classroom.create' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'teacher.classroom.edit' })).toBeDisabled();
   });
 
   it('cancel closes the dialog without submitting', async () => {
     const user = userEvent.setup();
     const onOpenChange = vi.fn();
     const onSubmit = vi.fn();
-    render(
-      <ClassroomFormDialog {...baseProps} mode="create" onOpenChange={onOpenChange} onSubmit={onSubmit} />
-    );
+    render(<ClassroomFormDialog {...baseProps} onOpenChange={onOpenChange} onSubmit={onSubmit} />);
 
     await user.click(screen.getByRole('button', { name: 'common.cancel' }));
 
@@ -85,7 +81,7 @@ describe('ClassroomFormDialog', () => {
   });
 
   it('renders nothing in the DOM while closed', () => {
-    render(<ClassroomFormDialog {...baseProps} mode="create" open={false} />);
+    render(<ClassroomFormDialog {...baseProps} open={false} />);
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });

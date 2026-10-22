@@ -19,6 +19,9 @@ export async function fetchEduRawRows(supabase: SupabaseClient, sinceIso: string
       .order('id')
       .range(from, to),
   );
+  const testAccounts = await fetchAllRows<{ id: string; is_test_account: boolean | null }>((from, to) =>
+    supabase.from('profiles').select('id, is_test_account').eq('is_test_account', true).order('id').range(from, to),
+  );
   const requests = await fetchAllRows((from, to) =>
     supabase
       .from('teacher_access_requests')
@@ -39,8 +42,9 @@ export async function fetchEduRawRows(supabase: SupabaseClient, sinceIso: string
   const subscriptions = await fetchAllRows((from, to) =>
     supabase
       .from('subscriptions')
-      .select('id, user_id, status, created_at')
+      .select('*')
       .eq('status', 'active')
+      .eq('tier', 'pro')
       .order('id')
       .range(from, to),
   );
@@ -72,7 +76,7 @@ export async function fetchEduRawRows(supabase: SupabaseClient, sinceIso: string
       }),
   );
 
-  const failure = [profiles, requests, classrooms, memberships, subscriptions].find((r) => r.error);
+  const failure = [profiles, testAccounts, requests, classrooms, memberships, subscriptions].find((r) => r.error);
   if (failure?.error) return { ok: false, error: failure.error };
 
   let outreachRows: Array<{ teacher_id: string; channel: string; created_at: string }> | null = outreach.data;
@@ -91,6 +95,7 @@ export async function fetchEduRawRows(supabase: SupabaseClient, sinceIso: string
     ok: true,
     raw: {
       profiles: profiles.data,
+      testAccountIds: testAccounts.data.filter((p) => p.is_test_account === true).map((p) => p.id),
       requests: requests.data,
       classrooms: classrooms.data,
       memberships: memberships.data,

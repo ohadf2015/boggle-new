@@ -53,10 +53,6 @@ vi.mock('@/components/education/ProFramingSection', () => ({
   ProFramingSection: ({ cta }: { cta?: React.ReactNode }) => <div data-testid="pro-framing">{cta}</div>,
 }));
 
-vi.mock('@/components/education/SixModeTour', () => ({
-  SixModeTour: () => <div data-testid="six-mode-tour" />,
-}));
-
 vi.mock('@/components/education/ComparisonStrip', () => ({
   ComparisonStrip: () => <div data-testid="comparison-strip" />,
 }));

@@ -1,19 +1,12 @@
 'use client';
 
-import React, { useState, useCallback, useRef, lazy, Suspense } from 'react';
+import React, { useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomAnalytics } from '@/hooks/useClassroomAnalytics';
-import { useStudentProgressMetrics } from '@/hooks/useStudentProgressMetrics';
 import { MetricCard } from './MetricCard';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { AlertTriangle, TrendingUp, Users, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { VocabularyHeatmap } from './VocabularyHeatmap';
-import { WordMasteryCard } from './WordMasteryCard';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
-
-const LessonEffectivenessChart = lazy(() => import('./LessonEffectivenessChart'));
 
 // ============================================
 // TYPE DEFINITIONS
@@ -28,8 +21,6 @@ export interface AnalyticsDashboardProps {
   onCreateReviewLesson?: (words: string[]) => void;
   /** False when the host page already carries the analytics title. */
   showHeader?: boolean;
-  /** Metric cards only — for a host page whose own tabs carry the table, chart and heatmap. */
-  summaryOnly?: boolean;
 }
 
 // ============================================
@@ -37,41 +28,20 @@ export interface AnalyticsDashboardProps {
 // ============================================
 
 /**
- * AnalyticsDashboard Component
- *
- * Main analytics dashboard displaying 4 key classroom metrics:
- * 1. Students Needing Help (urgent) - Students with <60% accuracy
- * 2. Class Average XP (info) - Average XP across all students
- * 3. Active Today (info) - Student engagement ratio
- * 4. Common Mistakes (warning) - Top mistake words
- *
- * Research shows limiting to 3-5 metrics prevents data fatigue.
- * Actionable buttons enable teacher workflows (view students, create review lesson).
- *
- * @example
- * <AnalyticsDashboard
- *   classroomId="class-123"
- *   onViewStudents={(filter) => navigate(`/students?filter=${filter}`)}
- *   onCreateReviewLesson={(words) => navigate(`/lessons/create?words=${words.join(',')}`)}
- * />
+ * The four class metrics (needing help, average XP, active today, common
+ * mistakes), each with its action. The host page's tabs carry the student
+ * table, lesson chart and heatmap; a student row there opens the report.
  */
 export function AnalyticsDashboard({
   classroomId,
   onViewStudents,
   onCreateReviewLesson,
   showHeader = true,
-  summaryOnly = false,
 }: AnalyticsDashboardProps) {
   const { t } = useLanguage();
   const { metrics, isLoading, error, refresh } = useClassroomAnalytics({ classroomId });
-  const { students } = useStudentProgressMetrics({ classroomId });
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
-  const studentTableRef = useRef<HTMLDivElement>(null);
 
   const handleViewStudents = useCallback(() => {
-    if (typeof studentTableRef.current?.scrollIntoView === 'function') {
-      studentTableRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
     onViewStudents?.('struggling');
   }, [onViewStudents]);
 
@@ -184,14 +154,14 @@ export function AnalyticsDashboard({
       )}
 
       {/* Metric Cards Grid */}
-      <div className={cn('grid lg:grid-cols-4', summaryOnly ? 'grid-cols-2 gap-3 sm:gap-4' : 'grid-cols-1 md:grid-cols-2 gap-4')}>
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {/* Metric 1: Students Needing Help (Urgent) */}
         <MetricCard
           title={t('education.analytics.studentsNeedingHelp')}
           value={metrics.studentsNeedingHelp}
           icon={<AlertTriangle className="w-6 h-6" />}
           severity="urgent"
-          compact={summaryOnly}
+          compact
           testId="metric-students-needing-help"
           actionable={{
             label: t('education.analytics.viewStudents'),
@@ -206,7 +176,7 @@ export function AnalyticsDashboard({
           icon={<TrendingUp className="w-6 h-6" />}
           severity="info"
           testId="metric-class-average-xp"
-          compact={summaryOnly}
+          compact
         />
 
         {/* Metric 3: Active Students Today (Info) */}
@@ -218,7 +188,7 @@ export function AnalyticsDashboard({
           trendValue={`${engagementPercent}%`}
           trend={engagementPercent >= 70 ? 'up' : engagementPercent >= 50 ? 'neutral' : 'down'}
           testId="metric-active-students"
-          compact={summaryOnly}
+          compact
         />
 
         {/* Metric 4: Common Mistakes (Warning) */}
@@ -228,7 +198,7 @@ export function AnalyticsDashboard({
           icon={<AlertCircle className="w-6 h-6" />}
           severity="warning"
           testId="metric-common-mistakes"
-          compact={summaryOnly}
+          compact
           actionable={
             onCreateReviewLesson && commonMistakesCount > 0
               ? {
@@ -239,97 +209,6 @@ export function AnalyticsDashboard({
           }
         />
       </div>
-
-      {!summaryOnly && (<>
-      {/* Student Progress Table */}
-      <div ref={studentTableRef} className="mt-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-neo-display font-bold text-neo-white">
-            {t('education.analytics.studentProgress')}
-          </h3>
-          <button
-            type="button"
-            onClick={() => {/* export logic */}}
-            className={cn(
-              'px-4 py-2 bg-neo-cyan text-black border-3 border-black',
-              'font-bold font-neo-body rounded-neo shadow-hard-sm',
-              'hover:-translate-y-0.5 active:translate-y-0.5',
-              'transition-all duration-100 text-sm'
-            )}
-          >
-            {t('education.analytics.exportReport')}
-          </button>
-        </div>
-
-        {students.length > 0 ? (
-          // overflow-x-auto: five columns of student metrics need ~560px; on a
-          // phone the table must scroll inside the card, not push the page wide.
-          <div className="border-3 border-black rounded-neo overflow-hidden overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-neo-navy/60 border-b-2 border-black/30">
-                  <th className="sticky start-0 z-10 bg-neo-navy px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.student')}</th>
-                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.level')}</th>
-                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.mastery')}</th>
-                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.accuracy')}</th>
-                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.streak')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {students.map((student) => (
-                  <tr
-                    key={student.studentId}
-                    onClick={() => setSelectedStudentId(student.studentId)}
-                    className="border-b border-black/10 hover:bg-neo-white/5 cursor-pointer"
-                  >
-                    <td className="sticky start-0 z-10 bg-neo-navy px-3 py-2 text-sm font-bold text-neo-white">{student.displayName}</td>
-                    <td className="px-3 py-2 text-sm text-neo-white">{student.currentLevel}</td>
-                    <td className="px-3 py-2 text-sm text-neo-white">{student.vocabularyMastery}%</td>
-                    <td className="px-3 py-2 text-sm text-neo-white">{student.overallAccuracy}%</td>
-                    <td className="px-3 py-2 text-sm text-neo-white">{student.currentStreak}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="text-sm text-neo-white">{t('education.analytics.noStudents')}</p>
-        )}
-      </div>
-
-      {/* Lesson Effectiveness Chart */}
-      <div className="mt-6">
-        <h3 className="text-lg font-neo-display font-bold text-neo-white mb-4">
-          {t('education.analytics.lessonEffectiveness')}
-        </h3>
-        <Suspense fallback={<div className="animate-pulse h-48 bg-neo-white/5 rounded-neo" />}>
-          <LessonEffectivenessChart classroomId={classroomId} />
-        </Suspense>
-      </div>
-
-      {/* Word Mastery Trends (Pro) — cross-session mastered/improving/stuck,
-          the trend the flat accuracy table above can't show. */}
-      <div className="mt-6">
-        <WordMasteryCard classroomId={classroomId} onCreateReviewLesson={onCreateReviewLesson} />
-      </div>
-
-      {/* Vocabulary Mastery Heatmap */}
-      <div className="mt-6">
-        <VocabularyHeatmap classroomId={classroomId} />
-      </div>
-      </>)}
-
-      {/* Student Detail Dialog */}
-      <Dialog open={!!selectedStudentId} onOpenChange={(open) => { if (!open) setSelectedStudentId(null); }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('education.analytics.studentDetail')}</DialogTitle>
-          </DialogHeader>
-          {selectedStudentId && (
-            <StudentProgressReport studentId={selectedStudentId} classroomId={classroomId} />
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

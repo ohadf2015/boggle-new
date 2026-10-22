@@ -24,14 +24,12 @@ describe('education landing contrast', () => {
   const page = read('app/[locale]/education/page.tsx');
   const client = read('app/[locale]/education/PageClient.tsx');
   const strip = read('components/education/ComparisonStrip.tsx');
-  const modes = read('components/education/SixModeTour.tsx');
-  const mock = read('components/education/EducationModeMock.tsx');
   const upsell = read('components/education/DistrictUpsellStrip.tsx');
   const packages = read('components/education/EducationPackages.tsx');
   const header = read('components/education/EducationHeader.tsx');
 
   it('puts black text on pink, purple, and red fills', () => {
-    const sources = [page, mock, packages, modes];
+    const sources = [page, packages];
     for (const src of sources) {
       for (const cls of quoted(src)) {
         if (/bg-neo-(pink|purple|red)\b/.test(cls) && /text-neo-/.test(cls)) {
@@ -50,10 +48,6 @@ describe('education landing contrast', () => {
     expect(duels).not.toMatch(/text-neo-lime/);
     expect(duels).toMatch(/text-neo-black/);
 
-    expect(mock).toContain("text: 'text-neo-black'");
-    expect(mock).not.toContain("text: 'text-neo-white'");
-    expect(modes).toContain("purple: 'text-neo-black'");
-    expect(modes).not.toContain("purple: 'text-neo-white'");
   });
 
   it('uses the light accent on navy cards, including hover', () => {
@@ -76,7 +70,6 @@ describe('education landing contrast', () => {
     expect(strip).not.toContain('text-neo-lime-dark');
     expect(strip).not.toContain('text-neo-navy/40');
     expect(strip).toContain('text-neo-navy/80');
-    expect(modes).not.toContain('text-neo-navy/50');
   });
 
   it('does not put black text on a pink wash over navy', () => {

@@ -24,7 +24,7 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
           aria-label={t('eg2Land.header.home')}
           className="flex min-w-0 shrink items-center gap-1.5 rounded-sm focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
         >
-          <span className="truncate font-neo-display text-lg font-black uppercase tracking-tight text-neo-cream sm:text-xl">
+          <span className="truncate font-neo-display text-base font-black uppercase tracking-tight text-neo-cream min-[400px]:text-lg sm:text-xl">
             LexiClash
           </span>
           <span className="hidden shrink-0 -rotate-2 rounded-neo-sm border-2 border-neo-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-[11px] font-black uppercase leading-none text-neo-navy shadow-hard-sm min-[400px]:inline-block">
@@ -32,7 +32,7 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
           </span>
         </Link>
 
-        <div className="ms-auto flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="ms-auto flex shrink-0 items-center gap-1.5 sm:gap-3">
           <QuickLanguageSwitcher compact />
           {!isAuthenticated && (
             <button
@@ -52,7 +52,7 @@ export function LandingHeader({ showStart = true }: { showStart?: boolean }) {
               href={`/${language}/education/access`}
               data-testid="landing-header-start"
               onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'education_header_start' })}
-              className="inline-flex min-h-10 items-center whitespace-nowrap rounded-neo border-2 border-neo-black bg-neo-lime px-3 font-neo-display text-sm font-black uppercase text-neo-navy shadow-hard-sm transition-transform duration-100 hover:-translate-y-0.5 active:translate-y-0.5 motion-reduce:transition-none sm:px-4"
+              className="inline-flex min-h-10 items-center whitespace-nowrap rounded-neo border-2 border-neo-black bg-neo-lime px-2.5 font-neo-display text-sm font-black uppercase text-neo-navy shadow-hard-sm transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed motion-reduce:transition-none sm:px-4"
             >
               {t('eg2Land.header.start')}
             </Link>

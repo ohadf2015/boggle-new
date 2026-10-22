@@ -1,177 +1,113 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { loadParentReportData } from '../parentReportData';
+import { fakeSupabase, ok, fail, type TableResponder } from './fakeSupabase';
 
 const STUDENT = 'student-1';
 const CLASSROOM = 'classroom-1';
+const NOW = new Date('2026-10-21T12:00:00Z');
 
-/**
- * A fake service-role client whose `.from(table)` branches by table name.
- * Each branch supports the exact chain the loader calls, nothing more —
- * mirrors the shape used by the sibling parent-report route tests.
- */
-function makeAdmin(opts: {
-  isMember?: boolean;
-  membershipError?: { message: string } | null;
-  profile?: { display_name: string | null; username: string | null } | null;
-  profileError?: { message: string } | null;
-  progress?: Array<{ total_xp: number | null; words_mastered: string[] | null; completed_at: string | null }>;
-  progressError?: { message: string } | null;
-  sessions?: Array<{ completed_at: string | null }>;
-  sessionsError?: { message: string } | null;
-}) {
-  const {
-    isMember = true,
-    membershipError = null,
-    profile = { display_name: 'Ana', username: null },
-    profileError = null,
-    progress = [],
-    progressError = null,
-    sessions = [],
-    sessionsError = null,
-  } = opts;
-
-  const from = vi.fn((table: string) => {
-    if (table === 'classroom_memberships') {
-      return {
-        select: () => ({
-          eq: () => ({
-            eq: () => ({
-              maybeSingle: async () => ({
-                data: isMember ? { id: 'membership-1' } : null,
-                error: membershipError,
-              }),
-            }),
-          }),
-        }),
-      };
-    }
-    if (table === 'public_profiles') {
-      return {
-        select: () => ({
-          eq: () => ({
-            maybeSingle: async () => ({ data: profile, error: profileError }),
-          }),
-        }),
-      };
-    }
-    if (table === 'student_lesson_progress') {
-      return {
-        select: () => ({
-          eq: async () => ({ data: progress, error: progressError }),
-        }),
-      };
-    }
-    if (table === 'practice_sessions') {
-      return {
-        select: () => ({
-          eq: () => ({
-            eq: () => ({
-              not: () => ({
-                order: () => ({
-                  limit: async () => ({ data: sessions, error: sessionsError }),
-                }),
-              }),
-            }),
-          }),
-        }),
-      };
-    }
-    throw new Error(`unexpected table ${table}`);
+function db(overrides: Partial<Record<string, TableResponder>> = {}) {
+  return fakeSupabase({
+    classroom_memberships: ok({ id: 'membership-1' }),
+    public_profiles: (filters) =>
+      filters.some(([m, col, val]) => m === 'eq' && col === 'id' && val === 'teacher-1')
+        ? ok({ display_name: 'Ms. Levi', username: null })
+        : ok({ display_name: 'Ana', username: null }),
+    classrooms: ok({ name: '5B English', teacher_id: 'teacher-1' }),
+    student_lesson_progress: ok([]),
+    practice_sessions: ok([]),
+    ...overrides,
   });
-
-  return { from };
 }
 
 describe('loadParentReportData', () => {
-  it('Given the student is not (or no longer) a member of the classroom, When loaded, Then it returns not_member', async () => {
-    const admin = makeAdmin({ isMember: false });
-
-    const result = await loadParentReportData(admin as any, STUDENT, CLASSROOM);
-
-    expect(result.status).toBe('not_member');
+  it('Given the student is not (or no longer) a member of the classroom, Then it returns not_member', async () => {
+    const { client } = db({ classroom_memberships: ok(null) });
+    expect((await loadParentReportData(client, STUDENT, CLASSROOM, NOW)).status).toBe('not_member');
   });
 
-  it('Given the membership check errors, When loaded, Then it returns error (never renders as "no progress")', async () => {
-    const admin = makeAdmin({ membershipError: { message: 'db down' } });
+  it.each(['classroom_memberships', 'student_lesson_progress', 'practice_sessions', 'classrooms'])(
+    'Given the %s read errors, Then it returns error (never renders as "no progress")',
+    async (table) => {
+      const { client } = db({ [table]: fail('boom') });
+      expect((await loadParentReportData(client, STUDENT, CLASSROOM, NOW)).status).toBe('error');
+    },
+  );
 
-    const result = await loadParentReportData(admin as any, STUDENT, CLASSROOM);
-
-    expect(result.status).toBe('error');
-  });
-
-  it('Given the student is a member with no progress rows, When loaded, Then it returns zeroed ok data', async () => {
-    const admin = makeAdmin({ profile: { display_name: 'Ana', username: null }, progress: [], sessions: [] });
-
-    const result = await loadParentReportData(admin as any, STUDENT, CLASSROOM);
-
-    expect(result).toEqual({
-      status: 'ok',
-      data: {
-        displayName: 'Ana',
-        totalXp: 0,
-        lessonsCompleted: 0,
-        wordsMastered: 0,
-        recentActivity: [],
-      },
+  it('Given a member with no progress, Then old fields are zeroed and the header carries class + teacher', async () => {
+    const { client } = db();
+    const result = await loadParentReportData(client, STUDENT, CLASSROOM, NOW);
+    if (result.status !== 'ok') throw new Error('expected ok');
+    expect(result.data).toMatchObject({
+      displayName: 'Ana',
+      totalXp: 0,
+      lessonsCompleted: 0,
+      wordsMastered: 0,
+      recentActivity: [],
+      classroomName: '5B English',
+      teacherName: 'Ms. Levi',
+      generatedAt: NOW.toISOString(),
     });
+    expect(result.data.insights?.insight).toBe('quiet');
   });
 
-  it('sums XP, counts completed lessons, and unions distinct mastered words across progress rows', async () => {
-    const admin = makeAdmin({
-      progress: [
-        { total_xp: 50, words_mastered: ['cat', 'dog'], completed_at: '2026-01-01T00:00:00Z' },
-        { total_xp: 30, words_mastered: ['dog', 'fox'], completed_at: null },
-        { total_xp: 20, words_mastered: [], completed_at: '2026-01-05T00:00:00Z' },
-      ],
-      sessions: [{ completed_at: '2026-01-05T00:00:00Z' }, { completed_at: '2026-01-01T00:00:00Z' }],
+  it('keeps the headline numbers equal to the insight totals and lists the 5 newest sessions', async () => {
+    const sessions = [0, 1, 2, 3, 4, 5].map((d) => ({
+      completed_at: new Date(NOW.getTime() - d * 86400000).toISOString(),
+      words_attempted: 10,
+      words_correct: 5,
+      time_spent_seconds: 0,
+      duration_seconds: 120,
+    }));
+    const { client } = db({
+      student_lesson_progress: ok([
+        { total_xp: 40, words_mastered: ['cat', 'dog'], words_attempted: {}, completed_at: '2026-10-01', current_streak: 1, longest_streak: 2 },
+        { total_xp: 60, words_mastered: ['dog', 'fox'], words_attempted: {}, completed_at: '2026-10-02', current_streak: 0, longest_streak: 0 },
+      ]),
+      practice_sessions: ok(sessions),
     });
-
-    const result = await loadParentReportData(admin as any, STUDENT, CLASSROOM);
-
-    expect(result.status).toBe('ok');
-    if (result.status !== 'ok') throw new Error('unreachable');
+    const result = await loadParentReportData(client, STUDENT, CLASSROOM, NOW);
+    if (result.status !== 'ok') throw new Error('expected ok');
     expect(result.data.totalXp).toBe(100);
     expect(result.data.lessonsCompleted).toBe(2);
-    expect(result.data.wordsMastered).toBe(3); // cat, dog, fox — deduped
-    expect(result.data.recentActivity).toEqual([
-      { completedAt: '2026-01-05T00:00:00Z' },
-      { completedAt: '2026-01-01T00:00:00Z' },
-    ]);
+    expect(result.data.wordsMastered).toBe(3);
+    expect(result.data.recentActivity).toHaveLength(5);
+    expect(result.data.recentActivity[0].completedAt).toBe(sessions[0].completed_at);
+    expect(result.data.insights?.thisWeek.sessions).toBe(6);
+  });
+
+  it('scopes sessions to this classroom and only completed ones', async () => {
+    const { client, calls } = db();
+    await loadParentReportData(client, STUDENT, CLASSROOM, NOW);
+    const sessions = calls.find((c) => c.table === 'practice_sessions')!;
+    expect(sessions.filters).toContainEqual(['eq', 'student_id', STUDENT]);
+    expect(sessions.filters).toContainEqual(['eq', 'classroom_id', CLASSROOM]);
+    expect(sessions.filters).toContainEqual(['not', 'completed_at', 'is', null]);
   });
 
   it('falls back to a generic name when the profile has no display_name or username', async () => {
-    const admin = makeAdmin({ profile: { display_name: null, username: null } });
-
-    const result = await loadParentReportData(admin as any, STUDENT, CLASSROOM);
-
-    expect(result.status).toBe('ok');
-    if (result.status !== 'ok') throw new Error('unreachable');
+    const { client } = db({ public_profiles: ok({ display_name: null, username: null }) });
+    const result = await loadParentReportData(client, STUDENT, CLASSROOM, NOW);
+    if (result.status !== 'ok') throw new Error('expected ok');
     expect(result.data.displayName).toBe('Student');
   });
 
-  it('never leaks email — only display_name/username are selected from the profile', async () => {
-    const admin = makeAdmin({});
-
-    await loadParentReportData(admin as any, STUDENT, CLASSROOM);
-
-    // The mock's public_profiles branch only ever returns display_name/username;
-    // this test documents the contract so a future edit can't widen the select.
-    expect(admin.from).toHaveBeenCalledWith('public_profiles');
+  it('never leaks email — only display_name/username are selected from profiles', async () => {
+    const { client, calls } = db();
+    await loadParentReportData(client, STUDENT, CLASSROOM, NOW);
+    for (const c of calls.filter((x) => x.table === 'public_profiles')) {
+      const select = c.filters.find(([m]) => m === 'select')!;
+      expect(String(select[1])).not.toMatch(/email/);
+    }
   });
 
-  it('Given the progress query errors, When loaded, Then it returns error', async () => {
-    const admin = makeAdmin({ progressError: { message: 'boom' } });
-
-    const result = await loadParentReportData(admin as any, STUDENT, CLASSROOM);
-
-    expect(result.status).toBe('error');
-  });
-
-  it('Given the sessions query errors, When loaded, Then it returns error', async () => {
-    const admin = makeAdmin({ sessionsError: { message: 'boom' } });
-
-    const result = await loadParentReportData(admin as any, STUDENT, CLASSROOM);
-
-    expect(result.status).toBe('error');
+  it('a failed teacher-name read hides the teacher line instead of failing the report', async () => {
+    const { client } = db({
+      public_profiles: (filters) =>
+        filters.some(([m, , val]) => m === 'eq' && val === 'teacher-1') ? fail('nope') : ok({ display_name: 'Ana', username: null }),
+    });
+    const result = await loadParentReportData(client, STUDENT, CLASSROOM, NOW);
+    if (result.status !== 'ok') throw new Error('expected ok');
+    expect(result.data.teacherName).toBeUndefined();
   });
 });

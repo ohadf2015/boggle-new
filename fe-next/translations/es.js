@@ -3917,7 +3917,68 @@ const es = {
     "invalidTitle": "Enlace no disponible",
     "invalidBody": "Este enlace del informe ha caducado o ya no es válido. Pide al profesor un enlace nuevo.",
     "footerNote": "Compartido por el profesor de tu hijo/a a través de LexiClash. No necesitas una cuenta.",
-    "language": "Ver en"
+    "language": "Ver en",
+    "printButton": "Imprimir o guardar como PDF",
+    "classLabel": "Clase",
+    "teacherLabel": "Profesor/a",
+    "periodLabel": "Periodo",
+    "periodRange": "{start} – {end}",
+    "noValue": "—",
+    "allTime": "En total: {xp} XP · {lessons} lecciones completadas",
+    "statWordsMeaning": "Palabras aprendidas lo bastante bien como para contar como dominadas.",
+    "statAccuracy": "Precisión",
+    "statAccuracyMeaning": "Porcentaje de respuestas correctas.",
+    "statWeekMinutes": "Minutos esta semana",
+    "statWeekMinutesMeaning": "Tiempo de práctica en los últimos 7 días.",
+    "statStreak": "Racha de días",
+    "statStreakMeaning": "Días seguidos practicando. Mejor racha: {best}.",
+    "weekTitle": "Esta semana frente a la anterior",
+    "weekThis": "Últimos 7 días",
+    "weekLast": "Los 7 días anteriores",
+    "rowSessions": "Sesiones de práctica",
+    "rowMinutes": "Minutos de práctica",
+    "rowActiveDays": "Días activos",
+    "rowAccuracy": "Precisión",
+    "practiceTitle": "Palabras para practicar",
+    "practiceHint": "Las que más se fallan. Un repaso rápido en casa ayuda.",
+    "winsTitle": "Logros recientes",
+    "winsHint": "Palabras respondidas bien hace poco o ya dominadas.",
+    "wordAccuracy": "{value} % de aciertos",
+    "wordMastered": "Dominada",
+    "insightTitle": "En resumen",
+    "activityTitle": "Para probar en casa",
+    "insight": {
+      "quiet": "{name} no ha practicado en las dos últimas semanas. Una sesión corta juntos puede retomar el hábito.",
+      "started_this_week": "{name} ha vuelto a practicar esta semana después de una semana tranquila. Sesiones esta semana: {count}.",
+      "more_active": "{name} practicó más esta semana que la anterior. Sesiones: {count} (antes {previous}).",
+      "less_active": "{name} practicó un poco menos esta semana. Sesiones: {count} (antes {previous}).",
+      "steady": "{name} mantiene un ritmo constante. Sesiones esta semana: {count}, igual que la anterior.",
+      "paused": "{name} practicó la semana pasada, pero aún no esta semana. Sesiones la semana pasada: {previous}."
+    },
+    "activity": {
+      "practice_weak_words": "Pide a {name} que use estas palabras en una frase durante la cena: {words}.",
+      "celebrate_wins": "Pide a {name} que te enseñe una palabra que aprendió hace poco, como {words}.",
+      "short_daily_session": "Elige tres días esta semana para practicar 10 minutos juntos."
+    },
+    "teacherPreviewTitle": "Lo que muestra el informe para familias",
+    "teacherPreviewHint": "Los mismos números que ve la familia en el enlace compartido.",
+    "loadFailed": "No se pudo cargar el resumen. Recarga la página para intentarlo de nuevo."
+  },
+  "parentReportsFlow": {
+    "title": "Informes para familias",
+    "lead": "Elige estudiantes, revisa un informe y luego copia los enlaces o descárgalos en CSV.",
+    "disclosureHint": "Elige estudiantes y comparte su progreso con casa",
+    "search": "Buscar estudiantes",
+    "selectAll": "Seleccionar todo",
+    "selectNone": "Quitar selección",
+    "selectedCount": "{count} de {total} seleccionados",
+    "noMatch": "Ningún estudiante coincide con la búsqueda.",
+    "rosterFailed": "No se pudo cargar la lista de estudiantes. Inténtalo de nuevo.",
+    "make": "Crear enlaces para {count} seleccionados",
+    "preview": "Vista previa",
+    "previewFor": "Vista previa del informe de {name}",
+    "copyOne": "Copiar enlace",
+    "copyOneFor": "Copiar el enlace de {name}"
   },
   "share": {
     "button": "Compartir",
@@ -11098,21 +11159,16 @@ const es = {
       }
     },
     "eduDashboard": {
-      "verdict": {
-        "none": "Aún no hay datos suficientes en este periodo.",
-        "eyebrow": "Mayor fuga",
-        "label": {
-          "approved": "las solicitudes de acceso nunca fueron aprobadas",
-          "classroom": "docentes aprobados nunca crearon una clase",
-          "student": "docentes crearon una clase pero aún no se ha unido ningún alumno"
-        },
-        "action": {
-          "approved": "Revisa las solicitudes pendientes en Acceso docente.",
-          "classroom": "Anímalos a crear su primera clase.",
-          "student": "Envía el código de acceso a estos docentes, primero los más recientes."
-        },
-        "convert": "llegan a este paso",
-        "openTop": "Abrir el primer docente"
+      "healthTitle": "Estado de los docentes",
+      "title": "Resumen educativo",
+      "window": "Periodo",
+      "loadFailed": "No se pudo cargar el resumen educativo.",
+      "loading": "Cargando…",
+      "noData": "Sin datos todavía",
+      "health": {
+        "thriving": "Prosperando",
+        "at_risk": "En riesgo",
+        "dormant": "Inactivo"
       },
       "rescue": {
         "nudge": {
@@ -11131,46 +11187,26 @@ const es = {
         "nudged": "Recordatorio {date}",
         "copy": "Copiar recordatorio",
         "email": "Correo",
-        "mark": "Marcar como hecho",
-        "title": "Lista de rescate",
-        "empty": "Nadie está atascado en este paso.",
-        "rowAction": {
-          "approved": "Animar a crear una clase",
-          "classroom": "Enviar el código de acceso"
+        "mark": "Marcar como hecho"
+      },
+      "verdict": {
+        "none": "Aún no hay datos suficientes en este periodo.",
+        "eyebrow": "La mayor caída",
+        "label": {
+          "approved": "solicitantes nunca fueron aprobados",
+          "signin": "docentes aprobados no pueden entrar: nunca se les dio el rol de docente",
+          "classroom": "docentes pueden entrar pero nunca crearon una clase",
+          "student": "docentes crearon una clase, pero aún no se unió ningún alumno"
         },
-        "more": "más en Todos los docentes abajo"
-      },
-      "healthTitle": "Estado de los docentes",
-      "quiet": "Métricas tranquilas",
-      "posthogHidden": "La conversión de la landing y del upsell está oculta: no hay clave de PostHog en el servidor.",
-      "title": "Resumen educativo",
-      "subtitle": "Se excluyen las cuentas de prueba. Las variaciones comparan con el periodo anterior.",
-      "window": "Periodo",
-      "loadFailed": "No se pudo cargar el resumen educativo.",
-      "loading": "Cargando…",
-      "noData": "Sin datos todavía",
-      "kpi": {
-        "activeTeachers": "Profesores activos",
-        "newTeachers": "Profesores nuevos",
-        "classesWithLiveGame": "Clases con partida en vivo",
-        "liveRounds": "Rondas en vivo jugadas",
-        "trialsStarted": "Pruebas Pro iniciadas",
-        "trialsPaid": "Pruebas convertidas en pago"
-      },
-      "funnel": {
-        "title": "Embudo de profesores",
-        "requested": "Solicitud",
-        "approved": "Aprobado",
-        "classroom": "Creó una clase",
-        "student": "Primer alumno se unió"
-      },
-      "health": {
-        "thriving": "Prosperando",
-        "at_risk": "En riesgo",
-        "dormant": "Inactivo"
-      },
-      "modeMix": {
-        "title": "Modos en clase"
+        "action": {
+          "approved": "Revisa las solicitudes pendientes en Acceso docente.",
+          "signin": "Dales el rol de docente en Acceso docente.",
+          "classroom": "Anímalos a crear su primera clase.",
+          "student": "Envía el código de la clase a estos docentes, primero a los más activos."
+        },
+        "convert": "Solo el {pct}% de \"{from}\" llega a \"{to}\".",
+        "seeCohort": "Ver a estos {count} docentes",
+        "openAccess": "Abrir Acceso docente"
       },
       "teachers": {
         "all": "Todos los docentes",
@@ -11183,16 +11219,118 @@ const es = {
         "lastActive": "Última actividad",
         "classes": "Clases",
         "students": "Alumnos",
-        "rounds7d": "Rondas 7d",
-        "health": "Estado"
-      },
-      "dying": {
-        "title": "Clases en declive",
-        "empty": "Ninguna por ahora."
+        "health": "Estado",
+        "rounds7d": "Partidas de clase, últimos 7 días",
+        "plan": "Plan",
+        "planPaid": "Pro de pago",
+        "planTrial": "Prueba",
+        "planFree": "Gratis",
+        "lockedOut": "No puede entrar",
+        "healthDefinition": "Activo: entró e hizo una partida de clase en los últimos 7 días. En riesgo: entró en los últimos 21 días sin eso. Inactivo: sin entrar en 21 días."
       },
       "classes": {
-        "title": "Clases"
+        "title": "Clases",
+        "name": "Clase",
+        "gamesInWindow": "Partidas del periodo",
+        "lastGame": "Última partida"
+      },
+      "subtitle": "Las cuentas de prueba no cuentan en ninguna cifra. Cada cambio se compara con el mismo número de días justo antes.",
+      "windowLast": "Últimos {days} días",
+      "notMeasured": "Aún sin medir: falta la tabla de partidas de clase en esta base de datos.",
+      "delta": {
+        "vsPrior": "{pct} frente a los {days} días anteriores (antes {prior})",
+        "fromZero": "Sube desde 0 en los {days} días anteriores",
+        "noneEither": "Tampoco hubo en los {days} días anteriores"
+      },
+      "drill": {
+        "show": "Ver la lista ({count})",
+        "stoppedAt": "Se quedaron en: {step}",
+        "clear": "Ver a todos",
+        "empty": "No hay nadie aquí."
+      },
+      "kpi": {
+        "activeTeachers": "Docentes que entraron",
+        "newTeachers": "Docentes recién aprobados",
+        "classesWithLiveGame": "Clases que jugaron",
+        "liveRounds": "Partidas de clase jugadas",
+        "trialsStarted": "Pruebas Pro iniciadas",
+        "trialsPaid": "Pruebas que pasaron a pago"
+      },
+      "kpiDefinition": {
+        "activeTeachers": "Docentes cuya última visita cae en este periodo. Solo se guarda la última visita, así que no hay comparación anterior.",
+        "newTeachers": "Solicitudes de acceso aprobadas en este periodo, una por persona.",
+        "classesWithLiveGame": "Clases que terminaron al menos una partida en vivo en este periodo.",
+        "liveRounds": "Partidas de clase en vivo terminadas en este periodo.",
+        "trialsStarted": "Docentes aprobados cuya prueba Pro empezó en este periodo.",
+        "trialsPaid": "Docentes en prueba que empezaron un plan Pro de pago en este periodo. El Pro gratis o regalado no cuenta."
+      },
+      "funnel": {
+        "title": "Recorrido del docente",
+        "hint": "Desde siempre. El % es la parte del paso anterior. Haz clic en un paso para ver quién se quedó ahí.",
+        "requested": "Solicitaron",
+        "approved": "Aprobados",
+        "signin": "Pueden entrar",
+        "classroom": "Crearon una clase",
+        "student": "Tienen alumnos"
+      },
+      "funnelDefinition": {
+        "requested": "Personas que llenaron el formulario de acceso docente, desde siempre.",
+        "approved": "Solicitantes que un admin aprobó.",
+        "signin": "Aprobados y con el rol de docente, así /teacher los deja entrar.",
+        "classroom": "Crearon al menos una clase.",
+        "student": "Al menos un alumno se unió a una de sus clases."
+      },
+      "attention": {
+        "title": "Necesita atención",
+        "hint": "Lo más urgente primero: problemas para entrar, pruebas a punto de terminar y luego docentes atascados en un paso.",
+        "empty": "Ahora mismo nadie necesita un empujón.",
+        "more": "+{count} más. Usa el embudo o la lista de docentes de abajo para verlos.",
+        "fixAccess": "Arreglar en Acceso docente",
+        "reason": {
+          "locked_out": "Aprobado, pero no puede entrar: le falta el rol de docente.",
+          "trial_ending": "La prueba Pro termina el {date} y aún no paga.",
+          "no_students": "Creó una clase, pero no se ha unido ningún alumno.",
+          "class_stalled": "Tiene alumnos, pero ninguna partida de clase en 14 días:",
+          "no_class": "Puede entrar, pero nunca creó una clase.",
+          "went_quiet": "Entró esta semana, pero no hizo ninguna partida de clase."
+        }
+      },
+      "modeMix": {
+        "title": "Qué juegan las clases",
+        "mode": "Modo de juego",
+        "rounds": "Partidas",
+        "players": "Plazas de jugador"
       }
+    },
+    "eduClass": {
+      "error": "No se pudo cargar esta clase.",
+      "teacher": "Docente",
+      "testTeacher": "Cuenta de prueba",
+      "joinCode": "Código de la clase",
+      "language": "Idioma",
+      "created": "Creada",
+      "lastGame": "Última partida de clase",
+      "students": "Alumnos",
+      "studentsEmpty": "Aún no se unió ningún alumno.",
+      "student": "Alumno",
+      "joined": "Se unió",
+      "lastSeen": "Última vez",
+      "noName": "Sin nombre ({id})",
+      "testStudents": "Cuentas de prueba excluidas: {count}.",
+      "assignments": "Tareas",
+      "assignmentsEmpty": "Aún no hay nada asignado.",
+      "completion": "{done} de {total} terminaron",
+      "due": "entrega {date}",
+      "games": "Partidas de clase",
+      "roundsSummary": "{count} partidas de clase en los últimos 30 días",
+      "unnamed": "(sin nombre)",
+      "colPlayed": "Jugada",
+      "colMode": "Modo",
+      "colPlayers": "Jugadores",
+      "colCoverage": "Palabras encontradas",
+      "colTop": "Mejores jugadores",
+      "colMissed": "Más falladas",
+      "noGames": "Aún no se jugaron partidas en vivo."
     },
     "teacherFunnel": {
       "excludedMachineRows": "{count} filas generadas por máquina (cuentas de prueba) excluidas de todas las cifras de arriba.",
@@ -14499,6 +14637,10 @@ const es = {
       "googleClassroomBody": "Toca el enlace para entrar a nuestra clase. No hace falta cuenta: solo elige un nombre.",
       "createdBannerBody": "Comparte este código con tus alumnos.",
       "dismissBanner": "Listo",
+      "card": {
+        "assign": "Asignar",
+        "report": "Informe"
+      },
       "wizard": {
         "title": "Tres pasos y listo",
         "subtitle": "En un minuto tienes el código.",
@@ -16710,6 +16852,7 @@ const es = {
           "label": "Te unes a:",
           "confirm": "Este es tu aula",
           "gameLabel": "Partida en vivo:",
+          "classroomNext": "Ahora no hay ninguna partida. Entrarás en la clase y verás lo que ha preparado tu profe.",
           "gameConfirm": "Tu clase está jugando ahora: entrarás directamente"
         },
         "success": "¡Ya estás dentro!",
@@ -16733,6 +16876,12 @@ const es = {
           "joinedHeadline": "Tu siguiente tarea",
           "joinedSub": "Ya estás en la clase. Juega la tarea que te espera.",
           "openAcademy": "Abrir mi clase",
+          "whereCode": "¿Dónde encuentro el código?",
+          "whereCodeAnswer": "Tu profe lo muestra en la pizarra o el proyector: 6 letras y números. ¿Tienes un código QR? Escanéalo con la cámara y te saltas este paso.",
+          "genericError": "Algo falló por nuestra parte. Toca el botón otra vez. Si sigue pasando, avisa a tu profe.",
+          "stepOf": "Paso {{current}} de {{total}}",
+          "successGame": "Entrando en la partida…",
+          "yourClass": "Tu clase",
           "findingAssignment": "Buscando tu tarea…"
         },
         "heroLine": "Pide a tu profe el código de la clase",
@@ -20749,7 +20898,14 @@ const es = {
       "minutes": "{count} min",
       "leave": "Salir de la sala",
       "moreJoined": "+{count} más",
-      "readyCount": "{ready} de {total} listos"
+      "readyCount": "{ready} de {total} listos",
+      "editRoster": "Editar lista",
+      "doneEditing": "Listo",
+      "removeStudent": "Quitar a {name}",
+      "removeConfirmTitle": "¿Quitar a {name}?",
+      "removeConfirmBody": "Sale de la partida y no podrá volver a entrar con este nombre.",
+      "removeConfirm": "Quitar",
+      "removeFailed": "No se quitó. Inténtalo de nuevo."
     },
     "student": {
       "youreIn": "¡Ya estás dentro!",
@@ -20780,7 +20936,14 @@ const es = {
       "nextMode": "Siguiente modo",
       "viewReport": "Ver informe",
       "endGame": "Terminar juego",
-      "noScores": "Nadie ha puntuado en esta ronda"
+      "noScores": "Nadie ha puntuado en esta ronda",
+      "mostMissed": "Palabras más falladas",
+      "needHelpCount": "Estudiantes por debajo de la mitad: {count}. Los nombres están en el informe.",
+      "replayMissed": "Repetir palabras falladas ({count})",
+      "replayFailed": "No se pudo preparar la repetición. Inténtalo de nuevo.",
+      "moreWords": "+{count} más",
+      "notOnBoard": "no salió en el tablero",
+      "replayReady": "Listo. Jugar otra vez usará estas palabras."
     },
     "studentResults": {
       "placed": "Tu puesto",

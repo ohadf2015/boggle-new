@@ -3,7 +3,7 @@
 /** Same props as the shared ProjectorLobby, so TvLobbyView's mode seed, practice round and auto-start run unchanged. */
 import { memo } from 'react';
 import Image from 'next/image';
-import { ArrowLeft, Clock, Loader2, Play } from 'lucide-react';
+import { ArrowLeft, Clock, Loader2, Play, Users } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 import { LobbyModeSwitcher } from '@/components/education/lobby/LobbyModeSwitcher';
@@ -12,6 +12,7 @@ import { canStartProjectorRound } from '@/components/education/projector/project
 import type { ProjectorLobbyProps } from '@/components/education/projector/ProjectorLobby';
 import { catalogueEntry } from '@/components/education/ClassroomModeCatalogueData';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
+import { useKickStudent } from '@/hooks/useKickStudent';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import { EduJoinCard } from './EduJoinCard';
 import { EduLobbyRoster } from './EduLobbyRoster';
@@ -45,6 +46,7 @@ export const EduProjectorLobby = memo<ProjectorLobbyProps>(function EduProjector
   const entry = catalogueEntry(lobbyMode.modeId);
   const canStart = canStartProjectorRound(students.length);
   const startLocked = !canStart || starting || lobbyMode.quizBlocked;
+  const { kick, statusOf } = useKickStudent(getSharedSocketIfExists());
 
   return (
     <div data-testid="edu-projector-lobby" className="fixed inset-0 z-[65] flex flex-col overflow-y-auto bg-neo-navy md:overflow-hidden">
@@ -78,7 +80,7 @@ export const EduProjectorLobby = memo<ProjectorLobbyProps>(function EduProjector
         </div>
 
         <div className="flex min-h-[16rem] flex-col md:row-start-2 md:min-h-0">
-          <EduLobbyRoster students={students} readyUsernames={readyUsernames} t={t} />
+          <EduLobbyRoster students={students} readyUsernames={readyUsernames} t={t} onRemove={kick} removeStatusOf={statusOf} />
         </div>
 
         <div data-testid="edu-lobby-mode" className="flex flex-wrap items-center gap-3 rounded-neo-lg border-4 border-neo-black bg-neo-cyan px-4 py-3 text-neo-black shadow-hard-lg md:row-start-3 md:gap-[1vw] md:px-[1.2vw] md:py-[0.8vw]">
@@ -121,6 +123,16 @@ export const EduProjectorLobby = memo<ProjectorLobbyProps>(function EduProjector
             >
               {starting ? <Loader2 className="size-[0.8em] animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Play className="size-[0.8em]" fill="currentColor" aria-hidden="true" />}
               {t(startLabelKey)}
+              {canStart && (
+                <span
+                  data-testid="edu-lobby-start-count"
+                  aria-label={t('eduLiveRoom.lobby.joined', { count: students.length })}
+                  className="inline-flex min-w-[1.6em] items-center justify-center gap-1 rounded-full border-[3px] border-neo-black bg-neo-cream px-2 text-[0.55em] leading-tight tabular-nums text-neo-black"
+                >
+                  <Users className="size-[0.9em]" aria-hidden="true" />
+                  {students.length}
+                </span>
+              )}
             </button>
             {!canStart && (
               <div className="flex flex-wrap items-center justify-between gap-2">
