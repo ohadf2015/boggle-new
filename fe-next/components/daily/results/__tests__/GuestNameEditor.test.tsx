@@ -101,14 +101,25 @@ describe('GuestNameEditor — first finish with an auto-generated name', () => {
     expect(screen.queryByTestId('guest-name-prompt')).not.toBeInTheDocument();
   });
 
-  it('lets the guest keep the suggested name, and does not ask again', () => {
+  it('is a blocking dialog with no way to skip it', () => {
     render(<GuestNameEditor name="WordNinja" guestFingerprint="fp-1" onRenamed={vi.fn()} t={t} />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Keep this name' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Keep this name' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /close/i })).not.toBeInTheDocument();
 
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+
+    expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
+    expect(hasChosenGuestName()).toBe(false);
+  });
+
+  it('will not submit a blank name', () => {
+    render(<GuestNameEditor name="WordNinja" guestFingerprint="fp-1" onRenamed={vi.fn()} t={t} />);
+
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: '   ' } });
+
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(hasChosenGuestName()).toBe(true);
-    expect(screen.queryByTestId('guest-name-prompt')).not.toBeInTheDocument();
-    expect(screen.getByText('WordNinja')).toBeInTheDocument();
   });
 });

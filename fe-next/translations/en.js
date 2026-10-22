@@ -9503,6 +9503,7 @@ const en = {
       "guestNameFailed": "Couldn't save your name. Try again.",
       "guestNamePrompt": "Save your score under your name",
       "guestNameKeep": "Keep this name",
+      "guestNameWhy": "Your name shows on today's leaderboard.",
       "wordsFound": "Words found",
       "masteryRatingLabel": "Rating",
       "masteryRatingChangeLabel": "Change",

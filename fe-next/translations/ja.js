@@ -10108,6 +10108,7 @@ const ja = {
       "guestNameFailed": "名前を保存できませんでした。もう一度お試しください。",
       "guestNamePrompt": "スコアを保存する名前を入力",
       "guestNameKeep": "この名前のままにする",
+      "guestNameWhy": "あなたの名前は今日のランキングに表示されます。",
       "wordsFound": "見つかった単語",
       "masteryRatingLabel": "レーティング",
       "masteryRatingChangeLabel": "変動",

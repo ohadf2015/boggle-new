@@ -10381,6 +10381,7 @@ const sv = {
       "guestNameFailed": "Kunde inte spara ditt namn. Försök igen.",
       "guestNamePrompt": "Vilket namn ska poängen sparas under?",
       "guestNameKeep": "Behåll det här namnet",
+      "guestNameWhy": "Ditt namn visas på dagens topplista.",
       "wordsFound": "Hittade ord",
       "masteryRatingLabel": "Rating",
       "masteryRatingChangeLabel": "Förändring",

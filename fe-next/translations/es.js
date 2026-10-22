@@ -9983,6 +9983,7 @@ const es = {
       "guestNameFailed": "No se pudo guardar tu nombre. Inténtalo de nuevo.",
       "guestNamePrompt": "¿Con qué nombre guardamos tu puntuación?",
       "guestNameKeep": "Mantener este nombre",
+      "guestNameWhy": "Tu nombre aparecerá en la clasificación de hoy.",
       "wordsFound": "Palabras encontradas",
       "masteryRatingLabel": "Rating",
       "masteryRatingChangeLabel": "Cambio",

@@ -2300,6 +2300,7 @@ const ru = {
       "guestNameFailed": "Не удалось сохранить имя. Попробуй ещё раз.",
       "guestNamePrompt": "Под каким именем сохранить результат?",
       "guestNameKeep": "Оставить это имя",
+      "guestNameWhy": "Ваше имя появится в таблице лидеров за сегодня.",
       "wordsFound": "Найденные слова",
       "masteryRatingLabel": "Рейтинг",
       "masteryRatingChangeLabel": "Изменение",

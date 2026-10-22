@@ -10033,6 +10033,7 @@ const he = {
       "guestNameFailed": "לא הצלחנו לשמור את השם. נסו שוב.",
       "guestNamePrompt": "באיזה שם לשמור את התוצאה שלך?",
       "guestNameKeep": "להשאיר את השם הזה",
+      "guestNameWhy": "השם שלך יופיע בלוח התוצאות של היום.",
       "wordsFound": "מילים שנמצאו",
       "masteryRatingLabel": "דירוג",
       "masteryRatingChangeLabel": "שינוי",

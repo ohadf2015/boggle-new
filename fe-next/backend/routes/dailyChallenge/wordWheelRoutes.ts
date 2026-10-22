@@ -18,6 +18,7 @@ import {
   isValidLanguage,
   isLeaderboardLanguageScope,
   withLanguageScope,
+  sanitizeGuestDisplayName,
 } from './utils';
 import { updateDailyProfileStats } from './profileStats';
 import { rerankSequential, dedupeByPlayerKeepBest, sortWordWheelRowsGlobally } from './leaderboardSort';
@@ -104,7 +105,7 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
       time_seconds: timeSeconds || 0,
       center_letter: centerLetter || null,
       completed_at: new Date().toISOString(),
-      display_name: displayName || 'Anonymous',
+      display_name: sanitizeGuestDisplayName(displayName),
       avatar_emoji: avatarEmoji || '🎯',
       avatar_color: avatarColor || '#6366f1',
       avatar_image: avatarImage || null,
