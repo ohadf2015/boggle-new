@@ -227,6 +227,15 @@ describe('PolarClient.createCheckout — rejected customer_email', () => {
     expect(JSON.parse(fetchMock.mock.calls[1][1].body)).not.toHaveProperty('customer_email')
   })
 
+  it('turns a stalled Polar create into a timeout error instead of hanging', async () => {
+    const stalled = new Error('The operation was aborted due to timeout')
+    stalled.name = 'TimeoutError'
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(stalled))
+    await expect(
+      new PolarClient('tok', 'production').createCheckout({ userId: 'u', productId: 'p' }),
+    ).rejects.toThrow('Polar request timed out')
+  })
+
   it('does not retry a 422 that is not about the email', async () => {
     const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 422, text: async () => '{"detail":[{"loc":["body","products"]}]}' })
     vi.stubGlobal('fetch', fetchMock)

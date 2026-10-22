@@ -66,6 +66,55 @@ describe('POST /api/subscription/checkout', () => {
     expect(body.missing).toEqual(['POLAR_PRO_PRODUCT_ID'])
   })
 
+  it('503s naming POLAR_ENVIRONMENT when Railway production is pointed at sandbox', async () => {
+    const prevRailway = process.env.RAILWAY_ENVIRONMENT_NAME
+    const prevVercel = process.env.VERCEL_ENV
+    const prevPolar = process.env.POLAR_ENVIRONMENT
+    delete process.env.VERCEL_ENV
+    process.env.RAILWAY_ENVIRONMENT_NAME = 'production'
+    process.env.POLAR_ENVIRONMENT = 'sandbox'
+    try {
+      const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+      expect(res.status).toBe(503)
+      const body = await res.json()
+      expect(body.missing).toEqual(['POLAR_ENVIRONMENT'])
+      expect(createCheckout).not.toHaveBeenCalled()
+    } finally {
+      if (prevRailway === undefined) delete process.env.RAILWAY_ENVIRONMENT_NAME
+      else process.env.RAILWAY_ENVIRONMENT_NAME = prevRailway
+      if (prevVercel === undefined) delete process.env.VERCEL_ENV
+      else process.env.VERCEL_ENV = prevVercel
+      if (prevPolar === undefined) delete process.env.POLAR_ENVIRONMENT
+      else process.env.POLAR_ENVIRONMENT = prevPolar
+    }
+  })
+
+  it('503s when the live host would be sent a sandbox checkout URL', async () => {
+    const prevPolar = process.env.POLAR_ENVIRONMENT
+    process.env.POLAR_ENVIRONMENT = 'production'
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue('https://sandbox.polar.sh/checkout/u1')
+    try {
+      const res = await POST(new Request('http://www.lexiclash.live/api/subscription/checkout', {
+        method: 'POST',
+        headers: { 'x-forwarded-host': 'www.lexiclash.live' },
+      }))
+      expect(res.status).toBe(503)
+      expect(createCheckout).toHaveBeenCalled()
+    } finally {
+      if (prevPolar === undefined) delete process.env.POLAR_ENVIRONMENT
+      else process.env.POLAR_ENVIRONMENT = prevPolar
+    }
+  })
+
+  it('returns 503 when Polar checkout URL creation times out', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockRejectedValue(new Error('Polar API error: 504 Polar request timed out'))
+    const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+    expect(res.status).toBe(503)
+    expect(await res.json()).toEqual({ error: 'Polar checkout URL creation timed out' })
+  })
+
   it('503s naming POLAR_ENVIRONMENT when a production deploy is pointed at sandbox', async () => {
     const prevVercel = process.env.VERCEL_ENV
     const prevPolar = process.env.POLAR_ENVIRONMENT

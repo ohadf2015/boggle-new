@@ -71,22 +71,34 @@ export class PolarClient {
   }
 
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${path}`, {
-      ...options,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.accessToken}`,
-        ...options.headers,
-      },
-    })
+    // A hung Polar create used to pin the checkout route until the proxy died.
+    // 15s is long enough for a real session and short enough to fail closed.
+    try {
+      const response = await fetch(`${this.baseUrl}${path}`, {
+        ...options,
+        signal: options.signal ?? AbortSignal.timeout(15_000),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.accessToken}`,
+          ...options.headers,
+        },
+      })
 
-    if (!response.ok) {
-      const error = await response.text()
-      throw new PolarApiError(response.status, error)
+      if (!response.ok) {
+        const error = await response.text()
+        throw new PolarApiError(response.status, error)
+      }
+
+      return response.json()
+    } catch (err) {
+      if (err instanceof PolarApiError) throw err
+      const name = err instanceof Error ? err.name : ''
+      if (name === 'TimeoutError' || name === 'AbortError') {
+        throw new PolarApiError(504, 'Polar request timed out')
+      }
+      throw err
     }
-
-    return response.json()
   }
 
   /**
