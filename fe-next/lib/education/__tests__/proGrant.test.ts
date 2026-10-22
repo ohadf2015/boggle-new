@@ -6,6 +6,7 @@ import {
   proGrantStatus,
   resolveProEntitlement,
   isPaidProviderSubscription,
+  proUserIdsFrom,
   type ProGrantRow,
   type SubscriptionRowLike,
 } from '../proGrant';
@@ -143,5 +144,19 @@ describe('resolveProEntitlement', () => {
     }, NOW);
     expect(r.hasPro).toBe(false);
     expect(r.source).toBe('admin_grant');
+  });
+});
+
+describe('proUserIdsFrom', () => {
+  it('keeps paying, trialing and live-grant users and drops lapsed ones', () => {
+    const ids = proUserIdsFrom([
+      { user_id: 'paid', tier: 'pro', status: 'active', source: 'polar', current_period_end: null },
+      { user_id: 'trial', tier: 'pro', status: 'trialing', source: 'polar', current_period_end: null },
+      { user_id: 'grant', tier: 'pro', status: 'active', source: 'admin_grant', current_period_end: new Date(NOW + DAY).toISOString() },
+      { user_id: 'oldGrant', tier: 'pro', status: 'active', source: 'admin_grant', current_period_end: new Date(NOW - DAY).toISOString() },
+      { user_id: 'canceled', tier: 'pro', status: 'canceled', source: 'polar', current_period_end: null },
+      { user_id: 'free', tier: 'free', status: 'active', source: null, current_period_end: null },
+    ], NOW);
+    expect([...ids].sort()).toEqual(['grant', 'paid', 'trial']);
   });
 });
