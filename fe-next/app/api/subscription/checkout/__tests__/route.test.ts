@@ -54,6 +54,7 @@ describe('POST /api/subscription/checkout', () => {
     expect(res.status).toBe(503)
     const body = await res.json()
     expect(body.error).toMatch(/Polar billing is not configured/)
+    expect(body.missing).toEqual(['POLAR_ACCESS_TOKEN'])
   })
 
   it('returns 503 when Polar product id is missing', async () => {
@@ -62,6 +63,26 @@ describe('POST /api/subscription/checkout', () => {
     expect(res.status).toBe(503)
     const body = await res.json()
     expect(body.error).toMatch(/Polar billing is not configured/)
+    expect(body.missing).toEqual(['POLAR_PRO_PRODUCT_ID'])
+  })
+
+  it('503s naming POLAR_ENVIRONMENT when a production deploy is pointed at sandbox', async () => {
+    const prevVercel = process.env.VERCEL_ENV
+    const prevPolar = process.env.POLAR_ENVIRONMENT
+    process.env.VERCEL_ENV = 'production'
+    process.env.POLAR_ENVIRONMENT = 'sandbox'
+    try {
+      const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+      expect(res.status).toBe(503)
+      const body = await res.json()
+      expect(body.missing).toEqual(['POLAR_ENVIRONMENT'])
+      expect(body.error).toContain('POLAR_ENVIRONMENT')
+    } finally {
+      if (prevVercel === undefined) delete process.env.VERCEL_ENV
+      else process.env.VERCEL_ENV = prevVercel
+      if (prevPolar === undefined) delete process.env.POLAR_ENVIRONMENT
+      else process.env.POLAR_ENVIRONMENT = prevPolar
+    }
   })
 
   it('returns 401 when user is not authenticated', async () => {

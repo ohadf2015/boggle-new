@@ -80,7 +80,8 @@ function resolveCheckoutLocale(bodyLocale: string, cookieHeader: string | null):
  * Response:
  * - 200: { url: string } — redirect to this URL
  * - 401: Unauthorized
- * - 503: Checkout disabled because Polar is not configured
+ * - 503: Checkout disabled because a named Polar env var is missing, or
+ *   POLAR_ENVIRONMENT=sandbox on a production deploy
  * - 500: Server error
  */
 export async function POST(request: NextRequest) {
@@ -89,12 +90,26 @@ export async function POST(request: NextRequest) {
     // Checkout gate: keep the till shut while Polar wiring is missing.
     // This is a runtime check, so it auto-opens the moment env vars are set
     // and stays shut with a clear message if they are not.
-    const polarAccessToken = process.env.POLAR_ACCESS_TOKEN;
-    const polarProductId = process.env.POLAR_PRO_PRODUCT_ID;
-    if (!polarAccessToken || !polarProductId) {
+    const missing: string[] = []
+    if (!process.env.POLAR_ACCESS_TOKEN) missing.push('POLAR_ACCESS_TOKEN')
+    if (!process.env.POLAR_PRO_PRODUCT_ID) missing.push('POLAR_PRO_PRODUCT_ID')
+    if (missing.length > 0) {
       captureProFunnelServerEvent(buildProCheckoutFailedEvent('anonymous', 'polar_not_configured'));
       return NextResponse.json(
-        { error: 'Checkout is not available yet — Polar billing is not configured' },
+        {
+          error: `Checkout is not available yet — Polar billing is not configured (missing ${missing.join(', ')})`,
+          missing,
+        },
+        { status: 503 }
+      );
+    }
+    if (process.env.VERCEL_ENV === 'production' && process.env.POLAR_ENVIRONMENT === 'sandbox') {
+      captureProFunnelServerEvent(buildProCheckoutFailedEvent('anonymous', 'polar_environment_mismatch'));
+      return NextResponse.json(
+        {
+          error: 'POLAR_ENVIRONMENT must be "production" when VERCEL_ENV=production (refusing sandbox checkout)',
+          missing: ['POLAR_ENVIRONMENT'],
+        },
         { status: 503 }
       );
     }

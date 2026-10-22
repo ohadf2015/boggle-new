@@ -5,13 +5,14 @@
  *
  * Configure in Polar dashboard → Settings → Webhooks:
  *   URL: https://<app-domain>/api/webhook/polar
- *   Secret → POLAR_WEBHOOK_SECRET
- * Events handled: subscription.*, order.created
+ *   Secret → POLAR_WEBHOOK_SECRET (Standard Webhooks; `whsec_` secrets are decoded)
+ * Events handled: subscription.*, order.created, order.paid,
+ *   checkout.completed, checkout.updated (status succeeded/confirmed/complete).
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
-import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
+import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, grantProFromCheckout, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
 import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
@@ -58,9 +59,38 @@ function getTierFromProductId(productId: string | undefined): Tier {
 function getUserId(p: WebhookPayload): string | undefined {
   const fromMetadata = p?.data?.metadata?.user_id
   if (fromMetadata) return String(fromMetadata)
+  // Checkout events carry this on the checkout object itself, not under customer.
+  const fromExternal = p?.data?.external_customer_id
+  if (fromExternal) return String(fromExternal)
   const fromCustomer = p?.data?.customer?.external_id
   if (fromCustomer) return String(fromCustomer)
   return undefined
+}
+
+const CHECKOUT_SUCCESS_STATUSES = new Set(['succeeded', 'confirmed', 'complete', 'completed'])
+
+/**
+ * Polar's current completion signal is `checkout.updated` with status
+ * `succeeded`. Older dashboards and this task's contract also send
+ * `checkout.completed`. An empty status on `checkout.completed` is itself
+ * the success signal; `checkout.updated` with status open/expired is not.
+ */
+function isCheckoutSuccess(eventType: string, payload: WebhookPayload): boolean {
+  if (eventType !== 'checkout.completed' && eventType !== 'checkout.updated') return false
+  const status = payload?.data?.status
+  if (status == null || status === '') return eventType === 'checkout.completed'
+  return CHECKOUT_SUCCESS_STATUSES.has(String(status))
+}
+
+/**
+ * Events that write a tier. Without POLAR_PRO_PRODUCT_ID every product maps
+ * to free and a 200 ack drops the payment on the floor — Polar will not retry.
+ */
+function eventRequiresProProductId(eventType: string, payload: WebhookPayload): boolean {
+  if (eventType === 'subscription.revoked') return false
+  if (eventType.startsWith('subscription.')) return true
+  if (eventType === 'order.created' || eventType === 'order.paid') return true
+  return isCheckoutSuccess(eventType, payload)
 }
 
 /** UI locale stamped at checkout (polar.ts metadata.locale) — undefined for pre-locale subscriptions. */
@@ -92,6 +122,14 @@ function trialMarker(data: WebhookPayload): { trial: boolean; trial_end: string 
 
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.POLAR_WEBHOOK_SECRET) {
+      console.error('[Polar] POLAR_WEBHOOK_SECRET is not configured')
+      return NextResponse.json(
+        { error: 'POLAR_WEBHOOK_SECRET is not configured', missing: ['POLAR_WEBHOOK_SECRET'] },
+        { status: 503 },
+      )
+    }
+
     const rawBody = await request.text()
     const signatureValid = PolarClient.validateWebhookSignature(rawBody, {
       id: request.headers.get('webhook-id'),
@@ -106,6 +144,14 @@ export async function POST(request: NextRequest) {
     const payload: WebhookPayload = JSON.parse(rawBody)
     const eventType = String(payload?.type ?? '')
     const userId = getUserId(payload)
+
+    if (eventRequiresProProductId(eventType, payload) && !process.env.POLAR_PRO_PRODUCT_ID) {
+      console.error(`[Polar] POLAR_PRO_PRODUCT_ID is not configured — refusing to ack ${eventType}`)
+      return NextResponse.json(
+        { error: 'POLAR_PRO_PRODUCT_ID is not configured', missing: ['POLAR_PRO_PRODUCT_ID'] },
+        { status: 503 },
+      )
+    }
 
     console.log(`[Polar] Event: ${eventType}`, { userId })
 
@@ -147,6 +193,13 @@ export async function POST(request: NextRequest) {
       case 'order.created':
       case 'order.paid':
         await handleOrderCreated(payload, userId)
+        break
+      case 'checkout.completed':
+      case 'checkout.updated':
+        if (isCheckoutSuccess(eventType, payload)) {
+          await handleCheckoutCompleted(payload, userId)
+          trackCheckoutGrant(payload, userId)
+        }
         break
       default:
         console.log(`[Polar] Unhandled event: ${eventType}`)
@@ -312,4 +365,52 @@ async function handleOrderCreated(payload: WebhookPayload, userId?: string) {
   const productId = getProductId(payload)
   if (getTierFromProductId(productId) !== 'pro') return
   await grantProFromOrder({ userId, providerOrderId: String(data.id ?? '') })
+}
+
+/**
+ * Checkout completion is the grant backstop when subscription.active is late
+ * or not subscribed on the Polar endpoint. Does not full-upsert over a row
+ * subscription.active already wrote (see grantProFromCheckout).
+ */
+async function handleCheckoutCompleted(payload: WebhookPayload, userId?: string) {
+  if (!userId) {
+    console.warn('[Polar] checkout completed — no user_id in metadata, external_customer_id, or customer.external_id')
+    return
+  }
+  const productId = getProductId(payload)
+  if (getTierFromProductId(productId) !== 'pro') return
+  const data = payload?.data ?? {}
+  const marker = trialMarker(data)
+  const subscriptionId = data.subscription_id != null && String(data.subscription_id)
+    ? String(data.subscription_id)
+    : null
+  const orderId = data.order_id != null && String(data.order_id) ? String(data.order_id) : null
+  await grantProFromCheckout({
+    userId,
+    status: marker.trial ? 'trialing' : 'active',
+    providerSubscriptionId: subscriptionId,
+    providerOrderId: orderId,
+    providerProductId: productId,
+    currentPeriodEnd: marker.trial_end,
+  })
+}
+
+/**
+ * Same conversion events as subscription.active, so a checkout completion
+ * that never gets a subscription.active still moves checkout_complete.
+ * Uses subscription_id when Polar sent one (data.id on this event is the
+ * checkout id). Never throws.
+ */
+function trackCheckoutGrant(payload: WebhookPayload, userId?: string) {
+  const data = payload?.data ?? {}
+  const subscriptionId = data.subscription_id != null && String(data.subscription_id)
+    ? String(data.subscription_id)
+    : String(data.id ?? '')
+  const marker = trialMarker(data)
+  const shaped = {
+    ...payload,
+    data: { ...data, id: subscriptionId, status: marker.trial ? 'trialing' : 'active' },
+  }
+  if (marker.trial) trackProTrial(shaped, userId)
+  else trackProConversion(shaped, userId)
 }
