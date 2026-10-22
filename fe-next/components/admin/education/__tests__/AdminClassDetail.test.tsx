@@ -73,6 +73,13 @@ describe('AdminClassDetail', () => {
     expect(games.textContent).toContain('lion');
   });
 
+  it('Given 3 rounds in 30 days but 1 game with results, Then the games heading carries no count that contradicts the summary', async () => {
+    fetchWithAuth.mockResolvedValue({ ok: true, json: async () => detail() });
+    render(<AdminClassDetail classId="c1" />);
+    const heading = within(await screen.findByTestId('class-games')).getByRole('heading', { level: 2 });
+    expect(heading.textContent).toBe('Class games');
+  });
+
   it('says class games are not measured when the table is missing', async () => {
     fetchWithAuth.mockResolvedValue({
       ok: true,

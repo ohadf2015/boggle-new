@@ -53,6 +53,23 @@ describe('<JoinFlow> nickname step polish', () => {
     expect(nameField().className).not.toMatch(/bg-neo-red\/\d+/);
   });
 
+  it('Given the class is found, Then its confirmation is a lime-edged panel, not a second lime slab beside LET\'S GO', async () => {
+    render(<JoinFlow initialCode="P45KRT" />);
+    const label = await screen.findByText('Ms Levy');
+    const card = label.parentElement!;
+    expect(card.className).toContain('border-neo-lime');
+    expect(card.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+    expect(goButton().className).toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+  });
+
+  it('Given a refused code, Then the alert uses black ink on red (white on neo-red is 3.5:1)', async () => {
+    mockResolve.mockResolvedValue({ verdict: 'invalid' });
+    render(<JoinFlow initialCode="ZZZZZ9" />);
+    const alert = await screen.findByRole('alert');
+    expect(alert.className).toContain('text-neo-black');
+    expect(alert.className).not.toContain('text-neo-white');
+  });
+
   it('Given a returning student with a saved nickname, Then the invite link greets them with it, not a new random one', async () => {
     mockStoredName.mockReturnValue('Maya');
     render(<JoinFlow initialCode="P45KRT" />);

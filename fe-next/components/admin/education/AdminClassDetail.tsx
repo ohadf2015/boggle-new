@@ -131,7 +131,8 @@ export function AdminClassDetail({ classId }: { classId: string }) {
         )}
       </Section>
 
-      <Section testId="class-games" icon={<Gamepad2 className="h-4 w-4" aria-hidden />} title={t('admin.eduClass.games', 'Class games')} count={data.games.length}>
+      {/* No count: the list is the latest rounds with saved student answers, not every round; the summary line is the count. */}
+      <Section testId="class-games" icon={<Gamepad2 className="h-4 w-4" aria-hidden />} title={t('admin.eduClass.games', 'Class games')}>
         <p className="text-sm">
           {rounds.available
             ? t('admin.eduClass.roundsSummary', '{count} class games in the last 30 days', { count: rounds.last30Days ?? 0 })
@@ -182,13 +183,13 @@ function Meta({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Section({ testId, icon, title, count, children }: { testId: string; icon: ReactNode; title: string; count: number; children: ReactNode }) {
+function Section({ testId, icon, title, count, children }: { testId: string; icon: ReactNode; title: string; count?: number; children: ReactNode }) {
   return (
     <section data-testid={testId} className="rounded-neo border-neo border-neo-black bg-neo-cream p-4 text-neo-navy shadow-hard-sm">
       <h2 className="flex items-center gap-2 font-neo-display text-lg font-black">
         {icon}
         {title}
-        <span className="rounded border border-neo-black bg-neo-navy px-1.5 text-xs text-neo-white">{count}</span>
+        {count === undefined ? null : <span className="rounded border border-neo-black bg-neo-navy px-1.5 text-xs text-neo-white">{count}</span>}
       </h2>
       <div className="mt-2">{children}</div>
     </section>

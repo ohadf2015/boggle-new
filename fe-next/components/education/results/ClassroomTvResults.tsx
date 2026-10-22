@@ -48,6 +48,7 @@ import { ZeroRoundNote } from './ZeroRoundNote';
 import { EmptyRoundCard } from './EmptyRoundCard';
 import { useReteachLinks } from './useReteachLinks';
 import { useReplayMissedWords } from '@/components/education/live/useReteachRound';
+import { reteachVerdict } from '@/components/education/live/eduReteachModel';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import { useIsPhoneRecap } from './useIsPhoneRecap';
@@ -215,6 +216,7 @@ export function ClassroomTvResults({
             pointsWithoutLesson={!landed && outcome.celebrate}
             phone={phone}
             maxChips={bossOver ? 8 : 12}
+            verdict={reteachVerdict(summary).kind}
             t={t}
           />
 

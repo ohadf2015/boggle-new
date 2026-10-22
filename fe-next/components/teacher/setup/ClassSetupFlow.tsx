@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Check } from 'lucide-react';
@@ -52,6 +52,14 @@ export function ClassSetupFlow() {
   const [limitHit, setLimitHit] = useState<{ currentCount: number; limit: number } | null>(null);
   const [trialAskDismissed, setTrialAskDismissed] = useState(false);
   const [projectorOpen, setProjectorOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // The create button sits below the fold on phones; without this the ready screen opens mid-scroll with focus on nothing.
+  useEffect(() => {
+    if (!created) return;
+    rootRef.current?.scrollIntoView?.({ block: 'start' });
+    document.getElementById('setup-ready-title')?.focus({ preventScroll: true });
+  }, [created]);
 
   const requestedId = searchParams?.get('classroomId') ?? null;
   const existing = requestedId ? classrooms.find((c) => c.id === requestedId) : undefined;
@@ -108,7 +116,7 @@ export function ClassSetupFlow() {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-5 px-4 py-5 sm:py-8">
+    <div ref={rootRef} className="mx-auto flex w-full max-w-xl scroll-mt-4 flex-col gap-5 px-4 py-5 sm:py-8">
       <SetupSteps current={ready ? 2 : 1} t={t} />
       {ready ? (
         <ClassReady

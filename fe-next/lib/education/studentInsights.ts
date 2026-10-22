@@ -120,7 +120,7 @@ export function buildStudentInsights(input: {
   const words = tallyStudentWords(progressRows);
   const { wordsMastered, wordsPracticed, accuracy } = summarizeTally(words);
 
-  const entries = [...words.entries()].map(([word, w]) => ({ word, ...w, accuracy: percent(w.correct, w.attempts) }));
+  const entries = [...words.values()].map((w) => ({ ...w, accuracy: percent(w.correct, w.attempts) }));
   const toInsight = (e: (typeof entries)[number]): WordInsight => ({ word: e.word, accuracy: e.accuracy, attempts: e.attempts });
 
   const wordsToPractice = entries

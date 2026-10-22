@@ -224,7 +224,7 @@ function TeacherReportsInner() {
                 >
                   <span className="min-w-0">
                     <span className="block break-words font-neo-display text-lg font-bold text-neo-white">
-                      {classroom.name}
+                      <bdi>{classroom.name}</bdi>
                     </span>
                     {typeof classroom.member_count === 'number' && (
                       <span className="mt-1 inline-flex items-center gap-1.5 text-sm text-neo-cream/75 tabular-nums">
@@ -286,7 +286,7 @@ function TeacherReportsInner() {
           <div className="min-w-0">
             <p className="text-xs font-black uppercase tracking-wide text-neo-cyan">{t('eduPro.reports.classEyebrow')}</p>
             <h1 className="break-words font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">
-              {selectedClassroom?.name ?? t('teacher.reports.title')}
+              <bdi>{selectedClassroom?.name ?? t('teacher.reports.title')}</bdi>
             </h1>
           </div>
           <TeacherPlanBadge />

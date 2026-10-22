@@ -8,7 +8,7 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { fetchStudentInsights } from '@/lib/education/studentInsightsClient';
-import { percent, summarizeStudentWords, tallyStudentWords } from '@/lib/education/wordTally';
+import { percent, summarizeStudentWords, tallyStudentWords, wordKey } from '@/lib/education/wordTally';
 import type {
   WordsAttemptedRecord,
   DateRange,
@@ -20,11 +20,15 @@ import type {
   VocabularyHeatmapData,
 } from './analyticsTypes';
 
-function latestPracticeFor(rows: Array<{ words_attempted?: unknown; last_practice_date?: string | null }>, word: string): string | null {
+function attemptedKeys(row: { words_attempted?: unknown }): Set<string> {
+  const attempted = row.words_attempted as WordsAttemptedRecord | null | undefined;
+  return new Set(Object.keys(attempted ?? {}).map(wordKey));
+}
+
+function latestPracticeFor(rows: Array<{ words_attempted?: unknown; last_practice_date?: string | null }>, key: string): string | null {
   let latest: string | null = null;
   for (const row of rows) {
-    const attempted = row.words_attempted as WordsAttemptedRecord | null | undefined;
-    if (!attempted?.[word] || !row.last_practice_date) continue;
+    if (!row.last_practice_date || !attemptedKeys(row).has(key)) continue;
     if (!latest || row.last_practice_date > latest) latest = row.last_practice_date;
   }
   return latest;
@@ -77,15 +81,15 @@ export async function getStudentReportData(
     const tally = tallyStudentWords(rows);
     const wordMasteryList: StudentReportData['wordMastery'] = [];
     let totalAttempts = 0;
-    for (const [word, w] of tally) {
-      if (!rows.some((p) => p.words_attempted?.[word])) continue;
+    for (const [key, w] of tally) {
+      if (!rows.some((p) => attemptedKeys(p).has(key))) continue;
       totalAttempts += w.attempts;
       wordMasteryList.push({
-        word,
+        word: w.word,
         mastered: w.mastered,
         accuracy: percent(w.correct, w.attempts) ?? 0,
         attempts: w.attempts,
-        lastPracticed: latestPracticeFor(rows, word),
+        lastPracticed: latestPracticeFor(rows, key),
       });
     }
 
@@ -374,31 +378,31 @@ export async function getVocabularyHeatmapData(
       return { data: emptyData, error: { message: progressError.message } };
     }
 
-    const wordsSet = new Set<string>();
-    if (progressData) {
-      progressData.forEach((progress) => {
-        if (progress.words_attempted) {
-          Object.keys(progress.words_attempted).forEach(word => wordsSet.add(word));
-        }
-      });
+    // One column per word key, labelled with the first spelling seen.
+    const labelByKey = new Map<string, string>();
+    for (const progress of progressData ?? []) {
+      for (const word of Object.keys(progress.words_attempted ?? {})) {
+        const key = wordKey(word);
+        if (!labelByKey.has(key)) labelByKey.set(key, word.trim());
+      }
     }
 
-    const words = Array.from(wordsSet);
+    const words = Array.from(labelByKey.values());
     const cells: HeatmapCell[] = [];
 
     students.forEach(student => {
-      words.forEach(word => {
+      labelByKey.forEach((word, key) => {
         let totalAttempts = 0;
         let totalCorrect = 0;
 
-        if (progressData) {
-          progressData.forEach((progress) => {
-            const wordsData = progress.words_attempted as WordsAttemptedRecord | null;
-            if (progress.student_id === student.id && wordsData?.[word]) {
-              totalAttempts += wordsData[word].attempts || 0;
-              totalCorrect += wordsData[word].correct || 0;
-            }
-          });
+        for (const progress of progressData ?? []) {
+          if (progress.student_id !== student.id) continue;
+          const wordsData = (progress.words_attempted ?? {}) as WordsAttemptedRecord;
+          for (const [stored, data] of Object.entries(wordsData)) {
+            if (!data || wordKey(stored) !== key) continue;
+            totalAttempts += data.attempts || 0;
+            totalCorrect += data.correct || 0;
+          }
         }
 
         let masteryLevel: MasteryLevel = 'not-started';

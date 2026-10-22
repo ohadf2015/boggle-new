@@ -84,6 +84,9 @@ const PRINT_CSS = `
 const SHARE_BTN =
   'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-bold text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white disabled:opacity-50';
 
+const SHARE_BTN_QUIET =
+  'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cyan bg-neo-navy px-4 py-2 font-bold text-neo-cyan transition-colors hover:bg-neo-cyan/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white disabled:opacity-50';
+
 export function ClassroomRosterProgress({ classroomId, classroomName = '' }: ClassroomRosterProgressProps) {
   const { t, language } = useLanguage();
   const { hasPro, loading: proLoading } = useTeacherPro();
@@ -153,12 +156,12 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
   const formatLastActive = useCallback(
     (date: string | null): string => {
       if (!date) return t('teacher.reports.rosterProgress.never');
-      const now = new Date();
-      const today = now.toISOString().split('T')[0];
-      const yesterday = new Date(now.getTime() - 86400000).toISOString().split('T')[0];
-      if (date === today) return t('education.analytics.today');
-      if (date === yesterday) return t('education.analytics.yesterday');
-      const daysAgo = Math.floor((now.getTime() - new Date(date).getTime()) / 86400000);
+      // Practice dates are UTC days, join dates are timestamps: compare both by their UTC day.
+      const day = date.slice(0, 10);
+      const today = new Date().toISOString().slice(0, 10);
+      const daysAgo = Math.round((Date.parse(today) - Date.parse(day)) / 86400000);
+      if (daysAgo <= 0) return t('education.analytics.today');
+      if (daysAgo === 1) return t('education.analytics.yesterday');
       return t('education.analytics.daysAgo', { count: daysAgo });
     },
     [t],
@@ -247,7 +250,7 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
                 ? t('teacher.reports.rosterProgress.parentShare.copied')
                 : t('teacher.reports.rosterProgress.parentShare.copy')}
             </button>
-            <button type="button" onClick={handlePrint} className={SHARE_BTN}>
+            <button type="button" onClick={handlePrint} className={SHARE_BTN_QUIET}>
               <Printer className="size-4" aria-hidden />
               {t('teacher.reports.rosterProgress.parentShare.print')}
             </button>

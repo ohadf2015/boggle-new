@@ -17,6 +17,7 @@ import {
   mapProgressRowToCompletion,
   type AssignmentProgressSourceRow,
 } from './assignmentProgressReport';
+import { wordKey } from './wordTally';
 
 export type ClassGridStatus = 'completed' | 'missing';
 
@@ -216,7 +217,7 @@ export function buildWeeklySummary(args: {
   const indexes = scope === 'week' ? inWeek : grid.assignments.map((_, i) => i);
 
   let completedCount = 0;
-  const wordCounts = new Map<string, number>();
+  const wordCounts = new Map<string, { word: string; count: number }>();
   const attention: WeeklySummary['needsAttention'] = [];
 
   if (grid.students.length > 0) {
@@ -226,16 +227,20 @@ export function buildWeeklySummary(args: {
     }
     grid.students.forEach((student, studentIndex) => {
       let missingCount = 0;
-      const studentWords = new Set<string>();
+      const studentWords = new Map<string, string>();
       for (const index of indexes) {
         const cell = grid.cells[studentIndex]?.[index];
         if (!cell || cell.status !== 'completed') {
           missingCount += 1;
           continue;
         }
-        if (cell.bestWord) studentWords.add(cell.bestWord);
+        if (cell.bestWord && !studentWords.has(wordKey(cell.bestWord))) studentWords.set(wordKey(cell.bestWord), cell.bestWord);
       }
-      for (const word of studentWords) wordCounts.set(word, (wordCounts.get(word) ?? 0) + 1);
+      for (const [key, word] of studentWords) {
+        const entry = wordCounts.get(key) ?? { word, count: 0 };
+        entry.count += 1;
+        wordCounts.set(key, entry);
+      }
       if (missingCount > 0) {
         attention.push({ studentId: student.id, name: student.name, missingCount });
       }
@@ -244,10 +249,10 @@ export function buildWeeklySummary(args: {
 
   attention.sort((a, b) => b.missingCount - a.missingCount || compareWords(a.name, b.name));
 
-  const topWords = [...wordCounts.entries()]
-    .sort((a, b) => b[1] - a[1] || compareWords(a[0], b[0]))
+  const topWords = [...wordCounts.values()]
+    .sort((a, b) => b.count - a.count || compareWords(a.word, b.word))
     .slice(0, TOP_WORD_LIMIT)
-    .map(([word]) => word);
+    .map(({ word }) => word);
 
   return {
     className,

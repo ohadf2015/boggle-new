@@ -162,7 +162,8 @@ describe('ClassAssignmentGrid', () => {
         'English 101',
         'Assignments due: 1 · Completed: 0',
         'Top words: abandon',
-        'Needs attention: Ben (1 missing)',
+        // Names are bidi-isolated so a Latin name in a Hebrew summary keeps its "(1 missing)" in place.
+        'Needs attention: \u2068Ben\u2069 (1 missing)',
       ].join('\n'),
     );
     expect(summary.textContent).not.toContain('Old verbs');

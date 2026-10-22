@@ -290,3 +290,17 @@ describe('formatWeeklySummary', () => {
     expect(text).toContain('Completed: 1');
   });
 });
+
+describe('buildWeeklySummary word key', () => {
+  it('counts Abandon and abandon as one top word, in the first spelling', () => {
+    const grid = buildClassProgressGrid({
+      students,
+      assignments,
+      completions: [
+        { assignmentId: 'a1', studentId: 's1', score: 75, bestWord: 'Abandon' },
+        { assignmentId: 'a1', studentId: 's2', score: 60, bestWord: 'abandon' },
+      ],
+    });
+    expect(buildWeeklySummary({ className: 'English 101', grid, now: NOW }).topWords).toEqual(['Abandon']);
+  });
+});

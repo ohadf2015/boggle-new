@@ -7,7 +7,7 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { resolveDisplayName } from '@/lib/displayName';
-import { summarizeStudentWords } from '@/lib/education/wordTally';
+import { summarizeStudentWords, wordKey } from '@/lib/education/wordTally';
 import type {
   WordsAttemptedRecord,
   StudentProgressSummary,
@@ -118,7 +118,7 @@ export async function getStudentsProgressSummary(
         totalXp += progress.total_xp || 0;
         currentLevel = Math.max(currentLevel, progress.current_level || 1);
         currentStreak = Math.max(currentStreak, progress.current_streak || 0);
-        for (const word of lessonWordsMap.get(progress.lesson_id) ?? []) lessonWords.add(word);
+        for (const word of lessonWordsMap.get(progress.lesson_id) ?? []) lessonWords.add(wordKey(word));
 
         if (progress.last_practice_date) {
           if (!lastPracticeDate || progress.last_practice_date > lastPracticeDate) {

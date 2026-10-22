@@ -81,6 +81,14 @@ describe('EduHostResults reteach', () => {
     render(<EduHostResults summary={allMissed} players={players} t={t} onRematch={vi.fn()} />);
     expect(screen.queryByTestId('edu-replay-missed')).not.toBeInTheDocument();
     expect(screen.getByTestId('tv-coverage-panel')).toBeInTheDocument();
+    expect(screen.getByTestId('tv-reteach-whole-lesson')).toHaveTextContent('education.results.wholeLessonAgain');
+  });
+
+  it('given no rematch handler and a word too few found, when results show, then the wall never claims all found', () => {
+    const fewFound = { ...summary, missedWords: [], coverage: summary.coverage.map((c) => ({ ...c, foundBy: c.foundBy.length ? c.foundBy : ['Lia'] })) } as ClassroomSummary;
+    render(<EduHostResults summary={fewFound} players={players} t={t} />);
+    expect(screen.getByTestId('tv-coverage-panel')).toBeInTheDocument();
+    expect(screen.queryByText('education.results.allFound')).not.toBeInTheDocument();
   });
 
   it('given no rematch handler, when results show, then no replay is offered that could not start a round', () => {

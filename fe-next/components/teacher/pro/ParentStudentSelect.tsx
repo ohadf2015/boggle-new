@@ -76,7 +76,7 @@ export function ParentStudentSelect({ students, selected, onChange }: ParentStud
                   type="checkbox"
                   checked={selected.has(s.id)}
                   onChange={() => toggle(s.id)}
-                  className="size-4 shrink-0 accent-neo-black"
+                  className="size-5 shrink-0 accent-neo-black [color-scheme:light]"
                 />
                 <bdi className="min-w-0 truncate" title={s.name}>{s.name}</bdi>
               </label>

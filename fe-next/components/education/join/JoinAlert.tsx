@@ -10,7 +10,7 @@ export function JoinAlert({ children, className }: { children: ReactNode; classN
     <p
       role="alert"
       className={cn(
-        'flex items-start gap-2 rounded-neo border-3 border-neo-black bg-neo-red px-3 py-2.5 font-neo-body text-sm font-bold leading-snug text-neo-white shadow-hard motion-safe:animate-neo-shake lg:text-base',
+        'flex items-start gap-2 rounded-neo border-3 border-neo-black bg-neo-red px-3 py-2.5 font-neo-body text-sm font-bold leading-snug text-neo-black shadow-hard motion-safe:animate-neo-shake lg:text-base',
         className
       )}
     >

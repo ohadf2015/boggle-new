@@ -227,6 +227,23 @@ describe('ClassroomRosterProgress', () => {
     expect(signedIn).toHaveTextContent('Priya');
   });
 
+  it('Given a student who joined earlier today and never practised, Then last active reads Today, never "0d ago"', async () => {
+    const joinedThisMorning = new Date(Date.now() - 60_000).toISOString();
+    const joinedTwoDaysAgo = new Date(Date.now() - 2 * 86400000).toISOString();
+    studentsState.data = [
+      rosterStudent('sA', { display_name: null, username: 'Player_11111111' }, joinedThisMorning),
+      rosterStudent('sB', { display_name: null, username: 'Player_22222222' }, joinedTwoDaysAgo),
+    ];
+
+    render(<ClassroomRosterProgress classroomId="c1" />);
+
+    const rows = await screen.findAllByTestId('classroom-roster-row');
+    const byName = (id: string) => rows.find((r) => r.textContent?.includes(`Student ${id}`))!;
+    expect(byName('sA')).toHaveTextContent('Today');
+    expect(byName('sB')).toHaveTextContent('2d ago');
+    rows.forEach((r) => expect(r).not.toHaveTextContent('0d ago'));
+  });
+
   it('renders nothing when the roster is empty', async () => {
     studentsState.data = [];
     render(<ClassroomRosterProgress classroomId="c1" />);

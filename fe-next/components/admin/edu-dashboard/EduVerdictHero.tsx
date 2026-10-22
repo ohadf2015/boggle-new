@@ -63,7 +63,7 @@ export function EduVerdictHero({
           <p className="text-lg font-bold">{t(`admin.eduDashboard.verdict.label.${step}`, LABEL_FALLBACK[step] ?? step)}</p>
         </div>
       </div>
-      <div className="min-w-0 flex-1 text-sm">
+      <div className="min-w-[14rem] flex-1 text-sm">
         <p>{t(`admin.eduDashboard.verdict.action.${step}`, ACTION_FALLBACK[step] ?? '')}</p>
         {verdict.pct !== null && (
           <p className={`mt-1 text-xs tabular-nums ${MUTED}`}>

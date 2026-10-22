@@ -35,7 +35,7 @@ import { useSearchParams } from 'next/navigation';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import { PRESS, PRIMARY_BUTTON, SECONDARY_BUTTON, type Translate } from './eduLiveStyles';
 import { EduReteachPanel } from './EduReteachPanel';
-import { studentsUnderHalf } from './eduReteachModel';
+import { reteachVerdict, studentsUnderHalf } from './eduReteachModel';
 import { useReplayMissedWords } from './useReteachRound';
 
 function Actions({ t, onRematch, onClose, onExitRoom }: Pick<ClassroomTvResultsScreenProps, 'onRematch' | 'onClose' | 'onExitRoom'> & { t: Translate }) {
@@ -164,6 +164,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               pointsWithoutLesson={!landed && outcome.celebrate}
               phone={phone}
               maxChips={bossOver ? 6 : 9}
+              verdict={reteachVerdict(summary).kind}
               t={t}
             />
           )}

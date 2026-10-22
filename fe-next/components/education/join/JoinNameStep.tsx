@@ -64,14 +64,14 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
           {flow.codeRejected ? (
             <JoinAlert>{t(`${K}.invalidCode`)}</JoinAlert>
           ) : flow.target?.label ? (
-            <div className="rounded-neo border-3 border-neo-black bg-neo-lime p-3 shadow-hard">
-              <p className="font-neo-display text-xs font-black uppercase tracking-wide text-neo-navy/70">
+            <div className="rounded-neo border-3 border-neo-lime bg-neo-navy-light p-3 shadow-hard">
+              <p className="font-neo-display text-xs font-black uppercase tracking-wide text-neo-lime">
                 {t(verdict === 'game' ? `${K}.preview.gameLabel` : `${K}.preview.label`)}
               </p>
-              <p title={flow.target.label} className="truncate font-neo-display text-xl font-black leading-tight text-neo-navy lg:text-2xl">
+              <p title={flow.target.label} className="truncate font-neo-display text-xl font-black leading-tight text-neo-cream lg:text-2xl">
                 {flow.target.label}
               </p>
-              <p className="mt-1 line-clamp-2 font-neo-body text-sm font-bold leading-snug text-neo-navy/80">
+              <p className="mt-1 line-clamp-2 font-neo-body text-sm font-bold leading-snug text-neo-cream/80">
                 {t(verdict === 'game' ? `${K}.preview.gameConfirm` : `${K}.preview.classroomNext`)}
               </p>
             </div>

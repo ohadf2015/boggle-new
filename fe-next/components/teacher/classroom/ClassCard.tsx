@@ -127,7 +127,7 @@ export function ClassCard({
           title={classroom.name}
           className="min-w-0 flex-1 line-clamp-2 font-neo-display text-lg font-bold text-neo-cream @[24rem]:text-xl"
         >
-          {classroom.name}
+          <bdi>{classroom.name}</bdi>
         </h3>
         <span className="shrink-0 rounded-neo border border-neo-cream/40 px-2 py-0.5 text-xs font-bold uppercase text-neo-cream/70">
           {classroom.language.toUpperCase()}

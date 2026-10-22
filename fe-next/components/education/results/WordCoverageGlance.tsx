@@ -82,6 +82,8 @@ export interface WordCoverageGlanceProps {
   maxChips?: number;
   /** Replaces the found/total meter with a plain heading, for a round where that meter would read 0 beside real points. */
   heading?: string;
+  /** Whether the empty missed list may say "all found". The wall passes the shared reteach verdict, which counts a word found by too few as still to teach. */
+  allFoundLine?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -98,6 +100,7 @@ export function WordCoverageGlance({
   missedOnly = false,
   maxChips,
   heading,
+  allFoundLine = true,
   t,
 }: WordCoverageGlanceProps) {
   const projector = size === 'projector';
@@ -314,7 +317,7 @@ export function WordCoverageGlance({
         {/* A swept round empties this list by construction — and an empty
             bordered panel is the last thing the 100% screen should show. The
             sweep takes the space the misses had, which is the whole point. */}
-        {missedOnly && shown.length === 0 && (
+        {missedOnly && allFoundLine && shown.length === 0 && (
           <li
             data-testid="coverage-all-found"
             className={cn(

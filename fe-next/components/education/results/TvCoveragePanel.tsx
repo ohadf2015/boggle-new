@@ -6,6 +6,7 @@ import { sweepReached, type RoundEndStage } from '@/lib/education/roundEndStage'
 import { WordCoverageGlance } from './WordCoverageGlance';
 import { NoLessonWordsPanel } from './NoLessonWordsPanel';
 import { classFoundWords } from './lessonTally';
+import type { ReteachVerdictKind } from '@/components/education/live/eduReteachModel';
 
 export interface TvCoveragePanelProps {
   summary: ClassroomSummary;
@@ -17,6 +18,8 @@ export interface TvCoveragePanelProps {
   phone: boolean;
   /** Wall cap on printed chips; the rest are counted. */
   maxChips?: number;
+  /** The shared reteach verdict: it decides the "all found" and "whole lesson" lines. */
+  verdict?: ReteachVerdictKind;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -25,13 +28,22 @@ export interface TvCoveragePanelProps {
  * empty panel), and the one region allowed to shrink and scroll when a class
  * missed everything, so Play again below it never leaves the wall.
  */
-export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWithoutLesson, phone, maxChips = 12, t }: TvCoveragePanelProps) {
+export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWithoutLesson, phone, maxChips = 12, verdict, t }: TvCoveragePanelProps) {
   const size = phone ? 'card' : 'projector';
+  const allFoundLine = verdict === undefined || verdict === 'allFound';
   return (
     <section
       data-testid="tv-coverage-panel"
       className="flex flex-col lg:min-h-0 lg:flex-initial lg:overflow-hidden rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated px-3 pt-3 pb-0 lg:p-4 shadow-hard"
     >
+      {verdict === 'wholeLesson' && (
+        <p
+          data-testid="tv-reteach-whole-lesson"
+          className={phone ? 'mb-2 font-neo-display font-bold text-sm text-neo-cream' : 'mb-3 font-neo-display font-bold text-xl 2xl:text-2xl text-neo-cream'}
+        >
+          {t('education.results.wholeLessonAgain')}
+        </p>
+      )}
       {!pointsWithoutLesson ? (
         <WordCoverageGlance
           summary={summary}
@@ -43,6 +55,7 @@ export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWi
           celebrate={sweepReached(stage)}
           missedOnly
           maxChips={phone ? 6 : maxChips}
+          allFoundLine={allFoundLine}
           t={t}
         />
       ) : (
@@ -60,6 +73,7 @@ export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWi
             missedOnly
             maxChips={phone ? 4 : 8}
             heading={t('eduLive.results.noLessonReteach')}
+            allFoundLine={allFoundLine}
             t={t}
           />
         </NoLessonWordsPanel>

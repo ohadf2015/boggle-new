@@ -14,6 +14,8 @@ export interface WordProgressRow {
 }
 
 export interface WordTally {
+  /** The spelling to show: the most recently practised one, else the first seen. */
+  word: string;
   correct: number;
   attempts: number;
   lastAt: string;
@@ -33,13 +35,21 @@ const num = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v)
 export const percent = (correct: number, attempts: number): number | null =>
   attempts > 0 ? Math.round((correct / attempts) * 100) : null;
 
+/**
+ * The merge key for a stored word. Case only: Hebrew finals and niqqud stay as
+ * stored, since the language-aware normalizers would fold them.
+ */
+export const wordKey = (word: string): string => word.normalize('NFC').trim().toLowerCase();
+
+/** Keyed by `wordKey`; read the spelling to show from `WordTally.word`. */
 export function tallyStudentWords(rows: readonly WordProgressRow[]): Map<string, WordTally> {
   const words = new Map<string, WordTally>();
-  const get = (word: string) => {
-    let w = words.get(word);
+  const get = (raw: string) => {
+    const key = wordKey(raw);
+    let w = words.get(key);
     if (!w) {
-      w = { correct: 0, attempts: 0, lastAt: '', mastered: false };
-      words.set(word, w);
+      w = { word: raw.trim(), correct: 0, attempts: 0, lastAt: '', mastered: false };
+      words.set(key, w);
     }
     return w;
   };
@@ -50,7 +60,10 @@ export function tallyStudentWords(rows: readonly WordProgressRow[]): Map<string,
       const w = get(word);
       w.correct += num(data.correct);
       w.attempts += num(data.attempts);
-      if (typeof data.lastAttemptAt === 'string' && data.lastAttemptAt > w.lastAt) w.lastAt = data.lastAttemptAt;
+      if (typeof data.lastAttemptAt === 'string' && data.lastAttemptAt > w.lastAt) {
+        w.lastAt = data.lastAttemptAt;
+        w.word = word.trim();
+      }
     }
     for (const word of Array.isArray(row.words_mastered) ? row.words_mastered : []) {
       if (typeof word === 'string') get(word).mastered = true;

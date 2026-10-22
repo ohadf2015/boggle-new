@@ -60,7 +60,7 @@ const lessons = [
   { id: 'l2', words: [{ word: 'tree' }, { word: 'moon' }] },
 ];
 
-function browserDb() {
+function browserDb(lessonRows: unknown[] = lessons, rows: typeof progressRows = progressRows) {
   return fakeSupabase({
     classrooms: ok({ id: CLASSROOM, name: 'Class A', teacher_id: 't1' }),
     classroom_memberships: ok([{ student_id: 'ana' }, { student_id: 'ben' }]),
@@ -73,9 +73,9 @@ function browserDb() {
         : ok({ display_name: 'Teacher T' }),
     student_lesson_progress: (filters) => {
       const one = filters.find(([m, col]) => m === 'eq' && col === 'student_id')?.[2];
-      return ok(progressRows.filter((r) => !one || r.student_id === one));
+      return ok(rows.filter((r) => !one || r.student_id === one));
     },
-    vocabulary_lessons: ok(lessons),
+    vocabulary_lessons: ok(lessonRows),
     practice_sessions: ok(sessions),
   });
 }
@@ -140,5 +140,24 @@ describe('class views count a word once per student, matching the student insigh
     if (!insights.ok) throw new Error('expected ok');
     expect(insights.insights.totalMinutes).toBe(10);
     expect(insights.insights.sessionsCompleted).toBe(1);
+  });
+});
+
+describe('class views fold capitalisation into one word', () => {
+  it('Tree in one lesson and tree in another are one mastered word of three lesson words', async () => {
+    const capitalised = progressRows.map((r) =>
+      r.lesson_id === 'l2' ? { ...r, words_mastered: ['Tree'], words_attempted: { Tree: { correct: 2, attempts: 2 } } } : r
+    );
+    const db = browserDb([lessons[0], { id: 'l2', words: [{ word: 'Tree' }, { word: 'moon' }] }], capitalised);
+    (supabase!.from as Mock).mockImplementation((table: string) => {
+      const b = db.from(table) as Record<string, unknown>;
+      b.single = b.maybeSingle;
+      return b;
+    });
+
+    const { data } = await getStudentsProgressSummary(CLASSROOM);
+    const ana = data.find((s) => s.studentId === 'ana')!;
+    expect(ana.wordsMastered).toBe(1);
+    expect(ana.vocabularyMastery).toBe(33);
   });
 });

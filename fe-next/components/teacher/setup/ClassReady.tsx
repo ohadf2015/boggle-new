@@ -41,7 +41,7 @@ export function ClassReady({ classroom, language, onShown, onCopy, onOpenProject
     <section data-testid="setup-step-ready" aria-labelledby="setup-ready-title" className="flex flex-col items-center gap-5 text-center">
       <EduMascot moment="success" animate size={200} className="size-40 sm:size-48" />
       <div className="flex flex-col gap-1">
-        <h1 id="setup-ready-title" className="font-neo-display text-3xl font-black leading-tight text-neo-cream sm:text-4xl">
+        <h1 id="setup-ready-title" tabIndex={-1} className="font-neo-display outline-none text-3xl font-black leading-tight text-neo-cream sm:text-4xl">
           {t('eduShell.setup.readyTitle')}
         </h1>
         <p dir="auto" className="font-neo-body text-base font-semibold text-neo-cream/80">

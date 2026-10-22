@@ -82,7 +82,7 @@ export function ClassAssignmentGrid({ classroomId, classroomName }: ClassAssignm
       topWords: t('teacher.reports.classGrid.summaryTopWords'),
       attention: t('teacher.reports.classGrid.summaryAttention'),
       none: t('teacher.reports.classGrid.summaryNone'),
-      missing: (name, count) => t('teacher.reports.classGrid.summaryMissing', { name, count }),
+      missing: (name, count) => t('teacher.reports.classGrid.summaryMissing', { name: `⁨${name}⁩`, count }),
     });
 
     return { data: { grid, summaryText }, error: null };

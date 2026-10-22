@@ -42,7 +42,7 @@ export function EduDashboardPanel() {
   }, [windowDays]);
 
   return (
-    <section className="space-y-4 text-neo-cream" aria-labelledby="edu-dashboard-title">
+    <section className="space-y-4 p-4 text-neo-cream sm:p-6" aria-labelledby="edu-dashboard-title">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 id="edu-dashboard-title" className="font-bold text-lg">

@@ -170,14 +170,14 @@ export function EducationNav({ nav, t, variant, brand, account, plan, className 
               href={nav.proHref}
               data-testid="education-side-pro"
               className={cn(
-                'group flex min-h-[44px] w-full items-center gap-3 rounded-neo px-3 py-2',
+                'group flex min-h-[44px] w-full items-center gap-2 rounded-neo px-3 py-2',
                 'font-neo-display text-[15px] font-bold text-neo-yellow transition-[colors,transform] duration-150',
                 'hover:bg-neo-yellow/10 active:scale-[0.97]',
                 FOCUS,
               )}
             >
               <Crown className="h-5 w-5 shrink-0" aria-hidden />
-              <span className="flex-1 truncate">{t(plan === 'free' ? 'teacher.plan.free' : 'eduShell.nav.pro')}</span>
+              <span className="line-clamp-2 min-w-0 flex-1 leading-tight">{t(plan === 'free' ? 'teacher.plan.free' : 'eduShell.nav.pro')}</span>
               {plan === 'free' || plan === 'trial' ? (
                 <span
                   data-testid="education-side-pro-pill"

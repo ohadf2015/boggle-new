@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, onTestFinished } from 'vitest';
 import { render, screen, cleanup, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
@@ -82,6 +82,22 @@ describe('<ClassSetupFlow>', () => {
     expect(screen.getByTestId('setup-join-code')).toHaveTextContent('K7Q2');
     await waitFor(() => expect(screen.getByTestId('setup-qr').querySelector('svg')).not.toBeNull());
     expect(screen.getByTestId('setup-start-game')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c9');
+  });
+
+  it('When a class is created from a scrolled-down form, Then the ready screen opens from its top with focus on its title', async () => {
+    createClassroom.mockResolvedValue({ success: true, data: NEW });
+    const scrollIntoView = vi.fn();
+    const original = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = scrollIntoView;
+    onTestFinished(() => {
+      Element.prototype.scrollIntoView = original;
+    });
+    render(<ClassSetupFlow />);
+    await userEvent.click(screen.getByTestId('setup-create'));
+    const title = await screen.findByRole('heading', { name: 'eduShell.setup.readyTitle' });
+    await waitFor(() => expect(title).toHaveFocus());
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'start' });
+    expect(scrollIntoView.mock.contexts[0]).toContainElement(screen.getByRole('list', { name: 'eduShell.setup.stepsLabel' }));
   });
 
   it('Given the ready screen is shown, Then the share step is recorded at show time', async () => {

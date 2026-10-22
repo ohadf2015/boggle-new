@@ -249,3 +249,20 @@ describe('teacherExportToCsv', () => {
     expect(csv.split('\n')[1]).toBe('Grade 5A,Student abcdef12,3,12,450,2026-09-20,7');
   });
 });
+
+describe('buildTeacherExportRows word key', () => {
+  it('counts Tree and tree mastered in two lessons as one word', () => {
+    const rows = buildTeacherExportRows({
+      classrooms: [{ id: 'c1', name: 'Grade 5A' }],
+      memberships: [{ classroomId: 'c1', studentId: 's1' }],
+      profiles: [{ studentId: 's1', name: 'Ada' }],
+      lessonAssignments: [{ classroomId: 'c1', lessonId: 'l1' }, { classroomId: 'c1', lessonId: 'l2' }],
+      progress: [
+        { studentId: 's1', lessonId: 'l1', totalXp: 10, wordsMastered: ['Tree', 'sun'], lastPracticeDate: null, completedAt: null },
+        { studentId: 's1', lessonId: 'l2', totalXp: 10, wordsMastered: ['tree'], lastPracticeDate: null, completedAt: null },
+      ],
+      sessions: [],
+    });
+    expect(rows[0].wordsMastered).toBe(2);
+  });
+});
