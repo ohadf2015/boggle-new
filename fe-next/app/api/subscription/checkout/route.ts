@@ -5,7 +5,12 @@ import { getPolarClient, getProProductId, probeCheckoutUrl } from '@/lib/polar';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { locales, defaultLocale } from '@/i18n/config';
 import logger from '@/utils/logger';
+import { logSubscriptionEvent } from '@/lib/subscriptions';
+import { withTimeout } from '@/lib/server/routeTimeout';
+import { CHECKOUT_STARTED_EVENT, checkoutStartedPayload } from '@/lib/education/abandonedCheckout';
 import { buildProCheckoutStartedEvent, buildProTrialStartedEvent, buildCheckoutStartedEvent, buildProCheckoutFailedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
+
+const CHECKOUT_START_RECORD_TIMEOUT_MS = 1500;
 
 /**
  * A second free trial, or a trial on top of Pro, is a paid checkout instead.
@@ -130,6 +135,19 @@ export async function POST(request: NextRequest) {
       allowTrial: trial,
       locale,
     });
+
+    try {
+      await withTimeout(
+        logSubscriptionEvent({
+          userId: user.id,
+          eventType: CHECKOUT_STARTED_EVENT,
+          payload: checkoutStartedPayload({ trial, locale }),
+        }),
+        CHECKOUT_START_RECORD_TIMEOUT_MS,
+      );
+    } catch (err) {
+      logger.warn('Could not record checkout start:', err);
+    }
 
     // Analytics only, after the checkout exists; never able to change the answer.
     // URL creation is `checkout_started` (plus the edu_* names). `checkout_complete`

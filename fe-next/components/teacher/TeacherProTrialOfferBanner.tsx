@@ -42,7 +42,7 @@ export function TeacherProTrialOfferBanner({ onDismiss }: { onDismiss?: () => vo
     }
     setPending(true);
     try {
-      const result = await postTeacherProCheckout(fetch, { trial: true, locale: language });
+      const result = await postTeacherProCheckout(fetch, { trial: true, locale: language, placement: 'dashboard_trial_offer' });
       if (!result.ok) {
         if (result.status === 401) {
           toast.error(t('teacher.subscription.signInRequired'));

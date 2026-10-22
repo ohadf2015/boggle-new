@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAuthorizedCronRequest } from '@/lib/cronAuth';
 import logger from '@/utils/logger';
 import { getSupabaseAdmin } from '@/lib/email';
-import { sendEmail } from '@/lib/email/send';
+import { loadLifecycleAudience, reachFor, sendLifecycleEmail } from '@/lib/email/lifecycleUnsubscribe';
 import { teacherWeeklyProgressDigest } from '@/lib/email/templates/teacherWeeklyProgressDigest';
 import {
   assembleWeeklyDigests,
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
           .filter((id) => id && !proUserIds.has(id)),
       );
 
-      const digests = assembleWeeklyDigests({
+      const assembled = assembleWeeklyDigests({
         teachers,
         classrooms,
         memberships,
@@ -228,13 +228,43 @@ export async function POST(request: NextRequest) {
         now,
       });
 
-      logger.log(`[Weekly Digest] ${digests.length} teachers due week ${week}${dry ? ' (dry run)' : ''}`);
+      const emailKey = (email: string) => (email ?? '').trim().toLowerCase();
+      const userIdsByEmail = new Map<string, string[]>();
+      for (const t of teachers) {
+        const list = userIdsByEmail.get(emailKey(t.email)) ?? [];
+        list.push(t.userId);
+        userIdsByEmail.set(emailKey(t.email), list);
+      }
+      const audience = await loadLifecycleAudience(
+        supabase,
+        assembled.flatMap((d) => userIdsByEmail.get(emailKey(d.email)) ?? [d.teacherId]),
+        { mint: !dry },
+      );
+      let unsubscribed = 0;
+      let unreachable = 0;
+      const digests: Array<(typeof assembled)[number] & { token: string }> = [];
+      for (const d of assembled) {
+        const reach = reachFor(audience, userIdsByEmail.get(emailKey(d.email)) ?? [d.teacherId]);
+        if ('skip' in reach) {
+          if (reach.skip === 'unsubscribed') unsubscribed++;
+          else unreachable++;
+          continue;
+        }
+        digests.push({ ...d, token: reach.token });
+      }
+
+      logger.log(
+        `[Weekly Digest] ${digests.length} teachers due week ${week}${dry ? ' (dry run)' : ''}; ` +
+          `skipped ${unsubscribed} unsubscribed, ${unreachable} with no unsubscribe link`,
+      );
 
       if (dry) {
         return {
           dry: true,
           due: digests.length,
           week,
+          unsubscribed,
+          unreachable,
           plan: digests.map((d) => ({ email: d.email, locale: d.locale, classrooms: d.classrooms.length, hasPro: d.hasPro })),
         };
       }
@@ -243,7 +273,13 @@ export async function POST(request: NextRequest) {
       let failed = 0;
       for (const digest of digests) {
         const tpl = teacherWeeklyProgressDigest(digest);
-        const result = await sendEmail({ to: digest.email, subject: tpl.subject, html: tpl.html });
+        const result = await sendLifecycleEmail({
+          to: digest.email,
+          subject: tpl.subject,
+          html: tpl.html,
+          locale: digest.locale === 'he' ? 'he' : 'en',
+          token: digest.token,
+        });
         if (!result.ok) {
           failed += 1;
           logger.error(`[Weekly Digest] send failed for ${digest.email}: ${result.error}`);
@@ -251,7 +287,7 @@ export async function POST(request: NextRequest) {
         }
         sent += 1;
       }
-      return { sent, failed, due: digests.length, week };
+      return { sent, failed, due: digests.length, week, unsubscribed, unreachable };
     });
 
     if (locked.status === 'skipped') {

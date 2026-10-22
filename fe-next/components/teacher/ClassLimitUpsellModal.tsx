@@ -88,7 +88,7 @@ export default function ClassLimitUpsellModal({
     });
     setPending(true);
     try {
-      const result = await postTeacherProCheckout(fetch, { trial: false, locale: language });
+      const result = await postTeacherProCheckout(fetch, { trial: false, locale: language, placement: `${source}_modal` });
       if (!result.ok) {
         if (result.status === 401) {
           toast.error(t('teacher.subscription.signInRequired'));
@@ -105,7 +105,7 @@ export default function ClassLimitUpsellModal({
     } finally {
       setPending(false);
     }
-  }, [pending, reason, isStudentLimit, language, t]);
+  }, [pending, reason, isStudentLimit, language, t, source]);
 
   const titleKey = isTrialExpired
     ? 'teacher.subscription.trialExpiredTitle'

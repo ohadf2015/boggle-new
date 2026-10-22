@@ -19,7 +19,7 @@ export function useStartTeacherProTrial(t: T, language: string, source: TrialCta
     }
     setPending(true);
     try {
-      const result = await postTeacherProCheckout(fetch, { trial: true, locale: language });
+      const result = await postTeacherProCheckout(fetch, { trial: true, locale: language, placement: source });
       if (!result.ok) {
         toast.error(
           t(

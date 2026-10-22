@@ -4259,6 +4259,8 @@ const sv = {
     "invalidTitle": "Länken är inte tillgänglig",
     "invalidBody": "Den här rapportlänken har gått ut eller är inte längre giltig. Be läraren om en ny länk.",
     "footerNote": "Delad av ditt barns lärare via LexiClash. Inget konto behövs.",
+    "joinPrompt": "Har ditt barn en klasskod?",
+    "joinCta": "Gå med i klassen",
     "language": "Visa på",
     "printButton": "Skriv ut eller spara som PDF",
     "classLabel": "Klass",
@@ -14319,6 +14321,12 @@ const sv = {
     "shell": {
       "profileLabel": "Min lärarprofil",
       "analyticsLabel": "Klassens statistik"
+    },
+    "classStreak": {
+      "kept": "Klassens svit: {count} dagar · spelat i dag",
+      "keptOne": "Klassens svit: 1 dag · spelat i dag",
+      "atRisk": "Klassens svit: {count} dagar – spela i dag för att behålla den",
+      "atRiskOne": "Klassens svit: 1 dag – spela i dag för att behålla den"
     },
     "pulse": {
       "state": {

@@ -26,6 +26,9 @@ vi.mock('@/utils/supabase/admin', () => ({
   }),
 }))
 
+const { logSubscriptionEvent } = vi.hoisted(() => ({ logSubscriptionEvent: vi.fn(async () => undefined) }))
+vi.mock('@/lib/subscriptions', () => ({ logSubscriptionEvent }))
+
 const getAuthedUser = vi.fn()
 vi.mock('@/lib/auth/getAuthedUser', () => ({
   getAuthedUser: (...args: unknown[]) => getAuthedUser(...args),
@@ -37,6 +40,8 @@ describe('POST /api/subscription/checkout', () => {
   beforeEach(() => {
     createCheckout.mockReset()
     getAuthedUser.mockReset()
+    logSubscriptionEvent.mockReset()
+    logSubscriptionEvent.mockResolvedValue(undefined)
     maybeSingle.mockReset()
     limitEvents.mockReset()
     maybeSingle.mockResolvedValue({ data: null, error: null })
@@ -107,6 +112,54 @@ describe('POST /api/subscription/checkout', () => {
       allowTrial: false,
       locale: 'en',
     })
+  })
+
+  it('records when a checkout started, for the abandoned-checkout email', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    await POST(new Request('http://localhost/api/subscription/checkout', {
+      method: 'POST',
+      body: JSON.stringify({ trial: true, locale: 'he' }),
+      headers: { 'Content-Type': 'application/json' },
+    }))
+    expect(logSubscriptionEvent).toHaveBeenCalledWith({
+      userId: 'u1',
+      eventType: 'checkout_started',
+      payload: { mode: 'trial', locale: 'he' },
+    })
+    expect(logSubscriptionEvent.mock.calls[0][0].payload).not.toHaveProperty('trial')
+  })
+
+  it('still returns the checkout url when recording the start fails', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    logSubscriptionEvent.mockRejectedValue(new Error('db down'))
+    const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ url: 'https://polar.sh/checkout/u1' })
+  })
+
+  it('does not hold the checkout url behind a hanging start record', async () => {
+    vi.useFakeTimers()
+    try {
+      getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+      createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+      logSubscriptionEvent.mockReturnValue(new Promise(() => {}))
+      const pending = POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+      await vi.advanceTimersByTimeAsync(2_000)
+      const res = await pending
+      expect(res.status).toBe(200)
+      expect(await res.json()).toEqual({ url: 'https://polar.sh/checkout/u1' })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('records nothing when the checkout could not be created', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockRejectedValue(new Error('polar down'))
+    await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+    expect(logSubscriptionEvent).not.toHaveBeenCalled()
   })
 
   it('uses the locale from the JSON body', async () => {

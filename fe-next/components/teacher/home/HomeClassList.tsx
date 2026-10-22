@@ -5,6 +5,7 @@ import { CalendarDays, Play, Plus, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarLite from '@/components/AvatarLite';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
+import { ClassStreakLine } from '@/components/teacher/hq/ClassStreakLine';
 import { PANEL, QUIET_LINK, SKELETON } from './homeStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -144,6 +145,7 @@ export function HomeClassList({
                     </span>
                     <LastPlayed played={played} pending={lastPlayedAt === null && !activityFailed} failed={activityFailed} language={language} nowMs={nowMs} t={t} />
                   </span>
+                  {(c.member_count ?? 0) > 0 ? <ClassStreakLine classroomId={c.id} className="mt-1 self-start" /> : null}
                 </span>
               </span>
               <span className="hidden items-center gap-1.5 font-neo-body text-sm font-semibold text-neo-cream/85 sm:inline-flex">

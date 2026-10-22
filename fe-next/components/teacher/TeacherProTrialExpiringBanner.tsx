@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { polarTrialDaysLeft, isPolarTrialDay10Expiring } from '@/lib/education/polarTrial';
 import posthog from '@/lib/analytics/lazyPosthog';
+import { goToPolarCheckout, postTeacherProCheckout } from '@/lib/education/postTeacherProCheckout';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
 
@@ -59,25 +60,16 @@ export function TeacherProTrialExpiringBanner({
     safeCapture('teacher_upgrade_clicked', { days_remaining: daysRemaining });
     setPending(true);
     try {
-      const response = await fetch('/api/subscription/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trial: false, locale: language }),
+      const result = await postTeacherProCheckout(fetch, {
+        trial: false,
+        locale: language,
+        placement: 'dashboard_trial_expiring',
       });
-      if (!response.ok) {
-        if (response.status === 503) {
-          toast.error(t('teacher.subscription.checkoutUnavailable'));
-          return;
-        }
-        toast.error(t('teacher.subscription.checkoutError'));
+      if (!result.ok) {
+        toast.error(t(result.status === 503 ? 'teacher.subscription.checkoutUnavailable' : 'teacher.subscription.checkoutError'));
         return;
       }
-      const { url } = await response.json();
-      if (typeof url === 'string' && url) {
-        window.location.href = url;
-        return;
-      }
-      toast.error(t('teacher.subscription.checkoutError'));
+      goToPolarCheckout(result.url);
     } catch {
       toast.error(t('teacher.subscription.checkoutError'));
     } finally {

@@ -57,6 +57,7 @@ describe('TeacherProTrialLifecycleBanner', () => {
       expect(postTeacherProCheckout).toHaveBeenCalledTimes(1);
     });
     expect(trackEduProUpgradeClicked).toHaveBeenCalledWith({ source: 'dashboard_trial_lifecycle' });
+    expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: false, locale: 'en', placement: 'dashboard_trial_lifecycle' });
     expect(goToPolarCheckout).toHaveBeenCalledWith('https://polar.sh/c/1');
   });
 });

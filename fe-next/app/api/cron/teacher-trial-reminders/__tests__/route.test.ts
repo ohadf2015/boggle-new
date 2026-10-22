@@ -44,7 +44,8 @@ function chainFor(name: string) {
 }
 
 vi.mock('@/lib/email/send', () => ({ sendEmail: h.sendEmailSpy }));
-vi.mock('@/lib/email', () => ({
+vi.mock('@/lib/email', async (importOriginal) => ({
+  ...(await importOriginal()),
   getSupabaseAdmin: () => ({ from: (name: string) => chainFor(name) }),
 }));
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
@@ -86,6 +87,9 @@ const access = (over = {}) => ({
   ...over,
 });
 
+const TOKEN = 'c'.repeat(64);
+const profile = (over = {}) => ({ id: 'u1', daily_email_subscribed: null, email_unsubscribe_token: TOKEN, ...over });
+
 describe('/api/cron/teacher-trial-reminders', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -95,7 +99,34 @@ describe('/api/cron/teacher-trial-reminders', () => {
     h.tables = {
       teacher_access_requests: { data: [access()], error: null },
       subscriptions: { data: [], error: null },
+      profiles: { data: [profile()], error: null },
     };
+  });
+
+  it('carries a one-click unsubscribe link with a footer in the teacher language', async () => {
+    h.tables.teacher_access_requests = { data: [access({ locale: 'he' })], error: null };
+    await POST(authed());
+    const mail = h.sendEmailSpy.mock.calls[0][0];
+    const url = `https://www.lexiclash.live/api/email/unsubscribe?token=${TOKEN}`;
+    expect(mail.headers['List-Unsubscribe']).toBe(`<${url}>`);
+    expect(mail.headers['List-Unsubscribe-Post']).toBe('List-Unsubscribe=One-Click');
+    expect(mail.html).toContain(url);
+    expect(mail.html).toContain('הסרה מרשימת התפוצה');
+  });
+
+  it('skips a teacher who unsubscribed and leaves the ledger alone', async () => {
+    h.tables.profiles = { data: [profile({ daily_email_subscribed: false })], error: null };
+    const body = await (await POST(authed())).json();
+    expect(body).toMatchObject({ sent: 0, unsubscribed: 1 });
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
+    expect(h.updates).toHaveLength(0);
+  });
+
+  it('sends nothing when the unsubscribe lookup fails', async () => {
+    h.tables.profiles = { data: null, error: { message: 'boom' } };
+    const res = await POST(authed());
+    expect(res.status).toBe(500);
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
   });
 
   it('rejects a request without the cron secret', async () => {

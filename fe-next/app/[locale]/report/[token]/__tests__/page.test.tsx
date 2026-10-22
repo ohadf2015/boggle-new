@@ -13,12 +13,14 @@ import { render } from '@testing-library/react';
 vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: vi.fn() }));
 vi.mock('@/lib/education/parentReportData', () => ({ loadParentReportData: vi.fn() }));
 vi.mock('@/utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
+vi.mock('@/backend/utils/educationTelemetry', () => ({ captureEduServerEvents: vi.fn() }));
 
 import Page, { generateMetadata } from '../page';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { loadParentReportData } from '@/lib/education/parentReportData';
 import { signParentReportToken } from '@/lib/education/parentReportToken';
 import logger from '@/utils/logger';
+import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
 
 const STUDENT = 'student-1';
 const CLASSROOM = 'classroom-1';
@@ -58,6 +60,7 @@ describe('parent report page', () => {
       expect(container.textContent).toContain('Link not available');
       expect(createAdminClient).not.toHaveBeenCalled();
       expect(loadParentReportData).not.toHaveBeenCalled();
+      expect(captureEduServerEvents).not.toHaveBeenCalled();
     });
 
     it('renders the friendly error view for an expired token', async () => {
@@ -92,6 +95,7 @@ describe('parent report page', () => {
       const { container } = render(await Page({ params: params('en', token) }));
 
       expect(container.textContent).toContain('Link not available');
+      expect(captureEduServerEvents).not.toHaveBeenCalled();
     });
 
     it('when the data query errors, logs (never silently) and shows the error view', async () => {
@@ -126,6 +130,32 @@ describe('parent report page', () => {
       expect(container.textContent).toContain('120');
       expect(container.textContent).toContain('4');
       expect(container.textContent).toContain('17');
+    });
+
+    it('stamps parent_report_viewed server-side with the class and locale, never the student', async () => {
+      (createAdminClient as any).mockReturnValue({});
+      (loadParentReportData as any).mockResolvedValue({ status: 'ok', data: okData });
+      const token = signParentReportToken(STUDENT, CLASSROOM);
+
+      await Page({ params: params('he', token) });
+
+      expect(captureEduServerEvents).toHaveBeenCalledTimes(1);
+      const [[events]] = (captureEduServerEvents as any).mock.calls;
+      expect(events).toHaveLength(1);
+      expect(events[0]).toMatchObject({ event: 'parent_report_viewed', properties: { classroom_id: CLASSROOM, locale: 'he' } });
+      expect(JSON.stringify(events[0])).not.toContain(STUDENT);
+    });
+
+    it('offers the parent a footer link into the student join flow', async () => {
+      (createAdminClient as any).mockReturnValue({});
+      (loadParentReportData as any).mockResolvedValue({ status: 'ok', data: okData });
+      const token = signParentReportToken(STUDENT, CLASSROOM);
+
+      const { getByTestId } = render(await Page({ params: params('he', token) }));
+
+      const link = getByTestId('parent-report-join');
+      expect(link).toHaveAttribute('href', '/he/join');
+      expect(link.className).toContain('print:hidden');
     });
 
     it('renders "no activity yet" when recentActivity is empty', async () => {

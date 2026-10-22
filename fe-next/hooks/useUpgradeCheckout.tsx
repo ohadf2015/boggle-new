@@ -95,7 +95,7 @@ export function useUpgradeCheckout({ t, language, user, authLoading, proLoading,
       window.location.href = url;
     } catch {
       try {
-        trackEduProCheckoutFailed({ reason: 'network', trial });
+        trackEduProCheckoutFailed({ reason: 'network', placement: 'teacher_upgrade', trial });
       } catch {
         /* analytics must never block the till */
       }

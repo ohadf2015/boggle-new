@@ -44,7 +44,8 @@ function chainFor(name: string) {
 }
 
 vi.mock('@/lib/email/send', () => ({ sendEmail: h.sendEmailSpy }));
-vi.mock('@/lib/email', () => ({
+vi.mock('@/lib/email', async (importOriginal) => ({
+  ...(await importOriginal()),
   getSupabaseAdmin: () => ({ from: (name: string) => chainFor(name) }),
 }));
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
@@ -86,6 +87,15 @@ const access = (over = {}) => ({
   ...over,
 });
 
+const TOKEN = 'b'.repeat(64);
+const profile = (over = {}) => ({
+  id: 'u1',
+  is_test_account: false,
+  daily_email_subscribed: null,
+  email_unsubscribe_token: TOKEN,
+  ...over,
+});
+
 describe('/api/cron/teacher-activation-nudge', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -95,7 +105,7 @@ describe('/api/cron/teacher-activation-nudge', () => {
     h.tables = {
       teacher_access_requests: { data: [access()], error: null },
       classrooms: { data: [], error: null },
-      profiles: { data: [], error: null },
+      profiles: { data: [profile()], error: null },
       subscriptions: { data: [], error: null },
     };
   });
@@ -121,6 +131,44 @@ describe('/api/cron/teacher-activation-nudge', () => {
     expect(h.updates[0].filters).toContainEqual(['in', 'id', ['r1']]);
   });
 
+  it('carries a one-click unsubscribe link in the headers and the footer', async () => {
+    await POST(authed());
+    const mail = h.sendEmailSpy.mock.calls[0][0];
+    const url = `https://www.lexiclash.live/api/email/unsubscribe?token=${TOKEN}`;
+    expect(mail.headers).toEqual({
+      'List-Unsubscribe': `<${url}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    });
+    expect(mail.html).toContain(url);
+  });
+
+  it('skips a teacher who unsubscribed', async () => {
+    h.tables.profiles = { data: [profile({ daily_email_subscribed: false })], error: null };
+    const body = await (await POST(authed())).json();
+    expect(body.sent).toBe(0);
+    expect(body.unsubscribed).toBe(1);
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
+  });
+
+  it('skips an email address when any of its accounts unsubscribed', async () => {
+    h.tables.teacher_access_requests = {
+      data: [access(), access({ id: 'r2', user_id: 'u2' })],
+      error: null,
+    };
+    h.tables.profiles = { data: [profile(), profile({ id: 'u2', daily_email_subscribed: false })], error: null };
+    const body = await (await POST(authed())).json();
+    expect(body.sent).toBe(0);
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
+  });
+
+  it('skips a row with no account, since it has no unsubscribe link', async () => {
+    h.tables.teacher_access_requests = { data: [access({ user_id: null })], error: null };
+    const body = await (await POST(authed())).json();
+    expect(body.sent).toBe(0);
+    expect(body.unreachable).toBe(1);
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
+  });
+
   it('skips a teacher who has a classroom', async () => {
     h.tables.classrooms = { data: [{ teacher_id: 'u1' }], error: null };
     const body = await (await POST(authed())).json();
@@ -130,7 +178,7 @@ describe('/api/cron/teacher-activation-nudge', () => {
   });
 
   it('skips a test account', async () => {
-    h.tables.profiles = { data: [{ id: 'u1', is_test_account: true }], error: null };
+    h.tables.profiles = { data: [profile({ is_test_account: true })], error: null };
     const body = await (await POST(authed())).json();
     expect(body.sent).toBe(0);
     expect(h.sendEmailSpy).not.toHaveBeenCalled();

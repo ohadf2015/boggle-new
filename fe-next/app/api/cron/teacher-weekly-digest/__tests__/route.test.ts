@@ -32,7 +32,8 @@ function chainFor(name: string) {
 }
 
 vi.mock('@/lib/email/send', () => ({ sendEmail: h.sendEmailSpy }));
-vi.mock('@/lib/email', () => ({
+vi.mock('@/lib/email', async (importOriginal) => ({
+  ...(await importOriginal()),
   getSupabaseAdmin: () => ({
     from: (name: string) => chainFor(name),
   }),
@@ -61,6 +62,16 @@ function makeRequest({ authorization, dry = false }: { authorization?: string; d
   } as any;
 }
 
+const TOKEN = 'd'.repeat(64);
+
+function seedTeacherWithClass() {
+  h.tables.teacher_access_requests = {
+    data: [{ user_id: 't1', email: 'ada@school.edu', full_name: 'Ada', locale: 'en' }],
+    error: null,
+  };
+  h.tables.classrooms = { data: [{ id: 'c1', name: 'Year 7', teacher_id: 't1' }], error: null };
+}
+
 describe('/api/cron/teacher-weekly-digest', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -75,6 +86,7 @@ describe('/api/cron/teacher-weekly-digest', () => {
       student_lesson_progress: { data: [], error: null },
       subscriptions: { data: [], error: null },
       subscription_events: { data: [], error: null },
+      profiles: { data: [{ id: 't1', daily_email_subscribed: null, email_unsubscribe_token: TOKEN }], error: null },
     };
   });
 
@@ -114,5 +126,32 @@ describe('/api/cron/teacher-weekly-digest', () => {
     expect(h.sendEmailSpy).toHaveBeenCalledTimes(1);
     const html = h.sendEmailSpy.mock.calls[0][0].html as string;
     expect(html).toContain('/en/teacher/upgrade');
+  });
+
+  it('carries a one-click unsubscribe link in headers and footer', async () => {
+    seedTeacherWithClass();
+    await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    const mail = h.sendEmailSpy.mock.calls[0][0];
+    const url = `https://www.lexiclash.live/api/email/unsubscribe?token=${TOKEN}`;
+    expect(mail.headers['List-Unsubscribe']).toBe(`<${url}>`);
+    expect(mail.headers['List-Unsubscribe-Post']).toBe('List-Unsubscribe=One-Click');
+    expect(mail.html).toContain(url);
+  });
+
+  it('skips a teacher who unsubscribed', async () => {
+    seedTeacherWithClass();
+    h.tables.profiles = { data: [{ id: 't1', daily_email_subscribed: false, email_unsubscribe_token: TOKEN }], error: null };
+    const body = await (await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }))).json();
+    expect(body.sent).toBe(0);
+    expect(body.unsubscribed).toBe(1);
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
+  });
+
+  it('sends nothing when the unsubscribe lookup fails', async () => {
+    seedTeacherWithClass();
+    h.tables.profiles = { data: null, error: { message: 'boom' } };
+    const res = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(res.status).toBe(500);
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
   });
 });

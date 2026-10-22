@@ -92,7 +92,7 @@ describe('ClassLimitUpsellModal', () => {
     fireEvent.click(screen.getByTestId('plan-gate-upgrade'));
 
     await waitFor(() => {
-      expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: false, locale: 'en' });
+      expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: false, locale: 'en', placement: 'class_limit_modal' });
     });
     expect(goToPolarCheckout).toHaveBeenCalledWith('https://polar.example/checkout');
   });
@@ -143,7 +143,7 @@ describe('ClassLimitUpsellModal', () => {
         limit_type: 'students',
       });
     });
-    expect(postTeacherProCheckout).toHaveBeenCalled();
+    expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: false, locale: 'en', placement: 'student_limit_modal' });
   });
 
   it('shows a concrete sample of what Pro adds to every class, not just a bullet list', () => {

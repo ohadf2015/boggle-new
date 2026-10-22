@@ -38,7 +38,7 @@ describe('pickPolarTrialExpiryJourney', () => {
     };
     expect(pickPolarTrialExpiryJourney(lapsed)).toBe('t+3');
     expect(pickPolarTrialExpiryJourney({ ...lapsed, alreadySent: ['t-0'] })).toBe('t+3');
-    expect(pickPolarTrialExpiryJourney({ ...lapsed, currentPeriodEnd: endIn(-20), alreadySent: [] })).toBe(
+    expect(pickPolarTrialExpiryJourney({ ...lapsed, currentPeriodEnd: endIn(-10), alreadySent: [] })).toBe(
       't+3',
     );
   });
@@ -49,10 +49,25 @@ describe('pickPolarTrialExpiryJourney', () => {
       pickPolarTrialExpiryJourney({
         ...live,
         status: 'canceled',
-        currentPeriodEnd: endIn(-20),
+        currentPeriodEnd: endIn(-10),
         alreadySent: ['t+3'],
       }),
     ).toBeNull();
+  });
+
+  it('sends the t+14 and t+30 win-back once each, latest due bucket only', () => {
+    const lapsed = { ...live, status: 'canceled', alreadySent: ['t-0', 't+3'] };
+    expect(pickPolarTrialExpiryJourney({ ...lapsed, currentPeriodEnd: endIn(-13.9) })).toBeNull();
+    expect(pickPolarTrialExpiryJourney({ ...lapsed, currentPeriodEnd: endIn(-14) })).toBe('t+14');
+    expect(pickPolarTrialExpiryJourney({ ...lapsed, currentPeriodEnd: endIn(-20), alreadySent: ['t+14'] })).toBeNull();
+    expect(pickPolarTrialExpiryJourney({ ...lapsed, currentPeriodEnd: endIn(-30) })).toBe('t+30');
+    expect(pickPolarTrialExpiryJourney({ ...lapsed, currentPeriodEnd: endIn(-45), alreadySent: ['t+30'] })).toBeNull();
+    expect(pickPolarTrialExpiryJourney({ ...lapsed, currentPeriodEnd: endIn(-30), alreadySent: [] })).toBe('t+30');
+  });
+
+  it('never sends a win-back to a row still marked trialing, which counts as Pro', () => {
+    expect(pickPolarTrialExpiryJourney({ ...live, status: 'trialing', currentPeriodEnd: endIn(-14) })).toBeNull();
+    expect(pickPolarTrialExpiryJourney({ ...live, status: 'trialing', currentPeriodEnd: endIn(-30) })).toBeNull();
   });
 
   it('leaves cold rows alone', () => {
@@ -87,6 +102,8 @@ describe('polarTrialExpiryUpgradeUrl', () => {
     );
     expect(polarTrialExpiryUpgradeUrl('he', 't+3')).toContain('/he/teacher/upgrade');
     expect(polarTrialExpiryUpgradeUrl('he', 't+3')).toContain('polar_trial_t3');
+    expect(polarTrialExpiryUpgradeUrl('en', 't+14')).toContain('utm_campaign=polar_trial_t14');
+    expect(polarTrialExpiryUpgradeUrl('en', 't+30')).toContain('utm_campaign=polar_trial_t30');
   });
 });
 

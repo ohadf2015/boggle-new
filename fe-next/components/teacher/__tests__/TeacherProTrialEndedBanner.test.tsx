@@ -54,7 +54,7 @@ describe('TeacherProTrialEndedBanner', () => {
     await waitFor(() => {
       expect(postTeacherProCheckout).toHaveBeenCalledTimes(1);
     });
-    expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: false, locale: 'en' });
+    expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: false, locale: 'en', placement: 'dashboard_trial_ended' });
     expect(goToPolarCheckout).toHaveBeenCalledWith('https://polar.sh/c/reactivate');
   });
 

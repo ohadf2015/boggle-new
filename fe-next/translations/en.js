@@ -3537,6 +3537,8 @@ const en = {
     "invalidTitle": "Link not available",
     "invalidBody": "This report link has expired or is no longer valid. Ask the teacher for a new link.",
     "footerNote": "Shared by your child's teacher via LexiClash. No account needed.",
+    "joinPrompt": "Does your child have a class code?",
+    "joinCta": "Join a class",
     "language": "View in",
     "printButton": "Print or save as PDF",
     "classLabel": "Class",
@@ -12422,6 +12424,12 @@ const en = {
     "shell": {
       "profileLabel": "My teacher profile",
       "analyticsLabel": "Class analytics"
+    },
+    "classStreak": {
+      "kept": "Class streak: {count} days · played today",
+      "keptOne": "Class streak: 1 day · played today",
+      "atRisk": "Class streak: {count} days — play today to keep it",
+      "atRiskOne": "Class streak: 1 day — play today to keep it"
     },
     "pulse": {
       "state": {

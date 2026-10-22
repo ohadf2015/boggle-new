@@ -81,7 +81,7 @@ export function TeacherTrialUpgradeStatus({ suppressed = false }: { suppressed?:
     try {
       const result = await postTeacherProCheckout(
         fetch,
-        startPolarTrial ? { trial: true } : {},
+        startPolarTrial ? { trial: true, placement: 'hq_trial_status' } : { placement: 'hq_trial_status' },
       );
       if (!result.ok) {
         if (result.status === 401) {

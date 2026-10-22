@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAuthorizedCronRequest } from '@/lib/cronAuth';
 import logger from '@/utils/logger';
 import { getSupabaseAdmin } from '@/lib/email';
-import { sendEmail } from '@/lib/email/send';
+import { loadLifecycleAudience, reachFor, sendLifecycleEmail } from '@/lib/email/lifecycleUnsubscribe';
 import { teacherActivationNudge } from '@/lib/email/templates/teacherActivationNudge';
 import { planActivationNudges, type ActivationNudgeRow } from '@/lib/education/activationNudge';
 import { proUserIdsFrom, type SubscriptionRowLike } from '@/lib/education/proGrant';
@@ -13,7 +13,8 @@ import { withCronLock } from '@/backend/redis/locking';
  * POST /api/cron/teacher-activation-nudge
  *
  * Daily: approved teachers with no classroom get a "make your first class" email on
- * day 1, 3 and 7 after approval. Skips test accounts and teachers who already have Pro.
+ * day 1, 3 and 7 after approval. Skips test accounts, unsubscribed teachers, and teachers
+ * who already have Pro.
  *
  * Idempotency: `teacher_access_requests.activation_nudges_sent`, merged across every row
  * of one email address and appended only after a confirmed send.
@@ -70,11 +71,37 @@ export async function POST(request: NextRequest) {
         proUserIds = proUserIdsFrom((subs.data ?? []) as Array<SubscriptionRowLike & { user_id: string }>, Date.now());
       }
 
-      const { due, skipped: excluded } = planActivationNudges(rows, { classroomTeacherIds, testUserIds, proUserIds }, Date.now());
+      const { due: planned, skipped: excluded } = planActivationNudges(rows, { classroomTeacherIds, testUserIds, proUserIds }, Date.now());
+
+      const emailKey = (email: string) => (email ?? '').trim().toLowerCase();
+      const userIdsByEmail = new Map<string, Array<string | null>>();
+      for (const r of rows) {
+        const list = userIdsByEmail.get(emailKey(r.email)) ?? [];
+        list.push(r.user_id);
+        userIdsByEmail.set(emailKey(r.email), list);
+      }
+      const audience = await loadLifecycleAudience(
+        supabase,
+        planned.flatMap((d) => userIdsByEmail.get(emailKey(d.email)) ?? []).filter((id): id is string => Boolean(id)),
+        { mint: !dry },
+      );
+      let unsubscribed = 0;
+      let unreachable = 0;
+      const due: Array<(typeof planned)[number] & { token: string }> = [];
+      for (const d of planned) {
+        const reach = reachFor(audience, userIdsByEmail.get(emailKey(d.email)) ?? []);
+        if ('skip' in reach) {
+          if (reach.skip === 'unsubscribed') unsubscribed++;
+          else unreachable++;
+          continue;
+        }
+        due.push({ ...d, token: reach.token });
+      }
 
       logger.log(
         `[Activation Nudge] ${due.length} teachers due${dry ? ' (dry run)' : ''}; skipped ` +
-          `${excluded.hasClassroom} with a class, ${excluded.hasPro} on Pro, ${excluded.testAccount} test`,
+          `${excluded.hasClassroom} with a class, ${excluded.hasPro} on Pro, ${excluded.testAccount} test, ` +
+          `${unsubscribed} unsubscribed, ${unreachable} with no unsubscribe link`,
       );
 
       if (dry) {
@@ -82,6 +109,8 @@ export async function POST(request: NextRequest) {
           dry: true,
           due: due.length,
           excluded,
+          unsubscribed,
+          unreachable,
           plan: due.map((d) => ({ email: d.email, locale: d.locale, bucket: d.bucket, rows: d.rowIds.length })),
         };
       }
@@ -90,7 +119,14 @@ export async function POST(request: NextRequest) {
       let failed = 0;
       for (const d of due) {
         const tpl = teacherActivationNudge({ full_name: d.full_name, locale: d.locale, bucket: d.bucket });
-        const result = await sendEmail({ to: d.email, subject: tpl.subject, html: tpl.html, replyTo: tpl.replyTo });
+        const result = await sendLifecycleEmail({
+          to: d.email,
+          subject: tpl.subject,
+          html: tpl.html,
+          replyTo: tpl.replyTo,
+          locale: d.locale,
+          token: d.token,
+        });
         if (!result.ok) {
           failed++;
           logger.error(`[Activation Nudge] send failed for ${d.email} (${d.bucket}): ${result.error}`);
@@ -107,7 +143,7 @@ export async function POST(request: NextRequest) {
       }
 
       logger.log(`[Activation Nudge] Completed: ${sent} sent, ${failed} failed of ${due.length} due`);
-      return { due: due.length, sent, failed, excluded };
+      return { due: due.length, sent, failed, excluded, unsubscribed, unreachable };
     });
 
     if (locked.status === 'skipped') {

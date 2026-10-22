@@ -3936,6 +3936,8 @@ const ja = {
     "invalidTitle": "リンクが無効です",
     "invalidBody": "このレポートのリンクは期限切れか、無効になっています。先生に新しいリンクをお願いしてください。",
     "footerNote": "お子様の先生がLexiClashで共有しました。アカウントは不要です。",
+    "joinPrompt": "お子様はクラスコードをお持ちですか?",
+    "joinCta": "クラスに参加",
     "language": "表示言語",
     "printButton": "印刷 / PDFで保存",
     "classLabel": "クラス",
@@ -14046,6 +14048,12 @@ const ja = {
     "shell": {
       "profileLabel": "先生プロフィール",
       "analyticsLabel": "クラス分析"
+    },
+    "classStreak": {
+      "kept": "クラス連続記録:{count}日・今日もプレイ済み",
+      "keptOne": "クラス連続記録:1日・今日もプレイ済み",
+      "atRisk": "クラス連続記録:{count}日。今日プレイして記録をつなごう",
+      "atRiskOne": "クラス連続記録:1日。今日プレイして記録をつなごう"
     },
     "pulse": {
       "state": {

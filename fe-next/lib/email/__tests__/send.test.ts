@@ -27,6 +27,19 @@ describe('sendEmail — Resend call cap', () => {
     expect(res).toEqual({ ok: true, id: 'em1' });
   });
 
+  it('passes custom headers through to Resend', async () => {
+    mockSend.mockResolvedValue({ data: { id: 'em2' }, error: null });
+    const headers = { 'List-Unsubscribe': '<https://x.test/u?token=a>' };
+    await sendEmail({ to: 'a@b.org', subject: 'hi', html: '<p>hi</p>', headers });
+    expect(mockSend.mock.calls[0][0].headers).toEqual(headers);
+  });
+
+  it('omits the headers key when none are given', async () => {
+    mockSend.mockResolvedValue({ data: { id: 'em3' }, error: null });
+    await sendEmail({ to: 'a@b.org', subject: 'hi', html: '<p>hi</p>' });
+    expect(mockSend.mock.calls[0][0]).not.toHaveProperty('headers');
+  });
+
   it('reports a provider error without throwing', async () => {
     mockSend.mockResolvedValue({ data: null, error: { message: 'invalid from address' } });
     const res = await sendEmail({ to: 'a@b.org', subject: 'hi', html: '<p>hi</p>' });

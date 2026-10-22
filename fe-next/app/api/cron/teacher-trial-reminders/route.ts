@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAuthorizedCronRequest } from '@/lib/cronAuth';
 import logger from '@/utils/logger';
 import { getSupabaseAdmin } from '@/lib/email';
-import { sendEmail } from '@/lib/email/send';
+import { loadLifecycleAudience, reachFor, sendLifecycleEmail } from '@/lib/email/lifecycleUnsubscribe';
 import { teacherTrialReminder } from '@/lib/email/templates/teacherTrialReminder';
 import { pickTrialReminder, dedupeDueByEmail } from '@/lib/education/trialReminders';
 import { proUserIdsFrom, type SubscriptionRowLike } from '@/lib/education/proGrant';
@@ -94,15 +94,41 @@ export async function POST(request: NextRequest) {
       // wrong per PERSON: a teacher who submitted the access form twice owns two approved rows
       // and would be reminded once per row. Five addresses in production have duplicates, one
       // with three.
-      const due = dedupeDueByEmail(dueRows);
-      const collapsed = dueRows.length - due.length;
+      const deduped = dedupeDueByEmail(dueRows);
+      const collapsed = dueRows.length - deduped.length;
+
+      const userIdsByEmail = new Map<string, Array<string | null>>();
+      for (const r of rows) {
+        const list = userIdsByEmail.get(emailKey(r.email)) ?? [];
+        list.push(r.user_id);
+        userIdsByEmail.set(emailKey(r.email), list);
+      }
+      const audience = await loadLifecycleAudience(
+        supabase,
+        deduped.flatMap((d) => userIdsByEmail.get(emailKey(d.row.email)) ?? []).filter((id): id is string => Boolean(id)),
+        { mint: !dry },
+      );
+      let unsubscribed = 0;
+      let unreachable = 0;
+      const due: Array<(typeof deduped)[number] & { token: string }> = [];
+      for (const d of deduped) {
+        const reach = reachFor(audience, userIdsByEmail.get(emailKey(d.row.email)) ?? []);
+        if ('skip' in reach) {
+          if (reach.skip === 'unsubscribed') unsubscribed++;
+          else unreachable++;
+          continue;
+        }
+        due.push({ ...d, token: reach.token });
+      }
 
       logger.log(
         `[Trial Cron] ${due.length} teachers due a trial reminder${dry ? ' (dry run)' : ''}` +
           // Never let deduplication be silent — if this number climbs, duplicate access
           // requests are being created again and the fix belongs upstream at the form.
           (collapsed > 0 ? ` (${collapsed} duplicate row(s) collapsed)` : '') +
-          (skippedPro > 0 ? ` (${skippedPro} already on Pro, skipped)` : ''),
+          (skippedPro > 0 ? ` (${skippedPro} already on Pro, skipped)` : '') +
+          (unsubscribed > 0 ? ` (${unsubscribed} unsubscribed, skipped)` : '') +
+          (unreachable > 0 ? ` (${unreachable} with no unsubscribe link, skipped)` : ''),
       );
 
       if (dry) {
@@ -110,6 +136,8 @@ export async function POST(request: NextRequest) {
           dry: true,
           due: due.length,
           skippedPro,
+          unsubscribed,
+          unreachable,
           plan: due.map(({ row, bucket }) => ({
             id: row.id,
             email: row.email,
@@ -122,14 +150,20 @@ export async function POST(request: NextRequest) {
 
       let sent = 0;
       let failed = 0;
-      for (const { row, bucket } of due) {
+      for (const { row, bucket, token } of due) {
         const tpl = teacherTrialReminder({
           full_name: row.full_name,
           locale: row.locale,
           bucket,
           trialExpiresAt: row.trial_expires_at!,
         });
-        const result = await sendEmail({ to: row.email, subject: tpl.subject, html: tpl.html });
+        const result = await sendLifecycleEmail({
+          to: row.email,
+          subject: tpl.subject,
+          html: tpl.html,
+          locale: row.locale === 'he' ? 'he' : 'en',
+          token,
+        });
         if (!result.ok) {
           failed++;
           logger.error(`[Trial Cron] send failed for ${row.id} (${bucket}): ${result.error}`);
@@ -148,7 +182,7 @@ export async function POST(request: NextRequest) {
       }
 
       logger.log(`[Trial Cron] Completed: ${sent} sent, ${failed} failed of ${due.length} due`);
-      return { due: due.length, sent, failed, skippedPro };
+      return { due: due.length, sent, failed, skippedPro, unsubscribed, unreachable };
     });
 
     if (locked.status === 'skipped') {

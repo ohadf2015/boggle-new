@@ -3917,6 +3917,8 @@ const es = {
     "invalidTitle": "Enlace no disponible",
     "invalidBody": "Este enlace del informe ha caducado o ya no es válido. Pide al profesor un enlace nuevo.",
     "footerNote": "Compartido por el profesor de tu hijo/a a través de LexiClash. No necesitas una cuenta.",
+    "joinPrompt": "¿Tu hijo/a tiene un código de clase?",
+    "joinCta": "Unirse a la clase",
     "language": "Ver en",
     "printButton": "Imprimir o guardar como PDF",
     "classLabel": "Clase",
@@ -13994,6 +13996,12 @@ const es = {
     "shell": {
       "profileLabel": "Mi perfil de docente",
       "analyticsLabel": "Analíticas de la clase"
+    },
+    "classStreak": {
+      "kept": "Racha de la clase: {count} días · ya jugaron hoy",
+      "keptOne": "Racha de la clase: 1 día · ya jugaron hoy",
+      "atRisk": "Racha de la clase: {count} días. Jueguen hoy para mantenerla",
+      "atRiskOne": "Racha de la clase: 1 día. Jueguen hoy para mantenerla"
     },
     "pulse": {
       "state": {

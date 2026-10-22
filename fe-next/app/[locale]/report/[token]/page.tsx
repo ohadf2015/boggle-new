@@ -8,6 +8,8 @@ import { isRTL, type Locale } from '@/i18n/config';
 import type { ReportT } from '@/components/parentReport/ReportInsights';
 import { ReportView } from '@/components/parentReport/ReportView';
 import logger from '@/utils/logger';
+import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
+import { buildParentReportViewedEvent } from '@/backend/utils/educationRoundTelemetry';
 
 /**
  * Public "parent report" page — no account needed, the signed token in the
@@ -71,6 +73,8 @@ export default async function ParentReportPage({
     logger.error('[parent-report-page] failed to load report data', result.message);
   }
   if (result.status !== 'ok') return <InvalidReportView locale={locale} t={t} />;
+
+  captureEduServerEvents([buildParentReportViewedEvent({ token, classroomId: payload.classroomId, locale })]);
 
   return <ReportView locale={locale} token={token} data={result.data} t={t} />;
 }
