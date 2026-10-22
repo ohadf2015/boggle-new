@@ -61,6 +61,16 @@ describe('EsScrabbleCrossLink', () => {
     expect(link.textContent).toMatch(/scrabble online español multijugador/i);
   });
 
+  it('queryAnchor adds the exact sin-registrarse query as its own anchor', () => {
+    const { container } = render(
+      <EsScrabbleCrossLink locale="es" anchorVariant="words" queryAnchor />,
+    );
+    const links = container.querySelectorAll('a');
+    expect(links.length).toBe(2);
+    expect(links[1].getAttribute('href')).toBe('/es/juego-de-palabras-multijugador');
+    expect(links[1].textContent).toBe('scrabble español online gratis sin registrarse');
+  });
+
   it('all five variants produce five distinct anchor texts', () => {
     const variants = ['words', 'anagram', 'daily', 'leaderboard', 'blog'] as const;
     const texts = variants.map(v =>

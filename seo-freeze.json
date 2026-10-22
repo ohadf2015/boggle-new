@@ -3,8 +3,8 @@
   "frozen": [
     {
       "path": "/es/juego-de-palabras-multijugador",
-      "until": "2026-09-17",
-      "why": "Growth Radar row 50: 62,054 impressions at 0.51% CTR, position 5.52 — the biggest single traffic lever in the portfolio. Frozen 2026-08-20 for one 28-day scoring window so we get one attributable CTR number. Verified 2026-08-22: the page has genuinely held still since the freeze, so the window is live — leave it alone."
+      "until": "2026-11-19",
+      "why": "Title tag is 'Juega Scrabble Online Gratis en Español | LexiClash' as of #1406 (merged 2026-10-22). Do not rewrite <title> or meta description before 2026-11-19. GR #11111 (sin registrarse, pos 4.29) is an H1/body/internal-anchor push only — a same-day title rewrite would make #1406 unmeasurable and risk the 10.6k-imp head query."
     },
     {
       "path": "/sv/swedish-multiplayer-word-game",

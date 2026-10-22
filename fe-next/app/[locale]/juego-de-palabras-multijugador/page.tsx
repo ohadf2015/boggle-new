@@ -103,7 +103,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
         mode="juego-de-palabras-multijugador"
         locale="es"
         name="LexiClash - Alternativa a Scrabble Online en Español Multijugador"
-        description="Alternativa al estilo Scrabble online en español multijugador gratis. Crea sala, comparte enlace, compite en tiempo real con amigos. Diccionario medido, sin registro, sin descargas."
+        description="Scrabble español online gratis sin registrarse. Crea sala, comparte enlace, compite en tiempo real con amigos. Sin email, sin cuenta, sin descargas."
         playMode="MultiPlayer"
         numberOfPlayers={{ minValue: 2, maxValue: 50 }}
       />
@@ -124,7 +124,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
               {
                 '@type': 'HowTo',
                 name: 'Cómo jugar Scrabble online en español gratis con amigos',
-                description: 'Juega Scrabble online en español gratis con amigos en tiempo real en 3 pasos — sin descargas, sin registro, en cualquier navegador.',
+                description: 'Juega scrabble español online gratis sin registrarse en 3 pasos — sin descargas, sin email, en cualquier navegador.',
                 totalTime: 'PT1M',
                 step: [
                   { '@type': 'HowToStep', name: 'Abrir LexiClash', text: 'Entra a lexiclash.live desde cualquier navegador en móvil, tablet o computadora. No requiere descarga.' },
@@ -153,6 +153,17 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <TopBackLink className="mb-4" />
         <HeroAnimated locale={locale} />
+        <section className="mb-14 max-w-3xl" data-seo="sin-registrarse">
+          <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+            Scrabble español online gratis sin registrarse
+          </h2>
+          <p className="font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+            Locura de Letras, Minijuegos y sopa-de-letras te ponen contra la máquina dentro de un iframe.
+            Aquí no: pulsas Crear sala, pegas el enlace en WhatsApp y tus amigos juegan la misma cuadrícula,
+            sin registrarse. No hay campo de email ni contraseña. Si no tienes un nombre guardado, un apodo
+            basta — eso no crea una cuenta.
+          </p>
+        </section>
         <MultijugadorIntent locale={locale} />
         <FeatureGrid />
         <StepsSection />
@@ -190,7 +201,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
               traen rompecabezas nuevos cada día con recompensas exclusivas.
             </p>
             <p>
-              Para jugar scrabble en línea gratis sin registrarte, abre LexiClash en tu navegador, crea una sala y comparte el enlace. Funciona como juego de palabras gratis online en español sin instalación. Compite en{' '}
+              Para jugar scrabble español online gratis sin registrarse, abre LexiClash en tu navegador, pulsa Crear sala y comparte el enlace. No pide email ni cuenta. Funciona como juego de palabras gratis online en español sin instalación. Compite en{' '}
               <Link href={`/${locale}/multiplayer`} className="text-neo-cyan underline">
                 modo multijugador en tiempo real
               </Link>{' '}
