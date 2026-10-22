@@ -281,6 +281,18 @@ const nextConfig = {
         destination: '/:locale/free-multiplayer-word-game',
         permanent: true,
       },
+      // Lessons live under /student/lessons; /education/lessons never had a route
+      // but still gets direct visits (Growth Radar rec 11669) → 404 without this.
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/education/lessons',
+        destination: '/:locale/student/lessons',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/education/lessons/:path+',
+        destination: '/:locale/student/lessons/:path+',
+        permanent: true,
+      },
       // Word Tower v2 old paths → canonical paths: redirect legacy /word-tower-v2 URLs
       // to the canonical /word-tower (clean, no version suffix). Permanent redirects
       // tell browsers and crawlers this is the new canonical URL for indexing.
