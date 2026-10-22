@@ -1,27 +1,28 @@
 {
-  "date": "2026-10-18",
-  "note": "IMPACT CHECK on 10-12's DailyLoadingFallback priority=false fix: p75 LCP /en/daily/word-wheel = 2704ms (n=4, sub-floor but directionally conclusive -- 64% down from 7428 baseline) -> verdict 'improved', logged to impact-ledger.ndjson. Found the SAME bug pattern unfixed in 3 more route-level loading.tsx boundaries: multiplayer, profile, leaderboard all rendered bare <PageLoader /> which defaults priority=true on its mascot Image -- identical to the daily-routes bug, competing with each route's real SSR'd LCP content (multiplayer's EntryScreen CTA per memory). Shipped priority={false} on all 3 (mechanical, 1-line each, matches the already-proven fix + the generic [locale]/loading.tsx precedent). Backend: supabase MCP still connecting at lane start and brief's backend items were low-score/stale -- no DB code change this round (not worth the risk of a migration/EXPLAIN without live MCP in the time budget).",
+  "date": "2026-10-22",
+  "note": "Brief top backend items (unindexed vocabulary_lessons FK, auth_db_connections) are repeats of already-closed/deferred items -- re-verified: table is 57 rows, index would add write cost for zero query benefit, skipped. pg_stat_statements top-by-total_exec_time is the Realtime WAL JSON parser (4.75M calls) -- already governed by the existing pg_cron auto-remediation guardrail (jobid 22-24); v_suspicious_realtime_publications shows only word_tower_pending_wrecks at verdict=ok. No new backend code change. Frontend: brief flagged /en/daily/word-wheel LCP 4432ms again (10-18's priority=false fix only touched the loading-fallback image, not the chunk). Found WordWheelGame.tsx (940 lines) + WordWheelResults.tsx (388 lines) -- both only needed after the 'ready' phase -- were statically imported into WordWheelChallenge.tsx, inflating the JS needed before the ready-card's first paint. Split both into next/dynamic(ssr:false) alongside the file's existing TabbedDailyLeaderboard/WordWheelEffectsCanvas lazy-load pattern.",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
     "closed": {
-      "vocabulary_lessons_classroom_id_fkey_unindexed": "re-verified 10-16 (3rd time): idx_vocabulary_lessons_classroom_id ALREADY EXISTS (pg_indexes confirmed). Advisor lint is stale/cached. No action needed."
+      "vocabulary_lessons_classroom_id_fkey_unindexed": "re-verified 10-22: table is 57 rows (classrooms 55). Index has write cost, zero query benefit at this size -- not worth it. No action."
     },
     "deferred": {
-      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (re-flagged 10-01, 10-06, 10-10, 10-12, 10-16, no change)",
-      "realtime_wal_json_parser_cpu": "systemic, tracked by existing 50-supabase-perf.md pg_cron guardrails -- founder-scope publication-membership call, not this lane's fix"
+      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (re-flagged 10-01 through 10-22, no change)",
+      "realtime_wal_json_parser_cpu": "top pg_stat_statements entry again tonight (4.75M calls, 26.3M ms total) -- already governed by 50-supabase-perf.md pg_cron auto-remediation (jobid 22-24); v_suspicious_realtime_publications shows only word_tower_pending_wrecks @ verdict=ok"
     }
   },
   "frontend": {
     "by_route": [],
     "shipped": [
       { "route": "/multiplayer", "fix": "lazy-load 4 classroom-only components via next/dynamic ssr:false", "baseline_lcp_ms": 11220, "route_variant": "/he/multiplayer" },
-      { "route": "/daily/word-wheel", "fix": "DailyLoadingFallback PageLoader priority=false (confirmed still present 10-16; IMPACT CHECK 10-18: improved, 2704ms n=4)", "baseline_lcp_ms": 7428 },
-      { "route": "/multiplayer", "fix": "multiplayer/loading.tsx PageLoader priority=false (10-18, closes same bug as daily fix)" },
+      { "route": "/daily/word-wheel", "fix": "DailyLoadingFallback PageLoader priority=false (10-12/10-18)", "baseline_lcp_ms": 7428 },
+      { "route": "/multiplayer", "fix": "multiplayer/loading.tsx PageLoader priority=false (10-18)" },
       { "route": "/profile", "fix": "profile/loading.tsx PageLoader priority=false (10-18)" },
-      { "route": "/leaderboard", "fix": "leaderboard/loading.tsx PageLoader priority=false (10-18)" }
+      { "route": "/leaderboard", "fix": "leaderboard/loading.tsx PageLoader priority=false (10-18)" },
+      { "route": "/daily/word-wheel", "fix": "WordWheelGame (940L) + WordWheelResults (388L) split from WordWheelChallenge.tsx into next/dynamic(ssr:false) -- both only mount after 'ready' phase, were bundled into the ready-card's first-paint chunk", "baseline_lcp_ms": 4432 }
     ],
-    "note": "Own-domain n>=50 sweep not re-run tonight (brief's frontend slice was the IMPACT CHECK, already handled). No new regression route identified. Still watching: brief-generator should $host-filter its PostHog query (imposketch.io cross-tenant noise, carried from prior nights).",
+    "note": "Brief's top-5 LCP entries were imposketch.io routes (cross-tenant PostHog noise, standing watch). Skipped those; acted on the one real lexiclash route in the brief.",
     "real_fix_needed": "brief-generator phase 0 must add properties.$host filter to its PostHog web-vitals query -- confirmed across multiple prior nights that unfiltered queries surface other tenants' routes as if they were lexiclash regressions"
   },
   "bundle": {

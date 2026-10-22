@@ -1,0 +1,4 @@
+status: research-only
+attempted: flag hygiene sweep + wire 1 unwired exp + instrument rage-click/MP funnel gap events
+files_touched: none (docs/nightly/reports/2026-10-22.md append only)
+next_steps: tonight's brief items (es/en/he multiplayer rage clicks, mp_round low sentiment) are already fully covered by prior-night experiments (exp-mp-quickplay-wait-v1, exp-mp-quickplay-eager-disable-v1, 5+ mp_round experiments) and instrumentation (mp_quickplay_rapid_click). exp-mp-quickplay-eager-disable-v1 stays volume-starved (0 events/14d on its guardrail) — not retireable, human call on whether to ship it to 100% on priors. exp-practice-wheel-cta-v1 still has 0 call sites — wire or drop. Future lane-03 runs: before building a new experiment against a PostHog signal, grep lib/experiments.ts descriptions first — this repo already has deep coverage on mp quickplay + mp_round sentiment, re-chasing the same signal wastes a lane.
