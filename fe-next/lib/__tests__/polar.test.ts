@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createHmac } from 'crypto'
-import { PolarClient, getPolarEnvironment, getProProductId } from '../polar'
+import { PolarClient, getPolarEnvironment, getProProductId, probeCheckoutUrl } from '../polar'
 
 const SECRET = 'polar-test-secret'
 
@@ -234,6 +234,27 @@ describe('PolarClient.createCheckout — rejected customer_email', () => {
       new PolarClient('tok', 'sandbox').createCheckout({ userId: 'u', productId: 'p', email: 'a@b.co' }),
     ).rejects.toThrow('Polar API error: 422')
     expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('probeCheckoutUrl', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('reports ok:true for a healthy checkout page', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200 }))
+    expect(await probeCheckoutUrl('https://polar.sh/checkout/abc')).toEqual({ ok: true, status: 200 })
+  })
+
+  it('reports the real status for a broken checkout page', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 503 }))
+    expect(await probeCheckoutUrl('https://polar.sh/checkout/abc')).toEqual({ ok: false, status: 503 })
+  })
+
+  it('returns null (never throws) when the probe request itself fails', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network down')))
+    await expect(probeCheckoutUrl('https://polar.sh/checkout/abc')).resolves.toBeNull()
   })
 })
 

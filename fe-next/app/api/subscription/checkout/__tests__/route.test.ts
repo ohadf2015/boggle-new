@@ -2,9 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
 const createCheckout = vi.fn()
+const probeCheckoutUrl = vi.fn(async () => ({ ok: true, status: 200 }))
 vi.mock('@/lib/polar', () => ({
   getPolarClient: () => ({ createCheckout }),
   getProProductId: () => process.env.POLAR_PRO_PRODUCT_ID,
+  probeCheckoutUrl: (...args: unknown[]) => probeCheckoutUrl(...args),
 }))
 
 const { maybeSingle, limitEvents } = vi.hoisted(() => ({
