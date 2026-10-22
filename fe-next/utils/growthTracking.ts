@@ -268,6 +268,10 @@ export type GrowthEvent =
   | 'trial_cta_tap'
   | 'edu_pro_upgrade_clicked'
   | 'edu_pro_checkout_success_seen'
+  // Unconditional return-from-Polar signal (t: webhook-broken vs abandoned).
+  // Fires on ?checkout=success regardless of entitlement, unlike
+  // edu_pro_checkout_success_seen which waits for hasPro.
+  | 'edu_pro_checkout_return_landed'
   // School pricing unify (2026-10-06): explicit GTM event names for Teacher Pro
   // CTAs + school quote. education_upsell_impression stays the impression twin.
   | 'teacher_pro_upgrade_click'
