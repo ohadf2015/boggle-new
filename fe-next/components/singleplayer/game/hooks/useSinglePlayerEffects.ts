@@ -8,6 +8,7 @@ import { updateActiveGameExtras } from '@/utils/abandonOnPagehide';
 import { useAuth } from '@/contexts/AuthContext';
 import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 import { ensureGuestDisplayName } from '@/utils/guestManager';
+import { afterLoadIdle } from '@/lib/perf/afterLoadIdle';
 
 interface UseSinglePlayerEffectsOptions {
   grid: LetterGrid | null;
@@ -102,17 +103,23 @@ export function useSinglePlayerEffects({
     // SinglePlayerGame, so emitting there would have missed it.
     const landing_path =
       typeof window !== 'undefined' ? `${window.location.pathname}${window.location.search}` : undefined;
-    trackGameStart('singleplayer', {
-      subMode: mode,
-      sp_mode: mode,
-      boardSize: grid?.length ?? 0,
-      ...(difficulty ? { difficulty } : {}),
-      language,
-      words_found: 0,
-      landing_path,
+    // Defer the network event past the load window: a mount-time POST here
+    // lands inside the Lighthouse trace and competes with the LCP image on
+    // throttled first loads. The event itself is unchanged.
+    const cancelDefer = afterLoadIdle(() => {
+      trackGameStart('singleplayer', {
+        subMode: mode,
+        sp_mode: mode,
+        boardSize: grid?.length ?? 0,
+        ...(difficulty ? { difficulty } : {}),
+        language,
+        words_found: 0,
+        landing_path,
+      });
     });
     // Mount-only — one event per game instance; remount = new game.
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    return cancelDefer;
   }, []);
 
   // Keep pagehide abandon payload current (words found mid-round).
@@ -163,10 +170,21 @@ export function useSinglePlayerEffects({
         /* ignore */
       }
     };
-    sendHeartbeat();
-    const interval = setInterval(sendHeartbeat, 30000);
+    // Defer the FIRST beat past the load window: the admin live view tolerates
+    // a couple of seconds, while a mount-time POST competes with the LCP image
+    // inside the Lighthouse trace. The 30s interval starts after the first
+    // beat; the DELETE on cleanup only fires once a beat was actually sent.
+    let interval: ReturnType<typeof setInterval> | undefined;
+    let beatSent = false;
+    const cancelDefer = afterLoadIdle(() => {
+      beatSent = true;
+      void sendHeartbeat();
+      interval = setInterval(sendHeartbeat, 30000);
+    });
     return () => {
-      clearInterval(interval);
+      cancelDefer();
+      if (interval !== undefined) clearInterval(interval);
+      if (!beatSent) return;
       fetch('/api/single-player/heartbeat', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },

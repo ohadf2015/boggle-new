@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { classifySlowFromRtt, probeReachability } from '@/lib/offline/networkProbe';
+import { afterLoadIdle } from '@/lib/perf/afterLoadIdle';
 
 export type NetworkType = 'wifi' | 'cellular' | 'none' | 'unknown';
 
@@ -89,7 +90,11 @@ export function useNetworkState(): NetworkState {
         if (typeof navigator !== 'undefined' && !navigator.onLine) return;
         void probeReachability().then(applyProbe);
       };
-      runProbe();
+      // Defer the mount-time probe past the load window: /api/ping fired during
+      // initial load competes with the LCP image and lands in the Lighthouse
+      // trace. Event-driven probes (online/focus) stay immediate — they are
+      // user-action-driven and never fire inside the first-load window.
+      const cancelInitialProbe = afterLoadIdle(runProbe);
       window.addEventListener('online', runProbe);
       window.addEventListener('focus', runProbe);
 
@@ -123,6 +128,7 @@ export function useNetworkState(): NetworkState {
 
       return () => {
         cancelled = true;
+        cancelInitialProbe();
         if (typeof window !== 'undefined') {
           window.removeEventListener('online', refresh);
           window.removeEventListener('offline', refresh);

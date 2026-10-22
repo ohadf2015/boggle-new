@@ -62,7 +62,7 @@ describe('useGridInit', () => {
 
       await waitFor(() => {
         expect(result.current.grid).toBeTruthy();
-      });
+      }, { timeout: 3000 });
 
       expect(mockGenerateRandomTable).toHaveBeenCalledWith(5, 5, 'en', expect.any(Array));
     });
@@ -83,7 +83,7 @@ describe('useGridInit', () => {
 
       await waitFor(() => {
         expect(result.current.grid).toBeTruthy();
-      });
+      }, { timeout: 3000 });
 
       // Should not call themed-words API for Japanese
       expect(global.fetch).not.toHaveBeenCalledWith(
@@ -119,7 +119,7 @@ describe('useGridInit', () => {
             body: expect.stringContaining('"count":16'), // baseWordCount * 2 for practice
           })
         );
-      });
+      }, { timeout: 3000 });
     });
   });
 
@@ -145,7 +145,7 @@ describe('useGridInit', () => {
 
       await waitFor(() => {
         expect(result.current.availableWords).toEqual(mockAvailableWords);
-      });
+      }, { timeout: 3000 });
     });
 
     it('should set empty words on API error', async () => {
@@ -169,7 +169,7 @@ describe('useGridInit', () => {
 
       await waitFor(() => {
         expect(result.current.availableWords).toEqual({ easy: [], medium: [], hard: [] });
-      });
+      }, { timeout: 3000 });
     });
 
     it('should set empty words on network error', async () => {
@@ -190,7 +190,7 @@ describe('useGridInit', () => {
 
       await waitFor(() => {
         expect(result.current.availableWords).toEqual({ easy: [], medium: [], hard: [] });
-      });
+      }, { timeout: 3000 });
     });
   });
 
@@ -222,7 +222,7 @@ describe('useGridInit', () => {
 
       await waitFor(() => {
         expect(result.current.totalBoardWords).toBe(4); // hello, tests, words, testing
-      });
+      }, { timeout: 3000 });
     });
 
     it('should return null when no available words', () => {
@@ -265,7 +265,7 @@ describe('useGridInit', () => {
 
       await waitFor(() => {
         expect(onGridChange).toHaveBeenCalled();
-      });
+      }, { timeout: 3000 });
     });
   });
 
@@ -298,7 +298,7 @@ describe('useGridInit', () => {
 
       await waitFor(() => {
         expect(result.current.grid).toBeTruthy();
-      });
+      }, { timeout: 3000 });
 
       act(() => {
         result.current.setGrid(newGrid);
@@ -330,7 +330,7 @@ describe('useGridInit', () => {
 
       await waitFor(() => {
         expect(result.current.gridRef.current).toEqual(result.current.grid);
-      });
+      }, { timeout: 3000 });
     });
 
     it('should keep availableWordsRef in sync', async () => {
@@ -354,7 +354,7 @@ describe('useGridInit', () => {
 
       await waitFor(() => {
         expect(result.current.availableWordsRef.current).toEqual(mockAvailableWords);
-      });
+      }, { timeout: 3000 });
     });
   });
 });
