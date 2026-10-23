@@ -8,11 +8,10 @@ export function isEduAppSurface(pathname: string | null | undefined): boolean {
   return [segments, segments.slice(1)].some(([head]) => !!head && WHOLE_SECTIONS.has(head));
 }
 
-/** The plan pages carry their own legal links; the fixed site footer pinned over their cards. */
-export function isPlanPage(pathname: string | null | undefined): boolean {
-  if (!pathname) return false;
-  const segments = pathname.split('?')[0].split('#')[0].split('/').filter(Boolean);
-  return [segments, segments.slice(1)].some(
-    (tail) => (tail[0] === 'pricing' && tail.length === 1) || (tail[0] === 'teacher' && tail[1] === 'upgrade' && tail.length === 2),
-  );
+/** The consumer site footer links to blog, FAQ and contact pages; on an edu surface those are exits out of the product. */
+export function hidesSiteFooter(pathname: string | null | undefined): boolean {
+  return isEduAppSurface(pathname);
 }
+
+// SiteFooter still imports the old name.
+export const isPlanPage = hidesSiteFooter;

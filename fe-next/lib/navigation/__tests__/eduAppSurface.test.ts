@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isEduAppSurface, isPlanPage } from '@/lib/navigation/eduAppSurface';
+import { hidesSiteFooter, isEduAppSurface, isPlanPage } from '@/lib/navigation/eduAppSurface';
 
 describe('isEduAppSurface — where player chrome (bottom nav, floating widgets) stays off', () => {
   it.each([
@@ -46,12 +46,8 @@ describe('isEduAppSurface — where player chrome (bottom nav, floating widgets)
   });
 });
 
-describe('isPlanPage — pages whose own legal links replace the fixed site footer', () => {
-  it.each(['/en/teacher/upgrade', '/en/pricing', '/he/pricing?plan=school'])('drops the site footer on %s', (path) => {
-    expect(isPlanPage(path)).toBe(true);
-  });
-
-  it.each(['/en/student', '/en/teacher', '/en/teacher/reports', '/en/education', '/en/join', '/en'])('keeps the site footer on %s', (path) => {
-    expect(isPlanPage(path)).toBe(false);
+describe('isPlanPage', () => {
+  it('is the site-footer gate under its old name', () => {
+    expect(isPlanPage).toBe(hidesSiteFooter);
   });
 });
