@@ -32,7 +32,8 @@ describe('RoundReports', () => {
     expect(screen.getAllByTestId('card').map((c) => c.textContent)).toEqual(['FIX001']);
     expect(screen.getAllByTestId('round-report-collapsed')).toHaveLength(1);
     expect(screen.getByRole('heading').textContent).toBe('teacher.lastGame.previousGames');
-    expect(screen.getByTestId('round-report-collapsed').textContent).toContain('teacher.pulse.participation');
+    expect(screen.getByTestId('round-report-collapsed').textContent).toContain('teacher.windowProgress.activeLine');
+    expect(screen.getByTestId('round-report-collapsed').textContent).not.toContain('teacher.pulse.participation');
   });
 
   it('tapping an older round opens it instead', () => {
@@ -63,9 +64,16 @@ describe('RoundReports', () => {
     expect(screen.getByTestId('card')).toHaveAttribute('data-pro', 'false');
   });
 
-  it('says how to get a report when no round has been played', () => {
+  it('renders nothing when no round has been played, leaving the class pulse as the one empty state', () => {
+    const { container } = render(<RoundReports classroomId="c1" classroomName="7B" />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('titles an older round of an unknown mode as a class game, never the raw id', () => {
+    games = { games: [ROUND_FIXTURE, { ...ROUND_FIXTURE, gameCode: 'FIX002', gameMode: 'mystery-mode' }], isLoading: false, error: null };
     render(<RoundReports classroomId="c1" classroomName="7B" />);
-    expect(screen.getByText('teacher.lastGame.emptyTitle')).toBeInTheDocument();
+    expect(screen.getByTestId('round-report-collapsed').textContent).toContain('teacher.classReport.notes.title');
+    expect(screen.getByTestId('round-report-collapsed').textContent).not.toContain('mystery-mode');
   });
 
   it('says the read failed rather than showing an empty state', () => {

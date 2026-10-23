@@ -1,19 +1,32 @@
 'use client';
 
-import { Users } from 'lucide-react';
+import { useId, useMemo, useState } from 'react';
+import { Printer, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { RecentClassroomGame } from '@/lib/supabase/analyticsLastGame';
+import { buildClassReportGrid } from '@/lib/education/classReport';
 import { MissedPracticeAction } from '@/components/teacher/reports/MissedPracticeAction';
+import { WordStudentGrid } from '@/components/teacher/report/WordStudentGrid';
 import { cn } from '@/lib/utils';
-import { buildRoundReport, participationParams, roundModeLabelKey, type RoundCellState } from './roundReport';
-
-
-const CELL: Record<Exclude<RoundCellState, 'absent'>, string> = {
-  found: 'bg-neo-lime',
-  missed: 'bg-neo-pink',
-};
+import { activeLineParams, buildRoundReport, roundTitleKey } from './roundReport';
+import { RoundStudentsTab } from './RoundStudentsTab';
+import { RoundWordsTab } from './RoundWordsTab';
 
 const MISSED_SHOWN = 5;
+
+type RoundTab = 'students' | 'words' | 'grid';
+const TAB_KEYS: Record<RoundTab, string> = {
+  students: 'teacher.dashboard.students',
+  words: 'teacher.lastGame.lessonWords',
+  grid: 'teacher.classReport.title',
+};
+
+// Hides everything but the open round card on paper; visibility, not display, so the card's ancestors still lay it out.
+const PRINT_CSS = `@media print {
+  body * { visibility: hidden; }
+  [data-round-print], [data-round-print] * { visibility: visible; }
+  [data-round-print] { position: absolute; inset-inline-start: 0; top: 0; width: 100%; }
+}`;
 
 export interface RoundReportCardProps {
   game: RecentClassroomGame;
@@ -25,24 +38,38 @@ export interface RoundReportCardProps {
 
 export function RoundReportCard({ game, hasPro, classroomId, classroomName, onStudentClick }: RoundReportCardProps) {
   const { t, language } = useLanguage();
+  const uid = useId();
+  const [tab, setTab] = useState<RoundTab>('students');
   const report = buildRoundReport(game);
-  const modeKey = roundModeLabelKey(game.gameMode);
+  const grid = useMemo(() => buildClassReportGrid({ ...game, absentStudents: [] }), [game]);
   const when = new Date(game.playedAt).toLocaleString(language, { weekday: 'short', hour: 'numeric', minute: '2-digit' });
   const missed = game.missedWords.filter((w) => w.missedBy > 0).slice(0, MISSED_SHOWN);
+  const namesById = new Map(report.rows.map((r) => [r.studentId, r.name]));
 
   return (
-    <article data-testid="round-report" className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 shadow-hard-sm sm:p-4">
-      <header className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+    <article data-testid="round-report" data-round-print="" className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 shadow-hard-sm sm:p-4">
+      <style>{PRINT_CSS}</style>
+      <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <h3 className="font-neo-display text-lg font-black text-neo-white">
-          {modeKey ? t(modeKey) : game.gameMode}
+          {t(roundTitleKey(game.gameMode))}
           <span className="ms-2 text-sm font-bold text-neo-white/60">{when}</span>
         </h3>
-        <p data-testid="round-report-played" className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-cyan">
-          <Users className="size-4" aria-hidden />
-          {t('teacher.pulse.participation', participationParams(game.participation))}
-        </p>
+        <div className="flex items-center gap-3">
+          <p data-testid="round-report-played" className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-cyan">
+            <Users className="size-4" aria-hidden />
+            {t('teacher.windowProgress.activeLine', activeLineParams(game.participation))}
+          </p>
+          <button
+            type="button"
+            data-testid="round-report-print"
+            onClick={() => window.print()}
+            className="inline-flex min-h-9 items-center gap-1.5 rounded-neo border-2 border-neo-cream/40 px-2.5 text-xs font-black text-neo-white hover:border-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan print:hidden"
+          >
+            <Printer className="size-4" aria-hidden />
+            {t('teacher.classReport.print')}
+          </button>
+        </div>
       </header>
-
       <div className="mt-3 grid grid-cols-2 gap-2">
         <div className="rounded-neo border-2 border-neo-black bg-neo-navy px-3 py-2">
           <p className="font-neo-display text-2xl font-black tabular-nums text-neo-lime">{game.averageAccuracyPct}%</p>
@@ -69,55 +96,38 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
         )}
       </section>
 
-      <section className="mt-3">
-        <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
-          <h4 className="font-neo-display text-sm font-black uppercase tracking-wide text-neo-white">{t('teacher.dashboard.students')}</h4>
-          <span className="flex items-center gap-3 text-xs font-bold text-neo-white/70">
-            <span className="inline-flex items-center gap-1"><span className="size-3 rounded-sm border border-neo-black bg-neo-lime" aria-hidden />{t('teacher.lastGame.found')}</span>
-            <span className="inline-flex items-center gap-1"><span className="size-3 rounded-sm border border-neo-black bg-neo-pink" aria-hidden />{t('teacher.lastGame.missed')}</span>
-          </span>
+      <section className="mt-4">
+        <div role="tablist" className="mb-2 flex gap-1 overflow-x-auto border-b-2 border-neo-cream/20 print:hidden">
+          {(Object.keys(TAB_KEYS) as RoundTab[]).map((key) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              id={`${uid}-tab-${key}`}
+              aria-selected={tab === key}
+              aria-controls={`${uid}-panel`}
+              onClick={() => setTab(key)}
+              className={cn(
+                '-mb-0.5 min-h-10 shrink-0 border-b-2 px-3 font-neo-display text-sm font-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
+                tab === key ? 'border-neo-lime text-neo-lime' : 'border-transparent text-neo-white/70 hover:text-neo-white',
+              )}
+            >
+              {t(TAB_KEYS[key])}
+            </button>
+          ))}
         </div>
-        <ul className="flex flex-col gap-1">
-          {report.rows.map((row) => {
-            const body = (
-              <>
-                <span className="w-24 shrink-0 truncate text-start text-sm font-bold text-neo-white"><bdi>{row.name}</bdi></span>
-                {row.absent ? (
-                  <span className="min-w-0 flex-1 text-start text-xs font-bold italic text-neo-white/60">{t('teacher.classReport.state.absent')}</span>
-                ) : (
-                  <span className="flex min-w-0 flex-1 gap-0.5" aria-hidden>
-                    {row.cells.map((cell) => (
-                      <span
-                        key={cell.word}
-                        data-testid="round-report-cell"
-                        title={`${cell.word}: ${t(`teacher.lastGame.${cell.state}`)}`}
-                        className={cn('h-4 min-w-2 flex-1 rounded-sm border border-neo-black', CELL[cell.state as 'found' | 'missed'])}
-                      />
-                    ))}
-                  </span>
-                )}
-                <span className="w-12 shrink-0 text-end text-xs font-black tabular-nums text-neo-white/80">
-                  {row.absent ? '—' : row.score}
-                </span>
-              </>
-            );
-            return (
-              <li key={row.studentId} data-testid="round-report-strip">
-                {onStudentClick && !row.absent ? (
-                  <button
-                    type="button"
-                    onClick={() => onStudentClick(row.studentId, row.name)}
-                    className="flex min-h-9 w-full min-w-0 items-center gap-2 rounded-sm px-1 hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
-                  >
-                    {body}
-                  </button>
-                ) : (
-                  <div className="flex min-h-9 min-w-0 items-center gap-2 px-1">{body}</div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+        <div role="tabpanel" id={`${uid}-panel`} aria-labelledby={`${uid}-tab-${tab}`}>
+          {tab === 'students' && <RoundStudentsTab report={report} sortId={`${uid}-sort`} onStudentClick={onStudentClick} />}
+          {tab === 'words' && <RoundWordsTab words={game.missedWords} />}
+          {tab === 'grid' && (
+            <div className="rounded-neo bg-neo-cream p-2">
+              <WordStudentGrid
+                grid={grid}
+                onSelectStudent={(id) => onStudentClick?.(id, namesById.get(id) ?? '')}
+              />
+            </div>
+          )}
+        </div>
       </section>
 
       <div className="mt-3">

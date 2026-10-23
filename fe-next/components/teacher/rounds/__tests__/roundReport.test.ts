@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildRoundReport, participationParams, roundModeLabelKey } from '../roundReport';
+import { activeLineParams, buildRoundReport, roundTitleKey, sortRoundRows } from '../roundReport';
 import { ROUND_FIXTURE } from '../roundFixture';
 
 describe('buildRoundReport', () => {
@@ -10,11 +10,14 @@ describe('buildRoundReport', () => {
     expect(maya.cells.map((c) => c.state)).toEqual(['missed', 'found', 'found', 'found']);
   });
 
-  it('lists absent roster students with empty strips after the players', () => {
+  it('keeps students who sat the round out apart from the players, so they collapse to one line', () => {
     const report = buildRoundReport(ROUND_FIXTURE);
-    const last = report.rows[report.rows.length - 1];
-    expect(last).toMatchObject({ name: 'Leo', absent: true });
-    expect(last.cells.every((c) => c.state === 'absent')).toBe(true);
+    expect(report.rows.map((r) => r.name)).toEqual(['Maya', 'Omar', 'Sofia']);
+    expect(report.absent).toEqual([{ studentId: 's4', name: 'Leo' }]);
+  });
+
+  it('carries each player\'s lesson-word accuracy for the row', () => {
+    expect(buildRoundReport(ROUND_FIXTURE).rows.map((r) => r.accuracyPct)).toEqual([75, 50, 25]);
   });
 
   it('practices the words at least one player missed, hardest first', () => {
@@ -23,27 +26,48 @@ describe('buildRoundReport', () => {
 
   it('handles a round with no lesson words', () => {
     const report = buildRoundReport({ ...ROUND_FIXTURE, missedWords: [], players: [], absentStudents: [] });
-    expect(report).toMatchObject({ words: [], rows: [], practiceWords: [] });
+    expect(report).toMatchObject({ words: [], rows: [], absent: [], practiceWords: [] });
   });
 });
 
-describe('participationParams', () => {
-  it('counts the rostered students who sat the round out', () => {
-    expect(participationParams({ played: 3, roster: 4 })).toEqual({ played: 3, total: 4, absent: 1 });
+describe('activeLineParams', () => {
+  it('counts who played against the roster, with no "missed it" count that reads as missed words', () => {
+    expect(activeLineParams({ played: 1, roster: 11 })).toEqual({ active: 1, roster: 11 });
   });
 
-  it('never reports a negative absence when more played than the roster lists', () => {
-    expect(participationParams({ played: 5, roster: 4 })).toEqual({ played: 5, total: 5, absent: 0 });
+  it('never shows more players than the roster', () => {
+    expect(activeLineParams({ played: 5, roster: 4 })).toEqual({ active: 5, roster: 5 });
   });
 });
 
-describe('roundModeLabelKey', () => {
+describe('sortRoundRows', () => {
+  const rows = buildRoundReport(ROUND_FIXTURE).rows;
+
+  it('sorts by score, highest first', () => {
+    expect(sortRoundRows(rows, 'score').map((r) => r.name)).toEqual(['Maya', 'Omar', 'Sofia']);
+  });
+
+  it('sorts by accuracy, lowest first, so the students who need help lead', () => {
+    expect(sortRoundRows(rows, 'accuracy').map((r) => r.name)).toEqual(['Sofia', 'Omar', 'Maya']);
+  });
+
+  it('sorts by name and leaves the input untouched', () => {
+    const shuffled = [rows[2], rows[0], rows[1]];
+    expect(sortRoundRows(shuffled, 'name').map((r) => r.name)).toEqual(['Maya', 'Omar', 'Sofia']);
+    expect(shuffled.map((r) => r.name)).toEqual(['Sofia', 'Maya', 'Omar']);
+  });
+});
+
+describe('roundTitleKey', () => {
   it('names a Wordcraft round with the translated mode label, never the raw mode id', () => {
-    expect(roundModeLabelKey('wordcraft')).toBe('teacher.classroom.gameModes.wordcraft');
+    expect(roundTitleKey('wordcraft')).toBe('teacher.classroom.gameModes.wordcraft');
   });
 
   it('keeps the existing labels for the classic modes', () => {
-    expect(roundModeLabelKey('vocab-quiz')).toBe('teacher.lastGame.mode.vocabQuiz');
-    expect(roundModeLabelKey('mystery')).toBeNull();
+    expect(roundTitleKey('vocab-quiz')).toBe('teacher.lastGame.mode.vocabQuiz');
+  });
+
+  it('falls back to a generic class-game title for a mode it does not know', () => {
+    expect(roundTitleKey('mystery')).toBe('teacher.classReport.notes.title');
   });
 });

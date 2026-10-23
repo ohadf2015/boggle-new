@@ -9,52 +9,60 @@ const MODE_KEYS: Record<string, string> = {
   wordcraft: 'teacher.classroom.gameModes.wordcraft',
 };
 
-export function roundModeLabelKey(mode: string): string | null {
-  return MODE_KEYS[mode] ?? null;
+const FALLBACK_TITLE_KEY = 'teacher.classReport.notes.title';
+
+export function roundTitleKey(mode: string): string {
+  return MODE_KEYS[mode] ?? FALLBACK_TITLE_KEY;
 }
 
-export function participationParams({ played, roster }: RecentClassroomGame['participation']) {
-  const total = Math.max(played, roster);
-  return { played, total, absent: total - played };
+export function activeLineParams({ played, roster }: RecentClassroomGame['participation']) {
+  return { active: played, roster: Math.max(played, roster) };
 }
 
-export type RoundCellState = 'found' | 'missed' | 'absent';
+export type RoundCellState = 'found' | 'missed';
 
 export interface RoundReportRow {
   studentId: string;
   name: string;
-  score: number | null;
-  absent: boolean;
+  score: number;
+  accuracyPct: number;
   cells: { word: string; state: RoundCellState }[];
 }
 
 export interface RoundReport {
   words: string[];
   rows: RoundReportRow[];
+  absent: { studentId: string; name: string }[];
   practiceWords: string[];
+}
+
+export type RoundSortKey = 'score' | 'accuracy' | 'name';
+
+export function sortRoundRows(rows: RoundReportRow[], key: RoundSortKey): RoundReportRow[] {
+  const byName = (a: RoundReportRow, b: RoundReportRow) => a.name.localeCompare(b.name);
+  const compare: Record<RoundSortKey, (a: RoundReportRow, b: RoundReportRow) => number> = {
+    score: (a, b) => b.score - a.score || byName(a, b),
+    accuracy: (a, b) => a.accuracyPct - b.accuracyPct || byName(a, b),
+    name: byName,
+  };
+  return [...rows].sort(compare[key]);
 }
 
 export function buildRoundReport(game: RecentClassroomGame): RoundReport {
   const words = game.missedWords.map((w) => w.word);
   const practiceWords = game.missedWords.filter((w) => w.missedBy > 0).map((w) => w.word);
 
-  const players: RoundReportRow[] = game.players.map((p) => {
+  const rows: RoundReportRow[] = game.players.map((p) => {
     const found = new Set(p.lessonWordsFound);
     return {
       studentId: p.studentId,
       name: p.name,
       score: p.score,
-      absent: false,
+      accuracyPct: p.accuracyPct,
       cells: words.map((word) => ({ word, state: found.has(word) ? 'found' : 'missed' })),
     };
   });
-  const absent: RoundReportRow[] = (game.absentStudents ?? []).map((s) => ({
-    studentId: s.studentId,
-    name: s.name,
-    score: null,
-    absent: true,
-    cells: words.map((word) => ({ word, state: 'absent' })),
-  }));
+  const absent = (game.absentStudents ?? []).map(({ studentId, name }) => ({ studentId, name }));
 
-  return { words, rows: [...players, ...absent], practiceWords };
+  return { words, rows, absent, practiceWords };
 }
