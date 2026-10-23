@@ -64,6 +64,17 @@ describe('SinglePlayerPageClient defers the board past the PSI load window', () 
     expect(queryByTestId('sp-view')).toBeTruthy();
   });
 
+  it('flags html[data-sp-engaged] once the board mounts so the tap hint hides', async () => {
+    const { unmount } = render(<SinglePlayerPageClient />);
+    expect(document.documentElement.hasAttribute('data-sp-engaged')).toBe(false);
+    await act(async () => {
+      window.dispatchEvent(new Event('keydown'));
+    });
+    expect(document.documentElement.hasAttribute('data-sp-engaged')).toBe(true);
+    unmount();
+    expect(document.documentElement.hasAttribute('data-sp-engaged')).toBe(false);
+  });
+
   it('mounts immediately when a previous page already recorded engagement', async () => {
     sessionStorage.setItem(ENGAGED_SESSION_KEY, '1');
     const { queryByTestId } = render(<SinglePlayerPageClient />);
