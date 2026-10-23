@@ -153,13 +153,16 @@ export const V2TopBar = memo(function V2TopBar({
 
           {/* Score only (no daily badge here anymore). Best chip if non-daily. */}
           <div className="flex shrink-0 items-center gap-1">
-            <div className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 py-0.5 font-neo-display text-xs font-bold leading-tight tabular-nums text-neo-cream lg:text-base">
-              {score.toLocaleString()}
-            </div>
+            {/* Daily ranks on metres grown, so the goal chip is the number; a second one is clutter. */}
+            {!daily ? (
+              <div className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 py-0.5 font-neo-display text-xs font-bold leading-tight tabular-nums text-neo-cream lg:text-base">
+                {score.toLocaleString()}
+              </div>
+            ) : null}
             {daily && dailyTarget && dailyTarget.targetM > 0 ? (
               <div
                 data-wt2-daily-target
-                className={`flex items-center gap-0.5 rounded-neo border-neo border-black px-1 font-neo-display text-[9px] font-bold leading-tight text-neo-navy shadow-hard-sm lg:text-xs ${
+                className={`flex items-center gap-0.5 rounded-neo border-neo border-black px-1.5 py-0.5 font-neo-display text-xs font-black leading-tight text-neo-navy shadow-hard-sm lg:text-base ${
                   dailyTarget.growthM >= dailyTarget.targetM ? 'bg-neo-lime' : 'bg-neo-yellow'
                 }`}
                 aria-label={t('wordTowerV2.dailyTower.targetA11y', { m: dailyTarget.growthM, target: dailyTarget.targetM })}

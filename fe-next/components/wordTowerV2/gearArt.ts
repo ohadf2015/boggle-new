@@ -49,6 +49,17 @@ function poly(b: GearFloor, local: Array<[number, number]>): number[] {
 }
 
 /**
+ * What `paintGear` output depends on, quantized: a settled tower paints the same
+ * pixels every frame, so the caller repaints only when this string changes.
+ * The beacon blink is the one time-dependent input.
+ */
+export function gearPaintKey(floors: GearFloor[], scale: number, ts: number, view: { top: number; bottom: number }): string {
+  const r = (n: number) => Math.round(n * 100);
+  const tower = floors.map((b) => `${r(b.x)},${r(b.y)},${r(b.angleRad * 100)}`).join(';');
+  return `${Math.round(scale * 10000)}|${Math.round(view.top / 20)},${Math.round(view.bottom / 20)}|${Math.sin(ts / 300) > 0 ? 1 : 0}|${tower}`;
+}
+
+/**
  * `floors`: the standing tower, ground floor first. `view` (world y range on
  * screen) culls the per-floor trim: a 40-floor run would otherwise redraw 40
  * cornices a frame for floors nobody sees (same lesson as paintTowerShaft).

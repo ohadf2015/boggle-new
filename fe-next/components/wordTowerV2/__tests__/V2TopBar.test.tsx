@@ -136,4 +136,11 @@ describe('V2TopBar', () => {
     // Daily badge is absent
     expect(screen.queryByLabelText(/dailyBadge/)).toBeNull();
   });
+
+  it('given a daily run, then the score chip is hidden and the goal chip is the only progress number', () => {
+    render(bar({ daily: true, dailyTarget: { growthM: 4, targetM: 12 } }));
+
+    expect(screen.queryByText('520')).toBeNull();
+    expect(document.querySelector('[data-wt2-daily-target]')).toBeTruthy();
+  });
 });

@@ -297,7 +297,7 @@ export function WordTowerWheel({
         <div
           aria-hidden
           className={cn('pointer-events-none absolute inset-0', !reducedMotion && 'wt-wheel-orbit')}
-          style={{ opacity: placing ? 0 : 0.8, transition: 'opacity 400ms' }}
+          style={{ opacity: placing ? 0 : 0.8, transition: 'opacity 400ms', animationPlayState: placing ? 'paused' : 'running' }}
         >
           {Array.from({ length: sparkCount }).map((_, i) => {
             const p = letterPos(i, sparkCount);
@@ -309,7 +309,7 @@ export function WordTowerWheel({
                 className="absolute h-1 w-1 rounded-full"
                 style={{
                   left: `${out}%`, top: `${outY}%`, transform: 'translate(-50%,-50%)',
-                  background: accentHex, boxShadow: `0 0 4px ${accentHex}`,
+                  background: accentHex,
                 }}
               />
             );

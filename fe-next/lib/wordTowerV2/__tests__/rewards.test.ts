@@ -28,6 +28,18 @@ const seq = (...values: number[]) => {
   return () => values[i++ % values.length];
 };
 
+describe('rollReward word length', () => {
+  it('given the same roll, when the word is long, then a crate drops that a short word would miss', () => {
+    const roll = 0.3;
+    expect(rollReward(seq(roll), { quality: 'good', combo: 0, sinceLast: 0, floors: 2, wordLen: 3 })).toBeNull();
+    expect(rollReward(seq(roll), { quality: 'good', combo: 0, sinceLast: 0, floors: 2, wordLen: 7 })).not.toBeNull();
+  });
+
+  it('given a miss, when the word is long, then still nothing', () => {
+    expect(rollReward(seq(0), { quality: 'miss', combo: 0, sinceLast: 0, floors: 2, wordLen: 8 })).toBeNull();
+  });
+});
+
 describe('rollReward', () => {
   it('given a miss, when rolled, then nothing — rewards follow good play', () => {
     expect(rollReward(seq(0), { quality: 'miss', combo: 0, sinceLast: 9, floors: 5 })).toBeNull();

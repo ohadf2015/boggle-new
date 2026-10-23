@@ -3,7 +3,7 @@ import type { Graphics } from 'pixi.js';
 import { emptyEstate } from '@/lib/wordTowerV2/estate';
 import { PLOT_SLOTS } from '@/lib/wordTowerV2/estateCatalog';
 import { gearFromEstate } from '@/lib/wordTowerV2/gear';
-import { paintGear } from '../gearArt';
+import { gearPaintKey, paintGear } from '../gearArt';
 
 /** Records every draw call; every method chains like Pixi's. */
 function recorder() {
@@ -59,5 +59,24 @@ describe('paintGear — culling', () => {
     // Only the two lowest floors are in view.
     paintGear(culled.g, gearFromEstate(estateAt(5)), floors, 1, 0, { top: -70, bottom: 200 });
     expect(culled.calls.length).toBeLessThan(all.calls.length);
+  });
+});
+
+describe('gearPaintKey', () => {
+  const view = { top: -500, bottom: 300 };
+
+  it('given an unchanged tower, then the key is stable so the repaint can be skipped', () => {
+    expect(gearPaintKey(floors, 1, 0, view)).toBe(gearPaintKey(floors.map((f) => ({ ...f })), 1, 0, view));
+  });
+
+  it('given a floor that moved, then the key changes', () => {
+    expect(gearPaintKey(floors, 1, 0, view)).not.toBe(gearPaintKey([{ ...floors[0], x: 4 }, ...floors.slice(1)], 1, 0, view));
+  });
+
+  it('given the beacon blinking, then the key changes with its phase but not between blinks', () => {
+    const on = Math.PI * 300 * 0.5;
+    const off = Math.PI * 300 * 1.5;
+    expect(gearPaintKey(floors, 1, on, view)).not.toBe(gearPaintKey(floors, 1, off, view));
+    expect(gearPaintKey(floors, 1, on, view)).toBe(gearPaintKey(floors, 1, on + 10, view));
   });
 });

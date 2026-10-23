@@ -46,6 +46,12 @@ export function paintGround(g: Graphics, halfW: number, scale: number): void {
  * `towerSkirts` is drawn as a concrete shaft with the same black outline as the
  * floors, so the building always reads as continuing down out of frame.
  */
+/** Repaint key: sub-centimetre solver jitter must not defeat the cache. */
+export function skirtsKey(skirts: Array<{ x: number; y: number; w: number; h: number }>, scale: number): string {
+  const r = (n: number) => Math.round(n * 100);
+  return `${Math.round(scale * 10000)}|${skirts.map((s) => `${r(s.x)},${r(s.y)},${r(s.w)},${r(s.h)}`).join(';')}`;
+}
+
 export function paintTowerShaft(g: Graphics, skirts: Array<{ x: number; y: number; w: number; h: number }>, scale: number): void {
   const px = (n: number) => n / scale;
   g.clear();

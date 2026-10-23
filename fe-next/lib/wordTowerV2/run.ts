@@ -116,7 +116,7 @@ export function applyLanding(
     return seed / 4294967296;
   };
   const floors = prev.floors + 1;
-  const id = rollReward(rng, { quality: landing.quality, combo, sinceLast: prev.wordsSinceSurprise, floors });
+  const id = rollReward(rng, { quality: landing.quality, combo, sinceLast: prev.wordsSinceSurprise, floors, wordLen: landing.wordLen });
   const reward = id ? payoutFor(id, floors) : null;
 
   const run: RunState = {

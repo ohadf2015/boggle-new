@@ -55,6 +55,16 @@ export interface RollContext {
   sinceLast: number;
   /** Floors in the tower including this one. */
   floors: number;
+  /** Letters in the word that built this floor: spelling long is rewarded, not just landing well. */
+  wordLen?: number;
+}
+
+const LONG_WORD_FROM = 4;
+const CHANCE_PER_LONG_LETTER = 0.05;
+const MAX_LONG_WORD_CHANCE = 0.2;
+
+function longWordBonus(wordLen = 0): number {
+  return Math.min(MAX_LONG_WORD_CHANCE, Math.max(0, wordLen - LONG_WORD_FROM) * CHANCE_PER_LONG_LETTER);
 }
 
 function pick(rng: () => number, pool: RewardDef[]): RewardId {
@@ -73,7 +83,7 @@ export function rollReward(rng: () => number, ctx: RollContext): RewardId | null
   const milestone = ctx.quality === 'perfect' && ctx.combo > 0 && ctx.combo % RARE_COMBOS === 0;
   const chance = rng();
   if (milestone) return pick(rng, eligible.filter((r) => r.rare));
-  if (ctx.sinceLast < PITY_AFTER && chance >= CHANCE[ctx.quality]) return null;
+  if (ctx.sinceLast < PITY_AFTER && chance >= CHANCE[ctx.quality] + longWordBonus(ctx.wordLen)) return null;
   return pick(rng, eligible);
 }
 

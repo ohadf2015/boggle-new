@@ -64,6 +64,8 @@ const keys: string[] = [
   'wordTowerV2.dailyTower.exitFree',
   'wordTowerV2.dailyTower.targetA11y',
   'wordTowerV2.dailyTower.goalToast',
+  'wordTowerV2.dailyTower.goalKeep',
+  'wordTowerV2.dailyTower.goalBank',
   'wordTowerV2.dailyTower.grewToday',
   'wordTowerV2.dailyTower.goal',
   'wordTowerV2.dailyTower.goalHit',

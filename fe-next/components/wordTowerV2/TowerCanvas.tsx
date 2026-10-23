@@ -14,12 +14,12 @@ import { floorsAt, skyAt } from '@/lib/wordTowerV2/biomes';
 import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
 import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
 import { COMBO_FLASH, CONFETTI_BURST, GOLD_STARS, RUBBLE_BURST, TOWER_DUST } from '@/lib/gameEngine/presets/particles';
-import { createBestLabel, paintBestLine, paintGround, paintLandingMark, paintRuler, paintThrowArc, paintTowerShaft } from './towerArt';
+import { createBestLabel, paintBestLine, paintGround, paintLandingMark, paintRuler, paintThrowArc, paintTowerShaft, skirtsKey } from './towerArt';
 import { type BlockView, addTenant, createBlockView, createGhost, paintBlock, paintGhost, setBlockGold, setBlockRebar, tickBlock } from './apartmentArt';
 import { createCity, paintCity, placeCity } from './skylineArt';
 import { paintCraneFrame, paintCraneHook } from './craneArt';
 import { SkyLayer } from './skyArt';
-import { paintGear } from './gearArt';
+import { gearPaintKey, paintGear } from './gearArt';
 import type { TowerGear } from '@/lib/wordTowerV2/gear';
 import { standingChain } from '@/lib/wordTowerV2/stability';
 import { TenantCrowd } from './tenantArt';
@@ -251,6 +251,9 @@ export default function TowerCanvas(props: Props) {
       const particles = new ParticlePool(scene);
 
       let lastTs = performance.now();
+      let shaftKey = '';
+      let gearKey = '';
+      let paintedGear: unknown = null;
 
       const tick = (ts: number) => {
         raf = requestAnimationFrame(tick);
@@ -492,22 +495,24 @@ export default function TowerCanvas(props: Props) {
         // Under every floor: fills the wedge of sky an overhang leaves, and
         // runs the lowest floors past the bottom edge so a panned camera never
         // shows the tower ending in mid-air above the dock.
-        paintTowerShaft(
-          shaft,
-          towerSkirts(
-            // Only what is on screen (plus a floor of margin): a 40-floor run
-            // would otherwise redraw 40 shafts a frame for floors nobody sees.
-            snap.blocks.filter(
-              (b) =>
-                b.id !== hangingId &&
-                world.landed.has(b.id) &&
-                scene.y + (b.y - b.heightPx) * scale < h + 240 &&
-                scene.y + (b.y + b.heightPx) * scale > -120,
-            ),
-            (h - scene.y) / scale,
+        const skirts = towerSkirts(
+          // Only what is on screen (plus a floor of margin): a 40-floor run
+          // would otherwise redraw 40 shafts a frame for floors nobody sees.
+          snap.blocks.filter(
+            (b) =>
+              b.id !== hangingId &&
+              world.landed.has(b.id) &&
+              scene.y + (b.y - b.heightPx) * scale < h + 240 &&
+              scene.y + (b.y + b.heightPx) * scale > -120,
           ),
-          scale,
+          (h - scene.y) / scale,
         );
+        // A settled tower is most frames: rebuilding its Graphics then is pure waste.
+        const nextShaftKey = skirtsKey(skirts, scale);
+        if (nextShaftKey !== shaftKey) {
+          shaftKey = nextShaftKey;
+          paintTowerShaft(shaft, skirts, scale);
+        }
         for (const block of snap.blocks) {
           let view = views.get(block.id);
           if (!view) {
@@ -556,11 +561,18 @@ export default function TowerCanvas(props: Props) {
           const base = snap.blocks.find((b) => floorNo(b.id) === 0);
           const landed = snap.blocks.filter((b) => b.id !== hangingId && world.landed.has(b.id));
           const ids = base ? standingChain(landed, base.id) : [];
-          paintGear(gearLayer, gear, ids.map((id) => byId.get(id)!).filter(Boolean), scale, ts, {
-            top: (-120 - scene.y) / scale,
-            bottom: (h + 240 - scene.y) / scale,
-          });
-        } else gearLayer.clear();
+          const floorsForGear = ids.map((id) => byId.get(id)!).filter(Boolean);
+          const view = { top: (-120 - scene.y) / scale, bottom: (h + 240 - scene.y) / scale };
+          const nextGearKey = gearPaintKey(floorsForGear, scale, ts, view);
+          if (gear !== paintedGear || nextGearKey !== gearKey) {
+            paintedGear = gear;
+            gearKey = nextGearKey;
+            paintGear(gearLayer, gear, floorsForGear, scale, ts, view);
+          }
+        } else {
+          gearLayer.clear();
+          paintedGear = null;
+        }
         // Crane Yard upgrade: the rail and pulley wear the part's finish.
         const craneGear = gear?.craneYard;
         const paintedCrane =

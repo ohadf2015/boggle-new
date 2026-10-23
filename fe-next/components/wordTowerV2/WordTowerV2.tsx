@@ -21,6 +21,7 @@ import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { type TowerGear, gearFromEstate } from '@/lib/wordTowerV2/gear';
 import TowerCanvas, { type FrameStats, type GhostPreview } from './TowerCanvas';
 import { V2Celebrations } from './V2Celebrations';
+import { DailyGoalCard } from './DailyGoalCard';
 import { V2Hud } from './V2Hud';
 import { V2Dock } from './V2Dock';
 import { V2Results } from './V2Results';
@@ -129,11 +130,15 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
       goalSeen.current = true;
       playSound('questComplete');
       setGoalToast(true);
-      const id = window.setTimeout(() => setGoalToast(false), 3200);
-      return () => window.clearTimeout(id);
     }
     return undefined;
   }, [daily, dailyTower.targetM, dailyTower.targetHit, playSound]);
+  // Left alone it must not sit over the crane forever.
+  useEffect(() => {
+    if (!goalToast) return undefined;
+    const id = window.setTimeout(() => setGoalToast(false), 8000);
+    return () => window.clearTimeout(id);
+  }, [goalToast]);
   /** Floors standing right now: this run's plus the ones restored from earlier days. */
   const towerFloors = run.floors + (daily ? dailyTower.restoredFloors : 0);
 
@@ -705,13 +710,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         </div>
       ) : null}
       {goalToast ? (
-        <div
-          role="status"
-          data-wt2-goal-toast
-          className="pointer-events-none absolute inset-x-0 top-1/4 z-[60] mx-auto w-fit max-w-[90%] rounded-neo border-neo-thick border-black bg-neo-lime px-4 py-2 text-center font-neo-display text-lg font-black text-neo-navy shadow-hard animate-neo-pop"
-        >
-          {t('wordTowerV2.dailyTower.goalToast', { m: dailyTower.growthM })}
-        </div>
+        <DailyGoalCard t={t} growthM={dailyTower.growthM} onKeepClimbing={() => setGoalToast(false)} onBank={exitFlow.goHome} />
       ) : null}
       {copied ? (
         <div className="pointer-events-none absolute inset-x-0 top-1/3 z-[60] mx-auto w-fit rounded-neo border-neo-thick border-black bg-neo-lime px-4 py-2 font-neo-display text-lg font-black text-neo-navy shadow-hard animate-neo-pop">
