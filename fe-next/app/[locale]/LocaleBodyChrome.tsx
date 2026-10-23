@@ -33,9 +33,10 @@ const SiteExtras = nextDynamic(() => import('./SiteExtras'), {
 interface LocaleBodyChromeProps {
   lang: Language;
   children: ReactNode;
+  siteNav?: ReactNode;
 }
 
-export default function LocaleBodyChrome({ lang, children }: LocaleBodyChromeProps) {
+export default function LocaleBodyChrome({ lang, children, siteNav }: LocaleBodyChromeProps) {
   const pathname = usePathname();
   const siteChrome = rendersSiteChrome(pathname);
   // Exclusive with SiteExtras: chrome routes already mount CookieConsent via
@@ -46,6 +47,7 @@ export default function LocaleBodyChrome({ lang, children }: LocaleBodyChromePro
 
   const inner = (
     <>
+      {siteNav}
       <ScrollToTopOnNavigate />
       <ChunkErrorRecovery />
       <div className="flex-1 flex flex-col min-h-0 relative overflow-x-clip">

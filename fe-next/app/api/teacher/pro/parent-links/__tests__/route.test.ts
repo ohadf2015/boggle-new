@@ -4,11 +4,16 @@ vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: vi.fn() }));
 vi.mock('@/utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('@/lib/subscriptions', () => ({ checkTeacherSubscription: vi.fn() }));
+vi.mock('@/lib/education/accessTrialServer', async (orig) => ({
+  ...(await orig<typeof import('@/lib/education/accessTrialServer')>()),
+  liveAccessTrialExpiry: vi.fn(async () => null),
+}));
 
 import { POST } from '../route';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { checkTeacherSubscription } from '@/lib/subscriptions';
+import { liveAccessTrialExpiry } from '@/lib/education/accessTrialServer';
 import { verifyParentReportToken } from '@/lib/education/parentReportToken';
 
 const CLASSROOM = '11111111-1111-4111-8111-111111111111';
@@ -74,6 +79,15 @@ describe('POST /api/teacher/pro/parent-links', () => {
     vi.mocked(createClient).mockResolvedValue(userClient({ user: { id: 't' }, owned: null }) as never);
     const res = await POST(req({ classroomId: CLASSROOM }));
     expect(res.status).toBe(403);
+  });
+
+  it('serves a free teacher on a live access trial', async () => {
+    vi.mocked(createClient).mockResolvedValue(userClient({ user: { id: 't1' }, owned: { id: CLASSROOM, name: 'Class' } }) as never);
+    vi.mocked(createAdminClient).mockReturnValue(adminClient({ members: [S1], profiles: [{ id: S1, display_name: 'A', username: null }] }) as never);
+    vi.mocked(checkTeacherSubscription).mockResolvedValue({ has_pro: false } as never);
+    vi.mocked(liveAccessTrialExpiry).mockResolvedValueOnce('2099-01-01T00:00:00Z');
+    const res = await POST(req({ classroomId: CLASSROOM }));
+    expect(res.status).toBe(200);
   });
 
   it('402s for a free teacher, before minting anything', async () => {

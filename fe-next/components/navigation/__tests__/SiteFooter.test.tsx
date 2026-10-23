@@ -8,13 +8,13 @@ vi.mock('@/components/AutoHideFooter', () => ({ default: () => <footer data-test
 import { SiteFooter } from '../SiteFooter';
 
 describe('SiteFooter', () => {
-  it.each(['/en/teacher/upgrade', '/en/pricing', '/he/pricing'])('leaves the fixed site footer off the plan page %s', (path) => {
+  it.each(['/en/teacher/upgrade', '/en/pricing', '/he/pricing', '/en/education', '/en/student', '/en/teacher/reports', '/en/join'])('leaves the consumer site footer off the edu page %s', (path) => {
     pathname = path;
     render(<SiteFooter />);
     expect(screen.queryByTestId('site-footer')).toBeNull();
   });
 
-  it.each(['/en', '/en/education', '/en/student', '/en/teacher/reports'])('keeps it on %s', (path) => {
+  it.each(['/en', '/en/singleplayer', '/en/blog'])('keeps it on %s', (path) => {
     pathname = path;
     render(<SiteFooter />);
     expect(screen.getByTestId('site-footer')).toBeInTheDocument();

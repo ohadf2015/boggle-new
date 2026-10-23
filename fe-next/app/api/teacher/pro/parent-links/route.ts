@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
-import { checkTeacherSubscription } from '@/lib/subscriptions';
+import { requireTeacherPro } from '@/lib/education/pro/requireTeacherPro';
 import { signParentReportToken } from '@/lib/education/parentReportToken';
 import { resolveDisplayName } from '@/lib/displayName';
 import logger from '@/utils/logger';
@@ -40,10 +40,8 @@ export async function POST(req: Request) {
   }
   if (!owned) return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
 
-  const subscription = await checkTeacherSubscription(user.id);
-  if (!subscription.has_pro) {
-    return NextResponse.json({ ok: false, error: 'Teacher Pro required' }, { status: 402 });
-  }
+  const proRefusal = await requireTeacherPro(user.id);
+  if (proRefusal) return proRefusal;
 
   const admin = createAdminClient();
   if (!admin) return NextResponse.json({ ok: false, error: 'service role key not configured' }, { status: 500 });

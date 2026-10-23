@@ -15,6 +15,7 @@ import { CHUNK_BOOT_GUARD_SCRIPT } from '@/utils/chunkBootGuard';
 import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
 import { ANDROID_PACKAGE } from '@/utils/androidApp';
 import type { Language } from '@/shared/types/game';
+import SrSiteNav from './SrSiteNav';
 import LocaleBodyChrome from './LocaleBodyChrome';
 
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew, fredokaCyrillic, rubikCyrillic } from '../fonts';
@@ -696,24 +697,19 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     anchor exists; the body MutationObserver was leftover main-thread
                     cost. H5 Games Ads remains the web ad path (intent-gated). */}
                 <ServiceWorkerRegistration />
-                {/* Server-rendered legal navigation — guarantees crawlers find
-                    privacy/terms/about links even without JS execution */}
-                <nav aria-label="Site Navigation" className="sr-only">
-                    <ul>
-                        <li><a href={`/${validLocale}/how-to-play`}>{translations[validLocale]?.nav?.howToPlay || 'How to Play'}</a></li>
-                        <li><a href={`/${validLocale}/blog`}>{translations[validLocale]?.nav?.blog || 'Blog'}</a></li>
-                        <li><a href={`/${validLocale}/faq`}>{translations[validLocale]?.nav?.faq || 'FAQ'}</a></li>
-                        <li><a href={`/${validLocale}/about`}>{translations[validLocale]?.nav?.aboutLexiClash || 'About LexiClash'}</a></li>
-                        <li><a href={`/${validLocale}/contact`}>{translations[validLocale]?.nav?.contactUs || 'Contact Us'}</a></li>
-                        <li><a href={`/${validLocale}/legal/privacy`}>{translations[validLocale]?.nav?.privacyPolicy || 'Privacy Policy'}</a></li>
-                        <li><a href={`/${validLocale}/legal/terms`}>{translations[validLocale]?.nav?.termsOfService || 'Terms of Service'}</a></li>
-                        <li><a href={`/${validLocale}/legal/disclaimer`}>{translations[validLocale]?.nav?.disclaimer || 'Disclaimer'}</a></li>
-                    </ul>
-                </nav>
                 {/* Site chrome + provider stack are a client shell: static imports
                     here kept Auth/Music/footer/nav in layout-*.js on /singleplayer
                     even when we skipped rendering them (r4 FCP still 1803ms). */}
-                <LocaleBodyChrome lang={validLocale as Language}>
+                <LocaleBodyChrome lang={validLocale as Language} siteNav={<SrSiteNav><ul>
+                            <li><a href={`/${validLocale}/how-to-play`}>{translations[validLocale]?.nav?.howToPlay || 'How to Play'}</a></li>
+                            <li><a href={`/${validLocale}/blog`}>{translations[validLocale]?.nav?.blog || 'Blog'}</a></li>
+                            <li><a href={`/${validLocale}/faq`}>{translations[validLocale]?.nav?.faq || 'FAQ'}</a></li>
+                            <li><a href={`/${validLocale}/about`}>{translations[validLocale]?.nav?.aboutLexiClash || 'About LexiClash'}</a></li>
+                            <li><a href={`/${validLocale}/contact`}>{translations[validLocale]?.nav?.contactUs || 'Contact Us'}</a></li>
+                            <li><a href={`/${validLocale}/legal/privacy`}>{translations[validLocale]?.nav?.privacyPolicy || 'Privacy Policy'}</a></li>
+                            <li><a href={`/${validLocale}/legal/terms`}>{translations[validLocale]?.nav?.termsOfService || 'Terms of Service'}</a></li>
+                            <li><a href={`/${validLocale}/legal/disclaimer`}>{translations[validLocale]?.nav?.disclaimer || 'Disclaimer'}</a></li>
+                        </ul></SrSiteNav>}>
                     {children}
                 </LocaleBodyChrome>
             </body>
