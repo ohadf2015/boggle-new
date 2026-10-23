@@ -4,6 +4,7 @@ import React, { Suspense, useEffect, useState } from 'react';
 import nextDynamic from 'next/dynamic';
 import { retryImport } from '@/utils/retryImport';
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary';
+import { SpLcpSrcSwap } from '@/components/singleplayer/SpLcpSrcSwap';
 
 // Loading fallback matches SinglePlayerGame's fullscreen shell.
 function LoadingFallback(): React.JSX.Element {
@@ -66,15 +67,18 @@ export default function SinglePlayerPageClient(): React.JSX.Element {
     };
   }, []);
 
-  if (!hydrateGame) {
-    return <LoadingFallback />;
-  }
-
   return (
-    <ChunkErrorBoundary>
-      <Suspense fallback={<LoadingFallback />}>
-        <SinglePlayerView />
-      </Suspense>
-    </ChunkErrorBoundary>
+    <>
+      <SpLcpSrcSwap />
+      {hydrateGame ? (
+        <ChunkErrorBoundary>
+          <Suspense fallback={<LoadingFallback />}>
+            <SinglePlayerView />
+          </Suspense>
+        </ChunkErrorBoundary>
+      ) : (
+        <LoadingFallback />
+      )}
+    </>
   );
 }
