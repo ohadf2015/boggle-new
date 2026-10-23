@@ -60,11 +60,14 @@ describe.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('EducationHeader exit links,
     expect(exit).toHaveAttribute('href', exitHref(lang));
   });
 
-  it('logo always links to the education landing, never the marketing home', () => {
-    authState = ROLES.teacher;
-    const { container } = render(<EducationHeader />);
-    const logo = container.querySelector(`a[href="/${lang}/education"]`);
-    expect(logo).not.toBeNull();
+  it.each([
+    ['teacher', 'teacher'],
+    ['student', 'student'],
+    ['guest', 'education'],
+  ] as const)('logo sends a %s to their edu hub, never the marketing home', (role, hub) => {
+    authState = ROLES[role];
+    render(<EducationHeader />);
+    expect(screen.getByLabelText('education.header.homeLink')).toHaveAttribute('href', `/${lang}/${hub}`);
   });
 
   it.each(['teacher', 'student'] as Role[])('desktop menu "Exit Education" for %s', (role) => {

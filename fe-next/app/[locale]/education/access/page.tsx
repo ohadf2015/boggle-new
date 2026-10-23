@@ -23,10 +23,10 @@ export default function Page() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-dvh bg-neo-navy text-neo-white">
+        <main className="flex h-dvh flex-col overflow-hidden bg-neo-navy text-neo-white">
           {/* Pitch chrome, not the approved card: most loads are the apply funnel. */}
-          <div className="h-14 border-b-2 border-neo-cream sm:h-16" aria-hidden="true" />
-          <section className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+          <div className="h-14 shrink-0 border-b-2 border-neo-cream sm:h-16" aria-hidden="true" />
+          <section className="mx-auto min-h-0 w-full max-w-6xl flex-1 overflow-y-auto px-4 py-10 sm:py-14">
             <div className="grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
               <div>
                 <div className="h-[3.5rem] w-3/4 animate-pulse rounded bg-neo-navy-light sm:h-[4.5rem]" />

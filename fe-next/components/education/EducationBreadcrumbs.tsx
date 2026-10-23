@@ -14,9 +14,6 @@ interface BreadcrumbItem {
   isCurrent?: boolean;
 }
 
-/** UUIDs and other opaque record ids — never a step a person navigated to. */
-const ID_SEGMENT = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 interface EducationBreadcrumbsProps {
   /** Additional class names */
   className?: string;
@@ -117,19 +114,12 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
           // raw slug "pricing" leaked into the Hebrew/Spanish/... trail.
           label = t('education.header.breadcrumbs.pricing');
           break;
-        default:
-          /*
-            A database id is not a place. This branch used to render
-            `d647f2f8...` as the last step of the student's practice trail —
-            a raw UUID above the games. Drop the crumb instead of truncating
-            it: the segment before it ("Lessons") is a real, clickable step,
-            and no new copy is needed in six locales.
-          */
-          if (ID_SEGMENT.test(segment)) return;
-          if (segment.length > 8) {
-            label = `${segment.slice(0, 8)}...`;
-          }
+        case 'help':
+          label = t('eduShell.account.help');
           break;
+        default:
+          // A raw slug or record id is English-only and not a place; the clickable crumb before it stands in.
+          return;
       }
 
       breadcrumbs.push({

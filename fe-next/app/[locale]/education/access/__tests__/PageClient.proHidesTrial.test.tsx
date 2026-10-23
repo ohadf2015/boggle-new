@@ -14,6 +14,7 @@ import { render, screen } from '@testing-library/react';
 vi.mock('next/navigation', () => ({
   useSearchParams: () => ({ get: () => null }),
   useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
+  usePathname: () => '/en/education/access',
 }));
 
 const mockUseTeacherAccess = vi.fn();

@@ -9,6 +9,7 @@ vi.mock('@/components/education/landing/LandingHeader', () => ({
 vi.mock('next/navigation', () => ({
   useSearchParams: () => ({ get: () => null }),
   useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
+  usePathname: () => '/en/education/access',
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),

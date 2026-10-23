@@ -27,6 +27,13 @@ import LessonPracticeError from '../error';
 describe('LessonPracticeError', () => {
   beforeEach(() => vi.clearAllMocks());
 
+  it('locks to the viewport instead of growing the page', () => {
+    const { container } = render(<LessonPracticeError error={new Error('boom')} reset={vi.fn()} />);
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).toHaveClass('h-dvh');
+    expect(root.className).not.toMatch(/min-h-(dvh|screen)/);
+  });
+
   it('offers exactly one dominant action, and it retries', () => {
     const reset = vi.fn();
     const { container } = render(<LessonPracticeError error={new Error('boom')} reset={reset} />);

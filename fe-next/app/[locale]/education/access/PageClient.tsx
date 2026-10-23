@@ -16,6 +16,7 @@ import { useGsapReveal } from '@/lib/animation/useGsapReveal';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { accessReturnPath } from '@/lib/education/accessReturnPath';
 import { LandingHeader } from '@/components/education/landing/LandingHeader';
+import { EducationShell } from '@/components/education/shell/EducationShell';
 
 const TRUST = [
   { key: 'trust_instant', Icon: Zap, chip: 'bg-neo-lime' },
@@ -146,128 +147,130 @@ export function PageClient() {
   // A returning teacher came here for one thing: their HQ. No re-pitch, no steps, no upsell strip.
   if (approved) {
     return (
-      <main className="min-h-dvh bg-neo-navy text-neo-white">
-        <LandingHeader showStart={false} />
-        <section className="mx-auto flex min-h-[80dvh] max-w-xl flex-col justify-center px-4 pb-10 pt-16">
-          <div className="relative rounded-neo-xl border-neo-thick border-black bg-neo-lime p-6 pt-14 text-neo-navy shadow-hard-xl sm:p-8 sm:pt-16">
-            <span className="absolute -top-12 start-1/2 flex size-24 shrink-0 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-neo-thick border-black bg-neo-cyan shadow-hard rtl:translate-x-1/2 [contain:layout]">
-              <Image src="/mascot/teacher/teacher-hero.webp" alt="" aria-hidden="true" width={96} height={96} priority className="size-full object-contain" />
-            </span>
-            <h1 className="text-center font-neo-display text-[clamp(1.75rem,6vw,2.5rem)] font-black leading-tight tracking-[-0.02em] text-balance [min-height:2.5em]">
-              {t('education.access.already_approved_title')}
-            </h1>
-            <Link
-              href={`/${language}/teacher`}
-              className="group mt-6 flex min-h-14 w-full items-center justify-center gap-3 rounded-neo border-neo-thick border-neo-cream bg-neo-navy px-5 py-3 font-neo-display text-lg font-black uppercase tracking-wide text-neo-white shadow-hard-lg transition-[box-shadow,transform] duration-100 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
-            >
-              {t('education.access.go_to_teacher')}
-              <DirectionalIcon icon={ArrowRight} className="size-5 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
-            </Link>
-            {trial && !hasPro && !proLoading && (
-              <div className="mt-5">
-                <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
-              </div>
-            )}
-          </div>
-        </section>
-      </main>
+      <EducationShell header={<LandingHeader showStart={false} />} contentClassName="flex flex-col">
+        <main className="flex flex-1 flex-col text-neo-white">
+          <section className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-4 pb-10 pt-16">
+            <div className="relative rounded-neo-xl border-neo-thick border-black bg-neo-lime p-6 pt-14 text-neo-navy shadow-hard-xl sm:p-8 sm:pt-16">
+              <span className="absolute -top-12 start-1/2 flex size-24 shrink-0 -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-neo-thick border-black bg-neo-cyan shadow-hard rtl:translate-x-1/2 [contain:layout]">
+                <Image src="/mascot/teacher/teacher-hero.webp" alt="" aria-hidden="true" width={96} height={96} priority className="size-full object-contain" />
+              </span>
+              <h1 className="text-center font-neo-display text-[clamp(1.75rem,6vw,2.5rem)] font-black leading-tight tracking-[-0.02em] text-balance [min-height:2.5em]">
+                {t('education.access.already_approved_title')}
+              </h1>
+              <Link
+                href={`/${language}/teacher`}
+                className="group mt-6 flex min-h-14 w-full items-center justify-center gap-3 rounded-neo border-neo-thick border-neo-cream bg-neo-navy px-5 py-3 font-neo-display text-lg font-black uppercase tracking-wide text-neo-white shadow-hard-lg transition-[box-shadow,transform] duration-100 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+              >
+                {t('education.access.go_to_teacher')}
+                <DirectionalIcon icon={ArrowRight} className="size-5 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
+              </Link>
+              {trial && !hasPro && !proLoading && (
+                <div className="mt-5">
+                  <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
+                </div>
+              )}
+            </div>
+          </section>
+        </main>
+      </EducationShell>
     );
   }
 
   return (
-    <main className="min-h-dvh bg-neo-navy text-neo-white">
-      <LandingHeader showStart={false} />
-      <section
-        className={`mx-auto px-4 py-10 sm:py-14 ${showPitch ? 'max-w-6xl' : 'max-w-2xl'}`}
-      >
-        <div
-          className={
-            showPitch
-              ? 'grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14'
-              : ''
-          }
+    <EducationShell header={<LandingHeader showStart={false} />}>
+      <main className="text-neo-white">
+        <section
+          className={`mx-auto px-4 py-10 sm:py-14 ${showPitch ? 'max-w-6xl' : 'max-w-2xl'}`}
         >
-          <div>
-            <h1 className="text-balance font-neo-display text-[clamp(2.125rem,6vw,3.5rem)] font-black leading-[1.05] tracking-[-0.035em]">
-              {t('education.access.h1')}
-            </h1>
-            <p className="mt-4 max-w-[62ch] text-lg leading-relaxed text-neo-white/85">
-              {t('education.access.lede')}
-            </p>
+          <div
+            className={
+              showPitch
+                ? 'grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14'
+                : ''
+            }
+          >
+            <div>
+              <h1 className="text-balance font-neo-display text-[clamp(2.125rem,6vw,3.5rem)] font-black leading-[1.05] tracking-[-0.035em]">
+                {t('education.access.h1')}
+              </h1>
+              <p className="mt-4 max-w-[62ch] text-lg leading-relaxed text-neo-white/85">
+                {t('education.access.lede')}
+              </p>
 
-            {/* The action (sign up, or sign in in one tap) sits right under the lede — on a phone the trust list used to push it below the fold. */}
-            <div className="mt-6">{statusCard}</div>
+              {/* The action (sign up, or sign in in one tap) sits right under the lede — on a phone the trust list used to push it below the fold. */}
+              <div className="mt-6">{statusCard}</div>
 
-            {/* Only for someone who still has to apply — an approved teacher who
-                happens to carry a `from` needs their status, not this. */}
+              {/* Only for someone who still has to apply — an approved teacher who
+                  happens to carry a `from` needs their status, not this. */}
+              {showPitch && (
+                <div className="mt-6 max-w-[62ch]">
+                  <AccessRedirectNotice from={redirectedFrom} />
+                </div>
+              )}
+
+              {showPitch && (
+                <ul className="mt-6 flex flex-col gap-3">
+                  {TRUST.map(({ key, Icon, chip }) => (
+                    <li key={key} className="flex items-center gap-3">
+                      <span
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-neo border-black ${chip} text-neo-navy shadow-hard-sm`}
+                      >
+                        <Icon className="h-[18px] w-[18px]" strokeWidth={2.5} aria-hidden="true" />
+                      </span>
+                      <span className="font-semibold text-neo-white">
+                        {t(`education.access.${key}`)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+            </div>
+
+            {/* Support art, not the message: on a phone the CTA comes first and the
+                illustration follows it. On lg it sits beside the pitch. No
+                `priority` — on phones (the primary device) it is below the CTA, so
+                a high-priority preload would compete with the h1 for LCP. */}
             {showPitch && (
-              <div className="mt-6 max-w-[62ch]">
-                <AccessRedirectNotice from={redirectedFrom} />
+              <div className="mx-auto w-full max-w-sm lg:mt-2 lg:max-w-none">
+                <Image
+                  src="/images/education-access-hero.webp"
+                  alt={t('education.access.hero_alt')}
+                  width={918}
+                  height={880}
+                  sizes="(min-width: 1024px) 34rem, (min-width: 640px) 24rem, 100vw"
+                  className="w-full rounded-neo-xl border-neo-thick border-black shadow-hard-lg"
+                />
               </div>
             )}
-
-            {showPitch && (
-              <ul className="mt-6 flex flex-col gap-3">
-                {TRUST.map(({ key, Icon, chip }) => (
-                  <li key={key} className="flex items-center gap-3">
-                    <span
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-neo border-black ${chip} text-neo-navy shadow-hard-sm`}
-                    >
-                      <Icon className="h-[18px] w-[18px]" strokeWidth={2.5} aria-hidden="true" />
-                    </span>
-                    <span className="font-semibold text-neo-white">
-                      {t(`education.access.${key}`)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-
           </div>
 
-          {/* Support art, not the message: on a phone the CTA comes first and the
-              illustration follows it. On lg it sits beside the pitch. No
-              `priority` — on phones (the primary device) it is below the CTA, so
-              a high-priority preload would compete with the h1 for LCP. */}
-          {showPitch && (
-            <div className="mx-auto w-full max-w-sm lg:mt-2 lg:max-w-none">
-              <Image
-                src="/images/education-access-hero.webp"
-                alt={t('education.access.hero_alt')}
-                width={918}
-                height={880}
-                sizes="(min-width: 1024px) 34rem, (min-width: 640px) 24rem, 100vw"
-                className="w-full rounded-neo-xl border-neo-thick border-black shadow-hard-lg"
-              />
-            </div>
-          )}
-        </div>
+          {/* Full section width so the ribbon's left edge lines up with the h1 —
+              a narrower centred block reads as misaligned against the hero. */}
+          <div ref={belowRef} className="mt-16">
+            <ol
+              data-access-reveal
+              className="grid divide-y-2 divide-neo-cream/30 overflow-hidden rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light sm:grid-cols-3 sm:divide-x-2 sm:rtl:divide-x-reverse sm:divide-y-0"
+            >
+              {(['step1', 'step2', 'step3'] as const).map((k, i) => (
+                <li key={k} className="p-5">
+                  <span className="font-neo-display text-sm font-black text-neo-lime">
+                    {i + 1}
+                  </span>
+                  <h2 className="mt-1 font-neo-display text-base font-bold text-neo-white">
+                    {t(`education.access.next.${k}_title`)}
+                  </h2>
+                  <p className="mt-1 text-sm leading-relaxed text-neo-white/70">
+                    {t(`education.access.next.${k}_body`)}
+                  </p>
+                </li>
+              ))}
+            </ol>
 
-        {/* Full section width so the ribbon's left edge lines up with the h1 —
-            a narrower centred block reads as misaligned against the hero. */}
-        <div ref={belowRef} className="mt-16">
-          <ol
-            data-access-reveal
-            className="grid divide-y-2 divide-neo-cream/30 overflow-hidden rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light sm:grid-cols-3 sm:divide-x-2 sm:rtl:divide-x-reverse sm:divide-y-0"
-          >
-            {(['step1', 'step2', 'step3'] as const).map((k, i) => (
-              <li key={k} className="p-5">
-                <span className="font-neo-display text-sm font-black text-neo-lime">
-                  {i + 1}
-                </span>
-                <h2 className="mt-1 font-neo-display text-base font-bold text-neo-white">
-                  {t(`education.access.next.${k}_title`)}
-                </h2>
-                <p className="mt-1 text-sm leading-relaxed text-neo-white/70">
-                  {t(`education.access.next.${k}_body`)}
-                </p>
-              </li>
-            ))}
-          </ol>
-
-          <DistrictUpsellStrip hideTeacherCta />
-        </div>
-      </section>
-    </main>
+            <DistrictUpsellStrip hideTeacherCta />
+          </div>
+        </section>
+      </main>
+    </EducationShell>
   );
 }

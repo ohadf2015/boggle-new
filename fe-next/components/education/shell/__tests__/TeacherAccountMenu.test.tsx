@@ -61,6 +61,9 @@ describe('<TeacherAccountMenu>', () => {
     expect(screen.getByRole('menuitem', { name: /eduShell.nav.pro/ })).toHaveAttribute('href', '/he/teacher/upgrade');
     expect(screen.getByRole('menuitem', { name: /auth.signOut/ })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: /education.header.exitEducation/ })).toHaveAttribute('href', '/he');
+    const hrefs = Array.from(document.querySelectorAll('a[href]')).map((a) => a.getAttribute('href'));
+    expect(hrefs.filter((h) => h === '/he')).toHaveLength(1);
+    for (const h of hrefs) expect(h).toMatch(/^\/he(\/|$)/);
   });
 
   it('When What’s new is chosen, Then the changelog dialog opens', async () => {

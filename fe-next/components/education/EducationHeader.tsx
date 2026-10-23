@@ -19,7 +19,7 @@ import { TeacherHelpButton } from '@/components/teacher/TeacherHelpButton';
 import { SearchIconButton } from './SearchIconButton';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
-import { educationBackHref } from '@/lib/navigation/educationBackHref';
+import { educationBackHref, educationHomeFor } from '@/lib/navigation/educationBackHref';
 
 /**
  * Flattens the controls inside the utility bar: no per-button border, hard
@@ -189,9 +189,8 @@ export const EducationHeader = memo<EducationHeaderProps>(({
             </button>
           )}
 
-          {/* Education Logo - Links to education landing only (no main app escape) */}
           <Link
-            href={`/${language}/education`}
+            href={educationHomeFor(language, eduRole)}
             className={cn(
               'flex min-w-0 items-center gap-1 sm:gap-2',
               'hover:opacity-90 transition-opacity',

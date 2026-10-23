@@ -18,6 +18,7 @@ const mockGet = vi.fn();
 vi.mock('next/navigation', () => ({
   useSearchParams: () => ({ get: mockGet }),
   useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
+  usePathname: () => '/en/education/access',
 }));
 
 const mockUseTeacherAccess = vi.fn();

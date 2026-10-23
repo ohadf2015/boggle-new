@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { EducationShell } from '@/components/education/shell/EducationShell';
+import { EducationHeader } from '@/components/education/EducationHeader';
 import { notFound } from 'next/navigation';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { HelpHome } from '@/components/education/help/HelpHome';
@@ -39,7 +41,9 @@ export default async function HelpHomePage({ params }: PageProps) {
       <JsonLd
         data={helpBreadcrumbJsonLd({ locale, trail: [{ name: t('eg2Help.article.breadcrumb'), path: HELP_PATH }] })}
       />
-      <HelpHome locale={locale} />
+      <EducationShell header={<EducationHeader showBackButton />}>
+        <HelpHome locale={locale} />
+      </EducationShell>
     </>
   );
 }

@@ -124,7 +124,7 @@ export function TeacherGate({
   if (isLoading && !wasGranted) {
     if (loadingFallback) return <>{loadingFallback}</>;
     return (
-      <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center min-h-screen">
+      <div className="flex h-dvh flex-1 items-center justify-center bg-neo-navy text-neo-white">
         <PageLoader size="lg" text={t('common.loading')} />
       </div>
     );
@@ -135,7 +135,7 @@ export function TeacherGate({
   if (!hasAccess) {
     if (redirectVariant === 'redirect-status') {
       return (
-        <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center min-h-screen">
+        <div className="flex h-dvh flex-1 items-center justify-center bg-neo-navy text-neo-white">
           <PageLoader size="lg" text={t('common.loading')} />
         </div>
       );

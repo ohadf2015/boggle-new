@@ -4,9 +4,15 @@ import { render } from '@testing-library/react';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/he/education/help',
   notFound: () => {
     throw new Error('NEXT_NOT_FOUND');
   },
+}));
+vi.mock('@/components/education/EducationHeader', () => ({
+  EducationHeader: ({ showBackButton }: { showBackButton?: boolean }) => (
+    <header data-testid="edu-header" data-back={String(!!showBackButton)} />
+  ),
 }));
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: vi.fn() } }));
 
@@ -22,6 +28,19 @@ function jsonLdTypes(container: HTMLElement): string[] {
     (s) => JSON.parse(s.textContent ?? '{}')['@type'],
   );
 }
+
+describe('help center frame', () => {
+  it('home and article sit in the locked edu shell under the edu header with a way back', async () => {
+    const pages = [await HelpHomePage(params('he')), await HelpArticlePage(articleParams('he', HELP_ARTICLES[0].slug))];
+    for (const page of pages) {
+      const { getByTestId, unmount } = render(page);
+      expect(getByTestId('education-shell')).toHaveClass('h-dvh');
+      expect(getByTestId('education-shell-header').querySelector('[data-testid="edu-header"]')?.getAttribute('data-back')).toBe('true');
+      expect(getByTestId('education-shell-scroll').querySelector('h1')).not.toBeNull();
+      unmount();
+    }
+  });
+});
 
 describe('help center home', () => {
   it('renders the search, every topic and a link to every guide', async () => {

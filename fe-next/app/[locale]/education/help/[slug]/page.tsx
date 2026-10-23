@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { EducationShell } from '@/components/education/shell/EducationShell';
+import { EducationHeader } from '@/components/education/EducationHeader';
 import { notFound } from 'next/navigation';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { HelpArticleView } from '@/components/education/help/HelpArticleView';
@@ -64,7 +66,9 @@ export default async function HelpArticlePage({ params }: PageProps) {
           ],
         })}
       />
-      <HelpArticleView locale={locale} meta={meta} article={article} />
+      <EducationShell header={<EducationHeader showBackButton />}>
+        <HelpArticleView locale={locale} meta={meta} article={article} />
+      </EducationShell>
     </>
   );
 }

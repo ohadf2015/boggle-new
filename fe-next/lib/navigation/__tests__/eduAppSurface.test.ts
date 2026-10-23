@@ -18,6 +18,13 @@ describe('isEduAppSurface — where player chrome (bottom nav, floating widgets)
     '/en/education/classroom-game',
     '/sv/education/lists',
     '/teacher',
+    '/en/education/duels',
+    '/he/education/duels/abc123',
+    '/en/education/help',
+    '/es/education/help/getting-started',
+    '/en/education/esl-word-games',
+    '/es/education/vocabulary-games-classroom',
+    '/he/education/brain-breaks-word-games',
   ])('hides on %s', (path) => {
     expect(isEduAppSurface(path)).toBe(true);
   });
@@ -25,9 +32,8 @@ describe('isEduAppSurface — where player chrome (bottom nav, floating widgets)
   it.each([
     '/en',
     '/en/multiplayer',
-    '/en/education/esl-word-games',
-    '/en/education/vocabulary-games-classroom',
     '/en/teacher-appreciation',
+    '/en/educational',
     '/en/pricing-tips',
     '/en/daily',
     '',
