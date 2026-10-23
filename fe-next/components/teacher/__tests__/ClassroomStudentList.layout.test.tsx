@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 
+const { mockLanguage } = vi.hoisted(() => ({ mockLanguage: { value: 'en' } }));
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (k: string, p?: Record<string, unknown>) => (p ? `${k}:${Object.values(p).join(',')}` : k), language: 'en' }),
+  useLanguage: () => ({ t: (k: string, p?: Record<string, unknown>) => (p ? `${k}:${Object.values(p).join(',')}` : k), language: mockLanguage.value }),
 }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('@/components/Avatar', () => ({ default: () => <div data-testid="avatar" /> }));
@@ -48,5 +49,21 @@ describe('ClassroomStudentList: roster row fits a narrow class card', () => {
     expect(details).not.toBeNull();
     expect(details.open).toBe(false);
     expect(within(details.querySelector('summary') as HTMLElement).getByText('teacher.levels.label')).toBeInTheDocument();
+  });
+});
+
+describe('ClassroomStudentList: joined time speaks the teacher language', () => {
+  it('formats the joined time with the active locale instead of English', async () => {
+    const twoDaysAgo = new Date(Date.now() - 2 * 86_400_000).toISOString();
+    mockGetClassroomStudents.mockResolvedValue({
+      data: [{ id: 'm1', student_id: 's1', classroom_id: 'c1', joined_at: twoDaysAgo, level: 'core', profiles: { display_name: 'Dana' } }],
+      error: null,
+    });
+    mockLanguage.value = 'he';
+    render(<ClassroomStudentList classroomId="c1" joinCode="ABC123" />);
+    const joined = await screen.findByTestId('roster-joined');
+    expect(joined.textContent).toBe(new Intl.RelativeTimeFormat('he', { numeric: 'auto' }).format(-2, 'day'));
+    expect(joined.textContent).not.toMatch(/ago/);
+    mockLanguage.value = 'en';
   });
 });

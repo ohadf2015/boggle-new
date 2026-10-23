@@ -188,7 +188,14 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
         {/* One gate over the dashboard AND the detail tabs — the tabs are the analytics
             being sold; gating only the summary card left them open to free teachers. */}
-        <ProGate feature="analytics">
+        <ProGate
+          feature="analytics"
+          whileChecking={
+            <div data-testid="analytics-pro-pending" aria-busy="true" className="flex min-h-60 items-center justify-center rounded-neo border-[2px] border-neo-cream/40 bg-neo-navy/30 shadow-hard">
+              <PageLoader size="md" text={t('common.loading')} />
+            </div>
+          }
+        >
           <div ref={masteryRef} className="scroll-mt-4">
             <WordMasteryReport classroomId={classroomId} classroomName={classroomName} />
           </div>

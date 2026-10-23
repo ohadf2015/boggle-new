@@ -63,6 +63,7 @@ const push = vi.fn();
 beforeEach(() => {
   vi.clearAllMocks();
   teacherPro.hasPro = true;
+  teacherPro.loading = false;
   (useRouter as ReturnType<typeof vi.fn>).mockReturnValue({ push });
   (useAuth as ReturnType<typeof vi.fn>).mockReturnValue({ user: { id: 't1' }, loading: false });
   (useRealtimeClassroomProgress as ReturnType<typeof vi.fn>).mockReturnValue({
@@ -92,6 +93,15 @@ describe('analytics page: summary first, every control does something', () => {
 
     expect(screen.queryByTestId('word-mastery-report')).not.toBeInTheDocument();
     expect(screen.getAllByText('teacher.proGate.analytics.title')).toHaveLength(1);
+  });
+
+  it('shows a busy placeholder while the Pro check resolves, so a slow load never reads as an empty page', () => {
+    teacherPro.loading = true;
+    render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+
+    expect(screen.getByTestId('analytics-pro-pending')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByTestId('word-mastery-report')).not.toBeInTheDocument();
+    expect(screen.queryByText('teacher.proGate.analytics.title')).not.toBeInTheDocument();
   });
 
   it('View Students brings the students tab back from any other tab', async () => {

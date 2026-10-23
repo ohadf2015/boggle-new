@@ -215,4 +215,13 @@ describe('WeeklyProgressDigestCard', () => {
     );
     expect(screen.getByTestId('weekly-progress-digest-overcap-cta')).toBeInTheDocument();
   });
+  it('sizes the stat tiles by the card width, so a narrow HQ side rail gets two columns instead of four clipped labels', () => {
+    render(<WeeklyProgressDigestCard classroomId="c1" classroomName="Year 7" />);
+    const region = screen.getByTestId('weekly-progress-digest');
+    const grid = screen.getByText('teacher.digest.weeklyAssignmentsCompleted').closest('.grid') as HTMLElement;
+    expect(region.className).toContain('@container');
+    expect(grid.className).toContain('grid-cols-2');
+    expect(grid.className).toContain('@md:grid-cols-4');
+    expect(grid.className).not.toMatch(/(^|\s)md:grid-cols-4/);
+  });
 });

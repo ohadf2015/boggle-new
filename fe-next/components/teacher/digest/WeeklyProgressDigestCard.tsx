@@ -110,7 +110,7 @@ export function WeeklyProgressDigestCard({
     <section
       data-testid="weekly-progress-digest"
       aria-label={t('teacher.digest.weeklyRegionLabel', { classroom: classroomName })}
-      className="space-y-3"
+      className="@container space-y-3"
     >
       <header>
         <h2 className="font-neo-display text-lg font-bold text-neo-white">
@@ -141,7 +141,7 @@ export function WeeklyProgressDigestCard({
         </NeoPanel>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 @md:grid-cols-4">
             <Stat
               value={week.assignmentCompleted}
               label={t('teacher.digest.weeklyAssignmentsCompleted')}

@@ -9,11 +9,11 @@ import { LEVEL_ORDER, levelLabelKey } from '@/lib/education/differentiation';
 import { cn } from '@/lib/utils';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { Mail, Calendar, SlidersHorizontal, ChevronDown } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
 import Avatar from '@/components/Avatar';
 import { resolveDisplayName } from '@/lib/displayName';
 import { InviteStudentsCta } from '@/components/teacher/classroom/InviteStudentsCta';
 import { RosterRemoveButton } from '@/components/teacher/classroom/RosterRemoveButton';
+import { lastPlayedLabel } from '@/components/teacher/home/HomeClassList';
 
 /** Selected-segment fill per level. Unselected segments are plain white. */
 const LEVEL_SELECTED_BG: Record<VocabularyLevel, string> = {
@@ -78,6 +78,7 @@ interface ClassroomStudentListProps {
 
 export default function ClassroomStudentList({ classroomId, joinCode }: ClassroomStudentListProps) {
   const { t, language } = useLanguage();
+  const [nowMs] = useState(() => Date.now());
   const isRTL = language === 'he';
   const [students, setStudents] = useState<ClassroomStudent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -184,7 +185,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
         );
         const email = profile?.email || '';
         const avatarConfig = profile?.avatar_config;
-        const joinedAt = formatDistanceToNow(new Date(student.joined_at), { addSuffix: true });
+        const joinedAt = lastPlayedLabel(student.joined_at, language, nowMs);
 
         return (
           <div

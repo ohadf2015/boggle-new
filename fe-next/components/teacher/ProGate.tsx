@@ -74,9 +74,11 @@ interface ProGateProps {
    * teachers who never opened it. Defaults to true for always-visible mounts.
    */
   active?: boolean;
+  /** Shown while the entitlement resolves, for pages where the gate is the whole body. */
+  whileChecking?: React.ReactNode;
 }
 
-export function ProGate({ feature, children, active = true }: ProGateProps) {
+export function ProGate({ feature, children, active = true, whileChecking = null }: ProGateProps) {
   const { t } = useLanguage();
   const { hasPro, loading, accessTrialExpires } = useTeacherPro();
   const [nowMs] = useState(() => Date.now());
@@ -98,7 +100,7 @@ export function ProGate({ feature, children, active = true }: ProGateProps) {
 
   // Neither branch while the entitlement is unresolved: painting the surface then removing it
   // is the flash, painting the upsell tells a paying teacher they are not paying.
-  if (loading) return null;
+  if (loading) return <>{whileChecking}</>;
   if (hasPro) return <>{children}</>;
   if (previewDaysLeft !== null) {
     return (
