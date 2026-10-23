@@ -18,6 +18,12 @@ describe('EducationBreadcrumbs labels', () => {
     for (const c of crumbText()) expect(c).not.toMatch(/^(help|create-a)/);
   });
 
+  it('keeps the help center clickable from an article', () => {
+    pathname = '/he/education/help/create-a-class';
+    render(<EducationBreadcrumbs />);
+    expect(screen.getByText('T(eduShell.account.help)').closest('a')).toHaveAttribute('href', '/he/education/help');
+  });
+
   it('drops any segment it has no label for instead of showing it raw', () => {
     pathname = '/he/education/some-unmapped-page';
     render(<EducationBreadcrumbs />);

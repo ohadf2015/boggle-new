@@ -14,6 +14,8 @@ interface BreadcrumbItem {
   isCurrent?: boolean;
 }
 
+const ID_SEGMENT = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 interface EducationBreadcrumbsProps {
   /** Additional class names */
   className?: string;
@@ -129,10 +131,9 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
       });
     });
 
-    // A dropped id segment would otherwise leave the trail with no current
-    // step, so the last crumb that survived is the one the student is on.
+    // On a record page the list it came from is the current step; under an article the hub stays a link.
     const tail = breadcrumbs[breadcrumbs.length - 1];
-    if (tail) tail.isCurrent = true;
+    if (tail && ID_SEGMENT.test(segments[segments.length - 1] ?? '')) tail.isCurrent = true;
 
     return breadcrumbs;
   }, [pathname, language, t, customItems]);
