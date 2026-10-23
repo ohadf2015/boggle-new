@@ -8,6 +8,7 @@ import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
 import { buildStudentJoinedEvent, isQaEmail } from '@/backend/utils/educationRoundTelemetry';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 import { lookupLiveGameForClassroom } from '@/lib/education/liveGameForClassroom';
+import { lookupEndedClassroomSession, recordEndedCodeTry } from './endedSessionCode';
 
 const joinClassroomSchema = z.object({
   joinCode: z.string().min(1).max(10),
@@ -165,6 +166,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // A student holding yesterday's whiteboard code belongs to that class: enrol them there instead of a dead end.
+    let endedSessionCode = false;
+    if (!classroom) {
+      const ended = await lookupEndedClassroomSession(normalizedCode);
+      if (ended) {
+        classroom = { id: ended.classroomId };
+        endedSessionCode = true;
+      }
+    }
+
     if (!classroom) {
       return NextResponse.json(
         { error: 'Classroom not found. Please check the code with your teacher.' },
@@ -195,6 +206,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (endedSessionCode && !liveGameCode && userId) {
+      await recordEndedCodeTry(classroom.id, userId);
+    }
+    const endedVerdict = endedSessionCode ? { verdict: 'class-join', endedSessionCode: true } : {};
+
     // Check if already a member
     const { data: existing } = await supabase
       .from('classroom_memberships')
@@ -210,6 +226,7 @@ export async function POST(request: NextRequest) {
           message: 'Already a member of this classroom',
           classroomId: classroom.id,
           alreadyMember: true,
+          ...endedVerdict,
           ...(liveGameCode ? { gameCode: liveGameCode } : {}),
         },
         { status: 200 }
@@ -258,6 +275,7 @@ export async function POST(request: NextRequest) {
       {
         message: 'Successfully joined classroom',
         classroomId: classroom.id,
+        ...endedVerdict,
         ...(liveGameCode ? { gameCode: liveGameCode } : {}),
       },
       { status: 200 }
