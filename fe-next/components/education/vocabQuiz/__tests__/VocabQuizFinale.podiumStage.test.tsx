@@ -89,4 +89,18 @@ describe('VocabQuizFinale — the wall podium', () => {
     render(<VocabQuizFinale standings={FIVE} totalQuestions={5} onPlayAgain={() => {}} t={t} />);
     expect(screen.getByTestId('podium-stage').className).toMatch(/w-\[min\(100%,calc\(\(100dvh_-_\d+rem\)\*1\.768\)\)\]/);
   });
+
+  it('Given a boss card above the finale, Then the podium gives up that height too, so Rematch stays on the wall', () => {
+    render(<VocabQuizFinale standings={FIVE} totalQuestions={5} onPlayAgain={() => {}} bossShown t={t} />);
+    expect(screen.getByTestId('podium-stage').className).toContain('100dvh_-_34rem');
+  });
+
+  it('Given more than three players, Then the runners-up row holds its place before the reveal, hidden, so the podium never jumps when it lands', () => {
+    render(<VocabQuizFinale standings={FIVE} totalQuestions={5} t={t} />);
+    const row = screen.getByTestId('quiz-finale-runners-up');
+    expect(row.className).toContain('invisible');
+    expect(row).toHaveAttribute('aria-hidden', 'true');
+    act(() => void vi.advanceTimersByTime(800));
+    expect(screen.getByTestId('quiz-finale-runners-up').className).not.toContain('invisible');
+  });
 });

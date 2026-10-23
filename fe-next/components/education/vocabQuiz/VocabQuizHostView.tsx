@@ -246,6 +246,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
           totalQuestions={quiz.totalQuestions}
           onPlayAgain={onPlayAgain}
           onBackToClass={onBackToClass}
+          bossShown={!!quiz.boss}
           t={t}
         />
       )}

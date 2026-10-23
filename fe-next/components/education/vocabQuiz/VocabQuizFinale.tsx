@@ -50,6 +50,7 @@ export interface VocabQuizFinaleProps {
   onPlayAgain?: () => void;
   /** Classroom host's confirmed exit to HQ; the finale's quiet way out. */
   onBackToClass?: () => void;
+  bossShown?: boolean;
   t: TranslateFn;
 }
 
@@ -85,12 +86,13 @@ function StatTile({
   );
 }
 
-function RunnersUp({ players, t }: { players: VocabQuizStanding[]; t: TranslateFn }) {
+function RunnersUp({ players, hidden, t }: { players: VocabQuizStanding[]; hidden: boolean; t: TranslateFn }) {
   return (
     <ol
       data-testid="quiz-finale-runners-up"
       aria-label={t('vocabQuiz.standings.title')}
-      className="shrink-0 flex flex-wrap items-center justify-center gap-2 md:gap-3"
+      aria-hidden={hidden || undefined}
+      className={cn('shrink-0 flex flex-wrap items-center justify-center gap-2 md:gap-3', hidden && 'invisible')}
     >
       {players.map((player, index) => (
         <li
@@ -114,7 +116,7 @@ function RunnersUp({ players, t }: { players: VocabQuizStanding[]; t: TranslateF
   );
 }
 
-export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBackToClass, t }: VocabQuizFinaleProps) {
+export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBackToClass, bossShown = false, t }: VocabQuizFinaleProps) {
   const stats = classFinaleStats(standings, totalQuestions);
   const celebrate = stats.correct > 0;
   const stage = useRoundEndReveal(celebrate);
@@ -203,10 +205,13 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
             stage={stage}
             muted={!celebrate}
             t={t}
-            className="w-[min(100%,calc((100dvh_-_28rem)*1.768))] min-w-[min(100%,20rem)]"
+            className={cn(
+              'min-w-[min(100%,20rem)]',
+              bossShown ? 'w-[min(100%,calc((100dvh_-_34rem)*1.768))]' : 'w-[min(100%,calc((100dvh_-_28rem)*1.768))]'
+            )}
           />
         )}
-        {runnersUp.length > 0 && isRevealed(4, stage) && <RunnersUp players={runnersUp} t={t} />}
+        {runnersUp.length > 0 && <RunnersUp players={runnersUp} hidden={!isRevealed(4, stage)} t={t} />}
       </div>
 
       <div className="shrink-0 flex flex-col items-stretch gap-3 lg:flex-row lg:items-stretch">

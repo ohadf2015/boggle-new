@@ -85,4 +85,16 @@ describe('VocabQuizHostView — the wall after the last question', () => {
     expect(screen.getByTestId('vocab-quiz-host').className).toContain('overflow-y-auto');
     expect(screen.getByTestId('vocab-quiz-host').className).not.toContain('md:overflow-hidden');
   });
+
+  it('gives the podium less height when the boss card sits above it', () => {
+    const withBoss = ENDED as typeof ENDED & { boss?: unknown };
+    withBoss.boss = { maxHp: 100, hp: 0, lastHits: 3, defeated: true };
+    try {
+      render(<VocabQuizHostView socket={null} joinCode="H9M5YJ" playerCount={2} t={t} />);
+      expect(screen.getByTestId('boss-outcome')).toBeInTheDocument();
+      expect(screen.getByTestId('podium-stage').className).toContain('100dvh_-_34rem');
+    } finally {
+      delete withBoss.boss;
+    }
+  });
 });

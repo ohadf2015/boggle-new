@@ -164,6 +164,7 @@ export function QuizPreview() {
         totalQuestions={10}
         onPlayAgain={() => toast('Preview: play again')}
         onBackToClass={() => toast('Preview: back to class')}
+        bossShown={qboss === 'defeated' || qboss === 'escaped'}
         t={t}
       />
     </div>
