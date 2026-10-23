@@ -9,7 +9,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
 let games: { games: unknown[]; isLoading: boolean; error: Error | null } = { games: [], isLoading: false, error: null };
 vi.mock('@/hooks/useRecentClassroomGames', () => ({ useRecentClassroomGames: () => games }));
 let hasPro = false;
-vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro, loading: false }) }));
+let accessTrialExpires: string | null = null;
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro, accessTrialExpires, loading: false }) }));
 vi.mock('../RoundReportCard', () => ({
   RoundReportCard: ({ game, hasPro: pro }: { game: { gameCode: string }; hasPro: boolean }) => (
     <div data-testid="card" data-pro={String(pro)}>{game.gameCode}</div>
@@ -21,6 +22,7 @@ import { RoundReports } from '../RoundReports';
 beforeEach(() => {
   games = { games: [], isLoading: false, error: null };
   hasPro = false;
+  accessTrialExpires = null;
 });
 
 describe('RoundReports', () => {
@@ -45,6 +47,20 @@ describe('RoundReports', () => {
     games = { games: [ROUND_FIXTURE], isLoading: false, error: null };
     render(<RoundReports classroomId="c1" classroomName="7B" />);
     expect(screen.getByTestId('card')).toHaveAttribute('data-pro', 'true');
+  });
+
+  it('unlocks the drill-down for a teacher on a live access trial, as the server does', () => {
+    accessTrialExpires = new Date(Date.now() + 86_400_000).toISOString();
+    games = { games: [ROUND_FIXTURE], isLoading: false, error: null };
+    render(<RoundReports classroomId="c1" classroomName="7B" />);
+    expect(screen.getByTestId('card')).toHaveAttribute('data-pro', 'true');
+  });
+
+  it('keeps it locked once the access trial has lapsed', () => {
+    accessTrialExpires = new Date(Date.now() - 86_400_000).toISOString();
+    games = { games: [ROUND_FIXTURE], isLoading: false, error: null };
+    render(<RoundReports classroomId="c1" classroomName="7B" />);
+    expect(screen.getByTestId('card')).toHaveAttribute('data-pro', 'false');
   });
 
   it('says how to get a report when no round has been played', () => {

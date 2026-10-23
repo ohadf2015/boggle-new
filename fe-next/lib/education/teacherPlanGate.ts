@@ -48,3 +48,10 @@ export function isDigestOverFreeTierCaps({
     isFreePlanUsageBlocked(false, n, FREE_TIER_LIMITS.assignmentsPerClass),
   );
 }
+
+/** Paid Pro or a live access trial: the same entitlement `teacherHasProAccess` grants on the server. */
+export function hasProAccess(state: { hasPro: boolean; accessTrialExpires: string | null }, nowMs: number): boolean {
+  if (state.hasPro) return true;
+  const end = state.accessTrialExpires ? Date.parse(state.accessTrialExpires) : NaN;
+  return Number.isFinite(end) && end > nowMs;
+}

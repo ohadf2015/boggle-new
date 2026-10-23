@@ -5,6 +5,7 @@ import { ChevronDown, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRecentClassroomGames } from '@/hooks/useRecentClassroomGames';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { hasProAccess } from '@/lib/education/teacherPlanGate';
 import type { RecentClassroomGame } from '@/lib/supabase/analyticsLastGame';
 import { RoundReportCard } from './RoundReportCard';
 import { participationParams, roundModeLabelKey } from './roundReport';
@@ -22,7 +23,9 @@ export interface RoundReportsProps {
 export function RoundReports({ classroomId, classroomName, onStudentClick, previewGames, previewPro }: RoundReportsProps) {
   const { t, language } = useLanguage();
   const fetched = useRecentClassroomGames({ classroomId: previewGames ? '' : classroomId, limit: ROUNDS_SHOWN });
-  const { hasPro } = useTeacherPro();
+  const entitlement = useTeacherPro();
+  const [nowMs] = useState(() => Date.now());
+  const hasPro = hasProAccess(entitlement, nowMs);
   const games = previewGames ?? fetched.games;
   const pro = previewPro ?? hasPro;
   const [openCode, setOpenCode] = useState<string | null>(null);
