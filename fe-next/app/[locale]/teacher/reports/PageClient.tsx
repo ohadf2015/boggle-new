@@ -303,6 +303,7 @@ function TeacherReportsInner() {
         <RoundReports
           classroomId={selectedClassroomId}
           classroomName={selectedClassroom?.name ?? ''}
+          onStudentClick={handleStudentClick}
           {...roundPreviewProps(searchParams?.get('roundPreview'))}
         />
         <WordMasteryReport

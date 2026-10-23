@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ROUND_FIXTURE } from '../roundFixture';
 
@@ -24,10 +24,18 @@ beforeEach(() => {
 });
 
 describe('RoundReports', () => {
-  it('renders a report for every completed round, newest first as fetched', () => {
+  it('opens the newest round and lists older rounds as one-line rows', () => {
     games = { games: [ROUND_FIXTURE, { ...ROUND_FIXTURE, gameCode: 'FIX002' }], isLoading: false, error: null };
     render(<RoundReports classroomId="c1" classroomName="7B" />);
-    expect(screen.getAllByTestId('card').map((c) => c.textContent)).toEqual(['FIX001', 'FIX002']);
+    expect(screen.getAllByTestId('card').map((c) => c.textContent)).toEqual(['FIX001']);
+    expect(screen.getAllByTestId('round-report-collapsed')).toHaveLength(1);
+  });
+
+  it('tapping an older round opens it instead', () => {
+    games = { games: [ROUND_FIXTURE, { ...ROUND_FIXTURE, gameCode: 'FIX002' }], isLoading: false, error: null };
+    render(<RoundReports classroomId="c1" classroomName="7B" />);
+    fireEvent.click(screen.getByTestId('round-report-collapsed'));
+    expect(screen.getAllByTestId('card').map((c) => c.textContent)).toEqual(['FIX002']);
   });
 
   it('passes the teacher plan down', () => {

@@ -1,20 +1,12 @@
 'use client';
 
-import Link from 'next/link';
-import { Lock, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { RecentClassroomGame } from '@/lib/supabase/analyticsLastGame';
 import { MissedPracticeAction } from '@/components/teacher/reports/MissedPracticeAction';
 import { cn } from '@/lib/utils';
-import { buildRoundReport, type RoundCellState } from './roundReport';
+import { buildRoundReport, roundModeLabelKey, type RoundCellState } from './roundReport';
 
-const MODE_KEYS: Record<string, string> = {
-  classic: 'classic',
-  blast: 'blast',
-  'word-hunt': 'wordHunt',
-  'wheel-rush': 'wheelRush',
-  'vocab-quiz': 'vocabQuiz',
-};
 
 const CELL: Record<Exclude<RoundCellState, 'absent'>, string> = {
   found: 'bg-neo-lime',
@@ -28,12 +20,13 @@ export interface RoundReportCardProps {
   hasPro: boolean;
   classroomId: string;
   classroomName: string;
+  onStudentClick?: (studentId: string, name: string) => void;
 }
 
-export function RoundReportCard({ game, hasPro, classroomId, classroomName }: RoundReportCardProps) {
+export function RoundReportCard({ game, hasPro, classroomId, classroomName, onStudentClick }: RoundReportCardProps) {
   const { t, language } = useLanguage();
   const report = buildRoundReport(game);
-  const modeKey = MODE_KEYS[game.gameMode];
+  const modeKey = roundModeLabelKey(game.gameMode);
   const when = new Date(game.playedAt).toLocaleString(language, { weekday: 'short', hour: 'numeric', minute: '2-digit' });
   const missed = game.missedWords.filter((w) => w.missedBy > 0).slice(0, MISSED_SHOWN);
 
@@ -41,7 +34,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName }: Ro
     <article data-testid="round-report" className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 shadow-hard-sm sm:p-4">
       <header className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h3 className="font-neo-display text-lg font-black text-neo-white">
-          {modeKey ? t(`teacher.lastGame.mode.${modeKey}`) : game.gameMode}
+          {modeKey ? t(modeKey) : game.gameMode}
           <span className="ms-2 text-sm font-bold text-neo-white/60">{when}</span>
         </h3>
         <p data-testid="round-report-played" className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-cyan">
@@ -79,22 +72,20 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName }: Ro
       <section className="mt-3">
         <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
           <h4 className="font-neo-display text-sm font-black uppercase tracking-wide text-neo-white">{t('teacher.rounds.participants')}</h4>
-          {hasPro ? (
-            <span className="flex items-center gap-3 text-xs font-bold text-neo-white/70">
-              <span className="inline-flex items-center gap-1"><span className="size-3 rounded-sm border border-neo-black bg-neo-lime" aria-hidden />{t('teacher.lastGame.found')}</span>
-              <span className="inline-flex items-center gap-1"><span className="size-3 rounded-sm border border-neo-black bg-neo-pink" aria-hidden />{t('teacher.lastGame.missed')}</span>
-            </span>
-          ) : null}
+          <span className="flex items-center gap-3 text-xs font-bold text-neo-white/70">
+            <span className="inline-flex items-center gap-1"><span className="size-3 rounded-sm border border-neo-black bg-neo-lime" aria-hidden />{t('teacher.lastGame.found')}</span>
+            <span className="inline-flex items-center gap-1"><span className="size-3 rounded-sm border border-neo-black bg-neo-pink" aria-hidden />{t('teacher.lastGame.missed')}</span>
+          </span>
         </div>
-        {hasPro ? (
-          <ul className="flex flex-col gap-1">
-            {report.rows.map((row) => (
-              <li key={row.studentId} data-testid="round-report-strip" className="flex min-w-0 items-center gap-2">
-                <span className="w-24 shrink-0 truncate text-sm font-bold text-neo-white"><bdi>{row.name}</bdi></span>
+        <ul className="flex flex-col gap-1">
+          {report.rows.map((row) => {
+            const body = (
+              <>
+                <span className="w-24 shrink-0 truncate text-start text-sm font-bold text-neo-white"><bdi>{row.name}</bdi></span>
                 {row.absent ? (
-                  <span className="min-w-0 flex-1 text-xs font-bold italic text-neo-white/60">{t('teacher.rounds.absent')}</span>
+                  <span className="min-w-0 flex-1 text-start text-xs font-bold italic text-neo-white/60">{t('teacher.rounds.absent')}</span>
                 ) : (
-                  <span className="flex min-w-0 flex-1 gap-0.5">
+                  <span className="flex min-w-0 flex-1 gap-0.5" aria-hidden>
                     {row.cells.map((cell) => (
                       <span
                         key={cell.word}
@@ -108,18 +99,25 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName }: Ro
                 <span className="w-12 shrink-0 text-end text-xs font-black tabular-nums text-neo-white/80">
                   {row.absent ? '—' : row.score}
                 </span>
+              </>
+            );
+            return (
+              <li key={row.studentId} data-testid="round-report-strip">
+                {onStudentClick && !row.absent ? (
+                  <button
+                    type="button"
+                    onClick={() => onStudentClick(row.studentId, row.name)}
+                    className="flex min-h-9 w-full min-w-0 items-center gap-2 rounded-sm px-1 hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                  >
+                    {body}
+                  </button>
+                ) : (
+                  <div className="flex min-h-9 min-w-0 items-center gap-2 px-1">{body}</div>
+                )}
               </li>
-            ))}
-          </ul>
-        ) : (
-          <div data-testid="round-report-locked" className="flex flex-wrap items-center gap-2 rounded-neo border-2 border-dashed border-neo-cream/40 px-3 py-2">
-            <Lock className="size-4 shrink-0 text-neo-lime" aria-hidden />
-            <p className="min-w-0 flex-1 break-words text-sm font-bold text-neo-white/80">{t('teacher.rounds.lockedBody')}</p>
-            <Link href={`/${language}/teacher/upgrade`} className="text-sm font-black text-neo-lime underline underline-offset-2">
-              {t('teacher.rounds.lockedCta')}
-            </Link>
-          </div>
-        )}
+            );
+          })}
+        </ul>
       </section>
 
       <div className="mt-3">

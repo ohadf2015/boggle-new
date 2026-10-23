@@ -1,5 +1,17 @@
 import type { RecentClassroomGame } from '@/lib/supabase/analyticsLastGame';
 
+const MODE_KEYS: Record<string, string> = {
+  classic: 'classic',
+  blast: 'blast',
+  'word-hunt': 'wordHunt',
+  'wheel-rush': 'wheelRush',
+  'vocab-quiz': 'vocabQuiz',
+};
+
+export function roundModeLabelKey(mode: string): string | null {
+  return MODE_KEYS[mode] ? `teacher.lastGame.mode.${MODE_KEYS[mode]}` : null;
+}
+
 export type RoundCellState = 'found' | 'missed' | 'absent';
 
 export interface RoundReportRow {

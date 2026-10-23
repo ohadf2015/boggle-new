@@ -63,6 +63,7 @@ describe('<GetStudentsInCard>', () => {
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
     fireEvent.click(screen.getByTestId('hq-copy-link'));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/en/join/AB12CD`));
+    expect(trackCopied).toHaveBeenCalledTimes(1);
     expect(trackCopied).toHaveBeenCalledWith({ classroomId: 'c1' });
   });
 

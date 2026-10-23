@@ -27,6 +27,9 @@ vi.mock('@/components/teacher/hq/HqProjectorSheet', () => ({
   HqProjectorSheet: ({ classroom }: { classroom: { join_code: string } }) => <div data-testid="projector-sheet">{classroom.join_code}</div>,
 }));
 
+const fetchWithAuth = vi.fn();
+vi.mock('@/utils/authFetch', () => ({ fetchWithAuth: (...a: unknown[]) => fetchWithAuth(...a) }));
+
 let classroomsState: Record<string, unknown>;
 vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => classroomsState }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: false, loading: false, source: null, refresh: vi.fn() }) }));
@@ -47,10 +50,8 @@ beforeEach(() => {
   triesCount = 0;
   activationProgress = { inviteCopied: true, liveStarted: true, dismissed: true };
   classroomsState = { classrooms: [EMPTY_CLASS], isLoading: false, error: null, refresh: vi.fn() };
-  global.fetch = vi.fn(async (url: string) => ({
-    ok: true,
-    json: async () => (String(url).includes('ended-code-tries') ? { count: triesCount } : {}),
-  })) as unknown as typeof fetch;
+  fetchWithAuth.mockImplementation(async () => ({ ok: true, json: async () => ({ count: triesCount }) }));
+  global.fetch = vi.fn(async () => ({ ok: true, json: async () => ({}) })) as unknown as typeof fetch;
 });
 afterEach(() => cleanup());
 
@@ -99,7 +100,7 @@ describe('Teacher Home: get students in', () => {
 
   it('Given nobody tried an ended code, Then no notice', async () => {
     render(<TeacherDashboard />);
-    await waitFor(() => expect(global.fetch).toHaveBeenCalledWith('/api/education/classroom/c1/ended-code-tries', expect.anything()));
+    await waitFor(() => expect(fetchWithAuth).toHaveBeenCalledWith('/api/education/classroom/c1/ended-code-tries'));
     expect(screen.queryByTestId('hq-ended-code-tries')).not.toBeInTheDocument();
   });
 });

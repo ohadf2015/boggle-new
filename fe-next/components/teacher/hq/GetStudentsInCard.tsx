@@ -142,7 +142,6 @@ export function GetStudentsInCard({
       sfx.playButtonClickSound();
       setCopied(true);
       toast.success(t("share.linkCopied"));
-      trackEduJoinCodeCopied({ classroomId: classroom.id });
       setTimeout(() => setCopied(false), 1800);
     } catch {
       toast.error(t("share.codeCopyError"));
