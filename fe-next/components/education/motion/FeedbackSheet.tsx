@@ -39,6 +39,7 @@ export function FeedbackSheet({ open, variant, title, children, action, icon, on
   return (
     <m.div
       key={variant}
+      data-testid="edu-feedback-sheet"
       role="status"
       aria-live="polite"
       data-variant={variant}
