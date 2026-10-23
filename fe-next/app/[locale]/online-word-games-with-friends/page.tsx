@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { EducationIntentCta } from '@/components/education/EducationIntentCta';
+import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
 
 
 interface PageProps {
@@ -226,6 +227,7 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
         </section>
 
         <EducationIntentCta locale={locale} variant="teachers" />
+        <ApalabradosSinDescargarLink />
 
         <section className="mb-12">
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Ready to Play With Friends?</h2>

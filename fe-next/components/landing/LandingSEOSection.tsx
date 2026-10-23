@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { Spline, Trophy, Users, Zap, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FreshCrossLink } from './fresh/FreshCrossLink';
+import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
 import { contentByLocale, type LandingSEOContent } from './landingSEOContent';
 import s from './fresh/FreshMotion.module.css';
 
@@ -77,6 +78,9 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
             className="whitespace-nowrap font-neo-body text-base font-bold text-neo-cream underline decoration-neo-lime decoration-2 underline-offset-4 transition-colors hover:text-neo-lime focus-visible:rounded-[4px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neo-lime md:text-lg"
           />
         </div>
+        {locale === 'es' ? (
+          <ApalabradosSinDescargarLink className="max-w-[46ch] font-neo-body text-base leading-relaxed text-neo-cream/80 md:text-lg" />
+        ) : null}
       </div>
 
       <div data-step-path className="relative">
