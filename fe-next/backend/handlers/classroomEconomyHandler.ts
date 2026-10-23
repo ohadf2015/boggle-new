@@ -199,7 +199,7 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
     const res = await spendHintFor({ gameCode, roundId, userId, now: Date.now() });
     if (!res.ok) { socket.emit(E.error, { reason: res.reason }); return; }
     const game = await getGameAsync(gameCode);
-    const words = ((game as { lessonVocabulary?: string[] } | null)?.lessonVocabulary ?? []).filter((w) => w.length > 0);
+    const words = Array.from((game as { lessonVocabulary?: Iterable<string> } | null)?.lessonVocabulary ?? []).filter((w) => w.length > 0);
     if (words.length === 0) { socket.emit(E.error, { reason: 'no_lesson_words' }); return; }
     const pick = words[Math.floor(Math.random() * words.length)];
     socket.emit(E.hint, { letter: pick[0], length: pick.length });

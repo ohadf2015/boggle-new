@@ -56,7 +56,7 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
   }
   // Defensive: ensure the submitting user exists in foundWords (init may have missed a late-join/bot).
   if (!state.foundWords[username]) {
-    logger.warn('WHEEL_RUSH', `submitWheelWord from ${username} in ${gameCode} — foundWords entry missing, initializing inline`);
+    logger.info('WHEEL_RUSH', `submitWheelWord from ${username} in ${gameCode} — foundWords entry missing, initializing inline`);
     state.foundWords[username] = [];
   }
 

@@ -51,7 +51,7 @@ export function resendFinishedResults(
 ): boolean {
   const cached = game.cachedResultsPayload;
   if (!cached) {
-    logger.warn(
+    logger.info(
       'SOCKET',
       `Finished game ${gameCode} has no cached results to resend — leaving the client's requestResults watchdog to retry`
     );

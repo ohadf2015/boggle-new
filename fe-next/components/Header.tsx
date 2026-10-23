@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '../contexts/AuthContext';
 import { cn } from '../lib/utils';
@@ -39,6 +39,18 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
         handleDismissGiftModal,
     } = useGiftNotifications();
 
+    // The header holds the bar plus the lazy-mounted desktop tabs, so its real height
+    // outgrows any CSS floor; the spacer copies what actually paints.
+    const headerRef = useRef<HTMLElement>(null);
+    const [headerHeight, setHeaderHeight] = useState(0);
+    useLayoutEffect(() => {
+        const el = headerRef.current;
+        if (!el || typeof ResizeObserver === 'undefined') return;
+        const ro = new ResizeObserver(() => setHeaderHeight(Math.ceil(el.getBoundingClientRect().height)));
+        ro.observe(el);
+        return () => ro.disconnect();
+    }, []);
+
     // Auth Modal State
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [authEverOpened, setAuthEverOpened] = useState(false);
@@ -75,9 +87,11 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 )}
                 style={{
                     paddingTop: safeArea.top > 0 ? `${safeArea.top}px` : undefined,
+                    minHeight: headerHeight > 0 ? `${headerHeight}px` : undefined,
                 }}
             />
             <header
+                ref={headerRef}
                 className={cn(
                     "pb-1 lg:pb-2 short:pb-0 medium-short:pb-0.5",
                     // Always fixed so it cannot silently lose its flow slot when an

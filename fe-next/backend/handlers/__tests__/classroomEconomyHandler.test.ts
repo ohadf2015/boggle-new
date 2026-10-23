@@ -8,6 +8,7 @@ const gameState = { value: { gameSessionId: 'sess-7' } as unknown };
 const memGame = { value: { gameSessionId: 'sess-7' } as unknown };
 const applyCorrect = vi.fn();
 const buyPowerUpFor = vi.fn();
+const spendHint = vi.fn();
 const handlers: Record<string, (data: unknown) => Promise<void>> = {};
 
 const SEATED_USERS = { Ann: { authUserId: 'u1' } };
@@ -27,7 +28,7 @@ vi.mock('../../modules/classroomEconomyService', () => ({
   buildBoard: vi.fn(),
   buyPowerUpFor: (input: unknown) => buyPowerUpFor(input),
   toSnapshot: vi.fn(),
-  spendHintFor: vi.fn(),
+  spendHintFor: (input: unknown) => spendHint(input),
   roundSummaryFor: async () => ({ roundCash: 12, rank: 2, size: 3 }),
 }));
 vi.mock('../../modules/classroomEconomyLocker', () => ({
@@ -238,5 +239,17 @@ describe('roundIdOf', () => {
 
   it('Given no session id, Then the game code is used', () => {
     expect(roundIdOf({}, 'ABC')).toBe('ABC');
+  });
+});
+
+describe('classroomEconomy:useHint', () => {
+  it('Given the live game holds lesson vocabulary as a Set, Then a hint is still picked', async () => {
+    memGame.value = { gameSessionId: 'sess-7', users: SEATED_USERS, lessonVocabulary: new Set(['apple']) };
+    spendHint.mockResolvedValue({ ok: true, snapshot: { cash: 1 } });
+    const emitted: Array<{ event: string; data: unknown }> = [];
+    const socket = { id: 's1', emit: (event: string, data: unknown) => emitted.push({ event, data }), on: (ev: string, fn: (d: unknown) => Promise<void>) => { handlers[ev] = fn; } };
+    registerClassroomEconomyHandlers({} as never, socket as never);
+    await handlers['classroomEconomy:useHint']({ gameCode: 'ABC' });
+    expect(emitted[0]).toEqual({ event: 'classroomEconomy:hint', data: { letter: 'a', length: 5 } });
   });
 });

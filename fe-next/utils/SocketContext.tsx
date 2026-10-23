@@ -603,7 +603,7 @@ export function useSocketEmit() {
       socket.emit(event, data);
       return true;
     }
-    logger.warn('[SOCKET.IO] Cannot emit - socket not connected');
+    logger.debug('[SOCKET.IO] Cannot emit - socket not connected');
     return false;
   }, [socket, isConnected]);
 

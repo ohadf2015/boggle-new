@@ -1,4 +1,4 @@
-import { getRedisClient, isRedisAvailable } from '@/backend/redis/connection';
+import { getSharedRedisClient } from '@/backend/redis/connection';
 
 export type ClaimResult = 'claimed' | 'taken' | 'unavailable';
 
@@ -9,7 +9,7 @@ export type ClaimResult = 'claimed' | 'taken' | 'unavailable';
  * NOT a pass — callers fail closed (withhold the payout) and say so.
  */
 export async function claimOnce(key: string, ttlSec = 60 * 60 * 24 * 120): Promise<ClaimResult> {
-  const redis = isRedisAvailable() ? getRedisClient() : null;
+  const redis = getSharedRedisClient();
   if (!redis) return 'unavailable';
   try {
     return (await redis.set(`once:${key}`, '1', 'EX', ttlSec, 'NX')) === 'OK' ? 'claimed' : 'taken';

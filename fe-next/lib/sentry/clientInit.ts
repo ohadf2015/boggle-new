@@ -313,6 +313,8 @@ Sentry.init({
     /\[SOCKET\.IO\] Rate limited by server/i,
     // Per-attempt dictionary fetch lines; the exhausted case throws DictionaryLoadError
     /\[loadWordCraftDictionary\].*\(attempt \d+\/\d+\)/i,
+    // Offline dictionary download refused (storage quota / private mode); the panel shows its own error
+    /^Download failed for \w+:/i,
     // Browser refused Cache.put (quota / offline); the SW falls back to network
     /SW cache error:.*Cache\.put\(\)/i,
     // Socket.IO AUTH_REQUIRED — unauth users hitting friends sockets; server rejects correctly (JAVASCRIPT-NEXTJS-12G)

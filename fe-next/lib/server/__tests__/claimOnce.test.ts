@@ -9,8 +9,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const store = new Map<string, string>();
 let available = true;
 vi.mock('@/backend/redis/connection', () => ({
-  isRedisAvailable: () => available,
-  getRedisClient: () =>
+  // Next route code gets its own copy of the module: its own client/flag stay unset.
+  isRedisAvailable: () => false,
+  getRedisClient: () => null,
+  getSharedRedisClient: () =>
     available
       ? {
           set: async (k: string, v: string, ...args: unknown[]) => {

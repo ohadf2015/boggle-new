@@ -58,7 +58,7 @@ export function OfflineDownloadManager() {
       });
       await refreshStatus();
     } catch (error) {
-      console.error(`Download failed for ${lang}:`, error);
+      console.warn(`Download failed for ${lang}:`, error);
       setErrors((prev) => ({ ...prev, [lang]: t('offlineDownload.errorGeneric') }));
     } finally {
       setLoading((prev) => ({ ...prev, [lang]: false }));
