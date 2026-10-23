@@ -36,6 +36,8 @@ import { ReportsProTeaser } from '@/components/teacher/pro/ReportsProTeaser';
 import { trackEduReportsViewed } from '@/lib/education/telemetry';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
+import { RoundReports } from '@/components/teacher/rounds/RoundReports';
+import { ROUND_FIXTURE } from '@/components/teacher/rounds/roundFixture';
 import { ReportsNoClasses } from '@/components/teacher/reports/ReportsNoClasses';
 import { FullReportDisclosure, ReportDisclosure, SectionDisclosure } from '@/components/teacher/reports/FullReportDisclosure';
 import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
@@ -298,6 +300,11 @@ function TeacherReportsInner() {
           classroomId={selectedClassroomId}
           classroomName={selectedClassroom?.name ?? ''}
         />
+        <RoundReports
+          classroomId={selectedClassroomId}
+          classroomName={selectedClassroom?.name ?? ''}
+          {...roundPreviewProps(searchParams?.get('roundPreview'))}
+        />
         <WordMasteryReport
           classroomId={selectedClassroomId}
           classroomName={selectedClassroom?.name ?? ''}
@@ -400,6 +407,12 @@ function TeacherReportsInner() {
 // free (CSV export is Pro). Full class/student analytics reports stay behind
 // ProGate, mounted inside Inner so a free teacher still gets the picker +
 // digest + assignment grid + Teacher Pro nudge.
+// Dev-only fixture so the round report can be judged without a played round.
+function roundPreviewProps(value: string | null | undefined) {
+  if (process.env.NODE_ENV === 'production' || !value) return {};
+  return { previewGames: [ROUND_FIXTURE], previewPro: value === 'pro' };
+}
+
 export default function TeacherReportsPage() {
   return (
     <ReportsShell>

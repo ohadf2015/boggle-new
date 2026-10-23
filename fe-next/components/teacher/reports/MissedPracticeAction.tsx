@@ -29,10 +29,12 @@ export function MissedPracticeAction({
   classroomId,
   classroomName,
   locked,
+  words,
 }: {
   classroomId: string;
   classroomName: string;
   locked: boolean;
+  words?: string[];
 }) {
   const { t, language } = useLanguage();
   const reduceMotion = useReducedMotion();
@@ -67,7 +69,7 @@ export function MissedPracticeAction({
       const res = await fetchWithAuth(`/api/education/classroom/${classroomId}/missed-practice`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ today: localDay(), names }),
+        body: JSON.stringify({ today: localDay(), names, ...(words?.length ? { words } : {}) }),
       });
       const body = await res.json().catch(() => null);
       if (res.status === 409) return setStatus({ kind: 'already' });
