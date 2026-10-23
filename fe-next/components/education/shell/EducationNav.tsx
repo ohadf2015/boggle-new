@@ -19,6 +19,7 @@ import {
 import { cn } from '@/lib/utils';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import type { EducationNavItem, ResolvedEducationNav } from './navItems';
+import './eduNav.css';
 
 /**
  * Phone/tablet bottom tabs and the desktop sidebar — one component, two
@@ -154,6 +155,7 @@ export function EducationNav({ nav, t, variant, brand, account, plan, className 
     return (
       <nav
         data-testid="education-sidebar"
+        data-edu-nav=""
         aria-label={t('teacher.nav.sidebarLabel')}
         className={cn(
           // Desktop only (`lg` = 1024); short enough never to scroll.
@@ -207,6 +209,7 @@ export function EducationNav({ nav, t, variant, brand, account, plan, className 
   return (
     <nav
       data-testid="education-tabbar"
+      data-edu-nav=""
       aria-label={t('teacher.nav.tabsLabel')}
       style={{ gridTemplateColumns: `repeat(${nav.items.length}, minmax(0, 1fr))` }}
       className={cn(

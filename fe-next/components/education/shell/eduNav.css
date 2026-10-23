@@ -1,0 +1,4 @@
+/* The feedback launcher is pinned bottom-start, on the first tab (phone/tablet) and the account row (desktop). */
+body:has([data-edu-nav]) #fdw-root {
+  display: none;
+}

@@ -29,6 +29,7 @@ const BOUNCES: [string, RegExp][] = [
   ['bare / link', /(href=|push\(|replace\()\s*\{?\s*['"`]\/['"`]/g],
   ['consumer singleplayer', /\/singleplayer\b/g],
   ['comparison page', /lexiclash-vs-/g],
+  ['consumer site page', /['"`]\/(\$\{\w+\}\/)?(how-to-play|blog|faq|about|contact)(?=['"`/?#])/g],
 ];
 
 // The one sanctioned way out, plus prefixes that are only ever extended (breadcrumb trail, SEO canonical URL).
@@ -56,6 +57,29 @@ const files = SCAN.flatMap(sourceFiles).map((abs) => ({ rel: relative(ROOT, abs)
 describe('edu link audit: nav-shell files never bounce to the game home', () => {
   it('scans a real file set', () => {
     expect(files.length).toBeGreaterThan(40);
+  });
+
+  it.each([
+    ['hardcoded /en link', "href='/en/teacher'"],
+    ['bare / link', "router.push('/')"],
+    ['consumer singleplayer', 'href={`/${locale}/singleplayer`}'],
+    ['comparison page', 'href={`/${locale}/lexiclash-vs-kahoot`}'],
+    ['consumer site page', 'href={`/${language}/how-to-play`}'],
+    ['consumer site page', "href={'/blog'}"],
+    ['consumer site page', 'push(`/${locale}/faq`)'],
+    ['consumer site page', 'href={`/${lang}/about`}'],
+    ['consumer site page', "href='/contact'"],
+  ])('the %s rule catches %s', (name, sample) => {
+    const re = new RegExp(BOUNCES.find(([n]) => n === name)?.[1] ?? /$^/);
+    expect(re.test(sample)).toBe(true);
+  });
+
+  it.each([
+    ['consumer site page', 'href={`/${locale}/teacher/about-pro`}'],
+    ['consumer site page', 'href={`/${locale}/education/help/contact-support`}'],
+  ])('the %s rule leaves edu routes alone: %s', (name, sample) => {
+    const re = new RegExp(BOUNCES.find(([n]) => n === name)?.[1] ?? /$^/);
+    expect(re.test(sample)).toBe(false);
   });
 
   it.each(BOUNCES)('no %s', (_, re) => {
