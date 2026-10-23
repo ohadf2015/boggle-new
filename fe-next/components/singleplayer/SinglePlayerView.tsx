@@ -1,6 +1,7 @@
 'use client';
 
 import { PageLoader } from '@/components/ui/PageLoader';
+import { SinglePlayerChunkFallback } from './SinglePlayerChunkFallback';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import nextDynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
@@ -45,7 +46,9 @@ const PracticeResults = nextDynamic(() => import('./results/PracticeResults'), {
 const PreGameTutorial = nextDynamic(() => import('./PreGameTutorial'), { ssr: false });
 const SinglePlayerGame = nextDynamic(() => import('./SinglePlayerGame'), {
   ssr: false,
-  loading: () => <div className="flex min-h-[60vh] items-center justify-center" aria-busy="true"><PageLoader size="lg" /></div>,
+  // Navy only. PageLoader's happy mascot is winner.webp at 112x112 — an
+  // equal-area client img that stole LCP from the preloaded shell in r7.
+  loading: SinglePlayerChunkFallback,
 });
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
@@ -339,9 +342,7 @@ const SinglePlayerView: React.FC = () => {
           </div>
         )}
         {phase === 'playing' && pendingMpRedirect && (
-          <div className="flex min-h-[60vh] items-center justify-center" aria-busy="true">
-            <PageLoader size="lg" />
-          </div>
+          <SinglePlayerChunkFallback />
         )}
         {phase === 'playing' && !pendingMpRedirect && (
           <SinglePlayerGame
