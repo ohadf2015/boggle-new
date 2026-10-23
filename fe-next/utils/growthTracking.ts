@@ -293,6 +293,7 @@ export type GrowthEvent =
   | 'edu_classroom_created'
   | 'edu_join_code_shown'
   | 'edu_join_code_copied'
+  | 'edu_join_code_shared'
   | 'edu_first_student_joined'
   | 'edu_classroom_join'
   | 'edu_live_game_started'

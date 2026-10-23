@@ -14,7 +14,7 @@ import {
   type Language,
 } from '@/lib/supabase/education';
 import logger from '@/utils/logger';
-import { trackEduClassroomCreated, trackEduTeacherActionFailed } from '@/lib/education/telemetry';
+import { trackEduTeacherActionFailed } from '@/lib/education/telemetry';
 
 interface UseClassroomsState {
   classrooms: ClassroomWithMembers[];
@@ -172,8 +172,6 @@ export function useClassrooms(): UseClassroomsReturn {
       }
 
       const { data: classroom } = await response.json();
-
-      if (classroom?.id) trackEduClassroomCreated({ classroomId: classroom.id, createdVia: 'dashboard' });
 
       // Optimistically update state
       if (isMounted.current && classroom) {

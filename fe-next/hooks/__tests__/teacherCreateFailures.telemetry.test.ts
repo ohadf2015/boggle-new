@@ -30,9 +30,11 @@ vi.mock('@/utils/logger', () => ({
 }));
 
 const failed = vi.fn();
+const created = vi.fn();
 vi.mock('@/lib/education/telemetry', async (orig) => ({
   ...(await orig<typeof import('@/lib/education/telemetry')>()),
   trackEduTeacherActionFailed: (...a: unknown[]) => failed(...a),
+  trackEduClassroomCreated: (...a: unknown[]) => created(...a),
 }));
 
 const asMock = (f: unknown) => f as ReturnType<typeof vi.fn>;
@@ -61,6 +63,17 @@ describe('teacher create failures are reported', () => {
     const { result } = renderHook(() => useClassrooms());
     await act(async () => { await result.current.createClassroom('A', 'en'); });
     expect(failed).toHaveBeenCalledWith({ action: 'create_classroom', reason: 'Failed to fetch' });
+  });
+
+  it('Given a successful classroom create, Then the hook leaves edu_classroom_created to its caller (one event per class)', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ data: { id: 'c1', name: 'A', join_code: 'ABCD' } }),
+    }) as unknown as typeof fetch;
+    const { result } = renderHook(() => useClassrooms());
+    await act(async () => { await result.current.createClassroom('A', 'en'); });
+    expect(created).not.toHaveBeenCalled();
   });
 
   it('Given a DB error, When a lesson create fails, Then it is reported', async () => {

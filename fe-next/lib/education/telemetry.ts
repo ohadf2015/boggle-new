@@ -54,6 +54,7 @@ const ACTIVATION_GROWTH_MIRROR = new Set<GrowthEvent>([
   'edu_classroom_created',
   'edu_join_code_shown',
   'edu_join_code_copied',
+  'edu_join_code_shared',
   'edu_first_student_joined',
   'edu_classroom_join',
   'edu_live_game_started',
@@ -305,6 +306,13 @@ function persistTeacherActivation(patch: { inviteCopied?: true; liveStarted?: tr
 
 export function trackEduJoinCodeCopied(args: EduJoinCodeArgs): void {
   captureActivation('edu_join_code_copied', { classroom_id: args.classroomId });
+  persistTeacherActivation({ inviteCopied: true });
+}
+
+export type EduJoinShareMethod = 'whatsapp' | 'google_classroom' | 'native' | 'copy_fallback';
+
+export function trackEduJoinCodeShared(args: EduJoinCodeArgs & { method: EduJoinShareMethod }): void {
+  captureActivation('edu_join_code_shared', { classroom_id: args.classroomId, method: args.method });
   persistTeacherActivation({ inviteCopied: true });
 }
 

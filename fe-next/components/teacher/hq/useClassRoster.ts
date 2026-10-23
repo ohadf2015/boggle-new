@@ -22,15 +22,24 @@ export interface ClassRosterState {
  * Polls only while `document.visibilityState === 'visible'` — a background tab
  * must not keep hitting Supabase every 15 s for a screen nobody is looking at.
  */
-export function useClassRoster(classroomId: string | null, fallbackName: string): ClassRosterState {
-  const [state, setState] = useState<ClassRosterState>({ students: [], loading: true, arrivals: [] });
+export function useClassRoster(
+  classroomId: string | null,
+  fallbackName: string,
+  pollMs: number = ROSTER_POLL_MS,
+): ClassRosterState {
+  const [state, setState] = useState<ClassRosterState & { forId: string | null }>({
+    students: [],
+    loading: true,
+    arrivals: [],
+    forId: classroomId,
+  });
   const prevIds = useRef<string[] | null>(null);
   const nameRef = useRef(fallbackName);
   nameRef.current = fallbackName;
 
   useEffect(() => {
     prevIds.current = null;
-    setState({ students: [], loading: Boolean(classroomId), arrivals: [] });
+    setState({ students: [], loading: Boolean(classroomId), arrivals: [], forId: classroomId });
     if (!classroomId) return;
 
     let cancelled = false;
@@ -44,21 +53,23 @@ export function useClassRoster(classroomId: string | null, fallbackName: string)
       const ids = students.map((s) => s.id);
       const arrivals = newArrivals(prevIds.current, ids);
       prevIds.current = ids;
-      setState({ students, loading: false, arrivals });
+      setState({ students, loading: false, arrivals, forId: classroomId });
     };
 
     void read();
     const id = setInterval(() => {
       if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return;
       void read();
-    }, ROSTER_POLL_MS);
+    }, pollMs);
     return () => {
       cancelled = true;
       clearInterval(id);
     };
-  }, [classroomId]);
+  }, [classroomId, pollMs]);
 
-  return state;
+  // The render after a class switch still holds the previous class's read.
+  const stale = state.forId !== classroomId;
+  return { students: stale ? [] : state.students, arrivals: stale ? [] : state.arrivals, loading: state.loading || stale };
 }
 
 export default useClassRoster;

@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import { classroomInvitePayload } from '@/lib/education/classroomInvitePayload';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
+import { trackEduJoinCodeCopied, trackEduJoinCodeShared } from '@/lib/education/telemetry';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { isEligibleForTeacherProUpgradeCta } from '@/lib/education/trial';
 import { type Language } from '@/lib/supabase/education/types';
@@ -95,14 +96,17 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   };
 
   // The code alone, pasted into a class chat, leaves a student with nowhere to type it.
-  const copyJoinCode = (code: string) => {
+  const copyJoinCode = (classroomId: string, code: string) => {
     navigator.clipboard
       .writeText(classroomInvitePayload(window.location.origin, language, code))
-      .then(() => toast.success(t('teacher.classroom.codeCopied')))
+      .then(() => {
+        toast.success(t('teacher.classroom.codeCopied'));
+        trackEduJoinCodeCopied({ classroomId });
+      })
       .catch(() => toast.error(t('share.codeCopyError')));
   };
 
-  const shareInvite = async (name: string, code: string) => {
+  const shareInvite = async (classroomId: string, name: string, code: string) => {
     const url = `${window.location.origin}/${language}/join/${code}`;
     const result = await shareWithFallback({
       title: name,
@@ -110,7 +114,11 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
       url,
       clipboardText: url,
     });
-    if (result === 'copied') toast.success(t('teacher.classroom.linkCopied'));
+    if (result === 'shared') trackEduJoinCodeShared({ classroomId, method: 'native' });
+    if (result === 'copied') {
+      toast.success(t('teacher.classroom.linkCopied'));
+      trackEduJoinCodeShared({ classroomId, method: 'copy_fallback' });
+    }
   };
 
   /** Google's own share dialog with the join link: no OAuth, no student data. Null when it cannot be built. */
@@ -196,8 +204,8 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
                 classroom={classroom}
                 expanded={expandedId === classroom.id}
                 onToggleExpanded={() => setExpandedId(expandedId === classroom.id ? null : classroom.id)}
-                onCopy={() => copyJoinCode(classroom.join_code)}
-                onShare={() => shareInvite(classroom.name, classroom.join_code)}
+                onCopy={() => copyJoinCode(classroom.id, classroom.join_code)}
+                onShare={() => shareInvite(classroom.id, classroom.name, classroom.join_code)}
                 googleHref={googleClassroomHref(classroom.name, classroom.join_code)}
                 onEdit={() => setEditingId(classroom.id)}
                 onDelete={() => setDeletingId(classroom.id)}
