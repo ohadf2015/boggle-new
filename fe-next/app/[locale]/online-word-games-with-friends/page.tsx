@@ -15,12 +15,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/en/online-word-games-with-friends`;
 
   return {
-    title: 'Words With Friends Online Free — No App | LexiClash',
-    description: 'Play Words With Friends free online — real-time multiplayer (no turns to wait!). No app, no account. 2–50 players. Start now →',
+    title: 'Play Words With Friends Online Free — No App | LexiClash',
+    description: 'Play Words With Friends free online — real-time multiplayer, no turns to wait! No app, no account. 2–50 players. Start in seconds →',
     keywords: 'online word games with friends, play word games with friends, multiplayer word game online, word games for groups, word game with friends free, online multiplayer word games like hanging with friends, word battle with friends, party word game online, word game for groups no download, online free word cloud game multiplayer, word games live with people',
     openGraph: {
-      title: 'Play Word Games With Friends Online — Free | LexiClash',
-      description: 'Create a room, share the link, compete in real-time word battles. 2-20+ players, no download!',
+      title: 'Play Words With Friends Online Free — No App | LexiClash',
+      description: 'Real-time word battles with friends — no turns to wait! Create a room, share the link, play instantly. No app, no account. 2–50 players.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Word Games With Friends — Free Multiplayer | LexiClash',
-      description: 'Real-time word battles with friends. Create a room, share link, play instantly!',
+      title: 'Play Words With Friends Online Free — No App | LexiClash',
+      description: 'Real-time word battles with friends. No app, no account. Create a room, share the link, play instantly!',
       images: [`${BASE_URL}/og-image-en.webp`],
     },
     alternates: {
