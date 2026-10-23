@@ -35,11 +35,11 @@ export function UpgradeYourClasses({ classes }: { classes: UpgradeClassSummary[]
           <li
             key={c.id}
             data-testid="upgrade-your-class"
-            className="flex min-w-0 items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-navy px-2 py-1.5"
+            className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 rounded-neo border-2 border-neo-black bg-neo-navy px-2 py-1.5"
           >
             <Users className="size-4 shrink-0 text-neo-cyan" strokeWidth={2.5} aria-hidden />
             <span className="min-w-0 shrink truncate font-neo-display text-sm font-black text-neo-white">{c.name}</span>
-            <span className="ms-auto min-w-0 text-end text-xs font-bold text-neo-lime">
+            <span className="w-full min-w-0 text-xs font-bold text-neo-lime sm:ms-auto sm:w-auto sm:text-end">
               {c.member_count > 0
                 ? t('eduPro.yourClasses.proAddsStudents', { count: c.member_count })
                 : t('eduPro.yourClasses.proAddsEmpty')}
