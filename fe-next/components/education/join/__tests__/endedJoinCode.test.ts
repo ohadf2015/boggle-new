@@ -5,6 +5,12 @@ vi.mock('@/app/api/education/classroom/join/endedSessionCode', () => ({
   lookupEndedClassroomSession: mockLookup,
 }));
 
+vi.mock('next/headers', () => ({ headers: async () => new Headers() }));
+vi.mock('@/backend/redis/rateLimit', () => ({
+  checkRateLimitRedis: async () => ({ limited: false, remaining: 1, resetTime: 0 }),
+  RATE_LIMIT_KEYS: { api: (k: string) => k },
+}));
+
 import { isEndedJoinCode } from '../endedJoinCode';
 
 describe('isEndedJoinCode', () => {

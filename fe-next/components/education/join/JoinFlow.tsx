@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { JOIN_CODE_LENGTH, joinCodeOverflows, sanitizeJoinCode } from './JoinCodeField';
@@ -49,7 +50,7 @@ export function JoinFlow({
   onSuccessBeforeNavigation: externalCallback,
   variant = 'standalone',
 }: JoinFlowProps) {
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   const academy = variant === 'academy';
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
 
@@ -199,6 +200,14 @@ export function JoinFlow({
             <JoinNameStep flow={flow} nameRef={nameRef} goRef={goRef} />
           )}
         </main>
+        <nav className="relative z-10 flex justify-center gap-4 px-4 pb-3 text-xs text-neo-white/60">
+          <Link prefetch={false} href={`/${language}/legal/privacy`} className="underline-offset-2 hover:text-neo-white hover:underline">
+            {t('legal.privacyPolicy')}
+          </Link>
+          <Link prefetch={false} href={`/${language}/legal/terms`} className="underline-offset-2 hover:text-neo-white hover:underline">
+            {t('legal.termsOfService')}
+          </Link>
+        </nav>
         </div>
       </div>
     </BoundedConfettiBurst>
