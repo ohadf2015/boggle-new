@@ -14,6 +14,7 @@ import { BottomCTA } from './components/BottomCTA';
 import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 import { ComparisonTable } from './components/ComparisonTable';
 import { SerpGapSections } from './components/SerpGapSections';
+import { SinDescargarSection } from './components/SinDescargarSection';
 import { PageScrollFx } from './components/PageScrollFx';
 import { FAQS, ES_DICT_FLOOR } from './data';
 
@@ -153,6 +154,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <TopBackLink className="mb-4" />
         <HeroAnimated locale={locale} />
+        <SinDescargarSection locale={locale} />
         <section className="mb-14 max-w-3xl" data-seo="sin-registrarse">
           <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
             Scrabble español online gratis sin registrarse
