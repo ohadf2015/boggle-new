@@ -96,7 +96,11 @@ describe('Teacher Home: get students in', () => {
     triesCount = 4;
     render(<TeacherDashboard />);
     const notice = await screen.findByTestId('hq-ended-code-tries');
-    expect(notice).toHaveTextContent('academy.hq.endedCodeTries:{"count":4}');
+    expect(notice).toHaveTextContent('education.student.gameEnded.title');
+    expect(within(notice).getByTestId('hq-ended-code-tries-count')).toHaveTextContent('4');
+    expect(within(notice).getByTestId('hq-ended-code-tries-count')).toHaveAttribute('aria-label', 'teacher.dashboard.students');
+    expect(notice).toHaveTextContent('tvBroadcast.waitingForGame');
+    expect(notice).not.toHaveTextContent('academy.hq.endedCodeTries');
     expect(within(notice).getByRole('link')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c1');
     expect(within(notice).getByRole('link')).toHaveTextContent('academy.hq.startTitle');
   });

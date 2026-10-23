@@ -12,8 +12,7 @@ const ROOT = path.resolve(__dirname, '..', '..', '..');
 const DIRS = ['components/teacher', 'app/[locale]/teacher'];
 const LOCALES: Record<string, unknown> = { en, he, es, sv, ja, ru };
 const CALL = /\bt\(\s*(['"])([a-zA-Z]\w*\.[\w.]+)\1/g;
-// Waiting on the i18n piece (requests.md); no existing translated key carries this sentence.
-const PENDING_I18N = new Set(['academy.hq.endedCodeTries']);
+const PENDING_I18N = new Set<string>();
 
 const lookup = (tree: unknown, key: string) =>
   key.split('.').reduce<unknown>((node, part) => (node && typeof node === 'object' ? (node as Record<string, unknown>)[part] : undefined), tree);
