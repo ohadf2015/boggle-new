@@ -60,4 +60,26 @@ describe('AnalyticsDashboard (summary cards; the page tabs carry the table, char
     fireEvent.click(screen.getByText('education.analytics.viewStudents'));
     expect(onViewStudents).toHaveBeenCalledWith('struggling');
   });
+
+  it('renders nothing for a class with no activity yet, so the class pulse empty state is not stacked on four zero tiles', () => {
+    vi.spyOn(useClassroomAnalyticsModule, 'useProClassAnalytics').mockReturnValue({
+      metrics: { ...metrics, studentsNeedingHelp: 0, classAverageXp: 0, activeStudentsToday: 0, weeklyEngagement: 0, commonMistakes: [] },
+      isLoading: false,
+      error: null,
+      refresh: vi.fn(),
+    } as never);
+    const { container } = render(<AnalyticsDashboard classroomId="c1" showHeader={false} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('keeps the tiles once one student has been active', () => {
+    vi.spyOn(useClassroomAnalyticsModule, 'useProClassAnalytics').mockReturnValue({
+      metrics: { ...metrics, studentsNeedingHelp: 0, classAverageXp: 0, activeStudentsToday: 1, commonMistakes: [] },
+      isLoading: false,
+      error: null,
+      refresh: vi.fn(),
+    } as never);
+    render(<AnalyticsDashboard classroomId="c1" showHeader={false} />);
+    expect(screen.getByTestId('metric-active-students')).toBeInTheDocument();
+  });
 });

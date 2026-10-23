@@ -8,7 +8,7 @@ import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { LEVEL_ORDER, levelLabelKey } from '@/lib/education/differentiation';
 import { cn } from '@/lib/utils';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { Mail, Calendar, SlidersHorizontal } from 'lucide-react';
+import { Mail, Calendar, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Avatar from '@/components/Avatar';
 import { resolveDisplayName } from '@/lib/displayName';
@@ -44,7 +44,7 @@ function LevelControl({ value, onChange, disabled, label, t }: LevelControlProps
     <div
       role="group"
       aria-label={label}
-      className="inline-flex w-full sm:w-auto border-2 border-black rounded-neo overflow-hidden bg-white shadow-hard-sm"
+      className="flex w-full border-2 border-black rounded-neo overflow-hidden bg-white shadow-hard-sm"
     >
       {LEVEL_ORDER.map((level, i) => {
         const selected = level === value;
@@ -56,7 +56,7 @@ function LevelControl({ value, onChange, disabled, label, t }: LevelControlProps
             disabled={disabled}
             onClick={() => onChange(level)}
             className={cn(
-              'flex-1 sm:flex-none min-h-[44px] px-3 text-xs sm:text-sm font-neo-display font-black uppercase tracking-wide text-black',
+              'flex-1 min-w-0 min-h-[44px] px-2 truncate text-xs font-neo-display font-black uppercase tracking-wide text-black',
               'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset',
               i > 0 && 'border-s-2 border-black',
               selected ? LEVEL_SELECTED_BG[level] : 'bg-white hover:bg-neo-cream',
@@ -161,18 +161,18 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
     );
   }
 
-  // Cycle through bold accent colors for visual interest
-  const accentColors = ['bg-neo-cyan', 'bg-neo-lime', 'bg-neo-pink', 'bg-neo-orange'];
-
   return (
     <div className="space-y-2" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Legend: what each level does. One line, wraps on narrow screens. */}
-      <div className="flex items-start gap-2 px-1 text-neo-cream/75 text-xs font-bold leading-snug">
-        <SlidersHorizontal className="w-4 h-4 shrink-0 mt-px" aria-hidden="true" />
-        <p>{t('teacher.levels.legend')}</p>
-      </div>
+      <details className="group px-1 text-neo-cream/75 text-xs font-bold leading-snug">
+        <summary className="inline-flex min-h-8 cursor-pointer list-none items-center gap-1.5 text-neo-cream hover:text-neo-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan rounded-sm">
+          <SlidersHorizontal className="w-4 h-4 shrink-0" aria-hidden="true" />
+          {t('teacher.levels.label')}
+          <ChevronDown className="w-3.5 h-3.5 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+        </summary>
+        <p className="mt-1">{t('teacher.levels.legend')}</p>
+      </details>
 
-      {students.map((student, idx) => {
+      {students.map((student) => {
         // Handle Supabase returning profiles as array or object
         const profile = Array.isArray(student.profiles) ? student.profiles[0] : student.profiles;
         // `username` is a DB placeholder ('Player_<8hex>') for anyone who never picked a
@@ -185,36 +185,32 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
         const email = profile?.email || '';
         const avatarConfig = profile?.avatar_config;
         const joinedAt = formatDistanceToNow(new Date(student.joined_at), { addSuffix: true });
-        const accentBg = accentColors[idx % accentColors.length];
 
         return (
           <div
             key={student.id}
             data-student-row
-            className="flex flex-wrap items-center gap-3 p-3 border-2 border-black rounded-neo bg-neo-cream shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition-all"
+            className="flex flex-wrap items-center gap-x-3 gap-y-2 p-3 border-2 border-black rounded-neo bg-neo-cream shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition-all"
           >
             {/* Avatar */}
             <div className="shrink-0">
               <Avatar customAvatar={avatarConfig} userId={student.student_id || student.id} size="lg" />
             </div>
 
-            {/* Student Info */}
-            <div className="flex-1 min-w-0">
-              <h4 className="text-black font-neo-display font-black text-base truncate">
+            <div data-testid="roster-identity" className="flex-1 min-w-0">
+              <h4 title={username} className="text-black font-neo-display font-black text-base truncate">
                 {username}
               </h4>
+              <p data-testid="roster-joined" className="flex items-center gap-1 text-black/60 text-xs mt-0.5 font-bold">
+                <Calendar className="w-3 h-3 shrink-0" aria-hidden="true" />
+                <span className="truncate">{joinedAt}</span>
+              </p>
               {email && (
-                <div className={cn('flex items-center gap-1.5 text-black/60 text-xs mt-0.5 font-bold')}>
+                <div className="flex items-center gap-1.5 text-black/60 text-xs mt-0.5 font-bold">
                   <Mail className="w-3 h-3 shrink-0" />
                   <span className="truncate">{email}</span>
                 </div>
               )}
-            </div>
-
-            {/* Joined badge */}
-            <div className={cn('flex items-center gap-1.5 text-xs font-black px-2 py-1 rounded-neo border-2 border-black shadow-hard-sm shrink-0', accentBg)}>
-              <Calendar className="w-3 h-3 text-black" />
-              <span className="text-black">{joinedAt}</span>
             </div>
 
             <RosterRemoveButton
@@ -224,8 +220,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
               onRemoved={handleRemoved}
             />
 
-            {/* Differentiation level — full-width row on phones, trailing on wider screens */}
-            <div className="basis-full sm:basis-auto sm:ms-auto">
+            <div className="basis-full">
               <LevelControl
                 value={student.level}
                 onChange={(level) => void handleLevelChange(student.student_id, level)}

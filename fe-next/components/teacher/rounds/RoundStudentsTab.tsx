@@ -31,7 +31,7 @@ export function RoundStudentsTab({ report, sortId, onStudentClick }: RoundStuden
             id={sortId}
             value={sortKey}
             onChange={(e) => setSortKey(e.target.value as RoundSortKey)}
-            className="min-h-9 rounded-neo border-2 border-neo-black bg-neo-cream px-2 text-xs font-black text-neo-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+            className="h-8 rounded-neo border-2 border-neo-black bg-neo-cream px-2 py-0 text-xs font-black text-neo-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
           >
             {(Object.keys(SORT_LABEL_KEYS) as RoundSortKey[]).map((key) => (
               <option key={key} value={key}>{t(SORT_LABEL_KEYS[key])}</option>

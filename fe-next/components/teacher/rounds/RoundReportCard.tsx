@@ -97,7 +97,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
       </section>
 
       <section className="mt-4">
-        <div role="tablist" className="mb-2 flex gap-1 overflow-x-auto border-b-2 border-neo-cream/20 print:hidden">
+        <div role="tablist" className="mb-2 flex border-b-2 border-neo-cream/20 print:hidden">
           {(Object.keys(TAB_KEYS) as RoundTab[]).map((key) => (
             <button
               key={key}
@@ -108,7 +108,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
               aria-controls={`${uid}-panel`}
               onClick={() => setTab(key)}
               className={cn(
-                '-mb-0.5 min-h-10 shrink-0 border-b-2 px-3 font-neo-display text-sm font-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
+                '-mb-0.5 min-h-10 min-w-0 border-b-2 px-2 font-neo-display text-xs font-black leading-tight sm:px-3 sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
                 tab === key ? 'border-neo-lime text-neo-lime' : 'border-transparent text-neo-white/70 hover:text-neo-white',
               )}
             >

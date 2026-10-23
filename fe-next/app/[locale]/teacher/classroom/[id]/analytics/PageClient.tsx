@@ -193,7 +193,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             <WordMasteryReport classroomId={classroomId} classroomName={classroomName} />
           </div>
 
-          <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-3 sm:p-6">
+          <div className="bg-neo-navy/30 border-[2px] border-neo-cream/40 shadow-hard rounded-neo p-3 sm:p-6 empty:hidden">
             <AnalyticsDashboard
               classroomId={classroomId}
               onViewStudents={handleViewStudents}

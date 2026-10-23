@@ -113,6 +113,13 @@ export function AnalyticsDashboard({
     );
   }
 
+  const noActivityYet =
+    metrics.activeStudentsToday === 0 &&
+    metrics.classAverageXp === 0 &&
+    metrics.studentsNeedingHelp === 0 &&
+    metrics.commonMistakes.length === 0;
+  if (noActivityYet) return null;
+
   // ==================== COMPUTE DERIVED VALUES ====================
 
   // Format class average XP with thousands separator
