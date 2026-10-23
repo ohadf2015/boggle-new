@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
-import { checkTeacherSubscription } from '@/lib/subscriptions';
+import { requireTeacherPro } from '@/lib/education/pro/requireTeacherPro';
 import { signParentReportToken } from '@/lib/education/parentReportToken';
 import logger from '@/utils/logger';
 
@@ -79,10 +79,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string; st
     return NextResponse.json({ ok: false, error: 'Student is not a member of this classroom' }, { status: 403 });
   }
 
-  const subscription = await checkTeacherSubscription(user.id);
-  if (!subscription.has_pro) {
-    return NextResponse.json({ ok: false, error: 'Teacher Pro required' }, { status: 402 });
-  }
+  const notPro = await requireTeacherPro(user.id);
+  if (notPro) return notPro;
 
   let token: string;
   try {

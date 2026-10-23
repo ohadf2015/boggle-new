@@ -16,6 +16,10 @@ vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: vi.fn() }));
 vi.mock('@/utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('@/lib/subscriptions', () => ({ checkTeacherSubscription: vi.fn() }));
+const trial = vi.hoisted(() => ({ live: false }));
+vi.mock('@/lib/education/accessTrialServer', () => ({
+  teacherHasProAccess: vi.fn(async (_u: string, s: { has_pro: boolean }) => s.has_pro || trial.live),
+}));
 
 import { POST } from '../route';
 import { createClient } from '@/utils/supabase/server';
@@ -142,6 +146,18 @@ describe('POST /api/education/classroom/[id]/members/[studentId]/parent-report',
     const res = await POST(req(), ctx());
 
     expect(res.status).toBe(402);
+  });
+
+  it('is not refused for a teacher on a live access trial', async () => {
+    (createClient as any).mockResolvedValue(makeUserClient({ user: { id: TEACHER }, ownsClassroom: true }));
+    (createAdminClient as any).mockReturnValue(makeAdminClient({ isMember: true }).client);
+    (checkTeacherSubscription as any).mockResolvedValue(proStatus(false));
+    trial.live = true;
+
+    const res = await POST(req(), ctx());
+    trial.live = false;
+
+    expect(res.status).not.toBe(402);
   });
 
   it('500 when the service-role client is not configured', async () => {

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { teacherHasProAccess } from '@/lib/education/accessTrialServer';
-import { checkTeacherSubscription } from '@/lib/subscriptions';
+import { requireTeacherPro } from '@/lib/education/pro/requireTeacherPro';
 import { getClassMastery } from '@/lib/supabase/wordMastery';
 import { buildWordMasteryReport, buildSpacedReviewDates, SPACED_REVIEW_DAYS } from '@/lib/education/wordMasteryReport';
 import { pickMissedPracticeWords, enrichReviewWords, isPlausibleLocalDay, missedWordPool } from '@/lib/education/missedPracticePlan';
@@ -25,10 +24,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   if (!auth.ok) return auth.response;
   const { sb, userId, classroom } = auth;
 
-  const subscription = await checkTeacherSubscription(userId);
-  if (!(await teacherHasProAccess(userId, subscription))) {
-    return NextResponse.json({ ok: false, error: 'Teacher Pro required' }, { status: 402 });
-  }
+  const notPro = await requireTeacherPro(userId);
+  if (notPro) return notPro;
 
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success || !isPlausibleLocalDay(parsed.data.today, Date.now())) {

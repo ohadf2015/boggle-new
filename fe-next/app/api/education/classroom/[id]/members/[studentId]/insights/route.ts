@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
-import { checkTeacherSubscription } from '@/lib/subscriptions';
+import { requireTeacherPro } from '@/lib/education/pro/requireTeacherPro';
 import { loadStudentInsights } from '@/lib/education/studentInsightsLoader';
 import logger from '@/utils/logger';
 
@@ -49,8 +49,8 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string; stu
   }
   if (!membership) return NextResponse.json({ ok: false, error: 'Student is not a member of this classroom' }, { status: 403 });
 
-  const subscription = await checkTeacherSubscription(user.id);
-  if (!subscription.has_pro) return NextResponse.json({ ok: false, error: 'Teacher Pro required' }, { status: 402 });
+  const notPro = await requireTeacherPro(user.id);
+  if (notPro) return notPro;
 
   const result = await loadStudentInsights(admin, studentId, classroomId);
   if (!result.ok) {

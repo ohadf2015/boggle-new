@@ -4,6 +4,10 @@ vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: vi.fn() }));
 vi.mock('@/utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('@/lib/subscriptions', () => ({ checkTeacherSubscription: vi.fn() }));
+const trial = vi.hoisted(() => ({ live: false }));
+vi.mock('@/lib/education/accessTrialServer', () => ({
+  teacherHasProAccess: vi.fn(async (_u: string, s: { has_pro: boolean }) => s.has_pro || trial.live),
+}));
 
 import { GET } from '../route';
 import { createClient } from '@/utils/supabase/server';
@@ -58,6 +62,7 @@ describe('GET /api/education/classroom/[id]/members/[studentId]/insights', () =>
     vi.mocked(createClient).mockResolvedValue(userClient() as never);
     vi.mocked(createAdminClient).mockReturnValue(admin().client as never);
     vi.mocked(checkTeacherSubscription).mockResolvedValue({ has_pro: true } as never);
+    trial.live = false;
   });
 
   it('400 on bad ids', async () => {
@@ -82,6 +87,12 @@ describe('GET /api/education/classroom/[id]/members/[studentId]/insights', () =>
   it('402 without Teacher Pro', async () => {
     vi.mocked(checkTeacherSubscription).mockResolvedValue({ has_pro: false } as never);
     expect((await call()).status).toBe(402);
+  });
+
+  it('200 for a teacher on a live access trial, same as paid Pro', async () => {
+    vi.mocked(checkTeacherSubscription).mockResolvedValue({ has_pro: false } as never);
+    trial.live = true;
+    expect((await call()).status).toBe(200);
   });
 
   it('500 (not an empty report) when a progress read fails', async () => {
