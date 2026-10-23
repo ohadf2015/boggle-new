@@ -7,7 +7,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string, p?: Record<string, unknown>) => (p ? `${k}:${JSON.stringify(p)}` : k), language: 'en', dir: 'ltr' }),
 }));
 let search = '';
-vi.mock('next/navigation', () => ({ useSearchParams: () => new URLSearchParams(search), useRouter: () => ({ replace: vi.fn(), push: vi.fn() }) }));
+const routerReplace = vi.fn();
+vi.mock('next/navigation', () => ({ useSearchParams: () => new URLSearchParams(search), useRouter: () => ({ replace: routerReplace, push: vi.fn() }) }));
 const toastSuccess = vi.fn();
 const toastError = vi.fn();
 vi.mock('react-hot-toast', () => ({ default: { success: (m: string) => toastSuccess(m), error: (m: string) => toastError(m) } }));
@@ -31,6 +32,30 @@ vi.mock('@/hooks/useTeacherActivationProgress', () => ({
   useTeacherActivationProgress: () => ({ progress: { inviteCopied: false, liveStarted: false, dismissed: false }, ready: true, markInviteCopied }),
 }));
 
+const telemetry = vi.hoisted(() => ({
+  trackEduClassroomCreated: vi.fn(),
+  trackEduJoinCodeShown: vi.fn(),
+  trackEduJoinCodeCopied: vi.fn(),
+  trackEduJoinCodeShared: vi.fn(),
+  trackEduFirstStudentJoined: vi.fn(),
+}));
+vi.mock('@/lib/education/telemetry', () => telemetry);
+const funnel = vi.fn();
+vi.mock('@/lib/education/teacherOnboardingFunnel', async (orig) => ({
+  ...(await orig<typeof import('@/lib/education/teacherOnboardingFunnel')>()),
+  captureTeacherOnboardingFunnel: (...a: unknown[]) => funnel(...a),
+}));
+let roster: { students: { id: string }[]; loading: boolean; arrivals: string[] };
+const rosterCalls: unknown[][] = [];
+vi.mock('@/components/teacher/hq/useClassRoster', () => ({
+  useClassRoster: (...a: unknown[]) => {
+    rosterCalls.push(a);
+    return roster;
+  },
+}));
+const shareWithFallback = vi.fn();
+vi.mock('@/utils/shareWithFallback', () => ({ shareWithFallback: (...a: unknown[]) => shareWithFallback(...a) }));
+
 import { ClassSetupFlow } from '../ClassSetupFlow';
 
 const writeText = vi.fn().mockResolvedValue(undefined);
@@ -41,6 +66,8 @@ beforeEach(() => {
   trial = null;
   pro = { hasPro: false, loading: false };
   createClassroom.mockReset();
+  roster = { students: [], loading: false, arrivals: [] };
+  rosterCalls.length = 0;
   Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
 });
 afterEach(() => {
@@ -84,6 +111,105 @@ describe('<ClassSetupFlow>', () => {
     expect(screen.getByTestId('setup-start-game')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c9');
   });
 
+  it('When a class is created, Then the join code is reported shown once with no click and the URL keeps the class', async () => {
+    createClassroom.mockResolvedValue({ success: true, data: NEW });
+    render(<ClassSetupFlow />);
+    await userEvent.click(screen.getByTestId('setup-create'));
+    expect(await screen.findByTestId('setup-join-code')).toBeVisible();
+    expect(telemetry.trackEduJoinCodeShown).toHaveBeenCalledTimes(1);
+    expect(telemetry.trackEduJoinCodeShown).toHaveBeenCalledWith({ classroomId: 'c9' });
+    expect(telemetry.trackEduClassroomCreated).toHaveBeenCalledTimes(1);
+    expect(routerReplace).toHaveBeenCalledWith('/en/teacher/classroom/new?classroomId=c9', { scroll: false });
+  });
+
+  it('Given no student yet, Then sharing is the hero and starting a game is demoted', async () => {
+    search = 'classroomId=a';
+    classrooms = [{ id: 'a', name: 'A', join_code: 'ABCD', member_count: 0, language: 'en' }];
+    render(<ClassSetupFlow />);
+    expect(screen.getByTestId('setup-joined-count')).toHaveTextContent('eduShell.setup.joinedNone');
+    expect(screen.getByTestId('setup-copy-link')).toHaveAttribute('data-hero', 'true');
+    expect(screen.getByTestId('setup-start-game')).toHaveAttribute('data-hero', 'false');
+    expect(screen.getByTestId('setup-start-game')).toHaveTextContent('eduShell.setup.startNow');
+  });
+
+  it('Given the roster is still loading, Then the counter claims no number', () => {
+    search = 'classroomId=a';
+    classrooms = [{ id: 'a', name: 'A', join_code: 'ABCD', member_count: 0, language: 'en' }];
+    roster = { students: [], loading: true, arrivals: [] };
+    render(<ClassSetupFlow />);
+    expect(screen.getByTestId('setup-joined-count')).toHaveTextContent('…');
+    expect(screen.getByTestId('setup-joined-count')).not.toHaveTextContent('joinedNone');
+  });
+
+  it('Given the ready screen, Then the roster is polled every 5 seconds', () => {
+    search = 'classroomId=a';
+    classrooms = [{ id: 'a', name: 'A', join_code: 'ABCD', member_count: 0, language: 'en' }];
+    render(<ClassSetupFlow />);
+    expect(rosterCalls[0]).toEqual(['a', expect.any(String), 5000]);
+  });
+
+  it('When the first student joins, Then the counter rises, first-student fires once and Start a quick game becomes the one hero', async () => {
+    search = 'classroomId=a';
+    classrooms = [{ id: 'a', name: 'A', join_code: 'ABCD', member_count: 0, language: 'en' }];
+    const { rerender } = render(<ClassSetupFlow />);
+    expect(telemetry.trackEduFirstStudentJoined).not.toHaveBeenCalled();
+    roster = { students: [{ id: 's1' }], loading: false, arrivals: ['s1'] };
+    rerender(<ClassSetupFlow />);
+    expect(screen.getByTestId('setup-joined-count')).toHaveTextContent('eduShell.setup.joinedOne');
+    expect(telemetry.trackEduFirstStudentJoined).toHaveBeenCalledTimes(1);
+    expect(telemetry.trackEduFirstStudentJoined).toHaveBeenCalledWith({ classroomId: 'a' });
+    expect(funnel).toHaveBeenCalledWith('student_joined', expect.objectContaining({ locale: 'en' }));
+    const start = screen.getByTestId('setup-start-game');
+    expect(start).toHaveAttribute('data-hero', 'true');
+    expect(start).toHaveTextContent('eduShell.setup.startQuick');
+    expect(screen.getByTestId('setup-copy-link')).toHaveAttribute('data-hero', 'false');
+    roster = { students: [{ id: 's1' }, { id: 's2' }], loading: false, arrivals: ['s2'] };
+    rerender(<ClassSetupFlow />);
+    expect(screen.getByTestId('setup-joined-count')).toHaveTextContent('eduShell.setup.joinedMany:{"count":2}');
+    expect(telemetry.trackEduFirstStudentJoined).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given a class that already has students, When it opens, Then first-student does not fire', () => {
+    search = 'classroomId=a';
+    classrooms = [{ id: 'a', name: 'A', join_code: 'ABCD', member_count: 3, language: 'en' }];
+    roster = { students: [{ id: 's1' }, { id: 's2' }, { id: 's3' }], loading: false, arrivals: [] };
+    render(<ClassSetupFlow />);
+    expect(telemetry.trackEduFirstStudentJoined).not.toHaveBeenCalled();
+  });
+
+  it('When WhatsApp or Google Classroom is tapped, Then each opens its share URL and reports its method', async () => {
+    search = 'classroomId=a';
+    classrooms = [{ id: 'a', name: 'A', join_code: 'ABCD', member_count: 0, language: 'en' }];
+    render(<ClassSetupFlow />);
+    const wa = await screen.findByTestId('setup-share-whatsapp');
+    expect(wa).toHaveAttribute('href', expect.stringMatching(/^https:\/\/wa\.me\/\?text=.*%2Fen%2Fjoin%2FABCD/));
+    wa.addEventListener('click', (e) => e.preventDefault());
+    await userEvent.click(wa);
+    expect(telemetry.trackEduJoinCodeShared).toHaveBeenLastCalledWith({ classroomId: 'a', method: 'whatsapp' });
+    const gc = screen.getByTestId('setup-share-google');
+    expect(gc).toHaveAttribute('href', expect.stringMatching(/^https:\/\/classroom\.google\.com\/share\?/));
+    gc.addEventListener('click', (e) => e.preventDefault());
+    await userEvent.click(gc);
+    expect(telemetry.trackEduJoinCodeShared).toHaveBeenLastCalledWith({ classroomId: 'a', method: 'google_classroom' });
+  });
+
+  it('When Share is tapped, Then the native sheet is used and a clipboard fallback is reported as such', async () => {
+    search = 'classroomId=a';
+    classrooms = [{ id: 'a', name: 'A', join_code: 'ABCD', member_count: 0, language: 'en' }];
+    render(<ClassSetupFlow />);
+    shareWithFallback.mockResolvedValueOnce('shared');
+    await userEvent.click(await screen.findByTestId('setup-share-native'));
+    expect(shareWithFallback).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringMatching(/\/en\/join\/ABCD$/) }));
+    expect(telemetry.trackEduJoinCodeShared).toHaveBeenLastCalledWith({ classroomId: 'a', method: 'native' });
+    shareWithFallback.mockResolvedValueOnce('copied');
+    await userEvent.click(screen.getByTestId('setup-share-native'));
+    expect(telemetry.trackEduJoinCodeShared).toHaveBeenLastCalledWith({ classroomId: 'a', method: 'copy_fallback' });
+    expect(toastSuccess).toHaveBeenCalledWith('eduShell.setup.copied');
+    shareWithFallback.mockResolvedValueOnce('cancelled');
+    await userEvent.click(screen.getByTestId('setup-share-native'));
+    expect(telemetry.trackEduJoinCodeShared).toHaveBeenCalledTimes(2);
+  });
+
   it('When a class is created from a scrolled-down form, Then the ready screen opens from its top with focus on its title', async () => {
     createClassroom.mockResolvedValue({ success: true, data: NEW });
     const scrollIntoView = vi.fn();
@@ -115,6 +241,7 @@ describe('<ClassSetupFlow>', () => {
     await userEvent.click(await screen.findByTestId('setup-copy-link'));
     expect(writeText).toHaveBeenCalledWith(expect.stringMatching(/\/en\/join\/K7Q2$/));
     expect(toastSuccess).toHaveBeenCalledWith('eduShell.setup.copied');
+    expect(telemetry.trackEduJoinCodeCopied).toHaveBeenCalledWith({ classroomId: 'c9' });
   });
 
   it('Given the free class cap already hit, When create is tapped, Then the upsell opens without posting', async () => {

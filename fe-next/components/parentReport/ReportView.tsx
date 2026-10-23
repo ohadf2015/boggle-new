@@ -98,6 +98,16 @@ export function ReportView({ locale, token, data, t }: { locale: string; token: 
         )}
         <RecentActivity data={data} locale={locale} t={t} />
         <p className="text-center text-xs text-neo-black/70">{t('parentReport.footerNote')}</p>
+        <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-sm font-bold print:hidden">
+          <span>{t('parentReport.joinPrompt')}</span>
+          <a
+            href={`/${locale}/join`}
+            data-testid="parent-report-join"
+            className="inline-flex min-h-11 items-center rounded-neo border-2 border-neo-black bg-neo-lime px-3 font-neo-display font-black text-neo-black shadow-hard-sm hover:-translate-y-0.5 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan print:hidden"
+          >
+            {t('parentReport.joinCta')}
+          </a>
+        </p>
       </article>
       <LocaleSwitcher token={token} current={locale} t={t} />
     </div>

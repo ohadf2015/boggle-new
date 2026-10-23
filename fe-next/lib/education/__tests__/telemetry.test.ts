@@ -54,6 +54,7 @@ import {
   trackWeeklySummaryCopied,
   trackEduJoinCodeShown,
   trackEduJoinCodeCopied,
+  trackEduJoinCodeShared,
   trackEduFirstStudentJoined,
   trackEduFirstAssignmentCtaShown,
   trackEduFirstAssignmentCtaClicked,
@@ -520,6 +521,13 @@ describe('education telemetry', () => {
     expect(captureMock).toHaveBeenNthCalledWith(3, 'edu_first_student_joined', {
       classroom_id: 'cls-1',
     });
+    expect(JSON.stringify(captureMock.mock.calls)).not.toContain('AB12CD');
+  });
+
+  it('Given a share tap, When tracked, Then edu_join_code_shared carries the method on both channels and never the code', () => {
+    trackEduJoinCodeShared({ classroomId: 'cls-1', method: 'whatsapp' });
+    expect(captureMock).toHaveBeenLastCalledWith('edu_join_code_shared', { classroom_id: 'cls-1', method: 'whatsapp' });
+    expect(growthMock).toHaveBeenLastCalledWith('edu_join_code_shared', { classroom_id: 'cls-1', method: 'whatsapp' });
     expect(JSON.stringify(captureMock.mock.calls)).not.toContain('AB12CD');
   });
 

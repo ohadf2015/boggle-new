@@ -3537,6 +3537,8 @@ const en = {
     "invalidTitle": "Link not available",
     "invalidBody": "This report link has expired or is no longer valid. Ask the teacher for a new link.",
     "footerNote": "Shared by your child's teacher via LexiClash. No account needed.",
+    "joinPrompt": "Does your child have a class code?",
+    "joinCta": "Join a class",
     "language": "View in",
     "printButton": "Print or save as PDF",
     "classLabel": "Class",
@@ -9503,6 +9505,7 @@ const en = {
       "guestNameFailed": "Couldn't save your name. Try again.",
       "guestNamePrompt": "Save your score under your name",
       "guestNameKeep": "Keep this name",
+      "guestNameWhy": "Your name shows on today's leaderboard.",
       "wordsFound": "Words found",
       "masteryRatingLabel": "Rating",
       "masteryRatingChangeLabel": "Change",
@@ -12421,6 +12424,12 @@ const en = {
     "shell": {
       "profileLabel": "My teacher profile",
       "analyticsLabel": "Class analytics"
+    },
+    "classStreak": {
+      "kept": "Class streak: {count} days · played today",
+      "keptOne": "Class streak: 1 day · played today",
+      "atRisk": "Class streak: {count} days — play today to keep it",
+      "atRiskOne": "Class streak: 1 day — play today to keep it"
     },
     "pulse": {
       "state": {
@@ -20142,6 +20151,13 @@ const en = {
       "joinCode": "Join code",
       "qrLabel": "QR code for the join link",
       "startNow": "Start a game now",
+      "startQuick": "Start a quick game",
+      "joinedNone": "Waiting for your first student…",
+      "joinedOne": "1 student joined",
+      "joinedMany": "{count} students joined",
+      "shareWhatsapp": "WhatsApp",
+      "shareGoogle": "Google Classroom",
+      "shareMore": "Share",
       "copyLink": "Copy invite link",
       "copied": "Copied",
       "copyFailed": "Couldn't copy. Share the code instead.",

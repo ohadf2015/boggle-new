@@ -4,7 +4,7 @@
  * Distinct from `trialReminders.ts` (access-trial t-3/t-0/t+3) and from
  * `polarTrialDay10.ts` (live trial, 4–1 days left). This clock is the Polar
  * 14-day Pro trial at/after the instant it ends: t-0 (ends today / just
- * lapsed) and t+3 (winback). Day-10 keeps the mid-late nudge so this module
+ * lapsed), t+3, and the t+14 / t+30 "your classes are still here" win-back. Day-10 keeps the mid-late nudge so this module
  * never returns a bucket while days remain.
  *
  * Pure so the schedule is testable without a DB or an email provider.
@@ -14,14 +14,18 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const SITE = 'https://www.lexiclash.live';
 
 /** In send order. Each teacher gets each bucket at most once, ever. */
-export const POLAR_TRIAL_EXPIRY_BUCKETS = ['t-0', 't+3'] as const;
+export const POLAR_TRIAL_EXPIRY_BUCKETS = ['t-0', 't+3', 't+14', 't+30'] as const;
 export type PolarTrialExpiryBucket = (typeof POLAR_TRIAL_EXPIRY_BUCKETS)[number];
 
-const THRESHOLD_DAYS: Record<PolarTrialExpiryBucket, number> = { 't-0': 0, 't+3': 3 };
+export const POLAR_TRIAL_WINBACK_BUCKETS: ReadonlySet<PolarTrialExpiryBucket> = new Set(['t+14', 't+30']);
+
+const THRESHOLD_DAYS: Record<PolarTrialExpiryBucket, number> = { 't-0': 0, 't+3': 3, 't+14': 14, 't+30': 30 };
 
 const CAMPAIGN: Record<PolarTrialExpiryBucket, string> = {
   't-0': 'polar_trial_t0',
   't+3': 'polar_trial_t3',
+  't+14': 'polar_trial_t14',
+  't+30': 'polar_trial_t30',
 };
 
 /** Don't surprise someone whose Polar trial died months ago. */
@@ -66,7 +70,11 @@ export function pickPolarTrialExpiryJourney(args: PolarTrialExpirySignals): Pola
 
   const sent = new Set(args.alreadySent ?? []);
   for (const bucket of [...POLAR_TRIAL_EXPIRY_BUCKETS].reverse()) {
-    if (daysPast >= THRESHOLD_DAYS[bucket]) return sent.has(bucket) ? null : bucket;
+    if (daysPast < THRESHOLD_DAYS[bucket]) continue;
+    if (sent.has(bucket)) return null;
+    // A row still `trialing` this long after its end is a missed webhook, and it counts as Pro.
+    if (POLAR_TRIAL_WINBACK_BUCKETS.has(bucket) && args.status === 'trialing') return null;
+    return bucket;
   }
   return null;
 }

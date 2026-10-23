@@ -30,7 +30,7 @@ export function useTeacherProCheckout(source: ProUpgradeSource) {
     }
     setPending(true);
     try {
-      const result = await postTeacherProCheckout(fetch, { trial: false, locale: language });
+      const result = await postTeacherProCheckout(fetch, { trial: false, locale: language, placement: source });
       if (!result.ok) {
         if (result.status === 401) {
           toast.error(t('teacher.subscription.signInRequired'));

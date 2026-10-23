@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
+import { afterLoadIdle } from '@/lib/perf/afterLoadIdle';
 import type { LetterGrid, Language, DifficultyLevel } from '@/shared/types/game';
 
 interface AvailableWords {
@@ -149,17 +150,21 @@ export function useGridInit({
       return;
     }
 
-    // Set timeout to ensure we get words even if API is slow/fails
-    const timeoutId = setTimeout(() => {
-      if (!availableWordsRef.current) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Grid solve API timed out (non-critical, using empty word list)');
-        }
-        setAvailableWords({ easy: [], medium: [], hard: [] });
-      }
-    }, 5000);
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     const fetchGridWords = async (): Promise<void> => {
+      // Set timeout to ensure we get words even if API is slow/fails. Starts
+      // with the fetch itself (not at effect time) so the post-load deferral
+      // below can't trip the fallback before the request even goes out.
+      timeoutId = setTimeout(() => {
+        if (!availableWordsRef.current) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Grid solve API timed out (non-critical, using empty word list)');
+          }
+          setAvailableWords({ easy: [], medium: [], hard: [] });
+        }
+      }, 5000);
+
       try {
         const response = await fetch('/api/solve-grid', {
           method: 'POST',
@@ -191,9 +196,18 @@ export function useGridInit({
       }
     };
 
-    fetchGridWords();
+    // Defer the solve past the load window: the result only feeds bot word
+    // lists and word-progress tracking (non-critical — the fallback above
+    // already tolerates an empty list), while an immediate fetch competes
+    // with the LCP image for throttled first-load bandwidth.
+    const cancelDefer = afterLoadIdle(() => {
+      void fetchGridWords();
+    });
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      cancelDefer();
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    };
   }, [grid, language, mode, onGridChange]);
 
   return {

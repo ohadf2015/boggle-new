@@ -3936,6 +3936,8 @@ const he = {
     "invalidTitle": "הקישור אינו זמין",
     "invalidBody": "פג תוקפו של קישור הדוח או שהוא כבר אינו תקף. בקשו מהמורה קישור חדש.",
     "footerNote": "שותף על ידי המורה של ילדכם באמצעות LexiClash. לא נדרש חשבון.",
+    "joinPrompt": "יש לילדכם קוד כיתה?",
+    "joinCta": "הצטרפות לכיתה",
     "language": "הצגה בשפה",
     "printButton": "הדפסה או שמירה כ-PDF",
     "classLabel": "כיתה",
@@ -10033,6 +10035,7 @@ const he = {
       "guestNameFailed": "לא הצלחנו לשמור את השם. נסו שוב.",
       "guestNamePrompt": "באיזה שם לשמור את התוצאה שלך?",
       "guestNameKeep": "להשאיר את השם הזה",
+      "guestNameWhy": "השם שלך יופיע בלוח התוצאות של היום.",
       "wordsFound": "מילים שנמצאו",
       "masteryRatingLabel": "דירוג",
       "masteryRatingChangeLabel": "שינוי",
@@ -13900,6 +13903,12 @@ const he = {
     "shell": {
       "profileLabel": "פרופיל המורה שלי",
       "analyticsLabel": "נתוני הכיתה"
+    },
+    "classStreak": {
+      "kept": "רצף כיתתי: {count} ימים · שיחקתם היום",
+      "keptOne": "רצף כיתתי: יום אחד · שיחקתם היום",
+      "atRisk": "רצף כיתתי: {count} ימים. שחקו היום כדי לשמור עליו",
+      "atRiskOne": "רצף כיתתי: יום אחד. שחקו היום כדי לשמור עליו"
     },
     "pulse": {
       "state": {
@@ -21013,6 +21022,13 @@ const he = {
       "joinCode": "קוד הצטרפות",
       "qrLabel": "קוד QR לקישור ההצטרפות",
       "startNow": "מתחילים משחק עכשיו",
+      "startQuick": "מתחילים משחק קצר",
+      "joinedNone": "מחכים לתלמיד הראשון…",
+      "joinedOne": "תלמיד אחד הצטרף",
+      "joinedMany": "{count} תלמידים הצטרפו",
+      "shareWhatsapp": "וואטסאפ",
+      "shareGoogle": "Google Classroom",
+      "shareMore": "שיתוף",
       "copyLink": "העתקת קישור הזמנה",
       "copied": "הועתק",
       "copyFailed": "ההעתקה לא הצליחה. אפשר לשתף את הקוד במקום.",

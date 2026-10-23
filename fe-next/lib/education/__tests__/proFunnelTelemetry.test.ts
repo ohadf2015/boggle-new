@@ -156,13 +156,25 @@ describe('other Teacher Pro checkout touchpoints', () => {
   });
 
   it('Given a checkout POST that never returned, When tracked, Then edu_pro_checkout_failed fires', () => {
-    trackEduProCheckoutFailed({ reason: 'network', trial: false });
+    trackEduProCheckoutFailed({ reason: 'network', placement: 'teacher_upgrade', trial: false });
     expect(captureMock).toHaveBeenCalledWith('edu_pro_checkout_failed', {
       product: 'teacher_pro',
       provider: 'polar',
       reason: 'network',
+      placement: 'teacher_upgrade',
       trial: false,
+      origin: 'client',
     });
+  });
+
+  it('Given an HTTP failure seen by the browser, When tracked, Then the status rides the reason and origin marks it client-side', () => {
+    trackEduProCheckoutFailed({ reason: 'http_503', placement: 'class_limit_modal', trial: true });
+    expect(captureMock).toHaveBeenCalledWith('edu_pro_checkout_failed', expect.objectContaining({
+      reason: 'http_503',
+      placement: 'class_limit_modal',
+      trial: true,
+      origin: 'client',
+    }));
   });
 
   it('Given a trial checkout start, When tracked, Then checkout_open does not fire', () => {

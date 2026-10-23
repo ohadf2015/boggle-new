@@ -18,6 +18,7 @@ import {
   isValidLanguage,
   isLeaderboardLanguageScope,
   withLanguageScope,
+  sanitizeGuestDisplayName,
 } from './utils';
 import { updateDailyProfileStats } from './profileStats';
 import { rerankSequential, dedupeByPlayerKeepBest, sortWordWheelRowsGlobally } from './leaderboardSort';
@@ -104,7 +105,7 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
       time_seconds: timeSeconds || 0,
       center_letter: centerLetter || null,
       completed_at: new Date().toISOString(),
-      display_name: displayName || 'Anonymous',
+      display_name: sanitizeGuestDisplayName(displayName),
       avatar_emoji: avatarEmoji || '🎯',
       avatar_color: avatarColor || '#6366f1',
       avatar_image: avatarImage || null,
@@ -492,17 +493,20 @@ router.get('/alltime-leaderboard/:language', async (req: Request<{ language: str
 interface WordsRouteParams {
   date: string;
   language: string;
-  playerId: string;
+  playerId?: string;
 }
 
-router.get('/words/:date/:language/:playerId', async (req: Request<WordsRouteParams>, res: Response): Promise<void> => {
+const handleWords = async (req: Request<WordsRouteParams>, res: Response): Promise<void> => {
   try {
     if (!isSupabaseConfigured()) {
       res.status(503).json({ error: 'Service not available' });
       return;
     }
 
-    const { date, language, playerId } = req.params;
+    const { date, language } = req.params;
+    const playerId = req.params.playerId;
+    // Guests have no player id; POST keeps their fingerprint (a credential) out of URLs and logs.
+    const guestFingerprint = playerId ? null : req.body?.guestFingerprint;
 
     if (!isValidDateFormat(date)) {
       res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
@@ -512,7 +516,8 @@ router.get('/words/:date/:language/:playerId', async (req: Request<WordsRoutePar
       res.status(400).json({ error: 'Invalid language code' });
       return;
     }
-    if (!playerId || typeof playerId !== 'string' || playerId.length > 128) {
+    const identity = playerId ?? guestFingerprint;
+    if (!identity || typeof identity !== 'string' || identity.length > 128) {
       res.status(400).json({ error: 'Invalid playerId' });
       return;
     }
@@ -523,13 +528,15 @@ router.get('/words/:date/:language/:playerId', async (req: Request<WordsRoutePar
       return;
     }
 
-    const { data, error } = await supabase
+    const base = supabase
       .from('daily_word_wheel_attempts')
       .select('words_found, score, word_count, longest_word, display_name, avatar_emoji, avatar_color, avatar_image')
       .eq('puzzle_date', date)
-      .eq('language', language)
-      .eq('player_id', playerId)
-      .maybeSingle();
+      .eq('language', language);
+    const { data, error } = await (playerId
+      ? base.eq('player_id', playerId)
+      : base.eq('guest_fingerprint', identity).is('player_id', null)
+    ).maybeSingle();
 
     if (error) {
       logger.error('API', `Word Wheel words fetch error: ${error.message}`);
@@ -560,7 +567,10 @@ router.get('/words/:date/:language/:playerId', async (req: Request<WordsRoutePar
     logger.error('API', `Word Wheel words fetch error: ${err.message}`);
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+};
+
+router.get('/words/:date/:language/:playerId', handleWords);
+router.post('/words/:date/:language', handleWords);
 
 // ==========================================
 // GET /api/daily-challenge/word-wheel/word-rarity/:date/:language

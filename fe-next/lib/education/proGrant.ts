@@ -117,3 +117,11 @@ export function resolveProEntitlement(row: SubscriptionRowLike | null | undefine
     periodEnd: row.current_period_end,
   };
 }
+
+/** Users Pro right now, from `subscriptions` rows selected with `source`. */
+export function proUserIdsFrom(
+  rows: ReadonlyArray<SubscriptionRowLike & { user_id: string }>,
+  nowMs: number,
+): Set<string> {
+  return new Set(rows.filter((r) => resolveProEntitlement(r, nowMs).hasPro).map((r) => r.user_id));
+}

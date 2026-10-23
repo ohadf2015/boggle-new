@@ -7,6 +7,7 @@ import {
   buildLiveRoundCompletedEvent,
   buildStudentReturnedEvents,
   buildTeacherFirstLiveGameEvent,
+  buildParentReportViewedEvent,
   isQaEmail,
 } from '../educationRoundTelemetry';
 
@@ -108,5 +109,23 @@ describe('educationRoundTelemetry builders', () => {
     expect(ev.event).toBe('edu_teacher_first_live_game');
     expect(ev.distinctId).toBe('t1');
     expect(ev.properties).toMatchObject({ classroom_id: 'c1', game_mode: 'classic', player_count: 4 });
+  });
+});
+
+describe('buildParentReportViewedEvent', () => {
+  it('Given a valid report link, When built, Then it names the class and locale but never the student', () => {
+    const ev = buildParentReportViewedEvent({ token: 'tok-1', classroomId: 'class-1', locale: 'he' });
+    expect(ev.event).toBe('parent_report_viewed');
+    expect(ev.properties).toEqual({ classroom_id: 'class-1', locale: 'he' });
+    expect(JSON.stringify(ev)).not.toContain('tok-1');
+  });
+
+  it('Given the same link opened twice, Then both views share one viewer id; a different link does not', () => {
+    const a = buildParentReportViewedEvent({ token: 'tok-1', classroomId: 'c', locale: 'en' });
+    const b = buildParentReportViewedEvent({ token: 'tok-1', classroomId: 'c', locale: 'en' });
+    const c = buildParentReportViewedEvent({ token: 'tok-2', classroomId: 'c', locale: 'en' });
+    expect(a.distinctId).toBe(b.distinctId);
+    expect(a.distinctId).not.toBe(c.distinctId);
+    expect(a.distinctId.startsWith('parent_report:')).toBe(true);
   });
 });

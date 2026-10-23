@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { resolveProEntitlement } from '@/lib/education/proGrant';
-import { getPolarClient, getProProductId } from '@/lib/polar';
+import { getPolarClient, getProProductId, probeCheckoutUrl } from '@/lib/polar';
 import { productionRefusesSandbox } from '@/lib/polarBillingRuntime';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { locales, defaultLocale } from '@/i18n/config';
 import logger from '@/utils/logger';
+import { logSubscriptionEvent } from '@/lib/subscriptions';
+import { withTimeout } from '@/lib/server/routeTimeout';
+import { CHECKOUT_STARTED_EVENT, checkoutStartedPayload } from '@/lib/education/abandonedCheckout';
 import { buildProCheckoutStartedEvent, buildProTrialStartedEvent, buildCheckoutStartedEvent, buildProCheckoutFailedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
+
+const CHECKOUT_START_RECORD_TIMEOUT_MS = 1500;
 
 /**
  * A second free trial, or a trial on top of Pro, is a paid checkout instead.
@@ -137,6 +142,8 @@ export async function POST(request: NextRequest) {
       locale,
     });
 
+    // Refuse before recording checkout_started. A sandbox URL must not count
+    // as a start — that is the stall this guard exists to stop.
     if (productionRefusesSandbox({
       hosts: [request.headers.get('x-forwarded-host'), request.headers.get('host')],
       checkoutUrl,
@@ -151,6 +158,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    try {
+      await withTimeout(
+        logSubscriptionEvent({
+          userId: user.id,
+          eventType: CHECKOUT_STARTED_EVENT,
+          payload: checkoutStartedPayload({ trial, locale }),
+        }),
+        CHECKOUT_START_RECORD_TIMEOUT_MS,
+      );
+    } catch (err) {
+      logger.warn('Could not record checkout start:', err);
+    }
+
     // Analytics only, after the checkout exists; never able to change the answer.
     // URL creation is `checkout_started` (plus the edu_* names). `checkout_complete`
     // fires from the Polar webhook on paid `subscription.active` — not here.
@@ -161,6 +181,15 @@ export async function POST(request: NextRequest) {
       } else {
         captureProFunnelServerEvent(buildProCheckoutStartedEvent(user.id));
         captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id));
+      }
+
+      // Diagnostic only — never blocks the redirect. A teacher who started
+      // checkout but never returns leaves no trace otherwise: URL creation
+      // succeeding doesn't mean the hosted checkout page the browser lands
+      // on is actually up (sandbox/prod mismatch, Polar outage).
+      const probe = await probeCheckoutUrl(checkoutUrl);
+      if (probe && !probe.ok) {
+        captureProFunnelServerEvent(buildProCheckoutFailedEvent(user.id, `checkout_page_${probe.status}`));
       }
     } catch {
       /* the teacher's checkout url matters more than the funnel */

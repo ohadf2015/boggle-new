@@ -16,6 +16,10 @@ vi.mock('@/lib/analytics/lazyPosthog', () => ({
   },
 }));
 
+vi.mock('../ClassStreakLine', () => ({
+  ClassStreakLine: ({ classroomId }: { classroomId: string }) => <p data-testid="streak-for">{classroomId}</p>,
+}));
+
 import { ClassProgressStrip } from '../ClassProgressStrip';
 
 describe('<ClassProgressStrip>', () => {
@@ -158,5 +162,10 @@ describe('<ClassProgressStrip>', () => {
       />,
     );
     expect(screen.getByTestId('hq-class-progress')).toContainElement(screen.getByRole('button', { name: 'go' }));
+  });
+
+  it('Given a visible strip, Then it carries the class streak line for that class', () => {
+    render(<ClassProgressStrip classroomId="c7" studentCount={4} assignmentCount={2} submittedCount={0} hasPro />);
+    expect(screen.getByTestId('streak-for')).toHaveTextContent('c7');
   });
 });

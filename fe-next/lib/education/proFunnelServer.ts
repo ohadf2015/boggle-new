@@ -13,6 +13,7 @@ import {
   captureEduServerEvents,
   type EduServerEvent,
 } from '@/backend/utils/educationTelemetry';
+import type { PolarTrialExpiryBucket } from '@/lib/education/polarTrialExpiryJourney';
 
 const BASE = { product: 'teacher_pro', provider: 'polar' } as const;
 
@@ -181,8 +182,8 @@ export function buildPolarTrialDay10SentEvent(userId: string, daysLeft: number):
   };
 }
 
-/** Polar trial t-0 / t+3 conversion email actually sent. */
-export function buildPolarTrialExpirySentEvent(userId: string, bucket: 't-0' | 't+3'): EduServerEvent {
+/** Polar trial expiry / win-back email actually sent. */
+export function buildPolarTrialExpirySentEvent(userId: string, bucket: PolarTrialExpiryBucket): EduServerEvent {
   return {
     distinctId: userId,
     event: 'teacher_polar_trial_expiry_sent',

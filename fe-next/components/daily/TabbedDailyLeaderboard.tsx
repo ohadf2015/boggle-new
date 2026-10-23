@@ -1192,6 +1192,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       puzzleDate={puzzleDate}
       language={language}
       playerId={wordsModalPlayer?.player_id ?? null}
+      guestFingerprint={wordsModalPlayer?.guest_fingerprint ?? null}
       playerName={wordsModalPlayer?.display_name ?? ''}
       myWordsFound={myWheelWordsFound}
       t={t}

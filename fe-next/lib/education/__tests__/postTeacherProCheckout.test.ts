@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { postTeacherProCheckout } from '../postTeacherProCheckout';
 
 describe('postTeacherProCheckout', () => {
@@ -62,5 +62,72 @@ describe('postTeacherProCheckout', () => {
       json: async () => ({}),
     });
     await expect(postTeacherProCheckout(fetchFn)).resolves.toEqual({ ok: false, status: 200 });
+  });
+});
+
+describe('postTeacherProCheckout failure telemetry', () => {
+  const failed = vi.fn();
+  beforeEach(() => {
+    failed.mockReset();
+    vi.doMock('@/lib/education/proFunnelTelemetry', () => ({ trackEduProCheckoutFailed: failed }));
+  });
+  afterEach(() => {
+    vi.doUnmock('@/lib/education/proFunnelTelemetry');
+    vi.resetModules();
+  });
+
+  async function load() {
+    vi.resetModules();
+    return (await import('../postTeacherProCheckout')).postTeacherProCheckout;
+  }
+
+  const res = (status: number, body: unknown = {}) => ({ ok: status >= 200 && status < 300, status, json: async () => body });
+
+  it.each([
+    [503, 'http_503'],
+    [500, 'http_500'],
+    [401, 'unauthorized'],
+  ])('Given the checkout answers %s, When posted, Then edu_pro_checkout_failed carries %s, the placement and trial', async (status, reason) => {
+    const post = await load();
+    await post(vi.fn().mockResolvedValue(res(status)), { trial: true, locale: 'en', placement: 'dashboard_trial_offer' });
+    expect(failed).toHaveBeenCalledWith({ reason, placement: 'dashboard_trial_offer', trial: true });
+  });
+
+  it('Given a 200 with no url, When posted, Then the reason is no_url', async () => {
+    const post = await load();
+    await post(vi.fn().mockResolvedValue(res(200, {})), { placement: 'hq_trial_status' });
+    expect(failed).toHaveBeenCalledWith({ reason: 'no_url', placement: 'hq_trial_status', trial: false });
+  });
+
+  it('Given a 200 whose body is not JSON, When posted, Then the reason is no_url', async () => {
+    const post = await load();
+    const bad = { ok: true, status: 200, json: async () => { throw new SyntaxError('x'); } };
+    await post(vi.fn().mockResolvedValue(bad), { placement: 'p' });
+    expect(failed).toHaveBeenCalledWith({ reason: 'no_url', placement: 'p', trial: false });
+  });
+
+  it('Given the request never returns, When posted, Then network is reported and the error still reaches the caller', async () => {
+    const post = await load();
+    await expect(post(vi.fn().mockRejectedValue(new TypeError('offline')), { trial: false, placement: 'p' })).rejects.toThrow('offline');
+    expect(failed).toHaveBeenCalledWith({ reason: 'network', placement: 'p', trial: false });
+  });
+
+  it('Given a successful checkout, When posted, Then nothing is reported', async () => {
+    const post = await load();
+    await post(vi.fn().mockResolvedValue(res(200, { url: 'https://polar.sh/c/1' })), { placement: 'p' });
+    expect(failed).not.toHaveBeenCalled();
+  });
+
+  it('Given only a placement, When posted, Then the request still has no body', async () => {
+    const post = await load();
+    const fetchFn = vi.fn().mockResolvedValue(res(200, { url: 'https://polar.sh/c/1' }));
+    await post(fetchFn, { placement: 'hq_trial_status' });
+    expect(fetchFn).toHaveBeenCalledWith('/api/subscription/checkout', { method: 'POST' });
+  });
+
+  it('Given no placement, When it fails, Then it is reported as other', async () => {
+    const post = await load();
+    await post(vi.fn().mockResolvedValue(res(502)));
+    expect(failed).toHaveBeenCalledWith({ reason: 'http_502', placement: 'other', trial: false });
   });
 });

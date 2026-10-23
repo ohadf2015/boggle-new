@@ -4,6 +4,7 @@
  * Pure builders only. Emission goes through `captureEduServerEvents` in
  * educationTelemetry.ts, which stamps `$host` (see that module's header).
  */
+import { createHash } from 'node:crypto';
 import { EDU_EVENTS } from '@/lib/analytics/eduEvents';
 import type { ClassroomGame } from '../modules/classroomGameManager';
 import type { EduServerEvent } from './educationTelemetry';
@@ -40,6 +41,19 @@ export function buildStudentJoinedEvent(args: {
     distinctId: args.studentId,
     event: EDU_EVENTS.studentJoined,
     properties: { classroom_id: args.classroomId, is_test_account: args.isTestAccount },
+  };
+}
+
+/** Keyed by a hash of the link, so repeat opens of one report count as one viewer without naming the child. */
+export function buildParentReportViewedEvent(args: {
+  token: string;
+  classroomId: string;
+  locale: string;
+}): EduServerEvent {
+  return {
+    distinctId: `parent_report:${createHash('sha256').update(args.token).digest('hex').slice(0, 24)}`,
+    event: 'parent_report_viewed',
+    properties: { classroom_id: args.classroomId, locale: args.locale },
   };
 }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,7 +11,15 @@ import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { isFreePlanUsageBlocked } from '@/lib/education/teacherPlanGate';
-import { trackEduClassroomCreated } from '@/lib/education/telemetry';
+import {
+  trackEduClassroomCreated,
+  trackEduFirstStudentJoined,
+  trackEduJoinCodeCopied,
+  trackEduJoinCodeShared,
+  trackEduJoinCodeShown,
+} from '@/lib/education/telemetry';
+import { shareWithFallback } from '@/utils/shareWithFallback';
+import { useClassRoster } from '@/components/teacher/hq/useClassRoster';
 import {
   captureTeacherOnboardingFunnel,
   TEACHER_ONBOARDING_FUNNEL_EVENTS,
@@ -27,6 +35,8 @@ import { classCap, defaultClassLanguage, resolveClassName, type GradeBand } from
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
+const JOIN_POLL_MS = 5_000;
+
 interface ReadyClass {
   id: string;
   name: string;
@@ -38,6 +48,7 @@ export function ClassSetupFlow() {
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { classrooms, createClassroom } = useClassrooms();
   const { hasPro, status, loading: proLoading } = useTeacherPro();
   const { trial, isLoading: accessLoading } = useTeacherAccess();
@@ -66,6 +77,22 @@ export function ClassSetupFlow() {
   const ready: ReadyClass | null =
     created ?? (existing?.join_code ? { id: existing.id, name: existing.name, join_code: existing.join_code } : null);
 
+  const readyId = ready?.id ?? null;
+  const roster = useClassRoster(readyId, t('teacher.classrooms.students.unknown'), JOIN_POLL_MS);
+  const joined = readyId && !roster.loading ? roster.students.length : null;
+  const lastJoined = useRef<{ id: string; count: number } | null>(null);
+  useEffect(() => {
+    if (!readyId || joined === null) return;
+    const prev = lastJoined.current;
+    lastJoined.current = { id: readyId, count: joined };
+    if (prev?.id !== readyId || prev.count !== 0 || joined < 1) return;
+    trackEduFirstStudentJoined({ classroomId: readyId });
+    captureTeacherOnboardingFunnel(TEACHER_ONBOARDING_FUNNEL_EVENTS.studentJoined, {
+      locale: language,
+      plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
+    });
+  }, [readyId, joined, language, hasPro, status, proLoading]);
+
   const cap = proLoading ? null : classCap({ count: classrooms.length, hasPro, limit: FREE_TIER_LIMITS.classes });
   // Expired trial: ask at the entrance to the NEXT class, never in front of the first one.
   const trialAskOpen =
@@ -92,6 +119,7 @@ export function ClassSetupFlow() {
         plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
       });
       setCreated({ id: result.data.id, name: result.data.name, join_code: result.data.join_code });
+      router.replace(`/${language}/teacher/classroom/new?classroomId=${result.data.id}`, { scroll: false });
       return;
     }
     if (result.code === 'CLASS_LIMIT_REACHED') {
@@ -100,19 +128,38 @@ export function ClassSetupFlow() {
     }
     setErrorKey('eduShell.setup.createFailed');
     toast.error(t('eduShell.setup.createFailed'));
-  }, [name, grade, t, language, classrooms, createClassroom, classLanguage, hasPro, status, proLoading]);
+  }, [name, grade, t, language, classrooms, createClassroom, classLanguage, hasPro, status, proLoading, router]);
 
   const copy = useCallback(
     async (url: string) => {
       try {
         await navigator.clipboard.writeText(url);
         toast.success(t('eduShell.setup.copied'));
-        markInviteCopied();
+        if (readyId) trackEduJoinCodeCopied({ classroomId: readyId });
       } catch {
         toast.error(t('eduShell.setup.copyFailed'));
       }
     },
-    [t, markInviteCopied],
+    [t, readyId],
+  );
+
+  const shown = useCallback(() => {
+    markInviteCopied();
+    if (readyId) trackEduJoinCodeShown({ classroomId: readyId });
+  }, [markInviteCopied, readyId]);
+
+  const nativeShare = useCallback(
+    async (share: { title: string; text: string; url: string }) => {
+      if (!readyId) return;
+      const result = await shareWithFallback({ ...share, clipboardText: share.url });
+      if (result === 'shared') trackEduJoinCodeShared({ classroomId: readyId, method: 'native' });
+      if (result === 'copied') {
+        trackEduJoinCodeShared({ classroomId: readyId, method: 'copy_fallback' });
+        toast.success(t('eduShell.setup.copied'));
+      }
+      if (result === 'failed') toast.error(t('eduShell.setup.copyFailed'));
+    },
+    [readyId, t],
   );
 
   return (
@@ -122,8 +169,11 @@ export function ClassSetupFlow() {
         <ClassReady
           classroom={ready}
           language={language}
-          onShown={markInviteCopied}
+          onShown={shown}
           onCopy={(url) => void copy(url)}
+          onShareLink={(method) => trackEduJoinCodeShared({ classroomId: ready.id, method })}
+          onNativeShare={(share) => void nativeShare(share)}
+          joined={joined}
           onOpenProjector={() => setProjectorOpen(true)}
           t={t}
         />

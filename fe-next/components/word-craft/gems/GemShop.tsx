@@ -34,6 +34,7 @@ function GemShopImpl({ shop, inventory, pendingAbilities, onBuy, onReroll, label
   const wrapRef = useRef<HTMLDivElement>(null);
   const shopKey = shop.map((c) => c.id).join('|');
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const cards = wrapRef.current?.querySelectorAll<HTMLElement>('[data-shop-card]');
     if (!cards || cards.length === 0) return;
     gsap.fromTo(
@@ -42,6 +43,13 @@ function GemShopImpl({ shop, inventory, pendingAbilities, onBuy, onReroll, label
       { y: 0, opacity: 1, rotateX: 0, duration: 0.32, ease: 'back.out(1.7)', stagger: 0.06 },
     );
   }, [shopKey]);
+
+  const handleBuy = (card: AbilityCard, el: HTMLButtonElement | null, isReroll: boolean) => {
+    if (el && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      gsap.to(el, { scale: 1.12, duration: 0.1, ease: 'power1.out', yoyo: true, repeat: 1 });
+    }
+    if (isReroll) onReroll(card); else onBuy(card);
+  };
 
   return (
     <section aria-label={labels.title} className="rounded-neo border-neo-thick border-black bg-neo-navy/95 p-2 shadow-hard">
@@ -71,9 +79,9 @@ function GemShopImpl({ shop, inventory, pendingAbilities, onBuy, onReroll, label
               type="button"
               data-shop-card={card.id}
               data-affordable={affordable ? 'true' : 'false'}
-              onClick={() => {
+              onClick={(e) => {
                 if (!affordable) return;
-                if (isReroll) onReroll(card); else onBuy(card);
+                handleBuy(card, e.currentTarget, isReroll);
               }}
               disabled={!affordable}
               aria-label={`${labels.abilityName[card.kind]} — ${labels.abilityDesc[card.kind]}`}

@@ -6,6 +6,7 @@ import { TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { shouldShowClassProgressStrip } from '@/lib/education/classProgressStrip';
+import { ClassStreakLine } from './ClassStreakLine';
 import {
   trackTeacherHqProgressViewed,
   trackTeacherHqUpgradeClicked,
@@ -133,6 +134,7 @@ export function ClassProgressStrip({
           {t('academy.hq.progressSubmitted', 'submitted')}
         </li>
       </ul>
+      <ClassStreakLine classroomId={classroomId} />
       {action}
       {showUpgrade ? (
         onUpgrade ? (

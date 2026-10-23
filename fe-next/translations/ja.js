@@ -3936,6 +3936,8 @@ const ja = {
     "invalidTitle": "リンクが無効です",
     "invalidBody": "このレポートのリンクは期限切れか、無効になっています。先生に新しいリンクをお願いしてください。",
     "footerNote": "お子様の先生がLexiClashで共有しました。アカウントは不要です。",
+    "joinPrompt": "お子様はクラスコードをお持ちですか?",
+    "joinCta": "クラスに参加",
     "language": "表示言語",
     "printButton": "印刷 / PDFで保存",
     "classLabel": "クラス",
@@ -10108,6 +10110,7 @@ const ja = {
       "guestNameFailed": "名前を保存できませんでした。もう一度お試しください。",
       "guestNamePrompt": "スコアを保存する名前を入力",
       "guestNameKeep": "この名前のままにする",
+      "guestNameWhy": "あなたの名前は今日のランキングに表示されます。",
       "wordsFound": "見つかった単語",
       "masteryRatingLabel": "レーティング",
       "masteryRatingChangeLabel": "変動",
@@ -14045,6 +14048,12 @@ const ja = {
     "shell": {
       "profileLabel": "先生プロフィール",
       "analyticsLabel": "クラス分析"
+    },
+    "classStreak": {
+      "kept": "クラス連続記録:{count}日・今日もプレイ済み",
+      "keptOne": "クラス連続記録:1日・今日もプレイ済み",
+      "atRisk": "クラス連続記録:{count}日。今日プレイして記録をつなごう",
+      "atRiskOne": "クラス連続記録:1日。今日プレイして記録をつなごう"
     },
     "pulse": {
       "state": {
@@ -21083,6 +21092,13 @@ const ja = {
       "joinCode": "参加コード",
       "qrLabel": "参加リンクのQRコード",
       "startNow": "今すぐゲームを始める",
+      "startQuick": "クイックゲームを始める",
+      "joinedNone": "最初の生徒を待っています…",
+      "joinedOne": "1人の生徒が参加しました",
+      "joinedMany": "{count}人の生徒が参加しました",
+      "shareWhatsapp": "WhatsApp",
+      "shareGoogle": "Google Classroom",
+      "shareMore": "共有",
       "copyLink": "招待リンクをコピー",
       "copied": "コピーしました",
       "copyFailed": "コピーできませんでした。代わりにコードを共有してください。",

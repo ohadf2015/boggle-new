@@ -118,7 +118,7 @@ describe('TeacherTrialUpgradeStatus', () => {
     await waitFor(() => {
       expect(postTeacherProCheckout).toHaveBeenCalledTimes(1);
     });
-    expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: true });
+    expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: true, placement: 'hq_trial_status' });
     expect(trackClicked).toHaveBeenCalledWith({ trial_days_remaining: 11 });
     expect(trackTrialTap).toHaveBeenCalledWith({ source: 'dashboard_trial_offer' });
     expect(goToPolarCheckout).toHaveBeenCalledWith('https://polar.sh/c/hq');
@@ -140,7 +140,7 @@ describe('TeacherTrialUpgradeStatus', () => {
     await waitFor(() => {
       expect(postTeacherProCheckout).toHaveBeenCalledTimes(1);
     });
-    expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, {});
+    expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { placement: 'hq_trial_status' });
     expect(goToPolarCheckout).toHaveBeenCalledWith('https://polar.sh/c/paid');
   });
 

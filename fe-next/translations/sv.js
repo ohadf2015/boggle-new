@@ -4259,6 +4259,8 @@ const sv = {
     "invalidTitle": "Länken är inte tillgänglig",
     "invalidBody": "Den här rapportlänken har gått ut eller är inte längre giltig. Be läraren om en ny länk.",
     "footerNote": "Delad av ditt barns lärare via LexiClash. Inget konto behövs.",
+    "joinPrompt": "Har ditt barn en klasskod?",
+    "joinCta": "Gå med i klassen",
     "language": "Visa på",
     "printButton": "Skriv ut eller spara som PDF",
     "classLabel": "Klass",
@@ -10381,6 +10383,7 @@ const sv = {
       "guestNameFailed": "Kunde inte spara ditt namn. Försök igen.",
       "guestNamePrompt": "Vilket namn ska poängen sparas under?",
       "guestNameKeep": "Behåll det här namnet",
+      "guestNameWhy": "Ditt namn visas på dagens topplista.",
       "wordsFound": "Hittade ord",
       "masteryRatingLabel": "Rating",
       "masteryRatingChangeLabel": "Förändring",
@@ -14318,6 +14321,12 @@ const sv = {
     "shell": {
       "profileLabel": "Min lärarprofil",
       "analyticsLabel": "Klassens statistik"
+    },
+    "classStreak": {
+      "kept": "Klassens svit: {count} dagar · spelat i dag",
+      "keptOne": "Klassens svit: 1 dag · spelat i dag",
+      "atRisk": "Klassens svit: {count} dagar – spela i dag för att behålla den",
+      "atRiskOne": "Klassens svit: 1 dag – spela i dag för att behålla den"
     },
     "pulse": {
       "state": {
@@ -21083,6 +21092,13 @@ const sv = {
       "joinCode": "Anslutningskod",
       "qrLabel": "QR-kod för anslutningslänken",
       "startNow": "Starta ett spel nu",
+      "startQuick": "Starta ett snabbt spel",
+      "joinedNone": "Väntar på första eleven…",
+      "joinedOne": "1 elev har anslutit",
+      "joinedMany": "{count} elever har anslutit",
+      "shareWhatsapp": "WhatsApp",
+      "shareGoogle": "Google Classroom",
+      "shareMore": "Dela",
       "copyLink": "Kopiera inbjudningslänk",
       "copied": "Kopierat",
       "copyFailed": "Det gick inte att kopiera. Dela koden i stället.",

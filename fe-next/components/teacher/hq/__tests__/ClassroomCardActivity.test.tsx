@@ -16,6 +16,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 vi.mock('@/hooks/useClassPulse', () => ({ useClassPulse: () => pulse() }));
+vi.mock('../ClassStreakLine', () => ({
+  ClassStreakLine: ({ classroomId }: { classroomId: string }) => <p data-testid="streak-for">{classroomId}</p>,
+}));
 
 import { ClassroomCardActivity } from '../ClassroomCardActivity';
 
@@ -74,5 +77,15 @@ describe('<ClassroomCardActivity>', () => {
     render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
     expect(screen.getByTestId('classroom-card-last')).toHaveTextContent('teacher.pulse.state.loading');
     expect(screen.getByTestId('classroom-card-last')).not.toHaveTextContent('neverPlayed');
+  });
+
+  it('Given a class with students, Then the card carries that class streak for the teacher', () => {
+    render(<ClassroomCardActivity classroomId="c9" rosterCount={3} />);
+    expect(screen.getByTestId('streak-for')).toHaveTextContent('c9');
+  });
+
+  it('Given no students yet, Then there is no streak to show', () => {
+    render(<ClassroomCardActivity classroomId="c9" rosterCount={0} />);
+    expect(screen.queryByTestId('streak-for')).toBeNull();
   });
 });

@@ -15,6 +15,7 @@ interface SendEmailArgs {
   html: string;
   from?: string;
   replyTo?: string;
+  headers?: Record<string, string>;
 }
 
 interface SendEmailResult {
@@ -32,7 +33,7 @@ function getResend(): Resend | null {
   return _resend;
 }
 
-export async function sendEmail({ to, subject, html, from, replyTo }: SendEmailArgs): Promise<SendEmailResult> {
+export async function sendEmail({ to, subject, html, from, replyTo, headers }: SendEmailArgs): Promise<SendEmailResult> {
   const resend = getResend();
   if (!resend) {
     console.warn('[sendEmail] RESEND_API_KEY not set; skipping send to', to);
@@ -47,6 +48,7 @@ export async function sendEmail({ to, subject, html, from, replyTo }: SendEmailA
         subject,
         html,
         ...(replyTo ? { replyTo } : {}),
+        ...(headers ? { headers } : {}),
       }),
       SEND_TIMEOUT_MS,
       () => console.warn('[sendEmail] Resend call exceeded', SEND_TIMEOUT_MS, 'ms; to=', to),

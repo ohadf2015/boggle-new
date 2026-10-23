@@ -5,6 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useClassPulse } from "@/hooks/useClassPulse";
 import type { ClassPulse } from "@/lib/education/classPulse";
 import { ClassRosterStatus } from "./ClassRosterStatus";
+import { ClassStreakLine } from "./ClassStreakLine";
 
 export interface ClassroomCardActivityProps {
   classroomId: string;
@@ -89,6 +90,7 @@ export function ClassroomCardActivity({
           </div>
         </dl>
       )}
+      {rosterCount > 0 ? <ClassStreakLine classroomId={classroomId} /> : null}
       {rosterCount > 0 ? <ClassRosterStatus classroomId={classroomId} /> : null}
     </div>
   );

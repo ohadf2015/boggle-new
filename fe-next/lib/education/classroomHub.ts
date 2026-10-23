@@ -22,6 +22,35 @@ export interface ClassHubState {
 const STREAK_WINDOW_DAYS = 60;
 const DAY_MS = 86_400_000;
 
+export interface ClassStreak {
+  streak: number;
+  playedToday: boolean;
+}
+
+export type ClassStreakStatus = 'none' | 'kept' | 'atRisk';
+
+export function classStreakStatus({ streak, playedToday }: ClassStreak): ClassStreakStatus {
+  if (streak < 1) return 'none';
+  return playedToday ? 'kept' : 'atRisk';
+}
+
+/** The one streak read: the student hub and the teacher HQ both go through it, so they can never disagree. */
+export async function loadClassStreak(
+  store: Pick<ClassHubStore, 'fetchRoundDays'>,
+  classroomId: string,
+  todayIso: string
+): Promise<ClassStreak> {
+  const since = new Date(Date.parse(`${todayIso}T00:00:00Z`) - STREAK_WINDOW_DAYS * DAY_MS).toISOString();
+  let days: string[] = [];
+  try {
+    days = await store.fetchRoundDays(classroomId, since);
+  } catch {
+    // Missing relation or a read blip: show an honest zero rather than a broken hub.
+    days = [];
+  }
+  return computeClassStreak(days, todayIso);
+}
+
 export async function loadClassHubState(
   store: ClassHubStore,
   classroomId: string,
@@ -31,16 +60,7 @@ export async function loadClassHubState(
   if (!(await store.isMember(classroomId, studentId))) {
     throw new Error('NOT_A_MEMBER');
   }
-  const since = new Date(Date.parse(`${todayIso}T00:00:00Z`) - STREAK_WINDOW_DAYS * DAY_MS).toISOString();
-
-  let days: string[] = [];
-  try {
-    days = await store.fetchRoundDays(classroomId, since);
-  } catch {
-    // Missing relation or a read blip: show an honest zero rather than a broken hub.
-    days = [];
-  }
-  const { streak, playedToday } = computeClassStreak(days, todayIso);
+  const { streak, playedToday } = await loadClassStreak(store, classroomId, todayIso);
   const rematchRequestedToday = await store.hasRematchToday(classroomId, studentId, todayIso);
   return { streak, playedToday, rematchRequestedToday };
 }

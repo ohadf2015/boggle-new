@@ -19,6 +19,7 @@ interface WordWheelWordsModalProps {
   puzzleDate: string;
   language: Language;
   playerId: string | null;
+  guestFingerprint?: string | null;
   playerName: string;
   /** Current player's found words. When provided, modal shows only the diff
    *  (words the opponent found that the current player did NOT) so the
@@ -36,7 +37,7 @@ interface WordsPayload {
 }
 
 export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
-  isOpen, onClose, puzzleDate, language, playerId, playerName, myWordsFound, t,
+  isOpen, onClose, puzzleDate, language, playerId, guestFingerprint, playerName, myWordsFound, t,
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,10 +48,10 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
   // leak into a different opponent's view.
   useEffect(() => {
     if (isOpen) setShowAll(false);
-  }, [isOpen, playerId]);
+  }, [isOpen, playerId, guestFingerprint]);
 
   useEffect(() => {
-    if (!isOpen || !playerId) return;
+    if (!isOpen || (!playerId && !guestFingerprint)) return;
 
     let cancelled = false;
     const controller = new AbortController();
@@ -60,10 +61,15 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
       setError(null);
       setPayload(null);
       try {
-        const res = await fetch(
-          `/api/daily-challenge/word-wheel/words/${puzzleDate}/${language}/${encodeURIComponent(playerId)}`,
-          { signal: controller.signal },
-        );
+        const base = `/api/daily-challenge/word-wheel/words/${puzzleDate}/${language}`;
+        const res = playerId
+          ? await fetch(`${base}/${encodeURIComponent(playerId)}`, { signal: controller.signal })
+          : await fetch(base, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ guestFingerprint }),
+              signal: controller.signal,
+            });
         if (!res.ok) {
           if (res.status === 404) {
             if (!cancelled) setPayload({ wordsFound: [], wordCount: 0, score: 0, longestWord: null, displayName: playerName });
@@ -85,7 +91,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
       cancelled = true;
       controller.abort();
     };
-  }, [isOpen, puzzleDate, language, playerId, playerName, t]);
+  }, [isOpen, puzzleDate, language, playerId, guestFingerprint, playerName, t]);
 
   const allWords = payload?.wordsFound ?? [];
   // Diff mode: only show words the opponent found that the current player missed.
