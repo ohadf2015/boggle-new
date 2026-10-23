@@ -169,25 +169,26 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                     {t('auth.signOut')}
                   </button>
                 </div>
-
-                <div className="h-px bg-neo-cream/20 mx-2" />
-
-                <div className="p-2">
-                  <Link
-                    href={exitHref ?? `/${language}`}
-                    role="menuitem"
-                    onClick={() => setIsOpen(false)}
-                    className={cn(
-                      'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors w-full',
-                      'text-neo-white hover:bg-neo-pink/30'
-                    )}
-                  >
-                    <Home className="w-4 h-4" />
-                    {t('education.header.exitEducation')}
-                  </Link>
-                </div>
               </>
             )}
+
+            {/* Every viewer, guests included, matching the phone menu: it is their only way out. */}
+            <div className="h-px bg-neo-cream/20 mx-2" />
+
+            <div className="p-2">
+              <Link
+                href={exitHref ?? `/${language}`}
+                role="menuitem"
+                onClick={() => setIsOpen(false)}
+                className={cn(
+                  'flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-neo transition-colors w-full',
+                  'text-neo-white hover:bg-neo-pink/30'
+                )}
+              >
+                <Home className="w-4 h-4" />
+                {t('education.header.exitEducation')}
+              </Link>
+            </div>
           </div>
         )}
     </div>

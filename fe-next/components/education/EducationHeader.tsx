@@ -142,7 +142,8 @@ export const EducationHeader = memo<EducationHeaderProps>(({
     <header
       className={cn(
         'w-full mb-1 sm:mb-2 lg:mb-3 px-2 sm:px-3 lg:px-4 pb-1 lg:pb-2',
-        'sticky lg:static',
+        // Positioned at every width so z-[60] holds and the desktop menu paints over the page below.
+        'sticky lg:relative',
         'z-[60] bg-neo-navy',
         'min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]',
         className

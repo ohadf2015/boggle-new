@@ -70,7 +70,7 @@ describe.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('EducationHeader exit links,
     expect(screen.getByLabelText('education.header.homeLink')).toHaveAttribute('href', `/${lang}/${hub}`);
   });
 
-  it.each(['teacher', 'student'] as Role[])('desktop menu "Exit Education" for %s', (role) => {
+  it.each(Object.keys(ROLES) as Role[])('desktop menu "Exit Education" for %s', (role) => {
     authState = ROLES[role];
     render(<EducationHeader />);
     fireEvent.click(screen.getByLabelText('common.menu'));
@@ -79,12 +79,6 @@ describe.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('EducationHeader exit links,
     expect(menu).toHaveAttribute('href', exitHref(lang));
   });
 
-  it('desktop menu has no exit item for a guest', () => {
-    authState = ROLES.guest;
-    render(<EducationHeader />);
-    fireEvent.click(screen.getByLabelText('common.menu'));
-    expect(screen.queryByText('education.header.exitEducation')).toBeNull();
-  });
 });
 
 describe('EducationHeader back button', () => {

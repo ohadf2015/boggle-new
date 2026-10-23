@@ -51,6 +51,7 @@ describe('EducationHeader links under he', () => {
   it.each([
     ['teacher', TEACHER],
     ['student', STUDENT],
+    ['guest', GUEST],
   ] as const)('the desktop account menu holds the only way out for a %s', (_, auth) => {
     authState = auth;
     render(<EducationHeader />);
