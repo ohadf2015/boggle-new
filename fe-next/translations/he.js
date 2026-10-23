@@ -173,7 +173,7 @@ const he = {
       "spellingTitle": "תרגול תחרות איות אונליין",
       "spellingDesc": "תוכנית אימון של 4 שבועות, רשימות מילים מותאמות, דואלי 1v1 — הכנה לתחרות.",
       "sightBadge": "מילים נפוצות",
-      "sightTitle": "תרגול Sight Words (Dolch ו-Fry)",
+      "sightTitle": "תרגול מילים נפוצות (רשימות Dolch ו-Fry)",
       "sightDesc": "כרטיסיות, התאמות ואיות — מבוסס על רשימת המילים שלכם.",
       "schoolsBadge": "לבתי ספר",
       "schoolsTitle": "LexiClash לבתי ספר",
@@ -699,6 +699,11 @@ const he = {
         "1": "אותן אותיות מופיעות בכל טלפון. כולם מחפשים מילים על אותו לוח.",
         "2": "כל מילה פוגעת בבוס. 7 אותיות ומעלה = קריטי, מילים מהירות בונות קומבו כיתתי.",
         "3": "מילים ארוכות טוענות מגן ועוצרות התקפות. תורידו לו את החיים לאפס לפני שהזמן נגמר."
+      },
+      "wordTower": {
+        "1": "כל תלמיד בונה מגדל משלו ממגש אותיות.",
+        "2": "כל מילה אמיתית מוסיפה לבנה. מילה רעועה מפילה אחת.",
+        "3": "המגדל הגבוה ביותר עולה לראש טבלת הכיתה על המסך הגדול."
       }
     },
     "boss": {
@@ -953,7 +958,8 @@ const he = {
       "progressStudents": "תלמידים",
       "progressAssignments": "מטלות",
       "progressSubmitted": "הוגשו",
-      "progressUpgrade": "פרו למורים"
+      "progressUpgrade": "פרו למורים",
+      "endedCodeTries": "תלמידים שניסו קוד של משחק שהסתיים: {count}. התחילו משחק חדש כדי שיוכלו לשחק."
     },
     "modes": {
       "workshop": {
@@ -1892,7 +1898,7 @@ const he = {
     },
     "focus": {
       "any": "מעורב",
-      "definition": "הגדרות",
+      "definition": "פירוש מילים",
       "synonym": "מילים נרדפות",
       "antonym": "הפכים",
       "context": "רמזים מההקשר",
@@ -14476,7 +14482,8 @@ const he = {
         "blast": "בלאסט",
         "wheelRush": "מרוץ הגלגל",
         "vocabQuiz": "חידון אוצר מילים",
-        "wordcraft": "וורדקראפט"
+        "wordcraft": "וורדקראפט",
+        "wordTower": "מגדל מילים"
       },
       "pressure": {
         "title": "לחץ",
@@ -15268,8 +15275,10 @@ const he = {
         "blast": "משרשרים מילים מהר ומפוצצים אריחים בשרשרת קומבו.",
         "wheelRush": "מסובבים את גלגל האותיות ויורים מילים נגד השעון.",
         "vocabQuiz": "ארבע אפשרויות, תשובה אחת נכונה. עונים מהר, צוברים נקודות ומגלים מי אלוף המילים!",
-        "wordcraft": "מרכיבים מילים על לוח אישי מול הברון. טבלת הכיתה תכריע את כל השאר."
-      }
+        "wordcraft": "מרכיבים מילים על לוח אישי מול הברון. טבלת הכיתה תכריע את כל השאר.",
+        "wordTower": "כל אחד בונה מגדל מילים משלו. מילה רעועה מפילה לבנים. המגדל הגבוה ביותר מנצח."
+      },
+      "wordcraftNeedsShortWords": "אי אפשר לחלק אף מילה מהרשימה הזו לאריחים של וורדקראפט. הוסיפו מילים קצרות יותר או בחרו מצב אחר."
     },
     "projectorLobby": {
       "joinAt": "היכנסו לכתובת",
@@ -15302,7 +15311,8 @@ const he = {
       "blast": "שרשור מילים לניקוי אריחים בקומבו",
       "wheelRush": "לבנות מילים מגלגל אותיות אחד",
       "vocabQuiz": "שאלות אמריקאיות מנתוני המילים שלכם",
-      "wordcraft": "הרכבת מילי השיעור על לוח אישי מול יריב בוט"
+      "wordcraft": "הרכבת מילי השיעור על לוח אישי מול יריב בוט",
+      "wordTower": "בונים מגדל מילים, הגבוה ביותר מנצח"
     },
     "wordcraftLive": {
       "rival": "הברון",
@@ -15582,7 +15592,7 @@ const he = {
       "practiceMissed": "תרגלו את המילים האלה",
       "playReteachRound": "שחקו סבב חזרה: רק המילים שהחסרנו",
       "backToLobby": "חזרה ללובי",
-      "rematch": "ריבאץ': אותה רשימה, אותו קוד",
+      "rematch": "משחק חוזר: אותה רשימה, אותו קוד",
       "teamBattle": {
         "title": "קרב קבוצות",
         "teamName": "קבוצה {number}",
@@ -15590,7 +15600,7 @@ const he = {
       },
       "participationBonus": "+{points} נקודות השתתפות לכולם",
       "shareGap": "שיתוף פער הכיתה",
-      "shareGapCopied": "הקישור הועתק. הדביקו ב-Slack או בצ'אט הורים",
+      "shareGapCopied": "הקישור הועתק. הדביקו אותו בקבוצת ההורים או בצ'אט של הצוות",
       "podium": {
         "title": "המובילים",
         "wordsFound": "{{found}} מתוך {{total}} מילים",
@@ -15641,7 +15651,7 @@ const he = {
       "moreWords": "+{count} נוספות",
       "fewerWords": "הצגה מצומצמת",
       "allBoardWordsFound": "הכיתה מצאה כל מילת שיעור שהופיעה על הלוח.",
-      "wholeLessonAgain": "רוב הכיתה פספסה את רוב השיעור. ריבאץ' יריץ את כל הרשימה.",
+      "wholeLessonAgain": "רוב הכיתה פספסה את רוב השיעור. משחק חוזר יעבור שוב על כל הרשימה.",
       "shareGapTitle": "פער אוצר המילים של הכיתה",
       "shareGapText": "{{lesson}}: הכיתה מצאה {{found}} מתוך {{total}} מילות השיעור. לתרגול: {{missed}}",
       "shareGapAllFoundText": "{{lesson}}: הכיתה מצאה את כל מילות השיעור.",
@@ -15652,8 +15662,8 @@ const he = {
       "shareGapEmptyText": "{{lesson}}: אין עדיין פער כיתה לשיתוף",
       "startReteachLive": "התחלת Live חזרה ל-3 דקות",
       "postReteachGoogleClassroom": "פרסום חזרה ל-3 דקות ב-Google Classroom",
-      "postReteachGoogleClassroomTitle": "Live חזרה ל-3 דקות: {{lesson}}",
-      "postReteachGoogleClassroomBody": "פתחו את הקישור והתחילו Live ל-3 דקות על המילים החסרות: {{missed}}. התלמידים מצטרפים מה-Stream.",
+      "postReteachGoogleClassroomTitle": "חזרה במשחק חי של 3 דקות: {{lesson}}",
+      "postReteachGoogleClassroomBody": "פתחו את הקישור והתחילו משחק חי של 3 דקות על המילים שפספסו: {{missed}}. התלמידים מצטרפים מעמוד הכיתה.",
       "assignPracticeGoogleClassroom": "שיבוץ תרגול ב-Google Classroom",
       "assignPracticeGoogleClassroomTitle": "תרגול מילים חסרות: {{lesson}}",
       "assignPracticeGoogleClassroomBody": "פתחו את הקישור ותרגלו בבית את המילים החסרות: {{missed}}. הגישו כשתסיימו.",
@@ -15665,8 +15675,8 @@ const he = {
       "printPracticeSheetNameLine": "שם: ________________",
       "printPracticeSheetDateLine": "תאריך: ________________",
       "printPracticeSheetFooter": "LexiClash · תרגול בלי מכשירים",
-      "startUnpluggedReteachLive": "התחילו Live חזרה בלי מכשירים",
-      "startTeamTilesUnplugged": "התחילו Team Tiles ללא מכשירים",
+      "startUnpluggedReteachLive": "התחילו חזרה בלי מכשירים",
+      "startTeamTilesUnplugged": "התחילו אריחי קבוצות בלי מכשירים",
       "teamTilesProgress": "אריחים {{judged}} מתוך {{total}}",
       "teamTilesClassScore": "ניקוד הכיתה",
       "teamTilesChooseTeams": "כמה קבוצות?",
@@ -15683,7 +15693,7 @@ const he = {
       "teamTilesPerfectHeadline": "ריצת Team Tiles מושלמת!",
       "teamTilesPerfectSub": "כל אריח miss-gap הופך ונוקה.",
       "teamTilesPlayAgain": "ערבבו ושחקו שוב",
-      "startClassicUnplugged": "התחילו Classic Unplugged",
+      "startClassicUnplugged": "התחילו קלאסי בלי מכשירים",
       "classicUnpluggedProgress": "מילה {{current}} מתוך {{total}}",
       "classicUnpluggedClassScore": "ניקוד הכיתה",
       "classicUnpluggedChooseMode": "כיתה או קבוצות?",
@@ -15702,14 +15712,14 @@ const he = {
       "classicUnpluggedPerfectHeadline": "Classic Unplugged מושלם!",
       "classicUnpluggedPerfectSub": "כל מילת miss-gap נסגרה בכיתה.",
       "classicUnpluggedPlayAgain": "שחקו שוב",
-      "assignUnpluggedGoogleClassroom": "שיבוץ שיעור מנותק ב-Google Classroom",
-      "assignUnpluggedGoogleClassroomTitle": "שיעורי בית מנותקים ממסכים: {{lesson}}",
-      "assignUnpluggedGoogleClassroomBody": "שיעורי בית בלי מכשירים: פתחו את קישור Unplugged Live, הדפיסו את דף התרגול למילים החסרות ותרגלו: {{missed}}. בלי מכשירי תלמידים. הגישו כשתסיימו.",
-      "assignMissGapLiveGoogleClassroom": "שיבוץ Live לפי miss-gap ל-Google Classroom",
-      "assignMissGapLiveGoogleClassroomTitle": "Live miss-gap ל-3 דק׳: {{lesson}}",
-      "assignMissGapLiveGoogleClassroomBody": "פתחו את הקישור והתחילו Live של 3 דקות על המילים שפספסו: {{missed}}. התלמידים מצטרפים מ-Classwork. עובד ב-Google Workspace for Education החינמי, בלי Education Plus.",
-      "launchMissGapQuestionPackLive": "הפעלת חבילת שאלות בשידור חי: מילים שחסרו",
-      "missGapQuestionPackTitle": "חבילת שאלות miss-gap: {{lesson}}",
+      "assignUnpluggedGoogleClassroom": "שיבוץ חזרה בלי מכשירים ב-Google Classroom",
+      "assignUnpluggedGoogleClassroomTitle": "שיעורי בית בלי מסכים: {{lesson}}",
+      "assignUnpluggedGoogleClassroomBody": "שיעורי בית בלי מכשירים: פתחו את הקישור, הדפיסו את דף התרגול של המילים שפספסו ותרגלו: {{missed}}. התלמידים לא צריכים מכשיר. הגישו כשתסיימו.",
+      "assignMissGapLiveGoogleClassroom": "שיבוץ משחק חי על המילים שפספסו ב-Google Classroom",
+      "assignMissGapLiveGoogleClassroomTitle": "משחק חי של 3 דקות על המילים שפספסו: {{lesson}}",
+      "assignMissGapLiveGoogleClassroomBody": "פתחו את הקישור והתחילו משחק חי של 3 דקות על המילים שפספסו: {{missed}}. התלמידים מצטרפים מ-Google Classroom. עובד בגרסה החינמית של Google Workspace for Education, בלי Education Plus.",
+      "launchMissGapQuestionPackLive": "משחק חי עם שאלות על המילים שפספסו",
+      "missGapQuestionPackTitle": "שאלות על המילים שפספסו: {{lesson}}",
       "unpluggedReteachHint": "התלמידים עונים על דף התרגול המודפס, בלי מכשירים",
       "unpluggedReteachReveal": "חשפו",
       "unpluggedReteachNext": "הבא",
@@ -15740,15 +15750,15 @@ const he = {
       "unpluggedGameCleared": "מילים שנוצחו",
       "unpluggedGameBestStreak": "הרצף הטוב ביותר",
       "unpluggedGamePlayAgain": "עוד סבב",
-      "shareMissGapPractice": "שיתוף כרטיס תרגול miss-gap",
+      "shareMissGapPractice": "שיתוף כרטיס תרגול של המילים שפספסו",
       "shareMissGapPracticeCopied": "קישור כרטיס התרגול הועתק. הדביקו אותו להורים",
-      "shareMissGapPracticeTitle": "כרטיס תרגול miss-gap",
-      "shareMissGapPracticeText": "{{lesson}}: תרגול miss-gap לבית (הדפסה או שמירת PDF): {{missed}}",
+      "shareMissGapPracticeTitle": "כרטיס תרגול: המילים שפספסו",
+      "shareMissGapPracticeText": "{{lesson}}: תרגול לבית על המילים שפספסו (להדפסה או לשמירה כ-PDF): {{missed}}",
       "missGapPracticeEyebrow": "תרגול לבית",
       "missGapPracticeSubtitle": "דף תרגול להדפסה עם המילים שהכיתה פספסה. פותחים, מדפיסים או שומרים כ-PDF. בלי מכשירים.",
       "missGapPracticeFoil": "ל-Kahoot Unplugged אין שיעורי בית. ל-LexiClash יש",
       "missGapPracticePrintPdf": "הדפסה / שמירת PDF לתרגול",
-      "assignMissGapAsyncHomework": "שיבוץ שיעורי בית miss-gap אסינכרוניים",
+      "assignMissGapAsyncHomework": "שיעורי בית על המילים שפספסו",
       "assignMissGapAsyncEyebrow": "שיעורי בית אסינכרוניים",
       "assignMissGapAsyncHeading": "תרגול miss-gap עם תאריך יעד",
       "assignMissGapAsyncSubtitle": "התלמידים משחקים משחק של שתי דקות על המילים שהכיתה פספסה. אתם רואים מי סיים, וסיום בזמן שומר על רצף הכיתה.",
@@ -15811,14 +15821,14 @@ const he = {
       "missGapWhatsAppOgTitle": "תרגול miss-gap להורים: {{lesson}}",
       "missGapWhatsAppOpenPractice": "פתיחת כרטיס תרגול miss-gap",
       "missGapWhatsAppOpenHomework": "פתיחת שיעורי בית miss-gap",
-      "printUnpluggedReteachPack": "הדפסת חבילת Unplugged reteach (PDF + QR)",
-      "unpluggedReteachPackTitle": "חבילת Unplugged reteach: {{lesson}}",
-      "unpluggedReteachPackSubtitle": "חבילה להדפסה ממילים שפספסו במפגש האחרון. ה-QR פותח Unplugged Live על המקרן",
-      "unpluggedReteachPackFoil": "ל-Kahoot Classic Unplugged אין חבילה להדפסה עם QR ל-Live. ל-LexiClash יש",
-      "unpluggedReteachPackQrHint": "סריקה לפתיחת Unplugged reteach Live",
+      "printUnpluggedReteachPack": "הדפסת דף חזרה בלי מכשירים (PDF + QR)",
+      "unpluggedReteachPackTitle": "דף חזרה בלי מכשירים: {{lesson}}",
+      "unpluggedReteachPackSubtitle": "דף להדפסה מהמילים שפספסו בשיעור הקודם. ה-QR פותח את המשחק על המקרן",
+      "unpluggedReteachPackFoil": "ב-Kahoot אין דף חזרה להדפסה עם QR שפותח משחק חי. ב-LexiClash יש.",
+      "unpluggedReteachPackQrHint": "סרקו כדי לפתוח את החזרה על המקרן",
       "unpluggedReteachPackHowTo": "1) הדפיסו את החבילה 2) חלקו דפי תרגול לתלמידים 3) סרקו את ה-QR על מסך המורה",
       "unpluggedReteachPackPracticeHeading": "דפי תרגול לתלמידים",
-      "unpluggedReteachPackFooter": "LexiClash · חבילת Unplugged reteach",
+      "unpluggedReteachPackFooter": "LexiClash · דף חזרה בלי מכשירים",
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
@@ -16478,13 +16488,13 @@ const he = {
     },
     "vsGimkit": {
       "proExclusiveModes": {
-        "eyebrow": "Pro Exclusive בתוכנית חינם — foil כנות",
-        "title": "Gimkit Basic: Pro-Exclusive modes limited to 5 players. LexiClash: whole-class free vocab.",
-        "lede": "Gimkit help “Player maximums” states Pro Exclusive modes are limited to 5 players for Gimkit Basic members. LexiClash free classroom vocab covers a whole class (up to 50) without a 5-seat Pro-Exclusive mode.",
-        "gimkitTitle": "Gimkit Basic — Pro Exclusive modes → 5 players",
-        "gimkitBody": "Featured modes: unlimited on Basic. Pro Exclusive modes: limited to 5 players until you upgrade — even when the whole class needs that mode.",
-        "lexiTitle": "LexiClash — whole-class free vocab",
-        "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games. One published classroom cap — no Pro-Exclusive mode that shrinks to five seats.",
+        "eyebrow": "השוואה כנה: מצבי Pro Exclusive בתוכנית החינמית",
+        "title": "Gimkit Basic: מצבי Pro Exclusive מוגבלים ל-5 שחקנים. LexiClash: אוצר מילים חינם לכל הכיתה.",
+        "lede": "לפי עמוד העזרה של Gimkit על מספר השחקנים המרבי, מצבי Pro Exclusive מוגבלים ל-5 שחקנים למנויי Gimkit Basic. משחקי אוצר המילים החינמיים של LexiClash מכסים כיתה שלמה (עד 50), בלי מצב שמוגבל ל-5 מקומות.",
+        "gimkitTitle": "Gimkit Basic: מצבי Pro Exclusive עד 5 שחקנים",
+        "gimkitBody": "מצבים מומלצים: ללא הגבלה ב-Basic. מצבי Pro Exclusive: עד 5 שחקנים עד שמשדרגים, גם כשכל הכיתה צריכה את המצב הזה.",
+        "lexiTitle": "LexiClash: אוצר מילים חינם לכל הכיתה",
+        "lexiBody": "בתוכנית החינמית: עד 50 תלמידים בכיתה במשחקי אוצר מילים. מגבלה מפורסמת אחת, בלי מצב שמצטמצם ל-5 מקומות.",
         "citePrefix": "Gimkit help:",
         "citePlayerMaximumsLabel": "Player maximums (Pro Exclusive → 5 on Basic)",
         "citeProFaqLabel": "Gimkit Pro FAQ",

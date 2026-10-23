@@ -699,6 +699,11 @@ const ja = {
         "1": "全員のスマホに同じ文字盤。みんなで同じ盤面から単語を探す。",
         "2": "見つけた単語がボスへの攻撃に。7文字以上はクリティカル、素早く続けるとクラスコンボ。",
         "3": "長い単語でシールドをため、攻撃を止める。時間切れまでにHPをゼロにしよう。"
+      },
+      "wordTower": {
+        "1": "生徒一人ひとりが、文字ラックから自分のタワーを建てます。",
+        "2": "正しい単語ごとにブロックが1つ積まれ、ぐらつく単語で1つ崩れます。",
+        "3": "いちばん高いタワーが、大きな画面のクラスランキングで1位に。"
       }
     },
     "boss": {
@@ -953,7 +958,8 @@ const ja = {
       "progressStudents": "生徒",
       "progressAssignments": "課題",
       "progressSubmitted": "提出済み",
-      "progressUpgrade": "Teacher Pro"
+      "progressUpgrade": "Teacher Pro",
+      "endedCodeTries": "終了したゲームのコードを入力した生徒：{count}人。新しいゲームを始めて、参加できるようにしましょう。"
     },
     "modes": {
       "workshop": {
@@ -14621,7 +14627,8 @@ const ja = {
         "blast": "ブラスト",
         "wheelRush": "ホイールラッシュ",
         "vocabQuiz": "単語クイズ",
-        "wordcraft": "ワードクラフト"
+        "wordcraft": "ワードクラフト",
+        "wordTower": "ワードタワー"
       },
       "pressure": {
         "title": "プレッシャー",
@@ -15413,8 +15420,10 @@ const ja = {
         "blast": "素早く単語をつなげて、タイルを連鎖で爆発させる。",
         "wheelRush": "文字ホイールを回して、時間と勝負で単語を撃ち出す。",
         "vocabQuiz": "4択で意味をあてる。正解が早いほど高得点。",
-        "wordcraft": "自分のボードでバロンと単語づくり。あとはクラスのランキングが決める。"
-      }
+        "wordcraft": "自分のボードでバロンと単語づくり。あとはクラスのランキングが決める。",
+        "wordTower": "それぞれ自分のタワーに単語を積み上げる。ぐらつく単語でブロックが崩れる。いちばん高いタワーが勝ち。"
+      },
+      "wordcraftNeedsShortWords": "このリストの単語はワードクラフトのタイルに配れません。短い単語を追加するか、別のモードを選んでください。"
     },
     "projectorLobby": {
       "joinAt": "アクセス先",
@@ -15447,7 +15456,8 @@ const ja = {
       "blast": "単語をつないでタイルを消すコンボ",
       "wheelRush": "1つの文字ホイールから単語を作る",
       "vocabQuiz": "先生の単語データから作る4択問題",
-      "wordcraft": "リストの単語を自分のボードで作り、ボットと競う"
+      "wordcraft": "リストの単語を自分のボードで作り、ボットと競う",
+      "wordTower": "単語を積み上げ、いちばん高い塔が勝ち"
     },
     "wordcraftLive": {
       "rival": "バロン",
@@ -15735,7 +15745,7 @@ const ja = {
       },
       "participationBonus": "全員に+{points}参加ポイント",
       "shareGap": "クラスの抜けをシェア",
-      "shareGapCopied": "リンクをコピーしました。Slackや保護者チャットに貼ってください",
+      "shareGapCopied": "リンクをコピーしました。保護者や先生のチャットに貼り付けてください",
       "podium": {
         "title": "トップスコア",
         "wordsFound": "{{total}}語中{{found}}語",
@@ -15797,8 +15807,8 @@ const ja = {
       "shareGapEmptyText": "{{lesson}}：まだ共有するクラスギャップはありません",
       "startReteachLive": "3分再指導ライブを開始",
       "postReteachGoogleClassroom": "3分再指導を Google Classroom に投稿",
-      "postReteachGoogleClassroomTitle": "3分再指導ライブ：{{lesson}}",
-      "postReteachGoogleClassroomBody": "リンクを開き、見逃した単語で3分ライブを開始: {{missed}}。生徒はストリームから参加します。",
+      "postReteachGoogleClassroomTitle": "3分間の復習ライブ：{{lesson}}",
+      "postReteachGoogleClassroomBody": "リンクを開いて、取りこぼした単語で3分間のライブを始めましょう：{{missed}}。生徒はクラスのストリームから参加します。",
       "assignPracticeGoogleClassroom": "練習課題を Google Classroom に割り当て",
       "assignPracticeGoogleClassroomTitle": "見逃した単語の練習：{{lesson}}",
       "assignPracticeGoogleClassroomBody": "リンクを開き、見逃した単語を家庭で練習: {{missed}}。終わったら提出してください。",
@@ -15810,8 +15820,8 @@ const ja = {
       "printPracticeSheetNameLine": "名前: ________________",
       "printPracticeSheetDateLine": "日付: ________________",
       "printPracticeSheetFooter": "LexiClash · デバイス不要の練習",
-      "startUnpluggedReteachLive": "デバイスなしの復習Liveを開始",
-      "startTeamTilesUnplugged": "Team Tiles Unplugged を開始",
+      "startUnpluggedReteachLive": "デバイスなしの復習を始める",
+      "startTeamTilesUnplugged": "デバイスなしのチームタイルを始める",
       "teamTilesProgress": "タイル {{judged}} / {{total}}",
       "teamTilesClassScore": "クラススコア",
       "teamTilesChooseTeams": "チーム数は？",
@@ -15828,7 +15838,7 @@ const ja = {
       "teamTilesPerfectHeadline": "完璧な Team Tiles！",
       "teamTilesPerfectSub": "すべての miss-gap タイルをめくってクリア。",
       "teamTilesPlayAgain": "シャッフルしてもう一度",
-      "startClassicUnplugged": "Classic Unplugged を開始",
+      "startClassicUnplugged": "デバイスなしのクラシックを始める",
       "classicUnpluggedProgress": "単語 {{current}} / {{total}}",
       "classicUnpluggedClassScore": "クラススコア",
       "classicUnpluggedChooseMode": "クラスかチーム？",
@@ -15847,14 +15857,14 @@ const ja = {
       "classicUnpluggedPerfectHeadline": "Perfect Classic Unplugged！",
       "classicUnpluggedPerfectSub": "miss-gap の単語をすべてクリア。",
       "classicUnpluggedPlayAgain": "もう一度",
-      "assignUnpluggedGoogleClassroom": "Unplugged再指導を Google Classroom に割り当て",
-      "assignUnpluggedGoogleClassroomTitle": "Unplugged再指導の宿題：{{lesson}}",
-      "assignUnpluggedGoogleClassroomBody": "デバイス不要の宿題: Unplugged Live のリンクを開き、見逃した単語の練習シートを印刷して練習: {{missed}}。生徒用デバイスは不要です。終わったら提出してください。",
-      "assignMissGapLiveGoogleClassroom": "miss-gap LiveをGoogle Classroomに割り当て",
-      "assignMissGapLiveGoogleClassroomTitle": "3分miss-gap Live：{{lesson}}",
-      "assignMissGapLiveGoogleClassroomBody": "リンクを開き、取りこぼした語で3分Liveを開始: {{missed}}。生徒はClassworkから参加。無料のGoogle Workspace for Educationで使え、Education Plusは不要です。",
-      "launchMissGapQuestionPackLive": "ライブ問題パックを開始（未習得の単語）",
-      "missGapQuestionPackTitle": "ミスギャップ問題パック：{{lesson}}",
+      "assignUnpluggedGoogleClassroom": "デバイスなしの復習をGoogle Classroomで出す",
+      "assignUnpluggedGoogleClassroomTitle": "デバイスなしの復習宿題：{{lesson}}",
+      "assignUnpluggedGoogleClassroomBody": "デバイスなしの宿題：リンクを開き、取りこぼした単語の練習シートを印刷して練習しましょう：{{missed}}。生徒のデバイスは不要です。終わったら提出してください。",
+      "assignMissGapLiveGoogleClassroom": "取りこぼした単語の3分ライブをGoogle Classroomで出す",
+      "assignMissGapLiveGoogleClassroomTitle": "取りこぼした単語の3分ライブ：{{lesson}}",
+      "assignMissGapLiveGoogleClassroomBody": "リンクを開いて、取りこぼした単語で3分間のライブを始めましょう：{{missed}}。生徒はGoogle Classroomから参加します。無料のGoogle Workspace for Educationで使え、Education Plusは不要です。",
+      "launchMissGapQuestionPackLive": "取りこぼした単語の問題でライブを始める",
+      "missGapQuestionPackTitle": "取りこぼした単語の問題集：{{lesson}}",
       "unpluggedReteachHint": "生徒は印刷した練習シートで答えます。端末は不要です",
       "unpluggedReteachReveal": "表示",
       "unpluggedReteachNext": "次へ",
@@ -15885,15 +15895,15 @@ const ja = {
       "unpluggedGameCleared": "クリアした単語",
       "unpluggedGameBestStreak": "最高の連続正解",
       "unpluggedGamePlayAgain": "もう一回",
-      "shareMissGapPractice": "ミスギャップ練習カードを共有",
+      "shareMissGapPractice": "取りこぼした単語の練習カードを共有",
       "shareMissGapPracticeCopied": "練習カードのリンクをコピーしました。保護者に貼り付けてください",
-      "shareMissGapPracticeTitle": "ミスギャップ練習カード",
-      "shareMissGapPracticeText": "{{lesson}}の持ち帰りミスギャップ練習（印刷またはPDF保存）: {{missed}}",
+      "shareMissGapPracticeTitle": "取りこぼした単語の練習カード",
+      "shareMissGapPracticeText": "{{lesson}}：取りこぼした単語の家庭学習（印刷またはPDF保存）：{{missed}}",
       "missGapPracticeEyebrow": "家庭学習カード",
       "missGapPracticeSubtitle": "クラスが取りこぼした単語の練習プリントです。開いて印刷するか、PDFとして保存できます。端末は不要です。",
       "missGapPracticeFoil": "Kahoot Unplugged には持ち帰り練習がありません。LexiClash にはあります",
       "missGapPracticePrintPdf": "練習PDFを印刷 / 保存",
-      "assignMissGapAsyncHomework": "非同期 miss-gap 宿題を割り当て",
+      "assignMissGapAsyncHomework": "取りこぼした単語の宿題を出す",
       "assignMissGapAsyncEyebrow": "非同期宿題",
       "assignMissGapAsyncHeading": "期限付き miss-gap 練習",
       "assignMissGapAsyncSubtitle": "クラスが取りこぼした単語で、生徒は2分間のゲームをプレイします。だれが終えたかが一目でわかり、期限内に終えるとクラスの連続記録が続きます。",
@@ -15956,14 +15966,14 @@ const ja = {
       "missGapWhatsAppOgTitle": "保護者向けmiss-gap練習：{{lesson}}",
       "missGapWhatsAppOpenPractice": "miss-gap練習カードを開く",
       "missGapWhatsAppOpenHomework": "非同期miss-gap宿題を開く",
-      "printUnpluggedReteachPack": "Unplugged再指導パックを印刷（PDF + QR）",
-      "unpluggedReteachPackTitle": "Unplugged再指導パック：{{lesson}}",
-      "unpluggedReteachPackSubtitle": "前回セッションの取りこぼしから作る印刷パック。QRでプロジェクターにUnplugged Liveを開く",
-      "unpluggedReteachPackFoil": "Kahoot Classic UnpluggedにはLive QR付き印刷パックがありませんが、LexiClashにはあります",
-      "unpluggedReteachPackQrHint": "スキャンしてUnplugged再指導Liveを開く",
+      "printUnpluggedReteachPack": "デバイスなしの復習シートを印刷（PDF + QR）",
+      "unpluggedReteachPackTitle": "デバイスなしの復習シート：{{lesson}}",
+      "unpluggedReteachPackSubtitle": "前回の授業で取りこぼした単語の印刷用シート。QRでプロジェクターにゲームが開きます",
+      "unpluggedReteachPackFoil": "Kahootには、ライブにつながるQR付きの印刷用復習シートはありません。LexiClashにはあります",
+      "unpluggedReteachPackQrHint": "スキャンしてプロジェクターで復習を開く",
       "unpluggedReteachPackHowTo": "1) このパックを印刷 2) 練習ページを生徒に渡す 3) 教師画面でQRをスキャン",
       "unpluggedReteachPackPracticeHeading": "生徒用練習ページ",
-      "unpluggedReteachPackFooter": "LexiClash · Unplugged再指導パック",
+      "unpluggedReteachPackFooter": "LexiClash · デバイスなしの復習シート",
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
@@ -16623,18 +16633,18 @@ const ja = {
     },
     "vsGimkit": {
       "proExclusiveModes": {
-        "eyebrow": "無料プランの Pro Exclusive — honesty foil",
-        "title": "Gimkit Basic: Pro-Exclusive modes limited to 5 players. LexiClash: whole-class free vocab.",
-        "lede": "Gimkit help “Player maximums” states Pro Exclusive modes are limited to 5 players for Gimkit Basic members. LexiClash free classroom vocab covers a whole class (up to 50) without a 5-seat Pro-Exclusive mode.",
-        "gimkitTitle": "Gimkit Basic — Pro Exclusive modes → 5 players",
-        "gimkitBody": "Featured modes: unlimited on Basic. Pro Exclusive modes: limited to 5 players until you upgrade — even when the whole class needs that mode.",
-        "lexiTitle": "LexiClash — whole-class free vocab",
-        "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games. One published classroom cap — no Pro-Exclusive mode that shrinks to five seats.",
+        "eyebrow": "正直な比較：無料プランのPro Exclusiveモード",
+        "title": "Gimkit Basic：Pro Exclusiveモードは5名まで。LexiClash：クラス全員で無料の語彙ゲーム。",
+        "lede": "Gimkitのヘルプ（プレイヤー上限）によると、Gimkit BasicメンバーのPro Exclusiveモードは5名まで。LexiClashの無料語彙ゲームなら、5席の枠に縛られずクラス全員（最大50人）で遊べます。",
+        "gimkitTitle": "Gimkit Basic：Pro Exclusiveモードは5名まで",
+        "gimkitBody": "注目モード：Basicで無制限。Pro Exclusiveモード：アップグレードするまで5名まで。クラス全員でそのモードを使いたくても同じです。",
+        "lexiTitle": "LexiClash：クラス全員で無料の語彙ゲーム",
+        "lexiBody": "無料プラン：語彙ゲームはクラスあたり最大50人。公開している上限はこれだけで、5席に縮むモードはありません。",
         "citePrefix": "Gimkit help:",
         "citePlayerMaximumsLabel": "Player maximums (Pro Exclusive → 5 on Basic)",
         "citeProFaqLabel": "Gimkit Pro FAQ",
         "citeSuffix": " — Pro Exclusive modes limited to 5 players for Gimkit Basic members.",
-        "cta": "明確な無料50席でクラス全体のボキャブをホスト"
+        "cta": "無料で最大50人。クラス全員で語彙ゲームを始めよう"
       }
     },
     "vsMentimeter": {

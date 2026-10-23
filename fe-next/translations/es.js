@@ -172,7 +172,7 @@ const es = {
       "spellingBadge": "Concurso de Ortografía",
       "spellingTitle": "Práctica de concurso de ortografía online",
       "spellingDesc": "Plan de entrenamiento de 4 semanas, listas personalizadas, duelos 1v1 — preparación para concursos.",
-      "sightBadge": "Sight Words",
+      "sightBadge": "Palabras frecuentes",
       "sightTitle": "Práctica de sight words (Dolch y Fry)",
       "sightDesc": "Tarjetas, emparejamientos y deletreo desde tu propia lista.",
       "schoolsBadge": "Para escuelas",
@@ -667,7 +667,7 @@ const es = {
     "steps": {
       "vocabQuiz": {
         "1": "Aparece un significado en la pantalla grande.",
-        "2": "Cada alumno toca una de cuatro palabras en su móvil.",
+        "2": "Cada alumno toca una de cuatro palabras en su teléfono.",
         "3": "Acertar rápido da más puntos. Las rachas y los cofres suman."
       },
       "wordcraft": {
@@ -696,9 +696,14 @@ const es = {
         "3": "Hay poco tiempo: cada palabra cuenta."
       },
       "bossBattle": {
-        "1": "Las mismas letras en cada móvil. Todos buscan palabras en el mismo tablero.",
+        "1": "Las mismas letras en cada teléfono. Todos buscan palabras en el mismo tablero.",
         "2": "Cada palabra golpea al jefe. Con 7+ letras es crítico y las palabras rápidas suben el combo de la clase.",
         "3": "Las palabras largas cargan el escudo y frenan ataques. Déjalo en cero antes de que acabe el tiempo."
+      },
+      "wordTower": {
+        "1": "Cada alumno construye su propia torre con un atril de letras.",
+        "2": "Cada palabra real suma un bloque. Una palabra floja tumba uno.",
+        "3": "La torre más alta encabeza la clasificación de la clase en la pantalla grande."
       }
     },
     "boss": {
@@ -922,7 +927,7 @@ const es = {
       "openProjector": "Abrir proyector",
       "joinedLabel": "dentro",
       "nobodyYet": "Nadie aún: comparte el código",
-      "firstStudentTitle": "Mete a tu primer estudiante",
+      "firstStudentTitle": "Suma a tu primer alumno",
       "proTitle": "Teacher Pro",
       "proChip": "Ir a Pro",
       "projectorTitle": "Únete a {name}",
@@ -953,7 +958,8 @@ const es = {
       "progressStudents": "estudiantes",
       "progressAssignments": "tareas",
       "progressSubmitted": "entregadas",
-      "progressUpgrade": "Teacher Pro"
+      "progressUpgrade": "Teacher Pro",
+      "endedCodeTries": "Alumnos que probaron el código de un juego que ya terminó: {count}. Empieza un juego nuevo para que puedan jugar."
     },
     "modes": {
       "workshop": {
@@ -13917,7 +13923,7 @@ const es = {
       "connecting": "Conectando al aula...",
       "idleHint": "Cuando tu profesor inicie un juego, aparecerá aquí",
       "joinEnded": "La partida ya terminó. Pídele a tu profe la siguiente.",
-      "joinRetry": "Todavía no pudimos meterte. Toca Unirme para intentarlo de nuevo. Si sigue fallando, pídele a tu profe que vuelva a iniciar la partida.",
+      "joinRetry": "Todavía no pudimos conectarte. Toca Unirme para intentarlo de nuevo. Si sigue fallando, pídele a tu profe que vuelva a iniciar la partida.",
       "joinNotMember": "Esta partida es solo para tu clase. Pídele a tu profe que te agregue.",
       "joinSignIn": "Vuelve a iniciar sesión para unirte a la partida.",
       "joinBusy": "El servidor está ocupado ahora mismo. Espera un momento y toca Unirme otra vez.",
@@ -14418,7 +14424,7 @@ const es = {
       "trustCancel": "Cancela cuando quieras, sin permanencia",
       "trustDataSafe": "Tus datos están a salvo",
       "trustReminder": "Correo de aviso antes de cada cobro",
-      "freePlanName": "Free",
+      "freePlanName": "Gratis",
       "freeForever": "Plan gratuito, sin caducidad",
       "freeClasses": "Hasta {count} clases",
       "freeStudents": "Hasta {count} estudiantes en la lista de cada clase",
@@ -14549,7 +14555,8 @@ const es = {
         "blast": "Blast",
         "wheelRush": "Carrera de Ruleta",
         "vocabQuiz": "Test de Vocabulario",
-        "wordcraft": "Wordcraft"
+        "wordcraft": "Wordcraft",
+        "wordTower": "Torre de Palabras"
       },
       "pressure": {
         "title": "Presión",
@@ -15362,8 +15369,10 @@ const es = {
         "blast": "Encadena palabras rápido y revienta las fichas en combos.",
         "wheelRush": "Gira la rueda de letras y dispara palabras contra el reloj.",
         "vocabQuiz": "Cuatro opciones, un significado: gana quien acierta más rápido.",
-        "wordcraft": "Forma palabras en tu propio tablero contra el Barón. La tabla de la clase decide lo demás."
-      }
+        "wordcraft": "Forma palabras en tu propio tablero contra el Barón. La tabla de la clase decide lo demás.",
+        "wordTower": "Cada quien apila palabras en su propia torre. Una palabra floja tumba bloques. Gana la torre más alta."
+      },
+      "wordcraftNeedsShortWords": "Wordcraft no puede repartir ninguna palabra de esta lista en sus fichas. Agrega palabras más cortas o elige otro modo."
     },
     "projectorLobby": {
       "joinAt": "Entra en",
@@ -15396,7 +15405,8 @@ const es = {
       "blast": "Encadena palabras para despejar fichas en combos",
       "wheelRush": "Forma palabras con una sola rueda de letras",
       "vocabQuiz": "Preguntas de cuatro opciones con tus propias palabras",
-      "wordcraft": "Forma las palabras de la lista en tu tablero contra un bot"
+      "wordcraft": "Forma las palabras de la lista en tu tablero contra un bot",
+      "wordTower": "Apila palabras: gana la torre más alta"
     },
     "wordcraftLive": {
       "rival": "El Barón",
@@ -15609,7 +15619,7 @@ const es = {
       "buttonHint": "Recorre la pantalla de acceso, la sala de espera y un tablero de muestra antes de la clase.",
       "disabledHint": "Elige una clase y al menos una lección para ver la vista previa.",
       "title": "Vista previa del alumno",
-      "subtitle": "Exactamente lo que ve un alumno en su móvil, paso a paso.",
+      "subtitle": "Exactamente lo que ve un alumno en su teléfono, paso a paso.",
       "close": "Cerrar la vista previa",
       "stepsLabel": "Pasos de la vista previa",
       "stepOf": "Paso {current} de {total}:",
@@ -16572,13 +16582,13 @@ const es = {
     },
     "vsGimkit": {
       "proExclusiveModes": {
-        "eyebrow": "Pro Exclusive del plan gratis — foil de honestidad",
-        "title": "Gimkit Basic: Pro-Exclusive modes limited to 5 players. LexiClash: whole-class free vocab.",
-        "lede": "Gimkit help “Player maximums” states Pro Exclusive modes are limited to 5 players for Gimkit Basic members. LexiClash free classroom vocab covers a whole class (up to 50) without a 5-seat Pro-Exclusive mode.",
-        "gimkitTitle": "Gimkit Basic — Pro Exclusive modes → 5 players",
-        "gimkitBody": "Featured modes: unlimited on Basic. Pro Exclusive modes: limited to 5 players until you upgrade — even when the whole class needs that mode.",
-        "lexiTitle": "LexiClash — whole-class free vocab",
-        "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games. One published classroom cap — no Pro-Exclusive mode that shrinks to five seats.",
+        "eyebrow": "Comparación honesta: modos Pro Exclusive en el plan gratis",
+        "title": "Gimkit Basic: los modos Pro Exclusive se limitan a 5 jugadores. LexiClash: vocabulario gratis para toda la clase.",
+        "lede": "Según la ayuda de Gimkit sobre el máximo de jugadores, los modos Pro Exclusive se limitan a 5 jugadores para los miembros de Gimkit Basic. El vocabulario gratis de LexiClash cubre toda la clase (hasta 50) sin modos limitados a 5 lugares.",
+        "gimkitTitle": "Gimkit Basic: modos Pro Exclusive, hasta 5 jugadores",
+        "gimkitBody": "Modos destacados: sin límite en Basic. Modos Pro Exclusive: hasta 5 jugadores hasta que mejores tu plan, aunque toda la clase necesite ese modo.",
+        "lexiTitle": "LexiClash: vocabulario gratis para toda la clase",
+        "lexiBody": "Plan gratis: hasta 50 alumnos por clase en juegos de vocabulario. Un solo límite publicado por clase, sin modos que se reduzcan a cinco lugares.",
         "citePrefix": "Gimkit help:",
         "citePlayerMaximumsLabel": "Player maximums (Pro Exclusive → 5 on Basic)",
         "citeProFaqLabel": "Gimkit Pro FAQ",
@@ -21018,7 +21028,7 @@ const es = {
     },
     "delivery": {
       "projector": "Proyector",
-      "phones": "En el móvil",
+      "phones": "En los teléfonos",
       "both": "Ambos"
     },
     "home": {

@@ -172,7 +172,7 @@ const sv = {
       "spellingBadge": "Stavning",
       "spellingTitle": "Stavningstävling online",
       "spellingDesc": "4-veckors träningsplan, anpassade ordlistor, 1v1-dueller — tävlingsförberedelse.",
-      "sightBadge": "Sight Words",
+      "sightBadge": "Högfrekventa ord",
       "sightTitle": "Träna sight words (Dolch & Fry)",
       "sightDesc": "Flashcards, matchning och stavning från din egen ordlista.",
       "schoolsBadge": "För skolor",
@@ -699,6 +699,11 @@ const sv = {
         "1": "Samma bokstäver på varje mobil. Alla letar ord på samma bräde.",
         "2": "Varje ord träffar bossen. 7+ bokstäver blir kritisk, snabba ord bygger klassens kombo.",
         "3": "Långa ord laddar skölden och stoppar attacker. Få ner den till noll innan tiden tar slut."
+      },
+      "wordTower": {
+        "1": "Varje elev bygger sitt eget torn från ett bokstavsställ.",
+        "2": "Varje riktigt ord lägger på ett block. Ett vingligt ord fäller ett.",
+        "3": "Det högsta tornet toppar klassens topplista på storskärmen."
       }
     },
     "boss": {
@@ -953,7 +958,8 @@ const sv = {
       "progressStudents": "elever",
       "progressAssignments": "uppgifter",
       "progressSubmitted": "inlämnade",
-      "progressUpgrade": "Teacher Pro"
+      "progressUpgrade": "Teacher Pro",
+      "endedCodeTries": "Elever som försökte med en gammal spelkod: {count}. Starta ett nytt spel så att de kan vara med."
     },
     "modes": {
       "workshop": {
@@ -14757,7 +14763,7 @@ const sv = {
       "trustCancel": "Avsluta när du vill, ingen bindningstid",
       "trustDataSafe": "Dina data är säkra",
       "trustReminder": "Påminnelse via e-post före varje betalning",
-      "freePlanName": "Free",
+      "freePlanName": "Gratis",
       "freeForever": "Gratisplan, utan slutdatum",
       "freeClasses": "Upp till {count} klasser",
       "freeStudents": "Upp till {count} elever i varje klasslista",
@@ -14909,7 +14915,8 @@ const sv = {
         "blast": "Blast",
         "wheelRush": "Hjulrush",
         "vocabQuiz": "Ordquiz",
-        "wordcraft": "Wordcraft"
+        "wordcraft": "Wordcraft",
+        "wordTower": "Ordtorn"
       },
       "pressure": {
         "title": "Press",
@@ -15701,8 +15708,10 @@ const sv = {
         "blast": "Kedja ord snabbt och spräng brickorna i kombos.",
         "wheelRush": "Snurra bokstavshjulet och skjut iväg ord mot klockan.",
         "vocabQuiz": "Fyra alternativ, en betydelse. Snabbast rätt svar ger mest.",
-        "wordcraft": "Bygg ord på din egen tavla mot Baronen. Klassens topplista avgör resten."
-      }
+        "wordcraft": "Bygg ord på din egen tavla mot Baronen. Klassens topplista avgör resten.",
+        "wordTower": "Alla staplar ord på sitt eget torn. Ett vingligt ord fäller block. Högsta tornet vinner."
+      },
+      "wordcraftNeedsShortWords": "Wordcraft kan inte lägga ut något ord från den här listan på brickorna. Lägg till kortare ord eller välj ett annat läge."
     },
     "projectorLobby": {
       "joinAt": "Gå till",
@@ -15735,7 +15744,8 @@ const sv = {
       "blast": "Kedja ord för att rensa brickor i combos",
       "wheelRush": "Bygg ord från ett enda bokstavshjul",
       "vocabQuiz": "Frågor med fyra svar från dina egna orddata",
-      "wordcraft": "Bygg listans ord på egen tavla mot en botmotståndare"
+      "wordcraft": "Bygg listans ord på egen tavla mot en botmotståndare",
+      "wordTower": "Stapla ord, högsta tornet vinner"
     },
     "wordcraftLive": {
       "rival": "Baronen",
@@ -16139,7 +16149,7 @@ const sv = {
       "assignUnpluggedGoogleClassroomTitle": "Frånkopplad reteach-läxa: {{lesson}}",
       "assignUnpluggedGoogleClassroomBody": "Enhetsfri läxa: öppna Unplugged Live-länken, skriv ut övningsbladet för missade ord och öva: {{missed}}. Eleverna behöver inga enheter. Lämna in när du är klar.",
       "assignMissGapLiveGoogleClassroom": "Tilldela miss-gap Live till Google Classroom",
-      "assignMissGapLiveGoogleClassroomTitle": "3-min miss-gap Live: {{lesson}}",
+      "assignMissGapLiveGoogleClassroomTitle": "3 min repetition av missade ord: {{lesson}}",
       "assignMissGapLiveGoogleClassroomBody": "Öppna länken och starta 3-min Live på dessa missade ord: {{missed}}. Elever går med från Classwork. Fungerar på gratis Google Workspace for Education, ingen Education Plus krävs.",
       "launchMissGapQuestionPackLive": "Starta live-frågepaket: missade ord",
       "missGapQuestionPackTitle": "Miss-gap-frågepaket: {{lesson}}",
@@ -16911,18 +16921,18 @@ const sv = {
     },
     "vsGimkit": {
       "proExclusiveModes": {
-        "eyebrow": "Gratisplanens Pro Exclusive — honesty foil",
-        "title": "Gimkit Basic: Pro-Exclusive modes limited to 5 players. LexiClash: whole-class free vocab.",
-        "lede": "Gimkit help “Player maximums” states Pro Exclusive modes are limited to 5 players for Gimkit Basic members. LexiClash free classroom vocab covers a whole class (up to 50) without a 5-seat Pro-Exclusive mode.",
-        "gimkitTitle": "Gimkit Basic — Pro Exclusive modes → 5 players",
-        "gimkitBody": "Featured modes: unlimited on Basic. Pro Exclusive modes: limited to 5 players until you upgrade — even when the whole class needs that mode.",
-        "lexiTitle": "LexiClash — whole-class free vocab",
-        "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games. One published classroom cap — no Pro-Exclusive mode that shrinks to five seats.",
+        "eyebrow": "Ärlig jämförelse: Pro Exclusive-lägen i gratisplanen",
+        "title": "Gimkit Basic: Pro Exclusive-lägen är begränsade till 5 spelare. LexiClash: gratis ordförråd för hela klassen.",
+        "lede": "Enligt Gimkits hjälpsida om maxantal spelare är Pro Exclusive-lägen begränsade till 5 spelare för Gimkit Basic-medlemmar. LexiClash gratis ordförrådsspel räcker för en hel klass (upp till 50), utan något läge som stannar vid 5 platser.",
+        "gimkitTitle": "Gimkit Basic: Pro Exclusive-lägen, max 5 spelare",
+        "gimkitBody": "Utvalda lägen: obegränsat på Basic. Pro Exclusive-lägen: max 5 spelare tills du uppgraderar, även när hela klassen behöver läget.",
+        "lexiTitle": "LexiClash: gratis ordförråd för hela klassen",
+        "lexiBody": "Gratisplan: upp till 50 elever per klass i ordförrådsspel. En enda publicerad klassgräns, inget läge som krymper till fem platser.",
         "citePrefix": "Gimkit help:",
         "citePlayerMaximumsLabel": "Player maximums (Pro Exclusive → 5 on Basic)",
         "citeProFaqLabel": "Gimkit Pro FAQ",
         "citeSuffix": " — Pro Exclusive modes limited to 5 players for Gimkit Basic members.",
-        "cta": "Håll helklass gratis vocab med tydlig gratisgräns på 50"
+        "cta": "Kör gratis ordförrådsspel med hela klassen, med en tydlig gräns på 50"
       }
     },
     "vsMentimeter": {

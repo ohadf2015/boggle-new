@@ -699,6 +699,11 @@ const en = {
         "1": "Letters go up on every phone. Everyone hunts words on the same board.",
         "2": "Every word hits the boss. 7+ letters crit, fast words build the class combo.",
         "3": "Long words charge the shield and stop attacks. Knock it to zero before time runs out."
+      },
+      "wordTower": {
+        "1": "Each student builds their own tower from a letter rack.",
+        "2": "Every real word stacks a block. A shaky word knocks one off.",
+        "3": "The tallest tower tops the class leaderboard on the big screen."
       }
     },
     "boss": {
@@ -953,7 +958,8 @@ const en = {
       "progressStudents": "students",
       "progressAssignments": "assigned",
       "progressSubmitted": "submitted",
-      "progressUpgrade": "Teacher Pro"
+      "progressUpgrade": "Teacher Pro",
+      "endedCodeTries": "{count} students tried an old game code. Start a new game so they can play."
     },
     "modes": {
       "workshop": {
@@ -12786,7 +12792,8 @@ const en = {
         "blast": "Blast",
         "wheelRush": "Wheel Rush",
         "vocabQuiz": "Vocab Quiz",
-        "wordcraft": "Wordcraft"
+        "wordcraft": "Wordcraft",
+        "wordTower": "Word Tower"
       },
       "pressure": {
         "title": "Pressure",
@@ -13789,8 +13796,10 @@ const en = {
         "blast": "Chain words fast and blow the tiles up in cascading combos.",
         "wheelRush": "Spin the letter wheel and fire off words against the clock.",
         "vocabQuiz": "Four choices, one meaning. The fastest right answer scores most.",
-        "wordcraft": "Craft words on your own board against the Baron. The class leaderboard decides the rest."
-      }
+        "wordcraft": "Craft words on your own board against the Baron. The class leaderboard decides the rest.",
+        "wordTower": "Everyone stacks words on their own tower. A shaky word knocks blocks off. Tallest tower wins."
+      },
+      "wordcraftNeedsShortWords": "Wordcraft can't deal any word from this list onto its tiles. Add shorter words or pick another mode."
     },
     "projectorLobby": {
       "joinAt": "Go to",
@@ -13823,7 +13832,8 @@ const en = {
       "blast": "Chain words to clear tiles in combos",
       "wheelRush": "Build words from one wheel of letters",
       "vocabQuiz": "Four-choice questions from your own word data",
-      "wordcraft": "Craft list words on your own board vs a bot rival"
+      "wordcraft": "Craft list words on your own board vs a bot rival",
+      "wordTower": "Stack words sky-high, tallest tower wins"
     },
     "wordcraftLive": {
       "rival": "The Baron",

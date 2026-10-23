@@ -172,8 +172,8 @@ const ru = {
       "spellingBadge": "Орфография",
       "spellingTitle": "Онлайн-практика орфографии",
       "spellingDesc": "4-недельный план тренировок, свои списки слов, дуэли 1 на 1 — подготовка к конкурсу.",
-      "sightBadge": "Sight Words",
-      "sightTitle": "Практика sight words (Dolch и Fry)",
+      "sightBadge": "Частые слова",
+      "sightTitle": "Практика частых слов (списки Dolch и Fry)",
       "sightDesc": "Карточки, совпадения и правописание по вашему списку слов.",
       "schoolsBadge": "Для школ",
       "schoolsTitle": "LexiClash для школ",
@@ -699,6 +699,11 @@ const ru = {
         "1": "На всех телефонах одни и те же буквы. Все ищут слова на одном поле.",
         "2": "Каждое слово бьёт босса. 7+ букв — крит, быстрые слова разгоняют комбо класса.",
         "3": "Длинные слова заряжают щит и сбивают атаки. Обнулите его здоровье до конца времени."
+      },
+      "wordTower": {
+        "1": "Каждый ученик строит свою башню из набора букв.",
+        "2": "Каждое настоящее слово — новый блок. Шаткое слово сбивает один.",
+        "3": "Самая высокая башня возглавляет таблицу класса на большом экране."
       }
     },
     "boss": {
@@ -955,7 +960,8 @@ const ru = {
       "progressStudents": "ученики",
       "progressAssignments": "задания",
       "progressSubmitted": "сдано",
-      "progressUpgrade": "Teacher Pro"
+      "progressUpgrade": "Teacher Pro",
+      "endedCodeTries": "Пытались войти по старому коду: {count}. Запустите новую игру, чтобы ученики смогли играть."
     },
     "modes": {
       "workshop": {
@@ -3505,8 +3511,10 @@ const ru = {
         "blast": "Быстро сцепляйте слова и взрывайте плитки цепочкой комбо.",
         "wheelRush": "Крутите колесо букв и выстреливайте словами наперегонки с таймером.",
         "vocabQuiz": "Четыре варианта, одно значение — быстрый верный ответ даёт больше.",
-        "wordcraft": "Составляйте слова на своём поле против Барона — а дальше решает таблица класса."
-      }
+        "wordcraft": "Составляйте слова на своём поле против Барона — а дальше решает таблица класса.",
+        "wordTower": "Каждый строит свою башню из слов. Шаткое слово сбивает блоки. Побеждает самая высокая башня."
+      },
+      "wordcraftNeedsShortWords": "Вордкрафт не может разложить на плитки ни одно слово из этого списка. Добавьте слова покороче или выберите другой режим."
     },
     "projectorLobby": {
       "joinAt": "Зайдите на",
@@ -3539,7 +3547,8 @@ const ru = {
       "blast": "Цепочки слов убирают плитки в комбо",
       "wheelRush": "Составляйте слова из одного колеса букв",
       "vocabQuiz": "Вопросы с четырьмя вариантами из ваших слов",
-      "wordcraft": "Слова урока на своём поле против бота-соперника"
+      "wordcraft": "Слова урока на своём поле против бота-соперника",
+      "wordTower": "Стройте башню из слов: выше всех — победа"
     },
     "wordcraftLive": {
       "rival": "Барон",
@@ -3828,7 +3837,7 @@ const ru = {
       },
       "participationBonus": "+{points} очков участия всем",
       "shareGap": "Поделиться пробелом класса",
-      "shareGapCopied": "Ссылка скопирована. Вставьте в Slack или родительский чат",
+      "shareGapCopied": "Ссылка скопирована. Вставьте её в родительский или рабочий чат",
       "podium": {
         "title": "Лучшие результаты",
         "wordsFound": "{{found}} из {{total}} слов",
@@ -3890,8 +3899,8 @@ const ru = {
       "shareGapEmptyText": "{{lesson}} — пока нет пробела класса для публикации",
       "startReteachLive": "Начать 3-минутное повторение Live",
       "postReteachGoogleClassroom": "Опубликовать 3-мин повторение в Google Classroom",
-      "postReteachGoogleClassroomTitle": "3-мин повторение Live — {{lesson}}",
-      "postReteachGoogleClassroomBody": "Откройте ссылку и начните 3-минутный Live по пропущенным словам: {{missed}}. Ученики заходят из Stream.",
+      "postReteachGoogleClassroomTitle": "3-минутное повторение в игре: {{lesson}}",
+      "postReteachGoogleClassroomBody": "Откройте ссылку и запустите 3-минутную игру по пропущенным словам: {{missed}}. Ученики заходят из ленты класса.",
       "assignPracticeGoogleClassroom": "Назначить практику в Google Classroom",
       "assignPracticeGoogleClassroomTitle": "Практика пропущенных слов — {{lesson}}",
       "assignPracticeGoogleClassroomBody": "Откройте ссылку и потренируйте дома пропущенные слова: {{missed}}. Сдайте, когда закончите.",
@@ -3903,8 +3912,8 @@ const ru = {
       "printPracticeSheetNameLine": "Имя: ________________",
       "printPracticeSheetDateLine": "Дата: ________________",
       "printPracticeSheetFooter": "LexiClash · практика без устройств",
-      "startUnpluggedReteachLive": "Начать офлайн-повторение Live",
-      "startTeamTilesUnplugged": "Начать Team Tiles Unplugged",
+      "startUnpluggedReteachLive": "Начать повторение без устройств",
+      "startTeamTilesUnplugged": "Начать «Командные плитки» без устройств",
       "teamTilesProgress": "Плитки {{judged}} из {{total}}",
       "teamTilesClassScore": "Счёт класса",
       "teamTilesChooseTeams": "Сколько команд?",
@@ -3921,7 +3930,7 @@ const ru = {
       "teamTilesPerfectHeadline": "Идеальный Team Tiles!",
       "teamTilesPerfectSub": "Каждая плитка с пропущенным словом перевёрнута и пройдена.",
       "teamTilesPlayAgain": "Перемешать и сыграть снова",
-      "startClassicUnplugged": "Начать Classic Unplugged",
+      "startClassicUnplugged": "Начать «Классический» без устройств",
       "classicUnpluggedProgress": "Слово {{current}} из {{total}}",
       "classicUnpluggedClassScore": "Счёт класса",
       "classicUnpluggedChooseMode": "Класс или команды?",
@@ -3940,14 +3949,14 @@ const ru = {
       "classicUnpluggedPerfectHeadline": "Идеальный Classic Unplugged!",
       "classicUnpluggedPerfectSub": "Все пропущенные слова закрыты классом.",
       "classicUnpluggedPlayAgain": "Сыграть снова",
-      "assignUnpluggedGoogleClassroom": "Назначить офлайн-повторение в Google Classroom",
-      "assignUnpluggedGoogleClassroomTitle": "Офлайн-повторение, ДЗ — {{lesson}}",
-      "assignUnpluggedGoogleClassroomBody": "Домашнее задание без устройств: откройте ссылку Unplugged Live, распечатайте лист практики пропущенных слов и потренируйте: {{missed}}. Устройства учеников не нужны. Сдайте, когда закончите.",
-      "assignMissGapLiveGoogleClassroom": "Назначить miss-gap Live в Google Classroom",
-      "assignMissGapLiveGoogleClassroomTitle": "3-мин miss-gap Live — {{lesson}}",
-      "assignMissGapLiveGoogleClassroomBody": "Откройте ссылку и запустите 3-мин Live по пропущенным словам: {{missed}}. Ученики заходят из Classwork. Работает на бесплатном Google Workspace for Education — без Education Plus.",
-      "launchMissGapQuestionPackLive": "Запустить Live-набор вопросов по пропущенным словам",
-      "missGapQuestionPackTitle": "Набор вопросов miss-gap — {{lesson}}",
+      "assignUnpluggedGoogleClassroom": "Отправить в Google Classroom повторение без устройств",
+      "assignUnpluggedGoogleClassroomTitle": "Повторение без устройств, домашнее задание: {{lesson}}",
+      "assignUnpluggedGoogleClassroomBody": "Домашнее задание без устройств: откройте ссылку, распечатайте лист с пропущенными словами и потренируйтесь: {{missed}}. Устройства ученикам не нужны. Сдайте, когда закончите.",
+      "assignMissGapLiveGoogleClassroom": "Отправить в Google Classroom игру по пропущенным словам",
+      "assignMissGapLiveGoogleClassroomTitle": "3-минутная игра по пропущенным словам: {{lesson}}",
+      "assignMissGapLiveGoogleClassroomBody": "Откройте ссылку и запустите 3-минутную игру по пропущенным словам: {{missed}}. Ученики заходят из Google Classroom. Работает на бесплатном Google Workspace for Education, без Education Plus.",
+      "launchMissGapQuestionPackLive": "Запустить игру с вопросами по пропущенным словам",
+      "missGapQuestionPackTitle": "Вопросы по пропущенным словам: {{lesson}}",
       "unpluggedReteachHint": "Ученики отвечают на распечатанном листе — без устройств",
       "unpluggedReteachReveal": "Показать",
       "unpluggedReteachNext": "Далее",
@@ -3978,15 +3987,15 @@ const ru = {
       "unpluggedGameCleared": "Слов пройдено",
       "unpluggedGameBestStreak": "Лучшая серия",
       "unpluggedGamePlayAgain": "Ещё раз",
-      "shareMissGapPractice": "Поделиться карточкой практики miss-gap",
+      "shareMissGapPractice": "Поделиться карточкой с пропущенными словами",
       "shareMissGapPracticeCopied": "Ссылка скопирована. Отправьте родителям",
-      "shareMissGapPracticeTitle": "Карточка практики miss-gap",
-      "shareMissGapPracticeText": "{{lesson}} — домашняя практика miss-gap (печать или PDF): {{missed}}",
+      "shareMissGapPracticeTitle": "Карточка с пропущенными словами",
+      "shareMissGapPracticeText": "{{lesson}}: домашняя практика по пропущенным словам (печать или PDF): {{missed}}",
       "missGapPracticeEyebrow": "Домашняя практика",
       "missGapPracticeSubtitle": "Лист для печати со словами, которые класс пропустил: откройте, распечатайте или сохраните в PDF. Устройства не нужны.",
       "missGapPracticeFoil": "У Kahoot Unplugged нет домашки — у LexiClash есть",
       "missGapPracticePrintPdf": "Печать / сохранить PDF для практики",
-      "assignMissGapAsyncHomework": "Назначить асинхронное miss-gap ДЗ",
+      "assignMissGapAsyncHomework": "Задать домашку по пропущенным словам",
       "assignMissGapAsyncEyebrow": "Асинхронное ДЗ",
       "assignMissGapAsyncHeading": "Практика miss-gap со сроком",
       "assignMissGapAsyncSubtitle": "Ученики играют две минуты со словами, которые класс пропустил. Вы видите, кто закончил, а выполнение в срок сохраняет серию класса.",
@@ -4049,14 +4058,14 @@ const ru = {
       "missGapWhatsAppOgTitle": "Miss-gap практика для родителей — {{lesson}}",
       "missGapWhatsAppOpenPractice": "Открыть карточку miss-gap практики",
       "missGapWhatsAppOpenHomework": "Открыть асинхронное miss-gap ДЗ",
-      "printUnpluggedReteachPack": "Печать Unplugged reteach-пакета (PDF + QR)",
-      "unpluggedReteachPackTitle": "Unplugged reteach-пакет — {{lesson}}",
-      "unpluggedReteachPackSubtitle": "Печатный пакет по пропускам прошлого занятия — QR открывает Unplugged Live на проекторе",
-      "unpluggedReteachPackFoil": "У Kahoot Classic Unplugged нет печатного пакета с QR на Live — у LexiClash есть",
-      "unpluggedReteachPackQrHint": "Отсканируйте, чтобы открыть Unplugged reteach Live",
+      "printUnpluggedReteachPack": "Распечатать лист повторения без устройств (PDF + QR)",
+      "unpluggedReteachPackTitle": "Лист повторения без устройств: {{lesson}}",
+      "unpluggedReteachPackSubtitle": "Лист для печати по пропущенным словам прошлого занятия. QR-код открывает игру на проекторе",
+      "unpluggedReteachPackFoil": "В Kahoot нет печатного листа повторения с QR-кодом для игры. В LexiClash есть",
+      "unpluggedReteachPackQrHint": "Отсканируйте, чтобы открыть повторение на проекторе",
       "unpluggedReteachPackHowTo": "1) Распечатайте пакет 2) Раздайте страницы практики 3) Отсканируйте QR на экране учителя",
       "unpluggedReteachPackPracticeHeading": "Страницы практики для учеников",
-      "unpluggedReteachPackFooter": "LexiClash · Unplugged reteach-пакет",
+      "unpluggedReteachPackFooter": "LexiClash · лист повторения без устройств",
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
@@ -4707,18 +4716,18 @@ const ru = {
     },
     "vsGimkit": {
       "proExclusiveModes": {
-        "eyebrow": "Pro Exclusive бесплатного плана — honesty foil",
-        "title": "Gimkit Basic: Pro-Exclusive modes limited to 5 players. LexiClash: whole-class free vocab.",
-        "lede": "Gimkit help “Player maximums” states Pro Exclusive modes are limited to 5 players for Gimkit Basic members. LexiClash free classroom vocab covers a whole class (up to 50) without a 5-seat Pro-Exclusive mode.",
-        "gimkitTitle": "Gimkit Basic — Pro Exclusive modes → 5 players",
-        "gimkitBody": "Featured modes: unlimited on Basic. Pro Exclusive modes: limited to 5 players until you upgrade — even when the whole class needs that mode.",
-        "lexiTitle": "LexiClash — whole-class free vocab",
-        "lexiBody": "Free tier: up to 50 students per class for word-formation vocab games. One published classroom cap — no Pro-Exclusive mode that shrinks to five seats.",
+        "eyebrow": "Честное сравнение: режимы Pro Exclusive на бесплатном плане",
+        "title": "Gimkit Basic: режимы Pro Exclusive — максимум 5 игроков. LexiClash: бесплатная лексика для всего класса.",
+        "lede": "По справке Gimkit о лимитах игроков режимы Pro Exclusive для участников Gimkit Basic ограничены 5 игроками. Бесплатные словарные игры LexiClash вмещают весь класс (до 50) без режимов на 5 мест.",
+        "gimkitTitle": "Gimkit Basic: режимы Pro Exclusive — до 5 игроков",
+        "gimkitBody": "Избранные режимы: без ограничений на Basic. Режимы Pro Exclusive: до 5 игроков, пока не перейдёте на платный план, даже если режим нужен всему классу.",
+        "lexiTitle": "LexiClash: бесплатная лексика для всего класса",
+        "lexiBody": "Бесплатный план: до 50 учеников в классе в словарных играх. Один опубликованный лимит на класс и никаких режимов, урезанных до пяти мест.",
         "citePrefix": "Gimkit help:",
         "citePlayerMaximumsLabel": "Player maximums (Pro Exclusive → 5 on Basic)",
         "citeProFaqLabel": "Gimkit Pro FAQ",
         "citeSuffix": " — Pro Exclusive modes limited to 5 players for Gimkit Basic members.",
-        "cta": "Провести бесплатный vocab на весь класс с ясным бесплатным лимитом 50"
+        "cta": "Проведите бесплатную словарную игру для всего класса — до 50 мест бесплатно"
       }
     },
     "vsMentimeter": {
@@ -13854,7 +13863,8 @@ const ru = {
         "blast": "Взрыв",
         "wheelRush": "Рулетка",
         "vocabQuiz": "Викторина по лексике",
-        "wordcraft": "Вордкрафт"
+        "wordcraft": "Вордкрафт",
+        "wordTower": "Башня слов"
       },
       "pressure": {
         "title": "Напряжение",
