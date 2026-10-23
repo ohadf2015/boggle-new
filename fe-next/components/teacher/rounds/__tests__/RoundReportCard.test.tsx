@@ -25,14 +25,14 @@ describe('RoundReportCard', () => {
   it('free: the whole session report is free, summary and per-student strips', () => {
     render(<RoundReportCard {...props} hasPro={false} />);
     const card = screen.getByTestId('round-report');
-    expect(within(card).getByTestId('round-report-played').textContent).toBe('teacher.rounds.played|3|4');
+    expect(within(card).getByTestId('round-report-played').textContent).toBe('teacher.pulse.participation|3|4|1');
     expect(within(card).getAllByTestId('round-report-missed-word').map((n) => n.textContent)).toEqual(
       expect.arrayContaining([expect.stringContaining('enormous')]),
     );
     const strips = within(card).getAllByTestId('round-report-strip');
     expect(strips).toHaveLength(4);
     expect(within(strips[0]).getAllByTestId('round-report-cell')).toHaveLength(4);
-    expect(within(strips[3]).getByText('teacher.rounds.absent')).toBeInTheDocument();
+    expect(within(strips[3]).getByText('teacher.classReport.state.absent')).toBeInTheDocument();
   });
 
   it('free: practising the missed words is the Pro step, locked', () => {

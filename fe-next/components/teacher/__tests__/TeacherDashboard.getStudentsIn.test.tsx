@@ -67,7 +67,9 @@ describe('Teacher Home: get students in', () => {
 
   it('Then it shows students joined against the goal', () => {
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('hq-joined-goal')).toHaveTextContent('academy.hq.joinedGoal:{"count":0,"goal":3}');
+    const goal = screen.getByTestId('hq-joined-goal');
+    expect(within(goal).getByTestId('hq-joined-goal-count')).toHaveTextContent('0/3');
+    expect(goal).toHaveTextContent('academy.hq.joinedLabel');
   });
 
   it('Given the share step is the next onboarding step, Then the card replaces the onboarding nudge', () => {
@@ -96,6 +98,7 @@ describe('Teacher Home: get students in', () => {
     const notice = await screen.findByTestId('hq-ended-code-tries');
     expect(notice).toHaveTextContent('academy.hq.endedCodeTries:{"count":4}');
     expect(within(notice).getByRole('link')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c1');
+    expect(within(notice).getByRole('link')).toHaveTextContent('academy.hq.startTitle');
   });
 
   it('Given nobody tried an ended code, Then no notice', async () => {

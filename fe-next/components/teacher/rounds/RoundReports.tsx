@@ -7,7 +7,7 @@ import { useRecentClassroomGames } from '@/hooks/useRecentClassroomGames';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import type { RecentClassroomGame } from '@/lib/supabase/analyticsLastGame';
 import { RoundReportCard } from './RoundReportCard';
-import { roundModeLabelKey } from './roundReport';
+import { participationParams, roundModeLabelKey } from './roundReport';
 
 const ROUNDS_SHOWN = 5;
 
@@ -30,7 +30,7 @@ export function RoundReports({ classroomId, classroomName, onStudentClick, previ
 
   return (
     <section data-testid="round-reports" aria-labelledby="round-reports-title" className="space-y-3">
-      <h2 id="round-reports-title" className="font-neo-display text-xl font-black text-neo-white">{t('teacher.rounds.title')}</h2>
+      <h2 id="round-reports-title" className="font-neo-display text-xl font-black text-neo-white">{t('teacher.lastGame.previousGames')}</h2>
       {!previewGames && fetched.isLoading ? (
         <div className="h-32 animate-pulse rounded-neo bg-neo-cream/10 motion-reduce:animate-none" />
       ) : !previewGames && fetched.error ? (
@@ -67,7 +67,7 @@ export function RoundReports({ classroomId, classroomName, onStudentClick, previ
               </span>
               <span className="ms-auto inline-flex items-center gap-1 text-xs font-bold text-neo-cyan">
                 <Users className="size-3.5" aria-hidden />
-                {t('teacher.rounds.played', { played: game.participation.played, roster: game.participation.roster })}
+                {t('teacher.pulse.participation', participationParams(game.participation))}
               </span>
               <ChevronDown className="size-4 shrink-0 text-neo-white/70" aria-hidden />
             </button>

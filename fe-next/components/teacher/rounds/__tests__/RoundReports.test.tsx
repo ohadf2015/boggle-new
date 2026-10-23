@@ -29,6 +29,8 @@ describe('RoundReports', () => {
     render(<RoundReports classroomId="c1" classroomName="7B" />);
     expect(screen.getAllByTestId('card').map((c) => c.textContent)).toEqual(['FIX001']);
     expect(screen.getAllByTestId('round-report-collapsed')).toHaveLength(1);
+    expect(screen.getByRole('heading').textContent).toBe('teacher.lastGame.previousGames');
+    expect(screen.getByTestId('round-report-collapsed').textContent).toContain('teacher.pulse.participation');
   });
 
   it('tapping an older round opens it instead', () => {

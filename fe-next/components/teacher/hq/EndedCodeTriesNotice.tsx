@@ -45,7 +45,7 @@ export function EndedCodeTriesNotice({ classroomId }: { classroomId: string }) {
         className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-lime px-3 font-neo-display text-sm font-black shadow-hard-sm active:translate-y-0.5"
       >
         <Play className="size-4" strokeWidth={3} aria-hidden />
-        {t('academy.hq.endedCodeStart')}
+        {t('academy.hq.startTitle')}
       </Link>
     </div>
   );

@@ -20,10 +20,12 @@ describe('Teacher Pro: per-word mastery and missed-words practice', () => {
       'app/api/education/classroom/[id]/missed-practice/route.ts',
     ]) {
       const src = read(route);
-      expect(src, route).toContain('checkTeacherSubscription');
       // The entitlement is paid Pro OR a live access trial; the helper is where `has_pro` is read.
-      expect(src, route).toContain('teacherHasProAccess');
+      expect(src, route).toMatch(/requireTeacherPro|checkTeacherSubscription[\s\S]*teacherHasProAccess/);
     }
+    const gate = read('lib/education/pro/requireTeacherPro.ts');
+    expect(gate).toContain('checkTeacherSubscription');
+    expect(gate).toContain('teacherHasProAccess');
     expect(read('lib/education/accessTrialServer.ts')).toContain('has_pro');
   });
 

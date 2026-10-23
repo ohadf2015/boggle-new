@@ -12,6 +12,11 @@ export function roundModeLabelKey(mode: string): string | null {
   return MODE_KEYS[mode] ? `teacher.lastGame.mode.${MODE_KEYS[mode]}` : null;
 }
 
+export function participationParams({ played, roster }: RecentClassroomGame['participation']) {
+  const total = Math.max(played, roster);
+  return { played, total, absent: total - played };
+}
+
 export type RoundCellState = 'found' | 'missed' | 'absent';
 
 export interface RoundReportRow {

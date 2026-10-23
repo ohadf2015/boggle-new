@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildRoundReport } from '../roundReport';
+import { buildRoundReport, participationParams } from '../roundReport';
 import { ROUND_FIXTURE } from '../roundFixture';
 
 describe('buildRoundReport', () => {
@@ -24,5 +24,15 @@ describe('buildRoundReport', () => {
   it('handles a round with no lesson words', () => {
     const report = buildRoundReport({ ...ROUND_FIXTURE, missedWords: [], players: [], absentStudents: [] });
     expect(report).toMatchObject({ words: [], rows: [], practiceWords: [] });
+  });
+});
+
+describe('participationParams', () => {
+  it('counts the rostered students who sat the round out', () => {
+    expect(participationParams({ played: 3, roster: 4 })).toEqual({ played: 3, total: 4, absent: 1 });
+  });
+
+  it('never reports a negative absence when more played than the roster lists', () => {
+    expect(participationParams({ played: 5, roster: 4 })).toEqual({ played: 5, total: 5, absent: 0 });
   });
 });

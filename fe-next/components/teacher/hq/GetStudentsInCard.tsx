@@ -346,8 +346,9 @@ export function GetStudentsInCard({
                 <span key={i} className={cn("size-2.5 rounded-full border-2 border-neo-black", i < count ? "bg-neo-lime" : "bg-neo-cream/30")} />
               ))}
             </span>
-            <span className="font-neo-display text-xs font-black uppercase tracking-wide text-neo-cyan">
-              {t("academy.hq.joinedGoal", { count, goal: STUDENT_GOAL })}
+            <span className="inline-flex items-baseline gap-1 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cyan">
+              <span data-testid="hq-joined-goal-count" dir="ltr" className="tabular-nums">{count}/{STUDENT_GOAL}</span>
+              {t('academy.hq.joinedLabel')}
             </span>
           </div>
         ) : null}

@@ -5,7 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import type { RecentClassroomGame } from '@/lib/supabase/analyticsLastGame';
 import { MissedPracticeAction } from '@/components/teacher/reports/MissedPracticeAction';
 import { cn } from '@/lib/utils';
-import { buildRoundReport, roundModeLabelKey, type RoundCellState } from './roundReport';
+import { buildRoundReport, participationParams, roundModeLabelKey, type RoundCellState } from './roundReport';
 
 
 const CELL: Record<Exclude<RoundCellState, 'absent'>, string> = {
@@ -39,7 +39,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
         </h3>
         <p data-testid="round-report-played" className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-cyan">
           <Users className="size-4" aria-hidden />
-          {t('teacher.rounds.played', { played: game.participation.played, roster: game.participation.roster })}
+          {t('teacher.pulse.participation', participationParams(game.participation))}
         </p>
       </header>
 
@@ -50,7 +50,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
         </div>
         <div className="rounded-neo border-2 border-neo-black bg-neo-navy px-3 py-2">
           <p className="font-neo-display text-2xl font-black tabular-nums text-neo-pink">{report.practiceWords.length}</p>
-          <p className="text-xs font-bold text-neo-white/70">{t('teacher.rounds.wordsMissed')}</p>
+          <p className="text-xs font-bold text-neo-white/70">{t('teacher.lastGame.missed')}</p>
         </div>
       </div>
 
@@ -71,7 +71,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
 
       <section className="mt-3">
         <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
-          <h4 className="font-neo-display text-sm font-black uppercase tracking-wide text-neo-white">{t('teacher.rounds.participants')}</h4>
+          <h4 className="font-neo-display text-sm font-black uppercase tracking-wide text-neo-white">{t('teacher.dashboard.students')}</h4>
           <span className="flex items-center gap-3 text-xs font-bold text-neo-white/70">
             <span className="inline-flex items-center gap-1"><span className="size-3 rounded-sm border border-neo-black bg-neo-lime" aria-hidden />{t('teacher.lastGame.found')}</span>
             <span className="inline-flex items-center gap-1"><span className="size-3 rounded-sm border border-neo-black bg-neo-pink" aria-hidden />{t('teacher.lastGame.missed')}</span>
@@ -83,7 +83,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
               <>
                 <span className="w-24 shrink-0 truncate text-start text-sm font-bold text-neo-white"><bdi>{row.name}</bdi></span>
                 {row.absent ? (
-                  <span className="min-w-0 flex-1 text-start text-xs font-bold italic text-neo-white/60">{t('teacher.rounds.absent')}</span>
+                  <span className="min-w-0 flex-1 text-start text-xs font-bold italic text-neo-white/60">{t('teacher.classReport.state.absent')}</span>
                 ) : (
                   <span className="flex min-w-0 flex-1 gap-0.5" aria-hidden>
                     {row.cells.map((cell) => (
