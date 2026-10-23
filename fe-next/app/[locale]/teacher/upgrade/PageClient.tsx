@@ -28,6 +28,8 @@ import { TeacherProofLine } from '@/components/teacher/pro/TeacherProofLine';
 import { UpgradeFaq } from '@/components/teacher/pro/UpgradeFaq';
 import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
 import { ProPlanPanel, PlanCardsSkeleton } from '@/components/teacher/pro/ProPlanPanel';
+import { UpgradeYourClasses } from '@/components/teacher/pro/UpgradeYourClasses';
+import { useClassrooms } from '@/hooks/useClassroom';
 
 const AuthModal = nextDynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
@@ -37,6 +39,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   const isRTL = language === 'he';
   const { user, profile, loading: authLoading } = useAuth();
   const searchParams = useSearchParams();
+  const { classrooms } = useClassrooms();
   const { tab: linkTab, requester } = readAskSchoolParams(new URLSearchParams(searchParams?.toString() ?? ''));
   const [tab, setTab] = useState<UpgradeTab>(linkTab);
   const [askOpen, setAskOpen] = useState(false);
@@ -255,6 +258,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                 <p className="mt-3 text-center text-xs font-bold text-neo-white/70">
                   {t('eduPlans.cards.liveCapNote', { players: MAX_PLAYERS_PER_ROOM })}
                 </p>
+                <UpgradeYourClasses classes={classrooms} />
                 <div data-testid="upgrade-legal-inline" className="lg:hidden mt-3 text-center">
                   <p className="text-neo-white/70 font-bold text-xs mb-1">{t('teacher.subscription.legalNote')}</p>
                   <div className="flex flex-wrap justify-center gap-3">{legalLinks}</div>
