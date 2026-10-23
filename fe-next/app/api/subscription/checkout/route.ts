@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { resolveProEntitlement } from '@/lib/education/proGrant';
 import { getPolarClient, getProProductId, probeCheckoutUrl } from '@/lib/polar';
+import { productionRefusesSandbox } from '@/lib/polarBillingRuntime';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { locales, defaultLocale } from '@/i18n/config';
 import logger from '@/utils/logger';
@@ -86,7 +87,8 @@ function resolveCheckoutLocale(bodyLocale: string, cookieHeader: string | null):
  * - 200: { url: string } — redirect to this URL
  * - 401: Unauthorized
  * - 503: Checkout disabled because a named Polar env var is missing, or
- *   POLAR_ENVIRONMENT=sandbox on a production deploy
+ *   POLAR_ENVIRONMENT=sandbox on a production deploy (Vercel, Railway, or
+ *   the live lexiclash.live host — VERCEL_ENV alone never fires here)
  * - 500: Server error
  */
 export async function POST(request: NextRequest) {
@@ -108,11 +110,15 @@ export async function POST(request: NextRequest) {
         { status: 503 }
       );
     }
-    if (process.env.VERCEL_ENV === 'production' && process.env.POLAR_ENVIRONMENT === 'sandbox') {
+    // VERCEL_ENV is unset on Railway, which is where lexiclash.live actually runs.
+    // A sandbox var there used to 201 a sandbox.polar.sh URL and collect nothing.
+    if (productionRefusesSandbox({
+      hosts: [request.headers.get('x-forwarded-host'), request.headers.get('host')],
+    })) {
       captureProFunnelServerEvent(buildProCheckoutFailedEvent('anonymous', 'polar_environment_mismatch'));
       return NextResponse.json(
         {
-          error: 'POLAR_ENVIRONMENT must be "production" when VERCEL_ENV=production (refusing sandbox checkout)',
+          error: 'POLAR_ENVIRONMENT must not be sandbox on the live LexiClash deploy (refusing sandbox checkout)',
           missing: ['POLAR_ENVIRONMENT'],
         },
         { status: 503 }
@@ -135,6 +141,22 @@ export async function POST(request: NextRequest) {
       allowTrial: trial,
       locale,
     });
+
+    // Refuse before recording checkout_started. A sandbox URL must not count
+    // as a start — that is the stall this guard exists to stop.
+    if (productionRefusesSandbox({
+      hosts: [request.headers.get('x-forwarded-host'), request.headers.get('host')],
+      checkoutUrl,
+    })) {
+      captureProFunnelServerEvent(buildProCheckoutFailedEvent(user.id, 'polar_environment_mismatch'));
+      return NextResponse.json(
+        {
+          error: 'POLAR_ENVIRONMENT must not be sandbox on the live LexiClash deploy (refusing sandbox checkout)',
+          missing: ['POLAR_ENVIRONMENT'],
+        },
+        { status: 503 }
+      );
+    }
 
     try {
       await withTimeout(
@@ -177,6 +199,13 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Exception in POST /api/subscription/checkout:', error);
+    if (error.includes('timed out')) {
+      captureProFunnelServerEvent(buildProCheckoutFailedEvent(user?.id ?? 'anonymous', 'polar_checkout_timeout'));
+      return NextResponse.json(
+        { error: 'Polar checkout URL creation timed out' },
+        { status: 503 }
+      );
+    }
     captureProFunnelServerEvent(buildProCheckoutFailedEvent(user?.id ?? 'anonymous', 'server_error'));
     return NextResponse.json(
       { error: 'Failed to create checkout' },
