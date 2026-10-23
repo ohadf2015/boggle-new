@@ -758,6 +758,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         onDrop={dropFloor}
         onPutBack={putBack}
         onBackspace={() => setSelected((s) => s.slice(0, -1))}
+        onClearWord={() => setSelected([])}
       />
 
       {((showOver && rewardsFlow.resultsReady) || forceResults) && !resultsDismissed ? (

@@ -1871,6 +1871,7 @@ export type InterstitialLifecycleStage =
   | 'failed_to_show'
   | 'failed_to_load'
   | 'safety_timeout'  // no terminal event fired within the safety window
+  | 'visibility_reconcile' // WebView came back but Dismissed never arrived
   | 'error';          // showInterstitial() threw
 
 /**

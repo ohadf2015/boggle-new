@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { subscribeForegroundResume } from '@/lib/native/foregroundResume';
 import { getDeadzoneThreshold } from '@/utils/consts';
 import {
   vibrateBacktrack,
@@ -300,6 +301,17 @@ export function useBoardSelection(
       if (e.key === 'Escape' && mode === 'click') clear();
     };
 
+    // An ad Activity / app switch can hide the WebView mid-swipe: no pointerup
+    // ever arrives, `pressing` stays true and the dropped tail rAF leaves `raf`
+    // non-zero, so the board ignores every later swipe until a restart. On
+    // resume, abandon the half-finished gesture (never auto-submit it).
+    const stopResume = subscribeForegroundResume(() => {
+      if (raf) { win.cancelAnimationFrame(raf); raf = 0; }
+      if (!pressing) return;
+      endGesture();
+      clear();
+    });
+
     root.addEventListener('pointerdown', onDown);
     root.addEventListener('pointermove', onMove);
     root.addEventListener('pointerup', onUp);
@@ -324,6 +336,7 @@ export function useBoardSelection(
     };
 
     return () => {
+      stopResume();
       clearTimers();
       if (raf) win.cancelAnimationFrame(raf);
       root.removeEventListener('pointerdown', onDown);

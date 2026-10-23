@@ -2,6 +2,7 @@
 
 import { Application, Container, Graphics } from 'pixi.js';
 import { useEffect, useRef } from 'react';
+import { keepRafLoopAlive, restartPixiTicker } from '@/lib/native/foregroundResume';
 import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
 import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
 import { RUBBLE_BURST, TOWER_DUST } from '@/lib/gameEngine/presets/particles';
@@ -119,6 +120,13 @@ export default function WreckCanvas({ className, ...props }: Props) {
     if (!host) return;
     let disposed = false;
     let raf = 0;
+    // Same WebView-pause hazard as TowerCanvas: a dropped rAF froze the raid
+    // mid-swing. Re-arm the loop on resume / stall.
+    let restartLoop: () => void = () => {};
+    const keepAlive = keepRafLoopAlive(() => {
+      restartPixiTicker(app);
+      restartLoop();
+    });
     let app: Application | null = null;
 
     const world: WreckWorld = buildWreckWorldFromTower(propsRef.current.tower);
@@ -204,6 +212,7 @@ export default function WreckCanvas({ className, ...props }: Props) {
 
       const tick = (ts: number) => {
         raf = requestAnimationFrame(tick);
+        keepAlive.beat();
         const frameMs = Math.min(ts - lastTs, 100);
         lastTs = ts;
         const dt = frameMs / 1000;
@@ -478,11 +487,18 @@ export default function WreckCanvas({ className, ...props }: Props) {
         flash.clear();
         if (flashAlpha > 0) flash.rect(0, 0, w, h).fill({ color: 0xffffff, alpha: flashAlpha });
       };
+      restartLoop = () => {
+        if (disposed) return;
+        cancelAnimationFrame(raf);
+        lastTs = performance.now();
+        raf = requestAnimationFrame(tick);
+      };
       raf = requestAnimationFrame(tick);
     })();
 
     return () => {
       disposed = true;
+      keepAlive.stop();
       cancelAnimationFrame(raf);
       app?.destroy(true, { children: true });
     };
