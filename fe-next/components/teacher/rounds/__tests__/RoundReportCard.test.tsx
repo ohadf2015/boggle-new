@@ -108,4 +108,28 @@ describe('RoundReportCard', () => {
     expect(onStudentClick).toHaveBeenCalledWith('s2', 'Omar');
     expect(screen.queryByRole('button', { name: /Leo/ })).not.toBeInTheDocument();
   });
+
+  it('warns that a quiz may count unasked words as missed, on the words and grid views', () => {
+    render(<RoundReportCard {...props} hasPro={false} />);
+    fireEvent.click(screen.getByRole('tab', { name: 'teacher.lastGame.lessonWords' }));
+    expect(screen.getByTestId('round-report-quiz-caveat').textContent).toContain('teacher.classReport.quizCaveat');
+    fireEvent.click(screen.getByRole('tab', { name: 'teacher.classReport.title' }));
+    expect(screen.getByTestId('round-report-quiz-caveat')).toBeInTheDocument();
+  });
+
+  it('shows no quiz caveat for a board round', () => {
+    render(<RoundReportCard {...props} game={{ ...ROUND_FIXTURE, gameMode: 'wordcraft' }} hasPro={false} />);
+    fireEvent.click(screen.getByRole('tab', { name: 'teacher.lastGame.lessonWords' }));
+    expect(screen.queryByTestId('round-report-quiz-caveat')).not.toBeInTheDocument();
+  });
+
+  it('a round with no lesson words says so and lists the players by score, instead of claiming the class found every word', () => {
+    const game = { ...ROUND_FIXTURE, gameMode: 'classic', missedWords: [], wordsNobodyFound: [], totalLessonWords: 0 };
+    render(<RoundReportCard {...props} game={game} hasPro={false} />);
+    expect(screen.getByText('eduLive.results.noLessonTitle')).toBeInTheDocument();
+    expect(screen.queryByText('teacher.lastGame.nothingToReview')).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('practice-action')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('round-report-player').map((n) => n.textContent)).toEqual(['Maya420', 'Omar310', 'Sofia150']);
+  });
 });
