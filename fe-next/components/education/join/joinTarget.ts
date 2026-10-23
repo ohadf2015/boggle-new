@@ -1,4 +1,5 @@
 import logger from '@/utils/logger';
+import { isEndedJoinCode } from './endedJoinCode';
 
 /**
  * What a six-character code is, in ONE round trip.
@@ -72,7 +73,11 @@ export async function resolveJoinTarget(code: string): Promise<JoinTarget> {
     if (data?.kind === 'ended') {
       return data.classroomName ? { verdict: 'ended', label: data.classroomName } : { verdict: 'ended' };
     }
-    if (data?.kind === 'unknown' && !data.degraded) return { verdict: 'invalid' };
+    if (data?.kind === 'unknown' && !data.degraded) {
+      // Resolve hides ended sessions behind 'unknown'; a dead code must not read as a typo.
+      const ended = await isEndedJoinCode(normalized).catch(() => false);
+      return ended ? { verdict: 'ended' } : { verdict: 'invalid' };
+    }
     return { verdict: 'unverified' };
   } catch (err) {
     logger.error(

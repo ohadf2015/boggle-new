@@ -26,7 +26,7 @@ export function JoinSuccessPanel(props: JoinSuccessPanelProps) {
       <h1
         ref={headingRef}
         tabIndex={-1}
-        className="flex items-center gap-3 font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-neo-white outline-none sm:text-5xl lg:text-6xl"
+        className="flex items-center gap-3 font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-neo-white outline-none! sm:text-5xl lg:text-6xl"
       >
         <PartyPopper aria-hidden="true" className="size-9 shrink-0 text-neo-lime lg:size-12" />
         {t(alreadyMember ? `${K}.alreadyMember` : `${K}.success`)}

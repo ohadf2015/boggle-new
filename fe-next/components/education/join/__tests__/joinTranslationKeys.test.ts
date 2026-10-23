@@ -16,7 +16,7 @@ const DIR = path.resolve(__dirname, '..');
 const LOCALES: Record<string, unknown> = { en, he, es, sv, ja, ru };
 const K = 'education.student.join';
 const TEMPLATE = /`\$\{K\}\.([\w.]+)`/g;
-const LITERAL = /'((?:eduStudent|education|eg2Fix|joinView)\.[\w.]+)'/g;
+const LITERAL = /'((?:eduStudent|education|eduLiveRoom|eg2Fix|joinView)\.[\w.]+)'/g;
 
 const lookup = (tree: unknown, key: string) =>
   key.split('.').reduce<unknown>((node, part) => (node && typeof node === 'object' ? (node as Record<string, unknown>)[part] : undefined), tree);

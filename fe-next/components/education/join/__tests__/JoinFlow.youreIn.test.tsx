@@ -44,8 +44,10 @@ describe('<JoinFlow> — the moment a student is in a live game', () => {
     fireEvent.click(screen.getByRole('button', { name: new RegExp(`${K}\\.flow\\.go`) }));
 
     const panel = await screen.findByTestId('join-success-panel');
-    expect(panel).toHaveTextContent(`${K}.flow.youreIn`);
+    expect(panel).toHaveTextContent('eduLiveRoom.student.youreIn');
+    expect(panel).toHaveTextContent('eduLiveRoom.student.watchBoard');
     expect(screen.getByTestId('join-waiting-name')).toHaveTextContent('Ada');
     expect(screen.getByTestId('avatar-stub')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveClass('outline-none!');
   });
 });

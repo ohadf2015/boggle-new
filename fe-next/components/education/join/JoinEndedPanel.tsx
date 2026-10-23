@@ -8,8 +8,6 @@ import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { JoinPrimaryButton } from './JoinPrimaryButton';
 import { joinClassHref } from './joinDestinations';
 
-const K = 'education.student.join';
-
 interface JoinEndedPanelProps {
   code: string;
   label?: string;
@@ -44,23 +42,23 @@ export function JoinEndedPanel({ code, label, classroomId: enrolledIn, onNewCode
           id="join-ended-title"
           ref={headingRef}
           tabIndex={-1}
-          className="font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-neo-white outline-none [overflow-wrap:anywhere] sm:text-5xl lg:text-6xl"
+          className="font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-neo-white outline-none! [overflow-wrap:anywhere] sm:text-5xl lg:text-6xl"
         >
-          {t(`${K}.ended.title`)}
+          {t('education.student.gameEnded.title')}
         </h1>
         {label && <p className="mt-2 font-neo-display text-lg font-black text-neo-lime lg:text-xl">{label}</p>}
-        <p className="mt-3 font-neo-body text-base font-bold text-neo-cyan lg:text-lg">{t(`${K}.ended.body`)}</p>
+        <p className="mt-3 font-neo-body text-base font-bold text-neo-cyan lg:text-lg">{t('education.student.classroomRoomGone')}</p>
       </div>
       <div className="flex flex-col gap-3">
         <JoinPrimaryButton type="button" onClick={onNewCode}>
-          {t(`${K}.ended.newCode`)}
+          {t('education.student.gameEnded.newCode')}
         </JoinPrimaryButton>
         {classroomId && (
           <Link
             href={joinClassHref(language)}
             className="flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cyan px-4 py-3 font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-cyan"
           >
-            {t(`${K}.ended.toClass`)}
+            {t('education.student.gameEnded.toClass')}
           </Link>
         )}
       </div>

@@ -44,10 +44,19 @@ describe('<JoinFlow> — a code whose game has ended', () => {
     render(<JoinFlow initialCode="ABC123" />);
 
     await waitFor(() => expect(endedPanel()).toBeInTheDocument());
-    expect(screen.getByText(`${K}.ended.title`)).toBeInTheDocument();
-    expect(screen.getByText(`${K}.ended.body`)).toBeInTheDocument();
+    expect(screen.getByText('education.student.gameEnded.title')).toBeInTheDocument();
+    expect(screen.getByText('education.student.classroomRoomGone')).toBeInTheDocument();
     expect(codeField()).toBeNull();
     expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('GIVEN the ended state takes focus THEN its heading opts out of the global focus ring', async () => {
+    mockResolve.mockResolvedValue({ verdict: 'ended' });
+    render(<JoinFlow initialCode="ABC123" />);
+
+    const heading = await screen.findByRole('heading', { name: 'education.student.gameEnded.title' });
+    await waitFor(() => expect(heading).toHaveFocus());
+    expect(heading).toHaveClass('outline-none!');
   });
 
   it('GIVEN the join itself answers SESSION_ENDED THEN the ended state shows', async () => {
@@ -73,7 +82,7 @@ describe('<JoinFlow> — a code whose game has ended', () => {
     fireEvent.click(screen.getByRole('button', { name: new RegExp(`${K}\\.flow\\.go`) }));
 
     await waitFor(() => expect(endedPanel()).toBeInTheDocument());
-    expect(screen.getByRole('link', { name: `${K}.ended.toClass` })).toHaveAttribute('href', '/en/student?class=open');
+    expect(screen.getByRole('link', { name: 'education.student.gameEnded.toClass' })).toHaveAttribute('href', '/en/student?class=open');
     await new Promise((r) => setTimeout(r, 900));
     expect(mockPush).not.toHaveBeenCalled();
   });
@@ -83,7 +92,7 @@ describe('<JoinFlow> — a code whose game has ended', () => {
     render(<JoinFlow initialCode="ABC123" />);
     await waitFor(() => expect(endedPanel()).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: `${K}.ended.newCode` }));
+    fireEvent.click(screen.getByRole('button', { name: 'education.student.gameEnded.newCode' }));
 
     expect(endedPanel()).toBeNull();
     expect(codeField()).toHaveValue('');
@@ -95,7 +104,7 @@ describe('<JoinFlow> — a code whose game has ended', () => {
     render(<JoinFlow initialCode="ABC123" />);
     await waitFor(() => expect(endedPanel()).toBeInTheDocument());
 
-    expect(screen.getByRole('link', { name: `${K}.ended.toClass` })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'education.student.gameEnded.toClass' })).toHaveAttribute(
       'href',
       '/en/student?class=open'
     );
@@ -106,7 +115,7 @@ describe('<JoinFlow> — a code whose game has ended', () => {
     render(<JoinFlow initialCode="ABC123" />);
     await waitFor(() => expect(endedPanel()).toBeInTheDocument());
 
-    expect(screen.queryByRole('link', { name: `${K}.ended.toClass` })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'education.student.gameEnded.toClass' })).toBeNull();
   });
 
   it('GIVEN a typed code the lookup calls ended WHEN NEXT is pressed THEN the ended state shows', async () => {

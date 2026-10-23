@@ -4,8 +4,6 @@ import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 
-const K = 'education.student.join';
-
 export function JoinWaitingCard({ name }: { name?: string }) {
   const { t } = useLanguage();
   const { profile } = useAuth();
@@ -18,8 +16,11 @@ export function JoinWaitingCard({ name }: { name?: string }) {
           {name}
         </p>
       )}
+      <p className="font-neo-display text-2xl font-black uppercase text-neo-lime lg:text-3xl">
+        {t('eduLiveRoom.student.youreIn')}
+      </p>
       <p className="font-neo-body text-base font-bold text-neo-cyan lg:text-lg">
-        {t(`${K}.flow.youreIn`)}
+        {t('eduLiveRoom.student.watchBoard')}
       </p>
     </div>
   );
