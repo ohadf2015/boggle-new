@@ -235,25 +235,27 @@ export function useMpPageState() {
       isClassroomMode: classroomContext === 'classroom',
       isHost: isHost || isClassroomHost,
       locale: language,
+      pathname,
     });
     // `null` = an ordinary arcade game, where the lobby genuinely is home and
     // the in-place reset above is the whole exit (a hard nav blanks the
     // Capacitor WebView). A router push is SPA navigation, so it is safe too.
     if (destination) router.push(destination);
   }, [gameCode, username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
-      classroomContext, isHost, isClassroomHost, language, router]);
+      classroomContext, isHost, isClassroomHost, language, router, pathname]);
 
   // The page's `useMpExit()` target: every MP screen exits through here.
   // In-room reasons take the one in-place reset above (leaveRoom emit, session
   // clear, exit-param strip, classroom hub); only back-from-entry and
   // continue-solo leave the multiplayer route.
   const exitMp = useCallback((reason: MpExitReason) => {
-    const action = mpExit(reason, {
-      isClassroomMode: classroomContext === 'classroom', isHost: isHost || isClassroomHost, locale: language, previousPath: readPreviousInAppPath(),
-    });
+    const ctx = { isClassroomMode: classroomContext === 'classroom', isHost: isHost || isClassroomHost, locale: language, pathname };
+    const action = mpExit(reason, { ...ctx, previousPath: readPreviousInAppPath() });
     if (reason !== 'back-from-entry') handleExitToLobby();
-    if (action.kind === 'navigate' && (reason === 'back-from-entry' || reason === 'continue-solo')) router.push(action.href);
-  }, [classroomContext, isHost, isClassroomHost, language, handleExitToLobby, router]);
+    // handleExitToLobby already pushed the classroom hub; only the arcade solo handoff still needs a push.
+    const soloHandoff = reason === 'continue-solo' && !multiplayerExitDestination(ctx);
+    if (action.kind === 'navigate' && (reason === 'back-from-entry' || soloHandoff)) router.push(action.href);
+  }, [classroomContext, isHost, isClassroomHost, language, handleExitToLobby, router, pathname]);
 
   // PageClient is the ONE writer of the global nav-hiding state (pitfall
   // class 1): hidden in a room and on results; on entry per the ENTRY piece's

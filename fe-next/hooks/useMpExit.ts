@@ -59,6 +59,7 @@ export function useMpExit(): MpExitFn {
         isClassroomMode: false,
         isHost: false,
         locale: language,
+        pathname: typeof window === 'undefined' ? null : window.location.pathname,
         previousPath: readPreviousInAppPath(),
       });
       router.push(action.kind === 'navigate' ? action.href : `/${language || 'en'}/multiplayer`);

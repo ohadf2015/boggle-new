@@ -102,7 +102,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
       data-testid="edu-host-results"
       data-round-end-stage={stage}
       data-outcome={outcome.kind}
-      className="fixed inset-0 z-[75] flex flex-col gap-3 overflow-y-auto bg-neo-navy px-3 pb-4 pt-16 text-neo-cream lg:gap-4 lg:overflow-hidden lg:px-8 lg:pb-6 lg:pt-6"
+      className="fixed inset-0 z-[75] flex flex-col gap-3 overflow-hidden bg-neo-navy px-3 pb-4 pt-16 text-neo-cream lg:gap-4 lg:px-8 lg:pb-6 lg:pt-6"
     >
       <BossOutcomeCard size="tv" className="shrink-0" />
       <TvRecapHeader
@@ -116,69 +116,71 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
         lessonNames={summary.lessonNames ?? []}
       />
 
-      <div className="grid grid-cols-1 gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-5 lg:gap-5 2xl:grid-cols-3">
-        {hasStage && (
-          <div className="relative flex flex-col gap-3 lg:col-span-3 lg:min-h-0 lg:gap-4 2xl:col-span-2">
-            {/* The winner bar stands down to "top hitter" when the boss got away; so does the party. */}
-            <CelebrationLoop active={winnerBeat && showPodium && bossStatus !== 'escaped'} className="z-10" />
-            {outcome.kind === 'empty' && !bossOver && <EmptyRoundCard t={t} />}
-            {showPodium && (
-              <PodiumStage
-                entries={podium}
-                muted={!outcome.celebrate}
-                stage={stage}
-                t={t}
-                className={bossOver ? 'lg:w-[min(100%,calc((100dvh_-_30rem)*1.768))]' : 'lg:w-[min(100%,calc((100dvh_-_19rem)*1.768))]'}
-              >
-                {landed && <ClassChest found={summary.classFoundCount} total={summary.totalWords} open={winnerBeat} t={t} />}
-                {!outcome.celebrate && <ZeroRoundNote t={t} />}
-              </PodiumStage>
+      <div data-testid="edu-host-results-scroll" className="-mx-3 flex min-h-0 flex-1 flex-col overflow-y-auto px-3 lg:mx-0 lg:overflow-hidden lg:px-0">
+        <div className="grid grid-cols-1 gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-5 lg:gap-5 2xl:grid-cols-3">
+          {hasStage && (
+            <div className="relative flex flex-col gap-3 lg:col-span-3 lg:min-h-0 lg:gap-4 2xl:col-span-2">
+              {/* The winner bar stands down to "top hitter" when the boss got away; so does the party. */}
+              <CelebrationLoop active={winnerBeat && showPodium && bossStatus !== 'escaped'} className="z-10" />
+              {outcome.kind === 'empty' && !bossOver && <EmptyRoundCard t={t} />}
+              {showPodium && (
+                <PodiumStage
+                  entries={podium}
+                  muted={!outcome.celebrate}
+                  stage={stage}
+                  t={t}
+                  className={bossOver ? 'lg:w-[min(100%,calc((100dvh_-_30rem)*1.768))]' : 'lg:w-[min(100%,calc((100dvh_-_19rem)*1.768))]'}
+                >
+                  {landed && <ClassChest found={summary.classFoundCount} total={summary.totalWords} open={winnerBeat} t={t} />}
+                  {!outcome.celebrate && <ZeroRoundNote t={t} />}
+                </PodiumStage>
+              )}
+              {showPodium && podium[0] && (
+                <WinnerSpotlight
+                  winner={{ username: podium[0].username, score: podium[0].score }}
+                  outcome={outcome.kind}
+                  leaders={outcome.leaders}
+                  active={isRevealed(1, stage)}
+                  cue={!swept}
+                  size={phone ? 'card' : 'projector'}
+                  t={t}
+                  className="z-20 shrink-0"
+                />
+              )}
+            </div>
+          )}
+
+          <div className={cn('flex flex-col gap-3 lg:min-h-0 lg:gap-4', hasStage ? 'lg:col-span-2 2xl:col-span-1' : 'lg:col-span-5 lg:mx-auto lg:w-full lg:max-w-4xl 2xl:col-span-3')}>
+            {stats && (
+              <div className={cn(!phone && bossOver && 'lg:[@media(max-height:900px)]:hidden')}>
+                <ClassPulse stats={stats} active={winnerBeat} size={phone ? 'card' : 'projector'} t={t} />
+              </div>
             )}
-            {showPodium && podium[0] && (
-              <WinnerSpotlight
-                winner={{ username: podium[0].username, score: podium[0].score }}
-                outcome={outcome.kind}
-                leaders={outcome.leaders}
-                active={isRevealed(1, stage)}
-                cue={!swept}
-                size={phone ? 'card' : 'projector'}
+            {summary.totalWords > 0 && missed.length === 0 && (
+              <TvCoveragePanel
+                summary={summary}
+                players={players}
+                neverPlaced={neverPlaced}
+                stage={stage}
+                pointsWithoutLesson={!landed && outcome.celebrate}
+                phone={phone}
+                maxChips={bossOver ? 6 : 9}
+                verdict={reteachVerdict(summary).kind}
                 t={t}
-                className="z-20 shrink-0"
               />
             )}
-          </div>
-        )}
-
-        <div className={cn('flex flex-col gap-3 lg:min-h-0 lg:gap-4', hasStage ? 'lg:col-span-2 2xl:col-span-1' : 'lg:col-span-5 lg:mx-auto lg:w-full lg:max-w-4xl 2xl:col-span-3')}>
-          {stats && (
-            <div className={cn(!phone && bossOver && 'lg:[@media(max-height:900px)]:hidden')}>
-              <ClassPulse stats={stats} active={winnerBeat} size={phone ? 'card' : 'projector'} t={t} />
+            <Actions t={t} onRematch={onRematch} onClose={onClose} onExitRoom={onExitRoom} />
+            <EduReteachPanel words={missed} underHalf={studentsUnderHalf(summary)} status={reteach.status} onReplay={reteach.replay} onRestoreFull={reteach.restoreFull} t={t} />
+            {summary.totalWords > 0 && (
+              // With the boss card up, a short wall keeps the words to reteach over the report teaser.
+              <div className={cn(!phone && bossOver && 'lg:[@media(max-height:900px)]:hidden')}>
+                <StrugglePreview masteryByPlayer={summary.masteryByPlayer ?? {}} teacherName={summary.teacherName ?? ''} language={language} t={t} />
+              </div>
+            )}
+            {/* Teacher Pro trial + school quote, after a class has actually played. Host tree only. On a short wall the reteach outranks it. */}
+            <div className={cn(!phone && (bossOver || missed.length > 0) && 'lg:[@media(max-height:900px)]:hidden')}>
+              <ResultsTeacherProTrialCard language={language} />
             </div>
-          )}
-          {summary.totalWords > 0 && missed.length === 0 && (
-            <TvCoveragePanel
-              summary={summary}
-              players={players}
-              neverPlaced={neverPlaced}
-              stage={stage}
-              pointsWithoutLesson={!landed && outcome.celebrate}
-              phone={phone}
-              maxChips={bossOver ? 6 : 9}
-              verdict={reteachVerdict(summary).kind}
-              t={t}
-            />
-          )}
-          <Actions t={t} onRematch={onRematch} onClose={onClose} onExitRoom={onExitRoom} />
-          <EduReteachPanel words={missed} underHalf={studentsUnderHalf(summary)} status={reteach.status} onReplay={reteach.replay} onRestoreFull={reteach.restoreFull} t={t} />
-          {summary.totalWords > 0 && (
-            // With the boss card up, a short wall keeps the words to reteach over the report teaser.
-            <div className={cn(!phone && bossOver && 'lg:[@media(max-height:900px)]:hidden')}>
-              <StrugglePreview masteryByPlayer={summary.masteryByPlayer ?? {}} teacherName={summary.teacherName ?? ''} language={language} t={t} />
-            </div>
-          )}
-          {/* Teacher Pro trial + school quote, after a class has actually played. Host tree only. On a short wall the reteach outranks it. */}
-          <div className={cn(!phone && (bossOver || missed.length > 0) && 'lg:[@media(max-height:900px)]:hidden')}>
-            <ResultsTeacherProTrialCard language={language} />
           </div>
         </div>
       </div>

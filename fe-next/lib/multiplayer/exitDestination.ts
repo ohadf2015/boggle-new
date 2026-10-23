@@ -17,6 +17,7 @@
  * render. Same reasoning as `lib/education/classroomRoomGone.ts`.
  */
 import { classroomStudentHomePath } from '@/lib/education/classroomRoomGone';
+import { isClassroomLivePathname } from '@/lib/education/classroomLivePath';
 
 export interface MultiplayerExitParams {
   /** The room was opened with `?classroom=true`. */
@@ -25,6 +26,8 @@ export interface MultiplayerExitParams {
   isHost: boolean;
   /** UI locale, used to keep the exit inside the user's language. */
   locale: string;
+  /** Current route: `/education/live` is a classroom even before the flag or record resolves. */
+  pathname?: string | null;
 }
 
 /**
@@ -39,8 +42,9 @@ export function multiplayerExitDestination({
   isClassroomMode,
   isHost,
   locale,
+  pathname,
 }: MultiplayerExitParams): string | null {
-  if (!isClassroomMode) return null;
+  if (!isClassroomMode && !isClassroomLivePathname(pathname)) return null;
   // The teacher is the only host a classroom room ever has, and their hub is the
   // teacher dashboard — derived from the role, so a second launch surface (the
   // full setup page as well as quick launch) returns to the same place without
@@ -85,13 +89,13 @@ export function isInAppPreviousPath(path: string | null | undefined): path is st
  * Where an exit goes. Classroom rooms go to their hub (same rule as
  * `multiplayerExitDestination`). In-room reasons reset to the MP entry. Only
  * `back-from-entry` leaves the section: to the previous in-app route, else the
- * locale root. `continue-solo` hands off to singleplayer.
+ * locale root. Arcade `continue-solo` hands off to singleplayer.
  */
 export function mpExit(reason: MpExitReason, ctx: MpExitContext): MpExitAction {
   const locale = ctx.locale || 'en';
-  if (reason === 'continue-solo') return { kind: 'navigate', href: `/${locale}/singleplayer?mpHandoff=1` };
   const classroom = multiplayerExitDestination(ctx);
   if (classroom) return { kind: 'navigate', href: classroom };
+  if (reason === 'continue-solo') return { kind: 'navigate', href: `/${locale}/singleplayer?mpHandoff=1` };
   if (reason === 'back-from-entry') {
     return { kind: 'navigate', href: isInAppPreviousPath(ctx.previousPath) ? ctx.previousPath : `/${locale}` };
   }
