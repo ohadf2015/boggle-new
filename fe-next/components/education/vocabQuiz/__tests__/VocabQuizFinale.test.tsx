@@ -8,8 +8,8 @@
  * rather than eyeballed, because a celebration nobody can test is a
  * celebration nobody can keep.
  */
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, act } from '@testing-library/react';
 import { VocabQuizFinale } from '../VocabQuizFinale';
 import { classFinaleStats } from '../vocabQuizJuice';
 
@@ -55,7 +55,10 @@ describe('VocabQuizFinale', () => {
   });
 
   it('stages the top three on the podium the board modes use', () => {
+    vi.useFakeTimers();
     render(<VocabQuizFinale standings={STANDINGS} totalQuestions={5} t={t} />);
+    act(() => void vi.advanceTimersByTime(6000));
+    vi.useRealTimers();
 
     expect(screen.getByTestId('podium-place-1')).toHaveTextContent('ana');
     expect(screen.getByTestId('podium-place-3')).toHaveTextContent('cy');

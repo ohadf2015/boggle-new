@@ -1,4 +1,4 @@
-import { render, screen, cleanup, fireEvent } from '@testing-library/react';
+import { render, screen, cleanup, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
 const fireVictoryConfetti = vi.fn();
@@ -31,7 +31,10 @@ describe('VocabQuizFinale — a way out, and no party for a blank quiz', () => {
   });
 
   it('Given real correct answers, Then the finale still celebrates once', () => {
+    vi.useFakeTimers();
     render(<VocabQuizFinale standings={scored} totalQuestions={10} t={(k) => k} />);
+    act(() => void vi.advanceTimersByTime(6000));
+    vi.useRealTimers();
     expect(fireVictoryConfetti).toHaveBeenCalledTimes(1);
   });
 });
