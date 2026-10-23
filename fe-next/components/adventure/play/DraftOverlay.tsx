@@ -98,7 +98,8 @@ export default function DraftOverlay({ offer, onPick, run }: Props) {
           {run && <GoldCounter value={run.gold} />}
         </div>
 
-        <div className="flex flex-1 flex-col justify-center">
+        <div data-testid="draft-scroll" className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <div className="my-auto flex min-h-full flex-col justify-center">
         <div className="text-center">
           <h2 id="draft-title" className="font-neo-display text-3xl font-bold uppercase leading-none tracking-tight">{t('adventurePlay.draftTitle')}</h2>
           <p className="mt-1.5 text-sm font-semibold opacity-80">{t('adventurePlay.draftSub')}</p>
@@ -140,8 +141,9 @@ export default function DraftOverlay({ offer, onPick, run }: Props) {
           </AnimatePresence>
         </div>
         </div>
+        </div>
 
-        <div className="flex flex-col gap-2">
+        <div data-testid="draft-actions" className="flex shrink-0 flex-col gap-2 pt-2">
           <button type="button" onClick={take} disabled={sel == null || busy} data-testid="draft-take"
             className="w-full rounded-xl border-[3px] border-black bg-neo-lime py-3 font-neo-display text-xl font-bold uppercase text-black shadow-[4px_4px_0_#000] active:translate-y-0.5 active:shadow-[1px_1px_0_#000] disabled:bg-neo-lime/40 disabled:shadow-none">
             {t('adventurePlay.loot.take')}

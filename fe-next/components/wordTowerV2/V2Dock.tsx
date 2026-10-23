@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
+import { memo, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react';
 import { Delete, Shuffle, Undo2 } from 'lucide-react';
 import { WordTowerWheel } from '@/components/wordTower/WordTowerWheel';
 
@@ -52,7 +52,7 @@ export const CLEAR_WORD_HOLD_MS = 450;
  * the canvas. Its measured height still frames the ground (WordTowerV2), so
  * nothing about the camera changed.
  */
-export function V2Dock(p: Props) {
+export const V2Dock = memo(function V2Dock(p: Props) {
   const { t } = p;
   // Rage clicks on backspace were the #1 frustration signal on Word Tower
   // (PostHog, Oct 2026): players hammer it to undo a long wrong word. Holding
@@ -79,6 +79,7 @@ export function V2Dock(p: Props) {
     if (holdFired.current) { holdFired.current = false; return; }
     if (p.swinging) p.onPutBack(); else p.onBackspace();
   };
+  const tray = useMemo(() => p.wheel.map((l) => l.toUpperCase()), [p.wheel]);
 
   return (
     <div
@@ -130,7 +131,7 @@ export function V2Dock(p: Props) {
           <div className="flex flex-col items-center gap-1">
             {!p.wide && p.stabilitySlot ? <div className="pointer-events-auto">{p.stabilitySlot}</div> : null}
             <WordTowerWheel
-              tray={p.wheel.map((l) => l.toUpperCase())}
+              tray={tray}
               selected={p.selected}
               word={p.word.toUpperCase()}
               placing={p.swinging}
@@ -172,4 +173,4 @@ export function V2Dock(p: Props) {
       {p.wide && p.stabilitySlot && <div className="pointer-events-auto">{p.stabilitySlot}</div>}
     </div>
   );
-}
+});

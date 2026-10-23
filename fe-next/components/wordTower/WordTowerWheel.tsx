@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { ChevronsDown, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
@@ -89,7 +89,7 @@ const BAND_HUB: Record<PlacementQuality, string> = {
 // we receive, we don't pass it to the drag handler — the gesture stays a tap.
 const DRAG_ENGAGEMENT_THRESHOLD_PX = 8;
 
-export function WordTowerWheel({
+export const WordTowerWheel = memo(function WordTowerWheel({
   tray, selected, word, placing, aimBand = null, canBuild, gainPreview, intensity, accentHex, goldenLetter,
   reducedMotion = false, dir, t, onSelectTile, onDeselectTile, onSubmit, onDrop,
 }: WordTowerWheelProps) {
@@ -472,4 +472,4 @@ export function WordTowerWheel({
       </div>
     </div>
   );
-}
+});

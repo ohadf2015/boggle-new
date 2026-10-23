@@ -9,7 +9,7 @@ import type { AttackEffect, CombatFx } from '@/lib/adventure/play/combat';
 
 export type ArenaCommand =
   /** A word landed: letters fly off the board and the last one is the blow. */
-  | { kind: 'cast'; id: number; word: string; power: number }
+  | { kind: 'cast'; id: number; word: string; power: number; crit?: boolean }
   /** The foe is winding up: charge the hand for `ms`. */
   | { kind: 'windup'; id: number; color: number; ms: number; effect: AttackEffect }
   /** The wind-up released: lunge, and the hero takes it (or blocks). */

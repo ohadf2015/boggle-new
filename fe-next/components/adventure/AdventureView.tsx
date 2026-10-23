@@ -138,6 +138,7 @@ export default function AdventureView() {
         onRestartRun={() => setRunNonce((n) => n + 1)}
         onSaved={onSaved}
         onEquipSkin={equip}
+        ownedSkins={skins}
         earnAchievement={earnAchievement}
         totalBossesBeaten={bossesBeaten}
         otherPerfectLevels={completions.filter((c) => c.stars === 3).length}

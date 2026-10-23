@@ -21,11 +21,10 @@ import type { FxEntry } from '../arena/arenaCommands';
 import type { HitEvent } from '../events';
 import type { RelicId } from '@/lib/adventure/play/relics';
 import { PLAYER_STATUS } from './PlayerBar';
-import { enemyArt, hpSegments, ruleKey, type ArtState } from './combatView';
+import { enemyArt, ruleKey, type ArtState } from './combatView';
+import BossHpBar from './BossHpBar';
 import type { CombatJuice } from './useCombatJuice';
 import { TRAVEL_MS, missileArt } from './flightMath';
-
-const SEGMENTS = 10;
 
 const STATUS_STYLE: Record<string, string> = {
   interrupt: 'bg-neo-lime text-black', phase: 'bg-neo-pink text-black',
@@ -71,7 +70,6 @@ function StaticEnemyStage({ world, isBoss, combat, juice, taunt, t, reduce }: St
   const tele = combat.telegraph;
   const art: ArtState = combat.defeated ? 'defeated'
     : juice.flash ?? (tele ? 'attack' : combat.phase === 2 ? 'enraged' : 'idle');
-  const segs = hpSegments(combat.enemyHp, combat.enemyMaxHp, SEGMENTS);
   const enraged = combat.phase === 2;
   const status = juice.status;
   const onEnemy = status && !PLAYER_STATUS.includes(status.kind);
@@ -162,18 +160,7 @@ function StaticEnemyStage({ world, isBoss, combat, juice, taunt, t, reduce }: St
             </span>
             <span className="font-neo-display font-bold text-neo-cream text-base leading-tight line-clamp-2 break-words min-w-0 drop-shadow-[2px_2px_0_#000]">{name}</span>
           </div>
-          <div className={cn('relative flex gap-[3px] rounded-lg border-[3px] border-black bg-black p-[2px] shadow-[3px_3px_0_#000]', enraged && 'shadow-[3px_3px_0_#ff3366]')}
-            role="progressbar" aria-label={t('adventurePlay.combat.enemyHp')} aria-valuemin={0} aria-valuemax={combat.enemyMaxHp} aria-valuenow={combat.enemyHp}>
-            {segs.map((f, i) => (
-              <div key={i} className="relative h-4 flex-1 rounded-[3px] bg-[#2a1030] overflow-hidden">
-                <div className={cn('absolute inset-y-0 start-0 transition-[width] duration-300', enraged ? 'bg-neo-pink' : 'bg-[#ff4d4d]')}
-                  style={{ width: `${f * 100}%` }} />
-              </div>
-            ))}
-            {[33, 66].map((p) => (
-              <span key={p} aria-hidden className="absolute -top-1 -bottom-1 w-[3px] bg-neo-yellow border-x border-black" style={{ insetInlineStart: `${p}%` }} />
-            ))}
-          </div>
+          <BossHpBar hp={combat.enemyHp} max={combat.enemyMaxHp} phase={combat.phase} className="h-5 shadow-[3px_3px_0_#000]" />
           <div className="rounded-xl border-[3px] border-black bg-[#0f1b3d]/90 p-1.5 shadow-[3px_3px_0_#000]">
             <IntentDial combat={combat} />
           </div>

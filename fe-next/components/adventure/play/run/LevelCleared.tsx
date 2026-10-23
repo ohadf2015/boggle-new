@@ -72,17 +72,18 @@ export default function LevelCleared({ result, run, onNext, onMap }: Props) {
         <GoldCounter value={counted ? endGold : startGold} from={startGold} anchorRef={coinTo} size="lg" durationMs={700} />
       </div>
 
-      <div className="mt-6 text-center">
+      <div data-testid="loot-scroll" className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-1 -mx-1">
+      <div className="mt-6 text-center [@media(max-height:700px)]:mt-3">
         <Stamp className="bg-neo-lime">{t('adventurePlay.cleared')}</Stamp>
       </div>
 
-      <div ref={coinFrom} className="mt-5 flex justify-center gap-2" aria-label={t('adventurePlay.starsEarned', { stars: result.stars })}>
+      <div ref={coinFrom} className="mt-5 flex justify-center gap-2 [@media(max-height:700px)]:mt-3" aria-label={t('adventurePlay.starsEarned', { stars: result.stars })}>
         {[1, 2, 3].map((n) => (
           <m.span key={n}
             initial={reduce ? false : { scale: 0, rotate: -90 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 420, damping: 14, delay: 0.25 + n * 0.12 }}>
-            <Star className={cn('h-14 w-14 stroke-black stroke-[2.5]', n <= result.stars ? 'fill-neo-yellow' : 'fill-white/10', n === 2 && '-mt-3')} />
+            <Star className={cn('h-14 w-14 stroke-black stroke-[2.5]', n <= result.stars ? 'fill-neo-yellow' : 'fill-white/10', n === 2 && '-mt-3', '[@media(max-height:700px)]:h-10 [@media(max-height:700px)]:w-10')} />
           </m.span>
         ))}
       </div>
@@ -100,15 +101,16 @@ export default function LevelCleared({ result, run, onNext, onMap }: Props) {
       {/* The chest is the deliberate squeeze target, but its "tap to open" badge
           is what ungates Continue — so it scales down here instead of being
           clipped by the button row on a short viewport. */}
-      <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden pb-1 [&>*]:max-h-full">
+      <div className="flex flex-1 shrink-0 items-center justify-center py-1">
         {hasChest && counted && (
           <m.div initial={reduce ? false : { y: 60, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 20 }}>
             <ChestOpen loot={loot} onOpened={() => setOpened(true)} />
           </m.div>
         )}
       </div>
+      </div>
 
-      <div className="flex gap-2">
+      <div data-testid="loot-actions" className="flex shrink-0 gap-2 pt-2">
         <button type="button" onClick={onMap} aria-label={t('adventurePlay.backToMap')} className={squareBtn}>
           <MapIcon className="h-5 w-5" />
         </button>

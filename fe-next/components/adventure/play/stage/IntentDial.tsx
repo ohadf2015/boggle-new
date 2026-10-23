@@ -29,6 +29,7 @@ import type { AttackEffect, CombatState } from '@/lib/adventure/play/combat';
 import { cn } from '@/lib/utils';
 import { moveKey } from './combatView';
 import { incomingThreat, phaseThreats, standingThreat, willBlock, type Threat } from './intentView';
+import { urgencyOf } from './bossView';
 
 export const EFFECT_ICON: Record<AttackEffect, LucideIcon> = {
   hit: Swords, freeze: Snowflake, curse: Skull, projectile: Flame, shuffle: Shuffle, drain: Droplet,
@@ -98,22 +99,35 @@ export function ThreatPlate({ combat }: { combat: CombatState }) {
   const n = hearts ? threat.damage : threat.tiles;
   const Icon = incoming ? EFFECT_ICON[threat.effect] : Hourglass;
   const Unit = blocked ? ShieldCheck : hearts ? Heart : Grid2x2;
+  const tele = incoming ? combat.telegraph : null;
+  const leftMs = tele ? Math.max(0, tele.endsAt - combat.now) : 0;
+  const urgency = tele && !blocked ? urgencyOf(leftMs) : 'calm';
   return (
-    <div
-      role="status"
-      aria-label={blocked
-        ? t('adventurePlay.combat.threatBlocked')
-        : hearts ? t('adventurePlay.combat.threatDamage', { count: n }) : t('adventurePlay.combat.threatTiles', { count: n })}
-      className={cn('inline-flex items-center gap-1 rounded-xl border-[3px] border-black px-1.5 py-0.5 shadow-[3px_3px_0_#000]',
-        blocked ? 'bg-neo-cyan' : incoming ? 'bg-neo-pink' : 'bg-[#0f1b3d]',
-        incoming && !reduce && 'animate-pulse')}>
-      <Icon className={cn('w-4 h-4 shrink-0', incoming ? 'text-black' : 'text-neo-pink')} strokeWidth={3} />
-      <span className={cn('font-neo-display text-xl font-black leading-none tabular-nums',
-        blocked ? 'text-black line-through decoration-2' : incoming ? 'text-black' : 'text-neo-pink')}>
-        {hedge && <span aria-hidden className="text-sm opacity-70">≤</span>}{n}
-      </span>
-      <Unit className={cn('w-3.5 h-3.5 shrink-0', blocked ? 'text-black' : incoming ? 'text-black fill-black' : 'text-neo-pink',
-        hearts && !blocked && !incoming && 'fill-neo-pink')} strokeWidth={3} />
+    <div className={cn('flex flex-col gap-0.5 origin-top transition-transform', urgency === 'urgent' && !reduce && 'scale-110')}>
+      <div
+        role="status"
+        aria-label={blocked
+          ? t('adventurePlay.combat.threatBlocked')
+          : hearts ? t('adventurePlay.combat.threatDamage', { count: n }) : t('adventurePlay.combat.threatTiles', { count: n })}
+        className={cn('inline-flex items-center justify-center gap-1 rounded-xl border-[3px] border-black px-1.5 py-0.5 shadow-[3px_3px_0_#000]',
+          blocked ? 'bg-neo-cyan' : incoming ? (urgency === 'calm' ? 'bg-neo-pink' : 'bg-neo-orange') : 'bg-[#0f1b3d]',
+          incoming && !reduce && (urgency === 'urgent' ? 'animate-bounce' : 'animate-pulse'))}>
+        <Icon className={cn('w-4 h-4 shrink-0', incoming ? 'text-black' : 'text-neo-pink')} strokeWidth={3} />
+        <span className={cn('font-neo-display text-xl font-black leading-none tabular-nums',
+          blocked ? 'text-black line-through decoration-2' : incoming ? 'text-black' : 'text-neo-pink')}>
+          {hedge && <span aria-hidden className="text-sm opacity-70">≤</span>}{n}
+        </span>
+        <Unit className={cn('w-3.5 h-3.5 shrink-0', blocked ? 'text-black' : incoming ? 'text-black fill-black' : 'text-neo-pink',
+          hearts && !blocked && !incoming && 'fill-neo-pink')} strokeWidth={3} />
+      </div>
+      {tele && (
+        <div aria-hidden className="h-1.5 w-full overflow-hidden rounded-full border-2 border-black bg-black/70">
+          {reduce ? <div className="h-full bg-neo-orange" style={{ width: `${(leftMs / Math.max(1, tele.endsAt - tele.startedAt)) * 100}%` }} />
+            : <m.div key={tele.startedAt} className={cn('h-full', urgency === 'calm' ? 'bg-neo-pink' : 'bg-neo-orange')}
+              initial={{ width: `${(leftMs / Math.max(1, tele.endsAt - tele.startedAt)) * 100}%` }} animate={{ width: '0%' }}
+              transition={{ duration: leftMs / 1000, ease: 'linear' }} />}
+        </div>
+      )}
     </div>
   );
 }

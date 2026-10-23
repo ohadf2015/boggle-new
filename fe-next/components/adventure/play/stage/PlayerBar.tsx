@@ -13,6 +13,7 @@ import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { MAX_SHIELDS, type CombatEvent, type CombatState } from '@/lib/adventure/play/combat';
 import { cn } from '@/lib/utils';
 import { heartStates, type StatusId } from './combatView';
+import { urgencyOf } from './bossView';
 
 /** Statuses that land on the player (stamped over the hearts, Bookworm-style). */
 export const PLAYER_STATUS: readonly StatusId[] = ['hit', 'drain', 'curse', 'freeze', 'shuffle', 'death', 'revive', 'heal', 'blocked'];
@@ -41,12 +42,14 @@ export default function PlayerBar({ combat, dispatchCombat, playing }: Props) {
 
   const ready = combat.shields > 0 && !combat.guard;
   const urgent = ready && !!combat.telegraph && combat.telegraph.attack.damage > 0;
+  const tele = combat.telegraph;
+  const brace = !!tele && tele.attack.damage > 0 && urgencyOf(tele.endsAt - combat.now) === 'urgent';
   const earnLen = combat.script.rules?.shieldLen ?? 5;
   const hearts = heartStates(combat.hp, combat.maxHp);
 
   return (
     <div className="mt-2 flex items-stretch gap-2" data-testid="player-bar">
-      <div data-player-hearts className="relative flex-1 min-w-0 flex items-center gap-0.5 rounded-xl border-[3px] border-black bg-black/70 px-2 py-1 shadow-[3px_3px_0_#000]"
+      <div data-player-hearts className={cn('relative flex-1 min-w-0 flex items-center gap-0.5 rounded-xl border-[3px] bg-black/70 px-2 py-1 transition-colors', brace ? 'border-neo-orange shadow-[3px_3px_0_var(--neo-orange)]' : 'border-black shadow-[3px_3px_0_#000]', !reduce && brace && 'animate-pulse')}
         role="meter" aria-label={t('adventurePlay.combat.yourHp')} aria-valuemin={0} aria-valuemax={combat.maxHp} aria-valuenow={combat.hp}>
         {hearts.map((h, i) => {
           const shattering = broken && i >= broken.from && i < broken.to;

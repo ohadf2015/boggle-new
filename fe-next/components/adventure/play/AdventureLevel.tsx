@@ -13,7 +13,7 @@ import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { getWorldConfig } from '@/lib/adventure/worldConfig';
-import { worldSkinId } from '@/lib/adventure/play/worldSkins';
+import { worldSkinOverride } from '@/lib/adventure/play/worldSkins';
 import type { AdventureAchievementId } from '@/utils/adventureAchievementUtils';
 import { useAdventureRun } from './useAdventureRun';
 import { useWordChecker } from './useWordChecker';
@@ -58,6 +58,7 @@ export const worldBackdrop = (world: number) => `/images/adventure/play/world-${
 
 // Module-level constant for empty hint array — never changes identity.
 const NO_HINT_CELLS: Cell[] = [];
+const NO_SKINS: ReadonlySet<number> = new Set();
 
 interface Props {
   world: number;
@@ -76,9 +77,11 @@ interface Props {
   otherPerfectLevels: number;
   /** Roguelike entry: open on the act map and let the player choose the node. */
   mapFirst?: boolean;
+  /** Worlds whose boss trophy is owned: only those show their tile skin. */
+  ownedSkins?: ReadonlySet<number>;
 }
 
-export default function AdventureLevel({ world, level, hasNext, onExit, onNext, onRestartRun, onSaved, onEquipSkin, earnAchievement, totalBossesBeaten, otherPerfectLevels, mapFirst }: Props) {
+export default function AdventureLevel({ world, level, hasNext, onExit, onNext, onRestartRun, onSaved, onEquipSkin, earnAchievement, totalBossesBeaten, otherPerfectLevels, mapFirst, ownedSkins = NO_SKINS }: Props) {
   const { t, language } = useLanguageSafe();
   const sfx = useSoundEffects();
   const isWord = useWordChecker(language);
@@ -224,14 +227,14 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
         onWordSubmit={onWordSubmit}
         onPathSubmit={onPathSubmit}
         language={language}
-        tileSkinOverride={worldSkinId(world)}
+        tileSkinOverride={worldSkinOverride(world, ownedSkins)}
         frozenTiles={run.frozen}
         cellFilter={frozenFilter}
         submitFeedback={feedback}
         comboLevel={run.combo}
       />
     ),
-    [run.grid, run.phase, onWordSubmit, onPathSubmit, language, world, run.frozen, frozenFilter, feedback, run.combo],
+    [run.grid, run.phase, onWordSubmit, onPathSubmit, language, world, ownedSkins, run.frozen, frozenFilter, feedback, run.combo],
   );
   // Hunt + chain goals live in the VariantPanel (tray / big letter) below the HUD.
   // Hunt: the foe cannot read K.O. before the hidden words are found (that is the real win).

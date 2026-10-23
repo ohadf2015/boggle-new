@@ -187,7 +187,7 @@ export default function TreasureScreen({ offers, taken, relic, gold, run, world,
             opacity is driven by the rAF loop paints black when that loop is
             starved — popupRevealGuard enforces this. */}
         {confirm != null && (
-          <div className="fixed inset-0 z-30 grid place-items-center bg-black/75 p-5 animate-in fade-in duration-200"
+          <div className="fixed inset-0 z-30 grid place-items-center overflow-y-auto bg-black/75 p-5 animate-in fade-in duration-200"
             onClick={() => setConfirm(null)}>
             <m.div role="dialog" aria-modal="true" data-testid="treasure-confirm"
               initial={reduce ? false : { scale: 0.85, y: 20 }} animate={{ scale: 1, y: 0 }} exit={reduce ? undefined : { scale: 0.9, opacity: 0 }}

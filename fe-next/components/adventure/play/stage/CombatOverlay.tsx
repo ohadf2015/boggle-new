@@ -17,6 +17,7 @@ import type { CombatState } from '@/lib/adventure/play/combat';
 import type { RelicId } from '@/lib/adventure/play/relics';
 import { cn } from '@/lib/utils';
 import { enemyArt, ruleKey } from './combatView';
+import { finaleTiming } from '../arena/arenaBeats';
 import KillBanner from './KillBanner';
 import DefeatBeat from './DefeatBeat';
 
@@ -25,8 +26,6 @@ type Moment = { kind: 'intro' | 'phase' | 'victory' | 'death'; id: number };
 // The finale components end themselves (tap or their own timer).
 const DURATION: Record<Moment['kind'], number> = { intro: 2600, phase: 1700, victory: 20_000, death: 20_000 };
 const FINALE_DELAY_MS = 550;
-/** The kill banner waits for the word-cast K.O. beat (WordCast, ≤1.2s) to land first. */
-const KILL_DELAY_MS = 1150;
 
 interface Props {
   world: number;
@@ -79,9 +78,9 @@ export default function CombatOverlay({ world, isBoss, combat, hurtPulse, phaseP
   useEffect(() => {
     if (!combat.defeated && !combat.dead) return;
     const next: Moment = combat.defeated ? { kind: 'victory', id: 1000 } : { kind: 'death', id: 2000 };
-    const id = setTimeout(() => setMoment(next), combat.defeated ? KILL_DELAY_MS : FINALE_DELAY_MS);
+    const id = setTimeout(() => setMoment(next), combat.defeated ? finaleTiming(combat.kill?.word ?? '', isBoss).bannerAtMs : FINALE_DELAY_MS);
     return () => clearTimeout(id);
-  }, [combat.defeated, combat.dead]);
+  }, [combat.defeated, combat.dead, combat.kill, isBoss]);
   useEffect(() => {
     if (!moment) return;
     const id = setTimeout(() => setMoment((m) => (m?.id === moment.id ? null : m)), DURATION[moment.kind]);

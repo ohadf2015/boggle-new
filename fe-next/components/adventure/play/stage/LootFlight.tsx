@@ -31,6 +31,8 @@ interface Props {
   from: Pt | null;
   gold: number;
   relic: RelicId | null;
+  /** How long the shower has before the kill banner covers it. */
+  windowMs?: number;
   onDone?: () => void;
 }
 
@@ -53,14 +55,14 @@ function target(kind: LootPiece['kind']): Pt {
   return { x: window.innerWidth - 40, y: 120 };
 }
 
-export default function LootFlight({ from, gold, relic, onDone }: Props) {
+export default function LootFlight({ from, gold, relic, windowMs = LOOT_WINDOW_MS, onDone }: Props) {
   const reduce = useReducedMotion();
   const [pieces, setPieces] = useState<Array<LootPiece & { to: Pt; id: number }> | null>(null);
 
   useEffect(() => {
     if (!from || reduce) { setPieces(null); return; }
-    setPieces(lootBurst(gold, !!relic).map((p, i) => ({ ...p, id: i, to: target(p.kind) })));
-    const id = setTimeout(() => { setPieces(null); onDone?.(); }, LOOT_WINDOW_MS + 120);
+    setPieces(lootBurst(gold, !!relic, windowMs).map((p, i) => ({ ...p, id: i, to: target(p.kind) })));
+    const id = setTimeout(() => { setPieces(null); onDone?.(); }, windowMs + 120);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one payout per corpse
   }, [from?.x, from?.y, reduce]);

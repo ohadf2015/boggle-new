@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { braceCost, nextBracePrice } from '@/lib/wordTowerV2/estate';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
@@ -113,16 +113,21 @@ export function useBrace({ brace, freeBraces, district, runCoins, floors, risk, 
     [rescue, onReject, brace, endRescue],
   );
 
-  return {
-    offered: !over && floors >= 2 && risk >= OFFER_RISK,
-    price,
-    affordable,
-    spent,
-    buy,
-    rescue,
-    rescuesLeft: MAX_RESCUES - rescuesUsed,
-    startRescue,
-    submitRescue,
-    cancelRescue: endRescue,
-  };
+  const offered = !over && floors >= 2 && risk >= OFFER_RISK;
+  const rescuesLeft = MAX_RESCUES - rescuesUsed;
+  return useMemo(
+    () => ({
+      offered,
+      price,
+      affordable,
+      spent,
+      buy,
+      rescue,
+      rescuesLeft,
+      startRescue,
+      submitRescue,
+      cancelRescue: endRescue,
+    }),
+    [offered, price, affordable, spent, buy, rescue, rescuesLeft, startRescue, submitRescue, endRescue],
+  );
 }

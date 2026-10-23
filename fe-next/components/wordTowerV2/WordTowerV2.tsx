@@ -592,6 +592,15 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
    * New run. The daily tower comes back as the day's checkpoint (a collapse
    * only costs today's growth); the free tower starts from an empty lot.
    */
+  const backspace = useCallback(() => setSelected((s) => s.slice(0, -1)), []);
+  const clearWord = useCallback(() => setSelected([]), []);
+  const showBrace = phase !== 'over' && !smashing && !district;
+  const stabilitySlot = useMemo(
+    () =>
+      showBrace ? <StabilityBrace t={t} risk={game.risk} api={braceApi} reducedMotion={reducedMotion} /> : undefined,
+    [showBrace, t, game.risk, braceApi, reducedMotion],
+  );
+
   const restartRun = useCallback(() => {
     preSubmitRef.current = null;
     undoGuardRef.current = null;
@@ -741,24 +750,15 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         accentHex={accentHex}
         reducedMotion={reducedMotion}
         canPutBack={!!preSubmitRef.current}
-        stabilitySlot={
-          phase !== 'over' && !smashing && !district ? (
-            <StabilityBrace
-              t={t}
-              risk={game.risk}
-              api={braceApi}
-              reducedMotion={reducedMotion}
-            />
-          ) : undefined
-        }
+        stabilitySlot={stabilitySlot}
         onScramble={scramble}
         onSelectTile={selectTile}
         onDeselectTile={deselectTile}
         onSubmit={submit}
         onDrop={dropFloor}
         onPutBack={putBack}
-        onBackspace={() => setSelected((s) => s.slice(0, -1))}
-        onClearWord={() => setSelected([])}
+        onBackspace={backspace}
+        onClearWord={clearWord}
       />
 
       {((showOver && rewardsFlow.resultsReady) || forceResults) && !resultsDismissed ? (

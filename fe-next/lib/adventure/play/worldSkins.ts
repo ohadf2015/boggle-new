@@ -14,3 +14,7 @@ export function unlockedWorldSkins(inventoryItemIds: string[]): Set<number> {
   const ids = new Set(inventoryItemIds);
   return new Set(WORLD_SKIN_WORLDS.filter((w) => ids.has(WORLD_SKIN_ITEM(w))));
 }
+
+/** The world's skin is a reward: without its boss trophy the player's own tile skin shows. */
+export const worldSkinOverride = (world: number, unlocked: ReadonlySet<number>) =>
+  unlocked.has(world) ? worldSkinId(world) : undefined;

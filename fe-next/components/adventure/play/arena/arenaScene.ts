@@ -13,6 +13,8 @@ export const LIME = 0xbfff00;
 export const PINK = 0xff3366;
 export const CYAN = 0x22d3ee;
 export const YELLOW = 0xffd60a;
+export const ORANGE = 0xff6b35;
+const INDIGO = 0x3b5bdb;
 
 /** One fighter: body, a hard black offset twin (the neo-brutalist pixel shadow),
  *  a white twin for the hit flash, and the contact shadow it casts. */
@@ -237,4 +239,14 @@ export function stepMissile(m: Missile, frameMs: number): boolean {
   m.view.rotation = (m.to.x >= m.from.x ? 1 : -1) * (-0.18 + p * 0.34);
   m.view.alpha = p > 0.92 ? Math.max(0, (1 - p) / 0.08) : 1;
   return m.ageMs < m.lifeMs;
+}
+
+const AURA_COLOR = [INDIGO, ORANGE, PINK] as const;
+
+/** The glow behind the foe: stacked discs read as a soft falloff with no blur filter. */
+export function paintAura(g: Graphics, cx: number, cy: number, r: number, phase: 0 | 1 | 2) {
+  g.clear();
+  const color = AURA_COLOR[phase];
+  const strength = 0.1 + phase * 0.05;
+  for (let i = 4; i >= 1; i--) g.circle(cx, cy, (r * i) / 4).fill({ color, alpha: strength });
 }

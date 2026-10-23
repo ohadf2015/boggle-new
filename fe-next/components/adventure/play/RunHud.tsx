@@ -22,13 +22,15 @@
  * where the grid can least afford it.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Heart, Shield, Volume2, VolumeX } from 'lucide-react';
+import { Clock, Coins, Heart, Shield, Volume2, VolumeX } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { useMasterMute } from '@/hooks/useMasterMute';
 import type { CombatEvent, CombatState } from '@/lib/adventure/play/combat';
 import { POTION_IDS, type PotionId, type RelicId } from '@/lib/adventure/play/relics';
 import type { LevelKind } from '@/lib/adventure/play/levels';
+import { runBuffs } from '@/lib/adventure/play/runBuffs';
+import { relicDescKey } from './nodes/nodeText';
 import { relicContributions } from '@/lib/adventure/play/relicStack';
 import type { HitEvent } from './events';
 import { runLevels } from './run/offerValue';
@@ -187,6 +189,7 @@ export default function RunHud({
     [prior, words, kind, seconds, relics],
   );
 
+  const buffs = useMemo(() => runBuffs(relics), [relics]);
   const showControls = combatControls && !!combat;
   // Only what can be used right now: a potion you do not hold is not a button.
   const held = POTION_IDS.filter((id) => (potionsLeft[id] ?? 0) > 0);
@@ -236,6 +239,20 @@ export default function RunHud({
       )}
       <RunHudMute />
     </div>
+    {buffs.length > 0 && (
+      <div className="flex items-center justify-center gap-1.5" data-testid="run-hud-buffs">
+        {buffs.map((b) => {
+          const Icon = b.kind === 'time' ? Clock : Coins;
+          const desc = t(relicDescKey(b.id));
+          return (
+            <span key={b.id} title={desc} aria-label={desc} data-buff={b.kind}
+              className="inline-flex items-center gap-1 rounded-full border-2 border-black bg-black/60 px-2 py-0.5 text-[11px] font-bold tabular-nums text-neo-yellow shadow-[2px_2px_0_#000]">
+              <Icon className="h-3 w-3" aria-hidden />{b.text}
+            </span>
+          );
+        })}
+      </div>
+    )}
     {goal && <div className="text-xs font-bold opacity-90 text-center">{goal}</div>}
     </div>
   );

@@ -19,19 +19,25 @@ import { useEffect, useRef } from 'react';
 import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
 import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
 import { arenaLayout, type ArenaLayout } from './arenaLayout';
-import { castImpactMs, hitStopMs, knockPx, missileFontSize } from './arenaBeats';
+import { castImpactMs, deathBeats, hitStopMs, knockPx, missileFontSize } from './arenaBeats';
+import { pickFoeFrame, type FoeFrame } from './arenaFoeArt';
 import type { ArenaCommand } from './arenaCommands';
-import { CYAN, LIME, PINK, YELLOW, createFloat, createRig, createRing, createWordMissile, fitRig, paintFloor, stepFloat, stepMissile, stepRing, type Float, type Missile, type Rig, type Ring } from './arenaScene';
+import { CYAN, LIME, PINK, YELLOW, createFloat, paintAura, createRig, createRing, createWordMissile, fitRig, paintFloor, stepFloat, stepMissile, stepRing, type Float, type Missile, type Rig, type Ring } from './arenaScene';
 import { FOE_DEBRIS, HERO_SPARK, LETTER_SPARK, LOOT_POP } from './arenaParticles';
 
 export interface ArenaSprites {
   hero: string;
   foeIdle: string;
   foeHurt: string;
+  /** Optional frames, loaded after the first paint. */
+  foeAttack?: string;
+  foeEnraged?: string;
 }
 
 export interface ArenaFacts {
   enraged: boolean;
+  /** The foe's phase: 0 fresh, 1 below 66%, 2 below 33%. */
+  phase: 0 | 1 | 2;
   defeated: boolean;
   /** The wind-up in flight: ms left, or null. */
   windupLeftMs: number | null;
@@ -51,6 +57,8 @@ interface Props {
   /** Death: the corpse's viewport position, so the DOM can fly loot out of it. */
   onDeath?: (at: { x: number; y: number }) => void;
   className?: string;
+  /** A boss fills more of the stage and dies in a longer set piece. */
+  boss?: boolean;
 }
 
 /** ms from a lunge starting to the blow connecting on the hero. */
@@ -58,10 +66,10 @@ const LUNGE_CONNECT_MS = 190;
 /** Commands already drained are dead weight; keep only a short tail. */
 const QUEUE_MAX = 48;
 
-export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel, onLayout, onDeath, className }: Props) {
+export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel, onLayout, onDeath, className, boss = false }: Props) {
   const hostRef = useRef<HTMLDivElement | null>(null);
-  const propsRef = useRef({ sprites, rtl, queue, getFacts, blockLabel, onLayout, onDeath });
-  propsRef.current = { sprites, rtl, queue, getFacts, blockLabel, onLayout, onDeath };
+  const propsRef = useRef({ sprites, rtl, queue, getFacts, blockLabel, onLayout, onDeath, boss });
+  propsRef.current = { sprites, rtl, queue, getFacts, blockLabel, onLayout, onDeath, boss };
 
   useEffect(() => {
     const host = hostRef.current;
@@ -118,17 +126,26 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
         return;
       }
       if (disposed) { created.destroy(true); return; }
+      const extra: Partial<Record<'attack' | 'enraged', Texture>> = {};
+      for (const k of ['attack', 'enraged'] as const) {
+        const url = k === 'attack' ? art.foeAttack : art.foeEnraged;
+        if (!url) continue;
+        Assets.load<Texture>(url).then((tex) => {
+          if (!disposed && tex.width === foeIdleTex.width) extra[k] = tex;
+        }).catch((err) => console.warn('[arena] optional foe frame failed, keeping idle', url, err));
+      }
       app = created;
       host.appendChild(created.canvas);
 
       const scene = new Container();
       const floor = new Graphics();
+      const aura = new Graphics();
       const bodies = new Container();
       const fxLayer = new Container();
       const orb = new Graphics();
       const vignette = new Graphics();
       created.stage.addChild(scene);
-      scene.addChild(floor, bodies, orb, fxLayer, vignette);
+      scene.addChild(floor, aura, bodies, orb, fxLayer, vignette);
 
       const hero = createRig(heroTex, rtl);
       const foe = createRig(foeIdleTex, !rtl);
@@ -145,6 +162,8 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
       let windupTotalMs = 1;
       let flashAlpha = 0;
       let flashColor = 0xffffff;
+      let auraKey = '';
+      let lastImpactAt = 0;
       // Start from the tail of the queue, not -1. The canvas is keyed on the foe
       // and remounts for a new fight, but `queueRef` lives in ArenaStage and does
       // not — so anything already queued belongs to the fight this canvas just
@@ -184,15 +203,20 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
         const q = propsRef.current.queue;
         // Append-only from React's side; bounded here so a long fight can't grow it.
         if (q.length > QUEUE_MAX) q.splice(0, q.length - QUEUE_MAX);
-        for (const cmd of q) {
-          if (cmd.id <= seen) continue;
-          seen = cmd.id;
+        // Casts first: a kill's `death` is queued before its killing word, and the
+        // word must be in the air before anything decides when the foe falls.
+        const fresh = q.filter((c) => c.id > seen).sort((a, b) => Number(b.kind === 'cast') - Number(a.kind === 'cast'));
+        if (!fresh.length) return;
+        seen = Math.max(...fresh.map((c) => c.id));
+        const afterCast = () => Math.max(0, lastImpactAt - performance.now());
+        for (const cmd of fresh) {
           const hitPt = { x: foe.root.x, y: layout.foe.y + layout.foe.h * 0.45 };
           if (cmd.kind === 'cast') {
             // The DOM board throws the traced letters at `[data-adv-hit-target]`,
             // which sits on the foe's chest. We take the punch on the same frame
             // they arrive, so one word reads as exactly one hit.
             const flightMs = castImpactMs(cmd.word, false);
+            lastImpactAt = performance.now() + flightMs;
             if (foe.pose !== 'dead') {
               // …and the word itself crosses the stage to get there. The DOM's own
               // bolts are 90ms — five frames — so without this the letters only
@@ -222,6 +246,15 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
               particles.burst(LETTER_SPARK, at.x, at.y, 12 + Math.round(cmd.power * 16));
               addRing(createRing(at.x, at.y, layout.h * 0.06, layout.h * (0.22 + cmd.power * 0.2), LIME));
               land(foe, cmd.power, LIME, layout.facing);
+              if (cmd.crit) {
+                // The finisher: a second shockwave, a gold burst and a longer freeze.
+                hitStopLeft += 110;
+                flashColor = YELLOW;
+                flashAlpha = Math.max(flashAlpha, 0.4);
+                shake.shake({ intensity: 26, duration: 0.4, decay: 'exponential' });
+                particles.burst(LOOT_POP, at.x, at.y, 14);
+                addRing(createRing(at.x, at.y, layout.h * 0.1, layout.h * 0.5, YELLOW, 460));
+              }
             }, flightMs);
           } else if (cmd.kind === 'windup') {
             foe.pose = 'windup';
@@ -263,21 +296,36 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
             particles.burst(LETTER_SPARK, layout.foeHand.x, layout.foeHand.y, 18);
             addRing(createRing(layout.foeHand.x, layout.foeHand.y, layout.h * 0.04, layout.h * 0.24, LIME));
           } else if (cmd.kind === 'phase') {
-            flashAlpha = 0.45;
-            flashColor = PINK;
-            shake.shake({ intensity: 16, duration: 0.5, decay: 'exponential' });
-            particles.burst(FOE_DEBRIS, hitPt.x, hitPt.y, 26);
+            later(() => {
+              if (foe.pose === 'dead') return;
+              hitStopLeft = Math.max(hitStopLeft, 170);
+              flashAlpha = 0.45;
+              flashColor = PINK;
+              shake.shake({ intensity: 16, duration: 0.5, decay: 'exponential' });
+              particles.burst(FOE_DEBRIS, hitPt.x, hitPt.y, 26);
+              addRing(createRing(hitPt.x, hitPt.y, layout.h * 0.08, layout.h * 0.6, PINK, 560));
+              // The roar: rear up in the attack frame while the new phase sinks in.
+              foe.pose = 'windup';
+              foe.poseLeftMs = 700;
+            }, afterCast());
           } else if (cmd.kind === 'heal') {
             particles.burst(LOOT_POP, hero.root.x, layout.hero.y + layout.hero.h * 0.4, 16);
           } else if (cmd.kind === 'death') {
-            foe.pose = 'dead';
-            foe.poseLeftMs = 1e9;
-            particles.burst(FOE_DEBRIS, hitPt.x, hitPt.y, 34);
-            particles.burst(LOOT_POP, hitPt.x, hitPt.y, 22);
-            shake.shake({ intensity: 22, duration: 0.6, decay: 'exponential' });
-            flashAlpha = 0.5;
-            flashColor = YELLOW;
-            propsRef.current.onDeath?.(toViewport(hitPt.x, hitPt.y));
+            // Wait for the killing word to land, then play the set piece.
+            deathBeats(propsRef.current.boss).forEach((beat, i) => later(() => {
+              if (i === 0) {
+                foe.pose = 'dead';
+                foe.poseLeftMs = 1e9;
+                particles.burst(LOOT_POP, hitPt.x, hitPt.y, 22);
+                propsRef.current.onDeath?.(toViewport(hitPt.x, hitPt.y));
+              }
+              hitStopLeft = Math.max(hitStopLeft, beat.freezeMs);
+              particles.burst(FOE_DEBRIS, hitPt.x, hitPt.y, beat.debris);
+              shake.shake({ intensity: beat.shake, duration: 0.6, decay: 'exponential' });
+              flashAlpha = Math.max(flashAlpha, beat.flash);
+              flashColor = i === 1 ? PINK : YELLOW;
+              if (i > 0) addRing(createRing(hitPt.x, hitPt.y, layout.h * 0.06, layout.h * (0.4 + i * 0.12), flashColor, 480));
+            }, afterCast() + beat.atMs));
           }
         }
       };
@@ -330,7 +378,8 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
         const key = `${Math.round(w)}x${Math.round(h)}|${rtl}`;
         if (key !== layoutKey) {
           layoutKey = key;
-          layout = arenaLayout(Math.max(1, w), Math.max(1, h), rtl);
+          layout = arenaLayout(Math.max(1, w), Math.max(1, h), rtl, propsRef.current.boss);
+          auraKey = '';
           paintFloor(floor, layout);
           fitRig(hero, layout.hero, layout.groundY);
           fitRig(foe, layout.foe, layout.groundY);
@@ -372,10 +421,11 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
           rig.knockV *= 0.86;
           if (rig.pose !== 'lunge') rig.knock *= 0.88;
         }
-        foe.body.texture = foe.pose === 'hurt' || foe.pose === 'dead' ? foeHurtTex : foeIdleTex;
+        const frame: FoeFrame = pickFoeFrame(foe.pose, facts.phase, { attack: !!extra.attack, enraged: !!extra.enraged });
+        foe.body.texture = frame === 'hurt' ? foeHurtTex : frame === 'attack' ? extra.attack! : frame === 'enraged' ? extra.enraged! : foeIdleTex;
         foe.flash.texture = foe.body.texture;
         foe.drop.texture = foe.body.texture;
-        foe.body.tint = facts.enraged && foe.pose !== 'dead' ? 0xffd9e3 : 0xffffff;
+        foe.body.tint = facts.enraged && frame === 'idle' ? 0xffd9e3 : 0xffffff;
 
         poseTransform(hero, layout.facing, dt);
         poseTransform(foe, -layout.facing as 1 | -1, dt);
@@ -383,6 +433,16 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
         foe.root.x = layout.foe.x + layout.foe.w / 2 + foe.knock;
         hero.root.y = layout.groundY;
         foe.root.y = layout.groundY;
+
+        // A glow under the foe that heats up with each phase. Painted when the
+        // phase or the stage changes, only faded here — no per-frame rebuild.
+        const nextAuraKey = `${layout.w}x${layout.h}|${facts.phase}`;
+        if (nextAuraKey !== auraKey) {
+          auraKey = nextAuraKey;
+          paintAura(aura, layout.foe.x + layout.foe.w / 2, layout.groundY - layout.foe.h * 0.45, layout.foe.h * 0.62, facts.phase);
+        }
+        aura.x = foe.knock;
+        aura.alpha = foe.pose === 'dead' ? 0 : 0.55 + 0.45 * Math.sin(foe.t * (2.4 + facts.phase * 1.6));
 
         // Shockwaves and travelling bolts. Driven by `rawMs`, not `frameMs`, so
         // an inbound shot keeps crossing while a hit-stop freezes the fighters.

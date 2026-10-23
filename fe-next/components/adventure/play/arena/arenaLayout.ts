@@ -61,11 +61,16 @@ const HERO_W = 0.42;
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
-export function arenaLayout(w: number, h: number, rtl = false): ArenaLayout {
+/** A boss fills more of the stage; the hero steps back a little to make room. */
+const BOSS_FOE_H = 0.76;
+const BOSS_FOE_W = 0.6;
+const BOSS_HERO_H = 0.46;
+
+export function arenaLayout(w: number, h: number, rtl = false, boss = false): ArenaLayout {
   const groundY = Math.round(h * GROUND);
-  const foeH = Math.round(h * FOE_H);
-  const heroH = Math.round(h * HERO_H);
-  const foeW = Math.round(Math.min(w * FOE_W, foeH * 1.15));
+  const foeH = Math.round(h * (boss ? BOSS_FOE_H : FOE_H));
+  const heroH = Math.round(h * (boss ? BOSS_HERO_H : HERO_H));
+  const foeW = Math.round(Math.min(w * (boss ? BOSS_FOE_W : FOE_W), foeH * 1.15));
   const heroW = Math.round(Math.min(w * HERO_W, heroH * 1.05));
 
   // Centres, measured left-to-right, then mirrored for RTL.

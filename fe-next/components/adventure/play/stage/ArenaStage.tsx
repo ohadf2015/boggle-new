@@ -31,18 +31,18 @@ import type { RelicId } from '@/lib/adventure/play/relics';
 import { cn } from '@/lib/utils';
 import { ThreatPlate } from './IntentDial';
 import { PLAYER_STATUS } from './PlayerBar';
-import { enemyArt, hpSegments } from './combatView';
+import { enemyArt } from './combatView';
+import BossHpBar from './BossHpBar';
 import type { CombatJuice } from './useCombatJuice';
 import type { ArenaLayout } from '../arena/arenaLayout';
 import { commandsFromFeed, effectColor, type ArenaCommand, type FxEntry } from '../arena/arenaCommands';
-import { wordPower } from '../arena/arenaBeats';
+import { finaleTiming, isFinisher, wordPower } from '../arena/arenaBeats';
 import type { HitEvent } from '../events';
 
 const LootFlight = dynamic(() => import('./LootFlight'), { ssr: false });
 
 const ArenaCanvas = dynamic(() => import('../arena/ArenaCanvas'), { ssr: false });
 
-const SEGMENTS = 10;
 const HERO_ART = '/images/adventure/play/hero-idle.webp';
 const STATUS_STYLE: Record<string, string> = {
   interrupt: 'bg-neo-lime text-black', phase: 'bg-neo-pink text-black',
@@ -80,6 +80,18 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
   const castRef = useRef<number | null>(lastHit?.id ?? null);
   const fxSeenRef = useRef(0);
 
+  // A landed word: the traced letters become a volley into the foe. Declared
+  // BEFORE the fx feed so a killing word is queued ahead of its own death.
+  useEffect(() => {
+    if (!lastHit || lastHit.result !== 'ok' || castRef.current === lastHit.id) return;
+    castRef.current = lastHit.id;
+    queueRef.current.push({
+      kind: 'cast', id: ++seqRef.current, word: lastHit.word,
+      power: wordPower(Array.from(lastHit.word).length),
+      crit: isFinisher(lastHit.word, lastHit.pts),
+    });
+  }, [lastHit]);
+
   // --- Combat fx → arena commands (append-only; the canvas drains).
   // The RAW feed, not `juice.status`: the banner keeps one StatusId per step and
   // 'projectile' is not one, so a fireball used to reach the stage as silence.
@@ -93,16 +105,6 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
     for (const cmd of cmds) queueRef.current.push({ ...cmd, id: ++seqRef.current });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- hearts/gold are read at feed time, never a trigger
   }, [fxFeed]);
-
-  // A landed word: the traced letters become a volley into the foe.
-  useEffect(() => {
-    if (!lastHit || lastHit.result !== 'ok' || castRef.current === lastHit.id) return;
-    castRef.current = lastHit.id;
-    queueRef.current.push({
-      kind: 'cast', id: ++seqRef.current, word: lastHit.word,
-      power: wordPower(Array.from(lastHit.word).length),
-    });
-  }, [lastHit]);
 
   // The wind-up: charged in the foe's hand for as long as the telegraph runs.
   const teleKey = combat.telegraph?.startedAt ?? null;
@@ -120,6 +122,7 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
     const tele = combat.telegraph;
     return {
       enraged: combat.phase === 2,
+      phase: combat.phase,
       defeated: combat.defeated,
       windupLeftMs: tele ? Math.max(0, tele.endsAt - combat.now) : null,
       windupColor: tele ? effectColor(tele.attack.effect) : 0xffffff,
@@ -134,9 +137,12 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
     hero: HERO_ART,
     foeIdle: enemyArt(world, isBoss, 'idle'),
     foeHurt: enemyArt(world, isBoss, 'hurt'),
+    foeAttack: enemyArt(world, isBoss, 'attack'),
+    ...(isBoss ? { foeEnraged: enemyArt(world, true, 'enraged') } : {}),
   }), [world, isBoss]);
 
-  const segs = hpSegments(combat.enemyHp, combat.enemyMaxHp, SEGMENTS);
+  const killWord = combat.kill?.word ?? lastHit?.word ?? '';
+  const lootWindowMs = finaleTiming(killWord, isBoss).lootWindowMs;
   const enraged = combat.phase === 2;
   // The DOM stamp still reads the collapsed banner — one word per beat is right
   // for a stamp. Only the canvas needs the full feed.
@@ -155,7 +161,7 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
   };
 
   return (
-    <div className="relative w-full h-[11rem]" data-testid="enemy-stage">
+    <div className={cn('relative w-full', isBoss ? 'h-[clamp(12rem,27dvh,14rem)]' : 'h-[11.5rem]')} data-testid="enemy-stage">
       {/* The arena itself. */}
       <div className="absolute inset-0 overflow-hidden rounded-2xl border-[3px] border-black bg-[#0b132f] shadow-[4px_4px_0_#000]">
         <div aria-hidden className={cn('absolute inset-x-0 bottom-0 h-2/3 blur-2xl opacity-60 transition-colors', enraged ? 'bg-neo-pink/40' : 'bg-[#3b5bdb]/30')} />
@@ -165,7 +171,7 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
         {/* Keyed on the foe: elite → boss inside one run must rebuild the
             scene, or the boss would fight wearing the elite's texture. */}
         <ArenaCanvas key={sprites.foeIdle} sprites={sprites} rtl={rtl} queue={queueRef.current}
-          getFacts={readFacts} blockLabel={t('adventurePlay.combat.status.blocked')}
+          getFacts={readFacts} boss={isBoss} blockLabel={t('adventurePlay.combat.status.blocked')}
           onLayout={setLayout} onDeath={setCorpse} className="absolute inset-0" />
       </div>
 
@@ -178,34 +184,24 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
       {heroHit && <span data-hero-anchor aria-hidden className="pointer-events-none absolute w-8 h-8 -ml-4 -mt-4" style={{ left: heroHit.x, top: heroHit.y }} />}
 
       {/* Top band: who you are fighting and how much of it is left. */}
-      <div className="absolute inset-x-0 top-0 flex items-center gap-1.5 rounded-t-2xl border-b-[3px] border-black bg-black/75 px-2 py-1">
-        <span className={cn('inline-flex shrink-0 items-center gap-1 rounded-md border-2 border-black px-1.5 py-px text-[9px] font-black uppercase tracking-wider text-black',
-          isBoss ? 'bg-neo-yellow' : 'bg-neo-cyan')}>
-          {isBoss ? <Crown className="w-2.5 h-2.5" /> : <Swords className="w-2.5 h-2.5" />}
-          {isBoss ? t('adventurePlay.combat.boss') : t('adventurePlay.combat.elite.tag')}
-        </span>
-        <span className="font-neo-display font-bold text-neo-cream text-[13px] leading-tight truncate min-w-0 max-w-[38%]">{name}</span>
-        <div className={cn('relative flex flex-1 min-w-0 gap-[2px] rounded-md border-2 border-black bg-black p-px', enraged && 'shadow-[0_0_0_2px_#ff3366]')}
-          role="progressbar" aria-label={t('adventurePlay.combat.enemyHp')} aria-valuemin={0} aria-valuemax={combat.enemyMaxHp} aria-valuenow={combat.enemyHp}>
-          {segs.map((f, i) => (
-            <div key={i} className="relative h-3 flex-1 rounded-[2px] bg-[#2a1030] overflow-hidden">
-              <div className={cn('absolute inset-y-0 start-0 transition-[width] duration-300', enraged ? 'bg-neo-pink' : 'bg-[#ff4d4d]')} style={{ width: `${f * 100}%` }} />
-            </div>
-          ))}
-          {[33, 66].map((p) => (
-            <span key={p} aria-hidden className="absolute -top-0.5 -bottom-0.5 w-[2px] bg-neo-yellow" style={{ insetInlineStart: `${p}%` }} />
-          ))}
+      <div className="absolute inset-x-0 top-0 flex flex-col gap-1 rounded-t-2xl border-b-[3px] border-black bg-black/75 px-2 pt-1 pb-1.5">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className={cn('inline-flex shrink-0 items-center gap-1 rounded-md border-2 border-black px-1.5 py-px text-[9px] font-black uppercase tracking-wider text-black',
+            isBoss ? 'bg-neo-yellow' : 'bg-neo-cyan')}>
+            {isBoss ? <Crown className="w-2.5 h-2.5" /> : <Swords className="w-2.5 h-2.5" />}
+            {isBoss ? t('adventurePlay.combat.boss') : t('adventurePlay.combat.elite.tag')}
+          </span>
+          <span className="font-neo-display font-bold text-neo-cream text-[13px] leading-tight truncate min-w-0">{name}</span>
         </div>
+        <BossHpBar hp={combat.enemyHp} max={combat.enemyMaxHp} phase={combat.phase} />
       </div>
 
       {/* The incoming hit, directly over the foe — the one thing the player must
           read mid-word. The move-list panel that sat beside it (09-21 declutter)
           restated it; the charge orb in the canvas carries the countdown. */}
       {!combat.defeated && (
-        <div className="pointer-events-none absolute z-20"
-          style={foeBox
-            ? { insetInlineStart: Math.round((rtl ? layout!.w - foeBox.x - foeBox.w : foeBox.x) + foeBox.w * 0.5) - 34, top: 24 }
-            : { insetInlineEnd: 6, top: 24 }}>
+        <div className="pointer-events-none absolute z-20 -translate-x-1/2"
+          style={hand ? { left: Math.max(36, hand.x), top: 54 } : { insetInlineEnd: 6, top: 54 }}>
           <ThreatPlate combat={combat} />
         </div>
       )}
@@ -214,7 +210,7 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
       <AnimatePresence>
         {taunt && !combat.defeated && (
           <m.p key={taunt} initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
-            className="absolute top-8 start-1 z-20 max-w-[11rem] rounded-xl rounded-es-none border-[3px] border-black bg-neo-cream px-2 py-1 text-[11px] font-bold leading-snug text-black line-clamp-3 shadow-[3px_3px_0_#000]">
+            className="absolute top-[3.25rem] start-1 z-20 max-w-[9.5rem] rounded-xl rounded-es-none border-[3px] border-black bg-neo-cream px-2 py-1 text-[10.5px] font-bold leading-snug text-black line-clamp-3 shadow-[3px_3px_0_#000]">
             {t(taunt, { requirement: t('adventurePlay.longerWords') })}
           </m.p>
         )}
@@ -234,7 +230,7 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
         )}
       </AnimatePresence>
 
-      <LootFlight from={corpse} gold={gold} relic={trophy} onDone={() => setCorpse(null)} />
+      <LootFlight from={corpse} gold={gold} relic={trophy} windowMs={lootWindowMs} onDone={() => setCorpse(null)} />
     </div>
   );
 }

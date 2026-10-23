@@ -10,6 +10,7 @@
  * word, one impact frame, never two hits drifting apart.
  */
 import { castTiming } from '../fx/castPath';
+import { hitTier } from '../fx/hitTier';
 
 /** Longest word that still gains power; past it a blow is simply maximal. */
 const POWER_CAP = 9;
@@ -69,15 +70,10 @@ export interface LootPiece {
 const MAX_COINS = 11;
 
 /**
- * How long the payout actually has. `CombatOverlay` slams an OPAQUE full-screen
- * kill banner `KILL_DELAY_MS` (1150ms) after the foe dies, taking the corpse,
- * the gold pill and the relic bar with it — so a coin still in the air at
- * 1151ms flies where nobody can see it.
- *
- * 1050, not 1150: a 20fps capture of a real elite kill put the impact flash at
- * t=0 and the header fully covered by the banner 1.1s later, so the curtain is
- * already closing on the nominal deadline. The margin buys the last coin a
- * frame it is certain to have.
+ * Default payout window when the caller has no kill word to time against; the real
+ * one comes from `finaleTiming`, which keeps the shower inside the gap between the
+ * foe's death and the opaque kill banner (which takes the corpse, gold pill and
+ * relic bar with it). A margin keeps the last coin from flying under the curtain.
  */
 export const LOOT_WINDOW_MS = 1050;
 
@@ -135,4 +131,49 @@ export function missileFontSize(len: number, stageW: number, stageH: number): nu
   const byWidth = (stageW * 0.66) / (n * GLYPH_EM);
   const byHeight = stageH * 0.17;
   return Math.max(MISSILE_MIN, Math.round(Math.min(byWidth, byHeight)));
+}
+
+/** A CRIT-tier word (hitTier's rule) earns the extra-heavy finisher blow. */
+export const isFinisher = (word: string, pts: number): boolean => hitTier(word, pts) === 'crit';
+
+export interface FinaleTiming {
+  /** The foe dies when the killing word lands — never before. */
+  deathAtMs: number;
+  /** The opaque kill banner takes the screen. */
+  bannerAtMs: number;
+  /** How long the loot shower has before the banner covers it. */
+  lootWindowMs: number;
+}
+
+const BOSS_HOLD_MS = 1100;
+const ELITE_MIN_BANNER_MS = 1150;
+const ELITE_HOLD_MS = 650;
+const LOOT_MARGIN_MS = 100;
+
+/** Measured from the moment the killing word is submitted. */
+export function finaleTiming(word: string, boss: boolean): FinaleTiming {
+  const deathAtMs = castImpactMs(word, false);
+  const bannerAtMs = boss ? deathAtMs + BOSS_HOLD_MS : Math.max(ELITE_MIN_BANNER_MS, deathAtMs + ELITE_HOLD_MS);
+  return { deathAtMs, bannerAtMs, lootWindowMs: bannerAtMs - deathAtMs - LOOT_MARGIN_MS };
+}
+
+export interface DeathBeat {
+  /** ms after the death. */
+  atMs: number;
+  /** Debris pieces thrown. */
+  debris: number;
+  shake: number;
+  /** Whole-stage hold on this beat (hit-stop). */
+  freezeMs: number;
+  flash: number;
+}
+
+/** A boss does not just fall: it freezes, then goes off in three staggered blasts. */
+export function deathBeats(boss: boolean): DeathBeat[] {
+  if (!boss) return [{ atMs: 0, debris: 34, shake: 22, freezeMs: 120, flash: 0.5 }];
+  return [
+    { atMs: 0, debris: 30, shake: 24, freezeMs: 360, flash: 0.6 },
+    { atMs: 260, debris: 26, shake: 18, freezeMs: 0, flash: 0.3 },
+    { atMs: 480, debris: 40, shake: 26, freezeMs: 0, flash: 0.55 },
+  ];
 }

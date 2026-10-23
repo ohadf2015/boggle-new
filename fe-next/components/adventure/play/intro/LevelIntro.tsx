@@ -97,13 +97,14 @@ function RuleBeat({ world, level, lvl, onBegin, onExit, floor = null }: Props) {
       </div>
 
       {/* Hero: kind, enemy (combat), and the one sentence. */}
-      <div className="relative flex flex-1 flex-col items-center justify-center gap-4 px-5 text-center">
+      <div data-testid="intro-scroll" className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div className="my-auto flex min-h-full flex-col items-center justify-center gap-4 px-5 py-2 text-center [@media(max-height:700px)]:gap-2">
         <div className="level-kind-banner inline-flex rounded-xl border-[3px] border-black bg-[#1a1a2e] px-3 py-2 shadow-[4px_4px_0_#000]">
           <KindBadge kind={lvl.kind} label={t(`adventurePlay.variety.kind.${lvl.kind}`)} size="lg" />
         </div>
 
         {combat && (
-          <div className="relative h-36 w-full max-w-[300px] overflow-hidden rounded-xl border-[3px] border-black bg-black/50 shadow-[4px_4px_0_#000]">
+          <div className="relative h-36 w-full max-w-[300px] [@media(max-height:700px)]:h-24 overflow-hidden rounded-xl border-[3px] border-black bg-black/50 shadow-[4px_4px_0_#000]">
             {boss && !reduced ? (
               <video src={`/videos/adventure/boss-w${world}.mp4`} poster={`/videos/adventure/boss-w${world}.webp`}
                 autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" aria-hidden />
@@ -136,9 +137,10 @@ function RuleBeat({ world, level, lvl, onBegin, onExit, floor = null }: Props) {
 
         {!combat && <MechanicPreview kind={lvl.kind} big />}
       </div>
+      </div>
 
       {/* Footer: the numbers, small, after the sentence has landed. */}
-      <div className="intro-foot relative px-4 pb-4">
+      <div data-testid="intro-foot" className="intro-foot relative shrink-0 px-4 pb-4">
         <div className="flex items-center gap-2 text-sm font-bold">
           <span className="inline-flex flex-1 items-center gap-1.5 rounded-lg border-[3px] border-black bg-[#1a1a2e] px-2.5 py-1.5">
             {combat ? <Swords className="h-4 w-4 opacity-70" /> : <Target className="h-4 w-4 opacity-70" />}
@@ -153,12 +155,12 @@ function RuleBeat({ world, level, lvl, onBegin, onExit, floor = null }: Props) {
         </div>
         {floor ? <FloorPath step={floor.step} total={floor.total} /> : <WorldPath world={world} level={level} />}
         <button type="button" onClick={onBegin} autoFocus
-          className={cn('mt-4 w-full rounded-xl border-[3px] border-black py-3 font-neo-display text-xl font-bold text-black shadow-[4px_4px_0_#000] active:translate-y-0.5 active:shadow-none',
+          className={cn('mt-4 w-full rounded-xl border-[3px] border-black py-3 [@media(max-height:700px)]:mt-2 font-neo-display text-xl font-bold text-black shadow-[4px_4px_0_#000] active:translate-y-0.5 active:shadow-none',
             combat ? 'bg-neo-pink' : 'bg-neo-lime')}>
           {combat ? t('adventurePlay.fight') : t('adventurePlay.start')}
         </button>
         <button type="button" onClick={onExit}
-          className="mt-3 w-full text-sm font-bold underline underline-offset-4 opacity-80 hover:opacity-100">
+          className="mt-3 w-full text-sm font-bold underline underline-offset-4 [@media(max-height:700px)]:mt-1 opacity-80 hover:opacity-100">
           {t('adventurePlay.backToMap')}
         </button>
       </div>
