@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useState, type ReactNode } from 'react';
 import { m, animate as fmAnimate } from 'framer-motion';
 import { Flame, Sparkles, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -37,6 +37,8 @@ interface ConnectionsDailyResultsProps {
   dateISO: string;
   /** Telemetry hook for the card's share/copy buttons. */
   onShareClick?: (method: 'native' | 'copy') => void;
+  /** Lifetime rank + week strip, rendered between the score and the share card. */
+  progressSlot?: ReactNode;
 }
 
 // Tier calculation based on score
@@ -96,6 +98,7 @@ const ConnectionsDailyResults: React.FC<ConnectionsDailyResultsProps> = ({
   shareText,
   dateISO,
   onShareClick,
+  progressSlot,
 }) => {
   const { t, language } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
@@ -290,6 +293,8 @@ const ConnectionsDailyResults: React.FC<ConnectionsDailyResultsProps> = ({
       )}
         </>
       )}
+
+      {progressSlot}
 
       {/* The shareable artifact — reuses the shared share card the wheel and
           singleplayer results already ship (GameEmojiShareCard over

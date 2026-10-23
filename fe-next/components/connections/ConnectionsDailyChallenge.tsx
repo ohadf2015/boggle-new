@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import Link from 'next/link';
-import { m } from 'framer-motion';
-import { Pyramid as PyramidIcon, Heart, ChevronRight } from 'lucide-react';
+import { Pyramid as PyramidIcon, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -21,7 +20,7 @@ import {
   attemptsLeft,
 } from '@/lib/connections/gameLogic';
 import type { GameState, PuzzleRating } from '@/lib/connections/types';
-import { dailyPuzzleSet, DAILY_ATTEMPTS_PER_PUZZLE } from '@/lib/connections/daily';
+import { dailyPuzzleSet, puzzlesByIds, DAILY_ATTEMPTS_PER_PUZZLE } from '@/lib/connections/daily';
 import {
   todayUTC,
   getGuestFingerprint,
@@ -41,7 +40,9 @@ import {
 import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
 import { saveDailyResult } from '@/lib/connections/dailyResultStore';
 import { useStoredDailyResult } from './useStoredDailyResult';
-import ConnectionsProgressTrack from './ConnectionsProgressTrack';
+import DailyHeader from './DailyHeader';
+import ProgressCard from './ProgressCard';
+import { useBridgeProgress } from './useBridgeProgress';
 import PuzzleCard from './PuzzleCard';
 import ConnectionsDailyResults from './ConnectionsDailyResults';
 
@@ -88,6 +89,8 @@ interface StoredRegularResult {
   outcomes: BridgeOutcome[];
   streak: number;
   rank: number | null;
+  /** The exact puzzles played — pool growth reseeds the daily, so revisits must not recompute. */
+  puzzleIds?: string[];
 }
 
 interface DailyChallengeProps {
@@ -166,7 +169,10 @@ function RestoredDailyResults({
 }) {
   const { t, language } = useLanguage();
   const { user } = useAuth();
-  const [puzzles] = useState(() => dailyPuzzleSet(today, language));
+  const [puzzles] = useState(
+    () => (result.puzzleIds && puzzlesByIds(result.puzzleIds, language)) || dailyPuzzleSet(today, language),
+  );
+  const progressApi = useBridgeProgress();
   const [board, setBoard] = useState<{ loading: boolean; rank: number | null; totalPlayers: number; rows: LeaderboardRow[] }>({
     loading: true,
     rank: result.rank,
@@ -213,6 +219,7 @@ function RestoredDailyResults({
         isLoading={board.loading}
         shareText={buildShareText(t, today, result.outcomes, result.streak, board.rank)}
         dateISO={today}
+        progressSlot={<ProgressCard api={progressApi} todayISO={today} />}
       />
       <PyramidLink />
     </>
@@ -230,6 +237,8 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
     initGameState(dailyPuzzleSet(today, lang), { attemptsPerPuzzle: DAILY_ATTEMPTS_PER_PUZZLE }),
   );
   const total = state.puzzles.length;
+  const progressApi = useBridgeProgress();
+  const { onBridgeSolved, onDayPlayed } = progressApi;
 
   const startRef = useRef<number>(0);
   const solvedRef = useRef<Set<number>>(new Set());
@@ -242,7 +251,7 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
   const submittedRef = useRef(false);
   const [results, setResults] = useState<Results | null>(null);
   // Bumped when a puzzle is solved so the (ref-backed) progress track re-renders.
-  const [solvedVersion, setSolvedVersion] = useState(0);
+  const [, setSolvedVersion] = useState(0);
 
   const isTerminal = state.status === 'finished' || state.status === 'outOfLives';
   const solvedCount = solvedRef.current.size;
@@ -276,6 +285,7 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
         wrongAttempts: wrongByIndexRef.current[idx] ?? 0,
         hintUsed: state.hintRevealed,
       });
+      onBridgeSolved();
       sfx.playMatchFoundSound();
       customHaptic(GAME_HAPTICS.validWord);
     } else if (
@@ -316,7 +326,7 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
     }
     prevStatusRef.current = state.status;
     prevWrongAttemptsRef.current = state.wrongAttempts;
-  }, [state.status, state.currentIndex, state.hintRevealed, state.wrongAttempts, state.puzzles, language, sfx, haptic, customHaptic]);
+  }, [state.status, state.currentIndex, state.hintRevealed, state.wrongAttempts, state.puzzles, language, sfx, haptic, customHaptic, onBridgeSolved]);
 
   // Spoiler-free "story of the chain" — shared by the on-card recap + share text.
   const collectOutcomes = useCallback((): BridgeOutcome[] =>
@@ -341,6 +351,7 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
     // authed and guest players (the streak alone is server-resolved for authed
     // players and never persisted locally). See hasPlayedConnectionsToday.
     markConnectionsPlayedToday(today);
+    onDayPlayed(today);
 
     const timeTakenSeconds = startRef.current ? Math.max(0, Math.floor((Date.now() - startRef.current) / 1000)) : 0;
     const puzzlesSolved = solvedRef.current.size;
@@ -354,6 +365,7 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
         outcomes: finalOutcomes,
         streak,
         rank,
+        puzzleIds: state.puzzles.map((p) => p.id),
       } satisfies StoredRegularResult);
     persist(0, null);
     if (puzzlesSolved > 0) {
@@ -395,7 +407,7 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
         rows: lb?.leaderboard ?? [],
       });
     })();
-  }, [isTerminal, prefersReducedMotion, profile, user, today, language, state.score, total, sfx, t, collectOutcomes]);
+  }, [isTerminal, prefersReducedMotion, profile, user, today, language, state.score, state.puzzles, total, sfx, t, collectOutcomes, onDayPlayed]);
 
   const handleInput = useCallback((value: string) => dispatch({ type: 'SET_INPUT', input: value }), []);
   const handleSubmit = useCallback(() => dispatch({ type: 'SUBMIT' }), []);
@@ -437,6 +449,7 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
           shareText={shareTextFor()}
           dateISO={today}
           onShareClick={handleShareClick}
+          progressSlot={<ProgressCard api={progressApi} todayISO={today} />}
         />
 
         <PyramidLink />
@@ -450,59 +463,17 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-4">
-      <header className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <h1 className="font-neo-display text-lg font-black text-neo-white">{t('connections.daily.title')}</h1>
-          <div className="flex items-center gap-3">
-            {/* Score was invisible until the results screen — surfacing it live
-                turns each solve into a felt reward instead of a silent tally. */}
-            <m.span
-              key={state.score}
-              initial={prefersReducedMotion ? undefined : { scale: 1.35 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-              data-testid="daily-score"
-              aria-label={`${t('connections.daily.scoreLabel')} ${state.score}`}
-              className="font-mono text-sm font-bold text-neo-yellow tabular-nums"
-            >
-              {state.score}
-            </m.span>
-            <span data-testid="daily-progress" className="font-mono text-sm font-bold text-neo-cyan tabular-nums">
-              {state.currentIndex + 1} / {total}
-            </span>
-          </div>
-        </div>
-        {/* Attempts were spent invisibly before — the player only found out the
-            budget existed when the run ended. Show it, per bridge. */}
-        <div
-          data-testid="daily-attempts"
-          data-remaining={remaining}
-          className="flex items-center justify-end gap-1.5"
-          aria-label={t('connections.daily.triesLeft', { count: remaining })}
-        >
-          {remaining === 1 && (
-            <span className="font-neo-body text-[0.7rem] font-bold uppercase tracking-wider text-neo-red">
-              {t('connections.daily.lastTry')}
-            </span>
-          )}
-          {Array.from({ length: DAILY_ATTEMPTS_PER_PUZZLE }, (_, i) => (
-            <Heart
-              key={i}
-              aria-hidden="true"
-              className={`h-4 w-4 transition-colors duration-200 ${
-                i < remaining ? 'fill-neo-red text-neo-red' : 'text-neo-white/25'
-              }`}
-              strokeWidth={2.5}
-            />
-          ))}
-        </div>
-        <ConnectionsProgressTrack
-          key={solvedVersion}
-          total={total}
-          currentIndex={state.currentIndex}
-          solvedIndices={solvedRef.current}
-        />
-      </header>
+      <DailyHeader
+        score={state.score}
+        currentIndex={state.currentIndex}
+        total={total}
+        attemptsLeft={remaining}
+        solvedIndices={solvedRef.current}
+        difficulties={state.puzzles.map((p) => p.difficulty)}
+        standing={progressApi.standing}
+        rankUpId={progressApi.rankUpId}
+        onRankUpShown={progressApi.dismissRankUp}
+      />
       <PuzzleCard
         puzzle={currentPuzzle}
         state={state}

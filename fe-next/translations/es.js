@@ -19614,6 +19614,21 @@ const es = {
     "nextLifeIn": "Próxima vida en {{time}}",
     "revealHint": "Revelar pista",
     "freeHint": "Pista gratis ({count} restantes)",
+    "rank": {
+      "plank": "Aprendiz de tablones",
+      "rope": "Atador de cuerdas",
+      "builder": "Constructor de puentes",
+      "span": "Maestro del vano",
+      "arch": "Arquitecto de arcos",
+      "legend": "Leyenda de los puentes",
+      "toNext": "{count} para {rank}",
+      "top": "Rango máximo",
+      "up": "¡Subes de rango!",
+      "bridges": "{count} puentes construidos"
+    },
+    "week": {
+      "title": "Esta semana"
+    },
     "revealHintAd": "Ver anuncio por pista",
     "revealAnswerAd": "Ver anuncio para revelar respuesta",
     "adminGiveUp": "Saltar puzzle (admin)",

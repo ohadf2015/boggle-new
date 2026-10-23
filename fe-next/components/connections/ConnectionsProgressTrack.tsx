@@ -16,9 +16,17 @@ interface Props {
   currentIndex: number;
   solvedIndices: ReadonlySet<number>;
   finished?: boolean;
+  /** Per-puzzle difficulty — tints upcoming nodes so the run reads as a ramp. */
+  difficulties?: readonly string[];
 }
 
-export default function ConnectionsProgressTrack({ total, currentIndex, solvedIndices, finished = false }: Props) {
+const TODO_TINT: Record<string, string> = {
+  easy: 'border-neo-lime/70 text-neo-lime',
+  medium: 'border-neo-cyan/70 text-neo-cyan',
+  hard: 'border-neo-pink/70 text-neo-pink',
+};
+
+export default function ConnectionsProgressTrack({ total, currentIndex, solvedIndices, finished = false, difficulties }: Props) {
   const nodes = buildProgressNodes(total, currentIndex, solvedIndices);
   const chest = chestState(solvedIndices.size, total, finished);
 
@@ -28,17 +36,15 @@ export default function ConnectionsProgressTrack({ total, currentIndex, solvedIn
         <div key={n.index} className="flex flex-1 items-center gap-1.5">
           <m.div
             initial={false}
-            animate={{
-              scale: n.state === 'current' ? [1, 1.12, 1] : 1,
-            }}
-            transition={n.state === 'current' ? { duration: 1.4, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
+            animate={{ scale: n.state === 'current' ? 1.15 : 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 18 }}
             className={[
-              'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 font-neo-display text-xs font-black',
+              'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 font-neo-display text-xs font-black',
               n.state === 'done'
                 ? 'border-neo-lime bg-neo-lime text-neo-navy'
                 : n.state === 'current'
-                ? 'border-neo-cyan bg-neo-navy text-neo-cyan'
-                : 'border-neo-white/25 bg-neo-navy text-neo-white/40',
+                ? 'border-neo-cyan bg-neo-cyan text-neo-navy shadow-hard-sm'
+                : `bg-neo-navy ${TODO_TINT[difficulties?.[n.index] ?? ''] ?? 'border-neo-cream/40 text-neo-white/60'}`,
             ].join(' ')}
           >
             {n.state === 'done' ? <Check className="h-3.5 w-3.5" strokeWidth={3.5} aria-hidden="true" /> : n.index + 1}

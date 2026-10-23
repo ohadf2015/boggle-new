@@ -17382,6 +17382,21 @@ const en = {
     "nextLifeIn": "Next life in {{time}}",
     "revealHint": "Reveal hint",
     "freeHint": "Free hint ({count} left)",
+    "rank": {
+      "plank": "Plank Picker",
+      "rope": "Rope Tier",
+      "builder": "Bridge Builder",
+      "span": "Span Master",
+      "arch": "Arch Architect",
+      "legend": "Bridge Legend",
+      "toNext": "{count} to {rank}",
+      "top": "Top rank",
+      "up": "Rank up!",
+      "bridges": "{count} bridges built"
+    },
+    "week": {
+      "title": "This week"
+    },
     "revealHintAd": "Watch ad for hint",
     "revealAnswerAd": "Watch ad to reveal answer",
     "adminGiveUp": "Skip puzzle (admin)",

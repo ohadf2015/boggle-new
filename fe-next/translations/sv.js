@@ -2378,6 +2378,21 @@ const sv = {
     "nextLifeIn": "Nästa liv om {{time}}",
     "revealHint": "Visa ledtråd",
     "freeHint": "Gratis ledtråd ({count} kvar)",
+    "rank": {
+      "plank": "Plankläggare",
+      "rope": "Replagare",
+      "builder": "Brobyggare",
+      "span": "Spännmästare",
+      "arch": "Bågarkitekt",
+      "legend": "Brolegend",
+      "toNext": "{count} till {rank}",
+      "top": "Högsta rang",
+      "up": "Ny rang!",
+      "bridges": "{count} broar byggda"
+    },
+    "week": {
+      "title": "Den här veckan"
+    },
     "revealHintAd": "Se annons för ledtråd",
     "revealAnswerAd": "Se annons för att visa svar",
     "adminGiveUp": "Hoppa över (admin)",

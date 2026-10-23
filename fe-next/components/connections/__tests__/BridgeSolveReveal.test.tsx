@@ -54,8 +54,9 @@ describe('BridgeSolveReveal', () => {
       <BridgeSolveReveal puzzle={puzzle} language="en" isCorrect={true} />
     );
     const reveal = container.querySelector('[data-testid="bridge-solve-reveal"]');
-    expect(reveal).toHaveClass('bg-neo-yellow/15');
-    expect(reveal).toHaveClass('border-neo-yellow/40');
+    // Solid yellow border on navy: the translucent /40 border measured under the 3:1 non-text floor.
+    expect(reveal).toHaveClass('border-neo-yellow');
+    expect(reveal!.querySelector('.bg-neo-yellow')).not.toBeNull();
   });
 
   it('applies dir attribute from language context', () => {

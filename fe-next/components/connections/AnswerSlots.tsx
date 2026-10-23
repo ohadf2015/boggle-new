@@ -16,16 +16,16 @@ interface AnswerSlotsProps {
 
 const CELL_STATE: Record<AnswerSlotsProps['state'], { filled: string; empty: string }> = {
   idle: {
-    filled: 'border-neo-purple bg-neo-purple/15 text-neo-white',
-    empty: 'border-neo-white/25 bg-neo-navy text-transparent',
+    filled: 'border-neo-black bg-neo-cream text-neo-navy',
+    empty: 'border-neo-cream/50 bg-neo-navy-light text-transparent',
   },
   correct: {
-    filled: 'border-neo-lime bg-neo-lime/20 text-neo-lime',
-    empty: 'border-neo-lime bg-neo-lime/20 text-neo-lime',
+    filled: 'border-neo-black bg-neo-lime text-neo-navy',
+    empty: 'border-neo-black bg-neo-lime text-neo-navy',
   },
   wrong: {
-    filled: 'border-neo-red bg-neo-red/15 text-neo-red',
-    empty: 'border-neo-red/60 bg-neo-red/10 text-transparent',
+    filled: 'border-neo-black bg-neo-red text-neo-white',
+    empty: 'border-neo-red bg-neo-red/20 text-transparent',
   },
 };
 
@@ -90,6 +90,8 @@ export default function AnswerSlots({ value, slotCount, state, dir, label }: Ans
             animate={
               state === 'correct'
                 ? { scale: [1, 1.18, 1], transition: { delay: i * 0.055, duration: 0.32 } }
+                : state === 'wrong' && filled
+                ? { y: [0, 6, 0], rotate: [0, i % 2 ? -5 : 5, 0], transition: { duration: 0.35 } }
                 : filled
                 ? { scale: [1.22, 1], transition: { duration: 0.12 } }
                 : { scale: 1 }
@@ -99,7 +101,7 @@ export default function AnswerSlots({ value, slotCount, state, dir, label }: Ans
               `flex min-w-0 aspect-[5/6] ${CELL_W} ${CELL_TEXT}`,
               'items-center justify-center rounded-neo border-2 shadow-hard-sm',
               'font-neo-display font-black uppercase leading-none transition-colors duration-150',
-              active ? 'border-neo-cyan bg-neo-cyan/10 text-transparent' : filled ? styles.filled : styles.empty,
+              active ? 'border-neo-cyan bg-neo-navy text-transparent' : filled ? styles.filled : styles.empty,
             ].join(' ')}
           >
             {ch}

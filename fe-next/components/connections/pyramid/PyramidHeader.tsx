@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { Heart } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -12,9 +13,11 @@ interface PyramidHeaderProps {
   metaAnswer: string;
   className?: string;
   testId?: string;
+  /** Lifetime rank badge, shown above the tries on the standalone (non-shell) layout. */
+  rankSlot?: ReactNode;
 }
 
-export default function PyramidHeader({ state, metaAnswer, className, testId }: PyramidHeaderProps) {
+export default function PyramidHeader({ state, metaAnswer, className, testId, rankSlot }: PyramidHeaderProps) {
   const { t } = useLanguage();
   const left = pyramidAttemptsLeft(state);
   return (
@@ -28,6 +31,7 @@ export default function PyramidHeader({ state, metaAnswer, className, testId }: 
       <p className="text-center font-neo-body text-xs text-neo-white/60">
         {state.stage < 3 ? t('connections.pyramid.explainer') : t('connections.pyramid.finalePrompt')}
       </p>
+      {rankSlot}
       {/* Attempts were spent invisibly — the player only learned a budget existed when the run ended. */}
       <div
         data-testid="pyramid-attempts"
@@ -44,7 +48,7 @@ export default function PyramidHeader({ state, metaAnswer, className, testId }: 
           <Heart
             key={i}
             aria-hidden="true"
-            className={`h-4 w-4 transition-colors duration-200 ${i < left ? 'fill-neo-red text-neo-red' : 'text-neo-white/25'}`}
+            className={`h-4 w-4 transition-colors duration-200 ${i < left ? 'fill-neo-red text-neo-red' : 'text-neo-white/30'}`}
             strokeWidth={2.5}
           />
         ))}

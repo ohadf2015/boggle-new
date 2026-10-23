@@ -34,6 +34,9 @@ import { stripEmoji } from '@/lib/share/stripEmoji';
 import type { GameState } from '@/lib/connections/types';
 import PyramidProgress from './PyramidProgress';
 import PyramidHeader from './PyramidHeader';
+import RankBadge from '../RankBadge';
+import ProgressCard from '../ProgressCard';
+import { useBridgeProgress } from '../useBridgeProgress';
 import { PyramidLeftRail, PyramidRightRail } from './PyramidShellRails';
 import { GameShell, SHELL_MEDIA } from '@/components/game/shell';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -149,11 +152,14 @@ function PyramidRun({
     restored ? { ...restored.state, pyramid: p } : initPyramidState(p),
   );
   const [input, setInput] = useState('');
+  const progressApi = useBridgeProgress();
+  const { onBridgeSolved, onDayPlayed } = progressApi;
 
   const startRef = useRef<number>(0);
   const wrongByStageRef = useRef<Record<number, number>>({});
   const outcomesRef = useRef<Map<number, BridgeOutcome>>(new Map(restored?.outcomes ?? []));
   const prevStatusRef = useRef(pyramidState.status);
+  const prevWrongRef = useRef(pyramidState.wrongAttempts);
   const [results, setResults] = useState<{ copied: boolean }>({ copied: false });
 
   const isTerminal = pyramidState.status === 'won' || pyramidState.status === 'lost';
@@ -199,9 +205,10 @@ function PyramidRun({
     if (!isTerminal || dailyStampedRef.current) return;
     dailyStampedRef.current = true;
     markConnectionsPlayedToday(today);
+    onDayPlayed(today);
     streakRef.current = advanceClientStreak(today).streak;
     setClientStreak(streakRef.current);
-  }, [isTerminal, today]);
+  }, [isTerminal, today, onDayPlayed]);
 
   // Tell the host before paint so its in-game chrome never lingers beside the
   // end screen.
@@ -215,6 +222,7 @@ function PyramidRun({
   useEffect(() => {
     const stage = pyramidState.stage;
     if (pyramidState.status === 'correct' && prevStatusRef.current !== 'correct') {
+      onBridgeSolved();
       sfx.playMatchFoundSound();
       customHaptic(GAME_HAPTICS.validWord);
       outcomesRef.current.set(stage, {
@@ -223,7 +231,11 @@ function PyramidRun({
         wrongAttempts: wrongByStageRef.current[stage] ?? 0,
         hintUsed: pyramidState.hintRevealed,
       });
-    } else if (pyramidState.status === 'wrong' && prevStatusRef.current !== 'wrong') {
+    } else if (
+      pyramidState.status === 'wrong' &&
+      // A second miss leaves the status on 'wrong' — the attempt counter is the signal.
+      pyramidState.wrongAttempts !== prevWrongRef.current
+    ) {
       wrongByStageRef.current[stage] = (wrongByStageRef.current[stage] ?? 0) + 1;
       sfx.playErrorSound();
       haptic('error');
@@ -235,6 +247,7 @@ function PyramidRun({
         hintUsed: pyramidState.hintRevealed,
       });
     } else if (pyramidState.status === 'won' && prevStatusRef.current !== 'won') {
+      onBridgeSolved();
       sfx.playVictorySound();
       if (!prefersReducedMotion) fireVictoryConfetti();
       // Beaten pyramids never come back — future days pick from unsolved ones.
@@ -254,7 +267,8 @@ function PyramidRun({
       });
     }
     prevStatusRef.current = pyramidState.status;
-  }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, pyramidState.wrongAttempts, sfx, haptic, customHaptic, prefersReducedMotion, pyramid, language]);
+    prevWrongRef.current = pyramidState.wrongAttempts;
+  }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, pyramidState.wrongAttempts, sfx, haptic, customHaptic, prefersReducedMotion, pyramid, language, onBridgeSolved]);
 
   // Daily host: persist the terminal run (after the outcome effect above has
   // recorded the finale) so a same-day revisit reopens this end screen.
@@ -419,6 +433,8 @@ function PyramidRun({
           </m.button>
         </m.div>
 
+        <ProgressCard api={progressApi} todayISO={today} />
+
         {/* The terminal screen was a dead end. As the day's daily quest, hand off
             to the next daily mode (a link to /connections/daily from here would
             just reload this page); standalone play routes to the daily. */}
@@ -511,7 +527,13 @@ function PyramidRun({
       right={<PyramidRightRail t={t} state={pyramidState} />}
     >
     <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-4 shell:my-auto shell:max-w-[40rem] shell:px-0" data-testid="pyramid-root">
-      {!inShell && <PyramidHeader state={pyramidState} metaAnswer={pyramid.metaAnswer} />}
+      {!inShell && (
+        <PyramidHeader
+          state={pyramidState}
+          metaAnswer={pyramid.metaAnswer}
+          rankSlot={<RankBadge standing={progressApi.standing} rankUpId={progressApi.rankUpId} onRankUpShown={progressApi.dismissRankUp} />}
+        />
+      )}
 
       {pyramidState.stage < 3 ? (
         <>

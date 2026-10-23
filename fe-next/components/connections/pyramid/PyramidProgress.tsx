@@ -14,10 +14,10 @@ interface PyramidProgressProps {
 type SlotState = 'solved' | 'gaveUp' | 'current' | 'locked';
 
 const SLOT_CLASS: Record<SlotState, string> = {
-  solved: 'border-neo-lime bg-neo-lime/20 text-neo-lime',
-  gaveUp: 'border-neo-red bg-neo-red/20 text-neo-red',
-  current: 'border-neo-cyan bg-neo-cyan/10 text-neo-cyan',
-  locked: 'border-neo-white/20 bg-neo-navy-light text-neo-white/40',
+  solved: 'border-neo-black bg-neo-lime text-neo-navy',
+  gaveUp: 'border-neo-black bg-neo-red text-neo-white',
+  current: 'border-neo-cyan bg-neo-navy text-neo-cyan',
+  locked: 'border-neo-cream/40 bg-neo-navy-light text-neo-white/60',
 };
 
 const BEAM_COLOR: Record<SlotState, string> = {
@@ -60,15 +60,15 @@ export default function PyramidProgress({
       {/* Apex — the goal word */}
       <m.div
         data-testid="pyramid-apex"
-        animate={finaleActive && !prefersReducedMotion ? { scale: [1, 1.06, 1] } : undefined}
-        transition={finaleActive && !prefersReducedMotion ? { duration: 1.6, repeat: Infinity, ease: 'easeInOut' } : undefined}
+        animate={finaleActive && !prefersReducedMotion ? { scale: 1.08 } : { scale: 1 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 16 }}
         className={[
           'relative z-10 min-w-24 h-12 px-3 rounded-neo border-neo-thick flex items-center justify-center font-neo-display font-black text-lg shadow-hard',
           won
-            ? 'border-neo-yellow bg-neo-lime/20 text-neo-lime'
+            ? 'border-neo-black bg-neo-yellow text-neo-navy'
             : finaleActive
-              ? 'border-neo-cyan bg-neo-cyan/10 text-neo-cyan'
-              : 'border-neo-purple bg-neo-purple/15 text-neo-purple',
+              ? 'border-neo-cyan bg-neo-navy text-neo-cyan'
+              : 'border-neo-purple bg-neo-navy text-neo-purple-light',
         ].join(' ')}
       >
         {won ? (

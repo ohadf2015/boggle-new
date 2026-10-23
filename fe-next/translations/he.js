@@ -19027,6 +19027,21 @@ const he = {
     "nextLifeIn": "חיים נוספים בעוד {{time}}",
     "revealHint": "הצגת רמז",
     "freeHint": "רמז חינם (נשארו {count})",
+    "rank": {
+      "plank": "מתלמד",
+      "rope": "קושר חבלים",
+      "builder": "בונה גשרים",
+      "span": "מומחה מבנים",
+      "arch": "אדריכל גשרים",
+      "legend": "אגדת הגשרים",
+      "toNext": "{count} עד {rank}",
+      "top": "הדרגה הגבוהה ביותר",
+      "up": "עלית דרגה!",
+      "bridges": "נבנו {count} גשרים"
+    },
+    "week": {
+      "title": "השבוע"
+    },
     "revealHintAd": "צפו בפרסומת לרמז",
     "revealAnswerAd": "צפו בפרסומת לחשיפת התשובה",
     "adminGiveUp": "דילוג על חידה (אדמין)",

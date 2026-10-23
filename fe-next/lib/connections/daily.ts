@@ -29,6 +29,8 @@ const POINTS_BY_DIFFICULTY: Record<ConnectionPuzzle['difficulty'], number> = {
   hard: POINTS_HARD,
 };
 
+const DIFFICULTY_ORDER: Record<ConnectionPuzzle['difficulty'], number> = { easy: 0, medium: 1, hard: 2 };
+
 /** Seeded Fisher-Yates shuffle over a copy of the array (deterministic). */
 function seededShuffle<T>(items: readonly T[], rng: () => number): T[] {
   const out = items.slice();
@@ -91,7 +93,9 @@ export function dailyPuzzleSet(dateISO: string, locale: string): ConnectionPuzzl
   const pool = getPuzzlesForLocale(locale);
   const rng = mulberry32(fnv1aHash(`${dateISO}:${locale}`));
   const order = seededShuffle(pool, rng);
-  return pickWithVariety(order, DAILY_PUZZLE_COUNT);
+  const picked = pickWithVariety(order, DAILY_PUZZLE_COUNT);
+  // Stable sort: the run builds from a warm-up to a finale, ties keep the seeded order.
+  return picked.sort((a, b) => DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty]);
 }
 
 /**
@@ -105,4 +109,15 @@ export function maxDailyScore(dateISO: string, locale: string): number {
     (sum, p) => sum + Math.ceil(POINTS_BY_DIFFICULTY[p.difficulty] * STREAK_BONUS_MULTIPLIER),
     0,
   );
+}
+
+/**
+ * Look up stored puzzle ids in the live pool. A same-day revisit uses this so
+ * pool growth (which reseeds `dailyPuzzleSet`) can't swap the answer key under
+ * a finished run; null means an id is gone and the caller should recompute.
+ */
+export function puzzlesByIds(ids: readonly string[], locale: string): ConnectionPuzzle[] | null {
+  const byId = new Map(getPuzzlesForLocale(locale).map((p) => [p.id, p]));
+  const out = ids.map((id) => byId.get(id));
+  return out.every((p): p is ConnectionPuzzle => !!p) ? out : null;
 }

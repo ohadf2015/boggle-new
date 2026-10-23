@@ -19569,6 +19569,21 @@ const ja = {
     "nextLifeIn": "次のライフまで {{time}}",
     "revealHint": "ヒントを表示",
     "freeHint": "無料ヒント（残り{count}回）",
+    "rank": {
+      "plank": "板拾い",
+      "rope": "ロープ結び",
+      "builder": "橋づくり",
+      "span": "スパンの達人",
+      "arch": "アーチ建築家",
+      "legend": "橋の伝説",
+      "toNext": "{rank}まであと{count}",
+      "top": "最高ランク",
+      "up": "ランクアップ！",
+      "bridges": "{count}本の橋を建設"
+    },
+    "week": {
+      "title": "今週"
+    },
     "revealHintAd": "広告を見てヒント",
     "revealAnswerAd": "広告を見て答えを表示",
     "adminGiveUp": "パズルをスキップ（管理者）",
