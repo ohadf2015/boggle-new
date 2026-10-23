@@ -50,7 +50,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
         </div>
         <div className="rounded-neo border-2 border-neo-black bg-neo-navy px-3 py-2">
           <p className="font-neo-display text-2xl font-black tabular-nums text-neo-pink">{report.practiceWords.length}</p>
-          <p className="text-xs font-bold text-neo-white/70">{t('teacher.lastGame.missed')}</p>
+          <p className="text-xs font-bold text-neo-white/70">{t('academy.student.review')}</p>
         </div>
       </div>
 

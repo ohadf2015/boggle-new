@@ -33,6 +33,7 @@ describe('RoundReportCard', () => {
     expect(strips).toHaveLength(4);
     expect(within(strips[0]).getAllByTestId('round-report-cell')).toHaveLength(4);
     expect(within(strips[3]).getByText('teacher.classReport.state.absent')).toBeInTheDocument();
+    expect(within(card).getByText('academy.student.review')).toBeInTheDocument();
   });
 
   it('free: practising the missed words is the Pro step, locked', () => {
