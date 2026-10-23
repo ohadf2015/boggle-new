@@ -2,7 +2,7 @@
 
 import React, { useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useClassroomAnalytics } from '@/hooks/useClassroomAnalytics';
+import { useProClassAnalytics } from './useProClassAnalytics';
 import { MetricCard } from './MetricCard';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { AlertTriangle, TrendingUp, Users, AlertCircle } from 'lucide-react';
@@ -39,7 +39,7 @@ export function AnalyticsDashboard({
   showHeader = true,
 }: AnalyticsDashboardProps) {
   const { t } = useLanguage();
-  const { metrics, isLoading, error, refresh } = useClassroomAnalytics({ classroomId });
+  const { metrics, isLoading, error, refresh } = useProClassAnalytics({ classroomId });
 
   const handleViewStudents = useCallback(() => {
     onViewStudents?.('struggling');

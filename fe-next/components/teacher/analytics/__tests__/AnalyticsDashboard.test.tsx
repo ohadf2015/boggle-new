@@ -10,7 +10,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AnalyticsDashboard } from '../AnalyticsDashboard';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import * as useClassroomAnalyticsModule from '@/hooks/useClassroomAnalytics';
+import * as useClassroomAnalyticsModule from '../useProClassAnalytics';
 
 // ============================================
 // MOCKS
@@ -66,7 +66,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   LanguageProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-vi.mock('@/hooks/useClassroomAnalytics');
+vi.mock('../useProClassAnalytics');
 
 // ============================================
 // TEST HELPERS
@@ -86,7 +86,7 @@ const renderDashboard = (props: React.ComponentProps<typeof AnalyticsDashboard>)
 
 describe('AnalyticsDashboard - Loading State', () => {
   beforeEach(() => {
-    vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+    vi.spyOn(useClassroomAnalyticsModule, 'useProClassAnalytics').mockReturnValue({
       metrics: null,
       isLoading: true,
       error: null,
@@ -107,7 +107,7 @@ describe('AnalyticsDashboard - Loading State', () => {
 
 describe('AnalyticsDashboard - Error State', () => {
   beforeEach(() => {
-    vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+    vi.spyOn(useClassroomAnalyticsModule, 'useProClassAnalytics').mockReturnValue({
       metrics: null,
       isLoading: false,
       error: new Error('Failed to fetch analytics'),
@@ -147,7 +147,7 @@ describe('AnalyticsDashboard - Error State', () => {
 
 describe('AnalyticsDashboard - Success State', () => {
   beforeEach(() => {
-    vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+    vi.spyOn(useClassroomAnalyticsModule, 'useProClassAnalytics').mockReturnValue({
       metrics: mockMetrics,
       isLoading: false,
       error: null,
@@ -206,7 +206,7 @@ describe('AnalyticsDashboard - Success State', () => {
 
 describe('AnalyticsDashboard - Actionable Callbacks', () => {
   beforeEach(() => {
-    vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+    vi.spyOn(useClassroomAnalyticsModule, 'useProClassAnalytics').mockReturnValue({
       metrics: mockMetrics,
       isLoading: false,
       error: null,
@@ -262,7 +262,7 @@ describe('AnalyticsDashboard - Actionable Callbacks', () => {
 
 describe('AnalyticsDashboard - Edge Cases', () => {
   it('handles zero students needing help', () => {
-    vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+    vi.spyOn(useClassroomAnalyticsModule, 'useProClassAnalytics').mockReturnValue({
       metrics: { ...mockMetrics, studentsNeedingHelp: 0 },
       isLoading: false,
       error: null,
@@ -275,7 +275,7 @@ describe('AnalyticsDashboard - Edge Cases', () => {
   });
 
   it('handles empty common mistakes array', () => {
-    vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+    vi.spyOn(useClassroomAnalyticsModule, 'useProClassAnalytics').mockReturnValue({
       metrics: { ...mockMetrics, commonMistakes: [] },
       isLoading: false,
       error: null,

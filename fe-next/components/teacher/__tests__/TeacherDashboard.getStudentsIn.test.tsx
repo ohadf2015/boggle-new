@@ -56,12 +56,13 @@ beforeEach(() => {
 afterEach(() => cleanup());
 
 describe('Teacher Home: get students in', () => {
-  it('Given the class has no students, Then the code, QR, copy link and projector share actions render', () => {
+  it('Given the class has no students, Then the code, one QR, copy link and projector share actions render', () => {
     render(<TeacherDashboard />);
     const card = screen.getByTestId('hq-get-students-in');
     expect(within(card).getByTestId('hq-join-code')).toHaveTextContent('PLSB66');
     expect(within(card).getByTestId('hq-copy-link')).toBeInTheDocument();
-    expect(within(card).getByTestId('hq-open-qr')).toBeInTheDocument();
+    expect(within(card).getByTestId('hq-first-student-qr')).toBeInTheDocument();
+    expect(within(card).queryByTestId('hq-open-qr')).toBeNull();
     expect(within(card).getByTestId('hq-open-projector')).toBeInTheDocument();
   });
 
@@ -98,8 +99,8 @@ describe('Teacher Home: get students in', () => {
     const notice = await screen.findByTestId('hq-ended-code-tries');
     expect(notice).toHaveTextContent('education.student.gameEnded.title');
     expect(within(notice).getByTestId('hq-ended-code-tries-count')).toHaveTextContent('4');
-    expect(within(notice).getByTestId('hq-ended-code-tries-count')).toHaveAttribute('aria-label', 'teacher.dashboard.students');
-    expect(notice).toHaveTextContent('tvBroadcast.waitingForGame');
+    expect(within(notice).getByTestId('hq-ended-code-tries-count')).toHaveTextContent('teacher.dashboard.students');
+    expect(notice).not.toHaveTextContent('tvBroadcast.waitingForGame');
     expect(notice).not.toHaveTextContent('academy.hq.endedCodeTries');
     expect(within(notice).getByRole('link')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c1');
     expect(within(notice).getByRole('link')).toHaveTextContent('academy.hq.startTitle');

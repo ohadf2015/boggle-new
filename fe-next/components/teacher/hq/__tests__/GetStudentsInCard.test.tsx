@@ -81,11 +81,26 @@ describe('<GetStudentsInCard>', () => {
     expect(screen.getByTestId('hq-joined-count')).toHaveTextContent('academy.hq.joinedLabel');
   });
 
-  it('Given nobody yet, Then it says so and points at the code instead of an empty list', () => {
+  it('Given nobody yet, Then one statement asks for the first student and the 0/3 goal is the only count', () => {
     roster.mockReturnValue({ students: [], loading: false, arrivals: [] });
     render(<GetStudentsInCard classroom={{ ...CLASS, member_count: 0 }} onOpenProjector={vi.fn()} />);
-    expect(screen.getByTestId('hq-joined-count')).toHaveTextContent('academy.hq.nobodyYet');
+    expect(screen.getByTestId('hq-first-student-title')).toHaveTextContent('academy.hq.firstStudentTitle');
+    expect(screen.queryByTestId('hq-joined-count')).toBeNull();
+    expect(screen.queryByText(/academy\.hq\.nobodyYet/)).toBeNull();
+    expect(screen.getByTestId('hq-joined-goal-count')).toHaveTextContent('0/3');
     expect(screen.queryAllByTestId('hq-roster-seat')).toHaveLength(0);
+  });
+
+  it('Given nobody yet, Then the first-student row reads as a placeholder (dashed), not as a button', () => {
+    roster.mockReturnValue({ students: [], loading: false, arrivals: [] });
+    render(<GetStudentsInCard classroom={{ ...CLASS, member_count: 0 }} onOpenProjector={vi.fn()} />);
+    expect(screen.getByTestId('hq-roster-row').className).toMatch(/\bborder-dashed\b/);
+  });
+
+  it('Given the code plate, Then it shows the code alone, never a raw origin URL', async () => {
+    render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
+    await waitFor(() => expect(screen.getByTestId('hq-join-code')).toBeInTheDocument());
+    expect(screen.queryByText(/\/join\/AB12CD/)).toBeNull();
   });
 
   it('Given a student who joins while the teacher watches, Then that seat lights up', () => {
@@ -141,12 +156,13 @@ describe('<GetStudentsInCard>', () => {
     expect(screen.queryAllByTestId('hq-roster-ghost')).toHaveLength(0);
   });
 
-  it('Given the join card, Then the code is the one hero and link / QR / projector are one secondary row', () => {
+  it('Given the join card, Then the code is the one hero and link / projector are one secondary row with no second QR button', () => {
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={vi.fn()} />);
     const row = screen.getByTestId('hq-join-actions');
-    for (const id of ['hq-copy-link', 'hq-open-qr', 'hq-open-projector']) {
+    for (const id of ['hq-copy-link', 'hq-open-projector']) {
       expect(row.contains(screen.getByTestId(id)), id).toBe(true);
     }
+    expect(screen.queryByTestId('hq-open-qr')).toBeNull();
     expect(row.contains(screen.getByTestId('hq-join-code'))).toBe(false);
   });
 
@@ -156,10 +172,10 @@ describe('<GetStudentsInCard>', () => {
     expect(screen.getByTestId('hq-join-status')).toHaveTextContent('academy.hq.codeReady');
   });
 
-  it('When the QR button is tapped, Then the projector (big QR) opens', () => {
+  it('When the projector button is tapped, Then the projector (big code + QR) opens', () => {
     const onOpen = vi.fn();
     render(<GetStudentsInCard classroom={CLASS} onOpenProjector={onOpen} />);
-    fireEvent.click(screen.getByTestId('hq-open-qr'));
+    fireEvent.click(screen.getByTestId('hq-open-projector'));
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
 

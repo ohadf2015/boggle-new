@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import logger from '@/utils/logger';
 import { LEVEL_ORDER } from '@/lib/education/differentiation';
+import { authorizeClassroomOwner } from '@/lib/education/ownedClassroomRoute';
 
 const paramsSchema = z.object({
   id: z.string().uuid(),
@@ -92,4 +93,29 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string; s
   }
 
   return NextResponse.json({ ok: true, level });
+}
+
+/** DELETE — free roster remove on the owner's own client; `.select()` turns an RLS no-op into a 404. */
+export async function DELETE(req: Request, ctx: { params: Promise<{ id: string; studentId: string }> }) {
+  const { id, studentId } = await ctx.params;
+  const auth = await authorizeClassroomOwner(req, id);
+  if (!auth.ok) return auth.response;
+  if (!z.string().uuid().safeParse(studentId).success) {
+    return NextResponse.json({ ok: false, error: 'Invalid student id' }, { status: 400 });
+  }
+
+  const r = await auth.sb
+    .from('classroom_memberships')
+    .delete()
+    .eq('classroom_id', auth.classroom.id)
+    .eq('student_id', studentId)
+    .select('id');
+  if (r.error) {
+    logger.error('[member-remove] delete failed', r.error);
+    return NextResponse.json({ ok: false, error: r.error.message }, { status: 500 });
+  }
+  if (!r.data || r.data.length === 0) {
+    return NextResponse.json({ ok: false, error: 'Student is not a member of this classroom' }, { status: 404 });
+  }
+  return NextResponse.json({ ok: true });
 }

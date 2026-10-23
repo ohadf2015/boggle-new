@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import toast from "react-hot-toast";
 import { AnimatePresence, m } from "framer-motion";
-import { Check, Link2, MonitorUp, QrCode, UsersRound } from "lucide-react";
+import { Check, Link2, MonitorUp, UsersRound } from "lucide-react";
 import { JoinCardFrame } from "./JoinCardFrame";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -153,7 +153,6 @@ export function GetStudentsInCard({
     onOpenProjector();
   }, [onOpenProjector, sfx]);
 
-  const shortUrl = joinUrl.replace(/^https?:\/\//, "");
   const waiting = rosterLoading || count === 0;
 
   return (
@@ -191,18 +190,10 @@ export function GetStudentsInCard({
           >
             {classroom.join_code}
           </span>
-          {shortUrl ? (
-            <span
-              dir="ltr"
-              className="mt-1 hidden max-w-full truncate font-mono text-sm font-bold text-black/60 lg:block lg:[@media(max-height:800px)]:hidden"
-            >
-              {shortUrl}
-            </span>
-          ) : null}
         </div>
 
         {/* Everything else is secondary, one quiet row of equals. */}
-        <div data-testid="hq-join-actions" className="grid shrink-0 grid-cols-3 gap-2">
+        <div data-testid="hq-join-actions" className="grid shrink-0 grid-cols-2 gap-2">
           <button
             type="button"
             data-testid="hq-copy-link"
@@ -215,33 +206,6 @@ export function GetStudentsInCard({
               <Link2 className="size-4 shrink-0 text-neo-lime" strokeWidth={3} aria-hidden="true" />
             )}
             <span className="line-clamp-2 min-w-0">{t("academy.hq.copyLink", "Copy link")}</span>
-          </button>
-          {/* The QR a phone in the room scans lives on the projector; here it
-              is a small thumbnail (desktop) or an icon (phone) that opens it. */}
-          <button
-            type="button"
-            data-testid="hq-open-qr"
-            onClick={openProjector}
-            aria-label={t("academy.hq.showQr", "Show QR code")}
-            className={SECONDARY}
-          >
-            {joinUrl ? (
-              <span className="hidden size-9 shrink-0 rounded-sm bg-neo-white p-0.5 lg:@[30rem]:block">
-                <QRCodeSVG
-                  value={joinUrl}
-                  size={64}
-                  level="L"
-                  style={{ width: "100%", height: "100%" }}
-                  aria-hidden="true"
-                />
-              </span>
-            ) : null}
-            <QrCode
-              className={cn("size-4 shrink-0 text-neo-cyan", joinUrl && "lg:@[30rem]:hidden")}
-              strokeWidth={2.5}
-              aria-hidden="true"
-            />
-            <span className="line-clamp-2 min-w-0">{t("academy.hq.qr", "QR")}</span>
           </button>
           <button
             type="button"
@@ -261,6 +225,7 @@ export function GetStudentsInCard({
             "flex shrink-0 rounded-neo border-2 border-neo-cream/60 bg-neo-navy/70 px-2 py-1.5",
             "lg:min-h-0 lg:flex-1 lg:flex-col lg:gap-3 lg:overflow-hidden lg:p-3 lg:[@media(max-height:800px)]:flex-row lg:[@media(max-height:800px)]:items-center lg:[@media(max-height:800px)]:gap-3 lg:[@media(max-height:800px)]:p-2",
             waiting ? "items-center" : "items-center justify-between gap-2 lg:items-stretch lg:justify-start",
+            empty && "border-dashed",
           )}
         >
           {waiting ? (
@@ -289,19 +254,21 @@ export function GetStudentsInCard({
               {empty ? (
                 <p
                   data-testid="hq-first-student-title"
-                  className="hidden font-neo-display text-sm font-black uppercase tracking-tight text-neo-lime lg:block lg:text-center lg:text-base lg:[@media(max-height:800px)]:hidden"
+                  className="min-w-0 font-neo-display text-sm font-black uppercase tracking-tight text-neo-lime lg:text-center lg:text-base"
                 >
                   {t("academy.hq.firstStudentTitle", "Get your first student in")}
                 </p>
               ) : null}
-              <JoinedCount
-                loading={rosterLoading}
-                count={count}
-                shown={shownCount}
-                reduced={reduced}
-                label={t("academy.hq.joinedLabel", "joined")}
-                empty={t("academy.hq.nobodyYet", "No one yet — share the code")}
-              />
+              {empty ? null : (
+                <JoinedCount
+                  loading={rosterLoading}
+                  count={count}
+                  shown={shownCount}
+                  reduced={reduced}
+                  label={t("academy.hq.joinedLabel")}
+                  empty={t("academy.hq.nobodyYet")}
+                />
+              )}
               {/* Claims no count, so it is honest while the read is open too. */}
               <p className="hidden max-w-sm text-center font-neo-body text-sm font-bold text-neo-white/60 lg:block lg:[@media(max-height:800px)]:hidden">
                 {t("teacher.activation.shareBody")}

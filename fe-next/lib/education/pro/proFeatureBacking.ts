@@ -31,6 +31,17 @@ export const PRO_FEATURE_BACKING: Record<string, ProFeatureBacking> = {
     },
   },
   analytics: {
+    route: 'app/api/education/classroom/[id]/analytics/route.ts',
+    guard: 'requireTeacherPro(',
+    ui: 'components/teacher/analytics/AnalyticsDashboard.tsx',
+    tapsFromHq: 2,
+    refusal: {
+      file: 'app/api/education/classroom/[id]/analytics/__tests__/route.test.ts',
+      name: '402s a free teacher and reads no student rows',
+      status: 402,
+    },
+  },
+  studentInsights: {
     route: 'app/api/education/classroom/[id]/members/[studentId]/insights/route.ts',
     guard: 'requireTeacherPro(',
     ui: 'components/teacher/reports/StudentParentPreview.tsx',

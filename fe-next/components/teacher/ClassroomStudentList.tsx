@@ -13,6 +13,7 @@ import { formatDistanceToNow } from 'date-fns';
 import Avatar from '@/components/Avatar';
 import { resolveDisplayName } from '@/lib/displayName';
 import { InviteStudentsCta } from '@/components/teacher/classroom/InviteStudentsCta';
+import { RosterRemoveButton } from '@/components/teacher/classroom/RosterRemoveButton';
 
 /** Selected-segment fill per level. Unselected segments are plain white. */
 const LEVEL_SELECTED_BG: Record<VocabularyLevel, string> = {
@@ -110,6 +111,10 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
     }
     toast.success(t('teacher.levels.saved'));
   }, [classroomId, students, t]);
+
+  const handleRemoved = useCallback((studentId: string) => {
+    setStudents((prev) => prev.filter((s) => s.student_id !== studentId));
+  }, []);
 
   useEffect(() => {
     async function fetchStudents() {
@@ -211,6 +216,13 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
               <Calendar className="w-3 h-3 text-black" />
               <span className="text-black">{joinedAt}</span>
             </div>
+
+            <RosterRemoveButton
+              classroomId={classroomId}
+              studentId={student.student_id}
+              name={username}
+              onRemoved={handleRemoved}
+            />
 
             {/* Differentiation level — full-width row on phones, trailing on wider screens */}
             <div className="basis-full sm:basis-auto sm:ms-auto">

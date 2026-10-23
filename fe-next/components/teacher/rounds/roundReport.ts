@@ -1,15 +1,16 @@
 import type { RecentClassroomGame } from '@/lib/supabase/analyticsLastGame';
 
 const MODE_KEYS: Record<string, string> = {
-  classic: 'classic',
-  blast: 'blast',
-  'word-hunt': 'wordHunt',
-  'wheel-rush': 'wheelRush',
-  'vocab-quiz': 'vocabQuiz',
+  classic: 'teacher.lastGame.mode.classic',
+  blast: 'teacher.lastGame.mode.blast',
+  'word-hunt': 'teacher.lastGame.mode.wordHunt',
+  'wheel-rush': 'teacher.lastGame.mode.wheelRush',
+  'vocab-quiz': 'teacher.lastGame.mode.vocabQuiz',
+  wordcraft: 'teacher.classroom.gameModes.wordcraft',
 };
 
 export function roundModeLabelKey(mode: string): string | null {
-  return MODE_KEYS[mode] ? `teacher.lastGame.mode.${MODE_KEYS[mode]}` : null;
+  return MODE_KEYS[mode] ?? null;
 }
 
 export function participationParams({ played, roster }: RecentClassroomGame['participation']) {

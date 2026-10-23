@@ -4,12 +4,12 @@ import { join } from 'node:path';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AnalyticsDashboard } from '../AnalyticsDashboard';
-import * as useClassroomAnalyticsModule from '@/hooks/useClassroomAnalytics';
+import * as useClassroomAnalyticsModule from '../useProClassAnalytics';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en', dir: 'ltr' }),
 }));
-vi.mock('@/hooks/useClassroomAnalytics');
+vi.mock('../useProClassAnalytics');
 
 const metrics = {
   studentsNeedingHelp: 2,
@@ -21,7 +21,7 @@ const metrics = {
 };
 
 beforeEach(() => {
-  vi.spyOn(useClassroomAnalyticsModule, 'useClassroomAnalytics').mockReturnValue({
+  vi.spyOn(useClassroomAnalyticsModule, 'useProClassAnalytics').mockReturnValue({
     metrics,
     isLoading: false,
     error: null,

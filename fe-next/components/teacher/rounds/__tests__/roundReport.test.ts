@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildRoundReport, participationParams } from '../roundReport';
+import { buildRoundReport, participationParams, roundModeLabelKey } from '../roundReport';
 import { ROUND_FIXTURE } from '../roundFixture';
 
 describe('buildRoundReport', () => {
@@ -34,5 +34,16 @@ describe('participationParams', () => {
 
   it('never reports a negative absence when more played than the roster lists', () => {
     expect(participationParams({ played: 5, roster: 4 })).toEqual({ played: 5, total: 5, absent: 0 });
+  });
+});
+
+describe('roundModeLabelKey', () => {
+  it('names a Wordcraft round with the translated mode label, never the raw mode id', () => {
+    expect(roundModeLabelKey('wordcraft')).toBe('teacher.classroom.gameModes.wordcraft');
+  });
+
+  it('keeps the existing labels for the classic modes', () => {
+    expect(roundModeLabelKey('vocab-quiz')).toBe('teacher.lastGame.mode.vocabQuiz');
+    expect(roundModeLabelKey('mystery')).toBeNull();
   });
 });

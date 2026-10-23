@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Flame, Lock } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import { SegmentedTabs } from '@/components/education/shell/SegmentedTabs';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -69,7 +69,7 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
   const totals = state.status === 'ready' ? state.report.totals : state.preview.totals;
   if (totals.sessions === 0) {
     return (
-      <Shell locked={state.status === 'locked'}>
+      <Shell>
         <ReportEmptyState classroomId={classroomId} />
       </Shell>
     );
@@ -78,7 +78,7 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
   if (state.status === 'locked') {
     const { preview } = state;
     return (
-      <Shell locked>
+      <Shell>
         <div className="space-y-4">
           <MasteryStatCards totals={totals} />
           <HardestBlock>
@@ -108,7 +108,7 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
   const summary = () => buildReportSummary({ t, classroomName, report, insights, names });
 
   return (
-    <Shell actions={<ReportShareActions summary={summary} />}>
+    <Shell pro actions={<ReportShareActions summary={summary} />}>
       <div className="space-y-4">
         <MasteryStatCards totals={totals} insights={insights} />
         {insights ? (
@@ -213,7 +213,7 @@ function HardestBlock({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Shell({ children, locked = false, actions }: { children: React.ReactNode; locked?: boolean; actions?: React.ReactNode }) {
+function Shell({ children, pro = false, actions }: { children: React.ReactNode; pro?: boolean; actions?: React.ReactNode }) {
   const { t } = useLanguage();
   return (
     <section
@@ -227,10 +227,11 @@ function Shell({ children, locked = false, actions }: { children: React.ReactNod
         <div className="min-w-0">
           <h2 className="flex items-center gap-2 font-neo-display text-xl font-bold text-neo-white sm:text-2xl">
             {t('eg2Rep.report.title')}
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-black bg-neo-lime px-2 py-0.5 font-neo-body text-xs font-black uppercase text-neo-black shadow-hard-sm">
-              {locked && <Lock className="size-3" aria-hidden="true" />}
-              {t('eduPro.mastery.proBadge')}
-            </span>
+            {pro && (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-black bg-neo-lime px-2 py-0.5 font-neo-body text-xs font-black uppercase text-neo-black shadow-hard-sm">
+                {t('eduPro.mastery.proBadge')}
+              </span>
+            )}
           </h2>
           <p className="mt-0.5 text-sm text-neo-cream/70">{t('eg2Rep.report.subtitle')}</p>
         </div>

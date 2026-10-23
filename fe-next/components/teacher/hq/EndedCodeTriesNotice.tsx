@@ -41,16 +41,15 @@ export function EndedCodeTriesNotice({ classroomId }: { classroomId: string }) {
       <TriangleAlert className="size-5 shrink-0" strokeWidth={2.5} aria-hidden />
       <div className="min-w-48 flex-1">
         <p className="font-neo-display text-sm font-black">{t('education.student.gameEnded.title')}</p>
-        <p className="mt-0.5 flex items-center gap-2 text-sm font-bold">
+        <p className="mt-0.5 text-sm font-bold">
           <span
             data-testid="hq-ended-code-tries-count"
-            aria-label={t('teacher.dashboard.students')}
             className="inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-white px-1.5 font-neo-display font-black"
           >
             <Users className="size-3.5" strokeWidth={3} aria-hidden />
             <span dir="ltr">{count}</span>
+            <span>{t('teacher.dashboard.students')}</span>
           </span>
-          {t('tvBroadcast.waitingForGame')}
         </p>
       </div>
       <Link

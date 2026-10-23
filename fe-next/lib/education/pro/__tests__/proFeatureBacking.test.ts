@@ -22,6 +22,12 @@ describe('every Pro feature we sell is refused to a free teacher on the server',
     );
   });
 
+  it('backs the analytics page with the class dashboard route its dashboard reads, and keeps the per-student drill-down', () => {
+    expect(PRO_FEATURE_BACKING.analytics.route).toBe('app/api/education/classroom/[id]/analytics/route.ts');
+    expect(read(PRO_FEATURE_BACKING.analytics.ui)).toContain('useProClassAnalytics');
+    expect(PRO_FEATURE_BACKING.studentInsights.route).toBe('app/api/education/classroom/[id]/members/[studentId]/insights/route.ts');
+  });
+
   it('names pressure dials as the only lock still enforced in the UI alone', () => {
     expect(Object.keys(PRO_FEATURES_WITHOUT_SERVER_GATE)).toEqual(['pressureDials']);
   });
