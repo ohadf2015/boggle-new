@@ -37,11 +37,11 @@ describe('the reference tail layout', () => {
   // a fundamentally different approach, so How to Play is now a section at the
   // story width of sections 2-6 (max-w-6xl, fresh.shell.r6.blog.test) and the
   // FAQ is one centered card that keeps the max-w-3xl column.
-  it('How to Play spans the story width; the FAQ card keeps a centered max-w-3xl column', () => {
+  it('How to Play and the about/FAQ board both span the story width', () => {
     const view = read('landing/LandingView.tsx');
     const faq = read('seo/HomepageContentSection.tsx');
     expect(view).toMatch(/data-home-tail="tail"[\s\S]{0,200}max-w-6xl/);
-    expect(faq).toMatch(/<section\s+aria-label=\{l\.about\}[\s\S]{0,200}max-w-3xl/);
+    expect(faq).toMatch(/<section\s+aria-label=\{l\.about\}[\s\S]{0,200}max-w-6xl/);
     expect(view).not.toMatch(/max-w-5xl/);
     expect(faq).not.toMatch(/max-w-5xl/);
   });

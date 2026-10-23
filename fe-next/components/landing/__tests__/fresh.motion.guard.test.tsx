@@ -20,7 +20,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
 const root = path.resolve(__dirname, '..', '..');
 const read = (rel: string) => readFileSync(path.join(root, rel), 'utf8');
 
-const MOTION_CSS = ['landing/fresh/FreshReveal.module.css', 'education/landing/landingMotion.module.css'];
+const MOTION_CSS = [
+  'landing/fresh/FreshReveal.module.css',
+  'landing/fresh/FreshBoard.module.css',
+  'education/landing/landingMotion.module.css',
+];
 
 /** Removes every `@media (prefers-reduced-motion: no-preference) {…}` block (brace matched). */
 function stripMotionSafe(css: string): string {
@@ -79,14 +83,14 @@ describe('FreshSection motion hooks', () => {
     expect(wrap.getAttribute('data-fresh-reveal')).toBe('art');
   });
 
-  it('keeps the default beat rhythm and offers a compact size for a closing beat', () => {
-    const { container } = render(
-      <FreshSection id="classrooms" accent="purple" size="compact" title="t" line="l" art={<div />} />
+  it('stacks a tile by default and sets copy beside art for the wide variant', () => {
+    const tile = render(<FreshSection id="daily" accent="cyan" title="t" line="l" art={<div />} />);
+    expect((tile.container.querySelector('section') as HTMLElement).className).toMatch(/(^|\s)flex-col(\s|$)/);
+    const wide = render(
+      <FreshSection id="classrooms" accent="purple" variant="wide" title="t" line="l" art={<div />} />
     );
-    const cls = (container.querySelector('section') as HTMLElement).className;
-    expect(cls).toMatch(/(^|\s)py-16(\s|$)/);
-    expect(cls).toMatch(/(^|\s)md:py-28(\s|$)/);
-    expect(cls).not.toMatch(/(^|\s)md:py-40(\s|$)/);
+    const cls = (wide.container.querySelector('section') as HTMLElement).className;
+    expect(cls).toContain('md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]');
   });
 });
 

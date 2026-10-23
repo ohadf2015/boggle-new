@@ -112,6 +112,8 @@ vi.mock('../../fonts', () => ({
     heeboHebrew: { variable: 'heebo-hebrew-var' },
     fredokaCyrillic: { variable: 'fredoka-cyrillic-var' },
     rubikCyrillic: { variable: 'rubik-cyrillic-var' },
+    unboundedLatin: { variable: 'unbounded-latin-var' },
+    unboundedCyrillic: { variable: 'unbounded-cyrillic-var' },
 }));
 
 describe('LocaleLayout Hydration', () => {

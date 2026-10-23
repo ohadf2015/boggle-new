@@ -18,7 +18,7 @@ export function LandingFinalCta({ setupPending = false }: { setupPending?: boole
           height={160}
           className={`pointer-events-none absolute -top-14 start-1/2 h-auto w-20 -translate-x-1/2 select-none rtl:translate-x-1/2 sm:-top-16 sm:start-auto sm:end-10 sm:w-24 sm:translate-x-0 sm:rtl:translate-x-0 ${m.peek}`}
         />
-        <h2 className="text-balance font-neo-display text-2xl font-black leading-tight sm:text-4xl">{t('eg2Land.final.title')}</h2>
+        <h2 className="text-balance font-neo-poster text-2xl font-extrabold leading-tight tracking-[-0.01em] [overflow-wrap:anywhere] sm:text-4xl">{t('eg2Land.final.title')}</h2>
         <p className="mx-auto mt-3 max-w-[52ch] text-base font-semibold text-neo-navy/80">{t('eg2Land.final.body')}</p>
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link

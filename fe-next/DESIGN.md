@@ -39,3 +39,16 @@ Strategy: **Full palette** — 5 named electric mode-roles over a dark navy base
 
 ## i18n
 All UI text via `t('landing.*')`. 5 locales (en, he-RTL, sv, ja, es). No hardcoded strings.
+
+## Marketing surfaces: "Game board" system (Hallmark, 2026-10)
+Applies to the logged-out landing, `/education`, `/teacher` sign-up and `/pricing`. Game screens keep the base system above.
+
+- **Genre:** playful, brand-overridden — the saturated mode colours stay; Hallmark's low-chroma playful default does not apply.
+- **Macrostructure family:** Bento Grid. The page is a board: story beats are tiles of mixed span on one grid, never alternating text/art rows (Split Studio is retired here).
+- **Poster face:** Unbounded (`font-neo-poster`, token `--font-poster`) for h1/h2 on these surfaces only, weight 700–800, tracking `-0.01em` (hero `-0.015em`). Hebrew falls through to Fredoka/Heebo, Japanese to the system face. Rubik stays the body.
+- **Tile voice:** a tile IS the card — `rounded-neo-xl border-3` in its mode colour, `bg-neo-navy-light`, `shadow-hard-xl` black. Art inside a tile is unboxed (no card-in-card). Mascot stickers may overlap a tile edge.
+- **Rules, not bars:** no short accent underline under headings. Sections split by space; the grid is the rhythm.
+- **CTA voice:** one solid fill per tile, in the tile's mode colour, black ink. Yellow stays reserved for celebration — never a CTA fill.
+- **Spacing:** tiles `gap-4 md:gap-5`; section blocks `py-12 md:py-20`; the hero is the only block allowed more.
+- **Motion:** transform only; tiles lift 2px on hover; one entrance per tile at most; all behind `motion-safe`.
+- **Stamp:** `components/landing/fresh/FreshBoard.module.css`.

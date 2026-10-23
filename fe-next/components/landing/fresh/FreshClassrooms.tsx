@@ -26,7 +26,8 @@ export function FreshClassrooms() {
     <FreshSection
       id="classrooms"
       accent="purple"
-      size="compact"
+      variant="wide"
+      tilt="c"
       title={t('homeFresh.sections.classrooms.title')}
       line={t('homeFresh.sections.classrooms.line')}
       link={{ href: `/${language}/education`, label: t('homeFresh.sections.classrooms.cta') }}
@@ -34,7 +35,7 @@ export function FreshClassrooms() {
         <div
           data-fresh-art="badges"
           aria-hidden="true"
-          className={cn('relative mx-auto grid h-56 w-full max-w-[380px] place-items-center md:h-80', s.badgeFan)}
+          className={cn('relative mx-auto grid h-48 w-full max-w-[380px] place-items-center md:h-64', s.badgeFan)}
         >
           {[
             { art: 'bg-[url(/home/shell/class-projector.webp)]', cls: s.badgeBack },
@@ -44,7 +45,7 @@ export function FreshClassrooms() {
             <div
               key={b.art}
               className={cn(
-                'col-start-1 row-start-1 aspect-square w-56 bg-contain bg-center bg-no-repeat drop-shadow-[4px_4px_0_rgb(0_0_0)] md:w-72',
+                'col-start-1 row-start-1 aspect-square w-48 bg-contain bg-center bg-no-repeat drop-shadow-[4px_4px_0_rgb(0_0_0)] md:w-60',
                 b.art,
                 b.cls
               )}

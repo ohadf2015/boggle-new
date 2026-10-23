@@ -1,14 +1,7 @@
 /**
- * Piece A (shell), round 7: every surviving beat gets real room to breathe.
- *
- * Blind critic (round 6): "Too many one-off sections stacked with no room to
- * breathe ... give each surviving section real vertical padding so it reads as
- * a single beat instead of a scrolling feature list."
- *
- * Round-6 story sections sat at py-14 on a phone (56px above and below): at
- * 390 the next headline arrived before the last visual had finished. Each
- * beat now owns close to a phone screen: generous padding, bigger art, and the
- * reference tail after it runs on the same cadence.
+ * The story beats are tiles on one board (DESIGN.md, marketing surfaces): the
+ * room each beat needs lives inside its tile, so the page no longer pays for a
+ * phone screen of empty navy between beats.
  */
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
@@ -30,42 +23,34 @@ function sectionClass(): string {
   return (container.querySelector('section') as HTMLElement).className;
 }
 
-describe('story beats breathe', () => {
-  it('pads each beat like a screen of its own: py-24 on a phone, md:py-40 on desktop', () => {
+describe('story beats sit on one board', () => {
+  it('makes each beat a tile: mode-colour border, hard shadow, padded inside instead of between', () => {
     const cls = sectionClass();
-    expect(cls).toMatch(/(^|\s)py-24(\s|$)/);
-    expect(cls).toMatch(/(^|\s)md:py-40(\s|$)/);
-    expect(cls).not.toMatch(/(^|\s)py-14(\s|$)/);
+    expect(cls).toMatch(/(^|\s)border-neo-cyan(\s|$)/);
+    expect(cls).toMatch(/(^|\s)shadow-hard-xl(\s|$)/);
+    expect(cls).not.toMatch(/(^|\s)md:py-40(\s|$)/);
   });
 
-  it('gives copy and art a clear gap when stacked on a phone', () => {
-    expect(sectionClass()).toMatch(/(^|\s)gap-12(\s|$)/);
-  });
-
-  it('sets the beat headline at display scale (text-4xl on a phone, md:text-5xl so a two-sentence headline breaks at its sentences in a half column)', () => {
+  it('sets the beat headline in the poster face', () => {
     const { container } = render(
       <FreshSection id="daily" accent="cyan" title="t" line="l" art={<div />} />
     );
     const h2 = container.querySelector('h2') as HTMLElement;
-    expect(h2.className).toMatch(/(^|\s)text-4xl(\s|$)/);
-    expect(h2.className).toMatch(/(^|\s)md:text-5xl(\s|$)/);
-    expect(h2.className).not.toMatch(/(^|\s)sm:text-/);
+    expect(h2.className).toMatch(/(^|\s)font-neo-poster(\s|$)/);
   });
 
-  it('opens the reference beat with the same room as a story beat', () => {
-    const view = read('landing/LandingView.tsx');
-    expect(view).toMatch(/data-home-tail="tail"[\s\S]{0,200}pt-24[\s\S]{0,80}md:pt-40/);
+  it('puts daily and friends side by side on one grid, not alternating rows', () => {
+    const page = read('landing/fresh/FreshPage.tsx');
+    expect(page).toMatch(/data-fresh-board[\s\S]{0,300}md:grid-cols-12[\s\S]{0,200}<FreshDaily \/>\s*<FreshFriends \/>/);
+    expect(read('landing/fresh/FreshDaily.tsx')).toMatch(/md:col-span-7/);
+    expect(read('landing/fresh/FreshFriends.tsx')).toMatch(/md:col-span-5/);
   });
 
-  // How to Play, the blog row and the FAQ card are ONE reference beat, not
-  // three: the tail wrapper closes tight so the FAQ card follows it as part of
-  // the same beat, and the beat's big breath comes after the FAQ, before the
-  // finale.
-  it('joins How to Play and the FAQ card into one beat: tight seam, big breath after', () => {
+  it('keeps How to Play and the FAQ board as one reference beat: tight seam, breath after', () => {
     const view = read('landing/LandingView.tsx');
     const faq = read('seo/HomepageContentSection.tsx');
     expect(view).toMatch(/data-home-tail="tail"[\s\S]{0,200}\bpb-8\b/);
-    expect(faq).toMatch(/<section\s+aria-label=\{l\.about\}[\s\S]{0,200}\bpb-24\b[\s\S]{0,120}md:pb-40/);
+    expect(faq).toMatch(/<section\s+aria-label=\{l\.about\}[\s\S]{0,250}\bpb-12\b[\s\S]{0,120}md:pb-16/);
   });
 });
 

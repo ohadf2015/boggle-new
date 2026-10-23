@@ -14,7 +14,7 @@
  *   ≥md puts copy + actions on the start side and the board on the end side.
  * - No JS animation library; CSS motion only, behind prefers-reduced-motion.
  */
-import { useCallback, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
@@ -46,6 +46,7 @@ export function FreshHero({ onPlay }: FreshHeroProps) {
   const [found, setFound] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const handleFound = useCallback(() => setFound(true), []);
+  const titleLines = t("homeFresh.hero.title").split("\n").filter(Boolean);
 
   return (
     <>
@@ -57,13 +58,25 @@ export function FreshHero({ onPlay }: FreshHeroProps) {
         <div className="flex flex-col items-start gap-3 md:col-start-1 md:row-start-1 md:self-end md:gap-5">
           <h1
             id="fresh-hero-title"
-            className="flex flex-col gap-2 font-neo-display font-bold text-neo-cream md:gap-3"
+            className="flex flex-col items-start gap-3 text-neo-cream md:gap-4"
           >
-            <span className="font-neo-body text-sm font-bold uppercase tracking-[0.14em] text-neo-lime md:text-base">
+            <span className="rounded-neo border-2 border-neo-lime px-2.5 py-1 font-neo-body text-sm font-bold text-neo-lime md:text-base">
               {t("homeFresh.hero.kicker")}
             </span>{" "}
-            <span className="whitespace-pre-line text-[2.15rem] leading-[1.04] sm:text-5xl lg:text-6xl">
-              {t("homeFresh.hero.title")}
+            <span className="flex flex-col font-neo-poster text-[1.85rem] font-extrabold leading-[1.04] tracking-[-0.015em] [overflow-wrap:anywhere] sm:text-[2.6rem] lg:text-[3.6rem]">
+              {titleLines.map((line, i) => (
+                <Fragment key={line}>
+                  {i > 0 && " "}
+                  <span
+                    className={cn(
+                      i > 0 && i === titleLines.length - 1 && "text-neo-lime",
+                      i > 0 && m.titlePunch,
+                    )}
+                  >
+                    {line}
+                  </span>
+                </Fragment>
+              ))}
             </span>
           </h1>
           <p className="hidden max-w-[36ch] font-neo-body text-lg leading-relaxed text-neo-cream/80 sm:block md:text-xl">
@@ -100,7 +113,7 @@ export function FreshHero({ onPlay }: FreshHeroProps) {
             onPlay={onPlay}
             cta="fresh_hero_play"
             href={firstGameRoute(language)}
-            className="inline-flex min-h-14 items-center justify-center gap-2 rounded-neo-lg border-3 border-neo-black bg-neo-lime px-10 py-4 font-neo-display text-xl font-bold uppercase tracking-wide text-neo-black shadow-hard-xl active:translate-x-[3px] active:translate-y-[3px] active:shadow-hard-pressed rtl:active:-translate-x-[3px] motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream md:min-w-[18rem] md:text-2xl"
+            className="inline-flex min-h-14 items-center justify-center gap-3 rounded-neo-lg border-3 border-neo-black bg-neo-lime px-10 py-4 font-neo-poster text-lg font-extrabold uppercase tracking-[0.02em] text-neo-black shadow-hard-xl active:translate-x-[3px] active:translate-y-[3px] active:shadow-hard-pressed rtl:active:-translate-x-[3px] motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream md:min-w-[18rem] md:text-xl"
           >
             {t("homeFresh.hero.play")}
             <DirectionalIcon
@@ -108,25 +121,27 @@ export function FreshHero({ onPlay }: FreshHeroProps) {
               className="hero-play-arrow h-6 w-6"
             />
           </FreshPlayLink>
-          <Link
-            href={`/${language}/multiplayer`}
-            onClick={() => trackLandingCtaClick("fresh_hero_play_friend")}
-            className="inline-flex min-h-11 items-center justify-center rounded-neo-lg px-4 font-neo-body text-base font-bold text-neo-cream underline decoration-neo-cream/30 decoration-2 underline-offset-4 hover:text-neo-lime hover:decoration-neo-lime focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream sm:px-1"
-          >
-            {t("homeFresh.hero.playFriend", "Play a friend")}
-          </Link>
-          {!isOnCrazyGamesPlatform && (
-            <button
-              type="button"
-              onClick={() => {
-                trackLandingCtaClick("fresh_hero_signin");
-                setAuthOpen(true);
-              }}
-              className="inline-flex min-h-11 items-center justify-center rounded-neo-lg px-4 font-neo-body text-base font-bold text-neo-cream/85 underline decoration-neo-cream/30 decoration-2 underline-offset-4 hover:text-neo-cream hover:decoration-neo-lime focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream sm:px-1"
+          <div className="flex flex-wrap items-center justify-center gap-x-6 sm:justify-start">
+            <Link
+              href={`/${language}/multiplayer`}
+              onClick={() => trackLandingCtaClick("fresh_hero_play_friend")}
+              className="inline-flex min-h-11 items-center justify-center rounded-neo-lg px-4 font-neo-body text-base font-bold text-neo-cream underline decoration-neo-cream/30 decoration-2 underline-offset-4 hover:text-neo-lime hover:decoration-neo-lime focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream sm:px-1"
             >
-              {t("homeFresh.hero.account")}
-            </button>
-          )}
+              {t("homeFresh.hero.playFriend", "Play a friend")}
+            </Link>
+            {!isOnCrazyGamesPlatform && (
+              <button
+                type="button"
+                onClick={() => {
+                  trackLandingCtaClick("fresh_hero_signin");
+                  setAuthOpen(true);
+                }}
+                className="inline-flex min-h-11 items-center justify-center rounded-neo-lg px-4 font-neo-body text-base font-bold text-neo-cream/85 underline decoration-neo-cream/30 decoration-2 underline-offset-4 hover:text-neo-cream hover:decoration-neo-lime focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream sm:px-1"
+              >
+                {t("homeFresh.hero.account")}
+              </button>
+            )}
+          </div>
         </div>
 
         {authOpen && (

@@ -37,7 +37,7 @@ describe('How to Play is a section, not fine print', () => {
     render(<LandingSEOSection />);
     const h = screen.getByRole('heading', { name: c.howToPlayTitle });
     expect(h.tagName).toBe('H2');
-    expect(h.className).toMatch(/\bfont-neo-display\b/);
+    expect(h.className).toMatch(/\bfont-neo-poster\b/);
     expect(h.className).toMatch(/\bmd:text-5xl\b/);
   });
 
@@ -60,15 +60,14 @@ describe('How to Play is a section, not fine print', () => {
     expect(line.compareDocumentPosition(steps) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it('strings the steps on a lime trace path (the hero trace, echoed)', () => {
+  it('lays the steps out as board cells led by their number, not icons on a rail', () => {
     const { container } = render(<LandingSEOSection />);
     const pathEl = container.querySelector('[data-step-path]') as HTMLElement;
-    expect(pathEl).not.toBeNull();
-    const rail = pathEl.querySelector('[data-step-rail]') as HTMLElement;
-    expect(rail).not.toBeNull();
-    expect(rail.getAttribute('aria-hidden')).toBe('true');
-    expect(rail.className).toMatch(/\bbg-neo-lime\b/);
     expect(pathEl.contains(container.querySelector('ol'))).toBe(true);
+    expect(pathEl.querySelector('[data-step-rail]')).toBeNull();
+    const tiles = [...container.querySelectorAll('[data-step-art]')];
+    expect(tiles.map((t) => t.textContent)).toEqual(c.steps.map((_, i) => String(i + 1)));
+    expect(container.querySelectorAll('[data-step-art] svg')).toHaveLength(0);
   });
 
   it("makes every step one of the hero's tiles: colored, black-bordered, hard-shadowed, one accent each", () => {

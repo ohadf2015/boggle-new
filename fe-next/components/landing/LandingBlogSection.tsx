@@ -32,7 +32,7 @@ export function LandingBlogSection() {
   return (
     <div data-home-tail="blog" className="flex w-full flex-col gap-2">
       <div className="flex flex-wrap items-baseline justify-between gap-x-6">
-        <h3 className="font-neo-display text-lg font-bold text-neo-cream md:text-xl">
+        <h3 className="font-neo-poster text-lg font-bold tracking-[-0.01em] text-neo-cream md:text-xl">
           {t('homeFresh.close.blogTitle')}
         </h3>
         <Link

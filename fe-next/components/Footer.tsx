@@ -58,7 +58,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
         ) : (
         <>
         {/* Link columns */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+        <div className="mb-8 grid grid-flow-dense grid-cols-2 gap-8 lg:grid-cols-6">
           {/* Explore */}
           <nav aria-label={t('footer.explore', 'Explore')}>
             <h3 className="text-xs font-black uppercase tracking-widest text-neo-lime mb-3">
@@ -83,7 +83,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               crawled hub); sitewide footer links flow crawl equity from every
               page so Google discovers + ranks them. See
               docs/2026-05-30-education-teacher-seo-intent.md. */}
-          <nav aria-label={t('footer.forTeachers', 'For Teachers')}>
+          <nav aria-label={t('footer.forTeachers', 'For Teachers')} className="col-span-2">
             <h3 className="text-xs font-black uppercase tracking-widest text-neo-lime mb-3">
               {t('footer.forTeachers', 'For Teachers')}
             </h3>

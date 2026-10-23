@@ -2,12 +2,12 @@
 
 import type { CSSProperties } from 'react';
 import { useParams } from 'next/navigation';
-import { Spline, Trophy, Users, Zap, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FreshCrossLink } from './fresh/FreshCrossLink';
 import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
 import { contentByLocale, type LandingSEOContent } from './landingSEOContent';
 import s from './fresh/FreshMotion.module.css';
+import b from './fresh/FreshBoard.module.css';
 
 /**
  * How to Play: the homepage's authored SEO copy as a real section (homepage
@@ -19,10 +19,9 @@ import s from './fresh/FreshMotion.module.css';
  *   section's line. "What is LexiClash?" stays in the HTML as an sr-only
  *   heading (SPEC §9): set as a bold question over a paragraph it read as a
  *   second FAQ. The locale's cross-link (en/es/sv) closes the line.
- * - The four steps are the hero's tiles (colored fill, black border, hard
- *   shadow) strung on a lime trace path: a column on phones, a row at md.
- *   The tiles pop along the path in order (FreshMotion, after the page's 9s
- *   hold, motion-safe); hover/press only straighten and lift them.
+ * - The four steps are board cells, each led by a numbered letter tile in its
+ *   mode colour: a column on phones, 2x2 at sm, a row at md. The tiles pop in
+ *   order (FreshMotion, after the page's 9s hold, motion-safe).
  * - Nothing folds: the FAQ keeps the page's one accordion.
  *
  * Plain markup on purpose: SSR'd (crawlers read it, LandingView.ssr.test) and
@@ -32,16 +31,15 @@ import s from './fresh/FreshMotion.module.css';
 
 interface StepArt {
   accent: 'lime' | 'pink' | 'cyan' | 'purple';
-  icon: LucideIcon;
   /** Literal class strings (Tailwind v4 only generates what it can read). */
   tile: string;
 }
 
 const STEP_ART: StepArt[] = [
-  { accent: 'lime', icon: Users, tile: 'bg-neo-lime -rotate-3' },
-  { accent: 'pink', icon: Spline, tile: 'bg-neo-pink rotate-2' },
-  { accent: 'cyan', icon: Zap, tile: 'bg-neo-cyan -rotate-2' },
-  { accent: 'purple', icon: Trophy, tile: 'bg-neo-purple rotate-3' },
+  { accent: 'lime', tile: 'bg-neo-lime -rotate-3' },
+  { accent: 'pink', tile: 'bg-neo-pink rotate-2' },
+  { accent: 'cyan', tile: 'bg-neo-cyan -rotate-2' },
+  { accent: 'purple', tile: 'bg-neo-purple rotate-3' },
 ];
 
 interface LandingSEOSectionProps {
@@ -59,10 +57,18 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
       aria-labelledby="home-how-title"
       className={cn('relative z-20 flex w-full flex-col gap-10 md:gap-14', className)}
     >
-      <div className="flex max-w-2xl flex-col gap-4">
+      <span
+        data-home-how-sticker
+        aria-hidden="true"
+        className={cn(
+          'pointer-events-none absolute -top-6 end-0 hidden aspect-square w-32 bg-[url(/mascot/victory-nobg.webp)] bg-contain bg-center bg-no-repeat drop-shadow-[4px_4px_0_rgb(0_0_0)] sm:block md:-top-10 md:end-6 md:w-44',
+          b.sticker
+        )}
+      />
+      <div className="flex max-w-2xl flex-col gap-4 sm:pe-36 md:pe-0">
         <h2
           id="home-how-title"
-          className="font-neo-display text-3xl font-bold leading-[1.08] text-neo-cream text-balance sm:text-4xl md:text-5xl"
+          className="font-neo-poster text-[1.75rem] font-extrabold leading-[1.08] tracking-[-0.01em] text-neo-cream text-balance [overflow-wrap:anywhere] sm:text-4xl md:text-5xl"
         >
           {c.howToPlayTitle}
         </h2>
@@ -84,39 +90,28 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
       </div>
 
       <div data-step-path className="relative">
-        {/* The lime trace through the tile centers: down a column on phones
-            (tiles are 56px, so centers sit 28px in), across a row at md. */}
-        <span
-          data-step-rail
-          aria-hidden="true"
-          className="absolute bottom-7 start-[25px] top-7 w-1.5 rounded-full bg-neo-lime md:bottom-auto md:end-[12.5%] md:start-[12.5%] md:top-[29px] md:h-1.5 md:w-auto"
-        />
-        <ol className="relative grid grid-cols-1 gap-5 md:grid-cols-4 md:gap-6">
+        <ol className="relative grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 md:gap-5">
           {c.steps.map((step, i) => {
             const art = STEP_ART[i % STEP_ART.length];
-            const Icon = art.icon;
             return (
               <li
                 key={step}
-                className="group flex items-center gap-4 md:flex-col md:gap-5 md:text-center"
+                className="group flex items-center gap-4 rounded-neo-xl border-2 border-neo-cream/40 bg-neo-navy-light p-4 md:flex-col md:items-start md:gap-5 md:p-5"
               >
                 <span
                   data-step-art={art.accent}
                   aria-hidden="true"
                   style={{ '--step': i } as CSSProperties}
                   className={cn(
-                    'relative flex h-14 w-14 shrink-0 items-center justify-center rounded-neo-lg border-3 border-neo-black text-neo-black shadow-hard-lg md:h-16 md:w-16',
+                    'flex h-14 w-14 shrink-0 items-center justify-center rounded-neo-lg border-3 border-neo-black font-neo-poster text-3xl font-extrabold tabular-nums text-neo-black shadow-hard-lg md:h-16 md:w-16 md:text-4xl',
                     'motion-safe:transition-transform motion-safe:duration-200 motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:rotate-0 motion-safe:group-active:translate-y-0.5',
                     art.tile,
                     s.stepPop
                   )}
                 >
-                  <Icon className="h-7 w-7 md:h-8 md:w-8" strokeWidth={2.5} />
-                  <span className="absolute -end-2.5 -top-2.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cream font-neo-display text-xs font-bold tabular-nums text-neo-black">
-                    {i + 1}
-                  </span>
+                  {i + 1}
                 </span>
-                <span className="font-neo-body text-base font-bold leading-snug text-neo-cream text-balance md:max-w-[16ch]">
+                <span className="font-neo-body text-base font-bold leading-snug text-neo-cream text-balance md:text-lg">
                   {step}
                 </span>
               </li>

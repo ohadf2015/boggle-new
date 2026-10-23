@@ -53,10 +53,10 @@ export function FreshClose({ locale, onPlay }: FreshCloseProps) {
         aria-labelledby="fresh-close-title"
         className="group/finale relative border-t-3 border-neo-black bg-neo-lime"
       >
-        <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-4 px-4 pb-16 pt-24 text-center sm:px-6 md:gap-5 md:pt-28">
+        <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-end gap-6 px-4 pb-14 pt-24 sm:px-6 md:grid-cols-[minmax(0,1fr)_auto] md:gap-10 md:pb-16 md:pt-24 lg:px-8">
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 -top-24 mx-auto block h-40 w-40 motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover/finale:-translate-y-2 md:-top-28 md:h-44 md:w-44"
+            className="pointer-events-none absolute -top-24 end-4 block h-32 w-32 motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover/finale:-translate-y-2 md:-top-28 md:end-10 md:h-44 md:w-44"
           >
             <Image
               src="/mascot/hello-nobg.webp"
@@ -68,22 +68,24 @@ export function FreshClose({ locale, onPlay }: FreshCloseProps) {
               className={cn('h-full w-full drop-shadow-[4px_4px_0_rgb(0_0_0)]', s.bob)}
             />
           </span>
-          <h2
-            id="fresh-close-title"
-            className="max-w-[18ch] font-neo-display text-4xl font-bold leading-[1.05] text-neo-black text-balance sm:text-5xl md:text-6xl"
-          >
-            {t('homeFresh.close.title')}
-          </h2>
-          <p className="max-w-[40ch] font-neo-body text-base font-medium text-neo-black/80 md:text-lg">
-            {t('homeFresh.close.line')}
-          </p>
+          <div className="flex min-w-0 flex-col gap-3">
+            <h2
+              id="fresh-close-title"
+              className="max-w-[16ch] font-neo-poster text-[2rem] font-extrabold leading-[1.04] tracking-[-0.015em] text-neo-black text-balance [overflow-wrap:anywhere] sm:text-5xl md:text-6xl"
+            >
+              {t('homeFresh.close.title')}
+            </h2>
+            <p className="max-w-[40ch] font-neo-body text-base font-medium text-neo-black/80 md:text-lg">
+              {t('homeFresh.close.line')}
+            </p>
+          </div>
           <FreshPlayLink
             onPlay={onPlay ?? bridged}
             cta="bottom_cta"
             locale={locale}
             className={cn(
-              'mt-3 inline-flex items-center gap-2 rounded-neo border-3 border-neo-cream/40 bg-neo-navy px-8 py-4',
-              'font-neo-display text-xl font-bold text-neo-lime shadow-hard-lg active:shadow-hard-pressed',
+              'inline-flex min-h-14 items-center justify-center gap-3 justify-self-start rounded-neo-lg border-3 border-neo-black bg-neo-navy px-8 py-4',
+              'font-neo-poster text-lg font-extrabold uppercase tracking-[0.02em] text-neo-lime shadow-hard-xl active:shadow-hard-pressed md:text-xl',
               'motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-[2px]',
               'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-black'
             )}

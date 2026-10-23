@@ -114,8 +114,9 @@ describe('the reference section before the finale is quiet under one headline', 
 
   it('LandingSEOSection has exactly one section-scale element: the How to Play headline', () => {
     const { container } = render(<LandingSEOSection />);
-    const big = [...container.querySelectorAll('*')].filter((e) =>
-      /\b(md:|sm:)?text-[2-9]xl\b/.test(e.getAttribute('class') ?? '')
+    // Step numerals are decorative tile glyphs (aria-hidden), not headings.
+    const big = [...container.querySelectorAll('*')].filter(
+      (e) => !e.closest('[data-step-art]') && /\b(md:|sm:)?text-[2-9]xl\b/.test(e.getAttribute('class') ?? '')
     );
     expect(big).toHaveLength(1);
     expect(big[0].tagName).toBe('H2');

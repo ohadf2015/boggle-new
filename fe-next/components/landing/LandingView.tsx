@@ -99,7 +99,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
           visible at rest; no disclosure here, the FAQ is the page's one. */}
       <div
         data-home-tail="tail"
-        className="relative z-20 mx-auto flex w-full max-w-6xl flex-col gap-16 px-4 pb-8 pt-24 sm:px-6 md:gap-20 md:pb-12 md:pt-40 lg:px-8"
+        className="relative z-20 mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 pb-8 pt-16 sm:px-6 md:gap-16 md:pb-12 md:pt-24 lg:px-8"
       >
         <LandingSEOSection />
         <LandingBlogSection />

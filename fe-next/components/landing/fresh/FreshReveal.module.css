@@ -12,6 +12,18 @@
   width: max-content;
 }
 
+/* ── hero title: the punch line sits askew and slams in once ──────────── */
+
+.titlePunch {
+  display: inline-block;
+  rotate: -1.5deg;
+  transform-origin: 0% 100%;
+}
+.titlePunch:dir(rtl) {
+  rotate: 1.5deg;
+  transform-origin: 100% 100%;
+}
+
 /* ── hero mascot ─────────────────────────────────────────────────────────── */
 
 .mascot {
@@ -19,11 +31,18 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .titlePunch {
+    animation: fresh-title-punch 560ms cubic-bezier(0.34, 1.56, 0.64, 1) 180ms both;
+  }
   .marquee {
     animation: fresh-marquee 48s linear infinite;
   }
   .marquee:dir(rtl) {
     animation-name: fresh-marquee-rtl;
+  }
+  .marqueeReverse {
+    animation-direction: reverse;
+    animation-duration: 56s;
   }
   .marqueeBand:hover .marquee {
     animation-play-state: paused;
@@ -47,7 +66,7 @@
   }
 
   @supports (animation-timeline: view()) {
-    /* Section art drifts up and un-tilts as it scrolls in. */
+    /* Tile art drifts up as it scrolls in. */
     .revealArt {
       /* Longhands: a minifier folding view() into the `animation` shorthand
          makes Chromium drop the whole declaration. */
@@ -56,14 +75,6 @@
       animation-fill-mode: both;
       animation-timeline: view();
       animation-range: entry 0% cover 40%;
-    }
-    /* The accent bar under each headline stretches out from the start edge. */
-    .revealBar {
-      animation-name: fresh-reveal-bar;
-      animation-timing-function: linear;
-      animation-fill-mode: both;
-      animation-timeline: view();
-      animation-range: entry 20% cover 45%;
     }
   }
 }
@@ -116,18 +127,18 @@
 
 @keyframes fresh-reveal-art {
   from {
-    transform: translateY(56px) rotate(-3deg) scale(0.94);
+    transform: translateY(24px) scale(0.97);
   }
   to {
     transform: none;
   }
 }
 
-@keyframes fresh-reveal-bar {
+@keyframes fresh-title-punch {
   from {
-    transform: scaleX(0.25);
+    transform: translateY(0.35em) scale(1.12);
   }
   to {
-    transform: scaleX(1);
+    transform: none;
   }
 }

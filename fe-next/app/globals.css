@@ -2465,6 +2465,9 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
     /* Font Family Variables */
     --font-fredoka: 'Fredoka', sans-serif;
     --font-rubik: 'Rubik', sans-serif;
+    /* Every var() carries a fallback: one undefined var invalidates the whole stack. */
+    --font-poster: var(--font-unbounded, var(--font-fredoka, 'Fredoka')), var(--font-heebo-hebrew, 'Heebo'),
+      var(--font-rubik, 'Rubik'), system-ui, sans-serif;
 
     /* Neo-Brutalist Color Palette - 4 Primary Colors with Tonal Variations */
     /* Primary: lime, Secondary: pink, Tertiary: cyan, Quaternary: purple */

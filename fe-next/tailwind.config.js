@@ -682,6 +682,7 @@ module.exports = {
       fontFamily: {
         'neo': ['var(--font-fredoka)', 'var(--font-heebo-hebrew)', 'var(--font-rubik)', 'Fredoka', 'Rubik', 'sans-serif'],
         'neo-display': ['var(--font-fredoka)', 'var(--font-heebo-hebrew)', 'var(--font-rubik)', 'Fredoka', 'Rubik', 'sans-serif'],
+        'neo-poster': ['var(--font-poster)'],
         'neo-display-he': ['var(--font-heebo-hebrew)', 'var(--font-rubik)', 'Rubik', 'sans-serif'],
         'neo-body': ['var(--font-rubik)', 'var(--font-heebo-hebrew)', 'Rubik', 'sans-serif'],
         'neo-body-he': ['var(--font-heebo-hebrew)', 'var(--font-rubik)', 'Rubik', 'sans-serif'],
