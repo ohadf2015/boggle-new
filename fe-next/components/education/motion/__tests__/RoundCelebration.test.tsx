@@ -6,10 +6,12 @@ import { pressClasses } from '../pressClasses';
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
 
-const base = { roundKey: 'r1', rank: 2, total: 9, score: 140, hero: <span>edu.hero</span>, t };
+let round = 0;
+let base = { roundKey: 'r0', rank: 2, total: 9, score: 140, hero: <span>edu.hero</span>, t };
 
 beforeEach(() => {
   motionPref.reduced = true;
+  base = { ...base, roundKey: `r${++round}` };
 });
 
 describe('RoundCelebration', () => {
@@ -39,8 +41,16 @@ describe('RoundCelebration', () => {
     expect(screen.queryByTestId('edu-celebration')).toBeNull();
     rerender(<RoundCelebration {...base} onDone={onDone} />);
     expect(screen.queryByTestId('edu-celebration')).toBeNull();
-    rerender(<RoundCelebration {...base} roundKey="r2" onDone={onDone} />);
+    rerender(<RoundCelebration {...base} roundKey={`${base.roundKey}-next`} onDone={onDone} />);
     expect(screen.getByTestId('edu-celebration')).toBeTruthy();
+  });
+
+  it('a remount for a round already shown does not replay the beat', () => {
+    const first = render(<RoundCelebration {...base} roundKey="seen-once" />);
+    expect(screen.getByTestId('edu-celebration')).toBeTruthy();
+    first.unmount();
+    render(<RoundCelebration {...base} roundKey="seen-once" />);
+    expect(screen.queryByTestId('edu-celebration')).toBeNull();
   });
 
   it('renders nothing before a placing exists', () => {

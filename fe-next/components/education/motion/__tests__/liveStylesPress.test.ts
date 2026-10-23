@@ -21,6 +21,7 @@ describe('live screen buttons press like the motion kit', () => {
 
   it('PRESS never overrides a lip, so lipless controls stay flat and instant', () => {
     expect(PRESS).not.toMatch(/shadow|translate|scale|transition/);
+    expect(PRESS).toMatch(/(^|\s)active:brightness-/);
     expect(PRESS).toContain('focus-visible:ring-neo-cyan');
     expect(PRESS).toContain('disabled:opacity-60');
   });

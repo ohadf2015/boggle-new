@@ -2,9 +2,9 @@ import { pressClasses } from '@/components/education/motion/pressClasses';
 
 export type Translate = (key: string, params?: Record<string, string | number>) => string;
 
-/** Focus and disabled states only; the lip and its instant press come from PRIMARY_BUTTON / SECONDARY_BUTTON, which PRESS must never override. */
+/** A filter-only press cue: a translate or scale here would override or stack on the lip's sink in cn(PRIMARY_BUTTON, PRESS). */
 export const PRESS =
-  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-not-allowed disabled:opacity-60';
+  'active:brightness-90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-not-allowed disabled:opacity-60';
 
 export const PRIMARY_BUTTON = `inline-flex items-center justify-center gap-2 rounded-neo border-4 border-neo-black bg-neo-lime font-neo-display font-black uppercase tracking-tight text-neo-black ${pressClasses(4)}`;
 
