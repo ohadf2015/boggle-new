@@ -1,6 +1,7 @@
 'use client';
 
 import { Application, Container, Graphics, type Text } from 'pixi.js';
+import { keepRafLoopAlive, restartPixiTicker, releaseStuckPointers } from '@/lib/native/foregroundResume';
 import { useEffect, useRef } from 'react';
 import { PX_PER_M, type TowerWorld, snapshotWorld, stepWorld } from '@/lib/wordTowerV2/engine';
 import { CRANE_ARM_PX, CRANE_CLEARANCE_PX, SWING, fallTimeMs, predictLandingX, throwArc } from '@/lib/wordTowerV2/crane';
@@ -151,9 +152,11 @@ export default function TowerCanvas(props: Props) {
     let lookX = 0;
     let lookHome = propsRef.current.homeKey;
     let dragFrom: { x: number; y: number; look: number; lookX: number } | null = null;
+    const capturedPointers = new Set<number>();
     const onPointerDown = (e: PointerEvent) => {
       dragFrom = { x: e.clientX, y: e.clientY, look: lookTarget, lookX: lookXTarget };
       host.setPointerCapture(e.pointerId);
+      capturedPointers.add(e.pointerId);
     };
     const onPointerMove = (e: PointerEvent) => {
       // Content follows the finger: drag UP to walk down your own tower.
@@ -163,8 +166,21 @@ export default function TowerCanvas(props: Props) {
     };
     const onPointerUp = (e: PointerEvent) => {
       dragFrom = null;
+      capturedPointers.delete(e.pointerId);
       if (host.hasPointerCapture(e.pointerId)) host.releasePointerCapture(e.pointerId);
     };
+    // A native ad / app switch hides the WebView mid-drag: pointerup never
+    // arrives, the capture keeps stealing taps, and the rAF loop below is
+    // dropped — the "Word Tower froze, had to restart" report. Restart the loop
+    // and drop any gesture that outlived the pause.
+    let restartLoop: () => void = () => {};
+    const keepAlive = keepRafLoopAlive(() => {
+      releaseStuckPointers(host, capturedPointers);
+      capturedPointers.clear();
+      dragFrom = null;
+      restartPixiTicker(app);
+      restartLoop();
+    });
     const onWheel = (e: WheelEvent) => {
       lookTarget -= e.deltaY;
       // Trackpads and shift+wheel report sideways scroll here.
@@ -257,6 +273,7 @@ export default function TowerCanvas(props: Props) {
 
       const tick = (ts: number) => {
         raf = requestAnimationFrame(tick);
+        keepAlive.beat();
         const p = propsRef.current;
         const world = p.world;
 
@@ -637,11 +654,18 @@ export default function TowerCanvas(props: Props) {
         }
       };
 
+      restartLoop = () => {
+        if (disposed) return;
+        cancelAnimationFrame(raf);
+        lastTs = performance.now();
+        raf = requestAnimationFrame(tick);
+      };
       raf = requestAnimationFrame(tick);
     })();
 
     return () => {
       disposed = true;
+      keepAlive.stop();
       cancelAnimationFrame(raf);
       resizeObserver?.disconnect();
       host.removeEventListener('pointerdown', onPointerDown);

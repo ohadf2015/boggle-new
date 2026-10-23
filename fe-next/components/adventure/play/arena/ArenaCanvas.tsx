@@ -14,6 +14,7 @@
  * under prefers-reduced-motion (the caller renders a static stage instead).
  */
 import { Application, Assets, Container, Graphics, type Texture } from 'pixi.js';
+import { keepRafLoopAlive } from '@/lib/native/foregroundResume';
 import { useEffect, useRef } from 'react';
 import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
 import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
@@ -67,6 +68,10 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
     if (!host) return;
     let disposed = false;
     let raf = 0;
+    // A native ad / app switch drops the pending rAF in the Android WebView and
+    // the fight freezes mid-blow. Re-arm the loop on resume / stall.
+    let restartLoop: () => void = () => {};
+    const keepAlive = keepRafLoopAlive(() => restartLoop());
     let app: Application | null = null;
     let visible = true;
     // Every delayed beat, so unmounting mid-fight can never fire into a dead scene.
@@ -317,6 +322,7 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
 
       const tick = (ts: number) => {
         raf = requestAnimationFrame(tick);
+        keepAlive.beat();
         const rawMs = Math.min(ts - lastTs, 90);
         lastTs = ts;
 
@@ -417,11 +423,18 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
         // The scene keeps stepping (cheap); only the GPU draw waits for the stage to be seen.
         if (visible) created.render();
       };
+      restartLoop = () => {
+        if (disposed) return;
+        cancelAnimationFrame(raf);
+        lastTs = performance.now();
+        raf = requestAnimationFrame(tick);
+      };
       raf = requestAnimationFrame(tick);
     })();
 
     return () => {
       disposed = true;
+      keepAlive.stop();
       cancelAnimationFrame(raf);
       for (const id of timers) clearTimeout(id);
       timers.clear();

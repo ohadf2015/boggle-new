@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode, RefObject } from 'react';
+import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
 import { Delete, Shuffle, Undo2 } from 'lucide-react';
 import { WordTowerWheel } from '@/components/wordTower/WordTowerWheel';
 
@@ -34,7 +34,12 @@ interface Props {
   onDrop: () => void;
   onPutBack: () => void;
   onBackspace: () => void;
+  /** Long-press on backspace: rub out the whole word at once. */
+  onClearWord?: () => void;
 }
+
+/** Hold this long on backspace to clear the whole word. */
+export const CLEAR_WORD_HOLD_MS = 450;
 
 /**
  * The controls: scramble, the swipe wheel (which morphs into the drop dial),
@@ -49,6 +54,31 @@ interface Props {
  */
 export function V2Dock(p: Props) {
   const { t } = p;
+  // Rage clicks on backspace were the #1 frustration signal on Word Tower
+  // (PostHog, Oct 2026): players hammer it to undo a long wrong word. Holding
+  // it now clears the word in one go; the click that ends the hold is eaten so
+  // it can't also rub out a letter of the NEXT word.
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const holdFired = useRef(false);
+  const cancelHold = () => {
+    if (holdTimer.current) { clearTimeout(holdTimer.current); holdTimer.current = null; }
+  };
+  useEffect(() => cancelHold, []);
+  const onBackspaceDown = () => {
+    holdFired.current = false;
+    cancelHold();
+    if (p.swinging || !p.onClearWord) return;
+    holdTimer.current = setTimeout(() => {
+      holdTimer.current = null;
+      holdFired.current = true;
+      p.onClearWord?.();
+    }, CLEAR_WORD_HOLD_MS);
+  };
+  const onBackspaceClick = () => {
+    cancelHold();
+    if (holdFired.current) { holdFired.current = false; return; }
+    if (p.swinging) p.onPutBack(); else p.onBackspace();
+  };
 
   return (
     <div
@@ -123,7 +153,11 @@ export function V2Dock(p: Props) {
             been a third control competing for the same corner. */}
         <button
           type="button"
-          onClick={p.swinging ? p.onPutBack : p.onBackspace}
+          onClick={onBackspaceClick}
+          onPointerDown={onBackspaceDown}
+          onPointerLeave={cancelHold}
+          onPointerCancel={cancelHold}
+          onContextMenu={(e) => e.preventDefault()}
           disabled={p.swinging ? !p.canPutBack : p.selected.length === 0 || !p.composing}
           aria-label={t(p.swinging ? 'wordTowerV2.changeWord' : 'wordTower.hud.backspace')}
           className={`flex h-14 w-14 items-center justify-center rounded-neo border-neo-thick border-black text-neo-navy shadow-hard transition-colors lg:h-16 lg:w-16 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none ${

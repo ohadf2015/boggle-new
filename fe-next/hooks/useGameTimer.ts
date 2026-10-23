@@ -17,6 +17,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { keepRafLoopAlive } from '@/lib/native/foregroundResume';
 
 // ==================== Types ====================
 
@@ -185,15 +186,33 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
 
     const useRAF = remainingTimeRef.current <= RAF_THRESHOLD;
 
-    if (useRAF) {
-      // RAF mode for final seconds — smooth visual countdown
+    // RAF mode (final seconds). The Android WebView drops a pending rAF while
+    // an ad Activity / app switch hides it, which froze the clock at e.g. 0:04
+    // forever — the round never ended and the player had to restart. The
+    // keep-alive re-arms the loop on resume or after a visible-but-frameless
+    // stall; the clock itself is wall-time based, so it catches up correctly.
+    let rafKeepAlive: ReturnType<typeof keepRafLoopAlive> | null = null;
+    const startRafCountdown = () => {
       const tick = () => {
-        const newTime = computeAndApplyTime();
-        if (newTime > 0) {
+        rafKeepAlive?.beat();
+        const t = computeAndApplyTime();
+        if (t > 0) {
           animationFrameRef.current = requestAnimationFrame(tick);
+        } else {
+          rafKeepAlive?.stop();
         }
       };
+      rafKeepAlive?.stop();
+      rafKeepAlive = keepRafLoopAlive(() => {
+        if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = requestAnimationFrame(tick);
+      });
       animationFrameRef.current = requestAnimationFrame(tick);
+    };
+
+    if (useRAF) {
+      // RAF mode for final seconds — smooth visual countdown
+      startRafCountdown();
     } else {
       // Interval mode for normal gameplay — check every 1000ms
       // Display only shows whole seconds, so 1s interval is sufficient.
@@ -204,13 +223,7 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
         // Switch to RAF when crossing threshold
         if (newTime > 0 && newTime <= RAF_THRESHOLD) {
           clearTimers();
-          const tick = () => {
-            const t = computeAndApplyTime();
-            if (t > 0) {
-              animationFrameRef.current = requestAnimationFrame(tick);
-            }
-          };
-          animationFrameRef.current = requestAnimationFrame(tick);
+          startRafCountdown();
         } else if (newTime <= 0) {
           clearTimers();
         }
@@ -218,6 +231,7 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
     }
 
     return () => {
+      rafKeepAlive?.stop();
       // IMPORTANT: Accumulate elapsed time on cleanup to preserve progress
       if (startTimestampRef.current !== null) {
         const now = performance.now();

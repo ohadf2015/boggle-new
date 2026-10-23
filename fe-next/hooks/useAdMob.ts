@@ -346,6 +346,15 @@ export function useAdMob() {
     // for a settle that arrives without a stage (defensive — all paths set one).
     let terminalStage: InterstitialLifecycleStage | null = null;
 
+    // Interstitial twin of the rewarded visibility reconcile: while the ad
+    // Activity fronts, the WebView's JS (and so the 30s show watchdog) is
+    // frozen. If Dismissed is dropped, the results screen / MP host stayed
+    // blocked — with the game clocks paused by the ad bus — for up to the full
+    // watchdog AFTER the player was already back. Settle a short grace after
+    // the WebView returns instead.
+    let visReconcileTimer: ReturnType<typeof setTimeout> | null = null;
+    let onVisibility: (() => void) | null = null;
+
     await new Promise<void>((resolve) => {
       const settle = () => {
         if (settled) return;
@@ -354,6 +363,11 @@ export function useAdMob() {
         // bus flag so the socket background-disconnect guard re-arms.
         emitRewardAdActive(false);
         if (timer) { clearTimeout(timer); timer = null; }
+        if (visReconcileTimer) { clearTimeout(visReconcileTimer); visReconcileTimer = null; }
+        if (onVisibility && typeof document !== 'undefined') {
+          document.removeEventListener('visibilitychange', onVisibility);
+          onVisibility = null;
+        }
         handles.forEach((h) => { try { h.remove(); } catch {} });
         handles.length = 0;
         // Ad-quality measurement (lib/ads/adQuality, Deloitte × AdMob 2025):
@@ -452,6 +466,21 @@ export function useAdMob() {
           // 5s background-disconnect (the "ad between games → disconnected"
           // report). settle() drops it on every terminal path.
           emitRewardAdActive(true);
+          if (typeof document !== 'undefined') {
+            let wentHidden = false;
+            onVisibility = () => {
+              if (settled) return;
+              if (document.hidden) { wentHidden = true; return; }
+              if (!wentHidden || visReconcileTimer) return;
+              visReconcileTimer = setTimeout(() => {
+                if (settled) return;
+                trackInterstitialLifecycle('visibility_reconcile');
+                terminalStage = 'visibility_reconcile';
+                settle();
+              }, VISIBILITY_RECONCILE_GRACE_MS);
+            };
+            document.addEventListener('visibilitychange', onVisibility);
+          }
           await AdMob.showInterstitial();
           trackInterstitialLifecycle('show_resolved');
         } catch {

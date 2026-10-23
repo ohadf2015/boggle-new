@@ -387,6 +387,40 @@ describe('useAdMob', () => {
     expect(isFullscreenAdActive()).toBe(false);
   });
 
+  it('interstitial settles shortly after the WebView returns when Dismissed is dropped', async () => {
+    // The ad Activity froze JS (and the 30s watchdog). If the native Dismissed
+    // never arrives, the results screen / MP host must not stay blocked with
+    // the game clocks paused once the player is back.
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await drainInterstitial(() => result.current.showInterstitial(), 5);
+    });
+    vi.useFakeTimers();
+    let hidden = false;
+    const hiddenSpy = vi.spyOn(document, 'hidden', 'get').mockImplementation(() => hidden);
+    try {
+      let done = false;
+      await act(async () => {
+        const p = result.current.showInterstitial().then(() => { done = true; });
+        await flush();
+        expect(AdMob.showInterstitial).toHaveBeenCalled();
+        hidden = true;
+        document.dispatchEvent(new Event('visibilitychange'));
+        hidden = false;
+        document.dispatchEvent(new Event('visibilitychange'));
+        await vi.advanceTimersByTimeAsync(2100);
+        await p;
+      });
+      expect(done).toBe(true);
+      expect(isFullscreenAdActive()).toBe(false);
+      expect(trackInterstitialLifecycle).toHaveBeenCalledWith('visibility_reconcile');
+    } finally {
+      hiddenSpy.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
   it('no-fill / ineligible interstitial never raises the bus flag', async () => {
     vi.mocked(AdMob.prepareInterstitial).mockRejectedValue(new Error('no fill'));
     try {
