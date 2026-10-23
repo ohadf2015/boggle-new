@@ -38,6 +38,7 @@ import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
 import { ClassroomModeCardRow, ClassroomModeCatalogue } from './ClassroomModeCatalogue';
 import { LobbySetupPanel } from './lobby/LobbySetupPanel';
 import { playableLessonWords } from '@/lib/education/lessonPickerModel';
+import { wordcraftPlayable } from './lobby/wordcraftPlayable';
 import { LobbyRoundSettings } from './lobby/LobbyRoundSettings';
 import { LobbySetupDisclosure } from './lobby/LobbySetupDisclosure';
 import { LobbyPressureDials } from './lobby/LobbyPressureDials';
@@ -232,6 +233,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
       setStartError(null);
       const classroom = classrooms.find((c) => c.id === selectedClassroomId);
       if (mode === VOCAB_QUIZ_MODE && !quizPlayable) return;
+      if (mode === 'wordcraft' && !wordcraftPlayable(allPlayableWords, lessonLanguage ?? language)) return;
       if (!user || !classroom || selectedLessonIds.length === 0) {
         toast.error(t('education.classroomGame.missingRequirements'));
         setStartError('education.classroomGame.missingRequirements');
@@ -338,7 +340,9 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
     ? 'education.modePicker.needsLesson'
     : gameMode === VOCAB_QUIZ_MODE && !quizPlayable
       ? 'eg2Modes.needsMeanings'
-      : null;
+      : gameMode === 'wordcraft' && !wordcraftPlayable(allPlayableWords, lessonLanguage ?? language)
+        ? 'education.modePicker.wordcraftNeedsShortWords'
+        : null;
 
   if (roomCreatedGameCode) {
     return <PageLoader text={t('teacher.classroom.settingUp')} size="lg" nested />;
