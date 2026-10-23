@@ -14,13 +14,6 @@
 
 /* ── shared ─────────────────────────────────────────────────────────────── */
 
-.tiltCard {
-  transform: rotate(-2deg);
-}
-.tiltCardAlt {
-  transform: rotate(2deg);
-}
-
 /* ── Daily: a new day resets to 6, then today's flame lights → 7 ───────── */
 
 .rollWindow {

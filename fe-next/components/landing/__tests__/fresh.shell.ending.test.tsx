@@ -106,7 +106,7 @@ describe('the finale is the last thing on the page', () => {
     const heads = finale.querySelectorAll('h1,h2,h3,h4');
     expect([...heads].map((h) => h.textContent)).toEqual(['homeFresh.close.title']);
     expect(heads[0].tagName).toBe('H2');
-    expect(heads[0].className).toMatch(/\bfont-neo-display\b/);
+    expect(heads[0].className).toMatch(/\bfont-neo-poster\b/);
     expect(heads[0].className).toMatch(/\bmd:text-6xl\b/);
     expect(screen.queryByText('homeFresh.close.signoff')).toBeNull();
   });

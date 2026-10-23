@@ -1,0 +1,73 @@
+/* Hallmark · genre: playful (brand-overridden) · macrostructure: Bento Grid · design-system: DESIGN.md · designed-as-app
+ * theme: LexiClash neo navy + mode accents · display: Unbounded (--font-poster) · body: Rubik
+ * pre-emit critique: P4 H4 E4 S4 R3 V4
+ */
+
+/* Long single words (sv/es compounds) wrap instead of pushing a tile wider than a 320px screen. */
+.posterWrap {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+/* Tiles lie on the board slightly askew, like letter tiles tipped out of the bag.
+   `rotate` and `translate` are separate properties, so the tilt, the hover lift
+   and the entrance (`transform`) compose instead of overwriting each other. */
+.tiltA {
+  rotate: -0.8deg;
+}
+.tiltB {
+  rotate: 0.9deg;
+}
+.tiltC {
+  rotate: -0.4deg;
+}
+.sticker {
+  transform: rotate(8deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tile {
+    transition: translate 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .tile:hover {
+    translate: 0 -4px;
+  }
+
+  /* Tiles drop onto the board as they scroll in and settle by mid-screen; the
+     resting frame (no support, reduced motion) is the settled tile. */
+  @supports (animation-timeline: view()) {
+    .enter {
+      animation-name: board-drop;
+      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+    .enterLate {
+      animation-range: entry 10% cover 36%;
+    }
+  }
+
+  .sticker {
+    animation: board-sticker 3.6s ease-in-out infinite;
+  }
+}
+
+@keyframes board-drop {
+  from {
+    transform: translateY(48px) rotate(-3deg) scale(0.94);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes board-sticker {
+  0%,
+  100% {
+    transform: rotate(8deg) translateY(0);
+  }
+  50% {
+    transform: rotate(3deg) translateY(-6px);
+  }
+}

@@ -181,7 +181,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
           <PlanCardsSkeleton />
         ) : viewer === 'pro' ? (
           <>
-            <h1 className="mb-4 font-neo-display text-2xl font-black text-neo-white md:text-3xl">{t('eg2Pro.tools.plansTitle')}</h1>
+            <h1 className="mb-4 font-neo-poster text-2xl font-extrabold tracking-[-0.01em] text-neo-white [overflow-wrap:anywhere] md:text-3xl">{t('eg2Pro.tools.plansTitle')}</h1>
             <ProPlanPanel
               status={status}
               source={source}
@@ -191,7 +191,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
               included={proFeatures}
             />
             <section data-testid="pro-tools" className="mt-8">
-              <h2 className="mb-3 font-neo-display text-xl font-black text-neo-white md:text-2xl">{t('eg2Pro.tools.title')}</h2>
+              <h2 className="mb-3 font-neo-poster text-xl font-extrabold tracking-[-0.01em] text-neo-white [overflow-wrap:anywhere] md:text-2xl">{t('eg2Pro.tools.title')}</h2>
               <ParentReportPack />
             </section>
             <UpgradeFaq />
@@ -206,7 +206,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                   </p>
                   <TeacherProofLine className="flex items-center gap-1.5 text-xs font-bold text-neo-white/85" />
                 </div>
-                <h1 className="font-neo-display text-2xl font-black text-neo-white md:text-3xl" style={{ textWrap: 'balance' }}>
+                <h1 className="font-neo-poster text-2xl font-extrabold tracking-[-0.01em] text-neo-white [overflow-wrap:anywhere] md:text-3xl" style={{ textWrap: 'balance' }}>
                   {t('teacher.subscription.upgradePricingTitle')}
                 </h1>
                 <p data-testid="upgrade-value-prop" className="mt-0.5 text-sm font-bold text-neo-lime">

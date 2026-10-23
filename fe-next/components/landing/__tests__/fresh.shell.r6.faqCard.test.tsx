@@ -51,13 +51,12 @@ describe('the FAQ is one card', () => {
     expect(card.contains(region.querySelector('p[data-home-tail="readmore"]'))).toBe(true);
   });
 
-  it('rhymes with the hero board: black border, pink hard shadow that flips in RTL', () => {
+  it('is a board tile: solid pink border (a black one vanishes on navy), black hard shadow', () => {
     const { card } = renderFaq();
     expect(card.className).toMatch(/\bborder-3\b/);
-    expect(card.className).toMatch(/\bborder-neo-black\b/);
+    expect(card.className).toMatch(/\bborder-neo-pink\b/);
     expect(card.className).toMatch(/\bbg-neo-navy-light\b/);
-    expect(card.className).toContain('shadow-[7px_7px_0_0_var(--neo-pink)]');
-    expect(card.className).toContain('rtl:shadow-[-7px_7px_0_0_var(--neo-pink)]');
+    expect(card.className).toMatch(/\bshadow-hard-xl\b/);
   });
 
   it('carries the thinking mascot on its corner, painted as CSS (no <img> in the FAQ)', () => {
@@ -72,8 +71,8 @@ describe('the FAQ is one card', () => {
   it('sets the FAQ headline at section scale', () => {
     renderFaq();
     const h = screen.getByRole('heading', { name: 'Frequently asked questions' });
-    expect(h.className).toMatch(/\bfont-neo-display\b/);
-    expect(h.className).toMatch(/\bmd:text-5xl\b/);
+    expect(h.className).toMatch(/\bfont-neo-poster\b/);
+    expect(h.className).toMatch(/\bmd:text-4xl\b/);
   });
 
   it('keeps the About lead at line scale, clamped, visible at rest', () => {

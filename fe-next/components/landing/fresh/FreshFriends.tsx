@@ -33,10 +33,7 @@ function RaceArt({ roomLabel, you, rival }: { roomLabel: string; you: string; ri
     <div
       data-fresh-art="race"
       aria-hidden="true"
-      className={cn(
-        'w-full max-w-[340px] rounded-neo-lg border-3 border-neo-pink bg-neo-navy-light p-5 shadow-[6px_6px_0_0_rgb(0_0_0)] md:max-w-[460px] md:p-7',
-        s.tiltCardAlt
-      )}
+      className="w-full rounded-neo-lg bg-neo-navy p-4 md:p-5"
     >
       <div className="flex items-center justify-between gap-3">
         <span className="font-neo-body text-sm font-bold uppercase tracking-wide text-neo-cream/70">{roomLabel}</span>
@@ -87,7 +84,9 @@ export function FreshFriends() {
     <FreshSection
       id="friends"
       accent="pink"
-      flip
+      tilt="b"
+      late
+      className="md:col-span-5"
       title={t('homeFresh.sections.friends.title')}
       line={t('homeFresh.sections.friends.line')}
       link={{ href: `/${language}/multiplayer`, label: t('homeFresh.sections.friends.cta') }}

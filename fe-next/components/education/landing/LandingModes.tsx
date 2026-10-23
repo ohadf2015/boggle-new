@@ -27,7 +27,7 @@ export function LandingModes() {
 
   return (
     <section id="modes" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-8 sm:px-6 sm:py-14 lg:px-8">
-      <h2 className="text-balance font-neo-display text-2xl font-black leading-tight text-neo-white sm:text-3xl">
+      <h2 className="text-balance font-neo-poster text-2xl font-extrabold leading-tight tracking-[-0.01em] text-neo-white [overflow-wrap:anywhere] sm:text-3xl">
         {t('eduPlans.modes.title', { count: modes.length })}
       </h2>
       <p className="mt-2 max-w-[60ch] text-base text-neo-white/75">{t('eduPlans.modes.sub')}</p>

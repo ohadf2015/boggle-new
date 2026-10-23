@@ -188,7 +188,7 @@ export function PageClient() {
           }
         >
           <div>
-            <h1 className="text-balance font-neo-display text-[clamp(2.125rem,6vw,3.5rem)] font-black leading-[1.05] tracking-[-0.035em]">
+            <h1 className="text-balance font-neo-poster text-[clamp(1.75rem,5vw,2.9rem)] font-extrabold leading-[1.08] tracking-[-0.015em] [overflow-wrap:anywhere]">
               {t('education.access.h1')}
             </h1>
             <p className="mt-4 max-w-[62ch] text-lg leading-relaxed text-neo-white/85">

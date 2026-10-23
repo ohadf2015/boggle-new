@@ -61,19 +61,22 @@ function Run({ words, hidden }: { words: readonly string[]; hidden?: boolean }) 
  * material at a glance. Decoration only (aria-hidden, no heading, no section
  * id); at rest it is a full static row, and the loop pauses on hover.
  */
-export function FreshMarquee() {
+export function FreshMarquee({ cross }: { cross?: boolean }) {
   const { language } = useLanguage();
-  const words = marqueeWords(language);
+  const all = marqueeWords(language);
+  // The crossing band starts mid-list and runs the other way, so the two bands never read as one repeated strip.
+  const words = cross ? [...all.slice(5), ...all.slice(0, 5)] : all;
   return (
     <div
       aria-hidden="true"
-      data-fresh-marquee=""
+      data-fresh-marquee={cross ? 'cross' : ''}
       className={cn(
-        'relative -mx-[4%] w-[108%] -rotate-1 select-none overflow-hidden border-y-3 border-neo-cream/40 bg-neo-navy-light py-4 md:py-5',
+        'relative -mx-[4%] w-[108%] select-none overflow-hidden border-y-3 py-4 md:py-5',
+        cross ? 'rotate-[1.5deg] border-neo-pink bg-neo-navy' : '-rotate-1 border-neo-cream/40 bg-neo-navy-light',
         s.marqueeBand
       )}
     >
-      <div className={s.marquee}>
+      <div className={cn(s.marquee, cross && s.marqueeReverse)}>
         <Run words={words} />
         <Run words={words} hidden />
       </div>

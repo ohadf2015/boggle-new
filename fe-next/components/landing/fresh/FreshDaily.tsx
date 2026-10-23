@@ -17,15 +17,10 @@ const DONE_DAYS = 6;
  */
 function StreakArt({ label }: { label: string }) {
   return (
-    <div data-fresh-art="streak" aria-hidden="true" className="relative w-full max-w-[340px] pt-12 md:max-w-[440px]">
-      <div
-        className={cn(
-          'rounded-neo-lg border-3 border-neo-cyan bg-neo-navy-light p-5 shadow-[6px_6px_0_0_rgb(0_0_0)] md:p-6',
-          s.tiltCard
-        )}
-      >
-        <div className="flex items-end gap-2">
-          <span className="font-neo-display text-6xl font-bold leading-none text-neo-orange md:text-7xl">
+    <div data-fresh-art="streak" aria-hidden="true" className="relative w-full pt-4">
+      <div className="rounded-neo-lg bg-neo-navy p-4 md:p-5">
+        <div className="flex items-end gap-3">
+          <span className="font-neo-poster text-6xl font-extrabold leading-none text-neo-orange md:text-7xl">
             <span className={s.rollWindow}>
               <span className={s.rollStrip}>
                 <span>{DONE_DAYS}</span>
@@ -58,7 +53,7 @@ function StreakArt({ label }: { label: string }) {
       </div>
       <div
         className={cn(
-          'absolute -top-4 end-0 aspect-square w-28 bg-[url(/home/shell/daily-inferno.webp)] bg-contain bg-center bg-no-repeat md:-end-6 md:w-32',
+          'absolute -top-14 end-0 aspect-square w-24 bg-[url(/home/shell/daily-inferno.webp)] bg-contain bg-center bg-no-repeat md:-top-16 md:w-28',
           s.bob
         )}
       />
@@ -77,6 +72,7 @@ export function FreshDaily() {
       line={t('homeFresh.sections.daily.line')}
       link={{ href: `/${language}/daily/word-wheel`, label: t('homeFresh.sections.daily.cta') }}
       art={<StreakArt label={t('homeFresh.sections.daily.streak')} />}
+      className="md:col-span-7"
     />
   );
 }

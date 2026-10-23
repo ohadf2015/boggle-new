@@ -119,13 +119,13 @@ export function HomepageContentSection({ content, locale }: HomepageContentSecti
     <div className="w-full">
       <section
         aria-label={l.about}
-        className="mx-auto w-full max-w-3xl px-4 pb-24 pt-24 font-neo-body text-neo-cream sm:px-6 md:pb-40 md:pt-32"
+        className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-4 pb-12 pt-16 font-neo-body text-neo-cream sm:px-6 md:grid-cols-12 md:gap-5 md:pb-16 md:pt-20 lg:px-8"
       >
         {siteAnswer && (
-          <section aria-labelledby="what-is-lexiclash-live" className="mb-10">
+          <section aria-labelledby="what-is-lexiclash-live" className="md:col-span-4 md:self-start md:pe-4 md:pt-20">
             <h2
               id="what-is-lexiclash-live"
-              className="font-neo-display text-xl font-bold leading-tight text-neo-cream text-balance"
+              className="font-neo-poster text-xl font-bold leading-tight tracking-[-0.01em] text-neo-cream text-balance [overflow-wrap:anywhere]"
             >
               {siteAnswer.question}
             </h2>
@@ -137,16 +137,16 @@ export function HomepageContentSection({ content, locale }: HomepageContentSecti
             </p>
             <Link
               href={`/${locale}/multiplayer`}
-              className="mt-5 inline-block rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg"
+              className="mt-5 inline-flex min-h-11 items-center rounded-neo border-3 border-neo-black bg-neo-lime px-5 py-2.5 font-neo-display text-base font-bold text-neo-black shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream"
             >
               Play LexiClash free
             </Link>
           </section>
         )}
-        <section aria-labelledby="home-faq-title">
+        <section aria-labelledby="home-faq-title" className="min-w-0 pt-16 md:col-span-8 md:pt-12">
           <div
             data-faq-card
-            className="relative rounded-neo-xl border-3 border-neo-black bg-neo-navy-light p-4 shadow-[7px_7px_0_0_var(--neo-pink)] rtl:shadow-[-7px_7px_0_0_var(--neo-pink)] sm:p-6 md:p-8"
+            className="relative rounded-neo-xl border-3 border-neo-pink bg-neo-navy-light p-4 shadow-hard-xl sm:p-6 md:p-8"
           >
             {/* Decorative, painted as CSS: it paints without scrolling, and a
                 background is never fetched while its tree is display:none. */}
@@ -160,7 +160,7 @@ export function HomepageContentSection({ content, locale }: HomepageContentSecti
             />
             <h2
               id="home-faq-title"
-              className="font-neo-display text-3xl font-bold leading-[1.08] text-neo-cream text-balance sm:text-4xl md:text-5xl"
+              className="font-neo-poster text-[1.6rem] font-extrabold leading-[1.08] tracking-[-0.01em] text-neo-cream text-balance [overflow-wrap:anywhere] sm:text-3xl md:text-4xl"
             >
               {l.faq}
             </h2>

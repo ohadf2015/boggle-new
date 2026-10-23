@@ -18,6 +18,7 @@ import { FreshDaily } from './FreshDaily';
 import { FreshFriends } from './FreshFriends';
 import { ModeRow } from './ModeRow';
 import { FreshAdSlot } from './FreshAdSlot';
+import { FreshMarquee } from './FreshMarquee';
 import { FreshClassrooms } from './FreshClassrooms';
 import { FreshEduStrip } from './FreshEduStrip';
 
@@ -34,12 +35,20 @@ export function FreshPage({ onPlay }: FreshPageProps) {
   return (
     <div className="flex w-full flex-col overflow-x-clip">
       <FreshHero onPlay={onPlay} />
-      <FreshDaily />
-      <FreshFriends />
+      <div
+        data-fresh-board=""
+        className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-4 px-4 pb-12 pt-16 sm:px-6 md:grid-cols-12 md:gap-5 md:pb-16 md:pt-20 lg:px-8"
+      >
+        <FreshDaily />
+        <FreshFriends />
+      </div>
+      <FreshMarquee cross />
       <ModeRow />
       <FreshEduStrip />
       <FreshAdSlot />
-      <FreshClassrooms />
+      <div className="mx-auto w-full max-w-6xl px-4 pb-4 pt-6 sm:px-6 md:pt-4 lg:px-8">
+        <FreshClassrooms />
+      </div>
     </div>
   );
 }

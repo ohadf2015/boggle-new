@@ -39,7 +39,7 @@ export function EducationHero({ setupPending = false }: { setupPending?: boolean
     <section data-testid="education-hero" className="relative overflow-hidden bg-neo-navy">
       <div className="relative mx-auto grid max-w-6xl items-start gap-6 px-4 pb-8 pt-5 sm:px-6 sm:pt-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12 lg:px-8 lg:pb-14">
         <div className="text-center lg:pt-6 lg:text-start">
-          <h1 className="text-balance font-neo-display text-[2rem] font-black leading-[1.08] text-neo-cream sm:text-5xl">
+          <h1 className="text-balance font-neo-poster text-[1.75rem] font-extrabold leading-[1.1] tracking-[-0.015em] text-neo-cream [overflow-wrap:anywhere] sm:text-[2.6rem]">
             {t('eg2Land.hero.h1')}
           </h1>
           <p className="education-hero-sub mx-auto mt-4 max-w-[46ch] text-base text-neo-cream/80 sm:text-lg lg:mx-0">

@@ -72,12 +72,12 @@ export function ModeRow() {
   };
 
   return (
-    <section data-fresh-section="modes" aria-labelledby="fresh-modes-title" className="w-full py-14 md:py-24">
+    <section data-fresh-section="modes" aria-labelledby="fresh-modes-title" className="w-full py-12 md:py-16">
       <div className="mx-auto flex w-full max-w-6xl items-end justify-between gap-6 px-4 sm:px-6 lg:px-8">
         <div>
           <h2
             id="fresh-modes-title"
-            className="font-neo-display text-3xl font-bold leading-[1.08] text-neo-cream text-balance sm:text-4xl md:text-5xl"
+            className="font-neo-poster text-[1.75rem] font-extrabold leading-[1.08] tracking-[-0.01em] text-neo-cream text-balance [overflow-wrap:anywhere] sm:text-4xl md:text-5xl"
           >
             {t('homeFresh.modes.title')}
           </h2>

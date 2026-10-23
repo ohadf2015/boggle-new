@@ -125,6 +125,36 @@ export const rubikCyrillic = localFont({
   preload: false,
 });
 
+// Poster display face for marketing headings. No Hebrew glyphs: `he` omits it and
+// --font-poster falls through to the Hebrew stack.
+export const unboundedLatin = localFont({
+  src: [
+    {
+      path: '../public/fonts/unbounded-latin.woff2',
+      weight: '200 900',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
+  variable: '--font-unbounded',
+  fallback: ['system-ui', 'Arial', 'sans-serif'],
+  preload: true,
+});
+
+export const unboundedCyrillic = localFont({
+  src: [
+    {
+      path: '../public/fonts/unbounded-cyrillic.woff2',
+      weight: '200 900',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
+  variable: '--font-unbounded',
+  fallback: ['system-ui', 'Arial', 'sans-serif'],
+  preload: false,
+});
+
 // Hebrew gamified body font — Heebo: clean, modern, variable weight 400-700
 export const heeboHebrew = localFont({
   src: [

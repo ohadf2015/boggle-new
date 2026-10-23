@@ -23,7 +23,7 @@ export function LandingSchoolLead() {
             <Building2 className="size-3.5" aria-hidden="true" />
             {t('eg2Land.school.eyebrow')}
           </span>
-          <h2 className="text-balance font-neo-display text-2xl sm:mt-3 font-black leading-tight sm:text-3xl">
+          <h2 className="text-balance font-neo-poster text-2xl font-extrabold leading-tight tracking-[-0.01em] [overflow-wrap:anywhere] sm:mt-3 sm:text-3xl">
             {t('eg2Land.school.title')}
           </h2>
           <p className="mt-3 hidden max-w-[52ch] text-base font-semibold text-neo-black/80 sm:block">{t('eg2Land.school.body')}</p>
