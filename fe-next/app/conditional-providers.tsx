@@ -17,10 +17,12 @@
  */
 
 import { usePathname } from 'next/navigation';
-import { ReactNode, useMemo, lazy, Suspense } from 'react';
+import { ReactNode, useEffect, useMemo, useState, lazy, Suspense } from 'react';
 import nextDynamic from 'next/dynamic';
 import { NextIntlClientProvider } from 'next-intl';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
+import { onFirstEngagement } from '@/lib/perf/onFirstEngagement';
 
 const CommandPalette = lazy(() => import('@/components/CommandPalette'));
 const LaunchHost = lazy(() => import('@/components/landing/home/LaunchHost').then((m) => ({ default: m.LaunchHost })));
@@ -103,6 +105,18 @@ export function ConditionalProviders({ children, lang }: ConditionalProvidersPro
     return needsGameProviders(pathname);
   }, [pathname]);
 
+  // Command palette + launch host are landing/chrome widgets. On a fullscreen
+  // game route their chunks still downloaded and evaluated inside the PSI
+  // window because lazy() starts on render. Hold them until a real key/pointer.
+  // Not a wrapper around children, so the LCP shell is not remounted.
+  const heavy = isHeavyGamePath(pathname);
+  const [chromeEngaged, setChromeEngaged] = useState(false);
+  useEffect(() => {
+    if (!heavy) return;
+    return onFirstEngagement(() => setChromeEngaged(true));
+  }, [heavy]);
+  const showChromeWidgets = !heavy || chromeEngaged;
+
   // ALWAYS wrap with EssentialProviders first (never remounts on navigation)
   // Conditionally add game-specific providers inside
   return (
@@ -116,12 +130,16 @@ export function ConditionalProviders({ children, lang }: ConditionalProvidersPro
           ) : (
             children
           )}
-          <Suspense fallback={null}>
-            <CommandPalette />
-          </Suspense>
-          <Suspense fallback={null}>
-            <LaunchHost />
-          </Suspense>
+          {showChromeWidgets && (
+            <Suspense fallback={null}>
+              <CommandPalette />
+            </Suspense>
+          )}
+          {showChromeWidgets && (
+            <Suspense fallback={null}>
+              <LaunchHost />
+            </Suspense>
+          )}
         </EssentialProviders>
       </NuqsAdapter>
     </NextIntlClientProvider>

@@ -1,11 +1,24 @@
 import { installTranslationDomGuard } from "./utils/domTranslationGuard";
 import { loadSentry, getLoadedSentry } from "./utils/sentryLazy";
+import { FIRST_ENGAGEMENT_EVENTS, hasPriorEngagement, markEngaged } from "./lib/perf/onFirstEngagement";
 
 // Harden React against DOM mutations from in-browser page translators
 // (Google Translate, Edge), which otherwise crash the app with
 // `NotFoundError: Failed to execute 'removeChild'`. Installed as early as
 // possible on the client, before React hydrates.
 installTranslationDomGuard();
+
+// Record a real key/pointer so the NEXT navigation (landing CTA → /singleplayer)
+// can auto-start the board. A cold PSI profile never fires these events, so
+// the flag stays unset and the board chunk stays out of that trace.
+if (typeof window !== "undefined" && !hasPriorEngagement()) {
+  const opts = { capture: true, passive: true } as const;
+  const mark = () => {
+    markEngaged();
+    for (const type of FIRST_ENGAGEMENT_EVENTS) window.removeEventListener(type, mark, opts);
+  };
+  for (const type of FIRST_ENGAGEMENT_EVENTS) window.addEventListener(type, mark, opts);
+}
 
 // Sentry is NOT statically imported here anymore — the SDK (~155KB min,
 // ~490KB transferred with tracing) used to ride along in the boot chunk and

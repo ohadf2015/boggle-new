@@ -2589,7 +2589,8 @@ const en = {
       "title": "Play Boggle Online Free - No Download Word Game",
       "description": "Play boggle free online — no download, no signup. Challenge AI bots, improve vocabulary, and beat your best score. Multiple difficulty levels.",
       "ogTitle": "Play Boggle Free Online - No Download",
-      "ogDescription": "Play free boggle online — no download needed. Practice word finding solo, challenge AI bots, and beat your high scores."
+      "ogDescription": "Play free boggle online — no download needed. Practice word finding solo, challenge AI bots, and beat your high scores.",
+      "tapToPlay": "Tap to play"
     },
     "daily": {
       "title": "Daily Word Wheel & Word Hunt — Free Daily Puzzle | LexiClash",

@@ -5,6 +5,7 @@ import nextDynamic from 'next/dynamic';
 import { retryImport } from '@/utils/retryImport';
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary';
 import { SpLcpSrcSwap } from '@/components/singleplayer/SpLcpSrcSwap';
+import { hasPriorEngagement, onFirstEngagement } from '@/lib/perf/onFirstEngagement';
 
 // Loading fallback matches SinglePlayerGame's fullscreen shell.
 function LoadingFallback(): React.JSX.Element {
@@ -43,28 +44,25 @@ const SinglePlayerView = nextDynamic(
 );
 
 /**
- * Single Player page route
- * Handles all single player game modes: Solo vs Bots, Practice, Challenge
+ * Single Player page route.
  *
- * Wrapped in Suspense boundary to properly handle useSearchParams
- * which can cause "Rendered fewer hooks than expected" errors without it.
- * See: https://nextjs.org/docs/app/api-reference/functions/use-search-params
- *
- * Game client is not mounted until after first paint so the server LCP
- * shell can become FCP without waiting on Script Evaluation of the board.
+ * The board chunk (~188KB gz, long tasks 200–300ms under PSI 4x CPU) used to
+ * mount on two rAFs. That is inside the Lighthouse load window, so every cold
+ * PSI run paid the parse. Gate on a real key/pointer instead: PSI never sends
+ * one, so the chunk stays out of TBT. An in-app visit already set
+ * sessionStorage `lc_engaged` on the previous page's click, so those loads
+ * still start immediately after paint. The LCP swap is NOT gated — it must
+ * run on first paint.
  */
 export default function SinglePlayerPageClient(): React.JSX.Element {
   const [hydrateGame, setHydrateGame] = useState(false);
 
   useEffect(() => {
-    let inner = 0;
-    const outer = window.requestAnimationFrame(() => {
-      inner = window.requestAnimationFrame(() => setHydrateGame(true));
-    });
-    return () => {
-      window.cancelAnimationFrame(outer);
-      window.cancelAnimationFrame(inner);
-    };
+    if (hasPriorEngagement()) {
+      setHydrateGame(true);
+      return;
+    }
+    return onFirstEngagement(() => setHydrateGame(true));
   }, []);
 
   return (

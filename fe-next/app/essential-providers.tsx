@@ -30,6 +30,9 @@ import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { AdMobProvider } from '@/contexts/AdMobContext';
 import { holdFxUntilFirstUse } from '@/lib/pixiFx/SharedFxGate';
 import { runWhenScrollSettles } from '@/lib/perf/runWhenScrollSettles';
+import { onFirstEngagement } from '@/lib/perf/onFirstEngagement';
+import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
+import { usePathname } from 'next/navigation';
 // Season claim/announcement are home-only, interaction-gated popups (never SSR/SEO
 // content) — lazy-load so their ~35KB stays out of the synchronous initial parse on
 // every route. ssr:false: they render nothing visible when there's nothing to claim,
@@ -182,6 +185,7 @@ const initLogRocket = () => {
  * mounts it immediately. useAuth returns a loading default until then.
  */
 export function EssentialProviders({ children, lang, initialTranslations }: EssentialProvidersProps) {
+    const pathname = usePathname();
     // Initialize session tracking for analytics
     useEffect(() => {
         initSessionTracking();
@@ -190,10 +194,33 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
         void initCrashlytics();
     }, []);
 
-    // Defer LogRocket initialization for optimal performance
-    // Load after 3 seconds or on first user interaction, whichever comes first
-    // Only initializes when analytics consent is granted
+    // Defer LogRocket initialization for optimal performance.
+    // Content routes: 3s or first interaction (scroll included — those pages
+    // are not the PSI TBT surface). Heavy game routes: pointer/key only.
+    // A 3s timer and scroll both fire inside a PSI mobile trace (TBT window
+    // runs until TTI, often 10s+), and the SDK eval was a long task on
+    // /singleplayer. No timeout fallback there.
     useEffect(() => {
+        if (isHeavyGamePath(pathname)) {
+            // Engagement opens the gate; consent (which may arrive later) is
+            // still required inside initLogRocket. Neither a timer nor scroll
+            // may open it — both fire inside a PSI trace.
+            let engaged = false;
+            const tryInit = () => {
+                if (engaged) initLogRocket();
+            };
+            const cancel = onFirstEngagement(() => {
+                engaged = true;
+                tryInit();
+            });
+            const handleConsent = () => tryInit();
+            window.addEventListener('cookie-consent-change', handleConsent);
+            return () => {
+                cancel();
+                window.removeEventListener('cookie-consent-change', handleConsent);
+            };
+        }
+
         const timeoutId = setTimeout(initLogRocket, 3000);
 
         const events = ['click', 'touchstart', 'keydown', 'scroll'] as const;
@@ -220,7 +247,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
             });
             window.removeEventListener('cookie-consent-change', handleConsent);
         };
-    }, []);
+    }, [pathname]);
 
     // Memoize children so that when active providers (Music, SoundEffects, Haptics)
     // change state, the children tree reference stays stable and React.memo'd
