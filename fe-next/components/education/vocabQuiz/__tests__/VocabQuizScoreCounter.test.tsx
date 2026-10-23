@@ -56,6 +56,15 @@ describe('VocabQuizScoreCounter', () => {
     expect(screen.getByTestId('vocab-quiz-score-pop')).toHaveTextContent('100');
   });
 
+  it('clears on time while the parent keeps re-rendering the same answer', () => {
+    const { rerender } = render(<VocabQuizScoreCounter score={0} pop={null} t={t} />);
+    rerender(<VocabQuizScoreCounter score={150} pop={{ points: 150, key: 1 }} t={t} />);
+    act(() => { vi.advanceTimersByTime(SCORE_POP_MS / 2); });
+    rerender(<VocabQuizScoreCounter score={150} pop={{ points: 150, key: 1 }} t={t} />);
+    act(() => { vi.advanceTimersByTime(SCORE_POP_MS / 2); });
+    expect(screen.queryByTestId('vocab-quiz-score-pop')).toBeNull();
+  });
+
   it('shows nothing flying for a wrong answer worth nothing', () => {
     const { rerender } = render(<VocabQuizScoreCounter score={150} pop={null} t={t} />);
     rerender(<VocabQuizScoreCounter score={150} pop={{ points: 0, key: 2 }} t={t} />);

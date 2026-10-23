@@ -76,11 +76,12 @@ export function VocabQuizScoreCounter({ score, pop, t, className }: VocabQuizSco
   }, [score]);
 
   const [landedKey, setLandedKey] = useState<number | null>(null);
+  const popKey = pop && pop.points > 0 ? pop.key : null;
   useEffect(() => {
-    if (!pop || pop.points <= 0) return;
-    const id = setTimeout(() => setLandedKey(pop.key), SCORE_POP_MS);
+    if (popKey === null) return;
+    const id = setTimeout(() => setLandedKey(popKey), SCORE_POP_MS);
     return () => clearTimeout(id);
-  }, [pop]);
+  }, [popKey]);
 
   const flying = pop && pop.points > 0 && pop.key !== landedKey ? pop : null;
 
