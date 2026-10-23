@@ -1,0 +1,4 @@
+/* The layout's crawler nav links to blog, FAQ and contact; on edu it must not be a keyboard or screen-reader exit. */
+body.edu-app-surface nav[aria-label="Site Navigation"] {
+  display: none;
+}
