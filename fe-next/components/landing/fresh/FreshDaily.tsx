@@ -17,7 +17,7 @@ const DONE_DAYS = 6;
  */
 function StreakArt({ label }: { label: string }) {
   return (
-    <div data-fresh-art="streak" aria-hidden="true" className="relative w-full pt-4">
+    <div data-fresh-art="streak" aria-hidden="true" className="relative w-full pt-10 sm:pt-4">
       <div className="rounded-neo-lg bg-neo-navy p-4 md:p-5">
         <div className="flex items-end gap-3">
           <span className="font-neo-poster text-6xl font-extrabold leading-none text-neo-orange md:text-7xl">
@@ -53,7 +53,7 @@ function StreakArt({ label }: { label: string }) {
       </div>
       <div
         className={cn(
-          'absolute -top-14 end-0 aspect-square w-24 bg-[url(/home/shell/daily-inferno.webp)] bg-contain bg-center bg-no-repeat md:-top-16 md:w-28',
+          'absolute -top-2 end-0 aspect-square w-20 bg-[url(/home/shell/daily-inferno.webp)] bg-contain bg-center bg-no-repeat sm:-top-14 sm:w-24 md:-top-16 md:w-28',
           s.bob
         )}
       />
