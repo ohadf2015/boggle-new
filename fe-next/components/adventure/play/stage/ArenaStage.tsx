@@ -160,8 +160,9 @@ export default function ArenaStage({ world, isBoss, combat, juice, taunt, lastHi
     h: Math.round(foeBox.h * 0.4),
   };
 
+  // The board frame cannot shrink below ~180px, so on a short phone the arena gives up height before it overlaps the player bar.
   return (
-    <div className={cn('relative w-full', isBoss ? 'h-[clamp(12rem,27dvh,14rem)]' : 'h-[11.5rem]')} data-testid="enemy-stage">
+    <div className={cn('relative w-full', isBoss ? 'h-[clamp(9rem,calc(100dvh-500px),14rem)]' : 'h-[clamp(9rem,calc(100dvh-500px),11.5rem)]')} data-testid="enemy-stage">
       {/* The arena itself. */}
       <div className="absolute inset-0 overflow-hidden rounded-2xl border-[3px] border-black bg-[#0b132f] shadow-[4px_4px_0_#000]">
         <div aria-hidden className={cn('absolute inset-x-0 bottom-0 h-2/3 blur-2xl opacity-60 transition-colors', enraged ? 'bg-neo-pink/40' : 'bg-[#3b5bdb]/30')} />

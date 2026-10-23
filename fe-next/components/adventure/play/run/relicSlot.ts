@@ -98,3 +98,13 @@ export function relicRows(count: number, railPx: number, size: RelicBarSize = 's
   const perRow = Math.max(1, Math.floor((railPx + 4) / (w + 4)));
   return Math.ceil(count / perRow);
 }
+
+/** Slots a rail `width` px wide holds at the 32px floor. */
+export const relicSlotsFit = (width: number) => Math.floor((width + RELIC_GAP_PX) / (RELIC_ICON_FLOOR_PX + RELIC_GAP_PX));
+
+/** Chips to show so chips + the "+N" tile fit `slots`; never below one chip. */
+export function fitVisible(count: number, maxVisible: number, slots: number): number {
+  let m = Math.min(maxVisible, count);
+  while (m > 1 && m + (count > m ? 1 : 0) > slots) m -= 1;
+  return m;
+}

@@ -10,14 +10,14 @@
  * numeral (`relicBadge`), and the tooltip is portaled so nothing can paint over
  * it (`RelicTooltip`).
  */
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type Ref } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Ref } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import type { RelicId } from '@/lib/adventure/play/relics';
 import RelicChip from './RelicChip';
 import RelicFireCallout from './RelicFireCallout';
 import RelicTooltip, { type StackCtx } from './RelicTooltip';
-import { relicSlotClass, relicRailMaxPx, type RelicBarSize } from './relicSlot';
+import { relicSlotClass, relicRailMaxPx, relicSlotsFit, fitVisible, type RelicBarSize } from './relicSlot';
 import { runStackCtx } from './relicRunTotals';
 import { cn } from '@/lib/utils';
 
@@ -54,13 +54,14 @@ interface Props {
   maxVisible?: number | null;
 }
 
-export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', className, contrib, stackCtx, runCtx, calloutHost, tooltipAvoid, maxVisible = null }: Props) {
+export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', className, contrib, stackCtx, runCtx, calloutHost, tooltipAvoid, maxVisible: maxCap = null }: Props) {
   const { t } = useLanguageSafe();
   const [open, setOpen] = useState<RelicId | null>(null);
   const [showMore, setShowMore] = useState(false);
   const chips = useRef(new Map<RelicId, HTMLButtonElement>());
   const moreRef = useRef<HTMLButtonElement>(null);
   const rail = useRef<HTMLDivElement>(null);
+  const [railW, setRailW] = useState(0);
   // The callout outlives its pulse prop by design — it HOLDS, so a still frame
   // catches it beside the celebration banner instead of after it.
   const [shown, setShown] = useState<number | null>(null);
@@ -78,6 +79,18 @@ export default function RelicBar({ relics, pulse, ghostRef, size = 'sm', classNa
     () => stackCtx ?? (runCtx?.world ? runStackCtx(runCtx.world, runCtx.step ?? 1, relics) : null),
     [stackCtx, runCtx?.world, runCtx?.step, relics],
   );
+  // A capped rail also gives up chips when the row beside it (potions, mute) leaves less room than the cap needs.
+  useLayoutEffect(() => {
+    const el = rail.current;
+    if (!maxCap || !el) return undefined;
+    const measure = () => setRailW(el.clientWidth);
+    measure();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [maxCap]);
+  const maxVisible = maxCap && railW > 0 ? fitVisible(relics.length, maxCap, relicSlotsFit(railW)) : maxCap;
   // Always render all relics, but mark overflow ones for CSS hiding on phone
   const hiddenCount = maxVisible ? Math.max(0, relics.length - maxVisible) : 0;
   // For layout calculation, count visible chips + the +N button (if any) + ghost

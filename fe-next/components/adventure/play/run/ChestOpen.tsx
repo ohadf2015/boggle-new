@@ -34,7 +34,7 @@ export default function ChestOpen({ loot, onOpened }: Props) {
     <div className="flex max-h-full min-h-0 flex-col items-center pb-3">
       <button type="button" onClick={openIt} disabled={open} data-testid="loot-chest"
         aria-label={open ? t('adventurePlay.loot.chestTitle') : t('adventurePlay.loot.tapToOpen')}
-        className="relative grid h-40 max-h-full w-40 place-items-center disabled:cursor-default">
+        className="relative grid h-40 max-h-full w-40 place-items-center disabled:cursor-default [@media(max-height:700px)]:h-28 [@media(max-height:700px)]:w-28">
         {open && (
           <>
             {/* light spill: rotating rays + glow */}
@@ -52,13 +52,13 @@ export default function ChestOpen({ loot, onOpened }: Props) {
           src={open ? CHEST_OPEN_ART : CHEST_CLOSED_ART}
           alt=""
           draggable={false}
-          className="relative h-36 max-h-full w-36 object-contain drop-shadow-[4px_4px_0_#000]"
+          className="relative h-36 max-h-full w-36 object-contain drop-shadow-[4px_4px_0_#000] [@media(max-height:700px)]:h-24 [@media(max-height:700px)]:w-24"
           initial={open && !reduce ? { scale: 0.7, y: 10 } : false}
           animate={open || reduce ? { scale: 1, y: 0 } : { rotate: [0, -6, 6, -4, 4, 0], y: [0, -4, 0] }}
           transition={open ? { type: 'spring', stiffness: 500, damping: 14 } : { duration: 0.9, repeat: Infinity, repeatDelay: 0.8 }}
         />
         {!open && (
-          <span className="absolute -bottom-1 rounded-full border-[3px] border-black bg-neo-lime px-3 py-0.5 font-neo-display text-sm font-bold text-black shadow-[3px_3px_0_#000] motion-safe:animate-bounce">
+          <span className="absolute -bottom-1 whitespace-nowrap rounded-full border-[3px] border-black bg-neo-lime px-3 py-0.5 font-neo-display text-sm font-bold text-black shadow-[3px_3px_0_#000] motion-safe:animate-bounce">
             {t('adventurePlay.loot.tapToOpen')}
           </span>
         )}

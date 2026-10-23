@@ -42,3 +42,21 @@ describe('short-viewport CTA contract (360x640, 375x667, landscape 667x375)', ()
     expect(foot).toContain('shrink-0');
   });
 });
+
+describe('combat arena leaves the board its minimum square on short phones', () => {
+  it('ArenaStage height shrinks with dvh (boss and elite) instead of a fixed floor', () => {
+    const s = src('stage/ArenaStage.tsx');
+    expect(s).toContain("'h-[clamp(9rem,calc(100dvh-500px),14rem)]'");
+    expect(s).toContain("'h-[clamp(9rem,calc(100dvh-500px),11.5rem)]'");
+    expect(s).not.toContain('27dvh');
+  });
+});
+
+describe('loot chest keeps its tap-to-open badge above the pinned footer', () => {
+  it('chest and its art shrink on short phones', () => {
+    const s = src('run/ChestOpen.tsx');
+    expect(classOf(s, 'loot-chest')).toContain('[@media(max-height:700px)]:h-28');
+    expect(s).toContain('[@media(max-height:700px)]:h-24');
+    expect(s).toMatch(/absolute -bottom-1[^']*whitespace-nowrap/);
+  });
+});
