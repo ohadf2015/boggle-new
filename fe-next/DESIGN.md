@@ -50,5 +50,6 @@ Applies to the logged-out landing, `/education`, `/teacher` sign-up and `/pricin
 - **Rules, not bars:** no short accent underline under headings. Sections split by space; the grid is the rhythm.
 - **CTA voice:** one solid fill per tile, in the tile's mode colour, black ink. Yellow stays reserved for celebration — never a CTA fill.
 - **Spacing:** tiles `gap-4 md:gap-5`; section blocks `py-12 md:py-20`; the hero is the only block allowed more.
-- **Motion:** transform only; tiles lift 2px on hover; one entrance per tile at most; all behind `motion-safe`.
+- **Tilt + layering:** tiles lie slightly askew (`rotate` ±0.4–0.9deg); mascot stickers overlap tile and section edges; a second word-tile band crosses the first in the opposite direction between the board and the modes row.
+- **Motion:** transform only, all behind `motion-safe`. Tiles drop in on scroll (ease-out, settled by mid-screen) and their art drifts up inside them; hover lifts a tile 4px on a spring (springy hover/press is a deliberate brand override of Hallmark's no-overshoot rule — entrances stay ease-out). The hero punch line eases in once on load. Existing marquee, streak, race and step-pop loops stay.
 - **Stamp:** `components/landing/fresh/FreshBoard.module.css`.

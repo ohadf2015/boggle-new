@@ -114,6 +114,7 @@ vi.mock('../../fonts', () => ({
     rubikCyrillic: { variable: 'rubik-cyrillic-var' },
     unboundedLatin: { variable: 'unbounded-latin-var' },
     unboundedCyrillic: { variable: 'unbounded-cyrillic-var' },
+    unboundedLatinForCyrillic: { variable: 'unbounded-latin-cyrillic-var' },
 }));
 
 describe('LocaleLayout Hydration', () => {

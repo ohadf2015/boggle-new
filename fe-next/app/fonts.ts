@@ -155,6 +155,21 @@ export const unboundedCyrillic = localFont({
   preload: false,
 });
 
+// The cyrillic subset has no space, punctuation or digits: ru chains this Latin copy after it.
+export const unboundedLatinForCyrillic = localFont({
+  src: [
+    {
+      path: '../public/fonts/unbounded-latin.woff2',
+      weight: '200 900',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
+  variable: '--font-unbounded-latin',
+  fallback: ['system-ui', 'Arial', 'sans-serif'],
+  preload: false,
+});
+
 // Hebrew gamified body font — Heebo: clean, modern, variable weight 400-700
 export const heeboHebrew = localFont({
   src: [

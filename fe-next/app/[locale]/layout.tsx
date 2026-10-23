@@ -18,7 +18,7 @@ import type { Language } from '@/shared/types/game';
 import SrSiteNav from './SrSiteNav';
 import LocaleBodyChrome from './LocaleBodyChrome';
 
-import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew, fredokaCyrillic, rubikCyrillic, unboundedLatin, unboundedCyrillic } from '../fonts';
+import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew, fredokaCyrillic, rubikCyrillic, unboundedLatin, unboundedCyrillic, unboundedLatinForCyrillic } from '../fonts';
 import Script from "next/script";
 import { headers } from 'next/headers';
 import { getRumBeaconScript } from '@/lib/analytics/rumBeaconScript';
@@ -241,7 +241,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     const fontClasses = validLocale === 'he'
       ? `${fredokaLatin.variable || ''} ${fredokaHebrew.variable || ''} ${rubikLatin.variable || ''} ${rubikHebrew.variable || ''} ${heeboHebrew.variable || ''}`
       : validLocale === 'ru'
-        ? `${fredokaCyrillic.variable || ''} ${rubikCyrillic.variable || ''} ${unboundedCyrillic.variable || ''}`
+        ? `${fredokaCyrillic.variable || ''} ${rubikCyrillic.variable || ''} ${unboundedCyrillic.variable || ''} ${unboundedLatinForCyrillic.variable || ''}`
         : `${fredokaLatin.variable || ''} ${rubikLatin.variable || ''} ${unboundedLatin.variable || ''}`;
 
     // The active language's catalogue reaches the client as a hashed asset (see
