@@ -87,19 +87,21 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
   // within 500ms. This hook is now the single emitter (it also covers Quick Play,
   // which mounts useSinglePlayerCore without SinglePlayerGame), so it must carry
   // the fields that emitter contributed.
-  it('carries difficulty and language so no field is lost with one emitter', () => {
+  // NOTE: the event is deferred past the load window (afterLoadIdle, 1500ms) so
+  // every assertion below waits with a 3s timeout instead of checking sync.
+  it('carries difficulty and language so no field is lost with one emitter', async () => {
     renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'classic', grid: grid4, difficulty: 'HARD' })));
-    expect(trackGameStart).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(trackGameStart).toHaveBeenCalledTimes(1), { timeout: 3000 });
     expect(trackGameStart).toHaveBeenCalledWith('singleplayer', expect.objectContaining({
       subMode: 'classic', boardSize: 4, difficulty: 'HARD', language: 'en',
       sp_mode: 'classic', words_found: 0,
     }));
   });
 
-  it('fires trackGameStart exactly once on mount with mode + boardSize', () => {
+  it('fires trackGameStart exactly once on mount with mode + boardSize', async () => {
     renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'practice', grid: grid4 })));
 
-    expect(trackGameStart).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(trackGameStart).toHaveBeenCalledTimes(1), { timeout: 3000 });
     expect(trackGameStart).toHaveBeenCalledWith('singleplayer', expect.objectContaining({
       subMode: 'practice',
       boardSize: 4,
@@ -110,38 +112,38 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
     }));
   });
 
-  it('uses grid length for boardSize when grid is 5x5', () => {
+  it('uses grid length for boardSize when grid is 5x5', async () => {
     renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'classic', grid: grid5 })));
 
-    expect(trackGameStart).toHaveBeenCalledWith('singleplayer', expect.objectContaining({
+    await waitFor(() => expect(trackGameStart).toHaveBeenCalledWith('singleplayer', expect.objectContaining({
       subMode: 'classic',
       boardSize: 5,
       difficulty: 'EASY',
       language: 'en',
       sp_mode: 'classic',
-    }));
+    })), { timeout: 3000 });
   });
 
-  it('reports boardSize=0 when grid is null on mount', () => {
+  it('reports boardSize=0 when grid is null on mount', async () => {
     renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'practice', grid: null })));
 
-    expect(trackGameStart).toHaveBeenCalledWith('singleplayer', expect.objectContaining({
+    await waitFor(() => expect(trackGameStart).toHaveBeenCalledWith('singleplayer', expect.objectContaining({
       subMode: 'practice',
       boardSize: 0,
       difficulty: 'EASY',
       language: 'en',
       sp_mode: 'practice',
       words_found: 0,
-    }));
+    })), { timeout: 3000 });
   });
 
-  it('does not re-fire on prop changes (mount-only)', () => {
+  it('does not re-fire on prop changes (mount-only)', async () => {
     const { rerender } = renderHook(
       (props: Parameters<typeof useSinglePlayerEffects>[0]) => useSinglePlayerEffects(props),
       { initialProps: baseOptions({ mode: 'practice', grid: grid4 }) }
     );
 
-    expect(trackGameStart).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(trackGameStart).toHaveBeenCalledTimes(1), { timeout: 3000 });
 
     rerender(baseOptions({ mode: 'classic', grid: grid5 }));
     rerender(baseOptions({ mode: 'classic', grid: grid5, score: 100 }));
@@ -157,10 +159,11 @@ describe('useSinglePlayerEffects — game_started tracking', () => {
   it('heartbeats a generated fun name instead of Guest', async () => {
     renderHook(() => useSinglePlayerEffects(baseOptions({ mode: 'solo-bots' })));
 
+    // First heartbeat is deferred past the load window (afterLoadIdle, 1500ms).
     await waitFor(() => {
       const calls = (global.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls;
       expect(calls.some((c) => String(c[0]).includes('/api/single-player/heartbeat'))).toBe(true);
-    });
+    }, { timeout: 3000 });
 
     const [, init] = (global.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls.find(
       (c) => String(c[0]).includes('/api/single-player/heartbeat') && c[1]?.method !== 'DELETE',
