@@ -21,9 +21,13 @@ export function CountUp({ to, from = 0, durationMs = EDU_DUR.countUp * 1000, for
   const [value, setValue] = useState(reduced ? to : from);
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
+  // Reduced motion reads true during SSR and can flip after mount; a landed number never replays.
+  const landedAt = useRef<number | null>(null);
 
   useEffect(() => {
+    if (landedAt.current === to) return;
     if (reduced || durationMs <= 0) {
+      landedAt.current = to;
       setValue(to);
       onDoneRef.current?.();
       return;
@@ -34,6 +38,7 @@ export function CountUp({ to, from = 0, durationMs = EDU_DUR.countUp * 1000, for
       setValue(Math.round(from + (to - from) * easeOutCubic(p)));
       if (p >= 1) {
         clearInterval(id);
+        landedAt.current = to;
         onDoneRef.current?.();
       }
     }, 16);

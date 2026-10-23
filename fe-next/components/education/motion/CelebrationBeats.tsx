@@ -36,7 +36,7 @@ export function CelebrationBeats({ hero, headline, subtitle, chips, cta, skipLab
   const landed = useRef(0);
 
   const go = useCallback((next: CelebrationBeat) => {
-    setBeat(next);
+    setBeat((prev) => (reached(prev, next) ? prev : next));
     if (next !== 'hold') onBeatRef.current?.(next);
   }, []);
 
@@ -50,6 +50,7 @@ export function CelebrationBeats({ hero, headline, subtitle, chips, cta, skipLab
       skip();
       return;
     }
+    if (skipped) return;
     const ids = [
       setTimeout(() => go('hero'), timeline.heroAt),
       setTimeout(() => go('pullBack'), timeline.pullBackAt),
@@ -57,7 +58,7 @@ export function CelebrationBeats({ hero, headline, subtitle, chips, cta, skipLab
       ...(timeline.chipsAt.length ? [] : [setTimeout(() => go('done'), timeline.total)]),
     ];
     return () => ids.forEach(clearTimeout);
-  }, [reduced, timeline, go, skip]);
+  }, [reduced, skipped, timeline, go, skip]);
 
   const onLand = useCallback(() => {
     onBeatRef.current?.('chip');

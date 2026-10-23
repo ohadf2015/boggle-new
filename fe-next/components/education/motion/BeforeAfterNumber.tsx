@@ -28,12 +28,13 @@ export function BeforeAfterNumber({ before, after, holdMs = EDU_MS.streakHold, i
       setLit(true);
       return;
     }
+    if (lit) return;
     const id = setTimeout(() => {
       setLit(true);
       onIgniteRef.current?.();
     }, holdMs);
     return () => clearTimeout(id);
-  }, [reduced, holdMs]);
+  }, [reduced, holdMs, lit]);
 
   const ignite = resolvePreset('ignite', reduced || !lit);
 
