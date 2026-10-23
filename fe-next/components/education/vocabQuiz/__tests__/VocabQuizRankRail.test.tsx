@@ -49,6 +49,13 @@ describe('VocabQuizRankRail', () => {
     expect(screen.getByTestId('vq-rail-close')).toHaveTextContent('vocabQuiz.rail.closeRace');
   });
 
+  it('keeps a Latin name beside its rank on a Hebrew wall', () => {
+    render(<div dir="rtl"><VocabQuizRankRail previous={null} standings={[row('Noa', 139)]} t={t} /></div>);
+    const name = screen.getByText('Noa');
+    expect(name.tagName).toBe('BDI');
+    expect(name.parentElement).not.toHaveAttribute('dir');
+  });
+
   it('shows at most five rows', () => {
     render(<VocabQuizRankRail previous={null} standings={['a', 'b', 'c', 'd', 'e', 'f'].map((n, i) => row(n, 100 - i))} t={t} />);
     expect(screen.getAllByTestId('vq-rail-row')).toHaveLength(5);

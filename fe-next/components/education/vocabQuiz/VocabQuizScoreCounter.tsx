@@ -35,6 +35,7 @@ export interface VocabQuizScoreCounterProps {
 
 const ROLL_MS = 560;
 const STEP_MS = 40;
+export const SCORE_POP_MS = 1_200;
 
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
@@ -74,7 +75,14 @@ export function VocabQuizScoreCounter({ score, pop, t, className }: VocabQuizSco
     return () => clearInterval(id);
   }, [score]);
 
-  const flying = pop && pop.points > 0 ? pop : null;
+  const [landedKey, setLandedKey] = useState<number | null>(null);
+  useEffect(() => {
+    if (!pop || pop.points <= 0) return;
+    const id = setTimeout(() => setLandedKey(pop.key), SCORE_POP_MS);
+    return () => clearTimeout(id);
+  }, [pop]);
+
+  const flying = pop && pop.points > 0 && pop.key !== landedKey ? pop : null;
 
   return (
     <span className={cn('relative inline-flex items-baseline', className)}>

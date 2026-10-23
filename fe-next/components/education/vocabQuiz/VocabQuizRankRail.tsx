@@ -93,7 +93,7 @@ export function VocabQuizRankRail({ previous, standings, t, className }: VocabQu
               )}
             >
               <span className="w-6 shrink-0 text-center tabular-nums md:w-8 md:text-xl">{i + 1}</span>
-              <span dir="auto" className="min-w-0 flex-1 truncate md:text-xl">{p.username}</span>
+              <span className="min-w-0 flex-1 truncate md:text-xl"><bdi>{p.username}</bdi></span>
               {up > 0 && (
                 <span
                   data-testid="vq-rail-up"

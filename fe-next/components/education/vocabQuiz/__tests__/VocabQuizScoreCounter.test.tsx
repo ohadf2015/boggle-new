@@ -9,7 +9,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
-import { VocabQuizScoreCounter } from '../VocabQuizScoreCounter';
+import { SCORE_POP_MS, VocabQuizScoreCounter } from '../VocabQuizScoreCounter';
 
 const t = (key: string, params?: Record<string, string | number>) =>
   params ? `${key}:${Object.values(params).join(',')}` : key;
@@ -45,6 +45,15 @@ describe('VocabQuizScoreCounter', () => {
     const { rerender } = render(<VocabQuizScoreCounter score={0} pop={null} t={t} />);
     rerender(<VocabQuizScoreCounter score={150} pop={{ points: 150, key: 1 }} t={t} />);
     expect(screen.getByTestId('vocab-quiz-score-pop')).toHaveTextContent('150');
+  });
+
+  it('lands the flying points and clears them, then flies again on the next scored answer', () => {
+    const { rerender } = render(<VocabQuizScoreCounter score={0} pop={null} t={t} />);
+    rerender(<VocabQuizScoreCounter score={150} pop={{ points: 150, key: 1 }} t={t} />);
+    act(() => { vi.advanceTimersByTime(SCORE_POP_MS); });
+    expect(screen.queryByTestId('vocab-quiz-score-pop')).toBeNull();
+    rerender(<VocabQuizScoreCounter score={250} pop={{ points: 100, key: 2 }} t={t} />);
+    expect(screen.getByTestId('vocab-quiz-score-pop')).toHaveTextContent('100');
   });
 
   it('shows nothing flying for a wrong answer worth nothing', () => {
