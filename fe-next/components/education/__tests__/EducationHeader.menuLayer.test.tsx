@@ -29,4 +29,11 @@ describe('EducationHeader paints its dropdown above the page below it', () => {
     expect(tokens.filter((c) => /^([a-z0-9]+:)?static$/.test(c))).toEqual([]);
     expect(tokens).toContain('lg:relative');
   });
+
+  it('stays under body-level z-50 overlays on desktop and ignores the safe-area offset there', () => {
+    const { container } = render(<EducationHeader />);
+    const tokens = container.querySelector('header')!.className.split(/\s+/);
+    expect(tokens).toContain('lg:z-40');
+    expect(tokens).toContain('lg:top-0!');
+  });
 });
