@@ -34,7 +34,7 @@ import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { useGameActions, useGameStore, useGameActive, useShowStartAnimation } from '@/hooks/gameState';
 import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
 import { multiplayerExitDestination, mpExit, type MpExitReason } from '@/lib/multiplayer/exitDestination';
-import { readPreviousInAppPath } from '@/hooks/useMpExit';
+import { readPreviousInAppPath, useHeldMpExit } from '@/hooks/useMpExit';
 import { resolveMpPagePhase } from '@/lib/multiplayer/mpPhase';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { ENTRY_HIDES_GLOBAL_CHROME } from '@/components/multiplayer/entry/entryChrome';
@@ -248,7 +248,7 @@ export function useMpPageState() {
   // In-room reasons take the one in-place reset above (leaveRoom emit, session
   // clear, exit-param strip, classroom hub); only back-from-entry and
   // continue-solo leave the multiplayer route.
-  const exitMp = useCallback((reason: MpExitReason) => {
+  const exitNow = useCallback((reason: MpExitReason) => {
     const ctx = { isClassroomMode: classroomContext === 'classroom', isHost: isHost || isClassroomHost, locale: language, pathname };
     const action = mpExit(reason, { ...ctx, previousPath: readPreviousInAppPath() });
     if (reason !== 'back-from-entry') handleExitToLobby();
@@ -256,6 +256,7 @@ export function useMpPageState() {
     const soloHandoff = reason === 'continue-solo' && !multiplayerExitDestination(ctx);
     if (action.kind === 'navigate' && (reason === 'back-from-entry' || soloHandoff)) router.push(action.href);
   }, [classroomContext, isHost, isClassroomHost, language, handleExitToLobby, router, pathname]);
+  const exitMp = useHeldMpExit(classroomContext, pathname, exitNow);
 
   // PageClient is the ONE writer of the global nav-hiding state (pitfall
   // class 1): hidden in a room and on results; on entry per the ENTRY piece's

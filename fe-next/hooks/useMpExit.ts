@@ -10,10 +10,12 @@
  * the hook falls back to the pure `mpExit` decision with an SPA router push
  * (never a hard nav — it blanks the Capacitor static-export WebView).
  */
-import { createContext, useCallback, useContext } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { isInAppPreviousPath, mpExit, type MpExitReason } from '@/lib/multiplayer/exitDestination';
+import { isInAppPreviousPath, mpExit, shouldHoldMpExit, type MpExitReason } from '@/lib/multiplayer/exitDestination';
+import type { ClassroomContext } from '@/lib/education/classroomRoomGone';
+import logger from '@/utils/logger';
 import { getTrackedPreviousPath } from '@/lib/navigation/previousInAppPath';
 
 export type { MpExitReason } from '@/lib/multiplayer/exitDestination';
@@ -68,4 +70,32 @@ export function useMpExit(): MpExitFn {
   );
 
   return pageExit ?? fallback;
+}
+
+export const MP_EXIT_HOLD_CAP_MS = 3000;
+
+/** Runs `run(reason)` now, or once the room's classroom record resolves (capped, then it runs as arcade). */
+export function useHeldMpExit(context: ClassroomContext, pathname: string | null | undefined, run: MpExitFn): MpExitFn {
+  const [held, setHeld] = useState<MpExitReason | null>(null);
+  const hold = shouldHoldMpExit(context, pathname);
+
+  useEffect(() => {
+    if (!held) return;
+    if (!hold) {
+      setHeld(null);
+      run(held);
+      return;
+    }
+    const timer = setTimeout(() => {
+      logger.info('[mpExit] classroom record still pending at the cap; exiting as arcade', { reason: held });
+      setHeld(null);
+      run(held);
+    }, MP_EXIT_HOLD_CAP_MS);
+    return () => clearTimeout(timer);
+  }, [held, hold, run]);
+
+  return useCallback<MpExitFn>((reason) => {
+    if (hold) setHeld(reason);
+    else run(reason);
+  }, [hold, run]);
 }

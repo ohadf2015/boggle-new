@@ -13,6 +13,7 @@ import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 import { useReconnectFlow } from '@/lib/multiplayer/useReconnectFlow';
 import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
 import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
+import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
 const WordHuntGame = dynamic(
@@ -158,6 +159,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   const [showStopConfirm, setShowStopConfirm] = useState(false);
 
   const mpExit = useMpExit();
+  const AbortedModal = useEduLiveSurfaces().AbortedModal ?? MPGameAbortedModal;
 
   // Get player's game history for trail display logic
   const { profile } = useAuth();
@@ -295,7 +297,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   const connectionOverlays = (
     <>
       {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
-      {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
+      {showAbortModal && <AbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
     </>
   );
 

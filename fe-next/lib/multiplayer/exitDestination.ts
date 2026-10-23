@@ -16,7 +16,7 @@
  * than inside PageClient, which is a provider-wrapped app shell no unit test can
  * render. Same reasoning as `lib/education/classroomRoomGone.ts`.
  */
-import { classroomStudentHomePath } from '@/lib/education/classroomRoomGone';
+import { classroomStudentHomePath, type ClassroomContext } from '@/lib/education/classroomRoomGone';
 import { isClassroomLivePathname } from '@/lib/education/classroomLivePath';
 
 export interface MultiplayerExitParams {
@@ -51,6 +51,11 @@ export function multiplayerExitDestination({
   // either call site naming a route.
   if (isHost) return `/${locale || 'en'}/teacher`;
   return classroomStudentHomePath(locale);
+}
+
+/** A typed classroom code on the arcade route: picking a side before its record lands could bounce a student out of edu. */
+export function shouldHoldMpExit(context: ClassroomContext, pathname?: string | null): boolean {
+  return context === 'pending' && !isClassroomLivePathname(pathname);
 }
 
 // ─── mpExit: every way out of a multiplayer screen ──────────────────────────

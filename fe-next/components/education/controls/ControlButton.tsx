@@ -90,11 +90,8 @@ export function ControlButton({
       data-armed={dataArmed === undefined ? undefined : dataArmed ? 'true' : 'false'}
       onClick={onClick}
       className={cn(
-        // `min-w-0` + a two-line label is what lets five controls hold ONE row
-        // from `lg` up (the bar sets `lg:flex-nowrap`): a long label in Hebrew or
-        // Russian breaks onto a second LINE inside the button, never a second row that
-        // would eat a third of the projector.
-        'relative overflow-hidden inline-flex min-w-0 items-center justify-center',
+        // One row from `lg` (`lg:flex-nowrap`): a long label takes more lines, never a cut word.
+        'relative overflow-hidden inline-flex min-w-0 lg:min-w-min items-center justify-center',
         'rounded-neo border-3 lg:border-4 border-neo-black shadow-hard lg:shadow-hard-lg',
         'font-neo-display font-black uppercase tracking-wide',
         // A classroom projector is usually 1280-1920px wide and read from 5m —
@@ -115,7 +112,7 @@ export function ControlButton({
       >
         {icon}
       </span>
-      <span className="line-clamp-2 min-w-0 text-balance text-center leading-[1.05] [overflow-wrap:anywhere] lg:whitespace-nowrap">{label}</span>
+      <span className="line-clamp-2 min-w-0 text-balance text-center leading-[1.05] [overflow-wrap:anywhere] lg:line-clamp-none lg:[overflow-wrap:normal]">{label}</span>
       {drainMs ? <DrainBar ms={drainMs} testId={drainTestId} /> : null}
     </button>
   );

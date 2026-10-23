@@ -7,6 +7,8 @@ import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { VocabQuizView } from '@/components/education/vocabQuiz/VocabQuizView';
 import { VocabQuizHostView } from '@/components/education/vocabQuiz/VocabQuizHostView';
+import { TeacherLiveControls } from '@/components/education/TeacherLiveControls';
+import { TEACHER_CONTROLS_INSET } from '@/components/education/controls/teacherBarInset';
 import { VOCAB_QUIZ_EVENTS, type VocabQuizStanding } from '@/shared/types/vocabQuiz';
 
 type Handler = (payload: unknown) => void;
@@ -27,6 +29,8 @@ const SWAPPED: VocabQuizStanding[] = [
   { username: 'Ari', score: 300, streak: 0, bestStreak: 1, correctCount: 3 },
 ];
 const SWAP_GAP_MS = 1500;
+const ROSTER = [{ username: 'Teacher', isHost: true }, ...STANDINGS.map(({ username }) => ({ username }))];
+const noop = () => {};
 
 function script(state: QuizState): Step[] {
   const gameCode = 'PREVIEW';
@@ -90,9 +94,15 @@ export function StudentQuizPreview() {
   const host = params?.get('host') === '1';
   const socket = useMemo(() => scriptedSocket(state), [state]);
   return (
-    <div className="fixed inset-0 z-[80] flex flex-col bg-neo-navy">
+    <div className="fixed inset-0 z-[80] flex flex-col bg-neo-navy" style={host ? TEACHER_CONTROLS_INSET : undefined}>
       {host ? (
-        <VocabQuizHostView socket={socket} joinCode="YHNCF4" playerCount={STANDINGS.length} t={t} />
+        <>
+          <VocabQuizHostView socket={socket} joinCode="YHNCF4" playerCount={STANDINGS.length} t={t} />
+          <TeacherLiveControls
+            isPaused={false} isQuizRound onPause={noop} onResume={noop} onExtendTime={noop} onEndRound={noop} onSkipWord={noop}
+            students={ROSTER} hostUsername="Teacher" socket={socket}
+          />
+        </>
       ) : (
         <VocabQuizView socket={socket} username="Leo" t={t} />
       )}

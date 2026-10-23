@@ -230,7 +230,7 @@ export function TeacherLiveControls({
           icon={isPaused ? <Play /> : <Pause />}
           label={isPaused ? t('education.liveControls.resume') : t('education.liveControls.pause')}
           onClick={isPaused ? onResume : onPause}
-          className="flex-1 basis-[8rem]"
+          className="flex-1 basis-[8rem] lg:basis-auto lg:shrink-0"
         />
 
         <ControlButton
@@ -240,7 +240,7 @@ export function TeacherLiveControls({
           icon={<Plus />}
           label={t('education.liveControls.addTime', { seconds: EXTEND_SECONDS })}
           onClick={() => onExtendTime(EXTEND_SECONDS)}
-          className="flex-1 basis-[6.5rem]"
+          className="flex-1 basis-[6.5rem] lg:basis-auto lg:shrink-0"
         />
 
         {(isQuizRound || gameMode === 'word-hunt') && (
@@ -251,7 +251,7 @@ export function TeacherLiveControls({
             icon={<DirectionalIcon icon={SkipForward} mirror />}
             label={t(isQuizRound ? 'education.liveControls.skipQuestion' : 'education.liveControls.skipWord')}
             onClick={onSkipWord}
-            className="flex-[1.4_1_9rem] bg-neo-cream"
+            className="flex-[1.4_1_9rem] lg:basis-auto bg-neo-cream"
           />
         )}
 
@@ -265,7 +265,7 @@ export function TeacherLiveControls({
           icon={<Square />}
           label={endArmed ? t('education.liveControls.endRoundConfirm') : t('education.liveControls.endRound')}
           onClick={handleEndRound}
-          className="flex-1 basis-[8rem]"
+          className="flex-1 basis-[8rem] lg:basis-auto"
         />
       </div>
     </div>

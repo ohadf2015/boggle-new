@@ -27,8 +27,10 @@ describe('ControlButton — destructive vs harmless weight', () => {
     expect(button('armed').className).toContain('bg-neo-red');
   });
 
-  it('given a projector width, then the label holds one line', () => {
+  it('given a projector width, then a long label wraps instead of being cut off', () => {
     button('neutral');
-    expect(screen.getByText('End round').className).toContain('lg:whitespace-nowrap');
+    const label = screen.getByText('End round').className;
+    expect(label).not.toContain('whitespace-nowrap');
+    expect(label).toContain('lg:line-clamp-none');
   });
 });

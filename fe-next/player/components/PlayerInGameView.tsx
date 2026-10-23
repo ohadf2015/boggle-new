@@ -53,6 +53,7 @@ import { PlayerRoundDialogs } from './in-game/PlayerRoundDialogs';
 import type { PlayerFoundWord, PlayerHintsState, PlayerLeaderboardEntry, PlayerTournamentData } from './in-game/types';
 import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
 import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
+import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import { useMpExit } from '@/hooks/useMpExit';
 import { MpRoundShell, isRoundFrameMode } from '@/components/multiplayer/round/MpRoundShell';
 import { MpBlastCanvas } from '@/components/multiplayer/round/MpBlastCanvas';
@@ -168,6 +169,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   useRoundToastLane();
 
   const mpExit = useMpExit();
+  const AbortedModal = useEduLiveSurfaces().AbortedModal ?? MPGameAbortedModal;
   const { isReconnecting, reconnectAttempt, maxReconnectAttempts, isServerUpdating, showAbortModal, triggerAbort } =
     useReconnectFlow({ gameCode, username, gameActive });
 
@@ -269,7 +271,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />
       )}
       {showAbortModal && (
-        <MPGameAbortedModal wordCount={foundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onExitRoom} />
+        <AbortedModal wordCount={foundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onExitRoom} />
       )}
     </>
   );
