@@ -16,6 +16,15 @@ const SV_TITLE = 'Spela Scrabble Svenska Gratis — Alfapet Online | LexiClash';
 const SV_DESCRIPTION =
   'Spela scrabble på svenska gratis online — ingen app, inget konto. Skapa ett rum, dela länken och tävla i realtid. Upp till 50 spelare. Starta nu! →';
 
+/**
+ * Growth Radar rec 2718: Bing grounds "scrabble på svenska" (111 AI groundings) but cites other
+ * domains. A visible, self-contained answer with real numbers: 50 = MAX_PLAYERS_PER_ROOM,
+ * 90 s = DEFAULT_TIMER, ~246k words in the loaded Swedish dictionary.
+ */
+const SCRABBLE_SV_QUESTION = 'Hur spelar man Scrabble på svenska online gratis?';
+const SCRABBLE_SV_ANSWER =
+  'LexiClash är ett gratis ordspel för dig som vill spela Scrabble på svenska online: öppna lexiclash.live/sv, skapa ett rum och dela länken. Upp till 50 spelare bildar ord på samma bokstavsrutnät samtidigt, en runda tar 90 sekunder och över 240 000 svenska ord godkänns. Till skillnad från Alfapet och Wordfeud väntar ingen på sin tur. Ingen app, ingen registrering.';
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const isTargetLocale = locale === 'sv';
@@ -82,8 +91,8 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
 
   const faqs = [
     {
-      q: 'Var kan man spela Scrabble online på svenska gratis?',
-      a: 'LexiClash är ett gratis Alfapet-/Scrabble-alternativ på svenska i webbläsaren — ingen app, ingen registrering. Skapa ett rum, bjud in vänner via länk och tävla i realtid med över 10 000 svenska ord. En match tar 2–3 minuter.',
+      q: SCRABBLE_SV_QUESTION,
+      a: SCRABBLE_SV_ANSWER,
     },
     {
       q: 'Hur börjar jag spela multiplayer ordspel?',
@@ -154,6 +163,14 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
           realtids-alternativ till Wordfeud: skapa ett rum, skicka länken, och upp till 50 spelare tävlar
           på samma bokstavsrutnät. Över 10 000 svenska ord, matcher på 2–3 minuter. Starta direkt.
         </p>
+
+        <section className="mb-12">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{SCRABBLE_SV_QUESTION}</h2>
+          <p className="mb-4 leading-relaxed text-neo-gray-200" data-speakable="true">{SCRABBLE_SV_ANSWER}</p>
+          <Link href={`/${locale}/multiplayer`} className="font-bold text-neo-yellow hover:underline">
+            Skapa ett rum och spela nu →
+          </Link>
+        </section>
 
         <section className="mb-12">
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
