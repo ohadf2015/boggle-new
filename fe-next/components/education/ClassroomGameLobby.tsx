@@ -227,13 +227,13 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
 
   const cannotStart =
     selectedLessonIds.length === 0 || !selectedClassroomId || allPlayableWords.length === 0;
+  const wordcraftOk = wordcraftPlayable(allPlayableWords, { lessonLanguage, classroomLanguage: classrooms.find((c) => c.id === selectedClassroomId)?.language, preset: activePreset });
 
   const startGame = useCallback(
     (mode: ClassroomGameMode, variant?: typeof vocabQuizVariant, boss?: ClassroomBossId) => {
       setStartError(null);
       const classroom = classrooms.find((c) => c.id === selectedClassroomId);
-      if (mode === VOCAB_QUIZ_MODE && !quizPlayable) return;
-      if (mode === 'wordcraft' && !wordcraftPlayable(allPlayableWords, lessonLanguage ?? language)) return;
+      if ((mode === VOCAB_QUIZ_MODE && !quizPlayable) || (mode === 'wordcraft' && !wordcraftOk)) return;
       if (!user || !classroom || selectedLessonIds.length === 0) {
         toast.error(t('education.classroomGame.missingRequirements'));
         setStartError('education.classroomGame.missingRequirements');
@@ -326,7 +326,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
       allPlayableWords, activePreset, gameCode, language, t, launch, saveConfig, setStartError,
       targetWord, minWordLength, timerMinutes, allowLateJoin, economy, boardSize, playStyle, teamCount, accessibility,
       vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds, treasureChestsEnabled,
-      pressure, hasTeacherPro, quizPlayable, lessonLanguage,
+      pressure, hasTeacherPro, quizPlayable, lessonLanguage, wordcraftOk,
     ]
   );
 
@@ -340,7 +340,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
     ? 'education.modePicker.needsLesson'
     : gameMode === VOCAB_QUIZ_MODE && !quizPlayable
       ? 'eg2Modes.needsMeanings'
-      : gameMode === 'wordcraft' && !wordcraftPlayable(allPlayableWords, lessonLanguage ?? language)
+      : gameMode === 'wordcraft' && !wordcraftOk
         ? 'education.modePicker.wordcraftNeedsShortWords'
         : null;
 

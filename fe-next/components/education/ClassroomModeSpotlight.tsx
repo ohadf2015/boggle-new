@@ -163,7 +163,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, language, dir, bus
           'bg-neo-lime font-neo-display text-xl font-black uppercase tracking-tight text-black shadow-hard-lg lg:text-4xl',
           'transition-transform motion-safe:hover:-translate-y-0.5 active:translate-y-0.5',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-          'disabled:cursor-not-allowed disabled:bg-neo-lime/60 disabled:hover:translate-y-0'
+          'disabled:cursor-not-allowed disabled:bg-neo-navy-light disabled:text-neo-cream/70 disabled:shadow-none disabled:hover:translate-y-0'
         )}
       >
         <Radio className="size-6 shrink-0 lg:size-8" strokeWidth={3} aria-hidden="true" />

@@ -69,6 +69,15 @@ describe('ClassroomGameLobby — Wordcraft gate', () => {
     expect(launch).not.toHaveBeenCalled();
   });
 
+  it('GIVEN Go Live is blocked THEN it drops the lime fill and the raised shadow so it does not read as tappable', () => {
+    lessonWords = LONG;
+    render(<ClassroomGameLobby onBack={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('mode-tile-wordcraft'));
+    const cls = screen.getByTestId('lobby-go-live').className.split(/\s+/);
+    expect(cls).toEqual(expect.arrayContaining(['disabled:bg-neo-navy-light', 'disabled:text-neo-cream/70', 'disabled:shadow-none']));
+    expect(cls).not.toContain('disabled:bg-neo-lime/60');
+  });
+
   it('GIVEN a Russian lesson WHEN the teacher picks Wordcraft THEN Go Live is blocked', () => {
     lessonWords = [{ word: 'кошка' }, { word: 'собака' }];
     lessonLanguage = 'ru';
