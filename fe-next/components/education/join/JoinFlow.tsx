@@ -76,11 +76,18 @@ export function JoinFlow({
     else goRef.current?.focus();
   }, [flow.step, flow.showNameField]);
 
+  // A name typed into the server markup lives only in the DOM until React adopts it.
+  useEffect(() => {
+    const typed = nameRef.current?.value;
+    if (typed && !flow.name) flow.setName(typed);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Invite link + guest: one GO, not type-a-name-from-blank. Wait until the
   // code lookup has spoken — a seeded name would look like "they started
   // typing" and block the invalid-code bounce back to the code step.
   useEffect(() => {
-    if (flow.step !== 'name' || !flow.showNameField || flow.name.trim()) return;
+    if (flow.step !== 'name' || !flow.showNameField || flow.name.trim() || nameRef.current?.value.trim()) return;
     if (sanitizeJoinCode(initialCode).length !== JOIN_CODE_LENGTH) return;
     if (flow.isChecking || !flow.target || flow.target.verdict === 'invalid') return;
     const seed = getStoredUsername() || pickFunName(funNames, '');
