@@ -25,6 +25,7 @@ import { useClassRoster } from "./useClassRoster";
 import { RosterSeats } from "./RosterSeats";
 import { useHqJuice } from "./useHqJuice";
 import { useRisingCount } from "./useRisingCount";
+import { STUDENT_GOAL } from "./studentGoal";
 
 export interface HqClassroom {
   id: string;
@@ -339,6 +340,18 @@ export function GetStudentsInCard({
             </>
           )}
         </div>
+        {!rosterLoading && count < STUDENT_GOAL ? (
+          <div data-testid="hq-joined-goal" className="flex shrink-0 items-center justify-center gap-2">
+            <span className="flex gap-1" aria-hidden="true">
+              {Array.from({ length: STUDENT_GOAL }, (_, i) => (
+                <span key={i} className={cn("size-2.5 rounded-full border-2 border-neo-black", i < count ? "bg-neo-lime" : "bg-neo-cream/30")} />
+              ))}
+            </span>
+            <span className="font-neo-display text-xs font-black uppercase tracking-wide text-neo-cyan">
+              {t("academy.hq.joinedGoal", { count, goal: STUDENT_GOAL })}
+            </span>
+          </div>
+        ) : null}
       </div>
     </JoinCardFrame>
   );

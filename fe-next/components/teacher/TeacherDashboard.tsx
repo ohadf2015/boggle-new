@@ -15,6 +15,8 @@ import { TeacherPlanBadge } from './TeacherPlanBadge';
 import { HqLoadError } from './hq/HqLoadError';
 import { greetingName } from './home/greetingName';
 import { HomeHero } from './home/HomeHero';
+import { HomeGetStudentsIn } from './home/HomeGetStudentsIn';
+import { belowStudentGoal } from './hq/studentGoal';
 import { HomeClassList } from './home/HomeClassList';
 import { HomeWeekCard } from './home/HomeWeekCard';
 import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
@@ -165,6 +167,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
 
   const showWeek = hasClasses && !(week.summary && Object.keys(week.summary.lastPlayedAt).length === 0);
   const selectedClassroom = classrooms.find((c) => c.id === effectiveId) ?? null;
+  const shareCardShown = selectedClassroom !== null && belowStudentGoal(selectedClassroom.member_count);
   const overFreeTierCaps = isDigestOverFreeTierCaps({
     hasPro,
     classroomCount: classrooms.length,
@@ -202,7 +205,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
             <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} variant="full" t={t} />
           ) : (
             <>
-              {onboarding.visible ? (
+              {onboarding.visible && !(onboarding.current === 'shareCode' && shareCardShown) ? (
                 <HomeOnboardingCard
                   onboarding={onboarding}
                   hrefs={onboardingHrefs}
@@ -212,6 +215,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                   t={t}
                 />
               ) : null}
+              {selectedClassroom ? <HomeGetStudentsIn classroom={selectedClassroom} /> : null}
               <HomeHero
                 classrooms={classrooms}
                 selectedId={effectiveId}
