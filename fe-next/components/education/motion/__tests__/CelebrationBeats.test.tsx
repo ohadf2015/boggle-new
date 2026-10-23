@@ -25,6 +25,7 @@ const renderBeats = (onBeat = vi.fn()) =>
   );
 
 const stage = () => screen.getByTestId('edu-celebration').getAttribute('data-beat');
+const slot = (text: string) => screen.getByText(text).closest('[data-slot]')?.className ?? '';
 
 beforeEach(() => {
   motionPref.reduced = false;
@@ -38,13 +39,15 @@ describe('CelebrationBeats', () => {
     renderBeats(onBeat);
     const t = celebrationTimeline(3);
     expect(stage()).toBe('hold');
-    expect(screen.queryByText('edu.hero')).toBeNull();
+    expect(slot('edu.hero')).toContain('invisible');
+    expect(slot('edu.headline')).toContain('invisible');
     tick(t.heroAt);
     expect(stage()).toBe('hero');
-    expect(screen.getByText('edu.hero')).toBeTruthy();
+    expect(slot('edu.hero')).not.toContain('invisible');
+    expect(slot('edu.headline')).toContain('invisible');
     tick(t.pullBackAt - t.heroAt);
     expect(stage()).toBe('pullBack');
-    expect(screen.getByText('edu.headline')).toBeTruthy();
+    expect(slot('edu.headline')).not.toContain('invisible');
     tick(t.chipsAt[0] - t.pullBackAt);
     expect(stage()).toBe('chips');
     tick(4500 - t.chipsAt[0]);
@@ -66,8 +69,14 @@ describe('CelebrationBeats', () => {
     motionPref.reduced = true;
     renderBeats();
     expect(stage()).toBe('done');
-    expect(screen.getByText('edu.hero')).toBeTruthy();
+    expect(slot('edu.hero')).not.toContain('invisible');
     expect(screen.getAllByTestId('edu-chip')).toHaveLength(3);
+  });
+
+  it('reserves every slot from the first frame so nothing shifts as beats arrive', () => {
+    renderBeats();
+    expect(slot('edu.continue')).toContain('invisible');
+    expect(screen.getByTestId('edu-celebration-chips').className).toMatch(/min-h-/);
   });
 
   it('is a dark-only fullscreen layer with no opacity entrance', () => {

@@ -45,7 +45,7 @@ export function FeedbackSheet({ open, variant, title, children, action, icon, on
       initial={sheet.initial}
       animate={sheet.animate}
       transition={sheet.transition}
-      className={`fixed inset-x-0 bottom-0 z-50 border-t-4 border-neo-black px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] ${TONE[variant]} ${className}`}
+      className={`fixed inset-x-0 bottom-0 z-50 after:absolute after:inset-x-0 after:top-full after:h-16 after:bg-inherit border-t-4 border-neo-black px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] ${TONE[variant]} ${className}`}
     >
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">

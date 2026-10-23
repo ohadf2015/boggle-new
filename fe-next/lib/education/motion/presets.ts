@@ -29,7 +29,7 @@ export const EDU_PRESETS = {
     animate: { x: 0, y: 0, rotate: 0, scale: 1.6 },
     transition: { duration: EDU_DUR.hero, ease: EDU_EASE.outQuint },
   },
-  pullBack: { initial: { scale: 1.6 }, animate: { scale: 1 }, transition: { duration: EDU_DUR.pullBack, ease: EDU_EASE.outQuint } },
+  pullBack: { initial: { scale: 1.6 }, animate: { x: 0, y: 0, rotate: 0, scale: 1 }, transition: { duration: EDU_DUR.pullBack, ease: EDU_EASE.outQuint } },
   chipIn: { initial: { scale: 0.4, y: 16 }, animate: { scale: 1, y: 0 }, transition: { duration: EDU_DUR.chipIn, ease: EDU_EASE.overshoot } },
   ignite: {
     initial: { scale: 1 },

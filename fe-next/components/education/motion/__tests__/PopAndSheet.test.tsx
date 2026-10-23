@@ -39,6 +39,11 @@ describe('FeedbackSheet', () => {
     expect(screen.getByRole('status').className).toContain('bg-neo-red');
   });
 
+  it('paints below its own bottom edge so the overshoot never shows a gap', () => {
+    render(<FeedbackSheet open variant="correct" title="edu.t" />);
+    expect(screen.getByRole('status').className).toMatch(/after:top-full.*after:bg-inherit|after:bg-inherit.*after:top-full/);
+  });
+
   it('renders title, body and action, and nothing when closed', () => {
     const { rerender } = render(
       <FeedbackSheet open variant="incorrect" title="edu.t" action={<button>edu.gotIt</button>}>

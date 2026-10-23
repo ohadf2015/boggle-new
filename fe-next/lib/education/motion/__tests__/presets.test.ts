@@ -29,6 +29,11 @@ describe('EDU_PRESETS', () => {
     expect(EDU_PRESETS.popIn.transition.duration).toBe(0.3);
   });
 
+  it('pullBack pins every transform the hero entrance moved, so an interrupted slide still lands centred', () => {
+    expect(EDU_PRESETS.pullBack.animate).toEqual({ x: 0, y: 0, rotate: 0, scale: 1 });
+    for (const k of Object.keys(EDU_PRESETS.heroIn.initial)) expect(EDU_PRESETS.pullBack.animate).toHaveProperty(k);
+  });
+
   it('pulse goes 1 to 1.2, holds, and returns to 1', () => {
     expect(EDU_PRESETS.pulse.animate).toEqual({ scale: [1, 1.2, 1.2, 1] });
     expect(EDU_PRESETS.pulse.transition.times).toEqual([0, 0.45, 0.75, 1]);

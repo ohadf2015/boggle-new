@@ -14,7 +14,7 @@ describe('motion-kit frozen contract', () => {
   it('lib/education/motion exports the hook and the timing tokens', () => {
     expect(typeof lib.useEduReducedMotion).toBe('function');
     expect(lib.EDU_EASE.overshoot).toEqual([0.35, 1.8, 0.35, 0.83]);
-    expect(lib.EDU_DUR.sheet).toBe(0.13);
+    expect(lib.EDU_DUR.sheet).toBe(0.1);
     expect(lib.EDU_DUR.pop).toBe(0.3);
   });
 });

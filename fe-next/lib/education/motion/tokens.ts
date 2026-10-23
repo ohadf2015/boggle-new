@@ -7,8 +7,8 @@ export const EDU_EASE = {
 
 /** Seconds, in framer-motion's unit. */
 export const EDU_DUR = {
-  // The web curve is 200ms, but the measured native sheet lands in two frames at 15fps, so the bar is 130ms.
-  sheet: 0.13,
+  // Web CSS says 200ms, but the native sheet lands within 130ms; 100ms leaves room for commit + frame quantisation.
+  sheet: 0.1,
   pop: 0.3,
   pulse: 0.3,
   hero: 0.13,
