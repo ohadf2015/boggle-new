@@ -56,7 +56,8 @@ const SAME_WORD_AS_ENGLISH: Record<string, Set<string>> = {
 
 // Older copy still mixing in English jargon; the cap only ever goes down.
 const LATIN_DEBT = /^(education\.vs[A-Z]|education\.classroomAddon\.|teacher\.reports\.googleClassroom\.|education\.results\.|teacher\.digest\.)/;
-const LATIN_DEBT_CAP: Record<string, number> = { he: 134, ja: 130, ru: 131 };
+const LATIN_DEBT_CAP: Record<string, number> = { he: 134, ja: 130, ru: 131, es: 70, sv: 69 };
+const JARGON = /miss-gap|reteach|unplugged|\bfoil\b|honesty|whole-class|\bvocab\b/i;
 
 const lookup = (tree: unknown, key: string) =>
   key.split('.').reduce<unknown>((node, part) => (node && typeof node === 'object' ? (node as Record<string, unknown>)[part] : undefined), tree);
@@ -121,7 +122,7 @@ function leftoverEnglish(locale: string, key: string): boolean {
   if (typeof value !== 'string' || /\.cite|\.importFormat/.test(key)) return false;
   const words = latinWords(value).filter((w) => !SAME_WORD_AS_ENGLISH[locale].has(w));
   if (locale === 'he' || locale === 'ja' || locale === 'ru') return words.some((w) => w.length >= 3);
-  return value === lookup(en, key) && words.length > 0;
+  return JARGON.test(value) || (value === lookup(en, key) && words.length > 0);
 }
 
 const uniqueKeys = () => [...new Set(allKeys.map(({ key }) => key))];
@@ -159,7 +160,7 @@ describe('education translation keys resolve in every locale', () => {
     expect(leftovers).toEqual([]);
   });
 
-  it('never grows the English jargon left in older he/ja/ru copy', () => {
+  it('never grows the English jargon left in older copy', () => {
     const counts = Object.fromEntries(
       Object.keys(LATIN_DEBT_CAP).map((locale) => [locale, leftoversIn(locale).filter((key) => LATIN_DEBT.test(key)).length]),
     );
