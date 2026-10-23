@@ -332,8 +332,6 @@ export function useJoinFlow(
               setEnded(true);
               return;
             }
-            toast.success(t('education.student.join.success'));
-
             if (trimmedName) {
               setStoredUsername(trimmedName);
             }
@@ -343,6 +341,7 @@ export function useJoinFlow(
             const targetGameCode =
               result.gameCode ||
               (target?.verdict === 'game' ? target.gameCode || trimmedCode : null);
+            if (!targetGameCode) toast.success(t('education.student.join.success'));
             if (!targetGameCode && result.classroomId) {
               setJoined({
                 classroomId: result.classroomId,

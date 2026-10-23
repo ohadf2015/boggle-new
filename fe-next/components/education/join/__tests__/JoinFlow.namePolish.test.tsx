@@ -62,6 +62,12 @@ describe('<JoinFlow> nickname step polish', () => {
     expect(goButton().className).toMatch(/(^|\s)bg-neo-lime(\s|$)/);
   });
 
+  it('Given a long word in the headline, Then it wraps inside the column instead of running off a phone', async () => {
+    render(<JoinFlow initialCode="P45KRT" />);
+    await screen.findByText('Ms Levy');
+    expect(screen.getByRole('heading', { level: 1 }).className).toMatch(/(^|\s)wrap-break-word(\s|$)/);
+  });
+
   it('Given a refused code, Then the alert uses black ink on red (white on neo-red is 3.5:1)', async () => {
     mockResolve.mockResolvedValue({ verdict: 'invalid' });
     render(<JoinFlow initialCode="ZZZZZ9" />);

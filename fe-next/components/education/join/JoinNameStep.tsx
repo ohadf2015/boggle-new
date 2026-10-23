@@ -83,7 +83,7 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
           ) : null}
         </div>
 
-        <h1 className="font-neo-display text-3xl font-black uppercase leading-[0.95] tracking-tight text-neo-white short:text-2xl sm:text-4xl lg:text-5xl">
+        <h1 className="font-neo-display text-3xl font-black uppercase leading-[0.95] tracking-tight wrap-break-word text-neo-white short:text-2xl sm:text-4xl lg:text-5xl">
           {t(flow.showNameField ? `${K}.flow.nameHeadline` : `${K}.flow.readyHeadline`)}
         </h1>
       </div>
