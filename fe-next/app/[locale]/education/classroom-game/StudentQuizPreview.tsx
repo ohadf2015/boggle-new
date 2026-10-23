@@ -1,6 +1,6 @@
 'use client';
 
-/** DEV-ONLY: `?preview=quizphone&state=question|correct|wrong|ended[&host=1]` drives the real quiz views from a scripted socket. */
+/** DEV-ONLY: `?preview=quizphone&state=question|correct|wrong|ended|swap[&host=1]` drives the real quiz views from a scripted socket. */
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import type { Socket } from 'socket.io-client';
@@ -10,7 +10,8 @@ import { VocabQuizHostView } from '@/components/education/vocabQuiz/VocabQuizHos
 import { VOCAB_QUIZ_EVENTS, type VocabQuizStanding } from '@/shared/types/vocabQuiz';
 
 type Handler = (payload: unknown) => void;
-type QuizState = 'question' | 'correct' | 'wrong' | 'ended';
+type QuizState = 'question' | 'correct' | 'wrong' | 'ended' | 'swap';
+type Step = [event: string, payload: unknown, atMs?: number];
 
 const CHOICES = ['fragile', 'enormous', 'quiet', 'ancient'];
 const STANDINGS: VocabQuizStanding[] = [
@@ -19,8 +20,15 @@ const STANDINGS: VocabQuizStanding[] = [
   { username: 'Noa', score: 590, streak: 1, bestStreak: 2, correctCount: 5 },
   { username: 'Ari', score: 300, streak: 0, bestStreak: 1, correctCount: 3 },
 ];
+const SWAPPED: VocabQuizStanding[] = [
+  { username: 'Leo', score: 860, streak: 1, bestStreak: 3, correctCount: 6 },
+  { username: 'Maya', score: 840, streak: 0, bestStreak: 4, correctCount: 7 },
+  { username: 'Noa', score: 590, streak: 0, bestStreak: 2, correctCount: 5 },
+  { username: 'Ari', score: 300, streak: 0, bestStreak: 1, correctCount: 3 },
+];
+const SWAP_GAP_MS = 1500;
 
-function script(state: QuizState): Array<[string, unknown]> {
+function script(state: QuizState): Step[] {
   const gameCode = 'PREVIEW';
   const question = {
     gameCode, index: 2, total: 8, focus: 'definition', prompt: 'brittle', choices: CHOICES,
@@ -36,7 +44,11 @@ function script(state: QuizState): Array<[string, unknown]> {
     gameCode, index: 2, total: 8, answerIndex: 0, answer: 'fragile', word: 'brittle',
     definition: 'hard but easily broken', distribution: [9, 4, 1, 0], standings: STANDINGS, nextInMs: 3_000, isLast: false,
   };
-  const steps: Array<[string, unknown]> = [[VOCAB_QUIZ_EVENTS.question, question], [VOCAB_QUIZ_EVENTS.answerResult, answerResult], [VOCAB_QUIZ_EVENTS.reveal, reveal]];
+  const steps: Step[] = [[VOCAB_QUIZ_EVENTS.question, question], [VOCAB_QUIZ_EVENTS.answerResult, answerResult], [VOCAB_QUIZ_EVENTS.reveal, reveal]];
+  if (state === 'swap') {
+    steps.push([VOCAB_QUIZ_EVENTS.question, { ...question, index: 3, prompt: 'vast' }, SWAP_GAP_MS]);
+    steps.push([VOCAB_QUIZ_EVENTS.reveal, { ...reveal, index: 3, word: 'vast', standings: SWAPPED }, SWAP_GAP_MS * 2]);
+  }
   if (state === 'ended') steps.push([VOCAB_QUIZ_EVENTS.ended, { gameCode, standings: STANDINGS, totalQuestions: 8, missed: [] }]);
   return steps;
 }
@@ -58,7 +70,9 @@ function scriptedSocket(state: QuizState): Socket {
     emit(event: string) {
       if (event !== VOCAB_QUIZ_EVENTS.requestState || played) return socket;
       played = true;
-      queueMicrotask(() => script(state).forEach(([e, p]) => fire(e, p)));
+      const steps = script(state);
+      queueMicrotask(() => steps.filter(([, , at]) => !at).forEach(([e, p]) => fire(e, p)));
+      steps.filter(([, , at]) => at).forEach(([e, p, at]) => setTimeout(() => fire(e, p), at));
       return socket;
     },
   };
@@ -66,7 +80,7 @@ function scriptedSocket(state: QuizState): Socket {
 }
 
 function readState(value: string | null | undefined): QuizState {
-  return value === 'question' || value === 'correct' || value === 'ended' ? value : 'wrong';
+  return value === 'question' || value === 'correct' || value === 'ended' || value === 'swap' ? value : 'wrong';
 }
 
 export function StudentQuizPreview() {

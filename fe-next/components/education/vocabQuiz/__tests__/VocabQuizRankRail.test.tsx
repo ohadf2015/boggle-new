@@ -24,11 +24,13 @@ describe('VocabQuizRankRail', () => {
   it('opens on last question\'s order, then swaps into the new one with the climber marked', () => {
     render(<VocabQuizRankRail previous={before} standings={after} t={t} />);
     expect(order()).toEqual(['Maya', 'Leo', 'Noa']);
+    expect(screen.getAllByTestId('vq-rail-row')[2]).toHaveTextContent('100');
     act(() => {
       vi.advanceTimersByTime(RANK_SWAP_DELAY_MS);
     });
     expect(order()).toEqual(['Noa', 'Maya', 'Leo']);
     expect(within(screen.getAllByTestId('vq-rail-row')[0]).getByTestId('vq-rail-up')).toHaveTextContent('2');
+    expect(screen.getAllByTestId('vq-rail-row')[0]).toHaveTextContent('400');
   });
 
   it('shows the final order at once under reduced motion or on the first reveal', () => {

@@ -197,8 +197,8 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
             <p className="font-neo-display font-bold text-2xl md:text-4xl leading-snug break-words">{question.prompt}</p>
           </div>
 
-          <div className="flex flex-col gap-3 md:flex-1 md:min-h-0 md:flex-row md:gap-5">
-            <div className="flex flex-col md:flex-1 md:min-h-0 md:min-w-0">
+          <div data-testid="vq-reveal-row" className="flex flex-col gap-3 md:flex-1 md:min-h-0 lg:flex-row lg:gap-5">
+            <div className="flex flex-col md:flex-1 md:min-h-0 lg:min-w-0">
               <VocabQuizChoiceBars
                 choices={choices}
                 distribution={reveal ? reveal.distribution : liveDistribution}
@@ -209,7 +209,7 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
               />
             </div>
             {showRail && reveal && (
-              <VocabQuizRankRail key={reveal.index} previous={previousStandings} standings={reveal.standings} t={t} className="md:w-[22rem] md:shrink-0" />
+              <VocabQuizRankRail key={reveal.index} previous={previousStandings} standings={reveal.standings} t={t} className="md:max-lg:hidden lg:w-[22rem] lg:shrink-0" />
             )}
           </div>
 

@@ -27,7 +27,6 @@ export function usePreviousRevealStandings(reveal: VocabQuizReveal | null): Voca
 }
 
 export interface VocabQuizRankRailProps {
-  /** Standings at the previous reveal, or null on the first. */
   previous: VocabQuizStanding[] | null;
   /** Server-sorted standings. */
   standings: VocabQuizStanding[];
@@ -37,10 +36,13 @@ export interface VocabQuizRankRailProps {
 
 const nameKey = (name: string) => name.trim().toLowerCase();
 
-function inPreviousOrder(standings: VocabQuizStanding[], previous: VocabQuizStanding[]): VocabQuizStanding[] {
-  const was = new Map(previous.map((p, i) => [nameKey(p.username), i]));
-  const at = (p: VocabQuizStanding) => was.get(nameKey(p.username)) ?? Number.MAX_SAFE_INTEGER;
-  return [...standings].sort((a, b) => at(a) - at(b));
+/** Current players as the wall showed them last time: old order, old scores; newcomers at the bottom on 0. */
+function asBefore(standings: VocabQuizStanding[], previous: VocabQuizStanding[]): VocabQuizStanding[] {
+  const was = new Map(previous.map((p, i) => [nameKey(p.username), { i, score: p.score }]));
+  const at = (p: VocabQuizStanding) => was.get(nameKey(p.username))?.i ?? Number.MAX_SAFE_INTEGER;
+  return [...standings]
+    .sort((a, b) => at(a) - at(b))
+    .map((p) => ({ ...p, score: was.get(nameKey(p.username))?.score ?? 0 }));
 }
 
 export function VocabQuizRankRail({ previous, standings, t, className }: VocabQuizRankRailProps) {
@@ -54,7 +56,7 @@ export function VocabQuizRankRail({ previous, standings, t, className }: VocabQu
   }, [swapped]);
 
   const moves = rankMoves(previous, standings);
-  const shown = (swapped || !previous ? standings : inPreviousOrder(standings, previous)).slice(0, LIMIT);
+  const shown = (swapped || !previous ? standings : asBefore(standings, previous)).slice(0, LIMIT);
   const close = swapped && closeRace(standings);
 
   return (
@@ -63,7 +65,7 @@ export function VocabQuizRankRail({ previous, standings, t, className }: VocabQu
       aria-label={t('vocabQuiz.rail.title')}
       className={cn('flex min-h-0 flex-col gap-2 rounded-neo border-[3px] border-neo-black bg-neo-navy-elevated p-3 shadow-hard md:gap-3 md:p-4', className)}
     >
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-neo-display text-lg font-black uppercase tracking-wide text-neo-cream md:text-2xl">{t('vocabQuiz.rail.title')}</h2>
         {close && (
           <span

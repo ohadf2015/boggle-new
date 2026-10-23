@@ -32,6 +32,15 @@ describe('VocabQuizHostView — standings between questions', () => {
     expect(screen.getAllByTestId('vq-rail-row').map((r) => r.getAttribute('data-username'))).toEqual(['ana', 'bo']);
   });
 
+  it('puts the standings beside the answers only at desktop width; a locked tablet wall keeps the tiles whole instead', () => {
+    render(<VocabQuizHostView socket={null} joinCode="H9M5YJ" playerCount={2} t={t} />);
+    const row = screen.getByTestId('vq-reveal-row');
+    expect(row.className).toContain('lg:flex-row');
+    expect(row.className).not.toContain('md:flex-row');
+    expect(screen.getByTestId('vq-rank-rail').className).toContain('lg:w-[22rem]');
+    expect(screen.getByTestId('vq-rank-rail').className).toContain('md:max-lg:hidden');
+  });
+
   it('keeps the standings off the wall when the teacher hid the leaderboard', () => {
     pressure.value = { leaderboard: 'hidden' };
     render(<VocabQuizHostView socket={null} joinCode="H9M5YJ" playerCount={2} t={t} />);
