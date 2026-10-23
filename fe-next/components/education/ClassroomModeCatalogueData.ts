@@ -51,7 +51,7 @@ type Row = Omit<CatalogueMode, 'suffix' | 'poster' | 'cover' | 'accent' | 'launc
 const ROWS: readonly Row[] = [
   { id: 'vocab-quiz', category: 'meaning', complexity: 'simple', style: 'ffa', teamsCapable: false, bestFor: ['meanings', 'testPrep'], preview: 'quiz', delivery: 'projector' },
   { id: BOSS_BATTLE_ID, category: 'board', complexity: 'simple', style: 'class', teamsCapable: false, bestFor: ['teamwork', 'review'], preview: 'boss', delivery: 'projector' },
-  { id: 'wordcraft', category: 'meaning', complexity: 'tricky', style: 'solo', teamsCapable: false, bestFor: ['lessonWords', 'independent'], preview: 'craft', delivery: 'phones' },
+  { id: 'wordcraft', category: 'meaning', complexity: 'medium', style: 'solo', teamsCapable: false, bestFor: ['lessonWords', 'independent'], preview: 'craft', delivery: 'phones' },
   { id: 'classic', category: 'board', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['spelling', 'mixedLevels'], preview: 'board', delivery: 'both' },
   { id: 'blast', category: 'board', complexity: 'simple', style: 'ffa', teamsCapable: true, bestFor: ['energy', 'warmup'], preview: 'blast', delivery: 'phones' },
   { id: 'word-hunt', category: 'board', complexity: 'medium', style: 'ffa', teamsCapable: true, bestFor: ['focus', 'spelling'], preview: 'hunt', delivery: 'phones' },

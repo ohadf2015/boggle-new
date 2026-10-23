@@ -29,6 +29,9 @@ import { ClassroomBossOutcome } from '../ClassroomBossOutcome';
 import { useVocabQuizJuice } from './useVocabQuizJuice';
 import { VocabQuizFinale } from './VocabQuizFinale';
 import { VocabQuizChoiceBars } from './VocabQuizChoiceBars';
+import { VocabQuizRankRail, usePreviousRevealStandings } from './VocabQuizRankRail';
+import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
+import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
 import { VocabQuizNextUp } from './VocabQuizNextUp';
 import { TreasureChestTicker } from './TreasureChestTicker';
 
@@ -47,6 +50,9 @@ export interface VocabQuizHostViewProps {
 export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, onBackToClass, t }: VocabQuizHostViewProps) {
   const quiz = useVocabQuiz(socket);
   const { question, reveal, phase } = quiz;
+  const pressure = useClassroomPressure();
+  const previousStandings = usePreviousRevealStandings(reveal);
+  const showRail = phase === 'reveal' && !!reveal && reveal.standings.length > 0 && !(pressure && isLeaderboardHidden(pressure));
 
   const juice = useVocabQuizJuice({
     surface: 'host',
@@ -191,14 +197,21 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
             <p className="font-neo-display font-bold text-2xl md:text-4xl leading-snug break-words">{question.prompt}</p>
           </div>
 
-          <VocabQuizChoiceBars
-            choices={choices}
-            distribution={reveal ? reveal.distribution : liveDistribution}
-            totalPlayers={roomSize}
-            answerIndex={reveal ? reveal.answerIndex : null}
-            sweep={juice.sweep}
-            t={t}
-          />
+          <div className="flex flex-col gap-3 md:flex-1 md:min-h-0 md:flex-row md:gap-5">
+            <div className="flex flex-col md:flex-1 md:min-h-0 md:min-w-0">
+              <VocabQuizChoiceBars
+                choices={choices}
+                distribution={reveal ? reveal.distribution : liveDistribution}
+                totalPlayers={roomSize}
+                answerIndex={reveal ? reveal.answerIndex : null}
+                sweep={juice.sweep}
+                t={t}
+              />
+            </div>
+            {showRail && reveal && (
+              <VocabQuizRankRail key={reveal.index} previous={previousStandings} standings={reveal.standings} t={t} className="md:w-[22rem] md:shrink-0" />
+            )}
+          </div>
 
           {reveal?.definition && (
             <p className="font-neo-body text-base md:text-xl text-neo-white/80">
