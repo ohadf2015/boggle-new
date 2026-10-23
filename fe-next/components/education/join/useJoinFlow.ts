@@ -8,12 +8,14 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useJoinClassroom } from '@/hooks/useJoinClassroom';
 import { trackEduClassroomJoin, trackStudentJoinStarted } from '@/lib/education/telemetry';
 import logger from '@/utils/logger';
-import { resolveJoinTarget, type JoinTarget } from './joinTarget';
+import type { JoinTarget } from './joinTarget';
 import { sanitizeJoinCode, joinCodeOverflows, JOIN_CODE_LENGTH } from './JoinCodeField';
-
-const CODE_TOO_LONG = 'eg2Fix.join.codeTooLong';
+import { useJoinTargetLookup } from './useJoinTargetLookup';
+import { joinFailure } from './joinFailure';
 import { setStoredUsername } from '@/utils/profileStorage';
 import { joinSuccessHref } from '@/lib/navigation/eduExitTargets';
+
+const CODE_TOO_LONG = 'eg2Fix.join.codeTooLong';
 
 export type JoinStep = 'code' | 'name';
 
@@ -79,13 +81,12 @@ export interface JoinFlowState {
   formErrorKey: string | null;
   nameError: boolean;
   suggestedName: string | null;
-  /**
-   * Set after a roster join (no live game) as the fallback success panel while
-   * the navigation to the class view (`/student?class=open`) is in flight —
-   * if the push is skipped, the next-assignment CTA is still on screen.
-   * Null while the student is still on the form.
-   */
+  /** After a roster join: the fallback success panel while the push to the class view is in flight. */
   joined: JoinedClassroom | null;
+  /** The game behind this code is over: retrying it can only fail. */
+  ended: boolean;
+  /** The class the server enrolled them in off an ended game code, if any. */
+  endedClassroomId: string | null;
   canSubmit: boolean;
   setCode: (next: string) => void;
   setName: (next: string) => void;
@@ -93,6 +94,7 @@ export interface JoinFlowState {
   advance: (codeArg?: string) => void;
   refuseTooLong: () => void;
   backToCode: () => void;
+  typeNewCode: () => void;
   submit: (overrideName?: string) => void;
 }
 
@@ -115,9 +117,7 @@ export function useJoinFlow(
     seedCode.length === JOIN_CODE_LENGTH ? 'name' : 'code'
   );
   const [name, setNameState] = useState('');
-  const [target, setTarget] = useState<JoinTarget | null>(null);
-  /** The code `target` describes; a verdict about another code must not act. */
-  const [targetCode, setTargetCode] = useState('');
+  const { target, targetCode, isChecking } = useJoinTargetLookup(code);
 
   // If initialCode resolves late (e.g. useParams hydration), sync it to state
   useEffect(() => {
@@ -133,7 +133,6 @@ export function useJoinFlow(
       setStep('name');
     }
   }, [initialCode]);
-  const [isChecking, setIsChecking] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codeErrorKey, setCodeErrorKey] = useState<string | null>(seedTooLong ? CODE_TOO_LONG : null);
   const [formErrorKey, setFormErrorKey] = useState<string | null>(null);
@@ -143,11 +142,10 @@ export function useJoinFlow(
   /** The hold outlived its deadline: go without the session. */
   const [holdExpired, setHoldExpired] = useState(false);
   const [joined, setJoined] = useState<JoinedClassroom | null>(null);
+  const [ended, setEnded] = useState(false);
+  const [endedClassroomId, setEndedClassroomId] = useState<string | null>(null);
   /** Synchronous: two taps in one frame must not send two joins. */
   const inFlight = useRef(false);
-
-  const lastLookedUp = useRef('');
-  const lookupSeq = useRef(0);
 
   // `!user`, deliberately, not `useIsGuest`. That hook answers
   // `!loading && !isAuthenticated`, which is right for HIDING things from
@@ -164,37 +162,6 @@ export function useJoinFlow(
   // name being submitted for them.
   const showNameField = isGuest || name.trim().length > 0;
 
-  /* ── The lookup. Decorates; never gates. ─────────────────────────────── */
-  useEffect(() => {
-    if (code.length !== JOIN_CODE_LENGTH) {
-      setTarget(null);
-      setIsChecking(false);
-      // Forget what we last asked about, or retyping the character just deleted
-      // matches the guard below and never re-fetches — the confirmation would
-      // then never come back for the rest of the session.
-      lastLookedUp.current = '';
-      return;
-    }
-    if (code === lastLookedUp.current) return;
-    lastLookedUp.current = code;
-    const seq = ++lookupSeq.current;
-    setIsChecking(true);
-    void (async () => {
-      let result: JoinTarget;
-      try {
-        result = await resolveJoinTarget(code);
-      } catch {
-        // A lookup we could not perform is not evidence of a bad code.
-        result = { verdict: 'unverified' };
-      }
-      // A slower answer for an older code must not overwrite a newer one.
-      if (seq !== lookupSeq.current) return;
-      setTarget(result);
-      setTargetCode(code);
-      setIsChecking(false);
-    })();
-  }, [code]);
-
   // A confident `invalid` sends the student back to fix the code, unless they
   // have already started typing a name: then the verdict only decorates.
   useEffect(() => {
@@ -203,6 +170,10 @@ export function useJoinFlow(
     setStep('code');
     setCodeErrorKey('education.student.join.invalidCode');
   }, [step, target, targetCode, code, isSubmitting, name]);
+
+  useEffect(() => {
+    if (target?.verdict === 'ended' && targetCode === code && !isSubmitting) setEnded(true);
+  }, [target, targetCode, code, isSubmitting]);
 
   /* ── Keep the sign-in return path alive from every entry point. ──────── */
   useEffect(() => {
@@ -276,9 +247,21 @@ export function useJoinFlow(
     setSuggestedName(null);
   }, []);
 
+  const typeNewCode = useCallback(() => {
+    setEnded(false);
+    setEndedClassroomId(null);
+    setCodeState('');
+    setNameState('');
+    setCodeErrorKey(null);
+    setFormErrorKey(null);
+    setNameError(false);
+    setSuggestedName(null);
+    setStep('code');
+  }, []);
+
   const submit = useCallback(
     (overrideName?: string) => {
-      if (isSubmitting || inFlight.current || joined) return;
+      if (isSubmitting || inFlight.current || joined || ended) return;
 
       const trimmedCode = code.trim().toUpperCase();
       // Passed in rather than read from state because setState is async —
@@ -334,7 +317,6 @@ export function useJoinFlow(
           );
 
           if (result.success) {
-            // Determine the outcome: success or already_member
             const joinOutcome = result.alreadyMember ? 'already_member' : 'success';
             trackEduClassroomJoin({
               result: joinOutcome,
@@ -345,19 +327,19 @@ export function useJoinFlow(
               matchedCodeType: result.gameCode ? 'game_code' : 'roster_code',
               source,
             });
+            if (result.endedSessionCode && !result.gameCode) {
+              setEndedClassroomId(result.classroomId ?? null);
+              setEnded(true);
+              return;
+            }
             toast.success(t('education.student.join.success'));
 
-            // Store the student nickname so multiplayer entry recognizes it immediately
             if (trimmedName) {
               setStoredUsername(trimmedName);
             }
 
-            // Call the success callback (e.g. to show confetti) before navigating
-            // A student who typed the LIVE GAME code came to PLAY, not to be
-            // enrolled. Walk them straight in; the enrolment already happened.
-            // A roster join (the teacher invite link) leaves for the class view:
-            // /student?class=open opens ClassSheet with the next open assignment.
-            // `joined` stays set as the fallback panel if the push is skipped.
+            // A live game code walks straight into the room; a roster join leaves for the class
+            // view, with `joined` kept as the fallback panel if the push is skipped.
             const targetGameCode =
               result.gameCode ||
               (target?.verdict === 'game' ? target.gameCode || trimmedCode : null);
@@ -382,37 +364,22 @@ export function useJoinFlow(
             return;
           }
 
-          // Determine the outcome based on the error code
-          let joinOutcome: 'invalid_code' | 'full' | 'name_taken' | 'server_error' = 'server_error';
-          if (result.code === 'INVALID_CODE') {
-            joinOutcome = 'invalid_code';
-          } else if (result.code === 'STUDENT_LIMIT_REACHED') {
-            joinOutcome = 'full';
-          } else if (result.code === 'NAME_TAKEN') {
-            joinOutcome = 'name_taken';
-          }
+          const failure = joinFailure(result.code);
+          trackEduClassroomJoin({ result: failure.outcome, attemptedCode: trimmedCode, source });
 
-          trackEduClassroomJoin({
-            result: joinOutcome,
-            attemptedCode: trimmedCode,
-            source,
-          });
-
-          if (result.code === 'NAME_TAKEN') {
-            // A problem the student can fix in a single tap should cost them a
-            // single tap — not a generic error and a guess.
+          if (failure.effect === 'name_taken') {
+            // A problem the student can fix in a single tap should cost them a single tap.
             setSuggestedName(result.suggestedName ?? null);
             setNameError(true);
-          } else if (result.code === 'STUDENT_LIMIT_REACHED') {
+          } else if (failure.effect === 'full') {
             setFormErrorKey('education.student.join.classroomFull');
-          } else if (result.code === 'INVALID_CODE') {
-            // Only say "that code is wrong" when the code really was wrong —
-            // and then put the student back on the field they have to fix.
+          } else if (failure.effect === 'ended') {
+            setEnded(true);
+          } else if (failure.effect === 'invalid_code') {
             setCodeErrorKey('education.student.join.invalidCode');
             setStep('code');
           } else {
-            // Guest sign-in refused, network, server fault. Saying "bad code"
-            // here sends a student to re-check a code that was fine.
+            // Guest sign-in refused, network, server fault: "bad code" would send them to re-check a fine code.
             setFormErrorKey('common.error');
           }
         } catch {
@@ -436,6 +403,7 @@ export function useJoinFlow(
       isAuthResolving,
       isSubmitting,
       joined,
+      ended,
       joinClassroom,
       language,
       router,
@@ -512,6 +480,8 @@ export function useJoinFlow(
     nameError,
     suggestedName,
     joined,
+    ended,
+    endedClassroomId,
     // Live unless a join is genuinely in flight. Disabling GO for a missing
     // nickname looked tidy and behaved as a silent no-op: the student taps a
     // grey button, nothing happens, and nothing on screen says why. `submit`
@@ -522,6 +492,7 @@ export function useJoinFlow(
     advance,
     refuseTooLong,
     backToCode,
+    typeNewCode,
     submit,
   };
 }

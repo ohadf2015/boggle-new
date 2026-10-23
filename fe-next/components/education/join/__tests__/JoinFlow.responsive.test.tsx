@@ -52,10 +52,23 @@ describe('<JoinFlow> layout', () => {
     expect(screen.queryByTestId('join-decor')).not.toBeInTheDocument();
   });
 
-  it('never clips: the root scrolls instead of hiding content behind an open keyboard', () => {
-    render(<JoinFlow variant="academy" />);
-    expect(root().className).toContain('overflow-y-auto');
-    expect(root().className).not.toContain('overflow-hidden');
+  it.each(['standalone', 'academy'] as const)(
+    'Given the %s door, Then the frame is locked to the viewport and one inner region scrolls',
+    (variant) => {
+      render(<JoinFlow variant={variant} />);
+      expect(root().className).not.toContain('min-h-dvh');
+      expect(root().className).not.toContain('overflow-y-auto');
+      const scroller = screen.getByTestId('join-scroll');
+      expect(scroller.className).toContain('min-h-0');
+      expect(scroller.className).toContain('flex-1');
+      expect(scroller.className).toContain('overflow-y-auto');
+      expect(scroller).toContainElement(screen.getByTestId('join-stage'));
+    }
+  );
+
+  it('Given the standalone door, Then the root is exactly one viewport tall', () => {
+    render(<JoinFlow />);
+    expect(root().className).toMatch(/(^|\s)h-dvh(\s|$)/);
   });
 
   it('sizes with CSS, not a JS zoom pinned to a phone design', () => {

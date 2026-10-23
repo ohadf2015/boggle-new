@@ -14,7 +14,7 @@ import logger from '@/utils/logger';
  * already uses (`CLASS_LIMIT_REACHED` in `ClassroomManager`). `error` stays for logs
  * and for the generic fallback; it is not fit to render on its own.
  */
-export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE' | 'NAME_TAKEN';
+export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE' | 'NAME_TAKEN' | 'SESSION_ENDED';
 
 export interface JoinClassroomResult {
   success: boolean;
@@ -26,6 +26,8 @@ export interface JoinClassroomResult {
   suggestedName?: string;
   /** Set to true when the student is already enrolled in the classroom. */
   alreadyMember?: boolean;
+  /** The code was an ended game's: the server enrolled them in that class instead. */
+  endedSessionCode?: boolean;
   error?: string;
 }
 
@@ -92,6 +94,9 @@ export function useJoinClassroom() {
 
       if (!response.ok) {
         const data = await response.json();
+        if (response.status === 410 || data?.code === 'SESSION_ENDED') {
+          return { success: false, code: 'SESSION_ENDED', error: data?.error || 'Game ended' };
+        }
         // Every 400 this route emits is a bad code (malformed JSON, failed Zod parse, or
         // no such classroom); a missing guest name is a 401, so it does not land here.
         return {
@@ -104,9 +109,15 @@ export function useJoinClassroom() {
       // `gameCode` is present only when the student joined by typing the LIVE GAME code
       // (the one on the projector) rather than the permanent roster code. It is the room
       // they should walk straight into — being on the roster is not the thing they came for.
-      const { classroomId, gameCode, alreadyMember } = await response.json();
+      const { classroomId, gameCode, alreadyMember, endedSessionCode } = await response.json();
 
-      return { success: true, classroomId, ...(gameCode ? { gameCode } : {}), ...(alreadyMember ? { alreadyMember } : {}) };
+      return {
+        success: true,
+        classroomId,
+        ...(gameCode ? { gameCode } : {}),
+        ...(alreadyMember ? { alreadyMember } : {}),
+        ...(endedSessionCode ? { endedSessionCode: true } : {}),
+      };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to join classroom';
       logger.error('Exception in joinClassroom:', error);

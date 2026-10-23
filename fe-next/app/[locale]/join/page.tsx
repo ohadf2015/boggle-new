@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { autoJoinSignedInStudent } from '@/lib/education/runSignedInJoin';
 import { JoinCodePageClient } from './PageClient';
+import { JoinFrameFallback } from '@/components/education/join/JoinFrameFallback';
 
 const META: Record<string, { title: string; description: string }> = {
   en: { title: 'Join a Game — LexiClash', description: 'Enter your game or class code to join a LexiClash room.' },
@@ -45,7 +46,7 @@ export default async function Page({
   const href = await autoJoinSignedInStudent(locale, code);
   if (href) redirect(href);
   return (
-    <Suspense fallback={<div className="min-h-dvh bg-neo-navy" />}>
+    <Suspense fallback={<JoinFrameFallback />}>
       <JoinCodePageClient />
     </Suspense>
   );

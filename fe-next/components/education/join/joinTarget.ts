@@ -19,7 +19,7 @@ import logger from '@/utils/logger';
  * "wrong code" is recurring pitfall class 4 in its most expensive form: our
  * outage, rendered as their typo, to an entire school at once.
  */
-export type JoinTargetVerdict = 'classroom' | 'game' | 'invalid' | 'unverified';
+export type JoinTargetVerdict = 'classroom' | 'game' | 'ended' | 'invalid' | 'unverified';
 
 export interface JoinTarget {
   verdict: JoinTargetVerdict;
@@ -68,6 +68,9 @@ export async function resolveJoinTarget(code: string): Promise<JoinTarget> {
         classroomId: data.classroomId,
         gameCode: data.gameCode ?? normalized,
       };
+    }
+    if (data?.kind === 'ended') {
+      return data.classroomName ? { verdict: 'ended', label: data.classroomName } : { verdict: 'ended' };
     }
     if (data?.kind === 'unknown' && !data.degraded) return { verdict: 'invalid' };
     return { verdict: 'unverified' };

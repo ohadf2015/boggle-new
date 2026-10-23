@@ -4,12 +4,13 @@ import { useEffect, useRef } from 'react';
 import { PartyPopper } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { JoinNextAssignmentCta } from './JoinNextAssignmentCta';
+import { JoinWaitingCard } from './JoinWaitingCard';
 
 const K = 'education.student.join';
 
 type JoinSuccessPanelProps =
   | { mode: 'class'; classroomId: string; alreadyMember: boolean; label?: string }
-  | { mode: 'game'; label?: string };
+  | { mode: 'game'; label?: string; name?: string };
 
 /** Where the student landed and what happens next — focused on arrival. */
 export function JoinSuccessPanel(props: JoinSuccessPanelProps) {
@@ -41,9 +42,12 @@ export function JoinSuccessPanel(props: JoinSuccessPanelProps) {
       )}
 
       {props.mode === 'game' ? (
-        <p role="status" className="font-neo-body text-base font-bold text-neo-cyan lg:text-lg">
-          {t(`${K}.flow.successGame`)}
-        </p>
+        <>
+          <JoinWaitingCard name={props.name} />
+          <p role="status" className="font-neo-body text-base font-bold text-neo-cyan lg:text-lg">
+            {t(`${K}.flow.successGame`)}
+          </p>
+        </>
       ) : (
         <>
           <p className="font-neo-body text-base font-bold text-neo-cyan lg:text-lg">{t(`${K}.flow.joinedSub`)}</p>

@@ -10,6 +10,7 @@ import { getStoredUsername } from '@/utils/profileStorage';
 import { JoinSuccessPanel } from './JoinSuccessPanel';
 import { JoinCodeStep } from './JoinCodeStep';
 import { JoinNameStep } from './JoinNameStep';
+import { JoinEndedPanel } from './JoinEndedPanel';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
 
 /**
@@ -21,8 +22,9 @@ import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
  * dark-only surface, so the navy is hardcoded (recurring pitfall class 5).
  *
  * The layout is fluid CSS on every door: one column that grows with the
- * screen, two columns on a phone on its side, and a scrolling root so an open
- * keyboard can never hide the field or its button.
+ * screen, two columns on a phone on its side, and a frame locked to the
+ * viewport whose one inner region scrolls, so an open keyboard can never hide
+ * the field or its button and the page itself never scrolls.
  */
 export type JoinFlowVariant = 'standalone' | 'academy';
 
@@ -122,10 +124,10 @@ export function JoinFlow({
         data-testid="join-root"
         dir={dir}
         className={cn(
-          'flex flex-col overflow-x-hidden overflow-y-auto overscroll-contain text-neo-white',
+          'flex flex-col overflow-hidden text-neo-white',
           academy
             ? 'fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)]'
-            : 'relative min-h-dvh bg-neo-navy pb-[var(--cookie-consent-height,0px)]'
+            : 'relative h-dvh bg-neo-navy pb-[var(--cookie-consent-height,0px)]'
         )}
       >
         {!academy && (
@@ -136,15 +138,19 @@ export function JoinFlow({
           </div>
         )}
 
+        <div
+          data-testid="join-scroll"
+          className="relative z-10 flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain"
+        >
         <main
           data-testid="join-stage"
-          className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-6 short:justify-start short:py-3 sm:max-w-lg lg:max-w-xl tv:max-w-3xl [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:max-w-3xl [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:justify-center"
+          className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-6 short:justify-start short:py-3 sm:max-w-lg lg:max-w-xl tv:max-w-3xl [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:max-w-3xl [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:justify-center"
         >
           <header className="mb-5 flex items-center justify-between gap-3 short:mb-3 lg:mb-8">
             <span className="inline-block -rotate-2 rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-lg font-black uppercase tracking-tight text-neo-navy shadow-hard lg:text-2xl">
               LexiClash
             </span>
-            {!flow.joined && !showSuccessCelebration && (
+            {!flow.joined && !showSuccessCelebration && !flow.ended && (
               <ol className="flex items-center gap-1.5" aria-label={t(`${K}.flow.steps`)}>
                 {STEPS.map((s) => (
                   <li
@@ -172,13 +178,21 @@ export function JoinFlow({
               label={flow.target?.label}
             />
           ) : showSuccessCelebration ? (
-            <JoinSuccessPanel mode="game" label={flow.target?.label} />
+            <JoinSuccessPanel mode="game" label={flow.target?.label} name={flow.name.trim() || undefined} />
+          ) : flow.ended ? (
+            <JoinEndedPanel
+              code={flow.code}
+              label={flow.target?.label}
+              classroomId={flow.endedClassroomId}
+              onNewCode={flow.typeNewCode}
+            />
           ) : flow.step === 'code' ? (
             <JoinCodeStep flow={flow} pasteNoteKey={pasteNoteKey} onPaste={handlePaste} />
           ) : (
             <JoinNameStep flow={flow} nameRef={nameRef} goRef={goRef} />
           )}
         </main>
+        </div>
       </div>
     </BoundedConfettiBurst>
   );
