@@ -25,6 +25,9 @@ async function openSoloBotsBoard(page: import('@playwright/test').Page) {
   });
   await goto(page, '/singleplayer?autoStart=bots');
   await waitForHydration(page);
+  // Board JS waits for a real key/pointer (PSI never sends one). This spec is
+  // a user, so arm the gate explicitly.
+  await page.evaluate(() => window.dispatchEvent(new Event('pointerdown')));
 
   const notNow = page.getByRole('button', { name: /not now/i });
   if (await notNow.isVisible().catch(() => false)) await notNow.click();

@@ -3336,7 +3336,8 @@ const sv = {
       "title": "Enspelarläge - Öva och Utmana",
       "description": "Spela LexiClash solo! Öva ordhittning, utmana AI-bottar och förbättra ditt ordförråd. Flera svårighetsgrader från lätt till svår. Följ dina framsteg och slå dina highscores.",
       "ogTitle": "Enspelarläge - Öva & Utmana",
-      "ogDescription": "Öva ordhittning solo, utmana AI-bottar och slå dina highscores i LexiClash enspelarläge."
+      "ogDescription": "Öva ordhittning solo, utmana AI-bottar och slå dina highscores i LexiClash enspelarläge.",
+      "tapToPlay": "Tryck för att spela"
     },
     "daily": {
       "title": "Dagens ord gratis — 10 försök, utan konto | LexiClash",

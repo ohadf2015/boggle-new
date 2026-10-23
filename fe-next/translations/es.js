@@ -3003,7 +3003,8 @@ const es = {
       "title": "Modo Un Jugador - Practica y Desafía",
       "description": "¡Juega LexiClash solo! Practica la búsqueda de palabras, desafía bots de IA y mejora tu vocabulario. Múltiples niveles de dificultad. Sigue tu progreso y supera tus mejores puntuaciones.",
       "ogTitle": "Modo Un Jugador - Practica y Desafía",
-      "ogDescription": "Practica la búsqueda de palabras solo, desafía bots de IA y supera tus mejores puntuaciones."
+      "ogDescription": "Practica la búsqueda de palabras solo, desafía bots de IA y supera tus mejores puntuaciones.",
+      "tapToPlay": "Toca para jugar"
     },
     "daily": {
       "title": "Rueda & Caza de Palabras Diaria — Gratis | LexiClash",

@@ -41,4 +41,10 @@ describe('ConditionalProviders game-stack split', () => {
     expect(SOURCE).not.toMatch(/shouldMountHeavyClientBoot/);
     expect(SOURCE).not.toMatch(/useAfterFirstPaint/);
   });
+
+  it('holds CommandPalette and LaunchHost on heavy paths until a real key/pointer', () => {
+    expect(SOURCE).toContain('onFirstEngagement');
+    expect(SOURCE).toContain('showChromeWidgets');
+    expect(SOURCE).not.toMatch(/requestAnimationFrame/);
+  });
 });

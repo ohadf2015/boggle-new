@@ -90,6 +90,10 @@ interface SinglePlayerLayoutProps {
 export default async function SinglePlayerLayout({ children, params }: SinglePlayerLayoutProps): Promise<ReactNode> {
   const { locale } = await params;
   const localePath = `/${locale}`;
+  const validLocale = (locale as Locale) || 'en';
+  const t = await loadTranslation(validLocale) as Record<string, any>;
+  const enT = validLocale === 'en' ? t : await loadTranslation('en') as Record<string, any>;
+  const tapToPlay: string | undefined = t?.seo?.singleplayer?.tapToPlay || enT?.seo?.singleplayer?.tapToPlay;
 
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
@@ -135,7 +139,7 @@ export default async function SinglePlayerLayout({ children, params }: SinglePla
           winner.webp (51 frames / 148KiB) must NOT be the LCP image — browsers
           wait on all frames and PSI billed ~142KiB compression waste. */}
       <link rel="preload" as="image" href="/mascot/winner-lcp.webp" fetchPriority="high" />
-      <SinglePlayerLcpShell />
+      <SinglePlayerLcpShell tapToPlay={tapToPlay} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([breadcrumbSchema, webPageSchema])) }}

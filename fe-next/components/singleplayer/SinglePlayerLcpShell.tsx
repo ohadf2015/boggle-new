@@ -14,12 +14,12 @@
  * After the client marks html[data-sp-ready] (results / pre-game), hide it
  * so the z-70 navy+mascot cannot cover the results CTA.
  */
-export function SinglePlayerLcpShell() {
+export function SinglePlayerLcpShell({ tapToPlay }: { tapToPlay?: string } = {}) {
   return (
     <>
       <style
         dangerouslySetInnerHTML={{
-          __html: 'html[data-sp-ready] #sp-lcp-paint{display:none}',
+          __html: 'html[data-sp-ready] #sp-lcp-paint{display:none}html[data-sp-ready] #sp-tap-hint{display:none}',
         }}
       />
       <div
@@ -39,6 +39,15 @@ export function SinglePlayerLcpShell() {
           className="h-28 w-28 object-contain"
         />
       </div>
+      {tapToPlay ? (
+        <p
+          id="sp-tap-hint"
+          data-testid="sp-tap-hint"
+          className="pointer-events-none fixed inset-x-0 bottom-[22%] z-[71] text-center text-xs font-neo-body text-white/80"
+        >
+          {tapToPlay}
+        </p>
+      ) : null}
     </>
   );
 }
