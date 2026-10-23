@@ -46,7 +46,17 @@ describe('VocabQuizRankRail', () => {
 
   it('calls a close race at the top', () => {
     render(<VocabQuizRankRail previous={null} standings={[row('Maya', 820), row('Leo', 800)]} t={t} />);
-    expect(screen.getByTestId('vq-rail-close')).toHaveTextContent('vocabQuiz.rail.closeRace');
+    expect(screen.getByTestId('vq-rail-close')).toHaveTextContent('wordWheel.closeRace');
+  });
+
+  it('heads the card and labels a climber with keys every locale already translates', () => {
+    render(<VocabQuizRankRail previous={before} standings={after} t={t} />);
+    act(() => {
+      vi.advanceTimersByTime(RANK_SWAP_DELAY_MS);
+    });
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('results.standings');
+    expect(screen.getByTestId('vq-rank-rail')).toHaveAttribute('aria-label', 'results.standings');
+    expect(screen.getAllByTestId('vq-rail-up')[0]).toHaveAttribute('aria-label', 'wordHunt.leaderboard.movedUp:{"count":2}');
   });
 
   it('keeps a Latin name beside its rank on a Hebrew wall', () => {

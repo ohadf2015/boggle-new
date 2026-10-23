@@ -62,18 +62,18 @@ export function VocabQuizRankRail({ previous, standings, t, className }: VocabQu
   return (
     <section
       data-testid="vq-rank-rail"
-      aria-label={t('vocabQuiz.rail.title')}
+      aria-label={t('results.standings')}
       className={cn('flex min-h-0 flex-col gap-2 rounded-neo border-[3px] border-neo-black bg-neo-navy-elevated p-3 shadow-hard md:gap-3 md:p-4', className)}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-neo-display text-lg font-black uppercase tracking-wide text-neo-cream md:text-2xl">{t('vocabQuiz.rail.title')}</h2>
+        <h2 className="font-neo-display text-lg font-black uppercase tracking-wide text-neo-cream md:text-2xl">{t('results.standings')}</h2>
         {close && (
           <span
             data-testid="vq-rail-close"
             className="inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard-sm md:text-base"
           >
             <Zap className="size-4" aria-hidden />
-            {t('vocabQuiz.rail.closeRace')}
+            {t('wordWheel.closeRace')}
           </span>
         )}
       </div>
@@ -97,7 +97,7 @@ export function VocabQuizRankRail({ previous, standings, t, className }: VocabQu
               {up > 0 && (
                 <span
                   data-testid="vq-rail-up"
-                  aria-label={t('vocabQuiz.rail.up', { count: up })}
+                  aria-label={t('wordHunt.leaderboard.movedUp', { count: up })}
                   className="inline-flex shrink-0 items-center gap-0.5 rounded-full border-2 border-neo-black bg-neo-lime px-1.5 text-xs leading-tight text-neo-black md:text-sm"
                 >
                   <ArrowUp className="size-3.5" aria-hidden />
