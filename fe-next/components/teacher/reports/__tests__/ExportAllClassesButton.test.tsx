@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 const proState: { hasPro: boolean; loading: boolean } = { hasPro: true, loading: false };
-const authState: { user: { id: string } | null } = { user: { id: 'teacher-1' } };
 
 const TRANSLATIONS: Record<string, string> = {
   'teacher.reports.exportAllClasses.button': 'Export all classes',
@@ -32,10 +31,6 @@ vi.mock('next/link', () => ({
 
 vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => proState,
-}));
-
-vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => authState,
 }));
 
 vi.mock('@/utils/growthTracking', () => ({
@@ -67,9 +62,7 @@ vi.mock('react-hot-toast', () => ({
   default: toastFn,
 }));
 
-vi.mock('@/lib/supabase/education/teacherExportAllClasses', () => ({
-  getTeacherExportRows: vi.fn(),
-}));
+vi.mock('@/utils/authFetch', () => ({ fetchWithAuth: vi.fn() }));
 
 vi.mock('@/lib/education/assignmentProgressReport', async () => {
   const actual = await vi.importActual<typeof import('@/lib/education/assignmentProgressReport')>(
@@ -78,7 +71,14 @@ vi.mock('@/lib/education/assignmentProgressReport', async () => {
   return { ...actual, downloadCsvFile: vi.fn() };
 });
 
-import { getTeacherExportRows } from '@/lib/supabase/education/teacherExportAllClasses';
+import { fetchWithAuth } from '@/utils/authFetch';
+
+const reply = (status: number, body: unknown) => ({ ok: status < 300, status, json: async () => body }) as Response;
+const rowsReply = (rows: unknown[]) => reply(200, { ok: true, rows });
+const serverReturns = {
+  mockResolvedValue: ({ data, error }: { data: unknown[]; error: unknown }) =>
+    vi.mocked(fetchWithAuth).mockResolvedValue(error ? reply(500, { ok: false }) : rowsReply(data)),
+};
 import { downloadCsvFile } from '@/lib/education/assignmentProgressReport';
 import { ExportAllClassesButton } from '../ExportAllClassesButton';
 
@@ -99,7 +99,6 @@ describe('ExportAllClassesButton', () => {
     vi.clearAllMocks();
     proState.hasPro = true;
     proState.loading = false;
-    authState.user = { id: 'teacher-1' };
   });
 
   it('hides the export action behind the Pro gate for a free teacher', () => {
@@ -123,7 +122,7 @@ describe('ExportAllClassesButton', () => {
   });
 
   it('fetches rows, builds the CSV, and triggers the shared download helper on click', async () => {
-    (getTeacherExportRows as ReturnType<typeof vi.fn>).mockResolvedValue({ data: [sampleRow], error: null });
+    serverReturns.mockResolvedValue({ data: [sampleRow], error: null });
     const user = userEvent.setup();
     render(<ExportAllClassesButton />);
 
@@ -134,11 +133,11 @@ describe('ExportAllClassesButton', () => {
     expect(fileName).toBe('All classes – progress export');
     expect(csv.split('\n')[0]).toBe('Classroom,Student,Lessons completed,Words mastered,Total XP,Last active,Games played');
     expect(csv.split('\n')[1]).toBe('Grade 5A,Ada,3,12,450,2026-09-20,7');
-    expect(getTeacherExportRows).toHaveBeenCalledWith('teacher-1');
+    expect(fetchWithAuth).toHaveBeenCalledWith('/api/education/classroom/export-all');
   });
 
   it('substitutes the translated anonymous-student label instead of a hardcoded string for a null studentName', async () => {
-    (getTeacherExportRows as ReturnType<typeof vi.fn>).mockResolvedValue({
+    serverReturns.mockResolvedValue({
       data: [{ ...sampleRow, studentName: null, studentId: 'abcdef1234567890' }],
       error: null,
     });
@@ -153,10 +152,8 @@ describe('ExportAllClassesButton', () => {
   });
 
   it('shows a loading state while the export is in flight, then returns to idle', async () => {
-    let resolveFetch: (v: { data: typeof sampleRow[]; error: null }) => void = () => {};
-    (getTeacherExportRows as ReturnType<typeof vi.fn>).mockReturnValue(
-      new Promise((resolve) => { resolveFetch = resolve; }),
-    );
+    let resolveFetch: (v: Response) => void = () => {};
+    vi.mocked(fetchWithAuth).mockReturnValue(new Promise((resolve) => { resolveFetch = resolve; }));
     const user = userEvent.setup();
     render(<ExportAllClassesButton />);
 
@@ -165,13 +162,13 @@ describe('ExportAllClassesButton', () => {
 
     expect(await screen.findByRole('button', { name: 'Exporting…' })).toBeDisabled();
 
-    resolveFetch({ data: [sampleRow], error: null });
+    resolveFetch(rowsReply([sampleRow]));
 
     await waitFor(() => expect(screen.getByRole('button', { name: 'Export all classes' })).toBeEnabled());
   });
 
   it('shows an error toast and does not download anything when the fetch fails', async () => {
-    (getTeacherExportRows as ReturnType<typeof vi.fn>).mockResolvedValue({ data: [], error: { message: 'RLS denied' } });
+    serverReturns.mockResolvedValue({ data: [], error: { message: 'RLS denied' } });
     const user = userEvent.setup();
     render(<ExportAllClassesButton />);
 
@@ -182,7 +179,7 @@ describe('ExportAllClassesButton', () => {
   });
 
   it('shows an info toast and does not download an empty file when there is nothing to export', async () => {
-    (getTeacherExportRows as ReturnType<typeof vi.fn>).mockResolvedValue({ data: [], error: null });
+    serverReturns.mockResolvedValue({ data: [], error: null });
     const user = userEvent.setup();
     render(<ExportAllClassesButton />);
 
@@ -192,8 +189,19 @@ describe('ExportAllClassesButton', () => {
     expect(downloadCsvFile).not.toHaveBeenCalled();
   });
 
-  it('shows an error toast if getTeacherExportRows throws instead of returning {error}', async () => {
-    (getTeacherExportRows as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('network down'));
+  it('shows an error toast and downloads nothing when the server refuses a lapsed Pro teacher (402)', async () => {
+    vi.mocked(fetchWithAuth).mockResolvedValue(reply(402, { ok: false, error: 'Teacher Pro required' }));
+    const user = userEvent.setup();
+    render(<ExportAllClassesButton />);
+
+    await user.click(screen.getByRole('button', { name: 'Export all classes' }));
+
+    await waitFor(() => expect(toastError).toHaveBeenCalledWith('Couldn\'t export your classes. Try again.'));
+    expect(downloadCsvFile).not.toHaveBeenCalled();
+  });
+
+  it('shows an error toast if the request throws', async () => {
+    vi.mocked(fetchWithAuth).mockRejectedValue(new Error('network down'));
     const user = userEvent.setup();
     render(<ExportAllClassesButton />);
 

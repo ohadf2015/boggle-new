@@ -2,20 +2,41 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { PLAN_MATRIX_ROWS } from '@/lib/education/planMatrix';
-import { PRO_FEATURE_BACKING } from '../proFeatureBacking';
+import { PRO_FEATURES } from '@/components/teacher/ProGate';
+import { PRO_FEATURE_BACKING, PRO_FEATURES_WITHOUT_SERVER_GATE } from '../proFeatureBacking';
 
 const ROOT = join(__dirname, '../../../..');
-const proOnly = PLAN_MATRIX_ROWS.filter((r) => r.free !== r.pro).map((r) => r.key);
+const read = (path: string) => readFileSync(join(ROOT, path), 'utf8');
+const matrixProRows = PLAN_MATRIX_ROWS.filter((r) => r.free !== r.pro).map((r) => r.key);
+const sold = [...new Set([...matrixProRows, ...PRO_FEATURES])];
 
-describe('every Pro row is backed on the server and reachable from HQ', () => {
-  it('lists a backing for every matrix row where Free and Pro differ', () => {
-    expect(Object.keys(PRO_FEATURE_BACKING).sort()).toEqual(expect.arrayContaining(proOnly.sort()));
+describe('every Pro feature we sell is refused to a free teacher on the server', () => {
+  it('covers every matrix Pro row and every ProGate lock, with no silent gaps', () => {
+    const accounted = [...Object.keys(PRO_FEATURE_BACKING), ...Object.keys(PRO_FEATURES_WITHOUT_SERVER_GATE)];
+    expect(accounted).toEqual(expect.arrayContaining(sold));
   });
 
-  it.each(Object.entries(PRO_FEATURE_BACKING))('%s: its route exists and enforces the plan', (_key, backing) => {
-    const file = join(ROOT, backing.route);
-    expect(existsSync(file), backing.route).toBe(true);
-    expect(readFileSync(file, 'utf8')).toContain(backing.guard);
+  it('backs the reports page actions a free teacher could otherwise reach: export, grade passback, parent links', () => {
+    expect(Object.keys(PRO_FEATURE_BACKING)).toEqual(
+      expect.arrayContaining(['reports', 'gradePassback', 'parentReport', 'parentLinks']),
+    );
+  });
+
+  it('names pressure dials as the only lock still enforced in the UI alone', () => {
+    expect(Object.keys(PRO_FEATURES_WITHOUT_SERVER_GATE)).toEqual(['pressureDials']);
+  });
+
+  it.each(Object.entries(PRO_FEATURE_BACKING))('%s: its route exists and calls the plan guard', (_key, backing) => {
+    expect(existsSync(join(ROOT, backing.route)), backing.route).toBe(true);
+    expect(read(backing.route)).toContain(backing.guard);
+  });
+
+  it.each(Object.entries(PRO_FEATURE_BACKING))('%s: a route test proves a free teacher is refused', (_key, backing) => {
+    const { file, name, status } = backing.refusal;
+    expect(existsSync(join(ROOT, file)), file).toBe(true);
+    const source = read(file);
+    expect(source).toContain(name);
+    expect(source).toContain(`toBe(${status})`);
   });
 
   it.each(Object.entries(PRO_FEATURE_BACKING))('%s: its UI exists and is at most 2 taps from HQ', (_key, backing) => {

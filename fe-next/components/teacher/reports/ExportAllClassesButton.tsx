@@ -4,10 +4,9 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Download, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { ProGate } from '@/components/teacher/ProGate';
-import { getTeacherExportRows } from '@/lib/supabase/education/teacherExportAllClasses';
-import { teacherExportToCsv } from '@/lib/education/teacherExportAllClasses';
+import { fetchWithAuth } from '@/utils/authFetch';
+import { teacherExportToCsv, type TeacherExportRow } from '@/lib/education/teacherExportAllClasses';
 import { downloadCsvFile } from '@/lib/education/assignmentProgressReport';
 
 /**
@@ -16,19 +15,21 @@ import { downloadCsvFile } from '@/lib/education/assignmentProgressReport';
  * words mastered, total XP, last active, games played, scoped per classroom).
  *
  * Gated by <ProGate feature="reports"> so a free teacher sees the same
- * upsell card as the rest of /teacher/reports instead of a working button.
+ * upsell card as the rest of /teacher/reports instead of a working button;
+ * the rows come from /api/education/classroom/export-all, which 402s a free teacher.
  */
 export function ExportAllClassesButton() {
   const { t } = useLanguage();
-  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleExport = async () => {
-    if (!user?.id || isLoading) return;
+    if (isLoading) return;
     setIsLoading(true);
     try {
-      const { data: rows, error } = await getTeacherExportRows(user.id);
-      if (error) {
+      const res = await fetchWithAuth('/api/education/classroom/export-all');
+      const body = (await res.json().catch(() => null)) as { ok?: boolean; rows?: TeacherExportRow[] } | null;
+      const rows = body?.rows;
+      if (!res.ok || !body?.ok || !Array.isArray(rows)) {
         toast.error(t('teacher.reports.exportAllClasses.failed'));
         return;
       }
@@ -48,8 +49,6 @@ export function ExportAllClassesButton() {
       });
       downloadCsvFile(t('teacher.reports.exportAllClasses.fileName'), csv);
     } catch {
-      // getTeacherExportRows always resolves {data, error} — this only fires
-      // on a bug (e.g. a thrown network error), and must not fail silently.
       toast.error(t('teacher.reports.exportAllClasses.failed'));
     } finally {
       setIsLoading(false);
