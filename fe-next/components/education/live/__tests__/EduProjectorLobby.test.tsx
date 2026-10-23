@@ -60,6 +60,26 @@ describe('EduProjectorLobby', () => {
     expect(base.onStartGame).toHaveBeenCalledTimes(1);
   });
 
+  it('given exactly one student, when the teacher looks at Start, then one tap starts the round with no blocked reason', () => {
+    render(<EduProjectorLobby {...base} students={[{ username: 'Noa' }]} onStartPracticeRound={vi.fn()} />);
+    const start = screen.getByTestId('edu-lobby-start');
+    expect(start).toBeEnabled();
+    expect(start).toHaveAttribute('data-ready', 'true');
+    expect(screen.getByTestId('edu-lobby-start-count')).toHaveTextContent('1');
+    expect(screen.queryByTestId('edu-lobby-start-reason')).toBeNull();
+    fireEvent.click(start);
+    expect(base.onStartGame).toHaveBeenCalledTimes(1);
+  });
+
+  it('given a phone-width lobby that scrolls, when the roster grows, then the Start row stays pinned to the bottom', () => {
+    render(<EduProjectorLobby {...base} students={[{ username: 'Noa' }]} />);
+    const row = screen.getByTestId('edu-lobby-start-row');
+    expect(row).toContainElement(screen.getByTestId('edu-lobby-start'));
+    expect(row.className).toMatch(/max-md:sticky/);
+    expect(row.className).toMatch(/max-md:bottom-0/);
+    expect(row.className).toMatch(/max-md:bg-neo-navy/);
+  });
+
   it('given a room starting, when Start is pending, then it shows a loading state and cannot double-fire', () => {
     render(<EduProjectorLobby {...base} students={[{ username: 'Noa' }]} starting />);
     const start = screen.getByTestId('edu-lobby-start');

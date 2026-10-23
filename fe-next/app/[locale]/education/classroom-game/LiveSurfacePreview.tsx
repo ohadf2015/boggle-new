@@ -37,6 +37,7 @@ import {
 import { DuelPreview, EndedPreview, HostResultsPreview, PhoneResultsPreview, QuizPreview } from './LiveResultsPreviews';
 
 import type { LiveSurfacePreviewKind } from './previewKinds';
+import { StudentQuizPreview } from './StudentQuizPreview';
 
 export type { LiveSurfacePreviewKind };
 
@@ -155,5 +156,6 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
   if (kind === 'quiz') return <QuizPreview />;
   if (kind === 'duel') return <DuelPreview />;
   if (kind === 'ended') return <EndedPreview />;
+  if (kind === 'quizphone') return <StudentQuizPreview />;
   return <ProjectorPreview />;
 }

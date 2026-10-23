@@ -99,7 +99,7 @@ export const EduProjectorLobby = memo<ProjectorLobbyProps>(function EduProjector
           <LobbyModeSwitcher gameCode={gameCode} currentMode={lobbyMode.modeId} socket={getSharedSocketIfExists()} t={t} onModeApplied={lobbyMode.applyMode} roundSettings={lobbyMode.roundSettings} />
         </div>
 
-        <div className="relative flex flex-col items-stretch gap-2 md:row-start-3 md:flex-row md:items-center md:gap-[1vw] md:pe-[11vw]">
+        <div data-testid="edu-lobby-start-row" className="relative flex flex-col items-stretch gap-2 max-md:sticky max-md:bottom-0 max-md:z-10 max-md:-mx-4 max-md:-mb-4 max-md:border-t-4 max-md:border-neo-black max-md:bg-neo-navy max-md:p-4 md:row-start-3 md:flex-row md:items-center md:gap-[1vw] md:pe-[11vw]">
           <div className="flex min-w-0 flex-1 flex-col gap-2">
             {lobbyMode.quizBlocked && <ProjectorQuizBlocked gameCode={gameCode} currentMode={lobbyMode.modeId} t={t} onApplied={lobbyMode.applyMode} />}
             {autoStartSecondsLeft !== null && (

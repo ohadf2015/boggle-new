@@ -7,7 +7,7 @@
  * verdict strip beneath it.
  *
  * The payoff layer lives in `useVocabQuizJuice`: a tick tightening under five
- * seconds, a chime or a buzz the instant the server judges, a stinger at three
+ * seconds, a chime or a buzz on the frame the verdict shows, a stinger at three
  * and five in a row, a burst when the class sweeps, confetti for a clean sheet.
  * It respects the app mute setting for free (`playSound` returns early when SFX
  * are muted) and reduced motion (the confetti helpers no-op).

@@ -11,9 +11,11 @@
 'use client';
 
 import type { CSSProperties } from 'react';
+import { m } from 'framer-motion';
 import { Check, Flame, Sparkles, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
+import { resolvePreset, useEduReducedMotion } from '@/lib/education/motion';
 
 export interface VocabQuizRevealBannerProps {
   /** Null when the student never answered in time. */
@@ -78,9 +80,17 @@ export function VocabQuizRevealBanner({
     : correct === false
       ? 'bg-neo-red text-neo-black'
       : 'bg-neo-purple text-neo-black';
+  const sheet = resolvePreset('sheetUp', useEduReducedMotion());
 
   return (
-    <div className="shrink-0 flex flex-col gap-2 animate-neo-pop" role="status">
+    <m.div
+      data-testid="vocab-quiz-verdict-sheet"
+      initial={sheet.initial}
+      animate={sheet.animate}
+      transition={sheet.transition}
+      className="shrink-0 flex flex-col gap-2"
+      role="status"
+    >
       {sweep && (
         <div className="flex items-center gap-2 rounded-neo border-[2px] border-neo-black bg-neo-yellow px-3 py-1.5 text-neo-black shadow-hard">
           <Sparkles className="w-5 h-5 shrink-0" aria-hidden />
@@ -136,7 +146,7 @@ export function VocabQuizRevealBanner({
           {definition}
         </p>
       )}
-    </div>
+    </m.div>
   );
 }
 

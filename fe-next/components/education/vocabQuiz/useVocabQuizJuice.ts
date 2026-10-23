@@ -4,7 +4,7 @@
  * The quiz already had the mechanics of a game — a speed bonus, a streak worth
  * up to fifty a question — and none of the feedback. This is the layer that
  * makes the scoring audible: a tick tightening under five seconds, a chime or a
- * buzz the instant the server judges you, a stinger at three and five in a row,
+ * buzz on the frame the verdict shows, a stinger at three and five in a row,
  * a burst when the whole class sweeps a question, and confetti for a clean
  * sheet.
  *
@@ -26,6 +26,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { EDU_MS } from '@/lib/education/motion';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireStreakConfetti, fireVictoryConfetti } from '@/utils/confettiUtils';
 import type { VocabQuizAnswerResult, VocabQuizReveal } from '@/shared/types/vocabQuiz';
@@ -56,6 +57,9 @@ export interface VocabQuizJuiceResult {
   /** True while the clock is inside the ticking window — drives the bar's pulse. */
   ticking: boolean;
 }
+
+/** The mascot answers the verdict a beat after the sheet lands, never on the same frame. */
+export const MASCOT_REACT_MS = EDU_MS.hold;
 
 /** Sounds are additive over a classroom of thirty phones; keep them low. */
 const TICK_VOLUME = 0.16;
@@ -100,9 +104,10 @@ export function useVocabQuizJuice(input: VocabQuizJuiceInput): VocabQuizJuiceRes
   }, [ticking, secondsLeft, questionNumber, playSound]);
 
   // ---- This student's own verdict -------------------------------------------
+  // Held for the reveal: the verdict strip mounts then, and a chime heard before it reads as a spoiler.
   useEffect(() => {
     if (surface !== 'student') return;
-    if (!myAnswer) return;
+    if (phase !== 'reveal' || !myAnswer) return;
     if (scoredAnswerRef.current === myAnswer.index) return;
     scoredAnswerRef.current = myAnswer.index;
 
@@ -114,12 +119,12 @@ export function useVocabQuizJuice(input: VocabQuizJuiceInput): VocabQuizJuiceRes
     } else {
       playSound('wordRejected', { volume: 0.45, requiresGameActive: false });
     }
-  }, [surface, myAnswer, playSound]);
+  }, [surface, phase, myAnswer, playSound]);
 
   // ---- Streak stingers -------------------------------------------------------
   useEffect(() => {
     if (surface !== 'student') return;
-    if (!myAnswer || !myAnswer.correct) return;
+    if (phase !== 'reveal' || !myAnswer || !myAnswer.correct) return;
     const streak = myAnswer.streak;
     if (stingerStreakRef.current === streak) return;
     const stinger = streakStinger(streak);
@@ -132,7 +137,7 @@ export function useVocabQuizJuice(input: VocabQuizJuiceInput): VocabQuizJuiceRes
     }
     playSound('streakFire', { volume: 0.65, requiresGameActive: false });
     fireStreakConfetti();
-  }, [surface, myAnswer, playSound]);
+  }, [surface, phase, myAnswer, playSound]);
 
   // ---- The class-wide sweep --------------------------------------------------
   useEffect(() => {
@@ -176,15 +181,24 @@ export function useVocabQuizJuice(input: VocabQuizJuiceInput): VocabQuizJuiceRes
     fireVictoryConfetti();
   }, [phase, surface, input.myCorrectCount, totalQuestions, playSound]);
 
+  const revealIndex = phase === 'reveal' && reveal ? reveal.index : null;
+  const [reactedReveal, setReactedReveal] = useState<number | null>(null);
+  useEffect(() => {
+    if (revealIndex === null) return;
+    const id = setTimeout(() => setReactedReveal(revealIndex), MASCOT_REACT_MS);
+    return () => clearTimeout(id);
+  }, [revealIndex]);
+  const reacted = revealIndex !== null && reactedReveal === revealIndex;
+
   const mascot = useMemo(
     () =>
       mascotStateFor({
         phase,
         answered: myAnswer !== null,
-        correct: phase === 'reveal' && myAnswer ? myAnswer.correct : null,
+        correct: reacted && myAnswer ? myAnswer.correct : null,
         streak: myStreak,
       }),
-    [phase, myAnswer, myStreak]
+    [phase, myAnswer, myStreak, reacted]
   );
 
   return { sweep, mascot, ticking };
