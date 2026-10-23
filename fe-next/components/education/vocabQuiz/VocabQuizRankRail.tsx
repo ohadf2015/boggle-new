@@ -63,7 +63,7 @@ export function VocabQuizRankRail({ previous, standings, t, className }: VocabQu
     <section
       data-testid="vq-rank-rail"
       aria-label={t('results.standings')}
-      className={cn('flex min-h-0 flex-col gap-2 rounded-neo border-[3px] border-neo-black bg-neo-navy-elevated p-3 shadow-hard md:gap-3 md:p-4', className)}
+      className={cn('flex min-h-0 flex-col gap-2 rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-elevated p-3 shadow-hard md:gap-3 md:p-4', className)}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-neo-display text-lg font-black uppercase tracking-wide text-neo-cream md:text-2xl">{t('results.standings')}</h2>

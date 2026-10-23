@@ -10,7 +10,7 @@ export function JoinWaitingCard({ name }: { name?: string }) {
   const { profile } = useAuth();
 
   return (
-    <div className="flex flex-col items-center gap-3 rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 text-center shadow-hard">
+    <div className="flex flex-col items-center gap-3 rounded-neo border-3 border-neo-cream/50 bg-neo-navy-light p-4 text-center shadow-hard">
       <Pop>
         <Avatar customAvatar={profile?.avatar_config ?? null} userId={name} size="2xl" />
       </Pop>

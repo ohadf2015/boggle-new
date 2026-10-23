@@ -58,7 +58,7 @@ export function RoundReports({ classroomId, classroomName, onStudentClick, previ
               type="button"
               data-testid="round-report-collapsed"
               onClick={() => setOpenCode(game.gameCode)}
-              className="flex min-h-12 w-full items-center gap-3 rounded-neo border-2 border-neo-cream/30 bg-neo-navy-light px-3 py-2 text-start hover:border-neo-cream/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+              className="flex min-h-12 w-full items-center gap-3 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light px-3 py-2 text-start hover:border-neo-cream/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
             >
               <span className="font-neo-display text-sm font-black text-neo-white">
                 {t(roundTitleKey(game.gameMode))}

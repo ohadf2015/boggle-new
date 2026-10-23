@@ -35,7 +35,7 @@ export function UpgradeYourClasses({ classes }: { classes: UpgradeClassSummary[]
           <li
             key={c.id}
             data-testid="upgrade-your-class"
-            className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 rounded-neo border-2 border-neo-black bg-neo-navy px-2 py-1.5"
+            className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 rounded-neo border-2 border-neo-cream/50 bg-neo-navy px-2 py-1.5"
           >
             <Users className="size-4 shrink-0 text-neo-cyan" strokeWidth={2.5} aria-hidden />
             <span data-testid="upgrade-class-students" className="shrink-0 font-neo-display text-sm font-black tabular-nums text-neo-cyan">{c.member_count}</span>

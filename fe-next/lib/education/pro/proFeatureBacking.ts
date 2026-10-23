@@ -98,7 +98,7 @@ export const PRO_FEATURE_BACKING: Record<string, ProFeatureBacking> = {
   },
   parentLinks: {
     route: 'app/api/teacher/pro/parent-links/route.ts',
-    guard: 'subscription.has_pro',
+    guard: 'requireTeacherPro',
     ui: 'components/teacher/pro/ParentReportPack.tsx',
     tapsFromHq: 2,
     refusal: {

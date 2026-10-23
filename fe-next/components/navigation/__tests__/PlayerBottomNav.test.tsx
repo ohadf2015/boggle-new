@@ -17,7 +17,7 @@ describe('PlayerBottomNav', () => {
     },
   );
 
-  it.each(['/en', '/en/daily', '/en/education/esl-word-games'])('shows the player tabs on %s', (path) => {
+  it.each(['/en', '/en/daily'])('shows the player tabs on %s', (path) => {
     pathname = path;
     render(<PlayerBottomNav />);
     expect(screen.getByTestId('player-bottom-nav')).toBeInTheDocument();

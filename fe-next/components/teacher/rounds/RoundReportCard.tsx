@@ -85,11 +85,11 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
       ) : (
         <>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-neo border-2 border-neo-black bg-neo-navy px-3 py-2">
+            <div className="rounded-neo border-2 border-neo-cream/50 bg-neo-navy px-3 py-2">
               <p className="font-neo-display text-2xl font-black tabular-nums text-neo-lime">{game.averageAccuracyPct}%</p>
               <p className="text-xs font-bold text-neo-white/70">{t('teacher.lastGame.avgAccuracy')}</p>
             </div>
-            <div className="rounded-neo border-2 border-neo-black bg-neo-navy px-3 py-2">
+            <div className="rounded-neo border-2 border-neo-cream/50 bg-neo-navy px-3 py-2">
               <p className="font-neo-display text-2xl font-black tabular-nums text-neo-pink">{report.practiceWords.length}</p>
               <p className="text-xs font-bold text-neo-white/70">{t('academy.student.review')}</p>
             </div>
