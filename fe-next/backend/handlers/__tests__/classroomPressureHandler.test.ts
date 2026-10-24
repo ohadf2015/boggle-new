@@ -13,8 +13,9 @@
  */
 import { vi, type Mock } from 'vitest';
 
-const { mockGetClassroomGame, mockSetPressure, mockBroadcastToRoom, mockCheckRateLimit } =
+const { mockGetClassroomGame, mockSetPressure, mockBroadcastToRoom, mockCheckRateLimit, mockHasPro } =
   vi.hoisted(() => ({
+    mockHasPro: vi.fn(),
     mockGetClassroomGame: vi.fn(),
     mockSetPressure: vi.fn(),
     mockBroadcastToRoom: vi.fn(),
@@ -33,6 +34,12 @@ vi.mock('../../utils/socketHelpers', () => ({
 }));
 vi.mock('../../utils/rateLimiter', () => ({
   checkRateLimit: mockCheckRateLimit,
+}));
+vi.mock('@/lib/subscriptions', () => ({
+  checkTeacherSubscription: vi.fn(async () => ({ has_pro: false })),
+}));
+vi.mock('@/lib/education/accessTrialServer', () => ({
+  teacherHasProAccess: mockHasPro,
 }));
 vi.mock('../../utils/logger', () => ({
   default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
@@ -72,6 +79,42 @@ describe('updateClassroomGamePressure', () => {
     mockCheckRateLimit.mockReturnValue(true);
     mockGetClassroomGame.mockResolvedValue(JSON.parse(JSON.stringify(GAME)));
     mockSetPressure.mockResolvedValue(true);
+    mockHasPro.mockResolvedValue(true);
+  });
+
+  it('refuses a free teacher a non-default dial — out loud, writing nothing', async () => {
+    mockHasPro.mockResolvedValue(false);
+    const socket = makeSocket();
+    const { handler } = registerOn(socket);
+
+    await handler({ gameCode: 'ABC123', pressure: { leaderboard: 'hidden' } });
+
+    expect(mockSetPressure).not.toHaveBeenCalled();
+    expect(socket.emit).toHaveBeenCalledWith(
+      'classroomGameError',
+      expect.objectContaining({ error: 'education.classroomGame.pressureNeedsPro' })
+    );
+  });
+
+  it('still lets a free teacher reset the dials to the loud defaults', async () => {
+    mockHasPro.mockResolvedValue(false);
+    const socket = makeSocket();
+    const { handler } = registerOn(socket);
+
+    await handler({ gameCode: 'ABC123', pressure: { leaderboard: 'full', timer: 'full', speedScoring: true } });
+
+    expect(mockSetPressure).toHaveBeenCalled();
+  });
+
+  it('fails closed when the plan lookup throws', async () => {
+    mockHasPro.mockRejectedValue(new Error('db down'));
+    const socket = makeSocket();
+    const { handler } = registerOn(socket);
+
+    await handler({ gameCode: 'ABC123', pressure: { timer: 'off' } });
+
+    expect(mockSetPressure).not.toHaveBeenCalled();
+    expect(socket.emit).toHaveBeenCalledWith('classroomGameError', expect.any(Object));
   });
 
   it('registers the listener', () => {

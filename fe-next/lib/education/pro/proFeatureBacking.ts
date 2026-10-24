@@ -121,6 +121,13 @@ export const PRO_FEATURE_BACKING: Record<string, ProFeatureBacking> = {
 };
 
 /** Locked in the UI only; each names where the server gate must go. */
-export const PRO_FEATURES_WITHOUT_SERVER_GATE: Record<string, string> = {
-  pressureDials: 'backend/handlers/classroomPressureHandler.ts checks room ownership, not Pro (request filed to the lead)',
+export const PRO_FEATURES_WITHOUT_SERVER_GATE: Record<string, string> = {};
+
+/** Refused over the socket, not HTTP: the handler and its refusal test (no status code to pin). */
+export const PRO_FEATURES_GATED_ON_SOCKET: Record<string, { handler: string; guard: string; test: string }> = {
+  pressureDials: {
+    handler: 'backend/handlers/classroomPressureHandler.ts',
+    guard: 'teacherHasProAccess',
+    test: 'backend/handlers/__tests__/classroomPressureHandler.test.ts',
+  },
 };

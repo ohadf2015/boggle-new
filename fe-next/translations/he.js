@@ -16096,6 +16096,7 @@ const he = {
         "revealAtEnd": "המורה יחשוף את התוצאות בסוף."
       },
       "pressureFailed": "לא הצלחנו לשמור את ההגדרות. נסו שוב.",
+      "pressureNeedsPro": "בקרות הלחץ הן תכונה של Teacher Pro.",
       "defaultClassroomName": "הכיתה שלי",
       "questions": "שאלות",
       "perQuestion": "לכל שאלה",

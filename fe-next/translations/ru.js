@@ -4322,6 +4322,7 @@ const ru = {
         "revealAtEnd": "Учитель покажет результаты в конце."
       },
       "pressureFailed": "Не удалось сохранить настройки. Попробуйте ещё раз.",
+      "pressureNeedsPro": "Настройки давления доступны в Teacher Pro.",
       "defaultClassroomName": "Мой класс",
       "questions": "Вопросы",
       "perQuestion": "На вопрос",

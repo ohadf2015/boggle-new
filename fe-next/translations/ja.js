@@ -16241,6 +16241,7 @@ const ja = {
         "revealAtEnd": "結果は最後に先生が発表します。"
       },
       "pressureFailed": "設定を保存できませんでした。もう一度お試しください。",
+      "pressureNeedsPro": "プレッシャー設定は Teacher Pro の機能です。",
       "defaultClassroomName": "マイクラス",
       "questions": "問題数",
       "perQuestion": "1問あたり",

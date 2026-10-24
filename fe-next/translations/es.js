@@ -16190,6 +16190,7 @@ const es = {
         "revealAtEnd": "Tu profesor revelará los resultados al final."
       },
       "pressureFailed": "No se pudieron guardar los ajustes. Inténtalo de nuevo.",
+      "pressureNeedsPro": "Los ajustes de presión son una función de Teacher Pro.",
       "defaultClassroomName": "Mi aula",
       "questions": "Preguntas",
       "perQuestion": "Por pregunta",

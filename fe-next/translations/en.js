@@ -14608,6 +14608,7 @@ const en = {
         "revealAtEnd": "Your teacher will reveal the results at the end."
       },
       "pressureFailed": "Couldn't save those settings. Try again.",
+      "pressureNeedsPro": "Pressure dials are a Teacher Pro feature.",
       "questions": "Questions",
       "perQuestion": "Per question",
       "namePrompt": {

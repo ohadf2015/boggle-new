@@ -16529,6 +16529,7 @@ const sv = {
         "revealAtEnd": "Din lärare avslöjar resultaten i slutet."
       },
       "pressureFailed": "Kunde inte spara inställningarna. Försök igen.",
+      "pressureNeedsPro": "Tryckreglagen är en funktion i Teacher Pro.",
       "defaultClassroomName": "Mitt klassrum",
       "questions": "Frågor",
       "perQuestion": "Per fråga",
