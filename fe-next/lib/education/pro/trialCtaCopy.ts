@@ -105,3 +105,24 @@ export function resultsTrialCopy(locale: string): ResultsTrialCopy {
   const fill = (s: string) => s.replace(/\{(\w+)\}/g, (m, k: string) => params[k] ?? m);
   return Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, fill(v)])) as ResultsTrialCopy;
 }
+
+/**
+ * Class-created variant: the same card right after a teacher makes a class,
+ * before any round has been played, so the title cannot say "keep going".
+ * Everything else (CTA, price note, school quote) is the results copy.
+ */
+const CLASS_CREATED: Record<string, { title: string; dismiss: string }> = {
+  en: { title: 'Try Teacher Pro free with your new class', dismiss: 'Not now' },
+  he: { title: 'נסו את פרו למורים בחינם עם הכיתה החדשה', dismiss: 'לא עכשיו' },
+  es: { title: 'Prueba Teacher Pro gratis con tu nueva clase', dismiss: 'Ahora no' },
+  sv: { title: 'Prova Teacher Pro gratis med din nya klass', dismiss: 'Inte nu' },
+  ja: { title: '新しいクラスでTeacher Proを無料で試す', dismiss: '今はしない' },
+  ru: { title: 'Попробуйте Teacher Pro бесплатно с новым классом', dismiss: 'Не сейчас' },
+};
+
+export type ClassCreatedTrialCopy = ResultsTrialCopy & { dismiss: string };
+
+export function classCreatedTrialCopy(locale: string): ClassCreatedTrialCopy {
+  const extra = CLASS_CREATED[trialCopyBase(locale)] ?? CLASS_CREATED.en;
+  return { ...resultsTrialCopy(locale), title: extra.title, dismiss: extra.dismiss };
+}

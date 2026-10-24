@@ -144,3 +144,71 @@ describe('ResultsTeacherProTrialCard impressions are viewport-gated', () => {
     expect(impressions().length).toBe(2);
   });
 });
+
+describe('ResultsTeacherProTrialCard on the class-created screen', () => {
+  beforeEach(() => {
+    Object.assign(pro, { hasPro: false, loading: false, known: true, trialUsed: false });
+    growth.trackGrowthEvent.mockClear();
+    funnel.trackTeacherProUpgradeClick.mockClear();
+    window.localStorage.clear();
+    globalThis.fetch = vi.fn(async () => new Response(null, { status: 204 })) as unknown as typeof fetch;
+  });
+
+  it('offers the trial with its own title and placement, CTA to the /teacher/upgrade trial path', () => {
+    render(<ResultsTeacherProTrialCard language="en" placement="class_created" />);
+    const card = screen.getByTestId('results-teacher-pro-trial-card');
+    expect(card).toHaveAttribute('data-placement', 'class_created');
+    expect(card).toHaveTextContent('Try Teacher Pro free with your new class');
+    expect(card).toHaveTextContent('Then $9/mo');
+    const cta = screen.getByTestId('results-teacher-pro-trial-cta');
+    expect(cta).toHaveTextContent('Start your 14-day Teacher Pro trial');
+    expect(cta.getAttribute('href')).toBe('/en/teacher/upgrade?source=class_created');
+    expect(screen.getByTestId('results-school-quote-link').getAttribute('href')).toBe('/en/education/for-schools?source=class_created');
+  });
+
+  it('fires the browser click events and the server twin on tap', () => {
+    render(<ResultsTeacherProTrialCard language="sv" placement="class_created" />);
+    fireEvent.click(screen.getByTestId('results-teacher-pro-trial-cta'));
+    expect(funnel.trackTeacherProUpgradeClick).toHaveBeenCalledWith(expect.objectContaining({ locale: 'sv', placement: 'class_created' }));
+    expect(growth.trackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', { cta: 'teacher_pro_trial', source: 'class_created' });
+    const [url, init] = (globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(url).toBe('/api/education/pro-cta-click');
+    expect(JSON.parse(init.body)).toEqual({ placement: 'class_created', locale: 'sv', cta: 'teacher_pro_trial' });
+    expect(init.keepalive).toBe(true);
+  });
+
+  it('can be dismissed, and stays dismissed on the next visit', () => {
+    const { unmount } = render(<ResultsTeacherProTrialCard language="he" placement="class_created" />);
+    const dismiss = screen.getByTestId('teacher-pro-trial-dismiss');
+    expect(dismiss).toHaveAttribute('aria-label', 'לא עכשיו');
+    fireEvent.click(dismiss);
+    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
+    unmount();
+    render(<ResultsTeacherProTrialCard language="he" placement="class_created" />);
+    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
+  });
+
+  it('never shows to a Pro teacher', () => {
+    pro.hasPro = true;
+    render(<ResultsTeacherProTrialCard language="en" placement="class_created" />);
+    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
+  });
+
+  it('the results screen keeps no dismiss button', () => {
+    render(<ResultsTeacherProTrialCard language="en" />);
+    expect(screen.queryByTestId('teacher-pro-trial-dismiss')).toBeNull();
+  });
+
+  it('has a translated class-created title and dismiss for all 6 locales', async () => {
+    const { classCreatedTrialCopy } = await import('@/lib/education/pro/trialCtaCopy');
+    const titles = new Set<string>();
+    for (const l of ['en', 'he', 'sv', 'ja', 'es', 'ru']) {
+      const c = classCreatedTrialCopy(l);
+      expect(c.title.length).toBeGreaterThan(0);
+      expect(c.dismiss.length).toBeGreaterThan(0);
+      expect(c.trialCta).toContain('14');
+      titles.add(c.title);
+    }
+    expect(titles.size).toBe(6);
+  });
+});

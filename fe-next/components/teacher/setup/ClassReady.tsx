@@ -10,6 +10,7 @@ import { classroomJoinUrl } from '@/lib/education/classroomInvitePayload';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import { PANEL, PRIMARY_BUTTON, QUIET_LINK, SECONDARY_BUTTON } from '../home/homeStyles';
+import { ResultsTeacherProTrialCard, CLASS_CREATED_TRIAL_PLACEMENT } from '@/components/education/results/ResultsTeacherProTrialCard';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -194,6 +195,15 @@ export function ClassReady({
           </Link>
         </div>
       </div>
+
+      {/* Teacher Pro trial right after the class exists. Below the join code and share
+          row, so getting students in stays the one loud step. Teacher setup flow only;
+          hidden for Pro and once dismissed. */}
+      <ResultsTeacherProTrialCard
+        language={language}
+        placement={CLASS_CREATED_TRIAL_PLACEMENT}
+        className="w-full max-w-md text-start"
+      />
     </section>
   );
 }
