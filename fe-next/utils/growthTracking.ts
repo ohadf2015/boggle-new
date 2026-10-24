@@ -31,6 +31,11 @@ import {
   trackSessionDepth,
 } from '@/utils/posthogEngagement';
 import { markGameActive, markGameInactive, isGameActive } from '@/utils/abandonOnPagehide';
+import {
+  clearPendingActivation,
+  isActivationCaptureArmed,
+  stashPendingActivation,
+} from '@/utils/activationGate';
 import { trackRetentionPlay } from '@/lib/retention/tracking';
 import {
   stampFirstWinClockStart,
@@ -1468,8 +1473,12 @@ let sessionGameCount = 0;
 /**
  * Fire activation funnel events once per device.
  *
- * Callers: trackGameEnd (all modes) + tutorial completion (engineered win).
- * Dedup via localStorage so whichever fires first wins the slot.
+ * Callers: trackGameEnd (all modes), tutorial completion (engineered win),
+ * and the first valid word in the shared single-player core. A finished
+ * timer is `game_completed`; activation is "they played".
+ * Dedup via localStorage so whichever fires first wins the slot — but only
+ * after PostHog will keep the capture. Burning the slot on a pre-init drop
+ * is how completers show `game_completed` and never `first_game_played`.
  */
 export const markFirstGameActivation = (args: {
   won: boolean;
@@ -1478,11 +1487,16 @@ export const markFirstGameActivation = (args: {
   mode: string;
 }): void => {
   if (typeof window === 'undefined') return;
+  if (!isActivationCaptureArmed()) {
+    stashPendingActivation(args);
+    return;
+  }
   const { won, score, wordCount, mode } = args;
   const playedKey = 'lexiclash_first_game_played';
   const wonKey = 'lexiclash_first_game_won';
 
   try {
+    clearPendingActivation();
     if (!localStorage.getItem(playedKey)) {
       localStorage.setItem(playedKey, '1');
       trackGrowthEvent('first_game_played', { score, wordCount, gameMode: mode });
