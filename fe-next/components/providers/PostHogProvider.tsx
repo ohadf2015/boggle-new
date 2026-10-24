@@ -18,6 +18,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import posthog from '@/lib/analytics/lazyPosthog';
 import type { PostHog } from 'posthog-js';
 import { onConsentChange, hasConsent } from '@/utils/cookieConsent';
+import { armActivationCapture, stashPendingActivation, takePendingActivation } from '@/utils/activationGate';
 import {
   setPostHogSuperProps,
   setPostHogSuperPropsOnce,
@@ -31,6 +32,29 @@ import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 
 let posthogInitialized = false;
 
+/** Replay a first-game that happened before PostHog would keep the capture. */
+function flushPendingActivation(): void {
+  armActivationCapture();
+  const pending = takePendingActivation();
+  if (!pending) return;
+  const emit = () => {
+    void import('@/utils/growthTracking')
+      .then(({ markFirstGameActivation }) => {
+        markFirstGameActivation(pending);
+      })
+      .catch(() => {
+        stashPendingActivation(pending);
+      });
+  };
+  // loaded() runs inside posthog.init, before the proxy reports isLoaded.
+  // A capture on this stack is queued and flushed into the opted-out default.
+  if (typeof posthog.isLoaded === 'function' && !posthog.isLoaded()) {
+    setTimeout(emit, 0);
+    return;
+  }
+  emit();
+}
+
 /** @internal Reset init flag for testing only */
 export function _resetPostHogInit() {
   posthogInitialized = false;
@@ -38,7 +62,10 @@ export function _resetPostHogInit() {
 
 function initPostHog() {
   const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-  if (!key || posthogInitialized) return;
+  if (!key || posthogInitialized) {
+    if (!key) armActivationCapture({ force: true });
+    return;
+  }
 
   posthogInitialized = true;
 
@@ -73,6 +100,9 @@ function initPostHog() {
         // on_reject only captures after an explicit reject, so an undecided visitor would emit nothing.
         ph.opt_out_capturing();
       }
+      // Cookieless (explicit opt-out) or opted-in: captures stick from here.
+      // Do this inside loaded(), not before — a flush any earlier hits the drop.
+      flushPendingActivation();
     },
   });
 }
@@ -160,6 +190,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
         posthog.opt_out_capturing();
       } else if (posthog.has_opted_out_capturing()) {
         posthog.opt_in_capturing();
+        flushPendingActivation();
       }
     });
 

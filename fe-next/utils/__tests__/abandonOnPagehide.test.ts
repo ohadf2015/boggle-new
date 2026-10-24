@@ -82,6 +82,41 @@ describe('abandonOnPagehide', () => {
     vi.useRealTimers();
   });
 
+  it('applies words found before the game was marked active', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    // Mount effect runs before afterLoadIdle trackGameStart. Those words must
+    // survive the start payload's words_found: 0.
+    updateActiveGameExtras({ words_found: 2, sp_mode: 'solo-bots' });
+    markGameActive('singleplayer', { words_found: 0, sp_mode: 'solo-bots' });
+    vi.setSystemTime(new Date('2026-01-01T00:00:31Z'));
+
+    fireEvent('pagehide');
+
+    const payload = captureMock.mock.calls.find((c) => c[0] === 'growth:game_abandoned')?.[1] as Record<string, unknown>;
+    expect(payload.words_found).toBe(2);
+    expect(payload.durationSec).toBe(31);
+    vi.useRealTimers();
+  });
+
+  it('does not leak a queued word count into the next game', () => {
+    updateActiveGameExtras({ words_found: 4 });
+    markGameInactive();
+    markGameActive('singleplayer', { words_found: 0 });
+
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    // re-mark so duration is measurable; inactive cleared the queue.
+    markGameInactive();
+    markGameActive('singleplayer', { words_found: 0 });
+    vi.setSystemTime(new Date('2026-01-01T00:00:05Z'));
+    fireEvent('pagehide');
+
+    const payload = captureMock.mock.calls.find((c) => c[0] === 'growth:game_abandoned')?.[1] as Record<string, unknown>;
+    expect(payload.words_found).toBe(0);
+    vi.useRealTimers();
+  });
+
   it('forwards coach_step on a challenge abandon', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));

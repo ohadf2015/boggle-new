@@ -16,12 +16,17 @@ vi.mock('@/utils/authFetch', () => ({
 }));
 
 import { markFirstGameActivation } from '@/utils/growthTracking';
+import posthog from '@/lib/analytics/lazyPosthog';
+import { armActivationCapture } from '@/utils/activationGate';
 
 const args = { won: false, score: 120, wordCount: 8, mode: 'classic' };
 
 describe('markFirstGameActivation → referral milestone', () => {
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
+    armActivationCapture();
+    vi.spyOn(posthog, 'isLoaded').mockReturnValue(true);
     postMock.mockReset();
     postMock.mockResolvedValue({ ok: true, status: 200 } as Response);
   });
