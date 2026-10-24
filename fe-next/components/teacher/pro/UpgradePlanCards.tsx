@@ -105,6 +105,7 @@ export function UpgradePlanCards({
     <div data-testid="pricing-cards" className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-3 md:gap-5">
       <article
         data-testid="plan-card-free"
+        data-tilt
         className="order-2 flex flex-col rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-4 md:order-1 sm:p-5"
       >
         <h2 className="font-neo-display text-lg font-black text-neo-white">{t('teacher.subscription.freePlanName')}</h2>
@@ -141,6 +142,7 @@ export function UpgradePlanCards({
 
       <article
         data-testid="plan-card-pro"
+        data-tilt
         className="relative order-1 flex flex-col rounded-neo border-3 border-neo-black bg-neo-yellow p-4 shadow-hard-lg md:order-2 sm:p-5"
       >
         <span className="absolute -top-3 start-4 inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-pink px-2.5 py-0.5 font-neo-display text-xs font-black text-neo-black">
@@ -197,6 +199,7 @@ export function UpgradePlanCards({
 
       <article
         data-testid="plan-card-school"
+        data-tilt
         className="order-3 flex flex-col rounded-neo border-3 border-neo-black bg-neo-purple p-4 text-neo-white shadow-hard sm:p-5"
       >
         <h2 className="flex items-center gap-2 font-neo-display text-lg font-black">

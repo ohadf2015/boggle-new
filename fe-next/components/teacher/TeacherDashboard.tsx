@@ -195,7 +195,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
       >
         <div className="flex min-w-0 flex-col gap-6">
           <header data-tm className="flex flex-wrap items-center justify-between gap-3">
-            <h1 suppressHydrationWarning className="font-neo-display text-2xl font-black text-neo-cream sm:text-3xl">
+            <h1 data-wipe suppressHydrationWarning className="font-neo-display text-2xl font-black text-neo-cream sm:text-3xl">
               {firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName')}
             </h1>
             <TeacherPlanBadge quiet className="shrink-0" />
@@ -229,7 +229,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                   t={t}
                 />
               </div>
-              <div data-tm>
+              <div>
                 <HomeClassList
                   classrooms={classrooms}
                   studentPreview={studentPreview}

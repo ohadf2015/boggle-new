@@ -8,9 +8,11 @@ import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion'
  * as it nears the viewport. EducationShell scrolls an inner div, not the
  * window, so ScrollTrigger must be pointed at it. GSAP loads on demand so it
  * stays out of the first bundle; transform + opacity only. `[data-magnet]`
- * elements lean toward a fine pointer and spring back on leave.
+ * elements lean toward a fine pointer and spring back on leave; `[data-tilt]`
+ * cards tilt in 3D; `[data-wipe]` headings unmask on mount.
  */
 const MAGNET_PX = 8;
+const TILT_DEG = 3;
 
 /** `rescan` re-collects targets when async content (a loaded list) mounts after first paint. */
 export function useTeacherReveal<T extends HTMLElement>(rescan: string | number | boolean = true) {
@@ -22,7 +24,9 @@ export function useTeacherReveal<T extends HTMLElement>(rescan: string | number 
     if (!root || reduced) return;
     const targets = Array.from(root.querySelectorAll<HTMLElement>('[data-tm]'));
     const magnets = Array.from(root.querySelectorAll<HTMLElement>('[data-magnet]'));
-    if (targets.length === 0 && magnets.length === 0) return;
+    const tilts = Array.from(root.querySelectorAll<HTMLElement>('[data-tilt]'));
+    const wipes = Array.from(root.querySelectorAll<HTMLElement>('[data-wipe]'));
+    if (targets.length + magnets.length + tilts.length + wipes.length === 0) return;
 
     let cancelled = false;
     let revert: (() => void) | undefined;
@@ -33,23 +37,39 @@ export function useTeacherReveal<T extends HTMLElement>(rescan: string | number 
       gsap.registerPlugin(ScrollTrigger);
       const scroller = root.closest<HTMLElement>('.edu-shell-scroll') ?? undefined;
       const finePointer = window.matchMedia?.('(hover: hover) and (pointer: fine)').matches;
+      const bind = (el: HTMLElement, move: (dx: number, dy: number) => gsap.TweenVars, rest: gsap.TweenVars) => {
+        const onMove = (e: PointerEvent) => {
+          const r = el.getBoundingClientRect();
+          const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+          const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+          gsap.to(el, { ...move(dx, dy), duration: 0.3, ease: 'power2.out', overwrite: 'auto' });
+        };
+        const onLeave = () => gsap.to(el, { ...rest, overwrite: 'auto' });
+        el.addEventListener('pointermove', onMove);
+        el.addEventListener('pointerleave', onLeave);
+        offs.push(() => {
+          el.removeEventListener('pointermove', onMove);
+          el.removeEventListener('pointerleave', onLeave);
+        });
+      };
       if (finePointer) {
         for (const el of magnets) {
-          const pull = (e: PointerEvent) => {
-            const r = el.getBoundingClientRect();
-            const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
-            const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
-            gsap.to(el, { x: dx * MAGNET_PX, y: dy * MAGNET_PX, duration: 0.25, ease: 'power3.out', overwrite: 'auto' });
-          };
-          const release = () =>
-            gsap.to(el, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.45)', overwrite: 'auto' });
-          el.addEventListener('pointermove', pull);
-          el.addEventListener('pointerleave', release);
-          offs.push(() => {
-            el.removeEventListener('pointermove', pull);
-            el.removeEventListener('pointerleave', release);
+          bind(el, (dx, dy) => ({ x: dx * MAGNET_PX, y: dy * MAGNET_PX }), {
+            x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.45)',
           });
         }
+        for (const el of tilts) {
+          bind(el, (dx, dy) => ({ rotateX: -dy * TILT_DEG, rotateY: dx * TILT_DEG, transformPerspective: 900 }), {
+            rotateX: 0, rotateY: 0, duration: 0.6, ease: 'power3.out',
+          });
+        }
+      }
+      for (const el of wipes) {
+        gsap.fromTo(
+          el,
+          { clipPath: 'inset(0 0 100% 0)', y: 12 },
+          { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 0.6, ease: 'power4.out', clearProps: 'clipPath,transform' },
+        );
       }
       if (targets.length === 0) return;
       const ctx = gsap.context(() => {

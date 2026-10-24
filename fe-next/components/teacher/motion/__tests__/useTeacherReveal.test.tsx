@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const reduced = vi.hoisted(() => ({ value: false }));
 const gsapMock = vi.hoisted(() => ({
   from: vi.fn(),
+  fromTo: vi.fn(),
   to: vi.fn(),
   set: vi.fn(),
   registerPlugin: vi.fn(),
@@ -32,6 +33,8 @@ function Probe() {
         <p data-tm>a</p>
         <p data-tm>b</p>
         <a data-magnet data-testid="mag">go</a>
+        <h1 data-wipe>hi</h1>
+        <article data-tilt data-testid="tilt">card</article>
       </div>
     </div>
   );
@@ -79,5 +82,27 @@ describe('useTeacherReveal', () => {
     expect(Math.abs(pull.x)).toBeLessThanOrEqual(8);
     fireEvent.pointerLeave(el);
     expect(gsapMock.to.mock.calls.at(-1)![1]).toMatchObject({ x: 0, y: 0, ease: 'elastic.out(1, 0.45)' });
+  });
+
+  it('wipes [data-wipe] headings in with a clip-path mask', async () => {
+    render(<Probe />);
+    await waitFor(() => expect(gsapMock.fromTo).toHaveBeenCalled());
+    const [, from, to] = gsapMock.fromTo.mock.calls[0];
+    expect(from.clipPath).toBe('inset(0 0 100% 0)');
+    expect(to.clipPath).toBe('inset(0 0 0% 0)');
+  });
+
+  it('tilts [data-tilt] cards in 3D toward a fine pointer and levels on leave', async () => {
+    window.matchMedia = vi.fn().mockReturnValue({ matches: true }) as never;
+    const { getByTestId } = render(<Probe />);
+    await waitFor(() => expect(gsapMock.batch).toHaveBeenCalled());
+    const el = getByTestId('tilt');
+    el.getBoundingClientRect = () => ({ left: 0, top: 0, width: 100, height: 100 }) as DOMRect;
+    fireEvent.pointerMove(el, { clientX: 100, clientY: 50 });
+    const t = gsapMock.to.mock.calls.at(-1)![1];
+    expect(t.rotateY).toBeGreaterThan(0);
+    expect(Math.abs(t.rotateY)).toBeLessThanOrEqual(3);
+    fireEvent.pointerLeave(el);
+    expect(gsapMock.to.mock.calls.at(-1)![1]).toMatchObject({ rotateX: 0, rotateY: 0 });
   });
 });

@@ -198,7 +198,7 @@ function TeacherReportsInner() {
     view = (
       <>
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">
+          <h1 data-wipe className="font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">
             {t('teacher.reports.title')}
           </h1>
           <TeacherPlanBadge />

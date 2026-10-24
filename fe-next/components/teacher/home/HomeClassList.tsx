@@ -113,6 +113,7 @@ export function HomeClassList({
             <li
               key={c.id}
               data-testid="home-class-row"
+              data-tm
               className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_7rem_11rem_3rem] sm:px-4"
             >
               <span className="flex min-w-0 items-center gap-3">

@@ -18,18 +18,26 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
+import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import ClassroomManager from '@/components/teacher/ClassroomManager';
 import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
 
 /** The shell wraps the gate, not the other way round — see curriculum's PageClient
  *  for why: the gate's own loading/denial states need the lock too. */
+function ClassesMain() {
+  const revealRef = useTeacherReveal<HTMLElement>();
+  return (
+    <main ref={revealRef} className="relative mx-auto max-w-6xl">
+      <ClassroomManager heading={<ClassesTitle />} />
+    </main>
+  );
+}
+
 export default function TeacherClassroomsPage() {
   return (
     <ClassesShell>
       <TeacherGate>
-        <main className="relative mx-auto max-w-6xl">
-          <ClassroomManager heading={<ClassesTitle />} />
-        </main>
+        <ClassesMain />
       </TeacherGate>
     </ClassesShell>
   );
@@ -38,7 +46,7 @@ export default function TeacherClassroomsPage() {
 function ClassesTitle() {
   const { t } = useLanguage();
   return (
-    <h1 className="min-w-0 truncate font-neo-display text-lg font-bold leading-none tracking-tight text-neo-cream min-[400px]:text-xl sm:text-3xl [@media(orientation:landscape)_and_(max-height:500px)]:text-xl">
+    <h1 data-wipe className="min-w-0 truncate font-neo-display text-lg font-bold leading-none tracking-tight text-neo-cream min-[400px]:text-xl sm:text-3xl [@media(orientation:landscape)_and_(max-height:500px)]:text-xl">
       {t('academy.teacher.classesTitle', 'Your classes')}
     </h1>
   );
