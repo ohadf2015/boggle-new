@@ -38,6 +38,8 @@ export interface BoardSelectionOptions {
   /** With a live combo, a touch finger resting on 3+ letters chains the word after 500ms. */
   comboLevel?: number;
   fireRoundActive?: boolean;
+  /** Shown when a tap lands on a board that is not live yet. */
+  lockedHint?: string;
 }
 
 export interface BoardSelectionApi {
@@ -209,8 +211,35 @@ export function useBoardSelection(
       return false;
     }
 
+    // Growth Radar's rage snapshot ignores data-sel / class. A monotonic
+    // data-state on the grid (the interactive ancestor of every tile tap)
+    // is what makes a working tap look like a response instead of rage.
+    const noteTap = (kind: string) => {
+      const n = Number(root.dataset.tap || 0) + 1;
+      root.dataset.tap = String(n);
+      root.setAttribute('data-state', `${kind}-${n}`);
+      return n;
+    };
+
+    const showLocked = () => {
+      const n = noteTap('locked');
+      const hint = o().lockedHint || '';
+      const banner = container.querySelector<HTMLElement>('[data-locked-banner]');
+      if (banner) {
+        banner.textContent = hint;
+        banner.hidden = false;
+        banner.setAttribute('data-show', String(n));
+        banner.animate?.([{ transform: 'scale(0.96)' }, { transform: 'scale(1)' }], { duration: 180 });
+      }
+    };
+
     const onDown = (e: PointerEvent) => {
-      if (!o().interactive || e.button === 2) return;
+      if (e.button === 2) return;
+      if (!o().interactive) {
+        showLocked();
+        return;
+      }
+      noteTap('tap');
       const cell = cellFromEvent(e);
       if (!cell) return;
       if (e.cancelable) e.preventDefault();

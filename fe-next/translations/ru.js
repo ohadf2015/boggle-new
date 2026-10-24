@@ -11600,6 +11600,7 @@ const ru = {
   },
   "game": {
     "doubleClickToSubmit": "Дважды нажми на последнюю букву, чтобы отправить",
+    "boardLocked": "Жди GO — поле ещё не активно",
     "foundByOther": "Найдено игроком ${player}",
     "combo": "Комбо",
     "comboHint": "Находи слова быстро, чтобы набрать комбо",
@@ -19835,7 +19836,8 @@ const ru = {
       "letters": "букв",
       "editSettings": "Изменить настройки раунда",
       "chatHint": "Скажи привет команде",
-      "chatUnread": "{count} новых"
+      "chatUnread": "{count} новых",
+      "modeOn": "{mode} выбран — жми Старт"
     },
     "round": {
       "getReady": "Приготовься",
