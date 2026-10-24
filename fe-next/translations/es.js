@@ -76,7 +76,8 @@ const es = {
       "title": "Jefe",
       "unlock": "Pro: los 10 jefes",
       "lockedName": "{name} (Pro)",
-      "freeHint": "Las clases gratis se enfrentan al Dragón del Léxico. Pro desbloquea los 10 jefes."
+      "freeHint": "Las clases gratis se enfrentan siempre al Dragón del Léxico. Pro trae un jefe nuevo en cada visita y desbloquea los 10.",
+      "proHint": "Pro: un jefe nuevo en cada visita. Toca uno para quedarte con él."
     }
   },
   // @eduBoss:end

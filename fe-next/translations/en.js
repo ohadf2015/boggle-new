@@ -76,7 +76,8 @@ const en = {
       "title": "Boss",
       "unlock": "Pro: all 10 bosses",
       "lockedName": "{name} (Pro)",
-      "freeHint": "Free classes fight the Lexicon Dragon. Pro unlocks all 10 bosses."
+      "freeHint": "Free classes fight the Lexicon Dragon every game. Pro brings a new boss each visit and unlocks all 10.",
+      "proHint": "Pro: a new boss every visit. Tap one to keep it."
     }
   },
   // @eduBoss:end

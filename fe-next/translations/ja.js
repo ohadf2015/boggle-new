@@ -76,7 +76,8 @@ const ja = {
       "title": "ボス",
       "unlock": "Pro: 10体すべて",
       "lockedName": "{name}(Pro)",
-      "freeHint": "無料プランはレキシコンドラゴンと対戦。Proなら10体すべて選べます。"
+      "freeHint": "無料プランは毎回レキシコンドラゴンと対戦。Proなら訪れるたびに新しいボスが登場し、10体すべて選べます。",
+      "proHint": "Pro：訪れるたびに新しいボス。タップで固定できます。"
     }
   },
   // @eduBoss:end

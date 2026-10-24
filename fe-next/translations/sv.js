@@ -76,7 +76,8 @@ const sv = {
       "title": "Boss",
       "unlock": "Pro: alla 10 bossar",
       "lockedName": "{name} (Pro)",
-      "freeHint": "Gratisklasser möter Lexikondraken. Pro låser upp alla 10 bossar."
+      "freeHint": "Gratisklasser möter alltid Lexikondraken. Pro ger en ny boss varje besök och låser upp alla 10.",
+      "proHint": "Pro: en ny boss varje besök. Tryck på en för att behålla den."
     }
   },
   // @eduBoss:end

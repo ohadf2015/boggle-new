@@ -36,6 +36,16 @@ describe('ClassroomBossPicker', () => {
     expect(screen.queryByTestId('boss-picker-pro')).toBeNull();
   });
 
+  it('given a Pro teacher, then a line says the boss changes every visit; a free teacher is told that is Pro', () => {
+    mockPro = { hasPro: true, loading: false };
+    const { unmount } = render(<ClassroomBossPicker value="msGrammar" onChange={vi.fn()} />);
+    expect(screen.getByTestId('boss-picker-hint')).toHaveTextContent('classroomBoss.picker.proHint');
+    unmount();
+    mockPro = { hasPro: false, loading: false };
+    render(<ClassroomBossPicker value="lexiconDragon" onChange={vi.fn()} />);
+    expect(screen.getByTestId('boss-picker-hint')).toHaveTextContent('classroomBoss.picker.freeHint');
+  });
+
   it('given the entitlement is still loading, then the Pro bosses stay locked and no upsell flashes', () => {
     mockPro = { hasPro: true, loading: true };
     const onChange = vi.fn();
