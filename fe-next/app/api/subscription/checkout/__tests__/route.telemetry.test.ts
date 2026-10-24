@@ -145,4 +145,38 @@ describe('POST /api/subscription/checkout — edu_pro_checkout_started', () => {
     expect(capture.mock.calls[0][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
     expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
+  it('Given a scripted call from a QA alias, When a checkout is created, Then every start event is tagged as test + script + url-created', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'someone+lexitest1020@gmail.com' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    const res = await POST(req())
+    expect(res.status).toBe(200)
+    for (const [arg] of capture.mock.calls) {
+      expect(arg.properties).toMatchObject({
+        stage: 'checkout_url_created',
+        trial: false,
+        checkout_mode: 'paid',
+        is_test_account: true,
+        test_reason: 'test_alias',
+        client_kind: 'script',
+        product: 'teacher_pro',
+        provider: 'polar',
+      })
+    }
+  })
+
+  it('Given a real teacher in a browser, When a trial checkout is created, Then the tags say browser and not test', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@school.org' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
+    // Request() strips Sec-* (forbidden header names); a browser request to the server carries them.
+    const browserReq = {
+      headers: new Headers({ 'content-type': 'application/json', 'sec-fetch-mode': 'cors', 'sec-fetch-site': 'same-origin' }),
+      text: async () => JSON.stringify({ trial: true }),
+    }
+    const res = await POST(browserReq as never)
+    expect(res.status).toBe(200)
+    expect(capture.mock.calls[0][0].event).toBe('edu_pro_trial_started')
+    for (const [arg] of capture.mock.calls) {
+      expect(arg.properties).toMatchObject({ trial: true, checkout_mode: 'trial', is_test_account: false, test_reason: null, client_kind: 'browser' })
+    }
+  })
 })
