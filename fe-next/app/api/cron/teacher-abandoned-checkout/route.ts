@@ -8,6 +8,7 @@ import {
   ABANDONED_CHECKOUT_EMAIL_EVENT,
   ABANDONED_MAX_HOURS,
   CHECKOUT_STARTED_EVENT,
+  abandonedCheckoutExcludedUserIds,
   planAbandonedCheckouts,
   type CheckoutStartedRow,
   type CheckoutUserEventRow,
@@ -22,7 +23,9 @@ import { withCronLock } from '@/backend/redis/locking';
  *
  * Hourly: one email to an approved teacher whose latest Teacher Pro checkout started
  * 1–24h ago and never completed, linking back to /teacher/upgrade for a fresh checkout.
- * Skips Pro, test accounts, unsubscribed teachers, and anyone already sent one.
+ * Skips Pro, test accounts (profile flag or QA-looking email), non-teacher roles,
+ * teachers with no classroom, checkouts a script created, unsubscribed teachers,
+ * and anyone already sent one.
  * Every lookup fails closed: an error sends nothing.
  *
  * Idempotency: subscription_events.event_type = 'abandoned_checkout_email_sent'.
@@ -72,31 +75,38 @@ export async function POST(request: NextRequest) {
       const userIds = [...new Set(started.map((s) => s.user_id).filter((id): id is string => Boolean(id)))];
       if (userIds.length === 0) return { sent: 0, failed: 0, due: 0 };
 
-      const [events, subs, profiles, access] = await Promise.all([
+      const [events, subs, profiles, access, classrooms] = await Promise.all([
         supabase.from('subscription_events').select('user_id, event_type, created_at').in('user_id', userIds),
         supabase.from('subscriptions').select('user_id, tier, status, source, current_period_end').in('user_id', userIds),
-        supabase.from('profiles').select('id, is_test_account').in('id', userIds),
+        supabase.from('profiles').select('id, is_test_account, user_role').in('id', userIds),
         supabase
           .from('teacher_access_requests')
           .select('user_id, email, full_name, locale')
           .eq('status', 'approved')
           .in('user_id', userIds),
+        supabase.from('classrooms').select('teacher_id').in('teacher_id', userIds),
       ]);
       if (events.error) throw new Error(`subscription_events select failed: ${events.error.message}`);
       if (subs.error) throw new Error(`subscriptions select failed: ${subs.error.message}`);
       if (profiles.error) throw new Error(`profiles select failed: ${profiles.error.message}`);
       if (access.error) throw new Error(`teacher_access_requests select failed: ${access.error.message}`);
+      if (classrooms.error) throw new Error(`classrooms select failed: ${classrooms.error.message}`);
 
-      const testUserIds = new Set(
-        ((profiles.data ?? []) as Array<{ id: string; is_test_account: boolean | null }>)
-          .filter((p) => p.is_test_account)
-          .map((p) => p.id),
-      );
       const proUserIds = proUserIdsFrom((subs.data ?? []) as Array<SubscriptionRowLike & { user_id: string }>, now);
       const accessByUser = new Map<string, AccessRow>();
       for (const row of (access.data ?? []) as AccessRow[]) {
         if (row.user_id && row.email && !accessByUser.has(row.user_id)) accessByUser.set(row.user_id, row);
       }
+      const testUserIds = abandonedCheckoutExcludedUserIds({
+        profiles: (profiles.data ?? []) as Array<{ id: string; is_test_account: boolean | null; user_role: string | null }>,
+        emailsByUser: new Map([...accessByUser].map(([id, row]) => [id, row.email])),
+        classroomTeacherIds: new Set(
+          ((classrooms.data ?? []) as Array<{ teacher_id: string | null }>)
+            .map((c) => c.teacher_id)
+            .filter((id): id is string => Boolean(id)),
+        ),
+        userIds,
+      });
 
       const plan = planAbandonedCheckouts({
         started,
