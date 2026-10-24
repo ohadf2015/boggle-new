@@ -20111,6 +20111,17 @@ const en = {
       "empty": "Your numbers show up here after your first game.",
       "unavailable": "Couldn't load this week's numbers. They'll be back on the next visit."
     },
+    "insight": {
+      "title": "Insight of the visit",
+      "next": "Show another insight",
+      "momentum": "more games than last week",
+      "streak": "days in a row you've taught. Keep it going!",
+      "busiest": "is when your classes play most",
+      "topClass": "games this week for {{name}}, your busiest class",
+      "quiet": "days since the last game. One 3-minute round brings them back.",
+      "reach": "students are one code away from playing",
+      "month": "games played in the last 30 days"
+    },
     "pro": {
       "title": "See who struggled after every game",
       "points": {

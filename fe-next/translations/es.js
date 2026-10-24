@@ -21064,6 +21064,17 @@ const es = {
       "empty": "Tus datos aparecerán aquí después de la primera partida.",
       "unavailable": "No pudimos cargar los datos de esta semana. Volverán en tu próxima visita."
     },
+    "insight": {
+      "title": "Dato de esta visita",
+      "next": "Mostrar otro dato",
+      "momentum": "partidas más que la semana pasada",
+      "streak": "días seguidos enseñando. ¡Sigue así!",
+      "busiest": "es cuando tus clases juegan más",
+      "topClass": "partidas esta semana en {{name}}, tu clase más activa",
+      "quiet": "días desde la última partida. Una ronda de 3 minutos los trae de vuelta.",
+      "reach": "estudiantes a un código de jugar",
+      "month": "partidas en los últimos 30 días"
+    },
     "pro": {
       "title": "Mira quién tuvo dificultades en cada partida",
       "points": {

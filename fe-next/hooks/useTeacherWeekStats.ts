@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import { buildTeacherInsights, type TeacherInsight } from '@/lib/education/teacherInsights';
 import {
   fetchTeacherActivityRows,
   summarizeTeacherWeek,
@@ -14,9 +15,10 @@ export type TeacherWeekStatus = 'loading' | 'ready' | 'error';
 
 /** `summary` is null until the read lands; on error it stays null so the UI shows "—", never a false 0. */
 export function useTeacherWeekStats(
-  classrooms: readonly { id: string; member_count?: number | null }[],
+  classrooms: readonly { id: string; name?: string; member_count?: number | null }[],
   classroomsReady: boolean,
-): { summary: TeacherWeekSummary | null; status: TeacherWeekStatus } {
+  locale = 'en',
+): { summary: TeacherWeekSummary | null; status: TeacherWeekStatus; insights: TeacherInsight[] } {
   const idsKey = classrooms.map((c) => c.id).sort().join(',');
   const [state, setState] = useState<{ key: string; rows: TeacherActivityRow[] | null; failed: boolean }>({
     key: '',
@@ -49,6 +51,10 @@ export function useTeacherWeekStats(
     () => (current && state.rows ? summarizeTeacherWeek(state.rows, classrooms, nowMs) : null),
     [current, state.rows, classrooms, nowMs],
   );
+  const insights = useMemo(
+    () => (current && state.rows ? buildTeacherInsights(state.rows, classrooms, nowMs, locale) : []),
+    [current, state.rows, classrooms, nowMs, locale],
+  );
   const status: TeacherWeekStatus = !current ? 'loading' : state.failed ? 'error' : 'ready';
-  return { summary, status };
+  return { summary, status, insights };
 }

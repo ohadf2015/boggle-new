@@ -21052,6 +21052,17 @@ const sv = {
       "empty": "Dina siffror visas här efter ert första spel.",
       "unavailable": "Veckans siffror gick inte att hämta. De är tillbaka nästa gång."
     },
+    "insight": {
+      "title": "Dagens insikt",
+      "next": "Visa en annan insikt",
+      "momentum": "fler spel än förra veckan",
+      "streak": "dagar i rad du har undervisat. Fortsätt så!",
+      "busiest": "är dagen då dina klasser spelar mest",
+      "topClass": "spel den här veckan för {{name}}, din mest aktiva klass",
+      "quiet": "dagar sedan senaste spelet. En runda på 3 minuter får igång dem igen.",
+      "reach": "elever är en kod från att spela",
+      "month": "spel de senaste 30 dagarna"
+    },
     "pro": {
       "title": "Se vem som kämpade efter varje spel",
       "points": {

@@ -19,6 +19,7 @@ import { HomeGetStudentsIn } from './home/HomeGetStudentsIn';
 import { belowStudentGoal } from './hq/studentGoal';
 import { HomeClassList } from './home/HomeClassList';
 import { HomeWeekCard } from './home/HomeWeekCard';
+import { HomeInsightCard } from './home/HomeInsightCard';
 import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
 import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
 import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
@@ -73,7 +74,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const pro = useTeacherPro();
   const { hasPro, loading: proLoading } = pro;
   const activation = useTeacherActivationProgress();
-  const week = useTeacherWeekStats(classrooms, !classroomsLoading && !classroomsError);
+  const week = useTeacherWeekStats(classrooms, !classroomsLoading && !classroomsError, language);
   const studentPreview = useClassStudentPreview(classrooms, !classroomsLoading && !classroomsError);
 
   const [selectedId, setSelectedId] = useState('');
@@ -242,7 +243,12 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
         {hasRail ? (
           <aside aria-label={t('eduShell.home.railLabel')} className="flex min-w-0 flex-col gap-6">
             {proCard}
-            {!ready ? <HomeRailSkeleton /> : showWeek ? <HomeWeekCard summary={week.summary} status={week.status} t={t} /> : null}
+            {!ready ? <HomeRailSkeleton /> : showWeek ? (
+              <>
+                <HomeInsightCard insights={week.insights} t={t} />
+                <HomeWeekCard summary={week.summary} status={week.status} t={t} />
+              </>
+            ) : null}
             {!ready || !selectedClassroom ? null : (
               <WeeklyProgressDigestCard
                 classroomId={selectedClassroom.id}

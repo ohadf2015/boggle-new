@@ -11,7 +11,7 @@
 'use client';
 
 import type React from 'react';
-import { School, BookOpen, Sparkles } from 'lucide-react';
+import { School, BookOpen, Sparkles, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { LessonPicker } from '../pickers/LessonPicker';
@@ -28,11 +28,11 @@ const PRESETS: { id: ClassroomPresetId; key: string }[] = [
   { id: 'standard', key: 'standard' },
 ];
 
-/** A numbered card per question, so an open panel reads as steps, not one long list. */
-function StepCard({ n, tone, children }: { n: number; tone: string; children: React.ReactNode }) {
+/** One icon-badged card per question, so an open panel reads as grouped decisions, not one long list. */
+function StepCard({ id, icon: Icon, tone, children }: { id: string; icon: LucideIcon; tone: string; children: React.ReactNode }) {
   return (
     <section
-      data-testid={`lobby-step-${n}`}
+      data-testid={`lobby-step-${id}`}
       className="relative rounded-neo-lg border-2 border-neo-cream/25 bg-neo-navy-light/60 p-4 ps-14"
     >
       <span
@@ -42,7 +42,7 @@ function StepCard({ n, tone, children }: { n: number; tone: string; children: Re
           tone
         )}
       >
-        {n}
+        <Icon className="size-4" strokeWidth={3} />
       </span>
       {children}
     </section>
@@ -92,12 +92,11 @@ export function LobbySetupPanel({
   return (
     <div className="space-y-5">
       {/* Which class */}
-      <StepCard n={1} tone="bg-neo-cyan">
+      <StepCard id="class" icon={School} tone="bg-neo-cyan">
         <div
           id="lobby-classroom-label"
           className="mb-2 flex items-center gap-1.5 font-neo-display text-xs font-black uppercase text-neo-white/70"
         >
-          <School className="size-4 text-neo-cyan" strokeWidth={3} aria-hidden="true" />
           {t('education.classroomGame.selectClassroom')}
         </div>
         <div role="radiogroup" aria-labelledby="lobby-classroom-label" className="flex flex-wrap gap-2">
@@ -135,7 +134,7 @@ export function LobbySetupPanel({
       </StepCard>
 
       {/* Which words */}
-      <StepCard n={2} tone="bg-neo-lime">
+      <StepCard id="words" icon={BookOpen} tone="bg-neo-lime">
         {selectedLessonIds.length > 0 && (
           <div className="mb-2 flex flex-wrap justify-end gap-2">
             {boardLanguage && <BoardLanguageChip language={boardLanguage} />}
@@ -161,12 +160,11 @@ export function LobbySetupPanel({
       </StepCard>
 
       {/* One-tap rituals */}
-      <StepCard n={3} tone="bg-neo-purple">
+      <StepCard id="presets" icon={Sparkles} tone="bg-neo-purple">
         <div
           id="lobby-preset-label"
           className="mb-2 flex items-center gap-1.5 font-neo-display text-xs font-black uppercase text-neo-white/70"
         >
-          <Sparkles className="size-4 text-neo-purple" strokeWidth={3} aria-hidden="true" />
           {t('teacher.classroom.presets.title')}
         </div>
         <div role="radiogroup" aria-labelledby="lobby-preset-label" className="grid gap-2 sm:grid-cols-3">

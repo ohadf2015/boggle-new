@@ -14,10 +14,10 @@ interface PickerClass {
 
 // Full class strings so Tailwind can see them; order matches the home class list.
 const ACCENTS = [
-  { tile: 'bg-neo-purple text-black', glow: 'hover:shadow-hard-purple', bar: 'bg-neo-purple' },
-  { tile: 'bg-neo-cyan text-black', glow: 'hover:shadow-hard-cyan', bar: 'bg-neo-cyan' },
-  { tile: 'bg-neo-pink text-black', glow: 'hover:shadow-hard-pink', bar: 'bg-neo-pink' },
-  { tile: 'bg-neo-lime text-black', glow: 'hover:shadow-hard-lime', bar: 'bg-neo-lime' },
+  { tile: 'bg-neo-purple text-black', glow: 'hover:shadow-hard-purple' },
+  { tile: 'bg-neo-cyan text-black', glow: 'hover:shadow-hard-cyan' },
+  { tile: 'bg-neo-pink text-black', glow: 'hover:shadow-hard-pink' },
+  { tile: 'bg-neo-lime text-black', glow: 'hover:shadow-hard-lime' },
 ] as const;
 
 export const accentFor = (i: number) => ACCENTS[i % ACCENTS.length];
@@ -60,15 +60,11 @@ export function ClassroomPicker({
               whileHover={reduce ? undefined : { y: -4, rotate: i % 2 ? 0.6 : -0.6 }}
               whileTap={reduce ? undefined : { y: 2, scale: 0.98 }}
               transition={SPRING}
-              className={`group relative flex min-h-28 w-full items-center gap-4 overflow-hidden rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 text-start shadow-hard transition-shadow duration-150 ${accent.glow} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan`}
+              className={`group relative flex min-h-28 w-full items-center gap-4 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 text-start shadow-hard transition-shadow duration-150 ${accent.glow} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan`}
             >
               <span
                 aria-hidden="true"
-                className={`absolute inset-y-0 start-0 w-1.5 ${accent.bar}`}
-              />
-              <span
-                aria-hidden="true"
-                className={`grid size-16 shrink-0 place-items-center rounded-neo border-2 border-black font-neo-display text-2xl font-black shadow-hard-sm transition-transform duration-200 group-hover:-rotate-6 group-hover:scale-110 ${accent.tile}`}
+                className={`grid size-16 shrink-0 place-items-center rounded-neo border-2 border-black font-neo-display text-2xl font-black shadow-hard-sm ${accent.tile}`}
               >
                 <bdi>{classBadge(c.name)}</bdi>
               </span>
@@ -95,7 +91,6 @@ export function ClassroomPicker({
 
 /** Class report header: the picker's badge carried over so the drill-down reads as one object. */
 export function ClassHero({ name, memberCount }: { name: string; memberCount?: number }) {
-  const { t } = useLanguage();
   const reduce = useReducedMotion();
   return (
     <m.div
@@ -111,7 +106,6 @@ export function ClassHero({ name, memberCount }: { name: string; memberCount?: n
         <bdi>{classBadge(name)}</bdi>
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-black uppercase tracking-wide text-neo-cyan">{t('eduPro.reports.classEyebrow')}</p>
         <h1 className="break-words font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">
           <bdi>{name}</bdi>
         </h1>
