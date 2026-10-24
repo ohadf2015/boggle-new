@@ -18,6 +18,8 @@ import { createAssignment } from '../assignments';
 
 const supabase = _supabase!;
 
+vi.mock('@/lib/supabase', () => ({ supabase: { from: vi.fn() } }));
+
 const captureMock = vi.fn();
 vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: { capture: (...args: unknown[]) => captureMock(...args) },
