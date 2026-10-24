@@ -44,7 +44,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
       <div className="flex items-center gap-3">
         <EduMascot moment="setup" size={72} className="size-16 shrink-0 sm:size-18" />
         <div className="min-w-0">
-          <h1 className="font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl">{t('eduShell.setup.title')}</h1>
+          <h1 data-wipe className="font-neo-display text-2xl font-black leading-tight text-neo-cream sm:text-3xl">{t('eduShell.setup.title')}</h1>
           <p className="font-neo-body text-sm text-neo-cream/80">{t('eduShell.setup.subtitle')}</p>
         </div>
       </div>

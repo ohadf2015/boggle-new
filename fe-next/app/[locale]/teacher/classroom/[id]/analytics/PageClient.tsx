@@ -14,6 +14,7 @@
 'use client';
 
 import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -57,6 +58,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   const { t } = useLanguage();
   const router = useRouter();
   const [tab, setTab] = useState('students');
+  const revealRef = useTeacherReveal<HTMLDivElement>();
   const tabsRef = useRef<HTMLDivElement>(null);
   const masteryRef = useRef<HTMLDivElement>(null);
   const [classroomName, setClassroomName] = useState('');
@@ -140,9 +142,9 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   // ==================== RENDER ====================
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div ref={revealRef} className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div data-tm className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           {/* Title & Back Button */}
           <div>
             <button type="button"
@@ -162,7 +164,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
               <span className="text-sm font-neo-body">{t('education.analytics.backToClassroom')}</span>
             </button>
 
-            <h1 className="text-3xl md:text-4xl font-neo-display text-neo-white mb-2">
+            <h1 data-wipe className="text-3xl md:text-4xl font-neo-display text-neo-white mb-2">
               {t('education.analytics.title')}
             </h1>
             <p className="text-neo-white font-neo-body">
@@ -188,6 +190,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
         {/* One gate over the dashboard AND the detail tabs — the tabs are the analytics
             being sold; gating only the summary card left them open to free teachers. */}
+        <div data-tm className="space-y-6">
         <ProGate
           feature="analytics"
           whileChecking={
@@ -283,6 +286,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             </TabsContent>
           </Tabs>
         </ProGate>
+        </div>
 
         {/* Recent Activity Feed (if any) */}
         {recentActivity.length > 0 && (
@@ -330,7 +334,7 @@ import { TeacherGate } from '@/components/education/TeacherGate';
 
 // Selected differs by FILL, not only text colour; unselected keeps a 2px cream edge so it reads as tappable.
 const TAB_BASE =
-  'min-h-11 h-auto whitespace-normal px-2 py-2 text-sm leading-tight font-neo-body font-bold rounded-neo border-[2px] data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream transition-all duration-200 active:translate-y-px motion-reduce:transition-none';
+  'min-h-11 h-auto whitespace-normal px-2 py-2 text-sm leading-tight font-neo-body font-bold rounded-neo border-[2px] data-[state=inactive]:text-neo-white data-[state=inactive]:border-neo-cream transition-[color,background-color,border-color,transform] duration-200 active:translate-y-px motion-reduce:transition-none';
 
 /**
  * Shell above gate — see `components/education/shell/__tests__/gatedShellOrder.test.ts`.

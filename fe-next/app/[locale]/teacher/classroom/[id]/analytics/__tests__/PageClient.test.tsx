@@ -136,6 +136,12 @@ describe('AnalyticsPageClient', () => {
   // RENDERING TESTS
   // ============================================
 
+  it('marks the title for the wipe and the analytics block for the scroll reveal', () => {
+    const { container } = render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+    expect(container.querySelector('h1[data-wipe]')).not.toBeNull();
+    expect(container.querySelectorAll('[data-tm]').length).toBeGreaterThanOrEqual(2);
+  });
+
   it('should render analytics page with all components', () => {
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
