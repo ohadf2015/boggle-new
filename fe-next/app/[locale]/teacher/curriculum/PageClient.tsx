@@ -12,12 +12,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { TeacherLibrary } from '@/components/teacher/lesson-creation/library/TeacherLibrary';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import type { LibraryLesson } from '@/lib/education/libraryTypes';
+import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import logger from '@/utils/logger';
 
 function TeacherCurriculumInner() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const classroomId = searchParams.get('classroomId') || undefined;
+  const revealRef = useTeacherReveal<HTMLElement>();
 
   // Never route here: the copy is already in My lists on this page, and `/classroom/{id}/lesson/{id}` 404s to the homepage.
   const handleImportSuccess = useCallback(
@@ -27,8 +29,10 @@ function TeacherCurriculumInner() {
 
   // The shell owns the one scroll region; Discover's search bar is sticky inside it.
   return (
-    <main className="max-w-6xl mx-auto">
-      <TeacherLibrary teacherId={user?.id} classroomId={classroomId} onImportSuccess={handleImportSuccess} />
+    <main ref={revealRef} className="max-w-6xl mx-auto">
+      <div data-tm>
+        <TeacherLibrary teacherId={user?.id} classroomId={classroomId} onImportSuccess={handleImportSuccess} />
+      </div>
     </main>
   );
 }

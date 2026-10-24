@@ -30,6 +30,7 @@ import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
 import { ProPlanPanel, PlanCardsSkeleton } from '@/components/teacher/pro/ProPlanPanel';
 import { UpgradeYourClasses } from '@/components/teacher/pro/UpgradeYourClasses';
 import { useClassrooms } from '@/hooks/useClassroom';
+import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 
 const AuthModal = nextDynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
@@ -44,6 +45,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   const [tab, setTab] = useState<UpgradeTab>(linkTab);
   const [askOpen, setAskOpen] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
+  const revealRef = useTeacherReveal<HTMLDivElement>(tab);
   const { hasPro, loading: proLoading, status, source, trialUsed, known, portalUrl, refresh, trialExpires, periodEnd } = useTeacherPro();
 
   const offerTrial = known === true && !proLoading && polarTrialUx({
@@ -179,7 +181,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
       contentClassName={cn('w-full px-4 lg:px-6', isRTL && 'rtl')}
       className="bg-neo-navy"
     >
-      <div className="mx-auto max-w-6xl pb-8 pt-4 lg:pt-6">
+      <div ref={revealRef} className="mx-auto max-w-6xl pb-8 pt-4 lg:pt-6">
         {resolvingPlan ? (
           <PlanCardsSkeleton />
         ) : viewer === 'pro' ? (
@@ -263,7 +265,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                   <p className="text-neo-white/70 font-bold text-xs mb-1">{t('teacher.subscription.legalNote')}</p>
                   <div className="flex flex-wrap justify-center gap-3">{legalLinks}</div>
                 </div>
-                <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                <div data-tm className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
                   {trustChips.map(({ icon: Icon, label }) => (
                     <div
                       key={label}
@@ -275,8 +277,8 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                     </div>
                   ))}
                 </div>
-                <ProPreviewStrip />
-                <div className="mt-8">
+                <div data-tm><ProPreviewStrip /></div>
+                <div data-tm className="mt-8">
                   <PlanComparisonMatrix compact />
                 </div>
               </div>
@@ -286,7 +288,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
               </div>
             )}
 
-            <UpgradeFaq />
+            <div data-tm><UpgradeFaq /></div>
           </>
         )}
         {legalFooter}

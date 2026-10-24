@@ -139,7 +139,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                   {/* Shimmer overlay for earned achievements */}
                   {isEarned && (
                     <div
-                      className="absolute inset-0 pointer-events-none opacity-20 animate-[shimmer_3s_ease-in-out_infinite]"
+                      className="absolute inset-0 pointer-events-none opacity-20 motion-safe:animate-[shimmer_3s_ease-out_1]"
                       style={{
                         background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%)',
                         backgroundSize: '200% 100%',
@@ -200,9 +200,9 @@ export const AchievementGrid = memo<AchievementGridProps>(
                       {/* Progress bar */}
                       <div className="w-full h-2 bg-neo-navy/50 rounded-full overflow-hidden border border-neo-cream/40">
                         <AdaptiveMotion.div
-                          className="h-full rounded-full"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${tierProgress.progress}%` }}
+                          className="h-full w-full origin-left rounded-full rtl:origin-right"
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: tierProgress.progress / 100 }}
                           transition={{ type: 'spring', stiffness: 60, damping: 18, delay: 0.3 + index * 0.03 }}
                           style={{
                             backgroundColor: tierDisplay?.colors.bg || TIER_COLORS.BRONZE.bg,

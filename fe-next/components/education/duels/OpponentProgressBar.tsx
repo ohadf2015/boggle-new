@@ -32,49 +32,32 @@ export function OpponentProgressBar({
   const myPercentage = total === 0 ? 50 : (myScore / total) * 100;
   const opponentPercentage = total === 0 ? 50 : (opponentScore / total) * 100;
 
+  // A label over a sliver of the other colour is unreadable; hide it until its side has room.
+  const MIN_LABEL_PCT = 18;
   return (
     <div
-      className="h-8 border-[2px] border-neo-cream rounded-neo shadow-hard overflow-hidden flex bg-neo-navy"
+      className="relative h-8 border-[2px] border-neo-cream rounded-neo shadow-hard overflow-hidden bg-neo-pink"
       data-testid="opponent-progress-bar"
     >
-      {/* Player Side (Left) */}
+      {/* Fill animates scaleX (compositor-only); animating width re-lays-out every frame. */}
       <m.div
         data-side="player"
-        className={cn(
-          // A right-edge border class in the `neo` family used to sit here. `neo`
-          // is not a border COLOR (it is an @utility that sets all four borders at
-          // once), so that class generated no CSS at all — verified against a real
-          // Tailwind build. Removing it is a no-op visually and drops a
-          // physical-direction token from the tree.
-          'h-full bg-neo-cyan flex items-center justify-between px-3'
-        )}
-        initial={{ width: '50%' }}
-        animate={{ width: `${myPercentage}%` }}
+        aria-hidden="true"
+        className="absolute inset-0 origin-left rtl:origin-right bg-neo-cyan"
+        initial={{ scaleX: 0.5 }}
+        animate={{ scaleX: myPercentage / 100 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      >
-        <span className="text-neo-black font-neo-body font-bold text-sm truncate">
-          {myName}
+      />
+      <div data-side="opponent" className="relative flex h-full items-center justify-between gap-2 px-3 font-neo-body text-sm font-bold">
+        <span className={cn('flex min-w-0 items-center gap-2 text-neo-black', myPercentage < MIN_LABEL_PCT && 'invisible')}>
+          <span className="truncate">{myName}</span>
+          <span>{myScore}</span>
         </span>
-        <span className="text-neo-black font-neo-body font-bold text-sm ms-2">
-          {myScore}
+        <span className={cn('flex min-w-0 items-center gap-2 text-neo-white', opponentPercentage < MIN_LABEL_PCT && 'invisible')}>
+          <span>{opponentScore}</span>
+          <span className="truncate">{opponentName}</span>
         </span>
-      </m.div>
-
-      {/* Opponent Side (Right) */}
-      <m.div
-        data-side="opponent"
-        className="h-full bg-neo-pink flex items-center justify-between px-3"
-        initial={{ width: '50%' }}
-        animate={{ width: `${opponentPercentage}%` }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      >
-        <span className="text-neo-white font-neo-body font-bold text-sm ms-2">
-          {opponentScore}
-        </span>
-        <span className="text-neo-white font-neo-body font-bold text-sm truncate">
-          {opponentName}
-        </span>
-      </m.div>
+      </div>
     </div>
   );
 }

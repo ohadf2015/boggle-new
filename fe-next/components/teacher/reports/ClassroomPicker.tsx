@@ -27,7 +27,7 @@ const SPRING = { type: 'spring', stiffness: 380, damping: 26 } as const;
 function StudentCount({ count }: { count: number }) {
   const { t } = useLanguage();
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-neo-cream/25 bg-neo-black/30 px-2.5 py-0.5 text-sm font-bold text-neo-cream tabular-nums">
+    <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-neo-cream/40 bg-neo-black/30 px-2.5 py-0.5 text-sm font-bold text-neo-cream tabular-nums">
       <Users aria-hidden="true" className="size-4" />
       <span className="sr-only">{t('teacher.reports.metrics.totalStudents')}: </span>
       {count}

@@ -33,7 +33,7 @@ function StepCard({ id, icon: Icon, tone, children }: { id: string; icon: Lucide
   return (
     <section
       data-testid={`lobby-step-${id}`}
-      className="relative rounded-neo-lg border-2 border-neo-cream/25 bg-neo-navy-light/60 p-4 ps-14"
+      className="relative rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/60 p-4 ps-14"
     >
       <span
         aria-hidden="true"

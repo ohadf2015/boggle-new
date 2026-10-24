@@ -159,6 +159,7 @@ export function HomeClassList({
               <Link
                 href={teacherHostHref(language, { classroomId: c.id })}
                 data-testid="home-class-play"
+                data-magnet
                 aria-label={t('eduShell.home.playWith', { name: c.name })}
                 className={cn(
                   'grid size-11 place-items-center justify-self-end rounded-neo border-[3px] border-neo-black bg-neo-lime text-neo-black shadow-hard-sm',

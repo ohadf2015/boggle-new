@@ -7,6 +7,7 @@
 
 'use client';
 
+import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
@@ -168,7 +169,7 @@ function TeacherReportsInner() {
 
   // A drill-down from the bottom of a long ranking should land on the new
   // report's header, not mid-table.
-  const viewRef = useRef<HTMLDivElement>(null);
+  const viewRef = useTeacherReveal<HTMLDivElement>(viewKey);
   const firstView = useRef(true);
   useEffect(() => {
     if (firstView.current) {
@@ -179,7 +180,7 @@ function TeacherReportsInner() {
       block: 'start',
       behavior: reduceMotion ? 'auto' : 'smooth',
     });
-  }, [viewKey, reduceMotion]);
+  }, [viewKey, reduceMotion, viewRef]);
 
   const offset = SLIDE_PX * (dir === 'rtl' ? -1 : 1);
   const variants = {
@@ -215,7 +216,7 @@ function TeacherReportsInner() {
             ))}
           </div>
         ) : classrooms && classrooms.length > 0 ? (
-          <ClassroomPicker classrooms={classrooms} onSelect={handleClassroomSelect} />
+          <div data-tm><ClassroomPicker classrooms={classrooms} onSelect={handleClassroomSelect} /></div>
         ) : (
           <ReportsNoClasses />
         )}
@@ -258,7 +259,7 @@ function TeacherReportsInner() {
     view = (
       <div className="space-y-4 sm:space-y-5">
         <div className="flex flex-wrap items-stretch gap-3">
-          <div className="min-w-0 flex-1">
+          <div data-tm className="min-w-0 flex-1">
             <ClassHero name={selectedClassroom?.name ?? t('teacher.reports.title')} memberCount={selectedClassroom?.member_count} />
           </div>
           <TeacherPlanBadge />
@@ -285,7 +286,7 @@ function TeacherReportsInner() {
           classroomId={selectedClassroomId}
           classroomName={selectedClassroom?.name ?? ''}
         />
-        <div className="space-y-2.5">
+        <div data-tm className="space-y-2.5">
           <SectionDisclosure section="assignments">
             <div className="space-y-4">
               <AssignmentCompletionReport classroomId={selectedClassroomId} />

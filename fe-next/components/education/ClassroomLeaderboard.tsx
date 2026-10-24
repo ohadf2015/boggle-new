@@ -113,7 +113,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
       >
         {/* Highlight pulse for current user */}
         {isCurrentUser && (
-          <div className="absolute inset-0 rounded-neo border-2 border-neo-cyan/40 animate-pulse pointer-events-none" />
+          <div className="absolute inset-0 rounded-neo border-2 border-neo-cyan/40 motion-safe:animate-pulse pointer-events-none" />
         )}
 
         {/* Rank Number */}

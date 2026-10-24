@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { useTeacherReveal } from './motion/useTeacherReveal';
 import LessonBuilder from './LessonBuilder';
 import { AssignmentCreator } from './assignments';
 import { TeacherHqWelcome } from './TeacherHqWelcome';
@@ -174,6 +175,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
     classroomCount: classrooms.length,
     studentCounts: classrooms.map((c) => c.member_count ?? 0),
   });
+  const revealRef = useTeacherReveal<HTMLDivElement>(`${ready}-${hasClasses}-${Boolean(classroomsError)}`);
   const hasRail = !ready || proCard !== null || showWeek || Boolean(selectedClassroom);
 
   return (
@@ -187,11 +189,12 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
       )}
 
       <div
+        ref={revealRef}
         data-testid="teacher-home"
         className={cn('mx-auto grid w-full max-w-[1280px] gap-6 px-4 py-4 sm:px-6 lg:px-8 lg:py-6', hasRail && 'lg:grid-cols-[minmax(0,1fr)_20rem]')}
       >
         <div className="flex min-w-0 flex-col gap-6">
-          <header className="flex flex-wrap items-center justify-between gap-3">
+          <header data-tm className="flex flex-wrap items-center justify-between gap-3">
             <h1 suppressHydrationWarning className="font-neo-display text-2xl font-black text-neo-cream sm:text-3xl">
               {firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName')}
             </h1>
@@ -217,24 +220,28 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                 />
               ) : null}
               {selectedClassroom ? <HomeGetStudentsIn classroom={selectedClassroom} /> : null}
-              <HomeHero
-                classrooms={classrooms}
-                selectedId={effectiveId}
-                onSelect={setSelectedId}
-                language={language}
-                t={t}
-              />
-              <HomeClassList
-                classrooms={classrooms}
-                studentPreview={studentPreview}
-                lastPlayedAt={week.summary?.lastPlayedAt ?? null}
-                activityFailed={week.status === 'error'}
-                newClassHref={newClassHref}
-                classLimit={!proLoading && !hasPro ? FREE_TIER_LIMITS.classes : null}
-                language={language}
-                nowMs={nowMs}
-                t={t}
-              />
+              <div data-tm>
+                <HomeHero
+                  classrooms={classrooms}
+                  selectedId={effectiveId}
+                  onSelect={setSelectedId}
+                  language={language}
+                  t={t}
+                />
+              </div>
+              <div data-tm>
+                <HomeClassList
+                  classrooms={classrooms}
+                  studentPreview={studentPreview}
+                  lastPlayedAt={week.summary?.lastPlayedAt ?? null}
+                  activityFailed={week.status === 'error'}
+                  newClassHref={newClassHref}
+                  classLimit={!proLoading && !hasPro ? FREE_TIER_LIMITS.classes : null}
+                  language={language}
+                  nowMs={nowMs}
+                  t={t}
+                />
+              </div>
               {accountBanner ? <div data-testid="home-account-banner">{accountBanner}</div> : null}
             </>
           )}
@@ -245,8 +252,8 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
             {proCard}
             {!ready ? <HomeRailSkeleton /> : showWeek ? (
               <>
-                <HomeInsightCard insights={week.insights} t={t} />
-                <HomeWeekCard summary={week.summary} status={week.status} t={t} />
+                <div data-tm><HomeInsightCard insights={week.insights} t={t} /></div>
+                <div data-tm><HomeWeekCard summary={week.summary} status={week.status} t={t} /></div>
               </>
             ) : null}
             {!ready || !selectedClassroom ? null : (

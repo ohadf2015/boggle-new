@@ -159,7 +159,6 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           'flex items-center justify-between',
           'px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5',
           'bg-neo-navy',
-          'backdrop-blur-md',
           'border-4 lg:border-4 border-neo-cream/40',
           'shadow-hard-lg',
           'rounded-neo-lg',

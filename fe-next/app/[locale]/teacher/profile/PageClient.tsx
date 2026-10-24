@@ -17,6 +17,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import SubscriptionStatusCard from '@/components/teacher/SubscriptionStatusCard';
 import { cn } from '@/lib/utils';
+import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import { ArrowRight, GraduationCap, Users, BookOpen, Mail, ShieldCheck } from 'lucide-react';
 
 const REPORT_CARD =
@@ -62,6 +63,7 @@ function TeacherProfileInner() {
     // genuine non-teacher to /education/access rather than to the homepage.
   }, [loading, user, router, language]);
 
+  const revealRef = useTeacherReveal<HTMLDivElement>(classroomsLoading);
   // The loading branch is inside the shell too (the shell is now above the
   // gate): a page that scrolls for the second before the profile lands, then
   // stops, is a jolt on a phone.
@@ -81,9 +83,9 @@ function TeacherProfileInner() {
   const userRole = profile?.user_role || (profile?.is_admin ? 'teacher' : 'student');
 
   return (
-    <div data-testid="teacher-profile-page" className="w-full max-w-3xl mx-auto space-y-6">
+    <div ref={revealRef} data-testid="teacher-profile-page" className="w-full max-w-3xl mx-auto space-y-6">
       {/* Profile Header */}
-      <div className={cn(REPORT_CARD, 'p-6')}>
+      <div data-tm className={cn(REPORT_CARD, 'p-6')}>
         <div className="flex flex-wrap items-center gap-4">
           <Avatar
             customAvatar={profile?.avatar_config ?? null}
@@ -115,7 +117,7 @@ function TeacherProfileInner() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div data-tm className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {classroomsLoading ? (
           <>
             {['a', 'b', 'c'].map((id) => (
