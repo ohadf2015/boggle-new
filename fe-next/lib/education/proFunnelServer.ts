@@ -17,8 +17,8 @@ import type { PolarTrialExpiryBucket } from '@/lib/education/polarTrialExpiryJou
 
 const BASE = { product: 'teacher_pro', provider: 'polar' } as const;
 
-export function buildProCheckoutStartedEvent(userId: string): EduServerEvent {
-  return { distinctId: userId, event: 'edu_pro_checkout_started', properties: { ...BASE } };
+export function buildProCheckoutStartedEvent(userId: string, tags: Record<string, unknown> = {}): EduServerEvent {
+  return { distinctId: userId, event: 'edu_pro_checkout_started', properties: { ...tags, ...BASE } };
 }
 
 /**
@@ -40,13 +40,18 @@ export function buildProCheckoutSucceededEvent(userId: string, subscriptionId: s
   };
 }
 
-export function buildProTrialStartedEvent(userId: string): EduServerEvent {
-  return { distinctId: userId, event: 'edu_pro_trial_started', properties: { ...BASE } };
+/**
+ * Fires when the TRIAL checkout URL is created, not when Polar opens the trial
+ * (that is `trial_started` / `teacher_trial_started` from the webhook). The
+ * name stays for existing dashboards; `stage: 'checkout_url_created'` says so.
+ */
+export function buildProTrialStartedEvent(userId: string, tags: Record<string, unknown> = {}): EduServerEvent {
+  return { distinctId: userId, event: 'edu_pro_trial_started', properties: { ...tags, ...BASE } };
 }
 
 /** Conversion funnel step 2 — Polar checkout session created (paid or trial). */
-export function buildCheckoutStartedEvent(userId: string): EduServerEvent {
-  return { distinctId: userId, event: 'checkout_started', properties: { ...BASE } };
+export function buildCheckoutStartedEvent(userId: string, tags: Record<string, unknown> = {}): EduServerEvent {
+  return { distinctId: userId, event: 'checkout_started', properties: { ...tags, ...BASE } };
 }
 
 /** Alias: trial checkout URL creation is the same `checkout_started` step. */
