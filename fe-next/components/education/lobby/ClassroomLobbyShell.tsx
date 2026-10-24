@@ -12,7 +12,7 @@
 
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { tr } from './eduText';
@@ -28,11 +28,18 @@ export interface ClassroomLobbyShellProps {
    * nothing to put here — one whole bar of height given back to the picker.
    */
   footer?: ReactNode;
+  /** Settings open: hide the pinned poster and give the scroller the height. */
+  expanded?: boolean;
   className?: string;
 }
 
-export function ClassroomLobbyShell({ pinned, children, footer, className }: ClassroomLobbyShellProps) {
+export function ClassroomLobbyShell({ pinned, children, footer, expanded, className }: ClassroomLobbyShellProps) {
   const { t, dir } = useLanguage();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  // Toggling options changes the scroller's height; a stale scrollTop leaves the mode strip cropped.
+  useEffect(() => {
+    scrollRef.current?.scrollTo?.({ top: 0 });
+  }, [expanded]);
   return (
     <div
       data-testid="classroom-lobby-shell"
@@ -63,11 +70,18 @@ export function ClassroomLobbyShell({ pinned, children, footer, className }: Cla
           </p>
         </header>
 
-        <div className="shrink-0">{pinned}</div>
+        {/* Options open = the poster steps aside (hidden, still mounted so no state resets): the settings need the whole height, not the 100px under a tall poster. */}
+        <div data-testid="lobby-pinned" className={cn('shrink-0', expanded && 'hidden')}>
+          {pinned}
+        </div>
 
         <div
           data-testid="lobby-scroll"
-          className="min-h-0 shrink overflow-y-auto overscroll-contain px-0.5 pb-1"
+          ref={scrollRef}
+          className={cn(
+            'min-h-0 overflow-y-auto overscroll-contain px-0.5 pb-1',
+            expanded ? 'flex-1' : 'shrink'
+          )}
         >
           {children}
         </div>

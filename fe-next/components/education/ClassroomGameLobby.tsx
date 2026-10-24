@@ -373,7 +373,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   }
 
   return (
-    <ClassroomLobbyShell
+    <ClassroomLobbyShell expanded={setupOpen}
       pinned={
         <div className="flex flex-col gap-2 lg:gap-3">
         <LobbyClassPicker
