@@ -76,7 +76,8 @@ const ja = {
       "title": "ボス",
       "unlock": "Pro: 10体すべて",
       "lockedName": "{name}(Pro)",
-      "freeHint": "無料プランはレキシコンドラゴンと対戦。Proなら10体すべて選べます。"
+      "freeHint": "無料プランは毎回レキシコンドラゴンと対戦。Proなら訪れるたびに新しいボスが登場し、10体すべて選べます。",
+      "proHint": "Pro：訪れるたびに新しいボス。タップで固定できます。"
     }
   },
   // @eduBoss:end
@@ -3686,6 +3687,7 @@ const ja = {
   },
   "game": {
     "doubleClickToSubmit": "最後の文字をダブルクリックで送信",
+    "boardLocked": "GOを待って — ボードはまだ動けません",
     "foundByOther": "${player}が見つけました",
     "combo": "コンボ",
     "comboHint": "素早く単語を見つけるとコンボ",
@@ -16240,6 +16242,7 @@ const ja = {
         "revealAtEnd": "結果は最後に先生が発表します。"
       },
       "pressureFailed": "設定を保存できませんでした。もう一度お試しください。",
+      "pressureNeedsPro": "プレッシャー設定は Teacher Pro の機能です。",
       "defaultClassroomName": "マイクラス",
       "questions": "問題数",
       "perQuestion": "1問あたり",
@@ -20139,7 +20142,8 @@ const ja = {
       "letters": "文字",
       "editSettings": "ラウンド設定を変更",
       "chatHint": "みんなにあいさつしよう",
-      "chatUnread": "新着 {count}件"
+      "chatUnread": "新着 {count}件",
+      "modeOn": "{mode}を選択中 — スタートを押して"
     },
     "round": {
       "getReady": "準備して",

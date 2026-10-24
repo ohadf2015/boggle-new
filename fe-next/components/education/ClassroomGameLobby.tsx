@@ -32,7 +32,7 @@ import { trackEduLiveGameStarted } from '@/lib/education/telemetry';
 import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { configuredRoundMinutes, recommendedModeBadge } from '@/lib/education/gameModes';
 import { launchOf, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
-import { FREE_CLASSROOM_BOSS_ID, type ClassroomBossId } from '@/shared/types/classroomBoss';
+import { useRotatingBoss } from './boss/useRotatingBoss';
 import { availableFocuses } from '@/lib/education/vocabFocus';
 import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
 import { ClassroomModeCardRow, ClassroomModeCatalogue } from './ClassroomModeCatalogue';
@@ -122,7 +122,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   // default below is derived at render from whether a lesson is attached — ONE
   // source of truth, nothing that can flip it late (pitfalls class 1).
   const [pickedGameMode, setPickedGameMode] = useState<ClassroomCatalogueId | null>(initialMode ?? null);
-  const [bossId, setBossId] = useState<ClassroomBossId>(FREE_CLASSROOM_BOSS_ID);
+  const [bossId, setBossId] = useRotatingBoss();
   const [vocabQuizFocus, setVocabQuizFocus] = useState<PracticeFocusSetting>('any');
   const [vocabQuizQuestionCount, setVocabQuizQuestionCount] = useState(VOCAB_QUIZ_DEFAULT_QUESTION_COUNT);
   const [vocabQuizSeconds, setVocabQuizSeconds] = useState(VOCAB_QUIZ_DEFAULT_SECONDS);
@@ -230,7 +230,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   const wordcraftOk = wordcraftPlayable(allPlayableWords, { lessonLanguage, classroomLanguage: classrooms.find((c) => c.id === selectedClassroomId)?.language, preset: activePreset });
 
   const startGame = useCallback(
-    (mode: ClassroomGameMode, variant?: typeof vocabQuizVariant, boss?: ClassroomBossId) => {
+    (mode: ClassroomGameMode, variant?: typeof vocabQuizVariant, boss?: Parameters<typeof launchOf>[1]) => {
       setStartError(null);
       const classroom = classrooms.find((c) => c.id === selectedClassroomId);
       if ((mode === VOCAB_QUIZ_MODE && !quizPlayable) || (mode === 'wordcraft' && !wordcraftOk)) return;
@@ -373,7 +373,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   }
 
   return (
-    <ClassroomLobbyShell
+    <ClassroomLobbyShell expanded={setupOpen}
       pinned={
         <div className="flex flex-col gap-2 lg:gap-3">
         <LobbyClassPicker

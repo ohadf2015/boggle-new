@@ -76,7 +76,8 @@ const es = {
       "title": "Jefe",
       "unlock": "Pro: los 10 jefes",
       "lockedName": "{name} (Pro)",
-      "freeHint": "Las clases gratis se enfrentan al Dragón del Léxico. Pro desbloquea los 10 jefes."
+      "freeHint": "Las clases gratis se enfrentan siempre al Dragón del Léxico. Pro trae un jefe nuevo en cada visita y desbloquea los 10.",
+      "proHint": "Pro: un jefe nuevo en cada visita. Toca uno para quedarte con él."
     }
   },
   // @eduBoss:end
@@ -3686,6 +3687,7 @@ const es = {
   },
   "game": {
     "doubleClickToSubmit": "Doble clic en la última letra para enviar",
+    "boardLocked": "Espera al GO — el tablero aún no está activo",
     "foundByOther": "Encontrada por ${player}",
     "combo": "Combo",
     "comboHint": "¡Rápido! Encadena palabras",
@@ -16189,6 +16191,7 @@ const es = {
         "revealAtEnd": "Tu profesor revelará los resultados al final."
       },
       "pressureFailed": "No se pudieron guardar los ajustes. Inténtalo de nuevo.",
+      "pressureNeedsPro": "Los ajustes de presión son una función de Teacher Pro.",
       "defaultClassroomName": "Mi aula",
       "questions": "Preguntas",
       "perQuestion": "Por pregunta",
@@ -20151,7 +20154,8 @@ const es = {
       "letters": "letras",
       "editSettings": "Editar ajustes de la ronda",
       "chatHint": "Saluda al grupo",
-      "chatUnread": "{count} nuevos"
+      "chatUnread": "{count} nuevos",
+      "modeOn": "{mode} está listo — pulsa Empezar"
     },
     "round": {
       "getReady": "Prepárate",

@@ -76,7 +76,8 @@ const he = {
       "title": "בוס",
       "unlock": "Pro: כל 10 הבוסים",
       "lockedName": "{name} (Pro)",
-      "freeHint": "בחשבון חינמי נלחמים בדרקון הלקסיקון. ב-Pro נפתחים כל 10 הבוסים."
+      "freeHint": "בחשבון חינמי נלחמים בדרקון הלקסיקון בכל משחק. ב-Pro מגיע בוס חדש בכל כניסה, וכל 10 הבוסים נפתחים.",
+      "proHint": "ב-Pro: בוס חדש בכל כניסה. לחצו על בוס כדי להשאיר אותו."
     }
   },
   // @eduBoss:end
@@ -3686,6 +3687,7 @@ const he = {
   },
   "game": {
     "doubleClickToSubmit": "לחיצה כפולה על האות האחרונה לשליחה",
+    "boardLocked": "חכו ל-GO — הלוח עדיין לא פעיל",
     "foundByOther": "נמצא על ידי ${player}",
     "combo": "קומבו",
     "comboHint": "מצאו מילים מהר לקומבו",
@@ -16095,6 +16097,7 @@ const he = {
         "revealAtEnd": "המורה יחשוף את התוצאות בסוף."
       },
       "pressureFailed": "לא הצלחנו לשמור את ההגדרות. נסו שוב.",
+      "pressureNeedsPro": "בקרות הלחץ הן חלק מפרו למורים.",
       "defaultClassroomName": "הכיתה שלי",
       "questions": "שאלות",
       "perQuestion": "לכל שאלה",
@@ -20069,7 +20072,8 @@ const he = {
       "letters": "אותיות",
       "editSettings": "עריכת הגדרות הסיבוב",
       "chatHint": "תגידו היי לחבורה",
-      "chatUnread": "{count} חדשות"
+      "chatUnread": "{count} חדשות",
+      "modeOn": "{mode} נבחר — לחצו התחל"
     },
     "round": {
       "getReady": "היכונו",

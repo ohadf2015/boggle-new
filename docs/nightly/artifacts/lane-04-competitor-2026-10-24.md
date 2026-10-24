@@ -1,0 +1,3 @@
+status: shipped
+files_touched: docs/nightly/ideas/2026-10-24.md, docs/nightly/ideas/2026-10-24-reddit.md, docs/nightly/reports/2026-10-24.md (appended), docs/nightly/artifacts/lane-04-competitor-2026-10-24.md
+next_steps: brain-drill phoenix-round idea is research-only (no code shipped, by lane design). reddit-fetch.sh has a ~50% jq-parse-fail rate on `feed` calls and the `score`/`num_comments` fields return null even on success this run — worth lane-07 investigating whether the OAuth response shape changed. r/dailygames is not a word-game sub (general community-game/worldbuilding sub) — drop it from the target-sub list, swap in r/Anagrams or r/Scrabble next time (both timed out via feed tonight, didn't retry further to stay in budget).

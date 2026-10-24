@@ -76,7 +76,8 @@ const sv = {
       "title": "Boss",
       "unlock": "Pro: alla 10 bossar",
       "lockedName": "{name} (Pro)",
-      "freeHint": "Gratisklasser möter Lexikondraken. Pro låser upp alla 10 bossar."
+      "freeHint": "Gratisklasser möter alltid Lexikondraken. Pro ger en ny boss varje besök och låser upp alla 10.",
+      "proHint": "Pro: en ny boss varje besök. Tryck på en för att behålla den."
     }
   },
   // @eduBoss:end
@@ -4024,6 +4025,7 @@ const sv = {
   },
   "game": {
     "doubleClickToSubmit": "Dubbelklicka på sista bokstaven för att skicka",
+    "boardLocked": "Vänta på GO — brädet är inte igång än",
     "foundByOther": "Hittades av ${player}",
     "combo": "Kombo",
     "comboHint": "Hitta ord snabbt för kombo",
@@ -16528,6 +16530,7 @@ const sv = {
         "revealAtEnd": "Din lärare avslöjar resultaten i slutet."
       },
       "pressureFailed": "Kunde inte spara inställningarna. Försök igen.",
+      "pressureNeedsPro": "Tryckreglagen är en funktion i Teacher Pro.",
       "defaultClassroomName": "Mitt klassrum",
       "questions": "Frågor",
       "perQuestion": "Per fråga",
@@ -20139,7 +20142,8 @@ const sv = {
       "letters": "bokstäver",
       "editSettings": "Ändra rundans inställningar",
       "chatHint": "Säg hej till gänget",
-      "chatUnread": "{count} nya"
+      "chatUnread": "{count} nya",
+      "modeOn": "{mode} är valt — tryck Start"
     },
     "round": {
       "getReady": "Gör dig redo",

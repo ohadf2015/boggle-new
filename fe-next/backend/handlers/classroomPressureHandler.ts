@@ -22,6 +22,7 @@ import { getAuthUserId } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { gameCodeSchema } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
+import { DEFAULT_CLASSROOM_PRESSURE } from '@/shared/utils/classroomPressure';
 
 const pressureSchema = z.object({
   gameCode: gameCodeSchema,
@@ -35,6 +36,27 @@ const pressureSchema = z.object({
     // of nothing that acks as if it were something.
     .refine((p) => Object.values(p).some((v) => v !== undefined)),
 });
+
+/** Resetting to the loud defaults is free; only a calmer dial is Pro. */
+function deviatesFromDefaults(pressure: Record<string, unknown>): boolean {
+  return Object.entries(pressure).some(
+    ([key, value]) => value !== undefined && value !== DEFAULT_CLASSROOM_PRESSURE[key as keyof typeof DEFAULT_CLASSROOM_PRESSURE]
+  );
+}
+
+// Lazy: these pull Next-only modules the Express bundle should not load at boot. Fails closed.
+async function teacherIsPro(userId: string): Promise<boolean> {
+  try {
+    const [{ checkTeacherSubscription }, { teacherHasProAccess }] = await Promise.all([
+      import('@/lib/subscriptions'),
+      import('@/lib/education/accessTrialServer'),
+    ]);
+    return await teacherHasProAccess(userId, await checkTeacherSubscription(userId));
+  } catch (error) {
+    logger.error('CLASSROOM_GAME', `Pro lookup failed for pressure dials: ${error}`);
+    return false;
+  }
+}
 
 export function registerClassroomPressureHandlers(io: Server, socket: Socket): void {
   socket.on('updateClassroomGamePressure', async (data: unknown) => {
@@ -63,6 +85,11 @@ export function registerClassroomPressureHandlers(io: Server, socket: Socket): v
       const game = await getClassroomGame(payload.gameCode);
       if (!game || authUserId !== game.teacherId) {
         socket.emit('classroomGameError', { error: 'education.classroomGame.pressureFailed' });
+        return;
+      }
+
+      if (deviatesFromDefaults(payload.pressure) && !(await teacherIsPro(authUserId))) {
+        socket.emit('classroomGameError', { error: 'education.classroomGame.pressureNeedsPro' });
         return;
       }
 

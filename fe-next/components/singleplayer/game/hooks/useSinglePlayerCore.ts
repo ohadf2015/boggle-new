@@ -47,7 +47,7 @@ import { useSpamDetection } from './useSpamDetection';
 import { useSinglePlayerEffects } from './useSinglePlayerEffects';
 import { buildGameResults, buildFallbackResults, emitSinglePlayerGameEnd } from './buildGameResults';
 import { soloResultFromErrorKey, useSoloJuice } from './useSoloJuice';
-import { trackGrowthEvent } from '@/utils/growthTracking';
+import { trackGrowthEvent, markFirstGameActivation } from '@/utils/growthTracking';
 import type { SinglePlayerGameState, SinglePlayerResultsData } from '../../SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
@@ -415,6 +415,18 @@ export function useSinglePlayerCore({
       });
       announceWordResult(normalizedWord, true, juice.wordPts);
       announceCombo(currentCombo + 1);
+      // Activation is "they played", not "the timer hit zero". QuickClassicBoard
+      // never mounts SinglePlayerGame's first_word_found effect, so the shared
+      // core is the one caller that covers both boards. Once-per-device dedup
+      // lives in markFirstGameActivation; a later trackGameEnd is a no-op.
+      if (foundWordsRef.current.filter(fw => fw.isValid === true).length === 1) {
+        markFirstGameActivation({
+          won: false,
+          score: juice.wordPts,
+          wordCount: 1,
+          mode: 'singleplayer',
+        });
+      }
 
       const validatedWords = foundWordsRef.current
         .filter(fw => fw.isValid === true)

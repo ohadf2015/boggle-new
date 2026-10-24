@@ -83,7 +83,11 @@ export function ClassroomBossPicker({ value, onChange }: ClassroomBossPickerProp
           );
         })}
       </div>
-      {!loading && !hasPro && <p className="text-xs font-bold text-neo-white/60">{t('classroomBoss.picker.freeHint')}</p>}
+      {!loading && (
+        <p data-testid="boss-picker-hint" className="text-xs font-bold text-neo-white/60">
+          {t(hasPro ? 'classroomBoss.picker.proHint' : 'classroomBoss.picker.freeHint')}
+        </p>
+      )}
     </section>
   );
 }

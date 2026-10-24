@@ -76,7 +76,8 @@ const en = {
       "title": "Boss",
       "unlock": "Pro: all 10 bosses",
       "lockedName": "{name} (Pro)",
-      "freeHint": "Free classes fight the Lexicon Dragon. Pro unlocks all 10 bosses."
+      "freeHint": "Free classes fight the Lexicon Dragon every game. Pro brings a new boss each visit and unlocks all 10.",
+      "proHint": "Pro: a new boss every visit. Tap one to keep it."
     }
   },
   // @eduBoss:end
@@ -3302,6 +3303,7 @@ const en = {
   },
   "game": {
     "doubleClickToSubmit": "Double-click last letter to submit",
+    "boardLocked": "Wait for GO — this board isn't live yet",
     "foundByOther": "Found by ${player}",
     "combo": "Combo",
     "comboHint": "Find words fast to build a combo",
@@ -14607,6 +14609,7 @@ const en = {
         "revealAtEnd": "Your teacher will reveal the results at the end."
       },
       "pressureFailed": "Couldn't save those settings. Try again.",
+      "pressureNeedsPro": "Pressure dials are a Teacher Pro feature.",
       "questions": "Questions",
       "perQuestion": "Per question",
       "namePrompt": {
@@ -19198,7 +19201,8 @@ const en = {
       "letters": "letters",
       "editSettings": "Edit round settings",
       "chatHint": "Say hi to the squad",
-      "chatUnread": "{count} new"
+      "chatUnread": "{count} new",
+      "modeOn": "{mode} is on — press Start"
     },
     "round": {
       "getReady": "Get ready",

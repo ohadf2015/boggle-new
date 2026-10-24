@@ -4,6 +4,7 @@ import {
   CHECKOUT_STARTED_EVENT,
   abandonedCheckoutUpgradeUrl,
   checkoutStartedPayload,
+  abandonedCheckoutExcludedUserIds,
   planAbandonedCheckouts,
 } from '../abandonedCheckout';
 
@@ -103,3 +104,34 @@ describe('planAbandonedCheckouts', () => {
     expect(plan.due[0]).toMatchObject({ mode: 'paid', locale: null });
   });
 });
+
+describe('checkoutStartedPayload client_kind', () => {
+  it('Given a client kind, Then it is stored without mentioning trial', () => {
+    const p = checkoutStartedPayload({ trial: false, locale: 'en', clientKind: 'script' })
+    expect(p).toEqual({ mode: 'paid', locale: 'en', client_kind: 'script' })
+    expect(JSON.stringify(p)).not.toContain('trial')
+  })
+})
+
+describe('abandonedCheckoutExcludedUserIds', () => {
+  const base = {
+    profiles: [
+      { id: 'real', is_test_account: false, user_role: 'teacher' },
+      { id: 'flag', is_test_account: true, user_role: 'teacher' },
+      { id: 'alias', is_test_account: false, user_role: 'teacher' },
+      { id: 'student', is_test_account: false, user_role: 'student' },
+      { id: 'noclass', is_test_account: false, user_role: 'teacher' },
+    ],
+    emailsByUser: new Map([
+      ['real', 'ada@school.edu'],
+      ['alias', 'x+lexitest@gmail.com'],
+      ['noclass', 'bo@school.edu'],
+    ]),
+    classroomTeacherIds: new Set(['real', 'flag', 'alias', 'student']),
+    userIds: ['real', 'flag', 'alias', 'student', 'noclass', 'gone'],
+  }
+  it('Given each kind of non-teacher traffic, Then only the real teacher is left', () => {
+    const out = abandonedCheckoutExcludedUserIds(base)
+    expect([...out].sort()).toEqual(['alias', 'flag', 'gone', 'noclass', 'student'])
+  })
+})

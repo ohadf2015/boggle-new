@@ -4,6 +4,13 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+## 2026-10-24
+
+### [Rage-click root cause found, instrumented not fixed] ru/multiplayer — native WebView offline-retry loop
+- Top rage-click surface tonight (reach=7, score 0.806). Element = **"Повторить"** (Russian for "Retry") with 6 clicks — traced to `native.offline.retry` → `components/native/OfflineFallback.tsx`, rendered by `components/native/NetworkStatusHandler.tsx` when `!isOnline && isNative() && !isOfflineCapable(pathname)`. `$current_url` is `www.lexiclash.live` even for native sessions (Capacitor loads the real site URL in-WebView), so this is NOT a web/native gating bug (Class 5) — it's a real native user with flaky connectivity hitting a retry button whose only action is `window.location.reload()`, with zero feedback on whether the reload actually reached the server.
+- Did NOT fix tonight — a WebView connectivity/reload robustness fix needs device testing, out of a 15-min lane. Instead shipped instrumentation: `app_offline_fallback_shown` (fires when the wall renders) and `app_offline_retry_clicked` (fires on tap), both with `pathname`, in `NetworkStatusHandler.tsx`. Next lane with 3+ days of data can tell whether retries actually recover (new session starts shortly after) or loop (repeated `_shown` events same session).
+- Recommended owner: human/lane-02 once `app_offline_fallback_shown` volume is in — if it clusters on `ru` locale specifically, check whether a CDN/region issue affects `www.lexiclash.live` reachability from Russian ISPs before assuming it's generic flaky mobile data.
+
 ## 2026-08-16
 
 ### [Watch update] `/multiplayer` rage-clicks persist post-fix — source is NOT Quick Play re-entrancy
@@ -2582,3 +2589,10 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 - Found the actual mode-card component (`components/landing/ModeCard.tsx:217-222`) already has unconditional CSS press feedback (`active:translate-x-px active:translate-y-px active:shadow-hard-pressed`), shipped `3dd4f4d908` on 2025-12-21 — **7 months before** the flag's 27-rage-click baseline was even measured. So either (a) the 2026-07-14 rage-clicks came from elsewhere (not this card), or (b) CSS `:active` doesn't reliably fire on mobile tap without a `touchstart` listener (known mobile-Safari quirk) and the press effect is invisible on the devices that are actually rage-clicking.
 - Did NOT wire this flag tonight — wiring a duplicate/conflicting press effect on top of an already-animated card without knowing which of (a)/(b) is true risks shipping a no-op or a double-animation glitch, and this run's rage-click brief items are all reach=2 (too thin to re-diagnose blind).
 - Recommended owner: review-by-eod. Next step: pull current `$rageclick` el_text/el selector breakdown for `/en`+`/` (not just count) to see if hits land on `ModeCard` DOM nodes specifically; if yes, test on a real mobile device whether `:active` fires on tap-down, fix path is a `touchstart`-triggered class toggle, not this flag.
+
+## 2026-10-24
+- [Restore] stale salvage 20261017-010002 (29 files, dropped 2026-10-17)
+  - status: shipped (restored via restore-salvaged-code.sh, 27 merged, 2 skipped-conflict)
+  - why real gate offender found: `useMpPageState.ts` imported `AD_FREE_SURFACE_CLASS` from `lib/admob-routes` which didn't export it at drop time — restoring both files together (same salvage batch) resolves the mismatch since admob-routes.ts now exports it (line 92). eslint clean on all restored code files.
+  - skipped (left untouched, conflicts vs current master): `backend/modules/gameSessionLogger.ts` + its test — need manual merge, not attempted tonight.
+  - recommended owner: review-by-eod

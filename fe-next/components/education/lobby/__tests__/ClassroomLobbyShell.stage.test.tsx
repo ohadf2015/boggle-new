@@ -26,6 +26,19 @@ describe('ClassroomLobbyShell — the launch stage', () => {
     expect(title.textContent?.length).toBeGreaterThan(3);
   });
 
+  it('hands the pinned poster\'s height to the scroller while options are open, keeping it mounted', () => {
+    const { rerender } = render(
+      <ClassroomLobbyShell pinned={<div data-testid="poster" />}>body</ClassroomLobbyShell>
+    );
+    expect(screen.getByTestId('lobby-pinned').className).not.toContain('hidden');
+    rerender(
+      <ClassroomLobbyShell expanded pinned={<div data-testid="poster" />}>body</ClassroomLobbyShell>
+    );
+    expect(screen.getByTestId('poster')).toBeInTheDocument();
+    expect(screen.getByTestId('lobby-pinned').className).toContain('hidden');
+    expect(screen.getByTestId('lobby-scroll').className).toContain('flex-1');
+  });
+
   it('still locks the shell and scrolls exactly one region', () => {
     render(<ClassroomLobbyShell pinned={<div />}>body</ClassroomLobbyShell>);
     expect(screen.getByTestId('classroom-lobby-shell').className).toContain('overflow-hidden');

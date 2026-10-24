@@ -370,8 +370,13 @@ export async function persistClassroomGameScores(
     await releaseIdempotency();
     return [];
   }
+  // Warn, do not info. A finished game that wrote nothing is the GHYRVS
+  // failure (pitfall class 4): the persistence tests pin a warn that names
+  // the game and "no participants" / "0 practice sessions". Teacher-only
+  // practice is the info branch above. This message stays out of Sentry
+  // (logger.ts) so issue 2GY does not reopen; do not drop the warn.
   if (participants.length === 0) {
-    logger.info(
+    logger.warn(
       'CLASSROOM_GAME',
       `Game ${game.gameCode} ended with no participants to record ` +
         `(roster ${game.players?.length ?? 0}, scores ${playerScores?.length ?? 0}) — ` +

@@ -65,6 +65,15 @@ export default function SinglePlayerPageClient(): React.JSX.Element {
     return onFirstEngagement(() => setHydrateGame(true));
   }, []);
 
+  // The shell's "Tap to play" hint sits at z-71, above the z-70 game overlay.
+  // Hide it as soon as the board is mounting so it does not paint over tiles.
+  useEffect(() => {
+    if (!hydrateGame) return;
+    const root = document.documentElement;
+    root.setAttribute('data-sp-engaged', '');
+    return () => root.removeAttribute('data-sp-engaged');
+  }, [hydrateGame]);
+
   return (
     <>
       <SpLcpSrcSwap />

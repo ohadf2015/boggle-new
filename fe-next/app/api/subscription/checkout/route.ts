@@ -8,10 +8,28 @@ import { locales, defaultLocale } from '@/i18n/config';
 import logger from '@/utils/logger';
 import { logSubscriptionEvent } from '@/lib/subscriptions';
 import { withTimeout } from '@/lib/server/routeTimeout';
+import { buildCheckoutTrafficTags } from '@/lib/education/checkoutTrafficTags';
 import { CHECKOUT_STARTED_EVENT, checkoutStartedPayload } from '@/lib/education/abandonedCheckout';
 import { buildProCheckoutStartedEvent, buildProTrialStartedEvent, buildCheckoutStartedEvent, buildProCheckoutFailedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 
 const CHECKOUT_START_RECORD_TIMEOUT_MS = 1500;
+const TEST_FLAG_LOOKUP_TIMEOUT_MS = 800;
+
+/** profiles.is_test_account, or null when unknown. Never throws, never slow. */
+async function profileIsTestAccount(userId: string): Promise<boolean | null> {
+  const admin = createAdminClient();
+  if (!admin) return null;
+  try {
+    const { data } = await withTimeout(
+      Promise.resolve(admin.from('profiles').select('is_test_account').eq('id', userId).maybeSingle()),
+      TEST_FLAG_LOOKUP_TIMEOUT_MS,
+    );
+    const flag = (data as { is_test_account?: boolean | null } | null)?.is_test_account;
+    return typeof flag === 'boolean' ? flag : null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * A second free trial, or a trial on top of Pro, is a paid checkout instead.
@@ -158,12 +176,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Tags let funnels and the abandoned-checkout mail drop QA/probe traffic: the
+    // week of 2026-10-20 every "checkout" was a scripted signed-in probe.
+    let tags: ReturnType<typeof buildCheckoutTrafficTags> | null = null;
+    try {
+      tags = buildCheckoutTrafficTags({
+        trial,
+        email: user.email ?? null,
+        profileIsTest: await profileIsTestAccount(user.id),
+        headers: request.headers,
+      });
+    } catch {
+      tags = null;
+    }
+
     try {
       await withTimeout(
         logSubscriptionEvent({
           userId: user.id,
           eventType: CHECKOUT_STARTED_EVENT,
-          payload: checkoutStartedPayload({ trial, locale }),
+          payload: checkoutStartedPayload({ trial, locale, clientKind: tags?.client_kind }),
         }),
         CHECKOUT_START_RECORD_TIMEOUT_MS,
       );
@@ -176,11 +208,11 @@ export async function POST(request: NextRequest) {
     // fires from the Polar webhook on paid `subscription.active` — not here.
     try {
       if (trial) {
-        captureProFunnelServerEvent(buildProTrialStartedEvent(user.id));
-        captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id));
+        captureProFunnelServerEvent(buildProTrialStartedEvent(user.id, { ...tags }));
+        captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id, { ...tags }));
       } else {
-        captureProFunnelServerEvent(buildProCheckoutStartedEvent(user.id));
-        captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id));
+        captureProFunnelServerEvent(buildProCheckoutStartedEvent(user.id, { ...tags }));
+        captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id, { ...tags }));
       }
 
       // Diagnostic only — never blocks the redirect. A teacher who started

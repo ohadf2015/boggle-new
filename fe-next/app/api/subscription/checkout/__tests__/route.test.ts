@@ -175,7 +175,7 @@ describe('POST /api/subscription/checkout', () => {
     expect(logSubscriptionEvent).toHaveBeenCalledWith({
       userId: 'u1',
       eventType: 'checkout_started',
-      payload: { mode: 'trial', locale: 'he' },
+      payload: { mode: 'trial', locale: 'he', client_kind: 'script' },
     })
     expect(logSubscriptionEvent.mock.calls[0][0].payload).not.toHaveProperty('trial')
   })
