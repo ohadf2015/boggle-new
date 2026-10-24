@@ -4024,6 +4024,7 @@ const sv = {
   },
   "game": {
     "doubleClickToSubmit": "Dubbelklicka på sista bokstaven för att skicka",
+    "boardLocked": "Vänta på GO — brädet är inte igång än",
     "foundByOther": "Hittades av ${player}",
     "combo": "Kombo",
     "comboHint": "Hitta ord snabbt för kombo",
@@ -20139,7 +20140,8 @@ const sv = {
       "letters": "bokstäver",
       "editSettings": "Ändra rundans inställningar",
       "chatHint": "Säg hej till gänget",
-      "chatUnread": "{count} nya"
+      "chatUnread": "{count} nya",
+      "modeOn": "{mode} är valt — tryck Start"
     },
     "round": {
       "getReady": "Gör dig redo",

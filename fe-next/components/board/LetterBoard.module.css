@@ -444,11 +444,40 @@
   80% { transform: translate(3px, -1px); }
 }
 
+.board[data-locked] .tile {
+  cursor: not-allowed;
+}
+
+/* Locked tap: the reason is hidden until the handler clears `hidden`.
+   Sits on the board so the tap has a visible answer in the same frame. */
+.lockedBanner {
+  position: absolute;
+  z-index: 30;
+  left: 8%;
+  right: 8%;
+  bottom: 10%;
+  pointer-events: none;
+  border: 3px solid #0b0b1e;
+  border-radius: 12px;
+  background: #bfff00;
+  color: #0b0b1e;
+  font-weight: 800;
+  font-size: clamp(12px, 3.2cqw, 18px);
+  line-height: 1.2;
+  text-align: center;
+  padding: 8px 10px;
+  box-shadow: 4px 4px 0 #0b0b1e;
+}
+.lockedBanner:not([hidden]) {
+  animation: tile-shake 280ms ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tile,
   .glyph,
   .grid,
-  .tile[data-head]::after {
+  .tile[data-head]::after,
+  .lockedBanner {
     animation: none !important;
     transition: none !important;
   }

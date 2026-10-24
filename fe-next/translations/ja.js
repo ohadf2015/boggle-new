@@ -3686,6 +3686,7 @@ const ja = {
   },
   "game": {
     "doubleClickToSubmit": "最後の文字をダブルクリックで送信",
+    "boardLocked": "GOを待って — ボードはまだ動けません",
     "foundByOther": "${player}が見つけました",
     "combo": "コンボ",
     "comboHint": "素早く単語を見つけるとコンボ",
@@ -20139,7 +20140,8 @@ const ja = {
       "letters": "文字",
       "editSettings": "ラウンド設定を変更",
       "chatHint": "みんなにあいさつしよう",
-      "chatUnread": "新着 {count}件"
+      "chatUnread": "新着 {count}件",
+      "modeOn": "{mode}を選択中 — スタートを押して"
     },
     "round": {
       "getReady": "準備して",

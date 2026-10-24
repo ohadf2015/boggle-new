@@ -3686,6 +3686,7 @@ const he = {
   },
   "game": {
     "doubleClickToSubmit": "לחיצה כפולה על האות האחרונה לשליחה",
+    "boardLocked": "חכו ל-GO — הלוח עדיין לא פעיל",
     "foundByOther": "נמצא על ידי ${player}",
     "combo": "קומבו",
     "comboHint": "מצאו מילים מהר לקומבו",
@@ -20069,7 +20070,8 @@ const he = {
       "letters": "אותיות",
       "editSettings": "עריכת הגדרות הסיבוב",
       "chatHint": "תגידו היי לחבורה",
-      "chatUnread": "{count} חדשות"
+      "chatUnread": "{count} חדשות",
+      "modeOn": "{mode} נבחר — לחצו התחל"
     },
     "round": {
       "getReady": "היכונו",

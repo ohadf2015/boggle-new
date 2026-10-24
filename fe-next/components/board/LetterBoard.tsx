@@ -57,6 +57,8 @@ export interface LetterBoardProps {
   cellLabel?: (row: number, col: number, letter: string) => string;
   gridLabel?: string;
   clickHint?: string;
+  /** Reason shown the instant a tap lands before the board is live. */
+  lockedHint?: string;
   className?: string;
   gridClassName?: string;
   gridStyle?: CSSProperties;
@@ -110,6 +112,7 @@ export default function LetterBoard({
   cellLabel,
   gridLabel,
   clickHint,
+  lockedHint,
   className,
   gridClassName,
   gridStyle,
@@ -127,6 +130,7 @@ export default function LetterBoard({
     autoSubmitIdleMs,
     comboLevel,
     fireRoundActive,
+    lockedHint,
   });
   useBoardKeyboard(containerRef, api, { grid, interactive, language, disableLetterKeyInput, fireRoundActive });
 
@@ -179,6 +183,7 @@ export default function LetterBoard({
       data-len="0"
       data-heat="0"
       data-word-dir={language === 'he' ? 'rtl' : 'ltr'}
+      data-locked={interactive ? undefined : ''}
       className={cn(styles.board, className)}
       // Intentional multi-tap / double-click-submit surface; skip GR rage
       // (same class as canvas / imposketch opt-out). Ghost boards stay measurable.
@@ -193,6 +198,14 @@ export default function LetterBoard({
       {clickHint && interactive && !ghost && (
         <div className={fx.clickHint} aria-hidden="true">{clickHint}</div>
       )}
+      <div
+        data-locked-banner=""
+        data-testid="board-locked-banner"
+        role="status"
+        aria-live="polite"
+        hidden
+        className={styles.lockedBanner}
+      />
       <div
         ref={gridRef}
         dir="ltr"

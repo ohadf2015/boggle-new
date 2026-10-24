@@ -107,3 +107,35 @@ describe('BattleModeCard — Showcase cards (expand selected on click)', () => {
     expect(setSelectedGameMode).toHaveBeenCalledWith('blast');
   });
 });
+
+describe('BattleModeCard — re-tap is never a silent no-op (GR #11743)', () => {
+  const t = (key: string, params?: Record<string, string | number>) =>
+    params?.mode ? `${key}:${params.mode}` : key;
+
+  it('given Classic is already selected, when the tile is clicked, then a visible ack mounts in the same turn', () => {
+    render(<BattleModeCard selectedGameMode="classic" setSelectedGameMode={vi.fn()} t={t} />);
+    const tile = screen.getByTestId('game-mode-classic');
+    expect(screen.queryByTestId('mode-select-ack')).toBeNull();
+    expect(tile.getAttribute('data-ack')).toBeNull();
+
+    fireEvent.click(tile);
+
+    const ack = screen.getByTestId('mode-select-ack');
+    expect(ack.hidden).toBe(false);
+    expect(ack.getAttribute('aria-hidden')).toBeNull();
+    expect(ack.className).not.toMatch(/sr-only/);
+    expect(ack.getAttribute('data-ack')).toBe('1');
+    expect(ack.textContent).toContain('gameModes.classic.name');
+    expect(tile.getAttribute('data-ack')).toBe('1');
+    expect(tile.getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('given a second click on the same tile, then the ack count moves again (no stale no-op)', () => {
+    render(<BattleModeCard selectedGameMode="classic" setSelectedGameMode={vi.fn()} t={t} />);
+    const tile = screen.getByTestId('game-mode-classic');
+    fireEvent.click(tile);
+    fireEvent.click(tile);
+    expect(screen.getByTestId('mode-select-ack').getAttribute('data-ack')).toBe('2');
+    expect(tile.getAttribute('data-ack')).toBe('2');
+  });
+});

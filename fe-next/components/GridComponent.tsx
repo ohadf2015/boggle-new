@@ -224,6 +224,7 @@ const GridComponent = memo<GridComponentProps>(({
           cellLabel={cellLabel}
           gridLabel={t('game.grid.label', 'Letter grid')}
           clickHint={t('game.doubleClickToSubmit', 'Double-click last letter to submit')}
+          lockedHint={t('game.boardLocked', "Wait for GO — this board isn't live yet")}
           gridClassName={cn(ghostCells && GRID_GAP_CLASS, className)}
           gridRef={setGridNode}
         />

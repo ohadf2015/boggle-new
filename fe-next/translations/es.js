@@ -3686,6 +3686,7 @@ const es = {
   },
   "game": {
     "doubleClickToSubmit": "Doble clic en la última letra para enviar",
+    "boardLocked": "Espera al GO — el tablero aún no está activo",
     "foundByOther": "Encontrada por ${player}",
     "combo": "Combo",
     "comboHint": "¡Rápido! Encadena palabras",
@@ -20151,7 +20152,8 @@ const es = {
       "letters": "letras",
       "editSettings": "Editar ajustes de la ronda",
       "chatHint": "Saluda al grupo",
-      "chatUnread": "{count} nuevos"
+      "chatUnread": "{count} nuevos",
+      "modeOn": "{mode} está listo — pulsa Empezar"
     },
     "round": {
       "getReady": "Prepárate",

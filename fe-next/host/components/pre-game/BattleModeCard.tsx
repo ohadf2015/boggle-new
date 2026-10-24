@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { cn } from '../../../lib/utils';
 import { getModeDescription, type GameModeOption } from '@/components/GameModeSelector';
 import { HowToArt, ModeArt } from '@/components/multiplayer/lobby/ModeArt';
@@ -70,7 +70,18 @@ export function BattleModeCard({
   fill = false,
   className,
 }: BattleModeCardProps): React.ReactElement {
-  const handleSelect = useCallback((mode: GameModeOption) => setSelectedGameMode(mode), [setSelectedGameMode]);
+  // Re-tapping the already-selected tile used to be a silent no-op (GR #11743:
+  // LEXIClassic, 6 sessions, no DOM change within 900ms). Every tap bumps `ack`
+  // so the tile and the status line mutate in the same turn, even when the mode
+  // does not change.
+  const [ack, setAck] = useState<{ n: number; mode: GameModeOption } | null>(null);
+  const handleSelect = useCallback((mode: GameModeOption) => {
+    setSelectedGameMode(mode);
+    setAck((prev) => ({ n: (prev?.n ?? 0) + 1, mode }));
+  }, [setSelectedGameMode]);
+  const ackNameKey = ack
+    ? [...MODES, ...IN_WORK_MODES].find((m) => m.mode === ack.mode)?.nameKey
+    : undefined;
 
   const inWork = showInWorkModes
     ? IN_WORK_MODES.filter(({ mode }) => getGameModeRules(mode as GameMode).languages?.includes((language || 'en') as Language) ?? true)
@@ -103,6 +114,7 @@ export function BattleModeCard({
               type="button"
               onClick={() => handleSelect(mode)}
               data-testid={`game-mode-${mode}`}
+              data-ack={ack?.mode === mode ? ack.n : undefined}
               aria-pressed={isActive}
               className={cn(
                 styles.modeTile,
@@ -115,6 +127,7 @@ export function BattleModeCard({
               )}
             >
               <ModeArt
+                key={ack?.mode === mode ? `on-${ack.n}` : mode}
                 mode={mode}
                 className={cn(
                   styles.modeArt,
@@ -148,6 +161,18 @@ export function BattleModeCard({
           </button>
         )}
       </div>
+      {ack && ackNameKey && (
+        <p
+          key={ack.n}
+          data-testid="mode-select-ack"
+          data-ack={ack.n}
+          role="status"
+          aria-live="polite"
+          className={cn(styles.modeAck, 'min-h-5 text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))] leading-snug font-bold text-neo-lime')}
+        >
+          {t('mpUi.lobby.modeOn', { mode: t(ackNameKey) })}
+        </p>
+      )}
       <p className="min-h-5 text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))] leading-snug font-bold text-neo-white/80 line-clamp-2">
         {getModeDescription(selectedGameMode, t)}
       </p>

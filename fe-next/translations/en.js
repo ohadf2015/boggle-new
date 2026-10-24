@@ -3302,6 +3302,7 @@ const en = {
   },
   "game": {
     "doubleClickToSubmit": "Double-click last letter to submit",
+    "boardLocked": "Wait for GO — this board isn't live yet",
     "foundByOther": "Found by ${player}",
     "combo": "Combo",
     "comboHint": "Find words fast to build a combo",
@@ -19198,7 +19199,8 @@ const en = {
       "letters": "letters",
       "editSettings": "Edit round settings",
       "chatHint": "Say hi to the squad",
-      "chatUnread": "{count} new"
+      "chatUnread": "{count} new",
+      "modeOn": "{mode} is on — press Start"
     },
     "round": {
       "getReady": "Get ready",
