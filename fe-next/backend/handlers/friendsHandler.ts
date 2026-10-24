@@ -25,6 +25,11 @@ const RATE_WEIGHTS = {
   GET_PENDING: 1,
 };
 
+/** Escape LIKE/ILIKE wildcards so user input matches literally. */
+function escapeLikePattern(input: string): string {
+  return input.replace(/[\\%_]/g, (c) => `\\${c}`);
+}
+
 /**
  * Register friend management socket event handlers
  */
@@ -104,6 +109,16 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
         createdAt: Date.now(),
         expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days
       };
+
+      if (result.autoAccepted) {
+        // The target had already asked us — both sides are friends now.
+        const acceptedData = { ...requestData, status: 'accepted' as const };
+        broadcastToUser(io, data.targetUserId, 'friends:requestAccepted', acceptedData);
+        notifyFriendAccepted(data.targetUserId, fromProfile.displayName || fromProfile.username, authUserId).catch(() => {});
+        socket.emit('friends:requestAccepted', acceptedData);
+        logger.info('FRIENDS', `Mutual friend request auto-accepted: ${authUserId} <-> ${data.targetUserId}`);
+        return;
+      }
 
       // Notify recipient via Socket.IO (online) + push (offline)
       broadcastToUser(io, data.targetUserId, 'friends:requestReceived', requestData);
@@ -340,6 +355,87 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
     }
   });
 
+  // ==================== Block / Unblock ====================
+  // Server-side (not a direct browser write) so the friendship cache is invalidated
+  // and a former friend's list refreshes immediately.
+  socket.on('friends:block', async (data: { targetUserId: string }) => {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.BLOCK)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    if (!authUserId) {
+      emitError(socket, ErrorCodes.AUTH_REQUIRED);
+      return;
+    }
+
+    if (!data?.targetUserId) {
+      socket.emit('friends:error', { code: 'VALIDATION_FAILED', message: 'Target user ID is required' });
+      return;
+    }
+
+    try {
+      const result = await friendsManager.blockUser(authUserId, data.targetUserId);
+      if (!result.success) {
+        socket.emit('friends:error', {
+          code: result.errorCode || 'SERVER_ERROR',
+          message: 'Failed to block user',
+        });
+        return;
+      }
+
+      socket.emit('friends:blocked', { targetUserId: data.targetUserId, timestamp: Date.now() });
+
+      // Do not reveal the block: a former friend only learns the friendship ended.
+      if (result.wasFriends) {
+        broadcastToUser(io, data.targetUserId, 'friends:friendRemoved', {
+          friendUserId: authUserId,
+          timestamp: Date.now(),
+        });
+      }
+
+      logger.info('FRIENDS', `User ${authUserId} blocked ${data.targetUserId}`);
+    } catch (error) {
+      logger.error('FRIENDS_HANDLER', `Error blocking user: ${(error as Error).message}`);
+      socket.emit('friends:error', { code: 'SERVER_ERROR', message: 'Failed to block user' });
+    }
+  });
+
+  socket.on('friends:unblock', async (data: { targetUserId: string }) => {
+    const authUserId = getAuthUserId(socket);
+    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.BLOCK)) {
+      socket.emit('rateLimited');
+      return;
+    }
+
+    if (!authUserId) {
+      emitError(socket, ErrorCodes.AUTH_REQUIRED);
+      return;
+    }
+
+    if (!data?.targetUserId) {
+      socket.emit('friends:error', { code: 'VALIDATION_FAILED', message: 'Target user ID is required' });
+      return;
+    }
+
+    try {
+      const result = await friendsManager.unblockUser(authUserId, data.targetUserId);
+      if (!result.success) {
+        socket.emit('friends:error', {
+          code: result.errorCode || 'SERVER_ERROR',
+          message: 'Failed to unblock user',
+        });
+        return;
+      }
+
+      socket.emit('friends:unblocked', { targetUserId: data.targetUserId, timestamp: Date.now() });
+    } catch (error) {
+      logger.error('FRIENDS_HANDLER', `Error unblocking user: ${(error as Error).message}`);
+      socket.emit('friends:error', { code: 'SERVER_ERROR', message: 'Failed to unblock user' });
+    }
+  });
+
   // ==================== Search Users ====================
   socket.on('friends:searchUsers', async (data: { query: string; limit?: number }) => {
     const authUserId = getAuthUserId(socket);
@@ -383,7 +479,7 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
       const { data: profiles } = await supabase
         .from('profiles')
         .select('id, username, display_name, avatar_emoji, avatar_color, avatar_image')
-        .ilike('username', `%${data.query}%`)
+        .ilike('username', `%${escapeLikePattern(data.query)}%`)
         .neq('id', authUserId) // Exclude self
         .limit(limit);
 
@@ -410,14 +506,20 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
       type FriendshipStatus = { isFriend: boolean; isPending: boolean };
       const statusMap = new Map<string, FriendshipStatus>();
 
+      const blockedIds = new Set<string>();
       for (const row of friendshipRows || []) {
         const otherId = row.user_id === authUserId ? row.friend_id : row.user_id;
+        if (row.status === 'blocked') {
+          // Either direction: never surface a blocker to the blocked user, or vice versa.
+          blockedIds.add(otherId);
+          continue;
+        }
         const isFriend = row.status === 'accepted';
         const isPending = row.status === 'pending';
         statusMap.set(otherId, { isFriend, isPending });
       }
 
-      const users = profiles.map((profile) => {
+      const users = profiles.filter((profile) => !blockedIds.has(profile.id)).map((profile) => {
         const status = statusMap.get(profile.id);
         return {
           userId: profile.id,

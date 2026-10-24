@@ -17,18 +17,31 @@ import {
 } from './friendsTypes';
 
 /**
+ * The query is spliced into a PostgREST `.or()` filter string: `,` `(` `)` `"` `\`
+ * would end or open clauses, and `%` / `_` are LIKE wildcards. Strip the former,
+ * escape the latter.
+ */
+function sanitizeSearchQuery(raw: string): string {
+  return raw
+    .replace(/[,()"\\]/g, '')
+    .trim()
+    .replace(/[%_]/g, (c) => `\\${c}`);
+}
+
+/**
  * Search for users to add as friends
  */
 export async function searchUsers(query: string, limit: number = 10): Promise<Friend[]> {
   const supabase = await loadSupabaseClient();
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user || query.length < 2) return [];
+  const term = sanitizeSearchQuery(query);
+  if (!user || term.replace(/\\/g, '').length < 2) return [];
 
   const { data: profiles, error } = await supabase
     .from(PUBLIC_PROFILES_TABLE)
     .select(PUBLIC_PROFILE_COLUMNS)
-    .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
+    .or(`username.ilike.%${term}%,display_name.ilike.%${term}%`)
     .neq('id', user.id)
     .limit(limit);
 
@@ -53,7 +66,10 @@ export async function searchUsers(query: string, limit: number = 10): Promise<Fr
     existingMap.set(otherId, e.status);
   });
 
-  return (profiles as ProfileRow[]).map((p: ProfileRow) => ({
+  // A block in either direction hides the pair from each other's search.
+  return (profiles as ProfileRow[])
+    .filter((p: ProfileRow) => existingMap.get(p.id) !== 'blocked')
+    .map((p: ProfileRow) => ({
     id: p.id,
     odUserId: p.id,
     username: p.username,
