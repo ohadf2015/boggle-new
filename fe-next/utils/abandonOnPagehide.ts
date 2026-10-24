@@ -32,6 +32,13 @@ interface ActiveGame {
 let active: ActiveGame | null = null;
 let alreadyEmitted = false;
 let pagehideFinalizer: (() => void) | null = null;
+/**
+ * Words found before `trackGameStart` (deferred afterLoadIdle + 1500ms) used
+ * to vanish: `updateActiveGameExtras` no-op'd while `active` was null, and
+ * the effect does not re-run if the count is unchanged after start. The
+ * abandon then reported words_found: 0 for a round that already had words.
+ */
+let pendingExtras: AbandonExtras | null = null;
 
 /**
  * Lets a mode settle its own end on pagehide before the generic abandon
@@ -59,6 +66,8 @@ function currentLandingPath(): string | undefined {
 }
 
 export function markGameActive(mode: string, extras: AbandonExtras = {}): void {
+  const queued = pendingExtras;
+  pendingExtras = null;
   active = {
     mode,
     startedAt: Date.now(),
@@ -67,18 +76,24 @@ export function markGameActive(mode: string, extras: AbandonExtras = {}): void {
       sp_mode: extras.sp_mode,
       landing_path: extras.landing_path ?? currentLandingPath(),
       ...(extras.coach_step ? { coach_step: extras.coach_step } : {}),
+      // Queued wins over the start payload's words_found: 0.
+      ...(queued ?? {}),
     },
   };
   alreadyEmitted = false;
 }
 
 export function updateActiveGameExtras(patch: AbandonExtras): void {
-  if (!active) return;
+  if (!active) {
+    pendingExtras = { ...(pendingExtras ?? {}), ...patch };
+    return;
+  }
   active.extras = { ...active.extras, ...patch };
 }
 
 export function markGameInactive(): void {
   active = null;
+  pendingExtras = null;
 }
 
 /** Whether a game is currently in progress (set by trackGameStart/trackGameEnd). */
@@ -166,4 +181,5 @@ export function __resetAbandonStateForTests(): void {
   active = null;
   alreadyEmitted = false;
   pagehideFinalizer = null;
+  pendingExtras = null;
 }

@@ -79,6 +79,7 @@ vi.mock('@/utils/growthTracking', () => ({
   trackDeadTime: vi.fn(),
   trackGameStart: vi.fn(),
   trackGrowthEvent: vi.fn(),
+  markFirstGameActivation: vi.fn(),
 }));
 vi.mock('@/utils/posthogEngagement', () => ({
   createFirstMinuteSurvivalTimer: () => ({ start: vi.fn(), cancel: vi.fn() }),

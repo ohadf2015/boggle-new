@@ -12,6 +12,7 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGameStart: vi.fn(),
   trackGameEnd: vi.fn(),
   trackDeadTime: vi.fn(),
+  markFirstGameActivation: vi.fn(),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
