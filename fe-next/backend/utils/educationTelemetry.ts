@@ -186,6 +186,13 @@ const GROWTH_TWIN_EVENTS: ReadonlySet<string> = new Set([
   // client telemetry mirror. Same privacy rule: classroom_id only.
   'student_join_started',
   'student_join_completed',
+  // Teacher activation funnel — the first_classroom step is emitted by
+  // app/api/education/classroom/create through this chokepoint, so its
+  // growth:* twin is guaranteed to ride with the bare name (the onboarding /
+  // first_assignment / completed steps mirror client-side via
+  // trackGrowthEvent instead).
+  'teacher_activation_funnel_step',
+  'teacher_activation_funnel_completed',
 ]);
 
 /**

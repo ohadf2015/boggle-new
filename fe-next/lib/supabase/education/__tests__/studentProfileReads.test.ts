@@ -67,6 +67,10 @@ vi.mock('@/lib/supabase', () => ({
 }));
 
 vi.mock('@/utils/logger', () => ({ default: { error: vi.fn(), warn: vi.fn(), info: vi.fn() } }));
+vi.mock('@/lib/education/teacherActivationFunnel', () => ({
+  captureTeacherActivationFunnelStep: vi.fn(),
+  captureTeacherActivationFunnelCompleted: vi.fn(),
+}));
 
 import { getClassroomStudents } from '../classrooms';
 import { getClassroomLeaderboard, getFullClassroomLeaderboard } from '../leaderboard';

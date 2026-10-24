@@ -136,7 +136,13 @@ export function useAssignments(classroomId: string | null): UseAssignmentsReturn
       }));
 
       try {
-        const { data: newAssignment, error, alreadyAssigned } = await createAssignmentAPI(data);
+        const { data: newAssignment, error, alreadyAssigned } = await createAssignmentAPI({
+          ...data,
+          // Activation-funnel slices for the first_assignment step — the same
+          // reads assignment_created stamps, so the two events always agree.
+          locale: language,
+          plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
+        });
 
         if (alreadyAssigned) {
           // Same lesson, same class: the existing assignment was updated with

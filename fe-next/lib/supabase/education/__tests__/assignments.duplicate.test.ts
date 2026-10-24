@@ -20,6 +20,12 @@ vi.mock('@/utils/logger', () => ({
   default: { error: vi.fn(), info: vi.fn(), warn: vi.fn(), debug: vi.fn() },
 }));
 vi.mock('@/lib/education/lessonPlayStat', () => ({ recordLessonPlays: vi.fn() }));
+// createAssignment now imports the activation funnel. Mock it so this file does
+// not load growthTracking, and so a count-query miss cannot emit for real.
+vi.mock('@/lib/education/teacherActivationFunnel', () => ({
+  captureTeacherActivationFunnelStep: vi.fn(),
+  captureTeacherActivationFunnelCompleted: vi.fn(),
+}));
 
 const DUPLICATE = {
   code: '23505',
@@ -40,7 +46,16 @@ function mockTable(existing: unknown, updateError: unknown = null) {
     maybeSingle,
   };
   const update = vi.fn().mockReturnValue(filter);
-  (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({ insert, update, select: vi.fn(() => filter) });
+  // The activation-funnel gate counts with select('id', { count }). That chain
+  // must not share `eqs` — the reassign assertion pins those pairs exactly.
+  const select = vi.fn((...args: unknown[]) => {
+    const opts = args[1] as { count?: string } | undefined;
+    if (opts?.count) {
+      return { eq: vi.fn(async () => ({ count: 3, error: null })) };
+    }
+    return filter;
+  });
+  (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({ insert, update, select });
   return { insert, update, eqs };
 }
 
