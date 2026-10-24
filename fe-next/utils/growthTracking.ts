@@ -314,6 +314,16 @@ export type GrowthEvent =
   // double-count them in PostHog. Privacy: classroom_id only, never the code.
   | 'student_join_started'
   | 'student_join_completed'
+  // Teacher ACTIVATION funnel — mirrored from lib/education/teacherActivationFunnel.ts
+  // (client steps: posthog.capture of the bare name + this mirror, same as
+  // captureActivation) and, for the first_classroom step, from the classroom
+  // create route via captureEduServerEvents' growth:* twin chokepoint. Lets
+  // Growth Radar run_funnel measure onboarding → first_classroom →
+  // first_assignment → completed before the Teacher Pro ask. NOT in
+  // CANONICAL_DUAL_EMIT: the bare names are captured at the emitters, a
+  // dual-emit would double-count them in PostHog.
+  | 'teacher_activation_funnel_step'
+  | 'teacher_activation_funnel_completed'
   // ESL winner-page depth (t_25b9ddb1). Demo start + CEFR list pick on
   // /education/esl-word-games. Props: { cefr: 'A1'|'A2'|'B1', page }.
   | 'edu_page_play_demo_started'

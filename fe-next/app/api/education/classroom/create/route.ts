@@ -6,6 +6,10 @@ import logger from '@/utils/logger';
 import { canCreateClass } from '@/lib/subscriptions';
 import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
 import { buildClassroomCreatedEvent, isQaEmail } from '@/backend/utils/educationRoundTelemetry';
+import {
+  buildTeacherActivationFunnelStepEvent,
+  resolveTeacherActivationPlan,
+} from '@/lib/education/teacherActivationFunnelServer';
 import { EDUCATION_LANGUAGES } from '@/lib/supabase/education/types';
 
 const createClassroomSchema = z.object({
@@ -66,6 +70,23 @@ export async function POST(request: NextRequest) {
 
     // Create classroom in Supabase
     const supabase = await createClient();
+
+    // Once-only funnel gate for the first_classroom step, counted BEFORE the
+    // insert. A read failure (null) skips only the funnel event — the insert,
+    // the cap check and edu_classroom_created are all untouched.
+    let classroomsBeforeInsert: number | null = null;
+    try {
+      const { count, error: countError } = await supabase
+        .from('classrooms')
+        .select('id', { count: 'exact', head: true })
+        .eq('teacher_id', user.id);
+      if (!countError && typeof count === 'number') {
+        classroomsBeforeInsert = count;
+      }
+    } catch {
+      /* funnel gate unreadable — insert proceeds, step is skipped */
+    }
+
     const { data: classroom, error: createError } = await supabase
       .from('classrooms')
       .insert({
@@ -92,6 +113,20 @@ export async function POST(request: NextRequest) {
         isTestAccount: isQaEmail(user.email),
       }),
     ]);
+
+    // First classroom ever → activation funnel step 2. Completed is NOT
+    // emitted here; it fires client-side on the first assignment.
+    if (classroomsBeforeInsert === 0) {
+      captureEduServerEvents([
+        buildTeacherActivationFunnelStepEvent({
+          teacherId: user.id,
+          step: 'first_classroom',
+          locale: language,
+          plan: await resolveTeacherActivationPlan(user.id),
+          isTestAccount: isQaEmail(user.email),
+        }),
+      ]);
+    }
 
     return NextResponse.json(
       {

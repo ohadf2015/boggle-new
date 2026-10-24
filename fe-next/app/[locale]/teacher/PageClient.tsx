@@ -24,6 +24,7 @@ import {
   captureTeacherOnboardingViewedOnce,
   teacherFunnelPlan,
 } from '@/lib/education/teacherOnboardingFunnel';
+import { captureTeacherActivationOnboardingOnce } from '@/lib/education/teacherActivationFunnel';
 
 // Access is settled by <TeacherGate> above: it owns the loading state and the
 // redirect for anyone without teacher access. This component previously
@@ -31,7 +32,7 @@ import {
 // two redirects, and a teacher could satisfy one while the other bounced them.
 function TeacherDashboardInner() {
   const { language } = useLanguage();
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { trial } = useTeacherAccess();
   const { hasPro, loading: proLoading, status, source, trialUsed, trialExpires, periodEnd } = useTeacherPro();
   const polarTrial = polarTrialUx({
@@ -108,14 +109,17 @@ function TeacherDashboardInner() {
     banner !== 'offerTrial';
 
   // First-view funnel step. Waits for the entitlement read so the plan stamped
-  // on the event is the real one, then fires at most once per browser.
+  // on the event is the real one, then fires at most once per browser. The
+  // activation funnel's onboarding step fires alongside it, once per teacher id.
   useEffect(() => {
     if (proLoading) return;
-    captureTeacherOnboardingViewedOnce({
+    const funnelProps = {
       locale: language,
       plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
-    });
-  }, [proLoading, hasPro, status, language]);
+    };
+    captureTeacherOnboardingViewedOnce(funnelProps);
+    captureTeacherActivationOnboardingOnce(user?.id, funnelProps);
+  }, [proLoading, hasPro, status, language, user?.id]);
 
   useEffect(() => {
     if (banner === 'pro' || banner === 'reactivate' || banner === 'trialing' || banner === 'offerTrial') {

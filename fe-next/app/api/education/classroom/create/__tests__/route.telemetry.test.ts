@@ -15,6 +15,7 @@ vi.mock('@/lib/auth/getAuthedUser', () => ({
 }));
 vi.mock('@/lib/subscriptions', () => ({
   canCreateClass: vi.fn(async () => ({ allowed: true, currentCount: 0, limit: 2 })),
+  checkTeacherSubscription: vi.fn(async () => ({ has_pro: false, status: 'active' })),
 }));
 
 import { POST } from '../route';
@@ -37,7 +38,12 @@ describe('POST /api/education/classroom/create — edu_classroom_created', () =>
   });
 
   it('Given a created classroom, When POSTed, Then exactly one event fires for the teacher with the classroom id', async () => {
-    (createClient as any).mockResolvedValue({ from: vi.fn(() => ({ insert: insertOk })) });
+    (createClient as any).mockResolvedValue({
+      from: vi.fn(() => ({
+        insert: insertOk,
+        select: () => ({ eq: async () => ({ count: 2, error: null }) }),
+      })),
+    });
 
     const res = await POST(req({ name: 'Class A', language: 'en' }));
 
@@ -48,7 +54,12 @@ describe('POST /api/education/classroom/create — edu_classroom_created', () =>
   });
 
   it('Given the insert fails, When POSTed, Then no classroom event fires', async () => {
-    (createClient as any).mockResolvedValue({ from: vi.fn(() => ({ insert: insertFails })) });
+    (createClient as any).mockResolvedValue({
+      from: vi.fn(() => ({
+        insert: insertFails,
+        select: () => ({ eq: async () => ({ count: 0, error: null }) }),
+      })),
+    });
 
     const res = await POST(req({ name: 'Class A', language: 'en' }));
 

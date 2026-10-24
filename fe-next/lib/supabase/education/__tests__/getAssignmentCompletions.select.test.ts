@@ -32,6 +32,10 @@ vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: { error: vi.fn(), info: vi.fn(), warn: vi.fn(), debug: vi.fn() },
 }));
+vi.mock('@/lib/education/teacherActivationFunnel', () => ({
+  captureTeacherActivationFunnelStep: vi.fn(),
+  captureTeacherActivationFunnelCompleted: vi.fn(),
+}));
 
 import { getAssignmentCompletions } from '../assignments';
 

@@ -18,6 +18,7 @@ vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('@/lib/auth/getAuthedUser', () => ({ getAuthedUser: vi.fn(async () => ({ id: 'teacher-1' })) }));
 vi.mock('@/lib/subscriptions', () => ({
   canCreateClass: vi.fn(async () => ({ allowed: true, currentCount: 0, limit: 2 })),
+  checkTeacherSubscription: vi.fn(async () => ({ has_pro: false, status: 'active' })),
 }));
 
 import { POST } from '../route';
@@ -31,7 +32,12 @@ const req = (body: unknown) =>
 describe('POST /api/education/classroom/create — language coverage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (createClient as any).mockResolvedValue({ from: vi.fn(() => ({ insert })) });
+    (createClient as any).mockResolvedValue({
+      from: vi.fn(() => ({
+        insert,
+        select: () => ({ eq: async () => ({ count: 2, error: null }) }),
+      })),
+    });
   });
 
   it.each(['en', 'he', 'sv', 'ja', 'es', 'ru'])('accepts a %s classroom', async (language) => {

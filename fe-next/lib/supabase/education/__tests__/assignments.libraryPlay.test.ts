@@ -3,13 +3,23 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 let insertResult: { data: unknown; error: { message: string } | null } = { data: { id: 'a1' }, error: null };
 vi.mock('@/lib/supabase', () => ({
   supabase: {
-    from: () => ({ insert: () => ({ select: () => ({ single: async () => insertResult }) }) }),
+    from: () => ({
+      insert: () => ({ select: () => ({ single: async () => insertResult }) }),
+      // Activation-funnel pre-insert count. A missing select used to throw
+      // inside the gate; keep the chain explicit so the insert path is the
+      // only thing this file asserts.
+      select: () => ({ eq: async () => ({ count: 3, error: null }) }),
+    }),
   },
 }));
 vi.mock('@/utils/logger', () => ({ default: { error: vi.fn(), info: vi.fn(), warn: vi.fn(), debug: vi.fn() } }));
 const recordLessonPlays = vi.fn();
 vi.mock('@/lib/education/lessonPlayStat', () => ({
   recordLessonPlays: (...a: unknown[]) => recordLessonPlays(...a),
+}));
+vi.mock('@/lib/education/teacherActivationFunnel', () => ({
+  captureTeacherActivationFunnelStep: vi.fn(),
+  captureTeacherActivationFunnelCompleted: vi.fn(),
 }));
 
 import { assignLesson, createAssignment } from '../assignments';

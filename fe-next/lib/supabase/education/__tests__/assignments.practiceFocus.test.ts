@@ -14,12 +14,17 @@ vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: { error: vi.fn(), info: vi.fn(), warn: vi.fn(), debug: vi.fn() },
 }));
+vi.mock('@/lib/education/teacherActivationFunnel', () => ({
+  captureTeacherActivationFunnelStep: vi.fn(),
+  captureTeacherActivationFunnelCompleted: vi.fn(),
+}));
 
 function insertChain() {
   const single = vi.fn().mockResolvedValue({ data: { id: 'a1' }, error: null });
   const select = vi.fn().mockReturnValue({ single });
   const insert = vi.fn().mockReturnValue({ select });
-  (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({ insert });
+  const countSelect = vi.fn(() => ({ eq: vi.fn(async () => ({ count: 3, error: null })) }));
+  (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({ insert, select: countSelect });
   return insert;
 }
 

@@ -4,6 +4,12 @@ import type { LessonAssignment, TeacherAssignment } from './types';
 import { isVocabFocus } from '@/lib/education/vocabFocus';
 import { recordLessonPlays } from '@/lib/education/lessonPlayStat';
 import { WORDCRAFT_FOCUS, isAssignmentFocusValue, type AssignmentFocusValue } from '@/lib/education/wordcraftAssignment';
+import {
+  captureTeacherActivationFunnelCompleted,
+  captureTeacherActivationFunnelStep,
+  type TeacherActivationFunnelProps,
+} from '@/lib/education/teacherActivationFunnel';
+import type { TeacherPlan } from '@/lib/education/teacherOnboardingFunnel';
 
 /**
  * Assign a lesson to a classroom (legacy - kept for backward compatibility)
@@ -108,6 +114,9 @@ export async function createAssignment(data: {
    * 'wordcraft' = play Word Craft.
    */
   practice_focus?: AssignmentFocusValue | null;
+  /** Activation-funnel slices stamped on the first_assignment step. Unset when the caller has no entitlement read. */
+  locale?: string;
+  plan?: TeacherPlan;
 }): Promise<{
   data: TeacherAssignment | null;
   error: { message: string; code?: string } | null;
@@ -117,6 +126,11 @@ export async function createAssignment(data: {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 
   try {
+    // Once-only funnel gate, counted BEFORE the insert so the first assignment
+    // is detected exactly once. A read failure (null) only skips the funnel
+    // events — the insert below runs exactly as it always has.
+    const assignmentsBeforeInsert = await countTeacherLessonAssignments(data.teacher_id);
+
     // Only write the column when a real focus (or 'wordcraft') was chosen, so the
     // legacy insert shape is untouched: 'any'/unset stays NULL = student picks.
     const focus = isVocabFocus(data.practice_focus) || data.practice_focus === WORDCRAFT_FOCUS
@@ -148,6 +162,13 @@ export async function createAssignment(data: {
     }
 
     void recordLessonPlays([data.lesson_id]);
+
+    if (assignmentsBeforeInsert === 0) {
+      // Awaited so the completed event (which needs the classroom count) has
+      // fired before the caller continues. The helper swallows its own errors.
+      await emitFirstAssignmentFunnel(data.teacher_id, { locale: data.locale, plan: data.plan });
+    }
+
     return { data: assignment, error: null };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
@@ -157,6 +178,63 @@ export async function createAssignment(data: {
 }
 
 const UNIQUE_VIOLATION = '23505';
+
+/**
+ * Once-only gate for the activation funnel, counted in the DB — never in
+ * localStorage: a storage flag cannot survive a second device or an incognito
+ * window, and a double-fired "first" breaks the funnel's math. Null when the
+ * count cannot be read; analytics must never block or alter the insert.
+ */
+async function countTeacherLessonAssignments(teacherId: string): Promise<number | null> {
+  if (!supabase) return null;
+  try {
+    const { count, error } = await supabase
+      .from('lesson_assignments')
+      .select('id', { count: 'exact', head: true })
+      .eq('teacher_id', teacherId);
+    if (error) return null;
+    return typeof count === 'number' ? count : null;
+  } catch {
+    return null;
+  }
+}
+
+async function countTeacherClassrooms(teacherId: string): Promise<number | null> {
+  if (!supabase) return null;
+  try {
+    const { count, error } = await supabase
+      .from('classrooms')
+      .select('id', { count: 'exact', head: true })
+      .eq('teacher_id', teacherId);
+    if (error) return null;
+    return typeof count === 'number' ? count : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Emit the first_assignment funnel step after the teacher's first-ever
+ * assignment insert, plus the funnel's completed event when the teacher
+ * already owns a classroom (the funnel's terminal state). Reached only from
+ * the insert-success path — a duplicate re-assign (UNIQUE_VIOLATION) returns
+ * earlier and never fires these. Never throws and never touches the result
+ * the caller gets back.
+ */
+async function emitFirstAssignmentFunnel(
+  teacherId: string,
+  funnel: TeacherActivationFunnelProps
+): Promise<void> {
+  try {
+    captureTeacherActivationFunnelStep('first_assignment', funnel);
+    const classroomCount = await countTeacherClassrooms(teacherId);
+    if (classroomCount !== null && classroomCount >= 1) {
+      captureTeacherActivationFunnelCompleted(funnel);
+    }
+  } catch {
+    /* analytics must never break the assignment path */
+  }
+}
 
 /**
  * The settings a re-assign carries over onto the existing assignment. A field
