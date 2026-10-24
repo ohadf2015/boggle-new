@@ -84,9 +84,10 @@ describe('/api/cron/teacher-abandoned-checkout', () => {
         error: null,
       },
       profiles: {
-        data: [{ id: 'u1', is_test_account: false, daily_email_subscribed: null, email_unsubscribe_token: TOKEN }],
+        data: [{ id: 'u1', is_test_account: false, user_role: 'teacher', daily_email_subscribed: null, email_unsubscribe_token: TOKEN }],
         error: null,
       },
+      classrooms: { data: [{ teacher_id: 'u1' }], error: null },
     };
   });
 
@@ -159,7 +160,27 @@ describe('/api/cron/teacher-abandoned-checkout', () => {
     expect(body).toMatchObject({ sent: 0, unsubscribed: 1 });
   });
 
-  it.each(['checkout_started', 'subscription_events', 'subscriptions', 'teacher_access_requests', 'profiles'])(
+  it.each([
+    ['a +lexitest Gmail alias', () => { h.tables.teacher_access_requests.data[0].email = 'ohad+lexitest1020@gmail.com'; }],
+    ['a +qa alias', () => { h.tables.teacher_access_requests.data[0].email = 'ada+qa@school.edu'; }],
+    ['an @lexiclash.test address', () => { h.tables.teacher_access_requests.data[0].email = 'qa1@lexiclash.test'; }],
+    ['a student role', () => { h.tables.profiles.data[0].user_role = 'student'; }],
+    ['a teacher with no classroom', () => { h.tables.classrooms = { data: [], error: null }; }],
+    ['a checkout a script created', () => { h.tables.checkout_started.data[0].payload.client_kind = 'script'; }],
+  ])('does not email %s', async (_label, arrange) => {
+    arrange();
+    const body = await (await POST(makeRequest())).json();
+    expect(body.sent).toBe(0);
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
+    expect(h.inserts).toHaveLength(0);
+  });
+
+  it('still emails a real teacher whose checkout came from a browser', async () => {
+    h.tables.checkout_started.data[0].payload.client_kind = 'browser';
+    expect((await (await POST(makeRequest())).json()).sent).toBe(1);
+  });
+
+  it.each(['checkout_started', 'subscription_events', 'subscriptions', 'teacher_access_requests', 'profiles', 'classrooms'])(
     'sends nothing when the %s lookup fails',
     async (table) => {
       h.tables[table] = { data: null, error: { message: 'boom' } };

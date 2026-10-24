@@ -1,6 +1,8 @@
 // One "finish your checkout" email for a teacher who opened Polar checkout and never paid.
 // Pure so the window, dedupe and exclusions are testable without a DB or an email provider.
 
+import { testEmailReason } from './checkoutTrafficTags';
+
 const HOUR_MS = 60 * 60 * 1000;
 const SITE = 'https://www.lexiclash.live';
 
@@ -13,8 +15,49 @@ export const ABANDONED_MAX_HOURS = 24;
 
 export type CheckoutMode = 'trial' | 'paid';
 
-export function checkoutStartedPayload({ trial, locale }: { trial: boolean; locale: string }) {
-  return { mode: (trial ? 'trial' : 'paid') as CheckoutMode, locale };
+/**
+ * `client_kind` is 'browser' | 'script' from checkoutTrafficTags (Fetch Metadata).
+ * Rows written before it existed have none and are treated as unknown, not script.
+ */
+export function checkoutStartedPayload({
+  trial,
+  locale,
+  clientKind,
+}: {
+  trial: boolean;
+  locale: string;
+  clientKind?: 'browser' | 'script';
+}) {
+  return {
+    mode: (trial ? 'trial' : 'paid') as CheckoutMode,
+    locale,
+    ...(clientKind ? { client_kind: clientKind } : {}),
+  };
+}
+
+/**
+ * Who must never get the abandoned-checkout email, beyond Pro and already-sent:
+ * the profile test flag, a QA-looking address (same rule as checkoutTrafficTags),
+ * a non-teacher role, or a teacher with no classroom. The week of 2026-10-20 every
+ * checkout was a scripted probe from an account like that.
+ */
+export function abandonedCheckoutExcludedUserIds(args: {
+  profiles: ReadonlyArray<{ id: string; is_test_account?: boolean | null; user_role?: string | null }>;
+  emailsByUser: ReadonlyMap<string, string>;
+  classroomTeacherIds: ReadonlySet<string>;
+  userIds: readonly string[];
+}): Set<string> {
+  const out = new Set<string>();
+  const profileById = new Map(args.profiles.map((p) => [p.id, p]));
+  for (const id of args.userIds) {
+    const p = profileById.get(id);
+    if (!p) { out.add(id); continue; }
+    if (p.is_test_account) { out.add(id); continue; }
+    if (p.user_role !== 'teacher') { out.add(id); continue; }
+    if (testEmailReason(args.emailsByUser.get(id))) { out.add(id); continue; }
+    if (!args.classroomTeacherIds.has(id)) out.add(id);
+  }
+  return out;
 }
 
 export function abandonedCheckoutUpgradeUrl(locale: string): string {
@@ -50,7 +93,7 @@ export interface AbandonedCheckoutDue {
 
 export interface AbandonedCheckoutPlan {
   due: AbandonedCheckoutDue[];
-  skipped: { tooRecent: number; stale: number; completed: number; alreadySent: number; pro: number; test: number };
+  skipped: { tooRecent: number; stale: number; completed: number; alreadySent: number; pro: number; test: number; script: number };
 }
 
 export function planAbandonedCheckouts(args: {
@@ -60,7 +103,7 @@ export function planAbandonedCheckouts(args: {
   testUserIds: ReadonlySet<string>;
   nowMs: number;
 }): AbandonedCheckoutPlan {
-  const skipped = { tooRecent: 0, stale: 0, completed: 0, alreadySent: 0, pro: 0, test: 0 };
+  const skipped = { tooRecent: 0, stale: 0, completed: 0, alreadySent: 0, pro: 0, test: 0, script: 0 };
   const latest = new Map<string, CheckoutStartedRow>();
   for (const row of args.started) {
     if (!row.user_id || Number.isNaN(Date.parse(row.created_at))) continue;
@@ -90,6 +133,11 @@ export function planAbandonedCheckouts(args: {
     }
     if (args.testUserIds.has(userId)) {
       skipped.test++;
+      continue;
+    }
+    const kind = (row.payload && typeof row.payload === 'object' ? (row.payload as { client_kind?: unknown }).client_kind : null);
+    if (kind === 'script') {
+      skipped.script++;
       continue;
     }
     if (args.proUserIds.has(userId)) {

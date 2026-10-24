@@ -176,12 +176,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Tags let funnels and the abandoned-checkout mail drop QA/probe traffic: the
+    // week of 2026-10-20 every "checkout" was a scripted signed-in probe.
+    let tags: ReturnType<typeof buildCheckoutTrafficTags> | null = null;
+    try {
+      tags = buildCheckoutTrafficTags({
+        trial,
+        email: user.email ?? null,
+        profileIsTest: await profileIsTestAccount(user.id),
+        headers: request.headers,
+      });
+    } catch {
+      tags = null;
+    }
+
     try {
       await withTimeout(
         logSubscriptionEvent({
           userId: user.id,
           eventType: CHECKOUT_STARTED_EVENT,
-          payload: checkoutStartedPayload({ trial, locale }),
+          payload: checkoutStartedPayload({ trial, locale, clientKind: tags?.client_kind }),
         }),
         CHECKOUT_START_RECORD_TIMEOUT_MS,
       );
@@ -193,14 +207,6 @@ export async function POST(request: NextRequest) {
     // URL creation is `checkout_started` (plus the edu_* names). `checkout_complete`
     // fires from the Polar webhook on paid `subscription.active` — not here.
     try {
-      // Tags let funnels drop QA/probe traffic: the week of 2026-10-20 every
-      // "checkout" was a scripted signed-in probe. See checkoutTrafficTags.ts.
-      const tags = buildCheckoutTrafficTags({
-        trial,
-        email: user.email ?? null,
-        profileIsTest: await profileIsTestAccount(user.id),
-        headers: request.headers,
-      });
       if (trial) {
         captureProFunnelServerEvent(buildProTrialStartedEvent(user.id, { ...tags }));
         captureProFunnelServerEvent(buildCheckoutStartedEvent(user.id, { ...tags }));
