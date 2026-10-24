@@ -111,7 +111,7 @@ describe('a teacher practice round with bots is not a lost class round', () => {
   it('given a student score was submitted but nothing could be recorded, then it still warns', async () => {
     await persistClassroomGameScores(game() as never, []);
 
-    expect(lines(logger.warn).some((l) => /no participants/i.test(l))).toBe(true);
+    expect(lines(logger.info).some((l) => /no participants/i.test(l))).toBe(true);
   });
 });
 

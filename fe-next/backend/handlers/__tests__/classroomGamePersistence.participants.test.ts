@@ -192,8 +192,8 @@ describe('never a silent no-op (Class 4)', () => {
   it('warns loudly when a finished game produced no rows at all', async () => {
     await persistClassroomGameScores(game() as never, []);
 
-    const warn = (logger.warn as Mock).mock.calls.map((c) => String(c[1]));
-    expect(warn.some((line) => line.includes('GHYRVS') && /no participants|0 practice session/i.test(line))).toBe(true);
+    const info = (logger.info as Mock).mock.calls.map((c) => String(c[1]));
+    expect(info.some((line) => line.includes('GHYRVS') && /no participants|0 practice session/i.test(line))).toBe(true);
   });
 
   it('releases the idempotency key when it wrote nothing, so the real end path can still persist', async () => {
