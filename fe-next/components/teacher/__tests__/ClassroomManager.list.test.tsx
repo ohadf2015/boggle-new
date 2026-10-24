@@ -99,6 +99,12 @@ describe('ClassroomManager — class list', () => {
       expect(within(row).getByRole('link', { name: /teacher\.classroom\.create/ })).toHaveAttribute('href', NEW_CLASS_HREF);
     });
 
+    it('Then each card sits in its own scroll-reveal wrapper, apart from the framer entrance', () => {
+      render(<ClassroomManager />);
+      const wrapper = screen.getByTestId('classroom-card').parentElement;
+      expect(wrapper).toHaveAttribute('data-tm');
+    });
+
     it('Then each card carries name, roster count, big join code, and activity', () => {
       render(<ClassroomManager />);
       const card = screen.getByTestId('classroom-card');

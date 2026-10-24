@@ -23,6 +23,7 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { ClassroomCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
 import { TEACHER_PRO_CHECKOUT_PATH, teacherProUpgradeCtaLabel } from '@/components/education/TeacherProCheckoutCta';
 import { ClassCapMeter } from '@/components/teacher/ClassCapMeter';
+import { useTeacherReveal } from './motion/useTeacherReveal';
 import { ClassCard } from './classroom/ClassCard';
 import { ClassroomEmptyState } from './classroom/ClassroomEmptyState';
 import { ClassPager } from './hq/ClassPager';
@@ -65,6 +66,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   const pageSize = classPageSize({ sm: isSm, lg: isLg, short: isShort });
   const [page, setPage] = useState(0);
   const paged = pageSlice(classrooms, page, pageSize);
+  const revealRef = useTeacherReveal<HTMLDivElement>(`${paged.page}-${paged.items.length}`);
 
   const newClassHref = `/${language}/teacher/classroom/new`;
   const editing = classrooms.find((c) => c.id === editingId);
@@ -193,32 +195,34 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
         <>
           <m.div
             key={paged.page}
+            ref={revealRef}
             className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:gap-6 xl:grid-cols-3 [@media(orientation:landscape)_and_(max-height:500px)]:grid-cols-1"
             variants={stagger}
             initial="hidden"
             animate="visible"
           >
             {paged.items.map((classroom) => (
-              <ClassCard
-                key={classroom.id}
-                classroom={classroom}
-                expanded={expandedId === classroom.id}
-                onToggleExpanded={() => setExpandedId(expandedId === classroom.id ? null : classroom.id)}
-                onCopy={() => copyJoinCode(classroom.id, classroom.join_code)}
-                onShare={() => shareInvite(classroom.id, classroom.name, classroom.join_code)}
-                googleHref={googleClassroomHref(classroom.name, classroom.join_code)}
-                onEdit={() => setEditingId(classroom.id)}
-                onDelete={() => setDeletingId(classroom.id)}
-                activity={<ClassroomCardActivity classroomId={classroom.id} rosterCount={classroom.member_count || 0} />}
-                startGameHref={teacherHostHref(language, { classroomId: classroom.id })}
-                assignHref={teacherAssignHref(language, classroom.id)}
-                reportHref={`/${language}/teacher/classroom/${classroom.id}/analytics`}
-                onOpenProjector={
-                  classroom.join_code
-                    ? () => setProjector({ id: classroom.id, name: classroom.name, join_code: classroom.join_code, member_count: classroom.member_count })
-                    : undefined
-                }
-              />
+              <div key={classroom.id} data-tm>
+                <ClassCard
+                  classroom={classroom}
+                  expanded={expandedId === classroom.id}
+                  onToggleExpanded={() => setExpandedId(expandedId === classroom.id ? null : classroom.id)}
+                  onCopy={() => copyJoinCode(classroom.id, classroom.join_code)}
+                  onShare={() => shareInvite(classroom.id, classroom.name, classroom.join_code)}
+                  googleHref={googleClassroomHref(classroom.name, classroom.join_code)}
+                  onEdit={() => setEditingId(classroom.id)}
+                  onDelete={() => setDeletingId(classroom.id)}
+                  activity={<ClassroomCardActivity classroomId={classroom.id} rosterCount={classroom.member_count || 0} />}
+                  startGameHref={teacherHostHref(language, { classroomId: classroom.id })}
+                  assignHref={teacherAssignHref(language, classroom.id)}
+                  reportHref={`/${language}/teacher/classroom/${classroom.id}/analytics`}
+                  onOpenProjector={
+                    classroom.join_code
+                      ? () => setProjector({ id: classroom.id, name: classroom.name, join_code: classroom.join_code, member_count: classroom.member_count })
+                      : undefined
+                  }
+                />
+              </div>
             ))}
             {/* A free slot on the last wide page is a compact "new class" seat, not a void. */}
             {paged.page === paged.pages - 1 && paged.items.length < pageSize ? (
