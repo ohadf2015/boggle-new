@@ -255,6 +255,8 @@ export interface ServerToClientEvents {
   'friends:requestSent': (data: FriendRequest) => void;
   'friends:requestAccepted': (data: FriendRequest) => void;
   'friends:friendRemoved': (data: { friendUserId: string; timestamp: number }) => void;
+  'friends:blocked': (data: { targetUserId: string; timestamp: number }) => void;
+  'friends:unblocked': (data: { targetUserId: string; timestamp: number }) => void;
   'friends:list': (data: FriendsListResponse) => void;
   'friends:pendingRequests': (data: PendingRequestsResponse) => void;
 
@@ -304,6 +306,7 @@ export const FriendErrorCodes = {
   NOT_FRIENDS: 'NOT_FRIENDS',
   UNAUTHORIZED: 'UNAUTHORIZED',
   VALIDATION_FAILED: 'VALIDATION_FAILED',
+  TOO_MANY_PENDING_REQUESTS: 'TOO_MANY_PENDING_REQUESTS',
   SERVER_ERROR: 'SERVER_ERROR',
 } as const;
 

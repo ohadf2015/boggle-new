@@ -56,22 +56,27 @@ export async function sendFriendRequest(targetUserId: string): Promise<{ success
     return { success: false, error: 'Not authenticated' };
   }
 
-  const { data: existing } = await supabase
+  // Not .single(): duplicate rows for a pair make it error, which read as "no relationship".
+  const { data: rows } = await supabase
     .from('friends')
-    .select('id, status')
+    .select('id, user_id, status')
     .or(`and(user_id.eq.${user.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${user.id})`)
-    .single();
+    .limit(10);
 
-  if (existing) {
-    if (existing.status === 'accepted') {
-      return { success: false, error: 'Already friends' };
-    }
-    if (existing.status === 'pending') {
-      return { success: false, error: 'Request already pending' };
-    }
-    if (existing.status === 'blocked') {
-      return { success: false, error: 'Unable to send request' };
-    }
+  const relations = (rows ?? []) as Array<{ id: string; user_id: string; status: FriendStatus }>;
+  if (relations.some((r) => r.status === 'blocked')) {
+    return { success: false, error: 'Unable to send request' };
+  }
+  if (relations.some((r) => r.status === 'accepted')) {
+    return { success: false, error: 'Already friends' };
+  }
+  const incoming = relations.find((r) => r.status === 'pending' && r.user_id === targetUserId);
+  if (incoming) {
+    // They already asked us — adding them back means accepting.
+    return acceptFriendRequest(incoming.id);
+  }
+  if (relations.some((r) => r.status === 'pending')) {
+    return { success: false, error: 'Request already pending' };
   }
 
   const { error } = await supabase
