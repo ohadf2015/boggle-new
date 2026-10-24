@@ -19,7 +19,7 @@ export function SinglePlayerLcpShell({ tapToPlay }: { tapToPlay?: string } = {})
     <>
       <style
         dangerouslySetInnerHTML={{
-          __html: 'html[data-sp-ready] #sp-lcp-paint{display:none}html[data-sp-ready] #sp-tap-hint{display:none}',
+          __html: 'html[data-sp-ready] #sp-lcp-paint{display:none}html[data-sp-ready] #sp-tap-hint{display:none}html[data-sp-engaged] #sp-tap-hint{display:none}',
         }}
       />
       <div
