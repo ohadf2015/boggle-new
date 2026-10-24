@@ -220,40 +220,6 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     return <VocabQuizView socket={socket} username={username} t={t} />;
   }
 
-  // Wheel-rush has no letter grid — render dedicated view before grid guard
-  if (gameMode === 'wheel-rush') {
-    const wheelCanvas = (
-      <WheelRushView
-        socket={socket}
-        username={username}
-        leaderboard={leaderboard}
-        onQuit={onExitRoom}
-        t={t}
-        remainingTime={remainingTime}
-        isDesktopCanvas={shellEnabled}
-      />
-    );
-    if (shellEnabled) {
-      return (
-        <div className={getMpInGameContainerClass(gameMode)}>
-          <MpDesktopShellFrame
-            gameMode={gameMode}
-            canvas={wheelCanvas}
-            leaderboard={leaderboard}
-            users={rosterUsers}
-            foundWords={foundWords}
-            socket={socket}
-            meId={username}
-            roomId={gameCode}
-            remainingTime={remainingTime}
-            totalTime={totalTime}
-          />
-        </div>
-      );
-    }
-    return wheelCanvas;
-  }
-
   const roundDialogs = (
     <>
       <PlayerRoundDialogs
@@ -275,6 +241,50 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
       )}
     </>
   );
+
+  // Wheel-rush has no letter grid — render dedicated view before grid guard.
+  // It still needs roundDialogs: its quit / "Back to lobby" buttons only open
+  // the exit confirm, which lives there.
+  if (gameMode === 'wheel-rush') {
+    const wheelCanvas = (
+      <WheelRushView
+        socket={socket}
+        username={username}
+        leaderboard={leaderboard}
+        onQuit={onExitRoom}
+        t={t}
+        remainingTime={remainingTime}
+        isDesktopCanvas={shellEnabled}
+      />
+    );
+    if (shellEnabled) {
+      return (
+        <>
+          <div className={getMpInGameContainerClass(gameMode)}>
+            <MpDesktopShellFrame
+              gameMode={gameMode}
+              canvas={wheelCanvas}
+              leaderboard={leaderboard}
+              users={rosterUsers}
+              foundWords={foundWords}
+              socket={socket}
+              meId={username}
+              roomId={gameCode}
+              remainingTime={remainingTime}
+              totalTime={totalTime}
+            />
+          </div>
+          {roundDialogs}
+        </>
+      );
+    }
+    return (
+      <>
+        {wheelCanvas}
+        {roundDialogs}
+      </>
+    );
+  }
 
   // Gridless versus modes — per-player towers / crossword race.
   if (gameMode === 'word-tower' || gameMode === 'crossword') {

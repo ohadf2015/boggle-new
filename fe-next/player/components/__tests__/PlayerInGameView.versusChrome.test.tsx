@@ -1,5 +1,5 @@
 /**
- * The gridless beta modes (word-tower, crossword) render their own full-screen
+ * The gridless modes (word-tower, crossword, wheel-rush) render their own full-screen
  * view; the round dialogs (exit confirm) and the reconnect overlay must still
  * mount around it, or the exit button and reconnect feedback are dead.
  */
@@ -104,7 +104,7 @@ vi.mock('@/components/wordhunt/WordHuntGame', () => ({
 }));
 
 vi.mock('@/components/multiplayer/WheelRushView', () => ({
-  WheelRushView: () => <div data-testid="wheel-rush-view" />,
+  WheelRushView: ({ onQuit }: { onQuit?: () => void }) => <button data-testid="versus-exit" onClick={onQuit}>exit</button>,
 }));
 vi.mock('@/lib/multiplayer/usePendingWords', () => ({
   usePendingWords: () => ({ pendingWords: new Map(), enqueuePending: vi.fn(), confirmPending: vi.fn(), rejectPending: vi.fn(), dismissPending: vi.fn(), clearAll: vi.fn(), isPending: vi.fn().mockReturnValue(false) }),
@@ -147,7 +147,7 @@ const baseProps = {
   onWordSubmit: vi.fn(),
 };
 
-describe.each(['word-tower', 'crossword'])('PlayerInGameView — %s round chrome', (mode) => {
+describe.each(['word-tower', 'crossword', 'wheel-rush'])('PlayerInGameView — %s round chrome', (mode) => {
   beforeEach(() => {
     mockGameModeConfirmed.value = true;
     mockGameMode.value = mode;
