@@ -230,6 +230,7 @@ export type TeacherProUpgradePlacement =
   | 'education_compare_strip'
   | 'results_upsell'
   | 'classroom_results'
+  | 'class_created'
   | 'education_landing'
   | 'other';
 
