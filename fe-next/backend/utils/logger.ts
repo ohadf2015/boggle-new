@@ -24,6 +24,15 @@ const pinoInstance = pino({
 // action); they keep their pino line but must not open a Sentry issue per id.
 const SENTRY_QUIET_WARN_CATEGORIES = new Set(['RATE_LIMIT', 'CLASSROOM_ECONOMY']);
 
+function sentryQuietWarn(category: string, message: string): boolean {
+  if (SENTRY_QUIET_WARN_CATEGORIES.has(category)) return true;
+  // Logged as warn — the persistence tests pin that a finished game with
+  // zero rows is not silent. Also common (empty roster, practice with no
+  // score rows), so a Sentry issue per game code (2GY) is noise. Scores
+  // that were submitted and then all refused already warn from the end handler.
+  return category === 'CLASSROOM_GAME' && message.includes('no participants to record');
+}
+
 // ==========================================
 // Logger class — preserves existing API
 // ==========================================
@@ -58,7 +67,7 @@ class Logger {
 
   warn(category: string, message: string, data?: unknown): void {
     this.pino.warn({ category, ...(data != null ? { data } : {}) }, message);
-    if (isProduction && !SENTRY_QUIET_WARN_CATEGORIES.has(category)) this.captureToSentry('warning', category, message, data);
+    if (isProduction && !sentryQuietWarn(category, message)) this.captureToSentry('warning', category, message, data);
   }
 
   info(category: string, message: string, data?: unknown): void {
