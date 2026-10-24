@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/en/play-boggle-online-free`;
 
   return {
-    title: 'Play Boggle Online Free — No Download | LexiClash',
-    description: 'Play boggle free online — 2–50 players, no download, no signup needed. Solo & multiplayer modes. Real-time word battles. Start in seconds →',
+    title: 'Boggle Online Free — No Download, No Signup | LexiClash',
+    description: 'Boggle online free — solo vs bots or real-time multiplayer with 2–50 friends. No download, no signup. Real-time word battles in your browser →',
     keywords: 'play boggle online free no download, boggle online free no download, play boggle online free, free boggle online no download, free online boggle no download, boggle game free no download, play boggle word shake free no download, play boggle online free with other players, boggle alternatives 2026, games like boggle online free, word game no download, boggle word shake free, word games online free, word making games, word hunt game online, free word game no download, word puzzle game free',
     openGraph: {
       title: 'Boggle Online Free — Play Solo or Multiplayer | LexiClash',
