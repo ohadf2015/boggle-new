@@ -1,0 +1,3 @@
+status: shipped
+files_touched: fe-next/components/native/NetworkStatusHandler.tsx, fe-next/components/native/__tests__/NetworkStatusHandler.test.tsx, docs/nightly/triage-queue.md, docs/nightly/impact-ledger.ndjson, docs/nightly/reports/2026-10-24.md
+next_steps: once app_offline_fallback_shown/app_offline_retry_clicked have 3+ days of data, check if retries recover or loop (see triage-queue.md 2026-10-24 entry). No flags retired tonight (full experiment-results sweep across ~55 active flags is a real to-do, out of 15-min budget — needs a dedicated per-flag p-value query helper, consider scripting under scripts/nightly/lib/). No new experiment shipped — rage-click root-cause took priority per brief ranking.

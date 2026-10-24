@@ -1,32 +1,23 @@
 {
-  "date": "2026-10-23",
-  "note": "supabase MCP never connected this run (still booting at lane timeout) -- backend section carried unchanged from 10-22 (vocabulary_lessons FK closed @ 57 rows, no re-query tonight). Frontend: brief's 5 LCP items were growthradar.app/imposketch.io (cross-tenant noise, standing watch) + /en/scrabble-alternative-online @ n=1 (confirmed via posthog-query.sh) -- below the mandatory n>=50 sample floor, correctly DEFERRED not flagged as regression. Ran one targeted query (top lexiclash-host routes by n, no HAVING floor): max n=31 (/en/multiplayer) -- NO route cleared 50 samples in the last 24h, so zero frontend items were eligible for a regression verdict tonight. Proactively spot-checked SinglePlayerLcpShell.tsx (the one LCP-critical hand-tuned shell) -- already correct (fetchPriority=high, decoding=sync, server-only, documented). No code change shipped tonight; research-only.",
+  "date": "2026-10-24",
+  "note": "supabase MCP still booting at lane time (empty toolset, no mcp__supabase__* tools surfaced) -- brief itself had zero real backend items (only a low-score 'Railway deploy status unclear' entry, not a query/index target), so STEP 1 skipped rather than force a query without the tool. Frontend: brief's top-5 were imposketch.io LCP entries (cross-tenant PostHog noise per standing memory -- not a lexiclash route) plus /en/student?class=open @ 4984ms, the one real signal. Traced it to AcademyMap.tsx's hero art Image (academy-map-{layout}.webp, 1080-1920px source, fill+sizes=100vw, the page's LCP element) rendering with `unoptimized` -- it was serving the full-res file to every viewport instead of a Next-optimized/resized variant, even though next.config.js images.deviceSizes already covers phone widths. Removed `unoptimized` on both Image tags (backdrop + main art) in AcademyMap.tsx so Next's image optimizer generates viewport-sized srcset entries. No test asserted `unoptimized` presence; same visual webp, smaller bytes on phones (primary audience).",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
-    "closed": {
-      "vocabulary_lessons_classroom_id_fkey_unindexed": "re-verified 10-22: table is 57 rows (classrooms 55). Index has write cost, zero query benefit at this size -- not worth it. No action."
-    },
     "deferred": {
-      "auth_db_connections_absolute": "dashboard config toggle, not a code/migration fix -- human queue (re-flagged 10-01 through 10-22, no change)",
-      "realtime_wal_json_parser_cpu": "top pg_stat_statements entry again tonight (4.75M calls, 26.3M ms total) -- already governed by 50-supabase-perf.md pg_cron auto-remediation (jobid 22-24); v_suspicious_realtime_publications shows only word_tower_pending_wrecks @ verdict=ok"
+      "auth_db_connections_absolute": "dashboard config toggle, not code/migration -- human queue, unchanged",
+      "realtime_wal_json_parser_cpu": "governed by 50-supabase-perf.md pg_cron auto-remediation (jobid 22-24), no new flag tonight"
     }
   },
   "frontend": {
     "by_route": [],
     "shipped": [
-      { "route": "/multiplayer", "fix": "lazy-load 4 classroom-only components via next/dynamic ssr:false", "baseline_lcp_ms": 11220, "route_variant": "/he/multiplayer" },
-      { "route": "/daily/word-wheel", "fix": "DailyLoadingFallback PageLoader priority=false (10-12/10-18)", "baseline_lcp_ms": 7428 },
-      { "route": "/multiplayer", "fix": "multiplayer/loading.tsx PageLoader priority=false (10-18)" },
-      { "route": "/profile", "fix": "profile/loading.tsx PageLoader priority=false (10-18)" },
-      { "route": "/leaderboard", "fix": "leaderboard/loading.tsx PageLoader priority=false (10-18)" },
-      { "route": "/daily/word-wheel", "fix": "WordWheelGame (940L) + WordWheelResults (388L) split from WordWheelChallenge.tsx into next/dynamic(ssr:false) -- both only mount after 'ready' phase, were bundled into the ready-card's first-paint chunk", "baseline_lcp_ms": 4432 }
+      { "route": "/[locale]/student?class=open", "fix": "AcademyMap.tsx hero/backdrop Image: removed `unoptimized`, let Next image optimizer serve viewport-sized srcset instead of full 1080-1920px webp", "baseline_lcp_ms": 4984 }
     ],
-    "note": "Brief's top-5 LCP entries were imposketch.io routes (cross-tenant PostHog noise, standing watch). Skipped those; acted on the one real lexiclash route in the brief.",
-    "real_fix_needed": "brief-generator phase 0 must add properties.$host filter to its PostHog web-vitals query -- confirmed across multiple prior nights that unfiltered queries surface other tenants' routes as if they were lexiclash regressions"
+    "note": "imposketch.io / growthradar-style cross-tenant entries in the brief are known PostHog noise (standing watch, brief-generator needs $host filter) -- skipped per memory."
   },
   "bundle": {
-    "note": "not re-measured tonight (no fresh .next build present) -- carrying 09-26 numbers unchanged.",
+    "note": "not re-measured tonight (no fresh .next build in this lane) -- carrying 10-23 numbers unchanged.",
     "total_kb": 34104,
     "top_chunks": [
       { "name": "82055-76fbea40d9b5ce20.js", "kb": 856 },
