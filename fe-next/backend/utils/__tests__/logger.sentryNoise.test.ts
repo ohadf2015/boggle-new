@@ -29,4 +29,19 @@ describe('logger warn -> Sentry', () => {
     logger.error('RATE_LIMIT', 'boom');
     expect(captureMessage).toHaveBeenCalledTimes(2);
   });
+
+  it('does not open a Sentry issue for a classroom game with nothing to record', async () => {
+    const logger = await loadProdLogger();
+    logger.warn(
+      'CLASSROOM_GAME',
+      'Game GHYRVS ended with no participants to record (roster 0, scores 0) — 0 practice sessions written',
+    );
+    expect(captureMessage).not.toHaveBeenCalled();
+  });
+
+  it('still reports other classroom warnings', async () => {
+    const logger = await loadProdLogger();
+    logger.warn('CLASSROOM_GAME', 'Failed to release the persistence lock for GHYRVS: boom');
+    expect(captureMessage).toHaveBeenCalledTimes(1);
+  });
 });
