@@ -371,7 +371,7 @@ export async function persistClassroomGameScores(
     return [];
   }
   if (participants.length === 0) {
-    logger.info(
+    logger.warn(
       'CLASSROOM_GAME',
       `Game ${game.gameCode} ended with no participants to record ` +
         `(roster ${game.players?.length ?? 0}, scores ${playerScores?.length ?? 0}) — ` +
