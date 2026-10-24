@@ -42,6 +42,10 @@ const { mockUseAuth, mockSocketCtx, fakeSocket, registeredEvents, friendsApi } =
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => mockUseAuth() }));
 vi.mock('@/utils/SocketContext', () => ({ useSocketOptional: () => mockSocketCtx() }));
 vi.mock('@/utils/friends', () => friendsApi);
+// These tests exercise the direct-DB path; the socket reports "no answer" immediately instead of after its timeout.
+vi.mock('@/utils/friendsSocketRequest', () => ({
+  friendsSocketRequest: () => Promise.resolve({ success: false, fallback: true }),
+}));
 vi.mock('@/utils/logger', () => ({ default: { error: vi.fn(), info: vi.fn(), warn: vi.fn(), debug: vi.fn() } }));
 vi.mock('@/hooks/useMounted', () => ({ useMounted: () => ({ current: true }) }));
 

@@ -23,6 +23,7 @@ import {
   type FriendChallenge,
 } from '@/utils/friends';
 import { useSocketOptional } from '@/utils/SocketContext';
+import { friendsSocketRequest, type FriendsSocketResult } from '@/utils/friendsSocketRequest';
 import logger from '@/utils/logger';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
@@ -141,24 +142,56 @@ export function useFriends(): UseFriendsReturn {
     await fetchAll();
   }, [fetchAll]);
 
+  /**
+   * Run a friend write through the socket when connected (server-side push/live
+   * notification, cache invalidation, Families Policy gate). Only when the server
+   * did not answer — or the socket is down — does the direct-DB `fallback` run.
+   * A definitive server rejection is returned as-is and never retried directly.
+   */
+  const viaSocket = useCallback(async (
+    run: () => Promise<FriendsSocketResult> | null,
+    fallback: () => Promise<{ success: boolean; error?: string }>
+  ): Promise<{ success: boolean; error?: string }> => {
+    const pending = socket && isSocketConnected ? run() : null;
+    if (pending) {
+      const res = await pending;
+      if (!res.fallback) {
+        return res.success ? { success: true } : { success: false, error: res.error || 'Request failed' };
+      }
+    }
+    return fallback();
+  }, [socket, isSocketConnected]);
+
   // Send friend request
   const sendRequest = useCallback(async (userId: string) => {
-    const result = await sendFriendRequest(userId);
+    const result = await viaSocket(
+      () => friendsSocketRequest(socket!, 'friends:sendRequest', { targetUserId: userId }, {
+        successEvent: 'friends:requestSent',
+        alsoSuccessOn: ['friends:requestAccepted'],
+      }),
+      () => sendFriendRequest(userId)
+    );
     if (result.success) {
       await refresh();
     }
     return result;
-  }, [refresh]);
+  }, [refresh, viaSocket, socket]);
 
   // Accept friend request
   const acceptRequest = useCallback(async (requestId: string) => {
-    const result = await acceptFriendRequest(requestId);
+    const result = await viaSocket(
+      () => friendsSocketRequest(socket!, 'friends:acceptRequest', { requestId }, {
+        successEvent: 'friends:requestAccepted',
+        match: (d) => (d as { requestId?: string })?.requestId === requestId,
+      }),
+      () => acceptFriendRequest(requestId)
+    );
     if (result.success) {
       trackGrowthEvent('friend_added');
       await refresh();
     }
     return result;
-  }, [refresh]);
+  }, [refresh, viaSocket, socket]);
 
   // Decline friend request
   const declineRequest = useCallback(async (requestId: string) => {
@@ -178,29 +211,21 @@ export function useFriends(): UseFriendsReturn {
     return result;
   }, [refresh]);
 
-  // Unfriend — prefer Socket.IO to trigger server-side Redis cache invalidation (F-4)
+  // Unfriend — via the socket so the server invalidates the friendship cache (F-4) and
+  // tells the other side; a rejection is reported, not swallowed as success.
   const unfriend = useCallback(async (friendUserId: string) => {
-    if (socket && isSocketConnected) {
-      return new Promise<{ success: boolean; error?: string }>((resolve) => {
-        let resolved = false;
-        const done = () => {
-          if (resolved) return;
-          resolved = true;
-          refresh();
-          resolve({ success: true });
-        };
-        socket.emit('friends:unfriend', { friendUserId });
-        socket.once('friends:friendRemoved', done);
-        // Timeout fallback — only fires if socket event didn't arrive
-        setTimeout(done, 3000);
-      });
-    }
-    const result = await removeFriend(friendUserId);
+    const result = await viaSocket(
+      () => friendsSocketRequest(socket!, 'friends:unfriend', { friendUserId }, {
+        successEvent: 'friends:friendRemoved',
+        match: (d) => (d as { friendUserId?: string })?.friendUserId === friendUserId,
+      }),
+      () => removeFriend(friendUserId)
+    );
     if (result.success) {
       await refresh();
     }
     return result;
-  }, [refresh, socket, isSocketConnected]);
+  }, [refresh, viaSocket, socket]);
 
   // Blocked users state
   const [blockedUsers, setBlockedUsers] = useState<Friend[]>([]);
@@ -220,22 +245,34 @@ export function useFriends(): UseFriendsReturn {
 
   // Block user
   const block = useCallback(async (userId: string) => {
-    const result = await blockUser(userId);
+    const result = await viaSocket(
+      () => friendsSocketRequest(socket!, 'friends:block', { targetUserId: userId }, {
+        successEvent: 'friends:blocked',
+        match: (d) => (d as { targetUserId?: string })?.targetUserId === userId,
+      }),
+      () => blockUser(userId)
+    );
     if (result.success) {
       await refresh();
       await refreshBlockedUsers();
     }
     return result;
-  }, [refresh, refreshBlockedUsers]);
+  }, [refresh, refreshBlockedUsers, viaSocket, socket]);
 
   // Unblock user
   const unblock = useCallback(async (userId: string) => {
-    const result = await unblockUser(userId);
+    const result = await viaSocket(
+      () => friendsSocketRequest(socket!, 'friends:unblock', { targetUserId: userId }, {
+        successEvent: 'friends:unblocked',
+        match: (d) => (d as { targetUserId?: string })?.targetUserId === userId,
+      }),
+      () => unblockUser(userId)
+    );
     if (result.success) {
       await refreshBlockedUsers();
     }
     return result;
-  }, [refreshBlockedUsers]);
+  }, [refreshBlockedUsers, viaSocket, socket]);
 
   // Search for users
   const search = useCallback(async (query: string): Promise<Friend[]> => {

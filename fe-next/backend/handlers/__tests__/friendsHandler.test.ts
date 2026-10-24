@@ -442,6 +442,97 @@ describe('friendsHandler', () => {
     });
   });
 
+  // ==================== sendRequest (mutual) ====================
+
+  describe('friends:sendRequest — mutual request auto-accept', () => {
+    it('tells both sides they are now friends instead of "request received"', async () => {
+      (friendsManager.sendFriendRequest as Mock).mockResolvedValue({
+        success: true,
+        autoAccepted: true,
+        request: { requestId: 'req-9' },
+      });
+      mockGetUserProfile.mockResolvedValueOnce(PROFILE_A).mockResolvedValueOnce(PROFILE_B);
+
+      await harness.trigger('friends:sendRequest', { targetUserId: 'user-b' });
+
+      expect(mockBroadcastToUser).toHaveBeenCalledWith(
+        harness.io, 'user-b', 'friends:requestAccepted',
+        expect.objectContaining({ requestId: 'req-9', status: 'accepted' })
+      );
+      expect(harness.socket.emit).toHaveBeenCalledWith(
+        'friends:requestAccepted',
+        expect.objectContaining({ requestId: 'req-9', status: 'accepted' })
+      );
+      expect(mockBroadcastToUser).not.toHaveBeenCalledWith(
+        harness.io, 'user-b', 'friends:requestReceived', expect.anything()
+      );
+    });
+  });
+
+  // ==================== block / unblock ====================
+
+  describe('friends:block', () => {
+    it('blocks via the manager, confirms to the blocker, and tells a former friend they were removed', async () => {
+      (friendsManager.blockUser as Mock).mockResolvedValue({ success: true, wasFriends: true });
+
+      await harness.trigger('friends:block', { targetUserId: 'user-b' });
+
+      expect(friendsManager.blockUser).toHaveBeenCalledWith('user-a', 'user-b');
+      expect(harness.socket.emit).toHaveBeenCalledWith(
+        'friends:blocked', expect.objectContaining({ targetUserId: 'user-b' })
+      );
+      // The blocked user must NOT be told they were blocked, only that the friendship is gone.
+      expect(mockBroadcastToUser).toHaveBeenCalledWith(
+        harness.io, 'user-b', 'friends:friendRemoved', expect.objectContaining({ friendUserId: 'user-a' })
+      );
+      expect(mockBroadcastToUser).not.toHaveBeenCalledWith(
+        harness.io, 'user-b', 'friends:blocked', expect.anything()
+      );
+    });
+
+    it('does not signal the target when they were not friends', async () => {
+      (friendsManager.blockUser as Mock).mockResolvedValue({ success: true, wasFriends: false });
+
+      await harness.trigger('friends:block', { targetUserId: 'user-b' });
+
+      expect(mockBroadcastToUser).not.toHaveBeenCalled();
+    });
+
+    it('rejects a missing target and unauthenticated sockets', async () => {
+      await harness.trigger('friends:block', {});
+      expect(harness.socket.emit).toHaveBeenCalledWith(
+        'friends:error', expect.objectContaining({ code: 'VALIDATION_FAILED' })
+      );
+
+      mockGetAuthUserId.mockReturnValue(null);
+      await harness.trigger('friends:block', { targetUserId: 'user-b' });
+      expect(mockEmitError).toHaveBeenCalled();
+    });
+
+    it('surfaces the manager error code', async () => {
+      (friendsManager.blockUser as Mock).mockResolvedValue({ success: false, errorCode: 'SERVER_ERROR' });
+
+      await harness.trigger('friends:block', { targetUserId: 'user-b' });
+
+      expect(harness.socket.emit).toHaveBeenCalledWith(
+        'friends:error', expect.objectContaining({ code: 'SERVER_ERROR' })
+      );
+    });
+  });
+
+  describe('friends:unblock', () => {
+    it('unblocks via the manager and confirms', async () => {
+      (friendsManager.unblockUser as Mock).mockResolvedValue({ success: true });
+
+      await harness.trigger('friends:unblock', { targetUserId: 'user-b' });
+
+      expect(friendsManager.unblockUser).toHaveBeenCalledWith('user-a', 'user-b');
+      expect(harness.socket.emit).toHaveBeenCalledWith(
+        'friends:unblocked', expect.objectContaining({ targetUserId: 'user-b' })
+      );
+    });
+  });
+
   // ==================== searchUsers ====================
 
   describe('friends:searchUsers', () => {
@@ -503,6 +594,34 @@ describe('friendsHandler', () => {
             }),
           ],
         })
+      );
+    });
+
+    it('escapes LIKE wildcards so "%" / "_" in a query are literal', async () => {
+      mockSupabase.limit.mockResolvedValue({ data: [] });
+
+      await harness.trigger('friends:searchUsers', { query: '50%_off' });
+
+      expect(mockSupabase.ilike).toHaveBeenCalledWith('username', '%50\\%\\_off%');
+    });
+
+    it('hides users in a block relationship (either direction) from results', async () => {
+      const profiles = [
+        { id: 'user-b', username: 'bob', display_name: 'Bob', avatar_emoji: '⚙️', avatar_color: '#00f', avatar_image: null },
+        { id: 'user-c', username: 'bobby', display_name: 'Bobby', avatar_emoji: '⚙️', avatar_color: '#00f', avatar_image: null },
+      ];
+      mockSupabase.limit.mockResolvedValue({ data: profiles });
+      mockSupabase.or.mockResolvedValue({
+        data: [
+          { user_id: 'user-a', friend_id: 'user-b', status: 'blocked', id: 'f-1' }, // we blocked them
+          { user_id: 'user-c', friend_id: 'user-a', status: 'blocked', id: 'f-2' }, // they blocked us
+        ],
+      });
+
+      await harness.trigger('friends:searchUsers', { query: 'bob' });
+
+      expect(harness.socket.emit).toHaveBeenCalledWith(
+        'friends:searchResults', expect.objectContaining({ users: [] })
       );
     });
 
