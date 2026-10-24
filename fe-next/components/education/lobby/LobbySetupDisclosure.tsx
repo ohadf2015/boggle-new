@@ -17,7 +17,8 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ChevronDown, ChevronUp, School, TriangleAlert } from 'lucide-react';
+import { m, useReducedMotion } from 'framer-motion';
+import { ChevronDown, School, SlidersHorizontal, TriangleAlert } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { BoardLanguageChip } from '../pickers/BoardLanguageChip';
@@ -46,6 +47,7 @@ export function LobbySetupDisclosure({
   children,
 }: LobbySetupDisclosureProps) {
   const { t } = useLanguage();
+  const reduce = useReducedMotion();
 
   const summary = incomplete
     ? t('education.modePicker.needsLesson')
@@ -68,8 +70,8 @@ export function LobbySetupDisclosure({
           // Secondary to GO LIVE: thin, small, a half-lit edge. Only the
           // blocked state gets a full-strength (pink) edge, because then it IS
           // the one thing to do.
-          'flex w-full items-center gap-2 rounded-neo border-[2px] px-3 py-1.5 text-start',
-          'font-neo-body text-xs font-bold transition-colors lg:text-sm',
+          'flex w-full items-center gap-2 rounded-neo border-[2px] px-3 py-2 text-start',
+          'font-neo-body text-sm font-bold transition-colors lg:text-base',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
           incomplete
             ? 'border-neo-pink bg-neo-navy-light text-neo-white hover:bg-neo-navy'
@@ -91,20 +93,32 @@ export function LobbySetupDisclosure({
           {summary}
         </span>
         {boardLanguage && !incomplete && <BoardLanguageChip language={boardLanguage} />}
-        <span className="shrink-0 font-neo-display text-[0.65rem] font-black uppercase tracking-wide">
+        <span
+          className={cn(
+            'inline-flex shrink-0 items-center gap-1.5 rounded-full border-2 border-black px-3 py-1 font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm',
+            open ? 'bg-neo-lime' : 'bg-neo-cyan'
+          )}
+        >
+          <SlidersHorizontal className="size-3.5" strokeWidth={3} aria-hidden="true" />
           {t(open ? 'eduShell.host.optionsHide' : 'eduShell.host.options')}
+          <ChevronDown
+            className={cn('size-4 transition-transform duration-200', open && 'rotate-180')}
+            strokeWidth={3}
+            aria-hidden="true"
+          />
         </span>
-        {open ? (
-          <ChevronUp className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
-        ) : (
-          <ChevronDown className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
-        )}
       </button>
 
       {open && (
-        <div data-testid="lobby-setup-body" className="space-y-5">
+        <m.div
+          data-testid="lobby-setup-body"
+          initial={reduce ? false : { opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+          className="space-y-5"
+        >
           {children}
-        </div>
+        </m.div>
       )}
     </div>
   );

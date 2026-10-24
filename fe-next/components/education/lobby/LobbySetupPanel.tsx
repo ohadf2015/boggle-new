@@ -10,6 +10,7 @@
 
 'use client';
 
+import type React from 'react';
 import { School, BookOpen, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -26,6 +27,27 @@ const PRESETS: { id: ClassroomPresetId; key: string }[] = [
   { id: 'sped', key: 'sped' },
   { id: 'standard', key: 'standard' },
 ];
+
+/** A numbered card per question, so an open panel reads as steps, not one long list. */
+function StepCard({ n, tone, children }: { n: number; tone: string; children: React.ReactNode }) {
+  return (
+    <section
+      data-testid={`lobby-step-${n}`}
+      className="relative rounded-neo-lg border-2 border-neo-cream/25 bg-neo-navy-light/60 p-4 ps-14"
+    >
+      <span
+        aria-hidden="true"
+        className={cn(
+          'absolute start-3 top-3 grid size-8 place-items-center rounded-full border-2 border-black font-neo-display text-sm font-black text-black shadow-hard-sm',
+          tone
+        )}
+      >
+        {n}
+      </span>
+      {children}
+    </section>
+  );
+}
 
 export interface LobbySetupPanelProps {
   classrooms: Classroom[];
@@ -70,7 +92,7 @@ export function LobbySetupPanel({
   return (
     <div className="space-y-5">
       {/* Which class */}
-      <section>
+      <StepCard n={1} tone="bg-neo-cyan">
         <div
           id="lobby-classroom-label"
           className="mb-2 flex items-center gap-1.5 font-neo-display text-xs font-black uppercase text-neo-white/70"
@@ -110,10 +132,10 @@ export function LobbySetupPanel({
             );
           })}
         </div>
-      </section>
+      </StepCard>
 
       {/* Which words */}
-      <section>
+      <StepCard n={2} tone="bg-neo-lime">
         {selectedLessonIds.length > 0 && (
           <div className="mb-2 flex flex-wrap justify-end gap-2">
             {boardLanguage && <BoardLanguageChip language={boardLanguage} />}
@@ -136,10 +158,10 @@ export function LobbySetupPanel({
             {t('teacher.classroom.support.vocabCapNote', { count: SPED_VOCAB_CAP })}
           </p>
         )}
-      </section>
+      </StepCard>
 
       {/* One-tap rituals */}
-      <section>
+      <StepCard n={3} tone="bg-neo-purple">
         <div
           id="lobby-preset-label"
           className="mb-2 flex items-center gap-1.5 font-neo-display text-xs font-black uppercase text-neo-white/70"
@@ -159,19 +181,19 @@ export function LobbySetupPanel({
                 data-testid={`preset-${id}`}
                 onClick={() => onApplyPreset(id)}
                 className={cn(
-                  'rounded-neo border-2 border-black px-3 py-2 text-start transition-all',
+                  'rounded-neo border-2 border-black px-3 py-3 text-start transition-all hover:-translate-y-0.5 active:translate-y-0',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                   isActive
                     ? 'bg-neo-purple text-black shadow-hard'
                     : 'border-neo-cream bg-neo-navy-light text-neo-cream shadow-hard-sm hover:bg-neo-navy'
                 )}
               >
-                <span className="block font-neo-display text-xs font-black uppercase">
+                <span className="block font-neo-display text-sm font-black uppercase">
                   {t(`teacher.classroom.presets.${key}.name`)}
                 </span>
                 <span
                   className={cn(
-                    'block font-neo-body text-[0.65rem] font-bold',
+                    'block font-neo-body text-xs font-bold',
                     isActive ? 'text-black/75' : 'text-neo-cream'
                   )}
                 >
@@ -181,7 +203,7 @@ export function LobbySetupPanel({
             );
           })}
         </div>
-      </section>
+      </StepCard>
 
       <ClassroomBattleSettings
         playStyle={playStyle}

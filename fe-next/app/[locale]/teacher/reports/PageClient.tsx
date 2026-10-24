@@ -10,7 +10,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, ChevronRight, Send, Users } from 'lucide-react';
+import { ArrowLeft, Send } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
@@ -38,13 +38,14 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
 import { RoundReports } from '@/components/teacher/rounds/RoundReports';
 import { ROUND_FIXTURE } from '@/components/teacher/rounds/roundFixture';
+import { ClassroomPicker, ClassHero } from '@/components/teacher/reports/ClassroomPicker';
 import { ReportsNoClasses } from '@/components/teacher/reports/ReportsNoClasses';
 import { FullReportDisclosure, ReportDisclosure, SectionDisclosure } from '@/components/teacher/reports/FullReportDisclosure';
 import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
 import { StudentParentPreview } from '@/components/teacher/reports/StudentParentPreview';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
-const SLIDE_PX = 32;
+const SLIDE_PX = 56;
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
 
 /**
@@ -182,11 +183,12 @@ function TeacherReportsInner() {
 
   const offset = SLIDE_PX * (dir === 'rtl' ? -1 : 1);
   const variants = {
-    enter: (d: number) => ({ opacity: 0, x: reduceMotion ? 0 : d * offset }),
-    center: { opacity: 1, x: 0 },
+    enter: (d: number) => ({ opacity: 0, x: reduceMotion ? 0 : d * offset, scale: reduceMotion ? 1 : 0.97 }),
+    center: { opacity: 1, x: 0, scale: 1 },
     exit: (d: number) => ({
       opacity: 0,
       x: reduceMotion ? 0 : -d * offset * 0.5,
+      scale: reduceMotion ? 1 : 0.98,
     }),
   };
 
@@ -213,36 +215,7 @@ function TeacherReportsInner() {
             ))}
           </div>
         ) : classrooms && classrooms.length > 0 ? (
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {classrooms.map((classroom) => (
-              <li key={classroom.id}>
-                <button
-                  type="button"
-                  onClick={() => handleClassroomSelect(classroom.id)}
-                  // The class picker IS the primary action of this screen, and
-                  // it read as navy-on-navy with a black edge (~1.2:1 both
-                  // ways). Cream edge + a lighter fill puts it back on the page.
-                  className="group flex min-h-20 w-full items-center justify-between gap-3 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 text-start shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0.5 active:shadow-none"
-                >
-                  <span className="min-w-0">
-                    <span className="block break-words font-neo-display text-lg font-bold text-neo-white">
-                      <bdi>{classroom.name}</bdi>
-                    </span>
-                    {typeof classroom.member_count === 'number' && (
-                      <span className="mt-1 inline-flex items-center gap-1.5 text-sm text-neo-cream/75 tabular-nums">
-                        <Users aria-hidden="true" className="size-4" />
-                        <span className="sr-only">{t('teacher.reports.metrics.totalStudents')}: </span>
-                        {classroom.member_count}
-                      </span>
-                    )}
-                  </span>
-                  <span className="grid size-10 shrink-0 place-items-center rounded-neo border-2 border-black bg-neo-cyan text-black transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5">
-                    <DirectionalIcon icon={ChevronRight} className="size-5" />
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
+          <ClassroomPicker classrooms={classrooms} onSelect={handleClassroomSelect} />
         ) : (
           <ReportsNoClasses />
         )}
@@ -284,12 +257,9 @@ function TeacherReportsInner() {
     const selectedClassroom = classrooms?.find((c) => c.id === selectedClassroomId);
     view = (
       <div className="space-y-4 sm:space-y-5">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-xs font-black uppercase tracking-wide text-neo-cyan">{t('eduPro.reports.classEyebrow')}</p>
-            <h1 className="break-words font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">
-              <bdi>{selectedClassroom?.name ?? t('teacher.reports.title')}</bdi>
-            </h1>
+        <div className="flex flex-wrap items-stretch gap-3">
+          <div className="min-w-0 flex-1">
+            <ClassHero name={selectedClassroom?.name ?? t('teacher.reports.title')} memberCount={selectedClassroom?.member_count} />
           </div>
           <TeacherPlanBadge />
         </div>
@@ -391,10 +361,11 @@ function TeacherReportsInner() {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{
-              duration: reduceMotion ? 0.12 : 0.32,
-              ease: EASE_OUT_EXPO,
-            }}
+            transition={
+              reduceMotion
+                ? { duration: 0.12 }
+                : { x: { type: 'spring', stiffness: 320, damping: 30 }, scale: { type: 'spring', stiffness: 320, damping: 30 }, opacity: { duration: 0.2, ease: EASE_OUT_EXPO } }
+            }
           >
             {view}
           </m.div>
