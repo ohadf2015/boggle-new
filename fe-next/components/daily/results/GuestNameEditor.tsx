@@ -3,8 +3,11 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { hasChosenGuestName, markGuestNameChosen, saveGuestNameEverywhere } from '@/utils/guestManager';
+import { useGrowthRadarFlag } from '@/hooks/useGrowthRadarFlag';
 
 const MAX_NAME_LENGTH = 20;
+// Growth Radar A/B (rec 11904): control = forced prompt, keep_name = skippable.
+const SKIP_EXPERIMENT_KEY = 'daily-guest-name-skip';
 
 interface GuestNameEditorProps {
   name: string;
@@ -21,6 +24,7 @@ export function GuestNameEditor({ name, guestFingerprint, onRenamed, t }: GuestN
   const [draft, setDraft] = useState(() => (prompting ? '' : name));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const canKeepName = useGrowthRadarFlag(SKIP_EXPERIMENT_KEY, prompting) === 'keep_name';
 
   const startEditing = () => {
     setDraft(name);
@@ -114,6 +118,15 @@ export function GuestNameEditor({ name, guestFingerprint, onRenamed, t }: GuestN
               </button>
             </div>
             {error && <p role="alert" className="text-xs text-neo-red font-bold">{error}</p>}
+            {canKeepName && (
+              <button
+                type="button"
+                onClick={keepName}
+                className="self-start text-xs font-bold opacity-70 underline underline-offset-2"
+              >
+                {t('wordHunt.results.guestNameKeep', 'Keep this name')}
+              </button>
+            )}
           </form>
         </DialogContent>
       </Dialog>

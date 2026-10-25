@@ -114,6 +114,24 @@ describe('GuestNameEditor — first finish with an auto-generated name', () => {
     expect(hasChosenGuestName()).toBe(false);
   });
 
+  it('offers "Keep this name" only to the keep_name arm of the daily-guest-name-skip test', async () => {
+    // Given Growth Radar serves the treatment arm
+    const getFlag = vi.fn(() => 'keep_name');
+    (window as unknown as { grq: unknown }).grq = { push: (cb: (gr: unknown) => void) => cb({ getFlag }) };
+    try {
+      render(<GuestNameEditor name="WordNinja" guestFingerprint="fp-1" onRenamed={vi.fn()} t={t} />);
+      // When the guest keeps the generated name
+      fireEvent.click(await screen.findByRole('button', { name: 'Keep this name' }));
+      // Then the prompt closes without a server call and does not come back
+      expect(getFlag).toHaveBeenCalledWith('daily-guest-name-skip');
+      expect(screen.queryByTestId('guest-name-prompt')).not.toBeInTheDocument();
+      expect(hasChosenGuestName()).toBe(true);
+      expect(fetchMock).not.toHaveBeenCalled();
+    } finally {
+      delete (window as unknown as { grq?: unknown }).grq;
+    }
+  });
+
   it('will not submit a blank name', () => {
     render(<GuestNameEditor name="WordNinja" guestFingerprint="fp-1" onRenamed={vi.fn()} t={t} />);
 
