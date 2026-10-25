@@ -6,11 +6,7 @@ interface SeatIdentity {
   guestTokenHash?: string | null;
 }
 
-/**
- * The seat name for a signed-in student in a classroom room. Their name comes from
- * their profile, so a classmate with the same name must not lock them out: they
- * get their own earlier seat back, or the next free "Name 2".
- */
+/** A signed-in student cannot rename (the name is their profile's), so a classmate's name must not lock them out. */
 export function classroomSeatName(users: Record<string, SeatIdentity | undefined>, requested: string, authUserId: string): string {
   const holder = users[requested];
   const heldBySomeoneElse = !!holder && (holder.authUserId ? holder.authUserId !== authUserId : !!holder.guestTokenHash);

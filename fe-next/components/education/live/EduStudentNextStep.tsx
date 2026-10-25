@@ -15,11 +15,7 @@ interface EduStudentNextStepProps {
   onPractice?: () => void;
 }
 
-/**
- * The phone's one next step after a teacher-paced round: stay for the next game (it arrives here
- * on its own), with practice, a tomorrow target and a share card as quieter options below it.
- * The share carries rank and score only; a child's name, class and room code never leave the phone.
- */
+/** The share carries rank and score only: a child's name, class and room code never leave the phone. */
 export function EduStudentNextStep({ t, language, placing, onPractice }: EduStudentNextStepProps) {
   const share = async () => {
     if (!placing) return;

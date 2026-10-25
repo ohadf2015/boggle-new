@@ -12,7 +12,6 @@ import { cn } from '@/lib/utils';
 interface ChestRewardCtaProps {
   gameCode: string;
   roundId: string | null;
-  /** Below a screen's one primary action: an outlined row instead of a solid lime slab. */
   quiet?: boolean;
 }
 

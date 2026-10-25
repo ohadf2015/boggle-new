@@ -25,7 +25,6 @@ function ProjectorPhoneMode({ mode, t }: { mode: string; t: Translate }) {
   );
 }
 
-/** What the class looks at during a round: the shared board, the wheel, or a phones-mode card. */
 export function ProjectorRoundStage({ gameMode, grid, wheelPuzzle, t }: { gameMode?: string; grid?: LetterGrid | null; wheelPuzzle: WheelPuzzle | null; t: Translate }) {
   if (grid && projectorShowsBoard(gameMode, grid)) return <ProjectorBoard grid={grid} label={t('eduLiveRoom.round.boardLabel')} />;
   if (wheelPuzzle) return <ProjectorWheel puzzle={wheelPuzzle} label={t('eduLiveRoom.round.wheelLabel')} />;

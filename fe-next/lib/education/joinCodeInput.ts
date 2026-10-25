@@ -7,7 +7,6 @@ const HEBREW_LETTERS: Record<string, string> = {
 /** The Q and W keys type punctuation on Hebrew; only read them as letters when the rest was typed on Hebrew too. */
 const HEBREW_PUNCTUATION: Record<string, string> = { '/': 'Q', "'": 'W', '׳': 'W' };
 
-/** Full-width → ASCII, Hebrew layout → Latin, trimmed and uppercased. Invalid characters are left for the caller. */
 export function foldJoinCode(raw: string): string {
   const chars = Array.from(raw.normalize('NFKC'));
   const hebrewLayout = chars.some((ch) => ch in HEBREW_LETTERS);

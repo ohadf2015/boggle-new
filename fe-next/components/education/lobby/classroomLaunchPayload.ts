@@ -42,7 +42,6 @@ export interface ClassroomLaunchPayload {
 
 type LaunchSettings = ClassroomLaunchPayload['settings'];
 
-/** Everything either lobby knows at GO LIVE, before the wire shape is decided. */
 export interface ClassroomLaunchInput extends Omit<ClassroomLaunchPayload, 'settings'> {
   mode: ClassroomGameMode;
   timerMinutes: number;
@@ -64,7 +63,6 @@ export interface ClassroomLaunchInput extends Omit<ClassroomLaunchPayload, 'sett
   pressure?: ClassroomPressure;
 }
 
-/** The one place both launch paths (full lobby and Express) shape `createClassroomGame`. */
 export function buildClassroomLaunchPayload(input: ClassroomLaunchInput): ClassroomLaunchPayload {
   const { mode, timerMinutes, boardSize, allowLateJoin, playStyle, economy, bossId, targetWord, quiz, teamCount, accessibility, pressure, ...room } = input;
   const accessibilityOn = accessibility && (accessibility.largeText || accessibility.audioCues || accessibility.participationPoints);
