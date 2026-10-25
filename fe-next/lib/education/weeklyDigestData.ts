@@ -1,8 +1,4 @@
-/**
- * Reads behind the Monday teacher digest. Every read is chunked and paged (no silent
- * 1000-row or `.limit(n)` truncation) and every failure throws: a digest built on a
- * missing subscription read would hand a Pro teacher the upgrade pitch.
- */
+// Every read throws: a digest built on a missing subscription read pitches Pro to a paying teacher.
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { fetchInChunks, fetchPaged, type Result } from './pro/fetchAll';
 import { isMachineRequest } from './teacherFunnel';

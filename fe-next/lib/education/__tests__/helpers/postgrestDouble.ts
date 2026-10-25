@@ -1,8 +1,4 @@
-/**
- * In-memory PostgREST double for cron tests: real eq/neq/in/gte/not-null filters, ordering,
- * `.range` with the 1000-row cap, upsert (ignoreDuplicates) / insert / update / delete.
- * A table seeded with `error` fails every read.
- */
+/** Real filters and the 1000-row cap, so truncation bugs fail here; a seeded `error` fails every read. */
 type Row = Record<string, unknown>;
 export type TableSeed = { data: Row[] | null; error: { message: string } | null };
 

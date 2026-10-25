@@ -1,8 +1,4 @@
-/**
- * I/O for the stage nudges (class made but code never shared, students in but no live
- * game, one live game day but no second). Every read throws on error; each send is
- * claimed in the ledger first and released if the send fails.
- */
+// Every read throws: an unknown roster or ledger must not turn into an email.
 import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import { loadLifecycleAudience, reachFor, sendLifecycleEmail } from '@/lib/email/lifecycleUnsubscribe';

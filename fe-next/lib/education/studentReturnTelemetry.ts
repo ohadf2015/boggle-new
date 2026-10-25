@@ -6,10 +6,7 @@ import { loadTestAccountIds } from './eduTestAccount';
 
 const MAX_CLASSROOMS = 20;
 
-/**
- * `edu_student_returned` from a solo session start (practice, assignment, duel).
- * Live rounds emit their own from the round record. Indexed lookups only; never throws.
- */
+/** Live rounds emit their own from the round record. */
 export async function captureStudentReturned(
   sb: Pick<SupabaseClient, 'from'> | null,
   args: { studentId: string; gameMode: string; surface: StudentReturnSurface; lessonId?: string; now?: Date },

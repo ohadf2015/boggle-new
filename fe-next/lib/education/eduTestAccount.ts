@@ -1,10 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 
-/**
- * Which of these users carry `profiles.is_test_account`. Read on a service-role
- * client: a student's session cannot see the teacher's profile row under RLS.
- */
+/** Pass a service-role client: under RLS a student's session cannot see the teacher's profile. */
 export async function loadTestAccountIds(
   sb: Pick<SupabaseClient, 'from'> | null | undefined,
   userIds: ReadonlyArray<string | null | undefined>,

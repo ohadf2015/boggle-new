@@ -4,10 +4,7 @@ import { captureEduServerEvents, type EduServerEvent } from '@/backend/utils/edu
 import { buildFirstStudentJoinedEvent, buildStudentJoinedEvent } from '@/backend/utils/educationRoundTelemetry';
 import { loadTestAccountIds } from './eduTestAccount';
 
-/**
- * Server-side join events after a new membership row. A guest student has no
- * email, so the teacher's flag is what marks a QA rig's students.
- */
+/** A guest student has no email, so the teacher's flag is what marks a QA rig's students. */
 export async function captureStudentJoinEvents(
   admin: Pick<SupabaseClient, 'from'> | null,
   args: { classroomId: string; studentId: string },

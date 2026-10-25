@@ -6,10 +6,7 @@ import { DIGEST_JOB, readHeartbeat } from './lifecycleLedger';
 export const DIGEST_STALE_DAYS = 8;
 const DAY_MS = 86_400_000;
 
-/**
- * Run by a daily cron: the weekly digest is the job that stops silently (it once sat
- * unscheduled for a month), so a missing or week-old heartbeat pages the owner.
- */
+/** The digest once sat unscheduled for a month with no signal; a daily cron checks its heartbeat. */
 export async function alertIfDigestStale(
   sb: Pick<SupabaseClient, 'from'>,
   nowMs: number,

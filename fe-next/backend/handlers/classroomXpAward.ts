@@ -1,8 +1,4 @@
-/**
- * XP awards and write retries for live classroom persistence. Only an error that
- * carries a database code is retried: the statement was rejected, so it did not
- * commit. A transport error may have landed, and both writes here are additive.
- */
+// Only errors with a DB code are retried: those statements did not commit, and both writes are additive.
 import type { getSupabase } from '../modules/supabase/client';
 import logger from '../utils/logger';
 
@@ -32,7 +28,6 @@ export async function retryDbWrite<T>(op: () => Promise<T>): Promise<T> {
   }
 }
 
-/** Splits the round's XP across its lessons and returns only what the RPC confirmed. */
 export async function awardLessonXp(
   supabase: Supabase,
   args: { userId: string; lessonIds: string[]; score: number; gameCode: string }

@@ -1,5 +1,4 @@
-// Stage-aware nudges after a teacher has a class, aimed at a second live game day.
-// Pure so the schedule, caps and exclusions are testable without a DB or an email provider.
+// Stage nudges after a teacher has a class, aimed at a second live game day.
 
 import { isMachineRequest } from './teacherFunnel';
 import type { LedgerRow } from './lifecycleLedger';

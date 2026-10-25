@@ -11,7 +11,7 @@ export type Where =
   | { op: 'notNull'; column: string }
   | { op: 'contains'; column: string; value: Record<string, unknown> };
 
-/** The slice of the PostgREST builder used here; keeps the generic types from exploding. */
+/** A narrow builder type: the full PostgREST generics hit TS2589 here. */
 interface Query {
   eq(column: string, value: unknown): Query;
   neq(column: string, value: unknown): Query;
@@ -36,10 +36,7 @@ function applyWhere(q: Query, where: readonly Where[]): Query {
   return out;
 }
 
-/**
- * Every row whose `column` is in `ids`: ids chunked to keep the URL short, each chunk paged
- * past PostgREST's 1000-row cap in a stable order (`order` must be unique together).
- */
+/** Ids chunked for URL length, each chunk paged past the 1000-row cap; `order` must be unique together. */
 export async function fetchInChunks<Row>(
   sb: Pick<SupabaseClient, 'from'>,
   table: string,
@@ -69,7 +66,6 @@ export async function fetchInChunks<Row>(
   return { data: out, error: null };
 }
 
-/** Every row of a filtered table, paged past the 1000-row cap (no id list to chunk). */
 export async function fetchPaged<Row>(
   sb: Pick<SupabaseClient, 'from'>,
   table: string,

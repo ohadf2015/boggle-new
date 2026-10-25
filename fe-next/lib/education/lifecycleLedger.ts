@@ -1,8 +1,4 @@
-/**
- * Send ledger for teacher lifecycle email (`teacher_lifecycle_sends`) and per-cron
- * heartbeats (`cron_heartbeats`). A send is claimed BEFORE the email goes out, so two
- * overlapping runs cannot both send; a failed send gives its claim back.
- */
+// Claimed before the email goes out so overlapping runs cannot both send; a failed send releases it.
 import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import { fetchInChunks } from './pro/fetchAll';
