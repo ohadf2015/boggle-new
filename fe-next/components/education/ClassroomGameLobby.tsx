@@ -1,7 +1,6 @@
 /**
  * ClassroomGameLobby — the host flow in three taps: class → mode → Start.
- * Data, socket and catalogue live in `lobby/`; this file coordinates the launch.
- * Fine-tuning (time, word length, late join, lists) sits behind one "Options" door.
+ * Data, socket and catalogue live in `lobby/`; fine-tuning sits behind one "Options" door.
  */
 
 'use client';
@@ -13,7 +12,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { StarterPacksSection } from '@/components/teacher/StarterPacksSection';
-import { classroomMultiplayerPath, socketTeacherName } from '@/lib/education/classroomGameHandoff';
+import { socketTeacherName } from '@/lib/education/classroomGameHandoff';
+import { classroomLivePath } from '@/lib/education/classroomLivePath';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import { cefrLessonPack, type CefrLevel } from '@/lib/education/eslCefrDemo';
 import {
@@ -110,7 +110,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
 
   // Same single hop as the express launch; held while a pressure write awaits its ack so a refusal is still shown.
   useEffect(() => {
-    if (roomCreatedGameCode && !pressurePending) router.replace(classroomMultiplayerPath(language, roomCreatedGameCode));
+    if (roomCreatedGameCode && !pressurePending) router.replace(classroomLivePath(language, roomCreatedGameCode, { host: true }));
   }, [roomCreatedGameCode, pressurePending, router, language]);
 
   // No class yet: the 2-step setup names it properly and shows the code before a game.

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { PLAN_MATRIX_ROWS } from '../planMatrix';
 import { FREE_TIER_LIMITS } from '../freeTierLimits';
-import { getTierConfig } from '../../lemonsqueezy';
+import { getTierConfig } from '../tierConfig';
 // @ts-expect-error — translations are untyped .js bundles
 import { en } from '../../../translations/en';
 
@@ -18,9 +18,7 @@ import { en } from '../../../translations/en';
  * error the pricing page can make.
  *
  * The binding is deliberately one-directional. `planMatrix.ts` imports ONLY
- * `freeTierLimits.ts` — it cannot import `lib/lemonsqueezy.ts`, which pulls
- * LemonSqueezyClient and its API key into whatever bundle touches it, and the matrix is
- * rendered by a client component. This test is the only place the two are allowed to meet.
+ * `freeTierLimits.ts`; this test is the only place it meets `tierConfig.ts`.
  */
 const LOCALES = ['en', 'es', 'he', 'ja', 'ru', 'sv'] as const;
 

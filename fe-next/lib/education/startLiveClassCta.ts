@@ -7,7 +7,7 @@
  * before Teacher Pro conversion.
  *
  * `assignmentCount === null` is unknown. Unknown must not look like "has an
- * assignment" (same pitfall as firstAssignmentCta).
+ * assignment".
  */
 export interface StartLiveClassCtaState {
   studentCount: number;

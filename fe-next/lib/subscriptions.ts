@@ -8,7 +8,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
-import { type TierConfig, getTierConfig } from './lemonsqueezy'
+import { getTierConfig } from './education/tierConfig'
 import { FREE_TIER_LIMITS } from './education/freeTierLimits'
 import { resolveProEntitlement, type SubscriptionSource } from './education/proGrant'
 import { teacherHasProAccess } from './education/accessTrialServer'

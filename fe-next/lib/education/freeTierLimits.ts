@@ -1,11 +1,8 @@
 /**
  * The free-tier caps and Teacher Pro pricing — the paywall, in one place.
  *
- * Lives in its own module, not in lib/lemonsqueezy.ts, because the upgrade PAGE has to
- * render these numbers and it is a client component: importing the tier config directly
- * would pull LemonSqueezyClient (and its API key handling) into the client bundle. So the
- * config imports from here, the page imports from here, and there is exactly one place the
- * numbers exist. `lib/education/__tests__/tierLimits.parity.test.ts` asserts the enforced
+ * The tier config (lib/education/tierConfig.ts) and the client upgrade page both import
+ * from here, so there is exactly one place the numbers exist. `lib/education/__tests__/tierLimits.parity.test.ts` asserts the enforced
  * limits and the advertised copy still agree.
  *
  * ── History ──

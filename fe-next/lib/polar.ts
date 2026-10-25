@@ -4,7 +4,7 @@
  * signature validation (Standard Webhooks spec).
  *
  * Replaces the Lemon Squeezy integration (store permanently rejected at KYC,
- * 2026-08-09). Tier limits/config stay in ./lemonsqueezy (provider-agnostic data).
+ * 2026-08-09). Tier limits/config live in ./education/tierConfig.
  *
  * Env:
  * - POLAR_ACCESS_TOKEN       Organization access token (sandbox or production)

@@ -10,12 +10,7 @@
  */
 
 import { sanitizeUsername } from '@/utils/consts';
-import { classroomLivePath, isClassroomLivePathname } from '@/lib/education/classroomLivePath';
-
-/** @deprecated Use `classroomLivePath(locale, code, { host: true })`. Kept so lobby callers need no edit. */
-export function classroomMultiplayerPath(locale: string, gameCode: string): string {
-  return classroomLivePath(locale, gameCode, { host: true });
-}
+import { isClassroomLivePathname } from '@/lib/education/classroomLivePath';
 
 /**
  * Whether this multiplayer entry carries a teacher-launched lesson.

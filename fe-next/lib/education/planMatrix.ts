@@ -3,10 +3,8 @@ import { FREE_TIER_LIMITS } from './freeTierLimits';
 /**
  * The Free-vs-Pro comparison matrix, as data.
  *
- * Imports `freeTierLimits.ts` and NOTHING else on purpose. The matrix renders inside a
- * client component, and `lib/lemonsqueezy.ts` — where `TIER_CONFIGS` lives — drags
- * LemonSqueezyClient and its API key handling into any bundle that touches it. The two are
- * held in agreement by `__tests__/planMatrix.test.ts`, which is allowed to import both.
+ * Imports `freeTierLimits.ts` and NOTHING else on purpose. The matrix and `tierConfig.ts`
+ * (where `TIER_CONFIGS` lives) are held in agreement by `__tests__/planMatrix.test.ts`.
  *
  * Why a fourth description of the same two tiers exists at all: the upgrade page's two cards
  * cannot be read across. The Free card lists "Unlimited classes ✗" while the Pro card beside

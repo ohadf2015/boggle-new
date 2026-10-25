@@ -14,7 +14,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { FREE_TIER_LIMITS } from '../freeTierLimits';
-import { getTierConfig } from '../../lemonsqueezy';
+import { getTierConfig } from '../tierConfig';
 // @ts-expect-error — translations are untyped .js bundles
 import { en } from '../../../translations/en';
 
