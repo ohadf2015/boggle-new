@@ -12,12 +12,14 @@ import { render } from '@testing-library/react';
 
 vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: vi.fn() }));
 vi.mock('@/lib/education/parentReportData', () => ({ loadParentReportData: vi.fn() }));
+vi.mock('@/lib/education/parentReportRevocation', () => ({ isParentReportRevoked: vi.fn(async () => false) }));
 vi.mock('@/utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('@/backend/utils/educationTelemetry', () => ({ captureEduServerEvents: vi.fn() }));
 
 import Page, { generateMetadata } from '../page';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { loadParentReportData } from '@/lib/education/parentReportData';
+import { isParentReportRevoked } from '@/lib/education/parentReportRevocation';
 import { signParentReportToken } from '@/lib/education/parentReportToken';
 import logger from '@/utils/logger';
 import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
@@ -44,6 +46,11 @@ describe('parent report page', () => {
     it('always sets robots noindex,nofollow regardless of token validity', async () => {
       const meta = await generateMetadata({ params: params('en', 'garbage') });
       expect(meta.robots).toEqual(expect.objectContaining({ index: false, follow: false }));
+    });
+
+    it('tells the browser never to send the report URL as a referrer', async () => {
+      const meta = await generateMetadata({ params: params('en', 'garbage') });
+      expect(meta.referrer).toBe('no-referrer');
     });
 
     it('never includes the student name (privacy: no PII in link previews)', async () => {
@@ -84,6 +91,17 @@ describe('parent report page', () => {
 
       expect(container.textContent).toContain('Link not available');
       expect(logger.error).toHaveBeenCalled();
+      expect(loadParentReportData).not.toHaveBeenCalled();
+    });
+
+    it('a link the teacher revoked shows the error view and loads no data', async () => {
+      (createAdminClient as any).mockReturnValue({});
+      (isParentReportRevoked as any).mockResolvedValueOnce(true);
+      const token = signParentReportToken(STUDENT, CLASSROOM);
+
+      const { container } = render(await Page({ params: params('en', token) }));
+
+      expect(container.textContent).toContain('Link not available');
       expect(loadParentReportData).not.toHaveBeenCalled();
     });
 

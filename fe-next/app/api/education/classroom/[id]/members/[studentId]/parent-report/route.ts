@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { requireTeacherPro } from '@/lib/education/pro/requireTeacherPro';
 import { signParentReportToken } from '@/lib/education/parentReportToken';
+import { revokeParentReportLinks } from '@/lib/education/parentReportRevocation';
 import logger from '@/utils/logger';
 
 const paramsSchema = z.object({
@@ -91,4 +92,45 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string; st
   }
 
   return NextResponse.json({ ok: true, path: `/report/${token}` });
+}
+
+/**
+ * DELETE — revoke every parent link issued so far for this student in this class.
+ * Owner only; no Pro check, so a lapsed teacher can still kill links already shared.
+ */
+export async function DELETE(req: Request, ctx: { params: Promise<{ id: string; studentId: string }> }) {
+  void req;
+  const parsedParams = paramsSchema.safeParse(await ctx.params);
+  if (!parsedParams.success) {
+    return NextResponse.json({ ok: false, error: 'Invalid classroom or student id' }, { status: 400 });
+  }
+  const { id: classroomId, studentId } = parsedParams.data;
+
+  const sb = await createClient();
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+
+  const { data: owned, error: ownErr } = await sb
+    .from('classrooms')
+    .select('id')
+    .eq('id', classroomId)
+    .eq('teacher_id', user.id)
+    .maybeSingle();
+  if (ownErr) {
+    logger.error('[parent-report] ownership check failed', ownErr);
+    return NextResponse.json({ ok: false, error: 'Could not revoke links' }, { status: 500 });
+  }
+  if (!owned) return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
+
+  const admin = createAdminClient();
+  if (!admin) {
+    return NextResponse.json({ ok: false, error: 'service role key not configured' }, { status: 500 });
+  }
+
+  const { error } = await revokeParentReportLinks(admin, classroomId, studentId);
+  if (error) {
+    logger.error('[parent-report] revoke failed', error);
+    return NextResponse.json({ ok: false, error: 'Could not revoke links' }, { status: 500 });
+  }
+  return NextResponse.json({ ok: true });
 }

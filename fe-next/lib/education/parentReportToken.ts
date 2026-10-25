@@ -30,6 +30,8 @@ export interface ParentReportTokenPayload {
   classroomId: string;
   /** Expiry, epoch ms. */
   exp: number;
+  /** Issue time, epoch ms. Absent on links minted before revocation existed. */
+  iat?: number;
 }
 
 function getSecret(): string {
@@ -54,6 +56,7 @@ export function signParentReportToken(
     studentId,
     classroomId,
     exp: nowMs + days * DAY_MS,
+    iat: nowMs,
   };
   return signPayload(payload, secret, DOMAIN);
 }
