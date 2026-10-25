@@ -960,7 +960,8 @@ const es = {
       "progressAssignments": "tareas",
       "progressSubmitted": "entregadas",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "Alumnos que probaron el código de un juego que ya terminó: {count}. Empieza un juego nuevo para que puedan jugar."
+      "endedCodeTries": "Alumnos que probaron el código de un juego que ya terminó: {count}. Empieza un juego nuevo para que puedan jugar.",
+      "endedCodeTriesOne": "Un alumno probó el código de un juego que ya terminó. Empieza un juego nuevo para que pueda jugar."
     },
     "modes": {
       "workshop": {

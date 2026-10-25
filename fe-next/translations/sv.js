@@ -960,7 +960,8 @@ const sv = {
       "progressAssignments": "uppgifter",
       "progressSubmitted": "inlämnade",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "Elever som försökte med en gammal spelkod: {count}. Starta ett nytt spel så att de kan vara med."
+      "endedCodeTries": "Elever som försökte med en gammal spelkod: {count}. Starta ett nytt spel så att de kan vara med.",
+      "endedCodeTriesOne": "En elev försökte med en gammal spelkod. Starta ett nytt spel så att eleven kan vara med."
     },
     "modes": {
       "workshop": {

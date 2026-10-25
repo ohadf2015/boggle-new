@@ -962,7 +962,8 @@ const ru = {
       "progressAssignments": "задания",
       "progressSubmitted": "сдано",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "Пытались войти по старому коду: {count}. Запустите новую игру, чтобы ученики смогли играть."
+      "endedCodeTries": "Пытались войти по старому коду: {count}. Запустите новую игру, чтобы ученики смогли играть.",
+      "endedCodeTriesOne": "Один ученик пытался войти по старому коду. Запустите новую игру, чтобы он смог играть."
     },
     "modes": {
       "workshop": {

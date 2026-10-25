@@ -960,7 +960,8 @@ const he = {
       "progressAssignments": "מטלות",
       "progressSubmitted": "הוגשו",
       "progressUpgrade": "פרו למורים",
-      "endedCodeTries": "תלמידים שניסו קוד של משחק שהסתיים: {count}. התחילו משחק חדש כדי שיוכלו לשחק."
+      "endedCodeTries": "תלמידים שניסו קוד של משחק שהסתיים: {count}. התחילו משחק חדש כדי שיוכלו לשחק.",
+      "endedCodeTriesOne": "תלמיד אחד ניסה קוד של משחק שהסתיים. התחילו משחק חדש כדי שיוכל לשחק."
     },
     "modes": {
       "workshop": {

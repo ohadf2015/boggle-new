@@ -960,7 +960,8 @@ const ja = {
       "progressAssignments": "課題",
       "progressSubmitted": "提出済み",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "終了したゲームのコードを入力した生徒：{count}人。新しいゲームを始めて、参加できるようにしましょう。"
+      "endedCodeTries": "終了したゲームのコードを入力した生徒：{count}人。新しいゲームを始めて、参加できるようにしましょう。",
+      "endedCodeTriesOne": "終了したゲームのコードを入力した生徒：{count}人。新しいゲームを始めて、参加できるようにしましょう。"
     },
     "modes": {
       "workshop": {
