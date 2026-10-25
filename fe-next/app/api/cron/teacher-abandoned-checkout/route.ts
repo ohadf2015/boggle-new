@@ -164,7 +164,10 @@ export async function POST(request: NextRequest) {
       for (const d of due) {
         // Still inside the free access trial: the trial checkout was "keep Pro after
         // the trial", so the reminder must not pitch a second 14-day trial.
-        const mode = d.mode === 'trial' && accessTrialLive(d.access.trial_expires_at) ? 'keep' : d.mode;
+        // Free access trial already over: no trial at all, continue with Pro at $9/mo.
+        const end = d.access.trial_expires_at;
+        const accessEnded = typeof end === 'string' && Number.isFinite(Date.parse(end)) && !accessTrialLive(end);
+        const mode = accessEnded ? 'ended' : d.mode === 'trial' && accessTrialLive(end) ? 'keep' : d.mode;
         const tpl = teacherAbandonedCheckout({ full_name: d.access.full_name || 'Teacher', locale: d.locale, mode });
         const result = await sendLifecycleEmail({
           to: d.access.email,

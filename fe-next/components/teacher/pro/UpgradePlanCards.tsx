@@ -11,6 +11,7 @@ import { SCHOOL_PRICING, schoolMonthlyParams } from '@/lib/education/pro/schoolP
 import { SchoolPriceTag } from './SchoolPriceTag';
 import type { UpgradeViewer } from '@/lib/education/pro/upgradeViewer';
 import { accessTrialLive, keepAfterTrialCopy } from '@/lib/education/pro/keepAfterTrialCopy';
+import { trialEndedCopy } from '@/lib/education/pro/trialEndedCopy';
 
 export interface UpgradePlanCardsProps {
   viewer: UpgradeViewer;
@@ -31,6 +32,8 @@ export interface UpgradePlanCardsProps {
    * second 14-day trial; the checkout's Polar trial runs only to this date.
    */
   accessTrialEndsAt?: string | null;
+  /** The free access trial has ended: no trial wording, a straight "Continue with Teacher Pro". */
+  accessTrialEnded?: boolean;
 }
 
 const BTN =
@@ -89,9 +92,11 @@ export function UpgradePlanCards({
   askSchool,
   manageBillingHref,
   accessTrialEndsAt = null,
+  accessTrialEnded = false,
 }: UpgradePlanCardsProps) {
   const { t, language } = useLanguage();
   const keep = showTrial && accessTrialLive(accessTrialEndsAt) ? keepAfterTrialCopy(language, accessTrialEndsAt) : null;
+  const ended = !showTrial && viewer !== 'pro' && accessTrialEnded ? trialEndedCopy(language) : null;
   const perMonth = t('teacher.subscription.perMonth');
   const price = `$${TEACHER_PRO_PRICE_USD}`;
   const busy = pending !== null;
@@ -156,7 +161,7 @@ export function UpgradePlanCards({
       >
         <span className="absolute -top-3 start-4 inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-pink px-2.5 py-0.5 font-neo-display text-xs font-black text-neo-black">
           <Sparkles className="h-3 w-3" strokeWidth={3} aria-hidden />
-          {keep ? keep.badge : showTrial ? t('eg2Pro.plans.trialBadge', { days: TEACHER_PRO_TRIAL_DAYS }) : t('eg2Pro.plans.recommended')}
+          {keep ? keep.badge : ended ? ended.badge : showTrial ? t('eg2Pro.plans.trialBadge', { days: TEACHER_PRO_TRIAL_DAYS }) : t('eg2Pro.plans.recommended')}
         </span>
         <h2 className="mt-1 font-neo-display text-lg font-black text-neo-black">{t('teacher.subscription.proPlanName')}</h2>
         <p className="mb-3 text-xs font-bold text-neo-black/75">{t('teacher.subscription.unlimitedAccess')}</p>
@@ -193,10 +198,10 @@ export function UpgradePlanCards({
                 className={cn(BTN, 'gap-2', showTrial ? 'min-h-11 bg-neo-cream text-neo-black text-sm' : 'bg-neo-black text-neo-white')}
               >
                 {pending === 'paid' ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> : null}
-                {pending === 'paid' ? t('common.loading') : showTrial ? t('eg2Pro.plans.buyNowInstead', { price }) : t('eg2Pro.plans.buyCta', { price })}
+                {pending === 'paid' ? t('common.loading') : ended ? ended.cta : showTrial ? t('eg2Pro.plans.buyNowInstead', { price }) : t('eg2Pro.plans.buyCta', { price })}
               </button>
               <p className="text-center text-xs font-bold text-neo-black/80">
-                {keep ? keep.note : showTrial ? t('eg2Pro.plans.trialNote', { days: TEACHER_PRO_TRIAL_DAYS, price }) : t('teacher.subscription.proCtaSubtext')}
+                {keep ? keep.note : ended ? ended.note : showTrial ? t('eg2Pro.plans.trialNote', { days: TEACHER_PRO_TRIAL_DAYS, price }) : t('teacher.subscription.proCtaSubtext')}
               </p>
               {askSchool}
             </>

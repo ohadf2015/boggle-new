@@ -136,6 +136,21 @@ describe('UpgradePlanCards inside the free access trial', () => {
     expect(card).not.toHaveTextContent('eg2Pro.plans.trialBadge');
   });
 
+  it('free access trial ended: straight to paid with "Continue with Teacher Pro", no trial wording', () => {
+    setup('free', { showTrial: false, accessTrialEnded: true });
+    expect(screen.queryByTestId('pricing-trial-cta')).toBeNull();
+    expect(screen.getByTestId('pricing-paid-cta')).toHaveTextContent('Continue with Teacher Pro');
+    const card = screen.getByTestId('plan-card-pro');
+    expect(card).toHaveTextContent('Free trial ended');
+    expect(card).toHaveTextContent('$9/mo · Cancel anytime');
+    expect(card).not.toHaveTextContent(/eg2Pro\.plans\.trial|14/);
+  });
+
+  it('a Pro teacher never sees the trial-ended copy', () => {
+    setup('pro', { showTrial: false, accessTrialEnded: true });
+    expect(screen.queryByText('Continue with Teacher Pro')).toBeNull();
+  });
+
   it('keeps the normal trial offer without a live access trial', () => {
     setup('free', { showTrial: true, accessTrialEndsAt: new Date(Date.now() - 1000).toISOString() });
     expect(screen.getByTestId('pricing-trial-cta')).toHaveTextContent('eg2Pro.plans.trialCta|14');

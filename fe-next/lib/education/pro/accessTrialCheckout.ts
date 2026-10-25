@@ -2,10 +2,10 @@ import { TEACHER_PRO_TRIAL_DAYS } from '@/lib/education/pro/trialDays';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export type PolarTrialSource = 'access_trial' | 'standard';
+export type PolarTrialSource = 'access_trial' | 'standard' | 'access_trial_ended';
 
 export interface PolarTrialPlan {
-  /** Days of Polar trial before the first $9 charge. */
+  /** Days of Polar trial before the first $9 charge. 0 = no trial: charge now. */
   days: number;
   /** `access_trial`: the teacher is already inside the free 14-day access window. */
   source: PolarTrialSource;
@@ -24,12 +24,14 @@ export interface PolarTrialPlan {
  * left gets 4, never less than they were promised. Capped at the standard length so
  * a mis-stamped expiry can never hand out more than 14 days.
  *
- * No live access window (never approved, or it already ran out) keeps the normal
- * 14-day trial.
+ * Never had an access window (or the lookup failed: null) keeps the normal 14-day
+ * trial. A window that already ran out means they had their free trial: no second
+ * one, the checkout is a straight $9/mo subscription (days 0).
  */
 export function polarTrialPlan(accessTrialExpiresAt: string | null | undefined, nowMs: number): PolarTrialPlan {
   const end = accessTrialExpiresAt ? Date.parse(accessTrialExpiresAt) : Number.NaN;
-  if (!Number.isFinite(end) || end <= nowMs) return { days: TEACHER_PRO_TRIAL_DAYS, source: 'standard' };
+  if (!Number.isFinite(end)) return { days: TEACHER_PRO_TRIAL_DAYS, source: 'standard' };
+  if (end <= nowMs) return { days: 0, source: 'access_trial_ended' };
   const days = Math.min(TEACHER_PRO_TRIAL_DAYS, Math.max(1, Math.ceil((end - nowMs) / DAY_MS)));
   return { days, source: 'access_trial' };
 }

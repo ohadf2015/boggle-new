@@ -5,8 +5,10 @@ import { abandonedCheckoutUpgradeUrl, type CheckoutMode } from '@/lib/education/
  * `keep`: a trial checkout from a teacher still inside the free access trial. They
  * already have the trial, so the email asks them to keep Pro when it ends rather
  * than "start a free 14-day trial" a second time.
+ * `ended`: the teacher's free access trial is over, so no trial is offered at all:
+ * continue with Teacher Pro at $9/mo.
  */
-export type AbandonedCheckoutEmailMode = CheckoutMode | 'keep';
+export type AbandonedCheckoutEmailMode = CheckoutMode | 'keep' | 'ended';
 
 interface Args {
   full_name: string;
@@ -55,6 +57,11 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
         lead: 'You started setting up Teacher Pro to keep after your free trial, but did not finish. $9/mo starts only when your free trial ends.',
         cta: 'Keep Teacher Pro after my trial',
       },
+      ended: {
+        subject: 'Your free trial has ended: continue with Teacher Pro',
+        lead: 'Your free trial has ended. You started setting up Teacher Pro but did not finish. Continue with Teacher Pro for $9/mo, cancel anytime.',
+        cta: 'Continue with Teacher Pro',
+      },
     },
     body: 'If something went wrong on the payment page, here is a fresh link. It takes under a minute.',
     price: 'Teacher Pro is $9/month: unlimited classrooms, live word games, and the progress dashboard. Cancel any time.',
@@ -79,6 +86,11 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
         subject: 'ממשיכים עם Teacher Pro אחרי תקופת הניסיון',
         lead: 'התחלת להגדיר את Teacher Pro להמשך אחרי תקופת הניסיון החינמית, אבל לא סיימת. התשלום של 9$ לחודש מתחיל רק כשתקופת הניסיון מסתיימת.',
         cta: 'להמשיך עם Teacher Pro אחרי הניסיון',
+      },
+      ended: {
+        subject: 'תקופת הניסיון החינמית הסתיימה: ממשיכים עם פרו למורים',
+        lead: 'תקופת הניסיון החינמית שלך הסתיימה. התחלת להגדיר את Teacher Pro אבל לא סיימת. אפשר להמשיך עם Teacher Pro ב-9$ לחודש, ביטול בכל עת.',
+        cta: 'להמשיך עם פרו למורים',
       },
     },
     body: 'אם משהו השתבש בדף התשלום, הנה קישור חדש. זה לוקח פחות מדקה.',
@@ -106,6 +118,11 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
         lead: 'Du började ställa in Teacher Pro för att behålla det efter gratisperioden, men slutförde inte. $9/mån börjar först när din gratisperiod slutar.',
         cta: 'Behåll Teacher Pro efter min provperiod',
       },
+      ended: {
+        subject: 'Din gratisperiod har tagit slut: fortsätt med Teacher Pro',
+        lead: 'Din gratisperiod har tagit slut. Du började ställa in Teacher Pro men slutförde inte. Fortsätt med Teacher Pro för $9/mån, avsluta när du vill.',
+        cta: 'Fortsätt med Teacher Pro',
+      },
     },
     body: 'Om något gick fel på betalsidan kommer här en ny länk. Det tar under en minut.',
     price: 'Teacher Pro kostar $9/månad: obegränsade klasser, ordspel i realtid och översikt över elevernas framsteg. Avsluta när du vill.',
@@ -130,6 +147,11 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
         subject: 'Sigue con Teacher Pro después de tu prueba gratis',
         lead: 'Empezaste a configurar Teacher Pro para seguir después de tu prueba gratis, pero no terminaste. Los $9/mes empiezan solo cuando termina tu prueba gratis.',
         cta: 'Seguir con Teacher Pro después de mi prueba',
+      },
+      ended: {
+        subject: 'Tu prueba gratis ha terminado: continúa con Teacher Pro',
+        lead: 'Tu prueba gratis ha terminado. Empezaste a configurar Teacher Pro pero no terminaste. Continúa con Teacher Pro por $9/mes, cancela cuando quieras.',
+        cta: 'Continuar con Teacher Pro',
       },
     },
     body: 'Si algo falló en la página de pago, aquí tienes un enlace nuevo. Tarda menos de un minuto.',
@@ -156,6 +178,11 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
         lead: '無料トライアル後もTeacher Proを続ける設定を始めましたが、完了していません。月$9のお支払いは無料トライアル終了日から始まります。',
         cta: 'トライアル後もTeacher Proを続ける',
       },
+      ended: {
+        subject: '無料トライアルは終了しました：Teacher Proを続けましょう',
+        lead: '無料トライアルは終了しました。Teacher Proの設定を始めましたが、完了していません。月$9でTeacher Proを続けられます。いつでも解約できます。',
+        cta: 'Teacher Proを続ける',
+      },
     },
     body: 'お支払いページで問題があった場合は、こちらの新しいリンクをご利用ください。1分もかかりません。',
     price: 'Teacher Proは月$9です：クラス無制限、リアルタイムの単語ゲーム、進捗ダッシュボード。いつでも解約できます。',
@@ -180,6 +207,11 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
         subject: 'Сохраните Teacher Pro после бесплатного периода',
         lead: 'Вы начали оформлять Teacher Pro, чтобы продолжить после бесплатного периода, но не закончили. Оплата $9/мес начнётся только когда закончится бесплатный период.',
         cta: 'Сохранить Teacher Pro после пробного периода',
+      },
+      ended: {
+        subject: 'Бесплатный период закончился: продолжите с Teacher Pro',
+        lead: 'Ваш бесплатный период закончился. Вы начали оформлять Teacher Pro, но не закончили. Продолжите с Teacher Pro за $9/мес, отмена в любой момент.',
+        cta: 'Продолжить с Teacher Pro',
       },
     },
     body: 'Если на странице оплаты что-то пошло не так, вот новая ссылка. Это займёт меньше минуты.',

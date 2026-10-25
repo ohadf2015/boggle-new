@@ -129,13 +129,32 @@ describe('/api/cron/teacher-abandoned-checkout', () => {
     expect(mail.html).not.toContain('14-day');
   });
 
-  it('a trial checkout after the access trial ended keeps the normal trial email', async () => {
+  it('after the access trial ended: the continue-with-Pro email, no trial wording', async () => {
     h.tables.checkout_started.data[0].payload = { mode: 'trial', locale: 'en' };
     h.tables.teacher_access_requests.data[0] = {
       ...h.tables.teacher_access_requests.data[0],
       locale: 'en',
       trial_expires_at: new Date(Date.now() - 3600 * 1000).toISOString(),
     };
+    await POST(makeRequest());
+    const mail = h.sendEmailSpy.mock.calls[0][0];
+    expect(mail.subject).toBe('Your free trial has ended: continue with Teacher Pro');
+    expect(mail.html).toContain('Continue with Teacher Pro');
+    expect(mail.html).not.toMatch(/14-day|Start my free trial/);
+  });
+
+  it('a paid checkout after the access trial ended also gets the continue-with-Pro email', async () => {
+    h.tables.teacher_access_requests.data[0] = {
+      ...h.tables.teacher_access_requests.data[0],
+      trial_expires_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
+    };
+    await POST(makeRequest());
+    expect(h.sendEmailSpy.mock.calls[0][0].subject).toBe('תקופת הניסיון החינמית הסתיימה: ממשיכים עם פרו למורים');
+  });
+
+  it('no access trial on record keeps the normal trial email', async () => {
+    h.tables.checkout_started.data[0].payload = { mode: 'trial', locale: 'en' };
+    h.tables.teacher_access_requests.data[0] = { ...h.tables.teacher_access_requests.data[0], locale: 'en', trial_expires_at: null };
     await POST(makeRequest());
     expect(h.sendEmailSpy.mock.calls[0][0].subject).toMatch(/free Teacher Pro trial/);
   });

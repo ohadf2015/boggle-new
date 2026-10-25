@@ -4,7 +4,7 @@ import { checkTeacherSubscription } from '@/lib/subscriptions';
 import { polarTrialExpires } from '@/lib/education/polarTrial';
 import { getPolarClient } from '@/lib/polar';
 import { createAdminClient } from '@/utils/supabase/admin';
-import { liveAccessTrialExpiry } from '@/lib/education/accessTrialServer';
+import { accessTrialExpiryAny } from '@/lib/education/accessTrialServer';
 import { hasPendingCheckout, type PendingCheckoutEventRow } from '@/lib/education/pendingCheckout';
 import { withTimeout } from '@/lib/server/routeTimeout';
 import logger from '@/utils/logger';
@@ -79,7 +79,7 @@ async function hasPolarTrialEvent(userId: string): Promise<boolean> {
  *
  * Response:
  * - 200: { has_pro, tier, status, source, grant_expired, portal_url, current_period_end,
- *          cancel_at_period_end, trial_expires, trial_used, access_trial_expires,
+ *          cancel_at_period_end, trial_expires, trial_used, access_trial_expires, access_trial_ended,
  *          grant: { id, expires_at, days, note, welcomed } | null }
  *   trial_expires is the ISO trial end while status is trialing, else null.
  *   trial_used is true once a Polar trial has started (no second free trial).
@@ -137,7 +137,11 @@ export async function GET(request: NextRequest) {
       subscription.source !== 'admin_grant'
     );
     const trialUsed = onPolarTrial || await hasPolarTrialEvent(user.id);
-    const accessTrialExpires = subscription.has_pro ? null : await liveAccessTrialExpiry(user.id);
+    const accessTrialEnd = subscription.has_pro ? null : await accessTrialExpiryAny(user.id);
+    const accessTrialLiveNow = accessTrialEnd !== null && Date.parse(accessTrialEnd) > Date.now();
+    const accessTrialExpires = accessTrialLiveNow ? accessTrialEnd : null;
+    // Known to have had (and finished) the free access trial: no second trial is offered.
+    const accessTrialEnded = accessTrialEnd !== null && !accessTrialLiveNow;
     const pendingCheckout = subscription.has_pro ? false : await resolvePendingCheckout(user.id);
 
     return NextResponse.json({
@@ -152,6 +156,7 @@ export async function GET(request: NextRequest) {
       trial_expires: trialExpires,
       trial_used: trialUsed,
       access_trial_expires: accessTrialExpires,
+      access_trial_ended: accessTrialEnded,
       pending_checkout: pendingCheckout,
       grant,
     });

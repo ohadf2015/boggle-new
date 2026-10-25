@@ -7,6 +7,18 @@ import { createAdminClient } from '@/utils/supabase/admin';
  * Fails closed to null.
  */
 export async function liveAccessTrialExpiry(userId: string): Promise<string | null> {
+  const end = await accessTrialExpiryAny(userId);
+  if (!end || Date.parse(end) <= Date.now()) return null;
+  return end;
+}
+
+/**
+ * End of the teacher's latest approved ACCESS trial, live OR already past, or null
+ * (never approved, no window, or the lookup failed). A past value means the free
+ * trial is known to have ended. Fails closed to null, which callers treat as
+ * "unknown / never had one", so a failed read never takes a trial away.
+ */
+export async function accessTrialExpiryAny(userId: string): Promise<string | null> {
   try {
     const admin = createAdminClient();
     if (!admin) return null;
@@ -19,7 +31,7 @@ export async function liveAccessTrialExpiry(userId: string): Promise<string | nu
       .limit(1)
       .maybeSingle();
     const end = (data as { trial_expires_at?: string | null } | null)?.trial_expires_at;
-    if (error || !end || Date.parse(end) <= Date.now()) return null;
+    if (error || !end || !Number.isFinite(Date.parse(end))) return null;
     return end;
   } catch {
     return null;
