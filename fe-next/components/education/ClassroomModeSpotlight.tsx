@@ -160,7 +160,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, language, dir, bus
         onClick={onGoLive}
         disabled={!!blockedKey || busy}
         className={cn(
-          'mt-3 flex min-h-14 w-full items-center justify-center gap-2 rounded-neo-lg border-[3px] border-black px-4 py-2 lg:min-h-16 lg:[@media(max-height:1099px)]:mt-0 lg:[@media(max-height:1099px)]:min-h-0 lg:[@media(max-height:1099px)]:w-auto lg:[@media(max-height:1099px)]:min-w-[40%] lg:[@media(max-height:1099px)]:shrink-0',
+          'mt-3 flex min-h-14 w-full items-center justify-center gap-2 rounded-neo-lg border-[3px] border-black px-4 py-2 lg:min-h-16 lg:[@media(max-height:1099px)]:mt-0 lg:[@media(max-height:1099px)]:min-h-0 lg:[@media(max-height:1099px)]:w-auto lg:[@media(max-height:1099px)]:min-w-[30%] lg:[@media(max-height:1099px)]:shrink-0',
           'bg-neo-lime font-neo-display text-xl font-black uppercase tracking-tight text-black shadow-hard-lg lg:text-4xl lg:[@media(max-height:1099px)]:text-2xl',
           'transition-transform motion-safe:hover:-translate-y-0.5 active:translate-y-0.5',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
