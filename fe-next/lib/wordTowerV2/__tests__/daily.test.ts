@@ -80,6 +80,29 @@ describe('v2 daily', () => {
     ).toBeNull();
   });
 
+  it('given a mid-climb tick, when recorded, then the body is not flagged final', () => {
+    const body = recordV2DailyClimb(
+      { climbM: 8, floors: 3, longestWord: 'tower' },
+      { language: 'en', guestFingerprint: null, storage: mem(), date: DAY },
+    );
+    expect(body?.final).toBeUndefined();
+  });
+
+  it('given a banked climb that did not beat the best, when recorded as final, then a final body is still returned', () => {
+    const storage = mem({ [dailyBestKey(utcDateKey(DAY))]: '20' });
+    const body = recordV2DailyClimb(
+      { climbM: 20, floors: 6, longestWord: 'tower' },
+      { language: 'en', guestFingerprint: null, storage, date: DAY, final: true },
+    );
+    expect(body).toMatchObject({ heightM: 20, final: true });
+  });
+
+  it('given a banked climb of zero, when recorded as final, then nothing is submitted', () => {
+    expect(
+      recordV2DailyClimb({ climbM: 0, floors: 0, longestWord: '' }, { language: 'en', guestFingerprint: null, storage: mem(), date: DAY, final: true }),
+    ).toBeNull();
+  });
+
   it('given a v2 climb, when mapped, then the body matches the existing daily score POST contract', () => {
     const body = recordV2DailyClimb(
       { climbM: 12.9, floors: 5, longestWord: 'crane' },

@@ -59,6 +59,8 @@ export interface DailySubmitBody extends DailyClimb {
   heightM: number;
   language: string;
   guestFingerprint: string | null;
+  /** The climb is banked (exit / pagehide): the server may credit daily quests. */
+  final?: true;
 }
 
 /**
@@ -72,6 +74,8 @@ export function recordV2DailyClimb(
     guestFingerprint: string | null;
     storage?: { getItem(key: string): string | null; setItem(key: string, value: string): void };
     date?: Date;
+    /** Banking flush: return a body even if the best did not improve, so quests get credited. */
+    final?: boolean;
   },
 ): DailySubmitBody | null {
   const date = opts.date ?? new Date();
@@ -88,11 +92,12 @@ export function recordV2DailyClimb(
   } catch {
     return null;
   }
-  if (!improved || merged <= 0) return null;
+  if (merged <= 0 || (!improved && !opts.final)) return null;
   return {
     ...result,
     heightM: merged,
     language: opts.language,
     guestFingerprint: opts.guestFingerprint,
+    ...(opts.final ? { final: true as const } : {}),
   };
 }

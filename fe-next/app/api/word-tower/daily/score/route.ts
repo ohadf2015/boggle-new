@@ -52,6 +52,13 @@ interface SubmitBody {
   language?: string;
   guestFingerprint?: string | null;
   longestWord?: string | null;
+  /**
+   * Set only by the client's exit/pagehide flush, i.e. the climb is banked. The
+   * 1.5 s ticks submit mid-climb heights for the leaderboard, but a total
+   * collapse reverts today's growth, so those must not complete a quest (the
+   * toast would fire for metres the player then loses).
+   */
+  final?: boolean;
 }
 
 export async function POST(request: NextRequest) {
@@ -78,6 +85,7 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabaseAdmin();
     if (!supabase) return NextResponse.json({ error: 'db unavailable' }, { status: 503 });
 
+    const isFinal = body.final === true;
     const puzzleDate = utcDateKey();
     const identity = user
       ? { column: 'player_id' as const, value: user.id }
@@ -97,6 +105,12 @@ export async function POST(request: NextRequest) {
       // localStorage best, so both sides agree on what "today's best" means.
       const merged = mergeDailyBest(Number(existing.best_height_m) || 0, heightM);
       if (merged <= (Number(existing.best_height_m) || 0)) {
+        if (isFinal) {
+          creditDailyQuests(user?.id, questResultForWordTower({
+            heightM: Number(existing.best_height_m) || 0,
+            floors: Number(existing.floors) || 0,
+          }));
+        }
         return NextResponse.json({ ok: true, bestHeightM: Number(existing.best_height_m) || 0, improved: false });
       }
       const { error } = await supabase
@@ -112,11 +126,13 @@ export async function POST(request: NextRequest) {
         captureApiError(error as unknown as Error, 'word-tower-daily-score-update');
         return NextResponse.json({ error: 'failed to save' }, { status: 500 });
       }
-      // Daily quests (authed only): today's best climb + floors. Fire-and-forget.
-      creditDailyQuests(user?.id, questResultForWordTower({
-        heightM: merged,
-        floors: Math.max(Number(existing.floors) || 0, Math.floor(Number(body.floors) || 0)),
-      }));
+      // Daily quests (authed only): today's banked climb + floors. Fire-and-forget.
+      if (isFinal) {
+        creditDailyQuests(user?.id, questResultForWordTower({
+          heightM: merged,
+          floors: Math.max(Number(existing.floors) || 0, Math.floor(Number(body.floors) || 0)),
+        }));
+      }
       return NextResponse.json({ ok: true, bestHeightM: merged, improved: true });
     }
 
@@ -136,10 +152,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'failed to save' }, { status: 500 });
     }
 
-    creditDailyQuests(user?.id, questResultForWordTower({
-      heightM,
-      floors: Math.floor(Number(body.floors) || 0),
-    }));
+    if (isFinal) {
+      creditDailyQuests(user?.id, questResultForWordTower({
+        heightM,
+        floors: Math.floor(Number(body.floors) || 0),
+      }));
+    }
     return NextResponse.json({ ok: true, bestHeightM: heightM, improved: true });
   } catch (err) {
     captureApiError(err as Error, 'word-tower-daily-score');
