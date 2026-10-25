@@ -45,3 +45,13 @@ describe('AlertDialogContent layering', () => {
     expect(layer).toHaveClass('max-w-[100vw]');
   });
 });
+
+describe('AlertDialogHeader alignment', () => {
+  it('aligns to the logical start (not hard-coded left) so RTL locales read right-to-left', async () => {
+    const { AlertDialogHeader } = await import('../alert-dialog');
+    const { container } = render(<AlertDialogHeader>x</AlertDialogHeader>);
+    const cls = (container.firstElementChild as HTMLElement).className;
+    expect(cls).toContain('sm:text-start');
+    expect(cls).not.toContain('sm:text-left');
+  });
+});
