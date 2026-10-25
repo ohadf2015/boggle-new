@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
-import { goToPolarCheckout, postTeacherProCheckout } from '@/lib/education/postTeacherProCheckout';
+import { goToPolarCheckout, postTeacherProCheckout, checkoutFailureKey } from '@/lib/education/postTeacherProCheckout';
 import { trackTrialCtaTap, type TrialCtaSource } from '@/lib/education/proFunnelTelemetry';
 
 type T = (key: string) => string;
@@ -21,15 +21,7 @@ export function useStartTeacherProTrial(t: T, language: string, source: TrialCta
     try {
       const result = await postTeacherProCheckout(fetch, { trial: true, locale: language, placement: source });
       if (!result.ok) {
-        toast.error(
-          t(
-            result.status === 401
-              ? 'teacher.subscription.signInRequired'
-              : result.status === 503
-                ? 'teacher.subscription.checkoutUnavailable'
-                : 'teacher.subscription.checkoutError',
-          ),
-        );
+        toast.error(t(checkoutFailureKey(result)));
         return;
       }
       goToPolarCheckout(result.url);

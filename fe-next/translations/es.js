@@ -14453,6 +14453,7 @@ const es = {
       "districtSubtitle": "¿Gestionas varios profesores o clases? Ofrecemos precios flexibles para escuelas y distritos.",
       "districtCta": "Contáctanos para precios escolares",
       "checkoutUnavailable": "El pago está cerrado ahora mismo; no se ha cobrado nada. Inténtalo de nuevo en un rato.",
+      "notInApp": "Teacher Pro no se puede comprar en la app.",
       "featureOutcome1": "Gestiona todas las clases que das, sin tope",
       "featureOutcome2": "Añade todas tus secciones, no solo las primeras 3 clases",
       "featureOutcome3": "Mira quién se atasca, palabra a palabra, en directo",

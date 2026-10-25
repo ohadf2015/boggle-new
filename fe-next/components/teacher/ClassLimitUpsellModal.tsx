@@ -9,6 +9,7 @@ import { TEACHER_PRO_PRICE_USD, FREE_TIER_LIMITS } from '@/lib/education/freeTie
 import {
   goToPolarCheckout,
   postTeacherProCheckout,
+  checkoutFailureKey,
 } from '@/lib/education/postTeacherProCheckout';
 import {
   trackTeacherPlanGateShown,
@@ -90,13 +91,7 @@ export default function ClassLimitUpsellModal({
     try {
       const result = await postTeacherProCheckout(fetch, { trial: false, locale: language, placement: `${source}_modal` });
       if (!result.ok) {
-        if (result.status === 401) {
-          toast.error(t('teacher.subscription.signInRequired'));
-        } else if (result.status === 503) {
-          toast.error(t('teacher.subscription.checkoutUnavailable'));
-        } else {
-          toast.error(t('teacher.subscription.checkoutError'));
-        }
+        toast.error(t(checkoutFailureKey(result)));
         return;
       }
       goToPolarCheckout(result.url);

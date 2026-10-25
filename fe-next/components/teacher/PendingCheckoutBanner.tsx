@@ -1,7 +1,9 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { isCheckoutBlockedInApp } from '@/lib/education/postTeacherProCheckout';
 
 const CTA_CLASS =
   'inline-flex shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-black px-4 py-2 font-neo-display text-sm font-black text-white shadow-hard hover:-translate-y-0.5 disabled:opacity-60';
@@ -24,6 +26,10 @@ export function PendingCheckoutBanner() {
 
   const handleResume = useCallback(async () => {
     if (pending) return;
+    if (isCheckoutBlockedInApp()) {
+      toast(t('teacher.subscription.notInApp'));
+      return;
+    }
     setPending(true);
     try {
       const response = await fetch('/api/subscription/checkout', {
@@ -41,7 +47,7 @@ export function PendingCheckoutBanner() {
     } finally {
       setPending(false);
     }
-  }, [pending, language]);
+  }, [pending, language, t]);
 
   return (
     <aside

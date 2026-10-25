@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import {
   goToPolarCheckout,
   postTeacherProCheckout,
+  checkoutFailureKey,
 } from '@/lib/education/postTeacherProCheckout';
 import {
   trackEduProUpgradeClicked,
@@ -32,13 +33,7 @@ export function useTeacherProCheckout(source: ProUpgradeSource) {
     try {
       const result = await postTeacherProCheckout(fetch, { trial: false, locale: language, placement: source });
       if (!result.ok) {
-        if (result.status === 401) {
-          toast.error(t('teacher.subscription.signInRequired'));
-        } else if (result.status === 503) {
-          toast.error(t('teacher.subscription.checkoutUnavailable'));
-        } else {
-          toast.error(t('teacher.subscription.checkoutError'));
-        }
+        toast.error(t(checkoutFailureKey(result)));
         return;
       }
       goToPolarCheckout(result.url);

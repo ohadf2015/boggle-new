@@ -259,7 +259,7 @@ export function trackTeacherProCheckoutStarted(args: { trial: boolean; signed_in
   }
 }
 
-export type EduProCheckoutFailReason = 'network' | 'no_url' | 'unauthorized' | `http_${number}`;
+export type EduProCheckoutFailReason = 'network' | 'no_url' | 'unauthorized' | 'native_app' | `http_${number}`;
 
 /** `origin: client` keeps these apart from the route's own server-side edu_pro_checkout_failed for the same 5xx. */
 export function trackEduProCheckoutFailed(args: { reason: EduProCheckoutFailReason; placement: string; trial: boolean }): void {

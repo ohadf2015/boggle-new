@@ -14792,6 +14792,7 @@ const sv = {
       "districtSubtitle": "Hanterar du flera lärare eller klassrum? Vi erbjuder flexibel prissättning för skolor och kommuner.",
       "districtCta": "Kontakta oss för skolpriser",
       "checkoutUnavailable": "Kassan är stängd just nu. Inget har debiterats. Försök igen om en stund.",
+      "notInApp": "Teacher Pro går inte att köpa i appen.",
       "featureOutcome1": "Kör alla klasser du undervisar, utan tak",
       "featureOutcome2": "Lägg till alla klasser du undervisar, inte bara de tre första",
       "featureOutcome3": "Se vem som fastnar, ord för ord, i realtid",

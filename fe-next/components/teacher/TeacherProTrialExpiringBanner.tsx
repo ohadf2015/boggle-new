@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { polarTrialDaysLeft, isPolarTrialDay10Expiring } from '@/lib/education/polarTrial';
 import posthog from '@/lib/analytics/lazyPosthog';
-import { goToPolarCheckout, postTeacherProCheckout } from '@/lib/education/postTeacherProCheckout';
+import { goToPolarCheckout, postTeacherProCheckout, checkoutFailureKey } from '@/lib/education/postTeacherProCheckout';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
 
@@ -66,7 +66,7 @@ export function TeacherProTrialExpiringBanner({
         placement: 'dashboard_trial_expiring',
       });
       if (!result.ok) {
-        toast.error(t(result.status === 503 ? 'teacher.subscription.checkoutUnavailable' : 'teacher.subscription.checkoutError'));
+        toast.error(t(checkoutFailureKey(result)));
         return;
       }
       goToPolarCheckout(result.url);

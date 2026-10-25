@@ -14504,6 +14504,7 @@ const ja = {
       "districtSubtitle": "複数の教師や教室を管理していますか？学校や学区向けに柔軟な料金プランをご用意しています。",
       "districtCta": "学校向け料金についてお問い合わせ",
       "checkoutUnavailable": "現在お支払いを受け付けていません。請求は発生していません。しばらくしてからお試しください。",
+      "notInApp": "Teacher Proはアプリ内では購入できません。",
       "featureOutcome1": "担当するクラスをすべて運営（上限なし）",
       "featureOutcome2": "最初の3クラスだけでなく、担当するすべてのクラスを追加",
       "featureOutcome3": "誰がどの単語でつまずいているかリアルタイムで把握",

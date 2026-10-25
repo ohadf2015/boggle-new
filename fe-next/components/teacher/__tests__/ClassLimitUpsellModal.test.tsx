@@ -16,7 +16,8 @@ vi.mock('@/lib/education/proFunnelTelemetry', () => ({
 
 const goToPolarCheckout = vi.fn();
 const postTeacherProCheckout = vi.fn();
-vi.mock('@/lib/education/postTeacherProCheckout', () => ({
+vi.mock('@/lib/education/postTeacherProCheckout', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
   postTeacherProCheckout: (...args: unknown[]) => postTeacherProCheckout(...args),
   goToPolarCheckout: (...args: unknown[]) => goToPolarCheckout(...args),
 }));

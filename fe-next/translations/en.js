@@ -13679,6 +13679,7 @@ const en = {
       "districtSubtitle": "Managing multiple teachers or classrooms? We offer flexible pricing for schools and districts.",
       "districtCta": "Get in touch for school pricing",
       "checkoutUnavailable": "Checkout is closed right now. Nothing was charged. Try again shortly.",
+      "notInApp": "Teacher Pro can't be bought in the app.",
       "featureOutcome1": "Run every class you teach, no cap",
       "featureOutcome2": "Add every section you teach, not just the first 3 classes",
       "featureOutcome3": "See who is stuck, word by word, live",
