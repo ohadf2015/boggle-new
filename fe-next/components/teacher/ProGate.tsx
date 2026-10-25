@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { useCheckoutBlockedInApp } from '@/hooks/useCheckoutBlockedInApp';
 import { useTeacherProCheckout } from '@/hooks/useTeacherProCheckout';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
@@ -87,6 +88,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
   const previewDaysLeft = trial && !trial.isExpired ? trial.daysLeft : null;
   const checkoutSource = `pro_gate_${feature}` as ProUpgradeSource;
   const { pending, start } = useTeacherProCheckout(checkoutSource);
+  const blockedInApp = useCheckoutBlockedInApp();
 
   useEffect(() => {
     if (!active || loading || hasPro) return;
@@ -114,7 +116,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
             <p className="text-sm font-bold text-neo-white">{t('teacher.proGate.trialPreview', { days: previewDaysLeft })}</p>
             <TrialStripRecap />
           </div>
-          <button
+          {blockedInApp ? null : <button
             type="button"
             data-testid="pro-trial-preview-upgrade"
             disabled={pending}
@@ -125,7 +127,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
             className="shrink-0 rounded-neo border-neo bg-neo-cyan px-4 py-2 text-sm font-black text-neo-navy shadow-hard-sm disabled:opacity-60"
           >
             {t('teacher.proGate.trialPreviewCta')}
-          </button>
+          </button>}
         </div>
         {children}
       </>
@@ -146,6 +148,9 @@ export function ProGate({ feature, children, active = true, whileChecking = null
           <p className="mb-4 text-sm font-bold leading-relaxed text-neo-white/80">
             {t(`teacher.proGate.${feature}.body`)}
           </p>
+          {blockedInApp ? (
+            <p data-testid="pro-gate-not-in-app" className="text-sm font-bold text-neo-white/80">{t('teacher.subscription.notInApp')}</p>
+          ) : (<>
           <button
             type="button"
             data-testid={`pro-gate-upgrade-${feature}`}
@@ -161,6 +166,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
             {t('teacher.proGate.cta', { price: `$${TEACHER_PRO_PRICE_USD}` })}
           </button>
           <p className="mt-2 text-xs font-bold text-neo-white/60">{t('teacher.subscription.trustCancel')}</p>
+          </>)}
         </div>
       </div>
     </div>
