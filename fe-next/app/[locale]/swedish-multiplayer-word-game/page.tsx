@@ -10,11 +10,11 @@ interface PageProps {
 
 const BASE_URL = 'https://www.lexiclash.live';
 
-/** "Scrabble Svenska" — 1,450 impr/28d at pos 4.4, CTR 1.3% vs 8% expected. Start with action verb "Spela"; remove & symbol (SERP noise). ≤60 chars. */
-const SV_TITLE = 'Spela Scrabble Svenska Gratis — Alfapet Online | LexiClash';
-/** Leads with action "Spela scrabble på svenska gratis"; adds room-share hook for click intent. ≤140 chars. */
+/** "Scrabble Svenska" — 1,450 impr/28d at pos 4.4, CTR 1.3% vs 8% expected; "alfapet online" pos 2.9, CTR 2.5% vs 11% expected. Added "Online" after "Gratis" to match "scrabble online svenska" query variant. ≤60 chars. */
+const SV_TITLE = 'Spela Scrabble Svenska Gratis Online — Alfapet | LexiClash';
+/** Adds Alfapet-alternativ signal for "alfapet online" searches; tightened to 136 chars. */
 const SV_DESCRIPTION =
-  'Spela scrabble på svenska gratis online — ingen app, inget konto. Skapa ett rum, dela länken och tävla i realtid. Upp till 50 spelare. Starta nu! →';
+  'Spela scrabble på svenska gratis online — Alfapet-alternativ utan app eller konto. Tävla i realtid med upp till 50 spelare. Starta nu! →';
 
 /**
  * Growth Radar rec 2718: Bing grounds "scrabble på svenska" (111 AI groundings) but cites other
