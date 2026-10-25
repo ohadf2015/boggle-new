@@ -144,20 +144,20 @@ export const EduProjectorLobby = memo<ProjectorLobbyProps>(function EduProjector
                   {t('eduLiveRoom.lobby.startBlocked')}
                 </p>
                 {onStartPracticeRound && botsCanRehearse && (
-                  <div className="flex flex-col items-start gap-1 md:items-end">
-                    <button type="button" data-testid="edu-lobby-practice" onClick={onStartPracticeRound} disabled={practiceRoundPending} aria-busy={practiceRoundPending} className={cn(PRIMARY_BUTTON, PRESS, 'min-h-12 px-5 py-2 text-lg md:min-h-0 md:px-[1.4vw] md:py-[0.6vw] md:text-[1.3vw]')}>
-                      {practiceRoundPending ? <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Play className="size-5" fill="currentColor" aria-hidden="true" />}
-                      {t('education.projectorLobby.rehearseCta')}
-                    </button>
-                    <p data-testid="rehearsal-private-note" className="font-neo-body text-xs font-bold text-neo-cream/75 md:text-[0.85vw]">
-                      {t('education.projectorLobby.rehearsePrivate')}
-                    </p>
-                  </div>
+                  <button type="button" data-testid="edu-lobby-practice" onClick={onStartPracticeRound} disabled={practiceRoundPending} aria-busy={practiceRoundPending} className={cn(PRIMARY_BUTTON, PRESS, 'min-h-12 px-5 py-2 text-lg md:min-h-0 md:px-[1.4vw] md:py-[0.5vw] md:text-[1.3vw]')}>
+                    {practiceRoundPending ? <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Play className="size-5" fill="currentColor" aria-hidden="true" />}
+                    {t('education.projectorLobby.rehearseCta')}
+                  </button>
                 )}
                 {onStartPracticeRound && !botsCanRehearse && !lobbyMode.quizBlocked && (
-                  <RehearsalBotsBlocked gameCode={gameCode} currentMode={lobbyMode.modeId} t={t} onApplied={lobbyMode.applyMode} onRehearse={onStartPracticeRound} className="md:items-end" />
+                  <RehearsalBotsBlocked gameCode={gameCode} currentMode={lobbyMode.modeId} t={t} onApplied={lobbyMode.applyMode} onRehearse={onStartPracticeRound} className="md:flex-row md:items-center md:gap-[1vw]" />
                 )}
               </div>
+            )}
+            {!canStart && onStartPracticeRound && botsCanRehearse && (
+              <p data-testid="rehearsal-private-note" className="font-neo-body text-xs font-bold text-neo-cream/70 md:text-[0.85vw]">
+                {t('education.projectorLobby.rehearsePrivate')}
+              </p>
             )}
             {practiceRoundFailed && (
               <p role="alert" className="font-neo-body text-sm font-bold text-neo-pink md:text-[1vw]">{t('tvLobby.practiceRoundFailed')}</p>
