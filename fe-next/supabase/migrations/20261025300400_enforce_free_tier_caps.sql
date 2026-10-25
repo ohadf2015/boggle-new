@@ -1,8 +1,8 @@
 -- The free class and seat caps lived only in API routes, so a direct PostgREST
 -- insert skipped them and two parallel requests both passed the count. These
 -- triggers count and insert under one per-teacher / per-class lock. Pro mirrors
--- resolveProEntitlement (lib/education/proGrant.ts); the access trial does not
--- lift caps (lib/education/teacherPlanGate.ts). Existing rows are grandfathered:
+-- resolveProEntitlement (lib/education/proGrant.ts); a live access trial lifts caps too,
+-- matching hasProAccess (lib/education/teacherPlanGate.ts). Existing rows are grandfathered:
 -- only new inserts are checked.
 create or replace function public.teacher_has_pro_for_caps(p_teacher uuid)
 returns boolean
@@ -19,6 +19,9 @@ as $$
         (coalesce(s.source, 'polar') <> 'admin_grant' and s.status in ('active', 'trialing'))
         or (s.source = 'admin_grant' and s.status = 'active' and s.current_period_end > now())
       )
+  ) or exists (
+    select 1 from public.teacher_access_requests t
+    where t.user_id = p_teacher and t.status = 'approved' and t.trial_expires_at > now()
   );
 $$;
 
