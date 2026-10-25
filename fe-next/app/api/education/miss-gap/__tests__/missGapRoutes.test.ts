@@ -129,6 +129,8 @@ let upsertedRun: Record<string, unknown> | null;
 let upsertedStreak: Record<string, unknown> | null;
 /** Every `.eq(column, value)` the progress route applied to the runs query. */
 let runFilters: Array<[string, unknown]>;
+/** The caller's profile as the service role reads it. */
+let callerProfile: { user_role: string; is_admin: boolean } | null;
 
 function makeClient() {
   return {
@@ -174,6 +176,9 @@ function makeClient() {
           },
         };
       }
+      if (table === 'profiles') {
+        return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: callerProfile, error: null }) }) }) };
+      }
       return {
         select: () => ({
           eq: () => ({
@@ -209,6 +214,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockCheckApiRateLimit.mockReturnValue({ success: true });
   mockGetAuthedUser.mockResolvedValue(null);
+  callerProfile = null;
   streakRow = null;
   previousRun = null;
   upsertedRun = null;
@@ -370,12 +376,23 @@ describe('GET /api/education/miss-gap/progress', () => {
 
   it('given a signed-in teacher, returns who played and how they did', async () => {
     mockGetAuthedUser.mockResolvedValue({ id: 'teacher-1' });
+    callerProfile = { user_role: 'teacher', is_admin: false };
     const res = await GET(new NextRequest(url) as never);
     const data = await res.json();
     expect(data.runs).toHaveLength(2);
     expect(data.runs[0]).toMatchObject({ name: 'Maya', stars: 3, accuracy: 100 });
     expect(data.players).toBe(2);
     expect(data.averageAccuracy).toBe(88);
+  });
+
+  it('given a signed-in student (guest accounts are signed in too), returns counts but no names', async () => {
+    mockGetAuthedUser.mockResolvedValue({ id: 'guest-student-1' });
+    callerProfile = { user_role: 'student', is_admin: false };
+    const res = await GET(new NextRequest(url) as never);
+    const data = await res.json();
+    expect(data.players).toBe(2);
+    expect(data.runs).toEqual([]);
+    expect(JSON.stringify(data)).not.toContain('Maya');
   });
 
   it('returns the stored class streak', async () => {
@@ -408,6 +425,7 @@ describe('GET /api/education/miss-gap/progress', () => {
    */
   it('given no dueDate at all, counts every assignment for the class', async () => {
     mockGetAuthedUser.mockResolvedValue({ id: 'teacher-1' });
+    callerProfile = { user_role: 'teacher', is_admin: false };
     const res = await GET(
       new NextRequest(
         'http://x/api/education/miss-gap/progress?classKey=week%203%20vocab%3A%3Ams.%20g',

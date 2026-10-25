@@ -8,7 +8,7 @@
  *   anonymous caller → counts only (players, average accuracy, stars, streak).
  *                      The student's own completion screen needs exactly this
  *                      much to say "you and 11 classmates are keeping it alive".
- *   signed-in caller → the named list, for the teacher's assignment card.
+ *   teacher          → the named list, for the teacher's assignment card.
  *
  * Names are first names a student typed themselves; no email, no roster row.
  */
@@ -19,6 +19,7 @@ import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { MISS_GAP_PROGRESS_RATE_LIMIT } from '@/lib/education/missGapRateLimits';
 import { normalizeDay } from '@/lib/education/classStreakMath';
 import { normalizeMissGapClassKey } from '@/lib/education/missGapClassKey';
+import { isTeacherProfile } from '@/lib/education/teacherRole';
 import logger from '@/utils/logger';
 
 export const dynamic = 'force-dynamic';
@@ -68,6 +69,8 @@ export async function GET(request: NextRequest) {
   }
 
   const user = await getAuthedUser(request);
+  // Homework students hold signed-in (often anonymous) sessions too; only a teacher sees names.
+  const showNames = user ? await callerIsTeacher(supabase, user.id) : false;
 
   const [{ data: runData, error: runError }, { data: streakRow }] = await Promise.all([
     (() => {
@@ -114,8 +117,8 @@ export async function GET(request: NextRequest) {
     totalStars,
     perfect,
     streak,
-    // Named roster for a signed-in caller only — see the privacy gate above.
-    runs: user
+    // Named roster for a teacher only — see the privacy gate above.
+    runs: showNames
       ? rows.map((r) => ({
           name: (r.student_name || '').trim(),
           stars: r.stars ?? 0,
@@ -130,4 +133,20 @@ export async function GET(request: NextRequest) {
         }))
       : [],
   });
+}
+
+async function callerIsTeacher(
+  supabase: NonNullable<ReturnType<typeof createAdminClient>>,
+  userId: string,
+): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('user_role, is_admin')
+    .eq('id', userId)
+    .maybeSingle();
+  if (error) {
+    logger.error('[miss-gap] progress: role read failed', error);
+    return false;
+  }
+  return isTeacherProfile(data as { user_role?: string | null; is_admin?: boolean | null } | null);
 }
