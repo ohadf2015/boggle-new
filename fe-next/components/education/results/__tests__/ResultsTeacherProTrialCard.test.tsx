@@ -12,7 +12,7 @@ vi.mock('next/link', () => ({
     </a>
   ),
 }));
-const pro = vi.hoisted(() => ({ hasPro: false, loading: false, known: true, trialUsed: false }));
+const pro = vi.hoisted(() => ({ hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null as string | null }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
 const growth = vi.hoisted(() => ({ trackGrowthEvent: vi.fn() }));
 vi.mock('@/utils/growthTracking', () => growth);
@@ -21,7 +21,7 @@ vi.mock('@/lib/education/proFunnelTelemetry', () => funnel);
 
 describe('ResultsTeacherProTrialCard', () => {
   beforeEach(() => {
-    Object.assign(pro, { hasPro: false, loading: false, known: true, trialUsed: false });
+    Object.assign(pro, { hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null });
     growth.trackGrowthEvent.mockClear();
     funnel.trackTeacherProUpgradeClick.mockClear();
   });
@@ -45,6 +45,23 @@ describe('ResultsTeacherProTrialCard', () => {
       expect.objectContaining({ locale: 'he', placement: 'classroom_results' }),
     );
     expect(screen.getByTestId('results-teacher-pro-trial-card')).toHaveAttribute('dir', 'rtl');
+  });
+
+  it('inside the free access trial asks to keep Pro when it ends, not for a second 14-day trial', () => {
+    pro.accessTrialExpires = new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString();
+    render(<ResultsTeacherProTrialCard language="en" />);
+    const card = screen.getByTestId('results-teacher-pro-trial-card');
+    expect(card).toHaveTextContent('Keep Teacher Pro after your free trial');
+    expect(screen.getByTestId('results-teacher-pro-trial-cta')).toHaveTextContent('Keep Teacher Pro after my trial');
+    expect(card).toHaveTextContent('$9/mo starts when your trial ends');
+    expect(card).toHaveTextContent('Cancel anytime');
+    expect(card).not.toHaveTextContent('14-day');
+  });
+
+  it('an access trial that already ended gets the normal trial offer', () => {
+    pro.accessTrialExpires = new Date(Date.now() - 60_000).toISOString();
+    render(<ResultsTeacherProTrialCard language="en" />);
+    expect(screen.getByTestId('results-teacher-pro-trial-cta')).toHaveTextContent('Start your 14-day Teacher Pro trial');
   });
 
   it('stays hidden for Pro teachers and while the entitlement loads', () => {

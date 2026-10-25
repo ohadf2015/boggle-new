@@ -46,7 +46,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   const [askOpen, setAskOpen] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
   const revealRef = useTeacherReveal<HTMLDivElement>(tab);
-  const { hasPro, loading: proLoading, status, source, trialUsed, known, portalUrl, refresh, trialExpires, periodEnd } = useTeacherPro();
+  const { hasPro, loading: proLoading, status, source, trialUsed, known, portalUrl, refresh, trialExpires, periodEnd, accessTrialExpires } = useTeacherPro();
 
   const offerTrial = known === true && !proLoading && polarTrialUx({
     hasPro,
@@ -236,6 +236,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                   onBuy={() => { void handleUpgrade(false); }}
                   onSchool={openSchool}
                   manageBillingHref={portalUrl}
+                  accessTrialEndsAt={accessTrialExpires}
                   askSchool={
                     askOpen ? (
                       <AskSchoolPanel

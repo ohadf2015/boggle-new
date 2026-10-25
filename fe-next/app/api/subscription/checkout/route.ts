@@ -8,12 +8,24 @@ import { locales, defaultLocale } from '@/i18n/config';
 import logger from '@/utils/logger';
 import { logSubscriptionEvent } from '@/lib/subscriptions';
 import { withTimeout } from '@/lib/server/routeTimeout';
+import { liveAccessTrialExpiry } from '@/lib/education/accessTrialServer';
+import { polarTrialPlan } from '@/lib/education/pro/accessTrialCheckout';
 import { buildCheckoutTrafficTags } from '@/lib/education/checkoutTrafficTags';
 import { CHECKOUT_STARTED_EVENT, checkoutStartedPayload } from '@/lib/education/abandonedCheckout';
 import { buildProCheckoutStartedEvent, buildProTrialStartedEvent, buildCheckoutStartedEvent, buildProCheckoutFailedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 
 const CHECKOUT_START_RECORD_TIMEOUT_MS = 1500;
 const TEST_FLAG_LOOKUP_TIMEOUT_MS = 800;
+const ACCESS_TRIAL_LOOKUP_TIMEOUT_MS = 800;
+
+/** End of the live free access window, or null. Never throws, never slow. */
+async function accessTrialEnd(userId: string): Promise<string | null> {
+  try {
+    return await withTimeout(liveAccessTrialExpiry(userId), ACCESS_TRIAL_LOOKUP_TIMEOUT_MS);
+  } catch {
+    return null;
+  }
+}
 
 /** profiles.is_test_account, or null when unknown. Never throws, never slow. */
 async function profileIsTestAccount(userId: string): Promise<boolean | null> {
@@ -99,7 +111,9 @@ function resolveCheckoutLocale(bodyLocale: string, cookieHeader: string | null):
 /**
  * POST /api/subscription/checkout
  * Create a Polar checkout URL for the Pro subscription.
- * Body `{ trial: true }` opts into the 14-day free trial. No body = pay $9/mo.
+ * Body `{ trial: true }` opts into the free trial: 14 days, or the days left in the
+ * teacher's free access window (polarTrialPlan) so billing starts when it ends.
+ * No body = pay $9/mo.
  *
  * Response:
  * - 200: { url: string } — redirect to this URL
@@ -151,12 +165,16 @@ export async function POST(request: NextRequest) {
     const body = await parseCheckoutBody(request);
     const trial = body.trial && !(await polarTrialBlocked(user.id));
     const locale = resolveCheckoutLocale(body.locale, request.headers.get('cookie'));
+    // One trial: inside the free access window the Polar trial runs only to its end,
+    // so the first charge lands the day the free trial ends, not 14 days later.
+    const trialPlan = trial ? polarTrialPlan(await accessTrialEnd(user.id), Date.now()) : null;
     const client = getPolarClient();
     const checkoutUrl = await client.createCheckout({
       userId: user.id,
       productId: getProProductId(),
       email: user.email ?? undefined,
       allowTrial: trial,
+      trialDays: trialPlan?.days,
       locale,
     });
 

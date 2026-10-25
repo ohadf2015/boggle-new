@@ -122,3 +122,22 @@ describe('UpgradePlanCards', () => {
     expect(props.onBuy).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('UpgradePlanCards inside the free access trial', () => {
+  const soon = () => new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString();
+
+  it('asks to keep Pro after the free trial instead of a second 14-day trial', () => {
+    setup('free', { showTrial: true, accessTrialEndsAt: soon() });
+    expect(screen.getByTestId('pricing-trial-cta')).toHaveTextContent('Keep Teacher Pro after my trial');
+    const card = screen.getByTestId('plan-card-pro');
+    expect(card).toHaveTextContent('$9/mo starts when your trial ends');
+    expect(card).toHaveTextContent('Free until');
+    expect(card).not.toHaveTextContent('eg2Pro.plans.trialCta');
+    expect(card).not.toHaveTextContent('eg2Pro.plans.trialBadge');
+  });
+
+  it('keeps the normal trial offer without a live access trial', () => {
+    setup('free', { showTrial: true, accessTrialEndsAt: new Date(Date.now() - 1000).toISOString() });
+    expect(screen.getByTestId('pricing-trial-cta')).toHaveTextContent('eg2Pro.plans.trialCta|14');
+  });
+});

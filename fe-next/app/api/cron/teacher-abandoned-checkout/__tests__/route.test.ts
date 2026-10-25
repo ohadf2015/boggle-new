@@ -116,6 +116,30 @@ describe('/api/cron/teacher-abandoned-checkout', () => {
     ]);
   });
 
+  it('a trial checkout from inside the free access trial gets the keep-Pro-after-trial email', async () => {
+    h.tables.checkout_started.data[0].payload = { mode: 'trial', locale: 'en' };
+    h.tables.teacher_access_requests.data[0] = {
+      ...h.tables.teacher_access_requests.data[0],
+      locale: 'en',
+      trial_expires_at: new Date(Date.now() + 5 * 24 * 3600 * 1000).toISOString(),
+    };
+    await POST(makeRequest());
+    const mail = h.sendEmailSpy.mock.calls[0][0];
+    expect(mail.subject).toBe('Keep Teacher Pro after your free trial');
+    expect(mail.html).not.toContain('14-day');
+  });
+
+  it('a trial checkout after the access trial ended keeps the normal trial email', async () => {
+    h.tables.checkout_started.data[0].payload = { mode: 'trial', locale: 'en' };
+    h.tables.teacher_access_requests.data[0] = {
+      ...h.tables.teacher_access_requests.data[0],
+      locale: 'en',
+      trial_expires_at: new Date(Date.now() - 3600 * 1000).toISOString(),
+    };
+    await POST(makeRequest());
+    expect(h.sendEmailSpy.mock.calls[0][0].subject).toMatch(/free Teacher Pro trial/);
+  });
+
   it('does not email a teacher who already got one', async () => {
     h.tables.subscription_events = {
       data: [{ user_id: 'u1', event_type: 'abandoned_checkout_email_sent', created_at: hoursAgo(500) }],
