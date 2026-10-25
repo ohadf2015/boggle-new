@@ -3550,6 +3550,8 @@ const en = {
     "footerNote": "Shared by your child's teacher via LexiClash. No account needed.",
     "joinPrompt": "Does your child have a class code?",
     "joinCta": "Join a class",
+    "playPrompt": "Play a word game with your child",
+    "playCta": "Play today's puzzle",
     "language": "View in",
     "printButton": "Print or save as PDF",
     "classLabel": "Class",

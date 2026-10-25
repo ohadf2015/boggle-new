@@ -3,6 +3,8 @@
 import { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { shareOrCopy } from '@/lib/education/shareOrCopy';
+import { trackEduParentReportShared } from '@/lib/education/shareTelemetry';
 
 interface ShareParentReportButtonProps {
   classroomId: string;
@@ -11,7 +13,8 @@ interface ShareParentReportButtonProps {
 
 /**
  * "Share with parent" — mints a signed, no-account report link for ONE
- * student in ONE classroom (Teacher Pro) and copies it to the clipboard.
+ * student in ONE classroom (Teacher Pro) and hands it to the share sheet
+ * (WhatsApp, Messages…), the clipboard, or, failing both, shows it to copy.
  *
  * Lives inside `StudentProgressTable`, which is already rendered behind
  * `<ProGate feature="analytics">` — no extra gating needed here. The API
@@ -20,6 +23,7 @@ interface ShareParentReportButtonProps {
 export function ShareParentReportButton({ classroomId, studentId }: ShareParentReportButtonProps) {
   const { t, language } = useLanguage();
   const [loading, setLoading] = useState(false);
+  const [manualUrl, setManualUrl] = useState<string | null>(null);
 
   const handleClick = useCallback(
     async (e: React.MouseEvent) => {
@@ -36,8 +40,13 @@ export function ShareParentReportButton({ classroomId, studentId }: ShareParentR
           return;
         }
         const url = `${window.location.origin}/${language}${body.path}`;
-        await navigator.clipboard.writeText(url);
-        toast.success(t('share.linkCopied'));
+        const outcome = await shareOrCopy({ title: t('education.analytics.shareParentReport'), url });
+        if (outcome === 'native' || outcome === 'copy') trackEduParentReportShared({ classroomId, method: outcome });
+        if (outcome === 'copy') toast.success(t('share.linkCopied'));
+        if (outcome === 'failed') {
+          setManualUrl(url);
+          toast.error(t('education.analytics.shareParentReportFailed'));
+        }
       } catch {
         toast.error(t('education.analytics.shareParentReportFailed'));
       } finally {
@@ -46,6 +55,22 @@ export function ShareParentReportButton({ classroomId, studentId }: ShareParentR
     },
     [classroomId, studentId, language, t, loading],
   );
+
+  if (manualUrl) {
+    return (
+      <input
+        readOnly
+        dir="ltr"
+        value={manualUrl}
+        aria-label={t('education.analytics.shareParentReport')}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.currentTarget.select();
+        }}
+        className="w-40 rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-2 py-1 text-xs text-neo-white"
+      />
+    );
+  }
 
   return (
     <button

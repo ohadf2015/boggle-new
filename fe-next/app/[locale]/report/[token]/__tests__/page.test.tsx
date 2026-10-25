@@ -146,15 +146,16 @@ describe('parent report page', () => {
       expect(JSON.stringify(events[0])).not.toContain(STUDENT);
     });
 
-    it('offers the parent a footer link into the student join flow', async () => {
+    it('Given a parent with no class code, Then the footer invites them to play today\'s public puzzle, not the student join page', async () => {
       (createAdminClient as any).mockReturnValue({});
       (loadParentReportData as any).mockResolvedValue({ status: 'ok', data: okData });
       const token = signParentReportToken(STUDENT, CLASSROOM);
 
       const { getByTestId } = render(await Page({ params: params('he', token) }));
 
-      const link = getByTestId('parent-report-join');
-      expect(link).toHaveAttribute('href', '/he/join');
+      const link = getByTestId('parent-report-play');
+      expect(link).toHaveAttribute('href', '/he/daily?utm_source=parent_report&utm_medium=referral');
+      expect(link.getAttribute('href')).not.toContain('/join');
       expect(link.className).toContain('print:hidden');
     });
 

@@ -3949,6 +3949,8 @@ const he = {
     "footerNote": "שותף על ידי המורה של ילדכם באמצעות LexiClash. לא נדרש חשבון.",
     "joinPrompt": "יש לילדכם קוד כיתה?",
     "joinCta": "הצטרפות לכיתה",
+    "playPrompt": "שחקו משחק מילים יחד עם הילד/ה",
+    "playCta": "לחידה של היום",
     "language": "הצגה בשפה",
     "printButton": "הדפסה או שמירה כ-PDF",
     "classLabel": "כיתה",

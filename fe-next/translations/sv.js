@@ -4287,6 +4287,8 @@ const sv = {
     "footerNote": "Delad av ditt barns lärare via LexiClash. Inget konto behövs.",
     "joinPrompt": "Har ditt barn en klasskod?",
     "joinCta": "Gå med i klassen",
+    "playPrompt": "Spela ett ordspel tillsammans med ditt barn",
+    "playCta": "Spela dagens utmaning",
     "language": "Visa på",
     "printButton": "Skriv ut eller spara som PDF",
     "classLabel": "Klass",

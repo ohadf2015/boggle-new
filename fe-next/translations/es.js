@@ -3930,6 +3930,8 @@ const es = {
     "footerNote": "Compartido por el profesor de tu hijo/a a través de LexiClash. No necesitas una cuenta.",
     "joinPrompt": "¿Tu hijo/a tiene un código de clase?",
     "joinCta": "Unirse a la clase",
+    "playPrompt": "Jueguen juntos a un juego de palabras",
+    "playCta": "Jugar el reto de hoy",
     "language": "Ver en",
     "printButton": "Imprimir o guardar como PDF",
     "classLabel": "Clase",

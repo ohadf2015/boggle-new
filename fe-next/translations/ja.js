@@ -3949,6 +3949,8 @@ const ja = {
     "footerNote": "お子様の先生がLexiClashで共有しました。アカウントは不要です。",
     "joinPrompt": "お子様はクラスコードをお持ちですか?",
     "joinCta": "クラスに参加",
+    "playPrompt": "お子さまと一緒にことばゲームで遊びましょう",
+    "playCta": "今日のパズルで遊ぶ",
     "language": "表示言語",
     "printButton": "印刷 / PDFで保存",
     "classLabel": "クラス",
