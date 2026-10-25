@@ -267,7 +267,7 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
         // and tappable the whole time it's on screen.
         pointerEvents: 'none',
         zIndex: 9998,
-        animation: 'lcMcvEnter 280ms ease-out both, lcMcvExit 320ms ease-in forwards',
+        animation: 'lcMcvEnter 280ms ease-out both, lcMcvExit 320ms cubic-bezier(0.23, 1, 0.32, 1) forwards',
         animationDelay: `0ms, ${Math.max(autoDismissMs - 280, 0)}ms`,
       }
     : { position: 'relative' };
