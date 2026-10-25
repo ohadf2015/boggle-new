@@ -25,9 +25,10 @@ const mockClient = {
   }),
 };
 
+const redisState = { available: true };
 vi.mock('../connection', () => ({
-  getRedisClient: () => mockClient,
-  isRedisAvailable: () => true,
+  getRedisClient: () => (redisState.available ? mockClient : null),
+  isRedisAvailable: () => redisState.available,
 }));
 
 vi.mock('../circuitBreaker', () => ({
@@ -37,7 +38,25 @@ vi.mock('../circuitBreaker', () => ({
 describe('cron lock', () => {
   beforeEach(() => {
     storedKeys = {};
+    redisState.available = true;
     vi.clearAllMocks();
+  });
+
+  it('Given Redis errors on acquire, When a cron runs, Then it fails loudly instead of reporting already-running', async () => {
+    const { withCronLock, CronLockError } = await import('../locking');
+    mockClient.set.mockRejectedValueOnce(new Error('ECONNRESET'));
+    const fn = vi.fn(async () => 'ran');
+    await expect(withCronLock('teacher-weekly-digest', 60_000, fn)).rejects.toBeInstanceOf(CronLockError);
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it('Given no Redis at all, When a cron runs, Then it runs unprotected and says so', async () => {
+    const logger = (await import('../../utils/logger')).default;
+    const { withCronLock } = await import('../locking');
+    redisState.available = false;
+    const r = await withCronLock('teacher-weekly-digest', 60_000, async () => 'ran');
+    expect(r).toEqual({ status: 'ran', result: 'ran' });
+    expect(logger.warn).toHaveBeenCalledWith('CRON_LOCK', expect.stringContaining('teacher-weekly-digest'));
   });
 
   it('tryAcquireCronLock returns lockId when key is free', async () => {
