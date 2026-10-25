@@ -147,7 +147,9 @@ export async function recordClassroomRound(
     }
 
     if ((count ?? 0) === 0 && opts.playerIds.length >= REAL_CLASS_MIN_PLAYERS) {
-      await startAccessTrialClock(supabase, game.teacherId, now.getTime());
+      await startAccessTrialClock(supabase, game.teacherId, now.getTime()).catch((err) =>
+        logger.error('CLASSROOM_GAME', `Trial clock start threw for ${game.teacherId}: ${err instanceof Error ? err.message : String(err)}`)
+      );
     }
 
     captureEduServerEvents(
