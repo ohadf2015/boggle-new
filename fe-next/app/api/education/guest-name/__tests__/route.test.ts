@@ -20,6 +20,9 @@ const mockCreateAdminClient = vi.fn(() => ({ from: mockFrom }));
 vi.mock('@/utils/supabase/admin', () => ({
   createAdminClient: () => mockCreateAdminClient(),
 }));
+vi.mock('@/lib/subscriptions', () => ({
+  canAddStudent: async () => ({ allowed: true, currentCount: 0, limit: 50 }),
+}));
 vi.mock('@/utils/logger', () => ({
   default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
 }));
