@@ -6,6 +6,7 @@ import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { TrialEndedBannerWithRecap, TrialUrgencyBannerWithRecap } from '@/components/teacher/TrialRecapBanners';
 import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTrialExpiringBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
+import { PendingCheckoutBanner } from '@/components/teacher/PendingCheckoutBanner';
 import { TeacherProUsagePromptCard } from '@/components/teacher/TeacherProUsagePromptCard';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
@@ -34,7 +35,7 @@ function TeacherDashboardInner() {
   const { language } = useLanguage();
   const { user, isAdmin } = useAuth();
   const { trial } = useTeacherAccess();
-  const { hasPro, loading: proLoading, status, source, trialUsed, trialExpires, periodEnd } = useTeacherPro();
+  const { hasPro, loading: proLoading, status, source, trialUsed, trialExpires, periodEnd, pendingCheckout } = useTeacherPro();
   const polarTrial = polarTrialUx({
     hasPro,
     status: status ?? 'active',
@@ -88,6 +89,7 @@ function TeacherDashboardInner() {
     polarTrialing: polarTrial.showLifecycleBanner,
     polarOfferTrial: polarTrial.offerTrial,
     offerTrialDismissed: trialOfferDismissed,
+    pendingCheckout: pendingCheckout === true,
   });
   const banner =
     picked === 'trial' && !hasRecentConfig && !trial?.isExpired ? null : picked;
@@ -106,7 +108,8 @@ function TeacherDashboardInner() {
     !usageDismissed &&
     banner !== 'pro' &&
     banner !== 'reactivate' &&
-    banner !== 'offerTrial';
+    banner !== 'offerTrial' &&
+    banner !== 'pendingCheckout';
 
   // First-view funnel step. Waits for the entitlement read so the plan stamped
   // on the event is the real one, then fires at most once per browser. The
@@ -122,17 +125,25 @@ function TeacherDashboardInner() {
   }, [proLoading, hasPro, status, language, user?.id]);
 
   useEffect(() => {
-    if (banner === 'pro' || banner === 'reactivate' || banner === 'trialing' || banner === 'offerTrial') {
+    if (
+      banner === 'pro' ||
+      banner === 'reactivate' ||
+      banner === 'trialing' ||
+      banner === 'offerTrial' ||
+      banner === 'pendingCheckout'
+    ) {
       trackGrowthEvent('iap_viewed', {
         product: 'teacher_pro',
         source:
-          banner === 'reactivate'
-            ? 'dashboard_trial_ended'
-            : banner === 'trialing'
-              ? 'dashboard_trial_lifecycle'
-              : banner === 'offerTrial'
-                ? 'dashboard_trial_offer'
-                : 'dashboard_banner',
+          banner === 'pendingCheckout'
+            ? 'dashboard_pending_checkout'
+            : banner === 'reactivate'
+              ? 'dashboard_trial_ended'
+              : banner === 'trialing'
+                ? 'dashboard_trial_lifecycle'
+                : banner === 'offerTrial'
+                  ? 'dashboard_trial_offer'
+                  : 'dashboard_banner',
         event_type: 'impression',
       });
     }
@@ -164,7 +175,9 @@ function TeacherDashboardInner() {
       }
       proOffer={proOffer}
       banner={
-        banner === 'trial' && trial?.isExpired ? (
+        banner === 'pendingCheckout' ? (
+          <PendingCheckoutBanner />
+        ) : banner === 'trial' && trial?.isExpired ? (
           // An expired access trial is account state: the renewal card, never dismissible.
           <TrialUrgencyBannerWithRecap trial={trial} href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`} />
         ) : banner === 'reactivate' ? (

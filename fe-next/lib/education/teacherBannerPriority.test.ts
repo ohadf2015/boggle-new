@@ -162,3 +162,61 @@ describe('pickTeacherBanner Polar Pro trial', () => {
     })).toBe('none');
   });
 });
+
+describe('pickTeacherBanner pendingCheckout', () => {
+  it('outranks reactivate, offerTrial, trial, and pro when pendingCheckout is true', () => {
+    expect(
+      pickTeacherBanner({
+        hasTrial: true,
+        isAdmin: false,
+        hasPro: false,
+        hasMilestone: true,
+        polarTrialExpired: true,
+        polarOfferTrial: true,
+        pendingCheckout: true,
+      }),
+    ).toBe('pendingCheckout');
+  });
+
+  it('never shows pendingCheckout for hasPro, isAdmin, or while proLoading', () => {
+    expect(
+      pickTeacherBanner({
+        hasTrial: false,
+        isAdmin: false,
+        hasPro: true,
+        pendingCheckout: true,
+      }),
+    ).toBe('none');
+    expect(
+      pickTeacherBanner({
+        hasTrial: false,
+        isAdmin: true,
+        hasPro: false,
+        pendingCheckout: true,
+      }),
+    ).toBe('none');
+    expect(
+      pickTeacherBanner({
+        hasTrial: false,
+        isAdmin: false,
+        hasPro: false,
+        proLoading: true,
+        pendingCheckout: true,
+      }),
+    ).toBe('none');
+  });
+
+  it('shows pendingCheckout even when milestone is not reached or pro ask was dismissed', () => {
+    expect(
+      pickTeacherBanner({
+        hasTrial: false,
+        isAdmin: false,
+        hasPro: false,
+        hasMilestone: false,
+        proAskDismissed: true,
+        offerTrialDismissed: true,
+        pendingCheckout: true,
+      }),
+    ).toBe('pendingCheckout');
+  });
+});

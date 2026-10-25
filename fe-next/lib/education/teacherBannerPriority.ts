@@ -14,8 +14,20 @@
  * above a Pro dashboard reads as "your Pro did not take". While the entitlement
  * is still loading we show nothing rather than an upsell a later answer retracts
  * (recurring pitfall class 1).
+ *
+ * When a free, non-admin teacher started Polar checkout in the last 14 days and
+ * never finished (`pendingCheckout`), that resume banner outranks `'reactivate'`,
+ * `'offerTrial'`, `'trial'`, and `'pro'` — they are the closest to revenue, and
+ * the banner stays until checkout completes or the 14-day window expires.
  */
-export type TeacherBanner = 'trial' | 'pro' | 'reactivate' | 'trialing' | 'offerTrial' | 'none';
+export type TeacherBanner =
+  | 'pendingCheckout'
+  | 'trial'
+  | 'pro'
+  | 'reactivate'
+  | 'trialing'
+  | 'offerTrial'
+  | 'none';
 
 export function pickTeacherBanner({
   hasTrial,
@@ -29,6 +41,7 @@ export function pickTeacherBanner({
   polarTrialing = false,
   polarOfferTrial = false,
   offerTrialDismissed = false,
+  pendingCheckout = false,
 }: {
   hasTrial: boolean;
   isAdmin: boolean;
@@ -57,6 +70,11 @@ export function pickTeacherBanner({
    */
   polarOfferTrial?: boolean;
   offerTrialDismissed?: boolean;
+  /**
+   * Started Polar checkout within the last 14 days without completing it.
+   * Non-dismissible; outranks reactivate, offerTrial, trial, and pro.
+   */
+  pendingCheckout?: boolean;
 }): TeacherBanner {
   // Pro is checked FIRST, and so is "Pro has not answered yet". A gifted-Pro
   // teacher keeps the trial deadline she was granted Pro to replace; checking
@@ -68,6 +86,7 @@ export function pickTeacherBanner({
   if (proLoading) return 'none';
   if (hasPro && polarTrialing) return 'trialing';
   if (hasPro) return 'none';
+  if (pendingCheckout && !isAdmin) return 'pendingCheckout';
   if (polarTrialExpired) return 'reactivate';
   // Polar trial start beats the access-trial countdown and the milestone $9
   // strip: 0 of 65 teachers ever started a trial they could not see.

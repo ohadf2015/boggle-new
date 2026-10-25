@@ -8,17 +8,37 @@ vi.mock('@/lib/subscriptions', () => ({ checkTeacherSubscription: (...a: unknown
 vi.mock('@/lib/polar', () => ({ getPolarClient: () => ({ createCustomerPortalUrl: async () => 'https://polar.sh/portal' }) }));
 
 let trialRows: Array<{ id: string }> = [];
+let eventRows: Array<{ event_type: string; created_at: string; payload?: unknown }> = [];
+let eventLookupError: unknown = null;
+let isTestAccount = false;
 vi.mock('@/utils/supabase/admin', () => ({
   createAdminClient: () => ({
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          contains: () => ({
-            limit: async () => ({ data: trialRows, error: null }),
+    from: (table: string) => {
+      if (table === 'profiles') {
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: { is_test_account: isTestAccount },
+                error: null,
+              }),
+            }),
           }),
+        };
+      }
+      return {
+        select: () => ({
+          eq: () => {
+            const p = Promise.resolve({ data: eventRows, error: eventLookupError });
+            return Object.assign(p, {
+              contains: () => ({
+                limit: async () => ({ data: trialRows, error: null }),
+              }),
+            });
+          },
         }),
-      }),
-    }),
+      };
+    },
   }),
 }));
 
@@ -27,7 +47,12 @@ import { GET } from '../route';
 const req = () => new NextRequest('http://localhost/api/subscription/status');
 
 describe('GET /api/subscription/status Polar trial', () => {
-  beforeEach(() => { trialRows = []; });
+  beforeEach(() => {
+    trialRows = [];
+    eventRows = [];
+    eventLookupError = null;
+    isTestAccount = false;
+  });
 
   it('exposes trial_expires while the row is trialing', async () => {
     checkTeacherSubscription.mockResolvedValue({
@@ -72,5 +97,49 @@ describe('GET /api/subscription/status Polar trial', () => {
     const body = await (await GET(req())).json();
     expect(body.trial_expires).toBeNull();
     expect(body.trial_used).toBe(false);
+    expect(body.pending_checkout).toBe(false);
+  });
+
+  it('sets pending_checkout=true for a free teacher with a recent incomplete checkout_started', async () => {
+    eventRows = [
+      {
+        event_type: 'checkout_started',
+        created_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+        payload: { mode: 'paid', locale: 'en' },
+      },
+    ];
+    checkTeacherSubscription.mockResolvedValue({
+      has_pro: false, tier: 'free', status: 'active', source: 'polar', grant_expired: false,
+      current_period_end: null, cancel_at_period_end: false,
+    });
+    const body = await (await GET(req())).json();
+    expect(body.pending_checkout).toBe(true);
+  });
+
+  it('excludes test accounts and defaults pending_checkout=false on lookup failure or when has_pro=true', async () => {
+    eventRows = [
+      {
+        event_type: 'checkout_started',
+        created_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+        payload: { mode: 'paid', locale: 'en' },
+      },
+    ];
+    isTestAccount = true;
+    checkTeacherSubscription.mockResolvedValue({
+      has_pro: false, tier: 'free', status: 'active', source: 'polar', grant_expired: false,
+      current_period_end: null, cancel_at_period_end: false,
+    });
+    expect((await (await GET(req())).json()).pending_checkout).toBe(false);
+
+    isTestAccount = false;
+    eventLookupError = { message: 'db down' };
+    expect((await (await GET(req())).json()).pending_checkout).toBe(false);
+
+    eventLookupError = null;
+    checkTeacherSubscription.mockResolvedValue({
+      has_pro: true, tier: 'pro', status: 'active', source: 'polar', grant_expired: false,
+      current_period_end: '2026-11-08T00:00:00Z', cancel_at_period_end: false,
+    });
+    expect((await (await GET(req())).json()).pending_checkout).toBe(false);
   });
 });

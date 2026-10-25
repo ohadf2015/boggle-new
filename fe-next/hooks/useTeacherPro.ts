@@ -37,12 +37,14 @@ export interface TeacherProState {
   grantExpired: boolean;
   /** Polar customer portal for a paying teacher, when the status read returned one. */
   portalUrl: string | null;
+  /** Started Polar checkout in the last 14 days without completing it. */
+  pendingCheckout: boolean;
   /** Re-read the entitlement (after a grant lands, after checkout returns). */
   refresh: () => Promise<void>;
 }
 
 const FREE: Omit<TeacherProState, 'loading' | 'refresh'> = {
-  hasPro: false, source: 'polar', status: 'active', periodEnd: null, trialExpires: null, accessTrialExpires: null, trialUsed: false, known: false, grant: null, grantExpired: false, portalUrl: null,
+  hasPro: false, source: 'polar', status: 'active', periodEnd: null, trialExpires: null, accessTrialExpires: null, trialUsed: false, known: false, grant: null, grantExpired: false, portalUrl: null, pendingCheckout: false,
 };
 
 // The dashboard mounts several consumers at once (plan badge, ProGate, the
@@ -51,7 +53,7 @@ const FREE: Omit<TeacherProState, 'loading' | 'refresh'> = {
 // Share the PARSED body, never the Response: a body reads once, so every consumer after the
 // first threw "body already used", fell back to FREE, and showed a paying teacher a paywall.
 // null = a non-OK response (stays free).
-type StatusBody = Record<string, unknown> | null;
+type StatusBody = (Record<string, unknown> & { pending_checkout?: boolean }) | null;
 let inflight: Promise<StatusBody> | null = null;
 function fetchStatus(force: boolean): Promise<StatusBody> {
   if (force || !inflight) {
@@ -103,6 +105,7 @@ export function useTeacherPro(): TeacherProState {
         grant: (data?.grant as TeacherProGrant | null) ?? null,
         grantExpired: data?.grant_expired === true,
         portalUrl: typeof data?.portal_url === 'string' ? data.portal_url : null,
+        pendingCheckout: data?.has_pro === true ? false : data?.pending_checkout === true,
       });
     } catch {
       // Stays free — see the fail-closed note above.
