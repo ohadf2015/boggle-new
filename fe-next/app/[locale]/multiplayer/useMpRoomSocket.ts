@@ -157,8 +157,10 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
       if (prefilledRoomCode) reportInviteConsumed(prefilledRoomCode);
       if (data.language) setRoomLanguage(data.language);
       const joinedUsername = data.username || username;
-      if (data.isHost) { setUsername(joinedUsername); setStoredUsername(joinedUsername); }
-      else if (username) { setStoredUsername(username); }
+      // A classroom seats a second student with the same profile name as "Name 2".
+      if (joinedUsername !== username) setUsername(joinedUsername);
+      if (data.isHost) setStoredUsername(joinedUsername);
+      else if (username) setStoredUsername(username);
       saveSession({
         gameCode: data.gameCode || gameCode, username: joinedUsername,
         isHost: data.isHost, roomName: data.roomName || roomName || '',

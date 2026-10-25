@@ -59,6 +59,7 @@ import {
   handleExistingAuthConnectionJoin
 } from './playerReconnectHandler';
 import { ensurePlayerState } from './playerDataInit';
+import { classroomSeatName } from './classroomSeatName';
 
 // Types for payloads
 interface JoinGamePayload {
@@ -158,11 +159,8 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         username = authResult.existingUsername;
       }
     } else if (guestTokenHash) {
-      // Audit HIGH #4 (2026-05-10): guest reconnect path. If a guest host
-      // returns to their game (sessionStorage cleared, new tab, etc.) and
-      // picks a different display name, the username-based reconnect lookup
-      // would miss them — they'd land as a brand-new player without host
-      // status. Match on guestTokenHash instead so they reclaim their slot.
+      // A returning guest who picks a different name would miss the username
+      // lookup and lose their seat (and host status): match the token hash.
       for (const [existingName, user] of Object.entries(game.users)) {
         if (user.guestTokenHash && user.guestTokenHash === guestTokenHash) {
           if (existingName !== username) {
@@ -173,6 +171,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         }
       }
     }
+    if (seat.game && authUserId) username = classroomSeatName(game.users, username, authUserId);
 
     // Block kicked players from re-joining
     if (game.kickedPlayers?.has(username)) {
