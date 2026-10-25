@@ -67,6 +67,22 @@ describe('identifyUserForAnalytics', () => {
     });
   });
 
+  it('Given a profile flagged as a test account with a normal email, Then is_test_account true is registered on every later event', () => {
+    identifyUserForAnalytics({
+      userId: 'user-1', displayName: 'QA', isAdmin: false, isTeacher: true, locale: 'en',
+      email: 'qa-runner@gmail.com', isTestAccount: true,
+    });
+    expect(posthogMock.register).toHaveBeenCalledWith({ is_test_account: true });
+  });
+
+  it('Given a real profile, Then is_test_account false is registered explicitly', () => {
+    identifyUserForAnalytics({
+      userId: 'user-1', displayName: 'Real', isAdmin: false, isTeacher: true, locale: 'en',
+      email: 'teacher@school.org', isTestAccount: false,
+    });
+    expect(posthogMock.register).toHaveBeenCalledWith({ is_test_account: false });
+  });
+
   it('includes email in identify when provided (for flag targeting)', () => {
     identifyUserForAnalytics({
       userId: 'user-1',

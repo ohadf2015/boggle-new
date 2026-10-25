@@ -36,6 +36,7 @@ export interface ProfileData {
   peak_mmr?: number;
   casual_games?: number;
   is_admin?: boolean;
+  is_test_account?: boolean;
   country_code?: string | null;
   utm_source?: string | null;
   utm_medium?: string | null;

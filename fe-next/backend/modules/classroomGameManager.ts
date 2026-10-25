@@ -10,6 +10,7 @@ import type { ClassroomTeam } from '@/shared/utils/teamBattle';
 import logger from '../utils/logger';
 import { isClassroomSessionEnded } from './classroomGameSessionState';
 import { advanceReteachForRound } from './classroomReteachRound';
+import { captureLiveGameEnded } from '../utils/eduLiveEvents';
 import type { ClassroomSessionScores } from './classroomSessionScores';
 
 /** Exported so in-place settings edits (classroomGameSettings) re-use ONE TTL. */
@@ -258,9 +259,8 @@ async function updateClassroomGameStatusUnlocked(
     // session marker every join gate reads. Stamping it here rather than in a
     // second "end the game" function keeps one writer for one outcome — the
     // teacher's socket event and the room teardown reach the same line.
-    if (status === 'ended' && !game.endedAt) {
-      game.endedAt = new Date().toISOString();
-    }
+    const justEnded = status === 'ended' && !game.endedAt;
+    if (justEnded) game.endedAt = new Date().toISOString();
 
     await redis.setex(
       `classroom_game:${gameCode}`,
@@ -272,6 +272,7 @@ async function updateClassroomGameStatusUnlocked(
     if (status === 'ended') {
       await redis.srem(`classroom_games:${game.classroomId}`, gameCode);
     }
+    if (justEnded) void captureLiveGameEnded(game);
 
     logger.info('CLASSROOM_GAME', `Updated game ${gameCode} status to ${status}`);
   } catch (error) {

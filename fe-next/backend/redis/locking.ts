@@ -160,11 +160,20 @@ export async function withGameLock<T>(
 
 const CRON_LOCK_PREFIX = `${LOCK_PREFIX}:cron`;
 
+/** Redis failed while taking the lock: the run did not happen and must not read as "already running". */
+export class CronLockError extends Error {
+  constructor(jobName: string, cause: string) {
+    super(`Cron lock for ${jobName} unavailable: ${cause}`);
+    this.name = 'CronLockError';
+  }
+}
+
 export async function tryAcquireCronLock(
   jobName: string,
   ttlMs: number
 ): Promise<string | null> {
   if (!isRedisAvailable() || !getRedisClient()) {
+    logger.warn('CRON_LOCK', `${jobName} running without overlap protection: Redis unavailable`);
     return `no-redis-${Date.now()}`;
   }
   const client = getRedisClient()!;
@@ -179,7 +188,7 @@ export async function tryAcquireCronLock(
   } catch (error: unknown) {
     const err = error as Error;
     logger.error('CRON_LOCK', `Error acquiring lock for ${jobName}: ${err.message}`);
-    return null;
+    throw new CronLockError(jobName, err.message);
   }
 }
 

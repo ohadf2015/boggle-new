@@ -1,6 +1,6 @@
 import type { Socket } from 'socket.io';
 import { getAuthUserId } from './classroomSocketAuth.js';
-import { buildClassroomJoinRefusedEvent, captureEduServerEvents } from '../utils/educationTelemetry';
+import { captureJoinRefusal } from '../utils/eduLiveEvents';
 
 /**
  * Turn a student away from a live classroom game, and leave a record that they
@@ -20,12 +20,11 @@ export function refuseClassroomJoin(
   classroomId: string | null
 ): void {
   socket.emit('classroomGameError', { ...payload, code: reason, gameCode });
-  const event = buildClassroomJoinRefusedEvent({
+  void captureJoinRefusal({
     gameCode,
     classroomId,
     reason,
     door: 'classroomBanner',
     actorId: getAuthUserId(socket),
   });
-  if (event) captureEduServerEvents([event]);
 }

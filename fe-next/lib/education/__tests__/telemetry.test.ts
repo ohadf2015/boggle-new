@@ -327,7 +327,7 @@ describe('education telemetry', () => {
   describe('classroom created', () => {
     it('Given a teacher creating a classroom, When tracked, Then classroom_id and origin ride the event', () => {
       trackEduClassroomCreated({ classroomId: 'cls-9', createdVia: 'dashboard' });
-      expect(captureMock).toHaveBeenCalledWith('edu_classroom_created', {
+      expect(captureMock).toHaveBeenCalledWith('edu_classroom_create_ui_done', {
         classroom_id: 'cls-9',
         created_via: 'dashboard',
       });
@@ -464,7 +464,7 @@ describe('education telemetry', () => {
 
   it('classroom created event captures id + language so we can quote create vs join', () => {
     trackEduClassroomCreated({ classroomId: 'cls-1', createdVia: 'dashboard', language: 'en' });
-    expect(captureMock).toHaveBeenCalledWith('edu_classroom_created', {
+    expect(captureMock).toHaveBeenCalledWith('edu_classroom_create_ui_done', {
       classroom_id: 'cls-1',
       created_via: 'dashboard',
       language: 'en',
@@ -518,7 +518,7 @@ describe('education telemetry', () => {
     expect(captureMock).toHaveBeenNthCalledWith(2, 'edu_join_code_copied', {
       classroom_id: 'cls-1',
     });
-    expect(captureMock).toHaveBeenNthCalledWith(3, 'edu_first_student_joined', {
+    expect(captureMock).toHaveBeenNthCalledWith(3, 'edu_first_student_seen', {
       classroom_id: 'cls-1',
     });
     expect(JSON.stringify(captureMock.mock.calls)).not.toContain('AB12CD');
@@ -634,10 +634,10 @@ describe('education telemetry', () => {
         .map((c) => c[0])
         .filter((n) => n !== 'student_join_completed' && n !== 'student_join_failed');
       expect(bare).toEqual([
-        'edu_classroom_created',
+        'edu_classroom_create_ui_done',
         'edu_join_code_shown',
         'edu_join_code_copied',
-        'edu_first_student_joined',
+        'edu_first_student_seen',
         'edu_classroom_join',
         'edu_live_game_started',
         'edu_teacher_onboarding_step',
@@ -670,7 +670,7 @@ describe('education telemetry', () => {
         throw new Error('growth down');
       });
       expect(() => trackEduClassroomCreated({ classroomId: 'cls-1', createdVia: 'dashboard' })).not.toThrow();
-      expect(captureMock).toHaveBeenCalledWith('edu_classroom_created', {
+      expect(captureMock).toHaveBeenCalledWith('edu_classroom_create_ui_done', {
         classroom_id: 'cls-1',
         created_via: 'dashboard',
       });

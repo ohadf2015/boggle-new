@@ -13,7 +13,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   const notPro = await requireTeacherPro(auth.userId);
   if (notPro) return notPro;
 
-  const { data, error } = await readClassAnalytics(auth.sb, auth.classroom.id);
+  const { data, error } = await readClassAnalytics(auth.sb, auth.classroom.id, auth.userId);
   if (error || !data) {
     logger.error('[class-analytics] read failed', error);
     return NextResponse.json({ ok: false, error: 'Could not read class analytics' }, { status: 500 });

@@ -19,6 +19,7 @@ export interface IdentifyArgs {
   isTeacher: boolean;
   locale: string;
   email?: string | null;
+  isTestAccount?: boolean;
 }
 
 type PHFn = (...args: unknown[]) => unknown;
@@ -43,7 +44,7 @@ function isPostHogLoaded(): boolean {
 
 export function identifyUserForAnalytics(args: IdentifyArgs): void {
   if (!isPostHogLoaded()) return;
-  const { userId, displayName, isAdmin, isTeacher, locale, email } = args;
+  const { userId, displayName, isAdmin, isTeacher, locale, email, isTestAccount } = args;
 
   safe(() =>
     (posthog.identify as PHFn)(userId, {
@@ -58,7 +59,7 @@ export function identifyUserForAnalytics(args: IdentifyArgs): void {
   // hand-built email pattern reconstructed after the fact
   // (.claude/rules/70-test-accounts.md). Registered as a super property so it
   // rides every later event, not just this one.
-  setEduTestAccountFlag(isTestAccountEmail(email));
+  setEduTestAccountFlag(isTestAccount === true || isTestAccountEmail(email));
 
   safe(() =>
     (posthog.capture as PHFn)('user_identified', {

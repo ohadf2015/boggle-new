@@ -2,18 +2,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const hashes = new Map<string, Map<string, string>>();
 let redisAvailable = true;
+let redisBroken = false;
+const { logError } = vi.hoisted(() => ({ logError: vi.fn() }));
+vi.mock('../../utils/logger', () => ({ default: { error: logError, warn: vi.fn(), info: vi.fn(), debug: vi.fn() } }));
+const broken = async () => { throw new Error('READONLY'); };
 
 vi.mock('../../redisClient', () => ({
   getRedisClient: () =>
     redisAvailable
       ? {
-          hget: async (k: string, f: string) => hashes.get(k)?.get(f) ?? null,
+          hget: async (k: string, f: string) => (redisBroken ? broken() : hashes.get(k)?.get(f) ?? null),
           hset: async (k: string, f: string, v: string) => {
             if (!hashes.has(k)) hashes.set(k, new Map());
             hashes.get(k)!.set(f, v);
             return 1;
           },
-          hgetall: async (k: string) => Object.fromEntries(hashes.get(k) ?? new Map()),
+          hgetall: async (k: string) => (redisBroken ? broken() : Object.fromEntries(hashes.get(k) ?? new Map())),
           expire: async () => 1,
         }
       : null,
@@ -36,6 +40,31 @@ import { emptyEconomyState, recordCorrectWord } from '../classroomEconomy';
 beforeEach(() => {
   hashes.clear();
   redisAvailable = true;
+  redisBroken = false;
+  logError.mockClear();
+});
+
+describe('classroomEconomyStore — Redis errors are never silent', () => {
+  it('Given Redis throws, When a student award is mutated, Then nothing is awarded and the withheld award is logged with the game', async () => {
+    redisBroken = true;
+    const res = await mutateEconomy('GAME1', 'u1', 'r1', (s) => ({ state: s, result: 'paid' }));
+    expect(res).toBeNull();
+    expect(logError).toHaveBeenCalledWith('CLASSROOM_ECONOMY', expect.stringContaining('GAME1'), expect.anything());
+  });
+
+  it('Given Redis throws on reads, Then both read paths log too', async () => {
+    redisBroken = true;
+    expect(await readEconomy('GAME2', 'u1')).toBeNull();
+    expect(await readAllEconomy('GAME2B')).toBeNull();
+    expect(logError).toHaveBeenCalledTimes(2);
+  });
+
+  it('Given a burst of failures in one game, Then logging is rate-limited so Sentry is not flooded', async () => {
+    redisBroken = true;
+    for (let i = 0; i < 30; i++) await mutateEconomy('GAME3', `u${i}`, 'r1', (s) => ({ state: s, result: null }));
+    expect(logError.mock.calls.length).toBeLessThan(5);
+    expect(logError.mock.calls.length).toBeGreaterThanOrEqual(1);
+  });
 });
 
 describe('classroomEconomyStore', () => {

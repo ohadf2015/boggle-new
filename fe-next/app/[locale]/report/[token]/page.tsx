@@ -9,8 +9,8 @@ import { isRTL, type Locale } from '@/i18n/config';
 import type { ReportT } from '@/components/parentReport/ReportInsights';
 import { ReportView } from '@/components/parentReport/ReportView';
 import logger from '@/utils/logger';
-import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
-import { buildParentReportViewedEvent } from '@/backend/utils/educationRoundTelemetry';
+import { createClient } from '@/utils/supabase/server';
+import { captureParentReportView } from '@/lib/education/parentReportTelemetry';
 
 /**
  * Public "parent report" page — no account needed, the signed token in the
@@ -78,7 +78,11 @@ export default async function ParentReportPage({
   }
   if (result.status !== 'ok') return <InvalidReportView locale={locale} t={t} />;
 
-  captureEduServerEvents([buildParentReportViewedEvent({ token, classroomId: payload.classroomId, locale })]);
+  // Cookie read only: this page is public and must not pay an auth round-trip.
+  const viewerId = await createClient()
+    .then(async (sb) => (await sb.auth.getSession()).data.session?.user.id ?? null)
+    .catch(() => null);
+  await captureParentReportView(admin, { token, classroomId: payload.classroomId, locale, viewerId });
 
   return <ReportView locale={locale} token={token} data={result.data} t={t} />;
 }

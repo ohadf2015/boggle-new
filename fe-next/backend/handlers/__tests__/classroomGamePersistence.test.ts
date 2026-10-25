@@ -385,6 +385,48 @@ describe('persistClassroomGameScores', () => {
       ]);
     });
 
+    it('Given the XP RPC fails for one of two lessons, Then the reward reports only the XP that landed', async () => {
+      const game = makeGame({ lessonIds: ['lesson-a', 'lesson-b'] });
+      mockRpc.mockImplementation(async (_fn: string, args: { p_lesson_id: string }) =>
+        args.p_lesson_id === 'lesson-b' ? { error: { message: 'boom', code: 'P0001' } } : { error: null });
+
+      const rewards = await persistClassroomGameScores(game, [{ userId: 'stu-1', score: 300 }]);
+
+      expect(rewards.find((r) => r.userId === 'stu-1')?.xpEarned).toBe(15);
+    });
+
+    it('Given a transient database error on the XP RPC, When retried, Then the full XP lands once', async () => {
+      const game = makeGame({ lessonIds: ['lesson-a'] });
+      mockRpc
+        .mockResolvedValueOnce({ error: { message: 'serialization failure', code: '40001' } })
+        .mockResolvedValue({ error: null });
+
+      const rewards = await persistClassroomGameScores(game, [{ userId: 'stu-1', score: 300 }]);
+
+      expect(rewards.find((r) => r.userId === 'stu-1')?.xpEarned).toBe(30);
+      expect(mockRpc).toHaveBeenCalledTimes(2);
+    });
+
+    it('Given a transport error with no database code, Then the XP is not retried (it may have landed)', async () => {
+      const game = makeGame({ lessonIds: ['lesson-a'] });
+      mockRpc.mockResolvedValue({ error: { message: 'fetch failed', code: '' } });
+
+      const rewards = await persistClassroomGameScores(game, [{ userId: 'stu-1', score: 300 }]);
+
+      expect(mockRpc).toHaveBeenCalledTimes(1);
+      expect(rewards.find((r) => r.userId === 'stu-1')?.xpEarned).toBe(0);
+    });
+
+    it('Given a transient database error on the lesson progress upsert, When retried, Then the progress lands once', async () => {
+      mockUpsert
+        .mockResolvedValueOnce({ error: { message: 'deadlock detected', code: '40P01' } })
+        .mockResolvedValue({ error: null });
+
+      await persistClassroomGameScores(makeGame(), [{ userId: 'stu-1', score: 50, wordsFound: ['cat'] }]);
+
+      expect(mockUpsert).toHaveBeenCalledTimes(2);
+    });
+
     it('returns empty array when persistence is skipped (already persisted)', async () => {
       mockRedisSet.mockResolvedValueOnce(null);
       const rewards = await persistClassroomGameScores(makeGame(), [{ userId: 'stu-1', score: 100 }]);

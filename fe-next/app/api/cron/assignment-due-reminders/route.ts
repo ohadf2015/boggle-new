@@ -49,10 +49,7 @@ export async function POST(request: NextRequest) {
   try {
     const locked = await withCronLock('assignment-due-reminders', 120_000, async () => {
       const supabase = getSupabaseAdmin();
-      if (!supabase) {
-        logger.error('[Assignment Due] no service-role client; skipping');
-        return { sent: 0, failed: 0, due: 0, reason: 'no-supabase-admin' };
-      }
+      if (!supabase) throw new Error('no service-role client');
 
       const since = new Date(now - OVERDUE_MAX_AGE_MS).toISOString();
       const until = new Date(now + DUE_SOON_WINDOW_MS).toISOString();
@@ -174,9 +171,8 @@ export async function POST(request: NextRequest) {
         .from('subscriptions')
         .select('user_id, tier, status, source, current_period_end')
         .in('user_id', teacherIds);
-      if (subError) {
-        logger.error(`[Assignment Due] subscriptions select failed: ${subError.message}`);
-      }
+      // Fail closed: an unknown Pro status would pitch an upgrade to a paying teacher.
+      if (subError) throw new Error(`subscriptions select failed: ${subError.message}`);
       const proUserIds = proUserIdsFrom(
         (subRows ?? []) as Array<SubscriptionRowLike & { user_id: string }>,
         Date.now(),
@@ -220,9 +216,8 @@ export async function POST(request: NextRequest) {
           const { error: insertError } = await supabase.from('assignment_reminder_sends').upsert(rows, {
             onConflict: 'assignment_id,recipient_id,kind',
           });
-          if (insertError) {
-            logger.error(`[Assignment Due] ledger insert failed: ${insertError.message}`);
-          }
+          // Unrecorded means tomorrow's run sends the same reminder again: stop and alert.
+          if (insertError) throw new Error(`sent to ${teacher.email} but ledger insert failed: ${insertError.message}`);
         }
         sent += 1;
       }

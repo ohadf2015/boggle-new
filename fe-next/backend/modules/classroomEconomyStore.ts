@@ -15,6 +15,7 @@ import {
   type ClassroomGame,
 } from './classroomGameManager';
 import { applyRoundBoundary, emptyEconomyState, type EconomyState } from './classroomEconomy';
+import logger from '../utils/logger';
 
 export interface EconomyConfig {
   wrongAnswerCost: boolean;
@@ -30,6 +31,20 @@ export function resolveConfig(game: Pick<ClassroomGame, 'settings'> | null | und
 }
 
 const hashKey = (gameCode: string) => `classroom_econ:${gameCode}`;
+
+const LOG_EVERY = 25;
+const MAX_TRACKED_GAMES = 500;
+const failuresByGame = new Map<string, number>();
+
+/** A null here withholds a student's coins, so it is logged: first failure per game, then every 25th. */
+function reportRedisFailure(op: string, gameCode: string, err: unknown): void {
+  const n = (failuresByGame.get(gameCode) ?? 0) + 1;
+  if (!failuresByGame.has(gameCode) && failuresByGame.size >= MAX_TRACKED_GAMES) failuresByGame.clear();
+  failuresByGame.set(gameCode, n);
+  if (n === 1 || n % LOG_EVERY === 0) {
+    logger.error('CLASSROOM_ECONOMY', `${op} failed for game ${gameCode} (${n} withheld so far)`, err);
+  }
+}
 
 function parseState(raw: string | null | undefined): EconomyState | null {
   if (!raw) return null;
@@ -48,7 +63,8 @@ export async function readEconomy(gameCode: string, userId: string, roundId?: st
   try {
     const state = parseState(await redis.hget(hashKey(gameCode), userId)) ?? emptyEconomyState();
     return roundId ? applyRoundBoundary(state, roundId) : state;
-  } catch {
+  } catch (err) {
+    reportRedisFailure('readEconomy', gameCode, err);
     return null;
   }
 }
@@ -64,7 +80,8 @@ export async function readAllEconomy(gameCode: string): Promise<Record<string, E
       if (state) out[userId] = state;
     }
     return out;
-  } catch {
+  } catch (err) {
+    reportRedisFailure('readAllEconomy', gameCode, err);
     return null;
   }
 }
@@ -89,7 +106,8 @@ export async function mutateEconomy<R>(
       await redis.hset(hashKey(gameCode), userId, JSON.stringify(next.state));
       await redis.expire(hashKey(gameCode), CLASSROOM_GAME_TTL);
       return next.result;
-    } catch {
+    } catch (err) {
+      reportRedisFailure('mutateEconomy', gameCode, err);
       return null;
     }
   });

@@ -14,29 +14,14 @@ vi.mock('next/server', () => ({
 const h = vi.hoisted(() => ({
   sendEmailSpy: vi.fn(async () => ({ ok: true })),
   tables: {} as Record<string, { data: unknown; error: { message: string } | null }>,
+  noAdmin: false,
 }));
-
-function chainFor(name: string) {
-  const result = h.tables[name] ?? { data: [], error: null };
-  const chain: Record<string, unknown> = {};
-  const self = () => chain;
-  chain.select = self;
-  chain.eq = self;
-  chain.not = self;
-  chain.in = self;
-  chain.gte = self;
-  chain.contains = self;
-  chain.limit = self;
-  chain.then = (resolve: unknown, reject: unknown) => Promise.resolve(result).then(resolve as never, reject as never);
-  return chain;
-}
+import { postgrestDouble } from '@/lib/education/__tests__/helpers/postgrestDouble';
 
 vi.mock('@/lib/email/send', () => ({ sendEmail: h.sendEmailSpy }));
 vi.mock('@/lib/email', async (importOriginal) => ({
   ...(await importOriginal()),
-  getSupabaseAdmin: () => ({
-    from: (name: string) => chainFor(name),
-  }),
+  getSupabaseAdmin: () => (h.noAdmin ? null : postgrestDouble(h.tables)),
 }));
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 vi.mock('@/backend/redis/locking', () => ({
@@ -66,7 +51,7 @@ const TOKEN = 'd'.repeat(64);
 
 function seedTeacherWithClass() {
   h.tables.teacher_access_requests = {
-    data: [{ user_id: 't1', email: 'ada@school.edu', full_name: 'Ada', locale: 'en' }],
+    data: [{ id: 'r1', status: 'approved', user_id: 't1', email: 'ada@school.edu', full_name: 'Ada', locale: 'en' }],
     error: null,
   };
   h.tables.classrooms = { data: [{ id: 'c1', name: 'Year 7', teacher_id: 't1' }], error: null };
@@ -77,6 +62,7 @@ describe('/api/cron/teacher-weekly-digest', () => {
     vi.clearAllMocks();
     process.env.CRON_SECRET = CRON_SECRET;
     h.sendEmailSpy.mockResolvedValue({ ok: true });
+    h.noAdmin = false;
     h.tables = {
       teacher_access_requests: { data: [], error: null },
       classrooms: { data: [], error: null },
@@ -98,17 +84,18 @@ describe('/api/cron/teacher-weekly-digest', () => {
 
   it('sends a Polar-CTA digest for a free teacher with a classroom', async () => {
     h.tables.teacher_access_requests = {
-      data: [{ user_id: 't1', email: 'ada@school.edu', full_name: 'Ada', locale: 'en' }],
+      data: [{ id: 'r1', status: 'approved', user_id: 't1', email: 'ada@school.edu', full_name: 'Ada', locale: 'en' }],
       error: null,
     };
     h.tables.classrooms = { data: [{ id: 'c1', name: 'Year 7', teacher_id: 't1' }], error: null };
     h.tables.classroom_memberships = {
-      data: [{ classroom_id: 'c1', student_id: 's1' }],
+      data: [{ id: 'm1', classroom_id: 'c1', student_id: 's1' }],
       error: null,
     };
     h.tables.practice_sessions = {
       data: [
         {
+          id: 'ps1',
           classroom_id: 'c1',
           student_id: 's1',
           completed_at: new Date().toISOString(),
@@ -170,5 +157,67 @@ describe('/api/cron/teacher-weekly-digest', () => {
     const res = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
     expect(res.status).toBe(500);
     expect(h.sendEmailSpy).not.toHaveBeenCalled();
+  });
+
+  it('Given the same week was already sent, When the cron is re-triggered, Then nobody is emailed again', async () => {
+    seedTeacherWithClass();
+    await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(h.sendEmailSpy).toHaveBeenCalledTimes(1);
+    const body = await (await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }))).json();
+    expect(h.sendEmailSpy).toHaveBeenCalledTimes(1);
+    expect(body.alreadySent).toBe(1);
+  });
+
+  it('Given a send fails, Then its claim is released so the next run can retry', async () => {
+    seedTeacherWithClass();
+    h.sendEmailSpy.mockResolvedValueOnce({ ok: false, error: 'resend 500' });
+    await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(h.tables.teacher_lifecycle_sends.data).toEqual([]);
+    await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(h.sendEmailSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('Given a teacher whose profile is a test account, Then no digest is sent to them', async () => {
+    seedTeacherWithClass();
+    h.tables.profiles = { data: [{ id: 't1', is_test_account: true, daily_email_subscribed: null, email_unsubscribe_token: TOKEN }], error: null };
+    const body = await (await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }))).json();
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
+    expect(body.excludedTestAccounts).toBe(1);
+  });
+
+  it('Given the subscriptions read fails, Then the run fails instead of pitching Pro teachers an upgrade', async () => {
+    seedTeacherWithClass();
+    h.tables.subscriptions = { data: null, error: { message: 'timeout' } };
+    const res = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(res.status).toBe(500);
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
+  });
+
+  it('Given no service-role client, Then the run fails loudly, not success:true', async () => {
+    h.noAdmin = true;
+    const res = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(res.status).toBe(500);
+  });
+
+  it('Given 1500 sessions in a busy fortnight, Then none are dropped by a row cap', async () => {
+    seedTeacherWithClass();
+    h.tables.classroom_memberships = { data: [{ id: 'm1', classroom_id: 'c1', student_id: 's1' }], error: null };
+    const at = new Date().toISOString();
+    h.tables.practice_sessions = {
+      data: Array.from({ length: 1500 }, (_, i) => ({
+        id: `ps${String(i).padStart(4, '0')}`, classroom_id: 'c1', student_id: 's1', completed_at: at,
+        results: { lessonWordsFound: ['a'], lessonWordsMissed: [] },
+      })),
+      error: null,
+    };
+    const { loadWeeklyDigestInputs } = await import('@/lib/education/weeklyDigestData');
+    const inputs = await loadWeeklyDigestInputs(postgrestDouble(h.tables) as never, Date.now());
+    expect(inputs.sessions).toHaveLength(1500);
+  });
+
+  it('Given a completed run, Then the digest heartbeat is written', async () => {
+    seedTeacherWithClass();
+    await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect((h.tables.cron_heartbeats.data as Array<{ job: string }>).map((r) => r.job)).toEqual(['teacher-weekly-digest']);
   });
 });

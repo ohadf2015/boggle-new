@@ -211,6 +211,18 @@ describe('autoJoinSignedInStudent', () => {
     expect(events[3].properties.classroom_id).toBe('c1');
   });
 
+  it('Given a profile flagged as a test account with a real-looking email, Then the join funnel events are tagged', async () => {
+    const capture = vi.fn();
+    const seen: string[] = [];
+    await autoJoinSignedInStudent('en', 'ABC123', deps({
+      capture,
+      isTestAccount: async (user) => { seen.push(user.id); return true; },
+    }));
+    expect(seen).toEqual(['student-1']);
+    const events = capture.mock.calls[0][0] as JoinFunnelEvent[];
+    expect(events.every((e) => e.properties.is_test_account === true)).toBe(true);
+  });
+
   it('returns null when the join throws, so the form still renders', async () => {
     const href = await autoJoinSignedInStudent(
       'en',

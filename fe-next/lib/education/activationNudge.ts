@@ -11,8 +11,11 @@ export type ActivationNudgeBucket = (typeof ACTIVATION_NUDGE_BUCKETS)[number];
 
 const THRESHOLD_DAYS: Record<ActivationNudgeBucket, number> = { d1: 1, d3: 3, d7: 7 };
 
-/** A teacher approved months ago gets nothing: a first-week nudge that late reads as spam. */
+/** Past day 14 the first-week copy reads as spam; one reactivation email replaces it. */
 export const MAX_DAYS_SINCE_APPROVAL = 14;
+export const MAX_DAYS_FOR_REACTIVATION = 120;
+
+export type ActivationNudgePick = ActivationNudgeBucket | 'reactivate';
 
 const LOCALES: readonly TeacherLocale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
@@ -21,15 +24,16 @@ export function pickActivationNudge(
   approvedAtISO: string | null | undefined,
   alreadySent: readonly string[] | null | undefined,
   nowMs: number,
-): ActivationNudgeBucket | null {
+): ActivationNudgePick | null {
   if (!approvedAtISO) return null;
   const approved = Date.parse(approvedAtISO);
   if (Number.isNaN(approved)) return null;
 
   const days = (nowMs - approved) / DAY_MS;
-  if (days > MAX_DAYS_SINCE_APPROVAL) return null;
-
   const sent = new Set(alreadySent ?? []);
+  if (days > MAX_DAYS_FOR_REACTIVATION) return null;
+  if (days > MAX_DAYS_SINCE_APPROVAL) return sent.has('reactivate') ? null : 'reactivate';
+
   for (const bucket of [...ACTIVATION_NUDGE_BUCKETS].reverse()) {
     if (days >= THRESHOLD_DAYS[bucket]) return sent.has(bucket) ? null : bucket;
   }
@@ -56,7 +60,8 @@ export interface ActivationNudgeDue {
   email: string;
   full_name: string;
   locale: TeacherLocale;
-  bucket: ActivationNudgeBucket;
+  bucket: ActivationNudgePick;
+  userIds: string[];
   rowIds: string[];
   alreadySent: string[];
 }
@@ -120,6 +125,7 @@ export function planActivationNudges(
       full_name: latest.full_name,
       locale: asLocale(latest.locale),
       bucket,
+      userIds,
       rowIds: group.map((r) => r.id),
       alreadySent,
     });

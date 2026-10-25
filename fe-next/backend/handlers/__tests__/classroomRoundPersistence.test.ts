@@ -7,6 +7,7 @@ const fake = {
   sessionError: null as null | { message: string },
   roundInsertError: null as null | { message: string },
   priorRounds: 0,
+  flagged: [] as string[],
 };
 
 vi.mock('../../modules/supabase/client.js', () => ({ getSupabase: vi.fn() }));
@@ -51,9 +52,16 @@ function makeSupabase() {
       }
       if (table === 'classroom_rounds') {
         return {
-          select: () => ({
-            eq: () => ({ gte: () => Promise.resolve({ count: fake.priorRounds, error: null }) }),
-          }),
+          select: (_cols: string, opts?: { head?: boolean }) => {
+            const result = opts?.head
+              ? { count: fake.priorRounds, error: null }
+              : { data: fake.priorRounds > 0 ? [{ completed_at: new Date().toISOString() }] : [], error: null };
+            const chain: Record<string, unknown> = {
+              then: (ok: (v: unknown) => unknown, bad?: (e: unknown) => unknown) => Promise.resolve(result).then(ok, bad),
+            };
+            for (const m of ['eq', 'gte', 'order', 'limit']) chain[m] = () => chain;
+            return chain;
+          },
           insert: (row: Record<string, unknown>) => {
             roundInserts.push(row);
             return Promise.resolve({ error: fake.roundInsertError });
@@ -71,6 +79,9 @@ function makeSupabase() {
             }),
           }),
         };
+      }
+      if (table === 'profiles') {
+        return { select: () => ({ in: (_c: string, ids: string[]) => ({ eq: () => Promise.resolve({ data: ids.filter((i) => fake.flagged.includes(i)).map((id) => ({ id })), error: null }) }) }) };
       }
       if (table === 'student_lesson_progress') {
         return {
@@ -118,6 +129,7 @@ beforeEach(() => {
   fake.sessionError = null;
   fake.roundInsertError = null;
   fake.priorRounds = 0;
+  fake.flagged = [];
   (getSupabase as Mock).mockReturnValue(makeSupabase());
 });
 
@@ -215,5 +227,22 @@ describe('persistClassroomGameScores — round education events', () => {
     const evs = eventsNamed('edu_student_returned');
     expect(evs.map((e) => e.distinctId)).toEqual(['user-ana']);
     expect(evs[0].properties).toMatchObject({ classroom_id: 'class-1', day_n: 2 });
+  });
+
+  it('Given a QA teacher, When the round persists, Then every per-student completion carries is_test_account true', async () => {
+    fake.flagged = ['teacher-1'];
+    (getSupabase as Mock).mockReturnValue(makeSupabase());
+    await persistClassroomGameScores(game as never, scores);
+    const done = eventsNamed('edu_classroom_game_completed');
+    expect(done.length).toBe(2);
+    for (const e of done) expect(e.properties.is_test_account).toBe(true);
+  });
+
+  it('Given a real teacher and one flagged QA student, When persisted, Then only that student is tagged', async () => {
+    fake.flagged = ['user-bo'];
+    (getSupabase as Mock).mockReturnValue(makeSupabase());
+    await persistClassroomGameScores(game as never, scores);
+    const byUser = Object.fromEntries(eventsNamed('edu_classroom_game_completed').map((e) => [e.distinctId, e.properties.is_test_account]));
+    expect(byUser).toEqual({ 'user-ana': false, 'user-bo': true });
   });
 });

@@ -21233,8 +21233,39 @@ const es = {
     "coverageLabel": "palabras de la lección que encontró la clase",
     "bossStaggers": "Ataques bloqueados: {count}",
     "bossDamage": "{dmg} de daño"
-  }
+  },
   // @eduResultsV3:end
+  // @teacherLifecycleEmail:start
+  "teacherLifecycleEmail": {
+    "greeting": "Hola, {name}:",
+    "ask": "¿Preguntas? Responde a este correo. Lo leo todo.",
+    "signoff": "— Ohad, el creador de LexiClash",
+    "share_code": {
+      "subject": "Tu clase está lista. A tus alumnos solo les falta el código",
+      "lead": "Tu clase ya está creada, pero todavía no se ha unido ningún alumno.",
+      "body": "Abre tu clase y comparte el enlace: pégalo en WhatsApp o en Google Classroom, o escribe el código en la pizarra. Los alumnos entran desde cualquier móvil o portátil.",
+      "cta": "Compartir mi enlace"
+    },
+    "start_live": {
+      "subject": "Tus alumnos ya están dentro. ¿Jugamos en vivo?",
+      "lead": "Hay alumnos en tu clase, pero todavía no habéis jugado una partida en vivo juntos.",
+      "body": "Abre tu clase, elige una lista de palabras y pulsa empezar. Una ronda es corta y toda la clase juega a la vez en la pantalla grande.",
+      "cta": "Empezar una partida en vivo"
+    },
+    "second_game": {
+      "subject": "¿Listos para la segunda ronda con tu clase?",
+      "lead": "Tu clase jugó su primera partida en vivo hace unos días.",
+      "body": "En la segunda partida es cuando las palabras empiezan a quedarse. Abre tu clase, mira qué palabras fallaron los alumnos y juega una partida en vivo con ellas.",
+      "cta": "Preparar la próxima partida"
+    },
+    "reactivate": {
+      "subject": "Tu acceso de docente en LexiClash sigue abierto",
+      "lead": "Te aprobamos hace un tiempo, pero todavía no has creado ninguna clase.",
+      "body": "Es cosa de un minuto: ponle nombre a tu clase, recibe un código y tus alumnos pueden jugar hoy mismo. Si algo te lo impidió, responde y cuéntame qué fue.",
+      "cta": "Crear mi primera clase"
+    }
+  }
+  // @teacherLifecycleEmail:end
 };
 
 export { es };

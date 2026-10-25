@@ -7,6 +7,8 @@ import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { isQaEmail } from '@/backend/utils/educationRoundTelemetry';
+import { isAnyTestAccount } from '@/lib/education/eduTestAccount';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
 import logger from '@/utils/logger';
 import {
@@ -64,7 +66,7 @@ export interface RunSignedInJoinDeps {
   currentUser: () => Promise<SignedInJoinUser | null>;
   join: (code: string) => Promise<SignedInJoinOutcome>;
   capture: (events: Parameters<typeof captureEduServerEvents>[0]) => void;
-  isTestAccount: (email: string | null | undefined) => boolean;
+  isTestAccount: (user: SignedInJoinUser) => boolean | Promise<boolean>;
 }
 
 const realDeps: RunSignedInJoinDeps = {
@@ -72,7 +74,7 @@ const realDeps: RunSignedInJoinDeps = {
   currentUser,
   join: joinClassroom,
   capture: captureEduServerEvents,
-  isTestAccount: isQaEmail,
+  isTestAccount: async (user) => isQaEmail(user.email) || isAnyTestAccount(createAdminClient(), [user.id]),
 };
 
 /**
@@ -96,7 +98,7 @@ export async function autoJoinSignedInStudent(
       locale,
       code: rawCode,
       user,
-      isTestAccount: deps.isTestAccount(user.email),
+      isTestAccount: await deps.isTestAccount(user),
       join: deps.join,
       capture: deps.capture,
     });

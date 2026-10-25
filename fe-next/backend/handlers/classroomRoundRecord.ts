@@ -13,12 +13,17 @@ import {
   buildLiveRoundCompletedEvent,
   buildStudentReturnedEvents,
   buildTeacherFirstLiveGameEvent,
+  buildTeacherSecondLiveGameDayEvent,
+  secondLiveGameDaysSinceFirst,
+  startOfNextUtcDay,
 } from '../utils/educationRoundTelemetry';
+import { loadTestAccountIds } from '@/lib/education/eduTestAccount';
 
 
 export interface RoundMembership {
   userId: string;
   joinedAt: string | null;
+  isTestAccount: boolean;
 }
 
 export function planClassroomRoundEvents(args: {
@@ -27,39 +32,72 @@ export function planClassroomRoundEvents(args: {
   durationSeconds: number | null;
   /** Earlier rounds by this teacher with a real class (2+ players); a solo self-test is not a class. */
   priorRealRounds: number;
+  /** The teacher's earliest real round before this one, and whether one already landed on a later UTC day. */
+  firstRealRoundAt: string | null;
+  secondDayReached: boolean;
+  teacherIsTest: boolean;
   memberships: RoundMembership[];
   now: Date;
 }): EduServerEvent[] {
-  const { game } = args;
+  const { game, teacherIsTest } = args;
   if (!game?.classroomId) return [];
 
+  const gameMode = game.settings?.gameMode ?? 'classic';
+  const playerCount = args.playerIds.length;
+  const isRealRound = playerCount >= REAL_CLASS_MIN_PLAYERS;
   const completed = buildLiveRoundCompletedEvent({
     game,
     durationSeconds: args.durationSeconds,
-    playerCount: args.playerIds.length,
+    playerCount,
+    isTestAccount: teacherIsTest,
   });
   const events: EduServerEvent[] = completed ? [completed] : [];
+  const teacher = { teacherId: game.teacherId, classroomId: game.classroomId, gameMode, playerCount, isTestAccount: teacherIsTest };
 
-  if (args.priorRealRounds === 0 && args.playerIds.length >= REAL_CLASS_MIN_PLAYERS) {
-    events.push(
-      buildTeacherFirstLiveGameEvent({
-        teacherId: game.teacherId,
-        classroomId: game.classroomId,
-        gameMode: game.settings?.gameMode ?? 'classic',
-        playerCount: args.playerIds.length,
-      })
-    );
-  }
+  if (args.priorRealRounds === 0 && isRealRound) events.push(buildTeacherFirstLiveGameEvent(teacher));
+
+  const daysSinceFirst = secondLiveGameDaysSinceFirst({
+    firstRealRoundAt: args.firstRealRoundAt,
+    secondDayReached: args.secondDayReached,
+    isRealRound,
+    now: args.now,
+  });
+  if (daysSinceFirst !== null) events.push(buildTeacherSecondLiveGameDayEvent({ ...teacher, daysSinceFirst }));
 
   const players = new Set(args.playerIds);
   events.push(
     ...buildStudentReturnedEvents({
       classroomId: game.classroomId,
       now: args.now,
-      students: args.memberships.filter((m) => players.has(m.userId)),
+      gameMode,
+      surface: 'live',
+      students: args.memberships
+        .filter((m) => players.has(m.userId))
+        .map((m) => ({ ...m, isTestAccount: teacherIsTest || m.isTestAccount })),
     })
   );
   return events;
+}
+
+async function loadRealRoundHistory(
+  supabase: NonNullable<ReturnType<typeof getSupabase>>,
+  teacherId: string
+): Promise<{ firstRealRoundAt: string | null; secondDayReached: boolean }> {
+  const realRounds = () =>
+    supabase
+      .from('classroom_rounds' as never)
+      .select('completed_at')
+      .eq('teacher_id', teacherId)
+      .gte('player_count', REAL_CLASS_MIN_PLAYERS);
+  const { data: first, error } = await realRounds().order('completed_at', { ascending: true }).limit(1);
+  if (error) throw new Error(error.message);
+  const firstRealRoundAt = ((first ?? []) as Array<{ completed_at: string | null }>)[0]?.completed_at ?? null;
+  if (!firstRealRoundAt) return { firstRealRoundAt: null, secondDayReached: false };
+  const { data: later, error: laterError } = await realRounds()
+    .gte('completed_at', startOfNextUtcDay(firstRealRoundAt))
+    .limit(1);
+  if (laterError) throw new Error(laterError.message);
+  return { firstRealRoundAt, secondDayReached: (later ?? []).length > 0 };
 }
 
 export async function recordClassroomRound(
@@ -77,6 +115,8 @@ export async function recordClassroomRound(
       .eq('teacher_id', game.teacherId)
       .gte('player_count', REAL_CLASS_MIN_PLAYERS);
     if (countError) throw new Error(countError.message);
+    const history = await loadRealRoundHistory(supabase, game.teacherId);
+    const flagged = await loadTestAccountIds(supabase, [game.teacherId, ...opts.playerIds]);
 
     const now = new Date();
     const { error: insertError } = await supabase.from('classroom_rounds' as never).insert({
@@ -102,6 +142,7 @@ export async function recordClassroomRound(
       memberships = (data ?? []).map((row) => ({
         userId: row.student_id,
         joinedAt: row.joined_at,
+        isTestAccount: flagged.has(row.student_id),
       }));
     }
 
@@ -115,6 +156,8 @@ export async function recordClassroomRound(
         playerIds: opts.playerIds,
         durationSeconds: opts.durationSeconds,
         priorRealRounds: count ?? 0,
+        ...history,
+        teacherIsTest: flagged.has(game.teacherId),
         memberships,
         now,
       })

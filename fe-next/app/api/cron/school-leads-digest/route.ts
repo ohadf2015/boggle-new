@@ -33,10 +33,7 @@ export async function POST(request: NextRequest) {
   try {
     const locked = await withCronLock('school-leads-digest', 60_000, async () => {
       const supabase = getSupabaseAdmin();
-      if (!supabase) {
-        logger.error('[SchoolLead Digest] no service-role client; skipping');
-        return { sent: false, count: 0, reason: 'no-supabase-admin' };
-      }
+      if (!supabase) throw new Error('no service-role client');
 
       const { data, error } = await supabase
         .from('school_leads')

@@ -295,11 +295,11 @@ export type GrowthEvent =
   // CANONICAL_DUAL_EMIT: the bare names are already captured by telemetry.ts,
   // a dual-emit would double-count them in PostHog. Privacy: classroom_id and
   // counts only — never the join code, student names or emails.
-  | 'edu_classroom_created'
+  | 'edu_classroom_create_ui_done'
   | 'edu_join_code_shown'
   | 'edu_join_code_copied'
   | 'edu_join_code_shared'
-  | 'edu_first_student_joined'
+  | 'edu_first_student_seen'
   | 'edu_classroom_join'
   | 'edu_live_game_started'
   | 'edu_teacher_onboarding_step'

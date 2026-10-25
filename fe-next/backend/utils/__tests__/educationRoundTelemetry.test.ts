@@ -8,6 +8,10 @@ import {
   buildStudentReturnedEvents,
   buildTeacherFirstLiveGameEvent,
   buildParentReportViewedEvent,
+  buildTeacherSecondLiveGameDayEvent,
+  buildFirstStudentJoinedEvent,
+  buildLiveGameEndedEvent,
+  secondLiveGameDaysSinceFirst,
   isQaEmail,
 } from '../educationRoundTelemetry';
 
@@ -66,7 +70,7 @@ describe('educationRoundTelemetry builders', () => {
   });
 
   it('Given a round completes, When built, Then duration and player count are included', () => {
-    const ev = buildLiveRoundCompletedEvent({ game: makeGame(), durationSeconds: 90, playerCount: 2 });
+    const ev = buildLiveRoundCompletedEvent({ game: makeGame(), durationSeconds: 90, playerCount: 2, isTestAccount: false });
     expect(ev).not.toBeNull();
     expect(ev!.event).toBe('edu_live_round_completed');
     expect(ev!.properties).toMatchObject({
@@ -75,37 +79,62 @@ describe('educationRoundTelemetry builders', () => {
   });
 
   it('Given a round completes with unknown duration, When built, Then duration is null, never NaN', () => {
-    const ev = buildLiveRoundCompletedEvent({ game: makeGame(), durationSeconds: null, playerCount: 2 });
+    const ev = buildLiveRoundCompletedEvent({ game: makeGame(), durationSeconds: null, playerCount: 2, isTestAccount: false });
     expect(ev!.properties.duration_seconds).toBeNull();
   });
 
   it('Given a student who joined yesterday, When the round completes, Then a day-1 return is emitted', () => {
     const joined = new Date(NOW.getTime() - 1.5 * DAY).toISOString();
     const events = buildStudentReturnedEvents({
-      classroomId: 'c1', now: NOW, students: [{ userId: 's1', joinedAt: joined }],
+      classroomId: 'c1', now: NOW, gameMode: 'classic', surface: 'live',
+      students: [{ userId: 's1', joinedAt: joined, isTestAccount: false }],
     });
     expect(events).toHaveLength(1);
     expect(events[0].event).toBe('edu_student_returned');
     expect(events[0].distinctId).toBe('s1');
-    expect(events[0].properties).toMatchObject({ classroom_id: 'c1', day_n: 1 });
+    expect(events[0].properties).toEqual({
+      classroom_id: 'c1', day_n: 1, retention_day: 1, game_mode: 'classic', surface: 'live', is_test_account: false,
+    });
   });
 
   it('Given a student who joined today or has no join date, When the round completes, Then no return is emitted', () => {
     const events = buildStudentReturnedEvents({
       classroomId: 'c1',
       now: NOW,
+      gameMode: 'classic',
+      surface: 'live',
       students: [
-        { userId: 's1', joinedAt: new Date(NOW.getTime() - 3_600_000).toISOString() },
-        { userId: 's2', joinedAt: null },
+        { userId: 's1', joinedAt: new Date(NOW.getTime() - 3_600_000).toISOString(), isTestAccount: false },
+        { userId: 's2', joinedAt: null, isTestAccount: false },
       ],
     });
     expect(events).toEqual([]);
   });
 
+  it('Given students 2, 4 and 9 days after joining, When they return, Then retention_day is the last 1/3/7 milestone reached', () => {
+    const events = buildStudentReturnedEvents({
+      classroomId: 'c1',
+      now: NOW,
+      gameMode: 'vocab-quiz',
+      surface: 'practice',
+      students: [
+        { userId: 'a', joinedAt: '2026-10-05T11:00:00Z', isTestAccount: false },
+        { userId: 'b', joinedAt: '2026-10-03T11:00:00Z', isTestAccount: true },
+        { userId: 'c', joinedAt: '2026-09-28T11:00:00Z', isTestAccount: false },
+      ],
+    });
+    expect(events.map((e) => [e.distinctId, e.properties.day_n, e.properties.retention_day, e.properties.is_test_account])).toEqual([
+      ['a', 2, 1, false],
+      ['b', 4, 3, true],
+      ['c', 9, 7, false],
+    ]);
+  });
+
   it('Given a teacher runs their first live round, When built, Then the first-live-game event is keyed on the teacher', () => {
     const ev = buildTeacherFirstLiveGameEvent({
-      teacherId: 't1', classroomId: 'c1', gameMode: 'classic', playerCount: 4,
+      teacherId: 't1', classroomId: 'c1', gameMode: 'classic', playerCount: 4, isTestAccount: true,
     });
+    expect(ev.properties.is_test_account).toBe(true);
     expect(ev.event).toBe('edu_teacher_first_live_game');
     expect(ev.distinctId).toBe('t1');
     expect(ev.properties).toMatchObject({ classroom_id: 'c1', game_mode: 'classic', player_count: 4 });
@@ -114,18 +143,78 @@ describe('educationRoundTelemetry builders', () => {
 
 describe('buildParentReportViewedEvent', () => {
   it('Given a valid report link, When built, Then it names the class and locale but never the student', () => {
-    const ev = buildParentReportViewedEvent({ token: 'tok-1', classroomId: 'class-1', locale: 'he' });
+    const ev = buildParentReportViewedEvent({ token: 'tok-1', classroomId: 'class-1', locale: 'he', isTestAccount: false });
     expect(ev.event).toBe('parent_report_viewed');
-    expect(ev.properties).toEqual({ classroom_id: 'class-1', locale: 'he' });
+    expect(ev.properties).toEqual({ classroom_id: 'class-1', locale: 'he', is_test_account: false });
     expect(JSON.stringify(ev)).not.toContain('tok-1');
   });
 
   it('Given the same link opened twice, Then both views share one viewer id; a different link does not', () => {
-    const a = buildParentReportViewedEvent({ token: 'tok-1', classroomId: 'c', locale: 'en' });
-    const b = buildParentReportViewedEvent({ token: 'tok-1', classroomId: 'c', locale: 'en' });
-    const c = buildParentReportViewedEvent({ token: 'tok-2', classroomId: 'c', locale: 'en' });
+    const a = buildParentReportViewedEvent({ token: 'tok-1', classroomId: 'c', locale: 'en', isTestAccount: false });
+    const b = buildParentReportViewedEvent({ token: 'tok-1', classroomId: 'c', locale: 'en', isTestAccount: false });
+    const c = buildParentReportViewedEvent({ token: 'tok-2', classroomId: 'c', locale: 'en', isTestAccount: false });
     expect(a.distinctId).toBe(b.distinctId);
     expect(a.distinctId).not.toBe(c.distinctId);
     expect(a.distinctId.startsWith('parent_report:')).toBe(true);
+  });
+});
+
+describe('north-star second live game day', () => {
+  it('Given the first real round on Oct 1 and none since, When a real round lands Oct 7, Then it is the second day, 6 days after the first', () => {
+    expect(secondLiveGameDaysSinceFirst({
+      firstRealRoundAt: '2026-10-01T23:30:00Z', secondDayReached: false, isRealRound: true, now: new Date('2026-10-07T08:00:00Z'),
+    })).toBe(6);
+  });
+
+  it('Given the first real round late on Oct 1 UTC, When another lands early Oct 2 UTC, Then a new UTC day counts with days_since_first 1', () => {
+    expect(secondLiveGameDaysSinceFirst({
+      firstRealRoundAt: '2026-10-01T23:59:00Z', secondDayReached: false, isRealRound: true, now: new Date('2026-10-02T00:01:00Z'),
+    })).toBe(1);
+  });
+
+  it('Given a second round the same UTC day, a solo round, no prior round, or a day already reached, Then nothing', () => {
+    const base = { firstRealRoundAt: '2026-10-01T08:00:00Z', secondDayReached: false, isRealRound: true, now: new Date('2026-10-01T22:00:00Z') };
+    expect(secondLiveGameDaysSinceFirst(base)).toBeNull();
+    expect(secondLiveGameDaysSinceFirst({ ...base, now: new Date('2026-10-04T08:00:00Z'), isRealRound: false })).toBeNull();
+    expect(secondLiveGameDaysSinceFirst({ ...base, now: new Date('2026-10-04T08:00:00Z'), firstRealRoundAt: null })).toBeNull();
+    expect(secondLiveGameDaysSinceFirst({ ...base, now: new Date('2026-10-04T08:00:00Z'), secondDayReached: true })).toBeNull();
+  });
+
+  it('Given the second day, When the event is built, Then it is keyed on the teacher with days_since_first', () => {
+    const ev = buildTeacherSecondLiveGameDayEvent({
+      teacherId: 't1', classroomId: 'c1', gameMode: 'blast', playerCount: 12, daysSinceFirst: 6, isTestAccount: false,
+    });
+    expect(ev).toEqual({
+      distinctId: 't1',
+      event: 'edu_teacher_second_live_game_day',
+      properties: { classroom_id: 'c1', game_mode: 'blast', player_count: 12, days_since_first: 6, is_test_account: false },
+    });
+  });
+});
+
+describe('server-side join and end events', () => {
+  it('Given the first student joins, When built, Then it is keyed on the teacher', () => {
+    expect(buildFirstStudentJoinedEvent({ teacherId: 't1', classroomId: 'c1', isTestAccount: true })).toEqual({
+      distinctId: 't1',
+      event: 'edu_first_student_joined',
+      properties: { classroom_id: 'c1', is_test_account: true },
+    });
+  });
+
+  it('Given a started game ends, When built, Then it reports duration and roster whether or not anything was written', () => {
+    const ev = buildLiveGameEndedEvent(makeGame(), { isTestAccount: false, now: NOW, roundsRecorded: 0 });
+    expect(ev).toEqual({
+      distinctId: 'teacher-1',
+      event: 'edu_live_game_ended',
+      properties: {
+        classroom_id: 'class-1', game_code: 'ABC123', game_mode: 'wordcraft', lesson_count: 2,
+        roster_count: 2, rounds_recorded: 0, had_started: true, duration_seconds: 90, is_test_account: false,
+      },
+    });
+  });
+
+  it('Given a lobby closed before start, When built, Then had_started is false and duration null', () => {
+    const ev = buildLiveGameEndedEvent(makeGame({ startedAt: undefined }), { isTestAccount: false, now: NOW, roundsRecorded: null });
+    expect(ev!.properties).toMatchObject({ had_started: false, duration_seconds: null, rounds_recorded: null });
   });
 });

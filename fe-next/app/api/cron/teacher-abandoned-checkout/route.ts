@@ -59,10 +59,7 @@ export async function POST(request: NextRequest) {
   try {
     const locked = await withCronLock('teacher-abandoned-checkout', 120_000, async () => {
       const supabase = getSupabaseAdmin();
-      if (!supabase) {
-        logger.error('[Abandoned Checkout] no service-role client; skipping');
-        return { sent: 0, failed: 0, due: 0, reason: 'no-supabase-admin' };
-      }
+      if (!supabase) throw new Error('no service-role client');
 
       const now = Date.now();
       const since = new Date(now - (ABANDONED_MAX_HOURS + 1) * HOUR_MS).toISOString();

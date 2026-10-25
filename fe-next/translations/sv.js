@@ -21221,8 +21221,39 @@ const sv = {
     "coverageLabel": "lektionsord som klassen hittade",
     "bossStaggers": "Stoppade attacker: {count}",
     "bossDamage": "{dmg} skada"
-  }
+  },
   // @eduResultsV3:end
+  // @teacherLifecycleEmail:start
+  "teacherLifecycleEmail": {
+    "greeting": "Hej {name},",
+    "ask": "Frågor? Svara bara på det här mejlet. Jag läser allt.",
+    "signoff": "— Ohad, skaparen av LexiClash",
+    "share_code": {
+      "subject": "Din klass är klar. Eleverna behöver bara koden",
+      "lead": "Din klass är skapad, men inga elever har gått med än.",
+      "body": "Öppna klassen och dela länken: klistra in den i WhatsApp eller Google Classroom, eller skriv koden på tavlan. Eleverna går med från vilken mobil eller dator som helst.",
+      "cta": "Dela min länk"
+    },
+    "start_live": {
+      "subject": "Eleverna är med. Dags för ett livespel?",
+      "lead": "Elever har gått med i din klass, men ni har inte spelat ett livespel tillsammans än.",
+      "body": "Öppna klassen, välj en ordlista och tryck på start. En runda är kort, och hela klassen spelar samtidigt på storskärmen.",
+      "cta": "Starta ett livespel"
+    },
+    "second_game": {
+      "subject": "Redo för omgång två med klassen?",
+      "lead": "Din klass spelade sitt första livespel för några dagar sedan.",
+      "body": "Det är i andra spelet som orden börjar fastna. Öppna klassen och se vilka ord eleverna missade, och kör sedan ett livespel på dem.",
+      "cta": "Planera nästa spel"
+    },
+    "reactivate": {
+      "subject": "Din lärarbehörighet i LexiClash är fortfarande öppen",
+      "lead": "Du godkändes för ett tag sedan, men har inte skapat någon klass än.",
+      "body": "Det tar en minut: ge klassen ett namn, få en kod, så kan eleverna spela redan i dag. Om något kom i vägen, svara och berätta vad.",
+      "cta": "Skapa min första klass"
+    }
+  }
+  // @teacherLifecycleEmail:end
 };
 
 export { sv };

@@ -11,6 +11,9 @@ import { render } from '@testing-library/react';
  */
 
 vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: vi.fn() }));
+vi.mock('@/utils/supabase/server', () => ({
+  createClient: vi.fn(async () => ({ auth: { getSession: async () => ({ data: { session: null } }) } })),
+}));
 vi.mock('@/lib/education/parentReportData', () => ({ loadParentReportData: vi.fn() }));
 vi.mock('@/lib/education/parentReportRevocation', () => ({ isParentReportRevoked: vi.fn(async () => false) }));
 vi.mock('@/utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
@@ -151,7 +154,12 @@ describe('parent report page', () => {
     });
 
     it('stamps parent_report_viewed server-side with the class and locale, never the student', async () => {
-      (createAdminClient as any).mockReturnValue({});
+      (createAdminClient as any).mockReturnValue({
+        from: (table: string) =>
+          table === 'classrooms'
+            ? { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { teacher_id: 'teacher-x' }, error: null }) }) }) }
+            : { select: () => ({ in: () => ({ eq: async () => ({ data: [], error: null }) }) }) },
+      });
       (loadParentReportData as any).mockResolvedValue({ status: 'ok', data: okData });
       const token = signParentReportToken(STUDENT, CLASSROOM);
 

@@ -4,17 +4,24 @@ import logger from '@/utils/logger';
 import { getSupabaseAdmin } from '@/lib/email';
 import { loadLifecycleAudience, reachFor, sendLifecycleEmail } from '@/lib/email/lifecycleUnsubscribe';
 import { teacherActivationNudge } from '@/lib/email/templates/teacherActivationNudge';
+import { teacherLifecycleNudge } from '@/lib/email/templates/teacherLifecycleNudge';
+import { claimSend } from '@/lib/education/lifecycleLedger';
+import { runLifecycleStageNudges } from '@/lib/education/lifecycleNudgeRunner';
+import { alertIfDigestStale } from '@/lib/education/cronHeartbeatAlert';
 import { planActivationNudges, type ActivationNudgeRow } from '@/lib/education/activationNudge';
 import { proUserIdsFrom, type SubscriptionRowLike } from '@/lib/education/proGrant';
 import { captureApiError } from '@/utils/sentry';
 import { withCronLock } from '@/backend/redis/locking';
+import { fetchInChunks, fetchPaged } from '@/lib/education/pro/fetchAll';
 
 /**
  * POST /api/cron/teacher-activation-nudge
  *
  * Daily: approved teachers with no classroom get a "make your first class" email on
- * day 1, 3 and 7 after approval. Skips test accounts, unsubscribed teachers, and teachers
- * who already have Pro.
+ * day 1, 3 and 7 after approval, and one reactivation email after day 14. Teachers with a
+ * class get one stage nudge each (lifecycleNudges.ts), at most one nudge per 3 days. Skips
+ * test accounts and unsubscribed teachers; the first-class emails also skip Pro. Also pages
+ * the owner when the weekly digest heartbeat is older than 8 days.
  *
  * Idempotency: `teacher_access_requests.activation_nudges_sent`, merged across every row
  * of one email address and appended only after a confirmed send.
@@ -32,46 +39,34 @@ export async function POST(request: NextRequest) {
   try {
     const locked = await withCronLock('teacher-activation-nudge', 120_000, async () => {
       const supabase = getSupabaseAdmin();
-      if (!supabase) {
-        logger.error('[Activation Nudge] no service-role client; skipping');
-        return { sent: 0, failed: 0, due: 0, reason: 'no-supabase-admin' };
-      }
+      if (!supabase) throw new Error('no service-role client');
+      const nowMs = Date.now();
 
-      const { data, error } = await supabase
-        .from('teacher_access_requests')
-        .select('id, user_id, email, full_name, locale, reviewed_at, activation_nudges_sent')
-        .eq('status', 'approved')
-        .not('reviewed_at', 'is', null);
-      if (error) throw new Error(`teacher_access_requests select failed: ${error.message}`);
+      const access = await fetchPaged<ActivationNudgeRow>(
+        supabase, 'teacher_access_requests', 'id, user_id, email, full_name, locale, reviewed_at, activation_nudges_sent',
+        [{ op: 'eq', column: 'status', value: 'approved' }, { op: 'notNull', column: 'reviewed_at' }],
+      );
+      if (access.error) throw new Error(`teacher_access_requests select failed: ${access.error.message}`);
 
-      const rows = (data ?? []) as ActivationNudgeRow[];
+      const rows = access.data;
       const userIds = [...new Set(rows.map((r) => r.user_id).filter((id): id is string => Boolean(id)))];
 
-      const classroomTeacherIds = new Set<string>();
-      const testUserIds = new Set<string>();
-      let proUserIds = new Set<string>();
-      if (userIds.length > 0) {
-        const [classes, profiles, subs] = await Promise.all([
-          supabase.from('classrooms').select('teacher_id').in('teacher_id', userIds),
-          supabase.from('profiles').select('id, is_test_account').in('id', userIds).eq('is_test_account', true),
-          supabase
-            .from('subscriptions')
-            .select('user_id, tier, status, source, current_period_end')
-            .in('user_id', userIds),
-        ]);
-        // Fail closed: an unknown exclusion would email a teacher who already has a class or Pro.
-        if (classes.error) throw new Error(`classrooms select failed: ${classes.error.message}`);
-        if (profiles.error) throw new Error(`profiles select failed: ${profiles.error.message}`);
-        if (subs.error) throw new Error(`subscriptions select failed: ${subs.error.message}`);
+      const [classes, profiles, subs] = await Promise.all([
+        fetchInChunks<{ teacher_id: string }>(supabase, 'classrooms', 'id, teacher_id', 'teacher_id', userIds),
+        fetchInChunks<{ id: string }>(supabase, 'profiles', 'id', 'id', userIds, [{ op: 'eq', column: 'is_test_account', value: true }]),
+        fetchInChunks<SubscriptionRowLike & { user_id: string }>(
+          supabase, 'subscriptions', 'id, user_id, tier, status, source, current_period_end', 'user_id', userIds,
+        ),
+      ]);
+      // Fail closed: an unknown exclusion would email a teacher who already has a class or Pro.
+      if (classes.error) throw new Error(`classrooms select failed: ${classes.error.message}`);
+      if (profiles.error) throw new Error(`profiles select failed: ${profiles.error.message}`);
+      if (subs.error) throw new Error(`subscriptions select failed: ${subs.error.message}`);
+      const classroomTeacherIds = new Set(classes.data.map((c) => c.teacher_id));
+      const testUserIds = new Set(profiles.data.map((p) => p.id));
+      const proUserIds = proUserIdsFrom(subs.data, nowMs);
 
-        for (const c of (classes.data ?? []) as Array<{ teacher_id: string }>) classroomTeacherIds.add(c.teacher_id);
-        for (const p of (profiles.data ?? []) as Array<{ id: string; is_test_account: boolean | null }>) {
-          if (p.is_test_account) testUserIds.add(p.id);
-        }
-        proUserIds = proUserIdsFrom((subs.data ?? []) as Array<SubscriptionRowLike & { user_id: string }>, Date.now());
-      }
-
-      const { due: planned, skipped: excluded } = planActivationNudges(rows, { classroomTeacherIds, testUserIds, proUserIds }, Date.now());
+      const { due: planned, skipped: excluded } = planActivationNudges(rows, { classroomTeacherIds, testUserIds, proUserIds }, nowMs);
 
       const emailKey = (email: string) => (email ?? '').trim().toLowerCase();
       const userIdsByEmail = new Map<string, Array<string | null>>();
@@ -112,13 +107,16 @@ export async function POST(request: NextRequest) {
           unsubscribed,
           unreachable,
           plan: due.map((d) => ({ email: d.email, locale: d.locale, bucket: d.bucket, rows: d.rowIds.length })),
+          stages: await runLifecycleStageNudges(supabase, { rows, dry, nowMs }),
         };
       }
 
       let sent = 0;
       let failed = 0;
       for (const d of due) {
-        const tpl = teacherActivationNudge({ full_name: d.full_name, locale: d.locale, bucket: d.bucket });
+        const tpl = d.bucket === 'reactivate'
+          ? teacherLifecycleNudge({ fullName: d.full_name, locale: d.locale, stage: 'reactivate' })
+          : teacherActivationNudge({ full_name: d.full_name, locale: d.locale, bucket: d.bucket });
         const result = await sendLifecycleEmail({
           to: d.email,
           subject: tpl.subject,
@@ -132,18 +130,20 @@ export async function POST(request: NextRequest) {
           logger.error(`[Activation Nudge] send failed for ${d.email} (${d.bucket}): ${result.error}`);
           continue;
         }
+        sent++;
         const { error: markError } = await supabase
           .from('teacher_access_requests')
           .update({ activation_nudges_sent: [...d.alreadySent, d.bucket] })
           .in('id', d.rowIds);
-        if (markError) {
-          logger.error(`[Activation Nudge] sent ${d.bucket} to ${d.email} but could not mark it: ${markError.message}`);
-        }
-        sent++;
+        // Unmarked means tomorrow's run sends the same email again: stop and alert instead.
+        if (markError) throw new Error(`sent ${d.bucket} to ${d.email} but could not mark it: ${markError.message}`);
+        for (const userId of d.userIds) await claimSend(supabase, { userId, kind: `activation:${d.bucket}`, periodKey: 'once' });
       }
 
       logger.log(`[Activation Nudge] Completed: ${sent} sent, ${failed} failed of ${due.length} due`);
-      return { due: due.length, sent, failed, excluded, unsubscribed, unreachable };
+      const stages = await runLifecycleStageNudges(supabase, { rows, dry, nowMs });
+      const digestHeartbeat = await alertIfDigestStale(supabase, nowMs);
+      return { due: due.length, sent, failed, excluded, unsubscribed, unreachable, stages, digestHeartbeat };
     });
 
     if (locked.status === 'skipped') {

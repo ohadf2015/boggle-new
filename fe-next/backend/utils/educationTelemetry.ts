@@ -41,17 +41,19 @@ import logger from './logger';
  * URL so a preview deployment tags itself honestly rather than masquerading as
  * production, with the production hostname as the fallback.
  */
-function resolveAnalyticsHost(): string {
-  const raw = process.env.NEXT_PUBLIC_APP_URL;
+export function normalizeAnalyticsHost(raw: string | undefined): string {
   if (!raw) return 'www.lexiclash.live';
   try {
-    return new URL(raw).hostname || 'www.lexiclash.live';
+    const host = new URL(raw).hostname.toLowerCase();
+    // The browser always stamps www; an apex app URL split every server step off the www funnel.
+    if (!host || host === 'lexiclash.live') return 'www.lexiclash.live';
+    return host;
   } catch {
     return 'www.lexiclash.live';
   }
 }
 
-export const EDU_ANALYTICS_HOST = resolveAnalyticsHost();
+export const EDU_ANALYTICS_HOST = normalizeAnalyticsHost(process.env.NEXT_PUBLIC_APP_URL);
 
 export interface EduServerEvent {
   distinctId: string;
@@ -88,6 +90,7 @@ export interface ClassroomPlayerOutcome {
   lessonWordsFoundCount: number;
   /** How many lesson words the game actually put in front of them. */
   lessonWordsAskedCount: number;
+  isTestAccount: boolean;
 }
 
 function gameModeOf(game: ClassroomGame): string {
@@ -160,6 +163,7 @@ export function buildClassroomGameCompletedEvents(
           : null,
       // The live roster is often already emptied at teardown; outcomes are who was recorded.
       player_count: outcomes.length,
+      is_test_account: o.isTestAccount,
     },
   }));
 }
@@ -193,6 +197,10 @@ const GROWTH_TWIN_EVENTS: ReadonlySet<string> = new Set([
   // trackGrowthEvent instead).
   'teacher_activation_funnel_step',
   'teacher_activation_funnel_completed',
+  // Server-canonical activation steps; the browser copies were renamed so each counts once.
+  'edu_classroom_created',
+  'edu_first_student_joined',
+  'edu_teacher_second_live_game_day',
 ]);
 
 /**
@@ -244,6 +252,7 @@ export interface ClassroomJoinRefusal {
   door: ClassroomJoinDoor;
   /** Supabase auth id, or null for a guest student. */
   actorId: string | null;
+  isTestAccount: boolean;
 }
 
 /**
@@ -285,6 +294,7 @@ export function buildClassroomJoinRefusedEvent(
       reason: refusal.reason,
       door: refusal.door,
       is_guest: !refusal.actorId,
+      is_test_account: refusal.isTestAccount,
     },
   };
 }

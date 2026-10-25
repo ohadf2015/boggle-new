@@ -46,7 +46,7 @@
 
 import type { Socket } from 'socket.io';
 
-import { buildClassroomJoinRefusedEvent, captureEduServerEvents } from '../utils/educationTelemetry';
+import { captureJoinRefusal } from '../utils/eduLiveEvents';
 import logger from '../utils/logger.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { getClassroomGame, type ClassroomGame } from '../modules/classroomGameManager.js';
@@ -94,14 +94,13 @@ export function refuseSeat(
   // classroom codes. That vagueness is right for the student and leaves the
   // teacher with nothing, which is why the server writes down the real reason
   // here. One record per refusal, at the one place both dialects refuse.
-  const refusalEvent = buildClassroomJoinRefusedEvent({
+  void captureJoinRefusal({
     gameCode,
     classroomId,
     reason: refusal === 'ended' ? 'SESSION_ENDED' : 'CODE_UNKNOWN',
     door: dialect === 'multiplayer' ? 'join' : 'classroomBanner',
     actorId: (socket.data?.verifiedUserId as string | undefined) ?? null,
   });
-  if (refusalEvent) captureEduServerEvents([refusalEvent]);
 
   if (dialect === 'multiplayer') {
     emitError(socket, ErrorCodes.GAME_NOT_FOUND);

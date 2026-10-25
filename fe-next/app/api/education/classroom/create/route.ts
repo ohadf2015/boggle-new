@@ -6,6 +6,8 @@ import logger from '@/utils/logger';
 import { canCreateClass } from '@/lib/subscriptions';
 import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
 import { buildClassroomCreatedEvent, isQaEmail } from '@/backend/utils/educationRoundTelemetry';
+import { isAnyTestAccount } from '@/lib/education/eduTestAccount';
+import { createAdminClient } from '@/utils/supabase/admin';
 import {
   buildTeacherActivationFunnelStepEvent,
   resolveTeacherActivationPlan,
@@ -118,13 +120,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const isTestAccount = isQaEmail(user.email) || (await isAnyTestAccount(createAdminClient(), [user.id]));
     captureEduServerEvents([
-      buildClassroomCreatedEvent({
-        teacherId: user.id,
-        classroomId: classroom.id,
-        language,
-        isTestAccount: isQaEmail(user.email),
-      }),
+      buildClassroomCreatedEvent({ teacherId: user.id, classroomId: classroom.id, language, isTestAccount }),
     ]);
 
     // First classroom ever → activation funnel step 2. Completed is NOT
@@ -136,7 +134,7 @@ export async function POST(request: NextRequest) {
           step: 'first_classroom',
           locale: language,
           plan: await resolveTeacherActivationPlan(user.id),
-          isTestAccount: isQaEmail(user.email),
+          isTestAccount,
         }),
       ]);
     }

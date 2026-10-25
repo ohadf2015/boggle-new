@@ -40,11 +40,7 @@ import logger from '../utils/logger.js';
 import { createClassroomGameSchema, startClassroomGameSchema, getActiveGamesSchema, joinClassroomGameSchema, leaveClassroomGameSchema } from './classroomGameSchemas.js';
 import { refuseClassroomJoin } from './classroomJoinRefusal.js';
 import { resolveBossForTeacher } from '../services/classroomBoss/bossEntitlement.js';
-import { buildLiveRoundStartedEvent } from '../utils/educationRoundTelemetry';
-import {
-  buildClassroomGameStartedEvent,
-  captureEduServerEvents,
-} from '../utils/educationTelemetry';
+import { captureLiveRoundStarted } from '../utils/eduLiveEvents';
 
 /**
  * Register classroom game socket event handlers
@@ -446,9 +442,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
         vocabularyWords: game.vocabularyWords,
       });
 
-      const startedEvent = buildClassroomGameStartedEvent(game, { isTestAccount: false });
-      const liveRoundStarted = buildLiveRoundStartedEvent(game, { isTestAccount: false });
-      captureEduServerEvents([startedEvent, liveRoundStarted].filter((e) => e !== null));
+      await captureLiveRoundStarted(game);
 
       logger.info('CLASSROOM_GAME', `Teacher ${authUserId} started game ${payload.gameCode}`);
     } catch (error) {

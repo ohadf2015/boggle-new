@@ -1,35 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import logger from '@/utils/logger';
 import { resolveDisplayName } from '@/lib/displayName';
 import { buildTeacherExportRows, type TeacherExportRow } from '@/lib/education/teacherExportAllClasses';
-
-const CHUNK_SIZE = 100;
-const PAGE_SIZE = 1000;
-
-type Result<T> = { data: T[]; error: { message: string } | null };
-
-async function fetchInChunks<Row>(sb: SupabaseClient, table: string, select: string, column: string, ids: string[]): Promise<Result<Row>> {
-  const out: Row[] = [];
-  for (let i = 0; i < ids.length; i += CHUNK_SIZE) {
-    const idChunk = ids.slice(i, i + CHUNK_SIZE);
-    for (let from = 0; ; from += PAGE_SIZE) {
-      const { data, error } = await sb
-        .from(table)
-        .select(select)
-        .in(column, idChunk)
-        .order('id', { ascending: true })
-        .range(from, from + PAGE_SIZE - 1);
-      if (error) {
-        logger.error(`[export-all] ${table} read failed`, error);
-        return { data: [], error: { message: error.message } };
-      }
-      if (!data || data.length === 0) break;
-      out.push(...(data as Row[]));
-      if (data.length < PAGE_SIZE) break;
-    }
-  }
-  return { data: out, error: null };
-}
+import { fetchInChunks, type Result } from './fetchAll';
 
 /** Server read of the Pro "Export all classes" CSV rows, on the caller's RLS-scoped client. */
 export async function readTeacherExportRows(sb: SupabaseClient, teacherId: string): Promise<Result<TeacherExportRow>> {

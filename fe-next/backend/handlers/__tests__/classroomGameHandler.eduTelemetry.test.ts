@@ -13,6 +13,18 @@ vi.mock('@/lib/posthog', () => ({
   }),
 }));
 vi.mock('../../modules/classroomGameManager');
+const flaggedProfiles = new Set<string>();
+vi.mock('../../modules/supabase/client', () => ({
+  getSupabase: () => ({
+    from: () => ({
+      select: () => ({
+        in: (_c: string, ids: string[]) => ({
+          eq: async () => ({ data: ids.filter((id) => flaggedProfiles.has(id)).map((id) => ({ id })), error: null }),
+        }),
+      }),
+    }),
+  }),
+}));
 vi.mock('../../modules/gameStateManager', () => ({
   bindSocketToGame: vi.fn(),
   unbindSocketFromGame: vi.fn(),
@@ -63,6 +75,7 @@ describe('startClassroomGame — education telemetry', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     captured.length = 0;
+    flaggedProfiles.clear();
     (classroomMembership.isClassroomTeacher as Mock).mockResolvedValue(true);
     (classroomMembership.isClassroomStudent as Mock).mockResolvedValue(true);
     (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(game);
@@ -99,5 +112,35 @@ describe('startClassroomGame — education telemetry', () => {
 
     expect(named('edu_classroom_game_started')).toHaveLength(1);
     expect(named('edu_live_round_started')).toHaveLength(1);
+  });
+
+  it('Given a teacher whose profile is a test account, When started, Then both start events carry is_test_account true', async () => {
+    flaggedProfiles.add(TEACHER);
+    const socket: any = {
+      id: 'socket-1', on: vi.fn(), emit: vi.fn(), join: vi.fn(),
+      handshake: { auth: { authUserId: TEACHER } },
+    };
+    const io: any = { to: vi.fn().mockReturnThis(), emit: vi.fn() };
+    registerClassroomGameHandlers(io, socket);
+    const startHandler = socket.on.mock.calls.find((c: any[]) => c[0] === 'startClassroomGame')[1];
+
+    await startHandler({ gameCode: 'ABC123' });
+
+    expect(named('edu_classroom_game_started')[0].properties.is_test_account).toBe(true);
+    expect(named('edu_live_round_started')[0].properties.is_test_account).toBe(true);
+  });
+
+  it('Given a real teacher, When started, Then is_test_account is an explicit false', async () => {
+    const socket: any = {
+      id: 'socket-1', on: vi.fn(), emit: vi.fn(), join: vi.fn(),
+      handshake: { auth: { authUserId: TEACHER } },
+    };
+    const io: any = { to: vi.fn().mockReturnThis(), emit: vi.fn() };
+    registerClassroomGameHandlers(io, socket);
+    const startHandler = socket.on.mock.calls.find((c: any[]) => c[0] === 'startClassroomGame')[1];
+
+    await startHandler({ gameCode: 'ABC123' });
+
+    expect(named('edu_live_round_started')[0].properties.is_test_account).toBe(false);
   });
 });

@@ -3,6 +3,7 @@ import {
   pickActivationNudge,
   planActivationNudges,
   MAX_DAYS_SINCE_APPROVAL,
+  MAX_DAYS_FOR_REACTIVATION,
   type ActivationNudgeRow,
 } from '../activationNudge';
 
@@ -48,9 +49,16 @@ describe('pickActivationNudge', () => {
     expect(pickActivationNudge(approvedDaysAgo(8), ['d7'], NOW)).toBeNull();
   });
 
-  it('leaves approvals older than the window alone', () => {
-    expect(pickActivationNudge(approvedDaysAgo(MAX_DAYS_SINCE_APPROVAL + 1), [], NOW)).toBeNull();
+  it('past the first-week window, sends one reactivation and then nothing', () => {
+    expect(pickActivationNudge(approvedDaysAgo(MAX_DAYS_SINCE_APPROVAL + 1), [], NOW)).toBe('reactivate');
+    expect(pickActivationNudge(approvedDaysAgo(46), ['d1', 'd3', 'd7'], NOW)).toBe('reactivate');
+    expect(pickActivationNudge(approvedDaysAgo(46), ['reactivate'], NOW)).toBeNull();
     expect(pickActivationNudge(approvedDaysAgo(MAX_DAYS_SINCE_APPROVAL - 1), ['d1', 'd3'], NOW)).toBe('d7');
+  });
+
+  it('leaves approvals older than the reactivation window alone', () => {
+    expect(MAX_DAYS_FOR_REACTIVATION).toBe(120);
+    expect(pickActivationNudge(approvedDaysAgo(121), [], NOW)).toBeNull();
   });
 
   it('ignores a missing or unparseable approval date', () => {

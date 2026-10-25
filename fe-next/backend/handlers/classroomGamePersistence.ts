@@ -36,6 +36,8 @@ import {
 
 import type { PlayerScore } from './classroomRoundParticipants.js';
 import { recordClassroomRound } from './classroomRoundRecord';
+import { awardLessonXp, DbWriteError, retryDbWrite } from './classroomXpAward';
+import { loadTestAccountIds } from '@/lib/education/eduTestAccount';
 
 export { playerScoresFromGameResults, roundHasStudents } from './classroomRoundParticipants.js';
 
@@ -240,7 +242,7 @@ async function upsertLessonProgress(
     .eq('lesson_id', lessonId)
     .maybeSingle();
 
-  if (readError) throw new Error(`read progress: ${readError.message}`);
+  if (readError) throw new DbWriteError(`read progress: ${readError.message}`, readError.code);
 
   const wordsAttempted: Record<string, WordAttempt> = {
     ...((existing?.words_attempted as Record<string, WordAttempt> | null) ?? {}),
@@ -276,7 +278,7 @@ async function upsertLessonProgress(
       { onConflict: 'student_id,lesson_id' }
     );
 
-  if (upsertError) throw new Error(`upsert progress: ${upsertError.message}`);
+  if (upsertError) throw new DbWriteError(`upsert progress: ${upsertError.message}`, upsertError.code);
 }
 
 /**
@@ -515,7 +517,7 @@ export async function persistClassroomGameScores(
         const vocab = restrictToAsked(lessonVocab, askedKeys);
         if (vocab.words.size === 0) continue;
         try {
-          await upsertLessonProgress(supabase, player.userId, lessonId, vocab, foundKeys, now);
+          await retryDbWrite(() => upsertLessonProgress(supabase, player.userId, lessonId, vocab, foundKeys, now));
         } catch (err) {
           logger.error(
             'CLASSROOM_GAME',
@@ -525,35 +527,7 @@ export async function persistClassroomGameScores(
         }
       }
 
-      // F-05: Split XP across all lessons covered by this game.
-      if (score > 0) {
-        const totalXp = Math.max(10, Math.floor(score / 10));
-        // At least 1 per lesson: a game may span up to 20 lessons, and flooring
-        // 10 XP across 11+ of them paid a scoring student nothing (and the early
-        // `continue` also dropped their edu_classroom_game_completed outcome).
-        const perLessonXp = Math.max(1, Math.floor(totalXp / lessonIds.length));
-        xpEarned = perLessonXp * lessonIds.length;
-
-        for (const lessonId of lessonIds) {
-          const { error: xpError } = await supabase.rpc('award_education_xp', {
-            p_student_id: player.userId,
-            p_xp_amount: perLessonXp,
-            p_lesson_id: lessonId,
-          });
-
-          if (xpError) {
-            logger.error(
-              'CLASSROOM_GAME',
-              `Failed to award XP for ${player.userId} on lesson ${lessonId}: ${xpError.message}`
-            );
-          } else {
-            logger.info(
-              'CLASSROOM_GAME',
-              `Awarded ${perLessonXp} XP to ${player.userId} for lesson ${lessonId} (game ${game.gameCode})`
-            );
-          }
-        }
-      }
+      xpEarned = await awardLessonXp(supabase, { userId: player.userId, lessonIds, score, gameCode: game.gameCode });
     } catch (error) {
       logger.error(
         'CLASSROOM_GAME',
@@ -569,12 +543,15 @@ export async function persistClassroomGameScores(
       // `lessonWordsFound` / `lessonWordsAsked` and those are string[].
       lessonWordsFoundCount: plFound,
       lessonWordsAskedCount: plAsked,
+      isTestAccount: false,
     });
   }
 
   // The only place a real classroom practice completion is observable. The
   // browser-side `edu_practice_complete` cannot see this path at all — it lives
   // in PracticeSessionProvider, which this server never runs.
+  const flagged = await loadTestAccountIds(supabase, [game.teacherId, ...outcomes.map((o) => o.userId)]);
+  for (const o of outcomes) o.isTestAccount = flagged.has(game.teacherId) || flagged.has(o.userId);
   captureEduServerEvents(buildClassroomGameCompletedEvents(game, outcomes));
 
   if (sessionsWritten > 0) {
