@@ -15591,6 +15591,8 @@ const en = {
       "day_left": "day left",
       "hours_left": "hours left",
       "hour_left": "hour left",
+      "days_left_few": "days left",
+      "hours_left_few": "hours left",
       "cta": "Start your first class",
       "expired_title": "Your teacher trial has ended",
       "expired_kept": "Your classes and word lists stay free. Reports, word mastery and calm mode need Pro.",

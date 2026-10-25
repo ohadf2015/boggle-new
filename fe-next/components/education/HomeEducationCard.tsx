@@ -129,7 +129,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       </div>
 
       {/* Teacher trial pill */}
-      {isTeacher && trial && <TrialPill trial={trial} t={t} />}
+      {isTeacher && trial && <TrialPill trial={trial} t={t} language={language} />}
 
       {/* Students with a class code skip the teacher pitch (sm and up; on phones
           the whole strip is one tap target and /education carries the join link). */}
@@ -174,6 +174,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
 interface TrialPillProps {
   trial: TrialStatus;
   t: (key: string) => string;
+  language: string;
 }
 
 /**
@@ -182,7 +183,7 @@ interface TrialPillProps {
  * to an urgent tone in the last stretch; shows a soft "ended" chip once expired
  * (access is not revoked — the card still links into the dashboard).
  */
-function TrialPill({ trial, t }: TrialPillProps) {
+function TrialPill({ trial, t, language }: TrialPillProps) {
   if (trial.isExpired) {
     return (
       <span
@@ -198,7 +199,7 @@ function TrialPill({ trial, t }: TrialPillProps) {
   // Shared with TrialUrgencyBanner so the two badges agree, and so the singular
   // hour gets its own unit string (the badge stacks bare number over bare unit,
   // so the unit has to carry its own grammatical number).
-  const { key: unitKey, count } = trialCountdownUnit(trial);
+  const { key: unitKey, count } = trialCountdownUnit(trial, language);
   const tone = trial.isUrgent ? 'bg-neo-pink text-neo-white' : 'bg-neo-lime text-neo-navy';
 
   return (

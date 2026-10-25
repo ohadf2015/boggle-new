@@ -17164,6 +17164,8 @@ const es = {
       "day_left": "día restante",
       "hours_left": "horas restantes",
       "hour_left": "hora restante",
+      "days_left_few": "días restantes",
+      "hours_left_few": "horas restantes",
       "cta": "Crea tu primera clase",
       "expired_title": "Tu prueba de profesor ha terminado",
       "expired_kept": "Tus clases y listas de palabras siguen gratis. Los informes, el dominio de palabras y el modo calmado requieren Pro.",

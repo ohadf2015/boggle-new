@@ -17530,6 +17530,8 @@ const sv = {
       "day_left": "dag kvar",
       "hours_left": "timmar kvar",
       "hour_left": "timme kvar",
+      "days_left_few": "dagar kvar",
+      "hours_left_few": "timmar kvar",
       "cta": "Skapa din första klass",
       "expired_title": "Din lärarprovperiod har tagit slut",
       "expired_kept": "Dina klasser och ordlistor förblir gratis. Rapporter, ordbehärskning och lugnt läge kräver Pro.",

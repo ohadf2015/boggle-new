@@ -17242,6 +17242,8 @@ const ja = {
       "day_left": "日残り",
       "hours_left": "時間残り",
       "hour_left": "時間残り",
+      "days_left_few": "日残り",
+      "hours_left_few": "時間残り",
       "cta": "最初のクラスを作成",
       "expired_title": "教師トライアルが終了しました",
       "expired_kept": "クラスと単語リストは引き続き無料です。レポート、単語の習熟度、落ち着きモードはProが必要です。",
