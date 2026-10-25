@@ -151,7 +151,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
             type="button"
             onClick={handleSignOut}
             disabled={isSigningOut}
-            className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-red-100 hover:bg-red-200 text-red-600", "disabled:opacity-50 disabled:cursor-not-allowed")}
+            className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition w-full", "bg-red-100 hover:bg-red-200 text-red-600", "disabled:opacity-50 disabled:cursor-not-allowed")}
           >
             {isSigningOut ? <Loader size="sm" /> : <LogOut size={14} aria-hidden="true" />}
             <span>{t('auth.signOut')}</span>
@@ -170,7 +170,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               size="sm"
               aria-label={t('auth.userMenu')}
               className={cn(
-                'flex items-center gap-1 sm:gap-2 rounded-full transition-all duration-300 px-2 sm:px-3 min-h-[44px]',
+                'flex items-center gap-1 sm:gap-2 rounded-full transition duration-150 px-2 sm:px-3 min-h-[44px]',
                 isDarkMode
                   ? 'bg-neo-navy-light text-cyan-300 hover:bg-neo-navy-elevated hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
                   : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
@@ -233,7 +233,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                   onClick={loginWithCrazyGames}
                   disabled={isCrazyGamesLoggingIn}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+                    "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition w-full",
                     "bg-neo-cyan shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
                     isCrazyGamesLoggingIn && "opacity-70 cursor-wait"
                   )}
@@ -248,7 +248,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               <button
                 type="button"
                 onClick={openSignIn}
-                className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-neo-cyan shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard")}
+                className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition w-full", "bg-neo-cyan shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard")}
               >
                 <User size={14} className="text-neo-black" aria-hidden="true" />
                 <span className="text-neo-black">{t('auth.signIn')}</span>
@@ -256,7 +256,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               <button
                 type="button"
                 onClick={openSignUp}
-                className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-neo-pink text-white shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard")}
+                className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition w-full", "bg-neo-pink text-white shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard")}
               >
                 <User size={14} aria-hidden="true" />
                 <span>{t('auth.signUp')}</span>
@@ -293,7 +293,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           onClick={loginWithCrazyGames}
           disabled={isCrazyGamesLoggingIn}
           className={cn(
-            'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
+            'flex items-center gap-2 rounded-full font-bold transition duration-150 min-h-[44px]',
             'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
           )}
         >
@@ -313,7 +313,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           size="sm"
           onClick={openSignIn}
           className={cn(
-            'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
+            'flex items-center gap-2 rounded-full font-bold transition duration-150 min-h-[44px]',
             'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
           )}
         >
@@ -324,7 +324,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           size="sm"
           onClick={openSignUp}
           className={cn(
-            'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
+            'flex items-center gap-2 rounded-full font-bold transition duration-150 min-h-[44px]',
             'bg-neo-pink text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.5)] border-2 border-neo-black'
           )}
         >

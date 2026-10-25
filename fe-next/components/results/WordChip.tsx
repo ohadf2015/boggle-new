@@ -209,7 +209,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
       <span
         className={cn(
           // Increased padding for 48px minimum touch target to account for borders (WCAG 2.1 AA)
-          "inline-flex items-center gap-1.5 px-4 py-3 min-h-[48px] text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
+          "inline-flex items-center gap-1.5 px-4 py-3 min-h-[48px] text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
           isDuplicate && "line-through opacity-80",
           !isDuplicate && !isValid && "opacity-70",
           hasInvalidReason && "cursor-pointer active:scale-95"

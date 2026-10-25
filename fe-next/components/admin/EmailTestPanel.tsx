@@ -200,7 +200,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
                 key={type}
                 onClick={() => handleTypeChange(type)}
                 className={cn(
-                  'w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-neo border-2 font-bold text-sm transition-all min-w-0',
+                  'w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-neo border-2 font-bold text-sm transition min-w-0',
                   isActive
                     ? `${cfg.bgClass} text-neo-black border-neo-black shadow-hard-sm`
                     : `bg-neo-navy ${cfg.borderClass} ${cfg.textClass} hover:opacity-80`
@@ -226,7 +226,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
                     key={opt.value}
                     onClick={() => setGameMode(opt.value)}
                     className={cn(
-                      'flex-1 px-3 py-2 rounded-neo border-2 font-bold text-sm transition-all',
+                      'flex-1 px-3 py-2 rounded-neo border-2 font-bold text-sm transition',
                       isActive
                         ? 'bg-neo-pink text-neo-black border-neo-black shadow-hard-sm'
                         : 'bg-neo-navy border-neo-pink text-neo-pink hover:opacity-80'

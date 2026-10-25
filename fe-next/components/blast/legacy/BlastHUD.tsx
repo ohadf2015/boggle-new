@@ -309,7 +309,7 @@ export function BlastHUD({
                   data-testid="blast-active-buff-chip"
                   data-consumed={buffConsumed ? 'true' : 'false'}
                   className={cn(
-                    'shrink-0 inline-flex items-center gap-1.5 rounded-lg border-2 border-black px-2.5 py-1 text-xs font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all animate-neo-pop',
+                    'shrink-0 inline-flex items-center gap-1.5 rounded-lg border-2 border-black px-2.5 py-1 text-xs font-black uppercase tracking-wider text-neo-navy shadow-hard transition-[background-color,color,opacity,box-shadow] animate-neo-pop',
                     buffConsumed ? 'bg-white/20 text-white line-through opacity-60 shadow-none' : `${meta.bg} blast-heartbeat`,
                   )}
                   style={NO_TEXT_SHADOW_STYLE}

@@ -24,7 +24,7 @@ export function HqLoadError({ onRetry, className }: { onRetry: () => void; class
         className={cn(
           'mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-neo px-6 py-2.5',
           'border-3 border-black bg-neo-cyan font-neo-display font-black text-black shadow-hard',
-          'transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
+          'transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
           'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
         )}
       >

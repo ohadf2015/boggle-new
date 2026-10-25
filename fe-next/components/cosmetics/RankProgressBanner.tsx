@@ -74,7 +74,7 @@ export function RankProgressBanner({ totalScore }: RankProgressBannerProps) {
         </div>
         <div className="h-2.5 overflow-hidden rounded-full border-neo bg-neo-navy">
           <div
-            className={`h-full rounded-full bg-linear-to-r ${tier.gradient} transition-all duration-500`}
+            className={`h-full rounded-full bg-linear-to-r ${tier.gradient} transition-[width] duration-500`}
             style={{ width: `${isMax ? 100 : Math.max(4, pct)}%` }}
           />
         </div>

@@ -106,7 +106,7 @@ export const EnhancedPlayerList = memo(function EnhancedPlayerList({
                 transition={{ delay: index * 0.05, type: 'spring', stiffness: 200 }}
                 className={cn(
                   // Responsive padding and gap for desktop
-                  'flex items-center gap-3 xl:gap-4 p-3 xl:p-4 rounded-neo border-2 xl:border-3 transition-all',
+                  'flex items-center gap-3 xl:gap-4 p-3 xl:p-4 rounded-neo border-2 xl:border-3 transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
                   isMe
                     ? 'bg-neo-lime/10 border-neo-lime/50'
                     : isBot

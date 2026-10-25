@@ -189,7 +189,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
                     className={cn(
                       'absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center',
                       'bg-white/80 dark:bg-neo-navy-elevated/80 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600',
-                      'hover:bg-white dark:hover:bg-neo-navy-elevated hover:scale-110 transition-all'
+                      'hover:bg-white dark:hover:bg-neo-navy-elevated hover:scale-110 transition'
                     )}
                   >
                     <X size={12} />

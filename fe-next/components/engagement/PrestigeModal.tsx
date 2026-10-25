@@ -197,7 +197,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                       'flex-1 p-3 rounded-neo border-2 border-white/30',
                       'font-bold uppercase text-sm',
                       'bg-neo-cream/10 text-neo-white hover:bg-neo-cream/20',
-                      'transition-all',
+                      'transition',
                       'disabled:opacity-50'
                     )}
                   >
@@ -213,7 +213,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                       `bg-linear-to-r ${colors.gradient}`,
                       colors.text,
                       'hover:shadow-hard-md hover:-translate-y-0.5',
-                      'transition-all',
+                      'transition',
                       'disabled:opacity-50'
                     )}
                   >
@@ -326,7 +326,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                           `bg-linear-to-r ${colors.gradient}`,
                           colors.text,
                           'hover:shadow-hard-xl hover:-translate-y-1',
-                          'transition-all'
+                          'transition'
                         )}
                       >
                         <Sparkles className="w-5 h-5 inline me-2" />

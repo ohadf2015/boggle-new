@@ -121,7 +121,7 @@ export function AnimatedBoardGrid({
                   // ── Exit: pop out ──
                   exit={prefersReduced
                     ? { opacity: 0 }
-                    : { scale: 0, opacity: 0, transition: { duration: 0.15 } }
+                    : { scale: 0.95, opacity: 0, transition: { duration: 0.15 } }
                   }
                   transition={prefersReduced
                     ? { duration: 0.15, delay: delay * 0.3 }

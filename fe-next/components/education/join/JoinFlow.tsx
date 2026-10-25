@@ -165,7 +165,7 @@ export function JoinFlow({
                     key={s}
                     aria-current={flow.step === s ? 'step' : undefined}
                     className={cn(
-                      'h-2.5 rounded-full border-2 border-neo-black transition-all lg:h-3',
+                      'h-2.5 rounded-full border-2 border-neo-black transition-[width,height,background-color,border-color] lg:h-3',
                       flow.step === s ? 'w-8 bg-neo-cyan lg:w-10' : 'w-2.5 bg-neo-white/30 lg:w-3'
                     )}
                   >

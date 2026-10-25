@@ -236,7 +236,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     className={cn(
-                      'relative w-full aspect-square rounded-xl overflow-hidden border-3 transition-all',
+                      'relative w-full aspect-square rounded-xl overflow-hidden border-3 transition',
                       selectedAvatar.id === avatar.id
                         ? 'border-amber-400 ring-4 ring-amber-400/50'
                         : 'border-neo-black hover:border-gray-500'
@@ -277,7 +277,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                 autoFocus
                 placeholder={t('auth.winnerOnboarding.namePlaceholder')}
                 className={cn(
-                  'w-full px-4 py-3 text-lg font-bold border-3 border-neo-black rounded-xl transition-all',
+                  'w-full px-4 py-3 text-lg font-bold border-3 border-neo-black rounded-xl transition',
                   isDarkMode
                     ? 'bg-neo-navy-elevated text-white placeholder-gray-500 focus:ring-4 focus:ring-amber-400/50'
                     : 'bg-white text-neo-black placeholder-gray-400 focus:ring-4 focus:ring-amber-400/50',
@@ -304,7 +304,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
               onClick={handleComplete}
               disabled={isSubmitting || displayName.trim().length < 1 || displayName.trim().length > 20}
               className={cn(
-                'w-full h-14 text-xl font-black rounded-xl border-4 shadow-hard transition-all',
+                'w-full h-14 text-xl font-black rounded-xl border-4 shadow-hard transition',
                 'hover:shadow-hard-lg hover:-translate-y-1',
                 'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0',
                 'bg-neo-lime border-amber-600 text-neo-black'

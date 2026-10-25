@@ -55,7 +55,7 @@ export interface ClassCardProps {
 }
 
 const PRESS =
-  'shadow-hard-sm transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed';
+  'shadow-hard-sm transition hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed';
 
 const QUIET_ACTION =
   'flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream/40 px-2 py-1.5 font-neo-body text-sm font-bold text-neo-cream hover:bg-neo-cream/10 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan';
@@ -281,7 +281,7 @@ export function ClassCard({
           onClick={onToggleExpanded}
           aria-expanded={expanded}
           className={cn(
-            'flex min-h-10 w-full items-center justify-between rounded-neo border-2 px-3 py-1.5 text-sm font-bold transition-all [@media(orientation:landscape)_and_(max-height:500px)]:col-start-1 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-2',
+            'flex min-h-10 w-full items-center justify-between rounded-neo border-2 px-3 py-1.5 text-sm font-bold transition [@media(orientation:landscape)_and_(max-height:500px)]:col-start-1 [@media(orientation:landscape)_and_(max-height:500px)]:row-start-2',
             expanded
               ? 'border-neo-cream/60 bg-neo-cream/10 text-neo-cream'
               : 'border-neo-cream/40 text-neo-cream hover:bg-neo-cream/5',

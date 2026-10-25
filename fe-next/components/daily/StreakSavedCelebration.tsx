@@ -143,7 +143,7 @@ const StreakSavedCelebration: React.FC<StreakSavedCelebrationProps> = ({
             >
               <Button
                 onClick={onClose}
-                className="w-full max-w-btn py-4 text-lg font-black uppercase bg-linear-to-r from-neo-cyan to-neo-lime text-neo-navy border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all"
+                className="w-full max-w-btn py-4 text-lg font-black uppercase bg-linear-to-r from-neo-cyan to-neo-lime text-neo-navy border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]"
               >
                 {t('streak.saved.dismiss')}
               </Button>

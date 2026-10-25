@@ -252,7 +252,7 @@ export default function UnlockRevealOverlay({
                 {reveal.unlocks.map((u, i) => (
                   <span
                     key={`${u.category}:${u.partId}`}
-                    className="h-2.5 rounded-full border-2 border-black transition-all"
+                    className="h-2.5 rounded-full border-2 border-black transition-[width,background-color]"
                     style={{ width: i === index ? 22 : 10, background: i <= index ? REVEAL_THEMES[u.rarity].hex : 'rgba(255,255,255,.25)' }}
                   />
                 ))}

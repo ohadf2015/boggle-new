@@ -270,7 +270,7 @@ export const WordPointsGroup = memo<WordPointsGroupProps>(({
           className={cn(
             'mt-2 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-neo',
             'text-xs font-black uppercase border-2 border-neo-black',
-            'bg-neo-cyan text-neo-black shadow-hard-sm transition-all',
+            'bg-neo-cyan text-neo-black shadow-hard-sm transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
             'hover:-translate-y-px hover:shadow-hard active:translate-y-0 active:shadow-none',
           )}
         >
@@ -409,7 +409,7 @@ export const InvalidWordsSection = memo<InvalidWordsSectionProps>(({
                   onClick={() => handleAppeal(wordObj.word)}
                   disabled={appealedWords.has(wordObj.word) || appealingWord === wordObj.word}
                   className={cn(
-                    'text-[10px] font-black uppercase px-2 py-1 rounded-neo border-2 border-neo-black transition-all min-h-[32px]',
+                    'text-[10px] font-black uppercase px-2 py-1 rounded-neo border-2 border-neo-black transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] min-h-[32px]',
                     appealedWords.has(wordObj.word)
                       ? 'bg-neo-lime text-neo-black cursor-default'
                       : 'bg-neo-orange text-neo-black hover:bg-neo-yellow active:translate-y-px active:shadow-none shadow-hard-sm cursor-pointer'

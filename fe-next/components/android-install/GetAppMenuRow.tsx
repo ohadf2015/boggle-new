@@ -59,7 +59,7 @@ export default function GetAppMenuRow({ onNavigate, source = 'menu' }: GetAppMen
     <button
       type="button"
       onClick={handleClick}
-      className="relative flex w-full items-center gap-3 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-3 text-sm font-bold text-neo-black shadow-hard-sm transition-all duration-100 hover:-translate-y-px hover:shadow-hard active:translate-y-px active:shadow-none"
+      className="relative flex w-full items-center gap-3 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-3 text-sm font-bold text-neo-black shadow-hard-sm transition duration-100 hover:-translate-y-px hover:shadow-hard active:translate-y-px active:shadow-none"
     >
       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black/30 bg-neo-black/15">
         <Smartphone className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />

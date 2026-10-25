@@ -102,7 +102,7 @@ export function StreakWager({ currentCoins, currentStreak, onWager, onSkip }: St
           className={cn(
             'flex-1 py-2.5 rounded-neo border-3 border-neo-black',
             'bg-neo-yellow text-neo-black font-black text-sm',
-            'shadow-hard-sm hover:shadow-hard-pressed active:translate-y-[2px] transition-all'
+            'shadow-hard-sm hover:shadow-hard-pressed active:translate-y-[2px] transition'
           )}
         >
           {t('streaks.wager.confirm')}

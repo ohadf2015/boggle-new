@@ -161,7 +161,7 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
         onClick={handleShare}
         className={cn(
           'inline-flex items-center gap-1.5 px-4 py-1.5 rounded-neo text-xs font-bold uppercase tracking-wider',
-          'border-2 border-neo-black transition-all',
+          'border-2 border-neo-black transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
           found
             ? 'bg-neo-yellow/20 text-neo-yellow hover:bg-neo-yellow/30'
             : 'bg-white/5 text-white hover:bg-white/10 hover:text-white',

@@ -102,7 +102,7 @@ export default function WordSolverPageClient() {
                   onClick={() => setSolverLang(lang.code)}
                   className={cn(
                     'px-3 py-1.5 font-neo-display font-bold text-sm',
-                    'border-2 border-neo-black rounded-neo transition-all duration-100',
+                    'border-2 border-neo-black rounded-neo transition-[background-color,color,box-shadow] duration-100',
                     solverLang === lang.code
                       ? 'bg-neo-cyan text-neo-black shadow-hard-sm'
                       : 'bg-neo-navy-elevated text-white hover:bg-slate-600'
@@ -163,7 +163,7 @@ export default function WordSolverPageClient() {
                   'px-4 py-3 font-neo-display font-bold',
                   'bg-slate-600 text-white border-3 border-neo-black rounded-neo',
                   'shadow-hard-sm hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px]',
-                  'transition-all duration-100'
+                  'transition-[box-shadow,translate,scale,rotate,transform] duration-100'
                 )}
               >
                 {content.clearButton}
@@ -248,7 +248,7 @@ export default function WordSolverPageClient() {
               'inline-block px-8 py-3 font-neo-display font-bold text-lg',
               'bg-neo-navy text-white border-3 border-neo-black rounded-neo',
               'shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px]',
-              'transition-all duration-100'
+              'transition-[box-shadow,translate,scale,rotate,transform] duration-100'
             )}
           >
             {content.ctaButton}

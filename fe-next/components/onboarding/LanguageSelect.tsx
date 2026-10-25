@@ -106,7 +106,7 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect, onPlayNow }) 
               onClick={() => handleSelect(lang)}
               className={cn(
                 'relative flex flex-col items-center gap-1.5 px-3 py-4 rounded-neo border-3',
-                'font-neo-body transition-all overflow-hidden',
+                'font-neo-body transition overflow-hidden',
                 isSelected
                   ? 'bg-neo-lime/15 border-neo-lime text-neo-white shadow-hard-sm'
                   : 'bg-neo-navy-light border-neo-cream/15 text-neo-white hover:border-neo-cream/30'
@@ -115,8 +115,8 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect, onPlayNow }) 
               {/* Selection check badge */}
               {isSelected && (
                 <m.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 20 }}
                   className="absolute top-1.5 inset-e-1.5 w-5 h-5 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center"
                 >

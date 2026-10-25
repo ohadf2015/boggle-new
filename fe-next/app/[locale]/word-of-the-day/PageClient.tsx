@@ -174,14 +174,14 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
             <div className="flex flex-wrap gap-3">
               <Link
                 href={`/${lang}/singleplayer`}
-                className="inline-flex items-center px-5 py-2.5 font-neo-display font-bold text-sm uppercase border-3 border-neo-black rounded-neo bg-neo-yellow text-neo-black shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100"
+                className="inline-flex items-center px-5 py-2.5 font-neo-display font-bold text-sm uppercase border-3 border-neo-black rounded-neo bg-neo-yellow text-neo-black shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform] duration-100"
               >
                 {label('practiceNow', lang)}
               </Link>
               <button
                 type="button"
                 onClick={handleShare}
-                className="inline-flex items-center px-5 py-2.5 font-neo-display font-bold text-sm uppercase border-3 border-neo-black rounded-neo bg-neo-cyan text-neo-black shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100"
+                className="inline-flex items-center px-5 py-2.5 font-neo-display font-bold text-sm uppercase border-3 border-neo-black rounded-neo bg-neo-cyan text-neo-black shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform] duration-100"
               >
                 {copied ? label('copied', lang) : label('share', lang)}
               </button>
@@ -206,7 +206,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
               <button
                 type="button"
                 onClick={handleEmbedCopy}
-                className="inline-flex items-center px-4 py-2 font-neo-display font-bold text-xs uppercase border-2 border-neo-black rounded-neo bg-neo-pink text-white shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100"
+                className="inline-flex items-center px-4 py-2 font-neo-display font-bold text-xs uppercase border-2 border-neo-black rounded-neo bg-neo-pink text-white shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform] duration-100"
               >
                 {embedCopied ? label('copied', lang) : label('embedCopyButton', lang)}
               </button>
@@ -257,7 +257,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
           >
             <Link
               href={`/${lang}/singleplayer`}
-              className="inline-flex items-center px-8 py-3 font-neo-display font-bold text-lg uppercase border-3 border-neo-black rounded-neo bg-neo-pink text-white shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100"
+              className="inline-flex items-center px-8 py-3 font-neo-display font-bold text-lg uppercase border-3 border-neo-black rounded-neo bg-neo-pink text-white shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform] duration-100"
             >
               {label('playNow', lang)}
             </Link>

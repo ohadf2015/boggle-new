@@ -36,7 +36,7 @@ import { UnlockReportUpgradeCta } from './UnlockReportUpgradeCta';
 const QUIET_LINK =
   'self-center flex items-center justify-center gap-1.5 px-2.5 py-1 font-neo-body font-bold text-xs text-neo-cream/85 rounded-neo border-[2px] border-neo-cream/50 hover:text-neo-cream hover:border-neo-cream transition-colors';
 const LOUD_LINK =
-  'self-center flex items-center justify-center gap-2 px-3 py-2 font-neo-body font-bold text-sm bg-neo-cyan text-neo-black border-[2px] border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all';
+  'self-center flex items-center justify-center gap-2 px-3 py-2 font-neo-body font-bold text-sm bg-neo-cyan text-neo-black border-[2px] border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition';
 
 export interface ResultsPrimaryActionsProps {
   /** Locale segment for the report href. */
@@ -89,7 +89,7 @@ export function ResultsPrimaryActions({
           className={cn(
             'flex items-center justify-center gap-2 px-4 py-4 font-neo-display font-bold text-lg',
             'bg-neo-yellow text-neo-black border-[3px] border-neo-black rounded-neo',
-            'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+            'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition'
           )}
         >
           <RotateCcw className="w-6 h-6 shrink-0" aria-hidden />

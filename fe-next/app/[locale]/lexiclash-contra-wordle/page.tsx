@@ -118,19 +118,19 @@ export default async function LexiClashContraWordlePage({ params }: PageProps) {
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link
             href={`/${locale}/singleplayer`}
-            className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
           >
             Jugar Solo — Gratis
           </Link>
           <Link
             href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-all hover:bg-neo-pink/10 sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4"
           >
             Jugar con Amigos
           </Link>
           <Link
             href={`/${locale}/daily`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
           >
             Desafío Diario
           </Link>
@@ -220,11 +220,11 @@ export default async function LexiClashContraWordlePage({ params }: PageProps) {
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Más Sobre Juegos de Palabras</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/es/juego-de-palabras-multijugador" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
+            <Link href="/es/juego-de-palabras-multijugador" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
               <h3 className="font-bold text-neo-pink">Scrabble Online en Español Multijugador</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Sala con enlace, tiempo real, gratis y sin registro</p>
             </Link>
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-cyan/40">
+            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
               <h3 className="font-bold text-neo-cyan">Mejores Juegos de Palabras 2026</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Guía completa de comparación</p>
             </Link>
@@ -246,7 +246,7 @@ export default async function LexiClashContraWordlePage({ params }: PageProps) {
           <div className="mt-6">
             <Link
               href={`/${locale}/singleplayer`}
-              className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg"
+              className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg"
             >
               Jugar LexiClash Gratis — Sin Descargas
             </Link>

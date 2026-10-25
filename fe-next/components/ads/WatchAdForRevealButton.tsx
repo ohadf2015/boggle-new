@@ -53,7 +53,7 @@ export const WatchAdForRevealButton: React.FC<WatchAdForRevealButtonProps> = ({
         'bg-neo-purple/15 text-neo-purple',
         'border-2 border-neo-purple/50 rounded-neo',
         'hover:bg-neo-purple/25 hover:border-neo-purple',
-        'transition-all duration-150',
+        'transition duration-150',
         'disabled:opacity-60 disabled:cursor-not-allowed',
         className,
       )}

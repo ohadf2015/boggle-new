@@ -219,7 +219,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                 type="button"
                 onClick={handleClose}
                 aria-label={t('common.close')}
-                className="p-2 hover:bg-neo-black/10 rounded-lg transition-all hover:scale-110 active:scale-95"
+                className="p-2 hover:bg-neo-black/10 rounded-lg transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] hover:scale-110 active:scale-95"
               >
                 <X className="w-6 h-6 sm:w-7 sm:h-7 text-neo-black" strokeWidth={2.5} />
               </button>
@@ -245,7 +245,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         onClick={() => setBoardSize(5)}
                         whileHover={{ scale: 1.05, y: -4 }}
                         whileTap={{ scale: 0.95, y: 0 }}
-                        className={`relative p-4 sm:p-5 rounded-xl border-neo-thick transition-all flex flex-col items-center gap-2 ${
+                        className={`relative p-4 sm:p-5 rounded-xl border-neo-thick transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] flex flex-col items-center gap-2 ${
                           boardSize === 5
                             ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-lg'
                             : 'bg-neo-white text-neo-black border-neo-black/30 hover:border-neo-cyan hover:text-neo-cyan shadow-hard-sm hover:shadow-hard'
@@ -274,7 +274,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         onClick={() => setBoardSize(7)}
                         whileHover={{ scale: 1.05, y: -4 }}
                         whileTap={{ scale: 0.95, y: 0 }}
-                        className={`relative p-4 sm:p-5 rounded-xl border-neo-thick transition-all flex flex-col items-center gap-2 ${
+                        className={`relative p-4 sm:p-5 rounded-xl border-neo-thick transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] flex flex-col items-center gap-2 ${
                           boardSize === 7
                             ? 'bg-neo-pink text-neo-black border-neo-black shadow-hard-lg'
                             : 'bg-neo-white text-neo-black border-neo-black/30 hover:border-neo-pink hover:text-neo-pink shadow-hard-sm hover:shadow-hard'
@@ -320,7 +320,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         min: 4,
                         max: 8
                       })}
-                      className={`w-full px-4 py-3 text-lg font-bold text-neo-black border-neo-thick rounded-xl shadow-hard-sm focus:shadow-hard focus:outline-hidden transition-all ${
+                      className={`w-full px-4 py-3 text-lg font-bold text-neo-black border-neo-thick rounded-xl shadow-hard-sm focus:shadow-hard focus:outline-hidden transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] ${
                         wordError
                           ? 'border-red-500 bg-red-50'
                           : 'border-neo-black bg-neo-white focus:border-neo-cyan'
@@ -341,7 +341,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   <Reveal>
                     <Button
                       onClick={handleCreate}
-                      className="relative w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-pink to-neo-pink/80 hover:from-neo-pink/90 hover:to-neo-pink/70 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide overflow-hidden group"
+                      className="relative w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-pink to-neo-pink/80 hover:from-neo-pink/90 hover:to-neo-pink/70 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] uppercase tracking-wide overflow-hidden group"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-3">
                         <Zap className="w-6 h-6" strokeWidth={2.5} fill="currentColor" />
@@ -484,7 +484,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       onClick={handleCopy}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      className={`shrink-0 p-3 rounded-lg border-3 border-neo-black transition-all ${
+                      className={`shrink-0 p-3 rounded-lg border-3 border-neo-black transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] ${
                         copied
                           ? 'bg-neo-lime text-neo-black shadow-hard-sm'
                           : 'bg-neo-white hover:bg-neo-lime shadow-hard-sm hover:shadow-hard'
@@ -504,7 +504,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   >
                     <Button
                       onClick={handleNativeShare}
-                      className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-cyan to-blue-500 hover:from-neo-cyan/90 hover:to-blue-500/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
+                      className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-cyan to-blue-500 hover:from-neo-cyan/90 hover:to-blue-500/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] uppercase tracking-wide"
                     >
                       <Share2 className="w-6 h-6 me-2" strokeWidth={2.5} />
                       {t('daily.shareChallenge')}
@@ -512,7 +512,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
 
                     <Button
                       onClick={() => setStep('stats')}
-                      className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-purple to-purple-600 hover:from-neo-purple/90 hover:to-purple-600/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
+                      className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-purple to-purple-600 hover:from-neo-purple/90 hover:to-purple-600/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] uppercase tracking-wide"
                     >
                       <BarChart3 className="w-6 h-6 me-2" strokeWidth={2.5} />
                       {t('daily.viewStats')}

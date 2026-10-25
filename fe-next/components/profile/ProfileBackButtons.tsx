@@ -38,7 +38,7 @@ export function ProfileBackButtons({
         <Button
           onClick={() => router.push(`/${language}`)}
           className={cn(
-            'w-full sm:w-auto px-8 py-3 rounded-2xl font-black uppercase tracking-wide transition-all',
+            'w-full sm:w-auto px-8 py-3 rounded-2xl font-black uppercase tracking-wide transition',
             'bg-neo-lime text-neo-black hover:opacity-90'
           )}
         >
@@ -51,7 +51,7 @@ export function ProfileBackButtons({
         onClick={() => router.push(`/${language}`)}
         variant={activeGameSession ? 'outline' : 'default'}
         className={cn(
-          'w-full sm:w-auto px-8 py-3 rounded-2xl font-black uppercase tracking-wide transition-all',
+          'w-full sm:w-auto px-8 py-3 rounded-2xl font-black uppercase tracking-wide transition',
           activeGameSession
             ? 'bg-neo-navy-light/40 border border-white/[0.08] text-gray-300 hover:bg-neo-navy-elevated/60'
             : 'bg-linear-to-r from-neo-cyan to-neo-cyan/80 text-neo-black hover:opacity-90'

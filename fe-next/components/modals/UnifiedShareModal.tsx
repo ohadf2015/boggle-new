@@ -421,7 +421,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               type="button"
               onClick={handleCopyLink}
               className={cn(
-                'border-2 border-neo-black rounded-neo p-3 min-w-[44px] min-h-[44px] flex items-center justify-center shadow-hard-sm hover:shadow-hard-md hover:-translate-y-0.5 transition-all focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2',
+                'border-2 border-neo-black rounded-neo p-3 min-w-[44px] min-h-[44px] flex items-center justify-center shadow-hard-sm hover:shadow-hard-md hover:-translate-y-0.5 transition focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2',
                 copied ? 'bg-neo-lime' : 'bg-neo-cyan'
               )}
               aria-label={copied ? t('share.linkCopied') : t('share.copyLink')}
@@ -446,7 +446,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 'w-full flex items-center justify-center gap-2 p-4 rounded-neo',
                 'border-4 border-neo-black shadow-hard-lg',
                 'hover:shadow-hard-xl hover:-translate-y-1 active:shadow-hard-sm active:translate-y-0',
-                'transition-all duration-150',
+                'transition duration-150',
                 'font-black text-lg uppercase tracking-wide',
                 copied ? 'bg-neo-lime text-neo-black' : 'bg-neo-lime text-neo-black',
                 'focus:outline-hidden focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2',
@@ -473,7 +473,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 'w-full flex items-center justify-center gap-2 p-3 rounded-neo',
                 'border-2 border-neo-black shadow-hard-sm',
                 'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
-                'transition-all duration-150',
+                'transition duration-150',
                 'font-bold text-sm uppercase tracking-wide',
                 'bg-brand-whatsapp text-black',
                 'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
@@ -525,7 +525,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     'flex items-center justify-center gap-2 p-3 rounded-neo',
                     'border-2 border-neo-black shadow-hard-sm',
                     'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
-                    'transition-all duration-150',
+                    'transition duration-150',
                     'font-bold text-xs uppercase tracking-wide',
                     'bg-black text-white',
                     'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
@@ -547,7 +547,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     'flex items-center justify-center gap-2 p-3 rounded-neo',
                     'border-2 border-neo-black shadow-hard-sm',
                     'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
-                    'transition-all duration-150',
+                    'transition duration-150',
                     'font-bold text-xs uppercase tracking-wide',
                     'bg-brand-discord text-white',
                     'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
@@ -567,7 +567,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     'flex items-center justify-center gap-2 p-3 rounded-neo',
                     'border-2 border-neo-black shadow-hard-sm',
                     'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
-                    'transition-all duration-150',
+                    'transition duration-150',
                     'font-bold text-xs uppercase tracking-wide',
                     'bg-neo-pink text-neo-black',
                     'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
@@ -588,7 +588,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                       'flex items-center justify-center gap-2 p-3 rounded-neo',
                       'border-2 border-neo-black shadow-hard-sm',
                       'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
-                      'transition-all duration-150',
+                      'transition duration-150',
                       'font-bold text-xs uppercase tracking-wide',
                       'bg-neo-lime text-neo-black',
                       'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
@@ -613,7 +613,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   'w-full flex items-center justify-center gap-2 p-3 rounded-neo',
                   'border-2 border-neo-black shadow-hard-sm',
                   'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
-                  'transition-all duration-150',
+                  'transition duration-150',
                   'font-bold text-sm uppercase tracking-wide',
                   challengeCreated ? 'bg-neo-lime text-neo-black' : 'bg-neo-cyan text-neo-black',
                   'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2',
@@ -645,7 +645,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   'animate-in fade-in-0 duration-300',
                   'w-full sm:hidden flex items-center justify-center gap-2 p-3 rounded-neo',
                   'border-2 border-white/30 shadow-hard-sm',
-                  'hover:shadow-hard-md hover:-translate-y-0.5 transition-all',
+                  'hover:shadow-hard-md hover:-translate-y-0.5 transition',
                   'font-bold text-sm uppercase tracking-wide',
                   'bg-white/10 text-white hover:bg-white/20',
                   'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'

@@ -124,7 +124,7 @@ function CreatorRow_({ creator, rank }: { creator: CreatorRow; rank: number }) {
       <Link
         href={`/community?creator=${creator.creator_id}`}
         className={cn(
-          'flex items-center gap-3 px-3 py-2.5 transition-all duration-100',
+          'flex items-center gap-3 px-3 py-2.5 transition duration-100',
           'hover:bg-neo-white/5 rounded-neo group',
           isTopThree && style
             ? cn('border', style.bg)

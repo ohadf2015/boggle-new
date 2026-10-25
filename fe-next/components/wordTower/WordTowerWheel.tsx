@@ -356,7 +356,7 @@ export const WordTowerWheel = memo(function WordTowerWheel({
             aria-label={t(isGolden ? 'wordTower.a11y.goldenTile' : 'wordTower.a11y.tile', { letter })}
             aria-pressed={isSel}
             className={cn(
-              'absolute z-10 flex h-[19%] w-[19%] items-center justify-center rounded-full border-neo-thick border-black font-neo-display text-2xl font-black uppercase shadow-hard transition-all duration-300',
+              'absolute z-10 flex h-[19%] w-[19%] items-center justify-center rounded-full border-neo-thick border-black font-neo-display text-2xl font-black uppercase shadow-hard transition duration-300',
               placing ? 'scale-50 opacity-0' : 'opacity-100',
               isSel
                 ? 'bg-neo-cyan text-black ring-2 ring-neo-cyan ring-offset-2 ring-offset-neo-navy'

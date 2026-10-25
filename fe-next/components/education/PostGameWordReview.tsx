@@ -107,7 +107,7 @@ export default function PostGameWordReview({
       <m.button
         whileTap={{ scale: 0.97 }}
         onClick={onPractice}
-        className="w-full py-2.5 px-4 bg-neo-lime text-black font-bold rounded-neo border-neo shadow-hard text-sm active:shadow-hard-pressed active:translate-y-[2px] transition-all"
+        className="w-full py-2.5 px-4 bg-neo-lime text-black font-bold rounded-neo border-neo shadow-hard text-sm active:shadow-hard-pressed active:translate-y-[2px] transition"
       >
         {t('education.postGame.practiceTheseWords')}
       </m.button>

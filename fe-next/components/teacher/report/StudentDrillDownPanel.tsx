@@ -65,7 +65,7 @@ export function StudentDrillDownPanel({
           className={cn(
             'inline-flex h-11 w-11 items-center justify-center rounded-neo',
             'border-3 border-black bg-neo-cream text-black shadow-hard-sm',
-            'hover:-translate-y-0.5 active:translate-y-0.5 transition-all duration-100',
+            'hover:-translate-y-0.5 active:translate-y-0.5 transition duration-100',
             'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-black'
           )}
         >
@@ -111,7 +111,7 @@ export function StudentDrillDownPanel({
               'inline-flex min-h-[44px] items-center gap-2 px-4 py-2 rounded-neo',
               'border-3 border-black bg-black text-neo-lime font-neo-body font-black text-sm shadow-hard-sm',
               'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
-              'transition-all duration-100 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
+              'transition duration-100 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
             )}
           >
             <Sparkles className="w-4 h-4" aria-hidden />

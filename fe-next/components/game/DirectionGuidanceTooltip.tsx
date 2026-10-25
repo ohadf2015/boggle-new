@@ -139,7 +139,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
               ? { opacity: 0, scale: 1.15, y: -20 }
               : { opacity: 1, y: 0, scale: 1 }
             }
-            exit={{ opacity: 0, scale: 0, y: -30 }}
+            exit={{ opacity: 0, scale: 0.95, y: -30 }}
             transition={isPopping
               ? { duration: 0.25, ease: [0.36, 1.2, 0.5, 1] }
               : { type: 'spring', stiffness: 300, damping: 25 }

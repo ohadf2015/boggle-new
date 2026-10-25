@@ -483,7 +483,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
             <button
               type="button"
               onClick={onClose}
-              className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-slate-600 hover:border-white hover:bg-white/10 transition-all text-gray-300 hover:text-white"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-slate-600 hover:border-white hover:bg-white/10 transition text-gray-300 hover:text-white"
               aria-label={t('common.close')}
             >
               <X size={16} />
@@ -548,7 +548,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                   <Button
                     onClick={() => showAuthPrompt()}
                     disabled={isAnyLoading}
-                    className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black hover:bg-neo-lime-light shadow-hard transition-all"
+                    className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black hover:bg-neo-lime-light shadow-hard transition"
                     asChild={false}
                   >
                     {isLoading === 'crazygames' ? (
@@ -569,7 +569,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                         onClick={() => handleSignIn(provider.id)}
                         disabled={isAnyLoading}
                         className={cn(
-                          'w-full h-12 text-base font-bold rounded-neo transition-all flex items-center justify-center gap-2',
+                          'w-full h-12 text-base font-bold rounded-neo transition flex items-center justify-center gap-2',
                           provider.className
                         )}
                         asChild={false}
@@ -632,7 +632,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           <Button
                             type="submit"
                             disabled={isAnyLoading || !email || !!emailError}
-                            className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2"
+                            className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition flex items-center justify-center gap-2"
                             asChild={false}
                           >
                             {isLoading === 'otp' ? (
@@ -681,7 +681,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           <Button
                             type="submit"
                             disabled={isAnyLoading || otpCode.length !== 6}
-                            className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all"
+                            className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition"
                             asChild={false}
                           >
                             {isLoading === 'otp-verify' ? (
@@ -739,7 +739,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                       <Button
                         type="submit"
                         disabled={isAnyLoading || !email || !!emailError}
-                        className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2"
+                        className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition flex items-center justify-center gap-2"
                         asChild={false}
                       >
                         {isLoading === 'magiclink' ? (
@@ -830,7 +830,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                       <Button
                         type="submit"
                         disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
-                        className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all"
+                        className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition"
                         asChild={false}
                       >
                         {isLoading === 'email' ? (

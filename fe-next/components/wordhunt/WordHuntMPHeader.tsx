@@ -43,7 +43,7 @@ export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
           onClick={onShowHelp}
           className={cn(
             iconBtnSize(compact),
-            'flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm hover:text-neo-white hover:shadow-hard active:shadow-hard-pressed transition-all',
+            'flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm hover:text-neo-white hover:shadow-hard active:shadow-hard-pressed transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]',
           )}
           aria-label={t('wordHuntRules.quickTipsTitle')}
           data-testid="wh-help-button"

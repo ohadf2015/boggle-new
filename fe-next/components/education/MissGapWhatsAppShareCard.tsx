@@ -144,7 +144,7 @@ export function MissGapWhatsAppShareCard({
             className={cn(
               'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
               'bg-brand-whatsapp text-neo-black border-[3px] border-neo-black rounded-neo',
-              'shadow-hard hover:shadow-hard-lg transition-all hover:bg-brand-whatsapp-hover',
+              'shadow-hard hover:shadow-hard-lg transition hover:bg-brand-whatsapp-hover',
             )}
           >
             {opened ? (
@@ -167,7 +167,7 @@ export function MissGapWhatsAppShareCard({
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
             'bg-neo-cream text-neo-black border-[3px] border-neo-black rounded-neo',
-            'shadow-hard-sm hover:shadow-hard transition-all',
+            'shadow-hard-sm hover:shadow-hard transition',
           )}
         >
           <MessageCircle className="w-5 h-5" aria-hidden />
@@ -182,7 +182,7 @@ export function MissGapWhatsAppShareCard({
               'w-full flex items-center justify-center gap-2 px-4 py-4',
               'font-neo-display font-bold text-lg',
               'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
-              'shadow-hard hover:shadow-hard-lg transition-all',
+              'shadow-hard hover:shadow-hard-lg transition',
             )}
           >
             {t('education.results.missGapWhatsAppOpenHomework')}

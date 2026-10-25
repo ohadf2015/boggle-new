@@ -99,7 +99,7 @@ function RosterRailImpl({ players }: { players: RosterPlayer[] }) {
           </div>
           <div className="ms-7 h-1.5 bg-foreground/10 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${p.isLeader ? 'bg-neo-yellow' : p.isYou ? 'bg-neo-cyan' : 'bg-neo-lime/60'}`}
+              className={`h-full rounded-full transition-[width,background-color] duration-500 ${p.isLeader ? 'bg-neo-yellow' : p.isYou ? 'bg-neo-cyan' : 'bg-neo-lime/60'}`}
               style={{ width: `${p.pctOfMax}%` }}
               aria-hidden="true"
             />

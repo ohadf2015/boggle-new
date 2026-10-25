@@ -9,7 +9,7 @@ export interface SurvivalAudioEffectsControlsProps {
 }
 
 const BTN_BASE =
-  'flex items-center justify-center w-9 h-9 min-w-[36px] min-h-[36px] bg-neo-black/50 border-2 border-neo-cream/10 rounded-full hover:bg-neo-black/70 active:scale-95 transition-all duration-150';
+  'flex items-center justify-center w-9 h-9 min-w-[36px] min-h-[36px] bg-neo-black/50 border-2 border-neo-cream/10 rounded-full hover:bg-neo-black/70 active:scale-95 transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-150';
 
 /**
  * SurvivalAudioEffectsControls — in-game effects toggle.

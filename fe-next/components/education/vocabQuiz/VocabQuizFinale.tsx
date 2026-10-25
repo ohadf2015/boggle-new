@@ -227,7 +227,7 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
               'w-full lg:flex-1 flex items-center justify-center gap-3 px-6 py-3 md:py-4',
               'font-neo-display font-black uppercase text-2xl md:text-4xl',
               'bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg',
-              'shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-0.5 active:translate-y-0.5 active:scale-[0.99] active:shadow-hard transition-all'
+              'shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-0.5 active:translate-y-0.5 active:scale-[0.99] active:shadow-hard transition'
             )}
           >
             <RotateCcw className="w-8 h-8 shrink-0" aria-hidden />

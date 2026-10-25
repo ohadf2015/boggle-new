@@ -85,7 +85,7 @@ export const TimeLowAdPrompt: React.FC<TimeLowAdPromptProps> = ({
         'bg-neo-orange text-neo-black',
         'border-3 border-neo-black rounded-neo shadow-hard',
         'hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed',
-        'transition-all duration-150',
+        'transition duration-150',
         'animate-pulse',
         'disabled:opacity-60 disabled:cursor-not-allowed disabled:animate-none',
         className,

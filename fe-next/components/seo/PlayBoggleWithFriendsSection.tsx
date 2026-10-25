@@ -128,7 +128,7 @@ export function PlayBoggleWithFriendsSection({ locale }: { locale: string }) {
       </div>
       <Link
         href={`/${locale}/multiplayer`}
-        className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+        className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
       >
         Create a room →
       </Link>

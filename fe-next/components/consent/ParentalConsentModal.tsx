@@ -374,7 +374,7 @@ export function ParentalConsentModal({
                   'w-full px-6 py-4',
                   'border-3 border-neo-black rounded-neo',
                   'font-black text-base uppercase tracking-wide',
-                  'transition-all duration-100',
+                  'transition duration-100',
                   'min-h-[52px]',
                   'bg-neo-lime text-neo-black',
                   'shadow-hard',

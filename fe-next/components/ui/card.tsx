@@ -69,7 +69,7 @@ const cardVariants = cva(
       hover: {
         none: "",
         lift: "transition-transform hover:-translate-y-1 hover:shadow-hard-xl",
-        tilt3d: "transition-all hover:rotate-0", // For ModeCard 3D effect
+        tilt3d: "transition hover:rotate-0", // For ModeCard 3D effect
       },
       padding: {
         none: "p-0",

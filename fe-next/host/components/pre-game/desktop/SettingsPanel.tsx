@@ -95,7 +95,7 @@ export function SettingsPanel({
                   onClick={() => onGameModeClick(mode)}
                   whileTap={{ scale: 0.98 }}
                   className={cn(
-                    'flex items-center gap-3 xl:gap-4 p-3 xl:p-4 rounded-neo border-2 xl:border-3 transition-all text-start',
+                    'flex items-center gap-3 xl:gap-4 p-3 xl:p-4 rounded-neo border-2 xl:border-3 transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] text-start',
                     isSelected
                       ? `${colors.bg} ${colors.border} shadow-none`
                       : 'bg-neo-navy/40 border-neo-black/50 hover:border-neo-black shadow-hard-sm'
@@ -137,7 +137,7 @@ export function SettingsPanel({
         data-checked={tvMode}
         onClick={onTvModeToggle}
         className={cn(
-          'flex items-center gap-3 xl:gap-4 p-3 xl:p-4 rounded-neo border-2 xl:border-3 transition-all',
+          'flex items-center gap-3 xl:gap-4 p-3 xl:p-4 rounded-neo border-2 xl:border-3 transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
           tvMode
             ? 'bg-neo-purple/20 border-neo-purple'
             : 'bg-neo-navy/40 border-neo-black/50 hover:border-neo-black'
@@ -154,7 +154,7 @@ export function SettingsPanel({
         </div>
         <div
           className={cn(
-            'w-10 h-6 xl:w-12 xl:h-7 rounded-full border-2 transition-all relative',
+            'w-10 h-6 xl:w-12 xl:h-7 rounded-full border-2 transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] relative',
             tvMode
               ? 'bg-neo-purple border-neo-purple'
               : 'bg-neo-navy border-neo-black/50'
@@ -162,7 +162,7 @@ export function SettingsPanel({
         >
           <div
             className={cn(
-              'w-4 h-4 xl:w-5 xl:h-5 rounded-full bg-neo-white absolute top-0.5 xl:top-0.5 transition-all',
+              'w-4 h-4 xl:w-5 xl:h-5 rounded-full bg-neo-white absolute top-0.5 xl:top-0.5 transition-[left]',
               tvMode ? 'left-4 xl:left-5' : 'left-0.5'
             )}
           />

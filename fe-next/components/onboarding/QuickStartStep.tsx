@@ -143,7 +143,7 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
               aria-pressed={isSelected}
               aria-label={config.name}
               className={cn(
-                'flex h-10 w-10 items-center justify-center rounded-neo border-2 text-xl transition-all',
+                'flex h-10 w-10 items-center justify-center rounded-neo border-2 text-xl transition',
                 isSelected
                   ? 'border-neo-lime bg-neo-lime/20 shadow-hard-sm'
                   : 'border-neo-cream/20 bg-neo-navy-light hover:border-neo-cream/40'
@@ -203,7 +203,7 @@ const QuickStartStep: React.FC<QuickStartStepProps> = ({ onPlay, onHowToPlay, on
             data-testid="quick-start-shuffle"
             onClick={handleShuffle}
             aria-label={t('onboarding.ftue.randomize', 'Randomize')}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-white shadow-hard-sm transition-all hover:bg-neo-yellow active:bg-neo-yellow active:shadow-hard-pressed"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-white shadow-hard-sm transition hover:bg-neo-yellow active:bg-neo-yellow active:shadow-hard-pressed"
           >
             <Shuffle className="h-5 w-5 text-neo-black" />
           </button>

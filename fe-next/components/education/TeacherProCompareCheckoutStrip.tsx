@@ -105,7 +105,7 @@ export function TeacherProCompareCheckoutStrip({
           locale={locale}
           placement="education_compare_strip"
           testId="teacher-pro-compare-checkout-link"
-          className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg"
+          className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition hover:shadow-hard-lg"
         >
           {c.cta}
         </TeacherProUpgradeLink>

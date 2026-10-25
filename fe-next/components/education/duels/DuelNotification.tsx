@@ -140,7 +140,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
               className={cn(
                 'inline-flex flex-1 items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 py-2.5',
                 'font-neo-display text-sm font-black uppercase italic tracking-tight text-neo-black shadow-hard',
-                'transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed'
+                'transition hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed'
               )}
             >
               <Swords className="h-4 w-4" aria-hidden="true" />

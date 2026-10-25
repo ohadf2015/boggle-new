@@ -105,7 +105,7 @@ const DroppableDefinitionSlot = memo<DroppableDefinitionSlotProps>(({
       className={cn(
         'p-4 rounded-neo border-[3px]',
         'font-neo-body text-base min-h-16 flex items-center justify-center',
-        'transition-all relative',
+        'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] relative',
         isMatched && 'border-neo-green bg-neo-green/10',
         // A black edge over a 5% white wash is invisible on navy (1.23:1); an
         // empty slot still has to read as a place a card can land.

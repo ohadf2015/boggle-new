@@ -179,7 +179,7 @@ export function BlastBragCard({ results, t }: BlastBragCardProps) {
             'rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black',
             'font-neo-display font-black uppercase text-xs tracking-wide',
             'shadow-hard hover:shadow-hard-pressed hover:translate-y-px',
-            'transition-all active:scale-[0.97]',
+            'transition-[transform,box-shadow] active:scale-[0.97]',
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink',
           )}
           data-testid="blast-brag-share"

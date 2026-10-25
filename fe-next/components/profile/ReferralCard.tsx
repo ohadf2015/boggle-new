@@ -236,7 +236,7 @@ export function ReferralCard() {
             onClick={handleCopyLink}
             size="sm"
             className={cn(
-              'h-10 px-4 rounded-xl font-bold transition-all',
+              'h-10 px-4 rounded-xl font-bold transition',
               copied
                 ? 'bg-green-500 hover:bg-green-500 text-white'
                 : isDarkMode

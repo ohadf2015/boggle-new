@@ -91,7 +91,7 @@ export function DuelWaitingRoom({
               className={cn(
                 'inline-flex w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 py-3',
                 'font-neo-display text-base font-black uppercase italic tracking-tight text-neo-black shadow-hard',
-                'transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed'
+                'transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed'
               )}
             >
               <RotateCcw className="h-5 w-5" aria-hidden="true" />
@@ -105,7 +105,7 @@ export function DuelWaitingRoom({
               className={cn(
                 'inline-flex w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 py-2.5',
                 'font-neo-body text-sm font-black text-neo-cream shadow-hard-sm',
-                'transition-all hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed'
+                'transition hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed'
               )}
             >
               <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />

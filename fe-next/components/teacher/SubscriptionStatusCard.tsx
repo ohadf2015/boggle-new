@@ -123,7 +123,7 @@ export default function SubscriptionStatusCard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {!subscription.has_pro && (
-          <Button asChild className="bg-neo-black text-white font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+          <Button asChild className="bg-neo-black text-white font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition flex items-center justify-center gap-2">
             <Link href={`/${language}/teacher/upgrade`}>
               <Zap className="w-4 h-4" />
               {t('teacher.subscription.upgradeNow')}
@@ -132,7 +132,7 @@ export default function SubscriptionStatusCard() {
         )}
 
         {subscription.has_pro && subscription.portal_url && (
-          <Button asChild className="bg-neo-black text-white font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+          <Button asChild className="bg-neo-black text-white font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition flex items-center justify-center gap-2">
             <a href={subscription.portal_url} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="w-4 h-4" />
               {t('teacher.subscription.manageSubscription')}
@@ -144,7 +144,7 @@ export default function SubscriptionStatusCard() {
           asChild
           variant="outline"
           className={cn(
-            'font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all',
+            'font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition',
             subscription.has_pro
               ? 'bg-black text-white hover:bg-black/80'
               : 'bg-neo-cream text-neo-black hover:bg-neo-cream/80'

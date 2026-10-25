@@ -61,7 +61,7 @@ export const RequestRow: React.FC<RequestRowProps> = ({
           disabled={isLoading}
           aria-label={t('friends.acceptRequest')}
           className={cn(
-            'p-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm transition-all',
+            'p-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm transition',
             'bg-neo-lime text-neo-black hover:shadow-hard hover:-translate-y-0.5',
             'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-hard-sm disabled:hover:translate-y-0'
           )}
@@ -74,7 +74,7 @@ export const RequestRow: React.FC<RequestRowProps> = ({
           disabled={isLoading}
           aria-label={t('friends.declineRequest')}
           className={cn(
-            'p-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm transition-all',
+            'p-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm transition',
             'bg-neo-pink text-white hover:shadow-hard hover:-translate-y-0.5',
             'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-hard-sm disabled:hover:translate-y-0'
           )}

@@ -50,12 +50,12 @@ export function AchievementCard({
       disabled={!isEarned}
       className={cn(
         'relative p-4 rounded-neo',
-        'border-3 transition-all duration-200',
+        'border-3 transition-[transform,box-shadow] duration-200',
         'flex flex-col items-center gap-2',
         'text-center',
         isEarned && tierColors && [
           'border-neo-black shadow-hard',
-          'hover:shadow-hard-lg hover:-translate-y-0.5',
+          'hover:shadow-hard-lg [@media(hover:hover)]:hover:-translate-y-0.5',
           'active:translate-y-0.5 active:shadow-hard-pressed',
         ],
         !isEarned && [

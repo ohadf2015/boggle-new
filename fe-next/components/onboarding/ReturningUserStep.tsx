@@ -121,7 +121,7 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
           whileHover={{ y: -2 }}
           whileTap={{ y: 1 }}
           onClick={onHaveAccount}
-          className="group relative w-full py-4 px-6 bg-neo-lime text-neo-navy font-neo-display font-black text-xl uppercase tracking-wide border-neo-thick border-black rounded-neo shadow-hard-lg hover:shadow-hard-pressed active:shadow-hard-pressed transition-all"
+          className="group relative w-full py-4 px-6 bg-neo-lime text-neo-navy font-neo-display font-black text-xl uppercase tracking-wide border-neo-thick border-black rounded-neo shadow-hard-lg hover:shadow-hard-pressed active:shadow-hard-pressed transition"
         >
           <span className="flex items-center justify-center gap-2">
             <span aria-hidden="true" className="text-2xl">🎮</span>
@@ -134,7 +134,7 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
           whileHover={{ y: -2 }}
           whileTap={{ y: 1 }}
           onClick={onNew}
-          className="group relative w-full py-4 px-6 bg-neo-cyan text-neo-navy font-neo-display font-black text-xl uppercase tracking-wide border-neo-thick border-black rounded-neo shadow-hard-lg hover:shadow-hard-pressed active:shadow-hard-pressed transition-all"
+          className="group relative w-full py-4 px-6 bg-neo-cyan text-neo-navy font-neo-display font-black text-xl uppercase tracking-wide border-neo-thick border-black rounded-neo shadow-hard-lg hover:shadow-hard-pressed active:shadow-hard-pressed transition"
         >
           <span className="flex items-center justify-center gap-2">
             <span aria-hidden="true" className="text-2xl">✨</span>

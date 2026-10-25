@@ -111,7 +111,7 @@ function MilestoneProgress({
       {/* Progress bar */}
       <div className="relative h-5 rounded-neo border-3 border-neo-black bg-neo-navy-elevated overflow-hidden mb-4">
         <div
-          className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 bg-linear-to-r rtl:bg-linear-to-l from-neo-lime to-neo-cyan transition-all duration-500"
+          className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 bg-linear-to-r rtl:bg-linear-to-l from-neo-lime to-neo-cyan transition-[width] duration-500"
           style={{ width: `${pct}%` }}
         />
         {/* Milestone markers */}
@@ -403,7 +403,7 @@ export default function ReferralDashboardClient() {
               onClick={handleCopy}
               className={cn(
                 'shrink-0 flex items-center gap-1.5 px-3 py-2 font-bold text-xs',
-                'rounded-neo border-3 border-neo-black transition-all',
+                'rounded-neo border-3 border-neo-black transition-[box-shadow]',
                 copied
                   ? 'bg-neo-lime text-neo-black shadow-none'
                   : 'bg-neo-white/10 text-neo-white shadow-hard hover:shadow-hard-lg active:shadow-none'

@@ -69,7 +69,7 @@ const BRAG_MODE_LABEL: Record<string, string> = {
  *  They differ in icon order, analytics and child wrapping, so they stay two
  *  buttons — only the chrome is common. */
 const DISCLOSURE_TOGGLE_CLASS =
-  'w-full flex items-center justify-center gap-2 py-2 px-4 border-2 border-black bg-neo-navy-light text-neo-white font-neo-body font-semibold rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all';
+  'w-full flex items-center justify-center gap-2 py-2 px-4 border-2 border-black bg-neo-navy-light text-neo-white font-neo-body font-semibold rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]';
 
 export interface ResultsMainContentProps {
   sortedScores: Player[];
@@ -702,7 +702,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
               });
               trackShareCompleted('clipboard', { surface: 'mp_brag_strip' });
             }}
-            className="shrink-0 flex items-center gap-1.5 py-2 px-3 border-2 border-black bg-neo-pink text-neo-white font-neo-body font-bold text-sm rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+            className="shrink-0 flex items-center gap-1.5 py-2 px-3 border-2 border-black bg-neo-pink text-neo-white font-neo-body font-bold text-sm rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]"
           >
             {stripCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             <span>{stripCopied ? t('brag.copied') : t('brag.share')}</span>

@@ -104,7 +104,7 @@ function WordCraftControlsImpl({
           className={cn(
             'relative w-12 h-12 sm:w-14 sm:h-14 rounded-neo border-neo-thick border-black',
             'bg-neo-cream text-neo-navy shadow-hard',
-            'flex items-center justify-center transition-all',
+            'flex items-center justify-center transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]',
             'active:translate-y-0.5 active:shadow-hard-pressed hover:bg-neo-cyan hover:text-neo-navy',
             'disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-hard-pressed',
           )}
@@ -152,7 +152,7 @@ function IconBtn({ onClick, disabled, label, tone, children }: IconBtnProps) {
       className={cn(
         'w-12 h-12 sm:w-14 sm:h-14 rounded-neo border-neo-thick border-black',
         'bg-neo-cream text-neo-navy shadow-hard',
-        'flex items-center justify-center transition-all',
+        'flex items-center justify-center transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]',
         'active:translate-y-0.5 active:shadow-hard-pressed',
         'disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-hard-pressed',
         TONE[tone],

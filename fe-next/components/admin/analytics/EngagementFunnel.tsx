@@ -58,7 +58,7 @@ export function EngagementFunnel({ funnel }: EngagementFunnelProps) {
             <div key={step.label} className="flex items-center gap-3">
               <div
                 className={cn(
-                  'rounded-neo border py-2 px-3 flex items-center justify-between transition-all',
+                  'rounded-neo border py-2 px-3 flex items-center justify-between transition',
                   STEP_COLORS[i]
                 )}
                 style={{ width: `${widthPct}%`, minWidth: 120 }}

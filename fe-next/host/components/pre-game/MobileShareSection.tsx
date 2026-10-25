@@ -84,7 +84,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
         className={cn(
           // Lime outline in both sizes: still findable among the header's
           // exit/settings controls, but never a rival to READY UP!.
-          'flex items-center gap-1.5 rounded-full border-2 border-neo-lime bg-neo-navy text-neo-lime font-black uppercase tracking-wide shadow-hard-sm hover:bg-neo-lime/10 active:translate-y-0.5 active:shadow-none transition-all',
+          'flex items-center gap-1.5 rounded-full border-2 border-neo-lime bg-neo-navy text-neo-lime font-black uppercase tracking-wide shadow-hard-sm hover:bg-neo-lime/10 active:translate-y-0.5 active:shadow-none transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
           compact ? 'h-8 px-3.5 text-xs' : 'h-10 px-4 text-sm',
           showHint && 'animate-neo-wobble',
         )}
@@ -132,7 +132,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
               className="w-full group relative"
             >
               <div className={cn(
-                'flex items-center justify-between px-4 py-3 rounded-neo border-3 transition-all',
+                'flex items-center justify-between px-4 py-3 rounded-neo border-3 transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
                 copied
                   ? 'border-neo-lime bg-neo-lime/10'
                   : 'border-neo-black bg-neo-navy-light hover:border-neo-lime/50'
@@ -149,9 +149,9 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
                   {copied ? (
                     <m.div
                       key="check"
-                      initial={{ scale: 0, rotate: -90 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      exit={{ scale: 0 }}
+                      initial={{ scale: 0.95, opacity: 0, rotate: -90 }}
+                      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                      exit={{ scale: 0.95, opacity: 0 }}
                       className="w-10 h-10 rounded-full bg-neo-lime flex items-center justify-center"
                     >
                       <Check className="w-5 h-5 text-neo-black" />
@@ -159,9 +159,9 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
                   ) : (
                     <m.div
                       key="copy"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
+                      initial={{ scale: 0.95, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.95, opacity: 0 }}
                       className="w-10 h-10 rounded-full bg-neo-black/30 flex items-center justify-center group-hover:bg-neo-lime/20 transition-colors"
                     >
                       <Copy className="w-4 h-4 text-neo-cream/70" />
@@ -179,7 +179,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
                 onClick={handleCopyLink}
                 whileTap={{ scale: 0.95 }}
                 className={cn(
-                  'flex-1 h-12 flex items-center justify-center gap-2 rounded-neo border-2 border-neo-black font-bold text-sm transition-all',
+                  'flex-1 h-12 flex items-center justify-center gap-2 rounded-neo border-2 border-neo-black font-bold text-sm transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
                   copied
                     ? 'bg-neo-lime text-neo-black'
                     : 'bg-white text-neo-black shadow-hard-sm active:shadow-none active:translate-y-0.5'

@@ -94,7 +94,7 @@ export function CompactModeRow({
           'flex items-center gap-3',
           'focus-visible:outline-hidden focus-visible:ring-4',
           config.ring,
-          'transition-all duration-200 group',
+          'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-200 group',
           played
             ? 'bg-neo-navy hover:bg-neo-navy/90 opacity-75'
             : 'bg-neo-navy/60 hover:bg-neo-navy/80'
@@ -152,8 +152,8 @@ export function CompactModeRow({
         {/* Status Badge / Play Button */}
         {played ? (
           <m.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
             className={cn(
               'relative shrink-0 py-1.5 px-3 text-xs font-black uppercase rounded-md text-center',
@@ -169,7 +169,7 @@ export function CompactModeRow({
           <div className={cn(
             'relative shrink-0 py-1.5 px-3 text-xs font-black uppercase rounded-md text-center',
             'bg-neo-lime text-neo-black border border-neo-black shadow-hard-xs',
-            'active:translate-y-0.5 active:shadow-none transition-all',
+            'active:translate-y-0.5 active:shadow-none transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]',
             'flex items-center gap-1 group-hover:scale-110'
           )}>
             <Play className="w-3 h-3" />

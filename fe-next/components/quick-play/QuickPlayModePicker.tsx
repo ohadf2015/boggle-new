@@ -183,7 +183,7 @@ export function QuickPlayModePicker({
                   : undefined
               }
               className={`
-                group relative flex min-h-[9rem] min-w-0 flex-col items-start justify-between gap-3 overflow-hidden rounded-neo border-neo-thick border-black text-start transition-all duration-200
+                group relative flex min-h-[9rem] min-w-0 flex-col items-start justify-between gap-3 overflow-hidden rounded-neo border-neo-thick border-black text-start transition duration-200
                 ${mode === HERO ? 'lg:justify-center lg:gap-5' : ''}
                 ${mode === HERO || mode === 'wheel-rush' ? 'col-span-2' : ''}
                 ${GRID_SPANS[mode]}
@@ -238,7 +238,7 @@ export function QuickPlayModePicker({
         aria-describedby={`${uid}-random-blurb`}
         data-testid="random-button"
         className={`
-          group flex w-full min-w-0 flex-col items-start gap-3 rounded-neo border-neo border-black bg-neo-navy-elevated text-start transition-all duration-200 sm:flex-row sm:items-center sm:gap-4 p-3 sm:p-4
+          group flex w-full min-w-0 flex-col items-start gap-3 rounded-neo border-neo border-black bg-neo-navy-elevated text-start transition duration-200 sm:flex-row sm:items-center sm:gap-4 p-3 sm:p-4
           ${isLoading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:shadow-hard-lg hover:-translate-y-0.5 motion-reduce:hover:translate-y-0'}
           active:shadow-hard-pressed active:translate-y-0
           focus:outline-none focus:ring-4 focus:ring-white focus:ring-offset-2 focus:ring-offset-black

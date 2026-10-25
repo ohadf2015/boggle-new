@@ -42,7 +42,7 @@ export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className="relative flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all min-w-[44px] min-h-[44px]"
+          className="relative flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] min-w-[44px] min-h-[44px]"
         >
           <span className="text-lg">{currentFlag}</span>
           <Globe className="w-4 h-4 text-neo-black" />

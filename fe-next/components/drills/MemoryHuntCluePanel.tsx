@@ -73,7 +73,7 @@ export function MemoryHuntCluePanel({
         className={cn(
           'relative flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-neo border-3 border-neo-black shadow-hard',
           'font-black text-sm uppercase tracking-wide',
-          'transition-all hover:-translate-y-px active:shadow-hard-pressed',
+          'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] hover:-translate-y-px active:shadow-hard-pressed',
           isHintActive
             ? 'bg-neo-lime text-neo-black cursor-not-allowed'
             : 'bg-neo-yellow text-neo-black hover:bg-neo-lime',
@@ -109,7 +109,7 @@ export function MemoryHuntCluePanel({
       className={cn(
         'relative flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-neo border-3 border-neo-black shadow-hard overflow-hidden',
         'font-black text-sm uppercase tracking-wide',
-        'transition-all hover:-translate-y-px active:shadow-hard-pressed',
+        'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] hover:-translate-y-px active:shadow-hard-pressed',
         'bg-neo-cyan text-neo-black hover:brightness-95 disabled:opacity-60 disabled:cursor-wait',
       )}
     >

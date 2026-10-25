@@ -57,7 +57,7 @@ export function MobileTabBar({
             }}
             className={cn(
               'flex flex-col items-center justify-center px-4 py-2 min-w-[64px]',
-              'transition-all duration-100',
+              'transition duration-100',
               isActive
                 ? 'text-neo-lime scale-110'
                 : 'text-neo-white hover:text-neo-white'
@@ -67,8 +67,8 @@ export function MobileTabBar({
               <span className="text-xl">{tab.icon}</span>
               {tab.badge !== undefined && tab.badge > 0 && (
                 <m.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
                   className="absolute -top-1 -right-2 rtl:-right-auto rtl:-left-2 bg-neo-pink text-neo-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center border-2 border-neo-black"
                 >
                   {tab.badge > 99 ? '99+' : tab.badge}

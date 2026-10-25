@@ -24,7 +24,7 @@ export function GiftTemplateSelector({
             type="button"
             onClick={() => onSelect(template)}
             className={cn(
-              'p-4 rounded-lg border-2 text-left transition-all',
+              'p-4 rounded-lg border-2 text-left transition',
               'hover:border-neo-lime hover:bg-neo-lime/5',
               isSelected
                 ? 'border-neo-lime bg-neo-lime/10 shadow-hard-sm'

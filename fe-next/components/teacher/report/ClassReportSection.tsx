@@ -184,7 +184,7 @@ export function ClassReportSection({
               'inline-flex min-h-[44px] items-center gap-2 px-3 py-2 rounded-neo',
               'border-3 border-black bg-neo-cyan font-neo-body font-black text-black text-sm shadow-hard-sm',
               'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
-              'transition-all duration-100 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-black'
+              'transition duration-100 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-black'
             )}
           >
             {copied ? (
@@ -203,7 +203,7 @@ export function ClassReportSection({
               'inline-flex min-h-[44px] items-center gap-2 px-3 py-2 rounded-neo',
               'border-3 border-black bg-neo-cream font-neo-body font-black text-black text-sm shadow-hard-sm',
               'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
-              'transition-all duration-100 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-black'
+              'transition duration-100 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-black'
             )}
           >
             <Printer className="w-4 h-4" aria-hidden />

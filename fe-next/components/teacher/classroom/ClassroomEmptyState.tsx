@@ -59,7 +59,7 @@ export function ClassroomEmptyState({ createHref }: { createHref: string }) {
           className={cn(
             'inline-flex min-h-12 items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-lime px-6 py-2.5',
             'font-neo-display text-lg font-black uppercase tracking-tight text-neo-black shadow-hard',
-            'transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
+            'transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
             'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
           )}
         >

@@ -59,7 +59,7 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
           rounded-full
           border-3 border-neo-black
           shadow-hard-sm
-          transition-all duration-100
+          transition duration-100
           hover:-translate-x-px hover:-translate-y-px hover:shadow-hard
           active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
           focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2

@@ -139,7 +139,7 @@ export default async function DailyArchivePage({ params }: PageParams) {
                   <Link
                     key={date}
                     href={`/${locale}/daily/archive/${date}`}
-                    className="flex items-center justify-between bg-neo-navy border-2 border-neo-black rounded-neo p-3 shadow-hard-sm hover:border-neo-yellow hover:shadow-hard transition-all"
+                    className="flex items-center justify-between bg-neo-navy border-2 border-neo-black rounded-neo p-3 shadow-hard-sm hover:border-neo-yellow hover:shadow-hard transition-[border-color,box-shadow]"
                   >
                     <div>
                       <span className="text-neo-white font-bold">

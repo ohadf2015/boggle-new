@@ -102,7 +102,7 @@ export function MissGapTeacherCompose({
           'w-full flex items-center justify-center gap-2 px-4 py-4',
           'font-neo-display font-bold text-lg',
           'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
-          'shadow-hard hover:shadow-hard-lg transition-all',
+          'shadow-hard hover:shadow-hard-lg transition',
           !payload.dueDate && 'opacity-60 cursor-not-allowed',
         )}
       >
@@ -128,7 +128,7 @@ export function MissGapTeacherCompose({
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
             'bg-neo-cream text-neo-black border-[3px] border-neo-black rounded-neo',
-            'shadow-hard-sm hover:shadow-hard transition-all',
+            'shadow-hard-sm hover:shadow-hard transition',
           )}
         >
           <GraduationCap className="w-5 h-5" aria-hidden />

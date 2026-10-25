@@ -196,7 +196,7 @@ export default function DuelChallengeModal({
                     aria-pressed={duelType === 'async'}
                     onClick={() => setDuelType('async')}
                     className={cn(
-                      'rounded-neo p-3 text-start shadow-hard-sm transition-all',
+                      'rounded-neo p-3 text-start shadow-hard-sm transition',
                       // Selected differs by FILL, not by a tint; the unselected
                       // tile keeps a cream edge because black on navy is 1.23:1.
                       duelType === 'async'
@@ -221,7 +221,7 @@ export default function DuelChallengeModal({
                     aria-pressed={duelType === 'realtime'}
                     onClick={() => setDuelType('realtime')}
                     className={cn(
-                      'rounded-neo p-3 text-start shadow-hard-sm transition-all',
+                      'rounded-neo p-3 text-start shadow-hard-sm transition',
                       duelType === 'realtime'
                         ? 'border-[3px] border-neo-black bg-neo-lime text-neo-black shadow-hard'
                         : 'border-[3px] border-neo-cream bg-neo-navy text-neo-white hover:shadow-hard'
@@ -286,7 +286,7 @@ export default function DuelChallengeModal({
               'flex-1 px-6 py-3 font-bold rounded-neo',
               'bg-neo-navy text-neo-cream',
               'border-[3px] border-neo-cream shadow-hard-sm',
-              'hover:bg-red-600 hover:shadow-hard transition-all'
+              'hover:bg-red-600 hover:shadow-hard transition'
             )}
           >
             {t('cancel')}
@@ -301,7 +301,7 @@ export default function DuelChallengeModal({
               'flex-1 px-6 py-3 font-bold rounded-neo',
               'bg-neo-lime text-neo-black',
               'border-[3px] border-neo-black shadow-hard',
-              'hover:shadow-hard-lg transition-all',
+              'hover:shadow-hard-lg transition',
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >

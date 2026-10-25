@@ -152,7 +152,7 @@ export function DuelPlayPanel({
           aria-disabled={currentWordEmpty}
           data-testid="submit-word-btn"
           className={cn(
-            'shrink-0 rounded-neo border-[2px] border-neo-black bg-neo-lime px-4 py-2.5 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard transition-all hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
+            'shrink-0 rounded-neo border-[2px] border-neo-black bg-neo-lime px-4 py-2.5 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
             currentWordEmpty && 'cursor-not-allowed opacity-50'
           )}
         >
@@ -192,7 +192,7 @@ export function DuelPlayPanel({
         type="button"
         onClick={onForfeit}
         data-testid="forfeit-btn"
-        className="mx-auto shrink-0 rounded-neo border-[3px] border-neo-cream bg-transparent px-4 py-1.5 font-neo-body text-xs font-black uppercase tracking-wide text-neo-cream transition-all hover:bg-neo-cream hover:text-neo-navy active:translate-y-0.5"
+        className="mx-auto shrink-0 rounded-neo border-[3px] border-neo-cream bg-transparent px-4 py-1.5 font-neo-body text-xs font-black uppercase tracking-wide text-neo-cream transition hover:bg-neo-cream hover:text-neo-navy active:translate-y-0.5"
       >
         {t('duels.forfeitConfirm')}
       </button>

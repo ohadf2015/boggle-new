@@ -60,7 +60,7 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
       whileHover={canAffordAction ? { scale: 1.02, y: -2 } : {}}
       whileTap={canAffordAction ? { scale: 0.98 } : {}}
       className={cn(
-        "rounded-neo-lg border-3 border-neo-black shadow-hard transition-all",
+        "rounded-neo-lg border-3 border-neo-black shadow-hard transition-[box-shadow,background-color,border-color,color,opacity]",
         canAffordAction
           ? `bg-linear-to-br ${gradientFrom} ${gradientTo} cursor-pointer hover:shadow-hard-lg`
           : "bg-neo-navy-elevated"

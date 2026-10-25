@@ -487,7 +487,7 @@ export function AdminGiftModal({
                   'bg-linear-to-r from-amber-400 to-amber-500',
                   'hover:from-amber-500 hover:to-amber-600',
                   'text-neo-navy border-2 border-neo-black',
-                  'shadow-hard transition-all duration-200',
+                  'shadow-hard transition duration-200',
                   'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
                   'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
                   (phase === 'done' || gift.claimed) && 'bg-neo-lime from-neo-lime to-neo-lime'

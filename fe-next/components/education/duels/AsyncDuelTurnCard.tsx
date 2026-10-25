@@ -144,7 +144,7 @@ export function AsyncDuelTurnCard({
           type="button"
           data-testid="duel-turn-play"
           onClick={() => onAccept(duelId)}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-neo border-[2px] border-neo-black bg-neo-lime px-4 py-2.5 font-neo-display text-sm font-black uppercase italic tracking-tight text-neo-black shadow-hard transition-all duration-100 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed"
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-neo border-[2px] border-neo-black bg-neo-lime px-4 py-2.5 font-neo-display text-sm font-black uppercase italic tracking-tight text-neo-black shadow-hard transition duration-100 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed"
         >
           <Swords className="h-4 w-4" aria-hidden="true" />
           {isLive
@@ -157,7 +157,7 @@ export function AsyncDuelTurnCard({
           type="button"
           data-testid="duel-turn-decline"
           onClick={() => onDecline(duelId)}
-          className="rounded-neo border-[3px] border-neo-cream bg-neo-navy px-3 py-2.5 font-neo-body text-sm font-black text-neo-cream shadow-hard-sm transition-all duration-100 hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+          className="rounded-neo border-[3px] border-neo-cream bg-neo-navy px-3 py-2.5 font-neo-body text-sm font-black text-neo-cream shadow-hard-sm transition duration-100 hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
         >
           {t('education.duels.turnDecline')}
         </button>

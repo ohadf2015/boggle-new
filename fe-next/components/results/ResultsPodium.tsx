@@ -162,7 +162,7 @@ function PodiumEmojiPicker({
           type="button"
           key={r.id}
           onClick={() => onSelect(r.id)}
-          className="w-8 h-8 flex items-center justify-center text-base rounded hover:bg-neo-white/10 active:scale-90 transition-all"
+          className="w-8 h-8 flex items-center justify-center text-base rounded hover:bg-neo-white/10 active:scale-90 transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]"
         >
           {r.emoji}
         </button>
@@ -392,7 +392,7 @@ export default function ResultsPodium({
                             'bg-neo-navy border-2 border-neo-white/20 shadow-hard-sm',
                             'hover:bg-neo-white/10 hover:border-neo-lime/40',
                             'active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
-                            'transition-all',
+                            'transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
                             openPicker === player.username && 'bg-neo-lime/15 border-neo-lime/50'
                           )}
                           aria-label={`Send emoji to ${player.username}`}

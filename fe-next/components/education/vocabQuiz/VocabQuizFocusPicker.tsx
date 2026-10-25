@@ -101,7 +101,7 @@ export function VocabQuizFocusPicker({
 
   const chipClass = (selected: boolean, enabled: boolean) =>
     cn(
-      'flex flex-col items-start gap-1 px-4 py-3 rounded-neo border-[2px] transition-all text-start',
+      'flex flex-col items-start gap-1 px-4 py-3 rounded-neo border-[2px] transition text-start',
       'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
       !enabled && 'opacity-45 cursor-not-allowed',
       selected && enabled
@@ -194,7 +194,7 @@ export function VocabQuizFocusPicker({
               aria-checked={questionCount === count}
               onClick={() => onQuestionCountChange(count)}
               className={cn(
-                'px-4 py-3 font-bold rounded-neo border-[2px] transition-all',
+                'px-4 py-3 font-bold rounded-neo border-[2px] transition',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2',
                 questionCount === count
                   ? 'bg-neo-lime border-neo-black text-neo-black shadow-hard'
@@ -226,7 +226,7 @@ export function VocabQuizFocusPicker({
               aria-checked={secondsPerQuestion === seconds}
               onClick={() => onSecondsChange(seconds)}
               className={cn(
-                'px-4 py-3 font-bold rounded-neo border-[2px] border-neo-cream transition-all',
+                'px-4 py-3 font-bold rounded-neo border-[2px] border-neo-cream transition',
                 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-pink focus-visible:ring-offset-2',
                 secondsPerQuestion === seconds
                   ? 'bg-neo-pink text-black shadow-hard'
@@ -248,7 +248,7 @@ export function VocabQuizFocusPicker({
             aria-checked={!!treasureChestsEnabled}
             onClick={() => onTreasureChestsChange?.(!treasureChestsEnabled)}
             className={cn(
-              'w-full flex items-center gap-3 px-4 py-3 rounded-neo border-[2px] transition-all',
+              'w-full flex items-center gap-3 px-4 py-3 rounded-neo border-[2px] transition',
               'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2',
               treasureChestsEnabled
                 ? 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow shadow-hard'

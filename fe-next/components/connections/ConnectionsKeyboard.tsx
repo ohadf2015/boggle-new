@@ -29,7 +29,7 @@ interface ConnectionsKeyboardProps {
 // No scale-95 — a non-uniform press reads as "danced but didn't commit" on
 // slow Android frames and drives rage-re-taps (wheel lesson, PostHog 2026-04-27).
 const KEY_BASE =
-  'inline-flex items-center justify-center rounded-neo border-3 border-neo-black font-neo-display font-black select-none touch-manipulation transition-all duration-75 shadow-hard active:shadow-hard-pressed active:translate-x-px active:translate-y-px disabled:opacity-40 disabled:cursor-default';
+  'inline-flex items-center justify-center rounded-neo border-3 border-neo-black font-neo-display font-black select-none touch-manipulation transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-75 shadow-hard active:shadow-hard-pressed active:translate-x-px active:translate-y-px disabled:opacity-40 disabled:cursor-default';
 
 /** Shared key sizing — taller keys, no basis floor, so no key squashes. */
 const KEY_SIZE = 'h-11 sm:h-12 min-w-0';

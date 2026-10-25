@@ -29,8 +29,10 @@
   .tile {
     transition: translate 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .tile:hover {
-    translate: 0 -4px;
+  @media (hover: hover) and (pointer: fine) {
+    .tile:hover {
+      translate: 0 -4px;
+    }
   }
 
   /* Tiles drop onto the board as they scroll in and settle by mid-screen; the

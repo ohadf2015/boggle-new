@@ -203,7 +203,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
             type="button"
             onClick={browseDiscover}
             data-testid="lessons-browse-discover"
-            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-3 font-neo-display text-sm font-bold uppercase text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard"
+            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-3 font-neo-display text-sm font-bold uppercase text-neo-white shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard"
           >
             <Compass className="size-4 text-neo-pink" aria-hidden="true" />
             {t('eduLibrary.tabs.discover')}
@@ -214,7 +214,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
             onClick={() => openCreate()}
             className={cn(
               'inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-cyan px-4 font-neo-display text-sm font-bold uppercase text-neo-black',
-              'shadow-hard transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none',
+              'shadow-hard transition hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none',
             )}
           >
             <Plus className="size-5" strokeWidth={3} aria-hidden="true" />

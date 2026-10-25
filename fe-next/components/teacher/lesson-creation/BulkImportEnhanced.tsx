@@ -327,7 +327,7 @@ export default function BulkImportEnhanced({
                 onClick={() => fileInputRef.current?.click()}
                 className={cn(
                   'w-full p-4 border-neo border-dashed border-neo-cyan/50 rounded-neo',
-                  'bg-neo-black/30 hover:bg-neo-black/50 transition-all',
+                  'bg-neo-black/30 hover:bg-neo-black/50 transition',
                   'flex items-center justify-center gap-2 text-neo-cyan font-neo-body'
                 )}
               >

@@ -132,11 +132,11 @@ export default async function Page({ params }: PageProps) {
             כל הכלים האלה טובים — אבל לכל אחד נקודת חוזק אחרת. הנה השוואה כנה למורים שמחפשים <strong className="text-neo-white">משחקי מילים לכיתה בעברית</strong>: מה כל כלי עושה הכי טוב, ואיפה LexiClash שונה — משחק אוצר מילים חי, בעברית מלאה, בלי חשבונות לתלמידים ובלי פרסומות.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
+            <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
               <span className="block text-base sm:text-lg">▶ התחילו משחק כיתתי</span>
               <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">חינם · ללא הרשמה לתלמידים</span>
             </Link>
-            <Link href={`/${locale}/hebrew-classroom-vocabulary-games`} className="rounded-neo border-4 border-neo-black bg-neo-navy-light px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
+            <Link href={`/${locale}/hebrew-classroom-vocabulary-games`} className="rounded-neo border-4 border-neo-black bg-neo-navy-light px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
               מדריך משחקי המילים לכיתה →
             </Link>
           </div>
@@ -197,7 +197,7 @@ export default async function Page({ params }: PageProps) {
           </h2>
           <div className="space-y-3">
             {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-all open:shadow-hard-lg">
+              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-[box-shadow] open:shadow-hard-lg">
                 <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide sm:px-6">
                   <span>{faq.q}</span>
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded border-2 border-neo-black bg-neo-yellow text-neo-navy transition-transform group-open:rotate-45">+</span>
@@ -214,10 +214,10 @@ export default async function Page({ params }: PageProps) {
           </h2>
           <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">בוחרים רשימת מילים, מציגים קוד לכיתה, ומשחקים. חמש דקות, בלי הרשמה לתלמידים.</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard-lg transition-all hover:translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
+            <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
               ▶ התחילו משחק כיתתי
             </Link>
-            <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-black bg-neo-navy-light px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg">
+            <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-black bg-neo-navy-light px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg">
               למרכז החינוך
             </Link>
           </div>

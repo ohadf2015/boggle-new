@@ -126,7 +126,7 @@ export default function ContactPageClient(): React.JSX.Element {
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.02]',
+                'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-[translate,scale,rotate,transform,background-color,box-shadow] hover:scale-[1.02]',
                 isDarkMode
                   ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
                   : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'
@@ -152,7 +152,7 @@ export default function ContactPageClient(): React.JSX.Element {
             <a
               href="mailto:lexiclash.game@gmail.com"
               className={cn(
-                'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.02]',
+                'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-[translate,scale,rotate,transform,background-color,box-shadow] hover:scale-[1.02]',
                 isDarkMode
                   ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
                   : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'
@@ -302,7 +302,7 @@ export default function ContactPageClient(): React.JSX.Element {
                   'bg-neo-lime text-neo-black shadow-hard',
                   'hover:bg-neo-orange hover:shadow-hard-lg',
                   'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-hard',
-                  'transition-all duration-150'
+                  'transition-[background-color,box-shadow,opacity] duration-150'
                 )}
               >
                 {status === 'submitting' ? (

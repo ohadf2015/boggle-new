@@ -480,7 +480,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const ctaBlock = (
     <div className="space-y-3">
       <Button
-        className="w-full h-14 text-lg font-black uppercase border-neo-thick border-neo-black bg-neo-yellow text-neo-black shadow-hard-lg hover:bg-neo-yellow hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all duration-150"
+        className="w-full h-14 text-lg font-black uppercase border-neo-thick border-neo-black bg-neo-yellow text-neo-black shadow-hard-lg hover:bg-neo-yellow hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150"
         onClick={handleQuickReplay}
         data-testid="quick-replay-btn"
       >

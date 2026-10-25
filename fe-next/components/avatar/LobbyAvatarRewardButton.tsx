@@ -51,7 +51,7 @@ export function LobbyAvatarRewardButton() {
         aria-label={t('avatar.dailyPart.title')}
         className={cn(
           'inline-flex items-center gap-2 rounded-neo border-neo bg-neo-purple px-4 py-2',
-          'font-neo-display text-neo-white shadow-hard transition-all duration-150',
+          'font-neo-display text-neo-white shadow-hard transition duration-150',
           eligible
             ? 'hover:-translate-y-0.5 active:translate-y-px active:shadow-hard-pressed'
             : 'opacity-60 cursor-not-allowed',

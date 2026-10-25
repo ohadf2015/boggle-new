@@ -101,7 +101,7 @@ export function BulkApproveButton({
             className={`
               flex items-center gap-2 px-4 py-2 rounded-lg font-medium
               border-2 border-black shadow-hard
-              transition-all duration-150
+              transition duration-150
               ${
                 isDisabled
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'

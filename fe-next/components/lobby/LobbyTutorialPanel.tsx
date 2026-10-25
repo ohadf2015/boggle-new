@@ -107,7 +107,7 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
               type="button"
               key={loc}
               onClick={() => setLanguage(loc)}
-              className={`px-2 py-1 text-xs font-bold rounded border-2 transition-all ${
+              className={`px-2 py-1 text-xs font-bold rounded border-2 transition ${
                 language === loc
                   ? 'bg-neo-cyan/20 border-neo-cyan text-neo-cyan'
                   : 'bg-neo-white/5 border-neo-white/20 text-neo-white hover:border-neo-cream/40'

@@ -81,7 +81,7 @@ export function AnalyticsDashboard({
             'px-6 py-2 bg-neo-cyan text-black border-3 border-black',
             'font-black font-neo-body rounded-neo shadow-hard-sm',
             'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5',
-            'transition-all duration-100'
+            'transition duration-100'
           )}
         >
           {t('education.analytics.retry')}

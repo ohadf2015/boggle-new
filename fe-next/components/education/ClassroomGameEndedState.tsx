@@ -15,7 +15,7 @@ interface ClassroomGameEndedStateProps {
 }
 
 const PRIMARY =
-  'flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-black bg-neo-black px-6 py-3 font-neo-display font-black text-neo-lime shadow-hard-sm transition-all hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]';
+  'flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-black bg-neo-black px-6 py-3 font-neo-display font-black text-neo-lime shadow-hard-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]';
 
 /** Shown to a classroom student whose room is gone: what happened, a way on, and a quiet retry. */
 export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }: ClassroomGameEndedStateProps) {

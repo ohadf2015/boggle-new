@@ -61,7 +61,7 @@ export default function ConnectionsHero({ locale, copy }: Props): React.JSX.Elem
             type="button"
             onClick={handleReveal}
             disabled={revealed}
-            className={`relative h-14 min-w-[6rem] rounded-neo border-3 border-neo-black px-3 font-neo-display text-lg font-black uppercase shadow-hard transition-all sm:h-16 sm:min-w-[7rem] sm:text-xl ${
+            className={`relative h-14 min-w-[6rem] rounded-neo border-3 border-neo-black px-3 font-neo-display text-lg font-black uppercase shadow-hard transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] sm:h-16 sm:min-w-[7rem] sm:text-xl ${
               revealed
                 ? 'bg-neo-lime text-neo-navy animate-neo-pop motion-reduce:animate-none'
                 : 'bg-neo-cream text-neo-navy hover:translate-y-[1px] hover:shadow-hard-pressed'
@@ -92,13 +92,13 @@ export default function ConnectionsHero({ locale, copy }: Props): React.JSX.Elem
           href={connectionsPrimaryPath(locale)}
           onClick={handlePrimary}
           data-testid="hero-cta-primary"
-          className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-8 py-4 text-center font-neo-display font-black uppercase tracking-wide text-neo-white shadow-hard transition-all hover:shadow-hard-lg"
+          className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-8 py-4 text-center font-neo-display font-black uppercase tracking-wide text-neo-white shadow-hard transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] hover:shadow-hard-lg"
         >
           {copy.ctaPrimary}
         </Link>
         <a
           href="#how-it-works"
-          className="inline-block rounded-neo border-4 border-neo-cyan bg-transparent px-8 py-4 text-center font-neo-display font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10"
+          className="inline-block rounded-neo border-4 border-neo-cyan bg-transparent px-8 py-4 text-center font-neo-display font-bold text-neo-cyan shadow-hard transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] hover:bg-neo-cyan/10"
         >
           {copy.ctaSecondary}
         </a>

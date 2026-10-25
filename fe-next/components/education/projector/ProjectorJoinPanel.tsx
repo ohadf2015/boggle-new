@@ -81,7 +81,7 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
             aria-label={t('share.copyLink')}
             className={cn(
               'shrink-0 rounded-neo border-3 border-neo-black p-2 text-neo-navy shadow-hard-sm',
-              'transition-all active:translate-y-0.5 active:shadow-none',
+              'transition active:translate-y-0.5 active:shadow-none',
               copied ? 'bg-neo-lime' : 'bg-neo-cream'
             )}
           >

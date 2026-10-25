@@ -453,7 +453,7 @@ export default function LightningRound({
               className={cn(
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black shell:mt-0 shell:shrink-0',
                 'font-bold text-sm uppercase',
-                'transition-all hover:-translate-y-px',
+                'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] hover:-translate-y-px',
                 'bg-neo-navy-elevated text-neo-white'
               )}
             >

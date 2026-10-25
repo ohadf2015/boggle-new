@@ -23,7 +23,7 @@ export function RuLandingLinks({ locale, current }: { locale: string; current: s
           <Link
             key={l.slug}
             href={`/${locale}/${l.slug}`}
-            className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40"
+            className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition hover:border-neo-lime/40"
           >
             <h3 className="font-bold text-neo-cyan">{l.label}</h3>
           </Link>

@@ -47,7 +47,7 @@ export function StudentNextActions({ onPlayAgain, onPractice, t }: StudentNextAc
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3.5 font-neo-display font-bold',
             'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
-            'shadow-hard hover:shadow-hard-lg transition-all hover:-translate-y-0.5'
+            'shadow-hard hover:shadow-hard-lg transition hover:-translate-y-0.5'
           )}
         >
           <RotateCcw className="w-5 h-5 shrink-0" aria-hidden />
@@ -101,7 +101,7 @@ export function StudentNextActions({ onPlayAgain, onPractice, t }: StudentNextAc
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
             'bg-neo-cyan/20 text-neo-cyan border-[2px] border-neo-cyan rounded-neo',
-            'shadow-hard hover:shadow-hard-lg transition-all',
+            'shadow-hard hover:shadow-hard-lg transition',
             'hover:bg-neo-cyan/30'
           )}
         >

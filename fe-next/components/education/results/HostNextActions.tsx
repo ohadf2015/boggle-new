@@ -63,7 +63,7 @@ export function HostNextActions({
             'w-full flex items-center justify-center gap-3 px-4 py-3 md:px-6 md:py-4 min-[2200px]:gap-6 min-[2200px]:py-7',
             'font-neo-display font-black text-2xl md:text-4xl lg:text-3xl 2xl:text-4xl min-[2200px]:text-7xl',
             'bg-neo-lime text-neo-black border-4 border-neo-black rounded-neo-lg',
-            'shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-0.5 active:translate-y-0.5 transition-all'
+            'shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-0.5 active:translate-y-0.5 transition'
           )}
         >
           <RotateCcw className="w-8 h-8 shrink-0 min-[2200px]:w-14 min-[2200px]:h-14" aria-hidden />

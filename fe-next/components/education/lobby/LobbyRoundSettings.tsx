@@ -183,7 +183,7 @@ export function LobbyRoundSettings({
                       aria-label={choice.label}
                       onClick={() => onTargetWordChange(choice.value)}
                       className={cn(
-                        'min-h-9 rounded-neo border-2 border-black px-3 py-1 font-neo-display text-xs font-black uppercase transition-all',
+                        'min-h-9 rounded-neo border-2 border-black px-3 py-1 font-neo-display text-xs font-black uppercase transition',
                         'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                         isSelected
                           ? 'bg-neo-lime text-black shadow-hard'

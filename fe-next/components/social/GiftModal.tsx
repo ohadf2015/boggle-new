@@ -91,7 +91,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
                 onClick={() => setSelectedType(type)}
                 disabled={!canAfford}
                 className={cn(
-                  'flex flex-col items-center p-3 border-3 border-neo-black rounded-neo shadow-hard-sm transition-all',
+                  'flex flex-col items-center p-3 border-3 border-neo-black rounded-neo shadow-hard-sm transition',
                   isSelected
                     ? 'bg-neo-lime scale-105'
                     : canAfford
@@ -145,7 +145,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
           onClick={handleSend}
           disabled={!selectedType || giftsRemaining <= 0}
           className={cn(
-            'w-full py-3 border-3 border-neo-black rounded-neo font-black text-lg uppercase shadow-hard transition-all',
+            'w-full py-3 border-3 border-neo-black rounded-neo font-black text-lg uppercase shadow-hard transition',
             selectedType && giftsRemaining > 0
               ? 'bg-neo-lime text-neo-black hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5'
               : 'bg-neo-navy-elevated text-gray-500 cursor-not-allowed'

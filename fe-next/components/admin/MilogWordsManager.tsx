@@ -356,7 +356,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
                 exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
               >
                 <Card className={cn(
-                  "bg-neo-navy-light border-slate-700 transition-all",
+                  "bg-neo-navy-light border-slate-700 transition",
                   word.approved_at && "ring-2 ring-neo-yellow"
                 )}>
                   <CardContent className="p-4 space-y-3">

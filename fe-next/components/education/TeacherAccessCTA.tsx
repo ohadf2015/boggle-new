@@ -60,7 +60,7 @@ export function TeacherAccessCTA() {
         data-cta-item
         href={`/${language}/education/access`}
         onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_individual' })}
-        className="mt-4 inline-block rounded-neo border-neo-thick border-neo-navy bg-neo-lime px-6 py-3 font-bold text-neo-navy shadow-hard-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-hard"
+        className="mt-4 inline-block rounded-neo border-neo-thick border-neo-navy bg-neo-lime px-6 py-3 font-bold text-neo-navy shadow-hard-lg transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-hard"
       >
         {t('education.landing.cta.button')}
       </Link>
@@ -69,7 +69,7 @@ export function TeacherAccessCTA() {
         data-testid="teacher-pro-trial-landing-cta"
         href={`/${language}/teacher/upgrade`}
         onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_pro_trial' })}
-        className="mt-3 inline-block rounded-neo border-neo-thick border-neo-navy bg-neo-navy px-6 py-3 font-bold text-neo-cream shadow-hard-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-hard"
+        className="mt-3 inline-block rounded-neo border-neo-thick border-neo-navy bg-neo-navy px-6 py-3 font-bold text-neo-cream shadow-hard-lg transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-hard"
       >
         {t('teacher.subscription.startTrial')}
       </Link>

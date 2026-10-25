@@ -158,7 +158,7 @@ export default function DrillProgressionOverlay({
               aria-label={t('common.close')}
               className={cn(
                 'absolute top-3 right-3 p-1.5 rounded-neo border-2 border-neo-black',
-                'transition-all hover:scale-105',
+                'transition-transform [@media(hover:hover)]:hover:scale-105',
                 isDarkMode ? 'bg-neo-navy-elevated text-neo-white' : 'bg-gray-100 text-neo-black'
               )}
             >

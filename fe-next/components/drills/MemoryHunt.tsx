@@ -247,7 +247,7 @@ export default function MemoryHunt({
                       className={cn(
                         'w-full px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
                         'font-bold text-lg uppercase',
-                        'transition-all hover:translate-y-[-2px] active:scale-95',
+                        'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] hover:translate-y-[-2px] active:scale-95',
                         'bg-neo-green text-neo-black'
                       )}
                     >
@@ -368,7 +368,7 @@ export default function MemoryHunt({
                   className={cn(
                     'px-4 py-3 rounded-neo border-3 border-neo-black shadow-hard',
                     'font-black text-sm uppercase tracking-wide',
-                    'transition-all hover:-translate-y-px active:shadow-hard-pressed',
+                    'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] hover:-translate-y-px active:shadow-hard-pressed',
                     'bg-neo-navy-elevated text-neo-cream'
                   )}
                 >

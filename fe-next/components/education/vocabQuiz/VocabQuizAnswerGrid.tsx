@@ -100,7 +100,7 @@ export function VocabQuizAnswerGrid({
             className={cn(
               'relative h-full min-h-[64px] px-3 py-3 sm:px-4 sm:py-4 rounded-neo border-[2px] border-neo-black',
               'font-neo-display font-bold text-base sm:text-lg text-start break-words',
-              'flex items-center gap-2 sm:gap-3 transition-all',
+              'flex items-center gap-2 sm:gap-3 transition',
               'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-white focus-visible:ring-offset-2',
               faded ? cn(style.dim, style.dimText) : cn(style.base, style.text),
               isSelected ? 'shadow-hard-lg ring-4 ring-neo-white' : 'shadow-hard',

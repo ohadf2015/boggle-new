@@ -89,9 +89,9 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
       {hasUnread && !isOpen && (
           <m.button
             key="chat-badge"
-            initial={{ scale: 0, opacity: 0 }}
+            initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
+            exit={{ scale: 0.95, opacity: 0 }}
             whileTap={{ scale: 0.9 }}
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             onClick={handleOpen}

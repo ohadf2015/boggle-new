@@ -95,7 +95,7 @@ export function CalendarRewardCard({
       onClick={canClaim ? onClaim : undefined}
       disabled={!canClaim}
       className={cn(
-        "relative flex flex-col items-center justify-center p-1 sm:p-2 rounded-neo border transition-all",
+        "relative flex flex-col items-center justify-center p-1 sm:p-2 rounded-neo border transition",
         "min-h-[42px] sm:min-h-[56px] md:min-h-[70px]",
         "border sm:border-2",
         // Base styles

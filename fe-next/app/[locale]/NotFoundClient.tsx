@@ -92,7 +92,7 @@ export default function NotFoundClient() {
         </div>
 
         {/* Heading with neo-brutalist card style */}
-        <div className="bg-neo-lime border-4 border-neo-black rounded-neo shadow-hard-lg p-6 mb-6 transform hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all">
+        <div className="bg-neo-lime border-4 border-neo-black rounded-neo shadow-hard-lg p-6 mb-6 transform hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] transition-[box-shadow,translate,scale,rotate,transform]">
           <h1 className="text-3xl font-black text-neo-black mb-3 uppercase font-neo-display leading-tight">
             {t('notFound.heading')}
           </h1>
@@ -104,7 +104,7 @@ export default function NotFoundClient() {
         {/* Action Button */}
         <Link
           href={homeHref}
-          className="inline-flex items-center justify-center px-8 py-4 bg-neo-cyan text-neo-black font-black uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all duration-150 text-lg font-neo-display"
+          className="inline-flex items-center justify-center px-8 py-4 bg-neo-cyan text-neo-black font-black uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform] duration-150 text-lg font-neo-display"
         >
           {t('notFound.button')}
         </Link>

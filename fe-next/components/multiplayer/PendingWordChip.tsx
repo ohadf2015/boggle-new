@@ -20,7 +20,7 @@ export function PendingWordChip({ word, status, onDismiss }: Props): React.React
     <span
       role="status"
       aria-label={`${word} ${status}`}
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-neo-body font-bold transition-all duration-300 ${statusClass[status]}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-neo-body font-bold transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-300 ${statusClass[status]}`}
       onAnimationEnd={status === 'confirmed' || status === 'rejected' ? () => onDismiss(word) : undefined}
     >
       {word}

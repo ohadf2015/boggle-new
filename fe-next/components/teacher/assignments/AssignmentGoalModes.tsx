@@ -32,7 +32,7 @@ export function AssignmentGoalModes({
           data-testid="assignment-mode-word-count"
           onClick={() => onSelect('word_count')}
           className={cn(
-            'px-4 py-3 rounded-neo border-neo transition-all font-bold',
+            'px-4 py-3 rounded-neo border-neo transition font-bold',
             selectedType === 'word_count'
               ? 'bg-neo-yellow border-neo-yellow text-neo-black shadow-hard-sm'
               : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
@@ -45,7 +45,7 @@ export function AssignmentGoalModes({
           data-testid="assignment-mode-word-list"
           onClick={() => onSelect('word_list')}
           className={cn(
-            'px-4 py-3 rounded-neo border-neo transition-all font-bold',
+            'px-4 py-3 rounded-neo border-neo transition font-bold',
             selectedType === 'word_list'
               ? 'bg-neo-yellow border-neo-yellow text-neo-black shadow-hard-sm'
               : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'

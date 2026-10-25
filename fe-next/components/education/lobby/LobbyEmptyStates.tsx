@@ -19,7 +19,7 @@ const CARD = 'rounded-neo border-[3px] border-neo-cream/30 bg-neo-navy p-8 shado
    width is `border-[3px]`, never `border-neo` — tailwind-merge folds that
    width utility into the colour class and the control ships borderless. */
 const GHOST_BTN =
-  'rounded-neo border-[3px] border-neo-cream bg-neo-navy px-6 py-3 font-bold text-neo-cream shadow-hard-sm transition-all hover:bg-neo-navy-light hover:shadow-hard';
+  'rounded-neo border-[3px] border-neo-cream bg-neo-navy px-6 py-3 font-bold text-neo-cream shadow-hard-sm transition hover:bg-neo-navy-light hover:shadow-hard';
 
 export interface LobbyNoClassroomsProps {
   onBack: () => void;
@@ -39,7 +39,7 @@ export function LobbyNoClassrooms({ onBack, onCreateClassroom }: LobbyNoClassroo
         <button
           type="button"
           onClick={onCreateClassroom}
-          className="rounded-neo border-[3px] border-black bg-neo-cyan px-6 py-3 font-bold text-black shadow-hard transition-all hover:shadow-hard-lg"
+          className="rounded-neo border-[3px] border-black bg-neo-cyan px-6 py-3 font-bold text-black shadow-hard transition hover:shadow-hard-lg"
         >
           {t('education.classroomGame.createClassroom')}
         </button>
@@ -76,7 +76,7 @@ export function LobbyNoLessons({ starterPacks, isCreating, onBack, onCreateLesso
         <button
           type="button"
           onClick={onCreateLesson}
-          className="rounded-neo border-[3px] border-black bg-neo-pink px-6 py-3 font-bold text-black shadow-hard transition-all hover:shadow-hard-lg"
+          className="rounded-neo border-[3px] border-black bg-neo-pink px-6 py-3 font-bold text-black shadow-hard transition hover:shadow-hard-lg"
         >
           {t('education.classroomGame.createLesson')}
         </button>

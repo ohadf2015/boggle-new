@@ -156,7 +156,7 @@ const GameFeedbackCard: React.FC<GameFeedbackCardProps> = ({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              'flex flex-col items-center gap-2 p-3 rounded-lg border-3 border-black font-bold transition-all',
+              'flex flex-col items-center gap-2 p-3 rounded-lg border-3 border-black font-bold transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
               'bg-neo-navy hover:bg-neo-navy/80 text-neo-white shadow-hard-sm',
             )}
           >
@@ -170,7 +170,7 @@ const GameFeedbackCard: React.FC<GameFeedbackCardProps> = ({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              'flex flex-col items-center gap-2 p-3 rounded-lg border-3 border-black font-bold transition-all',
+              'flex flex-col items-center gap-2 p-3 rounded-lg border-3 border-black font-bold transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
               'bg-neo-cyan text-neo-navy hover:bg-neo-cyan/80 shadow-hard-sm',
             )}
           >
@@ -184,7 +184,7 @@ const GameFeedbackCard: React.FC<GameFeedbackCardProps> = ({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={cn(
-              'flex flex-col items-center gap-2 p-3 rounded-lg border-3 border-black font-bold transition-all',
+              'flex flex-col items-center gap-2 p-3 rounded-lg border-3 border-black font-bold transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
               'bg-neo-lime text-neo-navy hover:bg-neo-lime/80 shadow-hard-sm',
             )}
           >

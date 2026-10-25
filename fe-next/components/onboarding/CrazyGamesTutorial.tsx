@@ -245,9 +245,9 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
           <AnimatePresence>
             {!autoTracing && !completed && (
               <m.div
-                initial={{ scale: 0, rotate: 0 }}
-                animate={{ scale: 1, rotate: -10 }}
-                exit={{ scale: 0, opacity: 0 }}
+                initial={{ scale: 0.95, opacity: 0, rotate: 0 }}
+                animate={{ scale: 1, opacity: 1, rotate: -10 }}
+                exit={{ scale: 0.95, opacity: 0 }}
                 transition={{ duration: 0.3, ease: DECEL }}
                 className={`absolute -top-3 ${isRTL ? '-left-3' : '-right-3'} w-14 h-14 rounded-full bg-neo-pink border-neo-thick border-black flex items-center justify-center font-neo-display text-[10px] uppercase text-black tracking-tight leading-none text-center shadow-hard`}
               >

@@ -406,7 +406,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               <Button
                 onClick={() => handleOAuthSignIn('google')}
                 disabled={isAnyLoading}
-                className="w-full py-3 bg-white hover:bg-gray-100 text-gray-800 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold flex items-center justify-center gap-2"
+                className="w-full py-3 bg-white hover:bg-gray-100 text-gray-800 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition font-bold flex items-center justify-center gap-2"
               >
                 {isLoading === 'google' ? (
                   <Loader size="sm" />
@@ -421,7 +421,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               <Button
                 onClick={() => handleOAuthSignIn('discord')}
                 disabled={isAnyLoading}
-                className="w-full py-3 bg-brand-discord hover:bg-brand-discord-hover text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold flex items-center justify-center gap-2"
+                className="w-full py-3 bg-brand-discord hover:bg-brand-discord-hover text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition font-bold flex items-center justify-center gap-2"
               >
                 {isLoading === 'discord' ? (
                   <Loader size="sm" />

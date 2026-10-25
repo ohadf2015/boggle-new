@@ -297,7 +297,7 @@ export function VocabFocusPractice({
                 data-state={state}
                 className={cn(
                   'min-h-16 px-4 py-3 rounded-neo border-[3px] border-black font-neo-display text-lg text-start',
-                  'transition-all shadow-hard active:shadow-hard-pressed active:translate-y-0.5',
+                  'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] shadow-hard active:shadow-hard-pressed active:translate-y-0.5',
                   'disabled:cursor-default',
                   state === 'idle' && 'bg-neo-cream text-neo-black hover:bg-neo-white',
                   state === 'idle' && answered && 'opacity-60',

@@ -59,7 +59,7 @@ export const TryAnotherLanguage: React.FC<TryAnotherLanguageProps> = ({
           <Button
             key={option.code}
             onClick={() => handleLanguageClick(option.code)}
-            className="px-4 py-2.5 bg-linear-to-r from-neo-cyan to-neo-purple hover:from-neo-cyan/90 hover:to-neo-purple/90 text-white font-bold text-sm border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center gap-2"
+            className="px-4 py-2.5 bg-linear-to-r from-neo-cyan to-neo-purple hover:from-neo-cyan/90 hover:to-neo-purple/90 text-white font-bold text-sm border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] flex items-center gap-2"
           >
             <span className="text-lg">{option.flag}</span>
             <span className="uppercase tracking-wide">{option.name}</span>

@@ -101,7 +101,7 @@ export default function StudentPageClient() {
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="min-h-[44px] w-full rounded-neo border-3 border-black bg-neo-black px-6 py-3 font-neo-display font-black text-neo-lime shadow-hard-sm transition-all hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]"
+            className="min-h-[44px] w-full rounded-neo border-3 border-black bg-neo-black px-6 py-3 font-neo-display font-black text-neo-lime shadow-hard-sm transition-[box-shadow,translate,scale,rotate,transform] hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]"
           >
             {t('student.profileStalled.retry')}
           </button>

@@ -114,7 +114,7 @@ export default function FriendsPageClient(): React.JSX.Element {
             onClick={() => router.push(`/${language}`)}
             className={cn(
               'p-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
-              'hover:shadow-hard hover:-translate-y-0.5 transition-all',
+              'hover:shadow-hard hover:-translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform]',
               isDark ? 'bg-neo-navy-elevated text-white' : 'bg-white text-gray-900'
             )}
           >
@@ -169,7 +169,7 @@ export default function FriendsPageClient(): React.JSX.Element {
                   <button type="button"
                     onClick={() => { void loginCrazyGames(); }}
                     disabled={isCrazyGamesLoggingIn}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black shadow-hard bg-neo-lime text-neo-black font-bold hover:shadow-hard-pressed hover:translate-y-px transition-all disabled:opacity-60"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black shadow-hard bg-neo-lime text-neo-black font-bold hover:shadow-hard-pressed hover:translate-y-px transition-[box-shadow,translate,scale,rotate,transform,opacity] disabled:opacity-60"
                   >
                     {isCrazyGamesLoggingIn ? '…' : t('auth.loginCrazyGames')}
                   </button>
@@ -185,14 +185,14 @@ export default function FriendsPageClient(): React.JSX.Element {
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
                     <button type="button"
                       onClick={() => { setAuthModalMode('signup'); setShowAuthModal(true); }}
-                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-neo border-2 border-neo-black shadow-hard bg-neo-lime text-neo-black font-bold uppercase tracking-wide hover:shadow-hard-pressed hover:translate-y-px transition-all"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-neo border-2 border-neo-black shadow-hard bg-neo-lime text-neo-black font-bold uppercase tracking-wide hover:shadow-hard-pressed hover:translate-y-px transition-[box-shadow,translate,scale,rotate,transform]"
                     >
                       <User size={16} aria-hidden="true" />
                       {t('auth.signUp')}
                     </button>
                     <button type="button"
                       onClick={() => { setAuthModalMode('signin'); setShowAuthModal(true); }}
-                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-neo border-2 border-neo-black shadow-hard bg-neo-pink text-white font-bold uppercase tracking-wide hover:shadow-hard-pressed hover:translate-y-px transition-all"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-neo border-2 border-neo-black shadow-hard bg-neo-pink text-white font-bold uppercase tracking-wide hover:shadow-hard-pressed hover:translate-y-px transition-[box-shadow,translate,scale,rotate,transform]"
                     >
                       <LogIn size={16} aria-hidden="true" />
                       {t('auth.signIn')}

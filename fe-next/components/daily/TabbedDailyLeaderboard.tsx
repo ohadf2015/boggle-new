@@ -856,7 +856,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
           <button
             type="button"
             onClick={retry}
-            className="block mx-auto mt-3 px-4 py-1.5 text-xs font-bold uppercase rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm hover:shadow-hard active:translate-y-0.5 active:shadow-none transition-all"
+            className="block mx-auto mt-3 px-4 py-1.5 text-xs font-bold uppercase rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm hover:shadow-hard active:translate-y-0.5 active:shadow-none transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]"
           >
             {t('common.retry')}
           </button>
@@ -1078,7 +1078,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
             title={t('wordHunt.leaderboard.languageScope')}
             className={`
               shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-neo-black
-              text-[10px] sm:text-xs font-black shadow-hard-sm transition-all
+              text-[10px] sm:text-xs font-black shadow-hard-sm transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]
               hover:-translate-y-px hover:shadow-hard active:translate-y-0.5 active:shadow-none
               ${languageScope === 'all' ? 'bg-neo-lime text-neo-black' : 'bg-neo-cream text-neo-black'}
             `}
@@ -1149,7 +1149,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                     title={s.name}
                     className={`
                       shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-neo border-2 border-neo-black
-                      text-[11px] sm:text-xs font-black transition-all shadow-hard-sm
+                      text-[11px] sm:text-xs font-black transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] shadow-hard-sm
                       hover:-translate-y-px hover:shadow-hard active:translate-y-0.5 active:shadow-none
                       ${active ? 'text-neo-black' : 'bg-neo-navy text-neo-white/80'}
                     `}

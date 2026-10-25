@@ -162,7 +162,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
           'border-4 lg:border-4 border-neo-cream/40',
           'shadow-hard-lg',
           'rounded-neo-lg',
-          'transition-all duration-100',
+          'transition duration-100',
           'min-w-0'
         )}
       >
@@ -180,7 +180,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 'rounded-neo shadow-hard-sm',
                 'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
                 'active:translate-x-px active:translate-y-px active:shadow-none',
-                'transition-all duration-100',
+                'transition duration-100',
                 'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
               )}
               aria-label={t('common.back')}

@@ -127,7 +127,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
         whileHover={!isDisabled ? { scale: 1.02, y: -2 } : {}}
         whileTap={!isDisabled ? { scale: 0.98 } : {}}
         className={cn(
-          "relative overflow-hidden rounded-neo-lg border-3 border-neo-black shadow-hard transition-all cursor-pointer",
+          "relative overflow-hidden rounded-neo-lg border-3 border-neo-black shadow-hard transition-[box-shadow,background-color,border-color,color,opacity] cursor-pointer",
           showSuccess
             ? "bg-linear-to-br from-neo-lime to-emerald-500"
             : isDisabled
@@ -183,7 +183,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
           onClick={showAd}
           disabled={isDisabled}
           className={cn(
-            "w-full py-3 text-base font-black uppercase border-2 border-neo-black rounded-neo shadow-hard transition-all",
+            "w-full py-3 text-base font-black uppercase border-2 border-neo-black rounded-neo shadow-hard transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]",
             showSuccess
               ? "bg-neo-lime text-neo-black"
               : isDisabled

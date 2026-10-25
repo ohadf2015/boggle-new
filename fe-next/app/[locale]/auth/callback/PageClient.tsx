@@ -102,7 +102,7 @@ function LoadingUI({ secondsRemaining, showRetry, onRetry, locale }: LoadingUIPr
                          rounded-neo border-neo-thick border-black shadow-hard
                          hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px]
                          active:shadow-none active:translate-x-[4px] active:translate-y-[4px]
-                         transition-all duration-150"
+                         transition-[box-shadow,translate,scale,rotate,transform] duration-150"
             >
               {t('auth.callback.tryAgain')}
             </button>

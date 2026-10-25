@@ -299,7 +299,7 @@ export function ClassroomModeBanner({
                   onClick={handleCopy}
                   className={cn(
                     'p-3 rounded-neo border-neo border-neo-black bg-neo-cream text-neo-black',
-                    'shadow-hard hover:shadow-hard-lg transition-all',
+                    'shadow-hard hover:shadow-hard-lg transition',
                     copied && 'bg-neo-lime'
                   )}
                   aria-label={t('share.copyLink')}

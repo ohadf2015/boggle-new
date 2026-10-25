@@ -72,7 +72,7 @@ export function ClassroomGuestDemo() {
             )}
             <button
               type="submit"
-              className="rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed"
+              className="rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-black uppercase tracking-wider text-neo-navy shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed"
             >
               {t('joinByCode.submit')}
             </button>

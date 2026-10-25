@@ -113,7 +113,7 @@ export function ClassroomWaitingStage({
           type="button"
           onClick={onExit}
           aria-label={t('common.exit')}
-          className="flex size-9 shrink-0 items-center justify-center rounded border-2 border-neo-black bg-neo-red text-neo-black shadow-hard-sm transition-all active:translate-y-0.5 active:shadow-none"
+          className="flex size-9 shrink-0 items-center justify-center rounded border-2 border-neo-black bg-neo-red text-neo-black shadow-hard-sm transition active:translate-y-0.5 active:shadow-none"
         >
           <LogOut className="size-4 text-neo-black rtl:scale-x-[-1]" aria-hidden="true" />
         </button>

@@ -138,7 +138,7 @@ export function TourScene3() {
             key={student.id}
             className={cn(
               'flex items-center gap-3 p-3 rounded-neo border-2 border-neo-white/60',
-              'bg-neo-navy transition-all duration-300',
+              'bg-neo-navy transition duration-300',
               i < joinedCount ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
             )}
             style={{
@@ -214,7 +214,7 @@ export function TourScene4() {
                   className={cn(
                     'w-12 h-12 flex items-center justify-center',
                     'rounded-neo border-2 font-neo-display font-black text-lg',
-                    'transition-all duration-300',
+                    'transition duration-300',
                     isHighlighted
                       ? 'bg-neo-lime text-neo-black shadow-hard border-neo-black'
                       : 'bg-neo-white/20 text-neo-white border-neo-white/60'
@@ -295,7 +295,7 @@ export function TourScene5() {
             <div className="h-32 w-12 bg-neo-black/20 border-2 border-neo-white/40 rounded-neo-sm flex items-end overflow-hidden">
               <div
                 className={cn(
-                  'w-full transition-all duration-500 ease-out',
+                  'w-full transition-[height] duration-500 ease-out',
                   student.color
                 )}
                 style={{

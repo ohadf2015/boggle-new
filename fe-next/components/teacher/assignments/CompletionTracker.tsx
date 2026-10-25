@@ -113,7 +113,7 @@ export default function CompletionTracker({
         </div>
         <div className="w-full h-3 bg-neo-black/30 rounded-full overflow-hidden border border-neo-cream/40">
           <div
-            className="h-full bg-neo-cyan transition-all duration-300"
+            className="h-full bg-neo-cyan transition-[width] duration-300"
             style={{ width: `${completionPercentage}%` }}
           />
         </div>
@@ -225,7 +225,7 @@ export default function CompletionTracker({
                       <div className="h-2 bg-neo-black/30 rounded-full overflow-hidden">
                         <div
                           className={cn(
-                            'h-full transition-all',
+                            'h-full transition-[width,background-color]',
                             item.errorRate > 66 ? 'bg-red-500' :
                             item.errorRate > 33 ? 'bg-neo-orange' :
                             'bg-neo-lime'

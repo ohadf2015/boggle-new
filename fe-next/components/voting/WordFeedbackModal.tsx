@@ -321,7 +321,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                     flex flex-col items-center gap-2
                     hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
                     active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm
-                    transition-all duration-150
+                    transition duration-150
                   "
                 >
                   <ThumbsDown className="w-5 h-5" />
@@ -343,7 +343,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                     flex flex-col items-center gap-2
                     hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
                     active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm
-                    transition-all duration-150
+                    transition duration-150
                   "
                 >
                   <HelpCircle className="w-5 h-5" />
@@ -365,7 +365,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                     flex flex-col items-center gap-2
                     hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
                     active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm
-                    transition-all duration-150
+                    transition duration-150
                   "
                 >
                   <ThumbsUp className="w-5 h-5" />

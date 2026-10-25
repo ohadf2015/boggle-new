@@ -65,7 +65,7 @@ export function ReportDialog({ open, onClose, onSubmit, t, titleKey }: ReportDia
                 onClick={() => setReason(r)}
                 aria-pressed={reason === r}
                 className={cn(
-                  'w-full text-start px-3 py-2.5 rounded-neo border-2 border-neo-black font-black text-sm uppercase tracking-wide transition-all',
+                  'w-full text-start px-3 py-2.5 rounded-neo border-2 border-neo-black font-black text-sm uppercase tracking-wide transition',
                   reason === r
                     ? 'bg-neo-pink text-neo-white shadow-hard'
                     : 'bg-neo-cream dark:bg-neo-navy-light text-neo-black dark:text-neo-white shadow-hard-sm hover:-translate-y-0.5'

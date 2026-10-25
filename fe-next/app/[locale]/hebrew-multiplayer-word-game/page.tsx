@@ -155,19 +155,19 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
         <section className="mb-12 flex flex-col gap-3 sm:flex-row-reverse sm:gap-4">
           <Link
             href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
           >
             התחילו לשחק
           </Link>
           <Link
             href={`/${locale}/singleplayer`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
           >
             משחק יחיד
           </Link>
           <Link
             href={`/${locale}/daily`}
-            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 font-bold text-neo-pink shadow-hard transition-all hover:bg-neo-pink/10 sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4"
           >
             אתגר יומי
           </Link>
@@ -217,28 +217,28 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
           <div className="grid gap-3 sm:grid-cols-2">
             <Link
               href={`/${locale}/daily`}
-              className="rounded-neo border-3 border-neo-lime/60 bg-neo-navy-light p-4 shadow-hard transition-all hover:border-neo-lime"
+              className="rounded-neo border-3 border-neo-lime/60 bg-neo-navy-light p-4 shadow-hard transition-[border-color] hover:border-neo-lime"
             >
               <h3 className="font-neo-display font-bold text-neo-lime">המילה היומית — מילת היום</h3>
               <p className="mt-1 text-xs text-slate-300">גלגל מילים וציד מילים — חידה חדשה כל יום עם טבלת מובילים גלובלית.</p>
             </Link>
             <Link
               href={`/${locale}/words`}
-              className="rounded-neo border-3 border-neo-cyan/60 bg-neo-navy-light p-4 shadow-hard transition-all hover:border-neo-cyan"
+              className="rounded-neo border-3 border-neo-cyan/60 bg-neo-navy-light p-4 shadow-hard transition-[border-color] hover:border-neo-cyan"
             >
               <h3 className="font-neo-display font-bold text-neo-cyan">מילון מילים בעברית</h3>
               <p className="mt-1 text-xs text-slate-300">חפשו לפי אורך מילה או אות ראשונה — כל המילים התקניות במשחק.</p>
             </Link>
             <Link
               href={`/${locale}/anagram`}
-              className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy-light p-4 shadow-hard transition-all hover:border-neo-pink"
+              className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy-light p-4 shadow-hard transition-[border-color] hover:border-neo-pink"
             >
               <h3 className="font-neo-display font-bold text-neo-pink">פותר אנגרמות בעברית</h3>
               <p className="mt-1 text-xs text-slate-300">הכניסו אותיות וגלו כל המילים האפשריות שאפשר לבנות.</p>
             </Link>
             <Link
               href={`/${locale}/leaderboard`}
-              className="rounded-neo border-3 border-neo-yellow/60 bg-neo-navy-light p-4 shadow-hard transition-all hover:border-neo-yellow"
+              className="rounded-neo border-3 border-neo-yellow/60 bg-neo-navy-light p-4 shadow-hard transition-[border-color] hover:border-neo-yellow"
             >
               <h3 className="font-neo-display font-bold text-neo-yellow">טבלת מובילים</h3>
               <p className="mt-1 text-xs text-slate-300">דירוגים יומיים, שבועיים וכלליים — עלו בדירוג הגלובלי.</p>

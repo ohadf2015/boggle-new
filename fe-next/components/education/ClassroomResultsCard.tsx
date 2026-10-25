@@ -294,7 +294,7 @@ export function ClassroomResultsCard({
         className={cn(
           'mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
           'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
-          'shadow-hard hover:shadow-hard-lg transition-all'
+          'shadow-hard hover:shadow-hard-lg transition'
         )}
       >
         {links.shareState === 'idle' ? (

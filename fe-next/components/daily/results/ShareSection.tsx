@@ -70,7 +70,7 @@ function WatchAdRetryButton({
     <Button
       onClick={() => void showAd()}
       disabled={disabled}
-      className="w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-all bg-linear-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 disabled:opacity-50"
+      className="w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] bg-linear-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 disabled:opacity-50"
     >
       {busy ? (
         <Loader2 className="me-2 w-5 h-5 animate-spin" />
@@ -153,7 +153,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
                 onClick={handleRetryClick}
                 disabled={!canAffordRetry || isRetrying}
                 className={cn(
-                  "w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-all",
+                  "w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]",
                   canAffordRetry && !isRetrying
                     ? "bg-linear-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
                     : "bg-gray-400 text-gray-600 border-neo-black cursor-not-allowed shadow-hard"
@@ -187,7 +187,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
         /* Winners: Challenge Friends CTA (falls back to native share) */
         <Button
           onClick={onChallengeShare ?? onShare}
-          className="w-full sm:max-w-btn sm:mx-auto py-3.5 text-lg font-black uppercase bg-linear-to-r from-neo-lime via-neo-lime to-neo-pink text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all"
+          className="w-full sm:max-w-btn sm:mx-auto py-3.5 text-lg font-black uppercase bg-linear-to-r from-neo-lime via-neo-lime to-neo-pink text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]"
         >
           <Share2 className="me-2 w-5 h-5" />
           {t('wordHunt.results.challengeFriends')}

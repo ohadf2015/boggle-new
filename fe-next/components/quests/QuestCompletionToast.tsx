@@ -136,7 +136,7 @@ export function showQuestCompletionToast({
           toastInstance.visible
             ? 'animate-[celebrationPop_0.5s_cubic-bezier(0.34,1.56,0.64,1)_forwards]'
             : 'opacity-0 scale-50',
-          'transition-all duration-300',
+          'transition duration-300',
         )}
         role="status"
         aria-live="assertive"

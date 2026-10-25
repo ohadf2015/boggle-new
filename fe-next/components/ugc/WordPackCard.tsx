@@ -43,7 +43,7 @@ function WordPackCardCompact({ pack, onPlay, className }: Pick<WordPackCardProps
         'bg-neo-navy border-2 border-black rounded-neo shadow-hard-sm',
         'hover:shadow-hard hover:-translate-y-0.5',
         'active:shadow-hard-pressed active:translate-y-0',
-        'transition-all duration-150 text-start w-full',
+        'transition duration-150 text-start w-full',
         className
       )}
     >
@@ -77,7 +77,7 @@ function WordPackCardCompact({ pack, onPlay, className }: Pick<WordPackCardProps
       <div className={cn(
         'shrink-0 w-8 h-8 flex items-center justify-center',
         'bg-neo-lime border-2 border-black rounded-neo shadow-hard-sm',
-        'group-hover:shadow-hard transition-all duration-100'
+        'group-hover:shadow-hard transition duration-100'
       )}>
         <Play size={14} className="text-black" />
       </div>
@@ -105,7 +105,7 @@ const WordPackCard = memo(function WordPackCard({
       'bg-neo-navy border-3 border-black rounded-neo',
       'shadow-hard hover:shadow-hard-lg',
       'hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed',
-      'transition-all duration-150',
+      'transition duration-150',
       className
     )}>
       {/* Pink accent strip */}
@@ -186,7 +186,7 @@ const WordPackCard = memo(function WordPackCard({
             'bg-neo-lime text-black font-neo-display text-sm',
             'border-2 border-black rounded-neo shadow-hard-sm',
             'hover:shadow-hard active:shadow-hard-pressed',
-            'transition-all duration-100'
+            'transition duration-100'
           )}
         >
           <Play className="w-4 h-4" aria-hidden="true" />
@@ -200,7 +200,7 @@ const WordPackCard = memo(function WordPackCard({
           className={cn(
             'flex items-center gap-1.5 px-3 py-2',
             'font-neo-display text-sm border-2 border-black rounded-neo shadow-hard-sm',
-            'hover:shadow-hard active:shadow-hard-pressed transition-all duration-100',
+            'hover:shadow-hard active:shadow-hard-pressed transition duration-100',
             isUpvoted
               ? 'bg-neo-pink text-white'
               : 'bg-neo-navy text-neo-white hover:bg-neo-white/5'

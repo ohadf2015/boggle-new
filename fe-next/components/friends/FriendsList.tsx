@@ -610,7 +610,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
               aria-controls={`friends-panel-${tab}`}
               onClick={() => setActiveTab(tab)}
               className={cn(
-                'flex items-center gap-2 px-3 sm:px-4 py-2 font-bold text-sm transition-all whitespace-nowrap shrink-0',
+                'flex items-center gap-2 px-3 sm:px-4 py-2 font-bold text-sm transition whitespace-nowrap shrink-0',
                 isActive
                   ? 'bg-neo-cyan text-neo-black border-2 border-neo-black border-b-0 -mb-0.5'
                   : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'

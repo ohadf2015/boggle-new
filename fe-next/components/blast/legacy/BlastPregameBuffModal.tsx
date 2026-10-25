@@ -70,7 +70,7 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
                     data-testid={`blast-pregame-buff-${id}`}
                     onClick={() => setSelected(id)}
                     aria-pressed={isSel}
-                    className={`flex flex-col items-center gap-2 rounded-neo border-neo-thick border-black ${color} p-3 font-neo-display text-xs font-black text-neo-navy shadow-hard transition-all hover:scale-105 ${isSel ? `translate-x-[1px] translate-y-[1px] shadow-hard-pressed ring-4 ${ring} scale-105` : ''}`}
+                    className={`flex flex-col items-center gap-2 rounded-neo border-neo-thick border-black ${color} p-3 font-neo-display text-xs font-black text-neo-navy shadow-hard transition-[transform,box-shadow] [@media(hover:hover)]:hover:scale-105 ${isSel ? `translate-x-[1px] translate-y-[1px] shadow-hard-pressed ring-4 ${ring} scale-105` : ''}`}
                   >
                     <Icon className="h-7 w-7" strokeWidth={3} />
                     <span>{t(`blast.pregameBuff.${id}`)}</span>
@@ -101,7 +101,7 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
                   data-testid="blast-pregame-buff-cta"
                   onClick={offer}
                   disabled={selected === null}
-                  className="flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-4 font-neo-display text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard-lg transition-all hover:bg-neo-lime-light active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-neo-lime"
+                  className="flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-4 font-neo-display text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard-lg transition-[background-color,transform,box-shadow,opacity] hover:bg-neo-lime-light active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-neo-lime"
                 >
                   <Play className="h-5 w-5 fill-neo-navy" strokeWidth={3} />
                   {selected

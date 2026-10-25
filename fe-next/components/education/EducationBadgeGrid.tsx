@@ -159,7 +159,7 @@ export default function EducationBadgeGrid({
             aria-valuemax={100}
           >
             <div
-              className="h-full bg-neo-lime transition-all duration-500"
+              className="h-full bg-neo-lime transition-[width] duration-500"
               style={{ width: `${completionPercent}%` }}
             />
           </div>
@@ -237,7 +237,7 @@ export default function EducationBadgeGrid({
                   })}
                 </span>
                 <ChevronDown
-                  className={`w-5 h-5 text-neo-white group-hover:text-neo-cyan transition-all duration-200 ${
+                  className={`w-5 h-5 text-neo-white group-hover:text-neo-cyan transition-transform duration-200 ${
                     isCollapsed ? '-rotate-90' : 'rotate-0'
                   }`}
                 />
@@ -252,7 +252,7 @@ export default function EducationBadgeGrid({
               data-expanded={!isCollapsed}
               role="region"
               className={cn(
-                'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-all duration-300 origin-top',
+                'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-[opacity,scale,grid-template-rows,height] duration-300 origin-top',
                 isCollapsed
                   ? 'grid-rows-[0fr] opacity-0 scale-y-0 h-0 overflow-hidden'
                   : 'grid-rows-[1fr] opacity-100 scale-y-100'

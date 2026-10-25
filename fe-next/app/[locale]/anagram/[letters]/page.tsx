@@ -240,7 +240,7 @@ export default async function AnagramPage({ params }: PageParams) {
                 </div>
                 <Link
                   href={`/${locale}/singleplayer`}
-                  className="shrink-0 bg-neo-lime text-neo-black font-neo-display font-black px-5 py-2.5 rounded-neo border-3 border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-all"
+                  className="shrink-0 bg-neo-lime text-neo-black font-neo-display font-black px-5 py-2.5 rounded-neo border-3 border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform]"
                 >
                   Play Free →
                 </Link>
@@ -261,7 +261,7 @@ export default async function AnagramPage({ params }: PageParams) {
                       <Link
                         key={word}
                         href={`/${locale}/words/${word}`}
-                        className="group flex items-center justify-between bg-neo-navy border border-slate-700 hover:border-neo-cyan hover:shadow-[0_0_12px_rgba(0,255,255,0.15)] rounded-neo px-3 py-2 transition-all duration-200"
+                        className="group flex items-center justify-between bg-neo-navy border border-slate-700 hover:border-neo-cyan hover:shadow-[0_0_12px_rgba(0,255,255,0.15)] rounded-neo px-3 py-2 transition-[border-color,box-shadow] duration-200"
                       >
                         <span className="font-bold text-sm text-neo-white group-hover:text-neo-lime transition-colors uppercase tracking-wide">
                           {word}

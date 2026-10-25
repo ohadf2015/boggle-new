@@ -90,7 +90,7 @@ export function GameModePopularity() {
                 </span>
                 <div className="flex-1 h-5 bg-neo-navy-elevated/50 rounded-sm overflow-hidden">
                   <div
-                    className={cn('h-full rounded-sm transition-all duration-500', config.barColor)}
+                    className={cn('h-full rounded-sm transition-[width] duration-500', config.barColor)}
                     style={{ width: `${barWidth}%`, opacity: 0.8 }}
                   />
                 </div>

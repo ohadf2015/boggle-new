@@ -210,7 +210,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
           aria-disabled={!isValid || disabled}
           className={cn(
             'shrink-0 p-2 rounded-neo border-2 border-neo-black',
-            'transition-all',
+            'transition',
             isValid && !disabled
               ? 'bg-neo-cyan shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5'
               : 'bg-gray-600 opacity-50'

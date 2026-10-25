@@ -60,7 +60,7 @@ export default function PracticePickerHero({ tile, onSelect }: PracticePickerHer
       // depend on a stylesheet being in step with the markup.
       style={{ minHeight: 248 }}
       className={cn(
-        'group relative flex w-full flex-col overflow-hidden rounded-neo border-[3px] border-black text-start shadow-hard-lg transition-all',
+        'group relative flex w-full flex-col overflow-hidden rounded-neo border-[3px] border-black text-start shadow-hard-lg transition',
         accent,
         'text-black hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-hard'
       )}

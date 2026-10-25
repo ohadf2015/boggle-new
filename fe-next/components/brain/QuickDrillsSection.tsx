@@ -46,8 +46,8 @@ export default function QuickDrillsSection({ drillProgress = EMPTY_DRILL_PROGRES
               transition={{ delay: index * 0.05 }}
               onClick={() => router.push(`/${language}/brain/drills/${drillId}`)}
               className={cn(
-                'flex flex-col p-3 md:p-5 rounded-neo border-2 border-neo-black w-full transition-all relative',
-                'shadow-hard-sm hover:translate-y-[-2px] hover:shadow-hard active:translate-y-[2px] active:shadow-none',
+                'flex flex-col p-3 md:p-5 rounded-neo border-2 border-neo-black w-full transition-[transform,box-shadow] relative',
+                'shadow-hard-sm [@media(hover:hover)]:hover:translate-y-[-2px] hover:shadow-hard active:translate-y-[2px] active:shadow-none',
                 isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
               )}
             >

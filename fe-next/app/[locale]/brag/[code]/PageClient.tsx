@@ -53,7 +53,7 @@ export default function BragPageClient({
 
         <Link
           href={joinHref}
-          className="w-full flex items-center justify-center py-4 px-6 border-neo-thick border-black bg-neo-lime text-neo-navy font-neo-display font-bold text-lg rounded-neo shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed transition-all"
+          className="w-full flex items-center justify-center py-4 px-6 border-neo-thick border-black bg-neo-lime text-neo-navy font-neo-display font-bold text-lg rounded-neo shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed transition-[box-shadow]"
         >
           {t('brag.page.cta', 'Take the rematch')}
         </Link>

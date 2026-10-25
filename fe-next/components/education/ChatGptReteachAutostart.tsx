@@ -20,9 +20,9 @@ export interface ChatGptReteachAutostartProps {
 }
 
 const primaryClass =
-  'mt-6 inline-flex w-full items-center justify-center gap-2 px-4 py-3 font-bold bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all';
+  'mt-6 inline-flex w-full items-center justify-center gap-2 px-4 py-3 font-bold bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition';
 const secondaryClass =
-  'mt-3 inline-flex w-full items-center justify-center px-4 py-3 font-bold bg-neo-navy text-neo-white border-neo border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all';
+  'mt-3 inline-flex w-full items-center justify-center px-4 py-3 font-bold bg-neo-navy text-neo-white border-neo border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition';
 
 export function ChatGptReteachAutostart({
   payload,

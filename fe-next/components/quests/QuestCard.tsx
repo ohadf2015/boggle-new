@@ -48,7 +48,7 @@ export function QuestCard({
         'rounded-neo-lg border-3 border-neo-black',
         'bg-neo-navy-light',
         'shadow-hard-sm',
-        'transition-all duration-200',
+        'transition duration-200',
         'hover:-translate-y-1 hover:shadow-hard',
         'active:translate-y-px active:shadow-hard-pressed',
         'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
@@ -77,8 +77,8 @@ export function QuestCard({
           {completed ? (
             <AdaptiveMotion.div
               className="w-8 h-8 rounded-full bg-neo-lime flex items-center justify-center border-2 border-neo-black"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 400, damping: 12 }}
             >
               <Check className="w-5 h-5 text-neo-black" aria-hidden="true" />
@@ -151,7 +151,7 @@ export function QuestCard({
               'font-neo-display text-sm font-black uppercase',
               'shadow-hard-sm',
               'group-hover:shadow-hard group-hover:-translate-y-px',
-              'transition-all duration-100',
+              'transition duration-100',
             )}
           >
             {t('quests.go')}

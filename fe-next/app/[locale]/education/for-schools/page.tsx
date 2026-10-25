@@ -113,10 +113,10 @@ export default async function Page({ params }: PageProps) {
             <NoAccountCta locale={locale} className="mt-7" />
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href={`/${locale}/education/classroom-game`} data-ph-capture-attribute-cta="hero_free_game" className="rounded-neo border-4 border-neo-black bg-neo-lime px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
+              <Link href={`/${locale}/education/classroom-game`} data-ph-capture-attribute-cta="hero_free_game" className="rounded-neo border-4 border-neo-black bg-neo-lime px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
                 {c.heroCta1}
               </Link>
-              <a href="#lead" data-ph-capture-attribute-cta="hero_tell_us" className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
+              <a href="#lead" data-ph-capture-attribute-cta="hero_tell_us" className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
                 {c.heroCta2}
               </a>
             </div>
@@ -207,7 +207,7 @@ export default async function Page({ params }: PageProps) {
         {/* Closing CTA — don't dead-end a high-intent reader who scrolled the whole page */}
         <section className="mt-16 text-center">
           <h2 className="font-neo-display text-2xl font-black sm:text-3xl">{c.closingTitle}</h2>
-          <a href="#lead" className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-pink px-8 py-4 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
+          <a href="#lead" className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-pink px-8 py-4 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
             {c.closingCta}
           </a>
         </section>

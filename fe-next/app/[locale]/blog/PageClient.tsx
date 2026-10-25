@@ -89,7 +89,7 @@ export default function BlogIndexPageClient(): React.ReactElement {
                 key={post.slug}
                 href={`/${locale}/blog/${post.slug}`}
                 className={cn(
-                  'group block rounded-neo border-3 border-neo-black transition-all hover:scale-[1.02] overflow-hidden',
+                  'group block rounded-neo border-3 border-neo-black transition-[translate,scale,rotate,transform,background-color,box-shadow] hover:scale-[1.02] overflow-hidden',
                   isDarkMode
                     ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
                     : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'

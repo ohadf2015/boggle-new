@@ -172,7 +172,7 @@ export function KeyboardHintTooltip({
               'font-bold text-[11px] uppercase',
               'shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
               'active:translate-x-px active:translate-y-px active:shadow-none',
-              'transition-all'
+              'transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]'
             )}
           >
             {t('keyboardHint.gotIt')}

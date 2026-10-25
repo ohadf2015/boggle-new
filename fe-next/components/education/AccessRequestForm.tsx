@@ -22,7 +22,7 @@ const USE_CASE_EXAMPLE_KEYS = ['use_case_ex1', 'use_case_ex2', 'use_case_ex3'] a
 
 const FIELD_CLASS =
   'mt-1 w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white placeholder-neo-white/40 p-3 ' +
-  'transition-all duration-150 outline-none ' +
+  'transition duration-150 outline-none ' +
   'focus:border-neo-lime focus:shadow-hard focus:-translate-y-0.5';
 const LABEL_CLASS = 'block text-sm font-semibold text-neo-white font-neo-display';
 
@@ -141,7 +141,7 @@ export function AccessRequestForm({
         <button
           type="button"
           onClick={() => setApprovalPending(false)}
-          className="mt-4 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-2 text-sm font-bold text-neo-white font-neo-display shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard active:shadow-hard-pressed"
+          className="mt-4 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-2 text-sm font-bold text-neo-white font-neo-display shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard active:shadow-hard-pressed"
         >
           {t('education.access.approval_pending_back')}
         </button>
@@ -258,7 +258,7 @@ export function AccessRequestForm({
                 aria-checked={selected}
                 onClick={() => setRole(value)}
                 whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
-                className={`flex items-center gap-2 rounded-neo border-neo p-3 text-start font-semibold font-neo-display shadow-hard-sm transition-all ${
+                className={`flex items-center gap-2 rounded-neo border-neo p-3 text-start font-semibold font-neo-display shadow-hard-sm transition ${
                   selected
                     ? 'border-neo-black bg-neo-lime text-neo-navy -translate-y-0.5 shadow-hard'
                     : 'border-neo-cream/40 bg-neo-navy text-neo-white hover:-translate-y-0.5 hover:shadow-hard'
@@ -294,7 +294,7 @@ export function AccessRequestForm({
               key={k}
               type="button"
               onClick={() => setUseCase(t(`education.access.${k}`))}
-              className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-2 py-1 text-xs text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:bg-neo-cyan hover:text-neo-navy"
+              className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-2 py-1 text-xs text-neo-white shadow-hard-sm transition hover:-translate-y-0.5 hover:bg-neo-cyan hover:text-neo-navy"
             >
               {t(`education.access.${k}`)}
             </button>

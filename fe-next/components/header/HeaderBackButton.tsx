@@ -27,7 +27,7 @@ export const HeaderBackButton = memo(function HeaderBackButton() {
         'px-2 py-1.5 lg:px-2.5 rounded-neo border-neo border-black dark:border-neo-cream/40',
         'bg-neo-white dark:bg-neo-navy-light text-neo-navy dark:text-neo-white',
         'shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-[1px]',
-        'font-neo-body font-bold text-sm transition-all duration-100'
+        'font-neo-body font-bold text-sm transition duration-100'
       )}
     >
       <ArrowLeft className="w-4 h-4 rtl:rotate-180" aria-hidden="true" />

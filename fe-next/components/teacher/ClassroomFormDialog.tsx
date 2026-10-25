@@ -101,7 +101,7 @@ export function ClassroomFormDialog({
             <Button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="flex-1 bg-neo-cream text-black font-black border-2 border-black shadow-hard-sm hover:bg-black/5 transition-all"
+              className="flex-1 bg-neo-cream text-black font-black border-2 border-black shadow-hard-sm hover:bg-black/5 transition"
             >
               {t('common.cancel')}
             </Button>
@@ -109,7 +109,7 @@ export function ClassroomFormDialog({
               type="button"
               onClick={handleSubmit}
               disabled={isSaving || !name.trim()}
-              className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all"
+              className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition"
             >
               {isSaving ? t('common.loading') : t('teacher.classroom.edit')}
             </Button>

@@ -236,7 +236,7 @@ export default function PlayerProfilePageClient() {
                 'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm',
                 'bg-neo-orange text-neo-black font-black text-sm uppercase',
                 'hover:brightness-110 active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
-                'transition-all'
+                'transition-[filter,box-shadow,translate,scale,rotate,transform]'
               )}
             >
               <Swords className="w-4 h-4" />
@@ -363,7 +363,7 @@ function FriendButton({
   const base = cn(
     'flex items-center justify-center gap-1.5',
     'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm',
-    'font-black text-sm uppercase transition-all',
+    'font-black text-sm uppercase transition-[filter,box-shadow,translate,scale,rotate,transform]',
   );
 
   if (state === 'loading') {

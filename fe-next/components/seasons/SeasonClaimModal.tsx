@@ -382,7 +382,7 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
                     border-neo border-black rounded-neo shadow-hard-sm
                     hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5
                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink
-                    transition-all
+                    transition
                   "
                 >
                   {t('season.continue')}

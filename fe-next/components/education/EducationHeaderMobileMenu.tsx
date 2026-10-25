@@ -75,7 +75,7 @@ export function EducationHeaderMobileMenu({
               'border-3 border-neo-cream/40',
               'rounded-neo shadow-hard-sm',
               'active:translate-x-px active:translate-y-px active:shadow-none',
-              'transition-all duration-100'
+              'transition duration-100'
             )}
             aria-label={t('common.closeMenu')}
           >
@@ -109,7 +109,7 @@ export function EducationHeaderMobileMenu({
                 href={`/${language}/teacher`}
                 onClick={() => onClose()}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
+                  'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition w-full',
                   isOnTeacherSection
                     ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard'
                     : 'bg-neo-navy-light hover:bg-neo-cyan/20 text-neo-white border-neo-cream/40 shadow-hard-sm hover:shadow-hard'
@@ -126,7 +126,7 @@ export function EducationHeaderMobileMenu({
               <TeacherProNavLink
                 onNavigate={onClose}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
+                  'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition w-full',
                   'bg-neo-navy-light hover:bg-neo-lime/20 text-neo-white border-neo-cream/40 shadow-hard-sm hover:shadow-hard',
                 )}
               />
@@ -138,7 +138,7 @@ export function EducationHeaderMobileMenu({
                 href={`/${language}/student`}
                 onClick={() => onClose()}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition-all w-full',
+                  'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 transition w-full',
                   isOnStudentSection
                     ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard'
                     : 'bg-neo-navy-light hover:bg-neo-cyan/20 text-neo-white border-neo-cream/40 shadow-hard-sm hover:shadow-hard'
@@ -156,7 +156,7 @@ export function EducationHeaderMobileMenu({
               href={`/${language}/education`}
               onClick={() => onClose()}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-cream/40 transition-all w-full',
+                'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-cream/40 transition w-full',
                 'bg-neo-navy-light hover:bg-neo-lime/20 text-neo-white',
                 'shadow-hard-sm hover:shadow-hard'
               )}
@@ -182,7 +182,7 @@ export function EducationHeaderMobileMenu({
                 <button
                   onClick={onSignOut}
                   className={cn(
-                    'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-cream/40 transition-all w-full',
+                    'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-cream/40 transition w-full',
                     'bg-neo-navy-light hover:bg-neo-pink/20 text-neo-white',
                     'shadow-hard-sm hover:shadow-hard'
                   )}
@@ -214,7 +214,7 @@ export function EducationHeaderMobileMenu({
               href={exitHref}
               onClick={() => onClose()}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-cream/40 transition-all w-full',
+                'flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-cream/40 transition w-full',
                 'bg-transparent hover:bg-neo-cream/10 text-neo-white'
               )}
             >

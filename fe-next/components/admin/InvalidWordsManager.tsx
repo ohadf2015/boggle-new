@@ -532,7 +532,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                   exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                 >
                   <Card className={cn(
-                    "bg-neo-navy-light border-slate-700 transition-all relative",
+                    "bg-neo-navy-light border-slate-700 transition relative",
                     isSelected(word.id) && "ring-2 ring-neo-yellow",
                     isProcessing && "opacity-50 pointer-events-none"
                   )}>

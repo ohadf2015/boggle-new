@@ -343,7 +343,7 @@ export default function PracticeModeSelector({
                       disabled={!unlocked}
                       onClick={() => unlocked && onSelectMode('vocab_focus', { focus })}
                       className={cn(
-                        'min-h-14 px-4 py-2 rounded-neo border-[3px] border-black text-start transition-all',
+                        'min-h-14 px-4 py-2 rounded-neo border-[3px] border-black text-start transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]',
                         unlocked
                           ? 'bg-neo-yellow text-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:shadow-hard-pressed active:translate-y-0.5'
                           : 'bg-black/10 text-black/80 border-black/50 cursor-not-allowed'

@@ -81,7 +81,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                 // over a navy page, an invisible control. Literal width + a cream
                 // edge; selected still differs by FILL, not just by text colour.
                 'px-4 py-2 min-h-11 rounded-neo border-[2px]',
-                'font-bold text-sm transition-all duration-200',
+                'font-bold text-sm transition duration-200',
                 activeCategory === key
                   ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard'
                   : 'bg-neo-navy-light text-neo-white border-neo-cream hover:bg-neo-navy'

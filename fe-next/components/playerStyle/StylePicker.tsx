@@ -142,7 +142,7 @@ export function StylePicker({
               aria-checked={isSelected}
               onClick={() => handleSelect(key)}
               className={[
-                'group relative flex flex-col items-center gap-1.5 rounded-neo border-neo-thick p-3 transition-all duration-150',
+                'group relative flex flex-col items-center gap-1.5 rounded-neo border-neo-thick p-3 transition duration-150',
                 isSelected
                   ? 'z-10 -translate-y-1 border-accent bg-accent/20 shadow-hard-lg ring-4 ring-accent ring-offset-2 ring-offset-neo-navy'
                   : 'border-neo-black bg-neo-navy-light shadow-hard hover:-translate-y-0.5 active:translate-y-0',

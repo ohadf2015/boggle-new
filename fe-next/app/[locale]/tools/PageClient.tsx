@@ -31,7 +31,7 @@ export default function ToolsHubPageClient() {
             className={cn(
               'block bg-neo-navy-light border-3 border-neo-black rounded-neo p-6',
               'shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px]',
-              'transition-all duration-100 group'
+              'transition-[box-shadow,translate,scale,rotate,transform] duration-100 group'
             )}
           >
             <div className="text-4xl mb-3">&#128300;</div>

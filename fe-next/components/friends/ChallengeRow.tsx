@@ -76,7 +76,7 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
           onClick={handleAccept}
           disabled={loading !== null}
           className={cn(
-            'w-8 h-8 flex items-center justify-center border-2 border-neo-black rounded-neo shadow-hard-sm transition-all',
+            'w-8 h-8 flex items-center justify-center border-2 border-neo-black rounded-neo shadow-hard-sm transition',
             'bg-neo-lime text-neo-black hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5',
             loading !== null && 'opacity-50 cursor-not-allowed'
           )}
@@ -91,7 +91,7 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
           onClick={handleDecline}
           disabled={loading !== null}
           className={cn(
-            'w-8 h-8 flex items-center justify-center border-2 border-neo-black rounded-neo shadow-hard-sm transition-all',
+            'w-8 h-8 flex items-center justify-center border-2 border-neo-black rounded-neo shadow-hard-sm transition',
             'bg-neo-red text-white hover:shadow-hard active:shadow-hard-pressed active:translate-y-0.5',
             loading !== null && 'opacity-50 cursor-not-allowed'
           )}

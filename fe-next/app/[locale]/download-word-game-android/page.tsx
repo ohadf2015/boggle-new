@@ -255,7 +255,7 @@ export default async function DownloadWordGameAndroidPage({ params }: PageProps)
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{copy.relatedHeading}</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {copy.related.map((r) => (
-              <Link key={r.hrefSuffix} href={`/${locale}${r.hrefSuffix}`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/60">
+              <Link key={r.hrefSuffix} href={`/${locale}${r.hrefSuffix}`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/60">
                 <h3 className="font-bold text-neo-cyan">{r.title}</h3>
                 <p className="mt-1 text-xs text-neo-gray-200">{r.sub}</p>
               </Link>

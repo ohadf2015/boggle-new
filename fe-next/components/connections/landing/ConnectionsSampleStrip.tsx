@@ -70,7 +70,7 @@ function SampleCard({ puzzle, locale, difficultyLabel, revealLabel, position }: 
       type="button"
       onClick={handleClick}
       data-testid={`sample-${position}`}
-      className="flex flex-col items-stretch rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 text-start shadow-hard transition-all hover:translate-y-[-2px] hover:shadow-hard-lg"
+      className="flex flex-col items-stretch rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 text-start shadow-hard transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] hover:translate-y-[-2px] hover:shadow-hard-lg"
     >
       <span
         className={`mb-3 inline-block self-start rounded-neo border-2 border-neo-black px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest shadow-hard-sm ${bg} ${fg}`}

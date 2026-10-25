@@ -164,7 +164,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
                     disabled={isLoading}
                     className={cn(
                       'flex flex-col items-center gap-1.5 px-3 py-3 rounded-neo border-3 border-neo-black',
-                      'font-black uppercase tracking-tight text-xs transition-all duration-100',
+                      'font-black uppercase tracking-tight text-xs transition duration-100',
                       isActive
                         ? (f === 'async'
                             ? 'bg-neo-lime text-neo-black shadow-hard-pressed translate-x-px translate-y-px'
@@ -203,7 +203,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
                     aria-pressed={isActive}
                     className={cn(
                       'relative flex flex-col items-center gap-1.5 px-2 py-3 rounded-neo border-3 border-neo-black',
-                      'font-black uppercase tracking-tight text-xs transition-all duration-100',
+                      'font-black uppercase tracking-tight text-xs transition duration-100',
                       isActive
                         ? cn(activeBg, activeText, 'shadow-hard-pressed translate-x-px translate-y-px')
                         : 'bg-neo-cream dark:bg-neo-navy-light text-neo-black dark:text-neo-white shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg',
@@ -236,7 +236,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
                     aria-pressed={isActive}
                     className={cn(
                       'py-2.5 rounded-neo border-3 border-neo-black font-black text-base tracking-tight',
-                      'transition-all duration-100',
+                      'transition duration-100',
                       isActive
                         ? 'bg-neo-lime text-neo-black shadow-hard-pressed translate-x-px translate-y-px'
                         : 'bg-neo-cream dark:bg-neo-navy-light text-neo-black dark:text-neo-white shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard',
@@ -311,7 +311,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
               'font-black text-base uppercase tracking-wider',
               'bg-neo-lime text-neo-black shadow-hard',
               'hover:shadow-hard-lg hover:-translate-y-0.5 active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
-              'transition-all duration-100',
+              'transition duration-100',
               isLoading && 'opacity-60 cursor-not-allowed'
             )}
           >

@@ -294,7 +294,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 <button
                   onClick={handleCopyLink}
                   className={cn(
-                    "w-10 h-10 rounded-neo border-2 border-neo-cream/50 flex items-center justify-center transition-all",
+                    "w-10 h-10 rounded-neo border-2 border-neo-cream/50 flex items-center justify-center transition",
                     copied ? "bg-neo-lime border-neo-lime" : "bg-neo-navy-light hover:bg-neo-cream/20"
                   )}
                 >
@@ -314,7 +314,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
               >
                 <Button
                   onClick={handleShare}
-                  className="w-full py-4 text-lg font-black uppercase bg-linear-to-r from-neo-pink to-neo-orange text-neo-white border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all"
+                  className="w-full py-4 text-lg font-black uppercase bg-linear-to-r from-neo-pink to-neo-orange text-neo-white border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition"
                 >
                   <Share2 className="w-5 h-5 me-2" />
                   {t('customPuzzle.share')}
@@ -323,7 +323,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 <Button
                   variant="outline"
                   onClick={onClose}
-                  className="w-full py-3 text-lg font-bold bg-neo-white text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all"
+                  className="w-full py-3 text-lg font-bold bg-neo-white text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition"
                 >
                   {t('common.done')}
                   <ArrowRight className="w-5 h-5 ms-2" />

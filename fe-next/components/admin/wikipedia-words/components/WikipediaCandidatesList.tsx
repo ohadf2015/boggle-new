@@ -218,7 +218,7 @@ export function WikipediaCandidatesList({
             <div
               key={candidate.id}
               className={cn(
-                'p-4 rounded-lg border-2 transition-all',
+                'p-4 rounded-lg border-2 transition',
                 isSelected
                   ? 'border-neo-pink bg-neo-pink/10'
                   : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-neo-navy-light',

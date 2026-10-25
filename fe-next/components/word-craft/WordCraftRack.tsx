@@ -153,7 +153,7 @@ function WordCraftRackImpl({
               'relative w-14 h-16 sm:w-16 sm:h-[72px] flex items-center justify-center touch-pan-x shrink-0 snap-center',
               disabled || isPending ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing',
               'rounded-neo border-neo-thick border-black',
-              'transition-all duration-200 ease-out',
+              'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-200 ease-out',
               tilt,
               // Gold ring = celebration semantic (design system): this tile
               // ring-captures on commit under golden_tiles.

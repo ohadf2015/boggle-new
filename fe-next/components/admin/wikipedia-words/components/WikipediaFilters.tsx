@@ -44,7 +44,7 @@ export function WikipediaFilters({
             type="button"
             onClick={() => onLanguageChange(lang.code)}
             className={cn(
-              'px-3 py-2 rounded-lg border-2 font-bold transition-all shrink-0 text-sm min-h-[40px]',
+              'px-3 py-2 rounded-lg border-2 font-bold transition shrink-0 text-sm min-h-[40px]',
               selectedLanguage === lang.code
                 ? 'bg-neo-pink text-white border-neo-pink shadow-hard-sm'
                 : 'bg-white dark:bg-neo-navy-elevated border-gray-300 dark:border-slate-600 hover:border-neo-pink text-gray-800 dark:text-gray-200'
@@ -69,7 +69,7 @@ export function WikipediaFilters({
                 type="button"
                 onClick={() => onStatusChange(option.value)}
                 className={cn(
-                  'px-2.5 py-1.5 rounded-lg border-2 text-xs font-bold transition-all',
+                  'px-2.5 py-1.5 rounded-lg border-2 text-xs font-bold transition',
                   selectedStatus === option.value
                     ? `${option.color} text-white border-transparent`
                     : 'bg-white dark:bg-neo-navy-elevated border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-gray-400'

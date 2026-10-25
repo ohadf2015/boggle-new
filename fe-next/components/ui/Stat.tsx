@@ -209,7 +209,7 @@ export function Stat({
   // Base wrapper classes
   const wrapperClasses = cn(
     'inline-flex flex-col items-center justify-center text-center',
-    'rounded-neo transition-all',
+    'rounded-neo transition',
     borderStyle,
     shadowStyle,
     variantStyle.bg,

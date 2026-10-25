@@ -40,7 +40,7 @@ export function SupporterInterestCard() {
           </div>
           <button
             onClick={handleTap}
-            className="shrink-0 rounded-neo border-neo border-neo-purple bg-neo-purple/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition-all hover:bg-neo-purple/30 hover:shadow-hard"
+            className="shrink-0 rounded-neo border-neo border-neo-purple bg-neo-purple/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition hover:bg-neo-purple/30 hover:shadow-hard"
           >
             {t('supporter.card.cta')}
           </button>

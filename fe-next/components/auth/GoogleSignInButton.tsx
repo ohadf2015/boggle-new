@@ -135,7 +135,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
           className={cn(
             'w-full flex items-center justify-center gap-2 py-3 rounded-xl',
             'border-3 border-neo-black bg-white text-neo-black font-black text-sm',
-            'shadow-hard transition-all hover:shadow-hard-sm active:translate-y-0.5',
+            'shadow-hard transition hover:shadow-hard-sm active:translate-y-0.5',
           )}
         >
           <GoogleIcon className="w-5 h-5" />
