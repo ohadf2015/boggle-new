@@ -31,7 +31,7 @@ function buildSupabaseMock(tables: TableState) {
   const from = vi.fn((table: string) => {
     const result = tables[table] ?? { data: [], error: null };
     const builder: Record<string, unknown> = {};
-    for (const m of ['select', 'eq', 'in', 'gte', 'order', 'limit']) builder[m] = vi.fn(() => builder);
+    for (const m of ['select', 'eq', 'in', 'gte', 'order', 'limit', 'range']) builder[m] = vi.fn(() => builder);
     builder.maybeSingle = vi.fn(() => Promise.resolve(result));
     builder.then = (resolve: (v: unknown) => void) => resolve(result);
     return builder;
