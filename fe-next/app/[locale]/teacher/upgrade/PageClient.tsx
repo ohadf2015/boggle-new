@@ -46,14 +46,14 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   const [askOpen, setAskOpen] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
   const revealRef = useTeacherReveal<HTMLDivElement>(tab);
-  const { hasPro, loading: proLoading, status, source, trialUsed, known, portalUrl, refresh, trialExpires, periodEnd, accessTrialExpires } = useTeacherPro();
+  const { hasPro, loading: proLoading, status, source, trialUsed, known, portalUrl, refresh, trialExpires, periodEnd, accessTrialExpires, accessTrialEnded } = useTeacherPro();
 
   const offerTrial = known === true && !proLoading && polarTrialUx({
     hasPro,
     status: status ?? 'active',
     source,
     trialUsed: trialUsed === true,
-  }).offerTrial;
+  }).offerTrial && !accessTrialEnded; // their free trial has ended: straight to paid, no second trial
   const viewer = upgradeViewer({ authLoading, signedIn: Boolean(user), proLoading, known: known === true, hasPro });
   const showTrial = showTrialOffer(viewer, offerTrial);
 
@@ -237,6 +237,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                   onSchool={openSchool}
                   manageBillingHref={portalUrl}
                   accessTrialEndsAt={accessTrialExpires}
+                  accessTrialEnded={accessTrialEnded}
                   askSchool={
                     askOpen ? (
                       <AskSchoolPanel

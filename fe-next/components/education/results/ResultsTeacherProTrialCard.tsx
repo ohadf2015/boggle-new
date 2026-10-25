@@ -20,6 +20,7 @@ import { Sparkles, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { accessTrialLive, keepAfterTrialCopy } from '@/lib/education/pro/keepAfterTrialCopy';
+import { trialEndedCopy } from '@/lib/education/pro/trialEndedCopy';
 import { classCreatedTrialCopy, resultsTrialCopy, trialCopyBase, TRIAL_COPY_RTL } from '@/lib/education/pro/trialCtaCopy';
 import { reportProCtaClick } from '@/lib/education/reportProCtaClick';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -59,7 +60,7 @@ export function ResultsTeacherProTrialCard({
   className?: string;
   placement?: TeacherProTrialPlacement;
 }) {
-  const { hasPro, loading, known, trialUsed, accessTrialExpires } = useTeacherPro();
+  const { hasPro, loading, known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
   const dismissible = placement === CLASS_CREATED_TRIAL_PLACEMENT;
   // Hidden until the stored dismissal is read, so a dismissed card never flashes.
   const [dismissed, setDismissed] = useState<boolean | null>(dismissible ? null : false);
@@ -69,12 +70,19 @@ export function ResultsTeacherProTrialCard({
   const show = !loading && !hasPro && dismissed === false;
   // Only a successful status read proves "never trialed"; an unknown read still
   // offers the trial — /teacher/upgrade re-checks eligibility before the POST.
-  const offerTrial = !(known && trialUsed);
+  // A teacher whose free access trial has ended had their trial: no second one.
+  const ended = accessTrialEnded === true && !accessTrialLive(accessTrialExpires);
+  const offerTrial = !(known && trialUsed) && !ended;
   const baseCopy = dismissible ? classCreatedTrialCopy(language) : { ...resultsTrialCopy(language), dismiss: '' };
   // Inside the free access trial there is one trial, not two: ask them to keep Pro
   // when it ends instead of pitching a fresh 14-day trial behind a card form.
   const keep = offerTrial && accessTrialLive(accessTrialExpires) ? keepAfterTrialCopy(language, accessTrialExpires) : null;
-  const copy = keep ? { ...baseCopy, title: keep.title, trialCta: keep.cta, trialNote: keep.note } : baseCopy;
+  const endedCopy = ended ? trialEndedCopy(language) : null;
+  const copy = keep
+    ? { ...baseCopy, title: keep.title, trialCta: keep.cta, trialNote: keep.note }
+    : endedCopy
+      ? { ...baseCopy, title: endedCopy.title, upgradeCta: endedCopy.cta, upgradeNote: endedCopy.note }
+      : baseCopy;
   const dir = TRIAL_COPY_RTL.has(trialCopyBase(language)) ? 'rtl' : undefined;
   const cardRef = useRef<HTMLElement>(null);
 

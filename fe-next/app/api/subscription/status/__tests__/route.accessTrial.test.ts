@@ -59,6 +59,27 @@ describe('GET /api/subscription/status — access trial', () => {
     expect((await (await GET(req())).json()).access_trial_expires).toBeNull();
   });
 
+  it('access_trial_ended: true only when an approved window is known to be over', async () => {
+    accessRow = { trial_expires_at: inDays(-1) };
+    expect((await (await GET(req())).json()).access_trial_ended).toBe(true);
+    accessRow = { trial_expires_at: inDays(3) };
+    expect((await (await GET(req())).json()).access_trial_ended).toBe(false);
+    accessRow = null;
+    expect((await (await GET(req())).json()).access_trial_ended).toBe(false);
+  });
+
+  it('a failed read never marks the trial as ended (keeps the standard offer)', async () => {
+    accessError = { message: 'boom' };
+    accessRow = { trial_expires_at: inDays(-1) };
+    expect((await (await GET(req())).json()).access_trial_ended).toBe(false);
+  });
+
+  it('a Pro teacher is never told the access trial ended', async () => {
+    accessRow = { trial_expires_at: inDays(-1) };
+    checkTeacherSubscription.mockResolvedValue({ ...free, has_pro: true, tier: 'pro' });
+    expect((await (await GET(req())).json()).access_trial_ended).toBe(false);
+  });
+
   it('a Pro teacher is never queried or told about an access trial', async () => {
     accessRow = { trial_expires_at: inDays(5) };
     checkTeacherSubscription.mockResolvedValue({ ...free, has_pro: true, tier: 'pro' });

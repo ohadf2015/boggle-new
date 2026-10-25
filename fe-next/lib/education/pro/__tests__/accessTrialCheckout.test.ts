@@ -12,9 +12,16 @@ describe('polarTrialPlan', () => {
     expect(polarTrialPlan('not a date', NOW)).toEqual({ days: 14, source: 'standard' });
   });
 
-  it('an access window that already ended: the standard trial', () => {
-    expect(polarTrialPlan(endsIn(-1), NOW)).toEqual({ days: 14, source: 'standard' });
-    expect(polarTrialPlan(endsIn(0), NOW)).toEqual({ days: 14, source: 'standard' });
+  it('an access window that already ended: no second trial (days 0)', () => {
+    expect(polarTrialPlan(endsIn(-1), NOW)).toEqual({ days: 0, source: 'access_trial_ended' });
+    expect(polarTrialPlan(endsIn(0), NOW)).toEqual({ days: 0, source: 'access_trial_ended' });
+    expect(polarTrialPlan(endsIn(-60), NOW)).toEqual({ days: 0, source: 'access_trial_ended' });
+  });
+
+  it('never had a window, or it is unknown: the standard 14-day trial', () => {
+    expect(polarTrialPlan(null, NOW)).toEqual({ days: 14, source: 'standard' });
+    expect(polarTrialPlan(undefined, NOW)).toEqual({ days: 14, source: 'standard' });
+    expect(polarTrialPlan('not-a-date', NOW)).toEqual({ days: 14, source: 'standard' });
   });
 
   it('inside the access window: only the days left, rounded up', () => {

@@ -12,7 +12,7 @@ vi.mock('next/link', () => ({
     </a>
   ),
 }));
-const pro = vi.hoisted(() => ({ hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null as string | null }));
+const pro = vi.hoisted(() => ({ hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null as string | null, accessTrialEnded: false }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
 const growth = vi.hoisted(() => ({ trackGrowthEvent: vi.fn() }));
 vi.mock('@/utils/growthTracking', () => growth);
@@ -21,7 +21,7 @@ vi.mock('@/lib/education/proFunnelTelemetry', () => funnel);
 
 describe('ResultsTeacherProTrialCard', () => {
   beforeEach(() => {
-    Object.assign(pro, { hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null });
+    Object.assign(pro, { hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null, accessTrialEnded: false });
     growth.trackGrowthEvent.mockClear();
     funnel.trackTeacherProUpgradeClick.mockClear();
   });
@@ -62,6 +62,25 @@ describe('ResultsTeacherProTrialCard', () => {
     pro.accessTrialExpires = new Date(Date.now() - 60_000).toISOString();
     render(<ResultsTeacherProTrialCard language="en" />);
     expect(screen.getByTestId('results-teacher-pro-trial-cta')).toHaveTextContent('Start your 14-day Teacher Pro trial');
+  });
+
+  it('free access trial ended: continue with Teacher Pro, no trial wording (results and class-ready)', () => {
+    pro.accessTrialEnded = true;
+    for (const placement of [undefined, 'class_created'] as const) {
+      const { unmount } = render(<ResultsTeacherProTrialCard language="en" placement={placement} />);
+      const card = screen.getByTestId('results-teacher-pro-trial-card');
+      expect(card).toHaveTextContent('Your free trial has ended: continue with Teacher Pro');
+      expect(screen.getByTestId('results-teacher-pro-trial-cta')).toHaveTextContent('Continue with Teacher Pro');
+      expect(card).toHaveTextContent('$9/mo · Cancel anytime');
+      expect(card).not.toHaveTextContent(/14-day|Start your|Try Teacher Pro free/);
+      unmount();
+    }
+  });
+
+  it('free access trial ended, in Hebrew', () => {
+    pro.accessTrialEnded = true;
+    render(<ResultsTeacherProTrialCard language="he" />);
+    expect(screen.getByTestId('results-teacher-pro-trial-cta')).toHaveTextContent('להמשיך עם פרו למורים');
   });
 
   it('stays hidden for Pro teachers and while the entitlement loads', () => {

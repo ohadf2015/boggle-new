@@ -30,7 +30,7 @@ describe('teacherAbandonedCheckout', () => {
     expect(subject).toBe('Termina tu compra de Teacher Pro');
     expect(html).toContain(abandonedCheckoutUpgradeUrl('es'));
     for (const locale of ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const) {
-      for (const mode of ['paid', 'trial', 'keep'] as const) {
+      for (const mode of ['paid', 'trial', 'keep', 'ended'] as const) {
         const out = teacherAbandonedCheckout({ full_name: 'T', locale, mode });
         expect(out.subject.length).toBeGreaterThan(0);
         expect(out.html).toContain(abandonedCheckoutUpgradeUrl(locale));
@@ -42,6 +42,20 @@ describe('teacherAbandonedCheckout', () => {
         );
       }
     }
+  });
+
+  it('after the free access trial: continue with Pro, no trial wording, in every locale', () => {
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const) {
+      const ended = teacherAbandonedCheckout({ full_name: 'T', locale, mode: 'ended' });
+      const trial = teacherAbandonedCheckout({ full_name: 'T', locale, mode: 'trial' });
+      expect(ended.subject).not.toBe(trial.subject);
+      expect(ended.html).not.toMatch(/14[- ]?(day|dag|día|日|дн)|14 יו/);
+      expect(ended.html).toMatch(/\$9|9\$/);
+    }
+    const en = teacherAbandonedCheckout({ full_name: 'Maya', locale: 'en', mode: 'ended' });
+    expect(en.subject).toBe('Your free trial has ended: continue with Teacher Pro');
+    expect(en.html).toContain('Continue with Teacher Pro');
+    expect(en.html).not.toContain('Start my free trial');
   });
 
   it('inside the free access trial: keep Pro after it, never a second 14-day trial', () => {
