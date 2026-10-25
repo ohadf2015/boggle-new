@@ -11,6 +11,9 @@ import { writeRehearseIntent } from '@/lib/education/rehearsal';
 import { buildRehearsalLaunch } from '@/lib/education/rehearsalLaunch';
 import { QUIET_LINK } from './homeStyles';
 
+// Fail open to the starter pack: a slow list lookup must not hold the teacher on a spinner.
+const LESSON_LOOKUP_CAP_MS = 2000;
+
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 export interface RehearseWithBotsButtonProps {
@@ -31,11 +34,11 @@ export function RehearseWithBotsButton({ classroomId, source, language, t, showN
   const rehearse = async () => {
     if (pending) return;
     setPending(true);
-    let lessons: Awaited<ReturnType<typeof getLessons>>['data'] = [];
-    try {
-      lessons = user ? (await getLessons(user.id)).data : [];
-    } catch {
-      lessons = [];
+    type Lessons = Awaited<ReturnType<typeof getLessons>>['data'];
+    let lessons: Lessons = [];
+    if (user) {
+      const capped = new Promise<Lessons>((resolve) => setTimeout(() => resolve([]), LESSON_LOOKUP_CAP_MS));
+      lessons = await Promise.race([getLessons(user.id).then((r) => r.data ?? []), capped]).catch(() => []);
     }
     writeQuickLaunchIntent(buildRehearsalLaunch({ lessons, uiLanguage: language, classroomId, packName: (key) => t(key) }));
     writeRehearseIntent({ source, classExists: !!classroomId });

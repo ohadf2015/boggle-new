@@ -21,7 +21,7 @@ import type { GameModeOption } from '@/components/GameModeSelector';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { LobbySettingsSummary } from '@/components/multiplayer/lobby/LobbySettingsSummary';
 import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
-import type { RehearseIntent, RehearsalSource } from '@/lib/education/rehearsal';
+import { modeAllowsRehearsalBots, type RehearseIntent, type RehearsalSource } from '@/lib/education/rehearsal';
 import { trackEduRehearsalStarted } from '@/lib/education/rehearsalTelemetry';
 import { useRehearseAutoStart } from '../../hooks/useRehearseAutoStart';
 
@@ -219,6 +219,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   useRehearseAutoStart({
     enabled: isClassroomMode && !!onStartSoloDemoWithBots,
     hostSeated,
+    botsAllowed: modeAllowsRehearsalBots(readLocalGameMode() ?? classroomGameMode),
     start: handleSoloDemoClick,
   });
 

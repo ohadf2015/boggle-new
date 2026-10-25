@@ -52,6 +52,20 @@ describe('RehearseWithBotsButton', () => {
     expect(peekRehearseIntent()).toEqual({ source: 'class', classExists: true });
   });
 
+  it('Given the lesson lookup hangs, Then the rehearsal still opens on the starter pack within a couple of seconds', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      getLessons.mockReturnValue(new Promise(() => {}));
+      render(<RehearseWithBotsButton classroomId="class-1" source="hq" language="en" t={t} />);
+      fireEvent.click(screen.getByTestId('rehearse-with-bots'));
+      await vi.advanceTimersByTimeAsync(2500);
+      expect(push).toHaveBeenCalledWith('/en/education/classroom-game?flow=quickLaunch');
+      expect(readQuickLaunchIntent()).toMatchObject({ source: 'pack' });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('labels the rehearsal as private when asked to', () => {
     render(<RehearseWithBotsButton classroomId="class-1" source="hq" language="en" t={t} showNote />);
     expect(screen.getByTestId('rehearse-with-bots')).toHaveTextContent('education.projectorLobby.rehearseCta');
