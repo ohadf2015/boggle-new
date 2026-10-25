@@ -62,6 +62,22 @@ describe('ClassLimitUpsellModal', () => {
     postTeacherProCheckout.mockResolvedValue({ ok: true, url: 'https://polar.example/checkout' });
   });
 
+  it('shows a pointer cursor on every clickable control', () => {
+    render(
+      <ClassLimitUpsellModal isOpen={true} onClose={vi.fn()} currentCount={2} limit={2} />,
+    );
+
+    const controls = [
+      screen.getByRole('button', { name: 'Close' }),
+      screen.getByTestId('plan-gate-upgrade'),
+      screen.getByRole('button', { name: 'Cancel' }),
+      screen.getByRole('link', { name: 'See district pricing' }),
+    ];
+    for (const el of controls) {
+      expect(el.className).toContain('cursor-pointer');
+    }
+  });
+
   it('shows a district/school cross-sell link alongside the individual Pro upsell', () => {
     render(
       <ClassLimitUpsellModal isOpen={true} onClose={vi.fn()} currentCount={2} limit={2} />,
