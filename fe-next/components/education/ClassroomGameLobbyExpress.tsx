@@ -31,6 +31,7 @@ import logger from '@/utils/logger';
 import type { Classroom, Language } from '@/lib/supabase/education/types';
 import { trackEduClassroomCreated, trackEduLiveGameStarted } from '@/lib/education/telemetry';
 import { recordLessonPlays } from '@/lib/education/lessonPlayStat';
+import { splitLaunchPayload } from './lobby/classroomLaunchPayload';
 import {
   abandonLaunch,
   ensureLaunch,
@@ -271,7 +272,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
             lessonCount: result.payload.lessonIds.length,
           };
           startedLessonIds = result.payload.lessonIds;
-          live.emit('createClassroomGame', { ...result.payload, language: result.lesson.language });
+          live.emit('createClassroomGame', splitLaunchPayload(result.payload).createPayload);
 
           // Bookkeeping only, and AFTER the room is asked for: a throw in the
           // recents store must never be the reason a class has no game.

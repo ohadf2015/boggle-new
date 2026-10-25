@@ -24,7 +24,7 @@ import {
   type PracticeFocusSetting,
 } from '@/shared/types/vocabQuiz';
 import { getPresetValues, applyVocabularyCap, type ClassroomPresetId } from '@/lib/education/classroomPresets';
-import { clampTeamCount, type PlayStyle } from '@/shared/utils/teamBattle';
+import type { PlayStyle } from '@/shared/utils/teamBattle';
 import type { ClassroomAccessibility, ClassroomPressure } from '@/shared/types/classroom';
 import { DEFAULT_CLASSROOM_PRESSURE } from '@/shared/utils/classroomPressure';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
@@ -49,6 +49,7 @@ import { LobbyEconomyToggles, type ClassroomEconomyConfig } from './lobby/LobbyE
 import { ZERO_ECONOMY_SNAPSHOT } from '@/shared/constants/classroomEconomy';
 import { defaultLessonIdsFor, useTeacherLobbyData } from './lobby/useTeacherLobbyData';
 import { useClassroomLaunchSocket } from './lobby/useClassroomLaunchSocket';
+import { buildClassroomLaunchPayload } from './lobby/classroomLaunchPayload';
 import { useRepeatLastSetup } from './lobby/useRepeatLastSetup';
 import { readRememberedRoundDefaults } from './lobby/rememberedRoundDefaults';
 
@@ -282,38 +283,31 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
         savedAt: Date.now(),
       });
 
-      launch({
-        gameCode,
-        classroomId: selectedClassroomId,
-        teacherId: user.id,
-        teacherName: socketTeacherName(user, profile?.display_name),
-        lessonIds: selectedLessonIds,
-        lessonNames,
-        vocabularyWords: playableWords,
-        language: lessonLanguage,
-        settings: {
+      launch(
+        buildClassroomLaunchPayload({
+          gameCode,
+          classroomId: selectedClassroomId,
+          teacherId: user.id,
+          teacherName: socketTeacherName(user, profile?.display_name),
+          lessonIds: selectedLessonIds,
+          lessonNames,
+          vocabularyWords: playableWords,
+          language: lessonLanguage,
+          mode,
           timerMinutes,
           boardSize,
           allowLateJoin,
           economy,
-          gameMode: mode,
-          ...(boss ? { classroomBossId: boss } : {}),
-          targetWord: targetWord || undefined,
-          ...(mode === VOCAB_QUIZ_MODE
-            ? { vocabQuizFocus, vocabQuizQuestionCount, vocabQuizSeconds, treasureChestsEnabled, ...(variant ? { vocabQuizVariant: variant } : {}) }
-            : {}),
+          bossId: boss,
+          targetWord,
+          quiz: { focus: vocabQuizFocus, questionCount: vocabQuizQuestionCount, seconds: vocabQuizSeconds, treasureChestsEnabled, variant },
           playStyle,
-          teamCount: playStyle === 'teams' ? clampTeamCount(teamCount) : undefined,
-          accessibility:
-            accessibility.largeText || accessibility.audioCues || accessibility.participationPoints
-              ? accessibility
-              : undefined,
-          // Peeled off in the launch hook and emitted to the room once it
-          // exists (the create handler whitelists its settings keys). Absent
-          // for a free teacher — the loud default is the free tier.
-          ...(hasTeacherPro ? { pressure } : {}),
-        },
-      });
+          teamCount,
+          accessibility,
+          // Absent for a free teacher: the loud default is the free tier.
+          pressure: hasTeacherPro ? pressure : undefined,
+        })
+      );
 
       trackEduLiveGameStarted({
         classroomId: selectedClassroomId,
