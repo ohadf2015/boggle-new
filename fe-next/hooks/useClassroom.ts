@@ -6,7 +6,6 @@ import { useMounted } from '@/hooks/useMounted';
 import {
   getClassrooms,
   getClassroom,
-  createClassroom as createClassroomAPI,
   updateClassroom as updateClassroomAPI,
   deleteClassroom as deleteClassroomAPI,
   type ClassroomWithMembers,

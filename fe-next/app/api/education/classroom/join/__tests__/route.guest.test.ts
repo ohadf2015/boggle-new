@@ -1,24 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 /**
- * The guest path of the classroom-join route creates an anonymous auth user and then writes
- * them a profile so the teacher's roster has a name to show.
- *
- * That write set `is_guest: true` — a column `public.profiles` does not have. PostgREST
- * rejects the whole upsert ("Could not find the 'is_guest' column of 'profiles' in the schema
- * cache"), and the route only logged it and carried on, so the guest joined with NO profile
- * row at all: a membership pointing at a user who renders nameless and faceless on every
- * teacher screen.
- *
- * It went unnoticed because the statement before it — signInAnonymously() — was failing
- * first: anonymous sign-ins were disabled on the project, so the route 500'd before ever
- * reaching this line. With anonymous auth now enabled, this became the next thing in the way.
- *
- * Guest-ness needs no column of our own: Supabase already flags it as
- * `auth.users.is_anonymous`, which is what `signInAnonymously()` sets.
+ * Guest path of the classroom-join route. The guest's profile row comes from the
+ * handle_new_user trigger reading the sign-in metadata (full_name, username), the
+ * same way signInAsGuestStudent does on the client, so the route writes no profile.
  */
 
 vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }));
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: () => ({ from: () => ({ insert: async () => ({ error: null }) }) }),
+}));
 vi.mock('@/lib/auth/getAuthedUser', () => ({ getAuthedUser: vi.fn(async () => null) }));
 vi.mock('@/lib/subscriptions', () => ({
   canAddStudent: vi.fn(async () => ({ allowed: true, currentCount: 0, limit: 30 })),
@@ -29,36 +20,11 @@ import { createClient } from '@/utils/supabase/server';
 
 const GUEST_ID = 'guest-uid-1';
 
-/**
- * Stands in for PostgREST: an upsert naming a column outside `columns` fails the way the
- * live database fails, rather than silently accepting anything the route sends.
- */
-const makeClient = (columns: string[]) => {
-  const upsert = vi.fn((row: Record<string, unknown>) => {
-    const unknownColumn = Object.keys(row).find((c) => !columns.includes(c));
-    return Promise.resolve(
-      unknownColumn
-        ? { error: { message: `Could not find the '${unknownColumn}' column of 'profiles' in the schema cache` } }
-        : { error: null }
-    );
-  });
-
-  return {
-    upsert,
-    auth: { signInAnonymously: vi.fn(async () => ({ data: { user: { id: GUEST_ID } }, error: null })) },
-    rpc: vi.fn(async () => ({ data: [{ id: 'c-1', teacher_id: 't-1' }], error: null })),
-    from: vi.fn((table: string) => {
-      if (table === 'profiles') return { upsert };
-      if (table === 'classroom_memberships') return {
-        select: () => ({ eq: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) }),
-        insert: async () => ({ error: null }),
-      };
-      return {};
-    }),
-  };
-};
-
-const PROFILE_COLUMNS = ['id', 'username', 'display_name', 'user_role'];
+const makeClient = () => ({
+  auth: { signInAnonymously: vi.fn(async () => ({ data: { user: { id: GUEST_ID } }, error: null })) },
+  rpc: vi.fn(async () => ({ data: [{ id: 'c-1', teacher_id: 't-1' }], error: null })),
+  from: vi.fn(() => ({ upsert: vi.fn() })),
+});
 
 const req = (body: unknown) =>
   new Request('http://t/api/education/classroom/join', { method: 'POST', body: JSON.stringify(body) }) as never;
@@ -66,42 +32,33 @@ const req = (body: unknown) =>
 describe('POST /api/education/classroom/join — guest path', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('writes a guest profile the profiles table can actually accept', async () => {
-    const client = makeClient(PROFILE_COLUMNS);
+  it('passes the typed name to the sign-in metadata the profile trigger reads', async () => {
+    const client = makeClient();
     (createClient as any).mockResolvedValue(client);
 
     await POST(req({ joinCode: 'ABC123', guestName: 'Dana' }));
 
-    expect(client.upsert).toHaveBeenCalled();
-    const row = client.upsert.mock.calls[0][0] as Record<string, unknown>;
-    expect(row).toMatchObject({ id: GUEST_ID, username: 'Dana' });
-    // Guest-ness lives on auth.users.is_anonymous; profiles has no such column.
-    expect(row).not.toHaveProperty('is_guest');
+    expect(client.auth.signInAnonymously).toHaveBeenCalledWith({
+      options: { data: expect.objectContaining({ full_name: 'Dana' }) },
+    });
   });
 
   /**
-   * The route read the body twice: once in the guest branch for `guestName`, then again
-   * below for `joinCode`. A Request body is single-use, so the second `request.json()`
-   * throws "Body is unusable: Body has already been read" and the guest is turned away
-   * with 400 Invalid JSON — *after* an anonymous auth user and a profile row have already
-   * been written for them. Every guest join left an orphaned identity and no membership.
-   *
-   * The two tests above never caught it because both assert on state written before the
-   * second read.
+   * The route once read the body twice (guest name, then join code). A Request body
+   * is single-use, so the second read threw and the guest got a 400 after an
+   * anonymous user already existed.
    */
   it('joins a guest instead of 400ing on a body it already consumed', async () => {
-    const client = makeClient(PROFILE_COLUMNS);
-    (createClient as any).mockResolvedValue(client);
+    (createClient as any).mockResolvedValue(makeClient());
 
     const res = await POST(req({ joinCode: 'ABC123', guestName: 'Dana' }));
 
-    expect(res.status).not.toBe(400);
     expect(res.status).toBe(200);
   });
 
-  it('does not join a guest whose profile write failed, leaving a nameless member', async () => {
-    // Only `id` accepted, so writing a username fails — stands for any schema drift.
-    const client = makeClient(['id']);
+  it('500s and enrols nobody when the guest session cannot be created', async () => {
+    const client = makeClient();
+    client.auth.signInAnonymously.mockResolvedValue({ data: { user: null }, error: { message: 'disabled' } } as never);
     (createClient as any).mockResolvedValue(client);
 
     const res = await POST(req({ joinCode: 'ABC123', guestName: 'Dana' }));
