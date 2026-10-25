@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { Check, ChevronDown, Loader2, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -32,10 +32,12 @@ export interface HomeHeroProps {
   onStart?: () => void;
   language: string;
   t: T;
+  /** Quiet secondary action under Start: a private practice round with bots. */
+  rehearse?: ReactNode;
 }
 
 /** "Start a game with <class>": the one primary action on Home, plus three featured modes. */
-export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t }: HomeHeroProps) {
+export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse }: HomeHeroProps) {
   const selected = classrooms.find((c) => c.id === selectedId) ?? classrooms[0];
   const [pending, setPending] = useState<string | null>(null);
   const go = (key: string) => {
@@ -69,6 +71,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
           )}
           {t('eduShell.home.startLive')}
         </Link>
+        {rehearse}
       </div>
 
       <ul className="relative mt-4 grid grid-cols-3 gap-2 sm:gap-3">
