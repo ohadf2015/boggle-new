@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
  * button; the power-up grid opens as a full-screen step so it cannot be missed
  * and is dismissed back to results. Cash figures come only from the server.
  */
-export default function RoundShop({ gameCode }: { gameCode: string }) {
+export default function RoundShop({ gameCode, compact = false }: { gameCode: string; compact?: boolean }) {
   const { t } = useLanguage();
   const econ = useClassroomEconomy(gameCode);
   const [open, setOpen] = useState(false);
@@ -23,6 +23,20 @@ export default function RoundShop({ gameCode }: { gameCode: string }) {
 
   return (
     <>
+      {compact ? (
+        shop && (
+          <button
+            type="button"
+            data-testid="round-shop-open"
+            onClick={() => setOpen(true)}
+            disabled={!canBuy}
+            className="flex min-h-11 w-full items-center justify-between gap-2 rounded-neo border-[3px] border-neo-cream/60 bg-neo-navy-elevated px-3 font-neo-display text-sm font-black text-neo-cream shadow-hard-sm disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <span className="min-w-0 truncate text-start">{t('economy.shop.title')}</span>
+            <span className="shrink-0 tabular-nums text-neo-lime">{t('economy.shop.open', { cash: shop.cash })}</span>
+          </button>
+        )
+      ) : (
       <section
         data-testid="round-shop"
         className="flex w-full flex-col gap-3 rounded-2xl border-4 border-neo-lime bg-neo-navy p-3 text-white shadow-hard-xl"
@@ -51,6 +65,10 @@ export default function RoundShop({ gameCode }: { gameCode: string }) {
           <p role="alert" className="text-sm text-neo-pink">{t(`economy.error.${econ.error}`)}</p>
         )}
       </section>
+      )}
+      {compact && econ.error && !open && (
+        <p role="alert" className="text-sm text-neo-pink">{t(`economy.error.${econ.error}`)}</p>
+      )}
 
       {open && shop && (
         <div

@@ -20693,6 +20693,9 @@ const ru = {
       "fullListFailed": "Не удалось вернуть весь список. Попробуйте ещё раз."
     },
     "studentResults": {
+      "tomorrowHook": "Возвращайся завтра и побей свой результат: {score}.",
+      "share": "Поделиться",
+      "shareText": "Мой результат в классной игре LexiClash: {rank}-е место из {total}, счёт {score}. Сможешь лучше?",
       "placed": "Твоё место",
       "rankOf": "{rank}-е из {total}",
       "points": "очков",

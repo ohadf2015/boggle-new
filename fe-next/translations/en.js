@@ -20056,6 +20056,9 @@ const en = {
       "fullListFailed": "Couldn't switch back to the full list. Try again."
     },
     "studentResults": {
+      "tomorrowHook": "Come back tomorrow and beat your score of {score}.",
+      "share": "Share",
+      "shareText": "I came #{rank} of {total} with {score} points in a LexiClash class game. Can you beat it?",
       "placed": "You placed",
       "rankOf": "#{rank} of {total}",
       "points": "points",

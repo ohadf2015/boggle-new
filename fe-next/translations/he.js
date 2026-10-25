@@ -20927,6 +20927,9 @@ const he = {
       "fullListFailed": "לא הצלחנו לחזור לרשימה המלאה. נסו שוב."
     },
     "studentResults": {
+      "tomorrowHook": "חזרו מחר ונסו לשבור את התוצאה שלכם: {score}.",
+      "share": "לשתף",
+      "shareText": "הגעתי למקום {rank} מתוך {total} עם {score} נקודות במשחק כיתה ב-LexiClash. תצליחו לעבור אותי?",
       "placed": "המקום שלך",
       "rankOf": "#{rank} מתוך {total}",
       "points": "נקודות",

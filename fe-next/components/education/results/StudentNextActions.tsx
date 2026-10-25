@@ -35,6 +35,7 @@ export function StudentNextActions({ onPlayAgain, onPractice, t }: StudentNextAc
         <m.button
           type="button"
           data-testid="play-again-button"
+          data-results-primary=""
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -62,6 +63,7 @@ export function StudentNextActions({ onPlayAgain, onPractice, t }: StudentNextAc
       {!onPlayAgain && (
         <div
           data-testid="wait-for-teacher-message"
+          data-results-primary=""
           role="status"
           aria-live="polite"
           className={cn(

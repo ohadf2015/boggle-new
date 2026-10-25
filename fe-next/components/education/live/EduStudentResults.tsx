@@ -20,10 +20,10 @@ import { sessionKeyFor } from '@/lib/education/roundEndHistory';
 import { classSwept } from '@/lib/education/roundEndSweep';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
-import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import type { PlayerResult } from '@/types/components';
 import { studentGap, studentPlacing } from './eduResultsModel';
 import { EduStudentHero } from './EduStudentHero';
+import { EduStudentNextStep } from './EduStudentNextStep';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
 
 export type EduStudentResultsProps = MpResultsProps;
@@ -132,20 +132,23 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
             </Beat>
           )}
 
+          <Beat index={beat++}>
+            <EduStudentNextStep
+              t={t}
+              language={c.language}
+              placing={placing}
+              onPractice={lessonId && missed.length > 0 ? () => openLessonPractice(lessonId) : undefined}
+            />
+          </Beat>
+
           {props.gameCode && (
             <Beat index={beat++}>
-              <ChestRewardCta gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
+              <ChestRewardCta quiet gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
             </Beat>
           )}
 
           <Beat index={beat++}>
-            <StudentMissedWords
-              words={missed}
-              language={props.roomLanguage ?? c.language}
-              t={t}
-              onPractice={lessonId && missed.length > 0 ? () => openLessonPractice(lessonId) : undefined}
-              className="w-full"
-            />
+            <StudentMissedWords words={missed} language={props.roomLanguage ?? c.language} t={t} className="w-full" />
           </Beat>
 
           <Beat index={beat++}>
@@ -179,17 +182,9 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
 
           {props.gameCode && (
             <Beat index={beat++}>
-              <RoundShop gameCode={props.gameCode} />
+              <RoundShop compact gameCode={props.gameCode} />
             </Beat>
           )}
-
-          <Beat index={beat++}>
-            <div className="flex items-center gap-3 rounded-neo-lg border-[3px] border-dashed border-neo-cream/50 px-3 py-2.5">
-              {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
-              <img src={EDU_MASCOT.success} alt="" aria-hidden="true" className="size-12 shrink-0 select-none" />
-              <p className="font-neo-body text-sm font-bold text-neo-cream/90">{t('eduLiveRoom.studentResults.nextRound')}</p>
-            </div>
-          </Beat>
         </main>
       )}
 

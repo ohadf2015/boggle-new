@@ -21009,6 +21009,9 @@ const es = {
       "fullListFailed": "No se pudo volver a la lista completa. Inténtalo de nuevo."
     },
     "studentResults": {
+      "tomorrowHook": "Vuelve mañana y supera tu puntuación: {score}.",
+      "share": "Compartir",
+      "shareText": "Quedé #{rank} de {total} con {score} puntos en un juego de clase de LexiClash. ¿Me superas?",
       "placed": "Tu puesto",
       "rankOf": "#{rank} de {total}",
       "points": "puntos",

@@ -20997,6 +20997,9 @@ const ja = {
       "fullListFailed": "全部の単語に戻せませんでした。もう一度お試しください。"
     },
     "studentResults": {
+      "tomorrowHook": "明日また来て、今日のスコア{score}を超えよう。",
+      "share": "シェア",
+      "shareText": "LexiClashのクラス対戦で{total}人中{rank}位、{score}点だったよ。超えられる？",
       "placed": "あなたの順位",
       "rankOf": "{total}人中{rank}位",
       "points": "ポイント",

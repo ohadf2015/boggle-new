@@ -20997,6 +20997,9 @@ const sv = {
       "fullListFailed": "Det gick inte att byta tillbaka till hela listan. Försök igen."
     },
     "studentResults": {
+      "tomorrowHook": "Kom tillbaka i morgon och slå ditt resultat: {score}.",
+      "share": "Dela",
+      "shareText": "Jag kom på plats {rank} av {total} med {score} poäng i ett klasspel i LexiClash. Kan du slå det?",
       "placed": "Din placering",
       "rankOf": "#{rank} av {total}",
       "points": "poäng",
