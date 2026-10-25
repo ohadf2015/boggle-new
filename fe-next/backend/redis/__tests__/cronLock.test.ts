@@ -11,6 +11,7 @@ vi.mock('../../utils/logger', () => ({
 let storedKeys: Record<string, string> = {};
 
 const mockClient = {
+  status: 'ready',
   set: vi.fn(async (key: string, value: string, _px: string, _ttl: number, mode: string) => {
     if (mode === 'NX' && storedKeys[key]) return null;
     storedKeys[key] = value;
@@ -26,9 +27,12 @@ const mockClient = {
 };
 
 const redisState = { available: true };
+// The cron routes' copy of ../connection never connects (null / false); only
+// the shared handle the server published carries the client.
 vi.mock('../connection', () => ({
-  getRedisClient: () => (redisState.available ? mockClient : null),
-  isRedisAvailable: () => redisState.available,
+  getRedisClient: () => null,
+  isRedisAvailable: () => false,
+  getSharedRedisClient: () => (redisState.available ? mockClient : null),
 }));
 
 vi.mock('../circuitBreaker', () => ({
@@ -39,6 +43,7 @@ describe('cron lock', () => {
   beforeEach(() => {
     storedKeys = {};
     redisState.available = true;
+    mockClient.status = 'ready';
     vi.clearAllMocks();
   });
 
@@ -57,6 +62,25 @@ describe('cron lock', () => {
     const r = await withCronLock('teacher-weekly-digest', 60_000, async () => 'ran');
     expect(r).toEqual({ status: 'ran', result: 'ran' });
     expect(logger.warn).toHaveBeenCalledWith('CRON_LOCK', expect.stringContaining('teacher-weekly-digest'));
+  });
+
+  it('Given the shared client is reconnecting, When a cron runs, Then it runs unprotected and says so', async () => {
+    const logger = (await import('../../utils/logger')).default;
+    const { withCronLock } = await import('../locking');
+    mockClient.status = 'reconnecting';
+    const r = await withCronLock('teacher-abandoned-checkout', 60_000, async () => 'ran');
+    expect(r).toEqual({ status: 'ran', result: 'ran' });
+    expect(mockClient.set).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith('CRON_LOCK', expect.stringContaining('teacher-abandoned-checkout'));
+  });
+
+  it('Given only the server-published Redis handle, When a cron runs, Then it takes the lock instead of running unprotected', async () => {
+    const logger = (await import('../../utils/logger')).default;
+    const { withCronLock } = await import('../locking');
+    const r = await withCronLock('teacher-abandoned-checkout', 60_000, async () => 'ran');
+    expect(r).toEqual({ status: 'ran', result: 'ran' });
+    expect(mockClient.set).toHaveBeenCalledWith(expect.stringMatching(/:cron:teacher-abandoned-checkout$/), expect.any(String), 'PX', 60_000, 'NX');
+    expect(logger.warn).not.toHaveBeenCalled();
   });
 
   it('tryAcquireCronLock returns lockId when key is free', async () => {

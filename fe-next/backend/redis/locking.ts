@@ -2,7 +2,7 @@
 
 import { circuitBreaker } from './circuitBreaker';
 import { DEFAULT_LOCK_TTL, LOCK_PREFIX, LOCK_RETRY_DELAY, MAX_LOCK_RETRIES } from './config';
-import { getRedisClient, isRedisAvailable } from './connection';
+import { getRedisClient, getSharedRedisClient, isRedisAvailable } from './connection';
 import type { LockResult } from './types';
 
 import logger from '../utils/logger';
@@ -160,6 +160,13 @@ export async function withGameLock<T>(
 
 const CRON_LOCK_PREFIX = `${LOCK_PREFIX}:cron`;
 
+// Cron routes run inside the Next bundle, whose copy of ./connection never
+// connects; read the client the server booted, and only while it is ready.
+function cronRedisClient() {
+  const client = getSharedRedisClient();
+  return client && client.status === 'ready' ? client : null;
+}
+
 /** Redis failed while taking the lock: the run did not happen and must not read as "already running". */
 export class CronLockError extends Error {
   constructor(jobName: string, cause: string) {
@@ -172,11 +179,11 @@ export async function tryAcquireCronLock(
   jobName: string,
   ttlMs: number
 ): Promise<string | null> {
-  if (!isRedisAvailable() || !getRedisClient()) {
+  const client = cronRedisClient();
+  if (!client) {
     logger.warn('CRON_LOCK', `${jobName} running without overlap protection: Redis unavailable`);
     return `no-redis-${Date.now()}`;
   }
-  const client = getRedisClient()!;
   const key = `${CRON_LOCK_PREFIX}:${jobName}`;
   const lockId = `${jobName}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
@@ -193,9 +200,9 @@ export async function tryAcquireCronLock(
 }
 
 export async function releaseCronLock(jobName: string, lockId: string): Promise<void> {
-  if (!isRedisAvailable() || !getRedisClient()) return;
   if (lockId.startsWith('no-redis-')) return;
-  const client = getRedisClient()!;
+  const client = cronRedisClient();
+  if (!client) return;
   const key = `${CRON_LOCK_PREFIX}:${jobName}`;
 
   // Atomic check-and-delete via Redis Lua. Bracket access avoids tooling
