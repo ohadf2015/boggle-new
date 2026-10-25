@@ -15,8 +15,18 @@ import { loadStudentInsights, type InsightsClient } from './studentInsightsLoade
 import type { StudentInsights } from './studentInsights';
 import logger from '@/utils/logger';
 
+const GENERATED_DISPLAY_NAME = /^player_[0-9a-f]{8}$/i;
+
+/** A typed display name is the child's name even when it reads like "Guest"; only the username can be a placeholder. */
+function studentReportName(displayName: string | null | undefined, username: string | null | undefined): string | null {
+  const typed = displayName?.trim();
+  if (typed && !GENERATED_DISPLAY_NAME.test(typed)) return typed;
+  return resolveDisplayName([username], '') || null;
+}
+
 export interface ParentReportSummary {
-  displayName: string;
+  /** Null when the student has no real name; the page shows a localized fallback. */
+  displayName: string | null;
   totalXp: number;
   lessonsCompleted: number;
   wordsMastered: number;
@@ -91,7 +101,7 @@ export async function loadParentReportData(
   return {
     status: 'ok',
     data: {
-      displayName: resolveDisplayName([profileResult.data?.display_name, profileResult.data?.username], 'Student'),
+      displayName: studentReportName(profileResult.data?.display_name, profileResult.data?.username),
       totalXp: insights.totalXp,
       lessonsCompleted: insights.lessonsCompleted,
       wordsMastered: insights.wordsMastered,

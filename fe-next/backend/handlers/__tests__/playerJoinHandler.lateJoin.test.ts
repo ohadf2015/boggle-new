@@ -231,6 +231,50 @@ describe('PlayerJoinHandler — a taken display name is not a reconnect', () => 
   });
 });
 
+describe('PlayerJoinHandler — two signed-in students share a display name in a classroom', () => {
+  const A = '11111111-1111-4111-8111-111111111111';
+  const B = '22222222-2222-4222-8222-222222222222';
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetGameUsers.mockReturnValue([]);
+    mockGetActiveRooms.mockReturnValue([]);
+    mockShouldSendGameState.mockReturnValue(false);
+    mockCheckSeat.mockResolvedValue({ game: { settings: {} }, refused: false });
+  });
+
+  it('Given Noa is seated, When a second signed-in Noa joins, Then she is seated as "Noa 2" and told so', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ gameState: 'waiting', users: { Noa: { socketId: 's-a', authUserId: A } } }));
+    mockGetSocketIdByUsername.mockImplementation((_code: string, name: string) => (name === 'Noa' ? 's-a' : undefined));
+    const { join, socket } = captureJoinHandler();
+    (socket.data as Record<string, unknown>).verifiedUserId = B;
+    await join({ gameCode: 'ABC123', username: 'Noa' });
+    expect(emitError).not.toHaveBeenCalled();
+    expect(handleReconnection).not.toHaveBeenCalled();
+    expect(mockAddUserToGame).toHaveBeenCalledWith('ABC123', 'Noa 2', 'late-socket-1', expect.objectContaining({ authUserId: B }));
+    expect(socket.emit).toHaveBeenCalledWith('joined', expect.objectContaining({ username: 'Noa 2' }));
+  });
+
+  it('Given the second Noa already sits as "Noa 2", When she rejoins asking for "Noa", Then she reconnects to "Noa 2"', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ users: { Noa: { socketId: 's-a', authUserId: A }, 'Noa 2': { socketId: 's-b', authUserId: B } } }));
+    mockGetSocketIdByUsername.mockReturnValue(undefined);
+    const { join, socket } = captureJoinHandler();
+    (socket.data as Record<string, unknown>).verifiedUserId = B;
+    await join({ gameCode: 'ABC123', username: 'Noa' });
+    expect(emitError).not.toHaveBeenCalled();
+    expect(vi.mocked(handleReconnection).mock.calls[0][4]).toBe('Noa 2');
+  });
+
+  it('Given an ordinary multiplayer room, When a second signed-in Noa joins, Then the name is still refused', async () => {
+    mockCheckSeat.mockResolvedValue({ game: null, refused: false });
+    mockGetGame.mockReturnValue(inProgressGame({ users: { Noa: { socketId: 's-a', authUserId: A } } }));
+    mockGetSocketIdByUsername.mockReturnValue('s-a');
+    const { join, socket } = captureJoinHandler();
+    (socket.data as Record<string, unknown>).verifiedUserId = B;
+    await join({ gameCode: 'ABC123', username: 'Noa' });
+    expect(emitError).toHaveBeenCalledWith(expect.anything(), 'PLAYER_USERNAME_TAKEN', expect.anything());
+  });
+});
+
 describe('PlayerJoinHandler — joining while the results screen is up (session still live)', () => {
   beforeEach(() => {
     vi.clearAllMocks();

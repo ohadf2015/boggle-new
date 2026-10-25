@@ -24,6 +24,7 @@ import { TvRecapHeader } from '@/components/education/results/TvRecapHeader';
 import { StrugglePreview } from '@/components/education/results/StrugglePreview';
 import { ResultsTeacherProTrialCard } from '@/components/education/results/ResultsTeacherProTrialCard';
 import { ZeroRoundNote } from '@/components/education/results/ZeroRoundNote';
+import { TeacherInviteNudge, showTeacherInvite } from '@/components/education/results/TeacherInviteNudge';
 import { EmptyRoundCard } from '@/components/education/results/EmptyRoundCard';
 import { useRoundEndReveal } from '@/components/education/results/useRoundEndReveal';
 import { useIsPhoneRecap } from '@/components/education/results/useIsPhoneRecap';
@@ -178,8 +179,9 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               </div>
             )}
             {/* Teacher Pro trial + school quote, after a class has actually played. Host tree only. On a short wall the reteach outranks it. */}
-            <div className={cn(!phone && (bossOver || missed.length > 0) && 'lg:[@media(max-height:900px)]:hidden')}>
+            <div className={cn('flex flex-col gap-3', !phone && (bossOver || missed.length > 0) && 'lg:[@media(max-height:900px)]:hidden')}>
               <ResultsTeacherProTrialCard language={language} />
+              {showTeacherInvite(outcome.celebrate, stats?.students ?? 0) && <TeacherInviteNudge students={stats?.students ?? 0} language={language} whatsapp={phone} t={t} />}
             </div>
           </div>
         </div>

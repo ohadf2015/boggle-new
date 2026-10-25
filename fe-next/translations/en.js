@@ -960,7 +960,8 @@ const en = {
       "progressAssignments": "assigned",
       "progressSubmitted": "submitted",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "{count} students tried an old game code. Start a new game so they can play."
+      "endedCodeTries": "{count} students tried an old game code. Start a new game so they can play.",
+      "endedCodeTriesOne": "1 student tried an old game code. Start a new game so they can play."
     },
     "modes": {
       "workshop": {
@@ -3535,6 +3536,7 @@ const en = {
     "backToHome": "Back to home"
   },
   "parentReport": {
+    "studentFallback": "Your child",
     "metaTitle": "Progress Report | LexiClash",
     "metaDescription": "A private student progress report shared by a teacher.",
     "subtitle": "Progress Report",
@@ -3548,6 +3550,8 @@ const en = {
     "footerNote": "Shared by your child's teacher via LexiClash. No account needed.",
     "joinPrompt": "Does your child have a class code?",
     "joinCta": "Join a class",
+    "playPrompt": "Play a word game with your child",
+    "playCta": "Play today's puzzle",
     "language": "View in",
     "printButton": "Print or save as PDF",
     "classLabel": "Class",
@@ -15592,6 +15596,8 @@ const en = {
       "day_left": "day left",
       "hours_left": "hours left",
       "hour_left": "hour left",
+      "days_left_few": "days left",
+      "hours_left_few": "hours left",
       "cta": "Start your first class",
       "expired_title": "Your teacher trial has ended",
       "expired_kept": "Your classes and word lists stay free. Reports, word mastery and calm mode need Pro.",
@@ -20027,6 +20033,9 @@ const en = {
       "toTeacher": "Back to teacher home"
     },
     "hostResults": {
+      "invitePrompt": "Know a teacher who'd like this?",
+      "inviteCta": "Invite a colleague",
+      "inviteText": "My class just played a word game on LexiClash. It's free for teachers, have a look:",
       "noScoresHint": "Same board, fresh start. Play again and the class gets another go.",
       "title": "Round results",
       "statStudents": "Students",
@@ -20051,6 +20060,9 @@ const en = {
       "fullListFailed": "Couldn't switch back to the full list. Try again."
     },
     "studentResults": {
+      "tomorrowHook": "Come back tomorrow and beat your score of {score}.",
+      "share": "Share",
+      "shareText": "I came #{rank} of {total} with {score} points in a LexiClash class game. Can you beat it?",
       "placed": "You placed",
       "rankOf": "#{rank} of {total}",
       "points": "points",

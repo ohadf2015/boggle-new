@@ -96,7 +96,7 @@ export function ClassNeedsHelp({ masteryByPlayer, t }: ClassNeedsHelpProps) {
               'bg-neo-navy text-neo-white font-neo-body font-bold text-sm'
             )}
           >
-            <span className="truncate max-w-[9rem]">{student.username}</span>
+            <span dir="auto" className="truncate max-w-[9rem]">{student.username}</span>
             <span className="shrink-0 tabular-nums text-neo-orange">
               {student.found}/{student.total}
             </span>

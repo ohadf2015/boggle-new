@@ -3,7 +3,7 @@
 import type { LetterGrid } from '@/shared/types/game';
 
 /** Modes where every student plays the SAME grid, so the wall can show it. */
-const SHARED_BOARD_MODES = new Set(['classic']);
+const SHARED_BOARD_MODES = new Set(['classic', 'word-hunt']);
 
 export function projectorShowsBoard(gameMode: string | undefined, grid: LetterGrid | undefined | null): boolean {
   return !!grid?.length && SHARED_BOARD_MODES.has(gameMode ?? 'classic');

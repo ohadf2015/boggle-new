@@ -35,6 +35,7 @@ const LITERAL = /(['"`])([a-zA-Z]\w*(?:\.[a-zA-Z]\w*){2,})\1/g;
 
 const AHEAD_OF_CODE = [
   'academy.hq.endedCodeTries',
+  'academy.hq.endedCodeTriesOne',
   'teacher.classroom.gameModes.wordTower',
   'education.modePicker.how.wordTower',
   'education.classroomModeBlurb.wordTower',

@@ -100,11 +100,28 @@ describe('loadParentReportData', () => {
     expect(sessions.filters).toContainEqual(['not', 'completed_at', 'is', null]);
   });
 
-  it('falls back to a generic name when the profile has no display_name or username', async () => {
+  it('Given no display_name or username, Then the name is left for the page to localize', async () => {
     const { client } = db({ public_profiles: ok({ display_name: null, username: null }) });
     const result = await loadParentReportData(client, STUDENT, CLASSROOM, NOW);
     if (result.status !== 'ok') throw new Error('expected ok');
-    expect(result.data.displayName).toBe('Student');
+    expect(result.data.displayName).toBeNull();
+  });
+
+  it.each(['Guest', 'Player-One', 'guest_star'])(
+    'Given a child whose typed display name is %s, Then the report names them as typed',
+    async (typed) => {
+      const { client } = db({ public_profiles: ok({ display_name: typed, username: 'Player_00952ce3' }) });
+      const result = await loadParentReportData(client, STUDENT, CLASSROOM, NOW);
+      if (result.status !== 'ok') throw new Error('expected ok');
+      expect(result.data.displayName).toBe(typed);
+    },
+  );
+
+  it('Given only the generated Player_<id> username, Then no id fragment reaches the parent', async () => {
+    const { client } = db({ public_profiles: ok({ display_name: '  ', username: 'Player_00952ce3' }) });
+    const result = await loadParentReportData(client, STUDENT, CLASSROOM, NOW);
+    if (result.status !== 'ok') throw new Error('expected ok');
+    expect(result.data.displayName).toBeNull();
   });
 
   it('never leaks email — only display_name/username are selected from profiles', async () => {

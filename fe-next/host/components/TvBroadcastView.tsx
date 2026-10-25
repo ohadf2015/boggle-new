@@ -28,8 +28,8 @@ import { TEACHER_CONTROLS_INSET } from '@/components/education/controls/teacherB
 import { ProjectorBossStage } from '@/components/education/boss/ProjectorBossStage';
 import { useBossActive } from '@/stores/classroomBossStore';
 import { ClassroomLivePanel } from '@/components/education/projector/ClassroomLivePanel';
-import ProjectorBoard, { projectorShowsBoard } from '@/components/education/live/ProjectorBoard';
-import ProjectorWheel, { useProjectorWheelPuzzle } from '@/components/education/live/ProjectorWheel';
+import { useProjectorWheelPuzzle } from '@/components/education/live/ProjectorWheel';
+import { ProjectorRoundStage } from '@/components/education/live/ProjectorRoundStage';
 import { roundHasScore } from '@/shared/utils/roundCelebration';
 import { wordHuntAlive } from './tv-broadcast/wordHuntAlive';
 import TvRoundFxLayers from './tv-broadcast/TvRoundFxLayers';
@@ -278,6 +278,19 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
 
   const isClassroom = !!classroomLive;
   const hunt = wordHuntAlive(wordHuntPlayerLives, wordHuntEliminatedPlayers, leaderboardData.length);
+  const activityPanel = (
+    <TvActivityPanel
+      playerScores={playerScores}
+      playerWordCounts={playerWordCounts}
+      socket={socket}
+      t={t}
+      fireRoundActive={fireRoundActive}
+      earthquakeShaking={earthquakeState === 'shaking'}
+      wordHuntTargetLength={wordHuntTargetLength}
+      wordHuntAliveCount={hunt.alive}
+      wordHuntTotalPlayers={hunt.total}
+    />
+  );
   const roomWordTotal = leaderboardData.reduce((sum, p) => sum + p.wordCount, 0);
   const fullscreenButton = showFullscreenButton ? (
     <m.button
@@ -414,27 +427,16 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
 
       <div className={`${isClassroom ? 'shrink-0 md:shrink md:flex-1 md:min-h-0 grid-rows-[auto_auto]' : 'flex-1 min-h-0 grid-rows-[1fr_1fr]'} grid grid-cols-1 md:grid-cols-2 md:grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
         <div className={isClassroom ? 'md:min-h-0 md:overflow-hidden' : 'min-h-[180px] md:min-h-0 overflow-hidden'}>
-          {isClassroom && gameMode !== 'word-hunt' ? (
+          {isClassroom ? (
             <div className="flex h-full min-h-0 gap-2 md:gap-4">
-              {projectorShowsBoard(gameMode, tableData) && tableData && <ProjectorBoard grid={tableData} label={t('eduLiveRoom.round.boardLabel')} />}
-              {wheelPuzzle && <ProjectorWheel puzzle={wheelPuzzle} label={t('eduLiveRoom.round.wheelLabel')} />}
+              <ProjectorRoundStage gameMode={gameMode} grid={tableData} wheelPuzzle={wheelPuzzle} t={t} />
               <div className="min-w-0 flex-1">
-                <ClassroomLivePanel socket={socket} totalWords={roomWordTotal} lessonWords={lessonWords} language={roomLanguage} hostUsername={username} t={t} />
+                {gameMode === 'word-hunt' ? activityPanel : (
+                  <ClassroomLivePanel socket={socket} totalWords={roomWordTotal} lessonWords={lessonWords} language={roomLanguage} hostUsername={username} t={t} />
+                )}
               </div>
             </div>
-          ) : (
-          <TvActivityPanel
-            playerScores={playerScores}
-            playerWordCounts={playerWordCounts}
-            socket={socket}
-            t={t}
-            fireRoundActive={fireRoundActive}
-            earthquakeShaking={earthquakeState === 'shaking'}
-            wordHuntTargetLength={wordHuntTargetLength}
-            wordHuntAliveCount={hunt.alive}
-            wordHuntTotalPlayers={hunt.total}
-          />
-          )}
+          ) : activityPanel}
         </div>
         <div
           data-testid="tv-leaderboard-card"

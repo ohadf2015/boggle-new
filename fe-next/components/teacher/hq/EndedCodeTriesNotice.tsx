@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Play, TriangleAlert, Users } from 'lucide-react';
+import { Play, TriangleAlert } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { fetchWithAuth } from '@/utils/authFetch';
 import logger from '@/utils/logger';
+import { pluralKey } from '@/lib/i18n/pluralKey';
+
+const ENDED_CODE_TRIES = { one: 'academy.hq.endedCodeTriesOne', other: 'academy.hq.endedCodeTries' };
 
 export function EndedCodeTriesNotice({ classroomId }: { classroomId: string }) {
   const { t, language } = useLanguage();
@@ -39,19 +42,9 @@ export function EndedCodeTriesNotice({ classroomId }: { classroomId: string }) {
       className="flex flex-wrap items-center gap-3 rounded-neo border-[3px] border-neo-black bg-neo-yellow px-3 py-2 text-neo-black shadow-hard-sm"
     >
       <TriangleAlert className="size-5 shrink-0" strokeWidth={2.5} aria-hidden />
-      <div className="min-w-48 flex-1">
-        <p className="font-neo-display text-sm font-black">{t('education.student.gameEnded.title')}</p>
-        <p className="mt-0.5 text-sm font-bold">
-          <span
-            data-testid="hq-ended-code-tries-count"
-            className="inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-white px-1.5 font-neo-display font-black"
-          >
-            <Users className="size-3.5" strokeWidth={3} aria-hidden />
-            <span dir="ltr">{count}</span>
-            <span>{t('teacher.dashboard.students')}</span>
-          </span>
-        </p>
-      </div>
+      <p data-testid="hq-ended-code-tries-text" className="min-w-48 flex-1 font-neo-display text-sm font-black">
+        {t(pluralKey(ENDED_CODE_TRIES, count, language), { count })}
+      </p>
       <Link
         href={teacherHostHref(language, { classroomId })}
         className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-lime px-3 font-neo-display text-sm font-black shadow-hard-sm active:translate-y-0.5"

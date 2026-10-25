@@ -158,4 +158,14 @@ describe('EduHostResults', () => {
     expect(screen.queryByTestId('celebration-loop')).toBeNull();
     expect(screen.queryByTestId('winner-boss-escaped')).toBeNull();
   });
+  it('Given a celebrated round with three or more students, When results show, Then a quiet invite-a-colleague row sits with the teacher cards', () => {
+    const class3 = [...players, { username: 'Lia', score: 5, wordsFoundCount: 1 }];
+    render(<EduHostResults summary={summary} players={class3} t={t} />);
+    expect(screen.getByTestId('teacher-invite')).toBeInTheDocument();
+  });
+
+  it('Given only two students, When results show, Then no invite appears', () => {
+    render(<EduHostResults summary={summary} players={players} t={t} />);
+    expect(screen.queryByTestId('teacher-invite')).toBeNull();
+  });
 });

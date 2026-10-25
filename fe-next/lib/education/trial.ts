@@ -3,6 +3,8 @@
 // ("your trial is live now — don't miss it"). This module holds the pure,
 // testable trial math so the duration policy lives in exactly one place.
 
+import { pluralKey } from '@/lib/i18n/pluralKey';
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 const HOUR_MS = 60 * 60 * 1000;
 
@@ -72,20 +74,28 @@ export function teacherTrialStatus(
  * genitive plural cannot follow "1" and the verb must agree ("час остался").
  *
  * `daysLeft` is rounded UP, so `daysLeft === 1` already means "inside the final
- * 24 hours" — which is why that case counts hours, and why the old
- * `education.trial.day_left` branch was unreachable.
+ * 24 hours" — which is why that case counts hours. The unit follows the
+ * locale's plural rules (Russian 21 days takes the singular form).
  *
  * Both consumers call this so the two badges cannot drift apart.
  */
-export function trialCountdownUnit(trial: TrialStatus): { key: string; count: number } {
+export function trialCountdownUnit(trial: TrialStatus, locale = 'en'): { key: string; count: number } {
   if (trial.daysLeft > 1) {
-    return { key: 'education.trial.days_left', count: trial.daysLeft };
+    return { key: pluralKey(DAY_FORMS, trial.daysLeft, locale), count: trial.daysLeft };
   }
-  return {
-    key: trial.hoursLeft === 1 ? 'education.trial.hour_left' : 'education.trial.hours_left',
-    count: trial.hoursLeft,
-  };
+  return { key: pluralKey(HOUR_FORMS, trial.hoursLeft, locale), count: trial.hoursLeft };
 }
+
+const DAY_FORMS = {
+  one: 'education.trial.day_left',
+  few: 'education.trial.days_left_few',
+  other: 'education.trial.days_left',
+};
+const HOUR_FORMS = {
+  one: 'education.trial.hour_left',
+  few: 'education.trial.hours_left_few',
+  other: 'education.trial.hours_left',
+};
 
 /** Active trial whose deadline is inside the dashboard upgrade-nudge window. */
 export function isTrialUpgradeNudgeWindow(trial: TrialStatus | null | undefined): boolean {

@@ -960,7 +960,8 @@ const he = {
       "progressAssignments": "מטלות",
       "progressSubmitted": "הוגשו",
       "progressUpgrade": "פרו למורים",
-      "endedCodeTries": "תלמידים שניסו קוד של משחק שהסתיים: {count}. התחילו משחק חדש כדי שיוכלו לשחק."
+      "endedCodeTries": "תלמידים שניסו קוד של משחק שהסתיים: {count}. התחילו משחק חדש כדי שיוכלו לשחק.",
+      "endedCodeTriesOne": "תלמיד אחד ניסה קוד של משחק שהסתיים. התחילו משחק חדש כדי שיוכל לשחק."
     },
     "modes": {
       "workshop": {
@@ -3934,6 +3935,7 @@ const he = {
     "backToHome": "חזרה לדף הבית"
   },
   "parentReport": {
+    "studentFallback": "הילד/ה שלכם",
     "metaTitle": "דוח התקדמות | LexiClash",
     "metaDescription": "דוח התקדמות פרטי של תלמיד/ה, ששותף על ידי המורה.",
     "subtitle": "דוח התקדמות",
@@ -3947,6 +3949,8 @@ const he = {
     "footerNote": "שותף על ידי המורה של ילדכם באמצעות LexiClash. לא נדרש חשבון.",
     "joinPrompt": "יש לילדכם קוד כיתה?",
     "joinCta": "הצטרפות לכיתה",
+    "playPrompt": "שחקו משחק מילים יחד עם הילד/ה",
+    "playCta": "לחידה של היום",
     "language": "הצגה בשפה",
     "printButton": "הדפסה או שמירה כ-PDF",
     "classLabel": "כיתה",
@@ -17094,6 +17098,8 @@ const he = {
       "day_left": "יום נותר",
       "hours_left": "שעות נותרו",
       "hour_left": "שעה נותרה",
+      "days_left_few": "ימים נותרו",
+      "hours_left_few": "שעות נותרו",
       "cta": "פתחו את הכיתה הראשונה",
       "expired_title": "תקופת הניסיון שלך כמורה הסתיימה",
       "expired_kept": "הכיתות ורשימות המילים שלכם נשארות חינם. דוחות, שליטה במילים ומצב רגוע דורשים פרו.",
@@ -20898,6 +20904,9 @@ const he = {
       "toTeacher": "חזרה לדף המורה"
     },
     "hostResults": {
+      "invitePrompt": "מכירים מורה שזה יתאים לה?",
+      "inviteCta": "להזמין עמית",
+      "inviteText": "הכיתה שלי שיחקה עכשיו משחק מילים ב-LexiClash. זה חינם למורים, שווה להציץ:",
       "noScoresHint": "אותו לוח, התחלה חדשה. עוד סיבוב והכיתה מנסה שוב.",
       "title": "תוצאות הסיבוב",
       "statStudents": "תלמידים",
@@ -20922,6 +20931,9 @@ const he = {
       "fullListFailed": "לא הצלחנו לחזור לרשימה המלאה. נסו שוב."
     },
     "studentResults": {
+      "tomorrowHook": "חזרו מחר ונסו לשבור את התוצאה שלכם: {score}.",
+      "share": "לשתף",
+      "shareText": "הגעתי למקום {rank} מתוך {total} עם {score} נקודות במשחק כיתה ב-LexiClash. תצליחו לעבור אותי?",
       "placed": "המקום שלך",
       "rankOf": "#{rank} מתוך {total}",
       "points": "נקודות",

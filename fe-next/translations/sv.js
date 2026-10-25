@@ -960,7 +960,8 @@ const sv = {
       "progressAssignments": "uppgifter",
       "progressSubmitted": "inlämnade",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "Elever som försökte med en gammal spelkod: {count}. Starta ett nytt spel så att de kan vara med."
+      "endedCodeTries": "Elever som försökte med en gammal spelkod: {count}. Starta ett nytt spel så att de kan vara med.",
+      "endedCodeTriesOne": "En elev försökte med en gammal spelkod. Starta ett nytt spel så att eleven kan vara med."
     },
     "modes": {
       "workshop": {
@@ -4272,6 +4273,7 @@ const sv = {
     "backToHome": "Tillbaka till startsidan"
   },
   "parentReport": {
+    "studentFallback": "Ditt barn",
     "metaTitle": "Framstegsrapport – LexiClash",
     "metaDescription": "En privat framstegsrapport för en elev, delad av en lärare.",
     "subtitle": "Framstegsrapport",
@@ -4285,6 +4287,8 @@ const sv = {
     "footerNote": "Delad av ditt barns lärare via LexiClash. Inget konto behövs.",
     "joinPrompt": "Har ditt barn en klasskod?",
     "joinCta": "Gå med i klassen",
+    "playPrompt": "Spela ett ordspel tillsammans med ditt barn",
+    "playCta": "Spela dagens utmaning",
     "language": "Visa på",
     "printButton": "Skriv ut eller spara som PDF",
     "classLabel": "Klass",
@@ -17531,6 +17535,8 @@ const sv = {
       "day_left": "dag kvar",
       "hours_left": "timmar kvar",
       "hour_left": "timme kvar",
+      "days_left_few": "dagar kvar",
+      "hours_left_few": "timmar kvar",
       "cta": "Skapa din första klass",
       "expired_title": "Din lärarprovperiod har tagit slut",
       "expired_kept": "Dina klasser och ordlistor förblir gratis. Rapporter, ordbehärskning och lugnt läge kräver Pro.",
@@ -20968,6 +20974,9 @@ const sv = {
       "toTeacher": "Tillbaka till lärarstarten"
     },
     "hostResults": {
+      "invitePrompt": "Känner du en lärare som skulle gilla det här?",
+      "inviteCta": "Bjud in en kollega",
+      "inviteText": "Min klass spelade just ett ordspel på LexiClash. Det är gratis för lärare, ta en titt:",
       "noScoresHint": "Samma bräde, ny start. Spela igen så får klassen ett nytt försök.",
       "title": "Rundans resultat",
       "statStudents": "Elever",
@@ -20992,6 +21001,9 @@ const sv = {
       "fullListFailed": "Det gick inte att byta tillbaka till hela listan. Försök igen."
     },
     "studentResults": {
+      "tomorrowHook": "Kom tillbaka i morgon och slå ditt resultat: {score}.",
+      "share": "Dela",
+      "shareText": "Jag kom på plats {rank} av {total} med {score} poäng i ett klasspel i LexiClash. Kan du slå det?",
       "placed": "Din placering",
       "rankOf": "#{rank} av {total}",
       "points": "poäng",

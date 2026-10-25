@@ -5,6 +5,7 @@ import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 import { readClassroomPressure } from '@/shared/utils/classroomPressure';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { foldJoinCode } from '@/lib/education/joinCodeInput';
 
 const querySchema = z.object({ code: z.string().min(1).max(10) });
 
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid game code' }, { status: 400 });
     }
 
-    const code = parsed.data.code.trim().toUpperCase();
+    const code = foldJoinCode(parsed.data.code);
     if (code.length !== 6 || !/^[A-Z0-9]+$/.test(code)) {
       return NextResponse.json({ error: 'Invalid game code' }, { status: 400 });
     }

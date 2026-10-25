@@ -23,6 +23,7 @@
 import { isMultiWordTerm } from '@/lib/education/singleWordTerm';
 import type { Classroom, VocabularyLesson, VocabularyWord, Language } from '@/lib/supabase/education/types';
 import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
+import { buildClassroomLaunchPayload, type ClassroomLaunchPayload } from './lobby/classroomLaunchPayload';
 import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromPack';
 import {
   VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
@@ -77,30 +78,10 @@ export interface QuickLaunchDeps {
   modeOverride?: ClassroomGameMode;
 }
 
-export interface CreateClassroomGamePayload {
-  gameCode: string;
-  classroomId: string;
-  teacherId: string;
-  teacherName: string;
-  lessonIds: string[];
-  lessonNames: string[];
-  vocabularyWords: string[];
-  settings: {
-    timerMinutes: number;
-    boardSize: 'small' | 'medium' | 'large';
-    allowLateJoin: boolean;
-    gameMode: ClassroomGameMode;
-    playStyle: 'ffa';
-    vocabQuizFocus?: 'any';
-    vocabQuizQuestionCount?: number;
-    vocabQuizSeconds?: number;
-  };
-}
-
 export type QuickLaunchResult =
   | {
       ok: true;
-      payload: CreateClassroomGamePayload;
+      payload: ClassroomLaunchPayload;
       classroom: Classroom;
       lesson: VocabularyLesson;
     }
@@ -209,13 +190,12 @@ export async function prepareQuickLaunch(
   }
 
   const gameMode = deps.modeOverride ?? resolveIntentMode(intent.mode, lessonWords);
-  const isQuiz = gameMode === 'vocab-quiz';
 
   return {
     ok: true,
     classroom: classroomStep.classroom,
     lesson,
-    payload: {
+    payload: buildClassroomLaunchPayload({
       gameCode: deps.gameCode,
       classroomId: classroomStep.classroom.id,
       teacherId: deps.userId,
@@ -223,20 +203,13 @@ export async function prepareQuickLaunch(
       lessonIds: [lesson.id],
       lessonNames: [lesson.name],
       vocabularyWords,
-      settings: {
-        timerMinutes: EXPRESS_TIMER_MINUTES,
-        boardSize: EXPRESS_BOARD_SIZE,
-        allowLateJoin: true,
-        gameMode,
-        playStyle: 'ffa',
-        ...(isQuiz
-          ? {
-              vocabQuizFocus: 'any' as const,
-              vocabQuizQuestionCount: VOCAB_QUIZ_DEFAULT_QUESTION_COUNT,
-              vocabQuizSeconds: VOCAB_QUIZ_DEFAULT_SECONDS,
-            }
-          : {}),
-      },
-    },
+      language: lesson.language,
+      mode: gameMode,
+      timerMinutes: EXPRESS_TIMER_MINUTES,
+      boardSize: EXPRESS_BOARD_SIZE,
+      allowLateJoin: true,
+      playStyle: 'ffa',
+      quiz: { focus: 'any', questionCount: VOCAB_QUIZ_DEFAULT_QUESTION_COUNT, seconds: VOCAB_QUIZ_DEFAULT_SECONDS },
+    }),
   };
 }

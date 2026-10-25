@@ -70,7 +70,7 @@ export function TeamBattleStandings({ teams, scores }: TeamBattleStandingsProps)
               <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
                 {team.members.map((member) => (
                   <li key={member.username} className="text-xs font-bold text-neo-black/80">
-                    {member.username} <span className="tabular-nums">({member.score})</span>
+                    <bdi>{member.username}</bdi> <span className="tabular-nums">({member.score})</span>
                   </li>
                 ))}
               </ul>

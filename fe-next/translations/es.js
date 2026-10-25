@@ -960,7 +960,8 @@ const es = {
       "progressAssignments": "tareas",
       "progressSubmitted": "entregadas",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "Alumnos que probaron el código de un juego que ya terminó: {count}. Empieza un juego nuevo para que puedan jugar."
+      "endedCodeTries": "Alumnos que probaron el código de un juego que ya terminó: {count}. Empieza un juego nuevo para que puedan jugar.",
+      "endedCodeTriesOne": "Un alumno probó el código de un juego que ya terminó. Empieza un juego nuevo para que pueda jugar."
     },
     "modes": {
       "workshop": {
@@ -3915,6 +3916,7 @@ const es = {
     "backToHome": "Volver al inicio"
   },
   "parentReport": {
+    "studentFallback": "Tu hijo/a",
     "metaTitle": "Informe de progreso | LexiClash",
     "metaDescription": "Un informe privado del progreso de un estudiante, compartido por su profesor.",
     "subtitle": "Informe de progreso",
@@ -3928,6 +3930,8 @@ const es = {
     "footerNote": "Compartido por el profesor de tu hijo/a a través de LexiClash. No necesitas una cuenta.",
     "joinPrompt": "¿Tu hijo/a tiene un código de clase?",
     "joinCta": "Unirse a la clase",
+    "playPrompt": "Jueguen juntos a un juego de palabras",
+    "playCta": "Jugar el reto de hoy",
     "language": "Ver en",
     "printButton": "Imprimir o guardar como PDF",
     "classLabel": "Clase",
@@ -17165,6 +17169,8 @@ const es = {
       "day_left": "día restante",
       "hours_left": "horas restantes",
       "hour_left": "hora restante",
+      "days_left_few": "días restantes",
+      "hours_left_few": "horas restantes",
       "cta": "Crea tu primera clase",
       "expired_title": "Tu prueba de profesor ha terminado",
       "expired_kept": "Tus clases y listas de palabras siguen gratis. Los informes, el dominio de palabras y el modo calmado requieren Pro.",
@@ -20980,6 +20986,9 @@ const es = {
       "toTeacher": "Volver al inicio de profe"
     },
     "hostResults": {
+      "invitePrompt": "¿Conoces a un docente a quien le gustaría?",
+      "inviteCta": "Invitar a un colega",
+      "inviteText": "Mi clase acaba de jugar a un juego de palabras en LexiClash. Es gratis para docentes, échale un vistazo:",
       "noScoresHint": "Mismo tablero, nuevo intento. Juega otra vez y la clase lo vuelve a probar.",
       "title": "Resultados de la ronda",
       "statStudents": "Alumnos",
@@ -21004,6 +21013,9 @@ const es = {
       "fullListFailed": "No se pudo volver a la lista completa. Inténtalo de nuevo."
     },
     "studentResults": {
+      "tomorrowHook": "Vuelve mañana y supera tu puntuación: {score}.",
+      "share": "Compartir",
+      "shareText": "Quedé #{rank} de {total} con {score} puntos en un juego de clase de LexiClash. ¿Me superas?",
       "placed": "Tu puesto",
       "rankOf": "#{rank} de {total}",
       "points": "puntos",

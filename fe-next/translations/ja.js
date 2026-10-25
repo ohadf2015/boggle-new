@@ -960,7 +960,8 @@ const ja = {
       "progressAssignments": "課題",
       "progressSubmitted": "提出済み",
       "progressUpgrade": "Teacher Pro",
-      "endedCodeTries": "終了したゲームのコードを入力した生徒：{count}人。新しいゲームを始めて、参加できるようにしましょう。"
+      "endedCodeTries": "終了したゲームのコードを入力した生徒：{count}人。新しいゲームを始めて、参加できるようにしましょう。",
+      "endedCodeTriesOne": "終了したゲームのコードを入力した生徒：{count}人。新しいゲームを始めて、参加できるようにしましょう。"
     },
     "modes": {
       "workshop": {
@@ -3934,6 +3935,7 @@ const ja = {
     "backToHome": "ホームに戻る"
   },
   "parentReport": {
+    "studentFallback": "お子さま",
     "metaTitle": "進捗レポート | LexiClash",
     "metaDescription": "先生が共有した、お子様の進捗に関する非公開レポートです。",
     "subtitle": "進捗レポート",
@@ -3947,6 +3949,8 @@ const ja = {
     "footerNote": "お子様の先生がLexiClashで共有しました。アカウントは不要です。",
     "joinPrompt": "お子様はクラスコードをお持ちですか?",
     "joinCta": "クラスに参加",
+    "playPrompt": "お子さまと一緒にことばゲームで遊びましょう",
+    "playCta": "今日のパズルで遊ぶ",
     "language": "表示言語",
     "printButton": "印刷 / PDFで保存",
     "classLabel": "クラス",
@@ -17243,6 +17247,8 @@ const ja = {
       "day_left": "日残り",
       "hours_left": "時間残り",
       "hour_left": "時間残り",
+      "days_left_few": "日残り",
+      "hours_left_few": "時間残り",
       "cta": "最初のクラスを作成",
       "expired_title": "教師トライアルが終了しました",
       "expired_kept": "クラスと単語リストは引き続き無料です。レポート、単語の習熟度、落ち着きモードはProが必要です。",
@@ -20968,6 +20974,9 @@ const ja = {
       "toTeacher": "先生ホームに戻る"
     },
     "hostResults": {
+      "invitePrompt": "気に入りそうな先生はいますか？",
+      "inviteCta": "同僚を招待",
+      "inviteText": "うちのクラスでLexiClashのことばゲームをやりました。先生は無料で使えます。よかったら見てみてください：",
       "noScoresHint": "同じ盤面でもう一度。クラスにもう一回チャンスを。",
       "title": "ラウンド結果",
       "statStudents": "生徒",
@@ -20992,6 +21001,9 @@ const ja = {
       "fullListFailed": "全部の単語に戻せませんでした。もう一度お試しください。"
     },
     "studentResults": {
+      "tomorrowHook": "明日また来て、今日のスコア{score}を超えよう。",
+      "share": "シェア",
+      "shareText": "LexiClashのクラス対戦で{total}人中{rank}位、{score}点だったよ。超えられる？",
       "placed": "あなたの順位",
       "rankOf": "{total}人中{rank}位",
       "points": "ポイント",

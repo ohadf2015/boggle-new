@@ -29,7 +29,7 @@ import { trackGrowthEvent, type GrowthEvent } from '@/utils/growthTracking';
 type Capture = (event: string, props?: Record<string, unknown>) => void;
 type Register = (props: Record<string, unknown>) => void;
 
-const safeCapture: Capture = (event, props) => {
+export const safeCapture: Capture = (event, props) => {
   try {
     (posthog.capture as unknown as Capture)(event, props);
   } catch (err) {

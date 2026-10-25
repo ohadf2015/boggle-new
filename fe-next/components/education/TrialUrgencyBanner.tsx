@@ -72,7 +72,7 @@ export function TrialUrgencyBanner({ trial, href, onDismiss, ctaLabel, recap }: 
   }
 
   // ---- Active: countdown + urgency. Final day counts down in hours. ----
-  const { key: unitKey, count } = trialCountdownUnit(trial);
+  const { key: unitKey, count } = trialCountdownUnit(trial, language);
   const titleKey = trial.isUrgent ? 'education.trial.urgent_title' : 'education.trial.title';
   const tone = trial.isUrgent ? 'bg-neo-pink text-neo-white' : 'bg-neo-lime text-neo-navy';
   const isUpgradeNudge = Boolean(onDismiss) || Boolean(ctaLabel);

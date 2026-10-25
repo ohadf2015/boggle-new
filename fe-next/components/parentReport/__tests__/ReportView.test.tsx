@@ -74,4 +74,11 @@ describe('parentReport RTL copy', () => {
     expect(flat).toContain('allTime');
     expect(flat).not.toMatch(/[A-Za-z]+[\s·,:–-]*\{\w+\}/);
   });
+  it.each(['he', 'en', 'ru'])('Given no student name, When the %s report renders, Then the heading uses the localized fallback', (locale) => {
+    render(<ReportView locale={locale} token="tok" data={{ ...data, displayName: null }} t={tFor(locale)} />);
+    const fallback = translateKey('parentReport.studentFallback', locale);
+    expect(fallback).not.toBe('parentReport.studentFallback');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(fallback);
+    expect(document.body).not.toHaveTextContent(/\bStudent\b/);
+  });
 });

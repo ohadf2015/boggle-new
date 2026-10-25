@@ -97,13 +97,18 @@ describe('Teacher Home: get students in', () => {
     triesCount = 4;
     render(<TeacherDashboard />);
     const notice = await screen.findByTestId('hq-ended-code-tries');
-    expect(notice).toHaveTextContent('education.student.gameEnded.title');
-    expect(within(notice).getByTestId('hq-ended-code-tries-count')).toHaveTextContent('4');
-    expect(within(notice).getByTestId('hq-ended-code-tries-count')).toHaveTextContent('teacher.dashboard.students');
-    expect(notice).not.toHaveTextContent('tvBroadcast.waitingForGame');
-    expect(notice).not.toHaveTextContent('academy.hq.endedCodeTries');
+    expect(notice).toHaveTextContent('academy.hq.endedCodeTries:{"count":4}');
+    expect(notice).not.toHaveTextContent('education.student.gameEnded.title');
     expect(within(notice).getByRole('link')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c1');
     expect(within(notice).getByRole('link')).toHaveTextContent('academy.hq.startTitle');
+  });
+
+  it('Given one student tried an ended code, Then the sentence uses the singular form', async () => {
+    triesCount = 1;
+    render(<TeacherDashboard />);
+    const notice = await screen.findByTestId('hq-ended-code-tries');
+    expect(notice).toHaveTextContent('academy.hq.endedCodeTriesOne');
+    expect(notice).not.toHaveTextContent('academy.hq.endedCodeTries:');
   });
 
   it('Given nobody tried an ended code, Then no notice', async () => {

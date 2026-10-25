@@ -204,7 +204,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                       className="!h-full !w-full"
                     />
                   </span>
-                  <span className="truncate">{student.username}</span>
+                  <span dir="auto" className="truncate">{student.username}</span>
                   {isReady && (
                     <span
                       data-testid="projector-ready-check"

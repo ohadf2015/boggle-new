@@ -10,7 +10,6 @@
 
 'use client';
 
-import type { ClassroomBossId } from '@/shared/types/classroomBoss';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { io, type Socket } from 'socket.io-client';
@@ -19,47 +18,12 @@ import logger from '@/utils/logger';
 import { getSocketURL } from '@/utils/SocketContext';
 import { classroomLivePath } from '@/lib/education/classroomLivePath';
 import { recordLessonPlays } from '@/lib/education/lessonPlayStat';
-import type { ClassroomGameMode, PracticeFocusSetting, VocabQuizVariant } from '@/shared/types/vocabQuiz';
-import type { PlayStyle } from '@/shared/utils/teamBattle';
-import type { ClassroomAccessibility, ClassroomPressure } from '@/shared/types/classroom';
+import type { ClassroomPressure } from '@/shared/types/classroom';
+import { splitLaunchPayload, type ClassroomLaunchPayload } from './classroomLaunchPayload';
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
 
-export interface ClassroomLaunchPayload {
-  gameCode: string;
-  classroomId: string;
-  teacherId: string;
-  teacherName: string;
-  lessonIds: string[];
-  lessonNames: string[];
-  vocabularyWords: string[];
-  /** The selected list's language; the server reconciles it with the class language. */
-  language?: string;
-  settings: {
-    timerMinutes: number;
-    boardSize: 'small' | 'medium' | 'large';
-    allowLateJoin: boolean;
-    /** In-round cash economy switches; stored on the room by the create handler. */
-    economy?: { wrongAnswerCost: boolean; powerUps: boolean };
-    gameMode: ClassroomGameMode;
-    targetWord?: string;
-    vocabQuizFocus?: PracticeFocusSetting;
-    vocabQuizQuestionCount?: number;
-    vocabQuizSeconds?: number;
-    vocabQuizVariant?: VocabQuizVariant;
-    classroomBossId?: ClassroomBossId;
-    playStyle: PlayStyle;
-    teamCount?: number;
-    accessibility?: ClassroomAccessibility;
-    /**
-     * The Pro pressure dials. NOT sent inside `createClassroomGame` — that
-     * handler whitelists its settings keys — but held and emitted as
-     * `updateClassroomGamePressure` the moment the room exists. Absent for a
-     * free teacher: the loud default is the free tier.
-     */
-    pressure?: ClassroomPressure;
-  };
-}
+export type { ClassroomLaunchPayload } from './classroomLaunchPayload';
 
 function randomGameCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -210,10 +174,9 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
       // the create handler whitelists its settings keys, so a pressure object
       // inside it would vanish without a trace (pitfall 4). They are emitted
       // to the room the moment the created ack lands.
-      const { pressure, ...createSettings } = payload.settings;
-      pressureRef.current = pressure ?? null;
+      const { createPayload, pressure } = splitLaunchPayload(payload);
+      pressureRef.current = pressure;
       launchedLessonIdsRef.current = payload.lessonIds;
-      const createPayload = { ...payload, settings: createSettings };
       if (socket) {
         socket.emit('createClassroomGame', createPayload);
         return;
