@@ -7,7 +7,7 @@ describe('projectorShowsBoard', () => {
   it.each([
     ['classic', true],
     [undefined, true],
-    ['word-hunt', false],
+    ['word-hunt', true],
     ['blast', false],
     ['wheel-rush', false],
     ['vocab-quiz', false],
