@@ -59,9 +59,12 @@ function isForeignProduct(p: WebhookPayload): boolean {
   return productId !== undefined && productId !== process.env.POLAR_PRO_PRODUCT_ID
 }
 
+/** Polar sends modified_at null on an object that was never modified; created_at is then its last change. */
 function getEventAt(p: WebhookPayload): string | null {
-  const at = p?.data?.modified_at
-  return typeof at === 'string' && Number.isFinite(Date.parse(at)) ? at : null
+  for (const at of [p?.data?.modified_at, p?.data?.created_at]) {
+    if (typeof at === 'string' && Number.isFinite(Date.parse(at))) return at
+  }
+  return null
 }
 
 /** Polar order totals are in cents; only a positive charge is a payment. */

@@ -92,7 +92,11 @@ export interface ProEntitlement {
 /** Slack after a trial end before a missing lapse webhook stops counting. */
 export const TRIAL_END_GRACE_MS = DAY_MS;
 
-/** How long a failed renewal keeps Pro while the provider retries the card (our choice, not Polar's number). */
+/**
+ * Grace past `current_period_end` for a past_due row (our choice, not Polar's number). Polar does
+ * not say whether that date has already rolled forward on a failed renewal, so the real bound is
+ * the provider's own unpaid/revoke event; this cap only stops a lost webhook keeping Pro forever.
+ */
 export const PAST_DUE_GRACE_MS = 7 * DAY_MS;
 
 function withinGrace(periodEnd: string | null, graceMs: number, nowMs: number, whenMissing: boolean): boolean {

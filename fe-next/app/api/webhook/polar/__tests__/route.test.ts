@@ -198,6 +198,11 @@ describe('polar webhook', () => {
     })
   })
 
+  it('falls back to created_at when Polar sends modified_at null (an object never modified)', async () => {
+    await POST(polarEvent('subscription.created', { ...subscriptionData, modified_at: null, created_at: '2026-10-09T09:00:00Z' }))
+    expect(upsertSubscription).toHaveBeenCalledWith(expect.objectContaining({ eventAt: '2026-10-09T09:00:00Z' }))
+  })
+
   it('passes the provider modified_at so an older delivery cannot overwrite a newer state', async () => {
     await POST(polarEvent('subscription.updated', { ...subscriptionData, modified_at: '2026-10-09T10:00:00Z' }))
     expect(upsertSubscription).toHaveBeenCalledWith(expect.objectContaining({ eventAt: '2026-10-09T10:00:00Z' }))
