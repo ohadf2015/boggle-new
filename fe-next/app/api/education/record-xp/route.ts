@@ -12,6 +12,7 @@ import { createClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
 import { claimOnce } from '@/lib/server/claimOnce';
 import { resolveRecordXpGrant } from '@/lib/education/recordXpPolicy';
+import { CONNECTIONS_DAILY_XP_CEILING, reserveDailyXp } from '@/lib/education/recordXpDailyCeiling';
 
 interface RecordEducationXpRequest {
   xpAmount: number;
@@ -68,8 +69,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Too many requests' }, { status: 429 });
     }
 
+    const day = new Date().toISOString().slice(0, 10);
+    let xpToGrant = grant.xp;
+    if (grant.kind === 'connections') {
+      const allowed = await reserveDailyXp(userId, day, grant.xp, CONNECTIONS_DAILY_XP_CEILING);
+      if (allowed === 'unavailable') {
+        return NextResponse.json({ error: 'Try again shortly' }, { status: 503 });
+      }
+      if (allowed < 1) {
+        return NextResponse.json({ success: true, xpEarned: 0, dailyCapReached: true });
+      }
+      xpToGrant = allowed;
+    }
+
     if (grant.kind === 'daily_chest') {
-      const day = new Date().toISOString().slice(0, 10);
       const claim = await claimOnce(`edu-daily-chest:${userId}:${day}`, 60 * 60 * 48);
       if (claim === 'unavailable') {
         return NextResponse.json({ error: 'Try again shortly' }, { status: 503 });
@@ -78,7 +91,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: true, xpEarned: 0, alreadyClaimed: true });
       }
     }
-    const xpToGrant = grant.xp;
 
     // Sync XP to main profiles table
     const { data: xpData, error: xpError } = await supabase.rpc('increment_player_xp', {
