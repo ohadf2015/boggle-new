@@ -5,7 +5,50 @@ import { polarTrialExpires } from '@/lib/education/polarTrial';
 import { getPolarClient } from '@/lib/polar';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { liveAccessTrialExpiry } from '@/lib/education/accessTrialServer';
+import { hasPendingCheckout, type PendingCheckoutEventRow } from '@/lib/education/pendingCheckout';
+import { withTimeout } from '@/lib/server/routeTimeout';
 import logger from '@/utils/logger';
+
+const PENDING_CHECKOUT_LOOKUP_TIMEOUT_MS = 800;
+
+async function profileIsTestAccount(userId: string): Promise<boolean> {
+  const admin = createAdminClient();
+  if (!admin) return false;
+  try {
+    const { data } = await withTimeout(
+      Promise.resolve(admin.from('profiles').select('is_test_account').eq('id', userId).maybeSingle()),
+      PENDING_CHECKOUT_LOOKUP_TIMEOUT_MS,
+    );
+    return (data as { is_test_account?: boolean | null } | null)?.is_test_account === true;
+  } catch {
+    return false;
+  }
+}
+
+async function resolvePendingCheckout(userId: string): Promise<boolean> {
+  try {
+    const admin = createAdminClient();
+    if (!admin) return false;
+    if (await profileIsTestAccount(userId)) return false;
+    const { data, error } = await withTimeout(
+      Promise.resolve(
+        admin
+          .from('subscription_events')
+          .select('event_type, created_at, payload')
+          .eq('user_id', userId),
+      ),
+      PENDING_CHECKOUT_LOOKUP_TIMEOUT_MS,
+    );
+    if (error || !Array.isArray(data)) return false;
+    return hasPendingCheckout({
+      events: data as PendingCheckoutEventRow[],
+      hasPro: false,
+    });
+  } catch (err) {
+    logger.warn('Pending checkout lookup failed:', err);
+    return false;
+  }
+}
 
 /**
  * True once any webhook for this teacher was marked as a Polar trial.
@@ -95,6 +138,7 @@ export async function GET(request: NextRequest) {
     );
     const trialUsed = onPolarTrial || await hasPolarTrialEvent(user.id);
     const accessTrialExpires = subscription.has_pro ? null : await liveAccessTrialExpiry(user.id);
+    const pendingCheckout = subscription.has_pro ? false : await resolvePendingCheckout(user.id);
 
     return NextResponse.json({
       has_pro: subscription.has_pro,
@@ -108,6 +152,7 @@ export async function GET(request: NextRequest) {
       trial_expires: trialExpires,
       trial_used: trialUsed,
       access_trial_expires: accessTrialExpires,
+      pending_checkout: pendingCheckout,
       grant,
     });
   } catch (err) {

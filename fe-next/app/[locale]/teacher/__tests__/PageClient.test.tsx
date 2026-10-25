@@ -416,4 +416,22 @@ describe('TeacherPage Polar 14-day trial offer', () => {
     render(<TeacherPage />);
     expect(screen.getByTestId('pro-offer')).toHaveAttribute('data-kind', 'upgrade');
   });
+
+  it('renders PendingCheckoutBanner when pendingCheckout is true, outranking offerTrial and suppressing usage prompt', () => {
+    proState = {
+      ...proState,
+      hasPro: false,
+      pendingCheckout: true,
+    } as typeof proState;
+    usageState = { reason: 'students', count: 12, loading: false, dismissed: false, dismiss: vi.fn() };
+    render(<TeacherPage />);
+    expect(screen.getByTestId('pending-checkout-banner')).toBeInTheDocument();
+    expect(screen.queryByTestId('pro-offer')).toBeNull();
+    expect(screen.queryByTestId('teacher-pro-usage-prompt')).toBeNull();
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', {
+      product: 'teacher_pro',
+      source: 'dashboard_pending_checkout',
+      event_type: 'impression',
+    });
+  });
 });
