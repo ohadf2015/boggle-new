@@ -13,8 +13,12 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export const TRIAL_REMINDER_BUCKETS = ['t-3', 't-0', 't+3'] as const;
 export type TrialReminderBucket = (typeof TRIAL_REMINDER_BUCKETS)[number];
 
-/** Whole days the expiry threshold has been open for. Negative = still ahead. */
-const THRESHOLD_DAYS: Record<TrialReminderBucket, number> = { 't-3': -3, 't-0': 0, 't+3': 3 };
+/**
+ * Days relative to expiry at which each bucket opens. Negative = still ahead.
+ * t-0 ("ends today") opens one day before the end and, in pickTrialReminder,
+ * closes AT the end: it is never sent for a trial that has already ended.
+ */
+const THRESHOLD_DAYS: Record<TrialReminderBucket, number> = { 't-3': -3, 't-0': -1, 't+3': 3 };
 
 /**
  * Don't surprise someone whose trial died months ago. Anything past this is
@@ -47,7 +51,15 @@ export function pickTrialReminder(
   for (const bucket of [...TRIAL_REMINDER_BUCKETS].reverse()) {
     // The latest due bucket wins, and if it already went out nothing older is
     // worth sending — "your trial ends in 3 days" is a lie once it has ended.
-    if (daysPast >= THRESHOLD_DAYS[bucket]) return sent.has(bucket) ? null : bucket;
+    if (daysPast >= THRESHOLD_DAYS[bucket]) {
+      if (sent.has(bucket)) return null;
+      // "Your trial ends today" is only true while the trial is still running
+      // and ends within the next day. Once the end has passed (a missed run, an
+      // outage, an off-schedule caller) the honest message is the t+3 one, so
+      // wait for it rather than sending a stale deadline.
+      if (bucket === 't-0' && daysPast >= 0) return null;
+      return bucket;
+    }
   }
   return null;
 }
