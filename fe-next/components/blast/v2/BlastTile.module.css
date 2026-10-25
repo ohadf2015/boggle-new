@@ -158,7 +158,13 @@
   touch-action: none;
   cursor: pointer;
   /* Smooth state transitions for depth effect */
-  transition: all 120ms ease-out;
+  transition:
+    transform 120ms ease-out,
+    box-shadow 120ms ease-out,
+    background-color 120ms ease-out,
+    color 120ms ease-out,
+    opacity 120ms ease-out,
+    filter 120ms ease-out;
 }
 
 /* Selected state: electric accent color face + white letter */

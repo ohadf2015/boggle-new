@@ -69,7 +69,7 @@ export async function GET(
   .pos { font-size: 14px; font-style: italic; color: #BFFF00; opacity: .8; }
   .def { font-size: 14px; line-height: 1.5; color: #FFFEF0; }
   .ex { font-size: 13px; line-height: 1.4; color: #FFFEF0; opacity: .85; margin-top: auto; padding-top: 12px; border-top: 1px solid #333; }
-  .footer { font-size: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #333; text-align: center; color: #BFFF00; }
+  .footer { font-size: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #333; text-align: center; color: #BFFF00; transition: opacity 150ms ease-out; }
   .footer:hover { opacity: .8; }
 </style>
 </head>

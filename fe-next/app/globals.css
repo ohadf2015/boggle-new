@@ -3375,7 +3375,7 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
 .slot-machine-text {
   display: inline-block;
   position: relative;
-  transition: all 0.3s ease-out;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
 }
 
 .slot-machine-text.animating {
