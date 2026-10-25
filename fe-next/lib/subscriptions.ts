@@ -11,6 +11,7 @@ import { createAdminClient } from '@/utils/supabase/admin'
 import { type TierConfig, getTierConfig } from './lemonsqueezy'
 import { FREE_TIER_LIMITS } from './education/freeTierLimits'
 import { resolveProEntitlement, type SubscriptionSource } from './education/proGrant'
+import { teacherHasProAccess } from './education/accessTrialServer'
 
 export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'paused' | 'trialing'
 export type Tier = 'free' | 'pro'
@@ -114,8 +115,7 @@ export async function canCreateClass(
 
   const currentCount = count || 0
 
-  // Pro users (active subscription) have unlimited classes
-  if (subscription.has_pro) {
+  if (await teacherHasProAccess(userId, subscription)) {
     return { allowed: true, currentCount, limit: null }
   }
 
@@ -201,8 +201,7 @@ export async function canAddStudent(
 
   const currentCount = count || 0
 
-  // Pro users (active subscription) have unlimited students
-  if (subscription.has_pro) {
+  if (await teacherHasProAccess(teacherId, subscription)) {
     return { allowed: true, currentCount, limit: null }
   }
 

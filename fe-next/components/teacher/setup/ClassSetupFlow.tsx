@@ -10,7 +10,7 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
-import { isFreePlanUsageBlocked } from '@/lib/education/teacherPlanGate';
+import { hasProAccess, isFreePlanUsageBlocked } from '@/lib/education/teacherPlanGate';
 import {
   trackEduClassroomCreated,
   trackEduFirstStudentJoined,
@@ -50,7 +50,7 @@ export function ClassSetupFlow() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { classrooms, createClassroom } = useClassrooms();
-  const { hasPro, status, loading: proLoading } = useTeacherPro();
+  const { hasPro, status, loading: proLoading, accessTrialExpires } = useTeacherPro();
   const { trial, isLoading: accessLoading } = useTeacherAccess();
   const { markInviteCopied } = useTeacherActivationProgress();
 
@@ -63,6 +63,8 @@ export function ClassSetupFlow() {
   const [limitHit, setLimitHit] = useState<{ currentCount: number; limit: number } | null>(null);
   const [trialAskDismissed, setTrialAskDismissed] = useState(false);
   const [projectorOpen, setProjectorOpen] = useState(false);
+  const [nowMs] = useState(() => Date.now());
+  const proAccess = hasProAccess({ hasPro, accessTrialExpires: accessTrialExpires ?? null }, nowMs);
   const rootRef = useRef<HTMLDivElement>(null);
 
   // The create button sits below the fold on phones; without this the ready screen opens mid-scroll with focus on nothing.
@@ -93,13 +95,13 @@ export function ClassSetupFlow() {
     });
   }, [readyId, joined, language, hasPro, status, proLoading]);
 
-  const cap = proLoading ? null : classCap({ count: classrooms.length, hasPro, limit: FREE_TIER_LIMITS.classes });
+  const cap = proLoading ? null : classCap({ count: classrooms.length, hasPro: proAccess, limit: FREE_TIER_LIMITS.classes });
   // Expired trial: ask at the entrance to the NEXT class, never in front of the first one.
   const trialAskOpen =
     !ready && classrooms.length > 0 && !accessLoading && !proLoading && !hasPro && !!trial?.isExpired && !trialAskDismissed;
 
   const submit = useCallback(async () => {
-    if (isFreePlanUsageBlocked(hasPro, classrooms.length, FREE_TIER_LIMITS.classes)) {
+    if (isFreePlanUsageBlocked(proAccess, classrooms.length, FREE_TIER_LIMITS.classes)) {
       setLimitHit({ currentCount: classrooms.length, limit: FREE_TIER_LIMITS.classes });
       return;
     }
@@ -128,7 +130,7 @@ export function ClassSetupFlow() {
     }
     setErrorKey('eduShell.setup.createFailed');
     toast.error(t('eduShell.setup.createFailed'));
-  }, [name, grade, t, language, classrooms, createClassroom, classLanguage, hasPro, status, proLoading, router]);
+  }, [name, grade, t, language, classrooms, createClassroom, classLanguage, hasPro, proAccess, status, proLoading, router]);
 
   const copy = useCallback(
     async (url: string) => {

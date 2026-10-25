@@ -17,7 +17,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
-import { isFreePlanUsageBlocked } from '@/lib/education/teacherPlanGate';
+import { hasProAccess, isFreePlanUsageBlocked } from '@/lib/education/teacherPlanGate';
 import { TEACHER_PRO_MILESTONE_MIN_STUDENTS } from '@/lib/education/teacherProMilestone';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
@@ -42,11 +42,13 @@ export function StudentCapMeter({
   source = 'dashboard',
 }: StudentCapMeterProps) {
   const { t, language } = useLanguage();
-  const { hasPro, loading } = useTeacherPro();
+  const pro = useTeacherPro();
+  const [nowMs] = useState(() => Date.now());
+  const hasPro = hasProAccess(pro, nowMs);
   const count = studentCount ?? 0;
   const limit = FREE_TIER_LIMITS.studentsPerClass;
   const atCap = isFreePlanUsageBlocked(hasPro, count, limit);
-  const showCta = !loading && shouldShowStudentCapUpgradeCta(count, hasPro);
+  const showCta = !pro.loading && shouldShowStudentCapUpgradeCta(count, hasPro);
   const [gateOpen, setGateOpen] = useState(false);
 
   return (
