@@ -361,8 +361,16 @@ export async function markCelebrated(
   const supabase = getSupabase()!;
   const today = getTodayDate(date);
 
-  // Ensure row exists
-  await getDailyMissions(playerId, date);
+  // Ensure row exists, and refuse to celebrate work that isn't done: the
+  // client toasts on newlyCelebrated, so it must never be true for an
+  // incomplete mission (or a grand slam with any slot still open).
+  const missions = await getDailyMissions(playerId, date);
+  const isComplete =
+    key === 'word_hunt' ? missions.wordHunt
+    : key === 'adventure' ? missions.adventure
+    : key === 'community' ? missions.community
+    : missions.wordHunt && missions.adventure && missions.community;
+  if (!isComplete) return { newlyCelebrated: false };
 
   // Conditional update: only flip false→true. If already true, affected=0
   // and we signal "not newly celebrated" to the caller.

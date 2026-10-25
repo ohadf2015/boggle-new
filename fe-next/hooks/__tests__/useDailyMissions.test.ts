@@ -385,3 +385,47 @@ describe('useDailyMissions', () => {
     });
   });
 });
+
+describe('useDailyMissions — celebrate flow only fires for truly complete missions', () => {
+  it('never POSTs /celebrate nor toasts when no mission is complete', async () => {
+    mockSingle.mockResolvedValueOnce({ data: EMPTY_DATA, error: null });
+
+    const { result } = renderHook(() => useDailyMissions());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    // let any pending effects / dynamic imports flush
+    await new Promise(r => setTimeout(r, 0));
+
+    expect(global.fetch).not.toHaveBeenCalled();
+    expect(showQuestCompletionToast).not.toHaveBeenCalled();
+  });
+
+  it('celebrates only the completed slot, not its incomplete siblings', async () => {
+    mockSingle.mockResolvedValueOnce({
+      data: { ...EMPTY_DATA, adventure_completed: true },
+      error: null,
+    });
+
+    const { result } = renderHook(() => useDailyMissions());
+    await waitFor(() => expect(showQuestCompletionToast).toHaveBeenCalledTimes(1));
+
+    const bodies = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.map(c => JSON.parse(c[1].body).key);
+    expect(bodies).toEqual(['adventure']);
+    expect(result.current.isGrandSlam).toBe(false);
+  });
+
+  it('does not fire the Grand Slam celebration with 2 of 3 complete', async () => {
+    mockSingle.mockResolvedValueOnce({
+      data: { ...EMPTY_DATA, word_hunt_completed: true, adventure_completed: true },
+      error: null,
+    });
+
+    const { result } = renderHook(() => useDailyMissions());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(2));
+    await new Promise(r => setTimeout(r, 0));
+
+    const keys = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.map(c => JSON.parse(c[1].body).key);
+    expect(keys).not.toContain('grand_slam');
+    expect(showQuestCompletionToast).not.toHaveBeenCalledWith(expect.objectContaining({ isGrandSlam: true }));
+  });
+});

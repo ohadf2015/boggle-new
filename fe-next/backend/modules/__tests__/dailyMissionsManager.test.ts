@@ -465,7 +465,7 @@ describe('markCelebrated', () => {
 
   it('returns newlyCelebrated=true when update affects a row (false→true transition)', async () => {
     // getDailyMissions (ensure row exists)
-    mockMaybeSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
+    mockMaybeSingle.mockResolvedValueOnce({ data: { ...EMPTY_ROW, word_hunt_completed: true }, error: null });
     const { eqCol } = setupCelebrationChain([{ word_hunt_celebrated: true }]);
 
     const result = await markCelebrated(PLAYER_ID, 'word_hunt');
@@ -477,7 +477,7 @@ describe('markCelebrated', () => {
 
   it('returns newlyCelebrated=false when update affects zero rows (already celebrated)', async () => {
     mockMaybeSingle.mockResolvedValueOnce({
-      data: { ...EMPTY_ROW, word_hunt_celebrated: true },
+      data: { ...FULL_ROW, word_hunt_celebrated: true },
       error: null,
     });
     setupCelebrationChain([]);
@@ -488,7 +488,7 @@ describe('markCelebrated', () => {
   });
 
   it('returns newlyCelebrated=false on db error', async () => {
-    mockMaybeSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
+    mockMaybeSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
     const selectFn = vi.fn().mockResolvedValue({ data: null, error: { message: 'boom' } });
     const eqCol = vi.fn().mockReturnValue({ select: selectFn });
     const eqDate = vi.fn().mockReturnValue({ eq: eqCol });
