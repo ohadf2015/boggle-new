@@ -6,6 +6,9 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { useTeacherPro } from '../useTeacherPro';
 
+const auth = vi.hoisted(() => ({ user: { id: 'teacher-a' } as { id: string } | null }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth }));
+
 describe('useTeacherPro', () => {
   const originalFetch = global.fetch;
 
@@ -53,6 +56,29 @@ describe('useTeacherPro', () => {
       expect(result.current.loading).toBe(false);
       expect(result.current.hasPro).toBe(true);
     } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('never reuses another account\'s answer on a shared computer when the read fails', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      vi.resetModules();
+      const fresh = await import('../useTeacherPro');
+      auth.user = { id: 'teacher-a' };
+      mockStatus({ has_pro: true });
+      const first = renderHook(() => fresh.useTeacherPro());
+      await waitFor(() => expect(first.result.current.loading).toBe(false));
+      first.unmount();
+      await act(async () => { await vi.advanceTimersByTimeAsync(10); });
+      auth.user = { id: 'teacher-b' };
+      global.fetch = vi.fn().mockRejectedValue(new Error('offline')) as unknown as typeof fetch;
+      const { result } = renderHook(() => fresh.useTeacherPro());
+      await act(async () => { await vi.advanceTimersByTimeAsync(5000); });
+      expect(result.current.hasPro).toBe(false);
+      expect(result.current.loading).toBe(true);
+    } finally {
+      auth.user = { id: 'teacher-a' };
       vi.useRealTimers();
     }
   });

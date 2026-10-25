@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import type { SubscriptionSource } from '@/lib/education/proGrant';
 
 export interface TeacherProGrant {
@@ -75,7 +76,7 @@ function fetchStatus(force: boolean): Promise<StatusRead> {
 }
 
 const RETRY_MS = 1500;
-let lastKnown: Omit<TeacherProState, 'loading' | 'refresh'> | null = null;
+let lastKnown: { userId: string; state: Omit<TeacherProState, 'loading' | 'refresh'> } | null = null;
 
 function stateFrom(data: StatusBody): Omit<TeacherProState, 'loading' | 'refresh'> {
   const status = (data?.status as TeacherProStatus) || 'active';
@@ -106,12 +107,15 @@ function stateFrom(data: StatusBody): Omit<TeacherProState, 'loading' | 'refresh
  *
  * - `hasPro` starts false, so a failure never gives the product away.
  * - A failed read (5xx, network) is retried once; if it still fails the last answer this
- *   tab saw is reused, else `loading` stays true. A paying teacher on flaky school wifi
+ *   tab saw for this same account is reused, else `loading` stays true. A paying teacher on flaky school wifi
  *   sees a neutral state, not "Upgrade". Only a signed-out answer resolves to free.
  */
 export function useTeacherPro(): TeacherProState {
   const [state, setState] = useState<Omit<TeacherProState, 'loading' | 'refresh'>>(FREE);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const userIdRef = useRef('');
+  userIdRef.current = user?.id ?? '';
 
   const load = useCallback(async (isCancelled: () => boolean, force = false) => {
     let read = await fetchStatus(force);
@@ -123,7 +127,7 @@ export function useTeacherPro(): TeacherProState {
     if (isCancelled()) return;
     if (read.kind === 'ok') {
       const next = stateFrom(read.body);
-      lastKnown = next;
+      lastKnown = userIdRef.current ? { userId: userIdRef.current, state: next } : null;
       setState(next);
       setLoading(false);
       return;
@@ -134,8 +138,8 @@ export function useTeacherPro(): TeacherProState {
       setLoading(false);
       return;
     }
-    if (lastKnown) {
-      setState(lastKnown);
+    if (lastKnown && userIdRef.current && lastKnown.userId === userIdRef.current) {
+      setState(lastKnown.state);
       setLoading(false);
     }
   }, []);
