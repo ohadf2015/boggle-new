@@ -51,9 +51,16 @@ function makeSupabase() {
       }
       if (table === 'classroom_rounds') {
         return {
-          select: () => ({
-            eq: () => ({ gte: () => Promise.resolve({ count: fake.priorRounds, error: null }) }),
-          }),
+          select: (_cols: string, opts?: { head?: boolean }) => {
+            const result = opts?.head
+              ? { count: fake.priorRounds, error: null }
+              : { data: fake.priorRounds > 0 ? [{ completed_at: new Date().toISOString() }] : [], error: null };
+            const chain: Record<string, unknown> = {
+              then: (ok: (v: unknown) => unknown, bad?: (e: unknown) => unknown) => Promise.resolve(result).then(ok, bad),
+            };
+            for (const m of ['eq', 'gte', 'order', 'limit']) chain[m] = () => chain;
+            return chain;
+          },
           insert: (row: Record<string, unknown>) => {
             roundInserts.push(row);
             return Promise.resolve({ error: fake.roundInsertError });
@@ -71,6 +78,9 @@ function makeSupabase() {
             }),
           }),
         };
+      }
+      if (table === 'profiles') {
+        return { select: () => ({ in: () => ({ eq: () => Promise.resolve({ data: [], error: null }) }) }) };
       }
       if (table === 'student_lesson_progress') {
         return {

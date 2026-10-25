@@ -17,4 +17,8 @@ describe('EDU_EVENTS catalog', () => {
     expect(EDU_EVENTS.teacherFirstLiveGame).toBe('edu_teacher_first_live_game');
     expect(EDU_EVENTS.teacherOnboardingStep).toBe('edu_teacher_onboarding_step');
   });
+
+  it('Given the north-star funnel, Then the second live game day event has a stable name', () => {
+    expect(EDU_EVENTS.teacherSecondLiveGameDay).toBe('edu_teacher_second_live_game_day');
+  });
 });

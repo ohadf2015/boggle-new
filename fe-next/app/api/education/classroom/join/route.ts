@@ -4,8 +4,8 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { z } from 'zod';
 import logger from '@/utils/logger';
 import { canAddStudent } from '@/lib/subscriptions';
-import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
-import { buildStudentJoinedEvent, isQaEmail } from '@/backend/utils/educationRoundTelemetry';
+import { createAdminClient } from '@/utils/supabase/admin';
+import { captureStudentJoinEvents } from '@/lib/education/joinTelemetry';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 import { lookupLiveGameForClassroom } from '@/lib/education/liveGameForClassroom';
 import { lookupEndedClassroomSession, recordEndedCodeTry } from './endedSessionCode';
@@ -263,13 +263,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    captureEduServerEvents([
-      buildStudentJoinedEvent({
-        studentId: userId,
-        classroomId: classroom.id,
-        isTestAccount: isQaEmail(user?.email),
-      }),
-    ]);
+    await captureStudentJoinEvents(createAdminClient(), { classroomId: classroom.id, studentId: userId });
 
     return NextResponse.json(
       {

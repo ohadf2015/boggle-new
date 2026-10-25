@@ -10,6 +10,18 @@ vi.mock('@/lib/posthog', () => ({
   }),
 }));
 vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }));
+const flaggedProfiles = new Set<string>();
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: () => ({
+    from: () => ({
+      select: () => ({
+        in: (_c: string, ids: string[]) => ({
+          eq: async () => ({ data: ids.filter((i) => flaggedProfiles.has(i)).map((id) => ({ id })), error: null }),
+        }),
+      }),
+    }),
+  }),
+}));
 vi.mock('@/lib/auth/getAuthedUser', () => ({
   getAuthedUser: vi.fn(async () => ({ id: 'teacher-1', email: 'teacher@example.com' })),
 }));
@@ -35,6 +47,21 @@ describe('POST /api/education/classroom/create — edu_classroom_created', () =>
   beforeEach(() => {
     vi.clearAllMocks();
     captured.length = 0;
+    flaggedProfiles.clear();
+  });
+
+  it('Given a teacher flagged as a test account without a QA email, When a class is created, Then the event says so', async () => {
+    flaggedProfiles.add('teacher-1');
+    (createClient as any).mockResolvedValue({
+      from: vi.fn(() => ({
+        insert: insertOk,
+        select: () => ({ eq: async () => ({ count: 2, error: null }) }),
+      })),
+    });
+
+    await POST(req({ name: 'Class A', language: 'en' }));
+
+    expect(created()[0].properties.is_test_account).toBe(true);
   });
 
   it('Given a created classroom, When POSTed, Then exactly one event fires for the teacher with the classroom id', async () => {

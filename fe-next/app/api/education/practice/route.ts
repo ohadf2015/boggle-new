@@ -11,6 +11,7 @@ import { VOCAB_FOCUSES } from '@/lib/education/vocabFocus';
 import { canStudentPracticeLesson } from '@/lib/education/lessonAccess';
 import { WORDCRAFT_SESSION_MODE } from '@/lib/education/wordcraftAssignment';
 import { findSatisfiedAssignment, stampAssignmentCompletion } from '@/lib/education/assignmentCompletion';
+import { captureStudentReturned } from '@/lib/education/studentReturnTelemetry';
 import { gateWordCraftCompletion } from '@/lib/education/wordcraftCompletionGate';
 
 function tooManyRequests(retryAfter: number | undefined) {
@@ -227,14 +228,9 @@ export async function POST(request: NextRequest) {
 
     const { lessonId, practiceType, focus, variant } = parseResult.data;
 
-    // Verify student has access to this lesson: owns it, or belongs to the
-    // classroom it lives in. `lesson_assignments` is metadata (due date,
-    // pinned focus), never the gate — see lib/education/lessonAccess.ts and
-    // app/api/education/practice/lessons/route.ts, which already treat access
-    // this way. Read with the service-role client: the `vocabulary_lessons`
-    // RLS SELECT policy for a student is assignment-shaped, so the student's
-    // own session would read back zero rows / error: null for exactly the
-    // lessons this check needs to see.
+    // Access = owns the lesson or is in its classroom; `lesson_assignments` is metadata, never
+    // the gate (lib/education/lessonAccess.ts). Service-role read: the student's own session sees
+    // zero rows / error: null under the assignment-shaped `vocabulary_lessons` RLS policy.
     const admin = createAdminClient();
     if (!admin) {
       logger.error('POST practice: service-role client unavailable');
@@ -272,6 +268,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create session' }, { status: 500 });
     }
 
+    void captureStudentReturned(admin, { studentId: user.id, gameMode: variant ?? practiceType, surface: 'practice', lessonId });
     return NextResponse.json({ session }, { status: 201 });
   } catch (error) {
     logger.error('POST practice error:', error);

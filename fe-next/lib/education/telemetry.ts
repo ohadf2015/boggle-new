@@ -51,11 +51,11 @@ const safeCapture: Capture = (event, props) => {
  * one, dual-emit would double-count.
  */
 const ACTIVATION_GROWTH_MIRROR = new Set<GrowthEvent>([
-  'edu_classroom_created',
+  'edu_classroom_create_ui_done',
   'edu_join_code_shown',
   'edu_join_code_copied',
   'edu_join_code_shared',
-  'edu_first_student_joined',
+  'edu_first_student_seen',
   'edu_classroom_join',
   'edu_live_game_started',
   'edu_teacher_onboarding_step',
@@ -268,9 +268,9 @@ export interface EduClassroomCreatedArgs {
 }
 
 /**
- * `edu_classroom_created` — the step between "teacher onboarded" and "students
- * joined" that had no event at all, so the teacher funnel could not tell a
- * teacher who never created a classroom from one whose students never joined.
+ * Which UI surface created the class. The canonical `edu_classroom_created`
+ * is emitted once by the create route; this browser twin used to share its name
+ * and counted every class twice.
  */
 export function trackEduClassroomCreated(args: EduClassroomCreatedArgs): void {
   const props: Record<string, unknown> = {
@@ -278,7 +278,7 @@ export function trackEduClassroomCreated(args: EduClassroomCreatedArgs): void {
     created_via: args.createdVia,
   };
   if (args.language) props.language = args.language;
-  captureActivation('edu_classroom_created', props);
+  captureActivation('edu_classroom_create_ui_done', props);
 }
 
 export interface EduJoinCodeArgs {
@@ -317,7 +317,7 @@ export function trackEduJoinCodeShared(args: EduJoinCodeArgs & { method: EduJoin
 }
 
 export function trackEduFirstStudentJoined(args: EduJoinCodeArgs): void {
-  captureActivation('edu_first_student_joined', { classroom_id: args.classroomId });
+  captureActivation('edu_first_student_seen', { classroom_id: args.classroomId });
 }
 
 export interface EduTeacherOnboardingStepArgs {

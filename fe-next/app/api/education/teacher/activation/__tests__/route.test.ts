@@ -12,7 +12,16 @@ vi.mock('@/utils/supabase/server', () => ({
   }),
 }));
 
+const captured: Array<{ distinctId: string; event: string; properties: Record<string, unknown> }> = [];
+vi.mock('@/lib/posthog', () => ({
+  getPostHogServer: () => ({ capture: (arg: (typeof captured)[number]) => captured.push(arg) }),
+}));
+vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: () => null }));
+
 import { GET, PATCH } from '../route';
+
+const patchReq = (body: unknown) =>
+  new Request('http://local/api/education/teacher/activation', { method: 'PATCH', body: JSON.stringify(body) }) as never;
 
 function profileChain(data: unknown, error: unknown = null) {
   return {
@@ -34,6 +43,26 @@ describe('GET/PATCH /api/education/teacher/activation', () => {
     updateEq.mockReset();
     from.mockReset();
     updateEq.mockResolvedValue({ error: null });
+    captured.length = 0;
+  });
+
+  it('Given a teacher copies the invite for the first time, When saved, Then one server copy event fires', async () => {
+    getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
+    from.mockReturnValue(profileChain({ teacher_activation_invite_copied_at: null }));
+    await PATCH(patchReq({ inviteCopied: true }));
+    const copies = captured.filter((c) => c.event === 'edu_join_code_copy_recorded');
+    expect(copies).toHaveLength(1);
+    expect(copies[0]).toMatchObject({ distinctId: 'u1', properties: { is_test_account: false } });
+  });
+
+  it('Given the invite was already copied, or the write fails, When saved again, Then no copy event fires', async () => {
+    getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
+    from.mockReturnValue(profileChain({ teacher_activation_invite_copied_at: '2026-10-05T00:00:00Z' }));
+    await PATCH(patchReq({ inviteCopied: true }));
+    from.mockReturnValue(profileChain({ teacher_activation_invite_copied_at: null }));
+    updateEq.mockResolvedValue({ error: { message: 'nope' } });
+    await PATCH(patchReq({ inviteCopied: true }));
+    expect(captured.filter((c) => c.event === 'edu_join_code_copy_recorded')).toHaveLength(0);
   });
 
   it('rejects anonymous readers', async () => {

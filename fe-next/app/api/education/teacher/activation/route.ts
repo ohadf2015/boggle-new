@@ -6,6 +6,10 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
+import { captureEduServerEvents } from '@/backend/utils/educationTelemetry';
+import { buildJoinCodeCopyRecordedEvent } from '@/backend/utils/educationRoundTelemetry';
+import { isAnyTestAccount } from '@/lib/education/eduTestAccount';
 import {
   applyActivationPatch,
   progressFromProfileRow,
@@ -108,5 +112,9 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ ok: true, ...next, unavailable: true }, { status: 200 });
   }
 
+  if (unset.inviteCopied) {
+    const isTestAccount = await isAnyTestAccount(createAdminClient(), [user.id]);
+    captureEduServerEvents([buildJoinCodeCopyRecordedEvent({ teacherId: user.id, isTestAccount })]);
+  }
   return NextResponse.json({ ok: true, ...next });
 }

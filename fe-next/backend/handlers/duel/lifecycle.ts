@@ -21,6 +21,7 @@ import {
 import { generateRandomTable } from '@/backend/utils/gameUtils';
 import { generateRichBoard } from '@/backend/utils/boardSelection';
 import { getSupabase } from '@/backend/modules/supabase/client';
+import { captureStudentReturned } from '@/lib/education/studentReturnTelemetry';
 import { startRealtimeDuel } from './realtime';
 import { emitToUser, joinUserToRoom } from './userSockets';
 import logger from '@/backend/utils/logger';
@@ -225,6 +226,10 @@ export function registerLifecycleHandlers(
         });
         logger.error('DUEL', `Failed to accept duel: ${updateError?.message}`);
         return;
+      }
+
+      for (const studentId of [duel.challenger_id, duel.opponent_id]) {
+        void captureStudentReturned(supabase, { studentId, gameMode: 'duel', surface: 'duel' });
       }
 
       // Both players join duel room

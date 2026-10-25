@@ -26,6 +26,7 @@ import {
   captureEduServerEvents,
   buildClassroomJoinRefusedEvent,
   EDU_ANALYTICS_HOST,
+  normalizeAnalyticsHost,
 } from '../educationTelemetry';
 
 function makeGame(over: Partial<ClassroomGame> = {}): ClassroomGame {
@@ -273,4 +274,29 @@ describe('buildClassroomJoinRefusedEvent', () => {
     expect(mockCapture).toHaveBeenCalledTimes(1);
     expect(mockCapture.mock.calls[0][0].properties.$host).toBe(EDU_ANALYTICS_HOST);
   });
+});
+
+describe('normalizeAnalyticsHost', () => {
+  it('Given the apex or www production URL, Then both stamp the www host the client stamps', () => {
+    expect(normalizeAnalyticsHost('https://lexiclash.live')).toBe('www.lexiclash.live');
+    expect(normalizeAnalyticsHost('https://www.lexiclash.live/')).toBe('www.lexiclash.live');
+    expect(normalizeAnalyticsHost('https://LexiClash.live')).toBe('www.lexiclash.live');
+  });
+
+  it('Given a preview or local URL, Then it keeps its own host; missing or broken falls back to www', () => {
+    expect(normalizeAnalyticsHost('http://localhost:3100')).toBe('localhost');
+    expect(normalizeAnalyticsHost('https://pr-12.up.railway.app')).toBe('pr-12.up.railway.app');
+    expect(normalizeAnalyticsHost(undefined)).toBe('www.lexiclash.live');
+    expect(normalizeAnalyticsHost('not a url')).toBe('www.lexiclash.live');
+  });
+});
+
+describe('captureEduServerEvents — server-canonical activation steps get growth twins', () => {
+  it.each(['edu_classroom_created', 'edu_first_student_joined', 'edu_teacher_second_live_game_day'])(
+    'Given %s, When captured, Then a growth: twin rides with it',
+    (event) => {
+      captureEduServerEvents([{ distinctId: 't1', event, properties: { classroom_id: 'c1' } }]);
+      expect(mockCapture.mock.calls.map((c) => c[0].event)).toEqual([event, `growth:${event}`]);
+    }
+  );
 });

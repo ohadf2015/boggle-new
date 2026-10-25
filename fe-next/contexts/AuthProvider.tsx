@@ -122,6 +122,7 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
           isTeacher,
           locale,
           email: user.email ?? null,
+          isTestAccount: profile.is_test_account === true,
         },
       });
       // Resolve pending signup-prompt funnel only on guest → authed flips.
