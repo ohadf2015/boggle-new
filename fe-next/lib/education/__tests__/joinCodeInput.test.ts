@@ -26,6 +26,13 @@ describe('foldJoinCode', () => {
     expect(foldJoinCode('ｐ４５ｋｒｔ')).toBe('P45KRT');
   });
 
+  it('Given a Latin code pasted inside quotes or after a slash, When sanitized, Then the punctuation is not read as Q or W', () => {
+    expect(sanitizeJoinCode("'ABC234'")).toBe('ABC234');
+    expect(sanitizeJoinCode('"ABC234"')).toBe('ABC234');
+    expect(sanitizeJoinCode('/ABC234')).toBe('ABC234');
+    expect(joinCodeOverflows("'ABC234'")).toBe(false);
+  });
+
   it('Given an ordinary code with padding, When folded, Then it is trimmed and uppercased', () => {
     expect(foldJoinCode('  p45krt ')).toBe('P45KRT');
   });
