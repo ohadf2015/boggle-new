@@ -20279,8 +20279,39 @@ const en = {
     "coverageLabel": "lesson words found by the class",
     "bossStaggers": "Attacks blocked: {count}",
     "bossDamage": "{dmg} dmg"
-  }
+  },
   // @eduResultsV3:end
+  // @teacherLifecycleEmail:start
+  "teacherLifecycleEmail": {
+    "greeting": "Hi {name},",
+    "ask": "Questions? Just reply to this email. I read everything.",
+    "signoff": "— Ohad, the creator of LexiClash",
+    "share_code": {
+      "subject": "Your class is ready. Your students just need the code",
+      "lead": "Your class is set up, but no students have joined yet.",
+      "body": "Open your class and share the join link: paste it into WhatsApp or Google Classroom, or put the code on the board. Students join from any phone or laptop.",
+      "cta": "Share my join link"
+    },
+    "start_live": {
+      "subject": "Your students are in. Ready for a live game?",
+      "lead": "Students have joined your class, but you haven't played a live game together yet.",
+      "body": "Open your class, pick a word list and press start. A round is short, and the whole class plays at once on the big screen.",
+      "cta": "Start a live game"
+    },
+    "second_game": {
+      "subject": "Ready for round two with your class?",
+      "lead": "Your class played its first live game a few days ago.",
+      "body": "The second game is where the words start to stick. Open your class to see which words students missed, then run a live game on them.",
+      "cta": "Plan the next game"
+    },
+    "reactivate": {
+      "subject": "Your LexiClash teacher access is still open",
+      "lead": "You were approved a while ago, but you haven't made a class yet.",
+      "body": "It takes a minute: name your class, get a join code, and your students can play today. If something got in the way, reply and tell me what it was.",
+      "cta": "Create my first class"
+    }
+  }
+  // @teacherLifecycleEmail:end
 };
 
 export { en };

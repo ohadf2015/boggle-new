@@ -14,41 +14,29 @@ vi.mock('next/server', () => ({
 const h = vi.hoisted(() => ({
   sendEmailSpy: vi.fn(async () => ({ ok: true })),
   tables: {} as Record<string, { data: unknown; error: { message: string } | null }>,
-  updates: [] as Array<{ table: string; values: unknown; filters: Array<[string, string, unknown]> }>,
+  noAdmin: false,
+  markFails: false,
+  telegram: vi.fn(async () => true),
 }));
-
-function chainFor(name: string) {
-  const result = h.tables[name] ?? { data: [], error: null };
-  const chain: Record<string, unknown> = {};
-  let update: { table: string; values: unknown; filters: Array<[string, string, unknown]> } | null = null;
-  const self = () => chain;
-  chain.select = self;
-  chain.not = self;
-  chain.gte = self;
-  chain.eq = (col: string, val: unknown) => {
-    update?.filters.push(['eq', col, val]);
-    return chain;
-  };
-  chain.in = (col: string, val: unknown) => {
-    update?.filters.push(['in', col, val]);
-    return chain;
-  };
-  chain.update = (values: unknown) => {
-    update = { table: name, values, filters: [] };
-    h.updates.push(update);
-    return chain;
-  };
-  chain.then = (resolve: unknown, reject: unknown) =>
-    Promise.resolve(update ? { data: null, error: null } : result).then(resolve as never, reject as never);
-  return chain;
-}
+import { postgrestDouble } from '@/lib/education/__tests__/helpers/postgrestDouble';
 
 vi.mock('@/lib/email/send', () => ({ sendEmail: h.sendEmailSpy }));
 vi.mock('@/lib/email', async (importOriginal) => ({
   ...(await importOriginal()),
-  getSupabaseAdmin: () => ({ from: (name: string) => chainFor(name) }),
+  getSupabaseAdmin: () => {
+    if (h.noAdmin) return null;
+    const db = postgrestDouble(h.tables);
+    return {
+      from: (t: string) => {
+        const q = db.from(t);
+        if (t === 'teacher_access_requests' && h.markFails) q.update = () => ({ in: async () => ({ error: { message: 'rls' } }) });
+        return q;
+      },
+    };
+  },
 }));
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
+vi.mock('@/lib/telegram', () => ({ sendTelegramMessage: h.telegram, escapeTelegramMarkdownV2: (s: string) => s }));
 vi.mock('@/backend/redis/locking', () => ({
   withCronLock: async (_n: string, _ms: number, fn: () => Promise<unknown>) => ({
     status: 'ran',
@@ -78,6 +66,7 @@ const authed = () => makeRequest({ authorization: `Bearer ${CRON_SECRET}` });
 
 const access = (over = {}) => ({
   id: 'r1',
+  status: 'approved',
   user_id: 'u1',
   email: 'ada@school.edu',
   full_name: 'Ada',
@@ -101,12 +90,13 @@ describe('/api/cron/teacher-activation-nudge', () => {
     vi.clearAllMocks();
     process.env.CRON_SECRET = CRON_SECRET;
     h.sendEmailSpy.mockResolvedValue({ ok: true });
-    h.updates = [];
+    h.noAdmin = false;
     h.tables = {
       teacher_access_requests: { data: [access()], error: null },
       classrooms: { data: [], error: null },
       profiles: { data: [profile()], error: null },
       subscriptions: { data: [], error: null },
+      cron_heartbeats: { data: [{ job: 'teacher-weekly-digest', last_run_at: daysAgo(2) }], error: null },
     };
   });
 
@@ -126,9 +116,8 @@ describe('/api/cron/teacher-activation-nudge', () => {
     expect(mail.replyTo).toBe('ohadf2015@gmail.com');
     expect(mail.html).toContain('/en/teacher/classroom/new');
     expect(mail.html).toContain('Practice first with 3 bots');
-    expect(h.updates).toHaveLength(1);
-    expect(h.updates[0].values).toEqual({ activation_nudges_sent: ['d1', 'd3'] });
-    expect(h.updates[0].filters).toContainEqual(['in', 'id', ['r1']]);
+    expect(h.tables.teacher_access_requests.data[0].activation_nudges_sent).toEqual(['d1', 'd3']);
+    expect(h.tables.teacher_lifecycle_sends.data.map((r) => r.kind)).toEqual(['activation:d3']);
   });
 
   it('carries a one-click unsubscribe link in the headers and the footer', async () => {
@@ -170,7 +159,7 @@ describe('/api/cron/teacher-activation-nudge', () => {
   });
 
   it('skips a teacher who has a classroom', async () => {
-    h.tables.classrooms = { data: [{ teacher_id: 'u1' }], error: null };
+    h.tables.classrooms = { data: [{ id: 'c1', teacher_id: 'u1', created_at: new Date().toISOString() }], error: null };
     const body = await (await POST(authed())).json();
     expect(body.sent).toBe(0);
     expect(body.excluded.hasClassroom).toBe(1);
@@ -206,7 +195,7 @@ describe('/api/cron/teacher-activation-nudge', () => {
     h.sendEmailSpy.mockResolvedValue({ ok: false, error: 'resend down' });
     const body = await (await POST(authed())).json();
     expect(body).toMatchObject({ sent: 0, failed: 1 });
-    expect(h.updates).toHaveLength(0);
+    expect(h.tables.teacher_access_requests.data[0].activation_nudges_sent).toEqual(['d1']);
   });
 
   it('plans without sending on a dry run', async () => {
@@ -215,6 +204,55 @@ describe('/api/cron/teacher-activation-nudge', () => {
     expect(body.excluded).toEqual({ hasClassroom: 0, testAccount: 0, hasPro: 0 });
     expect(body.plan).toEqual([{ email: 'ada@school.edu', locale: 'en', bucket: 'd3', rows: 1 }]);
     expect(h.sendEmailSpy).not.toHaveBeenCalled();
-    expect(h.updates).toHaveLength(0);
+    expect(h.tables.teacher_access_requests.data[0].activation_nudges_sent).toEqual(['d1']);
+  });
+
+  it('Given no service-role client, Then the run fails loudly instead of success:true', async () => {
+    h.noAdmin = true;
+    expect((await POST(authed())).status).toBe(500);
+  });
+
+  it('Given a teacher approved 40 days ago with no class, Then one reactivation email goes out, once', async () => {
+    h.tables.teacher_access_requests = { data: [access({ reviewed_at: daysAgo(40), activation_nudges_sent: ['d1', 'd3', 'd7'] })], error: null };
+    await POST(authed());
+    expect(h.sendEmailSpy).toHaveBeenCalledTimes(1);
+    expect(h.sendEmailSpy.mock.calls[0][0].subject).toBe('Your LexiClash teacher access is still open');
+    await POST(authed());
+    expect(h.sendEmailSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given a 2-day-old class nobody joined, Then the share-the-code nudge goes out once and respects the 3-day cap', async () => {
+    h.tables.teacher_access_requests = { data: [access({ reviewed_at: daysAgo(6), activation_nudges_sent: ['d1', 'd3'] })], error: null };
+    h.tables.classrooms = { data: [{ id: 'c1', teacher_id: 'u1', created_at: daysAgo(2) }], error: null };
+    h.tables.classroom_memberships = { data: [{ id: 'm0', classroom_id: 'c1', student_id: 'u1' }], error: null };
+    const body = await (await POST(authed())).json();
+    expect(body.stages).toMatchObject({ sent: 1 });
+    expect(h.sendEmailSpy.mock.calls[0][0].subject).toBe('Your class is ready. Your students just need the code');
+    h.tables.classroom_memberships.data.push({ id: 'm1', classroom_id: 'c1', student_id: 's1' });
+    const again = await (await POST(authed())).json();
+    expect(again.stages.skipped.cooldown).toBe(1);
+    expect(h.sendEmailSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given marking the row fails after a send, Then the batch stops with a 500 instead of re-sending tomorrow', async () => {
+    h.tables.teacher_access_requests = { data: [access(), access({ id: 'r2', user_id: 'u2', email: 'bo@school.edu' })], error: null };
+    h.tables.profiles = { data: [profile(), profile({ id: 'u2' })], error: null };
+    h.markFails = true;
+    const res = await POST(authed());
+    h.markFails = false;
+    expect(res.status).toBe(500);
+    expect(h.sendEmailSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given the weekly digest has not run for 9 days, Then the owner is paged', async () => {
+    h.tables.cron_heartbeats = { data: [{ job: 'teacher-weekly-digest', last_run_at: daysAgo(9) }], error: null };
+    const body = await (await POST(authed())).json();
+    expect(body.digestHeartbeat.stale).toBe(true);
+    expect(h.telegram).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given a fresh digest heartbeat, Then nobody is paged', async () => {
+    await POST(authed());
+    expect(h.telegram).not.toHaveBeenCalled();
   });
 });
