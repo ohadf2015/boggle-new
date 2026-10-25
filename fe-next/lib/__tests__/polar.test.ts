@@ -24,6 +24,41 @@ function nowSeconds(): string {
   return String(Math.floor(Date.now() / 1000))
 }
 
+describe('PolarClient.validateWebhookSignature — Standard Webhooks spec vector', () => {
+  const ORIGINAL_SECRET = process.env.POLAR_WEBHOOK_SECRET
+
+  afterEach(() => {
+    process.env.POLAR_WEBHOOK_SECRET = ORIGINAL_SECRET
+    vi.useRealTimers()
+  })
+
+  it('accepts the published spec example exactly as given (fixed strings, no signing helper)', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1614265330 * 1000)
+    process.env.POLAR_WEBHOOK_SECRET = 'whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw'
+    expect(
+      PolarClient.validateWebhookSignature('{"test": 2432232314}', {
+        id: 'msg_p5jXN8AQM9LWM0D4loKWxJek',
+        timestamp: '1614265330',
+        signature: 'v1,g0hM9SsE+OTPJTGt/tmIKtSyZlE3uFJELVlNIOLJ1OE=',
+      })
+    ).toBe(true)
+  })
+
+  it('rejects the spec example with one byte of the body changed', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1614265330 * 1000)
+    process.env.POLAR_WEBHOOK_SECRET = 'whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw'
+    expect(
+      PolarClient.validateWebhookSignature('{"test": 2432232315}', {
+        id: 'msg_p5jXN8AQM9LWM0D4loKWxJek',
+        timestamp: '1614265330',
+        signature: 'v1,g0hM9SsE+OTPJTGt/tmIKtSyZlE3uFJELVlNIOLJ1OE=',
+      })
+    ).toBe(false)
+  })
+})
+
 describe('PolarClient.validateWebhookSignature', () => {
   const ORIGINAL_SECRET = process.env.POLAR_WEBHOOK_SECRET
 

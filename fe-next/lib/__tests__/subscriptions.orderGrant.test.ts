@@ -38,7 +38,7 @@ describe('grantProFromOrder — order events must not wipe provider fields', () 
     const { client, upsert, update } = adminClient({ existing: null });
     vi.mocked(createAdminClient).mockReturnValue(client as never);
 
-    await grantProFromOrder({ userId: 'u1', providerOrderId: 'ord_1' });
+    await grantProFromOrder({ userId: 'u1', providerOrderId: 'ord_1', allowGrant: true });
 
     expect(upsert).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: 'u1', tier: 'pro', status: 'active', lemon_squeezy_order_id: 'ord_1' }),
@@ -51,7 +51,7 @@ describe('grantProFromOrder — order events must not wipe provider fields', () 
     const { client, upsert, update } = adminClient({ existing: polarRow });
     vi.mocked(createAdminClient).mockReturnValue(client as never);
 
-    await grantProFromOrder({ userId: 'u1', providerOrderId: 'ord_1' });
+    await grantProFromOrder({ userId: 'u1', providerOrderId: 'ord_1', allowGrant: true });
 
     expect(upsert).not.toHaveBeenCalled();
     expect(update).toHaveBeenCalledWith({ lemon_squeezy_order_id: 'ord_1' });
@@ -61,7 +61,7 @@ describe('grantProFromOrder — order events must not wipe provider fields', () 
     const { client, upsert, update } = adminClient({ existing: { ...polarRow, source: null } });
     vi.mocked(createAdminClient).mockReturnValue(client as never);
 
-    await grantProFromOrder({ userId: 'u1', providerOrderId: 'ord_1' });
+    await grantProFromOrder({ userId: 'u1', providerOrderId: 'ord_1', allowGrant: true });
 
     expect(upsert).not.toHaveBeenCalled();
     expect(update).toHaveBeenCalled();
@@ -71,12 +71,38 @@ describe('grantProFromOrder — order events must not wipe provider fields', () 
     const { client, upsert, update } = adminClient({ existing: { ...polarRow, source: 'admin_grant' } });
     vi.mocked(createAdminClient).mockReturnValue(client as never);
 
-    await grantProFromOrder({ userId: 'u1', providerOrderId: 'ord_1' });
+    await grantProFromOrder({ userId: 'u1', providerOrderId: 'ord_1', allowGrant: true });
 
     expect(update).not.toHaveBeenCalled();
     expect(upsert).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: 'u1', tier: 'pro', status: 'active', source: 'polar', grant_id: null }),
       expect.anything()
     );
+  });
+
+  it('an unpaid ($0) order never creates a Pro row when there is none', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { client, upsert, update } = adminClient({ existing: null });
+    vi.mocked(createAdminClient).mockReturnValue(client as never);
+    await grantProFromOrder({ userId: 'u1', providerOrderId: 'ord_0', allowGrant: false });
+    expect(upsert).not.toHaveBeenCalled();
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('an unpaid ($0) order does not replace an admin grant', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { client, upsert, update } = adminClient({ existing: { ...polarRow, source: 'admin_grant' } });
+    vi.mocked(createAdminClient).mockReturnValue(client as never);
+    await grantProFromOrder({ userId: 'u1', providerOrderId: 'ord_0', allowGrant: false });
+    expect(upsert).not.toHaveBeenCalled();
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('an unpaid ($0) order still stamps its id on a provider row', async () => {
+    const { client, upsert, update } = adminClient({ existing: polarRow });
+    vi.mocked(createAdminClient).mockReturnValue(client as never);
+    await grantProFromOrder({ userId: 'u1', providerOrderId: 'ord_0', allowGrant: false });
+    expect(upsert).not.toHaveBeenCalled();
+    expect(update).toHaveBeenCalledWith({ lemon_squeezy_order_id: 'ord_0' });
   });
 });

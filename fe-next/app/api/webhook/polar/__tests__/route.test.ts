@@ -170,6 +170,42 @@ describe('polar webhook', () => {
     expect(await res.json()).toMatchObject({ received: true })
   })
 
+  describe('foreign products share the endpoint and must not touch a Teacher Pro row', () => {
+    for (const type of ['subscription.active', 'subscription.updated', 'subscription.canceled', 'subscription.revoked', 'subscription.past_due']) {
+      it(`ignores ${type} for a non-Teacher-Pro product`, async () => {
+        const res = await POST(polarEvent(type, { ...subscriptionData, product_id: 'prod-imposketch-pack' }))
+        expect(res.status).toBe(200)
+        expect(upsertSubscription).not.toHaveBeenCalled()
+      })
+    }
+  })
+
+  describe('status mapping fails closed', () => {
+    it('maps an unknown provider status to a non-Pro status, never active', async () => {
+      await POST(polarEvent('subscription.updated', { ...subscriptionData, status: 'something_new' }))
+      const status = upsertSubscription.mock.calls[0][0].status
+      expect(['active', 'trialing', 'past_due']).not.toContain(status)
+    })
+
+    it('maps a first payment that never succeeded (incomplete) to a non-Pro status', async () => {
+      await POST(polarEvent('subscription.updated', { ...subscriptionData, status: 'incomplete' }))
+      expect(['active', 'trialing', 'past_due']).not.toContain(upsertSubscription.mock.calls[0][0].status)
+    })
+
+    it('maps unpaid (retries exhausted) to a non-Pro status', async () => {
+      await POST(polarEvent('subscription.updated', { ...subscriptionData, status: 'unpaid' }))
+      expect(['active', 'trialing', 'past_due']).not.toContain(upsertSubscription.mock.calls[0][0].status)
+    })
+  })
+
+  it('passes the provider modified_at so an older delivery cannot overwrite a newer state', async () => {
+    await POST(polarEvent('subscription.updated', { ...subscriptionData, modified_at: '2026-10-09T10:00:00Z' }))
+    expect(upsertSubscription).toHaveBeenCalledWith(expect.objectContaining({ eventAt: '2026-10-09T10:00:00Z' }))
+    upsertSubscription.mockClear()
+    await POST(polarEvent('subscription.revoked', { ...subscriptionData, status: 'canceled', modified_at: '2026-10-09T11:00:00Z' }))
+    expect(upsertSubscription).toHaveBeenCalledWith(expect.objectContaining({ eventAt: '2026-10-09T11:00:00Z' }))
+  })
+
   it('grants nothing when no user id is present', async () => {
     await POST(
       polarEvent('subscription.active', { ...subscriptionData, metadata: {}, customer: {} })
@@ -194,21 +230,28 @@ describe('polar webhook', () => {
     // The route now delegates to grantProFromOrder, which stamps only the order id
     // when a provider row exists.
 
-    it('order.created with the Pro product grants via the order path', async () => {
+    it('order.created is log-only: it fires before payment, so it never grants', async () => {
       const res = await POST(
-        polarEvent('order.created', { id: 'ord_1', product_id: PRO_PRODUCT_ID, metadata: { user_id: 'u1' } })
+        polarEvent('order.created', { id: 'ord_1', product_id: PRO_PRODUCT_ID, total_amount: 900, metadata: { user_id: 'u1' } })
       )
       expect(await res.json()).toMatchObject({ received: true })
-      expect(grantProFromOrder).toHaveBeenCalledWith({ userId: 'u1', providerOrderId: 'ord_1' })
+      expect(grantProFromOrder).not.toHaveBeenCalled()
       expect(upsertSubscription).not.toHaveBeenCalled()
     })
 
-    it('order.paid grants via the same order path', async () => {
+    it('a paid order.paid may grant via the order path', async () => {
       const res = await POST(
-        polarEvent('order.paid', { id: 'ord_1', product_id: PRO_PRODUCT_ID, metadata: { user_id: 'u1' } })
+        polarEvent('order.paid', { id: 'ord_1', product_id: PRO_PRODUCT_ID, total_amount: 900, metadata: { user_id: 'u1' } })
       )
       expect(await res.json()).toMatchObject({ received: true })
-      expect(grantProFromOrder).toHaveBeenCalledWith({ userId: 'u1', providerOrderId: 'ord_1' })
+      expect(grantProFromOrder).toHaveBeenCalledWith({ userId: 'u1', providerOrderId: 'ord_1', allowGrant: true })
+    })
+
+    it('a $0 order.paid (trial start) only stamps an existing row, never grants active Pro', async () => {
+      await POST(
+        polarEvent('order.paid', { id: 'ord_0', product_id: PRO_PRODUCT_ID, total_amount: 0, metadata: { user_id: 'u1' } })
+      )
+      expect(grantProFromOrder).toHaveBeenCalledWith({ userId: 'u1', providerOrderId: 'ord_0', allowGrant: false })
     })
 
     it('order.created with a non-Pro product grants nothing', async () => {

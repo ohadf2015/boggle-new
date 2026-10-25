@@ -236,6 +236,7 @@ export async function upsertSubscription({
   providerProductId,
   currentPeriodEnd,
   cancelAtPeriodEnd,
+  eventAt,
 }: {
   userId: string
   tier: Tier
@@ -245,11 +246,27 @@ export async function upsertSubscription({
   providerProductId?: string | null
   currentPeriodEnd?: string | null
   cancelAtPeriodEnd?: boolean
+  /** Provider `modified_at` of the event; an older event than the row's is dropped. */
+  eventAt?: string | null
 }): Promise<void> {
   // Called only from the payment webhooks, where there is no user session — the
   // request-scoped client is `anon` there, and `subscriptions` grants writes to
   // service_role only, so this upsert was refused by RLS and threw.
   const supabase = createAdminClient() ?? (await createClient())
+
+  if (eventAt) {
+    // Webhooks arrive out of order; a delayed `updated` after a `revoked` must not resurrect Pro.
+    const { data: current, error: readError } = await supabase
+      .from('subscriptions')
+      .select('provider_event_at')
+      .eq('user_id', userId)
+      .maybeSingle()
+    const lastAt = !readError ? (current as { provider_event_at?: string | null } | null)?.provider_event_at : null
+    if (lastAt && Date.parse(lastAt) > Date.parse(eventAt)) {
+      console.warn('[Subscription] Skipping out-of-order provider event', { userId, eventAt, lastAt })
+      return
+    }
+  }
 
   const legacyRow = {
     user_id: userId,
@@ -270,6 +287,7 @@ export async function upsertSubscription({
       // applying to a teacher who is now paying.
       source: 'polar',
       grant_id: null,
+      ...(eventAt ? { provider_event_at: eventAt } : {}),
     },
     { onConflict: 'user_id' }
   )
@@ -299,31 +317,24 @@ export async function upsertSubscription({
 }
 
 /**
- * Belt-and-braces Pro grant from an ORDER event (order.created / order.paid).
+ * Belt-and-braces Pro grant from a paid ORDER event (order.paid).
  *
- * Order events exist to grant Pro when the subscription events were missed —
- * and they arrive in the same burst as those subscription events, almost always
- * AFTER them. A full upsert here would overwrite the row the subscription event
- * just wrote: `currentPeriodEnd` defaults to null and no providerSubscriptionId
- * is passed, so both fields the subscription event had just stamped get wiped.
- * Seen in production 2026-09-09 (the first paying Teacher Pro): subscription.active
- * wrote the renewal date at 00:50:32Z, order.created nulled it again at 00:50:33Z,
- * and the dashboard showed a paying teacher a row with no renewal date and no
- * subscription id.
- *
- * Rule:
- * - Provider-owned row (source polar/lemon_squeezy, or NULL source on a row that
- *   predates the column) → stamp ONLY the order id. Subscription events own the
- *   lifecycle of these rows; an order event only records which order paid.
- * - No row, or an admin grant → the full belt-and-braces upsert. A payment
- *   replaces a gift (same rule as upsertSubscription, which clears grant_id).
+ * Order events arrive in the same burst as the subscription events, usually after
+ * them; a full upsert here once wiped the renewal date and subscription id that
+ * subscription.active had just written (first paying Teacher Pro, 2026-09-09).
+ * So a provider-owned row (source polar/lemon_squeezy, or NULL) only gets the
+ * order id stamped. No row, or an admin grant, gets the full upsert (a payment
+ * replaces a gift), but only when the order actually charged money.
  */
 export async function grantProFromOrder({
   userId,
   providerOrderId,
+  allowGrant,
 }: {
   userId: string
   providerOrderId: string
+  /** Only a paid (non-zero) order may create or replace a row; otherwise it only stamps. */
+  allowGrant: boolean
 }): Promise<void> {
   const supabase = createAdminClient() ?? (await createClient())
 
@@ -348,6 +359,11 @@ export async function grantProFromOrder({
       console.error('[Subscription] grantProFromOrder: failed to stamp order id:', error)
       throw error
     }
+    return
+  }
+
+  if (!allowGrant) {
+    console.warn('[Subscription] grantProFromOrder: unpaid order grants nothing', { userId, providerOrderId })
     return
   }
 

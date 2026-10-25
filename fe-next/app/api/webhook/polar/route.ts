@@ -6,7 +6,7 @@
  * Configure in Polar dashboard → Settings → Webhooks:
  *   URL: https://<app-domain>/api/webhook/polar
  *   Secret → POLAR_WEBHOOK_SECRET (Standard Webhooks; `whsec_` secrets are decoded)
- * Events handled: subscription.*, order.created, order.paid,
+ * Events handled: subscription.* (Teacher Pro product only), order.paid,
  *   checkout.completed, checkout.updated (status succeeded/confirmed/complete).
  */
 
@@ -20,7 +20,7 @@ import { isPolarTrialLapse } from '@/lib/education/polarTrial'
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
 
-/** Map Polar subscription statuses onto our internal union */
+/** Map Polar subscription statuses onto our internal union. Anything unrecognised fails closed. */
 function mapStatus(polarStatus: unknown): SubscriptionStatus {
   const status = String(polarStatus ?? 'active')
   switch (status) {
@@ -33,9 +33,10 @@ function mapStatus(polarStatus: unknown): SubscriptionStatus {
     case 'unpaid':
     case 'incomplete':
     case 'incomplete_expired':
-      return 'past_due'
+      return 'canceled'
     default:
-      return 'active'
+      console.error(`[Polar] Unknown subscription status "${status}" — recording as paused`)
+      return 'paused'
   }
 }
 
@@ -50,6 +51,24 @@ function getTierFromProductId(productId: string | undefined): Tier {
   const proProductId = process.env.POLAR_PRO_PRODUCT_ID
   if (proProductId && productId === proProductId) return 'pro'
   return 'free'
+}
+
+/** True when the event names a product other than Teacher Pro (the endpoint is shared with other products). */
+function isForeignProduct(p: WebhookPayload): boolean {
+  const productId = getProductId(p)
+  return productId !== undefined && productId !== process.env.POLAR_PRO_PRODUCT_ID
+}
+
+function getEventAt(p: WebhookPayload): string | null {
+  const at = p?.data?.modified_at
+  return typeof at === 'string' && Number.isFinite(Date.parse(at)) ? at : null
+}
+
+/** Polar order totals are in cents; only a positive charge is a payment. */
+function isPaidOrder(p: WebhookPayload): boolean {
+  const data = p?.data ?? {}
+  const amount = data.total_amount ?? data.net_amount ?? data.amount
+  return typeof amount === 'number' && amount > 0
 }
 
 /**
@@ -89,7 +108,7 @@ function isCheckoutSuccess(eventType: string, payload: WebhookPayload): boolean 
 function eventRequiresProProductId(eventType: string, payload: WebhookPayload): boolean {
   if (eventType === 'subscription.revoked') return false
   if (eventType.startsWith('subscription.')) return true
-  if (eventType === 'order.created' || eventType === 'order.paid') return true
+  if (eventType === 'order.paid') return true
   return isCheckoutSuccess(eventType, payload)
 }
 
@@ -155,6 +174,11 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Polar] Event: ${eventType}`, { userId })
 
+    if (eventType.startsWith('subscription.') && isForeignProduct(payload)) {
+      console.log(`[Polar] Ignoring ${eventType} for non-Teacher-Pro product ${getProductId(payload)}`, { userId })
+      return NextResponse.json({ received: true, ignored: 'foreign_product' })
+    }
+
     switch (eventType) {
       case 'subscription.created':
       case 'subscription.active':
@@ -191,8 +215,9 @@ export async function POST(request: NextRequest) {
         trackTrialExpired(payload, userId)
         break
       case 'order.created':
+        break
       case 'order.paid':
-        await handleOrderCreated(payload, userId)
+        await handleOrderPaid(payload, userId)
         break
       case 'checkout.completed':
       case 'checkout.updated':
@@ -303,6 +328,7 @@ async function handleSubscriptionActive(payload: WebhookPayload, userId?: string
     providerProductId: getProductId(payload),
     currentPeriodEnd: subscriptionPeriodEnd(data),
     cancelAtPeriodEnd: Boolean(data.cancel_at_period_end ?? false),
+    eventAt: getEventAt(payload),
   })
 }
 
@@ -317,6 +343,7 @@ async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: strin
     providerProductId: getProductId(payload),
     currentPeriodEnd: subscriptionPeriodEnd(data),
     cancelAtPeriodEnd: Boolean(data.cancel_at_period_end ?? false),
+    eventAt: getEventAt(payload),
   })
 }
 
@@ -336,6 +363,7 @@ async function handleSubscriptionCanceled(payload: WebhookPayload, userId?: stri
     providerProductId: getProductId(payload),
     currentPeriodEnd: subscriptionPeriodEnd(data),
     cancelAtPeriodEnd: true,
+    eventAt: getEventAt(payload),
   })
 }
 
@@ -348,23 +376,20 @@ async function handleSubscriptionRevoked(payload: WebhookPayload, userId?: strin
     status: 'canceled',
     providerSubscriptionId: String(data.id ?? ''),
     cancelAtPeriodEnd: false,
+    eventAt: getEventAt(payload),
   })
 }
 
 /**
- * One-off purchases / first subscription order — belt-and-braces Pro grant.
- *
- * Delegates to grantProFromOrder: when the subscription events already wrote
- * the row (the common case — they arrive first in the same burst), this only
- * stamps the order id and leaves the provider-owned fields (renewal date,
- * subscription id) untouched.
+ * Belt-and-braces Pro grant from a paid order. `order.created` is ignored: it fires
+ * before payment. A $0 order (trial start) may only stamp an existing row; the
+ * subscription events own trialing.
  */
-async function handleOrderCreated(payload: WebhookPayload, userId?: string) {
+async function handleOrderPaid(payload: WebhookPayload, userId?: string) {
   if (!userId) return
   const data = payload?.data ?? {}
-  const productId = getProductId(payload)
-  if (getTierFromProductId(productId) !== 'pro') return
-  await grantProFromOrder({ userId, providerOrderId: String(data.id ?? '') })
+  if (getTierFromProductId(getProductId(payload)) !== 'pro') return
+  await grantProFromOrder({ userId, providerOrderId: String(data.id ?? ''), allowGrant: isPaidOrder(payload) })
 }
 
 /**
