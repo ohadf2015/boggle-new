@@ -7,6 +7,7 @@ import { getSupabase } from '../modules/supabase/client';
 import type { ClassroomGame } from '../modules/classroomGameManager';
 import logger from '../utils/logger';
 import { REAL_CLASS_MIN_PLAYERS } from '@/lib/education/teacherUsagePrompt';
+import { planTrialClockStart, type TrialClockRow } from '@/lib/education/trialClockStart';
 import { captureEduServerEvents, type EduServerEvent } from '../utils/educationTelemetry';
 import {
   buildLiveRoundCompletedEvent,
@@ -104,6 +105,10 @@ export async function recordClassroomRound(
       }));
     }
 
+    if ((count ?? 0) === 0 && opts.playerIds.length >= REAL_CLASS_MIN_PLAYERS) {
+      await startAccessTrialClock(supabase, game.teacherId, now.getTime());
+    }
+
     captureEduServerEvents(
       planClassroomRoundEvents({
         game,
@@ -120,4 +125,33 @@ export async function recordClassroomRound(
       `Failed to record classroom round ${game.gameCode}: ${err instanceof Error ? err.message : 'unknown'}`
     );
   }
+}
+
+async function startAccessTrialClock(
+  supabase: NonNullable<ReturnType<typeof getSupabase>>,
+  teacherId: string,
+  nowMs: number
+): Promise<void> {
+  const { data, error } = await supabase
+    .from('teacher_access_requests')
+    .select('id, trial_expires_at, trial_reminders_sent')
+    .eq('user_id', teacherId)
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) {
+    logger.error('CLASSROOM_GAME', `Trial clock lookup failed for ${teacherId}: ${error.message}`);
+    return;
+  }
+  if (!data) return;
+  const row = data as unknown as TrialClockRow & { id: string };
+  const patch = planTrialClockStart(row, nowMs);
+  if (!patch) return;
+  const { error: updateError } = await supabase.from('teacher_access_requests').update(patch as never).eq('id', row.id);
+  if (updateError) {
+    logger.error('CLASSROOM_GAME', `Trial clock start failed for ${teacherId}: ${updateError.message}`);
+    return;
+  }
+  logger.info('CLASSROOM_GAME', `Access trial clock started at first real class game for ${teacherId}: ends ${patch.trial_expires_at}`);
 }
