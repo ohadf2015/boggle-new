@@ -18,6 +18,8 @@ import { ProjectorQuizBlocked, useQuizStartRefused } from './ProjectorQuizBlocke
 import { catalogueEntry } from '@/components/education/ClassroomModeCatalogueData';
 import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
+import { modeAllowsRehearsalBots, realStudentCount } from '@/lib/education/rehearsal';
+import { RehearsalBotsBlocked } from './RehearsalBotsBlocked';
 
 export interface ProjectorLobbyProps {
   gameCode: string;
@@ -128,7 +130,8 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   const [quizRefused, clearQuizRefused] = useQuizStartRefused(gameCode, t);
   const [quizPlayable] = useState(readLocalQuizPlayable);
   const quizBlocked = isQuiz && (quizRefused || quizPlayable === false);
-  const canStart = canStartProjectorRound(students.length);
+  // Bots seated by a practice round never unlock Start: until a student is in, practice stays the one action.
+  const canStart = canStartProjectorRound(realStudentCount(students));
   const startLocked = !canStart || starting || quizBlocked;
   const startReady = !startLocked;
   const settings = liveGame?.settings ?? null;
@@ -356,7 +359,20 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
                   {t('tvLobby.practiceRoundFailed')}
                 </p>
               )}
-              {onStartPracticeRound && (
+              {onStartPracticeRound && !quizBlocked && !modeAllowsRehearsalBots(mode) && (
+                <RehearsalBotsBlocked
+                  gameCode={gameCode}
+                  currentMode={modeId}
+                  t={t}
+                  onApplied={(id) => {
+                    clearQuizRefused();
+                    setSwitchedMode(id);
+                  }}
+                  onRehearse={onStartPracticeRound}
+                  className="md:items-end"
+                />
+              )}
+              {onStartPracticeRound && modeAllowsRehearsalBots(mode) && (
                 <>
                   <button
                     type="button"
@@ -368,8 +384,8 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
                     <Play className="h-[0.9em] w-[0.9em] shrink-0" aria-hidden="true" />
                     {practiceRoundPending ? t('common.loading') : t('education.projectorLobby.practiceFirst')}
                   </button>
-                  <p className="font-neo-body text-[2.8vw] font-bold leading-snug text-neo-cream/70 md:text-[0.85vw]">
-                    {t('education.projectorLobby.practiceFirstHint')}
+                  <p data-testid="rehearsal-private-note" className="font-neo-body text-[2.8vw] font-bold leading-snug text-neo-cream/70 md:text-[0.85vw]">
+                    {t('education.projectorLobby.rehearsePrivate')}
                   </p>
                 </>
               )}

@@ -4135,6 +4135,7 @@ const en = {
     }
   },
   "hostView": {
+    "demoBotsFailed": "Practice rounds run on the big screen. Leave player mode to rehearse with bots.",
     "lobby": "War Room",
     "lobbyTitle": "Multiplayer lobby",
     "waitingForPlayers": "Gathering warriors...",
@@ -13818,6 +13819,10 @@ const en = {
       "startBlocked": "Waiting for one student to join before you can start.",
       "practiceFirst": "Practice first with 3 bots",
       "practiceFirstHint": "See what your class will see. The bots leave when your first student joins.",
+      "rehearseCta": "Rehearse with bots",
+      "rehearsePrivate": "Only you see this. Students are not in the room and it is not counted.",
+      "rehearseBotsBlocked": "Bots can't play this game, so you can't rehearse it with them.",
+      "rehearseUseClassic": "Rehearse with Classic instead",
       "lateJoinOn": "Late join on",
       "lateJoinOff": "Late join off"
     },

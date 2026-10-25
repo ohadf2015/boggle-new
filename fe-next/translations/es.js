@@ -4593,6 +4593,7 @@ const es = {
     }
   },
   "hostView": {
+    "demoBotsFailed": "Las rondas de práctica se juegan en la pantalla grande. Sal del modo jugador para ensayar con bots.",
     "lobby": "Cuartel",
     "lobbyTitle": "Sala multijugador",
     "waitingForPlayers": "Esperando que llegue la banda...",
@@ -15391,6 +15392,10 @@ const es = {
       "startBlocked": "Espera a que entre al menos un alumno para empezar.",
       "practiceFirst": "Practica primero con 3 bots",
       "practiceFirstHint": "Mira lo que verá tu clase. Los bots se van cuando entra tu primer alumno.",
+      "rehearseCta": "Ensaya con bots",
+      "rehearsePrivate": "Solo tú ves esto. Los estudiantes no están en la sala y no cuenta.",
+      "rehearseBotsBlocked": "Los bots no pueden jugar a este juego, así que no puedes ensayarlo con ellos.",
+      "rehearseUseClassic": "Ensaya con Clásico",
       "lateJoinOn": "Se puede entrar tarde",
       "lateJoinOff": "No se puede entrar tarde"
     },
