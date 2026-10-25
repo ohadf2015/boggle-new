@@ -6,14 +6,14 @@
  * The marker is written when the chest OPENS (not when the reveal is
  * dismissed), so a reload mid-reveal cannot re-open it (pitfall class 1).
  *
- * XP rides the existing `/api/education/record-xp` route; `daily_challenge` is
- * on its allow-list and the lesson id is a fixed tag (the route only needs it
- * non-empty).
+ * XP rides `/api/education/record-xp`, which pays this tag a fixed amount once
+ * per UTC day whatever the body asks for.
  */
 
-export const DAILY_CHEST_XP = 25;
+import { DAILY_CHEST_LESSON_TAG as CHEST_LESSON_TAG, DAILY_CHEST_XP } from '@/lib/education/recordXpPolicy';
+
+export { DAILY_CHEST_XP };
 const KEY_PREFIX = 'lexiclash.academy.dailyChest.';
-const CHEST_LESSON_TAG = 'academy-daily-chest';
 
 export function localDay(now: Date): string {
   const m = String(now.getMonth() + 1).padStart(2, '0');

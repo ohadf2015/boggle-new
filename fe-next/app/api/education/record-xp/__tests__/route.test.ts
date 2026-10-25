@@ -17,6 +17,9 @@ vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
+const mockClaimOnce = vi.fn();
+vi.mock('@/lib/server/claimOnce', () => ({ claimOnce: (...args) => mockClaimOnce(...args) }));
+
 vi.mock('@/utils/sentry', () => ({
   captureApiError: vi.fn(),
 }));
@@ -56,85 +59,74 @@ beforeEach(() => {
     data: [{ new_total_xp: 200, new_level: 2, xp_granted: 50 }],
     error: null,
   });
+  mockClaimOnce.mockResolvedValue('claimed');
 });
 
 describe('POST /api/education/record-xp', () => {
-  const validBody = {
-    xpAmount: 50,
-    lessonId: 'lesson-123',
-    activityType: 'flashcard',
-  };
+  const connections = { xpAmount: 20, lessonId: 'connections-game', activityType: 'connections' };
+  const chest = { xpAmount: 25, lessonId: 'academy-daily-chest', activityType: 'daily_challenge' };
 
   it('returns 401 when not authenticated', async () => {
     mockGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'Unauthorized' } });
-    const result = await POST(makeRequest(validBody));
+    const result = await POST(makeRequest(connections));
     expect(result.status).toBe(401);
   });
 
-  it('returns 400 for invalid xpAmount', async () => {
-    const result = await POST(makeRequest({ ...validBody, xpAmount: -5 }));
+  it('returns 400 for a non-positive amount', async () => {
+    const result = await POST(makeRequest({ ...connections, xpAmount: -5 }));
     expect(result.status).toBe(400);
   });
 
-  it('returns 400 for xpAmount over 1000', async () => {
-    const result = await POST(makeRequest({ ...validBody, xpAmount: 2000 }));
-    expect(result.status).toBe(400);
-  });
-
-  it('returns 400 for missing lessonId', async () => {
-    const result = await POST(makeRequest({ xpAmount: 50, activityType: 'flashcard' }));
-    expect(result.status).toBe(400);
-  });
-
-  it('returns 400 for invalid activityType', async () => {
-    const result = await POST(makeRequest({ ...validBody, activityType: 'hacking' }));
-    expect(result.status).toBe(400);
-  });
-
-  it('calls increment_player_xp RPC and returns success', async () => {
-    const result = await POST(makeRequest(validBody));
+  it('awards a connections solve and returns the new total', async () => {
+    const result = await POST(makeRequest(connections));
     expect(result.status).toBe(200);
-    expect(result.data.success).toBe(true);
-    expect(result.data.xpEarned).toBe(50);
-    expect(result.data.newTotalXp).toBe(200);
-    expect(result.data.newLevel).toBe(2);
-    expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', {
-      p_player_id: 'student-456',
-      p_xp_amount: 50,
-    });
+    expect(result.data).toMatchObject({ success: true, xpEarned: 20, newTotalXp: 200, newLevel: 2 });
+    expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', { p_player_id: 'student-456', p_xp_amount: 20 });
+  });
+
+  it('never awards more than the best connections solve is worth (hard + streak = 53)', async () => {
+    await POST(makeRequest({ ...connections, xpAmount: 1000 }));
+    expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', { p_player_id: 'student-456', p_xp_amount: 53 });
+  });
+
+  it('pays the daily chest its fixed 25 whatever the client asks for', async () => {
+    await POST(makeRequest({ ...chest, xpAmount: 999 }));
+    expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', { p_player_id: 'student-456', p_xp_amount: 25 });
+    expect(mockClaimOnce).toHaveBeenCalledWith(expect.stringMatching(/^edu-daily-chest:student-456:\d{4}-\d{2}-\d{2}$/), expect.any(Number));
+  });
+
+  it('pays the daily chest once per day', async () => {
+    mockClaimOnce.mockResolvedValue('taken');
+    const result = await POST(makeRequest(chest));
+    expect(result.status).toBe(200);
+    expect(result.data).toMatchObject({ success: true, xpEarned: 0, alreadyClaimed: true });
+    expect(mockRpc).not.toHaveBeenCalled();
+  });
+
+  it('withholds the chest when the once-only store is down', async () => {
+    mockClaimOnce.mockResolvedValue('unavailable');
+    const result = await POST(makeRequest(chest));
+    expect(result.status).toBe(503);
+    expect(mockRpc).not.toHaveBeenCalled();
+  });
+
+  it.each(['flashcard', 'solo_board', 'lesson_completion', 'duel', 'not_a_real_type'])(
+    'rejects %s, whose XP is awarded server-side elsewhere or not at all',
+    async (activityType) => {
+      const result = await POST(makeRequest({ ...connections, activityType }));
+      expect(result.status).toBe(400);
+      expect(mockRpc).not.toHaveBeenCalled();
+    },
+  );
+
+  it('rejects a daily_challenge that is not the chest', async () => {
+    const result = await POST(makeRequest({ ...chest, lessonId: 'lesson-123' }));
+    expect(result.status).toBe(400);
   });
 
   it('returns 500 when RPC fails', async () => {
     mockRpc.mockResolvedValue({ data: null, error: { message: 'DB error' } });
-    const result = await POST(makeRequest(validBody));
+    const result = await POST(makeRequest(connections));
     expect(result.status).toBe(500);
-  });
-
-  it('accepts all valid activity types (matches PracticeSessionXp union)', async () => {
-    const allTypes = [
-      'flashcard',
-      'solo_board',
-      'lesson_completion',
-      'matching',
-      'spelling',
-      'blitz',
-      'duel',
-      'duel_async',
-      'duel_realtime',
-      'daily_challenge',
-    ];
-    for (const type of allTypes) {
-      mockRpc.mockResolvedValue({
-        data: [{ new_total_xp: 100, new_level: 1, xp_granted: 50 }],
-        error: null,
-      });
-      const result = await POST(makeRequest({ ...validBody, activityType: type }));
-      expect(result.status).toBe(200);
-    }
-  });
-
-  it('rejects unknown activity types', async () => {
-    const result = await POST(makeRequest({ ...validBody, activityType: 'not_a_real_type' }));
-    expect(result.status).toBe(400);
   });
 });

@@ -10,6 +10,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
+import { claimOnce } from '@/lib/server/claimOnce';
+import { resolveRecordXpGrant } from '@/lib/education/recordXpPolicy';
 
 interface RecordEducationXpRequest {
   xpAmount: number;
@@ -46,38 +48,42 @@ export async function POST(request: NextRequest) {
 
     const { xpAmount, lessonId, activityType } = body as unknown as RecordEducationXpRequest;
 
-    if (typeof xpAmount !== 'number' || xpAmount <= 0 || xpAmount > 1000) {
-      return NextResponse.json({ error: 'Invalid xpAmount: must be 1-1000' }, { status: 400 });
+    if (typeof xpAmount !== 'number' || !Number.isFinite(xpAmount) || xpAmount <= 0) {
+      return NextResponse.json({ error: 'Invalid xpAmount' }, { status: 400 });
     }
 
     if (typeof lessonId !== 'string' || !lessonId) {
       return NextResponse.json({ error: 'Missing lessonId' }, { status: 400 });
     }
 
-    // Keep in sync with PracticeSessionXp['type'] in backend/modules/educationXpManager.ts
-    const validTypes = [
-      'flashcard',
-      'solo_board',
-      'lesson_completion',
-      'matching',
-      'spelling',
-      'blitz',
-      'duel',
-      'duel_async',
-      'duel_realtime',
-      'daily_challenge',
-      'connections',
-    ];
-    if (!validTypes.includes(activityType)) {
+    const grant = resolveRecordXpGrant(activityType, lessonId, xpAmount);
+    if (grant.kind === 'rejected' || grant.xp < 1) {
       return NextResponse.json({ error: 'Invalid activityType' }, { status: 400 });
     }
 
     const userId = user.id;
+    // A school shares one IP; this is the per-student budget (a solve takes far longer than 5s).
+    const perUser = checkApiRateLimit(request, `education-record-xp:${userId}`, { maxRequests: 12, windowMs: 60_000 });
+    if (!perUser.success) {
+      return NextResponse.json({ success: false, error: 'Too many requests' }, { status: 429 });
+    }
+
+    if (grant.kind === 'daily_chest') {
+      const day = new Date().toISOString().slice(0, 10);
+      const claim = await claimOnce(`edu-daily-chest:${userId}:${day}`, 60 * 60 * 48);
+      if (claim === 'unavailable') {
+        return NextResponse.json({ error: 'Try again shortly' }, { status: 503 });
+      }
+      if (claim === 'taken') {
+        return NextResponse.json({ success: true, xpEarned: 0, alreadyClaimed: true });
+      }
+    }
+    const xpToGrant = grant.xp;
 
     // Sync XP to main profiles table
     const { data: xpData, error: xpError } = await supabase.rpc('increment_player_xp', {
       p_player_id: userId,
-      p_xp_amount: xpAmount,
+      p_xp_amount: xpToGrant,
     });
 
     if (xpError) {
@@ -85,7 +91,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to save XP' }, { status: 500 });
     }
 
-    let newTotalXp = xpAmount;
+    let newTotalXp = xpToGrant;
     let newLevel = 1;
 
     if (xpData && (xpData as unknown[]).length > 0) {
@@ -102,7 +108,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      xpEarned: xpAmount,
+      xpEarned: xpToGrant,
       newTotalXp,
       newLevel,
     });
