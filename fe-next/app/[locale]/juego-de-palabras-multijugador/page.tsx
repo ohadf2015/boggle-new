@@ -13,6 +13,7 @@ import { FaqAccordion } from './components/FaqAccordion';
 import { BottomCTA } from './components/BottomCTA';
 import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 import { ComparisonTable } from './components/ComparisonTable';
+import { BoggleAppFreeLink } from '@/components/seo/BoggleAppFreeLink';
 import { SerpGapSections } from './components/SerpGapSections';
 import { SinDescargarSection } from './components/SinDescargarSection';
 import { PageScrollFx } from './components/PageScrollFx';
@@ -264,6 +265,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
           </div>
         </section>
 
+        <BoggleAppFreeLink lead="En inglés, sin tienda de apps:" />
         <EducationIntentCta locale={locale} variant="esl" />
 
         <BottomCTA locale={locale} />

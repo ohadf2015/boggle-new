@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { FreshCrossLink } from './fresh/FreshCrossLink';
 import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
+import { BoggleAppFreeLink } from '@/components/seo/BoggleAppFreeLink';
 import { contentByLocale, type LandingSEOContent } from './landingSEOContent';
 import s from './fresh/FreshMotion.module.css';
 import b from './fresh/FreshBoard.module.css';
@@ -86,6 +87,12 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         </div>
         {locale === 'es' ? (
           <ApalabradosSinDescargarLink className="max-w-[46ch] font-neo-body text-base leading-relaxed text-neo-cream/80 md:text-lg" />
+        ) : null}
+        {locale === 'en' ? (
+          <BoggleAppFreeLink
+            lead="Skip the install:"
+            className="max-w-[46ch] font-neo-body text-base leading-relaxed text-neo-cream/80 md:text-lg"
+          />
         ) : null}
       </div>
 

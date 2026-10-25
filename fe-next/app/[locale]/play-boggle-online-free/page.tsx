@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: 'Play Boggle Online Free — No Download, No Signup | LexiClash',
     description: 'Play Boggle online free — 2–50 players, no signup or download needed. Solo vs bots or real-time multiplayer with friends. Start a word battle in seconds →',
-    keywords: 'play boggle online free no download, boggle online free no download, play boggle online free, free boggle online no download, free online boggle no download, boggle game free no download, play boggle word shake free no download, play boggle online free with other players, boggle alternatives 2026, games like boggle online free, word game no download, boggle word shake free, word games online free, word making games, word hunt game online, free word game no download, word puzzle game free',
+    keywords: 'boggle app free, play boggle online free no download, boggle online free no download, play boggle online free, free boggle online no download, free online boggle no download, boggle game free no download, play boggle word shake free no download, play boggle online free with other players, boggle alternatives 2026, games like boggle online free, word game no download, boggle word shake free, word games online free, word making games, word hunt game online, free word game no download, word puzzle game free',
     openGraph: {
       title: 'Boggle Online Free — Play Solo or Multiplayer | LexiClash',
       description: 'Play boggle online free — no download, no signup. Real-time multiplayer with friends or solo challenge. Instant play in your browser!',
@@ -89,6 +89,10 @@ const faqs = [
   {
     q: 'Can students play Boggle online free in a classroom?',
     a: 'Yes! LexiClash works great as a free classroom Boggle game — no accounts, no downloads, no setup. Teachers create a room in seconds and share the link or QR code. Up to 50 students compete simultaneously on the word grid, making it ideal for vocabulary practice, spelling drills, and ESL classes.',
+  },
+  {
+    q: 'Is there a free Boggle app?',
+    a: 'Yes. Boggle With Friends is the official free app: it has ads and in-app purchases, 1M+ Android installs, and a 316.7 MB iPhone download. LexiClash is the free option that is not an app — $0, no download, no in-app purchases. Open lexiclash.live in the browser and the grid starts.',
   },
 ];
 
@@ -228,6 +232,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
               The loudest, fastest free Boggle alternative on the internet. Find words on a letter grid solo, or
               throw 50 friends into a real-time word brawl. Open the browser. Start playing. That&apos;s it.
+              If you searched for a boggle app free, this is the one that skips the store.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
@@ -417,6 +422,126 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               LexiClash for Schools
             </Link>
             .
+          </p>
+        </section>
+
+        {/* APP INTENT — GR #11385. Extend this page; do not publish a second URL. */}
+        <section className="mt-20">
+          <h2 className="mb-3 font-neo-display text-3xl font-black uppercase leading-tight sm:text-4xl">
+            Is there a free <span className="text-neo-lime">Boggle app</span>?
+          </h2>
+          <p className="max-w-3xl text-sm leading-relaxed text-neo-white sm:text-base">
+            Yes. Boggle With Friends is the official free app — ads, in-app purchases, and a download.
+            LexiClash is the free option that is not an app: $0, no install, no token packs. Open the
+            browser, the grid starts. Store figures below were read from the public listings on 25 Oct 2026,
+            not from our analytics.
+          </p>
+
+          <h3 className="mb-4 mt-10 font-neo-display text-2xl font-black uppercase">
+            Free Boggle apps, compared
+          </h3>
+          <div className="overflow-x-auto rounded-neo border-4 border-neo-black bg-neo-navy-light shadow-hard-lg">
+            <table className="w-full border-collapse text-sm sm:text-base">
+              <thead>
+                <tr className="border-b-3 border-neo-black bg-neo-navy">
+                  <th className="px-4 py-4 text-left font-neo-display font-black uppercase tracking-wider text-neo-yellow"> </th>
+                  <th className="px-4 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime">LexiClash</th>
+                  <th className="px-4 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-gray-300">Boggle With Friends, Android</th>
+                  <th className="px-4 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-gray-300">Boggle With Friends, iPhone</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ['Price', '$0, no in-app purchases', 'Free, ads + in-app purchases', 'Free, in-app purchases from US$0.99'],
+                  ['Download', 'None — browser', 'Required. 1M+ installs', 'Required. 316.7 MB'],
+                  ['Rating', 'Not a store app', '3.8★ from 26.8K reviews', '4.5 from 45K ratings'],
+                  ['Age', 'No store rating', 'Everyone', '4+'],
+                  ['Offline', 'A room needs a connection', 'Listing says offline 24/7', 'Same listing: offline 24/7'],
+                  ['Players', '2–50 on one grid, live', 'Match, friends, tournaments', 'Same, plus a #92 Word chart rank'],
+                  ['Languages', '6: EN, HE, SV, JA, ES, RU', '9, including EN', 'EN + 8 more'],
+                  ['Round', '2–3 min', '2 min', '2 min'],
+                  ['Updated', 'Live in the browser', '21 Sep 2026', 'Listing current 25 Oct 2026'],
+                ].map((row, i) => (
+                  <tr key={row[0]} className={`border-b border-neo-gray-400/20 ${i % 2 ? 'bg-neo-navy/30' : ''}`}>
+                    <td className="px-4 py-3 font-bold">{row[0]}</td>
+                    <td className="px-4 py-3 text-center font-bold text-neo-lime">{row[1]}</td>
+                    <td className="px-4 py-3 text-center text-neo-gray-300">{row[2]}</td>
+                    <td className="px-4 py-3 text-center text-neo-gray-300">{row[3]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3 max-w-3xl text-xs text-neo-gray-300">
+            Android: Google Play, com.zynga.boggle. iPhone: App Store id 1197041040. Token packs on that
+            listing start at the Small Token Package, US$0.99. A Large Mega Freeze pack on the same listing
+            is US$19.99. LexiClash charges neither.
+          </p>
+
+          <h3 className="mb-3 mt-10 font-neo-display text-2xl font-black uppercase">
+            Play offline, or skip the install
+          </h3>
+          <p className="max-w-3xl text-sm leading-relaxed text-neo-gray-200 sm:text-base">
+            The store pages lead with offline play, daily prizes, and power-ups. Those are real: the listing
+            says you can play Boggle With Friends offline, and the prizes are how the free app sells tokens.
+            LexiClash does not do offline rooms. A match needs a connection, because everyone is on the same
+            grid at once. What you skip is the 316.7 MB install, the ads, and the token pack.
+          </p>
+
+          <h3 className="mb-3 mt-10 font-neo-display text-2xl font-black uppercase">
+            A free round, scored — our points, not the classic 1
+          </h3>
+          <p className="mb-4 max-w-3xl text-sm leading-relaxed text-neo-gray-200 sm:text-base">
+            Browser Boggle sites publish the classic table: 3–4 letters score 1, 5 scores 2, 6 scores 3,
+            7 scores 5, 8+ scores 11. LexiClash does not use that table. Base points, before any combo, are
+            3 letters = 10, 4 = 20, 5 = 50, 6 = 100, 7 = 200, 8 or more = 500. Here is one 4×4 you can trace.
+            Letters touch horizontally, vertically, or diagonally. No tile is reused inside a word.
+          </p>
+          <div className="grid max-w-xs grid-cols-4 gap-2">
+            {['C', 'A', 'T', 'S', 'O', 'P', 'E', 'N', 'R', 'L', 'I', 'D', 'M', 'U', 'G', 'Y'].map((letter) => (
+              <span
+                key={letter}
+                className="grid h-14 place-items-center rounded-neo border-3 border-neo-black bg-neo-yellow font-neo-display text-2xl font-black text-neo-navy shadow-hard"
+              >
+                {letter}
+              </span>
+            ))}
+          </div>
+          <div className="mt-4 overflow-x-auto rounded-neo border-4 border-neo-black bg-neo-navy-light shadow-hard">
+            <table className="w-full border-collapse text-sm sm:text-base">
+              <thead>
+                <tr className="border-b-3 border-neo-black bg-neo-navy">
+                  <th className="px-4 py-3 text-left font-neo-display font-black uppercase text-neo-yellow">Word</th>
+                  <th className="px-4 py-3 text-left font-neo-display font-black uppercase text-neo-yellow">Path</th>
+                  <th className="px-4 py-3 text-center font-neo-display font-black uppercase text-neo-lime">LexiClash</th>
+                  <th className="px-4 py-3 text-center font-neo-display font-black uppercase text-neo-gray-300">Classic</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ['CAT', 'C-A-T across the top row', '10', '1'],
+                  ['OPEN', 'O-P-E-N across the second row', '20', '1'],
+                  ['TEND', 'T down to E, across to N, down to D', '20', '1'],
+                  ['PINE', 'P diagonal to I, diagonal to N, back to E', '20', '1'],
+                ].map((row) => (
+                  <tr key={row[0]} className="border-b border-neo-gray-400/20">
+                    <td className="px-4 py-3 font-bold">{row[0]}</td>
+                    <td className="px-4 py-3 text-neo-gray-200">{row[1]}</td>
+                    <td className="px-4 py-3 text-center font-bold text-neo-lime">{row[2]}</td>
+                    <td className="px-4 py-3 text-center text-neo-gray-300">{row[3]}</td>
+                  </tr>
+                ))}
+                <tr>
+                  <td className="px-4 py-3 font-black" colSpan={2}>Four words, same board</td>
+                  <td className="px-4 py-3 text-center font-black text-neo-lime">70</td>
+                  <td className="px-4 py-3 text-center text-neo-gray-300">4</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3 max-w-3xl text-xs text-neo-gray-300">
+            70 versus 4 is the gap the store listings never show. Combos add more on top of the 70; the
+            classic column stays at 1 point per 3–4 letter word. That scoring table is the one the game uses.
           </p>
         </section>
 

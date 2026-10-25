@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
+import { BoggleAppFreeLink } from '@/components/seo/BoggleAppFreeLink';
 
 
 interface PageProps {
@@ -227,6 +228,7 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
         </section>
 
         <EducationIntentCta locale={locale} variant="teachers" />
+        <BoggleAppFreeLink lead="The no-download page for a" />
         <ApalabradosSinDescargarLink />
 
         <section className="mb-12">
