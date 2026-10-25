@@ -139,7 +139,7 @@ export default function ClassLimitUpsellModal({
             </DialogTitle>
             <DialogClose asChild>
               <button
-                className="text-black hover:bg-black/10 p-1 rounded transition-colors"
+                className="cursor-pointer text-black hover:bg-black/10 p-1 rounded transition-colors"
                 aria-label={t('common.close')}
               >
                 <X className="w-5 h-5" />
@@ -193,7 +193,7 @@ export default function ClassLimitUpsellModal({
               {isTrialExpired ? (
                 <Button
                   asChild
-                  className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
+                  className="flex-1 cursor-pointer bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
                 >
                   <Link
                     href={`/${language}/teacher/upgrade`}
@@ -216,7 +216,7 @@ export default function ClassLimitUpsellModal({
                   onClick={() => {
                     void startPolarCheckout();
                   }}
-                  className="flex-1 bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all disabled:opacity-60"
+                  className="flex-1 cursor-pointer bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all disabled:opacity-60"
                 >
                   {pending ? t('common.loading') : teacherProUpgradeCtaLabel(language)}
                 </Button>
@@ -224,7 +224,7 @@ export default function ClassLimitUpsellModal({
               <Button
                 onClick={isTrialExpired && onContinueFree ? onContinueFree : onClose}
                 variant="outline"
-                className="flex-1 border-2 border-black bg-neo-cream text-black font-black shadow-hard hover:-translate-y-0.5 transition-all"
+                className="flex-1 cursor-pointer border-2 border-black bg-neo-cream text-black font-black shadow-hard hover:-translate-y-0.5 transition-all"
               >
                 {isTrialExpired && onContinueFree
                   ? t('teacher.subscription.continueFree')
@@ -244,7 +244,7 @@ export default function ClassLimitUpsellModal({
                     source: isStudentLimit ? 'student_limit_modal' : 'class_limit_modal',
                   })
                 }
-                className="mt-1 inline-block text-sm font-black text-neo-purple underline underline-offset-2 hover:text-black"
+                className="mt-1 inline-block cursor-pointer text-sm font-black text-neo-purple underline underline-offset-2 hover:text-black"
               >
                 {t('education.landing.districtCta.button')}
               </Link>
