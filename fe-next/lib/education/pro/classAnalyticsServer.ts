@@ -91,7 +91,7 @@ export async function readClassAnalytics(
   teacherId: string,
 ): Promise<{ data: ClassAnalytics | null; error: { message: string } | null }> {
   const members = await fetchInChunks<{ student_id: string }>(
-    sb, 'classroom_memberships', 'student_id', 'classroom_id', [classroomId], { column: 'student_id', value: teacherId },
+    sb, 'classroom_memberships', 'student_id', 'classroom_id', [classroomId], [{ op: 'neq', column: 'student_id', value: teacherId }],
   );
   if (members.error) return { data: null, error: members.error };
   const ids = [...new Set(members.data.map((m) => m.student_id))];

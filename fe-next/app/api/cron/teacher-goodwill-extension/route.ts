@@ -33,10 +33,7 @@ export async function POST(request: NextRequest) {
   try {
     const locked = await withCronLock('teacher-goodwill-extension', 300_000, async () => {
       const supabase = getSupabaseAdmin();
-      if (!supabase) {
-        logger.error('[Goodwill] no service-role client; skipping');
-        return { sent: 0, failed: 0, due: 0, reason: 'no-supabase-admin' };
-      }
+      if (!supabase) throw new Error('no service-role client');
 
       const { data, error } = await supabase
         .from('teacher_access_requests')

@@ -14,6 +14,8 @@ vi.mock('next/server', () => ({
 const h = vi.hoisted(() => ({
   sendEmailSpy: vi.fn(async () => ({ ok: true })),
   upsertSpy: vi.fn(async () => ({ error: null })),
+  upsertError: null as null | { message: string },
+  noAdmin: false,
   tables: {} as Record<string, { data: unknown; error: { message: string } | null }>,
 }));
 
@@ -30,7 +32,7 @@ function chainFor(name: string) {
   chain.limit = self;
   chain.upsert = (...args: unknown[]) => {
     h.upsertSpy(...args);
-    return Promise.resolve({ error: null });
+    return Promise.resolve({ error: h.upsertError });
   };
   chain.then = (resolve: unknown, reject: unknown) => Promise.resolve(result).then(resolve as never, reject as never);
   return chain;
@@ -38,9 +40,7 @@ function chainFor(name: string) {
 
 vi.mock('@/lib/email/send', () => ({ sendEmail: h.sendEmailSpy }));
 vi.mock('@/lib/email', () => ({
-  getSupabaseAdmin: () => ({
-    from: (name: string) => chainFor(name),
-  }),
+  getSupabaseAdmin: () => (h.noAdmin ? null : { from: (name: string) => chainFor(name) }),
 }));
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 vi.mock('@/backend/redis/locking', () => ({
@@ -71,6 +71,8 @@ describe('/api/cron/assignment-due-reminders', () => {
     vi.clearAllMocks();
     process.env.CRON_SECRET = CRON_SECRET;
     h.sendEmailSpy.mockResolvedValue({ ok: true });
+    h.upsertError = null;
+    h.noAdmin = false;
     h.tables = {
       lesson_assignments: { data: [], error: null },
       classrooms: { data: [], error: null },
@@ -116,6 +118,34 @@ describe('/api/cron/assignment-due-reminders', () => {
     expect(html).toContain('/en/teacher/reports?classroomId=c1');
     expect(html).toContain('/en/teacher/upgrade');
     expect(h.upsertSpy).toHaveBeenCalled();
+  });
+
+  function seedOverdue() {
+    const due = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    h.tables.lesson_assignments = { data: [{ id: 'a1', classroom_id: 'c1', lesson_id: 'l1', due_date: due, title: 'Week 3' }], error: null };
+    h.tables.classrooms = { data: [{ id: 'c1', name: 'Year 7', teacher_id: 't1' }], error: null };
+    h.tables.classroom_memberships = { data: [{ classroom_id: 'c1', student_id: 's1' }], error: null };
+    h.tables.teacher_access_requests = { data: [{ user_id: 't1', email: 'ada@school.edu', full_name: 'Ada', locale: 'en' }], error: null };
+  }
+
+  it('Given the subscriptions read fails, Then no reminder goes out with an upgrade pitch to a maybe-Pro teacher', async () => {
+    seedOverdue();
+    h.tables.subscriptions = { data: null, error: { message: 'timeout' } };
+    const res = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(res.status).toBe(500);
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
+  });
+
+  it('Given the send ledger write fails, Then the run fails loudly so tomorrow does not silently re-send', async () => {
+    seedOverdue();
+    h.upsertError = { message: 'rls' };
+    const res = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(res.status).toBe(500);
+  });
+
+  it('Given no service-role client, Then the run fails instead of success:true', async () => {
+    h.noAdmin = true;
+    expect((await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }))).status).toBe(500);
   });
 
   it('dry run sends nothing', async () => {
