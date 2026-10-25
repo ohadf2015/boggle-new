@@ -74,7 +74,7 @@ export function ClassroomModeCatalogueCard({
           {recommendedLabel}
         </span>
       )}
-      <span className="relative block aspect-square w-full overflow-hidden rounded-neo border-[2px] border-neo-cream bg-neo-navy lg:aspect-[5/4]">
+      <span className="relative block aspect-square w-full overflow-hidden rounded-neo border-[2px] border-neo-cream bg-neo-navy lg:aspect-[5/4] lg:[@media(max-height:1099px)]:aspect-[2/1]">
         {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover, same file as the catalog */}
         <img
           data-testid="mode-card-cover"

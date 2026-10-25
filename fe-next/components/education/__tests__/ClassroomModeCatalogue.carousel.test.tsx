@@ -53,7 +53,9 @@ describe('<ClassroomModeCardRow> carousel', () => {
     render(<ClassroomModeCardRow selected="blast" onPick={vi.fn()} t={t} />);
     const scroller = screen.getByTestId('mode-row-scroller');
     expect(scroller.className).toContain('lg:overflow-visible');
-    expect(scroller.className).toContain('lg:px-0');
+    // A small gutter (not half-row): the check badge and recommended chip hang
+    // 8px outside their card, and without it the lobby scroller grew a sideways bar.
+    expect(scroller.className).toContain('lg:px-2');
     expect(scroller.className).not.toMatch(/lg:px-\[calc/);
     expect(screen.getByTestId('mode-tile-blast').className).toContain('lg:w-auto');
     for (const group of screen.getAllByTestId(/^mode-group-/)) {
