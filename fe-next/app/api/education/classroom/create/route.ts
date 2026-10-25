@@ -11,9 +11,10 @@ import {
   resolveTeacherActivationPlan,
 } from '@/lib/education/teacherActivationFunnelServer';
 import { EDUCATION_LANGUAGES } from '@/lib/supabase/education/types';
+import { parseCapDetail } from '@/lib/education/capDetail';
 
 const createClassroomSchema = z.object({
-  name: z.string().min(1).max(100),
+  name: z.string().trim().min(1).max(100),
   language: z.enum(EDUCATION_LANGUAGES),
 });
 
@@ -98,6 +99,18 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (createError) {
+      if (createError.message?.includes('CLASS_LIMIT_REACHED')) {
+        const cap = parseCapDetail(createError.details);
+        return NextResponse.json(
+          {
+            error: 'CLASS_LIMIT_REACHED',
+            message: `You've reached the free tier limit of ${cap.limit ?? capCheck.limit} classes. Upgrade to Pro for unlimited classes.`,
+            currentCount: cap.currentCount ?? capCheck.currentCount,
+            limit: cap.limit ?? capCheck.limit,
+          },
+          { status: 403 }
+        );
+      }
       logger.error('Error creating classroom:', createError);
       return NextResponse.json(
         { error: 'Failed to create classroom' },
