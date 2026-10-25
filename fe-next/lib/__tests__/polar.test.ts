@@ -156,6 +156,30 @@ describe('PolarClient.createCheckout', () => {
     })
   })
 
+  it('a trial checkout inside the free access window asks Polar only for the days left', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ url: 'https://sandbox.polar.sh/checkout/trial' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    const client = new PolarClient('token-123', 'sandbox')
+    await client.createCheckout({ userId: 'user-1', productId: 'prod-1', allowTrial: true, trialDays: 5 })
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({
+      allow_trial: true,
+      trial_interval: 'day',
+      trial_interval_count: 5,
+      metadata: { user_id: 'user-1', trial: true, trial_days: 5 },
+    })
+    fetchMock.mockClear()
+    await client.createCheckout({ userId: 'user-1', productId: 'prod-1', allowTrial: true, trialDays: 99 })
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).trial_interval_count).toBe(14)
+    fetchMock.mockClear()
+    await client.createCheckout({ userId: 'user-1', productId: 'prod-1', allowTrial: false, trialDays: 5 })
+    const paid = JSON.parse(fetchMock.mock.calls[0][1].body)
+    expect(paid.allow_trial).toBe(false)
+    expect(paid.trial_interval_count).toBeUndefined()
+  })
+
   it('builds the fallback success_url with the /en prefix by default', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,

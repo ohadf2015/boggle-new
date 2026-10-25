@@ -25,10 +25,36 @@ describe('teacherAbandonedCheckout', () => {
     expect(html).not.toContain('Finish checkout');
   });
 
-  it('falls back to English copy for other locales but keeps their link', () => {
+  it('has its own copy and link for every teacher locale', () => {
     const { subject, html } = teacherAbandonedCheckout({ full_name: 'Ana', locale: 'es', mode: 'paid' });
-    expect(subject).toBe('Finish your Teacher Pro checkout');
+    expect(subject).toBe('Termina tu compra de Teacher Pro');
     expect(html).toContain(abandonedCheckoutUpgradeUrl('es'));
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const) {
+      for (const mode of ['paid', 'trial', 'keep'] as const) {
+        const out = teacherAbandonedCheckout({ full_name: 'T', locale, mode });
+        expect(out.subject.length).toBeGreaterThan(0);
+        expect(out.html).toContain(abandonedCheckoutUpgradeUrl(locale));
+        expect(out.html).toMatch(/\$9|9\$/);
+      }
+      if (locale !== 'en') {
+        expect(teacherAbandonedCheckout({ full_name: 'T', locale, mode: 'keep' }).subject).not.toBe(
+          'Keep Teacher Pro after your free trial',
+        );
+      }
+    }
+  });
+
+  it('inside the free access trial: keep Pro after it, never a second 14-day trial', () => {
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const) {
+      const keep = teacherAbandonedCheckout({ full_name: 'T', locale, mode: 'keep' });
+      const trial = teacherAbandonedCheckout({ full_name: 'T', locale, mode: 'trial' });
+      expect(keep.subject).not.toBe(trial.subject);
+      expect(keep.html).not.toMatch(/14[- ]?(day|dag|día|日|дн)|14 יו/);
+    }
+    const en = teacherAbandonedCheckout({ full_name: 'Maya', locale: 'en', mode: 'keep' });
+    expect(en.subject).toBe('Keep Teacher Pro after your free trial');
+    expect(en.html).toContain('$9/mo starts only when your free trial ends');
+    expect(en.html).toContain('Keep Teacher Pro after my trial');
   });
 
   it('escapes a hostile display name', () => {

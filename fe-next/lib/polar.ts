@@ -135,6 +135,7 @@ export class PolarClient {
     redirectUrl,
     locale,
     allowTrial = false,
+    trialDays,
   }: {
     userId: string
     productId: string
@@ -143,19 +144,28 @@ export class PolarClient {
     /** Locale prefix for the fallback success_url (validated by callers). */
     locale?: string
     allowTrial?: boolean
+    /**
+     * Polar trial length in days when `allowTrial`. Defaults to the standard 14; a teacher
+     * inside the free access window passes the days left in it (see polarTrialPlan).
+     */
+    trialDays?: number
   }): Promise<string> {
     const trial = allowTrial === true
+    const trialLength =
+      typeof trialDays === 'number' && Number.isFinite(trialDays)
+        ? Math.min(POLAR_PRO_TRIAL_DAYS, Math.max(1, Math.ceil(trialDays)))
+        : POLAR_PRO_TRIAL_DAYS
     const successLocale = locale ?? 'en'
     const payload = {
       products: [productId],
       success_url:
         redirectUrl || `${process.env.NEXT_PUBLIC_APP_URL}/${successLocale}/teacher?checkout=success`,
       external_customer_id: userId,
-      metadata: { user_id: userId, trial, locale: successLocale },
+      metadata: { user_id: userId, trial, locale: successLocale, ...(trial ? { trial_days: trialLength } : {}) },
       // Paid path must not inherit a trial configured on the Polar product.
       allow_trial: trial,
       ...(trial
-        ? { trial_interval: 'day', trial_interval_count: POLAR_PRO_TRIAL_DAYS }
+        ? { trial_interval: 'day', trial_interval_count: trialLength }
         : {}),
     }
     const post = (customerEmail?: string) =>

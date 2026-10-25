@@ -29,6 +29,9 @@ vi.mock('@/utils/supabase/admin', () => ({
 const { logSubscriptionEvent } = vi.hoisted(() => ({ logSubscriptionEvent: vi.fn(async () => undefined) }))
 vi.mock('@/lib/subscriptions', () => ({ logSubscriptionEvent }))
 
+const { liveAccessTrialExpiry } = vi.hoisted(() => ({ liveAccessTrialExpiry: vi.fn(async (): Promise<string | null> => null) }))
+vi.mock('@/lib/education/accessTrialServer', () => ({ liveAccessTrialExpiry }))
+
 const getAuthedUser = vi.fn()
 vi.mock('@/lib/auth/getAuthedUser', () => ({
   getAuthedUser: (...args: unknown[]) => getAuthedUser(...args),
@@ -46,6 +49,8 @@ describe('POST /api/subscription/checkout', () => {
     limitEvents.mockReset()
     maybeSingle.mockResolvedValue({ data: null, error: null })
     limitEvents.mockResolvedValue({ data: [], error: null })
+    liveAccessTrialExpiry.mockReset()
+    liveAccessTrialExpiry.mockResolvedValue(null)
     process.env.POLAR_ACCESS_TOKEN = 'polar-token'
     process.env.POLAR_PRO_PRODUCT_ID = 'prod-pro-1'
   })
@@ -307,5 +312,49 @@ describe('POST /api/subscription/checkout', () => {
     limitEvents.mockResolvedValue({ data: [{ id: 'e1' }], error: null })
     await POST(new Request('http://localhost/api/subscription/checkout', trialBody))
     expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ allowTrial: false }))
+  })
+
+  it('gives a teacher with no free access window the full 14-day trial', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
+    await POST(new Request('http://localhost/api/subscription/checkout', {
+      method: 'POST',
+      body: JSON.stringify({ trial: true }),
+      headers: { 'Content-Type': 'application/json' },
+    }))
+    expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ allowTrial: true, trialDays: 14 }))
+  })
+
+  it('inside the free access window, the Polar trial ends when the free trial ends (no second 14 days)', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
+    liveAccessTrialExpiry.mockResolvedValue(new Date(Date.now() + 5.5 * 24 * 60 * 60 * 1000).toISOString())
+    await POST(new Request('http://localhost/api/subscription/checkout', {
+      method: 'POST',
+      body: JSON.stringify({ trial: true }),
+      headers: { 'Content-Type': 'application/json' },
+    }))
+    expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ allowTrial: true, trialDays: 6 }))
+  })
+
+  it('a paid checkout never carries trial days, access window or not', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/paid')
+    liveAccessTrialExpiry.mockResolvedValue(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString())
+    await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+    expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ allowTrial: false, trialDays: undefined }))
+  })
+
+  it('a slow access-window lookup falls back to the standard trial instead of failing checkout', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/trial')
+    liveAccessTrialExpiry.mockRejectedValue(new Error('db down'))
+    const res = await POST(new Request('http://localhost/api/subscription/checkout', {
+      method: 'POST',
+      body: JSON.stringify({ trial: true }),
+      headers: { 'Content-Type': 'application/json' },
+    }))
+    expect(res.status).toBe(200)
+    expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ allowTrial: true, trialDays: 14 }))
   })
 })

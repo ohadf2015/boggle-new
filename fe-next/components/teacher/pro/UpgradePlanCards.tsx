@@ -10,6 +10,7 @@ import { trackEduProUpgradeClicked, trackTeacherProUpgradeClick } from '@/lib/ed
 import { SCHOOL_PRICING, schoolMonthlyParams } from '@/lib/education/pro/schoolPricing';
 import { SchoolPriceTag } from './SchoolPriceTag';
 import type { UpgradeViewer } from '@/lib/education/pro/upgradeViewer';
+import { accessTrialLive, keepAfterTrialCopy } from '@/lib/education/pro/keepAfterTrialCopy';
 
 export interface UpgradePlanCardsProps {
   viewer: UpgradeViewer;
@@ -24,6 +25,12 @@ export interface UpgradePlanCardsProps {
   askSchool?: React.ReactNode;
   /** Pro viewer only: a link to the billing portal, when the status read returned one. */
   manageBillingHref?: string | null;
+  /**
+   * End of the teacher's live free access trial. While it is open the trial button
+   * asks them to keep Pro when it ends ($9/mo from that day) instead of offering a
+   * second 14-day trial; the checkout's Polar trial runs only to this date.
+   */
+  accessTrialEndsAt?: string | null;
 }
 
 const BTN =
@@ -81,8 +88,10 @@ export function UpgradePlanCards({
   onSchool,
   askSchool,
   manageBillingHref,
+  accessTrialEndsAt = null,
 }: UpgradePlanCardsProps) {
   const { t, language } = useLanguage();
+  const keep = showTrial && accessTrialLive(accessTrialEndsAt) ? keepAfterTrialCopy(language, accessTrialEndsAt) : null;
   const perMonth = t('teacher.subscription.perMonth');
   const price = `$${TEACHER_PRO_PRICE_USD}`;
   const busy = pending !== null;
@@ -147,7 +156,7 @@ export function UpgradePlanCards({
       >
         <span className="absolute -top-3 start-4 inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-pink px-2.5 py-0.5 font-neo-display text-xs font-black text-neo-black">
           <Sparkles className="h-3 w-3" strokeWidth={3} aria-hidden />
-          {showTrial ? t('eg2Pro.plans.trialBadge', { days: TEACHER_PRO_TRIAL_DAYS }) : t('eg2Pro.plans.recommended')}
+          {keep ? keep.badge : showTrial ? t('eg2Pro.plans.trialBadge', { days: TEACHER_PRO_TRIAL_DAYS }) : t('eg2Pro.plans.recommended')}
         </span>
         <h2 className="mt-1 font-neo-display text-lg font-black text-neo-black">{t('teacher.subscription.proPlanName')}</h2>
         <p className="mb-3 text-xs font-bold text-neo-black/75">{t('teacher.subscription.unlimitedAccess')}</p>
@@ -172,7 +181,7 @@ export function UpgradePlanCards({
               {showTrial && (
                 <button type="button" onClick={onTrial} disabled={busy} aria-busy={pending === 'trial' || undefined} data-testid="pricing-trial-cta" className={cn(BTN, 'gap-2 bg-neo-black text-neo-white')}>
                   {pending === 'trial' ? <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden /> : null}
-                  {pending === 'trial' ? t('common.loading') : t('eg2Pro.plans.trialCta', { days: TEACHER_PRO_TRIAL_DAYS })}
+                  {pending === 'trial' ? t('common.loading') : keep ? keep.cta : t('eg2Pro.plans.trialCta', { days: TEACHER_PRO_TRIAL_DAYS })}
                 </button>
               )}
               <button
@@ -187,7 +196,7 @@ export function UpgradePlanCards({
                 {pending === 'paid' ? t('common.loading') : showTrial ? t('eg2Pro.plans.buyNowInstead', { price }) : t('eg2Pro.plans.buyCta', { price })}
               </button>
               <p className="text-center text-xs font-bold text-neo-black/80">
-                {showTrial ? t('eg2Pro.plans.trialNote', { days: TEACHER_PRO_TRIAL_DAYS, price }) : t('teacher.subscription.proCtaSubtext')}
+                {keep ? keep.note : showTrial ? t('eg2Pro.plans.trialNote', { days: TEACHER_PRO_TRIAL_DAYS, price }) : t('teacher.subscription.proCtaSubtext')}
               </p>
               {askSchool}
             </>

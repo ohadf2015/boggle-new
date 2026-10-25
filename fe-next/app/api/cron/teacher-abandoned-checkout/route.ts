@@ -13,6 +13,7 @@ import {
   type CheckoutStartedRow,
   type CheckoutUserEventRow,
 } from '@/lib/education/abandonedCheckout';
+import { accessTrialLive } from '@/lib/education/pro/keepAfterTrialCopy';
 import { proUserIdsFrom, type SubscriptionRowLike } from '@/lib/education/proGrant';
 import type { TeacherLocale } from '@/lib/education/types';
 import { captureApiError } from '@/utils/sentry';
@@ -45,6 +46,7 @@ interface AccessRow {
   email: string;
   full_name: string;
   locale: string | null;
+  trial_expires_at?: string | null;
 }
 
 export async function POST(request: NextRequest) {
@@ -81,7 +83,7 @@ export async function POST(request: NextRequest) {
         supabase.from('profiles').select('id, is_test_account, user_role').in('id', userIds),
         supabase
           .from('teacher_access_requests')
-          .select('user_id, email, full_name, locale')
+          .select('user_id, email, full_name, locale, trial_expires_at')
           .eq('status', 'approved')
           .in('user_id', userIds),
         supabase.from('classrooms').select('teacher_id').in('teacher_id', userIds),
@@ -160,7 +162,10 @@ export async function POST(request: NextRequest) {
       let sent = 0;
       let failed = 0;
       for (const d of due) {
-        const tpl = teacherAbandonedCheckout({ full_name: d.access.full_name || 'Teacher', locale: d.locale, mode: d.mode });
+        // Still inside the free access trial: the trial checkout was "keep Pro after
+        // the trial", so the reminder must not pitch a second 14-day trial.
+        const mode = d.mode === 'trial' && accessTrialLive(d.access.trial_expires_at) ? 'keep' : d.mode;
+        const tpl = teacherAbandonedCheckout({ full_name: d.access.full_name || 'Teacher', locale: d.locale, mode });
         const result = await sendLifecycleEmail({
           to: d.access.email,
           subject: tpl.subject,
