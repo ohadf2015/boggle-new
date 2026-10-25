@@ -185,4 +185,21 @@ describe('fetchMpModeBreakdown', () => {
 
     expect(result).toEqual([]);
   });
+
+  it('should keep the window exactly N days when it spans a DST change', async () => {
+    vi.stubEnv('TZ', 'Asia/Jerusalem');
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-26T00:00:00Z'));
+    try {
+      const mockGte = vi.fn().mockResolvedValue({ data: [], error: null });
+      mockSupabase.from.mockReturnValue({ select: vi.fn().mockReturnValue({ gte: mockGte }) });
+
+      await fetchMpModeBreakdown(7);
+
+      expect(mockGte.mock.calls[0][1]).toBe('2026-10-19T00:00:00.000Z');
+    } finally {
+      vi.useRealTimers();
+      vi.unstubAllEnvs();
+    }
+  });
 });
