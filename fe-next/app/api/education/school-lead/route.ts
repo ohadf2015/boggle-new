@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { sendEmail } from '@/lib/email/send';
 import { schoolLeadAdminNotify } from '@/lib/email/templates/schoolLeadAdminNotify';
 import { validateSchoolLeadPayload } from '@/lib/education/schoolLead';
@@ -12,6 +14,10 @@ function bad(msg: string, status = 400) {
 // Public (no auth) — a school lead form. Non-admin /api/education/* path, so it is
 // served by the Next route handler (Express body-parse 408 only bites /api/admin/*).
 export async function POST(req: Request) {
+  // Per-IP on top of per-email: rotating addresses must not flood the inbox.
+  const ipLimit = checkApiRateLimit(req as never, 'education-school-lead', { maxRequests: 5, windowMs: 60 * 60_000 });
+  if (!ipLimit.success) return bad('too many requests, try again later', 429);
+
   let body: unknown;
   try { body = await req.json(); } catch { return bad('invalid json'); }
 
@@ -19,23 +25,24 @@ export async function POST(req: Request) {
   if (!v.ok) return bad(v.error);
   const lead = v.payload;
 
+  // Service role: anon has no EXECUTE on the limiter, so on the request client it always
+  // errored and the per-email limit never applied to logged-out visitors.
+  const admin = createAdminClient();
+  const limiter = admin
+    ? await admin.rpc('school_lead_rate_limited', { p_email: lead.email })
+    : { data: null, error: { message: 'service role key not configured' } };
+  if (limiter.error) {
+    console.error('[school-lead] rate-limit check failed, refusing:', limiter.error.message);
+    return bad('could not submit right now, please try again in a minute', 503);
+  }
+  if (limiter.data === true) return bad('too many requests in 24h, try again later', 429);
+
   const sb = await createClient();
-
-  // Rate limit: max 3 submissions per email per 24h. Evaluated via a SECURITY DEFINER
-  // boolean RPC — a plain SELECT here returns 0 under RLS (school_leads SELECT is
-  // admin-only), which would silently disable the limit and leave the endpoint
-  // spammable. Boolean (not raw count) so anon can't enumerate submissions.
-  const { data: rateLimited, error: countErr } = await sb.rpc('school_lead_rate_limited', {
-    p_email: lead.email,
-  });
-  // Fail OPEN by design: a high-value school lead must not be lost to a transient RPC
-  // hiccup. But log so a chronically-broken limiter surfaces instead of silently
-  // disabling itself (the exact regression this RPC was added to fix).
-  if (countErr) console.error('[school-lead] rate-limit check failed, proceeding:', countErr.message);
-  if (rateLimited === true) return bad('too many requests in 24h, try again later', 429);
-
   const ins = await sb.from('school_leads').insert({ ...lead });
-  if (ins.error) return bad('insert failed: ' + ins.error.message, 500);
+  if (ins.error) {
+    console.error('[school-lead] insert failed:', ins.error.message);
+    return bad('could not submit right now, please try again', 500);
+  }
 
   const submittedAt = new Date().toISOString();
   const tpl = schoolLeadAdminNotify({ ...lead, submittedAt });
