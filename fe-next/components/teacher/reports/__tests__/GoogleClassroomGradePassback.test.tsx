@@ -30,7 +30,6 @@ const json = (body: unknown, status = 200) =>
 let fetchMock: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
-  vi.stubEnv('NEXT_PUBLIC_GC_GRADE_PASSBACK', 'true');
   fetchMock = vi.fn();
   vi.stubGlobal('fetch', fetchMock);
 });
@@ -40,20 +39,19 @@ afterEach(() => {
 });
 
 describe('GoogleClassroomGradePassback', () => {
-  it('renders nothing when the flag is off (default)', () => {
-    vi.stubEnv('NEXT_PUBLIC_GC_GRADE_PASSBACK', '');
-    const { container } = render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+  it('renders nothing when the server flag is off', () => {
+    const { container } = render(<GoogleClassroomGradePassback classroomId={CLASSROOM} enabled={false} />);
     expect(container).toBeEmptyDOMElement();
   });
 
   it('shows the send button when the flag is on', () => {
-    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} enabled />);
     expect(screen.getByRole('button', { name: `${K}.button` })).toBeInTheDocument();
   });
 
   it('asks to connect Google when the server says reauth', async () => {
     fetchMock.mockResolvedValueOnce(json({ ok: false, error: 'reauth', reauth: true }, 401));
-    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} enabled />);
     await userEvent.click(screen.getByRole('button', { name: `${K}.button` }));
     const link = await screen.findByRole('link', { name: `${K}.connectCta` });
     expect(link.getAttribute('href')).toContain('/api/education/google-classroom/oauth/start?returnTo=');
@@ -81,7 +79,7 @@ describe('GoogleClassroomGradePassback', () => {
         }),
       );
 
-    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} enabled />);
     await userEvent.click(screen.getByRole('button', { name: `${K}.button` }));
 
     await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseLabel`), 'c1');
@@ -113,7 +111,7 @@ describe('GoogleClassroomGradePassback', () => {
       .mockResolvedValueOnce(json({ ok: true, courses: [{ id: 'c1', name: '5A' }] }))
       .mockResolvedValueOnce(json({ ok: true, courseWork: [{ id: 'w1', title: 'A', maxPoints: 100, associatedWithDeveloper: true }] }))
       .mockResolvedValueOnce(json({ ok: false, error: 'rate_limited', retryAfter: 30 }, 429));
-    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} enabled />);
     await userEvent.click(screen.getByRole('button', { name: `${K}.button` }));
     await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseLabel`), 'c1');
     await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseWorkLabel`), 'w1');
@@ -123,7 +121,7 @@ describe('GoogleClassroomGradePassback', () => {
 
   it('a Google 403 that reconnecting cannot fix shows an error, not the Connect step', async () => {
     fetchMock.mockResolvedValueOnce(json({ ok: false, error: 'google_forbidden' }, 403));
-    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} enabled />);
     await userEvent.click(screen.getByRole('button', { name: `${K}.button` }));
     expect(await screen.findByRole('alert')).toHaveTextContent(`${K}.errorForbidden`);
     expect(screen.queryByRole('link', { name: `${K}.connectCta` })).toBeNull();
@@ -131,7 +129,7 @@ describe('GoogleClassroomGradePassback', () => {
 
   it('explains partial consent after ?gc=scopes', async () => {
     window.history.replaceState({}, '', '/en/teacher/reports?gc=scopes');
-    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} enabled />);
     expect(await screen.findByText(`${K}.scopesMissing`)).toBeInTheDocument();
     window.history.replaceState({}, '', '/');
   });
@@ -152,7 +150,7 @@ describe('GoogleClassroomGradePassback', () => {
           ],
         }),
       );
-    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} enabled />);
     await userEvent.click(screen.getByRole('button', { name: `${K}.button` }));
     await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseLabel`), 'c1');
     await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseWorkLabel`), 'w1');
@@ -169,7 +167,7 @@ describe('GoogleClassroomGradePassback', () => {
       .mockResolvedValueOnce(
         json({ ok: true, updated: 1, unmatched: [], failed: [], skipped: [], notReturned: [{ studentId: 's5', name: 'Ben' }] }),
       );
-    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} enabled />);
     await userEvent.click(screen.getByRole('button', { name: `${K}.button` }));
     await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseLabel`), 'c1');
     await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseWorkLabel`), 'w1');
@@ -187,7 +185,7 @@ describe('GoogleClassroomGradePassback', () => {
       .mockResolvedValueOnce(json({ ok: true, courses: [{ id: 'c1', name: '5A' }] }))
       .mockResolvedValueOnce(json({ ok: true, courseWork: [{ id: 'w1', title: 'A', maxPoints: 100, associatedWithDeveloper: true }] }));
 
-    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} enabled />);
     await userEvent.click(screen.getByRole('button', { name: `${K}.button` }));
     await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseLabel`), 'c1');
     await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseWorkLabel`), 'w1');
@@ -207,7 +205,7 @@ describe('GoogleClassroomGradePassback', () => {
       .mockResolvedValueOnce(json({ ok: true, courses: [{ id: 'c1', name: '5A' }] }))
       .mockResolvedValueOnce(json({ ok: true, courseWork: [] }))
       .mockResolvedValueOnce(json({ ok: true, courseWork: { id: 'w9', title: 'Animals', maxPoints: 100, associatedWithDeveloper: true } }));
-    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} />);
+    render(<GoogleClassroomGradePassback classroomId={CLASSROOM} enabled />);
     await userEvent.click(screen.getByRole('button', { name: `${K}.button` }));
     await userEvent.selectOptions(await screen.findByLabelText(`${K}.courseLabel`), 'c1');
     await userEvent.click(await screen.findByRole('button', { name: `${K}.createCourseWork` }));

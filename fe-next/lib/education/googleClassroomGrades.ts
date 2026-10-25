@@ -44,14 +44,9 @@ export const GC_GRADE_PASSBACK_SCOPES = [
   'https://www.googleapis.com/auth/classroom.profile.emails',
 ] as const;
 
-/** Server gate — every route 404s unless exactly 'true'. Default OFF. */
+/** The one gate: every route 404s unless exactly 'true', and the reports page passes it to the UI. Default OFF. */
 export function isGradePassbackServerEnabled(): boolean {
   return process.env.GC_GRADE_PASSBACK_ENABLED === 'true';
-}
-
-/** UI gate — baked at build time (NEXT_PUBLIC_*). Default OFF. */
-export function isGradePassbackUiEnabled(): boolean {
-  return process.env.NEXT_PUBLIC_GC_GRADE_PASSBACK === 'true';
 }
 
 export interface ProgressRowLike {
