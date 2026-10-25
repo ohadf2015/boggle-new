@@ -20941,6 +20941,8 @@ const sv = {
       "wheelLabel": "Klassens bokstavshjul"
     },
     "lobby": {
+      "roomFull": "Rummet är fullt: {seated} av {max} platser tagna",
+      "roomFullWatching": "{count} tittar utan plats",
       "brand": "Klass",
       "joinAt": "Gå med på",
       "joined": "{count} med",
@@ -20968,6 +20970,8 @@ const sv = {
       "leave": "Lämna"
     },
     "entry": {
+      "roomFullTitle": "Rummet är fullt: du tittar på",
+      "roomFullHint": "Alla {max} platser är tagna. Din lärare ser att du väntar.",
       "connecting": "Ansluter till klassen…",
       "openingRoom": "Öppnar ditt rum…",
       "waitingTeacher": "Läraren har inte öppnat spelet än",

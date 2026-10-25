@@ -11,6 +11,7 @@ import { SocketContext } from '@/utils/SocketContext';
 import { MpExitProvider } from '@/hooks/useMpExit';
 import { classroomStudentHomePath, CLASSROOM_ROOM_GONE_KEY } from '@/lib/education/classroomRoomGone';
 import { useMpPageState } from '@/app/[locale]/multiplayer/useMpPageState';
+import { EduRoomFullNotice } from '@/components/education/live/EduRoomFullNotice';
 import { EduLivePhaseRouter } from './EduLivePhaseRouter';
 
 const HostLeftGraceModal = nextDynamic(
@@ -72,10 +73,14 @@ export default function EduLivePageClient(): React.JSX.Element {
                 routerProps={s.routerProps}
                 urlRoom={urlRoom || s.gameCode || null}
                 isTeacher={isTeacher}
+                isSpectator={s.isSpectator}
                 language={s.language}
                 t={s.t as (key: string, params?: Record<string, string | number>) => string}
               />
             </div>
+            {isTeacher && !s.showResults && (
+              <EduRoomFullNotice players={s.playersInRoom} watching={s.spectators.length} t={s.t as (key: string, params?: Record<string, string | number>) => string} />
+            )}
             {s.isActive && s.gameActive && !s.showResults && s.isPaused && <GamePausedOverlay isHost={s.isHost} />}
             {s.isActive && s.gameActive && !s.showResults && <StudentWordBank level={s.classroomLevel} words={s.classroomWordBank} />}
             {s.teacherStrip.visible && (
