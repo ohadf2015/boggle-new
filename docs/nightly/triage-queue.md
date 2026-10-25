@@ -2596,3 +2596,23 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - why real gate offender found: `useMpPageState.ts` imported `AD_FREE_SURFACE_CLASS` from `lib/admob-routes` which didn't export it at drop time — restoring both files together (same salvage batch) resolves the mismatch since admob-routes.ts now exports it (line 92). eslint clean on all restored code files.
   - skipped (left untouched, conflicts vs current master): `backend/modules/gameSessionLogger.ts` + its test — need manual merge, not attempted tonight.
   - recommended owner: review-by-eod
+
+## 2026-10-25 — lane 03-engagement
+
+- [Signal quality] `$rageclick` on tile/board games is systemically unreliable: confirmed null-dominated
+  (board-tile taps, not UI friction) on THREE separate brief items tonight — `/en/connections/daily`
+  (10/12 null), `/en/multiplayer` (30/62 null + retry-button clicks), `/es/word-tower/daily` (11/12 null).
+  Same pattern found 2026-10-18 on `/en/multiplayer`. **Recommendation: stop surfacing raw `$rageclick`
+  count as a brief signal for tile/grid game pages — it structurally misfires on rapid taps.** A real
+  signal would need `$el_text` non-null filtering or a custom rage-tap heuristic scoped to game canvas
+  elements, not the stock PostHog heuristic.
+- [IMPACT CHECK verdict] `03-engagement-2026-10-18-rageclick-mp-triage` measured 62 (baseline 10) =
+  "regressed" by raw count, but breakdown composition (null + board-tile taps + localized retry-button
+  clicks) is unchanged from 10-18's finding — this reads as traffic-volume growth on a noisy metric, not
+  a real UX regression. No code was shipped 10-18 (triage-only), so nothing to revert.
+- [Flag hygiene] Checked `game_feedback` volume for `surface='mp_round'` over 45d via HogQL — effectively
+  near-zero distinct responders. None of the 4 stacked mp_round experiments (`exp-mp-round-reaction-v1`,
+  `exp-mp-results-rival-best-word-v1`, `exp-mp-round-issue-probe-v1`, `exp-mp-round-great-delight-v1`) is
+  close to the 1000/arm significance threshold — none removed. All 23 experiments defined in
+  `lib/experiments.ts` already have a live matching PostHog flag (swept via `posthog flags` API) — no
+  `ensure` calls needed tonight.

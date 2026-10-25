@@ -1,6 +1,6 @@
 {
-  "date": "2026-10-24",
-  "note": "supabase MCP still booting at lane time (empty toolset, no mcp__supabase__* tools surfaced) -- brief itself had zero real backend items (only a low-score 'Railway deploy status unclear' entry, not a query/index target), so STEP 1 skipped rather than force a query without the tool. Frontend: brief's top-5 were imposketch.io LCP entries (cross-tenant PostHog noise per standing memory -- not a lexiclash route) plus /en/student?class=open @ 4984ms, the one real signal. Traced it to AcademyMap.tsx's hero art Image (academy-map-{layout}.webp, 1080-1920px source, fill+sizes=100vw, the page's LCP element) rendering with `unoptimized` -- it was serving the full-res file to every viewport instead of a Next-optimized/resized variant, even though next.config.js images.deviceSizes already covers phone widths. Removed `unoptimized` on both Image tags (backdrop + main art) in AcademyMap.tsx so Next's image optimizer generates viewport-sized srcset entries. No test asserted `unoptimized` presence; same visual webp, smaller bytes on phones (primary audience).",
+  "date": "2026-10-25",
+  "note": "Brief's top backend item was 'Railway deploy status unclear' (score 0.05, not a query/index target) -- STEP 1 skipped, no backend query work tonight. Frontend top item: /en/multiplayer LCP 5318ms. Traced to app/[locale]/multiplayer/page.tsx ReactDOM.preload of /images/arena-hub-hero.jpg at fetchPriority:high -- that hero art banner was removed from the entry screen by a prior redesign (DESIGN section b.1; RoomListView.test.tsx explicitly asserts the image never renders), so the preload was a dead 294KB high-priority fetch stealing bandwidth from the real critical path on every /multiplayer load. Removed the dead ReactDOM.preload call. Second frontend item (/es/daily/word-hunt 3872ms) and the imposketch.io entries not actioned -- time budget; imposketch.io is known cross-tenant PostHog noise per standing memory.",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
@@ -12,7 +12,10 @@
   "frontend": {
     "by_route": [],
     "shipped": [
-      { "route": "/[locale]/student?class=open", "fix": "AcademyMap.tsx hero/backdrop Image: removed `unoptimized`, let Next image optimizer serve viewport-sized srcset instead of full 1080-1920px webp", "baseline_lcp_ms": 4984 }
+      { "route": "/[locale]/multiplayer", "fix": "page.tsx: removed dead ReactDOM.preload (fetchPriority:high) of arena-hub-hero.jpg -- image no longer rendered since DESIGN b.1 removed the hero banner from RoomListView/EntryScreen", "baseline_lcp_ms": 5318 }
+    ],
+    "deferred": [
+      { "route": "/es/daily/word-hunt", "baseline_lcp_ms": 3872, "reason": "time budget -- not investigated tonight" }
     ],
     "note": "imposketch.io / growthradar-style cross-tenant entries in the brief are known PostHog noise (standing watch, brief-generator needs $host filter) -- skipped per memory."
   },
