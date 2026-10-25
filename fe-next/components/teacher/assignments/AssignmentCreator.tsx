@@ -369,7 +369,7 @@ export default function AssignmentCreator({
                 aria-pressed={selectedType === 'wordcraft'}
                 onClick={() => setSelectedType('wordcraft')}
                 className={cn(
-                  'w-full mb-3 px-4 py-3 rounded-neo border-neo transition-all flex items-center gap-3 text-start',
+                  'w-full mb-3 px-4 py-3 rounded-neo border-neo transition flex items-center gap-3 text-start',
                   selectedType === 'wordcraft'
                     ? 'bg-neo-lime border-neo-lime text-neo-black shadow-hard-sm'
                     : 'bg-neo-navy/50 border-neo-cream/40 text-neo-white hover:bg-neo-navy/80'
@@ -389,7 +389,7 @@ export default function AssignmentCreator({
                   type="button"
                   onClick={() => setSelectedType('practice')}
                   className={cn(
-                    'px-4 py-3 rounded-neo border-neo transition-all',
+                    'px-4 py-3 rounded-neo border-neo transition',
                     'flex items-center justify-center gap-2',
                     selectedType === 'practice'
                       ? 'bg-neo-cyan border-neo-cyan text-neo-black shadow-hard-sm'
@@ -403,7 +403,7 @@ export default function AssignmentCreator({
                   type="button"
                   onClick={() => setSelectedType('duel')}
                   className={cn(
-                    'px-4 py-3 rounded-neo border-neo transition-all',
+                    'px-4 py-3 rounded-neo border-neo transition',
                     'flex items-center justify-center gap-2',
                     selectedType === 'duel'
                       ? 'bg-neo-pink border-neo-pink text-neo-black shadow-hard-sm'
@@ -445,7 +445,7 @@ export default function AssignmentCreator({
                     aria-checked={focus === 'any'}
                     onClick={() => setFocus('any')}
                     className={cn(
-                      'min-h-12 p-3 rounded-neo border-neo text-start transition-all',
+                      'min-h-12 p-3 rounded-neo border-neo text-start transition',
                       focus === 'any'
                         ? 'bg-neo-cyan border-neo-cyan text-neo-black shadow-hard-sm'
                         : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
@@ -466,7 +466,7 @@ export default function AssignmentCreator({
                         disabled={!supported}
                         onClick={() => supported && setFocus(option)}
                         className={cn(
-                          'min-h-12 p-3 rounded-neo border-neo text-start transition-all',
+                          'min-h-12 p-3 rounded-neo border-neo text-start transition',
                           active && 'bg-neo-yellow border-neo-yellow text-neo-black shadow-hard-sm',
                           !active && supported && 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80',
                           !supported && 'bg-neo-navy/30 border-neo-black/40 text-neo-white/50 cursor-not-allowed'

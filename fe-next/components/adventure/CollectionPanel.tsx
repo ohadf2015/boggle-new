@@ -139,7 +139,7 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
                 aria-selected={isActive}
                 onClick={() => setActiveCategory(key)}
                 className={cn(
-                  'flex-1 py-3 flex flex-col items-center gap-1 transition-all',
+                  'flex-1 py-3 flex flex-col items-center gap-1 transition-[color,background-color,border-color]',
                   isActive
                     ? `${active} border-b-3 border-black`
                     : 'text-neo-white hover:bg-neo-white/5'
@@ -183,7 +183,7 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
                     key={item.id}
                     data-testid={`collection-item-${item.id}`}
                     className={cn(
-                      'flex flex-col items-center p-3 rounded-neo border-2 transition-all',
+                      'flex flex-col items-center p-3 rounded-neo border-2 transition-[border-color,background-color,opacity]',
                       owned
                         ? `${RARITY_BORDER[item.rarity]} ${RARITY_BG[item.rarity]}`
                         : 'border-neo-white/10 bg-neo-white/2 opacity-50'

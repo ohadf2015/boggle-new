@@ -131,7 +131,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
           'inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-neo border-2 border-neo-lime bg-neo-navy px-3',
           'font-neo-display text-xs font-black uppercase tracking-wide text-neo-lime shadow-hard-sm',
           'motion-safe:animate-[hq-card-pop_260ms_cubic-bezier(.2,1.4,.4,1)_both]',
-          'transition-all duration-100 hover:-translate-y-px hover:bg-neo-lime hover:text-black hover:shadow-hard',
+          'transition duration-100 hover:-translate-y-px hover:bg-neo-lime hover:text-black hover:shadow-hard',
           'active:translate-y-px active:shadow-none',
           'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
         )}
@@ -208,7 +208,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
               'bg-neo-cyan text-neo-black',
               'border-neo border-neo-black shadow-hard',
               'hover:-translate-y-0.5 hover:bg-neo-cyan/90 hover:shadow-hard-lg',
-              'active:translate-y-0.5 active:shadow-hard-pressed transition-all'
+              'active:translate-y-0.5 active:shadow-hard-pressed transition'
             )}
           >
             <Check className="me-2 h-5 w-5" />

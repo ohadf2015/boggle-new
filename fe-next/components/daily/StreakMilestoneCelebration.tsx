@@ -218,7 +218,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
             >
               <Button
                 onClick={onClose}
-                className="w-full max-w-btn py-4 text-lg font-black uppercase bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all"
+                className="w-full max-w-btn py-4 text-lg font-black uppercase bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]"
               >
                 Keep the streak going!
               </Button>

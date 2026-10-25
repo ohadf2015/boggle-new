@@ -54,7 +54,7 @@ export function EducationHeroBanner({ title, subtitle, cta }: Props) {
 
       {/* Content */}
       <div
-        className={`relative mx-auto max-w-2xl px-6 py-12 sm:py-16 transition-all duration-700 ease-out ${
+        className={`relative mx-auto max-w-2xl px-6 py-12 sm:py-16 transition-[opacity,translate] duration-700 ease-out ${
           visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}
       >
@@ -72,7 +72,7 @@ export function EducationHeroBanner({ title, subtitle, cta }: Props) {
           <div className="mt-6">
             <a
               href={cta.href}
-              className="inline-flex items-center gap-2 px-5 py-3 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px]"
+              className="inline-flex items-center gap-2 px-5 py-3 bg-neo-lime text-neo-navy font-bold rounded-neo shadow-hard hover:shadow-hard-lg transition hover:translate-x-[2px] hover:translate-y-[2px]"
             >
               {cta.label}
               <span aria-hidden>→</span>

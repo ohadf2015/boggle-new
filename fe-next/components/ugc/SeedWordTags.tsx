@@ -90,9 +90,9 @@ export function SeedWordTags({
             <m.span
               key={`${tag}-${i}`}
               layout
-              initial={{ scale: 0, rotate: -12 }}
-              animate={{ scale: 1, rotate: 0 }}
-              exit={{ scale: 0, rotate: 12, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0, rotate: -12 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              exit={{ scale: 0.95, rotate: 12, opacity: 0 }}
               transition={TAG_SPRING}
               className={cn(
                 'inline-flex items-center gap-1',

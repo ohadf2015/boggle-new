@@ -131,7 +131,7 @@ function QuickCtaButton({ cta }: { cta: QuickCta }) {
   return (
     <Link
       href={cta.href}
-      className={`rounded-neo border-neo-thick ${CTA_BG[variant]} px-6 py-3 text-center font-neo-display text-base font-black uppercase tracking-wide text-neo-navy shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed`}
+      className={`rounded-neo border-neo-thick ${CTA_BG[variant]} px-6 py-3 text-center font-neo-display text-base font-black uppercase tracking-wide text-neo-navy shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed`}
     >
       {cta.label}
     </Link>
@@ -209,7 +209,7 @@ function FeatureGrid({
       {features.map((item) => (
         <div
           key={item.title}
-          className="rounded-neo border-neo-thick bg-neo-navy-elevated p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+          className="rounded-neo border-neo-thick bg-neo-navy-elevated p-5 shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
         >
           <h3
             className={
@@ -314,7 +314,7 @@ export function ComparisonLanding(props: ComparisonLandingProps) {
             {faqs.map((faq, idx) => (
               <details
                 key={`faq-${idx}-${faq.q}`}
-                className="group rounded-neo border-neo-thick bg-neo-navy-elevated shadow-hard transition-all open:shadow-hard-lg"
+                className="group rounded-neo border-neo-thick bg-neo-navy-elevated shadow-hard transition open:shadow-hard-lg"
               >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide text-neo-cream sm:px-6">
                   <span>{faq.q}</span>
@@ -342,7 +342,7 @@ export function ComparisonLanding(props: ComparisonLandingProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="rounded-neo border-neo-thick bg-neo-navy-elevated p-4 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+                  className="rounded-neo border-neo-thick bg-neo-navy-elevated p-4 shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
                 >
                   <div className="font-neo-display font-black text-neo-cream">
                     {link.title}
@@ -368,7 +368,7 @@ export function ComparisonLanding(props: ComparisonLandingProps) {
           </div>
           <Link
             href={finalCta.href}
-            className="mt-7 inline-block rounded-neo border-neo-thick bg-neo-navy px-8 py-4 font-neo-display text-lg font-black uppercase tracking-wide text-neo-cream shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
+            className="mt-7 inline-block rounded-neo border-neo-thick bg-neo-navy px-8 py-4 font-neo-display text-lg font-black uppercase tracking-wide text-neo-cream shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
           >
             {finalCta.label}
           </Link>

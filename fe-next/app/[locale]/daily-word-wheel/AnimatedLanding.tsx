@@ -145,13 +145,13 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
         <m.div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4" variants={fadeUp}>
           <Link
             href={`/${locale}/daily/word-wheel`}
-            className="w-full rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-px active:translate-y-px sm:w-auto sm:px-8 sm:py-4"
+            className="w-full rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow,translate,scale,rotate,transform] hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-px active:translate-y-px sm:w-auto sm:px-8 sm:py-4"
           >
             {hero.cta}
           </Link>
           <Link
             href={`/${locale}/leaderboard`}
-            className="w-full rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 active:shadow-hard-pressed active:translate-x-px active:translate-y-px sm:w-auto sm:px-8 sm:py-4"
+            className="w-full rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color,box-shadow,translate,scale,rotate,transform] hover:bg-neo-cyan/10 active:shadow-hard-pressed active:translate-x-px active:translate-y-px sm:w-auto sm:px-8 sm:py-4"
           >
             {hero.leaderboard}
           </Link>
@@ -260,7 +260,7 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
         <m.div className="mt-6" variants={scaleIn}>
           <Link
             href={`/${locale}/daily/word-wheel`}
-            className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-px active:translate-y-px"
+            className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow,translate,scale,rotate,transform] hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-px active:translate-y-px"
           >
             {finalCta.button}
           </Link>

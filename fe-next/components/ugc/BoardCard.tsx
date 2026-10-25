@@ -105,7 +105,7 @@ function BoardCardCompact({ board, personalBest, onPlay, className }: Omit<Board
         'bg-neo-navy border-2 border-black rounded-neo shadow-hard-sm',
         'hover:shadow-hard hover:-translate-y-0.5',
         'active:shadow-hard-pressed active:translate-y-0',
-        'transition-all duration-150 text-start w-full',
+        'transition duration-150 text-start w-full',
         className
       )}
     >
@@ -163,7 +163,7 @@ function BoardCardCompact({ board, personalBest, onPlay, className }: Omit<Board
       <div className={cn(
         'shrink-0 w-8 h-8 flex items-center justify-center',
         'bg-neo-lime border-2 border-black rounded-neo shadow-hard-sm',
-        'group-hover:shadow-hard transition-all duration-100'
+        'group-hover:shadow-hard transition duration-100'
       )}>
         <Play size={14} className="text-black" />
       </div>
@@ -192,7 +192,7 @@ const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay, variant =
       'bg-neo-navy border-3 border-black rounded-neo',
       'shadow-hard hover:shadow-hard-lg',
       'hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed',
-      'transition-all duration-150',
+      'transition duration-150',
       className
     )}>
       {/* Difficulty accent strip */}
@@ -277,7 +277,7 @@ const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay, variant =
             'bg-neo-lime text-black font-neo-body font-bold text-sm py-2',
             'rounded-neo border-2 border-black shadow-hard-sm',
             'hover:shadow-hard active:shadow-hard-pressed',
-            'transition-all duration-100'
+            'transition duration-100'
           )}
         >
           <Play size={14} />
@@ -290,7 +290,7 @@ const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay, variant =
             'bg-neo-navy text-neo-white font-neo-body font-bold text-sm',
             'rounded-neo border-2 border-black shadow-hard-sm',
             'hover:shadow-hard active:shadow-hard-pressed',
-            'transition-all duration-100'
+            'transition duration-100'
           )}
           aria-label={t('ugc.board.share')}
         >

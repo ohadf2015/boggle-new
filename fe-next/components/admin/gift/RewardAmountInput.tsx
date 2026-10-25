@@ -66,7 +66,7 @@ export function RewardAmountInput({
               size="sm"
               onClick={() => handlePresetClick(preset)}
               className={cn(
-                'transition-all',
+                'transition',
                 isActive && 'bg-neo-lime text-black border-neo-black'
               )}
             >

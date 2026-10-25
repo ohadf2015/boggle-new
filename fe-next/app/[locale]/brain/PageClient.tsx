@@ -44,7 +44,7 @@ function Header({ isDarkMode, onBack, title, backText }: HeaderProps) {
           className={cn(
             'flex items-center gap-2 px-3 py-2 rounded-neo',
             'border-3 border-neo-black shadow-hard-sm',
-            'transition-all hover:translate-y-[-2px] hover:shadow-hard',
+            'transition-[translate,scale,rotate,transform,box-shadow] hover:translate-y-[-2px] hover:shadow-hard',
             isDarkMode ? 'bg-neo-navy text-neo-white' : 'bg-neo-cream text-neo-black'
           )}
         >
@@ -131,14 +131,14 @@ export default function BrainTrainingPageClient() {
               <button
                 type="button"
                 onClick={() => openAuth('signup')}
-                className="px-6 py-3 rounded-neo font-bold border-3 border-neo-black shadow-hard transition-all hover:translate-y-[-2px] hover:shadow-hard-lg bg-neo-lime text-neo-black"
+                className="px-6 py-3 rounded-neo font-bold border-3 border-neo-black shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:translate-y-[-2px] hover:shadow-hard-lg bg-neo-lime text-neo-black"
               >
                 {t('auth.signUp')}
               </button>
               <button
                 type="button"
                 onClick={() => openAuth('signin')}
-                className="px-6 py-3 rounded-neo font-bold border-3 border-neo-black shadow-hard transition-all hover:translate-y-[-2px] hover:shadow-hard-lg bg-neo-cyan text-neo-black"
+                className="px-6 py-3 rounded-neo font-bold border-3 border-neo-black shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:translate-y-[-2px] hover:shadow-hard-lg bg-neo-cyan text-neo-black"
               >
                 {t('auth.signIn')}
               </button>

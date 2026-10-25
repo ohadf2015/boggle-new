@@ -135,7 +135,7 @@ export function PageClient() {
             <p className="mt-2">{t('education.access.status_unknown_body')}</p>
             <Link
               href={`/${language}/teacher`}
-              className="mt-4 inline-block rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-5 py-3 font-neo-display font-bold text-neo-white shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed"
+              className="mt-4 inline-block rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-5 py-3 font-neo-display font-bold text-neo-white shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed"
             >
               {t('education.access.go_to_teacher')}
             </Link>

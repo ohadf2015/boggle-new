@@ -87,7 +87,7 @@ export default function FAQPageClient(): React.ReactElement {
                     <div
                       key={globalIndex}
                       className={cn(
-                        'rounded-neo border-3 border-neo-black transition-all',
+                        'rounded-neo border-3 border-neo-black transition-[box-shadow]',
                         isDarkMode
                           ? 'bg-neo-navy-light'
                           : 'bg-white shadow-hard',
@@ -114,7 +114,7 @@ export default function FAQPageClient(): React.ReactElement {
                       {/* Always render answer in DOM for SEO — use CSS to toggle visibility */}
                       <div
                         className={cn(
-                          'overflow-hidden transition-all duration-300',
+                          'overflow-hidden transition-[max-height,opacity] duration-300',
                           isOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
                         )}
                       >

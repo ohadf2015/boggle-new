@@ -163,7 +163,7 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
           'shadow-hard',
           'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
           'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
-          'cursor-pointer transition-all duration-100'
+          'cursor-pointer transition duration-100'
         )}
       >
         <span className="text-2xl">🏆</span>
@@ -235,7 +235,7 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
                             'bg-neo-white border-3 border-neo-black',
                             'shadow-hard-sm',
                             'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard',
-                            'transition-all duration-100 cursor-pointer'
+                            'transition duration-100 cursor-pointer'
                           )}
                         >
                           <div className="w-10 h-10 rounded-md bg-neo-cyan text-neo-black border-2 border-neo-black flex items-center justify-center shadow-hard-sm shrink-0">

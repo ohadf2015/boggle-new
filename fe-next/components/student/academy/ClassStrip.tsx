@@ -87,7 +87,7 @@ export function ClassStrip({ classroomId, reducedMotion }: Props) {
           type="button"
           onClick={ask}
           disabled={asking}
-          className="min-h-[44px] rounded-neo border-3 border-black bg-neo-lime px-4 py-2 font-neo-display text-sm font-black text-neo-black shadow-hard-sm transition-all hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-60"
+          className="min-h-[44px] rounded-neo border-3 border-black bg-neo-lime px-4 py-2 font-neo-display text-sm font-black text-neo-black shadow-hard-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-60"
         >
           {t('student.classStrip.askRematch')}
         </button>

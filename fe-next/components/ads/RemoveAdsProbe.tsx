@@ -60,7 +60,7 @@ export function RemoveAdsProbe({ isDarkMode }: RemoveAdsProbeProps) {
           aria-label={t('settings.removeAds.button')}
           className={cn(
             'shrink-0 rounded-neo border-2 border-neo-purple px-3 py-1.5 text-xs font-bold',
-            'text-neo-purple transition-all hover:bg-neo-purple/10 active:scale-95'
+            'text-neo-purple transition hover:bg-neo-purple/10 active:scale-95'
           )}
         >
           {t('settings.removeAds.button')}

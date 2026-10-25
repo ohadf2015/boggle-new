@@ -29,7 +29,7 @@ const progressVariants = cva(
 const indicatorVariants = cva(
   // Base indicator styles
   [
-    "h-full transition-all duration-300 ease-out",
+    "h-full transition-[width] duration-300 ease-out",
     "border-r-2 border-neo-black",
   ].join(" "),
   {

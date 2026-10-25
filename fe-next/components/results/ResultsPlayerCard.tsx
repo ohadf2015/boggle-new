@@ -152,7 +152,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
       {/* Neo-Brutalist Card */}
       <div
         className={cn(
-          "transition-all duration-200 rounded-neo-lg relative overflow-hidden",
+          "transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-200 rounded-neo-lg relative overflow-hidden",
           compact
             ? "p-2 border-2 shadow-hard-sm"
             : "p-3 sm:p-4 border-4 shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl",
@@ -271,7 +271,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
         <div className="mb-2 relative z-10">
           <button type="button"
             onClick={handleToggleExpand}
-            className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-white uppercase border-2 border-neo-black bg-neo-cream dark:bg-neo-navy-elevated shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard transition-all"
+            className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-white uppercase border-2 border-neo-black bg-neo-cream dark:bg-neo-navy-elevated shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]"
           >
             <span>{t('hostView.words')}: ({player.allWords?.length || 0})</span>
             {isWordsExpanded ? (
@@ -373,7 +373,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
             <button type="button"
               onClick={() => setShowAchievements(!showAchievements)}
               aria-expanded={showAchievements}
-              className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-white uppercase border-2 border-neo-black bg-neo-lime/20 dark:bg-neo-lime/10 shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard transition-all"
+              className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-white uppercase border-2 border-neo-black bg-neo-lime/20 dark:bg-neo-lime/10 shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]"
             >
               <span className="flex items-center gap-2">
                 <Award className="w-4 h-4 text-neo-pink" />

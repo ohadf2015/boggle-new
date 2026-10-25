@@ -64,7 +64,7 @@ const TabsTrigger = React.forwardRef<
       ref={ref}
       className={cn(
         // Common styles
-        "inline-flex items-center justify-center whitespace-nowrap transition-all",
+        "inline-flex items-center justify-center whitespace-nowrap transition",
         "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
         "disabled:pointer-events-none disabled:opacity-70",
         // Variant-specific styles

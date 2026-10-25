@@ -78,7 +78,7 @@ export function RelatedArticles({ currentSlug, locale, heading, articles }: Rela
             key={article.slug}
             href={`/${locale}/blog/${article.slug}`}
             className={cn(
-              'group block rounded-neo border-3 border-neo-black overflow-hidden transition-all hover:scale-[1.02]',
+              'group block rounded-neo border-3 border-neo-black overflow-hidden transition hover:scale-[1.02]',
               isDarkMode
                 ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
                 : 'bg-white hover:bg-neo-cream shadow-hard-sm hover:shadow-hard'

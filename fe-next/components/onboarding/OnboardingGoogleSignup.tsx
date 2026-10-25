@@ -111,7 +111,7 @@ export default function OnboardingGoogleSignup({
             className={cn(
               'w-full flex items-center justify-center gap-2 py-3 rounded-neo',
               'border-3 border-neo-black bg-white text-neo-black font-black',
-              'shadow-hard-sm transition-all hover:shadow-hard active:translate-y-0.5',
+              'shadow-hard-sm transition hover:shadow-hard active:translate-y-0.5',
               'disabled:opacity-60 disabled:cursor-not-allowed'
             )}
           >

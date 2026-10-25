@@ -341,7 +341,7 @@ export default function DuelLobby({
             'bg-neo-lime text-neo-black',
             'border-[3px] border-neo-black shadow-hard',
             'hover:-translate-y-1 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
-            'animate-neo-press transition-all duration-100',
+            'animate-neo-press transition duration-100',
             'disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-hard',
             'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan'
           )}
@@ -374,7 +374,7 @@ export default function DuelLobby({
                   'bg-neo-pink text-neo-black',
                   'border-[3px] border-neo-black shadow-hard-sm',
                   'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
-                  'transition-all duration-100',
+                  'transition duration-100',
                   'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan'
                 )}
               >
@@ -396,7 +396,7 @@ export default function DuelLobby({
                   'bg-neo-cream text-neo-black shadow-hard-sm',
                   'hover:-translate-y-1 hover:shadow-hard',
                   'active:translate-y-0.5 active:shadow-hard-pressed',
-                  'transition-all duration-100 cursor-pointer',
+                  'transition duration-100 cursor-pointer',
                   'flex flex-col items-center gap-2',
                   'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan'
                 )}

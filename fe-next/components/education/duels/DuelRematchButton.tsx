@@ -108,7 +108,7 @@ export function DuelRematchButton({
         onClick={state === 'pending' ? onCancel : state === 'invited' ? undefined : onRematch}
         className={cn(
           'inline-flex w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black px-4 py-3',
-          'font-neo-display text-base font-black uppercase italic tracking-tight shadow-hard transition-all',
+          'font-neo-display text-base font-black uppercase italic tracking-tight shadow-hard transition',
           'hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
           FILL[state]
         )}

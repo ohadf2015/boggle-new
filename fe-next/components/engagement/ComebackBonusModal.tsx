@@ -195,7 +195,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                   <button
                     onClick={exhausted ? onClose : handleClaim}
                     disabled={claimState === 'claiming' || claimState === 'success' || cooling}
-                    className={`w-full py-3.5 px-4 font-black uppercase text-base border-neo-thick border-neo-white rounded-neo transition-all flex items-center justify-center gap-2 ${
+                    className={`w-full py-3.5 px-4 font-black uppercase text-base border-neo-thick border-neo-white rounded-neo transition flex items-center justify-center gap-2 ${
                       claimState === 'success'
                         ? 'bg-neo-lime text-neo-navy shadow-hard'
                         : claimState === 'error'

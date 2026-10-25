@@ -14,7 +14,7 @@ const buttonVariants = cva(
     "text-sm font-bold uppercase tracking-wide",
     "border-3 border-neo-black rounded-neo",
     "shadow-hard",
-    "transition-all duration-100",
+    "transition duration-100",
     // Press effect: translate to close shadow gap
     "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg",
     "active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed",

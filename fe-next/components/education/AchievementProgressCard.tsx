@@ -111,7 +111,7 @@ export default function AchievementProgressCard({
       className={`
         relative rounded-neo border-neo border-neo-cream/40
         ${isEarned ? 'bg-neo-navy/50 shadow-hard' : 'bg-neo-navy-light/70 opacity-80'}
-        p-4 transition-all
+        p-4 transition
       `}
       aria-label={`${t(`education.achievements.${achievement.key}.name`)} achievement`}
       data-locked={isLocked ? 'true' : 'false'}
@@ -172,7 +172,7 @@ export default function AchievementProgressCard({
                 title={!isPinned && !canPin ? t('education.achievements.maxPinsReached') : ''}
                 className={`
                   w-8 h-8 rounded flex items-center justify-center
-                  border-neo transition-all
+                  border-neo transition
                   ${isPinned ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm' : 'bg-neo-navy-light text-neo-white border-neo-cream/40'}
                   ${!isPinned && !canPin ? 'opacity-40 cursor-not-allowed' : 'hover:scale-110 active:scale-95'}
                 `}
@@ -193,7 +193,7 @@ export default function AchievementProgressCard({
                 aria-valuemax={achievement.nextThreshold}
               >
                 <div
-                  className={`h-full ${tierColors?.fill || 'bg-neo-cyan'} transition-all duration-300`}
+                  className={`h-full ${tierColors?.fill || 'bg-neo-cyan'} transition-[width] duration-300`}
                   style={{ width: `${percentToNext}%` }}
                 />
               </div>

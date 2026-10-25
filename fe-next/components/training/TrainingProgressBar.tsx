@@ -113,7 +113,7 @@ const SkillCheckpoint = memo<{
           }
         : undefined}
       className={cn(
-        'flex items-center gap-2 p-2 rounded-lg border-2 transition-all duration-300',
+        'flex items-center gap-2 p-2 rounded-lg border-2 transition duration-300',
         isCompleted
           ? 'border-neo-lime bg-neo-lime/10 dark:bg-neo-lime/20'
           : isDarkMode
@@ -237,7 +237,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
         onClick={onToggleExpand}
         whileTap={{ scale: 0.98 }}
         className={cn(
-          'flex items-center gap-3 px-4 py-3 min-h-[52px] w-full max-w-[320px] rounded-xl border-2 shadow-hard-sm transition-all',
+          'flex items-center gap-3 px-4 py-3 min-h-[52px] w-full max-w-[320px] rounded-xl border-2 shadow-hard-sm transition',
           isComplete
             ? 'bg-neo-lime border-neo-lime text-neo-black'
             : isDarkMode

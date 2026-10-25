@@ -9,7 +9,7 @@ const badgeVariants = cva(
   [
     "inline-flex items-center justify-center",
     "font-black uppercase tracking-wide",
-    "transition-all duration-100",
+    "transition duration-100",
   ].join(" "),
   {
     variants: {

@@ -85,7 +85,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
         className={cn(
           'w-full flex items-center justify-between gap-2 p-2.5 sm:p-3',
           'font-bold text-sm uppercase tracking-wide',
-          'border-b-2 transition-all duration-150',
+          'border-b-2 transition duration-150',
           'hover:brightness-95 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-1',
           'min-h-[44px]', // WCAG touch target
           styles.header,

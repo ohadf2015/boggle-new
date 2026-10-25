@@ -143,7 +143,7 @@ export function InsightsPanel() {
               <div key={b.dow} className="flex-1 flex flex-col items-center justify-end h-full gap-1">
                 <div className="w-full bg-neo-navy-elevated/40 rounded-sm flex items-end h-full">
                   <div
-                    className={cn('w-full rounded-sm transition-all duration-500', b.dow === peakDow ? 'bg-neo-lime' : 'bg-neo-pink/70')}
+                    className={cn('w-full rounded-sm transition-[height] duration-500', b.dow === peakDow ? 'bg-neo-lime' : 'bg-neo-pink/70')}
                     style={{ height: `${barPct(b.games, dowMax)}%` }}
                   />
                 </div>
@@ -167,7 +167,7 @@ export function InsightsPanel() {
               return (
                 <div key={h} className="flex-1 flex items-end h-full" title={`${String(h).padStart(2, '0')}:00 — ${games}`}>
                   <div
-                    className={cn('w-full rounded-t-sm transition-all duration-500', h === peakHour ? 'bg-neo-cyan' : 'bg-neo-purple/60')}
+                    className={cn('w-full rounded-t-sm transition-[height] duration-500', h === peakHour ? 'bg-neo-cyan' : 'bg-neo-purple/60')}
                     style={{ height: `${barPct(games, hourMax)}%` }}
                   />
                 </div>

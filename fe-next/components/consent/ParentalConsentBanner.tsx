@@ -106,7 +106,7 @@ export const ParentalConsentBanner = memo<ParentalConsentBannerProps>(({
                       'px-3 py-1.5 sm:px-4 sm:py-2',
                       'border-2 border-neo-black rounded-neo',
                       'font-bold text-xs sm:text-sm uppercase',
-                      'transition-all duration-100',
+                      'transition duration-100',
                       'min-h-[44px] min-w-[44px]',
                       'bg-neo-lime text-neo-black',
                       'shadow-hard',
@@ -124,7 +124,7 @@ export const ParentalConsentBanner = memo<ParentalConsentBannerProps>(({
                       'px-3 py-1.5 sm:px-4 sm:py-2',
                       'border-2 border-white/30 rounded-neo',
                       'font-bold text-xs sm:text-sm uppercase',
-                      'transition-all duration-100',
+                      'transition duration-100',
                       'min-h-[44px] min-w-[44px]',
                       'bg-white/20 hover:bg-white/30',
                       'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'

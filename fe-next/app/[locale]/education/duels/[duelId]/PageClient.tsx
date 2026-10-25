@@ -164,7 +164,7 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
                 'px-6 py-3 font-bold rounded-neo',
                 'bg-neo-lime text-neo-black',
                 'border-[3px] border-neo-black shadow-hard',
-                'hover:shadow-hard transition-all'
+                'hover:shadow-hard transition'
               )}
             >
               {t('backToLobby')}

@@ -22,9 +22,9 @@ export function GiftNotificationBadge({ count, className }: GiftNotificationBadg
   return (
     <AnimatePresence>
       <m.div
-        initial={{ scale: 0, opacity: 0 }}
+        initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0, opacity: 0 }}
+        exit={{ scale: 0.95, opacity: 0 }}
         className={cn(
           'absolute -top-1 -inset-e-1 z-10',
           'min-w-[18px] h-[18px] px-1',

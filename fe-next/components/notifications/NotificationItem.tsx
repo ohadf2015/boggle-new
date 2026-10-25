@@ -46,7 +46,7 @@ export function NotificationItem({ notification, onClick, onMarkAsRead, onDismis
         }
       }}
       className={`
-        relative flex gap-3 p-3 cursor-pointer transition-all duration-200
+        relative flex gap-3 p-3 cursor-pointer transition duration-200
         border-b-2 border-black/10 last:border-b-0 w-full text-start
         hover:bg-neo-navy/50
         ${!notification.read ? 'bg-neo-navy/30' : 'bg-transparent'}
@@ -89,7 +89,7 @@ export function NotificationItem({ notification, onClick, onMarkAsRead, onDismis
           w-6 h-6 rounded-full
           flex items-center justify-center
           text-neo-white hover:text-neo-white hover:bg-neo-white/10
-          transition-all duration-150
+          transition duration-150
         "
         title={t('notifications.dismiss')}
       >

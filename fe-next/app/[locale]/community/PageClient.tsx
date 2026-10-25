@@ -362,7 +362,7 @@ export default function CommunityPageClient() {
               'border-3 border-black rounded-neo shadow-hard-lg',
               'hover:shadow-hard hover:-translate-y-0.5',
               'active:shadow-hard-pressed active:translate-y-0',
-              'transition-all duration-150'
+              'transition-[box-shadow,translate,scale,rotate,transform] duration-150'
             )}
           >
             {/* Attention pulse ring */}

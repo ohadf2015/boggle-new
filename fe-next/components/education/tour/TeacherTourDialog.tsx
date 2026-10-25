@@ -83,7 +83,7 @@ export function TeacherTourDialog() {
         className={cn(
           'inline-flex items-center gap-2 rounded-neo border-neo border-neo-black',
           'bg-neo-cyan px-4 py-2 font-neo-display font-black uppercase text-neo-black',
-          'shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg',
+          'shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg',
           'active:translate-y-0.5 active:shadow-hard-pressed text-sm'
         )}
       >
@@ -130,7 +130,7 @@ export function TeacherTourDialog() {
                 data-testid={`tour-progress-${i + 1}`}
                 onClick={() => goToScene(i + 1)}
                 className={cn(
-                  'flex-1 h-1.5 rounded-full transition-all cursor-pointer',
+                  'flex-1 h-1.5 rounded-full transition-[width,background-color] cursor-pointer',
                   i + 1 <= currentScene ? 'bg-neo-lime' : 'bg-neo-white/30'
                 )}
                 style={{
@@ -159,7 +159,7 @@ export function TeacherTourDialog() {
                 onClick={previousScene}
                 disabled={currentScene === 1}
                 className={cn(
-                  'p-2 rounded border-2 transition-all',
+                  'p-2 rounded border-2 transition',
                   currentScene === 1
                     ? 'bg-neo-white/20 text-neo-white/40 cursor-not-allowed border-neo-white/50'
                     : 'bg-neo-cyan text-neo-black border-neo-black hover:-translate-y-0.5 active:translate-y-0.5'
@@ -175,7 +175,7 @@ export function TeacherTourDialog() {
                   onClick={togglePause}
                   className={cn(
                     'p-2 px-4 rounded border-2 border-neo-black bg-neo-pink text-neo-black',
-                    'hover:-translate-y-0.5 active:translate-y-0.5 transition-all'
+                    'hover:-translate-y-0.5 active:translate-y-0.5 transition'
                   )}
                   aria-label={t('common.pause')}
                 >
@@ -187,7 +187,7 @@ export function TeacherTourDialog() {
                   onClick={togglePause}
                   className={cn(
                     'p-2 px-4 rounded border-2 border-neo-black bg-neo-lime text-neo-black',
-                    'hover:-translate-y-0.5 active:translate-y-0.5 transition-all'
+                    'hover:-translate-y-0.5 active:translate-y-0.5 transition'
                   )}
                   aria-label={t('common.play')}
                 >
@@ -200,7 +200,7 @@ export function TeacherTourDialog() {
                 onClick={nextScene}
                 disabled={currentScene === 5}
                 className={cn(
-                  'p-2 rounded border-2 transition-all',
+                  'p-2 rounded border-2 transition',
                   currentScene === 5
                     ? 'bg-neo-white/20 text-neo-white/40 cursor-not-allowed border-neo-white/50'
                     : 'bg-neo-cyan text-neo-black border-neo-black hover:-translate-y-0.5 active:translate-y-0.5'
@@ -219,7 +219,7 @@ export function TeacherTourDialog() {
                   className={cn(
                     'block w-full rounded-neo border-2 border-neo-black bg-neo-lime',
                     'px-4 py-3 text-center font-neo-display font-black uppercase text-neo-black',
-                    'shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg',
+                    'shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg',
                     'active:translate-y-0.5 active:shadow-hard-pressed'
                   )}
                 >

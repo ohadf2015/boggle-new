@@ -132,7 +132,7 @@ export function LastGameInsights({
         <button
           type="button"
           onClick={() => { void refresh(); }}
-          className="inline-flex items-center gap-2 px-3 py-2 bg-black text-neo-lime font-black font-neo-body text-sm rounded-neo border-3 border-black shadow-hard-sm hover:-translate-y-0.5 transition-all duration-100"
+          className="inline-flex items-center gap-2 px-3 py-2 bg-black text-neo-lime font-black font-neo-body text-sm rounded-neo border-3 border-black shadow-hard-sm hover:-translate-y-0.5 transition duration-100"
         >
           <RefreshCw className="w-4 h-4" aria-hidden />
           {t('teacher.lastGame.retry')}
@@ -320,7 +320,7 @@ export function LastGameInsights({
                 'inline-flex items-center gap-2 px-4 py-2 bg-black text-neo-lime',
                 'font-black font-neo-body text-sm rounded-neo border-3 border-black shadow-hard-sm',
                 'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
-                'transition-all duration-100 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
+                'transition duration-100 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
               )}
             >
               <Sparkles className="w-4 h-4" aria-hidden />

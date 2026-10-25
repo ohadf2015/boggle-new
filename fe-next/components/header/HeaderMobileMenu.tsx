@@ -300,7 +300,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                             "rounded-neo shadow-hard-sm",
                             "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
                             "active:translate-x-px active:translate-y-px active:shadow-none",
-                            "transition-all duration-100",
+                            "transition duration-100",
                             "text-[11px] font-bold whitespace-nowrap"
                         )}
                         aria-label={t('auth.signIn')}
@@ -342,7 +342,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                         "rounded-neo shadow-hard-sm",
                         "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
                         "active:translate-x-px active:translate-y-px active:shadow-none",
-                        "transition-all duration-100"
+                        "transition duration-100"
                     )}
                     aria-label={showMobileMenu ? t('common.closeMenu') : t('common.openMenu')}
                     aria-expanded={showMobileMenu}
@@ -432,7 +432,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             "rounded-full",
                                             "hover:bg-neo-white/20 hover:text-neo-white",
                                             "active:scale-90",
-                                            "transition-all duration-100"
+                                            "transition duration-100"
                                         )}
                                         aria-label={t('common.closeMenu')}
                                     >
@@ -724,7 +724,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                         "border-3 border-neo-black shadow-hard-sm",
                                                         "hover:shadow-hard hover:-translate-y-px",
                                                         "active:translate-y-px active:shadow-none",
-                                                        "transition-all duration-100"
+                                                        "transition duration-100"
                                                     )}
                                                 >
                                                     <MenuIcon className="bg-white/30 border-neo-black/30">
@@ -860,7 +860,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                         "border-2 border-neo-pink",
                                                         "hover:bg-neo-pink/20",
                                                         "active:scale-[0.98]",
-                                                        "transition-all duration-100"
+                                                        "transition duration-100"
                                                     )}
                                                 >
                                                     <MenuIcon className="bg-neo-pink/30 border-neo-pink">
@@ -890,7 +890,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 "border-2 border-neo-pink",
                                                 "hover:bg-neo-pink/20",
                                                 "active:scale-[0.98]",
-                                                "transition-all duration-100"
+                                                "transition duration-100"
                                             )}
                                         >
                                             <MenuIcon className="bg-neo-pink/30 border-neo-pink">
@@ -924,7 +924,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                     "bg-neo-purple/15 text-neo-white",
                                                     "border-2 border-neo-purple",
                                                     "hover:bg-neo-purple/25 hover:text-neo-white",
-                                                    "transition-all duration-100"
+                                                    "transition duration-100"
                                                 )}
                                             >
                                                 <span className="flex items-center justify-center w-5 h-5 rounded-md bg-neo-purple text-white">
@@ -942,7 +942,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                     "bg-neo-white/5 text-neo-white",
                                                     "border-2 border-neo-white/10",
                                                     "hover:border-neo-white/20 hover:text-neo-white",
-                                                    "transition-all duration-100"
+                                                    "transition duration-100"
                                                 )}
                                             >
                                                 <span className="flex items-center justify-center w-5 h-5 rounded-md bg-neo-lime/20 text-neo-lime">
@@ -1047,7 +1047,7 @@ function MenuLink({ href, onClick, accentColor, children }: {
                 hoverColors[accentColor],
                 "hover:bg-neo-white/8",
                 "active:scale-[0.98]",
-                "transition-all duration-100"
+                "transition duration-100"
             )}
         >
             {children}
@@ -1072,7 +1072,7 @@ function InfoLink({ href, onClick, icon, color, children }: {
                 "border-2 border-neo-white/10",
                 "hover:border-neo-white/20 hover:text-neo-white",
                 "active:scale-[0.97]",
-                "transition-all duration-100"
+                "transition duration-100"
             )}
         >
             <span className={cn("flex items-center justify-center w-5 h-5 rounded-md", color)}>
@@ -1104,7 +1104,7 @@ function InfoLinkExternal({ href, onClick, icon, color, label, children }: {
                 "border-2 border-neo-white/10",
                 "hover:border-neo-white/20 hover:text-neo-white",
                 "active:scale-[0.97]",
-                "transition-all duration-100"
+                "transition duration-100"
             )}
         >
             <span className={cn("flex items-center justify-center w-5 h-5 rounded-md", color)}>

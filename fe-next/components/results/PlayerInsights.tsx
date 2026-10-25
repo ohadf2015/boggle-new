@@ -358,7 +358,7 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
                 'p-2 rounded-neo border-2 border-neo-black',
                 'bg-white shadow-hard-sm',
                 'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard',
-                'transition-all duration-100'
+                'transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-100'
               )}
             >
               <div className="flex items-center gap-2 mb-1">

@@ -230,7 +230,7 @@ export function FriendDetailDialog({
                       'flex-1 flex items-center justify-center gap-2 py-3 rounded-neo',
                       'border-3 border-neo-black shadow-hard',
                       'bg-neo-cyan text-neo-black font-black uppercase tracking-wide',
-                      'hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+                      'hover:shadow-hard-lg hover:-translate-y-0.5 transition'
                     )}
                   >
                     {actionLoading ? (
@@ -253,7 +253,7 @@ export function FriendDetailDialog({
                         'flex-1 flex items-center justify-center gap-2 py-3 rounded-neo',
                         'border-3 border-neo-black shadow-hard',
                         'bg-neo-lime text-neo-black font-black uppercase tracking-wide',
-                        'hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+                        'hover:shadow-hard-lg hover:-translate-y-0.5 transition'
                       )}
                     >
                       <Target className="w-4 h-4 stroke-3" aria-hidden="true" />
@@ -266,7 +266,7 @@ export function FriendDetailDialog({
                         'flex items-center gap-2 px-4 py-3 rounded-neo',
                         'border-3 border-neo-black shadow-hard',
                         'bg-neo-pink text-neo-white font-black uppercase tracking-wide',
-                        'hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+                        'hover:shadow-hard-lg hover:-translate-y-0.5 transition'
                       )}
                       aria-label={t('friends.remove')}
                     >
@@ -284,7 +284,7 @@ export function FriendDetailDialog({
                           'flex items-center gap-2 px-4 py-3 rounded-neo',
                           'border-3 border-neo-black shadow-hard',
                           'bg-neo-red text-neo-white font-black uppercase tracking-wide',
-                          'hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+                          'hover:shadow-hard-lg hover:-translate-y-0.5 transition'
                         )}
                         aria-label={t('friends.block')}
                       >

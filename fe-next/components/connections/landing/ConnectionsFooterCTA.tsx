@@ -27,7 +27,7 @@ export default function ConnectionsFooterCTA({ locale, copy }: Props): React.JSX
           href={connectionsPrimaryPath(locale)}
           onClick={handleClick}
           data-testid="footer-cta-button"
-          className="inline-block rounded-neo border-4 border-neo-black bg-neo-navy px-8 py-4 font-neo-display text-base font-black uppercase tracking-widest text-neo-white shadow-hard transition-all hover:translate-y-[-2px] hover:shadow-hard-lg"
+          className="inline-block rounded-neo border-4 border-neo-black bg-neo-navy px-8 py-4 font-neo-display text-base font-black uppercase tracking-widest text-neo-white shadow-hard transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] hover:translate-y-[-2px] hover:shadow-hard-lg"
         >
           {copy.button}
         </Link>

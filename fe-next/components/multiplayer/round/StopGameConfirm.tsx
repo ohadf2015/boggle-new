@@ -18,10 +18,10 @@ export function StopGameConfirm({
       <div className="bg-neo-navy border-4 border-neo-black shadow-hard-lg p-6 max-w-xs w-full text-center rounded-neo">
         <p className="font-bold text-neo-cream text-lg mb-4 font-neo-display">{t('mp.stopGameConfirm')}</p>
         <div className="flex gap-3 justify-center">
-          <button type="button" onClick={onConfirm} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
+          <button type="button" onClick={onConfirm} className="bg-neo-pink border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]">
             {t('mp.stopGameYes')}
           </button>
-          <button type="button" onClick={onCancel} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-all">
+          <button type="button" onClick={onCancel} className="bg-neo-cream border-2 border-neo-black font-black px-4 py-2 text-neo-black rounded-neo hover:shadow-hard active:shadow-hard-pressed transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]">
             {t('common.cancel')}
           </button>
         </div>

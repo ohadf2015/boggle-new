@@ -466,7 +466,7 @@ export default function ConnectionsGame() {
           type="button"
           onClick={exitGuard.requestExit}
           aria-label={t('common.back')}
-          className="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-neo border-neo border-black bg-neo-navy-light text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-[1px] transition-all duration-100"
+          className="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-neo border-neo border-black bg-neo-navy-light text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-[1px] transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-100"
         >
           <ArrowLeft className="w-4 h-4 rtl:rotate-180" aria-hidden="true" />
         </button>
@@ -560,7 +560,7 @@ export default function ConnectionsGame() {
         {getPyramidsForLocale(language).length > 0 && (
           <Link
             href={`/${language}/connections/pyramid`}
-            className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-purple/25 px-3 py-1 font-neo-body text-xs font-bold text-neo-purple shadow-hard-sm transition-all duration-100 hover:bg-neo-purple/40 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
+            className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-purple/25 px-3 py-1 font-neo-body text-xs font-bold text-neo-purple shadow-hard-sm transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-100 hover:bg-neo-purple/40 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
           >
             <Pyramid className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
             <span>{t('connections.pyramid.cta')}</span>
@@ -568,14 +568,14 @@ export default function ConnectionsGame() {
         )}
         <Link
           href={`/${language}/connections/daily`}
-          className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-yellow/15 px-3 py-1 font-neo-body text-xs font-bold text-neo-yellow shadow-hard-sm transition-all duration-100 hover:bg-neo-yellow/25 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
+          className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-yellow/15 px-3 py-1 font-neo-body text-xs font-bold text-neo-yellow shadow-hard-sm transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-100 hover:bg-neo-yellow/25 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
         >
           <Trophy className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
           <span>{t('connections.daily.cta')}</span>
         </Link>
         <Link
           href={`/${language}/connections/community`}
-          className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-pink/15 px-3 py-1 font-neo-body text-xs font-bold text-neo-pink shadow-hard-sm transition-all duration-100 hover:bg-neo-pink/25 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
+          className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-pink/15 px-3 py-1 font-neo-body text-xs font-bold text-neo-pink shadow-hard-sm transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-100 hover:bg-neo-pink/25 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
         >
           <Users className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
           <span>{t('connections.community.cta')}</span>

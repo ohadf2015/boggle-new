@@ -117,13 +117,13 @@ export default async function Page({ params }: PageProps) {
       <TeacherProCompareCheckoutStrip locale={locale} />
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4">
+          <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
             Try LexiClash Free
           </Link>
-          <Link href={`/${locale}/education/games-for-teachers`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
+          <Link href={`/${locale}/education/games-for-teachers`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
             For Teachers
           </Link>
-          <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-all hover:bg-neo-pink/10 sm:px-8 sm:py-4">
+          <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4">
             ESL Word Games
           </Link>
         </section>
@@ -204,15 +204,15 @@ export default async function Page({ params }: PageProps) {
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More comparisons</h2>
           <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/lexiclash-vs-quizlet`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/lexiclash-vs-quizlet`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Quizlet</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Word games vs flashcards. Free vs Quizlet Plus.</p>
             </Link>
-            <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Unlimited play vs 1 puzzle/day</p>
             </Link>
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">Best Word Games 2026</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Complete comparison guide</p>
             </Link>
@@ -227,7 +227,7 @@ export default async function Page({ params }: PageProps) {
             you&apos;ve lost five minutes — and gained a tool to keep in mind for vocabulary review days.
           </p>
           <div className="mt-6">
-            <Link href={`/${locale}/education/classroom-game`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg">
+            <Link href={`/${locale}/education/classroom-game`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
               Start a Classroom Game Free
             </Link>
           </div>

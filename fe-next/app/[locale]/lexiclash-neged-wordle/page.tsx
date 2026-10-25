@@ -240,19 +240,19 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
         <section className="mb-12 flex flex-col gap-3 sm:flex-row-reverse sm:gap-4">
           <Link
             href={`/${locale}/singleplayer`}
-            className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
           >
             שחקו עכשיו - בחינם!
           </Link>
           <Link
             href={`/${locale}/daily`}
-            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-all hover:bg-neo-pink/10 sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4"
           >
             אתגר יומי
           </Link>
           <Link
             href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
           >
             מרובה משתתפים
           </Link>
@@ -288,7 +288,7 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
           </p>
           <Link
             href="/he/hebrew-multiplayer-word-game"
-            className="inline-block rounded-neo border-3 border-neo-pink bg-neo-pink/10 px-5 py-2 font-bold text-neo-pink transition-all hover:bg-neo-pink/20"
+            className="inline-block rounded-neo border-3 border-neo-pink bg-neo-pink/10 px-5 py-2 font-bold text-neo-pink transition-[background-color] hover:bg-neo-pink/20"
           >
             למדריך המלא &larr;
           </Link>

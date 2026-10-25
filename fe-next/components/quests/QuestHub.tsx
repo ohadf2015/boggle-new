@@ -258,7 +258,7 @@ function WeeklyQuestSection() {
                 aria-valuemax={100}
               >
                 <div
-                  className="h-full bg-linear-to-r from-neo-cyan to-neo-cyan-light rounded-full transition-all duration-700 ease-out"
+                  className="h-full bg-linear-to-r from-neo-cyan to-neo-cyan-light rounded-full transition-[width] duration-700 ease-out"
                   style={{
                     width: `${Math.min(100, (activeQuest.current / activeQuest.target) * 100)}%`,
                   }}
@@ -288,7 +288,7 @@ function WeeklyQuestSection() {
                       'flex items-center justify-between p-3',
                       'rounded-neo border-2',
                       'shadow-hard-sm',
-                      'transition-all duration-200',
+                      'transition duration-200',
                       isSelecting
                         ? [
                             'border-neo-cyan bg-neo-cyan/15',

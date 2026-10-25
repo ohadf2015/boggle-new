@@ -46,7 +46,7 @@ const ICON: Record<string, React.ElementType> = {
 const TILE =
   'group flex items-center gap-3 p-3 rounded-neo border-3 border-neo-black shadow-hard text-start ' +
   'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-x-0.5 active:translate-y-0.5 ' +
-  'active:shadow-hard-pressed transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white';
+  'active:shadow-hard-pressed transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white';
 
 /**
  * NextGamePicker — the mode choice single player lost when its lobby was

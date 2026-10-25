@@ -135,7 +135,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
               className={cn(
                 'flex items-center gap-1.5 px-3.5 py-2 rounded-neo',
                 'font-neo-body font-bold text-xs whitespace-nowrap',
-                'border-2 border-black transition-all duration-100',
+                'border-2 border-black transition duration-100',
                 sort === tab.key
                   ? 'bg-neo-yellow text-black shadow-hard-sm'
                   : 'bg-neo-navy text-neo-white shadow-hard-sm hover:text-neo-white hover:bg-neo-white/5'
@@ -157,7 +157,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
               onClick={() => handleDifficultyToggle(chip.key)}
               className={cn(
                 'px-2.5 py-1 rounded-neo font-neo-body font-bold text-[11px]',
-                'border transition-all duration-100',
+                'border transition duration-100',
                 difficulty === chip.key
                   ? cn(chip.color, 'border-current shadow-hard-sm')
                   : 'border-neo-white/10 text-neo-white hover:text-neo-white'
@@ -193,7 +193,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
           </div>
           <Link
             href={`/${language}/create/board`}
-            className="px-5 py-2.5 bg-neo-yellow text-black font-neo-display font-bold text-sm rounded-neo border-3 border-black shadow-hard hover:shadow-hard-pressed transition-all"
+            className="px-5 py-2.5 bg-neo-yellow text-black font-neo-display font-bold text-sm rounded-neo border-3 border-black shadow-hard hover:shadow-hard-pressed transition"
           >
             {t('ugc.gallery.createBoard')}
           </Link>
@@ -244,7 +244,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
                   'border-3 border-black shadow-hard',
                   'hover:shadow-hard-lg hover:-translate-y-0.5',
                   'active:shadow-hard-pressed active:translate-y-0',
-                  'transition-all duration-150 disabled:opacity-50'
+                  'transition duration-150 disabled:opacity-50'
                 )}
               >
                 {t('ugc.gallery.loadMore')}

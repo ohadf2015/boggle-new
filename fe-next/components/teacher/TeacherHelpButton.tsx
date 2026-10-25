@@ -45,7 +45,7 @@ export function TeacherHelpButton() {
           'rounded-neo shadow-hard-sm',
           'hover:-translate-y-px hover:bg-neo-cyan hover:text-neo-black hover:shadow-hard',
           'active:translate-y-px active:shadow-none',
-          'transition-all duration-100',
+          'transition duration-100',
           'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2',
         )}
       >

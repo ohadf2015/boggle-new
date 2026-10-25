@@ -62,7 +62,7 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
         // while the tile itself takes its full aspect height — so every row
         // overlapped the one below it. A min-height contributes to track sizing
         // directly and renders identically.
-        'group relative flex w-full flex-col overflow-hidden rounded-neo border-[3px] text-start transition-all',
+        'group relative flex w-full flex-col overflow-hidden rounded-neo border-[3px] text-start transition',
         tile.ready
           ? // ONE card style for every tile on this surface. The hero owns the
             // screen's accent fill; a tile carries a cream edge (16.8:1 on navy,

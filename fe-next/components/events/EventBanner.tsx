@@ -115,7 +115,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
                 data-testid="event-progress-bar"
               >
                 <div
-                  className="h-full rounded-full transition-all duration-1000"
+                  className="h-full rounded-full transition-[width] duration-1000"
                   style={{
                     width: `${(1 - progress) * 100}%`,
                     backgroundColor: accentColor,
@@ -138,7 +138,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
                   className={cn(
                     'px-4 py-2 rounded-neo border-3 border-black font-bold text-sm text-black',
                     'shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5',
-                    'transition-all duration-150'
+                    'transition duration-150'
                   )}
                   style={{ backgroundColor: accentColor }}
                 >

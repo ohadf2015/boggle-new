@@ -50,11 +50,13 @@
   .marqueeTile {
     transition: transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .marqueeWord:hover .marqueeTile {
-    transform: translateY(-5px) rotate(-4deg);
-  }
-  .marqueeWord:hover .marqueeTile:nth-child(even) {
-    transform: translateY(-3px) rotate(4deg);
+  @media (hover: hover) and (pointer: fine) {
+    .marqueeWord:hover .marqueeTile {
+      transform: translateY(-5px) rotate(-4deg);
+    }
+    .marqueeWord:hover .marqueeTile:nth-child(even) {
+      transform: translateY(-3px) rotate(4deg);
+    }
   }
 
   /* A slow idle sway with a wave every few seconds; a found word makes it hop. */

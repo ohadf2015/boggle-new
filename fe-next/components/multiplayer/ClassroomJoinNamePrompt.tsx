@@ -115,7 +115,7 @@ export const ClassroomJoinNamePrompt: React.FC<ClassroomJoinNamePromptProps> = (
             'mt-4 w-full flex items-center justify-center gap-2 py-3 px-4',
             'rounded-neo border-neo-thick border-neo-black bg-neo-lime text-neo-black',
             'font-black uppercase tracking-wide shadow-hard',
-            'active:translate-y-0.5 active:shadow-none transition-all',
+            'active:translate-y-0.5 active:shadow-none transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
             disabled && 'opacity-50 cursor-not-allowed'
           )}
         >

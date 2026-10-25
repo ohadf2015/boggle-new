@@ -97,7 +97,7 @@ const PlayerProfileTooltipContent = memo<{
           'px-2 py-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm',
           'hover:bg-neo-cyan hover:text-neo-black',
           'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
-          'transition-all'
+          'transition'
         )}
         onClick={(e) => e.stopPropagation()}
       >

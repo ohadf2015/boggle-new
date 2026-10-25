@@ -166,7 +166,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
     <div
       role="listitem"
       tabIndex={0}
-      className={`flex items-center gap-2 p-1.5 rounded-neo border-3 shadow-hard-sm transition-all duration-300
+      className={`flex items-center gap-2 p-1.5 rounded-neo border-3 shadow-hard-sm transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-300
         hover:-translate-x-px hover:-translate-y-px hover:shadow-hard
         focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1
         ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}

@@ -131,7 +131,7 @@ export default function CreatorProfileStats({ stats, className }: CreatorProfile
           'block w-full text-center py-2 rounded-neo border-2 border-neo-black',
           'bg-neo-yellow text-neo-black font-black text-sm',
           'shadow-hard-sm hover:shadow-none hover:translate-x-1 hover:translate-y-1',
-          'transition-all duration-100'
+          'transition duration-100'
         )}
         aria-label={t('ugc.creator.myBoards')}
       >

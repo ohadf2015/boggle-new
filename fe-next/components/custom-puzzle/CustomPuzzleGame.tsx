@@ -317,8 +317,8 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
 
               {beatCreator && (
                 <AdaptiveMotion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
                   className="inline-flex items-center gap-2 bg-neo-lime text-neo-black px-4 py-2 rounded-neo font-bold"
                 >
                   <Trophy className="w-5 h-5" />

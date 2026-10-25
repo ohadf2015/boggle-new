@@ -61,7 +61,7 @@ export const SeasonLeaderboardTabs: React.FC<SeasonLeaderboardTabsProps> = ({
             className={`
               inline-flex items-center gap-1.5 px-3 py-2
               rounded-neo border-neo border-black font-neo-display text-sm
-              transition-all motion-reduce:transition-none
+              transition motion-reduce:transition-none
               hover:shadow-hard
               active:translate-y-0.5 active:shadow-hard-pressed
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink

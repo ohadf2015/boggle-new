@@ -566,27 +566,27 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Detailed Comparisons</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <Link href="/en/words-with-friends-alternative" className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink">
+            <Link href="/en/words-with-friends-alternative" className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink">
               <h3 className="font-bold text-neo-pink">Words With Friends Alternative</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time multiplayer, free, no download</p>
             </Link>
-            <Link href={`/${locale}/scrabble-alternative-online`} className="rounded-neo border-3 border-neo-lime/60 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime">
+            <Link href={`/${locale}/scrabble-alternative-online`} className="rounded-neo border-3 border-neo-lime/60 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime">
               <h3 className="font-bold text-neo-lime">Scrabble Alternative Online</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time, 2-20 players, browser-based</p>
             </Link>
-            <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Unlimited play vs 1 puzzle/day</p>
             </Link>
-            <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Scrabble GO</h3>
               <p className="mt-1 text-xs text-neo-gray-200">No pay-to-win, no bots, real players</p>
             </Link>
-            <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">Play Boggle Online Free</h3>
               <p className="mt-1 text-xs text-neo-gray-200">No download, instant play</p>
             </Link>
-            <Link href={`/${locale}/blog/boggle-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/blog/boggle-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">Boggle vs Scrabble</h3>
               <p className="mt-1 text-xs text-neo-gray-200">7 honest differences, verdict for 2026</p>
             </Link>
@@ -603,10 +603,10 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
             browser — give LexiClash a shot. Worst case, you waste five fun minutes.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Link href={`/${locale}/singleplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg">
+            <Link href={`/${locale}/singleplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
               Play LexiClash Free
             </Link>
-            <Link href={`/${locale}/daily`} className="inline-block rounded-neo border-4 border-neo-cyan bg-transparent px-8 py-4 text-center font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10">
+            <Link href={`/${locale}/daily`} className="inline-block rounded-neo border-4 border-neo-cyan bg-transparent px-8 py-4 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10">
               Try the Daily Challenge
             </Link>
           </div>

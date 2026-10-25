@@ -160,10 +160,10 @@ export default async function BrainTrainingWordGamesPage({ params }: PageProps) 
         <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">{copy.introP2}</p>
 
         <div className="mb-12 flex flex-col gap-3 sm:flex-row">
-          <Link href={`/${locale}/brain`} className="inline-block rounded-neo border-4 border-neo-purple bg-neo-purple px-8 py-4 text-center font-bold text-neo-white shadow-hard transition-all hover:shadow-hard-lg">
+          <Link href={`/${locale}/brain`} className="inline-block rounded-neo border-4 border-neo-purple bg-neo-purple px-8 py-4 text-center font-bold text-neo-white shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
             {copy.ctaPrimary}
           </Link>
-          <Link href={`/${locale}/brain/drills/lightning-round`} className="inline-block rounded-neo border-4 border-neo-cyan bg-transparent px-8 py-4 text-center font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10">
+          <Link href={`/${locale}/brain/drills/lightning-round`} className="inline-block rounded-neo border-4 border-neo-cyan bg-transparent px-8 py-4 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10">
             {copy.ctaSecondary}
           </Link>
         </div>
@@ -260,27 +260,27 @@ export default async function BrainTrainingWordGamesPage({ params }: PageProps) 
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{copy.relatedHeading}</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <Link href={`/${locale}/brain`} className="rounded-neo border-3 border-neo-purple/60 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-purple">
+            <Link href={`/${locale}/brain`} className="rounded-neo border-3 border-neo-purple/60 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple">
               <h3 className="font-bold text-neo-purple">{copy.relatedHubTitle}</h3>
               <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedHubSub}</p>
             </Link>
-            <Link href={`/${locale}/blog/word-games-for-brain-training`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-purple/40">
+            <Link href={`/${locale}/blog/word-games-for-brain-training`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple/40">
               <h3 className="font-bold text-neo-cyan">{copy.relatedScienceTitle}</h3>
               <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedScienceSub}</p>
             </Link>
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-purple/40">
+            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple/40">
               <h3 className="font-bold text-neo-cyan">{copy.relatedBestTitle}</h3>
               <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedBestSub}</p>
             </Link>
-            <Link href={`/${locale}/daily`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-purple/40">
+            <Link href={`/${locale}/daily`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple/40">
               <h3 className="font-bold text-neo-cyan">{copy.relatedDailyTitle}</h3>
               <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedDailySub}</p>
             </Link>
-            <Link href={`/${locale}/word-of-the-day`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-purple/40">
+            <Link href={`/${locale}/word-of-the-day`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-purple/40">
               <h3 className="font-bold text-neo-cyan">{copy.relatedWotdTitle}</h3>
               <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedWotdSub}</p>
             </Link>
-            <Link href={`/${locale}/multiplayer`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
+            <Link href={`/${locale}/multiplayer`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
               <h3 className="font-bold text-neo-pink">{copy.relatedMpTitle}</h3>
               <p className="mt-1 text-xs text-neo-gray-200">{copy.relatedMpSub}</p>
             </Link>
@@ -292,10 +292,10 @@ export default async function BrainTrainingWordGamesPage({ params }: PageProps) 
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">{copy.finalCtaHeading}</h2>
           <p className="mt-4 text-neo-gray-200">{copy.finalCtaBody}</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Link href={`/${locale}/brain`} className="inline-block rounded-neo border-4 border-neo-purple bg-neo-purple px-8 py-4 text-center font-bold text-neo-white shadow-hard transition-all hover:shadow-hard-lg">
+            <Link href={`/${locale}/brain`} className="inline-block rounded-neo border-4 border-neo-purple bg-neo-purple px-8 py-4 text-center font-bold text-neo-white shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
               {copy.finalCtaPrimary}
             </Link>
-            <Link href={`/${locale}/brain/drills/lightning-round`} className="inline-block rounded-neo border-4 border-neo-lime bg-transparent px-8 py-4 text-center font-bold text-neo-lime shadow-hard transition-all hover:bg-neo-lime/10">
+            <Link href={`/${locale}/brain/drills/lightning-round`} className="inline-block rounded-neo border-4 border-neo-lime bg-transparent px-8 py-4 text-center font-bold text-neo-lime shadow-hard transition-[background-color] hover:bg-neo-lime/10">
               {copy.finalCtaSecondary}
             </Link>
           </div>

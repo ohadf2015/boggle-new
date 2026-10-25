@@ -202,7 +202,7 @@ export function CinematicFallback({
           className={`
             px-4 py-2 sm:px-6 sm:py-3 rounded-neo border-neo border-black
             font-neo-display text-base sm:text-lg
-            transition-all duration-200
+            transition-[background-color,color,box-shadow,opacity] duration-200
             ${
               canSkip
                 ? 'bg-neo-yellow hover:bg-neo-orange text-black cursor-pointer shadow-hard hover:shadow-hard-lg'

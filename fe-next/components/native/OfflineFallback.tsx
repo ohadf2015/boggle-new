@@ -72,7 +72,7 @@ export function OfflineFallback({ onRetry, isRetrying = false }: OfflineFallback
           flex items-center gap-2 px-8 py-3
           font-neo-body font-bold text-lg
           rounded-neo border-neo border-black
-          transition-all duration-150
+          transition duration-150
           ${isRetrying
             ? 'bg-neo-yellow/50 cursor-not-allowed'
             : 'bg-neo-yellow shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]'
@@ -103,7 +103,7 @@ export function OfflineFallback({ onRetry, isRetrying = false }: OfflineFallback
                 bg-neo-cyan text-black
                 shadow-hard hover:shadow-hard-pressed
                 active:translate-x-[2px] active:translate-y-[2px]
-                transition-all duration-150
+                transition duration-150
               "
             >
               {t(labelKey)}

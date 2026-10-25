@@ -153,7 +153,7 @@ export function ProWelcomeCelebration({ grant, paid = false }: { grant: TeacherP
         <button
           type="button"
           onClick={close}
-          className="mt-5 w-full rounded-neo border-3 border-black bg-black py-3 font-neo-display text-base font-black text-neo-lime shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 transition-all focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
+          className="mt-5 w-full rounded-neo border-3 border-black bg-black py-3 font-neo-display text-base font-black text-neo-lime shadow-hard hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 transition focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
         >
           {t('teacher.proWelcome.cta')}
         </button>

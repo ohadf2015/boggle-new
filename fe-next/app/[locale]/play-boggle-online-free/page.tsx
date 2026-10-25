@@ -238,14 +238,14 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link
                 href={`/${locale}/singleplayer?autoStart=bots`}
-                className="group rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+                className="group rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
               >
                 <span className="block text-base sm:text-lg">▶ Play Free Now</span>
                 <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">No download · No login</span>
               </Link>
               <Link
                 href={`/${locale}/multiplayer`}
-                className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7"
+                className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7"
               >
                 <span className="block text-base sm:text-lg">★ Play w/ Friends</span>
                 <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">2–50 players</span>
@@ -284,7 +284,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
         <section className="mt-12">
           <Link
             href="/en/words-with-friends-alternative"
-            className="group relative flex items-center justify-between gap-4 overflow-hidden rounded-neo border-4 border-neo-black bg-neo-pink p-5 shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:p-6"
+            className="group relative flex items-center justify-between gap-4 overflow-hidden rounded-neo border-4 border-neo-black bg-neo-pink p-5 shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:p-6"
           >
             <div className="absolute inset-0 texture-halftone-comic opacity-20" aria-hidden="true" />
             <div className="relative">
@@ -294,7 +294,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               </h3>
               <p className="mt-2 max-w-xl text-sm text-neo-white">2-50 friends play the same grid simultaneously. Match takes 2-3 min, not 3 days. No download.</p>
             </div>
-            <span className="relative shrink-0 rounded-neo border-3 border-neo-black bg-neo-navy px-4 py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-lime shadow-hard transition-all group-hover:translate-x-1">
+            <span className="relative shrink-0 rounded-neo border-3 border-neo-black bg-neo-navy px-4 py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-lime shadow-hard transition-[translate,scale,rotate,transform] group-hover:translate-x-1">
               Compare →
             </span>
           </Link>
@@ -313,7 +313,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               <Link
                 key={m.href}
                 href={`/${locale}/${m.href}`}
-                className={`group relative flex flex-col gap-4 rounded-neo border-4 border-neo-black bg-neo-navy-light p-6 shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl ${modeColorMap[m.color]}`}
+                className={`group relative flex flex-col gap-4 rounded-neo border-4 border-neo-black bg-neo-navy-light p-6 shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl ${modeColorMap[m.color]}`}
                 style={{ transform: `rotate(${i % 2 === 0 ? '-1deg' : '1deg'})` }}
               >
                 <span className={`absolute -right-2 -top-3 inline-block rotate-[6deg] rounded border-3 border-neo-black px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest shadow-hard ${modeBgMap[m.color]}`}>
@@ -398,7 +398,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             </p>
             <Link
               href={`/${locale}/multiplayer`}
-              className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+              className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-3 font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
             >
               Start a Room →
             </Link>
@@ -554,7 +554,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             {features.map((f, i) => (
               <li
                 key={f.text}
-                className="flex items-start gap-4 rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard transition-all hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg"
+                className="flex items-start gap-4 rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg"
                 style={{ transform: i % 3 === 0 ? 'rotate(-0.4deg)' : i % 3 === 1 ? 'rotate(0.3deg)' : 'rotate(0deg)' }}
               >
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-neo border-3 border-neo-black bg-neo-lime text-xl shadow-hard-sm" aria-hidden="true">{f.icon}</span>
@@ -603,7 +603,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             {faqs.map((faq, idx) => (
               <details
                 key={`faq-${idx}-${faq.q}`}
-                className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-all open:shadow-hard-lg"
+                className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-[box-shadow] open:shadow-hard-lg"
               >
                 <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide sm:px-6">
                   <span>{faq.q}</span>
@@ -628,7 +628,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               <Link
                 key={c.href}
                 href={`/${locale}/${c.href}`}
-                className={`relative rounded-neo border-3 ${c.accent} bg-neo-navy-light p-4 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg`}
+                className={`relative rounded-neo border-3 ${c.accent} bg-neo-navy-light p-4 shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg`}
               >
                 <span className="absolute -top-3 left-3 border-2 border-neo-black bg-neo-navy px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest">{c.tag}</span>
                 <h3 className="mt-2 font-neo-display text-base font-black">{c.title}</h3>
@@ -656,13 +656,13 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href={`/${locale}/singleplayer?autoStart=bots`}
-                  className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg"
+                  className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-lime shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg"
                 >
                   ▶ Play Boggle Now
                 </Link>
                 <Link
                   href={`/${locale}/multiplayer`}
-                  className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg"
+                  className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg"
                 >
                   ★ Invite Friends
                 </Link>

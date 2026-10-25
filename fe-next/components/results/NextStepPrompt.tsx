@@ -243,7 +243,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
                 'shadow-hard-lg hover:shadow-hard-xl',
                 'hover:-translate-x-1 hover:-translate-y-1',
                 'active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed',
-                'transition-all duration-150'
+                'transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150'
               )}
             >
               {rematchText}
@@ -260,7 +260,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
               'font-bold text-sm uppercase',
               'border-3 border-neo-black rounded-neo',
               'shadow-hard hover:shadow-hard-lg',
-              'transition-all duration-150'
+              'transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150'
             )}
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
@@ -284,7 +284,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             'border-3 border-neo-black rounded-neo shadow-hard',
             'hover:shadow-hard-lg hover:-translate-x-0.5 hover:-translate-y-0.5',
             'active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5',
-            'transition-all duration-150'
+            'transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150'
           )}
         >
           <div className={cn('p-2 rounded-neo border-2 border-neo-black', config.iconBg)}>
@@ -323,7 +323,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             'border-4 border-neo-black rounded-neo-lg shadow-hard-lg',
             'hover:shadow-hard-xl hover:-translate-x-1 hover:-translate-y-1',
             'active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5',
-            'transition-all duration-150 overflow-hidden'
+            'transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150 overflow-hidden'
           )}
         >
           {/* Shine effect - pointer-events-none to allow button clicks */}
@@ -361,7 +361,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           <button
             type="button"
             onClick={onBackToLobby}
-            className="w-full py-3 text-sm font-bold uppercase text-neo-white bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5 transition-all duration-150"
+            className="w-full py-3 text-sm font-bold uppercase text-neo-white bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5 transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             {backText}
@@ -443,7 +443,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             'shadow-hard-lg hover:shadow-hard-xl',
             'hover:-translate-x-1 hover:-translate-y-1',
             'active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed',
-            'transition-all duration-150',
+            'transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150',
             'group overflow-hidden'
           )}
         >
@@ -476,7 +476,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             'shadow-hard hover:shadow-hard-lg',
             'hover:-translate-x-0.5 hover:-translate-y-0.5',
             'active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed',
-            'transition-all duration-150'
+            'transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150'
           )}
         >
           <ArrowLeft className="w-4 h-4 rtl:rotate-180" />

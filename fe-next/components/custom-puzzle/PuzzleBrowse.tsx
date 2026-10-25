@@ -96,7 +96,7 @@ const PuzzleBrowse: React.FC = () => {
           </div>
           <Button
             onClick={() => setShowCreator(true)}
-            className="bg-linear-to-r from-neo-pink to-neo-orange text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all"
+            className="bg-linear-to-r from-neo-pink to-neo-orange text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition"
           >
             <Plus className="w-5 h-5 me-2" />
             {t('puzzleBrowse.createYourOwn')}
@@ -107,7 +107,7 @@ const PuzzleBrowse: React.FC = () => {
         <div className="flex gap-2 mt-4">
           <button type="button"
             onClick={() => handleSortChange('newest')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm transition-all ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm transition ${
               sort === 'newest'
                 ? 'bg-neo-cyan text-neo-black shadow-hard-sm'
                 : 'bg-neo-navy-light text-neo-white hover:bg-neo-navy-light/80'
@@ -118,7 +118,7 @@ const PuzzleBrowse: React.FC = () => {
           </button>
           <button type="button"
             onClick={() => handleSortChange('popular')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm transition-all ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm transition ${
               sort === 'popular'
                 ? 'bg-neo-cyan text-neo-black shadow-hard-sm'
                 : 'bg-neo-navy-light text-neo-white hover:bg-neo-navy-light/80'
@@ -176,7 +176,7 @@ const PuzzleBrowse: React.FC = () => {
                 transition={{ delay: i * 0.04 }}
               >
                 <Link href={`/${language}/custom/${puzzle.puzzleCode}`}>
-                  <NeoPanel tone="cream" className="hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all p-4 cursor-pointer h-full flex flex-col">
+                  <NeoPanel tone="cream" className="hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition p-4 cursor-pointer h-full flex flex-col">
                     {/* Top row: code + difficulty */}
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-1.5 text-neo-black/50">

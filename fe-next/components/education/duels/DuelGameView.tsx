@@ -210,7 +210,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         <button
           type="button"
           onClick={onBackToLobby}
-          className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-[2px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+          className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-[2px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition"
         >
           {t('duels.backToLobby')}
         </button>
@@ -294,14 +294,14 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
                 onBackToLobby?.();
               }
             }}
-            className="px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold rounded-neo border-[3px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+            className="px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold rounded-neo border-[3px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition"
           >
             {t('duels.rematch')}
           </button>
           <button
             type="button"
             onClick={onBackToLobby}
-            className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-[2px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+            className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-[2px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition"
           >
             {t('duels.backToLobby')}
           </button>
@@ -429,7 +429,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
               onClick={handleAddWord}
               aria-disabled={currentWordEmpty}
               className={cn(
-                'px-4 py-2 bg-neo-lime text-neo-black font-neo-body font-bold rounded-neo border-[2px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all',
+                'px-4 py-2 bg-neo-lime text-neo-black font-neo-body font-bold rounded-neo border-[2px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition',
                 currentWordEmpty && 'opacity-50 cursor-not-allowed'
               )}
             >
@@ -467,7 +467,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
             type="button"
             onClick={handleSubmitScore}
             disabled={wordsFound.length === 0 || phase === 'submitting'}
-            className="w-full px-6 py-3 bg-neo-pink text-neo-black font-neo-display font-bold text-lg rounded-neo border-[3px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-3 bg-neo-pink text-neo-black font-neo-display font-bold text-lg rounded-neo border-[3px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {phase === 'submitting' ? t('duels.loading') : t('duels.submitScore')}
           </button>

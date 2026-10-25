@@ -19,7 +19,7 @@ interface MyListCardProps {
 
 const GHOST = cn(
   'inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream bg-neo-navy px-2.5',
-  'font-neo-display text-xs font-bold uppercase text-neo-white shadow-hard-sm transition-all',
+  'font-neo-display text-xs font-bold uppercase text-neo-white shadow-hard-sm transition',
   'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-none',
   'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
 );
@@ -79,7 +79,7 @@ export default function MyListCard({
           type="button"
           onClick={onEdit}
           aria-label={t('teacher.lesson.editLesson')}
-          className="flex size-10 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream bg-neo-navy text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:bg-neo-cream hover:text-neo-black"
+          className="flex size-10 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream bg-neo-navy text-neo-white shadow-hard-sm transition hover:-translate-y-0.5 hover:bg-neo-cream hover:text-neo-black"
         >
           <Pencil className="size-4" aria-hidden="true" />
         </button>
@@ -105,7 +105,7 @@ export default function MyListCard({
           type="button"
           data-testid={`lesson-host-${lesson.id}`}
           onClick={onHost}
-          className="mt-auto inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime font-neo-display text-sm font-bold uppercase text-neo-black shadow-hard transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none"
+          className="mt-auto inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime font-neo-display text-sm font-bold uppercase text-neo-black shadow-hard transition hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none"
         >
           <Play className="size-4 fill-current" aria-hidden="true" />
           {t('education.template.startGame')}

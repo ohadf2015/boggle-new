@@ -9,7 +9,7 @@ import { LanguagePicker } from '@/components/education/pickers/LanguagePicker';
 import { GRADE_BANDS, LIBRARY_TOPICS, isGradeBand, isLibraryTopic } from '@/lib/education/library';
 import type { DiscoverFilters as Filters } from './useDiscoverLibrary';
 
-const PILL = 'inline-flex min-h-9 shrink-0 items-center gap-1 rounded-neo border-2 px-2.5 text-xs font-bold uppercase transition-all';
+const PILL = 'inline-flex min-h-9 shrink-0 items-center gap-1 rounded-neo border-2 px-2.5 text-xs font-bold uppercase transition';
 const SELECT =
   'h-10 min-w-0 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-2 text-sm font-bold text-neo-white focus:outline-hidden focus:ring-2 focus:ring-neo-cyan';
 

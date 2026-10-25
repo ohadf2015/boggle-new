@@ -140,11 +140,11 @@ export default async function Page({ params }: PageProps) {
               El juego de vocabulario que los profesores realmente usan. Multijugador en vivo, duelos 1v1, tus listas de palabras, seis idiomas — y los estudiantes nunca necesitan una cuenta.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-              <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
+              <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
                 <span className="block text-base sm:text-lg">▶ Iniciar Juego de Aula</span>
                 <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">Gratis · Sin registro de estudiantes</span>
               </Link>
-              <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7">
+              <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7">
                 <span className="block text-base sm:text-lg">⚔ Duelo 1v1</span>
                 <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">Estudiantes cara a cara</span>
               </Link>
@@ -188,7 +188,7 @@ export default async function Page({ params }: PageProps) {
           </h2>
           <div className="space-y-3">
             {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-all open:shadow-hard-lg">
+              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-[box-shadow] open:shadow-hard-lg">
                 <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide sm:px-6">
                   <span>{faq.q}</span>
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded border-2 border-neo-black bg-neo-yellow text-neo-navy transition-transform group-open:rotate-45">+</span>
@@ -206,10 +206,10 @@ export default async function Page({ params }: PageProps) {
           </h2>
           <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">Elige una lista. Comparte el código. Juega. Revisa el panel. Eso es todo el bucle.</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-yellow shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
+            <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-yellow shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
               ▶ Iniciar Juego de Aula
             </Link>
-            <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg">
+            <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg">
               Ver Hub Educativo
             </Link>
           </div>

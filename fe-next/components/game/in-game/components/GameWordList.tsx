@@ -142,7 +142,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
                         }
                       : undefined
                   }
-                  className={`p-2 text-center font-black uppercase border-3 border-neo-black rounded-neo transition-all
+                  className={`p-2 text-center font-black uppercase border-3 border-neo-black rounded-neo transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]
                     ${
                       isInvalid
                         ? 'bg-neo-red text-neo-white shadow-hard-sm line-through opacity-70'

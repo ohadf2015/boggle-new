@@ -2279,7 +2279,7 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
 }
 
 @utility neo-card-hover {
-  @apply neo-card hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl transition-all duration-200;
+  @apply neo-card hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl transition-[translate,scale,rotate,transform,box-shadow,background-color,color,outline-color] duration-200;
 }
 
 @utility btn-neo-primary {
@@ -2287,34 +2287,34 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   @apply bg-neo-yellow text-neo-black border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
   @apply hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg;
   @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
-  @apply transition-all duration-100;
+  @apply transition-[translate,scale,rotate,transform,box-shadow,background-color,color,outline-color] duration-100;
 }
 
 @utility btn-neo-secondary {
   @apply bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
   @apply hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg;
   @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
-  @apply transition-all duration-100;
+  @apply transition-[translate,scale,rotate,transform,box-shadow,background-color,color,outline-color] duration-100;
 }
 
 @utility btn-neo-accent {
   @apply bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
   @apply hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg;
   @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
-  @apply transition-all duration-100;
+  @apply transition-[translate,scale,rotate,transform,box-shadow,background-color,color,outline-color] duration-100;
 }
 
 @utility btn-neo-ghost {
   @apply bg-transparent text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold uppercase tracking-wide;
   @apply hover:bg-neo-navy-light hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg;
   @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed;
-  @apply transition-all duration-100;
+  @apply transition-[translate,scale,rotate,transform,box-shadow,background-color,color,outline-color] duration-100;
 }
 
 @utility badge-neo {
   /* Neo-Brutalist Badge */
   @apply px-3 py-1 text-sm font-black uppercase tracking-wide border-3 border-neo-black rounded-md shadow-hard-sm;
-  @apply transition-all duration-100;
+  @apply transition-[translate,scale,rotate,transform,box-shadow,background-color,color,outline-color] duration-100;
 }
 
 @utility badge-neo-yellow {
@@ -2388,7 +2388,7 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   /* Input field styling */
   @apply w-full px-4 py-3 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm;
   @apply placeholder:text-neo-gray focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2;
-  @apply transition-all duration-100;
+  @apply transition-[translate,scale,rotate,transform,box-shadow,background-color,color,outline-color] duration-100;
 
   &:focus {
     @apply -translate-x-px -translate-y-px shadow-hard;

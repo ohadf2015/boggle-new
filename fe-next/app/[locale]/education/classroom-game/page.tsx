@@ -72,7 +72,7 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
           <Link
             href={`/${locale}/education/for-schools`}
             data-ph-capture-attribute-cta="classroom_for_schools"
-            className="mt-4 inline-block rounded-neo border-neo-thick border-neo-black bg-neo-lime px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg"
+            className="mt-4 inline-block rounded-neo border-neo-thick border-neo-black bg-neo-lime px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg"
           >
             {FOR_SCHOOLS_CTA[locale] ?? FOR_SCHOOLS_CTA.en}
           </Link>

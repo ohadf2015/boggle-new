@@ -524,7 +524,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
                 language,
               })
             }
-            className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-pink shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+            className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-pink shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]"
           >
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0 font-neo-display font-black text-neo-white text-lg">

@@ -104,10 +104,10 @@ export default async function Page({ params }: PageProps) {
       <TeacherProCompareCheckoutStrip locale={locale} />
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4">
+          <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
             {c.ctaPlayClass}
           </Link>
-          <Link href={`/${locale}/education/for-schools`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-all hover:bg-neo-pink/10 sm:px-8 sm:py-4">
+          <Link href={`/${locale}/education/for-schools`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4">
             {c.ctaForSchools}
           </Link>
         </section>
@@ -184,7 +184,7 @@ export default async function Page({ params }: PageProps) {
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{c.moreTitle}</h2>
           <div className="grid gap-3 sm:grid-cols-3">
             {c.moreCards.map((card, i) => (
-              <Link key={card.title} href={moreHrefs[i]} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+              <Link key={card.title} href={moreHrefs[i]} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
                 <h3 className="font-bold text-neo-cyan">{card.title}</h3>
                 <p className="mt-1 text-xs text-neo-gray-200">{card.sub}</p>
               </Link>
@@ -196,10 +196,10 @@ export default async function Page({ params }: PageProps) {
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">{c.finalTitle}</h2>
           <p className="mt-4 text-neo-gray-200">{c.finalBody}</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-4">
-            <Link href={`/${locale}/education/classroom-game`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg">
+            <Link href={`/${locale}/education/classroom-game`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
               {c.finalCtaPlay}
             </Link>
-            <Link href={`/${locale}/education/for-schools`} className="inline-block rounded-neo border-4 border-neo-pink bg-transparent px-8 py-4 font-bold text-neo-pink shadow-hard transition-all hover:bg-neo-pink/10">
+            <Link href={`/${locale}/education/for-schools`} className="inline-block rounded-neo border-4 border-neo-pink bg-transparent px-8 py-4 font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10">
               {c.finalCtaSchools}
             </Link>
           </div>

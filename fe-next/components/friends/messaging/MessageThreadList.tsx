@@ -96,7 +96,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
             onClick={onStartConversation}
             className={cn(
               'flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
-              'hover:shadow-hard hover:-translate-y-0.5 transition-all',
+              'hover:shadow-hard hover:-translate-y-0.5 transition',
               'bg-neo-cyan text-neo-black font-bold text-sm'
             )}
           >
@@ -119,7 +119,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
           onClick={() => onThreadClick(thread)}
           className={cn(
             'w-full rounded-neo border-2 border-neo-black shadow-hard p-3',
-            'hover:shadow-hard-lg hover:-translate-y-0.5 transition-all',
+            'hover:shadow-hard-lg hover:-translate-y-0.5 transition',
             'flex items-center gap-3 text-left',
             isDark ? 'bg-neo-navy-light' : 'bg-white'
           )}

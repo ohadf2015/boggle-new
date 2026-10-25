@@ -67,7 +67,7 @@ export const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
           'rounded-neo shadow-hard-sm',
           'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard',
           'active:translate-x-px active:translate-y-px active:shadow-none',
-          'transition-all duration-100',
+          'transition duration-100',
           'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
         )}
         aria-label={t('common.menu')}

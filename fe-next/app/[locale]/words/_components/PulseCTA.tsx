@@ -47,7 +47,7 @@ export function PulseCTA({
         relative shrink-0 ${c.bg} ${c.text} font-neo-display font-black
         px-6 py-3 rounded-neo border-3 border-neo-black
         shadow-hard hover:shadow-hard-pressed active:translate-y-0.5
-        transition-all group
+        transition-[box-shadow,translate,scale,rotate,transform] group
         ${className}
       `}
     >

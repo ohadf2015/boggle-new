@@ -216,7 +216,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
               'w-full mt-2 py-2.5 rounded-lg border-2 border-neo-black shadow-hard-sm',
               'bg-linear-to-r from-neo-lime to-neo-lime',
               'text-neo-black font-black uppercase text-sm',
-              'hover:shadow-hard-md hover:-translate-y-0.5 transition-all'
+              'hover:shadow-hard-md hover:-translate-y-0.5 transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]'
             )}
           >
             {t('nearMiss.oneMoreGame')}

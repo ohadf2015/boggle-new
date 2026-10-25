@@ -81,13 +81,13 @@ export default async function Page({ params }: PageProps) {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href={playHref}
-                className="rounded-neo border-4 border-neo-black bg-neo-lime px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl"
+                className="rounded-neo border-4 border-neo-black bg-neo-lime px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl"
               >
                 {c.playCta}
               </Link>
               <a
                 href="#how"
-                className="rounded-neo border-4 border-neo-black bg-neo-cyan px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+                className="rounded-neo border-4 border-neo-black bg-neo-cyan px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
               >
                 {c.secondaryCta}
               </a>
@@ -155,7 +155,7 @@ export default async function Page({ params }: PageProps) {
             <p className="mt-4 max-w-3xl text-lg text-neo-gray-200">{c.duelBody}</p>
             <Link
               href={playHref}
-              className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl"
+              className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl"
             >
               {c.duelCta}
             </Link>
@@ -180,7 +180,7 @@ export default async function Page({ params }: PageProps) {
           <h2 className="font-neo-display text-2xl font-black sm:text-3xl">{c.closingTitle}</h2>
           <Link
             href={playHref}
-            className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-lime px-8 py-4 font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl"
+            className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-lime px-8 py-4 font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl"
           >
             {c.closingCta}
           </Link>

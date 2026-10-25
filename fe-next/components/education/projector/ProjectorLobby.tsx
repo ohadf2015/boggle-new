@@ -379,7 +379,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
                     data-testid="projector-practice-round"
                     onClick={onStartPracticeRound}
                     disabled={practiceRoundPending}
-                    className="mt-1 inline-flex items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-2 font-neo-display text-[3.6vw] font-black text-neo-black shadow-hard transition-all active:translate-y-0.5 active:shadow-none focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60 md:px-[1.2vw] md:py-[0.5vw] md:text-[1.15vw]"
+                    className="mt-1 inline-flex items-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-2 font-neo-display text-[3.6vw] font-black text-neo-black shadow-hard transition active:translate-y-0.5 active:shadow-none focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-60 md:px-[1.2vw] md:py-[0.5vw] md:text-[1.15vw]"
                   >
                     <Play className="h-[0.9em] w-[0.9em] shrink-0" aria-hidden="true" />
                     {practiceRoundPending ? t('common.loading') : t('education.projectorLobby.practiceFirst')}
@@ -413,7 +413,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
               'relative flex w-full items-center justify-center gap-[0.6vw] rounded-neo border-4 md:w-auto',
               'px-4 py-3 font-neo-display text-[5vw] font-black uppercase tracking-tight',
               'md:px-[2.4vw] md:py-[0.7vw] md:text-[2vw]',
-              'transition-all active:translate-y-1 active:shadow-hard',
+              'transition active:translate-y-1 active:shadow-hard',
               'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
               // Locked keeps a full cream edge and cream ink: a 40% lime on navy read as a dead olive slab.
               startLocked

@@ -140,19 +140,19 @@ export default async function MultiplayerWordGameOnlinePage({ params }: PageProp
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link
             href={`/${validLocale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
           >
             Start Playing Multiplayer
           </Link>
           <Link
             href={`/${validLocale}/singleplayer`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
           >
             Try Singleplayer
           </Link>
           <Link
             href={`/${validLocale}/daily`}
-            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 font-bold text-neo-pink shadow-hard transition-all hover:bg-neo-pink/10 sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4"
           >
             Daily Challenge
           </Link>
@@ -188,23 +188,23 @@ export default async function MultiplayerWordGameOnlinePage({ params }: PageProp
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Explore More</h2>
           <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${validLocale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${validLocale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-lime">Daily Word Wheel</h3>
               <p className="mt-1 text-xs text-neo-gray-200">New letter puzzle every day — compete globally</p>
             </Link>
-            <Link href={`/${validLocale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-cyan/40">
+            <Link href={`/${validLocale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
               <h3 className="font-bold text-neo-cyan">Play Boggle Free</h3>
               <p className="mt-1 text-xs text-neo-gray-200">No download, instant browser play</p>
             </Link>
-            <Link href="/en/words-with-friends-alternative" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
+            <Link href="/en/words-with-friends-alternative" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
               <h3 className="font-bold text-neo-pink">vs Words With Friends</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time, not turn-based</p>
             </Link>
-            <Link href={`/${validLocale}/online-word-games-with-friends`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${validLocale}/online-word-games-with-friends`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-lime">Word Games With Friends</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Create a room, share the link, play together</p>
             </Link>
-            <Link href={`/${validLocale}/word-games-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-cyan/40">
+            <Link href={`/${validLocale}/word-games-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
               <h3 className="font-bold text-neo-cyan">Word Games Online Free</h3>
               <p className="mt-1 text-xs text-neo-gray-200">7+ free modes — no download, no signup</p>
             </Link>
@@ -214,11 +214,11 @@ export default async function MultiplayerWordGameOnlinePage({ params }: PageProp
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Play in Your Language</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Link href="/es/juego-de-palabras-multijugador" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href="/es/juego-de-palabras-multijugador" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-lime">Jugar Scrabble Online en Español</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Multijugador en tiempo real, gratis, sin registro</p>
             </Link>
-            <Link href="/sv/swedish-multiplayer-word-game" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-cyan/40">
+            <Link href="/sv/swedish-multiplayer-word-game" className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
               <h3 className="font-bold text-neo-cyan">Spela Scrabble Online Svenska</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Multiplayer ordspel på svenska, gratis</p>
             </Link>

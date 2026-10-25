@@ -238,7 +238,7 @@ export function DuelRevealScreen({
             type="button"
             data-testid="duel-back-btn"
             onClick={onBackToLobby}
-            className="inline-flex items-center gap-1.5 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 py-3 font-neo-body text-sm font-black text-neo-cream shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+            className="inline-flex items-center gap-1.5 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 py-3 font-neo-body text-sm font-black text-neo-cream shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
           >
             <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
             {t('education.duels.backToLobby')}

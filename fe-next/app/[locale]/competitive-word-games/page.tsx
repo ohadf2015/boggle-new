@@ -129,19 +129,19 @@ export default async function CompetitiveWordGamesPage({ params }: PageProps) {
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link
             href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
           >
             Play a Ranked Match
           </Link>
           <Link
             href={`/${locale}/leaderboard`}
-            className="rounded-neo border-4 border-neo-yellow bg-transparent px-6 py-3 text-center font-bold text-neo-yellow shadow-hard transition-all hover:bg-neo-yellow/10 sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-yellow bg-transparent px-6 py-3 text-center font-bold text-neo-yellow shadow-hard transition-[background-color] hover:bg-neo-yellow/10 sm:px-8 sm:py-4"
           >
             View Global Leaderboard
           </Link>
           <Link
             href={`/${locale}/daily-word-wheel`}
-            className="rounded-neo border-4 border-neo-lime bg-transparent px-6 py-3 text-center font-bold text-neo-lime shadow-hard transition-all hover:bg-neo-lime/10 sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-lime bg-transparent px-6 py-3 text-center font-bold text-neo-lime shadow-hard transition-[background-color] hover:bg-neo-lime/10 sm:px-8 sm:py-4"
           >
             Ranked Daily Challenge
           </Link>
@@ -171,19 +171,19 @@ export default async function CompetitiveWordGamesPage({ params }: PageProps) {
             Competitive Game Modes on LexiClash
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Link href={`/${locale}/multiplayer`} className="rounded-neo border-3 border-neo-pink/50 bg-neo-navy/50 p-5 shadow-hard transition-all hover:border-neo-pink">
+            <Link href={`/${locale}/multiplayer`} className="rounded-neo border-3 border-neo-pink/50 bg-neo-navy/50 p-5 shadow-hard transition-[border-color] hover:border-neo-pink">
               <h3 className="font-bold text-neo-pink">Multiplayer Grid Battle</h3>
               <p className="mt-1 text-sm text-neo-gray-200">Real-time head-to-head for 2-20+ players on a shared grid. The core competitive mode.</p>
             </Link>
-            <Link href={`/${locale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-lime/50 bg-neo-navy/50 p-5 shadow-hard transition-all hover:border-neo-lime">
+            <Link href={`/${locale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-lime/50 bg-neo-navy/50 p-5 shadow-hard transition-[border-color] hover:border-neo-lime">
               <h3 className="font-bold text-neo-lime">Daily Word Wheel</h3>
               <p className="mt-1 text-sm text-neo-gray-200">Same puzzle for everyone, every day. Leaderboard-scored — pure skill comparison.</p>
             </Link>
-            <Link href={`/${locale}/daily`} className="rounded-neo border-3 border-neo-cyan/50 bg-neo-navy/50 p-5 shadow-hard transition-all hover:border-neo-cyan">
+            <Link href={`/${locale}/daily`} className="rounded-neo border-3 border-neo-cyan/50 bg-neo-navy/50 p-5 shadow-hard transition-[border-color] hover:border-neo-cyan">
               <h3 className="font-bold text-neo-cyan">Daily Word Hunt</h3>
               <p className="mt-1 text-sm text-neo-gray-200">A daily target-word hunt on a Boggle-style grid. Ranked on the global board.</p>
             </Link>
-            <Link href={`/${locale}/leaderboard`} className="rounded-neo border-3 border-neo-yellow/50 bg-neo-navy/50 p-5 shadow-hard transition-all hover:border-neo-yellow">
+            <Link href={`/${locale}/leaderboard`} className="rounded-neo border-3 border-neo-yellow/50 bg-neo-navy/50 p-5 shadow-hard transition-[border-color] hover:border-neo-yellow">
               <h3 className="font-bold text-neo-yellow">Global Leaderboard</h3>
               <p className="mt-1 text-sm text-neo-gray-200">Where every ranked match and daily challenge lands. See your worldwide standing.</p>
             </Link>
@@ -208,19 +208,19 @@ export default async function CompetitiveWordGamesPage({ params }: PageProps) {
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More Word Games</h2>
           <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/blog/most-popular-word-games-2026`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-cyan/40">
+            <Link href={`/${locale}/blog/most-popular-word-games-2026`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
               <h3 className="font-bold text-neo-cyan">Most Popular Word Games 2026</h3>
               <p className="mt-1 text-xs text-neo-gray-200">The games everyone is playing — and why</p>
             </Link>
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-lime">Best Online Word Games</h3>
               <p className="mt-1 text-xs text-neo-gray-200">9 honest picks, no download</p>
             </Link>
-            <Link href={`/${locale}/free-multiplayer-word-game`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
+            <Link href={`/${locale}/free-multiplayer-word-game`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
               <h3 className="font-bold text-neo-pink">Multiplayer Word Game Online</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time, browser-based, free</p>
             </Link>
-            <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-yellow/40">
+            <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-yellow/40">
               <h3 className="font-bold text-neo-yellow">Vocabulary-Building Word Games</h3>
               <p className="mt-1 text-xs text-neo-gray-200">ESL & classroom vocabulary practice mode</p>
             </Link>
@@ -237,7 +237,7 @@ export default async function CompetitiveWordGamesPage({ params }: PageProps) {
           <div className="mt-6">
             <Link
               href={`/${locale}/multiplayer`}
-              className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-8 py-4 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg"
+              className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg"
             >
               Play a Ranked Match
             </Link>

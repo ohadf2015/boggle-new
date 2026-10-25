@@ -166,7 +166,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                 onClick={onClose}
                 className={cn(
                   'p-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
-                  'hover:shadow-hard hover:-translate-y-0.5 transition-all',
+                  'hover:shadow-hard hover:-translate-y-0.5 transition',
                   isDark ? 'bg-neo-navy-elevated' : 'bg-white'
                 )}
               >
@@ -210,7 +210,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                 onClick={onChallenge}
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm',
-                  'hover:shadow-hard hover:-translate-y-0.5 transition-all',
+                  'hover:shadow-hard hover:-translate-y-0.5 transition',
                   'bg-neo-lime text-neo-black font-bold text-sm'
                 )}
               >

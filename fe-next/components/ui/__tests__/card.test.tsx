@@ -143,7 +143,7 @@ describe('Card Component', () => {
       const card = container.firstChild as HTMLElement;
 
       expect(card).toHaveClass('hover:rotate-0');
-      expect(card).toHaveClass('transition-all');
+      expect(card).toHaveClass('transition');
     });
   });
 

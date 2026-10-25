@@ -44,7 +44,7 @@ interface ClassroomManagerProps {
   heading?: ReactNode;
 }
 
-const PRESS = 'shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed';
+const PRESS = 'shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed';
 const SHORT_LANDSCAPE_BUTTON =
   '[@media(orientation:landscape)_and_(max-height:500px)]:h-9 [@media(orientation:landscape)_and_(max-height:500px)]:min-h-9 [@media(orientation:landscape)_and_(max-height:500px)]:py-1';
 
@@ -233,7 +233,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
                   href={newClassHref}
                   data-testid="classroom-add-tile"
                   aria-label={t('teacher.classroom.createAnother')}
-                  className="inline-flex items-center gap-3 rounded-neo border-2 border-dashed border-neo-cream/40 bg-neo-navy/80 py-3 pe-5 ps-3 text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:border-neo-cream focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                  className="inline-flex items-center gap-3 rounded-neo border-2 border-dashed border-neo-cream/40 bg-neo-navy/80 py-3 pe-5 ps-3 text-neo-white shadow-hard-sm transition hover:-translate-y-0.5 hover:border-neo-cream focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
                 >
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm">
                     <Plus className="size-5" strokeWidth={3} aria-hidden="true" />

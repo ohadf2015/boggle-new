@@ -268,7 +268,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 <Reveal
                   key={skill}
                   className={cn(
-                    'p-3 rounded-xl border-2 transition-all',
+                    'p-3 rounded-xl border-2 transition',
                     isMastered
                       ? (isDarkMode
                         ? 'bg-green-900/20 border-green-500/30'
@@ -416,7 +416,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   <Button
                     onClick={() => handleGoToMode('multiplayer')}
                     className={cn(
-                      'h-12 font-semibold rounded-xl transition-all flex items-center justify-center gap-2',
+                      'h-12 font-semibold rounded-xl transition flex items-center justify-center gap-2',
                       'bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600',
                       'text-white shadow-lg hover:shadow-xl'
                     )}
@@ -427,7 +427,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   <Button
                     onClick={() => handleGoToMode('daily')}
                     className={cn(
-                      'h-12 font-semibold rounded-xl transition-all flex items-center justify-center gap-2',
+                      'h-12 font-semibold rounded-xl transition flex items-center justify-center gap-2',
                       'bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600',
                       'text-white shadow-lg hover:shadow-xl'
                     )}
@@ -442,7 +442,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   onClick={handleTryAgain}
                   variant="ghost"
                   className={cn(
-                    'w-full h-10 text-sm font-medium rounded-xl transition-all',
+                    'w-full h-10 text-sm font-medium rounded-xl transition',
                     isDarkMode
                       ? 'text-gray-400 hover:text-gray-200 hover:bg-neo-navy-elevated'
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
@@ -458,7 +458,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 <Button
                   onClick={handleTryAgain}
                   className={cn(
-                    'w-full h-12 text-base font-semibold rounded-xl transition-all flex items-center justify-center gap-2',
+                    'w-full h-12 text-base font-semibold rounded-xl transition flex items-center justify-center gap-2',
                     'bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
                     'text-white shadow-lg hover:shadow-xl'
                   )}
@@ -474,7 +474,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                     onClick={() => handleGoToMode(returnTo)}
                     variant="ghost"
                     className={cn(
-                      'w-full h-10 text-sm font-medium rounded-xl transition-all',
+                      'w-full h-10 text-sm font-medium rounded-xl transition',
                       isDarkMode
                         ? 'text-gray-400 hover:text-gray-200 hover:bg-neo-navy-elevated'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'

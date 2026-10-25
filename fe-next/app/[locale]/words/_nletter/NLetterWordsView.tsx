@@ -174,7 +174,7 @@ export async function NLetterWordsView({ locale, n }: { locale: string; n: WordL
             </div>
             <Link
               href={`/${locale}/singleplayer`}
-              className="shrink-0 bg-neo-lime text-neo-black font-neo-display font-black px-5 py-2.5 rounded-neo border-3 border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-all"
+              className="shrink-0 bg-neo-lime text-neo-black font-neo-display font-black px-5 py-2.5 rounded-neo border-3 border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform]"
             >
               Play Now →
             </Link>

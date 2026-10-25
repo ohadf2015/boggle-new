@@ -115,7 +115,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
               className={cn(
                 "w-full px-4 py-4 text-2xl font-black text-center uppercase tracking-widest",
                 "bg-neo-white border-4 border-neo-black rounded-neo shadow-hard-sm",
-                "focus:outline-hidden focus:shadow-hard focus:-translate-y-0.5 transition-all",
+                "focus:outline-hidden focus:shadow-hard focus:-translate-y-0.5 transition",
                 "placeholder:text-neo-black/30 placeholder:lowercase placeholder:font-normal placeholder:tracking-normal placeholder:text-base",
                 validationStatus === 'valid' && "border-neo-lime bg-neo-lime/10",
                 (validationStatus === 'invalid' || validationStatus === 'too-short' || validationStatus === 'too-long') && "border-neo-pink bg-neo-pink/10 animate-shake"
@@ -127,8 +127,8 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
             {/* Validation icon */}
             <AdaptiveMotion.div
               className="absolute right-4 top-1/2 -translate-y-1/2"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
               key={validationStatus}
             >
               {validationStatus === 'valid' && (
@@ -202,7 +202,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
             onClick={onCreatePuzzle}
             disabled={validationStatus !== 'valid' || isCreating}
             className={cn(
-              "w-full py-4 text-xl font-black uppercase border-4 rounded-neo transition-all",
+              "w-full py-4 text-xl font-black uppercase border-4 rounded-neo transition",
               validationStatus === 'valid' && !isCreating
                 ? "bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed"
                 : "bg-neo-black/20 text-neo-black/40 border-neo-black/30 cursor-not-allowed shadow-none"

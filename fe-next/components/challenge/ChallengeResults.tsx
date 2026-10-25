@@ -208,7 +208,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
         >
           <Button
             onClick={onPlayAgain}
-            className="w-full flex items-center justify-center gap-2 p-4 font-black text-lg uppercase rounded-neo border-4 border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 transition-all bg-neo-lime text-neo-black"
+            className="w-full flex items-center justify-center gap-2 p-4 font-black text-lg uppercase rounded-neo border-4 border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 transition bg-neo-lime text-neo-black"
           >
             <RotateCw className="w-5 h-5" />
             {t('common.playAgain')}
@@ -217,14 +217,14 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <Button
               onClick={handleShare}
-              className="flex items-center justify-center gap-2 p-3 font-bold uppercase rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all bg-neo-cyan text-neo-black"
+              className="flex items-center justify-center gap-2 p-3 font-bold uppercase rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition bg-neo-cyan text-neo-black"
             >
               <Share2 className="w-4 h-4" />
               {t('common.share')}
             </Button>
             <Button
               onClick={handleCopyLink}
-              className="flex items-center justify-center gap-2 p-3 font-bold uppercase rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all bg-neo-yellow text-neo-black"
+              className="flex items-center justify-center gap-2 p-3 font-bold uppercase rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition bg-neo-yellow text-neo-black"
             >
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               {copied ? t('common.copied') : t('common.copy')}

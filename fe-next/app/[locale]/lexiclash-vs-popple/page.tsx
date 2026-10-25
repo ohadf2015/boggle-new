@@ -107,13 +107,13 @@ export default async function LexiClashVsPopplePage({ params }: PageProps) {
         </p>
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4">
+          <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
             Try LexiClash Free
           </Link>
-          <Link href={`/${locale}/adventure`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
+          <Link href={`/${locale}/adventure`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
             Adventure Mode
           </Link>
-          <Link href={`/${locale}/brain`} className="rounded-neo border-4 border-neo-purple bg-transparent px-6 py-3 text-center font-bold text-neo-purple shadow-hard transition-all hover:bg-neo-purple/10 sm:px-8 sm:py-4">
+          <Link href={`/${locale}/brain`} className="rounded-neo border-4 border-neo-purple bg-transparent px-6 py-3 text-center font-bold text-neo-purple shadow-hard transition-[background-color] hover:bg-neo-purple/10 sm:px-8 sm:py-4">
             Brain Drills
           </Link>
         </section>
@@ -220,15 +220,15 @@ export default async function LexiClashVsPopplePage({ params }: PageProps) {
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More Comparisons</h2>
           <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Unlimited vs 1 puzzle/day</p>
             </Link>
-            <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Scrabble GO</h3>
               <p className="mt-1 text-xs text-neo-gray-200">No interruptions, no bots</p>
             </Link>
-            <Link href={`/${locale}/lexiclash-vs-puzzly-words`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/lexiclash-vs-puzzly-words`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-cyan">LexiClash vs Puzzly Words</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Grid vs Rack gameplay</p>
             </Link>
@@ -247,7 +247,7 @@ export default async function LexiClashVsPopplePage({ params }: PageProps) {
             Both are free. Both are real multiplayer. You honestly can&apos;t go wrong. But if you&apos;re scrolling this page, you probably want to see what LexiClash offers beyond the single-grid puzzle format. Here&apos;s your shot.
           </p>
           <div className="mt-6">
-            <Link href={`/${locale}/multiplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg">
+            <Link href={`/${locale}/multiplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
               Play LexiClash Now — Free, No Download
             </Link>
           </div>

@@ -14,7 +14,7 @@ export interface ClassPagerProps {
 }
 
 const STEP =
-  'flex size-11 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-lime text-black shadow-hard-sm transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-not-allowed disabled:bg-neo-navy-light disabled:text-neo-white/40 disabled:shadow-none disabled:hover:translate-y-0';
+  'flex size-11 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-lime text-black shadow-hard-sm transition hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-not-allowed disabled:bg-neo-navy-light disabled:text-neo-white/40 disabled:shadow-none disabled:hover:translate-y-0';
 
 /**
  * Prev / "2 of 5" / next for the Classes tab. Renders nothing for one page.

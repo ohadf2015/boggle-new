@@ -21,7 +21,7 @@ import { trackSchoolQuoteRequested } from '@/lib/education/proFunnelTelemetry';
 
 const FIELD_CLASS =
   'mt-1 w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white placeholder-neo-white/40 p-3 ' +
-  'transition-all duration-150 outline-none ' +
+  'transition duration-150 outline-none ' +
   'focus:border-neo-lime focus:shadow-hard focus:-translate-y-0.5';
 const LABEL_CLASS = 'block text-sm font-semibold text-neo-white font-neo-display';
 

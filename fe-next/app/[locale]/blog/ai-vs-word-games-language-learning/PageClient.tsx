@@ -146,13 +146,13 @@ export default function AiVsWordGamesPageClient(): React.ReactElement {
           {/* CTAs */}
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
             <Link href={`/${locale}/daily`} className="flex-1">
-              <Button className="w-full bg-neo-lime text-neo-black font-black rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+              <Button className="w-full bg-neo-lime text-neo-black font-black rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform]">
                 {cta.daily}
               </Button>
             </Link>
             <Link href={`/${locale}/education`} className="flex-1">
               <Button variant="outline" className={cn(
-                'w-full font-black rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-all',
+                'w-full font-black rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-[box-shadow,translate,scale,rotate,transform]',
                 isDarkMode ? 'bg-neo-navy-light text-white' : 'bg-white text-neo-black'
               )}>
                 {cta.edu}

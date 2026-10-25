@@ -261,7 +261,7 @@ export const AllTimeParticipantRow = memo<{
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
       className={`
-        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
+        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-200
         ${getRankColors(rank, isCurrentUser)}
         ${compact ? 'py-2' : ''}
         ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
@@ -391,7 +391,7 @@ export const SeasonParticipantRow = memo<{
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
       className={`
-        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
+        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-200
         ${getRankColors(rank, isCurrentUser)}
         ${compact ? 'py-2' : ''}
         ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}

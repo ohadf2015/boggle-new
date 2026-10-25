@@ -118,7 +118,7 @@ function AssignmentCard({
             </div>
             <div className="w-24 h-2 bg-neo-black/30 rounded-full overflow-hidden">
               <div
-                className="h-full bg-neo-cyan transition-all"
+                className="h-full bg-neo-cyan transition-[width]"
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
@@ -232,7 +232,7 @@ export default function AssignmentTrackingPanel({
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={cn(
-                'px-4 py-2 rounded-neo border-neo font-neo-body text-sm transition-all',
+                'px-4 py-2 rounded-neo border-neo font-neo-body text-sm transition',
                 activeTab === tab.key
                   ? 'bg-neo-cyan border-neo-cyan text-neo-black shadow-hard-sm font-bold'
                   : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'

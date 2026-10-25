@@ -80,7 +80,7 @@ export const DoubleGoldAdButton: React.FC<DoubleGoldAdButtonProps> = ({
         'bg-linear-to-r from-neo-yellow via-neo-orange to-neo-yellow',
         'text-neo-black border-3 border-neo-black rounded-neo shadow-hard-lg',
         'hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed',
-        'transition-all duration-150',
+        'transition duration-150',
         'disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0',
         className,
       )}

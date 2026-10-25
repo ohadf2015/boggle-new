@@ -122,7 +122,7 @@ function ErrorFallback({ error, onRetry, onSkip, testId }: ErrorFallbackProps) {
           <button
             type="button"
             onClick={onRetry}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-neo-cyan text-neo-black rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-sm active:translate-y-1 transition-all font-neo-display font-bold"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-neo-cyan text-neo-black rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-sm active:translate-y-1 transition-[transform,box-shadow] font-neo-display font-bold"
           >
             <RefreshCw className="w-4 h-4" />
             {t('adventure.bosses.cinematics.retry')}
@@ -130,7 +130,7 @@ function ErrorFallback({ error, onRetry, onSkip, testId }: ErrorFallbackProps) {
           <button
             type="button"
             onClick={onSkip}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-neo-yellow text-neo-black rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-sm active:translate-y-1 transition-all font-neo-display font-bold"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-neo-yellow text-neo-black rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-sm active:translate-y-1 transition-[transform,box-shadow] font-neo-display font-bold"
           >
             <SkipForward className="w-4 h-4" />
             {t('adventure.bosses.cinematics.skip')}

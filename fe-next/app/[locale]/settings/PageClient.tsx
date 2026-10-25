@@ -481,7 +481,7 @@ export default function SettingsPageClient(): React.JSX.Element {
             <Link
               href={`/${language}/contact`}
               className={cn(
-                'flex items-center justify-between p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.01]',
+                'flex items-center justify-between p-4 rounded-neo border-3 border-neo-black transition-[translate,scale,rotate,transform,background-color] hover:scale-[1.01]',
                 isDarkMode ? 'bg-neo-navy-light hover:bg-neo-navy-elevated' : 'bg-white hover:bg-neo-cream shadow-hard'
               )}
             >

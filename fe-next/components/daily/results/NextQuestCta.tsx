@@ -145,7 +145,7 @@ export function NextQuestCta({
         'flex items-center gap-3 text-start cursor-pointer',
         'focus-visible:outline-hidden focus-visible:ring-4',
         accent.ring,
-        'active:translate-y-0.5 active:shadow-none transition-all',
+        'active:translate-y-0.5 active:shadow-none transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]',
         className,
       )}
     >

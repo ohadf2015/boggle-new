@@ -373,7 +373,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
             'rounded-full border-neo-black',
             secondary ? 'border' : 'border-2',
             'flex items-center justify-center shrink-0',
-            'transition-all duration-200 ease-out',
+            'transition duration-200 ease-out',
             !locked && 'opacity-100 lg:opacity-0 lg:group-hover:opacity-100',
             !locked && (isRTL ? 'lg:group-hover:-translate-x-1' : 'lg:group-hover:translate-x-1'),
             locked ? 'bg-neo-black/80 text-neo-white' : styles.arrow

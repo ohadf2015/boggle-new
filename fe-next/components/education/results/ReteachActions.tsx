@@ -37,7 +37,7 @@ import { ReteachStatusNote } from '@/components/education/live/ReteachStatusNote
 const ACTION =
   'flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm text-center ' +
   'text-neo-black border-[3px] border-neo-black rounded-neo shadow-hard-sm ' +
-  'hover:shadow-hard hover:-translate-y-0.5 transition-all';
+  'hover:shadow-hard hover:-translate-y-0.5 transition';
 
 export interface ReteachActionsProps {
   links: ReteachLinks;
@@ -109,7 +109,7 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
                     className={cn(
                       'w-full flex items-center justify-center gap-2 px-4 py-3 font-neo-display font-bold text-base',
                       'bg-neo-pink text-neo-black border-[3px] border-neo-black rounded-neo',
-                      'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+                      'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition'
                     )}
                   >
                     <Play className="w-5 h-5" aria-hidden />
@@ -137,7 +137,7 @@ export function ReteachActions({ links, onReteach, reteachStatus = 'idle', onRes
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-3.5 font-neo-display font-bold text-base',
             'bg-neo-pink text-neo-black border-[3px] border-neo-black rounded-neo',
-            'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+            'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition'
           )}
         >
           <Play className="w-5 h-5" aria-hidden />

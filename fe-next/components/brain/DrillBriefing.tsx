@@ -85,7 +85,7 @@ export default function DrillBriefing({ drillId, level, goalText, onStart }: Dri
         className={cn(
           'w-full px-8 py-3.5 rounded-neo border-neo-thick border-neo-black shadow-hard-lg',
           'font-black text-lg uppercase text-neo-black',
-          'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-y-0',
+          'transition-[transform,box-shadow] [@media(hover:hover)]:hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-y-0',
           accentCls.bg
         )}
       >

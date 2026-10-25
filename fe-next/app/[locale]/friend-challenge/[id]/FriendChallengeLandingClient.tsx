@@ -226,7 +226,7 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
                 'flex-1 py-3 rounded-neo border-neo-thick border-neo-black shadow-hard',
                 'bg-neo-white text-neo-navy font-bold uppercase tracking-wide',
                 'hover:shadow-hard-lg hover:-translate-y-0.5 active:shadow-hard-pressed',
-                'transition-all duration-150 disabled:opacity-60',
+                'transition-[box-shadow,translate,scale,rotate,transform,opacity] duration-150 disabled:opacity-60',
                 'flex items-center justify-center gap-2',
               )}
             >
@@ -241,7 +241,7 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
                 'flex-[2] py-3 rounded-neo border-neo-thick border-neo-black shadow-hard',
                 'bg-neo-lime text-neo-black font-bold uppercase tracking-wide',
                 'hover:shadow-hard-lg hover:-translate-y-0.5 active:shadow-hard-pressed',
-                'transition-all duration-150 disabled:opacity-60',
+                'transition-[box-shadow,translate,scale,rotate,transform,opacity] duration-150 disabled:opacity-60',
                 'flex items-center justify-center gap-2',
               )}
             >
@@ -274,7 +274,7 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
             className={cn(
               'w-full py-3 rounded-neo border-neo-thick border-neo-black shadow-hard',
               'bg-neo-lime text-neo-black font-bold uppercase tracking-wide',
-              'hover:shadow-hard-lg active:shadow-hard-pressed transition-all',
+              'hover:shadow-hard-lg active:shadow-hard-pressed transition-[box-shadow]',
             )}
           >
             {t('friends.challenges.playNow')}

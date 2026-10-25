@@ -118,13 +118,13 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link
             href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
           >
             Create a Room — Play With Friends
           </Link>
           <Link
             href={`/${locale}/singleplayer`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
+            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
           >
             Practice Solo First
           </Link>
@@ -204,23 +204,23 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More Ways to Play</h2>
           <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-lime">Daily Word Wheel</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Play the daily puzzle and compare scores with friends</p>
             </Link>
-            <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-cyan/40">
+            <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
               <h3 className="font-bold text-neo-cyan">Free Boggle Online</h3>
               <p className="mt-1 text-xs text-neo-gray-200">No download, no signup required</p>
             </Link>
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
+            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
               <h3 className="font-bold text-neo-pink">Best Word Games 2026</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Complete comparison guide</p>
             </Link>
-            <Link href={`/${locale}/free-multiplayer-word-game`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+            <Link href={`/${locale}/free-multiplayer-word-game`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
               <h3 className="font-bold text-neo-lime">Multiplayer Word Game Online</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time Scrabble alternative — play live</p>
             </Link>
-            <Link href={`/${locale}/word-games-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-cyan/40">
+            <Link href={`/${locale}/word-games-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
               <h3 className="font-bold text-neo-cyan">Word Games Online Free</h3>
               <p className="mt-1 text-xs text-neo-gray-200">7+ free modes — no download, no signup</p>
             </Link>
@@ -240,7 +240,7 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
           <div className="mt-6">
             <Link
               href={`/${locale}/multiplayer`}
-              className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-8 py-4 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg"
+              className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg"
             >
               Play With Friends Now — Free
             </Link>

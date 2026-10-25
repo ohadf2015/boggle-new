@@ -361,7 +361,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
             type="button"
             data-testid="express-retry"
             onClick={retry}
-            className="inline-flex min-h-11 items-center rounded-neo border-3 border-black bg-neo-lime px-6 py-2.5 font-neo-display font-black uppercase text-black shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5"
+            className="inline-flex min-h-11 items-center rounded-neo border-3 border-black bg-neo-lime px-6 py-2.5 font-neo-display font-black uppercase text-black shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5"
           >
             {t('teacher.playNow.retry')}
           </button>
@@ -369,7 +369,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
             type="button"
             data-testid="express-open-full-setup"
             onClick={openFullSetup}
-            className="inline-flex min-h-11 items-center rounded-neo border-3 border-black bg-neo-cyan px-6 py-2.5 font-neo-display font-black uppercase text-black shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard"
+            className="inline-flex min-h-11 items-center rounded-neo border-3 border-black bg-neo-cyan px-6 py-2.5 font-neo-display font-black uppercase text-black shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard"
           >
             {t('teacher.playNow.openFullSetup')}
           </button>

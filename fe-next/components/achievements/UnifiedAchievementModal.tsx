@@ -279,7 +279,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
             'shadow-hard hover:shadow-hard-lg',
             'hover:-translate-y-0.5',
             'active:translate-y-0.5 active:shadow-hard-pressed',
-            'transition-all duration-200',
+            'transition duration-200',
             'animate-in fade-in-0 duration-300'
           )}
         >

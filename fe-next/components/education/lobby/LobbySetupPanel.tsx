@@ -111,7 +111,7 @@ export function LobbySetupPanel({
                 aria-label={classroom.name}
                 onClick={() => onSelectClassroom(classroom.id)}
                 className={cn(
-                  'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black px-3 py-1.5 transition-all',
+                  'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black px-3 py-1.5 transition',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                   isSelected
                     ? 'bg-neo-cyan text-black shadow-hard'
@@ -179,7 +179,7 @@ export function LobbySetupPanel({
                 data-testid={`preset-${id}`}
                 onClick={() => onApplyPreset(id)}
                 className={cn(
-                  'rounded-neo border-2 border-black px-3 py-3 text-start transition-all hover:-translate-y-0.5 active:translate-y-0',
+                  'rounded-neo border-2 border-black px-3 py-3 text-start transition hover:-translate-y-0.5 active:translate-y-0',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                   isActive
                     ? 'bg-neo-purple text-black shadow-hard'

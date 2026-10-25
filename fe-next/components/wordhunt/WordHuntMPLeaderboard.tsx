@@ -98,7 +98,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
               data-eliminated={isEliminated ? 'true' : undefined}
               data-wrong-guess={isDamaged && !isEliminated ? 'true' : undefined}
               className={cn(
-                "flex-1 min-w-0 flex items-center gap-1.5 px-1.5 py-1 rounded-neo border-2 transition-all",
+                "flex-1 min-w-0 flex items-center gap-1.5 px-1.5 py-1 rounded-neo border-2 transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]",
                 isEliminated
                   ? 'border-neo-white/10 bg-neo-white/5 opacity-40'
                   : 'border-neo-white/15 bg-neo-white/5'
@@ -138,7 +138,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                 >
                   <div
                     className={cn(
-                      "h-full rounded-sm transition-all duration-500 relative overflow-hidden",
+                      "h-full rounded-sm transition-[width,background-color,opacity] duration-500 relative overflow-hidden",
                       colors.bar,
                       isEliminated && 'opacity-30'
                     )}
@@ -178,7 +178,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                 data-current={isCurrent ? 'true' : undefined}
                 data-wrong-guess={isDamaged && !isEliminated ? 'true' : undefined}
                 className={cn(
-                  "flex flex-col gap-1 px-2.5 py-1.5 rounded-neo border-2 transition-all",
+                  "flex flex-col gap-1 px-2.5 py-1.5 rounded-neo border-2 transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]",
                   isCurrent
                     ? 'border-neo-yellow bg-neo-yellow/10'
                     : isEliminated
@@ -231,7 +231,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
                 >
                   <div
                     className={cn(
-                      "h-full rounded-sm transition-all duration-500 relative overflow-hidden",
+                      "h-full rounded-sm transition-[width,background-color,opacity] duration-500 relative overflow-hidden",
                       colors.bar,
                       isEliminated && 'opacity-30'
                     )}

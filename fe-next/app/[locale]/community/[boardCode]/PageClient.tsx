@@ -133,7 +133,7 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
         <button
           type="button"
           onClick={handlePlay}
-          className="w-full bg-neo-lime text-black font-neo-body font-bold py-3 rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed active:shadow-hard-pressed transition-all flex items-center justify-center gap-2 text-lg mt-2"
+          className="w-full bg-neo-lime text-black font-neo-body font-bold py-3 rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed active:shadow-hard-pressed transition-[box-shadow] flex items-center justify-center gap-2 text-lg mt-2"
         >
           <Play size={20} />
           {t('ugc.gallery.play')}

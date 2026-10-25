@@ -76,7 +76,7 @@ export const GameFeedback: React.FC<GameFeedbackProps> = (props) => {
                 type="button"
                 aria-label={t(r.labelKey)}
                 onClick={() => handleRate(r.key)}
-                className="w-12 h-12 flex items-center justify-center text-2xl border-2 border-black rounded-neo bg-neo-navy shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                className="w-12 h-12 flex items-center justify-center text-2xl border-2 border-black rounded-neo bg-neo-navy shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed hover:-translate-y-0.5 active:translate-y-0 transition"
               >
                 <span aria-hidden="true">{r.emoji}</span>
               </button>

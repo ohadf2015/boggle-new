@@ -134,7 +134,7 @@ export default function WordListPreview({
                 onClick={() => handleToggleExpand(word.word)}
                 className={cn(
                   'border-[3px] border-neo-black shadow-hard cursor-pointer',
-                  'transition-all hover:shadow-hard-lg',
+                  'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] hover:shadow-hard-lg',
                   expandedWord === word.word
                     ? 'bg-neo-cyan/10'
                     : 'bg-neo-navy/80 hover:bg-neo-navy/60'

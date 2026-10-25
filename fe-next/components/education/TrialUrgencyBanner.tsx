@@ -63,7 +63,7 @@ export function TrialUrgencyBanner({ trial, href, onDismiss, ctaLabel, recap }: 
             money. Both strings already exist in every locale. */}
         <Link
           href={checkoutHref}
-          className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo border-neo-cream/40 shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+          className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo border-neo-cream/40 shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition"
         >
           {t('teacher.subscription.upgradeNow')}
         </Link>
@@ -119,7 +119,7 @@ export function TrialUrgencyBanner({ trial, href, onDismiss, ctaLabel, recap }: 
       <Link
         href={ctaHref}
         data-testid="trial-urgency-banner-cta"
-        className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo border-neo-cream/40 shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+        className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo border-neo-cream/40 shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition"
       >
         {ctaText}
       </Link>

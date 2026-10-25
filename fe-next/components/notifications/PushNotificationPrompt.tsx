@@ -166,7 +166,7 @@ export function PushNotificationPrompt() {
                   <button
                     type="button"
                     onClick={handleEnable}
-                    className="flex-1 px-4 py-2 bg-neo-lime text-neo-black font-bold text-sm rounded-neo border-neo border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-all"
+                    className="flex-1 px-4 py-2 bg-neo-lime text-neo-black font-bold text-sm rounded-neo border-neo border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition"
                   >
                     {t('notifications.prompt.enable')}
                   </button>

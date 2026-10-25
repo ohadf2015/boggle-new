@@ -202,7 +202,7 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
                     aria-pressed={active}
                     aria-label={t(labelKey)}
                     className={cn(
-                      'flex items-center justify-center gap-1.5 px-2 py-2 rounded-neo border-2 text-xs font-bold uppercase transition-all',
+                      'flex items-center justify-center gap-1.5 px-2 py-2 rounded-neo border-2 text-xs font-bold uppercase transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
                       active
                         ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm'
                         : 'bg-white/5 text-neo-cream/70 border-neo-white/15 hover:border-neo-white/30 hover:bg-white/10'
@@ -222,14 +222,14 @@ export const AdvancedSettingsModal = memo<AdvancedSettingsModalProps>(function A
           <button
             type="button"
             onClick={handleCancel}
-            className="flex-1 px-3 py-2 rounded-neo border-2 border-neo-white/20 bg-white/5 text-neo-cream/80 text-sm font-bold uppercase hover:bg-white/10 hover:border-neo-white/30 transition-all"
+            className="flex-1 px-3 py-2 rounded-neo border-2 border-neo-white/20 bg-white/5 text-neo-cream/80 text-sm font-bold uppercase hover:bg-white/10 hover:border-neo-white/30 transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]"
           >
             {t('common.cancel')}
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="flex-1 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black text-sm font-black uppercase shadow-hard-sm hover:translate-y-[-1px] active:translate-y-0 active:shadow-hard-pressed transition-all"
+            className="flex-1 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black text-sm font-black uppercase shadow-hard-sm hover:translate-y-[-1px] active:translate-y-0 active:shadow-hard-pressed transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]"
           >
             {t('common.save')}
           </button>
@@ -267,7 +267,7 @@ function ChipButton({ active, onClick, label }: {
       type="button"
       onClick={onClick}
       className={cn(
-        'px-3 py-1.5 rounded-neo border-2 text-xs font-bold uppercase transition-all',
+        'px-3 py-1.5 rounded-neo border-2 text-xs font-bold uppercase transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
         active
           ? 'bg-neo-lime text-neo-black border-neo-black shadow-hard-sm'
           : 'bg-white/5 text-neo-cream/70 border-neo-white/15 hover:border-neo-white/30 hover:bg-white/10'

@@ -133,14 +133,16 @@
   .badgeFront {
     transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .badgeFan:hover .badgeBack {
-    transform: translateX(-42%) rotate(-16deg) scale(0.84);
-  }
-  .badgeFan:hover .badgeBackAlt {
-    transform: translateX(42%) rotate(16deg) scale(0.84);
-  }
-  .badgeFan:hover .badgeFront {
-    transform: rotate(0deg) translateY(-6px);
+  @media (hover: hover) and (pointer: fine) {
+    .badgeFan:hover .badgeBack {
+      transform: translateX(-42%) rotate(-16deg) scale(0.84);
+    }
+    .badgeFan:hover .badgeBackAlt {
+      transform: translateX(42%) rotate(16deg) scale(0.84);
+    }
+    .badgeFan:hover .badgeFront {
+      transform: rotate(0deg) translateY(-6px);
+    }
   }
 
   /* How to Play (LandingSEOSection): the four step tiles pop along the lime

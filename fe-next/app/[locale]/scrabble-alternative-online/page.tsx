@@ -175,13 +175,13 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Link
               href="/en/multiplayer"
-              className="rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg"
+              className="rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg"
             >
               Play free now →
             </Link>
             <Link
               href="/en/best-online-word-games"
-              className="rounded-neo border-3 border-neo-black bg-neo-navy-light px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10"
+              className="rounded-neo border-3 border-neo-black bg-neo-navy-light px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10"
             >
               Compare 9 word games
             </Link>
@@ -290,7 +290,7 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
           </p>
           <Link
             href="/en/multiplayer"
-            className="inline-block rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg"
+            className="inline-block rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg"
           >
             Start a free room →
           </Link>

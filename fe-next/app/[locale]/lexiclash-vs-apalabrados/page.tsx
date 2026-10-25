@@ -114,13 +114,13 @@ export default async function LexiClashVsApalabradosPage({ params }: PageProps) 
                 </p>
 
                 <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-                    <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg sm:px-8 sm:py-4">
+                    <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
                         Jugar LexiClash Gratis
                     </Link>
-                    <Link href={`/${locale}/daily`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-all hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
+                    <Link href={`/${locale}/daily`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
                         Desafío Diario
                     </Link>
-                    <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-purple bg-transparent px-6 py-3 text-center font-bold text-neo-purple shadow-hard transition-all hover:bg-neo-purple/10 sm:px-8 sm:py-4">
+                    <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-purple bg-transparent px-6 py-3 text-center font-bold text-neo-purple shadow-hard transition-[background-color] hover:bg-neo-purple/10 sm:px-8 sm:py-4">
                         Para Profesores
                     </Link>
                 </section>
@@ -247,15 +247,15 @@ export default async function LexiClashVsApalabradosPage({ params }: PageProps) 
                 <section className="mb-12">
                     <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Otras Comparaciones</h2>
                     <div className="grid gap-3 sm:grid-cols-3">
-                        <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+                        <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
                             <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
                             <p className="mt-1 text-xs text-neo-gray-200">Multijugador vs un puzle diario</p>
                         </Link>
-                        <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+                        <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
                             <h3 className="font-bold text-neo-cyan">LexiClash vs Scrabble GO</h3>
                             <p className="mt-1 text-xs text-neo-gray-200">Tiempo real vs por turnos</p>
                         </Link>
-                        <Link href={`/${locale}/lexiclash-vs-cabanagrams`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+                        <Link href={`/${locale}/lexiclash-vs-cabanagrams`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
                             <h3 className="font-bold text-neo-cyan">LexiClash vs Cabanagrams</h3>
                             <p className="mt-1 text-xs text-neo-gray-200">Cuadrícula compartida vs personal</p>
                         </Link>
@@ -274,7 +274,7 @@ export default async function LexiClashVsApalabradosPage({ params }: PageProps) 
                         Ambos son gratis. Ambos funcionan en español. Ambos tienen diccionarios sólidos. La diferencia está en qué sensación buscas.
                     </p>
                     <div className="mt-6">
-                        <Link href={`/${locale}/multiplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg">
+                        <Link href={`/${locale}/multiplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
                             Jugar LexiClash Ahora — Gratis, Sin Descarga
                         </Link>
                     </div>

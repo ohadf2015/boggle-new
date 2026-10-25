@@ -16,7 +16,7 @@ export function ScrollRevealSection({ children, className = '' }: Props) {
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out ${
+      className={`transition-[opacity,translate] duration-700 ease-out ${
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       } ${className}`}
     >

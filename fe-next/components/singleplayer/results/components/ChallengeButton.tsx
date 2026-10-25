@@ -171,7 +171,7 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
           'border-3 border-neo-black shadow-hard',
           'hover:shadow-hard-lg hover:-translate-y-0.5',
           'active:shadow-hard-pressed active:translate-y-0',
-          'transition-all duration-150',
+          'transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150',
           'disabled:opacity-70 disabled:cursor-not-allowed',
           challengeUrl
             ? 'bg-neo-lime text-neo-black'

@@ -104,7 +104,7 @@ export const PastSeasonsLeaderboard: React.FC = () => {
             key={s.season_id}
             onClick={() => setActiveSeason(s.season_id)}
             className={cn(
-              'px-3 py-1.5 text-xs font-neo-display rounded-neo border-neo border-black transition-all',
+              'px-3 py-1.5 text-xs font-neo-display rounded-neo border-neo border-black transition',
               activeSeason === s.season_id
                 ? 'bg-neo-pink text-black shadow-hard'
                 : 'bg-neo-navy-light text-neo-white hover:bg-neo-navy'

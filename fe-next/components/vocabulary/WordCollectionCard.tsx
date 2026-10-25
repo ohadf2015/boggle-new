@@ -67,7 +67,7 @@ export function WordCollectionCard({ onReviewClick, className = '' }: WordCollec
               className="h-2 w-full overflow-hidden rounded-full border border-neutral-700 bg-neo-navy-light"
             >
               <div
-                className="h-full rounded-full bg-neo-cyan transition-all duration-300"
+                className="h-full rounded-full bg-neo-cyan transition-[width] duration-300"
                 style={{ width: `${masteryPercent}%` }}
               />
             </div>

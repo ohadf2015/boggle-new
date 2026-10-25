@@ -31,7 +31,7 @@ export function HuntProgressMeter({ mode, found, target }: HuntProgressMeterProp
       >
         <div
           data-testid="hunt-progress-fill"
-          className={`h-full rounded-full transition-all duration-500 ${theme.bgTintClass.replace('/5', '/40')} ${theme.borderClass.replace('border-', 'bg-')}`}
+          className={`h-full rounded-full transition-[width] duration-500 ${theme.bgTintClass.replace('/5', '/40')} ${theme.borderClass.replace('border-', 'bg-')}`}
           style={{ width: `${pct}%` }}
         />
       </div>

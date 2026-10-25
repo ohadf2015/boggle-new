@@ -43,7 +43,7 @@ function StandingsRail({ standings, me, t }: { standings: CrosswordStanding[]; m
             <span className="font-neo-body text-[10px] tabular-nums text-neo-cream/60">{s.solved ? t('crossword.mp.done') : `${s.percent}%`}</span>
           </div>
           <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-black/40">
-            <div className="h-full rounded-full bg-neo-cyan transition-all" style={{ width: `${s.percent}%` }} />
+            <div className="h-full rounded-full bg-neo-cyan transition-[width]" style={{ width: `${s.percent}%` }} />
           </div>
         </li>
       ))}

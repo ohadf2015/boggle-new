@@ -23,7 +23,7 @@ interface ListPreviewSheetProps {
 
 const ACTION = cn(
   'inline-flex min-h-12 min-w-0 items-center justify-center gap-2 rounded-neo border-3 border-neo-black px-3',
-  'font-neo-display text-sm font-bold uppercase text-neo-black shadow-hard transition-all',
+  'font-neo-display text-sm font-bold uppercase text-neo-black shadow-hard transition',
   'hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none disabled:opacity-60 sm:text-base',
 );
 

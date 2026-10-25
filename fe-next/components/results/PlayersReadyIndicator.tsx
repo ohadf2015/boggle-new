@@ -117,9 +117,9 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                     <m.div
                       key={player.username}
                       layout
-                      initial={{ opacity: 0, scale: 0, x: -10 }}
+                      initial={{ opacity: 0, scale: 0.95, x: -10 }}
                       animate={{ opacity: 1, scale: 1, x: 0 }}
-                      exit={{ opacity: 0, scale: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
                       transition={{
                         duration: 0.25,
                         delay: index * 0.04,
@@ -132,7 +132,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                     >
                       {/* Avatar */}
                       <div className={`
-                        relative rounded-full transition-all duration-200
+                        relative rounded-full transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity,filter] duration-200
                         ${isCurrentUser ? 'ring-2 ring-neo-lime ring-offset-1 ring-offset-neo-navy z-10' : ''}
                         ${!isReady ? 'opacity-40 grayscale' : ''}
                       `}>

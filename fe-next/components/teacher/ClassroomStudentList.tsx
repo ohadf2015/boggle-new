@@ -191,7 +191,7 @@ export default function ClassroomStudentList({ classroomId, joinCode }: Classroo
           <div
             key={student.id}
             data-student-row
-            className="flex flex-wrap items-center gap-x-3 gap-y-2 p-3 border-2 border-black rounded-neo bg-neo-cream shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition-all"
+            className="flex flex-wrap items-center gap-x-3 gap-y-2 p-3 border-2 border-black rounded-neo bg-neo-cream shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition"
           >
             {/* Avatar */}
             <div className="shrink-0">

@@ -345,7 +345,7 @@ export function TimedBlitzPractice({
                   'shadow-hard',
                   'focus:outline-hidden focus:ring-4 focus:ring-neo-cyan',
                   'disabled:opacity-50 disabled:cursor-not-allowed',
-                  'transition-all'
+                  'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]'
                 )}
                 placeholder={t('education.practice.typeAnswer')}
               />
@@ -366,7 +366,7 @@ export function TimedBlitzPractice({
                 // visible edge, instead of fading the whole control.
                 'disabled:bg-neo-navy-light disabled:text-neo-cream disabled:border-neo-cream',
                 'disabled:shadow-none disabled:cursor-not-allowed',
-                'transition-all active:translate-y-1'
+                'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] active:translate-y-1'
                 )}
               >
                 {t('education.practice.submit')}

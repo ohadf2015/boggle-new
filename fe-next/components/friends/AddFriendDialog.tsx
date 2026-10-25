@@ -108,7 +108,7 @@ export function AddFriendDialog({
               className={cn(
                 'w-full flex items-center justify-center gap-2 py-3 px-4',
                 'rounded-neo border-3 border-neo-black font-black uppercase tracking-wide text-sm',
-                'transition-all duration-100',
+                'transition duration-100',
                 linkCopied
                   ? 'bg-neo-lime text-neo-black shadow-hard-pressed translate-x-px translate-y-px'
                   : 'bg-neo-yellow text-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5'
@@ -195,7 +195,7 @@ export function AddFriendDialog({
                     className={cn(
                       'shrink-0 px-3 py-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm',
                       'bg-neo-lime text-neo-black font-black uppercase tracking-wide text-xs',
-                      'hover:shadow-hard hover:-translate-y-0.5 transition-all'
+                      'hover:shadow-hard hover:-translate-y-0.5 transition'
                     )}
                   >
                     {actionLoading === searchUser.odUserId ? (

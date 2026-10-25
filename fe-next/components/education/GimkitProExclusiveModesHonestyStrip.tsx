@@ -106,7 +106,7 @@ export function GimkitProExclusiveModesHonestyStrip({
       <div className="mt-5">
         <Link
           href={`/${loc}/education/classroom-game`}
-          className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-all hover:shadow-hard-lg"
+          className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition hover:shadow-hard-lg"
           data-testid="gimkit-pro-exclusive-modes-cta"
         >
           {t('education.vsGimkit.proExclusiveModes.cta')}

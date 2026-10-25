@@ -74,7 +74,7 @@ export default function UnsubscribePageClient() {
                 <Button
                   onClick={handleBackToGame}
                   className={cn(
-                    'flex-1 px-6 py-3 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide transition-all',
+                    'flex-1 px-6 py-3 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide transition-[translate,scale,rotate,transform,box-shadow,background-color]',
                     'shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
                     'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
                     'bg-neo-lime text-neo-black hover:bg-neo-lime/90'
@@ -88,7 +88,7 @@ export default function UnsubscribePageClient() {
                   onClick={handleResubscribe}
                   variant="outline"
                   className={cn(
-                    'flex-1 px-6 py-3 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide transition-all',
+                    'flex-1 px-6 py-3 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide transition-[translate,scale,rotate,transform,box-shadow,background-color]',
                     'shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
                     'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
                     'bg-neo-navy-elevated text-neo-white hover:bg-slate-600'
@@ -116,7 +116,7 @@ export default function UnsubscribePageClient() {
               <Button
                 onClick={handleBackToGame}
                 className={cn(
-                  'w-full px-6 py-3 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide transition-all',
+                  'w-full px-6 py-3 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide transition-[translate,scale,rotate,transform,box-shadow,background-color]',
                   'shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
                   'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
                   'bg-neo-cyan text-neo-black hover:bg-neo-cyan/90'

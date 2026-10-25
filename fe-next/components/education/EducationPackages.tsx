@@ -144,7 +144,7 @@ function PackageCard({
               /* analytics must never block */
             }
           }}
-          className="mt-6 rounded-neo border-4 border-neo-black bg-neo-yellow px-4 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all hover:-translate-y-0.5"
+          className="mt-6 rounded-neo border-4 border-neo-black bg-neo-yellow px-4 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard transition hover:-translate-y-0.5"
         >
           {t('education.packages.teacherPro.cta')}
         </Link>

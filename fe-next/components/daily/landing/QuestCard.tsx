@@ -248,7 +248,7 @@ export function QuestCard({
           'relative z-10 font-black uppercase rounded-lg text-center',
           colorConfig.bg,
           'text-neo-black border-2 border-neo-black shadow-hard-sm',
-          'active:translate-y-0.5 active:shadow-none transition-all',
+          'active:translate-y-0.5 active:shadow-none transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]',
           'w-full py-3 text-xs md:w-auto md:px-8 md:shrink-0'
         )}>
           {buttonText}

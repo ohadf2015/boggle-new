@@ -73,7 +73,7 @@ export function OAuthButtonGroup({
           onClick={() => showAuthPrompt()}
           disabled={isAnyLoading}
           className={cn(
-            'w-full h-12 text-base font-medium rounded-xl transition-all',
+            'w-full h-12 text-base font-medium rounded-xl transition',
             'bg-neo-pink text-white hover:bg-neo-pink/90'
           )}
         >
@@ -98,7 +98,7 @@ export function OAuthButtonGroup({
             onClick={() => onSignIn(provider.id)}
             disabled={isAnyLoading}
             className={cn(
-              'w-full h-12 text-base font-medium rounded-xl transition-all',
+              'w-full h-12 text-base font-medium rounded-xl transition',
               provider.color
             )}
           >

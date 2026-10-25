@@ -169,7 +169,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = memo(function Val
                       onClick={() => handleToggleWord(item.word, isDuplicate)}
                       disabled={isDuplicate}
                       className={cn(
-                        "p-3 rounded-neo text-center transition-all border-3 border-neo-black cursor-pointer",
+                        "p-3 rounded-neo text-center transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] border-3 border-neo-black cursor-pointer",
                         isDuplicate
                           ? "bg-neo-orange/40 opacity-50 cursor-not-allowed"
                           : isValid
@@ -417,7 +417,7 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = memo(function F
           {tournamentData && !tournamentData.isComplete && (
             <Button
               onClick={onNextRound}
-              className="w-full h-14 text-lg font-black uppercase bg-accent text-accent-foreground border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+              className="w-full h-14 text-lg font-black uppercase bg-accent text-accent-foreground border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]"
             >
               🏁 {t('hostView.startNextRound')}
             </Button>
@@ -425,7 +425,7 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = memo(function F
           {(!tournamentData || tournamentData.isComplete) && (
             <Button
               onClick={onStartNewGame}
-              className="w-full h-14 text-lg font-black uppercase bg-accent text-accent-foreground border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+              className="w-full h-14 text-lg font-black uppercase bg-accent text-accent-foreground border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]"
             >
               🎮 {t('hostView.startNewGame')}
             </Button>

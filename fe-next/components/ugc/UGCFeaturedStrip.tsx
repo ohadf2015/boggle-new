@@ -141,7 +141,7 @@ const UGCFeaturedStrip = memo<UGCFeaturedStripProps>(({
             'flex items-center gap-3 mt-3 px-3 py-2',
             'bg-neo-pink/10 border-2 border-neo-pink/25 rounded-neo',
             'hover:bg-neo-pink/20 hover:border-neo-pink/40',
-            'transition-all duration-150 group'
+            'transition duration-150 group'
           )}
         >
           <div className="flex items-center justify-center w-7 h-7 bg-neo-pink/20 rounded-neo shrink-0">

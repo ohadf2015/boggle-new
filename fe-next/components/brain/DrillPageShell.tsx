@@ -235,7 +235,7 @@ export default function DrillPageShell({ drillType, Drill, isCheck = false }: Pr
           onClick={goHub}
           className={cn(
             'flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm',
-            'transition-all hover:translate-y-[-2px] hover:shadow-hard',
+            'transition-[transform,box-shadow] [@media(hover:hover)]:hover:translate-y-[-2px] hover:shadow-hard',
             isDarkMode ? 'bg-neo-navy text-neo-white' : 'bg-neo-cream text-neo-black'
           )}
         >

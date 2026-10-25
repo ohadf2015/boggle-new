@@ -154,7 +154,7 @@ export function MetricCard({
               'mt-1 px-3 py-2 bg-black text-neo-lime',
               'font-black font-neo-body text-sm rounded-neo border-3 border-black shadow-hard-sm',
               'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
-              'transition-all duration-100',
+              'transition duration-100',
               'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime'
             )}
           >

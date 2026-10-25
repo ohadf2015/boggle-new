@@ -204,7 +204,7 @@ export default async function GlobalNotFound() {
                 border-neo-thick shadow-hard-lg
                 hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px]
                 active:shadow-none active:translate-x-[3px] active:translate-y-[3px]
-                transition-all duration-150"
+                transition-[box-shadow,translate,scale,rotate,transform] duration-150"
             >
               {t.cta}
             </Link>

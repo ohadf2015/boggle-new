@@ -260,7 +260,7 @@ export default function PracticeCompletionMoment({
             data-primary="true"
             data-testid={onNext ? 'practice-completion-next' : 'practice-completion-again'}
             onClick={onNext ?? onAgain}
-            className="flex min-h-[58px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-black bg-neo-lime px-4 font-neo-display text-xl font-black uppercase text-black shadow-hard transition-all hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed"
+            className="flex min-h-[58px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-black bg-neo-lime px-4 font-neo-display text-xl font-black uppercase text-black shadow-hard transition hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed"
           >
             {onNext ? (
               <>

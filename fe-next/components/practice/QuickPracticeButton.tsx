@@ -164,7 +164,7 @@ export function QuickPracticeButton({
           'bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black',
           'shadow-hard hover:shadow-hard-lg',
           'border-[3px] border-neo-black',
-          'transition-all',
+          'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]',
           size === 'lg' ? 'text-base px-6' : 'px-4',
           isRTL ? 'rounded-l-none rounded-r-neo' : 'rounded-r-none rounded-l-neo'
         )}
@@ -185,7 +185,7 @@ export function QuickPracticeButton({
           'shadow-hard hover:shadow-hard-lg',
           'border-[3px] border-neo-black',
           isRTL ? 'border-r-0 rounded-r-none rounded-l-neo' : 'border-l-0 rounded-l-none rounded-r-neo',
-          'px-2 transition-all'
+          'px-2 transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]'
         )}
       >
         <ChevronDown

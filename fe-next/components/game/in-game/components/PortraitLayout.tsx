@@ -396,7 +396,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         <div
           aria-hidden="true"
           className={cn(
-            'fixed inset-0 pointer-events-none z-30 transition-all duration-500',
+            'fixed inset-0 pointer-events-none z-30 transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-500',
             timerUrgencyState === 'critical'
               ? cn('shadow-[inset_0_0_60px_rgba(255,50,50,0.6)]', !reduceMotion && 'animate-timer-vignette-ambient')
               : timerUrgencyState === 'veryLow'
@@ -441,7 +441,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
       />
 
       <div className={mpChrome ? cn(MP_CHROME_ROOT_CLASS, comboShakeKey > 0 && 'animate-combo-shake') : cn(
-        'flex flex-col gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 desktop-medium-short:lg:gap-1 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-hidden transition-all duration-500 ease-in-out pb-16 medium-short:pb-12 lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 desktop-medium-short:lg:pb-1 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 min-h-0',
+        'flex flex-col gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 desktop-medium-short:lg:gap-1 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-hidden transition-[gap,padding,transform,opacity] duration-500 ease-in-out pb-16 medium-short:pb-12 lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 desktop-medium-short:lg:pb-1 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 min-h-0',
         // In the MP shell the canvas is just the board column — don't run the
         // internal lg: 3-column split (the shell supplies the side rails).
         !inDesktopShell && 'lg:flex-row lg:items-stretch lg:justify-center',

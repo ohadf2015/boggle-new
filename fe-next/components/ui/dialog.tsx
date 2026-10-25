@@ -142,7 +142,7 @@ const DialogContent = React.forwardRef<
             "right-2 sm:right-3",
             "rtl:right-auto rtl:left-2 sm:rtl:left-3",
             "flex items-center justify-center",
-            "transition-all duration-100",
+            "transition duration-100",
             "focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
             "z-10",
             // Variant-specific styles

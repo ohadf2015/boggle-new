@@ -157,7 +157,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
                 'border-[2px] border-neo-cream bg-neo-navy-light shadow-hard-sm',
                 'text-neo-white hover:-translate-y-0.5 hover:shadow-hard',
                 'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
-                'transition-all duration-200'
+                'transition duration-200'
               )}
             >
               <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />

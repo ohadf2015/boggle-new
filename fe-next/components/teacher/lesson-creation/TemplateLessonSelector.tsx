@@ -285,7 +285,7 @@ export default function TemplateLessonSelector({
             key={category}
             onClick={() => setSelectedCategory(category)}
             className={cn(
-              'px-3 py-2 rounded-neo border-neo font-neo-body text-sm transition-all',
+              'px-3 py-2 rounded-neo border-neo font-neo-body text-sm transition',
               selectedCategory === category
                 ? 'bg-neo-pink text-neo-white shadow-hard-sm'
                 : 'bg-neo-navy text-neo-white hover:bg-neo-navy/80'
@@ -305,7 +305,7 @@ export default function TemplateLessonSelector({
             onClick={() => onSelect(template)}
             className={cn(
               'p-4 bg-neo-black/30 border-neo border-neo-cyan/50',
-              'rounded-neo text-start hover:shadow-hard-sm transition-all',
+              'rounded-neo text-start hover:shadow-hard-sm transition',
               'hover:translate-x-[-2px] hover:translate-y-[-2px]'
             )}
           >

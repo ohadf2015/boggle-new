@@ -169,7 +169,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
           </p>
           <Button
             onClick={() => router.push(`/${language}`)}
-            className="w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard-md hover:shadow-hard-lg hover:-translate-y-1 transition-all font-bold"
+            className="w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard-md hover:shadow-hard-lg hover:-translate-y-1 transition font-bold"
           >
             {t('challengeView.backToHome')}
           </Button>
@@ -216,8 +216,8 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             {/* Header */}
             <div className="text-center mb-6">
               <m.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, type: 'spring' }}
                 className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neo-lime border-3 border-neo-black shadow-hard-md mb-3"
               >
@@ -353,7 +353,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                 'w-full flex items-center justify-center gap-3 p-4',
                 'font-black text-xl uppercase tracking-wide rounded-neo',
                 'border-4 border-neo-black shadow-hard-lg',
-                'hover:shadow-hard-xl transition-all',
+                'hover:shadow-hard-xl transition',
                 'bg-neo-lime text-neo-black'
               )}
             >

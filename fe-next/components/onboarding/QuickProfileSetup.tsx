@@ -205,9 +205,9 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
                   <AnimatePresence mode="wait">
                     <m.div
                       key={avatarKey}
-                      initial={{ scale: 0, rotate: -90 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      exit={{ scale: 0, rotate: 90 }}
+                      initial={{ scale: 0.95, opacity: 0, rotate: -90 }}
+                      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                      exit={{ scale: 0.95, opacity: 0, rotate: 90 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                       className="w-full h-full"
                     >
@@ -283,9 +283,9 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
               {isNameValid && (
                 <m.div
                   key="valid-check"
-                  initial={{ scale: 0, rotate: -45 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  exit={{ scale: 0, rotate: 45 }}
+                  initial={{ scale: 0.95, opacity: 0, rotate: -45 }}
+                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                  exit={{ scale: 0.95, opacity: 0, rotate: 45 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 18 }}
                   className="absolute top-1/2 -translate-y-1/2 inset-e-2 w-6 h-6 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm pointer-events-none"
                   aria-hidden
@@ -315,7 +315,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           className={cn(
             'w-full py-3 border-3 border-neo-black rounded-neo',
             'font-black text-lg uppercase',
-            'shadow-hard-sm transition-all',
+            'shadow-hard-sm transition',
             isNameValid
               ? 'bg-neo-pink text-neo-white hover:shadow-hard'
               : 'bg-neo-black/15 text-neo-black/35 cursor-not-allowed shadow-none'

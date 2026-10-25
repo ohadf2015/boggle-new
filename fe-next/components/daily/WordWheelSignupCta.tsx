@@ -205,7 +205,7 @@ const WordWheelSignupCta: React.FC<WordWheelSignupCtaProps> = ({
             type="button"
             data-testid="wheel-signup-cta-button"
             onClick={handleOpen}
-            className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-cyan shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all text-start"
+            className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-cyan shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] text-start"
           >
             <span className="flex items-center gap-3">
               <span className="flex items-center justify-center w-11 h-11 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">

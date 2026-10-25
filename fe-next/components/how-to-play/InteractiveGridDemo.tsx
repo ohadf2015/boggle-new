@@ -283,7 +283,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             variant="outline"
             size="sm"
             onClick={() => setAutoPlay(false)}
-            className="bg-neo-cream hover:bg-neo-cream/80 text-[10px] sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 border sm:border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
+            className="bg-neo-cream hover:bg-neo-cream/80 text-[10px] sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 border sm:border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition"
           >
             <span className={`me-1`}>⏸</span>
             {t('howToPlay.demo.pause')}
@@ -293,7 +293,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             variant="outline"
             size="sm"
             onClick={() => setAutoPlay(true)}
-            className="bg-neo-lime hover:bg-neo-lime/80 text-[10px] sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 border sm:border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
+            className="bg-neo-lime hover:bg-neo-lime/80 text-[10px] sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 border sm:border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition"
           >
             <Play className={`w-3 h-3 sm:w-4 sm:h-4 me-1`} />
             {t('howToPlay.demo.play')}
@@ -303,7 +303,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
           variant="outline"
           size="sm"
           onClick={handleReplay}
-          className="bg-neo-cyan hover:bg-neo-cyan/80 text-[10px] sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 border sm:border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition-all"
+          className="bg-neo-cyan hover:bg-neo-cyan/80 text-[10px] sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 border sm:border-2 border-neo-black shadow-hard-sm hover:shadow-hard transition"
         >
           <RotateCw className={`w-3 h-3 sm:w-4 sm:h-4 me-1`} />
           {t('howToPlay.demo.replay')}

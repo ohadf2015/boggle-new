@@ -188,7 +188,7 @@ export default function ClassLimitUpsellModal({
               {isTrialExpired ? (
                 <Button
                   asChild
-                  className="flex-1 cursor-pointer bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all"
+                  className="flex-1 cursor-pointer bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition"
                 >
                   <Link
                     href={`/${language}/teacher/upgrade`}
@@ -211,7 +211,7 @@ export default function ClassLimitUpsellModal({
                   onClick={() => {
                     void startPolarCheckout();
                   }}
-                  className="flex-1 cursor-pointer bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition-all disabled:opacity-60"
+                  className="flex-1 cursor-pointer bg-neo-cyan text-black font-black border-2 border-black shadow-hard hover:-translate-y-0.5 transition disabled:opacity-60"
                 >
                   {pending ? t('common.loading') : teacherProUpgradeCtaLabel(language)}
                 </Button>
@@ -219,7 +219,7 @@ export default function ClassLimitUpsellModal({
               <Button
                 onClick={isTrialExpired && onContinueFree ? onContinueFree : onClose}
                 variant="outline"
-                className="flex-1 cursor-pointer border-2 border-black bg-neo-cream text-black font-black shadow-hard hover:-translate-y-0.5 transition-all"
+                className="flex-1 cursor-pointer border-2 border-black bg-neo-cream text-black font-black shadow-hard hover:-translate-y-0.5 transition"
               >
                 {isTrialExpired && onContinueFree
                   ? t('teacher.subscription.continueFree')

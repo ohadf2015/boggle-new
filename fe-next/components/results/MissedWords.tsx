@@ -141,7 +141,7 @@ const MissedWords = memo<MissedWordsProps>(({
                   disabled={!hasPath}
                   className={cn(
                     'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-neo text-sm',
-                    'border-2 transition-all duration-150',
+                    'border-2 transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150',
                     hasPath && 'cursor-pointer hover:scale-105',
                     isSelected
                       ? 'border-neo-lime bg-neo-lime/30 ring-2 ring-neo-lime/50'

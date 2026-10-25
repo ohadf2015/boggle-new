@@ -77,7 +77,7 @@ export default function ReportListDialog({ lessonId, listName, onClose, onReport
           data-testid="report-submit"
           disabled={!reason || sending}
           onClick={() => void submit()}
-          className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-pink font-neo-display font-bold uppercase text-neo-black shadow-hard transition-all active:translate-y-0.5 active:shadow-none disabled:opacity-50"
+          className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-pink font-neo-display font-bold uppercase text-neo-black shadow-hard transition active:translate-y-0.5 active:shadow-none disabled:opacity-50"
         >
           {sending && <Loader2 className="size-5 animate-spin" aria-hidden="true" />}
           {t('eduLibrary.report.submit')}

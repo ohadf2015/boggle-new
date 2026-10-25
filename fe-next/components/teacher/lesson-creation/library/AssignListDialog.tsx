@@ -62,7 +62,7 @@ export default function AssignListDialog({ lessonId, onClose }: AssignListDialog
                 key={c.id}
                 type="button"
                 onClick={() => setClassroomId(c.id)}
-                className="flex min-h-12 items-center gap-2 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-3 text-start font-bold text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:border-neo-cyan"
+                className="flex min-h-12 items-center gap-2 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-3 text-start font-bold text-neo-white shadow-hard-sm transition hover:-translate-y-0.5 hover:border-neo-cyan"
               >
                 <GraduationCap className="size-5 shrink-0 text-neo-cyan" aria-hidden="true" />
                 <span className="truncate">{c.name}</span>

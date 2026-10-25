@@ -299,7 +299,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
               border-neo-thick border-black rounded-neo shadow-hard
               hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink
-              transition-all uppercase tracking-wider animate-in fade-in-0 duration-300
+              transition uppercase tracking-wider animate-in fade-in-0 duration-300
             "
             style={{ animationDelay: '0.65s' }}
             aria-label={t('season.continue')}

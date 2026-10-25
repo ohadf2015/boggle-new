@@ -14,7 +14,7 @@ const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: fa
 const CTA_CLASS =
   'inline-flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-4 py-3 ' +
   'font-bold text-neo-navy font-neo-display shadow-hard hover:shadow-hard-sm ' +
-  'active:shadow-hard-pressed disabled:opacity-50 disabled:cursor-not-allowed transition-all';
+  'active:shadow-hard-pressed disabled:opacity-50 disabled:cursor-not-allowed transition';
 
 /** The one action this page exists for — sized and weighted accordingly. */
 const PRIMARY_CTA_CLASS =
@@ -22,7 +22,7 @@ const PRIMARY_CTA_CLASS =
   // text-base on phones: the longer locales (es/ru/sv) wrap badly at 18px in a
   // ~290px content box. text-balance keeps the wrap even when it does happen.
   'bg-neo-lime px-5 py-4 font-neo-display text-base font-black tracking-[-0.01em] text-neo-navy ' +
-  'text-balance shadow-hard-lg transition-all hover:-translate-y-0.5 hover:shadow-hard-xl ' +
+  'text-balance shadow-hard-lg transition hover:-translate-y-0.5 hover:shadow-hard-xl ' +
   'active:translate-y-0 active:shadow-hard-pressed sm:px-6 sm:text-xl';
 
 /**
@@ -172,7 +172,7 @@ export function AccessRequestGate() {
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-3 font-bold text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+            className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-3 font-bold text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition"
           >
             {t('education.access.verify_email_refresh')}
           </button>

@@ -96,7 +96,7 @@ export function BadgeSelector({ authToken, selectedBadgeId, onSelect }: BadgeSel
         type="button"
         onClick={() => onSelect(null, undefined)}
         className={cn(
-          'w-full p-3 rounded-lg border-2 flex items-center gap-3 transition-all',
+          'w-full p-3 rounded-lg border-2 flex items-center gap-3 transition',
           selectedBadgeId === null
             ? 'border-neo-lime bg-neo-lime/10 shadow-md'
             : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -136,7 +136,7 @@ export function BadgeSelector({ authToken, selectedBadgeId, onSelect }: BadgeSel
                   type="button"
                   onClick={() => onSelect(badge.id, badge)}
                   className={cn(
-                    'p-3 rounded-lg border-2 flex items-center gap-3 transition-all text-left',
+                    'p-3 rounded-lg border-2 flex items-center gap-3 transition text-left',
                     rarityColors[rarity],
                     selectedBadgeId === badge.id
                       ? 'ring-2 ring-neo-lime ring-offset-2 shadow-md'

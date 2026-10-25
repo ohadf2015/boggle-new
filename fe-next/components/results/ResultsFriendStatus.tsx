@@ -161,7 +161,7 @@ export function AddFriendBadge({
         className={cn(
           'inline-flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-neo-black',
           'bg-neo-cyan text-neo-black font-black text-[10px] uppercase shadow-hard-sm',
-          'hover:shadow-hard hover:-translate-y-px transition-all',
+          'hover:shadow-hard hover:-translate-y-px transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
           'disabled:opacity-60 disabled:cursor-not-allowed',
           className
         )}
@@ -182,7 +182,7 @@ export function AddFriendBadge({
       className={cn(
         'w-7 h-7 inline-flex items-center justify-center rounded-neo',
         'bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm',
-        'hover:shadow-hard hover:-translate-y-px transition-all',
+        'hover:shadow-hard hover:-translate-y-px transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity]',
         'disabled:opacity-60 disabled:cursor-not-allowed',
         className
       )}

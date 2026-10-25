@@ -94,7 +94,7 @@ export default function LegalIndexPageClient(): React.ReactElement {
             key={page.href}
             href={page.href}
             className={cn(
-              'block p-6 rounded-lg border transition-all hover:scale-[1.02]',
+              'block p-6 rounded-lg border transition-[translate,scale,rotate,transform,border-color,box-shadow] hover:scale-[1.02]',
               isDarkMode
                 ? 'bg-neo-navy-light border-gray-700 hover:border-purple-500'
                 : 'bg-white border-gray-200 hover:border-purple-500 shadow-xs hover:shadow-md'

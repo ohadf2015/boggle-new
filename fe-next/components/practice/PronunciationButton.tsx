@@ -59,7 +59,7 @@ export function PronunciationButton({
           border-[3px] border-black
           rounded-neo
           shadow-hard
-          transition-all duration-150
+          transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-150
           hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-hard-pressed
           active:translate-x-[4px] active:translate-y-[4px] active:shadow-none
           disabled:opacity-50 disabled:cursor-not-allowed

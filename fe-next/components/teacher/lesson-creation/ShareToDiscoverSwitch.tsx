@@ -49,7 +49,7 @@ export default function ShareToDiscoverSwitch({ checked, onChange, issues = [], 
         <span
           aria-hidden="true"
           className={cn(
-            'absolute top-0.5 size-5 rounded-full border-2 border-neo-black bg-neo-cream transition-all duration-200',
+            'absolute top-0.5 size-5 rounded-full border-2 border-neo-black bg-neo-cream transition-[inset-inline-start] duration-200',
             checked ? 'start-[1.6rem]' : 'start-0.5',
           )}
         />

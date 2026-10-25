@@ -187,7 +187,7 @@ export function ClassroomAddonPlanner({
             className={cn(
               'mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold text-sm',
               'bg-neo-lime text-neo-black border-neo border-neo-black rounded-neo',
-              'shadow-hard hover:shadow-hard-lg transition-all',
+              'shadow-hard hover:shadow-hard-lg transition',
             )}
           >
             <MonitorPlay className="w-4 h-4" aria-hidden />
@@ -202,7 +202,7 @@ export function ClassroomAddonPlanner({
             className={cn(
               'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
               'bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo',
-              'shadow-hard-sm hover:shadow-hard transition-all',
+              'shadow-hard-sm hover:shadow-hard transition',
             )}
           >
             <ClipboardCheck className="w-4 h-4" aria-hidden />
@@ -218,7 +218,7 @@ export function ClassroomAddonPlanner({
               className={cn(
                 'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
                 'bg-neo-cream text-neo-black border-neo border-neo-black rounded-neo',
-                'shadow-hard-sm hover:shadow-hard transition-all',
+                'shadow-hard-sm hover:shadow-hard transition',
               )}
             >
               <Share2 className="w-4 h-4" aria-hidden />

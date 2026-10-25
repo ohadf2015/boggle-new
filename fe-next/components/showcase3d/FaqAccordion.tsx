@@ -36,7 +36,7 @@ export default function FaqAccordion({ title, items }: { title: string; items: F
                   <span>{item.q}</span>
                   <span
                     aria-hidden
-                    className={`grid h-7 w-7 shrink-0 place-items-center rounded-neo border-neo border-black font-neo-display text-xl leading-none transition-all duration-200 ${
+                    className={`grid h-7 w-7 shrink-0 place-items-center rounded-neo border-neo border-black font-neo-display text-xl leading-none transition duration-200 ${
                       isOpen ? 'rotate-45 bg-neo-lime text-black' : 'bg-neo-navy text-neo-lime'
                     }`}
                   >

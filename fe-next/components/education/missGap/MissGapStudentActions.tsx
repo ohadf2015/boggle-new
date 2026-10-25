@@ -58,7 +58,7 @@ export function MissGapStudentActions({
         onClick={onPlay}
         className={cn(
           'w-full flex items-center justify-center gap-2 px-4',
-          'font-neo-display font-bold border-[3px] rounded-neo transition-all',
+          'font-neo-display font-bold border-[3px] rounded-neo transition',
           completed
             ? 'py-2.5 text-sm bg-neo-navy text-neo-cream border-neo-cream'
             : 'py-4 text-lg bg-neo-lime text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg',

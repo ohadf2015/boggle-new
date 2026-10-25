@@ -134,7 +134,7 @@ export function MissGapPracticeCard({ payload }: MissGapPracticeCardProps) {
         className={cn(
           'mt-5 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
           'bg-neo-cream text-neo-black border-[3px] border-neo-black rounded-neo',
-          'shadow-hard hover:shadow-hard-lg transition-all',
+          'shadow-hard hover:shadow-hard-lg transition',
         )}
       >
         <Printer className="w-5 h-5" aria-hidden />
@@ -148,7 +148,7 @@ export function MissGapPracticeCard({ payload }: MissGapPracticeCardProps) {
         className={cn(
           'mt-2 w-full flex items-center justify-center gap-2 px-4 py-3 font-bold',
           'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
-          'shadow-hard-sm hover:shadow-hard transition-all',
+          'shadow-hard-sm hover:shadow-hard transition',
         )}
       >
         {shareState === 'idle' ? (
@@ -171,7 +171,7 @@ export function MissGapPracticeCard({ payload }: MissGapPracticeCardProps) {
           className={cn(
             'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
             'bg-neo-cyan text-neo-black border-[3px] border-neo-black rounded-neo',
-            'shadow-hard-sm hover:shadow-hard transition-all',
+            'shadow-hard-sm hover:shadow-hard transition',
           )}
         >
           {t('education.results.startUnpluggedReteachLive')}

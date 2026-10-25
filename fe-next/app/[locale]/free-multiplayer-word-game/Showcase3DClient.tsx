@@ -343,10 +343,10 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
                 aria-label={t(`showcase3d.rail${i}`, label)}
                 className="s3-railseg group flex items-center justify-end gap-2"
               >
-                <span className="font-neo-display text-xs font-bold uppercase tracking-wide text-neo-white transition-all duration-200 group-hover:text-neo-white group-[.s3-railseg-on]:text-neo-white">
+                <span className="font-neo-display text-xs font-bold uppercase tracking-wide text-neo-white transition-[color] duration-200 group-hover:text-neo-white group-[.s3-railseg-on]:text-neo-white">
                   {t(`showcase3d.rail${i}`, label)}
                 </span>
-                <span className="h-3 w-3 rounded-full border-neo border-black bg-neo-cream/30 transition-all duration-200 group-[.s3-railseg-on]:scale-150 group-[.s3-railseg-on]:bg-neo-lime" />
+                <span className="h-3 w-3 rounded-full border-neo border-black bg-neo-cream/30 transition-[translate,scale,rotate,transform,background-color] duration-200 group-[.s3-railseg-on]:scale-150 group-[.s3-railseg-on]:bg-neo-lime" />
               </button>
             ))}
           </div>

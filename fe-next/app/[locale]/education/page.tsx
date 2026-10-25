@@ -114,7 +114,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <Link
             href={`/${locale}/education/duels`}
-            className="group rounded-neo border-3 border-neo-black bg-neo-pink p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+            className="group rounded-neo border-3 border-neo-black bg-neo-pink p-5 shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
           >
             <h3 className="font-neo-display text-lg font-black uppercase text-neo-black">{translateKey('eg6Land.resources.duelsTitle', locale)}</h3>
             <p className="mt-2 text-sm text-neo-black">{translateKey('eg6Land.resources.duelsDesc', locale)}</p>
@@ -122,7 +122,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           </Link>
           <Link
             href={`/${locale}/education/classroom-game`}
-            className="group rounded-neo border-3 border-neo-black bg-neo-cyan p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+            className="group rounded-neo border-3 border-neo-black bg-neo-cyan p-5 shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
           >
             <h3 className="font-neo-display text-lg font-black uppercase text-neo-navy">{translateKey('eg6Land.resources.classroomTitle', locale)}</h3>
             <p className="mt-2 text-sm text-neo-navy/90">{translateKey('eg6Land.resources.classroomDesc', locale)}</p>
@@ -141,8 +141,8 @@ function EducationResourceLinks({ locale }: { locale: string }) {
               href={`/${locale}/education/${card.slug}`}
               className={
                 card.dark
-                  ? 'rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg'
-                  : 'rounded-neo border-3 border-neo-black bg-neo-lime p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg'
+                  ? 'rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-5 shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg'
+                  : 'rounded-neo border-3 border-neo-black bg-neo-lime p-5 shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg'
               }
               {...(card.slug === 'for-schools' ? { 'data-ph-capture-attribute-source': 'edu_hub_for_schools_card' } : {})}
             >

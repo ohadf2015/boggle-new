@@ -76,7 +76,7 @@ function PackCard({
             'bg-neo-lime text-black border-3 border-black',
             'font-black font-neo-body text-sm rounded-neo shadow-hard-sm',
             'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5',
-            'transition-all duration-100'
+            'transition duration-100'
           )}
         >
           <Sparkles className="w-4 h-4" />

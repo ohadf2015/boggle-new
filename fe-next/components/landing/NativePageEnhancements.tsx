@@ -225,7 +225,7 @@ export default function NativePageEnhancements({ locale }: Props) {
             <Link
               key={m.mode}
               href={`/${locale}/${m.href}`}
-              className={`group relative flex flex-col gap-3 rounded-neo border-4 border-neo-black bg-neo-navy-light p-5 shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl ${accentBorder[m.accent]}`}
+              className={`group relative flex flex-col gap-3 rounded-neo border-4 border-neo-black bg-neo-navy-light p-5 shadow-hard-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl ${accentBorder[m.accent]}`}
               style={{ transform: `rotate(${(i % 3) - 1}deg)` }}
             >
               <span className={`absolute -right-2 -top-3 inline-block rotate-[6deg] rounded border-3 border-neo-black px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest shadow-hard ${accentChip[m.accent]}`}>
@@ -271,8 +271,8 @@ export default function NativePageEnhancements({ locale }: Props) {
             <h2 className="font-neo-display text-3xl font-black leading-[0.95] sm:text-4xl">{c.ctaHeading}</h2>
             <p className="mt-3 max-w-xl text-base font-bold sm:text-lg">{c.ctaBody}</p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-              <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">▶ {c.ctaPrimary}</Link>
-              <Link href={`/${locale}/daily`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">★ {c.ctaSecondary}</Link>
+              <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">▶ {c.ctaPrimary}</Link>
+              <Link href={`/${locale}/daily`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">★ {c.ctaSecondary}</Link>
             </div>
             {c.reviewNote && (
               <p className="mt-3 text-[10px] uppercase tracking-widest opacity-60">{c.reviewNote}</p>

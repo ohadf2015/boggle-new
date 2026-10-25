@@ -28,7 +28,7 @@ function FeatureCard({
       className={cn(
         'p-5 rounded-neo border-3 border-neo-black h-full',
         isDarkMode ? 'bg-neo-navy-light' : 'bg-white shadow-hard',
-        href && 'transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg'
+        href && 'transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg'
       )}
     >
       <div className="flex items-center gap-3 mb-3">
@@ -238,7 +238,7 @@ export default function AboutPageClient(): React.ReactElement {
           <a
             href="mailto:lexiclash.game@gmail.com"
             className={cn(
-              'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.02]',
+              'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-[translate,scale,rotate,transform,background-color,box-shadow] hover:scale-[1.02]',
               isDarkMode
                 ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
                 : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'
@@ -262,7 +262,7 @@ export default function AboutPageClient(): React.ReactElement {
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-              'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.02]',
+              'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-[translate,scale,rotate,transform,background-color,box-shadow] hover:scale-[1.02]',
               isDarkMode
                 ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
                 : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'

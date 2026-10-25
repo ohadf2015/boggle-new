@@ -37,7 +37,7 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
           >
             <m.div
               className={cn(
-                'rounded-full border-2 transition-all',
+                'rounded-full border-2 transition',
                 isActive && 'bg-neo-pink border-neo-black scale-125 shadow-hard-sm',
                 isPast && 'bg-neo-cyan border-neo-black',
                 !isActive && !isPast && 'bg-neo-cream border-neo-black/30'

@@ -10,7 +10,7 @@ import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
 
 const CHIP = cn(
   'inline-flex min-h-10 min-w-0 cursor-pointer items-center gap-1.5 rounded-neo border-2 border-neo-cream bg-neo-navy-light px-3',
-  'font-neo-display text-xs font-bold uppercase text-neo-white shadow-hard-sm transition-all',
+  'font-neo-display text-xs font-bold uppercase text-neo-white shadow-hard-sm transition',
   'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-none',
   'focus-within:ring-2 focus-within:ring-neo-cyan',
 );

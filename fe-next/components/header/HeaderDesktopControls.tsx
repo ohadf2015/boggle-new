@@ -36,7 +36,7 @@ const HeaderDesktopControls = memo<HeaderDesktopControlsProps>(({ onSignIn, onSi
                 <Link
                     href={`/${language}${teacherEntry.href}`}
                     data-testid="header-for-teachers"
-                    className="inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-lime bg-neo-lime/10 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-neo-lime hover:bg-neo-lime/20 transition-all"
+                    className="inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-lime bg-neo-lime/10 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-neo-lime hover:bg-neo-lime/20 transition"
                 >
                     <GraduationCap className="w-3.5 h-3.5" aria-hidden="true" />
                     {t(teacherEntry.labelKey)}

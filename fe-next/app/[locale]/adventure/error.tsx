@@ -55,14 +55,14 @@ export default function AdventureError({
           <button
             type="button"
             onClick={reset}
-            className="px-5 py-2 rounded-lg font-bold bg-linear-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white transition-all"
+            className="px-5 py-2 rounded-lg font-bold bg-linear-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white transition-colors"
           >
             {t('common.retry')}
           </button>
           <button
             type="button"
             onClick={() => window.location.href = `/${locale}`}
-            className="px-5 py-2 rounded-lg font-bold bg-neo-navy-light text-white border border-gray-600 hover:bg-neo-navy-elevated transition-all"
+            className="px-5 py-2 rounded-lg font-bold bg-neo-navy-light text-white border border-gray-600 hover:bg-neo-navy-elevated transition-[background-color]"
           >
             {t('common.back')}
           </button>

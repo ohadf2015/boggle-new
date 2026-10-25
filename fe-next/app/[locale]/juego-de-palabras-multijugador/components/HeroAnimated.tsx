@@ -80,7 +80,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
               data-magnetic
               className={cn(
                 'group inline-flex items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-pink px-7 py-4 font-neo-display text-base font-black uppercase tracking-wide text-neo-navy shadow-hard-lg',
-                'transition-all duration-150 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed sm:text-lg'
+                'transition-[translate,scale,rotate,transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed sm:text-lg'
               )}
             >
               Jugar ahora
@@ -90,7 +90,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
               href={`/${locale}/singleplayer?autoStart=bots`}
               className={cn(
                 'inline-flex items-center justify-center gap-2 rounded-neo border-3 border-neo-cyan bg-transparent px-7 py-4 font-neo-display text-base font-black uppercase tracking-wide text-neo-cyan shadow-hard-cyan',
-                'transition-all duration-150 hover:-translate-y-0.5 hover:bg-neo-cyan/10 sm:text-lg'
+                'transition-[translate,scale,rotate,transform,background-color] duration-150 hover:-translate-y-0.5 hover:bg-neo-cyan/10 sm:text-lg'
               )}
             >
               Probar solo

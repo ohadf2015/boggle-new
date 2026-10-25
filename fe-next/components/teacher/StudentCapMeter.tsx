@@ -83,7 +83,7 @@ export function StudentCapMeter({
             <button
               type="button"
               data-testid="student-cap-upgrade-cta"
-              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard"
               onClick={() => {
                 trackGrowthEvent('landing_cta_clicked', {
                   cta: 'teacher_pro',
@@ -101,7 +101,7 @@ export function StudentCapMeter({
             <Link
               href={`/${language}/teacher/upgrade`}
               data-testid="student-cap-upgrade-cta"
-              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan px-3 py-2 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard"
               onClick={() =>
                 trackGrowthEvent('landing_cta_clicked', {
                   cta: 'teacher_pro',

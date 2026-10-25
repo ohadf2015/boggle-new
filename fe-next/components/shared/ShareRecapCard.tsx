@@ -170,7 +170,7 @@ export const ShareRecapCard: React.FC<ShareRecapCardProps> = ({
         <Button
           onClick={onShare}
           size="sm"
-          className="flex-1 py-2.5 bg-neo-cyan text-neo-black border-2 border-neo-black rounded-neo shadow-hard-sm font-black text-xs uppercase hover:shadow-hard transition-all"
+          className="flex-1 py-2.5 bg-neo-cyan text-neo-black border-2 border-neo-black rounded-neo shadow-hard-sm font-black text-xs uppercase hover:shadow-hard transition"
         >
           {shareLabel}
         </Button>
@@ -178,7 +178,7 @@ export const ShareRecapCard: React.FC<ShareRecapCardProps> = ({
           onClick={onCopy}
           size="sm"
           aria-label={copied ? copiedLabel : copyLabel}
-          className="flex-1 py-2.5 bg-neo-navy-light text-white border-2 border-neo-black rounded-neo shadow-hard-sm text-xs uppercase font-black hover:shadow-hard transition-all"
+          className="flex-1 py-2.5 bg-neo-navy-light text-white border-2 border-neo-black rounded-neo shadow-hard-sm text-xs uppercase font-black hover:shadow-hard transition"
         >
           {copied ? copiedLabel : copyLabel}
         </Button>

@@ -200,7 +200,7 @@ function TeacherProfileInner() {
           </div>
           <Link
             href={`/${language}/education/for-schools`}
-            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-neo border-2 border-neo-black bg-neo-cyan px-4 py-2 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard-sm transition-all hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-neo border-2 border-neo-black bg-neo-cyan px-4 py-2 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white"
           >
             <span>{t('teacher.profile.contactAdmin')}</span>
             <DirectionalIcon icon={ArrowRight} className="w-4 h-4" />
