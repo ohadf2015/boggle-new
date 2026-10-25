@@ -1,6 +1,7 @@
 /**
  * Seam test: the daily Word Tower score route credits today's daily quests for
- * authed players (metres climbed + floors built), and never for guests.
+ * authed players (metres climbed + floors built) once the climb is banked
+ * (`final: true`), and never for guests.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
@@ -40,7 +41,7 @@ describe('word tower daily score -> daily quests', () => {
   });
 
   it('credits an authed first submit with metres + floors', async () => {
-    const res = await post({ heightM: 30, floors: 9, language: 'en' });
+    const res = await post({ heightM: 30, floors: 9, language: 'en', final: true });
     expect(res.status).toBe(200);
     expect(creditMock).toHaveBeenCalledTimes(1);
     const [uid, result] = creditMock.mock.calls[0];
@@ -52,7 +53,7 @@ describe('word tower daily score -> daily quests', () => {
 
   it('credits with the merged best (improved update uses the higher of stored/new)', async () => {
     existingRow.current = { id: 'r1', best_height_m: 10, floors: 12 };
-    await post({ heightM: 30, floors: 5, language: 'en' });
+    await post({ heightM: 30, floors: 5, language: 'en', final: true });
     const [, result] = creditMock.mock.calls[0];
     expect(result.towerMetres).toBe(30);
     expect(result.towerFloors).toBe(12);
@@ -60,14 +61,14 @@ describe('word tower daily score -> daily quests', () => {
 
   it('does not credit guests', async () => {
     authedUser.current = null;
-    const res = await post({ heightM: 30, floors: 9, language: 'en', guestFingerprint: 'g1' });
+    const res = await post({ heightM: 30, floors: 9, language: 'en', guestFingerprint: 'g1', final: true });
     expect(res.status).toBe(200);
     // creditDailyQuests itself no-ops without a user id (see questSeams.test.ts);
     // the route must never pass a guest identity through as a user id.
     for (const [uid] of creditMock.mock.calls) expect(uid).toBeFalsy();
   });
 
-  it('does not re-credit when the submit is not an improvement', async () => {
+  it('does not credit a mid-climb tick that is not an improvement', async () => {
     existingRow.current = { id: 'r1', best_height_m: 50, floors: 20 };
     await post({ heightM: 30, floors: 9, language: 'en' });
     expect(creditMock).not.toHaveBeenCalled();
