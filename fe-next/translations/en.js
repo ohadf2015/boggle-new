@@ -20032,6 +20032,9 @@ const en = {
       "toTeacher": "Back to teacher home"
     },
     "hostResults": {
+      "invitePrompt": "Know a teacher who'd like this?",
+      "inviteCta": "Invite a colleague",
+      "inviteText": "My class just played a word game on LexiClash. It's free for teachers, have a look:",
       "noScoresHint": "Same board, fresh start. Play again and the class gets another go.",
       "title": "Round results",
       "statStudents": "Students",

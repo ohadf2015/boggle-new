@@ -20973,6 +20973,9 @@ const sv = {
       "toTeacher": "Tillbaka till lärarstarten"
     },
     "hostResults": {
+      "invitePrompt": "Känner du en lärare som skulle gilla det här?",
+      "inviteCta": "Bjud in en kollega",
+      "inviteText": "Min klass spelade just ett ordspel på LexiClash. Det är gratis för lärare, ta en titt:",
       "noScoresHint": "Samma bräde, ny start. Spela igen så får klassen ett nytt försök.",
       "title": "Rundans resultat",
       "statStudents": "Elever",

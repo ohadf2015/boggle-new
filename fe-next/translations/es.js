@@ -20985,6 +20985,9 @@ const es = {
       "toTeacher": "Volver al inicio de profe"
     },
     "hostResults": {
+      "invitePrompt": "¿Conoces a un docente a quien le gustaría?",
+      "inviteCta": "Invitar a un colega",
+      "inviteText": "Mi clase acaba de jugar a un juego de palabras en LexiClash. Es gratis para docentes, échale un vistazo:",
       "noScoresHint": "Mismo tablero, nuevo intento. Juega otra vez y la clase lo vuelve a probar.",
       "title": "Resultados de la ronda",
       "statStudents": "Alumnos",

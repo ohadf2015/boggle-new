@@ -20973,6 +20973,9 @@ const ja = {
       "toTeacher": "先生ホームに戻る"
     },
     "hostResults": {
+      "invitePrompt": "気に入りそうな先生はいますか？",
+      "inviteCta": "同僚を招待",
+      "inviteText": "うちのクラスでLexiClashのことばゲームをやりました。先生は無料で使えます。よかったら見てみてください：",
       "noScoresHint": "同じ盤面でもう一度。クラスにもう一回チャンスを。",
       "title": "ラウンド結果",
       "statStudents": "生徒",
