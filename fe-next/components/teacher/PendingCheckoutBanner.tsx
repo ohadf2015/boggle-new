@@ -1,8 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { trackGrowthEvent } from '@/utils/growthTracking';
 
 const CTA_CLASS =
   'inline-flex shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-black px-4 py-2 font-neo-display text-sm font-black text-white shadow-hard hover:-translate-y-0.5 disabled:opacity-60';
@@ -14,22 +13,14 @@ const CTA_CLASS =
  * Non-dismissible: resolves automatically once checkout completes or ages out.
  * CTA POSTs /api/subscription/checkout with `{ locale }` to create a fresh
  * Polar checkout session reusing the teacher's customer record.
+ *
+ * The `iap_viewed` impression is fired by the banner effect in
+ * app/[locale]/teacher/PageClient.tsx (source: 'dashboard_pending_checkout'),
+ * same as every other dashboard banner — never here, or it double-counts.
  */
 export function PendingCheckoutBanner() {
   const { t, language } = useLanguage();
   const [pending, setPending] = useState(false);
-
-  useEffect(() => {
-    try {
-      trackGrowthEvent('iap_viewed', {
-        product: 'teacher_pro',
-        source: 'dashboard_pending_checkout',
-        event_type: 'impression',
-      });
-    } catch {
-      /* analytics must never block UI */
-    }
-  }, []);
 
   const handleResume = useCallback(async () => {
     if (pending) return;

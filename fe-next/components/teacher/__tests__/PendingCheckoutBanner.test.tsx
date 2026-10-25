@@ -10,17 +10,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-const trackGrowthEvent = vi.fn();
-vi.mock('@/utils/growthTracking', () => ({
-  trackGrowthEvent: (...a: unknown[]) => trackGrowthEvent(...a),
-}));
-
 describe('PendingCheckoutBanner', () => {
   const originalLocation = window.location;
   const assignMock = vi.fn();
 
   beforeEach(() => {
-    trackGrowthEvent.mockReset();
     assignMock.mockReset();
     Object.defineProperty(window, 'location', {
       configurable: true,
@@ -36,7 +30,9 @@ describe('PendingCheckoutBanner', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders copy keys and fires iap_viewed impression on mount', () => {
+  // The iap_viewed impression lives in PageClient's banner effect (single
+  // source for every dashboard banner) — this component must not self-track.
+  it('renders the resume copy and CTA', () => {
     render(<PendingCheckoutBanner />);
     expect(screen.getByTestId('pending-checkout-banner')).toBeInTheDocument();
     expect(screen.getByText('teacher.subscription.pendingCheckoutTitle')).toBeInTheDocument();
@@ -44,11 +40,6 @@ describe('PendingCheckoutBanner', () => {
     expect(screen.getByTestId('pending-checkout-cta')).toHaveTextContent(
       'teacher.subscription.pendingCheckoutCta',
     );
-    expect(trackGrowthEvent).toHaveBeenCalledWith('iap_viewed', {
-      product: 'teacher_pro',
-      source: 'dashboard_pending_checkout',
-      event_type: 'impression',
-    });
   });
 
   it('POSTs /api/subscription/checkout with locale and calls window.location.assign(url)', async () => {
