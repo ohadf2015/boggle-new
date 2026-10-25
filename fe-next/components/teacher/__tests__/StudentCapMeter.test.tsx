@@ -90,6 +90,17 @@ describe('StudentCapMeter', () => {
     expect(screen.getByTestId('plan-gate-sheet')).toHaveAttribute('data-reason', 'student_limit');
   });
 
+  it('is not at the cap for a teacher on a live access trial, matching the server cap', () => {
+    mockUseTeacherPro.mockReturnValue({
+      hasPro: false,
+      loading: false,
+      accessTrialExpires: new Date(Date.now() + 3 * 86_400_000).toISOString(),
+      refresh: vi.fn(),
+    });
+    render(<StudentCapMeter studentCount={FREE_TIER_LIMITS.studentsPerClass} />);
+    expect(screen.queryByTestId('student-cap-upgrade-cta')).toBeNull();
+  });
+
   it('hides the CTA for a Pro teacher', () => {
     mockUseTeacherPro.mockReturnValue({
       hasPro: true,

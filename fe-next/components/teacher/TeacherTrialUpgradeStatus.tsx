@@ -10,6 +10,7 @@ import { shouldShowTeacherTrialUpgradeStatus } from '@/lib/education/trial';
 import {
   goToPolarCheckout,
   postTeacherProCheckout,
+  checkoutFailureKey,
 } from '@/lib/education/postTeacherProCheckout';
 import {
   trackTeacherTrialUpgradeCtaClicked,
@@ -84,13 +85,7 @@ export function TeacherTrialUpgradeStatus({ suppressed = false }: { suppressed?:
         startPolarTrial ? { trial: true, placement: 'hq_trial_status' } : { placement: 'hq_trial_status' },
       );
       if (!result.ok) {
-        if (result.status === 401) {
-          toast.error(t('teacher.subscription.signInRequired'));
-        } else if (result.status === 503) {
-          toast.error(t('teacher.subscription.checkoutUnavailable'));
-        } else {
-          toast.error(t('teacher.subscription.checkoutError'));
-        }
+        toast.error(t(checkoutFailureKey(result)));
         return;
       }
       goToPolarCheckout(result.url);

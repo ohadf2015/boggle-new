@@ -10,7 +10,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { getTierConfig } from '@/lib/lemonsqueezy';
+import { getTierConfig } from '@/lib/education/tierConfig';
 import { PRO_FEATURES } from '@/components/teacher/ProGate';
 
 const UPGRADE_PAGE = join(__dirname, '../../../[locale]/teacher/upgrade/PageClient.tsx');

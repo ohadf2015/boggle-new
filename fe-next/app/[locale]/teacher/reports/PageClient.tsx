@@ -54,7 +54,7 @@ const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
  *
  * Classroom picker → class report → student report, one level at a time.
  */
-function TeacherReportsInner() {
+function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: boolean }) {
   const { t, dir } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
@@ -337,7 +337,7 @@ function TeacherReportsInner() {
                         free teacher never sees two upsell cards stacked here. */}
                     <ExportAllClassesButton />
                   </div>
-                  <GoogleClassroomGradePassback classroomId={selectedClassroomId} />
+                  <GoogleClassroomGradePassback classroomId={selectedClassroomId} enabled={gradePassbackEnabled} />
                   <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
                 </div>
               </ProGate>
@@ -386,11 +386,11 @@ function roundPreviewProps(value: string | null | undefined) {
   return { previewGames: [ROUND_FIXTURE], previewPro: value === 'pro' };
 }
 
-export default function TeacherReportsPage() {
+export default function TeacherReportsPage({ gradePassbackEnabled = false }: { gradePassbackEnabled?: boolean }) {
   return (
     <ReportsShell>
       <TeacherGate>
-        <TeacherReportsInner />
+        <TeacherReportsInner gradePassbackEnabled={gradePassbackEnabled} />
       </TeacherGate>
     </ReportsShell>
   );

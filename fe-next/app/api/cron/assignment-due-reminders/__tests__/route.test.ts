@@ -118,6 +118,29 @@ describe('/api/cron/assignment-due-reminders', () => {
     expect(h.upsertSpy).toHaveBeenCalled();
   });
 
+  it('treats a teacher whose admin grant has expired as free (upgrade link shown)', async () => {
+    const due = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    h.tables.lesson_assignments = {
+      data: [{ id: 'a1', classroom_id: 'c1', lesson_id: 'l1', due_date: due, title: 'Week 3' }],
+      error: null,
+    };
+    h.tables.classrooms = { data: [{ id: 'c1', name: 'Year 7', teacher_id: 't1' }], error: null };
+    h.tables.vocabulary_lessons = { data: [{ id: 'l1', name: 'Week 3 nouns' }], error: null };
+    h.tables.classroom_memberships = { data: [{ classroom_id: 'c1', student_id: 's1' }], error: null };
+    h.tables.teacher_access_requests = {
+      data: [{ user_id: 't1', email: 'ada@school.edu', full_name: 'Ada', locale: 'en' }],
+      error: null,
+    };
+    h.tables.subscriptions = {
+      data: [{ user_id: 't1', tier: 'pro', status: 'active', source: 'admin_grant', current_period_end: '2020-01-01T00:00:00Z' }],
+      error: null,
+    };
+
+    await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    const html = h.sendEmailSpy.mock.calls[0][0].html as string;
+    expect(html).toContain('/en/teacher/upgrade');
+  });
+
   it('dry run sends nothing', async () => {
     const due = new Date(Date.now() - 60 * 60 * 1000).toISOString();
     h.tables.lesson_assignments = {

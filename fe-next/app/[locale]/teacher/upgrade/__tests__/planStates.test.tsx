@@ -141,3 +141,18 @@ describe('plan page — free teacher', () => {
     expect(screen.getByTestId('school-monthly').textContent).toBe('eduPlans.cards.schoolMonthly|$4.08|54');
   });
 });
+
+describe('plan page — inside the native app', () => {
+  afterEach(() => {
+    delete (globalThis as { Capacitor?: unknown }).Capacitor;
+  });
+
+  it('shows no purchase UI, only a line saying Teacher Pro is not sold in the app', async () => {
+    (globalThis as { Capacitor?: unknown }).Capacitor = { isNativePlatform: () => true };
+    auth.user = { id: 't1' };
+    Object.assign(pro, { known: true, hasPro: false });
+    render(<PageClient />);
+    expect(await screen.findByTestId('upgrade-not-in-app')).toHaveTextContent('teacher.subscription.notInApp');
+    expect(screen.queryByTestId('pricing-cards')).toBeNull();
+  });
+});

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { Crown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -7,14 +8,16 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { hasProAccess } from '@/lib/education/teacherPlanGate';
 import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProCheckoutCta';
 
 /** Free-class usage on the Classes tab: quiet with one slot left, one Pro link at the cap. */
 export function ClassCapMeter({ count, className }: { count: number; className?: string }) {
   const { t, language } = useLanguage();
-  const { hasPro, loading } = useTeacherPro();
+  const pro = useTeacherPro();
+  const [nowMs] = useState(() => Date.now());
   const limit = FREE_TIER_LIMITS.classes;
-  if (loading || hasPro || count < limit - 1) return null;
+  if (pro.loading || hasProAccess(pro, nowMs) || count < limit - 1) return null;
   const full = count >= limit;
 
   return (

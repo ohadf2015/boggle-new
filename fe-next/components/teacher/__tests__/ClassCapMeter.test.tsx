@@ -8,7 +8,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('next/link', () => ({
   default: ({ href, children, ...props }: React.PropsWithChildren<{ href: string }>) => <a href={href} {...props}>{children}</a>,
 }));
-const pro = { hasPro: false, loading: false };
+const pro: { hasPro: boolean; loading: boolean; accessTrialExpires?: string | null } = { hasPro: false, loading: false };
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 
@@ -17,9 +17,15 @@ import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 
 const LIMIT = FREE_TIER_LIMITS.classes;
 
-beforeEach(() => Object.assign(pro, { hasPro: false, loading: false }));
+beforeEach(() => Object.assign(pro, { hasPro: false, loading: false, accessTrialExpires: null }));
 
 describe('ClassCapMeter', () => {
+  it('stays hidden for a teacher on a live access trial, matching the server cap', () => {
+    pro.accessTrialExpires = new Date(Date.now() + 3 * 86_400_000).toISOString();
+    const { container } = render(<ClassCapMeter count={LIMIT} />);
+    expect(container.firstChild).toBeNull();
+  });
+
   it('stays out of the way while a free teacher is well under the cap', () => {
     const { container } = render(<ClassCapMeter count={LIMIT - 2} />);
     expect(container.firstChild).toBeNull();

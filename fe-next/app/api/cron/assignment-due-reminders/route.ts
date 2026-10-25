@@ -17,6 +17,7 @@ import {
 import type { TeacherLocale } from '@/lib/education/types';
 import { captureApiError } from '@/utils/sentry';
 import { withCronLock } from '@/backend/redis/locking';
+import { proUserIdsFrom, type SubscriptionRowLike } from '@/lib/education/proGrant';
 
 /**
  * POST /api/cron/assignment-due-reminders
@@ -171,15 +172,14 @@ export async function POST(request: NextRequest) {
 
       const { data: subRows, error: subError } = await supabase
         .from('subscriptions')
-        .select('user_id, tier, status')
+        .select('user_id, tier, status, source, current_period_end')
         .in('user_id', teacherIds);
       if (subError) {
         logger.error(`[Assignment Due] subscriptions select failed: ${subError.message}`);
       }
-      const proUserIds = new Set(
-        ((subRows ?? []) as Array<{ user_id: string; tier: string; status: string }>)
-          .filter((s) => s.tier === 'pro' && (s.status === 'active' || s.status === 'trialing'))
-          .map((s) => s.user_id),
+      const proUserIds = proUserIdsFrom(
+        (subRows ?? []) as Array<SubscriptionRowLike & { user_id: string }>,
+        Date.now(),
       );
 
       if (dry) {

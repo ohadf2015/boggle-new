@@ -57,20 +57,28 @@ describe('classroomUsagePromptReason', () => {
   });
 });
 
+const LIVE = { hasRealLiveGame: true };
+
 describe('teacherUsagePrompt', () => {
+  it('waits for a completed live game with real students, even past a limit', () => {
+    expect(
+      teacherUsagePrompt([{ studentCount: 25, assignmentCreatedCount: 4 }], { hasRealLiveGame: false }),
+    ).toBeNull();
+  });
+
   it('returns null with no classrooms', () => {
-    expect(teacherUsagePrompt([])).toBeNull();
+    expect(teacherUsagePrompt([], LIVE)).toBeNull();
   });
 
   it('ignores a small roster even when assignments are unknown (fail closed)', () => {
-    expect(teacherUsagePrompt([{ studentCount: 2 }])).toBeNull();
+    expect(teacherUsagePrompt([{ studentCount: 2 }], LIVE)).toBeNull();
   });
 
   it('reports the largest roster and its size', () => {
     const hit = teacherUsagePrompt([
       { studentCount: 4, assignmentCreatedCount: 0 },
       { studentCount: 14, assignmentCreatedCount: 0 },
-    ]);
+    ], LIVE);
     expect(hit).toEqual({ reason: 'students', count: 14 });
   });
 
@@ -78,7 +86,7 @@ describe('teacherUsagePrompt', () => {
     const hit = teacherUsagePrompt([
       { studentCount: 2, assignmentCreatedCount: 1 },
       { studentCount: 5, assignmentCreatedCount: 3 },
-    ]);
+    ], LIVE);
     expect(hit).toEqual({ reason: 'assignments', count: 3 });
   });
 
@@ -87,7 +95,7 @@ describe('teacherUsagePrompt', () => {
       teacherUsagePrompt([
         { studentCount: 2, assignmentCreatedCount: 2 },
         { studentCount: 2, assignmentCreatedCount: 2 },
-      ]),
+      ], LIVE),
     ).toBeNull();
   });
 });
@@ -144,4 +152,15 @@ describe('usage prompt dismiss', () => {
       }),
     ).not.toThrow();
   });
+});
+
+describe('the usage prompt card says Pro in its title', () => {
+  const brand: Record<string, RegExp> = { en: /Pro/, sv: /Pro/, ja: /Pro/, es: /Pro/, ru: /Pro/, he: /פרו/ };
+  for (const [locale, pattern] of Object.entries(brand)) {
+    it(`${locale} title names Pro`, async () => {
+      const mod = await import(`@/translations/${locale}`);
+      const dict = (mod[locale] ?? mod.default) as { teacher: { subscription: { usagePromptTitle: string } } };
+      expect(dict.teacher.subscription.usagePromptTitle).toMatch(pattern);
+    });
+  }
 });

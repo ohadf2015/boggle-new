@@ -4,7 +4,7 @@
  * After a class has students AND at least one assignment, HQ should show
  * counts in-view (including zeros) so teachers see evidence of value before
  * the Teacher Pro ask. `assignmentCount === null` is unknown — never treat
- * unknown as zero (same pitfall as firstAssignmentCta).
+ * unknown as zero.
  */
 
 export interface ClassProgressStripState {

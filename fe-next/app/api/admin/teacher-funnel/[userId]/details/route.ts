@@ -152,7 +152,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const subscription = await checkTeacherSubscription(userId);
     plan = {
       tier: subscription.tier,
-      hasPro: subscription.tier === 'pro' && subscription.status === 'active',
+      hasPro: subscription.has_pro,
       periodEnd: subscription.current_period_end,
     };
   } catch {

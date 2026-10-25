@@ -7,6 +7,7 @@
 import { isMachineRequest } from '@/lib/education/teacherFunnel';
 import type { EduDashboardInput } from './eduDashboard';
 import type { WindowDays } from './eduMetrics';
+import { resolveProEntitlement } from '@/lib/education/proGrant';
 
 export interface RawProfile {
   id: string;
@@ -40,6 +41,7 @@ export interface RawSubscription {
   tier?: string | null;
   /** 'grant' for complimentary Pro. Absent before the source column was migrated. */
   source?: string | null;
+  current_period_end?: string | null;
 }
 
 export interface EduRawRows {
@@ -59,8 +61,12 @@ export interface EduRawRows {
 
 const toMs = (ts: string | null) => (ts ? Date.parse(ts) : NaN);
 
-const isPaidPro = (s: RawSubscription) =>
-  s.status === 'active' && (s.tier ?? 'pro') === 'pro' && s.source !== 'grant';
+const isPaidPro = (s: RawSubscription, nowMs: number) =>
+  s.source !== 'grant' &&
+  resolveProEntitlement(
+    { tier: s.tier ?? 'pro', status: s.status, source: s.source, current_period_end: s.current_period_end ?? null },
+    nowMs,
+  ).paid;
 
 function personKey(r: { user_id: string | null; email: string | null }): string {
   return r.user_id ?? (r.email ?? '').trim().toLowerCase();
@@ -115,7 +121,7 @@ export function prepareEduDashboardInput(
 
   const earliestPaid = new Map<string, string>();
   for (const s of raw.subscriptions) {
-    if (!isPaidPro(s) || testIds.has(s.user_id)) continue;
+    if (!isPaidPro(s, nowMs) || testIds.has(s.user_id)) continue;
     const prev = earliestPaid.get(s.user_id);
     if (!prev || toMs(s.created_at) < toMs(prev)) earliestPaid.set(s.user_id, s.created_at);
   }

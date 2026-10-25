@@ -1,7 +1,8 @@
 'use client';
 
 /**
- * "Send grades to Google Classroom" (Teacher Pro, flagged OFF by default).
+ * "Send grades to Google Classroom" (Teacher Pro). `enabled` is the server's
+ * GC_GRADE_PASSBACK_ENABLED, passed down by the reports page, so the button and the routes share one flag.
  * Mounted inside <ProGate feature="reports"> on /teacher/reports. Flow:
  * button → (connect Google if needed) → lesson + course + courseWork →
  * confirm → summary (updated / unmatched / failed / skipped).
@@ -13,7 +14,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { GraduationCap, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getClassroomAssignments } from '@/lib/supabase/education/assignments';
-import { isGradePassbackUiEnabled } from '@/lib/education/googleClassroomGrades';
 
 interface Course { id: string; name: string }
 interface CourseWork { id: string; title: string; maxPoints?: number; associatedWithDeveloper?: boolean }
@@ -58,7 +58,7 @@ const btn =
   'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black px-4 py-2 font-bold shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white disabled:opacity-50 disabled:hover:translate-y-0';
 const selectCls = 'min-h-11 w-full rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-3 py-2 text-neo-white';
 
-export function GoogleClassroomGradePassback({ classroomId }: { classroomId: string }) {
+export function GoogleClassroomGradePassback({ classroomId, enabled }: { classroomId: string; enabled: boolean }) {
   const { t } = useLanguage();
   const [phase, setPhase] = useState<Phase>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +73,6 @@ export function GoogleClassroomGradePassback({ classroomId }: { classroomId: str
   const [summary, setSummary] = useState<PushSummary | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const enabled = isGradePassbackUiEnabled();
 
   // OAuth callback lands back here with ?gc=connected|denied|error.
   useEffect(() => {

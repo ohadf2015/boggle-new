@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import {
   goToPolarCheckout,
   postTeacherProCheckout,
+  checkoutFailureKey,
 } from '@/lib/education/postTeacherProCheckout';
 import {
   trackTrialCtaTap,
@@ -44,13 +45,7 @@ export function TeacherProTrialOfferBanner({ onDismiss }: { onDismiss?: () => vo
     try {
       const result = await postTeacherProCheckout(fetch, { trial: true, locale: language, placement: 'dashboard_trial_offer' });
       if (!result.ok) {
-        if (result.status === 401) {
-          toast.error(t('teacher.subscription.signInRequired'));
-        } else if (result.status === 503) {
-          toast.error(t('teacher.subscription.checkoutUnavailable'));
-        } else {
-          toast.error(t('teacher.subscription.checkoutError'));
-        }
+        toast.error(t(checkoutFailureKey(result)));
         return;
       }
       goToPolarCheckout(result.url);

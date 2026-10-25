@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useTeacherProCheckout } from '@/hooks/useTeacherProCheckout';
+import { useCheckoutBlockedInApp } from '@/hooks/useCheckoutBlockedInApp';
 import type { ProUpgradeSource } from '@/lib/education/proFunnelTelemetry';
 
 const CTA_CLASS =
@@ -17,6 +18,8 @@ export function TeacherProCheckoutButton({
   children: ReactNode;
 }) {
   const { pending, start } = useTeacherProCheckout(source);
+  const blockedInApp = useCheckoutBlockedInApp();
+  if (blockedInApp) return null;
   return (
     <button
       type="button"

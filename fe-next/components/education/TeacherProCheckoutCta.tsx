@@ -7,6 +7,7 @@ import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTie
 import { resultsTrialCopy } from '@/lib/education/pro/trialCtaCopy';
 import { useUpsellImpression, type UpsellImpression } from '@/lib/education/useUpsellImpression';
 import { trackTeacherProUpgradeClick, type TeacherProUpgradePlacement } from '@/lib/education/proFunnelTelemetry';
+import { useCheckoutBlockedInApp } from '@/hooks/useCheckoutBlockedInApp';
 
 /**
  * Hard Teacher Pro checkout CTA for SSR classroom traffic.
@@ -138,6 +139,7 @@ export function TeacherProCheckoutCta({
   const { t } = useLanguage();
   const rootRef = React.useRef<HTMLDivElement>(null);
   useUpsellImpression(rootRef, impression, { locale });
+  const blockedInApp = useCheckoutBlockedInApp();
   const onClick = impression
     ? () => {
         try {
@@ -164,6 +166,7 @@ export function TeacherProCheckoutCta({
     c.cta = tc.trialCta;
     c.note = tc.trialNote;
   }
+  if (blockedInApp) return <></>;
   if (variant === 'inline') {
     return (
       <div ref={rootRef} data-testid="teacher-pro-checkout-cta" className={className}>

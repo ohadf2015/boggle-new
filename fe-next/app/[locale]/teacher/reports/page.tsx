@@ -7,9 +7,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 import ReportsPageClient from './PageClient';
+import { isGradePassbackServerEnabled } from '@/lib/education/googleClassroomGrades';
 
 export const dynamic = 'force-dynamic';
 
 export default function TeacherReportsPage() {
-  return <ReportsPageClient />;
+  return <ReportsPageClient gradePassbackEnabled={isGradePassbackServerEnabled()} />;
 }

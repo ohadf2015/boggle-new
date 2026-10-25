@@ -121,19 +121,44 @@ describe('resolveProEntitlement', () => {
     expect(resolveProEntitlement(null, NOW).hasPro).toBe(false);
   });
 
-  it('a Polar trial (status trialing, tier pro) is Pro — the webhook owns the end date', () => {
+  it('a Polar trial (status trialing, tier pro) is Pro through its end date plus a day of webhook slack', () => {
     const r = resolveProEntitlement({
       tier: 'pro', status: 'trialing', source: 'polar',
-      current_period_end: new Date(NOW - DAY).toISOString(),
+      current_period_end: new Date(NOW - 60 * 60 * 1000).toISOString(),
     }, NOW);
     expect(r.hasPro).toBe(true);
     expect(r.source).toBe('polar');
     expect(r.expired).toBe(false);
+    expect(r.paid).toBe(false);
   });
 
-  it('a canceled or past-due Polar row is not Pro', () => {
+  it('a Polar trial more than a day past its end is not Pro even if the lapse webhook never came', () => {
+    const r = resolveProEntitlement({
+      tier: 'pro', status: 'trialing', source: 'polar',
+      current_period_end: new Date(NOW - 2 * DAY).toISOString(),
+    }, NOW);
+    expect(r.hasPro).toBe(false);
+  });
+
+  it('a Polar trial with no end date stays Pro (nothing to backstop against)', () => {
+    expect(resolveProEntitlement({ tier: 'pro', status: 'trialing', source: 'polar', current_period_end: null }, NOW).hasPro).toBe(true);
+  });
+
+  it('only an active provider row counts as paid', () => {
+    expect(resolveProEntitlement({ tier: 'pro', status: 'active', source: 'polar', current_period_end: null }, NOW).paid).toBe(true);
+    expect(resolveProEntitlement(grant(new Date(NOW + DAY).toISOString()), NOW).paid).toBe(false);
+    expect(resolveProEntitlement(null, NOW).paid).toBe(false);
+  });
+
+  it('past_due keeps Pro for 7 days after the failed renewal date while the provider retries', () => {
+    const pastDue = (endMs: number) => ({ tier: 'pro', status: 'past_due', source: 'polar', current_period_end: new Date(endMs).toISOString() });
+    expect(resolveProEntitlement(pastDue(NOW - 6 * DAY), NOW).hasPro).toBe(true);
+    expect(resolveProEntitlement(pastDue(NOW - 8 * DAY), NOW).hasPro).toBe(false);
+    expect(resolveProEntitlement({ tier: 'pro', status: 'past_due', source: 'polar', current_period_end: null }, NOW).hasPro).toBe(false);
+  });
+
+  it('a canceled or paused Polar row is not Pro', () => {
     expect(resolveProEntitlement({ tier: 'pro', status: 'canceled', source: 'polar', current_period_end: new Date(NOW + DAY).toISOString() }, NOW).hasPro).toBe(false);
-    expect(resolveProEntitlement({ tier: 'pro', status: 'past_due', source: 'polar', current_period_end: new Date(NOW + DAY).toISOString() }, NOW).hasPro).toBe(false);
     expect(resolveProEntitlement({ tier: 'pro', status: 'paused', source: 'polar', current_period_end: null }, NOW).hasPro).toBe(false);
   });
 
@@ -158,5 +183,19 @@ describe('proUserIdsFrom', () => {
       { user_id: 'free', tier: 'free', status: 'active', source: null, current_period_end: null },
     ], NOW);
     expect([...ids].sort()).toEqual(['grant', 'paid', 'trial']);
+  });
+
+  it('counts the same rows as Pro that the entitlement read does, for every lifecycle state', () => {
+    const rows = [
+      { user_id: 'polarActive', tier: 'pro', status: 'active', source: 'polar', current_period_end: '2026-09-01T00:00:00Z' },
+      { user_id: 'legacyNullSource', tier: 'pro', status: 'active', source: null, current_period_end: null },
+      { user_id: 'trialing', tier: 'pro', status: 'trialing', source: 'polar', current_period_end: '2026-09-10T00:00:00Z' },
+      { user_id: 'staleTrial', tier: 'pro', status: 'trialing', source: 'polar', current_period_end: '2026-09-01T00:00:00Z' },
+      { user_id: 'grantValid', tier: 'pro', status: 'active', source: 'admin_grant', current_period_end: '2026-12-31T00:00:00Z' },
+      { user_id: 'grantExpired', tier: 'pro', status: 'active', source: 'admin_grant', current_period_end: '2026-09-04T00:00:00Z' },
+      { user_id: 'canceled', tier: 'pro', status: 'canceled', source: 'polar', current_period_end: '2026-10-01T00:00:00Z' },
+      { user_id: 'revoked', tier: 'free', status: 'canceled', source: 'polar', current_period_end: null },
+    ];
+    expect([...proUserIdsFrom(rows, NOW)].sort()).toEqual(['grantValid', 'legacyNullSource', 'polarActive', 'trialing']);
   });
 });

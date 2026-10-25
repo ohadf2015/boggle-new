@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import {
   TeacherProCheckoutCta,
@@ -37,5 +37,18 @@ describe('TeacherProCheckoutCta', () => {
     expect(teacherProUpgradeCtaLabel('he')).not.toBe('Upgrade to Teacher Pro');
     expect(teacherProUpgradeCtaLabel('HE-IL')).toBe(teacherProUpgradeCtaLabel('he'));
     expect(teacherProUpgradeCtaLabel('xx')).toBe('Upgrade to Teacher Pro');
+  });
+});
+
+describe('TeacherProCheckoutCta inside the native app', () => {
+  afterEach(() => {
+    delete (globalThis as { Capacitor?: unknown }).Capacitor;
+  });
+
+  it('renders no purchase link', async () => {
+    (globalThis as { Capacitor?: unknown }).Capacitor = { isNativePlatform: () => true };
+    render(<TeacherProCheckoutCta locale="en" />);
+    await Promise.resolve();
+    expect(screen.queryByTestId('teacher-pro-checkout-link')).toBeNull();
   });
 });

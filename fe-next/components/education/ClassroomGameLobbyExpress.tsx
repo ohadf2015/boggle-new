@@ -22,7 +22,8 @@ import { useRecentGameSettings } from '@/hooks/useRecentGameSettings';
 import { getSocketURL } from '@/utils/SocketContext';
 import { getClassrooms, getLesson, createLesson } from '@/lib/supabase/education';
 import { createClient } from '@/utils/supabase/client';
-import { classroomMultiplayerPath, socketTeacherName, type LessonGameData } from '@/lib/education/classroomGameHandoff';
+import { socketTeacherName, type LessonGameData } from '@/lib/education/classroomGameHandoff';
+import { classroomLivePath } from '@/lib/education/classroomLivePath';
 import { clearQuickLaunchIntent, type QuickLaunchIntent } from '@/components/teacher/dashboard/quickLaunchIntent';
 import { ModePickerStrip } from './modePicker/ModePickerStrip';
 import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
@@ -311,7 +312,7 @@ export function ClassroomGameLobbyExpress({ intent, onOpenFullSetup }: Classroom
     if (!liveGameCode) return;
     clearQuickLaunchIntent();
     // Replace, not push: a launch page left in history re-launches on Back.
-    router.replace(classroomMultiplayerPath(language, liveGameCode));
+    router.replace(classroomLivePath(language, liveGameCode, { host: true }));
   }, [liveGameCode, router, language]);
 
   const retry = useCallback(() => {

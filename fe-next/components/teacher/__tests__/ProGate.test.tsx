@@ -229,4 +229,27 @@ describe('ProGate', () => {
       cta: 'pro_gate_reports',
     });
   });
+
+  describe('inside the native app', () => {
+    afterEach(() => {
+      delete (globalThis as { Capacitor?: unknown }).Capacitor;
+    });
+
+    it('shows the locked surface without a purchase button, saying Pro is not sold in the app', async () => {
+      (globalThis as { Capacitor?: unknown }).Capacitor = { isNativePlatform: () => true };
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false });
+      render(<ProGate feature="analytics"><div>paid surface</div></ProGate>);
+      expect(await screen.findByTestId('pro-gate-not-in-app')).toHaveTextContent('teacher.subscription.notInApp');
+      expect(screen.queryByTestId('pro-gate-upgrade-analytics')).not.toBeInTheDocument();
+    });
+
+    it('drops the trial strip upgrade button too', async () => {
+      (globalThis as { Capacitor?: unknown }).Capacitor = { isNativePlatform: () => true };
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: new Date(Date.now() + 5 * 86_400_000).toISOString() });
+      render(<ProGate feature="reports"><div>paid surface</div></ProGate>);
+      await screen.findByText('paid surface');
+      await Promise.resolve();
+      expect(screen.queryByTestId('pro-trial-preview-upgrade')).not.toBeInTheDocument();
+    });
+  });
 });

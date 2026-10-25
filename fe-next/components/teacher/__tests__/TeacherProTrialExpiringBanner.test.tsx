@@ -12,7 +12,8 @@ vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: vi.fn() } })
 
 const goToPolarCheckout = vi.fn();
 const postTeacherProCheckout = vi.fn();
-vi.mock('@/lib/education/postTeacherProCheckout', () => ({
+vi.mock('@/lib/education/postTeacherProCheckout', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
   postTeacherProCheckout: (...a: unknown[]) => postTeacherProCheckout(...a),
   goToPolarCheckout: (...a: unknown[]) => goToPolarCheckout(...a),
 }));
@@ -45,8 +46,15 @@ describe('TeacherProTrialExpiringBanner checkout', () => {
     await waitFor(() => expect(screen.getByTestId('teacher-pro-trial-expiring-cta')).not.toBeDisabled());
   });
 
-  it('Given any other failure, When tapped, Then the generic error toast shows', async () => {
+  it('Given a signed-out session (401), When tapped, Then it asks to sign in like every other checkout CTA', async () => {
     postTeacherProCheckout.mockResolvedValue({ ok: false, status: 401 });
+    render(<TeacherProTrialExpiringBanner trialExpires={expiresIn(3)} />);
+    fireEvent.click(screen.getByTestId('teacher-pro-trial-expiring-cta'));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('teacher.subscription.signInRequired'));
+  });
+
+  it('Given any other failure, When tapped, Then the generic error toast shows', async () => {
+    postTeacherProCheckout.mockResolvedValue({ ok: false, status: 500 });
     render(<TeacherProTrialExpiringBanner trialExpires={expiresIn(3)} />);
     fireEvent.click(screen.getByTestId('teacher-pro-trial-expiring-cta'));
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('teacher.subscription.checkoutError'));

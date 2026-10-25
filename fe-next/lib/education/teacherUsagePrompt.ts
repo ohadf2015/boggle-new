@@ -23,6 +23,9 @@ import { TEACHER_PRO_ASK_DISMISS_TTL_MS } from './teacherProMilestone';
 export const TEACHER_USAGE_PROMPT_MIN_STUDENTS = 10;
 export const TEACHER_USAGE_PROMPT_MIN_ASSIGNMENTS = 3;
 
+/** Players in a completed live round for it to count as a real class (a solo self-test does not). */
+export const REAL_CLASS_MIN_PLAYERS = 2;
+
 export const TEACHER_USAGE_PROMPT_DISMISS_KEY = 'lexiclash.teacher_usage_prompt_dismissed';
 
 export type TeacherUsagePromptReason = 'students' | 'assignments';
@@ -54,7 +57,10 @@ export function classroomUsagePromptReason(
  */
 export function teacherUsagePrompt(
   classrooms: TeacherUsageClassroomSnapshot[],
+  { hasRealLiveGame }: { hasRealLiveGame: boolean },
 ): { reason: TeacherUsagePromptReason; count: number } | null {
+  // A roster import or three drafted assignments is not value yet; the ask waits for a real class to play.
+  if (!hasRealLiveGame) return null;
   let maxStudents = 0;
   for (const c of classrooms) maxStudents = Math.max(maxStudents, c.studentCount ?? 0);
   if (maxStudents >= TEACHER_USAGE_PROMPT_MIN_STUDENTS) {

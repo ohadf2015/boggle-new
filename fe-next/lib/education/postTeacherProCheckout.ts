@@ -7,10 +7,24 @@
  */
 
 import { trackEduProCheckoutFailed, type EduProCheckoutFailReason } from '@/lib/education/proFunnelTelemetry';
+import { isNative } from '@/utils/platform';
 
 export type TeacherProCheckoutResult =
   | { ok: true; url: string }
-  | { ok: false; status: number };
+  | { ok: false; status: number; nativeApp?: true };
+
+/** The toast for a failed checkout start, shared by every caller. */
+export function checkoutFailureKey(result: { ok: false; status: number; nativeApp?: true }): string {
+  if (result.nativeApp) return 'teacher.subscription.notInApp';
+  if (result.status === 401) return 'teacher.subscription.signInRequired';
+  if (result.status === 503) return 'teacher.subscription.checkoutUnavailable';
+  return 'teacher.subscription.checkoutError';
+}
+
+/** The Play-distributed wrapper must not sell a digital subscription through an external checkout. */
+export function isCheckoutBlockedInApp(): boolean {
+  return isNative();
+}
 
 function reportFailure(reason: EduProCheckoutFailReason, placement: string, trial: boolean): void {
   try {
@@ -26,6 +40,10 @@ export async function postTeacherProCheckout(
 ): Promise<TeacherProCheckoutResult> {
   const trial = options.trial === true;
   const placement = options.placement ?? 'other';
+  if (isCheckoutBlockedInApp()) {
+    reportFailure('native_app', placement, trial);
+    return { ok: false, status: 0, nativeApp: true };
+  }
   const hasOptions = options.trial !== undefined || options.locale !== undefined;
   let response: Response;
   try {

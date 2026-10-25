@@ -5,7 +5,6 @@ import {
   scaleToMaxPoints,
   matchStudentsByEmail,
   isGradePassbackServerEnabled,
-  isGradePassbackUiEnabled,
 } from '../googleClassroomGrades';
 
 describe('GC_GRADE_PASSBACK_SCOPES', () => {
@@ -121,10 +120,4 @@ describe('feature flags', () => {
     expect(isGradePassbackServerEnabled()).toBe(true);
   });
 
-  it('UI flag defaults OFF', () => {
-    vi.stubEnv('NEXT_PUBLIC_GC_GRADE_PASSBACK', '');
-    expect(isGradePassbackUiEnabled()).toBe(false);
-    vi.stubEnv('NEXT_PUBLIC_GC_GRADE_PASSBACK', 'true');
-    expect(isGradePassbackUiEnabled()).toBe(true);
-  });
 });

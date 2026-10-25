@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAssignments } from '@/hooks/useAssignments';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { hasProAccess } from '@/lib/education/teacherPlanGate';
 import { AssignmentLimitUpsell } from './AssignmentLimitUpsell';
 import { AssignmentTemplateGallery } from './AssignmentTemplateGallery';
 import { useLessons } from '@/hooks/useVocabularyLesson';
@@ -79,15 +80,14 @@ export default function AssignmentCreator({
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { createAssignment, assignments } = useAssignments(classroomId);
-  const { hasPro, status, loading: proLoading } = useTeacherPro();
-  // Soft paywall: a free teacher at the per-class assignment cap gets the
-  // upsell instead of the form. Pro lifts the cap; the entitlement must be
-  // resolved first so we neither flash the gate at a paying teacher nor lock
-  // them out while loading. `assignments` is undefined in older hook mocks —
-  // treat a missing list as 0 rather than at-cap.
+  const pro = useTeacherPro();
+  const { hasPro, status, loading: proLoading } = pro;
+  const [nowMs] = useState(() => Date.now());
+  // Soft paywall: Pro or a live access trial lifts it; wait for the entitlement so a
+  // paying teacher never sees the gate. `assignments` is undefined in older hook mocks.
   const assignmentCount = assignments?.length ?? 0;
   const atAssignmentCap =
-    !proLoading && !hasPro && assignmentCount >= FREE_TIER_LIMITS.assignmentsPerClass;
+    !proLoading && !hasProAccess(pro, nowMs) && assignmentCount >= FREE_TIER_LIMITS.assignmentsPerClass;
   const { lessons, isLoading: isLoadingLessons, createLesson } = useLessons();
   const { classrooms = [] } = useClassrooms();
 

@@ -131,6 +131,7 @@ describe('prepareEduDashboardInput', () => {
         subscriptions: [
           { user_id: 'free', status: 'active', created_at: daysAgo(1), tier: 'free', source: 'grant' },
           { user_id: 'gift', status: 'active', created_at: daysAgo(1), tier: 'pro', source: 'grant' },
+          { user_id: 'adminGift', status: 'active', created_at: daysAgo(1), tier: 'pro', source: 'admin_grant', current_period_end: daysAgo(-30) },
           { user_id: 'paid', status: 'active', created_at: daysAgo(1), tier: 'pro', source: 'polar' },
           { user_id: 'legacy', status: 'active', created_at: daysAgo(1), tier: 'pro' },
         ],

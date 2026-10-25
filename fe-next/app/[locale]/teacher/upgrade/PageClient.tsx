@@ -17,6 +17,7 @@ import { polarTrialUx } from '@/lib/education/polarTrial';
 import { trackTrialCtaView } from '@/lib/education/proFunnelTelemetry';
 import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
 import { useUpgradeCheckout } from '@/hooks/useUpgradeCheckout';
+import { useCheckoutBlockedInApp } from '@/hooks/useCheckoutBlockedInApp';
 import { upgradeViewer, showTrialOffer } from '@/lib/education/pro/upgradeViewer';
 import { readAskSchoolParams, type UpgradeTab } from '@/lib/education/pro/askSchool';
 import { PlanComparisonMatrix } from '@/components/teacher/PlanComparisonMatrix';
@@ -80,6 +81,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
     }
   }, [showTrial, viewer]);
 
+  const blockedInApp = useCheckoutBlockedInApp();
   const { pending, handleUpgrade, showAuthModal, setShowAuthModal } = useUpgradeCheckout({
     t, language, user, authLoading, proLoading, known, hasPro, offerTrial,
   });
@@ -226,6 +228,11 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
 
             {tab === 'teacher' ? (
               <div id="upgrade-panel-teacher" role="tabpanel" aria-labelledby="upgrade-tab-teacher" data-testid="upgrade-hero-section">
+                {blockedInApp ? (
+                  <p data-testid="upgrade-not-in-app" className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-4 text-center text-sm font-bold text-neo-white">
+                    {t('teacher.subscription.notInApp')}
+                  </p>
+                ) : (
                 <UpgradePlanCards
                   viewer={viewer}
                   freeFeatures={freeFeatures}
@@ -259,6 +266,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                     )
                   }
                 />
+                )}
                 <p className="mt-3 text-center text-xs font-bold text-neo-white/70">
                   {t('eduPlans.cards.liveCapNote', { players: MAX_PLAYERS_PER_ROOM })}
                 </p>

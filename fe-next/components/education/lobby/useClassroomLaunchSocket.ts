@@ -17,7 +17,7 @@ import { io, type Socket } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
 import { getSocketURL } from '@/utils/SocketContext';
-import { classroomMultiplayerPath } from '@/lib/education/classroomGameHandoff';
+import { classroomLivePath } from '@/lib/education/classroomLivePath';
 import { recordLessonPlays } from '@/lib/education/lessonPlayStat';
 import type { ClassroomGameMode, PracticeFocusSetting, VocabQuizVariant } from '@/shared/types/vocabQuiz';
 import type { PlayStyle } from '@/shared/utils/teamBattle';
@@ -226,7 +226,7 @@ export function useClassroomLaunchSocket(t: Translate, language: string) {
 
   const startLiveGame = useCallback(() => {
     if (roomCreatedGameCode) {
-      router.push(classroomMultiplayerPath(language, roomCreatedGameCode));
+      router.push(classroomLivePath(language, roomCreatedGameCode, { host: true }));
     }
   }, [roomCreatedGameCode, router, language]);
 

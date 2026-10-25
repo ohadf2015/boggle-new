@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { PRO_FEATURES } from '../ProGate';
-import { getTierConfig } from '@/lib/lemonsqueezy';
+import { getTierConfig } from '@/lib/education/tierConfig';
 import { PLAN_MATRIX_ROWS } from '@/lib/education/planMatrix';
 
 const ROOT = join(__dirname, '../../..');

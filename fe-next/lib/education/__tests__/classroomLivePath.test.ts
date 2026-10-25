@@ -5,7 +5,7 @@ import {
   readClassroomLiveFlags,
   legacyClassroomLiveRedirect,
 } from '@/lib/education/classroomLivePath';
-import { classroomMultiplayerPath, shouldLoadLessonData } from '@/lib/education/classroomGameHandoff';
+import { shouldLoadLessonData } from '@/lib/education/classroomGameHandoff';
 import { joinSuccessHref } from '@/lib/navigation/eduExitTargets';
 import { signedInJoinHref } from '@/lib/education/signedInJoin';
 
@@ -20,10 +20,6 @@ describe('classroomLivePath', () => {
 
   it('given a code with stray characters, when built, then the code is URL-encoded', () => {
     expect(classroomLivePath('en', 'AB C')).toBe('/en/education/live?room=AB%20C');
-  });
-
-  it('given the deprecated lobby builder, when called, then it returns the new host path', () => {
-    expect(classroomMultiplayerPath('sv', 'XYZ789')).toBe('/sv/education/live?room=XYZ789&host=1');
   });
 
   it('given a join that resolved to a live game, when routed, then students land on the live route', () => {

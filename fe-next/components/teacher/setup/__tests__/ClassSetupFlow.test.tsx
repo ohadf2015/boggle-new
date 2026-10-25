@@ -23,7 +23,7 @@ let classrooms: { id: string; name: string; join_code: string; member_count: num
 vi.mock('@/hooks/useClassroom', () => ({
   useClassrooms: () => ({ classrooms, isLoading: false, error: null, createClassroom, refresh: vi.fn() }),
 }));
-let pro = { hasPro: false, loading: false };
+let pro: { hasPro: boolean; loading: boolean; accessTrialExpires?: string | null } = { hasPro: false, loading: false };
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
 let trial: { isExpired: boolean } | null = null;
 vi.mock('@/lib/education/useTeacherAccess', () => ({ useTeacherAccess: () => ({ trial, isLoading: false }) }));
@@ -95,6 +95,13 @@ describe('<ClassSetupFlow>', () => {
 
   it('Given a Pro teacher, Then there is no cap meter', () => {
     pro = { hasPro: true, loading: false };
+    render(<ClassSetupFlow />);
+    expect(screen.queryByTestId('setup-cap-meter')).not.toBeInTheDocument();
+  });
+
+  it('Given a teacher on a live access trial, Then there is no cap meter, matching the server cap', () => {
+    pro = { hasPro: false, loading: false, accessTrialExpires: new Date(Date.now() + 3 * 86_400_000).toISOString() };
+    classrooms = [{ id: 'a', name: 'A', join_code: 'AAAA', member_count: 0, language: 'en' }];
     render(<ClassSetupFlow />);
     expect(screen.queryByTestId('setup-cap-meter')).not.toBeInTheDocument();
   });

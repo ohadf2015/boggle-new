@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { isCheckoutBlockedInApp } from '@/lib/education/postTeacherProCheckout';
 import {
   markResumeCheckoutIntent,
   clearResumeCheckoutIntent,
@@ -39,6 +40,10 @@ export function useUpgradeCheckout({ t, language, user, authLoading, proLoading,
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleUpgrade = useCallback(async (trial: boolean) => {
+    if (isCheckoutBlockedInApp()) {
+      toast(t('teacher.subscription.notInApp'));
+      return;
+    }
     setPending(trial ? 'trial' : 'paid');
     if (trial) {
       try {
