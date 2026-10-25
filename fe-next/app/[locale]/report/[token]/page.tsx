@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { verifyParentReportToken } from '@/lib/education/parentReportToken';
 import { loadParentReportData } from '@/lib/education/parentReportData';
+import { isParentReportRevoked } from '@/lib/education/parentReportRevocation';
 import { translateKey } from '@/lib/i18n/serverTranslate';
 import { interpolate } from '@/components/education/lobby/eduText';
 import { isRTL, type Locale } from '@/i18n/config';
@@ -15,8 +16,8 @@ import { buildParentReportViewedEvent } from '@/backend/utils/educationRoundTele
  * Public "parent report" page — no account needed, the signed token in the
  * URL IS the access control (see `lib/education/parentReportToken.ts`).
  *
- * Every failure mode (malformed/tampered/expired token, service role not
- * configured, student no longer on the roster, or a query error) renders
+ * Every failure mode (malformed/tampered/expired/revoked token, service role
+ * not configured, student no longer on the roster, or a query error) renders
  * the SAME friendly "link not available" view, so the page never hints at
  * which check failed. A real backend error still gets logged.
  *
@@ -34,6 +35,7 @@ export async function generateMetadata({
     title: translateKey('parentReport.metaTitle', locale),
     description: translateKey('parentReport.metaDescription', locale),
     robots: { index: false, follow: false },
+    referrer: 'no-referrer',
   };
 }
 
@@ -67,6 +69,8 @@ export default async function ParentReportPage({
     logger.error('[parent-report-page] service role key not configured');
     return <InvalidReportView locale={locale} t={t} />;
   }
+
+  if (await isParentReportRevoked(admin, payload)) return <InvalidReportView locale={locale} t={t} />;
 
   const result = await loadParentReportData(admin, payload.studentId, payload.classroomId);
   if (result.status === 'error') {

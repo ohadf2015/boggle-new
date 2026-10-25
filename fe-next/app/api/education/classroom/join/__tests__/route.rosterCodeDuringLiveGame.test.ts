@@ -15,6 +15,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
  */
 
 vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }));
+vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: () => ({ from: () => ({ insert: async () => ({ error: null }) }) }) }));
 vi.mock('@/lib/auth/getAuthedUser', () => ({
   getAuthedUser: vi.fn(async () => ({ id: 'student-1' })),
 }));

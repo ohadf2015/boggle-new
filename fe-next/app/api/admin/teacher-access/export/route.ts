@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
+import { csvCell } from '@/lib/admin/csvCell';
 
 export async function GET(req: Request) {
   const sb = await createClient();
@@ -16,11 +17,12 @@ export async function GET(req: Request) {
   if (locale) q = q.eq('locale', locale);
   if (country) q = q.eq('country', country);
 
-  const { data } = await q;
+  const { data, error } = await q;
+  if (error) return new Response('Export failed', { status: 500 });
   const rows = data || [];
   const headers = ['id','created_at','email','full_name','role','locale','country','school_or_org','status','admin_note','use_case'];
   const csv = [headers.join(',')].concat(
-    rows.map((r: any) => headers.map((h) => `"${String(r[h] ?? '').replace(/"/g, '""')}"`).join(','))
+    rows.map((r: any) => headers.map((h) => csvCell(r[h])).join(','))
   ).join('\n');
 
   return new Response(csv, {

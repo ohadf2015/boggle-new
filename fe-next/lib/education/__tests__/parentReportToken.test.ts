@@ -48,6 +48,7 @@ describe('parentReportToken', () => {
         studentId: 'student-1',
         classroomId: 'classroom-1',
         exp: now + PARENT_REPORT_TOKEN_DAYS * DAY_MS,
+        iat: now,
       });
     });
 

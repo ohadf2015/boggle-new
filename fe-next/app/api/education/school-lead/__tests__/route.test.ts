@@ -10,11 +10,18 @@ const { insertSpy, sendEmailSpy } = h;
 
 vi.mock('@/utils/supabase/server', () => ({
   createClient: async () => ({
-    // Rate-limit goes through a SECURITY DEFINER boolean rpc (RLS-safe), not a SELECT.
-    rpc: vi.fn(async (_fn: string, _args: unknown) => ({ data: h.rpcError ? null : h.rateLimited, error: h.rpcError })),
+    rpc: vi.fn(async () => {
+      throw new Error('anon has no EXECUTE on school_lead_rate_limited; the limiter must use the service role');
+    }),
     from: () => ({
       insert: h.insertSpy,
     }),
+  }),
+}));
+
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: () => ({
+    rpc: vi.fn(async (_fn: string, _args: unknown) => ({ data: h.rpcError ? null : h.rateLimited, error: h.rpcError })),
   }),
 }));
 
@@ -23,10 +30,11 @@ vi.mock('@/lib/email/send', () => ({ sendEmail: h.sendEmailSpy }));
 import { POST } from '../route';
 import { SCHOOL_LEAD_NOTIFY_TO } from '@/lib/education/schoolLeadNotify';
 
-const mkReq = (body: any): Request =>
+let ipSeq = 0;
+const mkReq = (body: any, ip = `198.18.0.${++ipSeq}`): Request =>
   new Request('http://test/api/education/school-lead', {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', 'x-forwarded-for': ip },
     body: JSON.stringify(body),
   });
 
@@ -117,10 +125,26 @@ describe('POST /api/education/school-lead', () => {
     expect(insertSpy).not.toHaveBeenCalled();
   });
 
-  it('fails OPEN (still captures the lead) if the rate-limit RPC errors', async () => {
+  it('fails closed when the per-email limiter cannot answer', async () => {
     h.rpcError = { message: 'rpc boom' };
     const res = await POST(mkReq(valid));
-    expect(res.status).toBe(200);
-    expect(insertSpy).toHaveBeenCalledTimes(1);
+    expect(res.status).toBe(503);
+    expect(insertSpy).not.toHaveBeenCalled();
+  });
+
+  it('limits one IP rotating emails', async () => {
+    const statuses: number[] = [];
+    for (let i = 0; i < 8; i++) {
+      statuses.push((await POST(mkReq({ ...valid, email: `p${i}@school${i}.edu` }, '198.19.0.1'))).status);
+    }
+    expect(statuses.slice(0, 5).every((s) => s === 200)).toBe(true);
+    expect(statuses.at(-1)).toBe(429);
+  });
+
+  it('does not echo database errors to the caller', async () => {
+    insertSpy.mockResolvedValueOnce({ data: null, error: { message: 'duplicate key value violates unique constraint "school_leads_pkey"' } } as never);
+    const res = await POST(mkReq(valid));
+    expect(res.status).toBe(500);
+    expect(JSON.stringify(await res.json())).not.toMatch(/school_leads|constraint/);
   });
 });

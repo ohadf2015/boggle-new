@@ -3,6 +3,8 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { suggestAvailableGuestName } from '@/lib/education/guestNameCollision';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 import logger from '@/utils/logger';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { canAddStudent } from '@/lib/subscriptions';
 
 /**
  * POST /api/education/guest-name  { name, joinCode? }
@@ -33,6 +35,12 @@ import logger from '@/utils/logger';
  * cannot join because our lookup broke is a real one.
  */
 export async function POST(request: Request) {
+  // Sized for a class behind one school NAT; a roster prober needs far more.
+  const limit = checkApiRateLimit(request as never, 'education-guest-name', { maxRequests: 120, windowMs: 60_000 });
+  if (!limit.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -85,6 +93,10 @@ export async function POST(request: Request) {
     // must not read as "that name is taken".
     if (!classroomId) {
       return NextResponse.json({ available: true, name });
+    }
+
+    if (await classIsFull(classroomId)) {
+      return NextResponse.json({ code: 'STUDENT_LIMIT_REACHED' }, { status: 403 });
     }
 
     // TWO reads, not an embed. `classroom_memberships` has exactly two foreign
@@ -147,5 +159,15 @@ export async function POST(request: Request) {
   } catch (err) {
     logger.error('guest-name: unexpected failure', err);
     return NextResponse.json({ available: true, name });
+  }
+}
+
+async function classIsFull(classroomId: string): Promise<boolean> {
+  try {
+    const seat = await canAddStudent(classroomId);
+    return !seat.allowed && seat.limit !== null && seat.currentCount >= seat.limit;
+  } catch (err) {
+    logger.warn('guest-name: seat check failed', err);
+    return false;
   }
 }

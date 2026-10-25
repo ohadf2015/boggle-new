@@ -14,6 +14,7 @@ import { buildClassDetail, type ClassDetailInput } from '@/lib/admin/eduClassDet
 import { slimClassroomGame } from '@/lib/education/teacherActivity';
 import { getRecentClassroomGames } from '@/lib/supabase/analyticsLastGame';
 import { migrationPendingHint } from '@/lib/supabase/migrationPendingHint';
+import { fetchAllRows } from '@/lib/admin/fetchAllRows';
 
 const DAY_MS = 86_400_000;
 const RECENT_GAMES = 10;
@@ -44,7 +45,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
       .select('id, name, join_code, language, created_at, teacher_id')
       .eq('id', classId)
       .maybeSingle(),
-    supabase.from('classroom_memberships').select('student_id, joined_at').eq('classroom_id', classId),
+    fetchAllRows<ClassDetailInput['memberships'][number]>((from, to) =>
+      supabase.from('classroom_memberships').select('student_id, joined_at').eq('classroom_id', classId).order('student_id').range(from, to),
+    ),
     supabase
       .from('lesson_assignments')
       .select('id, lesson_id, due_date, created_at')
@@ -58,9 +61,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
     getRecentClassroomGames(classId, RECENT_GAMES, { fallbackName: 'Student' }, supabase),
   ]);
 
-  const firstError = classRes.error || membershipsRes.error || assignmentsRes.error;
+  const firstError = classRes.error?.message || membershipsRes.error || assignmentsRes.error?.message;
   if (firstError) {
-    return NextResponse.json({ error: firstError.message }, { status: 500 });
+    return NextResponse.json({ error: firstError }, { status: 500 });
   }
   if (!classRes.data) {
     return NextResponse.json({ error: 'Class not found' }, { status: 404 });
@@ -78,18 +81,28 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
   const [profilesRes, lessonsRes, progressRes] = await Promise.all([
     profileIds.length
-      ? supabase.from('profiles').select('id, display_name, username, last_seen_at, is_test_account').in('id', profileIds)
+      ? fetchAllRows<ClassDetailInput['profiles'][number]>((from, to) =>
+          supabase.from('profiles').select('id, display_name, username, last_seen_at, is_test_account').in('id', profileIds).order('id').range(from, to),
+        )
       : Promise.resolve({ data: [], error: null }),
     lessonIds.length
       ? supabase.from('vocabulary_lessons').select('id, name').in('id', lessonIds)
       : Promise.resolve({ data: [], error: null }),
     assignmentIds.length
-      ? supabase.from('student_lesson_progress').select('assignment_id, student_id, completed_at').in('assignment_id', assignmentIds)
+      ? fetchAllRows<ClassDetailInput['progress'][number]>((from, to) =>
+          supabase
+            .from('student_lesson_progress')
+            .select('assignment_id, student_id, completed_at')
+            .in('assignment_id', assignmentIds)
+            .order('assignment_id')
+            .order('student_id')
+            .range(from, to),
+        )
       : Promise.resolve({ data: [], error: null }),
   ]);
-  const followError = profilesRes.error || lessonsRes.error || progressRes.error;
+  const followError = profilesRes.error || lessonsRes.error?.message || progressRes.error;
   if (followError) {
-    return NextResponse.json({ error: followError.message }, { status: 500 });
+    return NextResponse.json({ error: followError }, { status: 500 });
   }
 
   return NextResponse.json(
