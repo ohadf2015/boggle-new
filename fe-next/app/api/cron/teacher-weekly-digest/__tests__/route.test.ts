@@ -128,6 +128,23 @@ describe('/api/cron/teacher-weekly-digest', () => {
     expect(html).toContain('/en/teacher/upgrade');
   });
 
+  it('treats a teacher whose admin grant has expired as free (Polar CTA shown)', async () => {
+    seedTeacherWithClass();
+    h.tables.classroom_memberships = { data: [{ classroom_id: 'c1', student_id: 's1' }], error: null };
+    h.tables.practice_sessions = {
+      data: [{ classroom_id: 'c1', student_id: 's1', completed_at: new Date().toISOString(), results: { lessonWordsFound: ['a'], lessonWordsMissed: [] } }],
+      error: null,
+    };
+    h.tables.subscriptions = {
+      data: [{ user_id: 't1', tier: 'pro', status: 'active', source: 'admin_grant', current_period_end: '2020-01-01T00:00:00Z' }],
+      error: null,
+    };
+
+    await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    const html = h.sendEmailSpy.mock.calls[0][0].html as string;
+    expect(html).toContain('/en/teacher/upgrade');
+  });
+
   it('carries a one-click unsubscribe link in headers and footer', async () => {
     seedTeacherWithClass();
     await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));

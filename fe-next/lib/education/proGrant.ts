@@ -80,6 +80,8 @@ export function isPaidProviderSubscription(row: SubscriptionRowLike | null | und
 
 export interface ProEntitlement {
   hasPro: boolean;
+  /** Pro on an active provider subscription: not a trial, a dunning grace or a gift. */
+  paid: boolean;
   source: SubscriptionSource;
   /** True only for a grant whose deadline has passed. */
   expired: boolean;
@@ -87,31 +89,48 @@ export interface ProEntitlement {
   periodEnd: string | null;
 }
 
+/** Slack after a trial end before a missing lapse webhook stops counting. */
+export const TRIAL_END_GRACE_MS = DAY_MS;
+
+/** How long a failed renewal keeps Pro while the provider retries the card (our choice, not Polar's number). */
+export const PAST_DUE_GRACE_MS = 7 * DAY_MS;
+
+function withinGrace(periodEnd: string | null, graceMs: number, nowMs: number, whenMissing: boolean): boolean {
+  const endMs = periodEnd ? Date.parse(periodEnd) : NaN;
+  if (!Number.isFinite(endMs)) return whenMissing;
+  return nowMs < endMs + graceMs;
+}
+
 /**
  * The single answer to "is this teacher Pro right now?".
  *
- * Provider rows: `tier === 'pro'` and `status` is `active` (paying) or
- * `trialing` (Polar 14-day Teacher Pro trial). The webhook drives their
- * lifecycle and `current_period_end` is the next renewal — or the trial end
- * while trialing. Enforcing that date here would log a teacher out of Pro
- * whenever a renewal webhook arrives late. Canceled, past_due, and paused
- * are not Pro.
+ * Provider rows (tier pro): `active` is Pro regardless of `current_period_end`,
+ * so a late renewal webhook never logs a paying teacher out. `trialing` is Pro
+ * until the trial end plus a day. `past_due` is Pro for PAST_DUE_GRACE_MS past
+ * the failed renewal. Canceled and paused are not Pro.
  *
  * Grant rows: `status === 'active'` AND `now < current_period_end`. A grant
  * with no deadline is treated as over, never as forever. Grants are not trials.
  */
 export function resolveProEntitlement(row: SubscriptionRowLike | null | undefined, nowMs: number): ProEntitlement {
-  if (!row) return { hasPro: false, source: 'polar', expired: false, periodEnd: null };
+  if (!row) return { hasPro: false, paid: false, source: 'polar', expired: false, periodEnd: null };
   const source = ((row.source as SubscriptionSource) || 'polar');
   const activePro = row.tier === 'pro' && row.status === 'active';
   if (source !== 'admin_grant') {
-    const providerPro = row.tier === 'pro' && (row.status === 'active' || row.status === 'trialing');
-    return { hasPro: providerPro, source, expired: false, periodEnd: row.current_period_end };
+    const end = row.current_period_end;
+    let providerPro = false;
+    if (row.tier === 'pro') {
+      if (row.status === 'active') providerPro = true;
+      else if (row.status === 'trialing') providerPro = withinGrace(end, TRIAL_END_GRACE_MS, nowMs, true);
+      else if (row.status === 'past_due') providerPro = withinGrace(end, PAST_DUE_GRACE_MS, nowMs, false);
+    }
+    return { hasPro: providerPro, paid: activePro, source, expired: false, periodEnd: end };
   }
   const endMs = row.current_period_end ? Date.parse(row.current_period_end) : NaN;
   const stillValid = Number.isFinite(endMs) && endMs > nowMs;
   return {
     hasPro: activePro && stillValid,
+    paid: false,
     source,
     expired: activePro && !stillValid,
     periodEnd: row.current_period_end,

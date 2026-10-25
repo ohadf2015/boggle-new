@@ -17,6 +17,7 @@ import { WEEK_MS } from '@/lib/education/weeklyProgressDigest';
 import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
 import { captureApiError } from '@/utils/sentry';
 import { withCronLock } from '@/backend/redis/locking';
+import { proUserIdsFrom, type SubscriptionRowLike } from '@/lib/education/proGrant';
 
 /**
  * POST /api/cron/teacher-weekly-digest
@@ -181,22 +182,13 @@ export async function POST(request: NextRequest) {
 
       const { data: subRows, error: subError } = await supabase
         .from('subscriptions')
-        .select('user_id, tier, status, current_period_end')
+        .select('user_id, tier, status, source, current_period_end')
         .in('user_id', teacherIds);
       if (subError) {
         logger.error(`[Weekly Digest] subscriptions select failed: ${subError.message}`);
       }
-      const subList = (subRows ?? []) as Array<{
-        user_id: string;
-        tier: string;
-        status: string;
-        current_period_end: string | null;
-      }>;
-      const proUserIds = new Set(
-        subList
-          .filter((s) => s.tier === 'pro' && (s.status === 'active' || s.status === 'trialing'))
-          .map((s) => s.user_id),
-      );
+      const subList = (subRows ?? []) as Array<SubscriptionRowLike & { user_id: string }>;
+      const proUserIds = proUserIdsFrom(subList, now);
       const trialingDaysByUser = new Map<string, number>();
       for (const s of subList) {
         if (s.tier === 'pro' && s.status === 'trialing') {
