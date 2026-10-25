@@ -4273,6 +4273,7 @@ const sv = {
     "backToHome": "Tillbaka till startsidan"
   },
   "parentReport": {
+    "studentFallback": "Ditt barn",
     "metaTitle": "Framstegsrapport – LexiClash",
     "metaDescription": "En privat framstegsrapport för en elev, delad av en lärare.",
     "subtitle": "Framstegsrapport",

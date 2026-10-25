@@ -11159,6 +11159,7 @@ const ru = {
     }
   },
   "parentReport": {
+    "studentFallback": "Ваш ребёнок",
     "metaTitle": "Отчёт о прогрессе — LexiClash",
     "metaDescription": "Приватный отчёт о прогрессе ученика, которым поделился учитель.",
     "subtitle": "Отчёт о прогрессе",

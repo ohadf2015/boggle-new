@@ -3935,6 +3935,7 @@ const ja = {
     "backToHome": "ホームに戻る"
   },
   "parentReport": {
+    "studentFallback": "お子さま",
     "metaTitle": "進捗レポート | LexiClash",
     "metaDescription": "先生が共有した、お子様の進捗に関する非公開レポートです。",
     "subtitle": "進捗レポート",

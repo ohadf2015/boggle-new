@@ -15,7 +15,7 @@ function Meta({ label, value, testId }: { label: string; value: string; testId?:
   );
 }
 
-export function ReportHeader({ data, locale, t }: { data: ParentReportSummary; locale: string; t: ReportT }) {
+export function ReportHeader({ data, name, locale, t }: { data: ParentReportSummary; name: string; locale: string; t: ReportT }) {
   const date = new Intl.DateTimeFormat(locale, { dateStyle: 'medium' });
   const end = data.generatedAt ? new Date(data.generatedAt) : null;
   const start = end ? new Date(end.getTime() - (PERIOD_DAYS - 1) * 86400000) : null;
@@ -26,7 +26,7 @@ export function ReportHeader({ data, locale, t }: { data: ParentReportSummary; l
         <div className="min-w-0">
           <p className="text-xs font-black uppercase tracking-wide text-neo-black/70">{t('parentReport.subtitle')}</p>
           <h1 className="break-words font-neo-display text-3xl font-bold text-neo-black">
-            <bdi>{data.displayName}</bdi>
+            <bdi>{name}</bdi>
           </h1>
         </div>
         <PrintReportButton label={t('parentReport.printButton')} />

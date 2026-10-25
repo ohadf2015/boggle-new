@@ -3536,6 +3536,7 @@ const en = {
     "backToHome": "Back to home"
   },
   "parentReport": {
+    "studentFallback": "Your child",
     "metaTitle": "Progress Report | LexiClash",
     "metaDescription": "A private student progress report shared by a teacher.",
     "subtitle": "Progress Report",

@@ -3935,6 +3935,7 @@ const he = {
     "backToHome": "חזרה לדף הבית"
   },
   "parentReport": {
+    "studentFallback": "הילד/ה שלכם",
     "metaTitle": "דוח התקדמות | LexiClash",
     "metaDescription": "דוח התקדמות פרטי של תלמיד/ה, ששותף על ידי המורה.",
     "subtitle": "דוח התקדמות",

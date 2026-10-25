@@ -82,6 +82,7 @@ function LocaleSwitcher({ token, current, t }: { token: string; current: string;
 }
 
 export function ReportView({ locale, token, data, t }: { locale: string; token: string; data: ParentReportSummary; t: ReportT }) {
+  const name = data.displayName ?? t('parentReport.studentFallback');
   return (
     <div
       data-parent-report=""
@@ -90,9 +91,9 @@ export function ReportView({ locale, token, data, t }: { locale: string; token: 
     >
       <style>{PRINT_CSS}</style>
       <article className="mx-auto w-full max-w-3xl space-y-4 rounded-neo border-3 border-neo-black bg-neo-cream p-4 font-neo-body text-neo-black shadow-hard sm:p-6 print:max-w-none print:space-y-3 print:border-0 print:bg-neo-white print:p-0 print:shadow-none">
-        <ReportHeader data={data} locale={locale} t={t} />
+        <ReportHeader data={data} name={name} locale={locale} t={t} />
         {data.insights ? (
-          <ReportInsights insights={data.insights} name={data.displayName} t={t} />
+          <ReportInsights insights={data.insights} name={name} t={t} />
         ) : (
           <LegacyStats data={data} t={t} />
         )}

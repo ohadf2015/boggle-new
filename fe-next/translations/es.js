@@ -3916,6 +3916,7 @@ const es = {
     "backToHome": "Volver al inicio"
   },
   "parentReport": {
+    "studentFallback": "Tu hijo/a",
     "metaTitle": "Informe de progreso | LexiClash",
     "metaDescription": "Un informe privado del progreso de un estudiante, compartido por su profesor.",
     "subtitle": "Informe de progreso",
