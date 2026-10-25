@@ -385,7 +385,7 @@ describe('GET /api/education/miss-gap/progress', () => {
     expect(data.averageAccuracy).toBe(88);
   });
 
-  it('given a signed-in student (guest accounts are signed in too), returns counts but no names', async () => {
+  it('given a signed-in student, returns counts but no names', async () => {
     mockGetAuthedUser.mockResolvedValue({ id: 'guest-student-1' });
     callerProfile = { user_role: 'student', is_admin: false };
     const res = await GET(new NextRequest(url) as never);

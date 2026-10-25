@@ -1,10 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-/**
- * Guest path of the classroom-join route. The guest's profile row comes from the
- * handle_new_user trigger reading the sign-in metadata (full_name, username), the
- * same way signInAsGuestStudent does on the client, so the route writes no profile.
- */
+// The guest's profile row comes from the handle_new_user trigger reading the sign-in metadata.
 
 vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('@/utils/supabase/admin', () => ({
@@ -43,11 +39,6 @@ describe('POST /api/education/classroom/join — guest path', () => {
     });
   });
 
-  /**
-   * The route once read the body twice (guest name, then join code). A Request body
-   * is single-use, so the second read threw and the guest got a 400 after an
-   * anonymous user already existed.
-   */
   it('joins a guest instead of 400ing on a body it already consumed', async () => {
     (createClient as any).mockResolvedValue(makeClient());
 

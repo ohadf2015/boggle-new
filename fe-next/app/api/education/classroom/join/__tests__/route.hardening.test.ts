@@ -70,7 +70,7 @@ describe('join route: nothing is created for a code that leads nowhere', () => {
     expect(signInAnonymously).not.toHaveBeenCalled();
   });
 
-  it('does not mint a guest account for a full class, and hides the plan from the guest', async () => {
+  it('does not mint a guest account for a full class and hides the plan from the guest', async () => {
     setup({ id: 'c1' });
     mocked(canAddStudent).mockResolvedValue({
       allowed: false,
@@ -151,10 +151,10 @@ describe('join route: code guessing', () => {
     mocked(getAuthedUser).mockResolvedValue({ id: 'student-1' });
     setup(null);
     const statuses: number[] = [];
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 210; i++) {
       statuses.push((await POST(req({ joinCode: 'ZZZZZZ' }, '198.51.100.9'))).status);
     }
-    expect(statuses.slice(0, 20).every((s) => s === 400)).toBe(true);
+    expect(statuses.slice(0, 100).every((s) => s === 400)).toBe(true);
     expect(statuses.at(-1)).toBe(429);
   });
 });

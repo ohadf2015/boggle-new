@@ -27,7 +27,7 @@ export function joinRateLimited(request: NextRequest): boolean {
   return !checkApiRateLimit(request, 'classroom-join', { maxRequests: 180, windowMs: 60_000 }).success;
 }
 
-export const JOIN_MISS_LIMIT = 30;
+export const JOIN_MISS_LIMIT = 200;
 const JOIN_MISS_WINDOW_MS = 10 * 60_000;
 const misses = new Map<string, { count: number; resetAt: number }>();
 
