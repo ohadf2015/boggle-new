@@ -13672,7 +13672,7 @@ const ru = {
       "classLimitMessage": "Вы создали {{current}} из {{limit}} бесплатных классов. Перейдите на Pro для неограниченного числа классов и учеников.",
       "studentLimitTitle": "Вы достигли лимита учеников",
       "studentLimitMessage": "В этом классе {{current}} из {{limit}} бесплатных учеников. Перейдите на Pro для неограниченного числа учеников.",
-      "usagePromptTitle": "Класс набрал обороты",
+      "usagePromptTitle": "Ваш класс готов к Teacher Pro",
       "usagePromptStudentsBody": "В вашем классе уже {{count}} учеников. Teacher Pro покроет всех: классы и ученики без лимита, плюс аналитика прогресса и печатные отчёты.",
       "usagePromptAssignmentsBody": "Вы создали {{count}} заданий для класса. Teacher Pro снимает лимит: задания без ограничений, плюс аналитика и отчёты.",
       "assignmentLimitTitle": "Лимит заданий исчерпан",

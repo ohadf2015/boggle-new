@@ -14723,7 +14723,7 @@ const sv = {
       "classLimitMessage": "Du har skapat {{current}} av {{limit}} gratisklasser. Uppgradera till Pro för obegränsat antal klasser och elever.",
       "studentLimitTitle": "Du har nått din elevgräns",
       "studentLimitMessage": "Den här klassen har {{current}} av {{limit}} gratiselever. Uppgradera till Pro för obegränsat antal elever.",
-      "usagePromptTitle": "Din klass är igång på riktigt",
+      "usagePromptTitle": "Din klass är redo för Teacher Pro",
       "usagePromptStudentsBody": "Du har {{count}} elever i ditt klassrum. Teacher Pro täcker alla: obegränsat antal klasser och elever, plus analys av framsteg och utskrivbara rapporter.",
       "usagePromptAssignmentsBody": "Du har skapat {{count}} uppgifter för ditt klassrum. Teacher Pro lyfter gränsen: obegränsat antal uppgifter, plus analys av framsteg och utskrivbara rapporter.",
       "assignmentLimitTitle": "Du har nått uppgiftsgränsen",

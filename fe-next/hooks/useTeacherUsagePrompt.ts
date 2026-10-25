@@ -9,7 +9,8 @@ import {
   TEACHER_USAGE_PROMPT_MIN_STUDENTS,
   type TeacherUsagePromptReason,
 } from '@/lib/education/teacherUsagePrompt';
-import { countClassroomCreatedAssignments } from '@/lib/education/teacherProMilestoneCounts';
+import { countClassroomCreatedAssignments, hasCompletedRealLiveGame } from '@/lib/education/teacherProMilestoneCounts';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface TeacherUsagePromptState {
   /** Which limit was hit, or null when no classroom has earned the ask. */
@@ -22,7 +23,8 @@ export interface TeacherUsagePromptState {
 }
 
 /**
- * Whether the signed-in teacher has hit a usage limit Teacher Pro lifts.
+ * Whether the signed-in teacher has hit a usage limit Teacher Pro lifts, after
+ * their first completed live game with a real class.
  *
  * Roster (>=10 students in one class) is already on `useClassrooms` — that
  * path never waits on assignments. Created-assignment counts are fetched only
@@ -35,6 +37,9 @@ export interface TeacherUsagePromptState {
  */
 export function useTeacherUsagePrompt(): TeacherUsagePromptState {
   const { classrooms, isLoading: classroomsLoading } = useClassrooms();
+  const { user } = useAuth();
+  const teacherId = user?.id ?? '';
+  const [liveGame, setLiveGame] = useState<{ teacherId: string; done: boolean } | null>(null);
   const [dismissed, setDismissed] = useState(true);
   const [createdById, setCreatedById] = useState<Record<string, number>>({});
   const [createdLoading, setCreatedLoading] = useState(false);
@@ -89,8 +94,21 @@ export function useTeacherUsagePrompt(): TeacherUsagePromptState {
     [classrooms, createdById],
   );
 
-  const prompt = teacherUsagePrompt(snapshots);
-  const loading = classroomsLoading || (!rosterHit && classrooms.length > 0 && createdLoading);
+  useEffect(() => {
+    if (!teacherId) return;
+    let cancelled = false;
+    void hasCompletedRealLiveGame(teacherId).then((done) => {
+      if (!cancelled) setLiveGame({ teacherId, done });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [teacherId]);
+
+  const liveGameKnown = liveGame !== null && liveGame.teacherId === teacherId;
+  const prompt = teacherUsagePrompt(snapshots, { hasRealLiveGame: liveGameKnown && liveGame.done });
+  const loading =
+    classroomsLoading || !liveGameKnown || (!rosterHit && classrooms.length > 0 && createdLoading);
 
   return {
     reason: prompt?.reason ?? null,

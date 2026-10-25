@@ -8,7 +8,7 @@
 
 import { supabase } from '@/lib/supabase';
 import { TEACHER_PRO_MILESTONE_MIN_COMPLETED } from '@/lib/education/teacherProMilestone';
-import { TEACHER_USAGE_PROMPT_MIN_ASSIGNMENTS } from '@/lib/education/teacherUsagePrompt';
+import { REAL_CLASS_MIN_PLAYERS, TEACHER_USAGE_PROMPT_MIN_ASSIGNMENTS } from '@/lib/education/teacherUsagePrompt';
 
 const MAX_SESSION_ROWS = TEACHER_PRO_MILESTONE_MIN_COMPLETED * 60;
 
@@ -106,5 +106,25 @@ export async function countClassroomCreatedAssignments(
     return Math.min(count ?? 0, TEACHER_USAGE_PROMPT_MIN_ASSIGNMENTS);
   } catch {
     return 0;
+  }
+}
+
+/** Whether the teacher has finished a live round with a real class. Unknown reads fail closed to false. */
+export async function hasCompletedRealLiveGame(
+  teacherId: string,
+  client?: typeof supabase,
+): Promise<boolean> {
+  const db = client ?? supabase;
+  if (!db || !teacherId) return false;
+  try {
+    const { count, error } = await db
+      .from('classroom_rounds')
+      .select('id', { count: 'exact', head: true })
+      .eq('teacher_id', teacherId)
+      .gte('player_count', REAL_CLASS_MIN_PLAYERS);
+    if (error) return false;
+    return (count ?? 0) > 0;
+  } catch {
+    return false;
   }
 }

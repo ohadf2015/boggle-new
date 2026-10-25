@@ -6,6 +6,7 @@
 import { getSupabase } from '../modules/supabase/client';
 import type { ClassroomGame } from '../modules/classroomGameManager';
 import logger from '../utils/logger';
+import { REAL_CLASS_MIN_PLAYERS } from '@/lib/education/teacherUsagePrompt';
 import { captureEduServerEvents, type EduServerEvent } from '../utils/educationTelemetry';
 import {
   buildLiveRoundCompletedEvent,
@@ -13,7 +14,6 @@ import {
   buildTeacherFirstLiveGameEvent,
 } from '../utils/educationRoundTelemetry';
 
-const REAL_CLASS_MIN_PLAYERS = 2;
 
 export interface RoundMembership {
   userId: string;

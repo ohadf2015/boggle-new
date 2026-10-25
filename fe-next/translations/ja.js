@@ -14435,7 +14435,7 @@ const ja = {
       "classLimitMessage": "無料クラスを{{limit}}個中{{current}}個作成しました。Proにアップグレードすると、クラスと生徒が無制限になります。",
       "studentLimitTitle": "生徒数の上限に達しました",
       "studentLimitMessage": "このクラスは無料プランの{{limit}}人中{{current}}人です。Proにアップグレードすると生徒数が無制限になります。",
-      "usagePromptTitle": "クラスが本格的になってきました",
+      "usagePromptTitle": "クラスがTeacher Proの出番です",
       "usagePromptStudentsBody": "クラスに{{count}}人の生徒がいます。Teacher Proなら全員をカバーできます。クラスも生徒数も無制限で、進捗分析と印刷できるレポートも使えます。",
       "usagePromptAssignmentsBody": "クラスに{{count}}件の課題を作成しました。Teacher Proなら上限なし。課題は無制限で、進捗分析とレポートも使えます。",
       "assignmentLimitTitle": "課題の上限に達しました",

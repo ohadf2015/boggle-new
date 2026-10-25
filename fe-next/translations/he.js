@@ -14290,7 +14290,7 @@ const he = {
       "classLimitMessage": "יצרתם {{current}} מתוך {{limit}} כיתות בחינם. שדרגו לפרו לכיתות ותלמידים ללא הגבלה.",
       "studentLimitTitle": "הגעתם למגבלת התלמידים",
       "studentLimitMessage": "בכיתה הזו {{current}} מתוך {{limit}} תלמידים בחינם. שדרגו לפרו לתלמידים ללא הגבלה.",
-      "usagePromptTitle": "הכיתה שלכם כבר בפעולה",
+      "usagePromptTitle": "הכיתה שלכם מוכנה לפרו למורים",
       "usagePromptStudentsBody": "יש לך {{count}} תלמידים בכיתה. פרו למורים מכסה את כולם — כיתות ותלמידים ללא הגבלה, וגם ניתוח התקדמות ודוחות להדפסה.",
       "usagePromptAssignmentsBody": "יצרת {{count}} משימות לכיתה. פרו למורים מוריד את התקרה — משימות ללא הגבלה, וגם ניתוח התקדמות ודוחות.",
       "assignmentLimitTitle": "הגעתם למגבלת המשימות",
