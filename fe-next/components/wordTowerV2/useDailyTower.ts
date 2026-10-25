@@ -90,9 +90,10 @@ export function useDailyTower({ daily, language, phase, worldRef, labelsRef, han
   }, [daily, language, restoreTower, persist]);
 
   const submitGrowth = useCallback(
-    (save: DailyTowerSave, keepalive: boolean) => {
+    (save: DailyTowerSave, keepalive: boolean, final: boolean) => {
       const growth = growthToday(save);
-      if (growth <= 0 || growth <= submittedRef.current) return;
+      // A banking flush re-sends an unchanged best: it is the quest-credit moment.
+      if (growth <= 0 || (!final && growth <= submittedRef.current)) return;
       const words = save.words;
       const body = recordV2DailyClimb(
         {
@@ -100,7 +101,7 @@ export function useDailyTower({ daily, language, phase, worldRef, labelsRef, han
           floors: Math.max(1, Math.round(growth / 3)),
           longestWord: words.reduce((a, w) => (w.length > a.length ? w : a), ''),
         },
-        { language, guestFingerprint: getGuestFingerprint(), storage: window.localStorage },
+        { language, guestFingerprint: getGuestFingerprint(), storage: window.localStorage, final },
       );
       submittedRef.current = growth;
       if (body) void postWithAuth('/api/word-tower/daily/score', body, keepalive ? { keepalive: true } : {}).catch(() => undefined);
@@ -109,16 +110,16 @@ export function useDailyTower({ daily, language, phase, worldRef, labelsRef, han
   );
 
   const snapshot = useCallback(
-    (keepalive: boolean) => {
+    (keepalive: boolean, final = false) => {
       if (!daily || phase === 'over') return;
       const tower = standingTower(worldRef.current, labelsRef.current, hangingIdRef.current);
       if (tower.words.length === 0) return;
       const key = tower.words.join('|');
-      if (key === lastKeyRef.current && !keepalive) return;
+      if (key === lastKeyRef.current && !keepalive && !final) return;
       lastKeyRef.current = key;
       const next = commitTower(saveRef.current, tower);
       persist(next);
-      submitGrowth(next, keepalive);
+      submitGrowth(next, keepalive, final);
     },
     [daily, phase, worldRef, labelsRef, hangingIdRef, persist, submitGrowth],
   );
@@ -141,7 +142,7 @@ export function useDailyTower({ daily, language, phase, worldRef, labelsRef, han
   }, [daily, phase, persist]);
 
   const flush = useCallback(
-    (opts?: { keepalive?: boolean }) => snapshot(opts?.keepalive ?? false),
+    (opts?: { keepalive?: boolean }) => snapshot(opts?.keepalive ?? false, true),
     [snapshot],
   );
 
