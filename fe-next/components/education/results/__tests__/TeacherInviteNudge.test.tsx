@@ -36,8 +36,13 @@ describe('TeacherInviteNudge', () => {
     expect(capture).toHaveBeenCalledWith('edu_teacher_invite_shared', { method: 'native', students: 12 });
   });
 
-  it('Given WhatsApp, When tapped, Then a wa.me link carries the sentence and the landing link, and is tracked', () => {
+  it('Given the projector wall, Then no WhatsApp link is offered (it would open the teacher\'s chats on the wall)', () => {
     render(<TeacherInviteNudge students={7} language="he" t={t} />);
+    expect(screen.queryByTestId('teacher-invite-whatsapp')).toBeNull();
+  });
+
+  it('Given the teacher\'s phone, When WhatsApp is tapped, Then a wa.me link carries the sentence and the landing link, and is tracked', () => {
+    render(<TeacherInviteNudge students={7} language="he" whatsapp t={t} />);
     const wa = screen.getByTestId('teacher-invite-whatsapp');
     expect(wa).toHaveAttribute('href', `https://wa.me/?text=${encodeURIComponent(`eduLiveRoom.hostResults.inviteText ${LANDING}`)}`);
     fireEvent.click(wa);

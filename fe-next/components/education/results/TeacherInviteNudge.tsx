@@ -9,7 +9,6 @@ import { PRESS, type Translate } from '@/components/education/live/eduLiveStyles
 
 const MIN_STUDENTS = 3;
 
-/** A round worth telling a colleague about: the class won something, with a real room playing. */
 export function showTeacherInvite(celebrate: boolean, students: number): boolean {
   return celebrate && students >= MIN_STUDENTS;
 }
@@ -21,8 +20,8 @@ function landingUrl(language: string): string {
 const ROW_BUTTON =
   'inline-flex min-h-11 items-center gap-1.5 rounded-neo border-2 border-neo-cream/60 px-3 font-neo-display text-xs font-black uppercase text-neo-cream hover:bg-neo-navy-light';
 
-/** Low-key "invite a colleague" under the teacher's round results. No referral reward, no teacher id in the link. */
-export function TeacherInviteNudge({ students, language, t }: { students: number; language: string; t: Translate }) {
+/** WhatsApp only on the teacher's own phone: on a projected laptop it would open their chat list in front of the class. */
+export function TeacherInviteNudge({ students, language, whatsapp = false, t }: { students: number; language: string; whatsapp?: boolean; t: Translate }) {
   const text = t('eduLiveRoom.hostResults.inviteText');
   const share = async () => {
     const outcome = await shareOrCopy({ title: 'LexiClash', text, url: landingUrl(language) });
@@ -39,6 +38,7 @@ export function TeacherInviteNudge({ students, language, t }: { students: number
         <Share2 className="size-4" aria-hidden="true" />
         {t('eduLiveRoom.hostResults.inviteCta')}
       </button>
+      {whatsapp && (
       <a
         data-testid="teacher-invite-whatsapp"
         href={whatsappHref}
@@ -50,6 +50,7 @@ export function TeacherInviteNudge({ students, language, t }: { students: number
         <MessageCircle className="size-4" aria-hidden="true" />
         {t('share.whatsapp')}
       </a>
+      )}
     </div>
   );
 }

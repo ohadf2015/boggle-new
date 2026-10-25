@@ -181,7 +181,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
             {/* Teacher Pro trial + school quote, after a class has actually played. Host tree only. On a short wall the reteach outranks it. */}
             <div className={cn('flex flex-col gap-3', !phone && (bossOver || missed.length > 0) && 'lg:[@media(max-height:900px)]:hidden')}>
               <ResultsTeacherProTrialCard language={language} />
-              {showTeacherInvite(outcome.celebrate, stats?.students ?? 0) && <TeacherInviteNudge students={stats?.students ?? 0} language={language} t={t} />}
+              {showTeacherInvite(outcome.celebrate, stats?.students ?? 0) && <TeacherInviteNudge students={stats?.students ?? 0} language={language} whatsapp={phone} t={t} />}
             </div>
           </div>
         </div>
