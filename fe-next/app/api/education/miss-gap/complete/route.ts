@@ -7,6 +7,9 @@
  * light: `classKey` (`lesson::teacher`, already the share link's own key) plus a
  * student key — the auth user id for a member, a device-generated id for a guest.
  * Only a display name is stored. No email, no roster, no classroom join.
+ * Guests stay allowed (they are most homework players), so the key is bounded
+ * instead: a per-device budget, a cap on distinct students per assignment, and
+ * a completion day no further than one day from the server's.
  *
  * An ON-TIME completion also moves the CLASS streak: consecutive calendar days
  * on which at least one student finished. That streak used to live in one
@@ -24,8 +27,14 @@ import {
   normalizeDay,
   MAX_COMPLETION_DAYS,
 } from '@/lib/education/classStreakMath';
-import { normalizeMissGapClassKey } from '@/lib/education/missGapClassKey';
+import {
+  normalizeMissGapClassKey,
+  MAX_CLASS_KEY,
+  MAX_STUDENTS_PER_ASSIGNMENT,
+} from '@/lib/education/missGapClassKey';
 import { mergeMissGapRun } from '@/lib/education/missGapRunMerge';
+import { isPlausibleLocalDay } from '@/lib/education/missedPracticePlan';
+import { z } from 'zod';
 import logger from '@/utils/logger';
 
 export const dynamic = 'force-dynamic';
@@ -33,6 +42,25 @@ export const dynamic = 'force-dynamic';
 const MAX_TEXT = 120;
 const MAX_NAME = 40;
 const CONTROL_CHARS = /[\u0000-\u001f\u007f]/g;
+const MISS_GAP_COMPLETE_PER_STUDENT_LIMIT = { windowMs: 60_000, maxRequests: 10 } as const;
+
+const optionalText = (max: number) => z.string().max(max).nullish();
+const optionalNumber = z.number().finite().nullish();
+const completeBodySchema = z.object({
+  classKey: z.string().max(MAX_CLASS_KEY * 2),
+  dueDate: optionalText(32),
+  completedOn: optionalText(32),
+  lesson: optionalText(MAX_TEXT * 2),
+  teacher: optionalText(MAX_TEXT),
+  studentName: optionalText(MAX_TEXT),
+  studentKey: optionalText(128),
+  wordsTotal: optionalNumber,
+  wordsCorrect: optionalNumber,
+  accuracy: optionalNumber,
+  stars: optionalNumber,
+  bestStreak: optionalNumber,
+  durationMs: optionalNumber,
+});
 
 function text(value: unknown, max = MAX_TEXT): string {
   return String(value ?? '')
@@ -61,12 +89,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
-  let body: Record<string, unknown>;
+  let raw: unknown;
   try {
-    body = ((await request.json()) || {}) as Record<string, unknown>;
+    raw = await request.json();
   } catch {
     return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
   }
+  const parsed = completeBodySchema.safeParse(raw ?? {});
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
+  }
+  const body = parsed.data;
 
   // Same spelling the progress route reads back with — see missGapClassKey.
   const classKey = normalizeMissGapClassKey(body.classKey);
@@ -83,13 +116,25 @@ export async function POST(request: NextRequest) {
   }
 
   const user = await getAuthedUser(request);
-  const dueDate = normalizeDay(body.dueDate as string);
-  const completedOn =
-    normalizeDay(body.completedOn as string) || new Date().toISOString().slice(0, 10);
+  const dueDate = normalizeDay(body.dueDate ?? '');
+  const claimedDay = normalizeDay(body.completedOn ?? '');
+  // The student's local day may differ from UTC by one; anything further would forge streak days.
+  const completedOn = claimedDay && isPlausibleLocalDay(claimedDay, Date.now())
+    ? claimedDay
+    : new Date().toISOString().slice(0, 10);
   const onTime = !dueDate || completedOn <= dueDate;
   const studentKey = user?.id
     ? `u:${user.id}`
     : `g:${text(body.studentKey, 64).toLowerCase() || 'anon'}`;
+
+  const perStudent = checkApiRateLimit(
+    request,
+    `education-miss-gap-complete:${studentKey}`,
+    MISS_GAP_COMPLETE_PER_STUDENT_LIMIT,
+  );
+  if (!perStudent.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
 
   const wordsTotal = int(body.wordsTotal, 0, 100);
   const wordsCorrect = int(body.wordsCorrect, 0, wordsTotal || 100);
@@ -126,7 +171,23 @@ export async function POST(request: NextRequest) {
     .eq('student_key', studentKey)
     .maybeSingle();
 
-  const { data: run, error: runError } = await supabase
+  if (!previousRun) {
+    const { count, error: countError } = await supabase
+      .from('miss_gap_homework_runs')
+      .select('student_key', { count: 'exact', head: true })
+      .eq('class_key', classKey)
+      .eq('due_key', dueDate);
+    if (countError) {
+      logger.error('[miss-gap] complete: roster count failed', countError);
+      return NextResponse.json({ error: 'Could not save' }, { status: 500 });
+    }
+    if ((count ?? 0) >= MAX_STUDENTS_PER_ASSIGNMENT) {
+      logger.warn('[miss-gap] complete: assignment full', { classKey, dueKey: dueDate });
+      return NextResponse.json({ error: 'Assignment is full' }, { status: 409 });
+    }
+  }
+
+  const { error: runError } = await supabase
     .from('miss_gap_homework_runs')
     .upsert(mergeMissGapRun(previousRun, row), {
       onConflict: 'class_key,due_key,student_key',
@@ -167,7 +228,7 @@ export async function POST(request: NextRequest) {
       : [];
     const folded = foldClassStreak(previousDays, completedOn, MAX_COMPLETION_DAYS);
     contributed = !previousDays.includes(completedOn);
-    const totalCompletions = (stored?.total_completions ?? 0) + 1;
+    const totalCompletions = (stored?.total_completions ?? 0) + (previousRun ? 0 : 1);
     const longestStreak = Math.max(folded.longestStreak, stored?.longest_streak ?? 0);
 
     const { error: streakError } = await supabase
@@ -201,5 +262,5 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ ok: true, run, streak, contributed, onTime });
+  return NextResponse.json({ ok: true, streak, contributed, onTime });
 }
