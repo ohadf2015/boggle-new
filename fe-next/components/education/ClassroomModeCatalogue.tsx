@@ -174,7 +174,7 @@ export function ClassroomModeCardRow({ selected, recommended = null, selectedMin
       data-testid="mode-row-scroller"
       role="radiogroup"
       aria-label={t('eg2Modes.title')}
-      className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-[calc(50%-3.3rem)] pb-2 pt-3 [scrollbar-width:none] lg:mx-0 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden"
+      className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-[calc(50%-3.3rem)] pb-2 pt-3 [scrollbar-width:none] lg:mx-0 lg:overflow-visible lg:px-2 lg:pb-1.5 [&::-webkit-scrollbar]:hidden"
     >
       {CATALOGUE_CATEGORIES.map((category) => {
         const group = modes.filter((m) => m.category === category);
