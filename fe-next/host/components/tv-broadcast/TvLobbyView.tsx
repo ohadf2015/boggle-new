@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useState, useEffect, useMemo } from 'react';
+import React, { memo, useState, useEffect, useMemo, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Zap, Monitor } from 'lucide-react';
 import { tvJoinAddress } from '@/lib/education/tvJoinAddress';
@@ -20,6 +20,10 @@ import type { Language, DifficultyLevel, Avatar as AvatarType, PresenceStatus } 
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { LobbySettingsSummary } from '@/components/multiplayer/lobby/LobbySettingsSummary';
+import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
+import { modeAllowsRehearsalBots, type RehearseIntent, type RehearsalSource } from '@/lib/education/rehearsal';
+import { trackEduRehearsalStarted } from '@/lib/education/rehearsalTelemetry';
+import { useRehearseAutoStart } from '../../hooks/useRehearseAutoStart';
 
 /** How long to wait for auto-filled stand-ins to appear on the roster before giving up. */
 const SOLO_DEMO_FILL_TIMEOUT_MS = 8000;
@@ -175,6 +179,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   const [soloDemoCallback, setSoloDemoCallback] = useState<(() => void) | null>(null);
 
   const [soloDemoFailed, setSoloDemoFailed] = useState(false);
+  const rehearsalOrigin = useRef<{ source: RehearsalSource; classExists: boolean }>({ source: 'lobby', classExists: true });
 
   // When bots are seated (playerCount > 0), invoke the callback to start the game
   useEffect(() => {
@@ -182,8 +187,11 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
       soloDemoCallback();
       setSoloDemoInProgress(false);
       setSoloDemoCallback(null);
+      if (isClassroomMode) {
+        trackEduRehearsalStarted({ ...rehearsalOrigin.current, mode: readLocalGameMode() ?? classroomGameMode ?? 'classic' });
+      }
     }
-  }, [soloDemoInProgress, soloDemoCallback, playerCount]);
+  }, [soloDemoInProgress, soloDemoCallback, playerCount, isClassroomMode, classroomGameMode]);
 
   // If the fill never lands, say so instead of leaving the button disabled
   // forever — a silently stuck control is the failure mode this repo keeps
@@ -198,13 +206,22 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     return () => clearTimeout(timeout);
   }, [soloDemoInProgress]);
 
-  const handleSoloDemoClick = () => {
+  const handleSoloDemoClick = (origin?: RehearseIntent) => {
     if (!onStartSoloDemoWithBots) return;
+    rehearsalOrigin.current = origin ?? { source: 'lobby', classExists: true };
     setSoloDemoFailed(false);
     setSoloDemoInProgress(true);
     const callback = onStartSoloDemoWithBots();
     setSoloDemoCallback(() => callback);
   };
+
+  const hostSeated = playersReady.some((p) => (typeof p === 'string' ? p === username : p.isHost || p.username === username));
+  useRehearseAutoStart({
+    enabled: isClassroomMode && !!onStartSoloDemoWithBots,
+    hostSeated,
+    botsAllowed: modeAllowsRehearsalBots(readLocalGameMode() ?? classroomGameMode),
+    start: handleSoloDemoClick,
+  });
 
   // A classroom room gets ONE surface. The arcade TV lobby stacks a join bar, a
   // roster, a settings card and a mode picker; on a projector, above
@@ -230,7 +247,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
           templateSettings={classroomTemplateSettings}
           autoStartSecondsLeft={autoStartSecondsLeft}
           onCancelAutoStart={cancelAutoStart}
-          onStartPracticeRound={onStartSoloDemoWithBots ? handleSoloDemoClick : undefined}
+          onStartPracticeRound={onStartSoloDemoWithBots ? () => handleSoloDemoClick() : undefined}
           practiceRoundPending={soloDemoInProgress}
           practiceRoundFailed={soloDemoFailed}
         />
@@ -356,7 +373,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
                 <button
                   type="button"
                   data-testid="solo-demo-button"
-                  onClick={handleSoloDemoClick}
+                  onClick={() => handleSoloDemoClick()}
                   disabled={playerCount > 0 || soloDemoInProgress}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-lime disabled:opacity-50 disabled:cursor-not-allowed text-base font-bold shadow-hard-sm active:translate-y-0.5 active:shadow-none"
                 >

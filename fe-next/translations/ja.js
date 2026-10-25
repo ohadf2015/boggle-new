@@ -4538,6 +4538,7 @@ const ja = {
     "crazyGamesFriends": "CrazyGamesで友達と遊ぶ"
   },
   "hostView": {
+    "demoBotsFailed": "練習ラウンドは大画面で行います。プレイヤーモードを終了するとボットでリハーサルできます。",
     "lobby": "ロビー",
     "lobbyTitle": "マルチプレイヤーロビー",
     "waitingForPlayers": "戦士集合中...",
@@ -15447,6 +15448,10 @@ const ja = {
       "startBlocked": "生徒が1人参加したらスタートできます。",
       "practiceFirst": "まずボット3人で練習",
       "practiceFirstHint": "クラスで映る画面をそのまま確認できます。最初の生徒が入るとボットは退出します。",
+      "rehearseCta": "ボットでリハーサル",
+      "rehearsePrivate": "これはあなただけに表示されます。生徒はルームにおらず、記録もされません。",
+      "rehearseBotsBlocked": "このゲームはボットがプレイできないため、ボットでリハーサルできません。",
+      "rehearseUseClassic": "代わりにクラシックでリハーサル",
       "lateJoinOn": "途中参加OK",
       "lateJoinOff": "途中参加なし"
     },

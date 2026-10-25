@@ -46,6 +46,8 @@ export interface ClassCardProps {
   activity?: ReactNode;
   /** "Start game" → Teacher HQ with this class preselected (one more tap: GO LIVE). */
   startGameHref?: string;
+  /** Quiet private practice with bots, under Start game. */
+  rehearse?: ReactNode;
   /** The dashboard with this class preselected and the assignment creator open. */
   assignHref?: string;
   /** This class's report. */
@@ -84,6 +86,7 @@ export function ClassCard({
   onDelete,
   activity,
   startGameHref,
+  rehearse,
   assignHref,
   reportHref,
   onOpenProjector,
@@ -332,6 +335,7 @@ export function ClassCard({
             {t('academy.hq.startTitle', 'Start a game')}
           </Link>
         ) : null}
+        {rehearse}
 
         {assignHref || reportHref ? (
           <div className="flex gap-2 [@media(orientation:landscape)_and_(max-height:500px)]:col-span-2">

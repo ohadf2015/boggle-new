@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -18,10 +19,12 @@ export interface HomeOnboardingCardProps {
   /** `full` replaces the hero for a teacher with no class; `compact` sits above it. */
   variant: 'full' | 'compact';
   t: T;
+  /** Full variant only: a quiet action under the step button. */
+  secondary?: ReactNode;
 }
 
 /** First run in three steps: create a class, share the code, try a 2-minute game. */
-export function HomeOnboardingCard({ onboarding, hrefs, onStepStart, onDismiss, variant, t }: HomeOnboardingCardProps) {
+export function HomeOnboardingCard({ onboarding, hrefs, onStepStart, onDismiss, variant, t, secondary }: HomeOnboardingCardProps) {
   const current = onboarding.current ?? 'tryDemo';
   const full = variant === 'full';
   if (!full) return <CompactOnboarding onboarding={onboarding} current={current} hrefs={hrefs} onStepStart={onStepStart} onDismiss={onDismiss} t={t} />;
@@ -98,6 +101,7 @@ export function HomeOnboardingCard({ onboarding, hrefs, onStepStart, onDismiss, 
         >
           {t(`eduShell.onboarding.steps.${current}.cta`)}
         </Link>
+        {secondary}
       </div>
       {full ? (
         <EduMascot moment="welcome" animate size={224} className="mx-auto hidden size-56 sm:block" />

@@ -25,6 +25,7 @@ import { TEACHER_PRO_CHECKOUT_PATH, teacherProUpgradeCtaLabel } from '@/componen
 import { ClassCapMeter } from '@/components/teacher/ClassCapMeter';
 import { useTeacherReveal } from './motion/useTeacherReveal';
 import { ClassCard } from './classroom/ClassCard';
+import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { ClassroomEmptyState } from './classroom/ClassroomEmptyState';
 import { ClassPager } from './hq/ClassPager';
 import { ClassroomCardActivity } from './hq/ClassroomCardActivity';
@@ -214,6 +215,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
                   onDelete={() => setDeletingId(classroom.id)}
                   activity={<ClassroomCardActivity classroomId={classroom.id} rosterCount={classroom.member_count || 0} />}
                   startGameHref={teacherHostHref(language, { classroomId: classroom.id })}
+                  rehearse={<RehearseWithBotsButton classroomId={classroom.id} source="class" language={language} t={t} className="self-center" />}
                   assignHref={teacherAssignHref(language, classroom.id)}
                   reportHref={`/${language}/teacher/classroom/${classroom.id}/analytics`}
                   onOpenProjector={

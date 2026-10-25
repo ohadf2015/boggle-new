@@ -4876,6 +4876,7 @@ const sv = {
     }
   },
   "hostView": {
+    "demoBotsFailed": "Övningsrundor körs på storskärmen. Lämna spelarläget för att repetera med bottar.",
     "lobby": "Krigsrummet",
     "lobbyTitle": "Flerspelarlobby",
     "waitingForPlayers": "Samlar krigare...",
@@ -15735,6 +15736,10 @@ const sv = {
       "startBlocked": "Vänta tills minst en elev har anslutit innan du startar.",
       "practiceFirst": "Öva först med 3 bottar",
       "practiceFirstHint": "Se exakt vad klassen kommer att se. Bottarna går när första eleven ansluter.",
+      "rehearseCta": "Repetera med bottar",
+      "rehearsePrivate": "Bara du ser det här. Eleverna är inte i rummet och det räknas inte.",
+      "rehearseBotsBlocked": "Bottar kan inte spela det här spelet, så du kan inte repetera det med dem.",
+      "rehearseUseClassic": "Repetera med Klassiskt i stället",
       "lateJoinOn": "Sen anslutning tillåten",
       "lateJoinOff": "Sen anslutning stängd"
     },

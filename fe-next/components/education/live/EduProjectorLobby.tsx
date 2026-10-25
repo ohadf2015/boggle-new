@@ -12,6 +12,9 @@ import { canStartProjectorRound } from '@/components/education/projector/project
 import type { ProjectorLobbyProps } from '@/components/education/projector/ProjectorLobby';
 import { catalogueEntry } from '@/components/education/ClassroomModeCatalogueData';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
+import { launchOf } from '@/lib/education/classroomCatalogueId';
+import { modeAllowsRehearsalBots, realStudentCount } from '@/lib/education/rehearsal';
+import { RehearsalBotsBlocked } from '@/components/education/projector/RehearsalBotsBlocked';
 import { useKickStudent } from '@/hooks/useKickStudent';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import { EduJoinCard } from './EduJoinCard';
@@ -44,7 +47,8 @@ export const EduProjectorLobby = memo<ProjectorLobbyProps>(function EduProjector
 }) {
   const lobbyMode = useEduLobbyMode({ gameCode, classroomGameMode, templateSettings, t });
   const entry = catalogueEntry(lobbyMode.modeId);
-  const canStart = canStartProjectorRound(students.length);
+  const canStart = canStartProjectorRound(realStudentCount(students));
+  const botsCanRehearse = modeAllowsRehearsalBots(lobbyMode.isQuiz ? 'vocab-quiz' : launchOf(lobbyMode.modeId).gameMode);
   const startLocked = !canStart || starting || lobbyMode.quizBlocked;
   const { kick, statusOf } = useKickStudent(getSharedSocketIfExists());
 
@@ -139,13 +143,21 @@ export const EduProjectorLobby = memo<ProjectorLobbyProps>(function EduProjector
                 <p data-testid="edu-lobby-start-reason" role="status" className="font-neo-body text-sm font-bold text-neo-cream/85 md:text-[1vw]">
                   {t('eduLiveRoom.lobby.startBlocked')}
                 </p>
-                {onStartPracticeRound && (
-                  <button type="button" data-testid="edu-lobby-practice" onClick={onStartPracticeRound} disabled={practiceRoundPending} aria-busy={practiceRoundPending} className={cn(SECONDARY_BUTTON, PRESS, 'md:text-[0.95vw]')}>
-                    {practiceRoundPending && <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />}
-                    {t('tvLobby.tryPracticeRound')}
+                {onStartPracticeRound && botsCanRehearse && (
+                  <button type="button" data-testid="edu-lobby-practice" onClick={onStartPracticeRound} disabled={practiceRoundPending} aria-busy={practiceRoundPending} className={cn(PRIMARY_BUTTON, PRESS, 'min-h-12 px-5 py-2 text-lg md:min-h-0 md:px-[1.4vw] md:py-[0.5vw] md:text-[1.3vw]')}>
+                    {practiceRoundPending ? <Loader2 className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Play className="size-5" fill="currentColor" aria-hidden="true" />}
+                    {t('education.projectorLobby.rehearseCta')}
                   </button>
                 )}
+                {onStartPracticeRound && !botsCanRehearse && !lobbyMode.quizBlocked && (
+                  <RehearsalBotsBlocked gameCode={gameCode} currentMode={lobbyMode.modeId} t={t} onApplied={lobbyMode.applyMode} onRehearse={onStartPracticeRound} className="md:flex-row md:items-center md:gap-[1vw]" />
+                )}
               </div>
+            )}
+            {!canStart && onStartPracticeRound && botsCanRehearse && (
+              <p data-testid="rehearsal-private-note" className="font-neo-body text-xs font-bold text-neo-cream/70 md:text-[0.85vw]">
+                {t('education.projectorLobby.rehearsePrivate')}
+              </p>
             )}
             {practiceRoundFailed && (
               <p role="alert" className="font-neo-body text-sm font-bold text-neo-pink md:text-[1vw]">{t('tvLobby.practiceRoundFailed')}</p>

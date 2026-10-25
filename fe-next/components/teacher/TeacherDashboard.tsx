@@ -25,6 +25,7 @@ import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
 import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
 import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
+import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { HomeRailSkeleton, HomeSkeleton } from './home/HomeSkeleton';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
@@ -206,7 +207,13 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
           ) : classroomsError ? (
             <HqLoadError onRetry={() => void classroomsState.refresh?.()} />
           ) : !hasClasses ? (
-            <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} variant="full" t={t} />
+            <HomeOnboardingCard
+              onboarding={onboarding}
+              hrefs={onboardingHrefs}
+              variant="full"
+              t={t}
+              secondary={<RehearseWithBotsButton classroomId={undefined} source="hq" language={language} t={t} showNote />}
+            />
           ) : (
             <>
               {onboarding.visible && !(onboarding.current === 'shareCode' && shareCardShown) ? (
@@ -227,6 +234,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                   onSelect={setSelectedId}
                   language={language}
                   t={t}
+                  rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} showNote />}
                 />
               </div>
               <div>
