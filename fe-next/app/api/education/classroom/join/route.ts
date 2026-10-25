@@ -9,6 +9,7 @@ import { buildStudentJoinedEvent, isQaEmail } from '@/backend/utils/educationRou
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 import { lookupLiveGameForClassroom } from '@/lib/education/liveGameForClassroom';
 import { lookupEndedClassroomSession, recordEndedCodeTry } from './endedSessionCode';
+import { foldJoinCode } from '@/lib/education/joinCodeInput';
 
 const joinClassroomSchema = z.object({
   joinCode: z.string().min(1).max(10),
@@ -107,7 +108,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { joinCode } = parsed.data;
-    const normalizedCode = joinCode.trim().toUpperCase();
+    const normalizedCode = foldJoinCode(joinCode);
 
     // Validate code format
     if (!normalizedCode || normalizedCode.length !== 6) {

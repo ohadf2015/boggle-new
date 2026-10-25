@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { z } from 'zod';
 import logger from '@/utils/logger';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { foldJoinCode } from '@/lib/education/joinCodeInput';
 
 const previewQuerySchema = z.object({
   code: z.string().min(1).max(10),
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { code: joinCode } = parsed.data;
-    const normalizedCode = joinCode.trim().toUpperCase();
+    const normalizedCode = foldJoinCode(joinCode);
 
     // Validate code format
     if (!normalizedCode || normalizedCode.length !== 6) {

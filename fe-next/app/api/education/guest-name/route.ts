@@ -3,6 +3,7 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { suggestAvailableGuestName } from '@/lib/education/guestNameCollision';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 import logger from '@/utils/logger';
+import { foldJoinCode } from '@/lib/education/joinCodeInput';
 
 /**
  * POST /api/education/guest-name  { name, joinCode? }
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
   }
 
   const joinCode =
-    typeof payload?.joinCode === 'string' ? payload.joinCode.trim().toUpperCase() : '';
+    typeof payload?.joinCode === 'string' ? foldJoinCode(payload.joinCode) : '';
   // No room named → nothing local to compare against. See the note above: this
   // is a deliberate pass, not a missing check.
   if (!joinCode) {

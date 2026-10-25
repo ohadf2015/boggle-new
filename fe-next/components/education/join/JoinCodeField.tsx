@@ -4,16 +4,17 @@ import React, { useCallback, useRef } from 'react';
 import { ClipboardPaste } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { foldJoinCode } from '@/lib/education/joinCodeInput';
 
 export const JOIN_CODE_LENGTH = 6;
 
 /** Uppercase, drop everything that is not a code character, cap at six. */
 export function sanitizeJoinCode(raw: string): string {
-  return raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, JOIN_CODE_LENGTH);
+  return foldJoinCode(raw).replace(/[^A-Z0-9]/g, '').slice(0, JOIN_CODE_LENGTH);
 }
 
 export function joinCodeOverflows(raw: string): boolean {
-  return raw.toUpperCase().replace(/[^A-Z0-9]/g, '').length > JOIN_CODE_LENGTH;
+  return foldJoinCode(raw).replace(/[^A-Z0-9]/g, '').length > JOIN_CODE_LENGTH;
 }
 
 interface JoinCodeFieldProps {

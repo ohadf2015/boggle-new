@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 import logger from '@/utils/logger';
+import { foldJoinCode } from '@/lib/education/joinCodeInput';
 
 /**
  * GET /api/education/join-code/resolve?code=ABC123
@@ -43,7 +44,7 @@ const CODE_RE = /^[A-Z0-9]{6}$/;
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const raw = url.searchParams.get('code') ?? '';
-  const code = raw.trim().toUpperCase();
+  const code = foldJoinCode(raw);
 
   if (!CODE_RE.test(code)) {
     return NextResponse.json({ error: 'Invalid join code' }, { status: 400 });
