@@ -54,7 +54,7 @@ describe('GET /api/education/classroom/[id]/analytics', () => {
     const res = await call();
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ ok: true, metrics });
-    expect(readClassAnalytics).toHaveBeenCalledWith(sb, CLASS);
+    expect(readClassAnalytics).toHaveBeenCalledWith(sb, CLASS, 't1');
   });
 
   it('500s when the read fails', async () => {
