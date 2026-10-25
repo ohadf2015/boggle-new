@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
     if (grant.kind === 'connections') {
       const allowed = await reserveDailyXp(userId, day, grant.xp, CONNECTIONS_DAILY_XP_CEILING);
       if (allowed === 'unavailable') {
+        console.warn('[EDUCATION RECORD-XP] daily XP ledger unavailable, grant withheld');
         return NextResponse.json({ error: 'Try again shortly' }, { status: 503 });
       }
       if (allowed < 1) {

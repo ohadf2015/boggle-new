@@ -31,8 +31,6 @@ vi.mock('@/hooks/useClassroom', () => ({
     classrooms: [{ id: 'classroom-1', name: 'Period 1', language: 'en', member_count: 5 }],
   })),
 }));
-// The browser thinks this teacher is under the cap (a second tab added rows, or Pro
-// lapsed after the page loaded); the database is the one that says no.
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: true, loading: false }) }));
 vi.mock('next/link', () => ({
   __esModule: true,

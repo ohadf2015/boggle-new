@@ -21,7 +21,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
-import { MISS_GAP_COMPLETE_RATE_LIMIT } from '@/lib/education/missGapRateLimits';
+import {
+  MISS_GAP_COMPLETE_RATE_LIMIT,
+  MISS_GAP_COMPLETE_PER_STUDENT_LIMIT,
+} from '@/lib/education/missGapRateLimits';
 import {
   foldClassStreak,
   normalizeDay,
@@ -42,7 +45,6 @@ export const dynamic = 'force-dynamic';
 const MAX_TEXT = 120;
 const MAX_NAME = 40;
 const CONTROL_CHARS = /[\u0000-\u001f\u007f]/g;
-const MISS_GAP_COMPLETE_PER_STUDENT_LIMIT = { windowMs: 60_000, maxRequests: 10 } as const;
 
 const optionalText = (max: number) => z.string().max(max).nullish();
 const optionalNumber = z.number().finite().nullish();
@@ -127,11 +129,10 @@ export async function POST(request: NextRequest) {
     ? `u:${user.id}`
     : `g:${text(body.studentKey, 64).toLowerCase() || 'anon'}`;
 
-  const perStudent = checkApiRateLimit(
-    request,
-    `education-miss-gap-complete:${studentKey}`,
-    MISS_GAP_COMPLETE_PER_STUDENT_LIMIT,
-  );
+  // Keyless guests share 'g:anon'; a shared bucket behind a school NAT would trip the app-wide IP block.
+  const perStudent = studentKey === 'g:anon'
+    ? { success: true }
+    : checkApiRateLimit(request, `education-miss-gap-complete:${studentKey}`, MISS_GAP_COMPLETE_PER_STUDENT_LIMIT);
   if (!perStudent.success) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }

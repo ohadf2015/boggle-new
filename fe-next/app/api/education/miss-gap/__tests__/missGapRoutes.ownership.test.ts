@@ -183,6 +183,12 @@ describe('complete: input and abuse limits', () => {
     expect(endpoints).toContain('education-miss-gap-complete:g:maya-device-1');
   });
 
+  it('keyless guests share no per-device bucket, so a class behind one IP is never blocked by it', async () => {
+    await complete({ ...BODY, studentKey: '' });
+    const endpoints = mockCheckApiRateLimit.mock.calls.map((call) => call[1]);
+    expect(endpoints).toEqual(['education-miss-gap-complete']);
+  });
+
   it('answers with the streak only, never another student key or id', async () => {
     const data = await (await complete(BODY)).json();
     expect(data.streak).toBeDefined();

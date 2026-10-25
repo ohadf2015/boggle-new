@@ -1,8 +1,3 @@
-/**
- * Shared fake for the miss-gap route tests: a PostgREST-shaped service client
- * that records what the routes write and applies the filters they read with.
- */
-
 export interface StreakRow {
   class_key: string;
   current_streak: number;
@@ -12,11 +7,7 @@ export interface StreakRow {
   total_completions: number;
 }
 
-/**
- * Two students finished the 2026-09-12 assignment; a third finished a LATER
- * assignment for the same class. The third row exists so "the teacher asked for
- * the whole class, not one due date" is a distinguishable outcome.
- */
+/** Two runs for the 2026-09-12 assignment, one for a later one, so "whole class" and "one due date" differ. */
 export const RUNS = [
   {
     class_key: 'week 3 vocab::ms. g',

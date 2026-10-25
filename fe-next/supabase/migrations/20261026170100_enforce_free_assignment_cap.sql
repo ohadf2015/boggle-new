@@ -1,8 +1,4 @@
--- The free per-class assignment cap lived only in the AssignmentCreator UI while the
--- browser inserts lesson_assignments directly, so any PostgREST call skipped it.
--- Counts every row of the class (the list the creator counts) under a per-class lock.
--- Re-assigning a lesson the class already has falls through to the unique constraint,
--- which the client turns into an update. Existing rows are grandfathered.
+-- A re-assign of an existing (classroom, lesson) falls through to the unique constraint, which the client turns into an update.
 create or replace function public.enforce_free_assignment_cap()
 returns trigger
 language plpgsql
