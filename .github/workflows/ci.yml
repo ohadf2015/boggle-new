@@ -164,8 +164,7 @@ jobs:
         working-directory: fe-next
         run: npx tsx scripts/build-i18n-assets.ts --skip-brotli
 
-      - name: Build backend schemas (required by handler tests)
-        if: matrix.shard == 1
+      - name: Build backend schemas (required by handler tests and frontend parity tests)
         working-directory: fe-next
         run: npm run build:schemas
 
