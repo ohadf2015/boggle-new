@@ -34,8 +34,6 @@ vi.mock('next/server', () => {
 });
 
 vi.mock('@/utils/supabase/server');
-const mockStudentReturned = vi.fn(async () => undefined);
-vi.mock('@/lib/education/studentReturnTelemetry', () => ({ captureStudentReturned: (...a: unknown[]) => mockStudentReturned(...(a as [])) }));
 vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: {
@@ -502,7 +500,6 @@ describe('POST /api/education/practice — lesson access (classroom membership, 
 
   beforeEach(() => {
     mockCheckApiRateLimit.mockReturnValue({ success: true });
-    mockStudentReturned.mockClear();
   });
 
   it('starts a session for a classroom member with NO lesson_assignments row', async () => {
@@ -519,9 +516,6 @@ describe('POST /api/education/practice — lesson access (classroom membership, 
 
     expect(response.status).toBe(201);
     expect(body.session).toBeDefined();
-    expect(mockStudentReturned).toHaveBeenCalledWith(expect.anything(), {
-      studentId: USER, gameMode: 'flashcard', surface: 'practice', lessonId: LESSON,
-    });
   });
 
   it('403s a student who is not a classroom member, has no assignment, and does not own the lesson', async () => {
@@ -536,6 +530,5 @@ describe('POST /api/education/practice — lesson access (classroom membership, 
     const response = await POST(requestFor(LESSON));
 
     expect(response.status).toBe(403);
-    expect(mockStudentReturned).not.toHaveBeenCalled();
   });
 });

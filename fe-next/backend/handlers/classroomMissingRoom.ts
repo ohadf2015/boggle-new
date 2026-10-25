@@ -30,7 +30,7 @@ import type { Server, Socket } from 'socket.io';
 import { getClassroomGame, type ClassroomGame } from '../modules/classroomGameManager.js';
 import { getGame } from '../modules/gameStateManager.js';
 import { isClassroomSessionEnded } from '../modules/classroomGameSessionState.js';
-import { buildClassroomJoinRefusedEvent, captureEduServerEvents } from '../utils/educationTelemetry.js';
+import { captureJoinRefusal } from '../utils/eduLiveEvents';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { getGameRoom } from '../utils/socketHelpers.js';
 import logger from '../utils/logger.js';
@@ -151,14 +151,13 @@ export async function answerMissingRoom(
   // Ending a session tears its room down, so an ended session lands here, not
   // at the seat gate; only a LIVE session without a room is a real ROOM_GONE.
   try {
-    const event = buildClassroomJoinRefusedEvent({
+    void captureJoinRefusal({
       gameCode,
       classroomId: record.classroomId,
       reason: isClassroomSessionEnded(record) ? 'SESSION_ENDED' : 'ROOM_GONE',
       door: 'join',
       actorId: (socket.data?.verifiedUserId as string | undefined) ?? null,
     });
-    if (event) captureEduServerEvents([event]);
   } catch (err) {
     logger.warn('CLASSROOM_GAME', `Could not record a lost room for ${gameCode}: ${(err as Error)?.message ?? err}`);
   }

@@ -202,19 +202,19 @@ describe('server-side join and end events', () => {
   });
 
   it('Given a started game ends, When built, Then it reports duration and roster whether or not anything was written', () => {
-    const ev = buildLiveGameEndedEvent(makeGame(), { isTestAccount: false, now: NOW });
+    const ev = buildLiveGameEndedEvent(makeGame(), { isTestAccount: false, now: NOW, roundsRecorded: 0 });
     expect(ev).toEqual({
       distinctId: 'teacher-1',
       event: 'edu_live_game_ended',
       properties: {
         classroom_id: 'class-1', game_code: 'ABC123', game_mode: 'wordcraft', lesson_count: 2,
-        player_count: 2, had_started: true, duration_seconds: 90, is_test_account: false,
+        roster_count: 2, rounds_recorded: 0, had_started: true, duration_seconds: 90, is_test_account: false,
       },
     });
   });
 
   it('Given a lobby closed before start, When built, Then had_started is false and duration null', () => {
-    const ev = buildLiveGameEndedEvent(makeGame({ startedAt: undefined }), { isTestAccount: false, now: NOW });
-    expect(ev!.properties).toMatchObject({ had_started: false, duration_seconds: null });
+    const ev = buildLiveGameEndedEvent(makeGame({ startedAt: undefined }), { isTestAccount: false, now: NOW, roundsRecorded: null });
+    expect(ev!.properties).toMatchObject({ had_started: false, duration_seconds: null, rounds_recorded: null });
   });
 });

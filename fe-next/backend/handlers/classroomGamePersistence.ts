@@ -37,6 +37,7 @@ import {
 import type { PlayerScore } from './classroomRoundParticipants.js';
 import { recordClassroomRound } from './classroomRoundRecord';
 import { awardLessonXp, DbWriteError, retryDbWrite } from './classroomXpAward';
+import { loadTestAccountIds } from '@/lib/education/eduTestAccount';
 
 export { playerScoresFromGameResults, roundHasStudents } from './classroomRoundParticipants.js';
 
@@ -542,12 +543,15 @@ export async function persistClassroomGameScores(
       // `lessonWordsFound` / `lessonWordsAsked` and those are string[].
       lessonWordsFoundCount: plFound,
       lessonWordsAskedCount: plAsked,
+      isTestAccount: false,
     });
   }
 
   // The only place a real classroom practice completion is observable. The
   // browser-side `edu_practice_complete` cannot see this path at all — it lives
   // in PracticeSessionProvider, which this server never runs.
+  const flagged = await loadTestAccountIds(supabase, [game.teacherId, ...outcomes.map((o) => o.userId)]);
+  for (const o of outcomes) o.isTestAccount = flagged.has(game.teacherId) || flagged.has(o.userId);
   captureEduServerEvents(buildClassroomGameCompletedEvents(game, outcomes));
 
   if (sessionsWritten > 0) {

@@ -2,16 +2,14 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import type { Socket } from 'socket.io';
 
 const getClassroomGame = vi.fn();
-const buildClassroomJoinRefusedEvent = vi.fn((r: unknown) => ({ event: 'edu_classroom_join_refused', r }));
-const captureEduServerEvents = vi.fn();
+const captureJoinRefusal = vi.fn(async (_r: unknown) => undefined);
 
 vi.mock('../../modules/gameStateManager', () => ({ getGame: () => undefined }));
 vi.mock('../../modules/classroomGameManager', () => ({
   getClassroomGame: (code: string) => getClassroomGame(code),
 }));
-vi.mock('../../utils/educationTelemetry', () => ({
-  buildClassroomJoinRefusedEvent: (r: unknown) => buildClassroomJoinRefusedEvent(r),
-  captureEduServerEvents: (e: unknown) => captureEduServerEvents(e),
+vi.mock('../../utils/eduLiveEvents', () => ({
+  captureJoinRefusal: (r: unknown) => captureJoinRefusal(r),
 }));
 vi.mock('../../utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() } }));
 
@@ -24,15 +22,14 @@ function fakeSocket() {
 }
 
 function reasonRecorded(): string | undefined {
-  const call = buildClassroomJoinRefusedEvent.mock.calls[0]?.[0] as { reason?: string } | undefined;
+  const call = captureJoinRefusal.mock.calls[0]?.[0] as { reason?: string } | undefined;
   return call?.reason;
 }
 
 describe('answerMissingRoom - why a classroom join with no room was refused', () => {
   beforeEach(() => {
     getClassroomGame.mockReset();
-    buildClassroomJoinRefusedEvent.mockClear();
-    captureEduServerEvents.mockClear();
+    captureJoinRefusal.mockClear();
   });
 
   it('given the teacher ended the session (room torn down), then it is recorded as SESSION_ENDED, not ROOM_GONE', async () => {

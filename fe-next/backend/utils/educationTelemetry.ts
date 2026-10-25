@@ -90,6 +90,7 @@ export interface ClassroomPlayerOutcome {
   lessonWordsFoundCount: number;
   /** How many lesson words the game actually put in front of them. */
   lessonWordsAskedCount: number;
+  isTestAccount: boolean;
 }
 
 function gameModeOf(game: ClassroomGame): string {
@@ -162,6 +163,7 @@ export function buildClassroomGameCompletedEvents(
           : null,
       // The live roster is often already emptied at teardown; outcomes are who was recorded.
       player_count: outcomes.length,
+      is_test_account: o.isTestAccount,
     },
   }));
 }
@@ -250,6 +252,7 @@ export interface ClassroomJoinRefusal {
   door: ClassroomJoinDoor;
   /** Supabase auth id, or null for a guest student. */
   actorId: string | null;
+  isTestAccount: boolean;
 }
 
 /**
@@ -291,6 +294,7 @@ export function buildClassroomJoinRefusedEvent(
       reason: refusal.reason,
       door: refusal.door,
       is_guest: !refusal.actorId,
+      is_test_account: refusal.isTestAccount,
     },
   };
 }

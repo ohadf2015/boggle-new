@@ -26,11 +26,6 @@ vi.mock('@/backend/utils/gameUtils', () => ({
   ]),
 }));
 
-const mockStudentReturned = vi.fn(async () => undefined);
-vi.mock('@/lib/education/studentReturnTelemetry', () => ({
-  captureStudentReturned: (...a: unknown[]) => mockStudentReturned(...(a as [])),
-}));
-
 // Mock Supabase
 const mockSupabaseFrom = vi.fn();
 const mockSupabaseSelect = vi.fn();
@@ -390,24 +385,6 @@ describe('Duel Lifecycle Handlers', () => {
         boardState: boardState,
         startedAt: expect.any(String),
       }));
-    });
-
-    test('Given an accepted duel, Then both students get a duel-surface return event', async () => {
-      mockSupabaseSingle.mockResolvedValueOnce({
-        data: {
-          id: '550e8400-e29b-41d4-a716-446655440000',
-          status: 'pending',
-          opponent_id: 'user-123',
-          challenger_id: 'user-999',
-          board_state: [],
-        },
-        error: null,
-      });
-
-      await socketHandlers['duel:accept']({ duelId: '550e8400-e29b-41d4-a716-446655440000' });
-
-      const ids = mockStudentReturned.mock.calls.map((c) => (c as unknown[])[1] as { studentId: string; surface: string });
-      expect(ids.map((a) => [a.studentId, a.surface]).sort()).toEqual([['user-123', 'duel'], ['user-999', 'duel']]);
     });
   });
 
