@@ -12,8 +12,28 @@ describe('pickTrialReminder', () => {
 
   it('warns 3 days out, then on the day, then after', () => {
     expect(pickTrialReminder(expiryIn(3), [], NOW)).toBe('t-3');
-    expect(pickTrialReminder(expiryIn(0), ['t-3'], NOW)).toBe('t-0');
+    expect(pickTrialReminder(expiryIn(0.5), ['t-3'], NOW)).toBe('t-0');
     expect(pickTrialReminder(expiryIn(-3), ['t-3', 't-0'], NOW)).toBe('t+3');
+  });
+
+  // Oct 2026: a 3-day cron outage left six teachers whose trials had ended 2-3
+  // days earlier owed "t-0". Whoever calls the route next must not tell them
+  // their trial "ends today".
+  it('never sends "ends today" once the trial has ended', () => {
+    expect(pickTrialReminder(expiryIn(0), ['t-3'], NOW)).toBeNull();
+    expect(pickTrialReminder(expiryIn(-0.1), ['t-3'], NOW)).toBeNull();
+    expect(pickTrialReminder(expiryIn(-2), ['t-3'], NOW)).toBeNull();
+    expect(pickTrialReminder(expiryIn(-2.9), [], NOW)).toBeNull();
+  });
+
+  it('waits for the post-expiry email instead, and sends it on day 3', () => {
+    expect(pickTrialReminder(expiryIn(-3), ['t-3'], NOW)).toBe('t+3');
+  });
+
+  it('sends "ends today" only in the final day of a running trial', () => {
+    expect(pickTrialReminder(expiryIn(1.5), ['t-3'], NOW)).toBeNull();
+    expect(pickTrialReminder(expiryIn(1), ['t-3'], NOW)).toBe('t-0');
+    expect(pickTrialReminder(expiryIn(0.01), [], NOW)).toBe('t-0');
   });
 
   it('never repeats a bucket', () => {
