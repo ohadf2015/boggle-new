@@ -317,6 +317,7 @@ export function buildMissGapGradePassback(body: unknown): MissGapGradePassbackRe
     total: typeof raw.total === 'number' ? raw.total : missedWords.length,
     missedWords,
     dueDate,
+    classToken: typeof raw.classToken === 'string' ? raw.classToken : null,
   };
 
   const payload = toMissGapAssignmentPayload(input);

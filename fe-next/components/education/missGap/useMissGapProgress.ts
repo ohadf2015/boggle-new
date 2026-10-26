@@ -31,6 +31,8 @@ export interface MissGapProgressData {
   averageAccuracy: number;
   runs: MissGapProgressRun[];
   streak: { currentStreak: number; longestStreak: number };
+  /** Signed class token, sent to the owning teacher only, for the share link. */
+  classToken?: string;
 }
 
 export interface MissGapProgressState {
@@ -39,11 +41,16 @@ export interface MissGapProgressState {
   failed: boolean;
 }
 
-export function buildMissGapProgressUrl(classKey: string, dueDate: string): string {
+export function buildMissGapProgressUrl(
+  classKey: string,
+  dueDate: string,
+  classToken: string = '',
+): string {
   const params = new URLSearchParams({ classKey });
   // Only send `dueDate` when there is one. An empty `dueDate=` would ask the
   // server to narrow to the empty due key and return nothing — see the route.
   if (dueDate) params.set('dueDate', dueDate);
+  if (classToken) params.set('k', classToken);
   return `/api/education/miss-gap/progress?${params.toString()}`;
 }
 
@@ -51,6 +58,7 @@ export function useMissGapProgress(
   classKey: string,
   dueDate: string,
   refreshToken: number = 0,
+  classToken: string = '',
 ): MissGapProgressState {
   const [data, setData] = useState<MissGapProgressData | null>(null);
   const [failed, setFailed] = useState(false);
@@ -60,7 +68,7 @@ export function useMissGapProgress(
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(buildMissGapProgressUrl(classKey, dueDate));
+        const res = await fetch(buildMissGapProgressUrl(classKey, dueDate, classToken));
         if (!res.ok) throw new Error(`status ${res.status}`);
         const body = (await res.json()) as MissGapProgressData;
         if (cancelled) return;
@@ -72,6 +80,7 @@ export function useMissGapProgress(
             currentStreak: body.streak?.currentStreak ?? 0,
             longestStreak: body.streak?.longestStreak ?? 0,
           },
+          classToken: typeof body.classToken === 'string' ? body.classToken : undefined,
         });
         setFailed(false);
       } catch {
@@ -83,7 +92,7 @@ export function useMissGapProgress(
     return () => {
       cancelled = true;
     };
-  }, [classKey, dueDate, refreshToken]);
+  }, [classKey, dueDate, refreshToken, classToken]);
 
   return { data, failed };
 }

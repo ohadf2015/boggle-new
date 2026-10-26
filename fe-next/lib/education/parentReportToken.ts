@@ -14,8 +14,8 @@
  * FAIL CLOSED: with no `PARENT_REPORT_SECRET` configured, signing throws
  * (a route must 500 + log, never silently issue an unsigned/guessable link)
  * and verifying always returns null (never treats a missing secret as "skip
- * the check"). This is a dedicated secret, not shared with adventure or any
- * other feature — rotating it only ever invalidates parent-report links.
+ * the check"). Miss-gap class links sign with the same secret under their own
+ * domain tag; rotating it invalidates parent-report and miss-gap class links.
  */
 import { signPayload, verifyPayload } from '../adventure/play/attemptToken';
 
@@ -34,11 +34,13 @@ export interface ParentReportTokenPayload {
   iat?: number;
 }
 
-function getSecret(): string {
+export function getParentReportSecret(): string {
   const secret = process.env.PARENT_REPORT_SECRET;
   if (!secret) throw new Error('PARENT_REPORT_SECRET is not configured');
   return secret;
 }
+
+const getSecret = getParentReportSecret;
 
 /**
  * Mint a parent report token for `studentId` in `classroomId`.

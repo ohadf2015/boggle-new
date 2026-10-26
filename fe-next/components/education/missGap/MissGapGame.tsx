@@ -37,12 +37,15 @@ import { MissGapRoundView, type RoundOutcome } from './MissGapRoundView';
 import { MissGapCompletion, type SaveState } from './MissGapCompletion';
 import { MissGapStreakFlame } from './MissGapStreakFlame';
 import { useMissGapSound } from './missGapSound';
+import { buildMissGapProgressUrl } from './useMissGapProgress';
 
 const REVEAL_MS = 950;
 const STREAK_SOUND_AT = 3;
 
 export interface MissGapGameProps {
   classKey: string;
+  /** Signed `k` from the homework link; without it the server keeps no record. */
+  classToken?: string;
   lesson: string;
   teacher: string;
   dueDate: string;
@@ -60,10 +63,12 @@ export interface MissGapGameProps {
 interface CompleteResponse {
   streak?: { currentStreak?: number };
   ok?: boolean;
+  code?: string;
 }
 
 export function MissGapGame({
   classKey,
+  classToken = '',
   lesson,
   teacher,
   dueDate,
@@ -226,6 +231,7 @@ export function MissGapGame({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             classKey,
+            classToken: classToken || undefined,
             dueDate,
             lesson,
             teacher,
@@ -239,6 +245,15 @@ export function MissGapGame({
             durationMs: Date.now() - startedAt.current,
           }),
         });
+        if (res.status === 403) {
+          const refused = (await res.json().catch(() => ({}))) as CompleteResponse;
+          if (refused.code === 'class_link_unsigned') {
+            // The run stays on this device so the student can still turn it in.
+            onFinished?.(classStreak, finalScore.accuracy);
+            if (!cancelled) setSaveState('unsigned');
+            return;
+          }
+        }
         if (!res.ok) throw new Error(`status ${res.status}`);
         const data = (await res.json()) as CompleteResponse;
         const nextStreak = data.streak?.currentStreak ?? classStreak;
@@ -251,9 +266,7 @@ export function MissGapGame({
         if (cancelled) return;
         setClassStreak(nextStreak);
         setSaveState('saved');
-        const progress = await fetch(
-          `/api/education/miss-gap/progress?classKey=${encodeURIComponent(classKey)}&dueDate=${encodeURIComponent(dueDate)}`,
-        );
+        const progress = await fetch(buildMissGapProgressUrl(classKey, dueDate, classToken));
         if (progress.ok && !cancelled) {
           const body = (await progress.json()) as { players?: number };
           setClassmates(Math.max(0, (body.players ?? 1) - 1));

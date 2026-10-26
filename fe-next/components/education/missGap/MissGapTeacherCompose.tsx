@@ -28,23 +28,31 @@ import {
 
 export interface MissGapTeacherComposeProps {
   payload: MissGapAssignmentPayload;
+  /** Minted for the owning teacher; undefined while loading, '' when this caller gets none. */
+  classToken?: string;
   lesson: string;
   dueDate: string;
   onDueDateChange: (next: string) => void;
 }
 
 export function MissGapTeacherCompose({
-  payload,
+  payload: unsignedPayload,
+  classToken,
   lesson,
   dueDate,
   onDueDateChange,
 }: MissGapTeacherComposeProps) {
   const { t } = useLanguage();
   const [shareState, setShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
+  const payload = useMemo(
+    () => ({ ...unsignedPayload, classToken: classToken ?? '' }),
+    [unsignedPayload, classToken],
+  );
   const words = payload.missedWords;
+  const tokenPending = classToken === undefined;
 
   const googleClassroomHref = useMemo(() => {
-    if (words.length === 0 || !payload.dueDate) return null;
+    if (words.length === 0 || !payload.dueDate || tokenPending) return null;
     try {
       const missed = words.slice(0, 8).join(', ');
       return buildMissGapAssignmentGoogleClassroomUrl({
@@ -58,10 +66,10 @@ export function MissGapTeacherCompose({
     } catch {
       return null;
     }
-  }, [words, payload, t, lesson]);
+  }, [words, payload, t, lesson, tokenPending]);
 
   const handleShare = async () => {
-    if (words.length === 0 || !payload.dueDate) return;
+    if (words.length === 0 || !payload.dueDate || tokenPending) return;
     const url = buildMissGapAssignmentShareUrl(payload);
     const text = t('education.results.assignMissGapAsyncShareText', {
       lesson,
@@ -97,13 +105,13 @@ export function MissGapTeacherCompose({
         type="button"
         data-testid="share-miss-gap-async-homework"
         onClick={handleShare}
-        disabled={!payload.dueDate}
+        disabled={!payload.dueDate || tokenPending}
         className={cn(
           'w-full flex items-center justify-center gap-2 px-4 py-4',
           'font-neo-display font-bold text-lg',
           'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
           'shadow-hard hover:shadow-hard-lg transition',
-          !payload.dueDate && 'opacity-60 cursor-not-allowed',
+          (!payload.dueDate || tokenPending) && 'opacity-60 cursor-not-allowed',
         )}
       >
         {shareState === 'idle' ? (
@@ -118,6 +126,12 @@ export function MissGapTeacherCompose({
           </>
         )}
       </button>
+
+      {classToken === '' ? (
+        <p data-testid="miss-gap-async-untracked" className="text-neo-cream font-neo-body text-sm">
+          {t('education.results.assignMissGapAsyncUntracked')}
+        </p>
+      ) : null}
 
       {googleClassroomHref ? (
         <a
