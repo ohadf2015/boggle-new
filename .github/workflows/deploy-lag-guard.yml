@@ -1,0 +1,40 @@
+name: Deploy lag guard
+
+# Alert-only guard: compares the newest green default-branch commit against
+# what prod actually serves, and opens/closes ONE `deploy-lag` GitHub issue.
+# Never redeploys. Reusable: set GUARD_REPO / GUARD_VERSION_URL /
+# GUARD_HEALTH_URL for another repo.
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Unit-test the guard
+        run: node --test fe-next/scripts/deploy-lag-guard/checkDeployLag.test.mjs
+
+      - name: Check prod deploy lag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GUARD_REPO: ${{ github.repository }}
+          GUARD_BRANCH: master
+          GUARD_VERSION_URL: https://www.lexiclash.live/api/version
+          GUARD_HEALTH_URL: https://www.lexiclash.live/api/health
+          GUARD_THRESHOLD_MINUTES: '120'
+        run: node fe-next/scripts/deploy-lag-guard/check-deploy-lag.mjs
