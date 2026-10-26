@@ -27,11 +27,11 @@ import { useTeacherReveal } from './motion/useTeacherReveal';
 import { ClassCard } from './classroom/ClassCard';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { ClassroomEmptyState } from './classroom/ClassroomEmptyState';
-import { ClassPager } from './hq/ClassPager';
+import { ClassCarousel } from './hq/ClassCarousel';
 import { ClassroomCardActivity } from './hq/ClassroomCardActivity';
 import { HqProjectorSheet } from './hq/HqProjectorSheet';
 import type { HqClassroom } from './hq/GetStudentsInCard';
-import { CLASS_GRID_QUERIES, classPageSize, pageSlice } from './hq/classPaging';
+import { CLASS_GRID_QUERIES, classPageSize } from './hq/classPaging';
 import { ClassroomFormDialog } from './ClassroomFormDialog';
 import { stagger, slideUp } from './teacherDashboardTabs';
 
@@ -48,7 +48,7 @@ const PRESS = 'shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-l
 const SHORT_LANDSCAPE_BUTTON =
   '[@media(orientation:landscape)_and_(max-height:500px)]:h-9 [@media(orientation:landscape)_and_(max-height:500px)]:min-h-9 [@media(orientation:landscape)_and_(max-height:500px)]:py-1';
 
-/** The Classes tab: one card per class, paged to fit the screen. Creating a class lives at /teacher/classroom/new. */
+/** The Classes tab: one card per class in a swipeable carousel. Creating a class lives at /teacher/classroom/new. */
 export default function ClassroomManager({ heading }: ClassroomManagerProps = {}) {
   const { t, language } = useLanguage();
   const { classrooms, isLoading, updateClassroom, deleteClassroom } = useClassrooms();
@@ -65,9 +65,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   const isLg = useMediaQuery(CLASS_GRID_QUERIES.lg);
   const isShort = useMediaQuery(CLASS_GRID_QUERIES.short);
   const pageSize = classPageSize({ sm: isSm, lg: isLg, short: isShort });
-  const [page, setPage] = useState(0);
-  const paged = pageSlice(classrooms, page, pageSize);
-  const revealRef = useTeacherReveal<HTMLDivElement>(`${paged.page}-${paged.items.length}`);
+  const revealRef = useTeacherReveal<HTMLDivElement>(`${pageSize}-${classrooms.length}`);
 
   const newClassHref = `/${language}/teacher/classroom/new`;
   const editing = classrooms.find((c) => c.id === editingId);
@@ -194,56 +192,57 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
         <ClassroomEmptyState createHref={newClassHref} />
       ) : (
         <>
-          <m.div
-            key={paged.page}
-            ref={revealRef}
-            className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:gap-6 xl:grid-cols-3 [@media(orientation:landscape)_and_(max-height:500px)]:grid-cols-1"
-            variants={stagger}
-            initial="hidden"
-            animate="visible"
-          >
-            {paged.items.map((classroom) => (
-              <div key={classroom.id} data-tm>
-                <ClassCard
-                  classroom={classroom}
-                  expanded={expandedId === classroom.id}
-                  onToggleExpanded={() => setExpandedId(expandedId === classroom.id ? null : classroom.id)}
-                  onCopy={() => copyJoinCode(classroom.id, classroom.join_code)}
-                  onShare={() => shareInvite(classroom.id, classroom.name, classroom.join_code)}
-                  googleHref={googleClassroomHref(classroom.name, classroom.join_code)}
-                  onEdit={() => setEditingId(classroom.id)}
-                  onDelete={() => setDeletingId(classroom.id)}
-                  activity={<ClassroomCardActivity classroomId={classroom.id} rosterCount={classroom.member_count || 0} />}
-                  startGameHref={teacherHostHref(language, { classroomId: classroom.id })}
-                  rehearse={<RehearseWithBotsButton classroomId={classroom.id} source="class" language={language} t={t} className="self-center" />}
-                  assignHref={teacherAssignHref(language, classroom.id)}
-                  reportHref={`/${language}/teacher/classroom/${classroom.id}/analytics`}
-                  onOpenProjector={
-                    classroom.join_code
-                      ? () => setProjector({ id: classroom.id, name: classroom.name, join_code: classroom.join_code, member_count: classroom.member_count })
-                      : undefined
-                  }
-                />
-              </div>
-            ))}
-            {/* A free slot on the last wide page is a compact "new class" seat, not a void. */}
-            {paged.page === paged.pages - 1 && paged.items.length < pageSize ? (
-              <m.div variants={slideUp} className="hidden self-start justify-self-start sm:block">
-                <Link
-                  href={newClassHref}
-                  data-testid="classroom-add-tile"
-                  aria-label={t('teacher.classroom.createAnother')}
-                  className="inline-flex items-center gap-3 rounded-neo border-2 border-dashed border-neo-cream/40 bg-neo-navy/80 py-3 pe-5 ps-3 text-neo-white shadow-hard-sm transition hover:-translate-y-0.5 hover:border-neo-cream focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
-                >
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm">
-                    <Plus className="size-5" strokeWidth={3} aria-hidden="true" />
-                  </span>
-                  <span className="font-neo-display text-base font-bold tracking-tight">{t('teacher.classroom.create')}</span>
-                </Link>
-              </m.div>
-            ) : null}
+          <m.div ref={revealRef} variants={stagger} initial="hidden" animate="visible">
+            <ClassCarousel
+              perView={pageSize}
+              label={t('academy.teacher.classesTitle', 'Your classes')}
+              slides={classrooms.map((classroom) => ({
+                key: classroom.id,
+                node: (
+                  <div data-tm>
+                    <ClassCard
+                      classroom={classroom}
+                      expanded={expandedId === classroom.id}
+                      onToggleExpanded={() => setExpandedId(expandedId === classroom.id ? null : classroom.id)}
+                      onCopy={() => copyJoinCode(classroom.id, classroom.join_code)}
+                      onShare={() => shareInvite(classroom.id, classroom.name, classroom.join_code)}
+                      googleHref={googleClassroomHref(classroom.name, classroom.join_code)}
+                      onEdit={() => setEditingId(classroom.id)}
+                      onDelete={() => setDeletingId(classroom.id)}
+                      activity={<ClassroomCardActivity classroomId={classroom.id} rosterCount={classroom.member_count || 0} />}
+                      startGameHref={teacherHostHref(language, { classroomId: classroom.id })}
+                      rehearse={<RehearseWithBotsButton classroomId={classroom.id} source="class" language={language} t={t} className="self-center" />}
+                      assignHref={teacherAssignHref(language, classroom.id)}
+                      reportHref={`/${language}/teacher/classroom/${classroom.id}/analytics`}
+                      onOpenProjector={
+                        classroom.join_code
+                          ? () => setProjector({ id: classroom.id, name: classroom.name, join_code: classroom.join_code, member_count: classroom.member_count })
+                          : undefined
+                      }
+                    />
+                  </div>
+                ),
+              }))}
+              trailing={
+                // A free slot on the last wide view is a compact "new class" seat, not a void.
+                classrooms.length % pageSize !== 0 ? (
+                  <m.div variants={slideUp} className="hidden shrink-0 self-start sm:block">
+                    <Link
+                      href={newClassHref}
+                      data-testid="classroom-add-tile"
+                      aria-label={t('teacher.classroom.createAnother')}
+                      className="inline-flex items-center gap-3 rounded-neo border-2 border-dashed border-neo-cream/40 bg-neo-navy/80 py-3 pe-5 ps-3 text-neo-white shadow-hard-sm transition hover:-translate-y-0.5 hover:border-neo-cream focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                    >
+                      <span className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm">
+                        <Plus className="size-5" strokeWidth={3} aria-hidden="true" />
+                      </span>
+                      <span className="font-neo-display text-base font-bold tracking-tight">{t('teacher.classroom.create')}</span>
+                    </Link>
+                  </m.div>
+                ) : null
+              }
+            />
           </m.div>
-          <ClassPager page={paged.page} pages={paged.pages} onChange={setPage} />
         </>
       )}
 

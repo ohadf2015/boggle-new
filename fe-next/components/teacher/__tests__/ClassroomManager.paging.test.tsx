@@ -1,8 +1,8 @@
 /**
  * ClassroomManager — the Classes tab never scrolls the page.
  *
- * A teacher with more classes than fit the screen pages through them (phone:
- * one class per page) instead of scrolling a long column of cards.
+ * A teacher with more classes than fit the screen swipes through them sideways
+ * (phone: one class in view) instead of scrolling a long column of cards.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -58,32 +58,45 @@ vi.mock('@/components/teacher/hq/ClassroomCardActivity', () => ({
 
 import ClassroomManager from '../ClassroomManager';
 
-describe('ClassroomManager — paging instead of page scroll', () => {
+const scrollIntoView = vi.fn();
+
+describe('ClassroomManager — swipe carousel instead of page scroll', () => {
   beforeEach(() => {
     state.classrooms = [mk(1), mk(2), mk(3)];
     mq.wide = false;
+    scrollIntoView.mockClear();
+    Element.prototype.scrollIntoView = scrollIntoView;
   });
 
-  it('Given three classes on a phone, Then one card shows with a 1 of 3 pager', () => {
+  it('Given three classes on a phone, Then every card is in the swipe track with a 1 of 3 indicator', () => {
     render(<ClassroomManager />);
-    expect(screen.getAllByTestId('classroom-card')).toHaveLength(1);
-    expect(screen.getByTestId('classroom-join-code')).toHaveTextContent('CODE01');
-    expect(screen.getByTestId('class-pager-status')).toHaveTextContent('"page":1');
-    expect(screen.getByTestId('class-pager-status')).toHaveTextContent('"pages":3');
-    expect(screen.getByTestId('class-pager-prev')).toBeDisabled();
+    expect(screen.getAllByTestId('classroom-card')).toHaveLength(3);
+    expect(screen.getByTestId('class-carousel-track')).toBeInTheDocument();
+    expect(screen.getByTestId('class-carousel-status')).toHaveTextContent('"page":1');
+    expect(screen.getByTestId('class-carousel-status')).toHaveTextContent('"pages":3');
+    expect(screen.getByTestId('class-carousel-prev')).toBeDisabled();
   });
 
-  it('When next is tapped, Then the next class shows', () => {
+  it('When next is tapped, Then the second class scrolls into view', () => {
     render(<ClassroomManager />);
-    fireEvent.click(screen.getByTestId('class-pager-next'));
-    expect(screen.getByTestId('classroom-join-code')).toHaveTextContent('CODE02');
-    expect(screen.getByTestId('class-pager-prev')).not.toBeDisabled();
+    fireEvent.click(screen.getByTestId('class-carousel-next'));
+    const second = screen.getAllByRole('group')[1];
+    expect(scrollIntoView.mock.contexts[0]).toBe(second);
+    expect(second).toHaveTextContent('CODE02');
+    expect(screen.getByTestId('class-carousel-prev')).not.toBeDisabled();
   });
 
-  it('Given one class, Then there is no pager at all', () => {
+  it('Given one class, Then there is no arrow nav at all', () => {
     state.classrooms = [mk(1)];
     render(<ClassroomManager />);
-    expect(screen.queryByTestId('class-pager')).toBeNull();
+    expect(screen.queryByTestId('class-carousel-nav')).toBeNull();
+  });
+
+  it('Given three classes on a desktop row, Then they all fit and there is no arrow nav', () => {
+    mq.wide = true;
+    render(<ClassroomManager />);
+    expect(screen.getAllByTestId('classroom-card')).toHaveLength(3);
+    expect(screen.queryByTestId('class-carousel-nav')).toBeNull();
   });
 
   it('Given a class, Then its card has activity and a Start game into the host flow for that class', () => {
@@ -118,7 +131,7 @@ describe('ClassroomManager — paging instead of page scroll', () => {
     render(<ClassroomManager />);
     const cls = screen.getByTestId('classroom-add-tile').parentElement!.className.toString();
     expect(cls).toMatch(/(^|\s)self-start(\s|$)/);
-    expect(cls).toMatch(/(^|\s)justify-self-start(\s|$)/);
+    expect(cls).toMatch(/(^|\s)shrink-0(\s|$)/);
     expect(cls).not.toMatch(/self-stretch|min-h-64/);
   });
 
