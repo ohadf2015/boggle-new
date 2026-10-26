@@ -8,7 +8,7 @@
  *   2. The roster (who played, how they did) is only returned to a signed-in
  *      caller. An anonymous holder of the share link gets counts, never names.
  */
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 vi.mock('next/server', () => {
   class MockNextRequest {
@@ -59,168 +59,20 @@ vi.mock('@/utils/supabase/admin', () => ({
 import { NextRequest } from 'next/server';
 import { POST } from '../complete/route';
 import { GET } from '../progress/route';
-
-interface StreakRow {
-  class_key: string;
-  current_streak: number;
-  longest_streak: number;
-  last_completion_date: string | null;
-  completion_days: string[];
-  total_completions: number;
-}
-
-/**
- * Two students finished the 2026-09-12 assignment; a third finished a LATER
- * assignment for the same class. The third row exists so "the teacher asked for
- * the whole class, not one due date" is a distinguishable outcome.
- */
-const RUNS = [
-  {
-    class_key: 'week 3 vocab::ms. g',
-    due_key: '2026-09-12',
-    student_name: 'Maya',
-    student_key: 'g:maya',
-    stars: 3,
-    accuracy: 100,
-    words_correct: 8,
-    words_total: 8,
-    best_streak: 8,
-    duration_ms: 91000,
-    on_time: true,
-    is_guest: true,
-    completed_at: '2026-09-11T09:00:00.000Z',
-  },
-  {
-    class_key: 'week 3 vocab::ms. g',
-    due_key: '2026-09-12',
-    student_name: 'Noah',
-    student_key: 'g:noah',
-    stars: 2,
-    accuracy: 75,
-    words_correct: 6,
-    words_total: 8,
-    best_streak: 4,
-    duration_ms: 120000,
-    on_time: true,
-    is_guest: true,
-    completed_at: '2026-09-11T09:20:00.000Z',
-  },
-  {
-    class_key: 'week 3 vocab::ms. g',
-    due_key: '2026-09-19',
-    student_name: 'Ada',
-    student_key: 'g:ada',
-    stars: 3,
-    accuracy: 100,
-    words_correct: 8,
-    words_total: 8,
-    best_streak: 8,
-    duration_ms: 80000,
-    on_time: true,
-    is_guest: true,
-    completed_at: '2026-09-18T09:00:00.000Z',
-  },
-];
-
-let streakRow: StreakRow | null;
-/** The row already filed for this student, if any — drives the replay merge. */
-let previousRun: Record<string, unknown> | null;
-let upsertedRun: Record<string, unknown> | null;
-let upsertedStreak: Record<string, unknown> | null;
-/** Every `.eq(column, value)` the progress route applied to the runs query. */
-let runFilters: Array<[string, unknown]>;
-/** The caller's profile as the service role reads it. */
-let callerProfile: { user_role: string; is_admin: boolean } | null;
-
-function makeClient() {
-  return {
-    from(table: string) {
-      if (table === 'miss_gap_homework_runs') {
-        return {
-          upsert: (row: Record<string, unknown>) => {
-            upsertedRun = row;
-            return {
-              select: () => ({
-                single: async () => ({ data: { id: 'run-1', ...row }, error: null }),
-              }),
-            };
-          },
-          // Chain-shaped like PostgREST: eq/order are chainable, limit resolves.
-          // It records the filters and actually applies them, so "the route
-          // forgot to narrow" and "the route narrowed too hard" are both visible.
-          select: () => {
-            const filters: Array<[string, unknown]> = [];
-            const builder = {
-              eq(column: string, value: unknown) {
-                filters.push([column, value]);
-                return builder;
-              },
-              order() {
-                return builder;
-              },
-              // The complete route's "what did this student already score?" read.
-              async maybeSingle() {
-                return { data: previousRun, error: null };
-              },
-              async limit() {
-                runFilters.push(...filters);
-                const data = RUNS.filter((row) =>
-                  filters.every(
-                    ([column, value]) => (row as Record<string, unknown>)[column] === value,
-                  ),
-                );
-                return { data, error: null };
-              },
-            };
-            return builder;
-          },
-        };
-      }
-      if (table === 'profiles') {
-        return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: callerProfile, error: null }) }) }) };
-      }
-      return {
-        select: () => ({
-          eq: () => ({
-            maybeSingle: async () => ({ data: streakRow, error: null }),
-          }),
-        }),
-        upsert: (row: Record<string, unknown>) => {
-          upsertedStreak = row;
-          return { select: () => ({ single: async () => ({ data: row, error: null }) }) };
-        },
-      };
-    },
-  };
-}
-
-const BODY = {
-  classKey: 'week 3 vocab::ms. g',
-  dueDate: '2026-09-12',
-  lesson: 'Week 3 Vocab',
-  teacher: 'Ms. G',
-  studentName: 'Maya',
-  studentKey: 'maya-device-1',
-  completedOn: '2026-09-11',
-  wordsTotal: 8,
-  wordsCorrect: 8,
-  accuracy: 100,
-  stars: 3,
-  bestStreak: 8,
-  durationMs: 91000,
-};
+import { BODY, makeClient, resetState, state } from './missGapHarness';
 
 beforeEach(() => {
   vi.clearAllMocks();
   mockCheckApiRateLimit.mockReturnValue({ success: true });
   mockGetAuthedUser.mockResolvedValue(null);
-  callerProfile = null;
-  streakRow = null;
-  previousRun = null;
-  upsertedRun = null;
-  upsertedStreak = null;
-  runFilters = [];
+  resetState();
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-09-11T10:00:00Z'));
   mockAdmin.mockReturnValue(makeClient());
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe('POST /api/education/miss-gap/complete', () => {
@@ -234,7 +86,7 @@ describe('POST /api/education/miss-gap/complete', () => {
     const data = await res.json();
 
     expect(res.status).toBe(200);
-    expect(upsertedRun).toMatchObject({
+    expect(state.upsertedRun).toMatchObject({
       class_key: 'week 3 vocab::ms. g',
       due_key: '2026-09-12',
       is_guest: true,
@@ -242,13 +94,13 @@ describe('POST /api/education/miss-gap/complete', () => {
       stars: 3,
       words_correct: 8,
     });
-    expect(String(upsertedRun?.student_key)).toContain('maya-device-1');
+    expect(String(state.upsertedRun?.student_key)).toContain('maya-device-1');
     expect(data.streak.currentStreak).toBe(1);
     expect(data.contributed).toBe(true);
   });
 
   it('given yesterday already counted, extends the class streak to 2', async () => {
-    streakRow = {
+    state.streakRow = {
       class_key: BODY.classKey,
       current_streak: 1,
       longest_streak: 1,
@@ -264,10 +116,11 @@ describe('POST /api/education/miss-gap/complete', () => {
     );
     const data = await res.json();
     expect(data.streak.currentStreak).toBe(2);
-    expect(upsertedStreak).toMatchObject({ current_streak: 2, longest_streak: 2 });
+    expect(state.upsertedStreak).toMatchObject({ current_streak: 2, longest_streak: 2 });
   });
 
   it('given a LATE completion, records the run but never moves the streak', async () => {
+    vi.setSystemTime(new Date('2026-09-20T10:00:00Z'));
     const res = await POST(
       new NextRequest('http://x/api/education/miss-gap/complete', {
         method: 'POST',
@@ -275,8 +128,8 @@ describe('POST /api/education/miss-gap/complete', () => {
       }) as never,
     );
     const data = await res.json();
-    expect(upsertedRun).toMatchObject({ on_time: false });
-    expect(upsertedStreak).toBeNull();
+    expect(state.upsertedRun).toMatchObject({ on_time: false });
+    expect(state.upsertedStreak).toBeNull();
     expect(data.contributed).toBe(false);
   });
 
@@ -288,7 +141,7 @@ describe('POST /api/education/miss-gap/complete', () => {
         body: BODY,
       }) as never,
     );
-    expect(upsertedRun).toMatchObject({
+    expect(state.upsertedRun).toMatchObject({
       is_guest: false,
       player_id: 'aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa',
     });
@@ -320,7 +173,7 @@ describe('POST /api/education/miss-gap/complete', () => {
    * teacher a worse row than the student already earned — see missGapRunMerge.
    */
   it('given a worse replay, keeps the best score the student already recorded', async () => {
-    previousRun = {
+    state.previousRun = {
       words_correct: 8,
       accuracy: 100,
       stars: 3,
@@ -334,7 +187,7 @@ describe('POST /api/education/miss-gap/complete', () => {
     });
     const response = await POST(request);
     expect(response.status).toBe(200);
-    expect(upsertedRun).toMatchObject({
+    expect(state.upsertedRun).toMatchObject({
       words_correct: 8,
       accuracy: 100,
       stars: 3,
@@ -345,7 +198,7 @@ describe('POST /api/education/miss-gap/complete', () => {
   });
 
   it('given a better replay, records the improvement', async () => {
-    previousRun = {
+    state.previousRun = {
       words_correct: 2,
       accuracy: 25,
       stars: 1,
@@ -358,7 +211,7 @@ describe('POST /api/education/miss-gap/complete', () => {
       body: BODY,
     });
     await POST(request);
-    expect(upsertedRun).toMatchObject({ words_correct: 8, accuracy: 100, stars: 3 });
+    expect(state.upsertedRun).toMatchObject({ words_correct: 8, accuracy: 100, stars: 3 });
   });
 });
 
@@ -376,7 +229,7 @@ describe('GET /api/education/miss-gap/progress', () => {
 
   it('given a signed-in teacher, returns who played and how they did', async () => {
     mockGetAuthedUser.mockResolvedValue({ id: 'teacher-1' });
-    callerProfile = { user_role: 'teacher', is_admin: false };
+    state.callerProfile = { user_role: 'teacher', is_admin: false };
     const res = await GET(new NextRequest(url) as never);
     const data = await res.json();
     expect(data.runs).toHaveLength(2);
@@ -387,7 +240,7 @@ describe('GET /api/education/miss-gap/progress', () => {
 
   it('given a signed-in student, returns counts but no names', async () => {
     mockGetAuthedUser.mockResolvedValue({ id: 'guest-student-1' });
-    callerProfile = { user_role: 'student', is_admin: false };
+    state.callerProfile = { user_role: 'student', is_admin: false };
     const res = await GET(new NextRequest(url) as never);
     const data = await res.json();
     expect(data.players).toBe(2);
@@ -396,7 +249,7 @@ describe('GET /api/education/miss-gap/progress', () => {
   });
 
   it('returns the stored class streak', async () => {
-    streakRow = {
+    state.streakRow = {
       class_key: 'week 3 vocab::ms. g',
       current_streak: 4,
       longest_streak: 9,
@@ -425,14 +278,14 @@ describe('GET /api/education/miss-gap/progress', () => {
    */
   it('given no dueDate at all, counts every assignment for the class', async () => {
     mockGetAuthedUser.mockResolvedValue({ id: 'teacher-1' });
-    callerProfile = { user_role: 'teacher', is_admin: false };
+    state.callerProfile = { user_role: 'teacher', is_admin: false };
     const res = await GET(
       new NextRequest(
         'http://x/api/education/miss-gap/progress?classKey=week%203%20vocab%3A%3Ams.%20g',
       ) as never,
     );
     const data = await res.json();
-    expect(runFilters.some(([column]) => column === 'due_key')).toBe(false);
+    expect(state.runFilters.some(([column]) => column === 'due_key')).toBe(false);
     expect(data.players).toBe(3);
     expect(data.runs.map((r: { name: string }) => r.name)).toContain('Ada');
   });
@@ -440,7 +293,7 @@ describe('GET /api/education/miss-gap/progress', () => {
   it('given an explicit dueDate, still narrows to that one assignment', async () => {
     const res = await GET(new NextRequest(url) as never);
     const data = await res.json();
-    expect(runFilters).toContainEqual(['due_key', '2026-09-12']);
+    expect(state.runFilters).toContainEqual(['due_key', '2026-09-12']);
     expect(data.players).toBe(2);
   });
 
@@ -456,14 +309,14 @@ describe('GET /api/education/miss-gap/progress', () => {
         body: { ...BODY, classKey: 'Week  3 Vocab::Ms.  G ' },
       }) as never,
     );
-    const writtenKey = upsertedRun?.class_key;
+    const writtenKey = state.upsertedRun?.class_key;
 
     await GET(
       new NextRequest(
         `http://x/api/education/miss-gap/progress?classKey=${encodeURIComponent('Week  3 Vocab::Ms.  G ')}`,
       ) as never,
     );
-    expect(runFilters).toContainEqual(['class_key', writtenKey]);
+    expect(state.runFilters).toContainEqual(['class_key', writtenKey]);
     expect(writtenKey).toBe('week 3 vocab::ms. g');
   });
 });
