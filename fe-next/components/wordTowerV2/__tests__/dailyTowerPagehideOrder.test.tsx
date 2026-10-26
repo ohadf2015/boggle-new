@@ -12,7 +12,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const captureMock = vi.fn();
 vi.mock('@/lib/analytics/lazyPosthog', () => ({
-  default: { capture: (...args: unknown[]) => captureMock(...args) },
+  default: {
+    capture: (...args: unknown[]) => captureMock(...args),
+    captureBeacon: (...args: unknown[]) => captureMock(...args),
+  },
 }));
 
 const trackGameEnd = vi.fn();

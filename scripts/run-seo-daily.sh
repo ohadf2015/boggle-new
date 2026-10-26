@@ -183,6 +183,9 @@ From today's report, pick UP TO:
   • 1 NEW landing page (only if a high-intent query >50 impr/28d has NO good page)
 
 SKIP an opportunity if any of:
+  • The page is listed in seo-freeze.json with `until` after today. Its title and
+    meta description must not change; CI (Check SEO freeze) fails the PR if they do.
+    Body/H2/internal-link work on a frozen page is still fine.
   • Existing meta already contains the target query verbatim (cosmetic only)
   • Brand-only term ("lexiclash") — no SEO win
   • Query intent doesn't match a real LexiClash feature (would force fabrication)

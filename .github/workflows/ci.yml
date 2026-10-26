@@ -50,6 +50,9 @@ jobs:
     needs: install
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The SEO freeze check diffs the PR merge commit against its base (HEAD^1).
+          fetch-depth: 2
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -81,6 +84,10 @@ jobs:
       - name: Lint
         working-directory: fe-next
         run: npm run lint
+
+      - name: Check SEO freeze
+        if: github.event_name == 'pull_request'
+        run: node fe-next/scripts/ci/check-seo-freeze.mjs HEAD^1 HEAD
 
   type-check:
     runs-on: ubuntu-latest

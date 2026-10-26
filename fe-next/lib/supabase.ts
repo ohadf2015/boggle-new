@@ -103,11 +103,33 @@ export async function signUpWithEmail(email: string, password: string) {
   const locale = currentLocale || 'en';
   const redirectUrl = appendNextParam(new URL(`/${locale}/auth/callback`, window.location.origin));
 
+  // t_a80f937b: pass the first-touch attribution as user metadata so
+  // handle_new_user() stamps it on the profile at insert time. This matters
+  // for email signups whose confirm link opens in a DIFFERENT browser (no
+  // localStorage there). Null values are dropped — an absent key is cleaner
+  // than an empty string in raw_user_meta_data.
+  const { getFirstTouchAttribution } = await import('@/utils/utmCapture');
+  const ft = getFirstTouchAttribution();
+  const attributionData = ft
+    ? Object.fromEntries(
+        Object.entries({
+          utm_source: ft.utm_source,
+          utm_medium: ft.utm_medium,
+          utm_campaign: ft.utm_campaign,
+          referrer_domain: ft.referrer_domain,
+          landing_path: ft.landing_path,
+        }).filter(([, v]) => v != null)
+      )
+    : undefined;
+
   return supabase.auth.signUp({
     email,
     password,
     options: {
       emailRedirectTo: redirectUrl,
+      ...(attributionData && Object.keys(attributionData).length > 0
+        ? { data: attributionData }
+        : {}),
     },
   });
 }

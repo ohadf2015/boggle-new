@@ -20,6 +20,7 @@ import { createSupabasePublicClient } from '@/lib/supabaseServer';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 import { fetchGameModeStats, getCardOrder, type GameModeStats, type LandingGameMode } from './fetchGameModeStats';
 import { cachedWithTtl } from '@/lib/cache/ttlCache';
+import { getCachedCurrentSeasonId } from '@/lib/cache/currentSeason';
 import { SUPPORTED_GAME_LANGUAGES } from '@/lib/languageConfig';
 
 export interface LandingInitialData {
@@ -73,8 +74,13 @@ async function fetchLandingDataUncached(language: string): Promise<LandingInitia
   // the season ID — start them in parallel with the season RPC instead of waiting
   // behind it. Leaderboard still waits for currentSeasonId, but the other three
   // round-trips overlap the season fetch rather than queuing after it.
-  const [seasonResp, gameModeStats, gamesTodayResult, solveRateResult] = await Promise.all([
-    supabase.rpc('get_current_season_id'),
+  // The season id changes once per season, so it is cached in-process for 5 min
+  // (was one rpc/get_current_season_id per SSR request: 4,415/day on 2026-10-25).
+  const [currentSeasonId, gameModeStats, gamesTodayResult, solveRateResult] = await Promise.all([
+    getCachedCurrentSeasonId(async () => {
+      const resp = await supabase.rpc('get_current_season_id');
+      return (resp?.data as number | null) ?? 1;
+    }),
     fetchGameModeStats(7),
     supabase
       .from('game_results')
@@ -88,14 +94,14 @@ async function fetchLandingDataUncached(language: string): Promise<LandingInitia
       .maybeSingle(),
   ]);
 
-  const currentSeasonId = (seasonResp?.data as number | null) ?? 1;
+  const seasonId = currentSeasonId ?? 1;
 
   const topPlayersResult = await supabase
     .from('leaderboard')
     .select(
       'player_id, username, display_name, total_score, avatar_image, avatar_config, profiles!leaderboard_player_id_fkey(prestige_level)'
     )
-    .eq('season_id', currentSeasonId)
+    .eq('season_id', seasonId)
     .gt('total_score', 0)
     .order('total_score', { ascending: false })
     .limit(TOP_PLAYERS_LIMIT);

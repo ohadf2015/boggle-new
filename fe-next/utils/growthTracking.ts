@@ -30,7 +30,7 @@ import {
   trackRageQuit,
   trackSessionDepth,
 } from '@/utils/posthogEngagement';
-import { markGameActive, markGameInactive, isGameActive } from '@/utils/abandonOnPagehide';
+import { markGameActive, markGameInactive, isGameActive, consumeResumedAfterHidden } from '@/utils/abandonOnPagehide';
 import {
   clearPendingActivation,
   isActivationCaptureArmed,
@@ -1677,8 +1677,15 @@ export const trackGameEnd = (
     });
   }
 
+  // A hidden/pagehide abandon may already have gone out for this round (mobile
+  // tabs backgrounded mid-game). If the player came back and finished, stamp
+  // the completion so funnels can drop the earlier abandon instead of
+  // double-counting churn.
+  const resumedAfterHidden = completed ? consumeResumedAfterHidden() : false;
+
   trackGrowthEvent(completed ? 'game_completed' : 'game_abandoned', {
     ...extras,
+    ...(resumedAfterHidden ? { resumed_after_hidden: true } : {}),
     mode,
     gameMode: mode,
     score,
