@@ -159,6 +159,7 @@ function inProgressGame(overrides: Record<string, unknown> = {}) {
 }
 
 import { emitError } from '../../utils/errorHandler';
+import { addSpectatorToGame } from '../../modules/gameStateManager';
 
 describe('PlayerJoinHandler — classroom late join switch', () => {
   beforeEach(() => {
@@ -380,5 +381,50 @@ describe('PlayerJoinHandler — reconnect after server restart (deploy)', () => 
 
     expect(handleReconnection).not.toHaveBeenCalled();
     expect(handleLateJoin).toHaveBeenCalled();
+  });
+});
+
+describe('PlayerJoinHandler — seats in a full room (cap mocked to 8)', () => {
+  const crowd = (n: number, host: boolean) => {
+    const users: Record<string, { isHost: boolean; socketId: string }> = {};
+    if (host) users.Teacher = { isHost: true, socketId: 'host' };
+    for (let i = 0; i < n; i++) users[`kid${i}`] = { isHost: false, socketId: `s${i}` };
+    return users;
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetGameUsers.mockReturnValue([]);
+    mockGetActiveRooms.mockReturnValue([]);
+    mockGetSocketIdByUsername.mockReturnValue(undefined);
+    mockShouldSendGameState.mockReturnValue(true);
+  });
+
+  it('a classroom teacher watches, so 7 students + teacher still leaves a seat for the 8th student', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ isClassroom: true, users: crowd(7, true) }));
+    mockCheckSeat.mockResolvedValue({ game: { settings: {} }, refused: false });
+    const { join, socket } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Eighth' });
+    expect(addSpectatorToGame).not.toHaveBeenCalled();
+    expect(mockAddUserToGame).toHaveBeenCalled();
+    expect(socket.emit).not.toHaveBeenCalledWith('joinedAsSpectator', expect.anything());
+  });
+
+  it('a classroom with 8 students seated sends the 9th to watch', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ isClassroom: true, users: crowd(8, true) }));
+    mockCheckSeat.mockResolvedValue({ game: { settings: {} }, refused: false });
+    const { join, socket } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Ninth' });
+    expect(addSpectatorToGame).toHaveBeenCalled();
+    expect(socket.emit).toHaveBeenCalledWith('joinedAsSpectator', expect.objectContaining({ spectator: true }));
+  });
+
+  it('an ordinary room still counts its playing host: 7 players + host is full', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ users: crowd(7, true) }));
+    mockCheckSeat.mockResolvedValue({ game: null, refused: false });
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Late' });
+    expect(addSpectatorToGame).toHaveBeenCalled();
+    expect(mockAddUserToGame).not.toHaveBeenCalled();
   });
 });

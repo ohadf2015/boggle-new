@@ -9,11 +9,11 @@ import {
   addToWeeklyLeaderboard,
   getLeaderboardPercentile,
 } from '../blastLeaderboard';
-import { getRedisClient } from '@/backend/redis/connection';
+import { getSharedRedisClient } from '@/backend/redis/connection';
 
 // Mock the backend redis client accessor (vitest via jest-compat shim)
 vi.mock('@/backend/redis/connection', () => ({
-  getRedisClient: vi.fn(),
+  getSharedRedisClient: vi.fn(),
 }));
 
 const mockZadd = vi.fn();
@@ -28,7 +28,7 @@ const fakeClient = {
   zcard: mockZcard,
 };
 
-const mockedGetRedisClient = getRedisClient as unknown as ReturnType<typeof vi.fn>;
+const mockedGetRedisClient = getSharedRedisClient as unknown as ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   mockZadd.mockReset().mockResolvedValue(1);

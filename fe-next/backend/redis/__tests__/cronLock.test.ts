@@ -30,6 +30,7 @@ const redisState = { available: true };
 // The cron routes' copy of ../connection never connects (null / false); only
 // the shared handle the server published carries the client.
 vi.mock('../connection', () => ({
+  // Next route code gets its own copy of the module: its own client/flag stay unset.
   getRedisClient: () => null,
   isRedisAvailable: () => false,
   getSharedRedisClient: () => (redisState.available ? mockClient : null),
