@@ -14,7 +14,7 @@ const BASE_URL = 'https://www.lexiclash.live';
 const SV_TITLE = 'Spela Scrabble Svenska Gratis Online — Alfapet | LexiClash';
 /** Adds Alfapet-alternativ signal for "alfapet online" searches; tightened to 136 chars. */
 const SV_DESCRIPTION =
-  'Spela scrabble på svenska gratis online — Alfapet-alternativ utan app eller konto. Tävla i realtid med upp till 50 spelare. Starta nu! →';
+  'Spela scrabble svenska online gratis — inget konto, ingen app. Alfapet-alternativ med riktigt multiplayer: upp till 50 spelare i realtid. Starta nu! →';
 
 /**
  * Growth Radar rec 2718: Bing grounds "scrabble på svenska" (111 AI groundings) but cites other
