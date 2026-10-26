@@ -160,6 +160,13 @@ export async function withGameLock<T>(
 
 const CRON_LOCK_PREFIX = `${LOCK_PREFIX}:cron`;
 
+// Cron routes run inside the Next bundle, whose copy of ./connection never
+// connects; read the client the server booted, and only while it is ready.
+function cronRedisClient() {
+  const client = getSharedRedisClient();
+  return client && client.status === 'ready' ? client : null;
+}
+
 /** Redis failed while taking the lock: the run did not happen and must not read as "already running". */
 export class CronLockError extends Error {
   constructor(jobName: string, cause: string) {
@@ -172,7 +179,7 @@ export async function tryAcquireCronLock(
   jobName: string,
   ttlMs: number
 ): Promise<string | null> {
-  const client = getSharedRedisClient();
+  const client = cronRedisClient();
   if (!client) {
     logger.warn('CRON_LOCK', `${jobName} running without overlap protection: Redis unavailable`);
     return `no-redis-${Date.now()}`;
@@ -194,7 +201,7 @@ export async function tryAcquireCronLock(
 
 export async function releaseCronLock(jobName: string, lockId: string): Promise<void> {
   if (lockId.startsWith('no-redis-')) return;
-  const client = getSharedRedisClient();
+  const client = cronRedisClient();
   if (!client) return;
   const key = `${CRON_LOCK_PREFIX}:${jobName}`;
 
