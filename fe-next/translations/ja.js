@@ -20941,6 +20941,8 @@ const ja = {
       "wheelLabel": "クラスの文字ホイール"
     },
     "lobby": {
+      "roomFull": "満員：{max}席中{seated}席が埋まっています",
+      "roomFullWatching": "{count}人が席なしで観戦中",
       "brand": "クラス",
       "joinAt": "参加はこちら",
       "joined": "{count}人参加",
@@ -20968,6 +20970,8 @@ const ja = {
       "leave": "退出"
     },
     "entry": {
+      "roomFullTitle": "満員です：観戦モードで参加中",
+      "roomFullHint": "{max}席すべて埋まっています。先生はあなたが待っていることを確認できます。",
       "connecting": "クラスに接続中…",
       "openingRoom": "ルームを準備中…",
       "waitingTeacher": "先生がまだゲームを開いていません",

@@ -7,6 +7,7 @@ import { useAssignments } from '@/hooks/useAssignments';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { hasProAccess } from '@/lib/education/teacherPlanGate';
+import { isAssignmentLimitError } from '@/lib/education/assignmentLimit';
 import { AssignmentLimitUpsell } from './AssignmentLimitUpsell';
 import { AssignmentTemplateGallery } from './AssignmentTemplateGallery';
 import { useLessons } from '@/hooks/useVocabularyLesson';
@@ -17,7 +18,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Swords, BookOpen, Crosshair, Lock, Grid2x2 } from 'lucide-react';
+import { Swords, BookOpen, Grid2x2 } from 'lucide-react';
 import { AssignmentCreatorDueDate, assignmentSubmitHintKey } from './AssignmentCreatorDueDate';
 import { AssignmentStep } from './AssignmentStep';
 import { AssignmentLessonStep } from './AssignmentLessonStep';
@@ -25,7 +26,6 @@ import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import {
   VOCAB_FOCUSES,
-  MIN_WORDS_PER_FOCUS,
   focusQuestionCounts,
   type PracticeFocusSetting,
 } from '@/lib/education/vocabFocus';
@@ -46,6 +46,7 @@ import {
 } from '@/lib/education/teacherOnboardingFunnel';
 import type { Language } from '@/lib/supabase/education/types';
 import { AssignmentGoalModes } from './AssignmentGoalModes';
+import { AssignmentFocusPicker } from './AssignmentFocusPicker';
 import { createWordGoalAssignment } from '@/lib/education/createWordGoalAssignment';
 import { SINGLE_WORDS_ONLY_KEY, formatRejectedTerms } from '@/lib/education/singleWordTerm';
 import {
@@ -83,11 +84,11 @@ export default function AssignmentCreator({
   const pro = useTeacherPro();
   const { hasPro, status, loading: proLoading } = pro;
   const [nowMs] = useState(() => Date.now());
-  // Soft paywall: Pro or a live access trial lifts it; wait for the entitlement so a
-  // paying teacher never sees the gate. `assignments` is undefined in older hook mocks.
+  const [dbCapHit, setDbCapHit] = useState(false);
+  // Waits for the entitlement so a paying teacher never sees the gate; the DB trigger is the backstop.
   const assignmentCount = assignments?.length ?? 0;
-  const atAssignmentCap =
-    !proLoading && !hasProAccess(pro, nowMs) && assignmentCount >= FREE_TIER_LIMITS.assignmentsPerClass;
+  const atAssignmentCap = dbCapHit ||
+    (!proLoading && !hasProAccess(pro, nowMs) && assignmentCount >= FREE_TIER_LIMITS.assignmentsPerClass);
   const { lessons, isLoading: isLoadingLessons, createLesson } = useLessons();
   const { classrooms = [] } = useClassrooms();
 
@@ -137,6 +138,7 @@ export default function AssignmentCreator({
       setWordCount(WORD_COUNT_DEFAULT);
       setWordListRaw('');
       setGalleryOpen(emptyLessonList);
+      setDbCapHit(false);
     }
   }, [isOpen, initialLessonId, emptyLessonList]);
 
@@ -153,6 +155,7 @@ export default function AssignmentCreator({
     ? assignmentSubmitHintKey(true, Boolean(dueDate))
     : assignmentSubmitHintKey(Boolean(selectedLessonId), Boolean(dueDate));
 
+  const showFailure = (err?: string) => (isAssignmentLimitError(err) ? setDbCapHit(true) : toast.error(err || t('teacher.assignment.error')));
   const handleSubmit = async () => {
     if (submittingRef.current) return;
     submittingRef.current = true;
@@ -205,7 +208,7 @@ export default function AssignmentCreator({
         onComplete();
         onClose();
       } else {
-        toast.error(result.error || t('teacher.assignment.error'));
+        showFailure(result.error);
       }
       return;
     }
@@ -226,7 +229,6 @@ export default function AssignmentCreator({
       instructions: instructions || null,
       practice_focus: selectedType === 'practice' ? focus : selectedType === 'wordcraft' ? WORDCRAFT_FOCUS : null,
     });
-
     setIsSubmitting(false);
 
     if (result.alreadyAssigned) {
@@ -250,7 +252,7 @@ export default function AssignmentCreator({
       onComplete();
       onClose();
     } else {
-      toast.error(result.error || t('teacher.assignment.error'));
+      showFailure(result.error);
     }
   };
 
@@ -297,9 +299,7 @@ export default function AssignmentCreator({
       onClose();
       return;
     }
-    toast.error(
-      result.assignmentError || result.error || t('teacher.assignment.error'),
-    );
+    showFailure(result.assignmentError || result.error);
   };
 
   return (
@@ -427,68 +427,7 @@ export default function AssignmentCreator({
 
             {/* Vocabulary focus (practice only, once a lesson is chosen) */}
             {selectedType === 'practice' && selectedLesson && (
-              <div>
-                <label className="block text-sm font-neo-body text-neo-white mb-1">
-                  {t('teacher.assignment.focus.label')}
-                </label>
-                <p className="text-xs text-neo-white/70 font-neo-body mb-2 text-pretty">
-                  {t('teacher.assignment.focus.help')}
-                </p>
-                <div
-                  role="radiogroup"
-                  aria-label={t('teacher.assignment.focus.label')}
-                  className="grid grid-cols-1 sm:grid-cols-2 gap-2"
-                >
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={focus === 'any'}
-                    onClick={() => setFocus('any')}
-                    className={cn(
-                      'min-h-12 p-3 rounded-neo border-neo text-start transition',
-                      focus === 'any'
-                        ? 'bg-neo-cyan border-neo-cyan text-neo-black shadow-hard-sm'
-                        : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
-                    )}
-                  >
-                    <span className="font-bold block">{t('teacher.assignment.focus.any')}</span>
-                    <span className="text-xs opacity-80 block">{t('teacher.assignment.focus.anyHint')}</span>
-                  </button>
-                  {VOCAB_FOCUSES.map((option) => {
-                    const supported = supportedFocuses.includes(option);
-                    const active = focus === option;
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        role="radio"
-                        aria-checked={active}
-                        disabled={!supported}
-                        onClick={() => supported && setFocus(option)}
-                        className={cn(
-                          'min-h-12 p-3 rounded-neo border-neo text-start transition',
-                          active && 'bg-neo-yellow border-neo-yellow text-neo-black shadow-hard-sm',
-                          !active && supported && 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80',
-                          !supported && 'bg-neo-navy/30 border-neo-black/40 text-neo-white/50 cursor-not-allowed'
-                        )}
-                      >
-                        <span className="font-bold flex items-center gap-1.5">
-                          {supported ? <Crosshair className="w-4 h-4" aria-hidden="true" /> : <Lock className="w-4 h-4" aria-hidden="true" />}
-                          {t(`education.vocabFocus.focus.${option}`)}
-                        </span>
-                        <span className="text-xs opacity-80 block">
-                          {supported
-                            ? t('teacher.assignment.focus.questionCount', {
-                                count: focusCounts?.[option] ?? 0,
-                                skill: t(`education.vocabFocus.instructions.${option}`),
-                              })
-                            : t(`education.vocabFocus.unlock.${option}`, { min: MIN_WORDS_PER_FOCUS })}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              <AssignmentFocusPicker focus={focus} onFocus={setFocus} supportedFocuses={supportedFocuses} focusCounts={focusCounts} t={t} />
             )}
 
             <AssignmentStep step="due" n={4} label={t('teacher.assignment.dueDate')}>
