@@ -4101,14 +4101,23 @@ body.edu-shell-locked {
    /en/teacher at 390x844 — a 398px reservation left the shell 446px tall, the
    bottom tab bar floating mid-screen and the last rows of content clipped.
    Same specificity as the generic rule (0,2,2), so this MUST stay after it in
-   the file. The nav / ad-banner reservation comes back only when one is really
-   on screen: --bottom-nav-height defaults to 64px, so an ungated reservation
-   left a blank band under the tab bar. */
+   the file.
+
+   The same band appears with NO cookie sheet: `html.has-admob-banner
+   body.screen-fit` (and has-web-anchor-ad / has-global-bottom-nav) pad the
+   flex-column body by --bottom-stack-height, whose max(16px, nav) floor is
+   64px + safe-area even when no nav exists (the player nav is hidden on
+   /teacher and /student). The h-dvh shell is a shrinkable flex item, so on the
+   native app the tab bar sat ~100px above the home indicator over an empty
+   band. A shell-locked body therefore reserves only the banner itself (a native
+   banner composites above the WebView) and never the nav floor; the tab bar owns
+   env(safe-area-inset-bottom) alone. Same specificity (0,2,2) as the generic
+   rules above, so this stays after them. */
 html.has-cookie-consent body.edu-shell-locked {
   padding-bottom: 0;
 }
-html.has-cookie-consent:is(.has-global-bottom-nav, .has-admob-banner, .has-web-anchor-ad) body.edu-shell-locked {
-  padding-bottom: var(--bottom-stack-height, 0px);
+html:is(.has-global-bottom-nav, .has-admob-banner, .has-web-anchor-ad) body.edu-shell-locked {
+  padding-bottom: min(var(--admob-banner-height, 0px), 120px);
 }
 
 /* ...and re-applied where it belongs: the one region that actually scrolls, so

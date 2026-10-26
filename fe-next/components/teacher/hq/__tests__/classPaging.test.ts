@@ -1,9 +1,9 @@
 /**
- * The Classes tab never scrolls the page: classes page instead. One per page
+ * The Classes tab never scrolls the page: classes sit in a swipeable carousel instead. One per page
  * on a phone, two on a tablet, three on a desktop row.
  */
 import { describe, it, expect } from 'vitest';
-import { CLASS_GRID_QUERIES, classPageSize, pageSlice } from '../classPaging';
+import { CLASS_GRID_QUERIES, carouselPage, carouselPages, classPageSize } from '../classPaging';
 
 describe('classPageSize', () => {
   it('Given a phone, Then one class per page', () => {
@@ -37,23 +37,27 @@ describe('CLASS_GRID_QUERIES', () => {
   });
 });
 
-describe('pageSlice', () => {
-  const items = ['a', 'b', 'c', 'd', 'e'];
-  it('Given page 0 of size 2, Then the first two and 3 pages total', () => {
-    expect(pageSlice(items, 0, 2)).toEqual({ items: ['a', 'b'], page: 0, pages: 3 });
+describe('carouselPages', () => {
+  it('Given 5 classes, 2 per view, Then 3 pages', () => {
+    expect(carouselPages(5, 2)).toBe(3);
   });
-  it('Given the last page, Then only what is left', () => {
-    expect(pageSlice(items, 2, 2)).toEqual({ items: ['e'], page: 2, pages: 3 });
+  it('Given everything fits, Then one page', () => {
+    expect(carouselPages(3, 3)).toBe(1);
+    expect(carouselPages(0, 3)).toBe(1);
   });
-  it('Given a page past the end (a class was deleted), Then it clamps to the last page', () => {
-    expect(pageSlice(items, 9, 2)).toEqual({ items: ['e'], page: 2, pages: 3 });
+});
+
+describe('carouselPage', () => {
+  it('Given the first card at the start edge, Then that card\'s page', () => {
+    expect(carouselPage({ firstIndex: 0, atEnd: false, perView: 2, count: 5 })).toBe(0);
+    expect(carouselPage({ firstIndex: 2, atEnd: false, perView: 2, count: 5 })).toBe(1);
   });
-  it('Given no items, Then one empty page', () => {
-    expect(pageSlice([], 0, 3)).toEqual({ items: [], page: 0, pages: 1 });
+  // The browser clamps the last scroll so card 4 of 5 never reaches the start edge.
+  it('Given the scroller is clamped at its end, Then the last page even if the first card is mid-page', () => {
+    expect(carouselPage({ firstIndex: 3, atEnd: true, perView: 2, count: 5 })).toBe(2);
   });
-  it('Given the page holding a given index, Then pageOf finds it', async () => {
-    const { pageOf } = await import('../classPaging');
-    expect(pageOf(4, 2)).toBe(2);
-    expect(pageOf(-1, 2)).toBe(0);
+  it('Given a mid-swipe position between cards, Then the nearest page', () => {
+    expect(carouselPage({ firstIndex: 1, atEnd: false, perView: 3, count: 9 })).toBe(0);
+    expect(carouselPage({ firstIndex: 2, atEnd: false, perView: 3, count: 9 })).toBe(1);
   });
 });

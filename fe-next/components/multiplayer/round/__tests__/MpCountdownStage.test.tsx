@@ -74,6 +74,18 @@ describe('MpCountdownStage', () => {
     expect(screen.getByTestId('mp-countdown-numeral').className).toContain('text-neo-lime');
   });
 
+  it('sizes the GO word by viewport width so a long word (e.g. Hebrew) never clips on phones', () => {
+    render(<MpCountdownStage t={(k: string) => (k === 'countdown.go' ? 'קדימה' : k)} />);
+    step(3);
+    const go = screen.getByTestId('mp-countdown-numeral');
+    expect(go).toHaveTextContent('קדימה');
+    expect(go.className).toContain('text-[min(26vh,14vw)]');
+    expect(go.className).toContain('md:text-[min(26vh,20vw)]');
+    expect(go.className).not.toContain('46vw');
+    expect(go.className).toContain('text-center');
+    expect(go.className).toContain('max-w-full');
+  });
+
   it('reduced motion: the number changes with no punch', () => {
     reduce.value = true;
     render(<MpCountdownStage t={t} />);

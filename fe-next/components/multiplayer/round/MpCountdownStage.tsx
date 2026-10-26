@@ -159,7 +159,7 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
         )}
       </div>
 
-      {/* The numeral — 40vh, keyed so the punch runs once per step */}
+      {/* The numeral — 40vh, keyed so the punch runs once per step. GO is width-capped: a 5+ glyph word (קדימה) at the 1.4x punch peak must still fit a phone. */}
       <div className="relative flex flex-1 min-h-0 items-center justify-center w-full">
         {isGo && !staticLayer && (
           <span
@@ -171,8 +171,8 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
           key={count}
           data-testid="mp-countdown-numeral"
           className={cn(
-            'relative font-neo-display font-bold leading-none tabular-nums [text-shadow:0.06em_0.06em_0_var(--neo-black)]',
-            isGo ? 'text-[min(26vh,46vw)] text-neo-lime' : cn('text-[40vh]', MODE_TEXT[mode.color]),
+            'relative max-w-full text-center font-neo-display font-bold leading-none tabular-nums [text-shadow:0.06em_0.06em_0_var(--neo-black)]',
+            isGo ? 'text-[min(26vh,14vw)] md:text-[min(26vh,20vw)] text-neo-lime' : cn('text-[40vh]', MODE_TEXT[mode.color]),
             !reduceMotion && styles.countPunch,
           )}
         >

@@ -53,13 +53,13 @@ export const EduProjectorLobby = memo<ProjectorLobbyProps>(function EduProjector
   const { kick, statusOf } = useKickStudent(getSharedSocketIfExists());
 
   return (
-    <div data-testid="edu-projector-lobby" className="fixed inset-0 z-[65] flex flex-col overflow-y-auto bg-neo-navy md:overflow-hidden">
+    <div data-testid="edu-projector-lobby" className="fixed inset-0 z-[65] flex flex-col overflow-y-auto bg-neo-navy md:overflow-y-auto">
       <style>{LIVE_KEYFRAMES}</style>
       {/* eslint-disable-next-line @next/next/no-img-element -- decorative full-bleed art, eager */}
       <img src={EDU_LOBBY_BG} alt="" aria-hidden="true" loading="eager" decoding="async" className="pointer-events-none fixed inset-0 h-full w-full select-none object-cover" />
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 bg-neo-navy/35" />
 
-      <div className="relative grid min-h-full flex-1 grid-cols-1 gap-4 p-4 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:grid-rows-[auto_minmax(0,1fr)_auto] md:gap-[1.4vw] md:p-[2vw]">
+      <div className="relative grid min-h-full flex-1 grid-cols-1 gap-4 p-4 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:grid-rows-[auto_minmax(min-content,1fr)_auto] md:gap-[1.4vw] md:p-[2vw]">
         <header className="flex flex-wrap items-center gap-3 md:col-span-2 md:gap-[1vw]">
           {onExitRoom && (
             <button type="button" data-testid="edu-lobby-leave" onClick={onExitRoom} aria-label={t('eduLiveRoom.lobby.leave')} title={t('eduLiveRoom.lobby.leave')} className={cn('grid size-11 shrink-0 place-items-center rounded-neo border-[3px] border-neo-cream bg-neo-navy-light text-neo-cream shadow-hard-sm hover:bg-neo-navy', PRESS)}>
@@ -79,7 +79,7 @@ export const EduProjectorLobby = memo<ProjectorLobbyProps>(function EduProjector
           )}
         </header>
 
-        <div className="md:row-start-2">
+        <div className="md:row-start-2 md:min-h-0">
           <EduJoinCard gameCode={gameCode} language={language} baseUrl={baseUrl} t={t} />
         </div>
 

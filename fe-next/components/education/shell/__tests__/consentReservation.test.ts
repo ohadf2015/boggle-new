@@ -51,15 +51,27 @@ describe('cookie-consent reservation vs the education shell', () => {
     expect(block).toMatch(/padding-bottom:\s*0\s*;/);
   });
 
-  it('keeps the bottom-stack reservation only behind a real nav / banner class', () => {
+  it('never pads a shell-locked body by the 64px nav floor, cookie sheet or not', () => {
+    // Measured on the native app (/teacher, 390x844 + home indicator): no cookie
+    // sheet, no player nav, but a banner class on <html>. `html.has-admob-banner
+    // body.screen-fit` padded the flex-column body by --bottom-stack-height
+    // (16px floor + banner); the h-dvh shell shrank by that much and the tab bar
+    // sat ~100px above the home indicator over an empty band.
     const gated = css.indexOf('body.edu-shell-locked', css.indexOf(OPT_OUT) + OPT_OUT.length);
     const selector = css.slice(css.lastIndexOf('}', gated) + 1, gated);
-    expect(selector).toContain('has-cookie-consent');
+    expect(selector).not.toContain('has-cookie-consent');
     expect(selector).toMatch(/has-admob-banner/);
-    expect(selector).toMatch(/has-global-bottom-nav/);
+    expect(selector).toMatch(/has-web-anchor-ad/);
     const block = css.slice(gated, css.indexOf('}', gated));
-    expect(block).toContain('--bottom-stack-height');
+    expect(block).toContain('--admob-banner-height');
+    expect(block).not.toContain('--bottom-stack-height');
     expect(block).not.toContain('--cookie-consent-height');
+  });
+
+  it('wins over the generic banner reservation in the cascade', () => {
+    const generic = css.indexOf('html.has-admob-banner body.screen-fit');
+    const gated = css.indexOf('body.edu-shell-locked', css.indexOf(OPT_OUT) + OPT_OUT.length);
+    expect(gated).toBeGreaterThan(generic);
   });
 
   it('moves the sheet reservation onto the one region that scrolls', () => {
