@@ -53,7 +53,8 @@ vi.mock('@/utils/supabase/admin', () => ({
   }),
 }));
 
-import { POST, sanitizeReferrerDomain, sanitizeLandingPath } from '../route';
+import { POST } from '../route';
+import { sanitizeReferrerDomain, sanitizeLandingPath } from '@/lib/auth/attributionSanitize';
 
 const AUTHED = { data: { user: { id: 'user-1' } }, error: null };
 const ANON = { data: { user: null }, error: new Error('no session') };
