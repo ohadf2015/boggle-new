@@ -20624,6 +20624,13 @@ const ja = {
       "askSchool": "学校に費用を負担してもらいたい場合",
       "featureParentPack": "クラス全員分の保護者向けレポートリンクをワンクリックで作成"
     },
+    "preCheckout": {
+      "title": "お支払いの前にひと目で確認",
+      "includesTitle": "Teacher Pro に含まれるもの",
+      "paidLine": "Teacher Pro は本日より {price}/月です。",
+      "secure": "安全な決済 — カード情報は当方に表示されません",
+      "confirm": "安全なチェックアウトへ進む"
+    },
     "faq": {
       "trialQ": "無料体験はどのような仕組みですか？",
       "trialA": "Teacher Proを初めて利用するアカウントは最初の{days}日間が無料で、その後は月{price}です。{days}日目までに解約すれば請求は発生しません。無料体験は1アカウントにつき1回です。",

@@ -72,6 +72,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/daily/archive",
   "/daily/word-hunt",
   "/daily/word-wheel",
+  "/dev/boss",
   "/dev/results",
   "/dev/reward-chest",
   "/download-word-game-android",

@@ -73,10 +73,16 @@ test.describe('Teacher Pro money path', () => {
     await expect(cta).toBeEnabled();
     await cta.scrollIntoViewIfNeeded();
 
+    await cta.click();
+
+    // The pre-checkout explainer is the hand-off step: CTA → explainer → confirm → POST.
+    const confirm = page.getByTestId('pre-checkout-confirm');
+    await expect(confirm).toBeVisible();
+
     const checkoutPost = page.waitForRequest(isCheckoutPost, { timeout: 15_000 });
     const polarLand = page.waitForURL(/sandbox\.polar\.sh\/checkout/, { timeout: 15_000 });
 
-    await cta.click();
+    await confirm.click();
 
     const request = await checkoutPost;
     const rawBody = request.postData() ?? '';

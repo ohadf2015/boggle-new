@@ -20624,6 +20624,13 @@ const sv = {
       "askSchool": "Vill du att skolan betalar?",
       "featureParentPack": "Föräldrarapporter för hela klassen med ett klick"
     },
+    "preCheckout": {
+      "title": "En sista titt innan betalningen",
+      "includesTitle": "Teacher Pro ingår",
+      "paidLine": "Teacher Pro kostar {price}/månad, från och med idag.",
+      "secure": "Säker betalning — vi ser aldrig ditt kort",
+      "confirm": "Fortsätt till säker betalning"
+    },
     "faq": {
       "trialQ": "Hur fungerar den gratis provperioden?",
       "trialA": "Nya Teacher Pro-konton får de första {days} dagarna gratis, sedan kostar det {price}/månad. Avsluta före dag {days} så debiteras du inte. En provperiod per konto.",

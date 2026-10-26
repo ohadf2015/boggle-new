@@ -19683,6 +19683,13 @@ const en = {
       "askSchool": "Want your school to pay?",
       "featureParentPack": "Parent report links for a whole class in one click"
     },
+    "preCheckout": {
+      "title": "One quick look before checkout",
+      "includesTitle": "Teacher Pro includes",
+      "paidLine": "Teacher Pro is {price}/month, starting today.",
+      "secure": "Secure checkout — we never see your card",
+      "confirm": "Continue to secure checkout"
+    },
     "faq": {
       "trialQ": "How does the free trial work?",
       "trialA": "New Teacher Pro accounts get the first {days} days free, then it's {price}/month. Cancel before day {days} and you aren't charged. One trial per account.",

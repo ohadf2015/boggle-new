@@ -39,7 +39,7 @@ describe('Pro funnel server events', () => {
     expect(buildProCheckoutStartedEvent('u-1')).toEqual({
       distinctId: 'u-1',
       event: 'edu_pro_checkout_started',
-      properties: { product: 'teacher_pro', provider: 'polar' },
+      properties: { product: 'teacher_pro', provider: 'polar', teacher_id: 'u-1' },
     });
   });
 
@@ -63,7 +63,7 @@ describe('Pro funnel server events', () => {
     expect(buildCheckoutStartedEvent('u-1')).toEqual({
       distinctId: 'u-1',
       event: 'checkout_started',
-      properties: { product: 'teacher_pro', provider: 'polar' },
+      properties: { product: 'teacher_pro', provider: 'polar', teacher_id: 'u-1' },
     });
     expect(buildTrialCheckoutStartedEvent('u-1')).toEqual(buildCheckoutStartedEvent('u-1'));
   });
@@ -112,7 +112,7 @@ describe('Pro funnel server events', () => {
     expect(buildCheckoutCompleteEvent('u-1', 'sub-9')).toEqual({
       distinctId: 'u-1',
       event: 'checkout_complete',
-      properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
+      properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9', teacher_id: 'u-1' },
     });
   });
 

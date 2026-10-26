@@ -20636,6 +20636,13 @@ const es = {
       "askSchool": "¿Quieres que pague tu centro?",
       "featureParentPack": "Enlaces de informe para las familias de toda la clase, con un clic"
     },
+    "preCheckout": {
+      "title": "Un último vistazo antes de pagar",
+      "includesTitle": "Teacher Pro incluye",
+      "paidLine": "Teacher Pro cuesta {price}/mes, a partir de hoy.",
+      "secure": "Pago seguro — nunca vemos tu tarjeta",
+      "confirm": "Continuar al pago seguro"
+    },
     "faq": {
       "trialQ": "¿Cómo funciona la prueba gratis?",
       "trialA": "Las cuentas nuevas de Teacher Pro tienen gratis los primeros {days} días; después cuesta {price}/mes. Si cancelas antes del día {days}, no se te cobra. Una prueba por cuenta.",
