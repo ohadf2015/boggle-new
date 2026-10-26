@@ -17,7 +17,7 @@ vi.mock('@/components/education/projector/ProjectorQuizBlocked', () => ({
 vi.mock('@/components/education/lobby/useClassroomModeSwitch', () => ({ readLocalGameMode: () => null }));
 vi.mock('@/utils/SocketContext', () => ({ getSharedSocketIfExists: () => null }));
 vi.mock('@/components/Avatar', () => ({ default: () => <span data-testid="avatar" /> }));
-vi.mock('qrcode.react', () => ({ QRCodeSVG: ({ value }: { value: string }) => <svg data-testid="join-qr" data-value={value} /> }));
+vi.mock('qrcode.react', () => ({ QRCodeSVG: ({ value, className }: { value: string; className?: string }) => <svg data-testid="join-qr" data-value={value} className={className} /> }));
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
 
@@ -78,6 +78,17 @@ describe('EduProjectorLobby', () => {
     expect(row.className).toMatch(/max-md:sticky/);
     expect(row.className).toMatch(/max-md:bottom-0/);
     expect(row.className).toMatch(/max-md:bg-neo-navy/);
+  });
+
+  it('given a short desktop viewport, when the join card renders, then the QR is height-capped, never squashed, and its grid row cannot collapse under the mode card', () => {
+    render(<EduProjectorLobby {...base} students={[{ username: 'Noa' }]} />);
+    const qr = screen.getByTestId('join-qr');
+    expect(qr.parentElement?.className).toMatch(/shrink-0/);
+    expect(qr.getAttribute('class')).toMatch(/md:size-\[min\(11vw,/);
+    expect(screen.getByTestId('edu-join-card').parentElement?.className).toMatch(/min-h-0|md:self-start/);
+    const grid = screen.getByTestId('edu-join-card').parentElement?.parentElement as HTMLElement;
+    expect(grid.className).toMatch(/grid-rows-\[auto_minmax\(min-content,1fr\)_auto\]/);
+    expect(screen.getByTestId('edu-projector-lobby').className).toMatch(/md:overflow-y-auto/);
   });
 
   it('given a room starting, when Start is pending, then it shows a loading state and cannot double-fire', () => {

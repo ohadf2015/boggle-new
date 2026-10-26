@@ -57,7 +57,7 @@ export function EduJoinCard({ gameCode, language, baseUrl, t }: EduJoinCardProps
         data-testid="edu-lobby-code"
         dir="ltr"
         aria-label={gameCode}
-        className="flex justify-center gap-[0.06em] rounded-neo-lg border-4 border-neo-black bg-neo-lime px-3 py-2 font-neo-display text-[15vw] font-black leading-none text-neo-white shadow-hard-xl md:px-[1vw] md:py-[0.6vw] md:text-[7vw]"
+        className="flex justify-center gap-[0.06em] rounded-neo-lg border-4 border-neo-black bg-neo-lime px-3 py-2 font-neo-display text-[15vw] font-black leading-none text-neo-white shadow-hard-xl md:px-[1vw] md:py-[0.6vw] md:text-[min(7vw,11vh)]"
       >
         {codeCharacters(gameCode).map((ch, i) => (
           <span key={`${ch}-${i}`} className="[-webkit-text-stroke:0.07em_#000] [paint-order:stroke_fill] drop-shadow-[0.05em_0.05em_0_#000]">
@@ -67,8 +67,8 @@ export function EduJoinCard({ gameCode, language, baseUrl, t }: EduJoinCardProps
       </div>
 
       <div className="flex justify-center">
-        <div className="rounded-neo-lg border-4 border-neo-black bg-neo-white p-2 shadow-hard-lg md:p-[0.6vw]">
-          <QRCodeSVG value={joinUrl} size={512} level="M" className="size-36 md:size-[11vw]" />
+        <div className="shrink-0 rounded-neo-lg border-4 border-neo-black bg-neo-white p-2 shadow-hard-lg md:p-[min(0.6vw,0.9vh)]">
+          <QRCodeSVG value={joinUrl} size={512} level="M" className="size-36 shrink-0 md:size-[min(11vw,17vh)]" />
         </div>
       </div>
     </section>
