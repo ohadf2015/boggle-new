@@ -196,6 +196,19 @@ const lazyPosthog = {
   },
 
   capture: ff(['capture']),
+
+  /**
+   * Unload-safe capture for terminal events fired from pagehide /
+   * visibilitychange -> hidden handlers. Skips the rate-limit DEFERRAL (a
+   * deferred event never survives the unload it was emitted during) and asks
+   * posthog-js for the sendBeacon transport, which the browser guarantees to
+   * deliver. Best-effort only: if posthog-js has not loaded yet the call is
+   * still buffered, but a hard unload will lose it — that is unchanged from
+   * before and beats the certain loss of a deferred XHR.
+   */
+  captureBeacon: (event: string, properties?: Record<string, unknown>): void => {
+    deliver(['capture'], [event, properties, { transport: 'sendBeacon', send_instantly: true }]);
+  },
   identify: ff(['identify']),
   reset: ff(['reset']),
   register: ff(['register']),

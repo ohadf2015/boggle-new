@@ -16,7 +16,15 @@ import { getSupabase } from './client';
  * historical earnings (daily play that never reached the leaderboard table)
  * onto the new season; see migration 20260602120000_season_score_from_events.
  */
-export async function updateLeaderboardEntry(playerId: string, retries = 1): Promise<{ data: unknown; error: { message: string } | null }> {
+const MAX_ATTEMPTS = 3;
+
+/** PostgREST surfaces a Postgres deadlock as SQLSTATE 40P01. */
+function isDeadlockError(error: { message?: string; code?: string } | null): boolean {
+  if (!error) return false;
+  return error.code === '40P01' || (error.message ?? '').toLowerCase().includes('deadlock');
+}
+
+export async function updateLeaderboardEntry(playerId: string, attemptsLeft = MAX_ATTEMPTS): Promise<{ data: unknown; error: { message: string } | null }> {
   const client = getSupabase();
   if (!client) return { data: null, error: { message: 'Supabase not configured' } };
 
@@ -24,10 +32,11 @@ export async function updateLeaderboardEntry(playerId: string, retries = 1): Pro
     p_player_id: playerId,
   });
 
-  // Retry on deadlock (concurrent recomputes for same player)
-  if (error && error.message.includes('deadlock') && retries > 0) {
-    await new Promise(r => setTimeout(r, 100 + Math.random() * 200));
-    return updateLeaderboardEntry(playerId, retries - 1);
+  // Retry on deadlock (concurrent recomputes when a multiplayer round ends)
+  // with jittered backoff — a single retry was not enough for a 6-player series.
+  if (error && isDeadlockError(error) && attemptsLeft > 1) {
+    await new Promise(r => setTimeout(r, 200 + Math.random() * 600));
+    return updateLeaderboardEntry(playerId, attemptsLeft - 1);
   }
 
   return { data, error };

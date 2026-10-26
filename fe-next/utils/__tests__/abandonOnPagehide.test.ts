@@ -10,7 +10,10 @@ import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest';
 
 const captureMock = vi.fn();
 vi.mock('@/lib/analytics/lazyPosthog', () => ({
-  default: { capture: (...args: unknown[]) => captureMock(...args) },
+  default: {
+    capture: (...args: unknown[]) => captureMock(...args),
+    captureBeacon: (...args: unknown[]) => captureMock(...args),
+  },
 }));
 
 import {
@@ -18,6 +21,8 @@ import {
   markGameActive,
   markGameInactive,
   emitAbandonOnSpaNavigate,
+  emitAbandonOnExit,
+  consumeResumedAfterHidden,
   updateActiveGameExtras,
   __resetAbandonStateForTests,
   setPagehideFinalizer,
@@ -266,5 +271,138 @@ describe('abandonOnPagehide', () => {
     clearPagehideFinalizer(theirs);
     fireEvent('pagehide');
     expect(theirs).toHaveBeenCalledTimes(1);
+  });
+
+  /**
+   * iOS Safari often never fires pagehide when the tab is backgrounded or
+   * killed — visibilitychange -> hidden is the last reliable signal. Mobile
+   * non-MP starts were losing their outcome at ~5x the desktop rate because
+   * only pagehide was listened for (UR audit 2026-10-26, t_19aaab43).
+   */
+  describe('visibilitychange -> hidden abandon (iOS path)', () => {
+    function fireHidden() {
+      Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+    }
+    function fireVisible() {
+      Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+    }
+
+    it('emits growth:game_abandoned with reason hidden when the tab is backgrounded mid-game', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      markGameActive('singleplayer', { sp_mode: 'practice' });
+      vi.setSystemTime(new Date('2026-01-01T00:00:20Z'));
+
+      fireHidden();
+
+      const calls = captureMock.mock.calls.filter((c) => c[0] === 'growth:game_abandoned');
+      expect(calls).toHaveLength(1);
+      expect(calls[0][1]).toMatchObject({ mode: 'singleplayer', reason: 'hidden', durationSec: 20 });
+      vi.useRealTimers();
+    });
+
+    it('emits only once when hidden is followed by pagehide', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      markGameActive('daily');
+      vi.setSystemTime(new Date('2026-01-01T00:00:20Z'));
+
+      fireHidden();
+      fireEvent('pagehide');
+
+      const calls = captureMock.mock.calls.filter((c) => c[0] === 'growth:game_abandoned');
+      expect(calls).toHaveLength(1);
+      expect(calls[0][1]).toMatchObject({ reason: 'hidden' });
+      vi.useRealTimers();
+    });
+
+    it('does not emit on visibilitychange to visible', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      markGameActive('singleplayer');
+      vi.setSystemTime(new Date('2026-01-01T00:00:20Z'));
+
+      fireVisible();
+
+      expect(captureMock).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
+
+    it('arms the resume flag so a later completion can be marked resumed_after_hidden', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      markGameActive('singleplayer');
+      vi.setSystemTime(new Date('2026-01-01T00:00:20Z'));
+
+      expect(consumeResumedAfterHidden()).toBe(false);
+      fireHidden();
+
+      expect(consumeResumedAfterHidden()).toBe(true);
+      // Read-and-clear: a second consume does not leak into the next game.
+      expect(consumeResumedAfterHidden()).toBe(false);
+      vi.useRealTimers();
+    });
+
+    it('a new game resets the resume flag', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      markGameActive('singleplayer');
+      vi.setSystemTime(new Date('2026-01-01T00:00:20Z'));
+      fireHidden();
+
+      markGameActive('singleplayer');
+
+      expect(consumeResumedAfterHidden()).toBe(false);
+      vi.useRealTimers();
+    });
+  });
+
+  /**
+   * Word Tower V2 fires growth:wt2_exit when the player leaves a screen, but
+   * the exit never mapped to a terminal growth event — mobile WT2 had 1 of 18
+   * starts with any outcome (UR audit 2026-10-26). emitAbandonOnExit closes
+   * the loop for unfinished runs.
+   */
+  describe('emitAbandonOnExit (wt2_exit path)', () => {
+    it('emits growth:game_abandoned with reason exit for an unfinished run', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      markGameActive('word-tower', { words_found: 4 });
+      updateActiveGameExtras({ floors: 2 });
+      vi.setSystemTime(new Date('2026-01-01T00:00:45Z'));
+
+      emitAbandonOnExit();
+      await vi.advanceTimersByTimeAsync(50);
+
+      const calls = captureMock.mock.calls.filter((c) => c[0] === 'growth:game_abandoned');
+      expect(calls).toHaveLength(1);
+      expect(calls[0][1]).toMatchObject({ mode: 'word-tower', reason: 'exit', words_found: 4, floors: 2 });
+      vi.useRealTimers();
+    });
+
+    it('a same-tick completion cancels the exit abandon (run -> results)', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+      markGameActive('word-tower');
+      vi.setSystemTime(new Date('2026-01-01T00:00:45Z'));
+
+      emitAbandonOnExit();
+      markGameInactive(); // results screen ended the round in the same commit
+      await vi.advanceTimersByTimeAsync(50);
+
+      expect(captureMock.mock.calls.filter((c) => c[0] === 'growth:game_abandoned')).toHaveLength(0);
+      vi.useRealTimers();
+    });
+
+    it('does not emit when no game is active (exit from home/results screens)', async () => {
+      vi.useFakeTimers();
+      emitAbandonOnExit();
+      await vi.advanceTimersByTimeAsync(50);
+
+      expect(captureMock).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
   });
 });

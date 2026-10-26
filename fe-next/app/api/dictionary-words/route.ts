@@ -15,7 +15,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { gzipSync, brotliCompressSync, constants } from 'zlib';
 import { extractHiraganaWords } from '@/shared/constants/japaneseLetters';
+import { normalizeRussianWord } from '@/shared/utils/wordNormalization';
 import { acceptsEncoding } from '@/lib/http/acceptEncoding';
+import { SUPPORTED_GAME_LANGUAGES } from '@/lib/languageConfig';
 import * as fsp from 'fs/promises';
 import * as path from 'path';
 import {
@@ -38,6 +40,7 @@ const gzippedPayloads: Record<
   he: null,
   sv: null,
   ja: null,
+  ru: null,
 };
 
 async function loadWords(language: string): Promise<string[]> {
@@ -74,6 +77,28 @@ async function loadWords(language: string): Promise<string[]> {
       return Array.from(wordSet);
     }
 
+    case 'ru': {
+      const backendDir = path.join(process.cwd(), 'backend');
+      const wordSet = new Set<string>();
+
+      // Mirrors backend/dictionaryLoaders.loadRussianDictionary EXACTLY (base +
+      // community-approved, normalizeRussianWord: lowercase + ё→е) so the client
+      // cache accepts precisely what server-side validation accepts.
+      const [russianContent, approvedContent] = await Promise.all([
+        fsp.readFile(path.join(backendDir, 'russian_words.txt'), 'utf-8').catch(() => ''),
+        fsp.readFile(path.join(backendDir, 'russian_words_approved.txt'), 'utf-8').catch(() => ''),
+      ]);
+
+      for (const content of [russianContent, approvedContent]) {
+        for (const line of content.split('\n')) {
+          const w = normalizeRussianWord(line.trim());
+          if (w.length > 0) wordSet.add(w);
+        }
+      }
+
+      return Array.from(wordSet);
+    }
+
     default:
       return [];
   }
@@ -100,8 +125,13 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const language = searchParams.get('lang') || 'en';
 
-  // Validate language
-  if (!['en', 'es', 'he', 'sv', 'ja'].includes(language)) {
+  // Validate language. Derived from SUPPORTED_GAME_LANGUAGES (not a separate
+  // hardcoded list) so a marketed locale can never drift into a 400 here again —
+  // Russian shipped in SUPPORTED_GAME_LANGUAGES without a loader and every /ru
+  // game's dictionary fetch failed (t_2a7bb6a8). A supported language with no
+  // loader falls through to the empty-dictionary 503 guard below, never a 400
+  // loop, and languages.test.ts covers one 200 per supported entry.
+  if (!SUPPORTED_GAME_LANGUAGES.includes(language as (typeof SUPPORTED_GAME_LANGUAGES)[number])) {
     return NextResponse.json(
       { error: 'Invalid language' },
       { status: 400 }

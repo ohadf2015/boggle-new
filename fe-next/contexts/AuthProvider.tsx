@@ -3,8 +3,9 @@
 import React, { useEffect, useMemo, useRef, ReactNode } from 'react';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import { syncAuthAnalyticsTransition } from '@/utils/authAnalytics';
-import { consumePendingSignupCompletion, consumeSignupSource, maybeTrackSignupCompleted, setAnalyticsIdentity } from '@/utils/growthTracking';
+import { consumePendingSignupCompletion, consumeSignupSource, isRecentAccount, maybeTrackSignupCompleted, setAnalyticsIdentity } from '@/utils/growthTracking';
 import { markAuthProviderMounted } from '@/lib/auth/authProviderMounted';
+import { persistProfileAttribution } from '@/utils/profileAttribution';
 import type { AuthContextValue } from './auth/authTypes';
 import { AuthContext } from './AuthContext';
 
@@ -151,6 +152,13 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
         // not recent and/or already counted, so no spurious signup is emitted.
         maybeTrackSignupCompleted({ userId: user.id, createdAt: user.created_at, source });
         consumePendingSignupCompletion();
+        // t_a80f937b: persist first-touch attribution (referrer domain,
+        // landing path, utm_*) + the signup surface onto the profile — only
+        // for a genuinely fresh account, server never overwrites non-null
+        // values. Fire-and-forget; must never block the auth flow.
+        if (isRecentAccount(user.created_at, Date.now())) {
+          void persistProfileAttribution(source);
+        }
         // Allowlist bridge: if this email was pre-approved for teacher access, consume the entry.
         if (user?.email) {
           fetch('/api/education/consume-allowlist', { method: 'POST' }).catch(() => {});

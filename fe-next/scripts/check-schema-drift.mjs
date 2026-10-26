@@ -193,6 +193,33 @@ async function main() {
     failures.push('updated_at trigger gap');
   }
 
+  // RPC body smoke probes. An RPC can exist in the catalog while its body
+  // references a relation that does not (calculate_lesson_mastery read the
+  // never-created vocabulary_words for 5 days, 2026-10-21..26). Existence
+  // checks cannot see that; executing the function with NULL args can. Every
+  // probe must be written so NULLs take the early-return path without
+  // writing anything.
+  const rpcProbes = [
+    {
+      name: 'calculate_lesson_mastery',
+      query: `select calculate_lesson_mastery(null::uuid, null::uuid) as result`,
+      expect: 'not_started',
+    },
+  ];
+  for (const probe of rpcProbes) {
+    try {
+      const rows = await runQuery(probe.query);
+      const got = rows?.[0]?.result;
+      if (got !== probe.expect) {
+        console.error(`  rpc ${probe.name} smoke probe returned ${JSON.stringify(got)}, expected ${JSON.stringify(probe.expect)}`);
+        failures.push('rpc smoke probe');
+      }
+    } catch (err) {
+      console.error(`  rpc ${probe.name} smoke probe errored: ${err.message}`);
+      failures.push('rpc smoke probe');
+    }
+  }
+
   if (failures.length) {
     console.error(`Schema drift check failed (${failures.join(', ')}).`);
     process.exit(1);
