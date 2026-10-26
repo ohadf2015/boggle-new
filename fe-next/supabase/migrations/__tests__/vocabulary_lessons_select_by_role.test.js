@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const migrationPath = path.join(__dirname, '../20261025600000_vocabulary_lessons_select_by_role.sql');
+const migrationPath = path.join(__dirname, '../20261026190000_vocabulary_lessons_select_by_role.sql');
 
 describe('vocabulary_lessons select policies split by role', () => {
   const sql = fs.existsSync(migrationPath) ? fs.readFileSync(migrationPath, 'utf8') : '';
