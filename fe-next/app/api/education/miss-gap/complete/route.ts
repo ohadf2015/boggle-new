@@ -7,6 +7,8 @@
  * light: `classKey` (`lesson::teacher`, already the share link's own key) plus a
  * student key — the auth user id for a member, a device-generated id for a guest.
  * Only a display name is stored. No email, no roster, no classroom join.
+ * The key is guessable, so a write also needs the link's signed class token
+ * (`missGapClassToken`), which only the teacher who owns the key can mint.
  * Guests stay allowed (they are most homework players), so the key is bounded
  * instead: a per-device budget, a cap on distinct students per assignment, and
  * a completion day no further than one day from the server's.
@@ -36,6 +38,7 @@ import {
   MAX_STUDENTS_PER_ASSIGNMENT,
 } from '@/lib/education/missGapClassKey';
 import { mergeMissGapRun } from '@/lib/education/missGapRunMerge';
+import { classTokenStatus, MAX_CLASS_TOKEN } from '@/lib/education/missGapClassToken';
 import { isPlausibleLocalDay } from '@/lib/education/missedPracticePlan';
 import { z } from 'zod';
 import logger from '@/utils/logger';
@@ -50,6 +53,7 @@ const optionalText = (max: number) => z.string().max(max).nullish();
 const optionalNumber = z.number().finite().nullish();
 const completeBodySchema = z.object({
   classKey: z.string().max(MAX_CLASS_KEY * 2),
+  classToken: optionalText(MAX_CLASS_TOKEN),
   dueDate: optionalText(32),
   completedOn: optionalText(32),
   lesson: optionalText(MAX_TEXT * 2),
@@ -107,6 +111,19 @@ export async function POST(request: NextRequest) {
   const classKey = normalizeMissGapClassKey(body.classKey);
   if (!classKey) {
     return NextResponse.json({ error: 'classKey required' }, { status: 400 });
+  }
+
+  const tokenStatus = classTokenStatus(body.classToken, classKey);
+  if (tokenStatus === 'invalid') {
+    return NextResponse.json({ error: 'Invalid class link' }, { status: 400 });
+  }
+  if (tokenStatus === 'absent') {
+    // No guest bucket exists to send it to; the client keeps the run on the device and says so.
+    logger.warn('[miss-gap] complete: unsigned class link', { classKey });
+    return NextResponse.json(
+      { ok: false, code: 'class_link_unsigned', error: 'Class link has no token' },
+      { status: 403 },
+    );
   }
 
   const supabase = createAdminClient();

@@ -28,6 +28,7 @@ import {
   parseMissGapDefinitions,
 } from './missGapDefinitions';
 import { buildMissGapPracticeShareUrl } from './missGapPracticeShare';
+import { MAX_CLASS_TOKEN } from './missGapClassKey';
 
 export const MISS_GAP_ASSIGNMENT_PATH = '/education/miss-gap-assignment';
 
@@ -43,6 +44,7 @@ export interface MissGapAssignmentInput extends ClassGapShareInput {
    * `missGapDefinitions.ts` for the wire format.
    */
   definitions?: Record<string, string> | null;
+  classToken?: string | null;
 }
 
 export interface MissGapAssignmentPayload extends ClassGapSharePayload {
@@ -50,6 +52,7 @@ export interface MissGapAssignmentPayload extends ClassGapSharePayload {
   dueDate: string;
   /** Cleaned word→meaning map, lower-cased keys. `{}` when the lesson had none. */
   definitions: Record<string, string>;
+  classToken?: string;
 }
 
 function sanitizeText(value: string, max: number): string {
@@ -73,6 +76,13 @@ function normalizeMissedWords(words: string[]): string[] {
     if (out.length >= MAX_MISSED_WORDS) break;
   }
   return out;
+}
+
+const CLASS_TOKEN_SHAPE = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+
+function normalizeClassToken(raw: unknown): string {
+  const value = typeof raw === 'string' ? raw.trim() : '';
+  return value.length <= MAX_CLASS_TOKEN && CLASS_TOKEN_SHAPE.test(value) ? value : '';
 }
 
 /** Accept only calendar dates YYYY-MM-DD. Rejects garbage / time strings. */
@@ -150,7 +160,10 @@ export function toMissGapAssignmentPayload(
       base.missedWords,
     ),
   );
-  return { ...base, dueDate, definitions };
+  const classToken = normalizeClassToken(
+    'classToken' in input ? (input as MissGapAssignmentInput).classToken : '',
+  );
+  return { ...base, dueDate, definitions, classToken };
 }
 
 function applyParams(url: URL, payload: MissGapAssignmentPayload): void {
@@ -165,6 +178,7 @@ function applyParams(url: URL, payload: MissGapAssignmentPayload): void {
   if (payload.dueDate) url.searchParams.set('due', payload.dueDate);
   const defs = encodeMissGapDefinitions(payload.definitions, payload.missedWords);
   if (defs) url.searchParams.set('defs', defs);
+  if (payload.classToken) url.searchParams.set('k', payload.classToken);
 }
 
 /**
