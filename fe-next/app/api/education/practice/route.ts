@@ -101,12 +101,17 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Failed to fetch progress' }, { status: 500 });
       }
 
-      // Get mastery level
-      const { data: masteryResult } = await supabase
+      // Get mastery level. A failed RPC used to be swallowed into
+      // 'not_started', which hid the vocabulary_words 42P01 for days — log it.
+      const { data: masteryResult, error: masteryError } = await supabase
         .rpc('calculate_lesson_mastery', {
           p_student_id: targetStudentId,
           p_lesson_id: lessonId,
         });
+
+      if (masteryError) {
+        logger.error('calculate_lesson_mastery RPC failed:', masteryError);
+      }
 
       return NextResponse.json({
         progress: progress || {

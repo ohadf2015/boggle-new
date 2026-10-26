@@ -135,4 +135,43 @@ describe('guestPracticeMastery', () => {
     expect(guestPracticeMastery(overshoot, 2)).toBe(guestPracticeMastery(exact, 2));
     expect(guestPracticeMastery(overshoot, 2)).toBe('practicing');
   });
+
+  // Agreement with the server RPC calculate_lesson_mastery (rewritten in
+  // 20261026120000 to read vocabulary_lessons.words). The SQL cannot run in
+  // vitest, so this mirror re-encodes it exactly: distinct lower+trimmed
+  // found words, coverage capped at 1, 60% coverage + 40% accuracy,
+  // thresholds 0.8 / 0.4 / >0. If either side's formula drifts, the fixture
+  // below breaks.
+  function serverMasteryMirror(
+    args: { totalWords: number; wordsFound: string[]; cardsReviewed: number; cardsCorrect: number },
+  ) {
+    if (args.totalWords <= 0) return 'not_started';
+    const distinct = new Set(args.wordsFound.map((w) => w.trim().toLowerCase()).filter(Boolean));
+    const coverage = Math.min(distinct.size / args.totalWords, 1);
+    const accuracy = args.cardsReviewed > 0 ? args.cardsCorrect / args.cardsReviewed : 0;
+    const score = coverage * 0.6 + accuracy * 0.4;
+    if (score >= 0.8) return 'mastered';
+    if (score >= 0.4) return 'practicing';
+    if (score > 0) return 'started';
+    return 'not_started';
+  }
+
+  it.each([
+    ['empty', { totalWords: 5, wordsFound: [], cardsReviewed: 0, cardsCorrect: 0 }],
+    ['one word of ten', { totalWords: 10, wordsFound: ['a'], cardsReviewed: 0, cardsCorrect: 0 }],
+    ['half coverage', { totalWords: 4, wordsFound: ['a', 'b', 'c'], cardsReviewed: 0, cardsCorrect: 0 }],
+    ['full everything', { totalWords: 5, wordsFound: ['a', 'b', 'c', 'd', 'e'], cardsReviewed: 5, cardsCorrect: 5 }],
+    ['case-folded dupes', { totalWords: 4, wordsFound: ['Apple', 'apple ', 'banana'], cardsReviewed: 4, cardsCorrect: 3 }],
+    ['coverage overshoot', { totalWords: 2, wordsFound: ['a', 'b', 'c'], cardsReviewed: 0, cardsCorrect: 0 }],
+    ['accuracy only', { totalWords: 8, wordsFound: [], cardsReviewed: 10, cardsCorrect: 9 }],
+  ])('guest and server formulas agree: %s', (_label, fixture) => {
+    const record = {
+      ...EMPTY_GUEST_PRACTICE,
+      // recordGuestPracticeResult lowercases before storing
+      wordsFound: fixture.wordsFound.map((w) => w.trim().toLowerCase()).filter(Boolean),
+      cardsReviewed: fixture.cardsReviewed,
+      cardsCorrect: fixture.cardsCorrect,
+    };
+    expect(guestPracticeMastery(record, fixture.totalWords)).toBe(serverMasteryMirror(fixture));
+  });
 });
