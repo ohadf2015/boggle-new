@@ -8,6 +8,7 @@ import type { MultiplayerFlowProps } from '@/components/multiplayer/MultiplayerF
 import { getStoredUsername } from '@/utils/profileStorage';
 import { cn } from '@/lib/utils';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
+import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
 import { LIVE_KEYFRAMES, PRESS, PRIMARY_BUTTON, type Translate } from './eduLiveStyles';
 
 interface EduLiveEntryProps {
@@ -15,6 +16,8 @@ interface EduLiveEntryProps {
   /** The room code straight off the URL — known on the first render, unlike session state. */
   urlRoom: string | null;
   isHost: boolean;
+  /** Seated as a watcher because every seat in the room is taken. */
+  isSpectator?: boolean;
   language: string;
   t: Translate;
 }
@@ -32,7 +35,7 @@ function Frame({ testId, mascot, children }: { testId: string; mascot: string; c
   );
 }
 
-function ActiveEntry({ entry, isHost, t }: Omit<EduLiveEntryProps, 'urlRoom' | 'language'>) {
+function ActiveEntry({ entry, isHost, t }: Omit<EduLiveEntryProps, 'urlRoom' | 'language' | 'isSpectator'>) {
   const flow = useMultiplayerFlowState(entry);
   const room = entry.prefilledRoom ?? '';
 
@@ -69,7 +72,15 @@ function ActiveEntry({ entry, isHost, t }: Omit<EduLiveEntryProps, 'urlRoom' | '
   );
 }
 
-export default function EduLiveEntry({ entry, urlRoom, isHost, language, t }: EduLiveEntryProps) {
+export default function EduLiveEntry({ entry, urlRoom, isHost, isSpectator = false, language, t }: EduLiveEntryProps) {
+  if (isSpectator && !isHost) {
+    return (
+      <Frame testId="edu-live-room-full" mascot={EDU_MASCOT.tip}>
+        <h1 role="status" aria-live="polite" className="font-neo-display text-2xl font-black">{t('eduLiveRoom.entry.roomFullTitle')}</h1>
+        <p className="font-neo-body text-base font-bold text-neo-cream/80">{t('eduLiveRoom.entry.roomFullHint', { max: MAX_PLAYERS_PER_ROOM })}</p>
+      </Frame>
+    );
+  }
   if (!urlRoom && !entry.prefilledRoom) {
     const href = isHost ? `/${language}/teacher` : `/${language}/join`;
     return (

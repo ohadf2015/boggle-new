@@ -10,6 +10,7 @@ import {
   type TeacherActivationFunnelProps,
 } from '@/lib/education/teacherActivationFunnel';
 import type { TeacherPlan } from '@/lib/education/teacherOnboardingFunnel';
+import { ASSIGNMENT_LIMIT_REACHED, isAssignmentLimitError } from '@/lib/education/assignmentLimit';
 
 /**
  * Assign a lesson to a classroom (legacy - kept for backward compatibility)
@@ -33,6 +34,7 @@ export async function assignLesson(
       .single();
 
     if (error) {
+      if (isAssignmentLimitError(error)) return { data: null, error: { message: ASSIGNMENT_LIMIT_REACHED } };
       logger.error('Error assigning lesson:', error);
       return { data: null, error: { message: error.message } };
     }
@@ -156,6 +158,9 @@ export async function createAssignment(data: {
       // report it as already assigned instead of failing.
       if (error.code === UNIQUE_VIOLATION) {
         return reassignExisting(data);
+      }
+      if (isAssignmentLimitError(error)) {
+        return { data: null, error: { message: ASSIGNMENT_LIMIT_REACHED, code: ASSIGNMENT_LIMIT_REACHED } };
       }
       logger.error('Error creating assignment:', error);
       return { data: null, error: { message: error.message, code: error.code } };

@@ -20637,6 +20637,8 @@ const ru = {
       "wheelLabel": "Колесо класса"
     },
     "lobby": {
+      "roomFull": "Комната заполнена: занято {seated} из {max} мест",
+      "roomFullWatching": "Без места смотрят: {count}",
       "brand": "Класс",
       "joinAt": "Заходите на",
       "joined": "Присоединились: {count}",
@@ -20664,6 +20666,8 @@ const ru = {
       "leave": "Выйти"
     },
     "entry": {
+      "roomFullTitle": "Комната заполнена: ты смотришь",
+      "roomFullHint": "Все {max} мест заняты. Учитель видит, что ты ждёшь.",
       "connecting": "Подключаемся к классу…",
       "openingRoom": "Открываем комнату…",
       "waitingTeacher": "Учитель ещё не открыл игру",

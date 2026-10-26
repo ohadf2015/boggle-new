@@ -2,62 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
-import { z } from 'zod';
 import logger from '@/utils/logger';
 import { calculatePracticeXp, type PracticeSessionXp } from '@/backend/modules/educationXpManager';
 import { updateEducationChallengeProgress } from '@/lib/supabase/education/challengeProgress';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
-import { VOCAB_FOCUSES } from '@/lib/education/vocabFocus';
 import { canStudentPracticeLesson } from '@/lib/education/lessonAccess';
 import { WORDCRAFT_SESSION_MODE } from '@/lib/education/wordcraftAssignment';
 import { findSatisfiedAssignment, stampAssignmentCompletion } from '@/lib/education/assignmentCompletion';
 import { captureStudentReturned } from '@/lib/education/studentReturnTelemetry';
 import { gateWordCraftCompletion } from '@/lib/education/wordcraftCompletionGate';
-
-function tooManyRequests(retryAfter: number | undefined) {
-  return NextResponse.json(
-    { error: 'Too many requests' },
-    { status: 429, headers: { 'Retry-After': String(retryAfter ?? 60) } }
-  );
-}
-
-// Validation schemas
-const practiceTypeSchema = z.enum(['flashcard', 'solo_board', 'warmup', 'word_list', 'matching', 'spelling', 'blitz', 'vocab_focus']);
-const vocabFocusSchema = z.enum(VOCAB_FOCUSES as [string, ...string[]]);
-
-const startSessionSchema = z.object({
-  lessonId: z.string().uuid(),
-  practiceType: practiceTypeSchema,
-  // vocab_focus only — which skill is drilled; persisted in `mode` + `results.focus`
-  focus: vocabFocusSchema.optional(),
-  // solo_board only: Word Craft (no 'wordcraft' in the practice_type CHECK) → `mode`
-  variant: z.literal(WORDCRAFT_SESSION_MODE).optional(),
-});
-
-const updateSessionSchema = z.object({
-  sessionId: z.string().uuid(),
-  // Flashcard updates
-  cardsReviewed: z.number().min(0).optional(),
-  cardsCorrect: z.number().min(0).optional(),
-  // Board practice updates
-  wordsFound: z.array(z.string()).optional(),
-  vocabularyWordsFound: z.array(z.string()).optional(),
-  totalScore: z.number().min(0).optional(),
-  // New practice modes (Phase 37)
-  wordsAttempted: z.number().min(0).optional(),
-  wordsCorrect: z.number().min(0).optional(),
-  accuracy: z.number().min(0).max(1).optional(),
-  maxCombo: z.number().min(0).optional(),
-  // xpAwarded removed (B7 fix) — server always computes XP, never trusts client
-  // Common
-  timeSpentSeconds: z.number().min(0).optional(),
-  completed: z.boolean().optional(),
-});
-
-const getProgressSchema = z.object({
-  lessonId: z.string().uuid(),
-  studentId: z.string().uuid().optional(), // For teachers viewing student progress
-});
+import { startSessionSchema, tooManyRequests, updateSessionSchema } from '@/lib/education/practiceSessionSchemas';
 
 /**
  * GET /api/education/practice

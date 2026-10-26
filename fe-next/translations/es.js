@@ -20953,6 +20953,8 @@ const es = {
       "wheelLabel": "Rueda de la clase"
     },
     "lobby": {
+      "roomFull": "Sala llena: {seated} de {max} puestos ocupados",
+      "roomFullWatching": "{count} miran sin puesto",
       "brand": "Clase",
       "joinAt": "Únete en",
       "joined": "{count} dentro",
@@ -20980,6 +20982,8 @@ const es = {
       "leave": "Salir"
     },
     "entry": {
+      "roomFullTitle": "La sala está llena: estás mirando",
+      "roomFullHint": "Los {max} puestos están ocupados. Tu docente ve que estás esperando.",
       "connecting": "Conectando con tu clase…",
       "openingRoom": "Abriendo tu sala…",
       "waitingTeacher": "Tu profe todavía no ha abierto el juego",
