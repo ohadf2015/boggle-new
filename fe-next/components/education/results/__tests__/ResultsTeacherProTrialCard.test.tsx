@@ -220,8 +220,9 @@ describe('ResultsTeacherProTrialCard on the class-created screen', () => {
     fireEvent.click(screen.getByTestId('results-teacher-pro-trial-cta'));
     expect(funnel.trackTeacherProUpgradeClick).toHaveBeenCalledWith(expect.objectContaining({ locale: 'sv', placement: 'class_created' }));
     expect(growth.trackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', { cta: 'teacher_pro_trial', source: 'class_created' });
-    const [url, init] = (globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0];
-    expect(url).toBe('/api/education/pro-cta-click');
+    const clickCall = (globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls.find(([u]) => u === '/api/education/pro-cta-click');
+    expect(clickCall).toBeDefined();
+    const [, init] = clickCall!;
     expect(JSON.parse(init.body)).toEqual({ placement: 'class_created', locale: 'sv', cta: 'teacher_pro_trial' });
     expect(init.keepalive).toBe(true);
   });
@@ -259,5 +260,82 @@ describe('ResultsTeacherProTrialCard on the class-created screen', () => {
       titles.add(c.title);
     }
     expect(titles.size).toBe(6);
+  });
+});
+
+describe('ResultsTeacherProTrialCard server-side (cookie-independent) impressions', () => {
+  type Cb = (entries: Array<{ isIntersecting: boolean; intersectionRatio: number }>) => void;
+  let observers: Array<{ cb: Cb }> = [];
+  const original = globalThis.IntersectionObserver;
+  const posts = () =>
+    (globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls
+      .filter(([u]) => u === '/api/education/pro-offer-impression')
+      .map(([, init]) => JSON.parse((init as RequestInit).body as string));
+
+  beforeEach(() => {
+    Object.assign(pro, { hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null, accessTrialEnded: false });
+    growth.trackGrowthEvent.mockClear();
+    window.localStorage.clear();
+    globalThis.fetch = vi.fn(async () => new Response(null, { status: 204 })) as unknown as typeof fetch;
+    observers = [];
+    class FakeIO {
+      constructor(cb: Cb) {
+        observers.push({ cb });
+      }
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+      takeRecords() {
+        return [];
+      }
+    }
+    globalThis.IntersectionObserver = FakeIO as unknown as typeof IntersectionObserver;
+  });
+  afterEach(() => {
+    globalThis.IntersectionObserver = original;
+  });
+
+  it('reports rendered on mount and viewed once on screen, with source=class_created, even when browser analytics is off', () => {
+    pro.accessTrialExpires = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString();
+    render(<ResultsTeacherProTrialCard language="sv" placement="class_created" />);
+    expect(posts()).toEqual([
+      { placement: 'class_created', locale: 'sv', cta: 'teacher_pro_trial', offer: 'keep_after_trial', stage: 'rendered' },
+    ]);
+    act(() => observers.forEach((o) => o.cb([{ isIntersecting: true, intersectionRatio: 1 }])));
+    act(() => observers.forEach((o) => o.cb([{ isIntersecting: true, intersectionRatio: 1 }])));
+    expect(posts()).toEqual([
+      { placement: 'class_created', locale: 'sv', cta: 'teacher_pro_trial', offer: 'keep_after_trial', stage: 'rendered' },
+      { placement: 'class_created', locale: 'sv', cta: 'teacher_pro_trial', offer: 'keep_after_trial', stage: 'viewed' },
+    ]);
+  });
+
+  it('labels the offer: a fresh trial, or paid once the access trial ended', () => {
+    const { unmount } = render(<ResultsTeacherProTrialCard language="en" placement="class_created" />);
+    expect(posts()[0]).toMatchObject({ offer: 'trial', cta: 'teacher_pro_trial' });
+    unmount();
+    (globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mockClear();
+    pro.accessTrialEnded = true;
+    render(<ResultsTeacherProTrialCard language="he" />);
+    expect(posts()[0]).toMatchObject({ placement: 'classroom_results', offer: 'paid', cta: 'teacher_pro', locale: 'he' });
+  });
+
+  it('reports nothing while loading, for a Pro teacher, or once dismissed', () => {
+    pro.loading = true;
+    const a = render(<ResultsTeacherProTrialCard language="en" placement="class_created" />);
+    a.unmount();
+    pro.loading = false;
+    pro.hasPro = true;
+    const b = render(<ResultsTeacherProTrialCard language="en" placement="class_created" />);
+    b.unmount();
+    pro.hasPro = false;
+    window.localStorage.setItem('lexi:proTrialCardDismissed:class_created', String(Date.now()));
+    render(<ResultsTeacherProTrialCard language="en" placement="class_created" />);
+    expect(posts()).toEqual([]);
+  });
+
+  it('a teacher who never scrolls to the card is rendered, not viewed', () => {
+    render(<ResultsTeacherProTrialCard language="ja" placement="class_created" />);
+    act(() => observers.forEach((o) => o.cb([{ isIntersecting: false, intersectionRatio: 0 }])));
+    expect(posts().map((p) => p.stage)).toEqual(['rendered']);
   });
 });
