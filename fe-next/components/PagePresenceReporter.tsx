@@ -18,6 +18,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ensureGuestDisplayName } from '@/utils/guestManager';
 
 const HEARTBEAT_INTERVAL_MS = 20000;
+/**
+ * Failure backoff: after MAX_FAST_FAILURES consecutive failures the interval
+ * grows 60s -> 2m -> 4m -> 5m (cap), resetting to 20s on the first success.
+ * UR audit 2026-10-26: one admin tab with a dead endpoint fired 2,603 failing
+ * heartbeats in 24h (~2/min around the clock), flooding FDT telemetry.
+ */
+const MAX_FAST_FAILURES = 3;
+const BACKOFF_BASE_MS = 60_000;
+const BACKOFF_CAP_MS = 300_000;
 const SID_KEY = 'lc_presence_sid';
 
 function getSessionId(): string {
@@ -55,14 +64,23 @@ export default function PagePresenceReporter({ language = 'en' }: { language?: s
     const sessionId = getSessionId();
     if (!sessionId) return;
 
-    const send = () => {
+    let failures = 0;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let disposed = false;
+    let inFlight = false;
+
+    const isHidden = () =>
+      typeof document !== 'undefined' && document.visibilityState === 'hidden';
+
+    /** Returns true when the heartbeat reached the server (2xx). */
+    const send = async (): Promise<boolean> => {
       const { user: u, profile: p } = identityRef.current;
       const username =
         p?.display_name ||
         p?.username ||
         (typeof window !== 'undefined' ? ensureGuestDisplayName(language) || null : null);
       try {
-        fetch('/api/presence/heartbeat', {
+        const res = await fetch('/api/presence/heartbeat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           keepalive: true,
@@ -73,23 +91,63 @@ export default function PagePresenceReporter({ language = 'en' }: { language?: s
             playerId: u?.id ?? null,
             isAuthenticated: !!u,
           }),
-        }).catch(() => {
-          // Silently ignore fetch failures (e.g., iOS Safari's keepalive limitations).
-          // Presence reporting is a best-effort signal; a failed heartbeat should not
-          // disrupt the player experience or bubble up to error tracking.
         });
+        return res.ok;
       } catch {
-        /* ignore synchronous errors during fetch creation */
+        // Presence reporting is best-effort; a failed heartbeat must not disrupt
+        // the player experience. It DOES count toward backoff so a dead endpoint
+        // can't burn ~2 requests/minute for a whole day.
+        return false;
       }
     };
 
-    send();
-    const interval = setInterval(send, HEARTBEAT_INTERVAL_MS);
+    const nextDelay = () => {
+      if (failures < MAX_FAST_FAILURES) return HEARTBEAT_INTERVAL_MS;
+      return Math.min(BACKOFF_BASE_MS * 2 ** (failures - MAX_FAST_FAILURES), BACKOFF_CAP_MS);
+    };
+
+    const schedule = () => {
+      if (disposed) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(tick, nextDelay());
+    };
+
+    const tick = async () => {
+      if (disposed || inFlight) return;
+      // Hidden tabs are reaped by the server's 45s TTL anyway — don't
+      // heartbeat from a background tab, just keep the loop alive.
+      if (isHidden()) {
+        schedule();
+        return;
+      }
+      inFlight = true;
+      const ok = await send();
+      inFlight = false;
+      failures = ok ? 0 : failures + 1;
+      schedule();
+    };
+
+    const onVisibility = () => {
+      if (disposed || isHidden()) return;
+      // Back in the foreground: the TTL likely reaped us, so re-announce
+      // immediately and resume the normal cadence.
+      if (timer) clearTimeout(timer);
+      void tick();
+    };
+
+    void tick();
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', onVisibility);
+    }
 
     // No unload beacon: the server TTL (45s) reaps closed tabs. A POST-only
     // sendBeacon here would lack a path and re-add the session at "/".
     return () => {
-      clearInterval(interval);
+      disposed = true;
+      if (timer) clearTimeout(timer);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', onVisibility);
+      }
     };
   }, [pathname, language]);
 

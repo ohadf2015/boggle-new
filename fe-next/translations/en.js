@@ -3737,6 +3737,7 @@ const en = {
     "failedToLoadWordOfTheDay": "Couldn't load the Word of the Day. Try again?",
     "signInFailedRetry": "Sign in didn't work. Try again?",
     "appleSignInIosOnly": "Apple Sign In needs an iPhone or iPad",
+    "microsoftSignInUnavailable": "Microsoft sign-in isn't available here yet",
     "unableToLoadData": "Couldn't load that. Try again.",
     "tryAgainButton": "Try again",
     "connectionTimeout": "Connection is slow. Hang tight.",
@@ -12943,6 +12944,20 @@ const en = {
         "error": "Failed to load students",
         "unknown": "Unknown student",
         "noneYet": "No students yet. Share the join code."
+      },
+      "gcImport": {
+        "action": "Import from Google Classroom",
+        "connect": "Connect Google Classroom",
+        "pickCourse": "Google Classroom class",
+        "check": "Check roster",
+        "matched": "{{count}} already in this class",
+        "unmatchedTitle": "Not here yet ({{count}}): share the join code with them",
+        "consentTitle": "Consent needed ({{count}})",
+        "consentHint": "These students need consent on file before their Google account is linked.",
+        "link": "Link matched students",
+        "linked": "{{count}} linked",
+        "noCourses": "No active Google Classroom classes found",
+        "error": "Couldn't reach Google Classroom. Try again."
       }
     },
     "lesson": {

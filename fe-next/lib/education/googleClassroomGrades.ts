@@ -116,13 +116,17 @@ export interface MatchResult {
 const normEmail = (e: string | null | undefined): string => (e || '').trim().toLowerCase();
 
 /** Exact (case-insensitive) email match only — a student without one is never guessed. */
-export function matchStudentsByEmail(students: LexiStudent[], roster: GoogleRosterStudent[]): MatchResult {
+export function matchStudentsByEmail(
+  students: LexiStudent[],
+  roster: GoogleRosterStudent[],
+  claimed: ReadonlySet<string> = new Set(),
+): MatchResult {
   const byEmail = new Map<string, string>();
   for (const r of roster) {
     const e = normEmail(r.profile?.emailAddress);
     if (e && r.userId) byEmail.set(e, r.userId);
   }
-  const used = new Set<string>();
+  const used = new Set<string>(claimed);
   const out: MatchResult = { matched: [], unmatched: [] };
   for (const s of students) {
     const e = normEmail(s.email);
@@ -143,4 +147,27 @@ export function matchStudentsByEmail(students: LexiStudent[], roster: GoogleRost
     out.matched.push({ studentId: s.studentId, name: s.name, googleUserId: gid });
   }
   return out;
+}
+
+/** A stored Google link wins over email; the rest fall back to exact email matching. */
+export function matchStudentsByIdentity(
+  students: LexiStudent[],
+  roster: GoogleRosterStudent[],
+  linked: ReadonlyMap<string, string>,
+): MatchResult {
+  const inRoster = new Set(roster.map((r) => r.userId));
+  const claimed = new Set<string>();
+  const byLink: MatchResult['matched'] = [];
+  const rest: LexiStudent[] = [];
+  for (const s of students) {
+    const gid = linked.get(s.studentId);
+    if (gid && inRoster.has(gid) && !claimed.has(gid)) {
+      claimed.add(gid);
+      byLink.push({ studentId: s.studentId, name: s.name, googleUserId: gid });
+    } else {
+      rest.push(s);
+    }
+  }
+  const byEmail = matchStudentsByEmail(rest, roster, claimed);
+  return { matched: [...byLink, ...byEmail.matched], unmatched: byEmail.unmatched };
 }

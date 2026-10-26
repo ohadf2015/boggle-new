@@ -4136,6 +4136,7 @@ const he = {
     "failedToLoadWordOfTheDay": "לא הצלחנו לטעון את מילת היום",
     "signInFailedRetry": "ההתחברות נכשלה. לנסות שוב?",
     "appleSignInIosOnly": "כניסה עם Apple זמינה רק במכשירי iPhone ו-iPad",
+    "microsoftSignInUnavailable": "כניסה עם Microsoft עדיין לא זמינה כאן",
     "unableToLoadData": "לא הצלחנו לטעון. נסו שוב",
     "tryAgainButton": "נסו שוב",
     "connectionTimeout": "לוקח יותר מדי זמן להתחבר",
@@ -14637,6 +14638,20 @@ const he = {
         "error": "לא הצלחנו לטעון את התלמידים",
         "unknown": "תלמיד לא ידוע",
         "noneYet": "אין עדיין תלמידים. שתפו את קוד ההצטרפות"
+      },
+      "gcImport": {
+        "action": "ייבוא מ-Google Classroom",
+        "connect": "חיבור ל-Google Classroom",
+        "pickCourse": "כיתה ב-Google Classroom",
+        "check": "בדיקת רשימת התלמידים",
+        "matched": "{{count}} כבר בכיתה",
+        "unmatchedTitle": "עוד לא כאן ({{count}}): שלחו להם את קוד ההצטרפות",
+        "consentTitle": "נדרשת הסכמה ({{count}})",
+        "consentHint": "לתלמידים האלה צריכה להיות הסכמה רשומה לפני שחשבון ה-Google שלהם יקושר.",
+        "link": "קישור התלמידים שנמצאו",
+        "linked": "{{count}} קושרו",
+        "noCourses": "לא נמצאו כיתות פעילות ב-Google Classroom",
+        "error": "אין חיבור ל-Google Classroom. נסו שוב."
       }
     },
     "lesson": {

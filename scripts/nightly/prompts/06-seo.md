@@ -4,15 +4,15 @@ You are running the nightly SEO/GEO/CTR lane for LexiClash. Today: __TODAY__. Wo
 __LEARNINGS__
 
 ═══ SKILLS TO USE ═══
-From the **Specialized Skills** table above, invoke the skills listed for **lane 06 SEO**. `seo-daily` is mandatory (instruction in Step 1). `humanizer` should run on generated meta descriptions to avoid AI-tells in SERPs.
+From the **Specialized Skills** table above, invoke the skills listed for **lane 06 SEO**, except `seo-daily`: this lane reads Growth Radar instead (Step 1). `humanizer` should run on generated meta descriptions to avoid AI-tells in SERPs.
 
 ═══ FOUNDER PRIORITY: EDUCATION KEYWORDS ═══
-Education is a top growth target. In the GSC/Bing analysis this run, explicitly surface and act on EDUCATION-intent queries (e.g. "spelling practice", "vocabulary builder", "word games for students/classroom/ESL", "learn english words"). Prioritize CTR/rank-up opportunities and FAQ/GEO content that capture education-intent search and point at the education module.
+Education is a top growth target. In the Growth Radar data this run, explicitly surface and act on EDUCATION-intent queries (e.g. "spelling practice", "vocabulary builder", "word games for students/classroom/ESL", "learn english words"). Prioritize CTR/rank-up opportunities and FAQ/GEO content that capture education-intent search and point at the education module.
 
-═══ STEP 0 — Pull Bing AI Performance + Keyword Research data ═══
+═══ STEP 0 — Pull Bing AI Performance data ═══
 
 **AI Performance (Copilot citation data — UI-only, scrape via Playwriter):**
-Run `scripts/nightly/lib/bing-ai-perf-scrape.sh` BEFORE invoking the seo-daily skill. It writes `docs/nightly/ai-search/__TODAY__.json` with: `totals` (citations + avg_cited_pages over the default window), `grounding_queries` (which Copilot questions cited us), `cited_pages` (which of our URLs AI cites most).
+Run `scripts/nightly/lib/bing-ai-perf-scrape.sh` BEFORE Step 1. It writes `docs/nightly/ai-search/__TODAY__.json` with: `totals` (citations + avg_cited_pages over the default window), `grounding_queries` (which Copilot questions cited us), `cited_pages` (which of our URLs AI cites most).
 
 Each grounding query now carries Bing's **enriched AI-visibility metadata** — use it, don't just read past it:
 - `intent` — Bing's intent label (e.g. "Learn and Solve", "Informational", "Media"). **Education lever:** treat `intent` containing "Learn"/"Solve" (and any query whose text is education-shaped) as the founder-priority education segment — prioritize those for the education-module CTR/FAQ/GEO work below.
@@ -20,33 +20,27 @@ Each grounding query now carries Bing's **enriched AI-visibility metadata** — 
 - `citation_share` — our % share of citations for that query. **HIGH share (>40%) = we already dominate → defend only (internal links + FAQPage schema), do NOT rewrite the working page. LOW share (<15%) with high citations = contested high-traffic query → highest-leverage target: optimize the cited page for that exact query.**
 - `citations` — absolute citation count (drives the intel-signal magnitude/severity).
 
-Skip-gracefully — if the scrape fails (Chrome closed, Playwriter extension offline), the JSON file won't exist; continue without it. Lane 6 still works from GSC + Bing search data alone.
+Skip-gracefully — if the scrape fails (Chrome closed, Playwriter extension offline), the JSON file won't exist; continue without it. Lane 6 still works from Growth Radar data alone.
 
-**Keyword Research API (works via REST):**
-For the top 5 grounding queries from `ai-search/__TODAY__.json`, call Bing's `GetKeywordStats` endpoint to enrich with Bing search-volume trends:
-
-```
-GET https://ssl.bing.com/webmaster/api.svc/json/GetKeywordStats?q=<urlencoded>&country=us&language=en-US&apikey=$BING_WMT_API_KEY
-```
-
-NEVER write the key value anywhere (report, artifact, commit, PR, Telegram). This repo is PUBLIC. Always reference it as `$BING_WMT_API_KEY`.
-
-Returns historical impressions per date — use to identify queries where we have AI citations but LOW Bing organic (= opportunity to capture the organic clicks too).
-
-**Action priority** (use this data to bias seo-daily picks):
+**Action priority** (use this data to bias Step 3 picks):
 - AI-winning pages (`cited_pages` top 5) should NOT get aggressive title rewrites — they're working. Only add internal links + FAQPage schema for `grounding_queries` they answer.
 - AI-winning queries that have LOW Bing organic = highest-leverage SEO target. Optimize the cited page for that exact query.
 - Cited pages on non-English locales (`/he`, `/es`) — translate the top 1-2 grounding queries into those locales for the lane's locale-specific edits.
 
-═══ STEP 1 — Invoke seo-daily skill ═══
-Invoke the `seo-daily` skill with these inputs:
-  --site sc-domain:lexiclash.live
-  --bing-site https://lexiclash.live/
-  --repo /Users/ohadfisher/git/boggle-new
-  --days 28
-  --no-pr      (project disallows branches; ship direct to master)
+═══ STEP 1 — Read Growth Radar (app "lexiclash") ═══
+All search data comes from the Growth Radar MCP. No Google or Bing credential is used in this lane; never look for, ask for or write one.
+  • `list_interventions` (app "lexiclash", limit 50). For each page whose title or description a lane-6 commit on master changed in the last 7 days (`git log --since=7.days --format=%H -- fe-next/app`), with no row yet: `record_intervention` (app "lexiclash", surface = page path, kind "title", or "meta" if only the description changed, metric "ctr", one-line summary, evidence = the commit sha). Record nothing else.
+  • `get_search_performance` (app "lexiclash", days 28, metric "impressions"). Rows are queries with clicks, impressions and CTR, and NO position or page.
+  • `get_ai_visibility` ("lexiclash").
+  • `get_recommendations` (app "lexiclash", limit 30, detail "summary"). Leave `includePending` off: a page whose change is still being graded is hidden on purpose.
 
-The skill writes `docs/seo-daily/__TODAY__.md`. Read it.
+Write `docs/seo-daily/__TODAY__.md` with these tables, every number copied from Growth Radar:
+  • Headline: 28-day Google and Bing clicks and impressions as separate totals; AI citations.
+  • Top queries: query, clicks, impressions, CTR.
+  • CTR opportunities: `Improve CTR for <page>` rows, with the position, impressions and CTR their description states.
+  • Rank-up opportunities (pos 8–25): rows whose description states a position from 8 to 25.
+  • Skipped: frozen pages (seo-freeze.json) and pages still being graded.
+A position comes only from the number a Growth Radar row states. A row that states none never goes in a position table. If Growth Radar is unavailable, write that in the report and stop the lane.
 
 ═══ STEP 2 — Self-audit BEFORE picking targets ═══
 Survey ground truth before writing copy:
@@ -63,6 +57,7 @@ From today's report, pick UP TO:
   • 1 NEW landing page (only if high-intent query >50 impr/28d has NO good page)
 
 SKIP if:
+  • The page is listed in seo-freeze.json with `until` after today: its title and meta description (and their openGraph/twitter copies) must not change. Body, H2 and internal-link work is still fine.
   • Existing meta already contains target query verbatim
   • Brand-only term ("lexiclash")
   • Query intent doesn't match a real feature

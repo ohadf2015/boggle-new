@@ -60,8 +60,6 @@ export function useFriendMessages(
   });
   const [typingUsername, setTypingUsername] = useState<string | null>(null);
 
-  const threadsIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const messagesIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Guards against overlapping conversation fetches. The 5s offline-poll fallback
   // re-fires loadMessages on an interval; under a slow network the previous
@@ -437,25 +435,20 @@ export function useFriendMessages(
   }, [socket, friendId, refreshThreads]);
 
   /**
-   * Polling fallback for threads (when Socket.IO disconnected)
+   * Threads: initial load on mount/user change.
    */
   useEffect(() => {
-    // Initial load
     refreshThreads();
+  }, [refreshThreads]);
 
-    // Poll threads every 30 seconds (stop if Socket.IO connected)
-    threadsIntervalRef.current = setInterval(() => {
-      if (!isConnected) {
-        refreshThreads();
-      }
-    }, 30000);
-
-    return () => {
-      if (threadsIntervalRef.current) {
-        clearInterval(threadsIntervalRef.current);
-      }
-    };
-  }, [isConnected, refreshThreads]);
+  /**
+   * Polling fallback for threads (only while Socket.IO is disconnected).
+   * Paused while the tab is hidden, with one catch-up refresh on return —
+   * previously a bare setInterval ran 2,880 rpc/get_friend_threads per day per
+   * background/disconnected client (UR audit 2026-10-26: 4,029/day with a
+   * ~122/h round-the-clock floor from a single hidden desktop tab).
+   */
+  useVisibilityPausedInterval(refreshThreads, 30000, { enabled: !isConnected });
 
   /**
    * Refresh immediately when a push notification arrives for a friend message
@@ -478,32 +471,38 @@ export function useFriendMessages(
   }, [friendId, refreshThreads, loadMessages]);
 
   /**
-   * Polling fallback for active conversation messages (when Socket.IO disconnected)
+   * Active conversation: initial load on friend change.
    */
   useEffect(() => {
-    if (!friendId) {
-      if (messagesIntervalRef.current) {
-        clearInterval(messagesIntervalRef.current);
-      }
-      return;
-    }
-
-    // Initial load
+    if (!friendId) return;
     loadMessages(friendId);
+  }, [friendId, loadMessages]);
 
-    // Poll messages every 5 seconds for active conversation (stop if Socket.IO connected)
-    messagesIntervalRef.current = setInterval(() => {
-      if (!isConnected) {
-        loadMessages(friendId);
-      }
-    }, 5000);
+  /**
+   * Polling fallback for the active conversation (only while Socket.IO is
+   * disconnected). Paused while the tab is hidden, with one catch-up refresh
+   * on return — same hidden-tab drain as the threads poll above.
+   */
+  useVisibilityPausedInterval(
+    () => {
+      if (friendId) loadMessages(friendId);
+    },
+    5000,
+    { enabled: !isConnected && !!friendId },
+  );
 
-    return () => {
-      if (messagesIntervalRef.current) {
-        clearInterval(messagesIntervalRef.current);
-      }
-    };
-  }, [friendId, isConnected, loadMessages]);
+  /**
+   * Diagnostics: log once when the friends socket stays disconnected for over
+   * 2 minutes, so a polling-fallback surge (like the 10-24 get_friend_threads
+   * jump after the friends hardening merges) is explainable from client logs.
+   */
+  useEffect(() => {
+    if (isConnected) return;
+    const timer = setTimeout(() => {
+      logger.debug('USE_FRIEND_MESSAGES', 'Friends socket disconnected for >2min — polling fallback active');
+    }, 120000);
+    return () => clearTimeout(timer);
+  }, [isConnected]);
 
   /**
    * Load pending challenges — initial load on mount/user change, then poll every

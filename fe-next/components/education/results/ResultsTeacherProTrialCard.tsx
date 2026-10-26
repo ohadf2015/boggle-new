@@ -22,7 +22,7 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { accessTrialLive, keepAfterTrialCopy } from '@/lib/education/pro/keepAfterTrialCopy';
 import { trialEndedCopy } from '@/lib/education/pro/trialEndedCopy';
 import { classCreatedTrialCopy, resultsTrialCopy, trialCopyBase, TRIAL_COPY_RTL } from '@/lib/education/pro/trialCtaCopy';
-import { reportProCtaClick } from '@/lib/education/reportProCtaClick';
+import { reportProCtaClick, reportProOfferImpression, type ProOfferKind } from '@/lib/education/reportProCtaClick';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
@@ -91,10 +91,26 @@ export function ResultsTeacherProTrialCard({
   // short laptop/projector after a boss round (display:none), and on a phone it
   // sits below the fold; firing on mount counted both as seen. `null` until the
   // entitlement read settles, so the observer attaches once the card renders.
+  const cta = offerTrial ? 'teacher_pro_trial' : 'teacher_pro';
+  const offer: ProOfferKind = keep ? 'keep_after_trial' : offerTrial ? 'trial' : 'paid';
+  // Browser PostHog only records teachers who accept cookies, so on its own the
+  // impression above is invisible for most real teachers (no class-ready
+  // impression at all in the first days after launch). The server twins record
+  // for every signed-in teacher: `rendered` once the card mounts, `viewed` once
+  // half of it is on screen. Clicks already have one (reportProCtaClick).
+  const offerRef = useRef({ placement, locale: language, cta, offer });
+  offerRef.current = { placement, locale: language, cta, offer };
+  const renderedRef = useRef(false);
+  useEffect(() => {
+    if (!show || renderedRef.current) return;
+    renderedRef.current = true;
+    reportProOfferImpression({ ...offerRef.current, stage: 'rendered' });
+  }, [show]);
   useUpsellImpression(
     cardRef,
-    show ? { cta: offerTrial ? 'teacher_pro_trial' : 'teacher_pro', placement: placement } : null,
+    show ? { cta, placement: placement } : null,
     { locale: language },
+    () => reportProOfferImpression({ ...offerRef.current, stage: 'viewed' }),
   );
   useUpsellImpression(
     cardRef,

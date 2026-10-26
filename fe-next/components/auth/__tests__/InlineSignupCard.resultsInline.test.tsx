@@ -11,6 +11,12 @@ import {
   markGameCompletedSignal,
   SIGNUP_SOURCE_PENDING_KEY,
 } from '@/utils/growthTracking';
+import {
+  RESULTS_INLINE_DAILY_CAP,
+  __resetResultsInlineCapForTests,
+  getResultsInlineImpressionCount,
+  resultsInlineCapKey,
+} from '@/utils/signupImpressionCap';
 import { markGameActive, markGameInactive } from '@/utils/abandonOnPagehide';
 
 const { mockTrack, mockClicked } = vi.hoisted(() => ({ mockTrack: vi.fn(), mockClicked: vi.fn() }));
@@ -46,8 +52,10 @@ describe('InlineSignupCard results_inline', () => {
     mockTrack.mockClear();
     mockClicked.mockClear();
     __resetGameCompletedSignalForTests();
+    __resetResultsInlineCapForTests();
     markGameInactive();
     sessionStorage.clear();
+    localStorage.clear();
   });
 
   it('renders nothing and emits nothing before game_completed', () => {
@@ -62,7 +70,7 @@ describe('InlineSignupCard results_inline', () => {
     rerender(<InlineSignupCard isAuthenticated={false} analyticsSource="results_inline" />);
     expect(screen.getByText('auth.multiGames.title')).toBeInTheDocument();
     expect(shownCalls()).toEqual([
-      ['signup_prompt_shown', { source: 'results_inline', surface: 'results_inline', trigger: 'results_inline' }],
+      ['signup_prompt_shown', { source: 'results_inline', surface: 'results_inline', trigger: 'results_inline', cap_rank: 1 }],
     ]);
   });
 
@@ -112,5 +120,62 @@ describe('InlineSignupCard results_inline', () => {
     render(<InlineSignupCard isAuthenticated={false} />);
     expect(screen.getByText('auth.multiGames.title')).toBeInTheDocument();
     expect(shownCalls()).toHaveLength(0);
+  });
+
+  it('caps at 3 renders per guest per day: cap_rank 1..3 on the events, then nothing renders or emits', () => {
+    markGameCompletedSignal();
+    for (let i = 0; i < RESULTS_INLINE_DAILY_CAP; i++) {
+      const { unmount } = render(<InlineSignupCard isAuthenticated={false} analyticsSource="results_inline" />);
+      expect(screen.getByText('auth.multiGames.title')).toBeInTheDocument();
+      unmount();
+    }
+    expect(shownCalls().map(([, d]) => (d as { cap_rank?: number }).cap_rank)).toEqual([1, 2, 3]);
+
+    // 4th mount of the day: no card, no event (t_561836a1 — 73% of impressions
+    // were a guest's 4th+ that day and produced 1 of 19 clicks).
+    const { container } = render(<InlineSignupCard isAuthenticated={false} analyticsSource="results_inline" />);
+    expect(container.firstChild).toBeNull();
+    expect(shownCalls()).toHaveLength(RESULTS_INLINE_DAILY_CAP);
+  });
+
+  it('the cap counter resets on a new local day: a full YESTERDAY does not cap today', () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    localStorage.setItem(resultsInlineCapKey(yesterday), String(RESULTS_INLINE_DAILY_CAP));
+
+    markGameCompletedSignal();
+    render(<InlineSignupCard isAuthenticated={false} analyticsSource="results_inline" />);
+    expect(screen.getByText('auth.multiGames.title')).toBeInTheDocument();
+    expect(shownCalls()).toHaveLength(1);
+    expect(getResultsInlineImpressionCount()).toBe(1);
+  });
+
+  it('a guest already at the cap renders nothing even after a fresh game_completed', () => {
+    localStorage.setItem(resultsInlineCapKey(), String(RESULTS_INLINE_DAILY_CAP));
+    markGameCompletedSignal();
+    const { container } = render(<InlineSignupCard isAuthenticated={false} analyticsSource="results_inline" />);
+    expect(container.firstChild).toBeNull();
+    expect(shownCalls()).toHaveLength(0);
+  });
+
+  it('the cap does not apply to signed-in users: they still hide via auth, and burn no impression', () => {
+    localStorage.setItem(resultsInlineCapKey(), String(RESULTS_INLINE_DAILY_CAP - 1));
+    markGameCompletedSignal();
+    const { container } = render(<InlineSignupCard isAuthenticated analyticsSource="results_inline" />);
+    expect(container.firstChild).toBeNull();
+    expect(shownCalls()).toHaveLength(0);
+    // Signed-in render must not consume an impression — the cap belongs to guests.
+    expect(getResultsInlineImpressionCount()).toBe(RESULTS_INLINE_DAILY_CAP - 1);
+  });
+
+  it('other sources are uncapped even when results_inline is capped out', () => {
+    localStorage.setItem(resultsInlineCapKey(), String(RESULTS_INLINE_DAILY_CAP));
+    markGameCompletedSignal();
+    render(<InlineSignupCard isAuthenticated={false} analyticsSource="practice_results" />);
+    expect(screen.getByText('auth.multiGames.title')).toBeInTheDocument();
+    expect(shownCalls()).toEqual([
+      ['signup_prompt_shown', { source: 'practice_results', surface: 'practice_results', trigger: 'practice_results' }],
+    ]);
+    expect(getResultsInlineImpressionCount()).toBe(RESULTS_INLINE_DAILY_CAP);
   });
 });

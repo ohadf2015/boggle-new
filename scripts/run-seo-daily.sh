@@ -1,6 +1,6 @@
 #!/bin/bash
 # Daily SEO Auto-Ship
-# Pulls GSC + Bing data, edits closest landing pages or ships a new one,
+# Reads search data from the Growth Radar MCP, edits closest landing pages or ships a new one,
 # runs lint/test/build, and ships a dated PR from a branch reset to origin/master.
 #
 # Usage:  ./scripts/run-seo-daily.sh
@@ -8,7 +8,7 @@
 #
 # Hard stops:
 #  - dirty git tree
-#  - missing GSC or Bing creds
+#  - growth-radar MCP not configured for claude
 #  - unable to close superseded seo/daily PRs
 #  - >8 files changed (sanity cap)
 #  - lint/test/build fails after 2 fix attempts
@@ -112,15 +112,11 @@ log "========================================"
 
 cd "$PROJECT_DIR" || { log "ERROR: cd $PROJECT_DIR failed"; exit 1; }
 
-[ -f "$HOME/.config/gcloud/application_default_credentials.json" ] || {
-  log "ERROR: gcloud ADC missing. Run: gcloud auth application-default login --scopes=...,webmasters.readonly"
-  exit 1
-}
-# Bing WMT API key: prefer the BING_WMT_API_KEY env var; fall back to the local
-# creds file the seo-daily skill reads. NEVER put the key value in the prompt,
-# the report, a commit, or a log — this repo is PUBLIC.
-if [ -z "${BING_WMT_API_KEY:-}" ] && [ ! -f "$HOME/.config/bing-wmt/credentials" ]; then
-  log "ERROR: Bing WMT creds missing (set BING_WMT_API_KEY or ~/.config/bing-wmt/credentials)"
+# Growth Radar is the only data source: it must be a user-scope MCP server
+# (claude mcp add --scope user --transport http growth-radar https://growthradar.app/api/mcp).
+# No Google or Bing credential is read by this job.
+if ! jq -e '.mcpServers["growth-radar"]' "${CLAUDE_CONFIG_JSON:-$HOME/.claude.json}" >/dev/null 2>&1; then
+  log "ERROR: growth-radar MCP not configured. Run: claude mcp add --scope user --transport http growth-radar https://growthradar.app/api/mcp"
   exit 1
 fi
 
@@ -157,15 +153,12 @@ You are running the daily SEO auto-ship loop for LexiClash. Today: __TODAY__.
 Working dir: /Users/ohadfisher/git/boggle-new. Stay terse, act fast.
 Current branch: `seo/daily-__TODAY__`, already reset to `origin/master` by the wrapper. Stay on this branch.
 
-═══ STEP 1 — Pull data ═══
-Invoke the `seo-daily` skill with these inputs:
-  --site sc-domain:lexiclash.com
-  --bing-site https://lexiclash.com/
-  --repo /Users/ohadfisher/git/boggle-new
-  --days 28
-  --no-pr            (report only; the wrapper manages the dated PR branch)
-
-This writes docs/seo-daily/__TODAY__.md. Read it.
+═══ STEP 1 — Read Growth Radar (app "lexiclash") ═══
+All search data comes from the Growth Radar MCP. Never look for, ask for or write a Google or Bing credential.
+  • get_search_performance (app "lexiclash", days 28, metric "impressions"): queries with clicks, impressions, CTR. No position, no page.
+  • get_ai_visibility ("lexiclash").
+  • get_recommendations (app "lexiclash", limit 30, detail "summary"). Leave includePending off: pages whose change is still being graded are hidden on purpose.
+Write docs/seo-daily/__TODAY__.md: headline (Google and Bing totals kept separate, AI citations), top queries, CTR opportunities (`Improve CTR for <page>` rows with the position their description states), rank-up opportunities (rows stating a position from 8 to 25), and skipped frozen or still-graded pages. Every number comes from Growth Radar; a row that states no position never goes in a position table. If Growth Radar is unavailable, say so in the report and stop.
 
 ═══ STEP 2 — Self-audit the site BEFORE picking targets ═══
 You MUST ground every claim in real product features. Survey the site:
@@ -183,6 +176,9 @@ From today's report, pick UP TO:
   • 1 NEW landing page (only if a high-intent query >50 impr/28d has NO good page)
 
 SKIP an opportunity if any of:
+  • The page is listed in seo-freeze.json with `until` after today. Its title and
+    meta description must not change; CI (Check SEO freeze) fails the PR if they do.
+    Body/H2/internal-link work on a frozen page is still fine.
   • Existing meta already contains the target query verbatim (cosmetic only)
   • Brand-only term ("lexiclash") — no SEO win
   • Query intent doesn't match a real LexiClash feature (would force fabrication)

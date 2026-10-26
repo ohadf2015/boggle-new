@@ -8362,6 +8362,7 @@ const ru = {
     "failedToLoadWordOfTheDay": "Не удалось загрузить слово дня. Повторить?",
     "signInFailedRetry": "Не удалось войти. Попробуй ещё раз",
     "appleSignInIosOnly": "Для входа через Apple нужен iPhone или iPad",
+    "microsoftSignInUnavailable": "Вход через Microsoft здесь пока недоступен",
     "unableToLoadData": "Не удалось получить данные. Попробуй ещё раз",
     "tryAgainButton": "Попробовать ещё",
     "connectionTimeout": "Соединение тормозит. Подожди",
@@ -14027,6 +14028,20 @@ const ru = {
         "error": "Не удалось загрузить учеников",
         "unknown": "Неизвестный ученик",
         "noneYet": "Пока нет учеников. Поделитесь кодом присоединения"
+      },
+      "gcImport": {
+        "action": "Импорт из Google Classroom",
+        "connect": "Подключить Google Classroom",
+        "pickCourse": "Класс в Google Classroom",
+        "check": "Сверить список",
+        "matched": "Уже в классе: {{count}}",
+        "unmatchedTitle": "Ещё не присоединились ({{count}}): отправьте им код",
+        "consentTitle": "Нужно согласие ({{count}})",
+        "consentHint": "Для этих учеников нужно сохранённое согласие, прежде чем связать их аккаунт Google.",
+        "link": "Связать найденных учеников",
+        "linked": "Связано: {{count}}",
+        "noCourses": "Нет активных классов в Google Classroom",
+        "error": "Не удалось связаться с Google Classroom. Попробуйте ещё раз."
       }
     },
     "lesson": {

@@ -7,6 +7,8 @@
 import { vi, describe, it, expect, beforeAll, beforeEach, afterEach } from 'vitest';
 import { createTestEnvironment } from '../helpers/socketTestHelper';
 import { getCachedTrie, getTrieNode } from '../../modules/boggleSolver';
+import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
+import { isProfane } from '../../utils/profanityFilter';
 
 vi.mock('../../modules/classroomGameManager', async (importOriginal) => ({
   ...(await importOriginal()),
@@ -66,6 +68,16 @@ function lastEvent(socket, name) {
   const evs = socket.getEmittedEventsByName(name);
   return evs.length ? evs[evs.length - 1].data : undefined;
 }
+// Async socket handlers can take several event-loop turns under CI load; a
+// single sleep(0) races the emission and flakes. Poll until the event lands,
+// counting so we wait for a NEW event when earlier ones of that name exist.
+async function waitForEventCount(socket, name, minCount, timeoutMs = 5000) {
+  const start = Date.now();
+  while (socket.getEmittedEventsByName(name).length < minCount && Date.now() - start < timeoutMs) {
+    await sleep(10);
+  }
+  return lastEvent(socket, name);
+}
 function eventDump(socket) {
   return socket.getEmittedEvents().map((e) => `${e.event}${e.event === 'error' ? ':' + JSON.stringify(e.data) : ''}`).slice(-25).join(' | ');
 }
@@ -95,7 +107,11 @@ async function startRound(host, others, gameCode, mode, language = 'en') {
   expect(getGame(gameCode).gameState).toBe('in-progress');
 }
 
-/** First dictionary word (3+ letters) traceable on the grid, with its cell path. */
+/**
+ * First dictionary word (3+ letters) traceable on the grid, with its cell path.
+ * Skips words the server rejects before scoring (vowelless "mtd", profanity
+ * like "ass"), so a random board can't turn the submit into a wordRejected.
+ */
 function findWordWithPath(grid, exclude = new Set()) {
   const trie = getCachedTrie('en');
   const rows = grid.length;
@@ -108,7 +124,7 @@ function findWordWithPath(grid, exclude = new Set()) {
     const node = getTrieNode(trie, word);
     if (!node) return;
     const next = [...path, { row: r, col: c }];
-    if (word.length >= 3 && node.isWord && !exclude.has(word)) { found = { word, path: next }; return; }
+    if (word.length >= 3 && node.isWord && !exclude.has(word) && !isWordShapeWeird(word, 'en').weird && !isProfane(word)) { found = { word, path: next }; return; }
     seen.add(`${r},${c}`);
     for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
       const nr = r + dr; const nc = c + dc;
@@ -149,20 +165,20 @@ describe('MP blast board sync (real socket flow)', () => {
     expect(hit, 'no traceable word on the blast board').toBeTruthy();
 
     await joiner.receiveEvent('submitWord', { word: hit.word, path: hit.path });
-    await sleep(0); // yield to event loop for async blastBoardUpdate emission
-    const ack = snap(lastEvent(joiner, 'blastBoardUpdate'));
+    const ack = snap(await waitForEventCount(joiner, 'blastBoardUpdate', 1));
     expect(ack?.clearedBy, eventDump(joiner)).toBe(JOINER);
     expect(ack.grid).toEqual(board().grid);
 
     getGame(gameCode).isPaused = true;
     const updatesBefore = joiner.getEmittedEventsByName('blastBoardUpdate').length;
     const second = findWordWithPath(board().grid, new Set([hit.word]));
+    const rejectedBefore = joiner.getEmittedEventsByName('wordRejected').length;
     await joiner.receiveEvent('submitWord', { word: second?.word ?? 'cat', path: second?.path });
-    expect(lastEvent(joiner, 'wordRejected')?.reason).toBe('paused');
+    expect((await waitForEventCount(joiner, 'wordRejected', rejectedBefore + 1))?.reason).toBe('paused');
     expect(joiner.getEmittedEventsByName('blastBoardUpdate').length).toBe(updatesBefore);
 
     await joiner.receiveEvent('blastRequestBoard');
-    const resync = snap(lastEvent(joiner, 'blastBoardUpdate'));
+    const resync = snap(await waitForEventCount(joiner, 'blastBoardUpdate', updatesBefore + 1));
     expect(resync.clearedBy).toBe('__server_resync__');
     expect(resync.grid).toEqual(board().grid);
     expect(resync.tileStates).toEqual(board().tileStates);
