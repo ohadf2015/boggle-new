@@ -27,8 +27,10 @@ const mockClient = {
 
 const redisState = { available: true };
 vi.mock('../connection', () => ({
-  getRedisClient: () => (redisState.available ? mockClient : null),
-  isRedisAvailable: () => redisState.available,
+  // Next route code gets its own copy of the module: its own client/flag stay unset.
+  getRedisClient: () => null,
+  isRedisAvailable: () => false,
+  getSharedRedisClient: () => (redisState.available ? mockClient : null),
 }));
 
 vi.mock('../circuitBreaker', () => ({
