@@ -43,6 +43,7 @@ import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
 import { myMissedWords } from '@/components/student/live/missedWords';
 import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
 
@@ -75,6 +76,12 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     series: { roundNumber: seriesRoundNumber, standings: seriesStandings },
   }), [data.sortedScores, username, data.normalizeUsername, seriesRoundNumber, seriesStandings]);
   const { branch, lock } = useLockedBranch(seriesRoundNumber >= seriesTotalGames);
+  // t_561836a1: PostHog flag `ri-mp-series-end` (50/50). Control = today's
+  // behaviour (signup CTA on every round-end, incl. the ~10s auto-advance gap);
+  // treatment = render it only on the series-end / Leave screen. Defaults to
+  // control so a flag-less client (no consent, flags not loaded) keeps today.
+  const riMpSeriesEndFlag = usePostHogFlag<string | boolean>('ri-mp-series-end', 'control');
+  const riSeriesEndOnly = riMpSeriesEndFlag === 'series-end' || riMpSeriesEndFlag === true;
   // The teacher's hidden dial means TRUE hidden — the final screen IS the reveal.
   const pressure = useClassroomPressure();
   const hideOutcome = branch !== 'final' && pressure != null && isLeaderboardHidden(pressure);
@@ -307,8 +314,10 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           <MpRoundAwards awards={awards} t={t} className="hidden lg:block" />
         ) : null)}
         {/* results_inline: guest signup CTA on the round-end screen. The card
-            itself waits for growth:game_completed and hides mid-round. */}
-        {c.isGuest && !c.isClassroom && seen('card') && (
+            itself waits for growth:game_completed and hides mid-round. Under
+            the `ri-mp-series-end` treatment it renders only on the series-end
+            / Leave screen — never in the auto-advance gap between rounds. */}
+        {c.isGuest && !c.isClassroom && seen('card') && (!riSeriesEndOnly || branch === 'final') && (
           <InlineSignupCard
             isAuthenticated={c.isAuthenticated}
             analyticsSource="results_inline"

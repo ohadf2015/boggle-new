@@ -20,6 +20,10 @@ import {
   latchSignupSource,
   trackGrowthEvent,
 } from '@/utils/growthTracking';
+import {
+  isResultsInlineCapped,
+  recordResultsInlineImpression,
+} from '@/utils/signupImpressionCap';
 
 interface InlineSignupCardProps {
   isAuthenticated: boolean;
@@ -79,18 +83,45 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
     return () => window.removeEventListener(GAME_COMPLETED_SIGNAL, onCompleted);
   }, [gated, gameCompleted]);
 
-  const visible = !isAuthenticated && !isOnCrazyGamesPlatform && gameCompleted;
+  // t_561836a1: results_inline is capped at RESULTS_INLINE_DAILY_CAP renders
+  // per guest per local day (73% of its impressions were a guest's 4th+ that
+  // day and produced 1 of 19 clicks). Past the cap the card does not render
+  // and no signup_prompt_shown is emitted. Signed-in users never reach this —
+  // `visible` is already false for them, so the cap only ever gates guests.
+  // Read in the initializer like the gameCompleted gate above: the gated card
+  // renders null on the server either way, so there is no hydration mismatch.
+  const isCappedSurface = analyticsSource === 'results_inline';
+  const [capped, setCapped] = useState<boolean>(() => isCappedSurface && isResultsInlineCapped());
+
+  const visible = !isAuthenticated && !isOnCrazyGamesPlatform && gameCompleted && !capped;
 
   const shownRef = useRef(false);
   useEffect(() => {
     if (!visible || !analyticsSource || shownRef.current) return;
+    if (isCappedSurface) {
+      // Race guard: another mount may have burnt the last impression since
+      // this one initialized — never emit (or render) past the cap.
+      if (isResultsInlineCapped()) {
+        setCapped(true);
+        return;
+      }
+      shownRef.current = true;
+      const capRank = recordResultsInlineImpression();
+      trackGrowthEvent('signup_prompt_shown', {
+        source: analyticsSource,
+        surface: analyticsSource,
+        trigger: analyticsSource,
+        cap_rank: capRank,
+      });
+      return;
+    }
     shownRef.current = true;
     trackGrowthEvent('signup_prompt_shown', {
       source: analyticsSource,
       surface: analyticsSource,
       trigger: analyticsSource,
     });
-  }, [visible, analyticsSource]);
+  }, [visible, analyticsSource, isCappedSurface]);
 
   const latch = () => {
     if (analyticsSource) latchSignupSource(analyticsSource);
