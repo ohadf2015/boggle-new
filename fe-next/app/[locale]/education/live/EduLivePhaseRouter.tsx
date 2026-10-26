@@ -26,17 +26,18 @@ interface EduLivePhaseRouterProps {
   routerProps: MpPhaseRouterProps;
   urlRoom: string | null;
   isTeacher: boolean;
+  isSpectator?: boolean;
   language: string;
   t: Translate;
 }
 
-export function EduLivePhaseRouter({ routerProps, urlRoom, isTeacher, language, t }: EduLivePhaseRouterProps): React.JSX.Element {
+export function EduLivePhaseRouter({ routerProps, urlRoom, isTeacher, isSpectator = false, language, t }: EduLivePhaseRouterProps): React.JSX.Element {
   const { phase } = routerProps;
 
   if (phase === 'entry') {
     return (
       <FeatureErrorBoundary featureName="Classroom Entry">
-        <EduLiveEntry entry={routerProps.entry} urlRoom={urlRoom} isHost={isTeacher} language={language} t={t} />
+        <EduLiveEntry entry={routerProps.entry} urlRoom={urlRoom} isHost={isTeacher} isSpectator={isSpectator} language={language} t={t} />
       </FeatureErrorBoundary>
     );
   }

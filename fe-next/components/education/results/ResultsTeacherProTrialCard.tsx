@@ -8,7 +8,7 @@
  *
  * Host tree only (EduHostResults) — no student phone mounts it, so thirty
  * phones never hit /api/subscription/status. Hidden for Pro teachers and while
- * the entitlement read is in flight. Play again stays the one loud button.
+ * the entitlement read is in flight. Play again stays the one loud button, so the CTA is an outline.
  *
  * Copy lives in lib/education/pro/trialCtaCopy.ts (self-contained per locale).
  */
@@ -160,7 +160,7 @@ export function ResultsTeacherProTrialCard({
             /* analytics must never block */
           }
         }}
-        className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-neo border-2 border-neo-black bg-neo-pink px-4 text-center font-neo-display text-sm font-black text-neo-navy shadow-hard-sm transition-transform active:translate-y-px"
+        className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-neo border-2 border-neo-pink bg-transparent px-4 text-center font-neo-display text-sm font-bold text-neo-pink-light transition-colors hover:bg-neo-pink/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:translate-y-px"
       >
         {offerTrial ? copy.trialCta : copy.upgradeCta}
       </Link>

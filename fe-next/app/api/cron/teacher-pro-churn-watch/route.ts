@@ -13,7 +13,7 @@ import {
 } from '@/lib/education/teacherProChurnWatch';
 import { escapeTelegramMarkdownV2, sendTelegramMessage } from '@/lib/telegram';
 import { withCronLock } from '@/backend/redis/locking';
-import { getRedisClient, isRedisAvailable } from '@/backend/redis/connection';
+import { getSharedRedisClient } from '@/backend/redis/connection';
 import { captureApiError } from '@/utils/sentry';
 import logger from '@/utils/logger';
 
@@ -31,9 +31,10 @@ import logger from '@/utils/logger';
  * Security: CRON_SECRET via x-cron-secret or Authorization: Bearer.
  */
 async function loadLastSnapshots(): Promise<TeacherProSubSnapshot[] | null> {
-  if (!isRedisAvailable() || !getRedisClient()) return null;
+  const redis = getSharedRedisClient();
+  if (!redis) return null;
   try {
-    const raw = await getRedisClient()!.get(TEACHER_PRO_CHURN_REDIS_KEY);
+    const raw = await redis.get(TEACHER_PRO_CHURN_REDIS_KEY);
     return parseStoredSnapshots(raw);
   } catch (err) {
     logger.warn('[TeacherPro Churn] redis get failed; treating as first run', err);
@@ -42,9 +43,10 @@ async function loadLastSnapshots(): Promise<TeacherProSubSnapshot[] | null> {
 }
 
 async function saveSnapshots(curr: TeacherProSubSnapshot[]): Promise<void> {
-  if (!isRedisAvailable() || !getRedisClient()) return;
+  const redis = getSharedRedisClient();
+  if (!redis) return;
   try {
-    await getRedisClient()!.set(TEACHER_PRO_CHURN_REDIS_KEY, JSON.stringify(curr));
+    await redis.set(TEACHER_PRO_CHURN_REDIS_KEY, JSON.stringify(curr));
   } catch (err) {
     logger.warn('[TeacherPro Churn] redis set failed; next run may re-notify', err);
   }
