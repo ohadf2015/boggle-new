@@ -19,17 +19,24 @@ const plan: TeacherReminderPlan = {
 };
 
 describe('assignmentDueReminderEmail', () => {
-  it('overdue copy deep-links the classroom progress report and Polar upgrade for free teachers', () => {
+  it('a free teacher gets the Pro upgrade as the one action, with no link into the Pro-only reports', () => {
     const { subject, html } = assignmentDueReminderEmail({
       fullName: 'Ada',
       locale: 'en',
       plan,
       hasPro: false,
+      canOpenReport: false,
     });
     expect(subject).toContain('overdue');
-    expect(html).toContain('/en/teacher/reports?classroomId=c1');
+    expect(html).not.toContain('/teacher/reports');
     expect(html).toContain('/en/teacher/upgrade');
     expect(html).toContain('Year 7');
+  });
+
+  it('a teacher on a live access trial still gets the report links, plus the upgrade', () => {
+    const { html } = assignmentDueReminderEmail({ fullName: 'Ada', locale: 'he', plan, hasPro: false, canOpenReport: true });
+    expect(html).toContain('/he/teacher/reports?classroomId=c1');
+    expect(html).toContain('/he/teacher/upgrade');
   });
 
   it('omits the Polar CTA when the teacher already has Pro', () => {
@@ -38,6 +45,7 @@ describe('assignmentDueReminderEmail', () => {
       locale: 'en',
       plan,
       hasPro: true,
+      canOpenReport: true,
     });
     expect(html).not.toContain('/en/teacher/upgrade');
     expect(html).toContain('/en/teacher/reports?classroomId=c1');

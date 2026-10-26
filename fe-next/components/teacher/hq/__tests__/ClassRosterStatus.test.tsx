@@ -15,7 +15,9 @@ vi.mock('@/lib/supabase/education/classrooms', () => ({
   getClassroomStudents: (...a: unknown[]) => getClassroomStudents(...a),
 }));
 let hasPro = true;
-vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro, isLoading: false }) }));
+let accessTrialExpires: string | null = null;
+let loading = false;
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro, loading, accessTrialExpires }) }));
 
 const getClassMastery = vi.fn();
 vi.mock('@/lib/supabase/wordMastery', () => ({
@@ -34,6 +36,8 @@ const session = (studentId: string, asked: string[], found: string[]) => ({
 describe('<ClassRosterStatus>', () => {
   beforeEach(() => {
     hasPro = true;
+    accessTrialExpires = null;
+    loading = false;
     getClassroomStudents.mockResolvedValue({
       data: [student('a', 'Ana'), student('b', 'Ben'), student('c', 'Cleo')],
       error: null,
@@ -98,6 +102,34 @@ describe('<ClassRosterStatus>', () => {
     expect(text).toContain('eg2Polish.classes.status.played');
     expect(text).toContain('eg2Polish.classes.status.notYet');
     expect(text).not.toMatch(/below|onTrack|%/);
+  });
+
+  it('free teachers get no student links into the Pro-only reports, and a Pro-labeled way in', async () => {
+    hasPro = false;
+    render(<ClassRosterStatus classroomId="c1" />);
+    await waitFor(() => expect(screen.getAllByTestId('roster-status-row')).toHaveLength(3));
+    for (const row of screen.getAllByTestId('roster-status-row')) expect(row.closest('a')).toBeNull();
+    const report = screen.getByTestId('roster-status-report');
+    expect(report).toHaveAttribute('href', '/en/teacher/reports?classroomId=c1');
+    expect(report).toHaveTextContent('teacher.subscription.proPlanName');
+  });
+
+  it('a teacher on a live access trial keeps the student links, with no Pro label', async () => {
+    hasPro = false;
+    accessTrialExpires = new Date(Date.now() + 5 * 86400000).toISOString();
+    render(<ClassRosterStatus classroomId="c1" />);
+    await waitFor(() => expect(screen.getAllByTestId('roster-status-row')).toHaveLength(3));
+    const hrefs = screen.getAllByTestId('roster-status-row').map((r) => r.getAttribute('href'));
+    expect(hrefs).toContain('/en/teacher/reports?classroomId=c1&studentId=a');
+    expect(hrefs.every(Boolean)).toBe(true);
+    expect(screen.getByTestId('roster-status-report')).not.toHaveTextContent('teacher.subscription.proPlanName');
+  });
+
+  it('links nothing while the plan is still resolving', async () => {
+    loading = true;
+    render(<ClassRosterStatus classroomId="c1" />);
+    await waitFor(() => expect(screen.getAllByTestId('roster-status-row')).toHaveLength(3));
+    expect(screen.queryByRole('link')).toBeNull();
   });
 
   it('puts the shared avatar before each student name', async () => {

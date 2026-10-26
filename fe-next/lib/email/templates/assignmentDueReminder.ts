@@ -66,18 +66,21 @@ export interface AssignmentDueReminderEmail {
   locale: TeacherLocale;
   plan: TeacherReminderPlan;
   hasPro: boolean;
+  /** Paid Pro or a live access trial: the reports are Pro only, so a free teacher gets no link into them. */
+  canOpenReport: boolean;
 }
 
 function copyFor(locale: TeacherLocale): Copy {
   return COPY[locale] ?? COPY.en;
 }
 
-function listHtml(items: TeacherReminderPlan['dueSoon'], locale: TeacherLocale): string {
+function listHtml(items: TeacherReminderPlan['dueSoon'], locale: TeacherLocale, linkReports: boolean): string {
   const copy = copyFor(locale);
   return items
     .map((n) => {
-      const href = reportsUrl(locale, n.classroomId);
-      return `<li><a href="${escape(href)}">${escape(n.classroomName)} — ${escape(n.title)}</a> (${escape(copy.missing(n.missingCount))})</li>`;
+      const label = `${escape(n.classroomName)} — ${escape(n.title)}`;
+      const item = linkReports ? `<a href="${escape(reportsUrl(locale, n.classroomId))}">${label}</a>` : label;
+      return `<li>${item} (${escape(copy.missing(n.missingCount))})</li>`;
     })
     .join('');
 }
@@ -99,11 +102,11 @@ export function assignmentDueReminderEmail(args: AssignmentDueReminderEmail): { 
 
   const dueSoonBlock =
     args.plan.dueSoon.length > 0
-      ? `<p>${escape(copy.dueSoonIntro)}</p><ul>${listHtml(args.plan.dueSoon, args.locale)}</ul>`
+      ? `<p>${escape(copy.dueSoonIntro)}</p><ul>${listHtml(args.plan.dueSoon, args.locale, args.canOpenReport)}</ul>`
       : '';
   const overdueBlock =
     args.plan.overdue.length > 0
-      ? `<p>${escape(copy.overdueIntro)}</p><ul>${listHtml(args.plan.overdue, args.locale)}</ul>`
+      ? `<p>${escape(copy.overdueIntro)}</p><ul>${listHtml(args.plan.overdue, args.locale, args.canOpenReport)}</ul>`
       : '';
 
   const proCta = args.hasPro
@@ -117,7 +120,7 @@ export function assignmentDueReminderEmail(args: AssignmentDueReminderEmail): { 
   <p>${escape(copy.greeting(args.fullName))}</p>
   ${dueSoonBlock}
   ${overdueBlock}
-  <p><a href="${escape(reportHref)}" data-testid="assignment-due-report">${escape(copy.openReport)}</a></p>
+  ${args.canOpenReport ? `<p><a href="${escape(reportHref)}" data-testid="assignment-due-report">${escape(copy.openReport)}</a></p>` : ''}
   ${proCta}
   <p>${escape(copy.signoff)}</p>
 </body>

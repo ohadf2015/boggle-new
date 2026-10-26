@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { hasProAccess } from '@/lib/education/teacherPlanGate';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
 import { getClassMastery } from '@/lib/supabase/wordMastery';
 import { resolveDisplayName } from '@/lib/displayName';
@@ -55,7 +56,10 @@ function toRows(
 /** Who in this class needs attention, from the same evidence the reports use. */
 export function ClassRosterStatus({ classroomId }: { classroomId: string }) {
   const { t, language } = useLanguage();
-  const { hasPro } = useTeacherPro();
+  const entitlement = useTeacherPro();
+  const { hasPro } = entitlement;
+  const [nowMs] = useState(() => Date.now());
+  const canOpenReport = !entitlement.loading && hasProAccess(entitlement, nowMs);
   const [rows, setRows] = useState<Row[] | null>(null);
 
   useEffect(() => {
@@ -93,11 +97,7 @@ export function ClassRosterStatus({ classroomId }: { classroomId: string }) {
       <ul className="divide-y divide-black/10">
         {rows.slice(0, VISIBLE).map((row) => (
           <li key={row.id}>
-            <Link
-              data-testid="roster-status-row"
-              href={`${report}&studentId=${row.id}`}
-              className="flex min-h-9 items-center justify-between gap-2 rounded-sm py-1 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
-            >
+            <RowShell href={canOpenReport ? `${report}&studentId=${row.id}` : null}>
               <span className="flex min-w-0 items-center gap-2">
                 <AvatarLite userId={row.id} pixelSize={28} />
                 <span className="min-w-0 truncate font-bold" dir="auto">
@@ -111,19 +111,41 @@ export function ClassRosterStatus({ classroomId }: { classroomId: string }) {
                     : t(`eg2Polish.classes.status.${row.status}`, { pct: row.accuracy })}
                 </span>
               ) : null}
-            </Link>
+            </RowShell>
           </li>
         ))}
       </ul>
-      <Link
-        data-testid="roster-status-report"
-        href={report}
-        className="mt-1 inline-flex min-h-9 items-center gap-1 text-xs font-black uppercase text-black underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
-      >
-        {hidden > 0 ? t('eg2Polish.classes.moreInReport', { count: hidden }) : t('eg2Polish.classes.openReport')}
-        <DirectionalIcon icon={ArrowRight} className="size-3.5" />
-      </Link>
+      {entitlement.loading ? null : (
+        <Link
+          data-testid="roster-status-report"
+          href={report}
+          className="mt-1 inline-flex min-h-9 items-center gap-1 text-xs font-black uppercase text-black underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+        >
+          {hidden > 0 ? t('eg2Polish.classes.moreInReport', { count: hidden }) : t('eg2Polish.classes.openReport')}
+          {canOpenReport ? null : (
+            <span className="rounded-full border-2 border-black bg-neo-lime px-1.5 py-px text-[0.6rem] normal-case">
+              {t('teacher.subscription.proPlanName')}
+            </span>
+          )}
+          <DirectionalIcon icon={ArrowRight} className="size-3.5" />
+        </Link>
+      )}
     </section>
+  );
+}
+
+const ROW = 'flex min-h-9 items-center justify-between gap-2 rounded-sm py-1';
+
+function RowShell({ href, children }: { href: string | null; children: React.ReactNode }) {
+  if (!href) return <div data-testid="roster-status-row" className={ROW}>{children}</div>;
+  return (
+    <Link
+      data-testid="roster-status-row"
+      href={href}
+      className={cn(ROW, 'hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan')}
+    >
+      {children}
+    </Link>
   );
 }
 

@@ -91,7 +91,7 @@ describe('/api/cron/assignment-due-reminders', () => {
     expect(h.sendEmailSpy).not.toHaveBeenCalled();
   });
 
-  it('emails a free teacher an overdue nudge that links the progress report', async () => {
+  it('emails a free teacher an overdue nudge whose one action is the Pro upgrade, not the Pro-only report', async () => {
     const due = new Date(Date.now() - 60 * 60 * 1000).toISOString();
     h.tables.lesson_assignments = {
       data: [{ id: 'a1', classroom_id: 'c1', lesson_id: 'l1', due_date: due, title: 'Week 3' }],
@@ -115,9 +115,25 @@ describe('/api/cron/assignment-due-reminders', () => {
     expect(body.sent).toBe(1);
     expect(h.sendEmailSpy).toHaveBeenCalledTimes(1);
     const html = h.sendEmailSpy.mock.calls[0][0].html as string;
-    expect(html).toContain('/en/teacher/reports?classroomId=c1');
+    expect(html).not.toContain('/teacher/reports');
     expect(html).toContain('/en/teacher/upgrade');
     expect(h.upsertSpy).toHaveBeenCalled();
+  });
+
+  it('keeps the report link for a teacher whose access trial is live, and drops it once it has lapsed', async () => {
+    seedOverdue();
+    const live = new Date(Date.now() + 5 * 86400000).toISOString();
+    h.tables.teacher_access_requests = {
+      data: [{ user_id: 't1', email: 'ada@school.edu', full_name: 'Ada', locale: 'en', trial_expires_at: live }],
+      error: null,
+    };
+    await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(h.sendEmailSpy.mock.calls[0][0].html).toContain('/en/teacher/reports?classroomId=c1');
+
+    h.sendEmailSpy.mockClear();
+    h.tables.teacher_access_requests.data[0].trial_expires_at = new Date(Date.now() - 86400000).toISOString();
+    await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(h.sendEmailSpy.mock.calls[0][0].html).not.toContain('/teacher/reports');
   });
 
   function seedOverdue() {

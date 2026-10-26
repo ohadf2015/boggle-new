@@ -23,7 +23,7 @@ import { proUserIdsFrom, type SubscriptionRowLike } from '@/lib/education/proGra
  * POST /api/cron/assignment-due-reminders
  *
  * Daily: email teachers about student homework due in the next 24h, and an
- * overdue nudge that deep-links /{locale}/teacher/reports?classroomId= so the
+ * overdue nudge that deep-links /{locale}/teacher/reports?classroomId= (Pro or live trial only) so the
  * progress report (Teacher Pro CSV) is the next click. Idempotent per
  * (assignment, teacher, kind) via assignment_reminder_sends.
  *
@@ -36,6 +36,7 @@ interface AccessRow {
   email: string;
   full_name: string;
   locale: string | null;
+  trial_expires_at?: string | null;
 }
 
 export async function POST(request: NextRequest) {
@@ -151,13 +152,15 @@ export async function POST(request: NextRequest) {
 
       const { data: accessRows, error: accessError } = await supabase
         .from('teacher_access_requests')
-        .select('user_id, email, full_name, locale')
+        .select('user_id, email, full_name, locale, trial_expires_at')
         .eq('status', 'approved')
         .in('user_id', teacherIds);
       if (accessError) throw new Error(`teacher_access_requests select failed: ${accessError.message}`);
 
       const teachersById = new Map<string, { email: string; fullName: string; locale: TeacherLocale }>();
+      const liveTrialIds = new Set<string>();
       for (const r of (accessRows ?? []) as AccessRow[]) {
+        if (r.user_id && r.trial_expires_at && Date.parse(r.trial_expires_at) > Date.now()) liveTrialIds.add(r.user_id);
         if (!r.user_id || !r.email) continue;
         if (teachersById.has(r.user_id)) continue;
         teachersById.set(r.user_id, {
@@ -200,6 +203,7 @@ export async function POST(request: NextRequest) {
           locale: teacher.locale,
           plan,
           hasPro: proUserIds.has(plan.teacherId),
+          canOpenReport: proUserIds.has(plan.teacherId) || liveTrialIds.has(plan.teacherId),
         });
         const result = await sendEmail({ to: teacher.email, subject: tpl.subject, html: tpl.html });
         if (!result.ok) {
