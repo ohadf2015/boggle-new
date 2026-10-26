@@ -169,10 +169,43 @@ describe('PolarClient.createCheckout', () => {
       products: ['prod-1'],
       customer_email: 'teacher@example.com',
       external_customer_id: 'user-1',
-      metadata: { user_id: 'user-1', trial: false },
+      metadata: { user_id: 'user-1', teacher_id: 'user-1', trial: false },
       allow_trial: false,
     })
     expect(body.trial_interval).toBeUndefined()
+  })
+
+  it('prefills the customer name on the hosted checkout when given one', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const client = new PolarClient('token-123', 'sandbox')
+    await client.createCheckout({
+      userId: 'user-1',
+      productId: 'prod-1',
+      email: 'teacher@example.com',
+      name: 'Ms Rivera',
+    })
+
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+    expect(body.customer_name).toBe('Ms Rivera')
+    expect(body.metadata.teacher_id).toBe('user-1')
+  })
+
+  it('omits customer_name when no name is given', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ url: 'https://sandbox.polar.sh/checkout/abc' }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const client = new PolarClient('token-123', 'sandbox')
+    await client.createCheckout({ userId: 'user-1', productId: 'prod-1' })
+
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).not.toHaveProperty('customer_name')
   })
 
   it('a trial checkout asks Polar for 14 days and marks metadata.trial', async () => {
@@ -284,6 +317,22 @@ describe('PolarClient.createCheckout — rejected customer_email', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
     expect(JSON.parse(fetchMock.mock.calls[0][1].body).customer_email).toBe('a@school.example')
     expect(JSON.parse(fetchMock.mock.calls[1][1].body)).not.toHaveProperty('customer_email')
+  })
+
+  it('retries once without prefill when Polar rejects the customer name', async () => {
+    const nameRejected = {
+      ok: false,
+      status: 422,
+      text: async () => '{"detail":[{"loc":["body","customer_name"],"msg":"extra fields not permitted"}]}',
+    }
+    const fetchMock = vi.fn().mockResolvedValueOnce(nameRejected).mockResolvedValueOnce(created)
+    vi.stubGlobal('fetch', fetchMock)
+    const url = await new PolarClient('tok', 'sandbox').createCheckout({ userId: 'u', productId: 'p', email: 'a@b.co', name: 'Ms Rivera' })
+    expect(url).toBe('https://polar.sh/checkout/ok')
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    const retry = JSON.parse(fetchMock.mock.calls[1][1].body)
+    expect(retry).not.toHaveProperty('customer_name')
+    expect(retry).not.toHaveProperty('customer_email')
   })
 
   it('turns a stalled Polar create into a timeout error instead of hanging', async () => {

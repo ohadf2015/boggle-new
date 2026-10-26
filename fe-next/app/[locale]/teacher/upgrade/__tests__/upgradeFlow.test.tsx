@@ -87,10 +87,27 @@ describe('upgrade page — logged-out visitor', () => {
     expect(screen.getByTestId('pricing-trial-cta')).toBeInTheDocument();
   });
 
-  it('a trial tap that comes back 401 remembers the trial intent and opens sign-in', async () => {
+  it('a trial tap opens the pre-checkout explainer and does not POST yet', () => {
+    render(<PageClient />);
+    fireEvent.click(screen.getByTestId('pricing-trial-cta'));
+    expect(screen.getByTestId('pre-checkout-explainer')).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('the explainer back button closes it without touching the till', () => {
+    render(<PageClient />);
+    fireEvent.click(screen.getByTestId('pricing-paid-cta'));
+    expect(screen.getByTestId('pre-checkout-explainer')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('pre-checkout-back'));
+    expect(screen.queryByTestId('pre-checkout-explainer')).not.toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('a trial tap confirmed through the explainer that comes back 401 remembers the trial intent and opens sign-in', async () => {
     fetchMock.mockResolvedValue({ ok: false, status: 401, json: async () => ({}) });
     render(<PageClient />);
     fireEvent.click(screen.getByTestId('pricing-trial-cta'));
+    fireEvent.click(screen.getByTestId('pre-checkout-confirm'));
     await waitFor(() => expect(screen.getByTestId('auth-modal')).toBeInTheDocument());
     expect(mark).toHaveBeenCalledWith({ trial: true });
     expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ trial: true, locale: 'en' });
@@ -100,6 +117,7 @@ describe('upgrade page — logged-out visitor', () => {
     fetchMock.mockResolvedValue({ ok: false, status: 503, json: async () => ({}) });
     render(<PageClient />);
     fireEvent.click(screen.getByTestId('pricing-paid-cta'));
+    fireEvent.click(screen.getByTestId('pre-checkout-confirm'));
     await waitFor(() => expect(toastError).toHaveBeenCalled());
     const { container } = render(<>{toastError.mock.calls[0][0]}</>);
     expect(container.textContent).toContain('eg2Pro.upgrade.checkoutOffline');

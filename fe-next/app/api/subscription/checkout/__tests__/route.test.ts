@@ -169,6 +169,24 @@ describe('POST /api/subscription/checkout', () => {
     })
   })
 
+  it('prefills the hosted checkout with the teacher display name from profiles', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    maybeSingle.mockResolvedValue({ data: { is_test_account: false, display_name: 'Ms Rivera' }, error: null })
+    const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+    expect(res.status).toBe(200)
+    expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ name: 'Ms Rivera', email: 'teacher@example.com' }))
+  })
+
+  it('checkout still works when the profile lookup fails (no name prefill, till stays open)', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')
+    maybeSingle.mockRejectedValue(new Error('db down'))
+    const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+    expect(res.status).toBe(200)
+    expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ name: undefined }))
+  })
+
   it('records when a checkout started, for the abandoned-checkout email', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
     createCheckout.mockResolvedValue('https://polar.sh/checkout/u1')

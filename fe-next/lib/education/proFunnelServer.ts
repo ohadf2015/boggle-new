@@ -18,7 +18,7 @@ import type { PolarTrialExpiryBucket } from '@/lib/education/polarTrialExpiryJou
 const BASE = { product: 'teacher_pro', provider: 'polar' } as const;
 
 export function buildProCheckoutStartedEvent(userId: string, tags: Record<string, unknown> = {}): EduServerEvent {
-  return { distinctId: userId, event: 'edu_pro_checkout_started', properties: { ...tags, ...BASE } };
+  return { distinctId: userId, event: 'edu_pro_checkout_started', properties: { ...tags, ...BASE, teacher_id: userId } };
 }
 
 /**
@@ -51,7 +51,9 @@ export function buildProTrialStartedEvent(userId: string, tags: Record<string, u
 
 /** Conversion funnel step 2 — Polar checkout session created (paid or trial). */
 export function buildCheckoutStartedEvent(userId: string, tags: Record<string, unknown> = {}): EduServerEvent {
-  return { distinctId: userId, event: 'checkout_started', properties: { ...tags, ...BASE } };
+  // teacher_id mirrors distinctId as a PROPERTY so a Gate-B query can join
+  // started↔complete on a shared key, not on PostHog person identity.
+  return { distinctId: userId, event: 'checkout_started', properties: { ...tags, ...BASE, teacher_id: userId } };
 }
 
 /** Alias: trial checkout URL creation is the same `checkout_started` step. */
@@ -147,7 +149,8 @@ export function buildCheckoutCompleteEvent(userId: string, subscriptionId: strin
   return {
     distinctId: userId,
     event: 'checkout_complete',
-    properties: { ...BASE, subscription_id: subscriptionId },
+    // teacher_id mirrors the property checkout_started carries, so the join is property-to-property.
+    properties: { ...BASE, subscription_id: subscriptionId, teacher_id: userId },
   };
 }
 
