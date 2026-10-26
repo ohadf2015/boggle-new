@@ -3,7 +3,10 @@
  *
  * The PostHog "Game Abandoned" goal saw zero conversions over 30 days because
  * no caller invoked `trackGameEnd(completed=false)` — players close the tab
- * rather than tap a quit button. A `pagehide` listener catches that path.
+ * rather than tap a quit button. A `pagehide` listener catches that path, and
+ * a `visibilitychange -> hidden` listener catches the iOS Safari path, which
+ * often never fires pagehide when the tab is backgrounded or killed. Both
+ * emit through the sendBeacon transport so the event survives the unload.
  *
  * Active state is set by `trackGameStart` and cleared by `trackGameEnd` so
  * completed games do not emit a phantom abandon.
@@ -12,6 +15,8 @@
 import posthog from '@/lib/analytics/lazyPosthog';
 
 const MIN_ENGAGED_MS = 2000;
+
+export type AbandonReason = 'pagehide' | 'hidden' | 'spa_navigate' | 'exit';
 
 export interface AbandonExtras {
   words_found?: number;
@@ -31,6 +36,13 @@ interface ActiveGame {
 
 let active: ActiveGame | null = null;
 let alreadyEmitted = false;
+/**
+ * Set when a hidden/pagehide abandon was emitted. The game may still resume
+ * (bfcache restore, tab foregrounded) and finish — `trackGameEnd` consumes
+ * this to stamp the completion `resumed_after_hidden: true` so analysis can
+ * drop the earlier abandon instead of double-counting.
+ */
+let abandonedWhileHidden = false;
 let pagehideFinalizer: (() => void) | null = null;
 /**
  * Words found before `trackGameStart` (deferred afterLoadIdle + 1500ms) used
@@ -68,6 +80,7 @@ function currentLandingPath(): string | undefined {
 export function markGameActive(mode: string, extras: AbandonExtras = {}): void {
   const queued = pendingExtras;
   pendingExtras = null;
+  abandonedWhileHidden = false;
   active = {
     mode,
     startedAt: Date.now(),
@@ -101,7 +114,19 @@ export function isGameActive(): boolean {
   return active !== null;
 }
 
-function emitAbandonIfActive() {
+/**
+ * Read-and-clear the "abandoned while hidden" flag. Called by `trackGameEnd`
+ * on a completed game: if an abandon already went out on hidden/pagehide and
+ * the player came back and finished, the completion is stamped
+ * `resumed_after_hidden: true` so funnels can drop the phantom abandon.
+ */
+export function consumeResumedAfterHidden(): boolean {
+  const was = abandonedWhileHidden;
+  abandonedWhileHidden = false;
+  return was;
+}
+
+function emitAbandonIfActive(reason: 'hidden' | 'pagehide') {
   if (pagehideFinalizer) {
     try {
       pagehideFinalizer();
@@ -114,12 +139,17 @@ function emitAbandonIfActive() {
   if (durationMs < MIN_ENGAGED_MS) return;
 
   alreadyEmitted = true;
+  abandonedWhileHidden = true;
   try {
-    posthog.capture('growth:game_abandoned', {
+    // sendBeacon transport: a hidden/pagehide handler is the last code that
+    // runs before unload — the default XHR (and lazyPosthog's own rate-limit
+    // deferral) routinely never leaves the device on mobile. iOS Safari in
+    // particular often fires ONLY visibilitychange, never pagehide.
+    posthog.captureBeacon('growth:game_abandoned', {
       mode: active.mode,
       gameMode: active.mode,
       durationSec: Math.round(durationMs / 1000),
-      reason: 'pagehide',
+      reason,
       ...active.extras,
     });
   } catch {
@@ -130,12 +160,52 @@ function emitAbandonIfActive() {
 export function installAbandonOnPagehide(): () => void {
   if (typeof window === 'undefined') return () => {};
 
-  const handler = () => emitAbandonIfActive();
-  window.addEventListener('pagehide', handler);
+  const onPagehide = () => emitAbandonIfActive('pagehide');
+  // iOS Safari often never fires pagehide when the tab is backgrounded or
+  // killed; visibilitychange -> hidden is the last reliable signal there.
+  // `alreadyEmitted` makes whichever fires second a no-op.
+  const onVisibility = () => {
+    if (document.visibilityState === 'hidden') emitAbandonIfActive('hidden');
+  };
+  window.addEventListener('pagehide', onPagehide);
+  document.addEventListener('visibilitychange', onVisibility);
 
   return () => {
-    window.removeEventListener('pagehide', handler);
+    window.removeEventListener('pagehide', onPagehide);
+    document.removeEventListener('visibilitychange', onVisibility);
   };
+}
+
+/**
+ * Emit abandon when a mode's own exit path fires (Word Tower V2 `wt2_exit`)
+ * while a run is unfinished — that trail used to end at wt2_exit with neither
+ * game_completed nor game_abandoned, an orphan start.
+ *
+ * Deferred one macrotask like `emitAbandonOnSpaNavigate`: a run -> results
+ * transition can fire the exit a tick before the completion, and the
+ * completion must cancel the phantom abandon.
+ */
+export function emitAbandonOnExit(): void {
+  if (!active || alreadyEmitted) return;
+  const snapshot = active;
+  const durationMs = Date.now() - snapshot.startedAt;
+  if (durationMs < MIN_ENGAGED_MS) return;
+
+  setTimeout(() => {
+    if (alreadyEmitted || active !== snapshot) return;
+    alreadyEmitted = true;
+    try {
+      posthog.capture('growth:game_abandoned', {
+        mode: snapshot.mode,
+        gameMode: snapshot.mode,
+        durationSec: Math.round(durationMs / 1000),
+        reason: 'exit',
+        ...snapshot.extras,
+      });
+    } catch {
+      // PostHog not initialized — analytics never block UX
+    }
+  }, 0);
 }
 
 /**
@@ -180,6 +250,7 @@ export function emitAbandonOnSpaNavigate(): void {
 export function __resetAbandonStateForTests(): void {
   active = null;
   alreadyEmitted = false;
+  abandonedWhileHidden = false;
   pagehideFinalizer = null;
   pendingExtras = null;
 }
