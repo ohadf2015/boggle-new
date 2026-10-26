@@ -4194,6 +4194,7 @@ const es = {
     "failedToLoadWordOfTheDay": "Error al cargar la Palabra del día",
     "signInFailedRetry": "No se pudo iniciar sesión. ¿Intentas de nuevo?",
     "appleSignInIosOnly": "Inicio con Apple solo en iPhone o iPad",
+    "microsoftSignInUnavailable": "El inicio con Microsoft aún no está disponible aquí",
     "unableToLoadData": "No se pudieron cargar los datos. Intenta de nuevo.",
     "tryAgainButton": "Intentar de nuevo",
     "connectionTimeout": "Tarda mucho en conectar",

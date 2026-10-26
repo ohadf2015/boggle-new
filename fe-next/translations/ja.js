@@ -4135,6 +4135,7 @@ const ja = {
     "failedToLoadWordOfTheDay": "今日の単語の読み込みに失敗",
     "signInFailedRetry": "サインインに失敗。もう一度試してね",
     "appleSignInIosOnly": "Appleでのサインインは iPhone / iPad のみ対応",
+    "microsoftSignInUnavailable": "Microsoftでのサインインはここではまだ使えません",
     "unableToLoadData": "データを読み込めなかった。もう一度試してね",
     "tryAgainButton": "もう一度",
     "connectionTimeout": "接続に時間かかりすぎ",

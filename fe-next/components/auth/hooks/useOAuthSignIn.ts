@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { signInWithGoogle, signInWithDiscord } from '@/lib/supabase';
+import { signInWithGoogle, signInWithDiscord, signInWithMicrosoft } from '@/lib/supabase';
+import { isMicrosoftSsoEnabled } from '@/components/auth/shared/authModalProviders';
 import { isNative } from '@/utils/platform';
 import { performMobileOAuth } from '@/utils/mobileOAuth';
 import {
@@ -12,6 +13,8 @@ import {
 import logger from '@/utils/logger';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackSignupPromptClicked } from '@/utils/growthTracking';
+
+export type OAuthSignInProvider = 'google' | 'discord' | 'apple' | 'microsoft';
 
 interface UseOAuthSignInOptions {
   /** Callback before redirect (e.g., to store pending data) */
@@ -35,7 +38,7 @@ interface UseOAuthSignInOptions {
 }
 
 interface UseOAuthSignInReturn {
-  signIn: (provider: 'google' | 'discord' | 'apple') => Promise<void>;
+  signIn: (provider: OAuthSignInProvider) => Promise<void>;
   loadingProvider: string | null;
   error: string | null;
   clearError: () => void;
@@ -86,7 +89,7 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
     setError(null);
   }, []);
 
-  const signIn = useCallback(async (provider: 'google' | 'discord' | 'apple') => {
+  const signIn = useCallback(async (provider: OAuthSignInProvider) => {
     setLoadingProvider(provider);
     setError(null);
 
@@ -97,6 +100,13 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
     }
 
     try {
+      if (provider === 'microsoft' && (!isMicrosoftSsoEnabled() || isNative())) {
+        const msErr = t('errors.microsoftSignInUnavailable');
+        setError(msErr);
+        onError?.(msErr);
+        return;
+      }
+
       // Call before redirect callback (e.g., to store pending game data)
       onBeforeRedirect?.();
 
@@ -173,6 +183,9 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
           break;
         case 'discord':
           result = await signInWithDiscord();
+          break;
+        case 'microsoft':
+          result = await signInWithMicrosoft();
           break;
         case 'apple': {
           // Apple OAuth on web requires additional setup

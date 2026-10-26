@@ -95,6 +95,16 @@ export async function signInWithDiscord() {
   });
 }
 
+/** Supabase calls Microsoft Entra ID "azure"; the email scope is needed for the address to come back. */
+export async function signInWithMicrosoft() {
+  if (!supabase) return { error: { message: 'Supabase not configured' } };
+  const locale = getCurrentLocale() || 'en';
+  return supabase.auth.signInWithOAuth({
+    provider: 'azure',
+    options: { scopes: 'email', redirectTo: appendNextParam(new URL(`/${locale}/auth/callback`, window.location.origin)) },
+  });
+}
+
 export async function signUpWithEmail(email: string, password: string) {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
 

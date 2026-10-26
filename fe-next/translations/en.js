@@ -3736,6 +3736,7 @@ const en = {
     "failedToLoadWordOfTheDay": "Couldn't load the Word of the Day. Try again?",
     "signInFailedRetry": "Sign in didn't work. Try again?",
     "appleSignInIosOnly": "Apple Sign In needs an iPhone or iPad",
+    "microsoftSignInUnavailable": "Microsoft sign-in isn't available here yet",
     "unableToLoadData": "Couldn't load that. Try again.",
     "tryAgainButton": "Try again",
     "connectionTimeout": "Connection is slow. Hang tight.",

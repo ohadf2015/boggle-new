@@ -4474,6 +4474,7 @@ const sv = {
     "failedToLoadWordOfTheDay": "Kunde inte ladda Dagens ord",
     "signInFailedRetry": "Inloggningen misslyckades. Försök igen.",
     "appleSignInIosOnly": "Apple-inloggning kräver iPhone eller iPad",
+    "microsoftSignInUnavailable": "Microsoft-inloggning finns inte här än",
     "unableToLoadData": "Kunde inte ladda data. Försök igen.",
     "tryAgainButton": "Försök igen",
     "connectionTimeout": "Tar för lång tid att ansluta",

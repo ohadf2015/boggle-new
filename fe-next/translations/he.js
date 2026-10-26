@@ -4135,6 +4135,7 @@ const he = {
     "failedToLoadWordOfTheDay": "לא הצלחנו לטעון את מילת היום",
     "signInFailedRetry": "ההתחברות נכשלה. לנסות שוב?",
     "appleSignInIosOnly": "כניסה עם Apple זמינה רק במכשירי iPhone ו-iPad",
+    "microsoftSignInUnavailable": "כניסה עם Microsoft עדיין לא זמינה כאן",
     "unableToLoadData": "לא הצלחנו לטעון. נסו שוב",
     "tryAgainButton": "נסו שוב",
     "connectionTimeout": "לוקח יותר מדי זמן להתחבר",

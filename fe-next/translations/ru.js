@@ -8361,6 +8361,7 @@ const ru = {
     "failedToLoadWordOfTheDay": "Не удалось загрузить слово дня. Повторить?",
     "signInFailedRetry": "Не удалось войти. Попробуй ещё раз",
     "appleSignInIosOnly": "Для входа через Apple нужен iPhone или iPad",
+    "microsoftSignInUnavailable": "Вход через Microsoft здесь пока недоступен",
     "unableToLoadData": "Не удалось получить данные. Попробуй ещё раз",
     "tryAgainButton": "Попробовать ещё",
     "connectionTimeout": "Соединение тормозит. Подожди",
