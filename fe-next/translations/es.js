@@ -733,7 +733,8 @@ const es = {
     "scrollNext": "Más juegos",
     "needsMeanings": "Esta lista no tiene significados para preguntar: añade definiciones o elige un juego de tablero.",
     "noQuizWords": "Esta lista no tiene palabras que sirvan como preguntas de test: elige otra lista o juega Clásico.",
-    "playClassicInstead": "Jugar Clásico"
+    "playClassicInstead": "Jugar Clásico",
+    "trySomethingNew": "Prueba algo nuevo: {{mode}}"
   },
   // @eg2Modes:end
   // @eduLibrary:start

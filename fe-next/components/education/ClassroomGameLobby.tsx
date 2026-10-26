@@ -387,6 +387,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           onPick={pickMode}
           onGoLive={() => startGame(gameMode, vocabQuizVariant, classroomBossId)}
           withCardRow={false}
+          isModeBlocked={(id) => (id === VOCAB_QUIZ_MODE && !quizPlayable) || (id === 'wordcraft' && !wordcraftOk)}
         />
         </div>
       }

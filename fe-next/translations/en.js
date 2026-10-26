@@ -733,7 +733,8 @@ const en = {
     "scrollNext": "More games",
     "needsMeanings": "This list has no meanings to quiz on. Add definitions, or pick a board game.",
     "noQuizWords": "This list has no words that work as quiz questions. Pick another list or play Classic.",
-    "playClassicInstead": "Play Classic instead"
+    "playClassicInstead": "Play Classic instead",
+    "trySomethingNew": "Try something new: {{mode}}"
   },
   // @eg2Modes:end
   // @eduLibrary:start

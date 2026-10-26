@@ -733,7 +733,8 @@ const ja = {
     "scrollNext": "ほかのゲーム",
     "needsMeanings": "このリストには出題できる意味がありません。定義を追加するか、盤面のゲームを選んでください。",
     "noQuizWords": "このリストにはクイズの問題にできる単語がありません。別のリストを選ぶか、クラシックで遊びましょう。",
-    "playClassicInstead": "クラシックで遊ぶ"
+    "playClassicInstead": "クラシックで遊ぶ",
+    "trySomethingNew": "新しいゲームを試そう：{{mode}}"
   },
   // @eg2Modes:end
   // @eduLibrary:start

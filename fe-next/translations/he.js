@@ -733,7 +733,8 @@ const he = {
     "scrollNext": "עוד משחקים",
     "needsMeanings": "ברשימה הזו אין הגדרות לשאול עליהן. הוסיפו הגדרות או בחרו משחק לוח.",
     "noQuizWords": "ברשימה הזו אין מילים שאפשר להפוך לשאלות חידון. בחרו רשימה אחרת או שחקו קלאסי.",
-    "playClassicInstead": "שחקו קלאסי במקום"
+    "playClassicInstead": "שחקו קלאסי במקום",
+    "trySomethingNew": "נסו משהו חדש: {{mode}}"
   },
   // @eg2Modes:end
   // @eduLibrary:start

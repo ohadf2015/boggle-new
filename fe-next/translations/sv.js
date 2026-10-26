@@ -733,7 +733,8 @@ const sv = {
     "scrollNext": "Fler spel",
     "needsMeanings": "Listan har inga betydelser att fråga om. Lägg till definitioner eller välj ett brädspel.",
     "noQuizWords": "Den här listan har inga ord som går att göra frågor av. Välj en annan lista eller spela Klassiskt.",
-    "playClassicInstead": "Spela Klassiskt i stället"
+    "playClassicInstead": "Spela Klassiskt i stället",
+    "trySomethingNew": "Testa något nytt: {{mode}}"
   },
   // @eg2Modes:end
   // @eduLibrary:start
