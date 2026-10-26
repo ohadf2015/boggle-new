@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useMemo, useState } from 'react';
-import { AlertTriangle, Printer, Users } from 'lucide-react';
+import { AlertTriangle, BookX, Printer, Target, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { RecentClassroomGame } from '@/lib/supabase/analyticsLastGame';
 import { buildClassReportGrid } from '@/lib/education/classReport';
@@ -9,7 +9,7 @@ import { missedThisRound } from '@/lib/education/freeGameHeadline';
 import { MissedPracticeAction } from '@/components/teacher/reports/MissedPracticeAction';
 import { WordStudentGrid } from '@/components/teacher/report/WordStudentGrid';
 import { cn } from '@/lib/utils';
-import { activeLineParams, buildRoundReport, roundTitleKey, sortRoundRows } from './roundReport';
+import { accuracyTone, activeLineParams, buildRoundReport, roundTitleKey, sortRoundRows, TONE_TEXT } from './roundReport';
 import { RoundStudentsTab } from './RoundStudentsTab';
 import { RoundWordsTab } from './RoundWordsTab';
 
@@ -23,10 +23,17 @@ const TAB_KEYS: Record<RoundTab, string> = {
 };
 
 // Hides everything but the open round card on paper; visibility, not display, so the card's ancestors still lay it out.
+// The card is light-on-navy on screen, and browsers drop backgrounds when printing, so the neutrals are remapped to
+// dark-on-white here and the found/missed cells keep their fills.
 const PRINT_CSS = `@media print {
   body * { visibility: hidden; }
   [data-round-print], [data-round-print] * { visibility: visible; }
-  [data-round-print] { position: absolute; inset-inline-start: 0; top: 0; width: 100%; }
+  [data-round-print] {
+    position: absolute; inset-inline-start: 0; top: 0; width: 100%;
+    --neo-white: 17 17 17; --neo-cream: #d4d4d8; --neo-navy: #fff; --neo-navy-light: #fff;
+    background: #fff; box-shadow: none;
+  }
+  [data-round-print] * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }`;
 
 export interface RoundReportCardProps {
@@ -48,12 +55,12 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
   const namesById = new Map(report.rows.map((r) => [r.studentId, r.name]));
 
   return (
-    <article data-testid="round-report" data-round-print="" className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 shadow-hard-sm sm:p-4">
+    <article data-testid="round-report" data-round-print="" className="rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard-sm sm:p-6">
       <style>{PRINT_CSS}</style>
-      <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <h3 className="font-neo-display text-lg font-black text-neo-white">
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <h3 className="font-neo-display text-xl font-black text-neo-white">
           {t(roundTitleKey(game.gameMode))}
-          <span className="ms-2 text-sm font-bold text-neo-white/60">{when}</span>
+          <span className="ms-2 text-sm font-bold text-neo-white/70">{when}</span>
         </h3>
         <div className="flex items-center gap-3">
           <p data-testid="round-report-played" className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-cyan">
@@ -85,25 +92,34 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
         </section>
       ) : (
         <>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="rounded-neo border-2 border-neo-cream/50 bg-neo-navy px-3 py-2">
-              <p className="font-neo-display text-2xl font-black tabular-nums text-neo-lime">{game.averageAccuracyPct}%</p>
-              <p className="text-xs font-bold text-neo-white/70">{t('teacher.lastGame.avgAccuracy')}</p>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div data-testid="round-report-accuracy" data-tone={accuracyTone(game.averageAccuracyPct)} className="rounded-neo border-2 border-neo-cream/50 bg-neo-navy p-3 sm:p-4">
+              <p className="flex items-center gap-1.5 text-xs font-bold text-neo-white/80">
+                <Target className="size-4 shrink-0" aria-hidden />
+                {t('teacher.lastGame.avgAccuracy')}
+              </p>
+              <p className={cn('mt-1 font-neo-display text-3xl font-black tabular-nums leading-none', TONE_TEXT[accuracyTone(game.averageAccuracyPct)])}>{game.averageAccuracyPct}%</p>
+              <div aria-hidden className="mt-3 h-1.5 overflow-hidden rounded-full bg-neo-cream/20">
+                <div className="h-full rounded-full bg-current" style={{ width: `${Math.min(100, Math.max(0, game.averageAccuracyPct))}%` }} />
+              </div>
             </div>
-            <div className="rounded-neo border-2 border-neo-cream/50 bg-neo-navy px-3 py-2">
-              <p className="font-neo-display text-2xl font-black tabular-nums text-neo-pink">{report.practiceWords.length}</p>
-              <p className="text-xs font-bold text-neo-white/70">{t('academy.student.review')}</p>
+            <div data-testid="round-report-review-count" className="rounded-neo border-2 border-neo-cream/50 bg-neo-navy p-3 sm:p-4">
+              <p className="flex items-center gap-1.5 text-xs font-bold text-neo-white/80">
+                <BookX className="size-4 shrink-0" aria-hidden />
+                {t('academy.student.review')}
+              </p>
+              <p className={cn('mt-1 font-neo-display text-3xl font-black tabular-nums leading-none', report.practiceWords.length > 0 ? TONE_TEXT.danger : TONE_TEXT.success)}>{report.practiceWords.length}</p>
             </div>
           </div>
 
-          <section className="mt-3">
-            <h4 className="mb-1.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-white">{t('teacher.lastGame.wordsToReview')}</h4>
+          <section className="mt-5">
+            <h4 className="mb-2 font-neo-display text-sm font-black uppercase tracking-wide text-neo-white">{t('teacher.lastGame.wordsToReview')}</h4>
             {missed.length === 0 ? (
               <p className="text-sm font-bold text-neo-white/70">{t('teacher.lastGame.nothingToReview')}</p>
             ) : (
-              <ul className="flex flex-wrap gap-1.5">
+              <ul className="flex flex-wrap gap-2">
                 {missed.map((w) => (
-                  <li key={w.word} data-testid="round-report-missed-word" className="rounded-neo border-2 border-neo-black bg-neo-cream px-2 py-0.5 text-sm font-black text-neo-black">
+                  <li key={w.word} data-testid="round-report-missed-word" className="rounded-neo border-2 border-neo-black bg-neo-cream px-2.5 py-1 text-sm font-black text-neo-black">
                     <bdi>{w.word}</bdi> <span className="tabular-nums text-neo-black/60">{w.missedBy}/{w.total}</span>
                   </li>
                 ))}
@@ -111,7 +127,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
             )}
           </section>
 
-          <section className="mt-4">
+          <section className="mt-6">
             <div role="tablist" className="mb-2 flex border-b-2 border-neo-cream/20 print:hidden">
               {(Object.keys(TAB_KEYS) as RoundTab[]).map((key) => (
                 <button
@@ -151,7 +167,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
             </div>
           </section>
 
-          <div className="mt-3">
+          <div data-testid="round-report-footer" className="mt-6 border-t-2 border-neo-cream/20 pt-5 print:hidden">
             <MissedPracticeAction classroomId={classroomId} classroomName={classroomName} locked={!hasPro} words={report.practiceWords} />
           </div>
         </>

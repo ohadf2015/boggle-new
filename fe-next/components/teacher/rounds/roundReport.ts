@@ -37,6 +37,26 @@ export interface RoundReport {
   practiceWords: string[];
 }
 
+export type AccuracyTone = 'success' | 'warning' | 'danger';
+
+/** 80%+ is on track, 50-79% needs a look, below 50% needs reteaching. */
+export function accuracyTone(pct: number): AccuracyTone {
+  if (pct >= 80) return 'success';
+  if (pct >= 50) return 'warning';
+  return 'danger';
+}
+
+/**
+ * Ink for a tone on the navy card, with a darker print variant: the card's
+ * light accent colours vanish on white paper, which is how a 0% once printed
+ * as pale green.
+ */
+export const TONE_TEXT: Record<AccuracyTone, string> = {
+  success: 'text-neo-lime print:text-green-800',
+  warning: 'text-neo-yellow print:text-amber-800',
+  danger: 'text-neo-pink print:text-red-700',
+};
+
 export type RoundSortKey = 'score' | 'accuracy' | 'name';
 
 export function sortRoundRows(rows: RoundReportRow[], key: RoundSortKey): RoundReportRow[] {

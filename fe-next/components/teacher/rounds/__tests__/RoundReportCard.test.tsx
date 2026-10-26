@@ -132,4 +132,29 @@ describe('RoundReportCard', () => {
     expect(screen.queryByTestId('practice-action')).not.toBeInTheDocument();
     expect(screen.getAllByTestId('round-report-player').map((n) => n.textContent)).toEqual(['Maya420', 'Omar310', 'Sofia150']);
   });
+
+  it('colours the accuracy stat by how well the class did, so a 0% never renders as a pale success colour', () => {
+    const { rerender } = render(<RoundReportCard {...props} game={{ ...ROUND_FIXTURE, averageAccuracyPct: 0 }} hasPro />);
+    expect(screen.getByTestId('round-report-accuracy').getAttribute('data-tone')).toBe('danger');
+    rerender(<RoundReportCard {...props} game={{ ...ROUND_FIXTURE, averageAccuracyPct: 65 }} hasPro />);
+    expect(screen.getByTestId('round-report-accuracy').getAttribute('data-tone')).toBe('warning');
+    rerender(<RoundReportCard {...props} game={{ ...ROUND_FIXTURE, averageAccuracyPct: 92 }} hasPro />);
+    expect(screen.getByTestId('round-report-accuracy').getAttribute('data-tone')).toBe('success');
+  });
+
+  it('puts the practice action in its own footer inside the card, not on the card edge', () => {
+    render(<RoundReportCard {...props} hasPro />);
+    const footer = screen.getByTestId('round-report-footer');
+    expect(within(footer).getByTestId('practice-action')).toBeInTheDocument();
+    expect(footer.closest('[data-testid="round-report"]')).not.toBeNull();
+  });
+
+  it('gives each student row a column header line and a glyph in every word cell, so the strip survives print', () => {
+    render(<RoundReportCard {...props} hasPro />);
+    expect(screen.getByTestId('round-report-columns')).toBeInTheDocument();
+    const cells = within(screen.getAllByTestId('round-report-strip')[0]).getAllByTestId('round-report-cell');
+    expect(cells.map((c) => c.getAttribute('data-state'))).toEqual(['missed', 'found', 'found', 'found']);
+    cells.forEach((c) => expect(c.querySelector('svg')).not.toBeNull());
+    expect(cells[0].getAttribute('title')).toBe('enormous: teacher.lastGame.missed');
+  });
 });
