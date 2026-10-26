@@ -14290,7 +14290,8 @@ const es = {
       "defaultClassroomName": "My Classroom",
       "reports": {
         "title": "Los informes de progreso son una función Pro",
-        "body": "Mira cómo le va a cada estudiante en todas tus clases y juegos: palabras dominadas, niveles, XP e informes PDF imprimibles para reuniones de padres. Actualiza a Teacher Pro para desbloquear los informes de clase y de estudiantes."
+        "body": "Mira cómo le va a cada estudiante en todas tus clases y juegos: palabras dominadas, niveles, XP e informes PDF imprimibles para reuniones de padres. Actualiza a Teacher Pro para desbloquear los informes de clase y de estudiantes.",
+        "cta": "Desbloquea los informes con Pro: {{price}}/mes"
       },
       "pressureDials": {
         "title": "Modo tranquilo para alumnos con ansiedad",

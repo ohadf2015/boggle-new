@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useCheckoutBlockedInApp } from '@/hooks/useCheckoutBlockedInApp';
@@ -77,9 +77,16 @@ interface ProGateProps {
   active?: boolean;
   /** Shown while the entitlement resolves, for pages where the gate is the whole body. */
   whileChecking?: React.ReactNode;
+  /** Page heading above the lock, for pages where the gate is the whole body. */
+  lockedTitle?: React.ReactNode;
+  /** Upgrade button copy; takes `{{price}}`. */
+  ctaKey?: string;
 }
 
-export function ProGate({ feature, children, active = true, whileChecking = null }: ProGateProps) {
+const OpenGate = createContext(false);
+
+export function ProGate({ feature, children, active = true, whileChecking = null, lockedTitle = null, ctaKey = 'teacher.proGate.cta' }: ProGateProps) {
+  const insideOpenGate = useContext(OpenGate);
   const { t } = useLanguage();
   const { hasPro, loading, accessTrialExpires } = useTeacherPro();
   const [nowMs] = useState(() => Date.now());
@@ -91,19 +98,21 @@ export function ProGate({ feature, children, active = true, whileChecking = null
   const blockedInApp = useCheckoutBlockedInApp();
 
   useEffect(() => {
-    if (!active || loading || hasPro) return;
+    if (insideOpenGate || !active || loading || hasPro) return;
     if (previewDaysLeft !== null) {
       trackProTrialPreviewViewed({ feature, days_left: previewDaysLeft });
       return;
     }
     trackGrowthEvent('iap_viewed', { source: `pro_gate_${feature}` });
     trackProGateViewed({ feature });
-  }, [active, loading, hasPro, feature, previewDaysLeft]);
+  }, [insideOpenGate, active, loading, hasPro, feature, previewDaysLeft]);
+
+  if (insideOpenGate) return <>{children}</>;
 
   // Neither branch while the entitlement is unresolved: painting the surface then removing it
   // is the flash, painting the upsell tells a paying teacher they are not paying.
   if (loading) return <>{whileChecking}</>;
-  if (hasPro) return <>{children}</>;
+  if (hasPro) return <OpenGate.Provider value>{children}</OpenGate.Provider>;
   if (previewDaysLeft !== null) {
     return (
       <>
@@ -129,12 +138,14 @@ export function ProGate({ feature, children, active = true, whileChecking = null
             {t('teacher.proGate.trialPreviewCta')}
           </button>}
         </div>
-        {children}
+        <OpenGate.Provider value>{children}</OpenGate.Provider>
       </>
     );
   }
 
   return (
+    <>
+    {lockedTitle}
     <div className="rounded-neo border-neo border-neo-lime bg-neo-navy-light p-4 shadow-hard sm:p-5">
       <div className="grid items-center gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-6">
         {/* Sample data, never the teacher's own rows: a free browser must not receive what the gate sells. */}
@@ -142,6 +153,12 @@ export function ProGate({ feature, children, active = true, whileChecking = null
           <ProFeaturePreview feature={feature} />
         </div>
         <div className="text-center md:text-start">
+          <span
+            data-testid="pro-gate-pill"
+            className="mb-2 inline-block rounded-full border-2 border-neo-black bg-neo-lime px-2.5 py-0.5 text-xs font-black uppercase text-neo-black"
+          >
+            {t('teacher.subscription.proPlanName')}
+          </span>
           <h3 className="mb-2 font-neo-display text-xl font-black text-neo-white">
             {t(`teacher.proGate.${feature}.title`)}
           </h3>
@@ -163,12 +180,13 @@ export function ProGate({ feature, children, active = true, whileChecking = null
             }}
             className="inline-block rounded-neo border-neo bg-neo-cyan px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg disabled:opacity-60"
           >
-            {t('teacher.proGate.cta', { price: `$${TEACHER_PRO_PRICE_USD}` })}
+            {t(ctaKey, { price: `$${TEACHER_PRO_PRICE_USD}` })}
           </button>
           <p className="mt-2 text-xs font-bold text-neo-white/60">{t('teacher.subscription.trustCancel')}</p>
           </>)}
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -252,4 +252,42 @@ describe('ProGate', () => {
       expect(screen.queryByTestId('pro-trial-preview-upgrade')).not.toBeInTheDocument();
     });
   });
+
+  describe('as a whole-page gate', () => {
+    const inDays = (d: number) => new Date(Date.now() + d * 86_400_000).toISOString();
+
+    it('labels the lock as Pro, names the page, and uses the page CTA', () => {
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: null });
+      render(
+        <ProGate feature="reports" ctaKey="teacher.proGate.reports.cta" lockedTitle={<h1>Reports</h1>}>
+          <div>paid surface</div>
+        </ProGate>,
+      );
+      expect(screen.getByTestId('pro-gate-pill')).toHaveTextContent('teacher.subscription.proPlanName');
+      expect(screen.getByRole('heading', { level: 1, name: 'Reports' })).toBeInTheDocument();
+      expect(screen.getByTestId('pro-gate-upgrade-reports')).toHaveTextContent('teacher.proGate.reports.cta');
+      expect(screen.getAllByRole('button')).toHaveLength(1);
+      expect(screen.queryByText('paid surface')).not.toBeInTheDocument();
+    });
+
+    it('shows no title or lock while the entitlement resolves', () => {
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: true });
+      render(<ProGate feature="reports" lockedTitle={<h1>Reports</h1>}><div>paid surface</div></ProGate>);
+      expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
+    });
+
+    it('lets a gate nested inside an open gate pass straight through, so a trial teacher sees one strip', () => {
+      mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: inDays(9) });
+      render(
+        <ProGate feature="reports">
+          <ProGate feature="reports"><div>inner</div></ProGate>
+          <ProGate feature="mastery"><div>inner 2</div></ProGate>
+        </ProGate>,
+      );
+      expect(screen.getAllByTestId('pro-trial-preview')).toHaveLength(1);
+      expect(screen.getByText('inner')).toBeInTheDocument();
+      expect(screen.getByText('inner 2')).toBeInTheDocument();
+    });
+  });
 });

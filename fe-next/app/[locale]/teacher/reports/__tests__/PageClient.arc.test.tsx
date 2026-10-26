@@ -1,7 +1,6 @@
 /**
- * Reports PageClient — the arc wiring decision (evidence pack §8.2):
- * the per-student arc and the class arc panel render for a FREE teacher,
- * while the deep printable reports stay behind ProGate.
+ * Reports PageClient — arc wiring for a Pro teacher. The whole page is Pro;
+ * the free-teacher lock is covered in PageClient.test.tsx.
  */
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -29,7 +28,7 @@ vi.mock('@/hooks/useClassroom', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: false, loading: false }) }));
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: true, loading: false }) }));
 vi.mock('@/lib/education/telemetry', () => ({ trackEduReportsViewed: vi.fn() }));
 const getClassroomStudents = vi.fn().mockResolvedValue({ data: [], error: null });
 vi.mock('@/lib/supabase/education/classrooms', () => ({
@@ -55,7 +54,7 @@ vi.mock('@/components/education/TeacherGate', () => ({
   TeacherGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 vi.mock('@/components/teacher/ProGate', () => ({
-  ProGate: () => <div data-testid="pro-gate" />,
+  ProGate: ({ children }: { children: React.ReactNode }) => <div data-testid="pro-gate">{children}</div>,
 }));
 vi.mock('@/components/teacher/TeacherPlanBadge', () => ({ TeacherPlanBadge: () => <div /> }));
 vi.mock('@/components/teacher/reports/StudentProgressReport', () => ({
@@ -93,6 +92,12 @@ vi.mock('@/components/teacher/reports/AssignmentCompletionReport', () => ({
 vi.mock('@/components/teacher/reports/GoogleClassroomGradePassback', () => ({
   GoogleClassroomGradePassback: () => <div />,
 }));
+vi.mock('@/components/teacher/pro/ParentReportPack', () => ({
+  ParentReportPack: () => <div data-testid="parent-report-pack" />,
+}));
+vi.mock('@/components/teacher/reports/StudentParentPreview', () => ({
+  StudentParentPreview: () => <div data-testid="student-parent-preview" />,
+}));
 vi.mock('@/components/teacher/reports/ExportAllClassesButton', () => ({
   ExportAllClassesButton: () => <div />,
 }));
@@ -108,20 +113,19 @@ describe('<TeacherReportsPage> arc gating', () => {
     search = '';
   });
 
-  it('shows the class arc panel to a free teacher on the class view', () => {
+  it('shows the class arc panel alongside the full class report', () => {
     search = 'classroomId=c1';
     render(<TeacherReportsPage />);
     expect(screen.getByTestId('class-arc-panel')).toBeInTheDocument();
-    expect(screen.getByTestId('pro-gate')).toBeInTheDocument();
-    expect(screen.queryByTestId('class-progress-report')).not.toBeInTheDocument();
+    expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
   });
 
-  it('shows the student arc to a free teacher while the deep report stays gated', () => {
+  it('shows the student arc above the deep student report', () => {
     search = 'classroomId=c1&studentId=s1';
     render(<TeacherReportsPage />);
-    expect(screen.getByTestId('student-arc-view')).toBeInTheDocument();
-    expect(screen.getByTestId('pro-gate')).toBeInTheDocument();
-    expect(screen.queryByTestId('student-progress-report')).not.toBeInTheDocument();
+    const arc = screen.getByTestId('student-arc-view');
+    const report = screen.getByTestId('student-progress-report');
+    expect(arc.compareDocumentPosition(report) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('hands the clicked student name through to the arc header', async () => {

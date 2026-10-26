@@ -33,7 +33,6 @@ import { TeacherPlanBadge } from '@/components/teacher/TeacherPlanBadge';
 import { ExportAllClassesButton } from '@/components/teacher/reports/ExportAllClassesButton';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { ProGate } from '@/components/teacher/ProGate';
-import { ReportsProTeaser } from '@/components/teacher/pro/ReportsProTeaser';
 import { trackEduReportsViewed } from '@/lib/education/telemetry';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
@@ -220,7 +219,6 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
         ) : (
           <ReportsNoClasses />
         )}
-        {classrooms && classrooms.length > 0 ? <ReportsProTeaser /> : null}
       </>
     );
   } else if (selectedStudentId) {
@@ -235,23 +233,17 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
           <DirectionalIcon icon={ArrowLeft} className="size-5" />
           <span>{t('teacher.reports.backToClass')}</span>
         </button>
-        {/* The arc is the free surface (§8.2: the student is the analytics
-            unit); the deep printable report under it stays Pro. */}
         <StudentArcView
           studentId={selectedStudentId}
           classroomId={selectedClassroomId}
           studentName={selectedStudentName ?? undefined}
         />
-        <ProGate feature="reports">
-          <div className="space-y-5">
-            <StudentParentPreview
-              classroomId={selectedClassroomId}
-              studentId={selectedStudentId}
-              studentName={selectedStudentName ?? undefined}
-            />
-            <StudentProgressReport studentId={selectedStudentId} classroomId={selectedClassroomId} />
-          </div>
-        </ProGate>
+        <StudentParentPreview
+          classroomId={selectedClassroomId}
+          studentId={selectedStudentId}
+          studentName={selectedStudentName ?? undefined}
+        />
+        <StudentProgressReport studentId={selectedStudentId} classroomId={selectedClassroomId} />
       </div>
     );
   } else {
@@ -264,9 +256,6 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
           </div>
           <TeacherPlanBadge />
         </div>
-        {/* Free surface, deliberately above the fold and outside ProGate: the
-            per-student join-funnel view (who converted but never practiced) is
-            the reason a free teacher upgrades. */}
         <ClassroomRosterProgress
           classroomId={selectedClassroomId}
           classroomName={selectedClassroom?.name ?? ''}
@@ -319,28 +308,17 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
             title={t('parentReportsFlow.title')}
             hint={t('parentReportsFlow.disclosureHint')}
           >
-            {(open) =>
-              open ? (
-                <ProGate feature="reports">
-                  <ParentReportPack classroomId={selectedClassroomId} />
-                </ProGate>
-              ) : null
-            }
+            {(open) => (open ? <ParentReportPack classroomId={selectedClassroomId} /> : null)}
           </ReportDisclosure>
           <FullReportDisclosure>
-            {(open) => (
-              <ProGate feature="reports" active={open}>
-                <div className="space-y-4">
-                  <div className="flex justify-end">
-                    {/* Reuses this screen's own ProGate — the button's own internal
-                        ProGate only ever mounts once the teacher is already Pro, so a
-                        free teacher never sees two upsell cards stacked here. */}
-                    <ExportAllClassesButton />
-                  </div>
-                  <GoogleClassroomGradePassback classroomId={selectedClassroomId} enabled={gradePassbackEnabled} />
-                  <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
+            {() => (
+              <div className="space-y-4">
+                <div className="flex justify-end">
+                  <ExportAllClassesButton />
                 </div>
-              </ProGate>
+                <GoogleClassroomGradePassback classroomId={selectedClassroomId} enabled={gradePassbackEnabled} />
+                <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
+              </div>
             )}
           </FullReportDisclosure>
         </div>
@@ -376,10 +354,6 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   );
 }
 
-// Last-lesson digest, assignment progress, and the class assignment grid are
-// free (CSV export is Pro). Full class/student analytics reports stay behind
-// ProGate, mounted inside Inner so a free teacher still gets the picker +
-// digest + assignment grid + Teacher Pro nudge.
 // Dev-only fixture so the round report can be judged without a played round.
 function roundPreviewProps(value: string | null | undefined) {
   if (process.env.NODE_ENV === 'production' || !value) return {};
@@ -390,9 +364,39 @@ export default function TeacherReportsPage({ gradePassbackEnabled = false }: { g
   return (
     <ReportsShell>
       <TeacherGate>
-        <TeacherReportsInner gradePassbackEnabled={gradePassbackEnabled} />
+        <ProGate
+          feature="reports"
+          ctaKey="teacher.proGate.reports.cta"
+          whileChecking={<ReportsChecking />}
+          lockedTitle={<ReportsLockedTitle />}
+        >
+          <TeacherReportsInner gradePassbackEnabled={gradePassbackEnabled} />
+        </ProGate>
       </TeacherGate>
     </ReportsShell>
+  );
+}
+
+function ReportsLockedTitle() {
+  const { t } = useLanguage();
+  return (
+    <h1 className="mb-6 font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">
+      {t('teacher.reports.title')}
+    </h1>
+  );
+}
+
+function ReportsChecking() {
+  const { t } = useLanguage();
+  return (
+    <div data-testid="reports-checking" aria-busy="true" className="grid gap-3 sm:grid-cols-2">
+      <span className="sr-only" role="status">
+        {t('teacher.reports.loadingClassrooms')}
+      </span>
+      {[0, 1, 2, 3].map((i) => (
+        <div key={i} aria-hidden="true" className="h-20 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+      ))}
+    </div>
   );
 }
 

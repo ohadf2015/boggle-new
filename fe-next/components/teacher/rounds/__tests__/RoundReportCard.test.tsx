@@ -22,8 +22,8 @@ import { ROUND_FIXTURE } from '../roundFixture';
 const props = { game: ROUND_FIXTURE, classroomId: 'c1', classroomName: 'Room 7B' };
 
 describe('RoundReportCard', () => {
-  it('free: the whole session report is free, summary and per-student strips', () => {
-    render(<RoundReportCard {...props} hasPro={false} />);
+  it('Pro: the session report shows the summary and every player strip (reports are Pro only; a free teacher gets the page lock)', () => {
+    render(<RoundReportCard {...props} hasPro />);
     const card = screen.getByTestId('round-report');
     expect(within(card).getByTestId('round-report-played').textContent).toBe('teacher.windowProgress.activeLine|3|4');
     expect(within(card).getAllByTestId('round-report-missed-word').map((n) => n.textContent)).toEqual(

@@ -13530,7 +13530,8 @@ const en = {
       },
       "reports": {
         "title": "Progress reports are a Pro feature",
-        "body": "See how every student is doing across all your classes and games: words mastered, levels, XP, and printable PDFs for parent evenings. Upgrade to Teacher Pro to unlock class and student reports."
+        "body": "See how every student is doing across all your classes and games: words mastered, levels, XP, and printable PDFs for parent evenings. Upgrade to Teacher Pro to unlock class and student reports.",
+        "cta": "Unlock reports with Pro: {{price}}/month"
       },
       "pressureDials": {
         "title": "Calm mode for anxious students",

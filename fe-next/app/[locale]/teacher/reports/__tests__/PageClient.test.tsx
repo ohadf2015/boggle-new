@@ -137,15 +137,20 @@ vi.mock('@/lib/education/useTeacherAccess', () => ({
   useTeacherAccess: () => ({ hasAccess: true, status: 'approved', latestRequest: null, isLoading: false }),
 }));
 
-// Deep links resolve the clicked student's name from the roster; not under test here.
-vi.mock('@/lib/supabase/education/classrooms', () => ({
-  getClassroomStudents: vi.fn().mockResolvedValue({ data: [], error: null }),
+const getRecentClassroomGames = vi.fn().mockResolvedValue({ data: [], error: null });
+vi.mock('@/lib/supabase/analyticsLastGame', () => ({
+  getRecentClassroomGames: (...a: unknown[]) => getRecentClassroomGames(...a),
 }));
 
-// Reports are a Pro surface: the page is wrapped in <ProGate feature="reports">.
-// Default every render to a Pro teacher so the existing view tests exercise the
-// reports; the gating describe below flips the mock to free/loading.
-const proState = { hasPro: true, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: async () => {} };
+const getClassroomStudents = vi.fn().mockResolvedValue({ data: [], error: null });
+vi.mock('@/lib/supabase/education/classrooms', () => ({
+  getClassroomStudents: (...a: unknown[]) => getClassroomStudents(...a),
+}));
+
+const proState: { hasPro: boolean; loading: boolean; accessTrialExpires: string | null; [k: string]: unknown } = {
+  hasPro: true, loading: false, accessTrialExpires: null, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: async () => {},
+};
+const inDays = (d: number) => new Date(Date.now() + d * 86_400_000).toISOString();
 vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => proState,
 }));
@@ -259,44 +264,86 @@ describe('ReportsPageClient', () => {
     afterEach(() => {
       proState.hasPro = true;
       proState.loading = false;
+      proState.accessTrialExpires = null;
     });
 
-    it('lets a free teacher pick a class and see the last-lesson digest', () => {
+    const REPORT_SURFACES = [
+      'class-progress-report', 'student-progress-report', 'progress-digest-dashboard', 'assignment-progress-report',
+      'assignment-completion-report', 'class-assignment-grid', 'classroom-roster-progress', 'class-arc-panel', 'student-arc-view',
+    ];
+    const expectNoReportData = () => {
+      for (const id of REPORT_SURFACES) expect(screen.queryByTestId(id)).not.toBeInTheDocument();
+      expect(screen.queryByText('English 101')).not.toBeInTheDocument();
+      expect(getClassroomStudents).not.toHaveBeenCalled();
+      expect(getRecentClassroomGames).not.toHaveBeenCalled();
+    };
+
+    it.each([
+      ['the picker', ''],
+      ['a class deep link', 'classroomId=classroom-1'],
+      ['a student deep link', 'classroomId=classroom-1&studentId=student-123'],
+    ])('shows a never-trial free teacher the Pro lock on %s, with no student results', (_label, query) => {
       proState.hasPro = false;
+      for (const [k, v] of new URLSearchParams(query)) mockSearchParams.set(k, v);
       render(<ReportsPageClient />);
 
-      expect(screen.getByText('Progress Reports')).toBeInTheDocument();
-      expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1, name: 'Progress Reports' })).toBeInTheDocument();
+      expect(screen.getByTestId('pro-gate-preview')).toBeInTheDocument();
+      expect(screen.getByTestId('pro-gate-pill')).toBeInTheDocument();
+      expect(screen.getByTestId('pro-gate-upgrade-reports')).toHaveTextContent('teacher.proGate.reports.cta');
+      expectNoReportData();
     });
 
-    it('keeps full reports behind Pro once a class is selected', () => {
+    it('locks the page again once the access trial has expired, keeping nothing on screen', () => {
       proState.hasPro = false;
+      proState.accessTrialExpires = inDays(-1);
       mockSearchParams.set('classroomId', 'classroom-1');
       render(<ReportsPageClient />);
 
-      expect(screen.getByTestId('progress-digest-dashboard')).toBeInTheDocument();
-      expect(screen.getByTestId('assignment-progress-report')).toBeInTheDocument();
-      expect(screen.getByTestId('class-assignment-grid')).toBeInTheDocument();
-      expect(screen.getByTestId('pro-gate-preview')).toBeInTheDocument();
-      expect(screen.queryByTestId('class-progress-report')).not.toBeInTheDocument();
+      expect(screen.getByTestId('pro-gate-upgrade-reports')).toBeInTheDocument();
+      expectNoReportData();
     });
 
-    it('holds the loading ProGate inside the shell, with no full report yet', () => {
+    it('shows neither reports nor the lock while the entitlement resolves', () => {
       proState.loading = true;
       mockSearchParams.set('classroomId', 'classroom-1');
       const { container } = render(<ReportsPageClient />);
 
       expect(screen.getByTestId('education-shell-scroll')).toBeInTheDocument();
       expect(container).not.toBeEmptyDOMElement();
-      expect(screen.getByTestId('progress-digest-dashboard')).toBeInTheDocument();
-      expect(screen.queryByTestId('class-progress-report')).not.toBeInTheDocument();
+      expect(screen.getByTestId('reports-checking')).toHaveAttribute('aria-busy', 'true');
       expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
+      expectNoReportData();
+    });
+
+    it('gives a teacher on a live access trial the full reports with one Pro strip', () => {
+      proState.hasPro = false;
+      proState.accessTrialExpires = inDays(9);
+      mockSearchParams.set('classroomId', 'classroom-1');
+      render(<ReportsPageClient />);
+
+      expect(screen.getAllByTestId('pro-trial-preview')).toHaveLength(1);
+      expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
+      expect(screen.getByTestId('classroom-roster-progress')).toBeInTheDocument();
+      expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
+    });
+
+    it('gives a paying teacher every report and no lock or strip', () => {
+      mockSearchParams.set('classroomId', 'classroom-1');
+      render(<ReportsPageClient />);
+
+      expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
+      expect(screen.getByTestId('progress-digest-dashboard')).toBeInTheDocument();
+      expect(getRecentClassroomGames).toHaveBeenCalledWith('classroom-1', expect.any(Number), expect.anything());
+      expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('pro-trial-preview')).not.toBeInTheDocument();
     });
 
     it('renders reports for a Pro teacher', () => {
       render(<ReportsPageClient />);
 
       expect(screen.getByText('Progress Reports')).toBeInTheDocument();
+      expect(screen.getByText('English 101')).toBeInTheDocument();
       expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
     });
   });

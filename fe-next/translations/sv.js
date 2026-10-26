@@ -14629,7 +14629,8 @@ const sv = {
       },
       "reports": {
         "title": "Framstegsrapporter är en Pro-funktion",
-        "body": "Se hur varje elev klarar sig i alla dina klasser och spel: inlärda ord, nivåer, XP och utskrivbara PDF:er till utvecklingssamtal. Uppgradera till Teacher Pro för att låsa upp klass- och elevrapporter."
+        "body": "Se hur varje elev klarar sig i alla dina klasser och spel: inlärda ord, nivåer, XP och utskrivbara PDF:er till utvecklingssamtal. Uppgradera till Teacher Pro för att låsa upp klass- och elevrapporter.",
+        "cta": "Lås upp rapporterna med Pro för {{price}}/månad"
       },
       "pressureDials": {
         "title": "Lugnt läge för ängsliga elever",

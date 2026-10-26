@@ -24,7 +24,7 @@ vi.mock('@/hooks/useClassroom', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: false, loading: false }) }));
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: true, loading: false }) }));
 vi.mock('@/lib/education/telemetry', () => ({ trackEduReportsViewed: vi.fn() }));
 const getClassroomStudents = vi.fn().mockResolvedValue({ data: [], error: null });
 vi.mock('@/lib/supabase/education/classrooms', () => ({
@@ -50,7 +50,7 @@ vi.mock('@/components/education/TeacherGate', () => ({
   TeacherGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 vi.mock('@/components/teacher/ProGate', () => ({
-  ProGate: ({ active }: { active?: boolean }) => <div data-testid="pro-gate" data-active={String(active)} />,
+  ProGate: ({ children }: { children: React.ReactNode }) => <div data-testid="pro-gate">{children}</div>,
 }));
 vi.mock('@/components/teacher/TeacherPlanBadge', () => ({ TeacherPlanBadge: () => <div /> }));
 vi.mock('@/components/teacher/reports/StudentProgressReport', () => ({
@@ -87,6 +87,12 @@ vi.mock('@/components/teacher/reports/AssignmentCompletionReport', () => ({
 }));
 vi.mock('@/components/teacher/reports/GoogleClassroomGradePassback', () => ({
   GoogleClassroomGradePassback: () => <div />,
+}));
+vi.mock('@/components/teacher/pro/ParentReportPack', () => ({
+  ParentReportPack: () => <div data-testid="parent-report-pack" />,
+}));
+vi.mock('@/components/teacher/reports/StudentParentPreview', () => ({
+  StudentParentPreview: () => <div data-testid="student-parent-preview" />,
 }));
 vi.mock('@/components/teacher/reports/ExportAllClassesButton', () => ({
   ExportAllClassesButton: () => <div />,
@@ -130,26 +136,25 @@ describe('<TeacherReportsPage> class view — summary first, detail on demand', 
     expect(mastery.compareDocumentPosition(arc) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it('folds the printable report into a closed disclosure and tells ProGate it is not on screen', () => {
+  it('gates the whole page once, and folds the printable report into a closed disclosure', () => {
     render(<TeacherReportsPage />);
-    const gate = screen.getByTestId('pro-gate');
-    const details = gate.closest('details');
+    expect(screen.getAllByTestId('pro-gate')).toHaveLength(1);
+    const details = screen.getByTestId('class-progress-report').closest('details');
     expect(details).not.toBeNull();
     expect(details).not.toHaveAttribute('open');
-    expect(gate).toHaveAttribute('data-active', 'false');
   });
 
-  it('offers parent reports in their own closed disclosure, gated by Pro only once opened', () => {
+  it('offers parent reports in their own closed disclosure, mounted only once opened', () => {
     render(<TeacherReportsPage />);
     const details = screen.getByTestId('parent-reports-disclosure') as HTMLDetailsElement;
     expect(details).not.toHaveAttribute('open');
     expect(screen.getByText('parentReportsFlow.title')).toBeInTheDocument();
-    expect(screen.getAllByTestId('pro-gate')).toHaveLength(1);
+    expect(screen.queryByTestId('parent-report-pack')).not.toBeInTheDocument();
     act(() => {
       details.open = true;
       details.dispatchEvent(new Event('toggle'));
     });
-    expect(screen.getAllByTestId('pro-gate')).toHaveLength(2);
+    expect(screen.getByTestId('parent-report-pack')).toBeInTheDocument();
   });
 
   it('keeps the summary short: assignments, arc and digest fold into closed disclosures between the mastery report and the full report', () => {
