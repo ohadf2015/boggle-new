@@ -7,6 +7,8 @@
 import { vi, describe, it, expect, beforeAll, beforeEach, afterEach } from 'vitest';
 import { createTestEnvironment } from '../helpers/socketTestHelper';
 import { getCachedTrie, getTrieNode } from '../../modules/boggleSolver';
+import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
+import { isProfane } from '../../utils/profanityFilter';
 
 vi.mock('../../modules/classroomGameManager', async (importOriginal) => ({
   ...(await importOriginal()),
@@ -95,7 +97,11 @@ async function startRound(host, others, gameCode, mode, language = 'en') {
   expect(getGame(gameCode).gameState).toBe('in-progress');
 }
 
-/** First dictionary word (3+ letters) traceable on the grid, with its cell path. */
+/**
+ * First dictionary word (3+ letters) traceable on the grid, with its cell path.
+ * Skips words the server rejects before scoring (vowelless "mtd", profanity
+ * like "ass"), so a random board can't turn the submit into a wordRejected.
+ */
 function findWordWithPath(grid, exclude = new Set()) {
   const trie = getCachedTrie('en');
   const rows = grid.length;
@@ -108,7 +114,7 @@ function findWordWithPath(grid, exclude = new Set()) {
     const node = getTrieNode(trie, word);
     if (!node) return;
     const next = [...path, { row: r, col: c }];
-    if (word.length >= 3 && node.isWord && !exclude.has(word)) { found = { word, path: next }; return; }
+    if (word.length >= 3 && node.isWord && !exclude.has(word) && !isWordShapeWeird(word, 'en').weird && !isProfane(word)) { found = { word, path: next }; return; }
     seen.add(`${r},${c}`);
     for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
       const nr = r + dr; const nc = c + dc;
