@@ -6,7 +6,7 @@ import { vi, type Mock, } from 'vitest';
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ReportsPageClient from '../PageClient';
 
@@ -265,6 +265,7 @@ describe('ReportsPageClient', () => {
       proState.hasPro = true;
       proState.loading = false;
       proState.accessTrialExpires = null;
+      Object.assign(proState, { known: undefined, trialUsed: undefined, status: undefined });
     });
 
     const REPORT_SURFACES = [
@@ -292,6 +293,23 @@ describe('ReportsPageClient', () => {
       expect(screen.getByTestId('pro-gate-pill')).toBeInTheDocument();
       expect(screen.getByTestId('pro-gate-upgrade-reports')).toHaveTextContent('teacher.proGate.reports.cta');
       expectNoReportData();
+    });
+
+    it('offers a never-trialed free teacher the Polar trial as the lock\'s one action', () => {
+      Object.assign(proState, { hasPro: false, known: true, status: 'active', trialUsed: false });
+      render(<ReportsPageClient />);
+
+      expect(screen.getByTestId('pro-gate-upgrade-reports')).toHaveTextContent('eduPlans.reports.trialCta');
+      const lockCard = screen.getByTestId('pro-gate-pill').closest('.rounded-neo') as HTMLElement;
+      expect(within(lockCard).getAllByRole('button')).toHaveLength(1);
+      expectNoReportData();
+    });
+
+    it('sends a free teacher whose Polar trial is used up to the paid unlock', () => {
+      Object.assign(proState, { hasPro: false, known: true, status: 'canceled', trialUsed: true });
+      render(<ReportsPageClient />);
+
+      expect(screen.getByTestId('pro-gate-upgrade-reports')).toHaveTextContent('teacher.proGate.reports.cta');
     });
 
     it('locks the page again once the access trial has expired, keeping nothing on screen', () => {

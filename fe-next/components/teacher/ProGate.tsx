@@ -5,6 +5,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useCheckoutBlockedInApp } from '@/hooks/useCheckoutBlockedInApp';
 import { useTeacherProCheckout } from '@/hooks/useTeacherProCheckout';
+import { useStartTeacherProTrial } from '@/hooks/useStartTeacherProTrial';
+import { polarTrialUx } from '@/lib/education/polarTrial';
+import { TEACHER_PRO_TRIAL_DAYS } from '@/lib/education/pro/trialDays';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { teacherTrialStatus } from '@/lib/education/trial';
@@ -16,6 +19,7 @@ import {
   trackProTrialPreviewViewed,
   trackProUpgradeClicked,
   type ProUpgradeSource,
+  type TrialCtaSource,
 } from '@/lib/education/proFunnelTelemetry';
 
 /**
@@ -81,20 +85,29 @@ interface ProGateProps {
   lockedTitle?: React.ReactNode;
   /** Upgrade button copy; takes `{{price}}`. */
   ctaKey?: string;
+  /** Offer a never-trialed teacher the Polar trial instead of the paid checkout. */
+  polarTrialPlacement?: TrialCtaSource;
 }
 
 const OpenGate = createContext(false);
 
-export function ProGate({ feature, children, active = true, whileChecking = null, lockedTitle = null, ctaKey = 'teacher.proGate.cta' }: ProGateProps) {
+export function ProGate({ feature, children, active = true, whileChecking = null, lockedTitle = null, ctaKey = 'teacher.proGate.cta', polarTrialPlacement }: ProGateProps) {
   const insideOpenGate = useContext(OpenGate);
-  const { t } = useLanguage();
-  const { hasPro, loading, accessTrialExpires } = useTeacherPro();
+  const { t, language } = useLanguage();
+  const { hasPro, loading, accessTrialExpires, known, status, source, trialUsed } = useTeacherPro();
   const [nowMs] = useState(() => Date.now());
   // A live access trial opens every Pro surface (the server-enforced reads honour it too).
   const trial = teacherTrialStatus(accessTrialExpires, nowMs);
   const previewDaysLeft = trial && !trial.isExpired ? trial.daysLeft : null;
   const checkoutSource = `pro_gate_${feature}` as ProUpgradeSource;
-  const { pending, start } = useTeacherProCheckout(checkoutSource);
+  const paid = useTeacherProCheckout(checkoutSource);
+  const polarTrial = useStartTeacherProTrial(t, language, polarTrialPlacement ?? 'reports_teaser');
+  const offerTrial =
+    polarTrialPlacement !== undefined &&
+    known === true &&
+    polarTrialUx({ hasPro, status: status ?? 'active', source, trialUsed: trialUsed === true }).offerTrial;
+  const { pending, start } = paid;
+  const lockAction = offerTrial ? polarTrial : paid;
   const blockedInApp = useCheckoutBlockedInApp();
 
   useEffect(() => {
@@ -171,18 +184,24 @@ export function ProGate({ feature, children, active = true, whileChecking = null
           <button
             type="button"
             data-testid={`pro-gate-upgrade-${feature}`}
-            disabled={pending}
-            aria-busy={pending || undefined}
+            disabled={lockAction.pending}
+            aria-busy={lockAction.pending || undefined}
             onClick={() => {
               trackGrowthEvent('landing_cta_clicked', { cta: `pro_gate_${feature}` });
-              trackProUpgradeClicked({ feature });
-              void start();
+              if (!offerTrial) trackProUpgradeClicked({ feature });
+              void lockAction.start();
             }}
             className="inline-block rounded-neo border-neo bg-neo-cyan px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg disabled:opacity-60"
           >
-            {t(ctaKey, { price: `$${TEACHER_PRO_PRICE_USD}` })}
+            {offerTrial
+              ? t('eduPlans.reports.trialCta', { days: TEACHER_PRO_TRIAL_DAYS })
+              : t(ctaKey, { price: `$${TEACHER_PRO_PRICE_USD}` })}
           </button>
-          <p className="mt-2 text-xs font-bold text-neo-white/60">{t('teacher.subscription.trustCancel')}</p>
+          <p className="mt-2 text-xs font-bold text-neo-white/60">
+            {offerTrial
+              ? t('eduPlans.reports.trialFine', { days: TEACHER_PRO_TRIAL_DAYS, price: `$${TEACHER_PRO_PRICE_USD}` })
+              : t('teacher.subscription.trustCancel')}
+          </p>
           </>)}
         </div>
       </div>

@@ -377,6 +377,7 @@ export function ReportsProGate({ children }: { children: React.ReactNode }) {
     <ProGate
       feature="reports"
       ctaKey="teacher.proGate.reports.cta"
+      polarTrialPlacement="reports_teaser"
       whileChecking={<ReportsChecking />}
       lockedTitle={<ReportsLockedTitle />}
     >

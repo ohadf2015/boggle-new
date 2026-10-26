@@ -26,6 +26,15 @@ vi.mock('@/hooks/useTeacherProCheckout', () => ({
   useTeacherProCheckout: () => ({ pending: false, start: mockStartCheckout }),
 }));
 
+const mockStartTrial = vi.fn();
+const trialSources: unknown[] = [];
+vi.mock('@/hooks/useStartTeacherProTrial', () => ({
+  useStartTeacherProTrial: (_t: unknown, _l: unknown, source: unknown) => {
+    trialSources.push(source);
+    return { pending: false, start: mockStartTrial };
+  },
+}));
+
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string, params?: Record<string, string | number>) => {
     // Mock interpolation for the CTA test
@@ -45,6 +54,8 @@ describe('ProGate', () => {
   beforeEach(() => {
     mockTrackGrowthEvent.mockClear();
     mockStartCheckout.mockClear();
+    mockStartTrial.mockClear();
+    trialSources.length = 0;
     mockRecap = null;
     mockGateViewed.mockClear();
     mockPreviewViewed.mockClear();
@@ -275,6 +286,51 @@ describe('ProGate', () => {
       render(<ProGate feature="reports" lockedTitle={<h1>Reports</h1>}><div>paid surface</div></ProGate>);
       expect(screen.queryByRole('heading')).not.toBeInTheDocument();
       expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
+    });
+
+    const free = { hasPro: false, loading: false, accessTrialExpires: null, known: true, status: 'active', source: 'polar' };
+    const lock = (state: Record<string, unknown>, offer = true) => {
+      mockUseTeacherPro.mockReturnValue(state);
+      render(
+        <ProGate feature="reports" ctaKey="teacher.proGate.reports.cta" polarTrialPlacement={offer ? 'reports_teaser' : undefined}>
+          <div>paid surface</div>
+        </ProGate>,
+      );
+      expect(screen.getAllByRole('button')).toHaveLength(1);
+      expect(screen.getByTestId('pro-gate-pill')).toBeInTheDocument();
+      return screen.getByTestId('pro-gate-upgrade-reports');
+    };
+
+    it('offers a never-trialed teacher the Polar trial as the one action', () => {
+      const cta = lock({ ...free, trialUsed: false });
+      expect(cta).toHaveTextContent('eduPlans.reports.trialCta');
+      expect(screen.getByText('eduPlans.reports.trialFine')).toBeInTheDocument();
+      fireEvent.click(cta);
+      expect(mockStartTrial).toHaveBeenCalledTimes(1);
+      expect(mockStartCheckout).not.toHaveBeenCalled();
+      expect(trialSources).toContain('reports_teaser');
+    });
+
+    it('sends a teacher who already used the Polar trial to the paid checkout', () => {
+      const cta = lock({ ...free, trialUsed: true });
+      expect(cta).toHaveTextContent('teacher.proGate.reports.cta');
+      fireEvent.click(cta);
+      expect(mockStartCheckout).toHaveBeenCalledTimes(1);
+      expect(mockStartTrial).not.toHaveBeenCalled();
+    });
+
+    it('sends a teacher whose Polar trial expired to the paid checkout', () => {
+      const cta = lock({ ...free, status: 'canceled', trialUsed: true, accessTrialExpires: new Date(Date.now() - 86_400_000).toISOString() });
+      expect(cta).toHaveTextContent('teacher.proGate.reports.cta');
+      expect(screen.queryByText('eduPlans.reports.trialCta')).not.toBeInTheDocument();
+    });
+
+    it('does not guess trial eligibility when the plan read is unknown', () => {
+      expect(lock({ ...free, known: false, trialUsed: false })).toHaveTextContent('teacher.proGate.reports.cta');
+    });
+
+    it('keeps the paid CTA on a gate that offers no trial', () => {
+      expect(lock({ ...free, trialUsed: false }, false)).toHaveTextContent('teacher.proGate.reports.cta');
     });
 
     it('lets a gate nested inside an open gate pass straight through, so a trial teacher sees one strip', () => {
