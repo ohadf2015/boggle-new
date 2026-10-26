@@ -157,4 +157,12 @@ describe('RoundReportCard', () => {
     cells.forEach((c) => expect(c.querySelector('svg')).not.toBeNull());
     expect(cells[0].getAttribute('title')).toBe('enormous: teacher.lastGame.missed');
   });
+
+  it('lets a student\'s word cells wrap inside their column, so a long lesson never spills over the accuracy and score on a phone', () => {
+    render(<RoundReportCard {...props} hasPro />);
+    const strip = screen.getAllByTestId('round-report-strip')[0];
+    const cells = within(strip).getByTestId('round-report-cells');
+    expect(cells.className).toContain('flex-wrap');
+    expect(cells.className).toContain('min-w-0');
+  });
 });
