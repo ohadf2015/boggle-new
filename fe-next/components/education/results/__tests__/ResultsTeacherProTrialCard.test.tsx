@@ -38,6 +38,19 @@ describe('ResultsTeacherProTrialCard', () => {
     expect(screen.getByTestId('results-teacher-pro-trial-card')).toHaveTextContent('$49 per teacher / year for 5+ teachers');
   });
 
+  it('stays a quiet outlined secondary so the round-end screen keeps one solid primary', () => {
+    for (const placement of [undefined, 'class_created'] as const) {
+      const { unmount } = render(<ResultsTeacherProTrialCard language="en" placement={placement} />);
+      const cta = screen.getByTestId('results-teacher-pro-trial-cta');
+      const solidFill = cta.className.split(/\s+/).filter((c) => /^bg-neo-[a-z-]+$/.test(c) && !/navy/.test(c));
+      expect(solidFill).toEqual([]);
+      expect(cta.className).not.toMatch(/shadow-hard/);
+      expect(cta.className).toMatch(/\bborder-neo-pink\b/);
+      expect(screen.getByTestId('results-teacher-pro-trial-card')).toHaveTextContent('Teacher Pro');
+      unmount();
+    }
+  });
+
   it('fires the upgrade click with placement classroom_results on tap (impressions: see the viewport-gated suite)', () => {
     render(<ResultsTeacherProTrialCard language="he" />);
     fireEvent.click(screen.getByTestId('results-teacher-pro-trial-cta'));

@@ -58,10 +58,9 @@ export const FREE_TIER_LIMITS = {
    */
   studentsPerClass: 50,
   /**
-   * Assignments a free teacher may have active per classroom. Pro lifts this.
-   * Soft paywall, enforced in the AssignmentCreator UI — there is no assignment
-   * API route to enforce it server-side, and the task is a usage-triggered ask,
-   * not a hard wall. See the 2026-09-21 note above.
+   * Assignments a free teacher may have per classroom (every lesson_assignments row).
+   * Pro or a live access trial lifts this. The AssignmentCreator shows the upsell and
+   * the enforce_free_assignment_cap insert trigger refuses the same rows server-side.
    */
   assignmentsPerClass: 3,
 } as const;

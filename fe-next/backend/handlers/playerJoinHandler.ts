@@ -50,6 +50,7 @@ import { validatePayload, joinGameSchema } from '../utils/socketValidation.js';
 import { emitClassroomContext } from '../modules/classroomGameContext.js';
 import { checkClassroomSeat } from './classroomSeatGate.js';
 import { MAX_PLAYERS_PER_ROOM } from '../utils/consts.js';
+import { seatedPlayerCount } from '../modules/roomSeats.js';
 import { isInProgress, shouldSendGameState } from '../utils/gameStateMachine.js';
 import { notifyPlayerJoined } from '../modules/notificationService.js';
 import {
@@ -234,8 +235,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // Check for existing user (reconnection)
     const existingSocketId = getSocketIdByUsername(gameCode, username);
 
-    // Check player limit
-    if (!existingSocketId && Object.keys(game.users).length >= MAX_PLAYERS_PER_ROOM) {
+    if (!existingSocketId && seatedPlayerCount({ users: game.users, isClassroom: game.isClassroom || !!seat.game }) >= MAX_PLAYERS_PER_ROOM) {
       // Add as spectator
       const userAvatar = avatar || generateRandomAvatar();
       addSpectatorToGame(gameCode, username, socket.id, {

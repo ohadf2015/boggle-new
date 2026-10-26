@@ -2616,3 +2616,20 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   close to the 1000/arm significance threshold — none removed. All 23 experiments defined in
   `lib/experiments.ts` already have a live matching PostHog flag (swept via `posthog flags` API) — no
   `ensure` calls needed tonight.
+
+## 2026-10-26
+- [PostHog] ChunkLoadError: Loading chunk 2703 failed
+  - reach=1, severity=1, score=0.299, evidence: https://eu.posthog.com/project/151059/error_tracking/019fceb9-2d31-7972-8cb8-ff0e8ce51814
+  - status: reviewed, no fix shipped
+  - why: codebase already has full self-healing coverage for this exact failure mode — `fe-next/utils/retryImport.ts` (retries lazy chunk imports, reloads once on persistent ChunkLoadError), `fe-next/utils/chunkBootGuard.ts`, and `fe-next/app/global-error.tsx` (detects ChunkLoadError via `isChunkLoadError`, calls `clearCachesAndReload()` with a single-shot guard). reach=1 is consistent with one user hitting a stale chunk during a deploy window and auto-recovering. No gap found to patch.
+  - recommended owner: self (re-check only if reach grows next night)
+- [Supabase] advisor sweep — no new actionable signal
+  - security: 170 lints (166 auth_allow_anonymous_sign_ins, 31 rls_enabled_no_policy, 90 authenticated_security_definer_function_executable, 10 anon_security_definer_function_executable) — all pre-existing backlog matching memory `supabase-advisor-cleanup-2026-04-29` (large intentionally-deferred sets), no diff tooling available to isolate "new since last night"
+  - perf: 6 lints (1 each: unindexed_foreign_keys, auth_rls_initplan, no_primary_key, unused_index, multiple_permissive_policies, auth_db_connections_absolute) — low count, none newly severe
+  - status: deferred
+  - why: no new-since-yesterday baseline to diff against; the backlog is known and already explicitly out of scope per standing memory. A future lane should snapshot advisor counts nightly to enable a real diff.
+  - recommended owner: backend (baseline diff tooling)
+- [Restore] stale 20260910-010000 (12 files, dropped 44 nights ago)
+  - status: partially resolved — 4/12 files already landed elsewhere (unchanged), 8/12 CONFLICT against current master (3-way merge rc=1): `app/[locale]/multiplayer/PageClient.tsx`, `translations/{en,es,he,ja,ru,sv}.js`, `scripts/nightly/prompts/12-telemetry-coverage.md`
+  - why: conflicts need manual diff/resolution (likely translation key drift across 44 nights) — not safe to force-merge in a 15-min lane
+  - recommended owner: self (next triage lane) — do NOT append {"resolve":"20260910-010000"} yet, 8 files still genuinely unresolved

@@ -211,6 +211,25 @@ describe('spectatorManager', () => {
       expect(game.users['alice']).toBeUndefined();
     });
 
+    it('a classroom teacher does not take a seat, so a watcher can still be seated', () => {
+      const game = createGame({ isClassroom: true });
+      game.users['teacher'] = { socketId: 's0', isHost: true } as any;
+      game.users['p1'] = { socketId: 's1' } as any;
+      addSpectatorToGame(game, 'alice', 'sock-1');
+
+      expect(upgradeSpectatorToPlayer(game, 'alice', 2)).toBe(true);
+      expect(game.users['alice']).toBeDefined();
+    });
+
+    it('an ordinary room counts its playing host as a seat', () => {
+      const game = createGame();
+      game.users['host'] = { socketId: 's0', isHost: true } as any;
+      game.users['p1'] = { socketId: 's1' } as any;
+      addSpectatorToGame(game, 'alice', 'sock-1');
+
+      expect(upgradeSpectatorToPlayer(game, 'alice', 2)).toBe(false);
+    });
+
     it('succeeds when exactly one slot remains', () => {
       const game = createGame();
       game.users['p1'] = { socketId: 's1' } as any;
