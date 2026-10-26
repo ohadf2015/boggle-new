@@ -99,6 +99,13 @@ export const state = {
   filedStudents: 2,
 };
 
+const ORIGINAL_SECRET = process.env.PARENT_REPORT_SECRET;
+
+export function restoreSecret(): void {
+  if (ORIGINAL_SECRET === undefined) delete process.env.PARENT_REPORT_SECRET;
+  else process.env.PARENT_REPORT_SECRET = ORIGINAL_SECRET;
+}
+
 export function resetState(): void {
   process.env.PARENT_REPORT_SECRET = FIXTURE_SECRET;
   state.streakRow = null;

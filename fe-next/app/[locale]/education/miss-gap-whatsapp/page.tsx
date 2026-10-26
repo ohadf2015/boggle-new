@@ -52,7 +52,7 @@ async function payloadFrom(props: PageProps) {
   if (!sp.get('lang') && !sp.get('locale')) sp.set('lang', locale);
   const base = parseClassGapShareParams(sp);
   const dueDate = normalizeDueDate(sp.get('due'));
-  return toMissGapAssignmentPayload({ ...base, dueDate });
+  return toMissGapAssignmentPayload({ ...base, dueDate, classToken: sp.get('k') });
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {

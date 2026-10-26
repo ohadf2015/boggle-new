@@ -47,6 +47,7 @@ function applyCardParams(url: URL, payload: MissGapAssignmentPayload): void {
   }
   url.searchParams.set('lang', payload.locale);
   if (payload.dueDate) url.searchParams.set('due', payload.dueDate);
+  if (payload.classToken) url.searchParams.set('k', payload.classToken);
   url.searchParams.set('utm_source', MISS_GAP_WHATSAPP_UTM.utm_source);
   url.searchParams.set('utm_medium', MISS_GAP_WHATSAPP_UTM.utm_medium);
   url.searchParams.set('utm_campaign', MISS_GAP_WHATSAPP_UTM.utm_campaign);

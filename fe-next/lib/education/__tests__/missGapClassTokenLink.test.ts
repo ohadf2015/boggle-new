@@ -7,6 +7,11 @@ import {
 } from '../missGapAsyncAssignment';
 import { resolveMissGapEntry } from '../missGapEntry';
 import { buildMissGapGradePassback } from '../missGapGradePassback';
+import {
+  buildMissGapWhatsAppCardPath,
+  buildMissGapWhatsAppCardShareUrl,
+  buildMissGapWhatsAppDeepLink,
+} from '../missGapWhatsAppShare';
 
 const TOKEN =
   'eyJjbGFzc0tleSI6InBoeXNpY3MgMTAxOjptcy4gY29oZW4iLCJ2IjoxfQ.abcDEF_123-xyz';
@@ -77,5 +82,13 @@ describe('homework links carry the signed class token as k=', () => {
     expect(result.ok).toBe(true);
     const homeworkUrl = (result as { homeworkUrl: string }).homeworkUrl;
     expect(new URL(homeworkUrl).searchParams.get('k')).toBe(TOKEN);
+  });
+
+  it('the parent WhatsApp card link and its deep link keep the token', () => {
+    const withToken = { ...input, classToken: TOKEN };
+    expect(new URL(buildMissGapWhatsAppCardShareUrl(withToken)).searchParams.get('k')).toBe(TOKEN);
+    expect(new URL(buildMissGapWhatsAppCardPath(withToken), 'https://x').searchParams.get('k')).toBe(TOKEN);
+    const deep = decodeURIComponent(buildMissGapWhatsAppDeepLink({ text: 'hi', input: withToken }));
+    expect(deep).toContain(`k=${TOKEN}`);
   });
 });

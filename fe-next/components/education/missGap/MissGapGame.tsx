@@ -44,7 +44,6 @@ const STREAK_SOUND_AT = 3;
 
 export interface MissGapGameProps {
   classKey: string;
-  /** Signed `k` from the homework link; without it the server keeps no record. */
   classToken?: string;
   lesson: string;
   teacher: string;

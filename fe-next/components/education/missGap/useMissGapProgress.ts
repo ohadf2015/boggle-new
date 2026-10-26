@@ -31,7 +31,6 @@ export interface MissGapProgressData {
   averageAccuracy: number;
   runs: MissGapProgressRun[];
   streak: { currentStreak: number; longestStreak: number };
-  /** Signed class token, sent to the owning teacher only, for the share link. */
   classToken?: string;
 }
 

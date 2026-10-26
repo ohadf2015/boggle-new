@@ -28,7 +28,7 @@ import {
 
 export interface MissGapTeacherComposeProps {
   payload: MissGapAssignmentPayload;
-  /** Minted for the owning teacher; undefined while loading, '' when this caller gets none. */
+  /** undefined while the owner check is in flight. */
   classToken?: string;
   lesson: string;
   dueDate: string;
@@ -36,7 +36,7 @@ export interface MissGapTeacherComposeProps {
 }
 
 export function MissGapTeacherCompose({
-  payload: unsignedPayload,
+  payload,
   classToken,
   lesson,
   dueDate,
@@ -44,10 +44,6 @@ export function MissGapTeacherCompose({
 }: MissGapTeacherComposeProps) {
   const { t } = useLanguage();
   const [shareState, setShareState] = useState<'idle' | 'copied' | 'shared'>('idle');
-  const payload = useMemo(
-    () => ({ ...unsignedPayload, classToken: classToken ?? '' }),
-    [unsignedPayload, classToken],
-  );
   const words = payload.missedWords;
   const tokenPending = classToken === undefined;
 

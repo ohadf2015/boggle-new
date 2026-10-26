@@ -44,7 +44,6 @@ export interface MissGapAssignmentInput extends ClassGapShareInput {
    * `missGapDefinitions.ts` for the wire format.
    */
   definitions?: Record<string, string> | null;
-  /** Signed class token (`k=`) minted for the owning teacher; absent on old links. */
   classToken?: string | null;
 }
 
@@ -53,7 +52,6 @@ export interface MissGapAssignmentPayload extends ClassGapSharePayload {
   dueDate: string;
   /** Cleaned word→meaning map, lower-cased keys. `{}` when the lesson had none. */
   definitions: Record<string, string>;
-  /** Signed class token, or '' when the link has none. */
   classToken?: string;
 }
 

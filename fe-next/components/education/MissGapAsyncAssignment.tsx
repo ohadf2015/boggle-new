@@ -100,6 +100,10 @@ export function MissGapAsyncAssignment({
   // undefined while the teacher's read is in flight; '' once it settled with no token for this caller.
   const mintedClassToken =
     progress.data || progress.failed ? (progress.data?.classToken ?? '') : undefined;
+  const sharePayload = useMemo(
+    () => (isTeacher ? { ...payload, classToken: mintedClassToken ?? '' } : payload),
+    [isTeacher, payload, mintedClassToken],
+  );
   const classStreak = resolveClassStreak({
     server: serverStreak,
     device: streak.currentStreak,
@@ -246,7 +250,7 @@ export function MissGapAsyncAssignment({
 
         {isTeacher ? (
           <MissGapTeacherCompose
-            payload={payload}
+            payload={sharePayload}
             classToken={mintedClassToken}
             lesson={lesson}
             dueDate={dueDate}
@@ -264,10 +268,10 @@ export function MissGapAsyncAssignment({
       </section>
 
       {isTeacher ? (
-        <MissGapTeacherProgress data={progress.data} failed={progress.failed} payload={payload} />
+        <MissGapTeacherProgress data={progress.data} failed={progress.failed} payload={sharePayload} />
       ) : null}
 
-      {isTeacher || completed ? <MissGapTakeHomeDisclosure payload={payload} /> : null}
+      {isTeacher || completed ? <MissGapTakeHomeDisclosure payload={sharePayload} /> : null}
 
       {playing ? (
         <MissGapGame

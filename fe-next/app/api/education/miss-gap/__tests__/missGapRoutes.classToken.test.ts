@@ -51,7 +51,7 @@ vi.mock('@/utils/supabase/admin', () => ({
 import { NextRequest } from 'next/server';
 import { POST } from '../complete/route';
 import { GET } from '../progress/route';
-import { BODY, CLASS_TOKEN, OTHER_CLASS_TOKEN, makeClient, resetState, state } from './missGapHarness';
+import { BODY, CLASS_TOKEN, OTHER_CLASS_TOKEN, makeClient, resetState, state, restoreSecret } from './missGapHarness';
 
 const PROGRESS = 'http://x/api/education/miss-gap/progress?classKey=week%203%20vocab%3A%3Ams.%20g&dueDate=2026-09-12';
 const tampered = CLASS_TOKEN.slice(0, -2) + (CLASS_TOKEN.endsWith('A') ? 'BB' : 'AA');
@@ -78,6 +78,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers();
+  restoreSecret();
 });
 
 describe('complete: the class token gates every write', () => {
