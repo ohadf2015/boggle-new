@@ -17,6 +17,9 @@ const CONTROL_CHARS = /[\u0000-\u001f\u007f]/g;
 /** Longest key we store; the column is text but an unbounded key is a foot-gun. */
 export const MAX_CLASS_KEY = 200;
 
+/** Distinct students one homework (class key + due date) accepts; the roster read returns this many. */
+export const MAX_STUDENTS_PER_ASSIGNMENT = 60;
+
 export function normalizeMissGapClassKey(raw: unknown): string {
   return String(raw ?? '')
     .replace(CONTROL_CHARS, ' ')

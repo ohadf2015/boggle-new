@@ -5,12 +5,14 @@
  */
 
 import type { Avatar, GameUser, Spectator } from '@/shared/types/game';
+import { seatedPlayerCount } from './roomSeats';
 
 // Base game interface for spectatorManager
 export interface SpectatorGameBase {
   users: Record<string, GameUser>;
   spectators: Record<string, Spectator>;
   lastActivity?: number;
+  isClassroom?: boolean;
 }
 
 export interface SpectatorOptions {
@@ -93,7 +95,7 @@ export function upgradeSpectatorToPlayer(
   }
 
   // Check if room has space
-  if (Object.keys(game.users).length >= maxPlayers) {
+  if (seatedPlayerCount(game) >= maxPlayers) {
     return false;
   }
 

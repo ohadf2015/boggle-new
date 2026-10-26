@@ -9,7 +9,7 @@
  * pitfalls Class 3; this is the one route.
  *
  * The API decides what comes back: an anonymous caller gets counts and the
- * streak, a signed-in caller also gets the named roster. Nothing here has to
+ * streak, the teacher who owns the class key also gets the named roster. Nothing here has to
  * know which — it renders what it is given.
  */
 'use client';
