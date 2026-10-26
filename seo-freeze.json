@@ -3,13 +3,18 @@
   "frozen": [
     {
       "path": "/es/juego-de-palabras-multijugador",
-      "until": "2026-11-19",
-      "why": "Title tag is 'Juega Scrabble Online Gratis en Español | LexiClash' as of #1406 (merged 2026-10-22). Do not rewrite <title> or meta description before 2026-11-19. GR #11111 (sin registrarse, pos 4.29) is an H1/body/internal-anchor push only — a same-day title rewrite would make #1406 unmeasurable and risk the 10.6k-imp head query."
+      "until": "2026-11-22",
+      "why": "Freeze restarted 2026-10-25. The 2026-10-22 freeze (#1409) did not hold: #1422 and #1435 rewrote the snippet anyway, so its window is spoiled. Current snippet as of #1435: title 'Scrabble Online en Español Gratis — Sin Registro | LexiClash', description starting 'Juega scrabble online gratis — sin registro ni descargas'. Body, H1 and internal-link work is fine; title and description stay as they are for 28 days. CI now enforces this (fe-next/scripts/ci/check-seo-freeze.mjs)."
+    },
+    {
+      "path": "/en/play-boggle-online-free",
+      "until": "2026-11-22",
+      "why": "Title/description rewritten seven times between 2026-10-19 and 2026-10-25 (#1373, #1385, #1401, #1406, #1422, #1435, #1437), so no 28-day window holds one snippet. Frozen 2026-10-25 on the snippet from #1435/#1437 so the next window can be attributed to it."
     },
     {
       "path": "/sv/swedish-multiplayer-word-game",
-      "until": "2026-09-19",
-      "why": "Growth Radar row 51: 3,313 impressions at 0.54% CTR, position 5.18. The routine rewrote this page's meta on 2026-08-20, which is the same failure row 50 was frozen for — the snippet is already good (it leads with 'Scrabble & Alfapet Online på Svenska — Gratis'), so what it lacks is a window, not better words. Frozen 2026-08-22."
+      "until": "2026-11-22",
+      "why": "SV_TITLE/SV_DESCRIPTION rewritten in #1373, #1385, #1406 and #1435 within a week, the same failure the 2026-08-22 freeze of this page was for. Frozen again 2026-10-25 on the #1435 snippet ('Spela Scrabble Svenska Gratis Online — Alfapet | LexiClash')."
     },
     {
       "path": "/en/competitive-word-games",

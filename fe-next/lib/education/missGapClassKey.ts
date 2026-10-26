@@ -17,6 +17,9 @@ const CONTROL_CHARS = /[\u0000-\u001f\u007f]/g;
 /** Longest key we store; the column is text but an unbounded key is a foot-gun. */
 export const MAX_CLASS_KEY = 200;
 
+/** Upper bound on a signed class token (`k`); a v1 token for a 200-char key is ~330 chars. */
+export const MAX_CLASS_TOKEN = 512;
+
 /** Distinct students one homework (class key + due date) accepts; the roster read returns this many. */
 export const MAX_STUDENTS_PER_ASSIGNMENT = 60;
 

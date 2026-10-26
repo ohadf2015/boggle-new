@@ -83,14 +83,14 @@ describe('MissGapAsyncAssignment', () => {
     mockProgressFetch();
   });
 
-  it('teacher mode: due date + GC assign (not Unplugged Live), no positioning copy', () => {
+  it('teacher mode: due date + GC assign (not Unplugged Live), no positioning copy', async () => {
     render(<MissGapAsyncAssignment payload={payload} teacherMode />);
     expect(screen.getByTestId('miss-gap-async-assignment')).toBeInTheDocument();
     // The competitor-positioning line was written for the PR, not for a teacher
     // standing in front of a class. One element fewer on the screen.
     expect(screen.queryByTestId('miss-gap-async-foil')).not.toBeInTheDocument();
     expect(screen.getByTestId('miss-gap-async-due-date')).toBeInTheDocument();
-    const gc = screen.getByTestId('assign-miss-gap-async-google-classroom');
+    const gc = await screen.findByTestId('assign-miss-gap-async-google-classroom');
     expect(gc.getAttribute('href')).toContain('classroom.google.com/share');
     expect(gc.getAttribute('href')).toContain('itemtype=assignment');
     expect(decodeURIComponent(gc.getAttribute('href') || '')).toContain(
@@ -168,6 +168,7 @@ describe('MissGapAsyncAssignment', () => {
         teacherMode
       />,
     );
+    await waitFor(() => expect(screen.getByTestId('share-miss-gap-async-homework')).toBeEnabled());
     fireEvent.click(screen.getByTestId('share-miss-gap-async-homework'));
     await waitFor(() => expect(shareWithFallback).toHaveBeenCalled());
     const arg = vi.mocked(shareWithFallback).mock.calls[0][0] as { url?: string };
@@ -264,5 +265,58 @@ describe('MissGapAsyncAssignment', () => {
       await screen.findByTestId('miss-gap-async-open-grade-passback'),
     ).toBeInTheDocument();
     expect(screen.getByTestId('miss-gap-takehome-toggle')).toBeInTheDocument();
+  });
+
+  describe('the signed class token', () => {
+    const TOKEN = 'eyJ2IjoxfQ.sig_-1';
+    function mockOwnerProgress(classToken?: string) {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          ok: true,
+          players: 0,
+          runs: [],
+          streak: { currentStreak: 0, longestStreak: 0 },
+          ...(classToken ? { classToken } : {}),
+        }),
+      });
+      global.fetch = fetchMock as unknown as typeof fetch;
+      return fetchMock;
+    }
+
+    it('teacher: the shared link and the Classroom link carry the token the server minted', async () => {
+      mockOwnerProgress(TOKEN);
+      render(<MissGapAsyncAssignment payload={{ ...payload, dueDate: '2026-09-11' }} teacherMode />);
+      await waitFor(() => expect(screen.getByTestId('share-miss-gap-async-homework')).toBeEnabled());
+      await waitFor(() => {
+        const gc = screen.getByTestId('assign-miss-gap-async-google-classroom').getAttribute('href') ?? '';
+        expect(new URL(new URL(gc).searchParams.get('url') ?? '').searchParams.get('k')).toBe(TOKEN);
+      });
+      fireEvent.click(screen.getByTestId('share-miss-gap-async-homework'));
+      await waitFor(() => expect(shareWithFallback).toHaveBeenCalled());
+      const arg = vi.mocked(shareWithFallback).mock.calls.at(-1)![0] as { url: string };
+      expect(new URL(arg.url).searchParams.get('k')).toBe(TOKEN);
+      expect(screen.queryByTestId('miss-gap-async-untracked')).toBeNull();
+    });
+
+    it('teacher without a token: says how to get a tracked link, and the link has no k', async () => {
+      mockOwnerProgress();
+      render(<MissGapAsyncAssignment payload={{ ...payload, dueDate: '2026-09-11' }} teacherMode />);
+      expect(await screen.findByTestId('miss-gap-async-untracked')).toHaveTextContent(
+        'education.results.assignMissGapAsyncUntracked',
+      );
+      fireEvent.click(screen.getByTestId('share-miss-gap-async-homework'));
+      await waitFor(() => expect(shareWithFallback).toHaveBeenCalled());
+      const arg = vi.mocked(shareWithFallback).mock.calls.at(-1)![0] as { url: string };
+      expect(new URL(arg.url).searchParams.has('k')).toBe(false);
+    });
+
+    it('student: the class read carries the link token', async () => {
+      const fetchMock = mockOwnerProgress();
+      render(<MissGapAsyncAssignment payload={{ ...payload, dueDate: '2026-09-11', classToken: TOKEN }} />);
+      await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+      const url = new URL(String(fetchMock.mock.calls[0][0]), 'https://x');
+      expect(url.searchParams.get('k')).toBe(TOKEN);
+    });
   });
 });

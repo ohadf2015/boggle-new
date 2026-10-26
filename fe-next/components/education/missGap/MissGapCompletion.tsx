@@ -22,7 +22,7 @@ import { MissGapStreakFlame } from './MissGapStreakFlame';
 import { useMissGapSound } from './missGapSound';
 import type { MissGapRunScore } from '@/lib/education/missGapQuiz';
 
-export type SaveState = 'saving' | 'saved' | 'failed';
+export type SaveState = 'saving' | 'saved' | 'failed' | 'unsigned';
 
 export interface MissGapCompletionProps {
   score: MissGapRunScore;
@@ -123,6 +123,13 @@ export function MissGapCompletion({
             className="w-full rounded-neo border-[3px] border-neo-black bg-neo-pink px-3 py-2 font-bold text-sm text-neo-black"
           >
             {t('education.homework.saveFailed')}
+          </p>
+        ) : saveState === 'unsigned' ? (
+          <p
+            data-testid="miss-gap-link-unsigned"
+            className="w-full rounded-neo border-[3px] border-neo-black bg-neo-cream px-3 py-2 font-bold text-sm text-neo-black"
+          >
+            {t('education.homework.linkUnsigned')}
           </p>
         ) : (
           <>

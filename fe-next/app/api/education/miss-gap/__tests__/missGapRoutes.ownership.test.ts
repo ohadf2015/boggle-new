@@ -55,7 +55,7 @@ vi.mock('@/utils/supabase/admin', () => ({
 import { NextRequest } from 'next/server';
 import { POST } from '../complete/route';
 import { GET } from '../progress/route';
-import { BODY, makeClient, resetState, state } from './missGapHarness';
+import { BODY, makeClient, resetState, state, restoreSecret } from './missGapHarness';
 
 const KEY = 'week 3 vocab::ms. g';
 const PROGRESS = 'http://x/api/education/miss-gap/progress?classKey=week%203%20vocab%3A%3Ams.%20g&dueDate=2026-09-12';
@@ -80,6 +80,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers();
+  restoreSecret();
 });
 
 describe('progress: names only for the teacher who owns the class key', () => {

@@ -11,7 +11,8 @@
  *   owning teacher   → the named list, for the teacher's assignment card. The
  *                      key is guessable text, so being a teacher is not enough:
  *                      the first teacher to open the card claims the key
- *                      (miss_gap_class_owners) and only that teacher sees names.
+ *                      (miss_gap_class_owners) and only that teacher sees names
+ *                      and gets the signed class token (`k`) the share link carries.
  *
  * Names are first names a student typed themselves; no email, no roster row.
  */
@@ -23,6 +24,7 @@ import { MISS_GAP_PROGRESS_RATE_LIMIT } from '@/lib/education/missGapRateLimits'
 import { normalizeDay } from '@/lib/education/classStreakMath';
 import { normalizeMissGapClassKey, MAX_STUDENTS_PER_ASSIGNMENT } from '@/lib/education/missGapClassKey';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
+import { classTokenStatus, signMissGapClassToken } from '@/lib/education/missGapClassToken';
 import logger from '@/utils/logger';
 
 export const dynamic = 'force-dynamic';
@@ -58,6 +60,10 @@ export async function GET(request: NextRequest) {
   const classKey = normalizeMissGapClassKey(url.searchParams.get('classKey'));
   if (!classKey) {
     return NextResponse.json({ error: 'classKey required' }, { status: 400 });
+  }
+  // A link without `k` predates class tokens and keeps its counts; a wrong `k` reads nothing.
+  if (classTokenStatus(url.searchParams.get('k'), classKey) === 'invalid') {
+    return NextResponse.json({ error: 'Invalid class link' }, { status: 400 });
   }
   // A MISSING `dueDate` means "every assignment for this class" — the teacher
   // composing on a URL with no `due=` must not be answered with the rows filed
@@ -117,6 +123,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     ok: true,
+    ...(showNames ? ownerClassToken(classKey) : {}),
     players,
     averageAccuracy,
     totalStars,
@@ -138,6 +145,15 @@ export async function GET(request: NextRequest) {
         }))
       : [],
   });
+}
+
+function ownerClassToken(classKey: string): { classToken?: string } {
+  try {
+    return { classToken: signMissGapClassToken(classKey) };
+  } catch (err) {
+    logger.error('[miss-gap] progress: class token not signed', err);
+    return {};
+  }
 }
 
 async function callerOwnsClassKey(

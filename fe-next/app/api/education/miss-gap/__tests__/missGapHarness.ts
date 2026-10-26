@@ -56,8 +56,17 @@ export const RUNS = [
   },
 ];
 
+export const FIXTURE_SECRET = 'fixture-secret';
+/** HMAC-SHA256 over `miss-gap-class:<body>` with FIXTURE_SECRET, computed outside the codebase. */
+export const CLASS_TOKEN =
+  'eyJjbGFzc0tleSI6IndlZWsgMyB2b2NhYjo6bXMuIGciLCJ2IjoxfQ.rwAXBO0dzz46AypxCnieV8sqNYlAO60DHufYX8Dyihg';
+/** Same secret, signed for 'week 4 verbs::ms. g'. */
+export const OTHER_CLASS_TOKEN =
+  'eyJjbGFzc0tleSI6IndlZWsgNCB2ZXJiczo6bXMuIGciLCJ2IjoxfQ.nrcLKJxXm2cuUS5o4rOkUP4YCuQFeMXzC6MaYtDRhUE';
+
 export const BODY = {
   classKey: 'week 3 vocab::ms. g',
+  classToken: CLASS_TOKEN,
   dueDate: '2026-09-12',
   lesson: 'Week 3 Vocab',
   teacher: 'Ms. G',
@@ -90,7 +99,15 @@ export const state = {
   filedStudents: 2,
 };
 
+const ORIGINAL_SECRET = process.env.PARENT_REPORT_SECRET;
+
+export function restoreSecret(): void {
+  if (ORIGINAL_SECRET === undefined) delete process.env.PARENT_REPORT_SECRET;
+  else process.env.PARENT_REPORT_SECRET = ORIGINAL_SECRET;
+}
+
 export function resetState(): void {
+  process.env.PARENT_REPORT_SECRET = FIXTURE_SECRET;
   state.streakRow = null;
   state.previousRun = null;
   state.upsertedRun = null;

@@ -270,4 +270,42 @@ describe('MissGapGame', () => {
 
     await waitFor(() => expect(onFinished).toHaveBeenCalledWith(6, expect.any(Number)));
   });
+
+  it('sends the link class token with the run and the classmates read', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true, streak: { currentStreak: 5 }, players: 4 }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    renderGame({ classToken: 'body.sig' });
+    fireEvent.click(screen.getByTestId('miss-gap-start'));
+    await finishAllRounds();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+
+    const [, postInit] = fetchMock.mock.calls.find(([u]) => String(u).includes('/complete'))!;
+    expect(JSON.parse(postInit.body).classToken).toBe('body.sig');
+    const [progressUrl] = fetchMock.mock.calls.find(([u]) => String(u).includes('/progress'))!;
+    expect(new URL(String(progressUrl), 'https://x').searchParams.get('k')).toBe('body.sig');
+  });
+
+  it('an old link the server will not record says so and still lets the student turn in', async () => {
+    const fetchMock = vi.fn().mockImplementation((url: string) =>
+      Promise.resolve(
+        String(url).includes('/complete')
+          ? { ok: false, status: 403, json: async () => ({ ok: false, code: 'class_link_unsigned' }) }
+          : { ok: true, json: async () => ({ players: 0 }) },
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const onFinished = vi.fn();
+    renderGame({ onFinished });
+    fireEvent.click(screen.getByTestId('miss-gap-start'));
+    await finishAllRounds();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('miss-gap-link-unsigned')).toHaveTextContent('education.homework.linkUnsigned');
+    });
+    expect(screen.queryByTestId('miss-gap-save-failed')).toBeNull();
+    expect(onFinished).toHaveBeenCalledWith(2, expect.any(Number));
+  });
 });
