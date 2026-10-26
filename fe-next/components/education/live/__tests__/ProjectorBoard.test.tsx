@@ -28,3 +28,16 @@ describe('ProjectorBoard', () => {
     expect(screen.getByRole('img', { name: 'Board' })).toBeInTheDocument();
   });
 });
+
+describe('ProjectorBoard sizing', () => {
+  it('given a wall taller than its column is wide, when shown, then the board is a square bounded by both sides of a capped box', () => {
+    render(<ProjectorBoard grid={[['a', 'b'], ['c', 'd']]} label="Board" />);
+    const board = screen.getByTestId('projector-board');
+    const box = board.parentElement as HTMLElement;
+    expect(box.getAttribute('data-testid')).toBe('projector-board-box');
+    expect(box.className).toContain('[container-type:size]');
+    expect(box.className).toMatch(/w-\[58%\]/);
+    expect(board.className).toContain('size-[min(100cqw,100cqh)]');
+    expect(board.className).not.toContain('h-full');
+  });
+});

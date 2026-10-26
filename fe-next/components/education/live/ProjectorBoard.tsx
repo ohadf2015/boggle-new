@@ -16,13 +16,15 @@ function tileText(letter: string): string {
 /** The class board, read-only and sized to its cell, for the projector during a round. */
 export default function ProjectorBoard({ grid, label }: { grid: LetterGrid; label: string }) {
   const cols = grid[0]?.length ?? 0;
+  // A 4:3 wall makes the column taller than it is wide; the square must fit both, and the live panel keeps the rest.
   return (
+    <div data-testid="projector-board-box" className="hidden h-full w-[58%] shrink-0 [container-type:size] md:block">
     <div
       role="img"
       aria-label={label}
       data-testid="projector-board"
       dir="ltr"
-      className="hidden aspect-square h-full md:grid max-h-full shrink-0 gap-[0.5vw] rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light p-[0.7vw] shadow-hard-lg"
+      className="grid size-[min(100cqw,100cqh)] gap-[0.5vw] rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light p-[0.7vw] shadow-hard-lg"
       style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
     >
       {grid.flat().map((letter, i) => (
@@ -34,6 +36,7 @@ export default function ProjectorBoard({ grid, label }: { grid: LetterGrid; labe
           {tileText(letter)}
         </span>
       ))}
+    </div>
     </div>
   );
 }
