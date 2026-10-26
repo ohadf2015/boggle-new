@@ -79,7 +79,7 @@ export const EduProjectorLobby = memo<ProjectorLobbyProps>(function EduProjector
           )}
         </header>
 
-        <div className="min-h-0 md:row-start-2">
+        <div className="md:row-start-2 md:min-h-0">
           <EduJoinCard gameCode={gameCode} language={language} baseUrl={baseUrl} t={t} />
         </div>
 
