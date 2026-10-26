@@ -47,9 +47,7 @@ export async function fetchMpModeBreakdown(days: number = 30): Promise<MpModeBre
     return [];
   }
 
-  const since = new Date();
-  since.setDate(since.getDate() - days);
-  const sinceISO = since.toISOString();
+  const sinceISO = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
   try {
     const { data, error } = await supabase

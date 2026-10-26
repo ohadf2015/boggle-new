@@ -5,10 +5,13 @@
  * PRIVACY GATE. The class key travels inside the homework share link, so anyone
  * holding that link could ask this route for the roster. They don't get one:
  *
- *   anonymous caller → counts only (players, average accuracy, stars, streak).
+ *   anyone else      → counts only (players, average accuracy, stars, streak).
  *                      The student's own completion screen needs exactly this
  *                      much to say "you and 11 classmates are keeping it alive".
- *   teacher          → the named list, for the teacher's assignment card.
+ *   owning teacher   → the named list, for the teacher's assignment card. The
+ *                      key is guessable text, so being a teacher is not enough:
+ *                      the first teacher to open the card claims the key
+ *                      (miss_gap_class_owners) and only that teacher sees names.
  *
  * Names are first names a student typed themselves; no email, no roster row.
  */
@@ -18,13 +21,13 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { MISS_GAP_PROGRESS_RATE_LIMIT } from '@/lib/education/missGapRateLimits';
 import { normalizeDay } from '@/lib/education/classStreakMath';
-import { normalizeMissGapClassKey } from '@/lib/education/missGapClassKey';
+import { normalizeMissGapClassKey, MAX_STUDENTS_PER_ASSIGNMENT } from '@/lib/education/missGapClassKey';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import logger from '@/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
-const MAX_RUNS = 60;
+const MAX_RUNS = MAX_STUDENTS_PER_ASSIGNMENT;
 
 interface RunRow {
   student_name?: string | null;
@@ -69,8 +72,10 @@ export async function GET(request: NextRequest) {
   }
 
   const user = await getAuthedUser(request);
-  // Homework students hold signed-in (often anonymous) sessions too; only a teacher sees names.
-  const showNames = user ? await callerIsTeacher(supabase, user.id) : false;
+  const showNames =
+    user && (await callerIsTeacher(supabase, user.id))
+      ? await callerOwnsClassKey(supabase, user.id, classKey)
+      : false;
 
   const [{ data: runData, error: runError }, { data: streakRow }] = await Promise.all([
     (() => {
@@ -133,6 +138,30 @@ export async function GET(request: NextRequest) {
         }))
       : [],
   });
+}
+
+async function callerOwnsClassKey(
+  supabase: NonNullable<ReturnType<typeof createAdminClient>>,
+  userId: string,
+  classKey: string,
+): Promise<boolean> {
+  const { error: claimError } = await supabase
+    .from('miss_gap_class_owners')
+    .upsert({ class_key: classKey, owner_id: userId }, { onConflict: 'class_key', ignoreDuplicates: true });
+  if (claimError) {
+    logger.error('[miss-gap] progress: owner claim failed', claimError);
+    return false;
+  }
+  const { data, error } = await supabase
+    .from('miss_gap_class_owners')
+    .select('owner_id')
+    .eq('class_key', classKey)
+    .maybeSingle();
+  if (error) {
+    logger.error('[miss-gap] progress: owner read failed', error);
+    return false;
+  }
+  return (data as { owner_id?: string } | null)?.owner_id === userId;
 }
 
 async function callerIsTeacher(

@@ -20871,6 +20871,8 @@ const he = {
       "wheelLabel": "גלגל הכיתה"
     },
     "lobby": {
+      "roomFull": "החדר מלא: {seated} מתוך {max} מקומות תפוסים",
+      "roomFullWatching": "{count} צופים בלי מקום",
       "brand": "כיתה",
       "joinAt": "הצטרפו ב־",
       "joined": "{count} הצטרפו",
@@ -20898,6 +20900,8 @@ const he = {
       "leave": "יציאה"
     },
     "entry": {
+      "roomFullTitle": "החדר מלא: אתם צופים",
+      "roomFullHint": "כל {max} המקומות תפוסים. המורה רואה שאתם מחכים.",
       "connecting": "מתחברים לכיתה…",
       "openingRoom": "פותחים את החדר…",
       "waitingTeacher": "המשחק עוד לא נפתח",
