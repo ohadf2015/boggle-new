@@ -17,6 +17,7 @@ import { registerPushToken, unregisterPushToken } from '@/utils/pushNotification
 import { broadcastSessionRefreshed } from '@/utils/crossTabAuthSync';
 import { captureBackgroundError } from '@/utils/sentry';
 import { triggerWelcomeEmail } from '@/lib/welcome/triggerWelcomeEmail';
+import { triggerExternalIdentityLink } from '@/lib/auth/triggerExternalIdentityLink';
 import logger from '@/utils/logger';
 import {
   isRefreshTokenError,
@@ -150,6 +151,7 @@ export function useAuthInitialization({
         // signup method (OAuth, email/password, magic-link, OTP).
         if (event === 'SIGNED_IN' && session) {
           void triggerWelcomeEmail(session.access_token);
+          void triggerExternalIdentityLink(session);
         }
 
         await handleAuthStateChange(
