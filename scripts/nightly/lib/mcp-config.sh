@@ -7,7 +7,7 @@
 # railway, atlassian, figma, rive, mcp-image, context7, ahrefs, fal-ai, …). Boot is only
 # ~3% of budget (NOT the headline timeout cause — that's data-starved rediscovery, see
 # backfill-tokens.sh) but every unused HTTP/SSE server is latent hang surface. Lanes
-# 04/06/07/08 use zero MCP; data lanes use 1–3. Trim is reversible: on any build
+# 04/07/08 use zero MCP; data lanes use 1–3 (06 reads Growth Radar). Trim is reversible: on any build
 # failure the caller simply omits the flags and gets today's behavior.
 #
 # Tested by test/mcp-config.test.sh.
@@ -21,6 +21,7 @@ _lane_mcp_servers() {
     11|11-mode-qa)    echo "posthog" ;;
     05|05-landing)    echo "posthog mcp-image" ;;
     09|09-monetization) echo "posthog" ;;
+    06|06-seo)        echo "growth-radar" ;;
     *)                echo "" ;;
   esac
 }

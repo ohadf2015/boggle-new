@@ -1,5 +1,5 @@
 #!/bin/bash
-# Lane 6 — SEO/GEO/CTR. Reuses existing seo-daily skill.
+# Lane 6 — SEO/GEO/CTR. Reads search data from the Growth Radar MCP.
 # Sonnet · 15 min cap
 #
 # Budget history: 720s (12 min) was 6/7 (86%) until 2026-05-27 first timeout
@@ -15,8 +15,12 @@ LIB_DIR="$(dirname "$0")/../lib"
 LOG="${RUN_LOG:-/tmp/lane-06.log}"
 PROMPT="$(dirname "$0")/../prompts/06-seo.md"
 
-if [ ! -f "$HOME/.config/gcloud/application_default_credentials.json" ]; then
-  echo "lane-06: gcloud ADC missing — skipping SEO lane" | tee -a "$LOG"
+# Growth Radar is the lane's only data source. It must be a user-scope MCP server in
+# claude.json (claude mcp add --scope user --transport http growth-radar <url>), which
+# lib/mcp-config.sh hands to this lane. No Google or Bing credential is read here.
+CLAUDE_JSON="${CLAUDE_CONFIG_JSON:-$HOME/.claude.json}"
+if ! jq -e '.mcpServers["growth-radar"]' "$CLAUDE_JSON" >/dev/null 2>&1; then
+  echo "lane-06: growth-radar MCP not configured in $CLAUDE_JSON — skipping SEO lane" | tee -a "$LOG"
   exit 0
 fi
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Test for lib/mcp-config.sh. Proves (fixture claude.json, no live anything):
 #   - emits the correct MCP server subset per lane (data lanes get their servers)
-#   - lanes needing none (04/06/07/08) get a valid EMPTY {"mcpServers":{}} → zero boot
+#   - lanes needing none (04/07/08) get a valid EMPTY {"mcpServers":{}} → zero boot
 #   - output is always valid JSON with an mcpServers object
 #   - a requested server absent from claude.json is skipped, not errored
 #   - returns nonzero (caller falls back) when jq/claude.json unavailable for a needy lane
@@ -22,7 +22,8 @@ cat > "$CJ" <<'JSON'
   "posthog":   {"type":"http","url":"https://mcp.posthog.com/mcp"},
   "mcp-image": {"type":"stdio","command":"npx","args":["z"]},
   "vercel":    {"type":"stdio","command":"npx","args":["v"]},
-  "figma":     {"type":"stdio","command":"npx","args":["f"]}
+  "figma":     {"type":"stdio","command":"npx","args":["f"]},
+  "growth-radar": {"type":"http","url":"https://growthradar.app/api/mcp"}
 } }
 JSON
 
@@ -44,8 +45,12 @@ assert "03-engagement selects posthog only" "[ \"\$(jq -c '.mcpServers|keys' '$O
 OUT="$ROOT/05.json"; build_lane_mcp_config "05-landing" "$OUT" "$CJ"
 assert "05-landing includes mcp-image+posthog" "jq -e '.mcpServers|has(\"mcp-image\") and has(\"posthog\")' '$OUT' >/dev/null"
 
-# 06-seo / 07 / 08 / 04 → empty {} (zero MCP boot)
-for L in 04-competitor 06-seo 07-self-learn 08-adsense; do
+# 06-seo → growth-radar only
+OUT="$ROOT/06.json"; build_lane_mcp_config "06-seo" "$OUT" "$CJ"
+assert "06-seo selects growth-radar only" "[ \"\$(jq -c '.mcpServers|keys' '$OUT')\" = '[\"growth-radar\"]' ]"
+
+# 07 / 08 / 04 → empty {} (zero MCP boot)
+for L in 04-competitor 07-self-learn 08-adsense; do
   OUT="$ROOT/$L.json"; build_lane_mcp_config "$L" "$OUT" "$CJ"; rc=$?
   assert "$L → empty mcpServers, rc=0" "[ \$rc -eq 0 ] && [ \"\$(jq -c '.mcpServers' '$OUT')\" = '{}' ]"
 done
@@ -60,7 +65,7 @@ OUT="$ROOT/01c.json"; build_lane_mcp_config "01-triage" "$OUT" "$ROOT/nope.json"
 assert "needy lane + missing claude.json → rc!=0" "[ \$rc -ne 0 ]"
 
 # Empty-needs lane never needs claude.json → still rc=0 even if file missing
-OUT="$ROOT/06b.json"; build_lane_mcp_config "06-seo" "$OUT" "$ROOT/nope.json"; rc=$?
+OUT="$ROOT/07b.json"; build_lane_mcp_config "07-self-learn" "$OUT" "$ROOT/nope.json"; rc=$?
 assert "empty lane + missing claude.json → rc=0, {}" "[ \$rc -eq 0 ] && [ \"\$(jq -c '.mcpServers' '$OUT')\" = '{}' ]"
 
 echo; echo "  mcp-config: $PASS passed, $FAIL failed"
