@@ -5,9 +5,10 @@
  * used for PDF report generation in the teacher dashboard.
  */
 
-import { supabase } from '@/lib/supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { supabase as browserSupabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import { fetchStudentInsights } from '@/lib/education/studentInsightsClient';
+import { fetchStudentInsights, type StudentInsightsFetch } from '@/lib/education/studentInsightsClient';
 import { percent, summarizeStudentWords, tallyStudentWords, wordKey } from '@/lib/education/wordTally';
 import type {
   WordsAttemptedRecord,
@@ -42,8 +43,10 @@ export async function getStudentReportData(
   studentId: string,
   classroomId: string,
   dateRange?: DateRange,
-  fetcher: typeof fetch = fetch
+  fetcher: typeof fetch = fetch,
+  deps: { sb?: SupabaseClient | null; insights?: () => Promise<StudentInsightsFetch> } = {}
 ): Promise<{ data: StudentReportData | null; error: { message: string } | null }> {
+  const supabase = deps.sb ?? browserSupabase;
   if (!supabase) {
     return { data: null, error: { message: 'Supabase not configured' } };
   }
@@ -53,7 +56,7 @@ export async function getStudentReportData(
       supabase.from('public_profiles').select('id, display_name, avatar_config').eq('id', studentId).single(),
       supabase.from('classrooms').select('id, name').eq('id', classroomId).single(),
       supabase.from('student_lesson_progress').select('*').eq('student_id', studentId),
-      fetchStudentInsights(classroomId, studentId, fetcher),
+      deps.insights ? deps.insights() : fetchStudentInsights(classroomId, studentId, fetcher),
     ]);
     const { data: student, error: studentError } = studentResult;
     const { data: classroom, error: classroomError } = classroomResult;
@@ -141,7 +144,8 @@ export async function getStudentReportData(
  */
 export async function getClassReportData(
   classroomId: string,
-  dateRange?: DateRange
+  dateRange?: DateRange,
+  supabase: SupabaseClient | null = browserSupabase
 ): Promise<{ data: ClassReportData | null; error: { message: string } | null }> {
   if (!supabase) {
     return { data: null, error: { message: 'Supabase not configured' } };
@@ -327,6 +331,7 @@ export async function getVocabularyHeatmapData(
   classroomId: string,
   lessonId?: string
 ): Promise<{ data: VocabularyHeatmapData; error: { message: string } | null }> {
+  const supabase = browserSupabase;
   const emptyData = { students: [], words: [], cells: [] };
 
   if (!supabase) {

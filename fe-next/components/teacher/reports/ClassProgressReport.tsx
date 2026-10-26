@@ -11,7 +11,8 @@
 import { useCallback } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getClassReportData, DateRange } from '@/lib/supabase/analytics';
+import type { DateRange } from '@/lib/supabase/analytics';
+import { fetchClassReport } from '@/lib/education/reportsClient';
 import { Stat } from '@/components/ui/Stat';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
@@ -40,7 +41,7 @@ const PODIUM = ['bg-neo-lime', 'bg-neo-cyan', 'bg-neo-pink'];
 export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: ClassProgressReportProps) {
   const { t, language, dir } = useLanguage();
 
-  const load = useCallback(() => getClassReportData(classroomId, dateRange), [classroomId, dateRange]);
+  const load = useCallback(() => fetchClassReport(classroomId, dateRange), [classroomId, dateRange]);
   const { data, loading, failed, retry } = useReportData(load);
 
   const build = useCallback(async () => {

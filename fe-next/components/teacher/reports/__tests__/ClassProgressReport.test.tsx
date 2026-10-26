@@ -9,12 +9,13 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ClassProgressReport } from '../ClassProgressReport';
-import { getClassReportData, ClassReportData } from '@/lib/supabase/analytics';
+import type { ClassReportData } from '@/lib/supabase/analytics';
+import { fetchClassReport } from '@/lib/education/reportsClient';
 import type { MockedFunction } from 'vitest';
 
 // Mock data fetching
-vi.mock('@/lib/supabase/analytics', () => ({
-  getClassReportData: vi.fn(),
+vi.mock('@/lib/education/reportsClient', () => ({
+  fetchClassReport: vi.fn(),
 }));
 
 // Mock react-pdf/renderer
@@ -121,8 +122,8 @@ const mockClassData: ClassReportData = {
 };
 
 describe('ClassProgressReport', () => {
-  const mockGetClassReportData = getClassReportData as MockedFunction<
-    typeof getClassReportData
+  const mockGetClassReportData = fetchClassReport as MockedFunction<
+    typeof fetchClassReport
   >;
 
   beforeEach(() => {
@@ -377,7 +378,7 @@ describe('ClassProgressReport', () => {
   });
 
   describe('Props', () => {
-    it('calls getClassReportData with correct parameters', async () => {
+    it('calls fetchClassReport with correct parameters', async () => {
       render(<ClassProgressReport classroomId="classroom-456" />);
 
       await waitFor(() => {
@@ -388,7 +389,7 @@ describe('ClassProgressReport', () => {
       });
     });
 
-    it('passes date range to getClassReportData', async () => {
+    it('passes date range to fetchClassReport', async () => {
       const dateRange = {
         start: new Date('2024-01-01'),
         end: new Date('2024-01-31'),

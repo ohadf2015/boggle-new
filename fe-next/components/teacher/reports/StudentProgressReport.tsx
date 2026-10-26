@@ -9,7 +9,8 @@
 
 import { useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getStudentReportData, DateRange } from '@/lib/supabase/analytics';
+import type { DateRange } from '@/lib/supabase/analytics';
+import { fetchStudentReport } from '@/lib/education/reportsClient';
 import { Stat } from '@/components/ui/Stat';
 import { cn } from '@/lib/utils';
 import { downloadReportPdf } from './downloadReportPdf';
@@ -36,7 +37,7 @@ export function StudentProgressReport({ studentId, classroomId, dateRange }: Stu
   const { t, language, dir } = useLanguage();
 
   const load = useCallback(
-    () => getStudentReportData(studentId, classroomId, dateRange),
+    () => fetchStudentReport(studentId, classroomId, dateRange),
     [studentId, classroomId, dateRange]
   );
   const { data, loading, failed, retry } = useReportData(load);

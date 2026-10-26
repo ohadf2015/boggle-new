@@ -18,7 +18,7 @@ describe('every Pro feature we sell is refused to a free teacher on the server',
 
   it('backs the reports page actions a free teacher could otherwise reach: export, grade passback, parent links', () => {
     expect(Object.keys(PRO_FEATURE_BACKING)).toEqual(
-      expect.arrayContaining(['reports', 'gradePassback', 'parentReport', 'parentLinks']),
+      expect.arrayContaining(['reports', 'reportsData', 'gradePassback', 'parentReport', 'parentLinks']),
     );
   });
 
