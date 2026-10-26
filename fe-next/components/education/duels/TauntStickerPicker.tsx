@@ -12,6 +12,7 @@
  * shows which one went out.
  */
 
+import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DUEL_TAUNTS, type DuelTauntId } from '@/lib/education/duelTaunts';
 import { cn } from '@/lib/utils';
@@ -59,7 +60,7 @@ export function TauntStickerPicker({
                 // name is read against this fill — and a label on an accent
                 // fill is black (cream on orange measures 2.3:1). The width is
                 // arbitrary so cn() cannot collapse it into the colour class.
-                'flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-[2px] border-neo-black text-neo-black shadow-hard-sm transition-all duration-100',
+                'flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-[2px] border-neo-black text-neo-black shadow-hard-sm transition duration-100',
                 taunt.accentClass,
                 isSelected && 'ring-4 ring-neo-yellow',
                 locked && !isSelected && 'opacity-40',
@@ -67,7 +68,8 @@ export function TauntStickerPicker({
                   'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed'
               )}
             >
-              <img
+              <Image
+                unoptimized
                 data-testid="duel-taunt-image"
                 src={taunt.src}
                 alt=""
