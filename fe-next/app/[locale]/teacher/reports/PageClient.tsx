@@ -364,16 +364,24 @@ export default function TeacherReportsPage({ gradePassbackEnabled = false }: { g
   return (
     <ReportsShell>
       <TeacherGate>
-        <ProGate
-          feature="reports"
-          ctaKey="teacher.proGate.reports.cta"
-          whileChecking={<ReportsChecking />}
-          lockedTitle={<ReportsLockedTitle />}
-        >
+        <ReportsProGate>
           <TeacherReportsInner gradePassbackEnabled={gradePassbackEnabled} />
-        </ProGate>
+        </ReportsProGate>
       </TeacherGate>
     </ReportsShell>
+  );
+}
+
+export function ReportsProGate({ children }: { children: React.ReactNode }) {
+  return (
+    <ProGate
+      feature="reports"
+      ctaKey="teacher.proGate.reports.cta"
+      whileChecking={<ReportsChecking />}
+      lockedTitle={<ReportsLockedTitle />}
+    >
+      {children}
+    </ProGate>
   );
 }
 
