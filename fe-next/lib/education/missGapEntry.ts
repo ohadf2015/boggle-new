@@ -128,7 +128,7 @@ export function resolveMissGapEntry(
   const dueDate = teacherMode ? requestedDue : requestedDue || defaultMissGapDueDate();
 
   return {
-    payload: toMissGapAssignmentPayload({ ...base, dueDate, definitions }),
+    payload: toMissGapAssignmentPayload({ ...base, dueDate, definitions, classToken: sp.get('k') }),
     teacherMode,
   };
 }

@@ -59,7 +59,7 @@ vi.mock('@/utils/supabase/admin', () => ({
 import { NextRequest } from 'next/server';
 import { POST } from '../complete/route';
 import { GET } from '../progress/route';
-import { BODY, makeClient, resetState, state } from './missGapHarness';
+import { BODY, makeClient, resetState, state, restoreSecret } from './missGapHarness';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -73,6 +73,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers();
+  restoreSecret();
 });
 
 describe('POST /api/education/miss-gap/complete', () => {
