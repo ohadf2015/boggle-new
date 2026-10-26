@@ -91,6 +91,16 @@ describe('EduProjectorLobby', () => {
     expect(screen.getByTestId('edu-projector-lobby').className).toMatch(/md:overflow-y-auto/);
   });
 
+  it('given a phone viewport, when the join card renders, then its wrapper keeps its content height so the roster card cannot slide over the QR', () => {
+    render(<EduProjectorLobby {...base} students={[{ username: 'Noa' }]} />);
+    const wrapper = screen.getByTestId('edu-join-card').parentElement as HTMLElement;
+    // A bare `min-h-0` lets the single-column (mobile) grid squeeze this auto row to ~0, and the
+    // roster card below then paints over the code + QR. Only the desktop grid may opt out.
+    const classes = wrapper.className.split(/\s+/);
+    expect(classes).not.toContain('min-h-0');
+    expect(classes).toContain('md:min-h-0');
+  });
+
   it('given a room starting, when Start is pending, then it shows a loading state and cannot double-fire', () => {
     render(<EduProjectorLobby {...base} students={[{ username: 'Noa' }]} starting />);
     const start = screen.getByTestId('edu-lobby-start');
