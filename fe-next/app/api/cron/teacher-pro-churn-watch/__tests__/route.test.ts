@@ -44,8 +44,7 @@ vi.mock('@/backend/redis/locking', () => ({
   }),
 }));
 vi.mock('@/backend/redis/connection', () => ({
-  isRedisAvailable: () => true,
-  getRedisClient: () => ({
+  getSharedRedisClient: () => ({
     get: async () => h.redisRaw,
     set: h.redisSet,
   }),

@@ -20000,6 +20000,8 @@ const en = {
       "wheelLabel": "Class wheel"
     },
     "lobby": {
+      "roomFull": "Room full: {seated} of {max} seated",
+      "roomFullWatching": "{count} watching without a seat",
       "brand": "Class",
       "joinAt": "Join at",
       "joined": "{count} joined",
@@ -20027,6 +20029,8 @@ const en = {
       "leave": "Leave"
     },
     "entry": {
+      "roomFullTitle": "The room is full: you are watching",
+      "roomFullHint": "All {max} seats are taken. Your teacher can see you are waiting.",
       "connecting": "Connecting to your class…",
       "openingRoom": "Opening your room…",
       "waitingTeacher": "Your teacher hasn't opened the game yet",

@@ -36,6 +36,15 @@ export const MISS_GAP_COMPLETE_RATE_LIMIT = {
 } as const;
 
 /**
+ * Per device on top of the class budget. A device key is one phone, so even
+ * the abuse-block threshold (×2) is far above one student's replays.
+ */
+export const MISS_GAP_COMPLETE_PER_STUDENT_LIMIT = {
+  windowMs: 60_000,
+  maxRequests: 10,
+} as const;
+
+/**
  * GET /api/education/miss-gap/progress — every finish screen reads the roster
  * once, on top of the teacher's own card, so it needs at least the completion
  * budget.
