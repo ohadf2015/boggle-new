@@ -120,9 +120,14 @@ export class PolarClient {
 
   /**
    * Create a checkout session for a product. Returns the URL to redirect the
-   * user to. `external_customer_id` + `metadata.user_id` both carry our user
-   * id; Polar copies checkout metadata onto the resulting subscription, which
-   * is how the webhook maps events back to a teacher.
+   * user to. `external_customer_id` + `metadata.user_id`/`metadata.teacher_id`
+   * both carry our user id; Polar copies checkout metadata onto the resulting
+   * subscription, which is how the webhook maps events back to a teacher.
+   *
+   * `email`/`name` prefill the hosted checkout so a signed-in teacher lands on
+   * a one-screen page (card only). Both are best-effort: a Polar 422 about
+   * either prefill field retries once WITHOUT prefill, so an odd address or
+   * name never stands between a teacher and the till.
    *
    * `allowTrial` defaults off. A paid checkout must send `allow_trial: false`
    * so it does not inherit a product-level Polar trial. The trial path sends
@@ -132,6 +137,7 @@ export class PolarClient {
     userId,
     productId,
     email,
+    name,
     redirectUrl,
     locale,
     allowTrial = false,
@@ -140,6 +146,8 @@ export class PolarClient {
     userId: string
     productId: string
     email?: string
+    /** Teacher's display name, prefilled on the hosted checkout. */
+    name?: string
     redirectUrl?: string
     /** Locale prefix for the fallback success_url (validated by callers). */
     locale?: string
@@ -161,26 +169,35 @@ export class PolarClient {
       success_url:
         redirectUrl || `${process.env.NEXT_PUBLIC_APP_URL}/${successLocale}/teacher?checkout=success`,
       external_customer_id: userId,
-      metadata: { user_id: userId, trial, locale: successLocale, ...(trial ? { trial_days: trialLength } : {}) },
+      metadata: { user_id: userId, teacher_id: userId, trial, locale: successLocale, ...(trial ? { trial_days: trialLength } : {}) },
       // Paid path must not inherit a trial configured on the Polar product.
       allow_trial: trial,
       ...(trial
         ? { trial_interval: 'day', trial_interval_count: trialLength }
         : {}),
     }
-    const post = (customerEmail?: string) =>
+    const post = (prefill?: { email?: string; name?: string }) =>
       this.request<{ url: string }>('/v1/checkouts/', {
         method: 'POST',
-        body: JSON.stringify({ ...payload, ...(customerEmail ? { customer_email: customerEmail } : {}) }),
+        body: JSON.stringify({
+          ...payload,
+          ...(prefill?.email ? { customer_email: prefill.email } : {}),
+          ...(prefill?.name ? { customer_name: prefill.name } : {}),
+        }),
       })
 
     let response: { url: string }
     try {
-      response = await post(email)
+      response = await post({ email, name })
     } catch (err) {
-      // Polar 422s an email whose domain does not resolve; the email is only a prefill, so a
-      // teacher with such an address must still reach checkout.
-      if (!email || !(err instanceof PolarApiError) || err.status !== 422 || !err.body.includes('customer_email')) throw err
+      // Polar 422s an email whose domain does not resolve (and can reject a
+      // prefill field it doesn't know after an API change); the prefill is
+      // only a convenience, so such a teacher must still reach checkout.
+      const prefillRejected =
+        err instanceof PolarApiError &&
+        err.status === 422 &&
+        (err.body.includes('customer_email') || err.body.includes('customer_name'))
+      if ((!email && !name) || !prefillRejected) throw err
       response = await post()
     }
 

@@ -30,6 +30,7 @@ import { UpgradeFaq } from '@/components/teacher/pro/UpgradeFaq';
 import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
 import { ProPlanPanel, PlanCardsSkeleton } from '@/components/teacher/pro/ProPlanPanel';
 import { UpgradeYourClasses } from '@/components/teacher/pro/UpgradeYourClasses';
+import { PreCheckoutExplainer } from '@/components/teacher/pro/PreCheckoutExplainer';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 
@@ -82,7 +83,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   }, [showTrial, viewer]);
 
   const blockedInApp = useCheckoutBlockedInApp();
-  const { pending, handleUpgrade, showAuthModal, setShowAuthModal } = useUpgradeCheckout({
+  const { pending, handleUpgrade, showAuthModal, setShowAuthModal, explainerFor, confirmExplainer, dismissExplainer } = useUpgradeCheckout({
     t, language, user, authLoading, proLoading, known, hasPro, offerTrial,
   });
   // Signed in and waiting on the entitlement: a skeleton, not a trial offer that flips away.
@@ -303,6 +304,17 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
         )}
         {legalFooter}
       </div>
+
+      {/* CTA → explainer → Polar: the one screen that answers "what do I get,
+          what does it cost, can I cancel" before the hosted checkout ask. */}
+      {explainerFor && (
+        <PreCheckoutExplainer
+          mode={explainerFor}
+          pending={pending !== null}
+          onConfirm={confirmExplainer}
+          onBack={dismissExplainer}
+        />
+      )}
 
       {/* onAuthSuccess re-reads the entitlement; the resume effect above then decides. */}
       {showAuthModal && (

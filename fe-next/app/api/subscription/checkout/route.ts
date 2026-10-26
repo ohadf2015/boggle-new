@@ -27,19 +27,26 @@ async function accessTrialEnd(userId: string): Promise<string | null> {
   }
 }
 
-/** profiles.is_test_account, or null when unknown. Never throws, never slow. */
-async function profileIsTestAccount(userId: string): Promise<boolean | null> {
+/**
+ * profiles.is_test_account + the display name used to prefill the hosted
+ * checkout (one row read, so checkout stays one DB hit). Either field is null
+ * when unknown. Never throws, never slow.
+ */
+async function profileCheckoutFields(userId: string): Promise<{ isTest: boolean | null; displayName: string | null }> {
   const admin = createAdminClient();
-  if (!admin) return null;
+  if (!admin) return { isTest: null, displayName: null };
   try {
     const { data } = await withTimeout(
-      Promise.resolve(admin.from('profiles').select('is_test_account').eq('id', userId).maybeSingle()),
+      Promise.resolve(admin.from('profiles').select('is_test_account, display_name').eq('id', userId).maybeSingle()),
       TEST_FLAG_LOOKUP_TIMEOUT_MS,
     );
-    const flag = (data as { is_test_account?: boolean | null } | null)?.is_test_account;
-    return typeof flag === 'boolean' ? flag : null;
+    const row = data as { is_test_account?: boolean | null; display_name?: string | null } | null;
+    return {
+      isTest: typeof row?.is_test_account === 'boolean' ? row.is_test_account : null,
+      displayName: typeof row?.display_name === 'string' && row.display_name.trim() ? row.display_name.trim() : null,
+    };
   } catch {
-    return null;
+    return { isTest: null, displayName: null };
   }
 }
 
@@ -170,11 +177,15 @@ export async function POST(request: NextRequest) {
     const trialPlan = body.trial ? polarTrialPlan(await accessTrialEnd(user.id), Date.now()) : null;
     const trial = body.trial && trialPlan !== null && trialPlan.days > 0 && !(await polarTrialBlocked(user.id));
     const locale = resolveCheckoutLocale(body.locale, request.headers.get('cookie'));
+    // Prefill + QA-tag lookup share the one profiles row read; it sits before
+    // checkout creation so the hosted page opens with name/email filled in.
+    const profile = await profileCheckoutFields(user.id);
     const client = getPolarClient();
     const checkoutUrl = await client.createCheckout({
       userId: user.id,
       productId: getProProductId(),
       email: user.email ?? undefined,
+      name: profile.displayName ?? undefined,
       allowTrial: trial,
       trialDays: trial ? trialPlan?.days : undefined,
       locale,
@@ -203,7 +214,7 @@ export async function POST(request: NextRequest) {
       tags = buildCheckoutTrafficTags({
         trial,
         email: user.email ?? null,
-        profileIsTest: await profileIsTestAccount(user.id),
+        profileIsTest: profile.isTest,
         headers: request.headers,
       });
     } catch {
