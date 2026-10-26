@@ -20,6 +20,12 @@ vi.mock('@/lib/apiRateLimit', () => ({
 const mockClaimOnce = vi.fn();
 vi.mock('@/lib/server/claimOnce', () => ({ claimOnce: (...args) => mockClaimOnce(...args) }));
 
+const mockReserveDailyXp = vi.fn();
+vi.mock('@/lib/education/recordXpDailyCeiling', async (importOriginal) => ({
+  ...(await importOriginal()),
+  reserveDailyXp: (...args) => mockReserveDailyXp(...args),
+}));
+
 vi.mock('@/utils/sentry', () => ({
   captureApiError: vi.fn(),
 }));
@@ -60,6 +66,7 @@ beforeEach(() => {
     error: null,
   });
   mockClaimOnce.mockResolvedValue('claimed');
+  mockReserveDailyXp.mockImplementation(async (_u, _d, xp) => xp);
 });
 
 describe('POST /api/education/record-xp', () => {
@@ -122,6 +129,43 @@ describe('POST /api/education/record-xp', () => {
   it('rejects a daily_challenge that is not the chest', async () => {
     const result = await POST(makeRequest({ ...chest, lessonId: 'lesson-123' }));
     expect(result.status).toBe(400);
+  });
+
+  it('caps connections XP per student per day (20 best-case solves)', async () => {
+    await POST(makeRequest(connections));
+    expect(mockReserveDailyXp).toHaveBeenCalledWith(
+      'student-456',
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+      20,
+      53 * 20,
+    );
+  });
+
+  it('grants only what is left of the daily connections budget', async () => {
+    mockReserveDailyXp.mockResolvedValue(7);
+    const result = await POST(makeRequest(connections));
+    expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', { p_player_id: 'student-456', p_xp_amount: 7 });
+    expect(result.data).toMatchObject({ success: true, xpEarned: 7 });
+  });
+
+  it('once the daily budget is spent, answers 200 with zero and never calls the RPC', async () => {
+    mockReserveDailyXp.mockResolvedValue(0);
+    const result = await POST(makeRequest(connections));
+    expect(result.status).toBe(200);
+    expect(result.data).toMatchObject({ success: true, xpEarned: 0, dailyCapReached: true });
+    expect(mockRpc).not.toHaveBeenCalled();
+  });
+
+  it('withholds connections XP when the daily ledger is down', async () => {
+    mockReserveDailyXp.mockResolvedValue('unavailable');
+    const result = await POST(makeRequest(connections));
+    expect(result.status).toBe(503);
+    expect(mockRpc).not.toHaveBeenCalled();
+  });
+
+  it('the fixed daily chest does not spend the connections budget', async () => {
+    await POST(makeRequest(chest));
+    expect(mockReserveDailyXp).not.toHaveBeenCalled();
   });
 
   it('returns 500 when RPC fails', async () => {

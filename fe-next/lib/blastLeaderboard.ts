@@ -10,7 +10,7 @@
  *
  * All functions are fire-and-forget: Redis downtime never throws.
  */
-import { getRedisClient } from '@/backend/redis/connection';
+import { getSharedRedisClient } from '@/backend/redis/connection';
 
 const TTL_SECONDS = 14 * 24 * 60 * 60; // 14 days
 
@@ -52,7 +52,7 @@ export async function addToWeeklyLeaderboard(
   difficulty: string,
   date: Date = new Date(),
 ): Promise<void> {
-  const client = getRedisClient();
+  const client = getSharedRedisClient();
   if (!client) return;
 
   const key = getWeekKey(lang, difficulty, date);
@@ -80,7 +80,7 @@ export async function getLeaderboardPercentile(
   difficulty: string,
   date: Date = new Date(),
 ): Promise<number | null> {
-  const client = getRedisClient();
+  const client = getSharedRedisClient();
   if (!client) return null;
 
   const key = getWeekKey(lang, difficulty, date);
