@@ -1,11 +1,11 @@
 /**
- * Paging for the Classes tab: the page never scrolls, so a teacher with more
- * classes than fit pages through them instead of scrolling a long column.
+ * Sizing for the Classes carousel: the page never scrolls vertically, so a
+ * teacher with more classes than fit swipes through them sideways.
  */
 
 /**
- * The media queries the Classes grid pages by. They MUST match the grid's
- * column classes (`sm:grid-cols-2 xl:grid-cols-3`). Three-up waits for xl:
+ * The media queries the Classes carousel sizes by. They MUST match the carousel's
+ * per-view widths (2 from sm, 3 from xl). Three-up waits for xl:
  * the education sidebar is 240px wide from lg, so a 1024px screen leaves a
  * ~720px column and three cards there crushed to ~220px each.
  */
@@ -16,7 +16,7 @@ export const CLASS_GRID_QUERIES = {
   short: '(orientation: landscape) and (max-height: 500px)',
 } as const;
 
-/** Classes per page for the viewport: phone 1, tablet 2, desktop row 3, sideways phone 1. */
+/** Classes in view for the viewport: phone 1, tablet 2, desktop row 3, sideways phone 1. */
 export function classPageSize(bp: { sm: boolean; lg: boolean; short?: boolean }): number {
   if (bp.short) return 1;
   if (bp.lg) return 3;
@@ -24,20 +24,20 @@ export function classPageSize(bp: { sm: boolean; lg: boolean; short?: boolean })
   return 1;
 }
 
-/** One page of `items`, with the page clamped into range (a class may have been deleted). */
-export function pageSlice<T>(
-  items: readonly T[],
-  page: number,
-  size: number,
-): { items: T[]; page: number; pages: number } {
-  const per = Math.max(1, size);
-  const pages = Math.max(1, Math.ceil(items.length / per));
-  const clamped = Math.min(Math.max(0, page), pages - 1);
-  return { items: items.slice(clamped * per, clamped * per + per), page: clamped, pages };
+/** How many snap stops the carousel has: one per screenful of cards. */
+export function carouselPages(count: number, perView: number): number {
+  return Math.max(1, Math.ceil(count / Math.max(1, perView)));
 }
 
-/** The page that holds item `index` (e.g. a class the teacher just created). */
-export function pageOf(index: number, size: number): number {
-  if (index < 0) return 0;
-  return Math.floor(index / Math.max(1, size));
+/**
+ * The page the scroller is on. `firstIndex` is the card nearest the start
+ * edge. A scroller clamped at its end can leave that card mid-page (5 cards,
+ * 2 per view: card 3 is the furthest it gets), so the end always means the
+ * last page.
+ */
+export function carouselPage(o: { firstIndex: number; atEnd: boolean; perView: number; count: number }): number {
+  const pages = carouselPages(o.count, o.perView);
+  if (o.atEnd) return pages - 1;
+  const page = Math.round(o.firstIndex / Math.max(1, o.perView));
+  return Math.min(Math.max(0, page), pages - 1);
 }
