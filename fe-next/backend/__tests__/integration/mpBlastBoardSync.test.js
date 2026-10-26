@@ -7,6 +7,8 @@
 import { vi, describe, it, expect, beforeAll, beforeEach, afterEach } from 'vitest';
 import { createTestEnvironment } from '../helpers/socketTestHelper';
 import { getCachedTrie, getTrieNode } from '../../modules/boggleSolver';
+import { isProfane } from '../../utils/profanityFilter.js';
+import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 
 vi.mock('../../modules/classroomGameManager', async (importOriginal) => ({
   ...(await importOriginal()),
@@ -118,7 +120,12 @@ function findWordWithPath(grid, exclude = new Set()) {
     const node = getTrieNode(trie, word);
     if (!node) return;
     const next = [...path, { row: r, col: c }];
-    if (word.length >= 3 && node.isWord && !exclude.has(word)) { found = { word, path: next }; return; }
+    // The server rejects profane / weird-shaped words before dictionary
+    // scoring; a random board's first DFS word can trip those filters
+    // (observed as a wordRejected instead of blastBoardUpdate on master CI),
+    // so skip candidates the handler would reject.
+    if (word.length >= 3 && node.isWord && !exclude.has(word)
+        && !isProfane(word) && !isWordShapeWeird(word, 'en').weird) { found = { word, path: next }; return; }
     seen.add(`${r},${c}`);
     for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
       const nr = r + dr; const nc = c + dc;
