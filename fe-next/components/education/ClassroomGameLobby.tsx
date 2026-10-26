@@ -37,6 +37,7 @@ import { availableFocuses } from '@/lib/education/vocabFocus';
 import { ClassroomLobbyShell } from './lobby/ClassroomLobbyShell';
 import { ClassroomModeCardRow, ClassroomModeCatalogue } from './ClassroomModeCatalogue';
 import { LobbySetupPanel } from './lobby/LobbySetupPanel';
+import { ModeSuggestion } from './lobby/ModeSuggestion';
 import { playableLessonWords } from '@/lib/education/lessonPickerModel';
 import { wordcraftPlayable } from './lobby/wordcraftPlayable';
 import { LobbyRoundSettings } from './lobby/LobbyRoundSettings';
@@ -387,12 +388,12 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           onPick={pickMode}
           onGoLive={() => startGame(gameMode, vocabQuizVariant, classroomBossId)}
           withCardRow={false}
-          isModeBlocked={(id) => (id === VOCAB_QUIZ_MODE && !quizPlayable) || (id === 'wordcraft' && !wordcraftOk)}
         />
         </div>
       }
     >
       {/* In the scroller, not pinned: a tall poster (Boss Battle) left the scroller 4px and options out of reach. */}
+      <ModeSuggestion selected={pickedId} isBlocked={(id) => (id === VOCAB_QUIZ_MODE && !quizPlayable) || (id === 'wordcraft' && !wordcraftOk)} onPick={pickMode} t={t as (key: string, params?: Record<string, string | number>) => string} />
       <ClassroomModeCardRow
         selected={pickedId}
         recommended={recommended}

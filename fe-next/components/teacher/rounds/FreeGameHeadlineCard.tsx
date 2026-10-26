@@ -16,9 +16,10 @@ export function FreeGameHeadlineCard({ classroomId }: { classroomId: string }) {
   const { t, language } = useLanguage();
   const entitlement = useTeacherPro();
   const [nowMs] = useState(() => Date.now());
-  const { games, isLoading } = useRecentClassroomGames({ classroomId, limit: 5 });
+  const pro = hasProAccess(entitlement, nowMs);
+  const { games, isLoading } = useRecentClassroomGames({ classroomId: entitlement.loading || pro ? '' : classroomId, limit: 5 });
 
-  if (entitlement.loading || hasProAccess(entitlement, nowMs) || isLoading) return null;
+  if (entitlement.loading || pro || isLoading) return null;
   const headline = freeGameHeadline(games);
   if (!headline) return null;
 

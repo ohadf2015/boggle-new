@@ -20,7 +20,6 @@ import {
 } from './ClassroomModeCatalogueData';
 import { teacherGameMode } from '@/lib/education/gameModes';
 import { DeliveryTag } from './DeliveryTag';
-import { ModeSuggestion } from './lobby/ModeSuggestion';
 
 export interface ClassroomModeCatalogueProps {
   selected: CatalogueMode['id'];
@@ -36,8 +35,6 @@ export interface ClassroomModeCatalogueProps {
   onGoLive: () => void;
   /** False when the host lays the card row out itself, e.g. inside its scroll region. */
   withCardRow?: boolean;
-  /** Set by the host lobby: modes it would grey out, so the "try something new" chip never offers one. */
-  isModeBlocked?: (id: CatalogueMode['id']) => boolean;
 }
 
 export function ClassroomModeCatalogue({
@@ -51,7 +48,6 @@ export function ClassroomModeCatalogue({
   onPick,
   onGoLive,
   withCardRow = true,
-  isModeBlocked,
 }: ClassroomModeCatalogueProps) {
   const { t, language, dir } = useLanguage();
   const tt = t as (key: string, params?: Record<string, string | number>) => string;
@@ -70,8 +66,6 @@ export function ClassroomModeCatalogue({
         onGoLive={onGoLive}
         t={tt}
       />
-
-      {isModeBlocked && <ModeSuggestion selected={live.id} isBlocked={isModeBlocked} onPick={onPick} t={tt} />}
 
       {withCardRow && (
         <ClassroomModeCardRow
