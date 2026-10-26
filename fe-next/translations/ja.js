@@ -14225,6 +14225,11 @@ const ja = {
       "missed": "未発見",
       "lessonWords": "レッスン単語",
       "practiceCta": "これらの単語を練習する",
+      "freeHeadlineTitle": "前回のクラスゲーム",
+      "classAverage": "クラス平均スコア",
+      "topMissed": "よく間違えた単語",
+      "proLine": "生徒一人ひとりと毎週の記録を見る",
+      "proBadge": "Pro",
       "mode": {
         "classic": "クラシック",
         "blast": "ブラスト",

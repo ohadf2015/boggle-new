@@ -14513,6 +14513,11 @@ const sv = {
       "missed": "Missade",
       "lessonWords": "Lektionsord",
       "practiceCta": "Öva på de här orden",
+      "freeHeadlineTitle": "Ditt senaste klasspel",
+      "classAverage": "Klassens snittpoäng",
+      "topMissed": "Mest missade ord",
+      "proLine": "Se varje elev och varje vecka",
+      "proBadge": "Pro",
       "mode": {
         "classic": "Klassiskt",
         "blast": "Blast",

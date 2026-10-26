@@ -1,4 +1,5 @@
 import type { RecentClassroomGame } from '@/lib/supabase/analyticsLastGame';
+import { missedThisRound } from '@/lib/education/freeGameHeadline';
 
 const MODE_KEYS: Record<string, string> = {
   classic: 'teacher.lastGame.mode.classic',
@@ -50,7 +51,7 @@ export function sortRoundRows(rows: RoundReportRow[], key: RoundSortKey): RoundR
 
 export function buildRoundReport(game: RecentClassroomGame): RoundReport {
   const words = game.missedWords.map((w) => w.word);
-  const practiceWords = game.missedWords.filter((w) => w.missedBy > 0).map((w) => w.word);
+  const practiceWords = missedThisRound(game).map((w) => w.word);
 
   const rows: RoundReportRow[] = game.players.map((p) => {
     const found = new Set(p.lessonWordsFound);

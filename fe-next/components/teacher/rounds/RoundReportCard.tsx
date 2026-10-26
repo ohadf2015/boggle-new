@@ -5,6 +5,7 @@ import { AlertTriangle, Printer, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { RecentClassroomGame } from '@/lib/supabase/analyticsLastGame';
 import { buildClassReportGrid } from '@/lib/education/classReport';
+import { missedThisRound } from '@/lib/education/freeGameHeadline';
 import { MissedPracticeAction } from '@/components/teacher/reports/MissedPracticeAction';
 import { WordStudentGrid } from '@/components/teacher/report/WordStudentGrid';
 import { cn } from '@/lib/utils';
@@ -43,7 +44,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
   const report = buildRoundReport(game);
   const grid = useMemo(() => buildClassReportGrid({ ...game, absentStudents: [] }), [game]);
   const when = new Date(game.playedAt).toLocaleString(language, { weekday: 'short', hour: 'numeric', minute: '2-digit' });
-  const missed = game.missedWords.filter((w) => w.missedBy > 0).slice(0, MISSED_SHOWN);
+  const missed = missedThisRound(game).slice(0, MISSED_SHOWN);
   const namesById = new Map(report.rows.map((r) => [r.studentId, r.name]));
 
   return (

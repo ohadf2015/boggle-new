@@ -12601,6 +12601,11 @@ const en = {
       "missed": "Missed",
       "lessonWords": "Lesson words",
       "practiceCta": "Practice these words",
+      "freeHeadlineTitle": "Your last class game",
+      "classAverage": "Class average score",
+      "topMissed": "Most missed words",
+      "proLine": "See every student and every week",
+      "proBadge": "Pro",
       "mode": {
         "classic": "Classic",
         "blast": "Blast",

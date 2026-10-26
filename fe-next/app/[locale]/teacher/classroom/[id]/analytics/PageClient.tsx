@@ -21,6 +21,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useRealtimeClassroomProgress } from '@/hooks/useRealtimeClassroomProgress';
 import { AnalyticsDashboard } from '@/components/teacher/analytics/AnalyticsDashboard';
 import { ProGate } from '@/components/teacher/ProGate';
+import { FreeGameHeadlineCard } from '@/components/teacher/rounds/FreeGameHeadlineCard';
 import { StudentProgressTable } from '@/components/teacher/analytics/StudentProgressTable';
 import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
 import { getClassroom } from '@/lib/supabase/education/classrooms';
@@ -191,6 +192,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
         {/* One gate over the dashboard AND the detail tabs — the tabs are the analytics
             being sold; gating only the summary card left them open to free teachers. */}
         <div data-tm className="space-y-6">
+        <FreeGameHeadlineCard classroomId={classroomId} />
         <ProGate
           feature="analytics"
           whileChecking={

@@ -13470,6 +13470,11 @@ const ru = {
       "missed": "Пропущено",
       "lessonWords": "Слова урока",
       "practiceCta": "Отработать эти слова",
+      "freeHeadlineTitle": "Последняя игра класса",
+      "classAverage": "Средний балл класса",
+      "topMissed": "Чаще всего пропущенные слова",
+      "proLine": "Каждый ученик и каждая неделя",
+      "proBadge": "Pro",
       "mode": {
         "classic": "Классика",
         "blast": "Бласт",

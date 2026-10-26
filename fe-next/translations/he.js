@@ -14080,6 +14080,11 @@ const he = {
       "missed": "פוספסו",
       "lessonWords": "מילות השיעור",
       "practiceCta": "לתרגל את המילים האלה",
+      "freeHeadlineTitle": "משחק הכיתה האחרון שלכם",
+      "classAverage": "ניקוד ממוצע בכיתה",
+      "topMissed": "המילים שהכי פוספסו",
+      "proLine": "כל תלמיד וכל שבוע, במבט אחד",
+      "proBadge": "Pro",
       "mode": {
         "classic": "קלאסי",
         "blast": "בלאסט",

@@ -14173,6 +14173,11 @@ const es = {
       "missed": "Sin encontrar",
       "lessonWords": "Palabras de la lección",
       "practiceCta": "Practicar estas palabras",
+      "freeHeadlineTitle": "Tu última partida de clase",
+      "classAverage": "Puntuación media de la clase",
+      "topMissed": "Palabras más falladas",
+      "proLine": "Ve a cada estudiante y cada semana",
+      "proBadge": "Pro",
       "mode": {
         "classic": "Clásico",
         "blast": "Blast",
