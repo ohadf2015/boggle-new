@@ -14777,6 +14777,20 @@ const ja = {
         "error": "生徒の読み込みに失敗しました",
         "unknown": "不明な生徒",
         "noneYet": "生徒はまだいません。参加コードを共有してください"
+      },
+      "gcImport": {
+        "action": "Google Classroomから取り込む",
+        "connect": "Google Classroomに接続",
+        "pickCourse": "Google Classroomのクラス",
+        "check": "名簿を確認",
+        "matched": "{{count}}人はすでにこのクラスにいます",
+        "unmatchedTitle": "まだ参加していない生徒（{{count}}人）：参加コードを共有してください",
+        "consentTitle": "同意が必要（{{count}}人）",
+        "consentHint": "Googleアカウントを連携する前に、同意の記録が必要な生徒です。",
+        "link": "見つかった生徒を連携",
+        "linked": "{{count}}人を連携しました",
+        "noCourses": "有効なGoogle Classroomのクラスがありません",
+        "error": "Google Classroomに接続できませんでした。もう一度お試しください。"
       }
     },
     "lesson": {

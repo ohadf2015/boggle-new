@@ -15065,6 +15065,20 @@ const sv = {
         "error": "Kunde inte ladda elever",
         "unknown": "Okänd elev",
         "noneYet": "Inga elever ännu. Dela koden så kan de gå med"
+      },
+      "gcImport": {
+        "action": "Importera från Google Classroom",
+        "connect": "Anslut Google Classroom",
+        "pickCourse": "Klass i Google Classroom",
+        "check": "Kontrollera klasslistan",
+        "matched": "{{count}} finns redan i klassen",
+        "unmatchedTitle": "Inte med än ({{count}}): dela anslutningskoden med dem",
+        "consentTitle": "Samtycke behövs ({{count}})",
+        "consentHint": "De här eleverna behöver ett registrerat samtycke innan deras Google-konto kopplas.",
+        "link": "Koppla matchade elever",
+        "linked": "{{count}} kopplade",
+        "noCourses": "Inga aktiva klasser i Google Classroom",
+        "error": "Kunde inte nå Google Classroom. Försök igen."
       }
     },
     "lesson": {

@@ -15,9 +15,10 @@ import {
   patchSubmissionGrade,
   returnSubmission,
 } from './googleClassroomApi';
+import { isIdentityLinkingEnabled, listLinkedIdentities } from '@/lib/auth/externalIdentity';
 import {
   gradePercentFromProgress,
-  matchStudentsByEmail,
+  matchStudentsByIdentity,
   scaleToMaxPoints,
   type LexiStudent,
   type ProgressRowLike,
@@ -120,6 +121,17 @@ async function loadLexiSide(admin: SupabaseClient, classroomId: string, lessonOr
   return { students, progress, names };
 }
 
+async function loadLinkedGoogleIds(admin: SupabaseClient, studentIds: string[]): Promise<Map<string, string>> {
+  if (!isIdentityLinkingEnabled()) return new Map();
+  try {
+    const links = await listLinkedIdentities(admin, 'google', studentIds);
+    return new Map(links.map((l) => [l.userId, l.externalId]));
+  } catch (err) {
+    logger.error('[gc-grades] identity links unreadable, matching by email only', err);
+    return new Map();
+  }
+}
+
 export async function pushGrades(input: PushInput): Promise<PushResult> {
   const { admin, token, courseId, courseWorkId, returnGrades } = input;
   const { students, progress, names } = await loadLexiSide(admin, input.classroomId, input.lessonOrAssignmentId);
@@ -140,7 +152,8 @@ export async function pushGrades(input: PushInput): Promise<PushResult> {
     throw new GoogleClassroomError('reauth', 403, 'classroom.profile.emails not granted: roster has no emails');
   }
   const subByUser = new Map(submissions.map((s) => [s.userId, s]));
-  const match = matchStudentsByEmail(students, roster);
+  const linked = await loadLinkedGoogleIds(admin, students.map((s) => s.studentId));
+  const match = matchStudentsByIdentity(students, roster, linked);
 
   const result: PushResult = {
     updated: 0,

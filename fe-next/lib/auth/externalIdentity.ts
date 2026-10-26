@@ -25,6 +25,8 @@ export interface LinkInput {
   provider: ExternalProvider;
   externalId: string;
   email?: string | null;
+  /** Already-hashed email, for callers that never held the raw address. */
+  emailHash?: string | null;
 }
 
 export type LinkResult =
@@ -36,7 +38,7 @@ export async function linkExternalIdentity(admin: SupabaseClient, input: LinkInp
   if (!input.userId || !externalId || !(EXTERNAL_PROVIDERS as readonly string[]).includes(input.provider)) {
     return { ok: false, reason: 'invalid' };
   }
-  const emailHash = hashEmail(input.email);
+  const emailHash = input.emailHash && /^[0-9a-f]{64}$/.test(input.emailHash) ? input.emailHash : hashEmail(input.email);
 
   const { data: existing, error: readErr } = await admin
     .from(TABLE)

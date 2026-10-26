@@ -43,7 +43,10 @@ export interface GcCourseWork {
 
 export interface GcStudent {
   userId: string;
-  profile?: { emailAddress?: string | null } | null;
+  profile?: {
+    emailAddress?: string | null;
+    name?: { givenName?: string | null; familyName?: string | null; fullName?: string | null } | null;
+  } | null;
 }
 
 export interface GcSubmission {

@@ -12938,6 +12938,20 @@ const en = {
         "error": "Failed to load students",
         "unknown": "Unknown student",
         "noneYet": "No students yet. Share the join code."
+      },
+      "gcImport": {
+        "action": "Import from Google Classroom",
+        "connect": "Connect Google Classroom",
+        "pickCourse": "Google Classroom class",
+        "check": "Check roster",
+        "matched": "{{count}} already in this class",
+        "unmatchedTitle": "Not here yet ({{count}}): share the join code with them",
+        "consentTitle": "Consent needed ({{count}})",
+        "consentHint": "These students need consent on file before their Google account is linked.",
+        "link": "Link matched students",
+        "linked": "{{count}} linked",
+        "noCourses": "No active Google Classroom classes found",
+        "error": "Couldn't reach Google Classroom. Try again."
       }
     },
     "lesson": {

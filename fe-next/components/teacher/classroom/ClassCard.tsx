@@ -20,6 +20,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import ClassroomStudentList from '../ClassroomStudentList';
+import { GoogleClassroomRosterImport } from './GoogleClassroomRosterImport';
 import { StudentCapMeter } from '../StudentCapMeter';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { slideUp } from '../teacherDashboardTabs';
@@ -316,6 +317,7 @@ export function ClassCard({
                 classroomId={classroom.id}
                 joinCode={classroom.join_code}
               />
+              <GoogleClassroomRosterImport classroomId={classroom.id} />
             </m.div>
           )}
         </AnimatePresence>

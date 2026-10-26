@@ -14705,6 +14705,20 @@ const es = {
         "error": "No se pudieron cargar los estudiantes",
         "unknown": "Estudiante desconocido",
         "noneYet": "Sin estudiantes aún. Comparte el código de ingreso"
+      },
+      "gcImport": {
+        "action": "Importar de Google Classroom",
+        "connect": "Conectar Google Classroom",
+        "pickCourse": "Clase de Google Classroom",
+        "check": "Revisar la lista",
+        "matched": "{{count}} ya están en esta clase",
+        "unmatchedTitle": "Aún no están ({{count}}): compárteles el código",
+        "consentTitle": "Falta consentimiento ({{count}})",
+        "consentHint": "Estos alumnos necesitan un consentimiento registrado antes de vincular su cuenta de Google.",
+        "link": "Vincular alumnos encontrados",
+        "linked": "{{count}} vinculados",
+        "noCourses": "No hay clases activas en Google Classroom",
+        "error": "No se pudo conectar con Google Classroom. Inténtalo de nuevo."
       }
     },
     "lesson": {
