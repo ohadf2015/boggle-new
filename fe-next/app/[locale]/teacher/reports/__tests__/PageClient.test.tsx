@@ -323,6 +323,7 @@ describe('ReportsPageClient', () => {
       render(<ReportsPageClient />);
 
       expect(screen.getAllByTestId('pro-trial-preview')).toHaveLength(1);
+      expect(screen.queryByTestId('teacher-plan-badge')).not.toBeInTheDocument();
       expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
       expect(screen.getByTestId('classroom-roster-progress')).toBeInTheDocument();
       expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
@@ -333,6 +334,7 @@ describe('ReportsPageClient', () => {
       render(<ReportsPageClient />);
 
       expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
+      expect(screen.getByTestId('teacher-plan-badge')).toBeInTheDocument();
       expect(screen.getByTestId('progress-digest-dashboard')).toBeInTheDocument();
       expect(getRecentClassroomGames).toHaveBeenCalledWith('classroom-1', expect.any(Number), expect.anything());
       expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();

@@ -200,7 +200,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
           <h1 data-wipe className="font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">
             {t('teacher.reports.title')}
           </h1>
-          <TeacherPlanBadge />
+          {hasPro ? <TeacherPlanBadge /> : null}
         </div>
 
         <h2 className="mb-3 text-base font-bold text-neo-cream/80">{t('teacher.reports.selectClassroom')}</h2>
@@ -254,7 +254,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
           <div data-tm className="min-w-0 flex-1">
             <ClassHero name={selectedClassroom?.name ?? t('teacher.reports.title')} memberCount={selectedClassroom?.member_count} />
           </div>
-          <TeacherPlanBadge />
+          {hasPro ? <TeacherPlanBadge /> : null}
         </div>
         <ClassroomRosterProgress
           classroomId={selectedClassroomId}

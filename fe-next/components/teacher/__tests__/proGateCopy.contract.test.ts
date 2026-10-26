@@ -72,4 +72,14 @@ describe('ProGate copy contract', () => {
       }
     }
   });
+
+  it('has the reports page CTA in every locale, with the price slot and its own words', () => {
+    const english = resolve(en, 'teacher.proGate.reports.cta');
+    for (const [locale, dict] of Object.entries(LOCALES)) {
+      const value = resolve(dict, 'teacher.proGate.reports.cta');
+      expect(typeof value, `${locale} is missing teacher.proGate.reports.cta`).toBe('string');
+      expect(value as string, locale).toContain('{{price}}');
+      if (locale !== 'en') expect(value, `${locale} still shows the English CTA`).not.toBe(english);
+    }
+  });
 });
