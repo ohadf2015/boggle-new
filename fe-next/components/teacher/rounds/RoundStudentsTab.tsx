@@ -1,9 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { Check, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { sortRoundRows, type RoundReport, type RoundSortKey } from './roundReport';
+import { accuracyTone, sortRoundRows, TONE_TEXT, type RoundReport, type RoundSortKey } from './roundReport';
+
+/** One grid for the header and every row, so name, words, accuracy and score line up. */
+const ROW_GRID = 'grid grid-cols-[minmax(5rem,8rem)_minmax(0,1fr)_3rem_3rem] items-center gap-x-3 sm:grid-cols-[minmax(6rem,10rem)_minmax(0,1fr)_3.5rem_3.5rem]';
 
 const SORT_LABEL_KEYS: Record<RoundSortKey, string> = {
   score: 'teacher.lastGame.score',
@@ -24,7 +28,7 @@ export function RoundStudentsTab({ report, sortId, onStudentClick }: RoundStuden
 
   return (
     <div>
-      <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <span className="flex items-center gap-2 text-xs font-bold text-neo-white/80">
           <label htmlFor={sortId}>{t('ugc.gallery.sortLabel')}</label>
           <select
@@ -38,29 +42,42 @@ export function RoundStudentsTab({ report, sortId, onStudentClick }: RoundStuden
             ))}
           </select>
         </span>
-        <span className="flex items-center gap-3 text-xs font-bold text-neo-white/70">
-          <span className="inline-flex items-center gap-1"><span className="size-3 rounded-sm border border-neo-black bg-neo-lime" aria-hidden />{t('teacher.lastGame.found')}</span>
-          <span className="inline-flex items-center gap-1"><span className="size-3 rounded-sm border border-neo-black bg-neo-pink" aria-hidden />{t('teacher.lastGame.missed')}</span>
+        <span className="flex items-center gap-3 text-xs font-bold text-neo-white/80">
+          <span className="inline-flex items-center gap-1.5"><span className="grid size-4 place-items-center rounded-[4px] border-2 border-neo-black bg-neo-lime text-neo-black" aria-hidden><Check className="size-3" strokeWidth={3.5} /></span>{t('teacher.lastGame.found')}</span>
+          <span className="inline-flex items-center gap-1.5"><span className="grid size-4 place-items-center rounded-[4px] border-2 border-neo-black bg-neo-pink text-neo-black" aria-hidden><X className="size-3" strokeWidth={3.5} /></span>{t('teacher.lastGame.missed')}</span>
         </span>
       </div>
 
-      <ul className="flex flex-col gap-1">
+      <div data-testid="round-report-columns" aria-hidden className={cn(ROW_GRID, 'border-b-2 border-neo-cream/20 px-2 pb-1.5 text-[11px] font-black uppercase tracking-wide text-neo-white/70')}>
+        <span className="text-start">{t('teacher.lastGame.student')}</span>
+        <span className="text-start">{t('teacher.lastGame.lessonWords')}</span>
+        <span className="text-end">{t('teacher.classReport.accuracy')}</span>
+        <span className="text-end">{t('teacher.lastGame.score')}</span>
+      </div>
+
+      <ul className="flex flex-col divide-y divide-neo-cream/10">
         {rows.map((row) => {
           const body = (
             <>
-              <span className="w-24 shrink-0 truncate text-start text-sm font-bold text-neo-white sm:w-32"><bdi>{row.name}</bdi></span>
-              <span className="flex min-w-0 flex-1 gap-0.5" aria-hidden>
+              <span className="truncate text-start text-sm font-bold text-neo-white"><bdi>{row.name}</bdi></span>
+              <span className="flex min-w-0 gap-1" aria-hidden>
                 {row.cells.map((cell) => (
                   <span
                     key={cell.word}
                     data-testid="round-report-cell"
+                    data-state={cell.state}
                     title={`${cell.word}: ${t(`teacher.lastGame.${cell.state}`)}`}
-                    className={cn('h-4 min-w-2 flex-1 rounded-sm border border-neo-black', cell.state === 'found' ? 'bg-neo-lime' : 'bg-neo-pink')}
-                  />
+                    className={cn(
+                      'grid h-6 min-w-4 max-w-8 flex-1 place-items-center rounded-[5px] border-2 border-neo-black',
+                      cell.state === 'found' ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-black',
+                    )}
+                  >
+                    {cell.state === 'found' ? <Check className="size-3.5" strokeWidth={3.5} /> : <X className="size-3.5" strokeWidth={3.5} />}
+                  </span>
                 ))}
               </span>
-              <span className="w-10 shrink-0 text-end text-xs font-black tabular-nums text-neo-lime">{row.accuracyPct}%</span>
-              <span className="w-12 shrink-0 text-end text-xs font-black tabular-nums text-neo-white/80">{row.score}</span>
+              <span dir="ltr" className={cn('text-end text-sm font-black tabular-nums', TONE_TEXT[accuracyTone(row.accuracyPct)])}>{row.accuracyPct}%</span>
+              <span dir="ltr" className="text-end text-sm font-black tabular-nums text-neo-white">{row.score}</span>
             </>
           );
           return (
@@ -69,12 +86,12 @@ export function RoundStudentsTab({ report, sortId, onStudentClick }: RoundStuden
                 <button
                   type="button"
                   onClick={() => onStudentClick(row.studentId, row.name)}
-                  className="flex min-h-9 w-full min-w-0 items-center gap-2 rounded-sm px-1 hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                  className={cn(ROW_GRID, 'min-h-11 w-full min-w-0 rounded-neo px-2 hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan')}
                 >
                   {body}
                 </button>
               ) : (
-                <div className="flex min-h-9 min-w-0 items-center gap-2 px-1">{body}</div>
+                <div className={cn(ROW_GRID, 'min-h-11 min-w-0 px-2')}>{body}</div>
               )}
             </li>
           );

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { activeLineParams, buildRoundReport, roundTitleKey, sortRoundRows } from '../roundReport';
+import { accuracyTone, activeLineParams, buildRoundReport, roundTitleKey, sortRoundRows } from '../roundReport';
 import { ROUND_FIXTURE } from '../roundFixture';
 
 describe('buildRoundReport', () => {
@@ -69,5 +69,13 @@ describe('roundTitleKey', () => {
 
   it('falls back to a generic class-game title for a mode it does not know', () => {
     expect(roundTitleKey('mystery')).toBe('teacher.classReport.notes.title');
+  });
+});
+
+describe('accuracyTone', () => {
+  it('reads 80% and up as success, 50-79% as warning, below 50% as danger', () => {
+    expect([100, 80, 79, 50, 49, 0].map(accuracyTone)).toEqual([
+      'success', 'success', 'warning', 'warning', 'danger', 'danger',
+    ]);
   });
 });
