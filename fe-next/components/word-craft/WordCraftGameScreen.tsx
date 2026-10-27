@@ -28,6 +28,7 @@ import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
 import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
 import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion';
 import { summarizeGame } from '@/lib/word-craft/gameHighlights';
+import { useWordCraftBoardEffects } from '@/components/word-craft/hooks/useWordCraftBoardEffects';
 import { useWordCraftMoveFeedback, type ScoreFloatState, type CelebrationState } from '@/components/word-craft/hooks/useWordCraftMoveFeedback';
 import { useWordCraftGameOver } from '@/components/word-craft/hooks/useWordCraftGameOver';
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
@@ -38,7 +39,6 @@ import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
 import { useWordCraftDrag } from '@/components/word-craft/useWordCraftDrag';
 import { useWordCraftKeyboardShortcuts } from '@/components/word-craft/hooks/useWordCraftKeyboardShortcuts';
 import type { SceneCtx } from '@/lib/word-craft/pixi/sceneCtx';
-import { playTilePlaceRipple } from '@/lib/word-craft/pixi/scenes/tilePlaceRipple';
 import { playSpectacleCommit } from '@/lib/word-craft/celebration/playSpectacleCommit';
 import { resolveCommitTier } from '@/lib/word-craft/celebration/commitTier';
 import { pickMiniCelebration } from '@/lib/word-craft/celebration/miniCelebration';
@@ -66,7 +66,6 @@ import {
   trackWordCraftTurnSubmitted,
   trackWordCraftGameStarted,
   trackWordCraftDictRetryClicked,
-  emitWordCraftMove,
   type WordCraftInputMethod,
 } from '@/components/word-craft/wordCraftTelemetry';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -550,56 +549,10 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
   // Score float state
   const [scoreFloat, setScoreFloat] = useState<ScoreFloatState | null>(null);
 
-  // Transient capture toast — fires when a turn flips opponent-claimed cells.
-  // turnIndex is monotonic so a fresh capture always triggers re-render.
-  const [captureToast, setCaptureToast] = useState<{ by: 'player' | 'bot'; count: number; bonus: number; key: number } | null>(null);
-  const lastCaptureTurnRef = useRef<number>(-1);
-  useEffect(() => {
-    const cap = game.state.lastCapture;
-    if (!cap) return;
-    if (cap.turnIndex === lastCaptureTurnRef.current) return;
-    lastCaptureTurnRef.current = cap.turnIndex;
-    setCaptureToast({ by: cap.by, count: cap.cells.length, bonus: cap.bonus, key: cap.turnIndex });
-    // Burst the flipped cells in the capturer's color — cyan when you take
-    // ground, pink when the bot takes yours.
-    if (typeof document !== 'undefined') {
-      const color = cap.by === 'player' ? '#00FFFF' : '#FF1493';
-      const cellEls = cap.cells.map((c) => document.querySelector(`[data-board-cell="${c.row},${c.col}"]`));
-      requestAnimationFrame(() => juice.captureBurst(cellEls, color));
-    }
-    const timer = setTimeout(() => setCaptureToast(null), 1800);
-    return () => clearTimeout(timer);
-  }, [game.state.lastCapture, juice]);
 
-  // --- Juice: tile place ---
-  const prevPendingIdsRef = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    const next = new Set(game.state.pendingPlacements.map((p) => p.rackTileId));
-    for (const p of game.state.pendingPlacements) {
-      if (!prevPendingIdsRef.current.has(p.rackTileId)) {
-        const el = document.querySelector(`[data-tile-id="${p.rackTileId}"]`);
-        juice.tilePlace(el);
-        // Fire Pixi ripple at the cell where the tile was placed
-        if (sceneCtx) {
-          playTilePlaceRipple(sceneCtx, { row: p.row, col: p.col }).catch(() => {
-            // Pixi animations can fail on low-end devices; silently continue
-          });
-        }
-      }
-    }
-    prevPendingIdsRef.current = next;
-  }, [game.state.pendingPlacements, juice, sceneCtx]);
 
-  // --- Juice: rack select ---
-  const prevSelectedRef = useRef<string | null>(null);
-  useEffect(() => {
-    const id = game.state.selectedRackTileId;
-    if (id && id !== prevSelectedRef.current) {
-      const el = document.querySelector(`[data-rack-tile-id="${id}"]`);
-      juice.rackSelect(el);
-    }
-    prevSelectedRef.current = id;
-  }, [game.state.selectedRackTileId, juice]);
+
+  const captureToast = useWordCraftBoardEffects({ game, juice, sceneCtx, hotseat });
 
   useWordCraftMoveFeedback({
     game, juice, sceneCtx, cosyMode, achievementsOn, t, queueAchievement, playCommitSound, playOpponentScored, setScoreFloat, setCelebration,
@@ -623,16 +576,6 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
   // hidden bot-ranking signal only.
   // Committed moves → listeners (academy Word Workshop callouts). Cursor resets
   // when history shrinks (new game); no listeners = no-op.
-  const emittedMovesRef = useRef(0);
-  useEffect(() => {
-    const history = game.state.history;
-    if (history.length < emittedMovesRef.current) emittedMovesRef.current = 0;
-    for (let i = emittedMovesRef.current; i < history.length; i++) {
-      const { who, words, score } = history[i];
-      emitWordCraftMove({ who, words, score }, { hotseat });
-    }
-    emittedMovesRef.current = history.length;
-  }, [game.state.history, hotseat]);
 
   const playerTerritory = useMemo(() => countClaimed(game.state.board, 'player'), [game.state.board]);
   const botTerritory = useMemo(() => countClaimed(game.state.board, 'bot'), [game.state.board]);
@@ -659,20 +602,6 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
   const hintTurnLimit = hintDurationVariant === 'extended-hints' ? 6 : 3;
   useEffect(() => { trackHintExposure(); }, [trackHintExposure]);
 
-  // --- Error shake ---
-  const lastErrorRef = useRef<string | null>(null);
-  useEffect(() => {
-    const e = game.state.lastError;
-    if (!e || e === lastErrorRef.current) {
-      lastErrorRef.current = e;
-      return;
-    }
-    lastErrorRef.current = e;
-    const cellEls = game.state.pendingPlacements
-      .map((p) => document.querySelector(`[data-tile-id="${p.rackTileId}"]`))
-      .filter((n): n is Element => Boolean(n));
-    juice.invalidShake(cellEls);
-  }, [game.state.lastError, game.state.pendingPlacements, juice]);
 
   // Card (power-card Run) mode now has its own stable entry — ?mode=cards is
   // routed straight to RunPageClient by WordCraftClient, so PageClient no
