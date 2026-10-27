@@ -142,6 +142,10 @@ export function useWordCraftMoveFeedback({
         playCommitSound(commitCtx);
       }
 
+      // Big plays shake the whole board, scaled by how big.
+      const impact = isBingo ? 3 : newest.placedTileIds.length >= 5 ? 2 : newest.placedTileIds.length >= 4 || gain.stolen >= 2 ? 1 : 0;
+      if (impact > 0) juice.boardImpact(document.querySelector('[data-wc-board]'), impact);
+
       // Achievement: first word
       if (!firstWordAchievedRef.current && achievementsOn) {
         firstWordAchievedRef.current = true;

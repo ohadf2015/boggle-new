@@ -33,6 +33,8 @@ export interface UseWordCraftJuice {
    * with a shower of particles, so claiming ground actually feels like a win.
    */
   captureBurst: (cellEls: JuiceTarget[], color: string) => void;
+  /** Big play: the whole board takes a short punch and springs back. power 1–3. */
+  boardImpact: (board: JuiceTarget, power: number) => void;
 }
 
 export function useWordCraftJuice(): UseWordCraftJuice {
@@ -277,6 +279,16 @@ export function useWordCraftJuice(): UseWordCraftJuice {
     }
   }, []);
 
+  const boardImpact = useCallback((board: JuiceTarget, power: number) => {
+    if (!board) return;
+    if (isReducedMotionPreferred()) return;
+    const p = Math.min(3, Math.max(1, power));
+    gsap
+      .timeline()
+      .to(board, { scale: 1 + 0.012 * p, y: -1.5 * p, duration: 0.06, ease: 'power2.out' })
+      .to(board, { scale: 1, y: 0, duration: 0.45, ease: 'elastic.out(1, 0.35)' });
+  }, []);
+
   const captureBurst = useCallback((cellEls: JuiceTarget[], color: string) => {
     const cells = cellEls.filter(Boolean) as Element[];
     if (cells.length === 0) return;
@@ -345,5 +357,6 @@ export function useWordCraftJuice(): UseWordCraftJuice {
     drawFromSack,
     jokerSparkle,
     captureBurst,
+    boardImpact,
   };
 }
