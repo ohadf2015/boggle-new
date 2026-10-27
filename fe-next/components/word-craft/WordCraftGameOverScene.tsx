@@ -1,6 +1,9 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { gsap } from 'gsap';
+import { isReducedMotionPreferred } from '@/utils/accessibility';
 import { cn } from '@/lib/utils';
 import { useCountUp } from '@/components/word-craft/hooks/useCountUp';
 import Avatar from '@/components/Avatar';
@@ -53,6 +56,18 @@ interface Props {
 }
 
 export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, playerAvatar, opponentAvatar, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, challengeIntent, highlights, dailyResult, onPlayAgain, onHome }: Props) {
+  const heroRef = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (!heroRef.current || isReducedMotionPreferred()) return;
+    const tween = gsap.fromTo(
+      heroRef.current,
+      { y: -90, rotation: -14, scale: 0.4, opacity: 0 },
+      { y: 0, rotation: 0, scale: 1, opacity: 1, duration: 0.9, delay: 0.1, ease: 'elastic.out(1, 0.5)' },
+    );
+    return () => {
+      tween.kill();
+    };
+  }, []);
   const shownPlayer = useCountUp(playerScore);
   const shownBot = useCountUp(botScore);
   // If in a duel, show duel result instead of vs-bot result
@@ -121,14 +136,16 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
         </span>
 
         {playerWon || !isTie ? (
-          <Image
-            src={playerWon ? '/word-craft/trophy.webp' : '/word-craft/bot.webp'}
-            alt=""
-            width={512}
-            height={510}
-            priority
-            className="wc-float w-20 [@media(min-height:860px)]:w-28 h-auto -my-1 drop-shadow-[0_6px_0_rgba(0,0,0,0.6)]"
-          />
+          <span ref={heroRef} className="block -my-1">
+            <Image
+              src={playerWon ? '/word-craft/trophy.webp' : '/word-craft/bot.webp'}
+              alt=""
+              width={512}
+              height={510}
+              priority
+              className="wc-float w-20 [@media(min-height:860px)]:w-28 h-auto drop-shadow-[0_6px_0_rgba(0,0,0,0.6)]"
+            />
+          </span>
         ) : null}
 
         {isNewBest ? (

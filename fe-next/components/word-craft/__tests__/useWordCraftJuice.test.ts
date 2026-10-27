@@ -99,6 +99,34 @@ describe('useWordCraftJuice', () => {
     });
   });
 
+  describe('boardImpact', () => {
+    it('punches the board and settles it back', () => {
+      const board = document.createElement('div');
+      const { result } = renderHook(() => useWordCraftJuice());
+      result.current.boardImpact(board, 2);
+      expect(timelines).toHaveLength(1);
+      const hit = [...timelines[0].fromToCalls.map((c) => c.target), ...timelines[0].toCalls.map((c) => c.target)];
+      expect(hit).toContain(board);
+    });
+
+    it('scales the punch with power', () => {
+      const board = document.createElement('div');
+      const { result } = renderHook(() => useWordCraftJuice());
+      result.current.boardImpact(board, 1);
+      result.current.boardImpact(board, 3);
+      const scale = (i: number) => (timelines[i].toCalls[0].vars as { scale: number }).scale;
+      expect(scale(1)).toBeGreaterThan(scale(0));
+    });
+
+    it('no-ops without a board or under reduced motion', () => {
+      const { result } = renderHook(() => useWordCraftJuice());
+      result.current.boardImpact(null, 2);
+      reducedMotionMock.mockReturnValue(true);
+      result.current.boardImpact(document.createElement('div'), 2);
+      expect(timelines).toHaveLength(0);
+    });
+  });
+
   describe('drawFromSack', () => {
     it('flies each newly-drawn rack tile in from the sack', () => {
       const sack = document.createElement('div');
