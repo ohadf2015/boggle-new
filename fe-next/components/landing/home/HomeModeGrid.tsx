@@ -103,7 +103,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
         tint.border,
         tint.shadow,
         // Solid panel + art window + text block: the label never sits on a busy picture.
-        anchor ? 'block bg-neo-navy' : 'flex flex-row items-center gap-2.5 bg-neo-navy-light p-2 md:flex-col md:items-stretch md:gap-0 md:p-2.5',
+        anchor ? 'block bg-neo-navy md:flex md:flex-col md:bg-neo-navy-light md:p-2.5' : 'flex flex-row items-center gap-2.5 bg-neo-navy-light p-2',
         // Hover: border brightens for everyone; the lift only when motion is welcome.
         'transition-[transform,box-shadow,border-color] duration-150 ease-out hover:border-neo-cream/80 motion-safe:hover:-translate-y-0.5',
         'active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-[border-color]',
@@ -119,8 +119,8 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
           data-testid={anchor ? undefined : 'mode-tile-art'}
           className={cn(
             anchor
-              ? 'absolute inset-0'
-              : 'relative h-[3.875rem] w-[3.875rem] shrink-0 overflow-hidden rounded-neo border-2 border-neo-cream/40 bg-neo-navy md:h-auto md:w-full md:aspect-[4/3]',
+              ? 'absolute inset-0 md:relative md:inset-auto md:min-h-0 md:flex-1 md:overflow-hidden md:rounded-neo md:border-2 md:border-neo-cream/40 md:bg-neo-navy'
+              : 'relative h-[3.875rem] w-[3.875rem] shrink-0 overflow-hidden rounded-neo border-2 border-neo-cream/40 bg-neo-navy',
           )}
         >
         <Image
@@ -135,19 +135,19 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
         />
         </span>
       ) : (
-        <span className={cn('flex items-center justify-center rounded-neo border-2 border-black', tint.chip, anchor ? 'absolute start-2 top-2 h-9 w-9' : 'h-[3.875rem] w-[3.875rem] shrink-0 md:h-auto md:w-full md:aspect-[4/3]')}>
+        <span className={cn('flex items-center justify-center rounded-neo border-2 border-black', tint.chip, anchor ? 'absolute start-2 top-2 h-9 w-9' : 'h-[3.875rem] w-[3.875rem] shrink-0')}>
           <model.Icon className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
         </span>
       )}
       {anchor && (
         <>
-          <span aria-hidden="true" className="absolute inset-x-0 bottom-0 z-[1] h-1/2 bg-gradient-to-t from-neo-navy via-neo-navy/70 to-transparent" />
+          <span aria-hidden="true" className="absolute inset-x-0 bottom-0 z-[1] h-1/2 bg-gradient-to-t from-neo-navy via-neo-navy/70 to-transparent md:hidden" />
         </>
       )}
       {anchor && (
         <span
           aria-hidden="true"
-          className="cube-sheen pointer-events-none absolute inset-y-0 -left-1/3 z-[1] w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent"
+          className="cube-sheen pointer-events-none absolute inset-y-0 -left-1/3 z-[1] w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent md:hidden"
         />
       )}
 
@@ -157,7 +157,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
       {showRun && model.resume && <ModeResumeChip resume={model.resume} anchor={anchor} />}
 
       {anchor ? (
-        <span className="absolute inset-0 z-[2] flex flex-col justify-end p-3 md:p-4">
+        <span className="absolute inset-0 z-[2] flex flex-col justify-end p-3 md:static md:inset-auto md:shrink-0 md:justify-start md:p-0 md:pe-14 md:pt-2.5">
           {model.tag && (
             <span className="mb-1.5">
               <ModeTagChip tag={model.tag} />
@@ -167,7 +167,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
             {model.title}
           </span>
           {model.description && (
-            <span className="mt-1 hidden max-w-[32ch] font-neo-body text-sm leading-snug text-neo-cream/90 md:line-clamp-2">
+            <span className="mt-1 hidden max-w-[32ch] font-neo-body text-sm leading-snug text-neo-cream/90">
               {model.description}
             </span>
           )}
@@ -187,7 +187,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
       ) : (
         <span
           data-testid="mode-tile-label"
-          className="flex min-w-0 flex-1 flex-col items-start justify-center gap-1 md:justify-start md:px-0.5 md:pt-2.5 md:pb-0.5"
+          className="flex min-w-0 flex-1 flex-col items-start justify-center gap-1"
         >
           {(badge || model.tag) && (
             <span className="flex max-w-full flex-wrap items-center gap-1">
@@ -204,7 +204,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
           {model.description && (
             <span
               data-testid="mode-tile-desc"
-              className="hidden font-neo-body text-[0.7rem] leading-snug text-neo-cream/85 lg:line-clamp-2"
+              className="hidden font-neo-body text-[0.7rem] leading-snug text-neo-cream/85"
             >
               {model.description}
             </span>
@@ -290,7 +290,7 @@ export function HomeModeGrid({ models, extras, liveCount }: HomeModeGridProps) {
   return (
     <section aria-labelledby="home-modes-title" className="flex min-h-0 flex-1 flex-col gap-2.5 md:flex-none md:gap-3">
       <div className="flex items-center justify-between gap-2 px-0.5">
-        <h2 id="home-modes-title" className="font-neo-display text-base font-black uppercase tracking-wide text-neo-cream md:text-xl">
+        <h2 id="home-modes-title" className="font-neo-poster text-lg font-extrabold text-neo-cream md:text-2xl">
           {t('landing.home.gameModes')}
         </h2>
         {liveCount > 0 && (
@@ -304,9 +304,9 @@ export function HomeModeGrid({ models, extras, liveCount }: HomeModeGridProps) {
         )}
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-2.5 md:grid md:flex-none md:grid-cols-[minmax(0,2fr)_repeat(5,minmax(0,1fr))] md:gap-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-2.5 md:grid md:flex-none md:grid-cols-[minmax(0,1.35fr)_repeat(3,minmax(0,1fr))] md:auto-rows-[6.5rem] md:gap-3">
         {anchor && (
-          <div className="flex min-h-[5.75rem] flex-1 flex-col md:min-h-0">
+          <div className="flex min-h-[5.75rem] flex-1 flex-col md:row-span-2 md:min-h-0">
             <ModeTile model={anchor} index={0} anchor />
           </div>
         )}
@@ -325,7 +325,7 @@ export function HomeModeGrid({ models, extras, liveCount }: HomeModeGridProps) {
             onClick={() => setMoreOpen(true)}
             className={cn(
               'flex h-11 w-[calc(100%-3.5rem)] md:w-full items-center gap-2.5 rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light px-2.5 text-start font-neo-display text-sm font-black uppercase tracking-wide text-neo-cream shadow-hard transition-[transform,box-shadow,border-color] duration-150 hover:border-neo-cream/80 motion-safe:hover:-translate-y-0.5 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy active:translate-x-[3px] active:translate-y-[3px] active:shadow-none',
-              'md:aspect-square md:h-auto md:flex-col md:justify-center md:gap-2 md:px-2 md:text-center',
+              'md:col-span-2 md:h-auto md:flex-col md:justify-center md:gap-1 md:px-2 md:text-center',
             )}
           >
             <span className="flex h-7 w-7 items-center justify-center rounded-neo border-2 border-black bg-neo-lime text-neo-navy md:h-12 md:w-12">
