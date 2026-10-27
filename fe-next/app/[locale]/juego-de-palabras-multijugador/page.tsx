@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: 'Scrabble Online en Español Gratis — Sin Registro | LexiClash',
     description: 'Juega scrabble online gratis — sin registro ni descargas. Crea sala, invita amigos y compite en tiempo real. Hasta 50 jugadores. ¡Empieza ya! →',
-    keywords: 'scrabble online español multijugador, scrabble online gratis, scrabble juego online, scrabble español online, jugar scrabble en español online gratis, scrabble en español online gratis, scrabble online español, cruzaletras online, apalabrados online gratis, scrabble en linea, scrabble en línea español, jugar scrabble online en español, alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, scrabble online en español multijugador, jugar scrabble gratis multijugador, juegos de palabras online multijugador, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real, juegos de letras online',
+    keywords: 'descargar scrabble en español gratis para pc, scrabble online español multijugador, scrabble online gratis, scrabble juego online, scrabble español online, jugar scrabble en español online gratis, scrabble en español online gratis, scrabble online español, cruzaletras online, apalabrados online gratis, scrabble en linea, scrabble en línea español, jugar scrabble online en español, alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, scrabble online en español multijugador, jugar scrabble gratis multijugador, juegos de palabras online multijugador, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real, juegos de letras online',
     openGraph: {
       title: 'Scrabble Online en Español Gratis — Sin Registro | LexiClash',
       description: 'Juega scrabble online gratis — sin registro ni descargas. Crea sala, invita amigos y compite en tiempo real. Hasta 50 jugadores. ¡Empieza ya! →',
@@ -168,6 +168,62 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
           </p>
         </section>
         <MultijugadorIntent locale={locale} />
+
+        {/* PC DOWNLOAD INTENT — GR #12022. Extend this page; do not publish a second URL. */}
+        <section className="mb-14 max-w-3xl" data-seo="descargar-pc">
+          <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
+            Descargar Scrabble en español gratis para PC: lo que hay de verdad
+          </h2>
+          <div className="space-y-3 font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
+            <p>
+              Si llegaste buscando &quot;descargar scrabble en español gratis para pc&quot;, la respuesta honesta
+              es corta: no existe una descarga oficial gratuita de Scrabble para PC en español. Scrabble GO,
+              la app oficial (Scopely), es solo móvil — el APK de Android pesa unos 195 MB y la versión de
+              iPhone 288.7 MB, con anuncios y compras dentro de la app. Para jugarla en el ordenador, las
+              páginas de descargas te mandan instalar un emulador como BlueStacks: dos instalaciones, una
+              cuenta de Google y varios cientos de MB antes de la primera partida.
+            </p>
+            <p>
+              LexiClash es la alternativa que se salta todo eso: se juega en el navegador del PC (y del móvil
+              y la tablet), gratis, sin descargar nada, sin emulador y sin registro. Diccionario de más de{' '}
+              {ES_DICT_FLOOR} palabras en español con variantes de España y Latinoamérica, salas de 2 a 50
+              jugadores en tiempo real y partidas de 2-3 minutos. Abre lexiclash.live, pulsa Crear sala y
+              comparte el enlace — eso es toda la &quot;instalación&quot;.
+            </p>
+          </div>
+          <div className="mt-6 overflow-x-auto rounded-neo border-4 border-neo-black bg-neo-navy-light shadow-hard-lg">
+            <table className="w-full border-collapse text-sm sm:text-base">
+              <thead>
+                <tr className="border-b-3 border-neo-black bg-neo-navy">
+                  <th className="px-4 py-4 text-left font-neo-display font-black uppercase tracking-wider text-neo-yellow"> </th>
+                  <th className="px-4 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime">LexiClash</th>
+                  <th className="px-4 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-gray-300">Scrabble GO en PC</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ['Precio', '$0, sin compras dentro del juego', 'Gratis, con anuncios y compras en la app'],
+                  ['Descarga en PC', 'Ninguna — navegador', 'Emulador (p. ej. BlueStacks) + la app de ~195 MB'],
+                  ['Registro', 'No — un apodo basta', 'Cuenta de Google / Scopely'],
+                  ['Idioma español', `Diccionario de +${ES_DICT_FLOOR} palabras`, 'Sí, entre 35 idiomas (listado de App Store)'],
+                  ['Multijugador', '2-50 en la misma sala, en tiempo real', 'Por turnos, 1 contra 1'],
+                ].map((row, i) => (
+                  <tr key={row[0]} className={`border-b border-neo-gray-400/20 ${i % 2 ? 'bg-neo-navy/30' : ''}`}>
+                    <td className="px-4 py-3 font-bold">{row[0]}</td>
+                    <td className="px-4 py-3 text-center font-bold text-neo-lime">{row[1]}</td>
+                    <td className="px-4 py-3 text-center text-neo-gray-300">{row[2]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3 max-w-3xl text-xs text-neo-gray-300">
+            Cifras leídas de los listados públicos el 27 oct 2026: App Store (id 1215933788, 288.7 MB, 4.6 de
+            304 k valoraciones) y el APK de Android (~195 MB) vía Softonic. LexiClash no cobra nada de eso
+            porque no hay nada que descargar.
+          </p>
+        </section>
+
         <FeatureGrid />
         <StepsSection />
         <ModesShowcase />

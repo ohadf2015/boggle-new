@@ -159,6 +159,10 @@ export const FAQS = [
     a: 'No. LexiClash se juega directamente en el navegador del móvil, la tablet o el ordenador. No hay que instalar nada, ni en Android ni en iPhone ni en PC. Abre lexiclash.live y ya estás jugando. Si quieres, puedes añadirlo a la pantalla de inicio como aplicación web (PWA).',
   },
   {
+    q: '¿Se puede descargar Scrabble en español gratis para PC?',
+    a: 'No hay una descarga oficial gratuita de Scrabble para PC: Scrabble GO es solo móvil (unos 195 MB en Android, 288.7 MB en iPhone, con anuncios y compras dentro de la app) y jugarla en el ordenador exige un emulador como BlueStacks. LexiClash es la alternativa sin descarga: se abre en el navegador del PC, es gratis, no pide registro y trae un diccionario de español con salas multijugador en tiempo real de 2 a 50 jugadores.',
+  },
+  {
     q: '¿Cuál es la mejor alternativa a Scrabble online en español?',
     a: `LexiClash es la alternativa a Scrabble online en español más completa de 2026: gratis, sin descargas, multijugador en tiempo real, 8 modos de juego y diccionario español de más de ${ES_DICT_FLOOR} palabras. A diferencia de las apps oficiales, no hay anuncios entre rondas, no hay bots disfrazados de jugadores reales y nunca se paga por ganar.`,
   },
