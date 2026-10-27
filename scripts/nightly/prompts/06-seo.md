@@ -29,7 +29,7 @@ Skip-gracefully — if the scrape fails (Chrome closed, Playwriter extension off
 
 ═══ STEP 1 — Read Growth Radar (app "lexiclash") ═══
 All search data comes from the Growth Radar MCP. No Google or Bing credential is used in this lane; never look for, ask for or write one.
-  • `list_interventions` (app "lexiclash", limit 50). For each page whose title or description a lane-6 commit on master changed in the last 7 days (`git log --since=7.days --format=%H -- fe-next/app`), with no row yet: `record_intervention` (app "lexiclash", surface = page path, kind "title", or "meta" if only the description changed, metric "ctr", one-line summary, evidence = the commit sha). Record nothing else.
+  • `list_interventions` (app "lexiclash", limit 50). For each page whose title or description any commit on master changed in the last 7 days (`git log --since=7.days --format=%H -- fe-next/app`), with no row yet: `record_intervention` (app "lexiclash", surface = page path, kind "title", or "meta" if only the description changed, metric "ctr", one-line summary, evidence = the commit sha). If an open `Improve CTR for <page>` recommendation names that page, pass its id as recommendationId and call `update_recommendation` (that id, "complete"). Record nothing else.
   • `get_search_performance` (app "lexiclash", days 28, metric "impressions"). Rows are queries with clicks, impressions and CTR, and NO position or page.
   • `get_ai_visibility` ("lexiclash").
   • `get_recommendations` (app "lexiclash", limit 30, detail "summary"). Leave `includePending` off: a page whose change is still being graded is hidden on purpose.
