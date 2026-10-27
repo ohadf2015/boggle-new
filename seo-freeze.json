@@ -3,28 +3,28 @@
   "frozen": [
     {
       "path": "/en/tools/word-solver",
-      "until": "2026-11-24",
-      "why": "#1485/#1487 rewrote the English title to lead with 'Anagram Solver' (Growth Radar row 12586, graded 2026-11-24). Leave title and description alone until then."
+      "until": "2026-11-28",
+      "why": "#1485/#1487 rewrote the English title to lead with 'Anagram Solver' (Growth Radar row 12586, graded 2026-11-27). Leave title and description alone until then."
     },
     {
       "path": "/es/education/esl-word-games",
-      "until": "2026-11-25",
+      "until": "2026-11-28",
       "why": "#1486 rewrote the Spanish title to 'Juegos de palabras en inglés para el aula' (Growth Radar row 53). The 2026-10-02 rewrite landed inside the previous grading window and spoiled it; hold this one for its full 28 days."
     },
     {
       "path": "/en/online-word-games-with-friends",
-      "until": "2026-11-24",
-      "why": "#1476 shipped 2026-10-27 (description targets 'words with friends 2'); Growth Radar intervention 241 grades its CTR on 2026-11-24. Leave title and description alone until then."
+      "until": "2026-11-28",
+      "why": "#1476 shipped 2026-10-27 (description targets 'words with friends 2'); Growth Radar intervention 241 grades its CTR on 2026-11-27. Leave title and description alone until then."
     },
     {
       "path": "/sv/tools/word-solver",
-      "until": "2026-11-24",
-      "why": "#1476 shipped 2026-10-27 (title 'Bilda Ord av Bokstäver — Anagramlösare Svenska'); Growth Radar intervention 240 grades its CTR on 2026-11-24. Leave title and description alone until then."
+      "until": "2026-11-28",
+      "why": "#1476 shipped 2026-10-27 (title 'Bilda Ord av Bokstäver — Anagramlösare Svenska'); Growth Radar intervention 240 grades its CTR on 2026-11-27. Leave title and description alone until then."
     },
     {
       "path": "/he/blog/hebrew-word-games-guide",
-      "until": "2026-11-24",
-      "why": "#1476 shipped 2026-10-27 (Hebrew title leads with 'סקריבל בעברית חינם'); Growth Radar intervention 239 grades its CTR on 2026-11-24. Leave title and description alone until then."
+      "until": "2026-11-28",
+      "why": "#1476 shipped 2026-10-27 (Hebrew title leads with 'סקריבל בעברית חינם'); Growth Radar intervention 239 grades its CTR on 2026-11-27. Leave title and description alone until then."
     },
     {
       "path": "/es/juego-de-palabras-multijugador",
