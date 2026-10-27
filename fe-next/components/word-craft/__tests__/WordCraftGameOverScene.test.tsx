@@ -309,4 +309,20 @@ describe('WordCraftGameOverScene', () => {
     const loss = render(<WordCraftGameOverScene t={t} playerScore={4} botScore={9} />);
     expect(loss.container.innerHTML).toContain('bot.webp');
   });
+
+  it('lists the daily goals with their done state, only on a daily result', () => {
+    const goals = [
+      { id: 'longWord' as const, done: true },
+      { id: 'claim' as const, done: false },
+      { id: 'win' as const, done: true },
+    ];
+    const without = render(<WordCraftGameOverScene t={t} playerScore={9} botScore={4} dailyGoals={goals} />);
+    expect(without.container.querySelector('[data-wc-daily-goals]')).toBeNull();
+    without.unmount();
+    const { container } = render(
+      <WordCraftGameOverScene t={t} playerScore={9} botScore={4} dailyGoals={goals} dailyResult={{ lastDate: '2026-10-27', streak: 2, best: 2 }} />,
+    );
+    const items = [...container.querySelectorAll('[data-wc-daily-goals] li')].map((li) => li.getAttribute('data-done'));
+    expect(items).toEqual(['true', 'false', 'true']);
+  });
 });
