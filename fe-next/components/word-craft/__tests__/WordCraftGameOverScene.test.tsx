@@ -280,4 +280,30 @@ describe('WordCraftGameOverScene', () => {
       expect(onHome).toHaveBeenCalledTimes(1);
     });
   });
+
+  it('shows the daily streak card and the highlights only when provided', () => {
+    const none = render(<WordCraftGameOverScene t={t} playerScore={9} botScore={4} />);
+    expect(none.container.querySelector('[data-wc-daily-result]')).toBeNull();
+    none.unmount();
+
+    const { container } = render(
+      <WordCraftGameOverScene
+        t={t}
+        playerScore={9}
+        botScore={4}
+        dailyResult={{ lastDate: '2026-10-27', streak: 3, best: 3 }}
+        highlights={{ bestMove: { word: 'quartz', score: 22 }, longestWord: 'quartz', moves: 4 }}
+      />,
+    );
+    expect(container.querySelector('[data-wc-daily-result]')?.textContent).toContain('wordcraft.daily.streakNow');
+    expect(container.textContent).toContain('quartz');
+  });
+
+  it('greets a loss with the bot art and a win with the trophy', () => {
+    const win = render(<WordCraftGameOverScene t={t} playerScore={9} botScore={4} />);
+    expect(win.container.innerHTML).toContain('trophy');
+    win.unmount();
+    const loss = render(<WordCraftGameOverScene t={t} playerScore={4} botScore={9} />);
+    expect(loss.container.innerHTML).toContain('bot.webp');
+  });
 });

@@ -104,7 +104,12 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
       </div>
 
       <div data-step-path className="relative">
-        <ol className="relative grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 md:gap-5">
+        {/* The swipe path: a dashed trail runs tile to tile behind the cards and shows in the gaps. */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute start-[3.25rem] end-[calc(25%-3.25rem)] top-[3.25rem] hidden border-t-4 border-dashed border-neo-lime/70 md:block"
+        />
+        <ol className="relative z-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 md:gap-5">
           {c.steps.map((step, i) => {
             const art = STEP_ART[i % STEP_ART.length];
             return (

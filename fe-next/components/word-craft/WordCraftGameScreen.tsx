@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
@@ -26,6 +27,9 @@ import { WordCraftTutor } from '@/components/word-craft/WordCraftTutor';
 import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
 import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
 import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion';
+import { summarizeGame } from '@/lib/word-craft/gameHighlights';
+import { useWordCraftMoveFeedback, type ScoreFloatState, type CelebrationState } from '@/components/word-craft/hooks/useWordCraftMoveFeedback';
+import { useWordCraftGameOver } from '@/components/word-craft/hooks/useWordCraftGameOver';
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
 import { WordCraftHandoff } from '@/components/word-craft/WordCraftHandoff';
 import { WordCraftGameOverScene } from '@/components/word-craft/WordCraftGameOverScene';
@@ -39,12 +43,9 @@ import { playSpectacleCommit } from '@/lib/word-craft/celebration/playSpectacleC
 import { resolveCommitTier } from '@/lib/word-craft/celebration/commitTier';
 import { pickMiniCelebration } from '@/lib/word-craft/celebration/miniCelebration';
 import { useWordCraftSound } from '@/components/word-craft/useWordCraftSound';
-import { recordBest } from '@/lib/word-craft/bestScore';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { WordCraftScorePreviewBadge } from '@/components/word-craft/WordCraftScorePreviewBadge';
 import { playBotMoveReveal } from '@/lib/word-craft/pixi/scenes/botMoveReveal';
-import { playGameOverBurst } from '@/lib/word-craft/pixi/scenes/gameOverBurst';
-import { shouldCelebrateEnding } from '@/lib/word-craft/celebration/endingCelebration';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { inferAxis, resolveTap, type Axis } from '@/lib/word-craft/placement';
 import { resolveScoreboardOpponent } from '@/lib/word-craft/opponentIdentity';
@@ -65,7 +66,6 @@ import {
   trackWordCraftTurnSubmitted,
   trackWordCraftGameStarted,
   trackWordCraftDictRetryClicked,
-  emitWordCraftGameEnd,
   emitWordCraftMove,
   type WordCraftInputMethod,
 } from '@/components/word-craft/wordCraftTelemetry';
@@ -74,15 +74,13 @@ import { useAchievementQueue } from '@/components/achievements';
 import { countClaimed } from '@/lib/word-craft/territory';
 import { cellsGainedThisTurn } from '@/lib/word-craft/territoryFeedback';
 import { cn } from '@/lib/utils';
-import { parseDuel, compareDuel } from '@/lib/word-craft/duel';
+import { parseDuel } from '@/lib/word-craft/duel';
 import { PHONE_DIMS, type BoardDims } from '@/lib/word-craft/boardDimensions';
 import type { PlacedTile } from '@/lib/word-craft/types';
 import { resolveChallengerIdentity } from '@/lib/word-craft/challengerIdentity';
 import { WordCraftDuelTargetStrip } from '@/components/word-craft/WordCraftDuelTargetStrip';
-import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
-const ENCOURAGEMENT_COUNT = 8;
 const LINGUIST_STORAGE_KEY = 'wc_locales_played';
 
 function getPlayedLocales(): Set<string> {
@@ -115,6 +113,8 @@ interface GameViewProps {
    * declared goal is a remote opponent, not the bot.
    */
   challengeIntent?: boolean;
+  /** Today's shared board: finishing it extends the daily streak. */
+  daily?: boolean;
   difficulty: BotDifficulty;
   /** Player-picked twist from the setup screen; undefined = seeded surprise roll. */
   modifierOverride?: WordCraftModifier;
@@ -135,7 +135,7 @@ interface GameViewProps {
   };
 }
 
-export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, difficulty, modifierOverride, lesson }: GameViewProps) {
+export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily, difficulty, modifierOverride, lesson }: GameViewProps) {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { loading: authLoading, profile } = useAuth();
@@ -542,13 +542,13 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   });
 
   // Celebrations
-  const [celebration, setCelebration] = useState<{ kind: CelebrationKind; burstId: number; origin?: { x: number; y: number } }>({
+  const [celebration, setCelebration] = useState<CelebrationState>({
     kind: null,
     burstId: 0,
   });
 
   // Score float state
-  const [scoreFloat, setScoreFloat] = useState<{ score: number; overdrive: boolean; isBingo: boolean; encouragement: string; key: number } | null>(null);
+  const [scoreFloat, setScoreFloat] = useState<ScoreFloatState | null>(null);
 
   // Transient capture toast — fires when a turn flips opponent-claimed cells.
   // turnIndex is monotonic so a fresh capture always triggers re-render.
@@ -601,143 +601,9 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
     prevSelectedRef.current = id;
   }, [game.state.selectedRackTileId, juice]);
 
-  // --- History: score float + celebrations + achievements ---
-  const prevHistoryLenRef = useRef(0);
-  const firstWordAchievedRef = useRef(false);
-
-  useEffect(() => {
-    const len = game.state.history.length;
-    if (len === prevHistoryLenRef.current) return;
-    const newest = game.state.history[len - 1];
-    prevHistoryLenRef.current = len;
-    if (!newest || newest.score === 0) return;
-
-    const popEl = document.querySelector(`[data-score-value="${newest.who}"]`);
-    juice.scorePop(popEl, newest.score);
-
-    const placedEls = newest.placedTileIds
-      .map((id) => document.querySelector(`[data-tile-id="${id}"]`))
-      .filter((n): n is Element => Boolean(n));
-
-    if (newest.who === 'bot' && placedEls.length > 0) {
-      juice.botReveal(placedEls);
-      // Fire Pixi bot move reveal animation. Placed tiles are on the board
-      // post-commit; scan by rackTileId rather than looking in history.
-      if (sceneCtx) {
-        const placements: { row: number; col: number }[] = [];
-        const ids = new Set(newest.placedTileIds);
-        for (let r = 0; r < game.state.board.size; r++) {
-          for (let c = 0; c < game.state.board.size; c++) {
-            const tile = game.state.board.cells[r][c].tile;
-            if (tile && ids.has(tile.rackTileId)) placements.push({ row: r, col: c });
-          }
-        }
-        playBotMoveReveal(sceneCtx, placements).catch(() => {
-          // Pixi animations can fail on low-end devices; silently continue
-        });
-      }
-      // Audio twin of the bot reveal — the opponent scoring was silent before.
-      if (newest.score > 0) playOpponentScored();
-    }
-    if (newest.who === 'player' && placedEls.length > 0) {
-      juice.playerCommitReveal(placedEls);
-    }
-
-    if (newest.who === 'player') {
-      const isBingo = newest.placedTileIds.length >= 7;
-      const encIdx = Math.floor(Math.random() * ENCOURAGEMENT_COUNT);
-      const encouragement = t(`wordcraft.encouragement.${encIdx}`);
-
-      // The float counts TERRITORY, not points: cells claimed by placing tiles
-      // plus cells stolen from the rival this turn.
-      const cap = game.state.lastCapture;
-      const gain = cellsGainedThisTurn(
-        newest.placedTileIds.length,
-        'player',
-        len - 1,
-        cap ? { by: cap.by, cellCount: cap.cells.length, turnIndex: cap.turnIndex } : null,
-      );
-      setScoreFloat({ score: gain.total, overdrive: false, isBingo, encouragement, key: len });
-
-      // Fire tiered spectacle: tier resolver picks the FX bundle (ripple →
-      // wave → path trace → word stamp → edge flash → aurora) per commit
-      // size/streak. Cosy mode clamps huge/bingo down to "great" to keep
-      // calm-mode players from being blasted by fullscreen flashes.
-      if (sceneCtx) {
-        const placements: { row: number; col: number; letter: string; value: number }[] = [];
-        const ids = new Set(newest.placedTileIds);
-        let premiumTriggered = false;
-        let hasRareTile = false;
-        for (let r = 0; r < game.state.board.size; r++) {
-          for (let c = 0; c < game.state.board.size; c++) {
-            const tile = game.state.board.cells[r][c].tile;
-            if (tile && ids.has(tile.rackTileId)) {
-              placements.push({ row: r, col: c, letter: tile.letter, value: tile.value });
-              if (game.state.board.cells[r][c].premium) premiumTriggered = true;
-              if (tile.value >= 8) hasRareTile = true;
-            }
-          }
-        }
-        const commitCtx = {
-          scoreThisTurn: newest.score,
-          tilesPlaced: newest.placedTileIds.length,
-          bingo: isBingo,
-          streak: game.state.streaks.player,
-          hasRareTile,
-          premiumTriggered,
-          heatLevel: game.state.heat,
-        };
-        playSpectacleCommit(sceneCtx, {
-          ctx: commitCtx,
-          placements,
-          word: newest.words[0] ?? '',
-          cosyMode,
-        }).catch(() => {
-          // Pixi animations can fail on low-end devices; silently continue
-        });
-        // Audio twin of the Pixi spectacle — confirm + tier flourish + rare sparkle.
-        playCommitSound(commitCtx);
-      }
-
-      // Achievement: first word
-      if (!firstWordAchievedRef.current && achievementsOn) {
-        firstWordAchievedRef.current = true;
-        queueAchievement({ key: 'wordcraft_first_word', icon: '🎉' });
-      }
-
-      // Confetti bursts: a bingo gets the full 80-particle blast; ordinary turns
-      // that are still satisfying — big words, stealing 2+ rival squares, or a
-      // streak milestone — get a lighter 'great' pop so the mid-game isn't silent.
-      const burstTier = resolveCommitTier({
-        scoreThisTurn: newest.score,
-        tilesPlaced: newest.placedTileIds.length,
-        bingo: isBingo,
-        streak: game.state.streaks.player,
-        hasRareTile: false,
-        premiumTriggered: false,
-        heatLevel: game.state.heat,
-      });
-      const miniKind = pickMiniCelebration({
-        tier: burstTier,
-        streak: game.state.streaks.player,
-        cellsStolen: gain.stolen,
-      });
-      if (isBingo || miniKind) {
-        const target = (placedEls[Math.floor(placedEls.length / 2)] as HTMLElement | undefined) ?? null;
-        const rect = target?.getBoundingClientRect();
-        setCelebration((prev) => ({
-          kind: isBingo ? 'bingo' : 'great',
-          burstId: prev.burstId + 1,
-          origin: rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : undefined,
-        }));
-      }
-
-      // Achievement: bingo
-      if (isBingo && achievementsOn) {
-        queueAchievement({ key: 'wordcraft_bingo', icon: '⭐' });
-      }
-    }
-  }, [game.state.history, game.state.overdrive, juice, t, queueAchievement, achievementsOn, sceneCtx, game, cosyMode, playCommitSound, playOpponentScored]);
+  useWordCraftMoveFeedback({
+    game, juice, sceneCtx, cosyMode, achievementsOn, t, queueAchievement, playCommitSound, playOpponentScored, setScoreFloat, setCelebration,
+  });
 
   // (Conquest removed the heat / overdrive / burnout systems and the
   // premium-cell ambient sparkles — territory captures are the only momentum.)
@@ -772,61 +638,22 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   const botTerritory = useMemo(() => countClaimed(game.state.board, 'bot'), [game.state.board]);
 
   // --- Game over ---
-  const [newBest, setNewBest] = useState(false);
-  const recordedBestRef = useRef(false);
-  // Separate from recordedBestRef (which is SP-only) — analytics must fire once
-  // for EVERY finished game (hotseat + duel included) so it lands in the admin log.
-  const gameEndTrackedRef = useRef(false);
-  const [duelOutcome, setDuelOutcome] = useState<{ outcome: 'win' | 'lose' | 'tie'; challengerName: string; challengerScore: number; challengerAvatar?: CustomAvatarConfig } | null>(null);
-  useEffect(() => {
-    if (game.state.turn === 'over') {
-      if (!gameEndTrackedRef.current) {
-        gameEndTrackedRef.current = true;
-        emitWordCraftGameEnd(game.state, { hotseat });
-      }
-      setCelebration((prev) => ({ kind: 'gameOver', burstId: prev.burstId + 1 }));
-      // Fire Pixi game over burst — only on a WIN (never a loss/tie), and never
-      // under cosy/reduced-motion. Confetti on a loss reads as mocking.
-      if (
-        sceneCtx &&
-        shouldCelebrateEnding({
-          playerScore: playerTerritory,
-          botScore: botTerritory,
-          hotseat,
-          cosyMode,
-          reducedMotion: prefersReducedMotion,
-        })
-      ) {
-        playGameOverBurst(sceneCtx).catch(() => {
-          // Pixi animations can fail on low-end devices; silently continue
-        });
-      }
-      // Duel outcome: compare player score vs challenger score
-      if (duel && !recordedBestRef.current) {
-        const outcome = compareDuel(playerTerritory, duel.score);
-        setDuelOutcome({
-          outcome,
-          challengerName: duel.name || t('wordcraft.duel.unnamedChallenger'),
-          challengerScore: duel.score,
-          challengerAvatar: duel.avatar,
-        });
-      }
-      // Personal best (SP vs bot only — hotseat has two human seats, no "mine").
-      if (!hotseat && !recordedBestRef.current) {
-        recordedBestRef.current = true;
-        const { isNewBest } = recordBest('territory', playerTerritory);
-        if (isNewBest) {
-          setNewBest(true);
-          playNewBest();
-        }
-      }
-    } else {
-      recordedBestRef.current = false;
-      gameEndTrackedRef.current = false;
-      setNewBest(false);
-      setDuelOutcome(null);
-    }
-  }, [game.state, game.state.turn, sceneCtx, hotseat, territoryEnabled, playerTerritory, botTerritory, cosyMode, prefersReducedMotion, playNewBest, duel, t]);
+  const highlights = useMemo(() => summarizeGame(game.state.history), [game.state.history]);
+  const onGameOver = useCallback(() => setCelebration((prev) => ({ kind: 'gameOver', burstId: prev.burstId + 1 })), []);
+  const { newBest, duelOutcome, dailyResult } = useWordCraftGameOver({
+    state: game.state,
+    sceneCtx,
+    hotseat,
+    daily: !!daily,
+    duel,
+    unnamedChallenger: t('wordcraft.duel.unnamedChallenger'),
+    playerTerritory,
+    botTerritory,
+    cosyMode,
+    reducedMotion: prefersReducedMotion,
+    playNewBest,
+    onOver: onGameOver,
+  });
 
   const { variant: hintDurationVariant, trackExposure: trackHintExposure } = useExperiment('exp-wordcraft-hint-duration-v1');
   const hintTurnLimit = hintDurationVariant === 'extended-hints' ? 6 : 3;
@@ -1261,9 +1088,13 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           role="status"
           className={cn(
             'absolute left-1/2 -translate-x-1/2 top-[calc(72px+40px)] z-40 px-3 py-1.5 border-neo-thick border-black rounded-neo shadow-hard-lg font-neo-display font-black text-sm uppercase tracking-wider animate-neo-pop',
+            'flex items-center gap-2',
             captureToast.by === 'player' ? 'bg-neo-cyan text-neo-navy' : 'bg-neo-pink text-neo-white',
           )}
         >
+          {captureToast.by === 'bot' && !hotseat ? (
+            <Image src="/word-craft/bot.webp" alt="" width={364} height={384} className="wc-rise h-9 w-auto -my-2 -ms-1" />
+          ) : null}
           {captureToast.by === 'player'
             ? t('wordcraft.territory.captureYou', { count: captureToast.count, bonus: captureToast.bonus })
             : t('wordcraft.territory.captureBot', { count: captureToast.count, bonus: captureToast.bonus })}
@@ -1289,6 +1120,8 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           currentDims={game.dims}
           currentDifficulty={effectiveDifficulty}
           challengeIntent={challengeIntent}
+          highlights={highlights}
+          dailyResult={dailyResult}
           onPlayAgain={() => game.reset(Math.floor(Math.random() * 1_000_000))}
           onHome={exit}
         />

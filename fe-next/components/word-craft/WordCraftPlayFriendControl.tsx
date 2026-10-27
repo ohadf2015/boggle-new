@@ -73,11 +73,11 @@ export function WordCraftPlayFriendControl({ t, seed, playerScore, locale, disab
         <Users className="w-4 h-4" />
         {t('wordcraft.duel.playFriend')}
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-col min-[420px]:flex-row gap-2">
         <Button
           onClick={handlePassAndPlay}
           disabled={disabled}
-          className="flex-1 h-9 text-xs bg-neo-cyan hover:bg-neo-cyan/90 border-2 border-black text-neo-navy font-neo-display font-black uppercase px-2 shadow-hard"
+          className="flex-1 h-auto min-h-9 py-1.5 whitespace-normal leading-tight text-xs bg-neo-cyan hover:bg-neo-cyan/90 border-2 border-black text-neo-navy font-neo-display font-black uppercase px-2 shadow-hard"
           variant="default"
         >
           {t('wordcraft.duel.passPlay')}
@@ -85,7 +85,7 @@ export function WordCraftPlayFriendControl({ t, seed, playerScore, locale, disab
         <Button
           onClick={handleInviteFriend}
           disabled={disabled || sharing}
-          className="flex-1 h-9 gap-1 text-xs bg-neo-pink hover:bg-neo-pink/90 border-2 border-black text-neo-white font-neo-display font-black uppercase px-2 shadow-hard"
+          className="flex-1 h-auto min-h-9 py-1.5 whitespace-normal leading-tight gap-1 text-xs bg-neo-pink hover:bg-neo-pink/90 border-2 border-black text-neo-white font-neo-display font-black uppercase px-2 shadow-hard"
           variant="default"
         >
           <Share2 className="w-3 h-3" />

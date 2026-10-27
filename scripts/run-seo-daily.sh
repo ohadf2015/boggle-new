@@ -155,6 +155,7 @@ Current branch: `seo/daily-__TODAY__`, already reset to `origin/master` by the w
 
 ═══ STEP 1 — Read Growth Radar (app "lexiclash") ═══
 All search data comes from the Growth Radar MCP. Never look for, ask for or write a Google or Bing credential.
+  • `list_interventions` (app "lexiclash", limit 50). For each page whose title or description any commit on master changed in the last 7 days (`git log --since=7.days --format=%H -- fe-next/app`), with no row yet: `record_intervention` (app "lexiclash", surface = page path, kind "title", or "meta" if only the description changed, metric "ctr", one-line summary, evidence = the commit sha). Before recording, find that page's `Improve CTR for <page>` row with `get_recommendations` (app "lexiclash", kind "seo", includePending true, limit 50); if one exists, pass its id as recommendationId, then call `update_recommendation` (that id, "complete"). Then add the page to seo-freeze.json until the reply's `gradedOn` date. Record nothing else.
   • get_search_performance (app "lexiclash", days 28, metric "impressions"): queries with clicks, impressions, CTR. No position, no page.
   • get_ai_visibility ("lexiclash").
   • get_recommendations (app "lexiclash", limit 30, detail "summary"). Leave includePending off: pages whose change is still being graded are hidden on purpose.

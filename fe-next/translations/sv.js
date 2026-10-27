@@ -19450,6 +19450,19 @@ const sv = {
       "challengeHint": "Utmana en vän från resultatskärmen",
       "sendChallengeNow": "Skicka din utmaning nu!"
     },
+    "daily": {
+      "title": "Dagens bräde",
+      "play": "Spela dagens bräde",
+      "done": "Klart idag · spela igen",
+      "streak": "{n} dagars svit",
+      "streakNow": "{n} dagars svit!",
+      "tomorrow": "Kom tillbaka imorgon för att fortsätta sviten"
+    },
+    "highlights": {
+      "best": "Bästa draget",
+      "longest": "Längsta ordet",
+      "pts": "{n} p"
+    },
     "squares": "rutor",
     "place": {
       "step1": "Tryck på en bokstav",

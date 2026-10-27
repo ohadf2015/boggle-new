@@ -4601,6 +4601,26 @@ body.mp-shell-locked {
   animation: wc-float-kf 3.2s ease-in-out infinite;
 }
 
+@keyframes wc-rise-kf {
+  from { transform: translateY(14px) scale(0.96); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.wc-rise {
+  animation: wc-rise-kf 380ms cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+  animation-delay: var(--wc-delay, 0ms);
+}
+
+@keyframes wc-flicker-kf {
+  0%, 100% { transform: scale(1) rotate(-3deg); }
+  50% { transform: scale(1.12, 1.06) rotate(3deg); }
+}
+
+.wc-flicker {
+  animation: wc-flicker-kf 1.1s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
 @keyframes wc-axis-hint-kf {
   0%, 100% { opacity: 0.45; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.18); }
@@ -4617,6 +4637,8 @@ body.mp-shell-locked {
   .wc-submit-pulse,
   .wc-tile-land,
   .wc-float,
+  .wc-rise,
+  .wc-flicker,
   .wc-axis-hint > span {
     animation: none;
   }
