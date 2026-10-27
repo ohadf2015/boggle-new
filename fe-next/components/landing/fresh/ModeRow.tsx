@@ -44,11 +44,11 @@ const SHAPE: Record<FreshModeKey, { shape: Shape; cell: string }> = {
 
 /** Literal class strings (Tailwind v4 only sees literals). Colour comes from the mode, not the position. */
 const TONE: Record<ModeCubeVariant, { border: string; shadow: string; chip: string; arrow: string; dots: string }> = {
-  pink: { border: 'border-neo-pink', shadow: 'shadow-hard-pink', chip: 'bg-neo-pink text-neo-navy', arrow: 'bg-neo-pink', dots: '[--dot:var(--color-neo-pink)]' },
-  cyan: { border: 'border-neo-cyan', shadow: 'shadow-hard-cyan', chip: 'bg-neo-cyan text-neo-navy', arrow: 'bg-neo-cyan', dots: '[--dot:var(--color-neo-cyan)]' },
-  purple: { border: 'border-neo-purple', shadow: 'shadow-hard-purple', chip: 'bg-neo-purple text-neo-black', arrow: 'bg-neo-purple', dots: '[--dot:var(--color-neo-purple)]' },
-  orange: { border: 'border-neo-orange', shadow: 'shadow-hard-orange', chip: 'bg-neo-orange text-neo-navy', arrow: 'bg-neo-orange', dots: '[--dot:var(--color-neo-orange)]' },
-  lime: { border: 'border-neo-lime', shadow: 'shadow-hard-lime', chip: 'bg-neo-lime text-neo-navy', arrow: 'bg-neo-lime', dots: '[--dot:var(--color-neo-lime)]' },
+  pink: { border: 'border-neo-pink', shadow: 'shadow-hard-pink', chip: 'bg-neo-pink text-neo-navy', arrow: 'bg-neo-pink', dots: '[--dot:var(--neo-pink)]' },
+  cyan: { border: 'border-neo-cyan', shadow: 'shadow-hard-cyan', chip: 'bg-neo-cyan text-neo-navy', arrow: 'bg-neo-cyan', dots: '[--dot:var(--neo-cyan)]' },
+  purple: { border: 'border-neo-purple', shadow: 'shadow-hard-purple', chip: 'bg-neo-purple text-neo-black', arrow: 'bg-neo-purple', dots: '[--dot:var(--neo-purple)]' },
+  orange: { border: 'border-neo-orange', shadow: 'shadow-hard-orange', chip: 'bg-neo-orange text-neo-navy', arrow: 'bg-neo-orange', dots: '[--dot:var(--neo-orange)]' },
+  lime: { border: 'border-neo-lime', shadow: 'shadow-hard-lime', chip: 'bg-neo-lime text-neo-navy', arrow: 'bg-neo-lime', dots: '[--dot:var(--neo-lime)]' },
   blue: { border: 'border-blue-500', shadow: 'shadow-hard-blue', chip: 'bg-blue-500 text-neo-black', arrow: 'bg-blue-500', dots: '[--dot:var(--color-blue-500)]' },
 };
 
