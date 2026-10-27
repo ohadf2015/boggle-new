@@ -2633,3 +2633,18 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: partially resolved — 4/12 files already landed elsewhere (unchanged), 8/12 CONFLICT against current master (3-way merge rc=1): `app/[locale]/multiplayer/PageClient.tsx`, `translations/{en,es,he,ja,ru,sv}.js`, `scripts/nightly/prompts/12-telemetry-coverage.md`
   - why: conflicts need manual diff/resolution (likely translation key drift across 44 nights) — not safe to force-merge in a 15-min lane
   - recommended owner: self (next triage lane) — do NOT append {"resolve":"20260910-010000"} yet, 8 files still genuinely unresolved
+
+## 2026-10-27
+- [Sentry|Supabase|PostHog] No actionable fresh issue tonight
+  - Sentry: 0 unresolved level:error issues firstSeen -24h (clean)
+  - PostHog error-tracking: 1 active issue, ChunkLoadError, occurrences=1 users=1 (stale-chunk noise, not root-causeable from 1 event)
+  - Supabase advisors: only long-standing INFO/pre-existing debt — 95 unindexed FKs on admin/rarely-queried tables, 17 no-PK backup tables, 167 auth_allow_anonymous_sign_ins (by design), 90 authenticated_security_definer + 10 anon_security_definer RPCs (known large pre-existing set per memory supabase-advisor-cleanup-2026-04-29) — none newly appeared since last audit snapshot, none small/isolated enough to safely triage+verify in one pass
+  - status: partially shipped — 2 of ~100 SECURITY DEFINER findings actioned this run: `flag_test_account_by_email`/`flag_test_account_by_classroom` (RETURNS trigger, zero .rpc() callsites) REVOKEd from anon/authenticated/public via `fe-next/supabase/migrations/20261027010000_revoke_test_account_trigger_fn_execute.sql`. Remaining ~88 authenticated + 8 anon findings deferred.
+  - why: full sweep needs its own dedicated audit pass (confirm each RPC's anon/authenticated callsite before any REVOKE), not a one-off nightly pick; the 2 shipped were the only ones with an unambiguous zero-callsite + non-public-API (trigger-only) signature
+  - recommended owner: self (dedicated audit night) or backend
+
+- [Restore] stale restore 20261024-010154 (31 files, dropped 2026-10-24, 3 nights unshipped)
+  - files span app/[locale]/multiplayer, word-craft, apple-app-site-association route+test, ads/BannerCoordinatorMount, blast legacy hooks, native NetworkStatusHandler/AdMobContext/bannerController, singleplayer results+core hook, student AcademyMap, word-craft run screens, 6-locale translations, dictionary candidates
+  - status: deferred
+  - why: too large (31 files across many subsystems) to restore + diagnose the original gate-fail cause + re-verify within this lane's remaining time budget tonight; a half-done restore this close to the time cutoff is worse than leaving it queued
+  - recommended owner: self (dedicated restore lane with full 15-min budget, ideally run.sh's lane 01 first act tomorrow per nightly-learnings)

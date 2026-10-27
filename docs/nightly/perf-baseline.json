@@ -1,23 +1,23 @@
 {
-  "date": "2026-10-25",
-  "note": "Brief's top backend item was 'Railway deploy status unclear' (score 0.05, not a query/index target) -- STEP 1 skipped, no backend query work tonight. Frontend top item: /en/multiplayer LCP 5318ms. Traced to app/[locale]/multiplayer/page.tsx ReactDOM.preload of /images/arena-hub-hero.jpg at fetchPriority:high -- that hero art banner was removed from the entry screen by a prior redesign (DESIGN section b.1; RoomListView.test.tsx explicitly asserts the image never renders), so the preload was a dead 294KB high-priority fetch stealing bandwidth from the real critical path on every /multiplayer load. Removed the dead ReactDOM.preload call. Second frontend item (/es/daily/word-hunt 3872ms) and the imposketch.io entries not actioned -- time budget; imposketch.io is known cross-tenant PostHog noise per standing memory.",
+  "date": "2026-10-27",
+  "note": "IMPACT CHECK on 10-22 wordwheel chunk-split: /en/daily/word-wheel p75 LCP 6096ms but n=4, below 50-sample floor -- verdict DEFERRED (impact-ledger.ndjson), not actionable. Frontend brief's other items (growthradar.app, imposketch.io) are cross-tenant PostHog noise, confirmed again tonight via $host breakdown on $pathname='/' (8 distinct tenant hosts, lexiclash only 9/57 events). No lexiclash.live route cleared n>=50 in the last 24h, so no frontend regression could be verdicted. Backend: advisor WARN count unchanged at 2 (auth_rls_initplan 56 findings, multiple_permissive_policies 115 findings) vs prior baseline -- no NEW warning, so no regression to act on; both are RLS-policy rewrites which this lane's hard rules put out of scope (no auth/RLS-replace writes) -- logged to perf-watch.md for a dedicated RLS-perf lane pass. No code shipped tonight; research-only.",
   "backend": {
     "advisor_warnings_count": 2,
     "shipped": [],
     "deferred": {
+      "auth_rls_initplan": "56 findings across RLS policies (e.g. daily_streak_freezes, web_vitals) re-evaluate auth.<function>() per row instead of (select auth.<function>()) -- semantics-preserving perf rewrite but RLS policy ALTERs are out of scope for this lane's autonomous safety rail, needs dedicated RLS-perf lane/human review",
+      "multiple_permissive_policies": "115 findings of overlapping permissive policies per table/role/action (e.g. assignment_completions SELECT has 3 policies) -- same RLS-out-of-scope reasoning",
       "auth_db_connections_absolute": "dashboard config toggle, not code/migration -- human queue, unchanged",
       "realtime_wal_json_parser_cpu": "governed by 50-supabase-perf.md pg_cron auto-remediation (jobid 22-24), no new flag tonight"
     }
   },
   "frontend": {
     "by_route": [],
-    "shipped": [
-      { "route": "/[locale]/multiplayer", "fix": "page.tsx: removed dead ReactDOM.preload (fetchPriority:high) of arena-hub-hero.jpg -- image no longer rendered since DESIGN b.1 removed the hero banner from RoomListView/EntryScreen", "baseline_lcp_ms": 5318 }
-    ],
+    "shipped": [],
     "deferred": [
-      { "route": "/es/daily/word-hunt", "baseline_lcp_ms": 3872, "reason": "time budget -- not investigated tonight" }
+      { "route": "/en/daily/word-wheel", "p75_lcp": 6096, "n": 4, "reason": "below 50-sample floor, IMPACT CHECK verdict DEFERRED" }
     ],
-    "note": "imposketch.io / growthradar-style cross-tenant entries in the brief are known PostHog noise (standing watch, brief-generator needs $host filter) -- skipped per memory."
+    "note": "PostHog project confirmed shared by 8+ tenants (imposketch.io, catalogsentry.com, growthradar.app, lf-finance.co.il, stoquant.com, titrate.day, feedback-devtools.com) -- zero lexiclash.live routes cleared n>=50 in last 24h, no regression verdict possible this run."
   },
   "bundle": {
     "note": "not re-measured tonight (no fresh .next build in this lane) -- carrying 10-23 numbers unchanged.",
