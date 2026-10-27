@@ -2,6 +2,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { WordCraftGameOverScene } from '../WordCraftGameOverScene';
 
+// Count-up jumps straight to the final number under reduced motion.
+vi.mock('@/hooks/useReducedMotion', () => ({ useReducedMotion: () => true }));
+
 const t = (k: string, vars?: Record<string, unknown>) => {
   if (k === 'wordcraft.youWon') return 'You won!';
   if (k === 'wordcraft.opponentWon') return `${String(vars?.name ?? '')} won`;
@@ -124,7 +127,7 @@ describe('WordCraftGameOverScene', () => {
     expect(overlay?.className).toContain('z-50');
   });
 
-  it('shows both final square counts so the result is concrete', () => {
+  it('shows both final square counts so the result is concrete', async () => {
     render(
       <WordCraftGameOverScene
         t={t}
@@ -133,8 +136,8 @@ describe('WordCraftGameOverScene', () => {
       />
     );
     // The headline number for each side (territory squares) must be visible.
-    expect(screen.getByText('120')).toBeTruthy();
-    expect(screen.getByText('80')).toBeTruthy();
+    expect(await screen.findByText('120')).toBeTruthy();
+    expect(await screen.findByText('80')).toBeTruthy();
   });
 
   it('shows the New Best badge only when isNewBest is set', () => {

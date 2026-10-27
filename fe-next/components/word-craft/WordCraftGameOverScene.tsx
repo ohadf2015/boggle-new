@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { useCountUp } from '@/components/word-craft/hooks/useCountUp';
 import Avatar from '@/components/Avatar';
 import { WordCraftDuelResult } from './WordCraftDuelResult';
 import { WordCraftPlayFriendControl } from './WordCraftPlayFriendControl';
@@ -52,6 +53,8 @@ interface Props {
 }
 
 export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, playerAvatar, opponentAvatar, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, challengeIntent, highlights, dailyResult, onPlayAgain, onHome }: Props) {
+  const shownPlayer = useCountUp(playerScore);
+  const shownBot = useCountUp(botScore);
   // If in a duel, show duel result instead of vs-bot result
   if (duelOutcome) {
     return (
@@ -110,9 +113,9 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
       role="dialog"
       aria-modal="true"
       aria-label={t('wordcraft.gameOver', 'Game over')}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-neo-pop"
+      className="fixed inset-0 z-50 flex overflow-y-auto overscroll-contain p-4 bg-black/80 animate-neo-pop"
     >
-      <div className="relative w-full max-w-sm flex flex-col items-center gap-4 bg-neo-navy-light border-neo-thick border-black rounded-neo shadow-hard-lg p-6">
+      <div className="relative m-auto w-full max-w-sm flex flex-col items-center gap-3 [@media(min-height:860px)]:gap-4 bg-neo-navy-light border-neo-thick border-black rounded-neo shadow-hard-lg p-6">
         <span className="text-[11px] font-neo-display font-black uppercase tracking-[0.2em] text-neo-white/70">
           {t('wordcraft.gameOver', 'Game over')}
         </span>
@@ -124,7 +127,7 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
             width={512}
             height={510}
             priority
-            className="wc-float w-28 h-auto -my-1 drop-shadow-[0_6px_0_rgba(0,0,0,0.6)]"
+            className="wc-float w-20 [@media(min-height:860px)]:w-28 h-auto -my-1 drop-shadow-[0_6px_0_rgba(0,0,0,0.6)]"
           />
         ) : null}
 
@@ -162,7 +165,7 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
             <span data-wc-result-avatar className="block">
               <Avatar customAvatar={playerAvatar ?? null} userId={`wc-player-${playerLabel}`} size="sm" disableEffects />
             </span>
-            <span className="text-3xl font-neo-display font-black leading-none">{playerScore}</span>
+            <span className="text-3xl font-neo-display font-black leading-none tabular-nums">{shownPlayer}</span>
             <span className="text-[10px] font-neo-body uppercase tracking-wider truncate max-w-full px-1">{playerLabel} · {squares}</span>
           </div>
           <div className={cn(
@@ -172,7 +175,7 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
             <span data-wc-result-avatar className="block">
               <Avatar customAvatar={opponentAvatar ?? null} userId={`wc-opponent-${botLabel}`} size="sm" disableEffects />
             </span>
-            <span className="text-3xl font-neo-display font-black leading-none">{botScore}</span>
+            <span className="text-3xl font-neo-display font-black leading-none tabular-nums">{shownBot}</span>
             <span className="text-[10px] font-neo-body uppercase tracking-wider truncate max-w-full px-1">{botLabel} · {squares}</span>
           </div>
         </div>
