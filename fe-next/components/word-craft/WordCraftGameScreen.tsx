@@ -57,7 +57,7 @@ import { WordCraftAxisChip } from '@/components/word-craft/WordCraftAxisChip';
 import { WordCraftStepHint } from '@/components/word-craft/WordCraftStepHint';
 import { resolveWordCraftStep } from '@/lib/word-craft/stepHint';
 import { WordCraftModifierChip } from '@/components/word-craft/WordCraftModifierChip';
-import { isGoldenTile, type WordCraftModifier } from '@/lib/word-craft/modifiers';
+import { isGoldenTile, starCells, type WordCraftModifier } from '@/lib/word-craft/modifiers';
 import {
   trackWordCraftAxisLocked,
   trackWordCraftFastTapUsed,
@@ -321,6 +321,11 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
     const seed = game.state.seed;
     return (tileId: string) => isGoldenTile(seed, tileId);
   }, [game.state.modifier, game.state.seed]);
+
+  const starLookup = useMemo(() => {
+    if (game.state.modifier !== 'star_squares') return undefined;
+    return new Set(starCells(game.state.seed, game.state.board.size).map((c) => `${c.row},${c.col}`));
+  }, [game.state.modifier, game.state.seed, game.state.board.size]);
 
   // Player-chosen direction for building a word, honored before a 2nd tile
   // locks the line. Default 'across'. Persistent so the player can pre-pick the
@@ -827,6 +832,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
               zoomLabel={t('wordcraft.zoomLabel')}
               zoomResetLabel={t('wordcraft.zoomReset')}
               isGolden={goldenLookup}
+              starCells={starLookup}
             />
             {scoreFloat ? (
               <ScoreFloat
