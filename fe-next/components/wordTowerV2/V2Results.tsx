@@ -1,7 +1,6 @@
 import { type ReactNode, useEffect, useState } from 'react';
-import { Hammer, Home, Medal, Send, Target, Trophy, Volume2, VolumeX, X } from 'lucide-react';
+import { Hammer, Home, Medal, Send, Target, Trophy, X } from 'lucide-react';
 import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
-import { useMasterMute } from '@/hooks/useMasterMute';
 import type { TowerBlock } from '@/lib/wordTowerV2/estateTower';
 import { ACHIEVEMENTS, type RunStats, emptyStats, progressOf } from '@/lib/wordTowerV2/achievements';
 import { floorsAt } from '@/lib/wordTowerV2/biomes';
@@ -10,10 +9,12 @@ import type { PayoutStatus } from './rewards/useRunPayout';
 import type { RevengeEntry, RivalView, UseEstate } from './useEstate';
 import { RaidFlow } from './rivals/RaidFlow';
 import { RivalBoard } from './rivals/RivalBoard';
+import { ResultsMute } from './ResultsMute';
+import { DailyTowerResults } from './DailyTowerResults';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
-interface Props {
+export interface V2ResultsProps {
   t: T;
   peakM: number;
   score: number;
@@ -49,6 +50,12 @@ interface Props {
    * to the goal and your rank on today's board.
    */
   daily?: { growthM: number; targetM: number; totalM: number; rank: number | null };
+  /** Daily: the day, shown next to the mode name. */
+  dateLabel?: string;
+  /** Daily: the run's longest word. */
+  bestWord?: string;
+  /** Daily: first showing right after the finish — plays the entrance and confetti once. */
+  celebrate?: boolean;
   /** Everything the rival board + raid round need; absent = no board (tests, demo). */
   rivals?: {
     estate: UseEstate;
@@ -78,26 +85,11 @@ function nextGoal(stats: RunStats, skip: Set<string>) {
   return best;
 }
 
-function ResultsMute() {
-  const { allMuted, toggle, label, title } = useMasterMute();
-  return (
-    <button
-      type="button"
-      data-testid="v2-results-mute"
-      onClick={toggle}
-      aria-label={label}
-      aria-pressed={!allMuted}
-      title={title}
-      className="absolute start-3 top-[max(0.75rem,env(safe-area-inset-top))] flex h-8 w-8 items-center justify-center rounded-neo border-neo border-black bg-neo-cream text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
-    >
-      {allMuted
-        ? <VolumeX className="h-4 w-4" strokeWidth={2.5} aria-hidden />
-        : <Volume2 className="h-4 w-4" strokeWidth={2.5} aria-hidden />}
-    </button>
-  );
+export function V2Results(props: V2ResultsProps) {
+  return props.daily ? <DailyTowerResults {...props} daily={props.daily} /> : <EndlessResults {...props} />;
 }
 
-export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, payoutStatus, onRestart, onHome, onClose, smashLabel, onSmash, onShare, extra, nextSlot, boardSlot, rivals, recapSrc, daily }: Props) {
+function EndlessResults({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, payoutStatus, onRestart, onHome, onClose, smashLabel, onSmash, onShare, extra, rivals, recapSrc }: V2ResultsProps) {
   // Own mute in the card header → the global FAB stands down (no end-14 race
   // against the FAB's 2.5s/5s re-probes).
   useRegisterHeaderAudioControl();
@@ -126,25 +118,6 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
     { label: t('wordTowerV2.results.tenants'), value: String(run.tenants), cls: 'bg-neo-cyan' },
     { label: t('wordTowerV2.results.crates'), value: String(run.crates), cls: 'bg-neo-yellow' },
   ];
-
-  if (daily) {
-    const hit = daily.targetM > 0 && daily.growthM >= daily.targetM;
-    cells.unshift(
-      {
-        label: t('wordTowerV2.dailyTower.grewToday'),
-        value: `+${daily.growthM}${t('wordTowerV2.unitM')}`,
-        cls: hit ? 'bg-neo-lime' : 'bg-neo-yellow',
-      },
-      {
-        label: hit ? t('wordTowerV2.dailyTower.goalHit') : t('wordTowerV2.dailyTower.goal'),
-        value: `${Math.min(daily.growthM, daily.targetM)}/${daily.targetM}${t('wordTowerV2.unitM')}`,
-        cls: hit ? 'bg-neo-lime' : 'bg-neo-cream',
-      },
-    );
-    if (daily.rank) {
-      cells.push({ label: t('wordTowerV2.dailyTower.rankLabel'), value: `#${daily.rank}`, cls: 'bg-neo-purple' });
-    }
-  }
 
   // Add coins cell based on payout status
   if (payoutStatus) {
@@ -271,8 +244,6 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
             </div>
           </div>
         ) : null}
-        {nextSlot ? <div className="mt-4 text-start">{nextSlot}</div> : null}
-        {boardSlot}
         </div>
         <div className={rivals ? 'md:min-w-0 md:flex-1' : 'contents'}>
         {rivals ? (
@@ -316,7 +287,7 @@ export function V2Results({ t, peakM, score, bestM, isBest, run, badges, unlocke
             autoFocus
             className="flex-1 rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
           >
-            {daily ? t('wordTowerV2.dailyTower.keepBuilding') : t('common.playAgain')}
+            {t('common.playAgain')}
           </button>
           <button
             type="button"

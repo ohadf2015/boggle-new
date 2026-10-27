@@ -2456,8 +2456,18 @@ const en = {
     "leaveGo": "Leave",
     "dailyPlayed": "Today's tower is done. Come back tomorrow.",
     "dailyRank": "You're #{rank} today",
-    "recapAlt": "Tower recap: {floors} floors, {m} metres"
-  },
+    "recapAlt": "Tower recap: {floors} floors, {m} metres",
+"dailyResults": { "headline": "Floor {n}!",
+"floors": "Floors",
+"height": "Height",
+"bestWord": "Best word",
+"chestIncoming": "Chest incoming…"
+},
+"guide": { "spell": "Swipe these letters",
+"drop": "Tap to drop it!",
+"done": "First floor!"
+}
+},
   "wordTower": {
     "mutator": {
       "todaysTwist": "TODAY'S TWIST",
@@ -5759,8 +5769,20 @@ const en = {
         "title": "Let's hunt",
         "sameChallenge": "Same puzzle for everyone worldwide. Compare your score.",
         "start": "Start Hunt"
-      }
-    },
+      },
+"howto": { "boardTitle": "Find a word",
+"boardHint": "Drag your finger along the glowing letters:",
+"tryAgain": "Not quite. Follow the glow to spell {word}.",
+"hiddenLabel": "Hidden word",
+"feedbackTitle": "Every word gives you clues",
+"feedbackBody": "Each letter lights up to show how it fits the hidden word.",
+"next": "Next",
+"goalTitle": "Crack the hidden word",
+"goalLife": "Guess it before your life runs out.",
+"goalClues": "Words you find on the board reveal clue letters.",
+"play": "Let's play"
+}
+},
     "welcome": {
       "title": "Welcome to LexiClash!",
       "description": "Swipe letters on the grid to form words. Here are the basics."
@@ -8641,10 +8663,14 @@ const en = {
       "badge": "Scanned",
       "line": "You scanned in. Today’s puzzle is ready."
     },
-    "todaysPuzzles": "Today's puzzles",
+    "todaysPuzzles": "Today's quests",
     "results": {
       "fullRecap": "Full recap",
       "fullRecapSummary": "Your rank, your rarest word, your coins, and who you beat",
+      "trailCount": "{n}/{total} today",
+      "heroStreak": "{n}-day streak",
+      "heroScore": "Score",
+      "heroDaily": "Daily",
       "signup": {
         "title": "Save your streak",
         "shortPrompt": "Save your streak",
@@ -8655,7 +8681,7 @@ const en = {
     "badge": "DAILY",
     "chooseChallengeHint": "Pick your quest",
     "chooseQuest": "Choose your quest",
-    "dailyMissions": "Daily missions",
+    "dailyMissions": "Daily quests",
     "journeyProgress": "Your progress",
     "completedCount": "Completed",
     "nextQuestsIn": "Next quests in",
@@ -9008,8 +9034,9 @@ const en = {
     },
     "streak": {
       "freeze_toast_no_remaining": "Streak Freeze used. {day} saved · no freezes left"
-    }
-  },
+    },
+"practiceBoard": "Practice board"
+},
   "dailyWordWheelLanding": {
     "hero": {
       "title": "Daily Word Wheel",
@@ -9220,8 +9247,14 @@ const en = {
       "wordWheelDetails": "Spell as many words as you can in 90s. Every word must use the center letter.",
       "wordHuntQuest": "Word Hunt",
       "wordHuntDesc": "Crack the hidden word in 10 tries"
-    }
-  },
+    },
+"howTo": { "title": "Try one first",
+"prompt": "Swipe a word through the middle letter. Try {word}",
+"accepted": "{word}! That's it. Now play today's wheel",
+"notWord": "Not a word here. Try {word}",
+"check": "Check"
+}
+},
   "dailyChallenge": {
     "pointsPerWord": "Points per word"
   },
@@ -17356,8 +17389,9 @@ const en = {
         "gold": "Gold: Flawless!",
         "silver": "Silver: So close",
         "bronze": "Bronze: Solid run"
-      }
-    },
+      },
+"missesLabel": "misses"
+},
     "community": {
       "title": "Community riddles",
       "suggest": "Suggest a riddle",
@@ -17415,8 +17449,9 @@ const en = {
       "won": "Pyramid complete!",
       "lost": "Pyramid lost.",
       "reveal": "The answer was",
-      "acceptLoss": "Accept loss"
-    },
+      "acceptLoss": "Accept loss",
+"topWord": "Top word: {word}"
+},
     "difficulty": { "easy": "Easy", "medium": "Medium", "hard": "Hard" },
     "like": "Like",
     "dislike": "Dislike",
@@ -17533,8 +17568,15 @@ const en = {
       "crossPromoTitle": "Try Word Bridge",
       "crossPromoBody": "Two words. One bridge. Free.",
       "crossPromoCta": "Play"
-    }
-  },
+    },
+"tutorial": { "step1": "One hidden word links the top and the bottom.",
+"step2": "Type it in. The boxes show how many letters.",
+"step3": "Each answer builds a plank of your bridge.",
+"tryAgain": "Not quite. Try again!",
+"showMe": "Show me",
+"start": "Play today's bridge"
+}
+},
   "boosts": {
     "title": "Pick a boost",
     "cta": "BOOST",

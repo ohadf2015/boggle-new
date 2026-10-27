@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { startTransition, useEffect, useMemo, useRef, useState } from 'react';
 import { useBoardSelection } from '@/components/board/useBoardSelection';
 import type { CellRef } from '@/components/board/selectionPath';
 import type { LetterGrid } from '@/types';
@@ -101,8 +101,11 @@ export function HuntBoard({
 
   const word = useMemo(() => selectedCells.map((c) => c.letter).join(''), [selectedCells]);
   useEffect(() => {
-    onWordChange(word, word ? selectedCells.length : 0);
-    onLive(word);
+    // The whole game screen re-renders on these; keep them out of the frame that paints the tile.
+    startTransition(() => {
+      onWordChange(word, word ? selectedCells.length : 0);
+      onLive(word);
+    });
     // Only a change of the formed word is news; callbacks are stable upstream.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [word]);
@@ -139,7 +142,23 @@ export function HuntBoard({
     line.setAttribute('y2', String(tipPos.y + dy * k));
     line.style.opacity = len > RUBBER_MIN ? '1' : '0';
   };
+  const pressedRef = useRef<HTMLElement | null>(null);
+  const clearPress = () => {
+    pressedRef.current?.removeAttribute('data-pressed');
+    pressedRef.current = null;
+  };
+  // Lights the touched tile straight from the event, before the selection engine and React catch up.
+  const pressTile = (e: React.PointerEvent) => {
+    boxRef.current = null;
+    if (!interactive) return;
+    const tile = (e.target as Element | null)?.closest?.('[data-tile]') as HTMLElement | null;
+    if (!tile) return;
+    clearPress();
+    tile.setAttribute('data-pressed', 'true');
+    pressedRef.current = tile;
+  };
   const dropLean = () => {
+    clearPress();
     if (rubberRef.current) rubberRef.current.style.opacity = '0';
   };
   const boardSeed = grid.map((row) => row.join('')).join('|');
@@ -158,7 +177,7 @@ export function HuntBoard({
         data-verdict={holding && verdict ? verdict : undefined}
         data-tier={lengthTier(shown.length)}
         onContextMenu={(e) => e.preventDefault()}
-        onPointerDown={() => { boxRef.current = null; }}
+        onPointerDown={pressTile}
         onPointerMove={leanToward}
         onPointerUp={dropLean}
         onPointerCancel={dropLean}

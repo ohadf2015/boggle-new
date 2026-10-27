@@ -24,7 +24,8 @@ export type CoachDemoType =
   | 'centerLetter' // must use the centre letter (wheel)
   | 'lockWord' // lock before a rival steals (wheel)
   | 'clearTiles' // clear cascading tiles (blast)
-  | 'stack' // stack words to build height (tower)
+  | 'stack' // spell a word, it drops onto the tower (tower)
+  | 'towerDrop' // time the drop dead centre (tower)
   | 'connectGroup' // group four related words (connections)
   | 'chain'; // last letter starts next word (word-chain demo)
 
@@ -103,7 +104,7 @@ export const MODE_COACH: Record<CoachModeKey, CoachContent> = {
     titleKey: 'modeCoach.wordTower.title',
     steps: [
       { demo: 'stack', captionKey: 'modeCoach.wordTower.step1' },
-      { demo: 'longWord', captionKey: 'modeCoach.wordTower.step2' },
+      { demo: 'towerDrop', captionKey: 'modeCoach.wordTower.step2' },
     ],
     scoreTipKey: 'modeCoach.wordTower.scoreTip',
   },

@@ -11,7 +11,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { m } from 'framer-motion';
-import { Eye, ArrowRight, CheckCircle2, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import DismissibleSignupLine, { isSignupLineDismissedLocally } from '@/components/daily/results/DismissibleSignupLine';
 import ResultsSignupModal from '@/components/daily/results/ResultsSignupModal';
@@ -21,11 +21,12 @@ import DailyInsightStack from './DailyInsightStack';
 import WordHuntTipBadge from '@/components/results/WordHuntTipBadge';
 import { SuggestWordCard } from './SuggestWordCard';
 import { RejectedWordAppeal } from '@/components/results/RejectedWordAppeal';
-import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
 import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { NextQuestCta } from './results/NextQuestCta';
+import { WordHuntResultsHero } from './results/WordHuntResultsHero';
+import { WordHuntAnswerReveal } from './results/WordHuntAnswerReveal';
 import { GuestNameEditor } from './results/GuestNameEditor';
 import { STICKY_CTA_WORD_HUNT } from './stickyCta';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -41,7 +42,6 @@ import {
   PastPerformanceCompare,
   DailyWordHuntFacts,
   ShareSection,
-  CoinUnlockCard,
   StreakFreezeIndicator,
   type WordHuntStats,
   type CoinReward,
@@ -113,7 +113,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   puzzleDate,
   language,
   countdown,
-  isNewCompletion: _isNewCompletion,
+  isNewCompletion,
   survivalBonusTime,
   rarestWord,
   stats,
@@ -195,72 +195,62 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   const shouldShowSignupLine = !isAuthenticated && !inlineSignupDismissed && !locallyDismissed;
   const [showSignupModal, setShowSignupModal] = useState(false);
 
-  /* The three blocks a guest keeps. Hoisted so the guest branch below reuses
-     them verbatim instead of a second copy that can drift.
-
-     failStateNode = reveal target word + watch ad. Guests keep it — the answer
-     is what they came back for. */
-  const failStateNode = !result.solved ? (
-      <div className="space-y-3">
-        {/* Reveal target word */}
-        {coinActions.targetWordRevealed ? (
-          <div className="py-3 px-4 bg-neo-navy-light/50 rounded-neo border-2 border-slate-700/50 text-center space-y-2">
-            <div className="text-xs text-slate-400">{t('wordHunt.results.theTargetWordWas')}</div>
-            <div className="text-2xl font-black text-neo-lime tracking-wider">
-              {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
-            </div>
-            {result.meaning && (
-              <div className="mt-2 flex items-start gap-2.5 rounded-neo border-neo-thick border-black bg-neo-cyan/15 px-3 py-2.5 shadow-hard text-start">
-                <BookOpen className="w-4 h-4 text-neo-cyan shrink-0 mt-0.5" aria-hidden="true" />
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-neo-cyan">
-                    {t('wordHunt.results.meaning')}
-                  </span>
-                  <span className="text-sm font-bold text-neo-cream leading-snug">
-                    {result.meaning}
-                  </span>
-                  {/* CC BY-SA attribution: meanings are dictionary-sourced from Wiktionary (all langs) */}
-                  <span className="text-[10px] text-slate-400 mt-0.5">
-                    {t('wordHunt.results.meaningSource')}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="max-w-btn space-y-2">
-            <CoinUnlockCard
-              icon={<Eye className="w-5 h-5 text-white" />}
-              title={t('wordHunt.results.revealTargetWord')}
-              subtitle={t('wordHunt.results.seeTheAnswer')}
-              cost={coinActions.revealCost}
-              currentCoins={coinActions.currentCoins}
-              gradientFrom="from-neo-pink"
-              gradientTo="to-neo-pink"
-              onClick={coinActions.handleRevealTargetWord}
-              onSpendStart={(pos) => onSpendStart(pos, coinActions.revealCost)}
-              t={t}
-            />
-          </div>
-        )}
-      </div>
-  ) : null;
-
-  const heroNode = (
-    <ResultDisplay
+  const shareNode = (
+    <ShareSection
       solved={result.solved}
-      attemptsUsed={result.attemptsUsed}
-      targetWord={result.targetWord}
-      streakDays={result.streakDays}
-      language={language}
-      puzzleNumber={puzzleNumber}
-      countdown={countdown}
-      lifeRemaining={result.lifeRemaining || 0}
-      wordsDiscovered={result.wordsDiscovered?.length || 0}
-      currentUserId={profile?.id}
-      meaning={result.meaning}
+      onShare={shareHandlers.handleNativeShare}
+      onChallengeShare={shareHandlers.handleChallengeShare}
+      onRetry={coinActions.handleRetryChallenge}
+      onRetryFree={onRetryFree}
+      canAffordRetry={coinActions.canAffordRetry}
+      retryCost={coinActions.retryCost}
+      currentCoins={coinActions.currentCoins}
+      onWhatsApp={shareHandlers.handleWhatsApp}
+      onTwitter={shareHandlers.handleTwitter}
+      onTelegram={shareHandlers.handleTelegram}
+      onCopy={shareHandlers.handleCopy}
+      onDownloadImage={shareHandlers.handleDownloadShareImage}
+      copied={shareHandlers.copied}
+      isGeneratingImage={shareHandlers.isGeneratingImage}
+      onSpendStart={onSpendStart}
       t={t}
     />
+  );
+
+  /* Shared hero (score, outcome, streak, quest trail) with the one share surface as its footer,
+     then the Word Hunt body: the answer, how the score was earned, and, after a loss, the reveal. */
+  const heroNode = (
+    <>
+      <WordHuntResultsHero result={result} puzzleNumber={puzzleNumber} celebrate={!!isNewCompletion} t={t}>
+        {shareNode}
+      </WordHuntResultsHero>
+      <ResultDisplay
+        solved={result.solved}
+        attemptsUsed={result.attemptsUsed}
+        targetWord={result.targetWord}
+        streakDays={result.streakDays}
+        language={language}
+        countdown={countdown}
+        lifeRemaining={result.lifeRemaining || 0}
+        wordsDiscovered={result.wordsDiscovered?.length || 0}
+        currentUserId={profile?.id}
+        meaning={result.meaning}
+        t={t}
+      />
+      {!result.solved && (
+        <WordHuntAnswerReveal
+          targetWord={result.targetWord}
+          meaning={result.meaning}
+          language={language}
+          revealed={coinActions.targetWordRevealed}
+          revealCost={coinActions.revealCost}
+          currentCoins={coinActions.currentCoins}
+          onReveal={coinActions.handleRevealTargetWord}
+          onSpendStart={onSpendStart}
+          t={t}
+        />
+      )}
+    </>
   );
 
   const leaderboardNode = (
@@ -323,35 +313,8 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       <div className="space-y-4">
         {heroNode}
 
-        {/* Guests never had a next step here at all — the wheel CTA lived only in
-            the full recap. With ~90% of daily players unregistered, that was the
-            branch that most needed one. */}
         <NextQuestCta justFinished="word-hunt" currentLanguage={language} source="word_hunt_results_guest" />
 
-        {/* ShareSection is the one share surface on this screen (native share,
-            challenge link, image, WhatsApp/X/Telegram/copy). The recap card that
-            used to sit above it was a second, duplicate share block. */}
-        <ShareSection
-          solved={result.solved}
-          onShare={shareHandlers.handleNativeShare}
-          onChallengeShare={shareHandlers.handleChallengeShare}
-          onRetry={coinActions.handleRetryChallenge}
-          onRetryFree={onRetryFree}
-          canAffordRetry={coinActions.canAffordRetry}
-          retryCost={coinActions.retryCost}
-          currentCoins={coinActions.currentCoins}
-          onWhatsApp={shareHandlers.handleWhatsApp}
-          onTwitter={shareHandlers.handleTwitter}
-          onTelegram={shareHandlers.handleTelegram}
-          onCopy={shareHandlers.handleCopy}
-          onDownloadImage={shareHandlers.handleDownloadShareImage}
-          copied={shareHandlers.copied}
-          isGeneratingImage={shareHandlers.isGeneratingImage}
-          onSpendStart={onSpendStart}
-          t={t}
-        />
-
-        {failStateNode}
         {leaderboardNode}
         {signupLineNode}
         {signupModalNode}
@@ -363,44 +326,12 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   <div className="space-y-4">
     {heroNode}
 
-    {/* Primary CTA — exactly one next step.
-        This used to be a pair of hardcoded nodes: "STEP 2 OF 2 → Word Wheel"
-        when the wheel was unplayed, "back to daily" once it was. Both predate
-        Word Tower and Connections going public, so a player who finished Hunt
-        and Wheel was told the day was over while two modes sat unplayed — and
-        the step badge miscounted a four-mode day as two. NextQuestCta reads the
-        same server-backed play state the hub does, offers whatever is genuinely
-        next, and only says "all clear" when all four are done. It carries the
-        `cross_promo_click` event the old wheel CTA emitted. */}
+    {/* Exactly one next step, from the same server-backed play state the hub reads. */}
     <NextQuestCta
       justFinished="word-hunt"
       currentLanguage={language}
       source="word_hunt_results"
       className={STICKY_CTA_WORD_HUNT}
-    />
-
-    {/* Share and retry sit right under the CTA, NOT inside the recap — burying
-        the share action behind a disclosure is the opposite of the goal. This
-        is the only share surface: the recap card that used to sit above it
-        duplicated it (removed 2026-10-16, owner call). */}
-    <ShareSection
-      solved={result.solved}
-      onShare={shareHandlers.handleNativeShare}
-      onChallengeShare={shareHandlers.handleChallengeShare}
-      onRetry={coinActions.handleRetryChallenge}
-      onRetryFree={onRetryFree}
-      canAffordRetry={coinActions.canAffordRetry}
-      retryCost={coinActions.retryCost}
-      currentCoins={coinActions.currentCoins}
-      onWhatsApp={shareHandlers.handleWhatsApp}
-      onTwitter={shareHandlers.handleTwitter}
-      onTelegram={shareHandlers.handleTelegram}
-      onCopy={shareHandlers.handleCopy}
-      onDownloadImage={shareHandlers.handleDownloadShareImage}
-      copied={shareHandlers.copied}
-      isGeneratingImage={shareHandlers.isGeneratingImage}
-      onSpendStart={onSpendStart}
-      t={t}
     />
 
     {/* Leaderboard — who else played, and how you stack up. */}
@@ -488,9 +419,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
 
         {/* Daily Insights */}
         <DailyInsightStack mode="word_hunt" date={puzzleDate} />
-
-        {/* Fail state (reveal target) */}
-        {failStateNode}
 
 
         {/* Minimal signup line — guests see this in the default scroll path */}

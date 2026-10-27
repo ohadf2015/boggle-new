@@ -33,7 +33,7 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (k: string, fb?: string) => fb || k,
+    t: (k: string, fb?: unknown) => (typeof fb === 'string' ? fb : k),
     language: 'en',
   }),
 }));

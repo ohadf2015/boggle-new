@@ -12,22 +12,22 @@ type T = (key: string, params?: Record<string, string | number>) => string;
 
 const ART = '/images/word-tower-v2/empire';
 
-const CHEST_ART = (tier: ChestTier, open: boolean) => `${ART}/chest-${tier}-${open ? 'open' : 'closed'}.webp`;
+export const CHEST_ART = (tier: ChestTier, open: boolean) => `${ART}/chest-${tier}-${open ? 'open' : 'closed'}.webp`;
 
-const ITEM_ART: Record<ChestItem, string> = {
+export const ITEM_ART: Record<ChestItem, string> = {
   blueprint: `${ART}/blueprint.webp`,
   brick: `${ART}/golden-brick.webp`,
   shield: `${ART}/shield.webp`,
 };
 
 /** Rarity colour — the plate's fill, so the tier reads before the words do. */
-const TIER_CLASS: Record<ChestTier, string> = {
+export const TIER_CLASS: Record<ChestTier, string> = {
   common: 'bg-neo-cream',
   rare: 'bg-neo-cyan',
   epic: 'bg-neo-pink',
 };
 
-const ITEM_CLASS: Record<ChestItem, string> = {
+export const ITEM_CLASS: Record<ChestItem, string> = {
   blueprint: 'bg-neo-purple',
   brick: 'bg-neo-yellow',
   shield: 'bg-neo-cyan',

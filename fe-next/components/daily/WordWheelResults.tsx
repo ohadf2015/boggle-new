@@ -2,12 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
-import { ArrowLeft, Sparkles, Gem } from 'lucide-react';
-import Link from 'next/link';
+import { Sparkles, Gem } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { selectRareFindCelebration, type RareFind } from '@/lib/wordWheel/wordRarity';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
@@ -15,7 +15,10 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeChainCta from '@/components/practice/PracticeChainCta';
 import DailyInsightStack from './DailyInsightStack';
-import WordWheelResultsHero from './WordWheelResultsHero';
+import { DailyResultsHero } from './results/DailyResultsHero';
+import WheelRankMeter from './wheel/WheelRankMeter';
+import WheelShareRow from './wheel/WheelShareRow';
+import { WHEEL_RANKS, rankProgress, rankThresholds } from '@/lib/wordWheel/rankLadder';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import { useIsGuest } from '@/hooks/useIsGuest';
 import WordWheelSignupCta from './WordWheelSignupCta';
@@ -54,7 +57,7 @@ interface WordWheelResultsProps {
   leaderboardKey?: number;
   /** Whether the viewer is signed in. Gates the guest signup CTA. */
   isAuthenticated?: boolean;
-  /** Current daily-streak length (getDailyStreak().currentStreak) — surfaced as a chip + signup hook. */
+  /** Current daily-streak length (getDailyStreak().currentStreak) — feeds the signup hook. */
   streakDays?: number;
   /** True on the player's first-ever daily completion (welcome framing). */
   isFirstCompletion?: boolean;
@@ -78,6 +81,9 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   const { playSound } = useSoundEffects();
   const isPractice = usePracticeFlag();
   const isExceptional = result.score >= EXCELLENT_SCORE || result.wordsFound.length >= EXCELLENT_WORD_COUNT;
+  const celebrate = !alreadyPlayed;
+  const formatWord = (w: string) => (gameLang === 'he' ? applyHebrewFinalLetters(w) : w);
+  const longest = result.wordsFound.reduce((best, w) => (w.length > best.length ? w : best), '');
   const [rareFind, setRareFind] = useState<RareFind | null>(null);
   // Live rank + field size for today, reported up by the leaderboard below.
   // Feeds the rank-aware guest signup hook ("you're #1 today"). The same board
@@ -146,72 +152,74 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
       className="relative flex flex-col items-center gap-3 w-full max-w-md mx-auto px-4 py-5 lg:max-w-5xl lg:flex-row lg:items-start lg:gap-8"
     >
       <div className="w-full flex flex-col items-center gap-3">
-        {/* Back to daily landing */}
-        <div className="w-full flex justify-start z-10">
-          <Link
-            href={`/${language}/daily`}
-            className="inline-flex items-center text-sm text-neo-white hover:text-neo-white transition-colors"
-          >
-            <ArrowLeft className="me-2 rtl:rotate-180 w-4 h-4" />
-            {t('common.back')}
-          </Link>
-        </div>
-
-        <WordWheelResultsHero
-          t={t}
+        <DailyResultsHero
+          mode="word-wheel"
+          outcome={result.wordsFound.length > 0 ? 'win' : 'done'}
+          headline={t(`wordWheel.rank.${WHEEL_RANKS[rankProgress(result.score, rankThresholds()).index]}`)}
+          eyebrow={`#${puzzleNumber}`}
           score={result.score}
-          wordsFound={result.wordsFound}
-          puzzleNumber={puzzleNumber}
-          streakDays={streakDays}
-          showStreak={!isPractice}
-          formatWord={(w) => (gameLang === 'he' ? applyHebrewFinalLetters(w) : w)}
-          highlights={isExceptional || rareFind ? (
-            <>
-              {isExceptional && (
-                <m.span
-                  data-testid="word-wheel-perfect-banner"
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-xs uppercase tracking-wider shadow-[2px_2px_0_#000]"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 1.0, type: 'spring', stiffness: 380, damping: 16 }}
-                >
-                  <Sparkles className="w-3.5 h-3.5" strokeWidth={2.5} aria-hidden />
-                  {t('wordWheel.results.perfectBanner', 'Word Wizard!')}
-                </m.span>
-              )}
-              {rareFind && (
-                <m.span
-                  data-testid="word-wheel-rare-find"
-                  data-exclusive={rareFind.isExclusive ? 'true' : 'false'}
-                  className={cn(
-                    'inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-neo-black text-xs font-black shadow-[2px_2px_0_#000]',
-                    rareFind.isExclusive ? 'bg-neo-yellow text-neo-black' : 'bg-neo-purple text-neo-white',
-                  )}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 1.1, type: 'spring', stiffness: 360, damping: 16 }}
-                >
-                  <Gem className="w-3.5 h-3.5 shrink-0" strokeWidth={2.5} aria-hidden />
-                  <span className="uppercase tracking-wide">
-                    {rareFind.isExclusive
-                      ? t('wordWheel.results.onlyYouFound', 'Only you found this — so far!')
-                      : t('wordWheel.results.rareFind', { count: rareFind.playerCount })}
-                  </span>
-                  <span dir="auto" className="font-neo-display tracking-widest">
-                    {gameLang === 'he' ? applyHebrewFinalLetters(rareFind.word) : rareFind.word}
-                  </span>
-                </m.span>
-              )}
-            </>
-          ) : undefined}
-          onShareClick={(method) => trackGrowthEvent('cross_promo_click', {
-            target: 'share',
-            source: 'word_wheel_results',
-            placement: 'results_hero',
-            method,
-            language,
-          })}
-        />
+          stats={[
+            { value: result.wordsFound.length, label: t('wordWheel.results.wordsFound') },
+            { value: longest ? formatWord(longest) : '-', label: t('wordWheel.strip.longest') },
+          ]}
+          meter={<WheelRankMeter t={t} score={result.score} animate={celebrate} />}
+          celebrate={celebrate}
+          className="z-10"
+        >
+          {result.wordsFound.length > 0 && (
+            <WheelShareRow
+              t={t}
+              score={result.score}
+              wordsFound={result.wordsFound}
+              puzzleNumber={puzzleNumber}
+              onShareClick={(method) => trackGrowthEvent('cross_promo_click', {
+                target: 'share',
+                source: 'word_wheel_results',
+                placement: 'results_hero',
+                method,
+                language,
+              })}
+            />
+          )}
+        </DailyResultsHero>
+
+        {(isExceptional || rareFind) && (
+          <div data-testid="results-highlights" className="z-10 flex flex-wrap items-center justify-center gap-2">
+            {isExceptional && (
+              <m.span
+                data-testid="word-wheel-perfect-banner"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-xs uppercase tracking-wider shadow-hard-sm"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ ...SPRING_PRESETS.bouncy, delay: 1.0 }}
+              >
+                <Sparkles className="w-3.5 h-3.5" strokeWidth={2.5} aria-hidden />
+                {t('wordWheel.results.perfectBanner', 'Word Wizard!')}
+              </m.span>
+            )}
+            {rareFind && (
+              <m.span
+                data-testid="word-wheel-rare-find"
+                data-exclusive={rareFind.isExclusive ? 'true' : 'false'}
+                className={cn(
+                  'inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-neo-black text-xs font-black shadow-hard-sm',
+                  rareFind.isExclusive ? 'bg-neo-yellow text-neo-black' : 'bg-neo-purple text-neo-white',
+                )}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ ...SPRING_PRESETS.bouncy, delay: 1.1 }}
+              >
+                <Gem className="w-3.5 h-3.5 shrink-0" strokeWidth={2.5} aria-hidden />
+                <span className="uppercase tracking-wide">
+                  {rareFind.isExclusive
+                    ? t('wordWheel.results.onlyYouFound', 'Only you found this — so far!')
+                    : t('wordWheel.results.rareFind', { count: rareFind.playerCount })}
+                </span>
+                <span dir="auto" className="font-neo-display tracking-widest">{formatWord(rareFind.word)}</span>
+              </m.span>
+            )}
+          </div>
+        )}
 
         {/* Guest signup conversion — Word Wheel bypasses the generic guest-stats
             signup gate, so this restores a value-led signup surface for the mode.
@@ -369,7 +377,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
                         key={word}
                         className="px-2 py-0.5 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white text-xs font-semibold shadow-hard-xs"
                       >
-                        {gameLang === 'he' ? applyHebrewFinalLetters(word) : word}{' '}
+                        {formatWord(word)}{' '}
                         <span className="text-neo-lime">+{scoreWord(word)}</span>
                       </span>
                     ))}

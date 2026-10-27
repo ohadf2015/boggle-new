@@ -3,7 +3,7 @@
 import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { DiscoveredWordsList } from './DiscoveredWordsList';
-import { AnimatePresence, m } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 
 const WordHuntEffectsCanvas = dynamic(
   () => import('./WordHuntEffectsCanvas'),
@@ -42,7 +42,9 @@ import { SurvivalExtraLifeModal } from './survival/SurvivalExtraLifeModal';
 import { useWordHuntFx } from './survival/useWordHuntFx';
 import { HuntPlayfield } from './survival/hunt/HuntPlayfield';
 import { useHuntStage } from './survival/hunt/useHuntStage';
-import { HuntSolveCelebration } from './survival/hunt/HuntSolveCelebration';
+import { HuntFinishOverlay } from './survival/hunt/HuntFinishOverlay';
+import { HuntFeedbackPill } from './survival/hunt/HuntFeedbackPill';
+import { wordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
 import { HuntHintSlots } from './survival/hunt/HuntHintSlots';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
@@ -308,8 +310,16 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     t,
   };
 
-  const celebration = fx.showTargetConfetti ? (
-    <HuntSolveCelebration tier={fx.solveTier} onDone={fx.clearTargetConfetti} t={t} />
+  const finishOverlay = state.isGameOver ? (
+    <HuntFinishOverlay
+      outcome={state.hasWon ? 'win' : 'loss'}
+      targetWord={targetWord}
+      language={language}
+      tier={state.hasWon ? wordHuntSolveTier(state.attempts.filter((a) => !a.isDiscovery).length) : null}
+      calm={skipAnimations}
+      onSkip={actions.skipFinish}
+      t={t}
+    />
   ) : null;
 
   const notifications = (
@@ -429,36 +439,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
       </div>
 
-      {/* The last word's result stays readable here; the board stage only flashes it. */}
-      <div data-testid="hunt-feedback-row" className="shrink-0 h-6 flex items-center justify-center">
-        <AnimatePresence mode="wait">
-          {state.feedbackType && state.feedbackMessage && (
-            <m.div
-              key={state.feedbackSeq}
-              data-testid="hunt-feedback-pill"
-              data-type={state.feedbackType}
-              role="status"
-              initial={skipAnimations ? false : { opacity: 0, y: -8, scale: 0.7 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.1 } }}
-              transition={{ type: 'spring', stiffness: 520, damping: 26 }}
-              className={cn(
-                'max-w-full truncate text-xs font-bold px-2.5 py-0.5 rounded-full',
-                state.feedbackType === 'valid-word' || state.feedbackType === 'target-found'
-                  ? 'bg-neo-lime/15 text-neo-lime'
-                  : state.feedbackType === 'duplicate' || state.feedbackType === 'too-short' || state.feedbackType === 'too-long'
-                    ? 'bg-neo-orange/15 text-neo-orange'
-                    : 'bg-neo-red/15 text-neo-red',
-              )}
-            >
-              {state.feedbackWord && (
-                <span className="font-black uppercase tracking-wider me-1">{state.feedbackWord}</span>
-              )}
-              {state.feedbackMessage}
-            </m.div>
-          )}
-        </AnimatePresence>
-      </div>
+      <HuntFeedbackPill
+        seq={state.feedbackSeq}
+        type={state.feedbackType}
+        message={state.feedbackMessage}
+        word={state.feedbackWord}
+        calm={skipAnimations}
+      />
 
       <HuntHintSlots
         showCategory={state.showCategory}
@@ -479,13 +466,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         <HuntPlayfield
           {...playfieldProps}
           size={inShell ? 'desktop' : 'phone'}
-          stageOverlay={
-            <>
-              <span id={fx.rewardId} className="absolute left-1/2 top-8 pointer-events-none" />
-              {celebration}
-            </>
-          }
+          stageOverlay={<span id={fx.rewardId} className="absolute left-1/2 top-8 pointer-events-none" />}
         />
+        {finishOverlay}
       </div>
 
       {/* Fixed height, not just a floor: the board is sized from what's left, so a
