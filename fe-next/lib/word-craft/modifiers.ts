@@ -14,7 +14,8 @@ export type WordCraftModifier =
   | 'rich_letters'
   | 'land_grab'
   | 'quick_draw'
-  | 'golden_tiles';
+  | 'golden_tiles'
+  | 'star_squares';
 
 export const WORDCRAFT_MODIFIERS: readonly WordCraftModifier[] = [
   'none',
@@ -24,6 +25,7 @@ export const WORDCRAFT_MODIFIERS: readonly WordCraftModifier[] = [
   'land_grab',
   'quick_draw',
   'golden_tiles',
+  'star_squares',
 ];
 
 // Weighted so ~half of games run with a live modifier and the rest are the
@@ -38,6 +40,7 @@ const WEIGHTED: readonly WordCraftModifier[] = [
   'land_grab', 'land_grab',
   'quick_draw',
   'golden_tiles',
+  'star_squares', 'star_squares',
 ];
 
 // Same small deterministic PRNG family used by the tile bag — seeded so a game
@@ -65,6 +68,7 @@ export function toScoreModifier(modifier: WordCraftModifier): ScoreModifierSpec 
     case 'land_grab':
     case 'quick_draw':
     case 'golden_tiles':
+    case 'star_squares':
       // Pure rule modifiers — no scoring change (see modifierCaptureSpread,
       // modifierRackSize, isGoldenTile).
       return {};
@@ -95,6 +99,50 @@ export function isGoldenTile(seed: number, tileId: string): boolean {
     h = Math.imul(h ^ tileId.charCodeAt(i), 0x01000193) >>> 0;
   }
   return h % 6 === 0;
+}
+
+export interface Cell2 {
+  row: number;
+  col: number;
+}
+
+/**
+ * star_squares: four fixed star cells, one per board quadrant, seeded so both
+ * seats, the board UI and bot ranking agree. Landing a tile on a star ring-captures
+ * the opponent cells around it (same rule as a golden tile), so the stars become
+ * the contested ground of the match.
+ */
+export function starCells(seed: number, size: number): Cell2[] {
+  const mid = Math.floor(size / 2);
+  const ranges: Array<[number, number]> = [
+    [1, Math.max(1, mid - 1)],
+    [mid, Math.max(mid, size - 2)],
+  ];
+  const out: Cell2[] = [];
+  for (let q = 0; q < 4; q++) {
+    const [r0, r1] = ranges[q >> 1];
+    const [c0, c1] = ranges[q & 1];
+    const h = hashSeed(seed ^ Math.imul(q + 1, 0x9e3779b1));
+    out.push({ row: r0 + (h % (r1 - r0 + 1)), col: c0 + ((h >>> 8) % (c1 - c0 + 1)) });
+  }
+  return out;
+}
+
+/** Cells whose placed tile ring-captures this turn, for the active modifier (undefined = none). */
+export function modifierRingCenters(
+  modifier: WordCraftModifier,
+  seed: number,
+  boardSize: number,
+  placements: ReadonlyArray<{ row: number; col: number; rackTileId: string }>,
+): Cell2[] | undefined {
+  if (modifier === 'golden_tiles') {
+    return placements.filter((p) => isGoldenTile(seed, p.rackTileId)).map((p) => ({ row: p.row, col: p.col }));
+  }
+  if (modifier === 'star_squares') {
+    const stars = new Set(starCells(seed, boardSize).map((c) => `${c.row},${c.col}`));
+    return placements.filter((p) => stars.has(`${p.row},${p.col}`)).map((p) => ({ row: p.row, col: p.col }));
+  }
+  return undefined;
 }
 
 /**

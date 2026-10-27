@@ -4,6 +4,7 @@ import { memo, useMemo } from 'react';
 import type { Board } from '@/lib/word-craft/board';
 import type { PlacedTile } from '@/lib/word-craft/types';
 import { JOKER_GLYPH, isUnassignedBlank } from '@/lib/word-craft/blankAssign';
+import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface WordCraftBoardProps {
@@ -32,6 +33,8 @@ export interface WordCraftBoardProps {
    * Golden pending/placed tiles carry a gold ring so the twist reads on-board.
    */
   isGolden?: (tileId: string) => boolean;
+  /** star_squares modifier: 'r,c' keys of the star cells (empty ones show a star). */
+  starCells?: ReadonlySet<string>;
 }
 
 /** Build the set of axis-hint cells (N/E/S/W neighbors) for a single anchor. */
@@ -57,6 +60,7 @@ function WordCraftBoardImpl({
   dragHoverCell,
   reticle,
   isGolden,
+  starCells,
 }: WordCraftBoardProps) {
   const size = board.size;
   const centerIndex = Math.floor(size / 2);
@@ -114,6 +118,7 @@ function WordCraftBoardImpl({
           const inviteEmpty = isEmpty && hasSelectedTile && !disabled;
           const isDragTarget = dragHoverCell === key && isEmpty;
           const isAxisHint = axisHintCells.has(key) && isEmpty && !disabled;
+          const isStar = isEmpty && !!starCells?.has(key);
           const isReticle = reticle?.row === r && reticle?.col === c;
           const isTabAnchor = tabAnchor.row === r && tabAnchor.col === c;
           const goldenId = pending?.rackTileId ?? placedTile?.rackTileId;
@@ -136,6 +141,7 @@ function WordCraftBoardImpl({
               role="gridcell"
               data-board-cell={key}
               data-golden={golden ? 'true' : undefined}
+              data-star={isStar ? 'true' : undefined}
               data-premium=""
               data-claim={placedTile && cell.claim ? cell.claim : undefined}
               data-tile-id={pending?.rackTileId ?? placedTile?.rackTileId ?? undefined}
@@ -175,6 +181,7 @@ function WordCraftBoardImpl({
                     ? 'bg-neo-navy-light/70'
                     : 'bg-neo-navy-light/45',
                 golden && !isDragTarget && 'ring-2 ring-neo-yellow z-10',
+                isStar && !isDragTarget && 'ring-2 ring-inset ring-neo-yellow/60',
                 isDragTarget && 'bg-neo-cyan/30 ring-4 ring-neo-cyan scale-110 z-10',
                 isAxisHint && !isDragTarget && 'wc-axis-hint',
                 isReticle && !isDragTarget && 'ring-2 ring-neo-yellow z-10',
@@ -214,6 +221,8 @@ function WordCraftBoardImpl({
                   )}
                   {isUnassignedBlank(pending) ? JOKER_GLYPH : pending.letter}
                 </span>
+              ) : isStar ? (
+                <Star aria-hidden className="w-[48%] h-[48%] text-neo-yellow fill-neo-yellow" strokeWidth={2} />
               ) : isAxisHint ? (
                 // tiny dot hints player at where next tile in a line could go
                 <span aria-hidden className="block w-1.5 h-1.5 rounded-full bg-neo-cyan/60" />
