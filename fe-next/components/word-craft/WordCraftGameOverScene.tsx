@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { useCountUp } from '@/components/word-craft/hooks/useCountUp';
 import Avatar from '@/components/Avatar';
 import { WordCraftDuelResult } from './WordCraftDuelResult';
 import { WordCraftPlayFriendControl } from './WordCraftPlayFriendControl';
@@ -52,6 +53,8 @@ interface Props {
 }
 
 export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, playerAvatar, opponentAvatar, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, challengeIntent, highlights, dailyResult, onPlayAgain, onHome }: Props) {
+  const shownPlayer = useCountUp(playerScore);
+  const shownBot = useCountUp(botScore);
   // If in a duel, show duel result instead of vs-bot result
   if (duelOutcome) {
     return (
@@ -162,7 +165,7 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
             <span data-wc-result-avatar className="block">
               <Avatar customAvatar={playerAvatar ?? null} userId={`wc-player-${playerLabel}`} size="sm" disableEffects />
             </span>
-            <span className="text-3xl font-neo-display font-black leading-none">{playerScore}</span>
+            <span className="text-3xl font-neo-display font-black leading-none tabular-nums">{shownPlayer}</span>
             <span className="text-[10px] font-neo-body uppercase tracking-wider truncate max-w-full px-1">{playerLabel} · {squares}</span>
           </div>
           <div className={cn(
@@ -172,7 +175,7 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
             <span data-wc-result-avatar className="block">
               <Avatar customAvatar={opponentAvatar ?? null} userId={`wc-opponent-${botLabel}`} size="sm" disableEffects />
             </span>
-            <span className="text-3xl font-neo-display font-black leading-none">{botScore}</span>
+            <span className="text-3xl font-neo-display font-black leading-none tabular-nums">{shownBot}</span>
             <span className="text-[10px] font-neo-body uppercase tracking-wider truncate max-w-full px-1">{botLabel} · {squares}</span>
           </div>
         </div>
