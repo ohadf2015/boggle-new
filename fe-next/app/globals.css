@@ -4593,6 +4593,15 @@ body.mp-shell-locked {
   animation: wc-tile-land-kf 220ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
 }
 
+@keyframes wc-float-kf {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-8px) rotate(2deg); }
+}
+
+.wc-float {
+  animation: wc-float-kf 3.2s ease-in-out infinite;
+}
+
 @keyframes wc-axis-hint-kf {
   0%, 100% { opacity: 0.45; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.18); }
@@ -4608,6 +4617,7 @@ body.mp-shell-locked {
   .wc-rack-glow,
   .wc-submit-pulse,
   .wc-tile-land,
+  .wc-float,
   .wc-axis-hint > span {
     animation: none;
   }

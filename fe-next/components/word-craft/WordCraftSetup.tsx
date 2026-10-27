@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import Image from 'next/image';
 import { Bot, Play, Send, Sparkles, Users } from 'lucide-react';
 import { BOT_DIFFICULTIES } from '@/lib/word-craft/botDifficulty';
 import { WORDCRAFT_MODIFIERS, modifierLabelKey, type WordCraftModifier } from '@/lib/word-craft/modifiers';
@@ -88,6 +89,17 @@ export function WordCraftSetup({ initial, onStart, t }: WordCraftSetupProps) {
         <p className="text-sm [@media(min-height:700px)]:text-base text-neo-white/60 font-neo-body">
           {t('wordcraft.setup.tagline', 'Place words. Claim territory. Outsmart the bot.')}
         </p>
+      </div>
+
+      <div className="flex-1 min-h-0 flex items-center justify-center [@media(max-height:640px)]:hidden" aria-hidden>
+        <Image
+          src="/word-craft/flag.webp"
+          alt=""
+          width={282}
+          height={512}
+          priority
+          className="wc-float h-52 w-auto object-contain drop-shadow-[0_6px_0_rgba(0,0,0,0.6)]"
+        />
       </div>
 
       {/* Opponent */}
