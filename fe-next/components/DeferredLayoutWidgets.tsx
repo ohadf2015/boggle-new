@@ -25,6 +25,10 @@ const VersionChecker = nextDynamic(
   () => import('@/components/VersionChecker'),
   { ssr: false, loading: () => null }
 );
+const StaleBuildReloader = nextDynamic(
+  () => import('@/components/StaleBuildReloader'),
+  { ssr: false, loading: () => null }
+);
 const AndroidAppRedirect = nextDynamic(
   () => import('@/components/AndroidAppRedirect'),
   { ssr: false, loading: () => null }
@@ -96,6 +100,10 @@ export default function DeferredLayoutWidgets() {
   return (
     <>
       <VersionChecker />
+      {/* Auto-reloads tabs whose build went stale > 30 min ago and are idle —
+          the complement to VersionChecker's manual toast, which a forgotten
+          tab never clicks (t_64ecd326). Silent, like the trackers below. */}
+      <StaleBuildReloader />
       {!quietChrome && (
         <>
           <AndroidAppRedirect />
