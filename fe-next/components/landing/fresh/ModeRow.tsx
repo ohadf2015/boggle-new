@@ -119,7 +119,7 @@ export function ModeRow() {
             const TagIcon = tag ? TAG_ICON[tag.players] : null;
             const artScale: CSSProperties | undefined = zoom > 1 ? { transform: `scale(${zoom})` } : undefined;
             return (
-              <li key={key} className={cn('flex', cell)}>
+              <li key={key} className={cn('flex', cell, styles.rise)} style={{ '--i': idx } as CSSProperties}>
                 <Link
                   href={href}
                   data-mode={key}
@@ -158,49 +158,60 @@ export function ModeRow() {
                     </div>
                   </div>
 
-                  <div className={cn('flex min-w-0 flex-col justify-center gap-1.5', feature ? 'mt-4 flex-none justify-end pe-14' : 'flex-1 pe-9 lg:group-data-[shape=tall]:mt-3')}>
-                    {tag && TagIcon && (
-                      <span
-                        data-testid="mode-tag"
+                  <div className={cn('flex min-w-0 flex-1 flex-col gap-2', feature ? 'mt-4 flex-none' : 'justify-center lg:group-data-[shape=tall]:mt-3')}>
+                    <div className="flex items-start justify-between gap-3">
+                      <h3
                         className={cn(
-                          'inline-flex w-fit items-center gap-1 rounded-full border-2 border-neo-black px-2 py-0.5 font-neo-body text-xs font-bold leading-none',
-                          tone.chip
+                          'font-neo-display font-bold leading-tight text-neo-white',
+                          feature ? 'font-neo-poster text-3xl sm:text-4xl' : 'text-lg sm:text-xl'
                         )}
                       >
-                        <TagIcon className="h-3 w-3" strokeWidth={2.75} aria-hidden="true" />
-                        {t(TAG_LABEL_KEY[tag.players])}
-                        {tag.untimed && (
-                          <>
-                            <span aria-hidden="true">·</span>
-                            {t('landing.home.modeTag.untimed')}
-                          </>
+                        {t(`homeFresh.modes.items.${key}.title`)}
+                      </h3>
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'grid shrink-0 place-items-center rounded-full border-3 border-neo-black text-neo-navy',
+                          tone.arrow,
+                          feature ? 'h-11 w-11' : 'h-8 w-8',
+                          'motion-safe:transition-transform motion-safe:duration-200 motion-safe:group-hover:translate-x-1 motion-safe:group-hover:scale-110 rtl:motion-safe:group-hover:-translate-x-1'
                         )}
+                      >
+                        <DirectionalIcon icon={ArrowRight} className={feature ? 'h-5 w-5' : 'h-4 w-4'} />
                       </span>
-                    )}
-                    <h3
-                      className={cn(
-                        'font-neo-display font-bold leading-tight text-neo-white',
-                        feature ? 'font-neo-poster text-3xl sm:text-4xl' : 'text-lg sm:text-xl'
-                      )}
-                    >
-                      {t(`homeFresh.modes.items.${key}.title`)}
-                    </h3>
+                    </div>
                     <p className={cn('font-neo-body leading-snug text-neo-cream/80', feature ? 'max-w-[36ch] text-base' : 'text-sm')}>
                       {t(`homeFresh.modes.items.${key}.line`)}
                     </p>
-                  </div>
-
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      'absolute grid place-items-center rounded-full border-3 border-neo-black text-neo-navy',
-                      tone.arrow,
-                      feature ? 'bottom-4 end-4 h-12 w-12 sm:bottom-5 sm:end-5' : 'bottom-3 end-3 h-9 w-9',
-                      'motion-safe:transition-transform motion-safe:group-hover:translate-x-0.5 rtl:motion-safe:group-hover:-translate-x-0.5'
+                    {tag && TagIcon && (
+                      <>
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            'h-0.5 w-full origin-left [background-image:repeating-linear-gradient(90deg,var(--dot)_0_6px,transparent_6px_12px)] rtl:origin-right',
+                            'motion-safe:scale-x-50 motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out motion-safe:group-hover:scale-x-100',
+                            tone.dots
+                          )}
+                        />
+                        <span
+                          data-testid="mode-tag"
+                          className={cn(
+                            'inline-flex w-fit items-center gap-1 rounded-full border-2 border-neo-black px-2 py-0.5 font-neo-body text-xs font-bold leading-none',
+                            tone.chip
+                          )}
+                        >
+                          <TagIcon className="h-3 w-3" strokeWidth={2.75} aria-hidden="true" />
+                          {t(TAG_LABEL_KEY[tag.players])}
+                          {tag.untimed && (
+                            <>
+                              <span aria-hidden="true">·</span>
+                              {t('landing.home.modeTag.untimed')}
+                            </>
+                          )}
+                        </span>
+                      </>
                     )}
-                  >
-                    <DirectionalIcon icon={ArrowRight} className={feature ? 'h-5 w-5' : 'h-4 w-4'} />
-                  </span>
+                  </div>
                 </Link>
               </li>
             );

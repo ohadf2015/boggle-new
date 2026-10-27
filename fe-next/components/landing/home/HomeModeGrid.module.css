@@ -20,3 +20,20 @@
     transform: translateY(-4%) scale(calc(var(--art-scale, 1) * 1.04));
   }
 }
+
+/* Cards rise into place one after another; transform-only so nothing starts hidden. */
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    transform: none;
+  }
+}

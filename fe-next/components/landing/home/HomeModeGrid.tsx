@@ -100,6 +100,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
       style={{ '--i': index, '--art-scale': model.imgScale ?? 1, '--cube-glow': tint.glow } as CSSProperties}
       className={cn(
         'group relative overflow-hidden rounded-neo border-[3px]',
+        styles.rise,
         tint.border,
         tint.shadow,
         // Solid panel + art window + text block: the label never sits on a busy picture.
@@ -189,18 +190,18 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
           data-testid="mode-tile-label"
           className="flex min-w-0 flex-1 flex-col items-start justify-center gap-1"
         >
-          {(badge || model.tag) && (
-            <span className="flex max-w-full flex-wrap items-center gap-1">
-              {badge && <span className={cn(BADGE_CLASS, 'text-[0.6rem] md:text-[0.65rem]', tint.chip)}>{badge}</span>}
-              {model.tag && <ModeTagChip tag={model.tag} compact />}
-            </span>
-          )}
           <span
             className="line-clamp-2 max-w-full font-neo-display text-[0.9rem] font-black leading-[1.1] text-neo-white md:text-sm"
             style={{ textWrap: 'balance' } as CSSProperties}
           >
             {model.title}
           </span>
+          {(badge || model.tag) && (
+            <span className="flex max-w-full flex-wrap items-center gap-1">
+              {badge && <span className={cn(BADGE_CLASS, 'text-[0.6rem] md:text-[0.65rem]', tint.chip)}>{badge}</span>}
+              {model.tag && <ModeTagChip tag={model.tag} compact />}
+            </span>
+          )}
           {model.description && (
             <span
               data-testid="mode-tile-desc"
@@ -210,6 +211,13 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
             </span>
           )}
         </span>
+      )}
+      {!anchor && !locked && (
+        <Arrow
+          aria-hidden="true"
+          className="h-4 w-4 shrink-0 text-neo-cream/50 motion-safe:transition-[transform,color] motion-safe:duration-200 group-hover:text-neo-cream motion-safe:group-hover:translate-x-1 rtl:motion-safe:group-hover:-translate-x-1"
+          strokeWidth={3}
+        />
       )}
 
       {locked && (
