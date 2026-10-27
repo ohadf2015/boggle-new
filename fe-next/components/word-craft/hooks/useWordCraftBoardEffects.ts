@@ -40,6 +40,7 @@ export function useWordCraftBoardEffects({ game, juice, sceneCtx, hotseat }: Arg
       const cellEls = cap.cells.map((c) => document.querySelector(`[data-board-cell="${c.row},${c.col}"]`));
       requestAnimationFrame(() => juice.captureBurst(cellEls, color));
     }
+    if (cap.by === 'bot' && cap.cells.length >= 2) juice.boardImpact(document.querySelector('[data-wc-board]'), 2);
     const timer = setTimeout(() => setCaptureToast(null), 1800);
     return () => clearTimeout(timer);
   }, [game.state.lastCapture, juice]);
