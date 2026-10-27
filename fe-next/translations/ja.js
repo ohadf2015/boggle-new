@@ -21156,6 +21156,26 @@ const ja = {
         }
       }
     },
+    "trialChecklist": {
+      "title": "今日からクラスでプレイしよう",
+      "subtitle": "3つのステップ。Teacher Proの無料体験が進行中です。",
+      "progress": "{done} / {total}",
+      "dismiss": "チェックリストを閉じる",
+      "steps": {
+        "create_classroom": {
+          "title": "クラスを作成する",
+          "cta": "クラスを作成"
+        },
+        "invite_students": {
+          "title": "生徒を招待する",
+          "cta": "生徒を招待"
+        },
+        "first_assignment": {
+          "title": "最初の課題を出す",
+          "cta": "課題を作成"
+        }
+      }
+    },
     "setup": {
       "title": "新しいクラス",
       "subtitle": "選ぶのは3つだけ。あとから変更できます。",

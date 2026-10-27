@@ -20215,6 +20215,26 @@ const en = {
         }
       }
     },
+    "trialChecklist": {
+      "title": "Get your class playing today",
+      "subtitle": "Three steps. Your Teacher Pro trial is running.",
+      "progress": "{done} of {total}",
+      "dismiss": "Dismiss checklist",
+      "steps": {
+        "create_classroom": {
+          "title": "Create a classroom",
+          "cta": "Create classroom"
+        },
+        "invite_students": {
+          "title": "Invite students",
+          "cta": "Invite students"
+        },
+        "first_assignment": {
+          "title": "Give the first assignment",
+          "cta": "Create assignment"
+        }
+      }
+    },
     "setup": {
       "title": "New class",
       "subtitle": "Three quick choices. You can change them later.",

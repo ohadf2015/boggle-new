@@ -25,19 +25,22 @@ import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
 import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
 import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
+import { TrialActivationChecklist } from './home/TrialActivationChecklist';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { HomeRailSkeleton, HomeSkeleton } from './home/HomeSkeleton';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
+import { useTeacherTrialChecklist } from '@/hooks/useTeacherTrialChecklist';
 import { useTeacherWeekStats } from '@/hooks/useTeacherWeekStats';
 import { useClassStudentPreview } from '@/hooks/useClassStudentPreview';
-import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
+import { teacherAssignHref, useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
 import { polarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
 import { trackEduTeacherDashboardViewed } from '@/lib/education/telemetry';
 import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { homeOnboarding, type HomeOnboardingStepId } from '@/lib/education/homeOnboarding';
+import type { TrialChecklistStepId } from '@/lib/education/trialChecklistProgress';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { isDigestOverFreeTierCaps } from '@/lib/education/teacherPlanGate';
 
@@ -63,7 +66,8 @@ function greetingKey(hour: number): string {
 export default function TeacherDashboard({ banner, proOffer, usagePrompt }: TeacherDashboardProps = {}) {
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
+  const teacherId = user?.id ?? (profile as { id?: string } | null)?.id ?? null;
   const router = useRouter();
   const searchParams = useSearchParams();
   const deepLink = useTeacherDashboardDeepLink();
@@ -76,6 +80,16 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   const pro = useTeacherPro();
   const { hasPro, loading: proLoading } = pro;
   const activation = useTeacherActivationProgress();
+  const trial = useTeacherTrialChecklist({
+    teacherId,
+    locale: language,
+    status: pro.status,
+    known: pro.known,
+    loading: proLoading,
+    classrooms,
+    classroomsReady: !classroomsLoading && !classroomsError,
+    inviteCopied: activation.progress.inviteCopied,
+  });
   const week = useTeacherWeekStats(classrooms, !classroomsLoading && !classroomsError, language);
   const studentPreview = useClassStudentPreview(classrooms, !classroomsLoading && !classroomsError);
 
@@ -93,6 +107,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   // One-shot: drop ?assign=1 once read so a refresh doesn't reopen the creator.
   useEffect(() => {
     if (!deepLink.openAssignment) return;
+    setShowAssignmentCreator(true);
     const rest = new URLSearchParams(searchParams?.toString() ?? '');
     rest.delete('assign');
     const query = rest.toString();
@@ -149,6 +164,12 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
   });
   const newClassHref = `/${language}/teacher/classroom/new`;
   const shareCodeHref = effectiveId ? `${newClassHref}?classroomId=${encodeURIComponent(effectiveId)}` : newClassHref;
+  const assignHref = effectiveId ? teacherAssignHref(language, effectiveId) : `/${language}/teacher?assign=1`;
+  const trialHrefs: Record<TrialChecklistStepId, string> = {
+    create_classroom: newClassHref,
+    invite_students: shareCodeHref,
+    first_assignment: assignHref,
+  };
   const onboardingHrefs: Record<HomeOnboardingStepId, string> = {
     createClass: newClassHref,
     shareCode: shareCodeHref,
@@ -212,51 +233,63 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
             <HomeSkeleton />
           ) : classroomsError ? (
             <HqLoadError onRetry={() => void classroomsState.refresh?.()} />
-          ) : !hasClasses ? (
-            <HomeOnboardingCard
-              onboarding={onboarding}
-              hrefs={onboardingHrefs}
-              variant="full"
-              t={t}
-              secondary={<RehearseWithBotsButton classroomId={undefined} source="hq" language={language} t={t} showNote />}
-            />
           ) : (
             <>
-              {onboarding.visible && !(onboarding.current === 'shareCode' && shareCardShown) ? (
-                <HomeOnboardingCard
-                  onboarding={onboarding}
-                  hrefs={onboardingHrefs}
-                 
-                  onDismiss={activation.dismiss}
-                  variant="compact"
-                  t={t}
-                />
-              ) : null}
-              {selectedClassroom ? <HomeGetStudentsIn classroom={selectedClassroom} /> : null}
-              <div data-tm>
-                <HomeHero
-                  classrooms={classrooms}
-                  selectedId={effectiveId}
-                  onSelect={setSelectedId}
-                  language={language}
-                  t={t}
-                  rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} showNote />}
-                />
-              </div>
-              <div>
-                <HomeClassList
-                  classrooms={classrooms}
-                  studentPreview={studentPreview}
-                  lastPlayedAt={week.summary?.lastPlayedAt ?? null}
-                  activityFailed={week.status === 'error'}
-                  newClassHref={newClassHref}
-                  classLimit={!proLoading && !hasPro ? FREE_TIER_LIMITS.classes : null}
-                  language={language}
-                  nowMs={nowMs}
-                  t={t}
-                />
-              </div>
-              {accountBanner ? <div data-testid="home-account-banner">{accountBanner}</div> : null}
+              <TrialActivationChecklist
+                checklist={trial.checklist}
+                hrefs={trialHrefs}
+                onDismiss={trial.dismiss}
+                onOpenAssignment={() => setShowAssignmentCreator(true)}
+                t={t}
+              />
+              {!hasClasses ? (
+                !trial.checklist.visible ? (
+                  <HomeOnboardingCard
+                    onboarding={onboarding}
+                    hrefs={onboardingHrefs}
+                    variant="full"
+                    t={t}
+                    secondary={<RehearseWithBotsButton classroomId={undefined} source="hq" language={language} t={t} showNote />}
+                  />
+                ) : null
+              ) : (
+                <>
+                  {!trial.checklist.visible && onboarding.visible && !(onboarding.current === 'shareCode' && shareCardShown) ? (
+                    <HomeOnboardingCard
+                      onboarding={onboarding}
+                      hrefs={onboardingHrefs}
+                      onDismiss={activation.dismiss}
+                      variant="compact"
+                      t={t}
+                    />
+                  ) : null}
+                  {selectedClassroom ? <HomeGetStudentsIn classroom={selectedClassroom} /> : null}
+                  <div data-tm>
+                    <HomeHero
+                      classrooms={classrooms}
+                      selectedId={effectiveId}
+                      onSelect={setSelectedId}
+                      language={language}
+                      t={t}
+                      rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} showNote />}
+                    />
+                  </div>
+                  <div>
+                    <HomeClassList
+                      classrooms={classrooms}
+                      studentPreview={studentPreview}
+                      lastPlayedAt={week.summary?.lastPlayedAt ?? null}
+                      activityFailed={week.status === 'error'}
+                      newClassHref={newClassHref}
+                      classLimit={!proLoading && !hasPro ? FREE_TIER_LIMITS.classes : null}
+                      language={language}
+                      nowMs={nowMs}
+                      t={t}
+                    />
+                  </div>
+                  {accountBanner ? <div data-testid="home-account-banner">{accountBanner}</div> : null}
+                </>
+              )}
             </>
           )}
         </div>
@@ -299,7 +332,10 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
           classroomId={effectiveId}
           isOpen={showAssignmentCreator}
           onClose={() => setShowAssignmentCreator(false)}
-          onComplete={() => setShowAssignmentCreator(false)}
+          onComplete={() => {
+            setShowAssignmentCreator(false);
+            trial.refreshAssignments();
+          }}
         />
       ) : null}
     </EducationShell>

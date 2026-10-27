@@ -204,6 +204,24 @@ async function countTeacherLessonAssignments(teacherId: string): Promise<number 
   }
 }
 
+/** Head-only count of lesson_assignments across the teacher's classroom IDs (null on failure). */
+export async function countClassroomsLessonAssignments(
+  classroomIds: readonly string[],
+): Promise<number | null> {
+  if (classroomIds.length === 0) return 0;
+  if (!supabase) return null;
+  try {
+    const { count, error } = await supabase
+      .from('lesson_assignments')
+      .select('id', { count: 'exact', head: true })
+      .in('classroom_id', [...classroomIds]);
+    if (error) return null;
+    return typeof count === 'number' ? count : null;
+  } catch {
+    return null;
+  }
+}
+
 async function countTeacherClassrooms(teacherId: string): Promise<number | null> {
   if (!supabase) return null;
   try {

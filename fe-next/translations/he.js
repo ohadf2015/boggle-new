@@ -21086,6 +21086,26 @@ const he = {
         }
       }
     },
+    "trialChecklist": {
+      "title": "מתחילים לשחק עם הכיתה כבר היום",
+      "subtitle": "שלושה צעדים. תקופת הניסיון שלך ב‑Teacher Pro פעילה.",
+      "progress": "{done} מתוך {total}",
+      "dismiss": "סגירת רשימת הצעדים",
+      "steps": {
+        "create_classroom": {
+          "title": "יצירת כיתה",
+          "cta": "יצירת כיתה"
+        },
+        "invite_students": {
+          "title": "הזמנת תלמידים",
+          "cta": "הזמנת תלמידים"
+        },
+        "first_assignment": {
+          "title": "נתינת המטלה הראשונה",
+          "cta": "יצירת מטלה"
+        }
+      }
+    },
     "setup": {
       "title": "כיתה חדשה",
       "subtitle": "שלוש בחירות קצרות. אפשר לשנות אחר כך.",

@@ -21156,6 +21156,26 @@ const sv = {
         }
       }
     },
+    "trialChecklist": {
+      "title": "Få igång klassen i dag",
+      "subtitle": "Tre steg. Din provperiod på Teacher Pro är i gång.",
+      "progress": "{done} av {total}",
+      "dismiss": "Stäng checklistan",
+      "steps": {
+        "create_classroom": {
+          "title": "Skapa ett klassrum",
+          "cta": "Skapa klassrum"
+        },
+        "invite_students": {
+          "title": "Bjud in elever",
+          "cta": "Bjud in elever"
+        },
+        "first_assignment": {
+          "title": "Ge den första uppgiften",
+          "cta": "Skapa uppgift"
+        }
+      }
+    },
     "setup": {
       "title": "Ny klass",
       "subtitle": "Tre snabba val. Du kan ändra dem senare.",

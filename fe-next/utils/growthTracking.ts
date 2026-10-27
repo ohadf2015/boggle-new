@@ -324,6 +324,12 @@ export type GrowthEvent =
   // dual-emit would double-count them in PostHog.
   | 'teacher_activation_funnel_step'
   | 'teacher_activation_funnel_completed'
+  // Teacher Pro Day-0 trial activation checklist — mirrored from
+  // lib/education/trialChecklistTelemetry.ts (bare posthog.capture + this mirror).
+  // NOT in CANONICAL_DUAL_EMIT: bare names are captured directly, dual-emit would double-count.
+  | 'trial_checklist_shown'
+  | 'trial_checklist_step_completed'
+  | 'trial_checklist_all_completed'
   // ESL winner-page depth (t_25b9ddb1). Demo start + CEFR list pick on
   // /education/esl-word-games. Props: { cefr: 'A1'|'A2'|'B1', page }.
   | 'edu_page_play_demo_started'
