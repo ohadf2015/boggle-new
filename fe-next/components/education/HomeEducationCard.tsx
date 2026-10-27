@@ -80,7 +80,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       data-edu-role={role}
       className={cn(
         'group relative flex w-full items-center gap-3 sm:gap-4',
-        'overflow-hidden rounded-neo border-[3px] bg-neo-navy-light',
+        'rounded-neo border-[3px] bg-neo-navy-light',
         border,
         'px-3 py-2.5 sm:px-4 sm:py-3',
         shadow,
@@ -132,6 +132,15 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
 
       {/* Teacher trial pill */}
       {isTeacher && trial && <TrialPill trial={trial} t={t} language={language} />}
+
+      {/* Ticket tear-line: a dashed rule with two bites out of the border, so the strip reads as a class ticket. */}
+      <span
+        aria-hidden="true"
+        className="relative mx-1 hidden self-stretch border-s-2 border-dashed border-neo-cream/35 sm:block"
+      >
+        <span className="absolute -start-[9px] -top-[23px] h-4 w-4 rounded-full bg-neo-navy" />
+        <span className="absolute -bottom-[23px] -start-[9px] h-4 w-4 rounded-full bg-neo-navy" />
+      </span>
 
       {/* Students with a class code skip the teacher pitch (sm and up; on phones
           the whole strip is one tap target and /education carries the join link). */}
