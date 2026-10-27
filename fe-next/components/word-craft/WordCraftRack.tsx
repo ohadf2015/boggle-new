@@ -95,8 +95,8 @@ function WordCraftRackImpl({
     >
       <div
         className={cn(
-          'flex gap-2 sm:gap-3 items-center justify-start p-3 pt-5',
-          'mx-auto w-fit max-w-full flex-nowrap',
+          'flex gap-1.5 sm:gap-3 items-center justify-center px-2 sm:px-3 pb-3 pt-5',
+          'mx-auto w-full sm:w-fit flex-nowrap',
         )}
       >
       {tiles.map((tile, idx) => {
@@ -150,7 +150,7 @@ function WordCraftRackImpl({
               // vertical-dominant motion still wins for drag-to-board.
               // Desktop cursor: grab on draggable tiles, not-allowed when
               // pending or disabled so mouse players see the affordance.
-              'relative w-14 h-16 sm:w-16 sm:h-[72px] flex items-center justify-center touch-pan-x shrink-0 snap-center',
+              'relative flex-1 basis-0 min-w-0 max-w-14 aspect-[7/8] sm:flex-none sm:basis-auto sm:max-w-none sm:w-16 sm:h-[72px] sm:aspect-auto flex items-center justify-center touch-pan-x snap-center',
               disabled || isPending ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing',
               'rounded-neo border-neo-thick border-black',
               'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-200 ease-out',
@@ -174,7 +174,7 @@ function WordCraftRackImpl({
               </span>
             )}
             <span
-              className={cn('wc-tile-glyph relative text-3xl sm:text-4xl', tile.isBlank && 'text-neo-purple')}
+              className={cn('wc-tile-glyph relative text-2xl min-[380px]:text-3xl sm:text-4xl', tile.isBlank && 'text-neo-purple')}
             >
               {displayTileLetter(tile)}
             </span>

@@ -171,7 +171,9 @@ function WordCraftBoardImpl({
                       : 'bg-neo-cream text-neo-navy shadow-[0_2px_0_0_rgba(0,0,0,0.85)]'
                   : pending
                     ? 'bg-neo-lime text-neo-navy shadow-[0_3px_0_0_rgba(0,0,0,0.9)] ring-2 ring-neo-lime-light hover:ring-neo-pink hover:rotate-1'
-                    : 'bg-neo-navy-light/70',
+                    : (r + c) % 2 === 0
+                    ? 'bg-neo-navy-light/70'
+                    : 'bg-neo-navy-light/45',
                 golden && !isDragTarget && 'ring-2 ring-neo-yellow z-10',
                 isDragTarget && 'bg-neo-cyan/30 ring-4 ring-neo-cyan scale-110 z-10',
                 isAxisHint && !isDragTarget && 'wc-axis-hint',
@@ -195,12 +197,12 @@ function WordCraftBoardImpl({
                       {JOKER_GLYPH}
                     </span>
                   )}
-                  <span className={cn('wc-tile-glyph font-bold', 'text-[clamp(14px,5cqi,32px)]')}>
+                  <span className={cn('wc-tile-glyph wc-tile-land font-bold', 'text-[clamp(14px,5cqi,32px)]')}>
                     {isUnassignedBlank(placedTile) ? JOKER_GLYPH : placedTile.letter}
                   </span>
                 </>
               ) : pending ? (
-                <span className={cn('wc-tile-glyph relative', tileFontClass)}>
+                <span className={cn('wc-tile-glyph wc-tile-land relative', tileFontClass)}>
                   {pending.isBlank && (
                     <span
                       data-joker-badge
