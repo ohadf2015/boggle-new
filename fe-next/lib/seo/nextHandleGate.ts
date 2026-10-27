@@ -185,6 +185,8 @@ export const PUBLIC_DIRS: ReadonlySet<string> = new Set([
   'ftue',
   'gifs',
   'home',
+  // Gitignored build output; only non-brotli clients reach the gate for it.
+  'i18n',
   'images',
   'landing',
   'logos',
