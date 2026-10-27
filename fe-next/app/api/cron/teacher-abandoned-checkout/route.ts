@@ -25,7 +25,8 @@ import { withCronLock } from '@/backend/redis/locking';
  * Hourly: one email to an approved teacher whose latest Teacher Pro checkout started
  * 1–24h ago and never completed, linking back to /teacher/upgrade for a fresh checkout.
  * Skips Pro, test accounts (profile flag or QA-looking email), non-teacher roles,
- * teachers with no classroom, checkouts a script created, unsubscribed teachers,
+ * checkouts a script created, signups with neither an approved access request nor a classroom
+ * (an approved teacher with no class yet IS emailed), unsubscribed teachers,
  * and anyone already sent one.
  * Every lookup fails closed: an error sends nothing.
  *
