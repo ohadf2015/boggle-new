@@ -13,6 +13,7 @@ import type { BoardDims } from '@/lib/word-craft/boardDimensions';
 import type { BotDifficulty } from '@/lib/word-craft/botDifficulty';
 import type { GameHighlights } from '@/lib/word-craft/gameHighlights';
 import type { DailyState } from '@/lib/word-craft/daily';
+import type { DailyGoalResult } from '@/lib/word-craft/dailyGoals';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface Props {
@@ -49,13 +50,15 @@ interface Props {
   highlights?: GameHighlights;
   /** Set when this game was today's daily board: the streak after recording it. */
   dailyResult?: DailyState | null;
+  /** Today's goals, shown under the streak on a daily game. */
+  dailyGoals?: DailyGoalResult[];
   /** Play-again closure loop — re-rolls a fresh solo game in place. */
   onPlayAgain?: () => void;
   /** Leave to the home/menu screen. */
   onHome?: () => void;
 }
 
-export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, playerAvatar, opponentAvatar, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, challengeIntent, highlights, dailyResult, onPlayAgain, onHome }: Props) {
+export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, playerAvatar, opponentAvatar, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, challengeIntent, highlights, dailyResult, dailyGoals, onPlayAgain, onHome }: Props) {
   const heroRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     if (!heroRef.current || isReducedMotionPreferred()) return;
@@ -209,6 +212,24 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
               <span className="text-[11px] font-neo-body font-bold opacity-80">{t('wordcraft.daily.tomorrow')}</span>
             </span>
           </div>
+        ) : null}
+
+        {dailyResult && dailyGoals ? (
+          <ul data-wc-daily-goals className="wc-rise w-full flex flex-col gap-1" style={{ '--wc-delay': '300ms' } as React.CSSProperties} aria-label={t('wordcraft.daily.goals.title')}>
+            {dailyGoals.map((g) => (
+              <li
+                key={g.id}
+                data-done={g.done ? 'true' : 'false'}
+                className={cn(
+                  'flex items-center gap-2 px-2.5 py-1 rounded-neo border-2 border-black text-xs font-neo-display font-black uppercase tracking-wide',
+                  g.done ? 'bg-neo-lime text-neo-navy' : 'bg-neo-navy text-neo-white/60',
+                )}
+              >
+                <span aria-hidden className="w-4 text-center">{g.done ? '✓' : '○'}</span>
+                {t(`wordcraft.daily.goals.${g.id}`)}
+              </li>
+            ))}
+          </ul>
         ) : null}
 
         {highlights?.bestMove ? (

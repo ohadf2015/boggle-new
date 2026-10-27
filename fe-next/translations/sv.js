@@ -15256,6 +15256,12 @@ const sv = {
       "quickSelect": "Snabbval",
       "today": "Idag",
       "tomorrow": "Imorgon",
+      "goals": {
+        "longWord": "Spela ett ord med 5 bokstäver",
+        "claim": "Ta 8+ rutor",
+        "win": "Vinn brädet",
+        "title": "Dagens mål"
+      },
       "nextWeek": "Nästa vecka",
       "nextMonth": "Nästa månad",
       "customDate": "Anpassat datum",

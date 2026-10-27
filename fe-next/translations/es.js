@@ -15244,6 +15244,12 @@ const es = {
       "quickSelect": "Selección rápida",
       "today": "Hoy",
       "tomorrow": "Mañana",
+      "goals": {
+        "longWord": "Juega una palabra de 5 letras",
+        "claim": "Conquista 8+ casillas",
+        "win": "Gana el tablero",
+        "title": "Objetivos de hoy"
+      },
       "nextWeek": "Próxima semana",
       "nextMonth": "Próximo mes",
       "customDate": "Fecha personalizada",

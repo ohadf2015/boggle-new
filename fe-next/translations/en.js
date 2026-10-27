@@ -13118,7 +13118,7 @@ const en = {
       "selectDate": "Select due date",
       "quickSelect": "Quick select",
       "today": "Today",
-      "tomorrow": "Tomorrow",
+      "tomorrow": "Tomorrow", "goals": {"longWord": "Play a 5-letter word", "claim": "Claim 8+ squares", "win": "Win the board", "title": "Today's goals"},
       "nextWeek": "Next week",
       "nextMonth": "Next month",
       "customDate": "Custom date",
