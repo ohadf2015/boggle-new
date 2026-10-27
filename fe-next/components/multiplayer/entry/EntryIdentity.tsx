@@ -112,6 +112,9 @@ export function EntryIdentity(props: EntryIdentityInput) {
               sfx.pop();
             }}
             aria-label={t('mpUi.entry.rerollAvatar')}
+            // Rolling until you like one is the point; repeat taps are not rage.
+            data-feedback-ignore-rage=""
+            data-gr-no-rage=""
             className="absolute -bottom-1.5 -end-1.5 flex h-8 w-8 items-center justify-center rounded-full border-2 border-neo-black bg-neo-yellow text-neo-black shadow-hard-sm transition-transform hover:scale-110 active:scale-90 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
           >
             <Dices
