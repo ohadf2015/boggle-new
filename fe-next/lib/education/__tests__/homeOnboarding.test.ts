@@ -38,4 +38,22 @@ describe('homeOnboarding', () => {
     expect(o.visible).toBe(true);
     expect(o.dismissible).toBe(false);
   });
+
+  it('Given a room opened but no real round, Then tryDemo stays open and asks for players', () => {
+    const o = homeOnboarding({ classroomCount: 1, inviteCopied: true, liveStarted: false, roomOpened: true, dismissed: false });
+    expect(o.current).toBe('tryDemo');
+    expect(o.awaitingPlayers).toBe(true);
+  });
+
+  it('Given no room opened yet, Then the demo nudge is the plain one', () => {
+    const o = homeOnboarding({ classroomCount: 1, inviteCopied: true, liveStarted: false, roomOpened: false, dismissed: false });
+    expect(o.current).toBe('tryDemo');
+    expect(o.awaitingPlayers).toBe(false);
+  });
+
+  it('Given a real round already happened, Then nothing is awaiting players', () => {
+    const o = homeOnboarding({ classroomCount: 1, inviteCopied: true, liveStarted: true, roomOpened: true, dismissed: false });
+    expect(o.complete).toBe(true);
+    expect(o.awaitingPlayers).toBe(false);
+  });
 });

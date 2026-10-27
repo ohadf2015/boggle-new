@@ -143,4 +143,21 @@ describe('GET/PATCH /api/education/teacher/activation', () => {
     expect(await res.json()).toMatchObject({ ok: true, inviteCopied: true });
     expect(updateEq).not.toHaveBeenCalled();
   });
+
+  it('persists room-opened from the client', async () => {
+    getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
+    from.mockReturnValue(profileChain({ teacher_activation_room_opened_at: null }));
+    const res = await PATCH(patchReq({ roomOpened: true }));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ ok: true, roomOpened: true });
+    expect(updateEq).toHaveBeenCalledWith('id', 'u1');
+  });
+
+  it('refuses a client that tries to self-stamp live-started (server-authoritative)', async () => {
+    getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
+    from.mockReturnValue(profileChain({ teacher_activation_live_started_at: null }));
+    const res = await PATCH(patchReq({ liveStarted: true }));
+    expect(res.status).toBe(400);
+    expect(updateEq).not.toHaveBeenCalled();
+  });
 });

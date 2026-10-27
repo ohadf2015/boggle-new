@@ -27,8 +27,8 @@ describe('activation checklist progress follows the real actions', () => {
     expect(patchedBody()).toEqual({ inviteCopied: true });
   });
 
-  it('Given a teacher launches a live game from any entry, Then live-started is saved', () => {
+  it('Given a teacher launches a live game from any entry, Then room-opened (not live-started) is saved', () => {
     trackEduLiveGameStarted({ classroomId: 'c1', source: 'hq_express' });
-    expect(patchedBody()).toEqual({ liveStarted: true });
+    expect(patchedBody()).toEqual({ roomOpened: true });
   });
 });

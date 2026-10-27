@@ -144,13 +144,19 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
     classroomCount: classrooms.length,
     inviteCopied: activation.progress.inviteCopied,
     liveStarted: activation.progress.liveStarted,
+    roomOpened: activation.progress.roomOpened,
     dismissed: activation.progress.dismissed,
   });
   const newClassHref = `/${language}/teacher/classroom/new`;
+  const shareCodeHref = effectiveId ? `${newClassHref}?classroomId=${encodeURIComponent(effectiveId)}` : newClassHref;
   const onboardingHrefs: Record<HomeOnboardingStepId, string> = {
     createClass: newClassHref,
-    shareCode: effectiveId ? `${newClassHref}?classroomId=${encodeURIComponent(effectiveId)}` : newClassHref,
-    tryDemo: teacherHostHref(language, { classroomId: effectiveId || undefined, minutes: 2 }),
+    shareCode: shareCodeHref,
+    // Room already open but nobody joined: the next nudge is the invite/QR,
+    // not another empty room.
+    tryDemo: onboarding.awaitingPlayers
+      ? shareCodeHref
+      : teacherHostHref(language, { classroomId: effectiveId || undefined, minutes: 2 }),
   };
 
   const ready = !classroomsLoading && activation.ready;

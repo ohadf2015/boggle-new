@@ -16,7 +16,9 @@ export function trackEduLiveGameStarted(args: EduLiveGameStartedArgs): void {
   };
   if (args.lessonCount !== undefined) props.lesson_count = args.lessonCount;
   captureActivation('edu_live_game_started', props);
-  persistTeacherActivation({ liveStarted: true });
+  // The teacher launched a room; whether students actually played is stamped
+  // server-side when the first real (2+ player) round completes.
+  persistTeacherActivation({ roomOpened: true });
 }
 
 export interface EduReportsViewedArgs {

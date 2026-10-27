@@ -20209,7 +20209,9 @@ const en = {
         "tryDemo": {
           "title": "Try a 2-minute game",
           "body": "Run a short round. Add practice bots in the lobby if no one has joined yet.",
-          "cta": "Start a 2-minute game"
+          "cta": "Start a 2-minute game",
+          "bodyAwaitingPlayers": "Your room is ready — now get students in. Show the join code or QR on the board.",
+          "ctaAwaitingPlayers": "Show the class code"
         }
       }
     },

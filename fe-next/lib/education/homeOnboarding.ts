@@ -6,7 +6,10 @@ export type HomeOnboardingStatus = 'done' | 'current' | 'todo';
 export interface HomeOnboardingInput {
   classroomCount: number;
   inviteCopied: boolean;
+  /** A real 2+ player round completed (server-stamped). */
   liveStarted: boolean;
+  /** The teacher opened a live room; false/undefined when unknown. */
+  roomOpened?: boolean;
   dismissed: boolean;
 }
 
@@ -18,6 +21,11 @@ export interface HomeOnboarding {
   visible: boolean;
   /** A teacher with no class has nothing else on Home, so the card cannot be dismissed. */
   dismissible: boolean;
+  /**
+   * Room is open but no real round yet: the tryDemo step should send the
+   * teacher back to the invite/QR, not to another empty room.
+   */
+  awaitingPlayers: boolean;
 }
 
 export function homeOnboarding(input: HomeOnboardingInput): HomeOnboarding {
@@ -41,5 +49,7 @@ export function homeOnboarding(input: HomeOnboardingInput): HomeOnboarding {
     complete,
     visible: input.classroomCount === 0 || (!complete && !input.dismissed),
     dismissible,
+    awaitingPlayers:
+      input.classroomCount > 0 && input.roomOpened === true && !input.liveStarted,
   };
 }

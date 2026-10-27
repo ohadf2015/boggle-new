@@ -8,25 +8,31 @@
 
 export interface TeacherActivationProgress {
   inviteCopied: boolean;
+  /** First classroom round with 2+ real players completed (server-stamped). */
   liveStarted: boolean;
+  /** Teacher opened a live room, whether or not anyone joined. */
+  roomOpened: boolean;
   dismissed: boolean;
 }
 
 export const EMPTY_TEACHER_ACTIVATION_PROGRESS: TeacherActivationProgress = {
   inviteCopied: false,
   liveStarted: false,
+  roomOpened: false,
   dismissed: false,
 };
 
 export const TEACHER_ACTIVATION_PROFILE_COLUMNS = [
   'teacher_activation_invite_copied_at',
   'teacher_activation_live_started_at',
+  'teacher_activation_room_opened_at',
   'teacher_activation_checklist_dismissed_at',
 ] as const;
 
 export type TeacherActivationProfileRow = {
   teacher_activation_invite_copied_at?: string | null;
   teacher_activation_live_started_at?: string | null;
+  teacher_activation_room_opened_at?: string | null;
   teacher_activation_checklist_dismissed_at?: string | null;
 };
 
@@ -37,13 +43,16 @@ export function progressFromProfileRow(
   return {
     inviteCopied: Boolean(row.teacher_activation_invite_copied_at),
     liveStarted: Boolean(row.teacher_activation_live_started_at),
+    roomOpened: Boolean(row.teacher_activation_room_opened_at),
     dismissed: Boolean(row.teacher_activation_checklist_dismissed_at),
   };
 }
 
 export type TeacherActivationPatch = {
   inviteCopied?: boolean;
+  /** Server-authoritative: the API route ignores client-sent liveStarted. */
   liveStarted?: boolean;
+  roomOpened?: boolean;
   dismissed?: boolean;
 };
 
@@ -55,6 +64,7 @@ export function applyActivationPatch(
   return {
     inviteCopied: patch.inviteCopied === true ? true : current.inviteCopied,
     liveStarted: patch.liveStarted === true ? true : current.liveStarted,
+    roomOpened: patch.roomOpened === true ? true : current.roomOpened,
     dismissed: patch.dismissed === true ? true : current.dismissed,
   };
 }
@@ -69,6 +79,9 @@ export function profileUpdateFromPatch(
   }
   if (patch.liveStarted === true) {
     update.teacher_activation_live_started_at = nowIso;
+  }
+  if (patch.roomOpened === true) {
+    update.teacher_activation_room_opened_at = nowIso;
   }
   if (patch.dismissed === true) {
     update.teacher_activation_checklist_dismissed_at = nowIso;

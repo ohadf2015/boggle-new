@@ -47,7 +47,7 @@ const CLASSES = [
 beforeEach(() => {
   classroomsState = { classrooms: CLASSES, isLoading: false, error: null, refresh: vi.fn() };
   proState = FREE;
-  activation = { progress: { inviteCopied: true, liveStarted: true, dismissed: false }, ready: true, markInviteCopied: vi.fn(), markLiveStarted: vi.fn(), dismiss: vi.fn() };
+  activation = { progress: { inviteCopied: true, liveStarted: true, roomOpened: true, dismissed: false }, ready: true, markInviteCopied: vi.fn(), dismiss: vi.fn() };
   week = { status: 'ready', summary: { gamesPlayed: 12, totalStudents: 54, activeClasses: 2, lastPlayedAt: { c5b: new Date().toISOString() } } };
   global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) }) as unknown as typeof fetch;
 });

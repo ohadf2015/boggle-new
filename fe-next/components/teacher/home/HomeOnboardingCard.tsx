@@ -10,6 +10,15 @@ import { PANEL, PRIMARY_BUTTON, SECONDARY_BUTTON } from './homeStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
+/** tryDemo with a room already open reads as "get students in", not "open another room". */
+function stepCopyKey(onboarding: HomeOnboarding, stepId: HomeOnboardingStepId, field: 'body' | 'cta'): string {
+  const suffix =
+    stepId === 'tryDemo' && onboarding.awaitingPlayers && onboarding.current === 'tryDemo'
+      ? `${field}AwaitingPlayers`
+      : field;
+  return `eduShell.onboarding.steps.${stepId}.${suffix}`;
+}
+
 export interface HomeOnboardingCardProps {
   onboarding: HomeOnboarding;
   /** Where each step's button goes. */
@@ -85,7 +94,7 @@ export function HomeOnboardingCard({ onboarding, hrefs, onStepStart, onDismiss, 
                   {t(`eduShell.onboarding.steps.${step.id}.title`)}
                 </span>
                 {step.status === 'current' ? (
-                  <span className="font-neo-body text-xs text-neo-cream/75">{t(`eduShell.onboarding.steps.${step.id}.body`)}</span>
+                  <span className="font-neo-body text-xs text-neo-cream/75">{t(stepCopyKey(onboarding, step.id, 'body'))}</span>
                 ) : null}
               </span>
             </li>
@@ -99,7 +108,7 @@ export function HomeOnboardingCard({ onboarding, hrefs, onStepStart, onDismiss, 
           // Beside the hero's Start live game, this is the secondary action, never a second lime slab.
           className={cn(full ? PRIMARY_BUTTON : SECONDARY_BUTTON, 'w-full sm:w-auto sm:self-start')}
         >
-          {t(`eduShell.onboarding.steps.${current}.cta`)}
+          {t(stepCopyKey(onboarding, current, 'cta'))}
         </Link>
         {secondary}
       </div>
@@ -149,7 +158,7 @@ function CompactOnboarding({
           onClick={() => onStepStart?.(current)}
           className={cn(SECONDARY_BUTTON, 'min-h-[44px] min-w-0 flex-1 px-3 py-2 text-base sm:flex-none sm:px-5')}
         >
-          {t(`eduShell.onboarding.steps.${current}.cta`)}
+          {t(stepCopyKey(onboarding, current, 'cta'))}
         </Link>
         {onboarding.dismissible && onDismiss ? (
           <button
