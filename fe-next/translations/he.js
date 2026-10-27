@@ -14814,6 +14814,12 @@ const he = {
       "quickSelect": "בחירה מהירה",
       "today": "היום",
       "tomorrow": "מחר",
+      "goals": {
+        "longWord": "משחקים מילה של 5 אותיות",
+        "claim": "כובשים 8+ משבצות",
+        "win": "מנצחים בלוח",
+        "title": "המטרות של היום"
+      },
       "nextWeek": "שבוע הבא",
       "nextMonth": "חודש הבא",
       "customDate": "תאריך מותאם",
