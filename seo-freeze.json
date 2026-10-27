@@ -2,6 +2,21 @@
   "_why": "Pages whose <title>/meta description must not change until the date given. The seo-daily routine (~/.claude/skills/seo-daily) drops these from its CTR opportunity list, so it cannot suggest an edit to them. A CTR change is graded by comparing 28 days before it shipped against 28 days after; this routine rewrote the pages below on 2026-07-29, 2026-08-15 AND 2026-08-18, so no window ever held one stable title and not one of those rewrites could be measured. Entries expire on their own `until` date — do not lift one early.",
   "frozen": [
     {
+      "path": "/en/online-word-games-with-friends",
+      "until": "2026-11-24",
+      "why": "#1476 shipped 2026-10-27 (description targets 'words with friends 2'); Growth Radar intervention 241 grades its CTR on 2026-11-24. Leave title and description alone until then."
+    },
+    {
+      "path": "/sv/tools/word-solver",
+      "until": "2026-11-24",
+      "why": "#1476 shipped 2026-10-27 (title 'Bilda Ord av Bokstäver — Anagramlösare Svenska'); Growth Radar intervention 240 grades its CTR on 2026-11-24. Leave title and description alone until then."
+    },
+    {
+      "path": "/he/blog/hebrew-word-games-guide",
+      "until": "2026-11-24",
+      "why": "#1476 shipped 2026-10-27 (Hebrew title leads with 'סקריבל בעברית חינם'); Growth Radar intervention 239 grades its CTR on 2026-11-24. Leave title and description alone until then."
+    },
+    {
       "path": "/es/juego-de-palabras-multijugador",
       "until": "2026-11-22",
       "why": "Freeze restarted 2026-10-25. The 2026-10-22 freeze (#1409) did not hold: #1422 and #1435 rewrote the snippet anyway, so its window is spoiled. Current snippet as of #1435: title 'Scrabble Online en Español Gratis — Sin Registro | LexiClash', description starting 'Juega scrabble online gratis — sin registro ni descargas'. Body, H1 and internal-link work is fine; title and description stay as they are for 28 days. CI now enforces this (fe-next/scripts/ci/check-seo-freeze.mjs)."
