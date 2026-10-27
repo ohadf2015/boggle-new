@@ -215,7 +215,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
       {!anchor && !locked && (
         <Arrow
           aria-hidden="true"
-          className="h-4 w-4 shrink-0 text-neo-cream/50 motion-safe:transition-[transform,color] motion-safe:duration-200 group-hover:text-neo-cream motion-safe:group-hover:translate-x-1 rtl:motion-safe:group-hover:-translate-x-1"
+          className="h-4 w-4 shrink-0 text-neo-cream/50 max-md:hidden motion-safe:transition-[transform,color] motion-safe:duration-200 group-hover:text-neo-cream motion-safe:group-hover:translate-x-1 rtl:motion-safe:group-hover:-translate-x-1"
           strokeWidth={3}
         />
       )}
