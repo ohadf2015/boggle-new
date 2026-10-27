@@ -35,7 +35,7 @@ function handleRadiogroupKeyDown<T>(
   onSelect(options[nextIndex]);
 }
 
-type TFn = (path: string, fallback?: string) => string;
+type TFn = (path: string, fallbackOrParams?: string | Record<string, string | number>) => string;
 
 export interface WordCraftSetupProps {
   initial: WordCraftSetupChoice;

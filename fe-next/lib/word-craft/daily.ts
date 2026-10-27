@@ -15,7 +15,7 @@ export function todayUtc(now: Date = new Date()): string {
 
 /** Everyone on the same UTC day gets the same board. */
 export function dailySeed(date: string): number {
-  return Number(date.replaceAll('-', '')) % 1_000_000;
+  return Number(date.replace(/-/g, '')) % 1_000_000;
 }
 
 function dayIndex(date: string): number {
