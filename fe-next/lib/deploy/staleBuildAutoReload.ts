@@ -46,10 +46,21 @@ export interface BuildIdentity {
 /** The identity this bundle was compiled with. Commit comes from
  *  NEXT_PUBLIC_SENTRY_RELEASE (next.config.mjs bakes the Railway/Vercel git
  *  SHA into it at build); buildTime from NEXT_PUBLIC_BUILD_TIME. */
-export function clientBuildIdentity(env: NodeJS.ProcessEnv = process.env): BuildIdentity {
+export function clientBuildIdentity(env?: NodeJS.ProcessEnv): BuildIdentity {
+  if (env) {
+    return {
+      commit: env.NEXT_PUBLIC_SENTRY_RELEASE || undefined,
+      buildTime: env.NEXT_PUBLIC_BUILD_TIME || undefined,
+    };
+  }
+  // Literal `process.env.NEXT_PUBLIC_*` member access is REQUIRED here: Next
+  // only inlines NEXT_PUBLIC_* at build when written this way. Reading them
+  // through an aliased object (e.g. `env = process.env`) compiles to the empty
+  // client `process.env` polyfill, so both values were undefined in prod and
+  // isBuildStale() could never return true.
   return {
-    commit: env.NEXT_PUBLIC_SENTRY_RELEASE || undefined,
-    buildTime: env.NEXT_PUBLIC_BUILD_TIME || undefined,
+    commit: process.env.NEXT_PUBLIC_SENTRY_RELEASE || undefined,
+    buildTime: process.env.NEXT_PUBLIC_BUILD_TIME || undefined,
   };
 }
 
