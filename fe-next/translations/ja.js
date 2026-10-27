@@ -19112,6 +19112,19 @@ const ja = {
       "challengeHint": "フレンド対戦リンクはリザルト画面から",
       "sendChallengeNow": "さあ、挑戦状を送ろう！"
     },
+    "daily": {
+      "title": "デイリーボード",
+      "play": "今日のボードをプレイ",
+      "done": "今日はクリア · もう一度",
+      "streak": "{n}日連続",
+      "streakNow": "{n}日連続！",
+      "tomorrow": "明日も来て連続記録をのばそう"
+    },
+    "highlights": {
+      "best": "ベストムーブ",
+      "longest": "最長ワード",
+      "pts": "{n}点"
+    },
     "squares": "マス",
     "place": {
       "step1": "文字をタップ",

@@ -19236,6 +19236,19 @@ const es = {
       "challengeHint": "Reta a un amigo desde la pantalla de resultados",
       "sendChallengeNow": "Ahora envía tu reto"
     },
+    "daily": {
+      "title": "Tablero diario",
+      "play": "Juega el tablero de hoy",
+      "done": "Hecho hoy · jugar otra vez",
+      "streak": "Racha de {n} días",
+      "streakNow": "¡Racha de {n} días!",
+      "tomorrow": "Vuelve mañana para seguir la racha"
+    },
+    "highlights": {
+      "best": "Mejor jugada",
+      "longest": "Palabra más larga",
+      "pts": "{n} pts"
+    },
     "squares": "casillas",
     "place": {
       "step1": "Toca una letra",

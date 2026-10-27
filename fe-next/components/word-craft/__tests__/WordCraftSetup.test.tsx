@@ -138,4 +138,16 @@ describe('WordCraftSetup', () => {
     const nextButton = screen.getAllByRole('radio').find((r) => r !== surpriseButton && r.getAttribute('aria-checked') === 'true');
     expect(nextButton).toBeTruthy();
   });
+
+  it('offers the daily board and starts it in one tap', async () => {
+    const onStartDaily = vi.fn();
+    render(<WordCraftSetup initial={DEFAULT_SETUP} onStart={vi.fn()} onStartDaily={onStartDaily} t={t} />);
+    fireEvent.click(await screen.findByText('wordcraft.daily.title'));
+    expect(onStartDaily).toHaveBeenCalledTimes(1);
+  });
+
+  it('hides the daily board when no handler is given', () => {
+    render(<WordCraftSetup initial={DEFAULT_SETUP} onStart={vi.fn()} t={t} />);
+    expect(screen.queryByText('wordcraft.daily.title')).toBeNull();
+  });
 });

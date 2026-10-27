@@ -7,6 +7,8 @@ import { WordCraftDuelResult } from './WordCraftDuelResult';
 import { WordCraftPlayFriendControl } from './WordCraftPlayFriendControl';
 import type { BoardDims } from '@/lib/word-craft/boardDimensions';
 import type { BotDifficulty } from '@/lib/word-craft/botDifficulty';
+import type { GameHighlights } from '@/lib/word-craft/gameHighlights';
+import type { DailyState } from '@/lib/word-craft/daily';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface Props {
@@ -39,13 +41,17 @@ interface Props {
    * point of this game, so the share block gets a headline + entrance pop.
    */
   challengeIntent?: boolean;
+  /** The player's best move + longest word this game. */
+  highlights?: GameHighlights;
+  /** Set when this game was today's daily board: the streak after recording it. */
+  dailyResult?: DailyState | null;
   /** Play-again closure loop — re-rolls a fresh solo game in place. */
   onPlayAgain?: () => void;
   /** Leave to the home/menu screen. */
   onHome?: () => void;
 }
 
-export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, playerAvatar, opponentAvatar, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, challengeIntent, onPlayAgain, onHome }: Props) {
+export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, playerAvatar, opponentAvatar, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, challengeIntent, highlights, dailyResult, onPlayAgain, onHome }: Props) {
   // If in a duel, show duel result instead of vs-bot result
   if (duelOutcome) {
     return (
@@ -111,9 +117,9 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
           {t('wordcraft.gameOver', 'Game over')}
         </span>
 
-        {playerWon ? (
+        {playerWon || !isTie ? (
           <Image
-            src="/word-craft/trophy.webp"
+            src={playerWon ? '/word-craft/trophy.webp' : '/word-craft/bot.webp'}
             alt=""
             width={512}
             height={510}
@@ -148,7 +154,7 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
         ) : null}
 
         {/* Concrete result: how many squares each side controls at the buzzer. */}
-        <div className="flex items-stretch gap-3 w-full">
+        <div className="wc-rise flex items-stretch gap-3 w-full" style={{ '--wc-delay': '120ms' } as React.CSSProperties}>
           <div className={cn(
             'flex-1 flex flex-col items-center gap-1 py-3 rounded-neo border-neo-thick border-black',
             playerWon ? 'bg-neo-cyan text-neo-navy' : 'bg-neo-navy text-neo-cyan',
@@ -170,6 +176,29 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
             <span className="text-[10px] font-neo-body uppercase tracking-wider truncate max-w-full px-1">{botLabel} · {squares}</span>
           </div>
         </div>
+
+        {dailyResult ? (
+          <div
+            data-wc-daily-result
+            className="wc-rise w-full flex items-center gap-3 px-3 py-2 rounded-neo border-neo-thick border-black bg-neo-orange text-neo-navy shadow-hard"
+            style={{ '--wc-delay': '240ms' } as React.CSSProperties}
+          >
+            <Image src="/word-craft/flame.webp" alt="" width={302} height={384} className="h-10 w-auto wc-flicker" />
+            <span className="flex flex-col min-w-0">
+              <span className="text-sm font-neo-display font-black uppercase tracking-wide leading-tight">{t('wordcraft.daily.streakNow', { n: dailyResult.streak })}</span>
+              <span className="text-[11px] font-neo-body font-bold opacity-80">{t('wordcraft.daily.tomorrow')}</span>
+            </span>
+          </div>
+        ) : null}
+
+        {highlights?.bestMove ? (
+          <div className="w-full grid grid-cols-2 gap-2">
+            <HighlightChip delay={300} label={t('wordcraft.highlights.best')} word={highlights.bestMove.word} sub={t('wordcraft.highlights.pts', { n: highlights.bestMove.score })} />
+            {highlights.longestWord ? (
+              <HighlightChip delay={380} label={t('wordcraft.highlights.longest')} word={highlights.longestWord} sub={`${highlights.longestWord.length}`} />
+            ) : null}
+          </div>
+        ) : null}
 
         {(onPlayAgain || onHome) ? (
           <div className="flex items-center gap-2 w-full">
@@ -218,6 +247,22 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
           </div>
         ) : null}
       </div>
+    </div>
+  );
+}
+
+function HighlightChip({ label, word, sub, delay }: { label: string; word: string; sub: string; delay: number }) {
+  return (
+    <div
+      className="wc-rise flex items-center gap-2 px-2 py-1.5 rounded-neo border-neo-thick border-black bg-neo-navy text-neo-white min-w-0"
+      style={{ '--wc-delay': `${delay}ms` } as React.CSSProperties}
+    >
+      <Image src="/word-craft/gem.webp" alt="" width={345} height={384} className="h-8 w-auto shrink-0" />
+      <span className="flex flex-col min-w-0">
+        <span className="text-[9px] font-neo-body uppercase tracking-wider text-neo-white/60 truncate">{label}</span>
+        <span className="text-sm font-neo-display font-black uppercase leading-tight truncate">{word}</span>
+        <span className="text-[10px] font-neo-body text-neo-cyan">{sub}</span>
+      </span>
     </div>
   );
 }

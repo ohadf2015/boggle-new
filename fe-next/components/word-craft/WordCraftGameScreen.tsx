@@ -26,6 +26,8 @@ import { WordCraftTutor } from '@/components/word-craft/WordCraftTutor';
 import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
 import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
 import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion';
+import { summarizeGame } from '@/lib/word-craft/gameHighlights';
+import { useWordCraftGameOver } from '@/components/word-craft/hooks/useWordCraftGameOver';
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
 import { WordCraftHandoff } from '@/components/word-craft/WordCraftHandoff';
 import { WordCraftGameOverScene } from '@/components/word-craft/WordCraftGameOverScene';
@@ -39,12 +41,9 @@ import { playSpectacleCommit } from '@/lib/word-craft/celebration/playSpectacleC
 import { resolveCommitTier } from '@/lib/word-craft/celebration/commitTier';
 import { pickMiniCelebration } from '@/lib/word-craft/celebration/miniCelebration';
 import { useWordCraftSound } from '@/components/word-craft/useWordCraftSound';
-import { recordBest } from '@/lib/word-craft/bestScore';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { WordCraftScorePreviewBadge } from '@/components/word-craft/WordCraftScorePreviewBadge';
 import { playBotMoveReveal } from '@/lib/word-craft/pixi/scenes/botMoveReveal';
-import { playGameOverBurst } from '@/lib/word-craft/pixi/scenes/gameOverBurst';
-import { shouldCelebrateEnding } from '@/lib/word-craft/celebration/endingCelebration';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { inferAxis, resolveTap, type Axis } from '@/lib/word-craft/placement';
 import { resolveScoreboardOpponent } from '@/lib/word-craft/opponentIdentity';
@@ -65,7 +64,6 @@ import {
   trackWordCraftTurnSubmitted,
   trackWordCraftGameStarted,
   trackWordCraftDictRetryClicked,
-  emitWordCraftGameEnd,
   emitWordCraftMove,
   type WordCraftInputMethod,
 } from '@/components/word-craft/wordCraftTelemetry';
@@ -74,12 +72,11 @@ import { useAchievementQueue } from '@/components/achievements';
 import { countClaimed } from '@/lib/word-craft/territory';
 import { cellsGainedThisTurn } from '@/lib/word-craft/territoryFeedback';
 import { cn } from '@/lib/utils';
-import { parseDuel, compareDuel } from '@/lib/word-craft/duel';
+import { parseDuel } from '@/lib/word-craft/duel';
 import { PHONE_DIMS, type BoardDims } from '@/lib/word-craft/boardDimensions';
 import type { PlacedTile } from '@/lib/word-craft/types';
 import { resolveChallengerIdentity } from '@/lib/word-craft/challengerIdentity';
 import { WordCraftDuelTargetStrip } from '@/components/word-craft/WordCraftDuelTargetStrip';
-import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
 const ENCOURAGEMENT_COUNT = 8;
@@ -115,6 +112,8 @@ interface GameViewProps {
    * declared goal is a remote opponent, not the bot.
    */
   challengeIntent?: boolean;
+  /** Today's shared board: finishing it extends the daily streak. */
+  daily?: boolean;
   difficulty: BotDifficulty;
   /** Player-picked twist from the setup screen; undefined = seeded surprise roll. */
   modifierOverride?: WordCraftModifier;
@@ -135,7 +134,7 @@ interface GameViewProps {
   };
 }
 
-export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, difficulty, modifierOverride, lesson }: GameViewProps) {
+export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily, difficulty, modifierOverride, lesson }: GameViewProps) {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { loading: authLoading, profile } = useAuth();
@@ -772,61 +771,22 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
   const botTerritory = useMemo(() => countClaimed(game.state.board, 'bot'), [game.state.board]);
 
   // --- Game over ---
-  const [newBest, setNewBest] = useState(false);
-  const recordedBestRef = useRef(false);
-  // Separate from recordedBestRef (which is SP-only) — analytics must fire once
-  // for EVERY finished game (hotseat + duel included) so it lands in the admin log.
-  const gameEndTrackedRef = useRef(false);
-  const [duelOutcome, setDuelOutcome] = useState<{ outcome: 'win' | 'lose' | 'tie'; challengerName: string; challengerScore: number; challengerAvatar?: CustomAvatarConfig } | null>(null);
-  useEffect(() => {
-    if (game.state.turn === 'over') {
-      if (!gameEndTrackedRef.current) {
-        gameEndTrackedRef.current = true;
-        emitWordCraftGameEnd(game.state, { hotseat });
-      }
-      setCelebration((prev) => ({ kind: 'gameOver', burstId: prev.burstId + 1 }));
-      // Fire Pixi game over burst — only on a WIN (never a loss/tie), and never
-      // under cosy/reduced-motion. Confetti on a loss reads as mocking.
-      if (
-        sceneCtx &&
-        shouldCelebrateEnding({
-          playerScore: playerTerritory,
-          botScore: botTerritory,
-          hotseat,
-          cosyMode,
-          reducedMotion: prefersReducedMotion,
-        })
-      ) {
-        playGameOverBurst(sceneCtx).catch(() => {
-          // Pixi animations can fail on low-end devices; silently continue
-        });
-      }
-      // Duel outcome: compare player score vs challenger score
-      if (duel && !recordedBestRef.current) {
-        const outcome = compareDuel(playerTerritory, duel.score);
-        setDuelOutcome({
-          outcome,
-          challengerName: duel.name || t('wordcraft.duel.unnamedChallenger'),
-          challengerScore: duel.score,
-          challengerAvatar: duel.avatar,
-        });
-      }
-      // Personal best (SP vs bot only — hotseat has two human seats, no "mine").
-      if (!hotseat && !recordedBestRef.current) {
-        recordedBestRef.current = true;
-        const { isNewBest } = recordBest('territory', playerTerritory);
-        if (isNewBest) {
-          setNewBest(true);
-          playNewBest();
-        }
-      }
-    } else {
-      recordedBestRef.current = false;
-      gameEndTrackedRef.current = false;
-      setNewBest(false);
-      setDuelOutcome(null);
-    }
-  }, [game.state, game.state.turn, sceneCtx, hotseat, territoryEnabled, playerTerritory, botTerritory, cosyMode, prefersReducedMotion, playNewBest, duel, t]);
+  const highlights = useMemo(() => summarizeGame(game.state.history), [game.state.history]);
+  const onGameOver = useCallback(() => setCelebration((prev) => ({ kind: 'gameOver', burstId: prev.burstId + 1 })), []);
+  const { newBest, duelOutcome, dailyResult } = useWordCraftGameOver({
+    state: game.state,
+    sceneCtx,
+    hotseat,
+    daily: !!daily,
+    duel,
+    unnamedChallenger: t('wordcraft.duel.unnamedChallenger'),
+    playerTerritory,
+    botTerritory,
+    cosyMode,
+    reducedMotion: prefersReducedMotion,
+    playNewBest,
+    onOver: onGameOver,
+  });
 
   const { variant: hintDurationVariant, trackExposure: trackHintExposure } = useExperiment('exp-wordcraft-hint-duration-v1');
   const hintTurnLimit = hintDurationVariant === 'extended-hints' ? 6 : 3;
@@ -1289,6 +1249,8 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
           currentDims={game.dims}
           currentDifficulty={effectiveDifficulty}
           challengeIntent={challengeIntent}
+          highlights={highlights}
+          dailyResult={dailyResult}
           onPlayAgain={() => game.reset(Math.floor(Math.random() * 1_000_000))}
           onHome={exit}
         />

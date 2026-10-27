@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { parseDuel } from '@/lib/word-craft/duel';
+import { dailySeed, todayUtc } from '@/lib/word-craft/daily';
 import { WordCraftSetup } from '@/components/word-craft/WordCraftSetup';
 import { WordCraftGameView } from '@/components/word-craft/WordCraftGameScreen';
 import { hasStoredSetupPrefs, loadSetupPrefs, saveSetupPrefs, type WordCraftSetupChoice } from '@/lib/word-craft/setupPrefs';
@@ -115,8 +116,18 @@ export default function WordCraftPageClient() {
   // remounts with the fresh choice.
   const [gameInstance, setGameInstance] = useState(0);
 
+  const [daily, setDaily] = useState(false);
+
+  const startDaily = useCallback(() => {
+    const choice = { ...loadSetupPrefs(), opponent: 'bot' as const };
+    setDaily(true);
+    setGameInstance((n) => n + 1);
+    setPhase({ name: 'playing', choice });
+  }, []);
+
   const startGame = useCallback((choice: WordCraftSetupChoice) => {
     saveSetupPrefs(choice);
+    setDaily(false);
     trackWordCraftSetupStart({ opponent: choice.opponent, difficulty: choice.difficulty, modifier: choice.modifier });
     setGameInstance((n) => n + 1);
     setPhase({ name: 'playing', choice });
@@ -134,7 +145,7 @@ export default function WordCraftPageClient() {
         />
         <Header />
         <h1 className="sr-only">{t('wordcraft.title')}</h1>
-        <WordCraftSetup initial={loadSetupPrefs()} onStart={startGame} t={t} />
+        <WordCraftSetup initial={loadSetupPrefs()} onStart={startGame} onStartDaily={startDaily} t={t} />
       </div>
     );
   }
@@ -142,7 +153,8 @@ export default function WordCraftPageClient() {
   return (
     <WordCraftGameView
       key={gameInstance}
-      seed={seed}
+      seed={daily ? dailySeed(todayUtc()) : seed}
+      daily={daily}
       duel={duel}
       hotseat={phase.choice.opponent === 'hotseat'}
       challengeIntent={phase.choice.opponent === 'friend'}
