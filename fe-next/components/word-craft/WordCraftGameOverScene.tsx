@@ -201,12 +201,12 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
         ) : null}
 
         {(onPlayAgain || onHome) ? (
-          <div className="flex items-center gap-2 w-full">
+          <div className="flex items-stretch gap-2 w-full">
             {onPlayAgain ? (
               <button
                 type="button"
                 onClick={onPlayAgain}
-                className="flex-1 px-4 py-2.5 bg-neo-lime border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
+                className="flex-1 flex items-center justify-center text-center px-3 py-2.5 bg-neo-lime border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
               >
                 ↻ {t('wordcraft.playAgain')}
               </button>
@@ -215,7 +215,7 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
               <button
                 type="button"
                 onClick={onHome}
-                className="flex-1 px-4 py-2.5 bg-neo-cyan border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
+                className="flex-1 flex items-center justify-center text-center px-3 py-2.5 bg-neo-cyan border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
               >
                 {t('wordcraft.home')}
               </button>
