@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import {
   claimStaleBuildReload,
   clientBuildIdentity,
@@ -146,6 +148,24 @@ describe('clientBuildIdentity / tabOpenMs', () => {
       NEXT_PUBLIC_BUILD_TIME: '2026-10-27T00:00:00Z',
     } as NodeJS.ProcessEnv);
     expect(id).toEqual({ commit: 'sha123', buildTime: '2026-10-27T00:00:00Z' });
+  });
+
+  it('default path reads NEXT_PUBLIC_* via literal process.env access (Next only inlines that form)', () => {
+    const src = readFileSync(join(__dirname, '..', 'staleBuildAutoReload.ts'), 'utf8');
+    expect(src).toContain('process.env.NEXT_PUBLIC_SENTRY_RELEASE');
+    expect(src).toContain('process.env.NEXT_PUBLIC_BUILD_TIME');
+    expect(src).not.toMatch(/env\??:\s*NodeJS\.ProcessEnv\s*=\s*process\.env/);
+  });
+
+  it('default path reads the runtime process.env', () => {
+    const prev = process.env.NEXT_PUBLIC_SENTRY_RELEASE;
+    process.env.NEXT_PUBLIC_SENTRY_RELEASE = 'from-env';
+    try {
+      expect(clientBuildIdentity().commit).toBe('from-env');
+    } finally {
+      if (prev === undefined) delete process.env.NEXT_PUBLIC_SENTRY_RELEASE;
+      else process.env.NEXT_PUBLIC_SENTRY_RELEASE = prev;
+    }
   });
 
   it('tabOpenMs derives age from performance.timeOrigin', () => {
