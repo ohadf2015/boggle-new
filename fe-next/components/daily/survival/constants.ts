@@ -120,4 +120,7 @@ export function getLanguageDrainMultiplier(language: string): number {
 }
 
 /** A solved target holds the board for its celebration before results take over. */
-export const SOLVE_CELEBRATION_MS = 1800;
+export const SOLVE_CELEBRATION_MS = 1200;
+
+/** A lost run holds the revealed answer long enough to read before results take over. */
+export const LOSS_REVEAL_MS = 1800;

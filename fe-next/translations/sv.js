@@ -2315,8 +2315,9 @@ const sv = {
         "gold": "Guld: felfritt!",
         "silver": "Silver: så nära",
         "bronze": "Brons: bra jobbat"
-      }
-    },
+      },
+"missesLabel": "missar"
+},
     "community": {
       "title": "Community-gåtor",
       "suggest": "Föreslå en gåta",
@@ -2363,8 +2364,9 @@ const sv = {
       "won": "Pyramiden klar!",
       "lost": "Pyramiden föll.",
       "reveal": "Svaret var",
-      "acceptLoss": "Acceptera förlusten"
-    },
+      "acceptLoss": "Acceptera förlusten",
+"topWord": "Toppordet: {word}"
+},
     "difficulty": {
       "easy": "Lätt",
       "medium": "Medel",
@@ -2485,8 +2487,15 @@ const sv = {
       "crossPromoTitle": "Prova Word Bridge",
       "crossPromoBody": "Två ord. En bro. Gratis.",
       "crossPromoCta": "Spela"
-    }
-  },
+    },
+"tutorial": { "step1": "Ett dolt ord binder ihop ordet överst och ordet nederst.",
+"step2": "Skriv in det. Rutorna visar hur många bokstäver det har.",
+"step3": "Varje svar lägger en planka på din bro.",
+"tryAgain": "Nästan. Försök igen!",
+"showMe": "Visa mig",
+"start": "Spela dagens bro"
+}
+},
   "cosy": {
     "wellDone": "Bra jobbat",
     "affirmLovely": "Fint",
@@ -2862,8 +2871,18 @@ const sv = {
     "leaveGo": "Lämna",
     "dailyPlayed": "Dagens torn är klart. Kom tillbaka i morgon.",
     "dailyRank": "Du är #{rank} idag",
-    "recapAlt": "Sammanfattning: {floors} våningar, {m} meter"
-  },
+    "recapAlt": "Sammanfattning: {floors} våningar, {m} meter",
+"dailyResults": { "headline": "Våning {n}!",
+"floors": "Våningar",
+"height": "Höjd",
+"bestWord": "Bästa ordet",
+"chestIncoming": "Kistan är på väg…"
+},
+"guide": { "spell": "Dra över de här bokstäverna",
+"drop": "Tryck för att släppa!",
+"done": "Första våningen!"
+}
+},
   "wordTower": {
     "mutator": {
       "todaysTwist": "DAGENS TWIST",
@@ -6558,8 +6577,20 @@ const sv = {
         "title": "Dags att jaga!",
         "sameChallenge": "Samma pussel för alla i världen – jämför din poäng!",
         "start": "Kör!"
-      }
-    },
+      },
+"howto": { "boardTitle": "Hitta ett ord",
+"boardHint": "Dra fingret längs de lysande bokstäverna:",
+"tryAgain": "Nästan. Följ ljuset och stava {word}.",
+"hiddenLabel": "Dolt ord",
+"feedbackTitle": "Varje ord ger dig ledtrådar",
+"feedbackBody": "Varje bokstav lyser upp och visar hur den passar i det dolda ordet.",
+"next": "Nästa",
+"goalTitle": "Knäck det dolda ordet",
+"goalLife": "Gissa det innan livet tar slut.",
+"goalClues": "Ord du hittar på brädet avslöjar ledtrådsbokstäver.",
+"play": "Nu kör vi"
+}
+},
     "welcome": {
       "title": "Välkommen till LexiClash!",
       "description": "Svep över bokstäverna på rutnätet för att bilda ord. Vi går igenom grunderna."
@@ -9547,6 +9578,10 @@ const sv = {
     "results": {
       "fullRecap": "Hela sammanfattningen",
       "fullRecapSummary": "Din placering, ditt ovanligaste ord, dina mynt och vem du slog",
+      "trailCount": "{n}/{total} idag",
+      "heroStreak": "{n} dagar i rad",
+      "heroScore": "Poäng",
+      "heroDaily": "Dagens",
       "signup": {
         "title": "Spara din svit",
         "shortPrompt": "Spara din svit",
@@ -9910,8 +9945,9 @@ const sv = {
     },
     "streak": {
       "freeze_toast_no_remaining": "Svitfrys använd. {day} räddad · inga frysar kvar"
-    }
-  },
+    },
+"practiceBoard": "Övningsbräde"
+},
   "dailyWordWheelLanding": {
     "hero": {
       "title": "Dagligt ordhjul",
@@ -10106,8 +10142,14 @@ const sv = {
       "wordWheelDetails": "Bilda så många ord du kan på 90 s. Varje ord måste innehålla mittenbokstaven.",
       "wordHuntQuest": "Ordjakt",
       "wordHuntDesc": "Knäck det dolda ordet på 10 försök"
-    }
-  },
+    },
+"howTo": { "title": "Testa först",
+"prompt": "Dra ett ord genom mittbokstaven. Testa {word}",
+"accepted": "{word}! Precis så. Spela nu dagens hjul",
+"notWord": "Inget ord här. Testa {word}",
+"check": "Kolla"
+}
+},
   "dailyChallenge": {
     "pointsPerWord": "Poäng per ord"
   },

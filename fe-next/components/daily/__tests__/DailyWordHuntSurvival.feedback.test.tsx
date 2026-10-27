@@ -134,4 +134,17 @@ describe('DailyWordHuntSurvival word feedback', () => {
     type('e');
     await waitFor(() => expect(screen.getByTestId('match-target-warning')).toBeInTheDocument());
   });
+
+  it('Given the target is solved, When the board locks, Then the answer pops over it and a tap opens results at once', async () => {
+    const onComplete = vi.fn();
+    render(<DailyWordHuntSurvival grid={grid} puzzleNumber={1} language="en" targetWord="HOUSE" onComplete={onComplete} onQuit={vi.fn()} />);
+    type('house');
+    fireEvent.keyDown(document, { key: 'Enter' });
+    const finish = await screen.findByTestId('hunt-finish');
+    expect(finish).toHaveAttribute('data-outcome', 'win');
+    expect(screen.getAllByTestId('hunt-finish-letter').map(el => el.textContent).join('')).toBe('HOUSE');
+    expect(onComplete).not.toHaveBeenCalled();
+    fireEvent.click(finish);
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
 });

@@ -12,6 +12,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import PyramidChallenge from '../PyramidChallenge';
 import FinaleCard from '../FinaleCard';
 
+vi.mock('@/hooks/useDailyPlayedStatus', () => ({
+  useDailyPlayedStatus: () => ({ today: { wordHunt: false, wordWheel: false, wordTower: false, connections: true }, streak: { current: 2, longest: 2 } }),
+}));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
 }));

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { useRunPayout } from '../rewards/useRunPayout';
 import type { RunSummary } from '@/lib/wordTowerV2/estate';
 
@@ -35,6 +35,13 @@ describe('useRunPayout — leaving mid-run banks the run', () => {
     const { result } = renderHook(() => useRunPayout({ over: false, ready: false, getSummary: () => summary(3), reportRun }));
     await act(() => result.current.bank());
     expect(reportRun).not.toHaveBeenCalled();
+  });
+
+  it('given the collapse pays, then the payout status carries the chest the server rolled', async () => {
+    const reportRun = vi.fn().mockResolvedValue(paid);
+    const { result } = renderHook(() => useRunPayout({ over: true, ready: true, getSummary: () => summary(5), reportRun }));
+    await waitFor(() => expect(result.current.payoutStatus.status).toBe('paid'));
+    expect(result.current.payoutStatus).toEqual({ status: 'paid', coins: 40, chest: (paid as { chest: unknown }).chest });
   });
 
   it('given a run that ended normally, then the collapse still reports exactly once', () => {

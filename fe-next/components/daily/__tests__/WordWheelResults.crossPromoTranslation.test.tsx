@@ -101,7 +101,7 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
       playedStatus.today = { wordHunt: false, wordWheel: true, wordTower: true, connections: true };
       vi.doMock('@/contexts/LanguageContext', () => ({
         useLanguage: () => ({
-          t: (k: string, fb?: string) => fb || k,
+          t: (k: string, fb?: unknown) => (typeof fb === 'string' ? fb : k),
           language: 'en',
           dir: 'ltr',
         }),
@@ -135,7 +135,7 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
       playedStatus.today = { wordHunt: true, wordWheel: true, wordTower: false, connections: true };
       vi.doMock('@/contexts/LanguageContext', () => ({
         useLanguage: () => ({
-          t: (k: string, fb?: string) => fb || k,
+          t: (k: string, fb?: unknown) => (typeof fb === 'string' ? fb : k),
           language: 'en',
           dir: 'ltr',
         }),
@@ -165,7 +165,7 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
       playedStatus.today = { wordHunt: true, wordWheel: true, wordTower: true, connections: true };
       vi.doMock('@/contexts/LanguageContext', () => ({
         useLanguage: () => ({
-          t: (k: string, fb?: string) => fb || k,
+          t: (k: string, fb?: unknown) => (typeof fb === 'string' ? fb : k),
           language: 'en',
           dir: 'ltr',
         }),
@@ -198,7 +198,7 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
       playedStatus.today = { wordHunt: true, wordWheel: true, wordTower: true, connections: true };
       vi.doMock('@/contexts/LanguageContext', () => ({
         useLanguage: () => ({
-          t: (k: string, fb?: string) => fb || k,
+          t: (k: string, fb?: unknown) => (typeof fb === 'string' ? fb : k),
           language: 'en',
           dir: 'ltr',
         }),

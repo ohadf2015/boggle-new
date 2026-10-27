@@ -1,6 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ language: 'en', t: (k: string) => k }),
+}));
 
 import WordWheelReadyCard from '../WordWheelReadyCard';
 
@@ -17,6 +21,45 @@ const base = {
 };
 
 describe('WordWheelReadyCard', () => {
+  beforeEach(() => { localStorage.clear(); });
+
+  it('names its place in the daily trail', () => {
+    render(<WordWheelReadyCard {...base} />);
+    expect(screen.getByTestId('ready-step').textContent).toContain('daily.journeyStepOf');
+  });
+
+  it('Given a player who saw the how-to on an earlier visit, When the card mounts, Then it stays closed', () => {
+    localStorage.setItem('lc:wheel-howto-seen', '1');
+    render(<WordWheelReadyCard {...base} autoShowHowTo />);
+    expect(screen.queryByTestId('wheel-howto')).toBeNull();
+  });
+
+  it('Given a first-time player, When the card mounts, Then the how-to shows, is remembered at show time, and survives a remount in the same visit', () => {
+    const { unmount } = render(<WordWheelReadyCard {...base} autoShowHowTo />);
+    expect(screen.getByTestId('wheel-howto')).toBeInTheDocument();
+    expect(localStorage.getItem('lc:wheel-howto-seen')).toBe('1');
+    unmount();
+    render(<WordWheelReadyCard {...base} autoShowHowTo />);
+    expect(screen.getByTestId('wheel-howto')).toBeInTheDocument();
+  });
+
+  it('Given a returning player, When they tap How to play, Then the how-to opens and PLAY still starts the day', () => {
+    const onPlay = vi.fn();
+    render(<WordWheelReadyCard {...base} onPlay={onPlay} />);
+    expect(screen.queryByTestId('wheel-howto')).toBeNull();
+    fireEvent.click(screen.getByTestId('ready-howto-link'));
+    expect(screen.getByTestId('wheel-howto')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'daily.play' }));
+    expect(onPlay).toHaveBeenCalledTimes(1);
+  });
+
+  it('offers a practice wheel, except when already practising', () => {
+    const { rerender } = render(<WordWheelReadyCard {...base} />);
+    expect(screen.getByTestId('ready-practice-link').getAttribute('href')).toBe('/en/daily/word-wheel?practice=1');
+    rerender(<WordWheelReadyCard {...base} isPractice />);
+    expect(screen.queryByTestId('ready-practice-link')).toBeNull();
+  });
+
   it('names today\'s puzzle and starts it from one PLAY button', () => {
     const onPlay = vi.fn();
     render(<WordWheelReadyCard {...base} onPlay={onPlay}><div data-testid="board" /></WordWheelReadyCard>);

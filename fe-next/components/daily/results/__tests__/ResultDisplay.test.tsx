@@ -129,9 +129,11 @@ describe('ResultDisplay Component', () => {
   };
 
   describe('Win state', () => {
-    it('renders the gauge ring-3 for solved puzzle', () => {
+    it('leaves score, puzzle number and streak to the shared hero above it', () => {
       render(<ResultDisplay {...solvedProps} />);
-      expect(screen.getByTestId('score-gauge-ring')).toBeInTheDocument();
+      expect(screen.queryByTestId('score-gauge-ring')).not.toBeInTheDocument();
+      expect(screen.queryByText('daily.puzzleNumber')).not.toBeInTheDocument();
+      expect(screen.queryByText('5')).not.toBeInTheDocument();
     });
 
     it('shows target word by default', () => {
@@ -150,21 +152,6 @@ describe('ResultDisplay Component', () => {
       expect(screen.queryByTestId('letter-C')).not.toBeInTheDocument();
       const questionMarks = screen.getAllByText('?');
       expect(questionMarks.length).toBe(3);
-    });
-
-    it('renders puzzle number in header', () => {
-      render(<ResultDisplay {...solvedProps} />);
-      expect(screen.getByText('daily.puzzleNumber')).toBeInTheDocument();
-    });
-
-    it('renders streak badge when streak > 0', () => {
-      render(<ResultDisplay {...solvedProps} />);
-      expect(screen.getByText('5')).toBeInTheDocument();
-    });
-
-    it('does not render streak badge when streak is 0', () => {
-      render(<ResultDisplay {...solvedProps} streakDays={0} />);
-      expect(screen.queryByText('0')).not.toBeInTheDocument();
     });
 
     it('renders countdown', () => {
@@ -199,10 +186,6 @@ describe('ResultDisplay Component', () => {
       expect(screen.getByText('wordHunt.results.scoreTierRising')).toBeInTheDocument();
     });
 
-    it('still shows attempts used as a secondary detail under the badge', () => {
-      render(<ResultDisplay {...solvedProps} attemptsUsed={3} />);
-      expect(screen.getByText('3/10')).toBeInTheDocument();
-    });
   });
 
   describe('Ron bonus prank (display-only)', () => {
@@ -271,16 +254,10 @@ describe('ResultDisplay Component', () => {
   describe('Fail state', () => {
     const failProps = { ...solvedProps, solved: false };
 
-    it('renders fail state without gauge score', () => {
+    it('does not repeat the game-over headline or the tries the hero already shows', () => {
       render(<ResultDisplay {...failProps} />);
-      // Gauge is rendered but with showScore=false
-      expect(screen.getByTestId('score-gauge-ring')).toBeInTheDocument();
-    });
-
-    it('shows attempts used', () => {
-      render(<ResultDisplay {...failProps} />);
-      const text = screen.getByText('3');
-      expect(text).toBeInTheDocument();
+      expect(screen.queryByTestId('score-gauge-ring')).not.toBeInTheDocument();
+      expect(screen.queryByText('wordHunt.results.gameOver')).not.toBeInTheDocument();
     });
 
     it('shows countdown in fail state', () => {
@@ -294,37 +271,19 @@ describe('ResultDisplay Component', () => {
     });
   });
 
-  describe('Auto-confetti on mount', () => {
+  describe('Confetti', () => {
     beforeEach(() => {
       vi.clearAllMocks();
     });
 
-    it('fires confetti automatically on mount when puzzle is solved with score', () => {
+    it('never fires on its own: the shared hero owns the one celebration', () => {
       render(<ResultDisplay {...solvedProps} lifeRemaining={60} />);
-      expect(fireConfetti).toHaveBeenCalled();
-    });
-
-    it('does not fire confetti on mount when puzzle is unsolved', () => {
-      render(<ResultDisplay {...solvedProps} solved={false} />);
       expect(fireConfetti).not.toHaveBeenCalled();
     });
 
-    it('confetti fires only once even with multiple condition changes', () => {
-      const { rerender } = render(
-        <ResultDisplay {...solvedProps} lifeRemaining={60} solved={true} />
-      );
-      expect(fireConfetti).toHaveBeenCalledTimes(1);
-
-      // Re-render with different lifeRemaining still should not re-fire
-      rerender(<ResultDisplay {...solvedProps} lifeRemaining={50} solved={true} />);
-      expect(fireConfetti).toHaveBeenCalledTimes(1);
-    });
-
-    it('fires confetti only once on mount, not on re-render', async () => {
-      const { rerender } = render(<ResultDisplay {...solvedProps} lifeRemaining={60} />);
-      expect(fireConfetti).toHaveBeenCalledTimes(1);
-
-      rerender(<ResultDisplay {...solvedProps} lifeRemaining={60} />);
+    it('fires only when the player taps the answer to celebrate', () => {
+      render(<ResultDisplay {...solvedProps} lifeRemaining={60} />);
+      fireEvent.click(screen.getByTestId('result-answer'));
       expect(fireConfetti).toHaveBeenCalledTimes(1);
     });
   });

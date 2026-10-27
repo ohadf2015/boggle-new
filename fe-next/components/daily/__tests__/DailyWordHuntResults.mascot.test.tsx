@@ -125,7 +125,6 @@ vi.mock('../results', () => ({
     handleRetryChallenge: vi.fn(),
     handleRevealTargetWord: vi.fn(),
   }),
-  useConfettiEffects: () => ({ handleBadgeClickConfetti: vi.fn() }),
   useSpendAnimation: () => ({ isVisible: false, position: { x: 0, y: 0 }, amount: 0, start: vi.fn(), hide: vi.fn() }),
   useStreakFreezeStatus: () => ({ freezesAvailable: 0, isStreakProtected: false }),
   ScoreBadge: () => <div data-testid="score-badge" />,
@@ -200,8 +199,8 @@ vi.mock('@/utils/mascotConfig', () => ({
   ENCOURAGING_SCORE_THRESHOLD: 0.4,
 }));
 
-vi.mock('../WinCinematic', () => ({
-  WinCinematic: () => null,
+vi.mock('../results/WordHuntResultsHero', () => ({
+  WordHuntResultsHero: ({ children }: { children?: React.ReactNode }) => <section data-testid="daily-results-hero">{children}</section>,
 }));
 
 

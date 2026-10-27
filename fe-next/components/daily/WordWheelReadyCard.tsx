@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { m } from 'framer-motion';
 import { Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { DAILY_MODES } from '@/lib/dailyModes';
+import WheelHowTo from './wheel/WheelHowTo';
+import { useWheelHowTo } from './wheel/useWheelHowTo';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -16,6 +20,9 @@ interface WordWheelReadyCardProps {
   wide?: boolean;
   /** Today's board (behind one tap on phones). */
   children?: React.ReactNode;
+  isPractice?: boolean;
+  /** First-time player: open the hands-on how-to once on its own. */
+  autoShowHowTo?: boolean;
 }
 
 // Decoy glyphs, never the real outer letter, so the pre-game scout can't read
@@ -39,10 +46,15 @@ function CensorTile({ seed, avoid }: { seed: number; avoid?: string }) {
 }
 
 const ORBIT = 72;
+const STEP = DAILY_MODES.findIndex((d) => d.id === 'word-wheel') + 1;
 
 export default function WordWheelReadyCard({
   t, centerLetter, outerLetters, puzzleNumber, streakDays, onPlay, wide = false, children,
+  isPractice = false, autoShowHowTo = false,
 }: WordWheelReadyCardProps) {
+  const { language } = useLanguage();
+  const howTo = useWheelHowTo(autoShowHowTo);
+  const [learned, setLearned] = useState(false);
   return (
     <div
       className={cn(
@@ -53,11 +65,15 @@ export default function WordWheelReadyCard({
       <section className="w-full max-w-sm shrink-0 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-lg overflow-hidden">
         <div className="px-5 pt-5 text-center">
           <span className="block text-[11px] font-black uppercase tracking-[0.2em] text-neo-lime/80">
+            {!isPractice && (
+              <span data-testid="ready-step">{t('daily.journeyStepOf', { n: STEP, total: DAILY_MODES.length })} · </span>
+            )}
             {t('daily.puzzleNumber', { number: puzzleNumber })}
           </span>
           <h1 className="font-neo-display font-black text-4xl text-neo-white mt-1">{t('wordWheel.title')}</h1>
         </div>
 
+        {howTo.open ? <WheelHowTo onAccepted={() => setLearned(true)} /> : (
         <div className="relative mx-auto my-5 w-52 h-52 flex items-center justify-center" aria-hidden>
           <div className="absolute inset-0 rounded-full border-2 border-neo-lime/25 shadow-[0_0_36px_rgba(191,255,0,0.18),inset_0_0_30px_rgba(191,255,0,0.08)]" />
           <div className="absolute inset-6 rounded-full border border-neo-cyan/15" />
@@ -86,6 +102,7 @@ export default function WordWheelReadyCard({
             );
           })}
         </div>
+        )}
 
         <p data-testid="ready-rules" className="px-5 text-center text-sm font-semibold text-neo-white/80 leading-relaxed">
           {t('wordWheel.centerLetterRule')}
@@ -106,11 +123,29 @@ export default function WordWheelReadyCard({
           <m.button
             type="button"
             onClick={onPlay}
-            className="w-full h-14 rounded-neo border-3 border-neo-black bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black font-neo-display font-black text-2xl tracking-wide shadow-[4px_4px_0px_black,0_0_20px_rgba(191,255,0,0.3)] active:shadow-hard-pressed active:translate-x-px active:translate-y-px"
+            className={cn(
+              'w-full h-14 rounded-neo border-3 border-neo-black bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black font-neo-display font-black text-2xl tracking-wide shadow-hard active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
+              learned && 'ring-4 ring-neo-yellow ring-offset-2 ring-offset-neo-navy-light',
+            )}
+            animate={learned ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+            transition={{ duration: 0.45 }}
             whileTap={{ scale: 0.97 }}
           >
             {t('daily.play')}
           </m.button>
+          <div className="mt-3 flex items-center justify-center gap-4 text-sm font-bold">
+            {!howTo.open && (
+              <button type="button" data-testid="ready-howto-link" onClick={howTo.show} className="text-neo-cyan underline underline-offset-4">
+                {t('daily.howToPlay')}
+              </button>
+            )}
+            {!isPractice && (
+              // Full navigation: the load hook decides practice once per mount.
+              <a data-testid="ready-practice-link" href={`/${language}/daily/word-wheel?practice=1`} className="text-neo-white/75 underline underline-offset-4">
+                {t('singlePlayer.practiceMode')}
+              </a>
+            )}
+          </div>
         </div>
       </section>
 

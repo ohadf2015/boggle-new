@@ -10,13 +10,15 @@ const prefersReducedMotion = () =>
 
 interface WordWheelBoardEntranceProps {
   className?: string;
+  /** The clock ran out: the board sinks back under the TIME stamp. */
+  settled?: boolean;
   children: (entranceDone: boolean) => React.ReactNode;
 }
 
 /**
- * Transform-only entrance: an opacity tween on this full-screen layer flashes on the mobile Chromium renderer.
+ * Transform-only entrance and no exit: an opacity tween on this full-screen layer flashes on the mobile Chromium renderer.
  */
-export default function WordWheelBoardEntrance({ className, children }: WordWheelBoardEntranceProps) {
+export default function WordWheelBoardEntrance({ className, settled = false, children }: WordWheelBoardEntranceProps) {
   const [reduced] = useState(prefersReducedMotion);
   const [entranceDone, setEntranceDone] = useState(reduced);
 
@@ -30,8 +32,7 @@ export default function WordWheelBoardEntrance({ className, children }: WordWhee
     <m.div
       className={className}
       initial={reduced ? false : { y: 24, scale: 0.96 }}
-      animate={{ y: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.3 } }}
+      animate={settled ? { y: 12, scale: 0.94 } : { y: 0, scale: 1 }}
       transition={{ type: 'spring', duration: BOARD_ENTRANCE_MS / 1000, bounce: 0.2 }}
     >
       {children(entranceDone)}

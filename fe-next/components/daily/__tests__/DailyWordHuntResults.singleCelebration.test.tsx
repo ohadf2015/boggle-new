@@ -1,11 +1,5 @@
 /**
- * TDD: WinCinematic wiring in DailyWordHuntResults
- *
- * Tests that:
- * - WinCinematic renders when isNewCompletion=true and result.solved=true
- * - WinCinematic does NOT render when isNewCompletion=false
- * - WinCinematic does NOT render when result.solved=false
- * - After onComplete fires, results content replaces the cinematic
+ * Finishing Word Hunt plays exactly one celebration: the shared hero's.
  */
 
 import React from 'react';
@@ -14,14 +8,12 @@ import { render, screen, act } from '@testing-library/react';
 // ── ResultsBannerSlot mock (added in 2026-05-05; pulls in useAdMob) ──────────
 vi.mock('@/components/ads/ResultsBannerSlot', () => ({ default: () => null }));
 
-// ── WinCinematic mock — captures onComplete for use in tests ──────────────────
-let capturedOnComplete: (() => void) | null = null;
-
-vi.mock('../WinCinematic', () => ({
-  __esModule: true,
-  WinCinematic: ({ onComplete, puzzleNumber }: { onComplete: () => void; puzzleNumber: number }) => {
-    capturedOnComplete = onComplete;
-    return <div data-testid="win-cinematic" data-puzzle={puzzleNumber} />;
+// ── Shared hero mock — records whether it was asked to celebrate ─────────────
+const heroCelebrate: boolean[] = [];
+vi.mock('../results/WordHuntResultsHero', () => ({
+  WordHuntResultsHero: ({ celebrate, children }: { celebrate: boolean; children?: React.ReactNode }) => {
+    heroCelebrate.push(celebrate);
+    return <section data-testid="daily-results-hero">{children}</section>;
   },
 }));
 
@@ -145,7 +137,6 @@ vi.mock('../results', () => ({
     handleRevealTargetWord: vi.fn(),
     handleRevealTargetWordViaAd: vi.fn(),
   }),
-  useConfettiEffects: () => ({ handleBadgeClickConfetti: vi.fn() }),
   useSpendAnimation: () => ({ isVisible: false, position: { x: 0, y: 0 }, amount: 0, start: vi.fn(), hide: vi.fn() }),
   useStreakFreezeStatus: () => ({ freezesAvailable: 0, isStreakProtected: false }),
   ScoreBadge: () => <div data-testid="score-badge" />,
@@ -264,51 +255,36 @@ const baseProps: DailyWordHuntResultsProps = {
 };
 
 // ── Tests ──────────────────────────────────────────────────────────────────────
-describe('DailyWordHuntResults - WinCinematic wiring', () => {
+describe('DailyWordHuntResults - one celebration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    capturedOnComplete = null;
+    heroCelebrate.length = 0;
   });
+  afterEach(() => { vi.useRealTimers(); });
 
-  it('renders WinCinematic when isNewCompletion=true and solved=true', () => {
+  it('Given a fresh solve, When results open, Then the hero shows straight away with no cinematic in front of it', () => {
     render(<DailyWordHuntResults {...baseProps} />);
-    expect(screen.getByTestId('win-cinematic')).toBeInTheDocument();
+    expect(screen.getAllByTestId('daily-results-hero').length).toBeGreaterThan(0);
+    expect(screen.queryByTestId('win-cinematic')).not.toBeInTheDocument();
+    expect(heroCelebrate.every(Boolean)).toBe(true);
   });
 
-  it('does NOT render WinCinematic when isNewCompletion=false', () => {
+  it('Given a fresh solve, When the entrance plays out, Then the results screen fires no confetti of its own', async () => {
+    vi.useFakeTimers();
+    const { fireConfetti } = await import('@/utils/confettiUtils');
+    render(<DailyWordHuntResults {...baseProps} />);
+    act(() => { vi.advanceTimersByTime(4000); });
+    expect(fireConfetti).not.toHaveBeenCalled();
+  });
+
+  it('Given a revisit, When results open, Then the hero does not celebrate again', () => {
     render(<DailyWordHuntResults {...baseProps} isNewCompletion={false} />);
-    expect(screen.queryByTestId('win-cinematic')).not.toBeInTheDocument();
+    expect(heroCelebrate.length).toBeGreaterThan(0);
+    expect(heroCelebrate.some(Boolean)).toBe(false);
   });
 
-  it('does NOT render WinCinematic when solved=false', () => {
-    render(
-      <DailyWordHuntResults
-        {...baseProps}
-        result={{ ...baseResult, solved: false }}
-      />
-    );
-    expect(screen.queryByTestId('win-cinematic')).not.toBeInTheDocument();
-  });
-
-  it('shows results content after WinCinematic onComplete fires', () => {
+  it('Given results, When the header renders, Then score and streak are not repeated outside the hero', () => {
     render(<DailyWordHuntResults {...baseProps} />);
-
-    // Cinematic must be showing first
-    expect(screen.getByTestId('win-cinematic')).toBeInTheDocument();
-
-    // Fire the captured onComplete callback
-    act(() => {
-      capturedOnComplete?.();
-    });
-
-    // Cinematic should be gone, results should appear
-    expect(screen.queryByTestId('win-cinematic')).not.toBeInTheDocument();
-    expect(screen.getByTestId('score-badge')).toBeInTheDocument();
-  });
-
-  it('passes correct puzzleNumber to WinCinematic', () => {
-    render(<DailyWordHuntResults {...baseProps} puzzleNumber={99} />);
-    const cinematic = screen.getByTestId('win-cinematic');
-    expect(cinematic).toHaveAttribute('data-puzzle', '99');
+    expect(screen.queryByTestId('score-badge')).not.toBeInTheDocument();
   });
 });

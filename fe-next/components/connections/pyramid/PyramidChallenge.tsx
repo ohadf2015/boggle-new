@@ -1,14 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
-import { m } from 'framer-motion';
-import Link from 'next/link';
-import { Share2, ChevronRight, Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
-import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -24,8 +19,6 @@ import {
 import { dailyPyramid } from '@/lib/connections/pyramid/daily';
 import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
 import { saveDailyResult } from '@/lib/connections/dailyResultStore';
-import { NextQuestCta } from '@/components/daily/results/NextQuestCta';
-import type { Language } from '@/types';
 import { getSolvedIds, markSolved } from '@/lib/connections/solvedStore';
 import { buildPyramidShareGrid } from '@/lib/connections/pyramid/shareGrid';
 import { todayUTC, markConnectionsPlayedToday, advanceClientStreak } from '@/lib/connections/dailyClient';
@@ -42,9 +35,13 @@ import { GameShell, SHELL_MEDIA } from '@/components/game/shell';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import FinaleCard from './FinaleCard';
 import PuzzleCard from '../PuzzleCard';
-import ConnectionsMascot from '../ConnectionsMascot';
-import DailyAnswerKey from '../DailyAnswerKey';
+import BridgeFinishBeat, { useFinishBeat } from '../BridgeFinishBeat';
+import PyramidDailyResults from './PyramidDailyResults';
+import PyramidEndScreen from './PyramidEndScreen';
+import PyramidOutOfLives from './PyramidOutOfLives';
 import { useStoredDailyResult } from '../useStoredDailyResult';
+
+const UNREACHED: BridgeOutcome = { reached: false, solved: false, wrongAttempts: 0, hintUsed: false };
 
 type Action =
   | { type: 'GUESS'; input: string }
@@ -163,6 +160,7 @@ function PyramidRun({
   const [results, setResults] = useState<{ copied: boolean }>({ copied: false });
 
   const isTerminal = pyramidState.status === 'won' || pyramidState.status === 'lost';
+  const beat = useFinishBeat(isTerminal && !restored);
   const isResolved = pyramidState.status === 'correct' || pyramidState.status === 'gaveUp';
   const baseStage = pyramidState.stage < 3;
   const currentPuzzle =
@@ -249,7 +247,8 @@ function PyramidRun({
     } else if (pyramidState.status === 'won' && prevStatusRef.current !== 'won') {
       onBridgeSolved();
       sfx.playVictorySound();
-      if (!prefersReducedMotion) fireVictoryConfetti();
+      // On the daily host the results hero owns the one celebration.
+      if (!sharePath && !prefersReducedMotion) fireVictoryConfetti();
       // Beaten pyramids never come back — future days pick from unsolved ones.
       if (pyramid) markSolved('pyramid', language, pyramid.id);
       outcomesRef.current.set(3, {
@@ -268,7 +267,7 @@ function PyramidRun({
     }
     prevStatusRef.current = pyramidState.status;
     prevWrongRef.current = pyramidState.wrongAttempts;
-  }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, pyramidState.wrongAttempts, sfx, haptic, customHaptic, prefersReducedMotion, pyramid, language, onBridgeSolved]);
+  }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, pyramidState.wrongAttempts, sfx, haptic, customHaptic, prefersReducedMotion, pyramid, language, onBridgeSolved, sharePath]);
 
   // Daily host: persist the terminal run (after the outcome effect above has
   // recorded the finale) so a same-day revisit reopens this end screen.
@@ -323,198 +322,80 @@ function PyramidRun({
     context: { pyramidId: pyramid.id, stage: pyramidState.stage },
   });
 
-  const handleShare = useCallback(async () => {
-    const baseOutcomes: readonly [BridgeOutcome, BridgeOutcome, BridgeOutcome] = [
-      outcomesRef.current.get(0) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
-      outcomesRef.current.get(1) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
-      outcomesRef.current.get(2) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
-    ];
-    const finaleOutcome = outcomesRef.current.get(3) ?? {
-      reached: false,
-      solved: false,
-      wrongAttempts: 0,
-      hintUsed: false,
-    };
+  const shareText = useCallback((): string => {
+    const at = (i: number) => outcomesRef.current.get(i) ?? UNREACHED;
+    const base = [at(0), at(1), at(2)] as const;
     const url = typeof window !== 'undefined' ? `${window.location.origin}/${sharePath ?? `${language}/connections/pyramid`}` : undefined;
-    const text = buildPyramidShareGrid({
+    return buildPyramidShareGrid({
       title: t('connections.pyramid.title'),
       dateISO: today,
-      base: baseOutcomes,
-      finale: finaleOutcome,
+      base,
+      finale: at(3),
       score: pyramidState.score,
-      callout: t(`connections.daily.shareCallout.${gridCallout(Array.from([...baseOutcomes, finaleOutcome]))}`),
+      callout: t(`connections.daily.shareCallout.${gridCallout([...base, at(3)])}`),
       url,
     });
+  }, [t, language, today, pyramidState.score, sharePath]);
+
+  const handleShare = useCallback(async () => {
     try {
-      const shareText = stripEmoji(text);
+      const text = stripEmoji(shareText());
       if (typeof navigator !== 'undefined' && navigator.share) {
-        await navigator.share({ text: shareText });
+        await navigator.share({ text });
       } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(shareText);
+        await navigator.clipboard.writeText(text);
         setResults({ copied: true });
       }
     } catch {
       /* user cancelled / unsupported */
     }
-  }, [t, language, today, pyramidState.score, sharePath]);
+  }, [shareText]);
 
   // Terminal state: won/lost
-  if (isTerminal) {
+  if (isTerminal && beat.showing) {
     return (
-      <div className="mx-auto flex w-full max-w-md flex-col gap-4 px-4 py-6">
-        <m.div
-          initial={{ opacity: 0, y: 16, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-          className={[
-            'rounded-neo border-neo-thick bg-neo-navy-light p-5 text-center shadow-hard',
-            pyramidState.status === 'won' ? 'border-neo-lime' : 'border-neo-red',
-          ].join(' ')}
-        >
-          <ConnectionsMascot status={pyramidState.status} className="mb-3 h-24 w-24" />
-          <PyramidProgress
-            stage={3}
-            solvedBridges={pyramidState.solvedBridges}
-            gaveUpBase={pyramidState.gaveUpBase}
-            metaAnswer={pyramid.metaAnswer}
-            won={pyramidState.status === 'won'}
-          />
-          <h1 className="mt-4 font-neo-display text-2xl font-black text-neo-white">
-            {pyramidState.status === 'won' ? t('connections.pyramid.won') : t('connections.pyramid.lost')}
-          </h1>
-          <div className="mt-2 flex items-center justify-center gap-2">
-            <span className="font-neo-display text-lg font-black text-neo-white/70">
-              {t('connections.score')}
-            </span>
-            <span className="font-neo-display text-xl font-black text-neo-yellow tabular-nums">
-              {pyramidState.score}
-            </span>
-            {/* Same streak chip the 5-riddle daily results draw — pyramid days
-                advance the same client streak, so it should show it too. */}
-            {clientStreak > 0 && (
-              <m.span
-                data-testid="pyramid-streak-chip"
-                initial={{ scale: 0, rotate: -12 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.4 }}
-                className="inline-flex items-center gap-1 rounded-neo border-neo border-neo-orange bg-neo-orange/10 px-3 py-1 shadow-hard-sm"
-              >
-                <Flame className="h-4 w-4 text-neo-orange" strokeWidth={2.5} aria-hidden="true" />
-                <span className="font-neo-display font-black text-neo-orange">{clientStreak}</span>
-              </m.span>
-            )}
-          </div>
-          {pyramidState.status === 'lost' && (
-            <p className="mt-3 font-neo-body text-sm text-neo-white/70">
-              {t('connections.pyramid.reveal')}: <span className="font-bold text-neo-white">{pyramid.metaAnswer}</span>
-            </p>
-          )}
-          {/* The 3 base bridges the run passed through — a lost pyramid used to
-              reveal only the meta, so a player who burned the base stages left
-              without ever learning what those answers were. */}
-          <div className="mt-4">
-            <DailyAnswerKey
-              puzzles={pyramid.base}
-              solvedIndices={new Set(
-                pyramid.base.map((_, i) => i).filter((i) => !pyramidState.gaveUpBase[i]),
-              )}
-              title={t('connections.daily.answerKey')}
-              isRTL={language === 'he'}
-            />
-          </div>
-          <m.button
-            type="button"
-            onClick={handleShare}
-            whileTap={{ scale: 0.96 }}
-            className="mt-4 inline-flex items-center gap-2 rounded-neo border-neo-thick border-neo-pink bg-neo-pink px-5 py-2.5 font-neo-display font-black text-neo-navy shadow-hard"
-          >
-            <Share2 className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
-            {results.copied ? t('connections.daily.copied') : t('connections.daily.share')}
-          </m.button>
-        </m.div>
-
-        <ProgressCard api={progressApi} todayISO={today} />
-
-        {/* The terminal screen was a dead end. As the day's daily quest, hand off
-            to the next daily mode (a link to /connections/daily from here would
-            just reload this page); standalone play routes to the daily. */}
-        {sharePath ? (
-          <NextQuestCta
-            justFinished="connections"
-            currentLanguage={language as Language}
-            source="pyramid_daily_results"
-          />
-        ) : (
-          <Link
-            href={`/${language}/connections/daily`}
-            data-testid="pyramid-back-to-daily"
-            className="flex items-center gap-3 rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan/15 p-4 shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
-          >
-            <span className="flex min-w-0 flex-1 flex-col text-start">
-              <span className="font-neo-display text-base font-black text-neo-cyan">
-                {t('connections.daily.cta')}
-              </span>
-              <span className="font-neo-body text-xs text-neo-white/70">{t('connections.daily.questDesc')}</span>
-            </span>
-            <DirectionalIcon icon={ChevronRight} className="h-5 w-5 shrink-0 text-neo-cyan" />
-          </Link>
-        )}
-
-        <ResultsBannerSlot placement="daily-complete" />
-      </div>
+      <BridgeFinishBeat
+        planks={pyramid.base.map((p, i) => ({ word: p.bridge, solved: Boolean(outcomesRef.current.get(i)?.solved) }))}
+        top={{ word: pyramid.metaAnswer, solved: pyramidState.status === 'won' }}
+        headline={t(pyramidState.status === 'won' ? 'connections.pyramid.won' : 'connections.pyramid.lost')}
+        onDone={beat.done}
+      />
     );
   }
 
-  // outOfLives state
+  if (isTerminal && sharePath) {
+    return (
+      <PyramidDailyResults
+        pyramid={pyramid}
+        state={pyramidState}
+        outcomes={[0, 1, 2, 3].map((i) => outcomesRef.current.get(i) ?? UNREACHED)}
+        celebrate={!restored}
+        shareText={shareText()}
+        progressSlot={<ProgressCard api={progressApi} todayISO={today} />}
+      />
+    );
+  }
+
+  if (isTerminal) {
+    return (
+      <PyramidEndScreen
+        state={pyramidState}
+        streak={clientStreak}
+        copied={results.copied}
+        onShare={handleShare}
+        progressSlot={<ProgressCard api={progressApi} todayISO={today} />}
+      />
+    );
+  }
+
   if (pyramidState.status === 'outOfLives' && !isResolved) {
     return (
-      <div className="mx-auto flex w-full max-w-md flex-col gap-4 px-4 py-6">
-        <m.div
-          initial={{ opacity: 0, y: 16, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-          className="rounded-neo border-neo-thick border-neo-red bg-neo-navy-light p-5 text-center shadow-hard"
-        >
-          <ConnectionsMascot status="outOfLives" className="mb-2 h-20 w-20" />
-          <h1 className="font-neo-display text-2xl font-black text-neo-red">{t('connections.outOfLives')}</h1>
-          <p className="mt-2 font-neo-body text-sm text-neo-white/70">{t('connections.reviveDescription')}</p>
-          <div className="mt-4 flex flex-col gap-3">
-            {isAdmin ? (
-              <m.button
-                type="button"
-                onClick={handleRevive}
-                whileTap={{ scale: 0.96 }}
-                className="rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan px-5 py-2.5 font-neo-display font-black text-neo-navy shadow-hard"
-              >
-                {t('connections.adminRefill')}
-              </m.button>
-            ) : reviveAd.canShowAd ? (
-              <m.button
-                type="button"
-                data-testid="pyramid-revive-ad"
-                onClick={reviveAd.offer}
-                whileTap={{ scale: 0.96 }}
-                disabled={reviveAd.status === 'loading' || reviveAd.status === 'showing'}
-                className="rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan px-5 py-2.5 font-neo-display font-black text-neo-navy shadow-hard disabled:opacity-60"
-              >
-                {t('connections.reviveAd')}
-              </m.button>
-            ) : (
-              <p className="font-neo-body text-xs text-neo-white/50">{t('connections.noAdAvailable')}</p>
-            )}
-            <m.button
-              type="button"
-              onClick={() => {
-                dispatch({ type: 'ADVANCE' });
-              }}
-              whileTap={{ scale: 0.96 }}
-              className="rounded-neo border-neo border-neo-white/20 bg-transparent px-5 py-2.5 font-neo-display font-black text-neo-white shadow-hard hover:bg-neo-white/10 transition-colors"
-            >
-              {t('connections.pyramid.acceptLoss')}
-            </m.button>
-          </div>
-        </m.div>
-      </div>
+      <PyramidOutOfLives
+        isAdmin={isAdmin}
+        reviveAd={reviveAd}
+        onRevive={handleRevive}
+        onAcceptLoss={handleAdvance}
+      />
     );
   }
 
@@ -529,6 +410,7 @@ function PyramidRun({
     <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-4 shell:my-auto shell:max-w-[40rem] shell:px-0" data-testid="pyramid-root">
       {!inShell && (
         <PyramidHeader
+          daily={Boolean(sharePath)}
           state={pyramidState}
           metaAnswer={pyramid.metaAnswer}
           rankSlot={<RankBadge standing={progressApi.standing} rankUpId={progressApi.rankUpId} onRankUpShown={progressApi.dismissRankUp} />}
