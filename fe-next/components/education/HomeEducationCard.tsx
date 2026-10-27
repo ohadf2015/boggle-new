@@ -94,7 +94,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
           'flex shrink-0 items-center justify-center',
           'h-10 w-10 sm:h-12 sm:w-12',
           'rounded-neo border-2 border-neo-black text-neo-black shadow-hard-sm',
-          'motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-safe:group-hover:-rotate-6 motion-safe:group-hover:scale-110',
+          'motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out motion-safe:group-hover:-rotate-6 motion-safe:group-hover:scale-110',
           accent
         )}
         aria-hidden="true"
@@ -105,7 +105,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       {/* Copy — the title is the main link; its ::after covers the whole strip. */}
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 items-center gap-2">
-          <span className="hidden shrink-0 rounded-full border-2 border-neo-black bg-neo-cream px-1.5 py-0.5 font-neo-display text-[10px] font-black uppercase leading-none tracking-wide text-neo-black sm:inline-block">
+          <span className="hidden shrink-0 rounded-full border-2 border-neo-black bg-neo-cream px-1.5 py-0.5 font-neo-display text-xs font-black leading-none text-neo-black sm:inline-block">
             {badge}
           </span>
           <Link
@@ -199,7 +199,7 @@ function TrialPill({ trial, t, language }: TrialPillProps) {
     return (
       <span
         data-testid="home-education-trial"
-        className="hidden shrink-0 rounded-neo border-neo bg-neo-pink px-2.5 py-1.5 text-center text-[11px] font-black uppercase tracking-wide text-neo-white shadow-hard-sm sm:block"
+        className="hidden shrink-0 rounded-neo border-neo bg-neo-pink px-2.5 py-1.5 text-center text-xs font-black text-neo-white shadow-hard-sm sm:block"
       >
         {t('education.home.trial_ended')}
       </span>
@@ -224,7 +224,7 @@ function TrialPill({ trial, t, language }: TrialPillProps) {
       <span data-testid="home-education-trial-count" className="text-xl font-black leading-none font-neo-display">
         {count}
       </span>
-      <span data-testid="home-education-trial-unit" className="mt-0.5 text-[9px] font-bold uppercase tracking-wide">
+      <span data-testid="home-education-trial-unit" className="mt-0.5 text-xs font-bold">
         {t(unitKey)}
       </span>
     </span>
