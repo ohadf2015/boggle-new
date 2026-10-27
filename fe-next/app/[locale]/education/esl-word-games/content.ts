@@ -375,7 +375,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       rest1: 'para el',
       rest2: 'aula.',
     },
-    heroSubtitle: 'Juegos de palabras en inglés dirigidos por la docente. Tú eliges la lista y el modo, la clase entra desde el móvil y el proyector muestra el tablero. Seis diccionarios, sin cuentas de estudiante y un nivel por estudiante para un aula de niveles mixtos.',
+    heroSubtitle: 'Juegos de palabras en inglés dirigidos por la docente. Tú eliges la lista y el modo, la clase entra desde el móvil y el proyector muestra el tablero. Seis diccionarios, sin cuentas de estudiante y un nivel por estudiante para un aula de niveles mixtos. Para empezar, pulsa «Iniciar juego de inglés» y proyecta el código: una ronda para toda la clase dura 5 minutos.',
     ctaLabel: 'Crear Aula Gratis',
     heroCtas: {
       primary: '▶ Iniciar juego de inglés',
@@ -481,7 +481,7 @@ const content: Record<EducationLocale, LocaleContent> = {
     faqs: [
       {
         q: '¿Cuáles son los mejores juegos para ESL/EFL?',
-        a: 'LexiClash ofrece juegos en vivo: Boggle rápido, Word Wheel para vocabulario, Word Hunt para búsqueda. Todos en tiempo real contra compañeros o IA — competitivo y divertido.',
+        a: 'LexiClash ofrece juegos en vivo: Boggle rápido, Word Wheel para vocabulario, Word Hunt para búsqueda. Todos en tiempo real contra compañeros o IA — competitivo y divertido. Para probarlo, abre lexiclash.live/es/education/classroom-game y proyecta el tablero.',
       },
       {
         q: '¿Necesitan cuenta?',
