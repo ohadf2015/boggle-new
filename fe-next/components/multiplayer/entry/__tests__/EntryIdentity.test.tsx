@@ -64,6 +64,11 @@ describe('EntryIdentity', () => {
     expect(screen.getByTestId('avatar-renderer').getAttribute('data-bg')).toBe(CFG_B.bgColor);
   });
 
+  it('guest: rapid rerolls opt out of rage-click detection', () => {
+    render(<EntryIdentity isAuthenticated={false} displayName="" profileAvatar={null} />);
+    expect(screen.getByRole('button', { name: 'mpUi.entry.rerollAvatar' })).toHaveAttribute('data-gr-no-rage');
+  });
+
   it('guest: a valid rename is stored on blur', () => {
     render(<EntryIdentity isAuthenticated={false} displayName="" profileAvatar={null} />);
     const input = screen.getByLabelText('mpUi.entry.nameAria');
