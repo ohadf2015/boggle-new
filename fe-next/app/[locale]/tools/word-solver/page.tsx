@@ -51,11 +51,12 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const t = await loadTranslation(validLocale) as Record<string, any>;
   const enT = await loadTranslation('en') as Record<string, any>;
   const content = getContent(validLocale);
+  const metaTitle = content.metaTitle ?? content.title;
   const localePath = `/${locale}`;
   const pageUrl = `${BASE_URL}${localePath}/tools/word-solver`;
 
   return {
-    title: `${content.title} | LexiClash`,
+    title: `${metaTitle} | LexiClash`,
     description: content.metaDescription,
     keywords: [
       'anagram solver', 'word finder', 'word unscrambler', 'unscramble letters',
@@ -66,7 +67,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       type: 'website',
       locale: validLocale,
       url: pageUrl,
-      title: content.title,
+      title: metaTitle,
       description: content.metaDescription,
       siteName: 'LexiClash',
       images: [{
@@ -78,7 +79,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     },
     twitter: {
       card: 'summary_large_image',
-      title: content.title,
+      title: metaTitle,
       description: content.metaDescription,
       images: [`${BASE_URL}/og-image.jpg`],
     },
