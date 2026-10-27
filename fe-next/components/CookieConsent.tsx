@@ -273,7 +273,7 @@ export default function CookieConsent() {
             type="button"
             onClick={handleAcceptAll}
             className={cn(
-              'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase sm:flex-none sm:px-4',
+              'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase max-sm:whitespace-nowrap max-sm:px-1.5 max-sm:normal-case sm:flex-none sm:px-4',
               'bg-neo-cyan text-neo-black',
               'border-3 border-neo-black rounded-neo shadow-hard-sm',
               'hover:shadow-hard active:shadow-hard-pressed',
@@ -287,7 +287,7 @@ export default function CookieConsent() {
             type="button"
             onClick={() => setShowDetails(!showDetails)}
             className={cn(
-              'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase sm:flex-none',
+              'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase max-sm:whitespace-nowrap max-sm:px-1.5 max-sm:normal-case sm:flex-none',
               'text-neo-cyan hover:text-neo-white',
               'border-3 border-neo-cyan rounded-neo transition-colors duration-100',
               dense && 'min-w-0 px-1 normal-case leading-tight sm:px-3 sm:uppercase'
@@ -299,7 +299,7 @@ export default function CookieConsent() {
             type="button"
             onClick={handleDeclineAll}
             className={cn(
-              'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase sm:flex-none',
+              'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase max-sm:whitespace-nowrap max-sm:px-1.5 max-sm:normal-case sm:flex-none',
               'text-neo-white',
               'border-3 border-neo-cream rounded-neo transition-colors duration-100',
               dense && 'min-w-0 px-1 normal-case leading-tight sm:px-3 sm:uppercase'
