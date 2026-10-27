@@ -121,17 +121,23 @@ describe('abandonedCheckoutExcludedUserIds', () => {
       { id: 'alias', is_test_account: false, user_role: 'teacher' },
       { id: 'student', is_test_account: false, user_role: 'student' },
       { id: 'noclass', is_test_account: false, user_role: 'teacher' },
+      { id: 'unverified', is_test_account: false, user_role: 'teacher' },
+      { id: 'noclassflag', is_test_account: true, user_role: 'teacher' },
+      { id: 'noclassstudent', is_test_account: false, user_role: 'student' },
     ],
     emailsByUser: new Map([
       ['real', 'ada@school.edu'],
       ['alias', 'x+lexitest@gmail.com'],
       ['noclass', 'bo@school.edu'],
+      ['noclassflag', 'cy@school.edu'],
+      ['noclassstudent', 'di@school.edu'],
     ]),
     classroomTeacherIds: new Set(['real', 'flag', 'alias', 'student']),
-    userIds: ['real', 'flag', 'alias', 'student', 'noclass', 'gone'],
+    userIds: ['real', 'flag', 'alias', 'student', 'noclass', 'unverified', 'noclassflag', 'noclassstudent', 'gone'],
   }
   it('Given each kind of non-teacher traffic, Then only the real teacher is left', () => {
     const out = abandonedCheckoutExcludedUserIds(base)
-    expect([...out].sort()).toEqual(['alias', 'flag', 'gone', 'noclass', 'student'])
+    // 'noclass' is an approved teacher with no class yet: kept. 'unverified' (no approved request, no class) is out.
+    expect([...out].sort()).toEqual(['alias', 'flag', 'gone', 'noclassflag', 'noclassstudent', 'student', 'unverified'])
   })
 })

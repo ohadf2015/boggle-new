@@ -208,7 +208,12 @@ describe('/api/cron/teacher-abandoned-checkout', () => {
     ['a +qa alias', () => { h.tables.teacher_access_requests.data[0].email = 'ada+qa@school.edu'; }],
     ['an @lexiclash.test address', () => { h.tables.teacher_access_requests.data[0].email = 'qa1@lexiclash.test'; }],
     ['a student role', () => { h.tables.profiles.data[0].user_role = 'student'; }],
-    ['a teacher with no classroom', () => { h.tables.classrooms = { data: [], error: null }; }],
+    ['a no-class teacher flagged as a test account', () => { h.tables.classrooms = { data: [], error: null }; h.tables.profiles.data[0].is_test_account = true; }],
+    ['a no-class student role', () => { h.tables.classrooms = { data: [], error: null }; h.tables.profiles.data[0].user_role = 'student'; }],
+    ['a no-class teacher whose checkout a script created', () => { h.tables.classrooms = { data: [], error: null }; h.tables.checkout_started.data[0].payload.client_kind = 'script'; }],
+    ['a no-class teacher who already got one', () => { h.tables.classrooms = { data: [], error: null }; h.tables.subscription_events.data = [{ user_id: 'u1', event_type: 'abandoned_checkout_email_sent', created_at: hoursAgo(1) }]; }],
+    ['a no-class teacher who is already subscribed', () => { h.tables.classrooms = { data: [], error: null }; h.tables.subscriptions.data = [{ user_id: 'u1', tier: 'pro', status: 'active', source: 'polar', current_period_end: new Date(Date.now() + 86400000).toISOString() }]; }],
+    ['a signup with no approved access request and no class', () => { h.tables.classrooms = { data: [], error: null }; h.tables.teacher_access_requests = { data: [], error: null }; }],
     ['a checkout a script created', () => { h.tables.checkout_started.data[0].payload.client_kind = 'script'; }],
   ])('does not email %s', async (_label, arrange) => {
     arrange();
@@ -216,6 +221,21 @@ describe('/api/cron/teacher-abandoned-checkout', () => {
     expect(body.sent).toBe(0);
     expect(h.sendEmailSpy).not.toHaveBeenCalled();
     expect(h.inserts).toHaveLength(0);
+  });
+
+  it('emails an approved teacher with no classroom yet (keep-Pro wording inside the free access trial)', async () => {
+    h.tables.classrooms = { data: [], error: null };
+    h.tables.checkout_started.data[0].payload = { mode: 'trial', locale: 'sv', client_kind: 'browser' };
+    h.tables.teacher_access_requests.data[0] = {
+      ...h.tables.teacher_access_requests.data[0],
+      locale: 'sv',
+      trial_expires_at: new Date(Date.now() + 10 * 24 * 3600 * 1000).toISOString(),
+    };
+    const body = await (await POST(makeRequest())).json();
+    expect(body).toMatchObject({ sent: 1, failed: 0 });
+    const mail = h.sendEmailSpy.mock.calls[0][0];
+    expect(mail.subject).toBe('Behåll Teacher Pro efter din gratisperiod');
+    expect(h.inserts).toHaveLength(1);
   });
 
   it('still emails a real teacher whose checkout came from a browser', async () => {

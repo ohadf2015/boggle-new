@@ -38,8 +38,13 @@ export function checkoutStartedPayload({
 /**
  * Who must never get the abandoned-checkout email, beyond Pro and already-sent:
  * the profile test flag, a QA-looking address (same rule as checkoutTrafficTags),
- * a non-teacher role, or a teacher with no classroom. The week of 2026-10-20 every
- * checkout was a scripted probe from an account like that.
+ * a non-teacher role, or someone who is neither a verified teacher nor a classroom
+ * owner. The week of 2026-10-20 every checkout was a scripted probe from an account like that.
+ *
+ * "Verified teacher" = role teacher AND an approved access request (emailsByUser holds
+ * exactly those). Since 2026-10-27 that is enough: a teacher who has not made a class yet
+ * (the 2026-10-26 Swedish checkout, 12 s after approval) still gets the one reminder.
+ * A teacher with no approved request and no class stays excluded.
  */
 export function abandonedCheckoutExcludedUserIds(args: {
   profiles: ReadonlyArray<{ id: string; is_test_account?: boolean | null; user_role?: string | null }>;
@@ -55,7 +60,7 @@ export function abandonedCheckoutExcludedUserIds(args: {
     if (p.is_test_account) { out.add(id); continue; }
     if (p.user_role !== 'teacher') { out.add(id); continue; }
     if (testEmailReason(args.emailsByUser.get(id))) { out.add(id); continue; }
-    if (!args.classroomTeacherIds.has(id)) out.add(id);
+    if (!args.classroomTeacherIds.has(id) && !args.emailsByUser.has(id)) out.add(id);
   }
   return out;
 }
