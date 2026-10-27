@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
 import { BoggleAppFreeLink } from '@/components/seo/BoggleAppFreeLink';
+import { DescargarScrabblePcLink } from '@/components/seo/DescargarScrabblePcLink';
 
 
 interface PageProps {
@@ -230,6 +231,7 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
         <EducationIntentCta locale={locale} variant="teachers" />
         <BoggleAppFreeLink lead="The no-download page for a" />
         <ApalabradosSinDescargarLink />
+        <DescargarScrabblePcLink lead="En español, para el PC sin instalar nada:" />
 
         <section className="mb-12">
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Ready to Play With Friends?</h2>

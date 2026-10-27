@@ -18,6 +18,11 @@ describe('/es/juego-de-palabras-multijugador metadata', () => {
     expect(meta.alternates?.canonical).toBe('https://www.lexiclash.live/es/juego-de-palabras-multijugador');
   });
 
+  it('targets the GR #12022 download-intent query in keywords', async () => {
+    const meta = await generateMetadata({ params: Promise.resolve({ locale: 'es' }) });
+    expect(String(meta.keywords)).toContain('descargar scrabble en español gratis para pc');
+  });
+
   it('keeps non-Spanish locale variants noindexed', async () => {
     for (const locale of ['en', 'he', 'sv', 'ja', 'ru']) {
       const meta = await generateMetadata({ params: Promise.resolve({ locale }) });

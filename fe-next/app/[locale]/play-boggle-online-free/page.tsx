@@ -5,6 +5,7 @@ import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 import { FRIENDS_ANSWER, PlayBoggleWithFriendsSection } from '@/components/seo/PlayBoggleWithFriendsSection';
 import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
+import { DescargarScrabblePcLink } from '@/components/seo/DescargarScrabblePcLink';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -279,6 +280,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
 
         <PlayBoggleWithFriendsSection locale={locale} />
         <ApalabradosSinDescargarLink />
+        <DescargarScrabblePcLink lead="En español, para el PC sin instalar nada:" />
 
         {/* WORDS WITH FRIENDS CROSS-LINK BANNER */}
         <section className="mt-12">
