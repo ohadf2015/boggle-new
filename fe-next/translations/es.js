@@ -19243,6 +19243,7 @@ const es = {
       "land_grab": "Conquista",
       "quick_draw": "Mano rápida",
       "golden_tiles": "Fichas doradas",
+      "star_squares": "Casillas estrella",
       "none": "",
       "desc": {
         "bingo_bonanza": "Los bingos suman +90",
@@ -19250,7 +19251,8 @@ const es = {
         "rich_letters": "Las fichas raras valen el doble",
         "land_grab": "Las capturas se extienden a las vecinas",
         "quick_draw": "Atril de 5 fichas: turnos más rápidos",
-        "golden_tiles": "Las fichas ✦ capturan las casillas de alrededor"
+        "golden_tiles": "Las fichas ✦ capturan las casillas de alrededor",
+        "star_squares": "Cae en una estrella y captura las casillas de alrededor"
       }
     },
     "setup": {

@@ -7,7 +7,7 @@ import { seedOpeningRack, drawTowardTarget, nextLessonTarget } from './lessonBag
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
 import { adaptTuning, botTuning, shouldBotSkipTurn, DEFAULT_BOT_DIFFICULTY, type BotDifficulty } from './botDifficulty';
-import { rollModifier, toScoreModifier, modifierCaptureSpread, modifierRackSize, isGoldenTile, WORDCRAFT_MODIFIERS, type WordCraftModifier } from './modifiers';
+import { rollModifier, toScoreModifier, modifierCaptureSpread, modifierRackSize, modifierRingCenters, WORDCRAFT_MODIFIERS, type WordCraftModifier } from './modifiers';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import { getBoardDims, type BoardDims } from './boardDimensions';
 import { applyClaims, countClaimed, endgameTerritoryBonus, resolveCaptures, type Coord, type Owner } from './territory';
@@ -217,15 +217,10 @@ function commitMove(
     // capture by one ring (symmetric — applies to whoever is committing).
     // golden_tiles: each golden tile placed this turn ring-captures around
     // its own cell — symmetric for whichever seat commits.
-    const goldenCenters =
-      state.modifier === 'golden_tiles'
-        ? placements
-            .filter((p) => isGoldenTile(state.seed, p.rackTileId))
-            .map((p) => ({ row: p.row, col: p.col }))
-        : undefined;
+    const ringCenters = modifierRingCenters(state.modifier, state.seed, state.board.size, placements);
     const capture = resolveCaptures(state.board, placements, lists, who, {
       spreadToNeighbors: modifierCaptureSpread(state.modifier),
-      ringCenters: goldenCenters,
+      ringCenters,
     });
     captureBonus = capture.bonus;
     nextBoard = applyClaims(tilePlacedBoard, placements, capture.capturedCells, who);
@@ -688,12 +683,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
                 spreadToNeighbors: modifierCaptureSpread(state.modifier),
                 // Keep the bot's valuation symmetric with commit-time rules:
                 // golden placements ring-capture, so it should chase them too.
-                ringCenters:
-                  state.modifier === 'golden_tiles'
-                    ? placements
-                        .filter((p) => isGoldenTile(state.seed, p.rackTileId))
-                        .map((p) => ({ row: p.row, col: p.col }))
-                    : undefined,
+                ringCenters: modifierRingCenters(state.modifier, state.seed, state.board.size, placements),
               }).bonus * live.captureAggression
           : undefined,
         // Difficulty: cap word length (easy/medium kill bingos) and pick from a

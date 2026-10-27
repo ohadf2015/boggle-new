@@ -19119,6 +19119,7 @@ const ja = {
       "land_grab": "陣取り",
       "quick_draw": "早撃ち",
       "golden_tiles": "黄金タイル",
+      "star_squares": "スターマス",
       "none": "",
       "desc": {
         "bingo_bonanza": "ビンゴは+90点",
@@ -19126,7 +19127,8 @@ const ja = {
         "rich_letters": "レアタイルは2倍",
         "land_grab": "占領が隣のマスへ広がる",
         "quick_draw": "手札5枚でテンポよく",
-        "golden_tiles": "✦タイルは周囲のマスを占領"
+        "golden_tiles": "✦タイルは周囲のマスを占領",
+        "star_squares": "スターに置くと周囲のマスを占領"
       }
     },
     "setup": {

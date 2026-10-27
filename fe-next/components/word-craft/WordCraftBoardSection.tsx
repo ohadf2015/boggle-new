@@ -28,6 +28,8 @@ interface Props {
   zoomResetLabel?: string;
   /** golden_tiles modifier: true for tile ids that ring-capture on commit. */
   isGolden?: (tileId: string) => boolean;
+  /** star_squares modifier: 'r,c' keys of the star cells. */
+  starCells?: ReadonlySet<string>;
 }
 
 export function WordCraftBoardSection(props: Props) {
@@ -73,6 +75,7 @@ export function WordCraftBoardSection(props: Props) {
           locale={props.locale}
           reticle={props.reticle}
           isGolden={props.isGolden}
+          starCells={props.starCells}
         />
         <WordCraftPixiStage
           boardRef={boardRef}

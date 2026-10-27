@@ -38,7 +38,7 @@ const PRESENTATION: Record<Exclude<WordCraftModifier, 'none'>, { emoji: string; 
   quick_draw: {
     emoji: '⚡',
     label: 'Quick Draw',
-    note: '5-tile rack — faster turns',
+    note: '5-tile rack, faster turns',
     tone: 'bg-neo-cyan text-neo-navy',
   },
   golden_tiles: {
@@ -46,6 +46,12 @@ const PRESENTATION: Record<Exclude<WordCraftModifier, 'none'>, { emoji: string; 
     label: 'Golden Tiles',
     note: '✦ tiles capture their ring',
     // Gold = celebration semantic; correct for the golden twist.
+    tone: 'bg-neo-yellow text-neo-navy',
+  },
+  star_squares: {
+    emoji: '★',
+    label: 'Star Squares',
+    note: 'Land on a star to capture around it',
     tone: 'bg-neo-yellow text-neo-navy',
   },
 };
