@@ -8554,6 +8554,10 @@ const he = {
         "untimed": "בלי טיימר"
       },
       "todaysPuzzle": "החידה היומית",
+      "groupTogether": "משחקים ביחד",
+      "groupSolo": "משחק יחיד",
+      "groupThink": "בלי לחץ",
+      "groupPreview": "גישה מוקדמת",
       "wheelWord": "חידות",
       "puzzleNo": "חידה #{n}",
       "resetsIn": "מתאפס בעוד {time}",

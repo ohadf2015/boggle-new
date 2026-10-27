@@ -16,7 +16,7 @@ import { placeBlastAfterArena } from '@/lib/landing/blastPlacement';
 import { orderModesForNewcomer } from '@/lib/landing/newcomerModeOrder';
 import { HomeModeGrid } from './home/HomeModeGrid';
 import { useAdventureResume } from './useAdventureResume';
-import { MODE_META, MODE_TAGS, modeLineKey, modeRoute, isCalmMode, type ModeCubeModel } from '@/lib/landing/modeMeta';
+import { MODE_META, MODE_TAGS, modeLineKey, modeRoute, type ModeCubeModel } from '@/lib/landing/modeMeta';
 
 interface LandingChallengeCardsProps {
   language: string;
@@ -269,7 +269,7 @@ export function LandingChallengeCards({
   };
 
   const isModel = (m: ModeCubeModel | null): m is ModeCubeModel => m !== null;
-  // Every mode renders directly in the grid — no above-fold/collapsed split.
+  // Every mode renders on the page; HomeModeGrid sorts them into intent groups.
   const visibleKeys: LandingCardKey[] = [
     ...mpCards,
     ...(featurePractice ? (['practice'] as LandingCardKey[]) : []),
@@ -278,21 +278,7 @@ export function LandingChallengeCards({
   const visibleModels = visibleKeys
     .map((k) => buildCubeModel(k, k === 'arena' ? 'anchor' : 'normal'))
     .filter(isModel);
-  // Fast modes before the calm no-timer ones (crossword, word craft, connections).
-  const fastModels = visibleModels.filter((m) => !isCalmMode(m.key));
-  const calmModels = visibleModels.filter((m) => isCalmMode(m.key));
-  // The live race anchors the home with the next four modes; the rest sit in the More sheet.
-  const leadModels = fastModels.filter((m) => m.key === 'arena');
-  const parkedModels = [
-    ...fastModels.filter((m) => m.key !== 'arena'),
-    ...calmModels,
-  ];
-  const SCREEN_TILES = 4;
   return (
-    <HomeModeGrid
-      models={[...leadModels, ...parkedModels.slice(0, SCREEN_TILES)]}
-      extras={parkedModels.slice(SCREEN_TILES)}
-      liveCount={activePlayers}
-    />
+    <HomeModeGrid models={visibleModels} liveCount={activePlayers} />
   );
 }

@@ -8014,6 +8014,10 @@ const en = {
         "untimed": "No timer"
       },
       "todaysPuzzle": "Today's puzzle",
+      "groupTogether": "Play together",
+      "groupSolo": "Play solo",
+      "groupThink": "Take your time",
+      "groupPreview": "Early access",
       "wheelWord": "PUZZLE",
       "puzzleNo": "Puzzle #{n}",
       "resetsIn": "resets in {time}",

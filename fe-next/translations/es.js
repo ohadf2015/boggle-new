@@ -8493,6 +8493,10 @@ const es = {
         "untimed": "Sin reloj"
       },
       "todaysPuzzle": "Reto de hoy",
+      "groupTogether": "Jugar juntos",
+      "groupSolo": "Jugar solo",
+      "groupThink": "Sin prisa",
+      "groupPreview": "Acceso anticipado",
       "wheelWord": "PALABRA",
       "puzzleNo": "Puzle #{n}",
       "resetsIn": "se reinicia en {time}",

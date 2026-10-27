@@ -8510,6 +8510,10 @@ const ja = {
         "untimed": "時間制限なし"
       },
       "todaysPuzzle": "今日のパズル",
+      "groupTogether": "みんなで遊ぶ",
+      "groupSolo": "ひとりで遊ぶ",
+      "groupThink": "のんびり考える",
+      "groupPreview": "先行公開",
       "wheelWord": "ことばあそび",
       "puzzleNo": "パズル #{n}",
       "resetsIn": "{time}でリセット",

@@ -8858,6 +8858,10 @@ const sv = {
         "untimed": "Ingen timer"
       },
       "todaysPuzzle": "Dagens pussel",
+      "groupTogether": "Spela tillsammans",
+      "groupSolo": "Spela själv",
+      "groupThink": "Ta det lugnt",
+      "groupPreview": "Tidig åtkomst",
       "wheelWord": "ORDHJUL",
       "puzzleNo": "Pussel #{n}",
       "resetsIn": "återställs om {time}",

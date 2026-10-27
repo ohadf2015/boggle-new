@@ -272,21 +272,21 @@ describe('LandingChallengeCards — Word Tower v2 public gate', () => {
   });
 });
 
-describe('LandingChallengeCards — the live race and four modes up front, the rest parked', () => {
-  it('leads with the live race, shows four more modes and parks the rest', () => {
+describe('LandingChallengeCards — every mode on the page, sorted into intent groups', () => {
+  it('leads with the live race and puts each mode in its group, with no More detour', () => {
     mockIsNewPlayer.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(0);
     mockUserStats.mockReturnValue({ totalGamesPlayed: 0 });
     mockUserEmail.mockReturnValue(undefined);
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    const more = container.querySelector('[data-testid="home-more-sheet"]');
-    expect(more).not.toBeNull();
-    const onHome = Array.from(container.querySelectorAll('[data-cube-key]')).filter((el) => !more!.contains(el));
-    expect(onHome.map((el) => el.getAttribute('data-cube-key'))[0]).toBe('arena');
-    expect(onHome).toHaveLength(5);
-    for (const key of ['blast', 'adventure', 'wordTowerV2', 'connections']) {
-      expect(container.querySelector(`[data-cube-key="${key}"]`)).toBeTruthy();
-    }
+    expect(container.querySelector('[data-testid="home-more-sheet"]')).toBeNull();
+    expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
+    const inGroup = (group: string, key: string) =>
+      !!container.querySelector(`[data-testid="home-group-${group}"] [data-cube-key="${key}"]`);
+    expect(inGroup('together', 'arena')).toBe(true);
+    for (const key of ['blast', 'adventure', 'wordTowerV2', 'brainGym']) expect(inGroup('solo', key)).toBe(true);
+    expect(inGroup('think', 'connections')).toBe(true);
+    expect(inGroup('think', 'wordCraft')).toBe(true);
   });
 });
 

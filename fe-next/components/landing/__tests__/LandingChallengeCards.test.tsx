@@ -146,25 +146,23 @@ describe('LandingChallengeCards', () => {
     });
   });
 
-  describe('two modes up front — the rest stay reachable', () => {
+  describe('every mode is on the page, sorted by intent', () => {
     afterEach(() => {
       mockIsVeteran.mockReturnValue(false);
     });
 
-    it('brand-new player sees the live race up front and the rest under More', () => {
+    it('brand-new player sees the live race as its own group above the rest', () => {
       const { container } = render(<LandingChallengeCards {...baseProps} />);
-      const more = container.querySelector('[data-testid="home-more-sheet"]');
-      expect(more).not.toBeNull();
-      expect(more!.contains(container.querySelector('[data-cube-key="arena"]'))).toBe(false);
+      expect(container.querySelector('[data-testid="home-more-sheet"]')).toBeNull();
+      expect(container.querySelector('[data-testid="home-group-together"] [data-cube-key="arena"]')).not.toBeNull();
     });
 
-    it('connections + brainGym stay in the document, brain training on the home and connections under More', () => {
+    it('connections sits with the untimed puzzles and brain training with the solo runs', () => {
       const { container } = render(<LandingChallengeCards {...baseProps} />);
-      const more = container.querySelector('[data-testid="home-more-sheet"]');
       expect(container.textContent).toContain('landing.wordChainMode');
       expect(container.textContent).toContain('landing.brainTraining');
-      expect(more!.contains(container.querySelector('[data-cube-key="connections"]'))).toBe(true);
-      expect(more!.contains(container.querySelector('[data-cube-key="brainGym"]'))).toBe(false);
+      expect(container.querySelector('[data-testid="home-group-think"] [data-cube-key="connections"]')).not.toBeNull();
+      expect(container.querySelector('[data-testid="home-group-solo"] [data-cube-key="brainGym"]')).not.toBeNull();
     });
   });
 });

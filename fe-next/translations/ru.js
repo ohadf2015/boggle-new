@@ -17042,6 +17042,10 @@ const ru = {
         "untimed": "Без таймера"
       },
       "todaysPuzzle": "Сегодняшний пазл",
+      "groupTogether": "Играть вместе",
+      "groupSolo": "Играть одному",
+      "groupThink": "Без спешки",
+      "groupPreview": "Ранний доступ",
       "wheelWord": "ЗАГАДКА",
       "puzzleNo": "Пазл #{n}",
       "resetsIn": "сбросится через {time}",

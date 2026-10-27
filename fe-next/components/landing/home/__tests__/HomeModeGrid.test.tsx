@@ -43,8 +43,7 @@ function model(key: string, over: Partial<ModeCubeModel> = {}): ModeCubeModel {
   };
 }
 
-const models = ['arena', 'adventure', 'wordTowerV2', 'brainGym', 'blast'].map((k) => model(k));
-const extras = [model('practice'), model('crossword')];
+const models = ['arena', 'adventure', 'wordTowerV2', 'brainGym', 'blast', 'connections', 'wordCraft', 'crossword'].map((k) => model(k));
 
 describe('HomeModeGrid', () => {
   beforeEach(() => {
@@ -56,35 +55,41 @@ describe('HomeModeGrid', () => {
     vi.useRealTimers();
   });
 
-  it('lays out the live arena first and the next four modes as tiles', () => {
-    render(<HomeModeGrid models={models} extras={extras} liveCount={42} />);
+  it('shows every mode on the page with no "more modes" detour', () => {
+    render(<HomeModeGrid models={models} liveCount={42} />);
+    expect(screen.queryByTestId('landing-cubes-more')).toBeNull();
+    expect(screen.queryByTestId('home-more-sheet')).toBeNull();
+    const keys = screen.getAllByTestId(/^mode-cube/).map((el) => el.getAttribute('data-cube-key'));
+    expect(keys.sort()).toEqual(models.map((m) => m.key).sort());
     expect(screen.getByTestId('mode-cube-anchor')).toHaveAttribute('data-cube-key', 'arena');
-    const sheet = screen.getByTestId('home-more-sheet');
-    const tiles = screen
-      .getAllByTestId('mode-cube')
-      .filter((el) => !sheet.contains(el))
-      .map((el) => el.getAttribute('data-cube-key'));
-    expect(tiles).toEqual(['adventure', 'wordTowerV2', 'brainGym', 'blast']);
     expect(screen.getByTestId('home-live-count')).toHaveTextContent('42');
   });
 
-  it('keeps the other modes one tap away in a sheet', () => {
-    render(<HomeModeGrid models={models} extras={extras} liveCount={0} />);
-    const sheet = screen.getByTestId('home-more-sheet');
-    expect(sheet).not.toHaveAttribute('open');
-    fireEvent.click(screen.getByTestId('landing-cubes-more'));
-    expect(sheet).toHaveAttribute('open');
-    const keys = within(sheet)
-      .getAllByRole('link')
-      .map((el) => el.getAttribute('data-cube-key'));
-    expect(keys).toEqual(['practice', 'crossword']);
+  it('organises modes into titled groups in intent order', () => {
+    render(<HomeModeGrid models={models} liveCount={0} />);
+    const groups = screen.getAllByTestId(/^home-group-/);
+    expect(groups.map((g) => g.getAttribute('data-testid'))).toEqual(['home-group-together', 'home-group-solo', 'home-group-think']);
+    expect(within(groups[0]).getByRole('heading')).toHaveTextContent('landing.home.groupTogether');
+    expect(within(groups[1]).getByRole('heading')).toHaveTextContent('landing.home.groupSolo');
+    expect(within(groups[2]).getByRole('heading')).toHaveTextContent('landing.home.groupThink');
+    const keysIn = (g: HTMLElement) => within(g).getAllByTestId(/^mode-cube/).map((el) => el.getAttribute('data-cube-key'));
+    expect(keysIn(groups[1])).toEqual(['adventure', 'wordTowerV2', 'brainGym', 'blast']);
+    expect(keysIn(groups[2])).toEqual(['connections', 'wordCraft', 'crossword']);
+  });
+
+  it('leaves out a group nobody can see and labels previews only when present', () => {
+    const { rerender } = render(<HomeModeGrid models={models.slice(0, 5)} liveCount={0} />);
+    expect(screen.queryByTestId('home-group-think')).toBeNull();
+    expect(screen.queryByTestId('home-group-preview')).toBeNull();
+    rerender(<HomeModeGrid models={[...models.slice(0, 5), model('wordfall', { badge: 'ADMIN' })]} liveCount={0} />);
+    expect(within(screen.getByTestId('home-group-preview')).getByRole('heading')).toHaveTextContent('landing.home.groupPreview');
   });
 
   it('tracks the tap and launches into the mode', () => {
     render(
       <>
         <LaunchProvider>
-          <HomeModeGrid models={models} extras={extras} liveCount={0} />
+          <HomeModeGrid models={models} liveCount={0} />
         </LaunchProvider>
         <LaunchHost />
       </>,
@@ -103,7 +108,7 @@ describe('HomeModeGrid', () => {
     render(
       <>
         <LaunchProvider>
-          <HomeModeGrid models={locked} extras={[]} liveCount={0} />
+          <HomeModeGrid models={locked} liveCount={0} />
         </LaunchProvider>
         <LaunchHost />
       </>,
@@ -115,7 +120,7 @@ describe('HomeModeGrid', () => {
 
   it('speaks the badge in the page language instead of a raw English tag', () => {
     const tagged = [model('arena'), model('adventure', { badge: 'NEW' }), model('blast', { badge: 'BETA' }), model('rain', { badge: 'ADMIN' })];
-    render(<HomeModeGrid models={tagged} extras={[]} liveCount={0} />);
+    render(<HomeModeGrid models={tagged} liveCount={0} />);
     expect(screen.getByText('landing.badge.new')).toBeInTheDocument();
     expect(screen.getByText('landing.badge.beta')).toBeInTheDocument();
     expect(screen.getByText('ADMIN')).toBeInTheDocument();
@@ -126,7 +131,7 @@ describe('HomeModeGrid', () => {
     // Given a small tile tagged NEW
     const tagged = [model('arena'), model('wordTowerV2', { badge: 'NEW' })];
     // When the grid renders
-    render(<HomeModeGrid models={tagged} extras={[]} liveCount={0} />);
+    render(<HomeModeGrid models={tagged} liveCount={0} />);
     // Then the badge sits in the tile's label column, next to its title
     const label = screen.getByTestId('mode-tile-label');
     expect(within(label).getByText('landing.badge.new')).toBeInTheDocument();
@@ -138,15 +143,10 @@ describe('HomeModeGrid', () => {
     const resume = { world: 2, step: 5, hp: 3, maxHp: 6, relics: [], gold: 0 };
     const tagged = [model('arena'), model('adventure', { badge: 'NEW', resume })];
     // When the grid renders
-    render(<HomeModeGrid models={tagged} extras={[]} liveCount={0} />);
+    render(<HomeModeGrid models={tagged} liveCount={0} />);
     // Then only the resume pill shows
     expect(screen.getByTestId('mode-resume-chip')).toBeInTheDocument();
     expect(screen.queryByText('landing.badge.new')).not.toBeInTheDocument();
-  });
-
-  it('keeps the extra-modes count reading "+2" in right-to-left pages', () => {
-    render(<HomeModeGrid models={models} extras={extras} liveCount={0} />);
-    expect(screen.getByText('+2')).toHaveAttribute('dir', 'ltr');
   });
 
   it('gives each tile a who-you-play-with chip and a one-line pitch', () => {
@@ -154,7 +154,7 @@ describe('HomeModeGrid', () => {
       model('arena', { tag: { players: 'multiplayer' } }),
       model('wordCraft', { tag: { players: 'vsBot', untimed: true }, description: 'Claim the grid' }),
     ];
-    render(<HomeModeGrid models={tagged} extras={[]} liveCount={0} />);
+    render(<HomeModeGrid models={tagged} liveCount={0} />);
     const label = screen.getByTestId('mode-tile-label');
     expect(within(label).getByTestId('mode-tag')).toHaveTextContent('landing.home.modeTag.vsBot');
     expect(within(label).getByTestId('mode-tag')).toHaveTextContent('landing.home.modeTag.untimed');
@@ -163,7 +163,7 @@ describe('HomeModeGrid', () => {
   });
 
   it('keeps the hover lift behind motion-safe (reduced motion gets no movement)', () => {
-    render(<HomeModeGrid models={models} extras={[]} liveCount={0} />);
+    render(<HomeModeGrid models={models} liveCount={0} />);
     for (const tile of screen.getAllByTestId('mode-cube')) {
       expect(tile.className).toContain('motion-safe:hover:-translate-y-0.5');
       expect(tile.className).not.toMatch(/(^|\s)hover:-translate-y/);
