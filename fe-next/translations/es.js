@@ -21162,7 +21162,9 @@ const es = {
         "tryDemo": {
           "title": "Prueba una partida de 2 minutos",
           "body": "Una ronda corta. Si aún no ha entrado nadie, añade bots de práctica en la sala.",
-          "cta": "Empezar una partida de 2 minutos"
+          "cta": "Empezar una partida de 2 minutos",
+          "bodyAwaitingPlayers": "Tu sala está lista: ahora haz que entren los alumnos. Muestra el código o el QR en la pizarra.",
+          "ctaAwaitingPlayers": "Mostrar el código de la clase"
         }
       }
     },

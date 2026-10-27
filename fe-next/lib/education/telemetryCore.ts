@@ -98,7 +98,9 @@ export const safeRegister: Register = (props) => {
 };
 
 // Every copy/launch surface reports here, so the activation checklist is saved here too.
-export function persistTeacherActivation(patch: { inviteCopied?: true; liveStarted?: true }): void {
+// liveStarted is NOT client-settable — the backend stamps it when a real
+// 2+ player round completes; a launched room persists `roomOpened` instead.
+export function persistTeacherActivation(patch: { inviteCopied?: true; roomOpened?: true }): void {
   if (typeof fetch !== 'function') return;
   fetch('/api/education/teacher/activation', {
     method: 'PATCH',

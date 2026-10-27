@@ -33,7 +33,7 @@ vi.mock('@/utils/authFetch', () => ({ fetchWithAuth: (...a: unknown[]) => fetchW
 let classroomsState: Record<string, unknown>;
 vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => classroomsState }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: false, loading: false, source: null, refresh: vi.fn() }) }));
-let activationProgress = { inviteCopied: true, liveStarted: true, dismissed: true };
+let activationProgress = { inviteCopied: true, liveStarted: true, roomOpened: true, dismissed: true };
 vi.mock('@/hooks/useTeacherActivationProgress', () => ({
   useTeacherActivationProgress: () => ({ progress: activationProgress, ready: true, dismiss: vi.fn() }),
 }));
@@ -48,7 +48,7 @@ const FULL_CLASS = { id: 'c2', name: '5B', member_count: 12, join_code: 'K7Q2AA'
 let triesCount = 0;
 beforeEach(() => {
   triesCount = 0;
-  activationProgress = { inviteCopied: true, liveStarted: true, dismissed: true };
+  activationProgress = { inviteCopied: true, liveStarted: true, roomOpened: true, dismissed: true };
   classroomsState = { classrooms: [EMPTY_CLASS], isLoading: false, error: null, refresh: vi.fn() };
   fetchWithAuth.mockImplementation(async () => ({ ok: true, json: async () => ({ count: triesCount }) }));
   global.fetch = vi.fn(async () => ({ ok: true, json: async () => ({}) })) as unknown as typeof fetch;
@@ -74,7 +74,7 @@ describe('Teacher Home: get students in', () => {
   });
 
   it('Given the share step is the next onboarding step, Then the card replaces the onboarding nudge', () => {
-    activationProgress = { inviteCopied: false, liveStarted: false, dismissed: false };
+    activationProgress = { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false };
     render(<TeacherDashboard />);
     expect(screen.getByTestId('hq-get-students-in')).toBeInTheDocument();
     expect(screen.queryByTestId('home-onboarding')).not.toBeInTheDocument();

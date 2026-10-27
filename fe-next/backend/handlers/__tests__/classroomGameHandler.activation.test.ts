@@ -1,16 +1,19 @@
-/** Creating a live room is the one moment the "ran a live game" checklist step becomes true. */
+/** Creating a live room stamps "room opened" — never the "ran a live game" step, which needs a real 2+ player round. */
 import { vi, type Mock } from 'vitest';
 import { registerClassroomGameHandlers } from '../classroomGameHandler';
 import * as classroomGameManager from '../../modules/classroomGameManager';
 import * as classroomMembership from '../../modules/supabase/classroomMembership';
-import { markTeacherLiveStarted } from '../../modules/supabase/teacherActivation';
+import { markTeacherRoomOpened, markTeacherLiveStarted } from '../../modules/supabase/teacherActivation';
 
 const { mockResolveBoss } = vi.hoisted(() => ({ mockResolveBoss: vi.fn() }));
 vi.mock('../../services/classroomBoss/bossEntitlement', () => ({ resolveBossForTeacher: mockResolveBoss }));
 vi.mock('../../services/classroomBoss/bossEntitlement.js', () => ({ resolveBossForTeacher: mockResolveBoss }));
 vi.mock('../../modules/classroomGameManager');
 vi.mock('../../modules/gameStateManager', () => ({ bindSocketToGame: vi.fn(), unbindSocketFromGame: vi.fn() }));
-vi.mock('../../modules/supabase/teacherActivation', () => ({ markTeacherLiveStarted: vi.fn(async () => undefined) }));
+vi.mock('../../modules/supabase/teacherActivation', () => ({
+  markTeacherRoomOpened: vi.fn(async () => undefined),
+  markTeacherLiveStarted: vi.fn(async () => undefined),
+}));
 vi.mock('../../modules/supabase/classroomMembership', () => ({
   isClassroomTeacher: vi.fn(),
   isClassroomStudent: vi.fn(),
@@ -57,14 +60,16 @@ describe('createClassroomGame — onboarding activation', () => {
     mockResolveBoss.mockResolvedValue(undefined);
   });
 
-  it('stamps the teacher once the room exists', async () => {
+  it('stamps room-opened (not live-started) once the room exists', async () => {
     await create();
-    expect(markTeacherLiveStarted).toHaveBeenCalledWith(TEACHER);
+    expect(markTeacherRoomOpened).toHaveBeenCalledWith(TEACHER);
+    expect(markTeacherLiveStarted).not.toHaveBeenCalled();
   });
 
   it('stamps nothing when the room could not be created', async () => {
     (classroomGameManager.createClassroomGame as Mock).mockRejectedValue(new Error('redis down'));
     await create();
+    expect(markTeacherRoomOpened).not.toHaveBeenCalled();
     expect(markTeacherLiveStarted).not.toHaveBeenCalled();
   });
 });

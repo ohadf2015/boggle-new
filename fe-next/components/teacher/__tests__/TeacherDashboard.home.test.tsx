@@ -47,7 +47,7 @@ const CLASSES = [
 beforeEach(() => {
   classroomsState = { classrooms: CLASSES, isLoading: false, error: null, refresh: vi.fn() };
   proState = FREE;
-  activation = { progress: { inviteCopied: true, liveStarted: true, dismissed: false }, ready: true, markInviteCopied: vi.fn(), markLiveStarted: vi.fn(), dismiss: vi.fn() };
+  activation = { progress: { inviteCopied: true, liveStarted: true, roomOpened: true, dismissed: false }, ready: true, markInviteCopied: vi.fn(), dismiss: vi.fn() };
   week = { status: 'ready', summary: { gamesPlayed: 12, totalStudents: 54, activeClasses: 2, lastPlayedAt: { c5b: new Date().toISOString() } } };
   global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) }) as unknown as typeof fetch;
 });
@@ -134,7 +134,7 @@ describe('Teacher Home', () => {
 
   it('Given a brand-new teacher, Then Home is the 3-step onboarding card, not a page of zeros', () => {
     classroomsState = { ...classroomsState, classrooms: [] };
-    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, dismissed: false } };
+    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
     render(<TeacherDashboard />);
     const card = screen.getByTestId('home-onboarding');
     expect(within(card).getAllByTestId(/^home-onboarding-step-/)).toHaveLength(3);
@@ -175,7 +175,7 @@ describe('Teacher Home', () => {
   });
 
   it('Given setup half done, Then the compact card is one slim row with no progress sentence or step blurbs', () => {
-    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, dismissed: false } };
+    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
     render(<TeacherDashboard />);
     const card = screen.getByTestId('home-onboarding');
     expect(card).not.toHaveTextContent('eduShell.onboarding.progress');

@@ -29,7 +29,7 @@ let trial: { isExpired: boolean } | null = null;
 vi.mock('@/lib/education/useTeacherAccess', () => ({ useTeacherAccess: () => ({ trial, isLoading: false }) }));
 const markInviteCopied = vi.fn();
 vi.mock('@/hooks/useTeacherActivationProgress', () => ({
-  useTeacherActivationProgress: () => ({ progress: { inviteCopied: false, liveStarted: false, dismissed: false }, ready: true, markInviteCopied }),
+  useTeacherActivationProgress: () => ({ progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false }, ready: true, markInviteCopied }),
 }));
 
 const telemetry = vi.hoisted(() => ({

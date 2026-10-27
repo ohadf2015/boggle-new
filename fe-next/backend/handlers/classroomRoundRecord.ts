@@ -18,6 +18,7 @@ import {
   startOfNextUtcDay,
 } from '../utils/educationRoundTelemetry';
 import { loadTestAccountIds } from '@/lib/education/eduTestAccount';
+import { markTeacherLiveStarted } from '../modules/supabase/teacherActivation';
 
 
 export interface RoundMembership {
@@ -147,6 +148,12 @@ export async function recordClassroomRound(
     }
 
     if ((count ?? 0) === 0 && opts.playerIds.length >= REAL_CLASS_MIN_PLAYERS) {
+      // The e334c5c8 "real first class game" predicate: first completed round
+      // with 2+ real players. It starts the access-trial clock AND stamps the
+      // checklist's live-started step — one definition of "ran a live game"
+      // for both. Bots never reach playerIds (no practice session rows), so a
+      // solo/bot rehearsal cannot trip this.
+      await markTeacherLiveStarted(game.teacherId);
       await startAccessTrialClock(supabase, game.teacherId, now.getTime()).catch((err) =>
         logger.error('CLASSROOM_GAME', `Trial clock start threw for ${game.teacherId}: ${err instanceof Error ? err.message : String(err)}`)
       );

@@ -16,6 +16,7 @@ async function readProgress(): Promise<TeacherActivationProgress> {
     return {
       inviteCopied: body.inviteCopied === true,
       liveStarted: body.liveStarted === true,
+      roomOpened: body.roomOpened === true,
       dismissed: body.dismissed === true,
     };
   } catch {
@@ -62,7 +63,6 @@ export function useTeacherActivationProgress() {
     progress,
     ready,
     markInviteCopied: () => patch({ inviteCopied: true }),
-    markLiveStarted: () => patch({ liveStarted: true }),
     dismiss: () => patch({ dismissed: true }),
   };
 }

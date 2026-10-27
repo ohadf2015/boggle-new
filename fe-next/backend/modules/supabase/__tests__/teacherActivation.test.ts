@@ -1,6 +1,7 @@
 /**
- * markTeacherLiveStarted — the "ran a live game" checklist step is stamped when a
- * room is actually created, once, and never throws into the socket handler.
+ * teacherActivation stamps — room-opened fires at room creation, live-started
+ * only fires server-side when a real 2+ player round completes. Both stamp
+ * once and never throw into the socket handler.
  */
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
@@ -12,8 +13,29 @@ const mockFrom = vi.fn(() => ({ update: mockUpdate }));
 vi.mock('../client', () => ({ getSupabase: vi.fn(() => ({ from: mockFrom })) }));
 vi.mock('../../../utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() } }));
 
-import { markTeacherLiveStarted } from '../teacherActivation';
+import { markTeacherLiveStarted, markTeacherRoomOpened } from '../teacherActivation';
 import { getSupabase } from '../client';
+
+describe('markTeacherRoomOpened', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockIs.mockResolvedValue({ error: null });
+    (getSupabase as unknown as ReturnType<typeof vi.fn>).mockReturnValue({ from: mockFrom });
+  });
+
+  it('stamps the room-opened column once, only while still empty', async () => {
+    await markTeacherRoomOpened('t1');
+    expect(mockFrom).toHaveBeenCalledWith('profiles');
+    expect(mockUpdate).toHaveBeenCalledWith({ teacher_activation_room_opened_at: expect.any(String) });
+    expect(mockEq).toHaveBeenCalledWith('id', 't1');
+    expect(mockIs).toHaveBeenCalledWith('teacher_activation_room_opened_at', null);
+  });
+
+  it('ignores an empty teacher id', async () => {
+    await markTeacherRoomOpened('');
+    expect(mockFrom).not.toHaveBeenCalled();
+  });
+});
 
 describe('markTeacherLiveStarted', () => {
   beforeEach(() => {

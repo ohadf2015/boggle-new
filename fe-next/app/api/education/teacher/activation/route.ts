@@ -30,9 +30,17 @@ function parsePatch(body: unknown): TeacherActivationPatch | null {
   const raw = body as Record<string, unknown>;
   const patch: TeacherActivationPatch = {};
   if (raw.inviteCopied === true) patch.inviteCopied = true;
-  if (raw.liveStarted === true) patch.liveStarted = true;
+  if (raw.roomOpened === true) patch.roomOpened = true;
   if (raw.dismissed === true) patch.dismissed = true;
-  if (raw.inviteCopied === false || raw.liveStarted === false || raw.dismissed === false) {
+  // liveStarted is deliberately NOT settable from the client: it means "a real
+  // 2+ player round completed" and only the backend (recordClassroomRound) may
+  // stamp it. A client that still sends it gets 400, which its fetch swallows.
+  if (
+    raw.inviteCopied === false ||
+    raw.roomOpened === false ||
+    raw.dismissed === false ||
+    raw.liveStarted !== undefined
+  ) {
     return null;
   }
   if (Object.keys(patch).length === 0) return null;
@@ -96,6 +104,7 @@ export async function PATCH(req: NextRequest) {
   const unset: TeacherActivationPatch = {
     inviteCopied: patch.inviteCopied && !current.inviteCopied,
     liveStarted: patch.liveStarted && !current.liveStarted,
+    roomOpened: patch.roomOpened && !current.roomOpened,
     dismissed: patch.dismissed && !current.dismissed,
   };
   const update = profileUpdateFromPatch(unset, new Date().toISOString());
