@@ -1,11 +1,17 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { m, useReducedMotion, type Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useStartTeacherProTrial } from '@/hooks/useStartTeacherProTrial';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { useCheckoutBlockedInApp } from '@/hooks/useCheckoutBlockedInApp';
+import { resolveProOffer } from '@/lib/education/pro/proOfferCopy';
+import { classCreatedTrialCopy, trialCopyBase, TRIAL_COPY_RTL } from '@/lib/education/pro/trialCtaCopy';
+import { reportProCtaClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
+import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
 import type { TeacherAccessSubmission, TeacherAccessRole, TeacherLocale } from '@/lib/education/types';
 
 /** Fun emoji per role — turns a boring dropdown into a tap-to-pick card grid. */
@@ -42,7 +48,12 @@ export function AccessRequestForm({
   const { t, language } = useLanguage();
   const { refreshProfile } = useAuth();
   const router = useRouter();
-  const polarTrial = useStartTeacherProTrial(t, language, 'access_success');
+  const pro = useTeacherPro();
+  const blockedInApp = useCheckoutBlockedInApp();
+  // Same decision as the class-ready card (lib/education/pro/proOfferCopy): keep Pro after the
+  // free access trial this very request just started, 14-day trial if unknown, $9/mo once ended.
+  const proOffer = resolveProOffer(language, pro, classCreatedTrialCopy(language));
+  const polarTrial = useStartTeacherProTrial(t, language, 'access_success', { trial: proOffer.checkoutTrial });
   const shouldReduceMotion = useReducedMotion();
   const [role, setRole] = useState<TeacherAccessRole | null>(null);
   const [useCase, setUseCase] = useState('');
@@ -59,6 +70,11 @@ export function AccessRequestForm({
   // server-side (202 approvalPending). Distinct from success: no /teacher
   // redirect — the account isn't promoted yet, so pushing would bounce.
   const [approvalPending, setApprovalPending] = useState(false);
+  // The entitlement read from before the request is stale (no access trial yet). The offer
+  // waits for one fresh read after approval so "keep Pro" carries the right end date.
+  const [offerReady, setOfferReady] = useState(false);
+  const offerRef = useRef<HTMLDivElement>(null);
+  const showOffer = !blockedInApp && !pro.hasPro && offerReady && !pro.loading;
 
   // Access is granted on POST. Do not auto-redirect: the 1.2s success beat
   // ate the Polar trial CTA (0 trial_cta_tap / 13 access requests in 14d).
@@ -117,6 +133,7 @@ export function AccessRequestForm({
         return;
       }
       setSuccess(true);
+      void pro.refresh().catch(() => {}).finally(() => setOfferReady(true));
     } catch {
       setError(t('education.access.submit_error'));
     } finally {
@@ -124,6 +141,22 @@ export function AccessRequestForm({
       setSubmitting(false);
     }
   };
+
+  const offerRefSnapshot = useRef({ locale: language, cta: proOffer.cta, offer: proOffer.offer });
+  offerRefSnapshot.current = { locale: language, cta: proOffer.cta, offer: proOffer.offer };
+  const offerRenderedRef = useRef(false);
+  useEffect(() => {
+    if (!success || !showOffer || offerRenderedRef.current) return;
+    offerRenderedRef.current = true;
+    reportProOfferImpression({ placement: 'access_success', stage: 'rendered', ...offerRefSnapshot.current });
+  }, [success, showOffer]);
+  // Browser impression (consent-gated) + the cookie-free server twin once half of the button is on screen.
+  useUpsellImpression(
+    offerRef,
+    success && showOffer ? { cta: proOffer.cta, placement: 'access_success' } : null,
+    { locale: language },
+    () => reportProOfferImpression({ placement: 'access_success', stage: 'viewed', ...offerRefSnapshot.current }),
+  );
 
   if (approvalPending) {
     return (
@@ -175,23 +208,48 @@ export function AccessRequestForm({
         </svg>
         <h3 className="text-2xl font-bold font-neo-display">{t('education.access.success_title')}</h3>
         <p className="mt-2 text-neo-navy/85">{t('education.access.success_body')}</p>
-        <div className="mt-4 flex flex-col gap-2">
+        <div className="mt-4 flex flex-col gap-3">
+          {/* The main offer: Teacher Pro, in the same words as the class-ready card.
+              Waits for one fresh entitlement read; keeps its height meanwhile. */}
+          {!blockedInApp && !pro.hasPro ? (
+            <div ref={offerRef} data-testid="access-success-offer" className="min-h-[5.5rem]" dir={TRIAL_COPY_RTL.has(trialCopyBase(language)) ? 'rtl' : undefined}>
+              {showOffer ? (
+                <>
+                  <button
+                    type="button"
+                    data-testid="access-success-trial"
+                    data-offer={proOffer.offer}
+                    disabled={polarTrial.pending}
+                    onClick={() => {
+                      try {
+                        reportProCtaClick({ placement: 'access_success', locale: language, cta: proOffer.cta });
+                      } catch {
+                        /* analytics must never block */
+                      }
+                      void polarTrial.start();
+                    }}
+                    className="min-h-14 w-full rounded-neo border-neo-thick border-neo-navy bg-neo-navy px-4 py-3 font-neo-display text-base font-black text-neo-white shadow-hard-lg transition-[box-shadow,transform] duration-100 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:opacity-50"
+                  >
+                    {polarTrial.pending ? t('common.loading') : proOffer.label}
+                  </button>
+                  <p data-testid="access-success-offer-note" className="mt-1.5 text-center text-xs font-bold text-neo-navy/75">{proOffer.note}</p>
+                </>
+              ) : (
+                <div aria-hidden="true" className="h-14 w-full animate-pulse rounded-neo bg-neo-navy/15" />
+              )}
+            </div>
+          ) : null}
           <button
             type="button"
             data-testid="access-success-hq"
             onClick={() => void goToTeacherHq()}
-            className="w-full rounded-neo border-neo border-neo-navy bg-neo-lime px-4 py-3 font-bold text-neo-navy font-neo-display shadow-hard-sm hover:shadow-hard"
+            className={
+              !blockedInApp && !pro.hasPro
+                ? 'w-full rounded-neo border-neo border-neo-navy/40 px-4 py-2 text-sm font-bold text-neo-navy font-neo-display hover:bg-neo-navy/10'
+                : 'w-full rounded-neo border-neo border-neo-navy bg-neo-lime px-4 py-3 font-bold text-neo-navy font-neo-display shadow-hard-sm hover:shadow-hard'
+            }
           >
             {t('education.access.go_to_teacher')}
-          </button>
-          <button
-            type="button"
-            data-testid="access-success-trial"
-            disabled={polarTrial.pending}
-            onClick={() => void polarTrial.start()}
-            className="w-full rounded-neo border-neo border-neo-navy/40 px-4 py-2 text-sm font-bold text-neo-navy font-neo-display hover:bg-neo-navy/10 disabled:opacity-50"
-          >
-            {polarTrial.pending ? t('common.loading') : t('teacher.subscription.startTrial')}
           </button>
         </div>
       </m.div>

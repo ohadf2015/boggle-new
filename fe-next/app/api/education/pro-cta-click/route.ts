@@ -12,7 +12,7 @@ import { checkoutClientKind, testEmailReason } from '@/lib/education/checkoutTra
  * checkout route records `checkout_started`. Anonymous or unknown placements
  * record nothing. Always 204: the CTA navigates regardless.
  */
-const PLACEMENTS = new Set(['class_created', 'classroom_results']);
+const PLACEMENTS = new Set(['class_created', 'classroom_results', 'access_success']);
 const LOCALE_RE = /^[a-z]{2}(-[A-Za-z]{2})?$/;
 
 export async function POST(request: NextRequest) {

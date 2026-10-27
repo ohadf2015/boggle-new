@@ -48,4 +48,9 @@ describe('POST /api/education/pro-cta-click', () => {
     const res = await POST({ headers: new Headers(), text: async () => '{nope' } as never)
     expect(res.status).toBe(204)
   })
+  it('records an access-success tap', async () => {
+    getAuthedUser.mockResolvedValue({ id: 't1', email: 'teacher@school.org' })
+    await POST(req({ placement: 'access_success', locale: 'sv', cta: 'teacher_pro_trial' }))
+    expect(capture.mock.calls[0][0]).toMatchObject({ event: 'edu_pro_cta_clicked', properties: { placement: 'access_success', locale: 'sv' } })
+  })
 })

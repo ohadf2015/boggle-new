@@ -8,7 +8,14 @@ import { trackTrialCtaTap, type TrialCtaSource } from '@/lib/education/proFunnel
 type T = (key: string) => string;
 
 /** The 14-day Polar trial checkout, same till and errors as the HQ trial banner. */
-export function useStartTeacherProTrial(t: T, language: string, source: TrialCtaSource) {
+export function useStartTeacherProTrial(
+  t: T,
+  language: string,
+  source: TrialCtaSource,
+  /** `trial: false` is the straight $9/mo checkout (access trial already ended). The server still caps trial days. */
+  options: { trial?: boolean } = {},
+) {
+  const trial = options.trial !== false;
   const [pending, setPending] = useState(false);
   const start = useCallback(async () => {
     if (pending) return;
@@ -19,7 +26,7 @@ export function useStartTeacherProTrial(t: T, language: string, source: TrialCta
     }
     setPending(true);
     try {
-      const result = await postTeacherProCheckout(fetch, { trial: true, locale: language, placement: source });
+      const result = await postTeacherProCheckout(fetch, { trial, locale: language, placement: source });
       if (!result.ok) {
         toast.error(t(checkoutFailureKey(result)));
         return;
@@ -30,6 +37,6 @@ export function useStartTeacherProTrial(t: T, language: string, source: TrialCta
     } finally {
       setPending(false);
     }
-  }, [pending, t, language, source]);
+  }, [pending, t, language, source, trial]);
   return { start, pending };
 }

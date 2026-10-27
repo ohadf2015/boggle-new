@@ -20,7 +20,7 @@ import { checkoutClientKind, testEmailReason } from '@/lib/education/checkoutTra
  * Anonymous callers, unknown placements and unknown stages record nothing.
  * Always 204: analytics must never affect the page.
  */
-const PLACEMENTS = new Set(['class_created', 'classroom_results']);
+const PLACEMENTS = new Set(['class_created', 'classroom_results', 'access_success']);
 const STAGES: Record<string, string> = {
   rendered: 'edu_pro_offer_rendered',
   viewed: 'edu_pro_offer_impression',

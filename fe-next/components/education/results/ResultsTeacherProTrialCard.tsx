@@ -19,10 +19,9 @@ import Link from 'next/link';
 import { Sparkles, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { accessTrialLive, keepAfterTrialCopy } from '@/lib/education/pro/keepAfterTrialCopy';
-import { trialEndedCopy } from '@/lib/education/pro/trialEndedCopy';
+import { resolveProOffer } from '@/lib/education/pro/proOfferCopy';
 import { classCreatedTrialCopy, resultsTrialCopy, trialCopyBase, TRIAL_COPY_RTL } from '@/lib/education/pro/trialCtaCopy';
-import { reportProCtaClick, reportProOfferImpression, type ProOfferKind } from '@/lib/education/reportProCtaClick';
+import { reportProCtaClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
@@ -68,21 +67,11 @@ export function ResultsTeacherProTrialCard({
     if (dismissible) setDismissed(readDismissed(placement));
   }, [dismissible, placement]);
   const show = !loading && !hasPro && dismissed === false;
-  // Only a successful status read proves "never trialed"; an unknown read still
-  // offers the trial — /teacher/upgrade re-checks eligibility before the POST.
-  // A teacher whose free access trial has ended had their trial: no second one.
-  const ended = accessTrialEnded === true && !accessTrialLive(accessTrialExpires);
-  const offerTrial = !(known && trialUsed) && !ended;
+  // One shared decision (lib/education/pro/proOfferCopy) so this card, the access-success
+  // page and the upgrade path always say the same thing.
   const baseCopy = dismissible ? classCreatedTrialCopy(language) : { ...resultsTrialCopy(language), dismiss: '' };
-  // Inside the free access trial there is one trial, not two: ask them to keep Pro
-  // when it ends instead of pitching a fresh 14-day trial behind a card form.
-  const keep = offerTrial && accessTrialLive(accessTrialExpires) ? keepAfterTrialCopy(language, accessTrialExpires) : null;
-  const endedCopy = ended ? trialEndedCopy(language) : null;
-  const copy = keep
-    ? { ...baseCopy, title: keep.title, trialCta: keep.cta, trialNote: keep.note }
-    : endedCopy
-      ? { ...baseCopy, title: endedCopy.title, upgradeCta: endedCopy.cta, upgradeNote: endedCopy.note }
-      : baseCopy;
+  const proOffer = resolveProOffer(language, { known, trialUsed, accessTrialExpires, accessTrialEnded }, baseCopy);
+  const copy = { ...baseCopy, title: proOffer.title ?? baseCopy.title };
   const dir = TRIAL_COPY_RTL.has(trialCopyBase(language)) ? 'rtl' : undefined;
   const cardRef = useRef<HTMLElement>(null);
 
@@ -91,8 +80,7 @@ export function ResultsTeacherProTrialCard({
   // short laptop/projector after a boss round (display:none), and on a phone it
   // sits below the fold; firing on mount counted both as seen. `null` until the
   // entitlement read settles, so the observer attaches once the card renders.
-  const cta = offerTrial ? 'teacher_pro_trial' : 'teacher_pro';
-  const offer: ProOfferKind = keep ? 'keep_after_trial' : offerTrial ? 'trial' : 'paid';
+  const { cta, offer } = proOffer;
   // Browser PostHog only records teachers who accept cookies, so on its own the
   // impression above is invisible for most real teachers (no class-ready
   // impression at all in the first days after launch). The server twins record
@@ -170,18 +158,18 @@ export function ResultsTeacherProTrialCard({
         onClick={() => {
           try {
             trackTeacherProUpgradeClick({ page: page(), locale: language, placement: placement });
-            trackGrowthEvent('landing_cta_clicked', { cta: offerTrial ? 'teacher_pro_trial' : 'teacher_pro', source: placement });
-            reportProCtaClick({ placement, locale: language, cta: offerTrial ? 'teacher_pro_trial' : 'teacher_pro' });
+            trackGrowthEvent('landing_cta_clicked', { cta, source: placement });
+            reportProCtaClick({ placement, locale: language, cta });
           } catch {
             /* analytics must never block */
           }
         }}
         className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-neo border-2 border-neo-pink bg-transparent px-4 text-center font-neo-display text-sm font-bold text-neo-pink-light transition-colors hover:bg-neo-pink/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:translate-y-px"
       >
-        {offerTrial ? copy.trialCta : copy.upgradeCta}
+        {proOffer.label}
       </Link>
       <p className="mt-1.5 text-center text-xs font-semibold text-neo-white/65">
-        {offerTrial ? copy.trialNote : copy.upgradeNote}
+        {proOffer.note}
       </p>
       <div className="mt-3 border-t border-neo-cream/20 pt-3 text-center">
         <Link
