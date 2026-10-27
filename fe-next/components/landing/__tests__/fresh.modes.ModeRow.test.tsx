@@ -91,14 +91,28 @@ describe('ModeRow (fresh section 4)', () => {
     expect(trackModeSelected).toHaveBeenCalledWith('arena', 'home');
   });
 
-  it('is a scroll-snap row whose first card clears the gutter', () => {
+  it('is a bento wall, not a scroll row: Arena is the feature tile, the rest vary in footprint', () => {
     const { container } = render(<ModeRow />);
     const ul = container.querySelector('[data-fresh-section="modes"] ul')!;
-    expect(ul.className).toMatch(/\bsnap-x\b/);
-    expect(ul.className).toMatch(/\bsnap-mandatory\b/);
-    expect(ul.className).toMatch(/\bscroll-px-4\b/);
-    for (const li of ul.querySelectorAll('li')) expect(li.className).toMatch(/\bsnap-start\b/);
+    expect(ul.className).toMatch(/\blg:grid-cols-12\b/);
+    expect(ul.className).not.toMatch(/overflow-x-auto|snap-x/);
+    expect(container.querySelector('a[data-mode="arena"]')!.getAttribute('data-shape')).toBe('feature');
+    const shapes = new Set([...cards(container)].map((a) => a.dataset.shape));
+    expect(shapes.size).toBeGreaterThanOrEqual(3);
   });
+
+  it('has no prev/next pager (nothing is hidden off-screen)', () => {
+    const { queryByRole } = render(<ModeRow />);
+    expect(queryByRole('button')).toBeNull();
+  });
+
+  it('a card takes its colour from its mode, so neighbours are not recoloured by position', () => {
+    const { container } = render(<ModeRow />);
+    const cls = (k: string) => (container.querySelector(`a[data-mode="${k}"]`) as HTMLElement).className;
+    expect(cls('arena')).toMatch(/border-neo-pink/);
+    expect(cls('adventure')).toMatch(/border-neo-lime/);
+  });
+
 
   it('is visible at rest: nothing starts at opacity-0', () => {
     const { container } = render(<ModeRow />);
@@ -121,38 +135,6 @@ describe('ModeRow (fresh section 4)', () => {
       const src = img.getAttribute('src') || '';
       expect(src).toMatch(/modes.*cubes/);
     }
-  });
-
-  describe('prev / next buttons', () => {
-    const scrollBy = vi.fn();
-    beforeEach(() => {
-      scrollBy.mockClear();
-      Object.defineProperty(HTMLElement.prototype, 'scrollBy', { value: scrollBy, configurable: true, writable: true });
-    });
-
-    it('are labelled for screen readers', () => {
-      const { getByRole } = render(<ModeRow />);
-      expect(getByRole('button', { name: 'homeFresh.modes.next' })).toBeInTheDocument();
-      expect(getByRole('button', { name: 'homeFresh.modes.prev' })).toBeInTheDocument();
-    });
-
-    it('next scrolls forward (rightward in LTR)', () => {
-      const { getByRole } = render(<ModeRow />);
-      fireEvent.click(getByRole('button', { name: 'homeFresh.modes.next' }));
-      expect(scrollBy).toHaveBeenCalledTimes(1);
-      expect(scrollBy.mock.calls[0][0].left).toBeGreaterThan(0);
-    });
-
-    it('next scrolls forward (leftward in RTL Hebrew)', () => {
-      lang.dir = 'rtl';
-      const { getByRole } = render(<ModeRow />);
-      fireEvent.click(getByRole('button', { name: 'homeFresh.modes.next' }));
-      const left = scrollBy.mock.calls[0][0].left;
-      fireEvent.click(getByRole('button', { name: 'homeFresh.modes.prev' }));
-      const back = scrollBy.mock.calls[1][0].left;
-      expect(Math.sign(left)).toBe(-Math.sign(back));
-      expect(left).toBeLessThan(0);
-    });
   });
 
   it('Given a fresh visitor, Then every public mode is a visible card, not a link hidden in a collapsed list', () => {
