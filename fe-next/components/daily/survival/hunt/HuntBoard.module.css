@@ -3,6 +3,7 @@
   --pad: clamp(5px, 1.5vw, 14px);
   --gap: clamp(4px, 1.1vw, 10px);
   --rib: var(--neo-pink);
+  --press-face: var(--neo-pink);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -146,6 +147,13 @@
   animation: tileJoin 200ms var(--ease) both;
 }
 
+/* Instant press light, set from pointerdown before React renders the selection. */
+.tile[data-pressed='true'] .face {
+  background: var(--press-face);
+  box-shadow: 0 2px 0 var(--ink), 0 0 0 3px var(--ink);
+  transition: none;
+}
+
 .tile[data-state='sel'] .face {
   background: linear-gradient(180deg, #ffe3f1 0%, #ffc2e0 100%);
   box-shadow: 0 5px 0 #b30066, 0 0 0 3px var(--ink);
@@ -168,7 +176,7 @@
 .tray[data-phase='pending'] .tile[data-state='held'],
 .tray[data-phase='pending'] .glyph[data-state='held'] {
   animation: releaseRipple 320ms var(--spring) both;
-  animation-delay: calc(var(--i) * 30ms);
+  animation-delay: calc(var(--i) * 18ms);
 }
 
 .tray[data-verdict='good'] .tile[data-state='held'] .face {
@@ -178,7 +186,7 @@
 .tray[data-verdict='good'] .tile[data-state='held'],
 .tray[data-verdict='good'] .glyph[data-state='held'] {
   animation: tileHop 440ms var(--spring) both;
-  animation-delay: calc(var(--i) * 40ms);
+  animation-delay: calc(var(--i) * 25ms);
 }
 
 .tray[data-verdict='bad'] .tile[data-state='held'] .face {

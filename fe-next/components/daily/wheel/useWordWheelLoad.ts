@@ -90,7 +90,8 @@ export function useWordWheelLoad({
     const init = async () => {
       if (isPractice) {
         if (alreadyEntered) return;
-        const generated = generateWordWheelPuzzle(date, language);
+        // A random wheel: seeding by date would hand out today's daily untimed.
+        const generated = generateWordWheelPuzzle(`practice-${Math.random().toString(36).slice(2)}`, language);
         if (!isMounted) return;
         setPuzzle(generated);
         setPhase('ready');

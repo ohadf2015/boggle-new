@@ -174,22 +174,90 @@ function ClearTilesDemo({ accent, reduced }: { accent: CoachAccent; reduced: boo
   );
 }
 
-function StackDemo({ accent, reduced }: { accent: CoachAccent; reduced: boolean }) {
+const STACK_LOOP = { duration: 3.2, repeat: Infinity, repeatDelay: 0.4, ease: 'easeInOut' as const };
+
+function Floor({ word, className }: { word: string; className?: string }) {
   return (
-    <div className="flex flex-col-reverse gap-1">
-      {[0, 1, 2].map((i) => (
+    <div
+      data-testid="coach-stack-floor"
+      className={cn(
+        'flex h-5 items-center justify-center rounded-[4px] border-2 border-black bg-neo-navy-light font-neo-display text-[10px] font-black tracking-[0.2em] text-neo-white shadow-hard-sm',
+        className,
+      )}
+    >
+      {word}
+    </div>
+  );
+}
+
+/** Spell T-O-P on the letters, then the word drops onto the tower as a new floor. */
+function StackDemo({ accent, reduced }: { accent: CoachAccent; reduced: boolean }) {
+  const letters = ['T', 'O', 'P'];
+  return (
+    <div className="flex items-end gap-5">
+      <div className="mb-3 flex gap-1">
+        {letters.map((l, i) => {
+          const on = 0.06 + i * 0.12;
+          return (
+            <m.div
+              key={l}
+              data-testid="coach-stack-letter"
+              data-letter={l}
+              className="relative"
+              animate={reduced ? {} : { scale: [1, 1, 1.22, 1, 1] }}
+              transition={reduced ? undefined : { ...STACK_LOOP, times: [0, on, on + 0.05, on + 0.1, 1] }}
+            >
+              <Tile active className="bg-neo-navy-light text-neo-white">{l}</Tile>
+              <m.span
+                aria-hidden
+                className={cn('absolute inset-0 flex items-center justify-center rounded-[5px] border-2 border-black font-neo-display text-sm font-black', ACCENT_BG[accent])}
+                initial={reduced ? { opacity: 1 } : { opacity: 0 }}
+                animate={reduced ? { opacity: 1 } : { opacity: [0, 0, 1, 1, 0, 0] }}
+                transition={reduced ? undefined : { ...STACK_LOOP, times: [0, on, on + 0.03, 0.5, 0.56, 1] }}
+              >
+                {l}
+              </m.span>
+            </m.div>
+          );
+        })}
+      </div>
+      <div className="flex w-[84px] flex-col items-center gap-0.5">
         <m.div
-          key={i}
-          className="flex gap-1"
-          initial={false}
-          animate={reduced ? {} : { y: [12, 0], opacity: [0, 1] }}
-          transition={reduced ? undefined : { duration: 0.6, delay: i * 0.4, repeat: Infinity, repeatDelay: 1.5, repeatType: 'reverse' }}
+          data-testid="coach-stack-slab"
+          className={cn('flex h-5 w-14 items-center justify-center rounded-[4px] border-2 border-black font-neo-display text-[10px] font-black tracking-[0.2em] shadow-hard-sm', ACCENT_BG[accent])}
+          initial={reduced ? false : { y: -34, opacity: 0 }}
+          animate={reduced ? {} : { y: [-34, -34, -34, 0, 0, 0], opacity: [0, 0, 1, 1, 1, 0], scaleY: [1, 1, 1, 0.8, 1, 1] }}
+          transition={reduced ? undefined : { ...STACK_LOOP, times: [0, 0.5, 0.54, 0.66, 0.72, 1] }}
         >
-          {Array.from({ length: 3 - i }).map((__, j) => (
-            <Tile key={j} active className={i === 0 ? ACCENT_BG[accent] : 'bg-neo-navy-light text-neo-white'} />
-          ))}
+          {letters.join('')}
         </m.div>
-      ))}
+        <Floor word="SUN" className="w-16" />
+        <Floor word="BEAM" className="w-20" />
+      </div>
+    </div>
+  );
+}
+
+/** The slab swings on the hook; a tap drops it dead centre on the tower. */
+function TowerDropDemo({ accent, reduced }: { accent: CoachAccent; reduced: boolean }) {
+  return (
+    <div className="flex h-[92px] w-[96px] flex-col items-center justify-between">
+      <m.div
+        className="flex flex-col items-center"
+        animate={reduced ? {} : { x: [-18, 18, -18, 0, 0, 0], y: [0, 0, 0, 0, 30, 30] }}
+        transition={reduced ? undefined : { ...STACK_LOOP, times: [0, 0.2, 0.4, 0.55, 0.68, 1] }}
+      >
+        <div
+          data-testid="coach-drop-slab"
+          className={cn('flex h-5 w-14 items-center justify-center rounded-[4px] border-2 border-black font-neo-display text-[10px] font-black tracking-[0.2em] shadow-hard-sm', ACCENT_BG[accent])}
+        >
+          TOP
+        </div>
+      </m.div>
+      <div className="flex flex-col items-center gap-0.5">
+        <Floor word="SUN" className="w-16" />
+        <Floor word="BEAM" className="w-20" />
+      </div>
     </div>
   );
 }
@@ -272,6 +340,8 @@ export function CoachDemo({ demo, accent, emoji }: CoachDemoProps) {
         return <ClearTilesDemo accent={accent} reduced={reduced} />;
       case 'stack':
         return <StackDemo accent={accent} reduced={reduced} />;
+      case 'towerDrop':
+        return <TowerDropDemo accent={accent} reduced={reduced} />;
       case 'connectGroup':
         return <ConnectGroupDemo accent={accent} reduced={reduced} />;
       case 'chain':

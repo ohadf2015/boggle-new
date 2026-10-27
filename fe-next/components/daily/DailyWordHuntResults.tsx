@@ -10,7 +10,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import GameFeedback from '@/components/feedback/GameFeedback';
-import { m } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { ArrowLeft, Trophy, BarChart3 } from 'lucide-react';
 import { CoinSpendAnimation } from '@/components/animations/CoinSpendAnimation';
@@ -29,14 +28,12 @@ import {
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import { fireConfetti } from '@/utils/confettiUtils';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import StreakSavedCelebration from './StreakSavedCelebration';
 import CustomPuzzleCreator from '@/components/custom-puzzle/CustomPuzzleCreator';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { WinCinematic } from './WinCinematic';
 import { WordHuntResultsContent } from './WordHuntResultsContent';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeChainCta from '@/components/practice/PracticeChainCta';
@@ -49,10 +46,8 @@ import {
   useShareHandlers,
   useResultSubmission,
   useCoinActions,
-  useConfettiEffects,
   useSpendAnimation,
   useStreakFreezeStatus,
-  ScoreBadge,
   AttemptHistory,
   StatsSection,
   SharePanel,
@@ -86,9 +81,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }
     trackGrowthEvent('results_viewed', { mode: 'word-hunt', score: result.efficiencyScore ?? 0 });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Show win cinematic for new completions before revealing results
-  const [showCinematic, setShowCinematic] = useState(() => Boolean(isNewCompletion && result.solved));
 
   // Local state
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
@@ -185,8 +177,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     },
     onFreezeBridged: ({ freezesRemaining }) => {
       setStreakSavedFreezesLeft(freezesRemaining);
-      // Let the results / win-cinematic settle, then reveal the save.
-      setTimeout(() => setShowStreakSaved(true), 900);
+      // Let the hero's entrance settle, then reveal the save.
+      setTimeout(() => setShowStreakSaved(true), 1800);
     },
     extraTries: result.extraTries,
     t,
@@ -225,50 +217,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }
   }, [isNewCompletion, fetchStats]);
 
-  // Use confetti effects hook
-  const { handleBadgeClickConfetti } = useConfettiEffects({
-    isNewCompletion,
-    solved: result.solved,
-    attemptsUsed: result.attemptsUsed,
-    stats,
-  });
-
-  // Confetti burst after results entrance (centered, timed after rank badge appears)
-  useEffect(() => {
-    if (isNewCompletion && result.solved) {
-      const timer = setTimeout(() => {
-        fireConfetti({
-          particleCount: 80,
-          spread: 120,
-          origin: { y: 0.5 },
-          colors: ['#BFFF00', '#00FFFF', '#FF1493', '#FFE135'],
-        });
-      }, 1200);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [isNewCompletion, result.solved]);
-
-  // Show streak milestone
+  // Milestone modal waits for the hero's count-up and confetti to land.
   useEffect(() => {
     if (isNewCompletion && milestoneMessage) {
-      const timer = setTimeout(() => setShowMilestoneCelebration(true), 1500);
+      const timer = setTimeout(() => setShowMilestoneCelebration(true), 1800);
       return () => clearTimeout(timer);
     }
     return undefined;
   }, [isNewCompletion, milestoneMessage]);
-
-  // ============================================================================
-  // HANDLERS
-  // ============================================================================
-
-  // Note: Removed handleSignupModalClose - using inline signup CTA instead
-
-  const handleScoreBadgeClick = useCallback(() => {
-    if (result.solved) {
-      handleBadgeClickConfetti(stats?.yourStats?.rank);
-    }
-  }, [result.solved, stats?.yourStats?.rank, handleBadgeClickConfetti]);
 
   // Results content props for extracted component
   const resultsContentProps = {
@@ -306,56 +262,25 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   /** Stats tab - Shows immersive attempt history and animated statistics */
   const renderStatsContent = () => (
-    <m.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-5 pb-4"
-    >
+    <div className="space-y-5 pb-4">
       <AttemptHistory attempts={result.attempts} attemptsUsed={result.attemptsUsed} t={t} />
       {stats && <StatsSection stats={stats} result={result} t={t} />}
-    </m.div>
+    </div>
   );
 
   // ============================================================================
   // RENDER
   // ============================================================================
 
-  // Show win cinematic before revealing results
-  if (showCinematic) {
-    return (
-      <WinCinematic
-        puzzleNumber={puzzleNumber}
-        finalScore={result.efficiencyScore ?? 0}
-        onComplete={() => setShowCinematic(false)}
-      />
-    );
-  }
-
   return (
-    <m.div
-      key="word-hunt-results"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col min-h-0 overflow-hidden"
-    >
-      {/* Compact Header */}
-      <div className="shrink-0 px-3 py-2 border-b border-slate-700/50 bg-neo-navy">
+    <div key="word-hunt-results" className="flex-1 flex flex-col min-h-0 overflow-hidden bg-neo-navy">
+      <div className="shrink-0 px-3 py-2 border-b-2 border-neo-black bg-neo-navy">
         <div className="max-w-md mx-auto lg:max-w-5xl xl:max-w-6xl">
           <div className="flex items-center justify-between gap-2">
             <Button variant="ghost" size="sm" onClick={onBack} className="text-neo-white/60 hover:text-neo-white -ms-2 py-1">
               <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
               {t('common.back')}
             </Button>
-            <ScoreBadge
-              solved={result.solved}
-              attemptsUsed={result.attemptsUsed}
-              targetWord={result.targetWord}
-              streakDays={result.streakDays}
-              language={language}
-              onClick={handleScoreBadgeClick}
-            />
           </div>
         </div>
       </div>
@@ -489,7 +414,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         />,
         document.body
       )}
-    </m.div>
+    </div>
   );
 };
 

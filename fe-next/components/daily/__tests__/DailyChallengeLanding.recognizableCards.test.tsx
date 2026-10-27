@@ -129,7 +129,7 @@ describe('DailyChallengeLanding — recognizable cards', () => {
     renderHub();
     await screen.findByTestId('secondary-modes');
     const huntArt = Array.from(
-      document.querySelectorAll('[data-art-url="/daily/word-hunt-mascot.jpg"]'),
+      document.querySelectorAll('[data-art-url="/daily/modes/word-hunt.webp"]'),
     );
     // Word Hunt is a secondary row here, so exactly one element may use its art.
     expect(huntArt.length).toBeLessThanOrEqual(1);

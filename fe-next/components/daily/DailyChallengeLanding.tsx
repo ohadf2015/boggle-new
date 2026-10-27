@@ -13,7 +13,9 @@ import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
 import type { Language } from '@/types';
 import type { PendingChest } from '@/hooks/useWeeklyChest';
 
-import { visibleDailyModes, pickPrimaryMode, type DailyModePlayState, type DailyModeId } from '@/lib/dailyModes';
+import { DAILY_MODES, visibleDailyModes, pickPrimaryMode, type DailyModePlayState, type DailyModeId } from '@/lib/dailyModes';
+
+const modeArt = (id: DailyModeId) => DAILY_MODES.find(m => m.id === id)?.art ?? '';
 import { dailyBestKey, isDailyTowerPlayed } from '@/lib/wordTower/dailyBest';
 import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
@@ -197,7 +199,7 @@ export function DailyChallengeLanding({
       tagline: t('wordWheel.hub.wordWheelDesc'),
       icon: <CircleDot className="w-8 h-8" />,
       color: 'yellow',
-      artUrl: '/daily/word-wheel-mascot.jpg',
+      artUrl: modeArt('word-wheel'),
       played: wordWheelPlayed,
       onPlay: onSelectWordWheel,
       visible: true,
@@ -209,7 +211,7 @@ export function DailyChallengeLanding({
       tagline: t('daily.wordHunt.desc'),
       icon: <Timer className="w-8 h-8" />,
       color: 'orange',
-      artUrl: '/daily/word-hunt-mascot.jpg',
+      artUrl: modeArt('word-hunt'),
       played: wordHuntPlayed,
       onPlay: onSelectWordHunt,
       visible: true,
@@ -221,7 +223,7 @@ export function DailyChallengeLanding({
       tagline: t('connections.daily.questDesc'),
       icon: <Link2 className="w-8 h-8" />,
       color: 'purple',
-      artUrl: '/daily/connections-mascot.jpg',
+      artUrl: modeArt('connections'),
       played: connectionsDone,
       onPlay: () => router.push(`/${currentLanguage}/connections/daily`),
       visible: showsConnections,
@@ -234,7 +236,7 @@ export function DailyChallengeLanding({
       tagline: t('wordTower.daily.questDesc'),
       icon: <Building2 className="w-8 h-8" />,
       color: 'cyan',
-      artUrl: '/daily/word-tower-mascot.jpg',
+      artUrl: modeArt('word-tower'),
       played: towerDone,
       onPlay: () => router.push(wordTowerHref),
       visible: showsWordTower,

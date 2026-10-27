@@ -25,6 +25,10 @@ vi.mock('framer-motion', () => ({
 vi.mock('@/components/ui/Mascot', () => ({
   MascotWithEntrance: () => <div data-testid="mascot" />,
 }));
+vi.mock('../results/WordHuntResultsHero', () => ({
+  WordHuntResultsHero: ({ children }: { children?: React.ReactNode }) => <section data-testid="daily-results-hero">{children}</section>,
+}));
+vi.mock('../results/CoinUnlockCard', () => ({ CoinUnlockCard: () => <div data-testid="coin-unlock" /> }));
 vi.mock('../results', () => ({
   ResultDisplay: () => <div data-testid="result-display" />,
   PastPerformanceCompare: () => <div data-testid="past-performance-compare" />,

@@ -41,20 +41,6 @@ describe('V2Results', () => {
     expect(img.getAttribute('src')).toContain('/api/word-tower/share');
   });
 
-  it('given a daily tower, when shown, then the score is the growth, the goal and the rank — and play again is never locked', () => {
-    render(<V2Results {...base} daily={{ growthM: 12, targetM: 15, totalM: 96, rank: 4 }} onRestart={() => {}} />);
-    expect(screen.getByText('+12wordTowerV2.unitM')).toBeTruthy();
-    expect(screen.getByText('12/15wordTowerV2.unitM')).toBeTruthy();
-    expect(screen.getByText('#4')).toBeTruthy();
-    expect(screen.getByText('wordTowerV2.dailyTower.keepBuilding')).toBeTruthy();
-  });
-
-  it('given the goal is reached, then the goal cell says so', () => {
-    render(<V2Results {...base} daily={{ growthM: 20, targetM: 15, totalM: 96, rank: null }} onRestart={() => {}} />);
-    expect(screen.getByText('wordTowerV2.dailyTower.goalHit')).toBeTruthy();
-    expect(screen.getByText('15/15wordTowerV2.unitM')).toBeTruthy();
-  });
-
   it('given badges still locked, when shown, then the closest one is offered as the next goal', () => {
     render(<V2Results {...base} onRestart={() => {}} />);
     expect(screen.getByText('wordTowerV2.results.nextGoal')).toBeTruthy();

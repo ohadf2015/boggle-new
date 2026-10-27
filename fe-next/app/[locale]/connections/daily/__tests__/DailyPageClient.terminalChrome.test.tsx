@@ -1,9 +1,7 @@
 /**
- * Once the Word Bridge daily run is over, the host's in-game chrome must not
- * linger beside the results: "skip" goes (the results hand off to the next
- * quest), and on the 5-riddle results the chrome's back pill goes too because
- * the results card has its own back button. The pyramid end screen has none,
- * so it keeps the chrome's back pill.
+ * Once the Word Bridge daily run is over, "skip" goes (the results hand off to
+ * the next quest). The chrome's back pill is the only back control on both
+ * flavors' results, so it stays.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
@@ -31,6 +29,7 @@ describe('DailyPageClient chrome after the run ends', () => {
   beforeEach(() => {
     cleanup();
     sessionStorage.clear();
+    localStorage.setItem('lc:connections-daily-tutorial-seen', '1');
   });
 
   it('given a live 5-riddle run, then back and skip are offered', () => {
@@ -40,12 +39,12 @@ describe('DailyPageClient chrome after the run ends', () => {
     expect(screen.getByTestId('skip-optional')).toBeTruthy();
   });
 
-  it('given the 5-riddle run ends, then the chrome nav is withdrawn (results own back + next)', () => {
+  it('given the 5-riddle run ends, then skip goes but the back pill stays', () => {
     variantMock.mockReturnValue('regular');
     render(<DailyPageClient locale="en" />);
     fireEvent.click(screen.getByTestId('finish'));
     expect(screen.queryByTestId('skip-optional')).toBeNull();
-    expect(screen.queryByTestId('back-to-daily')).toBeNull();
+    expect(screen.getByTestId('back-to-daily')).toBeTruthy();
   });
 
   it('given the pyramid run ends, then skip goes but the back pill stays', () => {

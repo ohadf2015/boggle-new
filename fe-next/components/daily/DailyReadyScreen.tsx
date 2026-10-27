@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, Trophy, Target, UserCircle2, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
-import DailyIntroCarousel from './DailyIntroCarousel';
+import { PracticeBoardLink } from './survival/howto/PracticeBoardLink';
 import { CreateChallengeModal } from './CreateChallengeModal';
 import { UnauthenticatedCreateChallengeSection } from './UnauthenticatedCreateChallengeSection';
 import { LanguageDropdown } from './LanguageDropdown';
@@ -61,7 +61,6 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
   currentFlag,
   challengeData,
   isAuthenticated,
-  targetWordLength,
   currentPlayerId,
   guestFingerprint,
   onLanguageChange,
@@ -275,18 +274,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           </button>
         </m.div>
 
-        {/* Animated Tutorial Carousel */}
-        {targetWordLength > 0 && (
-          <m.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
-          >
-            <DailyIntroCarousel targetWordLength={targetWordLength} />
-          </m.div>
-        )}
-
-        {/* Secondary actions row — demoted from primary CTA, sits below carousel */}
+        {/* Secondary actions row — demoted from primary CTA */}
         {isAuthenticated ? (
           <m.div
             initial={{ opacity: 0, y: 10 }}
@@ -318,6 +306,10 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               <HelpCircle className="w-4 h-4" />
               {t('daily.howToPlay')}
             </button>
+            <PracticeBoardLink
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors"
+              iconClassName="w-4 h-4"
+            />
           </m.div>
         ) : (
           <>
@@ -334,22 +326,26 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, type: 'spring', stiffness: 280, damping: 26 }}
-              className="flex items-center justify-center gap-4 pt-2"
+              className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 pt-2"
             >
               <button
                 type="button"
                 onClick={() => setShowLeaderboard(!showLeaderboard)}
-                className="text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
+                className="whitespace-nowrap text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
               >
                 <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
               </button>
               <button
                 type="button"
                 onClick={onShowTutorial}
-                className="text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
+                className="whitespace-nowrap text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
               >
                 <HelpCircle className="w-3 h-3" /> {t('daily.howToPlay')}
               </button>
+              <PracticeBoardLink
+                className="whitespace-nowrap text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
+                iconClassName="w-3 h-3"
+              />
             </m.div>
           </>
         )}
@@ -467,6 +463,9 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           initialMode="signup"
         />
       )}
+
+      {/* Footprint of the portaled sticky PLAY, so it never covers the last actions. */}
+      <div data-testid="ready-sticky-cta-spacer" aria-hidden="true" className="h-24 w-full shrink-0 sm:hidden" />
     </m.div>
   );
 };

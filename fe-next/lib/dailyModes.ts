@@ -34,7 +34,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
     titleKey: 'wordWheel.hub.wordWheelQuest',
     descKey: 'wordWheel.hub.wordWheelDesc',
     accent: 'yellow',
-    art: '/daily/word-wheel-mascot.jpg',
+    art: '/daily/modes/word-wheel.webp',
   },
   {
     id: 'word-hunt',
@@ -43,7 +43,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
     titleKey: 'daily.wordHunt.title',
     descKey: 'daily.wordHunt.desc',
     accent: 'orange',
-    art: '/daily/word-hunt-mascot.jpg',
+    art: '/daily/modes/word-hunt.webp',
   },
   {
     id: 'connections',
@@ -53,7 +53,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
     titleKey: 'connections.daily.questTitle',
     descKey: 'connections.daily.questDesc',
     accent: 'purple',
-    art: '/daily/connections-mascot.jpg',
+    art: '/daily/modes/connections.webp',
   },
   {
     id: 'word-tower',
@@ -63,7 +63,7 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
     titleKey: 'wordTower.daily.questTitle',
     descKey: 'wordTower.daily.questDesc',
     accent: 'cyan',
-    art: '/daily/word-tower-mascot.jpg',
+    art: '/daily/modes/word-tower.webp',
   },
 ];
 
