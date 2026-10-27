@@ -44,7 +44,7 @@ const content: Record<Locale, ToolContent> = {
     description:
       'Free online anagram solver and word unscrambler. Enter your letters and instantly find all possible words. Perfect for Scrabble, Boggle, Words With Friends, and LexiClash.',
     metaDescription:
-      'Enter up to 20 letters and see every word they spell, longest first. Free anagram solver with full dictionaries in 5 languages, no signup.',
+      'Enter up to 20 letters and see every word they spell, longest first. Free anagram and letter solver with a full dictionary, no signup.',
     inputPlaceholder: 'Enter your letters (e.g. AELRST)',
     inputLabel: 'Your Letters',
     languageLabel: 'Dictionary Language',

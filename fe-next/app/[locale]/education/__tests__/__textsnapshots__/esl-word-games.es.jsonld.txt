@@ -86,7 +86,7 @@
       "name": "¿Cuáles son los mejores juegos para ESL/EFL?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "LexiClash ofrece juegos en vivo: Boggle rápido, Word Wheel para vocabulario, Word Hunt para búsqueda. Todos en tiempo real contra compañeros o IA — competitivo y divertido."
+        "text": "LexiClash ofrece juegos en vivo: Boggle rápido, Word Wheel para vocabulario, Word Hunt para búsqueda. Todos en tiempo real contra compañeros o IA — competitivo y divertido. Para probarlo, abre lexiclash.live/es/education/classroom-game y proyecta el tablero."
       }
     },
     {
