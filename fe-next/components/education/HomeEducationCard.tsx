@@ -64,6 +64,7 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
   // the education header/menu color language. Literal class strings (Tailwind v4).
   const accent = isPromo ? 'bg-neo-purple' : isTeacher ? 'bg-neo-cyan' : 'bg-neo-lime';
   const shadow = isPromo ? 'shadow-hard-purple' : isTeacher ? 'shadow-hard-cyan' : 'shadow-hard-lime';
+  const border = isPromo ? 'border-neo-purple' : isTeacher ? 'border-neo-cyan' : 'border-neo-lime';
   const ring = isPromo
     ? 'focus-visible:after:ring-neo-purple'
     : isTeacher
@@ -79,7 +80,8 @@ export function HomeEducationCard({ role, trial, classroomName }: HomeEducationC
       data-edu-role={role}
       className={cn(
         'group relative flex w-full items-center gap-3 sm:gap-4',
-        'rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light',
+        'overflow-hidden rounded-neo border-[3px] bg-neo-navy-light',
+        border,
         'px-3 py-2.5 sm:px-4 sm:py-3',
         shadow,
         'motion-safe:transition-transform motion-safe:duration-150',

@@ -52,7 +52,6 @@ import { alphabetForLocale } from '@/lib/word-craft/wordCraftAlphabet';
 import { isUnassignedBlank } from '@/lib/word-craft/blankAssign';
 import { WordCraftBlankPicker } from '@/components/word-craft/WordCraftBlankPicker';
 import { WordCraftAxisChip } from '@/components/word-craft/WordCraftAxisChip';
-import { WordCraftPlacementGuide } from '@/components/word-craft/WordCraftPlacementGuide';
 import { WordCraftStepHint } from '@/components/word-craft/WordCraftStepHint';
 import { resolveWordCraftStep } from '@/lib/word-craft/stepHint';
 import { WordCraftModifierChip } from '@/components/word-craft/WordCraftModifierChip';
@@ -1108,18 +1107,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
         ) : canInteract ? (
           // Persistent direction toggle, available before the first tile lands so
           // the player can pre-pick across/down and just keep tapping letters.
-          // On the very first move we also surface the place→submit steps inline
-          // so new players know how to put letters down without opening the tutor.
           <div className="flex flex-col items-center gap-1 py-0.5 shrink-0">
-            {isFirstMove && showGuide ? (
-              <WordCraftPlacementGuide
-                labels={{
-                  step1: t('wordcraft.place.step1', 'Tap a letter'),
-                  step2: t('wordcraft.place.step2', 'Tap a square'),
-                  step3: t('wordcraft.place.step3', 'Submit'),
-                }}
-              />
-            ) : null}
             <div className="flex items-center justify-center gap-2">
               <WordCraftAxisChip
                 axis={effectiveAxis}
@@ -1128,7 +1116,6 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
                 labelVertical={t('wordcraft.axis.vertical')}
                 ariaLabel={t('wordcraft.axis.flipAria')}
               />
-              {showGuide && <span className="text-[10px] text-neo-white/60 font-neo-body">{t('wordcraft.axis.hint')}</span>}
             </div>
           </div>
         ) : null}

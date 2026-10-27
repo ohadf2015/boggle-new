@@ -12,13 +12,13 @@ import ModeResumeChip from '../ModeResumeChip';
 import { useHomeLaunch } from './HomeLaunch';
 import styles from './HomeModeGrid.module.css';
 
-const TINT: Record<ModeCubeVariant, { shadow: string; chip: string; ring: string; glow: string }> = {
-  pink: { shadow: 'shadow-hard-pink', chip: 'bg-neo-pink text-neo-navy', ring: 'focus-visible:ring-neo-pink', glow: 'rgba(255,20,147,0.42)' },
-  cyan: { shadow: 'shadow-hard-cyan', chip: 'bg-neo-cyan text-neo-navy', ring: 'focus-visible:ring-neo-cyan', glow: 'rgba(0,255,255,0.34)' },
-  purple: { shadow: 'shadow-hard-purple', chip: 'bg-neo-purple text-neo-white', ring: 'focus-visible:ring-neo-purple', glow: 'rgba(139,92,246,0.5)' },
-  orange: { shadow: 'shadow-hard-orange', chip: 'bg-neo-orange text-neo-navy', ring: 'focus-visible:ring-neo-orange', glow: 'rgba(255,107,53,0.42)' },
-  lime: { shadow: 'shadow-hard-lime', chip: 'bg-neo-lime text-neo-navy', ring: 'focus-visible:ring-neo-lime', glow: 'rgba(191,255,0,0.36)' },
-  blue: { shadow: 'shadow-hard-blue', chip: 'bg-blue-500 text-neo-white', ring: 'focus-visible:ring-blue-400', glow: 'rgba(59,130,246,0.42)' },
+const TINT: Record<ModeCubeVariant, { shadow: string; chip: string; ring: string; glow: string; border: string }> = {
+  pink: { shadow: 'shadow-hard-pink', chip: 'bg-neo-pink text-neo-navy', ring: 'focus-visible:ring-neo-pink', glow: 'rgba(255,20,147,0.42)', border: 'border-neo-pink' },
+  cyan: { shadow: 'shadow-hard-cyan', chip: 'bg-neo-cyan text-neo-navy', ring: 'focus-visible:ring-neo-cyan', glow: 'rgba(0,255,255,0.34)', border: 'border-neo-cyan' },
+  purple: { shadow: 'shadow-hard-purple', chip: 'bg-neo-purple text-neo-black', ring: 'focus-visible:ring-neo-purple', glow: 'rgba(139,92,246,0.5)', border: 'border-neo-purple' },
+  orange: { shadow: 'shadow-hard-orange', chip: 'bg-neo-orange text-neo-navy', ring: 'focus-visible:ring-neo-orange', glow: 'rgba(255,107,53,0.42)', border: 'border-neo-orange' },
+  lime: { shadow: 'shadow-hard-lime', chip: 'bg-neo-lime text-neo-navy', ring: 'focus-visible:ring-neo-lime', glow: 'rgba(191,255,0,0.36)', border: 'border-neo-lime' },
+  blue: { shadow: 'shadow-hard-blue', chip: 'bg-blue-500 text-neo-black', ring: 'focus-visible:ring-blue-400', glow: 'rgba(59,130,246,0.42)', border: 'border-blue-500' },
 };
 
 const BADGE_CLASS =
@@ -45,7 +45,7 @@ function ModeTagChip({ tag, compact = false }: { tag: ModeTag; compact?: boolean
       data-testid="mode-tag"
       title={compact ? t(TAG_LABEL_KEY[tag.players]) : undefined}
       className={cn(
-        'inline-flex w-fit max-w-full items-center gap-1 rounded-full border border-neo-cream/35 bg-black/45 py-0.5 font-neo-body text-[0.6rem] font-bold uppercase leading-none tracking-wide text-neo-cream md:px-1.5 md:text-[0.62rem]',
+        'inline-flex w-fit max-w-full items-center gap-1 rounded-full border border-neo-cream/35 bg-black/45 py-0.5 font-neo-body text-[0.68rem] font-bold leading-none text-neo-cream md:px-1.5',
         compact ? 'px-1' : 'px-1.5',
       )}
     >
@@ -99,14 +99,17 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
       }}
       style={{ '--i': index, '--art-scale': model.imgScale ?? 1, '--cube-glow': tint.glow } as CSSProperties}
       className={cn(
-        'group relative block overflow-hidden rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy',
+        'group relative overflow-hidden rounded-neo border-[3px]',
+        tint.border,
         tint.shadow,
+        // Solid panel + art window + text block: the label never sits on a busy picture.
+        anchor ? 'block bg-neo-navy' : 'flex flex-row items-center gap-2.5 bg-neo-navy-light p-2 md:flex-col md:items-stretch md:gap-0 md:p-2.5',
         // Hover: border brightens for everyone; the lift only when motion is welcome.
         'transition-[transform,box-shadow,border-color] duration-150 ease-out hover:border-neo-cream/80 motion-safe:hover:-translate-y-0.5',
         'active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-[border-color]',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
         tint.ring,
-        anchor ? 'min-h-[5.75rem] flex-1 md:min-h-0' : 'h-[5.5rem] md:h-auto md:aspect-square',
+        anchor ? 'min-h-[5.75rem] flex-1 md:min-h-0' : 'h-[5.5rem] md:h-auto',
         model.highlighted && 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
         locked && 'cursor-not-allowed',
       )}
@@ -115,11 +118,9 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
         <span
           data-testid={anchor ? undefined : 'mode-tile-art'}
           className={cn(
-            'absolute inset-0',
-            // Phone row tile: the mascot sits in its own inset well rather than a
-            // hard-ruled slab glued to the edge, so the card reads as one object.
-            // A touch narrower than before so long titles (ADVENTURE, WORD TOWER) fit.
-            !anchor && 'max-md:inset-y-2.5 max-md:start-2.5 max-md:end-auto max-md:w-[3.875rem] max-md:overflow-hidden max-md:rounded-neo max-md:border-2 max-md:border-neo-cream/40 max-md:bg-black/30',
+            anchor
+              ? 'absolute inset-0'
+              : 'relative h-[3.875rem] w-[3.875rem] shrink-0 overflow-hidden rounded-neo border-2 border-neo-cream/40 bg-neo-navy md:h-auto md:w-full md:aspect-[4/3]',
           )}
         >
         <Image
@@ -134,26 +135,15 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
         />
         </span>
       ) : (
-        <span className={cn('absolute start-2 top-2 flex h-9 w-9 items-center justify-center rounded-neo border-2 border-black', tint.chip)}>
+        <span className={cn('flex items-center justify-center rounded-neo border-2 border-black', tint.chip, anchor ? 'absolute start-2 top-2 h-9 w-9' : 'h-[3.875rem] w-[3.875rem] shrink-0 md:h-auto md:w-full md:aspect-[4/3]')}>
           <model.Icon className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
         </span>
       )}
-      {!anchor && (
-        // Mode-hue wash across the whole card so each tile owns its colour, not just its shadow.
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-40"
-          style={{ background: 'linear-gradient(160deg, var(--cube-glow) 0%, transparent 70%)' }}
-        />
+      {anchor && (
+        <>
+          <span aria-hidden="true" className="absolute inset-x-0 bottom-0 z-[1] h-1/2 bg-gradient-to-t from-neo-navy via-neo-navy/70 to-transparent" />
+        </>
       )}
-      <span aria-hidden="true" className="cube-glow pointer-events-none absolute inset-0 z-[1]" />
-      <span
-        aria-hidden="true"
-        className={cn(
-          'absolute inset-x-0 bottom-0 z-[1] h-3/5 bg-gradient-to-t from-neo-navy via-neo-navy/80 to-transparent',
-          !anchor && 'max-md:hidden md:h-3/4',
-        )}
-      />
       {anchor && (
         <span
           aria-hidden="true"
@@ -173,16 +163,16 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
               <ModeTagChip tag={model.tag} />
             </span>
           )}
-          <span className="font-neo-display text-2xl font-black uppercase leading-none tracking-tight text-neo-white drop-shadow-[0_2px_0_rgba(0,0,0,0.7)] md:text-2xl">
+          <span className="font-neo-display text-2xl font-black leading-none tracking-tight text-neo-white md:text-2xl">
             {model.title}
           </span>
           {model.description && (
-            <span className="mt-1 hidden max-w-[32ch] font-neo-body text-sm leading-snug text-neo-cream/90 drop-shadow-[0_1px_0_rgba(0,0,0,0.8)] md:line-clamp-2">
+            <span className="mt-1 hidden max-w-[32ch] font-neo-body text-sm leading-snug text-neo-cream/90 md:line-clamp-2">
               {model.description}
             </span>
           )}
           {model.livePill && (
-            <span className="mt-1.5 inline-flex w-fit items-center gap-1.5 rounded-full border-2 border-black bg-neo-lime px-2 py-0.5 font-neo-display text-[0.65rem] font-black uppercase tracking-wide text-neo-navy shadow-hard-sm md:text-xs">
+            <span className="mt-1.5 inline-flex w-fit items-center gap-1.5 rounded-full border-2 border-black bg-neo-lime px-2 py-0.5 font-neo-display text-xs font-black text-neo-navy shadow-hard-sm">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full rounded-full bg-neo-navy opacity-70 motion-safe:animate-ping" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-neo-navy" />
@@ -197,10 +187,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
       ) : (
         <span
           data-testid="mode-tile-label"
-          className={cn(
-            'absolute inset-y-0 start-[4.875rem] end-1.5 z-[2] flex flex-col items-start justify-center gap-1',
-            'md:inset-x-0 md:inset-y-auto md:bottom-0 md:start-0 md:end-0 md:justify-end md:px-2.5 md:pb-2',
-          )}
+          className="flex min-w-0 flex-1 flex-col items-start justify-center gap-1 md:justify-start md:px-0.5 md:pt-2.5 md:pb-0.5"
         >
           {(badge || model.tag) && (
             <span className="flex max-w-full flex-wrap items-center gap-1">
@@ -209,7 +196,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
             </span>
           )}
           <span
-            className="line-clamp-2 max-w-full font-neo-display text-[0.84rem] font-black uppercase leading-[1.1] text-neo-white drop-shadow-[0_1px_0_rgba(0,0,0,0.8)] md:text-sm"
+            className="line-clamp-2 max-w-full font-neo-display text-[0.9rem] font-black leading-[1.1] text-neo-white md:text-sm"
             style={{ textWrap: 'balance' } as CSSProperties}
           >
             {model.title}
@@ -217,7 +204,7 @@ function ModeTile({ model, index, anchor = false, onPicked }: ModeTileProps) {
           {model.description && (
             <span
               data-testid="mode-tile-desc"
-              className="hidden font-neo-body text-[0.7rem] leading-snug text-neo-cream/85 drop-shadow-[0_1px_0_rgba(0,0,0,0.8)] lg:line-clamp-2"
+              className="hidden font-neo-body text-[0.7rem] leading-snug text-neo-cream/85 lg:line-clamp-2"
             >
               {model.description}
             </span>

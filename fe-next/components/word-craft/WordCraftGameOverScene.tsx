@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import { WordCraftDuelResult } from './WordCraftDuelResult';
@@ -109,6 +110,17 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
         <span className="text-[11px] font-neo-display font-black uppercase tracking-[0.2em] text-neo-white/70">
           {t('wordcraft.gameOver', 'Game over')}
         </span>
+
+        {playerWon ? (
+          <Image
+            src="/word-craft/trophy.webp"
+            alt=""
+            width={512}
+            height={510}
+            priority
+            className="wc-float w-28 h-auto -my-1 drop-shadow-[0_6px_0_rgba(0,0,0,0.6)]"
+          />
+        ) : null}
 
         {isNewBest ? (
           <div className="animate-neo-pop px-3 py-1.5 bg-neo-lime border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider">
