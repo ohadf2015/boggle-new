@@ -11,6 +11,9 @@ import ConnectionsDailyChallenge from '../ConnectionsDailyChallenge';
 import { DAILY_ATTEMPTS_PER_PUZZLE, DAILY_PUZZLE_COUNT } from '@/lib/connections/daily';
 import { dailyResultKey } from '@/lib/connections/dailyResultStore';
 
+vi.mock('@/hooks/useDailyPlayedStatus', () => ({
+  useDailyPlayedStatus: () => ({ today: { wordHunt: false, wordWheel: false, wordTower: false, connections: true }, streak: { current: 2, longest: 2 } }),
+}));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
 }));
@@ -25,7 +28,8 @@ vi.mock('@/hooks/useHapticFeedback', () => ({
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({ playMatchFoundSound: vi.fn(), playErrorSound: vi.fn(), playVictorySound: vi.fn() }),
 }));
-vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn() }));
+const confetti = vi.hoisted(() => ({ fireVictoryConfetti: vi.fn(), fireConfetti: vi.fn() }));
+vi.mock('@/utils/confettiUtils', () => confetti);
 vi.mock('@/hooks/useRewardedFeatureUnlock', () => ({
   useRewardedFeatureUnlock: () => ({ canShowAd: false, status: 'idle', offer: vi.fn() }),
 }));
@@ -113,5 +117,19 @@ describe('ConnectionsDailyChallenge — finished day stays finished', () => {
     // Next quest stays first in document order.
     const cta = screen.getByTestId('next-quest-cta');
     expect(cta.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('given a finished run, then the shared daily hero leads the results (live and restored) and the game fires no confetti of its own', async () => {
+    const first = render(<ConnectionsDailyChallenge />);
+    burnWholeRun();
+    const hero = await screen.findByTestId('daily-results-hero');
+    expect(hero.getAttribute('data-mode')).toBe('connections');
+    expect(hero.getAttribute('data-outcome')).toBe('loss');
+    expect(screen.queryByTestId('back-button')).toBeNull();
+    expect(confetti.fireVictoryConfetti).not.toHaveBeenCalled();
+    first.unmount();
+
+    render(<ConnectionsDailyChallenge />);
+    expect(screen.getByTestId('daily-results-hero').getAttribute('data-outcome')).toBe('loss');
   });
 });

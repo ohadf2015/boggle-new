@@ -1,11 +1,12 @@
 /**
- * DailyChallengeTutorial must no longer auto-show when the ready phase loads —
- * that auto-fire duplicated ModeCoach's wordHunt overlay. It's now opened only
- * on demand via DailyReadyScreen's "How to Play" button.
+ * First visit: the interactive how-to-play opens by itself once, and it takes the
+ * place of the in-game ModeCoach card (one onboarding, never two stacked).
+ * Returning players never see it unasked.
  */
 
 import React from 'react';
-import { render, screen, waitFor, act } from '@testing-library/react';
+let mockEverPlayed = true;
+import { render, screen, waitFor, act, fireEvent } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
   m: {
@@ -96,20 +97,25 @@ vi.mock('@/utils/dailyChallenge', () => ({
   GAME_LANGUAGE_KEY: 'daily_game_language',
   getWordHuntTutorialKey: vi.fn(() => 'word_hunt_tutorial_en'),
   getWordHuntResultKey: vi.fn(() => 'word_hunt_result_en'),
-  hasEverPlayedWordHunt: vi.fn(() => true),
+  hasEverPlayedWordHunt: vi.fn(() => mockEverPlayed),
 }));
 
+const survivalProps: Array<Record<string, unknown>> = [];
 vi.mock('../DailyWordHuntSurvival', () => ({
   __esModule: true,
-  default: () => <div data-testid="survival-game" />,
+  default: (props: Record<string, unknown>) => { survivalProps.push(props); return <div data-testid="survival-game" />; },
 }));
 vi.mock('../DailyWordHuntResults', () => ({ __esModule: true, default: () => <div data-testid="results-screen" /> }));
 vi.mock('../DailyReadyScreen', () => ({
   __esModule: true,
-  default: () => <div data-testid="ready-screen" />,
+  default: ({ onStart }: { onStart: () => void }) => (
+    <div data-testid="ready-screen"><button data-testid="play-button" onClick={onStart}>Play</button></div>
+  ),
 }));
 vi.mock('../DailyChallengeTutorial', () => ({
-  DailyChallengeTutorial: () => <div data-testid="tutorial" />,
+  DailyChallengeTutorial: ({ onComplete }: { onComplete: () => void }) => (
+    <div data-testid="tutorial"><button data-testid="tutorial-done" onClick={onComplete}>done</button></div>
+  ),
 }));
 
 global.fetch = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ hasPlayed: false }) })) as unknown as typeof fetch;
@@ -117,23 +123,44 @@ global.fetch = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resol
 vi.mock('@/hooks/useInterstitialAd', () => ({ useInterstitialAd: () => ({ showInterstitial: () => Promise.resolve() }) }));
 import DailyChallenge from '../DailyChallenge';
 
-describe('DailyChallenge — tutorial no longer auto-shows', () => {
+const settle = () => act(async () => { await new Promise((resolve) => setTimeout(resolve, 100)); });
+
+describe('DailyChallenge — first-visit how-to-play', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    Storage.prototype.getItem = vi.fn(() => null);
-    Storage.prototype.setItem = vi.fn();
+    survivalProps.length = 0;
+    window.localStorage.clear();
   });
 
-  it('does NOT auto-show the tutorial once the ready phase loads', async () => {
+  it('Given a returning player, When the page loads, Then the how-to-play stays closed', async () => {
+    mockEverPlayed = true;
     render(<DailyChallenge />);
-
-    await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
-    // Give any pending auto-show effect a chance to fire its follow-up render
-    // before asserting it never does.
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    });
-
+    await settle();
     expect(screen.queryByTestId('tutorial')).toBeNull();
+  });
+
+  it('Given a first visit, When the ready screen loads, Then the how-to-play opens once and is remembered at show time', async () => {
+    mockEverPlayed = false;
+    render(<DailyChallenge />);
+    await waitFor(() => expect(screen.getByTestId('tutorial')).toBeInTheDocument());
+    expect(window.localStorage.getItem('lc_coach_wordHunt')).not.toBeNull();
+  });
+
+  it('Given the onboarding was already shown, When a first-timer comes back, Then it does not pop again', async () => {
+    mockEverPlayed = false;
+    window.localStorage.setItem('lc_coach_wordHunt', '1');
+    render(<DailyChallenge />);
+    await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
+    await settle();
+    expect(screen.queryByTestId('tutorial')).toBeNull();
+  });
+
+  it('Given the how-to-play was just shown, When the game starts, Then the in-game coach card stays hidden', async () => {
+    mockEverPlayed = false;
+    render(<DailyChallenge />);
+    fireEvent.click(await screen.findByTestId('tutorial-done'));
+    fireEvent.click(screen.getByTestId('play-button'));
+    await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
+    expect(survivalProps.at(-1)?.hideModeCoach).toBe(true);
   });
 });

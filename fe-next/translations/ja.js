@@ -2524,8 +2524,18 @@ const ja = {
     "leaveGo": "離れる",
     "dailyPlayed": "今日のタワーは終了。また明日。",
     "dailyRank": "今日の順位は #{rank}",
-    "recapAlt": "タワー記録: {floors}階、{m}メートル"
-  },
+    "recapAlt": "タワー記録: {floors}階、{m}メートル",
+"dailyResults": { "headline": "{n}階到達!",
+"floors": "階数",
+"height": "高さ",
+"bestWord": "ベストワード",
+"chestIncoming": "宝箱を受け取り中…"
+},
+"guide": { "spell": "この文字をなぞろう",
+"drop": "タップで落とそう!",
+"done": "1階完成!"
+}
+},
   "wordTower": {
     "mutator": {
       "todaysTwist": "今日のひねり",
@@ -6221,8 +6231,20 @@ const ja = {
         "title": "準備OK",
         "sameChallenge": "世界中みんな同じパズル。スコアを比べよう。",
         "start": "スタート"
-      }
-    },
+      },
+"howto": { "boardTitle": "単語を見つけよう",
+"boardHint": "光っている文字を指でなぞってね:",
+"tryAgain": "おしい!光をたどって {word} を作ろう。",
+"hiddenLabel": "隠された単語",
+"feedbackTitle": "単語を作るたびにヒントが出る",
+"feedbackBody": "文字の色で、隠された単語との関係がわかります。",
+"next": "次へ",
+"goalTitle": "隠された単語を当てよう",
+"goalLife": "ライフがなくなる前に当てよう。",
+"goalClues": "盤面で見つけた単語が、ヒントの文字を明かします。",
+"play": "プレイしよう"
+}
+},
     "welcome": {
       "title": "LexiClashへようこそ！",
       "description": "グリッド上の文字をスワイプして単語を作ろう。まず基本から。"
@@ -9259,6 +9281,10 @@ const ja = {
     "results": {
       "fullRecap": "くわしい結果",
       "fullRecapSummary": "順位、いちばん珍しかった単語、コイン、そして誰に勝ったか",
+      "trailCount": "今日 {n}/{total}",
+      "heroStreak": "{n}日連続",
+      "heroScore": "スコア",
+      "heroDaily": "デイリー",
       "signup": {
         "title": "ストリークを守る",
         "shortPrompt": "ストリークを守る",
@@ -9622,8 +9648,9 @@ const ja = {
     },
     "streak": {
       "freeze_toast_no_remaining": "ストリークフリーズ使用：{day}を保存 · 残りなし"
-    }
-  },
+    },
+"practiceBoard": "練習ボード"
+},
   "dailyWordWheelLanding": {
     "hero": {
       "title": "デイリーワードホイール",
@@ -9818,8 +9845,14 @@ const ja = {
       "wordWheelDetails": "90秒でできるだけ多くの単語を。すべての単語は中央の文字を含む必要があります。",
       "wordHuntQuest": "ワードハント",
       "wordHuntDesc": "10回以内に隠れた単語を当てよう"
-    }
-  },
+    },
+"howTo": { "title": "まずは練習",
+"prompt": "真ん中の文字を通って単語をなぞろう。{word}を試してみて",
+"accepted": "{word}！その調子。今日のホイールに挑戦しよう",
+"notWord": "その言葉はないよ。{word}を試してみて",
+"check": "チェック"
+}
+},
   "dailyChallenge": {
     "pointsPerWord": "単語あたりのポイント"
   },
@@ -19552,8 +19585,9 @@ const ja = {
         "gold": "金：完璧！",
         "silver": "銀：惜しい！",
         "bronze": "銅：よくやった"
-      }
-    },
+      },
+"missesLabel": "ミス"
+},
     "community": {
       "title": "コミュニティの謎",
       "suggest": "謎を提案",
@@ -19611,8 +19645,9 @@ const ja = {
       "won": "ピラミッド完成！",
       "lost": "ピラミッドが崩れた。",
       "reveal": "答えは",
-      "acceptLoss": "負けを認める"
-    },
+      "acceptLoss": "負けを認める",
+"topWord": "頂上の言葉：{word}"
+},
     "difficulty": {
       "easy": "かんたん",
       "medium": "ふつう",
@@ -19733,8 +19768,15 @@ const ja = {
       "crossPromoTitle": "ワードブリッジを試す",
       "crossPromoBody": "2つの単語、1つの橋、無料。",
       "crossPromoCta": "プレイ"
-    }
-  },
+    },
+"tutorial": { "step1": "上と下の言葉をつなぐ、かくれた言葉がひとつあります。",
+"step2": "その言葉を入力しよう。",
+"step3": "正解するたびに、橋に板が一枚かかります。",
+"tryAgain": "おしい！もう一度。",
+"showMe": "答えを見る",
+"start": "今日の橋に挑戦"
+}
+},
   "showcase3d": {
     "heroBadge": "言葉の世界",
     "cap0Title": "言葉をなぞる",

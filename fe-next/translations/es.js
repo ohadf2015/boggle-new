@@ -2523,8 +2523,18 @@ const es = {
     "leaveGo": "Salir",
     "dailyPlayed": "La torre de hoy ya está. Vuelve mañana.",
     "dailyRank": "Eres el #{rank} hoy",
-    "recapAlt": "Resumen: {floors} pisos, {m} metros"
-  },
+    "recapAlt": "Resumen: {floors} pisos, {m} metros",
+"dailyResults": { "headline": "¡Piso {n}!",
+"floors": "Pisos",
+"height": "Altura",
+"bestWord": "Mejor palabra",
+"chestIncoming": "Cofre en camino…"
+},
+"guide": { "spell": "Desliza estas letras",
+"drop": "¡Toca para soltarla!",
+"done": "¡Primer piso!"
+}
+},
   "wordTower": {
     "mutator": {
       "todaysTwist": "GIRO DE HOY",
@@ -7827,8 +7837,20 @@ const es = {
         "title": "¡A cazar!",
         "sameChallenge": "El mismo puzzle para todo el mundo: compara tu puntaje",
         "start": "Empezar"
-      }
-    },
+      },
+"howto": { "boardTitle": "Encuentra una palabra",
+"boardHint": "Desliza el dedo por las letras brillantes:",
+"tryAgain": "Casi. Sigue el brillo para formar {word}.",
+"hiddenLabel": "Palabra oculta",
+"feedbackTitle": "Cada palabra te da pistas",
+"feedbackBody": "Cada letra se ilumina para mostrar cómo encaja en la palabra oculta.",
+"next": "Siguiente",
+"goalTitle": "Descubre la palabra oculta",
+"goalLife": "Adivínala antes de quedarte sin vida.",
+"goalClues": "Las palabras que encuentras en el tablero revelan letras pista.",
+"play": "¡A jugar!"
+}
+},
     "welcome": {
       "title": "¡Bienvenido a LexiClash!",
       "description": "Desliza letras en la grilla para formar palabras. ¡Aprendamos lo básico!"
@@ -9197,6 +9219,10 @@ const es = {
     "results": {
       "fullRecap": "Resumen completo",
       "fullRecapSummary": "Tu puesto, tu palabra más rara, tus monedas y a quién ganaste",
+      "trailCount": "{n}/{total} hoy",
+      "heroStreak": "Racha de {n} días",
+      "heroScore": "Puntos",
+      "heroDaily": "Diario",
       "signup": {
         "title": "Mantén tu racha",
         "shortPrompt": "Mantén tu racha",
@@ -9583,8 +9609,9 @@ const es = {
     },
     "streak": {
       "freeze_toast_no_remaining": "Congelación de racha usada: {day} guardado · sin congelaciones"
-    }
-  },
+    },
+"practiceBoard": "Tablero de práctica"
+},
   "dailyWordWheelLanding": {
     "hero": {
       "title": "Rueda de Palabras Diaria",
@@ -9779,8 +9806,14 @@ const es = {
       "wordWheelDetails": "Forma tantas palabras como puedas en 90s. Cada palabra debe usar la letra central.",
       "wordHuntQuest": "Caza de palabras",
       "wordHuntDesc": "Descifra la palabra oculta en 10 intentos"
-    }
-  },
+    },
+"howTo": { "title": "Prueba primero",
+"prompt": "Desliza una palabra que pase por la letra del centro. Prueba {word}",
+"accepted": "¡{word}! Eso es. Ahora juega la rueda de hoy",
+"notWord": "Esa no vale. Prueba {word}",
+"check": "Comprobar"
+}
+},
   "dailyChallenge": {
     "pointsPerWord": "Puntos por palabra"
   },
@@ -19597,8 +19630,9 @@ const es = {
         "gold": "Oro: ¡impecable!",
         "silver": "Plata: ¡casi!",
         "bronze": "Bronce: buen intento"
-      }
-    },
+      },
+"missesLabel": "fallos"
+},
     "community": {
       "title": "Acertijos de la comunidad",
       "suggest": "Sugiere un acertijo",
@@ -19656,8 +19690,9 @@ const es = {
       "won": "¡Pirámide completada!",
       "lost": "La pirámide se derrumbó.",
       "reveal": "La respuesta era",
-      "acceptLoss": "Aceptar derrota"
-    },
+      "acceptLoss": "Aceptar derrota",
+"topWord": "Palabra de arriba: {word}"
+},
     "difficulty": {
       "easy": "Fácil",
       "medium": "Media",
@@ -19778,8 +19813,15 @@ const es = {
       "crossPromoTitle": "Prueba Puente de Palabras",
       "crossPromoBody": "Dos palabras. Un puente. Gratis.",
       "crossPromoCta": "Jugar"
-    }
-  },
+    },
+"tutorial": { "step1": "Una palabra oculta une la de arriba con la de abajo.",
+"step2": "Escríbela. Las casillas te dicen cuántas letras tiene.",
+"step3": "Cada respuesta pone una tabla en tu puente.",
+"tryAgain": "Casi. ¡Prueba otra vez!",
+"showMe": "Muéstramela",
+"start": "Jugar el puente de hoy"
+}
+},
   "mp": {
     "quality": {
       "degraded": "Conexión inestable",

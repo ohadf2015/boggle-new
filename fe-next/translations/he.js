@@ -2524,8 +2524,18 @@ const he = {
     "leaveGo": "לצאת",
     "dailyPlayed": "מגדל היום הסתיים. נתראה מחר.",
     "dailyRank": "אתם במקום #{rank} היום",
-    "recapAlt": "סיכום מגדל: {floors} קומות, {m} מטרים"
-  },
+    "recapAlt": "סיכום מגדל: {floors} קומות, {m} מטרים",
+"dailyResults": { "headline": "קומה {n}!",
+"floors": "קומות",
+"height": "גובה",
+"bestWord": "המילה הכי טובה",
+"chestIncoming": "התיבה בדרך…"
+},
+"guide": { "spell": "החליקו על האותיות האלה",
+"drop": "הקישו כדי להפיל!",
+"done": "קומה ראשונה!"
+}
+},
   "wordTower": {
     "mutator": {
       "todaysTwist": "הטוויסט של היום",
@@ -6264,8 +6274,20 @@ const he = {
         "title": "יוצאים לציד!",
         "sameChallenge": "אותו פאזל לכולם בעולם. השוו ניקוד 🌍",
         "start": "יאללה!"
-      }
-    },
+      },
+"howto": { "boardTitle": "מצאו מילה",
+"boardHint": "גררו את האצבע על האותיות הזוהרות:",
+"tryAgain": "כמעט. עקבו אחרי הזוהר כדי ליצור {word}.",
+"hiddenLabel": "המילה הנסתרת",
+"feedbackTitle": "כל מילה נותנת רמזים",
+"feedbackBody": "כל אות נצבעת ומראה איך היא מתאימה למילה הנסתרת.",
+"next": "הבא",
+"goalTitle": "פצחו את המילה הנסתרת",
+"goalLife": "נחשו אותה לפני שנגמרים החיים.",
+"goalClues": "מילים שתמצאו על הלוח חושפות אותיות רמז.",
+"play": "יאללה, משחקים"
+}
+},
     "welcome": {
       "title": "ברוכים הבאים ל-LexiClash!",
       "description": "החליקו על אותיות בלוח כדי ליצור מילים. בואו נלמד את הבסיס."
@@ -9188,6 +9210,10 @@ const he = {
     "results": {
       "fullRecap": "הסיכום המלא",
       "fullRecapSummary": "הדירוג, המילה הנדירה שמצאת, המטבעות ואת מי ניצחת",
+      "trailCount": "{n}/{total} היום",
+      "heroStreak": "רצף של {n} ימים",
+      "heroScore": "ניקוד",
+      "heroDaily": "יומי",
       "signup": {
         "title": "שמרו על הרצף שלכם",
         "shortPrompt": "שמרו על הרצף שלכם",
@@ -9551,8 +9577,9 @@ const he = {
     },
     "streak": {
       "freeze_toast_no_remaining": "הקפאת הרצף הופעלה, {day} נשמר · אין עוד הקפאות"
-    }
-  },
+    },
+"practiceBoard": "לוח אימון"
+},
   "dailyWordWheelLanding": {
     "hero": {
       "title": "גלגל מילים יומי",
@@ -9747,8 +9774,14 @@ const he = {
       "wordWheelDetails": "כמה שיותר מילים ב־90 שניות. כל מילה חייבת להכיל את האות המרכזית.",
       "wordHuntQuest": "ציד מילים",
       "wordHuntDesc": "פצחו את המילה הנסתרת ב-10 ניסיונות"
-    }
-  },
+    },
+"howTo": { "title": "קודם ניסיון קטן",
+"prompt": "החליקו מילה שעוברת דרך האות שבאמצע. נסו {word}",
+"accepted": "{word}! בדיוק ככה. עכשיו לגלגל של היום",
+"notWord": "זו לא מילה. נסו {word}",
+"check": "בדיקה"
+}
+},
   "dailyChallenge": {
     "pointsPerWord": "נקודות למילה"
   },
@@ -18997,8 +19030,9 @@ const he = {
         "gold": "זהב: מושלם!",
         "silver": "כסף: כמעט!",
         "bronze": "ארד: כל הכבוד"
-      }
-    },
+      },
+"missesLabel": "פספוסים"
+},
     "community": {
       "title": "חידות הקהילה",
       "suggest": "הציעו חידה",
@@ -19056,8 +19090,9 @@ const he = {
       "won": "פירמידה הושלמה!",
       "lost": "הפירמידה נפלה.",
       "reveal": "התשובה הייתה",
-      "acceptLoss": "מקבלים הפסד"
-    },
+      "acceptLoss": "מקבלים הפסד",
+"topWord": "המילה העליונה: {word}"
+},
     "difficulty": {
       "easy": "קל",
       "medium": "בינוני",
@@ -19178,8 +19213,15 @@ const he = {
       "crossPromoTitle": "נסו ראש זנב",
       "crossPromoBody": "שתי מילים, גשר אחד. חינם.",
       "crossPromoCta": "שחקו"
-    }
-  },
+    },
+"tutorial": { "step1": "מילה נסתרת אחת מחברת בין המילה למעלה למילה למטה.",
+"step2": "הקלידו אותה. המשבצות מראות כמה אותיות יש בה.",
+"step3": "כל תשובה מוסיפה קרש לגשר שלכם.",
+"tryAgain": "כמעט. נסו שוב!",
+"showMe": "תראו לי",
+"start": "לגשר של היום"
+}
+},
   "wheel": {
     "rush": {
       "loading": "טוען...",

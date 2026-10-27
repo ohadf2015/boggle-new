@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useExperiment } from '@/hooks/useExperiment';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useGameRewards } from '@/hooks/useGameRewards';
-import { wordHuntSolveTier, type WordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
+import { wordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
 import type { WordHuntEffect } from '../WordHuntEffectsCanvas';
 import type { SurvivalGameState } from './useSurvivalGameLogic';
 
@@ -15,10 +15,8 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean)
     useExperiment('exp-wordhunt-clue-shake-v1');
   const [shakingClues, setShakingClues] = useState(false);
   const { rewardId, triggerReward } = useGameRewards();
-  const [showTargetConfetti, setShowTargetConfetti] = useState(false);
-  const [solveTier, setSolveTier] = useState<WordHuntSolveTier | null>(null);
   const [flashTrigger, setFlashTrigger] = useState(0);
-  const [flashColor, setFlashColor] = useState('bg-green-400/15');
+  const [flashColor, setFlashColor] = useState('bg-neo-lime/15');
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
@@ -27,10 +25,6 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean)
     setPixiEffects((prev) => [...prev, effect]);
   }, []);
   const handleEffectsConsumed = useCallback(() => setPixiEffects([]), []);
-  const clearTargetConfetti = useCallback(() => {
-    setShowTargetConfetti(false);
-    setSolveTier(null);
-  }, []);
 
   useEffect(() => {
     if (skipAnimations) return;
@@ -57,15 +51,13 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean)
     if (type === 'valid-word') {
       if (skipAnimations) return;
       triggerReward('wordFound');
-      setFlashColor('bg-green-400/15');
+      setFlashColor('bg-neo-lime/15');
       setFlashTrigger((n) => n + 1);
       pushEffect({ type: 'wordValid', x: cx, y: cy, points: state.lastScoreIncrement ?? 1 });
     } else if (type === 'target-found') {
       if (skipAnimations) return;
       const tier = wordHuntSolveTier(state.attempts.filter((a) => !a.isDiscovery).length);
-      setSolveTier(tier);
       triggerReward('levelUp');
-      setShowTargetConfetti(true);
       setFlashColor(tier.tier <= 1 ? 'bg-neo-yellow/30' : 'bg-neo-lime/20');
       setFlashTrigger((n) => n + 1);
       pushEffect({ type: 'targetFound', x: cx, y: cy });
@@ -144,9 +136,6 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean)
     handleEffectsConsumed,
     flashTrigger,
     flashColor,
-    showTargetConfetti,
-    solveTier,
-    clearTargetConfetti,
     rewardId,
     shakingClues,
   };

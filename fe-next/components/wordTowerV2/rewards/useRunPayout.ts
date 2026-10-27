@@ -55,6 +55,8 @@ interface Args {
 export interface PayoutStatus {
   status: 'idle' | 'pending' | 'paid' | 'none';
   coins: number;
+  /** The chest the server rolled, once paid. */
+  chest?: ChestRoll;
 }
 
 export function useRunPayout({ over, ready, getSummary, reportRun }: Args): {
@@ -104,7 +106,7 @@ export function useRunPayout({ over, ready, getSummary, reportRun }: Args): {
       .then((res) => {
         if (res) {
           setPayout({ coins: res.coins, chest: res.chest, summary });
-          setPayoutStatus({ status: 'paid', coins: res.coins });
+          setPayoutStatus({ status: 'paid', coins: res.coins, chest: res.chest });
         } else {
           setPayout(null);
           setPayoutStatus({ status: 'none', coins: 0 });

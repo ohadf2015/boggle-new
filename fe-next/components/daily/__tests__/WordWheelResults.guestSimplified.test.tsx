@@ -81,7 +81,7 @@ const renderResults = (isAuthenticated: boolean) =>
 describe('WordWheelResults — guest simplification', () => {
   it('keeps score stat and leaderboard for a guest', () => {
     renderResults(false);
-    expect(screen.getByTestId('word-wheel-words-stat')).toBeInTheDocument();
+    expect(screen.getAllByTestId('daily-results-stat')[0].textContent).toContain('wordWheel.results.wordsFound');
     expect(screen.getByTestId('leaderboard-stub')).toBeInTheDocument();
   });
 

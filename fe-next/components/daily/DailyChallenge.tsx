@@ -28,37 +28,28 @@ import {
   getSecondsUntilNextDaily,
   hasPlayedWordHuntToday,
   getTodaysWordHuntResult,
-  saveWordHuntResult,
   getGuestFingerprint,
   mapServerResultToStoredResult,
-  getWordHuntResultKey,
   markWordHuntForfeitToday,
-  hasWordHuntForfeitToday,
   clearWordHuntForfeitToday,
   hasEverPlayedWordHunt,
-  type WordHuntResult,
   type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
 import { neoErrorToast } from '@/components/NeoToast';
-import { trackDailyPuzzle, trackFeatureFirstUse, trackGrowthEvent } from '@/utils/growthTracking';
-import {
-  buildDailyWordHuntCompletePayload,
-  type WordHuntRescueMethod,
-} from './analytics/wordHuntCompletePayload';
+import { trackDailyPuzzle, trackFeatureFirstUse } from '@/utils/growthTracking';
+import { useWordHuntCompletion } from './survival/useWordHuntCompletion';
+import { useWordHuntPuzzleInit } from './survival/useWordHuntPuzzleInit';
+import { COACH_VERSION, hasSeenCoach, markCoachSeen } from '@/lib/tutorial/modeCoachStore';
 import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
 import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge/catchUp';
-import { isUsableDailyPuzzle } from '@/utils/dailyChallenge/puzzlePayload';
 import { useRetryChallenge } from './useRetryChallenge';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeBadge from '@/components/practice/PracticeBadge';
 import { useNetworkState } from '@/hooks/useNetworkState';
-import { getOfflineStore } from '@/lib/offline';
-import { getCachedDailyPuzzle } from '@/lib/offline/prefetchDaily';
 import { usePrefetchDailyContent } from '@/hooks/usePrefetchDailyContent';
 import DailyOfflineFallback from '@/components/offline/DailyOfflineFallback';
 import type { LetterGrid, Language } from '@/types';
 import SessionRevealHost from '@/components/avatar/reveal/SessionRevealHost';
-import { levelUpFromRecordGame, publishLevelUp } from '@/lib/avatar/revealTrigger';
 
 export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played' | 'offline-miss';
 
@@ -155,8 +146,6 @@ const DailyChallenge: React.FC = () => {
 
 
   // Track previous values for smarter re-initialization
-  const prevGameLanguageRef = useRef<Language | null>(null);
-  const prevWasResetRef = useRef<boolean>(false);
   const gameStartedAtRef = useRef<number>(0);
   // One rewarded ad unlocks one catch-up date; reset when the date changes so
   // each missed day is its own watch (and today's daily is never gated).
@@ -165,123 +154,10 @@ const DailyChallenge: React.FC = () => {
     catchupAdUnlockedRef.current = false;
   }, [catchupDate]);
 
-  // Initialize Word Hunt daily challenge
-  useEffect(() => {
-    let isMounted = true;
-
-    const languageChanged = prevGameLanguageRef.current !== null && prevGameLanguageRef.current !== gameLanguage;
-    const wasJustReset = wasReset && !prevWasResetRef.current;
-    const needsFullReload = languageChanged || wasJustReset || prevGameLanguageRef.current === null;
-
-    prevGameLanguageRef.current = gameLanguage;
-    prevWasResetRef.current = wasReset;
-
-    if (needsFullReload) setPhase('loading');
-
-    const initializePuzzle = async () => {
-      const date = catchupDate || getDailyChallengeDate();
-      const number = getPuzzleNumber(date);
-      if (!isMounted) return;
-      setPuzzleDate(date);
-      setPuzzleNumber(number);
-
-      // Mid-game forfeit today (no saved result) → gate re-entry behind a
-      // rewarded ad on native. Skipped for practice + post-retry replays.
-      setForfeitedToday(!isPractice && !wasJustReset && hasWordHuntForfeitToday(gameLanguage));
-
-      // Practice mode: bypass already-played gates so the player can replay safely.
-      // Catch-up skips the today-only local cache (it's keyed to today) but still
-      // runs the server check below, which gates by the catch-up `date`.
-      if (!wasJustReset && !isPractice) {
-        const localResult = isCatchup ? null : getTodaysWordHuntResult(gameLanguage);
-        if (localResult) {
-          if (!isMounted) return;
-          setStoredResult(localResult);
-          setPhase('already-played');
-          return;
-        }
-
-        try {
-          const fp = await getGuestFingerprint();
-          const checkParams = new URLSearchParams();
-          if (isAuthenticated && profile) checkParams.set('playerId', profile.id);
-          else if (fp) checkParams.set('guestFingerprint', fp);
-
-          if (checkParams.toString()) {
-            const checkResponse = await fetch(
-              `/api/daily-challenge/word-hunt/check-played/${date}/${gameLanguage}?${checkParams.toString()}`
-            );
-            if (!isMounted) return;
-            if (checkResponse.ok) {
-              const checkData = await checkResponse.json();
-              if (checkData.hasPlayed && checkData.result) {
-                const serverResult = mapServerResultToStoredResult(
-                  checkData.result, date, number, gameLanguage, checkData.streak?.currentStreak || 0
-                );
-                if (typeof window !== 'undefined') {
-                  const storageKey = getWordHuntResultKey(gameLanguage, date);
-                  localStorage.setItem(storageKey, JSON.stringify(serverResult));
-                }
-                setStoredResult(serverResult);
-                setPhase('already-played');
-                return;
-              }
-            }
-          }
-        } catch (checkError) {
-          console.warn('Failed to check server for existing attempt:', checkError);
-        }
-      }
-
-      if (!online) {
-        const store = await getOfflineStore();
-        const cached = await getCachedDailyPuzzle<{ grid: LetterGrid; targetWord: string; meaning?: string | null }>(
-          store, date, gameLanguage, 'wordhunt',
-        );
-        if (cached && isMounted) {
-          setGrid(cached.grid);
-          setTargetWord(cached.targetWord);
-          setMeaning(cached.meaning ?? null);
-          setPhase('ready');
-          return;
-        }
-        if (isMounted) setPhase('offline-miss');
-        return;
-      }
-
-      try {
-        const response = await fetch(`/api/daily-challenge/puzzle/${date}/${gameLanguage}`);
-        if (!isMounted) return;
-        const puzzleData = response.ok ? await response.json().catch(() => null) : null;
-        if (!isMounted) return;
-        if (isUsableDailyPuzzle(puzzleData)) {
-          setGrid(puzzleData.grid);
-          setTargetWord(puzzleData.targetWord);
-          setMeaning(puzzleData.meaning ?? null);
-        } else {
-          // ok-but-empty body, non-ok status, or unparseable JSON → generate locally
-          const puzzle = generateDailyPuzzle(date, gameLanguage);
-          if (!isMounted) return;
-          setGrid(puzzle.grid);
-          setTargetWord(puzzle.targetWord);
-          setMeaning(null);
-        }
-      } catch {
-        if (!isMounted) return;
-        const puzzle = generateDailyPuzzle(date, gameLanguage);
-        setGrid(puzzle.grid);
-        setTargetWord(puzzle.targetWord);
-        setMeaning(null);
-      }
-
-      if (!isMounted) return;
-      setPhase('ready');
-    };
-
-    initializePuzzle();
-    return () => { isMounted = false; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameLanguage, wasReset, isAuthenticated, profile?.id, catchupDate]);
+  useWordHuntPuzzleInit({
+    gameLanguage, wasReset, isAuthenticated, profileId: profile?.id ?? null, catchupDate, isPractice, online,
+    setPhase, setPuzzleDate, setPuzzleNumber, setForfeitedToday, setStoredResult, setGrid, setTargetWord, setMeaning,
+  });
 
   // Safety net: the only render branch for `playing` requires both grid AND
   // targetWord; entering `playing` without them renders nothing (blank screen).
@@ -465,121 +341,24 @@ const DailyChallenge: React.FC = () => {
     handleStartGame();
   }, [phase, isPractice, isCatchup, challengeData, puzzleNumber, gameLanguage, handleStartGame]);
 
-  // Handle game completion
-  const handleGameComplete = useCallback((result: SurvivalGameResult, rescueMethod?: WordHuntRescueMethod) => {
-    // Practice mode: skip all persistence (no streak, no leaderboard, no analytics).
-    // Show transient results only and let player replay freely.
-    if (isPractice) {
-      setGameResult(result);
-      setPhase('completed');
-      return;
-    }
-    const wordHuntResult: WordHuntResult = {
-      puzzleNumber,
-      puzzleDate,
-      language: gameLanguage,
-      isCatchup,
-      solved: result.solved,
-      attemptsUsed: result.attemptsUsed,
-      targetWord: result.targetWord,
-      meaning: meaning ?? null,
-      attempts: result.attempts,
-      wordsDiscovered: result.wordsDiscovered,
-      lifeRemaining: result.lifeRemaining,
-      clueTokensEarned: result.clueTokensEarned,
-      clueTokensSpent: result.clueTokensSpent,
-      hintsUnlocked: result.hintsUnlocked,
-      efficiencyScore: result.efficiencyScore,
-      extraTries,
-      streakDays: 0,
-      completedAt: new Date().toISOString(),
-    };
+  const showResults = useCallback(() => setPhase('completed'), []);
+  const handleGameComplete = useWordHuntCompletion({
+    isPractice, isCatchup, puzzleNumber, puzzleDate, gameLanguage, meaning, extraTries, isAuthenticated,
+    gameStartedAtRef, recordStreak, showInterstitial, setGameResult, setStoredResult, onShowResults: showResults, t,
+  });
 
-    const updatedStreak = saveWordHuntResult(wordHuntResult, isAuthenticated);
-    wordHuntResult.streakDays = updatedStreak.currentStreak;
+  // First visit: the interactive how-to-play opens once and replaces the in-game coach card.
+  const [onboardedThisVisit, setOnboardedThisVisit] = useState(false);
+  useEffect(() => {
+    if (phase !== 'ready' || onboardedThisVisit || hasEverPlayedWordHunt(gameLanguage)) return;
+    const storage = typeof window !== 'undefined' ? window.localStorage : null;
+    if (!storage || hasSeenCoach('wordHunt', COACH_VERSION, storage)) return;
+    markCoachSeen('wordHunt', COACH_VERSION, storage);
+    setOnboardedThisVisit(true);
+    setShowTutorial(true);
+  }, [phase, onboardedThisVisit, gameLanguage]);
 
-    // Record to universal play streak (tracks consecutive days across all game modes)
-    recordStreak();
-
-    trackDailyPuzzle('completed', 'word_hunt', {
-      solved: result.solved,
-      attempts: result.attemptsUsed,
-    });
-
-    // First-class daily-challenge funnel event (was registered with 0 call sites).
-    // Distinct from daily_puzzle_completed: it's the mode-agnostic "the daily was
-    // finished" signal the retention funnel is built on. Fires once per real
-    // completion — never in practice (early-returned above).
-    trackGrowthEvent('daily_challenge_completed', {
-      puzzleNumber,
-      language: gameLanguage,
-      isCatchup,
-      solved: result.solved,
-      attemptsUsed: result.attemptsUsed,
-    });
-
-    trackGrowthEvent('daily_word_hunt_complete', {
-      ...buildDailyWordHuntCompletePayload({
-        result,
-        puzzleNumber,
-        language: gameLanguage,
-        startedAt: gameStartedAtRef.current,
-        completedAt: Date.now(),
-        rescueMethod: rescueMethod ?? null,
-      }),
-    });
-
-    setGameResult(result);
-    setStoredResult({
-      date: puzzleDate,
-      puzzleNumber,
-      result: wordHuntResult,
-      completedAt: new Date().toISOString(),
-    });
-    // Ad sits between the game and the results; catch-up days already paid with a rewarded ad.
-    const adGate = isCatchup ? Promise.resolve() : showInterstitial(`word-hunt-complete-${extraTries}`);
-    adGate.catch(() => {}).finally(() => setPhase('completed'));
-
-    // Update weekly quest progress for daily challenge completion
-    if (isAuthenticated && result.solved) {
-      fetch('/api/stats/record-game', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          score: result.efficiencyScore ?? 0,
-          wordCount: result.wordsDiscovered?.length ?? 0,
-          longWordsFound: result.wordsDiscovered?.filter(w => (w.word?.length ?? 0) >= 6).length ?? 0,
-          mode: 'daily-challenge',
-          isDailyChallenge: true,
-        }),
-      })
-        .then(r => r.json())
-        .then(data => {
-          // Level-up → avatar unlock reveal (in memory; SessionRevealHost shows it).
-          publishLevelUp(levelUpFromRecordGame(data));
-          if (data.questUpdate?.completed) {
-            import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
-              showQuestCompletionToast({
-                questName: t(data.questUpdate.description),
-                xpReward: data.questUpdate.xpReward,
-                dedupKey: `weekly:${data.questUpdate.questType ?? data.questUpdate.description}`,
-                t,
-              });
-            });
-          }
-        })
-        .catch(() => { /* non-critical */ });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable from LanguageContext
-}, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak, isPractice, isCatchup, showInterstitial, extraTries]);
-
-  const handleTutorialComplete = useCallback(() => {
-    setShowTutorial(false);
-  }, []);
-
-  const handleTutorialSkip = useCallback(() => {
-    setShowTutorial(false);
-  }, []);
+  const closeTutorial = useCallback(() => setShowTutorial(false), []);
   const handleShowTutorial = useCallback(() => setShowTutorial(true), []);
   // Client-side nav (no hard reload) — a hard nav while the game-active
   // beforeunload guard is armed can blank a Capacitor WebView (black screen).
@@ -604,6 +383,12 @@ const DailyChallenge: React.FC = () => {
           empty band at the top (the header is hidden during play anyway). */}
       <AutoHideHeader collapseSpacerWhenHidden />
       <SessionRevealHost />
+
+      {phase === 'playing' && isPractice && (
+        <div className="absolute top-3 end-3 z-30 pointer-events-none">
+          <PracticeBadge />
+        </div>
+      )}
 
       <AnimatePresence mode="wait">
         {phase === 'loading' && (
@@ -631,12 +416,6 @@ const DailyChallenge: React.FC = () => {
           />
         )}
 
-        {phase === 'playing' && isPractice && (
-          <div className="absolute top-3 right-3 z-30 pointer-events-none">
-            <PracticeBadge />
-          </div>
-        )}
-
         {phase === 'playing' && grid && targetWord && (
           <DailyWordHuntSurvival
             key="playing"
@@ -650,6 +429,7 @@ const DailyChallenge: React.FC = () => {
             currentPlayerId={isAuthenticated && profile ? profile.id : null}
             currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
             practice={isPractice}
+            hideModeCoach={onboardedThisVisit}
           />
         )}
 
@@ -675,7 +455,7 @@ const DailyChallenge: React.FC = () => {
       </AnimatePresence>
 
       {showTutorial && (
-        <DailyChallengeTutorial onComplete={handleTutorialComplete} onSkip={handleTutorialSkip} />
+        <DailyChallengeTutorial onComplete={closeTutorial} onSkip={closeTutorial} />
       )}
     </div>
   );

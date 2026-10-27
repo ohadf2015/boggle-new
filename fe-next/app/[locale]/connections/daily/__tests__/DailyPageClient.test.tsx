@@ -39,6 +39,7 @@ describe('DailyPageClient variant host', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     cleanup();
+    localStorage.setItem('lc:connections-daily-tutorial-seen', '1');
   });
 
   it('renders the regular 5-riddle challenge on regular days', () => {

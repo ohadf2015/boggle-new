@@ -12,6 +12,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ConnectionsDailyChallenge from '../ConnectionsDailyChallenge';
 import { DAILY_ATTEMPTS_PER_PUZZLE, DAILY_PUZZLE_COUNT } from '@/lib/connections/daily';
 
+vi.mock('@/hooks/useDailyPlayedStatus', () => ({
+  useDailyPlayedStatus: () => ({ today: { wordHunt: false, wordWheel: false, wordTower: false, connections: true }, streak: { current: 2, longest: 2 } }),
+}));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
 }));

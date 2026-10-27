@@ -6,6 +6,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { useSurvivalGameLogic } from '../useSurvivalGameLogic';
+import { LOSS_REVEAL_MS } from '../constants';
 import * as MusicContextModule from '@/contexts/MusicContext';
 import * as GameMusicModule from '@/hooks/useGameMusic';
 
@@ -74,6 +75,7 @@ describe('useSurvivalGameLogic - extra life', () => {
 
     rerender({ defer: false });
     act(() => { vi.advanceTimersByTime(0); });
+    act(() => { vi.advanceTimersByTime(LOSS_REVEAL_MS); });
 
     expect(onComplete).toHaveBeenCalledTimes(1);
     expect(onComplete.mock.calls[0][0]).toMatchObject({ solved: false });
@@ -100,6 +102,7 @@ describe('useSurvivalGameLogic - extra life', () => {
     );
 
     act(() => { vi.advanceTimersByTime(100_000); });
+    act(() => { vi.advanceTimersByTime(LOSS_REVEAL_MS); });
 
     expect(result.current[0].isGameOver).toBe(true);
     expect(result.current[0].hasWon).toBe(false);

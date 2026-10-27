@@ -6,10 +6,8 @@ import { Pyramid as PyramidIcon, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
-import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import {
   initGameState,
   applyGuess,
@@ -44,7 +42,8 @@ import DailyHeader from './DailyHeader';
 import ProgressCard from './ProgressCard';
 import { useBridgeProgress } from './useBridgeProgress';
 import PuzzleCard from './PuzzleCard';
-import ConnectionsDailyResults from './ConnectionsDailyResults';
+import RegularDailyResults, { regularTier } from './RegularDailyResults';
+import BridgeFinishBeat, { useFinishBeat } from './BridgeFinishBeat';
 
 type Action =
   | { type: 'SET_INPUT'; input: string }
@@ -206,20 +205,16 @@ function RestoredDailyResults({
 
   return (
     <>
-      <ConnectionsDailyResults
+      <RegularDailyResults
         score={result.score}
         solvedCount={result.solvedCount}
-        total={puzzles.length}
-        streak={result.streak}
-        rank={board.rank}
-        totalPlayers={board.totalPlayers}
         outcomes={result.outcomes}
         puzzles={puzzles}
-        leaderboardRows={board.rows}
-        isLoading={board.loading}
-        shareText={buildShareText(t, today, result.outcomes, result.streak, board.rank)}
         dateISO={today}
+        celebrate={false}
+        shareText={buildShareText(t, today, result.outcomes, result.streak, board.rank)}
         progressSlot={<ProgressCard api={progressApi} todayISO={today} />}
+        board={board}
       />
       <PyramidLink />
     </>
@@ -229,7 +224,6 @@ function RestoredDailyResults({
 function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => void }) {
   const { t, language } = useLanguage();
   const { user, profile, isAdmin } = useAuth();
-  const prefersReducedMotion = useReducedMotion();
   const { haptic, customHaptic } = useHapticFeedback();
   const sfx = useSoundEffects();
 
@@ -255,6 +249,7 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
 
   const isTerminal = state.status === 'finished' || state.status === 'outOfLives';
   const solvedCount = solvedRef.current.size;
+  const beat = useFinishBeat(isTerminal);
 
   // Stamp the start time once mounted (kept out of render for purity).
   useEffect(() => {
@@ -368,10 +363,7 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
         puzzleIds: state.puzzles.map((p) => p.id),
       } satisfies StoredRegularResult);
     persist(0, null);
-    if (puzzlesSolved > 0) {
-      sfx.playVictorySound();
-      if (!prefersReducedMotion) fireVictoryConfetti();
-    }
+    if (puzzlesSolved > 0) sfx.playVictorySound();
     trackDailyCompleted({
       locale: language,
       solved: puzzlesSolved,
@@ -407,7 +399,7 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
         rows: lb?.leaderboard ?? [],
       });
     })();
-  }, [isTerminal, prefersReducedMotion, profile, user, today, language, state.score, state.puzzles, total, sfx, t, collectOutcomes, onDayPlayed]);
+  }, [isTerminal, profile, user, today, language, state.score, state.puzzles, total, sfx, t, collectOutcomes, onDayPlayed]);
 
   const handleInput = useCallback((value: string) => dispatch({ type: 'SET_INPUT', input: value }), []);
   const handleSubmit = useCallback(() => dispatch({ type: 'SUBMIT' }), []);
@@ -432,24 +424,35 @@ function DailyRun({ today, onTerminal }: { today: string; onTerminal?: () => voi
     trackDailyShared({ locale: language, solved: outcomes.filter((o) => o.solved).length, total });
   }, [collectOutcomes, language, total]);
 
+  if (isTerminal && beat.showing) {
+    return (
+      <BridgeFinishBeat
+        planks={state.puzzles.map((p, i) => ({ word: p.bridge, solved: solvedRef.current.has(i) }))}
+        headline={t(regularTier(state.score, solvedCount, total).key)}
+        onDone={beat.done}
+      />
+    );
+  }
+
   if (isTerminal) {
     return (
       <>
-        <ConnectionsDailyResults
+        <RegularDailyResults
           score={state.score}
           solvedCount={solvedCount}
-          total={total}
-          streak={results?.streak ?? 0}
-          rank={results?.rank ?? null}
-          totalPlayers={results?.totalPlayers ?? 0}
           outcomes={collectOutcomes()}
           puzzles={state.puzzles}
-          leaderboardRows={results?.rows ?? []}
-          isLoading={results?.loading ?? true}
-          shareText={shareTextFor()}
           dateISO={today}
+          celebrate
+          shareText={shareTextFor()}
           onShareClick={handleShareClick}
           progressSlot={<ProgressCard api={progressApi} todayISO={today} />}
+          board={{
+            rows: results?.rows ?? [],
+            rank: results?.rank ?? null,
+            totalPlayers: results?.totalPlayers ?? 0,
+            loading: results?.loading ?? true,
+          }}
         />
 
         <PyramidLink />

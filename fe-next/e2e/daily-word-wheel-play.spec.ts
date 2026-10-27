@@ -186,9 +186,11 @@ test.describe('Daily Word Wheel — phone', () => {
   test('ending the run lands on the rank hero with share', async ({ page }) => {
     await startPractice(page);
     await page.getByRole('button', { name: /^end run$/i }).click({ force: true });
-    await expect(page.getByTestId('word-wheel-results-hero')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByTestId('results-rank-name')).toBeVisible();
-    await expect(page.getByTestId('word-wheel-words-stat')).toBeVisible();
+    const hero = page.getByTestId('daily-results-hero');
+    await expect(hero).toBeVisible({ timeout: 15000 });
+    await expect(hero).toHaveAttribute('data-mode', 'word-wheel');
+    await expect(page.getByTestId('wheel-rank-meter')).toBeVisible();
+    await expect(page.getByTestId('daily-results-stat').first()).toBeVisible();
   });
 });
 

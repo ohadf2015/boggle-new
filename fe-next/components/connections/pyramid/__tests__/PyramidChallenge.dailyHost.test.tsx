@@ -10,6 +10,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import PyramidChallenge from '../PyramidChallenge';
 import { dailyResultKey } from '@/lib/connections/dailyResultStore';
 
+vi.mock('@/hooks/useDailyPlayedStatus', () => ({
+  useDailyPlayedStatus: () => ({ today: { wordHunt: false, wordWheel: false, wordTower: false, connections: true }, streak: { current: 2, longest: 2 } }),
+}));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
 }));
@@ -24,7 +27,8 @@ vi.mock('@/hooks/useHapticFeedback', () => ({
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({ playMatchFoundSound: vi.fn(), playErrorSound: vi.fn(), playVictorySound: vi.fn() }),
 }));
-vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn() }));
+const confetti = vi.hoisted(() => ({ fireVictoryConfetti: vi.fn(), fireConfetti: vi.fn() }));
+vi.mock('@/utils/confettiUtils', () => confetti);
 vi.mock('@/hooks/useRewardedFeatureUnlock', () => ({
   useRewardedFeatureUnlock: () => ({ canShowAd: false, status: 'idle', offer: vi.fn() }),
 }));
@@ -83,6 +87,20 @@ describe('PyramidChallenge as the daily host', () => {
   beforeEach(() => {
     window.localStorage.clear();
     nextQuest.mockClear();
+    // The results hero reads reduced motion from matchMedia, not the mocked hook.
+    window.matchMedia = vi.fn().mockImplementation((q: string) => ({
+      matches: q.includes('reduce'), media: q, addEventListener: vi.fn(), removeEventListener: vi.fn(),
+    })) as unknown as typeof window.matchMedia;
+  });
+
+  it('given a finished daily pyramid, then the shared daily hero leads the end screen and the game fires no confetti of its own', () => {
+    render(<PyramidChallenge sharePath={SHARE} />);
+    winPyramid();
+    const hero = screen.getByTestId('daily-results-hero');
+    expect(hero.getAttribute('data-mode')).toBe('connections');
+    expect(hero.getAttribute('data-outcome')).toBe('win');
+    expect(screen.queryByTestId('pyramid-streak-chip')).toBeNull();
+    expect(confetti.fireVictoryConfetti).not.toHaveBeenCalled();
   });
 
   it('given a finished daily pyramid, then the end screen offers the next daily quest, not a link back to this page', () => {
@@ -95,10 +113,11 @@ describe('PyramidChallenge as the daily host', () => {
     expect(screen.queryByTestId('pyramid-back-to-daily')).toBeNull();
   });
 
-  it('given the standalone pyramid route, then the end screen keeps its hub link', () => {
+  it('given the standalone pyramid route, then the end screen keeps its hub link and no daily hero', () => {
     render(<PyramidChallenge />);
     winPyramid();
     expect(screen.getByTestId('pyramid-back-to-daily')).toBeTruthy();
+    expect(screen.queryByTestId('daily-results-hero')).toBeNull();
     expect(screen.queryByTestId('next-quest-cta')).toBeNull();
   });
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { CoachDemo } from './CoachDemo';
 import type { CoachDemoType } from '@/lib/tutorial/modeCoachContent';
@@ -34,11 +34,29 @@ const ALL_DEMOS: CoachDemoType[] = [
   'stack',
   'connectGroup',
   'chain',
+  'towerDrop',
 ];
 
 describe('CoachDemo', () => {
   it.each(ALL_DEMOS)('renders the "%s" demo without throwing', (demo) => {
     const { container } = render(<CoachDemo demo={demo} accent="purple" emoji="🎯" />);
     expect(container.firstChild).not.toBeNull();
+  });
+});
+
+describe('CoachDemo stack (word tower)', () => {
+  it('given the stack demo, when rendered, then it shows real letters being spelled and the word slab on a tower', () => {
+    render(<CoachDemo demo="stack" accent="cyan" />);
+    const letters = screen.getAllByTestId('coach-stack-letter').map((el) => el.getAttribute('data-letter'));
+    expect(letters.join('')).toBe('TOP');
+    expect(screen.getByTestId('coach-stack-slab').textContent).toBe('TOP');
+    expect(screen.getAllByTestId('coach-stack-floor').length).toBeGreaterThanOrEqual(2);
+    for (const floor of screen.getAllByTestId('coach-stack-floor')) expect(floor.textContent).not.toBe('');
+  });
+
+  it('given the drop demo, when rendered, then a slab hangs over a tower', () => {
+    render(<CoachDemo demo="towerDrop" accent="cyan" />);
+    expect(screen.getByTestId('coach-drop-slab')).toBeTruthy();
+    expect(screen.getAllByTestId('coach-stack-floor').length).toBeGreaterThanOrEqual(2);
   });
 });
