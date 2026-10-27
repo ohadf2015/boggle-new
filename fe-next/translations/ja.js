@@ -14959,6 +14959,12 @@ const ja = {
       "quickSelect": "クイック選択",
       "today": "今日",
       "tomorrow": "明日",
+      "goals": {
+        "longWord": "5文字の単語を出す",
+        "claim": "8マス以上を獲得",
+        "win": "ボードに勝つ",
+        "title": "今日のミッション"
+      },
       "nextWeek": "来週",
       "nextMonth": "来月",
       "customDate": "カスタム日付",

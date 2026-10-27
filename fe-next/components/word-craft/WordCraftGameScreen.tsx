@@ -27,6 +27,7 @@ import { WordCraftTutor } from '@/components/word-craft/WordCraftTutor';
 import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
 import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
 import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion';
+import { evaluateDailyGoals } from '@/lib/word-craft/dailyGoals';
 import { summarizeGame } from '@/lib/word-craft/gameHighlights';
 import { useWordCraftBoardEffects } from '@/components/word-craft/hooks/useWordCraftBoardEffects';
 import { useWordCraftMoveFeedback, type ScoreFloatState, type CelebrationState } from '@/components/word-craft/hooks/useWordCraftMoveFeedback';
@@ -1051,6 +1052,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
           challengeIntent={challengeIntent}
           highlights={highlights}
           dailyResult={dailyResult}
+          dailyGoals={dailyResult ? evaluateDailyGoals({ highlights, playerCells: playerTerritory, botCells: botTerritory }) : undefined}
           onPlayAgain={() => game.reset(Math.floor(Math.random() * 1_000_000))}
           onHome={exit}
         />
