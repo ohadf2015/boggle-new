@@ -1,6 +1,6 @@
 {
-  "title": "ESL Word Games para el aula — en vivo | LexiClash",
-  "description": "ESL word games para toda la clase: código al móvil, tablero en el proyector, sin cuentas ni descargas. Nivel por alumno y 6 idiomas.",
+  "title": "Juegos de palabras en inglés para el aula | LexiClash",
+  "description": "Juegos de vocabulario en inglés para toda la clase: los alumnos entran con un código desde el móvil, sin cuenta, y el tablero va al proyector. Gratis.",
   "keywords": "esl word games online, esl word games free, free esl games online, esl vocabulary games, english word games for esl students, free esl games for english learners, efl word games, esl spelling games, vocabulary games for english learners, juegos en ingles, juegos de ingles gratis, juegos para aprender ingles, juegos interactivos en ingles, juegos de palabras en ingles, juegos de vocabulario en ingles, juego de vocabulario en ingles, vocabulario en ingles juegos, juegos para aprender vocabulario en ingles",
   "robots": {
     "index": true,
@@ -33,8 +33,8 @@
     "es-CO": "https://www.lexiclash.live/es/education/esl-word-games",
     "ru-RU": "https://www.lexiclash.live/ru/education/esl-word-games"
   },
-  "ogTitle": "ESL Word Games para el aula",
-  "ogDescription": "ESL word games para toda la clase: código al móvil, tablero en el proyector, nivel por alumno. Gratis, sin cuentas.",
+  "ogTitle": "Juegos de palabras en inglés para el aula",
+  "ogDescription": "Juegos de vocabulario en inglés para toda la clase: código al móvil, tablero en el proyector, nivel por alumno. Gratis.",
   "ogLocale": "es_ES",
   "ogType": "website",
   "ogUrl": "https://www.lexiclash.live/es/education/esl-word-games",
@@ -43,12 +43,12 @@
       "url": "https://www.lexiclash.live/images/education-hero-es.webp",
       "width": 1200,
       "height": 675,
-      "alt": "ESL Word Games para el aula"
+      "alt": "Juegos de palabras en inglés para el aula"
     }
   ],
   "twCard": "summary_large_image",
-  "twTitle": "ESL Word Games para el aula",
-  "twDescription": "ESL word games para el aula: código, proyector, nivel por alumno. Gratis.",
+  "twTitle": "Juegos de palabras en inglés para el aula",
+  "twDescription": "Juegos de palabras en inglés para el aula: código, proyector, nivel por alumno. Gratis.",
   "twImages": [
     "https://www.lexiclash.live/images/education-hero-es.webp"
   ]
