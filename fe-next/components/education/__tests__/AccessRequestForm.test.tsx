@@ -26,6 +26,18 @@ vi.mock('@/hooks/useStartTeacherProTrial', () => ({
   useStartTeacherProTrial: () => ({ start: startPolarTrialMock, pending: false }),
 }));
 
+
+const proState = vi.hoisted(() => ({
+  hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null as string | null, accessTrialEnded: false,
+  refresh: vi.fn(async () => {}),
+}));
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState }));
+const offerReports = vi.hoisted(() => ({ click: vi.fn(), impression: vi.fn() }));
+vi.mock('@/lib/education/reportProCtaClick', () => ({
+  reportProCtaClick: (...a: unknown[]) => offerReports.click(...a),
+  reportProOfferImpression: (...a: unknown[]) => offerReports.impression(...a),
+}));
+
 import { AccessRequestForm } from '../AccessRequestForm';
 
 describe('<AccessRequestForm>', () => {
@@ -139,12 +151,12 @@ describe('<AccessRequestForm>', () => {
 
     await screen.findByText('education.access.success_title');
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('edu_access_request_submitted', { ok: true, status: 200 });
-    expect(screen.getByTestId('access-success-trial')).toHaveTextContent('teacher.subscription.startTrial');
+    expect(await screen.findByTestId('access-success-trial')).toHaveTextContent('Start your 14-day Teacher Pro trial');
     expect(screen.getByTestId('access-success-hq')).toHaveTextContent('education.access.go_to_teacher');
     expect(pushMock).not.toHaveBeenCalled();
   });
 
-  it('puts Go to HQ before the trial offer so value comes before the ask', async () => {
+  it('makes Teacher Pro the main offer: first, big, with HQ as the quiet secondary', async () => {
     global.fetch = vi.fn(async () => ({
       ok: true,
       status: 200,
@@ -157,9 +169,11 @@ describe('<AccessRequestForm>', () => {
     await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
     await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
 
-    const hq = await screen.findByTestId('access-success-hq');
-    const trial = screen.getByTestId('access-success-trial');
-    expect(hq.compareDocumentPosition(trial) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const trial = await screen.findByTestId('access-success-trial');
+    const hq = screen.getByTestId('access-success-hq');
+    expect(trial.compareDocumentPosition(hq) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(trial.className).toMatch(/\bmin-h-14\b/);
+    expect(hq.className).not.toMatch(/bg-neo-lime/);
   });
 
   it('starts Polar trial from the success card', async () => {
@@ -252,5 +266,64 @@ describe('<AccessRequestForm>', () => {
 
     await screen.findByText('education.access.success_title');
     expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  describe('Teacher Pro offer wording matches the class-ready card', () => {
+    const submit = async () => {
+      global.fetch = vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, success: true }) } as any)) as any;
+      const user = userEvent.setup();
+      render(<AccessRequestForm />);
+      await user.click(screen.getByRole('radio', { name: /education\.access\.role_teacher/i }));
+      await user.type(screen.getByLabelText(/education\.access\.use_case_q/i), 'Teaching 9th grade ESL students.');
+      await user.click(screen.getByRole('button', { name: /education\.access\.submit/i }));
+      return user;
+    };
+    beforeEach(() => {
+      Object.assign(proState, { hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null, accessTrialEnded: false });
+      proState.refresh.mockClear();
+      offerReports.click.mockClear();
+      offerReports.impression.mockClear();
+    });
+
+    it('re-reads the entitlement after approval and reports rendered (source access_success)', async () => {
+      await submit();
+      await screen.findByTestId('access-success-trial');
+      expect(proState.refresh).toHaveBeenCalledTimes(1);
+      expect(offerReports.impression).toHaveBeenCalledWith({
+        placement: 'access_success', stage: 'rendered', locale: 'en', cta: 'teacher_pro_trial', offer: 'trial',
+      });
+    });
+
+    it('inside the free access trial asks to keep Pro, with the end date, as a trial checkout', async () => {
+      proState.accessTrialExpires = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+      await submit();
+      const btn = await screen.findByTestId('access-success-trial');
+      expect(btn).toHaveTextContent('Keep Teacher Pro after my trial');
+      expect(btn).toHaveAttribute('data-offer', 'keep_after_trial');
+      expect(screen.getByTestId('access-success-offer-note')).toHaveTextContent(/starts when your trial ends/);
+    });
+
+    it('an ended access trial goes straight to $9/mo with no trial wording', async () => {
+      proState.accessTrialEnded = true;
+      await submit();
+      const btn = await screen.findByTestId('access-success-trial');
+      expect(btn).toHaveTextContent('Continue with Teacher Pro');
+      expect(btn).not.toHaveTextContent(/14|trial/i);
+    });
+
+    it('reports the tap server-side and starts checkout', async () => {
+      const user = await submit();
+      await user.click(await screen.findByTestId('access-success-trial'));
+      expect(offerReports.click).toHaveBeenCalledWith({ placement: 'access_success', locale: 'en', cta: 'teacher_pro_trial' });
+      expect(startPolarTrialMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows no Pro offer to a teacher who already has Pro; HQ stays the one button', async () => {
+      proState.hasPro = true;
+      await submit();
+      await screen.findByTestId('access-success-hq');
+      expect(screen.queryByTestId('access-success-trial')).toBeNull();
+      expect(offerReports.impression).not.toHaveBeenCalled();
+    });
   });
 });

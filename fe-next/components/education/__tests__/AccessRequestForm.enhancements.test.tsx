@@ -9,6 +9,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+const proState = vi.hoisted(() => ({
+  hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null as string | null, accessTrialEnded: false,
+  refresh: vi.fn(async () => {}),
+}));
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState }));
+const offerReports = vi.hoisted(() => ({ click: vi.fn(), impression: vi.fn() }));
+vi.mock('@/lib/education/reportProCtaClick', () => ({
+  reportProCtaClick: (...a: unknown[]) => offerReports.click(...a),
+  reportProOfferImpression: (...a: unknown[]) => offerReports.impression(...a),
+}));
+
 import { AccessRequestForm } from '../AccessRequestForm';
 
 const pushMock = vi.fn();
