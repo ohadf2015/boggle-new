@@ -149,6 +149,9 @@ vi.mock('@/components/celebration/NewYearCountdown', () => ({
 vi.mock('@/components/VersionChecker', () => ({
   default: () => <div data-testid="version-checker" />,
 }));
+vi.mock('@/components/StaleBuildReloader', () => ({
+  default: () => <div data-testid="stale-build-reloader" />,
+}));
 vi.mock('@/components/engagement/ChurnSignalTracker', () => ({
   ChurnSignalTracker: () => <div data-testid="churn-tracker" />,
 }));
@@ -212,10 +215,12 @@ describe('deferred layout widgets on the student join routes', () => {
   it('keeps the silent, non-painting widgets running — this is not a blackout', async () => {
     pathname = '/en/join/AB3K9Z';
     render(<DeferredLayoutWidgets />);
-    // Version checks, churn telemetry and referral attribution have no UI and
-    // no reason to stop; suppressing them would be a bigger change than the
-    // problem, and referral attribution is money.
+    // Version checks (manual toast AND the silent auto-reloader), churn
+    // telemetry and referral attribution have no UI and no reason to stop;
+    // suppressing them would be a bigger change than the problem, and
+    // referral attribution is money.
     expect(await screen.findByTestId('version-checker')).toBeInTheDocument();
+    expect(await screen.findByTestId('stale-build-reloader')).toBeInTheDocument();
     expect(await screen.findByTestId('churn-tracker')).toBeInTheDocument();
     expect(await screen.findByTestId('referral-claimer')).toBeInTheDocument();
   });
