@@ -6,11 +6,11 @@ import { createBag, draw, remaining, swap as swapBag, type SupportedLocale, type
 import { seedOpeningRack, drawTowardTarget, nextLessonTarget } from './lessonBag';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
-import { botTuning, shouldBotSkipTurn, DEFAULT_BOT_DIFFICULTY, type BotDifficulty } from './botDifficulty';
+import { adaptTuning, botTuning, shouldBotSkipTurn, DEFAULT_BOT_DIFFICULTY, type BotDifficulty } from './botDifficulty';
 import { rollModifier, toScoreModifier, modifierCaptureSpread, modifierRackSize, isGoldenTile, WORDCRAFT_MODIFIERS, type WordCraftModifier } from './modifiers';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import { getBoardDims, type BoardDims } from './boardDimensions';
-import { applyClaims, endgameTerritoryBonus, resolveCaptures, type Coord, type Owner } from './territory';
+import { applyClaims, countClaimed, endgameTerritoryBonus, resolveCaptures, type Coord, type Owner } from './territory';
 import { assignBlankLetter, hasUnassignedBlank } from './blankAssign';
 import type { PlacedTile, PlayerState, RackTile } from './types';
 import {
@@ -669,7 +669,8 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       // passes, gifting the player a free turn to seize ground. This is the
       // difficulty lever a player actually feels in a territory game (claims
       // scale with tiles placed, so word-length nerfs barely register).
-      if (shouldBotSkipTurn(tuning)) {
+      const live = adaptTuning(tuning, countClaimed(state.board, 'player'), countClaimed(state.board, 'bot'));
+      if (shouldBotSkipTurn(live)) {
         dispatch({ type: 'PASS' });
         botTurnRunning.current = false;
         return;
@@ -693,15 +694,15 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
                         .filter((p) => isGoldenTile(state.seed, p.rackTileId))
                         .map((p) => ({ row: p.row, col: p.col }))
                     : undefined,
-              }).bonus * tuning.captureAggression
+              }).bonus * live.captureAggression
           : undefined,
         // Difficulty: cap word length (easy/medium kill bingos) and pick from a
         // wider, weaker pool so the bot is beatable. Both derived from the
         // selected difficulty preset (default 'easy').
-        maxLength: tuning.maxLength,
+        maxLength: live.maxLength,
         skillVariance: effectiveVariance,
         // Press the pick toward the weakest pooled word on lower difficulties.
-        selectionSkew: tuning.selectionSkew,
+        selectionSkew: live.selectionSkew,
         scoreModifier: modifierSpec,
       });
       if (move) {

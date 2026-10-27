@@ -76,6 +76,33 @@ export function shouldBotSkipTurn(tuning: BotTuning, rng: () => number = Math.ra
   return rng() < tuning.turnSkipChance;
 }
 
+/**
+ * Rubber band: keep the match close so it stays tense. A player far behind gets
+ * a gentler bot, a player running away with it faces a sharper one. Bounded so a
+ * difficulty keeps its identity (easy never reaches hard's bingo length).
+ */
+export function adaptTuning(base: BotTuning, playerCells: number, botCells: number): BotTuning {
+  const total = playerCells + botCells;
+  if (total === 0) return base;
+  const lead = (playerCells - botCells) / total;
+  const strength = Math.min(1, (Math.abs(lead) - 0.2) / 0.4);
+  if (strength <= 0) return base;
+  if (lead < 0) {
+    return {
+      ...base,
+      maxLength: Math.max(3, base.maxLength - 1),
+      turnSkipChance: Math.min(0.6, base.turnSkipChance + 0.2 * strength),
+      captureAggression: base.captureAggression * (1 - 0.5 * strength),
+    };
+  }
+  return {
+    ...base,
+    maxLength: Math.min(base.maxLength + 1, base.maxLength >= 7 ? 7 : 6),
+    turnSkipChance: base.turnSkipChance * (1 - 0.6 * strength),
+    captureAggression: Math.min(1, base.captureAggression + 0.35 * strength),
+  };
+}
+
 export function isBotDifficulty(value: unknown): value is BotDifficulty {
   return typeof value === 'string' && (BOT_DIFFICULTIES as readonly string[]).includes(value);
 }
