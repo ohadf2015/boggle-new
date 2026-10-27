@@ -19466,6 +19466,7 @@ const sv = {
       "land_grab": "Markrofferi",
       "quick_draw": "Snabbgiv",
       "golden_tiles": "Guldbrickor",
+      "star_squares": "Stjärnrutor",
       "none": "",
       "desc": {
         "bingo_bonanza": "Bingo ger +90",
@@ -19473,7 +19474,8 @@ const sv = {
         "rich_letters": "Sällsynta brickor räknas dubbelt",
         "land_grab": "Erövringar sprids till grannrutor",
         "quick_draw": "5 brickor på handen. Snabbare rundor",
-        "golden_tiles": "✦-brickor erövrar rutorna runt omkring"
+        "golden_tiles": "✦-brickor erövrar rutorna runt omkring",
+        "star_squares": "Landa på en stjärna och ta rutorna runt omkring"
       }
     },
     "setup": {
