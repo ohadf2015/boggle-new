@@ -59,6 +59,85 @@ export function buildCheckoutStartedEvent(userId: string, tags: Record<string, u
 /** Alias: trial checkout URL creation is the same `checkout_started` step. */
 export const buildTrialCheckoutStartedEvent = buildCheckoutStartedEvent;
 
+/**
+ * Server-side probe right after Polar checkout URL creation: the hosted
+ * checkout URL answered 2xx (`checkout_url_reachable`) with its HTTP status.
+ */
+export function buildCheckoutUrlReachableEvent(
+  userId: string,
+  httpStatus: number,
+  tags: Record<string, unknown> = {},
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'checkout_url_reachable',
+    properties: {
+      ...tags,
+      ...BASE,
+      teacher_id: userId,
+      http_status: httpStatus,
+      status: httpStatus,
+    },
+  };
+}
+
+/**
+ * Server-side probe right after Polar checkout URL creation: the hosted
+ * checkout URL returned non-2xx or timed out/failed (`http_status: 0`).
+ */
+export function buildCheckoutUrlErrorEvent(
+  userId: string,
+  httpStatus: number,
+  tags: Record<string, unknown> = {},
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'checkout_url_error',
+    properties: {
+      ...tags,
+      ...BASE,
+      teacher_id: userId,
+      http_status: httpStatus,
+      status: httpStatus,
+    },
+  };
+}
+
+/**
+ * Unconditional server-side return step: the teacher landed back from Polar
+ * with `?checkout=success`, recorded before/regardless of webhook grant.
+ */
+export function buildCheckoutReturnLandedEvent(
+  userId: string,
+  tags: Record<string, unknown> = {},
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'checkout_return_landed',
+    properties: {
+      ...tags,
+      ...BASE,
+      teacher_id: userId,
+    },
+  };
+}
+
+/** Server twin of `edu_pro_checkout_return_landed` (not gated behind grant success). */
+export function buildEduProCheckoutReturnLandedEvent(
+  userId: string,
+  tags: Record<string, unknown> = {},
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'edu_pro_checkout_return_landed',
+    properties: {
+      ...tags,
+      ...BASE,
+      teacher_id: userId,
+    },
+  };
+}
+
 export function buildProTrialSucceededEvent(userId: string, subscriptionId: string): EduServerEvent {
   return {
     distinctId: userId,

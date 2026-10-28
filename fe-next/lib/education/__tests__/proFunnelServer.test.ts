@@ -19,6 +19,10 @@ import {
   buildProTrialSucceededEvent,
   buildTrialCheckoutStartedEvent,
   buildCheckoutStartedEvent,
+  buildCheckoutUrlReachableEvent,
+  buildCheckoutUrlErrorEvent,
+  buildCheckoutReturnLandedEvent,
+  buildEduProCheckoutReturnLandedEvent,
   buildTrialActivatedEvent,
   buildEduAccessRequestCreatedEvent,
   buildTrialStartEvent,
@@ -66,6 +70,58 @@ describe('Pro funnel server events', () => {
       properties: { product: 'teacher_pro', provider: 'polar', teacher_id: 'u-1' },
     });
     expect(buildTrialCheckoutStartedEvent('u-1')).toEqual(buildCheckoutStartedEvent('u-1'));
+  });
+
+  it('Given a Polar checkout URL probe succeeds, When built, Then it is checkout_url_reachable with http_status', () => {
+    expect(buildCheckoutUrlReachableEvent('u-1', 200, { client_kind: 'browser' })).toEqual({
+      distinctId: 'u-1',
+      event: 'checkout_url_reachable',
+      properties: {
+        product: 'teacher_pro',
+        provider: 'polar',
+        teacher_id: 'u-1',
+        http_status: 200,
+        status: 200,
+        client_kind: 'browser',
+      },
+    });
+  });
+
+  it('Given a Polar checkout URL probe fails, When built, Then it is checkout_url_error with http_status', () => {
+    expect(buildCheckoutUrlErrorEvent('u-1', 503)).toEqual({
+      distinctId: 'u-1',
+      event: 'checkout_url_error',
+      properties: {
+        product: 'teacher_pro',
+        provider: 'polar',
+        teacher_id: 'u-1',
+        http_status: 503,
+        status: 503,
+      },
+    });
+  });
+
+  it('Given a teacher lands on ?checkout=success, When built, Then checkout_return_landed and edu_pro_checkout_return_landed carry teacher_id', () => {
+    expect(buildCheckoutReturnLandedEvent('u-1', { locale: 'en' })).toEqual({
+      distinctId: 'u-1',
+      event: 'checkout_return_landed',
+      properties: {
+        product: 'teacher_pro',
+        provider: 'polar',
+        teacher_id: 'u-1',
+        locale: 'en',
+      },
+    });
+    expect(buildEduProCheckoutReturnLandedEvent('u-1', { locale: 'en' })).toEqual({
+      distinctId: 'u-1',
+      event: 'edu_pro_checkout_return_landed',
+      properties: {
+        product: 'teacher_pro',
+        provider: 'polar',
+        teacher_id: 'u-1',
+        locale: 'en',
+      },
+    });
   });
 
   it('Given a trialing subscription, When built, Then it is edu_pro_trial_succeeded with the id', () => {
