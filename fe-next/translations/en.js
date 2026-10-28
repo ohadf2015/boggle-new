@@ -5077,6 +5077,10 @@ const en = {
       "title": "TOMORROW: new Daily Challenge",
       "countdown": "New puzzle in {time}"
     },
+    "firstGameBridge": {
+      "quickMatch": "Next: quick match vs real players",
+      "wordWheel": "Next: today's Word Wheel (2 min)"
+    },
     "saveStreak": {
       "title": "Save my streak",
       "body": "Streaks live on this device. Create a free account to keep them anywhere."

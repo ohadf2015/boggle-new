@@ -5535,6 +5535,10 @@ const ja = {
       "title": "明日：新しいデイリーチャレンジ",
       "countdown": "新しいパズルまで {time}"
     },
+    "firstGameBridge": {
+      "quickMatch": "次へ：本物の相手とクイックマッチ",
+      "wordWheel": "次へ：今日のワードホイール（2分）"
+    },
     "saveStreak": {
       "title": "ストリークを保存",
       "body": "ストリークはこの端末に保存されます。無料アカウントを作成すれば、どこでも引き継げます。"

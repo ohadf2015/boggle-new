@@ -43,6 +43,12 @@ describe('useMpExit', () => {
     result.current('continue-solo');
     expect(push).toHaveBeenCalledWith('/he/singleplayer?mpHandoff=1');
   });
+
+  it('outside the page: first-game-bridge hands off to the Word Wheel', () => {
+    const { result } = renderHook(() => useMpExit());
+    result.current('first-game-bridge');
+    expect(push).toHaveBeenCalledWith('/he/daily/word-wheel?start=1');
+  });
 });
 
 describe('readPreviousInAppPath', () => {

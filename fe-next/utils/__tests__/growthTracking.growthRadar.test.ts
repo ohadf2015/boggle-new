@@ -132,6 +132,7 @@ describe('trackGrowthEvent → Growth Radar mirror', () => {
       'game_completed',
       'first_game_won',
       'game_abandoned',
+      'next_game_picked',
     ];
     for (const event of spine) {
       trackGrowthEvent(event, {});
