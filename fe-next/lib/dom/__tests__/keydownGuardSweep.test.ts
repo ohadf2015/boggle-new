@@ -34,7 +34,9 @@ describe('game keydown handlers guard with isTypingTarget', () => {
   });
 
   it('Word Tower v2 keydown handler checks isTypingTarget', () => {
-    const src = readFileSync(join(ROOT, 'components/wordTowerV2/WordTowerV2.tsx'), 'utf8');
+    // The window listener moved out of WordTowerV2.tsx into the wheel hook.
+    const src = readFileSync(join(ROOT, 'components/wordTowerV2/useWordWheel.ts'), 'utf8');
     expect(src).toMatch(/isTypingTarget\(event\)/);
+    expect(src).toMatch(/addEventListener\('keydown'/);
   });
 });
