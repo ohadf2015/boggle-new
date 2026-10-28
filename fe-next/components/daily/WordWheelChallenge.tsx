@@ -337,7 +337,12 @@ const WordWheelChallenge: React.FC = () => {
         className="flex-1 flex items-center justify-center bg-neo-navy"
         style={{ background: STAGE_AMBIENT_BG }}
       >
-        <PageLoader size="lg" text={t('wordWheel.loading')} />
+        {/* SSR renders this phase with the full catalogue, but /daily/* hydrates on
+            the slim landing subset (heavy game path). `wordWheel.*` is not in that
+            subset, so the client painted the raw key and React threw #418 whenever
+            the full-catalogue upgrade lost the race with this chunk. `daily.*` is
+            in the subset, so server and client agree. */}
+        <PageLoader size="lg" text={t('daily.loadingWordWheel')} />
       </div>
     );
   }
