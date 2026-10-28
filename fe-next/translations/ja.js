@@ -1,5 +1,28 @@
 // Ja translations
 const ja = {
+  // @blastProgress:start
+  "blastProgress": {
+    "wave": "ウェーブ {wave}",
+    "tapToSkip": "タップでスキップ",
+    "toPass": "あと{points}点で{name}を抜く",
+    "toBest": "自己ベストまであと{points}点",
+    "passed": "{name}を抜いた！",
+    "newBest": "自己ベスト更新！",
+    "top": "今週1位",
+    "weekly": "今週",
+    "cleared": "ウェーブ{wave}クリア！",
+    "waveScore": "ウェーブのスコア",
+    "coins": "コイン",
+    "diamonds": "ダイヤ",
+    "nextUp": "次はこれ",
+    "reward": "報酬 {coins}コイン",
+    "bigReward": "報酬×{mult}",
+    "record": "新記録",
+    "play": "ウェーブ{wave}へ",
+    "autoIn": "あと{seconds}秒で開始",
+    "runLabel": "進行状況：ウェーブ{wave}"
+  },
+  // @blastProgress:end
   // @eduPickers:start
   "eduPickers": {
     "language": {
@@ -1239,7 +1262,7 @@ const ja = {
         },
         "blast": {
           "title": "ブラストモード",
-          "line": "言葉をつないで、盤面をドカンと消そう。"
+          "line": "言葉で爆弾をドカン！コインもダイヤもざくざく。"
         }
       }
     },
@@ -8547,7 +8570,8 @@ const ja = {
     "badgeHost": "ホスト",
     "badge": {
       "new": "新作",
-      "beta": "ベータ版"
+      "beta": "ベータ版",
+      "recommended": "おすすめ"
     },
     "multiPlayer": "マルチプレイヤー",
     "multiplayer": "マルチプレイヤー",
@@ -13022,6 +13046,26 @@ const ja = {
       "waveFailed": "ウェーブ失敗",
       "needClearPct": "{required}%クリアが必要。結果は{got}%",
       "tilesShort": "あと{count}タイルだった!",
+      "reveal": {
+        "coins": "コイン",
+        "diamonds": "ダイヤ",
+        "bombs": "爆発させたボム",
+        "combo": "最高コンボ",
+        "words": "単語",
+        "waves": "ウェーブ",
+        "longestWord": "最長の単語",
+        "goalRival": "あと{gap}点で{name}を抜ける",
+        "goalLead": "{name}に{gap}点差で勝利",
+        "goalBest": "あと{gap}点で自己ベスト",
+        "nearMiss": "惜しい!",
+        "rank": "順位",
+        "rankUp": "{n}位アップ",
+        "rankDown": "{n}位ダウン",
+        "headlineLow": "ドンマイ!",
+        "headlineMid": "ナイス爆破",
+        "headlineHigh": "大活躍!",
+        "headlineNewBest": "自己ベスト!"
+      },
       "failHint": "進むにはボードの90%以上をクリアしてください",
       "tryAgain": "もう一度",
       "share": "共有",
@@ -13258,92 +13302,16 @@ const ja = {
     },
     "tile": {
       "gold": {
-        "name": "ゴールド",
-        "desc": "スコア3倍 + ボーナス1手。"
-      },
-      "silver": {
-        "name": "シルバー",
-        "desc": "スコア1.5倍。カウントダウンを1手延長。"
+        "name": "コイン",
+        "desc": "単語スコア3倍、手数+1、コインも獲得。"
       },
       "diamond": {
         "name": "ダイヤモンド",
-        "desc": "スコア5倍。フロストの中身を3ターン公開。"
+        "desc": "レアな単語で出現。消すと大ボーナス。"
       },
       "bomb": {
         "name": "ボム",
         "desc": "周囲3×3をクリア。近くのボムに連鎖。"
-      },
-      "lightning": {
-        "name": "ライトニング",
-        "desc": "列全体を即座にクリア。"
-      },
-      "prism": {
-        "name": "プリズム",
-        "desc": "2回。行と列を全クリア。ボムとライトニングに連鎖。"
-      },
-      "rainbow": {
-        "name": "レインボー",
-        "desc": "最強スペシャルをコピー＆倍増。単独: 2倍スコア。"
-      },
-      "ice": {
-        "name": "アイス",
-        "desc": "2回で破壊。複数ヒット防御タイル。"
-      },
-      "gem": {
-        "name": "ジェム",
-        "desc": "3回で収集。完了時にスペシャル2個生成。"
-      },
-      "frozen": {
-        "name": "フロスト",
-        "desc": "2回。中にスペシャルを隠す：ボム、ライトニング、プリズム、ジェム、レインボー。"
-      },
-      "magnet": {
-        "name": "ボルテックス",
-        "desc": "近くのタイルを引き寄せ、エリアを爆発。"
-      },
-      "mirror": {
-        "name": "ミラー",
-        "desc": "単語内の最初の攻撃スペシャルをコピー。単独: 2倍スコア。"
-      },
-      "wildcard": {
-        "name": "ワイルド",
-        "desc": "どの文字にもなれる。使用文字のスクラブル値でスコア。"
-      },
-      "countdown": {
-        "name": "カウントダウン",
-        "desc": "毎手減少。単語で解除: +15点と2ボーナス手。期限切れ: -50点と3×3爆発。"
-      },
-      "shuffle": {
-        "name": "シャッフル",
-        "desc": "クリア時にボード上の残り文字を全て並べ替える。"
-      },
-      "magma": {
-        "name": "マグマ",
-        "desc": "両対角線（X字パターン）をクリアし、スコア2倍。"
-      },
-      "portal": {
-        "name": "ポータル",
-        "desc": "リンクしたペア間でワードパスをテレポート。両方クリア。スコア2倍。+5ボーナス。"
-      },
-      "catalyst": {
-        "name": "触媒",
-        "desc": "+10点。隣接する通常タイルをスペシャルに昇格。"
-      },
-      "crystal": {
-        "name": "クリスタル",
-        "desc": "未使用のターンごとに×1成長（最大×5）。使用時に単語スコアを倍増。"
-      },
-      "fuse": {
-        "name": "導火線",
-        "desc": "連結ペア。片方を消すと相方に火がつく。3ターン以内に解除すれば+15点と+2手、失敗すると3×3爆発で-50点。"
-      },
-      "anchor": {
-        "name": "アンカー",
-        "desc": "長い単語にご褒美。消去時、1文字につき+3点。"
-      },
-      "mystery": {
-        "name": "ミステリー",
-        "desc": "スロットマシン！消すとランダムでサプライズ：スコアバースト、新スペシャル、ミニポップ、メガ+150。"
       }
     },
     "title": "ブラストモード",
@@ -13416,7 +13384,6 @@ const ja = {
     "giveUp": "ゲーム終了",
     "goldTile": "3倍スコア！",
     "bombTile": "周囲クリア！",
-    "rainbowTile": "ワイルドボーナス！",
     "cascadeChain": "CASCADE x{level}",
     "waveBadge": "ウェーブ {wave}",
     "stars1": "グッド",
@@ -13430,34 +13397,20 @@ const ja = {
     "helpDrag": "文字をなぞって単語を作ります。2文字以上の単語が必要です。",
     "helpGold": "単語のスコアが3倍になります。",
     "helpBomb": "周囲8マスをすべてクリアします。",
-    "helpRainbow": "+5ボーナスポイント。",
     "helpGoal": "できるだけ多くのタイルをクリアして最高スコアを目指そう！",
     "helpGoldLabel": "ゴールド",
     "helpBombLabel": "ボム",
-    "helpRainbowLabel": "レインボー",
-    "helpPrismLabel": "プリズム",
-    "helpPrism": "2つの単語で使用するとクロスクリア（行全体＋列全体）が発動。",
     "mpResults": {
       "boardCleared": "ボードクリア！",
       "yourPosition": "あなたの順位",
-      "champion": "チャンピオン"
+      "champion": "チャンピオン",
+      "coinKing": "コイン王",
+      "mostDiamonds": "ダイヤ最多",
+      "bonus": "+{n}点",
+      "bonusLabel": "収集ボーナス"
     },
-    "helpGemLabel": "ジェム",
-    "helpGem": "3つの単語で使用して収集。使用ごとに+3、収集時に+8。",
-    "helpIceLabel": "アイス",
-    "helpIce": "壊すには2回のヒットが必要。最初の使用でひび割れ。",
-    "helpLightningLabel": "ライトニング",
-    "helpLightning": "単語に使用すると列全体をクリア。",
-    "helpMagnetLabel": "マグネット",
-    "helpMagnet": "クリア時に近くのタイルを引き寄せる。",
-    "helpMirrorLabel": "ミラー",
-    "helpMirror": "パートナーの特殊効果を倍増、または2倍スコア。",
-    "helpSilverLabel": "シルバー",
-    "helpSilver": "単語のスコア4倍。",
     "helpDiamondLabel": "ダイヤモンド",
     "helpDiamond": "スコア5倍。最高価値タイル。",
-    "helpFrozenLabel": "フローズン",
-    "helpFrozen": "壊すには3回のヒットが必要。カスケード検出をブロック。",
     "foundWords": "見つけた単語",
     "noWordsLeft": "残りの単語はありません",
     "moreLevelsComingSoon": "新しいレベルを準備中です。",
@@ -13564,7 +13517,6 @@ const ja = {
     },
     "stuck": "詰まった？",
     "hintCooldown": "使用済",
-    "tileNearby": "✦ 近く ✦",
     "waveClearBanner": "ウェーブクリア！",
     "tapToContinue": "タップして続ける",
     "levelComplete": "レベルクリア！",
@@ -13596,7 +13548,6 @@ const ja = {
     "objective": {
       "scoreTarget": "{target}点を獲得",
       "collectType": "{tileType}を{target}個集める",
-      "clearAllType": "すべての{tileType}をクリア",
       "wordLength": "{minWordLength}文字以上の単語を{target}個",
       "clearPercent": "ボードの{target}%をクリア",
       "targetWord": "見つける: {word}",
@@ -13606,9 +13557,6 @@ const ja = {
       "colorPink": "ピンク",
       "colorCyan": "シアン",
       "colorLime": "ライム",
-      "clearJelly": "ゼリーをすべて取り除こう",
-      "killCake": "ケーキを破壊しよう",
-      "stopChocolate": "チョコレートを止めよう",
       "bannerTitle": "目標",
       "pathRoute": "◯と◉を1単語でつなぐ",
       "pathRouteSuccess": "ルート完成！",
@@ -13634,38 +13582,7 @@ const ja = {
     },
     "combo": {
       "bomb_bomb": "メガブラスト！",
-      "bomb_lightning": "サンダーボム！",
-      "bomb_prism": "シャッターストーム！",
-      "bomb_rainbow": "レインボー爆発！",
-      "bomb_mirror": "ミラーボム！",
-      "bomb_magnet": "磁気爆発！",
-      "bomb_gem": "結晶粉砕！",
-      "bomb_frozen": "解凍爆発！",
-      "lightning_lightning": "チェーンライトニング！",
-      "lightning_prism": "クロスサンダー！",
-      "lightning_rainbow": "レインボーストーム！",
-      "lightning_mirror": "ダブルストライク！",
-      "lightning_magnet": "サージプル！",
-      "lightning_gem": "スパーク結晶！",
-      "lightning_frozen": "衝撃波解凍！",
-      "prism_prism": "完全破壊！",
-      "prism_rainbow": "スペクトルノバ！",
-      "prism_mirror": "無限クロス！",
-      "prism_magnet": "渦クロス！",
-      "prism_gem": "結晶プリズム！",
-      "prism_frozen": "プリズム解凍！",
-      "rainbow_mirror": "ミラーレインボー！",
-      "rainbow_magnet": "レインボープル！",
-      "rainbow_gem": "レインボー結晶！",
-      "rainbow_frozen": "レインボー解凍！",
-      "mirror_magnet": "ダブル渦！",
-      "mirror_gem": "結晶ミラー！",
-      "mirror_frozen": "エコーフリーズ！",
-      "magnet_gem": "結晶プル！",
-      "magnet_frozen": "凍結渦！",
-      "gem_frozen": "氷結晶！",
       "gold_special": "ゴールデンパワー！",
-      "rainbow_special": "ダブルレインボー！",
       "triple_special": "トリプルスレット！"
     },
     "micro": {
@@ -13679,10 +13596,6 @@ const ja = {
       "specialist": "スペシャリスト！",
       "waveClearer": "ウェーブクリア！"
     },
-    "comboCodex": "コンボ図鑑",
-    "codexProgress": "{discovered}/{total} 発見済み",
-    "codexLocked": "???",
-    "comboDiscovered": "コンボ発見！",
     "chainCounter": "チェーン x{{count}}",
     "wave": "ウェーブ",
     "words": "単語",
@@ -13697,6 +13610,38 @@ const ja = {
     "gameOver": "ゲームオーバー",
     "waves": "ウェーブ",
     "bestWord": "ベスト",
+    "theme": {
+      "warmUp": {
+        "name": "ウォームアップ",
+        "goal": "3文字以上の単語を4つ見つけよう",
+        "flavor": "やさしい盤面に手数おまけ。リズムをつかもう。"
+      },
+      "bombSquad": {
+        "name": "ボム部隊",
+        "goal": "ボムを爆発させよう",
+        "flavor": "ボムだらけ。連鎖は2倍。"
+      },
+      "coinRush": {
+        "name": "コインラッシュ",
+        "goal": "コインを集めよう",
+        "flavor": "コインが降ってきて2倍もらえる。"
+      },
+      "diamondHunt": {
+        "name": "ダイヤ探し",
+        "goal": "ダイヤを手に入れよう",
+        "flavor": "レアな単語が出しやすい。ダイヤを狙おう。"
+      },
+      "boss": {
+        "name": "ボスウェーブ",
+        "goal": "スコアを達成しよう",
+        "flavor": "手数は少なく、ごほうびは大きく。1語も無駄にしないで。"
+      },
+      "cascadeCarnival": {
+        "name": "連鎖カーニバル",
+        "goal": "長い単語を見つけよう",
+        "flavor": "連鎖が深くなり、得点もアップ。"
+      }
+    },
     "tileGuide": {
       "title": "タイルガイド",
       "standard": {
@@ -13704,100 +13649,16 @@ const ja = {
         "desc": "基本タイル。特殊効果なし"
       },
       "gold": {
-        "name": "ゴールド",
-        "desc": "×3スコア + ボーナス1手"
-      },
-      "silver": {
-        "name": "シルバー",
-        "desc": "×1.5スコア + カウントダウンを1延長"
+        "name": "コイン",
+        "desc": "スコア×3・手数+1・コイン獲得"
       },
       "diamond": {
         "name": "ダイヤモンド",
-        "desc": "×5スコア + 凍結タイルの中身を3ターン表示"
+        "desc": "レアな単語で出現・消すと大ボーナス"
       },
       "bomb": {
         "name": "ボム",
         "desc": "3×3エリアをクリア。近くのボムに連鎖"
-      },
-      "lightning": {
-        "name": "ライトニング",
-        "desc": "列全体をクリア。他のライトニングに連鎖"
-      },
-      "prism": {
-        "name": "プリズム",
-        "desc": "2回。行+列クリア、スペシャル2つ生成"
-      },
-      "rainbow": {
-        "name": "レインボー",
-        "desc": "単語内の最強スペシャルをコピー、または×2スコア"
-      },
-      "ice": {
-        "name": "アイス",
-        "desc": "2回で破壊。複数ヒット防御タイル。"
-      },
-      "frozen": {
-        "name": "フローズン",
-        "desc": "2回。中に隠れたスペシャルを解放"
-      },
-      "gem": {
-        "name": "ジェム",
-        "desc": "3回。スペシャル2つ + ボーナス2手"
-      },
-      "mirror": {
-        "name": "ミラー",
-        "desc": "単語内の最初の攻撃スペシャルをコピー"
-      },
-      "magnet": {
-        "name": "マグネット",
-        "desc": "近くのタイルを引き寄せ、3×3を爆発"
-      },
-      "wildcard": {
-        "name": "ワイルドカード",
-        "desc": "どの文字にもなる。レア度でスコア"
-      },
-      "countdown": {
-        "name": "カウントダウン",
-        "desc": "0になる前に解除！+2手。さもなくば50点ペナルティ"
-      },
-      "shuffle": {
-        "name": "シャッフル",
-        "desc": "クリア時にボード上の残り文字を全て並べ替える"
-      },
-      "magma": {
-        "name": "マグマ",
-        "desc": "両対角線（X字パターン）をクリアし、スコア2倍"
-      },
-      "portal": {
-        "name": "ポータル",
-        "desc": "ペア間テレポート。両方消去、単語スコア×2"
-      },
-      "catalyst": {
-        "name": "カタリスト",
-        "desc": "隣接タイルを全てランダムなスペシャルに昇格"
-      },
-      "crystal": {
-        "name": "クリスタル",
-        "desc": "未使用ターン毎に+×1（最大×5）。単語スコアを倍増"
-      },
-      "fuse": {
-        "name": "導火線",
-        "desc": "連結ペア。片方を消すと相方に火がつく。3ターン以内に解除しないと爆発"
-      },
-      "anchor": {
-        "name": "アンカー",
-        "desc": "長単語ボーナス。消去時、単語の文字数×+3点"
-      },
-      "mystery": {
-        "name": "ミステリー",
-        "desc": "ランダムなサプライズ。スコアバースト、新スペシャル、ミニポップ、またはメガ+150"
-      },
-      "chocolate": {
-        "name": "チョコレート",
-        "desc": "毎ターン隣のマスへ広がる。チョコのマスを使えば止まる"
-      },
-      "cake": {
-        "name": "ケーキ",
-        "desc": "複数マスで体力を共有するブロック。何度も当てて壊そう"
       }
     },
     "highlight": {

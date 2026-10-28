@@ -1,16 +1,12 @@
 'use client';
 
 import { memo, useEffect, useState } from 'react';
-import { Snowflake } from 'lucide-react';
-import type { BlastTileType } from './types';
+import { DIAMOND_CLEAR_BONUS, type BlastTileType } from './types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTileTooltip } from './utils/blastTileTooltips';
 import { TILE_VISUALS } from './blastTileVisuals';
 import { getPhaseStyles, getSelectionStyles } from './blastCascadeStyle';
-import { BlastJellyOverlay } from './BlastJellyOverlay';
-import { BlastCakeOverlay } from './BlastCakeOverlay';
-import { BlastChocolateOverlay } from './BlastChocolateOverlay';
 
 /* Dark letters on light faces: a crisp (blur-free) light emboss — the old
  * blurred drop shadow smeared the glyph edges at small sizes. */
@@ -32,7 +28,6 @@ export interface BlastTileProps {
   phase: TilePhase;
   isSelected: boolean;
   isCleared: boolean;
-  hitsRemaining?: number;
   /** Fall distance in pixels (set by sequencer for falling phase) */
   fallOffset?: number;
   /** Tile column (0-based) — drives per-column cascade stagger so columns ripple */
@@ -43,7 +38,7 @@ export interface BlastTileProps {
   spawnOffset?: number;
   /** Near-miss shimmer — tile was adjacent to path and could have formed a combo */
   isNearMiss?: boolean;
-  /** Activation effect from game engine (frost-free, tile-earned, etc.) */
+  /** Activation effect from game engine (tile-earned, diamond-spawn, etc.) */
   activationEffect?: string | null;
   /** Combo preview — this tile will participate in a combo if the word is submitted */
   isComboPreview?: boolean;
@@ -51,34 +46,12 @@ export interface BlastTileProps {
   selectionIndex?: number;
   /** Total selected tiles in current word */
   selectionTotal?: number;
-  /** Whether this tile is locked (unthawed ice/frozen — not selectable) */
-  isLocked?: boolean;
-  /** Countdown moves remaining (countdown tile only) */
-  countdown?: number;
-  /** Fuse timer — set once partner is cleared; undefined = unlit (fuse tile only) */
-  fuseTimer?: number;
   /** Zone preview type — shows effect radius indicator when tile is selected */
-  zonePreview?: 'bomb' | 'lightning' | 'prism' | 'magnet' | null;
-  /** Diamond reveal: shows inner type indicator on frozen tiles */
-  isDiamondRevealed?: boolean;
-  /** The hidden inner type of a frozen tile */
-  innerType?: BlastTileType;
+  zonePreview?: 'bomb' | null;
   /** Cascade highlight — tile is about to be cleared by a cascade chain reaction */
   isCascadeHighlight?: boolean;
-  /** Portal pair color index (0-based) — portals with the same index are linked */
-  portalPairIndex?: number;
-  /** Rainbow scan target — this tile will be copied by rainbow */
-  isScanTarget?: 'rainbow';
   /** Color tag for color_power objectives (pink/cyan/lime) — applies pulsing glow */
   colorTag?: 'pink' | 'cyan' | 'lime';
-  /** Jelly layers beneath this cell for clear_jelly objective. Undefined/0 = no jelly. */
-  jellyLayers?: number;
-  /** Cake-bomb HP for the kill_cake objective. Set on the anchor cell only. */
-  cakeHp?: number;
-  /** Cake-bomb max HP — drives the pip-ring length. */
-  cakeMaxHp?: number;
-  /** True if this tile is part of any cake-bomb cluster (renders the pink wash). */
-  isCakeCell?: boolean;
   /**
    * Suppress the special-tile explanation tooltip (the native `title` hint). Used
    * in multiplayer where the per-tile descriptions are distracting during a timed,
@@ -89,52 +62,11 @@ export interface BlastTileProps {
   onClick?: () => void;
 }
 
-/** Multiplier badges for score-multiplier tiles */
-const MULTIPLIER_BADGES: Partial<Record<BlastTileType, string>> = {
+/** Value badges: coins multiply the word, diamonds pay a flat bonus */
+const VALUE_BADGES: Partial<Record<BlastTileType, string>> = {
   gold: '×3',
-  diamond: '×5',
+  diamond: `+${DIAMOND_CLEAR_BONUS}`,
 };
-
-/** Portal pair colors — each pair gets a distinct dot color */
-const PORTAL_PAIR_COLORS = ['#FF6B9D', '#00E5FF', '#FFD700', '#B388FF', '#69F0AE'];
-
-/** Multi-hit tiles: initial hit counts for crack state calculation */
-const MULTI_HIT_MAX: Partial<Record<BlastTileType, number>> = {
-  ice: 2,
-  prism: 2,
-  gem: 3,
-  frozen: 2,
-};
-
-/**
- * Returns crack-state CSS class based on damage progression.
- * - "cracked": tile has taken damage but isn't about to break
- * - "critical": tile is one hit from breaking (gem only, since gem has 3 max hits)
- */
-function getCrackClass(type: BlastTileType, hitsRemaining?: number): string {
-  const maxHits = MULTI_HIT_MAX[type];
-  if (!maxHits || hitsRemaining == null || hitsRemaining >= maxHits) return '';
-  if (hitsRemaining <= 1 && maxHits >= 3) return 'blast-tile-critical';
-  if (hitsRemaining < maxHits) return 'blast-tile-cracked';
-  return '';
-}
-
-/** Type-specific visual effect classes for gem/frozen/ice tiles */
-function getSpecialEffectClasses(type: BlastTileType, phase: TilePhase, hitsRemaining?: number): string {
-  const classes: string[] = [];
-
-  if (type === 'gem') {
-    if (hitsRemaining != null && hitsRemaining > 0) classes.push(`blast-tile-gem-glow-${hitsRemaining}`);
-    if (phase === 'clearing') classes.push('blast-tile-gem-golden-flash');
-  } else if (type === 'frozen') {
-    if (hitsRemaining != null && hitsRemaining < (MULTI_HIT_MAX.frozen ?? 2)) classes.push('blast-tile-frozen-cracked');
-    if (phase === 'clearing') classes.push('blast-tile-frozen-emerge');
-  } else if (type === 'ice') {
-    classes.push('blast-tile-ice-shimmer');
-  }
-
-  return classes.join(' ');
-}
 
 /** Letters that get a rare glow effect — high Scrabble-value letters */
 const RARE_LETTERS = new Set(['Q', 'Z', 'X', 'J']);
@@ -163,10 +95,10 @@ function getColorTagGlow(colorTag?: 'pink' | 'cyan' | 'lime'): string {
 }
 
 export const BlastTile = memo(function BlastTile({
-  letter, type, phase, isSelected, isCleared, hitsRemaining,
+  letter, type, phase, isSelected, isCleared,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
-  selectionIndex, selectionTotal, isLocked, countdown, fuseTimer, zonePreview,
-  isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, colorTag, jellyLayers, cakeHp, cakeMaxHp, isCakeCell, hideTooltip, onClick, col,
+  selectionIndex, selectionTotal, zonePreview,
+  isCascadeHighlight, colorTag, hideTooltip, onClick, col,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
   const { t } = useLanguage();
@@ -185,11 +117,7 @@ export const BlastTile = memo(function BlastTile({
   // Without this, cascade clearing animations never play (tile goes invisible instantly).
   const isAnimatingClear = phase === 'clearing' || phase === 'anticipation' || phase === 'falling' || phase === 'appearing';
   // An empty-letter `standard` tile is an empty cell with nothing to show —
-  // never a playable white square. This also catches the invalid
-  // {standard, isCleared:false, letter:''} state an interrupted magnet/vortex
-  // letter-swap can strand (suspected root cause of "blank white tiles"; the
-  // engine-side swap/grid desync is tracked separately). Specials carry an
-  // icon rather than a letter, so only `standard` is treated as empty.
+  // never a playable white square. Specials carry an icon, so only `standard` counts.
   const isEmptyStandard = type === 'standard' && letter === '';
   if (isEmptyStandard || (isCleared && !isAnimatingClear)) {
     return <div className="aspect-square opacity-0 pointer-events-none" aria-hidden="true" />;
@@ -221,7 +149,7 @@ export const BlastTile = memo(function BlastTile({
         // Clear the live activation-effect flag when its own keyframe finishes.
         // Name-guarding prevents other keyframes (falling, appearing, etc.) from clearing it.
         const name = e.animationName;
-        if (name === 'blast-frost-shatter' || name === 'blast-tile-birth' || name === 'blast-shuffle-rearrange' || name === 'blast-frost-melt-flash') {
+        if (name === 'blast-tile-birth') {
           setLiveActivationEffect(null);
         }
       }}
@@ -237,15 +165,9 @@ export const BlastTile = memo(function BlastTile({
         visual.bg,
         visual.text ?? 'text-neo-navy',
         type !== 'standard' ? `blast-tile-${type}` : '',
-        getCrackClass(type, hitsRemaining),
-        getSpecialEffectClasses(type, phase, hitsRemaining),
-        liveActivationEffect === 'frost-free' ? 'blast-tile-frost-shatter' : '',
-        liveActivationEffect === 'tile-earned' ? 'blast-tile-earned' : '',
-        liveActivationEffect === 'shuffle-rearrange' ? 'blast-tile-shuffle-rearrange' : '',
-        (type === 'prism' && effectivePhase === 'clearing') ? 'blast-tile-prism-flash' : '',
+        liveActivationEffect === 'tile-earned' || liveActivationEffect === 'diamond-spawn' ? 'blast-tile-earned' : '',
         RARE_LETTERS.has(letter.toUpperCase()) ? 'blast-rare-letter' : '',
         isComboPreview ? 'blast-combo-preview' : '',
-        isLocked ? 'blast-tile-locked' : '',
         isCascadeHighlight ? 'blast-tile-cascade-highlight' : '',
         isNearMiss ? 'ring-2 ring-neo-lime/80 animate-pulse' : '',
         getColorTagGlow(colorTag),
@@ -261,15 +183,6 @@ export const BlastTile = memo(function BlastTile({
       aria-label={`${letter}${type !== 'standard' ? ` ${type} tile` : ''}`}
       title={tooltip ? `${tooltip.name}: ${tooltip.desc}` : undefined}
     >
-      <BlastJellyOverlay layers={jellyLayers ?? 0} />
-      {isCakeCell && (
-        <BlastCakeOverlay
-          hp={cakeHp ?? cakeMaxHp ?? 5}
-          maxHp={cakeMaxHp ?? 5}
-          isAnchor={typeof cakeHp === 'number'}
-        />
-      )}
-      <BlastChocolateOverlay active={type === 'chocolate'} />
       {/* Letter size lives on this CHILD span: `cqw` resolves against the nearest
           ANCESTOR container, so on the button itself it never saw the tile (the
           1.1rem floor always bound — 17.6px on a 53px tile). Here 54cqw is a
@@ -295,146 +208,18 @@ export const BlastTile = memo(function BlastTile({
           <visual.indicator className="w-[62%] h-[62%]" strokeWidth={2.75} />
         </span>
       )}
-      {hitsRemaining != null && hitsRemaining > 0 && (
-        <span
-          // Was clamp(0.4rem,…,0.55rem) — about 6-9px, i.e. present but unreadable.
-          // The hit count is the difference between "one more tap" and "three", so
-          // it has to survive a glance on a dense board. Solid backing + border so
-          // it reads on any tile fill.
-          className="absolute bottom-0.5 inset-s-0.5 text-[clamp(0.6rem,2.2cqw,0.85rem)] font-neo-body font-black bg-white/85 text-neo-navy border border-black/50 rounded px-1 leading-tight tabular-nums"
-          aria-label={`${hitsRemaining} hits remaining`}
-        >
-          {hitsRemaining}
-        </span>
-      )}
-      {MULTIPLIER_BADGES[type] && (
+      {VALUE_BADGES[type] && (
         <span
           className="absolute bottom-0.5 inset-e-0.5 text-[clamp(0.6rem,22cqw,0.95rem)] font-neo-body font-black bg-neo-navy text-white rounded px-1 leading-tight tabular-nums"
           aria-hidden="true"
         >
-          {MULTIPLIER_BADGES[type]}
-        </span>
-      )}
-      {type === 'gem' && hitsRemaining != null && hitsRemaining > 0 && (
-        <span
-          data-testid="gem-shards"
-          className="absolute top-0.5 inset-s-0.5 flex gap-px pointer-events-none"
-          aria-hidden="true"
-        >
-          {Array.from({ length: 3 }, (_, i) => {
-            const filled = i < (3 - hitsRemaining);
-            return (
-              <span
-                key={`shard-${i}`}
-                className={`w-1.5 h-1.5 rounded-full border border-white/40 ${filled ? 'bg-white/80' : 'bg-white/20'}`}
-              />
-            );
-          })}
-        </span>
-      )}
-      {type === 'countdown' && countdown != null && (
-        <span
-          data-testid="countdown-badge"
-          className={`absolute bottom-0.5 inset-s-0.5 text-[clamp(0.5rem,2cqw,0.7rem)] font-neo-body font-bold rounded px-0.5 leading-tight ${
-            countdown <= 1 ? 'bg-red-500/80 text-white animate-pulse' : 'bg-orange-400/70 text-white'
-          }`}
-          aria-label={`${countdown} moves until explosion`}
-        >
-          {countdown}
-        </span>
-      )}
-      {type === 'fuse' && fuseTimer != null && (
-        <span
-          data-testid="fuse-badge"
-          className={`absolute bottom-0.5 inset-s-0.5 text-[clamp(0.5rem,2cqw,0.7rem)] font-neo-body font-bold rounded px-0.5 leading-tight ${
-            fuseTimer <= 1 ? 'bg-red-600/90 text-white animate-pulse' : 'bg-orange-500/80 text-white'
-          }`}
-          aria-label={`${fuseTimer} moves until fuse detonation`}
-        >
-          {fuseTimer}
-        </span>
-      )}
-      {type === 'portal' && portalPairIndex != null && (
-        <span
-          data-testid="portal-pair-badge"
-          className="absolute bottom-0.5 inset-s-0.5 w-2.5 h-2.5 rounded-full border border-white/50 pointer-events-none"
-          style={{ background: PORTAL_PAIR_COLORS[portalPairIndex % PORTAL_PAIR_COLORS.length] }}
-          aria-hidden="true"
-        />
-      )}
-      {isScanTarget && (
-        <span
-          data-testid="scan-target"
-          className={`absolute inset-0 rounded-neo pointer-events-none z-15 border-2 border-dashed ${
-            isScanTarget === 'rainbow' ? 'border-yellow-300/80 bg-yellow-400/10' : 'border-pink-300/80 bg-pink-400/10'
-          }`}
-          aria-hidden="true"
-        />
-      )}
-      {(liveActivationEffect === 'frost-crack' || liveActivationEffect === 'ice-crack') && (
-        /* Visible one-hit melt — the FIRST hit on a frozen/ice tile now reads
-           clearly: cracked-ice flash + a melt drip. The intermediate state was
-           previously silent. Reduced-motion users get a static crack frame
-           (CSS @media handles the freeze). */
-        <span
-          data-testid="frost-melt"
-          className="blast-frost-melt absolute inset-0 rounded-neo pointer-events-none z-30"
-          aria-hidden="true"
-        />
-      )}
-      {isLocked && (
-        /* Frost shell for ice/frozen — reads as ICE (not a padlocked "locked"
-           mechanic). Hides the inner tile until a neighbouring word thaws it, or
-           reveals it with a diamond glow when it's close to breaking. */
-        <span
-          data-testid="locked-overlay"
-          className={`blast-frost-shell absolute inset-0 rounded-neo pointer-events-none z-20 flex flex-col items-center justify-center gap-0 ${
-            isDiamondRevealed
-              ? 'bg-white/15 border-2 border-dashed border-cyan-300/50'
-              : 'bg-linear-to-br from-cyan-200/30 via-sky-300/20 to-blue-400/30 border border-cyan-100/40'
-          }`}
-          aria-hidden="true"
-        >
-          {isDiamondRevealed && innerType ? (
-            (() => {
-              const InnerIcon = TILE_VISUALS[innerType]?.indicator;
-              return (
-                <span className={`animate-pulse drop-shadow-[0_0_4px_rgba(0,255,255,0.6)] ${TILE_VISUALS[innerType]?.text ?? ''}`}>
-                  {InnerIcon ? <InnerIcon className="w-[clamp(12px,3.2cqw,20px)] h-[clamp(12px,3.2cqw,20px)]" strokeWidth={2.5} /> : '?'}
-                </span>
-              );
-            })()
-          ) : (
-            <span className="blast-frost-hint flex flex-col items-center">
-              <Snowflake className="w-[clamp(10px,2.6cqw,16px)] h-[clamp(10px,2.6cqw,16px)] text-cyan-50 drop-shadow-[0_0_3px_rgba(125,224,255,0.8)]" strokeWidth={2.5} />
-              {type === 'frozen' && innerType ? (
-                (() => {
-                  const InnerIcon = TILE_VISUALS[innerType]?.indicator;
-                  return (
-                    <span className={`opacity-30 blur-[1px] leading-none -mt-px ${TILE_VISUALS[innerType]?.text ?? ''}`}>
-                      {InnerIcon ? <InnerIcon className="w-[clamp(8px,1.8cqw,11px)] h-[clamp(8px,1.8cqw,11px)]" strokeWidth={2.5} /> : '?'}
-                    </span>
-                  );
-                })()
-              ) : (
-                <span className="text-[clamp(0.3rem,1.2cqw,0.45rem)] text-cyan-200/80 font-neo-body leading-none -mt-px">
-                  {t('blast.tileNearby')}
-                </span>
-              )}
-            </span>
-          )}
+          {VALUE_BADGES[type]}
         </span>
       )}
       {zonePreview && isSelected && (
         <span
           data-testid="zone-preview"
-          className={[
-            'absolute inset-0 rounded-neo pointer-events-none z-20 border-2 border-dashed',
-            zonePreview === 'bomb' ? 'border-red-400/70 bg-red-500/10' : '',
-            zonePreview === 'lightning' ? 'border-yellow-400/70 bg-yellow-500/10' : '',
-            zonePreview === 'prism' ? 'border-purple-400/70 bg-purple-500/10' : '',
-            zonePreview === 'magnet' ? 'border-cyan-400/70 bg-cyan-500/10' : '',
-          ].filter(Boolean).join(' ')}
+          className="absolute inset-0 rounded-neo pointer-events-none z-20 border-2 border-dashed border-red-400/70 bg-red-500/10"
           aria-hidden="true"
         />
       )}
@@ -446,9 +231,6 @@ export const BlastTile = memo(function BlastTile({
   prev.phase === next.phase &&
   prev.isSelected === next.isSelected &&
   prev.isCleared === next.isCleared &&
-  prev.hitsRemaining === next.hitsRemaining &&
-  prev.countdown === next.countdown &&
-  prev.fuseTimer === next.fuseTimer &&
   prev.fallOffset === next.fallOffset &&
   prev.col === next.col &&
   prev.clearRotate === next.clearRotate &&
@@ -458,13 +240,9 @@ export const BlastTile = memo(function BlastTile({
   prev.isComboPreview === next.isComboPreview &&
   prev.selectionIndex === next.selectionIndex &&
   prev.selectionTotal === next.selectionTotal &&
-  prev.isLocked === next.isLocked &&
   prev.zonePreview === next.zonePreview &&
-  prev.isDiamondRevealed === next.isDiamondRevealed &&
-  prev.innerType === next.innerType &&
   prev.isCascadeHighlight === next.isCascadeHighlight &&
-  prev.portalPairIndex === next.portalPairIndex &&
-  prev.isScanTarget === next.isScanTarget &&
+  prev.colorTag === next.colorTag &&
   prev.hideTooltip === next.hideTooltip &&
   prev.onClick === next.onClick
 );

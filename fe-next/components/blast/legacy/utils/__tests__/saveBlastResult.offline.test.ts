@@ -75,4 +75,14 @@ describe('saveBlastResult — offline enqueue', () => {
     expect(enqueueScore).not.toHaveBeenCalled();
     expect(patch).toMatchObject({ percentile: 42, isNewBestScore: true });
   });
+
+  it('passes weekly rank, previous rank and rival through to the results screen', async () => {
+    setOnline(true);
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ rank: 3, previousRank: 7, totalPlayers: 50, rival: { name: 'Zoe', score: 900 } }), { status: 200 }),
+    );
+
+    const patch = await saveBlastResult(results, 'medium', 'en');
+    expect(patch).toMatchObject({ rank: 3, previousRank: 7, totalPlayers: 50, rival: { name: 'Zoe', score: 900 } });
+  });
 });

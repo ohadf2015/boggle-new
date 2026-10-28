@@ -433,7 +433,14 @@ export interface BlastTileOverlay {
 /** Per-player blast stats tracked during a game */
 export interface BlastPlayerStats {
   maxCombo: number;
+  /** Mirrors diamondsCollected for results screens that still read the old name */
   gemsCollected: number;
+  /** Optional: stats saved before diamonds existed lack it */
+  diamondsCollected?: number;
+  /** Optional for the same reason: bombs detonated, chains included */
+  bombsPopped?: number;
+  /** Optional for the same reason: coin tiles cleared, chains included */
+  coinsCollected?: number;
   wordsFound: string[];
   bestWord: string;
   tilesCleared: number;

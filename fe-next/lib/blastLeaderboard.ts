@@ -100,3 +100,69 @@ export async function getLeaderboardPercentile(
     return null;
   }
 }
+
+// Completion is a hot path: a hung Redis must not hold the player's results screen.
+const READ_CAP_MS = 400;
+
+export function capped<T>(work: Promise<T>, fallback: T): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<T>((resolve) => {
+    timer = setTimeout(() => resolve(fallback), READ_CAP_MS);
+  });
+  return Promise.race([work.catch(() => fallback), timeout]).finally(() => clearTimeout(timer));
+}
+
+export interface BlastStanding {
+  /** 1-based, 1 = top of this week's board. */
+  rank: number;
+  total: number;
+  /** The week's best that is actually on the board (ZADD GT keeps it over a worse run). */
+  score: number;
+}
+
+/** A player's place on this week's board; null when unranked or Redis is unavailable. */
+export async function getWeeklyStanding(
+  userId: string,
+  lang: string,
+  difficulty: string,
+  date: Date = new Date(),
+): Promise<BlastStanding | null> {
+  const client = getSharedRedisClient();
+  if (!client) return null;
+  const key = getWeekKey(lang, difficulty, date);
+  return capped(
+    Promise.all([client.zrevrank(key, userId), client.zcard(key), client.zscore(key, userId)]).then(
+      ([rank, total, score]) => {
+        if (rank === null || rank === undefined || !total || total <= 0) return null;
+        return { rank: rank + 1, total, score: Number(score ?? 0) };
+      },
+    ),
+    null,
+  );
+}
+
+export interface BlastBoardEntry {
+  userId: string;
+  score: number;
+}
+
+/** The nearest weekly scores strictly above `score`, closest first. */
+export async function getWeeklyScoresAbove(
+  score: number,
+  lang: string,
+  difficulty: string,
+  limit = 3,
+  date: Date = new Date(),
+): Promise<BlastBoardEntry[]> {
+  const client = getSharedRedisClient();
+  if (!client) return [];
+  const key = getWeekKey(lang, difficulty, date);
+  return capped(
+    client.zrangebyscore(key, `(${score}`, '+inf', 'WITHSCORES', 'LIMIT', 0, limit).then((flat: string[]) => {
+      const rows: BlastBoardEntry[] = [];
+      for (let i = 0; i + 1 < flat.length; i += 2) rows.push({ userId: flat[i], score: Number(flat[i + 1]) });
+      return rows;
+    }),
+    [],
+  );
+}

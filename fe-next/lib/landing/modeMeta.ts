@@ -172,6 +172,8 @@ export interface ModeCubeModel {
   readonly description?: string;
   /** who you play with + pacing, painted as a small chip — see MODE_TAGS */
   readonly tag?: ModeTag;
+  /** the homepage's recommended mode — bigger badge, pitch shown at every width */
+  readonly featured?: boolean;
   /** bento role: the anchor gets the 2×2 hero slot, the rest are 1×1 cubes */
   readonly role: 'anchor' | 'normal';
   readonly onClick: () => void;

@@ -43,7 +43,7 @@ const LETTER_POINTS: Record<string, number> = {
 };
 
 /** Point value for a single letter (case-insensitive, sofit-aware). 0 if unknown. */
-function getLetterPoints(letter: string): number {
+export function getLetterPoints(letter: string): number {
   const base = SOFIT_TO_BASE[letter] ?? letter;
   return LETTER_POINTS[base.toUpperCase()] ?? 0;
 }

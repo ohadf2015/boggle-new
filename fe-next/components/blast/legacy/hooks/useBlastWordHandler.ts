@@ -12,7 +12,8 @@ import { useCallback, useRef, type Dispatch, type SetStateAction, type MutableRe
 import { detectSpecialCombos, type SpecialCombo } from '../utils/blastCombos';
 import { diffClearedTiles } from '../utils/diffClearedTiles';
 import { detectNearMiss } from '../utils/blastNearMiss';
-import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism } from '@/components/grid/hapticFeedback';
+import { vibrateBlastBomb, vibrateBlastPrism } from '@/components/grid/hapticFeedback';
+import { blastCoinDelta } from '../utils/blastCoinCurrency';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { hasGemLetter } from '@/lib/blast/gemLetters';
 import { blastLetterBonus } from '@/lib/blast/blastLetterBonus';
@@ -64,6 +65,8 @@ interface UseBlastWordHandlerParams {
   effects: WordHandlerEffects;
   /** Multiplies baseScore before submission (e.g. combo2x pre-game buff). Defaults to 1. */
   scoreMultiplier?: number;
+  /** Multiplies the coins a word pays (the wave theme's coin multiplier). Defaults to 1. */
+  coinMultiplier?: number;
   /** Highlight recorder for capturing replay moments. Optional for backward compatibility. */
   recorder?: HighlightRecorder;
   /**
@@ -89,6 +92,7 @@ export function useBlastWordHandler({
   t,
   effects,
   scoreMultiplier = 1,
+  coinMultiplier = 1,
   recorder,
   enableTreasureRoll = false,
 }: UseBlastWordHandlerParams) {
@@ -144,13 +148,8 @@ export function useBlastWordHandler({
     const pop = () => {
       if (popped) return;
       popped = true;
-      effects.setClearedTilesForEffects(clearedInfo.map(c => {
-        const hits = preGrid[c.row]?.[c.col]?.hitsRemaining;
-        return { row: c.row, col: c.col, type: c.type as BlastTileType, ...(hits != null && { hitsRemaining: hits - 1 }) };
-      }));
+      effects.setClearedTilesForEffects(clearedInfo.map(c => ({ row: c.row, col: c.col, type: c.type as BlastTileType })));
       if (clearedTypes.has('bomb')) vibrateBlastBomb();
-      else if (clearedTypes.has('lightning')) vibrateBlastLightning();
-      else if (clearedTypes.has('prism')) vibrateBlastPrism();
       for (const type of clearedTypes) {
         if (type !== 'standard') sounds.playSpecialTileSound(type);
       }
@@ -234,7 +233,7 @@ export function useBlastWordHandler({
 
     // Currency earn (SP only, wired via callback)
     try {
-      effects.onCurrencyEarned?.({ coinDelta: Math.max(1, Math.round(result.score / 10)) });
+      effects.onCurrencyEarned?.({ coinDelta: blastCoinDelta(result.score, clearedInfo.filter(c => c.type === 'gold').length, coinMultiplier) });
     } catch {
       // Currency is decorative — never block gameplay on earn failure
     }
@@ -266,10 +265,8 @@ export function useBlastWordHandler({
     }
 
     // 5b. Screen shake
-    const hasBombExplosion = clearedTypes.has('bomb') || clearedTypes.has('countdown');
-    const countdownExplosionCount = result.countdownExplosions?.length ?? 0;
-    if (hasBombExplosion || countdownExplosionCount > 0) {
-      const bombCount = clearedInfo.filter(c => c.type === 'bomb' || c.type === 'countdown').length + countdownExplosionCount;
+    if (clearedTypes.has('bomb')) {
+      const bombCount = clearedInfo.filter(c => c.type === 'bomb').length;
       const intensity = Math.min(3, bombCount) as 1 | 2 | 3;
       const duration = 300 + intensity * 100;
       if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
@@ -323,7 +320,7 @@ export function useBlastWordHandler({
       processingRef.current = false;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engine, runCascade, onComboDetected, sounds, sequencer, config.gridSize, t, scoreMultiplier, enableTreasureRoll]);
+  }, [engine, runCascade, onComboDetected, sounds, sequencer, config.gridSize, t, scoreMultiplier, coinMultiplier, enableTreasureRoll]);
 
   return { handleWordAccepted };
 }

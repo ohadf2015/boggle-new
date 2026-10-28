@@ -14,11 +14,7 @@
 import { TILE_VISUALS, CLEARING_COLORS } from '../blastTileVisuals';
 import type { BlastTileType } from '../types';
 
-const SPECIALS: BlastTileType[] = [
-  'gold', 'bomb', 'lightning', 'prism', 'rainbow', 'ice', 'gem', 'frozen',
-  'magnet', 'diamond', 'countdown', 'shuffle', 'magma', 'portal', 'catalyst',
-  'crystal', 'fuse', 'anchor',
-];
+const SPECIALS: BlastTileType[] = ['gold', 'bomb', 'diamond'];
 
 function bg(type: BlastTileType): string {
   return (TILE_VISUALS[type].style?.background as string) ?? '';
@@ -32,8 +28,7 @@ describe('Blast tile visuals — solid neo-brutalist faces', () => {
   });
 
   it.each(SPECIALS)('%s resting face is solid — no soft gradient', (type) => {
-    // Soft radial/linear gradients are the banned look. (prism/rainbow may carry
-    // a hard-edged multi-colour BORDER, but the face itself must be solid.)
+    // Soft radial/linear gradients are the banned look.
     expect(bg(type)).not.toMatch(/(radial|linear)-gradient/i);
   });
 

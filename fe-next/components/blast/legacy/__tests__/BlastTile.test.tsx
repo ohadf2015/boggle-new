@@ -6,6 +6,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BlastTile } from '../BlastTile';
 import type { BlastTileType } from '@/shared/types/blast';
+import { DIAMOND_CLEAR_BONUS } from '../types';
 
 // Mock reduced motion to always return false for consistent tests
 vi.mock('@/hooks/usePrefersReducedMotion', () => ({
@@ -22,10 +23,7 @@ const baseProps = {
 
 describe('BlastTile', () => {
   describe('idle animation classes', () => {
-    const tileTypes: BlastTileType[] = [
-      'gold', 'bomb', 'rainbow', 'ice', 'lightning', 'magnet',
-      'prism', 'gem', 'frozen', 'diamond',
-    ];
+    const tileTypes: BlastTileType[] = ['gold', 'bomb', 'diamond'];
 
     it.each(tileTypes)('renders blast-tile-%s class for %s type', (type) => {
       render(<BlastTile {...baseProps} type={type} />);
@@ -40,54 +38,15 @@ describe('BlastTile', () => {
     });
   });
 
-  describe('multi-hit crack progression', () => {
-    it('renders blast-tile-cracked class when hitsRemaining = 1 on ice tile', () => {
-      render(<BlastTile {...baseProps} type="ice" hitsRemaining={1} />);
-      const button = screen.getByRole('button');
-      expect(button.className).toContain('blast-tile-cracked');
-    });
-
-    it('does NOT render blast-tile-cracked when hitsRemaining = 2 (full health)', () => {
-      render(<BlastTile {...baseProps} type="ice" hitsRemaining={2} />);
-      const button = screen.getByRole('button');
-      expect(button.className).not.toContain('blast-tile-cracked');
-    });
-
-    it('renders blast-tile-cracked on prism with hitsRemaining = 1', () => {
-      render(<BlastTile {...baseProps} type="prism" hitsRemaining={1} />);
-      const button = screen.getByRole('button');
-      expect(button.className).toContain('blast-tile-cracked');
-    });
-
-    it('renders blast-tile-critical class on gem with hitsRemaining = 1 (about to break)', () => {
-      render(<BlastTile {...baseProps} type="gem" hitsRemaining={1} />);
-      const button = screen.getByRole('button');
-      expect(button.className).toContain('blast-tile-critical');
-    });
-
-    it('renders blast-tile-cracked on gem with hitsRemaining = 2 (mid damage)', () => {
-      render(<BlastTile {...baseProps} type="gem" hitsRemaining={2} />);
-      const button = screen.getByRole('button');
-      expect(button.className).toContain('blast-tile-cracked');
-    });
-
-    it('does NOT render crack classes on gem with hitsRemaining = 3 (full)', () => {
-      render(<BlastTile {...baseProps} type="gem" hitsRemaining={3} />);
-      const button = screen.getByRole('button');
-      expect(button.className).not.toContain('blast-tile-cracked');
-      expect(button.className).not.toContain('blast-tile-critical');
-    });
-  });
-
   describe('multiplier badges', () => {
     it('renders ×3 badge for gold tiles', () => {
       render(<BlastTile {...baseProps} type="gold" />);
       expect(screen.getByText('×3')).toBeInTheDocument();
     });
 
-    it('renders ×5 badge for diamond tiles', () => {
+    it('renders the flat bonus badge for diamond tiles', () => {
       render(<BlastTile {...baseProps} type="diamond" />);
-      expect(screen.getByText('×5')).toBeInTheDocument();
+      expect(screen.getByText(`+${DIAMOND_CLEAR_BONUS}`)).toBeInTheDocument();
     });
 
     it('does NOT render multiplier badge for standard tiles', () => {
@@ -110,15 +69,6 @@ describe('BlastTile', () => {
       expect(button?.style.transform).toContain('scale(2.2)');
     });
 
-    it('lightning clearing stretches vertically', () => {
-      const { container } = render(
-        <BlastTile {...baseProps} type="lightning" phase="clearing" />
-      );
-      const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scaleY(3.5)');
-      expect(button?.style.transform).toContain('scaleX(0.15)');
-    });
-
     it('standard clearing pops: swell, flash lime, shrink-spin to nothing', () => {
       const { container } = render(
         <BlastTile {...baseProps} type="standard" phase="clearing" clearRotate={10} />
@@ -138,46 +88,6 @@ describe('BlastTile', () => {
       expect(button?.style.transform).toContain('scale(1.12)');
     });
 
-    it('magnet clearing implodes (shrinks + spins)', () => {
-      const { container } = render(
-        <BlastTile {...baseProps} type="magnet" phase="clearing" />
-      );
-      const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scale(0.05)');
-      expect(button?.style.transform).toContain('rotate(1080deg)');
-    });
-  });
-
-  describe('gem shard progress indicator', () => {
-    it('renders 3 shard dots for gem tile', () => {
-      render(<BlastTile {...baseProps} type="gem" hitsRemaining={3} />);
-      const shards = screen.getByTestId('gem-shards');
-      expect(shards).toBeInTheDocument();
-      expect(shards.children).toHaveLength(3);
-    });
-
-    it('fills shards as gem takes damage (3 hits = 0 filled, 2 = 1 filled, 1 = 2 filled)', () => {
-      const { rerender } = render(<BlastTile {...baseProps} type="gem" hitsRemaining={3} />);
-      let shards = screen.getByTestId('gem-shards');
-      // All 3 unfilled at full health
-      expect(shards.querySelectorAll('.bg-white\\/80')).toHaveLength(0);
-      expect(shards.querySelectorAll('.bg-white\\/20')).toHaveLength(3);
-
-      rerender(<BlastTile {...baseProps} type="gem" hitsRemaining={2} />);
-      shards = screen.getByTestId('gem-shards');
-      expect(shards.querySelectorAll('.bg-white\\/80')).toHaveLength(1);
-      expect(shards.querySelectorAll('.bg-white\\/20')).toHaveLength(2);
-
-      rerender(<BlastTile {...baseProps} type="gem" hitsRemaining={1} />);
-      shards = screen.getByTestId('gem-shards');
-      expect(shards.querySelectorAll('.bg-white\\/80')).toHaveLength(2);
-      expect(shards.querySelectorAll('.bg-white\\/20')).toHaveLength(1);
-    });
-
-    it('does NOT render shard dots for non-gem tiles', () => {
-      render(<BlastTile {...baseProps} type="ice" hitsRemaining={2} />);
-      expect(screen.queryByTestId('gem-shards')).not.toBeInTheDocument();
-    });
   });
 
   describe('rare letter glow', () => {
@@ -215,12 +125,6 @@ describe('BlastTile', () => {
   });
 
   describe('activation effects', () => {
-    it('renders frost-shatter class when activationEffect is frost-free', () => {
-      render(<BlastTile {...baseProps} type="frozen" activationEffect="frost-free" />);
-      const button = screen.getByRole('button');
-      expect(button.className).toContain('blast-tile-frost-shatter');
-    });
-
     it('renders earned class when activationEffect is tile-earned', () => {
       render(<BlastTile {...baseProps} type="gold" activationEffect="tile-earned" />);
       const button = screen.getByRole('button');
@@ -320,41 +224,6 @@ describe('BlastTile', () => {
     it('still renders an empty-letter SPECIAL tile (specials carry an icon, not a letter)', () => {
       render(<BlastTile {...baseProps} letter="" type="bomb" isCleared={false} phase="idle" />);
       expect(screen.getByRole('button')).toBeInTheDocument();
-    });
-  });
-
-  describe('locked tile overlay (ice/frozen)', () => {
-    it('renders locked overlay for unthawed ice tile', () => {
-      render(<BlastTile {...baseProps} type="ice" isLocked />);
-      expect(screen.getByTestId('locked-overlay')).toBeInTheDocument();
-    });
-
-    it('renders locked overlay for unthawed frozen tile', () => {
-      render(<BlastTile {...baseProps} type="frozen" isLocked />);
-      expect(screen.getByTestId('locked-overlay')).toBeInTheDocument();
-    });
-
-    it('does NOT render locked overlay when isLocked is false', () => {
-      render(<BlastTile {...baseProps} type="ice" isLocked={false} />);
-      expect(screen.queryByTestId('locked-overlay')).not.toBeInTheDocument();
-    });
-
-    it('does NOT render locked overlay for non-lockable tiles', () => {
-      render(<BlastTile {...baseProps} type="bomb" />);
-      expect(screen.queryByTestId('locked-overlay')).not.toBeInTheDocument();
-    });
-
-    it('applies reduced opacity class when locked', () => {
-      render(<BlastTile {...baseProps} type="ice" isLocked />);
-      const button = screen.getByRole('button');
-      expect(button.className).toContain('blast-tile-locked');
-    });
-
-    it('renders the "nearby" hint inside the locked overlay for a plain locked tile', () => {
-      // The hint text itself comes from t('blast.tileNearby'); the locked
-      // overlay must render it (regression guard for the locked-tile branch).
-      render(<BlastTile {...baseProps} type="ice" isLocked />);
-      expect(screen.getByTestId('locked-overlay')).toBeInTheDocument();
     });
   });
 

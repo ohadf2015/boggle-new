@@ -30,11 +30,11 @@ const props = {
 };
 
 describe('LandingChallengeCards home', () => {
-  it('shows the live arena first and every other mode on the page', () => {
+  it('shows featured blast first, then the live arena, and every other mode on the page', () => {
     const { container, queryByTestId } = render(<LandingChallengeCards {...props} />);
     expect(queryByTestId('landing-cubes-more')).toBeNull();
     const cubes = Array.from(container.querySelectorAll('[data-cube-key]'));
-    expect(cubes[0].getAttribute('data-cube-key')).toBe('arena');
+    expect(cubes.slice(0, 2).map((el) => el.getAttribute('data-cube-key'))).toEqual(['blast', 'arena']);
     expect(cubes.length).toBeGreaterThanOrEqual(7);
   });
 

@@ -98,13 +98,15 @@ export function ModeTile({ model, index, slot = 0, variant }: ModeTileProps) {
   // A run in progress is the more useful thing to say than "new": one chip per tile.
   const showRun = !!model.resume && !locked;
   const badge = model.badge && !showRun ? t(`landing.badge.${model.badge.toLowerCase()}`, model.badge) : null;
+  const badgeTone = model.featured ? cn('bg-neo-lime text-neo-navy px-2.5 py-1 text-xs md:text-sm', styles.featuredBadge) : cn('text-[0.65rem]', tint.chip);
 
   return (
     <Link
       href={locked ? '#' : model.href}
       prefetch={false}
-      data-testid={banner ? 'mode-cube-anchor' : 'mode-cube'}
+      data-testid={banner && model.role === 'anchor' ? 'mode-cube-anchor' : 'mode-cube'}
       data-cube-key={model.key}
+      data-featured={model.featured || undefined}
       aria-disabled={locked || undefined}
       onPointerEnter={() => !locked && launch?.prefetch(model.href)}
       onClick={(e) => {
@@ -155,7 +157,7 @@ export function ModeTile({ model, index, slot = 0, variant }: ModeTileProps) {
       )}
 
       {banner && badge && (
-        <span className={cn('absolute end-1.5 top-1.5 z-[2] md:hidden', BADGE_CLASS, 'text-[0.65rem]', tint.chip)}>{badge}</span>
+        <span className={cn('absolute end-1.5 top-1.5 z-[2] md:hidden', BADGE_CLASS, badgeTone)}>{badge}</span>
       )}
       {showRun && model.resume && <ModeResumeChip resume={model.resume} anchor={banner} />}
 
@@ -163,12 +165,12 @@ export function ModeTile({ model, index, slot = 0, variant }: ModeTileProps) {
         <>
           <span className="absolute inset-0 z-[2] flex flex-col justify-end p-3 pe-14 md:static md:inset-auto md:flex-1 md:justify-center md:gap-1 md:p-0">
             <span className="mb-1.5 flex flex-wrap items-center gap-1.5 md:mb-0">
-              {badge && <span className={cn('hidden md:inline-flex', BADGE_CLASS, 'text-[0.65rem]', tint.chip)}>{badge}</span>}
+              {badge && <span className={cn('hidden md:inline-flex', BADGE_CLASS, badgeTone)}>{badge}</span>}
               {model.tag && <ModeTagChip tag={model.tag} />}
             </span>
             <span className="font-neo-display text-2xl font-black leading-none tracking-tight text-neo-white md:text-4xl">{model.title}</span>
             {model.description && (
-              <span className="mt-1 hidden max-w-[44ch] font-neo-body leading-snug text-neo-cream/90 md:block md:text-base">{model.description}</span>
+              <span className={cn('mt-1 max-w-[44ch] font-neo-body leading-snug text-neo-cream/90 md:block md:text-base', model.featured ? 'line-clamp-2 text-[0.8rem]' : 'hidden')}>{model.description}</span>
             )}
             {model.livePill && (
               <span className="mt-1.5 inline-flex w-fit items-center gap-1.5 rounded-full border-2 border-black bg-neo-lime px-2 py-0.5 font-neo-display text-xs font-black text-neo-navy shadow-hard-sm md:mt-2 md:text-sm">

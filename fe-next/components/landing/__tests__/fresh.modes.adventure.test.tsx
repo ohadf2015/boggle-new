@@ -24,12 +24,13 @@ describe('ModeRow (fresh) — every mode is a card', () => {
     trackModeSelected.mockClear();
   });
 
-  it('leads with the grid race and shows Adventure, Word Tower and Blast as cards', () => {
+  it('features Blast above a row led by the grid race, with Adventure and Word Tower as cards', () => {
     const { container } = render(<ModeRow />);
     const lead = container.querySelector('[data-fresh-section="modes"] ul')!;
     const modes = [...lead.querySelectorAll<HTMLAnchorElement>('a[data-mode]')].map((a) => a.dataset.mode);
     expect(modes[0]).toBe('arena');
-    for (const mode of ['adventure', 'wordTowerV2', 'blast']) expect(modes).toContain(mode);
+    for (const mode of ['adventure', 'wordTowerV2']) expect(modes).toContain(mode);
+    expect(container.querySelector('a[data-featured="true"]')?.getAttribute('data-mode')).toBe('blast');
   });
 
   it('does not render the old Adventure and Word Tower spotlight cards', () => {

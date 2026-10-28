@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, Gift, Shield, Bomb, Zap } from 'lucide-react';
+import { Gift, Shield, Bomb, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useCoinContext } from '@/contexts/CoinContext';
@@ -23,11 +23,10 @@ import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { useBlastUpgradeStore, computeUpgradeEffects } from '@/lib/blast/useBlastUpgradeStore';
 import { playWaveFailArpeggio } from '@/lib/blast/waveFailArpeggio';
 import { useBlastCheckpoint } from './hooks/useBlastCheckpoint';
-import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
+import { getWaveConfig, getWaveDistribution, buildWaveResult, totalWaveRewardCoins } from './utils/blastWaveConfig';
 import { BLAST_MAX_LIVES } from './utils/blastLives';
 import { selectWaveModifier, applyModifierToWaveConfig } from './utils/blastModifiers';
 import { BlastModifierBadge } from './BlastModifierBadge';
-import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from './types';
 import { useHighlightStore } from '@/stores/highlightStore';
 import { rankMoments } from '@/lib/blast/highlightScoring';
@@ -37,6 +36,9 @@ import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import { useGameExitGuard } from '@/hooks/useGameExitGuard';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { saveBlastResult } from './utils/saveBlastResult';
+import { BlastWaveClear } from '@/components/blast/progress/BlastWaveClear';
+import { useBlastLadder } from '@/components/blast/progress/useBlastLadder';
+import { autoContinueMs } from '@/components/blast/progress/progressTiming';
 
 /**
  * BlastView — Phase router for Blast Mode.
@@ -81,7 +83,10 @@ export function BlastView() {
   const [totalScore, setTotalScore] = useState(0);
   const [allWordsFound, setAllWordsFound] = useState<string[]>([]);
   const [waveHistory, setWaveHistory] = useState<WaveResult[]>([]);
-  const [lastWaveStats, setLastWaveStats] = useState({ score: 0, words: 0, clearPct: 0 });
+  const [lastWaveStats, setLastWaveStats] = useState({ score: 0, words: 0, clearPct: 0, diamonds: 0 });
+  const [runDiamonds, setRunDiamonds] = useState(0);
+  // Furthest wave before this run started, so the ladder can flag a new record.
+  const [recordAtStart, setRecordAtStart] = useState(0);
 
   // 3-lives model (run-level). Each out-of-moves dead-end free-revives and
   // burns a life; only once all are spent does BlastGame show the ad-continue
@@ -159,18 +164,31 @@ export function BlastView() {
     [activeModifier?.scoreMultiplier, upgradeEffects.comboScoreMult],
   );
 
+  const ladder = useBlastLadder({ language, difficulty: config.difficulty ?? 'medium', runId: runSeed });
+  const hudProgress = useMemo(
+    () => ({
+      baseScore: totalScore,
+      baseDiamonds: runDiamonds,
+      recordWave: recordAtStart,
+      personalBest: ladder.personalBest,
+      rivals: ladder.rivals,
+    }),
+    [totalScore, runDiamonds, recordAtStart, ladder],
+  );
+
   /** Wave completed — transition to next wave */
-  const handleWaveComplete = useCallback((waveScore: number, waveWords: string[], clearPct: number) => {
-    const waveResult: WaveResult = {
-      waveNumber: currentWave,
-      score: waveScore,
-      wordsFound: waveWords.length,
-      clearPercentage: clearPct,
+  const runCollectedRef = useRef({ diamonds: 0, bombs: 0 });
+  const handleWaveComplete = useCallback((waveScore: number, waveWords: string[], clearPct: number, collected?: { diamonds: number; bombs: number }) => {
+    runCollectedRef.current = {
+      diamonds: runCollectedRef.current.diamonds + (collected?.diamonds ?? 0),
+      bombs: runCollectedRef.current.bombs + (collected?.bombs ?? 0),
     };
+    const waveResult = buildWaveResult(currentWave, waveScore, waveWords.length, clearPct);
     setTotalScore(prev => prev + waveScore);
     setAllWordsFound(prev => [...prev, ...waveWords]);
     setWaveHistory(prev => [...prev, waveResult]);
-    setLastWaveStats({ score: waveScore, words: waveWords.length, clearPct });
+    setLastWaveStats({ score: waveScore, words: waveWords.length, clearPct, diamonds: collected?.diamonds ?? 0 });
+    setRunDiamonds(runCollectedRef.current.diamonds);
     checkpoint.recordWaveReached(currentWave);
     emitMascotEvent({ kind: 'wave-clear' });
     setPhase('waveTransition');
@@ -188,6 +206,8 @@ export function BlastView() {
     const mergedResults: BlastResultsData = {
       ...resultsData,
       finalScore: totalScore + resultsData.finalScore,
+      diamondsCollected: runCollectedRef.current.diamonds + (resultsData.diamondsCollected ?? 0),
+      bombsPopped: runCollectedRef.current.bombs + (resultsData.bombsPopped ?? 0),
       wordsFound: [...allWordsFound, ...resultsData.wordsFound],
       wavesCompleted: waveHistory.length,
       waveResults: [
@@ -200,6 +220,9 @@ export function BlastView() {
         },
       ],
     };
+    if (resultsData.sessionCoins !== undefined) {
+      mergedResults.sessionCoins = resultsData.sessionCoins + totalWaveRewardCoins(waveHistory);
+    }
     setResults(mergedResults);
     setPhase('results');
 
@@ -210,13 +233,10 @@ export function BlastView() {
       playWaveFailArpeggio();
     }
 
-    // Save gate: only persist progress when player either passed the wave (>=90% clear)
-    // or accepted the rewarded-ad continue offer. Wave-loss + ad declined = no DB write,
-    // no PB upsert, no XP, no leaderboard. The PostHog telemetry below still fires for
-    // funnel parity — that's analytics, not progress.
+    // A run only ends on a failed wave, so it saves when it earned something: a cleared wave or the ad continue.
     const passedWave = (mergedResults.clearPercentage ?? 0) >= 90;
     const adWatched = mergedResults.adContinueUsed === true;
-    if (passedWave || adWatched) {
+    if (passedWave || adWatched || mergedResults.wavesCompleted >= 1) {
       saveBlastResult(mergedResults, config.difficulty ?? 'medium', language).then(
         (patch) => {
           if (!patch) return;
@@ -270,18 +290,20 @@ export function BlastView() {
     setRunSeed(Math.floor(Math.random() * 1_000_000));
     setCurrentWave(1);
     setLivesRemaining(BLAST_MAX_LIVES);
+    setRecordAtStart(checkpoint.checkpoint?.highestWave ?? 0);
     snapshotPreWave(1, 0, [], []);
     setPhase('playing');
-  }, [snapshotPreWave]);
+  }, [snapshotPreWave, checkpoint.checkpoint]);
 
   const handleResume = useCallback(() => {
     setRunSeed(Math.floor(Math.random() * 1_000_000));
     const wave = checkpoint.resumeFromWave;
     setCurrentWave(wave);
     setLivesRemaining(BLAST_MAX_LIVES);
+    setRecordAtStart(checkpoint.checkpoint?.highestWave ?? 0);
     snapshotPreWave(wave, 0, [], []);
     setPhase('playing');
-  }, [checkpoint.resumeFromWave, snapshotPreWave]);
+  }, [checkpoint.resumeFromWave, checkpoint.checkpoint, snapshotPreWave]);
 
   /** Retry the failed wave — restore the pre-wave snapshot, keep retry-used flag. */
   const handleRetryWave = useCallback(() => {
@@ -306,6 +328,8 @@ export function BlastView() {
     setResults(null);
     setCurrentWave(1);
     setTotalScore(0);
+    runCollectedRef.current = { diamonds: 0, bombs: 0 };
+    setRunDiamonds(0);
     setAllWordsFound([]);
     setWaveHistory([]);
     setPregameBuff(null);
@@ -435,6 +459,7 @@ export function BlastView() {
             onGameEnd={handleGameEnd}
             onHighlightStart={handleHighlightStart}
             onQuit={exitGuard.requestExit}
+            progress={hudProgress}
           />
           {/* Transient celebration: the mascot pops in on a reaction and
               auto-hides after a beat so it never sits over the score/HUD. When
@@ -463,65 +488,24 @@ export function BlastView() {
       )}
 
       {phase === 'waveTransition' && (() => {
-        const stars = calculateEarnedStars(
-          Math.round(lastWaveStats.clearPct * config.gridSize * config.gridSize / 100),
-          config.gridSize * config.gridSize,
-        );
-        // Reveal the modifier the player is about to face on the next wave.
         const nextModifier = selectWaveModifier(runSeed, currentWave + 1);
+        const lastWave = waveHistory[waveHistory.length - 1];
         return (
-          <div className="flex-1 flex flex-col items-center justify-center gap-6 px-4">
-            <AdaptiveMotion.h2
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              className="text-3xl font-black uppercase text-neo-cyan font-neo-display"
-            >
-              {t('blast.waveComplete', { wave: String(currentWave) }) || `Wave ${currentWave} Complete!`}
-            </AdaptiveMotion.h2>
-
-            {/* Stars */}
-            <div className="flex gap-3">
-              {[0, 1, 2].map(i => (
-                <AdaptiveMotion.div
-                  key={`star-${i}`}
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 12, delay: 0.3 + i * 0.2 }}
-                >
-                  <Star className={`h-10 w-10 ${i < stars ? 'text-amber-400 fill-amber-400' : 'text-white fill-white/10'}`} />
-                </AdaptiveMotion.div>
-              ))}
-            </div>
-
-            <AdaptiveMotion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="text-white text-center space-y-1"
-            >
-              <p className="text-lg font-bold tabular-nums">{lastWaveStats.score} {t('common.points')}</p>
-              <p className="text-sm">{lastWaveStats.words} {t('blast.wordsFound')} · {Math.round(lastWaveStats.clearPct)}% {t('blast.cleared')}</p>
-            </AdaptiveMotion.div>
-
-            {nextModifier && <BlastModifierBadge modifier={nextModifier} variant="banner" t={t} />}
-
-            <AdaptiveMotion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.9 }}
-              className="w-full max-w-xs"
-            >
-              <Button
-                data-testid="next-wave-button"
-                size="lg"
-                onClick={handleWaveAdvance}
-                className="min-h-[56px] w-full font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-cyan text-neo-black hover:bg-neo-cyan/90"
-              >
-                {t('blast.nextWave', { wave: currentWave + 1 })}
-              </Button>
-            </AdaptiveMotion.div>
-          </div>
+          <BlastWaveClear
+            wave={currentWave}
+            waveScore={lastWaveStats.score}
+            words={lastWaveStats.words}
+            clearPct={lastWaveStats.clearPct}
+            reward={lastWave?.reward}
+            runScoreBefore={totalScore - lastWaveStats.score}
+            runCoinsBefore={totalWaveRewardCoins(waveHistory.slice(0, -1))}
+            runDiamondsBefore={runDiamonds - lastWaveStats.diamonds}
+            waveDiamonds={lastWaveStats.diamonds}
+            recordWave={recordAtStart}
+            autoContinueMs={autoContinueMs()}
+            onContinue={handleWaveAdvance}
+            nextExtra={nextModifier ? <BlastModifierBadge modifier={nextModifier} variant="banner" t={t} /> : null}
+          />
         );
       })()}
 

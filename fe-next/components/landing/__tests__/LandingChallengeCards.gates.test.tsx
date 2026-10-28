@@ -273,7 +273,7 @@ describe('LandingChallengeCards — Word Tower v2 public gate', () => {
 });
 
 describe('LandingChallengeCards — every mode on the page, sorted into intent groups', () => {
-  it('leads with the live race and puts each mode in its group, with no More detour', () => {
+  it('leads with featured blast, then puts each other mode in its group, with no More detour', () => {
     mockIsNewPlayer.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(0);
     mockUserStats.mockReturnValue({ totalGamesPlayed: 0 });
@@ -283,8 +283,11 @@ describe('LandingChallengeCards — every mode on the page, sorted into intent g
     expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
     const inGroup = (group: string, key: string) =>
       !!container.querySelector(`[data-testid="home-group-${group}"] [data-cube-key="${key}"]`);
+    expect(container.querySelector('[data-cube-key]')?.getAttribute('data-cube-key')).toBe('blast');
+    expect(container.querySelector('[data-testid="home-featured"] [data-cube-key="blast"]')).toBeTruthy();
     expect(inGroup('together', 'arena')).toBe(true);
-    for (const key of ['blast', 'adventure', 'wordTowerV2', 'brainGym']) expect(inGroup('solo', key)).toBe(true);
+    for (const key of ['adventure', 'wordTowerV2', 'brainGym']) expect(inGroup('solo', key)).toBe(true);
+    expect(inGroup('solo', 'blast')).toBe(false);
     expect(inGroup('think', 'connections')).toBe(true);
     expect(inGroup('think', 'wordCraft')).toBe(true);
   });

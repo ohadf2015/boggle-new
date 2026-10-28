@@ -40,8 +40,8 @@ const STAGGER_BY_INTENSITY: Record<SugarCrushIntensity, number> = {
 /** Tile type assigned at each intensity phase */
 const CONVERT_TYPE_BY_INTENSITY: Record<SugarCrushIntensity, BlastTileType[]> = {
   low: ['bomb'],
-  medium: ['lightning', 'prism'],
-  high: ['rainbow'],
+  medium: ['bomb', 'gold'],
+  high: ['gold'],
 };
 
 /**

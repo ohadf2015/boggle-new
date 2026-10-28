@@ -8,6 +8,8 @@ import {
   getWeekKey,
   addToWeeklyLeaderboard,
   getLeaderboardPercentile,
+  getWeeklyStanding,
+  getWeeklyScoresAbove,
 } from '../blastLeaderboard';
 import { getSharedRedisClient } from '@/backend/redis/connection';
 
@@ -20,12 +22,16 @@ const mockZadd = vi.fn();
 const mockExpire = vi.fn();
 const mockZrevrank = vi.fn();
 const mockZcard = vi.fn();
+const mockZrangebyscore = vi.fn();
+const mockZscore = vi.fn();
 
 const fakeClient = {
   zadd: mockZadd,
   expire: mockExpire,
   zrevrank: mockZrevrank,
   zcard: mockZcard,
+  zrangebyscore: mockZrangebyscore,
+  zscore: mockZscore,
 };
 
 const mockedGetRedisClient = getSharedRedisClient as unknown as ReturnType<typeof vi.fn>;
@@ -35,6 +41,8 @@ beforeEach(() => {
   mockExpire.mockReset().mockResolvedValue(1);
   mockZrevrank.mockReset();
   mockZcard.mockReset();
+  mockZrangebyscore.mockReset();
+  mockZscore.mockReset().mockResolvedValue('480');
   mockedGetRedisClient.mockReset().mockReturnValue(fakeClient);
 });
 
@@ -141,5 +149,61 @@ describe('getLeaderboardPercentile', () => {
 
     const pct = await getLeaderboardPercentile('user-1', 'en', 'medium');
     expect(pct).toBeNull();
+  });
+});
+
+describe('getWeeklyStanding', () => {
+  it('returns a 1-based rank, the board size and the stored best score', async () => {
+    mockZrevrank.mockResolvedValue(4);
+    mockZcard.mockResolvedValue(37);
+
+    await expect(getWeeklyStanding('user-1', 'en', 'medium')).resolves.toEqual({ rank: 5, total: 37, score: 480 });
+  });
+
+  it('returns null when the user is not on the board yet', async () => {
+    mockZrevrank.mockResolvedValue(null);
+    mockZcard.mockResolvedValue(10);
+
+    await expect(getWeeklyStanding('user-1', 'en', 'medium')).resolves.toBeNull();
+  });
+
+  it('returns null when Redis is down or errors', async () => {
+    mockedGetRedisClient.mockReturnValueOnce(null);
+    await expect(getWeeklyStanding('user-1', 'en', 'medium')).resolves.toBeNull();
+
+    mockZrevrank.mockRejectedValue(new Error('boom'));
+    await expect(getWeeklyStanding('user-1', 'en', 'medium')).resolves.toBeNull();
+  });
+
+  it('fails open to null when Redis hangs', async () => {
+    vi.useFakeTimers();
+    mockZrevrank.mockReturnValue(new Promise(() => {}));
+    mockZcard.mockReturnValue(new Promise(() => {}));
+    mockZscore.mockReturnValue(new Promise(() => {}));
+    const pending = getWeeklyStanding('user-1', 'en', 'medium');
+    await vi.advanceTimersByTimeAsync(1000);
+    await expect(pending).resolves.toBeNull();
+    vi.useRealTimers();
+  });
+});
+
+describe('getWeeklyScoresAbove', () => {
+  it('returns the closest scores strictly above, nearest first', async () => {
+    mockZrangebyscore.mockResolvedValue(['u-a', '520', 'u-b', '610']);
+
+    const rows = await getWeeklyScoresAbove(500, 'en', 'medium', 2, new Date('2026-04-09T12:00:00Z'));
+
+    expect(mockZrangebyscore).toHaveBeenCalledWith(
+      'blast:lb:en:medium:2026-W15', '(500', '+inf', 'WITHSCORES', 'LIMIT', 0, 2,
+    );
+    expect(rows).toEqual([{ userId: 'u-a', score: 520 }, { userId: 'u-b', score: 610 }]);
+  });
+
+  it('returns [] when Redis is down or errors', async () => {
+    mockedGetRedisClient.mockReturnValueOnce(null);
+    await expect(getWeeklyScoresAbove(500, 'en', 'medium')).resolves.toEqual([]);
+
+    mockZrangebyscore.mockRejectedValue(new Error('boom'));
+    await expect(getWeeklyScoresAbove(500, 'en', 'medium')).resolves.toEqual([]);
   });
 });

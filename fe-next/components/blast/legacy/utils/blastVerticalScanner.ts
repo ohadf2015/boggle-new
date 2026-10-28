@@ -50,9 +50,7 @@ export function detectVerticalWords(
 
     for (let row = 0; row < rows; row++) {
       const isCleared = tileStates[row]?.[col]?.isCleared ?? true;
-      const isFrozen = tileStates[row]?.[col]?.type === 'frozen';
-      // Frozen tiles break contiguous runs (they block cascade detection)
-      if (!isCleared && !isFrozen && grid[row][col]) {
+      if (!isCleared && grid[row][col]) {
         if (!currentRun) {
           currentRun = { startRow: row, letters: [] };
         }
@@ -142,8 +140,7 @@ export function detectHorizontalWords(
 
     for (let col = 0; col < cols; col++) {
       const isCleared = tileStates[row]?.[col]?.isCleared ?? true;
-      const isFrozen = tileStates[row]?.[col]?.type === 'frozen';
-      if (!isCleared && !isFrozen && grid[row][col]) {
+      if (!isCleared && grid[row][col]) {
         if (!currentRun) {
           currentRun = { startCol: col, letters: [] };
         }

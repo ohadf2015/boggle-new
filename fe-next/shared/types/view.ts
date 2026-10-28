@@ -47,6 +47,10 @@ export interface LiveLeaderboardEntry {
   isHost?: boolean;
   isBot?: boolean;
   comboLevel?: number;
+  /** Blast only */
+  coinsCollected?: number;
+  /** Blast only */
+  diamondsCollected?: number;
 }
 
 /**

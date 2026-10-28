@@ -168,9 +168,9 @@ vi.mock('../../../backend/utils/logger', () => {
 
 vi.mock('../../../backend/modules/blastModeManager', () => ({
   validateBlastWordPath: vi.fn().mockReturnValue(null),
-  getTilesOnResolvedPath: vi.fn().mockReturnValue([]),
   calculateBlastTileBonus: vi.fn().mockReturnValue(0),
-  getTilesOnPath: vi.fn().mockReturnValue([]),
+  getTilesOnBoardPath: vi.fn().mockReturnValue([]),
+  recordBlastCollection: vi.fn(() => 0),
   recordBlastMove: vi.fn().mockReturnValue(null),
 }));
 

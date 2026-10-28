@@ -6,13 +6,13 @@
 import type { BlastObjective, BlastTileType } from '../types';
 
 /**
- * Extract unique tile types referenced by objectives (collect_type, clear_all_type).
+ * Extract unique tile types referenced by collect_type objectives.
  * Used to highlight objective-relevant tiles on the grid.
  */
 export function getObjectiveTileTypes(objectives: BlastObjective[]): BlastTileType[] {
   const types = new Set<BlastTileType>();
   for (const obj of objectives) {
-    if ((obj.type === 'collect_type' || obj.type === 'clear_all_type') && obj.tileType) {
+    if (obj.type === 'collect_type' && obj.tileType) {
       types.add(obj.tileType);
     }
   }
@@ -36,9 +36,6 @@ export function formatObjectiveLabel(
     case 'collect_type':
       template = t('blast.objective.collectType', 'Collect {target} {tileType} tiles') ?? 'Collect {target} {tileType} tiles';
       break;
-    case 'clear_all_type':
-      template = t('blast.objective.clearAllType', 'Clear all {tileType} tiles') ?? 'Clear all {tileType} tiles';
-      break;
     case 'word_length':
       template = t('blast.objective.wordLength', 'Find {target} words with {minWordLength}+ letters') ?? 'Find {target} words with {minWordLength}+ letters';
       break;
@@ -50,15 +47,6 @@ export function formatObjectiveLabel(
       break;
     case 'color_power':
       template = t('blast.objective.colorPower', 'Use {count}+ {color} tiles in one word') ?? 'Use {count}+ {color} tiles in one word';
-      break;
-    case 'clear_jelly':
-      template = t('blast.objective.clearJelly', 'Clear all jelly') ?? 'Clear all jelly';
-      break;
-    case 'kill_cake':
-      template = t('blast.objective.killCake', 'Destroy the cake') ?? 'Destroy the cake';
-      break;
-    case 'stop_chocolate':
-      template = t('blast.objective.stopChocolate', 'Stop the chocolate') ?? 'Stop the chocolate';
       break;
     default:
       template = '';

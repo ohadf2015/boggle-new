@@ -13,6 +13,8 @@ import { BlastHudMuteButton } from '../v2/BlastHudMuteButton';
 import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { BLAST_MAX_LIVES } from './utils/blastLives';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
+import { BlastHudProgressRow, comboTier, type BlastHudProgress } from '../progress/BlastHudProgress';
+import { accentColor, getWaveTheme } from '../progress/waveTheme';
 
 /** Pre-game buff chip — shown in HUD top row when player claimed a rewarded-ad boost. */
 type ActiveBuff = 'shield' | 'bomb' | 'combo2x';
@@ -188,6 +190,9 @@ interface BlastHUDProps {
   isDesktopCanvas?: boolean;
   /** In-run coins balance (SP only) */
   coins?: number;
+  /** SP run context — ribbon, run diamonds, target to beat. */
+  progress?: BlastHudProgress;
+  waveDiamonds?: number;
   t: (key: string, fallback?: string) => string | undefined;
 }
 
@@ -219,6 +224,8 @@ export function BlastHUD({
   totalTime,
   isDesktopCanvas = false,
   coins = 0,
+  progress,
+  waveDiamonds = 0,
   t,
 }: BlastHUDProps) {
   const ownMute = !isMultiplayer && !isDesktopCanvas;
@@ -229,8 +236,12 @@ export function BlastHUD({
   const clearPct = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
   const isFiniteMoves = isFinite(totalMoves);
   const goalMet = clearPct >= BLAST_WAVE_GOAL_PCT;
-  const { display: animatedScore, pulse: scorePulse } = useAnimatedScore(score);
+  const showProgress = !isMultiplayer && !!progress;
+  // A run total keeps the score and the "X to pass" chip on the same number; wave goals show their own count.
+  const { display: animatedScore, pulse: scorePulse } = useAnimatedScore(showProgress && progress ? progress.baseScore + score : score);
   const { pulse: clearPulse, delta: clearDelta, burstKey: clearBurstKey } = useClearPulse(tilesCleared);
+  const accent = showProgress ? accentColor(getWaveTheme(waveNumber)) : undefined;
+  const combo = comboTier(comboStreak?.isActive ? comboStreak.level : 0);
 
   let moveColorClass: string;
   if (movesRemaining <= 2) {
@@ -245,7 +256,8 @@ export function BlastHUD({
 
   return (
     <div
-      className="flex flex-col gap-0 bg-neo-navy border-b-2 border-neo-black"
+      className={cn('flex flex-col gap-0 bg-neo-navy border-b-2 border-neo-black', showProgress && 'border-b-4')}
+      style={accent ? { borderBottomColor: accent } : undefined}
       data-testid="blast-hud"
     >
       {/* Top row: wave + buff slot + controls. Min-h fixed so chip toggles never reflow. */}
@@ -256,8 +268,8 @@ export function BlastHUD({
           {showTimer && (
             <BlastHUDTimer remainingTime={remainingTime as number} totalTime={totalTime as number} t={t} />
           )}
-          {/* Wave chip — hidden in MP (timer-era, no waves) */}
-          {!isMultiplayer && (
+          {/* Wave chip — hidden in MP (timer-era, no waves); the progress ribbon replaces it in SP runs */}
+          {!isMultiplayer && !showProgress && (
             <span
               className="shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border-2 border-neo-cyan text-neo-cyan tabular-nums"
               style={NO_TEXT_SHADOW_STYLE}
@@ -356,7 +368,7 @@ export function BlastHUD({
           aria-label={`${t('blast.score')}: ${animatedScore}`}
         >
           <div data-board-score-target="" className="flex items-center gap-1.5 min-w-0">
-            <span className="text-amber-400 text-sm shrink-0">★</span>
+            <span className="text-neo-yellow text-sm shrink-0">★</span>
             <span
               className={cn(
                 'text-xl font-black tabular-nums truncate transition-transform duration-150 text-neo-white origin-left',
@@ -406,7 +418,12 @@ export function BlastHUD({
           {/* Reserved combo badge slot — fixed footprint regardless of streak presence. */}
           <div
             data-testid="blast-combo-slot"
-            className="w-[44px] h-[44px] flex items-center justify-center"
+            data-combo-tier={combo}
+            className={cn(
+              'w-[44px] h-[44px] flex items-center justify-center rounded-full transition-transform duration-200',
+              combo === 2 && 'scale-110 shadow-[0_0_0_3px_var(--neo-pink)]',
+              combo === 3 && 'scale-125 shadow-[0_0_0_3px_var(--neo-yellow),0_0_18px_var(--neo-orange)] blast-heartbeat',
+            )}
           >
             {comboStreak && comboStreakArcRef && (
               <BlastComboStreakBadge streak={comboStreak} arcRef={comboStreakArcRef} />
@@ -454,9 +471,7 @@ export function BlastHUD({
               )}
               style={{
                 width: `${clearPct}%`,
-                background: goalMet
-                  ? 'linear-gradient(90deg, #BFFF00, #D9FF66)'
-                  : 'linear-gradient(90deg, #00FFFF, #66FFFF)',
+                background: goalMet ? 'var(--neo-lime)' : (accent ?? 'var(--neo-cyan)'),
               }}
             />
           </div>
@@ -471,6 +486,9 @@ export function BlastHUD({
           </span>
         </div>
       </div>
+      {showProgress && progress && (
+        <BlastHudProgressRow progress={progress} wave={waveNumber} waveScore={score} waveDiamonds={waveDiamonds} />
+      )}
     </div>
   );
 }

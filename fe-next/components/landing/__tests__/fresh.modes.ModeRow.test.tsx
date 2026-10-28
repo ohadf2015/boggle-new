@@ -47,9 +47,58 @@ describe('ModeRow (fresh section 4)', () => {
     expect(h2s[0].textContent).toBe('homeFresh.modes.title');
   });
 
-  it('offers only public modes, newcomer-friendly first and blast last', () => {
+  it('offers only public modes in the row, with blast lifted out of it', () => {
     const { container } = render(<ModeRow />);
     expect(cards(container).map((a) => a.getAttribute('href'))).toEqual(PUBLIC_HREFS);
+    expect(FRESH_MODE_KEYS).not.toContain('blast');
+  });
+
+  describe('featured Blast card', () => {
+    const featured = (c: HTMLElement) => c.querySelector<HTMLAnchorElement>('[data-fresh-section="modes"] a[data-featured="true"]');
+
+    it('leads the section, above the row, and links to the public V1 route', () => {
+      const { container } = render(<ModeRow />);
+      const card = featured(container)!;
+      expect(card).not.toBeNull();
+      expect(card.getAttribute('href')).toBe('/en/blast');
+      expect(card.closest('ul')).toBeNull();
+      expect(card.compareDocumentPosition(cards(container)[0]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('carries the Recommended badge, its title and the hook line', () => {
+      const { container } = render(<ModeRow />);
+      const text = featured(container)!.textContent;
+      expect(text).toContain('landing.badge.recommended');
+      expect(text).toContain('homeFresh.modes.items.blast.title');
+      expect(text).toContain('homeFresh.modes.items.blast.line');
+    });
+
+    it('localises its link', () => {
+      lang.language = 'he';
+      const { container } = render(<ModeRow />);
+      expect(featured(container)!.getAttribute('href')).toBe('/he/blast');
+    });
+
+    it('is absent where Blast has no letters (ru), and nothing else links to /blast', () => {
+      lang.language = 'ru';
+      const { container } = render(<ModeRow />);
+      expect(featured(container)).toBeNull();
+      expect(container.querySelector('a[href*="/blast"]')).toBeNull();
+    });
+
+    it('fires the same click events, flagged as featured', () => {
+      const { container } = render(<ModeRow />);
+      fireEvent.click(featured(container)!);
+      expect(trackModeSelected).toHaveBeenCalledWith('blast', 'home');
+      expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', expect.objectContaining({ mode: 'blast', featured: true, surface: 'fresh' }));
+    });
+
+    it('only moves when motion is welcome (motion-safe idle)', () => {
+      const { container } = render(<ModeRow />);
+      const html = featured(container)!.innerHTML;
+      expect(html).not.toMatch(/(^|\s)animate-/);
+      expect(html).not.toMatch(/opacity-0/);
+    });
   });
 
   it('never links a fresh visitor to a beta-gated route', () => {

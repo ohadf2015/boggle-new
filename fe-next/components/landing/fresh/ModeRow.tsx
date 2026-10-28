@@ -5,8 +5,8 @@
  *
  * - Only modes a logged-out visitor can open. crossword / quick-play
  *   remain beta-gated in LandingChallengeCards (and route-guards).
- * - Order is newcomer-first: blast ranks lowest for first-day players
- *   (lib/landing/newcomerModeOrder.ts), so it goes last.
+ * - Blast is the recommended mode: it leads as one wide featured card above
+ *   the wall, and the wall carries the rest.
  * - Arena is the feature tile (it is the product); the rest vary in size so the
  *   wall has a hierarchy instead of a row of identical cards.
  * - A card click fires the same `mode_card` + `mode_selected` events the hub
@@ -24,9 +24,10 @@ import { MODE_META, MODE_TAGS, modeRoute, type ModeCubeVariant } from '@/lib/lan
 import { trackLandingCtaClick, trackModeSelected } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 import styles from '../home/HomeModeGrid.module.css';
+import { FeaturedModeCard } from './FeaturedModeCard';
 
-/** Every public mode is a card: a lone card read as "this site has one game". Blast last (newcomer order). */
-export const FRESH_MODE_KEYS = ['arena', 'adventure', 'wordTowerV2', 'wordCraft', 'connections', 'brainGym', 'blast'] as const;
+/** Every other public mode is a card: a lone card read as "this site has one game". */
+export const FRESH_MODE_KEYS = ['arena', 'adventure', 'wordTowerV2', 'wordCraft', 'connections', 'brainGym'] as const;
 type FreshModeKey = (typeof FRESH_MODE_KEYS)[number];
 
 type Shape = 'feature' | 'wide' | 'tall' | 'slim';
@@ -37,9 +38,8 @@ const SHAPE: Record<FreshModeKey, { shape: Shape; cell: string }> = {
   adventure: { shape: 'wide', cell: 'lg:col-span-6' },
   wordTowerV2: { shape: 'tall', cell: 'lg:col-span-3' },
   wordCraft: { shape: 'tall', cell: 'lg:col-span-3' },
-  connections: { shape: 'slim', cell: 'lg:col-span-4' },
-  brainGym: { shape: 'slim', cell: 'lg:col-span-4' },
-  blast: { shape: 'slim', cell: 'sm:col-span-2 lg:col-span-4' },
+  connections: { shape: 'slim', cell: 'lg:col-span-6' },
+  brainGym: { shape: 'slim', cell: 'sm:col-span-2 lg:col-span-6' },
 };
 
 /** Literal class strings (Tailwind v4 only sees literals). Colour comes from the mode, not the position. */
@@ -56,11 +56,11 @@ const TONE: Record<ModeCubeVariant, { border: string; shadow: string; chip: stri
  * The square cube PNGs fill the art window edge to edge (object-cover), so
  * their baked navy (which varies per file) never shows a seam against the
  * window. Zoom on top of that, measured from each sticker's trimmed bounds so
- * nothing but navy margin is cropped: small-framed stickers get more, blast
- * bleeds its FX to the edge and brainGym is already tall, so they stay at 1.
+ * nothing but navy margin is cropped: small-framed stickers get more, and
+ * brainGym is already tall, so it stays at 1.
  */
 const ART_ZOOM: Partial<Record<FreshModeKey, number>> = {
-  arena: 1, wordCraft: 1.15, connections: 1.25, brainGym: 1, blast: 1,
+  arena: 1, wordCraft: 1.15, connections: 1.25, brainGym: 1,
 };
 
 /** Literal keys so i18n guards can see them; same chip facts as the returning hub. */
@@ -88,9 +88,11 @@ const ART_SHAPE: Record<Shape, string> = {
 export function ModeRow() {
   const { t, language } = useLanguage();
 
-  const onCardClick = (key: FreshModeKey) => {
+  const onCardClick = (key: string, featured = false) => {
     trackModeSelected(key, 'home');
-    trackLandingCtaClick('mode_card', { mode: key, variant: MODE_META[key]?.variant, surface: 'fresh' });
+    trackLandingCtaClick('mode_card', {
+      mode: key, variant: MODE_META[key]?.variant, surface: 'fresh', ...(featured && { featured: true }),
+    });
   };
 
   return (
@@ -106,7 +108,9 @@ export function ModeRow() {
           {t('homeFresh.modes.line')}
         </p>
 
-        <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:mt-10 lg:grid-cols-12 lg:gap-5">
+        <FeaturedModeCard onPick={(key) => onCardClick(key, true)} />
+
+        <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12 lg:gap-5">
           {FRESH_MODE_KEYS.map((key, idx) => {
             const meta = MODE_META[key];
             const href = modeRoute(key, language);

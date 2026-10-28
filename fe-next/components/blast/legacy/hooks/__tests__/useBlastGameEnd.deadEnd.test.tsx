@@ -31,6 +31,8 @@ interface EngineState {
     wordsFound: string[];
     tilesCleared: number;
     totalTiles: number;
+    diamondsCollected?: number;
+    tileTypeClears?: Record<string, number>;
   };
 }
 
@@ -95,6 +97,15 @@ describe('useBlastGameEnd — dead-end finale callback', () => {
       { row: 1, col: 0, type: 'normal' },
       { row: 1, col: 1, type: 'gem' },
     ]);
+  });
+
+  it("passes the wave's diamonds and bombs to onWaveComplete so the run can total them", async () => {
+    const deps = { ...makeDeps({ isDeadEnd: true, tilesCleared: 6, diamondsCollected: 2, tileTypeClears: { bomb: 3 } }), onWaveComplete: vi.fn() };
+    renderHook(() => useBlastGameEnd(deps));
+
+    await act(async () => { await vi.runAllTimersAsync(); });
+
+    expect(deps.onWaveComplete).toHaveBeenCalledWith(500, ['HELLO'], 100, { diamonds: 2, bombs: 3 });
   });
 
   it('ends the game after the finale burst has time to play', async () => {

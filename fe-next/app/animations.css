@@ -2191,12 +2191,6 @@ html.reduce-motion *::after {
 }
 
 /* Disable heavy blast tile animations (box-shadow + filter keyframes) */
-.low-end-device .blast-tile-ice,
-.low-end-device .blast-tile-lightning,
-.low-end-device .blast-tile-magnet,
-.low-end-device .blast-tile-prism,
-.low-end-device .blast-tile-gem,
-.low-end-device .blast-tile-frozen,
 .low-end-device .blast-tile-objective {
   animation: none !important;
   filter: none !important;

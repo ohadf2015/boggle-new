@@ -6,6 +6,7 @@
 
 import type { Avatar, WordDetail, LeaderboardEntry, GameUser, FirstFinderEntry } from '@/shared/types/game';
 import logger from '../utils/logger';
+import { compareBlastStandings } from '@/shared/utils/blastCollectionScore';
 
 // Base game interface for scoreManager - compatible with both Game and GameState
 
@@ -27,6 +28,8 @@ export interface ScoreGameBase {
   firstFinderMap?: Record<string, FirstFinderEntry>;
   /** Teacher-run room: the host is a spectator, never a contestant. */
   isClassroom?: boolean;
+  /** Blast only: per-player coins/diamonds collected */
+  blastModeState?: { playerStats?: Record<string, { coinsCollected?: number; diamondsCollected?: number }> } | null;
 }
 
 // Leaderboard throttling - maps gameCode to timeout ID
@@ -101,6 +104,10 @@ export interface LeaderboardPlayer {
   isHost: boolean;
   isBot: boolean;
   comboLevel?: number;
+  /** Blast only */
+  coinsCollected?: number;
+  /** Blast only */
+  diamondsCollected?: number;
 }
 
 /**
@@ -270,7 +277,8 @@ export function getLeaderboard(game: ScoreGameBase | null, gameCode?: string): L
     return leaderboardCache[gameCode];
   }
 
-  const result = Object.entries(game.playerScores)
+  const blastStats = game.blastModeState?.playerStats;
+  const result: LeaderboardPlayer[] = Object.entries(game.playerScores)
     .map(([username, score]) => ({
       username,
       score,
@@ -279,10 +287,14 @@ export function getLeaderboard(game: ScoreGameBase | null, gameCode?: string): L
       isHost: game.users[username]?.isHost || false,
       isBot: game.users[username]?.isBot || false,
       comboLevel: game.playerCombos?.[username] || 0,
+      ...(blastStats ? {
+        coinsCollected: blastStats[username]?.coinsCollected ?? 0,
+        diamondsCollected: blastStats[username]?.diamondsCollected ?? 0,
+      } : {}),
     }))
     // A classroom teacher spectates; an idle host must not rank as "0" on every student's board.
     .filter((p) => !(game.isClassroom && p.isHost && p.wordCount === 0))
-    .sort((a, b) => b.score - a.score);
+    .sort(compareBlastStandings);
 
   // Cache the result
   if (gameCode) {

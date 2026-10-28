@@ -46,13 +46,12 @@ beforeEach(() => {
 });
 
 describe('LandingChallengeCards — cubes layout', () => {
-  it('renders the bento cube layout with arena anchor', () => {
+  it('renders the bento cube layout with the featured blast anchor and the live arena beside it', () => {
     const { container } = render(<LandingChallengeCards {...baseProps} />);
     const anchor = screen.getByTestId('mode-cube-anchor');
-    expect(anchor).toBeInTheDocument();
-    // arena anchor links to multiplayer + shows the live pill from activePlayers
-    expect(anchor).toHaveAttribute('href', '/en/multiplayer');
-    expect(screen.getByText(/1,234 landing\.playingNow/)).toBeInTheDocument();
+    expect(anchor).toHaveAttribute('href', '/en/blast');
+    expect(container.querySelector('[data-cube-key="arena"]')).toHaveAttribute('href', '/en/multiplayer');
+    expect(screen.getByTestId('home-live-count')).toHaveTextContent('landing.home.online');
   });
 
   it('preserves analytics on cube click (mode_selected + landing_cta_clicked)', () => {

@@ -3,23 +3,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { BlastResultsSummary } from '../BlastResultsSummary';
 import type { BlastResultsData } from '../types';
 
-// Render motion + animate-presence inline so children mount synchronously.
-vi.mock('@/components/motion/AdaptiveMotion', () => {
-  const passthrough = (Tag: string) => {
-    const Comp = ({ children, ...props }: any) => {
-      const { initial, animate, exit, transition, ...rest } = props;
-      void initial; void animate; void exit; void transition;
-      // Render as a generic element so we don't need to validate Tag.
-      return <div {...rest}>{children}</div>;
-    };
-    Comp.displayName = `MotionMock(${Tag})`;
-    return Comp;
-  };
-  return {
-    AdaptiveMotion: new Proxy({}, { get: (_, key) => passthrough(String(key)) }),
-    AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
-  };
-});
+vi.mock('../../results/useBlastResultsReveal', () => ({ useBlastResultsReveal: vi.fn() }));
+
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ language: 'en', dir: 'ltr' }),
+}));
 
 // Stub the unlock hook so we don't touch the Zustand store or sonner.
 vi.mock('../hooks/useBlastBadgeUnlocks', () => ({
@@ -160,30 +148,71 @@ describe('BlastResultsSummary', () => {
     expect(old.textContent).not.toContain('blast.results.newBadge');
   });
 
-  it('renders mascot image matching results priority ladder', () => {
-    // PB beaten → celebrating mascot
+  it('picks the results mascot pose by outcome tier', () => {
     const { rerender } = render(
       <BlastResultsSummary
-        results={makeResults({ finalScore: 9000, previousBest: 6000, maxCombo: 3, wavesCompleted: 2 })}
+        results={makeResults({ finalScore: 9000, previousBest: 6000, clearPercentage: 95 })}
         t={t}
         onPlayAgain={noop}
         onQuit={noop}
       />,
     );
     const celebrating = screen.getByTestId('blast-results-mascot') as HTMLImageElement;
-    expect(celebrating.src).toContain('mascot-new-trophy');
+    expect(celebrating.dataset.tier).toBe('newBest');
+    expect(celebrating.src).toContain('/blast/results/mascot-celebrate.webp');
 
-    // Flameout → sadSmile
     rerender(
       <BlastResultsSummary
-        results={makeResults({ finalScore: 200, previousBest: 6000, maxCombo: 1, wavesCompleted: 1 })}
+        results={makeResults({ finalScore: 200, previousBest: 6000, clearPercentage: 50 })}
         t={t}
         onPlayAgain={noop}
         onQuit={noop}
       />,
     );
     const sad = screen.getByTestId('blast-results-mascot') as HTMLImageElement;
-    expect(sad.src).toContain('mascot-new-oops');
+    expect(sad.dataset.tier).toBe('low');
+    expect(sad.src).toContain('/blast/results/mascot-sad.webp');
+  });
+
+  it('shows coin, diamond and bomb chips, defaulting diamonds to 0', () => {
+    render(
+      <BlastResultsSummary
+        results={{ ...makeResults({ sessionCoins: 14 }), bombsPopped: 3 }}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    expect(screen.getByTestId('blast-stat-coins').textContent).toContain('14');
+    expect(screen.getByTestId('blast-stat-diamonds').textContent).toContain('0');
+    expect(screen.getByTestId('blast-stat-bombs').textContent).toContain('3');
+  });
+
+  it('teases the next goal with a near-miss nudge when close to the best', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({ finalScore: 5900, previousBest: 6000, clearPercentage: 95 })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const goal = screen.getByTestId('blast-results-next-goal');
+    expect(goal.dataset.kind).toBe('personalBest');
+    expect(goal.textContent).toContain('blast.results.reveal.goalBest 101');
+    expect(screen.getByTestId('blast-results-near-miss')).toBeDefined();
+  });
+
+  it('names the leaderboard rival when the engine sends one', () => {
+    render(
+      <BlastResultsSummary
+        results={{ ...makeResults({ finalScore: 5000, clearPercentage: 95 }), rival: { name: 'Maya', score: 5120 } }}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    expect(screen.getByTestId('blast-results-next-goal').textContent).toContain('Maya');
   });
 
   it('shows fail banner + hides stars when clearPercentage < 90', () => {
@@ -319,6 +348,8 @@ describe('BlastResultsSummary', () => {
     // Footer is the actual parent of the CTAs (not just the document).
     expect(footer.contains(screen.getByTestId('play-again-button'))).toBe(true);
     expect(footer.contains(screen.getByText('common.home'))).toBe(true);
+    expect(footer.contains(screen.getByTestId('blast-results-leaderboard-link'))).toBe(true);
+    expect(footer.querySelectorAll('[data-reveal="cta"]')).toHaveLength(1);
   });
 
   it('uses tryAgain copy on play-again button when wave failed', () => {
@@ -353,9 +384,6 @@ describe('BlastResultsSummary', () => {
   });
 });
 
-// Neo-brutalist polish: flat solid surfaces (no soft gradients), full-contrast
-// text, and a celebratory confetti burst on a winning run. Mirrors the Claude
-// Design mockups under .superdesign/claude-design/blast/.
 describe('BlastResultsSummary — neo-brutalist polish', () => {
   const noop = () => {};
   const win = (o = {}) => makeResults({ clearPercentage: 95, stars: 3, ...o });
@@ -402,8 +430,8 @@ describe('BlastResultsSummary — neo-brutalist polish', () => {
       <BlastResultsSummary results={win()} t={t} onPlayAgain={noop} onQuit={noop} />,
     );
     const label = screen.getByText('blast.stars3');
-    expect(label.className).toContain('text-yellow-400');
-    expect(label.className).not.toContain('text-yellow-400/80');
+    expect(label.className).toContain('text-neo-yellow');
+    expect(label.className).not.toMatch(/text-neo-yellow\//);
   });
 });
 

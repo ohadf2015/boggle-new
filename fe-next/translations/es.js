@@ -1,5 +1,28 @@
 // Es translations
 const es = {
+  // @blastProgress:start
+  "blastProgress": {
+    "wave": "Oleada {wave}",
+    "tapToSkip": "Toca para saltar",
+    "toPass": "{points} para pasar a {name}",
+    "toBest": "{points} para tu récord",
+    "passed": "¡Pasaste a {name}!",
+    "newBest": "¡Nuevo récord!",
+    "top": "N.º 1 esta semana",
+    "weekly": "Esta semana",
+    "cleared": "¡Oleada {wave} superada!",
+    "waveScore": "Puntos de la oleada",
+    "coins": "Monedas",
+    "diamonds": "Diamantes",
+    "nextUp": "Lo siguiente",
+    "reward": "Premio de {coins} monedas",
+    "bigReward": "Premio ×{mult}",
+    "record": "Nuevo récord",
+    "play": "Jugar oleada {wave}",
+    "autoIn": "Empieza en {seconds}",
+    "runLabel": "Progreso: oleada {wave}"
+  },
+  // @blastProgress:end
   // @eduPickers:start
   "eduPickers": {
     "language": {
@@ -1239,7 +1262,7 @@ const es = {
         },
         "blast": {
           "title": "Modo Blast",
-          "line": "Encadena palabras, limpia el tablero y ¡bum!"
+          "line": "Arma palabras, revienta bombas, junta monedas y diamantes."
         }
       }
     },
@@ -8530,7 +8553,8 @@ const es = {
     "badgeHost": "Anfitrión",
     "badge": {
       "new": "Nuevo",
-      "beta": "Beta"
+      "beta": "Beta",
+      "recommended": "Recomendado"
     },
     "multiPlayer": "Multijugador",
     "multiplayer": "Multijugador",
@@ -12974,6 +12998,26 @@ const es = {
       "waveFailed": "Oleada Fallida",
       "needClearPct": "Necesitabas {required}% despejado, lograste {got}%",
       "tilesShort": "¡Solo {count} fichas más!",
+      "reveal": {
+        "coins": "Monedas",
+        "diamonds": "Diamantes",
+        "bombs": "Bombas explotadas",
+        "combo": "Mejor combo",
+        "words": "Palabras",
+        "waves": "Oleadas",
+        "longestWord": "Palabra más larga",
+        "goalRival": "Te faltan {gap} pts para superar a {name}",
+        "goalLead": "Le ganaste a {name} por {gap}",
+        "goalBest": "Te faltan {gap} pts para tu récord",
+        "nearMiss": "¡Por poco!",
+        "rank": "Puesto",
+        "rankUp": "Subes {n}",
+        "rankDown": "Bajas {n}",
+        "headlineLow": "A la próxima",
+        "headlineMid": "Buena explosión",
+        "headlineHigh": "¡Partidazo!",
+        "headlineNewBest": "¡Récord personal!"
+      },
       "failHint": "Despeja al menos el 90% del tablero para avanzar",
       "tryAgain": "Intentar de Nuevo",
       "share": "Compartir",
@@ -13210,92 +13254,16 @@ const es = {
     },
     "tile": {
       "gold": {
-        "name": "Oro",
-        "desc": "Puntos ×3 + 1 movimiento extra."
-      },
-      "silver": {
-        "name": "Plata",
-        "desc": "Puntos ×1.5. Extiende cuentas atrás en 1."
+        "name": "Moneda",
+        "desc": "×3 a la puntuación de la palabra, +1 movimiento y monedas extra."
       },
       "diamond": {
         "name": "Diamante",
-        "desc": "Puntos ×5. Revela contenido de escarcha por 3 turnos."
+        "desc": "Lo ganas con palabras raras. Despéjalo para un gran bono."
       },
       "bomb": {
         "name": "Bomba",
         "desc": "Limpia área 3×3. Encadena con bombas cercanas."
-      },
-      "lightning": {
-        "name": "Rayo",
-        "desc": "Limpia la columna entera al instante."
-      },
-      "prism": {
-        "name": "Prisma",
-        "desc": "2 golpes. Limpia fila + columna. Encadena bombas y rayos."
-      },
-      "rainbow": {
-        "name": "Arcoíris",
-        "desc": "Copia y duplica el mejor especial. Solo: puntos ×2."
-      },
-      "ice": {
-        "name": "Hielo",
-        "desc": "2 golpes para romper. Ficha defensiva de múltiples golpes."
-      },
-      "gem": {
-        "name": "Gema",
-        "desc": "3 golpes para recoger. Genera 2 especiales al completar."
-      },
-      "frozen": {
-        "name": "Escarcha",
-        "desc": "2 golpes. Oculta un especial dentro: bomba, rayo, prisma, gema o arcoíris."
-      },
-      "magnet": {
-        "name": "Vórtice",
-        "desc": "Atrae fichas cercanas y luego explota el área."
-      },
-      "mirror": {
-        "name": "Espejo",
-        "desc": "Copia el primer especial ofensivo de tu palabra. Solo: puntos ×2."
-      },
-      "wildcard": {
-        "name": "Comodín",
-        "desc": "Cualquier letra. Puntúa según valor Scrabble de la letra usada."
-      },
-      "countdown": {
-        "name": "Cuenta atrás",
-        "desc": "Cuenta movimientos. Desarma en palabra: +15 pts y 2 extras. Expira: -50 pts y explosión 3×3."
-      },
-      "shuffle": {
-        "name": "Mezcla",
-        "desc": "Reorganiza todas las letras restantes del tablero al limpiar."
-      },
-      "magma": {
-        "name": "Magma",
-        "desc": "Limpia ambas diagonales (patrón X) con multiplicador de puntos ×2."
-      },
-      "portal": {
-        "name": "Portal",
-        "desc": "Teletransporta tu camino de palabras a través de pares vinculados. Limpia ambos. ×2 puntos. +5 bonus."
-      },
-      "catalyst": {
-        "name": "Catalizador",
-        "desc": "+10 pts. Convierte fichas normales adyacentes en especiales."
-      },
-      "crystal": {
-        "name": "Cristal",
-        "desc": "Crece +1× cada turno sin usar (máx 5×). Multiplica tu puntuación de palabra al usarlo."
-      },
-      "fuse": {
-        "name": "Mecha",
-        "desc": "Par vinculado. Elimina una para encender su pareja: desactívala en 3 turnos para +15 pts y 2 movimientos, o detona un estallido 3×3 de -50 pts."
-      },
-      "anchor": {
-        "name": "Ancla",
-        "desc": "Recompensa palabras largas. Suma +3 puntos por cada letra de la palabra al eliminarse."
-      },
-      "mystery": {
-        "name": "Misterio",
-        "desc": "Sorpresa aleatoria: ráfaga de puntos, nueva especial, mini-pop o mega +150."
       }
     },
     "title": "Modo Blast",
@@ -13369,7 +13337,6 @@ const es = {
     "giveUp": "Terminar juego",
     "goldTile": "¡3x puntos!",
     "bombTile": "¡Limpia zona!",
-    "rainbowTile": "¡Bonus!",
     "cascadeChain": "CASCADE x{level}",
     "waveBadge": "Oleada {wave}",
     "stars1": "Bien",
@@ -13384,21 +13351,17 @@ const es = {
     "mpResults": {
       "boardCleared": "¡Tablero despejado!",
       "yourPosition": "Tu posición",
-      "champion": "Campeón"
+      "champion": "Campeón",
+      "coinKing": "Rey de monedas",
+      "mostDiamonds": "Más diamantes",
+      "bonus": "+{n} pts",
+      "bonusLabel": "Bonus de recolección"
     },
     "helpGold": "Multiplicador de puntuación x3 para la palabra.",
     "helpBomb": "Limpia las 8 casillas circundantes.",
-    "helpRainbow": "+5 puntos de bonificación.",
     "helpGoal": "Limpia todas las casillas que puedas para lograr la mayor puntuación",
     "helpGoldLabel": "Oro",
     "helpBombLabel": "Bomba",
-    "helpRainbowLabel": "Arcoíris",
-    "helpPrismLabel": "Prisma",
-    "helpPrism": "Usa en 2 palabras para activar limpieza cruzada (fila + columna completa).",
-    "helpGemLabel": "Gema",
-    "helpGem": "Usa en 3 palabras para recolectar. +3 por uso, +8 al recolectar.",
-    "helpFrozenLabel": "Congelado",
-    "helpFrozen": "Requiere 3 golpes para romper. Bloquea la detección de cascada.",
     "foundWords": "Palabras encontradas",
     "noWordsLeft": "No quedan palabras",
     "moreLevelsComingSoon": "Nuevos niveles están en camino.",
@@ -13504,20 +13467,9 @@ const es = {
       "rule3": "Fichas especiales explotan, congelan y multiplican",
       "rule4": "Limpia el tablero para avanzar"
     },
-    "helpIceLabel": "Hielo",
-    "helpIce": "2 golpes para romper. Se agrieta en el primero.",
-    "helpLightningLabel": "Rayo",
-    "helpLightning": "Limpia toda la columna al usarse en una palabra.",
-    "helpMagnetLabel": "Imán",
-    "helpMagnet": "Atrae fichas cercanas al limpiarse.",
-    "helpMirrorLabel": "Espejo",
-    "helpMirror": "Duplica efecto de ficha especial, o 2x puntaje.",
-    "helpSilverLabel": "Plata",
-    "helpSilver": "Multiplicador de 4x para la palabra.",
     "helpDiamondLabel": "Diamante",
     "helpDiamond": "Multiplicador de 5x. La ficha de mayor valor.",
     "hintCooldown": "Usada",
-    "tileNearby": "✦ cerca ✦",
     "waveClearBanner": "¡Oleada Limpia!",
     "tapToContinue": "Toca para continuar",
     "levelComplete": "¡Nivel Completo!",
@@ -13548,7 +13500,6 @@ const es = {
     "objective": {
       "scoreTarget": "Anota {target} pts",
       "collectType": "Recolecta {target} fichas {tileType}",
-      "clearAllType": "Limpia todas las fichas {tileType}",
       "wordLength": "{target} palabras de {minWordLength}+ letras",
       "clearPercent": "Limpia {target}% del tablero",
       "targetWord": "Encuentra: {word}",
@@ -13558,9 +13509,6 @@ const es = {
       "colorPink": "Rosa",
       "colorCyan": "Cian",
       "colorLime": "Lima",
-      "clearJelly": "Elimina toda la gelatina",
-      "killCake": "Destruye el pastel",
-      "stopChocolate": "Detén el chocolate",
       "bannerTitle": "Objetivos",
       "pathRoute": "Conecta ◯ con ◉ en una palabra",
       "pathRouteSuccess": "¡RUTA CONECTADA!",
@@ -13586,38 +13534,7 @@ const es = {
     },
     "combo": {
       "bomb_bomb": "¡MEGA EXPLOSIÓN!",
-      "bomb_lightning": "¡BOMBA TRUENO!",
-      "bomb_prism": "¡TORMENTA DE CRISTAL!",
-      "bomb_rainbow": "¡DETONADOR ARCOÍRIS!",
-      "bomb_mirror": "¡BOMBA ESPEJO!",
-      "bomb_magnet": "¡EXPLOSIÓN MAGNÉTICA!",
-      "bomb_gem": "¡DESTROZO DE GEMA!",
-      "bomb_frozen": "¡EXPLOSIÓN DESHIELO!",
-      "lightning_lightning": "¡CADENA DE RAYOS!",
-      "lightning_prism": "¡TRUENO CRUZADO!",
-      "lightning_rainbow": "¡TORMENTA ARCOÍRIS!",
-      "lightning_mirror": "¡DOBLE IMPACTO!",
-      "lightning_magnet": "¡TIRÓN ELÉCTRICO!",
-      "lightning_gem": "¡CHISPA CRISTAL!",
-      "lightning_frozen": "¡DESHIELO DE ONDA!",
-      "prism_prism": "¡DESTRUCCIÓN TOTAL!",
-      "prism_rainbow": "¡NOVA ESPECTRAL!",
-      "prism_mirror": "¡CRUZ INFINITA!",
-      "prism_magnet": "¡VÓRTICE CRUZADO!",
-      "prism_gem": "¡PRISMA DE CRISTAL!",
-      "prism_frozen": "¡DESHIELO PRISMA!",
-      "rainbow_mirror": "¡ARCOÍRIS ESPEJO!",
-      "rainbow_magnet": "¡TIRÓN ARCOÍRIS!",
-      "rainbow_gem": "¡CRISTAL ARCOÍRIS!",
-      "rainbow_frozen": "¡DESHIELO ARCOÍRIS!",
-      "mirror_magnet": "¡DOBLE VÓRTICE!",
-      "mirror_gem": "¡CRISTAL ESPEJO!",
-      "mirror_frozen": "¡ECO CONGELANTE!",
-      "magnet_gem": "¡TIRÓN CRISTAL!",
-      "magnet_frozen": "¡VÓRTICE HELADO!",
-      "gem_frozen": "¡CRISTAL DE HIELO!",
       "gold_special": "¡PODER DORADO!",
-      "rainbow_special": "¡DOBLE ARCOÍRIS!",
       "triple_special": "¡TRIPLE AMENAZA!"
     },
     "micro": {
@@ -13631,10 +13548,6 @@ const es = {
       "specialist": "¡Especialista!",
       "waveClearer": "¡Oleada superada!"
     },
-    "comboCodex": "CÓDEX DE COMBOS",
-    "codexProgress": "{discovered}/{total} descubiertos",
-    "codexLocked": "???",
-    "comboDiscovered": "¡COMBO DESCUBIERTO!",
     "chainCounter": "CADENA x{{count}}",
     "wave": "Oleada",
     "words": "palabras",
@@ -13650,6 +13563,38 @@ const es = {
     "waves": "oleadas",
     "bestWord": "Mejor",
     "waveComplete": "¡Oleada {{wave}} completada!",
+    "theme": {
+      "warmUp": {
+        "name": "Calentamiento",
+        "goal": "Encuentra 4 palabras de 3+ letras",
+        "flavor": "Tablero fácil y movimientos extra. Coge el ritmo."
+      },
+      "bombSquad": {
+        "name": "Escuadrón bomba",
+        "goal": "Haz estallar las bombas",
+        "flavor": "Bombas por todas partes y las cadenas valen el doble."
+      },
+      "coinRush": {
+        "name": "Lluvia de monedas",
+        "goal": "Atrapa las monedas",
+        "flavor": "Llueven monedas y valen el doble."
+      },
+      "diamondHunt": {
+        "name": "Caza de diamantes",
+        "goal": "Gana un diamante",
+        "flavor": "Las palabras raras salen más fácil. ¡A por diamantes!"
+      },
+      "boss": {
+        "name": "Oleada jefe",
+        "goal": "Alcanza la puntuación",
+        "flavor": "Menos movimientos, mejor premio. Cada palabra cuenta."
+      },
+      "cascadeCarnival": {
+        "name": "Carnaval de cascadas",
+        "goal": "Encuentra palabras largas",
+        "flavor": "Las cadenas llegan más lejos y pagan más."
+      }
+    },
     "tileGuide": {
       "title": "Guía de fichas",
       "standard": {
@@ -13657,100 +13602,16 @@ const es = {
         "desc": "Ficha básica, sin efecto especial"
       },
       "gold": {
-        "name": "Oro",
-        "desc": "×3 puntos + 1 movimiento extra"
-      },
-      "silver": {
-        "name": "Plata",
-        "desc": "×1.5 puntos + extiende cuentas regresivas en 1"
+        "name": "Moneda",
+        "desc": "×3 puntos, +1 movimiento, monedas extra"
       },
       "diamond": {
         "name": "Diamante",
-        "desc": "×5 puntos + revela contenido congelado por 3 turnos"
+        "desc": "Se gana con palabras raras: gran bono al despejarlo"
       },
       "bomb": {
         "name": "Bomba",
         "desc": "Limpia área 3×3. Encadena a bombas cercanas."
-      },
-      "lightning": {
-        "name": "Rayo",
-        "desc": "Limpia columna entera. Encadena a otros rayos."
-      },
-      "prism": {
-        "name": "Prisma",
-        "desc": "2 golpes. Limpia fila + columna, crea 2 especiales."
-      },
-      "rainbow": {
-        "name": "Arcoíris",
-        "desc": "Copia el mejor especial en tu palabra, o ×2 puntos"
-      },
-      "ice": {
-        "name": "Hielo",
-        "desc": "2 golpes para romper. Ficha defensiva de múltiples golpes."
-      },
-      "frozen": {
-        "name": "Congelado",
-        "desc": "2 golpes. Libera un especial oculto."
-      },
-      "gem": {
-        "name": "Gema",
-        "desc": "3 golpes. Genera 2 especiales + 2 movimientos extra."
-      },
-      "mirror": {
-        "name": "Espejo",
-        "desc": "Copia el primer especial ofensivo en tu palabra"
-      },
-      "magnet": {
-        "name": "Imán",
-        "desc": "Atrae fichas cercanas hacia adentro, luego explota 3×3"
-      },
-      "wildcard": {
-        "name": "Comodín",
-        "desc": "Vale por cualquier letra. Puntúa por rareza."
-      },
-      "countdown": {
-        "name": "Cuenta regresiva",
-        "desc": "Desactívala antes de 0: +2 movimientos, o penalización de 50pts"
-      },
-      "shuffle": {
-        "name": "Mezcla",
-        "desc": "Reorganiza todas las letras restantes del tablero al limpiar"
-      },
-      "magma": {
-        "name": "Magma",
-        "desc": "Limpia ambas diagonales (patrón X) con multiplicador de puntos ×2"
-      },
-      "portal": {
-        "name": "Portal",
-        "desc": "Teletransporta entre pares. Limpia ambos, ×2 puntos."
-      },
-      "catalyst": {
-        "name": "Catalizador",
-        "desc": "Convierte todas las fichas adyacentes en especiales aleatorias"
-      },
-      "crystal": {
-        "name": "Cristal",
-        "desc": "Crece +1× por turno sin usar (máx 5×). Multiplica la puntuación."
-      },
-      "fuse": {
-        "name": "Mecha",
-        "desc": "Par vinculado. Al eliminar uno se enciende el otro: desactívalo en 3 turnos o explota"
-      },
-      "anchor": {
-        "name": "Ancla",
-        "desc": "Bonus de palabra larga: +3 pts por cada letra de la palabra al eliminarse"
-      },
-      "mystery": {
-        "name": "Misterio",
-        "desc": "Sorpresa: ráfaga de puntos, nueva especial, mini-pop o mega +150"
-      },
-      "chocolate": {
-        "name": "Chocolate",
-        "desc": "Se extiende a una ficha vecina cada turno. Usa una ficha de chocolate para detenerlo."
-      },
-      "cake": {
-        "name": "Tarta",
-        "desc": "Bloque de varias fichas con vida compartida. Golpéalo una y otra vez para destruirlo"
       }
     },
     "highlight": {

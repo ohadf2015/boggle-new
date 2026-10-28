@@ -2,12 +2,9 @@
 
 import { BLAST_TILE_TYPE_LIST } from '@/shared/types/blast';
 import { cn } from '@/lib/utils';
-import { BLAST_RETIRED_SPECIAL_TYPES } from './utils/blastWaveConfig';
 import { TILE_VISUALS } from './blastTileVisuals';
 
-// Retired types are zeroed in every wave distribution, so listing them taught
-// players tiles they can never meet.
-export const GUIDE_TILE_TYPES = BLAST_TILE_TYPE_LIST.filter((type) => !BLAST_RETIRED_SPECIAL_TYPES.has(type));
+export const GUIDE_TILE_TYPES = BLAST_TILE_TYPE_LIST;
 
 interface BlastTileLegendListProps {
   t: (key: string) => string | undefined;

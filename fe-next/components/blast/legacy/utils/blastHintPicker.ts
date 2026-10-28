@@ -49,7 +49,6 @@ export function pickHintTarget(
     'target_word',
     'color_power',
     'collect_type',
-    'clear_all_type',
   ];
 
   for (const wantedType of priorities) {
@@ -91,7 +90,7 @@ export function pickHintTarget(
       };
     }
 
-    if (wantedType === 'collect_type' || wantedType === 'clear_all_type') {
+    if (wantedType === 'collect_type') {
       const type = p.objective.tileType;
       if (!type) continue;
       const cells: Array<{ row: number; col: number }> = [];

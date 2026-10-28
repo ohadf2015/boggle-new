@@ -1,53 +1,19 @@
-/**
- * BlastResultsScene Tests
- *
- * The scene is current-user-focused: the player who just played gets an
- * emphasized block with their full Blast stats + placement, while opponents
- * are condensed into compact ranked rows (name + score + peak combo) so the
- * screen isn't a wall of every rival's stat grid.
- */
-
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import BlastResultsScene from '../BlastResultsScene';
 import type { BlastPlayerStats } from '@/shared/types/game';
+import { blastCollectionScore } from '@/shared/utils/blastCollectionScore';
 
-// Mock LanguageContext — t() echoes the key so we can assert on keys directly.
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => key,
+    t: (key: string, vars?: Record<string, string | number>) =>
+      vars ? `${key} ${Object.values(vars).join(' ')}` : key,
     language: 'en',
     dir: 'ltr',
   }),
 }));
 
-vi.mock('framer-motion', () => {
-  const React = require('react');
-  // eslint-disable-next-line react/display-name
-  const MotionDiv = React.forwardRef(
-    ({ children, initial, animate, exit, variants, whileHover, whileTap, transition, ...rest }: Record<string, unknown>, ref: React.Ref<HTMLDivElement>) =>
-      React.createElement('div', { ...rest, ref }, children)
-  );
-  return {
-    m: new Proxy({}, {
-      get: (_target: Record<string, unknown>, prop: string) => {
-        if (prop === 'div') return MotionDiv;
-        // eslint-disable-next-line react/display-name
-        return React.forwardRef((props: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {
-          const { initial, animate, exit, variants, whileHover, whileTap, transition, ...rest } = props;
-          return React.createElement(prop, { ...rest, ref });
-        });
-      },
-    }),
-    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
-    useReducedMotion: () => false,
-  };
-});
-
-// Mock ScoreCountUp to render the number directly
-vi.mock('@/components/results/shared', () => ({
-  ScoreCountUp: ({ to }: { to: number }) => React.createElement('span', null, String(to)),
-}));
+vi.mock('@/components/blast/results/useBlastResultsReveal', () => ({ useBlastResultsReveal: vi.fn() }));
 
 const stats = (over: Partial<BlastPlayerStats>): BlastPlayerStats => ({
   maxCombo: 0,
@@ -79,13 +45,43 @@ describe('BlastResultsScene', () => {
     expect(me).toHaveTextContent('results.you'); // the YOU marker
   });
 
-  it('shows the current user full blast stat grid in their block', () => {
+  it('shows diamonds and combo, and omits coin / bomb chips the MP payload does not carry', () => {
     renderScene('bob');
     const me = screen.getByTestId('blast-result-me');
-    expect(within(me).getByText('blast.results.comboChain')).toBeInTheDocument();
-    expect(within(me).getByText('blast.results.gemsCollected')).toBeInTheDocument();
-    expect(within(me).getByText('blast.results.tilesCleared')).toBeInTheDocument();
-    expect(within(me).getByText('blast.results.boardClears')).toBeInTheDocument();
+    expect(within(me).getByTestId('blast-stat-diamonds')).toHaveTextContent('4');
+    expect(within(me).getByTestId('blast-stat-combo')).toHaveTextContent('x3');
+    expect(within(me).queryByTestId('blast-stat-coins')).toBeNull();
+    expect(within(me).queryByTestId('blast-stat-bombs')).toBeNull();
+  });
+
+  it('re-adds the coins chip and the collection bonus when the MP payload carries them', () => {
+    render(
+      <BlastResultsScene
+        playerStats={{ ...playerStats, bob: { ...playerStats.bob, coinsCollected: 9 } }}
+        scores={scores}
+        currentUsername="bob"
+        collection={{ bob: blastCollectionScore({ coins: 9, diamonds: 1 }) }}
+      />,
+    );
+    expect(screen.getByTestId('blast-stat-coins')).toHaveTextContent('9');
+    expect(screen.getByTestId('blast-results-bonus')).toHaveTextContent('blast.mpResults.bonus 330');
+  });
+
+  it('reads diamondsCollected from MP stats', () => {
+    renderScene('bob', { ...playerStats, bob: { ...playerStats.bob, diamondsCollected: 7 } });
+    expect(screen.getByTestId('blast-stat-diamonds')).toHaveTextContent('7');
+  });
+
+  it('tells a trailing player how many points beat the player above', () => {
+    renderScene('bob');
+    const goal = screen.getByTestId('blast-results-next-goal');
+    expect(goal.dataset.kind).toBe('rival');
+    expect(goal).toHaveTextContent('blast.results.reveal.goalRival 401 alice');
+  });
+
+  it('tells the winner their margin over the runner-up', () => {
+    renderScene('alice');
+    expect(screen.getByTestId('blast-results-next-goal')).toHaveTextContent('blast.results.reveal.goalLead 400 bob');
   });
 
   it('does not repeat the score/placement already shown by the shared results hero', () => {

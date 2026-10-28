@@ -56,9 +56,10 @@ describe('LandingChallengeCards - hydration safety', () => {
     expect(html).toContain('data-cube-key="blast"');
   });
 
-  it('keeps the whole roster on the page after mount, sorted by intent', () => {
+  it('keeps the whole roster on the page after mount: featured blast first, the rest sorted by intent', () => {
     const { container } = render(<LandingChallengeCards {...baseProps} />);
     expect(container.querySelector('[data-testid="home-more-sheet"]')).toBeNull();
+    expect(container.querySelector('[data-testid="home-featured"] [data-cube-key="blast"]')).toBeTruthy();
     const groups = Array.from(container.querySelectorAll('[data-testid^="home-group-"]')).map((el) => el.getAttribute('data-testid'));
     expect(groups.slice(0, 3)).toEqual(['home-group-together', 'home-group-solo', 'home-group-think']);
     expect(container.querySelectorAll('[data-cube-key]').length).toBeGreaterThanOrEqual(7);

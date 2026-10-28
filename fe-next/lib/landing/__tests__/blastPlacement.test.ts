@@ -1,39 +1,26 @@
-/**
- * TDD for "bump Blast up the mode order, under multiplayer" (2026-06-07).
- * Blast must sit directly after the multiplayer ('arena') card.
- */
-import { placeBlastAfterArena } from '../blastPlacement';
+import { describe, it, expect } from 'vitest';
+import { BLAST_LOCALES, FEATURED_HOME_MODE, isBlastLocale, pickHomeAnchor } from '../blastPlacement';
 
-describe('placeBlastAfterArena', () => {
-  it('moves blast to immediately after arena', () => {
-    expect(placeBlastAfterArena(['daily', 'arena', 'practice', 'blast', 'adventure']))
-      .toEqual(['daily', 'arena', 'blast', 'practice', 'adventure']);
+describe('isBlastLocale', () => {
+  it('offers Blast only where it has a letter pool', () => {
+    expect([...BLAST_LOCALES].sort()).toEqual(['en', 'es', 'he', 'ja', 'sv']);
+    for (const l of BLAST_LOCALES) expect(isBlastLocale(l)).toBe(true);
+    expect(isBlastLocale('ru')).toBe(false);
+    expect(isBlastLocale('fr')).toBe(false);
+  });
+});
+
+describe('pickHomeAnchor', () => {
+  it('features blast on the homepage', () => {
+    expect(FEATURED_HOME_MODE).toBe('blast');
   });
 
-  it('leaves order unchanged when blast already follows arena', () => {
-    const order = ['daily', 'arena', 'blast', 'practice'];
-    expect(placeBlastAfterArena(order)).toEqual(order);
+  it('gives blast the hero slot wherever it sits in the order', () => {
+    expect(pickHomeAnchor(['daily', 'arena', 'adventure', 'blast'])).toBe('blast');
+    expect(pickHomeAnchor(['blast', 'arena'])).toBe('blast');
   });
 
-  it('handles blast appearing BEFORE arena', () => {
-    expect(placeBlastAfterArena(['blast', 'daily', 'arena', 'practice']))
-      .toEqual(['daily', 'arena', 'blast', 'practice']);
-  });
-
-  it('is a no-op when arena is absent', () => {
-    const order = ['daily', 'practice', 'blast'];
-    expect(placeBlastAfterArena(order)).toEqual(order);
-  });
-
-  it('is a no-op when blast is absent', () => {
-    const order = ['daily', 'arena', 'practice'];
-    expect(placeBlastAfterArena(order)).toEqual(order);
-  });
-
-  it('does not mutate the input array', () => {
-    const order = ['daily', 'arena', 'practice', 'blast'];
-    const copy = [...order];
-    placeBlastAfterArena(order);
-    expect(order).toEqual(copy);
+  it('falls back to the live arena when blast is not on offer', () => {
+    expect(pickHomeAnchor(['daily', 'arena', 'adventure'])).toBe('arena');
   });
 });

@@ -13,49 +13,9 @@ import { DESKTOP_IDLE_AUTOSUBMIT_MS } from '@/components/grid/submitHintVisibili
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { COMBO_ELIGIBLE_TILES } from './utils/blastCombos';
-import { computeCellFilter, createPortalAdjacency } from './hooks/blastCellFilterLogic';
-import { scanOffensiveSpecial, OFFENSIVE_RANK } from './utils/blastTileEffects';
 import { getTileTooltip } from './utils/blastTileTooltips';
 
 const TILE_TOOLTIP_HOLD_MS = 550;
-
-const ZONE_PREVIEW_TILES: Partial<Record<BlastTileType, 'bomb' | 'lightning' | 'prism' | 'magnet'>> = {
-  bomb: 'bomb',
-  lightning: 'lightning',
-  prism: 'prism',
-  magnet: 'magnet',
-};
-
-function getZonePreview(type: BlastTileType): 'bomb' | 'lightning' | 'prism' | 'magnet' | null {
-  return ZONE_PREVIEW_TILES[type] ?? null;
-}
-
-/** Find which tile rainbow will copy in the current selection */
-function computeScanTarget(
-  cells: SelectedCell[],
-  tiles: BlastTileState[][],
-): { key: string; source: 'rainbow' } | null {
-  if (cells.length < 2) return null;
-  const hasRainbow = cells.some(c => tiles[c.row]?.[c.col]?.type === 'rainbow');
-  if (!hasRainbow) return null;
-
-  const path = cells.map(c => ({ row: c.row, col: c.col }));
-
-  if (scanOffensiveSpecial(path, tiles, 'best')) {
-    let bestRank = -1;
-    let bestKey: string | null = null;
-    for (const c of cells) {
-      const t = tiles[c.row]?.[c.col];
-      if (t && !t.isCleared && t.type !== 'rainbow') {
-        const rank = OFFENSIVE_RANK[t.type] ?? -1;
-        if (rank > bestRank) { bestRank = rank; bestKey = `${c.row}-${c.col}`; }
-      }
-    }
-    if (bestKey) return { key: bestKey, source: 'rainbow' };
-  }
-
-  return null;
-}
 
 export interface BlastBoardProps {
   grid: LetterGrid;
@@ -70,8 +30,6 @@ export interface BlastBoardProps {
   nearMissCells?: Array<{ row: number; col: number }>;
   /** Cells highlighted during cascade discovery — glow before clearing */
   cascadeHighlightCells?: Array<{ row: number; col: number }>;
-  /** Remaining turns of diamond reveal (shows frozen tile inner types) */
-  diamondRevealTurns?: number;
   /**
    * Multiplayer round — suppress the per-tile explanation tooltips (the mobile
    * info pop-up + the native `title` hint). In a timed competitive MP game the
@@ -102,7 +60,6 @@ export const BlastBoard = memo(function BlastBoard({
   sequencerState,
   nearMissCells = [],
   cascadeHighlightCells = [],
-  diamondRevealTurns = 0,
   isMultiplayer = false,
   submitFeedback,
 }: BlastBoardProps) {
@@ -142,18 +99,6 @@ export const BlastBoard = memo(function BlastBoard({
     setSelectedCells(cells);
   }, []);
 
-  // Cell filter: gates selectability based on tile type (ice, gem, etc.)
-  const cellFilter = useMemo(
-    () => computeCellFilter(tileStates, selectedCells),
-    [tileStates, selectedCells],
-  );
-
-  // Portal-aware adjacency: lets word paths teleport through paired portal tiles
-  const portalAdjacency = useMemo(
-    () => createPortalAdjacency(tileStates),
-    [tileStates],
-  );
-
   const selectedPositions = useMemo(
     () => new Set(selectedCells.map((c) => `${c.row}-${c.col}`)),
     [selectedCells],
@@ -190,26 +135,6 @@ export const BlastBoard = memo(function BlastBoard({
     }
     return eligibleKeys.length >= 2 ? new Set(eligibleKeys) : null;
   }, [selectedCells, tileStates]);
-
-  // Portal pair index map — assign each unique portalPairId a color index
-  const portalPairMap = useMemo(() => {
-    const map = new Map<string, number>();
-    let idx = 0;
-    for (const row of tileStates) {
-      for (const tile of row) {
-        if (tile.type === 'portal' && tile.portalPairId && !tile.isCleared && !map.has(tile.portalPairId)) {
-          map.set(tile.portalPairId, idx++);
-        }
-      }
-    }
-    return map;
-  }, [tileStates]);
-
-  // Rainbow/Mirror scan target — find which tile in the selection will be copied
-  const scanTargetKey = useMemo(
-    () => computeScanTarget(selectedCells, tileStates),
-    [selectedCells, tileStates],
-  );
 
   // Build a lookup map from sequencer active tiles
   const animLookup = useMemo(() => {
@@ -259,8 +184,6 @@ export const BlastBoard = memo(function BlastBoard({
         onPathSubmit={onPathSubmit}
         onWordChange={onWordChange}
         onSelectionChange={handleSelectionChange}
-        cellFilter={cellFilter}
-        isAdjacent={portalAdjacency}
         autoSubmitIdleMs={DESKTOP_IDLE_AUTOSUBMIT_MS}
         hideWordPreview
         hideComboIndicator
@@ -312,21 +235,13 @@ export const BlastBoard = memo(function BlastBoard({
                 phase={tilePhase}
                 isSelected={isSelected}
                 isCleared={tile.isCleared}
-                hitsRemaining={tile.hitsRemaining}
-                countdown={tile.countdown}
-                fuseTimer={tile.fuseTimer}
                 isNearMiss={nearMissSet.has(key)}
                 activationEffect={tile.activationEffect}
                 isComboPreview={comboPreviewSet?.has(key) ?? false}
                 selectionIndex={selectionIndexMap.get(key)}
                 selectionTotal={selectedCells.length}
-                isLocked={!cellFilter(tile.row, tile.col) && !tile.isCleared}
                 isCascadeHighlight={cascadeHighlightSet.has(key)}
-                zonePreview={isSelected ? getZonePreview(tile.type) : null}
-                isDiamondRevealed={tile.type === 'frozen' && diamondRevealTurns > 0 && tile.innerType != null}
-                innerType={tile.innerType}
-                portalPairIndex={tile.type === 'portal' && tile.portalPairId ? portalPairMap.get(tile.portalPairId) : undefined}
-                isScanTarget={scanTargetKey?.key === key ? scanTargetKey.source : undefined}
+                zonePreview={isSelected && tile.type === 'bomb' ? 'bomb' : null}
                 hideTooltip={isMultiplayer}
                 clearRotate={animState?.clearRotate}
                 col={tile.col}

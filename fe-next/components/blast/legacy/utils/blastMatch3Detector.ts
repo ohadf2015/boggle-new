@@ -39,9 +39,7 @@ export function detectMatch3Clusters(
   const isUsable = (r: number, c: number): boolean => {
     const tile = tileStates[r]?.[c];
     if (!tile) return false;
-    if (tile.isCleared) return false;
-    if (tile.type === 'frozen') return false;
-    return true;
+    return !tile.isCleared;
   };
 
   const letterAt = (r: number, c: number): string =>

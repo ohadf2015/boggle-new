@@ -97,9 +97,8 @@ describe('blastModifiers — applyModifierToWaveConfig', () => {
     expect(out.cascadeChainBonus).toBeCloseTo(base.cascadeChainBonus * 2, 5);
   });
 
-  it('luckyVowels cuts ice and lifts gold (both live distribution fields)', () => {
+  it('luckyVowels lifts the coin share', () => {
     const out = applyModifierToWaveConfig(base, BLAST_MODIFIERS.luckyVowels);
-    expect(out.iceDistribution).toBeLessThan(base.iceDistribution);
     expect(out.goldDistribution).toBeGreaterThan(base.goldDistribution);
   });
 
@@ -138,7 +137,7 @@ describe('blastModifiers — applyModifierToWaveConfig', () => {
       expect(out.specialTileChance).toBeGreaterThanOrEqual(0);
       expect(out.specialTileChance).toBeLessThanOrEqual(1);
       expect(out.goldDistribution).toBeGreaterThanOrEqual(0);
-      expect(out.iceDistribution).toBeGreaterThanOrEqual(0);
+      expect(out.goldDistribution).toBeLessThanOrEqual(1);
       expect(out.movesAllowed).toBeGreaterThanOrEqual(1);
       expect(out.vowelModifier).toBeGreaterThan(0);
     }

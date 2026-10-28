@@ -10,20 +10,17 @@ import type { BlastTileType, BlastTileState } from '@/shared/types/blast';
 
 import {
   BLAST_BONUS_MOVE_COMBO_THRESHOLD,
-  BLAST_SPECIAL_TILE_CHANCE,
   BLAST_TILE_BONUSES,
-  BLAST_RAINBOW_FLAT_BONUS,
 } from '@/shared/constants/blastMultiplayerConstants';
 
 import { getWaveConfig, getWaveDistribution } from '@/components/blast/legacy/utils/blastWaveConfig';
 import { rollSpecialType, createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
 import { overlayToTileStates } from '@/components/blast/legacy/utils/blastOverlayToTileStates';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
-import { applyVortexLetterSwaps } from '@/components/blast/legacy/utils/blastLetterSwaps';
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
-import { computeThawedCells } from '@/components/blast/legacy/utils/blastThaw';
 import { normalizeWordForLanguage, normalizeLetterForLanguage } from './wordValidator.js';
 import { buildOverlayMap } from './gameState/reviveBlastState';
+import { blastCollectionScore } from '@/shared/utils/blastCollectionScore';
 import type { Language } from '@/shared/types';
 
 // H2: per-game mutex set guarding the check→advance→broadcast sequence so a
@@ -58,135 +55,39 @@ export function hashStringToSeed(str: string): number {
 }
 
 /**
- * Tiles that obstruct normal play: require multiple hits or special handling to clear.
- * At high density, these must be capped to keep boards playable.
- * Note: frozen, locked, magma, anchor are in BLAST_RETIRED_SPECIAL_TYPES and never spawn,
- * but we cap conservatively here so un-retiring any would be safe.
- */
-const OBSTRUCTIVE_TILE_TYPES: Set<BlastTileType> = new Set([
-  'ice',      // Takes 2 hits to clear
-  'frozen',   // Takes 2 hits; retired but defensively capped
-  'locked',   // Requires key to unlock; retired
-]);
-
-/**
- * Obstructive tiles should not exceed this share of the board to maintain playability.
- * At 40% base density, this keeps obstructive share ~6-8% of cells (2-3 tiles on 6×6).
- */
-const MAX_OBSTRUCTIVE_SHARE = 0.15;
-
-/**
- * Generate blast tile overlay for a grid using wave-aware tile distribution.
- * For each cell, rolls using rollSpecialType with the wave's distribution so
- * tile availability matches singleplayer progression (e.g., diamond only wave 4+).
- * Enforces a cap on obstructive tiles (ice, frozen, locked) so high-density boards
- * remain playable.
+ * Generate the blast tile overlay for a grid with the same wave spawn rate and
+ * bomb/coin split as singleplayer.
  *
- * @param grid - The letter grid
- * @param specialChance - Base probability of a special tile [0, 1]
- * @param wave - Current wave number (defaults to 1); gates which tile types can appear
  * @param seed - Optional seed for deterministic overlay generation (multiplayer). When
- *               omitted, Math.random is used (singleplayer behaviour).
+ *               omitted, Math.random is used.
  * @returns Array of special tile overlays (standard tiles omitted)
  */
-export function generateBlastOverlay(
-  grid: string[][],
-  specialChance: number,
-  wave = 1,
-  seed?: number
-): BlastTileOverlay[] {
+export function generateBlastOverlay(grid: string[][], wave = 1, seed?: number): BlastTileOverlay[] {
   const overlay: BlastTileOverlay[] = [];
   const waveConfig = getWaveConfig(wave);
   const distribution = getWaveDistribution(waveConfig);
   const rng = seed !== undefined ? createSeededRandom(seed) : Math.random;
 
-  const boardSize = grid.length * grid[0].length;
-  const maxObstructiveCells = Math.ceil(boardSize * MAX_OBSTRUCTIVE_SHARE);
-  let obstructiveCount = 0;
-
   for (let row = 0; row < grid.length; row++) {
     for (let col = 0; col < grid[row].length; col++) {
-      const tileType = rollSpecialType(specialChance, distribution, 0, rng);
-
-      if (tileType !== 'standard') {
-        // Cap obstructive tiles to maintain playability
-        if (OBSTRUCTIVE_TILE_TYPES.has(tileType)) {
-          if (obstructiveCount >= maxObstructiveCells) {
-            // Swap to a beneficial type by rerolling with modified distribution
-            const beneficialDist = { ...distribution };
-            for (const obsType of OBSTRUCTIVE_TILE_TYPES) {
-              beneficialDist[obsType as string] = 0;
-            }
-            const normalizedDist = normalizeDistribution(beneficialDist);
-            const swappedType = rollSpecialType(1.0, normalizedDist, 0, rng);
-            if (swappedType !== 'standard') {
-              overlay.push({ row, col, type: swappedType as BlastTileType });
-            }
-          } else {
-            overlay.push({ row, col, type: tileType as BlastTileType });
-            obstructiveCount++;
-          }
-        } else {
-          overlay.push({ row, col, type: tileType as BlastTileType });
-        }
-      }
+      const type = rollSpecialType(waveConfig.specialTileChance, distribution, 0, rng);
+      if (type !== 'standard') overlay.push({ row, col, type });
     }
   }
-
   return overlay;
 }
 
-/**
- * Normalize a distribution so it sums to 1.0.
- * Used internally to ensure obstructive-cap rerolls are properly weighted.
- */
-function normalizeDistribution(dist: Record<string, number>): Record<string, number> {
-  const sum = Object.values(dist).reduce((a, b) => a + b, 0);
-  if (sum <= 0 || Math.abs(sum - 1.0) < 0.001) return dist;
-
-  const normalized: Record<string, number> = {};
-  for (const [key, value] of Object.entries(dist)) {
-    normalized[key] = value / sum;
-  }
-  return normalized;
-}
-
-/**
- * Calculate tile bonus for tiles on a word path.
- * Sums up bonus multipliers from BLAST_TILE_BONUSES.
- * If rainbow is in path, adds BLAST_RAINBOW_FLAT_BONUS as flat addition (once).
- */
+/** Sum the per-tile bonus multipliers from BLAST_TILE_BONUSES along a word path. */
 export function calculateBlastTileBonus(tilesOnPath: BlastTileType[]): number {
-  if (tilesOnPath.length === 0) return 0;
-
-  let total = 0;
-  let hasRainbow = false;
-
-  for (const tileType of tilesOnPath) {
-    total += BLAST_TILE_BONUSES[tileType];
-    if (tileType === 'rainbow') {
-      hasRainbow = true;
-    }
-  }
-
-  if (hasRainbow) {
-    total += BLAST_RAINBOW_FLAT_BONUS;
-  }
-
-  return total;
+  return tilesOnPath.reduce((total, type) => total + BLAST_TILE_BONUSES[type], 0);
 }
-
 
 /**
  * Build BlastTileState[][] from overlay + grid size. Delegates to the shared
  * helper used by useBlastMultiplayerBridge so client + server agree byte-for-byte.
  */
-function buildTileStatesFromOverlay(
-  overlay: BlastTileOverlay[],
-  gridSize: number,
-  seed: number,
-): BlastTileState[][] {
-  return overlayToTileStates(overlay, gridSize, seed);
+function buildTileStatesFromOverlay(overlay: BlastTileOverlay[], gridSize: number): BlastTileState[][] {
+  return overlayToTileStates(overlay, gridSize);
 }
 
 /**
@@ -205,7 +106,7 @@ export function initBlastModeState(
   wave = 1,
   overlaySeed?: number
 ): BlastModeState {
-  const overlay = generateBlastOverlay(grid, BLAST_SPECIAL_TILE_CHANCE, wave, overlaySeed);
+  const overlay = generateBlastOverlay(grid, wave, overlaySeed);
 
   const playerMoves: Record<string, number> = {};
   const playerBonusMoves: Record<string, number> = {};
@@ -214,7 +115,7 @@ export function initBlastModeState(
   for (const player of players) {
     playerMoves[player] = 0;
     playerBonusMoves[player] = 0;
-    playerStats[player] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0, boardClears: 0 };
+    playerStats[player] = emptyPlayerStats();
   }
 
   // Refill seed for gravity RNG.
@@ -227,11 +128,10 @@ export function initBlastModeState(
     ? ((overlaySeed ^ 0x9E3779B9) >>> 0) || 1
     : ((Date.now() ^ Math.floor(Math.random() * 0xFFFFFFFF)) >>> 0) || 1;
 
-  // Build cached overlay lookup map for O(1) getTilesOnPath queries
   const overlayMap = buildOverlayMap(overlay);
 
   // Build server-authoritative tileStates from overlay
-  const tileStates = buildTileStatesFromOverlay(overlay, grid.length, seed);
+  const tileStates = buildTileStatesFromOverlay(overlay, grid.length);
 
   return { overlay, overlayMap, playerMoves, playerBonusMoves, playerStats, seed, grid, tileStates, totalMoves: 0, wave, playerBoards: {} };
 }
@@ -273,7 +173,7 @@ export function cascadeBlastWord(
   word: string,
   wave: number,
   language: Language,
-): { clearedCount: number; totalMoves: number } {
+): { clearedCount: number; totalMoves: number; coinsCollected: number; diamondsCollected: number; bombsPopped: number } {
   const gridSize = board.grid.length;
   const totalMoves = (board.totalMoves ?? 0) + 1;
   board.totalMoves = totalMoves;
@@ -287,23 +187,12 @@ export function cascadeBlastWord(
     currentWave: wave,
     rng,
   });
-  // Thaw ice/frozen tiles adjacent to the played path BEFORE gravity (matches the
-  // client's useBlastEngine exactly). Gravity preserves isThawed on survivors, so
-  // the authoritative board the client receives no longer re-locks thawed tiles.
-  const thawedCells = computeThawedCells(processResult.next, wordPath);
-  for (const { row, col } of thawedCells) {
-    const tile = processResult.next[row]?.[col];
-    if (tile) tile.isThawed = true;
-  }
-  // Apply vortex/magnet swaps to the grid so it stays aligned with the swapped
-  // tileStates, then run gravity WITHOUT refill (shrink-until-clear).
-  board.grid = applyVortexLetterSwaps(board.grid, processResult.vortexLetterSwaps);
   const gravityResult = computeGravityResult(
     board.grid,
     processResult.next,
     gridSize,
     language,
-    BLAST_SPECIAL_TILE_CHANCE,
+    getWaveConfig(wave).specialTileChance,
     undefined,
     0,
     rng,
@@ -311,7 +200,13 @@ export function cascadeBlastWord(
   );
   board.grid = gravityResult.newGrid;
   board.tileStates = gravityResult.newTileStates;
-  return { clearedCount: processResult.newlyClearedCount, totalMoves };
+  return {
+    clearedCount: processResult.newlyClearedCount,
+    totalMoves,
+    coinsCollected: processResult.clearedTypeCounts.gold ?? 0,
+    diamondsCollected: processResult.diamondsCollected,
+    bombsPopped: processResult.clearedTypeCounts.bomb ?? 0,
+  };
 }
 
 /**
@@ -347,14 +242,14 @@ export function safeCascadeBlastWord(
   wave: number,
   language: Language,
   cascadeFn: typeof cascadeBlastWord = cascadeBlastWord,
-): { board: BlastPlayerBoard; clearedCount: number; totalMoves: number; ok: boolean } {
+): { board: BlastPlayerBoard; clearedCount: number; totalMoves: number; coinsCollected: number; diamondsCollected: number; bombsPopped: number; ok: boolean } {
   const work = cloneBlastBoard(liveBoard);
   try {
-    const { clearedCount, totalMoves } = cascadeFn(work, wordPath, word, wave, language);
-    return { board: work, clearedCount, totalMoves, ok: true };
+    const { clearedCount, totalMoves, coinsCollected, diamondsCollected, bombsPopped } = cascadeFn(work, wordPath, word, wave, language);
+    return { board: work, clearedCount, totalMoves, coinsCollected, diamondsCollected, bombsPopped, ok: true };
   } catch {
     // Discard the half-mutated clone; hand back the untouched authoritative board.
-    return { board: liveBoard, clearedCount: 0, totalMoves: liveBoard.totalMoves ?? 0, ok: false };
+    return { board: liveBoard, clearedCount: 0, totalMoves: liveBoard.totalMoves ?? 0, coinsCollected: 0, diamondsCollected: 0, bombsPopped: 0, ok: false };
   }
 }
 
@@ -368,7 +263,6 @@ export function recordBlastMove(
   comboLevel: number,
   word?: string,
   tilesCleared?: number,
-  gemCount?: number,
   tileBonus?: number,
 ): { movesUsed: number; bonusMove: boolean } {
   // Initialize if unknown player
@@ -388,7 +282,7 @@ export function recordBlastMove(
 
   // Update rich per-player stats (initialize lazily for late-joining players)
   if (!state.playerStats[username]) {
-    state.playerStats[username] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0, boardClears: 0 };
+    state.playerStats[username] = emptyPlayerStats();
   }
   const stats = state.playerStats[username];
   if (comboLevel > stats.maxCombo) stats.maxCombo = comboLevel;
@@ -397,7 +291,6 @@ export function recordBlastMove(
     if (word.length > stats.bestWord.length) stats.bestWord = word;
   }
   if (tilesCleared) stats.tilesCleared += tilesCleared;
-  if (gemCount) stats.gemsCollected += gemCount;
   if (tileBonus) stats.totalTileBonus = (stats.totalTileBonus || 0) + tileBonus;
 
   return {
@@ -438,24 +331,14 @@ function resolveWordPositions(
 }
 
 /**
- * Get tile types for each letter in a word based on grid positions and overlay.
+ * Tile types along a path, read from the player's LIVE board — the starting
+ * overlay goes stale once gravity moves tiles or a rare word spawns a diamond.
  */
-export function getTilesOnPath(
-  word: string,
-  letterPositions: Map<string, [number, number][]>,
-  overlay: BlastTileOverlay[],
-  cachedOverlayMap?: Map<string, BlastTileType>
+export function getTilesOnBoardPath(
+  tileStates: BlastTileState[][],
+  path: ReadonlyArray<{ row: number; col: number }>,
 ): BlastTileType[] {
-  const overlayMap = cachedOverlayMap ?? new Map<string, BlastTileType>();
-  if (!cachedOverlayMap) {
-    for (const tile of overlay) {
-      overlayMap.set(`${tile.row},${tile.col}`, tile.type);
-    }
-  }
-
-  return resolveWordPositions(word, letterPositions).map(([r, c]) =>
-    overlayMap.get(`${r},${c}`) ?? 'standard'
-  );
+  return path.map(({ row, col }) => tileStates[row]?.[col]?.type ?? 'standard');
 }
 
 /**
@@ -515,11 +398,29 @@ export function regeneratePlayerBoard(
 }
 
 /**
+ * Add what a player's word collected (known only after the cascade runs) and
+ * return the collection points it earned — the server credits these to the score.
+ */
+export function recordBlastCollection(
+  state: BlastModeState,
+  username: string,
+  collected: { coins: number; diamonds: number; bombs: number },
+): number {
+  if (!state.playerStats[username]) state.playerStats[username] = emptyPlayerStats();
+  const stats = state.playerStats[username];
+  stats.coinsCollected = (stats.coinsCollected ?? 0) + collected.coins;
+  stats.diamondsCollected = (stats.diamondsCollected ?? 0) + collected.diamonds;
+  stats.gemsCollected += collected.diamonds;
+  stats.bombsPopped = (stats.bombsPopped ?? 0) + collected.bombs;
+  return blastCollectionScore(collected).total;
+}
+
+/**
  * Record that `username` fully cleared the board (timer-era bonus event).
  */
 export function recordBlastBoardClear(state: BlastModeState, username: string): void {
   if (!state.playerStats[username]) {
-    state.playerStats[username] = { maxCombo: 0, gemsCollected: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0, boardClears: 0 };
+    state.playerStats[username] = emptyPlayerStats();
   }
   state.playerStats[username].boardClears = (state.playerStats[username].boardClears ?? 0) + 1;
 }
@@ -585,15 +486,6 @@ export function validateBlastWordPath(
   return path.map(({ row, col }) => ({ row, col }));
 }
 
-/**
- * Tile types along an ALREADY-RESOLVED path (as opposed to getTilesOnPath,
- * which reconstructs a path from the word). Pair with validateBlastWordPath
- * so the tile bonus and the cascade operate on the exact cells the player
- * dragged through.
- */
-export function getTilesOnResolvedPath(
-  path: ReadonlyArray<{ row: number; col: number }>,
-  overlayMap: Map<string, BlastTileType>,
-): BlastTileType[] {
-  return path.map(({ row, col }) => overlayMap.get(`${row},${col}`) ?? 'standard');
+function emptyPlayerStats(): BlastPlayerStats {
+  return { maxCombo: 0, gemsCollected: 0, coinsCollected: 0, diamondsCollected: 0, bombsPopped: 0, wordsFound: [], bestWord: '', tilesCleared: 0, totalTileBonus: 0, boardClears: 0 };
 }
