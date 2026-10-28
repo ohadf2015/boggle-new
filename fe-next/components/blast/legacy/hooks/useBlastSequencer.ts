@@ -40,18 +40,19 @@ export interface UseBlastSequencerReturn {
 /** Tile types that warrant a longer anticipation beat for dramatic effect */
 const SPECIAL_TILE_TYPES = new Set(['bomb', 'lightning', 'prism', 'rainbow', 'diamond', 'gem', 'catalyst']);
 
+// Input stays locked from anticipation through landing; keep that span near 600ms for a plain word.
 export const ANIM_TIMING = {
-  anticipation: 120,
+  anticipation: 80,
   /** Extended anticipation for paths containing special tiles — builds tension */
-  anticipationSpecial: 220,
-  clearing: 360,
-  clearStagger: 8,
-  pauseAfterClear: 120,
-  fallBase: 280,
-  fallPerRow: 40,
+  anticipationSpecial: 160,
+  clearing: 220,
+  clearStagger: 5,
+  pauseAfterClear: 60,
+  fallBase: 160,
+  fallPerRow: 30,
   columnStagger: 25,
-  landBounce: 100,
-  appearBase: 320,
+  landBounce: 50,
+  appearBase: 340,
   appearStagger: 15,
   chainPause: 80,
   chainSpeedFn: (level: number) => Math.max(0.65, 1 - level * 0.12),
@@ -98,6 +99,7 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
   const cancelTokenRef = useRef(0);
   // Concurrent execution guard — prevents overlapping animate calls
   const runningRef = useRef(false);
+  const commitSeqRef = useRef(0);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -112,6 +114,7 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
    *  Checks cancellation token to prevent stale writes after reset(). */
   const commit = useCallback((next: SequencerState, token: number) => {
     if (token !== cancelTokenRef.current) return; // stale sequence — abort
+    commitSeqRef.current++;
     workingRef.current = next;
     if (mountedRef.current) setState(next);
   }, []);
@@ -207,8 +210,8 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
         if (cancelled()) return;
       }
 
-      // Phase 1: Clear cascade-matched tiles
-      if (gravity.clearedTiles.length > 0) {
+      // Phase 1: Clear cascade-matched tiles. Chain 0's cleared tiles are the word itself, already popped by animateWordClear.
+      if (gravity.clearedTiles.length > 0 && chainLevel >= 1) {
         const clearTiles: TileAnimState[] = gravity.clearedTiles.map((t) => ({
           row: t.row, col: t.col, phase: 'clearing' as AnimPhase,
         }));
@@ -228,37 +231,27 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
         const fallDur = (ANIM_TIMING.fallBase + ANIM_TIMING.fallPerRow * maxFall) * speed;
         await wait(fallDur, timersRef.current);
         if (cancelled()) return;
-
-        // Landing phase — brief squish-bounce at destination; keep appearTiles
-        const landTiles: TileAnimState[] = gravity.fallingTiles.map((t) => ({
-          row: t.row, col: t.col, phase: 'landing' as AnimPhase,
-          fallDistance: t.fallDistance, column: t.col,
-        }));
-        commit({ ...workingRef.current, phase: 'landing', activeTiles: [...landTiles, ...appearTiles], chainLevel }, token);
-        await wait(ANIM_TIMING.landBounce * speed, timersRef.current);
-        if (cancelled()) return;
       }
 
-      // Phase 3: Appearing
-      if (gravity.newTiles.length > 0) {
-        const appearTiles: TileAnimState[] = gravity.newTiles.map((t) => ({
-          row: t.row, col: t.col, phase: 'appearing' as AnimPhase,
-          spawnOffset: t.spawnOffset, column: t.col,
-        }));
-        commit({ ...workingRef.current, phase: 'appearing', activeTiles: appearTiles, chainLevel }, token);
-        const appearDur = (ANIM_TIMING.appearBase + ANIM_TIMING.appearStagger * gravity.newTiles.length) * speed;
-        await wait(appearDur, timersRef.current);
-        if (cancelled()) return;
+      // The grid is final once tiles land, so appear + chain pause play as an unlocked visual tail.
+      const landTiles: TileAnimState[] = gravity.fallingTiles.map((t) => ({
+        row: t.row, col: t.col, phase: 'landing' as AnimPhase,
+        fallDistance: t.fallDistance, column: t.col,
+      }));
+      const landMs = landTiles.length > 0 ? ANIM_TIMING.landBounce * speed : 0;
+      const appearMs = gravity.newTiles.length > 0
+        ? (ANIM_TIMING.appearBase + ANIM_TIMING.appearStagger * gravity.newTiles.length) * speed
+        : 0;
+      const tailMs = Math.max(landMs, appearMs);
+      if (tailMs > 0) {
+        commit({ phase: appearMs > 0 ? 'appearing' : 'landing', activeTiles: [...landTiles, ...appearTiles], isAnimating: false, chainLevel }, token);
+        const seq = commitSeqRef.current;
+        timersRef.current.push(setTimeout(() => {
+          if (seq === commitSeqRef.current) commit(INITIAL_STATE, token);
+        }, tailMs));
+      } else {
+        commit(INITIAL_STATE, token);
       }
-
-      // Phase 4: Chain pause — keep last active tiles visible to avoid pop
-      const lastTiles = workingRef.current.activeTiles;
-      commit({ ...workingRef.current, phase: 'chain_pause', activeTiles: lastTiles, chainLevel }, token);
-      await wait(ANIM_TIMING.chainPause * speed, timersRef.current);
-      if (cancelled()) return;
-
-      // Done
-      commit(INITIAL_STATE, token);
     } finally {
       runningRef.current = false;
     }

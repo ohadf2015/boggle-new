@@ -375,7 +375,7 @@ export const BlastStage = memo(function BlastStage({
             isDesktopCanvas && '!hidden',
           )}
         >
-          <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} />
+          <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} morphLayout={false} />
           <BlastWordRewardPreview wordLength={formedWord.length} />
         </div>
         {/* Board frame — neo-brutalist with hard shadow + reactive glow */}
@@ -516,7 +516,7 @@ export const BlastStage = memo(function BlastStage({
             background: liveWord ? 'rgba(255,255,255,0.05)' : 'transparent',
           }}
         >
-          <WordFormingArea word={liveWord} letterCount={liveWord.length} feedback={currentFeedback} compact />
+          <WordFormingArea word={liveWord} letterCount={liveWord.length} feedback={currentFeedback} compact morphLayout={false} />
           <BlastWordRewardPreview wordLength={liveWord.length} />
           {liveWord && (
             <span className="text-[10px] font-bold text-white tabular-nums">

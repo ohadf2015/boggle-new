@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getCascadeFallStyle, getCascadeLandStyle } from '../blastCascadeStyle';
+import { ANIM_TIMING } from '../hooks/useBlastSequencer';
 
 describe('getCascadeFallStyle', () => {
   it('scales duration with fall distance', () => {
@@ -10,19 +11,25 @@ describe('getCascadeFallStyle', () => {
     expect(farMs).toBeGreaterThan(nearMs);
   });
 
-  it('clamps to a minimum of 250ms', () => {
+  it('clamps to a minimum of 140ms', () => {
     const style = getCascadeFallStyle(0, 0);
     const ms = parseInt(String(style.animation).match(/(\d+)ms/)![1], 10);
-    expect(ms).toBeGreaterThanOrEqual(250);
+    expect(ms).toBeGreaterThanOrEqual(140);
   });
 
-  it('staggers columns by 18ms (mod 5) so wide grids ripple', () => {
+  it('staggers columns by 10ms (mod 5) so wide grids ripple', () => {
     const c0 = getCascadeFallStyle(100, 0);
     const c2 = getCascadeFallStyle(100, 2);
     const c5 = getCascadeFallStyle(100, 5);
     expect(String(c0.animation)).toMatch(/\b0ms forwards$/);
-    expect(String(c2.animation)).toMatch(/\b36ms forwards$/);
+    expect(String(c2.animation)).toMatch(/\b20ms forwards$/);
     expect(String(c5.animation)).toMatch(/\b0ms forwards$/);
+  });
+
+  it.each([[2, 80], [5, 80], [2, 55], [5, 55]])('lands inside the sequencer fall phase (%i rows, %ipx tiles)', (rows, tile) => {
+    const s = getCascadeFallStyle(rows * tile, 4);
+    const [dur, delay] = [...String(s.animation).matchAll(/(\d+)ms/g)].map((m) => Number(m[1]));
+    expect(dur + delay).toBeLessThanOrEqual(ANIM_TIMING.fallBase + ANIM_TIMING.fallPerRow * rows + 16);
   });
 
   it('exposes --fall-from pointing up by the fall distance', () => {
