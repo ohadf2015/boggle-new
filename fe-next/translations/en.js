@@ -20079,6 +20079,8 @@ const en = {
       "students": "{count} students",
       "notPlayedRecently": "No games in 30 days",
       "playWith": "Start a game with {name}",
+      "showCode": "Show code",
+      "showCodeFor": "Show the join code for {name}",
       "reviewTitle": "Practise the missed words"
     },
     "week": {
@@ -20133,7 +20135,8 @@ const en = {
           "body": "Run a short round. Add practice bots in the lobby if no one has joined yet.",
           "cta": "Start a 2-minute game",
           "bodyAwaitingPlayers": "Your room is ready — now get students in. Show the join code or QR on the board.",
-          "ctaAwaitingPlayers": "Show the class code"
+          "ctaAwaitingPlayers": "Show the class code",
+          "titleAwaitingPlayers": "Get your students in"
         }
       }
     },

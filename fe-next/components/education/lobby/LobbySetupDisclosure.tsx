@@ -92,7 +92,7 @@ export function LobbySetupDisclosure({
         >
           {summary}
         </span>
-        {boardLanguage && !incomplete && <BoardLanguageChip language={boardLanguage} />}
+        {boardLanguage && !incomplete && <span className="contents max-sm:hidden"><BoardLanguageChip language={boardLanguage} /></span>}
         <span
           className={cn(
             'inline-flex shrink-0 items-center gap-1.5 rounded-full border-2 border-black px-3 py-1 font-neo-display text-xs font-black uppercase tracking-wide text-black shadow-hard-sm',

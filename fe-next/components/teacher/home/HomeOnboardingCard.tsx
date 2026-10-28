@@ -11,7 +11,7 @@ import { PANEL, PRIMARY_BUTTON, SECONDARY_BUTTON } from './homeStyles';
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 /** tryDemo with a room already open reads as "get students in", not "open another room". */
-function stepCopyKey(onboarding: HomeOnboarding, stepId: HomeOnboardingStepId, field: 'body' | 'cta'): string {
+function stepCopyKey(onboarding: HomeOnboarding, stepId: HomeOnboardingStepId, field: 'title' | 'body' | 'cta'): string {
   const suffix =
     stepId === 'tryDemo' && onboarding.awaitingPlayers && onboarding.current === 'tryDemo'
       ? `${field}AwaitingPlayers`
@@ -149,7 +149,7 @@ function CompactOnboarding({
         ))}
       </ol>
       <h2 id="home-onboarding-title" className="min-w-0 flex-1 truncate font-neo-body text-sm font-bold text-neo-cream">
-        {t(`eduShell.onboarding.steps.${current}.title`)}
+        {t(stepCopyKey(onboarding, current, 'title'))}
       </h2>
       <div className="flex min-w-0 items-center justify-end gap-1 max-sm:basis-full">
         <Link

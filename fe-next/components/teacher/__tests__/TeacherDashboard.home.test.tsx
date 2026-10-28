@@ -202,6 +202,7 @@ describe('Teacher Home', () => {
 
   it('Given setup half done, Then the compact card is one slim row with no progress sentence or step blurbs', () => {
     activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
+    week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
     render(<TeacherDashboard />);
     const card = screen.getByTestId('home-onboarding');
     expect(card).not.toHaveTextContent('eduShell.onboarding.progress');
@@ -212,10 +213,24 @@ describe('Teacher Home', () => {
 
   it('Given setup half done, Then the next step rides inside the hero, never a row of its own', () => {
     activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
+    week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
     render(<TeacherDashboard />);
     const card = screen.getByTestId('home-onboarding');
     expect(card.closest('[data-testid="home-hero"]')).not.toBeNull();
     expect(card).toHaveTextContent('eduShell.onboarding.steps.tryDemo.title');
+  });
+
+  it('Given a class that already played but the activation flag never landed, Then no setup nudge shows', () => {
+    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: true, dismissed: false } };
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('home-onboarding')).toBeNull();
+  });
+
+  it('Given the activity read is still in flight, Then the setup nudge waits instead of flashing', () => {
+    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
+    week = { status: 'loading', summary: null };
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('home-onboarding')).toBeNull();
   });
 
   it('Given ?reviewWords= from a results card, Then the lesson creator opens with those words', () => {

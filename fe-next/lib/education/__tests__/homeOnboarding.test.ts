@@ -63,4 +63,10 @@ describe('homeOnboarding', () => {
     expect(o.complete).toBe(true);
     expect(o.awaitingPlayers).toBe(false);
   });
+  it('Given a class that already played a live game, Then the first-run nudge is finished even when the server flag never landed', () => {
+    const o = homeOnboarding({ classroomCount: 1, studentCount: 34, inviteCopied: false, liveStarted: false, roomOpened: true, gamesPlayed: 1, dismissed: false });
+    expect(o.complete).toBe(true);
+    expect(o.visible).toBe(false);
+    expect(o.awaitingPlayers).toBe(false);
+  });
 });

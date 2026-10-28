@@ -21041,6 +21041,8 @@ const ja = {
       "students": "生徒 {count}人",
       "notPlayedRecently": "30日間プレイなし",
       "playWith": "{name}でゲームを始める",
+      "showCode": "コードを表示",
+      "showCodeFor": "{name}の参加コードを表示",
       "reviewTitle": "間違えた単語を練習する"
     },
     "week": {
@@ -21095,7 +21097,8 @@ const ja = {
           "body": "短いラウンドを1回。まだ誰も参加していなければ、ロビーで練習用ボットを追加できます。",
           "cta": "2分のゲームを始める",
           "bodyAwaitingPlayers": "ルームの準備ができました。あとは生徒を入れるだけです。参加コードかQRコードを黒板に映しましょう。",
-          "ctaAwaitingPlayers": "クラスコードを表示"
+          "ctaAwaitingPlayers": "クラスコードを表示",
+          "titleAwaitingPlayers": "生徒をルームに入れよう"
         }
       }
     },

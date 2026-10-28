@@ -147,6 +147,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
     inviteCopied: activation.progress.inviteCopied,
     liveStarted: activation.progress.liveStarted,
     roomOpened: activation.progress.roomOpened,
+    gamesPlayed: Object.keys(week.summary?.lastPlayedAt ?? {}).length,
     dismissed: activation.progress.dismissed,
   });
   const newClassHref = `/${language}/teacher/classroom/new`;
@@ -234,7 +235,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                   language={language}
                   t={t}
                   rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} />}
-                  nudge={onboarding.visible && !(onboarding.current === 'shareCode' && shareCardShown) ? (
+                  nudge={week.status !== 'loading' && onboarding.visible && !(onboarding.current === 'shareCode' && shareCardShown) ? (
                     <HomeOnboardingCard onboarding={onboarding} hrefs={onboardingHrefs} onDismiss={activation.dismiss} variant="compact" t={t} />
                   ) : undefined}
                 />
@@ -259,7 +260,6 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
 
         {hasRail ? (
           <aside aria-label={t('eduShell.home.railLabel')} className="flex min-w-0 flex-col gap-6">
-            {proCard ? <div data-tm>{proCard}</div> : null}
             {!ready ? <HomeRailSkeleton /> : showWeek ? (
               <>
                 <div data-tm>
@@ -290,6 +290,7 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt }: Teac
                 ) : null}
               </details>
             )}
+            {proCard ? <div data-tm>{proCard}</div> : null}
           </aside>
         ) : null}
       </div>

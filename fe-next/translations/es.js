@@ -21053,6 +21053,8 @@ const es = {
       "students": "{count} alumnos",
       "notPlayedRecently": "Sin partidas en 30 días",
       "playWith": "Empezar una partida con {name}",
+      "showCode": "Ver código",
+      "showCodeFor": "Mostrar el código de {name}",
       "reviewTitle": "Practicar las palabras falladas"
     },
     "week": {
@@ -21107,7 +21109,8 @@ const es = {
           "body": "Una ronda corta. Si aún no ha entrado nadie, añade bots de práctica en la sala.",
           "cta": "Empezar una partida de 2 minutos",
           "bodyAwaitingPlayers": "Tu sala está lista: ahora haz que entren los alumnos. Muestra el código o el QR en la pizarra.",
-          "ctaAwaitingPlayers": "Mostrar el código de la clase"
+          "ctaAwaitingPlayers": "Mostrar el código de la clase",
+          "titleAwaitingPlayers": "Haz que entren tus alumnos"
         }
       }
     },

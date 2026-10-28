@@ -20971,6 +20971,8 @@ const he = {
       "students": "{count} תלמידים",
       "notPlayedRecently": "אין משחקים ב‑30 הימים האחרונים",
       "playWith": "התחלת משחק עם {name}",
+      "showCode": "הצגת קוד",
+      "showCodeFor": "הצגת קוד ההצטרפות של {name}",
       "reviewTitle": "תרגול המילים שפוספסו"
     },
     "week": {
@@ -21025,7 +21027,8 @@ const he = {
           "body": "סבב קצר. אם עוד אף אחד לא הצטרף, אפשר להוסיף בוטים לתרגול בלובי.",
           "cta": "התחלת משחק של 2 דקות",
           "bodyAwaitingPlayers": "החדר מוכן — עכשיו מכניסים תלמידים. מציגים את הקוד או ה-QR על הלוח.",
-          "ctaAwaitingPlayers": "הצגת קוד הכיתה"
+          "ctaAwaitingPlayers": "הצגת קוד הכיתה",
+          "titleAwaitingPlayers": "מכניסים את התלמידים"
         }
       }
     },

@@ -21041,6 +21041,8 @@ const sv = {
       "students": "{count} elever",
       "notPlayedRecently": "Inga spel på 30 dagar",
       "playWith": "Starta ett spel med {name}",
+      "showCode": "Visa kod",
+      "showCodeFor": "Visa anslutningskoden för {name}",
       "reviewTitle": "Öva på de missade orden"
     },
     "week": {
@@ -21095,7 +21097,8 @@ const sv = {
           "body": "Kör en kort runda. Lägg till övningsbottar i lobbyn om ingen har anslutit än.",
           "cta": "Starta ett 2-minutersspel",
           "bodyAwaitingPlayers": "Ditt rum är klart — nu ska eleverna in. Visa anslutningskoden eller QR-koden på tavlan.",
-          "ctaAwaitingPlayers": "Visa klasskoden"
+          "ctaAwaitingPlayers": "Visa klasskoden",
+          "titleAwaitingPlayers": "Få in dina elever"
         }
       }
     },

@@ -21,8 +21,7 @@ export function HomeWeekCard({ summary, status, t, children }: { summary: Teache
       <h2 id="home-week-title" className="font-neo-display text-lg font-black text-neo-cream">
         {t('eduShell.week.title')}
       </h2>
-      {children ? <div className="mt-3">{children}</div> : null}
-      <dl className={cn('mt-3 grid grid-cols-3 divide-x-[2px] divide-neo-cream/15 rtl:divide-x-reverse', children && 'border-t-[2px] border-neo-cream/15 pt-3')}>
+      <dl className="mt-3 grid grid-cols-3 divide-x-[2px] divide-neo-cream/15 rtl:divide-x-reverse">
         {STATS.map((s) => (
           <div key={s.id} className="flex flex-col items-center gap-1 px-1 text-center">
             <dd data-testid={`home-week-${s.id}`} className={cn('font-neo-display text-3xl font-black tabular-nums leading-none', s.ink)}>
@@ -38,6 +37,7 @@ export function HomeWeekCard({ summary, status, t, children }: { summary: Teache
           </div>
         ))}
       </dl>
+      {children ? <div className="mt-4 border-t-[2px] border-neo-cream/15 pt-3">{children}</div> : null}
       {status === 'error' ? (
         <p role="status" className="mt-3 font-neo-body text-xs font-semibold text-neo-cream/70">
           {t('eduShell.week.unavailable')}
