@@ -355,7 +355,9 @@ export function CoachDemo({ demo, accent, emoji, compact = false }: CoachDemoPro
   })();
 
   return (
+    // Demo words are Latin (CAT, TOP); an RTL page would mirror the row into TAC.
     <div
+      dir="ltr"
       className={cn(
         'flex items-center justify-center rounded-neo border-neo border-black bg-neo-navy/60',
         compact ? 'h-16 w-32 shrink-0' : 'h-[108px] w-full',
