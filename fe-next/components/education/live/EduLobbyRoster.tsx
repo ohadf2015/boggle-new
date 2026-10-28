@@ -87,7 +87,7 @@ export function EduLobbyRoster({ students, readyUsernames, t, onRemove, removeSt
                 data-testid="edu-lobby-student"
                 style={{ '--tilt': tiltOf(student.username) } as CSSProperties}
                 className={cn(
-                  'relative flex min-w-0 items-center gap-2 rounded-full shadow-hard-sm motion-safe:animate-[edu-live-pop_340ms_cubic-bezier(0.34,1.56,0.64,1)_both]',
+                  'relative flex min-w-0 items-center gap-2 rounded-full shadow-hard-sm motion-safe:animate-[edu-live-pop_260ms_cubic-bezier(0.34,1.56,0.64,1)_both]',
                   'font-neo-display font-black',
                   layout.chip,
                   chipAccent(student.username, index)
