@@ -5905,6 +5905,10 @@ const sv = {
       "title": "IMORGON: ny daglig utmaning",
       "countdown": "Nytt pussel om {time}"
     },
+    "firstGameBridge": {
+      "quickMatch": "Nästa: snabbmatch mot riktiga spelare",
+      "wordWheel": "Nästa: dagens ordhjul (2 min)"
+    },
     "saveStreak": {
       "title": "Spara min svit",
       "body": "Sviter sparas bara på den här enheten. Skapa ett gratiskonto så följer de med överallt."

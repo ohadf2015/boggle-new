@@ -77,6 +77,8 @@ const WordWheelChallenge: React.FC = () => {
   const dateParam = searchParams.get('date');
   const catchupDate = dateParam && isCatchUpDate(getDailyChallengeDate(), dateParam) ? dateParam : null;
   const isCatchup = !!catchupDate;
+  // First-game bridge: one tap from MP results should land in the game, not a ready card.
+  const bridgeStart = searchParams.get('start') === '1';
 
   /**
    * Bumped once the submit POST lands, to remount the results leaderboard.
@@ -108,6 +110,7 @@ const WordWheelChallenge: React.FC = () => {
     setGameActive,
     catchupAdUnlockedRef,
     preloadForPlay: loadEffectsCanvas,
+    autoStart: bridgeStart,
   });
 
   // Mid-game exit. The Word Wheel had no exit affordance at all — the player

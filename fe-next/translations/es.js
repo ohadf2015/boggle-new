@@ -5327,6 +5327,10 @@ const es = {
       "title": "MAÑANA: nuevo Desafío Diario",
       "countdown": "Nuevo puzzle en {time}"
     },
+    "firstGameBridge": {
+      "quickMatch": "Siguiente: partida rápida contra jugadores reales",
+      "wordWheel": "Siguiente: la Rueda de hoy (2 min)"
+    },
     "saveStreak": {
       "title": "Guardar mi racha",
       "body": "Tus rachas se guardan solo en este dispositivo. Crea una cuenta gratis para tenerlas en todos lados."
