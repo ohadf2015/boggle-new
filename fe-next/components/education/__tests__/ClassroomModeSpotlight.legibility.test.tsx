@@ -39,13 +39,19 @@ describe('<ClassroomModeSpotlight> on a projected desktop', () => {
     });
   });
 
-  it('Given the spec tiles, When rendered, Then the value reads at text-2xl and the label at text-sm', () => {
+  it('Given the specs, When rendered, Then they are one row of pills in the text column, values legible at text-xl', () => {
     setup();
+    const text = screen.getByTestId('spotlight-text');
     for (const id of ['spec-duration', 'spec-complexity', 'spec-style']) {
-      const tile = screen.getByTestId(id);
-      expect(tile.querySelector('[data-spec="value"]')?.className).toContain('lg:text-2xl');
-      expect(tile.querySelector('[data-spec="label"]')?.className).toContain('lg:text-sm');
+      const pill = within(text).getByTestId(id);
+      expect(pill.querySelector('[data-spec="value"]')?.className).toContain('lg:text-xl');
     }
+  });
+
+  it('Given the poster layout, When rendered, Then GO LIVE sits under the title in the text column, beside a wide art column', () => {
+    setup();
+    expect(within(screen.getByTestId('spotlight-text')).getByTestId('lobby-go-live')).toBeInTheDocument();
+    expect(screen.getByTestId('spotlight-art').parentElement?.className).toContain('lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]');
   });
 
   it('Given the best-for badges, When rendered, Then they read at text-base on desktop', () => {
