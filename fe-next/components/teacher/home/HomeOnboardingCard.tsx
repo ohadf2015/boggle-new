@@ -131,7 +131,7 @@ function CompactOnboarding({
     <section
       data-testid="home-onboarding"
       aria-labelledby="home-onboarding-title"
-      className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 rounded-neo border-[2px] border-neo-cream/25 bg-neo-navy/60 py-1.5 pe-1.5 ps-3"
+      className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 rounded-neo border-[2px] border-neo-cream/50 bg-neo-navy/60 py-1.5 pe-1.5 ps-3"
     >
       <ol aria-label={t('eduShell.onboarding.titleCompact')} className="flex shrink-0 gap-1">
         {onboarding.steps.map((step) => (
