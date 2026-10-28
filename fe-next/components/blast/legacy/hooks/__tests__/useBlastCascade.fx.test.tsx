@@ -86,6 +86,42 @@ describe('useBlastCascade — cascade FX feed', () => {
     ]));
   });
 
+  it('submits a match-3 cluster flagged as a cluster, not as a word', async () => {
+    const tiles = makeTiles();
+    const grid = tiles.map(row => row.map(t => t.type === 'standard' ? 'A' : t.type));
+    const clusterCells = [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 2, col: 0 }];
+    detectMatch3Clusters.mockReturnValueOnce([{ letter: 'A', cells: clusterCells }]).mockReturnValue([]);
+    const engine = {
+      startCascade: vi.fn(() => ({ gravity: { newGrid: grid, newTileStates: tiles, clearedTiles: [], fallingTiles: [], newTiles: [] }, commit: undefined })),
+      stopCascade: vi.fn(),
+      submitWord: vi.fn((cells: Array<{ row: number; col: number }>) => {
+        for (const c of cells) tiles[c.row][c.col].isCleared = true;
+        return { score: 0, combos: [], clearedTiles: [], explosions: [], bonusMoves: 0 };
+      }),
+      getLatestState: () => ({ grid, tileStates: tiles }),
+      gameState: { wordsFound: [] },
+    };
+    const deps = {
+      engine: engine as never,
+      sequencer: { animateCascade: vi.fn().mockResolvedValue(undefined) } as never,
+      sounds: { playCascadeChain: vi.fn() },
+      comboStreak: { pauseTimer: vi.fn(), resumeTimer: vi.fn(), onWordSubmitted: vi.fn() } as never,
+      checkWord: vi.fn(() => true),
+      waveConfig: undefined,
+      setCascadeHighlightCells: vi.fn(),
+      setCascadeHighlightWord: vi.fn(),
+      setScoreFlyEvents: vi.fn(),
+      setComboFlash: vi.fn(),
+      flyIdRef: { current: 0 },
+      setClearedTilesForEffects: vi.fn(),
+    };
+
+    const { result } = renderHook(() => useBlastCascade(deps as never));
+    await result.current.runCascade(5);
+
+    expect(engine.submitWord).toHaveBeenCalledWith(clusterCells, '[A×3]', expect.any(Number), { cascadeCluster: true });
+  });
+
   it('chain score fly shows the ACTUAL credited bonus, not a token placeholder', async () => {
     const tiles = makeTiles();
     const grid = tiles.map(row => row.map(t => t.type === 'standard' ? 'A' : t.type));

@@ -34,7 +34,7 @@ interface CascadeDeps {
   engine: {
     startCascade: () => CascadeResult;
     stopCascade: () => void;
-    submitWord: (cells: Array<{ row: number; col: number }>, word: string, score: number) => WordSubmitResult;
+    submitWord: (cells: Array<{ row: number; col: number }>, word: string, score: number, opts?: { cascadeCluster?: boolean }) => WordSubmitResult;
     getLatestState: () => { grid: string[][] | null; tileStates: BlastTileState[][] };
     gameState: { wordsFound: string[] };
   };
@@ -101,7 +101,7 @@ export function useBlastCascade(deps: CascadeDeps) {
         const { grid, tileStates: latestTiles } = engine.getLatestState();
         if (!grid) break;
 
-        type CascadeFind = { cells: Array<{ row: number; col: number }>; label: string; bonusFn: (cl: number) => number };
+        type CascadeFind = { cells: Array<{ row: number; col: number }>; label: string; isCluster: boolean; bonusFn: (cl: number) => number };
         const cascadeFinds: CascadeFind[] = [];
 
         // 1. Match-3 clusters
@@ -110,6 +110,7 @@ export function useBlastCascade(deps: CascadeDeps) {
           cascadeFinds.push({
             cells: cluster.cells,
             label: `[${cluster.letter}×${cluster.cells.length}]`,
+            isCluster: true,
             bonusFn: (cl) => Math.round(cluster.cells.length * 3 * cascadeBonusMult * cl),
           });
         }
@@ -120,6 +121,7 @@ export function useBlastCascade(deps: CascadeDeps) {
           cascadeFinds.push({
             cells: vw.path,
             label: vw.word,
+            isCluster: false,
             bonusFn: (cl) => Math.round(vw.word.length * vw.word.length * cascadeBonusMult * cl),
           });
         }
@@ -130,6 +132,7 @@ export function useBlastCascade(deps: CascadeDeps) {
           cascadeFinds.push({
             cells: hw.path,
             label: hw.word,
+            isCluster: false,
             bonusFn: (cl) => Math.round(hw.word.length * hw.word.length * cascadeBonusMult * cl),
           });
         }
@@ -161,7 +164,8 @@ export function useBlastCascade(deps: CascadeDeps) {
         for (const find of cascadeFinds) {
           const bonus = find.bonusFn(chainLevel);
           creditedBonus += bonus;
-          engine.submitWord(find.cells, find.label, bonus);
+          if (find.isCluster) engine.submitWord(find.cells, find.label, bonus, { cascadeCluster: true });
+          else engine.submitWord(find.cells, find.label, bonus);
           foundWordsSet.add(find.label);
         }
         const cascadeCleared = diffClearedTiles(preCascade, engine.getLatestState().tileStates);

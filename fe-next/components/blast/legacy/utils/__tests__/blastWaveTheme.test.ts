@@ -136,12 +136,10 @@ describe('wave theme text', () => {
 });
 
 describe('wave 1 is winnable for a new player', () => {
-  it('passes the warm-up at 75% cleared, ordinary early waves at 85%, bosses and later waves at 90%', () => {
+  it('ramps the pass bar: 75% warm-up, 85% wave 2, 90% from wave 3 on (bosses included)', () => {
     expect(getWavePassPct(1)).toBe(75);
     expect(getWavePassPct(2)).toBe(85);
-    expect(getWavePassPct(4)).toBe(85);
-    expect(getWavePassPct(5)).toBe(90);
-    expect(getWavePassPct(7)).toBe(90);
+    for (const wave of [3, 4, 5, 6, 10, 15]) expect(getWavePassPct(wave)).toBe(90);
   });
 
   it('uses the wave pass bar as the clear-the-board objective', () => {

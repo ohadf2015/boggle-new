@@ -10,6 +10,7 @@ import { computeGravityResult, type GravityResult } from '../utils/blastGravity'
 import type { SpecialCombo } from '../utils/blastCombos';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { shuffleForPlayableWord } from '../utils/blastShuffle';
+import { recordFoundWord } from '../utils/blastFoundWords';
 import { buildDeadEndGrid } from '../utils/blastDeadEndGrid';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
 import { blastBoardsEqual } from '../utils/blastBoardEquality';
@@ -71,7 +72,8 @@ export interface UseBlastEngineReturn {
   grid: LetterGrid | null;
   tileStates: BlastTileState[][];
   gameState: BlastGameState;
-  submitWord: (path: Array<{ row: number; col: number }>, word: string, baseScore: number) => WordSubmitResult;
+  /** `cascadeCluster`: a match-3 cluster clears tiles and scores but is not a word. */
+  submitWord: (path: Array<{ row: number; col: number }>, word: string, baseScore: number, opts?: { cascadeCluster?: boolean }) => WordSubmitResult;
   shuffleGrid: () => void;
   endGame: () => void;
   unlockMoves: () => void;
@@ -313,7 +315,9 @@ export function useBlastEngine(
     path: Array<{ row: number; col: number }>,
     word: string,
     baseScore: number,
+    opts?: { cascadeCluster?: boolean },
   ): WordSubmitResult => {
+    const cascadeCluster = opts?.cascadeCluster ?? false;
     ddaStateRef.current = updateDDA(ddaStateRef.current, 'success');
     setDdaBoostActive(isDDABoostActive(ddaStateRef.current));
 
@@ -329,7 +333,7 @@ export function useBlastEngine(
     const result = processTilesForWord({ prev: currentTiles, path, word, baseScore, gridSize, currentWave, rng: submitRng });
     const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, detectedCombos, bonusMoveCount, diamondsCollected, diamondsSpawned } = result;
 
-    if (word.length > bestWordRef.current.length) bestWordRef.current = word;
+    bestWordRef.current = recordFoundWord({ wordsFound: [], bestWord: bestWordRef.current }, word, cascadeCluster).bestWord;
 
     setTileStates(next);
     tileStatesRef.current = next;
@@ -361,7 +365,7 @@ export function useBlastEngine(
       return {
         ...prev,
         score: prev.score + totalScore,
-        wordsFound: [...prev.wordsFound, word],
+        wordsFound: recordFoundWord({ wordsFound: prev.wordsFound, bestWord: '' }, word, cascadeCluster).wordsFound,
         tilesCleared: prev.tilesCleared + newlyClearedCount,
         movesRemaining: newMovesRemaining,
         movesUsed: prev.movesUsed + 1,
