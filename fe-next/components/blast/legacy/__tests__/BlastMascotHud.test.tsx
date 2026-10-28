@@ -87,9 +87,10 @@ describe('BlastMascotHud', () => {
 });
 
 describe('BLAST_MASCOT_SLOT_CLASS', () => {
-  it('drops below the HUD on phones so it never covers the coin wallet, top corner from sm up', () => {
+  it('drops below the goal banner on phones so it never covers the wallet or goal counters, top corner from sm up', () => {
     const cls = BLAST_MASCOT_SLOT_CLASS.split(' ');
-    expect(cls).toContain('top-[9.25rem]');
+    expect(cls).toContain('top-[12.875rem]');
+    expect(cls).toContain('max-sm:[@media(max-height:700px)]:top-[9.5rem]');
     expect(cls).toContain('sm:top-3');
     expect(cls).toContain('end-3');
     expect(cls).not.toContain('right-3');

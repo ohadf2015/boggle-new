@@ -11849,9 +11849,12 @@ const en = {
     "moveWarning": {
       "label": "LOW MOVES!"
     },
+    "boardBusy": "Hold on, tiles are still falling",
     "ready": {
       "title": "Blast Mode",
-      "subtitle": "Clear tiles by forming words. Chain combos for big scores.",
+      "subtitle": "Swipe words to blast the board. Bombs clear 3×3, coins pay ×3, rare words drop diamonds.",
+      "start": "Play",
+      "best": "Best: {score}",
       "play": "Start from beginning",
       "resume": "Resume wave {wave}",
       "step1Title": "Swipe Words",

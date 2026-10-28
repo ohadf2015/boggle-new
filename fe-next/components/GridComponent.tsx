@@ -65,6 +65,8 @@ interface GridComponentProps {
   showHandCoach?: boolean;
   /** Force a tile skin (e.g. an adventure world's skin) over the player's equipped one. */
   tileSkinOverride?: string;
+  /** Why a locked board ignores taps; defaults to the pregame "wait for GO". */
+  lockedHint?: string;
 }
 
 const HINT_BLINK_MS = 1500;
@@ -110,6 +112,7 @@ const GridComponent = memo<GridComponentProps>(({
   submitFeedback,
   showHandCoach = false,
   tileSkinOverride,
+  lockedHint,
 }) => {
   const { t } = useLanguage();
   const reduceMotion = usePrefersReducedMotion();
@@ -224,7 +227,7 @@ const GridComponent = memo<GridComponentProps>(({
           cellLabel={cellLabel}
           gridLabel={t('game.grid.label', 'Letter grid')}
           clickHint={t('game.doubleClickToSubmit', 'Double-click last letter to submit')}
-          lockedHint={t('game.boardLocked', "Wait for GO — this board isn't live yet")}
+          lockedHint={lockedHint ?? t('game.boardLocked', "Wait for GO — this board isn't live yet")}
           gridClassName={cn(ghostCells && GRID_GAP_CLASS, className)}
           gridRef={setGridNode}
         />

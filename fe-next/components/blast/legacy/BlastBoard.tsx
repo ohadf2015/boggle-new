@@ -191,6 +191,7 @@ export const BlastBoard = memo(function BlastBoard({
         language={language}
         ghostCells
         submitFeedback={submitFeedback}
+        lockedHint={t('blast.boardBusy')}
       />
 
       {/* Layer 2: Blast tile type overlay — indicators, special backgrounds, selection glow */}

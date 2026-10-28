@@ -13781,9 +13781,12 @@ const sv = {
     "moveWarning": {
       "label": "FÅ DRAG!"
     },
+    "boardBusy": "Vänta, brickorna faller fortfarande",
     "ready": {
       "title": "Blast-läge",
-      "subtitle": "Rensa brickor genom att bilda ord. Kedjekombos ger stora poäng.",
+      "subtitle": "Svep ord och spräng brädet. Bomber rensar 3×3, mynt ger ×3 och ovanliga ord ger diamanter.",
+      "start": "Spela",
+      "best": "Ditt rekord: {score}",
       "play": "Börja från början",
       "resume": "Fortsätt våg {wave}",
       "step1Title": "Svep ord",

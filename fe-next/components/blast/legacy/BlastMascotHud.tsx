@@ -28,8 +28,9 @@ interface BlastMascotHudProps {
   className?: string;
 }
 
-/** Positioned slot for the mascot: below the HUD on phones (the wallet lives in the top corner). */
-export const BLAST_MASCOT_SLOT_CLASS = 'absolute top-[9.25rem] sm:top-3 end-3 z-50';
+/** Phones: under the goal banner so its counters stay readable; short phones have no gap there, so it overlaps the banner rather than the board. */
+export const BLAST_MASCOT_SLOT_CLASS =
+  'absolute top-[12.875rem] max-sm:[@media(max-height:700px)]:top-[9.5rem] sm:top-3 end-3 z-50';
 
 export function BlastMascotHud({
   state,
@@ -57,7 +58,7 @@ export function BlastMascotHud({
       data-enabled={String(enabled)}
       {...interactiveProps}
       className={[
-        'pointer-events-auto relative w-20 h-20 rounded-full overflow-hidden',
+        'pointer-events-auto relative w-14 h-14 sm:w-20 sm:h-20 rounded-full overflow-hidden',
         'border-2 border-black bg-neo-cyan',
         'shadow-hard-lg',
         'motion-safe:transition-transform motion-safe:duration-200',

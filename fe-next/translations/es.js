@@ -13444,9 +13444,12 @@ const es = {
     "moveWarning": {
       "label": "¡POCOS MOVIMIENTOS!"
     },
+    "boardBusy": "Espera, las fichas siguen cayendo",
     "ready": {
       "title": "Modo Blast",
-      "subtitle": "Limpia fichas formando palabras. Encadena combos para sumar más puntos",
+      "subtitle": "Desliza palabras y revienta el tablero. Las bombas limpian 3×3, las monedas valen ×3 y las palabras raras sueltan diamantes.",
+      "start": "Jugar",
+      "best": "Tu récord: {score}",
       "play": "Empezar desde el principio",
       "resume": "Continuar ola {wave}",
       "step1Title": "Desliza palabras",

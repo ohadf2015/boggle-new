@@ -88,4 +88,27 @@ describe('ModeCoach', () => {
     });
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
+
+  it('floats at the top by default so existing modes keep their layout', () => {
+    render(<ModeCoach mode="classic" />);
+    act(() => {
+      vi.advanceTimersByTime(700);
+    });
+    const anchor = screen.getByRole('dialog').parentElement!;
+    expect(anchor.dataset.placement).toBe('top');
+    expect(anchor.className).toContain('top-0');
+  });
+
+  it('bottom placement anchors a compact card to the screen bottom, clear of the HUD', () => {
+    render(<ModeCoach mode="blast" placement="bottom" />);
+    act(() => {
+      vi.advanceTimersByTime(700);
+    });
+    const anchor = screen.getByRole('dialog').parentElement!;
+    expect(anchor.dataset.placement).toBe('bottom');
+    expect(anchor.className).toContain('bottom-0');
+    expect(anchor.className).not.toContain('top-0');
+    expect(screen.getByTestId('mode-coach-demo-row')).toBeInTheDocument();
+    expect(screen.getByText('modeCoach.blast.step1')).toBeInTheDocument();
+  });
 });

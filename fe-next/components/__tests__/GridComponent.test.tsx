@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import GridComponent from '../GridComponent';
 import { LanguageProvider } from '@/contexts/LanguageContext';
@@ -62,6 +62,15 @@ describe('GridComponent rendering', () => {
     expect(container.querySelectorAll('[data-tile]')).toHaveLength(9);
     expect(container.querySelector('[data-board]')?.hasAttribute('data-ghost')).toBe(true);
     expect(container.querySelector('[data-gk="0-0"]')?.textContent).toBe('');
+  });
+
+  it('given a lockedHint, when a locked board is tapped, then the caller reason replaces the pregame one', () => {
+    const { container } = render(
+      <GridComponent grid={GRID} interactive={false} lockedHint="Tiles still falling" />,
+      { wrapper: Wrapper },
+    );
+    fireEvent.pointerDown(container.querySelector('[role="grid"]') as HTMLElement, { button: 0, pointerId: 1, pointerType: 'touch' });
+    expect(container.querySelector('[data-testid="board-locked-banner"]')?.textContent).toBe('Tiles still falling');
   });
 
   it('given a tileSkinOverride, then the board carries that skin regardless of the equipped one', () => {

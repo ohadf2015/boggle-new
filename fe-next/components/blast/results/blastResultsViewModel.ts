@@ -101,6 +101,16 @@ function longestOf(words: readonly string[]): string | null {
   return words.reduce<string | null>((a, w) => (!a || w.length > a.length ? w : a), null);
 }
 
+// Cascades log their match-3 clears as bracketed labels ("[O×3]") in the word list.
+const isClusterLabel = (w: string) => w.startsWith('[');
+
+/** Longest real word of the whole run; the engine only tracks the current wave's. */
+export function runBestWord(words: readonly string[] = [], fallback = ''): string {
+  const longest = longestOf(words.filter((w) => !isClusterLabel(w)));
+  if (longest && longest.length >= fallback.length) return longest;
+  return isClusterLabel(fallback) ? '' : fallback;
+}
+
 export function toBlastResultsView(input: BlastResultsInput): BlastResultsView {
   const best = input.personalBest ?? 0;
   const isNewBest = best > 0 && input.score > best;
@@ -152,8 +162,8 @@ export function fromSpResults(r: BlastResultsData & BlastResultsExtras): BlastRe
     diamonds: r.diamondsCollected,
     bombsPopped: r.bombsPopped,
     maxCombo: r.maxCombo,
-    wordsFound: r.wordsFound,
-    bestWord: r.bestWord,
+    wordsFound: r.wordsFound?.filter((w) => !isClusterLabel(w)),
+    bestWord: r.bestWord && isClusterLabel(r.bestWord) ? runBestWord(r.wordsFound) : r.bestWord,
     wavesReached: r.wavesCompleted,
     personalBest: r.previousBest ?? null,
     rank: r.rank ?? null,

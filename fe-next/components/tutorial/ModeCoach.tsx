@@ -34,16 +34,23 @@ export interface ModeCoachProps {
   onShown?: () => void;
   /** Grace period before the "touch the board to dismiss" listener arms. */
   graceMs?: number;
+  /** `bottom` docks a compact card under the board for modes whose HUD fills the top. */
+  placement?: 'top' | 'bottom';
 }
 
+const ANCHOR = {
+  top: 'top-0 pt-[max(4.25rem,calc(env(safe-area-inset-top)+3.75rem))]',
+  bottom: 'bottom-0 pb-[max(0.75rem,calc(env(safe-area-inset-bottom)+0.5rem))]',
+} as const;
+
 /**
- * Gentle, non-blocking FTUE coach. Floats at the bottom of the screen over live
+ * Gentle, non-blocking FTUE coach. Floats at the top (or docked at the bottom) over live
  * gameplay — the wrapper is pointer-events-none so the board behind stays fully
  * playable, and the first touch on the board (after a short grace) dismisses it.
  * Shows once per mode per device. Visual-first: a looping gesture demo carries
  * the meaning, the caption is ≤6 words.
  */
-export function ModeCoach({ mode, onShown, graceMs = 1500 }: ModeCoachProps) {
+export function ModeCoach({ mode, onShown, graceMs = 1500, placement = 'top' }: ModeCoachProps) {
   const content = getModeCoach(mode);
   const { t, language } = useLanguage();
   const reduced = useReducedMotion() ?? false;
@@ -82,25 +89,38 @@ export function ModeCoach({ mode, onShown, graceMs = 1500 }: ModeCoachProps) {
   const step = content.steps[stepIndex];
   const accent = content.accent;
   const isRtl = language === 'he';
+  const compact = placement === 'bottom';
+  const enterY = compact ? 24 : -24;
+  const caption = (
+    <p
+      className={cn(
+        'font-neo-body font-semibold leading-snug text-neo-white',
+        compact ? 'text-start text-sm' : 'text-center text-base',
+      )}
+    >
+      {t(step?.captionKey ?? '')}
+    </p>
+  );
 
   return (
     <AnimatePresence>
       {visible && step && (
         <div
-          className="pointer-events-none fixed inset-x-0 top-0 z-[70] flex justify-center px-3 pt-[max(4.25rem,calc(env(safe-area-inset-top)+3.75rem))]"
+          data-placement={placement}
+          className={cn('pointer-events-none fixed inset-x-0 z-[70] flex justify-center px-3', ANCHOR[placement])}
           dir={isRtl ? 'rtl' : 'ltr'}
         >
           <m.div
             ref={cardRef}
             role="dialog"
             aria-label={t(content.titleKey)}
-            initial={reduced ? { opacity: 0 } : { opacity: 0, y: -24 }}
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: enterY }}
             animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -18 }}
+            exit={reduced ? { opacity: 0 } : { opacity: 0, y: enterY * 0.75 }}
             transition={reduced ? { duration: 0.15 } : { type: 'spring', stiffness: 380, damping: 30 }}
             className={cn(
-              'pointer-events-auto w-full max-w-xs rounded-neo border-neo-thick bg-neo-navy-light shadow-hard-lg',
-              'flex flex-col gap-3 p-4',
+              'pointer-events-auto w-full rounded-neo border-neo-thick bg-neo-navy-light shadow-hard-lg',
+              compact ? 'flex max-w-sm flex-col gap-2 p-3' : 'flex max-w-xs flex-col gap-3 p-4',
               ACCENT_BORDER[accent],
             )}
           >
@@ -118,11 +138,17 @@ export function ModeCoach({ mode, onShown, graceMs = 1500 }: ModeCoachProps) {
               </button>
             </div>
 
-            <CoachDemo demo={step.demo} accent={accent} emoji={step.emoji} />
-
-            <p className="text-center font-neo-body text-base font-semibold leading-snug text-neo-white">
-              {t(step.captionKey)}
-            </p>
+            {compact ? (
+              <div data-testid="mode-coach-demo-row" className="flex items-center gap-3">
+                <CoachDemo demo={step.demo} accent={accent} emoji={step.emoji} compact />
+                {caption}
+              </div>
+            ) : (
+              <>
+                <CoachDemo demo={step.demo} accent={accent} emoji={step.emoji} />
+                {caption}
+              </>
+            )}
 
             {isLastStep && content.scoreTipKey && (
               <p className={cn('rounded-neo border-2 border-black px-2 py-1 text-center font-neo-body text-xs font-bold', ACCENT_BTN[accent])}>

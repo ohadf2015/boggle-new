@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   fromMpResults,
   fromSpResults,
+  runBestWord,
   toBlastResultsView,
   type BlastResultsInput,
 } from '../blastResultsViewModel';
@@ -140,6 +141,23 @@ describe('fromSpResults', () => {
 
   it('flags a run under 90% clear as failed', () => {
     expect(fromSpResults(spResults({ clearPercentage: 89 })).failed).toBe(true);
+  });
+
+  it('Given cascade cluster labels in the word list, Then they are neither counted nor shown as the best word', () => {
+    const input = fromSpResults(spResults({ wordsFound: ['be', '[O×3]', 'kee', '[A×4]'], bestWord: '[O×3]' }));
+    expect(input.wordsFound).toEqual(['be', 'kee']);
+    expect(input.bestWord).toBe('kee');
+  });
+});
+
+describe('runBestWord', () => {
+  it('Given words from every wave, Then the longest real word wins over the last wave best and over cluster labels', () => {
+    expect(runBestWord(['dowel', 'at', '[O×3]', 'wemb'], 'wemb')).toBe('dowel');
+  });
+
+  it('Given no real words, Then it keeps the fallback unless that is a cluster label', () => {
+    expect(runBestWord(['[O×3]'], 'ox')).toBe('ox');
+    expect(runBestWord(['[O×3]'], '[O×3]')).toBe('');
   });
 });
 
