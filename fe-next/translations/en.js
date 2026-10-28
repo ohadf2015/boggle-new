@@ -11452,11 +11452,30 @@ const en = {
     }
   },
   "blast": {
+    "stamp": {
+      "coin": "COIN",
+      "gem": "GEM",
+      "lucky": "LUCKY",
+      "jackpot": "JACKPOT",
+      "gemBlast": "GEM BLAST!"
+    },
     "toCatchUp": "to catch up",
     "leadingBy": "leading by",
     "firstUse": { "gotIt": "Got it" },
     "level": "Level {n}",
     "results": {
+      "loot": "Loot",
+      "journey": {
+        "title": "Your run",
+        "stars": "{count} stars earned",
+        "here": "You",
+        "upNext": "Up next",
+        "wavesAway": "{count} waves away",
+        "passMark": "{pct}% to pass"
+      },
+      "runReached": "Made it to wave {wave}!",
+      "waveGoals": "Wave {wave} goals",
+      "failHintPct": "Clear at least {required}% of the board to advance",
       "boardDomination": "Board Domination",
       "matchRecap": "Blast Match Recap",
       "totalTilesDemolished": "Tiles Demolished",
@@ -11692,7 +11711,7 @@ const en = {
       },
       "diamond": {
         "name": "Diamond",
-        "desc": "Earned by rare words. Clear it for a big bonus."
+        "desc": "Rare words earn it. Use it in a word for ×2 and a row + column blast."
       },
       "bomb": {
         "name": "Bomb",
@@ -11852,7 +11871,7 @@ const en = {
     "boardBusy": "Hold on, tiles are still falling",
     "ready": {
       "title": "Blast Mode",
-      "subtitle": "Swipe words to blast the board. Bombs clear 3×3, coins pay ×3, rare words drop diamonds.",
+      "subtitle": "Swipe words to blast the board. Bombs clear 3×3, coins pay ×3, diamonds pay ×2.",
       "start": "Play",
       "best": "Best: {score}",
       "play": "Start from beginning",
@@ -12042,7 +12061,7 @@ const en = {
       },
       "diamond": {
         "name": "Diamond",
-        "desc": "Earned by rare words — big bonus when cleared"
+        "desc": "Rare words earn it. ×2 word plus a row + column blast"
       },
       "bomb": {
         "name": "Bomb",

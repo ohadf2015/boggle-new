@@ -170,6 +170,13 @@ export const BlastBoard = memo(function BlastBoard({
     return { ...tooltip, row: c.row, col: c.col };
   }, [heldKey, singleKey, selectedCells, tileStates, t]);
 
+  const sockets = useMemo(
+    () => Array.from({ length: gridSize * gridSize }, (_, i) => (
+      <div key={i} data-testid="blast-socket" className="blast-socket rounded-neo" />
+    )),
+    [gridSize],
+  );
+
   // Only render overlay once we have tile states
   const hasTileStates = tileStates.length > 0 && tileStates[0]?.length > 0;
 
@@ -180,6 +187,16 @@ export const BlastBoard = memo(function BlastBoard({
       {...(equippedTileSkin && { 'data-tile-skin': equippedTileSkin.replace('tile-', '') })}
       style={{ contain: 'layout paint' }}
     >
+      {/* Layer 0: one socket per cell, so a cleared cell reads as an empty well, not a void */}
+      <div
+        dir="ltr"
+        className={`absolute inset-0 pointer-events-none z-0 grid ${GRID_GAP_CLASS}`}
+        style={gridStyle}
+        aria-hidden="true"
+      >
+        {sockets}
+      </div>
+
       {/* Layer 1: GridComponent — word selection via touch/drag */}
       <GridComponent
         grid={grid}

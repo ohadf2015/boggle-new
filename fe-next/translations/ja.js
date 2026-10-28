@@ -13015,6 +13015,13 @@ const ja = {
     }
   },
   "blast": {
+    "stamp": {
+      "coin": "コイン",
+      "gem": "ダイヤ",
+      "lucky": "ラッキー",
+      "jackpot": "ジャックポット",
+      "gemBlast": "ダイヤ爆破！"
+    },
     "toCatchUp": "追いつくまで",
     "leadingBy": "リード",
     "firstUse": {
@@ -13022,6 +13029,18 @@ const ja = {
     },
     "level": "レベル{n}",
     "results": {
+      "loot": "戦利品",
+      "journey": {
+        "title": "今回のラン",
+        "stars": "スター{count}個を獲得",
+        "here": "ここ",
+        "upNext": "次は",
+        "wavesAway": "あと{count}ウェーブ",
+        "passMark": "{pct}%でクリア"
+      },
+      "runReached": "ウェーブ{wave}まで到達！",
+      "waveGoals": "ウェーブ{wave}の目標",
+      "failHintPct": "進むにはボードの{required}%以上をクリアしよう",
       "boardDomination": "ボード制覇",
       "matchRecap": "ブラストマッチ要約",
       "totalTilesDemolished": "破壊タイル",
@@ -13311,7 +13330,7 @@ const ja = {
       },
       "diamond": {
         "name": "ダイヤモンド",
-        "desc": "レアな単語で出現。消すと大ボーナス。"
+        "desc": "レアな単語で出現。単語に使うと得点2倍、縦と横の列をまとめて一掃。"
       },
       "bomb": {
         "name": "ボム",
@@ -13487,7 +13506,7 @@ const ja = {
     "boardBusy": "タイル落下中…ちょっと待ってね",
     "ready": {
       "title": "ブラストモード",
-      "subtitle": "単語をなぞってボードを爆破！爆弾は3×3を一掃、コインは得点3倍、レアな単語でダイヤが出る。",
+      "subtitle": "単語をなぞってボードを爆破！爆弾は3×3を一掃、コインは3倍、ダイヤは2倍。",
       "start": "プレイ",
       "best": "ベスト：{score}",
       "play": "最初から始める",
@@ -13661,7 +13680,7 @@ const ja = {
       },
       "diamond": {
         "name": "ダイヤモンド",
-        "desc": "レアな単語で出現・消すと大ボーナス"
+        "desc": "レアな単語で出現・2倍＋縦横一掃"
       },
       "bomb": {
         "name": "ボム",

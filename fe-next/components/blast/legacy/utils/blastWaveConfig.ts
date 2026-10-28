@@ -104,73 +104,14 @@ const MAX_SCORE_PER_MOVE = 120;
 
 import type { BlastObjective, WaveResult } from '../types';
 import { calculateEarnedStars } from './blastStarCalculator';
-import { getTargetWordPool, pickRandomTargetWord } from './blastTargetWordPool';
-import { getWaveTheme, getWavePassPct, type BlastWaveThemeId } from './blastWaveTheme';
+import { getWaveTheme, getWavePassPct } from './blastWaveTheme';
 
 export { getWaveTheme, getWavePassPct, BLAST_WAVE_THEME_IDS } from './blastWaveTheme';
 export type { BlastWaveTheme, BlastWaveThemeId, BlastWaveThemeParams, BlastWaveAccentToken } from './blastWaveTheme';
 
-/**
- * Objectives per wave — designed with progressive disclosure:
- * Each wave teaches ONE new concept, building on what the player already knows.
- * Wave 1: core mechanic (find words). Wave 2: longer = better.
- * Wave 3: special tiles matter. Wave 4+: compound goals.
- */
-
-/**
- * Max objectives shown per wave (incl. the clear_percent primary). The banner
- * filters out clear_percent, so this caps VISIBLE goal rows at MAX-1 (=3) — the
- * comfortable ceiling on a phone before the list scrolls off and players lose
- * track. Base objectives always come first and bonuses are appended, so capping
- * from the front preserves every base goal and trims only bonus goals.
- */
-export const MAX_WAVE_OBJECTIVES = 4;
-
-/**
- * Clamp a wave's objective list to `max` by trimming from the END. Base
- * objectives are built first and bonus objectives (target_word / color_power /
- * cc-mechanic) are appended, so slicing the front keeps the required goals and
- * drops surplus bonuses.
- */
-export function capWaveObjectives(
-  objectives: BlastObjective[],
-  max: number = MAX_WAVE_OBJECTIVES,
-): BlastObjective[] {
-  return objectives.length <= max ? objectives : objectives.slice(0, max);
-}
-
-function themeGoal(id: BlastWaveThemeId, wave: number, tier: number): BlastObjective {
-  switch (id) {
-    case 'warmUp':
-      return { type: 'word_length', target: 4, minWordLength: 3 };
-    case 'bombSquad':
-      return { type: 'collect_type', tileType: 'bomb', target: 2 + tier };
-    case 'coinRush':
-      return { type: 'collect_type', tileType: 'gold', target: 3 + tier };
-    case 'diamondHunt':
-      return { type: 'collect_type', tileType: 'diamond', target: 1 + tier };
-    case 'boss':
-      return { type: 'score_target', target: 150 + wave * 40 };
-    case 'cascadeCarnival':
-      return { type: 'word_length', target: 2 + tier, minWordLength: 5 };
-  }
-}
-
-/**
- * Objectives for a wave: clear the board, the wave theme's own goal, and (after
- * the warm-up, outside boss waves whose goal already is a score) a score target.
- */
-export function getWaveObjectives(wave: number, language?: string): BlastObjective[] {
-  const clamped = Math.max(wave, 1);
-  const theme = getWaveTheme(clamped);
-  const base: BlastObjective[] = [
-    { type: 'clear_percent', target: getWavePassPct(clamped) },
-    themeGoal(theme.id, clamped, theme.tier),
-  ];
-  if (clamped > 1 && theme.id !== 'boss') base.push({ type: 'score_target', target: 40 + clamped * 30 });
-
-  const withTargetWord = seedTargetWordObjective(clamped, language ?? 'en', base);
-  return capWaveObjectives(seedColorPowerObjective(clamped, withTargetWord));
+/** One goal per wave, always the same shape: clear the board to the wave's pass bar. */
+export function getWaveObjectives(wave: number): BlastObjective[] {
+  return [{ type: 'clear_percent', target: getWavePassPct(Math.max(wave, 1)) }];
 }
 
 export interface BlastWaveClearReward {
@@ -195,81 +136,6 @@ export function buildWaveResult(waveNumber: number, score: number, wordsFound: n
 
 export function totalWaveRewardCoins(waves: readonly WaveResult[]): number {
   return waves.reduce((sum, w) => sum + (w.reward ? w.reward.coins + w.reward.chestBonus : 0), 0);
-}
-
-/**
- * Optionally seed a target_word objective into wave objectives.
- * Adds target_word goal for waves 3+ at 25% probability per wave.
- * Defers to server/RNG for actual board validation.
- *
- * @param wave wave number
- * @param language game language (en/he/sv/ja/es)
- * @param objectives current wave objectives to augment
- * @returns objectives with optional target_word added
- */
-export function seedTargetWordObjective(
-  wave: number,
-  language: string,
-  objectives: BlastObjective[],
-): BlastObjective[] {
-  // Only add to wave 3+ at 25% rate
-  if (wave < 3) return objectives;
-
-  // Deterministic RNG: use wave as seed for pseudo-random chance
-  const shouldAdd = ((wave * 37) % 100) < 25;
-  if (!shouldAdd) return objectives;
-
-  const pool = getTargetWordPool(language as import('@/shared/types/game').Language);
-  if (pool.length === 0) return objectives; // No words available for language
-
-  const targetWord = pickRandomTargetWord(pool);
-  if (!targetWord) return objectives;
-
-  // Add target_word objective (bonus, not required for advance)
-  return [
-    ...objectives,
-    { type: 'target_word' as const, target: 1, targetWord },
-  ];
-}
-
-/**
- * Optionally seed a color_power objective into wave objectives.
- * Adds color_power goal for waves 4+ at 25% probability per wave.
- * Rotates color: wave 4=pink, 5=cyan, 8=lime, then repeats.
- *
- * @param wave wave number
- * @param objectives current wave objectives to augment
- * @returns objectives with optional color_power added
- */
-export function seedColorPowerObjective(
-  wave: number,
-  objectives: BlastObjective[],
-): BlastObjective[] {
-  // Only add to wave 4+ at 25% rate
-  if (wave < 4) return objectives;
-
-  // Deterministic RNG: use wave as seed for pseudo-random chance
-  const shouldAdd = ((wave * 47) % 100) < 25;
-  if (!shouldAdd) return objectives;
-
-  // Rotate color: pink (4) → cyan (5) → lime (8) → pink (11) ...
-  const colorRotation: Array<'pink' | 'cyan' | 'lime'> = ['pink', 'cyan', 'lime'];
-  const colorIndex = (wave - 4) % 3;
-  const color = colorRotation[colorIndex];
-
-  // Ramp minColorCount: early waves 3, later waves 4+
-  const minColorCount = wave >= 8 ? 4 : 3;
-
-  // Add color_power objective (bonus, not required for advance)
-  return [
-    ...objectives,
-    {
-      type: 'color_power' as const,
-      target: 1,
-      colorTag: color,
-      minColorCount,
-    },
-  ];
 }
 
 /** Random-spawn split for a wave. Diamonds stay at 0: they are earned by rare words, never rolled. */

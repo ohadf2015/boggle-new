@@ -6,7 +6,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BlastTile } from '../BlastTile';
 import type { BlastTileType } from '@/shared/types/blast';
-import { DIAMOND_CLEAR_BONUS } from '../types';
+import { DIAMOND_WORD_MULTIPLIER } from '../types';
 
 // Mock reduced motion to always return false for consistent tests
 vi.mock('@/hooks/usePrefersReducedMotion', () => ({
@@ -38,15 +38,33 @@ describe('BlastTile', () => {
     });
   });
 
+  describe('special face art', () => {
+    it.each([
+      ['bomb', 'blast-tile-watermark'],
+      ['gold', 'blast-tile-shine'],
+      ['diamond', 'blast-tile-facets'],
+    ] as const)('given a %s tile, then it carries its own face art (%s), not only a colour', (type, testId) => {
+      render(<BlastTile {...baseProps} type={type} />);
+      expect(screen.getByTestId(testId)).toBeInTheDocument();
+    });
+
+    it('given a standard tile, then no special face art renders', () => {
+      render(<BlastTile {...baseProps} type="standard" />);
+      expect(screen.queryByTestId('blast-tile-watermark')).toBeNull();
+      expect(screen.queryByTestId('blast-tile-shine')).toBeNull();
+      expect(screen.queryByTestId('blast-tile-facets')).toBeNull();
+    });
+  });
+
   describe('multiplier badges', () => {
     it('renders ×3 badge for gold tiles', () => {
       render(<BlastTile {...baseProps} type="gold" />);
       expect(screen.getByText('×3')).toBeInTheDocument();
     });
 
-    it('renders the flat bonus badge for diamond tiles', () => {
+    it('renders the word multiplier badge for diamond tiles', () => {
       render(<BlastTile {...baseProps} type="diamond" />);
-      expect(screen.getByText(`+${DIAMOND_CLEAR_BONUS}`)).toBeInTheDocument();
+      expect(screen.getByText(`×${DIAMOND_WORD_MULTIPLIER}`)).toBeInTheDocument();
     });
 
     it('does NOT render multiplier badge for standard tiles', () => {

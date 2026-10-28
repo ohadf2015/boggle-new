@@ -167,8 +167,8 @@ export function BlastGame({
 
   // Wave objectives (SP only)
   const waveObjectives = useMemo(
-    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber, config.language)),
-    [waveNumber, isMultiplayer, config.language],
+    () => (isMultiplayer ? [] : getWaveObjectives(waveNumber)),
+    [waveNumber, isMultiplayer],
   );
 
   // Core engine

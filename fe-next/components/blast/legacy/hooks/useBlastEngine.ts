@@ -58,6 +58,8 @@ export interface WordSubmitResult {
   bonusMoves: number;
   diamondsCollected: number;
   diamondsSpawned: Array<{ row: number; col: number }>;
+  /** Tiles a played diamond's cross blast cleared */
+  gemCrossCount: number;
 }
 
 export interface CascadeResult {
@@ -331,7 +333,7 @@ export function useBlastEngine(
       submitRng = createSeededRandom(blastSeedRef.current + validMovesRef.current);
     }
     const result = processTilesForWord({ prev: currentTiles, path, word, baseScore, gridSize, currentWave, rng: submitRng });
-    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, detectedCombos, bonusMoveCount, diamondsCollected, diamondsSpawned } = result;
+    const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, detectedCombos, bonusMoveCount, diamondsCollected, diamondsSpawned, gemCrossCount } = result;
 
     bestWordRef.current = recordFoundWord({ wordsFound: [], bestWord: bestWordRef.current }, word, cascadeCluster).bestWord;
 
@@ -388,6 +390,7 @@ export function useBlastEngine(
       bonusMoves: bonusMoveCount,
       diamondsCollected,
       diamondsSpawned,
+      gemCrossCount,
     };
   }, [gridSize, currentWave, options?.isMultiplayer]);
 

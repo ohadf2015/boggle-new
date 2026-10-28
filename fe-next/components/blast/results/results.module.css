@@ -1,0 +1,40 @@
+@keyframes stamp {
+  0% { transform: scale(2.2) rotate(-18deg); opacity: 0; }
+  60% { transform: scale(0.92) rotate(-6deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-6deg); opacity: 1; }
+}
+
+@keyframes reachedPulse {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+.stamp {
+  transform: rotate(-6deg);
+  animation: stamp 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) 0.9s both;
+}
+
+.reachedRing {
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 3px solid var(--neo-pink);
+  pointer-events: none;
+  animation: reachedPulse 1.1s ease-out 1.2s 3 both;
+}
+
+.milestoneDash {
+  background-image: repeating-linear-gradient(90deg, rgb(var(--neo-white)) 0 6px, transparent 6px 11px);
+  opacity: 0.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stamp,
+  .reachedRing {
+    animation: none;
+  }
+
+  .reachedRing {
+    opacity: 0;
+  }
+}

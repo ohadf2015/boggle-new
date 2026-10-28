@@ -28,9 +28,9 @@ interface BlastMascotHudProps {
   className?: string;
 }
 
-/** Phones: under the goal banner so its counters stay readable; short phones have no gap there, so it overlaps the banner rather than the board. */
+/** Phones: the HUD hero row reserves a slot beside the combo ring (BlastHUD); from sm up the top corner is free. */
 export const BLAST_MASCOT_SLOT_CLASS =
-  'absolute top-[12.875rem] max-sm:[@media(max-height:700px)]:top-[9.5rem] sm:top-3 end-3 z-50';
+  'absolute top-[calc(env(safe-area-inset-top,0px)+2.375rem)] end-[4.25rem] sm:top-3 sm:end-3 z-50';
 
 export function BlastMascotHud({
   state,

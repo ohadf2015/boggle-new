@@ -1,12 +1,13 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ArrowDown, ArrowUp, Star, TrendingUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, Crosshair, Star, Swords, TrendingUp, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { BLAST_RESULT_ASSETS, TIER_THEME } from './blastResultsTheme';
 import type { BlastResultsView } from './blastResultsViewModel';
 import type { BlastTranslate } from './types';
+import styles from './results.module.css';
 
 interface BlastResultsHeroProps {
   view: BlastResultsView;
@@ -98,10 +99,13 @@ export function BlastResultsHero({ view, t, locale, headline, subline, footer, s
         )}
 
         {view.isNewBest && (
+          // A CSS stamp, not a timeline step: the saved best can land after the reveal has played.
           <div
-            data-reveal="banner"
             data-testid="blast-results-new-best"
-            className="absolute -top-4 start-3 -rotate-6 rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-wider text-neo-black shadow-hard"
+            className={cn(
+              'absolute -top-4 start-3 rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-wider text-neo-black shadow-hard',
+              styles.stamp,
+            )}
           >
             {t('blast.results.newRecord')}
           </div>
@@ -129,8 +133,49 @@ export function BlastResultsHero({ view, t, locale, headline, subline, footer, s
           {view.rank && <RankChip rank={view.rank} t={t} />}
         </div>
 
+        <GoalLine view={view} t={t} locale={locale} />
+
         {footer}
       </div>
+    </div>
+  );
+}
+
+function GoalLine({ view, t, locale }: { view: BlastResultsView; t: BlastTranslate; locale: string }) {
+  const goal = view.nextGoal;
+  if (!goal) return null;
+  const gap = safeToLocaleString(goal.gap, locale);
+  const text =
+    goal.kind === 'rival'
+      ? t('blast.results.reveal.goalRival', { gap, name: goal.name })
+      : goal.kind === 'lead'
+        ? t('blast.results.reveal.goalLead', { gap, name: goal.name })
+        : t('blast.results.reveal.goalBest', { gap });
+  const Icon = goal.kind === 'lead' ? Trophy : goal.kind === 'rival' ? Swords : Crosshair;
+  const progress = goal.kind === 'lead' ? 100 : Math.max(4, Math.round((view.score / (view.score + goal.gap)) * 100));
+
+  return (
+    <div data-testid="blast-results-next-goal" data-kind={goal.kind} className="mx-auto mt-3 w-full max-w-xs">
+      <div className="flex items-center justify-center gap-1.5 text-neo-white">
+        <Icon className="h-4 w-4 shrink-0 text-neo-yellow" strokeWidth={2.75} aria-hidden="true" />
+        <p className="text-sm font-black" dir="auto">{text}</p>
+        {view.nearMiss && (
+          <span
+            data-testid="blast-results-near-miss"
+            className="shrink-0 -rotate-3 rounded-neo border-2 border-neo-black bg-neo-pink px-1.5 py-0.5 font-neo-display text-[10px] font-black uppercase text-neo-white"
+          >
+            {t('blast.results.reveal.nearMiss')}
+          </span>
+        )}
+      </div>
+      {goal.kind !== 'lead' && (
+        <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full border-2 border-neo-black bg-neo-navy">
+          <div
+            className={cn('h-full origin-left rtl:origin-right', view.nearMiss ? 'bg-neo-pink' : 'bg-neo-yellow')}
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      )}
     </div>
   );
 }

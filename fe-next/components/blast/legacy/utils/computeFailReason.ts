@@ -6,12 +6,10 @@
  * card instead of the older generic "Game Over" message.
  */
 
-const DEFAULT_ADVANCE_PCT = 90;
-
 export interface ComputeFailReasonInput {
   tilesCleared: number;
   totalTiles: number;
-  passPct?: number;
+  passPct: number;
 }
 
 export type FailReasonKind = 'tiles_short' | 'met';
@@ -25,7 +23,7 @@ export interface FailReason {
 export function computeFailReason({
   tilesCleared,
   totalTiles,
-  passPct = DEFAULT_ADVANCE_PCT,
+  passPct,
 }: ComputeFailReasonInput): FailReason {
   if (totalTiles <= 0) return { kind: 'met', tilesShort: 0 };
 

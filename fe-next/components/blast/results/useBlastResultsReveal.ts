@@ -1,6 +1,6 @@
 'use client';
 
-import { type RefObject } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { fireConfetti, VICTORY_COLORS } from '@/utils/confettiUtils';
@@ -23,6 +23,11 @@ const prefersReducedMotion = () =>
  * reduced motion, SSR and tests all see the finished screen.
  */
 export function useBlastResultsReveal(scope: RefObject<HTMLElement | null>, opts: RevealOptions) {
+  // Read at call time so a late personal best does not replay the whole reveal.
+  const confettiRef = useRef(opts.confetti);
+  useEffect(() => {
+    confettiRef.current = opts.confetti;
+  }, [opts.confetti]);
   useGSAP(
     () => {
       if (prefersReducedMotion()) return;
@@ -58,6 +63,29 @@ export function useBlastResultsReveal(scope: RefObject<HTMLElement | null>, opts
         }, 0.2);
       }
 
+      if (has('[data-reveal="node"]')) {
+        tl.from(q('[data-reveal="node"]'), { y: 18, scale: 0.4, duration: 0.32, stagger: 0.09 }, 0.35);
+      }
+      if (has('[data-reveal="meter"]')) {
+        tl.from(q('[data-reveal="meter"]'), { scaleX: 0, duration: 0.6, ease: 'power2.out' }, '<0.2');
+      }
+      if (has('[data-reveal="loot"]')) {
+        tl.from(q('[data-reveal="loot"]'), { y: 20, scale: 0.6, duration: 0.35, stagger: 0.08 }, '>-0.2');
+      }
+      q('[data-countup]').forEach((el: HTMLElement) => {
+        const target = Number(el.dataset.countup);
+        if (!(target > 0)) return;
+        const fmt = new Intl.NumberFormat(opts.locale);
+        const c = { v: 0 };
+        el.textContent = fmt.format(0);
+        tl.to(c, { v: target, duration: 0.7, ease: 'power2.out', onUpdate: () => { el.textContent = fmt.format(Math.round(c.v)); } }, '<0.1');
+      });
+      if (has('[data-reveal="tile"]')) {
+        tl.from(q('[data-reveal="tile"]'), { y: -30, rotation: () => gsap.utils.random(-15, 15), duration: 0.3, stagger: 0.05 }, '>-0.2');
+      }
+      if (has('[data-reveal="badge-new"]')) {
+        tl.from(q('[data-reveal="badge-new"]'), { scale: 0, rotation: -20, duration: 0.4, ease: 'back.out(3)', stagger: 0.12 }, '>-0.1');
+      }
       if (has('[data-reveal="chip"]')) {
         tl.from(q('[data-reveal="chip"]'), { y: -36, scale: 0, rotation: () => gsap.utils.random(-12, 12), duration: 0.45, stagger: 0.07 }, '>-0.15');
       }
@@ -85,8 +113,9 @@ export function useBlastResultsReveal(scope: RefObject<HTMLElement | null>, opts
       if (has('[data-reveal="banner"]')) {
         tl.from(q('[data-reveal="banner"]'), { scale: 0, rotation: -25, duration: 0.45, ease: 'back.out(3)' }, '>-0.05');
       }
-      if (opts.confetti && !prefersStaticFullscreenOverlay()) {
+      if (!prefersStaticFullscreenOverlay()) {
         tl.call(() => {
+          if (!confettiRef.current) return;
           fireConfetti({ particleCount: 90, spread: 80, startVelocity: 42, origin: { y: 0.3 }, colors: VICTORY_COLORS });
         });
       }
@@ -97,6 +126,6 @@ export function useBlastResultsReveal(scope: RefObject<HTMLElement | null>, opts
         tl.fromTo(q('[data-reveal="cta"]'), { scale: 1 }, { scale: 1.05, duration: 0.18, yoyo: true, repeat: 1, ease: 'power1.inOut' });
       }
     },
-    { scope, dependencies: [opts.score, opts.confetti] },
+    { scope, dependencies: [opts.score] },
   );
 }

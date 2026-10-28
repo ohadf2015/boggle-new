@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { processTilesForWord } from '../clearTilesProcessor';
 import { createSeededRandom } from '../blastLetterGenerator';
-import { type BlastTileState, DIAMOND_CLEAR_BONUS } from '../../types';
+import { type BlastTileState, DIAMOND_CLEAR_BONUS, DIAMOND_WORD_MULTIPLIER, DIAMOND_CROSS_POINTS } from '../../types';
 
 function makeGrid(size: number): BlastTileState[][] {
   return Array.from({ length: size }, (_, r) =>
@@ -71,13 +71,36 @@ describe('processTilesForWord — earned diamonds', () => {
     expect(result.diamondsSpawned).toEqual([]);
   });
 
-  it('awards DIAMOND_CLEAR_BONUS and counts the diamond when one is cleared', () => {
-    const plain = run('cat');
+  it('a diamond in the word doubles it, pays its bonus and blasts its row and column', () => {
     const prev = makeGrid(6);
     prev[0][1].type = 'diamond';
     const result = run('cat', prev);
     expect(result.diamondsCollected).toBe(1);
-    expect(result.totalScore).toBe(plain.totalScore + DIAMOND_CLEAR_BONUS);
+    const crossCells = 5 + 3; // column 1 below the diamond + the rest of row 0 off the path
+    expect(result.gemCrossCount).toBe(crossCells);
+    expect(result.newlyClearedCount).toBe(3 + crossCells);
+    expect(result.totalScore).toBe(10 * DIAMOND_WORD_MULTIPLIER + DIAMOND_CLEAR_BONUS + crossCells * DIAMOND_CROSS_POINTS);
+    for (let r = 0; r < 6; r++) expect(result.next[r][1].isCleared).toBe(true);
+    for (let c = 0; c < 6; c++) expect(result.next[0][c].isCleared).toBe(true);
+  });
+
+  it('a bomb caught in a diamond cross still detonates', () => {
+    const prev = makeGrid(6);
+    prev[0][1].type = 'diamond';
+    prev[4][1].type = 'bomb';
+    const result = run('cat', prev);
+    expect(result.next[5][2].isCleared).toBe(true);
+    expect(result.next[3][0].isCleared).toBe(true);
+  });
+
+  it('a diamond swept up by a bomb pays its bonus but does not cross-blast', () => {
+    const prev = makeGrid(6);
+    prev[0][0].type = 'bomb';
+    prev[1][1].type = 'diamond';
+    const result = run('cat', prev);
+    expect(result.diamondsCollected).toBe(1);
+    expect(result.gemCrossCount).toBe(0);
+    expect(result.next[5][1].isCleared).toBe(false);
   });
 
   it('counts zero diamonds collected when none is on the path', () => {

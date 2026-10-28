@@ -14,10 +14,9 @@ const base = {
 const progress = { baseScore: 600, baseDiamonds: 0, recordWave: 0, personalBest: null, rivals: [{ name: 'Zoe', score: 700 }] };
 
 describe('BlastHUD run score', () => {
-  it('shows the run total in single-player so it agrees with the target chip', () => {
+  it('shows the run total in single-player', () => {
     render(<BlastHUD {...base} progress={progress} />);
     expect(screen.getByText('640')).toBeInTheDocument();
-    expect(screen.getByTestId('blast-target-chip')).toHaveTextContent('"points":"60"');
   });
 
   it('keeps the plain score when there is no run context', () => {

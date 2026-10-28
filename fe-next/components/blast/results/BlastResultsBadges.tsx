@@ -24,9 +24,9 @@ export function BlastResultsBadges({ badges, t }: { badges: BlastResultBadge[]; 
   if (badges.length === 0) return null;
   return (
     <section className="w-full" data-testid="blast-results-badges">
-      <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-widest text-neo-white">
+      <h3 className="mb-2 px-1 font-neo-display text-xs font-black uppercase tracking-[0.18em] text-neo-white tv:text-lg">
         {t('blast.results.badgesEarned')}
-      </p>
+      </h3>
       <div className="flex flex-wrap gap-2">
         {badges.map((badge) => {
           const Icon = BADGE_ICONS[badge.icon] ?? Sparkles;
@@ -45,16 +45,24 @@ export function BlastResultsBadges({ badges, t }: { badges: BlastResultBadge[]; 
             >
               <button
                 type="button"
-                data-reveal="chip"
+                data-reveal={badge.isNew ? 'badge-new' : 'chip'}
                 data-testid={`blast-badge-${badge.id}`}
                 aria-label={`${badge.label}: ${badge.desc}`}
                 className={cn(
-                  'relative flex cursor-help items-center gap-1.5 rounded-neo border-3 border-neo-black px-3 py-2 shadow-hard',
+                  'relative flex cursor-help items-center gap-2 rounded-neo border-3 border-neo-black py-1.5 pe-3 ps-1.5 shadow-hard',
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink',
                   badge.isNew ? 'bg-neo-lime' : 'bg-neo-navy text-neo-white',
                 )}
               >
-                <Icon className={cn('h-4 w-4 shrink-0', badge.isNew ? 'text-neo-black' : 'text-neo-lime')} strokeWidth={2.75} />
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-neo-black shadow-hard-sm',
+                    badge.isNew ? 'bg-neo-yellow text-neo-black' : 'bg-neo-navy-light text-neo-lime',
+                  )}
+                >
+                  <Icon className="h-4 w-4" strokeWidth={2.75} />
+                </span>
                 <span
                   className={cn(
                     'font-neo-display text-[11px] font-black uppercase tracking-wide',

@@ -8,6 +8,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { MASCOT_IMAGES } from '@/components/blast/legacy/utils/blastMascot';
 import { THEME_ICON, THEME_MASCOT, accentColor, getWaveTheme } from './waveTheme';
 import { introDurationMs } from './progressTiming';
+import { getWavePassPct } from '@/components/blast/legacy/utils/blastWaveTheme';
 
 gsap.registerPlugin(useGSAP);
 
@@ -103,7 +104,7 @@ export function BlastLevelIntro({ wave, durationMs, onDone }: BlastLevelIntroPro
           {t(theme.nameKey)}
         </h2>
         <p data-intro="goal" className="font-neo-display text-lg font-black uppercase text-neo-white tv:text-2xl">
-          {t(theme.goalKey)}
+          {t('blast.objective.clearPercent', { target: getWavePassPct(wave) })}
         </p>
         <p data-intro="goal" className="max-w-[18rem] font-neo-body text-sm text-neo-white/80 tv:text-lg">
           {t(theme.flavorKey)}

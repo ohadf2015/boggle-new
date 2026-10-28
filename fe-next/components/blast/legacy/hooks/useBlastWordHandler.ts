@@ -20,6 +20,7 @@ import { blastLetterBonus } from '@/lib/blast/blastLetterBonus';
 import { rollTreasure, type TreasureTier } from '@/lib/blast/blastTreasureRoll';
 import type { BlastTileType, BlastGameConfig } from '../types';
 import type { ScoreFlyEvent } from '../BlastScoreFly';
+import { buildScoreStamps } from '../utils/blastScoreStamps';
 import type { ClearedTileEvent } from '../BlastEffectsCanvas';
 import type { HighlightRecorder } from '@/lib/blast/highlightRecorder';
 import type { useBlastEngine } from './useBlastEngine';
@@ -229,7 +230,15 @@ export function useBlastWordHandler({
       ...(treasureBonus > 0 && treasureTier !== 'common'
         ? { bonus: treasureBonus, luckyTier: treasureTier }
         : {}),
+      stamps: buildScoreStamps(clearedInfo.map(c => c.type as BlastTileType), treasureTier, t),
     }]);
+
+    if ((result.gemCrossCount ?? 0) > 0) {
+      vibrateBlastPrism();
+      effects.setComboFlash({ id: `gem-${flyIdRef.current}`, tier: 2 });
+      effects.setComboTypeName(t('blast.stamp.gemBlast'));
+      sounds.playComboActivation(2);
+    }
 
     // Currency earn (SP only, wired via callback)
     try {

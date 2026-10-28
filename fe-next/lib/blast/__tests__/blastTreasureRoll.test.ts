@@ -30,10 +30,10 @@ describe('rollTreasure — floor rule (upside only)', () => {
 });
 
 describe('rollTreasure — capped', () => {
-  it('bonus never exceeds base * maxBonusRatio (default 1.0)', () => {
+  it('bonus never exceeds base * maxBonusRatio (default 2.0)', () => {
     for (let s = 0; s < 500; s++) {
       const r = rollTreasure({ seed: s, base: 50, comboLevel: 9, cascadeDepth: 9, hasSpecial: true });
-      expect(r.bonus).toBeLessThanOrEqual(50);
+      expect(r.bonus).toBeLessThanOrEqual(100);
     }
   });
 
@@ -93,5 +93,30 @@ describe('rollTreasure — skill bias', () => {
     const baseline = count({ seed: 0, base: 40 });
     const boosted = count({ seed: 0, base: 40, comboLevel: 5, cascadeDepth: 4, hasSpecial: true });
     expect(boosted).toBeGreaterThan(baseline);
+  });
+});
+
+describe('rollTreasure — rare, readable multipliers', () => {
+  it('lucky doubles the word and jackpot triples it', () => {
+    for (let s = 0; s < 1000; s++) {
+      const r = rollTreasure({ seed: s, base: 40 });
+      if (r.tier === 'lucky') expect(r.multiplier).toBe(2);
+      if (r.tier === 'jackpot') expect(r.multiplier).toBe(3);
+    }
+  });
+
+  it('most plain words roll nothing, so a hit stands out', () => {
+    let hits = 0;
+    const n = 4000;
+    for (let s = 0; s < n; s++) if (rollTreasure({ seed: s, base: 40 }).tier !== 'common') hits++;
+    expect(hits / n).toBeGreaterThan(0.06);
+    expect(hits / n).toBeLessThan(0.16);
+  });
+
+  it('average payout stays near the old curve so leaderboard points do not inflate', () => {
+    let bonus = 0;
+    const n = 4000;
+    for (let s = 0; s < n; s++) bonus += rollTreasure({ seed: s, base: 100 }).bonus;
+    expect(bonus / n / 100).toBeLessThan(0.16);
   });
 });
