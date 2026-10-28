@@ -82,7 +82,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, language, dir, bus
                 <span
                   key={k}
                   data-testid="best-for-chip"
-                  className="rounded-full border-[2px] border-neo-black bg-neo-cream px-2 py-0.5 font-neo-display text-xs font-black text-neo-black lg:px-3 lg:py-1 lg:text-base"
+                  className="rounded-full border-[2px] border-neo-cream/45 px-2 py-0.5 font-neo-display text-xs font-bold text-neo-cream lg:px-3 lg:py-0.5 lg:text-base"
                 >
                   {t(k)}
                 </span>
